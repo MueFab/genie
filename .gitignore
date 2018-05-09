@@ -1,6 +1,6 @@
 # Directory attributes files
-.directory # Dolphin
-.DS_Store # Finder
+.directory
+.DS_Store
 
 # Regeneratables
 descriptor-stream-generator/build/
