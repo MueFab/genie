@@ -15,7 +15,6 @@
 #include "common/os.h"
 
 
-namespace genie {
 namespace dsg {
 
 
@@ -29,6 +28,7 @@ File::File(void)
       {
     // empty on purpose
 }
+
 
 File::File(const std::string &path,
            const Mode mode)
@@ -46,10 +46,12 @@ File::File(const std::string &path,
     open(path, mode);
 }
 
+
 File::~File(void)
 {
     close();
 }
+
 
 void File::open(const std::string& path,
                 const Mode mode)
@@ -93,6 +95,7 @@ void File::open(const std::string& path,
     isOpen_ = true;
 }
 
+
 void File::close(void)
 {
     if (isOpen_ == true) {
@@ -105,6 +108,7 @@ void File::close(void)
     }
 }
 
+
 void File::advance(const size_t offset)
 {
     int ret = fseek(fp_, (long int)offset, SEEK_CUR);
@@ -113,17 +117,22 @@ void File::advance(const size_t offset)
     }
 }
 
+
 bool File::eof(void) const
 {
     int eof = feof(fp_);
     return eof != 0 ? true : false;
 }
 
-void * File::handle(void) const {
+
+void * File::handle(void) const
+{
     return fp_;
 }
 
-void File::seek(const size_t pos) {
+
+void File::seek(const size_t pos)
+{
     if (pos > LONG_MAX) {
         throw std::runtime_error("pos out of range");
     }
@@ -133,11 +142,15 @@ void File::seek(const size_t pos) {
     }
 }
 
-size_t File::size(void) const {
+
+size_t File::size(void) const
+{
     return fsize_;
 }
 
-size_t File::tell(void) const {
+
+size_t File::tell(void) const
+{
     long int offset = ftell(fp_);
     if (offset == -1) {
         throw std::runtime_error("ftell failed");
@@ -145,33 +158,43 @@ size_t File::tell(void) const {
     return offset;
 }
 
-size_t File::nrReadBytes(void) const {
+
+size_t File::nrReadBytes(void) const
+{
     if (mode_ != MODE_READ) {
         throw std::runtime_error("File is not open in read mode");
     }
     return nrReadBytes_;
 }
 
-size_t File::nrWrittenBytes(void) const {
+
+size_t File::nrWrittenBytes(void) const
+{
     if (mode_ != MODE_WRITE) {
         throw std::runtime_error("File is not open in write mode");
     }
     return nrWrittenBytes_;
 }
 
-bool File::isReadable(void) const {
+
+bool File::isReadable(void) const
+{
     if (isOpen_ == true && mode_ == MODE_READ)
         return true;
     return false;
 }
 
-bool File::isWritable(void) const {
+
+bool File::isWritable(void) const
+{
     if (isOpen_ == true && mode_ == MODE_WRITE)
         return true;
     return false;
 }
 
-size_t File::read(void *buffer, const size_t size) {
+
+size_t File::read(void *buffer, const size_t size)
+{
     if (buffer == NULL) {
         throw std::runtime_error("buffer is NULL");
     }
@@ -186,7 +209,9 @@ size_t File::read(void *buffer, const size_t size) {
     return ret;
 }
 
-size_t File::write(void *buffer, const size_t size) {
+
+size_t File::write(void *buffer, const size_t size)
+{
     if (buffer == NULL) {
         throw std::runtime_error("buffer is NULL");
     }
@@ -201,7 +226,9 @@ size_t File::write(void *buffer, const size_t size) {
     return ret;
 }
 
-size_t File::readByte(unsigned char *byte) {
+
+size_t File::readByte(unsigned char *byte)
+{
     size_t ret = fread(byte, 1, 1, fp_);
     if (ret != sizeof(unsigned char)) {
         throw std::runtime_error("fread failed");
@@ -210,11 +237,15 @@ size_t File::readByte(unsigned char *byte) {
     return ret;
 }
 
-size_t File::readUint8(uint8_t *byte) {
+
+size_t File::readUint8(uint8_t *byte)
+{
     return readByte(byte);
 }
 
-size_t File::readUint16(uint16_t *word) {
+
+size_t File::readUint16(uint16_t *word)
+{
     unsigned char *buffer = (unsigned char *)malloc(sizeof(uint16_t));
     if (buffer == NULL) {
         throw std::runtime_error("malloc failed");
@@ -233,7 +264,9 @@ size_t File::readUint16(uint16_t *word) {
     return ret;
 }
 
-size_t File::readUint32(uint32_t *dword) {
+
+size_t File::readUint32(uint32_t *dword)
+{
     unsigned char *buffer = (unsigned char *)malloc(sizeof(uint32_t));
     if (buffer == NULL) {
         throw std::runtime_error("malloc failed");
@@ -255,7 +288,9 @@ size_t File::readUint32(uint32_t *dword) {
     return ret;
 }
 
-size_t File::readUint64(uint64_t *qword) {
+
+size_t File::readUint64(uint64_t *qword)
+{
     unsigned char *buffer = (unsigned char *)malloc(sizeof(uint64_t));
     if (buffer == NULL) {
         throw std::runtime_error("malloc failed");
@@ -281,43 +316,9 @@ size_t File::readUint64(uint64_t *qword) {
     return ret;
 }
 
-// int File::fwrite(
-//     void *items,
-//     size_t itemSize,
-//     size_t numItems,
-//     FILE *fp)
-// {
-//     if (items == NULL) {
-//         GENIE_LOG("Error: Received null pointer\n");
-//         return GENIE_FAILURE;
-//     }
-//
-//     if (fp == NULL) {
-//         GENIE_LOG("Error: Received null pointer\n");
-//         return GENIE_FAILURE;
-//     }
-//
-//     size_t rc = fwrite(items, itemSize, numItems, fp);
-//     if (rc != numItems) {
-//         if (feof(fp) != 0) {
-//             GENIE_LOG("Warning: Reached EOF on write (full HD?)\n");
-//             return CABAC_EOF;
-//         }
-//         return GENIE_FAILURE;
-//     }
-//
-//     return GENIE_SUCCESS;
-// }
 
 size_t File::writeByte(const unsigned char byte)
 {
-//     int rc = do_fwrite(&byte, 1, 1 fp_);
-//     if (rc != GENIE_SUCCESS) {
-//         throwGenieException("do_fwrite did not complete successfully");
-//     }
-//
-//     numWrittenBytes_++;
-//
     size_t ret = fwrite(&byte, 1, 1, fp_);
     if (ret != sizeof(unsigned char)) {
         throw std::runtime_error("fwrite failed");
@@ -331,12 +332,15 @@ size_t File::writeUint8(const uint8_t byte)
     return writeByte(byte);
 }
 
-size_t File::writeUint16(const uint16_t word) {
+
+size_t File::writeUint16(const uint16_t word)
+{
     size_t ret = 0;
     ret += writeByte((unsigned char)(word >> 8) & 0xFF);
     ret += writeByte((unsigned char)(word)      & 0xFF);
     return ret;
 }
+
 
 size_t File::writeUint32(const uint32_t dword)
 {
@@ -349,6 +353,7 @@ size_t File::writeUint32(const uint32_t dword)
 
     return numWrittenBytes;
 }
+
 
 size_t File::writeUint64(const uint64_t qword)
 {
@@ -366,5 +371,5 @@ size_t File::writeUint64(const uint64_t qword)
     return numWrittenBytes;
 }
 
+
 }  // namespace dsg
-}  // namespace genie

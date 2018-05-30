@@ -15,7 +15,6 @@
 #include <string>
 
 
-namespace genie {
 namespace dsg {
 
 
@@ -69,7 +68,6 @@ class File {
 
 
 }  // namespace dsg
-}  // namespace genie
 
 
 #endif  // DSG_INPUT_FILE_H_

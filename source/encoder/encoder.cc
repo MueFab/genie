@@ -1,5 +1,6 @@
 // Copyright 2018 The genie authors
 
+
 /**
  *  @file encoder.cc
  *  @brief encoder main file
@@ -15,13 +16,24 @@
 #include <stdexcept>
 
 
+static void printVersionAndCopyright(void)
+{
+    printf("----------------------------------------------------------\n");
+    printf("genie encoder\n");
+    printf("Copyright (c) 2018 The genie authors\n");
+    printf("----------------------------------------------------------\n");
+}
+
+
 static int encoder_main(int argc, char *argv[])
 {
     try {
-        fprintf(stdout, "encoder\n");
+        printVersionAndCopyright();
+
+//         parseOptions(argc, argv);
     }
     catch (const std::runtime_error& e) {
-        fprintf(stderr, "Error: %s\n", e.what());
+        fprintf(stderr, "Runtime error: %s\n", e.what());
         return -1;
     }
     catch (...) {

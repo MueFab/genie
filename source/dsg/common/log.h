@@ -9,9 +9,6 @@
  */
 
 
-// Copyright 2018 The genie authors
-
-
 #ifndef DSG_COMMON_LOG_H_
 #define DSG_COMMON_LOG_H_
 

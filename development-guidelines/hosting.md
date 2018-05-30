@@ -1,3 +1,3 @@
 # Hosting
 
-genie is hosted at **Bitbucket**.
+genie is hosted at **GitHub**.

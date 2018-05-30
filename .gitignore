@@ -5,3 +5,6 @@
 # Regeneratables
 build/
 
+# KDevelop project files
+.kdev4/
+genie.kdev4

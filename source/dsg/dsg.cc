@@ -20,13 +20,10 @@
 
 static void printVersionAndCopyright(void)
 {
-    printf("-----------------------------------------------\n");
-    printf("Program: genie-dsg (descriptor-stream-generator)\n");
-//     printf("Version: %s\n", DSG_VERSION);
-//     printf("Build time: %s\n", DSG_BUILD_TIMESTAMP_UTC);
-//     printf("Git commit hash: %s\n", DSG_GIT_COMMIT_HASH_SHORT);
-    printf("-----------------------------------------------\n");
-//     printf("Copyright (c) 2015-%d The genie authors\n", DSG_BUILD_YEAR);
+    printf("----------------------------------------------------------\n");
+    printf("genie dsg (descriptor-stream-generator)\n");
+    printf("Copyright (c) 2018 The genie authors\n");
+    printf("----------------------------------------------------------\n");
 }
 
 
@@ -37,7 +34,7 @@ static int dsg_main(int argc, char *argv[])
 
 //         parseOptions(argc, argv);
 
-        genie::dsg::FASTAFile inputFASTAFile("test.fasta", genie::dsg::FASTAFile::MODE_READ);
+        dsg::FASTAFile inputFASTAFile("test.fasta", dsg::FASTAFile::MODE_READ);
     }
     catch (const std::runtime_error& e) {
         fprintf(stderr, "Runtime error: %s\n", e.what());

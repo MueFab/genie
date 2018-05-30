@@ -17,7 +17,6 @@
 #include <string>
 
 
-namespace genie {
 namespace dsg {
 
 
@@ -25,7 +24,7 @@ FASTAFile::FASTAFile(const std::string& path,
                      const Mode& mode)
     : File(path, mode),
       line_(NULL)
-      {
+{
     if (path.empty() == true) {
         throw std::runtime_error("path is empty");
     }
@@ -97,5 +96,5 @@ void FASTAFile::parse(void)
     references.insert(std::pair<std::string, std::string>(currentHeader, currentSequence));
 }
 
+
 }  // namespace dsg
-}  // namespace genie

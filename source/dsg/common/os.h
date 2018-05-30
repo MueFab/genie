@@ -8,8 +8,10 @@
  *  @bug No known bugs
  */
 
+
 #ifndef DSG_COMMON_OS_H_
 #define DSG_COMMON_OS_H_
+
 
 #ifdef _WIN32
     // Defines for Windows (32-bit and 64-bit, this part is common)
@@ -30,5 +32,6 @@
 #else
     #error "Operating system not supported"
 #endif
+
 
 #endif  // DSG_COMMON_OS_H_

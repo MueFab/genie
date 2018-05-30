@@ -11,14 +11,16 @@
 #ifndef DSG_INPUT_FASTA_FASTAFILE_H_
 #define DSG_INPUT_FASTA_FASTAFILE_H_
 
+
 #include <map>
 #include <string>
 
 #include "common/constants.h"
 #include "input/File.h"
 
-namespace genie {
+
 namespace dsg {
+
 
 class FASTAFile : public File {
  public:
@@ -37,7 +39,6 @@ class FASTAFile : public File {
 
 
 }  // namespace dsg
-}  // namespace genie
 
 
 #endif  // DSG_INPUT_FASTA_FASTAFILE_H_

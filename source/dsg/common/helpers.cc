@@ -17,7 +17,10 @@
 #include "common/os.h"
 
 
-void ac_printCurrentDateAndTime(FILE *stream)
+namespace dsg {
+
+
+void aprintCurrentDateAndTime(FILE *stream)
 {
     // ISO 8601 format: 2007-04-05T14:30:21Z
     char timeString[] = "yyyy-mm-ddTHH:MM:SSZ";
@@ -47,3 +50,6 @@ void ac_printCurrentDateAndTime(FILE *stream)
 
     fprintf(stream, "%s", timeString);
 }
+
+
+}  // namespace dsg
