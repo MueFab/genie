@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 
 
-project("encoder")
+project("genie")
 
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -38,9 +38,27 @@ else ()
 endif ()
 
 
+set(dsg "dsg")
+set(dsg_source_dir ${CMAKE_SOURCE_DIR}/source/dsg)
+set(dsg_include_dir ${CMAKE_SOURCE_DIR}/source/dsg)
+
+file(GLOB_RECURSE dsg_c_files ${dsg_source_dir}/*.c)
+file(GLOB_RECURSE dsg_cc_files ${dsg_source_dir}/*.cc)
+file(GLOB_RECURSE dsg_cpp_files ${dsg_source_dir}/*.cpp)
+file(GLOB_RECURSE dsg_h_files ${dsg_source_dir}/*.h)
+file(GLOB_RECURSE dsg_hpp_files ${dsg_source_dir}/*.hpp)
+
+set(dsg_source_files ${dsg_c_files} ${dsg_cc_files} ${dsg_cpp_files})
+set(dsg_header_files ${dsg_h_files} ${dsg_hpp_files})
+
+add_executable(dsg ${dsg_source_files})
+
+target_include_directories(${dsg} PRIVATE ${dsg_include_dir})
+
+
 set(encoder "encoder")
-set(encoder_source_dir ${CMAKE_SOURCE_DIR}/source)
-set(encoder_include_dir ${CMAKE_SOURCE_DIR}/source)
+set(encoder_source_dir ${CMAKE_SOURCE_DIR}/source/encoder)
+set(encoder_include_dir ${CMAKE_SOURCE_DIR}/source/encoder)
 
 file(GLOB_RECURSE encoder_c_files ${encoder_source_dir}/*.c)
 file(GLOB_RECURSE encoder_cc_files ${encoder_source_dir}/*.cc)

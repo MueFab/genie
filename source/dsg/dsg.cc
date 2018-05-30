@@ -1,6 +1,9 @@
+// Copyright 2018 The genie authors
+
+
 /**
- *  @file encoder.cc
- *  @brief encoder main file
+ *  @file dsg.cc
+ *  @brief dsg (descriptor-stream-generator) main file
  *  @author Jan Voges
  *  @bug No known bugs
  */
@@ -12,14 +15,32 @@
 
 #include <stdexcept>
 
+#include "input/fasta/FASTAFile.h"
 
-static int encoder_main(int argc, char *argv[])
+
+static void printVersionAndCopyright(void)
+{
+    printf("-----------------------------------------------\n");
+    printf("Program: genie-dsg (descriptor-stream-generator)\n");
+//     printf("Version: %s\n", DSG_VERSION);
+//     printf("Build time: %s\n", DSG_BUILD_TIMESTAMP_UTC);
+//     printf("Git commit hash: %s\n", DSG_GIT_COMMIT_HASH_SHORT);
+    printf("-----------------------------------------------\n");
+//     printf("Copyright (c) 2015-%d The genie authors\n", DSG_BUILD_YEAR);
+}
+
+
+static int dsg_main(int argc, char *argv[])
 {
     try {
-        fprintf(stdout, "encoder\n");
+        printVersionAndCopyright();
+
+//         parseOptions(argc, argv);
+
+        genie::dsg::FASTAFile inputFASTAFile("test.fasta", genie::dsg::FASTAFile::MODE_READ);
     }
     catch (const std::runtime_error& e) {
-        fprintf(stderr, "Error: %s\n", e.what());
+        fprintf(stderr, "Runtime error: %s\n", e.what());
         return -1;
     }
     catch (...) {
@@ -39,9 +60,9 @@ static int encoder_main(int argc, char *argv[])
  */
 int main(int argc, char *argv[])
 {
-    int rc = encoder_main(argc, argv);
+    int rc = dsg_main(argc, argv);
     if (rc != 0) {
-        fprintf(stderr, "Error: Failed to run encoder\n");
+        fprintf(stderr, "Error: Failed to run dsg\n");
     }
 
     // The C standard makes no guarantees as to when output to stdout or stderr

@@ -1,39 +1,44 @@
-/** @file FASTAFile.cc
- *  @brief This file contains the implementation of the FASTAFile class.
+// Copyright 2018 The genie authors
+
+
+/**
+ *  @file FASTAFile.cc
+ *  @brief FASTA file implementation
+ *  @author Jan Voges
+ *  @bug No known bugs
  */
 
-// Copyright 2015-2017 Leibniz Universitaet Hannover
-
-#include "IO/FASTA/FASTAFile.h"
+#include "input/fasta/FASTAFile.h"
 
 #include <string.h>
 
+#include <stdexcept>
 #include <utility>
 #include <string>
 
-#include "Common/Exceptions.h"
 
-namespace calq {
+namespace genie {
+namespace dsg {
 
 
 FASTAFile::FASTAFile(const std::string& path,
                      const Mode& mode)
     : File(path, mode),
       line_(NULL)
-{
+      {
     if (path.empty() == true) {
-        throwErrorException("path is empty");
+        throw std::runtime_error("path is empty");
     }
 
     if (mode != FASTAFile::MODE_READ) {
-        throwErrorException("Currently only MODE_READ supported");
+        throw std::runtime_error("Currently only MODE_READ supported");
     }
 
     // Usually, lines in a FASTA file should be limited to 80 chars, so 4 KB
     // should be enough
-    line_ = (char *)malloc(LINE_SIZE);
+    line_ = reinterpret_cast<char *>(malloc(LINE_SIZE));
     if (line_ == NULL) {
-        throwErrorException("malloc failed");
+        throw std::runtime_error("malloc failed");
     }
 
     // Parse the complete FASTA file
@@ -63,13 +68,13 @@ void FASTAFile::parse(void)
             if (currentSequence.empty() == false) {
                 // We have a sequence, check if we have a header
                 if (currentHeader.empty() == true) {
-                    throwErrorException("Found sequence but no header");
+                    throw std::runtime_error("Found sequence but no header");
                 }
 
                 // We have a header, check if it is already present in our
                 // references map
                 if (references.find(currentHeader) != references.end()) {
-                    throwErrorException("Found the same header twice");
+                    throw std::runtime_error("Found the same header twice");
                 }
 
                 // Everything ok, insert header-sequence pair into our
@@ -92,5 +97,5 @@ void FASTAFile::parse(void)
     references.insert(std::pair<std::string, std::string>(currentHeader, currentSequence));
 }
 
-
+}  // namespace dsg
 }  // namespace genie

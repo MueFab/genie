@@ -8,14 +8,15 @@
  */
 
 
-#ifndef GENIE_DSG_INPUT_FILE_H
-#define GENIE_DSG_INPUT_FILE_H
+#ifndef DSG_INPUT_FILE_H_
+#define DSG_INPUT_FILE_H_
 
 
 #include <string>
 
 
 namespace genie {
+namespace dsg {
 
 
 class File {
@@ -67,7 +68,8 @@ class File {
 };
 
 
+}  // namespace dsg
 }  // namespace genie
 
 
-#endif  // GENIE_DSG_INPUT_FILE_H
+#endif  // DSG_INPUT_FILE_H_

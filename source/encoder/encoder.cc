@@ -1,6 +1,8 @@
+// Copyright 2018 The genie authors
+
 /**
- *  @file dsg.cc
- *  @brief dsg (descriptor-stream-generator) main file
+ *  @file encoder.cc
+ *  @brief encoder main file
  *  @author Jan Voges
  *  @bug No known bugs
  */
@@ -13,10 +15,10 @@
 #include <stdexcept>
 
 
-static int dsg_main(int argc, char *argv[])
+static int encoder_main(int argc, char *argv[])
 {
     try {
-        fprintf(stdout, "dsg (descriptor-stream-generator)\n");
+        fprintf(stdout, "encoder\n");
     }
     catch (const std::runtime_error& e) {
         fprintf(stderr, "Error: %s\n", e.what());
@@ -39,9 +41,9 @@ static int dsg_main(int argc, char *argv[])
  */
 int main(int argc, char *argv[])
 {
-    int rc = dsg_main(argc, argv);
+    int rc = encoder_main(argc, argv);
     if (rc != 0) {
-        fprintf(stderr, "Error: Failed to run dsg\n");
+        fprintf(stderr, "Error: Failed to run encoder\n");
     }
 
     // The C standard makes no guarantees as to when output to stdout or stderr

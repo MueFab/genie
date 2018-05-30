@@ -3,6 +3,5 @@
 .DS_Store
 
 # Regeneratables
-descriptor-stream-generator/build/
-encoder/build/
+build/
 
