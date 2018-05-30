@@ -24,17 +24,26 @@ namespace dsg {
 
 class FASTAFile : public File {
  public:
-    explicit FASTAFile(const std::string &path, const Mode &mode = MODE_READ);
+
+    FastaFile(
+        const std::string& path,
+        const Mode& mode = MODE_READ);
+
     ~FASTAFile(void);
 
-    std::map<std::string, std::string> references;
+ public:
+
+     FastaIndex index;
 
  private:
-    static const size_t LINE_SIZE = sizeof(char) * (4*KB);
 
-    void parse(void);
+     void constructIndex(void);
 
-    char *line_;
+ private:
+
+    static const size_t MAX_LINE_LENGTH = sizeof(char) * (4 * KB);
+
+    char *m_line;
 };
 
 

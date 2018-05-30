@@ -20,8 +20,9 @@
 namespace dsg {
 
 
-FASTAFile::FASTAFile(const std::string& path,
-                     const Mode& mode)
+FASTAFile::FASTAFile(
+    const std::string& path,
+    const Mode& mode)
     : File(path, mode),
       line_(NULL)
 {
@@ -48,6 +49,56 @@ FASTAFile::FASTAFile(const std::string& path,
 FASTAFile::~FASTAFile(void)
 {
     free(line_);
+}
+
+
+void FastaFile::loadSequence(
+    const std::string& header,
+    std::string * const sequence)
+                            )
+{
+    if (header.empty() == true) {
+        throw runtime_error("header is empty");
+    }
+}
+
+
+void FASTAFile::constructIndex(void)
+{
+    std::string header("");
+    size_t offset = 0;
+    size_t length = 0;
+
+    while (fgets(line_, LINE_SIZE, fp_) != NULL) {
+        // Trim the line.
+        size_t l = strlen(line_) - 1;
+        while (l && (line_[l] == '\r' || line_[l] == '\n')) {
+            line_[l--] = '\0';
+        }
+
+        if (m_line[0] == '>') {
+            // We found a header. Construct a FastaIndexEntry for the previous
+            // header-sequence pair and add it to the index.
+            FastaIndexEntry entry(header, offset, sequenceLength);
+            index.addEntry(entry);
+
+            // Reset the variables to be ready for the next header-sequence
+            // pair.
+            header = "";
+            offset = 0;
+            length = 0;
+
+            // Now store the new header and trim it: do not take the
+            // leading '>' and remove everything after the first space.
+            std::string header("");
+            header = m_line + 1;
+            header = header.substr(0, header.find_first_of(" "));
+        } else {
+            // This line is part of a sequence. For now, we just store its
+            // length.
+            sequenceLength += strlen(m_line);
+        }
+    }
 }
 
 
