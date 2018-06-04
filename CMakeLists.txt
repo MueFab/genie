@@ -42,14 +42,14 @@ set(dsg "dsg")
 set(dsg_source_dir ${CMAKE_SOURCE_DIR}/source/dsg)
 set(dsg_include_dir ${CMAKE_SOURCE_DIR}/source/dsg)
 
-file(GLOB_RECURSE dsg_c_files ${dsg_source_dir}/*.c)
-file(GLOB_RECURSE dsg_cc_files ${dsg_source_dir}/*.cc)
-file(GLOB_RECURSE dsg_cpp_files ${dsg_source_dir}/*.cpp)
-file(GLOB_RECURSE dsg_h_files ${dsg_source_dir}/*.h)
-file(GLOB_RECURSE dsg_hpp_files ${dsg_source_dir}/*.hpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/dsg.cc)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/common/helpers.cc)
 
-set(dsg_source_files ${dsg_c_files} ${dsg_cc_files} ${dsg_cpp_files})
-set(dsg_header_files ${dsg_h_files} ${dsg_hpp_files})
+set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/common/constants.h)
+set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/common/helpers.h)
+set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/common/log.h)
+set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/common/os.h)
+set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/common/return-codes.h)
 
 add_executable(dsg ${dsg_source_files})
 
@@ -60,14 +60,9 @@ set(encoder "encoder")
 set(encoder_source_dir ${CMAKE_SOURCE_DIR}/source/encoder)
 set(encoder_include_dir ${CMAKE_SOURCE_DIR}/source/encoder)
 
-file(GLOB_RECURSE encoder_c_files ${encoder_source_dir}/*.c)
-file(GLOB_RECURSE encoder_cc_files ${encoder_source_dir}/*.cc)
-file(GLOB_RECURSE encoder_cpp_files ${encoder_source_dir}/*.cpp)
-file(GLOB_RECURSE encoder_h_files ${encoder_source_dir}/*.h)
-file(GLOB_RECURSE encoder_hpp_files ${encoder_source_dir}/*.hpp)
+set(encoder_source_files ${encoder_source_files} ${encoder_source_dir}/encoder.cc)
 
-set(encoder_source_files ${encoder_c_files} ${encoder_cc_files} ${encoder_cpp_files})
-set(encoder_header_files ${encoder_h_files} ${encoder_hpp_files})
+#set(encoder_header_files ${encoder_header_files} )
 
 add_executable(encoder ${encoder_source_files})
 

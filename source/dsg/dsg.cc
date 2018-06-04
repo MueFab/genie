@@ -15,8 +15,6 @@
 
 #include <stdexcept>
 
-#include "input/fasta/FASTAFile.h"
-
 
 static void printVersionAndCopyright(void)
 {
@@ -34,7 +32,7 @@ static int dsg_main(int argc, char *argv[])
 
 //         parseOptions(argc, argv);
 
-        dsg::FASTAFile inputFASTAFile("test.fasta", dsg::FASTAFile::MODE_READ);
+//         dsg::FASTAFile inputFASTAFile("test.fasta", dsg::FASTAFile::MODE_READ);
     }
     catch (const std::runtime_error& e) {
         fprintf(stderr, "Runtime error: %s\n", e.what());
