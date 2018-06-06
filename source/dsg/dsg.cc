@@ -11,7 +11,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string>
+#include <iostream>
+#include <boost/program_options.hpp>
 
 #include <stdexcept>
 
@@ -55,6 +57,38 @@ static int dsg_main(int argc, char *argv[])
  */
 int main(int argc, char *argv[])
 {
+    try {
+        boost::program_options::options_description desc("Options");
+        desc.add_options()
+            ("help", "Provides helpful information")
+            ("int", boost::program_options::value<int>()->default_value(10)->implicit_value(20), "Enter an int")
+            ("string", boost::program_options::value<std::string>(), "Enter a string")
+        ;
+        boost::program_options::variables_map vm;
+        boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
+
+        if(vm.count("help")) {
+            std::cout << desc << "\n";
+        }
+        if (vm.count("int")) {
+            std::cout << "Input number was: " << vm["int"].as<int>() << ".\n";
+        } else {
+            std::cout << "No number was given.\n" << "number is: " << vm["int"].as<int>() << ".\n";
+        }
+        if (vm.count("string")) {
+            std::cout << "String is: " << vm["string"].as<std::string>() << std::endl;
+        } else {
+            std::cout << "no string.\n";
+        }       
+    }
+
+    catch(boost::program_options::error& e) 
+    { 
+      fprintf(stderr, "Runtime error: %s\n", e.what()); 
+      return -1; 
+    } 
+    
+
     int rc = dsg_main(argc, argv);
     if (rc != 0) {
         fprintf(stderr, "Error: Failed to run dsg\n");
