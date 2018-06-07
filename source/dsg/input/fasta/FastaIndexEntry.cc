@@ -11,7 +11,7 @@
 
 #include "input/fasta/FastaIndexEntry.h"
 
-#include "common/log.h"
+#include <iostream>
 
 
 namespace dsg {
@@ -26,11 +26,11 @@ FastaIndexEntry::FastaIndexEntry(
       this->length(length)
 {
     if (this->header.empty() == true) {
-        DSG_LOG("Warning: FASTA index entry with empty header was added.\n");
+        std::cout << "Warning: FASTA index entry with empty header was added." << std::endl;
     }
 
     if (this->length == 0) {
-        DSG_LOG("Warning: FASTA index entry with length=0 was added.\n");
+        std::cout << "Warning: FASTA index entry with length=0 was added." << std::endl;
     }
 }
 

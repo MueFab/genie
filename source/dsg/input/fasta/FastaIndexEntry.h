@@ -25,7 +25,7 @@ class FastaIndexEntry {
     FastaIndexEntry(
         const std::string& header,
         const size_t offset,
-        const size_t sequenceLength);
+        const size_t length);
 
     ~FastaIndexEntry(void);
 

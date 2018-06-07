@@ -3,38 +3,10 @@ cmake_minimum_required(VERSION 3.1)
 
 project("genie")
 
-# Download boost from git
 
-include(ExternalProject)
-
-if ( UNIX )
-  if (NOT Boost)
-
-  SET (Boost_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/include/boost/)
-  SET (Boost_LIBRARIES ${CMAKE_CURRENT_BINARY_DIR}/lib )
-  SET (BOOST_URL https://github.com/boostorg/boost.git )
-  SET (BOOST_BUILD ${CMAKE_CURRENT_BINARY_DIR}) 
-  SET (FILESYSTEM_STATIC_LIBRARIES ${BOOST_BUILD}/lib/libboost_filesystem.a) 
-  SET (SYSTEM_STATIC_LIBRARIES ${BOOST_BUILD}/lib/libboost_system.a)
-  SET (REGEX_STATIC_LIBRARIES ${BOOST_BUILD}/lib/libboost_regex.a)
-  SET (PROGRAM_OPTIONS_STATIC_LIBRARIES ${BOOST_BUILD}/lib/libboost_program_options.a)
-
-  ExternalProject_Add( Boost
-    PREFIX Boost
-    GIT_REPOSITORY ${BOOST_URL}
-    UPDATE_COMMAND ./bootstrap.sh --with-libraries=filesystem,system,regex,program_options --includedir=${CMAKE_BINARY_DIR}/include/
-    CONFIGURE_COMMAND ./b2 headers
-    BUILD_COMMAND ./b2 link=static install --libdir=${CMAKE_BINARY_DIR}/lib
-    BUILD_IN_SOURCE 1
-    INSTALL_COMMAND ""
-  )
-
-  ADD_LIBRARY (Boost_LIB STATIC IMPORTED DEPENDS Boost)  
-  SET_TARGET_PROPERTIES (Boost_LIB PROPERTIES IMPORTED_LOCATION ${PROGRAM_OPTIONS_STATIC_LIBRARIES}) 
-
-  endif()
-endif()
-
+#==============================================================================
+# Compiler configuration
+#==============================================================================
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     message(STATUS "Detected compiler: GNU Compiler Collection")
@@ -70,48 +42,65 @@ else ()
 endif ()
 
 
+#==============================================================================
+# Boost
+#==============================================================================
+
+set(boost_root_dir ${CMAKE_CURRENT_BINARY_DIR}/boost)
+set(boost_include_dir ${boost_root_dir}/include)
+set(boost_lib_dir ${boost_root_dir}/lib)
+
+if (UNIX)
+    include(ExternalProject)
+
+    set(BOOST_ROOT ${boost_root_dir})
+    find_package(Boost)
+
+    if (NOT Boost_FOUND)
+        set(boost_git_repository https://github.com/boostorg/boost.git)
+        set(boost_git_tag "boost-1.67.0")
+
+        ExternalProject_Add(Boost
+            PREFIX ${boost_root_dir}
+            GIT_REPOSITORY ${boost_git_repository}
+            GIT_TAG ${boost_git_tag}
+            CONFIGURE_COMMAND ./bootstrap.sh --with-libraries=program_options --prefix=${boost_root_dir}
+            BUILD_COMMAND ./b2 link=static install
+            BUILD_IN_SOURCE 1
+            INSTALL_COMMAND ""
+        )
+
+        add_library(boost STATIC IMPORTED DEPENDS Boost)
+    else ()
+        message(STATUS "Boost already installed - rebuild not required")
+    endif()
+else ()
+    message(FATAL_ERROR "Boost build currently not supported on non-UNIX-like systems")
+endif()
+
+
+
+#==============================================================================
+# dsg
+#==============================================================================
+
 set(dsg "dsg")
+
 set(dsg_source_dir ${CMAKE_SOURCE_DIR}/source/dsg)
 set(dsg_include_dir ${CMAKE_SOURCE_DIR}/source/dsg)
 
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/dsg.cc)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/common/helpers.cc)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/ProgramOptions.cc)
+
+add_executable(${dsg} ${dsg_source_files})
+target_include_directories(${dsg} PRIVATE ${dsg_include_dir} ${boost_include_dir})
+link_directories(${boost_lib_dir})
+target_link_libraries(${dsg} ${boost_lib_dir}/libboost_program_options.a)
 
 
-set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/common/constants.h)
-set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/common/helpers.h)
-set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/common/log.h)
-set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/common/os.h)
-set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/common/return-codes.h)
-
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options.hpp)
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options/cmdline.hpp)
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options/config.hpp)
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options/environment_iterator.hpp)
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options/eof_iterator.hpp)
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options/errors.hpp)
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options/option.hpp)
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options/options_description.hpp)
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options/parsers.hpp)
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options/positional_options.hpp)
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options/value_semantic.hpp)
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options/variables_map.hpp)
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options/version.hpp)
-# 
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options/detail/cmdline.hpp)
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options/detail/config_file.hpp)
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options/detail/convert.hpp)
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options/detail/parsers.hpp)
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options/detail/utf8_codecvt_facet.hpp)
-# set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/vendor/program_options/detail/value_sema.hpp)
-
-link_directories(${CMAKE_CURRENT_BINARY_DIR}/lib)
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
-
-add_executable(dsg ${dsg_source_files})
-target_link_libraries(${dsg} Boost_LIB)
-
-message(STATUS ${program_optionsIncludeDir})
+#==============================================================================
+# encoder
+#==============================================================================
 
 set(encoder "encoder")
 set(encoder_source_dir ${CMAKE_SOURCE_DIR}/source/encoder)
@@ -119,8 +108,7 @@ set(encoder_include_dir ${CMAKE_SOURCE_DIR}/source/encoder)
 
 set(encoder_source_files ${encoder_source_files} ${encoder_source_dir}/encoder.cc)
 
-#set(encoder_header_files ${encoder_header_files} )
-
 add_executable(encoder ${encoder_source_files})
 
 target_include_directories(${encoder} PRIVATE ${encoder_include_dir})
+

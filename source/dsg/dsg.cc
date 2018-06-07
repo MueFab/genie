@@ -11,20 +11,28 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string>
-#include <iostream>
+#include <string.h>
+
 #include <boost/program_options.hpp>
 
+#include <iostream>
 #include <stdexcept>
+#include <string>
+
+#include "ProgramOptions.h"
 
 
-static void printVersionAndCopyright(void)
-{
-    printf("----------------------------------------------------------\n");
-    printf("genie dsg (descriptor-stream-generator)\n");
-    printf("Copyright (c) 2018 The genie authors\n");
-    printf("----------------------------------------------------------\n");
-}
+static void printHelp(
+    const boost::program_options::options_description& optionsDescription);
+
+
+static void printVersionAndCopyright(void);
+
+
+static void processProgramOptions(
+    int argc,
+    char *argv[],
+    dsg::ProgramOptions * const programOptions);
 
 
 static int dsg_main(int argc, char *argv[])
@@ -32,16 +40,30 @@ static int dsg_main(int argc, char *argv[])
     try {
         printVersionAndCopyright();
 
-//         parseOptions(argc, argv);
+        dsg::ProgramOptions programOptions;
+
+        processProgramOptions(argc, argv, &programOptions);
 
 //         dsg::FASTAFile inputFASTAFile("test.fasta", dsg::FASTAFile::MODE_READ);
     }
+    catch(boost::program_options::error& e) {
+        std::cerr << "Program options error";
+        if (strlen(e.what()) > 0) {
+            std::cerr << ": " << e.what();
+        }
+        std::cerr << std::endl;
+        return -1;
+    }
     catch (const std::runtime_error& e) {
-        fprintf(stderr, "Runtime error: %s\n", e.what());
+        std::cerr << "Runtime error";
+        if (strlen(e.what()) > 0) {
+            std::cerr << ": " << e.what();
+        }
+        std::cerr << std::endl;
         return -1;
     }
     catch (...) {
-        fprintf(stderr, "Unkown error occurred\n");
+        std::cerr << "Unkown error occurred" << std::endl;
         return -1;
     }
 
@@ -57,41 +79,9 @@ static int dsg_main(int argc, char *argv[])
  */
 int main(int argc, char *argv[])
 {
-    try {
-        boost::program_options::options_description desc("Options");
-        desc.add_options()
-            ("help", "Provides helpful information")
-            ("int", boost::program_options::value<int>()->default_value(10)->implicit_value(20), "Enter an int")
-            ("string", boost::program_options::value<std::string>(), "Enter a string")
-        ;
-        boost::program_options::variables_map vm;
-        boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
-
-        if(vm.count("help")) {
-            std::cout << desc << "\n";
-        }
-        if (vm.count("int")) {
-            std::cout << "Input number was: " << vm["int"].as<int>() << ".\n";
-        } else {
-            std::cout << "No number was given.\n" << "number is: " << vm["int"].as<int>() << ".\n";
-        }
-        if (vm.count("string")) {
-            std::cout << "String is: " << vm["string"].as<std::string>() << std::endl;
-        } else {
-            std::cout << "no string.\n";
-        }       
-    }
-
-    catch(boost::program_options::error& e) 
-    { 
-      fprintf(stderr, "Runtime error: %s\n", e.what()); 
-      return -1; 
-    } 
-    
-
     int rc = dsg_main(argc, argv);
     if (rc != 0) {
-        fprintf(stderr, "Error: Failed to run dsg\n");
+        std::cerr << "Failed to run dsg" << std::endl;
     }
 
     // The C standard makes no guarantees as to when output to stdout or stderr
@@ -107,6 +97,71 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    // Return to the OS.
+    // Exit.
+    std::cerr << "Exiting with return code: " << ((rc == 0) ? EXIT_SUCCESS : EXIT_FAILURE) << std::endl;
     return (rc == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
+
+
+static void printHelp(const boost::program_options::options_description& optionsDescription)
+{
+    std::cout << optionsDescription;
+}
+
+
+static void printVersionAndCopyright(void)
+{
+    std::cout << std::string(80, '-') << std::endl;
+    printf("genie dsg (descriptor stream generator)\n");
+    printf("Copyright (c) 2018 The genie authors\n");
+    std::cout << std::string(80, '-') << std::endl;
+}
+
+
+static void processProgramOptions(
+    int argc,
+    char *argv[],
+    dsg::ProgramOptions * const programOptions)
+{
+    namespace po = boost::program_options;
+
+    // Declare the supported program options.
+    po::options_description optionsDescription("Options");
+    optionsDescription.add_options()
+        ("force,f",
+             po::bool_switch(&(programOptions->force)),
+            "Overwrite output files")
+        ("help,h",
+            "Print help")
+        ("input-file-name,i",
+            po::value<std::string>(&(programOptions->inputFileName))->required(),
+            "Input file name")
+        ("input-file-type,t",
+            po::value<std::string>(&(programOptions->inputFileType))->required(),
+            "Input file type")
+        ("output-file-name,o",
+            po::value<std::string>(&(programOptions->outputFileName))->required(),
+            "Output file name")
+        ("verbose,v",
+             po::bool_switch(&(programOptions->verbose)),
+            "Be verbose");
+
+    // Parse the command line.
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, optionsDescription), vm);
+
+    // First thing to do is to print the help.
+    if (vm.count("help")) {
+        printHelp(optionsDescription);
+        return;
+    }
+
+    // This will throw on erroneous program options. Thus, we call notify()
+    // after printing the help.
+    po::notify(vm);
+
+    // Validate and print the program options.
+    programOptions->print();
+    programOptions->validate();
+}
+
