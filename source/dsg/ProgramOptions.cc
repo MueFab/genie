@@ -72,7 +72,7 @@ void ProgramOptions::validate(void)
     // inputFileType
     //
 
-    std::set<std::string> allowedInputFileTypes{"FASTA", "FASTQ", "SAM"};
+    std::set<std::string> allowedInputFileTypes = {"FASTA", "FASTQ", "SAM"};
 
     // Check if the user input string for input file type is in the set of
     // allowed input file types.

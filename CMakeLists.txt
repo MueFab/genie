@@ -4,6 +4,8 @@
 
 cmake_minimum_required(VERSION 3.1)
 
+set (CMAKE_CXX_STANDARD 11)
+
 project("genie")
 
 
@@ -121,4 +123,3 @@ set(encoder_source_files ${encoder_source_files} ${encoder_source_dir}/encoder.c
 add_executable(encoder ${encoder_source_files})
 
 target_include_directories(${encoder} PRIVATE ${encoder_include_dir})
-
