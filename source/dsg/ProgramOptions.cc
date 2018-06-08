@@ -14,6 +14,8 @@
 #include <iostream>
 #include <set>
 
+#include "common/utils.h"
+
 
 namespace dsg {
 
@@ -38,33 +40,38 @@ ProgramOptions::~ProgramOptions(void)
 void ProgramOptions::print(void)
 {
     std::cout << "Program options:" << std::endl;
-    std::cout << "  Force            : " << (force ? "true" : "false") << std::endl;
-    std::cout << "  Input file name  : " << inputFileName << std::endl;
-    std::cout << "  Input file type  : " << inputFileType << std::endl;
-    std::cout << "  Output file name : " << outputFileName << std::endl;
-    std::cout << "  Verbose          : " << (verbose ? "true" : "false") << std::endl;
+    std::cout << "  force          : " << ((force == true) ? "true" : "false") << std::endl;
+    std::cout << "  inputFileName  : " << inputFileName << std::endl;
+    std::cout << "  inputFileTypee : " << inputFileType << std::endl;
+    std::cout << "  outputFileName : " << outputFileName << std::endl;
+    std::cout << "  verbose        : " << (verbose ? "true" : "false") << std::endl;
 }
 
 
 void ProgramOptions::validate(void)
 {
-    std::cout << "Validating program options" << std::endl;
-
+    //
     // force
-    if (force == true) {
-        std::cout << "Attention: overwriting output files!" << std::endl;
-    }
+    //
 
+
+    //
     // inputFileName
+    //
+
     if (inputFileName.empty() == true) {
-        throw std::runtime_error("No input file name provided");
+        throw std::runtime_error("no input file name provided");
     }
 
-//     if (fileExists(inputFileName) == false) {
-//         throw std::runtime_error("Input file does not exist");
-//     }
+    if (fileExists(inputFileName) == false) {
+        throw std::runtime_error("input file does not exist");
+    }
 
+
+    //
     // inputFileType
+    //
+
     std::set<std::string> allowedInputFileTypes{"FASTA", "FASTQ", "SAM"};
 
     // Check if the user input string for input file type is in the set of
@@ -80,19 +87,28 @@ void ProgramOptions::validate(void)
         throw std::runtime_error("Input file type is invalid");
     }
 
+
+    //
     // outputFileName
+    //
+
     if (outputFileName.empty() == true) {
         throw std::runtime_error("No output file name provided");
     }
 
-//     if ((fileExists(outputFileName)) == true && (force == false)) {
-//         throw std::runtime_error("Not overwriting output file (use option 'f' to force overwriting)");
-//     }
+    if ((fileExists(outputFileName)) == true && (force == false)) {
+        throw std::runtime_error("not overwriting output file (use option 'f' to force overwriting)");
+    }
 
+
+    //
     // verbose
+    //
+
     if (verbose == true) {
         std::cout << "Verbose log output activated" << std::endl;
     }
+
 
     std::cout << "Program options are valid" << std::endl;
 }

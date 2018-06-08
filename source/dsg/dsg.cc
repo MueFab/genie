@@ -3,13 +3,12 @@
 
 /**
  *  @file dsg.cc
- *  @brief dsg (descriptor-stream-generator) main file
+ *  @brief dsg (descriptor stream generator) main file
  *  @author Jan Voges
  *  @bug No known bugs
  */
 
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -17,9 +16,9 @@
 
 #include <iostream>
 #include <stdexcept>
-#include <string>
 
 #include "ProgramOptions.h"
+#include "input/fasta/FastaFileReader.h"
 
 
 static void printHelp(
@@ -35,7 +34,9 @@ static void processProgramOptions(
     dsg::ProgramOptions * const programOptions);
 
 
-static int dsg_main(int argc, char *argv[])
+static int dsg_main(
+    int argc,
+    char *argv[])
 {
     try {
         printVersionAndCopyright();
@@ -44,7 +45,20 @@ static int dsg_main(int argc, char *argv[])
 
         processProgramOptions(argc, argv, &programOptions);
 
-//         dsg::FASTAFile inputFASTAFile("test.fasta", dsg::FASTAFile::MODE_READ);
+        if (programOptions.inputFileType == "FASTA") {
+            dsg::FastaFileReader fastaFileReader(programOptions.inputFileName);
+
+            for (const auto fastaRecord : fastaFileReader.records) {
+                std::cout << fastaRecord.header << "  ";
+                std::cout << fastaRecord.sequence << std::endl;
+            }
+        } else if (programOptions.inputFileType == "FASTQ") {
+            //
+        } else if (programOptions.inputFileType == "SAM") {
+            //
+        } else {
+            throw std::runtime_error("wrong input file type");
+        }
     }
     catch(boost::program_options::error& e) {
         std::cerr << "Program options error";

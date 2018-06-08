@@ -4,7 +4,7 @@ We use CMake (https://cmake.org/) as build system.
 
 genie comprises two applications:
 
-* dsg (descriptor-stream-generator)
+* dsg (descriptor stream generator)
 * encoder
 
 We provide a ``CMakeLists.txt`` file to build these applications with CMake (https://cmake.org/).

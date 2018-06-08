@@ -1,5 +1,8 @@
-cmake_minimum_required(VERSION 3.1)
+#==============================================================================
+# General CMake configuration
+#==============================================================================
 
+cmake_minimum_required(VERSION 3.1)
 
 project("genie")
 
@@ -91,10 +94,16 @@ set(dsg_include_dir ${CMAKE_SOURCE_DIR}/source/dsg)
 
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/dsg.cc)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/ProgramOptions.cc)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/common/utils.cc)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/FileReader.cc)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/fasta/FastaFileReader.cc)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/fasta/FastaRecord.cc)
 
 add_executable(${dsg} ${dsg_source_files})
-target_include_directories(${dsg} PRIVATE ${dsg_include_dir} ${boost_include_dir})
-link_directories(${boost_lib_dir})
+
+target_include_directories(${dsg} PRIVATE ${dsg_include_dir})
+target_include_directories(${dsg} PRIVATE ${boost_include_dir})
+
 target_link_libraries(${dsg} ${boost_lib_dir}/libboost_program_options.a)
 
 
@@ -103,6 +112,7 @@ target_link_libraries(${dsg} ${boost_lib_dir}/libboost_program_options.a)
 #==============================================================================
 
 set(encoder "encoder")
+
 set(encoder_source_dir ${CMAKE_SOURCE_DIR}/source/encoder)
 set(encoder_include_dir ${CMAKE_SOURCE_DIR}/source/encoder)
 

@@ -10,7 +10,7 @@ This is the official repository for the development of genie.
 
 genie comprises two applications:
 
-* dsg (descriptor-stream-generator)
+* dsg (descriptor stream generator)
 * encoder
 
 We provide a ``CMakeLists.txt`` file to build these applications with CMake (https://cmake.org/).
