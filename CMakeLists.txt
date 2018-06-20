@@ -57,6 +57,7 @@ if (UNIX)
     include(ExternalProject)
 
     set(BOOST_ROOT ${boost_root_dir})
+    set(Boost_NO_SYSTEM_PATHS "ON")
     find_package(Boost)
 
     if (NOT Boost_FOUND)
@@ -78,9 +79,8 @@ if (UNIX)
         message(STATUS "Boost already installed - rebuild not required")
     endif()
 else ()
-    message(FATAL_ERROR "Boost build currently not supported on non-UNIX-like systems")
+    message(FATAL_ERROR "Boost build currently not supported on non UNIX-like systems")
 endif()
-
 
 
 #==============================================================================
