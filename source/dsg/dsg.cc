@@ -48,7 +48,7 @@ static int dsg_main(
         if (programOptions.inputFileType == "FASTA") {
             dsg::FastaFileReader fastaFileReader(programOptions.inputFileName);
 
-            for (const auto fastaRecord : fastaFileReader.records) {
+            for (const auto& fastaRecord : fastaFileReader.records) {
                 std::cout << fastaRecord.header << "  ";
                 std::cout << fastaRecord.sequence << std::endl;
             }
