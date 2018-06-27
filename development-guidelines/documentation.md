@@ -6,3 +6,4 @@ Few rules apply:
 
 * Every source and every header file shall have a "Doxygen header".
 * Use Doxygen documentation only in *header* files.
+

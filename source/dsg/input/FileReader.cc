@@ -7,42 +7,51 @@
  *  @bug No known bugs
  */
 
-#include "input/FileReader.h"
+#include "FileReader.h"
 
 #include <limits.h>
-#include <stdexcept>
+#include <string.h>
 
-#include "common/os.h"
+#include "common/exceptions.h"
+#include "common/operating-system.h"
 
 
 namespace dsg {
+namespace input {
 
 
 FileReader::FileReader(void)
-    : fp_(NULL),
-      fsize_(0),
-      isOpen_(false)
+    : m_fp(NULL),
+      m_fsize(0)
 {
     // Nothing to do here.
 }
 
 
 FileReader::FileReader(
-    const std::string &path)
-    : fp_(NULL),
-      fsize_(0),
-      isOpen_(false)
+    const std::string& path)
+    : m_fp(NULL),
+      m_fsize(0)
 {
     if (path.empty() == true) {
-        throw std::runtime_error("path is empty");
+        throwRuntimeError("path is empty");
     }
 
     open(path);
+
+    // Usually, lines in a FASTA file should be limited to 80 chars, so 4 KB
+    // should be enough.
+    m_line = reinterpret_cast<char *>(malloc(MAX_LINE_LENGTH));
+    if (m_line == NULL) {
+        throwRuntimeError("malloc failed");
+    }
 }
 
 
 FileReader::~FileReader(void)
 {
+    free(m_line);
+
     close();
 }
 
@@ -51,101 +60,150 @@ void FileReader::open(
     const std::string& path)
 {
     if (path.empty() == true) {
-        throw std::runtime_error("path is empty");
+        throwRuntimeError("path is empty");
     }
 
-    if (fp_ != NULL) {
-        throw std::runtime_error("File pointer already in use");
+    if (m_fp != NULL) {
+        throwRuntimeError("file pointer already in use");
     }
 
     const char *mode = "rb";
 
-#ifdef CQ_OS_WINDOWS
-    int err = fopen_s(&fp_, path.c_str(), mode);
-    if (err != 0) {
-        throw std::runtime_error("failed to open file");
+#ifdef OS_WINDOWS
+    int rc = fopen_s(&m_fp, path.c_str(), mode);
+    if (rc != 0) {
+        throwRuntimeError("failed to open file");
     }
 #else
-    fp_ = fopen(path.c_str(), mode);
-    if (fp_ == NULL) {
-        throw std::runtime_error("failed to open file");
+    m_fp = fopen(path.c_str(), mode);
+    if (m_fp == NULL) {
+        throwRuntimeError("failed to open file");
     }
 #endif
 
     // Compute file size.
-    fseek(fp_, 0, SEEK_END);
-    fsize_ = ftell(fp_);
-    fseek(fp_, 0, SEEK_SET);
-
-    isOpen_ = true;
+    seekFromEnd(0);
+    m_fsize = tell();
+    seekFromSet(0);
 }
 
 
 void FileReader::close(void)
 {
-    if (isOpen_ == true) {
-        if (fp_ != NULL) {
-            fclose(fp_);
-            fp_ = NULL;
-        } else {
-            throw std::runtime_error("failed to close file");
-        }
+    if (m_fp != NULL) {
+        fclose(m_fp);
+        m_fp = NULL;
+    } else {
+        throwRuntimeError("failed to close file");
     }
 }
 
 
 void FileReader::advance(
-    const size_t offset)
+    const int64_t offset)
 {
-    int ret = fseek(fp_, (long int)offset, SEEK_CUR);
-    if (ret != 0) {
-        throw std::runtime_error("fseek failed");
-    }
+    seekFromCur(offset);
 }
 
 
 bool FileReader::eof(void) const
 {
-    return feof(fp_) != 0 ? true : false;
+    return (feof(m_fp) != 0) ? true : false;
 }
 
 
 void * FileReader::handle(void) const
 {
-    return fp_;
+    return m_fp;
 }
 
 
-void FileReader::seek(
-    const size_t pos)
+void FileReader::readLine(
+    std::string * const line)
 {
-    if (pos > LONG_MAX) {
-        throw std::runtime_error("pos out of range");
+    line->clear();
+
+    char *rc = fgets(m_line, MAX_LINE_LENGTH, m_fp);
+
+    if (rc == NULL) {
+        // This means:
+        //   - error during read
+        //   OR
+        //   - encountered EOF, nothing has been read
+        // We just return to the caller and leave 'line' empty.
+        return;
     }
 
-    int ret = fseek(fp_, (long)pos, SEEK_SET);
-    if (ret != 0) {
-        throw std::runtime_error("fseek failed");
+    if (eof() == true) {
+        // This means: EOF was reached but contents were read into 'm_line'
+        // and 'rc', respectively.
+        // We just proceed processing the read contents.
     }
+
+    // Trim line.
+    size_t l = strlen(m_line) - 1;
+    while (l && ((m_line[l] == '\r') || (m_line[l] == '\n'))) {
+        m_line[l--] = '\0';
+    }
+
+    *line = m_line;
+}
+
+
+void FileReader::seekFromCur(
+    const int64_t offset)
+{
+    seek(offset, SEEK_CUR);
+}
+
+
+void FileReader::seekFromEnd(
+    const int64_t offset)
+{
+    seek(offset, SEEK_END);
+}
+
+
+void FileReader::seekFromSet(
+    const int64_t offset)
+{
+    seek(offset, SEEK_SET);
 }
 
 
 size_t FileReader::size(void) const
 {
-    return fsize_;
+    return m_fsize;
 }
 
 
-size_t FileReader::tell(void) const
+int64_t FileReader::tell(void) const
 {
-    long int offset = ftell(fp_);
+    int64_t offset = static_cast<int64_t>(ftell(m_fp));
 
     if (offset == -1) {
-        throw std::runtime_error("ftell failed");
+        throwRuntimeError("ftell failed");
     }
 
     return offset;
 }
 
 
+void FileReader::seek(
+    const int64_t offset,
+    const int whence)
+{
+    if (offset > LONG_MAX) {
+        throwRuntimeError("position out of range");
+    }
+
+    int rc = fseek(m_fp, offset, whence);
+    if (rc != 0) {
+        throwRuntimeError("fseek failed");
+    }
+}
+
+
+}  // namespace input
 }  // namespace dsg
+

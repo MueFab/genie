@@ -3,7 +3,7 @@
 
 /**
  *  @file constants.h
- *  @brief File input/output interface
+ *  @brief Constants
  *  @author Jan Voges
  *  @bug No known bugs
  */
@@ -27,3 +27,4 @@
 
 
 #endif  // DSG_COMMON_CONSTANTS_H_
+

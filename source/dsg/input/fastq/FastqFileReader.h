@@ -8,46 +8,40 @@
  *  @bug No known bugs
  */
 
-#ifndef DSG_INPUT_FASTA_FASTQFILEREADER_H_
-#define DSG_INPUT_FASTA_FASTQFILEREADER_H_
+#ifndef DSG_INPUT_FASTQ_FASTQFILEREADER_H_
+#define DSG_INPUT_FASTQ_FASTQFILEREADER_H_
 
 
+#include <string>
 #include <vector>
 
 #include "common/constants.h"
 #include "input/FileReader.h"
-#include "input/fasta/FastqRecord.h"
+#include "input/fastq/FastqRecord.h"
 
 
 namespace dsg {
+namespace input {
+namespace fastq {
 
 
 class FastqFileReader : public FileReader {
  public:
-
     FastqFileReader(
         const std::string& path);
 
     ~FastqFileReader(void);
 
- public:
-
-     std::vector<FastqRecord> records;
-
- private:
-
-     void parse(void);
-
- private:
-
-    static const size_t MAX_LINE_LENGTH = sizeof(char) * (4 * KB);
-
-    char *m_line;
+    size_t readRecords(
+        const size_t numRecords,
+        std::vector<FastqRecord> * const records);
 };
 
 
+}  // namespace fastq
+}  // namespace input
 }  // namespace dsg
 
 
-#endif  // DSG_INPUT_FASTA_FASTQFILEREADER_H_
+#endif  // DSG_INPUT_FASTQ_FASTQFILEREADER_H_
 

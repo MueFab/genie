@@ -8,3 +8,4 @@ That means:
 * Development takes place on the ``develop``branch.
 * Actual development takes place in *feature* branches, e.g. ``feature/encoder``.
 * Once a *feature* is completed, its branch can be merged back into the ``develop`` branch.
+
