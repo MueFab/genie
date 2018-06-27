@@ -17,25 +17,26 @@
 
 
 namespace dsg {
+namespace input {
+namespace fasta {
 
 
 struct FastaRecord {
-  public:
-
+ public:
     FastaRecord(
         const std::string& header,
         const std::string& sequence);
 
     ~FastaRecord(void);
 
-  public:
-
+ public:
     std::string header;
-
     std::string sequence;
 };
 
 
+}  // namespace fasta
+}  // namespace input
 }  // namespace dsg
 
 

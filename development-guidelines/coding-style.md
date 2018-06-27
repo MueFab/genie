@@ -7,3 +7,4 @@ Conformance (and static code analysis) testing of a source or header file with r
 Furthermore, we provide a cpplint configuration in the file ``source/CPPLINT.cfg``.
 
 The testing of the entire source code is automated via the Bash script ``cpplint/run-cpplint.sh``, which must be executed from the ``cpplint`` folder.
+

@@ -28,15 +28,10 @@ struct ProgramOptions {
 
     void validate(void);
 
-
     bool force;
-
     std::string inputFileName;
-
     std::string outputFileName;
-
     std::string inputFileType;
-
     bool verbose;
 };
 
@@ -45,3 +40,4 @@ struct ProgramOptions {
 
 
 #endif  // DSG_PROGRAMOPTIONS_H_
+

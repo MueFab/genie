@@ -40,7 +40,6 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     message(STATUS "Detected compiler: Microsoft Visual Studio")
-
     message(FATAL_ERROR "Compiler currently not supported by CMake build: ${CMAKE_CXX_COMPILER_ID}")
 else ()
     message(FATAL_ERROR "Compiler currently not supported by CMake build: ${CMAKE_CXX_COMPILER_ID}")
@@ -70,7 +69,7 @@ if (UNIX)
             PREFIX ${boost_root_dir}
             GIT_REPOSITORY ${boost_git_repository}
             GIT_TAG ${boost_git_tag}
-            CONFIGURE_COMMAND ./bootstrap.sh --with-libraries=program_options --prefix=${boost_root_dir}
+            CONFIGURE_COMMAND ./bootstrap.sh --with-libraries=log,program_options --prefix=${boost_root_dir}
             BUILD_COMMAND ./b2 link=static install
             BUILD_IN_SOURCE 1
             INSTALL_COMMAND ""
@@ -95,17 +94,24 @@ set(dsg_source_dir ${CMAKE_SOURCE_DIR}/source/dsg)
 set(dsg_include_dir ${CMAKE_SOURCE_DIR}/source/dsg)
 
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/dsg.cc)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/generation.cc)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/ProgramOptions.cc)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/common/utils.cc)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/common/utilities.cc)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/common/exceptions.cc)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/FileReader.cc)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/fasta/FastaFileReader.cc)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/fasta/FastaRecord.cc)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/fastq/FastqFileReader.cc)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/fastq/FastqRecord.cc)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/sam/SamRecord.cc)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/sam/SamFileReader.cc)
 
 add_executable(${dsg} ${dsg_source_files})
 
 target_include_directories(${dsg} PRIVATE ${dsg_include_dir})
 target_include_directories(${dsg} PRIVATE ${boost_include_dir})
 
+# #target_link_libraries(${dsg} ${boost_lib_dir}/libboost_log.a)
 target_link_libraries(${dsg} ${boost_lib_dir}/libboost_program_options.a)
 
 
@@ -123,3 +129,6 @@ set(encoder_source_files ${encoder_source_files} ${encoder_source_dir}/encoder.c
 add_executable(encoder ${encoder_source_files})
 
 target_include_directories(${encoder} PRIVATE ${encoder_include_dir})
+
+target_link_libraries(${dsg} ${boost_lib_dir}/libboost_program_options.a)
+

@@ -14,7 +14,8 @@
 #include <iostream>
 #include <set>
 
-#include "common/utils.h"
+#include "common/exceptions.h"
+#include "common/utilities.h"
 
 
 namespace dsg {
@@ -42,7 +43,7 @@ void ProgramOptions::print(void)
     std::cout << "Program options:" << std::endl;
     std::cout << "  force          : " << ((force == true) ? "true" : "false") << std::endl;
     std::cout << "  inputFileName  : " << inputFileName << std::endl;
-    std::cout << "  inputFileTypee : " << inputFileType << std::endl;
+    std::cout << "  inputFileType  : " << inputFileType << std::endl;
     std::cout << "  outputFileName : " << outputFileName << std::endl;
     std::cout << "  verbose        : " << (verbose ? "true" : "false") << std::endl;
 }
@@ -60,11 +61,11 @@ void ProgramOptions::validate(void)
     //
 
     if (inputFileName.empty() == true) {
-        throw std::runtime_error("no input file name provided");
+        throwRuntimeError("no input file name provided");
     }
 
-    if (fileExists(inputFileName) == false) {
-        throw std::runtime_error("input file does not exist");
+    if (common::fileExists(inputFileName) == false) {
+        throwRuntimeError("input file does not exist");
     }
 
 
@@ -84,7 +85,7 @@ void ProgramOptions::validate(void)
         for (const auto& allowedInputFileType : allowedInputFileTypes) {
             std::cout << "  " << allowedInputFileType << std::endl;
         }
-        throw std::runtime_error("Input file type is invalid");
+        throwRuntimeError("input file type is invalid");
     }
 
 
@@ -93,11 +94,11 @@ void ProgramOptions::validate(void)
     //
 
     if (outputFileName.empty() == true) {
-        throw std::runtime_error("No output file name provided");
+        throwRuntimeError("no output file name provided");
     }
 
-    if ((fileExists(outputFileName)) == true && (force == false)) {
-        throw std::runtime_error("not overwriting output file (use option 'f' to force overwriting)");
+    if ((common::fileExists(outputFileName)) == true && (force == false)) {
+        throwRuntimeError("not overwriting output file (use option 'f' to force overwriting)");
     }
 
 
@@ -113,4 +114,6 @@ void ProgramOptions::validate(void)
     std::cout << "Program options are valid" << std::endl;
 }
 
+
 }  // namespace dsg
+

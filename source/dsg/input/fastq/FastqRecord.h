@@ -9,18 +9,21 @@
  */
 
 
-#ifndef DSG_INPUT_FASTA_FASTQRECORD_H_
-#define DSG_INPUT_FASTA_FASTQRECORD_H_
+#ifndef DSG_INPUT_FASTQ_FASTQRECORD_H_
+#define DSG_INPUT_FASTQ_FASTQRECORD_H_
 
 
 #include <string>
 
 
 namespace dsg {
+namespace input {
+namespace fastq {
 
 
 struct FastqRecord {
-  public:
+ public:
+    FastqRecord(void);
 
     FastqRecord(
         const std::string& title,
@@ -30,20 +33,18 @@ struct FastqRecord {
 
     ~FastqRecord(void);
 
-  public:
-
+ public:
     std::string title;
-
     std::string sequence;
-
     std::string optional;
-
     std::string qualityScores;
 };
 
 
+}  // namespace fastq
+}  // namespace input
 }  // namespace dsg
 
 
-#endif  // DSG_INPUT_FASTA_FASTQRECORD_H_
+#endif  // DSG_INPUT_FASTQ_FASTQRECORD_H_
 

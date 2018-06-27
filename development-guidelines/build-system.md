@@ -17,3 +17,6 @@ Build the applications from the command line with the following commands; altern
     make
 
 This generates executables named ``dsg`` and ``encoder`` in the ``build`` folder.
+
+To add new source files to the build they have to be added manually to the ``CMakeLists.txt``.
+

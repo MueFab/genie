@@ -9,12 +9,24 @@
  */
 
 
-#include "input/fasta/FastqRecord.h"
+#include "FastqRecord.h"
 
-#include <iostream>
+#include <string>
 
 
 namespace dsg {
+namespace input {
+namespace fastq {
+
+
+FastqRecord::FastqRecord(void)
+    : title(""),
+      sequence(""),
+      optional(""),
+      qualityScores("")
+{
+    // Nothing to do here.
+}
 
 
 FastqRecord::FastqRecord(
@@ -37,5 +49,7 @@ FastqRecord::~FastqRecord(void)
 }
 
 
+}  // namespace fastq
+}  // namespace input
 }  // namespace dsg
 

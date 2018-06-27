@@ -5,7 +5,7 @@ if [ "$#" -ne 0 ]; then
     exit -1;
 fi
 
-source_folder="../source/"
+source_folder="../source"
 if [ ! -d $source_folder ]; then
     printf "Error: File $source_folder is not a directory.\n";
     exit -1;
@@ -29,25 +29,39 @@ if [ ! -f $cpplint_py ]; then
     exit -1;
 fi
 
-find="/usr/bin/find"
-if [ ! -x $find ]; then
-    printf "Error: Binary file $find is not executable.\n";
-    exit -1;
-fi
+files=()
+files+=("$source_folder/dsg/dsg.cc")
+files+=("$source_folder/dsg/generation.h")
+files+=("$source_folder/dsg/generation.cc")
+files+=("$source_folder/dsg/ProgramOptions.h")
+files+=("$source_folder/dsg/ProgramOptions.cc")
+files+=("$source_folder/dsg/common/constants.h")
+files+=("$source_folder/dsg/common/exceptions.h")
+files+=("$source_folder/dsg/common/exceptions.cc")
+files+=("$source_folder/dsg/common/operating-system.h")
+files+=("$source_folder/dsg/common/return-codes.h")
+files+=("$source_folder/dsg/common/utilities.h")
+files+=("$source_folder/dsg/common/utilities.cc")
+files+=("$source_folder/dsg/input/FileReader.h")
+files+=("$source_folder/dsg/input/FileReader.cc")
+files+=("$source_folder/dsg/input/fasta/FastaFileReader.h")
+files+=("$source_folder/dsg/input/fasta/FastaFileReader.cc")
+files+=("$source_folder/dsg/input/fasta/FastaRecord.h")
+files+=("$source_folder/dsg/input/fasta/FastaRecord.cc")
+files+=("$source_folder/dsg/input/fastq/FastqFileReader.h")
+files+=("$source_folder/dsg/input/fastq/FastqFileReader.cc")
+files+=("$source_folder/dsg/input/fastq/FastqRecord.h")
+files+=("$source_folder/dsg/input/fastq/FastqRecord.cc")
+files+=("$source_folder/dsg/input/sam/SamFileReader.h")
+files+=("$source_folder/dsg/input/sam/SamFileReader.cc")
+files+=("$source_folder/dsg/input/sam/SamRecord.h")
+files+=("$source_folder/dsg/input/sam/SamRecord.cc")
 
-find_options=" -type f "
-find_options+=" -name *.c "
-find_options+=" -or -name *.cc "
-find_options+=" -or -name *.cpp "
-find_options+=" -or -name *.h "
-find_options+=" -or -name *.hpp "
+for file in "${files[@]}"; do
+    printf "Running cpplint on: $file\n";
 
-source_files=`$find $source_folder $find_options`
+    $python $cpplint_py $file;
 
-for source_file in $source_files; do
     printf "\n";
-    printf "Running cpplint on: $source_file\n";
-#     printf "\n";
-
-    $python $cpplint_py $source_file;
 done
+

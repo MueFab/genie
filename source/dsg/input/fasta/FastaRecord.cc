@@ -9,12 +9,14 @@
  */
 
 
-#include "input/fasta/FastaRecord.h"
+#include "FastaRecord.h"
 
 #include <iostream>
 
 
 namespace dsg {
+namespace input {
+namespace fasta {
 
 
 FastaRecord::FastaRecord(
@@ -33,4 +35,7 @@ FastaRecord::~FastaRecord(void)
 }
 
 
+}  // namespace fasta
+}  // namespace input
 }  // namespace dsg
+

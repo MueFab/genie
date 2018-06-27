@@ -12,6 +12,7 @@
 #define DSG_INPUT_FASTA_FASTAFILEREADER_H_
 
 
+#include <string>
 #include <vector>
 
 #include "common/constants.h"
@@ -20,33 +21,26 @@
 
 
 namespace dsg {
+namespace input {
+namespace fasta {
 
 
 class FastaFileReader : public FileReader {
  public:
-
     FastaFileReader(
         const std::string& path);
 
     ~FastaFileReader(void);
 
- public:
-
-     std::vector<FastaRecord> records;
-
- private:
-
-     void parse(void);
-
- private:
-
-    static const size_t MAX_LINE_LENGTH = sizeof(char) * (4 * KB);
-
-    char *m_line;
+    void parse(
+        std::vector<FastaRecord> * const fastaRecords);
 };
 
 
+}  // namespace fasta
+}  // namespace input
 }  // namespace dsg
 
 
 #endif  // DSG_INPUT_FASTA_FASTAFILEREADER_H_
+

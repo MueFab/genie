@@ -15,33 +15,69 @@
 
 #include <string>
 
+#include "common/constants.h"
+
 
 namespace dsg {
+namespace input {
 
 
 class FileReader {
  public:
     FileReader(void);
-    FileReader(const std::string& path);
+
+    FileReader(
+        const std::string& path);
+
     virtual ~FileReader(void);
 
-    void open(const std::string &path);
+    void advance(
+        const int64_t offset);
+
+    bool eof(void) const;
+
     void close(void);
 
-    void advance(const size_t offset);
-    bool eof(void) const;
     void * handle(void) const;
-    void seek(const size_t pos);
+
+    void open(
+        const std::string &path);
+
+    void readLine(
+        std::string * const line);
+
+    void seekFromCur(
+        const int64_t offset);
+
+    void seekFromEnd(
+        const int64_t offset);
+
+    void seekFromSet(
+        const int64_t offset);
+
     size_t size(void) const;
-    size_t tell(void) const;
+
+    int64_t tell(void) const;
+
 
  protected:
-    FILE *fp_;
-    size_t fsize_;
-    bool isOpen_;
+    FILE *m_fp;
+
+    size_t m_fsize;
+
+ private:
+    void seek(
+        const int64_t offset,
+        const int whence);
+
+ private:
+    static const size_t MAX_LINE_LENGTH = sizeof(char) * (4 * KB);
+
+    char *m_line;
 };
 
 
+}  // namespace input
 }  // namespace dsg
 
 

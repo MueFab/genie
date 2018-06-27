@@ -1,6 +1,5 @@
 // Copyright 2018 The genie authors
 
-
 /**
  *  @file FastqFileReader.cc
  *  @brief FASTQ file input implementation
@@ -9,65 +8,80 @@
  */
 
 
-#include "input/fastq/FastqFileReader.h"
+#include "FastqFileReader.h"
 
-#include <string.h>
-
-#include <stdexcept>
 #include <string>
+
+#include "common/exceptions.h"
 
 
 namespace dsg {
+namespace input {
+namespace fastq {
 
 
 FastqFileReader::FastqFileReader(
     const std::string& path)
-    : FileReader(path),
-      records(),
-      m_line(NULL)
+    : FileReader(path)
 {
-    if (path.empty() == true) {
-        throw std::runtime_error("path is empty");
-    }
-
-    // Usually, lines in a FASTA file should be limited to 80 chars, so 4 KB
-    // should be enough
-    m_line = reinterpret_cast<char *>(malloc(MAX_LINE_LENGTH));
-    if (m_line == NULL) {
-        throw std::runtime_error("malloc failed");
-    }
-
-    // Parse the complete FASTA file
-    parse();
+    // Nothing to do here.
 }
 
 
 FastqFileReader::~FastqFileReader(void)
 {
-    free(m_line);
+    // Nothing to do here.
 }
 
 
-void FastqFileReader::parse(void)
+size_t FastqFileReader::readRecords(
+    const size_t numRecords,
+    std::vector<FastqRecord> * const fastqRecords)
 {
-    std::string currentHeader("");
-    std::string currentSequence("");
+    fastqRecords->clear();
 
-    while (fgets(m_line, MAX_LINE_LENGTH, fp_) != NULL) {
-        // Trim line
-        size_t l = strlen(m_line) - 1;
-        while (l && (m_line[l] == '\r' || m_line[l] == '\n')) {
-            m_line[l--] = '\0';
+    while (true) {
+        // Try to read 4 lines, i.e. an entire FASTQ record.
+        FastqRecord fastqRecord;
+        std::string line("");
+
+        // Try to read the title line.
+        readLine(&line);
+        if (line.empty() == true) {
+            return fastqRecords->size();
         }
+        fastqRecord.title = line;
 
-        if (m_line[0] == '@') {
+        readLine(&line);
+        if (line.empty() == true) {
+            throwRuntimeError("truncated FASTQ record");
+        }
+        fastqRecord.sequence = line;
 
+        readLine(&line);
+        if (line.empty() == true) {
+            throwRuntimeError("truncated FASTQ record");
+        }
+        fastqRecord.optional = line;
+
+        readLine(&line);
+        if (line.empty() == true) {
+            throwRuntimeError("truncated FASTQ record");
+        }
+        fastqRecord.qualityScores = line;
+
+//         validateFastqRecords(fastqRecord);
+
+        fastqRecords->push_back(fastqRecord);
+
+        if (fastqRecords->size() == numRecords) {
+            return fastqRecords->size();
+        }
     }
-
-    FastqRecord currentFastqRecord(currentHeader, currentSequence);
-    records.push_back(currentFastqRecord);
 }
 
 
+}  // namespace fastq
+}  // namespace input
 }  // namespace dsg
 

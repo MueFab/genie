@@ -15,10 +15,10 @@
 #include <boost/program_options.hpp>
 
 #include <iostream>
-#include <stdexcept>
 
+#include "generation.h"
 #include "ProgramOptions.h"
-#include "input/fasta/FastaFileReader.h"
+#include "common/exceptions.h"
 
 
 static void printHelp(
@@ -45,20 +45,7 @@ static int dsg_main(
 
         processProgramOptions(argc, argv, &programOptions);
 
-        if (programOptions.inputFileType == "FASTA") {
-            dsg::FastaFileReader fastaFileReader(programOptions.inputFileName);
-
-            for (const auto& fastaRecord : fastaFileReader.records) {
-                std::cout << fastaRecord.header << "  ";
-                std::cout << fastaRecord.sequence << std::endl;
-            }
-        } else if (programOptions.inputFileType == "FASTQ") {
-            //
-        } else if (programOptions.inputFileType == "SAM") {
-            //
-        } else {
-            throw std::runtime_error("wrong input file type");
-        }
+        generation(programOptions);
     }
     catch(boost::program_options::error& e) {
         std::cerr << "Program options error";
@@ -68,7 +55,7 @@ static int dsg_main(
         std::cerr << std::endl;
         return -1;
     }
-    catch (const std::runtime_error& e) {
+    catch (const dsg::common::RuntimeErrorException& e) {
         std::cerr << "Runtime error";
         if (strlen(e.what()) > 0) {
             std::cerr << ": " << e.what();
@@ -91,7 +78,9 @@ static int dsg_main(
  *  @param argv Argument values
  *  @return EXIT_FAILURE on failure and EXIT_SUCCESS on success.
  */
-int main(int argc, char *argv[])
+int main(
+    int argc,
+    char *argv[])
 {
     int rc = dsg_main(argc, argv);
     if (rc != 0) {
@@ -117,7 +106,8 @@ int main(int argc, char *argv[])
 }
 
 
-static void printHelp(const boost::program_options::options_description& optionsDescription)
+static void printHelp(
+    const boost::program_options::options_description& optionsDescription)
 {
     std::cout << optionsDescription;
 }
@@ -126,8 +116,8 @@ static void printHelp(const boost::program_options::options_description& options
 static void printVersionAndCopyright(void)
 {
     std::cout << std::string(80, '-') << std::endl;
-    printf("genie dsg (descriptor stream generator)\n");
-    printf("Copyright (c) 2018 The genie authors\n");
+    std::cout << "genie dsg (descriptor stream generator)" << std::endl;
+    std::cout << "Copyright (c) 2018 The genie authors" << std::endl;
     std::cout << std::string(80, '-') << std::endl;
 }
 

@@ -2,15 +2,15 @@
 
 
 /**
- *  @file os.c
+ *  @file operating-system.h
  *  @brief Operating system-specific definitions
  *  @author Jan Voges
  *  @bug No known bugs
  */
 
 
-#ifndef DSG_COMMON_OS_H_
-#define DSG_COMMON_OS_H_
+#ifndef DSG_COMMON_OPERATING_SYSTEM_H_
+#define DSG_COMMON_OPERATING_SYSTEM_H_
 
 
 #ifdef _WIN32
@@ -34,4 +34,5 @@
 #endif
 
 
-#endif  // DSG_COMMON_OS_H_
+#endif  // DSG_COMMON_OPERATING_SYSTEM_H_
+

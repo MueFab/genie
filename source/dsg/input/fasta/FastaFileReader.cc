@@ -9,83 +9,84 @@
  */
 
 
-#include "input/fasta/FastaFileReader.h"
+#include "FastaFileReader.h"
 
-#include <string.h>
-
-#include <stdexcept>
 #include <string>
+
+#include "common/exceptions.h"
 
 
 namespace dsg {
+namespace input {
+namespace fasta {
 
 
 FastaFileReader::FastaFileReader(
     const std::string& path)
-    : FileReader(path),
-      records(),
-      m_line(NULL)
+    : FileReader(path)
 {
-    if (path.empty() == true) {
-        throw std::runtime_error("path is empty");
-    }
-
-    // Usually, lines in a FASTA file should be limited to 80 chars, so 4 KB
-    // should be enough
-    m_line = reinterpret_cast<char *>(malloc(MAX_LINE_LENGTH));
-    if (m_line == NULL) {
-        throw std::runtime_error("malloc failed");
-    }
-
-    // Parse the complete FASTA file
-    parse();
+    // Nothing to do here.
 }
 
 
 FastaFileReader::~FastaFileReader(void)
 {
-    free(m_line);
+    // Nothing to do here.
 }
 
 
-void FastaFileReader::parse(void)
+void FastaFileReader::parse(
+    std::vector<FastaRecord> * const fastaRecords)
 {
+    // Reset file pointer to the beginning of the file.
+    size_t fpos = tell();
+    seekFromSet(0);
+
     std::string currentHeader("");
     std::string currentSequence("");
 
-    while (fgets(m_line, MAX_LINE_LENGTH, fp_) != NULL) {
-        // Trim line
-        size_t l = strlen(m_line) - 1;
-        while (l && (m_line[l] == '\r' || m_line[l] == '\n')) {
-            m_line[l--] = '\0';
+    while (true) {
+        // Read a line.
+        std::string line("");
+        readLine(&line);
+        if (line.empty() == true) {
+            break;
         }
 
-        if (m_line[0] == '>') {
+        // Process line.
+        if (line[0] == '>') {
+            // Store the previous FASTA record, if there is one.
             if (currentSequence.empty() == false) {
-                // We have a sequence, check if we have a header
+                // We have a sequence, check if we have a header.
                 if (currentHeader.empty() == true) {
-                    throw std::runtime_error("found sequence but no header");
+                    throwRuntimeError("found sequence but no header");
                 }
 
                 FastaRecord currentFastaRecord(currentHeader, currentSequence);
-                records.push_back(currentFastaRecord);
+                fastaRecords->push_back(currentFastaRecord);
+
+                currentHeader = "";
+                currentSequence = "";
             }
 
-            // Store the header and trim it: do not take the leading '>' and
-            // remove everything after the first space
-            currentHeader = m_line + 1;
+            // Store the header and trim it: remove everything after the first space.
+            currentHeader = line;
             currentHeader = currentHeader.substr(0, currentHeader.find_first_of(" "));
 
-            // Reset sequence
-            currentSequence = "";
         } else {
-            currentSequence += m_line;
+            currentSequence += line;
         }
     }
 
     FastaRecord currentFastaRecord(currentHeader, currentSequence);
-    records.push_back(currentFastaRecord);
+    fastaRecords->push_back(currentFastaRecord);
+
+    // Seek back.
+    seekFromSet(fpos);
 }
 
 
+}  // namespace fasta
+}  // namespace input
 }  // namespace dsg
+
