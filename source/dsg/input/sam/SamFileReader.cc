@@ -28,7 +28,6 @@ static void parseLine(
     fields->clear();
     fields->push_back("");
 
-    size_t position = 0;
     int fieldCount = 0;
 
     for (const auto& c : line) {
@@ -60,12 +59,7 @@ size_t SamFileReader::readRecords(
     const size_t numRecords,
     std::vector<SamRecord> * const records)
 {
-    std::string rnamePrev("");
-    uint32_t posPrev = 0;
-
     for (size_t i = 0; i < numRecords; i++) {
-        size_t fpos = tell();
-
         // Read a line.
         std::string line("");
         readLine(&line);
