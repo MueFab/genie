@@ -11,98 +11,97 @@
 #include "codebook.h"
 #include "qv_compressor.h"
 #include "sam_block.h"
+#include "input/fastq/FastqFileReader.h"
+#include "algorithms/SPRING/reorder_compress_quality_id.h"
 
-uint8_t paired_id_code;
-std::string preserve_order, quality_mode, paired_end, preserve_quality,
-    preserve_id;
-double quality_ratio;
-uint32_t numreads, numreads_by_2;
-int max_readlen, num_thr;
-char illumina_binning_table[128];
+struct reorder_compress_quality_id_global {
+	uint8_t paired_id_code;
+	bool preserve_order, paired_end, preserve_quality, preserve_id;
+	std::string quality_mode;
+	double quality_ratio;
+	uint32_t numreads, numreads_by_2;
+	int max_readlen, num_thr;
+	char illumina_binning_table[128];
 
-std::string infile_fastq_1;
-std::string infile_fastq_2;
-std::string infile_id_1;
-std::string infile_id_2;
-std::string infile_order;
-std::string outfile_order;
-std::string infilenumreads;
-std::string basedir;
-void generate_order();
+	std::string infile_id_1;
+	std::string infile_id_2;
+	std::string infile_order;
+	std::string outfile_order;
+	std::string infilenumreads;
+	std::string basedir;
+};
+
+void generate_order(reorder_compress_quality_id_global &rg);
 // generate reordering information for the two separate files (pairs) from
 // read_order.bin
 
-void reorder_quality();
-void reorder_id();
+void reorder_quality(dsg::FastqFileReader &fastqFileReader1, dsg::FastqFileReader &fastqFileReader2, reorder_compress_quality_id_global &rg);
+void reorder_id(reorder_compress_quality_id_global &rg);
 void encode(FILE *fout, struct qv_options_t *opts, uint32_t max_readlen,
             uint32_t numreads, char *quality_array, uint8_t *read_lengths,
-            std::string &infile_order, uint64_t startpos);
+            std::string &infile_order, uint64_t startpos, reorder_compress_quality_id_global &rg);
 void illumina_binning(char *quality, uint8_t readlen);
 void generate_illumina_binning_table();
 
-int main(int argc, char **argv) {
-  basedir = std::string(argv[1]);
+int reorder_compress_quality_id(std::string &working_dir, int max_readlen, int num_thr, bool preserve_order, bool paired_end, bool preserve_quality, bool preserve_id, dsg::FastqFileReader &fastqFileReader1, dsg::FastqFileReader &fastqFileReader2, std::string quality_mode, double quality_ratio) {
+  reorder_compress_quality_id_global rg;	
+  rg.basedir = working_dir;
 
-  infile_id_1 = basedir + "/input_1.id";
-  infile_id_2 = basedir + "/input_2.id";
-  infile_order = basedir + "/read_order.bin";
-  outfile_order = basedir + "/read_order.bin.tmp";
-  infilenumreads = basedir + "/numreads.bin";
+  rg.infile_id_1 = rg.basedir + "/input_1.id";
+  rg.infile_id_2 = rg.basedir + "/input_2.id";
+  rg.infile_order = rg.basedir + "/read_order.bin";
+  rg.outfile_order = rg.basedir + "/read_order.bin.tmp";
+  rg.infilenumreads = rg.basedir + "/numreads.bin";
 
-  max_readlen = atoi(argv[2]);
-  num_thr = atoi(argv[3]);
-  preserve_order = std::string(argv[4]);
-  paired_end = std::string(argv[5]);
-  preserve_quality = std::string(argv[6]);
-  preserve_id = std::string(argv[7]);
-  if (preserve_quality == "True") {
-    quality_mode = std::string(argv[8]);
-    quality_ratio = atof(argv[9]);
-    infile_fastq_1 = std::string(argv[10]);
-    if (paired_end == "True") infile_fastq_2 = std::string(argv[11]);
-  } else {
-    infile_fastq_1 = std::string(argv[8]);
-    if (paired_end == "True") infile_fastq_2 = std::string(argv[9]);
+  rg.max_readlen = max_readlen;
+  rg.num_thr = num_thr;
+  rg.preserve_order = preserve_order;
+  rg.paired_end = paired_end;
+  rg.preserve_quality = preserve_quality;
+  rg.preserve_id = preserve_id;
+  if (rg.preserve_quality == true) {
+    rg.quality_mode = quality_mode;
+    rg.quality_ratio = quality_ratio;
   }
-  if (preserve_quality == "False" && preserve_id == "False") return 0;
+  if (rg.preserve_quality == false && rg.preserve_id == false) return 0;
   // fill illumina binning table
   generate_illumina_binning_table();
 
-  omp_set_num_threads(num_thr);
-  std::ifstream f_numreads(infilenumreads, std::ios::binary);
+  omp_set_num_threads(rg.num_thr);
+  std::ifstream f_numreads(rg.infilenumreads, std::ios::binary);
   f_numreads.seekg(4);
-  f_numreads.read((char *)&numreads, sizeof(uint32_t));
-  f_numreads.read((char *)&paired_id_code, sizeof(uint8_t));
+  f_numreads.read((char *)&rg.numreads, sizeof(uint32_t));
+  f_numreads.read((char *)&rg.paired_id_code, sizeof(uint8_t));
   f_numreads.close();
-  numreads_by_2 = numreads / 2;
-  if (paired_end == "False") numreads_by_2 = numreads;
-  generate_order();
+  rg.numreads_by_2 = rg.numreads / 2;
+  if (paired_end == false) rg.numreads_by_2 = rg.numreads;
+  generate_order(rg);
   std::cout << "Compressing qualities and/or ids\n";
-  if (preserve_quality == "True") reorder_quality();
-  if (preserve_id == "True") reorder_id();
-  if (paired_end == "True") remove((basedir + "/read_order.bin.tmp").c_str());
+  if (preserve_quality == true) reorder_quality(fastqFileReader1, fastqFileReader2, rg);
+  if (preserve_id == true) reorder_id(rg);
+  if (paired_end == true) remove((rg.basedir + "/read_order.bin.tmp").c_str());
   return 0;
 }
 
-void generate_order() {
-  if (preserve_order == "True")  // write fake order information in this case to
+void generate_order(reorder_compress_quality_id_global &rg) {
+  if (rg.preserve_order == true)  // write fake order information in this case to
                                  // provide common interface
   {
-    std::ofstream fout_order(outfile_order, std::ios::binary);
-    for (uint32_t i = 0; i < numreads_by_2; i++) {
+    std::ofstream fout_order(rg.outfile_order, std::ios::binary);
+    for (uint32_t i = 0; i < rg.numreads_by_2; i++) {
       fout_order.write((char *)&i, sizeof(uint32_t));
     }
     fout_order.close();
   } else {
-    if (paired_end == "False")
-      outfile_order = infile_order;
+    if (paired_end == false)
+      rg.outfile_order = rg.infile_order;
     else {
-      std::ifstream fin_order(infile_order, std::ios::binary);
-      std::ofstream fout_order(outfile_order, std::ios::binary);
+      std::ifstream fin_order(rg.infile_order, std::ios::binary);
+      std::ofstream fout_order(rg.outfile_order, std::ios::binary);
       uint32_t order;
-      for (uint32_t i = 0; i < numreads; i++) {
+      for (uint32_t i = 0; i < rg.numreads; i++) {
         fin_order.read((char *)&order, sizeof(uint32_t));
-        if (order < numreads_by_2) {
+        if (order < rg.numreads_by_2) {
           fout_order.write((char *)&order, sizeof(uint32_t));
         }
       }
@@ -113,17 +112,17 @@ void generate_order() {
   return;
 }
 
-void reorder_quality() {
+void reorder_quality(dsg::FastqFileReader &fastqFileReader1, dsg::FastqFileReader &fastqFileReader2, reorder_compress_quality_id_global &rg) {
   std::string infile_fastq[2] = {infile_fastq_1, infile_fastq_2};
   std::string line;
   char line_ch[max_readlen + 1];
   uint8_t cur_readlen;
   if ((quality_mode == "bsc" || quality_mode == "illumina_binning_bsc") &&
-      preserve_order == "True")
+      preserve_order == true)
   // just write to file without newlines
   {
     for (int k = 0; k < 2; k++) {
-      if (k == 1 && paired_end == "False") continue;
+      if (k == 1 && paired_end == false) continue;
       std::ifstream f_in(infile_fastq[k]);
       std::ofstream f_out(basedir + "/quality_" + std::to_string(k + 1) +
                           ".txt");
@@ -146,7 +145,7 @@ void reorder_quality() {
   uint8_t *read_lengths = new uint8_t[numreads_by_2];
 
   for (int k = 0; k < 2; k++) {
-    if (k == 1 && paired_end == "False") continue;
+    if (k == 1 && paired_end == false) continue;
     std::ifstream f_in(infile_fastq[k]);
 
     for (uint64_t i = 0; i < numreads_by_2; i++) {
@@ -208,11 +207,11 @@ void reorder_quality() {
   return;
 }
 
-void reorder_id() {
-  std::string *id = new std::string[numreads_by_2];
-  std::string infile_id[2] = {infile_id_1, infile_id_2};
+void reorder_id(reorder_compress_quality_id_global &rg) {
+  std::string *id = new std::string[rg.numreads_by_2];
+  std::string infile_id[2] = {rg.infile_id_1, rg.infile_id_2};
   for (int k = 0; k < 2; k++) {
-    if (k == 1 && paired_end == "False") continue;
+    if (k == 1 && paired_end == false) continue;
     if (paired_id_code != 0 && k == 1) break;
     std::ifstream f_in(infile_id[k]);
 

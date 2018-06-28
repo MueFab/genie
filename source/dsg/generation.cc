@@ -22,7 +22,7 @@
 #include "input/fastq/FastqRecord.h"
 #include "input/sam/SamFileReader.h"
 #include "input/sam/SamRecord.h"
-
+#include "algorithms/SPRING/spring.h"
 
 namespace dsg {
 
@@ -103,6 +103,27 @@ static void generationFromFastq(
 }
 
 
+static void generationFromFastq_SPRING(
+    const ProgramOptions& programOptions)
+{
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "Descriptor stream generation from FASTQ file" << std::endl;
+    std::cout << std::string(80, '-') << std::endl;
+
+    bool paired_end = false;
+    // Initialize a FASTQ file reader.
+    input::fastq::FastqFileReader fastqFileReader1(programOptions.inputFileName);
+    input::fastq::FastqFileReader fastqFileReader2(programOptions.inputFileName); 
+    if (!programOptions.inputPairFileName.empty()) {
+        paired_end = true;
+        fastqFileReader2.open(programOptions.inputPairFileName);
+    }
+    	
+    std::cout << "Calling SPRING" << std::endl;
+    generate_streams_SPRING(fastqFileReader1, fastqFileReader2, programOptions.numThr, paired_end);	
+}
+
+
 static void generationFromSam(
     const ProgramOptions& programOptions)
 {
@@ -151,7 +172,8 @@ void generation(
     if (programOptions.inputFileType == "FASTA") {
         generationFromFasta(programOptions);
     } else if (programOptions.inputFileType == "FASTQ") {
-        generationFromFastq(programOptions);
+    //    generationFromFastq(programOptions);
+        generationFromFastq_SPRING(programOptions);
     } else if (programOptions.inputFileType == "SAM") {
         generationFromSam(programOptions);
     } else {

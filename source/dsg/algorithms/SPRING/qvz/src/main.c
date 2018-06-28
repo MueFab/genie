@@ -55,7 +55,7 @@ void encode(FILE *fout, struct qv_options_t *opts, uint32_t max_readlen,
   *(qv_info.blocks[0].infile_order) = infile_order;
   qv_info.blocks[0].startpos = startpos;
   //	qv_info.blocks[0].lines = (struct line_t *)
-  // calloc(qv_info.blocks[0].count, sizeof(struct line_t));
+  //calloc(qv_info.blocks[0].count, sizeof(struct line_t));
   //	uint32_t order;
   //	for(uint32_t i = 0; i < qv_info.lines; i++)
   //	{

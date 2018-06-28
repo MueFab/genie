@@ -110,7 +110,7 @@ ending!
 //	}
 //
 //	info->blocks = (struct line_block_t *) calloc(info->block_count,
-// sizeof(struct line_block_t));
+//sizeof(struct line_block_t));
 //	if (!info->blocks) {
 //		return LF_ERROR_NO_MEMORY;
 //	}
@@ -129,7 +129,7 @@ ending!
 //
 //		// Allocate array of line info structs for the block
 //		cblock->lines = (struct line_t *) calloc(cblock->count,
-// sizeof(struct line_t));
+//sizeof(struct line_t));
 //		if (!cblock->lines) {
 //			return LF_ERROR_NO_MEMORY;
 //		}

@@ -30,8 +30,10 @@ struct ProgramOptions {
 
     bool force;
     std::string inputFileName;
+    std::string inputPairFileName;
     std::string outputFileName;
     std::string inputFileType;
+    int numThr;	
     bool verbose;
 };
 

@@ -59,9 +59,7 @@ if (UNIX)
 
     set(BOOST_ROOT ${boost_root_dir})
     set(Boost_NO_SYSTEM_PATHS "ON")
-    find_package(Boost)
 
-    if (NOT Boost_FOUND)
         set(boost_git_repository https://github.com/boostorg/boost.git)
         set(boost_git_tag "boost-1.67.0")
 
@@ -69,16 +67,13 @@ if (UNIX)
             PREFIX ${boost_root_dir}
             GIT_REPOSITORY ${boost_git_repository}
             GIT_TAG ${boost_git_tag}
-            CONFIGURE_COMMAND ./bootstrap.sh --with-libraries=log,program_options --prefix=${boost_root_dir}
+            CONFIGURE_COMMAND ./bootstrap.sh --with-libraries=log,program_options,filesystem,system --prefix=${boost_root_dir}
             BUILD_COMMAND ./b2 link=static install
             BUILD_IN_SOURCE 1
             INSTALL_COMMAND ""
         )
 
         add_library(boost STATIC IMPORTED DEPENDS Boost)
-    else ()
-        message(STATUS "Boost already installed - rebuild not required")
-    endif()
 else ()
     message(FATAL_ERROR "Boost build currently not supported on non UNIX-like systems")
 endif()
@@ -105,6 +100,8 @@ set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/fastq/FastqFile
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/fastq/FastqRecord.cc)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/sam/SamRecord.cc)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/sam/SamFileReader.cc)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/spring.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/preprocess.cpp)
 
 add_executable(${dsg} ${dsg_source_files})
 
@@ -113,6 +110,8 @@ target_include_directories(${dsg} PRIVATE ${boost_include_dir})
 
 # #target_link_libraries(${dsg} ${boost_lib_dir}/libboost_log.a)
 target_link_libraries(${dsg} ${boost_lib_dir}/libboost_program_options.a)
+target_link_libraries(${dsg} ${boost_lib_dir}/libboost_filesystem.a)
+target_link_libraries(${dsg} ${boost_lib_dir}/libboost_system.a)
 
 
 #==============================================================================

@@ -41,11 +41,13 @@ ProgramOptions::~ProgramOptions(void)
 void ProgramOptions::print(void)
 {
     std::cout << "Program options:" << std::endl;
-    std::cout << "  force          : " << ((force == true) ? "true" : "false") << std::endl;
-    std::cout << "  inputFileName  : " << inputFileName << std::endl;
-    std::cout << "  inputFileType  : " << inputFileType << std::endl;
-    std::cout << "  outputFileName : " << outputFileName << std::endl;
-    std::cout << "  verbose        : " << (verbose ? "true" : "false") << std::endl;
+    std::cout << "  force              : " << ((force == true) ? "true" : "false") << std::endl;
+    std::cout << "  inputFileName      : " << inputFileName << std::endl;
+    std::cout << "  inputPairFileName  : " << inputPairFileName << std::endl;
+    std::cout << "  inputFileType      : " << inputFileType << std::endl;
+    std::cout << "  outputFileName     : " << outputFileName << std::endl;
+    std::cout << "  numThr             : " << numThr << std::endl;	
+    std::cout << "  verbose            : " << (verbose ? "true" : "false") << std::endl;
 }
 
 
@@ -69,6 +71,16 @@ void ProgramOptions::validate(void)
     }
 
 
+    //
+    // inputPairFileName
+    //
+
+    if (inputPairFileName.empty() == false) {
+        if (common::fileExists(inputPairFileName) == false) {
+            throwRuntimeError("input pair file does not exist");
+        }
+    }
+	
     //
     // inputFileType
     //

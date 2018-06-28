@@ -20,7 +20,6 @@
 #include "ProgramOptions.h"
 #include "common/exceptions.h"
 
-
 static void printHelp(
     const boost::program_options::options_description& optionsDescription);
 
@@ -140,12 +139,18 @@ static void processProgramOptions(
         ("input-file-name,i",
             po::value<std::string>(&(programOptions->inputFileName))->required(),
             "Input file name")
+        ("input-pair-file-name,p",
+            po::value<std::string>(&(programOptions->inputPairFileName)),
+            "Paired input file name")
         ("input-file-type,t",
             po::value<std::string>(&(programOptions->inputFileType))->required(),
             "Input file type")
         ("output-file-name,o",
             po::value<std::string>(&(programOptions->outputFileName))->required(),
             "Output file name")
+        ("num-thr",
+            po::value<int>(&(programOptions->numThr))->default_value(1),
+            "Number of threads")
         ("verbose,v",
              po::bool_switch(&(programOptions->verbose)),
             "Be verbose");
