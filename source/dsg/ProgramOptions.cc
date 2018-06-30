@@ -79,6 +79,9 @@ void ProgramOptions::validate(void)
         if (common::fileExists(inputPairFileName) == false) {
             throwRuntimeError("input pair file does not exist");
         }
+        if (inputPairFileName == inputFileName) {
+            throwRuntimeError("Same file name for two files");
+        }
     }
 	
     //

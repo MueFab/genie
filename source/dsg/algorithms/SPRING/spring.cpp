@@ -6,15 +6,14 @@
 #include "algorithms/SPRING/spring.h"
 #include "input/fastq/FastqFileReader.h"
 #include "algorithms/SPRING/preprocess.h"
-/*
 #include "algorithms/SPRING/reorder.h"
 #include "algorithms/SPRING/encoder.h"
+/*
 #include "algorithms/SPRING/pe_encode.h"
 #include "algorithms/SPRING/reorder_compress_quality_id.h"
 */
 
-void call_reorder(std::string &working_dir, int max_readlen, int num_thr);
-void call_encoder(std::string &working_dir, int max_readlen, int num_thr);
+namespace spring {
 
 void generate_streams_SPRING(dsg::input::fastq::FastqFileReader &fastqFileReader1, dsg::input::fastq::FastqFileReader &fastqFileReader2, int num_thr, bool paired_end) {
 	// generate random working directory in the current directory
@@ -23,7 +22,7 @@ void generate_streams_SPRING(dsg::input::fastq::FastqFileReader &fastqFileReader
 	std::string working_dir = p1.native();
 	std::cout << "Temporary directory: " << working_dir << "\n";
 	int status = preprocess(fastqFileReader1, fastqFileReader2, working_dir, paired_end, true, true);
-/*	if (status != 0)
+	if (status != 0)
 		throw std::runtime_error("Bad input file");
 	std::ifstream f_meta(working_dir + "/read_meta.txt");
 	std::string max_readlen_str;
@@ -32,7 +31,7 @@ void generate_streams_SPRING(dsg::input::fastq::FastqFileReader &fastqFileReader
 	
 	call_reorder(working_dir, max_readlen, num_thr);
 	call_encoder(working_dir, max_readlen, num_thr);
-	if (paired_end == true)
+/*	if (paired_end == true)
 		pe_encode_main(working_dir, false);
 	fastqFileReader1.seekFromSet(0);
 	if (paired_end == true)
@@ -40,7 +39,7 @@ void generate_streams_SPRING(dsg::input::fastq::FastqFileReader &fastqFileReader
 	reorder_compress_quality_id(working_dir, max_readlen, num_thr, paired_end, true, true, true, fastqFileReader1, fastqFileReader2, "bsc", 8.0);
 */	return;
 }
-/*
+
 void call_reorder(std::string &working_dir, int max_readlen, int num_thr)
 {
 	size_t bitset_size_reorder = (2*max_readlen-1)/64*64+64;
@@ -61,6 +60,7 @@ void call_reorder(std::string &working_dir, int max_readlen, int num_thr)
 			 break;
 		case 512: reorder_main<512>(working_dir, max_readlen, num_thr);
 			 break;
+		default: throw std::runtime_error("Wrong bitset size.");
 	}
 }
 
@@ -92,6 +92,8 @@ void call_encoder(std::string &working_dir, int max_readlen, int num_thr)
 			 break;
 		case 768: encoder_main<768>(working_dir, max_readlen, num_thr);
 			 break;
+		default: throw std::runtime_error("Wrong bitset size.");
 	}
 }
-*/
+
+} // namespace spring

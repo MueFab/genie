@@ -5,7 +5,9 @@
 // should work with arbitray large number of elements, based on a cascade of
 // "collision-free" bit arrays
 
-#pragma once
+#ifndef SPRING_BOOPHF_H_
+#define SPRING_BOOPHF_H_
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,9 +23,11 @@
 #include <unordered_map>
 #include <vector>
 
+namespace spring {
+
 namespace boomphf {
 
-u_int64_t printPt(pthread_t pt) {
+static u_int64_t printPt(pthread_t pt) {
   unsigned char* ptc = (unsigned char*)(void*)(&pt);
   u_int64_t res = 0;
   for (size_t i = 0; i < sizeof(pt); i++) {
@@ -32,10 +36,6 @@ u_int64_t printPt(pthread_t pt) {
   return res;
 }
 
-////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark utils
-////////////////////////////////////////////////////////////////
 
 // iterator from disk file of u_int64_t with buffered read,   todo template
 template <typename basetype>
@@ -62,7 +62,8 @@ class bfile_iterator
     // printf("bf it %p\n",_is);
     _buffsize = 10000;
     _buffer = (basetype*)malloc(_buffsize * sizeof(basetype));
-    int reso = fseek(_is, 0, SEEK_SET);
+    // int reso = 
+    fseek(_is, 0, SEEK_SET);
     advance();
   }
 
@@ -164,7 +165,7 @@ inline unsigned int popcount_32(unsigned int x) {
 
 inline unsigned int popcount_64(uint64_t x) {
   unsigned int low = x & 0xffffffff;
-  unsigned int high = (x >> 32LL) & 0xffffffff;
+  unsigned int high = (unsigned int)((x >> 32LL) & 0xffffffff);
 
   return (popcount_32(low) + popcount_32(high));
 }
@@ -228,7 +229,6 @@ class Progress {
   void finish_threaded()  // called by only one of the threads
   {
     done = 0;
-    double rem = 0;
     for (int ii = 0; ii < _nthreads; ii++) done += (done_threaded[ii]);
     for (int ii = 0; ii < _nthreads; ii++) partial += (partial_threaded[ii]);
 
@@ -308,10 +308,6 @@ class Progress {
   // include timer, to print ETA ?
 };
 
-////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark hasher
-////////////////////////////////////////////////////////////////
 
 typedef std::array<uint64_t, 10> hash_set_t;
 typedef std::array<uint64_t, 2> hash_pair_t;
@@ -484,10 +480,6 @@ class XorshiftHashFunctors {
   SingleHasher_t singleHasher;
 };
 
-////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark iterators
-////////////////////////////////////////////////////////////////
 
 template <typename Iterator>
 struct iter_range {
@@ -505,10 +497,6 @@ iter_range<Iterator> range(Iterator begin, Iterator end) {
   return iter_range<Iterator>(begin, end);
 }
 
-////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark BitVector
-////////////////////////////////////////////////////////////////
 
 class bitVector {
  public:
@@ -601,9 +589,9 @@ class bitVector {
 
   // for debug purposes
   void print() const {
-    printf("bit array of size %lli: \n", _size);
+    printf("bit array of size %lli: \n", (long long int)_size);
     for (uint64_t ii = 0; ii < _size; ii++) {
-      if (ii % 10 == 0) printf(" (%llu) ", ii);
+      if (ii % 10 == 0) printf(" (%llu) ", (long long unsigned int)ii);
       int val = (_bitArray[ii >> 6] >> (ii & 63)) & 1;
       printf("%i", val);
     }
@@ -611,7 +599,7 @@ class bitVector {
 
     printf("rank array : size %lu \n", _ranks.size());
     for (uint64_t ii = 0; ii < _ranks.size(); ii++) {
-      printf("%llu :  %lli,  ", ii, _ranks[ii]);
+      printf("%llu :  %lli,  ", (long long unsigned int)ii, (long long int)_ranks[ii]);
     }
     printf("\n");
   }
@@ -717,10 +705,6 @@ class bitVector {
   std::vector<uint64_t> _ranks;
 };
 
-////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark level
-////////////////////////////////////////////////////////////////
 
 static inline uint64_t fastrange64(uint64_t word, uint64_t p) {
   // return word %  p;
@@ -747,10 +731,6 @@ class level {
   bitVector bitset;
 };
 
-////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark mphf
-////////////////////////////////////////////////////////////////
 
 #define NBBUFF 10000
 //#define NBBUFF 2
@@ -1144,8 +1124,8 @@ class mphf {
         1.0 - pow(((_gamma * (double)_nelem - 1) / (_gamma * (double)_nelem)),
                   _nelem - 1);
 
-    double sum_geom =
-        _gamma * (1.0 + _proba_collision / (1.0 - _proba_collision));
+    // double sum_geom =
+    //    _gamma * (1.0 + _proba_collision / (1.0 - _proba_collision));
     // printf("proba collision %f  sum_geom  %f \n",_proba_collision,sum_geom);
 
     _nb_levels = 25;
@@ -1402,10 +1382,6 @@ class mphf {
   pthread_mutex_t _mutex;
 };
 
-////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark threading
-////////////////////////////////////////////////////////////////
 
 template <typename elem_t, typename Hasher_t, typename Range, typename it_type>
 void* thread_processLevel(void* args) {
@@ -1435,3 +1411,7 @@ void* thread_processLevel(void* args) {
   return NULL;
 }
 }
+
+} //namespace spring
+
+#endif // SPRING_BOOPHF_H_
