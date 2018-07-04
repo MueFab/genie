@@ -1,5 +1,5 @@
 
-#include "util.h"
+#include "algorithms/SPRING/qvz/include/util.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -9,11 +9,14 @@
 #include <iostream>
 #include <string>
 
-#include "cluster.h"
-#include "codebook.h"
-#include "qv_compressor.h"
+#include "algorithms/SPRING/qvz/include/cluster.h"
+#include "algorithms/SPRING/qvz/include/codebook.h"
+#include "algorithms/SPRING/qvz/include/qv_compressor.h"
 
 #define ALPHABET_SIZE 72
+
+namespace spring {
+namespace qvz {
 
 /**
  *
@@ -24,14 +27,11 @@ void encode(FILE *fout, struct qv_options_t *opts, uint32_t max_readlen,
   struct quality_file_t qv_info;
   struct distortion_t *dist;
   struct alphabet_t *alphabet = alloc_alphabet(ALPHABET_SIZE);
-  uint32_t status;
-  struct hrtimer_t stats, encoding, total;
   //	FILE *fout, *funcompressed = NULL;
   FILE *funcompressed = NULL;
   uint64_t bytes_used;
   double distortion;
 
-  start_timer(&total);
 
   if (opts->distortion == DISTORTION_CUSTOM) {
     dist = gen_custom_distortion(ALPHABET_SIZE, opts->dist_file);
@@ -55,7 +55,7 @@ void encode(FILE *fout, struct qv_options_t *opts, uint32_t max_readlen,
   *(qv_info.blocks[0].infile_order) = infile_order;
   qv_info.blocks[0].startpos = startpos;
   //	qv_info.blocks[0].lines = (struct line_t *)
-  //calloc(qv_info.blocks[0].count, sizeof(struct line_t));
+  // calloc(qv_info.blocks[0].count, sizeof(struct line_t));
   //	uint32_t order;
   //	for(uint32_t i = 0; i < qv_info.lines; i++)
   //	{
@@ -69,14 +69,10 @@ void encode(FILE *fout, struct qv_options_t *opts, uint32_t max_readlen,
   qv_info.opts = opts;
 
   // Then find stats and generate codebooks for each cluster
-  start_timer(&stats);
   calculate_statistics(&qv_info);
   generate_codebooks(&qv_info);
-  stop_timer(&stats);
 
   if (opts->verbose) {
-    printf("Stats and codebook generation took %.4f seconds\n",
-           get_timer_interval(&stats));
     // @todo expected distortion is inaccurate due to lack of pmf
     // printf("Expected distortion: %f\n", opts->e_dist);
   }
@@ -100,11 +96,8 @@ void encode(FILE *fout, struct qv_options_t *opts, uint32_t max_readlen,
 
   // @todo qv_compression should use quality_file structure with data in memory,
   // now
-  start_timer(&encoding);
   write_codebooks(fout, &qv_info);
   bytes_used = start_qv_compression(&qv_info, fout, &distortion, funcompressed);
-  stop_timer(&encoding);
-  stop_timer(&total);
 
   fclose(fout);
   delete qv_info.blocks[0].infile_order;
@@ -129,18 +122,16 @@ void encode(FILE *fout, struct qv_options_t *opts, uint32_t max_readlen,
       default:
         break;
     }
-    printf("Lines: %llu\n", qv_info.lines);
+    printf("Lines: %lu\n", qv_info.lines);
     printf("Columns: %u\n", qv_info.columns);
-    printf("Total bytes used: %llu\n", bytes_used);
-    printf("Encoding took %.4f seconds.\n", get_timer_interval(&total));
-    printf("Total time elapsed: %.4f seconds.\n", get_timer_interval(&total));
+    printf("Total bytes used: %lu\n", bytes_used);
   }
 
   // Parse-able stats
   if (opts->stats) {
-    printf("rate, %.4f, distortion, %.4f, time, %.4f, size, %llu \n",
+    printf("rate, %.4f, distortion, %.4f, size, %lu \n",
            (bytes_used * 8.) / ((double)(qv_info.lines) * qv_info.columns),
-           distortion, get_timer_interval(&total), bytes_used);
+           distortion, bytes_used);
   }
 }
 
@@ -150,14 +141,12 @@ void encode(FILE *fout, struct qv_options_t *opts, uint32_t max_readlen,
 void decode(char *input_file, char *output_file, struct qv_options_t *opts,
             uint8_t *read_lengths) {
   FILE *fin, *fout;
-  struct hrtimer_t timer;
   struct quality_file_t qv_info;
   struct alphabet_t *A = alloc_alphabet(ALPHABET_SIZE);
 
   qv_info.alphabet = A;
   qv_info.opts = opts;
 
-  start_timer(&timer);
 
   fin = fopen(input_file, "rb");
   fout = fopen(output_file, "wt");
@@ -171,12 +160,7 @@ void decode(char *input_file, char *output_file, struct qv_options_t *opts,
 
   fclose(fout);
   fclose(fin);
-  stop_timer(&timer);
 
-  if (opts->verbose) {
-    printf("Decoded %llu lines in %f seconds.\n", qv_info.lines,
-           get_timer_interval(&timer));
-  }
 }
 
 /**
@@ -404,3 +388,6 @@ movement threshold of %.0f.\n", opts.clusters, opts.cluster_threshold);
         return 0;
 }
 */
+
+} // namespace qvz
+} // namespace spring

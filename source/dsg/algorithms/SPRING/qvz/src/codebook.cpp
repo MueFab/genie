@@ -1,6 +1,6 @@
-#include "codebook.h"
-#include "cluster.h"
-#include "lines.h"
+#include "algorithms/SPRING/qvz/include/codebook.h"
+#include "algorithms/SPRING/qvz/include/cluster.h"
+#include "algorithms/SPRING/qvz/include/lines.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -10,6 +10,9 @@
 #if defined(LINUX) || defined(__APPLE__)
 #include <arpa/inet.h>
 #endif
+#include <arpa/inet.h>
+namespace spring {
+namespace qvz {
 
 /**
  * To compute stats for the training data, we will need a set of conditional
@@ -338,9 +341,9 @@ void compute_qpmf_quan_list(struct quantizer_t *q_lo, struct quantizer_t *q_hi,
     for (idx = 0; idx < q_output_union->size; idx++) {
       q_symbol = q_output_union->symbols[idx];
 
-      if (q_lo->q[x] == q_symbol) q_x_pmf->pmfs[x]->pmf[idx] += ratio;
+      if (q_lo->q[(uint8_t)x] == q_symbol) q_x_pmf->pmfs[(uint8_t)x]->pmf[idx] += ratio;
 
-      if (q_hi->q[x] == q_symbol) q_x_pmf->pmfs[x]->pmf[idx] += (1 - ratio);
+      if (q_hi->q[(uint8_t)x] == q_symbol) q_x_pmf->pmfs[(uint8_t)x]->pmf[idx] += (1 - ratio);
     }
   }
 }
@@ -379,7 +382,7 @@ void compute_qpmf_list(struct pmf_list_t *qpmf_list,
         p_temp = 0;
         for (x = 0; x < prev_qpmf_list->size; ++x) {
           p_temp +=
-              get_probability(prev_qpmf_list->pmfs[x], j) *
+              get_probability(prev_qpmf_list->pmfs[(uint8_t)x], j) *
               get_probability(get_cond_pmf(in_pmfs, column - 1, x), k) *
               get_probability(in_pmfs->marginal_pmfs->pmfs[column - 2], x);
         }
@@ -407,7 +410,7 @@ void compute_xpmf_list(struct pmf_list_t *qpmf_list,
       // compute P(X_{i+1} = k | Q_i = q)
       for (x = 0; x < qpmf_list->size; ++x) {
         xpmf_list->pmfs[idx]->pmf[k] +=
-            get_probability(qpmf_list->pmfs[x], idx) *
+            get_probability(qpmf_list->pmfs[(uint8_t)x], idx) *
             get_probability(get_cond_pmf(in_pmfs, column, x), k) *
             get_probability(in_pmfs->marginal_pmfs->pmfs[column - 1], x);
       }
@@ -599,8 +602,8 @@ void write_codebook(FILE *fp, struct cond_quantizer_list_t *quantizers) {
   struct quantizer_t *q_temp = get_cond_quantizer_indexed(quantizers, 0, 0);
   uint32_t size = q_temp->alphabet->size;
   uint32_t buflen = columns > size ? columns : size;
-  char *eol = "\n";
-  char *linebuf = (char *)_alloca(sizeof(char) * buflen);
+  char const *eol = "\n";
+  char *linebuf = (char *)malloc(sizeof(char) * buflen);
 
   // First line, ratio for zero context quantizer
   linebuf[0] = quantizers->qratio[0][0] + 33;
@@ -643,6 +646,7 @@ void write_codebook(FILE *fp, struct cond_quantizer_list_t *quantizers) {
     }
     fwrite(eol, sizeof(char), 1, fp);
   }
+  free(linebuf);
 }
 
 /**
@@ -777,3 +781,6 @@ void print_codebook(struct cond_quantizer_list_t *q) {
     }
   }
 }
+
+} // namespace qvz
+} // namespace spring

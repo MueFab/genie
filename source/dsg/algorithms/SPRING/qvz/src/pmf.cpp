@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "pmf.h"
+#include "algorithms/SPRING/qvz/include/pmf.h"
+
+namespace spring {
+namespace qvz {
 
 //#define log2(a) log(a)/log(2.0)
 /**
@@ -16,7 +19,7 @@ struct alphabet_t *alloc_alphabet(uint32_t size) {
   rtn->symbols = (symbol_t *)calloc(size, sizeof(symbol_t));
 
   for (i = 0; i < size; ++i) {
-    rtn->symbols[i] = i;
+    rtn->symbols[(uint8_t)i] = i;
   }
   alphabet_compute_index(rtn);
 
@@ -294,7 +297,7 @@ void clear_pmf_list(struct pmf_list_t *list) {
  * Determines if the given alphabet contains the given symbol
  */
 uint32_t alphabet_contains(const struct alphabet_t *alphabet, symbol_t symbol) {
-  return alphabet->indexes[symbol] != ALPHABET_SYMBOL_NOT_FOUND ? 1 : 0;
+  return alphabet->indexes[(uint8_t)symbol] != ALPHABET_SYMBOL_NOT_FOUND ? 1 : 0;
 }
 
 /**
@@ -302,7 +305,7 @@ uint32_t alphabet_contains(const struct alphabet_t *alphabet, symbol_t symbol) {
  * if the alphabet doesn't start at zero, has gaps, etc.
  */
 uint32_t get_symbol_index(const struct alphabet_t *alphabet, symbol_t symbol) {
-  return alphabet->indexes[symbol];
+  return alphabet->indexes[(uint8_t)symbol];
 }
 
 /**
@@ -312,7 +315,7 @@ uint32_t get_symbol_index(const struct alphabet_t *alphabet, symbol_t symbol) {
 void alphabet_union(const struct alphabet_t *restrict a,
                     const struct alphabet_t *restrict b,
                     struct alphabet_t *result) {
-  symbol_t *sym = (symbol_t *)_alloca((a->size + b->size) * sizeof(symbol_t));
+  symbol_t *sym = (symbol_t *)malloc((a->size + b->size) * sizeof(symbol_t));
   uint32_t i = 0;
   uint32_t j = 0;
   uint32_t k = 0;
@@ -353,6 +356,7 @@ void alphabet_union(const struct alphabet_t *restrict a,
   memcpy(result->symbols, sym, k * sizeof(symbol_t));
   result->size = k;
   alphabet_compute_index(result);
+  free(sym);
 }
 
 /**
@@ -376,7 +380,7 @@ void alphabet_compute_index(struct alphabet_t *A) {
   }
 
   for (i = 0; i < A->size; ++i) {
-    A->indexes[A->symbols[i]] = i;
+    A->indexes[(uint8_t)A->symbols[i]] = i;
   }
 }
 
@@ -403,3 +407,7 @@ void print_pmf(struct pmf_t *pmf) {
            pmf->counts[i], pmf->total);
   }
 }
+
+} // namespace qvz
+} // namespace spring
+

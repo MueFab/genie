@@ -1,6 +1,10 @@
-#include "qv_compressor.h"
+#include "algorithms/SPRING/qvz/include/qv_compressor.h"
 #include <assert.h>
 #include <fstream>
+
+namespace spring {
+namespace qvz {
+
 /**
  * Compress a quality value and send it into the arithmetic encoder output
  * stream,
@@ -102,7 +106,7 @@ uint32_t start_qv_compression(struct quality_file_t *info, FILE *fout,
 
     // Quantize, compress and calculate error simultaneously
     data = line[0] - 33;
-    qv = q->q[data];
+    qv = q->q[(uint8_t)data];
 
     q_state = get_symbol_index(q->output_alphabet, qv);
     compress_qv(qvc->Quals, q_state, cluster_id, 0, idx);
@@ -118,7 +122,7 @@ uint32_t start_qv_compression(struct quality_file_t *info, FILE *fout,
     for (s = 1; s < cur_readlen; ++s) {
       q = choose_quantizer(qlist, &info->well, s, prev_qv, &idx);
       data = line[s] - 33;
-      qv = q->q[data];
+      qv = q->q[(uint8_t)data];
       q_state = get_symbol_index(q->output_alphabet, qv);
 
       // @todo use buffer to speed up the writing
@@ -171,7 +175,7 @@ void start_qv_decompression(FILE *fout, FILE *fin, struct quality_file_t *info,
   struct cond_quantizer_list_t *qlist;
   struct quantizer_t *q;
 
-  char *line = (char *)_alloca(columns + 2);
+  char *line = (char *)malloc(columns + 2);
 
   // Initialize the compressor
   qvc = initialize_qv_compressor(fin, DECOMPRESSION, info);
@@ -257,4 +261,8 @@ void start_qv_decompression(FILE *fout, FILE *fin, struct quality_file_t *info,
   fwrite(line, cur_readlen + 1, sizeof(uint8_t), fout);
 
   info->lines = lineCtr;
+  free(line);
 }
+
+} // namespace qvz
+} // namespace spring

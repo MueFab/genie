@@ -1,13 +1,16 @@
-#ifndef _QUANTIZER_H_
-#define _QUANTIZER_H_
+#ifndef SPRING_QVZ_QUANTIZER_H_
+#define SPRING_QVZ_QUANTIZER_H_
 
 #include <stdint.h>
 
-#include "distortion.h"
-#include "pmf.h"
-#include "util.h"
+#include "algorithms/SPRING/qvz/include/distortion.h"
+#include "algorithms/SPRING/qvz/include/pmf.h"
+#include "algorithms/SPRING/qvz/include/util.h"
 
 #define QUANTIZER_MAX_ITER 100
+
+namespace spring {
+namespace qvz {
 
 /**
  * Structure holding information about a quantizer, which just maps input
@@ -41,5 +44,8 @@ void find_output_alphabet(struct quantizer_t *);
 
 // Display/debugging
 void print_quantizer(struct quantizer_t *);
+
+} // namespace qvz
+} // naemspace spring
 
 #endif

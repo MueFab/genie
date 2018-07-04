@@ -1,11 +1,11 @@
 #ifndef SPRING_UTIL_H_
 #define SPRING_UTIL_H_
 
-#include <bitset>
-#include <string>
-#include <fstream>
-#include <algorithm>
 #include <omp.h>
+#include <algorithm>
+#include <bitset>
+#include <fstream>
+#include <string>
 #include "algorithms/SPRING/BooPHF.h"
 
 namespace spring {
@@ -19,7 +19,7 @@ class bbhashdict {
  public:
   boophf_t *bphf;
   int start;
-  int end;	
+  int end;
   uint32_t numkeys;
   uint32_t dict_numreads;  // number of reads in this dict (for variable length)
   uint32_t *startpos;
@@ -40,13 +40,15 @@ class bbhashdict {
   }
 };
 
-template<size_t bitset_size>
-void stringtobitset(std::string s, uint8_t readlen, std::bitset<bitset_size> &b, std::bitset<bitset_size> basemask[256][128]) {
+template <size_t bitset_size>
+void stringtobitset(std::string s, uint8_t readlen, std::bitset<bitset_size> &b,
+                    std::bitset<bitset_size> basemask[256][128]) {
   for (int i = 0; i < readlen; i++) b |= basemask[i][(uint8_t)s[i]];
 }
 
-template<size_t bitset_size>
-void generateindexmasks(std::bitset<bitset_size> *mask1, bbhashdict *dict, int numdict, int bpb) {
+template <size_t bitset_size>
+void generateindexmasks(std::bitset<bitset_size> *mask1, bbhashdict *dict,
+                        int numdict, int bpb) {
   for (int j = 0; j < numdict; j++) mask1[j].reset();
   for (int j = 0; j < numdict; j++)
     for (int i = bpb * dict[j].start; i < bpb * (dict[j].end + 1); i++)
@@ -54,8 +56,10 @@ void generateindexmasks(std::bitset<bitset_size> *mask1, bbhashdict *dict, int n
   return;
 }
 
-template<size_t bitset_size>
-void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint8_t *read_lengths, int numdict, uint32_t numreads, int bpb, std::string &basedir, int num_thr) {
+template <size_t bitset_size>
+void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict,
+                         uint8_t *read_lengths, int numdict, uint32_t numreads,
+                         int bpb, std::string &basedir, int num_thr) {
   std::bitset<bitset_size> mask[numdict];
   generateindexmasks<bitset_size>(mask, dict, numdict, bpb);
   for (int j = 0; j < numdict; j++) {
@@ -199,30 +203,35 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint8
   return;
 }
 
-template<size_t bitset_size>
-void generatemasks(std::bitset<bitset_size> mask[MAX_READ_LEN][MAX_READ_LEN], int max_readlen, int bpb) {
-// mask for zeroing the end bits (needed while reordering to compute Hamming
-// distance between shifted reads)
+template <size_t bitset_size>
+void generatemasks(std::bitset<bitset_size> mask[MAX_READ_LEN][MAX_READ_LEN],
+                   int max_readlen, int bpb) {
+  // mask for zeroing the end bits (needed while reordering to compute Hamming
+  // distance between shifted reads)
   for (int i = 0; i < max_readlen; i++) {
     for (int j = 0; j < max_readlen; j++) {
       mask[i][j].reset();
-      for (int k = bpb * i; k < bpb * max_readlen - bpb * j; k++) mask[i][j][k] = 1;
+      for (int k = bpb * i; k < bpb * max_readlen - bpb * j; k++)
+        mask[i][j][k] = 1;
     }
   }
   return;
 }
 
-void reverse_complement(char *s, char *s1, int readlen, char chartorevchar[128]);
+void reverse_complement(char *s, char *s1, int readlen,
+                        char chartorevchar[128]);
 
-template<size_t bitset_size>
-void chartobitset(char *s, int readlen, std::bitset<bitset_size> &b, std::bitset<bitset_size> basemask[256][128]) {
+template <size_t bitset_size>
+void chartobitset(char *s, int readlen, std::bitset<bitset_size> &b,
+                  std::bitset<bitset_size> basemask[256][128]) {
   b.reset();
   for (int i = 0; i < readlen; i++) b |= basemask[i][(uint8_t)s[i]];
   return;
 }
 
-std::string reverse_complement(std::string s, int readlen, char chartorevchar[128]);
+std::string reverse_complement(std::string s, int readlen,
+                               char chartorevchar[128]);
 
-} // namespace spring
+}  // namespace spring
 
-#endif // SPRING_UTIL_H_
+#endif  // SPRING_UTIL_H_

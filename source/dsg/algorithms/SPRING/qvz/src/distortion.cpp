@@ -3,8 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "distortion.h"
-#include "util.h"
+#include "algorithms/SPRING/qvz/include/distortion.h"
+#include "algorithms/SPRING/qvz/include/util.h"
+
+namespace spring {
+namespace qvz {
 
 /**
  * Allocates memory for a distortion matrix
@@ -184,3 +187,6 @@ void print_distortion(struct distortion_t *dist) {
     printf("\n");
   }
 }
+
+} // namespace qvz
+} // namespace spring

@@ -4,14 +4,17 @@
  * and converting between the different formats we use
  */
 
-#include "util.h"
+#include "algorithms/SPRING/qvz/include/util.h"
 
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/mman.h>
 
-#include "lines.h"
+#include "algorithms/SPRING/qvz/include/lines.h"
+
+namespace spring {
+namespace qvz {
 
 /**
  * This reads data from the given file pointer into memory, breaking it into
@@ -110,7 +113,7 @@ ending!
 //	}
 //
 //	info->blocks = (struct line_block_t *) calloc(info->block_count,
-//sizeof(struct line_block_t));
+// sizeof(struct line_block_t));
 //	if (!info->blocks) {
 //		return LF_ERROR_NO_MEMORY;
 //	}
@@ -129,7 +132,7 @@ ending!
 //
 //		// Allocate array of line info structs for the block
 //		cblock->lines = (struct line_t *) calloc(cblock->count,
-//sizeof(struct line_t));
+// sizeof(struct line_t));
 //		if (!cblock->lines) {
 //			return LF_ERROR_NO_MEMORY;
 //		}
@@ -154,3 +157,6 @@ void free_blocks(struct quality_file_t *info) {
   //	}
   free(info->blocks);
 }
+
+} // namespace qvz
+} // namespace spring

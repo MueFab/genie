@@ -9,7 +9,10 @@
 #ifndef XC_s2fastqIO_stream_stats_h
 #define XC_s2fastqIO_stream_stats_h
 
-#include "Arithmetic_stream.h"
+#include "algorithms/SPRING/ID_compression/include/Arithmetic_stream.h"
+
+namespace spring {
+namespace id_comp {
 
 typedef struct stream_model_t {
   uint32_t *counts;
@@ -30,4 +33,8 @@ int read_value_from_as(Arithmetic_stream as, stream_model model);
 
 void free_model(stream_model model);
 void free_models_array(stream_model *model_ptr, uint32_t num_models);
+
+} // namespace id_comp
+} // namespace spring
+
 #endif

@@ -1,11 +1,11 @@
-#ifndef _LINES_H_
-#define _LINES_H_
+#ifndef SPRING_QVZ_LINES_H_
+#define SPRING_QVZ_LINES_H_
 
 #include <stdint.h>
 #include <string>
-#include "distortion.h"
-#include "pmf.h"
-#include "well.h"
+#include "algorithms/SPRING/qvz/include/distortion.h"
+#include "algorithms/SPRING/qvz/include/pmf.h"
+#include "algorithms/SPRING/qvz/include/well.h"
 
 // This limits us to chunks that aren't too big to fit into a modest amount of
 // memory at a time
@@ -19,15 +19,19 @@
 #define LF_ERROR_NO_MEMORY 2
 #define LF_ERROR_TOO_LONG 4
 
+namespace spring {
+namespace qvz {
+
+
 /**
  * Points to a single line, which may be a pointer to a file in memory
  */
 // struct line_t {
 //	uint8_t cluster;		// Assigned cluster ID
 //	const symbol_t *m_data;	// Pointer to part of mmap'd region, has no
-//offsets applied, do not modify!
+// offsets applied, do not modify!
 //	symbol_t *m_data;	// Pointer to part of mmap'd region, has no
-//offsets applied, do not modify!
+// offsets applied, do not modify!
 //};
 
 /**
@@ -88,5 +92,8 @@ uint32_t load_file(const char *path, struct quality_file_t *info,
                    uint64_t max_lines);
 uint32_t alloc_blocks(struct quality_file_t *info);
 void free_blocks(struct quality_file_t *info);
+
+} // namespace qvz
+} // namespace spring
 
 #endif

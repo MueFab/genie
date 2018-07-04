@@ -38,6 +38,9 @@
 #define IDOFILE_PATH_ROOT "/tmp/idoFiles/idoFile."
 #endif
 
+namespace spring {
+namespace id_comp {
+
 extern int file_available;
 
 struct remote_file_info {
@@ -104,5 +107,8 @@ void *remote_decompression(void *remote_info);
 int clean_compressed_dir(struct io_stream_t *ios);
 void open_new_iofile(struct io_stream_t *ios);
 void stream_fill_buffer(struct io_stream_t *os);
+
+} // namespace id_comp
+} // namespace spring
 
 #endif

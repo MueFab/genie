@@ -6,10 +6,13 @@
 //  Copyright (c) 2014 Mikel Hernaez. All rights reserved.
 //
 
-#include "sam_block.h"
+#include "algorithms/SPRING/ID_compression/include/sam_block.h"
 
 // devuelve la longitud del PRIMER read?
 // se asume que todos lso reads son de la misma longitud.
+
+namespace spring {
+namespace id_comp {
 
 /**
  *
@@ -34,9 +37,10 @@ id_block alloc_id_block() {
   return rtn;
 }
 
-sam_block alloc_sam_models(Arithmetic_stream as, std::string *id_array,
-                           std::ifstream *f_order, uint32_t numreads,
-                           uint8_t mode) {
+sam_block alloc_sam_models(//Arithmetic_stream as, 
+			   std::string *id_array,
+                           std::ifstream *f_order, uint32_t numreads
+                          ) {
   sam_block sb = (sam_block)calloc(1, sizeof(struct sam_block_t));
 
   //   sb->fs = fin;
@@ -70,3 +74,6 @@ uint32_t load_sam_line(sam_block sb) {
   } else
     return 1;
 }
+
+} // namespace id_comp
+} // namespace spring

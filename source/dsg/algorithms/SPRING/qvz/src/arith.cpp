@@ -1,6 +1,9 @@
 #include <assert.h>
 #include <stdio.h>
-#include "qv_compressor.h"
+#include "algorithms/SPRING/qvz/include/qv_compressor.h"
+
+namespace spring {
+namespace qvz {
 
 Arithmetic_code initialize_arithmetic_encoder(uint32_t m) {
   Arithmetic_code a_code;
@@ -207,3 +210,6 @@ uint32_t decoder_last_step(Arithmetic_code a, stream_stats_ptr_t stats) {
 
   return x;
 }
+
+} // namespace qvz
+} // namespace spring

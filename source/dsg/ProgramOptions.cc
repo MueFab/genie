@@ -46,7 +46,7 @@ void ProgramOptions::print(void)
     std::cout << "  inputPairFileName  : " << inputPairFileName << std::endl;
     std::cout << "  inputFileType      : " << inputFileType << std::endl;
     std::cout << "  outputFileName     : " << outputFileName << std::endl;
-    std::cout << "  numThr             : " << numThr << std::endl;	
+    std::cout << "  numThr             : " << numThr << std::endl;
     std::cout << "  verbose            : " << (verbose ? "true" : "false") << std::endl;
 }
 
@@ -83,7 +83,7 @@ void ProgramOptions::validate(void)
             throwRuntimeError("Same file name for two files");
         }
     }
-	
+
     //
     // inputFileType
     //

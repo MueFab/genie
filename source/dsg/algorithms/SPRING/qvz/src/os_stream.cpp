@@ -1,4 +1,7 @@
-#include "qv_compressor.h"
+#include "algorithms/SPRING/qvz/include/qv_compressor.h"
+
+namespace spring {
+namespace qvz {
 
 /**
  * Allocates a file stream wrapper for the arithmetic encoder, with a given
@@ -121,3 +124,6 @@ void stream_write_buffer(struct os_stream_t *os) {
   os->written += os->bufPos;
   os->bufPos = 0;
 }
+
+} // namespace qvz
+} // namespace spring

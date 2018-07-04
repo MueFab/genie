@@ -6,9 +6,12 @@
 //  Copyright (c) 2014 Mikel Hernaez. All rights reserved.
 //
 
-#include "stream_model.h"
+#include "algorithms/SPRING/ID_compression/include/stream_model.h"
 #include <stdbool.h>
 #define DEBUG false
+
+namespace spring {
+namespace id_comp {
 
 void free_models_array(stream_model *model_ptr, uint32_t num_models) {
   uint32_t i = 0;
@@ -120,3 +123,6 @@ int read_value_from_as(Arithmetic_stream as, stream_model model) {
   }
   return x;
 }
+
+} // namespace id_comp
+} // namespace spring

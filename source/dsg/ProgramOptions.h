@@ -33,7 +33,7 @@ struct ProgramOptions {
     std::string inputPairFileName;
     std::string outputFileName;
     std::string inputFileType;
-    int numThr;	
+    int numThr;
     bool verbose;
 };
 

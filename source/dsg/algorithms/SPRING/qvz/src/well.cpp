@@ -1,4 +1,7 @@
-#include "well.h"
+#include "algorithms/SPRING/qvz/include/well.h"
+
+namespace spring {
+namespace qvz {
 
 /**
  * Implementation of WELL-1024a PRNG
@@ -44,3 +47,6 @@ uint32_t well_1024a_bits(struct well_state_t *state, uint8_t bits) {
   state->bits_left -= bits;
   return rtn;
 }
+
+} // namespace qvz
+} // namespace spring

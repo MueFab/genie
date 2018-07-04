@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "quantizer.h"
-#include "util.h"
+#include "algorithms/SPRING/qvz/include/quantizer.h"
+#include "algorithms/SPRING/qvz/include/util.h"
+
+namespace spring {
+namespace qvz {
 
 /**
  * Allocate enough room based on the size of the alphabet supplied
@@ -40,8 +43,8 @@ struct quantizer_t *generate_quantizer(struct pmf_t *restrict pmf,
   uint32_t i, j, r, size;
   uint32_t min_r;
   double mse, min_mse, next_mse;
-  symbol_t *bounds = (symbol_t *)_alloca((states + 1) * sizeof(symbol_t));
-  symbol_t *reconstruction = (symbol_t *)_alloca(states * sizeof(symbol_t));
+  symbol_t *bounds = (symbol_t *)malloc((states + 1) * sizeof(symbol_t));
+  symbol_t *reconstruction = (symbol_t *)malloc(states * sizeof(symbol_t));
 
   // Initial bounds and reconstruction points
   bounds[0] = 0;
@@ -131,7 +134,8 @@ struct quantizer_t *generate_quantizer(struct pmf_t *restrict pmf,
           get_distortion(dist, i, reconstruction[j]) * get_probability(pmf, i);
     }
   }
-
+  free(bounds);
+  free(reconstruction);
   return q;
 }
 
@@ -159,7 +163,7 @@ struct pmf_t *apply_quantizer(struct quantizer_t *restrict q,
 
   // Sum together input probabilities that map to the same output
   for (i = 0; i < pmf->alphabet->size; ++i) {
-    output->pmf[q->q[i]] += get_probability(pmf, i);
+    output->pmf[(uint8_t)q->q[i]] += get_probability(pmf, i);
   }
   output->pmf_ready = 1;
 
@@ -174,7 +178,7 @@ void find_output_alphabet(struct quantizer_t *q) {
   symbol_t p;
   uint32_t x;
   uint32_t size;
-  symbol_t *uniques = (symbol_t *)_alloca(q->alphabet->size * sizeof(symbol_t));
+  symbol_t *uniques = (symbol_t *)malloc(q->alphabet->size * sizeof(symbol_t));
 
   // First symbol in quantizer output is always unique
   p = q->q[0];
@@ -194,6 +198,7 @@ void find_output_alphabet(struct quantizer_t *q) {
   q->output_alphabet = alloc_alphabet(size);
   memcpy(q->output_alphabet->symbols, uniques, size * sizeof(symbol_t));
   alphabet_compute_index(q->output_alphabet);
+  free(uniques);
 }
 
 /**
@@ -201,7 +206,7 @@ void find_output_alphabet(struct quantizer_t *q) {
  */
 void print_quantizer(struct quantizer_t *q) {
   uint32_t i;
-  char *tmp = (char *)_alloca(q->alphabet->size + 1);
+  char *tmp = (char *)malloc(q->alphabet->size + 1);
 
   tmp[q->alphabet->size] = 0;
   for (i = 0; i < q->alphabet->size; ++i) {
@@ -214,4 +219,8 @@ void print_quantizer(struct quantizer_t *q) {
     tmp[i] = (char)(q->output_alphabet->symbols[i] + 33);
   }
   printf("Unique alphabet: %s\n", tmp);
+  free(tmp);
 }
+
+} // namespace qvz
+} // namespace spring

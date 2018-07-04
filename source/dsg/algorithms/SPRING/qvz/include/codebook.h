@@ -1,22 +1,25 @@
-#ifndef _CODEBOOK_H_
-#define _CODEBOOK_H_
+#ifndef SPRING_QVZ_CODEBOOK_H_
+#define SPRING_QVZ_CODEBOOK_H_
 /**
  * Functions and definitions relating to reading codebooks from files, used
  * for both the encoder and decoder code
  */
 
-#include "util.h"
+#include "algorithms/SPRING/qvz/include/util.h"
 
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "distortion.h"
-#include "lines.h"
-#include "pmf.h"
-#include "quantizer.h"
-#include "well.h"
+#include "algorithms/SPRING/qvz/include/distortion.h"
+#include "algorithms/SPRING/qvz/include/lines.h"
+#include "algorithms/SPRING/qvz/include/pmf.h"
+#include "algorithms/SPRING/qvz/include/quantizer.h"
+#include "algorithms/SPRING/qvz/include/well.h"
+
+namespace spring {
+namespace qvz {
 
 #define MODE_RATIO \
   0  // Traditional implementation, output bitrate is scaled from input
@@ -133,4 +136,6 @@ struct cond_quantizer_list_t *read_codebook(FILE *fp,
 
 void print_codebook(struct cond_quantizer_list_t *);
 
+} // namsepace qvz
+} // namespace spring
 #endif

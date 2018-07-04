@@ -1,14 +1,17 @@
-#ifndef _PMF_H_
-#define _PMF_H_
+#ifndef SPRING_QVZ_PMF_H_
+#define SPRING_QVZ_PMF_H_
 
 #include <stdint.h>
 
-#include "util.h"
+#include "algorithms/SPRING/qvz/include/util.h"
 
 // Used to indicate a symbol not found during index lookup
 #define ALPHABET_SYMBOL_NOT_FOUND UINT32_MAX
 
 #define ALPHABET_INDEX_SIZE_HINT 72
+
+namespace spring {
+namespace qvz {
 
 // Unfortunately this is a bit brittle so don't change it
 typedef char symbol_t;
@@ -85,5 +88,8 @@ void alphabet_union(const struct alphabet_t *restrict a,
 // Display routines
 void print_alphabet(const struct alphabet_t *);
 void print_pmf(struct pmf_t *);
+
+} // namespace qvz
+} // namespace spring
 
 #endif

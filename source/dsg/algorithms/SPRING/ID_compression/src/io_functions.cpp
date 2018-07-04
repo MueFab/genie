@@ -6,7 +6,10 @@
 //  Copyright (c) 2014 Mikel Hernaez. All rights reserved.
 //
 
-#include "Arithmetic_stream.h"
+#include "algorithms/SPRING/ID_compression/include/Arithmetic_stream.h"
+
+namespace spring {
+namespace id_comp {
 
 int clean_compressed_dir(struct io_stream_t *ios) {
   uint32_t rc = 0;
@@ -81,10 +84,10 @@ void open_new_iofile(struct io_stream_t *ios) {
  * Writes out the current stream buffer regardless of fill amount
  */
 void stream_write_buffer(struct io_stream_t *os) {
-  FILE *temp_lock;
-  char lockname[256];
+//  FILE *temp_lock;
+//  char lockname[256];
 
-  int rc;
+//  int rc;
 
   switch (os->mode) {
     case COMPRESSION:
@@ -108,3 +111,6 @@ void stream_write_buffer(struct io_stream_t *os) {
  * Fills out the current stream buffer regardless of fill amount
  */
 void stream_fill_buffer(struct io_stream_t *is) { stream_write_buffer(is); }
+
+} // namespace id_comp
+} // namespace spring

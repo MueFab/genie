@@ -6,7 +6,10 @@
 //  Copyright (c) 2014 Mikel Hernaez. All rights reserved.
 //
 
-#include "Arithmetic_stream.h"
+#include "algorithms/SPRING/ID_compression/include/Arithmetic_stream.h"
+
+namespace spring {
+namespace id_comp {
 
 int file_available = 0;
 
@@ -28,9 +31,9 @@ struct io_stream_t *alloc_io_stream(uint8_t mode, FILE *fp) {
 
   rtn->buf = (uint8_t *)calloc(IO_STREAM_BUF_LEN + 1, sizeof(uint8_t));
 
-  char lockname[256];
+  //char lockname[256];
 
-  int rc;
+//  int rc;
 
   switch (mode) {
     case COMPRESSION:
@@ -410,3 +413,6 @@ void arithmetic_decoder_step(Arithmetic_stream a, uint32_t cumCountX_1,
     }
   }
 }
+
+} // namespace id_comp
+} // namespace spring

@@ -21,7 +21,7 @@
 
 #include <pthread.h>
 
-#include "stream_model.h"
+#include "algorithms/SPRING/ID_compression/include/stream_model.h"
 //#include "pmf.h"
 //#include "qv_codebook.h"
 //#include "util.h"
@@ -51,6 +51,10 @@
 
 #define MAX_ALPHA 5000000
 #define MAX_CARDINALITY 50000000
+
+namespace spring {
+namespace id_comp {
+
 
 struct sam_line_t {
   char ID[1024];
@@ -137,9 +141,10 @@ stream_model *alloc_stream_model_qv(uint32_t read_length,
                                     uint32_t input_alphabet_size,
                                     uint32_t rescale);
 
-sam_block alloc_sam_models(Arithmetic_stream as, std::string *id_array,
-                           std::ifstream *f_order, uint32_t numreads,
-                           uint8_t decompression);
+sam_block alloc_sam_models(//Arithmetic_stream as, 
+                           std::string *id_array,
+                           std::ifstream *f_order, uint32_t numreads
+                          );
 uint32_t load_sam_block(sam_block sb);
 
 id_models alloc_id_models_t();
@@ -161,5 +166,8 @@ uint32_t load_sam_line(sam_block sb);
 
 uint8_t create_most_common_list(sam_block sb);
 uint8_t get_most_common_token(char **list, uint32_t list_size, char *aux_field);
+
+} // namespace id_comp
+} // namespace spring
 
 #endif

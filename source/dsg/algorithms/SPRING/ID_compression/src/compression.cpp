@@ -10,7 +10,10 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <time.h>
-#include "sam_block.h"
+#include "algorithms/SPRING/ID_compression/include/sam_block.h"
+
+namespace spring {
+namespace id_comp {
 
 int print_line(struct sam_line_t *sline, FILE *fs) {
   fprintf(fs, "%s\n", sline->ID);
@@ -19,12 +22,9 @@ int print_line(struct sam_line_t *sline, FILE *fs) {
 
 void *compress(void *thread_info) {
   uint64_t compress_file_size = 0;
-  clock_t begin;
-  clock_t ticks;
 
   unsigned long long lineCtr = 0;
 
-  begin = clock();
 
   struct compressor_info_t info = *((struct compressor_info_t *)thread_info);
 
@@ -32,8 +32,8 @@ void *compress(void *thread_info) {
   Arithmetic_stream as = alloc_arithmetic_stream(info.mode, info.fcomp);
 
   // Allocs the different blocks and all the models for the Arithmetic
-  sam_block samBlock = alloc_sam_models(as, info.id_array, info.f_order,
-                                        info.numreads, info.mode);
+  sam_block samBlock = alloc_sam_models(info.id_array, info.f_order,
+                                        info.numreads);
   char prev_ID[1024] = {0};  // these were static before. That didn't play well
                              // with parallelization
   uint32_t prev_tokens_ptr[1024] = {0};
@@ -46,8 +46,6 @@ void *compress(void *thread_info) {
   // end the compression
   compress_file_size = encoder_last_step(as);
 
-  ticks = clock() - begin;
-
   return NULL;
 }
 
@@ -59,7 +57,7 @@ void *decompress(void *thread_info) {
 
   Arithmetic_stream as = alloc_arithmetic_stream(info->mode, info->fcomp);
 
-  sam_block samBlock = alloc_sam_models(as, NULL, NULL, 0, DECOMPRESSION);
+  sam_block samBlock = alloc_sam_models(NULL, NULL, 0);
 
   char prev_ID[1024] = {0};
   uint32_t prev_tokens_ptr[1024] = {0};
@@ -75,3 +73,6 @@ void *decompress(void *thread_info) {
   ticks = clock() - begin;
   return NULL;
 }
+
+} // namespace id_comp
+} // namespace spring

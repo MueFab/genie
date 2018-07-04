@@ -1,5 +1,5 @@
-#ifndef qv_compressor_h
-#define qv_compressor_h
+#ifndef SPRING_QVZ_QV_COMPRESSOR_H_
+#define SPRING_QVZ_QV_COMPRESSOR_H_
 
 #include <math.h>
 #include <stdint.h>
@@ -14,7 +14,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "codebook.h"
+#include "algorithms/SPRING/qvz/include/codebook.h"
 
 #define m_arith 22
 
@@ -22,6 +22,9 @@
 
 #define COMPRESSION 0
 #define DECOMPRESSION 1
+
+namespace spring {
+namespace qvz {
 
 typedef struct Arithmetic_code_t {
   int32_t scale3;
@@ -97,5 +100,8 @@ uint32_t start_qv_compression(struct quality_file_t *info, FILE *fout,
                               double *dis, FILE *funcompressed);
 void start_qv_decompression(FILE *fout, FILE *fin, struct quality_file_t *info,
                             uint8_t *read_lengths);
+
+} // namespace qvz
+} // namespace spring
 
 #endif

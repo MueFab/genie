@@ -10,7 +10,10 @@
 // Mahonney and Bonfiled (2012)
 
 #include <stdio.h>
-#include "sam_block.h"
+#include "algorithms/SPRING/ID_compression/include/sam_block.h"
+
+namespace spring {
+namespace id_comp {
 
 uint32_t compute_num_digits(uint32_t x) {
   // Get the number of digits (We assume readLength < 1000)
@@ -277,3 +280,6 @@ int decompress_id(Arithmetic_stream as, id_models model, char *id,
 
   return 1;
 }
+
+} // namespace id_comp
+} // namespace spring

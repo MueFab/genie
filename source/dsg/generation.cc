@@ -100,6 +100,34 @@ static void generationFromFastq(
             break;
         }
     }
+    if (!programOptions.inputPairFileName.empty()) {
+        std::cout << "Paired file:\n";
+        // Initialize a FASTQ file reader.
+        input::fastq::FastqFileReader fastqFileReader1(programOptions.inputPairFileName);
+
+        // Read FASTQ records in blocks of 10 records.
+        size_t blockSize = 10;
+
+        while (true) {
+            std::vector<input::fastq::FastqRecord> fastqRecords;
+            size_t numRecords = fastqFileReader1.readRecords(blockSize, &fastqRecords);
+            if (numRecords != blockSize) {
+                std::cout << "Read only " << numRecords << " records (" << blockSize << " requested)." << std::endl;
+            }
+
+            // Iterate through the records.
+            for (const auto& fastqRecord : fastqRecords) {
+                std::cout << fastqRecord.title << "\t";
+                std::cout << fastqRecord.sequence << "\t";
+                std::cout << fastqRecord.optional << "\t";
+                std::cout << fastqRecord.qualityScores << std::endl;
+            }
+
+            if (numRecords != blockSize) {
+                break;
+            }
+        }
+    }
 }
 
 
@@ -115,11 +143,11 @@ static void generationFromFastq_SPRING(
     input::fastq::FastqFileReader fastqFileReader1(programOptions.inputFileName);
     std::cout << "Calling SPRING" << std::endl;
     if (programOptions.inputPairFileName.empty()) {
-        spring::generate_streams_SPRING(fastqFileReader1, fastqFileReader1, programOptions.numThr, paired_end);
+        spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader1, programOptions.numThr, paired_end);
     } else {
         paired_end = true;
         input::fastq::FastqFileReader fastqFileReader2(programOptions.inputPairFileName);
-        spring::generate_streams_SPRING(fastqFileReader1, fastqFileReader2, programOptions.numThr, paired_end);
+        spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader2, programOptions.numThr, paired_end);
     }
 }
 

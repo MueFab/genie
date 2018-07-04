@@ -10,16 +10,19 @@
  * are discrete values, rather than continuous.
  */
 
-#include "util.h"
+#include "algorithms/SPRING/qvz/include/util.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 //#include <malloc.h>
 
-#include "cluster.h"
-#include "codebook.h"
-#include "pmf.h"
+#include "algorithms/SPRING/qvz/include/cluster.h"
+#include "algorithms/SPRING/qvz/include/codebook.h"
+#include "algorithms/SPRING/qvz/include/pmf.h"
+
+namespace spring {
+namespace qvz {
 
 /**
  * Allocate the memory used for the clusters based on the number wanted and
@@ -66,3 +69,6 @@ void free_cluster_list(struct cluster_list_t *clusters) {
   free(clusters->clusters);
   free(clusters);
 }
+
+} // namespace qvz
+} // namespace spring

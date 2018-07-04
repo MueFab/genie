@@ -1,15 +1,17 @@
+#include "algorithms/SPRING/preprocess.h"
 #include <fstream>
 #include <iostream>
 #include <string>
-#include "algorithms/SPRING/preprocess.h"
 #include "algorithms/SPRING/util.h"
 #include "input/fastq/FastqFileReader.h"
 #include "input/fastq/FastqRecord.h"
 
 namespace spring {
 
-int preprocess(dsg::input::fastq::FastqFileReader &fastqFileReader1, dsg::input::fastq::FastqFileReader &fastqFileReader2, std::string &working_dir, bool paired_end, bool preserve_id, bool preserve_quality) {
-
+int preprocess(dsg::input::fastq::FastqFileReader *fastqFileReader1,
+               dsg::input::fastq::FastqFileReader *fastqFileReader2,
+               const std::string &working_dir, bool paired_end, bool preserve_id,
+               bool preserve_quality) {
   std::string outfileclean;
   std::string outfileN;
   std::string outfileorderN;
@@ -43,9 +45,8 @@ int preprocess(dsg::input::fastq::FastqFileReader &fastqFileReader1, dsg::input:
   // code 3: * 1:# and * 2:# where * and # are common to both and * contains no
   // space (used in new versions)
   for (int j = 0; j < 2; j++) {
-    dsg::input::fastq::FastqFileReader& fastqFileReader = fastqFileReader1;
-    if (j == 1)
-      fastqFileReader = fastqFileReader2;
+    dsg::input::fastq::FastqFileReader *fastqFileReader = fastqFileReader1;
+    if (j == 1) fastqFileReader = fastqFileReader2;
     if (j == 1 && paired_end == false) continue;
 
     std::ofstream f_id;
@@ -56,59 +57,62 @@ int preprocess(dsg::input::fastq::FastqFileReader &fastqFileReader1, dsg::input:
       if (j == 1) {
         fin_id_1.open(outfileid[0]);
         // check first ids to detect patterns
-        fastqFileReader.readRecords(1, &fastqRecord);
-        std::string id_2 = fastqRecord[0].title;
-        std::getline(fin_id_1, id_1);
-        paired_id_code = find_id_pattern(id_1, id_2);
-        if (paired_id_code != 0) paired_id_match = true;
-        fastqFileReader.seekFromSet(0);
+        size_t numRecordsRead = fastqFileReader->readRecords(1, &fastqRecord);
+        if (numRecordsRead == 1) {
+          std::string id_2 = fastqRecord[0].title;
+          std::getline(fin_id_1, id_1);
+          paired_id_code = find_id_pattern(id_1, id_2);
+          if (paired_id_code != 0) paired_id_match = true;
+        }
+        fastqFileReader->seekFromSet(0);
         fin_id_1.close();
         fin_id_1.open(outfileid[0]);
       }
     }
     while (true) {
-      size_t numRecordsRead = fastqFileReader.readRecords(1, &fastqRecord);
-      if (numRecordsRead != 1)
-        break;
-          if (preserve_id == true) {
-            f_id << fastqRecord[0].title << "\n";
-            if (j == 1 && paired_id_match) {
-              std::getline(fin_id_1, id_1);
-              if (fin_id_1.eof())
-                paired_id_match = false;
-              else
-                paired_id_match = check_id_pattern(id_1, fastqRecord[0].title, paired_id_code);
-            }
-          }
-          current_readlen = (int)fastqRecord[0].sequence.length();
-          if (current_readlen >= 256) {
-            std::cout << "Read length cannot exceed 255. Read with length "
-                      << current_readlen << " found\n";
-            return -1;
-          }
-          if (current_readlen > max_readlen) max_readlen = current_readlen;
-          if (fastqRecord[0].sequence.find('N') != std::string::npos) {
-            f_N << fastqRecord[0].sequence << "\n";
-            f_order_N.write((char *)&readnum, sizeof(uint32_t));
-          } else {
-            num_clean++;
-            f_clean << fastqRecord[0].sequence << "\n";
-          }
-          if (preserve_quality == true) {
-            if ((int)fastqRecord[0].qualityScores.length() != current_readlen) {
-              std::cout << "Quality length does not match read length: "
-                        << current_readlen << " and " << fastqRecord[0].qualityScores.length()
-                        << " found.\n";
-              return -1;
-            }
-          }
-          readnum++;
+      size_t numRecordsRead = fastqFileReader->readRecords(1, &fastqRecord);
+      if (numRecordsRead != 1) break;
+      if (preserve_id == true) {
+        f_id << fastqRecord[0].title << "\n";
+        if (j == 1 && paired_id_match) {
+          std::getline(fin_id_1, id_1);
+          if (fin_id_1.eof())
+            paired_id_match = false;
+          else
+            paired_id_match =
+                check_id_pattern(id_1, fastqRecord[0].title, paired_id_code);
+        }
+      }
+      current_readlen = (int)fastqRecord[0].sequence.length();
+      if (current_readlen >= 256) {
+        std::cout << "Read length cannot exceed 255. Read with length "
+                  << current_readlen << " found\n";
+        return -1;
+      }
+      if (current_readlen > max_readlen) max_readlen = current_readlen;
+      if (fastqRecord[0].sequence.find('N') != std::string::npos) {
+        f_N << fastqRecord[0].sequence << "\n";
+        f_order_N.write((char *)&readnum, sizeof(uint32_t));
+      } else {
+        num_clean++;
+        f_clean << fastqRecord[0].sequence << "\n";
+      }
+      if (preserve_quality == true) {
+        if ((int)fastqRecord[0].qualityScores.length() != current_readlen) {
+          std::cout << "Quality length does not match read length: "
+                    << current_readlen << " and "
+                    << fastqRecord[0].qualityScores.length() << " found.\n";
+          return -1;
+        }
+      }
+      readnum++;
     }
     total_reads[j] = readnum;
   }
   total_reads[1] = total_reads[1] - total_reads[0];
   if (readnum > MAX_NUM_READS) {
-    std::cout << "Too many reads. HARC supports at most " << MAX_NUM_READS <<" reads\n";
+    std::cout << "Too many reads. HARC supports at most " << MAX_NUM_READS
+              << " reads\n";
     return -1;
   } else if (total_reads[1] != total_reads[0] && paired_end == true) {
     std::cout << "Number of reads in the two paired files are not equal\n";
@@ -136,11 +140,11 @@ int preprocess(dsg::input::fastq::FastqFileReader &fastqFileReader1, dsg::input:
     f_meta.close();
   }
   std::cout << "Preprocessing Done!\n";
-  
+
   return 0;
 }
 
-uint8_t find_id_pattern(std::string &id_1, std::string &id_2) {
+uint8_t find_id_pattern(const std::string &id_1, const std::string &id_2) {
   if (id_1.length() != id_2.length()) return 0;
   if (id_1 == id_2) return 2;
   size_t len = id_1.length();
@@ -164,7 +168,7 @@ uint8_t find_id_pattern(std::string &id_1, std::string &id_2) {
   return 0;
 }
 
-bool check_id_pattern(std::string &id_1, std::string &id_2,
+bool check_id_pattern(const std::string &id_1, const std::string &id_2,
                       uint8_t paired_id_code) {
   if (id_1.length() != id_2.length()) return false;
   size_t len = id_1.length();
@@ -194,9 +198,9 @@ bool check_id_pattern(std::string &id_1, std::string &id_2,
       if (i == len) return true;
       break;
     default:
-      throw std::runtime_error("Invalid paired id code.");		
+      throw std::runtime_error("Invalid paired id code.");
   }
   return false;
 }
 
-} // namespace spring
+}  // namespace spring

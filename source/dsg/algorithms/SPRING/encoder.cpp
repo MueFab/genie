@@ -1,3 +1,4 @@
+#include "algorithms/SPRING/encoder.h"
 #include <omp.h>
 #include <algorithm>
 #include <array>
@@ -12,7 +13,6 @@
 #include <string>
 #include <string>
 #include <vector>
-#include "algorithms/SPRING/encoder.h"
 
 namespace spring {
 
@@ -35,10 +35,11 @@ std::string buildcontig(std::list<contig_reads> &current_contig,
     count.insert(count.end(), to_insert, {0, 0, 0, 0});
     currentsize = currentsize + to_insert;
     for (long i = 0; i < (*current_contig_it).read_length; i++)
-      count[currentpos + i][eg.chartolong[(*current_contig_it).read[i]]] += 1;
+      count[currentpos + i]
+           [eg.chartolong[(uint8_t)(*current_contig_it).read[i]]] += 1;
   }
   std::string ref(count.size(), 'A');
-  for (long i = 0; i < count.size(); i++) {
+  for (size_t i = 0; i < count.size(); i++) {
     long max = 0, indmax = 0;
     for (long j = 0; j < 4; j++)
       if (count[i][j] > max) {
@@ -65,7 +66,8 @@ void writecontig(std::string &ref, std::list<contig_reads> &current_contig,
     prevj = 0;
     for (long j = 0; j < (*current_contig_it).read_length; j++)
       if ((*current_contig_it).read[j] != ref[currentpos + j]) {
-        f_noise << eg.enc_noise[ref[currentpos + j]][(*current_contig_it).read[j]];
+        f_noise << eg.enc_noise[(uint8_t)ref[currentpos + j]]
+                               [(uint8_t)(*current_contig_it).read[j]];
         c = j - prevj;
         f_noisepos << c;
         prevj = j;
@@ -93,7 +95,8 @@ void packbits(encoder_global &eg) {
     std::ifstream in_seq(eg.outfile_seq + '.' + std::to_string(tid));
     std::ofstream f_seq(eg.outfile_seq + '.' + std::to_string(tid) + ".tmp",
                         std::ios::binary);
-    std::ofstream f_seq_tail(eg.outfile_seq + '.' + std::to_string(tid) + ".tail");
+    std::ofstream f_seq_tail(eg.outfile_seq + '.' + std::to_string(tid) +
+                             ".tail");
     uint64_t file_len = 0;
     char c;
     while (in_seq >> std::noskipws >> c) file_len++;
@@ -110,13 +113,15 @@ void packbits(encoder_global &eg) {
     for (uint64_t i = 0; i < file_len / 4; i++) {
       in_seq.read(dnabase, 4);
 
-      dnabin = 64 * basetoint[dnabase[3]] + 16 * basetoint[dnabase[2]] +
-               4 * basetoint[dnabase[1]] + basetoint[dnabase[0]];
+      dnabin = 64 * basetoint[(uint8_t)dnabase[3]] +
+               16 * basetoint[(uint8_t)dnabase[2]] +
+               4 * basetoint[(uint8_t)dnabase[1]] +
+               basetoint[(uint8_t)dnabase[0]];
       f_seq.write((char *)&dnabin, sizeof(uint8_t));
     }
     f_seq.close();
     in_seq.read(dnabase, file_len % 4);
-    for (int i = 0; i < file_len % 4; i++) f_seq_tail << dnabase[i];
+    for (uint i = 0; i < file_len % 4; i++) f_seq_tail << dnabase[i];
     f_seq_tail.close();
     in_seq.close();
     remove((eg.outfile_seq + '.' + std::to_string(tid)).c_str());
@@ -127,7 +132,8 @@ void packbits(encoder_global &eg) {
     std::ifstream in_rev(eg.infile_RC + '.' + std::to_string(tid));
     std::ofstream f_rev(eg.infile_RC + '.' + std::to_string(tid) + ".tmp",
                         std::ios::binary);
-    std::ofstream f_rev_tail(eg.infile_RC + '.' + std::to_string(tid) + ".tail");
+    std::ofstream f_rev_tail(eg.infile_RC + '.' + std::to_string(tid) +
+                             ".tail");
     file_len = 0;
     while (in_rev >> std::noskipws >> c) file_len++;
     basetoint['d'] = 0;
@@ -137,15 +143,19 @@ void packbits(encoder_global &eg) {
     in_rev.open(eg.infile_RC + '.' + std::to_string(tid));
     for (uint64_t i = 0; i < file_len / 8; i++) {
       in_rev.read(dnabase, 8);
-      dnabin = 128 * basetoint[dnabase[7]] + 64 * basetoint[dnabase[6]] +
-               32 * basetoint[dnabase[5]] + 16 * basetoint[dnabase[4]] +
-               8 * basetoint[dnabase[3]] + 4 * basetoint[dnabase[2]] +
-               2 * basetoint[dnabase[1]] + basetoint[dnabase[0]];
+      dnabin = 128 * basetoint[(uint8_t)dnabase[7]] +
+               64 * basetoint[(uint8_t)dnabase[6]] +
+               32 * basetoint[(uint8_t)dnabase[5]] +
+               16 * basetoint[(uint8_t)dnabase[4]] +
+               8 * basetoint[(uint8_t)dnabase[3]] +
+               4 * basetoint[(uint8_t)dnabase[2]] +
+               2 * basetoint[(uint8_t)dnabase[1]] +
+               basetoint[(uint8_t)dnabase[0]];
       f_rev.write((char *)&dnabin, sizeof(uint8_t));
     }
     f_rev.close();
     in_rev.read(dnabase, file_len % 8);
-    for (int i = 0; i < file_len % 8; i++) f_rev_tail << dnabase[i];
+    for (uint i = 0; i < file_len % 8; i++) f_rev_tail << dnabase[i];
     f_rev_tail.close();
     remove((eg.infile_RC + '.' + std::to_string(tid)).c_str());
     rename((eg.infile_RC + '.' + std::to_string(tid) + ".tmp").c_str(),
@@ -170,17 +180,20 @@ void packbits(encoder_global &eg) {
   for (uint64_t i = 0; i < file_len / 4; i++) {
     in_singleton.read(dnabase, 4);
 
-    dnabin = 64 * basetoint[dnabase[3]] + 16 * basetoint[dnabase[2]] +
-             4 * basetoint[dnabase[1]] + basetoint[dnabase[0]];
+    dnabin = 64 * basetoint[(uint8_t)dnabase[3]] +
+             16 * basetoint[(uint8_t)dnabase[2]] +
+             4 * basetoint[(uint8_t)dnabase[1]] +
+             basetoint[(uint8_t)dnabase[0]];
     f_singleton.write((char *)&dnabin, sizeof(uint8_t));
   }
   f_singleton.close();
   in_singleton.read(dnabase, file_len % 4);
-  for (int i = 0; i < file_len % 4; i++) f_singleton_tail << dnabase[i];
+  for (uint i = 0; i < file_len % 4; i++) f_singleton_tail << dnabase[i];
   f_singleton_tail.close();
   in_singleton.close();
   remove((eg.outfile_singleton).c_str());
-  rename((eg.outfile_singleton + ".tmp").c_str(), (eg.outfile_singleton).c_str());
+  rename((eg.outfile_singleton + ".tmp").c_str(),
+         (eg.outfile_singleton).c_str());
   return;
 }
 
@@ -231,8 +244,8 @@ void correct_order(uint32_t *order_s, encoder_global &eg) {
   for (int tid = 0; tid < eg.num_thr; tid++) {
     std::ifstream fin_order(eg.infile_order + '.' + std::to_string(tid),
                             std::ios::binary);
-    std::ofstream fout_order(eg.infile_order + '.' + std::to_string(tid) + ".tmp",
-                             std::ios::binary);
+    std::ofstream fout_order(
+        eg.infile_order + '.' + std::to_string(tid) + ".tmp", std::ios::binary);
     uint32_t pos;
     fin_order.read((char *)&pos, sizeof(uint32_t));
     while (!fin_order.eof()) {
@@ -252,4 +265,4 @@ void correct_order(uint32_t *order_s, encoder_global &eg) {
   return;
 }
 
-} // namespace spring
+}  // namespace spring

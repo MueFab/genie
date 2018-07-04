@@ -36,7 +36,6 @@ static u_int64_t printPt(pthread_t pt) {
   return res;
 }
 
-
 // iterator from disk file of u_int64_t with buffered read,   todo template
 template <typename basetype>
 class bfile_iterator
@@ -62,7 +61,7 @@ class bfile_iterator
     // printf("bf it %p\n",_is);
     _buffsize = 10000;
     _buffer = (basetype*)malloc(_buffsize * sizeof(basetype));
-    // int reso = 
+    // int reso =
     fseek(_is, 0, SEEK_SET);
     advance();
   }
@@ -308,7 +307,6 @@ class Progress {
   // include timer, to print ETA ?
 };
 
-
 typedef std::array<uint64_t, 10> hash_set_t;
 typedef std::array<uint64_t, 2> hash_pair_t;
 
@@ -480,7 +478,6 @@ class XorshiftHashFunctors {
   SingleHasher_t singleHasher;
 };
 
-
 template <typename Iterator>
 struct iter_range {
   iter_range(Iterator b, Iterator e) : m_begin(b), m_end(e) {}
@@ -496,7 +493,6 @@ template <typename Iterator>
 iter_range<Iterator> range(Iterator begin, Iterator end) {
   return iter_range<Iterator>(begin, end);
 }
-
 
 class bitVector {
  public:
@@ -599,7 +595,8 @@ class bitVector {
 
     printf("rank array : size %lu \n", _ranks.size());
     for (uint64_t ii = 0; ii < _ranks.size(); ii++) {
-      printf("%llu :  %lli,  ", (long long unsigned int)ii, (long long int)_ranks[ii]);
+      printf("%llu :  %lli,  ", (long long unsigned int)ii,
+             (long long int)_ranks[ii]);
     }
     printf("\n");
   }
@@ -705,7 +702,6 @@ class bitVector {
   std::vector<uint64_t> _ranks;
 };
 
-
 static inline uint64_t fastrange64(uint64_t word, uint64_t p) {
   // return word %  p;
 
@@ -730,7 +726,6 @@ class level {
   uint64_t hash_domain;
   bitVector bitset;
 };
-
 
 #define NBBUFF 10000
 //#define NBBUFF 2
@@ -1382,7 +1377,6 @@ class mphf {
   pthread_mutex_t _mutex;
 };
 
-
 template <typename elem_t, typename Hasher_t, typename Range, typename it_type>
 void* thread_processLevel(void* args) {
   if (args == NULL) return NULL;
@@ -1412,6 +1406,6 @@ void* thread_processLevel(void* args) {
 }
 }
 
-} //namespace spring
+}  // namespace spring
 
-#endif // SPRING_BOOPHF_H_
+#endif  // SPRING_BOOPHF_H_

@@ -6,7 +6,10 @@
 //  Copyright (c) 2014 Mikel Hernaez. All rights reserved.
 //
 
-#include "sam_block.h"
+#include "algorithms/SPRING/ID_compression/include/sam_block.h"
+
+namespace spring {
+namespace id_comp {
 
 enum BASEPAIR char2basepair(char c) {
   switch (c) {
@@ -467,3 +470,6 @@ stream_model* initialize_stream_model_codebook(uint32_t rescale) {
 
   return s;
 }
+
+} // namespace id_comp
+} // namespace spring

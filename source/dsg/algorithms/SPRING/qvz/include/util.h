@@ -1,5 +1,5 @@
-#ifndef _UTIL_H_
-#define _UTIL_H_
+#ifndef SPRING_QVZ_UTIL_H_
+#define SPRING_QVZ_UTIL_H_
 /**
  * Utility functions to help do stuff and manage cross-platform issues
  */
@@ -12,41 +12,23 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#ifdef LINUX
+//#ifdef LINUX
 #include <time.h>
 #define _stat stat
 #define _alloca alloca
 #define restrict __restrict__
-#elif __APPLE__
-#include <time.h>
-#define _stat stat
-#define _alloca alloca
-#else
-#include <malloc.h>
-#include <windows.h>
-#define restrict __restrict
-#endif
+//#elif __APPLE__
+//#include <time.h>
+//#define _stat stat
+//#define _alloca alloca
+//#else
+//#include <malloc.h>
+//#include <windows.h>
+//#define restrict __restrict
+//#endif
 
-struct hrtimer_t {
-#ifdef LINUX
-  struct timespec start;
-  struct timespec stop;
-  struct timespec res;
-#elif __APPLE__
-  struct timespec start;
-  struct timespec stop;
-  struct timespec res;
-#else
-  LARGE_INTEGER start;
-  LARGE_INTEGER stop;
-  LARGE_INTEGER freq;
-#endif
-};
-
-// Cross platform timer interface
-void start_timer(struct hrtimer_t *timer);
-void stop_timer(struct hrtimer_t *timer);
-double get_timer_interval(struct hrtimer_t *timer);
+namespace spring {
+namespace qvz {
 
 // ceiling(log2()) function used in bit calculations
 int cb_log2(int x);
@@ -63,5 +45,7 @@ int cb_log2(int x);
 #ifndef NAN
 #define NAN (INFINITY - INFINITY)
 #endif
+} // namespace qvz
+} // namespace spring
 
 #endif

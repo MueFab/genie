@@ -1,4 +1,7 @@
-#include "qv_compressor.h"
+#include "algorithms/SPRING/qvz/include/qv_compressor.h"
+
+namespace spring {
+namespace qvz {
 
 /**
  * Update stats structure used for adaptive arithmetic coding
@@ -134,3 +137,6 @@ qv_compressor initialize_qv_compressor(FILE *fout, uint8_t streamDirection,
   s->Quals = initialize_arithStream(fout, streamDirection, info);
   return s;
 }
+
+} // namespace qvz
+} // namespace spring
