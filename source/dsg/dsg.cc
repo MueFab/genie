@@ -13,8 +13,11 @@
 #include <string.h>
 
 #include <boost/program_options.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/token_functions.hpp>
 
 #include <iostream>
+#include <fstream>
 
 #include "generation.h"
 #include "ProgramOptions.h"
@@ -155,7 +158,10 @@ static void processProgramOptions(
             "Output the version number")
         ("verbose,v",
             po::bool_switch(&(programOptions->verbose)),
-            "Be verbose");
+            "Be verbose")
+        ("config-file", po::value<std::string>(),
+            "Config file")
+    ;
     
     optionsInput.add_options()
         ("input-file-name,i",
@@ -163,12 +169,14 @@ static void processProgramOptions(
             "Input file name")
         ("input-file-type,t",
             po::value<std::string>(&(programOptions->inputFileType))->required(),
-            "Input file type");
+            "Input file type")
+    ;
     
     optionsOutput.add_options()
         ("output-file-base-name,o",
             po::value<std::string>(&(programOptions->outputFileName))->required(),
-            "Output files base name");
+            "Output files base name")
+    ;
 
     optionsAlgorithm.add_options()
         ("read-algorithm,r",
@@ -179,7 +187,8 @@ static void processProgramOptions(
             "ID-compression-algorithm to use")
         ("qv-compression-algorithm,y",
             po::value<std::string>(&(programOptions->qvCompAlgo))->required(),
-            "qv-compression-algorithm to use");
+            "qv-compression-algorithm to use")
+    ;
 
     // Declare an options description instance which will include
     // all the options
@@ -210,6 +219,24 @@ static void processProgramOptions(
             throwRuntimeError("Unknown module in the --help-module option");
         }
         return;
+    }
+    if (vm.count("config-file")) {
+        // load file
+        std::ifstream ifs(vm["config-file"].as<std::string>().c_str());
+        if (!ifs) {
+            std::cout << "Could not open the config file." << std::endl;
+            throwRuntimeError("Failed to open file.");
+        }
+        // Read file into stringstream
+        std::stringstream ss;
+        ss << ifs.rdbuf();
+        // Split file contents
+        boost::char_separator<char> sep(" \n\r");
+        std::string sstr = ss.str();
+        boost::tokenizer<boost::char_separator<char> > tok(sstr, sep);
+        std::vector<std::string> args;
+        std::copy(tok.begin(), tok.end(), std::back_inserter(args));
+        store(po::command_line_parser(args).options(all).run(), vm);
     }
 
     // This will throw on erroneous program options. Thus, we call notify()

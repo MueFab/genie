@@ -1,0 +1,1 @@
+-d . -f -v -i ../resources/test-files/sam/four-reads-with-header.sam -t SAM -o .out -y CALQ -x EXAMPLE -r EXAMPLE
