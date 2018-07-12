@@ -28,11 +28,15 @@ struct ProgramOptions {
 
     void validate(void);
 
+    std::string root;
     bool force;
-    std::string inputFileName;
-    std::string outputFileName;
-    std::string inputFileType;
     bool verbose;
+    std::string inputFileName;
+    std::string inputFileType;
+    std::string outputFileName;
+    std::string readAlgo;
+    std::string idCompAlgo;
+    std::string qvCompAlgo;
 };
 
 
