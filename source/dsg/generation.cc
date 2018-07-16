@@ -35,14 +35,14 @@ static void generationFromFasta(
     std::cout << std::string(80, '-') << std::endl;
 
     // Initialize a FASTA file reader.
-    input::fasta::FastaFileReader fastaFileReader(programOptions.inputFileName);
+    input::fasta::FastaFileReader fastaFileReader(programOptions.inputFilePath);
 
     // Parse the entire file.
     std::vector<input::fasta::FastaRecord> fastaRecords;
     fastaFileReader.parse(&fastaRecords);
 
     // Print information about the FASTA file.
-    std::cout << "FASTA file: " << programOptions.inputFileName << std::endl;
+    std::cout << "FASTA file: " << programOptions.inputFilePath << std::endl;
     std::cout << "Records: " << fastaRecords.size() << std::endl;
 
     // Iterate through all FASTA records.
@@ -76,7 +76,10 @@ static void generationFromFastq(
     std::cout << std::string(80, '-') << std::endl;
 
     // Initialize a FASTQ file reader.
-    input::fastq::FastqFileReader fastqFileReader(programOptions.inputFileName);
+    input::fastq::FastqFileReader fastqFileReader(programOptions.inputFilePath);
+
+    // Second pass for HARC.
+
 
     // Read FASTQ records in blocks of 10 records.
     size_t blockSize = 10;
@@ -111,7 +114,7 @@ static void generationFromSam(
     std::cout << std::string(80, '-') << std::endl;
 
     // Initialize a SAM file reader.
-    input::sam::SamFileReader samFileReader(programOptions.inputFileName);
+    input::sam::SamFileReader samFileReader(programOptions.inputFilePath);
 
     // Get SAM header.
     std::cout << "-- SAM header begin" << std::endl;

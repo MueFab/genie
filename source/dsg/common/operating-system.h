@@ -29,6 +29,8 @@
 #elif __linux__
     // Defines for Linux
     #define OS_LINUX
+#elif __CYGWIN__
+    #define OS_LINUX
 #else
     #error "Operating system not supported"
 #endif

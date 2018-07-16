@@ -21,17 +21,7 @@
 #include "common/exceptions.h"
 
 
-static void printHelp(
-    const boost::program_options::options_description& optionsDescription);
-
-
-static void printVersionAndCopyright(void);
-
-
-static void processProgramOptions(
-    int argc,
-    char *argv[],
-    dsg::ProgramOptions * const programOptions);
+static void printProgramInformation(void);
 
 
 static int dsg_main(
@@ -39,13 +29,11 @@ static int dsg_main(
     char *argv[])
 {
     try {
-        printVersionAndCopyright();
+        printProgramInformation();
 
-        dsg::ProgramOptions programOptions;
+        dsg::ProgramOptions programOptions(argc, argv);
 
-        processProgramOptions(argc, argv, &programOptions);
-
-        generation(programOptions);
+        // generation(programOptions);
     }
     catch(boost::program_options::error& e) {
         std::cerr << "Program options error";
@@ -100,72 +88,18 @@ int main(
         return EXIT_FAILURE;
     }
 
-    // Exit.
-    std::cerr << "Exiting with return code: " << ((rc == 0) ? EXIT_SUCCESS : EXIT_FAILURE) << std::endl;
+    // Exit to the operating system.
+    std::cerr << "Exiting with return code: ";
+    std::cerr << ((rc == 0) ? EXIT_SUCCESS : EXIT_FAILURE);
+    std::cerr << std::endl;
     return (rc == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 
-static void printHelp(
-    const boost::program_options::options_description& optionsDescription)
-{
-    std::cout << optionsDescription;
-}
-
-
-static void printVersionAndCopyright(void)
+static void printProgramInformation(void)
 {
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "genie dsg (descriptor stream generator)" << std::endl;
     std::cout << "Copyright (c) 2018 The genie authors" << std::endl;
     std::cout << std::string(80, '-') << std::endl;
 }
-
-
-static void processProgramOptions(
-    int argc,
-    char *argv[],
-    dsg::ProgramOptions * const programOptions)
-{
-    namespace po = boost::program_options;
-
-    // Declare the supported program options.
-    po::options_description optionsDescription("Options");
-    optionsDescription.add_options()
-        ("force,f",
-             po::bool_switch(&(programOptions->force)),
-            "Overwrite output files")
-        ("help,h",
-            "Print help")
-        ("input-file-name,i",
-            po::value<std::string>(&(programOptions->inputFileName))->required(),
-            "Input file name")
-        ("input-file-type,t",
-            po::value<std::string>(&(programOptions->inputFileType))->required(),
-            "Input file type")
-        ("output-file-name,o",
-            po::value<std::string>(&(programOptions->outputFileName))->required(),
-            "Output file name")
-        ("verbose,v",
-             po::bool_switch(&(programOptions->verbose)),
-            "Be verbose");
-
-    // Parse the command line.
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, optionsDescription), vm);
-
-    // First thing to do is to print the help.
-    if (vm.count("help")) {
-        printHelp(optionsDescription);
-        return;
-    }
-
-    // This will throw on erroneous program options. Thus, we call notify()
-    // after printing the help.
-    po::notify(vm);
-
-    // Validate and print the program options.
-    programOptions->print();
-    programOptions->validate();
-}
-
