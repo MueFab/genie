@@ -69,7 +69,7 @@ if (UNIX)
             PREFIX ${boost_root_dir}
             GIT_REPOSITORY ${boost_git_repository}
             GIT_TAG ${boost_git_tag}
-            CONFIGURE_COMMAND ./bootstrap.sh --with-libraries=log,program_options --prefix=${boost_root_dir}
+            CONFIGURE_COMMAND ./bootstrap.sh --with-libraries=program_options --prefix=${boost_root_dir}
             BUILD_COMMAND ./b2 link=static install
             BUILD_IN_SOURCE 1
             INSTALL_COMMAND ""
@@ -90,8 +90,20 @@ endif()
 
 set(dsg "dsg")
 
-set(dsg_source_dir ${CMAKE_SOURCE_DIR}/source/dsg)
 set(dsg_include_dir ${CMAKE_SOURCE_DIR}/source/dsg)
+set(dsg_source_dir ${CMAKE_SOURCE_DIR}/source/dsg)
+
+set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/generation.h)
+set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/ProgramOptions.h)
+set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/common/utilities.h)
+set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/common/exceptions.h)
+set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/input/FileReader.h)
+set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/input/fasta/FastaFileReader.h)
+set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/input/fasta/FastaRecord.h)
+set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/input/fastq/FastqFileReader.h)
+set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/input/fastq/FastqRecord.h)
+set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/input/sam/SamFileReader.h)
+set(dsg_header_files ${dsg_header_files} ${dsg_include_dir}/input/sam/SamRecord.h)
 
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/dsg.cc)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/generation.cc)
@@ -103,15 +115,14 @@ set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/fasta/FastaFile
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/fasta/FastaRecord.cc)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/fastq/FastqFileReader.cc)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/fastq/FastqRecord.cc)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/sam/SamRecord.cc)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/sam/SamFileReader.cc)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/sam/SamRecord.cc)
 
-add_executable(${dsg} ${dsg_source_files})
+add_executable(${dsg} ${dsg_header_files} ${dsg_source_files})
 
 target_include_directories(${dsg} PRIVATE ${dsg_include_dir})
 target_include_directories(${dsg} PRIVATE ${boost_include_dir})
 
-# #target_link_libraries(${dsg} ${boost_lib_dir}/libboost_log.a)
 target_link_libraries(${dsg} ${boost_lib_dir}/libboost_program_options.a)
 
 
@@ -121,14 +132,17 @@ target_link_libraries(${dsg} ${boost_lib_dir}/libboost_program_options.a)
 
 set(encoder "encoder")
 
-set(encoder_source_dir ${CMAKE_SOURCE_DIR}/source/encoder)
 set(encoder_include_dir ${CMAKE_SOURCE_DIR}/source/encoder)
+set(encoder_source_dir ${CMAKE_SOURCE_DIR}/source/encoder)
+
+#set(encoder_header_files ${enocder_header_files} ${encoder_include_dir}/dummy.h)
 
 set(encoder_source_files ${encoder_source_files} ${encoder_source_dir}/encoder.cc)
 
-add_executable(encoder ${encoder_source_files})
+add_executable(encoder ${encoder_header_files} ${encoder_source_files})
 
 target_include_directories(${encoder} PRIVATE ${encoder_include_dir})
+target_include_directories(${dsg} PRIVATE ${boost_include_dir})
 
 target_link_libraries(${dsg} ${boost_lib_dir}/libboost_program_options.a)
 

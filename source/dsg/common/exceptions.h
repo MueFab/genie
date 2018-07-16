@@ -43,7 +43,7 @@ class Exception : public std::exception {
 class RuntimeErrorException : public Exception {
  public:
     explicit RuntimeErrorException(
-        const std::string& msg);
+        const std::string& message);
 };
 
 

@@ -19,24 +19,39 @@
 namespace dsg {
 
 
-struct ProgramOptions {
-    ProgramOptions(void);
+class ProgramOptions {
+ public:
+    ProgramOptions(
+        int argc,
+        char *argv[]);
 
     ~ProgramOptions(void);
 
     void print(void);
 
-    void validate(void);
-
-    std::string root;
+ public:
+    // Generic
     bool force;
     bool verbose;
-    std::string inputFileName;
+    std::string workingDirectory;
+
+    // Input
+    std::string inputFilePath;
     std::string inputFileType;
-    std::string outputFileName;
-    std::string readAlgo;
-    std::string idCompAlgo;
-    std::string qvCompAlgo;
+
+    // Algorithm
+    std::string idAlgorithm;
+    std::string qvAlgorithm;
+    std::string readAlgorithm;
+
+ private:
+    void processCommandLine(
+        int argc,
+        char *argv[]);
+
+    void validate(void);
+
+    void validateDependencies(void);
 };
 
 
