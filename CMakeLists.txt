@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.1)
 
 set(CMAKE_CXX_STANDARD 11)
 
-project("genie")
+project("genie" C CXX)
 
 
 #==============================================================================
@@ -17,6 +17,8 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     message(STATUS "Detected compiler: GNU Compiler Collection")
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -dl")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wfloat-equal")
@@ -83,6 +85,19 @@ else ()
     message(FATAL_ERROR "Boost build currently not supported on non UNIX-like systems")
 endif()
 
+#==============================================================================
+# loguru
+#==============================================================================
+
+add_library(loguru INTERFACE)
+target_include_directories(loguru INTERFACE  ${CMAKE_SOURCE_DIR}/source/common/logging)
+find_package(Threads REQUIRED)
+
+if (Threads_FOUND)
+    message(STATUS "Threads found")
+else ()
+    message(FATAL_ERROR "Threads not found")
+endif()
 
 #==============================================================================
 # dsg
@@ -123,7 +138,7 @@ add_executable(${dsg} ${dsg_header_files} ${dsg_source_files})
 target_include_directories(${dsg} PRIVATE ${dsg_include_dir})
 target_include_directories(${dsg} PRIVATE ${boost_include_dir})
 
-target_link_libraries(${dsg} ${boost_lib_dir}/libboost_program_options.a)
+target_link_libraries(${dsg} ${boost_lib_dir}/libboost_program_options.a loguru -pthread ${CMAKE_DL_LIBS})
 
 
 #==============================================================================
