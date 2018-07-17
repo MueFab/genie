@@ -25,6 +25,5 @@
 
 #define GiB (MB*1024LL)
 
-
 #endif  // DSG_COMMON_CONSTANTS_H_
 
