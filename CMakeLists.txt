@@ -33,13 +33,27 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wswitch-enum")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wunreachable-code")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wconversion")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wundef")
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfloat-equal")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpointer-arith")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wwrite-strings")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-qual")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-default")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-enum")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunreachable-code")
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     message(STATUS "Detected compiler: LLVM Clang or Apple Clang")
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra")
+    FIND_PACKAGE( OpenMP REQUIRED)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     message(STATUS "Detected compiler: Microsoft Visual Studio")
     message(FATAL_ERROR "Compiler currently not supported by CMake build: ${CMAKE_CXX_COMPILER_ID}")
@@ -61,9 +75,8 @@ if (UNIX)
 
     set(BOOST_ROOT ${boost_root_dir})
     set(Boost_NO_SYSTEM_PATHS "ON")
-    find_package(Boost)
-
     if (NOT Boost_FOUND)
+
         set(boost_git_repository https://github.com/boostorg/boost.git)
         set(boost_git_tag "boost-1.67.0")
 
@@ -71,16 +84,16 @@ if (UNIX)
             PREFIX ${boost_root_dir}
             GIT_REPOSITORY ${boost_git_repository}
             GIT_TAG ${boost_git_tag}
-            CONFIGURE_COMMAND ./bootstrap.sh --with-libraries=program_options --prefix=${boost_root_dir}
+            CONFIGURE_COMMAND ./bootstrap.sh --with-libraries=log,program_options,filesystem,system --prefix=${boost_root_dir}
             BUILD_COMMAND ./b2 link=static install
             BUILD_IN_SOURCE 1
             INSTALL_COMMAND ""
         )
 
         add_library(boost STATIC IMPORTED DEPENDS Boost)
-    else ()
-        message(STATUS "Boost already installed - rebuild not required")
-    endif()
+	else()
+	        message(STATUS "Boost already installed - rebuild not required")
+	endif()
 else ()
     message(FATAL_ERROR "Boost build currently not supported on non UNIX-like systems")
 endif()
@@ -132,13 +145,44 @@ set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/fastq/FastqFile
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/fastq/FastqRecord.cc)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/sam/SamFileReader.cc)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/sam/SamRecord.cc)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/input/sam/SamFileReader.cc)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/spring.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/preprocess.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/util.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/encoder.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/pe_encode.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/reorder_compress_quality_id.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/qvz/src/arith.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/qvz/src/cluster.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/qvz/src/codebook.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/qvz/src/distortion.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/qvz/src/lines.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/qvz/src/main.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/qvz/src/os_stream.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/qvz/src/pmf.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/qvz/src/quantizer.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/qvz/src/qv_compressor.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/qvz/src/qv_stream.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/qvz/src/util.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/qvz/src/well.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/ID_compression/src/Arithmetic_stream.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/ID_compression/src/id_compression.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/ID_compression/src/sam_file_allocation.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/ID_compression/src/stream_model.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/ID_compression/src/compression.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/ID_compression/src/io_functions.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/ID_compression/src/sam_models.cpp)
 
 add_executable(${dsg} ${dsg_header_files} ${dsg_source_files})
 
 target_include_directories(${dsg} PRIVATE ${dsg_include_dir})
 target_include_directories(${dsg} PRIVATE ${boost_include_dir})
 
-target_link_libraries(${dsg} ${boost_lib_dir}/libboost_program_options.a loguru -pthread ${CMAKE_DL_LIBS})
+# #target_link_libraries(${dsg} ${boost_lib_dir}/libboost_log.a)
+target_link_libraries(${dsg} ${boost_lib_dir}/libboost_program_options.a)
+target_link_libraries(${dsg} ${boost_lib_dir}/libboost_filesystem.a)
+target_link_libraries(${dsg} ${boost_lib_dir}/libboost_system.a)
+target_link_libraries(${dsg} "-fopenmp")
 
 
 #==============================================================================
