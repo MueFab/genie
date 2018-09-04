@@ -4,23 +4,28 @@
 
 ---
 
-This is the official repository for the development of genie.
+## Quick start on Linux
 
-## Quick start
+TBD
 
-genie comprises two applications:
+## Development guide lines
 
-* dsg (descriptor stream generator)
-* encoder
+### Build system
 
-We provide a ``CMakeLists.txt`` file to build these applications with CMake (https://cmake.org/).
+Please see ``documentation/development-guidelines/build-system.md``.
 
-Build the applications from the command line with the following commands; alternatively use the CMake GUI.
+### Coding style
 
-    mkdir build
-    cd build
-    cmake ..
-    make
+Please see ``documentation/development-guidelines/coding-style.md``.
 
-This generates executables named ``dsg`` and ``encoder`` in the ``build`` folder.
+### Documentation
 
+Please see ``documentation/development-guidelines/documentation.md``.
+
+### Test data
+
+Please see ``documentation/development-guidelines/test-data.md``.
+
+### Version control system
+
+Please see ``documentation/development-guidelines/version-control-system.md``.
