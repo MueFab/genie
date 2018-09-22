@@ -1,6 +1,6 @@
 # genie
 
-**GEN**omic **I**nformation **E**ncoding
+Open source MPEG-G encoder
 
 ---
 
