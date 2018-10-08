@@ -122,8 +122,8 @@ endif()
 
 set(dsg "dsg")
 
-set(dsg_include_dir ${CMAKE_SOURCE_DIR}/source/dsg)
-set(dsg_source_dir ${CMAKE_SOURCE_DIR}/source/dsg)
+set(dsg_include_dir ${CMAKE_SOURCE_DIR}/source/lib/dsg)
+set(dsg_source_dir ${CMAKE_SOURCE_DIR}/source/lib/dsg)
 set(app_include_dir ${CMAKE_SOURCE_DIR}/source/app)
 set(app_source_dir ${CMAKE_SOURCE_DIR}/source/app)
 set(logging_include_dir ${CMAKE_SOURCE_DIR}/source/utils/logging)
@@ -154,6 +154,7 @@ set(dsg_source_files ${dsg_source_files} ${app_source_dir}/input/fastq/FastqReco
 set(dsg_source_files ${dsg_source_files} ${app_source_dir}/input/sam/SamFileReader.cc)
 set(dsg_source_files ${dsg_source_files} ${app_source_dir}/input/sam/SamRecord.cc)
 set(dsg_source_files ${dsg_source_files} ${app_source_dir}/input/sam/SamFileReader.cc)
+
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/spring.cpp)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/preprocess.cpp)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/util.cpp)
