@@ -78,7 +78,9 @@ ProgramOptions::ProgramOptions(
     : force(false),
       verbose(false),
       workingDirectory(""),
+      numThreads(1),
       inputFilePath(""),
+      inputFilePairPath(""),
       inputFileType(""),
       idAlgorithm(""),
       qvAlgorithm(""),
@@ -98,15 +100,17 @@ void ProgramOptions::print(void)
 {
     LOG_S(INFORMATIONAL) << "Program options:";
     LOG_S(INFORMATIONAL) << "  generic:";
-    LOG_S(INFORMATIONAL) << "    force              : " << ((force == true) ? "true" : "false");
-    LOG_S(INFORMATIONAL) << "    verbose            : " << (verbose ? "true" : "false");
+    LOG_S(INFORMATIONAL) << "    force                : " << ((force == true) ? "true" : "false");
+    LOG_S(INFORMATIONAL) << "    verbose              : " << (verbose ? "true" : "false");
+    LOG_S(INFORMATIONAL) << "    number of threads    : " << numThreads;
     LOG_S(INFORMATIONAL) << "  input:";
-    LOG_S(INFORMATIONAL) << "    input file path    : " << inputFilePath;
-    LOG_S(INFORMATIONAL) << "    input file type    : " << inputFileType;
+    LOG_S(INFORMATIONAL) << "    input file path      : " << inputFilePath;
+    LOG_S(INFORMATIONAL) << "    input file pair path : " << inputFilePairPath;
+    LOG_S(INFORMATIONAL) << "    input file type      : " << inputFileType;
     LOG_S(INFORMATIONAL) << "  algorithm:";
-    LOG_S(INFORMATIONAL) << "    read algorithm     : " << readAlgorithm;
-    LOG_S(INFORMATIONAL) << "    ID algorithm       : " << idAlgorithm;
-    LOG_S(INFORMATIONAL) << "    QV algorithm       : " << qvAlgorithm;
+    LOG_S(INFORMATIONAL) << "    read algorithm       : " << readAlgorithm;
+    LOG_S(INFORMATIONAL) << "    ID algorithm         : " << idAlgorithm;
+    LOG_S(INFORMATIONAL) << "    QV algorithm         : " << qvAlgorithm;
 }
 
 
@@ -152,13 +156,19 @@ void ProgramOptions::processCommandLine(
             "Be verbose")
         ("working-directory,d",
             po::value<std::string>(&workingDirectory)->required(),
-            "Working directory");
+            "Working directory")
+        ("num-thr",
+            po::value<int>(&numThreads),
+            "Number of threads");
 
     // Add the input options.
     inputOptions.add_options()
         ("input-file-path,i",
             po::value<std::string>(&inputFilePath)->required(),
             "Input file path")
+        ("input-file-pair-path,p",
+            po::value<std::string>(&inputFilePairPath),
+            "Input file pair path")
         ("input-file-type,t",
             po::value<std::string>(&inputFileType)->required(),
             "Input file type");
@@ -187,7 +197,7 @@ void ProgramOptions::processCommandLine(
     po::variables_map allOptionsMap;
 
     // Parse only the basic options from the command line.
-    po::store(po::parse_command_line(argc, argv, basicOptions), basicOptionsMap);
+    po::store(po::command_line_parser(argc, argv).options(basicOptions).allow_unregistered().run(), basicOptionsMap);
 
     // Now check if we shall load the other options from a configuration file.
     if (basicOptionsMap.count("configuration-file-path")) {
@@ -196,6 +206,8 @@ void ProgramOptions::processCommandLine(
         parseConfigurationFile(configurationFilePath, &args);
         po::store(po::command_line_parser(args).options(allOptions).run(), allOptionsMap);
     }
+    else
+        po::store(po::parse_command_line(argc, argv, allOptions), allOptionsMap);
 
     // First thing to do is to print the help.
     if (basicOptionsMap.count("help") || basicOptionsMap.count("h")) {
@@ -262,6 +274,15 @@ void ProgramOptions::validate(void)
         throwRuntimeError("input file does not exist");
     }
 
+
+    if (inputFilePairPath.empty() == false) {
+        if (common::fileExists(inputFilePairPath) == false) {
+            throwRuntimeError("input pair file does not exist");
+        }
+        if (inputFilePairPath == inputFilePath) {
+            throwRuntimeError("Same file name for two files");
+        }
+    }
 
     //
     // inputFileType

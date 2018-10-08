@@ -34,9 +34,11 @@ class ProgramOptions {
     bool force;
     bool verbose;
     std::string workingDirectory;
+    int numThreads;
 
     // Input
     std::string inputFilePath;
+    std::string inputFilePairPath;
     std::string inputFileType;
 
     // Algorithm

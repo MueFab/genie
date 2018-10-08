@@ -103,10 +103,10 @@ static void generationFromFastq(
             break;
         }
     }
-    if (!programOptions.inputPairFileName.empty()) {
+    if (!programOptions.inputFilePairPath.empty()) {
         std::cout << "Paired file:\n";
         // Initialize a FASTQ file reader.
-        input::fastq::FastqFileReader fastqFileReader1(programOptions.inputPairFileName);
+        input::fastq::FastqFileReader fastqFileReader1(programOptions.inputFilePairPath);
 
         // Read FASTQ records in blocks of 10 records.
         size_t blockSize = 10;
@@ -143,14 +143,14 @@ static void generationFromFastq_SPRING(
 
     bool paired_end = false;
     // Initialize a FASTQ file reader.
-    input::fastq::FastqFileReader fastqFileReader1(programOptions.inputFileName);
+    input::fastq::FastqFileReader fastqFileReader1(programOptions.inputFilePath);
     std::cout << "Calling SPRING" << std::endl;
-    if (programOptions.inputPairFileName.empty()) {
-        spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader1, programOptions.numThr, paired_end);
+    if (programOptions.inputFilePairPath.empty()) {
+        spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader1, programOptions.numThreads, paired_end);
     } else {
         paired_end = true;
-        input::fastq::FastqFileReader fastqFileReader2(programOptions.inputPairFileName);
-        spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader2, programOptions.numThr, paired_end);
+        input::fastq::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath);
+        spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader2, programOptions.numThreads, paired_end);
     }
 }
 
@@ -203,8 +203,10 @@ void generation(
     if (programOptions.inputFileType == "FASTA") {
         generationFromFasta(programOptions);
     } else if (programOptions.inputFileType == "FASTQ") {
-    //    generationFromFastq(programOptions);
-        generationFromFastq_SPRING(programOptions);
+        if (programOptions.readAlgorithm == "HARC")
+           generationFromFastq_SPRING(programOptions);
+        else 
+           generationFromFastq(programOptions);
     } else if (programOptions.inputFileType == "SAM") {
         generationFromSam(programOptions);
     } else {

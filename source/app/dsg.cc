@@ -36,10 +36,10 @@ static int dsg_main(
     try {
         loggerInitialization(argc, argv);
         printProgramInformation();
-
+	
         dsg::ProgramOptions programOptions(argc, argv);
 
-        // generation(programOptions);
+        generation(programOptions);
     }
     catch(boost::program_options::error& e) {
         std::cerr << "Program options error";
