@@ -146,11 +146,11 @@ static void generationFromFastq_SPRING(
     input::fastq::FastqFileReader fastqFileReader1(programOptions.inputFilePath);
     std::cout << "Calling SPRING" << std::endl;
     if (programOptions.inputFilePairPath.empty()) {
-        spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader1, programOptions.numThreads, paired_end);
+        spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader1, programOptions.numThreads, paired_end, programOptions.workingDirectory);
     } else {
         paired_end = true;
         input::fastq::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath);
-        spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader2, programOptions.numThreads, paired_end);
+        spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader2, programOptions.numThreads, paired_end, programOptions.workingDirectory);
     }
 }
 

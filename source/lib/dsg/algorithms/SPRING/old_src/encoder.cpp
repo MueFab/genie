@@ -9,22 +9,15 @@
 #include <fstream>
 #include <iostream>
 #include <list>
+#include <numeric>
+#include <string>
 #include <string>
 #include <vector>
-#include "libbsc/bsc.h"
+
 namespace spring {
 
 std::string buildcontig(std::list<contig_reads> &current_contig,
-                        const uint32_t &list_size) {
-  static const char longtochar[5] = {'A', 'C', 'G', 'T', 'N'};
-  static const long chartolong[128] = {
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 3, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  };
+                        uint32_t list_size, encoder_global &eg) {
   if (list_size == 1) return (current_contig.front()).read;
   auto current_contig_it = current_contig.begin();
   int64_t currentpos = 0, currentsize = 0, to_insert;
@@ -43,7 +36,7 @@ std::string buildcontig(std::list<contig_reads> &current_contig,
     currentsize = currentsize + to_insert;
     for (long i = 0; i < (*current_contig_it).read_length; i++)
       count[currentpos + i]
-           [chartolong[(uint8_t)(*current_contig_it).read[i]]] += 1;
+           [eg.chartolong[(uint8_t)(*current_contig_it).read[i]]] += 1;
   }
   std::string ref(count.size(), 'A');
   for (size_t i = 0; i < count.size(); i++) {
@@ -53,23 +46,21 @@ std::string buildcontig(std::list<contig_reads> &current_contig,
         max = count[i][j];
         indmax = j;
       }
-    ref[i] = longtochar[indmax];
+    ref[i] = eg.longtochar[indmax];
   }
   return ref;
 }
 
-void writecontig(const std::string &ref,
-                 std::list<contig_reads> &current_contig, std::ofstream &f_seq,
-                 std::ofstream &f_pos, std::ofstream &f_noise,
-                 std::ofstream &f_noisepos, std::ofstream &f_order,
-                 std::ofstream &f_RC, std::ofstream &f_readlength,
-                 const encoder_global &eg, uint64_t &abs_pos) {
+void writecontig(std::string &ref, std::list<contig_reads> &current_contig,
+                 std::ofstream &f_seq, std::ofstream &f_pos,
+                 std::ofstream &f_noise, std::ofstream &f_noisepos,
+                 std::ofstream &f_order, std::ofstream &f_RC,
+                 std::ofstream &f_readlength, encoder_global &eg) {
   f_seq << ref;
-  uint16_t pos_var;
+  char c;
   long prevj = 0;
   auto current_contig_it = current_contig.begin();
-  long currentpos;
-  uint64_t abs_current_pos;
+  long currentpos, prevpos = 0;
   for (; current_contig_it != current_contig.end(); ++current_contig_it) {
     currentpos = (*current_contig_it).pos;
     prevj = 0;
@@ -77,23 +68,26 @@ void writecontig(const std::string &ref,
       if ((*current_contig_it).read[j] != ref[currentpos + j]) {
         f_noise << eg.enc_noise[(uint8_t)ref[currentpos + j]]
                                [(uint8_t)(*current_contig_it).read[j]];
-        pos_var = j - prevj;
-        f_noisepos.write((char *)&pos_var, sizeof(uint16_t));
+        c = j - prevj;
+        f_noisepos << c;
         prevj = j;
       }
     f_noise << "\n";
-    abs_current_pos = abs_pos + currentpos;
-    f_pos.write((char *)&abs_current_pos, sizeof(uint64_t));
+    if (current_contig_it == current_contig.begin())
+      c = eg.max_readlen;
+    else
+      c = currentpos - prevpos;
+    f_pos << c;
     f_order.write((char *)&((*current_contig_it).order), sizeof(uint32_t));
     f_readlength.write((char *)&((*current_contig_it).read_length),
-                       sizeof(uint16_t));
+                       sizeof(uint8_t));
     f_RC << (*current_contig_it).RC;
+    prevpos = currentpos;
   }
-  abs_pos += ref.size();
   return;
 }
 
-void pack_compress_seq(const encoder_global &eg, uint64_t *file_len_seq_thr) {
+void packbits(encoder_global &eg) {
 #pragma omp parallel
   {
     int tid = omp_get_thread_num();
@@ -106,7 +100,6 @@ void pack_compress_seq(const encoder_global &eg, uint64_t *file_len_seq_thr) {
     uint64_t file_len = 0;
     char c;
     while (in_seq >> std::noskipws >> c) file_len++;
-    file_len_seq_thr[tid] = file_len;
     uint8_t basetoint[128];
     basetoint[(uint8_t)'A'] = 0;
     basetoint[(uint8_t)'C'] = 1;
@@ -128,22 +121,88 @@ void pack_compress_seq(const encoder_global &eg, uint64_t *file_len_seq_thr) {
     }
     f_seq.close();
     in_seq.read(dnabase, file_len % 4);
-    for (unsigned int i = 0; i < file_len % 4; i++) f_seq_tail << dnabase[i];
+    for (uint i = 0; i < file_len % 4; i++) f_seq_tail << dnabase[i];
     f_seq_tail.close();
     in_seq.close();
-    bsc::BSC_compress(
-        (eg.outfile_seq + '.' + std::to_string(tid) + ".tmp").c_str(),
-        (eg.outfile_seq + '.' + std::to_string(tid) + ".bsc").c_str());
     remove((eg.outfile_seq + '.' + std::to_string(tid)).c_str());
-    remove((eg.outfile_seq + '.' + std::to_string(tid) + ".tmp").c_str());
+    rename((eg.outfile_seq + '.' + std::to_string(tid) + ".tmp").c_str(),
+           (eg.outfile_seq + '.' + std::to_string(tid)).c_str());
+
+    // rev
+    std::ifstream in_rev(eg.infile_RC + '.' + std::to_string(tid));
+    std::ofstream f_rev(eg.infile_RC + '.' + std::to_string(tid) + ".tmp",
+                        std::ios::binary);
+    std::ofstream f_rev_tail(eg.infile_RC + '.' + std::to_string(tid) +
+                             ".tail");
+    file_len = 0;
+    while (in_rev >> std::noskipws >> c) file_len++;
+    basetoint['d'] = 0;
+    basetoint['r'] = 1;
+
+    in_rev.close();
+    in_rev.open(eg.infile_RC + '.' + std::to_string(tid));
+    for (uint64_t i = 0; i < file_len / 8; i++) {
+      in_rev.read(dnabase, 8);
+      dnabin = 128 * basetoint[(uint8_t)dnabase[7]] +
+               64 * basetoint[(uint8_t)dnabase[6]] +
+               32 * basetoint[(uint8_t)dnabase[5]] +
+               16 * basetoint[(uint8_t)dnabase[4]] +
+               8 * basetoint[(uint8_t)dnabase[3]] +
+               4 * basetoint[(uint8_t)dnabase[2]] +
+               2 * basetoint[(uint8_t)dnabase[1]] +
+               basetoint[(uint8_t)dnabase[0]];
+      f_rev.write((char *)&dnabin, sizeof(uint8_t));
+    }
+    f_rev.close();
+    in_rev.read(dnabase, file_len % 8);
+    for (uint i = 0; i < file_len % 8; i++) f_rev_tail << dnabase[i];
+    f_rev_tail.close();
+    remove((eg.infile_RC + '.' + std::to_string(tid)).c_str());
+    rename((eg.infile_RC + '.' + std::to_string(tid) + ".tmp").c_str(),
+           (eg.infile_RC + '.' + std::to_string(tid)).c_str());
   }
+  // singleton
+  std::ifstream in_singleton(eg.outfile_singleton);
+  std::ofstream f_singleton(eg.outfile_singleton + ".tmp", std::ios::binary);
+  std::ofstream f_singleton_tail(eg.outfile_singleton + ".tail");
+  uint64_t file_len = 0;
+  char c;
+  while (in_singleton >> std::noskipws >> c) file_len++;
+  uint8_t basetoint[128];
+  basetoint[(uint8_t)'A'] = 0;
+  basetoint[(uint8_t)'C'] = 1;
+  basetoint[(uint8_t)'G'] = 2;
+  basetoint[(uint8_t)'T'] = 3;
+  in_singleton.close();
+  in_singleton.open(eg.outfile_singleton);
+  char dnabase[8];
+  uint8_t dnabin;
+  for (uint64_t i = 0; i < file_len / 4; i++) {
+    in_singleton.read(dnabase, 4);
+
+    dnabin = 64 * basetoint[(uint8_t)dnabase[3]] +
+             16 * basetoint[(uint8_t)dnabase[2]] +
+             4 * basetoint[(uint8_t)dnabase[1]] +
+             basetoint[(uint8_t)dnabase[0]];
+    f_singleton.write((char *)&dnabin, sizeof(uint8_t));
+  }
+  f_singleton.close();
+  in_singleton.read(dnabase, file_len % 4);
+  for (uint i = 0; i < file_len % 4; i++) f_singleton_tail << dnabase[i];
+  f_singleton_tail.close();
+  in_singleton.close();
+  remove((eg.outfile_singleton).c_str());
+  rename((eg.outfile_singleton + ".tmp").c_str(),
+         (eg.outfile_singleton).c_str());
   return;
 }
 
-void getDataParams(encoder_global &eg, const compression_params &cp) {
+void getDataParams(encoder_global &eg) {
+  std::ifstream f_numreads(eg.infilenumreads, std::ios::binary);
   uint32_t numreads_clean, numreads_total;
-  numreads_clean = cp.num_reads_clean[0] + cp.num_reads_clean[1];
-  numreads_total = cp.num_reads;
+  f_numreads.read((char *)&numreads_clean, sizeof(uint32_t));
+  f_numreads.read((char *)&numreads_total, sizeof(uint32_t));
+  f_numreads.close();
 
   std::ifstream myfile_s(eg.infile + ".singleton", std::ifstream::in);
   eg.numreads_s = 0;
@@ -159,7 +218,7 @@ void getDataParams(encoder_global &eg, const compression_params &cp) {
   std::cout << "Number of reads with N: " << eg.numreads_N << std::endl;
 }
 
-void correct_order(uint32_t *order_s, const encoder_global &eg) {
+void correct_order(uint32_t *order_s, encoder_global &eg) {
   uint32_t numreads_total = eg.numreads + eg.numreads_s + eg.numreads_N;
   bool *read_flag_N = new bool[numreads_total]();
   // bool array indicating N reads

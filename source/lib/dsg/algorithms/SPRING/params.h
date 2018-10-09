@@ -20,7 +20,6 @@ const int MAX_SEARCH_ENCODER = 1000;
 const int THRESH_ENCODER = 24;
 const int NUM_READS_PER_BLOCK = 256000;
 const int NUM_READS_PER_BLOCK_LONG = 10000;
-const int BSC_BLOCK_SIZE = 64;  // 64 MB
 }  // namespace spring
 
 #endif  // SPRING_PARAMS_H_

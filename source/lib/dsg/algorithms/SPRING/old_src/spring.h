@@ -2,21 +2,18 @@
 #define SPRING_SPRING_H_
 
 #include <string>
-#include "algorithms/SPRING/util.h"
+#include "generation.h"
 #include "input/fastq/FastqFileReader.h"
 
 namespace spring {
 
+void call_reorder(const std::string &working_dir, int max_readlen, int num_thr);
+void call_encoder(const std::string &working_dir, int max_readlen, int num_thr);
+
 void generate_streams_SPRING(
     dsg::input::fastq::FastqFileReader *fastqFileReader1,
     dsg::input::fastq::FastqFileReader *fastqFileReader2, int num_thr,
-    bool paired_end, const std::string &working_dir);
-
-void call_reorder(const std::string &temp_dir, compression_params &cp);
-
-void call_encoder(const std::string &temp_dir, compression_params &cp);
-
-std::string random_string(size_t length);
+    bool paired_end);
 
 }  // namespace spring
 

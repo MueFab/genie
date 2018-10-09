@@ -1,9 +1,9 @@
-#include "bitset_util.h"
-#include "params.h"
+#include "algorithms/SPRING/util.h"
+#include <string>
 
 namespace spring {
 
-void bbhashdict::findpos(int64_t *dictidx, const uint64_t &startposidx) {
+void bbhashdict::findpos(int64_t *dictidx, uint64_t &startposidx) {
   dictidx[0] = startpos[startposidx];
   auto endidx = startpos[startposidx + 1];
   if (read_id[endidx - 1] ==
@@ -20,8 +20,8 @@ void bbhashdict::findpos(int64_t *dictidx, const uint64_t &startposidx) {
   return;
 }
 
-void bbhashdict::remove(int64_t *dictidx, const uint64_t &startposidx,
-                        const int64_t current) {
+void bbhashdict::remove(int64_t *dictidx, uint64_t &startposidx,
+                        int64_t current) {
   auto size = dictidx[1] - dictidx[0];
   if (size == 1)  // just one read left in bin
   {
@@ -46,6 +46,22 @@ void bbhashdict::remove(int64_t *dictidx, const uint64_t &startposidx,
     read_id[endidx - 2]--;
 
   return;
+}
+
+void reverse_complement(char *s, char *s1, int readlen,
+                        char chartorevchar[128]) {
+  for (int j = 0; j < readlen; j++)
+    s1[j] = chartorevchar[(uint8_t)s[readlen - j - 1]];
+  s1[readlen] = '\0';
+  return;
+}
+
+std::string reverse_complement(std::string s, int readlen,
+                               char chartorevchar[128]) {
+  std::string s1(s);
+  for (int j = 0; j < readlen; j++)
+    s1[j] = chartorevchar[(uint8_t)s[readlen - j - 1]];
+  return s1;
 }
 
 }  // namespace spring
