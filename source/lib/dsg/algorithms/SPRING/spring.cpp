@@ -16,7 +16,7 @@
 #include "algorithms/SPRING/preprocess.h"
 #include "algorithms/SPRING/reorder.h"
 #include "algorithms/SPRING/reorder_compress_quality_id.h"
-//#include "algorithms/SPRING/reorder_compress_streams.h"
+#include "algorithms/SPRING/generate_read_streams.h"
 #include "algorithms/SPRING/spring.h"
 #include "algorithms/SPRING/util.h"
 #include "input/fastq/FastqFileReader.h"
@@ -112,17 +112,17 @@ void generate_streams_SPRING(
                 << " s\n";
     }
 
-//    std::cout << "Reordering and compressing streams ...\n";
-//    auto rcs_start = std::chrono::steady_clock::now();
-//    reorder_compress_streams(temp_dir, cp);
-//    auto rcs_end = std::chrono::steady_clock::now();
-//    std::cout << "Reordering and compressing streams done!\n";
-//    std::cout << "Time for this step: "
-//              << std::chrono::duration_cast<std::chrono::seconds>(rcs_end -
-//                                                                  rcs_start)
-//                     .count()
-//              << " s\n";
-//  }
+    std::cout << "Generating read streams ...\n";
+    auto grs_start = std::chrono::steady_clock::now();
+    generate_read_streams(temp_dir, cp);
+    auto grs_end = std::chrono::steady_clock::now();
+    std::cout << "Generating read streams done!\n";
+    std::cout << "Time for this step: "
+              << std::chrono::duration_cast<std::chrono::seconds>(grs_end -
+                                                                  grs_start)
+                     .count()
+              << " s\n";
+// }
 
   // Write compression params to a file
   std::string compression_params_file = temp_dir + "/cp.bin";

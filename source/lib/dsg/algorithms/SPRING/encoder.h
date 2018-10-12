@@ -345,15 +345,23 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     f_RC.close();
     delete[] deleted_rids;
   }  // end omp parallel
-
+    
+  uint64_t *file_len_seq_thr = new uint64_t[eg.num_thr];
+  for (int tid = 0; tid < eg.num_thr; tid++) {
+    std::ifstream in_seq(eg.outfile_seq + '.' + std::to_string(tid));
+    in_seq.seekg(0, in_seq.end);
+    file_len_seq_thr[tid] = in_seq.tellg();
+    in_seq.close();
+  }
   // Combine files produced by the threads
   std::ofstream f_order(eg.infile_order);
   std::ofstream f_readlength(eg.infile_readlength);
   std::ofstream f_noisepos(eg.outfile_noisepos);
   std::ofstream f_noise(eg.outfile_noise);
   std::ofstream f_RC(eg.infile_RC);
-
+  std::ofstream f_seq(eg.outfile_seq);
   for (int tid = 0; tid < eg.num_thr; tid++) {
+    std::ifstream in_seq(eg.outfile_seq + '.' + std::to_string(tid));
     std::ifstream in_order(eg.infile_order + '.' + std::to_string(tid) +
                            ".tmp");
     std::ifstream in_readlength(eg.infile_readlength + '.' +
@@ -361,6 +369,8 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     std::ifstream in_RC(eg.infile_RC + '.' + std::to_string(tid) + ".tmp");
     std::ifstream in_noisepos(eg.outfile_noisepos + '.' + std::to_string(tid));
     std::ifstream in_noise(eg.outfile_noise + '.' + std::to_string(tid));
+    f_seq << in_seq.rdbuf();
+    f_seq.clear();
     f_order << in_order.rdbuf();
     f_order.clear();  // clear error flag in case in_order is empty
     f_noisepos << in_noisepos.rdbuf();
@@ -372,6 +382,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     f_RC << in_RC.rdbuf();
     f_RC.clear();  // clear error flag in case in_RC is empty
 
+    remove((eg.outfile_seq + '.' + std::to_string(tid)).c_str());
     remove((eg.infile_order + '.' + std::to_string(tid)).c_str());
     remove((eg.infile_order + '.' + std::to_string(tid) + ".tmp").c_str());
     remove((eg.infile_readlength + '.' + std::to_string(tid)).c_str());
@@ -419,9 +430,8 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
   delete[] mask;
   delete[] mask1;
 
-  // pack read_Seq and convert read_pos into 8 byte non-diff (absolute)
+  // convert read_pos into 8 byte non-diff (absolute)
   // positions
-  uint64_t *file_len_seq_thr = new uint64_t[eg.num_thr];
   uint64_t abs_pos = 0;
   uint64_t abs_pos_thr;
   std::ofstream fout_pos(eg.outfile_pos, std::ios::binary);
@@ -540,7 +550,7 @@ void encoder_main(const std::string &temp_dir, const compression_params &cp) {
   eg.infile_RC = eg.basedir + "/read_rev.txt";
   eg.infile_readlength = eg.basedir + "/read_lengths.bin";
   eg.infile_N = eg.basedir + "/input_N.dna";
-  eg.outfile_seq = eg.basedir + "/read_seq.bin";
+  eg.outfile_seq = eg.basedir + "/read_seq.txt";
   eg.outfile_pos = eg.basedir + "/read_pos.bin";
   eg.outfile_noise = eg.basedir + "/read_noise.txt";
   eg.outfile_noisepos = eg.basedir + "/read_noisepos.bin";

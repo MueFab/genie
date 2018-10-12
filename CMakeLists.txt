@@ -162,13 +162,7 @@ set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/bit
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/encoder.cpp)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/pe_encode.cpp)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/reorder_compress_quality_id.cpp)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/id_compression/src/Arithmetic_stream.cpp)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/id_compression/src/id_compression.cpp)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/id_compression/src/sam_file_allocation.cpp)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/id_compression/src/stream_model.cpp)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/id_compression/src/compression.cpp)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/id_compression/src/io_functions.cpp)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/id_compression/src/sam_models.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/generate_read_streams.cpp)
 
 add_executable(${dsg} ${dsg_header_files} ${dsg_source_files})
 

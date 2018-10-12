@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "algorithms/SPRING/id_compression/include/sam_block.h"
 #include "algorithms/SPRING/reorder_compress_quality_id.h"
@@ -152,8 +153,9 @@ void reorder_compress(const std::string &file_name,
             file_name + "." + std::to_string(block_num_offset + block_num);
 
         if (mode == "id") {
-          compress_id_block(outfile_name.c_str(), str_array + start_read_num,
-                            num_reads_block);
+          std::vector<int64_t> tokens[128][8];
+          generate_read_id_tokens(str_array + start_read_num, num_reads_block, tokens);
+          write_read_id_tokens_to_file(outfile_name.c_str(), tokens);
         } else {
           // store lengths in array for quality compression
           for (uint64_t i = 0; i < num_reads_block; i++)
@@ -169,6 +171,157 @@ void reorder_compress(const std::string &file_name,
       }
       if (mode == "quality") delete[] read_lengths_array;
     }  // omp parallel
+  }
+}
+
+void generate_read_id_tokens (std::string *id_array, const uint32_t &num_ids, std::vector<int64_t> tokens[128][8]) {
+  char prev_ID[1024] = {0};
+  uint32_t prev_tokens_ptr[1024] = {0};
+  for (uint32_t id_num = 0; id_num < num_ids; id_num++) {
+    tokens[0][0].push_back(1); // DIFF
+    if (id_num == 0)
+      tokens[0][1].push_back(0); // DIFF 0 for first id
+    else
+      tokens[0][1].push_back(1); // DIFF 1 for rest of ids
+
+    // due to above, we see token_ctr+1 at a bunch of places below
+
+    uint8_t token_len = 0, match_len = 0;
+    uint32_t i = 0, k = 0, tmp = 0, token_ctr = 0, digit_value = 0,
+             prev_digit = 0;
+    int delta = 0;
+  
+    char *id_ptr = &id_array[id_num][0];
+    char *id_ptr_tok = NULL;
+  
+    while (*id_ptr != 0) {
+      match_len += (*id_ptr == prev_ID[prev_tokens_ptr[token_ctr] + token_len]),
+          token_len++;
+      id_ptr_tok = id_ptr + 1;
+  
+      // Check if the token is a alphabetic word
+      if (isalpha(*id_ptr)) {
+        while (isalpha(*id_ptr_tok)) {
+          // compare with the same token from previous ID
+          match_len +=
+              (*id_ptr_tok == prev_ID[prev_tokens_ptr[token_ctr] + token_len]),
+              token_len++, id_ptr_tok++;
+        }
+        if (match_len == token_len &&
+            !isalpha(prev_ID[prev_tokens_ptr[token_ctr] + token_len])) {
+          // The token is the same as last ID
+          // Encode a token_type ID_MATCH
+          tokens[token_ctr+1][0].push_back(8); // MATCH 
+  
+        } else {
+          tokens[token_ctr+1][0].push_back(2); // STRING 
+          for (k = 0; k < token_len; k++) {
+            tokens[token_ctr+1][2].push_back((int64_t)(*(id_ptr + k)));
+          }
+          tokens[token_ctr+1][2].push_back((int64_t)'\0');
+        } 
+      }
+      // check if the token is a run of zeros
+      else if (*id_ptr == '0') {
+        while (*id_ptr_tok == '0') {
+          // compare with the same token from previous ID
+          match_len += ('0' == prev_ID[prev_tokens_ptr[token_ctr] + token_len]),
+              token_len++, id_ptr_tok++;
+        }
+        if (match_len == token_len &&
+            prev_ID[prev_tokens_ptr[token_ctr] + token_len] != '0') {
+          // The token is the same as last ID
+          // Encode a token_type ID_MATCH
+          tokens[token_ctr+1][0].push_back(8); // MATCH 
+        } else {
+            tokens[token_ctr+1][0].push_back(2); // STRING 
+            for (k = 0; k < token_len; k++) {
+              tokens[token_ctr+1][2].push_back((int64_t)'0');
+            }
+            tokens[token_ctr+1][2].push_back((int64_t)'\0');
+        }
+  
+      }
+      // Check if the token is a number smaller than (1<<29)
+      else if (isdigit(*id_ptr)) {
+        digit_value = (*id_ptr - '0');
+        if (*prev_ID != 0) {
+          prev_digit = prev_ID[prev_tokens_ptr[token_ctr] + token_len - 1] - '0';
+        }
+  
+        if (*prev_ID != 0) {
+          tmp = 1;
+          while (isdigit(prev_ID[prev_tokens_ptr[token_ctr] + tmp])) {
+            prev_digit = prev_digit * 10 +
+                         (prev_ID[prev_tokens_ptr[token_ctr] + tmp] - '0');
+            tmp++;
+          }
+        }
+  
+        while (isdigit(*id_ptr_tok) && digit_value < (1 << 29)) {
+          digit_value = digit_value * 10 + (*id_ptr_tok - '0');
+          // if (*prev_ID != 0){
+          //    prev_digit = prev_digit * 10 + (prev_ID[prev_tokens_ptr[token_ctr]
+          //    + token_len] - '0');
+          //}
+          // compare with the same token from previous ID
+          match_len +=
+              (*id_ptr_tok == prev_ID[prev_tokens_ptr[token_ctr] + token_len]),
+              token_len++, id_ptr_tok++;
+        }
+        if (match_len == token_len &&
+            !isdigit(prev_ID[prev_tokens_ptr[token_ctr] + token_len])) {
+          // The token is the same as last ID
+          // Encode a token_type ID_MATCH
+          tokens[token_ctr+1][0].push_back(8); // MATCH
+  
+        } else if ((delta = (digit_value - prev_digit)) < 256 && delta > 0) {
+          tokens[token_ctr+1][0].push_back(5); // DDELTA
+          tokens[token_ctr+1][5].push_back((int64_t)delta);
+  
+        } else {
+          // Encode a token type ID_DIGIT and the value (byte-based)
+          tokens[token_ctr+1][0].push_back(4); // DIGITS
+          tokens[token_ctr+1][4].push_back((int64_t)digit_value);
+        }
+      } else {
+        // compare with the same token from previous ID
+        // match_len += (*id_ptr == prev_ID[prev_tokens_ptr[token_ctr]]);
+  
+        if (match_len == token_len) {
+          // The token is the same as last ID
+          // Encode a token_type ID_MATCH
+          tokens[token_ctr+1][0].push_back(8); // MATCH
+  
+        } else {
+          // Encode a token type ID_CHAR and the char
+          tokens[token_ctr+1][0].push_back(3); // CHAR
+          tokens[token_ctr+1][3].push_back((int64_t)(*id_ptr));  
+        }
+      }
+  
+      prev_tokens_ptr[token_ctr] = i;
+      i += token_len;
+      id_ptr = id_ptr_tok;
+      match_len = 0;
+      token_len = 0;
+      token_ctr++;
+      if(token_ctr > 126) 
+        throw std::runtime_error("Too many tokens in ID");
+    }
+    strcpy(prev_ID, id_array[i].c_str());
+    tokens[token_ctr+1][0].push_back(9); // END
+  }
+}
+
+void write_read_id_tokens_to_file(const std::string &outfile_name, const std::vector<int64_t> tokens[128][8]) {
+  for (int i = 0; i < 128; i++) {
+    for (int j = 0; j < 8; j++) {
+      if (!tokens[i][j].empty()) {
+        std::string outfile_name_i_j = outfile_name + "." + std::to_string(i) + "." + std::to_string(j);
+        write_vector_to_file(tokens[i][j], outfile_name_i_j);
+      }
+    }
   }
 }
 

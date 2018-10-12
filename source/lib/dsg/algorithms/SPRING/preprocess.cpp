@@ -255,7 +255,7 @@ void preprocess(dsg::input::fastq::FastqFileReader *fastqFileReader1,
             fout_order_N[j].write((char *)&pos_N, sizeof(uint32_t));
             fout_N[j] << fastqRecords[i].sequence << "\n";
           }
-//        }
+        }
 //        if (!cp.preserve_order) {
 //          // write qualities to file
           for (uint32_t i = 0; i < num_reads_read; i++)
@@ -263,7 +263,7 @@ void preprocess(dsg::input::fastq::FastqFileReader *fastqFileReader1,
           // write ids to file
           for (uint32_t i = 0; i < num_reads_read; i++)
             fout_id[j] << fastqRecords[i].title << "\n";
-        }
+//        }
 //      }
       num_reads[j] += num_reads_read;
       max_readlen =

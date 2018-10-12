@@ -22,6 +22,10 @@ void reorder_compress(const std::string &file_name,
                       uint32_t *order_array, const std::string &mode, const compression_params &cp);
 // mode can be "quality" or "id"
 
+void generate_read_id_tokens (std::string *id_array, const uint32_t &num_ids, std::vector<int64_t> tokens[128][8]);
+
+void write_read_id_tokens_to_file(const std::string &outfile_name, const std::vector<int64_t> tokens[128][8]);
+
 }  // namespace spring
 
 #endif  // SPRING_REORDER_COMPRESS_QUALITY_ID_H_

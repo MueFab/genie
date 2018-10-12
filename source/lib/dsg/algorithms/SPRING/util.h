@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <string>
+#include <vector>
 
 namespace spring {
 
@@ -45,11 +46,8 @@ void write_fastq_block(std::ofstream &fout, std::string *id_array,
                        std::string *read_array, std::string *quality_array,
                        const uint32_t &num_reads, const bool preserve_quality);
 
-void compress_id_block(const char *outfile_name, std::string *id_array,
-                       const uint32_t &num_ids);
+void write_vector_to_file(const std::vector<int64_t> &subseq, const std::string &file_name);
 
-void decompress_id_block(const char *infile_name, std::string *id_array,
-                         const uint32_t &num_ids);
 
 void quantize_quality(std::string *quality_array, const uint32_t &num_lines,
                       char *quantization_table);

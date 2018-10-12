@@ -75,8 +75,9 @@ void writecontig(const std::string &ref,
     prevj = 0;
     for (long j = 0; j < (*current_contig_it).read_length; j++)
       if ((*current_contig_it).read[j] != ref[currentpos + j]) {
-        f_noise << eg.enc_noise[(uint8_t)ref[currentpos + j]]
-                               [(uint8_t)(*current_contig_it).read[j]];
+        f_noise << (*current_contig_it).read[j];
+//eg.enc_noise[(uint8_t)ref[currentpos + j]]
+//                               [(uint8_t)(*current_contig_it).read[j]];
         pos_var = j - prevj;
         f_noisepos.write((char *)&pos_var, sizeof(uint16_t));
         prevj = j;

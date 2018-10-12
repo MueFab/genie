@@ -3,7 +3,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
-#include "algorithms/SPRING/id_compression/include/sam_block.h"
+#include <vector>
 
 namespace spring {
 
@@ -40,35 +40,13 @@ void write_fastq_block(std::ofstream &fout, std::string *id_array,
   }
 }
 
-void compress_id_block(const char *outfile_name, std::string *id_array,
-                       const uint32_t &num_ids) {
-  struct id_comp::compressor_info_t comp_info;
-  comp_info.numreads = num_ids;
-  comp_info.mode = COMPRESSION;
-  comp_info.id_array = id_array;
-  comp_info.fcomp = fopen(outfile_name, "w");
-  if (!comp_info.fcomp) {
-    perror(outfile_name);
-    throw std::runtime_error("ID compression: File output error");
-  }
-  id_comp::compress((void *)&comp_info);
-  fclose(comp_info.fcomp);
+void write_vector_to_file(const std::vector<int64_t> &subseq, const std::string &file_name) {
+  std::ofstream f_out(file_name,std::ios::binary);
+  for (int64_t val : subseq)
+    f_out.write((char*)&val, sizeof(int64_t));
+  f_out.close();
 }
 
-void decompress_id_block(const char *infile_name, std::string *id_array,
-                         const uint32_t &num_ids) {
-  struct id_comp::compressor_info_t comp_info;
-  comp_info.numreads = num_ids;
-  comp_info.mode = DECOMPRESSION;
-  comp_info.id_array = id_array;
-  comp_info.fcomp = fopen(infile_name, "r");
-  if (!comp_info.fcomp) {
-    perror(infile_name);
-    throw std::runtime_error("ID compression: File input error");
-  }
-  id_comp::decompress((void *)&comp_info);
-  fclose(comp_info.fcomp);
-}
 
 void quantize_quality(std::string *quality_array, const uint32_t &num_lines,
                       char *quantization_table) {
