@@ -86,6 +86,22 @@ void generate_streams_SPRING(
                      .count()
               << " s\n";
 
+
+
+    std::cout << "Generating read streams ...\n";
+    auto grs_start = std::chrono::steady_clock::now();
+    if (!cp.paired_end) 
+      generate_read_streams_se(temp_dir, cp);
+    else
+      generate_read_streams_pe(temp_dir, cp);
+    auto grs_end = std::chrono::steady_clock::now();
+    std::cout << "Generating read streams done!\n";
+    std::cout << "Time for this step: "
+              << std::chrono::duration_cast<std::chrono::seconds>(grs_end -
+                                                                  grs_start)
+                     .count()
+              << " s\n";
+    
     if (preserve_quality || preserve_id) {
       std::cout << "Reordering and compressing quality and/or ids ...\n";
       auto rcqi_start = std::chrono::steady_clock::now();
@@ -98,30 +114,6 @@ void generate_streams_SPRING(
                        .count()
                 << " s\n";
     }
-
-    if (paired_end) {
-      std::cout << "Encoding pairing information ...\n";
-      auto pe_encode_start = std::chrono::steady_clock::now();
-      pe_encode(temp_dir, cp);
-      auto pe_encode_end = std::chrono::steady_clock::now();
-      std::cout << "Encoding pairing information done!\n";
-      std::cout << "Time for this step: "
-                << std::chrono::duration_cast<std::chrono::seconds>(
-                       pe_encode_end - pe_encode_start)
-                       .count()
-                << " s\n";
-    }
-
-    std::cout << "Generating read streams ...\n";
-    auto grs_start = std::chrono::steady_clock::now();
-    generate_read_streams(temp_dir, cp);
-    auto grs_end = std::chrono::steady_clock::now();
-    std::cout << "Generating read streams done!\n";
-    std::cout << "Time for this step: "
-              << std::chrono::duration_cast<std::chrono::seconds>(grs_end -
-                                                                  grs_start)
-                     .count()
-              << " s\n";
 // }
 
   // Write compression params to a file
