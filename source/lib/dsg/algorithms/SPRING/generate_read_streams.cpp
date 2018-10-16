@@ -489,6 +489,8 @@ void generate_read_streams_pe(const std::string &temp_dir,
         block_seq_start.push_back(pos_arr[current]);
     }
     if (!already_seen[current]) {
+      // current is already seen when current is unaligned and its pair has already 
+      // appeared before - in such cases we don't need to handle it now.
       already_seen[current] = true;
       uint32_t pair = (current < num_reads_by_2)?(current + num_reads_by_2):(current - num_reads_by_2);
       if (already_seen[pair]) {
@@ -512,7 +514,7 @@ void generate_read_streams_pe(const std::string &temp_dir,
           if (!flag_arr[current]) {
             // both unaligned - put in same record
             block_num[pair] = current_block_num;
-            genomic_record_index[pair] = num_records_current_block;
+            genomic_record_index[pair] = num_records_current_block - 1;
             read_index_genomic_record.push_back(std::min(current,pair)); // always put read 1 first in this case
           } else {
             // pair is unaligned, put in same block at end (not in same record)
@@ -583,7 +585,7 @@ void generate_read_streams_pe(const std::string &temp_dir,
   }
   f_order_quality.close();
   f_blocks_quality.close();
-
+  std::cout << quality_block_pos << "\n";
   // id:
   std::ofstream f_blocks_id(file_blocks_id, std::ios::binary);
   // store block start and end positions (measured in terms of records since 1 record = 1 id)
@@ -591,18 +593,20 @@ void generate_read_streams_pe(const std::string &temp_dir,
     f_blocks_id.write((char*)&block_start[i], sizeof(uint32_t));
     f_blocks_id.write((char*)&block_end[i], sizeof(uint32_t));
     std::ofstream f_order_id(file_order_id + "." + std::to_string(i), std::ios::binary); 
-    // store order (int64_t - positive means index while negative means DUP)
+    // store order (uint64_t - < 2^32 means index while greater means DUP)
     for (uint32_t j = block_start[i]; j < block_end[i]; j++) {
       uint32_t current = read_index_genomic_record[j];
       uint32_t pair = (current < num_reads_by_2)?(current + num_reads_by_2):(current - num_reads_by_2);
       if ((block_num[current] == block_num[pair]) && (genomic_record_index[pair] < genomic_record_index[current])) {
         // DUP
-        int64_t gap = genomic_record_index[pair] - genomic_record_index[current];
-        f_order_id.write((char*)&gap, sizeof(int64_t));  
+        uint64_t gap = genomic_record_index[current] - genomic_record_index[pair];
+        uint64_t min_index = (current > pair)?pair:current;
+        uint64_t val_to_write = (gap<<32)|min_index;
+        f_order_id.write((char*)&val_to_write, sizeof(uint64_t));  
       } else {
         // just write the min of current and pair
-        int64_t min_index = (current > pair)?pair:current;
-        f_order_id.write((char*)&min_index, sizeof(int64_t));
+        uint64_t min_index = (current > pair)?pair:current;
+        f_order_id.write((char*)&min_index, sizeof(uint64_t));
       }
     }
     f_order_id.close();
