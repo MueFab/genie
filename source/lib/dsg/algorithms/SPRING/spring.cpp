@@ -17,6 +17,7 @@
 #include "algorithms/SPRING/reorder.h"
 #include "algorithms/SPRING/reorder_compress_quality_id.h"
 #include "algorithms/SPRING/generate_read_streams.h"
+#include "algorithms/SPRING/generate_new_fastq.h"
 #include "algorithms/SPRING/spring.h"
 #include "algorithms/SPRING/util.h"
 #include "input/fastq/FastqFileReader.h"
@@ -86,11 +87,25 @@ void generate_streams_SPRING(
                      .count()
               << " s\n";
 
-
+    std::cout << "Generating new FASTQ\n";
+    auto new_fq_start = std::chrono::steady_clock::now();
+    if (!paired_end) {
+      generate_new_fastq_se(fastqFileReader1, temp_dir, cp);
+    }
+    else {
+      throw std::runtime_error("NOT IMPLEMENTED");
+    }
+    auto new_fq_end = std::chrono::steady_clock::now();
+    std::cout << "Generating new FASTQ done\n";
+    std::cout << "Time for this step: "
+              << std::chrono::duration_cast<std::chrono::seconds>(new_fq_end -
+                                                                  new_fq_start)
+                     .count()
+              << " s\n";
 
     std::cout << "Generating read streams ...\n";
     auto grs_start = std::chrono::steady_clock::now();
-    if (!cp.paired_end) 
+    if (!cp.paired_end)
       generate_read_streams_se(temp_dir, cp);
     else
       generate_read_streams_pe(temp_dir, cp);
@@ -101,7 +116,7 @@ void generate_streams_SPRING(
                                                                   grs_start)
                      .count()
               << " s\n";
-    
+
     if (preserve_quality || preserve_id) {
       std::cout << "Reordering and compressing quality and/or ids ...\n";
       auto rcqi_start = std::chrono::steady_clock::now();

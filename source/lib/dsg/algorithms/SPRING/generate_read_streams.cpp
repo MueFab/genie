@@ -14,9 +14,9 @@ namespace spring {
 
 void generate_read_streams_se(const std::string &temp_dir,
                               const compression_params &cp) {
-  
+
   std::string basedir = temp_dir;
- 
+
   std::string file_subseq_0_0 = basedir + "/subseq_0_0"; // pos
   std::string file_subseq_1_0 = basedir + "/subseq_1_0"; // rcomp
   std::string file_subseq_3_0 = basedir + "/subseq_3_0"; // mmpos
@@ -167,26 +167,26 @@ void generate_read_streams_se(const std::string &temp_dir,
     bool done = false;
     while (!done) {
       //clear vectors
-      subseq_0_0[tid].clear();	
-      subseq_1_0[tid].clear();	
-      subseq_3_0[tid].clear();	
-      subseq_3_1[tid].clear();	
-      subseq_4_0[tid].clear();	
-      subseq_4_1[tid].clear();	
-      subseq_6_0[tid].clear();	
-      subseq_7_0[tid].clear();	
-      subseq_12_0[tid].clear();	
+      subseq_0_0[tid].clear();
+      subseq_1_0[tid].clear();
+      subseq_3_0[tid].clear();
+      subseq_3_1[tid].clear();
+      subseq_4_0[tid].clear();
+      subseq_4_1[tid].clear();
+      subseq_6_0[tid].clear();
+      subseq_7_0[tid].clear();
+      subseq_12_0[tid].clear();
 
       uint64_t start_read_num = block_num * num_reads_per_block;
       uint64_t end_read_num = (block_num + 1) * num_reads_per_block;
-     
+
       if (start_read_num >= num_reads) break;
       if (end_read_num >= num_reads) {
         done = true;
         end_read_num = num_reads;
       }
-     
-      // first find the seq 
+
+      // first find the seq
       uint64_t seq_start, seq_end;
       if (flag_arr[start_read_num] == false)
         seq_start = seq_end = 0; // all reads unaligned
@@ -197,7 +197,7 @@ void generate_read_streams_se(const std::string &temp_dir,
         for (; i < end_read_num; i++)
           if (flag_arr[i] == false)
             break;
-        seq_end = pos_arr[i-1] + read_length_arr[i-1]; 
+        seq_end = pos_arr[i-1] + read_length_arr[i-1];
       }
       if (seq_start != seq_end) {
         // not all unaligned
@@ -215,14 +215,14 @@ void generate_read_streams_se(const std::string &temp_dir,
           if (i == start_read_num) {
             // Note: In order non-preserving mode, if the first read of
             // the block is a singleton, then the rest are too.
-            subseq_0_0[tid].push_back(0); 
+            subseq_0_0[tid].push_back(0);
             prevpos = pos_arr[i];
           } else {
             diffpos = pos_arr[i] - prevpos;
             subseq_0_0[tid].push_back(diffpos); // pos
             prevpos = pos_arr[i];
           }
-          if (noise_len_arr[i] == 0) 
+          if (noise_len_arr[i] == 0)
             subseq_12_0[tid].push_back(1); // rtype = P
           else {
             subseq_12_0[tid].push_back(3); // rtype = M
@@ -235,7 +235,7 @@ void generate_read_streams_se(const std::string &temp_dir,
             subseq_3_0[tid].push_back(1);
           }
         } else {
-          subseq_12_0[tid].push_back(5); // rtype
+          subseq_12_0[tid].push_back(6); // rtype
           subseq_7_0[tid].push_back(read_length_arr[i]); // rlen
           for (uint64_t j = 0; j < read_length_arr[i]; j++) {
             subseq_6_0[tid].push_back(char_to_int[(uint8_t)unaligned_arr[pos_arr[i] + j]]); // ureads
@@ -245,7 +245,7 @@ void generate_read_streams_se(const std::string &temp_dir,
           subseq_7_0[tid].push_back(read_length_arr[i]); // rlen
           subseq_12_0[tid].push_back(1); // rtype = P
           prevpos = seq_end;
-          seq_end = prevpos + read_length_arr[i]; 
+          seq_end = prevpos + read_length_arr[i];
         }
       }
       // write vectors to files
@@ -279,18 +279,18 @@ void generate_read_streams_se(const std::string &temp_dir,
 
 void generate_read_streams_pe(const std::string &temp_dir,
                               const compression_params &cp) {
- 
+
 // basic approach: start looking at reads from left to right. If current is aligned but
 // pair is unaligned, pair is kept at the end current AU and stored in different record.
 // We try to keep number of records in AU = num_reads_per_block (without counting the the unaligned
-// pairs above. 
+// pairs above.
 // As we scan to right, if we come across a read whose pair has already been seen in the same AU
 // and the gap is < 32768 (and non-ovelapping since delta >= 0), then we add this to the paired read's
 // genomic record. Finally when we come to unaligned reads whose pair is also unaligned, we store them
 // in same genomic record.
- 
+
   std::string basedir = temp_dir;
- 
+
   std::string file_subseq_0_0 = basedir + "/subseq_0_0"; // pos
   std::string file_subseq_1_0 = basedir + "/subseq_1_0"; // rcomp
   std::string file_subseq_3_0 = basedir + "/subseq_3_0"; // mmpos
@@ -351,8 +351,8 @@ void generate_read_streams_pe(const std::string &temp_dir,
   std::vector<uint32_t> block_num(num_reads);
 
   std::vector<uint32_t> genomic_record_index(num_reads);
-  
-  std::vector<uint32_t> block_start, block_end; // block start and end positions wrt 
+
+  std::vector<uint32_t> block_start, block_end; // block start and end positions wrt
                                                 // read_index_genomic_record vector
   std::vector<uint32_t> read_index_genomic_record; // read numbers in genomic records
   std::vector<uint32_t> block_seq_start, block_seq_end; // seq start and end positions for this block
@@ -477,19 +477,19 @@ void generate_read_streams_pe(const std::string &temp_dir,
   block_start.push_back(0);
 
   std::vector<bool> already_seen(num_reads, false);
-  std::vector<uint32_t> to_push_at_end_of_block; 
+  std::vector<uint32_t> to_push_at_end_of_block;
 
   for (uint32_t i = 0; i < num_reads; i++) {
     uint32_t current = order_arr[i];
     if (num_records_current_block == 0) {
       // first read of block
-      if (!flag_arr[current]) 
+      if (!flag_arr[current])
         block_seq_start.push_back(0);
-      else 
+      else
         block_seq_start.push_back(pos_arr[current]);
     }
     if (!already_seen[current]) {
-      // current is already seen when current is unaligned and its pair has already 
+      // current is already seen when current is unaligned and its pair has already
       // appeared before - in such cases we don't need to handle it now.
       already_seen[current] = true;
       uint32_t pair = (current < num_reads_by_2)?(current + num_reads_by_2):(current - num_reads_by_2);
@@ -508,7 +508,7 @@ void generate_read_streams_pe(const std::string &temp_dir,
         // add new genomic record
         block_num[current] = current_block_num;
         genomic_record_index[current] = num_records_current_block++;
-  
+
         if (!flag_arr[pair]) {
           already_seen[pair] = true;
           if (!flag_arr[current]) {
@@ -519,11 +519,11 @@ void generate_read_streams_pe(const std::string &temp_dir,
           } else {
             // pair is unaligned, put in same block at end (not in same record)
             // for now, put in to_push_at_end_of_block vector (processed at end of block)
-            read_index_genomic_record.push_back(current); 
+            read_index_genomic_record.push_back(current);
             to_push_at_end_of_block.push_back(pair);
           }
         } else {
-          read_index_genomic_record.push_back(current); 
+          read_index_genomic_record.push_back(current);
         }
       }
       if (flag_arr[current]) {
@@ -553,11 +553,11 @@ void generate_read_streams_pe(const std::string &temp_dir,
       }
     }
   }
-  already_seen.clear();  
+  already_seen.clear();
   order_arr.clear();
   // PE step 3: generate index for ids and quality
-  
-  // quality: 
+
+  // quality:
   std::ofstream f_order_quality(file_order_quality, std::ios::binary);
   // store order (as usual in uint32_t)
   std::ofstream f_blocks_quality(file_blocks_quality, std::ios::binary);
@@ -572,9 +572,9 @@ void generate_read_streams_pe(const std::string &temp_dir,
       if ((block_num[current] == block_num[pair]) && (genomic_record_index[pair] == genomic_record_index[current])) {
         // pair in genomic record
         f_order_quality.write((char*)&current, sizeof(uint32_t));
-        quality_block_pos++; 
+        quality_block_pos++;
         f_order_quality.write((char*)&pair, sizeof(uint32_t));
-        quality_block_pos++; 
+        quality_block_pos++;
       } else {
         // only single read in genomic record
         f_order_quality.write((char*)&current, sizeof(uint32_t));
@@ -592,7 +592,7 @@ void generate_read_streams_pe(const std::string &temp_dir,
   for (uint32_t i = 0; i < block_start.size(); i++) {
     f_blocks_id.write((char*)&block_start[i], sizeof(uint32_t));
     f_blocks_id.write((char*)&block_end[i], sizeof(uint32_t));
-    std::ofstream f_order_id(file_order_id + "." + std::to_string(i), std::ios::binary); 
+    std::ofstream f_order_id(file_order_id + "." + std::to_string(i), std::ios::binary);
     // store order (uint64_t - < 2^32 means index while greater means DUP)
     for (uint32_t j = block_start[i]; j < block_end[i]; j++) {
       uint32_t current = read_index_genomic_record[j];
@@ -602,7 +602,7 @@ void generate_read_streams_pe(const std::string &temp_dir,
         uint64_t gap = genomic_record_index[current] - genomic_record_index[pair];
         uint64_t min_index = (current > pair)?pair:current;
         uint64_t val_to_write = (gap<<32)|min_index;
-        f_order_id.write((char*)&val_to_write, sizeof(uint64_t));  
+        f_order_id.write((char*)&val_to_write, sizeof(uint64_t));
       } else {
         // just write the min of current and pair
         uint64_t min_index = (current > pair)?pair:current;
@@ -611,8 +611,8 @@ void generate_read_streams_pe(const std::string &temp_dir,
     }
     f_order_id.close();
   }
-  f_blocks_id.close(); 
-  
+  f_blocks_id.close();
+
   // PE step 4: Now generate read streams and compress blocks in parallel
   omp_set_num_threads(num_thr);
 #pragma omp parallel
@@ -621,33 +621,33 @@ void generate_read_streams_pe(const std::string &temp_dir,
     uint64_t cur_block_num = tid;
     while (true) {
       //clear vectors
-      subseq_0_0[tid].clear();	
-      subseq_1_0[tid].clear();	
-      subseq_3_0[tid].clear();	
-      subseq_3_1[tid].clear();	
-      subseq_4_0[tid].clear();	
-      subseq_4_1[tid].clear();	
-      subseq_6_0[tid].clear();	
-      subseq_7_0[tid].clear();	
-      subseq_8_0[tid].clear();	
-      subseq_8_1[tid].clear();	
-      subseq_8_2[tid].clear();	
-      subseq_8_3[tid].clear();	
-      subseq_8_4[tid].clear();	
-      subseq_8_5[tid].clear();	
-      subseq_8_7[tid].clear();	
-      subseq_8_8[tid].clear();	
-      subseq_12_0[tid].clear();	
+      subseq_0_0[tid].clear();
+      subseq_1_0[tid].clear();
+      subseq_3_0[tid].clear();
+      subseq_3_1[tid].clear();
+      subseq_4_0[tid].clear();
+      subseq_4_1[tid].clear();
+      subseq_6_0[tid].clear();
+      subseq_7_0[tid].clear();
+      subseq_8_0[tid].clear();
+      subseq_8_1[tid].clear();
+      subseq_8_2[tid].clear();
+      subseq_8_3[tid].clear();
+      subseq_8_4[tid].clear();
+      subseq_8_5[tid].clear();
+      subseq_8_7[tid].clear();
+      subseq_8_8[tid].clear();
+      subseq_12_0[tid].clear();
 
       if (cur_block_num >= block_start.size())
         break;
-     
-      // first find the seq 
+
+      // first find the seq
       uint64_t seq_start = block_seq_start[cur_block_num], seq_end = block_seq_end[cur_block_num];
       if (seq_start != seq_end) {
         // not all unaligned
         subseq_7_0[tid].push_back(seq_end - seq_start); // rlen
-        subseq_12_0[tid].push_back(5); // rtype
+        subseq_12_0[tid].push_back(6); // rtype
         for (uint64_t i = seq_start; i < seq_end; i++)
           subseq_6_0[tid].push_back(char_to_int[(uint8_t)seq[i]]); // ureads
       }
@@ -656,12 +656,12 @@ void generate_read_streams_pe(const std::string &temp_dir,
       for (uint32_t i = block_start[cur_block_num]; i < block_end[cur_block_num]; i++) {
         uint32_t current = read_index_genomic_record[i];
         uint32_t pair = (current < num_reads_by_2)?(current + num_reads_by_2):(current - num_reads_by_2);
-         
+
         if (flag_arr[current] == true) {
           if (i == block_start[cur_block_num]) {
             // Note: In order non-preserving mode, if the first read of
             // the block is a singleton, then the rest are too.
-            subseq_0_0[tid].push_back(0); // pos 
+            subseq_0_0[tid].push_back(0); // pos
             prevpos = pos_arr[current];
           } else {
             diffpos = pos_arr[current] - prevpos;
@@ -673,7 +673,7 @@ void generate_read_streams_pe(const std::string &temp_dir,
           // both reads in same record
           if (flag_arr[current] == false) {
             // Case 1: both unaligned
-            subseq_12_0[tid].push_back(5); // rtype
+            subseq_12_0[tid].push_back(6); // rtype
             subseq_7_0[tid].push_back(read_length_arr[current] + read_length_arr[pair]); // rlen
             for (uint64_t j = 0; j < read_length_arr[current]; j++) {
               subseq_6_0[tid].push_back(char_to_int[(uint8_t)unaligned_arr[pos_arr[current] + j]]); // ureads
@@ -689,7 +689,7 @@ void generate_read_streams_pe(const std::string &temp_dir,
             subseq_8_0[tid].push_back(0); // pair decoding case same_rec
             bool read_1_first = true;
             uint16_t delta = 0;
-            subseq_8_1[tid].push_back(!(read_1_first)+2*delta); // pair 
+            subseq_8_1[tid].push_back(!(read_1_first)+2*delta); // pair
             prevpos = seq_end;
             seq_end = prevpos + read_length_arr[current] + read_length_arr[pair];
           } else {
@@ -697,7 +697,7 @@ void generate_read_streams_pe(const std::string &temp_dir,
             subseq_7_0[tid].push_back(read_length_arr[current]); // rlen
             subseq_7_0[tid].push_back(read_length_arr[pair]); // rlen
             subseq_1_0[tid].push_back(rc_to_int[(uint8_t)RC_arr[current]]+2*rc_to_int[(uint8_t)RC_arr[pair]]); // rcomp
-            if (noise_len_arr[current] == 0 && noise_len_arr[pair] == 0) 
+            if (noise_len_arr[current] == 0 && noise_len_arr[pair] == 0)
               subseq_12_0[tid].push_back(1); // rtype = P
             else {
               subseq_12_0[tid].push_back(3); // rtype = M
@@ -730,7 +730,7 @@ void generate_read_streams_pe(const std::string &temp_dir,
           if (flag_arr[current] == true) {
             subseq_7_0[tid].push_back(read_length_arr[current]); // rlen
             subseq_1_0[tid].push_back(rc_to_int[(uint8_t)RC_arr[current]]); // rcomp
-            if (noise_len_arr[current] == 0) 
+            if (noise_len_arr[current] == 0)
               subseq_12_0[tid].push_back(1); // rtype = P
             else {
               subseq_12_0[tid].push_back(3); // rtype = M
@@ -743,7 +743,7 @@ void generate_read_streams_pe(const std::string &temp_dir,
               subseq_3_0[tid].push_back(1);
             }
           } else {
-            subseq_12_0[tid].push_back(5); // rtype
+            subseq_12_0[tid].push_back(6); // rtype
             subseq_7_0[tid].push_back(read_length_arr[current]); // rlen
             for (uint64_t j = 0; j < read_length_arr[current]; j++) {
               subseq_6_0[tid].push_back(char_to_int[(uint8_t)unaligned_arr[pos_arr[current] + j]]); // ureads
@@ -753,7 +753,7 @@ void generate_read_streams_pe(const std::string &temp_dir,
             subseq_7_0[tid].push_back(read_length_arr[current]); // rlen
             subseq_12_0[tid].push_back(1); // rtype = P
             prevpos = seq_end;
-            seq_end = prevpos + read_length_arr[current]; 
+            seq_end = prevpos + read_length_arr[current];
           }
 
           // pair subsequences
