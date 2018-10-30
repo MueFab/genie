@@ -1,5 +1,4 @@
 #include "algorithms/SPRING/generate_new_fastq.h"
-#include "algorithms/SPRING/reorder_compress_quality_id.h"
 #include "algorithms/SPRING/util.h"
 #include "input/fastq/FastqFileReader.h"
 
@@ -16,7 +15,7 @@ void generate_new_fastq_se(dsg::input::fastq::FastqFileReader *fastqFileReader1,
   // array containing index mapping position in original fastq to
   // position after reordering
   order_array = new uint32_t[numreads];
-  generate_order(file_order, order_array, numreads);
+  generate_order_array(file_order, order_array, numreads);
   uint32_t str_array_size = numreads/8+1;
   // numreads/8+1 chosen so that these many FASTQ records can be stored in
   // memory without exceeding the RAM consumption of reordering stage
@@ -26,10 +25,10 @@ void generate_new_fastq_se(dsg::input::fastq::FastqFileReader *fastqFileReader1,
 
   std::ofstream fout_fastq(outfile_fastq);
 
-  for (uint32_t i = 0; i <= num_reads_per_file / str_array_size; i++) {
+  for (uint32_t i = 0; i <= numreads / str_array_size; i++) {
     uint32_t num_reads_bin = str_array_size;
-    if (i == num_reads_per_file / str_array_size)
-      num_reads_bin = num_reads_per_file % str_array_size;
+    if (i == numreads / str_array_size)
+      num_reads_bin = numreads % str_array_size;
     if (num_reads_bin == 0) break;
     uint32_t start_read_bin = i * str_array_size;
     uint32_t end_read_bin = i * str_array_size + num_reads_bin;
@@ -39,7 +38,7 @@ void generate_new_fastq_se(dsg::input::fastq::FastqFileReader *fastqFileReader1,
     for (uint32_t j = 0; j < numreads; j++) {
       fastqFileReader1->readRecords(1, &fastqRecords);
       if (order_array[j] >= start_read_bin && order_array[j] < end_read_bin) {
-        uint32_t index = order_array[j] - start_read_bin
+        uint32_t index = order_array[j] - start_read_bin;
         read_array[index] = fastqRecords[0].sequence;
         id_array[index] = fastqRecords[0].title;
         quality_array[index] = fastqRecords[0].qualityScores;
@@ -53,7 +52,22 @@ void generate_new_fastq_se(dsg::input::fastq::FastqFileReader *fastqFileReader1,
     }
   }
   fout_fastq.close();
+  delete[] order_array;
+  delete[] id_array;
+  delete[] read_array;
+  delete[] quality_array;
   return;
+}
+
+void generate_order_array(const std::string &file_order, uint32_t *order_array,
+                       const uint32_t &numreads) {
+  std::ifstream fin_order(file_order, std::ios::binary);
+  uint32_t order;
+  for (uint32_t i = 0; i < numreads; i++) {
+    fin_order.read((char *)&order, sizeof(uint32_t));
+    order_array[order] = i;
+  }
+  fin_order.close();
 }
 
 } // namespace spring

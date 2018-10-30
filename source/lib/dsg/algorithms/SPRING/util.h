@@ -48,6 +48,7 @@ void write_fastq_block(std::ofstream &fout, std::string *id_array,
 
 void write_vector_to_file(const std::vector<int64_t> &subseq, const std::string &file_name);
 
+std::vector<int64_t> read_vector_from_file(const std::string &file_name);
 
 void quantize_quality(std::string *quality_array, const uint32_t &num_lines,
                       char *quantization_table);

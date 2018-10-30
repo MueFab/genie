@@ -1,12 +1,14 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <fstream>
+#include <iostream>
 #include "algorithms/SPRING/util.h"
+#include "algorithms/SPRING/decode_read_streams.h"
 
 namespace spring {
 
-  std::vector<std::string> decode_read_streams_se(const subsequences_se &subseq) {
-
+std::vector<std::string> decode_read_streams_se(const subsequences_se_t &subseq) {
   std::vector<std::string> decoded_reads;
   std::string refBuf;
 
@@ -31,7 +33,7 @@ namespace spring {
       // put in refBuf
       uint32_t rlen = (uint32_t)(*(subseq_7_0_it++)); // rlen
       for (uint32_t i = 0; i < rlen; i++) {
-        refBuf.push_back(int_to_char(*(subseq_6_0_it++))); // ureads
+        refBuf.push_back(int_to_char[*(subseq_6_0_it++)]); // ureads
       }
     }
     else {
@@ -59,14 +61,42 @@ namespace spring {
         }
       }
       // finally, reverse complement if needed
-      cur_read = reverse_complement(cur_read, rlen);
+      if(rcomp == 1)
+        cur_read = reverse_complement(cur_read, rlen);
       decoded_reads.push_back(cur_read);
     }
   }
+  return decoded_reads;
 }
 
+void decompress_se_reads(const std::string &temp_dir, uint32_t num_blocks) {
+  std::string basedir = temp_dir;
+  std::string file_subseq_0_0 = basedir + "/subseq_0_0";
+  std::string file_subseq_1_0 = basedir + "/subseq_1_0";
+  std::string file_subseq_3_0 = basedir + "/subseq_3_0";
+  std::string file_subseq_3_1 = basedir + "/subseq_3_1";
+  std::string file_subseq_4_0 = basedir + "/subseq_4_0";
+  std::string file_subseq_4_1 = basedir + "/subseq_4_1";
+  std::string file_subseq_6_0 = basedir + "/subseq_6_0";
+  std::string file_subseq_7_0 = basedir + "/subseq_7_0";
+  std::string file_subseq_12_0 = basedir + "/subseq_12_0";
+  std::string file_decompressed_reads = basedir + "/decompressed.reads";
+  std::ofstream fout(file_decompressed_reads);
+  subsequences_se_t subseq;
+  for (uint32_t i = 0; i < num_blocks; i++) {
+    subseq.subseq_0_0 = read_vector_from_file(file_subseq_0_0 + '.' + std::to_string(i));
+    subseq.subseq_1_0 = read_vector_from_file(file_subseq_1_0 + '.' + std::to_string(i));
+    subseq.subseq_3_0 = read_vector_from_file(file_subseq_3_0 + '.' + std::to_string(i));
+    subseq.subseq_3_1 = read_vector_from_file(file_subseq_3_1 + '.' + std::to_string(i));
+    subseq.subseq_4_0 = read_vector_from_file(file_subseq_4_0 + '.' + std::to_string(i));
+    subseq.subseq_4_1 = read_vector_from_file(file_subseq_4_1 + '.' + std::to_string(i));
+    subseq.subseq_6_0 = read_vector_from_file(file_subseq_6_0 + '.' + std::to_string(i));
+    subseq.subseq_7_0 = read_vector_from_file(file_subseq_7_0 + '.' + std::to_string(i));
+    subseq.subseq_12_0 = read_vector_from_file(file_subseq_12_0 + '.' + std::to_string(i));
+    std::vector<std::string> decoded_reads = decode_read_streams_se(subseq);
+    for (auto s: decoded_reads)
+      fout << s << "\n";
+  }
 }
 
 }  // namespace spring
-
-#endif  // SPRING_DECODE_READ_STREAMS_H_

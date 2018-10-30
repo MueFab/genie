@@ -163,6 +163,8 @@ set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/enc
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/pe_encode.cpp)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/reorder_compress_quality_id.cpp)
 set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/generate_read_streams.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/generate_new_fastq.cpp)
+set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/decode_read_streams.cpp)
 
 add_executable(${dsg} ${dsg_header_files} ${dsg_source_files})
 

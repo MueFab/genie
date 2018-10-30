@@ -89,7 +89,7 @@ void generate_streams_SPRING(
 
     std::cout << "Generating new FASTQ\n";
     auto new_fq_start = std::chrono::steady_clock::now();
-    if (!paired_end) {
+    if (!cp.paired_end) {
       generate_new_fastq_se(fastqFileReader1, temp_dir, cp);
     }
     else {

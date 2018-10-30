@@ -47,6 +47,17 @@ void write_vector_to_file(const std::vector<int64_t> &subseq, const std::string 
   f_out.close();
 }
 
+std::vector<int64_t> read_vector_from_file(const std::string &file_name) {
+  std::ifstream f_in(file_name, std::ios::binary);
+  std::vector<int64_t> vec;
+  int64_t val;
+  f_in.read((char*)&val, sizeof(int64_t));
+  while(!f_in.eof()) {
+    vec.push_back(val);
+    f_in.read((char*)&val, sizeof(int64_t));
+  }
+  return vec;
+}
 
 void quantize_quality(std::string *quality_array, const uint32_t &num_lines,
                       char *quantization_table) {

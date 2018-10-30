@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "algorithms/SPRING/generate_read_streams.h"
+#include "algorithms/SPRING/decode_read_streams.h"
 #include "algorithms/SPRING/util.h"
 
 namespace spring {
@@ -150,7 +151,6 @@ void generate_read_streams_se(const std::string &temp_dir,
   remove(file_noise.c_str());
   remove(file_noisepos.c_str());
   remove(file_RC.c_str());
-  remove(file_order.c_str());
   remove(file_readlength.c_str());
   remove(file_unaligned.c_str());
   remove(file_pos.c_str());
@@ -202,7 +202,7 @@ void generate_read_streams_se(const std::string &temp_dir,
       if (seq_start != seq_end) {
         // not all unaligned
         subseq_7_0[tid].push_back(seq_end - seq_start); // rlen
-        subseq_12_0[tid].push_back(5); // rtype
+        subseq_12_0[tid].push_back(6); // rtype
         for (uint64_t i = seq_start; i < seq_end; i++)
           subseq_6_0[tid].push_back(char_to_int[(uint8_t)seq[i]]); // ureads
       }
@@ -262,6 +262,10 @@ void generate_read_streams_se(const std::string &temp_dir,
       block_num += num_thr;
     }
   }  // end omp parallel
+
+  // decode and write the reads to a file (for testing purposes)
+  uint32_t num_blocks = 1 + (num_reads-1)/num_reads_per_block;
+  decompress_se_reads(temp_dir, num_blocks);
 
   // deallocate
   delete[] RC_arr;
