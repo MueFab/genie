@@ -468,7 +468,6 @@ void generate_read_streams_pe(const std::string &temp_dir,
   remove(file_noise.c_str());
   remove(file_noisepos.c_str());
   remove(file_RC.c_str());
-  remove(file_order.c_str());
   remove(file_readlength.c_str());
   remove(file_unaligned.c_str());
   remove(file_pos.c_str());
@@ -802,6 +801,10 @@ void generate_read_streams_pe(const std::string &temp_dir,
       cur_block_num += num_thr;
     }
   }  // end omp parallel
+
+  // decode and write the reads to a file (for testing purposes)
+  uint32_t num_blocks = block_start.size();
+  decompress_pe_reads(temp_dir, num_blocks);
 
   // deallocate
   delete[] RC_arr;

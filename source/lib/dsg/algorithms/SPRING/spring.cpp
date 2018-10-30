@@ -87,22 +87,6 @@ void generate_streams_SPRING(
                      .count()
               << " s\n";
 
-    std::cout << "Generating new FASTQ\n";
-    auto new_fq_start = std::chrono::steady_clock::now();
-    if (!cp.paired_end) {
-      generate_new_fastq_se(fastqFileReader1, temp_dir, cp);
-    }
-    else {
-      throw std::runtime_error("NOT IMPLEMENTED");
-    }
-    auto new_fq_end = std::chrono::steady_clock::now();
-    std::cout << "Generating new FASTQ done\n";
-    std::cout << "Time for this step: "
-              << std::chrono::duration_cast<std::chrono::seconds>(new_fq_end -
-                                                                  new_fq_start)
-                     .count()
-              << " s\n";
-
     std::cout << "Generating read streams ...\n";
     auto grs_start = std::chrono::steady_clock::now();
     if (!cp.paired_end)
@@ -116,6 +100,23 @@ void generate_streams_SPRING(
                                                                   grs_start)
                      .count()
               << " s\n";
+
+    std::cout << "Generating new FASTQ\n";
+    auto new_fq_start = std::chrono::steady_clock::now();
+    if (!cp.paired_end) {
+      generate_new_fastq_se(fastqFileReader1, temp_dir, cp);
+    }
+    else {
+      generate_new_fastq_pe(fastqFileReader1, temp_dir, cp);
+    }
+    auto new_fq_end = std::chrono::steady_clock::now();
+    std::cout << "Generating new FASTQ done\n";
+    std::cout << "Time for this step: "
+              << std::chrono::duration_cast<std::chrono::seconds>(new_fq_end -
+                                                                  new_fq_start)
+                     .count()
+              << " s\n";
+
 
     if (preserve_quality || preserve_id) {
       std::cout << "Reordering and compressing quality and/or ids ...\n";
