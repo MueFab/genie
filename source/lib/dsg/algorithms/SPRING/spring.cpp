@@ -107,7 +107,7 @@ void generate_streams_SPRING(
       generate_new_fastq_se(fastqFileReader1, temp_dir, cp);
     }
     else {
-      generate_new_fastq_pe(fastqFileReader1, temp_dir, cp);
+      generate_new_fastq_pe(fastqFileReader1, fastqFileReader2, temp_dir, cp);
     }
     auto new_fq_end = std::chrono::steady_clock::now();
     std::cout << "Generating new FASTQ done\n";

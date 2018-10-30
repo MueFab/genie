@@ -45,6 +45,8 @@ std::vector<std::string> decode_read_streams_pe(const subsequences_pe_t &subseq)
 
 void decompress_se_reads(const std::string &temp_dir, uint32_t num_blocks);
 
+void decompress_pe_reads(const std::string &temp_dir, uint32_t num_blocks);
+
 }  // namespace spring
 
 #endif  // SPRING_DECODE_READ_STREAMS_H_

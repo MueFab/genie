@@ -90,7 +90,7 @@ std::vector<std::string> decode_read_streams_pe(const subsequences_pe_t &subseq)
   auto subseq_8_2_it = subseq.subseq_8_2.begin();
   auto subseq_8_3_it = subseq.subseq_8_3.begin();
   auto subseq_8_4_it = subseq.subseq_8_4.begin();
-  auto subseq_8_5_it = subseq.subseq_8_6.begin();
+  auto subseq_8_5_it = subseq.subseq_8_5.begin();
   auto subseq_8_7_it = subseq.subseq_8_7.begin();
   auto subseq_8_8_it = subseq.subseq_8_8.begin();
 
@@ -154,7 +154,7 @@ std::vector<std::string> decode_read_streams_pe(const subsequences_pe_t &subseq)
       for (int i = 0; i < number_of_record_segments; i++)
       {
         if ((rcomp >> (number_of_record_segments - i - 1)) & 1)
-          cur_read[i] = reverse_complement(cur_read[i], rlen);
+          cur_read[i] = reverse_complement(cur_read[i], rlen[i]);
         decoded_reads.push_back(cur_read[i]);
       }
     }
@@ -207,7 +207,7 @@ void decompress_pe_reads(const std::string &temp_dir, uint32_t num_blocks) {
   std::string file_subseq_8_2 = basedir + "/subseq_8_2";
   std::string file_subseq_8_3 = basedir + "/subseq_8_3";
   std::string file_subseq_8_4 = basedir + "/subseq_8_4";
-  std::string file_subseq_8_6 = basedir + "/subseq_8_6";
+  std::string file_subseq_8_5 = basedir + "/subseq_8_5";
   std::string file_subseq_8_7 = basedir + "/subseq_8_7";
   std::string file_subseq_8_8 = basedir + "/subseq_8_8";
   std::string file_subseq_12_0 = basedir + "/subseq_12_0";
@@ -228,7 +228,7 @@ void decompress_pe_reads(const std::string &temp_dir, uint32_t num_blocks) {
     subseq.subseq_8_2 = read_vector_from_file(file_subseq_8_2 + '.' + std::to_string(i));
     subseq.subseq_8_3 = read_vector_from_file(file_subseq_8_3 + '.' + std::to_string(i));
     subseq.subseq_8_4 = read_vector_from_file(file_subseq_8_4 + '.' + std::to_string(i));
-    subseq.subseq_8_6 = read_vector_from_file(file_subseq_8_6 + '.' + std::to_string(i));
+    subseq.subseq_8_5 = read_vector_from_file(file_subseq_8_5 + '.' + std::to_string(i));
     subseq.subseq_8_7 = read_vector_from_file(file_subseq_8_7 + '.' + std::to_string(i));
     subseq.subseq_8_8 = read_vector_from_file(file_subseq_8_8 + '.' + std::to_string(i));
     subseq.subseq_12_0 = read_vector_from_file(file_subseq_12_0 + '.' + std::to_string(i));
