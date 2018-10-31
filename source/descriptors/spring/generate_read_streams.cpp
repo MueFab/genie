@@ -598,7 +598,6 @@ void generate_read_streams_pe(const std::string &temp_dir,
   }
   f_order_quality.close();
   f_blocks_quality.close();
-  std::cout << quality_block_pos << "\n";
   // id:
   std::ofstream f_blocks_id(file_blocks_id, std::ios::binary);
   // store block start and end positions (measured in terms of records since 1 record = 1 id)

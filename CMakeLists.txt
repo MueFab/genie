@@ -21,12 +21,40 @@ message(STATUS "GENIE_BUILD_TESTS=${GENIE_BUILD_TESTS}")
 message(STATUS "GENIE_DISABLE_ASSERTS=${GENIE_DISABLE_ASSERTS}")
 message(STATUS "GENIE_USE_OPENMP=${GENIE_USE_OPENMP}")
 
-
 #==============================================================================
 # Boost
 #==============================================================================
+set(boost_root_dir ${CMAKE_CURRENT_BINARY_DIR}/boost)
+set(boost_include_dir ${boost_root_dir}/include)
+set(boost_lib_dir ${boost_root_dir}/lib)
 
-find_package(Boost 1.67 COMPONENTS filesystem log program_options system REQUIRED)
+if (UNIX)
+    include(ExternalProject)
+
+    set(BOOST_ROOT ${boost_root_dir})
+    set(Boost_NO_SYSTEM_PATHS "ON")
+    if (NOT Boost_FOUND)
+
+        set(boost_git_repository https://github.com/boostorg/boost.git)
+        set(boost_git_tag "boost-1.67.0")
+
+        ExternalProject_Add(Boost
+            PREFIX ${boost_root_dir}
+            GIT_REPOSITORY ${boost_git_repository}
+            GIT_TAG ${boost_git_tag}
+            CONFIGURE_COMMAND ./bootstrap.sh --with-libraries=log,program_options,filesystem,system --prefix=${boost_root_dir}
+            BUILD_COMMAND ./b2 link=static install
+            BUILD_IN_SOURCE 1
+            INSTALL_COMMAND ""
+        )
+
+        add_library(boost STATIC IMPORTED DEPENDS Boost)
+	else()
+	        message(STATUS "Boost already installed - rebuild not required")
+	endif()
+else ()
+    message(FATAL_ERROR "Boost build currently not supported on non UNIX-like systems")
+endif()
 
 
 #==============================================================================
@@ -84,6 +112,8 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     message(STATUS "Compiler ID: ${CMAKE_CXX_COMPILER_ID})")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     if (${GENIE_USE_OPENMP})
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -184,9 +214,15 @@ if (${GENIE_USE_OPENMP})
     target_compile_definitions(${genie} PRIVATE GENIE_USE_OPENMP)
 endif ()
 target_include_directories(${genie} PRIVATE ${genie_include_dir})
-target_link_libraries(${genie} Boost::program_options)
-target_link_libraries(${genie} Boost::filesystem)
-target_link_libraries(${genie} Boost::system)
+target_include_directories(${genie} PRIVATE ${boost_include_dir})
+
+# target_link_libraries(${genie} Boost::program_options)
+# target_link_libraries(${genie} Boost::filesystem)
+# target_link_libraries(${genie} Boost::system)
+target_link_libraries(${genie} ${boost_lib_dir}/libboost_program_options.a)
+target_link_libraries(${genie} ${boost_lib_dir}/libboost_filesystem.a)
+target_link_libraries(${genie} ${boost_lib_dir}/libboost_system.a)
+target_link_libraries(${genie} ${CMAKE_DL_LIBS})
 
 
 #==============================================================================

@@ -1,7 +1,6 @@
 #include "descriptors/spring/generate_new_fastq.h"
 #include "descriptors/spring/util.h"
 #include "fileio/fastq_file_reader.h"
-
 namespace spring {
 
 void generate_new_fastq_se(dsg::input::fastq::FastqFileReader *fastqFileReader1,
@@ -93,7 +92,7 @@ void generate_new_fastq_pe(dsg::input::fastq::FastqFileReader *fastqFileReader1,
     for(int k = 0; k < 2; k++) {
       fastqFileReader[k]->seekFromSet(0);
       std::vector<dsg::input::fastq::FastqRecord> fastqRecords;
-      for (uint32_t j = 0; j < numreads/2; j++) {
+      for (uint32_t j = k*numreads/2; j < (k+1)*numreads/2; j++) {
         fastqFileReader[k]->readRecords(1, &fastqRecords);
         if (order_array[j] >= start_read_bin && order_array[j] < end_read_bin) {
           uint32_t index = order_array[j] - start_read_bin;
