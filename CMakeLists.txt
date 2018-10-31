@@ -13,9 +13,11 @@ set(CMAKE_CXX_STANDARD 11)
 project("genie")
 
 # Custom CMake cache variables
+set(GENIE_BUILD_TESTS OFF CACHE BOOL "Build unit tests (target 'tests').")
 set(GENIE_DISABLE_ASSERTS OFF CACHE BOOL "Disable assert() statements.")
 set(GENIE_USE_OPENMP OFF CACHE BOOL "Use OpenMP parallelization.")
 message(STATUS "Custom CMake cache variables:")
+message(STATUS "GENIE_BUILD_TESTS=${GENIE_BUILD_TESTS}")
 message(STATUS "GENIE_DISABLE_ASSERTS=${GENIE_DISABLE_ASSERTS}")
 message(STATUS "GENIE_USE_OPENMP=${GENIE_USE_OPENMP}")
 
@@ -33,6 +35,43 @@ find_package(Boost 1.67 COMPONENTS filesystem log program_options system REQUIRE
 
 if (${GENIE_USE_OPENMP})
     find_package(OpenMP REQUIRED)
+endif ()
+
+#==============================================================================
+# Google Test
+#==============================================================================
+
+if (${GENIE_BUILD_TESTS})
+    # Download and unpack googletest at configure time
+    configure_file(CMakeListsGoogleTest.txt.in googletest/download/CMakeLists.txt)
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+        RESULT_VARIABLE result
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest/download
+    )
+    if (result)
+        message(FATAL_ERROR "CMake step for googletest failed: ${result}")
+    endif()
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} --build .
+        RESULT_VARIABLE result
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest/download
+    )
+    if(result)
+        message(FATAL_ERROR "Build step for googletest failed: ${result}")
+    endif()
+
+    # Prevent overriding the parent project's compiler/linker settings on
+    # Windows
+    # set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+    # Add googletest directly to our build and define the gtest and gtest_main
+    # targets.
+    add_subdirectory(
+        ${CMAKE_BINARY_DIR}/googletest/src
+        ${CMAKE_BINARY_DIR}/googletest/build
+        EXCLUDE_FROM_ALL
+    )
 endif ()
 
 
@@ -148,3 +187,32 @@ target_include_directories(${genie} PRIVATE ${genie_include_dir})
 target_link_libraries(${genie} Boost::program_options)
 target_link_libraries(${genie} Boost::filesystem)
 target_link_libraries(${genie} Boost::system)
+
+
+#==============================================================================
+# tests
+#==============================================================================
+
+if (${GENIE_BUILD_TESTS})
+    # Set our tests paths
+    set(tests "tests")
+    set(tests_source_dir ${CMAKE_SOURCE_DIR}/tests)
+    set(tests_header_dir ${CMAKE_SOURCE_DIR}/tests)
+    set(tests_include_dir ${CMAKE_SOURCE_DIR})
+
+    # List all source files (alphabetically)
+    set(tests_source_files ${tests_source_files} ${tests_source_dir}/format/example_test.cpp)
+    set(tests_source_files ${tests_source_files} ${tests_source_dir}/main.cpp)
+
+    # List all header files (alphabetically)
+    # set(tests_header_files ${tests_header_files} ${tests_header_dir}/whatever.h)
+
+    # Group the source and header files
+    source_group("Source Files" FILES ${tests_source_files})
+    # source_group("Header Files" FILES ${tests_header_files})
+
+    # Set up the tests target
+    add_executable(${tests} EXCLUDE_FROM_ALL ${tests_source_files})
+    target_include_directories(${tests} PRIVATE ${CMAKE_BINARY_DIR})
+    target_link_libraries(${tests} gtest_main)
+endif ()
