@@ -2,10 +2,6 @@
 // Created by daniel on 23/10/18.
 //
 
-#ifdef __cplusplus
-extern "C" {
-#endif  // __cplusplus
-
 #include "format/EncodingParameters.h"
 #include <stdlib.h>
 #include "format/DataStructures/BitStreams/OutputBitstream.h"
@@ -2775,7 +2771,3 @@ EncodingParametersRC getDecoderConfigurationTokentypeCabacSupportShareSubsymPrvF
             shareSubsymPrvFlag
     );
 }
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif  // __cplusplus

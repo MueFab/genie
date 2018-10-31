@@ -5,6 +5,10 @@
 #ifndef READ_SIGNATURES_SIGNATURE_INTEGER_H
 #define READ_SIGNATURES_SIGNATURE_INTEGER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 typedef struct {
@@ -48,4 +52,9 @@ uint8_t getSymbolArbitraryLengthInteger(SignatureInputArbitraryLengthInteger *si
 
 int isTerminator(uint8_t symbol);
 void freeSignatureArbitraryLengthInteger(SignatureInputArbitraryLengthInteger *signatureInputArbitraryLengthInteger);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif //READ_SIGNATURES_SIGNATURE_INTEGER_H

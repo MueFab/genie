@@ -5,6 +5,10 @@
 #ifndef BITSTREAMIO_OUTPUTBITSTREAM_H
 #define BITSTREAMIO_OUTPUTBITSTREAM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -40,5 +44,8 @@ bool writeBigEndian32ToBitstream(OutputBitstream *outputBitstream, uint32_t valu
 bool writeBigEndian64ToBitstream(OutputBitstream *outputBitstream, uint64_t value);
 bool writeCharBufferToBitstream(OutputBitstream *outputBitstream, char* buffer);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //BITSTREAMIO_OUTPUTBITSTREAM_H

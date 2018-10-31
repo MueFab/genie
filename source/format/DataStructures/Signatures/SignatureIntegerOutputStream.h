@@ -5,6 +5,9 @@
 #ifndef READ_SIGNATURES_SIGNATURE_INTEGER_OUTPUT_STREAM_H
 #define READ_SIGNATURES_SIGNATURE_INTEGER_OUTPUT_STREAM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "../BitStreams/OutputBitstream.h"
 #include "Signature.h"
@@ -36,5 +39,8 @@ int writeTerminator(SignatureIntegerOutputStream* signatureIntegerOutputStream);
 int writeBufferSignature(SignatureIntegerOutputStream* signatureIntegerOutputStream);
 void writeSignature(SignatureIntegerOutputStream* signatureIntegerOutputStream, Signature* signature);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //READ_SIGNATURES_SIGNATURE_INTEGER_OUTPUT_STREAM_H_H

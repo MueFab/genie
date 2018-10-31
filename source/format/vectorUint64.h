@@ -4,6 +4,9 @@
 
 #ifndef MPEGG_CAPSULATOR_VectorUint64INT_H
 #define MPEGG_CAPSULATOR_VectorUint64INT_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -22,5 +25,9 @@ size_t getAllocatedSizeVectorUint64(VectorUint64* vectorUint64);
 void freeVectorUint64(VectorUint64 *vectorUint64);
 bool pushBackVectorUint64(VectorUint64 *vectorUint64, uint64_t value);
 uint64_t getValueVectorUint64(VectorUint64 *vectorUint64, size_t position);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //MPEGG_CAPSULATOR_VectorUint64INT_H

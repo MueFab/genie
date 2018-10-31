@@ -5,6 +5,10 @@
 #ifndef READ_SIGNATURES_SIGNATURE_SIZE_COMPUTATION_H
 #define READ_SIGNATURES_SIGNATURE_SIZE_COMPUTATION_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include "Signature.h"
 
@@ -29,5 +33,9 @@ void simulateSymbol(SignatureSizeComputation* signatureSizeComputation);
 void simulateTerminator(SignatureSizeComputation* signatureSizeComputation);
 uint64_t getTotalSizeInBits(SignatureSizeComputation* signatureSizeComputation);
 uint64_t getTotalSizeInBytes(SignatureSizeComputation* signatureSizeComputation);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //READ_SIGNATURES_SIGNATURE_SIZE_COMPUTATION_H

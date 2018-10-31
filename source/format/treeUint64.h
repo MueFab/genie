@@ -5,6 +5,11 @@
 #ifndef MPEGG_CAPSULATOR_TREEUINT64_H
 #define MPEGG_CAPSULATOR_TREEUINT64_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint-gcc.h>
 #include <stdbool.h>
 
@@ -29,5 +34,9 @@ long int numberElements(Tree* tree);
 void freeTree(Tree* tree);
 TreeNode* findNode(Tree* tree, uint64_t value);
 TreeNode* getNext(TreeNode* treeNode);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //MPEGG_CAPSULATOR_TREEUINT64_H

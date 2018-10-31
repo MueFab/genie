@@ -5,6 +5,10 @@
 #ifndef MPEGG_CAPSULATOR_BOXES_H
 #define MPEGG_CAPSULATOR_BOXES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stdio.h>
 #include "DataStructures/FromFile.h"
@@ -939,6 +943,8 @@ bool writeDataUnitAccessUnit(DataUnitAccessUnit* dataUnitAccessUnit, bool multip
 void freeDataUnitAccessUnit(DataUnitAccessUnit* dataUnitAccessUnit);
 
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif //MPEGG_CAPSULATOR_BOXES_H

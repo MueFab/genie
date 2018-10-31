@@ -5,6 +5,10 @@
 #ifndef READ_SIGNATURES_SIGNATURE_INTEGER_STREAM_H
 #define READ_SIGNATURES_SIGNATURE_INTEGER_STREAM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include "SignatureInputInteger.h"
 #include "Signature.h"
@@ -31,5 +35,10 @@ uint8_t getNextSymbol(SignatureArbitraryLengthIntegerInputStream* signatureInteg
 Signature getSignatureFromInputStream(SignatureArbitraryLengthIntegerInputStream *signatureIntegerStream);
 int getNewInteger(SignatureArbitraryLengthIntegerInputStream *stream);
 void freeSignatureInputStream(SignatureArbitraryLengthIntegerInputStream* signatureArbitraryLengthIntegerInputStream);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //READ_SIGNATURES_SIGNATURE_INTEGER_STREAM_H

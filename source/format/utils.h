@@ -5,6 +5,10 @@
 #ifndef MPEGG_CAPSULATOR_UTILS_H
 #define MPEGG_CAPSULATOR_UTILS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -50,5 +54,9 @@ bool writeBigEndian64ToFile(uint64_t value, FILE *outputFile);
 
 bool writeBoxHeader(FILE *output_file, const char *type, uint64_t box_size);
 bool readBoxHeader(FILE *input_file, char *type, uint64_t *boxSize);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //MPEGG_CAPSULATOR_UTILS_H

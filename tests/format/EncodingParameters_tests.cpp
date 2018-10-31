@@ -1,5 +1,8 @@
 #include "gtest/gtest.h"
+
+extern "C" {
 #include "format/EncodingParameters.h"
+}
 
 class encoding_parameters_test : public ::testing::Test
 {

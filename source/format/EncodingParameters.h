@@ -5,6 +5,10 @@
 #ifndef MPEGG_REFERENCE_SW_ENCODINGPARAMETERS_H
 #define MPEGG_REFERENCE_SW_ENCODINGPARAMETERS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // #include <stdint-gcc.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -674,5 +678,8 @@ EncodingParametersRC getDecoderConfigurationTokentypeCabacSupportShareSubsymPrvF
         bool* shareSubsymPrvFlag
 );
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //MPEGG_REFERENCE_SW_ENCODINGPARAMETERS_H

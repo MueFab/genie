@@ -5,6 +5,10 @@
 #ifndef BITSTREAMIO_INPUTBITSTREAM_H
 #define BITSTREAMIO_INPUTBITSTREAM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -28,5 +32,9 @@ bool readNBitsShiftAndConvertBigToNativeEndian64(InputBitstream *inputBitstream,
 bool initializeInputBitstreamFromFilename(InputBitstream *inputBitstream, const char *filename);
 bool initializeInputBitstream(InputBitstream *inputBitstream, FILE* inputFile);
 bool eofInputBitstream(InputBitstream *inputBitstream);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //BITSTREAMIO_INPUTBITSTREAM_H
