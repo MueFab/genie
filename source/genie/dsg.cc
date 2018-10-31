@@ -16,9 +16,6 @@
 
 #include <iostream>
 
-#define LOGURU_IMPLEMENTATION 1
-#include <loguru.h>
-
 #include "genie/generation.h"
 #include "genie/ProgramOptions.h"
 #include "genie/exceptions.h"
@@ -111,37 +108,37 @@ static void loggerInitialization(
     int argc,
     char *argv[])
 {
-    loguru::init(argc, argv);
-
-    // Initialize logs for syslog protocol severity levels
-    loguru::add_file("logs/full_emergency.log",     loguru::Append, loguru::Verbosity_EMERGENCY);
-    loguru::add_file("logs/full_alert.log",         loguru::Append, loguru::Verbosity_ALERT);
-    loguru::add_file("logs/full_critical.log",      loguru::Append, loguru::Verbosity_CRITICAL);
-    loguru::add_file("logs/full_error.log",         loguru::Append, loguru::Verbosity_ERROR);
-    loguru::add_file("logs/full_warning.log",       loguru::Append, loguru::Verbosity_WARNING);
-    loguru::add_file("logs/full_notice.log",        loguru::Append, loguru::Verbosity_NOTICE);
-    loguru::add_file("logs/full_informatonal.log",  loguru::Append, loguru::Verbosity_INFORMATIONAL);
-    loguru::add_file("logs/full_debug.log",         loguru::Append, loguru::Verbosity_DEBUG);
-
-    loguru::add_file("logs/latest_emergency.log",       loguru::Truncate, loguru::Verbosity_EMERGENCY);
-    loguru::add_file("logs/latest_alert.log",           loguru::Truncate, loguru::Verbosity_ALERT);
-    loguru::add_file("logs/latest_critical.log",        loguru::Truncate, loguru::Verbosity_CRITICAL);
-    loguru::add_file("logs/latest_error.log",           loguru::Truncate, loguru::Verbosity_ERROR);
-    loguru::add_file("logs/latest_warning.log",         loguru::Truncate, loguru::Verbosity_WARNING);
-    loguru::add_file("logs/latest_notice.log",          loguru::Truncate, loguru::Verbosity_NOTICE);
-    loguru::add_file("logs/latest_informatonal.log",    loguru::Truncate, loguru::Verbosity_INFORMATIONAL);
-    loguru::add_file("logs/latest_debug.log",           loguru::Truncate, loguru::Verbosity_DEBUG);
-
-    LOG_F(ALERT, "Alert");
-    LOG_F(CRITICAL, "Critical");
-    LOG_F(ERROR, "Error");
-    LOG_F(WARNING, "Warning");
-    LOG_F(NOTICE, "Notice");
-    LOG_F(INFORMATIONAL, "Informational");
-    LOG_F(DEBUG, "Debug");
-
-    // Only show most relevant things on stderr:
-    loguru::g_stderr_verbosity = loguru::Verbosity_DEBUG;
+    // loguru::init(argc, argv);
+    //
+    // // Initialize logs for syslog protocol severity levels
+    // loguru::add_file("logs/full_emergency.log",     loguru::Append, loguru::Verbosity_EMERGENCY);
+    // loguru::add_file("logs/full_alert.log",         loguru::Append, loguru::Verbosity_ALERT);
+    // loguru::add_file("logs/full_critical.log",      loguru::Append, loguru::Verbosity_CRITICAL);
+    // loguru::add_file("logs/full_error.log",         loguru::Append, loguru::Verbosity_ERROR);
+    // loguru::add_file("logs/full_warning.log",       loguru::Append, loguru::Verbosity_WARNING);
+    // loguru::add_file("logs/full_notice.log",        loguru::Append, loguru::Verbosity_NOTICE);
+    // loguru::add_file("logs/full_informatonal.log",  loguru::Append, loguru::Verbosity_INFORMATIONAL);
+    // loguru::add_file("logs/full_debug.log",         loguru::Append, loguru::Verbosity_DEBUG);
+    //
+    // loguru::add_file("logs/latest_emergency.log",       loguru::Truncate, loguru::Verbosity_EMERGENCY);
+    // loguru::add_file("logs/latest_alert.log",           loguru::Truncate, loguru::Verbosity_ALERT);
+    // loguru::add_file("logs/latest_critical.log",        loguru::Truncate, loguru::Verbosity_CRITICAL);
+    // loguru::add_file("logs/latest_error.log",           loguru::Truncate, loguru::Verbosity_ERROR);
+    // loguru::add_file("logs/latest_warning.log",         loguru::Truncate, loguru::Verbosity_WARNING);
+    // loguru::add_file("logs/latest_notice.log",          loguru::Truncate, loguru::Verbosity_NOTICE);
+    // loguru::add_file("logs/latest_informatonal.log",    loguru::Truncate, loguru::Verbosity_INFORMATIONAL);
+    // loguru::add_file("logs/latest_debug.log",           loguru::Truncate, loguru::Verbosity_DEBUG);
+    //
+    // LOG_F(ALERT, "Alert");
+    // LOG_F(CRITICAL, "Critical");
+    // LOG_F(ERROR, "Error");
+    // LOG_F(WARNING, "Warning");
+    // LOG_F(NOTICE, "Notice");
+    // LOG_F(INFORMATIONAL, "Informational");
+    // LOG_F(DEBUG, "Debug");
+    //
+    // // Only show most relevant things on stderr:
+    // loguru::g_stderr_verbosity = loguru::Verbosity_DEBUG;
 }
 
 

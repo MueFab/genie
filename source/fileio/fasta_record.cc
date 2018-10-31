@@ -9,7 +9,7 @@
  */
 
 
-#include "genie/FastaRecord.h"
+#include "fileio/fasta_record.h"
 
 #include <iostream>
 

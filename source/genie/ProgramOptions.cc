@@ -14,7 +14,6 @@
 #include <boost/program_options.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/token_functions.hpp>
-#include <loguru.h>
 
 #include <iostream>
 #include <set>
@@ -22,7 +21,7 @@
 
 #include "genie/exceptions.h"
 #include "genie/utilities.h"
-#include "genie/FileReader.h"
+#include "fileio/file_reader.h"
 
 
 namespace dsg {
@@ -34,7 +33,7 @@ static void parseConfigurationFile(
 {
     namespace po = boost::program_options;
 
-    LOG_F(INFORMATIONAL, "Parsing configurration file");
+    std::cout << "Parsing configurration file" << std::endl;
 
     dsg::input::FileReader fileReader(path);
     std::string options("");
@@ -98,19 +97,19 @@ ProgramOptions::~ProgramOptions(void)
 
 void ProgramOptions::print(void)
 {
-    LOG_S(INFORMATIONAL) << "Program options:";
-    LOG_S(INFORMATIONAL) << "  generic:";
-    LOG_S(INFORMATIONAL) << "    force                : " << ((force == true) ? "true" : "false");
-    LOG_S(INFORMATIONAL) << "    verbose              : " << (verbose ? "true" : "false");
-    LOG_S(INFORMATIONAL) << "    number of threads    : " << numThreads;
-    LOG_S(INFORMATIONAL) << "  input:";
-    LOG_S(INFORMATIONAL) << "    input file path      : " << inputFilePath;
-    LOG_S(INFORMATIONAL) << "    input file pair path : " << inputFilePairPath;
-    LOG_S(INFORMATIONAL) << "    input file type      : " << inputFileType;
-    LOG_S(INFORMATIONAL) << "  algorithm:";
-    LOG_S(INFORMATIONAL) << "    read algorithm       : " << readAlgorithm;
-    LOG_S(INFORMATIONAL) << "    ID algorithm         : " << idAlgorithm;
-    LOG_S(INFORMATIONAL) << "    QV algorithm         : " << qvAlgorithm;
+    // LOG_S(INFORMATIONAL) << "Program options:";
+    // LOG_S(INFORMATIONAL) << "  generic:";
+    // LOG_S(INFORMATIONAL) << "    force                : " << ((force == true) ? "true" : "false");
+    // LOG_S(INFORMATIONAL) << "    verbose              : " << (verbose ? "true" : "false");
+    // LOG_S(INFORMATIONAL) << "    number of threads    : " << numThreads;
+    // LOG_S(INFORMATIONAL) << "  input:";
+    // LOG_S(INFORMATIONAL) << "    input file path      : " << inputFilePath;
+    // LOG_S(INFORMATIONAL) << "    input file pair path : " << inputFilePairPath;
+    // LOG_S(INFORMATIONAL) << "    input file type      : " << inputFileType;
+    // LOG_S(INFORMATIONAL) << "  algorithm:";
+    // LOG_S(INFORMATIONAL) << "    read algorithm       : " << readAlgorithm;
+    // LOG_S(INFORMATIONAL) << "    ID algorithm         : " << idAlgorithm;
+    // LOG_S(INFORMATIONAL) << "    QV algorithm         : " << qvAlgorithm;
 }
 
 
@@ -229,10 +228,10 @@ void ProgramOptions::processCommandLine(
         } else if (selectedOptionGroup == "algorithm") {
             printHelp(allOptions);
         } else {
-            LOG_S(ERROR) << "Unknown option group name '" << selectedOptionGroup << "'";
-            LOG_S(ERROR) << "Allowed option group names are:";
+            // LOG_S(ERROR) << "Unknown option group name '" << selectedOptionGroup << "'";
+            // LOG_S(ERROR) << "Allowed option group names are:";
             for (const auto& allowedOptionGroupName : allowedOptionGroupNames) {
-                LOG_S(ERROR) << "  " << allowedOptionGroupName;
+                // LOG_S(ERROR) << "  " << allowedOptionGroupName;
             }
             throwRuntimeError("unknown option group name");
         }
@@ -306,10 +305,10 @@ void ProgramOptions::validate(void)
     it = allowedInputFileTypes.find(inputFileType);
 
     if (it == allowedInputFileTypes.end()) {
-        LOG_S(ERROR) << "Input file type '" << inputFileType << "' is invalid";
-        LOG_S(ERROR) << "Allowed input file types are:";
+        // LOG_S(ERROR) << "Input file type '" << inputFileType << "' is invalid";
+        // LOG_S(ERROR) << "Allowed input file types are:";
         for (const auto& allowedInputFileType : allowedInputFileTypes) {
-            LOG_S(ERROR) << "  " << allowedInputFileType;
+            // LOG_S(ERROR) << "  " << allowedInputFileType;
         }
         throwRuntimeError("input file type is invalid");
     }
@@ -335,10 +334,10 @@ void ProgramOptions::validate(void)
     it = allowedIdAlgorithms.find(idAlgorithm);
 
     if (it == allowedIdAlgorithms.end()) {
-        LOG_S(ERROR) << "ID algorithm '" << idAlgorithm << "' is invalid";
-        LOG_S(ERROR) << "Allowed ID algorithms are:";
+        // LOG_S(ERROR) << "ID algorithm '" << idAlgorithm << "' is invalid";
+        // LOG_S(ERROR) << "Allowed ID algorithms are:";
         for (const auto& allowedIdAlgorithm : allowedIdAlgorithms) {
-            LOG_S(ERROR) << "  " << allowedIdAlgorithm;
+            // LOG_S(ERROR) << "  " << allowedIdAlgorithm;
         }
         throwRuntimeError("ID algorithm is invalid");
     }
@@ -358,10 +357,10 @@ void ProgramOptions::validate(void)
     it = allowedQvAlgorithms.find(qvAlgorithm);
 
     if (it == allowedQvAlgorithms.end()) {
-        LOG_S(ERROR) << "QV algorithm '" << qvAlgorithm << "' is invalid";
-        LOG_S(ERROR) << "Allowed QV algorithms are:";
+        // LOG_S(ERROR) << "QV algorithm '" << qvAlgorithm << "' is invalid";
+        // LOG_S(ERROR) << "Allowed QV algorithms are:";
         for (const auto& allowedQvAlgorithm : allowedQvAlgorithms) {
-            LOG_S(ERROR) << "  " << allowedQvAlgorithm;
+            // LOG_S(ERROR) << "  " << allowedQvAlgorithm;
         }
         throwRuntimeError("QV algorithm is invalid");
     }
@@ -381,10 +380,10 @@ void ProgramOptions::validate(void)
     it = allowedReadAlgorithms.find(readAlgorithm);
 
     if (it == allowedReadAlgorithms.end()) {
-        LOG_S(ERROR) << "Read algorithm '" << readAlgorithm << "' is invalid";
-        LOG_S(ERROR) << "Allowed read algorithms are:";
+        // LOG_S(ERROR) << "Read algorithm '" << readAlgorithm << "' is invalid";
+        // LOG_S(ERROR) << "Allowed read algorithms are:";
         for (const auto& allowedReadAlgorithm : allowedReadAlgorithms) {
-            LOG_S(ERROR) << "  " << allowedReadAlgorithm;
+            // LOG_S(ERROR) << "  " << allowedReadAlgorithm;
         }
         throwRuntimeError("read algorithm is invalid");
     }
@@ -395,16 +394,16 @@ void ProgramOptions::validateDependencies(void)
 {
     if (readAlgorithm == "HARC") {
         if ((inputFileType != "FASTA") && (inputFileType != "FASTQ")) {
-            LOG_S(ERROR) << "Read algorithm 'HARC' requires a FASTA file "
-                         "or a FASTQ file as input";
+            // LOG_S(ERROR) << "Read algorithm 'HARC' requires a FASTA file "
+                         // "or a FASTQ file as input";
             throwRuntimeError("invalid dependency");
         }
     }
 
     if (readAlgorithm == "TSC") {
         if ((inputFileType != "SAM")) {
-            LOG_S(ERROR) << "Read algorithm 'TSC' requires a SAM file "
-                         "as input";
+            // LOG_S(ERROR) << "Read algorithm 'TSC' requires a SAM file "
+                         // "as input";
             throwRuntimeError("invalid dependency");
         }
     }
@@ -415,8 +414,8 @@ void ProgramOptions::validateDependencies(void)
 
     if (qvAlgorithm == "CALQ") {
         if ((inputFileType != "SAM")) {
-            LOG_S(ERROR) << "QV algorithm 'CALQ' requires a SAM file "
-                         "as input";
+            // LOG_S(ERROR) << "QV algorithm 'CALQ' requires a SAM file "
+                         // "as input";
             throwRuntimeError("invalid dependency");
         }
     }

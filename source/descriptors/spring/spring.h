@@ -3,7 +3,7 @@
 
 #include <string>
 #include "descriptors/spring/util.h"
-#include "genie/FastqFileReader.h"
+#include "fileio/fastq_file_reader.h"
 
 namespace spring {
 

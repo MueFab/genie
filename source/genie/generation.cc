@@ -16,12 +16,12 @@
 #include <vector>
 
 #include "genie/exceptions.h"
-#include "genie/FastaFileReader.h"
-#include "genie/FastaRecord.h"
-#include "genie/FastqFileReader.h"
-#include "genie/FastqRecord.h"
-#include "genie/SamFileReader.h"
-#include "genie/SamRecord.h"
+#include "fileio/fasta_file_reader.h"
+#include "fileio/fasta_record.h"
+#include "fileio/fastq_file_reader.h"
+#include "fileio/fastq_record.h"
+#include "fileio/sam_file_reader.h"
+#include "fileio/sam_record.h"
 #include "descriptors/spring/spring.h"
 
 namespace dsg {

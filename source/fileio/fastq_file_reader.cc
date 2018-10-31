@@ -8,7 +8,7 @@
  */
 
 
-#include "genie/FastqFileReader.h"
+#include "fileio/fastq_file_reader.h"
 
 #include <string>
 

@@ -8,12 +8,12 @@
  *  @bug No known bugs
  */
 
-#include "genie/SamFileReader.h"
+#include "fileio/sam_file_reader.h"
 
 #include <iostream>
 #include <string>
 
-#include "genie/SamRecord.h"
+#include "fileio/sam_record.h"
 
 
 namespace dsg {

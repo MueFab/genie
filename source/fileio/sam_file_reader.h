@@ -16,8 +16,8 @@
 #include <string>
 #include <vector>
 
-#include "genie/FileReader.h"
-#include "genie/SamRecord.h"
+#include "fileio/file_reader.h"
+#include "fileio/sam_record.h"
 
 
 namespace dsg {

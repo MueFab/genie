@@ -9,7 +9,7 @@
  */
 
 
-#include "genie/FastaFileReader.h"
+#include "fileio/fasta_file_reader.h"
 
 #include <string>
 

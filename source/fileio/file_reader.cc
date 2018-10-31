@@ -7,7 +7,7 @@
  *  @bug No known bugs
  */
 
-#include "genie/FileReader.h"
+#include "fileio/file_reader.h"
 
 #include <limits.h>
 #include <string.h>

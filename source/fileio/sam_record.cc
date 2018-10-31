@@ -8,7 +8,7 @@
  *  @bug No known bugs
  */
 
-#include "genie/SamRecord.h"
+#include "fileio/sam_record.h"
 
 
 namespace dsg {

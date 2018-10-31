@@ -1,148 +1,150 @@
 #==============================================================================
-# General CMake configuration
+# Generic
 #==============================================================================
 
+# We require at least CMake 3.1
 cmake_minimum_required(VERSION 3.1)
+message(STATUS "CMake generator: ${CMAKE_GENERATOR}")
 
+# C++ code shall be compliant to C++11
 set(CMAKE_CXX_STANDARD 11)
 
-project("genie" C CXX)
+# This is genie
+project("genie")
 
 # Custom CMake cache variables
+set(GENIE_DISABLE_ASSERTS OFF CACHE BOOL "Disable assert() statements.")
 set(GENIE_USE_OPENMP OFF CACHE BOOL "Use OpenMP parallelization.")
 message(STATUS "Custom CMake cache variables:")
+message(STATUS "GENIE_DISABLE_ASSERTS=${GENIE_DISABLE_ASSERTS}")
 message(STATUS "GENIE_USE_OPENMP=${GENIE_USE_OPENMP}")
-
-
-#==============================================================================
-# Compiler configuration
-#==============================================================================
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    message(STATUS "Detected compiler: GNU Compiler Collection")
-
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -dl")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wfloat-equal")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wshadow")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wpointer-arith")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wcast-align")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wstrict-prototypes")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wwrite-strings")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Waggregate-return")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wcast-qual")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wswitch-default")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wswitch-enum")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wunreachable-code")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wconversion")
-
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfloat-equal")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpointer-arith")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wwrite-strings")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-qual")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-default")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-enum")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunreachable-code")
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion")
-
-    if (${GENIE_USE_OPENMP})
-        find_package( OpenMP REQUIRED)
-        message(STATUS "OPENMP FOUND")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    endif ()
-
-elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-    message(STATUS "Detected compiler: LLVM Clang or Apple Clang")
-
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra")
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    message(STATUS "Detected compiler: Microsoft Visual Studio")
-    message(FATAL_ERROR "Compiler currently not supported by CMake build: ${CMAKE_CXX_COMPILER_ID}")
-else ()
-    message(FATAL_ERROR "Compiler currently not supported by CMake build: ${CMAKE_CXX_COMPILER_ID}")
-endif ()
 
 
 #==============================================================================
 # Boost
 #==============================================================================
 
-find_package(Boost 1.67 COMPONENTS program_options filesystem system REQUIRED)
+find_package(Boost 1.67 COMPONENTS filesystem log program_options system REQUIRED)
 
 
 #==============================================================================
-# loguru
+# OpenMP
 #==============================================================================
 
-add_library(loguru INTERFACE)
-target_include_directories(loguru INTERFACE  ${CMAKE_SOURCE_DIR}/source/common/logging)
-find_package(Threads REQUIRED)
+if (${GENIE_USE_OPENMP})
+    find_package(OpenMP REQUIRED)
+endif ()
 
-if (Threads_FOUND)
-    message(STATUS "Threads found")
+
+#==============================================================================
+# Compiler
+#==============================================================================
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    message(STATUS "C++ compiler: GNU Compiler Collection")
+    message(STATUS "Compiler ID: ${CMAKE_CXX_COMPILER_ID})")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
+    if (${GENIE_USE_OPENMP})
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    endif ()
+elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+    message(STATUS "C++ compiler: LLVM Clang or Apple Clang")
+    message(STATUS "Compiler ID: ${CMAKE_CXX_COMPILER_ID})")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
+elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
+     message(STATUS "C++ compiler: Intel")
+     message(STATUS "Compiler ID: ${CMAKE_CXX_COMPILER_ID})")
+     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    message(STATUS "C++ compiler: Microsoft Visual Studio")
+    message(STATUS "Compiler ID: ${CMAKE_CXX_COMPILER_ID})")
 else ()
-    message(FATAL_ERROR "Threads not found")
-endif()
+    message(FATAL_ERROR "C++ compiler currently not supported by CMake build")
+    message(FATAL_ERROR "Compiler ID: ${CMAKE_CXX_COMPILER_ID})")
+endif ()
+
+
+#==============================================================================
+# Build type
+#==============================================================================
+
+# Detect the build type
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    message(STATUS "Build type: Debug")
+elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+    message(STATUS "Build type: Release")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG")
+elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+    message(STATUS "Build type: RelWithDebInfo")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG")
+elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
+    message(STATUS "Build type: MinSizeRel")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG")
+else ()
+    message(STATUS "Build type: None (CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})")
+endif ()
+
+# Log the compiler flags for each build type
+message(STATUS "C++ compiler flags for build type 'None': ${CMAKE_CXX_FLAGS}")
+message(STATUS "C++ compiler flags for build type 'Debug': ${CMAKE_CXX_FLAGS_DEBUG}")
+message(STATUS "C++ compiler flags for build type 'Release': ${CMAKE_CXX_FLAGS_RELEASE}")
+message(STATUS "C++ compiler flags for build type 'RelWithDebInfo': ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+message(STATUS "C++ compiler flags for build type 'MinSizeRel': ${CMAKE_CXX_FLAGS_MINSIZEREL}")
 
 
 #==============================================================================
 # genie
 #==============================================================================
 
+# Set ou genie paths
 set(genie "genie")
-
 set(genie_source_dir ${CMAKE_SOURCE_DIR}/source)
 set(genie_header_dir ${CMAKE_SOURCE_DIR}/source)
 set(genie_include_dir ${CMAKE_SOURCE_DIR}/source)
 
-set(logging_include_dir ${CMAKE_SOURCE_DIR}/source/utils/logging)
-
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/dsg.cc)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/exceptions.cc)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/FastaFileReader.cc)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/FastaRecord.cc)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/FastqFileReader.cc)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/FastqRecord.cc)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/FileReader.cc)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/generation.cc)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/ProgramOptions.cc)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/SamFileReader.cc)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/SamRecord.cc)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/utilities.cc)
-
+# List all source files
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/spring.cpp)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/preprocess.cpp)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/util.cpp)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/bitset_util.cpp)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/encoder.cpp)
-# set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/pe_encode.cpp)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/reorder_compress_quality_id.cpp)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/generate_read_streams.cpp)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/generate_new_fastq.cpp)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/decode_read_streams.cpp)
+#
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/fasta_file_reader.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/fasta_record.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/fastq_file_reader.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/fastq_record.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/file_reader.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/sam_file_reader.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/sam_record.cc)
+#
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/dsg.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/exceptions.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/generation.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/ProgramOptions.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/utilities.cc)
 
+
+# Group the source and header files
+source_group("Source Files" FILES ${gabac_source_files})
+# source_group("Header Files" FILES ${gabac_header_files})
+
+# Set up the genie target
 add_executable(${genie} ${genie_source_files})
-
+if (${GENIE_DISABLE_ASSERTS})
+    target_compile_definitions(${genie} PRIVATE NDEBUG)
+endif ()
 if (${GENIE_USE_OPENMP})
     target_compile_definitions(${genie} PRIVATE GENIE_USE_OPENMP)
 endif ()
-
 target_include_directories(${genie} PRIVATE ${genie_include_dir})
-target_include_directories(${genie} PRIVATE ${logging_include_dir})
-# target_include_directories(${genie} PRIVATE ${boost_include_dir})
-
-# #target_link_libraries(${genie} ${boost_lib_dir}/libboost_log.a)
 target_link_libraries(${genie} Boost::program_options)
 target_link_libraries(${genie} Boost::filesystem)
 target_link_libraries(${genie} Boost::system)
-# target_link_libraries(${genie} ${CMAKE_DL_LIBS})

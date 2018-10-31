@@ -9,7 +9,7 @@
  */
 
 
-#include "genie/FastqRecord.h"
+#include "fileio/fastq_record.h"
 
 #include <string>
 

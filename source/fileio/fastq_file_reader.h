@@ -16,8 +16,8 @@
 #include <vector>
 
 #include "genie/constants.h"
-#include "genie/FileReader.h"
-#include "genie/FastqRecord.h"
+#include "fileio/file_reader.h"
+#include "fileio/fastq_record.h"
 
 
 namespace dsg {
