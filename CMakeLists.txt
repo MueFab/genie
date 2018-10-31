@@ -26,7 +26,7 @@ message(STATUS "GENIE_USE_OPENMP=${GENIE_USE_OPENMP}")
 # Boost
 #==============================================================================
 
-find_package(Boost 1.67 COMPONENTS filesystem log program_options system REQUIRED)
+find_package(Boost 1.58 COMPONENTS filesystem log program_options system REQUIRED)
 
 
 #==============================================================================
@@ -84,6 +84,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     message(STATUS "Compiler ID: ${CMAKE_CXX_COMPILER_ID})")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
     if (${GENIE_USE_OPENMP})
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -139,7 +140,7 @@ message(STATUS "C++ compiler flags for build type 'MinSizeRel': ${CMAKE_CXX_FLAG
 # genie
 #==============================================================================
 
-# Set ou genie paths
+# Set our genie paths
 set(genie "genie")
 set(genie_source_dir ${CMAKE_SOURCE_DIR}/source)
 set(genie_header_dir ${CMAKE_SOURCE_DIR}/source)
@@ -163,6 +164,8 @@ set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/fastq_re
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/file_reader.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/sam_file_reader.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/sam_record.cc)
+#
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/format/DataStructures/EncodingParameters.c)
 #
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/dsg.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/exceptions.cc)
@@ -202,7 +205,7 @@ if (${GENIE_BUILD_TESTS})
 
     # List all source files (alphabetically)
     set(tests_source_files ${tests_source_files} ${tests_source_dir}/format/example_test.cpp)
-    set(tests_source_files ${tests_source_files} ${tests_source_dir}/main.cpp)
+    set(tests_source_files ${tests_source_files} ${tests_source_dir}/format/EncodingParameters.cpp)
 
     # List all header files (alphabetically)
     # set(tests_header_files ${tests_header_files} ${tests_header_dir}/whatever.h)
@@ -213,6 +216,7 @@ if (${GENIE_BUILD_TESTS})
 
     # Set up the tests target
     add_executable(${tests} EXCLUDE_FROM_ALL ${tests_source_files})
+    target_include_directories(${tests} PRIVATE ${genie_include_dir})
     target_include_directories(${tests} PRIVATE ${CMAKE_BINARY_DIR})
     target_link_libraries(${tests} gtest_main)
 endif ()
