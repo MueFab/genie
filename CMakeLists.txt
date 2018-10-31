@@ -8,6 +8,11 @@ set(CMAKE_CXX_STANDARD 11)
 
 project("genie" C CXX)
 
+# Custom CMake cache variables
+set(GENIE_USE_OPENMP OFF CACHE BOOL "Use OpenMP parallelization.")
+message(STATUS "Custom CMake cache variables:")
+message(STATUS "GENIE_USE_OPENMP=${GENIE_USE_OPENMP}")
+
 
 #==============================================================================
 # Compiler configuration
@@ -46,10 +51,13 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-enum")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunreachable-code")
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion")
-    FIND_PACKAGE( OpenMP REQUIRED)
-    message(STATUS "OPENMP FOUND")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+
+    if (${GENIE_USE_OPENMP})
+        find_package( OpenMP REQUIRED)
+        message(STATUS "OPENMP FOUND")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    endif ()
 
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     message(STATUS "Detected compiler: LLVM Clang or Apple Clang")
@@ -57,7 +65,6 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra")
-    FIND_PACKAGE( OpenMP REQUIRED)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     message(STATUS "Detected compiler: Microsoft Visual Studio")
     message(FATAL_ERROR "Compiler currently not supported by CMake build: ${CMAKE_CXX_COMPILER_ID}")
@@ -70,37 +77,8 @@ endif ()
 # Boost
 #==============================================================================
 
-set(boost_root_dir ${CMAKE_CURRENT_BINARY_DIR}/boost)
-set(boost_include_dir ${boost_root_dir}/include)
-set(boost_lib_dir ${boost_root_dir}/lib)
+find_package(Boost 1.67 COMPONENTS program_options filesystem system REQUIRED)
 
-if (UNIX)
-    include(ExternalProject)
-
-    set(BOOST_ROOT ${boost_root_dir})
-    set(Boost_NO_SYSTEM_PATHS "ON")
-    if (NOT Boost_FOUND)
-
-        set(boost_git_repository https://github.com/boostorg/boost.git)
-        set(boost_git_tag "boost-1.67.0")
-
-        ExternalProject_Add(Boost
-            PREFIX ${boost_root_dir}
-            GIT_REPOSITORY ${boost_git_repository}
-            GIT_TAG ${boost_git_tag}
-            CONFIGURE_COMMAND ./bootstrap.sh --with-libraries=log,program_options,filesystem,system --prefix=${boost_root_dir}
-            BUILD_COMMAND ./b2 link=static install
-            BUILD_IN_SOURCE 1
-            INSTALL_COMMAND ""
-        )
-
-        add_library(boost STATIC IMPORTED DEPENDS Boost)
-	else()
-	        message(STATUS "Boost already installed - rebuild not required")
-	endif()
-else ()
-    message(FATAL_ERROR "Boost build currently not supported on non UNIX-like systems")
-endif()
 
 #==============================================================================
 # loguru
@@ -116,87 +94,55 @@ else ()
     message(FATAL_ERROR "Threads not found")
 endif()
 
+
 #==============================================================================
-# dsg
+# genie
 #==============================================================================
 
-set(dsg "dsg")
+set(genie "genie")
 
-set(dsg_include_dir ${CMAKE_SOURCE_DIR}/source/lib/dsg)
-set(dsg_source_dir ${CMAKE_SOURCE_DIR}/source/lib/dsg)
-set(app_include_dir ${CMAKE_SOURCE_DIR}/source/app)
-set(app_source_dir ${CMAKE_SOURCE_DIR}/source/app)
+set(genie_source_dir ${CMAKE_SOURCE_DIR}/source)
+set(genie_header_dir ${CMAKE_SOURCE_DIR}/source)
+set(genie_include_dir ${CMAKE_SOURCE_DIR}/source)
+
 set(logging_include_dir ${CMAKE_SOURCE_DIR}/source/utils/logging)
 
-set(dsg_header_files ${dsg_header_files} ${app_include_dir}/generation.h)
-set(dsg_header_files ${dsg_header_files} ${app_include_dir}/ProgramOptions.h)
-set(dsg_header_files ${dsg_header_files} ${app_include_dir}/common/utilities.h)
-set(dsg_header_files ${dsg_header_files} ${app_include_dir}/common/exceptions.h)
-set(dsg_header_files ${dsg_header_files} ${app_include_dir}/input/FileReader.h)
-set(dsg_header_files ${dsg_header_files} ${app_include_dir}/input/fasta/FastaFileReader.h)
-set(dsg_header_files ${dsg_header_files} ${app_include_dir}/input/fasta/FastaRecord.h)
-set(dsg_header_files ${dsg_header_files} ${app_include_dir}/input/fastq/FastqFileReader.h)
-set(dsg_header_files ${dsg_header_files} ${app_include_dir}/input/fastq/FastqRecord.h)
-set(dsg_header_files ${dsg_header_files} ${app_include_dir}/input/sam/SamFileReader.h)
-set(dsg_header_files ${dsg_header_files} ${app_include_dir}/input/sam/SamRecord.h)
-set(dsg_header_files ${dsg_header_files} ${logging_include_dir}/loguru.h)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/dsg.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/exceptions.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/FastaFileReader.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/FastaRecord.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/FastqFileReader.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/FastqRecord.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/FileReader.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/generation.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/ProgramOptions.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/SamFileReader.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/SamRecord.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/utilities.cc)
 
-set(dsg_source_files ${dsg_source_files} ${app_source_dir}/dsg.cc)
-set(dsg_source_files ${dsg_source_files} ${app_source_dir}/generation.cc)
-set(dsg_source_files ${dsg_source_files} ${app_source_dir}/ProgramOptions.cc)
-set(dsg_source_files ${dsg_source_files} ${app_source_dir}/common/utilities.cc)
-set(dsg_source_files ${dsg_source_files} ${app_source_dir}/common/exceptions.cc)
-set(dsg_source_files ${dsg_source_files} ${app_source_dir}/input/FileReader.cc)
-set(dsg_source_files ${dsg_source_files} ${app_source_dir}/input/fasta/FastaFileReader.cc)
-set(dsg_source_files ${dsg_source_files} ${app_source_dir}/input/fasta/FastaRecord.cc)
-set(dsg_source_files ${dsg_source_files} ${app_source_dir}/input/fastq/FastqFileReader.cc)
-set(dsg_source_files ${dsg_source_files} ${app_source_dir}/input/fastq/FastqRecord.cc)
-set(dsg_source_files ${dsg_source_files} ${app_source_dir}/input/sam/SamFileReader.cc)
-set(dsg_source_files ${dsg_source_files} ${app_source_dir}/input/sam/SamRecord.cc)
-set(dsg_source_files ${dsg_source_files} ${app_source_dir}/input/sam/SamFileReader.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/spring.cpp)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/preprocess.cpp)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/util.cpp)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/bitset_util.cpp)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/encoder.cpp)
+# set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/pe_encode.cpp)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/reorder_compress_quality_id.cpp)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/generate_read_streams.cpp)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/generate_new_fastq.cpp)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/decode_read_streams.cpp)
 
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/spring.cpp)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/preprocess.cpp)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/util.cpp)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/bitset_util.cpp)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/encoder.cpp)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/pe_encode.cpp)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/reorder_compress_quality_id.cpp)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/generate_read_streams.cpp)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/generate_new_fastq.cpp)
-set(dsg_source_files ${dsg_source_files} ${dsg_source_dir}/algorithms/SPRING/decode_read_streams.cpp)
+add_executable(${genie} ${genie_source_files})
 
-add_executable(${dsg} ${dsg_header_files} ${dsg_source_files})
+if (${GENIE_USE_OPENMP})
+    target_compile_definitions(${genie} PRIVATE GENIE_USE_OPENMP)
+endif ()
 
-target_include_directories(${dsg} PRIVATE ${dsg_include_dir})
-target_include_directories(${dsg} PRIVATE ${app_include_dir})
-target_include_directories(${dsg} PRIVATE ${logging_include_dir})
-target_include_directories(${dsg} PRIVATE ${boost_include_dir})
+target_include_directories(${genie} PRIVATE ${genie_include_dir})
+target_include_directories(${genie} PRIVATE ${logging_include_dir})
+# target_include_directories(${genie} PRIVATE ${boost_include_dir})
 
-# #target_link_libraries(${dsg} ${boost_lib_dir}/libboost_log.a)
-target_link_libraries(${dsg} ${boost_lib_dir}/libboost_program_options.a)
-target_link_libraries(${dsg} ${boost_lib_dir}/libboost_filesystem.a)
-target_link_libraries(${dsg} ${boost_lib_dir}/libboost_system.a)
-target_link_libraries(${dsg} ${CMAKE_DL_LIBS})
-
-
-#==============================================================================
-# encoder
-#==============================================================================
-
-set(encoder "encoder")
-
-set(encoder_include_dir ${CMAKE_SOURCE_DIR}/source/lib/encoder)
-set(encoder_source_dir ${CMAKE_SOURCE_DIR}/source/lib/encoder)
-
-#set(encoder_header_files ${enocder_header_files} ${encoder_include_dir}/dummy.h)
-
-set(encoder_source_files ${encoder_source_files} ${encoder_source_dir}/encoder.cc)
-
-add_executable(${encoder} ${encoder_header_files} ${encoder_source_files})
-
-target_include_directories(${encoder} PRIVATE ${encoder_include_dir})
-target_include_directories(${encoder} PRIVATE ${boost_include_dir})
-
-target_link_libraries(${encoder} ${boost_lib_dir}/libboost_program_options.a)
-
+# #target_link_libraries(${genie} ${boost_lib_dir}/libboost_log.a)
+target_link_libraries(${genie} Boost::program_options)
+target_link_libraries(${genie} Boost::filesystem)
+target_link_libraries(${genie} Boost::system)
+# target_link_libraries(${genie} ${CMAKE_DL_LIBS})
