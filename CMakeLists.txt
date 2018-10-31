@@ -137,6 +137,31 @@ message(STATUS "C++ compiler flags for build type 'MinSizeRel': ${CMAKE_CXX_FLAG
 
 
 #==============================================================================
+# format library
+#==============================================================================
+
+# Set our format paths
+set(format "format")
+set(format_source_dir ${CMAKE_SOURCE_DIR}/source/format)
+set(format_header_dir ${CMAKE_SOURCE_DIR}/source/format)
+set(format_include_dir ${CMAKE_SOURCE_DIR}/source)
+
+# List all source files
+set(format_source_files ${format_source_dir} ${format_source_dir}/DataStructures/EncodingParameters.c)
+
+# List all header files
+# TODO
+
+# Group the source and header files
+source_group("Source Files" FILES ${format_source_files})
+# source_group("Header Files" FILES ${format_header_files})
+
+# Set up the format target
+add_library(${format} STATIC ${format_source_files})
+target_include_directories(${format} PRIVATE ${format_include_dir})
+
+
+#==============================================================================
 # genie
 #==============================================================================
 
@@ -165,14 +190,11 @@ set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/file_rea
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/sam_file_reader.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/sam_record.cc)
 #
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/format/DataStructures/EncodingParameters.c)
-#
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/dsg.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/exceptions.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/generation.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/ProgramOptions.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/utilities.cc)
-
 
 # Group the source and header files
 source_group("Source Files" FILES ${gabac_source_files})
@@ -204,8 +226,9 @@ if (${GENIE_BUILD_TESTS})
     set(tests_include_dir ${CMAKE_SOURCE_DIR})
 
     # List all source files (alphabetically)
+    set(tests_source_files ${tests_source_files} ${tests_source_dir}/main.cpp)
+    set(tests_source_files ${tests_source_files} ${tests_source_dir}/format/EncodingParameters_tests.cpp)
     set(tests_source_files ${tests_source_files} ${tests_source_dir}/format/example_test.cpp)
-    set(tests_source_files ${tests_source_files} ${tests_source_dir}/format/EncodingParameters.cpp)
 
     # List all header files (alphabetically)
     # set(tests_header_files ${tests_header_files} ${tests_header_dir}/whatever.h)
@@ -219,4 +242,5 @@ if (${GENIE_BUILD_TESTS})
     target_include_directories(${tests} PRIVATE ${genie_include_dir})
     target_include_directories(${tests} PRIVATE ${CMAKE_BINARY_DIR})
     target_link_libraries(${tests} gtest_main)
+    target_link_libraries(${tests} ${format})
 endif ()

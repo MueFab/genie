@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "format/EncodingParameters_tests.h"
+#include "format/EncodingParameters.h"
 
 class encoding_parameters_test : public ::testing::Test
 {
@@ -84,4 +84,3 @@ TEST_F(encoding_parameters_test, transformSubseqParameters)
     responseCall = getRLECodingGuard(transformSubseqParameters, &rleCodingGuard);
     EXPECT_EQ(responseCall , FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
 }
-

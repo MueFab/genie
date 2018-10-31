@@ -5,7 +5,8 @@
 #ifndef MPEGG_REFERENCE_SW_ENCODINGPARAMETERS_H
 #define MPEGG_REFERENCE_SW_ENCODINGPARAMETERS_H
 
-#include <stdint-gcc.h>
+// #include <stdint-gcc.h>
+#include <stdint.h>
 #include <stdbool.h>
 #include "DataStructures/BitStreams/OutputBitstream.h"
 

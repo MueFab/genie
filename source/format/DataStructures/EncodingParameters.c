@@ -2,9 +2,13 @@
 // Created by daniel on 23/10/18.
 //
 
-#include "EncodingParameters.h"
+#ifdef __cplusplus
+extern "C" {
+#endif  // __cplusplus
+
+#include "format/EncodingParameters.h"
 #include <stdlib.h>
-#include <DataStructures/BitStreams/OutputBitstream.h>
+#include "format/DataStructures/BitStreams/OutputBitstream.h"
 #include <string.h>
 
 EncodingParametersRC getCorrectedTransform_subseq_counter(
@@ -400,7 +404,7 @@ EncodingParametersRC getCABACDecoderConfigurationTokenType(
         return OUT_OF_BOUNDERIES;
     }
     if(descriptorID == 11 || descriptorID == 15){
-        *decoderConfigurationTokentypeCABAC = encodingParameters->decoderConfiguration[classIndex][descriptorID];
+        // *decoderConfigurationTokentypeCABAC = encodingParameters->decoderConfiguration[classIndex][descriptorID];
         return SUCCESS;
     }
     return OUT_OF_BOUNDERIES;
@@ -2322,7 +2326,7 @@ Encoding_ParametersType* constructEncodingParameters(
         goto release_encoding_mode;
     }
     for(int i=0; i<numClasses; i++){
-        encodingParametersType->decoderConfiguration[i]=malloc(18*sizeof(void*));
+        // encodingParametersType->decoderConfiguration[i]=malloc(18*sizeof(void*));
         if(encodingParametersType->encoding_mode_id[i] == NULL){
             goto release_decoderConfiguration;
         }
@@ -2771,3 +2775,7 @@ EncodingParametersRC getDecoderConfigurationTokentypeCabacSupportShareSubsymPrvF
             shareSubsymPrvFlag
     );
 }
+
+#ifdef __cplusplus
+}  // extern "C"
+#endif  // __cplusplus
