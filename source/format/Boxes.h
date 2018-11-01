@@ -412,8 +412,8 @@ bool writeContentDatasetMasterIndexTable(DatasetMasterIndexTable* datasetMasterI
 bool writeDatasetMasterIndexTable(DatasetMasterIndexTable* datasetMasterIndexTable, FILE *outputFile);
 uint64_t getSizeContentDatasetMasterIndexTable(DatasetMasterIndexTable* datasetMasterIndexTable);
 uint64_t getSizeDatasetMasterIndexTable(DatasetMasterIndexTable* datasetMasterIndexTable);
-void setStartAndEnd(DatasetMasterIndexTable* datasetMasterIndexTable,
-                    uint16_t sequenceId, uint16_t classId, uint32_t AU_id, uint32_t start, uint32_t end);
+void setStartEndAndOffset(DatasetMasterIndexTable *datasetMasterIndexTable, uint16_t sequenceId, uint16_t classId,
+                          uint32_t AU_id, uint32_t start, uint32_t end, uint64_t offset);
 void setExtendedStartAndEnd(DatasetMasterIndexTable* datasetMasterIndexTable,
                             uint16_t sequenceId, uint16_t classId, uint32_t AU_id, uint32_t extended_start,
                             uint32_t extended_end);

@@ -4,7 +4,7 @@ extern "C" {
 #include "format/EncodingParameters.h"
 }
 
-class encodingParametersTest : public ::testing::Test
+class mpeggFileCreatorTest : public ::testing::Test
 {
 protected:
     virtual void SetUp()
@@ -19,7 +19,7 @@ protected:
 };
 
 
-TEST_F(encodingParametersTest, transformSubseqParameters)
+TEST_F(mpeggFileCreatorTest, transformSubseqParameters)
 {
 
 }

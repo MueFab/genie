@@ -548,8 +548,8 @@ uint64_t getAUExtendedEndPosition(
             .extended_au_end_position;
 }
 
-void setStartAndEnd(DatasetMasterIndexTable* datasetMasterIndexTable,
-                    uint16_t sequenceId, uint16_t classId, uint32_t AU_id, uint32_t start, uint32_t end){
+void setStartEndAndOffset(DatasetMasterIndexTable *datasetMasterIndexTable, uint16_t sequenceId, uint16_t classId,
+                          uint32_t AU_id, uint32_t start, uint32_t end, uint64_t offset) {
     if(sequenceId<datasetMasterIndexTable->sequence_indexes.number_sequences){
         if(classId<datasetMasterIndexTable->sequence_indexes.sequence_indexes[sequenceId].number_of_classes){
             if(AU_id<datasetMasterIndexTable->sequence_indexes.sequence_indexes[sequenceId].classIndex[classId].number_AUs){
@@ -557,6 +557,8 @@ void setStartAndEnd(DatasetMasterIndexTable* datasetMasterIndexTable,
                         .au_indexings[AU_id].au_start_position= start;
                 datasetMasterIndexTable->sequence_indexes.sequence_indexes[sequenceId].classIndex[classId]
                         .au_indexings[AU_id].au_end_position = end;
+                datasetMasterIndexTable->sequence_indexes.sequence_indexes[sequenceId].classIndex[classId]
+                        .au_indexings[AU_id].AU_offset = offset;
             }
         }
     }
