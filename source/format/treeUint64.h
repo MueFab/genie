@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-#include <stdint-gcc.h>
+#include <stdint.h>
 #include <stdbool.h>
 
 typedef struct TreeNode_ TreeNode;
