@@ -220,6 +220,32 @@ source_group("Header Files" FILES ${format_header_files})
 add_library(${format} STATIC ${format_source_files})
 target_include_directories(${format} PRIVATE ${format_include_dir})
 
+#==============================================================================
+# MPEGGFileCreation library
+#==============================================================================
+
+# Set our format paths
+set(MPEGGFileCreation "MPEGGFileCreation")
+set(MPEGGFileCreation_source_dir ${CMAKE_SOURCE_DIR}/source/utils/MPEGGFileCreation)
+set(MPEGGFileCreation_header_dir ${CMAKE_SOURCE_DIR}/source/utils/MPEGGFileCreation)
+set(MPEGGFileCreation_include_dir ${CMAKE_SOURCE_DIR}/source/utils/MPEGGFileCreation ${CMAKE_SOURCE_DIR}/source)
+
+# List all source files
+set(MPEGGFileCreation_source_files ${MPEGGFileCreation_source_files} ${MPEGGFileCreation_source_dir}/MPEGGFileCreator.cpp)
+
+
+# List all header files
+set(MPEGGFileCreation_header_files ${MPEGGFileCreation_header_files} ${MPEGGFileCreation_header_dir}/MPEGGFileCreator.h)
+
+
+# Group the source and header files
+source_group("Source Files" FILES ${format_source_files})
+source_group("Header Files" FILES ${format_header_files})
+
+# Set up the format target
+add_library(${MPEGGFileCreation} STATIC ${MPEGGFileCreation_source_files})
+target_include_directories(${MPEGGFileCreation} PRIVATE ${MPEGGFileCreation_include_dir})
+target_link_libraries(${MPEGGFileCreation} ${format})
 
 #==============================================================================
 # genie
@@ -289,6 +315,7 @@ if (${GENIE_BUILD_TESTS})
     set(tests_source_files ${tests_source_files} ${tests_source_dir}/main.cpp)
     set(tests_source_files ${tests_source_files} ${tests_source_dir}/format/EncodingParameters_tests.cpp)
     set(tests_source_files ${tests_source_files} ${tests_source_dir}/format/example_test.cpp)
+    set(tests_source_files ${tests_source_files} ${tests_source_dir}/utils/MPEGGFileCreation/MPEGGFileCreatorTest.cpp)
 
     # List all header files (alphabetically)
     # set(tests_header_files ${tests_header_files} ${tests_header_dir}/whatever.h)
