@@ -850,3 +850,124 @@ TEST_F(encodingParametersTest, decoderConfigurationTypeCABAC)
         }
     } 
 }
+
+TEST_F(encodingParametersTest, decoderConfigurationTokentypeCABAC)
+{
+    uint8_t expected_output_symbol_size_tokentype = 64;
+    uint8_t expected_output_symbol_size = 32;
+    uint8_t expected_coding_symbols_tokentype_numbers = 8;
+    uint8_t expected_coding_symbol_tokentype_size[64];
+    for(int i=0; i<64; i++){
+        expected_coding_symbol_tokentype_size[i] = (uint8_t) ((i < 8) ? 8 : 0);
+    }
+    uint8_t expected_coding_symbol_size = 66;
+    uint8_t expected_coding_order = 1;
+    bool expected_share_subsym_lut_flag = true;
+    bool expected_share_subsym_prv_flag = true;
+    Cabac_binarizationsType* expectedCabacBinarizations = constructCabacBinarizationTruncatedUnary_Bypass();
+
+    uint8_t retrieved_output_symbol_size_tokentype;
+    uint8_t retrieved_output_symbol_size;
+    uint8_t retrieved_coding_symbols_tokentype_numbers;
+    uint8_t* retrieved_coding_symbol_tokentype_size;
+    uint8_t retrieved_coding_symbol_size;
+    uint8_t retrieved_coding_order;
+    bool retrieved_share_subsym_lut_flag;
+    bool retrieved_share_subsym_prv_flag;
+    Cabac_binarizationsType* retrievedCabacBinarizations;
+
+
+    TransformSubSymIdEnum transformSubSymIdEnumToken = SubSym_NO_TRANSFORM;
+    Support_valuesType* expected_support_values = constructSupportValues(
+            expected_output_symbol_size,
+            expected_coding_symbol_size,
+            expected_coding_order,
+            expected_share_subsym_lut_flag,
+            expected_share_subsym_prv_flag
+    );
+
+    Decoder_configuration_tokentype_cabac* decoderConfigurationTokentypeCABAC = contructDecoder_configuration_tokentypeCABAC(
+            expected_output_symbol_size_tokentype,
+            expected_coding_symbols_tokentype_numbers,
+            expected_coding_symbol_tokentype_size,
+            transformSubSymIdEnumToken,
+            expected_support_values,
+            expectedCabacBinarizations
+    );
+    EXPECT_TRUE(decoderConfigurationTokentypeCABAC != NULL);
+    EXPECT_TRUE(getOutputSymbolSizeToken(decoderConfigurationTokentypeCABAC, &retrieved_output_symbol_size_tokentype)==SUCCESS);
+    EXPECT_TRUE(expected_output_symbol_size_tokentype == retrieved_output_symbol_size_tokentype);
+    EXPECT_TRUE(getCodingSymbolsNumbers(decoderConfigurationTokentypeCABAC, &retrieved_coding_symbols_tokentype_numbers)==SUCCESS);
+    EXPECT_TRUE(retrieved_coding_symbols_tokentype_numbers == expected_coding_symbols_tokentype_numbers);
+    EXPECT_TRUE(getCodingSymbolSizes(
+            decoderConfigurationTokentypeCABAC,
+            &retrieved_coding_symbol_size,
+            &retrieved_coding_symbol_tokentype_size
+    ) == SUCCESS
+    );
+    EXPECT_TRUE(retrieved_coding_symbols_tokentype_numbers == expected_coding_symbols_tokentype_numbers);
+    for(int i=0; i<64; i++) {
+        EXPECT_TRUE(retrieved_coding_symbol_tokentype_size[i] == expected_coding_symbol_tokentype_size[i]);
+    }
+    EXPECT_TRUE(getDecoderConfigurationTokentypeCabacSupportOutputSymbolSize(
+            decoderConfigurationTokentypeCABAC,
+            &retrieved_output_symbol_size
+    ) == SUCCESS);
+    EXPECT_TRUE(getDecoderConfigurationTokentypeCabacSupportCodingSymbolSize(
+            decoderConfigurationTokentypeCABAC,
+            &retrieved_coding_symbol_size
+    )==SUCCESS);
+    EXPECT_TRUE(retrieved_coding_symbol_size == expected_coding_symbol_size);
+    EXPECT_TRUE(getDecoderConfigurationTokentypeCabacSupportCodingOrder(
+            decoderConfigurationTokentypeCABAC,
+            &retrieved_coding_order
+    ) == SUCCESS);
+    EXPECT_TRUE(retrieved_coding_order == expected_coding_order);
+    EXPECT_TRUE(getDecoderConfigurationTokentypeCabacSupportShareSubsymLutFlag(
+            decoderConfigurationTokentypeCABAC,
+            &retrieved_share_subsym_lut_flag
+    )==FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(getDecoderConfigurationTokentypeCabacSupportShareSubsymPrvFlag(
+            decoderConfigurationTokentypeCABAC,
+            &retrieved_share_subsym_lut_flag
+    )==FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(getCabacBinarizationsToken(
+            decoderConfigurationTokentypeCABAC,
+            &retrievedCabacBinarizations
+    )==SUCCESS);
+    EXPECT_TRUE(expectedCabacBinarizations == retrievedCabacBinarizations);
+
+
+    uint8_t expectedRleGuard = 50;
+    uint8_t retrievedRleGuard;
+    Decoder_configuration_tokentype_cabac* decoderConfigurationTokentypeCABAC2 = contructDecoder_configuration_tokentypeCABAC(
+            expected_output_symbol_size_tokentype,
+            expected_coding_symbols_tokentype_numbers,
+            expected_coding_symbol_tokentype_size,
+            transformSubSymIdEnumToken,
+            expected_support_values,
+            expectedCabacBinarizations
+    );
+    Decoder_configuration_tokentype* decoderConfigurationTokentype = constructDecoderConfigurationTokentype(
+            expectedRleGuard,
+            decoderConfigurationTokentypeCABAC,
+            decoderConfigurationTokentypeCABAC2
+    );
+    Decoder_configuration_tokentype_cabac* retrievedDecoderConfigurationTokentype1;
+    Decoder_configuration_tokentype_cabac* retrievedDecoderConfigurationTokentype2;
+    EXPECT_TRUE(getRLEGuardTokenType(
+            decoderConfigurationTokentype,
+            &retrievedRleGuard
+    )==SUCCESS);
+    EXPECT_TRUE(retrievedRleGuard == expectedRleGuard);
+    EXPECT_TRUE(getDecoderConfigurationTokentypeCabac_order0(
+            decoderConfigurationTokentype,
+            &retrievedDecoderConfigurationTokentype1
+    ) == SUCCESS);
+    EXPECT_TRUE(retrievedDecoderConfigurationTokentype1 == decoderConfigurationTokentypeCABAC);
+    EXPECT_TRUE(getDecoderConfigurationTokentypeCabac_order1(
+            decoderConfigurationTokentype,
+            &retrievedDecoderConfigurationTokentype2
+    )==SUCCESS);
+    EXPECT_TRUE(retrievedDecoderConfigurationTokentype2 == decoderConfigurationTokentypeCABAC2);
+}
