@@ -906,7 +906,7 @@ TEST_F(encodingParametersTest, decoderConfigurationTokentypeCABAC)
     ) == SUCCESS
     );
     EXPECT_TRUE(retrieved_coding_symbols_tokentype_numbers == expected_coding_symbols_tokentype_numbers);
-    for(int i=0; i<64; i++) {
+    for(int i=0; i<retrieved_coding_symbol_size; i++) {
         EXPECT_TRUE(retrieved_coding_symbol_tokentype_size[i] == expected_coding_symbol_tokentype_size[i]);
     }
     EXPECT_TRUE(getDecoderConfigurationTokentypeCabacSupportOutputSymbolSize(

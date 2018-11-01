@@ -1436,6 +1436,7 @@ Support_valuesType* constructSupportValues(
     supportValues->coding_order = coding_order;
     supportValues->share_subsym_lut_flag = share_subsym_lut_flag;
     supportValues->share_subsym_prv_flag = share_subsym_prv_flag;
+    return supportValues;
 }
 
 Cabac_binarization_parametersType* constructCABACBinarizationParameters(
