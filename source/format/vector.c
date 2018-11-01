@@ -2,7 +2,11 @@
 // Created by gencom on 15/11/17.
 //
 
-#include <malloc.h>
+#ifdef __APPLE__
+    #include <malloc/malloc.h>
+#else
+    #include <malloc.h>
+#endif
 #include "vector.h"
 
 Vector* initVector(){
