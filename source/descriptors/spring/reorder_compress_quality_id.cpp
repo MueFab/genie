@@ -60,7 +60,7 @@ void reorder_compress_quality_id(const std::string &temp_dir,
       uint32_t num_reads_per_file = numreads;
       reorder_compress(file_quality[0], num_reads_per_file, num_thr,
                        num_reads_per_block, str_array, str_array_size,
-                       order_array, "quality", cp);
+                       order_array, "quality");
       remove(file_quality[0].c_str());
     }
     if (preserve_id) {
@@ -68,7 +68,7 @@ void reorder_compress_quality_id(const std::string &temp_dir,
       uint32_t num_reads_per_file = numreads;
       reorder_compress(file_id[0], num_reads_per_file, num_thr,
                        num_reads_per_block, str_array, str_array_size,
-                       order_array, "id", cp);
+                       order_array, "id");
       remove(file_id[0].c_str());
     }
 
@@ -247,7 +247,7 @@ void reorder_compress(const std::string &file_name,
                       const uint32_t &num_reads_per_file, const int &num_thr,
                       const uint32_t &num_reads_per_block,
                       std::string *str_array, const uint32_t &str_array_size,
-                      uint32_t *order_array, const std::string &mode, const compression_params &cp) {
+                      uint32_t *order_array, const std::string &mode) {
   for (uint32_t i = 0; i <= num_reads_per_file / str_array_size; i++) {
     uint32_t num_reads_bin = str_array_size;
     if (i == num_reads_per_file / str_array_size)

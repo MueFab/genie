@@ -22,7 +22,7 @@ void reorder_compress(const std::string &file_name,
                       const uint32_t &num_reads_per_file, const int &num_thr,
                       const uint32_t &num_reads_per_block,
                       std::string *str_array, const uint32_t &str_array_size,
-                      uint32_t *order_array, const std::string &mode, const compression_params &cp);
+                      uint32_t *order_array, const std::string &mode);
 // mode can be "quality" or "id"
 
 void generate_read_id_tokens_se(std::string *id_array, const uint32_t &num_ids, std::vector<int64_t> tokens[128][8]);

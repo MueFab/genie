@@ -63,7 +63,7 @@ void writecontig(const std::string &ref,
                  std::ofstream &f_pos, std::ofstream &f_noise,
                  std::ofstream &f_noisepos, std::ofstream &f_order,
                  std::ofstream &f_RC, std::ofstream &f_readlength,
-                 const encoder_global &eg, uint64_t &abs_pos) {
+                 uint64_t &abs_pos) {
   f_seq << ref;
   uint16_t pos_var;
   long prevj = 0;
@@ -76,8 +76,6 @@ void writecontig(const std::string &ref,
     for (long j = 0; j < (*current_contig_it).read_length; j++)
       if ((*current_contig_it).read[j] != ref[currentpos + j]) {
         f_noise << (*current_contig_it).read[j];
-//eg.enc_noise[(uint8_t)ref[currentpos + j]]
-//                               [(uint8_t)(*current_contig_it).read[j]];
         pos_var = j - prevj;
         f_noisepos.write((char *)&pos_var, sizeof(uint16_t));
         prevj = j;
