@@ -18,7 +18,7 @@ typedef struct{
     bool initiated;
 } FromFile;
 
-FromFile* initFromFileWithFilename(char* filename);
+FromFile* initFromFileWithFilename(const char* filename);
 FromFile* initFromFile();
 FromFile* initFromFileWithFilenameAndBoundaries(char *filename, long startPos, long endPos);
 long getFromFileSize(FromFile* fromFile);

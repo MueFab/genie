@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include "FromFile.h"
 
-FromFile* initFromFileWithFilename(char* filename){
+FromFile* initFromFileWithFilename(const char* filename){
     FromFile* fromFile = (FromFile*)malloc(sizeof(FromFile));
     if(fromFile == NULL){
         return NULL;
