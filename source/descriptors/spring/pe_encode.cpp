@@ -10,10 +10,14 @@ namespace spring {
 void pe_encode(const std::string &temp_dir, const compression_params &cp) {
   // Read some parameters
   uint32_t numreads = cp.num_reads;
-  uint32_t numreads_by_2 = numreads / 2;
 
   std::string basedir = temp_dir;
   std::string file_order = basedir + "/read_order.bin";
+  std::string file_order_single = basedir + "/read_order_single.bin";
+  // this file is used for reordering ids and quality 
+  // this will just store numreads/2 values as the reordering of both files is same 
+  // also used for generate new fastq
+
   uint32_t *order_array = new uint32_t[numreads];
   // stores index mapping position in reordered file to
   // position in original file
@@ -33,39 +37,44 @@ void pe_encode(const std::string &temp_dir, const compression_params &cp) {
   }
   fin_order.close();
 
-  // First fill positions in new order array corresponding to reads
-  // in file 1. These reads are decompressed in the same order as
-  // in the reordered file
-  uint32_t pos_in_file_1 = 0;
+  // Find new order array by going from left to right and picking reads whose pair hasn't been picked
+  bool *already_seen_array = new bool [numreads]();
+  uint32_t *new_order_array = new uint32_t [numreads];
+  uint32_t pos_in_new_order = 0;
+  std::ofstream fout_order_single(file_order_single, std::ios::binary);
   for (uint32_t i = 0; i < numreads; i++) {
-    if (order_array[i] < numreads_by_2) order_array[i] = pos_in_file_1++;
-  }
-
-  // Now fill positions in new order array corresponding to reads in
-  // file 2. These are automatically decided by the pairing.
-  for (uint32_t i = 0; i < numreads; i++) {
-    if (order_array[i] >= numreads_by_2) {
-      uint32_t pos_in_original = order_array[i];
-      uint32_t pos_of_pair_in_original = pos_in_original - numreads_by_2;
-      uint32_t pos_of_pair_in_reordered =
-          inverse_order_array[pos_of_pair_in_original];
-      uint32_t new_order_of_pair = order_array[pos_of_pair_in_reordered];
-      order_array[i] = new_order_of_pair + numreads_by_2;
+    uint32_t current = order_array[i];
+    uint32_t pair = (current>=numreads/2)?(current-numreads/2):(current+numreads/2);
+    already_seen_array[current] = true;
+    if (!already_seen_array[pair]) {
+      // current read is to the left of pair
+      uint32_t pos_of_pair_after_reordering = inverse_order_array[pair];
+      if (pos_of_pair_after_reordering < i)
+        throw std::runtime_error("Error in pe encode index");
+      if (current < pair) {
+        new_order_array[i] = pos_in_new_order;
+        new_order_array[pos_of_pair_after_reordering] = pos_in_new_order + numreads/2;
+        fout_order_single.write((char*)&current, sizeof(uint32_t));
+      } else {
+        new_order_array[i] = pos_in_new_order + numreads/2;
+        new_order_array[pos_of_pair_after_reordering] = pos_in_new_order;
+        fout_order_single.write((char*)&pair, sizeof(uint32_t));
+      }
+      pos_in_new_order++;
     }
   }
-
-  // Write to tmp file and replace
-  std::ofstream fout_order(file_order + ".tmp", std::ios::binary);
+  fout_order_single.close();
+  // Write to file
+  std::ofstream fout_order(file_order, std::ios::binary);
   for (uint32_t i = 0; i < numreads; i++) {
-    fout_order.write((char *)&order_array[i], sizeof(uint32_t));
+    fout_order.write((char *)&new_order_array[i], sizeof(uint32_t));
   }
   fout_order.close();
 
-  remove(file_order.c_str());
-  rename((file_order + ".tmp").c_str(), file_order.c_str());
-
   delete[] order_array;
   delete[] inverse_order_array;
+  delete[] already_seen_array;
+  delete[] new_order_array;
   return;
 }
 

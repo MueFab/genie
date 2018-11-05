@@ -60,6 +60,9 @@ static int dsg_main(
         std::cerr << std::endl;
         return -1;
     }
+    catch (const std::exception& e) {
+        std::cerr << "STL error: " << e.what() << std::endl;
+    }
     catch (...) {
         std::cerr << "Unkown error occurred" << std::endl;
         return -1;
