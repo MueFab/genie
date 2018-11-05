@@ -249,10 +249,23 @@ bool writeAccessUnitHeaderContent(FILE* outputFile, AccessUnitHeader* accessUnit
                     (uint32_t)accessUnitHeader->ref_start_position
             );
         }
+        bool ref_end_positionSuccessfulWrite;
+        if(isPosOffsetUint40(getDatasetHeader(accessUnitHeader->datasetContainer))){
+            ref_end_positionSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian64(
+                    &outputBitstream, 40,
+                    accessUnitHeader->ref_end_position
+            );
+        }else{
+            ref_end_positionSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian32(
+                    &outputBitstream, 32,
+                    (uint32_t)accessUnitHeader->ref_end_position
+            );
+        }
         if(
                 !ref_sequence_idSuccessfulWrite ||
-                !ref_start_positionSuccessfulWrite
-                ){
+                !ref_start_positionSuccessfulWrite ||
+                !ref_end_positionSuccessfulWrite
+        ){
             fprintf(stderr, "Error writing access unit header.\n");
             return false;
         }
@@ -394,6 +407,7 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
     //if dataset_type == 2
         uint16_t  ref_sequence_id = 0;
         uint64_t ref_start_position = 0;
+        uint64_t ref_end_position = 0;
 
     //if MIT_flag == 0
         //if AU_type != U_TYPE_AU || dataset_type == 2
@@ -411,10 +425,25 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
                 &inputBitstream, 16,
                 (char*)&ref_sequence_id
         );
-        bool ref_start_position_SuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian64(
-                &inputBitstream, 64,
-                (char*)&ref_start_position
-        );
+        if(isPosOffsetUint40(getDatasetHeader(datasetContainer))) {
+            bool ref_start_position_SuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian64(
+                    &inputBitstream, 40,
+                    (char *) &ref_start_position
+            );
+            bool ref_end_position_SuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian64(
+                    &inputBitstream, 40,
+                    (char *) &ref_end_position
+            );
+        }else{
+            bool ref_start_position_SuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian64(
+                    &inputBitstream, 32,
+                    (char *) &ref_start_position
+            );
+            bool ref_end_position_SuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian64(
+                    &inputBitstream, 32,
+                    (char *) &ref_end_position
+            );
+        }
     }
     if(!isMITFlagSet(getDatasetHeader(datasetContainer))){
         if(
@@ -584,4 +613,16 @@ uint16_t getMMThreshold(AccessUnitHeader* accessUnitHeader){
 
 uint32_t getMMCount(AccessUnitHeader* accessUnitHeader){
     return accessUnitHeader->mm_count;
+}
+
+void setReferenceSequenceId(AccessUnitHeader* accessUnitHeader, uint16_t sequenceId){
+    accessUnitHeader->ref_sequence_id = sequenceId;
+}
+
+void setReferenceStartPosition(AccessUnitHeader* accessUnitHeader, uint64_t startPosition){
+    accessUnitHeader->ref_start_position = startPosition;
+}
+
+void setReferenceEndPosition(AccessUnitHeader* accessUnitHeader, uint64_t endPosition){
+    accessUnitHeader->ref_end_position = endPosition;
 }

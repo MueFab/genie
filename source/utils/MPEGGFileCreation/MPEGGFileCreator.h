@@ -19,6 +19,8 @@ private:
     DatasetId datasetId;
     ReferenceId referenceId;
     std::vector<std::string> referenceFiles;
+    std::vector<uint64_t> accessUnitsStarts;
+    std::vector<uint64_t> accessUnitsEnds;
 public:
     DatasetsGroupReferenceGenome *getReferenceGenome();
     FakeInternalReference(
@@ -27,7 +29,9 @@ public:
             DatasetGroupId datasetGroupId,
             DatasetId  datasetId,
             ReferenceId referenceId,
-            std::vector<std::string> referenceFiles
+            const std::vector<std::string>& referenceFiles,
+            const std::vector<uint64_t>& accessUnitsStarts,
+            const std::vector<uint64_t>& accessUnitsEnds
     );
     DatasetId getDatasetId() const;
     ReferenceId getReferenceId() const;
@@ -59,9 +63,10 @@ public:
 
 class Dataset{
 private:
-    std::vector<Class_type> existing_classes;
+    std::vector<Class_type> existing_aligned_classes;
     std::map<Class_type, std::vector<uint8_t >> descriptorsIdPerClass;
     std::map<uint16_t , std::map<Class_type, std::vector<AccessUnit> > > accessUnitsAligned;
+    std::vector<AccessUnit> accessUnitsUnaligned;
     DatasetGroupId datasetGroupId;
     DatasetId datasetId = 1;
     uint16_t majorBrand_DatasetHeader = 1;
@@ -82,10 +87,18 @@ private:
     bool uSignatureConstantLength = true;
     uint8_t uSignatureLength = 0;
     bool multipleAlignmentFlag = false;
-
+    std::vector<std::string> parametersFilenames;
 public:
-    Dataset();
+    Dataset(const std::vector<Class_type> &existing_aligned_classes,
+                const std::map<Class_type, std::vector<uint8_t>> &descriptorsIdPerClass,
+                const std::map<uint16_t, std::map<Class_type, std::vector<AccessUnit>>> &accessUnitsAligned,
+                const std::vector<AccessUnit> &accessUnitsUnaligned, DatasetGroupId datasetGroupId,
+                DatasetId datasetId, const std::vector<std::string> & parametersFilenames);
+
     DatasetContainer* constructDataset();
+    void addAsDatasetToDatasetGroup(
+            DatasetsGroupContainer* datasetsGroupContainer
+    );
 };
 
 class DatasetGroup{
@@ -96,12 +109,22 @@ private:
     DatasetsGroupContainer* datasetsGroupContainer;
 public:
     DatasetsGroupContainer *getDatasetsGroupContainer() const;
-    DatasetGroup(DatasetGroupId datasetGroupId);
+    explicit DatasetGroup(DatasetGroupId datasetGroupId);
     FakeInternalReference addFakeInternalReference(
             std::string referenceURI,
             std::string sequenceName,
-            const std::vector<std::string> & dataFiles
+            const std::vector<std::string> & dataFiles,
+            const std::vector<uint64_t>& accessUnitsStarts,
+            const std::vector<uint64_t>& accessUnitsEnds
     );
+    Dataset addDatasetData(
+            const std::vector<Class_type> &existing_aligned_classes,
+            const std::map<Class_type, std::vector<uint8_t>> &descriptorsIdPerClass,
+            const std::map<uint16_t, std::map<Class_type, std::vector<AccessUnit>>> &accessUnitsAligned,
+            const std::vector<AccessUnit> &accessUnitsUnaligned,
+            const std::vector<std::string> &parametersFilename
+    );
+
 
 };
 
@@ -111,7 +134,7 @@ private:
     DatasetGroupId datasetsGroupCreated = 0;
 public:
     MPEGGFileCreator();
-    DatasetGroup  addDatasetGroup();
+    DatasetGroup * addDatasetGroup();
     bool write(const std::string& filename);
 };
 

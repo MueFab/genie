@@ -18,7 +18,7 @@ void freeDatasetParameters(DatasetParameters* datasetParameters){
     free(datasetParameters);
 }
 
-bool defineContentDatasetParameters(DatasetParameters* datasetParameters, char* filename){
+bool defineContentDatasetParameters(DatasetParameters* datasetParameters, const char* filename){
     FILE* protectionInput = fopen(filename,"rb");
     if (protectionInput != NULL) {
         int errorSeekingEnd = fseek(protectionInput, 0, SEEK_END);
