@@ -8,15 +8,17 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "descriptors/spring/generate_read_streams_eru.h"
 #include "descriptors/spring/util.h"
 
 namespace spring {
 
-void generate_read_streams(const std::string &temp_dir,
-                              const compression_params &cp) {
+std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams(const std::string &temp_dir,
+                                                                  const compression_params &cp) {
 
+  std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> descriptorFilesPerAU;
   std::string basedir = temp_dir;
 
   std::string file_subseq_0_0 = basedir + "/subseq_0_0"; // pos
@@ -178,6 +180,7 @@ void generate_read_streams(const std::string &temp_dir,
     uint64_t block_num = tid;
     bool done = false;
     while (!done) {
+      std::map<uint8_t, std::map<uint8_t, std::string>> listDescriptorFiles;
       //clear vectors
       subseq_0_0[tid].clear();
       subseq_1_0[tid].clear();
@@ -358,23 +361,52 @@ void generate_read_streams(const std::string &temp_dir,
         }
       }
       // write vectors to files
-      write_vector_to_file(subseq_0_0[tid], file_subseq_0_0 + '.' + std::to_string(block_num));
-      write_vector_to_file(subseq_1_0[tid], file_subseq_1_0 + '.' + std::to_string(block_num));
-      write_vector_to_file(subseq_3_0[tid], file_subseq_3_0 + '.' + std::to_string(block_num));
-      write_vector_to_file(subseq_3_1[tid], file_subseq_3_1 + '.' + std::to_string(block_num));
-      write_vector_to_file(subseq_4_0[tid], file_subseq_4_0 + '.' + std::to_string(block_num));
-      write_vector_to_file(subseq_4_1[tid], file_subseq_4_1 + '.' + std::to_string(block_num));
-      write_vector_to_file(subseq_6_0[tid], file_subseq_6_0 + '.' + std::to_string(block_num));
-      write_vector_to_file(subseq_7_0[tid], file_subseq_7_0 + '.' + std::to_string(block_num));
+      std::string filename0_0 = file_subseq_0_0 + '.' + std::to_string(block_num);
+      std::string filename1_0 = file_subseq_1_0 + '.' + std::to_string(block_num);
+      std::string filename3_0 = file_subseq_3_0 + '.' + std::to_string(block_num);
+      std::string filename3_1 = file_subseq_3_1 + '.' + std::to_string(block_num);
+      std::string filename4_0 = file_subseq_4_0 + '.' + std::to_string(block_num);
+      std::string filename4_1 = file_subseq_4_1 + '.' + std::to_string(block_num);
+      std::string filename6_0 = file_subseq_6_0 + '.' + std::to_string(block_num);
+      std::string filename7_0 = file_subseq_7_0 + '.' + std::to_string(block_num);
+      std::string filename8_0 = file_subseq_8_0 + '.' + std::to_string(block_num);
+      std::string filename8_10 = file_subseq_8_10 + '.' + std::to_string(block_num);
+      std::string filename8_11 = file_subseq_8_11 + '.' + std::to_string(block_num);
+      std::string filename8_12 = file_subseq_8_12 + '.' + std::to_string(block_num);
+      std::string filename12_0 = file_subseq_12_0 + '.' + std::to_string(block_num);
+
+      write_vector_to_file(subseq_0_0[tid], filename0_0);
+      listDescriptorFiles[0][0]=filename0_0;
+      write_vector_to_file(subseq_1_0[tid], filename1_0);
+      listDescriptorFiles[1][0]=filename1_0;
+      write_vector_to_file(subseq_3_0[tid], filename3_0);
+      listDescriptorFiles[3][0]=filename3_0;
+      write_vector_to_file(subseq_3_1[tid], filename3_1);
+      listDescriptorFiles[3][1]=filename3_1;
+      write_vector_to_file(subseq_4_0[tid], filename4_0);
+      listDescriptorFiles[4][0]=filename4_0;
+      write_vector_to_file(subseq_4_1[tid], filename4_1);
+      listDescriptorFiles[4][1]=filename4_1;
+      write_vector_to_file(subseq_6_0[tid], filename6_0);
+      listDescriptorFiles[6][0]=filename6_0;
+      write_vector_to_file(subseq_7_0[tid], filename7_0);
+      listDescriptorFiles[7][0]=filename7_0;
       if (paired_end) {
-        write_vector_to_file(subseq_8_0[tid], file_subseq_8_0 + '.' + std::to_string(block_num));
-        write_vector_to_file(subseq_8_10[tid], file_subseq_8_10 + '.' + std::to_string(block_num));
-        write_vector_to_file(subseq_8_11[tid], file_subseq_8_11 + '.' + std::to_string(block_num));
-        write_vector_to_file(subseq_8_12[tid], file_subseq_8_12 + '.' + std::to_string(block_num));
+        write_vector_to_file(subseq_8_0[tid], filename8_0);
+        listDescriptorFiles[8][0] = filename8_0;
+        write_vector_to_file(subseq_8_10[tid], filename8_10);
+        listDescriptorFiles[8][10] = filename8_10;
+        write_vector_to_file(subseq_8_11[tid], filename8_11);
+        listDescriptorFiles[8][11] = filename8_11;
+        write_vector_to_file(subseq_8_12[tid], filename8_12);
+        listDescriptorFiles[8][12] = filename8_12;
       }
-      write_vector_to_file(subseq_12_0[tid], file_subseq_12_0 + '.' + std::to_string(block_num));
+      write_vector_to_file(subseq_12_0[tid], filename12_0);
+      listDescriptorFiles[12][0] = filename12_0;
 
       block_num += num_thr;
+
+      descriptorFilesPerAU.push_back(listDescriptorFiles);
     }
   }  // end omp parallel
 
@@ -389,7 +421,7 @@ void generate_read_streams(const std::string &temp_dir,
   delete[] noise_arr;
   delete[] noisepos_arr;
 
-  return;
+  return descriptorFilesPerAU;
 }
 
 }  // namespace spring
