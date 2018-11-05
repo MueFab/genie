@@ -80,7 +80,7 @@ void writecontig(const std::string &ref,
                  std::ofstream &f_pos, std::ofstream &f_noise,
                  std::ofstream &f_noisepos, std::ofstream &f_order,
                  std::ofstream &f_RC, std::ofstream &f_readlength,
-                 const encoder_global &eg, uint64_t &abs_pos);
+                 uint64_t &abs_pos);
 
 void getDataParams(encoder_global &eg, const compression_params &cp);
 
@@ -348,7 +348,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
             return a.pos < b.pos;
           });
           writecontig(ref, current_contig, f_seq, f_pos, f_noise, f_noisepos,
-                      f_order, f_RC, f_readlength, eg, abs_pos);
+                      f_order, f_RC, f_readlength, abs_pos);
         }
         if (!done) {
           current_contig = {{current, p, rc, ord, rl}};

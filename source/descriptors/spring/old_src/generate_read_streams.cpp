@@ -72,14 +72,7 @@ void generate_read_streams_se(const std::string &temp_dir,
   std::vector<int64_t> subseq_12_0[num_thr];
 
   // read streams for aligned reads
-  std::string seq;
-  std::ifstream f_seq(file_seq);
-  f_seq.seekg(0,f_seq.end);
-  uint64_t seq_len = f_seq.tellg();
-  seq.resize(seq_len);
-  f_seq.seekg(0);
-  f_seq.read(&seq[0], seq_len);
-  f_seq.close();
+  std::string seq = read_file_as_string(file_seq);
   std::ifstream f_order;
   std::ifstream f_RC(file_RC);
   std::ifstream f_readlength(file_readlength, std::ios::binary);
@@ -131,13 +124,7 @@ void generate_read_streams_se(const std::string &temp_dir,
 
   // Now start with unaligned reads
   num_reads_unaligned = num_reads - num_reads_aligned;
-  std::ifstream f_unaligned(file_unaligned);
-  f_unaligned.seekg(0, f_unaligned.end);
-  uint64_t unaligned_array_size = f_unaligned.tellg();
-  f_unaligned.seekg(0, f_unaligned.beg);
-  char *unaligned_arr = new char[unaligned_array_size];
-  f_unaligned.read(unaligned_arr, unaligned_array_size);
-  f_unaligned.close();
+  std::string unaligned_arr = read_file_as_string(file_unaligned);
   uint64_t current_pos_in_unaligned_arr = 0;
   for (uint32_t i = 0; i < num_reads_unaligned; i++) {
     f_readlength.read((char *)&read_length, sizeof(uint16_t));
@@ -286,7 +273,6 @@ void generate_read_streams_se(const std::string &temp_dir,
   delete[] noise_len_arr;
   delete[] noise_arr;
   delete[] noisepos_arr;
-  delete[] unaligned_arr;
 
   return;
 }
@@ -393,14 +379,7 @@ void generate_read_streams_pe(const std::string &temp_dir,
   // PE step 1: read all streams indexed by original position in FASTQ, also read order array
 
   // read streams for aligned reads
-  std::string seq;
-  std::ifstream f_seq(file_seq);
-  f_seq.seekg(0,f_seq.end);
-  uint64_t seq_len = f_seq.tellg();
-  seq.resize(seq_len);
-  f_seq.seekg(0);
-  f_seq.read(&seq[0], seq_len);
-  f_seq.close();
+  std::string seq = read_file_as_string(file_seq);
   std::ifstream f_order;
   f_order.open(file_order, std::ios::binary);
   std::ifstream f_RC(file_RC);
@@ -454,13 +433,7 @@ void generate_read_streams_pe(const std::string &temp_dir,
 
   // Now start with unaligned reads
   num_reads_unaligned = num_reads - num_reads_aligned;
-  std::ifstream f_unaligned(file_unaligned);
-  f_unaligned.seekg(0, f_unaligned.end);
-  uint64_t unaligned_array_size = f_unaligned.tellg();
-  f_unaligned.seekg(0, f_unaligned.beg);
-  char *unaligned_arr = new char[unaligned_array_size];
-  f_unaligned.read(unaligned_arr, unaligned_array_size);
-  f_unaligned.close();
+  std::string unaligned_arr = read_file_as_string(file_unaligned);
   uint64_t current_pos_in_unaligned_arr = 0;
   for (uint32_t i = 0; i < num_reads_unaligned; i++) {
     f_order.read((char *)&order, sizeof(uint32_t));
@@ -598,7 +571,6 @@ void generate_read_streams_pe(const std::string &temp_dir,
   }
   f_order_quality.close();
   f_blocks_quality.close();
-  std::cout << quality_block_pos << "\n";
   // id:
   std::ofstream f_blocks_id(file_blocks_id, std::ios::binary);
   // store block start and end positions (measured in terms of records since 1 record = 1 id)
@@ -834,7 +806,6 @@ void generate_read_streams_pe(const std::string &temp_dir,
   delete[] noise_len_arr;
   delete[] noise_arr;
   delete[] noisepos_arr;
-  delete[] unaligned_arr;
 
   return;
 }

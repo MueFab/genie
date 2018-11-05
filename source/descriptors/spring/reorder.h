@@ -353,9 +353,9 @@ bool search_match(const std::bitset<bitset_size> &ref,
 template <size_t bitset_size>
 void reorder(std::bitset<bitset_size> *read, bbhashdict *dict,
              uint16_t *read_lengths, const reorder_global<bitset_size> &rg) {
+#ifdef GENIE_USE_OPENMP
   const uint32_t num_locks =
       NUM_LOCKS_REORDER;  // limits on number of locks (power of 2 for fast mod)
-#ifdef GENIE_USE_OPENMP
   omp_lock_t *dict_lock = new omp_lock_t[num_locks];
   omp_lock_t *read_lock = new omp_lock_t[num_locks];
   for (unsigned int j = 0; j < num_locks; j++) {

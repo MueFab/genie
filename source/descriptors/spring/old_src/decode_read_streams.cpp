@@ -87,12 +87,12 @@ std::vector<std::string> decode_read_streams_pe(const subsequences_pe_t &subseq)
   auto subseq_7_0_it = subseq.subseq_7_0.begin();
   auto subseq_8_0_it = subseq.subseq_8_0.begin();
   auto subseq_8_1_it = subseq.subseq_8_1.begin();
-  auto subseq_8_2_it = subseq.subseq_8_2.begin();
-  auto subseq_8_3_it = subseq.subseq_8_3.begin();
-  auto subseq_8_4_it = subseq.subseq_8_4.begin();
-  auto subseq_8_5_it = subseq.subseq_8_5.begin();
-  auto subseq_8_7_it = subseq.subseq_8_7.begin();
-  auto subseq_8_8_it = subseq.subseq_8_8.begin();
+//  auto subseq_8_2_it = subseq.subseq_8_2.begin();
+//  auto subseq_8_3_it = subseq.subseq_8_3.begin();
+//  auto subseq_8_4_it = subseq.subseq_8_4.begin();
+//  auto subseq_8_5_it = subseq.subseq_8_5.begin();
+//  auto subseq_8_7_it = subseq.subseq_8_7.begin();
+//  auto subseq_8_8_it = subseq.subseq_8_8.begin();
 
   // some state variables
   uint64_t abs_pos = 0;
@@ -107,7 +107,7 @@ std::vector<std::string> decode_read_streams_pe(const subsequences_pe_t &subseq)
     }
     else {
       // rtype can be 1 (P) or 3 (M)
-      uint8_t pairing_decoding_case = (uint8_t)(*(subseq_8_0_it++));
+      uint64_t pairing_decoding_case = (uint64_t)(*(subseq_8_0_it++));
       uint8_t number_of_record_segments;
       if (pairing_decoding_case == 0)
         number_of_record_segments = 2;
@@ -156,6 +156,7 @@ std::vector<std::string> decode_read_streams_pe(const subsequences_pe_t &subseq)
         if ((rcomp >> (number_of_record_segments - i - 1)) & 1)
           cur_read[i] = reverse_complement(cur_read[i], rlen[i]);
         decoded_reads.push_back(cur_read[i]);
+
       }
     }
   }

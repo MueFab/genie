@@ -21,13 +21,11 @@ message(STATUS "GENIE_BUILD_TESTS=${GENIE_BUILD_TESTS}")
 message(STATUS "GENIE_DISABLE_ASSERTS=${GENIE_DISABLE_ASSERTS}")
 message(STATUS "GENIE_USE_OPENMP=${GENIE_USE_OPENMP}")
 
-
 #==============================================================================
 # Boost
 #==============================================================================
 
 find_package(Boost 1.58 COMPONENTS filesystem log program_options system REQUIRED)
-
 
 #==============================================================================
 # OpenMP
@@ -263,10 +261,12 @@ set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spr
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/util.cpp)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/bitset_util.cpp)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/encoder.cpp)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/reorder_compress_quality_id.cpp)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/generate_read_streams.cpp)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/reorder_compress_quality_id_eru.cpp)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/generate_read_streams_eru.cpp)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/generate_new_fastq.cpp)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/decode_read_streams.cpp)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/decode_eru.cpp)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/id_tokenization.cpp)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/pe_encode.cpp)
 #
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/fasta_file_reader.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/fasta_record.cc)
@@ -295,9 +295,14 @@ if (${GENIE_USE_OPENMP})
     target_compile_definitions(${genie} PRIVATE GENIE_USE_OPENMP)
 endif ()
 target_include_directories(${genie} PRIVATE ${genie_include_dir})
+
 target_link_libraries(${genie} Boost::program_options)
 target_link_libraries(${genie} Boost::filesystem)
 target_link_libraries(${genie} Boost::system)
+# target_link_libraries(${genie} ${boost_lib_dir}/libboost_program_options.a)
+# target_link_libraries(${genie} ${boost_lib_dir}/libboost_filesystem.a)
+# target_link_libraries(${genie} ${boost_lib_dir}/libboost_system.a)
+# target_link_libraries(${genie} ${CMAKE_DL_LIBS})
 
 
 #==============================================================================

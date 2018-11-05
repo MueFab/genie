@@ -9,8 +9,8 @@
 #include <string>
 #include <vector>
 
-// #include "descriptors/spring/id_compression/include/sam_block.h"
 #include "descriptors/spring/reorder_compress_quality_id.h"
+#include "descriptors/spring/id_tokenization.h"
 #include "descriptors/spring/util.h"
 
 namespace spring {
@@ -45,7 +45,7 @@ void reorder_compress_quality_id(const std::string &temp_dir,
     // array containing index mapping position in original fastq to
     // position after reordering
     order_array = new uint32_t[numreads];
-    generate_order(file_order, order_array, numreads);
+    generate_order_array(file_order, order_array, numreads);
 
     uint32_t str_array_size =
         (1 + (numreads / 4 - 1) / num_reads_per_block) * num_reads_per_block;
@@ -60,7 +60,7 @@ void reorder_compress_quality_id(const std::string &temp_dir,
       uint32_t num_reads_per_file = numreads;
       reorder_compress(file_quality[0], num_reads_per_file, num_thr,
                        num_reads_per_block, str_array, str_array_size,
-                       order_array, "quality", cp);
+                       order_array, "quality");
       remove(file_quality[0].c_str());
     }
     if (preserve_id) {
@@ -68,7 +68,7 @@ void reorder_compress_quality_id(const std::string &temp_dir,
       uint32_t num_reads_per_file = numreads;
       reorder_compress(file_id[0], num_reads_per_file, num_thr,
                        num_reads_per_block, str_array, str_array_size,
-                       order_array, "id", cp);
+                       order_array, "id");
       remove(file_id[0].c_str());
     }
 
@@ -87,7 +87,7 @@ void reorder_compress_quality_id(const std::string &temp_dir,
       read_block_start_end (file_blocks_quality, block_start, block_end);
       // read order into order_array
       uint32_t *order_array = new uint32_t[numreads];
-      generate_order(file_order_quality, order_array, numreads);
+      generate_order_array(file_order_quality, order_array, numreads);
       uint64_t quality_array_size = numreads/4 + 3*num_reads_per_block;
       std::string *quality_array = new std::string[quality_array_size];
       // numreads/4 so that memory consumption isn't too high
@@ -134,17 +134,6 @@ void read_block_start_end (const std::string &file_blocks, std::vector<uint32_t>
     f_blocks.read((char*)&block_pos_temp, sizeof(uint32_t));
   }
   f_blocks.close();
-}
-
-void generate_order(const std::string &file_order, uint32_t *order_array,
-                       const uint32_t &numreads) {
-  std::ifstream fin_order(file_order, std::ios::binary);
-  uint32_t order;
-  for (uint32_t i = 0; i < numreads; i++) {
-    fin_order.read((char *)&order, sizeof(uint32_t));
-    order_array[order] = i;
-  }
-  fin_order.close();
 }
 
 void reorder_compress_id_pe(std::string *id_array, const std::string &file_order_id, const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end, const std::string &file_name, const compression_params &cp) {
@@ -247,7 +236,7 @@ void reorder_compress(const std::string &file_name,
                       const uint32_t &num_reads_per_file, const int &num_thr,
                       const uint32_t &num_reads_per_block,
                       std::string *str_array, const uint32_t &str_array_size,
-                      uint32_t *order_array, const std::string &mode, const compression_params &cp) {
+                      uint32_t *order_array, const std::string &mode) {
   for (uint32_t i = 0; i <= num_reads_per_file / str_array_size; i++) {
     uint32_t num_reads_bin = str_array_size;
     if (i == num_reads_per_file / str_array_size)
@@ -323,153 +312,6 @@ void generate_read_id_tokens_se(std::string *id_array, const uint32_t &num_ids, 
     else
       tokens[0][1].push_back(1); // DIFF 1 for rest of ids
     generate_id_tokens(prev_ID, prev_tokens_ptr, id_array[id_num], tokens);
-  }
-}
-
-void generate_id_tokens (char *prev_ID, uint32_t *prev_tokens_ptr, std::string &current_id, std::vector<int64_t> tokens[128][8], bool dont_write_to_vector) {
-  uint8_t token_len = 0, match_len = 0;
-  uint32_t i = 0, k = 0, tmp = 0, token_ctr = 0, digit_value = 0,
-           prev_digit = 0;
-  int delta = 0;
-
-  char *id_ptr = &current_id[0];
-  char *id_ptr_tok = NULL;
-
-  while (*id_ptr != 0) {
-    match_len += (*id_ptr == prev_ID[prev_tokens_ptr[token_ctr] + token_len]),
-        token_len++;
-    id_ptr_tok = id_ptr + 1;
-
-    // Check if the token is a alphabetic word
-    if (isalpha(*id_ptr)) {
-      while (isalpha(*id_ptr_tok)) {
-        // compare with the same token from previous ID
-        match_len +=
-            (*id_ptr_tok == prev_ID[prev_tokens_ptr[token_ctr] + token_len]),
-            token_len++, id_ptr_tok++;
-      }
-      if (!dont_write_to_vector) {
-        if (match_len == token_len &&
-            !isalpha(prev_ID[prev_tokens_ptr[token_ctr] + token_len])) {
-          // The token is the same as last ID
-          // Encode a token_type ID_MATCH
-          tokens[token_ctr+1][0].push_back(8); // MATCH
-
-        } else {
-          tokens[token_ctr+1][0].push_back(2); // STRING
-          for (k = 0; k < token_len; k++) {
-            tokens[token_ctr+1][2].push_back((int64_t)(*(id_ptr + k)));
-          }
-          tokens[token_ctr+1][2].push_back((int64_t)'\0');
-        }
-      }
-    }
-    // check if the token is a run of zeros
-    else if (*id_ptr == '0') {
-      while (*id_ptr_tok == '0') {
-        // compare with the same token from previous ID
-        match_len += ('0' == prev_ID[prev_tokens_ptr[token_ctr] + token_len]),
-            token_len++, id_ptr_tok++;
-      }
-      if (!dont_write_to_vector) {
-        if (match_len == token_len &&
-            prev_ID[prev_tokens_ptr[token_ctr] + token_len] != '0') {
-          // The token is the same as last ID
-          // Encode a token_type ID_MATCH
-          tokens[token_ctr+1][0].push_back(8); // MATCH
-        } else {
-            tokens[token_ctr+1][0].push_back(2); // STRING
-            for (k = 0; k < token_len; k++) {
-              tokens[token_ctr+1][2].push_back((int64_t)'0');
-            }
-            tokens[token_ctr+1][2].push_back((int64_t)'\0');
-        }
-      }
-    }
-    // Check if the token is a number smaller than (1<<29)
-    else if (isdigit(*id_ptr)) {
-      digit_value = (*id_ptr - '0');
-      if (*prev_ID != 0) {
-        prev_digit = prev_ID[prev_tokens_ptr[token_ctr] + token_len - 1] - '0';
-      }
-
-      if (*prev_ID != 0) {
-        tmp = 1;
-        while (isdigit(prev_ID[prev_tokens_ptr[token_ctr] + tmp])) {
-          prev_digit = prev_digit * 10 +
-                       (prev_ID[prev_tokens_ptr[token_ctr] + tmp] - '0');
-          tmp++;
-        }
-      }
-
-      while (isdigit(*id_ptr_tok) && digit_value < (1 << 29)) {
-        digit_value = digit_value * 10 + (*id_ptr_tok - '0');
-        // if (*prev_ID != 0){
-        //    prev_digit = prev_digit * 10 + (prev_ID[prev_tokens_ptr[token_ctr]
-        //    + token_len] - '0');
-        //}
-        // compare with the same token from previous ID
-        match_len +=
-            (*id_ptr_tok == prev_ID[prev_tokens_ptr[token_ctr] + token_len]),
-            token_len++, id_ptr_tok++;
-      }
-      if (!dont_write_to_vector) {
-        if (match_len == token_len &&
-            !isdigit(prev_ID[prev_tokens_ptr[token_ctr] + token_len])) {
-          // The token is the same as last ID
-          // Encode a token_type ID_MATCH
-          tokens[token_ctr+1][0].push_back(8); // MATCH
-
-        } else if ((delta = (digit_value - prev_digit)) < 256 && delta > 0) {
-          tokens[token_ctr+1][0].push_back(5); // DDELTA
-          tokens[token_ctr+1][5].push_back((int64_t)delta);
-
-        } else {
-          // Encode a token type ID_DIGIT and the value (byte-based)
-          tokens[token_ctr+1][0].push_back(4); // DIGITS
-          tokens[token_ctr+1][4].push_back((int64_t)digit_value);
-        }
-      }
-    } else {
-      // compare with the same token from previous ID
-      // match_len += (*id_ptr == prev_ID[prev_tokens_ptr[token_ctr]]);
-      if(!dont_write_to_vector) {
-        if (match_len == token_len) {
-          // The token is the same as last ID
-          // Encode a token_type ID_MATCH
-          tokens[token_ctr+1][0].push_back(8); // MATCH
-
-        } else {
-          // Encode a token type ID_CHAR and the char
-          tokens[token_ctr+1][0].push_back(3); // CHAR
-          tokens[token_ctr+1][3].push_back((int64_t)(*id_ptr));
-        }
-      }
-    }
-
-    prev_tokens_ptr[token_ctr] = i;
-    i += token_len;
-    id_ptr = id_ptr_tok;
-    match_len = 0;
-    token_len = 0;
-    token_ctr++;
-    if(token_ctr > 126)
-      throw std::runtime_error("Too many tokens in ID");
-  }
-  strcpy(prev_ID, current_id.c_str());
-  if (!dont_write_to_vector)
-    tokens[token_ctr+1][0].push_back(9); // END
-}
-
-
-void write_read_id_tokens_to_file(const std::string &outfile_name, const std::vector<int64_t> tokens[128][8]) {
-  for (int i = 0; i < 128; i++) {
-    for (int j = 0; j < 8; j++) {
-      if (!tokens[i][j].empty()) {
-        std::string outfile_name_i_j = outfile_name + "." + std::to_string(i) + "." + std::to_string(j);
-        write_vector_to_file(tokens[i][j], outfile_name_i_j);
-      }
-    }
   }
 }
 

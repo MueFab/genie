@@ -17,7 +17,7 @@ static const char chartorevchar[128] = {
 
 struct compression_params {
   bool paired_end;
-//  bool preserve_order;
+  bool preserve_order;
   bool preserve_quality;
   bool preserve_id;
 //  bool long_flag;
@@ -70,6 +70,11 @@ void read_dna_from_bits(std::string &read, std::ifstream &fin);
 void reverse_complement(char *s, char *s1, const int readlen);
 
 std::string reverse_complement(const std::string &s, const int readlen);
+
+std::string read_file_as_string(const std::string &file_seq);
+
+void generate_order_array(const std::string &file_order, uint32_t *order_array,
+                       const uint32_t &numreads);
 
 }  // namespace spring
 
