@@ -119,7 +119,7 @@ void generate_streams_SPRING(
 
     std::cout << "Generating read streams ...\n";
     auto grs_start = std::chrono::steady_clock::now();
-    generate_read_streams(temp_dir, cp);
+    auto descriptorFilesPerAUs = generate_read_streams(temp_dir, cp);
     auto grs_end = std::chrono::steady_clock::now();
     std::cout << "Generating read streams done!\n";
     std::cout << "Time for this step: "
