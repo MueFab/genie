@@ -15,8 +15,9 @@
 #include "descriptors/spring/pe_encode.h"
 #include "descriptors/spring/preprocess.h"
 #include "descriptors/spring/reorder.h"
-#include "descriptors/spring/reorder_compress_quality_id.h"
-#include "descriptors/spring/generate_read_streams.h"
+#include "descriptors/spring/reorder_compress_quality_id_eru.h"
+#include "descriptors/spring/generate_read_streams_eru.h"
+#include "descriptors/spring/decode_eru.h"
 #include "descriptors/spring/generate_new_fastq.h"
 #include "descriptors/spring/spring.h"
 #include "descriptors/spring/util.h"
@@ -52,6 +53,7 @@ void generate_streams_SPRING(
   cp.preserve_quality = preserve_quality;
   cp.num_reads_per_block = NUM_READS_PER_BLOCK;
   cp.num_thr = num_thr;
+  cp.preserve_order = true;
 
   std::cout << "Preprocessing ...\n";
   auto preprocess_start = std::chrono::steady_clock::now();
@@ -86,22 +88,20 @@ void generate_streams_SPRING(
                                                                   encoder_start)
                      .count()
               << " s\n";
+    if (!cp.preserve_order && paired_end) {
+      std::cout << "Generating index for paired end ...\n";
+      auto pe_encode_start = std::chrono::steady_clock::now();
+      pe_encode(temp_dir, cp);
+      auto pe_encode_end = std::chrono::steady_clock::now();
+      std::cout << "Generating index for paired end done!\n";
+      std::cout << "Time for this step: "
+                << std::chrono::duration_cast<std::chrono::seconds>(pe_encode_end -
+                                                                    pe_encode_start)
+                       .count()
+                << " s\n";
+    }
 
-    std::cout << "Generating read streams ...\n";
-    auto grs_start = std::chrono::steady_clock::now();
-    if (!cp.paired_end)
-      generate_read_streams_se(temp_dir, cp);
-    else
-      generate_read_streams_pe(temp_dir, cp);
-    auto grs_end = std::chrono::steady_clock::now();
-    std::cout << "Generating read streams done!\n";
-    std::cout << "Time for this step: "
-              << std::chrono::duration_cast<std::chrono::seconds>(grs_end -
-                                                                  grs_start)
-                     .count()
-              << " s\n";
-
-    std::cout << "Generating new FASTQ\n";
+    std::cout << "Generating new FASTQ from index (for testing) ... \n";
     auto new_fq_start = std::chrono::steady_clock::now();
     if (!cp.paired_end) {
       generate_new_fastq_se(fastqFileReader1, temp_dir, cp);
@@ -117,6 +117,16 @@ void generate_streams_SPRING(
                      .count()
               << " s\n";
 
+    std::cout << "Generating read streams ...\n";
+    auto grs_start = std::chrono::steady_clock::now();
+    generate_read_streams(temp_dir, cp);
+    auto grs_end = std::chrono::steady_clock::now();
+    std::cout << "Generating read streams done!\n";
+    std::cout << "Time for this step: "
+              << std::chrono::duration_cast<std::chrono::seconds>(grs_end -
+                                                                  grs_start)
+                     .count()
+              << " s\n";
 
     if (preserve_quality || preserve_id) {
       std::cout << "Reordering and compressing quality and/or ids ...\n";
@@ -130,6 +140,24 @@ void generate_streams_SPRING(
                        .count()
                 << " s\n";
     }
+
+    // decode and write the reads to a file (for testing purposes)
+    std::cout << "Decompression (for testing) ...\n";
+    auto decompression_start = std::chrono::steady_clock::now();
+    uint32_t num_blocks;
+    if (!paired_end) 
+      num_blocks = 1 + (cp.num_reads-1)/cp.num_reads_per_block;
+    else 
+      num_blocks = 1 + (cp.num_reads/2-1)/cp.num_reads_per_block;
+    decompress(temp_dir, num_blocks, cp.preserve_order, cp.paired_end);
+    auto decompression_end = std::chrono::steady_clock::now();
+    std::cout << "Decompression done!\n";
+    std::cout << "Time for this step: "
+              << std::chrono::duration_cast<std::chrono::seconds>(decompression_end -
+                                                                  decompression_start)
+                     .count()
+              << " s\n";
+    
 // }
 
   // Write compression params to a file
@@ -138,47 +166,6 @@ void generate_streams_SPRING(
   f_cp.write((char *)&cp, sizeof(compression_params));
   f_cp.close();
 
-  // Print out sizes of reads, quality and id after compression
-//  namespace fs = boost::filesystem;
-//  uint64_t size_read = 0;
-//  uint64_t size_quality = 0;
-//  uint64_t size_id = 0;
-//  fs::path p{temp_dir};
-//  fs::directory_iterator itr{p};
-//  for (; itr != fs::directory_iterator{}; ++itr) {
-//    std::string current_file = itr->path().filename().string();
-//    switch (current_file[0]) {
-//      case 'r':
-//        size_read += fs::file_size(itr->path());
-//        break;
-//      case 'q':
-//        size_quality += fs::file_size(itr->path());
-//        break;
-//      case 'i':
-//        size_id += fs::file_size(itr->path());
-//        break;
-//    }
-//  }
-//  std::cout << "\n";
-//  std::cout << "Sizes of streams after compression: \n";
-//  std::cout << "Reads:      " << std::setw(12) << size_read << " bytes\n";
-//  std::cout << "Quality:    " << std::setw(12) << size_quality << " bytes\n";
-//  std::cout << "ID:         " << std::setw(12) << size_id << " bytes\n";
-//
-//  auto tar_start = std::chrono::steady_clock::now();
-//  std::cout << "Creating tar archive ...";
-//  std::string tar_command = "tar -cf " + outfile + " -C " + temp_dir + " . ";
-//  int tar_status = std::system(tar_command.c_str());
-//  if (tar_status != 0)
-//    throw std::runtime_error("Error occurred during tar archive generation.");
-//  std::cout << "Tar archive done!\n";
-//  auto tar_end = std::chrono::steady_clock::now();
-//  std::cout << "Time for this step: "
-//            << std::chrono::duration_cast<std::chrono::seconds>(tar_end -
-//                                                                tar_start)
-//                   .count()
-//            << " s\n";
-//
   delete cp_ptr;
   auto compression_end = std::chrono::steady_clock::now();
   std::cout << "Compression done!\n";
@@ -188,10 +175,6 @@ void generate_streams_SPRING(
                    .count()
             << " s\n";
 
-//  fs::path p1{outfile};
-//  std::cout << "\n";
-//  std::cout << "Total size: " << std::setw(12) << fs::file_size(p1)
-//            << " bytes\n";
   return;
 }
 
