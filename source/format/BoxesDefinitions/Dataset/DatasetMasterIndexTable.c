@@ -319,6 +319,12 @@ bool writeUnalignedIndexing(DatasetMasterIndexTable* datasetMasterIndexTable, Ou
 
 
     for(uint32_t uAccessUnit_i=0; uAccessUnit_i<datasetMasterIndexTable->uAccessUnitsIndex.numberUAccessUnits; uAccessUnit_i++) {
+        uint32_t uAccessUnitOffset =
+                (uint32_t) datasetMasterIndexTable->uAccessUnitsIndex.uAccessUnitOffsets[uAccessUnit_i];
+        writeBigEndian32ToBitstream(
+                outputBitstream,
+                uAccessUnitOffset
+        );
         if (multipleSignatureBase != 0) {
             size_t actualSignatureNumber = datasetMasterIndexTable->uAccessUnitsIndex.signatures[uAccessUnit_i]->allocated_signatures;
             if (actualSignatureNumber != multipleSignatureBase) {
@@ -349,13 +355,6 @@ bool writeUnalignedIndexing(DatasetMasterIndexTable* datasetMasterIndexTable, Ou
             writeBuffer(outputBitstream);
 
             if (isBlockHeaderFlagSet(datasetHeader)) {
-                uint32_t uAccessUnitOffset =
-                        (uint32_t) datasetMasterIndexTable->uAccessUnitsIndex.uAccessUnitOffsets[uAccessUnit_i];
-                writeBigEndian32ToBitstream(
-                        outputBitstream,
-                        uAccessUnitOffset
-                );
-            } else {
                 for (int descriptorUnalignedAccessUnit_i = 0;
                      descriptorUnalignedAccessUnit_i < numberDescriptorsUnmapped; descriptorUnalignedAccessUnit_i++) {
                     uint64_t block_offset =
@@ -549,7 +548,7 @@ uint64_t getAUExtendedEndPosition(
 }
 
 void setStartEndAndOffset(DatasetMasterIndexTable *datasetMasterIndexTable, uint16_t sequenceId, uint16_t classId,
-                          uint32_t AU_id, uint32_t start, uint32_t end, uint64_t offset) {
+                          uint32_t AU_id, uint64_t start, uint64_t end, uint64_t offset) {
     if(sequenceId<datasetMasterIndexTable->sequence_indexes.number_sequences){
         if(classId<datasetMasterIndexTable->sequence_indexes.sequence_indexes[sequenceId].number_of_classes){
             if(AU_id<datasetMasterIndexTable->sequence_indexes.sequence_indexes[sequenceId].classIndex[classId].number_AUs){
@@ -623,8 +622,17 @@ void insertFinalOffset(
     }
 }
 
-void setUnalignedOffset(DatasetMasterIndexTable* datasetMasterIndexTable, uint32_t uAU_id, uint32_t uDescriptorId,
-                        uint64_t offset){
+void setUnalignedOffset(DatasetMasterIndexTable *datasetMasterIndexTable, uint32_t uAU_id, uint64_t offset){
+    if (datasetMasterIndexTable->uAccessUnitsIndex.byteOffset!= NULL){
+        if(uAU_id<datasetMasterIndexTable->uAccessUnitsIndex.numberUAccessUnits){
+            datasetMasterIndexTable->uAccessUnitsIndex.uAccessUnitOffsets[uAU_id]=offset;
+        }
+    }
+}
+
+void setDescriptorUnalignedOffset(DatasetMasterIndexTable *datasetMasterIndexTable, uint32_t uAU_id,
+                                  uint32_t uDescriptorId,
+                                  uint64_t offset){
     uint8_t unalignedClassId = 5;
     uint16_t numberDescriptorsUnmapped =
             getNumberDescriptorsInClass(getDatasetHeader(datasetMasterIndexTable->datasetContainer), unalignedClassId);
@@ -816,8 +824,8 @@ void parseDatasetMasterIndexTableUnalignedAUs(DatasetMasterIndexTable* datasetMa
                     readNBitsShiftAndConvertBigToNativeEndian32(&inputBitstream, 32, (char*)&offset_buffer32);
                     offset_buffer = offset_buffer32;
                 }
-                setUnalignedOffset(datasetMasterIndexTable, uAccessUnit_i, descriptorUnalignedAccessUnit_i,
-                                   offset_buffer);
+                setDescriptorUnalignedOffset(datasetMasterIndexTable, uAccessUnit_i, descriptorUnalignedAccessUnit_i,
+                                             offset_buffer);
 
             }
         }

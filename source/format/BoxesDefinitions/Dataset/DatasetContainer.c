@@ -17,11 +17,10 @@ DatasetContainer *initDatasetContainer() {
     datasetContainer->datasetParameters = NULL;
     datasetContainer->datasetMetadata = NULL;
     datasetContainer->datasetProtection = NULL;
-    datasetContainer->streamContainers = NULL;
-    datasetContainer->accessUnitContainers = NULL;
+    datasetContainer->streamContainers = initVector();
+    datasetContainer->accessUnitContainers = initVector();
     datasetContainer->seekPosition = -1;
     datasetContainer->accessUnitsOffsets = NULL;
-    datasetContainer->accessUnitsContainers = NULL;
     return datasetContainer;
 }
 
@@ -268,7 +267,7 @@ bool writeContentDatasetContainer(DatasetContainer* datasetContainer, FILE *outp
 bool isDatasetContainerValid(DatasetContainer *datasetContainer){
     if (
         datasetContainer->datasetHeader== NULL ||
-        datasetContainer->datasetParameters == NULL
+                (datasetContainer->datasetParameters == NULL && datasetContainer->datasetHeader->datasetType != 2)
     ){
         return false;
     }

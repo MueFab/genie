@@ -4,8 +4,9 @@
 # macOS Finder directory attributes files
 .DS_Store
 
-# CMake build directory
+# CMake build directories
 build/
+cmake-build-debug/
 
 # External tools directory
 external_tools/

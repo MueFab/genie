@@ -10,7 +10,7 @@
 
 DatasetGroup::DatasetGroup(DatasetGroupId datasetGroupId) {
     id = datasetGroupId;
-    DatasetsGroupContainer* datasetsGroupContainer= initDatasetsGroupContainer();
+    datasetsGroupContainer = initDatasetsGroupContainer();
     DatasetsGroupHeader* datasetsGroupHeader = initDatasetsGroupHeader(datasetGroupId, 1);
     setDatasetsGroupHeader(datasetsGroupContainer, datasetsGroupHeader);
 }
@@ -26,10 +26,10 @@ MPEGGFileCreator::MPEGGFileCreator() {
     setFileHeaderToFile(file, fileHeader);
 }
 
-DatasetGroup MPEGGFileCreator::addDatasetGroup() {
-    DatasetGroup datasetGroup = DatasetGroup(datasetsGroupCreated);
+DatasetGroup* MPEGGFileCreator::addDatasetGroup() {
+    auto * datasetGroup = new DatasetGroup(datasetsGroupCreated);
     datasetsGroupCreated++;
-    addDatasetsGroupToFile(file, datasetGroup.getDatasetsGroupContainer());
+    addDatasetsGroupToFile(file, datasetGroup->getDatasetsGroupContainer());
     return datasetGroup;
 }
 
@@ -39,15 +39,17 @@ FakeInternalReference::FakeInternalReference(
     DatasetGroupId datasetGroupId,
     DatasetId  datasetId,
     ReferenceId referenceId,
-    std::vector<std::string> referenceFiles
-) {
+    const std::vector<std::string>& referenceFiles,
+    const std::vector<uint64_t>& accessUnitsStarts,
+    const std::vector<uint64_t>& accessUnitsEnds
+): accessUnitsStarts(accessUnitsStarts), accessUnitsEnds(accessUnitsEnds) {
     char* refURI = (char*)calloc(100,sizeof(char));
     referenceURI.copy(refURI,99);
     FakeInternalReference::datasetId = datasetId;
     FakeInternalReference::referenceId = referenceId;
 
 
-    DatasetsGroupReferenceGenome* datasetsGroupReferenceGenome = initDatasetsGroupReferenceGenome(
+    referenceGenome = initDatasetsGroupReferenceGenome(
             datasetGroupId,
             datasetId,
             referenceId,
@@ -56,10 +58,10 @@ FakeInternalReference::FakeInternalReference(
             2,
             3
     );
-    resizeSequences(datasetsGroupReferenceGenome, 1);
-    char* sequenceNameBuffer = (char*)calloc(5,sizeof(char));
+    resizeSequences(referenceGenome, 1);
+    char* sequenceNameBuffer = (char*)calloc(100,sizeof(char));
     sequenceName.copy(sequenceNameBuffer,99);
-    setSequenceName(datasetsGroupReferenceGenome,0, sequenceNameBuffer);
+    setSequenceName(referenceGenome,0, sequenceNameBuffer);
 
     FakeInternalReference::referenceFiles = referenceFiles;
 }
@@ -135,6 +137,18 @@ void FakeInternalReference::addAsDatasetToDatasetGroup(
                 mm_threshold,
                 mm_count
         );
+        setReferenceSequenceId(
+                accessUnitHeader,
+                1
+        );
+        setReferenceStartPosition(
+                 accessUnitHeader,
+                 accessUnitsStarts[access_unit_ID]
+        );
+        setReferenceEndPosition(
+                accessUnitHeader,
+                accessUnitsEnds[access_unit_ID]
+        );
         setAccessUnitContainerHeader(accessUnitContainer, accessUnitHeader);
 
 
@@ -152,10 +166,10 @@ void FakeInternalReference::addAsDatasetToDatasetGroup(
         setBlockHeader(block, blockHeader);
         addBlock(accessUnitContainer, block);
 
-        //addAccessUnitToDataset(datasetContainer, accessUnitContainer);
+        addAccessUnitToDataset(datasetContainer, accessUnitContainer);
         access_unit_ID++;
     }
-
+    addDatasetsContainer(datasetsGroupContainer, datasetContainer);
 }
 
 AccessUnitContainer * AccessUnit::createAccessUnitContainer(DatasetContainer *datasetContainer) {
@@ -216,14 +230,10 @@ ReferenceId FakeInternalReference::getReferenceId() const {
     return referenceId;
 }
 
-Dataset::Dataset() {
-
-}
-
 DatasetContainer* Dataset::constructDataset() {
     DatasetContainer* datasetContainer = initDatasetContainer();
-    uint8_t numClassesAligned = existing_classes.size();
-    uint8_t numClasses = numClassesAligned;
+    auto numClassesAligned = static_cast<uint8_t>(existing_aligned_classes.size());
+    uint8_t numClasses = static_cast<uint8_t>(numClassesAligned + numberUAccessUnits > 0 ? 1 : 0);
 
 
     DatasetHeader* datasetHeader = initDatasetHeader(
@@ -259,43 +269,55 @@ DatasetContainer* Dataset::constructDataset() {
 
     uint8_t class_index = 0;
     for(uint8_t class_it=0; class_it<numClasses; class_it++){
-        setClassType(datasetHeader, class_index, existing_classes[class_index]);
+        setClassType(datasetHeader, class_index, existing_aligned_classes[class_index]);
     }
 
     for(uint8_t i=0;i<numClasses; i++){
-        setNumberDescriptorsInClass(datasetHeader, i,(uint8_t) descriptorsIdPerClass[existing_classes[i]].size());
+        setNumberDescriptorsInClass(datasetHeader, i,(uint8_t) descriptorsIdPerClass[existing_aligned_classes[i]].size());
     }
     for(uint8_t classIndex=0;classIndex<numClasses; classIndex++){
-        for(uint8_t descriptor_i=0; descriptor_i<descriptorsIdPerClass[existing_classes[classIndex]].size(); descriptor_i++){
+        for(uint8_t descriptor_i=0; descriptor_i<descriptorsIdPerClass[existing_aligned_classes[classIndex]].size(); descriptor_i++){
             setDescriptorIdInClass(
                     datasetHeader,
                     classIndex,
                     descriptor_i,
-                    descriptorsIdPerClass[existing_classes[classIndex]][descriptor_i]
+                    descriptorsIdPerClass[existing_aligned_classes[classIndex]][descriptor_i]
             );
         }
     }
     setDatasetHeader(datasetContainer, datasetHeader);
 
+    uint64_t currentOffset =
+            getSizeDatasetHeader(datasetHeader);
+
+    Vector* datasetParametersVector = initVector();
+    for(auto& paramFilename : parametersFilenames) {
+        DatasetParameters *datasetParameters = initDatasetParameters();
+        defineContentDatasetParameters(datasetParameters, paramFilename.c_str());
+        pushBack(datasetParametersVector, datasetParameters);
+
+        currentOffset += getSizeDatasetParameters(datasetParameters);
+    }
+
+    setDatasetParameters(datasetContainer, datasetParametersVector);
+
     DatasetMasterIndexTable* datasetMasterIndexTable = initDatasetMasterIndexTable(datasetContainer);
     setDatasetMasterIndexTable(datasetContainer, datasetMasterIndexTable);
 
     sequence_index = 0;
-    uint64_t currentOffset =
-            getSizeDatasetHeader(datasetHeader)
-            + getSizeDatasetMasterIndexTable(datasetMasterIndexTable)
-            + getSizeDatasetParameters(NULL); //todo change this
+
+    currentOffset += getSizeDatasetMasterIndexTable(datasetMasterIndexTable);
 
     for(auto &entrySequenceClassAUs : accessUnitsAligned){
         for(uint8_t class_i=0; class_i<numClassesAligned; class_i++){
-            Class_type classType = existing_classes[class_i];
+            Class_type classType = existing_aligned_classes[class_i];
             auto entryClassAccessUnits = entrySequenceClassAUs.second.find(classType);
             if(entryClassAccessUnits != entrySequenceClassAUs.second.end()){
                 auto AUstoAdd = (uint8_t) entryClassAccessUnits->second.size();
                 for(uint8_t au_i=0; au_i<AUstoAdd; au_i++){
-                    AccessUnit & accessUnitContainer = entryClassAccessUnits->second[au_i];
-                    uint32_t start = accessUnitContainer.getStart();
-                    uint32_t end = accessUnitContainer.getEnd();
+                    AccessUnit & accessUnit = entryClassAccessUnits->second[au_i];
+                    uint64_t start = accessUnit.getStart();
+                    uint64_t end = accessUnit.getEnd();
                     setStartEndAndOffset(
                             datasetMasterIndexTable,
                             sequence_index,
@@ -305,35 +327,58 @@ DatasetContainer* Dataset::constructDataset() {
                             end,
                             currentOffset
                     );
-                    currentOffset += getAccessUnitContainerSize(accessUnitContainer.createAccessUnitContainer(datasetContainer));
+                    AccessUnitContainer* accessUnitContainer = accessUnit.createAccessUnitContainer(datasetContainer);
+                    addAccessUnitToDataset(datasetContainer, accessUnitContainer);
+                    currentOffset += getAccessUnitContainerSize(accessUnitContainer);
                 }
             }
         }
         sequence_index++;
     }
 
-    for(uint32_t uAccessUnit_i=0; uAccessUnit_i<numberUAccessUnits; uAccessUnit_i++){
-
-
+    uint32_t uAcessUnit_id = 0;
+    for(auto & uAccessUnit : accessUnitsUnaligned){
+        AccessUnitContainer* accessUnitContainer = uAccessUnit.createAccessUnitContainer(datasetContainer);
+        setUnalignedOffset(datasetMasterIndexTable, uAcessUnit_id, currentOffset);
+        addAccessUnitToDataset(datasetContainer, accessUnitContainer);
+        currentOffset += getAccessUnitContainerSize(accessUnitContainer);
+        uAcessUnit_id++;
     }
 
-
-    char paramsFilename[] = "dtParamsFileName";
-    DatasetParameters* datasetParameters = initDatasetParameters();
-    defineContentDatasetParameters(datasetParameters, paramsFilename);
-
-    Vector* datasetParametersVector = initVector();
-    pushBack(datasetParametersVector, datasetParameters);
-
-    setDatasetParameters(datasetContainer, datasetParametersVector);
-
     return datasetContainer;
+}
+
+Dataset::Dataset(const std::vector<Class_type> &existing_aligned_classes,
+                 const std::map<Class_type, std::vector<uint8_t>> &descriptorsIdPerClass,
+                 const std::map<uint16_t, std::map<Class_type, std::vector<AccessUnit>>> &accessUnitsAligned,
+                 const std::vector<AccessUnit> &accessUnitsUnaligned, DatasetGroupId datasetGroupId,
+                 DatasetId datasetId,
+                 const std::vector<std::string>& parametersFilenames
+                 ) : existing_aligned_classes(existing_aligned_classes),
+                                        descriptorsIdPerClass(descriptorsIdPerClass),
+                                        accessUnitsAligned(accessUnitsAligned),
+                                        accessUnitsUnaligned(accessUnitsUnaligned),
+                                       datasetGroupId(datasetGroupId),
+                                       datasetId(datasetId),
+                                       parametersFilenames(parametersFilenames){
+    numberUAccessUnits = (uint32_t) accessUnitsUnaligned.size();
+}
+
+void Dataset::addAsDatasetToDatasetGroup(
+        DatasetsGroupContainer* datasetsGroupContainer
+){
+    DatasetContainer* datasetContainer = constructDataset();
+    addDatasetsContainer(datasetsGroupContainer,datasetContainer);
+
+
 }
 
 FakeInternalReference DatasetGroup::addFakeInternalReference(
         std::string referenceURI,
         std::string sequenceName,
-        const std::vector<std::string> & dataFiles
+        const std::vector<std::string> & dataFiles,
+        const std::vector<uint64_t>& accessUnitsStarts,
+        const std::vector<uint64_t>& accessUnitsEnds
 ){
     FakeInternalReference fakeInternalReference(
         referenceURI,
@@ -341,20 +386,47 @@ FakeInternalReference DatasetGroup::addFakeInternalReference(
         id,
         datasetsCreated,
         referenceId,
-        dataFiles
+        dataFiles,
+        accessUnitsStarts,
+        accessUnitsEnds
     );
     datasetsCreated++;
     referenceId++;
 
 
     fakeInternalReference.addAsDatasetToDatasetGroup(getDatasetsGroupContainer(), id);
+    Vector* referenceGenomeVector = initVector();
+    pushBack(referenceGenomeVector, fakeInternalReference.getReferenceGenome());
+    setDatasetsGroupReferenceGenomes(datasetsGroupContainer, referenceGenomeVector);
     return fakeInternalReference;
+}
+
+Dataset DatasetGroup::addDatasetData(
+        const std::vector<Class_type> &existing_aligned_classes,
+        const std::map<Class_type, std::vector<uint8_t>> &descriptorsIdPerClass,
+        const std::map<uint16_t, std::map<Class_type, std::vector<AccessUnit>>> &accessUnitsAligned,
+        const std::vector<AccessUnit> &accessUnitsUnaligned,
+        const std::vector<std::string> &parametersFilename
+) {
+    Dataset dataset(
+            existing_aligned_classes,
+            descriptorsIdPerClass,
+            accessUnitsAligned,
+            accessUnitsUnaligned,
+            id,
+            datasetsCreated,
+            parametersFilename
+    );
+    datasetsCreated++;
+
+    dataset.addAsDatasetToDatasetGroup(datasetsGroupContainer);
+    return dataset;
 }
 
 
 bool MPEGGFileCreator::write(const std::string &filename) {
     if(isFileValid(file)){
-        FILE* outputFile = fopen("exampleMPEGG","wb");
+        FILE* outputFile = fopen(filename.c_str(),"wb");
         if(!writeFile(file,outputFile)){
             printf("Unsuccessful write.\n");
             return false;

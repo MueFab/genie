@@ -301,6 +301,7 @@ bool generateDatasetsGroupSeekPoints(DatasetsGroupContainer* datasetsGroupContai
 typedef struct DataUnitAccessUnit_ DataUnitAccessUnit;
 DatasetContainer *initDatasetContainer();
 void freeDatasetContainer(DatasetContainer *datasetContainer);
+void addAccessUnitToDataset(DatasetContainer* datasetContainer, AccessUnitContainer* accessUnitContainer);
 void addStreamContainerToDataset(DatasetContainer* datasetContainer, StreamContainer* streamContainer);
 size_t getNumberStreamContainer(DatasetContainer* datasetContainer);
 uint64_t getSizeContentDatasetContainer(DatasetContainer* datasetContainer);
@@ -413,7 +414,7 @@ bool writeDatasetMasterIndexTable(DatasetMasterIndexTable* datasetMasterIndexTab
 uint64_t getSizeContentDatasetMasterIndexTable(DatasetMasterIndexTable* datasetMasterIndexTable);
 uint64_t getSizeDatasetMasterIndexTable(DatasetMasterIndexTable* datasetMasterIndexTable);
 void setStartEndAndOffset(DatasetMasterIndexTable *datasetMasterIndexTable, uint16_t sequenceId, uint16_t classId,
-                          uint32_t AU_id, uint32_t start, uint32_t end, uint64_t offset);
+                          uint32_t AU_id, uint64_t start, uint64_t end, uint64_t offset);
 void setExtendedStartAndEnd(DatasetMasterIndexTable* datasetMasterIndexTable,
                             uint16_t sequenceId, uint16_t classId, uint32_t AU_id, uint32_t extended_start,
                             uint32_t extended_end);
@@ -425,8 +426,10 @@ void insertFinalOffset(
         uint16_t descriptorId,
         uint64_t offset
 );
-void setUnalignedOffset(DatasetMasterIndexTable* datasetMasterIndexTable, uint32_t uAU_id, uint32_t uDescriptorId,
-                        uint64_t offset);
+void setUnalignedOffset(DatasetMasterIndexTable *datasetMasterIndexTable, uint32_t uAU_id, uint64_t offset);
+void setDescriptorUnalignedOffset(DatasetMasterIndexTable *datasetMasterIndexTable, uint32_t uAU_id,
+                                  uint32_t uDescriptorId,
+                                  uint64_t offset);
 Signatures * getSignatures(DatasetMasterIndexTable* datasetMasterIndexTable, int uAccessUnit_i);
 DatasetMasterIndexTable *parseDatasetMasterIndexTable(DatasetContainer *datasetContainer, FILE *inputFile);
 long getDatasetMasterIndexTableSeekPosition(DatasetMasterIndexTable* datasetMasterIndexTable);
@@ -469,7 +472,7 @@ struct DatasetParameters_ {
 
 DatasetParameters *initDatasetParameters();
 void freeDatasetParameters(DatasetParameters* datasetParameters);
-bool defineContentDatasetParameters(DatasetParameters* datasetParameters, char* filename);
+bool defineContentDatasetParameters(DatasetParameters* datasetParameters, const char* filename);
 bool writeDatasetParameters(DatasetParameters* datasetParameters, FILE *outputFile);
 bool writeContentDatasetParameters(DatasetParameters* datasetParameters, FILE *outputFile);
 uint64_t getSizeContentDatasetParameters(DatasetParameters* datasetParameters);
@@ -765,6 +768,7 @@ struct AccessUnitHeader_ {
     //if dataset_type == 2
         uint16_t  ref_sequence_id;
         uint64_t ref_start_position;
+        uint64_t ref_end_position;
 
     //if MIT_flag == 0
         //if AU_type != U_TYPE_AU || dataset_type == 2
@@ -801,6 +805,9 @@ uint16_t getParametersSetId(AccessUnitHeader* accessUnitHeader);
 uint32_t getReadsCount(AccessUnitHeader* accessUnitHeader);
 uint16_t getMMThreshold(AccessUnitHeader* accessUnitHeader);
 uint32_t getMMCount(AccessUnitHeader* accessUnitHeader);
+void setReferenceSequenceId(AccessUnitHeader* accessUnitHeader, uint16_t sequenceId);
+void setReferenceStartPosition(AccessUnitHeader* accessUnitHeader, uint64_t startPosition);
+void setReferenceEndPosition(AccessUnitHeader* accessUnitHeader, uint64_t endPosition);
 
 struct AccessUnitProtection_ {
     ByteArray* protection;
