@@ -17,6 +17,7 @@
 #include "descriptors/spring/reorder.h"
 #include "descriptors/spring/reorder_compress_quality_id_eru.h"
 #include "descriptors/spring/generate_read_streams_eru.h"
+#include "descriptors/spring/generate_ref_streams_eru.h"
 #include "descriptors/spring/decode_eru.h"
 #include "descriptors/spring/generate_new_fastq.h"
 #include "descriptors/spring/spring.h"
@@ -128,6 +129,17 @@ void generate_streams_SPRING(
                      .count()
               << " s\n";
 
+    std::cout << "Generating ref streams ...\n";
+    auto grefs_start = std::chrono::steady_clock::now();
+    auto ref_descriptorFilesPerAUs = generate_ref_streams(temp_dir, cp);
+    auto grefs_end = std::chrono::steady_clock::now();
+    std::cout << "Generating ref streams done!\n";
+    std::cout << "Time for this step: "
+              << std::chrono::duration_cast<std::chrono::seconds>(grefs_end -
+                                                                  grefs_start)
+                     .count()
+              << " s\n";
+
     if (preserve_quality || preserve_id) {
       std::cout << "Reordering and compressing quality and/or ids ...\n";
       auto rcqi_start = std::chrono::steady_clock::now();
@@ -149,7 +161,7 @@ void generate_streams_SPRING(
       num_blocks = 1 + (cp.num_reads-1)/cp.num_reads_per_block;
     else 
       num_blocks = 1 + (cp.num_reads/2-1)/cp.num_reads_per_block;
-    decompress(temp_dir, num_blocks, cp.preserve_order, cp.paired_end);
+    decompress(temp_dir, ref_descriptorFilesPerAUs, num_blocks, cp.preserve_order, cp.paired_end);
     auto decompression_end = std::chrono::steady_clock::now();
     std::cout << "Decompression done!\n";
     std::cout << "Time for this step: "
