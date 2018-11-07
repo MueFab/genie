@@ -263,6 +263,7 @@ set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spr
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/encoder.cpp)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/reorder_compress_quality_id_eru.cpp)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/generate_read_streams_eru.cpp)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/generate_ref_streams_eru.cpp)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/generate_new_fastq.cpp)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/decode_eru.cpp)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/id_tokenization.cpp)
