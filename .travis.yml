@@ -1,6 +1,7 @@
 branches:
   only:
   - master
+  - develop
 
 language: cpp
 
@@ -20,7 +21,7 @@ addons:
     - libboost-program-options-dev
     - libboost-regex-dev
   homebrew:
-  #   update: true
+    # update: true
     packages:
     - boost
 

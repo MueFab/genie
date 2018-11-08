@@ -35,6 +35,29 @@ endif ()
 
 
 #==============================================================================
+# Build type
+#==============================================================================
+
+# Set default build type
+if (NOT CMAKE_BUILD_TYPE)
+    message(WARNING "Unsupported build type (CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})")
+    set(CMAKE_BUILD_TYPE Debug)
+    message(WARNING "Using default build type '${CMAKE_BUILD_TYPE}'")
+endif ()
+
+# Set build type-specific flags
+# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast")
+
+# Log the compiler flags for each build type
+message(STATUS "C++ compiler flags: ${CMAKE_CXX_FLAGS}")
+message(STATUS "Additional C++ compiler flags for build type 'Debug': ${CMAKE_CXX_FLAGS_DEBUG}")
+message(STATUS "Additional C++ compiler flags for build type 'Release': ${CMAKE_CXX_FLAGS_RELEASE}")
+message(STATUS "Additional C++ compiler flags for build type 'RelWithDebInfo': ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+message(STATUS "Additional C++ compiler flags for build type 'MinSizeRel': ${CMAKE_CXX_FLAGS_MINSIZEREL}")
+message(STATUS "Selected build type: ${CMAKE_BUILD_TYPE}")
+
+
+#==============================================================================
 # Google Test
 #==============================================================================
 
@@ -93,29 +116,6 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
 else ()
     message(FATAL_ERROR "C++ compiler currently not supported by CMake build")
 endif ()
-
-
-#==============================================================================
-# Build type
-#==============================================================================
-
-# Set default build type
-if (NOT CMAKE_BUILD_TYPE)
-    message(WARNING "Unsupported build type (CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})")
-    set(CMAKE_BUILD_TYPE Debug)
-    message(WARNING "Using default build type '${CMAKE_BUILD_TYPE}'")
-endif ()
-
-# Set build type-specific flags
-# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast")
-
-# Log the compiler flags for each build type
-message(STATUS "C++ compiler flags: ${CMAKE_CXX_FLAGS}")
-message(STATUS "Additional C++ compiler flags for build type 'Debug': ${CMAKE_CXX_FLAGS_DEBUG}")
-message(STATUS "Additional C++ compiler flags for build type 'Release': ${CMAKE_CXX_FLAGS_RELEASE}")
-message(STATUS "Additional C++ compiler flags for build type 'RelWithDebInfo': ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
-message(STATUS "Additional C++ compiler flags for build type 'MinSizeRel': ${CMAKE_CXX_FLAGS_MINSIZEREL}")
-message(STATUS "Selected build type: ${CMAKE_BUILD_TYPE}")
 
 
 #==============================================================================
@@ -289,7 +289,7 @@ target_link_libraries(${genie} Boost::system)
 # tests
 #==============================================================================
 
-if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+# if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     # Set the paths
     set(tests "tests")
     set(tests_source_dir ${CMAKE_SOURCE_DIR}/tests)
@@ -316,4 +316,4 @@ if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     target_link_libraries(${tests} gtest_main)
     target_link_libraries(${tests} ${format})
     target_link_libraries(${tests} ${MPEGGFileCreation})
-endif ()
+# endif ()
