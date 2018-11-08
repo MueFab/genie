@@ -1,9 +1,0 @@
---force
---verbose
---working-directory /Users/janvoges/Desktop/genie-working-directory/
---input-file-path /Users/janvoges/Repositories/genie/resources/test-files/fasta/two-times-gattaca.fasta
---input-file-type FASTA
---id-algorithm TOK
---qv-algorithm QVZ
---read-algorithm HARC
-

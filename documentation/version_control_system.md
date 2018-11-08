@@ -8,7 +8,7 @@ That means:
 
 * The ``master`` branch contains only *release* commits.
 * Every commit on the master branch is *tagged* according to **Semantic Versioning 2.0.0** (see below).
-* Development generally takes place on the ``develop``branch.
+* Development generally takes place on the ``develop`` branch.
 * Actual development takes place in *feature* branches, e.g., ``feature/my_fancy_feature``.
 * Once a *feature* is completed, its branch can be merged back into the ``develop`` branch.
 

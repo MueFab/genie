@@ -1,0 +1,46 @@
+branches:
+  only:
+  - master
+  - develop
+
+language: cpp
+
+# Define the build matrix explicitly. Manually expanding the combinations
+# of (os, compiler, env) is more tedious, but grants far more flexibility.
+matrix:
+  include:
+    - os: linux
+      compiler: gcc
+      env: MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+      before_install: eval "${MATRIX_EVAL}"
+    - os: linux
+      compiler: clang
+    - os: osx
+      compiler: gcc
+    - os: osx
+      compiler: clang
+
+addons:
+  apt:
+    update: true
+    packages:
+    - g++-5
+    - libboost-filesystem-dev
+    - libboost-log-dev
+    - libboost-program-options-dev
+    - libboost-regex-dev
+    - libboost-system-dev
+  homebrew:
+    # update: true
+    packages:
+    - boost
+
+before_script:
+  - mkdir build
+  - cd build
+  - cmake ..
+
+script:
+  - make
+  - make tests
+  # - ./tests
