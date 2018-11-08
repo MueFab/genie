@@ -22,7 +22,7 @@ message(STATUS "GENIE_USE_OPENMP=${GENIE_USE_OPENMP}")
 # Boost
 #==============================================================================
 
-find_package(Boost 1.58 COMPONENTS filesystem log program_options system REQUIRED)
+find_package(Boost 1.54 COMPONENTS filesystem log program_options system REQUIRED)
 
 
 #==============================================================================
