@@ -7,6 +7,7 @@ cmake_minimum_required(VERSION 3.1)
 message(STATUS "CMake generator: ${CMAKE_GENERATOR}")
 
 # C++ code shall be compliant to C++11
+set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 11)
 
 # This is genie
