@@ -2,8 +2,8 @@
 #include <fstream>
 #include <iostream>
 
-#include "descriptors/spring/pe_encode.h"
-#include "descriptors/spring/util.h"
+#include "spring/pe_encode.h"
+#include "spring/util.h"
 
 namespace spring {
 

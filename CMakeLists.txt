@@ -133,6 +133,62 @@ message(STATUS "C++ compiler flags for build type 'Release': ${CMAKE_CXX_FLAGS_R
 message(STATUS "C++ compiler flags for build type 'RelWithDebInfo': ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
 message(STATUS "C++ compiler flags for build type 'MinSizeRel': ${CMAKE_CXX_FLAGS_MINSIZEREL}")
 
+#==============================================================================
+# coding library
+#==============================================================================
+
+# Set our coding paths
+set(coding "coding")
+set(coding_source_dir ${CMAKE_SOURCE_DIR}/source/coding )
+set(coding_header_dir ${CMAKE_SOURCE_DIR}/source/coding )
+set(coding_include_dir ${CMAKE_SOURCE_DIR}/source/coding ${CMAKE_SOURCE_DIR}/source)
+
+# List all source files
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/ReturnStructures.cpp)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/spring.cpp)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/preprocess.cpp)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/util.cpp)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/bitset_util.cpp)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/encoder.cpp)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/reorder_compress_quality_id_eru.cpp)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/generate_read_streams_eru.cpp)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/generate_ref_streams_eru.cpp)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/generate_new_fastq.cpp)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/decode_eru.cpp)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/id_tokenization.cpp)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/pe_encode.cpp)
+
+# List all header files
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/ReturnStructures.h)
+set(coding_header_files ${coding_header_files} ${coding_header_dir}/CoderConstans.h)
+set(coding_header_files ${coding_header_files} ${coding_header_dir}/spring.h)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/bitset_util.h)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/BooPHF.h)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/decode_eru.h)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/encoder.h)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/generate_new_fastq.h)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/generate_read_streams_eru.h)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/generate_ref_streams_eru.h)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/id_tokenization.h)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/params.h)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/pe_encode.h)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/preprocess.h)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/reorder_compress_quality_id_eru.h)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/reorder.h)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/spring.h)
+set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/util.h)
+
+# Group the source and header files
+source_group("Source Files" FILES ${coding_source_files})
+source_group("Header Files" FILES ${coding_header_files})
+
+# Set up the format target
+add_library(${coding} STATIC ${coding_source_files})
+target_include_directories(${coding} PRIVATE ${coding_include_dir})
+target_link_libraries(${coding} Boost::program_options)
+target_link_libraries(${coding} Boost::filesystem)
+target_link_libraries(${coding} Boost::system)
+
 
 #==============================================================================
 # format library
@@ -256,19 +312,6 @@ set(genie_header_dir ${CMAKE_SOURCE_DIR}/source)
 set(genie_include_dir ${CMAKE_SOURCE_DIR}/source)
 
 # List all source files
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/spring.cpp)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/preprocess.cpp)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/util.cpp)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/bitset_util.cpp)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/encoder.cpp)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/reorder_compress_quality_id_eru.cpp)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/generate_read_streams_eru.cpp)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/generate_ref_streams_eru.cpp)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/generate_new_fastq.cpp)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/decode_eru.cpp)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/id_tokenization.cpp)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/descriptors/spring/pe_encode.cpp)
-#
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/fasta_file_reader.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/fasta_record.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/fastq_file_reader.cc)
@@ -300,6 +343,10 @@ target_include_directories(${genie} PRIVATE ${genie_include_dir})
 target_link_libraries(${genie} Boost::program_options)
 target_link_libraries(${genie} Boost::filesystem)
 target_link_libraries(${genie} Boost::system)
+target_link_libraries(${genie} ${format})
+target_link_libraries(${genie} ${file})
+target_link_libraries(${genie} ${MPEGGFileCreation})
+target_link_libraries(${genie} ${coding})
 # target_link_libraries(${genie} ${boost_lib_dir}/libboost_program_options.a)
 # target_link_libraries(${genie} ${boost_lib_dir}/libboost_filesystem.a)
 # target_link_libraries(${genie} ${boost_lib_dir}/libboost_system.a)

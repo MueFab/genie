@@ -6,16 +6,20 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <genie/generation.h>
 
-#include "descriptors/spring/generate_ref_streams_eru.h"
-#include "descriptors/spring/util.h"
-#include "descriptors/spring/params.h"
+#include "spring/generate_ref_streams_eru.h"
+#include "spring/util.h"
+#include "spring/params.h"
 
 namespace spring {
 
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_ref_streams(const std::string &temp_dir, const compression_params &cp) {
+generated_aus_ref generate_ref_streams(const std::string &temp_dir, const compression_params &cp) {
 
   std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> descriptorFilesPerAU;
+  std::vector<uint64_t> start_au_ref;
+  std::vector<uint64_t> end_au_ref;
+
   std::string basedir = temp_dir;
 
   std::string file_subseq_6_0 = basedir + "/ref_subseq_6_0"; // ureads
@@ -71,9 +75,11 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_ref_stre
     listDescriptorFiles[7][0]=filename7_0;
 
     descriptorFilesPerAU.push_back(listDescriptorFiles);
+    start_au_ref.push_back(seq_start);
+    end_au_ref.push_back(seq_end);
   }
 
-  return descriptorFilesPerAU;
+  return generated_aus_ref(descriptorFilesPerAU, start_au_ref, end_au_ref);
 }
 
 }  // namespace spring

@@ -2,7 +2,7 @@
 #define SPRING_PE_ENCODE_H_
 
 #include <string>
-#include "descriptors/spring/util.h"
+#include "spring/util.h"
 
 namespace spring {
 

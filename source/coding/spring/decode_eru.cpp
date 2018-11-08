@@ -5,9 +5,9 @@
 #include <stdexcept>
 #include <fstream>
 #include <iostream>
-#include "descriptors/spring/util.h"
-#include "descriptors/spring/decode_eru.h"
-#include "descriptors/spring/id_tokenization.h"
+#include "spring/util.h"
+#include "spring/decode_eru.h"
+#include "spring/id_tokenization.h"
 #include "fileio/fastq_record.h"
 
 namespace spring {

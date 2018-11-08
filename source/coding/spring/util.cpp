@@ -1,4 +1,4 @@
-#include "descriptors/spring/util.h"
+#include "spring/util.h"
 #include <algorithm>
 #include <fstream>
 #include <stdexcept>

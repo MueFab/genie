@@ -5,11 +5,12 @@
 #include <vector>
 #include <map>
 
-#include "descriptors/spring/util.h"
+#include "spring/util.h"
+#include "ReturnStructures.h"
 
 namespace spring {
 
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_ref_streams(const std::string &temp_dir, const compression_params &cp);
+generated_aus_ref generate_ref_streams(const std::string &temp_dir, const compression_params &cp);
 
 }  // namespace spring
 

@@ -25,7 +25,21 @@ Block* initBlock(
         return NULL;
     }
     block->blockHeader = NULL;
-    block->payload = fromFile;
+    block->payload = initVector();
+    pushBack(block->payload, fromFile);
+    block->datasetContainer = datasetContainer;
+
+    return block;
+}
+
+Block* initBlockMultiplePayloads(DatasetContainer* datasetContainer, Vector* payload){
+    Block* block = (Block*)malloc(sizeof(Block));
+    if(block == NULL){
+        fprintf(stderr,"Block could not be allocated.\n");
+        return NULL;
+    }
+    block->blockHeader = NULL;
+    block->payload = payload;
     block->datasetContainer = datasetContainer;
 
     return block;
@@ -33,10 +47,6 @@ Block* initBlock(
 
 void setBlockHeader(Block* block, BlockHeader* blockHeader){
     block->blockHeader = blockHeader;
-}
-
-void setPaddingSize(Block* block, uint32_t paddingSize){
-    block->padding_size = paddingSize;
 }
 
 bool writeBlock(Block* block, FILE* outputFile){
@@ -52,9 +62,15 @@ bool writeBlock(Block* block, FILE* outputFile){
         }
     }
     if(block->payload != NULL) {
-        if (!writeFromFile(block->payload, outputFile)) {
-            fprintf(stderr, "Block's payload: error writing.\n");
-            return false;
+        size_t numberBlocks = getSize(block->payload);
+        for(size_t block_i = 0; block_i < numberBlocks; block_i++){
+            FromFile* subdescriptor = (FromFile*)getValue(block->payload, block_i);
+            if(subdescriptor != NULL) {
+                if (!writeFromFile(subdescriptor, outputFile)) {
+                    fprintf(stderr, "Block's payload: error writing.\n");
+                    return false;
+                }
+            }
         }
     }
     if(block->blockHeader != NULL){
@@ -126,9 +142,14 @@ uint64_t getBlockSize(Block* block){
             blockSize += getBlockHeaderSize(block->blockHeader);
         }
     }
-    if(block->payload != NULL) {
-        blockSize += getFromFileSize(block->payload);
+    size_t numberSubsequences = getSize(block->payload);
+    for(size_t subsequence_i = 0; subsequence_i<(numberSubsequences-1); subsequence_i++) {
+        blockSize += 4;
+        if (block->payload != NULL) {
+            blockSize += getFromFileSize(getValue(block->payload, subsequence_i));
+        }
     }
+    blockSize += getFromFileSize(getValue(block->payload, numberSubsequences-1));
 
     if(block->blockHeader != NULL){
         if(isPaddingFlagSet(block->blockHeader)){

@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include <map>
-#include "descriptors/spring/util.h"
+#include "spring/util.h"
 #include "fileio/fastq_record.h"
 
 namespace spring {

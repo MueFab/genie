@@ -1,4 +1,4 @@
-#include "descriptors/spring/preprocess.h"
+#include "spring/preprocess.h"
 #ifdef GENIE_USE_OPENMP
     #include <omp.h>
 #endif
@@ -9,8 +9,8 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
-#include "descriptors/spring/params.h"
-#include "descriptors/spring/util.h"
+#include "spring/params.h"
+#include "spring/util.h"
 #include "fileio/fastq_file_reader.h"
 
 namespace spring {

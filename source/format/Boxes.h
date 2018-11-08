@@ -853,22 +853,21 @@ uint8_t getBlocksDescriptorId(BlockHeader* blockHeader);
 uint32_t getPayloadSize(BlockHeader* blockHeader);
 BlockHeader* parseBlockHeader(DatasetContainer* datasetContainer, FILE* inputFile);
 bool writeBlockHeader(BlockHeader* blockHeader, FILE* outputFile);
-bool writeBlockHeaderDataUnit(BlockHeader* blockHeader, FILE* outputFile);
 void freeBlockHeader(BlockHeader* blockHeader);
 uint64_t getBlockHeaderSize(BlockHeader* blockHeader);
 
 
 struct Block_{
     BlockHeader* blockHeader;
-    FromFile* payload;
+    Vector* payload;
     uint32_t padding_size;
     DatasetContainer *datasetContainer;
 };
 
 void freeBlock(Block* block);
 Block* initBlock(DatasetContainer* datasetContainer, FromFile* fromFile);
+Block* initBlockMultiplePayloads(DatasetContainer* datasetContainer, Vector* payload);
 void setBlockHeader(Block* block, BlockHeader* blockHeader);
-void setPaddingSize(Block* block, uint32_t paddingSize);
 bool writeBlock(Block* block, FILE* outputFile);
 Block* parseBlockContainerAUCmode(DatasetContainer *datasetContainer, FILE *inputFile, char *fileName);
 uint64_t getBlockSize(Block* block);

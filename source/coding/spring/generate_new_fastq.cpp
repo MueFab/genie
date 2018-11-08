@@ -1,5 +1,5 @@
-#include "descriptors/spring/generate_new_fastq.h"
-#include "descriptors/spring/util.h"
+#include "spring/generate_new_fastq.h"
+#include "spring/util.h"
 #include "fileio/fastq_file_reader.h"
 #include <iostream>
 

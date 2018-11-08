@@ -10,26 +10,26 @@
 #include <string>
 #include <vector>
 
-#include "descriptors/spring/encoder.h"
-#include "descriptors/spring/params.h"
-#include "descriptors/spring/pe_encode.h"
-#include "descriptors/spring/preprocess.h"
-#include "descriptors/spring/reorder.h"
-#include "descriptors/spring/reorder_compress_quality_id_eru.h"
-#include "descriptors/spring/generate_read_streams_eru.h"
-#include "descriptors/spring/generate_ref_streams_eru.h"
-#include "descriptors/spring/decode_eru.h"
-#include "descriptors/spring/generate_new_fastq.h"
-#include "descriptors/spring/spring.h"
-#include "descriptors/spring/util.h"
+#include "spring/encoder.h"
+#include "spring/params.h"
+#include "spring/pe_encode.h"
+#include "spring/preprocess.h"
+#include "spring/reorder.h"
+#include "spring/reorder_compress_quality_id_eru.h"
+#include "spring/generate_read_streams_eru.h"
+#include "spring/generate_ref_streams_eru.h"
+#include "spring/decode_eru.h"
+#include "spring/generate_new_fastq.h"
+#include "spring/spring.h"
+#include "spring/util.h"
 #include "fileio/fastq_file_reader.h"
 
 namespace spring {
 
-void generate_streams_SPRING(
-    dsg::input::fastq::FastqFileReader *fastqFileReader1,
-    dsg::input::fastq::FastqFileReader *fastqFileReader2, int num_thr,
-    bool paired_end, const std::string &working_dir) {
+generated_aus generate_streams_SPRING(
+        dsg::input::fastq::FastqFileReader *fastqFileReader1,
+        dsg::input::fastq::FastqFileReader *fastqFileReader2, int num_thr,
+        bool paired_end, const std::string &working_dir) {
   // generate random temp directory in the working directory
   std::string temp_dir;
   while (true) {
@@ -131,7 +131,7 @@ void generate_streams_SPRING(
 
     std::cout << "Generating ref streams ...\n";
     auto grefs_start = std::chrono::steady_clock::now();
-    auto ref_descriptorFilesPerAUs = generate_ref_streams(temp_dir, cp);
+    auto descriptorRefFilesPerAUs = generate_ref_streams(temp_dir, cp);
     auto grefs_end = std::chrono::steady_clock::now();
     std::cout << "Generating ref streams done!\n";
     std::cout << "Time for this step: "
@@ -139,7 +139,7 @@ void generate_streams_SPRING(
                                                                   grefs_start)
                      .count()
               << " s\n";
-
+    generated_aus result(descriptorRefFilesPerAUs, descriptorFilesPerAUs);
     if (preserve_quality || preserve_id) {
       std::cout << "Reordering and compressing quality and/or ids ...\n";
       auto rcqi_start = std::chrono::steady_clock::now();
@@ -161,7 +161,7 @@ void generate_streams_SPRING(
       num_blocks = 1 + (cp.num_reads-1)/cp.num_reads_per_block;
     else 
       num_blocks = 1 + (cp.num_reads/2-1)/cp.num_reads_per_block;
-    decompress(temp_dir, ref_descriptorFilesPerAUs, num_blocks, cp.preserve_order, cp.paired_end);
+    decompress(temp_dir, descriptorRefFilesPerAUs.getRefAus(), num_blocks, cp.preserve_order, cp.paired_end);
     auto decompression_end = std::chrono::steady_clock::now();
     std::cout << "Decompression done!\n";
     std::cout << "Time for this step: "
@@ -187,7 +187,7 @@ void generate_streams_SPRING(
                    .count()
             << " s\n";
 
-  return;
+  return result;
 }
 
 void call_reorder(const std::string &temp_dir, compression_params &cp) {

@@ -653,7 +653,7 @@ DataUnitAccessUnit* getDataUnitAccessUnit(DatasetContainer *datasetContainer, ui
     if(blocks != NULL){
         for(size_t block_i=0; block_i<getSize(blocks); block_i++){
             Block* block = getValue(blocks, block_i);
-            uint32_t blockSize = (uint32_t) (block->payload->endPos - block->payload->startPos);
+            uint32_t blockSize = (uint32_t) getBlockSize(block);
             DataUnitBlockHeader* blockHeader = initDataUnitBlockHeader(block->blockHeader->descriptorId, blockSize);
             if(block != NULL && blockHeader != NULL){
                 addBlockToDataUnitAccessUnit(dataUnitAccessUnit, block, blockHeader);

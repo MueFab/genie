@@ -40,7 +40,6 @@ uint32_t getPayloadSize(BlockHeader* blockHeader){
 BlockHeader* parseBlockHeader(DatasetContainer* datasetContainer, FILE* inputFile){
     uint8_t descritorIdAndPaddingFlagBuffer;
     uint32_t payloadSizeBuffer;
-    uint8_t buffer;
 
     bool descritorIdAndPaddingFlagSuccessfulRead =
             read(&descritorIdAndPaddingFlagBuffer, inputFile);
