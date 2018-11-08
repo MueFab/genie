@@ -5,13 +5,20 @@ branches:
 
 language: cpp
 
-os:
-  - linux
-  - osx
-
-compiler:
-  - gcc
-  - clang
+# Define the build matrix explicitly. Manually expanding the combinations
+# of (os, compiler, env) is more tedious, but grants far more flexibility.
+matrix:
+  include:
+    - os: linux
+      compiler: gcc
+      env: MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+      before_install: eval "${MATRIX_EVAL}"
+    - os: linux
+      compiler: clang
+    - os: osx
+      compiler: gcc
+    - os: osx
+      compiler: clang
 
 addons:
   apt:
@@ -27,12 +34,6 @@ addons:
     # update: true
     packages:
     - boost
-
-env:
-  - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
-
-before_install:
-  - eval "${MATRIX_EVAL}"
 
 before_script:
   - mkdir build
