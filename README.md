@@ -1,6 +1,6 @@
 # genie
 
-Open source MPEG-G encoder
+Open source MPEG-G codec
 
 ---
 
@@ -8,24 +8,10 @@ Open source MPEG-G encoder
 
 TBD
 
-## Development guide lines
+## Who do I talk to?
 
-### Build system
+Jan Voges <[voges@tnt.uni-hannover.de](mailto:voges@tnt.uni-hannover.de)>
 
-Please see ``documentation/development-guidelines/build-system.md``.
+Tom Paridaens <[tom.paridaens@ugent.be](mailto:tom.paridaens@ugent.be)>
 
-### Coding style
-
-Please see ``documentation/development-guidelines/coding-style.md``.
-
-### Documentation
-
-Please see ``documentation/development-guidelines/documentation.md``.
-
-### Test data
-
-Please see ``documentation/development-guidelines/test-data.md``.
-
-### Version control system
-
-Please see ``documentation/development-guidelines/version-control-system.md``.
+Mikel Hernaez <[mhernaez@illinois.edu](mhernaez@illinois.edu)>

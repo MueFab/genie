@@ -8,8 +8,6 @@ Conformance testing of a file with regard to the Google C++ Style Guide is done 
 
 Furthermore, we provide a cpplint configuration in the file ``source/CPPLINT.cfg``.
 
-The testing of the entire code tree is automated via the Bash script ``extras/run_cpplint.sh``. To add new files to the testing they have to be added manually to the file ``run_cpplint.sh``.
-
 ## Style guide
 
 The used coding style in a nutshell: look what's already there and try to use the same style.
@@ -33,6 +31,7 @@ using namespace gabac;  // forbidden!
 All file names have lower-case letters only. Words are separated by an underscore. C++ files end on `.cpp`, header files end on `.h`.
 
 #### Class names
+
 Class names are in CamelCase, starting with a Capital letter.
 
 #### Variable names
@@ -59,4 +58,4 @@ class DCTTransformCoding {...};  // no!
 
 ### Line length
 
-The maximal allowed line length is 80.
+The maximal allowed line length is 120.

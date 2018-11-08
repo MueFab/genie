@@ -7,25 +7,24 @@ cmake_minimum_required(VERSION 3.1)
 message(STATUS "CMake generator: ${CMAKE_GENERATOR}")
 
 # C++ code shall be compliant to C++11
+set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 11)
 
 # This is genie
 project("genie")
 
 # Custom CMake cache variables
-set(GENIE_BUILD_TESTS OFF CACHE BOOL "Build unit tests (target 'tests').")
-set(GENIE_DISABLE_ASSERTS OFF CACHE BOOL "Disable assert() statements.")
 set(GENIE_USE_OPENMP OFF CACHE BOOL "Use OpenMP parallelization.")
 message(STATUS "Custom CMake cache variables:")
-message(STATUS "GENIE_BUILD_TESTS=${GENIE_BUILD_TESTS}")
-message(STATUS "GENIE_DISABLE_ASSERTS=${GENIE_DISABLE_ASSERTS}")
 message(STATUS "GENIE_USE_OPENMP=${GENIE_USE_OPENMP}")
+
 
 #==============================================================================
 # Boost
 #==============================================================================
 
-find_package(Boost 1.58 COMPONENTS filesystem log program_options system REQUIRED)
+find_package(Boost 1.54 COMPONENTS filesystem log program_options system REQUIRED)
+
 
 #==============================================================================
 # OpenMP
@@ -35,51 +34,72 @@ if (${GENIE_USE_OPENMP})
     find_package(OpenMP REQUIRED)
 endif ()
 
+
+#==============================================================================
+# Build type
+#==============================================================================
+
+# Set default build type
+if (NOT CMAKE_BUILD_TYPE)
+    message(WARNING "Unsupported build type (CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})")
+    set(CMAKE_BUILD_TYPE Debug)
+    message(WARNING "Using default build type '${CMAKE_BUILD_TYPE}'")
+endif ()
+
+# Set build type-specific flags
+# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast")
+
+# Log the compiler flags for each build type
+message(STATUS "C++ compiler flags: ${CMAKE_CXX_FLAGS}")
+message(STATUS "Additional C++ compiler flags for build type 'Debug': ${CMAKE_CXX_FLAGS_DEBUG}")
+message(STATUS "Additional C++ compiler flags for build type 'Release': ${CMAKE_CXX_FLAGS_RELEASE}")
+message(STATUS "Additional C++ compiler flags for build type 'RelWithDebInfo': ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+message(STATUS "Additional C++ compiler flags for build type 'MinSizeRel': ${CMAKE_CXX_FLAGS_MINSIZEREL}")
+message(STATUS "Selected build type: ${CMAKE_BUILD_TYPE}")
+
+
 #==============================================================================
 # Google Test
 #==============================================================================
 
-if (${GENIE_BUILD_TESTS})
-    # Download and unpack googletest at configure time
-    configure_file(CMakeListsGoogleTest.txt.in googletest/download/CMakeLists.txt)
-    execute_process(
-        COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-        RESULT_VARIABLE result
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest/download
-    )
-    if (result)
-        message(FATAL_ERROR "CMake step for googletest failed: ${result}")
-    endif()
-    execute_process(
-        COMMAND ${CMAKE_COMMAND} --build .
-        RESULT_VARIABLE result
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest/download
-    )
-    if(result)
-        message(FATAL_ERROR "Build step for googletest failed: ${result}")
-    endif()
+# Download and unpack googletest at configure time
+configure_file(CMakeListsGoogleTest.txt.in googletest/download/CMakeLists.txt)
+execute_process(
+    COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+    RESULT_VARIABLE result
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest/download
+)
+if (result)
+    message(FATAL_ERROR "CMake step for googletest failed: ${result}")
+endif()
+execute_process(
+    COMMAND ${CMAKE_COMMAND} --build .
+    RESULT_VARIABLE result
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest/download
+)
+if(result)
+    message(FATAL_ERROR "Build step for googletest failed: ${result}")
+endif()
 
-    # Prevent overriding the parent project's compiler/linker settings on
-    # Windows
-    # set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+# Prevent overriding the parent project's compiler/linker settings on
+# Windows
+# set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
-    # Add googletest directly to our build and define the gtest and gtest_main
-    # targets.
-    add_subdirectory(
-        ${CMAKE_BINARY_DIR}/googletest/src
-        ${CMAKE_BINARY_DIR}/googletest/build
-        EXCLUDE_FROM_ALL
-    )
-endif ()
+# Add googletest directly to our build and define the gtest and gtest_main
+# targets.
+add_subdirectory(
+    ${CMAKE_BINARY_DIR}/googletest/src
+    ${CMAKE_BINARY_DIR}/googletest/build
+    EXCLUDE_FROM_ALL
+)
 
 
 #==============================================================================
 # Compiler
 #==============================================================================
 
+message(STATUS "CMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID})")
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    message(STATUS "C++ compiler: GNU Compiler Collection")
-    message(STATUS "Compiler ID: ${CMAKE_CXX_COMPILER_ID})")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
@@ -89,49 +109,15 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     message(STATUS "C++ compiler: LLVM Clang or Apple Clang")
-    message(STATUS "Compiler ID: ${CMAKE_CXX_COMPILER_ID})")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
-     message(STATUS "C++ compiler: Intel")
-     message(STATUS "Compiler ID: ${CMAKE_CXX_COMPILER_ID})")
      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    message(STATUS "C++ compiler: Microsoft Visual Studio")
-    message(STATUS "Compiler ID: ${CMAKE_CXX_COMPILER_ID})")
 else ()
     message(FATAL_ERROR "C++ compiler currently not supported by CMake build")
-    message(FATAL_ERROR "Compiler ID: ${CMAKE_CXX_COMPILER_ID})")
 endif ()
 
-
-#==============================================================================
-# Build type
-#==============================================================================
-
-# Detect the build type
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    message(STATUS "Build type: Debug")
-elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-    message(STATUS "Build type: Release")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG")
-elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-    message(STATUS "Build type: RelWithDebInfo")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG")
-elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
-    message(STATUS "Build type: MinSizeRel")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG")
-else ()
-    message(STATUS "Build type: None (CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})")
-endif ()
-
-# Log the compiler flags for each build type
-message(STATUS "C++ compiler flags for build type 'None': ${CMAKE_CXX_FLAGS}")
-message(STATUS "C++ compiler flags for build type 'Debug': ${CMAKE_CXX_FLAGS_DEBUG}")
-message(STATUS "C++ compiler flags for build type 'Release': ${CMAKE_CXX_FLAGS_RELEASE}")
-message(STATUS "C++ compiler flags for build type 'RelWithDebInfo': ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
-message(STATUS "C++ compiler flags for build type 'MinSizeRel': ${CMAKE_CXX_FLAGS_MINSIZEREL}")
 
 #==============================================================================
 # coding library
@@ -194,13 +180,13 @@ target_link_libraries(${coding} Boost::system)
 # format library
 #==============================================================================
 
-# Set our format paths
+# Set the paths
 set(format "format")
 set(format_source_dir ${CMAKE_SOURCE_DIR}/source/format)
 set(format_header_dir ${CMAKE_SOURCE_DIR}/source/format)
 set(format_include_dir ${CMAKE_SOURCE_DIR}/source/format ${CMAKE_SOURCE_DIR}/source)
 
-# List all source files
+# List all source files (alphabetically)
 set(format_source_files ${format_source_files} ${format_source_dir}/BoxesDefinitions/AccessUnit/AccessUnitContainer.c)
 set(format_source_files ${format_source_files} ${format_source_dir}/BoxesDefinitions/AccessUnit/AccessUnitHeader.c)
 set(format_source_files ${format_source_files} ${format_source_dir}/BoxesDefinitions/AccessUnit/AccessUnitInformation.c)
@@ -247,7 +233,7 @@ set(format_source_files ${format_source_files} ${format_source_dir}/utils.c)
 set(format_source_files ${format_source_files} ${format_source_dir}/vector.c)
 set(format_source_files ${format_source_files} ${format_source_dir}/VectorUint64.c)
 
-# List all header files
+# List all header files (alphabetically)
 set(format_header_files ${format_header_files} ${format_header_dir}/DataStructures/BitStreams/InputBitstream.h)
 set(format_header_files ${format_header_files} ${format_header_dir}/DataStructures/BitStreams/OutputBitstream.h)
 set(format_header_files ${format_header_files} ${format_header_dir}/DataStructures/Signatures/Signature.h)
@@ -267,45 +253,45 @@ set(format_header_files ${format_header_files} ${format_header_dir}/vector.h)
 set(format_header_files ${format_header_files} ${format_header_dir}/vectorUint64.h)
 
 # Group the source and header files
-source_group("Source Files" FILES ${format_source_files})
-source_group("Header Files" FILES ${format_header_files})
+source_group("format Source Files" FILES ${format_source_files})
+source_group("format Header Files" FILES ${format_header_files})
 
-# Set up the format target
+# Set up the target
 add_library(${format} STATIC ${format_source_files})
 target_include_directories(${format} PRIVATE ${format_include_dir})
+
 
 #==============================================================================
 # MPEGGFileCreation library
 #==============================================================================
 
-# Set our format paths
+# Set the paths
 set(MPEGGFileCreation "MPEGGFileCreation")
 set(MPEGGFileCreation_source_dir ${CMAKE_SOURCE_DIR}/source/utils/MPEGGFileCreation)
 set(MPEGGFileCreation_header_dir ${CMAKE_SOURCE_DIR}/source/utils/MPEGGFileCreation)
 set(MPEGGFileCreation_include_dir ${CMAKE_SOURCE_DIR}/source/utils/MPEGGFileCreation ${CMAKE_SOURCE_DIR}/source)
 
-# List all source files
+# List all source files (alphabetically)
 set(MPEGGFileCreation_source_files ${MPEGGFileCreation_source_files} ${MPEGGFileCreation_source_dir}/MPEGGFileCreator.cpp)
 
-
-# List all header files
+# List all header files (alphabetically)
 set(MPEGGFileCreation_header_files ${MPEGGFileCreation_header_files} ${MPEGGFileCreation_header_dir}/MPEGGFileCreator.h)
 
-
 # Group the source and header files
-source_group("Source Files" FILES ${format_source_files})
-source_group("Header Files" FILES ${format_header_files})
+source_group("MPEGGFileCreation Source Files" FILES ${MPEGGFileCreation_source_files})
+source_group("MPEGGFileCreation Header Files" FILES ${MPEGGFileCreation_header_files})
 
-# Set up the format target
+# Set up the target
 add_library(${MPEGGFileCreation} STATIC ${MPEGGFileCreation_source_files})
 target_include_directories(${MPEGGFileCreation} PRIVATE ${MPEGGFileCreation_include_dir})
 target_link_libraries(${MPEGGFileCreation} ${format})
+
 
 #==============================================================================
 # genie
 #==============================================================================
 
-# Set our genie paths
+# Set the paths
 set(genie "genie")
 set(genie_source_dir ${CMAKE_SOURCE_DIR}/source)
 set(genie_header_dir ${CMAKE_SOURCE_DIR}/source)
@@ -326,15 +312,15 @@ set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/generatio
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/ProgramOptions.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/utilities.cc)
 
-# Group the source and header files
-source_group("Source Files" FILES ${gabac_source_files})
-# source_group("Header Files" FILES ${gabac_header_files})
+# List all header files (alphabetically)
+# TBD
 
-# Set up the genie target
+# Group the source and header files
+source_group("genie Source Files" FILES ${genie_source_files})
+# source_group("genie Header Files" FILES ${genie_header_files})
+
+# Set up the target
 add_executable(${genie} ${genie_source_files})
-if (${GENIE_DISABLE_ASSERTS})
-    target_compile_definitions(${genie} PRIVATE NDEBUG)
-endif ()
 if (${GENIE_USE_OPENMP})
     target_compile_definitions(${genie} PRIVATE GENIE_USE_OPENMP)
 endif ()
@@ -357,8 +343,8 @@ target_link_libraries(${genie} ${coding})
 # tests
 #==============================================================================
 
-if (${GENIE_BUILD_TESTS})
-    # Set our tests paths
+# if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    # Set the paths
     set(tests "tests")
     set(tests_source_dir ${CMAKE_SOURCE_DIR}/tests)
     set(tests_header_dir ${CMAKE_SOURCE_DIR}/tests)
@@ -366,22 +352,22 @@ if (${GENIE_BUILD_TESTS})
 
     # List all source files (alphabetically)
     set(tests_source_files ${tests_source_files} ${tests_source_dir}/main.cpp)
+    set(tests_source_files ${tests_source_files} ${tests_source_dir}/example_test.cpp)
     set(tests_source_files ${tests_source_files} ${tests_source_dir}/format/EncodingParameters_tests.cpp)
-    set(tests_source_files ${tests_source_files} ${tests_source_dir}/format/example_test.cpp)
     set(tests_source_files ${tests_source_files} ${tests_source_dir}/utils/MPEGGFileCreation/MPEGGFileCreatorTest.cpp)
 
     # List all header files (alphabetically)
-    # set(tests_header_files ${tests_header_files} ${tests_header_dir}/whatever.h)
+    # TBD
 
     # Group the source and header files
-    source_group("Source Files" FILES ${tests_source_files})
-    # source_group("Header Files" FILES ${tests_header_files})
+    source_group("tests Source Files" FILES ${tests_source_files})
+    # source_group("tests Header Files" FILES ${tests_header_files})
 
-    # Set up the tests target
+    # Set up the target
     add_executable(${tests} EXCLUDE_FROM_ALL ${tests_source_files})
     target_include_directories(${tests} PRIVATE ${genie_include_dir})
     target_include_directories(${tests} PRIVATE ${CMAKE_BINARY_DIR})
     target_link_libraries(${tests} gtest_main)
     target_link_libraries(${tests} ${format})
     target_link_libraries(${tests} ${MPEGGFileCreation})
-endif ()
+# endif ()
