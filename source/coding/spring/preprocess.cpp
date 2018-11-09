@@ -55,7 +55,8 @@ void preprocess(dsg::input::fastq::FastqFileReader *fastqFileReader1,
 //  } else {
     for (int j = 0; j < 2; j++) {
       if (j == 1 && !cp.paired_end) continue;
-      fout_clean[j].open(outfileclean[j]);
+      //fout_clean[j].open(outfileclean[j]);
+      fout_clean[j] = std::ofstream(outfileclean[j]);
       fout_N[j].open(outfileN[j]);
       fout_order_N[j].open(outfileorderN[j], std::ios::binary);
 //      if (!cp.preserve_order) {

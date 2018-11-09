@@ -82,7 +82,7 @@ bool writeBlock(Block* block, FILE* outputFile){
             }
             bool paddingBytesSuccessfulWrite = true;
             for(uint32_t i=0; i<block->padding_size; i++){
-                bool paddingByteSuccessfulWrite = write(0,outputFile);
+                bool paddingByteSuccessfulWrite = writeUint8(0,outputFile);
                 if (!paddingByteSuccessfulWrite){
                     paddingBytesSuccessfulWrite = false;
                     break;
@@ -149,7 +149,11 @@ uint64_t getBlockSize(Block* block){
             blockSize += getFromFileSize(getValue(block->payload, subsequence_i));
         }
     }
-    blockSize += getFromFileSize(getValue(block->payload, numberSubsequences-1));
+
+    FromFile* lastDescriptor = getValue(block->payload, numberSubsequences-1);
+    if(lastDescriptor != NULL) {
+        blockSize += getFromFileSize(getValue(block->payload, numberSubsequences - 1));
+    }
 
     if(block->blockHeader != NULL){
         if(isPaddingFlagSet(block->blockHeader)){
