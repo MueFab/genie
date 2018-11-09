@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 
 #include "descriptors/spring/pe_encode.h"
 #include "descriptors/spring/util.h"
@@ -14,8 +15,8 @@ void pe_encode(const std::string &temp_dir, const compression_params &cp) {
   std::string basedir = temp_dir;
   std::string file_order = basedir + "/read_order.bin";
   std::string file_order_single = basedir + "/read_order_single.bin";
-  // this file is used for reordering ids and quality 
-  // this will just store numreads/2 values as the reordering of both files is same 
+  // this file is used for reordering ids and quality
+  // this will just store numreads/2 values as the reordering of both files is same
   // also used for generate new fastq
 
   uint32_t *order_array = new uint32_t[numreads];
