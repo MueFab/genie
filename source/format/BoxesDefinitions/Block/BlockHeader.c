@@ -40,10 +40,9 @@ uint32_t getPayloadSize(BlockHeader* blockHeader){
 BlockHeader* parseBlockHeader(DatasetContainer* datasetContainer, FILE* inputFile){
     uint8_t descritorIdAndPaddingFlagBuffer;
     uint32_t payloadSizeBuffer;
-    uint8_t buffer;
 
     bool descritorIdAndPaddingFlagSuccessfulRead =
-            read(&descritorIdAndPaddingFlagBuffer, inputFile);
+            readUint8(&descritorIdAndPaddingFlagBuffer, inputFile);
     if(!descritorIdAndPaddingFlagSuccessfulRead){
         fprintf(stderr, "Error reading descriptor Id or padding flag.\n");
         return NULL;
@@ -68,7 +67,7 @@ bool writeBlockHeader(
     FILE* outputFile
 ){
     uint8_t descriptorIdAndPaddingFlag = (blockHeader->descriptorId<<1 | (uint8_t) (blockHeader->paddingFlag?1:0));
-    bool descriptorIdAndPaddingFlagSuccessfulWrite = write(descriptorIdAndPaddingFlag, outputFile);
+    bool descriptorIdAndPaddingFlagSuccessfulWrite = writeUint8(descriptorIdAndPaddingFlag, outputFile);
     bool payloadSizeSuccessfulWrite = writeBigEndian32ToFile(blockHeader->payloadSize, outputFile);
     if(
         !descriptorIdAndPaddingFlagSuccessfulWrite ||

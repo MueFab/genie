@@ -86,7 +86,7 @@ bool writeDatasetsGroupReferenceGenomeContent(
         DatasetsGroupReferenceGenome* datasetsGroupReferenceGenome,
         FILE *outputFile
 ){
-    bool referenceIdSuccessfulWrite = write(datasetsGroupReferenceGenome->referenceId, outputFile);
+    bool referenceIdSuccessfulWrite = writeUint8(datasetsGroupReferenceGenome->referenceId, outputFile);
 
     size_t referenceNameSize = strlen(datasetsGroupReferenceGenome->referenceName);
     bool referenceNameWriteSuccessfulWrite =
@@ -133,7 +133,7 @@ bool writeDatasetsGroupReferenceGenomeContent(
 
 
     uint8_t isExternalFlagValue = datasetsGroupReferenceGenome->isExternal ? (uint8_t)1:(uint8_t)0;
-    if (!write(isExternalFlagValue,outputFile)){
+    if (!writeUint8(isExternalFlagValue,outputFile)){
         fprintf(stderr,"Error external uri.\n");
         return false;
     }
@@ -147,13 +147,13 @@ bool writeDatasetsGroupReferenceGenomeContent(
             return false;
         }
         bool externalDatasetGroupIdSuccessfulWrite =
-                write(datasetsGroupReferenceGenome->externalReference.externalDatasetGroupId,
+                writeUint8(datasetsGroupReferenceGenome->externalReference.externalDatasetGroupId,
                                           outputFile);
         bool externalDatasetIdSuccessfulWrite =
                 writeBigEndian16ToFile(datasetsGroupReferenceGenome->externalReference.externalDatasetId, outputFile);
 
         bool checksumAlgorithmSuccessfulWrite =
-                write(datasetsGroupReferenceGenome->externalReference.checksumAlgorithm, outputFile);
+                writeUint8(datasetsGroupReferenceGenome->externalReference.checksumAlgorithm, outputFile);
         size_t checksumSize = datasetsGroupReferenceGenome->externalReference.checksumAlgorithm? 32:16;
         for(size_t seq_i = 0; seq_i < seq_count; seq_i++) {
             //todo add error check
@@ -172,7 +172,7 @@ bool writeDatasetsGroupReferenceGenomeContent(
             return false;
         }
     }else{
-        bool datasetGroupIdSuccessfulWrite = write(datasetsGroupReferenceGenome->internalRefDatasetGroupId, outputFile)==1;
+        bool datasetGroupIdSuccessfulWrite = writeUint8(datasetsGroupReferenceGenome->internalRefDatasetGroupId, outputFile)==1;
         bool datasetIdSuccessfulWrite =
                 writeBigEndian16ToFile(datasetsGroupReferenceGenome->internalRefDatasetId, outputFile);
         if(!datasetGroupIdSuccessfulWrite || !datasetIdSuccessfulWrite){
@@ -240,7 +240,7 @@ DatasetsGroupReferenceGenome *parseDatasetsGroupReferenceGenome(FILE *inputFile)
     uint16_t referenceMinorVersion = 0;
     uint16_t referencePatchVersion = 0;
 
-    bool referenceIdSuccessfulRead = read(&referenceIdBuffer,inputFile);
+    bool referenceIdSuccessfulRead = readUint8(&referenceIdBuffer,inputFile);
     bool referenceNameSuccessfulRead = getdelim(&referenceNameBuffer,&referenceNameBufferSize,'\0',inputFile)!=-1;
 
     if (!referenceIdSuccessfulRead || !referenceNameSuccessfulRead) {
@@ -304,7 +304,7 @@ DatasetsGroupReferenceGenome *parseDatasetsGroupReferenceGenome(FILE *inputFile)
     }
 
     uint8_t isExternalFlagValue;
-    if(!read(&isExternalFlagValue, inputFile)){
+    if(!readUint8(&isExternalFlagValue, inputFile)){
         fprintf(stderr,"Error reading reference genome external flag.\n");
         for(uint32_t seq_i=0; seq_i<seqCountBuffer; seq_i++) {
             void* value = getValue(sequenceNames, seq_i);
@@ -331,11 +331,11 @@ DatasetsGroupReferenceGenome *parseDatasetsGroupReferenceGenome(FILE *inputFile)
             return NULL;
         };
         DatasetGroupId datasetGroupId;
-        bool datasetGroupIdSuccessfulRead = read(&datasetGroupId, inputFile);
+        bool datasetGroupIdSuccessfulRead = readUint8(&datasetGroupId, inputFile);
         DatasetId datasetId;
         bool datasetIdSuccessfulRead = readBigEndian16FromFile(&datasetId, inputFile);
         uint8_t checksumAlgorithmBuffer;
-        bool checksumAlgorithmSuccessfulRead = read(&checksumAlgorithmBuffer, inputFile);
+        bool checksumAlgorithmSuccessfulRead = readUint8(&checksumAlgorithmBuffer, inputFile);
 
         Vector* checksums = initVector();
         for(uint32_t seq_i=0; seq_i<seqCountBuffer; seq_i++) {
@@ -374,7 +374,7 @@ DatasetsGroupReferenceGenome *parseDatasetsGroupReferenceGenome(FILE *inputFile)
 
     DatasetGroupId internalDatasetGroupId;
     DatasetId internalDatasetId;
-    bool internalDatasetGroupIdSuccessfulRead = read(&internalDatasetGroupId, inputFile);
+    bool internalDatasetGroupIdSuccessfulRead = readUint8(&internalDatasetGroupId, inputFile);
     bool internalDatasetIdSuccessfulRead = readBigEndian16FromFile(&internalDatasetId, inputFile);
     if (!internalDatasetGroupIdSuccessfulRead || !internalDatasetIdSuccessfulRead) {
         fprintf(stderr,"Error reading internal reference.\n");

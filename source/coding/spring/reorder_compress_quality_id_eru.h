@@ -2,7 +2,7 @@
 #define SPRING_REORDER_COMPRESS_QUALITY_ID_ERU_H_
 
 #include <string>
-#include "descriptors/spring/util.h"
+#include "spring/util.h"
 
 namespace spring {
 

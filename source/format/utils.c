@@ -154,7 +154,7 @@ bool readBoxHeader(FILE *input_file, char *type, uint64_t *boxSize) {
     return sizeReadType == 4 && sizeReadBoxSize == 1;
 }
 
-bool read(uint8_t* value, FILE *inputFile){
+bool readUint8(uint8_t* value, FILE *inputFile){
     return fread(value,sizeof(uint8_t),1,inputFile)==1;
 }
 
@@ -204,7 +204,7 @@ bool readChars(char* charArray, uint32_t charArrayLength, FILE* inputFile) {
     return fread(charArray, sizeof(char), charArrayLength, inputFile)==charArrayLength;
 }
 
-bool write(uint8_t value, FILE* outputFile){
+bool writeUint8(uint8_t value, FILE* outputFile){
     return fwrite(&value, sizeof(value),1,outputFile)==1;
 }
 

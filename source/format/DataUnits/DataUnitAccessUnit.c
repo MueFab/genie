@@ -77,7 +77,7 @@ uint32_t getDataUnitAccessUnitSize(DataUnitAccessUnit* dataUnitAccessUnit, bool 
 }
 
 bool writeDataUnitAccessUnit(DataUnitAccessUnit* dataUnitAccessUnit, bool multipleAlignmentsFlag, FILE* outputFile){
-    bool dataUnitAccessUnitTypeSuccessfulWrite = write(2, outputFile);
+    bool dataUnitAccessUnitTypeSuccessfulWrite = writeUint8(2, outputFile);
 
     uint32_t contentSize = getDataUnitAccessUnitSize(dataUnitAccessUnit, multipleAlignmentsFlag);
     bool contentSizeSuccessfulWrite = writeBigEndian32ToFile(contentSize<<3, outputFile);

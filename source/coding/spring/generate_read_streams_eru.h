@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "descriptors/spring/util.h"
+#include "spring/util.h"
 
 namespace spring {
 

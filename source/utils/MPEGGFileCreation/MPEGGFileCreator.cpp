@@ -5,6 +5,8 @@
 #include <string>
 #include <cstring>
 #include <vector>
+#include <coding/CoderConstants.h>
+#include <coding/ReturnStructures.h>
 #include "MPEGGFileCreator.h"
 
 
@@ -189,14 +191,27 @@ AccessUnitContainer * AccessUnit::createAccessUnitContainer(DatasetContainer *da
 
     setAccessUnitContainerHeader(accessUnitContainer, accessUnitHeader);
     for(auto& entryBlockList : blocksList){
-        FromFile* data = initFromFileWithFilename(entryBlockList.second.c_str());
+        Vector* payloads = initVector();
+        uint8_t numberSubstreamsForDescriptor = numberOfDescriptorSubsequences[entryBlockList.first];
+        //todo add check for variable cases
+
+        for(uint8_t substreamId=0; substreamId<numberSubstreamsForDescriptor; substreamId++){
+
+            const auto& entryForSubstream = entryBlockList.second.find(substreamId);
+            if(entryForSubstream == entryBlockList.second.end()){
+                pushBack(payloads, nullptr);
+            }else{
+                pushBack(payloads, initFromFileWithFilename(entryForSubstream->second.c_str()));
+            }
+        }
+
+        Block* block = initBlockMultiplePayloads(datasetContainer, payloads);
         BlockHeader* blockHeader = initBlockHeader(
                 datasetContainer,
                 entryBlockList.first,
                 false,
-                (uint32_t)getFromFileSize(data)
+                (uint32_t)getBlockSize(block)
         );
-        Block* block = initBlock(datasetContainer, data);
         setBlockHeader(block, blockHeader);
         addBlock(accessUnitContainer, block);
     }
@@ -204,7 +219,7 @@ AccessUnitContainer * AccessUnit::createAccessUnitContainer(DatasetContainer *da
     return accessUnitContainer;
 }
 
-AccessUnit::AccessUnit(const std::map<uint8_t, std::string> &blocksList, uint32_t accessUnitId,
+AccessUnit::AccessUnit(const std::map<uint8_t, std::map<uint8_t, std::string>> &blocksList, uint32_t accessUnitId,
                        uint16_t parameter_set_id, uint8_t au_type, uint64_t start, uint64_t end) : blocksList(
         blocksList), accessUnitId(accessUnitId), parameter_set_id(parameter_set_id), au_type(au_type), start(start),
                                                                                                    end(end) {}
@@ -439,4 +454,214 @@ bool MPEGGFileCreator::write(const std::string &filename) {
     }
 }
 
-//addDatasetsContainer(datasetsGroupContainer, datasetContainer);
+InternalReference::InternalReference(
+        const std::string &referenceURI,
+        const std::string &sequenceName,
+        DatasetGroupId datasetGroupId,
+        DatasetId  datasetId,
+        ReferenceId referenceId,
+        const generated_aus_ref & generatedAusRef
+) {
+    char* refURI = (char*)calloc(100,sizeof(char));
+    referenceURI.copy(refURI,99);
+    InternalReference::datasetId = datasetId;
+    InternalReference::referenceId = referenceId;
+
+
+    referenceGenome = initDatasetsGroupReferenceGenome(
+            datasetGroupId,
+            datasetId,
+            referenceId,
+            refURI,
+            1,
+            2,
+            3
+    );
+    resizeSequences(referenceGenome, 1);
+    char* sequenceNameBuffer = (char*)calloc(100,sizeof(char));
+    sequenceName.copy(sequenceNameBuffer,99);
+    setSequenceName(referenceGenome,0, sequenceNameBuffer);
+
+}
+
+void InternalReference::addAsDatasetToDatasetGroup(
+        DatasetsGroupContainer* datasetsGroupContainer,
+        DatasetGroupId datasetGroupId
+){
+    DatasetContainer* datasetContainer = initDatasetContainer();
+
+
+    DatasetId datasetId = InternalReference::datasetId;
+    char version[]="1900";
+    bool unmapped_indexing_flag = false;
+    bool byteOffsetSizeFlag = false;
+    bool posOffsetIsUint40 = false;
+    bool nonOverlappingAURange = true;
+    bool blockHeaderFlag = true;
+    uint16_t sequencesCount = 0;
+    ReferenceId referenceId = InternalReference::referenceId;
+    uint8_t datasetType = 2;
+    uint8_t numClasses = 1;
+    uint8_t alphabetId = 0;
+    uint32_t numUClusters = 0;
+    bool uSignatureConstantLength = true;
+    uint8_t uSignatureSize = 0;
+    uint8_t uSignatureLength = 0;
+    auto numberUAccessUnits = (uint32_t) referenceFiles.size();
+    bool multipleAlignmentFlag = false;
+    uint32_t multipleSignatureBase = 0;
+
+    DatasetHeader* datasetHeader = initDatasetHeader(
+            datasetGroupId, datasetId, version, unmapped_indexing_flag, byteOffsetSizeFlag, posOffsetIsUint40,
+            nonOverlappingAURange, blockHeaderFlag, sequencesCount, referenceId, datasetType, numClasses, alphabetId,
+            numUClusters, uSignatureConstantLength, uSignatureSize, uSignatureLength, numberUAccessUnits,
+            multipleAlignmentFlag, multipleSignatureBase
+    );
+
+    setMITFlag(datasetHeader, false);
+
+
+    setThresholdForSequence(datasetHeader, 0,0);
+
+    std::set<uint8_t> existingDescriptors;
+    for(const auto &descriptorMapInAU : referenceFiles){
+        for(const auto &subdescriptorInDescriptorMap : descriptorMapInAU){
+            existingDescriptors.insert(subdescriptorInDescriptorMap.first);
+        }
+    }
+    setNumberDescriptorsInClass(datasetHeader, 0, static_cast<uint8_t>(existingDescriptors.size()));
+
+    uint8_t descriptorIndex = 0;
+    for(uint8_t descriptorId : existingDescriptors){
+        setDescriptorIdInClass(datasetHeader, 0, descriptorIndex, descriptorId);
+        descriptorIndex++;
+    }
+
+    setDatasetHeader(datasetContainer, datasetHeader);
+
+    uint32_t access_unit_ID = 0;
+
+    for (auto & filesInAu : referenceFiles) {
+        AccessUnitContainer* accessUnitContainer = initAccessUnitContainer(datasetContainer);
+
+        uint8_t num_blocks = 1;
+        uint16_t parameter_set_ID = 0;
+        uint8_t au_type = 1;
+        uint32_t reads_count = 1;
+        uint16_t mm_threshold = 0;
+        uint32_t mm_count = 0;
+
+        AccessUnitHeader* accessUnitHeader = initAccessUnitHeaderWithValues(
+                datasetContainer,
+                access_unit_ID,
+                num_blocks,
+                parameter_set_ID,
+                au_type,
+                reads_count,
+                mm_threshold,
+                mm_count
+        );
+        setReferenceSequenceId(
+                accessUnitHeader,
+                1
+        );
+        setReferenceStartPosition(
+                accessUnitHeader,
+                accessUnitsStarts[access_unit_ID]
+        );
+        setReferenceEndPosition(
+                accessUnitHeader,
+                accessUnitsEnds[access_unit_ID]
+        );
+        setAccessUnitContainerHeader(accessUnitContainer, accessUnitHeader);
+
+        for(const auto& filesInDescriptorInAu : filesInAu){
+            uint8_t descriptorId = filesInDescriptorInAu.first;
+
+            Vector* subsequencesDescriptor = initVector();
+            uint32_t payloadSize = 0;
+
+            uint8_t expectedNumberOfDescriptorSubsequences = numberOfDescriptorSubsequences[descriptorId];
+            //todo check if expectedNumberOfDescriptorSubsequences is 0, if it is correct
+
+            for(
+                uint8_t descriptorSubsequence_index = 0;
+                descriptorSubsequence_index<expectedNumberOfDescriptorSubsequences;
+                descriptorSubsequence_index++
+            ){
+                if(descriptorSubsequence_index != expectedNumberOfDescriptorSubsequences-1){
+                    payloadSize += 4;
+                }
+                auto entryForDescriptorSubsequence = filesInDescriptorInAu.second.find(descriptorSubsequence_index);
+                if(
+                    entryForDescriptorSubsequence != filesInDescriptorInAu.second.end()
+                ){
+                    FromFile* subsequencePayload =
+                            initFromFileWithFilename(entryForDescriptorSubsequence->second.c_str());
+                    payloadSize += getFromFileSize(subsequencePayload);
+                    pushBack(subsequencesDescriptor, subsequencePayload);
+                }else{
+                    pushBack(subsequencesDescriptor, nullptr);
+                }
+            }
+
+            Block* block = initBlockMultiplePayloads(datasetContainer, subsequencesDescriptor);
+
+
+            bool paddingFlag = false;
+
+            BlockHeader* blockHeader = initBlockHeader(
+                    datasetContainer,
+                    descriptorId,
+                    paddingFlag,
+                    payloadSize
+            );
+            setBlockHeader(block, blockHeader);
+
+            addBlock(accessUnitContainer, block);
+
+        }
+
+
+        addAccessUnitToDataset(datasetContainer, accessUnitContainer);
+        access_unit_ID++;
+    }
+    addDatasetsContainer(datasetsGroupContainer, datasetContainer);
+}
+
+
+DatasetsGroupReferenceGenome *InternalReference::getReferenceGenome() {
+    return referenceGenome;
+}
+
+DatasetId InternalReference::getDatasetId() const {
+    return datasetId;
+}
+
+ReferenceId InternalReference::getReferenceId() const {
+    return referenceId;
+}
+
+InternalReference DatasetGroup::addInternalReference(
+        std::string referenceURI,
+        std::string sequenceName,
+        const generated_aus_ref & generatedAusRef
+){
+    InternalReference internalReference(
+            referenceURI,
+            sequenceName,
+            id,
+            datasetsCreated,
+            referenceId,
+            generatedAusRef
+    );
+    datasetsCreated++;
+    referenceId++;
+
+
+    internalReference.addAsDatasetToDatasetGroup(getDatasetsGroupContainer(), id);
+    Vector* referenceGenomeVector = initVector();
+    pushBack(referenceGenomeVector, internalReference.getReferenceGenome());
+    setDatasetsGroupReferenceGenomes(datasetsGroupContainer, referenceGenomeVector);
+    return internalReference;
+}
