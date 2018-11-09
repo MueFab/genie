@@ -14,10 +14,11 @@
 
 
 #include "genie/ProgramOptions.h"
+#include <vector>
+#include <map>
 
 
 namespace dsg {
-
 
 void generation(
     const ProgramOptions& programOptions);

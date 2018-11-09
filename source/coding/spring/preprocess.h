@@ -2,7 +2,7 @@
 #define SPRING_PREPROCESS_H_
 
 #include <string>
-#include "descriptors/spring/util.h"
+#include "spring/util.h"
 #include "fileio/fastq_file_reader.h"
 
 namespace spring {

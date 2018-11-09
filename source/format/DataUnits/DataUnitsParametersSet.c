@@ -8,7 +8,7 @@
 #include "DataUnits.h"
 
 bool writeParametersSet(ParametersSet *parametersSet, FILE* outputFile){
-    bool typeSuccessfulWrite = write(1,outputFile);
+    bool typeSuccessfulWrite = writeUint8(1,outputFile);
     bool parametersSetSuccessfulWrite = writeBigEndian32ToFile(8, outputFile);
     OutputBitstream outputBitstream;
     if(typeSuccessfulWrite || parametersSetSuccessfulWrite || initializeOutputBitstream(&outputBitstream, outputFile)) {

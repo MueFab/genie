@@ -14,6 +14,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <utils/MPEGGFileCreation/MPEGGFileCreator.h>
 
 #include "genie/exceptions.h"
 #include "fileio/fasta_file_reader.h"
@@ -22,7 +23,7 @@
 #include "fileio/fastq_record.h"
 #include "fileio/sam_file_reader.h"
 #include "fileio/sam_record.h"
-#include "descriptors/spring/spring.h"
+#include "coding/spring/spring.h"
 
 namespace dsg {
 
@@ -134,7 +135,7 @@ static void generationFromFastq(
 }
 
 
-static void generationFromFastq_SPRING(
+static generated_aus generationFromFastq_SPRING(
     const ProgramOptions& programOptions)
 {
     std::cout << std::string(80, '-') << std::endl;
@@ -146,11 +147,11 @@ static void generationFromFastq_SPRING(
     input::fastq::FastqFileReader fastqFileReader1(programOptions.inputFilePath);
     std::cout << "Calling SPRING" << std::endl;
     if (programOptions.inputFilePairPath.empty()) {
-        spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader1, programOptions.numThreads, paired_end, programOptions.workingDirectory);
+        return spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader1, programOptions.numThreads, paired_end, programOptions.workingDirectory);
     } else {
         paired_end = true;
         input::fastq::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath);
-        spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader2, programOptions.numThreads, paired_end, programOptions.workingDirectory);
+        return spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader2, programOptions.numThreads, paired_end, programOptions.workingDirectory);
     }
 }
 
@@ -203,15 +204,96 @@ void generation(
     if (programOptions.inputFileType == "FASTA") {
         generationFromFasta(programOptions);
     } else if (programOptions.inputFileType == "FASTQ") {
-        if (programOptions.readAlgorithm == "HARC")
-           generationFromFastq_SPRING(programOptions);
-        else
-           generationFromFastq(programOptions);
+        if (programOptions.readAlgorithm == "HARC") {
+            auto generated_aus = generationFromFastq_SPRING(programOptions);
+            MPEGGFileCreator mpeggFileCreator;
+            DatasetGroup* datasetGroup = mpeggFileCreator.addDatasetGroup();
+            datasetGroup->addInternalReference("test","test",generated_aus.getGeneratedAusRef());
+
+            std::vector<Class_type> existing_classes;
+            existing_classes.push_back(CLASS_U);
+
+            std::set<uint8_t> descriptorsUsed;
+            for(const auto & auEntry : generated_aus.getEncodedFastqAus()){
+                for(const auto & descriptorFileEntry : auEntry){
+                    descriptorsUsed.insert(descriptorFileEntry.first);
+                }
+            }
+
+            std::map<Class_type, std::vector<uint8_t>> descriptorsIdPerClass;
+            for(uint8_t descriptorUsed : descriptorsUsed){
+                descriptorsIdPerClass[CLASS_U].push_back(descriptorUsed);
+            }
+
+            std::map<uint16_t, std::map<Class_type, std::vector<AccessUnit>>> accessUnitsAligned;
+            std::vector<AccessUnit> accessUnitsUnaligned;
+            for(const auto & auEntry : generated_aus.getEncodedFastqAus()){
+                accessUnitsUnaligned.push_back(AccessUnit(
+                    auEntry,
+                    0,
+                    0,
+                    CLASS_U,
+                    0,
+                    0
+                ));
+            }
+            std::ofstream fakeParameters("fakePayload1");
+            fakeParameters << "fakePayload1";
+            fakeParameters.close();
+
+            std::vector<std::string> parametersFilenames = {"fakePayload1"};
+
+            datasetGroup->addDatasetData(
+                    existing_classes,
+                    descriptorsIdPerClass,
+                    accessUnitsAligned,
+                    accessUnitsUnaligned,
+                    parametersFilenames
+            );
+
+
+        }else {
+            generationFromFastq(programOptions);
+        }
     } else if (programOptions.inputFileType == "SAM") {
         generationFromSam(programOptions);
     } else {
         throwRuntimeError("wrong input file type");
     }
+}
+
+void fastqSpringResultToFile(generated_aus generatedAus){
+    MPEGGFileCreator fileCreator;
+    DatasetGroup* datasetGroup1 = fileCreator.addDatasetGroup();
+
+    datasetGroup1->addInternalReference("ref1","seq1", generatedAus.getGeneratedAusRef());
+
+    std::vector<Class_type> existing_classes;
+    existing_classes.push_back(CLASS_P);
+    existing_classes.push_back(CLASS_M);
+
+    std::map<Class_type, std::vector<uint8_t>> descriptorsIdPerClass;
+    descriptorsIdPerClass[CLASS_P].push_back(0);
+    descriptorsIdPerClass[CLASS_P].push_back(1);
+    descriptorsIdPerClass[CLASS_M].push_back(0);
+    descriptorsIdPerClass[CLASS_M].push_back(1);
+
+
+    std::map<uint16_t, std::map<Class_type, std::vector<AccessUnit>>> accessUnitsAligned;
+    std::vector<AccessUnit> accessUnitsUnaligned;
+
+    for(const auto& accessUnitEntry : generatedAus.getEncodedFastqAus()) {
+        accessUnitsUnaligned.emplace_back(
+                accessUnitEntry,
+                0,
+                0,
+                CLASS_U,
+                0,
+                0
+        );
+    }
+
+    fileCreator.write("testOutput0");
 }
 
 

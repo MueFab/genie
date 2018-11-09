@@ -10,8 +10,8 @@
 #include <vector>
 #include <map>
 
-#include "descriptors/spring/generate_read_streams_eru.h"
-#include "descriptors/spring/util.h"
+#include "spring/generate_read_streams_eru.h"
+#include "spring/util.h"
 
 namespace spring {
 

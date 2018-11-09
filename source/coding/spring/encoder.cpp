@@ -1,4 +1,4 @@
-#include "descriptors/spring/encoder.h"
+#include "spring/encoder.h"
 // #include <omp.h>
 #include <algorithm>
 #include <array>

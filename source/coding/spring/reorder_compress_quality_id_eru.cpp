@@ -9,9 +9,9 @@
 #include <string>
 #include <vector>
 
-#include "descriptors/spring/reorder_compress_quality_id_eru.h"
-#include "descriptors/spring/id_tokenization.h"
-#include "descriptors/spring/util.h"
+#include "spring/reorder_compress_quality_id_eru.h"
+#include "spring/id_tokenization.h"
+#include "spring/util.h"
 
 namespace spring {
 

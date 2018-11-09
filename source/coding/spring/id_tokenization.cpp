@@ -1,5 +1,5 @@
-#include "descriptors/spring/id_tokenization.h"
-#include "descriptors/spring/util.h"
+#include "spring/id_tokenization.h"
+#include "spring/util.h"
 #include <stdexcept>
 #include <string>
 #include <vector>

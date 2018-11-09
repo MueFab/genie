@@ -1,5 +1,5 @@
-#include "descriptors/spring/bitset_util.h"
-#include "descriptors/spring/params.h"
+#include "spring/bitset_util.h"
+#include "spring/params.h"
 
 namespace spring {
 

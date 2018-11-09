@@ -1,12 +1,13 @@
 #include <string>
 #include <vector>
+#include <map>
 #include <algorithm>
 #include <stdexcept>
 #include <fstream>
 #include <iostream>
-#include "descriptors/spring/util.h"
-#include "descriptors/spring/decode_eru.h"
-#include "descriptors/spring/id_tokenization.h"
+#include "spring/util.h"
+#include "spring/decode_eru.h"
+#include "spring/id_tokenization.h"
 #include "fileio/fastq_record.h"
 
 namespace spring {
@@ -165,7 +166,19 @@ std::string decode_type_U(std::vector<int64_t>::const_iterator &subseq_6_0_it, u
   return cur_read;
 }
 
-void decompress(const std::string &temp_dir, uint32_t num_blocks, bool eru_abs_flag, bool paired_end) {
+std::string decode_ref_AU (const std::vector<int64_t> &subseq_6_0, const std::vector<int64_t> &subseq_7_0) {
+  // int_to_char
+  char int_to_char[5] = {'A','C','G','T','N'};
+  std::string ref;
+  auto subseq_6_0_it = subseq_6_0.begin();
+  for (auto rlen: subseq_7_0) {
+    for (uint64_t i = 0; i < rlen; i++)
+      ref.push_back(int_to_char[*(subseq_6_0_it++)]);
+  }
+  return ref;
+}
+
+void decompress(const std::string &temp_dir, const std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> &ref_descriptorFilesPerAU, uint32_t num_blocks, bool eru_abs_flag, bool paired_end) {
   std::string basedir = temp_dir;
   std::string file_subseq_0_0 = basedir + "/subseq_0_0";
   std::string file_subseq_1_0 = basedir + "/subseq_1_0";
@@ -182,10 +195,17 @@ void decompress(const std::string &temp_dir, uint32_t num_blocks, bool eru_abs_f
   std::string file_subseq_12_0 = basedir + "/subseq_12_0";
   std::string file_quality = basedir + "/quality";
   std::string file_id = basedir + "/id";
-  std::string file_ref = basedir + "/read_seq.txt";
   std::string file_decompressed_fastq = basedir + "/decompressed.fastq";
-  std::string ref = read_file_as_string(file_ref);
+  
+  // decode ref
+  std::string ref;
+  for (auto listDescriptorFiles: ref_descriptorFilesPerAU) {
+    auto subseq_6_0 = read_vector_from_file(listDescriptorFiles[6][0]);
+    auto subseq_7_0 = read_vector_from_file(listDescriptorFiles[7][0]);
+    ref.append(decode_ref_AU(subseq_6_0, subseq_7_0));
+  }
   std::ofstream fout(file_decompressed_fastq);
+
   subsequences_t subseq;
   for (uint32_t i = 0; i < num_blocks; i++) {
     subseq.subseq_0_0 = read_vector_from_file(file_subseq_0_0 + '.' + std::to_string(i));

@@ -12,6 +12,8 @@ extern "C"{
 #include <vector>
 #include <map>
 #include <string>
+#include "coding/ReturnStructures.h"
+
 
 class FakeInternalReference{
 private:
@@ -41,9 +43,35 @@ public:
     );
 };
 
+class InternalReference{
+private:
+    DatasetsGroupReferenceGenome* referenceGenome;
+    DatasetId datasetId;
+    ReferenceId referenceId;
+    std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> referenceFiles;
+    std::vector<uint64_t> accessUnitsStarts;
+    std::vector<uint64_t> accessUnitsEnds;
+public:
+    DatasetsGroupReferenceGenome *getReferenceGenome();
+    InternalReference(
+            const std::string &referenceURI,
+            const std::string &sequenceName,
+            DatasetGroupId datasetGroupId,
+            DatasetId  datasetId,
+            ReferenceId referenceId,
+            const generated_aus_ref & generatedAusRef
+    );
+    DatasetId getDatasetId() const;
+    ReferenceId getReferenceId() const;
+    void addAsDatasetToDatasetGroup(
+            DatasetsGroupContainer* datasetsGroupContainer,
+            DatasetGroupId datasetGroupId
+    );
+};
+
 class AccessUnit{
 private:
-    std::map<uint8_t, std::string> blocksList;
+    std::map<uint8_t, std::map<uint8_t, std::string>> blocksList;
     uint32_t accessUnitId;
     uint16_t parameter_set_id;
     uint8_t au_type;
@@ -53,7 +81,8 @@ private:
     uint64_t start;
     uint64_t end;
 public:
-    AccessUnit(const std::map<uint8_t, std::string> &blocksList, uint32_t accessUnitId, uint16_t parameter_set_id,
+    AccessUnit(const std::map<uint8_t, std::map<uint8_t, std::string>> &blocksList, uint32_t accessUnitId,
+               uint16_t parameter_set_id,
                uint8_t au_type, uint64_t start, uint64_t end);
 
     uint64_t getStart() const;
@@ -116,6 +145,11 @@ public:
             const std::vector<std::string> & dataFiles,
             const std::vector<uint64_t>& accessUnitsStarts,
             const std::vector<uint64_t>& accessUnitsEnds
+    );
+    InternalReference addInternalReference(
+            std::string referenceURI,
+            std::string sequenceName,
+            const generated_aus_ref & generatedAusRef
     );
     Dataset addDatasetData(
             const std::vector<Class_type> &existing_aligned_classes,
