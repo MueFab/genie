@@ -37,7 +37,7 @@ bool writeDatasetsGroupHeader(DatasetsGroupHeader* datasetsGroupHeader, FILE *ou
 }
 
 bool writeDatasetsGroupHeaderContent(DatasetsGroupHeader* datasetsGroupHeader, FILE *outputFile){
-    bool datasetGroupIdSuccessfulWrite = write(datasetsGroupHeader->datasetGroupId, outputFile);
+    bool datasetGroupIdSuccessfulWrite = writeUint8(datasetsGroupHeader->datasetGroupId, outputFile);
     size_t versionNumberWrittenSize = fwrite(&datasetsGroupHeader->versionNumber,1,1,outputFile);
     if (!datasetGroupIdSuccessfulWrite || versionNumberWrittenSize != 1){
         fprintf(stderr, "Dataset group header could not write dataset group id or version number.\n");

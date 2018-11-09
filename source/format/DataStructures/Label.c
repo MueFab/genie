@@ -30,10 +30,10 @@ void freeRegionsForDataset(RegionsForDataset *regionsForDataset) {
 
 bool writeRegionsForDataset(RegionsForDataset* regionsForDataset, FILE* outputFile){
     //writeBigEndian16ToFile(regionsForDataset->datasetId, outputFile);
-    bool datasetidSuccessfulWrite = write((uint8_t) regionsForDataset->datasetId, outputFile);
-    bool referenceIdSuccesfulWrite = write(regionsForDataset->referenceId, outputFile);
+    bool datasetidSuccessfulWrite = writeUint8((uint8_t) regionsForDataset->datasetId, outputFile);
+    bool referenceIdSuccesfulWrite = writeUint8(regionsForDataset->referenceId, outputFile);
     uint8_t numRegions = (uint8_t) getSize(regionsForDataset->regions);
-    bool numRegionsSuccessfulWrite = write(numRegions, outputFile);
+    bool numRegionsSuccessfulWrite = writeUint8(numRegions, outputFile);
 
     if(!datasetidSuccessfulWrite || !referenceIdSuccesfulWrite || !numRegionsSuccessfulWrite){
         fprintf(stderr,"Error writing dataset id, reference id or number regions (RegionsForDataset).\n");
@@ -53,9 +53,9 @@ RegionsForDataset* parseRegionsForDataset(FILE *inputFile){
     uint8_t referenceId;
     uint8_t numRegions;
 
-    bool datasetIdSuccesfulRead = read(&datasetId, inputFile);
-    bool referenceIdSuccesfulRead = read(&referenceId, inputFile);
-    bool numRegionsSuccesfulRead = read(&numRegions, inputFile);
+    bool datasetIdSuccesfulRead = readUint8(&datasetId, inputFile);
+    bool referenceIdSuccesfulRead = readUint8(&referenceId, inputFile);
+    bool numRegionsSuccesfulRead = readUint8(&numRegions, inputFile);
 
     RegionsForDataset* regionsForDataset = initRegionsForDataset(datasetId, referenceId);
     if(regionsForDataset == NULL){
@@ -223,7 +223,7 @@ unsigned long getNumberClasses(Region* region){
 bool writeRegion(Region* region, FILE* outputFile){
     bool sequenceIDSuccessfulWrite = writeBigEndian16ToFile(region->sequence_Id, outputFile);
     uint8_t number_classes = (uint8_t) getNumberClasses(region);
-    bool numberClassesSuccessfulWrite = write(number_classes, outputFile);
+    bool numberClassesSuccessfulWrite = writeUint8(number_classes, outputFile);
     if (!sequenceIDSuccessfulWrite || !numberClassesSuccessfulWrite){
         fprintf(stderr, "Error writing sequence Id or number classes.\n");
         return false;
@@ -264,7 +264,7 @@ Region * parseRegion(FILE *inputFile) {
     uint16_t sequence_Id;
     uint8_t numberClasses;
     bool sequenceIdRead = readBigEndian16FromFile(&sequence_Id, inputFile);
-    bool numberClassesRead = read(&numberClasses, inputFile);
+    bool numberClassesRead = readUint8(&numberClasses, inputFile);
     if (!sequenceIdRead || ! numberClassesRead){
         fprintf(stderr,"Error reading sequenceId or number of classes.\n");
         return NULL;

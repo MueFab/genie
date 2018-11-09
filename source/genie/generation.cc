@@ -221,7 +221,9 @@ void generation(
             }
 
             std::map<Class_type, std::vector<uint8_t>> descriptorsIdPerClass;
-            std::copy(descriptorsUsed.begin(), descriptorsUsed.end(), descriptorsIdPerClass[CLASS_U].begin());
+            for(uint8_t descriptorUsed : descriptorsUsed){
+                descriptorsIdPerClass[CLASS_U].push_back(descriptorUsed);
+            }
 
             std::map<uint16_t, std::map<Class_type, std::vector<AccessUnit>>> accessUnitsAligned;
             std::vector<AccessUnit> accessUnitsUnaligned;
@@ -235,6 +237,10 @@ void generation(
                     0
                 ));
             }
+            std::ofstream fakeParameters("fakePayload1");
+            fakeParameters << "fakePayload1";
+            fakeParameters.close();
+
             std::vector<std::string> parametersFilenames = {"fakePayload1"};
 
             datasetGroup->addDatasetData(

@@ -43,7 +43,7 @@ uint64_t getSizeDatasetsGroupLabelsList(DatasetsGroupLabelsList* datasetsGroupLa
 }
 
 bool writeContentDatasetsGroupLabelsList(DatasetsGroupLabelsList* datasetsGroupLabelsList, FILE* outputFile){
-    bool datasetGroupIdSuccessfulWrite= write(datasetsGroupLabelsList->datasetsGroupId, outputFile);
+    bool datasetGroupIdSuccessfulWrite= writeUint8(datasetsGroupLabelsList->datasetsGroupId, outputFile);
     size_t numberLabels = getSize(datasetsGroupLabelsList->labels);
     bool numberLabelsSuccessfulWrite = writeBigEndian16ToFile((uint16_t) numberLabels, outputFile);
     if(!datasetGroupIdSuccessfulWrite || !numberLabelsSuccessfulWrite){
@@ -74,7 +74,7 @@ bool writeDatasetsGroupLabelsList(DatasetsGroupLabelsList* datasetsGroupLabelsLi
 
 DatasetsGroupLabelsList *parseDatasetsGroupLabelsList(FILE *inputFile) {
     DatasetGroupId datasetGroupId;
-    bool datasetGroupIdRead = read(&datasetGroupId, inputFile);
+    bool datasetGroupIdRead = readUint8(&datasetGroupId, inputFile);
     uint16_t numberLabels;
     bool numberLabelsRead = readBigEndian16FromFile(&numberLabels, inputFile);
     if(!datasetGroupIdRead || !numberLabelsRead){
