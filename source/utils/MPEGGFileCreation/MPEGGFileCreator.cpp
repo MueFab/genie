@@ -461,7 +461,7 @@ InternalReference::InternalReference(
         DatasetId  datasetId,
         ReferenceId referenceId,
         const generated_aus_ref & generatedAusRef
-) {
+){
     char* refURI = (char*)calloc(100,sizeof(char));
     referenceURI.copy(refURI,99);
     InternalReference::datasetId = datasetId;
@@ -482,6 +482,9 @@ InternalReference::InternalReference(
     sequenceName.copy(sequenceNameBuffer,99);
     setSequenceName(referenceGenome,0, sequenceNameBuffer);
 
+    referenceFiles = generatedAusRef.getRefAus();
+    accessUnitsStarts = generatedAusRef.getRefStart();
+    accessUnitsEnds = generatedAusRef.getRefEnd();
 }
 
 void InternalReference::addAsDatasetToDatasetGroup(
