@@ -251,6 +251,8 @@ void generation(
                     parametersFilenames
             );
 
+            mpeggFileCreator.write("output.mpegg");
+
 
         }else {
             generationFromFastq(programOptions);
