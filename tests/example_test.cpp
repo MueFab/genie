@@ -36,12 +36,12 @@ class ExampleTestCase : public ::testing::Test
     //   that will be overridden in a derived class, you have to use
     //   SetUp()/TearDown().
 
-    virtual void SetUp() override
+    void SetUp() override
     {
         // Code here will be called immediately before each test
     }
 
-    virtual void TearDown() override
+    void TearDown() override
     {
         // Code here will be called immediately after each test
     }
