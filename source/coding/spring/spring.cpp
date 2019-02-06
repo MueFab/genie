@@ -23,6 +23,7 @@
 #include "spring/spring.h"
 #include "spring/util.h"
 #include "fileio/fastq_file_reader.h"
+#include "fileio/gabac_file.h"
 
 namespace spring {
 
@@ -101,6 +102,53 @@ generated_aus generate_streams_SPRING(
                        .count()
                 << " s\n";
     }
+
+
+  // ----------------------------------------------------
+
+  gabac::Configuration defaultConf;
+  defaultConf.wordSize = 1;
+  defaultConf.sequenceTransformationId = gabac::SequenceTransformationId::no_transform;
+  defaultConf.sequenceTransformationParameter = 0;
+  defaultConf.transformedSequenceConfigurations.resize(1);
+  defaultConf.transformedSequenceConfigurations.front().binarizationId = gabac::BinarizationId::BI;
+  defaultConf.transformedSequenceConfigurations.front().binarizationParameters = {8};
+  defaultConf.transformedSequenceConfigurations.front().contextSelectionId = gabac::ContextSelectionId::adaptive_coding_order_1;
+  defaultConf.transformedSequenceConfigurations.front().diffCodingEnabled = false;
+  defaultConf.transformedSequenceConfigurations.front().lutTransformationEnabled = true;
+  defaultConf.transformedSequenceConfigurations.front().lutTransformationParameter = 0;
+
+  std::vector<std::string> filenames = {
+"/id_1",
+"/quality_1",
+"/read_lengths.bin",
+"/read_noisepos.bin",
+"/read_noise.txt",
+"/read_order.bin",
+"/read_pos.bin",
+"/read_rev.txt",
+"/read_seq.txt",
+"/read_unaligned.txt"};
+
+
+  {
+    GabacFile f(temp_dir + "/compressed.gabac", false);
+
+    for (const auto& s: filenames) {
+      f.packFile(temp_dir + "/" + s, defaultConf);
+    }
+  }
+
+  {
+    GabacFile f(temp_dir + "/compressed.gabac", true);
+
+    for (const auto& s: filenames) {
+      f.unpackFile(temp_dir + "/" + s + "_new", defaultConf);
+    }
+  }
+
+  // ----------------------------------------------------
+
 
     std::cout << "Generating new FASTQ from index (for testing) ... \n";
     auto new_fq_start = std::chrono::steady_clock::now();
@@ -186,7 +234,6 @@ generated_aus generate_streams_SPRING(
                    compression_end - compression_start)
                    .count()
             << " s\n";
-
   return result;
 }
 
