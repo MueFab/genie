@@ -23,6 +23,9 @@ namespace dsg {
 void generation(
     const ProgramOptions& programOptions);
 
+void decompression(
+        const ProgramOptions& programOptions);
+
 
 }  // namespace dsg
 

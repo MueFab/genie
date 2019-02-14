@@ -76,7 +76,7 @@ ProgramOptions::ProgramOptions(
     char *argv[])
     : force(false),
       verbose(false),
-      workingDirectory(""),
+      workingDirectory("./"),
       numThreads(1),
       inputFilePath(""),
       inputFilePairPath(""),
@@ -124,6 +124,9 @@ void ProgramOptions::processCommandLine(
     po::options_description genericOptions("Generic");
     po::options_description inputOptions("Input");
     po::options_description algorithmOptions("Algorithm");
+    po::positional_options_description p;
+
+    p.add("input-file", -1);
 
     std::set<std::string> allowedOptionGroupNames = {
         "basic",
@@ -132,57 +135,17 @@ void ProgramOptions::processCommandLine(
         "algorithm"
     };
 
-    // Add the basic options.
-    // These go without a member variable and are processed directly here in
-    // this function.
-    basicOptions.add_options()
-        ("configuration-file-path,c",
-            po::value<std::string>(),
-            "Configuration file path")
-        ("help,h",
-            "Print help")
-        ("help-group",
-            po::value<std::string>(),
-            "Print help for given option group only");
-
-    // Add the generic options.
-    genericOptions.add_options()
-        ("force",
-         po::bool_switch(&force),
-            "Overwrite output files")
-        ("verbose,v",
-            po::bool_switch(&verbose),
-            "Be verbose")
-        ("working-directory,d",
-            po::value<std::string>(&workingDirectory)->required(),
-            "Working directory")
-        ("num-thr",
-            po::value<int>(&numThreads),
-            "Number of threads");
-
     // Add the input options.
     inputOptions.add_options()
-        ("input-file-path,i",
-            po::value<std::string>(&inputFilePath)->required(),
+        ("input-file",
+            po::value<std::string>(&inputFilePath),
             "Input file path")
         ("input-file-pair-path,p",
             po::value<std::string>(&inputFilePairPath),
             "Input file pair path")
         ("input-file-type,t",
-            po::value<std::string>(&inputFileType)->required(),
+            po::value<std::string>(&inputFileType),
             "Input file type");
-
-    // Add the algorithm options.
-    algorithmOptions.add_options()
-        ("read-algorithm",
-            po::value<std::string>(&readAlgorithm),
-            "Read algorithm")
-        ("id-algorithm",
-            po::value<std::string>(&idAlgorithm),
-            "ID algorithm")
-        ("qv-algorithm",
-            po::value<std::string>(&qvAlgorithm),
-            "QV algorithm");
 
     // Declare an options_description instance which will include all the
     // options except for the basic options.
@@ -206,7 +169,8 @@ void ProgramOptions::processCommandLine(
         po::store(po::command_line_parser(args).options(allOptions).run(), allOptionsMap);
     }
     else
-        po::store(po::parse_command_line(argc, argv, allOptions), allOptionsMap);
+        po::store(po::command_line_parser(argc, argv).
+                options(allOptions).positional(p).run(), allOptionsMap);
 
     // First thing to do is to print the help.
     if (basicOptionsMap.count("help") || basicOptionsMap.count("h")) {
@@ -288,9 +252,8 @@ void ProgramOptions::validate(void)
     //
 
     std::set<std::string> allowedInputFileTypes = {
-        "FASTA",
+        "GENIE",
         "FASTQ",
-        "SAM"
     };
 
 #ifndef GENIE_USE_OPENMP
@@ -302,6 +265,11 @@ void ProgramOptions::validate(void)
 
     // Check if the user input string for inputFileType is in the set of
     // allowed input file types.
+
+    inputFileType = inputFilePath.substr(inputFilePath.find_last_of('.') + 1, std::string::npos);
+
+    std::transform(inputFileType.begin(), inputFileType.end(),inputFileType.begin(), ::toupper);
+
     it = allowedInputFileTypes.find(inputFileType);
 
     if (it == allowedInputFileTypes.end()) {
@@ -331,6 +299,7 @@ void ProgramOptions::validate(void)
 
     // Check if the user input string for idAlgorithm is in the
     // set of allowed ID algorithms.
+    idAlgorithm = "TOK";
     it = allowedIdAlgorithms.find(idAlgorithm);
 
     if (it == allowedIdAlgorithms.end()) {
@@ -351,6 +320,8 @@ void ProgramOptions::validate(void)
         "CALQ",
         "QVZ"
     };
+
+    qvAlgorithm = "QVZ";
 
     // Check if the user input string for qvAlgorithm is in the
     // set of allowed QV algorithms.
@@ -375,6 +346,7 @@ void ProgramOptions::validate(void)
         "TSC",
     };
 
+    readAlgorithm = "HARC";
     // Check if the user input string for readAlgorithm is in the
     // set of allowed read algorithms.
     it = allowedReadAlgorithms.find(readAlgorithm);
@@ -393,7 +365,7 @@ void ProgramOptions::validate(void)
 void ProgramOptions::validateDependencies(void)
 {
     if (readAlgorithm == "HARC") {
-        if ((inputFileType != "FASTA") && (inputFileType != "FASTQ")) {
+        if ((inputFileType != "GENIE") && (inputFileType != "FASTQ")) {
             // LOG_S(ERROR) << "Read algorithm 'HARC' requires a FASTA file "
                          // "or a FASTQ file as input";
             throwRuntimeError("invalid dependency");
