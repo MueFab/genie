@@ -103,69 +103,6 @@ generated_aus generate_streams_SPRING(
                 << " s\n";
     }
 
-
-  // ----------------------------------------------------
-
-  gabac::Configuration defaultConf;
-  defaultConf.wordSize = 1;
-  defaultConf.sequenceTransformationId = gabac::SequenceTransformationId::no_transform;
-  defaultConf.sequenceTransformationParameter = 0;
-  defaultConf.transformedSequenceConfigurations.resize(1);
-  defaultConf.transformedSequenceConfigurations.front().binarizationId = gabac::BinarizationId::BI;
-  defaultConf.transformedSequenceConfigurations.front().binarizationParameters = {8};
-  defaultConf.transformedSequenceConfigurations.front().contextSelectionId = gabac::ContextSelectionId::adaptive_coding_order_1;
-  defaultConf.transformedSequenceConfigurations.front().diffCodingEnabled = false;
-  defaultConf.transformedSequenceConfigurations.front().lutTransformationEnabled = true;
-  defaultConf.transformedSequenceConfigurations.front().lutTransformationParameter = 0;
-
-  std::vector<std::string> filenames = {
-"/id_1",
-"/quality_1",
-"/read_lengths.bin",
-"/read_noisepos.bin",
-"/read_noise.txt",
-"/read_order.bin",
-"/read_pos.bin",
-"/read_rev.txt",
-"/read_seq.txt",
-"/read_unaligned.txt"};
-
-
-  {
-    GabacFile f(temp_dir + "/compressed.gabac", false);
-
-    for (const auto& s: filenames) {
-      f.packFile(temp_dir + "/" + s, defaultConf);
-    }
-  }
-
-  {
-    GabacFile f(temp_dir + "/compressed.gabac", true);
-
-    for (const auto& s: filenames) {
-      f.unpackFile(temp_dir + "/" + s + "_new", defaultConf);
-    }
-  }
-
-  // ----------------------------------------------------
-
-
-    std::cout << "Generating new FASTQ from index (for testing) ... \n";
-    auto new_fq_start = std::chrono::steady_clock::now();
-    if (!cp.paired_end) {
-      generate_new_fastq_se(fastqFileReader1, temp_dir, cp);
-    }
-    else {
-      generate_new_fastq_pe(fastqFileReader1, fastqFileReader2, temp_dir, cp);
-    }
-    auto new_fq_end = std::chrono::steady_clock::now();
-    std::cout << "Generating new FASTQ done\n";
-    std::cout << "Time for this step: "
-              << std::chrono::duration_cast<std::chrono::seconds>(new_fq_end -
-                                                                  new_fq_start)
-                     .count()
-              << " s\n";
-
     std::cout << "Generating read streams ...\n";
     auto grs_start = std::chrono::steady_clock::now();
     auto descriptorFilesPerAUs = generate_read_streams(temp_dir, cp);
@@ -176,6 +113,8 @@ generated_aus generate_streams_SPRING(
                                                                   grs_start)
                      .count()
               << " s\n";
+
+
 
     std::cout << "Generating ref streams ...\n";
     auto grefs_start = std::chrono::steady_clock::now();
@@ -200,23 +139,6 @@ generated_aus generate_streams_SPRING(
                        .count()
                 << " s\n";
     }
-
-    // decode and write the reads to a file (for testing purposes)
-    std::cout << "Decompression (for testing) ...\n";
-    auto decompression_start = std::chrono::steady_clock::now();
-    uint32_t num_blocks;
-    if (!paired_end) 
-      num_blocks = 1 + (cp.num_reads-1)/cp.num_reads_per_block;
-    else 
-      num_blocks = 1 + (cp.num_reads/2-1)/cp.num_reads_per_block;
-    decompress(temp_dir, descriptorRefFilesPerAUs.getRefAus(), num_blocks, cp.preserve_order, cp.paired_end);
-    auto decompression_end = std::chrono::steady_clock::now();
-    std::cout << "Decompression done!\n";
-    std::cout << "Time for this step: "
-              << std::chrono::duration_cast<std::chrono::seconds>(decompression_end -
-                                                                  decompression_start)
-                     .count()
-              << " s\n";
     
 // }
 
