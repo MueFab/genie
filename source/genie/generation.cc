@@ -94,6 +94,8 @@ static void generationFromFastq(
     // Read FASTQ records in blocks of 10 records.
     size_t blockSize = 10;
 
+    std::string ureads = "";
+
     while (true) {
         std::vector<input::fastq::FastqRecord> fastqRecords;
         size_t numRecords = fastqFileReader.readRecords(blockSize, &fastqRecords);
@@ -105,6 +107,7 @@ static void generationFromFastq(
         for (const auto& fastqRecord : fastqRecords) {
             std::cout << fastqRecord.title << "\t";
             std::cout << fastqRecord.sequence << "\t";
+            ureads += fastqRecord.sequence;
             std::cout << fastqRecord.optional << "\t";
             std::cout << fastqRecord.qualityScores << std::endl;
         }
@@ -113,6 +116,33 @@ static void generationFromFastq(
             break;
         }
     }
+
+    std::cout << "ureads: " << ureads << std::endl;
+
+    std::string defaultGabacConf = "{\"word_size\":\"1\",\"sequence_transformation_id\":\"0\",\""
+                                   "sequence_transformation_parameter\":\"0\",\"transformed_sequences\""
+                                   ":[{\"lut_transformation_enabled\":\"0\",\"lut_transformation_bits\""
+                                   ":\"0\",\"lut_transformation_order\":\"0\",\"diff_coding_enabled\":\""
+                                   "0\",\"binarization_id\":\"0\",\"binarization_parameters\":[\"8\"],\""
+                                   "context_selection_id\":\"2\"}]}";
+
+    gabac::DataBlock inputDataBlock(0, 1);
+    gabac::DataBlock outputDataBlock(0, 1);
+
+    gabac::BufferInputStream bufferInputStream(&inputDataBlock);
+    gabac::BufferOutputStream bufferOutputStream(&outputDataBlock);
+
+    for (const auto& symbol : ureads) {
+        inputDataBlock.push_back(static_cast<uint64_t>(symbol));
+    }
+
+    gabac::IOConfiguration ioconf = {&bufferInputStream, &bufferOutputStream, 0, &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
+    gabac::EncodingConfiguration enConf(defaultGabacConf);
+
+    gabac::encode(ioconf, enConf);
+
+    std::cout << "Bitstream size: " << outputDataBlock.size() << std::endl;
+
     // if (!programOptions.inputFilePairPath.empty()) {
     //     std::cout << "Paired file:\n";
     //     // Initialize a FASTQ file reader.
