@@ -273,7 +273,7 @@ static void run_gabac(const std::vector<std::string>& files, bool decompress){
         gabac::FileOutputStream fout(fout_desc);
 
         gabac::IOConfiguration
-                ioconf = {&fin, &fout, 10000000, &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
+                ioconf = {&fin, &fout, 0, &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
 
         gabac::EncodingConfiguration enConf(config);
 

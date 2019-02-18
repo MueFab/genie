@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <map>
+#include <string>
 
 class generated_aus_ref{
     std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> refAus;
