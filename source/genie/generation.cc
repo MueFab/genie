@@ -127,21 +127,32 @@ static void generationFromFastq(
                                    "context_selection_id\":\"2\"}]}";
 
     gabac::DataBlock inputDataBlock(0, 1);
-    gabac::DataBlock outputDataBlock(0, 1);
-
-    gabac::BufferInputStream bufferInputStream(&inputDataBlock);
-    gabac::BufferOutputStream bufferOutputStream(&outputDataBlock);
-
     for (const auto& symbol : ureads) {
         inputDataBlock.push_back(static_cast<uint64_t>(symbol));
     }
-
+    std::cout << "Input data block size: " << inputDataBlock.size() << std::endl;
+        
+    gabac::BufferInputStream bufferInputStream(&inputDataBlock);
+    gabac::BufferOutputStream bufferOutputStream;
+    
     gabac::IOConfiguration ioconf = {&bufferInputStream, &bufferOutputStream, 0, &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
     gabac::EncodingConfiguration enConf(defaultGabacConf);
 
     gabac::encode(ioconf, enConf);
 
+    gabac::DataBlock outputDataBlock(0, 1);
+    bufferOutputStream.flush(&outputDataBlock);
     std::cout << "Bitstream size: " << outputDataBlock.size() << std::endl;
+    
+    gabac::BlockStepper blockStepper = outputDataBlock.getReader();
+
+    size_t payloadSize = outputDataBlock.size() * outputDataBlock.getWordSize();
+    uint8_t *payload = static_cast<uint8_t*>(malloc(payloadSize));
+    int i = 0;
+    while (blockStepper.isValid()) {
+        payload[i++] = static_cast<uint8_t>(blockStepper.get());
+        blockStepper.inc();
+    }
 
     // if (!programOptions.inputFilePairPath.empty()) {
     //     std::cout << "Paired file:\n";
