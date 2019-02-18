@@ -131,10 +131,10 @@ static void generationFromFastq(
         inputDataBlock.push_back(static_cast<uint64_t>(symbol));
     }
     std::cout << "Input data block size: " << inputDataBlock.size() << std::endl;
-        
+
     gabac::BufferInputStream bufferInputStream(&inputDataBlock);
     gabac::BufferOutputStream bufferOutputStream;
-    
+
     gabac::IOConfiguration ioconf = {&bufferInputStream, &bufferOutputStream, 0, &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
     gabac::EncodingConfiguration enConf(defaultGabacConf);
 
@@ -143,7 +143,7 @@ static void generationFromFastq(
     gabac::DataBlock outputDataBlock(0, 1);
     bufferOutputStream.flush(&outputDataBlock);
     std::cout << "Bitstream size: " << outputDataBlock.size() << std::endl;
-    
+
     gabac::BlockStepper blockStepper = outputDataBlock.getReader();
 
     size_t payloadSize = outputDataBlock.size() * outputDataBlock.getWordSize();
@@ -368,13 +368,13 @@ void packFile(const std::string& path, const std::string& file, FILE *fout){
     uint64_t byteswritten = 0;
     std::vector<uint8_t> buffer(1000000);
     while (byteswritten < size) {
-        uint64_t tmp = fread(buffer.data(), 1, std::min(buffer.size(), size - byteswritten), fin_desc);
-        if (tmp != std::min(buffer.size(), size - byteswritten)) {
+        uint64_t tmp = fread(buffer.data(), 1, std::min(buffer.size(), static_cast<size_t>(size - byteswritten)), fin_desc);
+        if (tmp != std::min(buffer.size(), static_cast<size_t>(size - byteswritten))) {
             fclose(fin_desc);
             throw std::runtime_error("Could not read from " + (path + file));
         }
         tmp = fwrite(buffer.data(), 1, tmp, fout);
-        if (tmp != std::min(buffer.size(), size - byteswritten)) {
+        if (tmp != (buffer.size(), size - byteswritten)) {
             fclose(fin_desc);
             throw std::runtime_error("Could not write to output file");
         }
@@ -420,8 +420,8 @@ std::string unpackFile(const std::string& path, FILE *fin){
 
     uint64_t readBytes = 0;
     while (readBytes < size) {
-        uint64_t tmp = fread(buffer.data(), 1, std::min(buffer.size(), size - readBytes), fin);
-        if (tmp != std::min(buffer.size(), size - readBytes)) {
+        uint64_t tmp = fread(buffer.data(), 1, std::min(buffer.size(), static_cast<size_t>(size - readBytes)), fin);
+        if (tmp != std::min(buffer.size(), static_cast<size_t>(size - readBytes))) {
             fclose(fout);
             throw std::runtime_error("Could not read from input file #5");
         }
