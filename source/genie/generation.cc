@@ -91,9 +91,6 @@ static void generationFromFastq(
     // Initialize a FASTQ file reader.
     input::fastq::FastqFileReader fastqFileReader(programOptions.inputFilePath);
 
-    // Second pass for HARC.
-
-
     // Read FASTQ records in blocks of 10 records.
     size_t blockSize = 10;
 
@@ -116,34 +113,34 @@ static void generationFromFastq(
             break;
         }
     }
-    if (!programOptions.inputFilePairPath.empty()) {
-        std::cout << "Paired file:\n";
-        // Initialize a FASTQ file reader.
-        input::fastq::FastqFileReader fastqFileReader1(programOptions.inputFilePairPath);
-
-        // Read FASTQ records in blocks of 10 records.
-        size_t blockSize = 10;
-
-        while (true) {
-            std::vector<input::fastq::FastqRecord> fastqRecords;
-            size_t numRecords = fastqFileReader1.readRecords(blockSize, &fastqRecords);
-            if (numRecords != blockSize) {
-                std::cout << "Read only " << numRecords << " records (" << blockSize << " requested)." << std::endl;
-            }
-
-            // Iterate through the records.
-            for (const auto& fastqRecord : fastqRecords) {
-                std::cout << fastqRecord.title << "\t";
-                std::cout << fastqRecord.sequence << "\t";
-                std::cout << fastqRecord.optional << "\t";
-                std::cout << fastqRecord.qualityScores << std::endl;
-            }
-
-            if (numRecords != blockSize) {
-                break;
-            }
-        }
-    }
+    // if (!programOptions.inputFilePairPath.empty()) {
+    //     std::cout << "Paired file:\n";
+    //     // Initialize a FASTQ file reader.
+    //     input::fastq::FastqFileReader fastqFileReader1(programOptions.inputFilePairPath);
+    //
+    //     // Read FASTQ records in blocks of 10 records.
+    //     size_t blockSize = 10;
+    //
+    //     while (true) {
+    //         std::vector<input::fastq::FastqRecord> fastqRecords;
+    //         size_t numRecords = fastqFileReader1.readRecords(blockSize, &fastqRecords);
+    //         if (numRecords != blockSize) {
+    //             std::cout << "Read only " << numRecords << " records (" << blockSize << " requested)." << std::endl;
+    //         }
+    //
+    //         // Iterate through the records.
+    //         for (const auto& fastqRecord : fastqRecords) {
+    //             std::cout << fastqRecord.title << "\t";
+    //             std::cout << fastqRecord.sequence << "\t";
+    //             std::cout << fastqRecord.optional << "\t";
+    //             std::cout << fastqRecord.qualityScores << std::endl;
+    //         }
+    //
+    //         if (numRecords != blockSize) {
+    //             break;
+    //         }
+    //     }
+    // }
 }
 
 
@@ -307,6 +304,9 @@ void packFile(const std::string& path, const std::string& file, FILE *fout){
         throw std::runtime_error("Could not open " + (path + file));
     }
     uint64_t size = file.size();
+    if (size == 0) {
+        throw std::runtime_error("Cannot compress empty file");
+    }
     if (fwrite(&size, sizeof(uint64_t), 1, fout) != 1) {
         fclose(fin_desc);
         throw std::runtime_error("Could not write to output file");
@@ -509,6 +509,9 @@ void decompression(
 void generation(
         const ProgramOptions& programOptions
 ){
+    generationFromFastq(programOptions);
+    return;
+
     if (programOptions.inputFileType == "FASTA") {
         generationFromFasta(programOptions);
     } else if (programOptions.inputFileType == "FASTQ") {
