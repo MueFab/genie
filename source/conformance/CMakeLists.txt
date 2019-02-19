@@ -1,9 +1,9 @@
 set(source_files
         encoding.cpp
         exceptions.cpp
-        fastq_file_reader.cc
-        fastq_record.cc
-        file_reader.cc
+        fastq_file_reader.cpp
+        fastq_record.cpp
+        file_reader.cpp
         log.cpp
         main.cpp
         program_options.cpp)

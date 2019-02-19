@@ -69,7 +69,7 @@ execute_process(
     RESULT_VARIABLE result
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest/download
 )
-if (result)
+if(result)
     message(FATAL_ERROR "CMake step for googletest failed: ${result}")
 endif()
 execute_process(
@@ -105,7 +105,7 @@ execute_process(
     RESULT_VARIABLE result2
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gabac-download
 )
-if(result)
+if(result2)
     message(FATAL_ERROR "CMake step for gabac failed: ${result2}")
 endif()
 execute_process(
