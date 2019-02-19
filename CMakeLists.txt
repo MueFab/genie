@@ -318,6 +318,11 @@ add_library(${MPEGGFileCreation} STATIC ${MPEGGFileCreation_source_files})
 target_include_directories(${MPEGGFileCreation} PRIVATE ${MPEGGFileCreation_include_dir})
 target_link_libraries(${MPEGGFileCreation} ${format})
 
+#==============================================================================
+# conformance
+#==============================================================================
+
+add_subdirectory(source/conformance)
 
 #==============================================================================
 # genie

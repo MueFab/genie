@@ -8,5 +8,8 @@
 build/
 cmake-build-debug/
 
+# CLion project directory
+.idea/
+
 # External tools directory
 external_tools/

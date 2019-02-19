@@ -11,8 +11,8 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <DataStructures/FromFile.h>
-#include <Boxes.h>
+#include <format/DataStructures/FromFile.h>
+#include <format/Boxes.h>
 
 #ifdef __cplusplus
 }
