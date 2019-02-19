@@ -6,33 +6,33 @@
 #include <string>
 
 
-struct GENIELogTmpStdout {
-    ~GENIELogTmpStdout() { std::cout << std::endl; }
+struct GenieLogTmpStdout {
+    ~GenieLogTmpStdout() { std::cout << std::endl; }
 };
 
 
-struct GENIELogTmpStderr {
-    ~GENIELogTmpStderr() { std::cout << std::endl; }
+struct GenieLogTmpStderr {
+    ~GenieLogTmpStderr() { std::cout << std::endl; }
 };
 
 
-#define GENIE_LOG_TRACE (GENIELogTmpStdout(), std::cout << "[" << genie::currentDateAndTime() << "] [trace] ")
+#define GENIE_LOG_TRACE (GenieLogTmpStdout(), std::cout << "[" << genie::currentDateAndTime() << "] [trace] ")
 
-#define GENIE_LOG_DEBUG (GENIELogTmpStdout(), std::cout << "[" << genie::currentDateAndTime() << "] [debug] ")
+#define GENIE_LOG_DEBUG (GenieLogTmpStdout(), std::cout << "[" << genie::currentDateAndTime() << "] [debug] ")
 
-#define GENIE_LOG_INFO (GENIELogTmpStdout(), std::cout << "[" << genie::currentDateAndTime() << "] [info] ")
+#define GENIE_LOG_INFO (GenieLogTmpStdout(), std::cout << "[" << genie::currentDateAndTime() << "] [info] ")
 
-#define GENIE_LOG_WARNING (GENIELogTmpStderr(), std::cerr << "[" << genie::currentDateAndTime() << "] [warning] ")
+#define GENIE_LOG_WARNING (GenieLogTmpStderr(), std::cerr << "[" << genie::currentDateAndTime() << "] [warning] ")
 
-#define GENIE_LOG_ERROR (GENIELogTmpStderr(), std::cerr << "[" << genie::currentDateAndTime() << "] [error] ")
+#define GENIE_LOG_ERROR (GenieLogTmpStderr(), std::cerr << "[" << genie::currentDateAndTime() << "] [error] ")
 
-#define GENIE_LOG_FATAL (GENIELogTmpStderr(), std::cerr << "[" << genie::currentDateAndTime() << "] [fatal] ")
+#define GENIE_LOG_FATAL (GenieLogTmpStderr(), std::cerr << "[" << genie::currentDateAndTime() << "] [fatal] ")
 
 
 namespace genie {
 
 
-    std::string currentDateAndTime();
+std::string currentDateAndTime();
 
 
 }  // namespace genie

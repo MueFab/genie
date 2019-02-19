@@ -6,14 +6,7 @@
 namespace genie {
 
 
-FastqRecord::FastqRecord(void)
-    : title(""),
-      sequence(""),
-      optional(""),
-      qualityScores("")
-{
-    // Nothing to do here.
-}
+FastqRecord::FastqRecord() : title(""), sequence(""), optional(""), qualityScores("") {}
 
 
 FastqRecord::FastqRecord(
@@ -30,10 +23,7 @@ FastqRecord::FastqRecord(
 }
 
 
-FastqRecord::~FastqRecord(void)
-{
-    // Nothing to do here.
-}
+FastqRecord::~FastqRecord() = default;
 
 
 }  // namespace genie

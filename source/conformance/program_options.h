@@ -15,10 +15,8 @@ class ProgramOptions {
 public:
     ProgramOptions(int argc, char *argv[]);
     ~ProgramOptions();
-
 public:
     std::string inputFilePath;
-
 private:
     void processCommandLine(int argc, char *argv[]);
 };
