@@ -126,7 +126,8 @@ void ProgramOptions::processCommandLine(
     po::options_description algorithmOptions("Algorithm");
     po::positional_options_description p;
 
-    p.add("input-file", -1);
+    p.add("input-file", 1);
+    p.add("input-file-pair-path", 1);
 
     std::set<std::string> allowedOptionGroupNames = {
         "basic",
@@ -245,6 +246,7 @@ void ProgramOptions::validate(void)
         if (inputFilePairPath == inputFilePath) {
             throwRuntimeError("Same file name for two files");
         }
+        std::cout << "paired mode activated" << std::endl;
     }
 
     //
