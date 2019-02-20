@@ -17,6 +17,10 @@
 #include <utils/MPEGGFileCreation/MPEGGFileCreator.h>
 #include <fileio/gabac_file.h>
 #include <boost/filesystem.hpp>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <queue>
 
 #include "genie/exceptions.h"
 #include "fileio/fasta_file_reader.h"
@@ -91,10 +95,11 @@ static void generationFromFastq(
     // Initialize a FASTQ file reader.
     input::fastq::FastqFileReader fastqFileReader(programOptions.inputFilePath);
 
+    // Second pass for HARC.
+
+
     // Read FASTQ records in blocks of 10 records.
     size_t blockSize = 10;
-
-    std::string ureads = "";
 
     while (true) {
         std::vector<input::fastq::FastqRecord> fastqRecords;
@@ -107,7 +112,6 @@ static void generationFromFastq(
         for (const auto& fastqRecord : fastqRecords) {
             std::cout << fastqRecord.title << "\t";
             std::cout << fastqRecord.sequence << "\t";
-            ureads += fastqRecord.sequence;
             std::cout << fastqRecord.optional << "\t";
             std::cout << fastqRecord.qualityScores << std::endl;
         }
@@ -116,74 +120,35 @@ static void generationFromFastq(
             break;
         }
     }
+    if (!programOptions.inputFilePairPath.empty()) {
+        std::cout << "Paired file:\n";
+        // Initialize a FASTQ file reader.
+        input::fastq::FastqFileReader fastqFileReader1(programOptions.inputFilePairPath);
 
-    std::cout << "ureads: " << ureads << std::endl;
+        // Read FASTQ records in blocks of 10 records.
+        size_t blockSize = 10;
 
-    std::string defaultGabacConf = "{\"word_size\":\"1\",\"sequence_transformation_id\":\"0\",\""
-                                   "sequence_transformation_parameter\":\"0\",\"transformed_sequences\""
-                                   ":[{\"lut_transformation_enabled\":\"0\",\"lut_transformation_bits\""
-                                   ":\"0\",\"lut_transformation_order\":\"0\",\"diff_coding_enabled\":\""
-                                   "0\",\"binarization_id\":\"0\",\"binarization_parameters\":[\"8\"],\""
-                                   "context_selection_id\":\"2\"}]}";
+        while (true) {
+            std::vector<input::fastq::FastqRecord> fastqRecords;
+            size_t numRecords = fastqFileReader1.readRecords(blockSize, &fastqRecords);
+            if (numRecords != blockSize) {
+                std::cout << "Read only " << numRecords << " records (" << blockSize << " requested)." << std::endl;
+            }
 
-    gabac::DataBlock inputDataBlock(0, 1);
-    for (const auto& symbol : ureads) {
-        inputDataBlock.push_back(static_cast<uint64_t>(symbol));
+            // Iterate through the records.
+            for (const auto& fastqRecord : fastqRecords) {
+                std::cout << fastqRecord.title << "\t";
+                std::cout << fastqRecord.sequence << "\t";
+                std::cout << fastqRecord.optional << "\t";
+                std::cout << fastqRecord.qualityScores << std::endl;
+            }
+
+            if (numRecords != blockSize) {
+                break;
+            }
+        }
     }
-    std::cout << "Input data block size: " << inputDataBlock.size() << std::endl;
-
-    gabac::BufferInputStream bufferInputStream(&inputDataBlock);
-    gabac::BufferOutputStream bufferOutputStream;
-
-    gabac::IOConfiguration ioconf = {&bufferInputStream, &bufferOutputStream, 0, &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
-    gabac::EncodingConfiguration enConf(defaultGabacConf);
-
-    gabac::encode(ioconf, enConf);
-
-    gabac::DataBlock outputDataBlock(0, 1);
-    bufferOutputStream.flush(&outputDataBlock);
-    std::cout << "Bitstream size: " << outputDataBlock.size() << std::endl;
-
-    gabac::BlockStepper blockStepper = outputDataBlock.getReader();
-
-    size_t payloadSize = outputDataBlock.size() * outputDataBlock.getWordSize();
-    uint8_t *payload = static_cast<uint8_t*>(malloc(payloadSize));
-    int i = 0;
-    while (blockStepper.isValid()) {
-        payload[i++] = static_cast<uint8_t>(blockStepper.get());
-        blockStepper.inc();
-    }
-
-    // if (!programOptions.inputFilePairPath.empty()) {
-    //     std::cout << "Paired file:\n";
-    //     // Initialize a FASTQ file reader.
-    //     input::fastq::FastqFileReader fastqFileReader1(programOptions.inputFilePairPath);
-    //
-    //     // Read FASTQ records in blocks of 10 records.
-    //     size_t blockSize = 10;
-    //
-    //     while (true) {
-    //         std::vector<input::fastq::FastqRecord> fastqRecords;
-    //         size_t numRecords = fastqFileReader1.readRecords(blockSize, &fastqRecords);
-    //         if (numRecords != blockSize) {
-    //             std::cout << "Read only " << numRecords << " records (" << blockSize << " requested)." << std::endl;
-    //         }
-    //
-    //         // Iterate through the records.
-    //         for (const auto& fastqRecord : fastqRecords) {
-    //             std::cout << fastqRecord.title << "\t";
-    //             std::cout << fastqRecord.sequence << "\t";
-    //             std::cout << fastqRecord.optional << "\t";
-    //             std::cout << fastqRecord.qualityScores << std::endl;
-    //         }
-    //
-    //         if (numRecords != blockSize) {
-    //             break;
-    //         }
-    //     }
-    // }
 }
-
 
 static generated_aus generationFromFastq_SPRING(
         const ProgramOptions& programOptions
@@ -267,75 +232,150 @@ std::string defaultGabacConf = "{\"word_size\":\"1\",\"sequence_transformation_i
                                "context_selection_id\":\"2\"}]}";
 
 
-static void run_gabac(const std::vector<std::string>& files, bool decompress){
-    for (const auto& file : files) {
+class ThreadPool {
+    bool running;
+    std::vector<std::thread> threads;
+    std::queue<std::function<void(void)>> tasks;
 
-        std::string config;
-        std::string streamName = file.substr(file.find_last_of('/') + 1, std::string::npos);
+    std::condition_variable consumer;
 
-        if (streamName.substr(0, 3) == "id.") {
-            streamName = "id" + streamName.substr(streamName.find_first_of('.', 3), std::string::npos);
-        } else {
-            streamName = streamName.substr(0, streamName.find_last_of('.'));
+    std::condition_variable empty;
+    std::mutex taskAccess;
+
+ public:
+    explicit ThreadPool(size_t numThreads) : running(true){
+        for(int i = 0; i < numThreads; ++i) {
+            threads.emplace_back([this, i]{
+                std::unique_lock<std::mutex> lk(this->taskAccess);
+                std::cout << "Launched thread " << i << "!" << std::endl;
+                while (this->running) {
+                    if(!this->tasks.empty()) {
+                        std::function<void(void)> task = this->tasks.front();
+                        this->tasks.pop();
+                        lk.unlock();
+
+                        task();
+
+                        lk.lock();
+                    }
+                    if(this->tasks.empty()) {
+                        empty.notify_all();
+                        if (this->running) {
+                            consumer.wait(lk);
+                        }
+                    }
+                }
+                std::cout << "Left thread " << i << "!" << std::endl;
+            });
         }
-
-        std::string configpath = "../gabac_config/" +
-                                 streamName +
-                                 ".json";
-
-        try {
-            std::ifstream t(configpath);
-            if (!t) {
-                throw std::runtime_error("Config not existent");
-            }
-            config = std::string((std::istreambuf_iterator<char>(t)),
-                                 std::istreambuf_iterator<char>());
-        }
-        catch (...) {
-            std::cerr << "Problem reading gabac configuration " << configpath << " switching to default" << std::endl;
-            config = defaultGabacConf;
-        }
-
-        FILE *fin_desc = fopen(file.c_str(), "rb");
-        FILE *fout_desc = fopen((file + ".gabac").c_str(), "wb");
-
-        if (!fin_desc) {
-            throw std::runtime_error("Could not open " + file);
-        }
-
-        if (!fout_desc) {
-            throw std::runtime_error("Could not open " + file + ".gabac");
-        }
-
-        gabac::FileInputStream fin(fin_desc);
-        gabac::FileOutputStream fout(fout_desc);
-
-        gabac::IOConfiguration
-                ioconf = {&fin, &fout, 0, &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
-
-        gabac::EncodingConfiguration enConf(config);
-
-        if (!decompress) {
-            gabac::encode(ioconf, enConf);
-            std::cout << "Sucessfully compressed ";
-        } else {
-            gabac::decode(ioconf, enConf);
-            std::cout << "Sucessfully decompressed ";
-        }
-
-
-        fclose(fin_desc);
-        fclose(fout_desc);
-
-        std::cout << file << "\n(" << boost::filesystem::file_size(file) << " to\t";
-        if (boost::filesystem::file_size(file) < 10000) {
-            std::cout << "\t";
-        }
-        std::cout << boost::filesystem::file_size(file + ".gabac") << ")" << std::endl;
-
-        std::remove(file.c_str());
-        std::rename((file + ".gabac").c_str(), file.c_str());
     }
+
+    void stop() {
+        std::unique_lock<std::mutex> lk(this->taskAccess);
+        running = false;
+        lk.unlock();
+        consumer.notify_all();
+        for(auto& t : threads) {
+            t.join();
+        }
+    }
+
+    void pushTask(const std::function<void(void)>& task) {
+        std::unique_lock<std::mutex> lock(taskAccess);
+        tasks.push(task);
+        lock.unlock();
+        consumer.notify_one();
+    }
+
+    ~ThreadPool() {
+        stop();
+    }
+
+    void wait() {
+        std::unique_lock<std::mutex> lock(taskAccess);
+        if(!tasks.empty()) {
+            empty.wait(lock);
+        }
+    }
+};
+
+
+static void compress_one_file(const std::string& file, bool decompress) {
+    std::string config;
+    std::string streamName = file.substr(file.find_last_of('/') + 1, std::string::npos);
+
+    if (streamName.substr(0, 3) == "id.") {
+        streamName = "id" + streamName.substr(streamName.find_first_of('.', 3), std::string::npos);
+    } else {
+        streamName = streamName.substr(0, streamName.find_last_of('.'));
+    }
+
+    std::string configpath = "../gabac_config/" +
+                             streamName +
+                             ".json";
+
+    try {
+        std::ifstream t(configpath);
+        if (!t) {
+            throw std::runtime_error("Config not existent");
+        }
+        config = std::string((std::istreambuf_iterator<char>(t)),
+                             std::istreambuf_iterator<char>());
+    }
+    catch (...) {
+        std::cerr << "Problem reading gabac configuration " << configpath << " switching to default" << std::endl;
+        config = defaultGabacConf;
+    }
+
+    FILE *fin_desc = fopen(file.c_str(), "rb");
+    FILE *fout_desc = fopen((file + ".gabac").c_str(), "wb");
+
+    if (!fin_desc) {
+        throw std::runtime_error("Could not open " + file);
+    }
+
+    if (!fout_desc) {
+        throw std::runtime_error("Could not open " + file + ".gabac");
+    }
+
+    gabac::FileInputStream fin(fin_desc);
+    gabac::FileOutputStream fout(fout_desc);
+
+    gabac::IOConfiguration
+            ioconf = {&fin, &fout, 0, &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
+
+    gabac::EncodingConfiguration enConf(config);
+
+    if (!decompress) {
+        gabac::encode(ioconf, enConf);
+        std::cout << "Sucessfully compressed ";
+    } else {
+        gabac::decode(ioconf, enConf);
+        std::cout << "Sucessfully decompressed ";
+    }
+
+
+    fclose(fin_desc);
+    fclose(fout_desc);
+
+    std::cout << file << "\n(" << boost::filesystem::file_size(file) << " to\t";
+    if (boost::filesystem::file_size(file) < 10000) {
+        std::cout << "\t";
+    }
+    std::cout << boost::filesystem::file_size(file + ".gabac") << ")" << std::endl;
+
+    std::remove(file.c_str());
+    std::rename((file + ".gabac").c_str(), file.c_str());
+}
+
+static void run_gabac(const std::vector<std::string>& files, bool decompress){
+    ThreadPool pool(4);
+    for (const auto& file : files) {
+        pool.pushTask([&file, decompress]{
+            compress_one_file(file, decompress);
+        });
+    }
+    pool.wait();
 }
 
 
@@ -345,9 +385,6 @@ void packFile(const std::string& path, const std::string& file, FILE *fout){
         throw std::runtime_error("Could not open " + (path + file));
     }
     uint64_t size = file.size();
-    if (size == 0) {
-        throw std::runtime_error("Cannot compress empty file");
-    }
     if (fwrite(&size, sizeof(uint64_t), 1, fout) != 1) {
         fclose(fin_desc);
         throw std::runtime_error("Could not write to output file");
@@ -374,7 +411,7 @@ void packFile(const std::string& path, const std::string& file, FILE *fout){
             throw std::runtime_error("Could not read from " + (path + file));
         }
         tmp = fwrite(buffer.data(), 1, tmp, fout);
-        if (tmp != (buffer.size(), size - byteswritten)) {
+        if (tmp != std::min(buffer.size(), size - byteswritten)) {
             fclose(fin_desc);
             throw std::runtime_error("Could not write to output file");
         }
@@ -544,15 +581,12 @@ void decompression(
 
     std::rename((temp_dir + "decompressed.fastq").c_str(), outname.c_str());
 
-    boost::filesystem::remove_all(temp_dir);
+//    boost::filesystem::remove_all(temp_dir);
 }
 
 void generation(
         const ProgramOptions& programOptions
 ){
-    generationFromFastq(programOptions);
-    return;
-
     if (programOptions.inputFileType == "FASTA") {
         generationFromFasta(programOptions);
     } else if (programOptions.inputFileType == "FASTQ") {
