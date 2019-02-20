@@ -47,7 +47,7 @@ void FileReader::open(const std::string& path)
 
     const char *mode = "rb";
 
-#ifdef OS_WINDOWS
+#ifdef _WIN32
     int rc = fopen_s(&m_fp, path.c_str(), mode);
     if (rc != 0) {
         GENIE_DIE("failed to open file");
