@@ -345,9 +345,12 @@ set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/sam_reco
 #
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/dsg.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/exceptions.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/gabac_integration.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/generation.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/genie_gabac_output_stream.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/genie_file_format.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/ProgramOptions.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/thread_pool.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/utilities.cc)
 
 # List all header files (alphabetically)
