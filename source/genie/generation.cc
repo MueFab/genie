@@ -30,7 +30,8 @@
 #include "fileio/sam_file_reader.h"
 #include "fileio/sam_record.h"
 #include "coding/spring/spring.h"
-#include "gabac/gabac.h"
+#include "genie/genie_file_format.h"
+#include "genie/gabac_integration.h"
 
 namespace spring {
 void decompress(const std::string& temp_dir,
@@ -224,306 +225,10 @@ static void generationFromSam(
     }
 }
 
-std::string defaultGabacConf = "{\"word_size\":\"1\",\"sequence_transformation_id\":\"0\",\""
-                               "sequence_transformation_parameter\":\"0\",\"transformed_sequences\""
-                               ":[{\"lut_transformation_enabled\":\"0\",\"lut_transformation_bits\""
-                               ":\"0\",\"lut_transformation_order\":\"0\",\"diff_coding_enabled\":\""
-                               "0\",\"binarization_id\":\"0\",\"binarization_parameters\":[\"8\"],\""
-                               "context_selection_id\":\"2\"}]}";
-
-
-class ThreadPool {
-    bool running;
-    std::vector<std::thread> threads;
-    std::queue<std::function<void(void)>> tasks;
-
-    std::condition_variable consumer;
-
-    std::condition_variable empty;
-    std::mutex taskAccess;
-
- public:
-    explicit ThreadPool(size_t numThreads) : running(true){
-        for(int i = 0; i < numThreads; ++i) {
-            threads.emplace_back([this, i]{
-                std::unique_lock<std::mutex> lk(this->taskAccess);
-                std::cout << "Launched thread " << i << "!" << std::endl;
-                while (this->running) {
-                    if(!this->tasks.empty()) {
-                        std::function<void(void)> task = this->tasks.front();
-                        this->tasks.pop();
-                        lk.unlock();
-
-                        task();
-
-                        lk.lock();
-                    }
-                    if(this->tasks.empty()) {
-                        empty.notify_all();
-                        if (this->running) {
-                            consumer.wait(lk);
-                        }
-                    }
-                }
-                std::cout << "Left thread " << i << "!" << std::endl;
-            });
-        }
-    }
-
-    void stop() {
-        std::unique_lock<std::mutex> lk(this->taskAccess);
-        running = false;
-        lk.unlock();
-        consumer.notify_all();
-        for(auto& t : threads) {
-            t.join();
-        }
-    }
-
-    void pushTask(const std::function<void(void)>& task) {
-        std::unique_lock<std::mutex> lock(taskAccess);
-        tasks.push(task);
-        lock.unlock();
-        consumer.notify_one();
-    }
-
-    ~ThreadPool() {
-        stop();
-    }
-
-    void wait() {
-        std::unique_lock<std::mutex> lock(taskAccess);
-        if(!tasks.empty()) {
-            empty.wait(lock);
-        }
-    }
-};
-
-
-static void compress_one_file(const std::string& file, bool decompress) {
-    std::string config;
-    std::string streamName = file.substr(file.find_last_of('/') + 1, std::string::npos);
-
-    if (streamName.substr(0, 3) == "id.") {
-        streamName = "id" + streamName.substr(streamName.find_first_of('.', 3), std::string::npos);
-    } else {
-        streamName = streamName.substr(0, streamName.find_last_of('.'));
-    }
-
-    std::string configpath = "../gabac_config/" +
-                             streamName +
-                             ".json";
-
-    try {
-        std::ifstream t(configpath);
-        if (!t) {
-            throw std::runtime_error("Config not existent");
-        }
-        config = std::string((std::istreambuf_iterator<char>(t)),
-                             std::istreambuf_iterator<char>());
-    }
-    catch (...) {
-        std::cerr << "Problem reading gabac configuration " << configpath << " switching to default" << std::endl;
-        config = defaultGabacConf;
-    }
-
-    FILE *fin_desc = fopen(file.c_str(), "rb");
-    FILE *fout_desc = fopen((file + ".gabac").c_str(), "wb");
-
-    if (!fin_desc) {
-        throw std::runtime_error("Could not open " + file);
-    }
-
-    if (!fout_desc) {
-        throw std::runtime_error("Could not open " + file + ".gabac");
-    }
-
-    gabac::FileInputStream fin(fin_desc);
-    gabac::FileOutputStream fout(fout_desc);
-
-    gabac::IOConfiguration
-            ioconf = {&fin, &fout, 0, &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
-
-    gabac::EncodingConfiguration enConf(config);
-
-    if (!decompress) {
-        gabac::encode(ioconf, enConf);
-        std::cout << "Sucessfully compressed ";
-    } else {
-        gabac::decode(ioconf, enConf);
-        std::cout << "Sucessfully decompressed ";
-    }
-
-
-    fclose(fin_desc);
-    fclose(fout_desc);
-
-    std::cout << file << "\n(" << boost::filesystem::file_size(file) << " to\t";
-    if (boost::filesystem::file_size(file) < 10000) {
-        std::cout << "\t";
-    }
-    std::cout << boost::filesystem::file_size(file + ".gabac") << ")" << std::endl;
-
-    std::remove(file.c_str());
-    std::rename((file + ".gabac").c_str(), file.c_str());
-}
-
-static void run_gabac(const std::vector<std::string>& files, bool decompress){
-    ThreadPool pool(4);
-    for (const auto& file : files) {
-        pool.pushTask([&file, decompress]{
-            compress_one_file(file, decompress);
-        });
-    }
-    pool.wait();
-}
-
-
-void packFile(const std::string& path, const std::string& file, FILE *fout){
-    FILE *fin_desc = fopen((path + file).c_str(), "rb");
-    if (!fin_desc) {
-        throw std::runtime_error("Could not open " + (path + file));
-    }
-    uint64_t size = file.size();
-    if (fwrite(&size, sizeof(uint64_t), 1, fout) != 1) {
-        fclose(fin_desc);
-        throw std::runtime_error("Could not write to output file");
-    }
-    if (fwrite(file.c_str(), 1, size, fout) != size) {
-        fclose(fin_desc);
-        throw std::runtime_error("Could not write to output file");
-    }
-
-    fseek(fin_desc, 0, SEEK_END);
-    size = ftell(fin_desc);
-    if (fwrite(&size, sizeof(uint64_t), 1, fout) != 1) {
-        fclose(fin_desc);
-        throw std::runtime_error("Could not write to output file");
-    }
-    fseek(fin_desc, 0, SEEK_SET);
-
-    uint64_t byteswritten = 0;
-    std::vector<uint8_t> buffer(1000000);
-    while (byteswritten < size) {
-        uint64_t tmp = fread(buffer.data(), 1, std::min(buffer.size(), static_cast<size_t>(size - byteswritten)), fin_desc);
-        if (tmp != std::min(buffer.size(), static_cast<size_t>(size - byteswritten))) {
-            fclose(fin_desc);
-            throw std::runtime_error("Could not read from " + (path + file));
-        }
-        tmp = fwrite(buffer.data(), 1, tmp, fout);
-        if (tmp != std::min(buffer.size(), size - byteswritten)) {
-            fclose(fin_desc);
-            throw std::runtime_error("Could not write to output file");
-        }
-        byteswritten += tmp;
-    }
-
-    fclose(fin_desc);
-    std::cout << "Successfully packed " << (path + file) << std::endl;
-
-}
-
-
-std::string packFiles(const std::vector<std::string>& list, FILE *fout){
-    std::string path;
-    for (const auto& k : list) {
-        size_t pos = k.find_last_of('/') + 1;
-        path = k.substr(0, pos);
-        packFile(path, k.substr(pos, std::string::npos), fout);
-    }
-
-    return path;
-}
-
-std::string unpackFile(const std::string& path, FILE *fin){
-    uint64_t size;
-    std::vector<uint8_t> buffer(1000000);
-    if (fread(&size, sizeof(uint64_t), 1, fin) != 1) {
-        throw std::runtime_error("Could not read from file #1");
-    }
-    std::string filename;
-    filename.resize(size);
-    if (fread((void *) filename.data(), sizeof(uint8_t), size, fin) != size) {
-        throw std::runtime_error("Could not read from file #2");
-    }
-    if (fread(&size, sizeof(uint64_t), 1, fin) != 1) {
-        throw std::runtime_error("Could not read from file #3");
-    }
-
-    FILE *fout = fopen((path + filename).c_str(), "wb");
-    if (!fout) {
-        throw std::runtime_error("Could not open output file #4");
-    }
-
-    uint64_t readBytes = 0;
-    while (readBytes < size) {
-        uint64_t tmp = fread(buffer.data(), 1, std::min(buffer.size(), static_cast<size_t>(size - readBytes)), fin);
-        if (tmp != std::min(buffer.size(), static_cast<size_t>(size - readBytes))) {
-            fclose(fout);
-            throw std::runtime_error("Could not read from input file #5");
-        }
-        readBytes += tmp;
-        if (fwrite(buffer.data(), 1, tmp, fout) != tmp) {
-            fclose(fout);
-            throw std::runtime_error("Could not write to output file #6");
-        }
-    }
-
-    fclose(fout);
-
-    std::cout << "Successfully unpacked " << (path + filename) << std::endl;
-
-    return path + filename;
-}
-
-
-std::vector<std::string> unpackFiles(const std::string& path, FILE *fin){
-    uint64_t pos = ftell(fin);
-    fseek(fin, 0, SEEK_END);
-    uint64_t end = ftell(fin);
-    fseek(fin, pos, SEEK_SET);
-
-    std::vector<std::string> filelist;
-
-    while (ftell(fin) < end) {
-        filelist.push_back(unpackFile(path, fin));
-    }
-
-    return filelist;
-}
-
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> createMap(const std::vector<std::string>& filelist){
-    std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> map;
-    for (const auto& f : filelist) {
-        size_t pos = std::string::npos;
-        size_t tmp = 0;
-        while ((tmp = f.find("ref_subseq_", tmp)) != std::string::npos) {
-            pos = tmp;
-            tmp++;
-        }
-        if (pos == std::string::npos) {
-            continue;
-        }
-        pos += std::string("ref_subseq_").length();
-        if (f.size() < pos + 5) {
-            continue;
-        }
-        uint8_t j = f[pos] - '0';
-        uint8_t k = f[pos + 2] - '0';
-        uint8_t i = f[pos + 4] - '0';
-
-        if (map.size() <= i) {
-            map.resize(i + 1);
-        }
-
-        map[i][j][k] = f;
-    }
-    return map;
-}
-
 void decompression(
         const ProgramOptions& programOptions
 ){
+    // Open file and create tmp directory with random name
     FILE *in = fopen(programOptions.inputFilePath.c_str(), "rb");
     if (!in) {
         throw std::runtime_error("Could not open input file");
@@ -541,25 +246,26 @@ void decompression(
     }
     std::cout << "Temporary directory: " << temp_dir << "\n";
 
+    // Unpack
     std::cout << "Starting decompression...\n";
     auto flist =
             unpackFiles(temp_dir, in);
     fclose(in);
 
+    // Decompress
     run_gabac(flist, true);
 
+    // Extract spring parameters
     spring::compression_params cp;
     FILE *cpfile = fopen((temp_dir + "cp.bin").c_str(), "rb");
     if (!cpfile) {
         throw std::runtime_error("Cannot open config file");
     }
-
     if (fread((uint8_t *) &cp, sizeof(spring::compression_params), 1, cpfile) != 1) {
         fclose(cpfile);
         throw std::runtime_error("Cannot read config");
     }
     fclose(cpfile);
-
     uint32_t num_blocks;
     if (!cp.paired_end) {
         num_blocks = 1 + (cp.num_reads - 1) / cp.num_reads_per_block;
@@ -567,21 +273,21 @@ void decompression(
         num_blocks = 1 + (cp.num_reads / 2 - 1) / cp.num_reads_per_block;
     }
 
+    // Decode spring streams
     spring::decompress(temp_dir, createMap(flist), num_blocks, cp.preserve_order, cp.paired_end);
 
+    // Finish fastq
     std::string outname = programOptions.inputFilePath;
     outname = outname.substr(0, outname.find_last_of('.'));
     outname += "_decompressed";
-
     int number = 0;
     while (boost::filesystem::exists(outname + std::to_string(number) + ".fastq")) {
         ++number;
     }
     outname += std::to_string(number) + ".fastq";
-
     std::rename((temp_dir + "decompressed.fastq").c_str(), outname.c_str());
 
-//    boost::filesystem::remove_all(temp_dir);
+    boost::filesystem::remove_all(temp_dir);
 }
 
 void generation(
@@ -593,45 +299,40 @@ void generation(
         if (programOptions.readAlgorithm == "HARC") {
             auto generated_aus = generationFromFastq_SPRING(programOptions);
 
+            // Open output directory of spring
             std::vector<std::string> filelist;
-
             std::string path = generated_aus.getGeneratedAusRef().getRefAus().front().begin()->second.begin()->second;
             path = path.substr(0, path.find_last_of('/') + 1);
-
             boost::filesystem::path p(path);
-
             boost::filesystem::directory_iterator end_itr;
 
+            // Remove temporary files
             std::remove((path + "read_order.bin").c_str());
             std::remove((path + "read_seq.txt").c_str());
 
-            // cycle through the directory
+            // Create list of all files
             for (boost::filesystem::directory_iterator itr(p); itr != end_itr; ++itr) {
-                // If it's not a directory, list it. If you want to list directories too, just remove this check.
                 if (is_regular_file(itr->path())) {
-                    // assign current file name to current_file and echo it out to the console.
                     std::string current_file = itr->path().string();
                     filelist.push_back(current_file);
                 }
             }
 
+            // Compress
             run_gabac(filelist, false);
 
-            std::string outfile = (programOptions.inputFilePath
-                                           .substr(0, programOptions.inputFilePath.find_last_of('.')) +
-                                   ".genie");
-
+            // Pack
+            std::string outfile = (programOptions.inputFilePath.substr(0, programOptions.inputFilePath.find_last_of('.')) + ".genie");
             FILE *output = fopen(
                     outfile.c_str(), "wb"
             );
             if (!output) {
                 throw std::runtime_error("Could not open output file");
             }
-
             packFiles(filelist, output);
-
             fclose(output);
 
+            // Finish
             std::cout << "**** Finished ****" << std::endl;
             std::cout
                     << "Compressed "
