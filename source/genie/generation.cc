@@ -26,7 +26,7 @@
 #include "fileio/sam_file_reader.h"
 #include "fileio/sam_record.h"
 #include "coding/spring/spring.h"
-#include "gabac/gabac.h"
+#include "genie/genie_gabac_output_stream.h"
 
 namespace spring {
 void decompress(const std::string& temp_dir,
@@ -126,32 +126,41 @@ static void generationFromFastq(
                                    "0\",\"binarization_id\":\"0\",\"binarization_parameters\":[\"8\"],\""
                                    "context_selection_id\":\"2\"}]}";
 
-    gabac::DataBlock inputDataBlock(0, 1);
-    for (const auto& symbol : ureads) {
-        inputDataBlock.push_back(static_cast<uint64_t>(symbol));
-    }
+    // Prepare input
+    gabac::DataBlock inputDataBlock(ureads.size(), 1);
+    memcpy(inputDataBlock.getData(), ureads.data(), ureads.size());
     std::cout << "Input data block size: " << inputDataBlock.size() << std::endl;
 
+    // Prepare streams
     gabac::BufferInputStream bufferInputStream(&inputDataBlock);
-    gabac::BufferOutputStream bufferOutputStream;
-
+    GenieGabacOutputStream bufferOutputStream;
     gabac::IOConfiguration ioconf = {&bufferInputStream, &bufferOutputStream, 0, &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
     gabac::EncodingConfiguration enConf(defaultGabacConf);
 
+    //Encode
     gabac::encode(ioconf, enConf);
 
-    gabac::DataBlock outputDataBlock(0, 1);
-    bufferOutputStream.flush(&outputDataBlock);
-    std::cout << "Bitstream size: " << outputDataBlock.size() << std::endl;
+    // Use output
+    std::vector<std::pair<size_t, uint8_t*>> outputData;
+    bufferOutputStream.flush(&outputData);
+    std::cout << "Number of streams: " << outputData.size() << std::endl;
+    for(const auto& s : outputData) {
+        std::cout << "Bitstream size: " << s.first << std::endl;
+        for(size_t i = 0; i < s.first; ++i) {
+            std::cout << static_cast<int>(s.second[i]) << " ";
+        }
+        std::cout << std::endl;
+    }
 
-    gabac::BlockStepper blockStepper = outputDataBlock.getReader();
+    size_t payloadSize = outputData[0].first;
+    uint8_t *payload = outputData[0].second;
 
-    size_t payloadSize = outputDataBlock.size() * outputDataBlock.getWordSize();
-    uint8_t *payload = static_cast<uint8_t*>(malloc(payloadSize));
-    int i = 0;
-    while (blockStepper.isValid()) {
-        payload[i++] = static_cast<uint8_t>(blockStepper.get());
-        blockStepper.inc();
+    /*
+     * Do stuff with payload ....
+     */
+
+    for(const auto& s : outputData) {
+        free(s.second);
     }
 
     // if (!programOptions.inputFilePairPath.empty()) {

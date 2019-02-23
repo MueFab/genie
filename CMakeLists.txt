@@ -346,6 +346,7 @@ set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/sam_reco
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/dsg.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/exceptions.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/generation.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/genie_gabac_output_stream.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/ProgramOptions.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/utilities.cc)
 
