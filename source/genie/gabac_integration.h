@@ -9,9 +9,9 @@
 namespace dsg {
 
 // Compress/Decompress a single file
-void compress_one_file(const std::string& file, bool decompress);
+void compress_one_file(const std::string& file, const std::string& config, bool decompress);
 
 // Decompress a list of files in parallel
-void run_gabac(const std::vector<std::string>& files, bool decompress);
+void run_gabac(const std::vector<std::string>& files, const std::string& config, bool decompress, size_t threads);
 }
 #endif //GENIE_GABAC_INTEGRATION_H
