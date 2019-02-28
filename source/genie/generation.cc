@@ -253,7 +253,7 @@ void decompression(
     fclose(in);
 
     // Decompress
-    run_gabac(flist, true);
+    run_gabac(flist, programOptions.configPath, true, programOptions.numThreads);
 
     // Extract spring parameters
     spring::compression_params cp;
@@ -279,13 +279,17 @@ void decompression(
     // Finish fastq
     std::string outname = programOptions.inputFilePath;
     outname = outname.substr(0, outname.find_last_of('.'));
-    outname += "_decompressed";
-    int number = 0;
-    while (boost::filesystem::exists(outname + std::to_string(number) + ".fastq")) {
-        ++number;
+    if(cp.paired_end) {
+        outname += "_decompressed_1.fastq";
+        std::rename((temp_dir + "decompressed_1.fastq").c_str(), outname.c_str());
+        outname = programOptions.inputFilePath;
+        outname = outname.substr(0, outname.find_last_of('.'));
+        outname += "_decompressed_2.fastq";
+        std::rename((temp_dir + "decompressed_2.fastq").c_str(), outname.c_str());
+    } else {
+        outname += "_decompressed.fastq";
+        std::rename((temp_dir + "decompressed.fastq").c_str(), outname.c_str());
     }
-    outname += std::to_string(number) + ".fastq";
-    std::rename((temp_dir + "decompressed.fastq").c_str(), outname.c_str());
 
     boost::filesystem::remove_all(temp_dir);
 }
@@ -319,7 +323,7 @@ void generation(
             }
 
             // Compress
-            run_gabac(filelist, false);
+            run_gabac(filelist, programOptions.configPath, false, programOptions.numThreads);
 
             // Pack
             std::string outfile = (programOptions.inputFilePath.substr(0, programOptions.inputFilePath.find_last_of('.')) + ".genie");

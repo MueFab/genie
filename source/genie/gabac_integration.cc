@@ -21,7 +21,7 @@ std::string defaultGabacConf = "{\"word_size\":\"1\",\"sequence_transformation_i
                                "context_selection_id\":\"2\"}]}";
 
 
-static std::string getConfigForFile(const std::string& file) {
+static std::string getConfigForFile(const std::string& file, const std::string& config) {
     std::string streamName = file.substr(file.find_last_of('/') + 1, std::string::npos);
 
     if (streamName.substr(0, 3) == "id.") {
@@ -30,15 +30,15 @@ static std::string getConfigForFile(const std::string& file) {
         streamName = streamName.substr(0, streamName.find_last_of('.'));
     }
 
-    std::string configpath = "../gabac_config/" +
+    std::string configpath = config +
                              streamName +
                              ".json";
     return configpath;
 }
 
-void compress_one_file(const std::string& file, bool decompress){
+void compress_one_file(const std::string& file, const std::string& configfolder, bool decompress){
     std::string config;
-    std::string configpath = getConfigForFile(file);
+    std::string configpath = getConfigForFile(file, configfolder);
 
     // Read config or fall back to default
     try {
@@ -94,14 +94,14 @@ void compress_one_file(const std::string& file, bool decompress){
     std::rename((file + ".gabac").c_str(), file.c_str());
 }
 
-void run_gabac(const std::vector<std::string>& files, bool decompress){
-    const size_t NUM_THREADS = 1;
+void run_gabac(const std::vector<std::string>& files, const std::string& config, bool decompress, size_t threads){
+    const size_t NUM_THREADS = threads;
     ThreadPool pool(NUM_THREADS);
     for (const auto& file : files) {
         pool.pushTask(
-                [&file, decompress]
+                [&file, &config, decompress]
                 {
-                    compress_one_file(file, decompress);
+                    compress_one_file(file, config, decompress);
                 }
         );
     }
