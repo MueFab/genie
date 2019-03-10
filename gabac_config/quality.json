@@ -6,13 +6,13 @@
         {
             "lut_transformation_enabled": "1",
             "lut_transformation_bits": "7",
-            "lut_transformation_order": "1",
+            "lut_transformation_order": "0",
             "diff_coding_enabled": "0",
             "binarization_id": "4",
             "binarization_parameters": [
-                "30"
+                "5"
             ],
-            "context_selection_id": "3"
+            "context_selection_id": "1"
         }
     ]
 }

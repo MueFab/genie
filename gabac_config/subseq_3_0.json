@@ -5,8 +5,6 @@
     "transformed_sequences": [
         {
             "lut_transformation_enabled": "0",
-            "lut_transformation_bits": "1",
-            "lut_transformation_order": "1",
             "diff_coding_enabled": "0",
             "binarization_id": "4",
             "binarization_parameters": [

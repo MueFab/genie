@@ -1,14 +1,12 @@
 {
-    "word_size": "1",
+    "word_size": "8",
     "sequence_transformation_id": "0",
     "sequence_transformation_parameter": "0",
     "transformed_sequences": [
         {
             "lut_transformation_enabled": "0",
-            "lut_transformation_bits": "0",
-            "lut_transformation_order": "0",
-            "diff_coding_enabled": "0",
-            "binarization_id": "4",
+            "diff_coding_enabled": "1",
+            "binarization_id": "5",
             "binarization_parameters": [
                 "1"
             ],
