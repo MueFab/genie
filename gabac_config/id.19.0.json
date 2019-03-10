@@ -1,7 +1,7 @@
 {
     "word_size": "8",
-    "sequence_transformation_id": "0",
-    "sequence_transformation_parameter": "0",
+    "sequence_transformation_id": "3",
+    "sequence_transformation_parameter": "255",
     "transformed_sequences": [
         {
             "lut_transformation_enabled": "1",
@@ -10,7 +10,16 @@
             "diff_coding_enabled": "0",
             "binarization_id": "4",
             "binarization_parameters": [
-                "3"
+                "2"
+            ],
+            "context_selection_id": "2"
+        },
+        {
+            "lut_transformation_enabled": "0",
+            "diff_coding_enabled": "0",
+            "binarization_id": "0",
+            "binarization_parameters": [
+                "32"
             ],
             "context_selection_id": "3"
         }
