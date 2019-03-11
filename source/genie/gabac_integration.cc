@@ -234,6 +234,8 @@ void update_configs(const std::vector<std::string>& files, const std::string& co
             }
             fclose(outfile);
 
+            update_one_config(file, configpath);
+
         }
     }
 }
