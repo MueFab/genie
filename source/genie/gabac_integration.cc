@@ -212,6 +212,9 @@ void update_one_config(const std::string& file, const std::string& configpath){
 }
 
 void update_configs(const std::vector<std::string>& files, const std::string& config){
+
+    auto start = std::chrono::high_resolution_clock::now();
+
     for (const auto& file : files) {
         std::string configpath = getConfigForFile(file, config);
         if(boost::filesystem::exists(boost::filesystem::path(configpath))){
@@ -238,6 +241,12 @@ void update_configs(const std::vector<std::string>& files, const std::string& co
 
         }
     }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+
+    std::cout << "Config check took " << duration.count() << " seconds!" << std::endl;
+
 }
 
 void run_gabac(const std::vector<std::string>& files, const std::string& config, bool decompress, size_t threads){
