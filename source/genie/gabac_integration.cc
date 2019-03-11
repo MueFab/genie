@@ -59,7 +59,7 @@ gabac::EncodingConfiguration updateConfig (const gabac::EncodingConfiguration& c
         case gabac::SequenceTransformationId::match_coding:
             bits = uint8_t (std::ceil(std::log2(ret.sequenceTransformationParameter + 1)));
             ret.transformedSequenceConfigurations[1].lutBits = bits;
-            updateBin(ret, ret.sequenceTransformationParameter + 1, 1);
+            updateBin(ret, ret.sequenceTransformationParameter, 1);
             ret.transformedSequenceConfigurations[2].lutBits = 32;
             updateBin(ret, std::numeric_limits<uint32_t >::max(), 2);
             break;
