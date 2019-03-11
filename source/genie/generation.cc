@@ -336,11 +336,15 @@ void generation(
             packFiles(filelist, output);
             fclose(output);
 
+            size_t orgSize = boost::filesystem::file_size(programOptions.inputFilePath);
+            if(!programOptions.inputFilePairPath.empty()) {
+                orgSize += boost::filesystem::file_size(programOptions.inputFilePairPath);
+            }
+
             // Finish
             std::cout << "**** Finished ****" << std::endl;
-            std::cout
-                    << "Compressed "
-                    << boost::filesystem::file_size(programOptions.inputFilePath)
+            std::cout << "Compressed "
+                    << orgSize
                     << " to "
                     << boost::filesystem::file_size(outfile)
                     << ". Compression rate "
