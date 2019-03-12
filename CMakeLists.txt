@@ -69,7 +69,7 @@ execute_process(
     RESULT_VARIABLE result
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest/download
 )
-if (result)
+if(result)
     message(FATAL_ERROR "CMake step for googletest failed: ${result}")
 endif()
 execute_process(
@@ -88,8 +88,40 @@ endif()
 # Add googletest directly to our build and define the gtest and gtest_main
 # targets.
 add_subdirectory(
-    ${CMAKE_BINARY_DIR}/googletest/src
-    ${CMAKE_BINARY_DIR}/googletest/build
+    ${CMAKE_BINARY_DIR}/googletest-src
+    ${CMAKE_BINARY_DIR}/googletest-build
+    EXCLUDE_FROM_ALL
+)
+
+#==============================================================================
+# gabac
+#==============================================================================
+
+configure_file(CMakeLists_gabac.txt.in gabac-download/CMakeLists.txt)
+set(BUILD_GABACIFY OFF CACHE BOOL "" FORCE)
+set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
+execute_process(
+    COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+    RESULT_VARIABLE result2
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gabac-download
+)
+if(result2)
+    message(FATAL_ERROR "CMake step for gabac failed: ${result2}")
+endif()
+execute_process(
+    COMMAND ${CMAKE_COMMAND} --build .
+    RESULT_VARIABLE result2
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gabac-download
+)
+if(result2)
+    message(FATAL_ERROR "Build step for gabac failed: ${result2}")
+endif()
+
+# Add gabac directly to our build. This defines the gtest and gtest_main
+# targets.
+add_subdirectory(
+    ${CMAKE_CURRENT_BINARY_DIR}/gabac-src
+    ${CMAKE_CURRENT_BINARY_DIR}/gabac-build
     EXCLUDE_FROM_ALL
 )
 
@@ -127,7 +159,7 @@ endif ()
 set(coding "coding")
 set(coding_source_dir ${CMAKE_SOURCE_DIR}/source/coding )
 set(coding_header_dir ${CMAKE_SOURCE_DIR}/source/coding )
-set(coding_include_dir ${CMAKE_SOURCE_DIR}/source/coding ${CMAKE_SOURCE_DIR}/source)
+set(coding_include_dir ${CMAKE_SOURCE_DIR}/source/coding ${CMAKE_SOURCE_DIR}/source ${CMAKE_CURRENT_BINARY_DIR}/gabac-src/source)
 
 # List all source files
 set(coding_source_files ${coding_source_files} ${coding_source_dir}/ReturnStructures.cpp)
@@ -286,6 +318,11 @@ add_library(${MPEGGFileCreation} STATIC ${MPEGGFileCreation_source_files})
 target_include_directories(${MPEGGFileCreation} PRIVATE ${MPEGGFileCreation_include_dir})
 target_link_libraries(${MPEGGFileCreation} ${format})
 
+#==============================================================================
+# conformance
+#==============================================================================
+
+add_subdirectory(source/conformance)
 
 #==============================================================================
 # genie
@@ -295,7 +332,7 @@ target_link_libraries(${MPEGGFileCreation} ${format})
 set(genie "genie")
 set(genie_source_dir ${CMAKE_SOURCE_DIR}/source)
 set(genie_header_dir ${CMAKE_SOURCE_DIR}/source)
-set(genie_include_dir ${CMAKE_SOURCE_DIR}/source)
+set(genie_include_dir ${CMAKE_SOURCE_DIR}/source ${CMAKE_CURRENT_BINARY_DIR}/gabac-src/source)
 
 # List all source files
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/fasta_file_reader.cc)
@@ -308,8 +345,12 @@ set(genie_source_files ${genie_source_files} ${genie_source_dir}/fileio/sam_reco
 #
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/dsg.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/exceptions.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/gabac_integration.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/generation.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/genie_gabac_output_stream.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/genie_file_format.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/ProgramOptions.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/thread_pool.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/utilities.cc)
 
 # List all header files (alphabetically)
@@ -333,6 +374,8 @@ target_link_libraries(${genie} ${format})
 target_link_libraries(${genie} ${file})
 target_link_libraries(${genie} ${MPEGGFileCreation})
 target_link_libraries(${genie} ${coding})
+target_link_libraries(${genie} ${file})
+target_link_libraries(${genie} gabac)
 # target_link_libraries(${genie} ${boost_lib_dir}/libboost_program_options.a)
 # target_link_libraries(${genie} ${boost_lib_dir}/libboost_filesystem.a)
 # target_link_libraries(${genie} ${boost_lib_dir}/libboost_system.a)

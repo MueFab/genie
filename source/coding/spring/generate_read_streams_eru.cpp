@@ -421,6 +421,7 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_str
   delete[] noise_arr;
   delete[] noisepos_arr;
 
+
   return descriptorFilesPerAU;
 }
 
