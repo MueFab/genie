@@ -7,6 +7,9 @@
 #include "SignatureInputInteger.h"
 #include "../../utils.h"
 
+uint8_t createMask(uint8_t lengthSymbol);
+
+
 int oneSymbolLeft8(SignatureInputInteger8* signatureInteger8, uint8_t lengthSymbol){
     return (8 - signatureInteger8->currentPosition >= lengthSymbol);
 }

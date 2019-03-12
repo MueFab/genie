@@ -5,16 +5,12 @@
 #ifndef READ_SIGNATURES_SIGNATURE_SIZE_COMPUTATION_H
 #define READ_SIGNATURES_SIGNATURE_SIZE_COMPUTATION_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdint.h>
 #include "Signature.h"
 
 typedef struct {
-    int signatureLengthInSymbols;
-    int currentSignatureSizeInSymbols;
+    uint32_t signatureLengthInSymbols;
+    uint32_t currentSignatureSizeInSymbols;
     uint8_t integerSize;
     uint8_t symbolSize;
     uint8_t currentIntegerContentLength;
@@ -22,8 +18,8 @@ typedef struct {
 } SignatureSizeComputation ;
 
 void initSignatureSizeComputation(
-        SignatureSizeComputation* signatureSizeComputation,
-        int signatureLengthInSymbols,
+        SignatureSizeComputation *signatureSizeComputation,
+        uint32_t signatureLengthInSymbols,
         uint8_t integerSize,
         uint8_t symbolSize
 );
@@ -33,9 +29,5 @@ void simulateSymbol(SignatureSizeComputation* signatureSizeComputation);
 void simulateTerminator(SignatureSizeComputation* signatureSizeComputation);
 uint64_t getTotalSizeInBits(SignatureSizeComputation* signatureSizeComputation);
 uint64_t getTotalSizeInBytes(SignatureSizeComputation* signatureSizeComputation);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif //READ_SIGNATURES_SIGNATURE_SIZE_COMPUTATION_H

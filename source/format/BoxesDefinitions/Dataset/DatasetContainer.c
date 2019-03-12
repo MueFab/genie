@@ -9,6 +9,10 @@
 #include "../../Boxes.h"
 #include "../../utils.h"
 
+void freeDatasetParametersVector(Vector* parametersVector);
+uint64_t getSizeDatasetParametersVector(Vector* parametersVector);
+bool writeDatasetParametersVector(Vector* datasetParametersVector, FILE* outputFile);
+
 DatasetContainer *initDatasetContainer() {
     DatasetContainer* datasetContainer = (DatasetContainer*) calloc(1,sizeof(DatasetContainer));
 
@@ -17,10 +21,13 @@ DatasetContainer *initDatasetContainer() {
     datasetContainer->datasetParameters = NULL;
     datasetContainer->datasetMetadata = NULL;
     datasetContainer->datasetProtection = NULL;
-    datasetContainer->streamContainers = initVector();
-    datasetContainer->accessUnitContainers = initVector();
-    datasetContainer->seekPosition = -1;
+    datasetContainer->streamContainers = NULL;
+    datasetContainer->accessUnitContainers = NULL;
+    datasetContainer->hasSeekPosition = false;
+    datasetContainer->seekPosition = 0;
     datasetContainer->accessUnitsOffsets = NULL;
+    datasetContainer->accessUnitsContainers = NULL;
+    datasetContainer->accessUnitsOffsetsInitiatedWithValues = false;
     return datasetContainer;
 }
 
@@ -72,7 +79,9 @@ void freeDatasetContainer(DatasetContainer *datasetContainer) {
     if(datasetContainer->accessUnitsOffsets != NULL) {
         for (uint16_t seqId = 0; seqId < datasetContainer->datasetHeader->sequencesCount; seqId++) {
             uint8_t num_classes = getClassesCount(datasetContainer->datasetHeader);
-            num_classes -= hasClassType(datasetContainer->datasetHeader, U_TYPE_AU);
+            ClassType uType;
+            uType.classType = CLASS_TYPE_CLASS_U;
+            num_classes -= hasClassType(datasetContainer->datasetHeader, uType);
             for (uint8_t class_i = 0; class_i < num_classes; class_i++) {
                 free(datasetContainer->accessUnitsOffsets[seqId][class_i]);
             }
@@ -84,7 +93,9 @@ void freeDatasetContainer(DatasetContainer *datasetContainer) {
     if(datasetContainer->accessUnitsContainers != NULL) {
         for(uint16_t seqId=0; seqId<datasetContainer->datasetHeader->sequencesCount; seqId++){
             uint8_t num_classes = getClassesCount(datasetContainer->datasetHeader);
-            num_classes -=  hasClassType(datasetContainer->datasetHeader, U_TYPE_AU);
+            ClassType uType;
+            uType.classType = CLASS_TYPE_CLASS_U;
+            num_classes -=  hasClassType(datasetContainer->datasetHeader, uType);
             for(uint8_t class_i=0; class_i<num_classes; class_i++){
                 free(datasetContainer->accessUnitsContainers[seqId][class_i]);
             }
@@ -227,6 +238,18 @@ bool writeContentDatasetContainer(DatasetContainer* datasetContainer, FILE *outp
         }
     }
 
+    if (datasetContainer->datasetMetadata!= NULL) {
+        if(!writeDatasetMetadata(datasetContainer->datasetMetadata, outputFile)){
+            fprintf(stderr,"Error writing datasetMetadata.\n");
+            return false;
+        }
+    }
+    if (datasetContainer->datasetProtection!= NULL){
+        if(!writeDatasetProtection(datasetContainer->datasetProtection, outputFile)){
+            fprintf(stderr,"Error writing datasetProtection.\n");
+            return false;
+        }
+    }
 
     if (datasetContainer->accessUnitContainers != NULL){
         unsigned long numberAccessUnits = getSize(datasetContainer->accessUnitContainers);
@@ -249,25 +272,13 @@ bool writeContentDatasetContainer(DatasetContainer* datasetContainer, FILE *outp
         }
     }
 
-    if (datasetContainer->datasetMetadata!= NULL) {
-        if(!writeDatasetMetadata(datasetContainer->datasetMetadata, outputFile)){
-            fprintf(stderr,"Error writing datasetMetadata.\n");
-            return false;
-        }
-    }
-    if (datasetContainer->datasetProtection!= NULL){
-        if(!writeDatasetProtection(datasetContainer->datasetProtection, outputFile)){
-            fprintf(stderr,"Error writing datasetProtection.\n");
-            return false;
-        }
-    }
     return true;
 }
 
 bool isDatasetContainerValid(DatasetContainer *datasetContainer){
     if (
         datasetContainer->datasetHeader== NULL ||
-                (datasetContainer->datasetParameters == NULL && datasetContainer->datasetHeader->datasetType != 2)
+        datasetContainer->datasetParameters == NULL
     ){
         return false;
     }
@@ -315,7 +326,13 @@ DatasetContainer *parseDatasetContainer(uint64_t boxContentSize, FILE *inputFile
     char type[5];
     uint64_t boxSize;
     DatasetContainer* datasetContainer = initDatasetContainer();
-    datasetContainer->seekPosition = ftell(inputFile);
+    long tellValue = ftell(inputFile);
+    if(tellValue == -1){
+        fprintf(stderr,"Dataset container could not retrieve seek position.\n");
+        freeDatasetContainer(datasetContainer);
+        return NULL;
+    }
+    datasetContainer->seekPosition = (size_t)tellValue;
 
     enum PreviousState {
         init,
@@ -329,8 +346,7 @@ DatasetContainer *parseDatasetContainer(uint64_t boxContentSize, FILE *inputFile
         accessUnit_container
     }  previousState = init;
 
-    FILE* debugMemory = fopen("/tmp/debugMemory","wb");
-    FILE* debugMemory2 = fopen("/tmp/debugMemory2","wb");
+    int accessUnitcount = 0;
 
     while(getSizeContentDatasetContainer(datasetContainer)<boxContentSize){
         if(!readBoxHeader(inputFile,type, &boxSize)){
@@ -353,19 +369,19 @@ DatasetContainer *parseDatasetContainer(uint64_t boxContentSize, FILE *inputFile
             setDatasetHeader(datasetContainer, datasetHeader);
             datasetContainer->accessUnitsOffsets =
                     (uint64_t***)calloc(datasetHeader->sequencesCount, sizeof(uint64_t**));
-            fprintf(debugMemory,"%hu\n", datasetHeader->sequencesCount);
             datasetContainer->accessUnitsContainers =
                     (AccessUnitContainer****)calloc(datasetHeader->sequencesCount, sizeof(AccessUnitContainer***));
             for(uint16_t seqId=0; seqId<datasetHeader->sequencesCount; seqId++){
                 uint8_t num_classes = getClassesCount(datasetHeader);
-                num_classes -=  hasClassType(datasetHeader, U_TYPE_AU);
+                ClassType uType;
+                uType.classType = CLASS_TYPE_CLASS_U;
+                num_classes -=  hasClassType(datasetHeader, uType);
 
                 datasetContainer->accessUnitsOffsets[seqId] =
                         (uint64_t**)calloc(
                                 num_classes,
                                 sizeof(uint64_t*)
                         );
-                fprintf(debugMemory,"%hu: %hu\n", seqId, num_classes);
                 datasetContainer->accessUnitsContainers[seqId] =
                         (AccessUnitContainer***)calloc(
                                 num_classes,
@@ -378,7 +394,6 @@ DatasetContainer *parseDatasetContainer(uint64_t boxContentSize, FILE *inputFile
                                     numBlocks,
                                     sizeof(uint64_t)
                             );
-                    fprintf(debugMemory,"%hu, %hu: %hu\n", seqId, class_i, numBlocks);
                     datasetContainer->accessUnitsContainers[seqId][class_i] =
                             (AccessUnitContainer**)calloc(
                                     numBlocks,
@@ -388,9 +403,19 @@ DatasetContainer *parseDatasetContainer(uint64_t boxContentSize, FILE *inputFile
             }
 
         }else if (strncmp(type,datasetMasterIndexTableName,4)==0){
-            if (previousState != parameter){
+            if (!(
+                    previousState == parameter
+                    || previousState == dataset_metadata
+                    || previousState == dataset_protection
+            )){
                 freeDatasetContainer(datasetContainer);
                 return NULL;
+            }
+            if(
+                    !isMITFlagSet(getDatasetHeader(datasetContainer))
+            ){
+                fprintf(stderr,"MIT found in dataset with mit flag set to 0");
+                freeDatasetContainer(datasetContainer);
             }
             previousState = master_index;
             DatasetMasterIndexTable* datasetMasterIndexTable = parseDatasetMasterIndexTable(datasetContainer, inputFile);
@@ -421,7 +446,7 @@ DatasetContainer *parseDatasetContainer(uint64_t boxContentSize, FILE *inputFile
             setDatasetParameters(datasetContainer, datasetParametersVector);
 
         }else if (strncmp(type,datasetMetadataName,4)==0){
-            if (!(previousState == descriptor_stream || previousState == accessUnit_container)){
+            if (!(previousState == parameter)){
                 freeDatasetContainer(datasetContainer);
                 return NULL;
             }
@@ -435,8 +460,7 @@ DatasetContainer *parseDatasetContainer(uint64_t boxContentSize, FILE *inputFile
             setDatasetMetadata(datasetContainer, datasetMetadata);
 
         }else if (strncmp(type,datasetProtectionName,4)==0){
-            if (!(previousState == descriptor_stream || previousState == accessUnit_container ||
-                    previousState == dataset_metadata)){
+            if (!(previousState == parameter || previousState == dataset_metadata)){
                 freeDatasetContainer(datasetContainer);
                 return NULL;
             }
@@ -451,43 +475,75 @@ DatasetContainer *parseDatasetContainer(uint64_t boxContentSize, FILE *inputFile
             setDatasetProtection(datasetContainer, datasetProtection);
 
         }else if (strncmp(type,accessUnitContainerName,4)==0){
-            if (!(previousState==parameter || previousState == master_index || previousState == accessUnit_container)){
+            if (
+                    !(
+                        previousState==parameter
+                        || previousState==dataset_metadata
+                        || previousState==dataset_protection
+                        || previousState == master_index
+                        || previousState == accessUnit_container
+                    )
+            ){
                 freeDatasetContainer(datasetContainer);
                 return NULL;
             }
-            size_t aucn_offset = ftell(inputFile)-(size_t)12;
+            if(
+                isMITFlagSet(getDatasetHeader(datasetContainer))
+                && !(previousState == master_index || previousState == accessUnit_container)
+            ){
+                fprintf(stderr, "File has MIT flag set, master index table has to be present.\n");
+            }
+            size_t aucn_offset = (size_t)(ftell(inputFile))-(size_t)12;
             previousState = accessUnit_container;
             AccessUnitContainer* accessUnitContainer = parseAccessUnitContainer(boxSize - 12, inputFile, fileName, datasetContainer);
+
+            accessUnitcount++;
+
             if(accessUnitContainer == NULL){
                 fprintf(stderr,"Error reading access unit container.\n");
                 freeDatasetContainer(datasetContainer);
                 return NULL;
             }
             addAccessUnitToDataset(datasetContainer, accessUnitContainer);
-            uint8_t auType = (uint8_t) (accessUnitContainer->accessUnitHeader->au_type - 1);
+            ClassType auType = accessUnitContainer->accessUnitHeader->au_type;
+            uint8_t class_index;
+            getClassIndexForType(
+                datasetContainer->datasetHeader,
+                auType,
+                &class_index
+            );
             uint32_t accessUnitID = accessUnitContainer->accessUnitHeader->access_unit_ID;
 
             uint16_t sequencesCount = getSequencesCount(datasetContainer->datasetHeader);
-            bool foundOffset = true;
-            for(uint16_t sequence_i=0; sequence_i<sequencesCount; sequence_i++){
-                if(accessUnitID < getBlocksInSequence(datasetContainer->datasetHeader, sequence_i)) {
-                    if (datasetContainer->accessUnitsOffsets[sequence_i][auType][accessUnitID] ==
-                        aucn_offset - datasetContainer->seekPosition
-                            ) {
-                        foundOffset = true;
-                        datasetContainer->accessUnitsContainers[sequence_i][auType][accessUnitID] = accessUnitContainer;
-                        break;
+
+            if(datasetContainer->accessUnitsOffsetsInitiatedWithValues) {
+                bool foundOffset = false;
+                for (uint16_t sequence_i = 0; sequence_i < sequencesCount; sequence_i++) {
+                    if (accessUnitID < getBlocksInSequence(datasetContainer->datasetHeader, sequence_i)) {
+
+                        if (datasetContainer->accessUnitsOffsets[sequence_i][class_index][accessUnitID] ==
+                            aucn_offset - datasetContainer->seekPosition
+                                ) {
+                            foundOffset = true;
+                            datasetContainer->accessUnitsContainers[sequence_i][class_index][accessUnitID] =
+                                    accessUnitContainer;
+                            break;
+                        }
                     }
                 }
-            }
-            if(!foundOffset){
-                fprintf(stderr,"access unit container offset was not found.\n");
-                return NULL;
+                if (!foundOffset) {
+                    fprintf(stderr, "access unit container offset was not found.\n");
+                    return NULL;
+                }
             }
 
         }else if (strncmp(type,streamContainerName,4)==0){
-            if (!(previousState == accessUnit_container || previousState == descriptor_stream ||
-                    previousState == master_index || previousState == parameter)){
+            if (
+                    !(
+                            previousState == accessUnit_container
+                            || previousState == descriptor_stream
+                    )
+            ){
                 freeDatasetContainer(datasetContainer);
                 return NULL;
             }
@@ -506,12 +562,10 @@ DatasetContainer *parseDatasetContainer(uint64_t boxContentSize, FILE *inputFile
             return NULL;
         }
     }
-    fclose(debugMemory);
-    fclose(debugMemory2);
     return datasetContainer;
 }
 
-long getDatasetContainerSeekPosition(DatasetContainer* datasetContainer){
+size_t getDatasetContainerSeekPosition(DatasetContainer *datasetContainer){
     return datasetContainer->seekPosition;
 }
 
@@ -595,27 +649,22 @@ Vector* getDataUnitAccessUnits(DatasetContainer* datasetContainer){
         return NULL;
     }
 
-    for(uint16_t sequence_i=0; sequence_i<getSequencesCount(datasetContainer->datasetHeader); sequence_i++){
-        uint8_t numClasses = getClassesCount(datasetContainer->datasetHeader);
-        numClasses -= hasClassType(getDatasetHeader(datasetContainer), U_TYPE_AU) ? 1 : 0;
-        for(uint8_t class_i=0; class_i<numClasses; class_i++){
-            uint32_t numberAUs = getBlocksInSequence(datasetContainer->datasetHeader, sequence_i);
-            for(uint32_t au_i=0; au_i<numberAUs; au_i++){
-                DataUnitAccessUnit* dataUnitAccessUnit = getDataUnitAccessUnit(datasetContainer, sequence_i, class_i, au_i);
-            }
-        }
-    }
+    return datasetContainer->accessUnitContainers;
 }
 
-DataUnitAccessUnit* getDataUnitAccessUnit(DatasetContainer *datasetContainer, uint16_t sequence_index, uint8_t class_index,
+DataUnitAccessUnit* getDataUnitAccessUnit(DatasetContainer *datasetContainer, SequenceID sequenceId,
+                                          uint8_t class_index,
                                           uint32_t au_id){
     DatasetMasterIndexTable* datasetMasterIndexTable = datasetContainer->datasetMasterIndexTable;
     if (datasetMasterIndexTable == NULL){
         return NULL;
     }
 
+    uint16_t sequenceIndex;
+    getSequenceIndex(getDatasetHeader(datasetContainer), sequenceId, &sequenceIndex);
+
     AccessUnitContainer* accessUnitContainer =
-            datasetContainer->accessUnitsContainers[sequence_index][class_index][au_id];
+            datasetContainer->accessUnitsContainers[sequenceIndex][class_index][au_id];
     if(accessUnitContainer == NULL) {
         return NULL;
     }
@@ -624,15 +673,17 @@ DataUnitAccessUnit* getDataUnitAccessUnit(DatasetContainer *datasetContainer, ui
     uint8_t numBlocks = getNumBlocks(accessUnitHeader);
     uint16_t parameterSetId = getParametersSetId(accessUnitHeader);
     uint32_t readsCount = getReadsCount(accessUnitHeader);
+    SequenceID refSequence = getReferenceSequence(accessUnitHeader);
+    uint64_t refStart = getReferenceStart(accessUnitHeader);
+    uint64_t refEnd = getReferenceEnd(accessUnitHeader);
     uint16_t mmThreshold = getMMThreshold(accessUnitHeader);
     uint32_t mmCount = getMMCount(accessUnitHeader);
-    uint64_t auStartPosition = getAUStartPosition(datasetMasterIndexTable, sequence_index, class_index, au_id);
-    uint64_t auEndPosition = getAUEndPosition(datasetMasterIndexTable, sequence_index, class_index, au_id);
-    uint64_t auExtendedStartPosition = getAUExtendedStartPosition(datasetMasterIndexTable, sequence_index, class_index, au_id);
-    uint64_t auExtendedEndPosition = getAUExtendedEndPosition(datasetMasterIndexTable, sequence_index, class_index, au_id);
+    uint64_t auStartPosition = getAUStartPosition(datasetMasterIndexTable, sequenceId, class_index, au_id);
+    uint64_t auEndPosition = getAUEndPosition(datasetMasterIndexTable, sequenceId, class_index, au_id);
+    uint64_t auExtendedStartPosition = getAUExtendedStartPosition(datasetMasterIndexTable, sequenceId, class_index, au_id);
+    uint64_t auExtendedEndPosition = getAUExtendedEndPosition(datasetMasterIndexTable, sequenceId, class_index, au_id);
 
-    uint8_t class_Id = getClassType(getDatasetHeader(datasetContainer), class_index);
-    uint16_t sequence_Id = getSequenceId(getDatasetHeader(datasetContainer), sequence_index);
+    ClassType class_Id = getClassType(getDatasetHeader(datasetContainer), class_index);
 
     DataUnitAccessUnit* dataUnitAccessUnit = initDataUnitAccessUnit(
             accessUnitId,
@@ -642,7 +693,10 @@ DataUnitAccessUnit* getDataUnitAccessUnit(DatasetContainer *datasetContainer, ui
             readsCount,
             mmThreshold,
             mmCount,
-            sequence_Id,
+            refSequence,
+            refStart,
+            refEnd,
+            sequenceId,
             auStartPosition,
             auEndPosition,
             auExtendedStartPosition,
@@ -652,9 +706,10 @@ DataUnitAccessUnit* getDataUnitAccessUnit(DatasetContainer *datasetContainer, ui
     Vector* blocks = getBlocks(accessUnitContainer);
     if(blocks != NULL){
         for(size_t block_i=0; block_i<getSize(blocks); block_i++){
-            Block* block = getValue(blocks, block_i);
-            uint32_t blockSize = (uint32_t) getBlockSize(block);
-            DataUnitBlockHeader* blockHeader = initDataUnitBlockHeader(block->blockHeader->descriptorId, blockSize);
+            Block* blockToCopy = getValue(blocks, block_i);
+            Block* block = initBlock(datasetContainer, cloneFromFile(blockToCopy->payload));
+            uint32_t blockSize = (uint32_t) (blockToCopy->payload->endPos - blockToCopy->payload->startPos);
+            DataUnitBlockHeader* blockHeader = initDataUnitBlockHeader(blockToCopy->blockHeader->descriptorId, blockSize);
             if(block != NULL && blockHeader != NULL){
                 addBlockToDataUnitAccessUnit(dataUnitAccessUnit, block, blockHeader);
             }else{
@@ -670,7 +725,7 @@ DataUnitAccessUnit* getDataUnitAccessUnit(DatasetContainer *datasetContainer, ui
             uint64_t block_start_position;
             bool block_start_found = getBlockByteOffset(
                     datasetMasterIndexTable,
-                    sequence_index,
+                    sequenceId,
                     class_index,
                     au_id,
                     block_i,
@@ -684,7 +739,7 @@ DataUnitAccessUnit* getDataUnitAccessUnit(DatasetContainer *datasetContainer, ui
             uint64_t block_end_position;
             bool block_end_found = getNextBlockByteOffset(
                     datasetMasterIndexTable,
-                    sequence_index,
+                    sequenceId,
                     class_index,
                     au_id,
                     block_i,
@@ -696,7 +751,13 @@ DataUnitAccessUnit* getDataUnitAccessUnit(DatasetContainer *datasetContainer, ui
             }
             FromFile* fromFile = initFromFileWithFilenameAndBoundaries(
                     /*todo change this hardcoded 0*/
-                    ((StreamContainer*)getValue(datasetContainer->streamContainers,0))->dataFromFile->filename,
+                    (
+                            (FromFile*)
+                            (
+                                    ((StreamContainer*)getValue(datasetContainer->streamContainers,0))
+                                    ->datasFromFile->vector[0]
+                            )
+                    )->filename,
                     block_start_position + datasetContainer->seekPosition,
                     block_end_position + datasetContainer->seekPosition
             );
@@ -710,5 +771,40 @@ DataUnitAccessUnit* getDataUnitAccessUnit(DatasetContainer *datasetContainer, ui
         }
     }
     return dataUnitAccessUnit;
+}
 
+int getNumberParameters(DatasetContainer* datasetContainer, size_t* value){
+    if(datasetContainer == NULL){
+        return -1;
+    }
+    if(datasetContainer->datasetParameters == NULL){
+        return -1;
+    }
+    *value = getSize(datasetContainer->datasetParameters);
+    return 0;
+}
+
+int getDatasetParameters(DatasetContainer* datasetContainer, size_t index, DatasetParameters** datasetParameters){
+    if(datasetContainer == NULL){
+        return -1;
+    }
+    if(datasetContainer->datasetParameters == NULL){
+        return -1;
+    }
+    *datasetParameters = getValue(datasetContainer->datasetParameters, index);
+    return 0;
+}
+
+int getDatasetParametersById(DatasetContainer *datasetContainer, uint16_t id, DatasetParameters **datasetParameters) {
+    size_t numberParameters;
+    getNumberParameters(datasetContainer, &numberParameters);
+    for(size_t parameter_i=0; parameter_i<numberParameters; parameter_i++){
+        if(getDatasetParameters(datasetContainer, parameter_i, datasetParameters)){
+            if((*datasetParameters)->parameter_set_ID == id){
+                return 0;
+            }
+        }
+    }
+    *datasetParameters = NULL;
+    return -1;
 }

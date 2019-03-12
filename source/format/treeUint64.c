@@ -3,6 +3,26 @@
 #include "treeUint64.h"
 
 void fixUp(Tree *tree, TreeNode *insertedNode);
+void setAsParentOf(TreeNode *child, TreeNode *parent);
+void setAsLeft(TreeNode* treeNode, TreeNode* parent);
+void setAsRight(TreeNode* treeNode, TreeNode* parent);
+void setBalance(TreeNode* treeNode, int balance);
+TreeNode* getParent(TreeNode* treeNode);
+TreeNode* getLeftChild(TreeNode* treeNode);
+TreeNode* getRightChild(TreeNode* treeNode);
+int8_t getBalance(TreeNode* treeNode);
+void setRoot(Tree *tree, TreeNode *newNode);
+void increaseBalance(TreeNode* parent);
+void decreaseBalance(TreeNode* parent);
+bool insertIntoNode(TreeNode* parent, TreeNode* treeNode);
+void setAsNewChildOf(Tree *tree, TreeNode *parent, TreeNode *newChild, TreeNode *oldChild);
+TreeNode* rotateLeft(TreeNode* parent, TreeNode* currentlyBeingFixedNode);
+TreeNode* rotateRight(TreeNode* parent, TreeNode* currentlyBeingFixedNode);
+TreeNode* rotateRightLeft(TreeNode *X, TreeNode* Z);
+TreeNode* rotateLeftRight(TreeNode *X, TreeNode* Z);
+uint64_t numberElementsInNode(TreeNode* treeNode);
+void freeTreeNode(TreeNode* treeNode);
+
 
 TreeNode* initTreeNode(uint64_t value){
     TreeNode* treeNode = (TreeNode*)calloc(1,sizeof(TreeNode));
@@ -334,23 +354,23 @@ int checkNode(TreeNode *node, TreeNode *parent) {
     return maxReport+1;
 }
 
-long int numberElementsInNode(TreeNode* treeNode){
+uint64_t numberElementsInNode(TreeNode* treeNode){
     if(treeNode == NULL){
         return 0;
     }
-    long int numberElements = 0;
+    uint64_t numberElements = 0;
     if(getLeftChild(treeNode) != NULL){
         numberElements += numberElementsInNode(getLeftChild(treeNode));
     }
     if(getRightChild(treeNode) != NULL){
         numberElements += numberElementsInNode(getRightChild(treeNode));
     }
-    return numberElements+1;
+    return numberElements+(uint64_t)1;
 }
 
-long int numberElements(Tree* tree){
+uint64_t numberElements(Tree *tree){
     if(tree == NULL){
-        return -1;
+        return 0;
     }
     if(tree->root == NULL){
         return 0;

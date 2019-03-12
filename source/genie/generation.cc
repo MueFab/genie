@@ -410,6 +410,11 @@ void generation(
     }
 }
 
+/*
+ *
+ * DISABLED FOR THE MOMENT
+ *
+ *
 void fastqSpringResultToFile(generated_aus generatedAus){
     MPEGGFileCreator fileCreator;
     DatasetGroup *datasetGroup1 = fileCreator.addDatasetGroup();
@@ -442,7 +447,7 @@ void fastqSpringResultToFile(generated_aus generatedAus){
     }
 
     fileCreator.write("testOutput0");
-}
+}*/
 
 
 }  // namespace dsg

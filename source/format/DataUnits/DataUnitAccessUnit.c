@@ -8,15 +8,25 @@
 #include <DataStructures/BitStreams/InputBitstream.h>
 #include "DataUnits.h"
 
+uint32_t getDataUnitAccessUnitSize(
+        DataUnitAccessUnit *dataUnitAccessUnit,
+        bool multipleAlignmentsFlag,
+        uint8_t datasetType,
+        bool pos40Bits
+);
+
 DataUnitAccessUnit* initDataUnitAccessUnit(
         uint32_t accessUnitId,
         uint8_t numBlocks,
         uint16_t parameterSetId,
-        uint8_t AU_type,
+        ClassType AU_type,
         uint32_t readsCount,
         uint16_t mmThreshold,
         uint32_t mmCount,
-        uint16_t sequenceId,
+        SequenceID referenceSequenceId,
+        uint64_t referenceStartPos,
+        uint64_t referenceEndPos,
+        SequenceID sequenceId,
         uint64_t auStartPosition,
         uint64_t auEndPosition,
         uint64_t extendedAUStartPosition,
@@ -34,6 +44,9 @@ DataUnitAccessUnit* initDataUnitAccessUnit(
     dataUnitAccessUnit->readsCount = readsCount;
     dataUnitAccessUnit->mmThreshold = mmThreshold;
     dataUnitAccessUnit->mmCount = mmCount;
+    dataUnitAccessUnit->ref_sequenced_ID = referenceSequenceId;
+    dataUnitAccessUnit->ref_start_position = referenceStartPos;
+    dataUnitAccessUnit->ref_end_position = referenceEndPos;
     dataUnitAccessUnit->sequenceId = sequenceId;
     dataUnitAccessUnit->auStartPosition = auStartPosition;
     dataUnitAccessUnit->auEndPosition = auEndPosition;
@@ -54,39 +67,276 @@ bool addBlockToDataUnitAccessUnit(DataUnitAccessUnit *dataUnitAccessUnit, Block 
     return true;
 }
 
-uint32_t getDataUnitAccessUnitSize(DataUnitAccessUnit* dataUnitAccessUnit, bool multipleAlignmentsFlag){
+uint32_t getDataUnitAccessUnitSize(
+        DataUnitAccessUnit *dataUnitAccessUnit,
+        bool multipleAlignmentsFlag,
+        uint8_t datasetType,
+        bool pos40Bits
+) {
     uint32_t contentSize = 1; //size of type
     contentSize += 4; //size of payload's size
-    contentSize += 13; //fixed Access unit header
+    contentSize += 4; //access_unit_ID
+    contentSize += 1; //num_blocks
+    contentSize += 2; //parameter_set_ID + AU_type
+    contentSize += 4; //reads_count
 
-    //todo unaccounted for
-    contentSize += 1;
+    if(
+            dataUnitAccessUnit->AU_type.classType == CLASS_TYPE_CLASS_N
+            || dataUnitAccessUnit->AU_type.classType == CLASS_TYPE_CLASS_M
+    ){
+        contentSize += 2; //mm_threshold
+        contentSize += 4; //mm_count
+    }
 
-    contentSize += dataUnitAccessUnit->AU_type == N_TYPE_AU || dataUnitAccessUnit->AU_type == M_TYPE_AU ? 6 : 0;
-    contentSize += dataUnitAccessUnit->AU_type != U_TYPE_AU ? 8:0;
-    contentSize += dataUnitAccessUnit->AU_type != U_TYPE_AU && multipleAlignmentsFlag ? 8:0;
+    if(datasetType == 2){
+        contentSize += 2; //ref_seq
+        contentSize += 4; //ref_start
+        contentSize += 4; //ref_end
+    }
+
+    if(dataUnitAccessUnit->AU_type.classType != CLASS_TYPE_CLASS_U){
+        contentSize += 2; //sequenceID
+        uint8_t sizePos = (uint8_t) (pos40Bits ? 5 : 4);
+        contentSize += sizePos; //au_start_position
+        contentSize += sizePos; //au_end_position
+        if(multipleAlignmentsFlag) {
+            contentSize += sizePos; //extended_AU_start_position
+            contentSize += sizePos; //extended_AU_end_position
+        }
+    }else{
+        //todo unaligned case
+    }
 
     for(size_t block_i=0; block_i<getSize(dataUnitAccessUnit->blocks); block_i++){
-        contentSize += 6; //
+        contentSize += 1; //descriptor_ID + reserved
+        contentSize += 4; //block_size
         Block* block = getValue(dataUnitAccessUnit->blocks, block_i);
-        long blockSize = getFromFileSize(block->payload);
+        uint64_t blockSize = getFromFileSize(block->payload);
         contentSize += blockSize;
     }
 
     return contentSize;
 }
 
-bool writeDataUnitAccessUnit(DataUnitAccessUnit* dataUnitAccessUnit, bool multipleAlignmentsFlag, FILE* outputFile){
-    bool dataUnitAccessUnitTypeSuccessfulWrite = writeUint8(2, outputFile);
+int parseDataUnitAccessUnit(DataUnitAccessUnit **dataUnitAccessUnit, DataUnits* dataUnits, bool multipleAlignmentsFlag, FILE *inputFile,
+                            char *filename, uint64_t size) {
+    *dataUnitAccessUnit = NULL;
 
-    uint32_t contentSize = getDataUnitAccessUnitSize(dataUnitAccessUnit, multipleAlignmentsFlag);
-    bool contentSizeSuccessfulWrite = writeBigEndian32ToFile(contentSize<<3, outputFile);
+    InputBitstream inputBitstream;
+    initializeInputBitstream(&inputBitstream, inputFile);
+    uint32_t accessUnitId;
+    uint8_t numBlocks;
+    uint16_t parameterSetId = 0;
+    uint8_t auType;
+    uint32_t readsCount;
+    uint16_t mmThreshold = 0;
+    uint32_t mmCount = 0;
+    SequenceID refSequence;
+    refSequence.sequenceID = 0;
+    uint64_t refStart = 0;
+    uint64_t refEnd = 0;
+    SequenceID sequenceId;
+    sequenceId.sequenceID = 0;
+    uint64_t auStartPosition = 0;
+    uint64_t auEndPosition = 0;
+    uint64_t extendedAuStartPosition = 0;
+    uint64_t extendedAuEndPosition = 0;
+    uint64_t remainingSize = size*8;
+
+
+
+    if(
+        !readNBitsBigToNativeEndian32(&inputBitstream, 32, &accessUnitId) ||
+        !readBytes(&inputBitstream, 1, (char*)&numBlocks) ||
+        !readNBitsShift(&inputBitstream, 8, (char*)&parameterSetId) ||
+        !(readNBitsShift(&inputBitstream, 4, (char*)&auType)) ||
+        !(readNBitsBigToNativeEndian32(&inputBitstream, 32, &readsCount))
+    ){
+        fprintf(stderr, "Error reading DataUnitAccessUnit (either in access unit id, num_blocks, parameter_set_id, "
+                        "au_type, or read_count.\n");
+        return false;
+    }
+
+    ParametersSet* parametersSet;
+    if (getDataUnitsParametersById(dataUnits, parameterSetId, &parametersSet) != 0){
+        fprintf(stderr, "Error reading DataUnitAccessUnit: parameters could not be found.\n");
+        return false;
+    }
+
+    remainingSize -= 32; //accessUnitId
+    remainingSize -= 8; //numBlocks
+    remainingSize -= 8; //parameterSetId
+    remainingSize -= 4; //auType
+    remainingSize -= 32; //readsCount
+    if(auType == CLASS_TYPE_CLASS_N ||  auType == CLASS_TYPE_CLASS_M){
+        if(
+            !readNBitsBigToNativeEndian16(&inputBitstream, 16, &mmThreshold) ||
+            !readNBitsBigToNativeEndian32(&inputBitstream, 32, &mmCount)
+        ){
+            fprintf(stderr, "Error reading DataUnitAccessUnit (either in mmThreshold or mmCount).\n");
+            return false;
+        }
+        remainingSize -= 16; //mmThreshold
+        remainingSize -= 32; //mmCount
+    }
+
+    if(parametersSet->dataset_type == 2){
+        uint16_t refSequenceBuffer;
+        if(
+            !readNBitsBigToNativeEndian16(&inputBitstream, 16, &refSequenceBuffer)
+        ){
+            fprintf(stderr, "Error reading DataUnitAccessUnit. ref_sequence_id could not be read.\n");
+        }
+        refSequence.sequenceID = refSequenceBuffer;
+        if(parametersSet->pos_40_bits){
+            if(
+                !readNBitsBigToNativeEndian64(&inputBitstream, 40, &refStart) ||
+                !readNBitsBigToNativeEndian64(&inputBitstream, 40, &refEnd)
+            ){
+                fprintf(stderr, "Error reading DataUnitAccessUnit ref_start or ref_end could not be read.\n");
+            }
+        }else{
+            if(
+                !readNBitsBigToNativeEndian64(&inputBitstream, 32, &refStart) ||
+                !readNBitsBigToNativeEndian64(&inputBitstream, 32, &refEnd)
+            ){
+                fprintf(stderr, "Error reading DataUnitAccessUnit ref_start or ref_end could not be read\n");
+            }
+        }
+    }
+
+    if(auType != CLASS_TYPE_CLASS_U){
+        if(
+            !readNBitsBigToNativeEndian16(&inputBitstream, 16, &(sequenceId.sequenceID))
+        ){
+            fprintf(stderr, "Error reading DataUnitAccessUnit. SequenceId could not be read.\n");
+            return false;
+        }
+        remainingSize -= 16; //sequenceId
+
+        bool auStartPositionSuccessfulRead;
+        bool auEndPositionSuccessfulRead;
+        if(parametersSet->pos_40_bits) {
+            auStartPositionSuccessfulRead= readNBitsBigToNativeEndian64(
+                    &inputBitstream, 40, &auStartPosition
+            );
+            auEndPositionSuccessfulRead= readNBitsBigToNativeEndian64(
+                    &inputBitstream, 40, &auEndPosition
+            );
+            remainingSize -= 5; //auStartPosition
+            remainingSize -= 5; //auEndPosition
+        }else{
+            auStartPositionSuccessfulRead= readNBitsBigToNativeEndian64(
+                    &inputBitstream, 32, &auStartPosition
+            );
+            auEndPositionSuccessfulRead= readNBitsBigToNativeEndian64(
+                    &inputBitstream, 32, &auEndPosition
+            );
+            remainingSize -= 4; //auStartPosition
+            remainingSize -= 4; //auEndPosition
+        }
+        if(
+            !auStartPositionSuccessfulRead ||
+            !auEndPositionSuccessfulRead
+        ) {
+            fprintf(stderr,
+                    "Error reading DataUnitAccessUnit. Either auStart or auEnd could not be read.\n");
+            return false;
+        }
+
+
+        if(multipleAlignmentsFlag) {
+            bool extendedAuStartPositionSuccessfulRead;
+            bool extendedAuEndPositionSuccessfulRead;
+            if(parametersSet->pos_40_bits){
+                extendedAuStartPositionSuccessfulRead = readNBitsBigToNativeEndian64(
+                        &inputBitstream, 40, &extendedAuStartPosition
+                );
+                extendedAuEndPositionSuccessfulRead = readNBitsBigToNativeEndian64(
+                        &inputBitstream, 40, &extendedAuEndPosition
+                );
+                remainingSize -= 5; //extendedAuStartPosition
+                remainingSize -= 5; //extendedAuEndPosition
+            }else{
+                extendedAuStartPositionSuccessfulRead = readNBitsBigToNativeEndian64(
+                        &inputBitstream, 32, &extendedAuStartPosition
+                );
+                extendedAuEndPositionSuccessfulRead = readNBitsBigToNativeEndian64(
+                        &inputBitstream, 32, &extendedAuEndPosition
+                );
+                remainingSize -= 4; //extendedAuStartPosition
+                remainingSize -= 4; //extendedAuEndPosition
+            }
+
+            if (
+                !extendedAuStartPositionSuccessfulRead || !extendedAuEndPositionSuccessfulRead
+            ) {
+                fprintf(stderr, "Error reading DataUnitAccessUnit either extended au start or extended au end "
+                                "could not be read.\n");
+                return false;
+            }
+
+        }
+    }
+
+    ClassType classType;
+    classType.classType = auType;
+
+    *dataUnitAccessUnit = initDataUnitAccessUnit(
+            accessUnitId,
+            numBlocks,
+            parameterSetId,
+            classType,
+            readsCount,
+            mmThreshold,
+            mmCount,
+            refSequence,
+            refStart,
+            refEnd,
+            sequenceId,
+            auStartPosition,
+            auEndPosition,
+            extendedAuStartPosition,
+            extendedAuEndPosition
+    );
+
+    forwardUntilAligned(&inputBitstream);
+    for(int i=0; i<numBlocks; i++){
+        uint8_t descriptorIdAndReserved;
+        uint32_t payloadSizeShifted;
+
+        readNBitsShift(&inputBitstream, 8, (char*)&descriptorIdAndReserved);
+        readNBitsBigToNativeEndian32(&inputBitstream, 32, &payloadSizeShifted);
+
+        uint8_t descriptorId = descriptorIdAndReserved >> 1;
+        uint32_t payloadSize = payloadSizeShifted;
+
+
+        FromFile* fromFile = initFromFileWithFilenameAndBoundaries(filename, (uint64_t) ftell(inputFile),
+                                                                   (uint64_t) (ftell(inputFile) + payloadSize));
+        fseek(inputFile, payloadSize, SEEK_CUR);
+
+        Block* block = initBlockWithHeader(descriptorId, payloadSize, fromFile);
+        DataUnitBlockHeader* dataUnitBlockHeader = initDataUnitBlockHeader(descriptorId, payloadSize);
+
+        addBlockToDataUnitAccessUnit(*dataUnitAccessUnit, block, dataUnitBlockHeader);
+    }
+
+    return true;
+}
+
+bool writeDataUnitAccessUnit(DataUnitAccessUnit* dataUnitAccessUnit, bool multipleAlignmentsFlag, uint8_t datasetType,
+        bool pos40Bits, FILE* outputFile){
+    bool dataUnitAccessUnitTypeSuccessfulWrite = utils_write(2, outputFile);
+
+    uint32_t contentSize = getDataUnitAccessUnitSize(dataUnitAccessUnit, multipleAlignmentsFlag, datasetType, pos40Bits);
+    bool contentSizeSuccessfulWrite = writeBigEndian32ToFile(contentSize, outputFile);
 
     OutputBitstream outputBitstream;
     initializeOutputBitstream(&outputBitstream, outputFile);
     bool accessUnitIdSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian32(&outputBitstream, 32, dataUnitAccessUnit->accessUnitId);
     bool numBlocksSuccessfulWrite = writeNBitsShift(&outputBitstream, 8, (char*)&(dataUnitAccessUnit->numBlocks));
-    bool parameterSetIdSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian16(&outputBitstream, 12, dataUnitAccessUnit->parameterSetId);
+    bool parameterSetIdSuccessfulWrite = writeNBitsShift(&outputBitstream, 8, (char*)&dataUnitAccessUnit->parameterSetId);
     bool AU_typeSuccessfulWrite = writeNBitsShift(&outputBitstream, 4, (char*)&(dataUnitAccessUnit->AU_type));
     bool readsCountSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian32(&outputBitstream, 32, dataUnitAccessUnit->readsCount);
     if(
@@ -102,7 +352,10 @@ bool writeDataUnitAccessUnit(DataUnitAccessUnit* dataUnitAccessUnit, bool multip
         return false;
     }
 
-    if(dataUnitAccessUnit->AU_type == N_TYPE_AU ||  dataUnitAccessUnit->AU_type == M_TYPE_AU){
+    if(
+            dataUnitAccessUnit->AU_type.classType == CLASS_TYPE_CLASS_N
+            ||  dataUnitAccessUnit->AU_type.classType == CLASS_TYPE_CLASS_M
+    ){
         bool mmThresholdSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian16(&outputBitstream, 16, dataUnitAccessUnit->mmThreshold);
         bool mmCountSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian32(&outputBitstream, 32, dataUnitAccessUnit->mmCount);
         if (!mmThresholdSuccessfulWrite || !mmCountSuccessfulWrite){
@@ -111,27 +364,58 @@ bool writeDataUnitAccessUnit(DataUnitAccessUnit* dataUnitAccessUnit, bool multip
         }
     }
 
-    uint32_t copySequenceId = dataUnitAccessUnit->sequenceId;
-    writeNBitsShiftAndConvertToBigEndian32_new(&outputBitstream, 24, copySequenceId, false);
+    if(datasetType == 2){
+        writeNBitsShiftAndConvertToBigEndian16(&outputBitstream, 16, dataUnitAccessUnit->ref_sequenced_ID.sequenceID);
+        if(pos40Bits){
+            writeNBitsShiftAndConvertToBigEndian64(&outputBitstream, 40, dataUnitAccessUnit->ref_start_position);
+            writeNBitsShiftAndConvertToBigEndian64(&outputBitstream, 40, dataUnitAccessUnit->ref_end_position);
+        }else{
+            writeNBitsShiftAndConvertToBigEndian32(&outputBitstream, 32, (uint32_t)dataUnitAccessUnit->ref_start_position);
+            writeNBitsShiftAndConvertToBigEndian32(&outputBitstream, 32, (uint32_t)dataUnitAccessUnit->ref_end_position);
+        }
+    }
 
-    //todo unaccounted for
-    //uint8_t bufferZero = 0;
-    //writeNBitsShift(&outputBitstream, 8, (const char *) &bufferZero);
+    if(dataUnitAccessUnit->AU_type.classType != CLASS_TYPE_CLASS_U){
+        writeNBitsShiftAndConvertToBigEndian16(&outputBitstream, 16, dataUnitAccessUnit->sequenceId.sequenceID);
 
-    if(dataUnitAccessUnit->AU_type != U_TYPE_AU){
-        bool auStartPositionSuccessfulWrite =
-                writeNBitsShiftAndConvertToBigEndian32(&outputBitstream, 32, dataUnitAccessUnit->auStartPosition);
-        bool auEndPositionSuccessfulWrite =
-                writeNBitsShiftAndConvertToBigEndian32(&outputBitstream, 32, dataUnitAccessUnit->auEndPosition);
+        bool auStartPositionSuccessfulWrite;
+        bool auEndPositionSuccessfulWrite;
+
+        if(pos40Bits){
+            auStartPositionSuccessfulWrite =
+                    writeNBitsShiftAndConvertToBigEndian64(&outputBitstream, 40, (uint32_t) dataUnitAccessUnit->auStartPosition);
+            auEndPositionSuccessfulWrite =
+                    writeNBitsShiftAndConvertToBigEndian64(&outputBitstream, 40, (uint32_t) dataUnitAccessUnit->auEndPosition);
+        }else{
+            auStartPositionSuccessfulWrite =
+                    writeNBitsShiftAndConvertToBigEndian32(&outputBitstream, 32, (uint32_t) dataUnitAccessUnit->auStartPosition);
+            auEndPositionSuccessfulWrite =
+                    writeNBitsShiftAndConvertToBigEndian32(&outputBitstream, 32, (uint32_t) dataUnitAccessUnit->auEndPosition);
+        }
+
+
         if (!auStartPositionSuccessfulWrite && !auEndPositionSuccessfulWrite){
             fprintf(stderr, "Error writing au start or end.\n");
             return false;
         }
         if (multipleAlignmentsFlag){
-            bool extendedAuStartSuccessfulWrite =
-                    writeNBitsShiftAndConvertToBigEndian32(&outputBitstream, 32, dataUnitAccessUnit->extendedAUStartPosition);
-            bool extendedAuEndSuccessfulWrite =
-                writeNBitsShiftAndConvertToBigEndian32(&outputBitstream, 32, dataUnitAccessUnit->extendedAUEndPosition);
+            bool extendedAuStartSuccessfulWrite;
+            bool extendedAuEndSuccessfulWrite;
+            if(pos40Bits){
+                extendedAuStartSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian64(
+                        &outputBitstream, 40, dataUnitAccessUnit->extendedAUStartPosition
+                );
+                extendedAuEndSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian64(
+                        &outputBitstream, 40, dataUnitAccessUnit->extendedAUEndPosition
+                );
+            } else {
+                extendedAuStartSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian32(
+                        &outputBitstream, 32, (uint32_t) dataUnitAccessUnit->extendedAUStartPosition
+                );
+                extendedAuEndSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian32(
+                        &outputBitstream, 32, (uint32_t) dataUnitAccessUnit->extendedAUEndPosition
+                );
+            }
             if(!extendedAuStartSuccessfulWrite && !extendedAuEndSuccessfulWrite){
                 fprintf(stderr, "Error writing extended au start or end.\n");
                 return false;
@@ -140,7 +424,7 @@ bool writeDataUnitAccessUnit(DataUnitAccessUnit* dataUnitAccessUnit, bool multip
     }
     writeBuffer(&outputBitstream);
 
-    for(int i=0; i<getSize(dataUnitAccessUnit->blocks); i++){
+    for(size_t i=0; i<getSize(dataUnitAccessUnit->blocks); i++){
         Block* block = getValue(dataUnitAccessUnit->blocks, i);
         DataUnitBlockHeader* dataUnitBlockHeader = getValue(dataUnitAccessUnit->blocksHeaders, i);
 
@@ -149,27 +433,22 @@ bool writeDataUnitAccessUnit(DataUnitAccessUnit* dataUnitAccessUnit, bool multip
             writeFromFile(block->payload, outputFile);
         }
     }
-    if(dataUnitAccessUnit->auStartPosition == 10005){
-        for(int i=0; i<getSize(dataUnitAccessUnit->blocks); i++){
-            Block* block = getValue(dataUnitAccessUnit->blocks, i);
-            DataUnitBlockHeader* dataUnitBlockHeader = getValue(dataUnitAccessUnit->blocksHeaders, i);
-
-            char* filename = calloc(500, sizeof(char));
-            sprintf(filename, "/home/bscuser/data/block_%hu", dataUnitBlockHeader->descriptorId);
-            FILE *outputBlock = fopen(filename, "wb");
-            writeFromFile(block->payload, outputBlock);
-            fclose(outputBlock);
-            free(filename);
-        }
-    }
     return true;
 }
 
 void freeDataUnitAccessUnit(DataUnitAccessUnit* dataUnitAccessUnit){
-    size_t number_blockHeaders = getSize(dataUnitAccessUnit->blocksHeaders);
 
+    size_t number_blocks = getSize(dataUnitAccessUnit->blocks);
+    for(size_t blocks_i = 0; blocks_i < number_blocks; blocks_i++){
+        Block* block = getValue(dataUnitAccessUnit->blocks, blocks_i);
+
+        if(block != NULL){
+            freeBlock(block);
+        }
+    }
     freeVector(dataUnitAccessUnit->blocks);
 
+    size_t number_blockHeaders = getSize(dataUnitAccessUnit->blocksHeaders);
     for(size_t blockHeaders_i = 0; blockHeaders_i < number_blockHeaders; blockHeaders_i++){
         DataUnitBlockHeader* dataUnitBlockHeader = getValue(dataUnitAccessUnit->blocksHeaders, blockHeaders_i);
 
@@ -182,149 +461,99 @@ void freeDataUnitAccessUnit(DataUnitAccessUnit* dataUnitAccessUnit){
 
     free(dataUnitAccessUnit);
 }
-/*
-DataUnitAccessUnit* parseDataUnitAccessUnit(FILE* inputFile, uint64_t size){
-    InputBitstream inputBitstream;
-    initializeInputBitstream(&inputBitstream, inputFile);
-    uint32_t accessUnitId;
-    uint8_t numBlocks;
-    uint16_t parameterSetId;
-    uint8_t auType;
-    uint32_t  readsCount;
-    uint16_t mmThreshold;
-    uint32_t mmCount;
-    uint16_t sequenceId;
-    uint64_t auStartPosition;
-    uint64_t auEndPosition;
-    uint64_t extendedAuStartPosition;
-    uint64_t extendedAuEndPosition;
 
-    bool accessUnitIdSuccessfulRead =
-            readNBitsShiftAndConvertBigToNativeEndian32(&inputBitstream, 32, (char*)&accessUnitId);
-    bool numBlocksSuccessfulRead = readNBitsShift(&inputBitstream, 8, (char*)&numBlocks);
-    bool parameterSetIdSuccessfulRead =
-            readNBitsShiftAndConvertBigToNativeEndian16(&inputBitstream, 12, (char*)&parameterSetId);
-    bool AU_typeSuccessfulRead = readNBitsShift(&inputBitstream, 4, (char*)&(auType));
-    bool readsCountSuccessfulRead =
-            readNBitsShiftAndConvertBigToNativeEndian32(&inputBitstream, 32, (char*)&readsCount);
+int getDataUnitAccessUnitId(DataUnitAccessUnit* dataUnitAccessUnit, uint32_t* accessUnitId){
+    if (dataUnitAccessUnit == NULL) return -1;
+    *accessUnitId = dataUnitAccessUnit->accessUnitId;
+    return 0;
+}
 
-    if(
-        !accessUnitIdSuccessfulRead ||
-        !numBlocksSuccessfulRead ||
-        !parameterSetIdSuccessfulRead ||
-        !AU_typeSuccessfulRead ||
-        !readsCountSuccessfulRead
-    ){
-        fprintf(stderr, "Error reading data unit access unit header.\n");
-        return false;
-    }
+int getDataUnitNumBlocks(DataUnitAccessUnit* dataUnitAccessUnit, uint8_t* numBlocks){
+    if(dataUnitAccessUnit == NULL) return -1;
+    *numBlocks = dataUnitAccessUnit->numBlocks;
+    return 0;
+}
 
-    if(auType == N_TYPE_AU ||  auType == M_TYPE_AU){
-        bool mmThresholdSuccessfulRead =
-                readNBitsShiftAndConvertBigToNativeEndian16(&inputBitstream, 16, (char*)&mmThreshold);
-        bool mmCountSuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian32(&inputBitstream, 32, (char*)&mmCount);
+int getDataUnitParameterSetId(DataUnitAccessUnit* dataUnitAccessUnit, uint8_t* parameterSetId){
+    if(dataUnitAccessUnit == NULL) return -1;
+    *parameterSetId = dataUnitAccessUnit->parameterSetId;
+    return 0;
+}
 
-        if (!mmThresholdSuccessfulRead || !mmCountSuccessfulRead){
-            fprintf(stderr, "Error reading threshold or count.\n");
-            return false;
-        }
-    }
+int getDataUnitAUType(DataUnitAccessUnit *dataUnitAccessUnit, ClassType *auType){
+    if(dataUnitAccessUnit == NULL) return -1;
+    *auType = dataUnitAccessUnit->AU_type;
+    return 0;
+}
 
-    if(auType != U_TYPE_AU){
-        bool sequenceIdSuccessfulRead =
-                readNBitsShiftAndConvertBigToNativeEndian16(&inputBitstream, 16, (char*)&sequenceId);
-        //todo correct posSize check
-        bool posSizeIs40bits = false;
+int getDataUnitReadsCount(DataUnitAccessUnit* dataUnitAccessUnit, uint32_t* readsCount){
+    if(dataUnitAccessUnit == NULL) return -1;
+    *readsCount = dataUnitAccessUnit->readsCount;
+    return 0;
+}
 
-        bool auStartPositionSuccessfulRead;
-        bool auEndPositionSuccessfulRead;
-        bool auExtendedStartPositionSuccessfulRead;
-        bool auExtendedEndPositionSuccessfulRead;
+int getDataUnitMMThreshold(DataUnitAccessUnit* dataUnitAccessUnit, uint16_t* mmThreshold){
+    if(dataUnitAccessUnit == NULL) return -1;
+    *mmThreshold = dataUnitAccessUnit->mmThreshold;
+    return 0;
+}
 
-        if(!posSizeIs40bits){
-            auStartPositionSuccessfulRead =
-                readNBitsShiftAndConvertBigToNativeEndian32(&inputBitstream, 32, (char*)&auStartPosition);
-            auEndPositionSuccessfulRead =
-                    readNBitsShiftAndConvertBigToNativeEndian32(&inputBitstream, 32, (char*)&auEndPosition);
-        }else{
-            auStartPositionSuccessfulRead =
-                    readNBitsShiftAndConvertBigToNativeEndian64(&inputBitstream, 40, (char*)&auStartPosition);
-            auEndPositionSuccessfulRead =
-                    readNBitsShiftAndConvertBigToNativeEndian64(&inputBitstream, 40, (char*)&auEndPosition);
-        }
+int getDataUnitMMCount(DataUnitAccessUnit* dataUnitAccessUnit, uint32_t* mmCount){
+    if(dataUnitAccessUnit == NULL) return -1;
+    *mmCount = dataUnitAccessUnit->mmCount;
+    return 0;
+}
 
-        //todo correct multipleAlignment
-        bool multipleAlignment = false;
-        if (multipleAlignment){
-            if(!posSizeIs40bits){
-                auExtendedStartPositionSuccessfulRead =
-                    readNBitsShiftAndConvertBigToNativeEndian32(
-                        &inputBitstream,
-                        32,
-                        (char*)&extendedAuStartPosition
-                    );
-                auExtendedEndPositionSuccessfulRead =
-                    readNBitsShiftAndConvertBigToNativeEndian32(
-                        &inputBitstream,
-                        32,
-                        (char*)&extendedAuEndPosition
-                    );
-            }else{
-                auExtendedStartPositionSuccessfulRead =
-                    readNBitsShiftAndConvertBigToNativeEndian64(&inputBitstream, 40, (char*)&extendedAuStartPosition);
-                auExtendedEndPositionSuccessfulRead =
-                    readNBitsShiftAndConvertBigToNativeEndian64(&inputBitstream, 40, (char*)&extendedAuEndPosition);
-            }
-        }else{
-            //todo getMultipleSignatureBase
-            uint32_t multiple
-        }
+int getDataUnitSequenceId(DataUnitAccessUnit *dataUnitAccessUnit, SequenceID *sequenceId){
+    if(dataUnitAccessUnit == NULL) return -1;
+    *sequenceId = dataUnitAccessUnit-> sequenceId;
+    return 0;
+}
 
+int getDataUnitAuStartPosition(DataUnitAccessUnit* dataUnitAccessUnit, uint64_t* auStartPosition){
+    if(dataUnitAccessUnit == NULL) return -1;
+    *auStartPosition = dataUnitAccessUnit->auStartPosition;
+    return 0;
+}
 
+int getDataUnitAuEndPosition(DataUnitAccessUnit* dataUnitAccessUnit, uint64_t* auEndPosition){
+    if(dataUnitAccessUnit == NULL) return -1;
+    *auEndPosition = dataUnitAccessUnit->auEndPosition;
+    return 0;
+}
 
+int getDataUnitReferenceSequenceId(DataUnitAccessUnit* dataUnitAccessUnit, SequenceID *refSequenceID){
+    if(dataUnitAccessUnit == NULL) return -1;
+    *refSequenceID = dataUnitAccessUnit->ref_sequenced_ID;
+    return 0;
+}
 
-        bool auStartPositionSuccessfulWrite =
-                writeNBitsShiftAndConvertToBigEndian32(&outputBitstream, 32, dataUnitAccessUnit->auStartPosition);
-        bool auEndPositionSuccessfulWrite =
-                writeNBitsShiftAndConvertToBigEndian32(&outputBitstream, 32, dataUnitAccessUnit->auEndPosition);
-        if (!auStartPositionSuccessfulWrite && !auEndPositionSuccessfulWrite){
-            fprintf(stderr, "Error writing au start or end.\n");
-            return false;
-        }
-        if (multipleAlignmentsFlag){
-            bool extendedAuStartSuccessfulWrite =
-                    writeNBitsShiftAndConvertToBigEndian32(&outputBitstream, 32, dataUnitAccessUnit->extendedAUStartPosition);
-            bool extendedAuEndSuccessfulWrite =
-                    writeNBitsShiftAndConvertToBigEndian32(&outputBitstream, 32, dataUnitAccessUnit->extendedAUEndPosition);
-            if(!extendedAuStartSuccessfulWrite && !extendedAuEndSuccessfulWrite){
-                fprintf(stderr, "Error writing extended au start or end.\n");
-                return false;
-            }
-        }
-    }
-    writeBuffer(&outputBitstream);
+int getDataUnitReferenceStartPosition(DataUnitAccessUnit* dataUnitAccessUnit, uint64_t* referenceStart){
+    if(dataUnitAccessUnit == NULL) return -1;
+    *referenceStart = dataUnitAccessUnit->ref_start_position;
+    return 0;
+}
 
-    for(int i=0; i<getSize(dataUnitAccessUnit->blocks); i++){
-        Block* block = getValue(dataUnitAccessUnit->blocks, i);
-        DataUnitBlockHeader* dataUnitBlockHeader = getValue(dataUnitAccessUnit->blocksHeaders, i);
+int getDataUnitReferenceEndPosition(DataUnitAccessUnit* dataUnitAccessUnit, uint64_t* referenceEnd){
+    if(dataUnitAccessUnit == NULL) return -1;
+    *referenceEnd = dataUnitAccessUnit->ref_end_position;
+    return 0;
+}
 
-        if(block != NULL && dataUnitBlockHeader != NULL){
-            writeDataUnitBlockHeader(outputFile, dataUnitBlockHeader);
-            writeFromFile(block->payload, outputFile);
-        }
-    }
-    if(dataUnitAccessUnit->auStartPosition == 10005){
-        for(int i=0; i<getSize(dataUnitAccessUnit->blocks); i++){
-            Block* block = getValue(dataUnitAccessUnit->blocks, i);
-            DataUnitBlockHeader* dataUnitBlockHeader = getValue(dataUnitAccessUnit->blocksHeaders, i);
+int getDataUnitExtendedAuStartPosition(DataUnitAccessUnit* dataUnitAccessUnit, uint64_t* extendedAuStartPosition){
+    if(dataUnitAccessUnit == NULL) return -1;
+    *extendedAuStartPosition = dataUnitAccessUnit->extendedAUStartPosition;
+    return 0;
+}
 
-            char* filename = calloc(500, sizeof(char));
-            sprintf(filename, "/home/bscuser/data/block_%hu", dataUnitBlockHeader->descriptorId);
-            FILE *outputBlock = fopen(filename, "wb");
-            writeFromFile(block->payload, outputBlock);
-            fclose(outputBlock);
-            free(filename);
-        }
-    }
-    return true;
-}*/
+int getDataUnitExtendedAuEndPosition(DataUnitAccessUnit* dataUnitAccessUnit, uint64_t* extendedAuEndPosition){
+    if(dataUnitAccessUnit == NULL) return -1;
+    *extendedAuEndPosition = dataUnitAccessUnit->extendedAUEndPosition;
+    return 0;
+}
+
+int getDataUnitBlock(DataUnitAccessUnit *dataUnitAccessUnit, uint8_t block_i, Block** block){
+    if(dataUnitAccessUnit == NULL || block_i>=dataUnitAccessUnit->numBlocks) return -1;
+    *block = getValue(dataUnitAccessUnit->blocks, block_i);
+    return 0;
+}

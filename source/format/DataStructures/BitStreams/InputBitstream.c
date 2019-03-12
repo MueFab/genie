@@ -50,6 +50,34 @@ bool readNBitsShift(InputBitstream *inputBitstream, uint32_t n, char *value){
     return true;
 }
 
+bool readBitsToByteArray(
+        InputBitstream *inputBitStream,
+        uint64_t numBits,
+        uint64_t sizeByteArrayInBytes,
+        uint8_t *byteArray
+){
+    uint64_t remainingBits = numBits;
+    uint64_t currentByte = sizeByteArrayInBytes - bitsToBytes(numBits);
+    while (remainingBits > 0){
+        uint8_t toRead;
+        if(remainingBits % 8 != 0){
+            toRead = (uint8_t) (remainingBits % 8);
+            if(!readNBitsShift(inputBitStream, toRead, (char*)byteArray+currentByte)){
+                return false;
+            };
+        } else {
+            toRead = 8;
+            if(!readNBits(inputBitStream, toRead, (char*)byteArray+currentByte)){
+                return false;
+            };
+        }
+
+        remainingBits -= toRead;
+        currentByte++;
+    }
+    return true;
+}
+
 bool readBytes(InputBitstream *inputBitstream, uint32_t n, char *value){
     return readNBits(inputBitstream, n*8, value);
 }
@@ -60,7 +88,7 @@ bool readNBits(InputBitstream *inputBitstream, uint32_t n, char *value){
     int current_bit = 0;
     int current_byte = 0;
 
-    for(int i=0; i<n; i++){
+    for(uint32_t i=0; i<n; i++){
         if(!readBit(inputBitstream, &bufferValue)){
             return false;
         }
@@ -79,70 +107,46 @@ bool readNBits(InputBitstream *inputBitstream, uint32_t n, char *value){
     return true;
 }
 
-bool readNBitsShiftAndConvertLittleToNativeEndian16(InputBitstream *inputBitstream, uint8_t n, char *value){
-    uint16_t buffer;
-    bool result = readNBits(inputBitstream, n, (char*) &buffer);
-    if (!result){
-        return result;
-    }
-    buffer >>= (16-n);
-    buffer = littleToNativeEndian16(buffer);
-    memcpy(value,&buffer,2);
-    return true;
-}
-bool readNBitsShiftAndConvertLittleToNativeEndian32(InputBitstream *inputBitstream, uint8_t n, char *value){
-    uint32_t buffer=0;
-    bool result = readNBits(inputBitstream, n, (char*) &buffer);
-    if (!result){
-        return result;
-    }
-    buffer >>= (32-n);
-    buffer = littleToNativeEndian32(buffer);
-    memcpy(value,&buffer,4);
-    return true;
-}
-bool readNBitsShiftAndConvertLittleToNativeEndian64(InputBitstream *inputBitstream, uint8_t n, char *value){
-    uint64_t buffer;
-    bool result = readNBits(inputBitstream, n, (char*) &buffer);
-    if (!result){
-        return result;
-    }
-    buffer >>= (64-n);
-    buffer = littleToNativeEndian64(buffer);
-    memcpy(value,&buffer,8);
-    return true;
-}
-
-bool readNBitsShiftAndConvertBigToNativeEndian16(InputBitstream *inputBitstream, uint8_t n, char *value){
-    uint16_t buffer;
-    bool result = readNBits(inputBitstream, n, (char*) &buffer);
+bool readNBitsBigToNativeEndian16(InputBitstream *inputBitstream, uint8_t n, uint16_t *value){
+    bool result = readBitsToByteArray(
+            inputBitstream,
+            n,
+            2,
+            (uint8_t *) value
+    );
 
     if (!result){
         return result;
     }
-    shiftRight((uint8_t *) &buffer, 2, (uint8_t) 16-n);
-    buffer = bigToNativeEndian16(buffer);
-    memcpy(value,&buffer,2);
+    *value = bigToNativeEndian16(*value);
     return true;
 }
-bool readNBitsShiftAndConvertBigToNativeEndian32(InputBitstream *inputBitstream, uint8_t n, char *value){
+bool readNBitsBigToNativeEndian32(InputBitstream *inputBitstream, uint8_t n, uint32_t *value){
     uint32_t buffer=0;
-    bool result = readNBits(inputBitstream, n, (char*) &buffer);
+    bool result = readBitsToByteArray(
+            inputBitstream,
+            n,
+            4,
+            (uint8_t *) &buffer
+    );
     if (!result){
         return result;
     }
-    shiftRight((uint8_t *) &buffer, 4, (uint8_t) 32-n);
     buffer = bigToNativeEndian32(buffer);
     memcpy(value,&buffer,4);
     return true;
 }
-bool readNBitsShiftAndConvertBigToNativeEndian64(InputBitstream *inputBitstream, uint8_t n, char *value){
-    uint64_t buffer;
-    bool result = readNBits(inputBitstream, n, (char*) &buffer);
+bool readNBitsBigToNativeEndian64(InputBitstream *inputBitstream, uint8_t n, uint64_t *value){
+    uint64_t buffer = 0;
+    bool result = readBitsToByteArray(
+            inputBitstream,
+            n,
+            8,
+            (uint8_t *) &buffer
+    );
     if (!result){
         return result;
     }
-    buffer >>= (64-n);
     buffer = bigToNativeEndian64(buffer);
     memcpy(value,&buffer,8);
     return true;

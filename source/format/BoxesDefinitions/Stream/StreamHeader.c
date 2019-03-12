@@ -8,12 +8,10 @@
 #include "../../DataStructures/BitStreams/OutputBitstream.h"
 
 StreamHeader* initStreamHeader(
-    StreamContainer* streamContainer,
-    uint8_t descriptorId,
-    uint8_t classId,
-    uint16_t parametersSetId,
-    uint32_t numberOfBlocks,
-    uint8_t protectionFlag
+        StreamContainer *streamContainer,
+        uint8_t descriptorId,
+        ClassType classId,
+        uint32_t numberOfBlocks
 ){
     StreamHeader* streamHeader = (StreamHeader*)malloc(sizeof(StreamHeader));
     if (streamHeader == NULL){
@@ -23,15 +21,14 @@ StreamHeader* initStreamHeader(
     streamHeader->streamContainer = streamContainer;
     streamHeader->descriptorId = descriptorId;
     streamHeader->classId = classId;
-    streamHeader->parametersSetId = parametersSetId;
     streamHeader->numberOfBlocks = numberOfBlocks;
-    streamHeader->protectionFlag = protectionFlag;
-    streamHeader->seekPosition = -1;
+    streamHeader->hasSeek = false;
+    streamHeader->seekPosition = 0;
 
     return streamHeader;
 }
 
-uint8_t getStreamClass(StreamHeader* streamHeader){
+ClassType getStreamClass(StreamHeader *streamHeader){
     return streamHeader->classId;
 }
 
@@ -43,20 +40,15 @@ bool writeContentStreamHeader(StreamHeader* streamHeader, FILE *outputFile){
     OutputBitstream outputBitstream;
     initializeOutputBitstream(&outputBitstream, outputFile);
 
-    bool descriptorIdSuccessfulWrite = writeNBitsShift(&outputBitstream, 7, (char *) &(streamHeader->descriptorId));
+    bool descriptorIdSuccessfulWrite = writeBytes(&outputBitstream, 1, (char *) &(streamHeader->descriptorId));
     bool classIdSuccessfulWrite = writeNBitsShift(&outputBitstream, 4, (char *) &streamHeader->classId);
-    bool parametersSetIdSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian16(&outputBitstream, 13,
-                                                                                    streamHeader->parametersSetId);
     bool numberOfBlocksSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian32(&outputBitstream, 32, streamHeader->numberOfBlocks);
-    bool protectionFlagSuccessfulWrite = writeBytes(&outputBitstream,1,(char*)&streamHeader->protectionFlag);
     writeBuffer(&outputBitstream);
 
     if (
         !descriptorIdSuccessfulWrite ||
         !classIdSuccessfulWrite ||
-        !parametersSetIdSuccessfulWrite ||
-        !numberOfBlocksSuccessfulWrite ||
-        !protectionFlagSuccessfulWrite
+        !numberOfBlocksSuccessfulWrite
     ){
         fprintf(stderr,"Error writing stream header.\n");
         return false;
@@ -77,7 +69,7 @@ bool writeStreamHeader(StreamHeader* streamHeader, FILE *outputFile){
 }
 
 uint64_t getSizeContentStreamHeader() {
-    return 8;
+    return 6;
 }
 
 uint64_t getSizeStreamHeader() {
@@ -86,38 +78,37 @@ uint64_t getSizeStreamHeader() {
 
 StreamHeader *parseStreamHeader(StreamContainer* streamContainer, FILE *inputFile){
     uint8_t descriptorId;
-    uint8_t classId;
-    uint16_t parametersSetId;
+    ClassType classId;
     uint32_t numberOfBlocks;
-    uint8_t protectionFlag;
 
     long seekPosition = ftell(inputFile);
+    if(seekPosition == -1){
+        fprintf(stderr, "Could not get file position.\n");
+        return NULL;
+    }
 
     InputBitstream inputBitstream;
     initializeInputBitstream(&inputBitstream, inputFile);
 
-    bool descriptorIdSuccessfulRead =readNBitsShift(&inputBitstream,7,(char*)&descriptorId);
-    bool classIdSuccessfulRead = readNBitsShift(&inputBitstream,4,(char*)&classId);
-    bool parametersSetIdSuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian16(&inputBitstream, 13,
-                                                                                        (char *) &parametersSetId);
-    bool numberOfBlocksSuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian32(&inputBitstream, 32,
-                                                                                       (char *) &numberOfBlocks);
-    bool protectionFlagSuccessfulRead = readBytes(&inputBitstream,1,(char*)&protectionFlag);
+    bool descriptorIdSuccessfulRead = readBytes(&inputBitstream,1,(char*)&descriptorId);
+    uint8_t classTypeBuffer;
+    bool classIdSuccessfulRead = readNBitsShift(&inputBitstream,4,(char*)&classTypeBuffer);
+    bool numberOfBlocksSuccessfulRead = readNBitsBigToNativeEndian32(&inputBitstream, 32, &numberOfBlocks);
 
     if (
         !descriptorIdSuccessfulRead ||
         !classIdSuccessfulRead ||
-        !parametersSetIdSuccessfulRead ||
-        !numberOfBlocksSuccessfulRead ||
-        !protectionFlagSuccessfulRead
+        !numberOfBlocksSuccessfulRead
     ){
         fprintf(stderr,"Error reading stream header.\n");
         return NULL;
     }
 
+    classId.classType = classTypeBuffer;
     StreamHeader* streamHeader =
-            initStreamHeader(streamContainer,descriptorId,classId,parametersSetId,numberOfBlocks,protectionFlag);
-    streamHeader->seekPosition = seekPosition;
+            initStreamHeader(streamContainer,descriptorId,classId,numberOfBlocks);
+    streamHeader->seekPosition = (size_t) seekPosition;
+    streamHeader->hasSeek = true;
     return streamHeader;
 
 }
@@ -126,6 +117,6 @@ void freeStreamHeader(StreamHeader* streamHeader){
     free(streamHeader);
 }
 
-long getStreamHeaderSeekPosition(StreamHeader* streamHeader){
+size_t getStreamHeaderSeekPosition(StreamHeader* streamHeader){
     return streamHeader->seekPosition;
 }

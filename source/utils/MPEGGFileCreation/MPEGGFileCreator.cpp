@@ -2,6 +2,12 @@
 // Created by daniel on 1/11/18.
 //
 
+/*
+ * FILE DISABLED FOR THE MOMENT
+ *
+ *
+ *
+
 #include <string>
 #include <cstring>
 #include <vector>
@@ -668,3 +674,5 @@ InternalReference DatasetGroup::addInternalReference(
     setDatasetsGroupReferenceGenomes(datasetsGroupContainer, referenceGenomeVector);
     return internalReference;
 }
+
+ */

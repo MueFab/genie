@@ -5,27 +5,19 @@
 #ifndef MPEGG_CAPSULATOR_SIGNATURES_H
 #define MPEGG_CAPSULATOR_SIGNATURES_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "Signature.h"
 #include <stdbool.h>
-#include <stdio.h>
 
 typedef struct {
-    Signature* signature;
-    int number_signatures;
+    Signature** signature;
+    uint32_t number_signatures;
     size_t allocated_signatures;
 } Signatures;
 
 Signatures* initSignatures(size_t size);
 bool changeSizeSignatures(Signatures *signatures, size_t size);
-Signature* getSignature(Signatures* signatures, int index);
+Signature* getSignature(Signatures* signatures, size_t index);
+void setSignature(Signatures* signatures, Signature* signature);
 void freeSignatures(Signatures* signatures);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif //MPEGG_CAPSULATOR_SIGNATURES_H

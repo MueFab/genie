@@ -12,7 +12,8 @@ DatasetsGroupHeader *initDatasetsGroupHeader(DatasetGroupId datasetGroupId, uint
     datasetsGroupHeader->datasetGroupId = datasetGroupId;
     datasetsGroupHeader->versionNumber = versionNumber;
     datasetsGroupHeader->datasetsId = initVectorUint64();
-    datasetsGroupHeader->seekPosition = -1;
+    datasetsGroupHeader->hasSeek = true;
+    datasetsGroupHeader->seekPosition = 0;
     return datasetsGroupHeader;
 }
 
@@ -37,7 +38,7 @@ bool writeDatasetsGroupHeader(DatasetsGroupHeader* datasetsGroupHeader, FILE *ou
 }
 
 bool writeDatasetsGroupHeaderContent(DatasetsGroupHeader* datasetsGroupHeader, FILE *outputFile){
-    bool datasetGroupIdSuccessfulWrite = writeUint8(datasetsGroupHeader->datasetGroupId, outputFile);
+    bool datasetGroupIdSuccessfulWrite = utils_write(datasetsGroupHeader->datasetGroupId, outputFile);
     size_t versionNumberWrittenSize = fwrite(&datasetsGroupHeader->versionNumber,1,1,outputFile);
     if (!datasetGroupIdSuccessfulWrite || versionNumberWrittenSize != 1){
         fprintf(stderr, "Dataset group header could not write dataset group id or version number.\n");
@@ -62,6 +63,10 @@ DatasetsGroupHeader *parseDatasetsGroupHeader(uint64_t boxContentSize, FILE *inp
     }
     DatasetGroupId datasetGroupId;
     long seekPosition = ftell(inputFile);
+    if(seekPosition == -1){
+        fprintf(stderr, "Could not get file position\n");
+    }
+
     size_t readDatasetGroupIdSize = fread(&datasetGroupId,sizeof(DatasetGroupId),1,inputFile);
     uint8_t versionNumber;
     size_t readVersionNumberSize = fread(&versionNumber,sizeof(versionNumber),1,inputFile);
@@ -76,7 +81,8 @@ DatasetsGroupHeader *parseDatasetsGroupHeader(uint64_t boxContentSize, FILE *inp
     }
     DatasetsGroupHeader* datasetsGroupHeader =
             initDatasetsGroupHeader(datasetGroupId, versionNumber);
-    datasetsGroupHeader->seekPosition = seekPosition;
+    datasetsGroupHeader->hasSeek = true;
+    datasetsGroupHeader->seekPosition = (size_t) seekPosition;
     while(remainingBoxContentSize>0){
         DatasetId datasetIdBigEndian;
         size_t readDatasetIdSize = fread(&datasetIdBigEndian,sizeof(DatasetId),1,inputFile);
@@ -87,8 +93,6 @@ DatasetsGroupHeader *parseDatasetsGroupHeader(uint64_t boxContentSize, FILE *inp
         }
         remainingBoxContentSize -= sizeof(DatasetId);
     }
-    datasetsGroupHeader->seekPosition=seekPosition;
-
     return datasetsGroupHeader;
 }
 
@@ -102,6 +106,6 @@ uint64_t getSizeDatasetsGroupHeader(DatasetsGroupHeader* datasetsGroupHeader){
     return BOX_HEADER_SIZE+getSizeContentDatasetsGroupHeader(datasetsGroupHeader);
 }
 
-long getDatasetGroupHeaderSeekPosition(DatasetsGroupHeader *datasetsGroupHeader){
+size_t getDatasetGroupHeaderSeekPosition(DatasetsGroupHeader *datasetsGroupHeader){
     return datasetsGroupHeader->seekPosition;
 }

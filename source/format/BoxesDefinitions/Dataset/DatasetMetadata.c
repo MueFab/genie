@@ -9,7 +9,8 @@
 DatasetMetadata *initDatasetMetadata() {
     DatasetMetadata* datasetMetadata = (DatasetMetadata*) malloc(sizeof(DatasetMetadata));
     datasetMetadata->metadata = NULL;
-    datasetMetadata->seekPosition = -1;
+    datasetMetadata->hasSeek = false;
+    datasetMetadata->seekPosition = 0;
     return datasetMetadata;
 }
 void freeDatasetMetadata(DatasetMetadata* datasetMetadata){
@@ -76,6 +77,12 @@ parseDatasetMetadata(uint64_t boxContentSize, FILE *inputFile) {
         return NULL;
     }
     long seekPosition = ftell(inputFile);
+    if(seekPosition == -1){
+        fprintf(stderr, "Could not get file position.\n");
+        free(metadataBuffer);
+        return NULL;
+    }
+
     size_t metadataBufferReadSize = fread(metadataBuffer,sizeof(Byte),boxContentSize,inputFile);
     if(metadataBufferReadSize!=boxContentSize){
         fprintf(stderr, "Could not read requested number of bytes.\n");
@@ -83,7 +90,8 @@ parseDatasetMetadata(uint64_t boxContentSize, FILE *inputFile) {
         return NULL;
     }
     DatasetMetadata* datasetMetadata = initDatasetMetadata();
-    datasetMetadata->seekPosition = seekPosition;
+    datasetMetadata->hasSeek = true;
+    datasetMetadata->seekPosition = (size_t)seekPosition;
     copyContentDatasetMetadata(datasetMetadata, (char*)metadataBuffer,boxContentSize);
     free(metadataBuffer);
     return datasetMetadata;
@@ -106,6 +114,6 @@ bool copyContentDatasetMetadata(DatasetMetadata* datasetMetadata, char *content,
     return copyBytesSource(datasetMetadata->metadata,(Byte*)content, contentSize);
 }
 
-long getDatasetMetadataSeekPosition(DatasetMetadata *datasetMetadata){
+size_t getDatasetMetadataSeekPosition(DatasetMetadata *datasetMetadata){
     return datasetMetadata->seekPosition;
 }

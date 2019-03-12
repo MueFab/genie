@@ -5,10 +5,6 @@
 #ifndef BITSTREAMIO_OUTPUTBITSTREAM_H
 #define BITSTREAMIO_OUTPUTBITSTREAM_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -31,7 +27,10 @@ bool writeNBitsShiftAndConvertToBigEndian16(OutputBitstream *outputBitstream, ui
 bool writeNBitsShiftAndConvertToBigEndian32(OutputBitstream *outputBitstream, uint8_t n, uint32_t value);
 
 bool
-writeNBitsShiftAndConvertToBigEndian32_new(OutputBitstream *outputBitstream, uint8_t n, uint32_t value, bool debug);
+writeNBitsShiftAndConvertToBigEndian32_new(OutputBitstream *outputBitstream, uint8_t n, uint32_t value);
+bool
+writeNBitsFromByteArray(OutputBitstream *outputBitstream, uint64_t numBits, uint64_t sizeByteArrayInBytes,
+                        const uint8_t *values);
 bool writeNBitsShiftAndConvertToBigEndian64(OutputBitstream *outputBitstream, uint8_t n, uint64_t value);
 bool initializeOutputBitstreamFilename(OutputBitstream* outputBitstream, const char* filename);
 bool initializeOutputBitstream(OutputBitstream* outputBitstream, FILE* output);
@@ -42,10 +41,6 @@ bool writeLittleEndian64ToBitstream(OutputBitstream *outputBitstream, uint64_t v
 bool writeBigEndian16ToBitstream(OutputBitstream *outputBitstream, uint16_t value);
 bool writeBigEndian32ToBitstream(OutputBitstream *outputBitstream, uint32_t value);
 bool writeBigEndian64ToBitstream(OutputBitstream *outputBitstream, uint64_t value);
-bool writeCharBufferToBitstream(OutputBitstream *outputBitstream, char* buffer);
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //BITSTREAMIO_OUTPUTBITSTREAM_H

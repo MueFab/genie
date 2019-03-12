@@ -8,10 +8,14 @@
 #include "../../Boxes.h"
 #include "../../utils.h"
 
+void freeDatasetsGroupReferenceMetadatas(Vector* referenceMetadata);
+void freeDatasetsGroupReferenceGenomes(Vector* referenceGenomes);
+
 DatasetsGroupContainer* initDatasetsGroupContainer(){
     DatasetsGroupContainer* datasetsGroupContainer = (DatasetsGroupContainer*)calloc(1,sizeof(DatasetsGroupContainer));
     datasetsGroupContainer->datasetsGroupHeader = NULL;
     datasetsGroupContainer->datasetsGroupReferenceGenomes = NULL;
+    datasetsGroupContainer->datasetsGroupReferenceMetadatas = NULL;
     datasetsGroupContainer->datasetsGroupMetadata = NULL;
     datasetsGroupContainer->datasetsGroupProtection = NULL;
     datasetsGroupContainer->datasetsContainer = initVector();
@@ -28,15 +32,31 @@ uint64_t getSizeContentDatasetsGroupContainer(DatasetsGroupContainer *datasetsGr
 
     if(datasetsGroupContainer->datasetsGroupReferenceGenomes != NULL) {
         for (
-                size_t reference_i = 0;
-                reference_i < getSize(datasetsGroupContainer->datasetsGroupReferenceGenomes);
-                reference_i++
-                ) {
+            size_t reference_i = 0;
+            reference_i < getSize(datasetsGroupContainer->datasetsGroupReferenceGenomes);
+            reference_i++
+        ) {
             DatasetsGroupReferenceGenome *referenceGenome = getValue(
                     datasetsGroupContainer->datasetsGroupReferenceGenomes,
                     reference_i
             );
             contentSize += referenceGenome != NULL ? getDatasetsGroupReferenceGenomeSize(referenceGenome) : 0;
+        }
+    }
+
+    if(datasetsGroupContainer->datasetsGroupReferenceMetadatas != NULL){
+        for (
+            size_t referenceMetadata_i = 0;
+            referenceMetadata_i < getSize(datasetsGroupContainer->datasetsGroupReferenceMetadatas);
+            referenceMetadata_i++
+        ){
+            DatasetsGroupReferenceMetadata *datasetsGroupReferenceMetadata = getValue(
+                    datasetsGroupContainer->datasetsGroupReferenceMetadatas,
+                    referenceMetadata_i
+            );
+            contentSize += datasetsGroupReferenceMetadata != NULL ?
+                    getSizeDatasetsGroupReferenceMetadata(datasetsGroupReferenceMetadata)
+                    : 0;
         }
     }
 
@@ -71,7 +91,6 @@ bool writeContentDatasetsGroupContainer(DatasetsGroupContainer* datasetsGroupCon
     }
     bool datasetsGroupReferenceGenomesSuccessfulWrite = true;
     if (datasetsGroupContainer->datasetsGroupReferenceGenomes != NULL){
-        datasetsGroupReferenceGenomesSuccessfulWrite = true;
         for(
             size_t reference_i=0;
             reference_i < getSize(datasetsGroupContainer->datasetsGroupReferenceGenomes);
@@ -88,9 +107,29 @@ bool writeContentDatasetsGroupContainer(DatasetsGroupContainer* datasetsGroupCon
             }
         }
     }
+    bool datasetsGroupReferenceMetadatasSuccessfulWrite = true;
+    if (datasetsGroupContainer->datasetsGroupReferenceMetadatas != NULL){
+        for(
+            size_t referenceMetadata_i = 0;
+            referenceMetadata_i < getSize(datasetsGroupContainer->datasetsGroupReferenceMetadatas);
+            referenceMetadata_i++
+        ) {
+            DatasetsGroupReferenceMetadata* referenceMetadata = getValue(
+                    datasetsGroupContainer->datasetsGroupReferenceMetadatas,
+                    referenceMetadata_i
+            );
+            if (referenceMetadata != NULL){
+                if (!writeDatasetsGroupReferenceMetadata(referenceMetadata, outputFile)){
+                    datasetsGroupReferenceMetadatasSuccessfulWrite = false;
+                    break;
+                }
+            }
+        }
+    }
     if (
         ! datasetsGroupHeaderSuccessfulWrite ||
-        ! datasetsGroupReferenceGenomesSuccessfulWrite
+        ! datasetsGroupReferenceGenomesSuccessfulWrite ||
+        ! datasetsGroupReferenceMetadatasSuccessfulWrite
     ){
         fprintf(stderr,"Error writing datasets group container.\n");
         return false;
@@ -99,19 +138,6 @@ bool writeContentDatasetsGroupContainer(DatasetsGroupContainer* datasetsGroupCon
     if(datasetsGroupContainer->datasetsGroupLabelsList != NULL) {
         if (!writeDatasetsGroupLabelsList(datasetsGroupContainer->datasetsGroupLabelsList, outputFile)) {
             fprintf(stderr, "Error writing datasets group container.\n");
-            return false;
-        }
-    }
-
-    size_t datasetsContainerSize = getSize(datasetsGroupContainer->datasetsContainer);
-    for(size_t datasetContainer_i = 0; datasetContainer_i<datasetsContainerSize; datasetContainer_i++){
-        DatasetContainer* datasetContainer = getValue(datasetsGroupContainer->datasetsContainer, datasetContainer_i);
-        bool datasetContainerSuccessfulWrite = true;
-        if (datasetContainer != NULL){
-            datasetContainerSuccessfulWrite = writeDatasetContainer(datasetContainer, outputFile);
-        }
-        if (!datasetContainerSuccessfulWrite){
-            fprintf(stderr,"Error writing dataset container %lu.\n", datasetContainer_i);
             return false;
         }
     }
@@ -134,6 +160,18 @@ bool writeContentDatasetsGroupContainer(DatasetsGroupContainer* datasetsGroupCon
         return false;
     }
 
+    size_t datasetsContainerSize = getSize(datasetsGroupContainer->datasetsContainer);
+    for(size_t datasetContainer_i = 0; datasetContainer_i<datasetsContainerSize; datasetContainer_i++){
+        DatasetContainer* datasetContainer = getValue(datasetsGroupContainer->datasetsContainer, datasetContainer_i);
+        bool datasetContainerSuccessfulWrite = true;
+        if (datasetContainer != NULL){
+            datasetContainerSuccessfulWrite = writeDatasetContainer(datasetContainer, outputFile);
+        }
+        if (!datasetContainerSuccessfulWrite){
+            fprintf(stderr,"Error writing dataset container %lu.\n", datasetContainer_i);
+            return false;
+        }
+    }
     return true;
 }
 
@@ -162,6 +200,33 @@ void setDatasetsGroupReferenceGenomes(
         }
     }
     datasetsGroupContainer->datasetsGroupReferenceGenomes = datasetsGroupReferenceGenomes;
+}
+
+void freeDatasetsGroupReferenceMetadatas(Vector* referenceMetadata){
+    for(
+            size_t referenceMetadata_i = 0;
+            referenceMetadata_i < getSize(referenceMetadata);
+            referenceMetadata_i++
+            ){
+        DatasetsGroupReferenceMetadata* datasetsGroupReferenceMetadata = getValue(
+                referenceMetadata,
+                referenceMetadata_i
+        );
+        if(datasetsGroupReferenceMetadata != NULL){
+            freeDatasetsGroupReferenceMetadata(datasetsGroupReferenceMetadata);
+        }
+        freeVector(referenceMetadata);
+    }
+}
+
+void setDatasetsGroupReferenceMetadata(
+        DatasetsGroupContainer* datasetsGroupContainer,
+        Vector* datasetsGroupReferenceMetadatas
+) {
+    if(datasetsGroupContainer->datasetsGroupReferenceMetadatas != NULL) {
+        freeDatasetsGroupReferenceMetadatas(datasetsGroupContainer->datasetsGroupReferenceMetadatas);
+    }
+    datasetsGroupContainer->datasetsGroupReferenceMetadatas = datasetsGroupReferenceMetadatas;
 }
 
 void setDatasetsGroupMetadata(
@@ -220,6 +285,9 @@ void freeDatasetsGroupContainer(DatasetsGroupContainer* datasetsGroupContainer){
     if (datasetsGroupContainer->datasetsGroupReferenceGenomes != NULL){
         freeDatasetsGroupReferenceGenomes(datasetsGroupContainer->datasetsGroupReferenceGenomes);
     };
+    if (datasetsGroupContainer->datasetsGroupReferenceMetadatas != NULL){
+        freeDatasetsGroupReferenceMetadatas(datasetsGroupContainer->datasetsGroupReferenceMetadatas);
+    }
     if (datasetsGroupContainer->datasetsGroupMetadata != NULL){
         freeDatasetsGroupMetadata(datasetsGroupContainer->datasetsGroupMetadata);
     };
@@ -266,13 +334,20 @@ parseDatasetsGroupContainer(FILE *inputFile, uint64_t boxContentSize, char *file
         init,
         dataset_group_header,
         reference,
+        reference_metadata,
         label_list,
         dataset,
         dataset_group_metadata,
         dataset_group_protection
     }  previousState = init;
     DatasetsGroupContainer* datasetsGroupContainer = initDatasetsGroupContainer();
-    datasetsGroupContainer->seekPosition = ftell(inputFile);
+    long seekPosition = ftell(inputFile);
+    if(seekPosition == -1){
+        fprintf(stderr, "Could not get file position");
+        freeDatasetsGroupContainer(datasetsGroupContainer);
+        return NULL;
+    }
+    datasetsGroupContainer->seekPosition = (size_t)ftell(inputFile);
 
     while(getSizeContentDatasetsGroupContainer(datasetsGroupContainer) < boxContentSize){
         char boxType[5];
@@ -295,7 +370,13 @@ parseDatasetsGroupContainer(FILE *inputFile, uint64_t boxContentSize, char *file
                     return NULL;
                 }
             }else if (strncmp(boxType,datasetsGroupMetadataName,4)==0){
-                if(previousState != dataset){
+                if(!(
+                        previousState == dataset_group_header ||
+                        previousState == reference ||
+                        previousState == reference_metadata ||
+                        previousState == label_list
+                    )
+                ){
                     freeDatasetsGroupContainer(datasetsGroupContainer);
                     return NULL;
                 }
@@ -309,11 +390,18 @@ parseDatasetsGroupContainer(FILE *inputFile, uint64_t boxContentSize, char *file
                     return NULL;
                 }
             }else if (strncmp(boxType,datasetsGroupProtectionName,4)==0){
-                if(!(previousState == dataset || previousState == dataset_group_metadata)){
+                if(!(
+                        previousState == dataset_group_header ||
+                        previousState == reference ||
+                        previousState == reference_metadata ||
+                        previousState == label_list ||
+                        previousState == dataset_group_metadata
+                    )
+                ){
                     freeDatasetsGroupContainer(datasetsGroupContainer);
                     return NULL;
                 }
-                previousState = dataset_group_header;
+                previousState = dataset_group_protection;
                 DatasetsGroupProtection* datasetsGroupProtection =
                         parseDatasetsGroupProtection(boxSize - 12, inputFile);
                 if(datasetsGroupProtection != NULL) {
@@ -323,7 +411,11 @@ parseDatasetsGroupContainer(FILE *inputFile, uint64_t boxContentSize, char *file
                     return NULL;
                 }
             }else if (strncmp(boxType,datasetsGroupReferencesName,4)==0){
-                if(!(previousState == dataset_group_header || previousState == reference)){
+                if(!(
+                        previousState == dataset_group_header ||
+                        previousState == reference
+                    )
+                ){
                     freeDatasetsGroupContainer(datasetsGroupContainer);
                     return NULL;
                 }
@@ -342,8 +434,41 @@ parseDatasetsGroupContainer(FILE *inputFile, uint64_t boxContentSize, char *file
                     freeDatasetsGroupContainer(datasetsGroupContainer);
                     return NULL;
                 }
+            }else if (strncmp(boxType, datasetsGroupReferenceMetadataName,4) == 0) {
+                if(!(previousState == reference || previousState == reference_metadata)) {
+                    freeDatasetsGroupContainer(datasetsGroupContainer);
+                    return NULL;
+                }
+                previousState = reference_metadata;
+
+                Vector* referenceMetadatas = datasetsGroupContainer->datasetsGroupReferenceMetadatas;
+                if(referenceMetadatas == NULL) {
+                    referenceMetadatas = initVector();
+                    setDatasetsGroupReferenceGenomes(datasetsGroupContainer, referenceMetadatas);
+                }
+                DatasetsGroupReferenceMetadata* referenceMetadata = parseDatasetsGroupReferenceMetadata(
+                        boxSize - BOX_HEADER_SIZE,
+                        inputFile
+                );
+                if(referenceMetadata != NULL) {
+                    pushBack(referenceMetadatas, referenceMetadata);
+                }else {
+                    freeDatasetsGroupContainer(datasetsGroupContainer);
+                    return NULL;
+                }
             }else if (strncmp(boxType,datasetContainerName,4)==0){
-                if(!(previousState == reference || previousState == dataset || previousState == label_list)){
+                if(
+                    !(
+                        previousState == dataset_group_header
+                        || previousState == reference
+                        || previousState == reference_metadata
+                        || previousState == dataset
+                        || previousState == label_list
+                        || previousState == dataset_group_metadata
+                        || previousState == dataset_group_protection
+
+                    )
+                ){
                     freeDatasetsGroupContainer(datasetsGroupContainer);
                     return NULL;
                 }
@@ -356,7 +481,10 @@ parseDatasetsGroupContainer(FILE *inputFile, uint64_t boxContentSize, char *file
                     return NULL;
                 }
             }else if (strncmp(boxType, datasetsGroupLabelsListName,4)==0){
-                if(!(previousState == reference)) {
+                if(!(
+                        previousState == dataset_group_header
+                        || previousState == reference
+                        || previousState == reference_metadata)) {
                     freeDatasetsGroupContainer(datasetsGroupContainer);
                     return NULL;
                 }else{
@@ -388,11 +516,22 @@ size_t getNumberDatasets(DatasetsGroupContainer* datasetsGroupContainer){
     return getSize(datasetsGroupContainer->datasetsContainer);
 }
 
-DatasetContainer * getDatasetContainer(DatasetsGroupContainer *datasetsGroupContainer, size_t index){
+DatasetContainer * getDatasetContainerByIndex(DatasetsGroupContainer *datasetsGroupContainer, size_t index){
     return getValue(datasetsGroupContainer->datasetsContainer, index);
 }
 
-long getDatasetGroupContainerSeekPosition(DatasetsGroupContainer* datasetsGroupContainer){
+DatasetContainer * getDatasetContainerById(DatasetsGroupContainer *datasetsGroupContainer, DatasetId datasetId){
+    size_t numDatasets = getNumberDatasets(datasetsGroupContainer);
+    for(size_t dataset_i=0; dataset_i < numDatasets; dataset_i++){
+        DatasetContainer* datasetContainer = getDatasetContainerByIndex(datasetsGroupContainer, dataset_i);
+        if(datasetContainer->datasetHeader->datasetId == datasetId){
+            return datasetContainer;
+        }
+    }
+    return NULL;
+}
+
+size_t getDatasetGroupContainerSeekPosition(DatasetsGroupContainer* datasetsGroupContainer){
     return datasetsGroupContainer->seekPosition;
 }
 
