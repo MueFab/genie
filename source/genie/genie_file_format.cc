@@ -158,7 +158,8 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> createMap(const s
         }
         uint8_t j = f[pos] - '0';
         uint8_t k = f[pos + 2] - '0';
-        uint8_t i = f[pos + 4] - '0';
+
+        uint8_t i = atoi(f.substr(pos+4, f.length() - pos - 4).c_str());
 
         if (map.size() <= i) {
             map.resize(i + 1);

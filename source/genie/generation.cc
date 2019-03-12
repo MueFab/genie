@@ -330,12 +330,12 @@ void decompression(
             unpackFiles(temp_dir, in);
     fclose(in);
 
-    copyDir(temp_dir,temp_dir + "/../genie_comp");
+    //copyDir(temp_dir,temp_dir + "/../genie_comp");
 
     // Decompress
     run_gabac(flist, programOptions.configPath, true, programOptions.numThreads);
 
-    copyDir(temp_dir,temp_dir + "/../genie_uncomp");
+    //copyDir(temp_dir,temp_dir + "/../genie_uncomp");
 
     // Extract spring parameters
     spring::compression_params cp;
@@ -404,7 +404,7 @@ void generation(
                 }
             }
 
-            copyDir(path,path + "/../genie_orig");
+           // copyDir(path,path + "/../genie_orig");
 
             // Compress
             run_gabac(filelist, programOptions.configPath, false, programOptions.numThreads);
