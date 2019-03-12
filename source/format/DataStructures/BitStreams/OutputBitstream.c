@@ -11,8 +11,19 @@
 bool writeNBits(OutputBitstream *outputBitstream, uint8_t n, const char *value);
 
 bool writeBuffer(OutputBitstream* outputBitstream){
+    if(outputBitstream == NULL){
+        fprintf(stderr, "outputBitstream is null\n");
+        return false;
+    }
     if(outputBitstream->currentPositionInChar!=0) {
-        if (fwrite(&(outputBitstream->currentChar), sizeof(outputBitstream->currentChar), 1, outputBitstream->output) !=
+
+        if(outputBitstream->output == NULL){
+            fprintf(stderr, "output is null\n");
+        }
+        if(&(outputBitstream->currentChar) == NULL){
+            fprintf(stderr, "current char address is null\n");
+        }
+        if (fwrite(&(outputBitstream->currentChar), 1, 1, outputBitstream->output) !=
             1) {
             return false;
         }
@@ -98,12 +109,17 @@ bool writeNBitsShiftAndConvertToBigEndian16(OutputBitstream *outputBitstream, ui
 
 bool writeNBitsShiftAndConvertToBigEndian32(OutputBitstream *outputBitstream, uint8_t n, uint32_t value){
     uint32_t buffer = nativeToBigEndian32(value);
+
+    uint32_t tmpBuffer1 = buffer << 1;
+    uint32_t tmpBuffer2 = buffer << 2;
+    uint32_t tmpBuffer8 = buffer << 8;
+
     buffer <<= (32-n);
     return writeNBits(outputBitstream, n, (char *) &buffer);
 }
 
 bool
-writeNBitsShiftAndConvertToBigEndian32_new(OutputBitstream *outputBitstream, uint8_t n, uint32_t value, bool debug) {
+writeNBitsShiftAndConvertToBigEndian32_new(OutputBitstream *outputBitstream, uint8_t n, uint32_t value) {
     uint32_t buffer = nativeToBigEndian32(value);
 
     uint8_t invalid_bits = (uint8_t )32-n;
@@ -120,7 +136,33 @@ writeNBitsShiftAndConvertToBigEndian32_new(OutputBitstream *outputBitstream, uin
         writeNBitsShift(outputBitstream, (uint8_t) 8 - invalid_bits, (char *) (&buffer)+3);
     }
     return true;
+}
 
+bool
+writeNBitsFromByteArray(
+        OutputBitstream *outputBitstream,
+        uint64_t numBits,
+        uint64_t sizeByteArrayInBytes,
+        const uint8_t *values
+) {
+    uint64_t currentByte = sizeByteArrayInBytes - bitsToBytes(numBits);
+    uint64_t bitsLeftToWrite = numBits;
+
+    while(bitsLeftToWrite > 0){
+        if(bitsLeftToWrite % 8 != 0) {
+            if(!writeNBitsShift(outputBitstream, (uint8_t) (bitsLeftToWrite % 8), (const char *) values + currentByte)){
+                return false;
+            };
+            bitsLeftToWrite -= bitsLeftToWrite % 8;
+        }else{
+            if(!writeNBits(outputBitstream, 8, (const char *) values + currentByte)){
+                return false;
+            };
+            bitsLeftToWrite -= 8;
+        }
+        currentByte++;
+    }
+    return true;
 }
 
 bool writeNBitsShiftAndConvertToBigEndian64(OutputBitstream *outputBitstream, uint8_t n, uint64_t value){
@@ -185,17 +227,4 @@ bool writeBigEndian32ToBitstream(OutputBitstream *outputBitstream, uint32_t valu
 bool writeBigEndian64ToBitstream(OutputBitstream *outputBitstream, uint64_t value){
     uint64_t valueBigEndian = nativeToBigEndian64(value);
     return writeNBits(outputBitstream, 64, (char *) &valueBigEndian);
-}
-
-bool writeCharBufferToBitstream(OutputBitstream *outputBitstream, char* buffer){
-    int pos = 0;
-    while(true){
-        if(!writeNBits(outputBitstream, 8, buffer+pos)){
-            return false;
-        }
-        if(buffer[pos]==0){
-            break;
-        }
-    }
-    return true;
 }

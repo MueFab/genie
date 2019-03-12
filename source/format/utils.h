@@ -5,10 +5,6 @@
 #ifndef MPEGG_CAPSULATOR_UTILS_H
 #define MPEGG_CAPSULATOR_UTILS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -34,7 +30,7 @@ bool firstNBitsSetTo(char* bits,uint64_t N, bool value);
 void shiftLeft(uint8_t *bytes, int numberBytes, uint8_t numberBits);
 void shiftRight(uint8_t *bytes, int numberBytes, uint8_t numberBits);
 
-bool readUint8(uint8_t* value, FILE *inputFile);
+bool utils_read(uint8_t* value, FILE *inputFile);
 bool readLittleEndian16FromFile(uint16_t *value, FILE *inputFile);
 bool readLittleEndian32FromFile(uint32_t *value, FILE *inputFile);
 bool readLittleEndian64FromFile(uint64_t *value, FILE *inputFile);
@@ -43,7 +39,7 @@ bool readBigEndian32FromFile(uint32_t *value, FILE *inputFile);
 bool readBigEndian64FromFile(uint64_t *value, FILE *inputFile);
 bool readChars(char* charArray, uint32_t charArrayLength, FILE* inputFile);
 
-bool writeUint8(uint8_t, FILE* outputFile);
+bool utils_write(uint8_t, FILE* outputFile);
 bool writeLittleEndian16ToFile(uint16_t value, FILE *outputFile);
 bool writeLittleEndian32ToFile(uint32_t value, FILE *outputFile);
 bool writeLittleEndian64ToFile(uint64_t value, FILE *outputFile);
@@ -54,9 +50,5 @@ bool writeBigEndian64ToFile(uint64_t value, FILE *outputFile);
 
 bool writeBoxHeader(FILE *output_file, const char *type, uint64_t box_size);
 bool readBoxHeader(FILE *input_file, char *type, uint64_t *boxSize);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif //MPEGG_CAPSULATOR_UTILS_H

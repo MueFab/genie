@@ -2,6 +2,17 @@
 // Created by daniel on 1/11/18.
 //
 
+
+/*
+ * FILE DISABLED FOR THE MOMENT
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+
 #ifndef GENIE_MASTERINDEXTABLECREATOR_H
 #define GENIE_MASTERINDEXTABLECREATOR_H
 extern "C"{
@@ -174,3 +185,6 @@ public:
 
 
 #endif //GENIE_MASTERINDEXTABLECREATOR_H
+
+
+ */

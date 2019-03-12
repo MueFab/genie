@@ -2,9 +2,9 @@
 // Created by bscuser on 7/02/18.
 //
 
-#include <Boxes.h>
-#include <utils.h>
-#include <DataStructures/BitStreams/OutputBitstream.h>
+#include "Boxes.h"
+#include "utils.h"
+#include "DataStructures/BitStreams/OutputBitstream.h"
 
 BlockHeader* initBlockHeader(
         DatasetContainer* datasetContainer,
@@ -42,7 +42,7 @@ BlockHeader* parseBlockHeader(DatasetContainer* datasetContainer, FILE* inputFil
     uint32_t payloadSizeBuffer;
 
     bool descritorIdAndPaddingFlagSuccessfulRead =
-            readUint8(&descritorIdAndPaddingFlagBuffer, inputFile);
+            utils_read(&descritorIdAndPaddingFlagBuffer, inputFile);
     if(!descritorIdAndPaddingFlagSuccessfulRead){
         fprintf(stderr, "Error reading descriptor Id or padding flag.\n");
         return NULL;
@@ -67,7 +67,7 @@ bool writeBlockHeader(
     FILE* outputFile
 ){
     uint8_t descriptorIdAndPaddingFlag = (blockHeader->descriptorId<<1 | (uint8_t) (blockHeader->paddingFlag?1:0));
-    bool descriptorIdAndPaddingFlagSuccessfulWrite = writeUint8(descriptorIdAndPaddingFlag, outputFile);
+    bool descriptorIdAndPaddingFlagSuccessfulWrite = utils_write(descriptorIdAndPaddingFlag, outputFile);
     bool payloadSizeSuccessfulWrite = writeBigEndian32ToFile(blockHeader->payloadSize, outputFile);
     if(
         !descriptorIdAndPaddingFlagSuccessfulWrite ||

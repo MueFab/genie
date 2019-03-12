@@ -10,7 +10,8 @@
 DatasetsGroupMetadata *initDatasetsGroupMetadata() {
     DatasetsGroupMetadata* datasetsGroupMetadata =
             (DatasetsGroupMetadata*) malloc(sizeof(DatasetsGroupMetadata));
-    datasetsGroupMetadata->seekPosition = -1;
+    datasetsGroupMetadata->hasSeek = true;
+    datasetsGroupMetadata->seekPosition = 0;
     return datasetsGroupMetadata;
 }
 
@@ -81,6 +82,11 @@ DatasetsGroupMetadata *parseDatasetsGroupMetadata(uint64_t boxContentSize, FILE 
         return NULL;
     }
     long seekPosition = ftell(inputFile);
+    if(seekPosition == -1){
+        fprintf(stderr, "Could not read file position.\n");
+        free(metadataBuffer);
+        return NULL;
+    }
     size_t metadataBufferReadSize = fread(metadataBuffer,sizeof(Byte),boxContentSize,inputFile);
     if(metadataBufferReadSize!=boxContentSize){
         fprintf(stderr, "Could not read requested number of bytes.\n");
@@ -89,7 +95,8 @@ DatasetsGroupMetadata *parseDatasetsGroupMetadata(uint64_t boxContentSize, FILE 
     }
     metadataBuffer[boxContentSize]='\0';
     DatasetsGroupMetadata* datasetsGroupMetadata = initDatasetsGroupMetadata();
-    datasetsGroupMetadata->seekPosition = seekPosition;
+    datasetsGroupMetadata->hasSeek = true;
+    datasetsGroupMetadata->seekPosition = (size_t) seekPosition;
     copyContentDatasetsGroupMetadata(datasetsGroupMetadata,(char*)metadataBuffer, boxContentSize);
     free(metadataBuffer);
     return datasetsGroupMetadata;
@@ -103,6 +110,6 @@ uint64_t getSizeContentDatasetsGroupMetadata(DatasetsGroupMetadata* datasetsGrou
     return getSizeByteArray(datasetsGroupMetadata->metadata);
 }
 
-long getDatasetGroupMetadataSeekPosition(DatasetsGroupMetadata *datasetsGroupMetadata){
+size_t getDatasetGroupMetadataSeekPosition(DatasetsGroupMetadata *datasetsGroupMetadata){
     return datasetsGroupMetadata->seekPosition;
 }

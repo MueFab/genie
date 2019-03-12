@@ -11,10 +11,10 @@
 StreamContainer *initStreamContainer() {
     StreamContainer* streamContainer=(StreamContainer*)calloc(1,sizeof(StreamContainer));
     streamContainer->streamHeader = NULL;
-    streamContainer->streamMetadata = NULL;
     streamContainer->streamProtection = NULL;
-    streamContainer->dataFromFile = initFromFile();
-    streamContainer->seekPosition = -1;
+    streamContainer->datasFromFile = initVector();
+    streamContainer->hasSeek = false;
+    streamContainer->seekPosition = 0;
     return streamContainer;
 }
 
@@ -22,14 +22,16 @@ void freeStreamContainer(StreamContainer* streamContainer){
     if(streamContainer->streamHeader != NULL) {
         freeStreamHeader(streamContainer->streamHeader);
     }
-    if(streamContainer->streamMetadata != NULL) {
-        freeStreamMetadata(streamContainer->streamMetadata);
-    }
     if(streamContainer->streamProtection != NULL) {
         freeStreamProtection(streamContainer->streamProtection);
     }
-    if(streamContainer->dataFromFile != NULL) {
-        freeFromFile(streamContainer->dataFromFile);
+    if(streamContainer->datasFromFile != NULL) {
+        size_t numberBlocksInStream = getSize(streamContainer->datasFromFile);
+        for(size_t block_i=0; block_i < numberBlocksInStream; block_i++) {
+            FromFile* fromFileBlock = getValue(streamContainer->datasFromFile, block_i);
+            freeFromFile(fromFileBlock);
+        }
+        freeVector(streamContainer->datasFromFile);
     }
     free(streamContainer);
 }
@@ -39,13 +41,17 @@ uint64_t getSizeContentStreamContainer(StreamContainer* streamContainer){
     if (streamContainer->streamHeader != NULL) {
         contentSize += getSizeStreamHeader();
     }
-    if (streamContainer->streamMetadata != NULL) {
-        contentSize += getSizeStreamMetadata(streamContainer->streamMetadata);
-    }
     if (streamContainer->streamProtection != NULL) {
         contentSize += getSizeStreamProtection(streamContainer->streamProtection);
     }
-    contentSize += getFromFileSize(streamContainer->dataFromFile);
+    if(streamContainer->datasFromFile != NULL) {
+        size_t numberBlocksInStream = getSize(streamContainer->datasFromFile);
+        for(size_t block_i=0; block_i < numberBlocksInStream; block_i++) {
+            FromFile* fromFileBlock = getValue(streamContainer->datasFromFile, block_i);
+            contentSize += getFromFileSize(fromFileBlock);
+        }
+    }
+
     return contentSize;
 }
 
@@ -60,21 +66,22 @@ bool writeContentStreamContainer(StreamContainer* streamContainer, FILE *outputF
             return false;
         }
     }
-    if(streamContainer->streamMetadata != NULL) {
-        if (!writeStreamMetadata(streamContainer->streamMetadata, outputFile)) {
-            fprintf(stderr, "Error writing metadata.\n");
-            return false;
-        }
-    }
     if(streamContainer->streamProtection != NULL) {
         if (!writeStreamProtection(streamContainer->streamProtection, outputFile)) {
             fprintf(stderr, "Error writing stream protection.\n");
             return false;
         }
     }
-    if(!writeFromFile(streamContainer->dataFromFile, outputFile)){
-        fprintf(stderr, "Error writing stream content.\n");
+    if(streamContainer->datasFromFile != NULL) {
+        size_t numberBlocksInStream = getSize(streamContainer->datasFromFile);
+        for(size_t block_i=0; block_i < numberBlocksInStream; block_i++) {
+            FromFile* fromFileBlock = getValue(streamContainer->datasFromFile, block_i);
+            if(!writeFromFile(fromFileBlock, outputFile)){
+                fprintf(stderr, "Error writing stream content.\n");
+            }
+        }
     }
+
     return true;
 }
 
@@ -98,32 +105,46 @@ void setStreamHeader(StreamContainer* streamContainer, StreamHeader *streamHeade
     streamContainer->streamHeader = streamHeader;
 }
 
-void setStreamMetadata(StreamContainer* streamContainer, StreamMetadata *streamMetadata){
-    streamContainer->streamMetadata = streamMetadata;
-}
-
 void setStreamProtection(StreamContainer* streamContainer, StreamProtection *streamProtection){
     streamContainer->streamProtection = streamProtection;
 }
 
 void setDataFromFilename(StreamContainer *streamContainer, char *filename){
-    if (streamContainer->dataFromFile != NULL){
-        freeFromFile(streamContainer->dataFromFile);
+    if(streamContainer->datasFromFile != NULL) {
+        size_t numberBlocksInStream = getSize(streamContainer->datasFromFile);
+        for(size_t block_i=0; block_i < numberBlocksInStream; block_i++) {
+            FromFile* fromFileBlock = getValue(streamContainer->datasFromFile, block_i);
+            freeFromFile(fromFileBlock);
+        }
+        freeVector(streamContainer->datasFromFile);
     }
-    streamContainer->dataFromFile = initFromFileWithFilename(filename);
+    streamContainer->datasFromFile = initVector();
+    setValue(streamContainer->datasFromFile, 0, initFromFileWithFilename(filename));
 }
 
-void setDataFromFilenameWithBoundaries(StreamContainer *streamContainer, char *filename, long startPos, long endPos){
-    if (streamContainer->dataFromFile != NULL){
-        freeFromFile(streamContainer->dataFromFile);
+void setDataFromFilenameWithBoundaries(StreamContainer *streamContainer, char *filename, uint64_t startPos, uint64_t endPos){
+    if(streamContainer->datasFromFile != NULL) {
+        size_t numberBlocksInStream = getSize(streamContainer->datasFromFile);
+        for(size_t block_i=0; block_i < numberBlocksInStream; block_i++) {
+            FromFile* fromFileBlock = getValue(streamContainer->datasFromFile, block_i);
+            freeFromFile(fromFileBlock);
+        }
+        freeVector(streamContainer->datasFromFile);
     }
-    streamContainer->dataFromFile = initFromFileWithFilenameAndBoundaries(filename, startPos, endPos);
+    streamContainer->datasFromFile = initVector();
+    setValue(streamContainer->datasFromFile, 0, initFromFileWithFilenameAndBoundaries(filename, startPos, endPos));
 }
 
 StreamContainer *
 parseStreamContainer(uint64_t boxContentSize, FILE *inputFile, char *fileName, DatasetContainer* datasetContainer) {
     StreamContainer* streamContainer = initStreamContainer();
-    streamContainer->seekPosition = ftell(inputFile);
+    long seekPosition = ftell(inputFile);
+    if(seekPosition == -1){
+        fprintf(stderr,"Could not get file position.\n");
+        freeStreamContainer(streamContainer);
+        return NULL;
+    }
+    streamContainer->seekPosition = (uint64_t) seekPosition;
 
     char type[5];
     uint64_t boxSize;
@@ -146,37 +167,50 @@ parseStreamContainer(uint64_t boxContentSize, FILE *inputFile, char *fileName, D
                 return NULL;
             }
             dataContentSize -= getSizeStreamHeader();
-        }else if(strncmp(type,streamMetadataName,4)==0){
-            StreamMetadata* streamMetadata = parseStreamMetadata(streamContainer,boxSize-12,inputFile);
-            if(streamMetadata!= NULL){
-                setStreamMetadata(streamContainer, streamMetadata);
-            }else{
-                fprintf(stderr,"Error reading stream metadata.\n");
-                freeStreamContainer(streamContainer);
-                return NULL;
-            }
-            dataContentSize -= getSizeStreamMetadata(streamMetadata);
         }else if(strncmp(type,streamProtectionName,4)==0){
             StreamProtection* streamProtection = parseStreamProtection(streamContainer,boxSize-12,inputFile);
             if(streamProtection!= NULL){
                 setStreamProtection(streamContainer, streamProtection);
             }else{
-                fprintf(stderr,"Error reading stream metadata.\n");
+                fprintf(stderr,"Error reading stream protection.\n");
                 freeStreamContainer(streamContainer);
                 return NULL;
             }
             dataContentSize -= getSizeStreamProtection(streamProtection);
         }else{
             fseek(inputFile,-12,SEEK_CUR);
-            long startPosition =  ftell(inputFile);
-            long endPosition = startPosition + (long)dataContentSize;
+            long startPositionRead = ftell(inputFile);
+            if(startPositionRead == -1){
+                fprintf(stderr, "Could not get file position.\n");
+                return NULL;
+            }
+            uint64_t startPosition =  (uint64_t)startPositionRead;
+
+            uint64_t endPosition = startPosition + dataContentSize;
             setDataFromFilenameWithBoundaries(streamContainer, fileName, startPosition, endPosition);
-            fseek(inputFile,endPosition-startPosition,SEEK_CUR);
-            dataContentSize-=getFromFileSize(streamContainer->dataFromFile);
+            fseek(inputFile,(long)(endPosition-startPosition),SEEK_CUR);
+            if(streamContainer->datasFromFile != NULL) {
+                size_t numberBlocksInStream = getSize(streamContainer->datasFromFile);
+                for(size_t block_i=0; block_i < numberBlocksInStream; block_i++) {
+                    FromFile* fromFileBlock = getValue(streamContainer->datasFromFile, block_i);
+                    dataContentSize-=getFromFileSize(fromFileBlock);
+                }
+            }
+
             break;
         }
     }
-    if(dataContentSize!=0 || getFromFileSize(streamContainer->dataFromFile)==0){
+
+    uint64_t sizeBlocks = 0;
+    if(streamContainer->datasFromFile != NULL) {
+        size_t numberBlocksInStream = getSize(streamContainer->datasFromFile);
+        for(size_t block_i=0; block_i < numberBlocksInStream; block_i++) {
+            FromFile* fromFileBlock = getValue(streamContainer->datasFromFile, block_i);
+            sizeBlocks += getFromFileSize(fromFileBlock);
+        }
+    }
+
+    if(dataContentSize!=0 || sizeBlocks==0){
         fprintf(stderr,"Error reading stream container.\n");
         freeStreamContainer(streamContainer);
         return NULL;
@@ -186,7 +220,7 @@ parseStreamContainer(uint64_t boxContentSize, FILE *inputFile, char *fileName, D
         DatasetMasterIndexTable* datasetMasterIndexTable = datasetContainer->datasetMasterIndexTable;
         uint64_t finalOffset = (uint64_t) ftell(inputFile)-datasetContainer->seekPosition;
 
-        uint8_t streamClass = getStreamClass(streamContainer->streamHeader);
+        ClassType streamClass = getStreamClass(streamContainer->streamHeader);
         uint8_t streamDescriptor = getStreamDescriptorId(streamContainer->streamHeader);
 
         uint8_t class_index;
@@ -197,7 +231,7 @@ parseStreamContainer(uint64_t boxContentSize, FILE *inputFile, char *fileName, D
         }
 
         uint8_t descriptor_index;
-        if(!getDescriptorIndexForType(datasetContainer->datasetHeader, class_index, streamDescriptor, &descriptor_index)){
+        if(!getDescriptorIndexForType(datasetContainer->datasetHeader, streamClass, streamDescriptor, &descriptor_index)){
             fprintf(stderr,"Error unknown descriptor.\n");
             freeStreamContainer(streamContainer);
             return NULL;
@@ -218,11 +252,11 @@ parseStreamContainer(uint64_t boxContentSize, FILE *inputFile, char *fileName, D
 }
 
 
-FromFile* getDataFromStreamContainer(StreamContainer* streamContainer){
-    return streamContainer->dataFromFile;
+Vector * getDataFromStreamContainer(StreamContainer *streamContainer){
+    return streamContainer->datasFromFile;
 }
 
-long getStreamContainerSeekPosition(StreamContainer* streamContainer){
+uint64_t getStreamContainerSeekPosition(StreamContainer *streamContainer){
     return streamContainer->seekPosition;
 }
 
@@ -243,15 +277,6 @@ bool generateStreamSeekPoints(StreamContainer* streamContainer){
                 + getSizeContentStreamHeader()
         );
     }
-    if(streamContainer->streamMetadata != NULL) {
-        fprintf(
-                stdout,
-                "\t\tstream metadata @ %li-%li\n",
-                getStreamMetadataSeekPosition(streamContainer->streamMetadata),
-                getStreamMetadataSeekPosition(streamContainer->streamMetadata)
-                + getSizeContentStreamMetadata(streamContainer->streamMetadata)
-        );
-    }
     if(streamContainer->streamProtection != NULL) {
         fprintf(
                 stdout,
@@ -261,11 +286,15 @@ bool generateStreamSeekPoints(StreamContainer* streamContainer){
                 + getSizeContentStreamProtection(streamContainer->streamProtection)
         );
     }
-    fprintf(
+    /*fprintf(
             stdout,
             "\t\tstream data @ %li-%li\n",
             streamContainer->dataFromFile->startPos,
             streamContainer->dataFromFile->endPos
-    );
+    );*/
     return true;
+}
+
+bool addBlockToStream(StreamContainer* streamContainer, FromFile* block){
+    return pushBack(streamContainer->datasFromFile, block);
 }

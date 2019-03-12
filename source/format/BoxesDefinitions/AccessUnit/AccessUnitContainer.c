@@ -114,6 +114,10 @@ bool writeAccessUnitContainer(FILE *outputFile, AccessUnitContainer *accessUnitC
     return true;
 }
 
+AccessUnitHeader* getAccessUnitHeader(AccessUnitContainer* accessUnitContainer){
+    return accessUnitContainer->accessUnitHeader;
+}
+
 void setAccessUnitContainerHeader(AccessUnitContainer* accessUnitContainer, AccessUnitHeader* accessUnitHeader){
     if(accessUnitContainer->accessUnitHeader != NULL){
         freeAccessUnitHeader(accessUnitContainer->accessUnitHeader);
@@ -175,18 +179,6 @@ parseAccessUnitContainer(uint64_t boxContentSize, FILE *inputFile, char *fileNam
             }
             setAccessUnitContainerHeader(accessUnitContainer, accessUnitHeader);
 
-            if(isBlockHeaderFlagSet(getDatasetHeader(datasetContainer))){
-                uint8_t numBlocks = getNumBlocks(accessUnitHeader);
-                for(uint8_t block_i=0; block_i<numBlocks; block_i++){
-                    long blockStartingPosition = ftell(inputFile);
-                    Block* block = parseBlockContainerAUCmode(datasetContainer, inputFile, fileName);
-                    if (block == NULL){
-                        freeAccessUnitContainer(accessUnitContainer);
-                        return NULL;
-                    }
-                    addBlock(accessUnitContainer, block);
-                }
-            }
         } else if (strncmp(type, accessUnitProtectionName, 4) == 0) {
             if(!(previousState == header ||  previousState == protection)){
                 fprintf(stderr,"Access unit container wrong order of components.\n");
@@ -214,8 +206,22 @@ parseAccessUnitContainer(uint64_t boxContentSize, FILE *inputFile, char *fileNam
             }
             setAccessUnitContainerInformation(accessUnitContainer, accessUnitInformation);
         } else {
-            fprintf(stderr, "Error: unknown access unit container element.\n");
-            return NULL;
+            fseek(inputFile, -BOX_HEADER_SIZE, SEEK_CUR);
+            if(isBlockHeaderFlagSet(getDatasetHeader(datasetContainer)) && previousState != init){
+                uint8_t numBlocks = getNumBlocks(accessUnitContainer->accessUnitHeader);
+                for(uint8_t block_i=0; block_i<numBlocks; block_i++){
+                    long blockStartingPosition = ftell(inputFile);
+                    Block* block = parseBlockContainerAUCmode(datasetContainer, inputFile, fileName);
+                    if (block == NULL){
+                        freeAccessUnitContainer(accessUnitContainer);
+                        return NULL;
+                    }
+                    addBlock(accessUnitContainer, block);
+                }
+            } else {
+                fprintf(stderr, "Error: unknown access unit container element.\n");
+                return NULL;
+            }
         }
     }
     return accessUnitContainer;

@@ -8,14 +8,14 @@
 #include "../../Boxes.h"
 #include "../../utils.h"
 
-File* initFile(){
-    File* file = (File*)malloc(sizeof(File));
+MPEGGFile* initFile(){
+    MPEGGFile* file = (MPEGGFile*)malloc(sizeof(MPEGGFile));
     file->fileHeader= NULL;
     file->datasetsGroups = initVector();
     return file;
 }
 
-void freeFile(File* file){
+void freeFile(MPEGGFile* file){
     freeFileHeader(file->fileHeader);
     size_t datasetsGroupContainer_size = getSize(file->datasetsGroups);
     for(
@@ -32,15 +32,15 @@ void freeFile(File* file){
     free(file);
 }
 
-void setFileHeaderToFile(File* file, FileHeader* fileHeader){
+void setFileHeaderToFile(MPEGGFile* file, FileHeader* fileHeader){
     file->fileHeader = fileHeader;
 }
 
-void addDatasetsGroupToFile(File *file, DatasetsGroupContainer *datasetsGroupContainer){
+void addDatasetsGroupToFile(MPEGGFile *file, DatasetsGroupContainer *datasetsGroupContainer){
     pushBack(file->datasetsGroups, datasetsGroupContainer);
 }
 
-bool writeFile(File *file, FILE *outputFile) {
+bool writeFile(MPEGGFile *file, FILE *outputFile) {
     if (!isFileValid(file)){
         fprintf(stderr,"File instance is not valid.\n");
         return false;
@@ -66,7 +66,7 @@ bool writeFile(File *file, FILE *outputFile) {
     return true;
 }
 
-bool generateFileSeekPoints(File *file) {
+bool generateFileSeekPoints(MPEGGFile *file) {
     size_t datasetsGroupContainer_size = getSize(file->datasetsGroups);
     for(
             size_t datasetsGroupContainer_i=0;
@@ -79,7 +79,7 @@ bool generateFileSeekPoints(File *file) {
     return true;
 }
 
-bool isFileValid(File* file){
+bool isFileValid(MPEGGFile* file){
     if (file->fileHeader == NULL) return false;
     size_t datasetsGroupContainer_size = getSize(file->datasetsGroups);
     for(
@@ -97,12 +97,12 @@ bool isFileValid(File* file){
     return true;
 }
 
-File* parseFile(FILE *inputFile, char *filename){
+MPEGGFile* parseFile(FILE *inputFile, char *filename){
     char boxType[5];
     uint64_t boxSize;
     bool successfulRead = readBoxHeader(inputFile, boxType, &boxSize);
     if (successfulRead){
-        File* file = (File*)malloc(sizeof(File));
+        MPEGGFile* file = (MPEGGFile*)malloc(sizeof(MPEGGFile));
 
         file->fileHeader = NULL;
         file->datasetsGroups = initVector();
@@ -120,6 +120,7 @@ File* parseFile(FILE *inputFile, char *filename){
                         parseDatasetsGroupContainer(inputFile, boxSize - 12, filename);
                 if(datasetsGroupContainer == NULL){
                     fprintf(stderr, "Error reading datasets group container.\n");
+                    freeFile(file);
                     return NULL;
                 }
                 addDatasetsGroupToFile(file, datasetsGroupContainer);
@@ -135,17 +136,33 @@ File* parseFile(FILE *inputFile, char *filename){
     return NULL;
 }
 
-FileHeader* getFileHeader(File* file){
+FileHeader* getFileHeader(MPEGGFile* file){
     return file->fileHeader;
 }
 
-DatasetsGroupContainer * getDatasetGroupContainer(File *file, size_t index) {
-    if (index<0 || index >= getSize(file->datasetsGroups)){
+DatasetsGroupContainer * getDatasetGroupContainerByIndex(MPEGGFile *file, size_t index) {
+    if (index >= getSize(file->datasetsGroups)){
         return NULL;
     }
     return getValue(file->datasetsGroups, index);
 
 }
-unsigned long getDatasetsGroupContainersSize(File *file) {
+
+DatasetsGroupContainer * getDatasetGroupContainerById(MPEGGFile *file, DatasetGroupId datasetGroupId){
+    size_t numDatasetGroups = getSize(file->datasetsGroups);
+    for(size_t datasetGroup_i = 0; datasetGroup_i < numDatasetGroups; datasetGroup_i++){
+        DatasetsGroupContainer* datasetsGroupContainer = getDatasetGroupContainerByIndex(file, datasetGroup_i);
+        if(datasetsGroupContainer == NULL){
+            continue;
+        }
+        if(datasetsGroupContainer->datasetsGroupHeader->datasetGroupId == datasetGroupId){
+            return datasetsGroupContainer;
+        }
+    }
+    return NULL;
+
+}
+
+unsigned long getDatasetsGroupContainersSize(MPEGGFile *file) {
     return getSize(file->datasetsGroups);
 }

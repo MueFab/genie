@@ -2,16 +2,16 @@
 // Created by gencom on 4/12/17.
 //
 
-#include "DataStructures/Signatures/SignatureIntegerOutputStream.h"
-#include "DataStructures/Signatures/SignatureIntegerOutputStream.h"
-#include "DataStructures/Signatures/Signatures.h"
-#include "DataStructures/Signatures/SignatureIntegerInputStream.h"
-#include "DataStructures/Signatures/SignatureSizeComputation.h"
+#include <DataStructures/Signatures/SignaturesOutputStream.h>
+#include <DataStructures/Signatures/Signatures.h>
+#include <DataStructures/Signatures/SignaturesInputStream.h>
+#include <DataStructures/Signatures/SignatureSizeComputation.h>
 #include "../../Boxes.h"
 #include "../../utils.h"
 #include "../../DataStructures/BitStreams/InputBitstream.h"
 #include "../../DataStructures/BitStreams/OutputBitstream.h"
 
+bool writeUnalignedHeaderInformation(OutputBitstream* outputBitstream, AccessUnitHeader* accessUnitHeader);
 AccessUnitHeader* initAccessUnitHeader(){
     AccessUnitHeader* accessUnitHeader = malloc(sizeof(AccessUnitHeader));
     if (accessUnitHeader != NULL){
@@ -19,19 +19,20 @@ AccessUnitHeader* initAccessUnitHeader(){
         accessUnitHeader->access_unit_ID = 0;
         accessUnitHeader->num_blocks = 0;
         accessUnitHeader->parameter_set_ID = 0;
-        accessUnitHeader->au_type = 0;
+        accessUnitHeader->au_type.classType = 0;
         accessUnitHeader->reads_count = 0;
         accessUnitHeader->mm_threshold = 0;
         accessUnitHeader->mm_count = 0;
         accessUnitHeader->seekPosition = -1;
 
         //if dataset_type == 2
-            accessUnitHeader->ref_sequence_id = 0;
+            accessUnitHeader->ref_sequence_id.sequenceID = 0;
             accessUnitHeader->ref_start_position = 0;
+            accessUnitHeader->ref_end_position = 0;
 
         //if MIT_flag == 0
             //if AU_type != U_TYPE_AU || dataset_type == 2
-                accessUnitHeader->sequence_ID = 0;
+                accessUnitHeader->sequence_ID.sequenceID = 0;
                 accessUnitHeader->AU_start_position = 0;
                 accessUnitHeader->AU_end_position = 0;
                 //if multiple_alignment_flag
@@ -44,14 +45,14 @@ AccessUnitHeader* initAccessUnitHeader(){
 }
 
 AccessUnitHeader* initAccessUnitHeaderWithValues(
-    DatasetContainer* datasetContainer,
-    uint32_t access_unit_ID,
-    uint8_t num_blocks,
-    uint16_t parameter_set_ID,
-    uint8_t au_type,
-    uint32_t reads_count,
-    uint16_t mm_threshold,
-    uint32_t mm_count
+        DatasetContainer *datasetContainer,
+        uint32_t access_unit_ID,
+        uint8_t num_blocks,
+        uint8_t parameter_set_ID,
+        ClassType au_type,
+        uint32_t reads_count,
+        uint16_t mm_threshold,
+        uint32_t mm_count
 ){
     AccessUnitHeader* accessUnitHeader = malloc(sizeof(AccessUnitHeader));
     if (accessUnitHeader != NULL){
@@ -59,18 +60,19 @@ AccessUnitHeader* initAccessUnitHeaderWithValues(
         accessUnitHeader->access_unit_ID = access_unit_ID;
         accessUnitHeader->num_blocks = num_blocks;
         accessUnitHeader->parameter_set_ID = parameter_set_ID;
-        accessUnitHeader->au_type = au_type;
+        accessUnitHeader->au_type.classType = au_type.classType;
         accessUnitHeader->reads_count = reads_count;
         accessUnitHeader->mm_threshold = mm_threshold;
         accessUnitHeader->mm_count = mm_count;
 
         //if dataset_type == 2
-            accessUnitHeader->ref_sequence_id = 0;
+            accessUnitHeader->ref_sequence_id.sequenceID = 0;
             accessUnitHeader->ref_start_position = 0;
+            accessUnitHeader->ref_end_position = 0;
 
         //if MIT_flag == 0
             //if AU_type != U_TYPE_AU || dataset_type == 2
-                accessUnitHeader->sequence_ID = 0;
+                accessUnitHeader->sequence_ID.sequenceID = 0;
                 accessUnitHeader->AU_start_position = 0;
                 accessUnitHeader->AU_end_position = 0;
             //if multiple_alignment_flag
@@ -92,10 +94,13 @@ uint64_t getAccessUnitHeaderContentSize(AccessUnitHeader *accessUnitHeader){
     uint64_t accessUnitInBits = 0;
     accessUnitInBits += 32;
     accessUnitInBits += 8;
-    accessUnitInBits += 12;
+    accessUnitInBits += 8;
     accessUnitInBits += 4;
     accessUnitInBits += 32;
-    if (accessUnitHeader->au_type == N_TYPE_AU || accessUnitHeader->au_type == M_TYPE_AU ){
+    if (
+            accessUnitHeader->au_type.classType == CLASS_TYPE_CLASS_N
+            || accessUnitHeader->au_type.classType == CLASS_TYPE_CLASS_M
+    ){
         accessUnitInBits += 16;
         accessUnitInBits += 32;
     }
@@ -103,12 +108,13 @@ uint64_t getAccessUnitHeaderContentSize(AccessUnitHeader *accessUnitHeader){
     if(getDatasetType(getDatasetHeader(accessUnitHeader->datasetContainer)) == 2){
         accessUnitInBits += 16; //ref_sequence_id
         accessUnitInBits += posSize;
+        accessUnitInBits += posSize;
     }
 
     if(!isMITFlagSet(getDatasetHeader(accessUnitHeader->datasetContainer))){
         if(
-            accessUnitHeader->au_type != U_TYPE_AU
-            || getDatasetType(getDatasetHeader(accessUnitHeader->datasetContainer))
+            accessUnitHeader->au_type.classType != CLASS_TYPE_CLASS_U
+            /*|| getDatasetType(getDatasetHeader(accessUnitHeader->datasetContainer))*/
         ){
             accessUnitInBits += 16; //sequence_ID
             accessUnitInBits += posSize; //AU_start_position
@@ -119,33 +125,38 @@ uint64_t getAccessUnitHeaderContentSize(AccessUnitHeader *accessUnitHeader){
                 accessUnitInBits += posSize; //extended_au_end_position
             }
         }else{
-            size_t actualSignatureNumber = accessUnitHeader->signatures->allocated_signatures;
             uint32_t multipleSignatureBase = getMultipleSignatureBase(getDatasetHeader(accessUnitHeader->datasetContainer));
-            uint64_t signatureSizeInBits = getUSignatureSize(getDatasetHeader(accessUnitHeader->datasetContainer));
-            int signatureLengthInSymbols = getSignatureLength(getDatasetHeader(accessUnitHeader->datasetContainer));
+            //todo correct this with entire support for all parameters
+            if (multipleSignatureBase != 0 && accessUnitHeader->signatures != NULL) {
+                size_t actualSignatureNumber = accessUnitHeader->signatures->allocated_signatures;
 
-            if (actualSignatureNumber != multipleSignatureBase) {
-                accessUnitInBits += /*signal that actual number differs*/ signatureSizeInBits + /*the actual number*/16;
-            }
+                uint64_t signatureSizeInBits = getUSignatureSize(getDatasetHeader(accessUnitHeader->datasetContainer));
+                uint64_t signatureLengthInSymbols = getSignatureLength(getDatasetHeader(accessUnitHeader->datasetContainer));
 
-            SignatureSizeComputation signatureSizeComputation;
+                if (actualSignatureNumber != multipleSignatureBase) {
+                    accessUnitInBits += /*signal that actual number differs*/
+                            signatureSizeInBits + /*the actual number*/16;
+                }
 
-            //todo find out bits per symbol based on alphabet
-            uint8_t bitsPerSymbol = 3;
-            initSignatureSizeComputation(
-                    &signatureSizeComputation,
-                    signatureLengthInSymbols,
-                    (uint8_t) signatureSizeInBits,
-                    bitsPerSymbol
-            );
-            for (uint16_t signature_i = 0; signature_i < actualSignatureNumber; signature_i++) {
-                simulateSignature(
+                SignatureSizeComputation signatureSizeComputation;
+
+                //todo find out bits per symbol based on alphabet
+                uint8_t bitsPerSymbol = 3;
+                initSignatureSizeComputation(
                         &signatureSizeComputation,
-                        getSignature(accessUnitHeader->signatures, signature_i)
+                        signatureLengthInSymbols,
+                        (uint8_t) signatureSizeInBits,
+                        bitsPerSymbol
                 );
-            }
+                for (uint16_t signature_i = 0; signature_i < actualSignatureNumber; signature_i++) {
+                    simulateSignature(
+                            &signatureSizeComputation,
+                            getSignature(accessUnitHeader->signatures, signature_i)
+                    );
+                }
 
-            accessUnitInBits += getTotalSizeInBits(&signatureSizeComputation);
+                accessUnitInBits += getTotalSizeInBits(&signatureSizeComputation);
+            }
         }
     }
 
@@ -164,7 +175,8 @@ bool writeUnalignedHeaderInformation(OutputBitstream* outputBitstream, AccessUni
     uint8_t signatureBitsPerSymbol = 3;
 
 
-    if (multipleSignatureBase != 0) {
+    //todo correct with support of all parameters
+    if (multipleSignatureBase != 0 && accessUnitHeader->signatures != NULL) {
         if (accessUnitHeader->signatures->number_signatures != multipleSignatureBase) {
             for (uint64_t signatureBit = 0; signatureBit < signatureSize; signatureBit++) {
                 writeBit(outputBitstream, 1);
@@ -172,10 +184,10 @@ bool writeUnalignedHeaderInformation(OutputBitstream* outputBitstream, AccessUni
             writeNBitsShiftAndConvertToBigEndian16(
                     outputBitstream, 16, (uint16_t) accessUnitHeader->signatures->number_signatures);
         }
-        SignatureIntegerOutputStream signatureIntegerOutputStream;
+        SignaturesOutputStream signatureIntegerOutputStream;
 
 
-        initSignatureOutputStream(
+        /*initSignaturesOutputStream(
                 &signatureIntegerOutputStream,
                 outputBitstream,
                 signatureLength,
@@ -189,7 +201,7 @@ bool writeUnalignedHeaderInformation(OutputBitstream* outputBitstream, AccessUni
             );
         }
         writeBufferSignature(&signatureIntegerOutputStream);
-        writeBuffer(outputBitstream);
+        writeBuffer(outputBitstream);*/
     }
 
     return true;
@@ -202,8 +214,7 @@ bool writeAccessUnitHeaderContent(FILE* outputFile, AccessUnitHeader* accessUnit
     bool accessUnitIdSuccessfulWrite =
             writeBigEndian32ToBitstream(&outputBitstream, accessUnitHeader->access_unit_ID);
     bool numBlocksSuccessfulWrite = writeToBitstream(&outputBitstream, accessUnitHeader->num_blocks);
-    bool parameterSetIDSuccessfulWrite =
-            writeNBitsShiftAndConvertToBigEndian16(&outputBitstream, 12, accessUnitHeader->parameter_set_ID);
+    bool parameterSetIDSuccessfulWrite = writeNBitsShift(&outputBitstream, 8, (char*)&accessUnitHeader->parameter_set_ID);
     bool auTypeSuccessfulWrite = writeNBitsShift(&outputBitstream, 4, (const char *) &(accessUnitHeader->au_type));
     bool readsCountSuccessfulWrite = writeBigEndian32ToBitstream(&outputBitstream, accessUnitHeader->reads_count);
 
@@ -218,7 +229,10 @@ bool writeAccessUnitHeaderContent(FILE* outputFile, AccessUnitHeader* accessUnit
         return false;
     }
 
-    if(accessUnitHeader->au_type == N_TYPE_AU || accessUnitHeader->au_type == M_TYPE_AU){
+    if(
+            accessUnitHeader->au_type.classType == CLASS_TYPE_CLASS_N
+            || accessUnitHeader->au_type.classType == CLASS_TYPE_CLASS_M
+    ){
         bool mmThresholdSuccessfulWrite =
                 writeBigEndian16ToBitstream(&outputBitstream, accessUnitHeader->mm_threshold);
         bool mmCountSuccessfulWrite =
@@ -235,27 +249,24 @@ bool writeAccessUnitHeaderContent(FILE* outputFile, AccessUnitHeader* accessUnit
     if(getDatasetType(getDatasetHeader(accessUnitHeader->datasetContainer))==2){
         bool ref_sequence_idSuccessfulWrite = writeBigEndian16ToBitstream(
                 &outputBitstream,
-                accessUnitHeader->ref_sequence_id
+                accessUnitHeader->ref_sequence_id.sequenceID
         );
         bool ref_start_positionSuccessfulWrite;
+        bool ref_end_positionSuccessfulWrite;
         if(isPosOffsetUint40(getDatasetHeader(accessUnitHeader->datasetContainer))){
             ref_start_positionSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian64(
                     &outputBitstream, 40,
                     accessUnitHeader->ref_start_position
+            );
+            ref_end_positionSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian64(
+                    &outputBitstream, 40,
+                    accessUnitHeader->ref_end_position
             );
         }else{
             ref_start_positionSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian32(
                     &outputBitstream, 32,
                     (uint32_t)accessUnitHeader->ref_start_position
             );
-        }
-        bool ref_end_positionSuccessfulWrite;
-        if(isPosOffsetUint40(getDatasetHeader(accessUnitHeader->datasetContainer))){
-            ref_end_positionSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian64(
-                    &outputBitstream, 40,
-                    accessUnitHeader->ref_end_position
-            );
-        }else{
             ref_end_positionSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian32(
                     &outputBitstream, 32,
                     (uint32_t)accessUnitHeader->ref_end_position
@@ -271,12 +282,10 @@ bool writeAccessUnitHeaderContent(FILE* outputFile, AccessUnitHeader* accessUnit
         }
     }
     if(!isMITFlagSet(getDatasetHeader(accessUnitHeader->datasetContainer))){
-        if(accessUnitHeader->au_type != U_TYPE_AU
-           || getDatasetType(getDatasetHeader(accessUnitHeader->datasetContainer))==2
-        ) {
+        if(accessUnitHeader->au_type.classType != CLASS_TYPE_CLASS_U) {
             bool sequenceIdSuccessfulWrite = writeNBitsShiftAndConvertToBigEndian16(
                     &outputBitstream, 16,
-                    accessUnitHeader->sequence_ID
+                    accessUnitHeader->sequence_ID.sequenceID
             );
             bool auStartPositionSuccessfulWrite;
             bool auEndPositionSuccessfulWrite;
@@ -368,20 +377,19 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
 
     uint32_t accessUnitIdBuffer;
     uint8_t numBlocksBuffer;
-    uint16_t parameterSetIdBuffer;
+    uint8_t parameterSetIdBuffer;
     uint8_t auTypeBuffer;
     uint32_t readsCountBuffer;
     uint16_t mmThresholdBuffer = 0;
     uint32_t mmCountBuffer = 0;
 
     bool accessUnitIdSuccessfulRead =
-            readNBitsShiftAndConvertBigToNativeEndian32(&inputBitstream, 32, (char *) &accessUnitIdBuffer);
+            readNBitsBigToNativeEndian32(&inputBitstream, 32, &accessUnitIdBuffer);
     bool numBlocksSuccessfulRead = readBytes(&inputBitstream,1,(char*)&numBlocksBuffer);
-    bool parameterSetIdSuccessfulRead =
-            readNBitsShiftAndConvertBigToNativeEndian16(&inputBitstream, 12, (char *) &parameterSetIdBuffer);
+    bool parameterSetIdSuccessfulRead = readNBitsShift(&inputBitstream, 8, (char *) &parameterSetIdBuffer);
     bool auTypeSuccessfulRead = readNBitsShift(&inputBitstream, 4, (char*)&auTypeBuffer);
     bool readsCountBufferSuccessfulRead =
-            readNBitsShiftAndConvertBigToNativeEndian32(&inputBitstream, 32, (char *) &readsCountBuffer);
+            readNBitsBigToNativeEndian32(&inputBitstream, 32, &readsCountBuffer);
     if (
         !accessUnitIdSuccessfulRead ||
         !numBlocksSuccessfulRead ||
@@ -393,11 +401,11 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
         return false;
     }
 
-    if(auTypeBuffer == N_TYPE_AU || auTypeBuffer == M_TYPE_AU) {
+    if(auTypeBuffer == CLASS_TYPE_CLASS_N || auTypeBuffer == CLASS_TYPE_CLASS_M) {
         bool mmThresholdSuccessfulRead =
-                readNBitsShiftAndConvertBigToNativeEndian16(&inputBitstream, 16, (char *) &mmThresholdBuffer);
+                readNBitsBigToNativeEndian16(&inputBitstream, 16, &mmThresholdBuffer);
         bool mmCountSuccessfulRead =
-                readNBitsShiftAndConvertBigToNativeEndian32(&inputBitstream, 32, (char *) &mmCountBuffer);
+                readNBitsBigToNativeEndian32(&inputBitstream, 32, &mmCountBuffer);
         if (!mmThresholdSuccessfulRead || !mmCountSuccessfulRead){
             fprintf(stderr,"Error parsing access unit header.\n");
             return false;
@@ -405,13 +413,15 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
     }
 
     //if dataset_type == 2
-        uint16_t  ref_sequence_id = 0;
+        SequenceID  ref_sequence_id;
+        ref_sequence_id.sequenceID = 0;
         uint64_t ref_start_position = 0;
         uint64_t ref_end_position = 0;
 
     //if MIT_flag == 0
         //if AU_type != U_TYPE_AU || dataset_type == 2
-            uint16_t sequence_ID = 0;
+            SequenceID sequence_ID;
+            sequence_ID.sequenceID = 0;
             uint64_t AU_start_position = 0;
             uint64_t AU_end_position = 0;
         //if multiple_alignment_flag
@@ -421,38 +431,40 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
         Signatures* signatures = NULL;
 
     if(getDatasetType(getDatasetHeader(datasetContainer)) == 2){
-        bool ref_sequence_id_SuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian16(
+        bool ref_sequence_id_SuccessfulRead = readNBitsBigToNativeEndian16(
                 &inputBitstream, 16,
-                (char*)&ref_sequence_id
+                &(ref_sequence_id.sequenceID)
         );
+        bool ref_start_position_SuccessfulRead;
+        bool ref_end_position_SuccessfulRead;
         if(isPosOffsetUint40(getDatasetHeader(datasetContainer))) {
-            bool ref_start_position_SuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian64(
+            ref_start_position_SuccessfulRead = readNBitsBigToNativeEndian64(
                     &inputBitstream, 40,
-                    (char *) &ref_start_position
+                    &ref_start_position
             );
-            bool ref_end_position_SuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian64(
+            ref_end_position_SuccessfulRead = readNBitsBigToNativeEndian64(
                     &inputBitstream, 40,
-                    (char *) &ref_end_position
+                    &ref_end_position
             );
         }else{
-            bool ref_start_position_SuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian64(
+            ref_start_position_SuccessfulRead = readNBitsBigToNativeEndian64(
                     &inputBitstream, 32,
-                    (char *) &ref_start_position
+                    &ref_start_position
             );
-            bool ref_end_position_SuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian64(
+            ref_end_position_SuccessfulRead = readNBitsBigToNativeEndian64(
                     &inputBitstream, 32,
-                    (char *) &ref_end_position
+                    &ref_end_position
             );
         }
     }
     if(!isMITFlagSet(getDatasetHeader(datasetContainer))){
         if(
-                auTypeBuffer != U_TYPE_AU
-                || getDatasetType(getDatasetHeader(datasetContainer)) == 2
+                auTypeBuffer != CLASS_TYPE_CLASS_U
+                /*|| getDatasetType(getDatasetHeader(datasetContainer)) == 2*/
         ){
-            bool sequence_ID_successfulRead = readNBitsShiftAndConvertBigToNativeEndian16(
+            bool sequence_ID_successfulRead = readNBitsBigToNativeEndian16(
                     &inputBitstream, 16,
-                    (char*)&sequence_ID
+                    &(sequence_ID.sequenceID)
             );
 
 
@@ -460,22 +472,22 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
             bool auEndPositionSuccessfulRead;
 
             if(isPosOffsetUint40(getDatasetHeader(datasetContainer))){
-                auStartPositionSuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian64(
-                    &inputBitstream, 40,
-                    (char*) &AU_start_position
-                );
-                auEndPositionSuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian64(
+                auStartPositionSuccessfulRead = readNBitsBigToNativeEndian64(
                         &inputBitstream, 40,
-                        (char*) &AU_end_position
+                        &AU_start_position
+                );
+                auEndPositionSuccessfulRead = readNBitsBigToNativeEndian64(
+                        &inputBitstream, 40,
+                        &AU_end_position
                 );
             }else{
-                auStartPositionSuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian32(
+                auStartPositionSuccessfulRead = readNBitsBigToNativeEndian64(
                         &inputBitstream, 32,
-                        (char*) &AU_start_position
+                        &AU_start_position
                 );
-                auEndPositionSuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian32(
+                auEndPositionSuccessfulRead = readNBitsBigToNativeEndian64(
                         &inputBitstream, 32,
-                        (char*) &AU_end_position
+                        &AU_end_position
                 );
             }
 
@@ -493,22 +505,22 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
                 bool extendedAuEndPositionSuccessfulRead;
 
                 if(isPosOffsetUint40(getDatasetHeader(datasetContainer))){
-                    extendedAuStartPositionSuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian64(
+                    extendedAuStartPositionSuccessfulRead = readNBitsBigToNativeEndian64(
                             &inputBitstream, 40,
-                            (char*) &extended_AU_start_position
+                            &extended_AU_start_position
                     );
-                    extendedAuEndPositionSuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian64(
+                    extendedAuEndPositionSuccessfulRead = readNBitsBigToNativeEndian64(
                             &inputBitstream, 40,
-                            (char*) &extended_AU_end_position
+                            &extended_AU_end_position
                     );
                 }else{
-                    extendedAuStartPositionSuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian32(
+                    extendedAuStartPositionSuccessfulRead = readNBitsBigToNativeEndian64(
                             &inputBitstream, 32,
-                            (char*) &extended_AU_start_position
+                            &extended_AU_start_position
                     );
-                    extendedAuEndPositionSuccessfulRead = readNBitsShiftAndConvertBigToNativeEndian32(
+                    extendedAuEndPositionSuccessfulRead = readNBitsBigToNativeEndian64(
                             &inputBitstream, 32,
-                            (char*) &extended_AU_end_position
+                            &extended_AU_end_position
                     );
                 }
 
@@ -528,14 +540,14 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
             uint8_t* signatureBuffer = (uint8_t*) malloc(bytesNeeded*sizeof(uint8_t));
 
             if (multipleSignatureBase!=0){
-                uint16_t actualSignatureNumber = (uint16_t) multipleSignatureBase;
+                /*uint16_t actualSignatureNumber = (uint16_t) multipleSignatureBase;
                 readNBitsShift(&inputBitstream,signatureLengthInBits,(char*)signatureBuffer);
                 bool allBitsToTrue = firstNBitsSetTo((char*)signatureBuffer, signatureLengthInBits, true);
 
 
                 SignatureArbitraryLengthIntegerInputStream signatureIntegerInputStream;
                 if(allBitsToTrue) {
-                    readNBitsShiftAndConvertBigToNativeEndian16(&inputBitstream, 16, (char *) &actualSignatureNumber);
+                    readNBitsBigToNativeEndian16(&inputBitstream, 16, (char *) &actualSignatureNumber);
                     changeSizeSignatures(
                             signatures,
                             actualSignatureNumber
@@ -560,7 +572,7 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
                         getNewInteger(&signatureIntegerInputStream);
                     }
                 }
-                freeSignatureInputStream(&signatureIntegerInputStream);
+                freeSignatureInputStream(&signatureIntegerInputStream);*/
             }
         }
     }
@@ -569,7 +581,7 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
     accessUnitHeader->access_unit_ID = accessUnitIdBuffer;
     accessUnitHeader->num_blocks = numBlocksBuffer;
     accessUnitHeader->parameter_set_ID =parameterSetIdBuffer;
-    accessUnitHeader->au_type =auTypeBuffer;
+    accessUnitHeader->au_type.classType = auTypeBuffer;
     accessUnitHeader->reads_count =readsCountBuffer;
     accessUnitHeader->mm_threshold =mmThresholdBuffer;
     accessUnitHeader->mm_count =mmCountBuffer;
@@ -577,6 +589,7 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
     accessUnitHeader->datasetContainer = datasetContainer;
     accessUnitHeader->ref_sequence_id = ref_sequence_id;
     accessUnitHeader->ref_start_position = ref_start_position;
+    accessUnitHeader->ref_end_position = ref_end_position;
     accessUnitHeader->sequence_ID = sequence_ID;
     accessUnitHeader->AU_start_position = AU_start_position;
     accessUnitHeader->AU_end_position = AU_end_position;
@@ -607,6 +620,16 @@ uint32_t getReadsCount(AccessUnitHeader* accessUnitHeader){
     return accessUnitHeader->reads_count;
 }
 
+SequenceID getReferenceSequence(AccessUnitHeader *accessUnitHeader){
+    return accessUnitHeader->ref_sequence_id;
+}
+uint64_t getReferenceStart(AccessUnitHeader* accessUnitHeader){
+    return accessUnitHeader->ref_start_position;
+}
+uint64_t getReferenceEnd(AccessUnitHeader* accessUnitHeader){
+    return accessUnitHeader->ref_end_position;
+}
+
 uint16_t getMMThreshold(AccessUnitHeader* accessUnitHeader){
     return accessUnitHeader->mm_threshold;
 }
@@ -615,14 +638,64 @@ uint32_t getMMCount(AccessUnitHeader* accessUnitHeader){
     return accessUnitHeader->mm_count;
 }
 
-void setReferenceSequenceId(AccessUnitHeader* accessUnitHeader, uint16_t sequenceId){
-    accessUnitHeader->ref_sequence_id = sequenceId;
+ClassType getAccessUnitType(AccessUnitHeader *accessUnitHeader){
+    return accessUnitHeader->au_type;
+}
+SequenceID getAccessUnitSequenceID(AccessUnitHeader *accessUnitHeader){
+    return accessUnitHeader->sequence_ID;
+}
+uint64_t getAccessUnitStart(AccessUnitHeader* accessUnitHeader){
+    return accessUnitHeader->AU_start_position;
+}
+uint64_t getAccessUnitEnd(AccessUnitHeader* accessUnitHeader){
+    return accessUnitHeader->AU_end_position;
+}
+uint64_t getExtendedAccessUnitStart(AccessUnitHeader* accessUnitHeader){
+    return accessUnitHeader->extended_AU_start_position;
+}
+uint64_t getExtendedAccessUnitEnd(AccessUnitHeader* accessUnitHeader){
+    return accessUnitHeader->extended_AU_end_position;
+}
+int setAccessUnitHeaderSequence_ID(AccessUnitHeader *accessUnitHeader, SequenceID sequenceId){
+    if(accessUnitHeader == NULL) return -1;
+    accessUnitHeader->sequence_ID = sequenceId;
+    return 0;
+}
+int setAccessUnitHeaderAuStartPosition(AccessUnitHeader* accessUnitHeader, uint64_t auStartPosition){
+    if(accessUnitHeader == NULL) return -1;
+    accessUnitHeader->AU_start_position = auStartPosition;
+    return 0;
+}
+int setAccessUnitHeaderAuEndPosition(AccessUnitHeader* accessUnitHeader, uint64_t auEndPosition){
+    if(accessUnitHeader == NULL) return -1;
+    accessUnitHeader->AU_end_position = auEndPosition;
+    return 0;
+}
+int setAccessUnitHeaderAuExtendedStartPosition(AccessUnitHeader* accessUnitHeader, uint64_t auExtendedStartPosition){
+    if(accessUnitHeader == NULL) return -1;
+    accessUnitHeader->extended_AU_start_position = auExtendedStartPosition;
+    return 0;
+}
+int setAccessUnitHeaderAuExtendedEndPosition(AccessUnitHeader* accessUnitHeader, uint64_t auExtendedEndPosition){
+    if(accessUnitHeader == NULL) return -1;
+    accessUnitHeader->extended_AU_end_position = auExtendedEndPosition;
+    return 0;
 }
 
-void setReferenceStartPosition(AccessUnitHeader* accessUnitHeader, uint64_t startPosition){
-    accessUnitHeader->ref_start_position = startPosition;
+int setAccessUnitHeaderReferenceSequence_ID(AccessUnitHeader *accessUnitHeader, SequenceID referenceSequenceId){
+    if(accessUnitHeader == NULL) return -1;
+    accessUnitHeader->ref_sequence_id = referenceSequenceId;
+    return 0;
 }
 
-void setReferenceEndPosition(AccessUnitHeader* accessUnitHeader, uint64_t endPosition){
-    accessUnitHeader->ref_end_position = endPosition;
+int setAccessUnitHeaderReferenceStartPosition(AccessUnitHeader *accessUnitHeader, uint64_t referenceStartPosition){
+    if(accessUnitHeader == NULL) return -1;
+    accessUnitHeader->ref_start_position = referenceStartPosition;
+    return 0;
+}
+
+int setAccessUnitHeaderReferenceEndPosition(AccessUnitHeader *accessUnitHeader, uint64_t referenceEndPosition){
+    if(accessUnitHeader == NULL) return -1;
+    accessUnitHeader->ref_end_position = referenceEndPosition;
+    return 0;
 }

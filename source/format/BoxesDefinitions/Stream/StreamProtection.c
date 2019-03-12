@@ -11,7 +11,8 @@ StreamProtection* initStreamProtection(StreamContainer* streamContainer){
     StreamProtection* streamProtection = (StreamProtection*)malloc(sizeof(StreamProtection));
     streamProtection->protection = NULL;
     streamProtection->streamContainer = streamContainer;
-    streamProtection->seekPosition = -1;
+    streamProtection->hasSeek = false;
+    streamProtection->seekPosition = 0;
     return streamProtection;
 }
 
@@ -90,6 +91,10 @@ bool copyContentStreamProtection(StreamProtection* streamProtection, char *conte
 
 StreamProtection *parseStreamProtection(StreamContainer* streamContainer, uint64_t boxContentSize, FILE *inputFile){
     long seekPosition = ftell(inputFile);
+    if(seekPosition == -1){
+        fprintf(stderr, "Could not get file position.\n");
+        return NULL;
+    }
     Byte* protectionBuffer = (Byte*) malloc(boxContentSize*sizeof(Byte));
     if(protectionBuffer== NULL){
         fprintf(stderr, "Error while reserving memory for protection buffer.\n");
@@ -102,12 +107,13 @@ StreamProtection *parseStreamProtection(StreamContainer* streamContainer, uint64
         return NULL;
     }
     StreamProtection* streamProtection = initStreamProtection(streamContainer);
-    streamProtection->seekPosition = seekPosition;
+    streamProtection->hasSeek = true;
+    streamProtection->seekPosition = (size_t) seekPosition;
     copyContentStreamProtection(streamProtection, (char*)protectionBuffer, boxContentSize);
     free(protectionBuffer);
     return streamProtection;
 }
 
-long getStreamProtectionSeekPosition(StreamProtection* streamProtection){
+size_t getStreamProtectionSeekPosition(StreamProtection* streamProtection){
     return streamProtection->seekPosition;
 }

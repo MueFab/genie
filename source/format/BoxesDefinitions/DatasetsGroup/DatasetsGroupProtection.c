@@ -11,7 +11,8 @@ DatasetsGroupProtection *initDatasetsGroupProtection() {
     DatasetsGroupProtection* datasetsGroupProtection =
             (DatasetsGroupProtection*)malloc(sizeof(DatasetsGroupProtection));
     datasetsGroupProtection->protection = NULL;
-    datasetsGroupProtection->seekPosition = -1;
+    datasetsGroupProtection->hasSeek = false;
+    datasetsGroupProtection->seekPosition = 0;
     return datasetsGroupProtection;
 }
 
@@ -89,6 +90,11 @@ DatasetsGroupProtection *parseDatasetsGroupProtection(uint64_t boxContentSize, F
         return NULL;
     }
     long seekPosition = ftell(inputFile);
+    if(seekPosition == -1){
+        fprintf(stderr, "Could not get file position.\n");
+        free(protectionBuffer);
+        return NULL;
+    }
     size_t protectionBufferReadSize = fread(protectionBuffer,sizeof(Byte),boxContentSize,inputFile);
     if(protectionBufferReadSize!=boxContentSize){
         fprintf(stderr, "Could not read requested number of bytes.\n");
@@ -96,10 +102,10 @@ DatasetsGroupProtection *parseDatasetsGroupProtection(uint64_t boxContentSize, F
         return NULL;
     }
     DatasetsGroupProtection* datasetsGroupProtection = initDatasetsGroupProtection();
-    datasetsGroupProtection->seekPosition = seekPosition;
+    datasetsGroupProtection->hasSeek = true;
+    datasetsGroupProtection->seekPosition = (size_t) seekPosition;
     copyContentDatasetsGroupProtection(datasetsGroupProtection, (char*)protectionBuffer, boxContentSize);
     free(protectionBuffer);
-    datasetsGroupProtection->seekPosition = seekPosition;
     return datasetsGroupProtection;
 }
 
@@ -110,6 +116,6 @@ bool copyContentDatasetsGroupProtection(
     return copyBytesSource(datasetsGroupProtection->protection, (Byte*)content, contentSize);
 }
 
-long getDatasetGroupProtectionSeekPosition(DatasetsGroupProtection* datasetsGroupProtection){
+size_t getDatasetGroupProtectionSeekPosition(DatasetsGroupProtection* datasetsGroupProtection){
     return datasetsGroupProtection->seekPosition;
 }

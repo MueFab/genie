@@ -8,52 +8,75 @@
 #include "../../Boxes.h"
 #include "../../utils.h"
 
+bool writeDatasetsGroupReferenceGenomeContent(
+        DatasetsGroupReferenceGenome* datasetsGroupReferenceGenome,
+        FILE *outputFile
+);
 
-DatasetsGroupReferenceGenome *initDatasetsGroupReferenceGenomeExternal(char *ref_uri, DatasetGroupId externalDatasetGroupId,
-                                                                       DatasetId externalDatasetId, uint8_t checksumAlg, Vector* checksums,
-                                                                       ReferenceId referenceId, char *referenceName,
-                                                                       ReferenceMajorVersion majorVersion, ReferenceMinorVersion minorVersion,
-                                                                       ReferencePatchVersion referencePathVersion) {
+
+DatasetsGroupReferenceGenome *initDatasetsGroupReferenceGenomeExternal(
+        uint8_t dataset_group_id, char *ref_uri, uint8_t referenceType,
+        DatasetGroupId externalDatasetGroupId,
+        DatasetId externalDatasetId, uint8_t checksumAlg, Vector* checksums,
+        ReferenceId referenceId, char *referenceName,
+        ReferenceMajorVersion majorVersion, ReferenceMinorVersion minorVersion,
+        ReferencePatchVersion referencePathVersion
+) {
     DatasetsGroupReferenceGenome* datasetsGroupReferenceGenome =
             (DatasetsGroupReferenceGenome*)malloc(sizeof(DatasetsGroupReferenceGenome));
+    datasetsGroupReferenceGenome->dataset_group_id = dataset_group_id;
+
     datasetsGroupReferenceGenome->isExternal = true;
     size_t ref_uri_length = strlen(ref_uri);
     datasetsGroupReferenceGenome->externalReference.ref_uri = (char*)malloc(ref_uri_length+1);
     strcpy(datasetsGroupReferenceGenome->externalReference.ref_uri,ref_uri);
     datasetsGroupReferenceGenome->externalReference.ref_uri[ref_uri_length]=0;
+    datasetsGroupReferenceGenome->externalReference.reference_type = referenceType;
     datasetsGroupReferenceGenome->externalReference.externalDatasetGroupId=externalDatasetGroupId;
     datasetsGroupReferenceGenome->externalReference.externalDatasetId= externalDatasetId;
     datasetsGroupReferenceGenome->externalReference.checksumAlgorithm = checksumAlg;
     datasetsGroupReferenceGenome->externalReference.checksums = checksums;
 
     datasetsGroupReferenceGenome->referenceId = referenceId;
-    datasetsGroupReferenceGenome->referenceName = referenceName;
+    size_t ref_name_length = strlen(referenceName);
+    datasetsGroupReferenceGenome->referenceName = (char*)malloc(ref_name_length+1);
+    strcpy(datasetsGroupReferenceGenome->referenceName, referenceName);
+
     datasetsGroupReferenceGenome->referenceMajorVersion = majorVersion;
     datasetsGroupReferenceGenome->referenceMinorVersion = minorVersion;
     datasetsGroupReferenceGenome->referencePatchVersion = referencePathVersion;
-    datasetsGroupReferenceGenome->seekPosition = -1;
+    datasetsGroupReferenceGenome->hasSeek = false;
+    datasetsGroupReferenceGenome->seekPosition = 0;
 
     datasetsGroupReferenceGenome->sequences = initVector();
     return datasetsGroupReferenceGenome;
 }
 
 DatasetsGroupReferenceGenome *
-initDatasetsGroupReferenceGenome(DatasetGroupId internalDatasetGroupId, DatasetId internalDatasetId,
-                                 ReferenceId referenceId, char *referenceName, ReferenceMajorVersion majorVersion,
-                                 ReferenceMinorVersion minorVersion, ReferencePatchVersion referencePathVersion) {
+initDatasetsGroupReferenceGenome(
+        uint8_t dataset_group_id, DatasetGroupId internalDatasetGroupId, DatasetId internalDatasetId,
+        ReferenceId referenceId, char *referenceName, ReferenceMajorVersion majorVersion,
+        ReferenceMinorVersion minorVersion, ReferencePatchVersion referencePathVersion
+) {
     DatasetsGroupReferenceGenome* datasetsGroupReferenceGenome =
             (DatasetsGroupReferenceGenome*)malloc(sizeof(DatasetsGroupReferenceGenome));
+
+    datasetsGroupReferenceGenome->dataset_group_id = dataset_group_id;
+
     datasetsGroupReferenceGenome->isExternal = false;
     datasetsGroupReferenceGenome->externalReference.ref_uri = NULL;
     datasetsGroupReferenceGenome->internalRefDatasetGroupId = internalDatasetGroupId;
     datasetsGroupReferenceGenome->internalRefDatasetId = internalDatasetId;
     datasetsGroupReferenceGenome->referenceId = referenceId;
 
-    datasetsGroupReferenceGenome->referenceName = referenceName;
+    size_t ref_name_length = strlen(referenceName);
+    datasetsGroupReferenceGenome->referenceName = (char*)malloc(ref_name_length+1);
+    strcpy(datasetsGroupReferenceGenome->referenceName, referenceName);
     datasetsGroupReferenceGenome->referenceMajorVersion = majorVersion;
     datasetsGroupReferenceGenome->referenceMinorVersion = minorVersion;
     datasetsGroupReferenceGenome->referencePatchVersion = referencePathVersion;
-    datasetsGroupReferenceGenome->seekPosition = -1;
+    datasetsGroupReferenceGenome->hasSeek = false;
+    datasetsGroupReferenceGenome->seekPosition = 0;
 
     datasetsGroupReferenceGenome->sequences = initVector();
     return datasetsGroupReferenceGenome;
@@ -86,7 +109,8 @@ bool writeDatasetsGroupReferenceGenomeContent(
         DatasetsGroupReferenceGenome* datasetsGroupReferenceGenome,
         FILE *outputFile
 ){
-    bool referenceIdSuccessfulWrite = writeUint8(datasetsGroupReferenceGenome->referenceId, outputFile);
+    bool datasetGroupIdSuccessfulWrite = utils_write(datasetsGroupReferenceGenome->dataset_group_id, outputFile);
+    bool referenceIdSuccessfulWrite = utils_write(datasetsGroupReferenceGenome->referenceId, outputFile);
 
     size_t referenceNameSize = strlen(datasetsGroupReferenceGenome->referenceName);
     bool referenceNameWriteSuccessfulWrite =
@@ -103,11 +127,14 @@ bool writeDatasetsGroupReferenceGenomeContent(
     bool referencePatchVersionSuccessfulWrite =
             writeBigEndian16ToFile(datasetsGroupReferenceGenome->referencePatchVersion, outputFile);
 
-    if (!referenceIdSuccessfulWrite ||
+    if (
+        !datasetGroupIdSuccessfulWrite ||
+        !referenceIdSuccessfulWrite ||
         !referenceNameWriteSuccessfulWrite ||
         !referenceMajorVersionSuccessfulWrite ||
         !referenceMinorVersionSuccessfulWrite ||
-        !referencePatchVersionSuccessfulWrite){
+        !referencePatchVersionSuccessfulWrite
+    ){
         fprintf(stderr,"Error printing reference information.\n");
         return false;
     }
@@ -129,11 +156,8 @@ bool writeDatasetsGroupReferenceGenomeContent(
         }
     }
 
-
-
-
     uint8_t isExternalFlagValue = datasetsGroupReferenceGenome->isExternal ? (uint8_t)1:(uint8_t)0;
-    if (!writeUint8(isExternalFlagValue,outputFile)){
+    if (!utils_write(isExternalFlagValue,outputFile)){
         fprintf(stderr,"Error external uri.\n");
         return false;
     }
@@ -146,36 +170,85 @@ bool writeDatasetsGroupReferenceGenomeContent(
             fprintf(stderr,"Error external uri.\n");
             return false;
         }
-        bool externalDatasetGroupIdSuccessfulWrite =
-                writeUint8(datasetsGroupReferenceGenome->externalReference.externalDatasetGroupId,
-                                          outputFile);
-        bool externalDatasetIdSuccessfulWrite =
-                writeBigEndian16ToFile(datasetsGroupReferenceGenome->externalReference.externalDatasetId, outputFile);
 
-        bool checksumAlgorithmSuccessfulWrite =
-                writeUint8(datasetsGroupReferenceGenome->externalReference.checksumAlgorithm, outputFile);
+        bool checksumAlgorithmSuccessfulWrite = utils_write(
+                datasetsGroupReferenceGenome->externalReference.checksumAlgorithm,
+                outputFile
+        );
+        if(
+                !checksumAlgorithmSuccessfulWrite
+                ){
+            fprintf(stderr,"Error printing external dataset group id, dataset id or checksum.\n");
+            return false;
+        }
+
+        bool externalReferenceTypeSuccessfulWrite = utils_write(
+                datasetsGroupReferenceGenome->externalReference.reference_type,
+                outputFile
+        );
+        if(!externalReferenceTypeSuccessfulWrite){
+            fprintf(stderr, "Error writing reference type.\n");
+            return false;
+        }
+
+        if(
+            datasetsGroupReferenceGenome->externalReference.reference_type == REFERENCE_TYPE_MPEGG_REF
+        ) {
+
+            bool externalDatasetGroupIdSuccessfulWrite = utils_write(
+                datasetsGroupReferenceGenome->externalReference.externalDatasetGroupId,
+                outputFile
+            );
+            bool externalDatasetIdSuccessfulWrite = writeBigEndian16ToFile(
+                datasetsGroupReferenceGenome->externalReference.externalDatasetId,
+                outputFile
+            );
+            if(
+                !externalDatasetGroupIdSuccessfulWrite
+                || !externalDatasetIdSuccessfulWrite
+            ){
+                fprintf(stderr, "Error writing external ids of reference.");
+                return false;
+            }
+        }
+
         size_t checksumSize = datasetsGroupReferenceGenome->externalReference.checksumAlgorithm? 32:16;
-        for(size_t seq_i = 0; seq_i < seq_count; seq_i++) {
-            //todo add error check
+        if(
+            datasetsGroupReferenceGenome->externalReference.reference_type == REFERENCE_TYPE_MPEGG_REF
+        ) {
             size_t externalChecksumWriteSize =
                     fwrite(
-                            getValue(datasetsGroupReferenceGenome->externalReference.checksums,seq_i),
+                            getValue(datasetsGroupReferenceGenome->externalReference.checksums,0),
                             sizeof(char),
                             checksumSize,
                             outputFile
                     );
         }
-        if(!externalDatasetGroupIdSuccessfulWrite ||
-                !externalDatasetIdSuccessfulWrite ||
-                !checksumAlgorithmSuccessfulWrite){
-            fprintf(stderr,"Error printing external dataset group id, dataset id or checksum.\n");
-            return false;
+
+        size_t numberChecksumsToWrite = 1;
+        if(
+            datasetsGroupReferenceGenome->externalReference.reference_type != REFERENCE_TYPE_MPEGG_REF
+        ){
+            numberChecksumsToWrite = seq_count;
         }
+
+        for(size_t seq_i = 0; seq_i < numberChecksumsToWrite; seq_i++) {
+            size_t externalChecksumWriteSize = fwrite(
+                    getValue(datasetsGroupReferenceGenome->externalReference.checksums,seq_i),
+                    sizeof(char),
+                    checksumSize,
+                    outputFile
+            );
+        }
+
     }else{
-        bool datasetGroupIdSuccessfulWrite = writeUint8(datasetsGroupReferenceGenome->internalRefDatasetGroupId, outputFile)==1;
-        bool datasetIdSuccessfulWrite =
+        bool internalRefDatasetGroupIdSuccessfulWrite = utils_write(
+                datasetsGroupReferenceGenome->internalRefDatasetGroupId,
+                outputFile
+        )==1;
+        bool internalRefDatasetIdSuccessfulWrite =
                 writeBigEndian16ToFile(datasetsGroupReferenceGenome->internalRefDatasetId, outputFile);
-        if(!datasetGroupIdSuccessfulWrite || !datasetIdSuccessfulWrite){
+        if(!internalRefDatasetGroupIdSuccessfulWrite || !internalRefDatasetIdSuccessfulWrite){
             fprintf(stderr,"Error printing internal dataset group or dataset reference.\n");
             return false;
         }
@@ -199,6 +272,7 @@ bool writeDatasetsGroupReferenceGenome(DatasetsGroupReferenceGenome* datasetsGro
 uint64_t getDatasetsGroupReferenceGenomeContentSize(DatasetsGroupReferenceGenome* datasetsGroupReferenceGenome){
     uint64_t boxContentSize = 0;
 
+    boxContentSize += sizeof(datasetsGroupReferenceGenome->dataset_group_id);
     boxContentSize += sizeof(datasetsGroupReferenceGenome->referenceId);
     boxContentSize += strlen(datasetsGroupReferenceGenome->referenceName)+1;
     boxContentSize += sizeof(datasetsGroupReferenceGenome->referenceMajorVersion);
@@ -212,13 +286,22 @@ uint64_t getDatasetsGroupReferenceGenomeContentSize(DatasetsGroupReferenceGenome
         boxContentSize += strlen(getValue(datasetsGroupReferenceGenome->sequences, seq_i))+1;
     }
 
-    boxContentSize += sizeof(uint8_t); //For flag
+    boxContentSize += sizeof(uint8_t); //for reserved + external_ref_flag
     if (datasetsGroupReferenceGenome->isExternal){
         boxContentSize += strlen(datasetsGroupReferenceGenome->externalReference.ref_uri)+1;
-        boxContentSize += sizeof(datasetsGroupReferenceGenome->externalReference.externalDatasetGroupId);
-        boxContentSize += sizeof(datasetsGroupReferenceGenome->externalReference.externalDatasetId);
+        boxContentSize += sizeof(datasetsGroupReferenceGenome->externalReference.reference_type);
         boxContentSize += sizeof(datasetsGroupReferenceGenome->externalReference.checksumAlgorithm);
-        boxContentSize += (datasetsGroupReferenceGenome->externalReference.checksumAlgorithm ? 32:16)*seq_count;
+        if(datasetsGroupReferenceGenome->externalReference.reference_type == REFERENCE_TYPE_MPEGG_REF) {
+            boxContentSize += sizeof(datasetsGroupReferenceGenome->externalReference.externalDatasetGroupId);
+            boxContentSize += sizeof(datasetsGroupReferenceGenome->externalReference.externalDatasetId);
+        }
+        if(datasetsGroupReferenceGenome->externalReference.reference_type != REFERENCE_TYPE_MPEGG_REF) {
+            boxContentSize += (uint64_t)(
+                    (datasetsGroupReferenceGenome->externalReference.checksumAlgorithm ? 32 : 16) * seq_count
+            );
+        }else{
+            boxContentSize += (uint64_t)(datasetsGroupReferenceGenome->externalReference.checksumAlgorithm ? 32 : 16);
+        }
     }else{
         boxContentSize += sizeof(datasetsGroupReferenceGenome->internalRefDatasetGroupId);
         boxContentSize += sizeof(datasetsGroupReferenceGenome->internalRefDatasetId);
@@ -232,7 +315,12 @@ uint64_t getDatasetsGroupReferenceGenomeSize(DatasetsGroupReferenceGenome* datas
 
 DatasetsGroupReferenceGenome *parseDatasetsGroupReferenceGenome(FILE *inputFile) {
     long seekPosition = ftell(inputFile);
+    if(seekPosition == -1){
+        fprintf(stderr, "Could not get file position.\n");
+        return NULL;
+    }
 
+    uint8_t dataset_group_id = 0;
     ReferenceId referenceIdBuffer = 0;
     char* referenceNameBuffer = NULL;
     size_t referenceNameBufferSize = 0;
@@ -240,11 +328,16 @@ DatasetsGroupReferenceGenome *parseDatasetsGroupReferenceGenome(FILE *inputFile)
     uint16_t referenceMinorVersion = 0;
     uint16_t referencePatchVersion = 0;
 
-    bool referenceIdSuccessfulRead = readUint8(&referenceIdBuffer,inputFile);
+    bool datasetGroupIdSuccessfulRead = utils_read(&dataset_group_id, inputFile);
+    bool referenceIdSuccessfulRead = utils_read(&referenceIdBuffer,inputFile);
     bool referenceNameSuccessfulRead = getdelim(&referenceNameBuffer,&referenceNameBufferSize,'\0',inputFile)!=-1;
 
-    if (!referenceIdSuccessfulRead || !referenceNameSuccessfulRead) {
-        fprintf(stderr, "Error reading reference Id or reference Name in reference genome.\n");
+    if (
+            !datasetGroupIdSuccessfulRead ||
+            !referenceIdSuccessfulRead ||
+            !referenceNameSuccessfulRead
+    ) {
+        fprintf(stderr, "Error reading dataset group id, reference Id or reference Name in reference genome.\n");
         free(referenceNameBuffer);
         return NULL;
     }
@@ -304,7 +397,7 @@ DatasetsGroupReferenceGenome *parseDatasetsGroupReferenceGenome(FILE *inputFile)
     }
 
     uint8_t isExternalFlagValue;
-    if(!readUint8(&isExternalFlagValue, inputFile)){
+    if(!utils_read(&isExternalFlagValue, inputFile)){
         fprintf(stderr,"Error reading reference genome external flag.\n");
         for(uint32_t seq_i=0; seq_i<seqCountBuffer; seq_i++) {
             void* value = getValue(sequenceNames, seq_i);
@@ -330,26 +423,18 @@ DatasetsGroupReferenceGenome *parseDatasetsGroupReferenceGenome(FILE *inputFile)
             fprintf(stderr,"Error reading reference uri.\n");
             return NULL;
         };
-        DatasetGroupId datasetGroupId;
-        bool datasetGroupIdSuccessfulRead = readUint8(&datasetGroupId, inputFile);
-        DatasetId datasetId;
-        bool datasetIdSuccessfulRead = readBigEndian16FromFile(&datasetId, inputFile);
-        uint8_t checksumAlgorithmBuffer;
-        bool checksumAlgorithmSuccessfulRead = readUint8(&checksumAlgorithmBuffer, inputFile);
 
-        Vector* checksums = initVector();
-        for(uint32_t seq_i=0; seq_i<seqCountBuffer; seq_i++) {
-            //todo add error handling
-            size_t checksumSize = checksumAlgorithmBuffer ? 32:16;
-            uint8_t * checksumBuffer = (uint8_t *)calloc(sizeof(uint8_t),checksumSize);
-            bool checksumSuccessfulRead = readChars((char*)checksumBuffer,(uint32_t) checksumSize,inputFile);
-            setValue(checksums, seq_i, checksumBuffer);
+        uint8_t checksum_alg;
+        if(!utils_read(&checksum_alg, inputFile)){
+            freeVector(sequenceNames);
+            free(referenceNameBuffer);
+            free(refUriBuffer);
+            fprintf(stderr,"Error reading checksum algorithm.\n");
+            return NULL;
         }
 
-        if (!datasetGroupIdSuccessfulRead ||
-                !datasetIdSuccessfulRead ||
-                !checksumAlgorithmSuccessfulRead
-        ){
+        uint8_t reference_type;
+        if(!utils_read(&reference_type, inputFile)){
             for(uint32_t seq_i=0; seq_i<seqCountBuffer; seq_i++) {
                 void* value = getValue(sequenceNames, seq_i);
                 free(value);
@@ -357,24 +442,61 @@ DatasetsGroupReferenceGenome *parseDatasetsGroupReferenceGenome(FILE *inputFile)
             freeVector(sequenceNames);
             free(referenceNameBuffer);
             free(refUriBuffer);
-            fprintf(stderr,"Error reading reference uri.\n");
+            fprintf(stderr,"Error reading reference type.\n");
             return NULL;
         }
 
+        DatasetGroupId datasetGroupId = 0;
+        DatasetId datasetId = 0;
+
+        if(reference_type == REFERENCE_TYPE_MPEGG_REF) {
+            bool externalDatasetGroupIdSuccessfulRead = utils_read(&datasetGroupId, inputFile);
+            bool externalDatasetIdSuccessfulRead = readBigEndian16FromFile(&datasetId, inputFile);
+
+            if(!externalDatasetGroupIdSuccessfulRead || !externalDatasetIdSuccessfulRead){
+                for(uint32_t seq_i=0; seq_i<seqCountBuffer; seq_i++) {
+                    void* value = getValue(sequenceNames, seq_i);
+                    free(value);
+                }
+                freeVector(sequenceNames);
+                free(referenceNameBuffer);
+                free(refUriBuffer);
+                fprintf(stderr,"Error reading dataset group id or dataset id.\n");
+                return NULL;
+            }
+        }
+
+        size_t numberSequencesWithChecksum = 1;
+        if(reference_type != REFERENCE_TYPE_MPEGG_REF){
+            numberSequencesWithChecksum = seqCountBuffer;
+        }
+
+        Vector* checksums = initVector();
+
+        for (uint32_t seq_i = 0; seq_i < numberSequencesWithChecksum; seq_i++) {
+            //todo add error handling
+            size_t checksumSize = checksum_alg ? 32:16;
+            uint8_t * checksumBuffer = (uint8_t *)calloc(sizeof(uint8_t),checksumSize);
+            bool checksumSuccessfulRead = readChars((char*)checksumBuffer,(uint32_t) checksumSize,inputFile);
+            setValue(checksums, seq_i, checksumBuffer);
+        }
 
         DatasetsGroupReferenceGenome* datasetsGroupReferenceGenome = initDatasetsGroupReferenceGenomeExternal(
-                refUriBuffer, datasetGroupId, datasetId, checksumAlgorithmBuffer, checksums, referenceIdBuffer, referenceNameBuffer,
-                referenceMajorVersion, referenceMinorVersion, referencePatchVersion);
+                dataset_group_id, refUriBuffer, reference_type, datasetGroupId, datasetId, checksum_alg,
+                checksums, referenceIdBuffer, referenceNameBuffer, referenceMajorVersion, referenceMinorVersion,
+                referencePatchVersion
+        );
         setSequenceNamesVector(datasetsGroupReferenceGenome, sequenceNames);
         freeVector(sequenceNames);
         free(refUriBuffer);
-        datasetsGroupReferenceGenome->seekPosition = seekPosition;
+        datasetsGroupReferenceGenome->hasSeek = true;
+        datasetsGroupReferenceGenome->seekPosition = (size_t)seekPosition;
         return datasetsGroupReferenceGenome;
     }
 
     DatasetGroupId internalDatasetGroupId;
     DatasetId internalDatasetId;
-    bool internalDatasetGroupIdSuccessfulRead = readUint8(&internalDatasetGroupId, inputFile);
+    bool internalDatasetGroupIdSuccessfulRead = utils_read(&internalDatasetGroupId, inputFile);
     bool internalDatasetIdSuccessfulRead = readBigEndian16FromFile(&internalDatasetId, inputFile);
     if (!internalDatasetGroupIdSuccessfulRead || !internalDatasetIdSuccessfulRead) {
         fprintf(stderr,"Error reading internal reference.\n");
@@ -382,7 +504,7 @@ DatasetsGroupReferenceGenome *parseDatasetsGroupReferenceGenome(FILE *inputFile)
     }
 
     DatasetsGroupReferenceGenome* datasetsGroupReferenceGenome =
-            initDatasetsGroupReferenceGenome(internalDatasetGroupId, internalDatasetId, referenceIdBuffer,
+            initDatasetsGroupReferenceGenome(dataset_group_id, internalDatasetGroupId, internalDatasetId, referenceIdBuffer,
                                              referenceNameBuffer, referenceMajorVersion, referenceMinorVersion,
                                              referencePatchVersion);
     for(uint32_t seq_i=0; seq_i<seqCountBuffer; seq_i++) {
@@ -390,11 +512,12 @@ DatasetsGroupReferenceGenome *parseDatasetsGroupReferenceGenome(FILE *inputFile)
         setSequenceName(datasetsGroupReferenceGenome, seq_i, sequenceNameBuffer);
     }
     freeVector(sequenceNames);
-    datasetsGroupReferenceGenome->seekPosition = seekPosition;
+    datasetsGroupReferenceGenome->hasSeek = true;
+    datasetsGroupReferenceGenome->seekPosition = (size_t) seekPosition;
     return datasetsGroupReferenceGenome;
 }
 
-long getDatasetGroupReferenceGenomeSeekPosition(DatasetsGroupReferenceGenome* datasetsGroupReferenceGenome){
+size_t getDatasetGroupReferenceGenomeSeekPosition(DatasetsGroupReferenceGenome *datasetsGroupReferenceGenome){
     return datasetsGroupReferenceGenome->seekPosition;
 }
 
@@ -403,7 +526,13 @@ bool resizeSequences(DatasetsGroupReferenceGenome* datasetsGroupReferenceGenome,
 }
 
 bool setSequenceName(DatasetsGroupReferenceGenome *datasetsGroupReferenceGenome, size_t sequence_i, char *name) {
-    setValue(datasetsGroupReferenceGenome->sequences, sequence_i, name);
+    size_t sequenceNameLength = strlen(name);
+    char* copyNameBuffer = malloc((sequenceNameLength+1)* sizeof(char));
+    if(copyNameBuffer == NULL){
+        return false;
+    }
+    strncpy(copyNameBuffer, name, sequenceNameLength+1);
+    return setValue(datasetsGroupReferenceGenome->sequences, sequence_i, copyNameBuffer);
 }
 
 bool setSequenceNamesVector(DatasetsGroupReferenceGenome *datasetsGroupReferenceGenome, Vector *namesToCopy) {

@@ -5,8 +5,8 @@
 #include "../../utils.h"
 
 void initSignatureSizeComputation(
-        SignatureSizeComputation* signatureSizeComputation,
-        int signatureLengthInSymbols,
+        SignatureSizeComputation *signatureSizeComputation,
+        uint32_t signatureLengthInSymbols,
         uint8_t integerSize,
         uint8_t symbolSize
 ){

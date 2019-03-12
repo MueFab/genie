@@ -5,10 +5,6 @@
 #ifndef MPEGG_CAPSULATOR_BOXES_H
 #define MPEGG_CAPSULATOR_BOXES_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdint.h>
 #include <stdio.h>
 #include "DataStructures/FromFile.h"
@@ -36,6 +32,7 @@ extern const char datasetsGroupHeaderName[];
 extern const char datasetsGroupMetadataName[];
 extern const char datasetsGroupProtectionName[];
 extern const char datasetsGroupReferencesName[];
+extern const char datasetsGroupReferenceMetadataName[];
 extern const char datasetsGroupLabelName[];
 extern const char datasetsGroupLabelsListName[];
 
@@ -63,7 +60,6 @@ typedef unsigned char Byte;
 typedef uint8_t DatasetType;
 typedef uint32_t AUs_count;
 typedef uint8_t Classes_count;
-typedef uint8_t Class_type;
 typedef uint16_t Descriptors_count;
 
 typedef struct{
@@ -72,10 +68,25 @@ typedef struct{
     Byte* byte_array;
 } ByteArray;
 
+typedef enum{
+    CLASS_TYPE_CLASS_P = 1,
+    CLASS_TYPE_CLASS_N = 2,
+    CLASS_TYPE_CLASS_M = 3,
+    CLASS_TYPE_CLASS_I = 4,
+    CLASS_TYPE_CLASS_HM = 5,
+    CLASS_TYPE_CLASS_U = 6
+} ClassTypeEnum;
+
+typedef struct{
+    ClassTypeEnum classType;
+} ClassType;
+
+
 typedef struct DatasetsGroupHeader_ DatasetsGroupHeader;
 typedef struct DatasetsGroupMetadata_ DatasetsGroupMetadata;
 typedef struct DatasetsGroupProtection_ DatasetsGroupProtection;
 typedef struct DatasetsGroupReferenceGenome_ DatasetsGroupReferenceGenome;
+typedef struct DatasetsGroupReferenceMetadata_ DatasetsGroupReferenceMetadata;
 typedef struct DatasetContainer_ DatasetContainer;
 typedef struct DatasetsGroupLabelsList_ DatasetsGroupLabelsList;
 typedef struct Label_ Label;
@@ -84,32 +95,48 @@ typedef struct Label_ Label;
 typedef struct{
     DatasetsGroupHeader* datasetsGroupHeader;
     Vector* datasetsGroupReferenceGenomes;
+    Vector* datasetsGroupReferenceMetadatas;
     DatasetsGroupMetadata* datasetsGroupMetadata;
     DatasetsGroupProtection* datasetsGroupProtection;
     DatasetsGroupLabelsList* datasetsGroupLabelsList;
     Vector* datasetsContainer;
-    long seekPosition;
+    size_t seekPosition;
 } DatasetsGroupContainer;
+
+typedef enum{
+    REFERENCE_TYPE_MPEGG_REF = 0,
+    REFERENCE_TYPE_RAW_REF = 1,
+    REFERENCE_TYPE_FASTA_REF = 2
+} ReferenceTypeEnum;
 
 struct DatasetsGroupHeader_ {
     DatasetGroupId datasetGroupId;
     uint8_t versionNumber;
     VectorUint64* datasetsId;
-    long seekPosition;
+    size_t seekPosition;
+    bool hasSeek;
 };
 
 struct DatasetsGroupMetadata_{
+    ByteArray* metadata;
+    size_t seekPosition;
+    bool hasSeek;
+} ;
+
+struct DatasetsGroupReferenceMetadata_{
     ByteArray* metadata;
     long seekPosition;
 } ;
 
 struct DatasetsGroupProtection_ {
     ByteArray* protection;
-    long seekPosition;
+    size_t seekPosition;
+    bool hasSeek;
 };
 
 typedef struct{
     char* ref_uri;
+    uint8_t reference_type;
     DatasetGroupId externalDatasetGroupId;
     DatasetId externalDatasetId;
     Vector* checksums;
@@ -143,13 +170,14 @@ getDatasetsGroupLabelsListSeekPosition(DatasetsGroupLabelsList* datasetsGroupLab
 
 ReferenceInformation initReferenceInformation();
 bool readReferenceInformation(ReferenceInformation *referenceInformation, FILE *inputFile);
-long getDatasetGroupReferenceGenomeSeekPosition(DatasetsGroupReferenceGenome* datasetsGroupReferenceGenome);
+size_t getDatasetGroupReferenceGenomeSeekPosition(DatasetsGroupReferenceGenome *datasetsGroupReferenceGenome);
 bool resizeSequences(DatasetsGroupReferenceGenome* datasetsGroupReferenceGenome, size_t newSize);
 bool setSequenceName(DatasetsGroupReferenceGenome* datasetsGroupReferenceGenome, size_t sequence_i, char* name);
 
 bool setSequenceNamesVector(DatasetsGroupReferenceGenome *datasetsGroupReferenceGenome, Vector *namesToCopy);
 
 struct DatasetsGroupReferenceGenome_ {
+    uint8_t dataset_group_id;
     bool isExternal;
     ExternalReference externalReference;
     DatasetGroupId internalRefDatasetGroupId;
@@ -159,8 +187,9 @@ struct DatasetsGroupReferenceGenome_ {
     ReferenceMajorVersion referenceMajorVersion;
     ReferenceMinorVersion referenceMinorVersion;
     ReferencePatchVersion referencePatchVersion;
-    long seekPosition;
+    size_t seekPosition;
     Vector* sequences;
+    bool hasSeek;
 };
 
 DatasetsGroupProtection *initDatasetsGroupProtection();
@@ -174,17 +203,21 @@ bool copyContentDatasetsGroupProtection(
 );
 uint64_t getDatasetsGroupProtectionContentSize(DatasetsGroupProtection* datasetsGroupProtection);
 uint64_t getDatasetsGroupProtectionSize(DatasetsGroupProtection* datasetsGroupProtection);
-long getDatasetGroupProtectionSeekPosition(DatasetsGroupProtection* datasetsGroupProtection);
+size_t getDatasetGroupProtectionSeekPosition(DatasetsGroupProtection* datasetsGroupProtection);
 
-DatasetsGroupReferenceGenome *initDatasetsGroupReferenceGenomeExternal(char *ref_uri, DatasetGroupId externalDatasetGroupId,
-                                                                       DatasetId externalDatasetId, uint8_t checksumAlg, Vector* checksums,
-                                                                       ReferenceId referenceId, char *referenceName,
-                                                                       ReferenceMajorVersion majorVersion, ReferenceMinorVersion minorVersion,
-                                                                       ReferencePatchVersion referencePathVersion);
+DatasetsGroupReferenceGenome *initDatasetsGroupReferenceGenomeExternal(
+        uint8_t dataset_group_id, char *ref_uri, uint8_t referenceType,DatasetGroupId externalDatasetGroupId,
+        DatasetId externalDatasetId, uint8_t checksumAlg, Vector* checksums,
+        ReferenceId referenceId, char *referenceName,
+        ReferenceMajorVersion majorVersion, ReferenceMinorVersion minorVersion,
+        ReferencePatchVersion referencePathVersion
+);
+
 DatasetsGroupReferenceGenome *
-initDatasetsGroupReferenceGenome(DatasetGroupId internalDatasetGroupId, DatasetId internalDatasetId,
-                                 ReferenceId referenceId, char *referenceName, ReferenceMajorVersion majorVersion,
-                                 ReferenceMinorVersion minorVersion, ReferencePatchVersion referencePathVersion);
+initDatasetsGroupReferenceGenome(uint8_t dataset_group_id, DatasetGroupId internalDatasetGroupId,
+        DatasetId internalDatasetId, ReferenceId referenceId, char *referenceName, ReferenceMajorVersion majorVersion,
+        ReferenceMinorVersion minorVersion, ReferencePatchVersion referencePathVersion
+);
 void freeDatasetsGroupReferenceGenome(DatasetsGroupReferenceGenome* datasetsGroupReferenceGenome);
 bool writeDatasetsGroupReferenceGenome(DatasetsGroupReferenceGenome* datasetsGroupReferenceGenome, FILE *outputFile);
 uint64_t getDatasetsGroupReferenceGenomeContentSize(DatasetsGroupReferenceGenome* datasetsGroupReferenceGenome);
@@ -201,7 +234,7 @@ typedef struct{
 typedef struct{
     FileHeader* fileHeader;
     Vector* datasetsGroups;
-} File;
+} MPEGGFile;
 
 
 typedef struct DatasetHeader_ DatasetHeader;
@@ -219,33 +252,39 @@ struct DatasetContainer_{
     Vector* datasetParameters;
     DatasetMetadata* datasetMetadata;
     DatasetProtection* datasetProtection;
-    long seekPosition;
+    size_t seekPosition;
     Vector* streamContainers;
     Vector *accessUnitContainers;
     uint64_t*** accessUnitsOffsets;
     AccessUnitContainer**** accessUnitsContainers;
+    bool accessUnitsOffsetsInitiatedWithValues;
+    bool hasSeekPosition;
 };
 
-File* initFile();
-void freeFile(File* file);
-void setFileHeaderToFile(File* file, FileHeader* fileHeader);
-void addDatasetsGroupToFile(File *file, DatasetsGroupContainer *datasetsGroupContainer);
-bool writeFile(File *file, FILE *outputFile);
-bool isFileValid(File* file);
-File* parseFile(FILE *inputFile, char *filename);
+MPEGGFile* initFile();
+void freeFile(MPEGGFile* file);
+void setFileHeaderToFile(MPEGGFile* file, FileHeader* fileHeader);
+void addDatasetsGroupToFile(MPEGGFile *file, DatasetsGroupContainer *datasetsGroupContainer);
+bool writeFile(MPEGGFile *file, FILE *outputFile);
+bool isFileValid(MPEGGFile* file);
+MPEGGFile* parseFile(FILE *inputFile, char *filename);
 
-bool generateFileSeekPoints(File *file);
+bool generateFileSeekPoints(MPEGGFile *file);
 
-FileHeader* getFileHeader(File* file);
-DatasetsGroupContainer * getDatasetGroupContainer(File *file, size_t index);
-unsigned long getDatasetsGroupContainersSize(File *file);
+FileHeader* getFileHeader(MPEGGFile* file);
+DatasetsGroupContainer * getDatasetGroupContainerByIndex(MPEGGFile *file, size_t index);
+DatasetsGroupContainer * getDatasetGroupContainerById(MPEGGFile *file, DatasetGroupId datasetGroupId);
+unsigned long getDatasetsGroupContainersSize(MPEGGFile *file);
 
 ByteArray* initByteArray();
+ByteArray* initByteArrayCopying(ByteArray* byteArray);
 ByteArray* initByteArrayWithSize(uint64_t size);
+ByteArray* initByteArrayPassData(uint64_t size, Byte* data);
 void freeByteArray(ByteArray* byteArray);
 bool writeByteArray(ByteArray* byteArray, FILE* outputFile);
 uint64_t getSizeByteArray(ByteArray* byteArray);
 bool copyBytesSource(ByteArray* byteArray, Byte* source, uint64_t source_size);
+ByteArray* cloneByteArray(ByteArray* sourceByteArray);
 
 FileHeader *initFileHeader(char *minorVersion);
 void freeFileHeader(FileHeader* fileHeader);
@@ -264,7 +303,7 @@ bool writeDatasetsGroupHeaderContent(DatasetsGroupHeader* datasetsGroupHeader, F
 DatasetsGroupHeader *parseDatasetsGroupHeader(uint64_t boxContentSize, FILE *inputFile);
 uint64_t getSizeContentDatasetsGroupHeader(DatasetsGroupHeader* datasetsGroupHeader);
 uint64_t getSizeDatasetsGroupHeader(DatasetsGroupHeader* datasetsGroupHeader);
-long getDatasetGroupHeaderSeekPosition(DatasetsGroupHeader *datasetsGroupHeader);
+size_t getDatasetGroupHeaderSeekPosition(DatasetsGroupHeader *datasetsGroupHeader);
 
 
 DatasetsGroupMetadata *initDatasetsGroupMetadata();
@@ -276,7 +315,7 @@ bool writeContentDatasetsGroupMetadata(DatasetsGroupMetadata* datasetsGroupMetad
 DatasetsGroupMetadata *parseDatasetsGroupMetadata(uint64_t boxContentSize, FILE *inputFile);
 uint64_t getSizeDatasetsGroupMetadata(DatasetsGroupMetadata* datasetsGroupMetadata);
 uint64_t getSizeContentDatasetsGroupMetadata(DatasetsGroupMetadata* datasetsGroupMetadata);
-long getDatasetGroupMetadataSeekPosition(DatasetsGroupMetadata *datasetsGroupMetadata);
+size_t getDatasetGroupMetadataSeekPosition(DatasetsGroupMetadata *datasetsGroupMetadata);
 
 DatasetsGroupContainer* initDatasetsGroupContainer();
 uint64_t getSizeContentDatasetsGroupContainer(DatasetsGroupContainer *datasetsGroupContainer);
@@ -285,20 +324,33 @@ bool writeDatasetsGroupContainer(DatasetsGroupContainer* datasetsGroupContainer,
 bool writeContentDatasetsGroupContainer(DatasetsGroupContainer* datasetsGroupContainer, FILE* outputFile);
 void setDatasetsGroupHeader(DatasetsGroupContainer* datasetsGroupContainer, DatasetsGroupHeader *datasetsGroupHeader);
 void setDatasetsGroupReferenceGenomes(DatasetsGroupContainer* datasetsGroupContainer, Vector* datasetsGroupReferenceGenome);
+void setDatasetsGroupReferenceMetadata(DatasetsGroupContainer* datasetsGroupContainer, Vector* datasetsGroupReferenceMetadatas);
 void setDatasetsGroupMetadata(DatasetsGroupContainer* datasetsGroupContainer, DatasetsGroupMetadata *datasetsGroupMetadata);
 void setDatasetsGroupProtection(DatasetsGroupContainer* datasetsGroupContainer, DatasetsGroupProtection *datasetsGroupProtection);
 void setDatasetsGroupLabelsList(DatasetsGroupContainer* datasetsGroupContainer, DatasetsGroupLabelsList *datasetsGroupLabelsList);
 void addDatasetsContainer(DatasetsGroupContainer* datasetsGroupContainer, DatasetContainer *datasetContainer);
 void freeDatasetsGroupContainer(DatasetsGroupContainer* datasetsGroupContainer);
 bool isDatasetsGroupContainerValid(DatasetsGroupContainer* datasetsGroupContainer);
-DatasetsGroupContainer *
-parseDatasetsGroupContainer(FILE *inputFile, uint64_t boxContentSize, char *filename);
+DatasetsGroupContainer *parseDatasetsGroupContainer(FILE *inputFile, uint64_t boxContentSize, char *filename);
 size_t getNumberDatasets(DatasetsGroupContainer* datasetsGroupContainer);
-DatasetContainer * getDatasetContainer(DatasetsGroupContainer *datasetsGroupContainer, size_t index);
-long getDatasetGroupContainerSeekPosition(DatasetsGroupContainer* datasetsGroupContainer);
+DatasetContainer * getDatasetContainerByIndex(DatasetsGroupContainer *datasetsGroupContainer, size_t index);
+DatasetContainer * getDatasetContainerById(DatasetsGroupContainer *datasetsGroupContainer, DatasetId datasetId);
+size_t getDatasetGroupContainerSeekPosition(DatasetsGroupContainer* datasetsGroupContainer);
 bool generateDatasetsGroupSeekPoints(DatasetsGroupContainer* datasetsGroupContainer);
 
-typedef struct DataUnitAccessUnit_ DataUnitAccessUnit;
+DatasetsGroupReferenceMetadata *initDatasetsGroupReferenceMetadata();
+void freeDatasetsGroupReferenceMetadata(DatasetsGroupReferenceMetadata* datasetsGroupReferenceMetadata);
+bool copyContentDatasetsGroupReferenceMetadata(DatasetsGroupReferenceMetadata* datasetsGroupReferenceMetadata, char* content, uint64_t contentSize);
+bool defineContentDatasetsGroupReferenceMetadata(DatasetsGroupReferenceMetadata* datasetsGroupReferenceMetadata, char* filename);
+bool writeDatasetsGroupReferenceMetadata(DatasetsGroupReferenceMetadata* datasetsGroupReferenceMetadata, FILE *outputFile);
+bool writeContentDatasetsGroupReferenceMetadata(DatasetsGroupReferenceMetadata* datasetsGroupReferenceMetadata, FILE *outputFile);
+DatasetsGroupReferenceMetadata *parseDatasetsGroupReferenceMetadata(uint64_t boxContentSize, FILE *inputFile);
+uint64_t getSizeDatasetsGroupReferenceMetadata(DatasetsGroupReferenceMetadata* datasetsGroupReferenceMetadata);
+uint64_t getSizeContentDatasetsGroupReferenceMetadata(DatasetsGroupReferenceMetadata* datasetsGroupReferenceMetadata);
+long getDatasetGroupReferenceMetadataSeekPosition(DatasetsGroupReferenceMetadata *datasetsGroupReferenceMetadata);
+
+
+//typedef struct DataUnitAccessUnit_ DataUnitAccessUnit;
 DatasetContainer *initDatasetContainer();
 void freeDatasetContainer(DatasetContainer *datasetContainer);
 void addAccessUnitToDataset(DatasetContainer* datasetContainer, AccessUnitContainer* accessUnitContainer);
@@ -317,15 +369,17 @@ void setDatasetParameters(DatasetContainer* datasetContainer, Vector *datasetPar
 void setDatasetMetadata(DatasetContainer* datasetContainer, DatasetMetadata *datasetMetadata);
 void setDatasetProtection(DatasetContainer* datasetContainer, DatasetProtection *datasetProtection);
 DatasetContainer *parseDatasetContainer(uint64_t boxContentSize, FILE *inputFile, char *fileName);
-long getDatasetContainerSeekPosition(DatasetContainer* datasetContainer);
+size_t getDatasetContainerSeekPosition(DatasetContainer *datasetContainer);
 bool generateDatasetSeekPoints(DatasetContainer* datasetContainer);
 Vector* getDataUnitAccessUnits(DatasetContainer* datasetContainer);
-DataUnitAccessUnit* getDataUnitAccessUnit(DatasetContainer *datasetContainer, uint16_t sequence_index, uint8_t class_index,
-                                          uint32_t au_id);
+int getNumberParameters(DatasetContainer* datasetContainer, size_t* value);
+int getDatasetParameters(DatasetContainer* datasetContainer, size_t index, DatasetParameters** datasetParameters);
+int getDatasetParametersById(DatasetContainer *datasetContainer, uint16_t id, DatasetParameters **datasetParameters);
 
 struct DatasetMetadata_ {
     ByteArray *metadata;
-    long seekPosition;
+    size_t seekPosition;
+    bool hasSeek;
 };
 
 DatasetMetadata *initDatasetMetadata();
@@ -338,11 +392,12 @@ parseDatasetMetadata(uint64_t boxContentSize, FILE *inputFile);
 uint64_t getSizeContentDatasetMetadata(DatasetMetadata* datasetMetadata);
 uint64_t getSizeDatasetMetadata(DatasetMetadata* datasetMetadata);
 bool copyContentDatasetMetadata(DatasetMetadata* datasetMetadata, char *content, uint64_t contentSize);
-long getDatasetMetadataSeekPosition(DatasetMetadata *datasetMetadata);
+size_t getDatasetMetadataSeekPosition(DatasetMetadata *datasetMetadata);
 
 struct DatasetProtection_ {
     ByteArray* protection;
-    long seekPosition;
+    bool hasSeek;
+    size_t seekPosition;
 };
 
 DatasetProtection *initDatasetProtection();
@@ -354,7 +409,7 @@ uint64_t getSizeContentDatasetProtection(DatasetProtection* datasetProtection);
 uint64_t getSizeDatasetProtection(DatasetProtection* datasetProtection);
 DatasetProtection *parseDatasetProtection(uint64_t boxContentSize, FILE *inputFile);
 bool copyContentDatasetProtection(DatasetProtection *datasetProtection, char *content, uint64_t contentSize);
-long getDatasetProtectionSeekPosition(DatasetProtection* datasetProtection);
+size_t getDatasetProtectionSeekPosition(DatasetProtection *datasetProtection);
 
 typedef struct{
     uint64_t* block_byte_offset;
@@ -363,7 +418,7 @@ typedef struct{
 typedef struct {
     Tree** offsetsPerStream;
     uint64_t* sizeTrees;
-    int numberStreams;
+    uint32_t numberStreams;
 } OffsetsPerStream;
 
 typedef struct {
@@ -371,12 +426,15 @@ typedef struct {
     int numberClasses;
 } OffsetsPerClass;
 typedef struct{
+    uint64_t AU_byte_offset;
     uint64_t au_start_position;
     uint64_t au_end_position;
+    uint16_t ref_sequence_id;
+    uint64_t ref_start_position;
+    uint64_t ref_end_position;
     uint64_t extended_au_start_position;
     uint64_t extended_au_end_position;
     Block_offsets block_byte_offset;
-    uint64_t AU_offset;
 } AU_indexing;
 typedef struct {
     AU_indexing *au_indexings;
@@ -385,26 +443,33 @@ typedef struct {
 typedef struct {
     AUs_index* classIndex;
     uint16_t number_of_classes;
-} Sequence_index;
+} Sequence_indexation;
 typedef struct{
-    Sequence_index* sequence_indexes;
+    Sequence_indexation* sequence_indexes;
     uint16_t number_sequences;
-} Sequences_indexes;
+} Sequences_indexations;
+typedef struct{
+    uint16_t sequenceID;
+} SequenceID;
 typedef struct {
     uint32_t numberUAccessUnits;
+    uint64_t* AU_byte_offset;
+    uint16_t* ref_sequence_id;
+    uint64_t* ref_start_position;
+    uint64_t* ref_end_position;
     Signatures** signatures;
-    uint64_t* uAccessUnitOffsets;
     uint32_t* uAccessUnitSizes;
     uint64_t** byteOffset;
 } UAccessUnitsIndex;
 
 
 struct DatasetMasterIndexTable_ {
-    Sequences_indexes sequence_indexes;
+    Sequences_indexations sequence_indexes;
     UAccessUnitsIndex uAccessUnitsIndex;
     DatasetContainer* datasetContainer;
-    long seekPosition;
+    size_t seekPosition;
     OffsetsPerClass* offsetsPerClass;
+    bool hasSeek;
 };
 
 DatasetMasterIndexTable* initDatasetMasterIndexTable(DatasetContainer *datasetContainer);
@@ -413,66 +478,117 @@ bool writeContentDatasetMasterIndexTable(DatasetMasterIndexTable* datasetMasterI
 bool writeDatasetMasterIndexTable(DatasetMasterIndexTable* datasetMasterIndexTable, FILE *outputFile);
 uint64_t getSizeContentDatasetMasterIndexTable(DatasetMasterIndexTable* datasetMasterIndexTable);
 uint64_t getSizeDatasetMasterIndexTable(DatasetMasterIndexTable* datasetMasterIndexTable);
-void setStartEndAndOffset(DatasetMasterIndexTable *datasetMasterIndexTable, uint16_t sequenceId, uint16_t classId,
-                          uint32_t AU_id, uint64_t start, uint64_t end, uint64_t offset);
+void setAUOffset(DatasetMasterIndexTable *datasetMasterIndexTable,
+                 SequenceID sequenceId, ClassType classType, uint64_t AU_id, uint64_t offset);
+void setStartAndEnd(DatasetMasterIndexTable *datasetMasterIndexTable,
+                    SequenceID sequenceId, ClassType classType, uint64_t AU_id, uint64_t start, uint64_t end);
 void setExtendedStartAndEnd(DatasetMasterIndexTable* datasetMasterIndexTable,
                             uint16_t sequenceId, uint16_t classId, uint32_t AU_id, uint32_t extended_start,
                             uint32_t extended_end);
 void setOffset(DatasetMasterIndexTable *datasetMasterIndexTable,
-               uint16_t sequenceId, uint16_t classId, uint32_t AU_id, uint16_t descriptorId, uint64_t offset);
+               SequenceID sequenceId, ClassType classType, uint32_t AU_i, uint16_t descriptor_i, uint64_t offset);
 void insertFinalOffset(
         DatasetMasterIndexTable *datasetMasterIndexTable,
         uint16_t classId,
         uint16_t descriptorId,
         uint64_t offset
 );
-void setUnalignedOffset(DatasetMasterIndexTable *datasetMasterIndexTable, uint32_t uAU_id, uint64_t offset);
-void setDescriptorUnalignedOffset(DatasetMasterIndexTable *datasetMasterIndexTable, uint32_t uAU_id,
-                                  uint32_t uDescriptorId,
-                                  uint64_t offset);
+void setUnalignedOffset(DatasetMasterIndexTable* datasetMasterIndexTable, uint32_t uAU_id, uint32_t uDescriptorId,
+                        uint64_t offset);
 Signatures * getSignatures(DatasetMasterIndexTable* datasetMasterIndexTable, int uAccessUnit_i);
 DatasetMasterIndexTable *parseDatasetMasterIndexTable(DatasetContainer *datasetContainer, FILE *inputFile);
-long getDatasetMasterIndexTableSeekPosition(DatasetMasterIndexTable* datasetMasterIndexTable);
+size_t getDatasetMasterIndexTableSeekPosition(DatasetMasterIndexTable *datasetMasterIndexTable);
 
 bool getAccessUnitByteOffset(DatasetMasterIndexTable *datasetMasterIndexTable, uint16_t sequenceId, uint16_t classId,
                              uint32_t auId, uint64_t *byteOffset);
-bool getBlockByteOffset(DatasetMasterIndexTable *datasetMasterIndexTable, uint16_t sequenceId, uint16_t classId,
+bool getBlockByteOffset(DatasetMasterIndexTable *datasetMasterIndexTable, SequenceID sequenceId, ClassTypeEnum classId,
                         uint32_t auId, uint32_t descriptorId, uint64_t *byteOffset);
-bool getNextBlockByteOffset(DatasetMasterIndexTable *datasetMasterIndexTable, uint16_t sequenceId, uint16_t classId,
+bool getNextBlockByteOffset(DatasetMasterIndexTable *datasetMasterIndexTable, SequenceID sequenceId, uint16_t classId,
                             uint32_t auId, uint32_t descriptorId, uint64_t *nextByteOffset);
 uint64_t getAUStartPosition(
+        DatasetMasterIndexTable *datasetMasterIndexTable,
+        SequenceID sequenceId,
+        uint16_t classId,
+        uint32_t AU_id
+);
+uint64_t getAUEndPosition(
+        DatasetMasterIndexTable *datasetMasterIndexTable,
+        SequenceID sequenceId,
+        uint16_t classId,
+        uint32_t AU_id
+);
+uint16_t getRefSequenceId(
         DatasetMasterIndexTable* datasetMasterIndexTable,
         uint16_t sequenceId,
         uint16_t classId,
         uint32_t AU_id
 );
-uint64_t getAUEndPosition(
+uint64_t getRefStartPosition(
+        DatasetMasterIndexTable* datasetMasterIndexTable,
+        uint16_t sequenceId,
+        uint16_t classId,
+        uint32_t AU_id
+);
+uint64_t getRefEndPosition(
         DatasetMasterIndexTable* datasetMasterIndexTable,
         uint16_t sequenceId,
         uint16_t classId,
         uint32_t AU_id
 );
 uint64_t getAUExtendedStartPosition(
-        DatasetMasterIndexTable* datasetMasterIndexTable,
-        uint16_t sequenceId,
+        DatasetMasterIndexTable *datasetMasterIndexTable,
+        SequenceID sequenceId,
         uint16_t classId,
         uint32_t AU_id
 );
 uint64_t getAUExtendedEndPosition(
-        DatasetMasterIndexTable* datasetMasterIndexTable,
-        uint16_t sequenceId,
+        DatasetMasterIndexTable *datasetMasterIndexTable,
+        SequenceID sequenceId,
         uint16_t classId,
         uint32_t AU_id
 );
 
 struct DatasetParameters_ {
+    uint8_t dataset_group_ID;
+    uint16_t dataset_ID;
+    uint8_t parent_parameter_set_ID;
+    uint8_t parameter_set_ID;
+    uint8_t dataset_type;
+    uint8_t alphabet_ID;
+    uint32_t reads_length;
+    uint8_t number_of_template_segments_minus1;
+    uint32_t max_au_data_unit_size;
+    bool pos_40_bits;
+    uint8_t qv_depth;
+    uint8_t as_depth;
     ByteArray* parameters;
-    long seekPosition;
+    size_t seekPosition;
+    bool hasSeek;
 };
 
-DatasetParameters *initDatasetParameters();
+DatasetParameters *initDatasetParameters(
+    uint8_t dataset_group_ID,
+    uint16_t dataset_ID,
+    uint16_t parent_parameter_set_ID,
+    uint16_t parameter_set_ID
+);
+DatasetParameters *initDatasetParametersWithParameters(
+        uint8_t dataset_group_ID,
+        uint16_t dataset_ID,
+        uint16_t parent_parameter_set_ID,
+        uint16_t parameter_set_ID,
+        uint8_t dataset_type,
+        uint8_t alphabet_ID,
+        uint32_t reads_length,
+        uint8_t number_of_template_segments_minus1,
+        uint32_t max_au_data_unit_size,
+        bool pos_40_bits,
+        uint8_t qv_depth,
+        uint8_t as_depth,
+        ByteArray* parameters
+);
 void freeDatasetParameters(DatasetParameters* datasetParameters);
-bool defineContentDatasetParameters(DatasetParameters* datasetParameters, const char* filename);
+bool defineContentDatasetParameters(DatasetParameters* datasetParameters, char* filename);
 bool writeDatasetParameters(DatasetParameters* datasetParameters, FILE *outputFile);
 bool writeContentDatasetParameters(DatasetParameters* datasetParameters, FILE *outputFile);
 uint64_t getSizeContentDatasetParameters(DatasetParameters* datasetParameters);
@@ -480,7 +596,7 @@ uint64_t getSizeDatasetParameters(DatasetParameters* datasetParameters);
 DatasetParameters *
 parseDatasetParameters(uint64_t boxContentSize, FILE *inputFile);
 bool copyContentDatasetParameters(DatasetParameters* datasetParameters, char *content, uint64_t contentSize);
-long getDatasetParametersSeekPosition(DatasetParameters *datasetParameters);
+size_t getDatasetParametersSeekPosition(DatasetParameters *datasetParameters);
 
 
 typedef struct {
@@ -528,36 +644,27 @@ bool writeLabel(Label* label, FILE *outputFile);
 bool writeContentLabel(Label *label, FILE *outputFile);
 Label* parseLabel(FILE* inputFile);
 
-
-#define CLASS_P 1
-#define CLASS_N 2
-#define CLASS_M 3
-#define CLASS_I 4
-#define CLASS_HM 5
-#define CLASS_U 6
-
 struct DatasetHeader_ {
     DatasetGroupId datasetGroupId;
     DatasetId datasetId;
     char version[4];
-    bool unmapped_indexing_flag;
+    bool multipleAlignmentFlag;
     bool byteOffsetSizeFlag;
     bool posOffsetIsUint40;
-    bool nonOverlappingAURange;
+    bool nonOverlappingAURange_flag;
     bool blockHeaderFlag;
     //if blockHeaderFlag
         bool mitFlag;
         bool classContiguosModeFlag;
-        bool blockStartCodePrefixFlag;
     //else
         bool orderedBlocksFlag;
     uint16_t sequencesCount;
     ReferenceId referenceId;
-    uint16_t* seqIds;
+    SequenceID* seqIds;
     uint32_t* seqBlocks;
     DatasetType datasetType;
     Classes_count numClasses;
-    uint8_t* classId;
+    ClassType* classId;
     uint8_t* numDescriptors;
     uint8_t** descriptorId;
     uint8_t alphabetId;
@@ -566,27 +673,42 @@ struct DatasetHeader_ {
     uint8_t uSignatureSize;
         uint8_t uSignatureLength;
     uint32_t numberUAccessUnits;
-    bool multipleAlignmentFlag;
     uint32_t multipleSignatureBase;
+    uint32_t threshold_0; //use to store threshold 0 when seq_count = 0
     uint32_t* thresholds;
-    long seekPosition;
+    size_t seekPosition;
+    bool hasSeek;
 };
 
 
-DatasetHeader *initDatasetHeader(DatasetGroupId datasetGroupId, DatasetId datasetId,
-                                 char* version, bool unmapped_indexing_flag, bool byteOffsetSizeFlag,
-                                 bool posOffsetIsUint40, bool nonOverlappingAURange, bool blockHeaderFlag,
-                                 uint16_t sequencesCount, ReferenceId referenceId, uint8_t datasetType,
-                                 uint8_t numClasses, uint8_t alphabetId, uint32_t numUClusters,
-                                 bool uSignatureConstantLength, uint8_t uSignatureSize, uint8_t uSignatureLength,
-                                 uint32_t numberUAccessUnits, bool multipleAlignmentFlag, uint32_t multipleSignatureBase);
+DatasetHeader *initDatasetHeaderNoMIT(DatasetGroupId datasetGroupId, DatasetId datasetId,
+                                      char *version, bool multipleAlignmentFlag, bool byteOffsetSizeFlag,
+                                      bool posOffsetIsUint40, bool nonOverlappingAURange, bool blockHeaderFlag,
+                                      uint16_t sequencesCount, ReferenceId referenceId, uint8_t datasetType,
+                                      uint8_t numClasses, uint8_t alphabetId, uint32_t numUClusters,
+                                      uint8_t uSignatureSize, uint8_t uSignatureLength,
+                                      uint32_t numberUAccessUnits, uint32_t multipleSignatureBase);
+DatasetHeader *initDatasetHeader_MIT_AUC(DatasetGroupId datasetGroupId, DatasetId datasetId, char *version, bool multipleAlignmentFlag,
+                                         bool byteOffsetSizeFlag, bool posOffsetIsUint40, bool nonOverlappingAURange,
+                                         uint16_t sequencesCount, ReferenceId referenceId, uint8_t datasetType, uint8_t numClasses,
+                                         uint8_t alphabetId, uint32_t numUClusters, bool uSignatureConstantLength,
+                                         uint8_t uSignatureSize, uint8_t uSignatureLength, uint32_t numberUAccessUnits,
+                                         uint32_t multipleSignatureBase, bool classContiguous);
+DatasetHeader *initDatasetHeader_DSC(DatasetGroupId datasetGroupId, DatasetId datasetId, char *version, bool multipleAlignmentFlag,
+                                     bool byteOffsetSizeFlag, bool posOffsetIsUint40, bool nonOverlappingAURange,
+                                     uint16_t sequencesCount, ReferenceId referenceId, uint8_t datasetType, uint8_t numClasses,
+                                     uint8_t alphabetId, uint32_t numUClusters, bool uSignatureConstantLength,
+                                     uint8_t uSignatureSize, uint8_t uSignatureLength, uint32_t numberUAccessUnits,
+                                     uint32_t multipleSignatureBase, bool orderedBlocksFlag);
 
 
 void freeDatasetHeader(DatasetHeader* datasetHeader);
 void setMITFlag(DatasetHeader* datasetHeader, bool value);
-bool setSequenceId(DatasetHeader* datasetHeader, uint16_t sequenceIndex, uint16_t sequenceId);
+int setClassContiguousModeFlag(DatasetHeader* datasetHeader, bool classContiguousMode);
+bool setSequenceId(DatasetHeader *datasetHeader, uint16_t sequenceIndex, SequenceID sequenceId);
 bool setBlocksInSequence(DatasetHeader* datasetHeader, uint16_t sequenceIndex, uint32_t blocks);
 bool setThresholdForSequence(DatasetHeader* datasetHeader, uint16_t sequenceIndex, uint32_t threshold);
+bool getThresholdForSequence(DatasetHeader *datasetHeader, uint16_t sequenceIndex, uint32_t *threshold);
 bool isMultipleAlignment(DatasetHeader* datasetHeader);
 bool isPosOffsetUint40(DatasetHeader *datasetHeader);
 bool isByteOffsetUint64(DatasetHeader *datasetHeader);
@@ -602,21 +724,22 @@ bool writeContentDatasetHeader(DatasetHeader* datasetHeader, FILE* outputFile);
 bool writeDatasetHeader(DatasetHeader* datasetHeader, FILE* outputFile);
 DatasetHeader *parseDatasetHeader(FILE *inputFile);
 bool setNumberDescriptorsInClass(DatasetHeader* datasetHeader, unsigned int classId, uint8_t numberDescriptors);
-void setClassType(DatasetHeader* datasetHeader, uint8_t classIt, uint8_t classType);
-void setDescriptorIdInClass(DatasetHeader* datasetHeader, uint8_t classId, uint8_t descriptorIndex, uint8_t descriptorId);
+void setClassType(DatasetHeader* datasetHeader, uint8_t classIt, ClassType classType);
+void setDescriptorIdInClass(DatasetHeader* datasetHeader, uint8_t classIndex, uint8_t descriptorIndex, uint8_t descriptorId);
 uint8_t getNumberDescriptorsInClass(DatasetHeader* datasetHeader, uint8_t class_index) ;
 uint8_t getDescriptorIdInClass(DatasetHeader* datasetHeader, uint8_t classId, uint8_t descriptorIndex);
 void setConstantSignatureLength(DatasetHeader *datasetHeader, uint8_t uSignatureLength);
 uint32_t getNumberUAccessUnits(DatasetHeader* datasetHeader );
 uint16_t getSequencesCount(DatasetHeader* datasetHeader );
-uint16_t getSequenceId(DatasetHeader* datasetHeader, uint16_t sequence_index);
+SequenceID getSequenceId(DatasetHeader *datasetHeader, uint16_t sequence_index);
+bool getSequenceIndex(DatasetHeader *datasetHeader, SequenceID sequence_id, uint16_t *sequence_index);
 uint8_t getClassesCount(DatasetHeader *datasetHeader);
-bool hasClassType(DatasetHeader* datasetHeader, uint8_t classType);
-uint8_t getClassType(DatasetHeader *datasetHeader, uint16_t class_i);
-bool getClassIndexForType(DatasetHeader *datasetHeader, uint8_t classType, uint8_t *class_i);
+bool hasClassType(DatasetHeader *datasetHeader, ClassType classType);
+ClassType getClassType(DatasetHeader *datasetHeader, uint16_t class_i);
+bool getClassIndexForType(DatasetHeader *datasetHeader, ClassType classType, uint8_t *class_i);
 bool getDescriptorIndexForType(
         DatasetHeader *datasetHeader,
-        uint8_t classType,
+        ClassType classType,
         uint8_t descriptorId,
         uint8_t *descriptorIndex
 );
@@ -625,31 +748,14 @@ uint32_t getBlocksInSequence(DatasetHeader* datasetHeader, uint16_t sequenceInde
 uint32_t getMultipleSignatureBase(DatasetHeader* datasetHeader);
 void setMultipleSignatureBase(DatasetHeader* datasetHeader, uint32_t newMultipleSignatureBase);
 uint32_t getSignatureLength(DatasetHeader* datasetHeader);
-long getDatasetHeaderSeekPosition(DatasetHeader* datasetHeader);
-bool isBlockStartCodePrefixFlagSet(DatasetHeader* datasetHeader);
+size_t getDatasetHeaderSeekPosition(DatasetHeader *datasetHeader);
 bool isMITFlagSet(DatasetHeader* datasetHeader);
-
-typedef struct {
-    ByteArray* metadata;
-    StreamContainer* streamContainer;
-    long seekPosition;
-} StreamMetadata;
-
-StreamMetadata* initStreamMetadata(StreamContainer* streamContainer);
-void freeStreamMetadata(StreamMetadata* streamMetadata);
-bool defineContentStreamMetadata(StreamMetadata* streamMetadata, char* filename);
-bool writeContentStreamMetadata(StreamMetadata* streamMetadata, FILE *outputFile);
-bool writeStreamMetadata(StreamMetadata* streamMetadata, FILE *outputFile);
-uint64_t getSizeContentStreamMetadata(StreamMetadata* streamMetadata );
-uint64_t getSizeStreamMetadata(StreamMetadata* streamMetadata );
-StreamMetadata *parseStreamMetadata(StreamContainer* streamContainer, uint64_t boxContentSize, FILE *inputFile);
-bool copyContentStreamMetadata(StreamMetadata* streamMetadata, char *content, uint64_t contentSize);
-long getStreamMetadataSeekPosition(StreamMetadata* streamMetadata);
 
 typedef struct {
     ByteArray* protection;
     StreamContainer* streamContainer;
-    long seekPosition;
+    size_t seekPosition;
+    bool hasSeek;
 } StreamProtection;
 
 StreamProtection* initStreamProtection(StreamContainer* streamContainer);
@@ -661,26 +767,25 @@ uint64_t getSizeContentStreamProtection(StreamProtection* streamProtection);
 uint64_t getSizeStreamProtection(StreamProtection* streamProtection);
 bool copyContentStreamProtection(StreamProtection* streamProtection, char *content, uint64_t contentSize);
 StreamProtection *parseStreamProtection(StreamContainer* streamContainer, uint64_t boxContentSize, FILE *inputFile);
-long getStreamProtectionSeekPosition(StreamProtection* streamProtection);
+size_t getStreamProtectionSeekPosition(StreamProtection* streamProtection);
 
 typedef struct{
     StreamContainer* streamContainer;
     uint8_t descriptorId;
-    uint8_t classId;
+    ClassType classId;
     uint16_t parametersSetId;
     uint32_t numberOfBlocks;
     uint8_t protectionFlag;
-    long seekPosition;
+    size_t seekPosition;
+    bool hasSeek;
 }  StreamHeader;
 
-StreamHeader* initStreamHeader(StreamContainer* streamContainer,
-             uint8_t descriptorId,
-             uint8_t classId,
-             uint16_t parametersSetId,
-             uint32_t numberOfBlocks,
-             uint8_t protectionFlag
+StreamHeader* initStreamHeader(StreamContainer *streamContainer,
+                               uint8_t descriptorId,
+                               ClassType classId,
+                               uint32_t numberOfBlocks
 );
-uint8_t getStreamClass(StreamHeader* streamHeader);
+ClassType getStreamClass(StreamHeader *streamHeader);
 uint8_t getStreamDescriptorId(StreamHeader* streamHeader);
 bool writeContentStreamHeader(StreamHeader* streamHeader, FILE *outputFile);
 bool writeStreamHeader(StreamHeader* streamHeader, FILE *outputFile);
@@ -688,14 +793,14 @@ uint64_t getSizeContentStreamHeader();
 uint64_t getSizeStreamHeader();
 StreamHeader *parseStreamHeader(StreamContainer* streamContainer, FILE *inputFile);
 void freeStreamHeader(StreamHeader* streamHeader);
-long getStreamHeaderSeekPosition(StreamHeader* streamHeader);
+size_t getStreamHeaderSeekPosition(StreamHeader* streamHeader);
 
 struct StreamContainer_ {
     StreamHeader* streamHeader;
-    StreamMetadata* streamMetadata;
     StreamProtection* streamProtection;
-    FromFile* dataFromFile;
-    long seekPosition;
+    Vector* datasFromFile;
+    uint64_t seekPosition;
+    bool hasSeek;
 };
 
 StreamContainer *initStreamContainer();
@@ -707,22 +812,14 @@ bool writeContentStreamContainer(StreamContainer* streamContainer, FILE *outputF
 bool writeStreamContainer(StreamContainer* streamContainer, FILE *outputFile);
 bool isStreamContainerValid(StreamContainer* streamContainer);
 void setStreamHeader(StreamContainer* streamContainer, StreamHeader *streamHeader);
-void setStreamMetadata(StreamContainer* streamContainer, StreamMetadata *streamMetadata);
 void setStreamProtection(StreamContainer* streamContainer, StreamProtection *streamProtection);
 void setDataFromFilename(StreamContainer *streamContainer, char *filename);
-void setDataFromFilenameWithBoundaries(StreamContainer *streamContainer, char *filename, long startPos, long endPos);
+void setDataFromFilenameWithBoundaries(StreamContainer *streamContainer, char *filename, uint64_t startPos, uint64_t endPos);
 StreamContainer *parseStreamContainer(uint64_t boxContentSize, FILE *inputFile, char *fileName, DatasetContainer* datasetContainer);
-FromFile* getDataFromStreamContainer(StreamContainer* streamContainer);
-long getStreamContainerSeekPosition(StreamContainer* streamContainer);
+Vector * getDataFromStreamContainer(StreamContainer *streamContainer);
+uint64_t getStreamContainerSeekPosition(StreamContainer *streamContainer);
 bool generateStreamSeekPoints(StreamContainer* streamContainer);
-
-
-extern const uint8_t P_TYPE_AU;
-extern const uint8_t N_TYPE_AU;
-extern const uint8_t M_TYPE_AU;
-extern const uint8_t I_TYPE_AU;
-extern const uint8_t HM_TYPE_AU;
-extern const uint8_t U_TYPE_AU;
+bool addBlockToStream(StreamContainer* streamContainer, FromFile* block);
 
 
 typedef struct AccessUnitProtection_ AccessUnitProtection;
@@ -742,6 +839,7 @@ bool isAccessUnitContainerValid(AccessUnitContainer* accessUnitContainer);
 uint64_t getAccessUnitContainerContentSize(AccessUnitContainer* accessUnitContainer);
 uint64_t getAccessUnitContainerSize(AccessUnitContainer* accessUnitContainer);
 bool writeAccessUnitContainer(FILE *outputFile, AccessUnitContainer *accessUnitContainer);
+AccessUnitHeader* getAccessUnitHeader(AccessUnitContainer* accessUnitContainer);
 void setAccessUnitContainerHeader(AccessUnitContainer* accessUnitContainer, AccessUnitHeader* accessUnitHeader);
 void setAccessUnitContainerProtection(AccessUnitContainer* accessUnitContainer, AccessUnitProtection* accessUnitProtection);
 void setAccessUnitContainerInformation(
@@ -758,21 +856,21 @@ struct AccessUnitHeader_ {
     DatasetContainer* datasetContainer;
     uint32_t access_unit_ID;
     uint8_t num_blocks;
-    uint16_t parameter_set_ID;
-    uint8_t au_type;
+    uint8_t parameter_set_ID;
+    ClassType au_type;
     uint32_t reads_count;
     uint16_t mm_threshold;
     uint32_t mm_count;
     long seekPosition;
 
     //if dataset_type == 2
-        uint16_t  ref_sequence_id;
+        SequenceID  ref_sequence_id;
         uint64_t ref_start_position;
         uint64_t ref_end_position;
 
     //if MIT_flag == 0
         //if AU_type != U_TYPE_AU || dataset_type == 2
-            uint16_t sequence_ID;
+            SequenceID sequence_ID;
             uint64_t AU_start_position;
             uint64_t AU_end_position;
             //if multiple_alignment_flag
@@ -783,11 +881,11 @@ struct AccessUnitHeader_ {
 };
 AccessUnitHeader* initAccessUnitHeader();
 AccessUnitHeader* initAccessUnitHeaderWithValues(
-        DatasetContainer* datasetContainer,
+        DatasetContainer *datasetContainer,
         uint32_t access_unit_ID,
         uint8_t num_blocks,
-        uint16_t parameter_set_ID,
-        uint8_t au_type,
+        uint8_t parameter_set_ID,
+        ClassType au_type,
         uint32_t reads_count,
         uint16_t mm_threshold,
         uint32_t mm_count
@@ -803,11 +901,25 @@ uint8_t getNumBlocks(AccessUnitHeader* accessUnitHeader);
 uint32_t getAccessUnitId(AccessUnitHeader* accessUnitHeader);
 uint16_t getParametersSetId(AccessUnitHeader* accessUnitHeader);
 uint32_t getReadsCount(AccessUnitHeader* accessUnitHeader);
+SequenceID getReferenceSequence(AccessUnitHeader *accessUnitHeader);
+uint64_t getReferenceStart(AccessUnitHeader* accessUnitHeader);
+uint64_t getReferenceEnd(AccessUnitHeader* accessUnitHeader);
 uint16_t getMMThreshold(AccessUnitHeader* accessUnitHeader);
 uint32_t getMMCount(AccessUnitHeader* accessUnitHeader);
-void setReferenceSequenceId(AccessUnitHeader* accessUnitHeader, uint16_t sequenceId);
-void setReferenceStartPosition(AccessUnitHeader* accessUnitHeader, uint64_t startPosition);
-void setReferenceEndPosition(AccessUnitHeader* accessUnitHeader, uint64_t endPosition);
+ClassType getAccessUnitType(AccessUnitHeader *accessUnitHeader);
+SequenceID getAccessUnitSequenceID(AccessUnitHeader *accessUnitHeader);
+uint64_t getAccessUnitStart(AccessUnitHeader* accessUnitHeader);
+uint64_t getAccessUnitEnd(AccessUnitHeader* accessUnitHeader);
+uint64_t getExtendedAccessUnitStart(AccessUnitHeader* accessUnitHeader);
+uint64_t getExtendedAccessUnitEnd(AccessUnitHeader* accessUnitHeader);
+int setAccessUnitHeaderSequence_ID(AccessUnitHeader *accessUnitHeader, SequenceID sequenceId);
+int setAccessUnitHeaderAuStartPosition(AccessUnitHeader* accessUnitHeader, uint64_t auStartPosition);
+int setAccessUnitHeaderAuEndPosition(AccessUnitHeader* accessUnitHeader, uint64_t auEndPosition);
+int setAccessUnitHeaderAuExtendedStartPosition(AccessUnitHeader* accessUnitHeader, uint64_t auExtendedStartPosition);
+int setAccessUnitHeaderAuExtendedEndPosition(AccessUnitHeader* accessUnitHeader, uint64_t auExtendedEndPosition);
+int setAccessUnitHeaderReferenceSequence_ID(AccessUnitHeader *accessUnitHeader, SequenceID referenceSequenceId);
+int setAccessUnitHeaderReferenceStartPosition(AccessUnitHeader *accessUnitHeader, uint64_t referenceStartPosition);
+int setAccessUnitHeaderReferenceEndPosition(AccessUnitHeader *accessUnitHeader, uint64_t referenceEndPosition);
 
 struct AccessUnitProtection_ {
     ByteArray* protection;
@@ -853,21 +965,23 @@ uint8_t getBlocksDescriptorId(BlockHeader* blockHeader);
 uint32_t getPayloadSize(BlockHeader* blockHeader);
 BlockHeader* parseBlockHeader(DatasetContainer* datasetContainer, FILE* inputFile);
 bool writeBlockHeader(BlockHeader* blockHeader, FILE* outputFile);
+bool writeBlockHeaderDataUnit(BlockHeader* blockHeader, FILE* outputFile);
 void freeBlockHeader(BlockHeader* blockHeader);
 uint64_t getBlockHeaderSize(BlockHeader* blockHeader);
 
 
 struct Block_{
     BlockHeader* blockHeader;
-    Vector* payload;
+    FromFile* payload;
     uint32_t padding_size;
     DatasetContainer *datasetContainer;
 };
 
 void freeBlock(Block* block);
 Block* initBlock(DatasetContainer* datasetContainer, FromFile* fromFile);
-Block* initBlockMultiplePayloads(DatasetContainer* datasetContainer, Vector* payload);
+Block* initBlockWithHeader(uint8_t descriptorId, uint32_t payloadSize, FromFile* payload);
 void setBlockHeader(Block* block, BlockHeader* blockHeader);
+void setPaddingSize(Block* block, uint32_t paddingSize);
 bool writeBlock(Block* block, FILE* outputFile);
 Block* parseBlockContainerAUCmode(DatasetContainer *datasetContainer, FILE *inputFile, char *fileName);
 uint64_t getBlockSize(Block* block);
@@ -875,82 +989,21 @@ uint64_t getBlockSize(Block* block);
 typedef struct {
     uint16_t parent_parameter_setId;
     uint16_t parameter_setId;
-    uint32_t buffer_size;
-    char* buffer;
-} ParametersSet;
 
+    uint8_t dataset_type;
+    uint8_t alphabet_ID;
+    uint32_t reads_length;
+    uint8_t number_of_template_segments_minus1;
+    uint32_t max_au_data_unit_size;
+    bool pos_40_bits;
+    uint8_t qv_depth;
+    uint8_t as_depth;
+
+    ByteArray* data;
+} ParametersSet;
+bool parseParametersSet(ParametersSet** parametersSet, FILE* inputFile, uint32_t sizeContent);
 bool writeParametersSet(ParametersSet *parametersSet, FILE* outputFile);
 
-ParametersSet * initParametersSet(uint16_t parent_parameter_setId, uint16_t parameter_setId);
-ParametersSet * initParametersSetWithBuffer(
-    uint16_t parent_parameter_setId,
-    uint16_t parameter_setId,
-    char* buffer,
-    uint32_t buffer_size
-);
-void freeDataUnitsParametersSet(ParametersSet* parameters);
 
-typedef struct {
-    FromFile* fromFile;
-} DataUnitRawReference;
-
-typedef struct {
-    FromFile* fromFile;
-} DataUnitParameterSet;
-
-struct DataUnitAccessUnit_{
-    uint32_t accessUnitId;
-    uint8_t numBlocks;
-    uint16_t parameterSetId;
-    uint8_t AU_type;
-    uint32_t readsCount;
-
-    uint16_t mmThreshold;
-    uint32_t mmCount;
-
-    uint16_t sequenceId;
-    uint64_t auStartPosition;
-    uint64_t auEndPosition;
-    uint64_t extendedAUStartPosition;
-    uint64_t extendedAUEndPosition;
-
-    //missing signatures;
-
-    Vector* blocks;
-    Vector* blocksHeaders;
-};
-
-typedef struct {
-    uint8_t descriptorId;
-    uint32_t blockSize;
-} DataUnitBlockHeader;
-
-void freeDataUnitBlockHeader(DataUnitBlockHeader *dataUnitBlockHeader);
-bool writeDataUnitBlockHeader(FILE *outputFile, DataUnitBlockHeader *dataUnitBlockHeader);
-DataUnitBlockHeader* initDataUnitBlockHeader(uint8_t descriptorId, uint32_t blockSize);
-
-DataUnitAccessUnit* initDataUnitAccessUnit(
-        uint32_t accessUnitId,
-        uint8_t numBlocks,
-        uint16_t parameterSetId,
-        uint8_t AU_type,
-        uint32_t readsCount,
-        uint16_t mmThreshold,
-        uint32_t mmCount,
-        uint16_t sequenceId,
-        uint64_t auStartPosition,
-        uint64_t auEndPosition,
-        uint64_t extendedAUStartPosition,
-        uint64_t extendedAUEndPosition
-);
-bool addBlockToDataUnitAccessUnit(DataUnitAccessUnit *dataUnitAccessUnit, Block *block,
-                                  DataUnitBlockHeader *blockHeader);
-bool writeDataUnitAccessUnit(DataUnitAccessUnit* dataUnitAccessUnit, bool multipleAlignmentsFlag, FILE* outputFile);
-void freeDataUnitAccessUnit(DataUnitAccessUnit* dataUnitAccessUnit);
-
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif //MPEGG_CAPSULATOR_BOXES_H

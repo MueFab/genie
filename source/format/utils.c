@@ -3,29 +3,13 @@
 //
 
 #include <stdint.h>
-#ifdef __APPLE__
-    #include <libkern/OSByteOrder.h>
-
-    #define htobe16(x) OSSwapHostToBigInt16(x)
-    #define htole16(x) OSSwapHostToLittleInt16(x)
-    #define be16toh(x) OSSwapBigToHostInt16(x)
-    #define le16toh(x) OSSwapLittleToHostInt16(x)
-
-    #define htobe32(x) OSSwapHostToBigInt32(x)
-    #define htole32(x) OSSwapHostToLittleInt32(x)
-    #define be32toh(x) OSSwapBigToHostInt32(x)
-    #define le32toh(x) OSSwapLittleToHostInt32(x)
-
-    #define htobe64(x) OSSwapHostToBigInt64(x)
-    #define htole64(x) OSSwapHostToLittleInt64(x)
-    #define be64toh(x) OSSwapBigToHostInt64(x)
-    #define le64toh(x) OSSwapLittleToHostInt64(x)
-#else
-    #include <endian.h>
-#endif
+#include <endian.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include "portability.h"
 #include "utils.h"
+
+uint8_t generateMask(uint8_t numberBits);
 
 uint16_t nativeToBigEndian16(uint16_t nativeValue){
     return htobe16(nativeValue);
@@ -154,7 +138,7 @@ bool readBoxHeader(FILE *input_file, char *type, uint64_t *boxSize) {
     return sizeReadType == 4 && sizeReadBoxSize == 1;
 }
 
-bool readUint8(uint8_t* value, FILE *inputFile){
+bool utils_read(uint8_t* value, FILE *inputFile){
     return fread(value,sizeof(uint8_t),1,inputFile)==1;
 }
 
@@ -204,7 +188,7 @@ bool readChars(char* charArray, uint32_t charArrayLength, FILE* inputFile) {
     return fread(charArray, sizeof(char), charArrayLength, inputFile)==charArrayLength;
 }
 
-bool writeUint8(uint8_t value, FILE* outputFile){
+bool utils_write(uint8_t value, FILE* outputFile){
     return fwrite(&value, sizeof(value),1,outputFile)==1;
 }
 

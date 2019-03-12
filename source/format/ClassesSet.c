@@ -22,6 +22,7 @@ bool checkClass(ClassesSet classesSet, uint8_t classId) {
         uint8_t newVal = (uint8_t) 1<<classId;
         return classesSet & newVal;
     }
+    return false;
 }
 
 uint8_t getSizeSet(ClassesSet classesSet){

@@ -2,8 +2,8 @@
 // Created by bscuser on 26/02/18.
 //
 #include <utils.h>
-#include <Boxes.h>
 #include "Boxes.h"
+#include "DataUnits.h"
 
 void freeDataUnitBlockHeader(DataUnitBlockHeader *dataUnitBlockHeader){
     free(dataUnitBlockHeader);
@@ -13,8 +13,8 @@ bool writeDataUnitBlockHeader(FILE *outputFile, DataUnitBlockHeader *dataUnitBlo
     if(dataUnitBlockHeader == NULL){
         return false;
     }
-    uint16_t descriptorIdReservedPadding = dataUnitBlockHeader->descriptorId<<9;
-    bool descriptorIdReservedPaddingSuccessfulWrite = writeBigEndian16ToFile(descriptorIdReservedPadding, outputFile);
+    uint8_t descriptorIdReservedPadding = dataUnitBlockHeader->descriptorId<<1;
+    bool descriptorIdReservedPaddingSuccessfulWrite = utils_write(descriptorIdReservedPadding, outputFile);
     bool blockSizeSuccessfulWrite = writeBigEndian32ToFile(dataUnitBlockHeader->blockSize, outputFile);
 
     if (!descriptorIdReservedPaddingSuccessfulWrite || !blockSizeSuccessfulWrite){

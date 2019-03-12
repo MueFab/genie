@@ -9,7 +9,8 @@
 DatasetProtection *initDatasetProtection() {
     DatasetProtection* datasetProtection = (DatasetProtection*)malloc(sizeof(DatasetProtection));
     datasetProtection->protection = NULL;
-    datasetProtection->seekPosition = -1;
+    datasetProtection->hasSeek = false;
+    datasetProtection->seekPosition = 0;
     return datasetProtection;
 }
 
@@ -89,6 +90,12 @@ DatasetProtection *parseDatasetProtection(uint64_t boxContentSize, FILE *inputFi
         return NULL;
     }
     long seekPosition = ftell(inputFile);
+    if(ftell(inputFile) == -1){
+        fprintf(stderr, "Could not get file position.\n");
+        free(protectionBuffer);
+        return NULL;
+    }
+
     size_t protectionBufferReadSize = fread(protectionBuffer,sizeof(Byte),boxContentSize,inputFile);
     if(protectionBufferReadSize!=boxContentSize){
         fprintf(stderr, "Could not read requested number of bytes.\n");
@@ -96,7 +103,8 @@ DatasetProtection *parseDatasetProtection(uint64_t boxContentSize, FILE *inputFi
         return NULL;
     }
     DatasetProtection* datasetProtection = initDatasetProtection();
-    datasetProtection->seekPosition = seekPosition;
+    datasetProtection->hasSeek = true;
+    datasetProtection->seekPosition = (size_t)seekPosition;
     copyContentDatasetProtection(datasetProtection, (char *) protectionBuffer, boxContentSize);
     free(protectionBuffer);
     return datasetProtection;
@@ -107,6 +115,6 @@ bool copyContentDatasetProtection(DatasetProtection *datasetProtection, char *co
     return copyBytesSource(datasetProtection->protection, (Byte*)content, contentSize);
 }
 
-long getDatasetProtectionSeekPosition(DatasetProtection* datasetProtection){
+size_t getDatasetProtectionSeekPosition(DatasetProtection *datasetProtection){
     return datasetProtection->seekPosition;
 }
