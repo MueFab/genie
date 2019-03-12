@@ -23,6 +23,7 @@
 #include "spring/spring.h"
 #include "spring/util.h"
 #include "fileio/fastq_file_reader.h"
+#include "fileio/gabac_file.h"
 
 namespace spring {
 
@@ -102,22 +103,6 @@ generated_aus generate_streams_SPRING(
                 << " s\n";
     }
 
-    std::cout << "Generating new FASTQ from index (for testing) ... \n";
-    auto new_fq_start = std::chrono::steady_clock::now();
-    if (!cp.paired_end) {
-      generate_new_fastq_se(fastqFileReader1, temp_dir, cp);
-    }
-    else {
-      generate_new_fastq_pe(fastqFileReader1, fastqFileReader2, temp_dir, cp);
-    }
-    auto new_fq_end = std::chrono::steady_clock::now();
-    std::cout << "Generating new FASTQ done\n";
-    std::cout << "Time for this step: "
-              << std::chrono::duration_cast<std::chrono::seconds>(new_fq_end -
-                                                                  new_fq_start)
-                     .count()
-              << " s\n";
-
     std::cout << "Generating read streams ...\n";
     auto grs_start = std::chrono::steady_clock::now();
     auto descriptorFilesPerAUs = generate_read_streams(temp_dir, cp);
@@ -128,6 +113,8 @@ generated_aus generate_streams_SPRING(
                                                                   grs_start)
                      .count()
               << " s\n";
+
+
 
     std::cout << "Generating ref streams ...\n";
     auto grefs_start = std::chrono::steady_clock::now();
@@ -152,23 +139,6 @@ generated_aus generate_streams_SPRING(
                        .count()
                 << " s\n";
     }
-
-    // decode and write the reads to a file (for testing purposes)
-    std::cout << "Decompression (for testing) ...\n";
-    auto decompression_start = std::chrono::steady_clock::now();
-    uint32_t num_blocks;
-    if (!paired_end) 
-      num_blocks = 1 + (cp.num_reads-1)/cp.num_reads_per_block;
-    else 
-      num_blocks = 1 + (cp.num_reads/2-1)/cp.num_reads_per_block;
-    decompress(temp_dir, descriptorRefFilesPerAUs.getRefAus(), num_blocks, cp.preserve_order, cp.paired_end);
-    auto decompression_end = std::chrono::steady_clock::now();
-    std::cout << "Decompression done!\n";
-    std::cout << "Time for this step: "
-              << std::chrono::duration_cast<std::chrono::seconds>(decompression_end -
-                                                                  decompression_start)
-                     .count()
-              << " s\n";
     
 // }
 
@@ -186,7 +156,6 @@ generated_aus generate_streams_SPRING(
                    compression_end - compression_start)
                    .count()
             << " s\n";
-
   return result;
 }
 

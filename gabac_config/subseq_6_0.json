@@ -1,0 +1,29 @@
+{
+    "word_size": "8",
+    "sequence_transformation_id": "3",
+    "sequence_transformation_parameter": "255",
+    "transformed_sequences": [
+        {
+            "lut_transformation_enabled": "1",
+            "lut_transformation_bits": "3",
+            "lut_transformation_order": "1",
+            "diff_coding_enabled": "0",
+            "binarization_id": "4",
+            "binarization_parameters": [
+                "5"
+            ],
+            "context_selection_id": "3"
+        },
+        {
+            "lut_transformation_enabled": "1",
+            "lut_transformation_bits": "8",
+            "lut_transformation_order": "0",
+            "diff_coding_enabled": "0",
+            "binarization_id": "4",
+            "binarization_parameters": [
+                "9"
+            ],
+            "context_selection_id": "2"
+        }
+    ]
+}

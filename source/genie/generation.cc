@@ -15,6 +15,12 @@
 #include <string>
 #include <vector>
 #include <utils/MPEGGFileCreation/MPEGGFileCreator.h>
+#include <fileio/gabac_file.h>
+#include <boost/filesystem.hpp>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <queue>
 
 #include "genie/exceptions.h"
 #include "fileio/fasta_file_reader.h"
@@ -24,13 +30,25 @@
 #include "fileio/sam_file_reader.h"
 #include "fileio/sam_record.h"
 #include "coding/spring/spring.h"
+#include "genie/genie_gabac_output_stream.h"
+#include "genie/genie_file_format.h"
+#include "genie/gabac_integration.h"
+
+namespace spring {
+void decompress(const std::string& temp_dir,
+                const std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>>& ref_descriptorFilesPerAU,
+                uint32_t num_blocks,
+                bool eru_abs_flag,
+                bool paired_end
+);
+}
 
 namespace dsg {
 
 
 static void generationFromFasta(
-    const ProgramOptions& programOptions)
-{
+        const ProgramOptions& programOptions
+){
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Descriptor stream generation from FASTA file" << std::endl;
     std::cout << std::string(80, '-') << std::endl;
@@ -69,9 +87,10 @@ static void generationFromFasta(
 }
 
 
+
 static void generationFromFastq(
-    const ProgramOptions& programOptions)
-{
+        const ProgramOptions& programOptions
+){
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Descriptor stream generation from FASTQ file" << std::endl;
     std::cout << std::string(80, '-') << std::endl;
@@ -79,11 +98,10 @@ static void generationFromFastq(
     // Initialize a FASTQ file reader.
     input::fastq::FastqFileReader fastqFileReader(programOptions.inputFilePath);
 
-    // Second pass for HARC.
-
-
     // Read FASTQ records in blocks of 10 records.
     size_t blockSize = 10;
+
+    std::string ureads = "";
 
     while (true) {
         std::vector<input::fastq::FastqRecord> fastqRecords;
@@ -96,6 +114,7 @@ static void generationFromFastq(
         for (const auto& fastqRecord : fastqRecords) {
             std::cout << fastqRecord.title << "\t";
             std::cout << fastqRecord.sequence << "\t";
+            ureads += fastqRecord.sequence;
             std::cout << fastqRecord.optional << "\t";
             std::cout << fastqRecord.qualityScores << std::endl;
         }
@@ -104,40 +123,86 @@ static void generationFromFastq(
             break;
         }
     }
-    if (!programOptions.inputFilePairPath.empty()) {
-        std::cout << "Paired file:\n";
-        // Initialize a FASTQ file reader.
-        input::fastq::FastqFileReader fastqFileReader1(programOptions.inputFilePairPath);
 
-        // Read FASTQ records in blocks of 10 records.
-        size_t blockSize = 10;
+    std::cout << "ureads: " << ureads << std::endl;
 
-        while (true) {
-            std::vector<input::fastq::FastqRecord> fastqRecords;
-            size_t numRecords = fastqFileReader1.readRecords(blockSize, &fastqRecords);
-            if (numRecords != blockSize) {
-                std::cout << "Read only " << numRecords << " records (" << blockSize << " requested)." << std::endl;
-            }
+    std::string defaultGabacConf = "{\"word_size\":\"1\",\"sequence_transformation_id\":\"0\",\""
+                                   "sequence_transformation_parameter\":\"0\",\"transformed_sequences\""
+                                   ":[{\"lut_transformation_enabled\":\"0\",\"lut_transformation_bits\""
+                                   ":\"0\",\"lut_transformation_order\":\"0\",\"diff_coding_enabled\":\""
+                                   "0\",\"binarization_id\":\"0\",\"binarization_parameters\":[\"8\"],\""
+                                   "context_selection_id\":\"2\"}]}";
 
-            // Iterate through the records.
-            for (const auto& fastqRecord : fastqRecords) {
-                std::cout << fastqRecord.title << "\t";
-                std::cout << fastqRecord.sequence << "\t";
-                std::cout << fastqRecord.optional << "\t";
-                std::cout << fastqRecord.qualityScores << std::endl;
-            }
+    // Prepare input
+    gabac::DataBlock inputDataBlock(ureads.size(), 1);
+    memcpy(inputDataBlock.getData(), ureads.data(), ureads.size());
+    std::cout << "Input data block size: " << inputDataBlock.size() << std::endl;
 
-            if (numRecords != blockSize) {
-                break;
-            }
+    // Prepare streams
+    gabac::BufferInputStream bufferInputStream(&inputDataBlock);
+    GenieGabacOutputStream bufferOutputStream;
+    gabac::IOConfiguration ioconf = {&bufferInputStream, &bufferOutputStream, 0, &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
+    gabac::EncodingConfiguration enConf(defaultGabacConf);
+
+    //Encode
+    gabac::encode(ioconf, enConf);
+
+    // Use output
+    std::vector<std::pair<size_t, uint8_t*>> outputData;
+    bufferOutputStream.flush(&outputData);
+    std::cout << "Number of streams: " << outputData.size() << std::endl;
+    for(const auto& s : outputData) {
+        std::cout << "Bitstream size: " << s.first << std::endl;
+        for(size_t i = 0; i < s.first; ++i) {
+            std::cout << static_cast<int>(s.second[i]) << " ";
         }
+        std::cout << std::endl;
     }
+
+    size_t payloadSize = outputData[0].first;
+    uint8_t *payload = outputData[0].second;
+
+    /*
+     * Do stuff with payload ....
+     */
+
+    for(const auto& s : outputData) {
+        free(s.second);
+    }
+
+    // if (!programOptions.inputFilePairPath.empty()) {
+    //     std::cout << "Paired file:\n";
+    //     // Initialize a FASTQ file reader.
+    //     input::fastq::FastqFileReader fastqFileReader1(programOptions.inputFilePairPath);
+    //
+    //     // Read FASTQ records in blocks of 10 records.
+    //     size_t blockSize = 10;
+    //
+    //     while (true) {
+    //         std::vector<input::fastq::FastqRecord> fastqRecords;
+    //         size_t numRecords = fastqFileReader1.readRecords(blockSize, &fastqRecords);
+    //         if (numRecords != blockSize) {
+    //             std::cout << "Read only " << numRecords << " records (" << blockSize << " requested)." << std::endl;
+    //         }
+    //
+    //         // Iterate through the records.
+    //         for (const auto& fastqRecord : fastqRecords) {
+    //             std::cout << fastqRecord.title << "\t";
+    //             std::cout << fastqRecord.sequence << "\t";
+    //             std::cout << fastqRecord.optional << "\t";
+    //             std::cout << fastqRecord.qualityScores << std::endl;
+    //         }
+    //
+    //         if (numRecords != blockSize) {
+    //             break;
+    //         }
+    //     }
+    // }
 }
 
-
 static generated_aus generationFromFastq_SPRING(
-    const ProgramOptions& programOptions)
-{
+        const ProgramOptions& programOptions
+){
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Descriptor stream generation from FASTQ file" << std::endl;
     std::cout << std::string(80, '-') << std::endl;
@@ -147,18 +212,30 @@ static generated_aus generationFromFastq_SPRING(
     input::fastq::FastqFileReader fastqFileReader1(programOptions.inputFilePath);
     std::cout << "Calling SPRING" << std::endl;
     if (programOptions.inputFilePairPath.empty()) {
-        return spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader1, programOptions.numThreads, paired_end, programOptions.workingDirectory);
+        return spring::generate_streams_SPRING(
+                &fastqFileReader1,
+                &fastqFileReader1,
+                programOptions.numThreads,
+                paired_end,
+                programOptions.workingDirectory
+        );
     } else {
         paired_end = true;
         input::fastq::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath);
-        return spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader2, programOptions.numThreads, paired_end, programOptions.workingDirectory);
+        return spring::generate_streams_SPRING(
+                &fastqFileReader1,
+                &fastqFileReader2,
+                programOptions.numThreads,
+                paired_end,
+                programOptions.workingDirectory
+        );
     }
 }
 
 
 static void generationFromSam(
-    const ProgramOptions& programOptions)
-{
+        const ProgramOptions& programOptions
+){
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Descriptor stream generation from SAM file" << std::endl;
     std::cout << std::string(80, '-') << std::endl;
@@ -197,64 +274,133 @@ static void generationFromSam(
     }
 }
 
+void decompression(
+        const ProgramOptions& programOptions
+){
+    // Open file and create tmp directory with random name
+    FILE *in = fopen(programOptions.inputFilePath.c_str(), "rb");
+    if (!in) {
+        throw std::runtime_error("Could not open input file");
+    }
+    std::string temp_dir;
+    while (true) {
+        std::string random_str = "tmp." + spring::random_string(10);
+        temp_dir = "./" + random_str + '/';
+        if (!boost::filesystem::exists(temp_dir)) {
+            break;
+        }
+    }
+    if (!boost::filesystem::create_directory(temp_dir)) {
+        throw std::runtime_error("Cannot create temporary directory.");
+    }
+    std::cout << "Temporary directory: " << temp_dir << "\n";
+
+    // Unpack
+    std::cout << "Starting decompression...\n";
+    auto flist =
+            unpackFiles(temp_dir, in);
+    fclose(in);
+
+    // Decompress
+    run_gabac(flist, true);
+
+    // Extract spring parameters
+    spring::compression_params cp;
+    FILE *cpfile = fopen((temp_dir + "cp.bin").c_str(), "rb");
+    if (!cpfile) {
+        throw std::runtime_error("Cannot open config file");
+    }
+    if (fread((uint8_t *) &cp, sizeof(spring::compression_params), 1, cpfile) != 1) {
+        fclose(cpfile);
+        throw std::runtime_error("Cannot read config");
+    }
+    fclose(cpfile);
+    uint32_t num_blocks;
+    if (!cp.paired_end) {
+        num_blocks = 1 + (cp.num_reads - 1) / cp.num_reads_per_block;
+    } else {
+        num_blocks = 1 + (cp.num_reads / 2 - 1) / cp.num_reads_per_block;
+    }
+
+    // Decode spring streams
+    spring::decompress(temp_dir, createMap(flist), num_blocks, cp.preserve_order, cp.paired_end);
+
+    // Finish fastq
+    std::string outname = programOptions.inputFilePath;
+    outname = outname.substr(0, outname.find_last_of('.'));
+    outname += "_decompressed";
+    int number = 0;
+    while (boost::filesystem::exists(outname + std::to_string(number) + ".fastq")) {
+        ++number;
+    }
+    outname += std::to_string(number) + ".fastq";
+    std::rename((temp_dir + "decompressed.fastq").c_str(), outname.c_str());
+
+    boost::filesystem::remove_all(temp_dir);
+}
 
 void generation(
-    const ProgramOptions& programOptions)
-{
+        const ProgramOptions& programOptions
+){
+    generationFromFastq(programOptions);
+    return;
+    
     if (programOptions.inputFileType == "FASTA") {
         generationFromFasta(programOptions);
     } else if (programOptions.inputFileType == "FASTQ") {
         if (programOptions.readAlgorithm == "HARC") {
             auto generated_aus = generationFromFastq_SPRING(programOptions);
-            MPEGGFileCreator mpeggFileCreator;
-            DatasetGroup* datasetGroup = mpeggFileCreator.addDatasetGroup();
-            datasetGroup->addInternalReference("test","test",generated_aus.getGeneratedAusRef());
 
-            std::vector<Class_type> existing_classes;
-            existing_classes.push_back(CLASS_U);
+            // Open output directory of spring
+            std::vector<std::string> filelist;
+            std::string path = generated_aus.getGeneratedAusRef().getRefAus().front().begin()->second.begin()->second;
+            path = path.substr(0, path.find_last_of('/') + 1);
+            boost::filesystem::path p(path);
+            boost::filesystem::directory_iterator end_itr;
 
-            std::set<uint8_t> descriptorsUsed;
-            for(const auto & auEntry : generated_aus.getEncodedFastqAus()){
-                for(const auto & descriptorFileEntry : auEntry){
-                    descriptorsUsed.insert(descriptorFileEntry.first);
+            // Remove temporary files
+            std::remove((path + "read_order.bin").c_str());
+            std::remove((path + "read_seq.txt").c_str());
+
+            // Create list of all files
+            for (boost::filesystem::directory_iterator itr(p); itr != end_itr; ++itr) {
+                if (is_regular_file(itr->path())) {
+                    std::string current_file = itr->path().string();
+                    filelist.push_back(current_file);
                 }
             }
 
-            std::map<Class_type, std::vector<uint8_t>> descriptorsIdPerClass;
-            for(uint8_t descriptorUsed : descriptorsUsed){
-                descriptorsIdPerClass[CLASS_U].push_back(descriptorUsed);
-            }
+            // Compress
+            run_gabac(filelist, false);
 
-            std::map<uint16_t, std::map<Class_type, std::vector<AccessUnit>>> accessUnitsAligned;
-            std::vector<AccessUnit> accessUnitsUnaligned;
-            for(const auto & auEntry : generated_aus.getEncodedFastqAus()){
-                accessUnitsUnaligned.push_back(AccessUnit(
-                    auEntry,
-                    0,
-                    0,
-                    CLASS_U,
-                    0,
-                    0
-                ));
-            }
-            std::ofstream fakeParameters("fakePayload1");
-            fakeParameters << "fakePayload1";
-            fakeParameters.close();
-
-            std::vector<std::string> parametersFilenames = {"fakePayload1"};
-
-            datasetGroup->addDatasetData(
-                    existing_classes,
-                    descriptorsIdPerClass,
-                    accessUnitsAligned,
-                    accessUnitsUnaligned,
-                    parametersFilenames
+            // Pack
+            std::string outfile = (programOptions.inputFilePath.substr(0, programOptions.inputFilePath.find_last_of('.')) + ".genie");
+            FILE *output = fopen(
+                    outfile.c_str(), "wb"
             );
+            if (!output) {
+                throw std::runtime_error("Could not open output file");
+            }
+            packFiles(filelist, output);
+            fclose(output);
 
-            mpeggFileCreator.write("output.mpegg");
+            // Finish
+            std::cout << "**** Finished ****" << std::endl;
+            std::cout
+                    << "Compressed "
+                    << boost::filesystem::file_size(programOptions.inputFilePath)
+                    << " to "
+                    << boost::filesystem::file_size(outfile)
+                    << ". Compression rate "
+                    << float(boost::filesystem::file_size(outfile)) /
+                       boost::filesystem::file_size(programOptions.inputFilePath) *
+                       100
+                    << "%"
+                    << std::endl;
 
+            boost::filesystem::remove_all(path);
 
-        }else {
+        } else {
             generationFromFastq(programOptions);
         }
     } else if (programOptions.inputFileType == "SAM") {
@@ -266,9 +412,9 @@ void generation(
 
 void fastqSpringResultToFile(generated_aus generatedAus){
     MPEGGFileCreator fileCreator;
-    DatasetGroup* datasetGroup1 = fileCreator.addDatasetGroup();
+    DatasetGroup *datasetGroup1 = fileCreator.addDatasetGroup();
 
-    datasetGroup1->addInternalReference("ref1","seq1", generatedAus.getGeneratedAusRef());
+    datasetGroup1->addInternalReference("ref1", "seq1", generatedAus.getGeneratedAusRef());
 
     std::vector<Class_type> existing_classes;
     existing_classes.push_back(CLASS_P);
@@ -284,7 +430,7 @@ void fastqSpringResultToFile(generated_aus generatedAus){
     std::map<uint16_t, std::map<Class_type, std::vector<AccessUnit>>> accessUnitsAligned;
     std::vector<AccessUnit> accessUnitsUnaligned;
 
-    for(const auto& accessUnitEntry : generatedAus.getEncodedFastqAus()) {
+    for (const auto& accessUnitEntry : generatedAus.getEncodedFastqAus()) {
         accessUnitsUnaligned.emplace_back(
                 accessUnitEntry,
                 0,

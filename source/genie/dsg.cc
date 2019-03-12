@@ -42,7 +42,11 @@ static int dsg_main(
 
         dsg::ProgramOptions programOptions(argc, argv);
 
-        generation(programOptions);
+        if(programOptions.inputFileType == "FASTQ") {
+            generation(programOptions);
+        } else if(programOptions.inputFileType == "GENIE"){
+            decompression(programOptions);
+        }
     }
     catch(boost::program_options::error& e) {
         std::cerr << "Program options error";
