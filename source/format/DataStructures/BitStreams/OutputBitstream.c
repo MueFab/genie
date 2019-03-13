@@ -110,11 +110,7 @@ bool writeNBitsShiftAndConvertToBigEndian16(OutputBitstream *outputBitstream, ui
 bool writeNBitsShiftAndConvertToBigEndian32(OutputBitstream *outputBitstream, uint8_t n, uint32_t value){
     uint32_t buffer = nativeToBigEndian32(value);
 
-    uint32_t tmpBuffer1 = buffer << 1;
-    uint32_t tmpBuffer2 = buffer << 2;
-    uint32_t tmpBuffer8 = buffer << 8;
-
-    buffer <<= (32-n);
+    //buffer <<= (32-n);
     return writeNBits(outputBitstream, n, (char *) &buffer);
 }
 
