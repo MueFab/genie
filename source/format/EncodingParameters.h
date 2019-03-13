@@ -12,6 +12,7 @@ extern "C" {
 // #include <stdint-gcc.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <DataStructures/BitStreams/InputBitstream.h>
 #include "DataStructures/BitStreams/OutputBitstream.h"
 
 typedef enum {
@@ -19,7 +20,7 @@ typedef enum {
     SubSeq_EQUALITY_CODING = 1,
     SubSeq_MATCH_CODING = 2,
     SubSeq_RLE_CODING = 3,
-    SubSeq_RLE_QV_CODING = 4
+    SubSeq_MERGE_CODING = 4
 } TransformSubSeqIdEnum;
 
 typedef enum {
@@ -60,6 +61,8 @@ typedef struct{
     TransformSubSeqIdEnum transform_ID_subseq;
     uint16_t match_coding_buffer_size;
     uint8_t rle_coding_guard;
+    uint8_t merge_coding_subseq_count;
+    uint8_t *merge_coding_shift_size;
 } Transform_subseq_parametersType;
 
 //METHODS START
@@ -68,7 +71,6 @@ Transform_subseq_parametersType* constructNoTransformSubseqParameters();
 Transform_subseq_parametersType* constructEqualityCodingTransformSubseqParameters();
 Transform_subseq_parametersType* constructMatchCodingSubseqTransformSubseqParameters(uint16_t match_coding_buffer_size);
 Transform_subseq_parametersType* constructRLECodingSubseqTransformSubseqParameters(uint8_t rle_coding_guard);
-Transform_subseq_parametersType* constructRLEQVCodingSubseqTransformSubseqParameters();
 EncodingParametersRC getTransformSubSeqId(
         Transform_subseq_parametersType* transformSubseqParameters,
         TransformSubSeqIdEnum* output
@@ -81,7 +83,7 @@ EncodingParametersRC getRLECodingGuard(
         Transform_subseq_parametersType* transformSubseqParameters,
         uint8_t* output
 );
-//------------------ until here tested---------------------------
+Transform_subseq_parametersType * parseTransformSubseqParameters(InputBitstream *input);
 
 typedef struct {
     uint8_t output_symbol_size;
@@ -92,8 +94,8 @@ typedef struct {
 } Support_valuesType;
 
 typedef struct {
-    bool bIFullCtxMode;
-    uint8_t cTruncExpGolParam;
+    uint8_t cmax;
+    uint8_t cmax_teg;
     uint8_t cMaxDTU;
     uint8_t splitUnitSize;
 } Cabac_binarization_parametersType;
@@ -103,9 +105,6 @@ typedef struct {
     uint16_t num_contexts;
     uint8_t* context_initialization_value;
     bool share_sub_sym_ctx_flag;
-    bool segment_ctx_flag;
-    uint16_t segment_ctx_len;
-    uint16_t segment_ctx_offset;
 } Cabac_context_parametersType;
 
 EncodingParametersRC getAdaptiveModeFlag(
@@ -117,18 +116,6 @@ EncodingParametersRC getContextInitializationValues(
         uint16_t* num_contexts,
         uint8_t** context_initialization_value
 );
-EncodingParametersRC getSegmentCtxFlag(
-        Cabac_context_parametersType* cabac_context_parameters,
-        bool* segment_ctx_flag
-);
-EncodingParametersRC getSegmentCtxLen(
-        Cabac_context_parametersType* cabac_context_parameters,
-        uint16_t* segment_ctx_len
-);
-EncodingParametersRC getSegmentCtxOffset(
-        Cabac_context_parametersType* cabac_context_parameters,
-        uint16_t* segment_ctx_offset
-);
 
 typedef struct {
     BinarizationIdEnum binarization_ID;
@@ -138,10 +125,6 @@ typedef struct {
 } Cabac_binarizationsType;
 EncodingParametersRC getBinarizationId(Cabac_binarizationsType* cabac_binarizations, uint8_t* binarizationId);
 EncodingParametersRC getBypassFlag(Cabac_binarizationsType* cabac_binarizations, bool* bypassFlag);
-EncodingParametersRC getBIFullCtxMode(
-        Cabac_binarizationsType* cabac_binarizations,
-        bool* biFullCtxMode
-);
 EncodingParametersRC getCTruncExpGolParam(
         Cabac_binarizationsType* cabac_binarizations,
         uint8_t* cTruncExpGolParam
@@ -158,131 +141,72 @@ EncodingParametersRC getCabacContextParameters(
         Cabac_binarizationsType* cabac_binarizations,
         Cabac_context_parametersType** cabac_context_parameters
 );
-Cabac_binarizationsType* constructCabacBinarizationBinaryCoding_NotBypass(
-        bool BIFullCtxMode,
-        bool adaptive_mode_flag,
-        uint16_t num_contexts,
-        uint8_t* context_initialization_value,
-        bool share_sub_sym_ctx_flag,
-        bool segment_ctx_flag,
-        uint16_t segment_ctx_len,
-        uint16_t segment_ctx_offset
-);
-Cabac_binarizationsType* constructCabacBinarizationBinaryCoding_Bypass(
-        bool BIFullCtxMode
-);
-Cabac_binarizationsType* constructCabacBinarizationTruncatedUnary_NotBypass(
-        bool adaptive_mode_flag,
-        uint16_t num_contexts,
-        uint8_t* context_initialization_value,
-        bool share_sub_sym_ctx_flag,
-        bool segment_ctx_flag,
-        uint16_t segment_ctx_len,
-        uint16_t segment_ctx_offset
-);
-Cabac_binarizationsType* constructCabacBinarizationTruncatedUnary_Bypass();
-Cabac_binarizationsType* constructCabacBinarizationExponentialGolomb_NotBypass(
-        bool adaptive_mode_flag,
-        uint16_t num_contexts,
-        uint8_t* context_initialization_value,
-        bool share_sub_sym_ctx_flag,
-        bool segment_ctx_flag,
-        uint16_t segment_ctx_len,
-        uint16_t segment_ctx_offset
-);
+Cabac_binarizationsType *readCabacBinarization(InputBitstream *input,
+                                               uint8_t coding_subsym_size,
+                                               uint8_t output_symbol_size);
+Cabac_binarizationsType *
+constructCabacBinarizationBinaryCoding_NotBypass(bool adaptive_mode_flag, uint16_t num_contexts,
+                                                 uint8_t *context_initialization_value, bool share_sub_sym_ctx_flag);
+Cabac_binarizationsType *constructCabacBinarizationBinaryCoding_Bypass();
+Cabac_binarizationsType *
+constructCabacBinarizationTruncatedUnary_NotBypass(uint8_t cmax, bool adaptive_mode_flag, uint16_t num_contexts,
+                                                   uint8_t *context_initialization_value, bool share_sub_sym_ctx_flag);
+Cabac_binarizationsType *constructCabacBinarizationTruncatedUnary_Bypass(uint8_t cmax);
+Cabac_binarizationsType *constructCabacBinarizationExponentialGolomb_NotBypass(bool adaptive_mode_flag, uint16_t num_contexts,
+                                                                               uint8_t *context_initialization_value,
+                                                                               bool share_sub_sym_ctx_flag);
 Cabac_binarizationsType* constructCabacBinarizationExponentialGolomb_Bypass();
-Cabac_binarizationsType* constructCabacBinarizationSignedExponentialGolomb_NotBypass(
-        bool adaptive_mode_flag,
-        uint16_t num_contexts,
-        uint8_t* context_initialization_value,
-        bool share_sub_sym_ctx_flag,
-        bool segment_ctx_flag,
-        uint16_t segment_ctx_len,
-        uint16_t segment_ctx_offset
-);
+Cabac_binarizationsType *constructCabacBinarizationSignedExponentialGolomb_NotBypass(bool adaptive_mode_flag, uint16_t num_contexts,
+                                                                                     uint8_t *context_initialization_value,
+                                                                                     bool share_sub_sym_ctx_flag);
 Cabac_binarizationsType* constructCabacBinarizationSignedExponentialGolomb_Bypass();
-Cabac_binarizationsType* constructCabacBinarizationTruncatedExponentialGolomb_NotBypass(
-        uint8_t cTruncExpGolParam,
-        bool adaptive_mode_flag,
-        uint16_t num_contexts,
-        uint8_t* context_initialization_value,
-        bool share_sub_sym_ctx_flag,
-        bool segment_ctx_flag,
-        uint16_t segment_ctx_len,
-        uint16_t segment_ctx_offset
-);
+Cabac_binarizationsType *constructCabacBinarizationTruncatedExponentialGolomb_NotBypass(uint8_t cTruncExpGolParam, bool adaptive_mode_flag,
+                                                                                        uint16_t num_contexts,
+                                                                                        uint8_t *context_initialization_value,
+                                                                                        bool share_sub_sym_ctx_flag);
 Cabac_binarizationsType* constructCabacBinarizationTruncatedExponentialGolomb_Bypass(
         uint8_t cTruncExpGolParam
 );
-Cabac_binarizationsType* constructCabacBinarizationSignedTruncatedExponentialGolomb_NotBypass(
-        uint8_t cTruncExpGolParam,
-        bool adaptive_mode_flag,
-        uint16_t num_contexts,
-        uint8_t* context_initialization_value,
-        bool share_sub_sym_ctx_flag,
-        bool segment_ctx_flag,
-        uint16_t segment_ctx_len,
-        uint16_t segment_ctx_offset
-);
+Cabac_binarizationsType *
+constructCabacBinarizationSignedTruncatedExponentialGolomb_NotBypass(uint8_t cTruncExpGolParam, bool adaptive_mode_flag,
+                                                                     uint16_t num_contexts,
+                                                                     uint8_t *context_initialization_value,
+                                                                     bool share_sub_sym_ctx_flag);
 Cabac_binarizationsType* constructCabacBinarizationSignedTruncatedExponentialGolomb_Bypass(
         uint8_t cTruncExpGolParam
 );
-Cabac_binarizationsType* constructCabacBinarizationSplitUnitwiseTruncatedUnary_NotBypass(
-        uint8_t splitUnitSize,
-        bool adaptive_mode_flag,
-        uint16_t num_contexts,
-        uint8_t* context_initialization_value,
-        bool share_sub_sym_ctx_flag,
-        bool segment_ctx_flag,
-        uint16_t segment_ctx_len,
-        uint16_t segment_ctx_offset
-);
+Cabac_binarizationsType *constructCabacBinarizationSplitUnitwiseTruncatedUnary_NotBypass(uint8_t splitUnitSize, bool adaptive_mode_flag,
+                                                                                         uint16_t num_contexts,
+                                                                                         uint8_t *context_initialization_value,
+                                                                                         bool share_sub_sym_ctx_flag);
 Cabac_binarizationsType* constructCabacBinarizationSplitUnitwiseTruncatedUnary_Bypass(
         uint8_t splitUnitSize
 );
-Cabac_binarizationsType* constructCabacBinarizationSignedSplitUnitwiseTruncatedUnary_NotBypass(
-        uint8_t splitUnitSize,
-        bool adaptive_mode_flag,
-        uint16_t num_contexts,
-        uint8_t* context_initialization_value,
-        bool share_sub_sym_ctx_flag,
-        bool segment_ctx_flag,
-        uint16_t segment_ctx_len,
-        uint16_t segment_ctx_offset
-);
+Cabac_binarizationsType *
+constructCabacBinarizationSignedSplitUnitwiseTruncatedUnary_NotBypass(uint8_t splitUnitSize, bool adaptive_mode_flag,
+                                                                      uint16_t num_contexts,
+                                                                      uint8_t *context_initialization_value,
+                                                                      bool share_sub_sym_ctx_flag);
 Cabac_binarizationsType* constructCabacBinarizationSignedSplitUnitwiseTruncatedUnary_Bypass(
         uint8_t splitUnitSize
 );
-Cabac_binarizationsType* constructCabacBinarizationDoubleTruncatedUnary_NotBypass(
-        uint8_t cMaxDTU,
-        uint8_t splitUnitSize,
-        bool adaptive_mode_flag,
-        uint16_t num_contexts,
-        uint8_t* context_initialization_value,
-        bool share_sub_sym_ctx_flag,
-        bool segment_ctx_flag,
-        uint16_t segment_ctx_len,
-        uint16_t segment_ctx_offset
-);
+Cabac_binarizationsType *constructCabacBinarizationDoubleTruncatedUnary_NotBypass(uint8_t cMaxDTU, uint8_t splitUnitSize,
+                                                                                  bool adaptive_mode_flag, uint16_t num_contexts,
+                                                                                  uint8_t *context_initialization_value,
+                                                                                  bool share_sub_sym_ctx_flag);
 Cabac_binarizationsType* constructCabacBinarizationDoubleTruncatedUnary_Bypass(
         uint8_t cMaxDTU,
         uint8_t splitUnitSize
 );
-Cabac_binarizationsType* constructCabacBinarizationSignedDoubleTruncatedUnary_NotBypass(
-        uint8_t cMaxDTU,
-        uint8_t splitUnitSize,
-        bool adaptive_mode_flag,
-        uint16_t num_contexts,
-        uint8_t* context_initialization_value,
-        bool share_sub_sym_ctx_flag,
-        bool segment_ctx_flag,
-        uint16_t segment_ctx_len,
-        uint16_t segment_ctx_offset
-);
+Cabac_binarizationsType *constructCabacBinarizationSignedDoubleTruncatedUnary_NotBypass(uint8_t cMaxDTU, uint8_t splitUnitSize,
+                                                                                        bool adaptive_mode_flag, uint16_t num_contexts,
+                                                                                        uint8_t *context_initialization_value,
+                                                                                        bool share_sub_sym_ctx_flag);
 Cabac_binarizationsType* constructCabacBinarizationSignedDoubleTruncatedUnary_Bypass(
         uint8_t cMaxDTU,
         uint8_t splitUnitSize
 );
+Cabac_binarization_parametersType *readCabacBinarizationParameters(InputBitstream* input, uint8_t binarization_ID);
 
 typedef struct {
     uint8_t num_descriptor_subsequence_cfgs_minus1;
@@ -441,7 +365,7 @@ EncodingParametersRC getCrBufMaxSize(
 typedef struct {
     uint8_t dataset_type;
     uint8_t alphabet_ID;
-    uint32_t reads_length;
+    uint32_t read_length;
     uint8_t number_of_template_segments_minus1;
     uint32_t max_au_data_unit_size;
     bool pos_40_bits;
@@ -450,21 +374,19 @@ typedef struct {
     uint8_t num_classes;
     uint8_t* classID;
     bool class_specific_dec_cfg_flag[18];
-    bool** dec_cfg_flag;
+    bool** dec_cfg_preset;
     uint8_t** encoding_mode_id;
     void*** decoderConfiguration; //13.1.2 //todo correct getter
     uint16_t num_groups;
     char** rgroup_ID;
+    bool multiple_alignments_flag;
     bool spliced_reads_flag;
-    bool multiple_signature_flag;
     uint32_t multiple_signature_base;
     uint8_t U_signature_size;
-    bool multiple_alignments_flag;
-    uint8_t mscore_mantissa;
     uint8_t* qv_coding_mode;
     bool* qvps_flag;
     Parameter_set_qvpsType** parameter_set_qvps; //8.1
-    uint8_t* default_qvps_ID;
+    uint8_t* qvps_preset_ID;
     bool crps_flag;
     Parameter_set_crpsType* parameter_set_crps; //8.2
 } Encoding_ParametersType;
@@ -496,26 +418,18 @@ EncodingParametersRC getCABACDecoderConfigurationTokenType(
 );
 EncodingParametersRC getNumGroups(Encoding_ParametersType* encodingParameters, uint16_t* numGroups);
 EncodingParametersRC getReadGroupId(Encoding_ParametersType* encodingParameters, uint16_t groupIndex, char** rgroupID);
-EncodingParametersRC getSplicedReadsFlag(Encoding_ParametersType* encodingParameters, bool* splicedReadsFlag);
-EncodingParametersRC getMultipleSignatureFlag(
-    Encoding_ParametersType* encodingParameters,
-    bool* multipleSignatureFlag
+EncodingParametersRC getMultipleAlignments_flag(
+        Encoding_ParametersType* encodingParameters,
+        bool* multiple_alignments_flag
 );
+EncodingParametersRC getSplicedReadsFlag(Encoding_ParametersType* encodingParameters, bool* splicedReadsFlag);
 EncodingParametersRC getMultipleSignatureBaseParameters(
-    Encoding_ParametersType* encodingParameters,
-    uint32_t* multiple_signature_base
+        Encoding_ParametersType* encodingParameters,
+        uint32_t* multiple_signature_base
 );
 EncodingParametersRC getSignatureSize(
-    Encoding_ParametersType* encodingParameters,
-    uint8_t* u_signature_size
-);
-EncodingParametersRC getMultipleAlignments_flag(
-    Encoding_ParametersType* encodingParameters,
-    bool* multiple_alignments_flag
-);
-EncodingParametersRC getMscoreMantissa(
-    Encoding_ParametersType* encodingParameters,
-    uint8_t* mscore_mantissa
+        Encoding_ParametersType* encodingParameters,
+        uint8_t* u_signature_size
 );
 EncodingParametersRC getQVCodingMode(
     Encoding_ParametersType* encodingParameters,
@@ -532,10 +446,10 @@ EncodingParametersRC getParameterSetQvps(
     uint8_t classIndex,
     Parameter_set_qvpsType** pParameter_set_qvpsType
 );
-EncodingParametersRC getDefaultQvpsId(
-    Encoding_ParametersType* encodingParameters,
-    uint8_t classIndex,
-    uint8_t* defaultQvpsId
+EncodingParametersRC getQvps_preset_id(
+        Encoding_ParametersType *encodingParameters,
+        uint8_t classIndex,
+        uint8_t *qvps_preset_ID
 );
 EncodingParametersRC getCrpsFlag(
     Encoding_ParametersType* encodingParameters,
@@ -625,7 +539,7 @@ Encoding_ParametersType* constructEncodingParametersMultipleAlignmentComputedRef
         uint8_t mscore_mantissa,
         Parameter_set_crpsType* parameter_set_crps
 );
-
+Encoding_ParametersType* readEncodingParameters(InputBitstream* input);
 
 
 Support_valuesType* constructSupportValues(
@@ -635,6 +549,7 @@ Support_valuesType* constructSupportValues(
     bool share_subsym_lut_flag,
     bool share_subsym_prv_flag
 );
+Support_valuesType * readSupportValuesType(InputBitstream *input, uint8_t transform_ID_subsym);
 DecoderConfigurationTypeCABAC* constructDecoderConfigurationCABAC(
         uint8_t num_descriptor_subsequence_cfgs_minus1,
         uint16_t* descriptor_subsequence_ID,

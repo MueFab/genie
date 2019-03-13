@@ -107,7 +107,22 @@ bool readNBits(InputBitstream *inputBitstream, uint32_t n, char *value){
     return true;
 }
 
+bool readNBits8(InputBitstream *inputBitstream, uint8_t n, uint8_t *value){
+    *value = 0;
+    bool result = readBitsToByteArray(
+            inputBitstream,
+            n,
+            1,
+            (uint8_t *) value
+    );
+
+    if (!result){
+        return result;
+    }
+    return true;
+}
 bool readNBitsBigToNativeEndian16(InputBitstream *inputBitstream, uint8_t n, uint16_t *value){
+    *value = 0;
     bool result = readBitsToByteArray(
             inputBitstream,
             n,

@@ -287,7 +287,7 @@ set(format_header_files ${format_header_files} ${format_header_dir}/DataStructur
 set(format_header_files ${format_header_files} ${format_header_dir}/DataStructures/Signatures/SignaturesOutputStream.h)
 set(format_header_files ${format_header_files} ${format_header_dir}/DataStructures/FromFile.h)
 set(format_header_files ${format_header_files} ${format_header_dir}/DataUnits/DataUnits.h)
-set(format_source_files ${format_source_files} ${format_source_dir}/FileHandlingUtils/FileHandlingUtils.h)
+set(format_header_files ${format_header_files} ${format_source_dir}/FileHandlingUtils/FileHandlingUtils.h)
 set(format_header_files ${format_header_files} ${format_header_dir}/AccessUnitTree.h)
 set(format_header_files ${format_header_files} ${format_header_dir}/AccessUnitTreeNode.h)
 set(format_header_files ${format_header_files} ${format_header_dir}/Boxes.h)
@@ -427,6 +427,7 @@ target_link_libraries(${genie} gabac)
 
     # Set up the target
     add_executable(${tests} EXCLUDE_FROM_ALL ${tests_source_files})
+    target_include_directories(${tests} PRIVATE ${format_include_dir})
     target_include_directories(${tests} PRIVATE ${genie_include_dir})
     target_include_directories(${tests} PRIVATE ${CMAKE_BINARY_DIR})
     target_link_libraries(${tests} gtest_main)
