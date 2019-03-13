@@ -25,6 +25,7 @@ bool readBitsToByteArray(
         uint64_t sizeByteArrayInBytes,
         uint8_t *byteArray
 );
+bool readNBits8(InputBitstream *inputBitstream, uint8_t n, uint8_t *value);
 bool readNBitsBigToNativeEndian16(InputBitstream *inputBitstream, uint8_t n, uint16_t *value);
 bool readNBitsBigToNativeEndian32(InputBitstream *inputBitstream, uint8_t n, uint32_t *value);
 bool readNBitsBigToNativeEndian64(InputBitstream *inputBitstream, uint8_t n, uint64_t *value);

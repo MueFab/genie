@@ -5,7 +5,7 @@
 extern "C" {
 #include "format/EncodingParameters.h"
 }
-
+/*
 class mpeggFileCreatorTest : public ::testing::Test
 {
 protected:
@@ -132,4 +132,4 @@ TEST_F(mpeggFileCreatorTest, transformSubseqParameters)
 
     fileCreator.write("testOutput0");
 
-}
+}*/

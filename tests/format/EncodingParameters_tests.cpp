@@ -75,25 +75,12 @@ TEST_F(encodingParametersTest, transformSubseqParameters)
     responseCall = getRLECodingGuard(transformSubseqParameters, &rleCodingGuard);
     EXPECT_EQ(responseCall , SUCCESS);
     EXPECT_EQ(rleCodingGuard , expectedRleCodingGuard);
-
-    transformSubseqParameters = constructRLEQVCodingSubseqTransformSubseqParameters();
-    responseCall = getTransformSubSeqId(transformSubseqParameters, &transformSubSeqId);
-    EXPECT_EQ(responseCall , SUCCESS);
-    EXPECT_EQ(transformSubSeqId , SubSeq_RLE_QV_CODING);
-
-    responseCall = getMatchCodingBufferSize(transformSubseqParameters, &matchCoding);
-    EXPECT_EQ(responseCall , FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
-
-    responseCall = getRLECodingGuard(transformSubseqParameters, &rleCodingGuard);
-    EXPECT_EQ(responseCall , FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
 }
 
 TEST_F(encodingParametersTest, binarization)
 {
     uint8_t binarization_ID;
     bool bypassFlag;
-    bool expectedBIFUllCtxMode = true;
-    bool BIFullCtxMode;
     uint8_t expectedCTruncExpGolParam = 1;
     uint8_t cTruncExpGolParam;
     uint8_t expectedCMaxDTU = 2;
@@ -107,93 +94,70 @@ TEST_F(encodingParametersTest, binarization)
     uint8_t  expectedContextInitialization[] ={1,2,3};
     uint8_t* contextInitialization;
     bool expectedShareSubSymCtxFlag = true;
-    bool shareSubSymCtxFlag;
-    bool expectedSegmentCtxFlag = true;
-    bool segmentCtxFlag;
-    uint16_t expectedSegmentCtxLen = 15;
-    uint16_t segmentCtxLen;
-    uint16_t expectedSegmentCtxOffset = 33;
-    uint16_t segmentCtxOffset;
     Cabac_context_parametersType* cabacContextParameters;
 
 
     Cabac_binarizationsType* cabacBinarization = constructCabacBinarizationBinaryCoding_NotBypass(
-            expectedBIFUllCtxMode,
             expectedAdaptive_mode_flag,
             expectedNumContexts,
             expectedContextInitialization,
-            expectedShareSubSymCtxFlag,
-            expectedSegmentCtxFlag,
-            expectedSegmentCtxLen,
-            expectedSegmentCtxOffset
-    );
-    EXPECT_TRUE(cabacBinarization != NULL);
+            expectedShareSubSymCtxFlag);
+
+    EXPECT_TRUE(nullptr != cabacBinarization);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_BinaryCoding);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == false);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == SUCCESS);
-    EXPECT_TRUE(BIFullCtxMode == expectedBIFUllCtxMode);
+    EXPECT_TRUE(!bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getSplitUnitSize(cabacBinarization, &splitUnitSize) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getCabacContextParameters(cabacBinarization, &cabacContextParameters) == SUCCESS);
-    EXPECT_TRUE(cabacContextParameters != NULL);
+    EXPECT_TRUE(nullptr != cabacContextParameters);
     EXPECT_TRUE(getAdaptiveModeFlag(cabacContextParameters, &adaptiveModeFlag) == SUCCESS);
     EXPECT_TRUE(adaptiveModeFlag == expectedAdaptive_mode_flag);
     EXPECT_TRUE(getContextInitializationValues(cabacContextParameters,&numContexts, &contextInitialization)==SUCCESS);
     EXPECT_TRUE(numContexts == expectedNumContexts);
     EXPECT_TRUE(contextInitialization == expectedContextInitialization);
 
-    cabacBinarization = constructCabacBinarizationBinaryCoding_Bypass(
-            expectedBIFUllCtxMode
-    );
-    EXPECT_TRUE(cabacBinarization != NULL);
+    cabacBinarization = constructCabacBinarizationBinaryCoding_Bypass();
+    EXPECT_TRUE(nullptr != cabacBinarization);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_BinaryCoding);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == true);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == SUCCESS);
-    EXPECT_TRUE(BIFullCtxMode == expectedBIFUllCtxMode);
+    EXPECT_TRUE(bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getSplitUnitSize(cabacBinarization, &splitUnitSize) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getCabacContextParameters(cabacBinarization, &cabacContextParameters) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
 
 
-    cabacBinarization = constructCabacBinarizationTruncatedUnary_NotBypass(
-            expectedAdaptive_mode_flag,
-            expectedNumContexts,
-            expectedContextInitialization,
-            expectedShareSubSymCtxFlag,
-            expectedSegmentCtxFlag,
-            expectedSegmentCtxLen,
-            expectedSegmentCtxOffset
-    );
-    EXPECT_TRUE(cabacBinarization != NULL);
+    cabacBinarization = constructCabacBinarizationTruncatedUnary_NotBypass(0,
+                                                                           expectedAdaptive_mode_flag,
+                                                                           expectedNumContexts,
+                                                                           expectedContextInitialization,
+                                                                           expectedShareSubSymCtxFlag);
+    EXPECT_TRUE(cabacBinarization != nullptr);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_TruncatedUnary);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == false);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(!bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getSplitUnitSize(cabacBinarization, &splitUnitSize) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getCabacContextParameters(cabacBinarization, &cabacContextParameters) == SUCCESS);
-    EXPECT_TRUE(cabacContextParameters != NULL);
+    EXPECT_TRUE(cabacContextParameters != nullptr);
     EXPECT_TRUE(getAdaptiveModeFlag(cabacContextParameters, &adaptiveModeFlag) == SUCCESS);
     EXPECT_TRUE(adaptiveModeFlag == expectedAdaptive_mode_flag);
     EXPECT_TRUE(getContextInitializationValues(cabacContextParameters,&numContexts, &contextInitialization)==SUCCESS);
     EXPECT_TRUE(numContexts == expectedNumContexts);
     EXPECT_TRUE(contextInitialization == expectedContextInitialization);
 
-    cabacBinarization = constructCabacBinarizationTruncatedUnary_Bypass();
-    EXPECT_TRUE(cabacBinarization != NULL);
+    cabacBinarization = constructCabacBinarizationTruncatedUnary_Bypass(0);
+    EXPECT_TRUE(cabacBinarization != nullptr);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_TruncatedUnary);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == true);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getSplitUnitSize(cabacBinarization, &splitUnitSize) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
@@ -203,17 +167,12 @@ TEST_F(encodingParametersTest, binarization)
             expectedAdaptive_mode_flag,
             expectedNumContexts,
             expectedContextInitialization,
-            expectedShareSubSymCtxFlag,
-            expectedSegmentCtxFlag,
-            expectedSegmentCtxLen,
-            expectedSegmentCtxOffset
-    );
-    EXPECT_TRUE(cabacBinarization != NULL);
+            expectedShareSubSymCtxFlag);
+    EXPECT_TRUE(cabacBinarization != nullptr);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_ExponentialGolomb);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == false);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(!bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getSplitUnitSize(cabacBinarization, &splitUnitSize) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
@@ -223,21 +182,14 @@ TEST_F(encodingParametersTest, binarization)
     EXPECT_TRUE(getContextInitializationValues(cabacContextParameters, &numContexts, &contextInitialization)==SUCCESS);
     EXPECT_TRUE(numContexts == expectedNumContexts);
     EXPECT_TRUE(contextInitialization == expectedContextInitialization);
-    EXPECT_TRUE(getSegmentCtxFlag(cabacContextParameters, &segmentCtxFlag)==SUCCESS);
-    EXPECT_TRUE(segmentCtxFlag == expectedSegmentCtxFlag);
-    EXPECT_TRUE(getSegmentCtxLen(cabacContextParameters, &segmentCtxLen)==SUCCESS);
-    EXPECT_TRUE(segmentCtxLen == expectedSegmentCtxLen);
-    EXPECT_TRUE(getSegmentCtxOffset(cabacContextParameters, &segmentCtxOffset) == SUCCESS);
-    EXPECT_TRUE(segmentCtxOffset == expectedSegmentCtxOffset);
 
 
     cabacBinarization = constructCabacBinarizationExponentialGolomb_Bypass();
-    EXPECT_TRUE(cabacBinarization != NULL);
+    EXPECT_TRUE(cabacBinarization != nullptr);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_ExponentialGolomb);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == true);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getSplitUnitSize(cabacBinarization, &splitUnitSize) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
@@ -247,17 +199,12 @@ TEST_F(encodingParametersTest, binarization)
             expectedAdaptive_mode_flag,
             expectedNumContexts,
             expectedContextInitialization,
-            expectedShareSubSymCtxFlag,
-            expectedSegmentCtxFlag,
-            expectedSegmentCtxLen,
-            expectedSegmentCtxOffset
-    );
-    EXPECT_TRUE(cabacBinarization != NULL);
+            expectedShareSubSymCtxFlag);
+    EXPECT_TRUE(cabacBinarization != nullptr);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_SignedExponentialGolomb);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == false);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(!bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getSplitUnitSize(cabacBinarization, &splitUnitSize) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
@@ -267,20 +214,13 @@ TEST_F(encodingParametersTest, binarization)
     EXPECT_TRUE(getContextInitializationValues(cabacContextParameters, &numContexts, &contextInitialization)==SUCCESS);
     EXPECT_TRUE(numContexts == expectedNumContexts);
     EXPECT_TRUE(contextInitialization == expectedContextInitialization);
-    EXPECT_TRUE(getSegmentCtxFlag(cabacContextParameters, &segmentCtxFlag)==SUCCESS);
-    EXPECT_TRUE(segmentCtxFlag == expectedSegmentCtxFlag);
-    EXPECT_TRUE(getSegmentCtxLen(cabacContextParameters, &segmentCtxLen)==SUCCESS);
-    EXPECT_TRUE(segmentCtxLen == expectedSegmentCtxLen);
-    EXPECT_TRUE(getSegmentCtxOffset(cabacContextParameters, &segmentCtxOffset) == SUCCESS);
-    EXPECT_TRUE(segmentCtxOffset == expectedSegmentCtxOffset);
 
     cabacBinarization = constructCabacBinarizationSignedExponentialGolomb_Bypass();
-    EXPECT_TRUE(cabacBinarization != NULL);
+    EXPECT_TRUE(cabacBinarization != nullptr);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_SignedExponentialGolomb);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == true);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getSplitUnitSize(cabacBinarization, &splitUnitSize) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
@@ -291,17 +231,12 @@ TEST_F(encodingParametersTest, binarization)
             expectedAdaptive_mode_flag,
             expectedNumContexts,
             expectedContextInitialization,
-            expectedShareSubSymCtxFlag,
-            expectedSegmentCtxFlag,
-            expectedSegmentCtxLen,
-            expectedSegmentCtxOffset
-    );
-    EXPECT_TRUE(cabacBinarization != NULL);
+            expectedShareSubSymCtxFlag);
+    EXPECT_TRUE(cabacBinarization != nullptr);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_TruncatedExponentialGolomb);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == false);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(!bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == SUCCESS);
     EXPECT_TRUE(cTruncExpGolParam == expectedCTruncExpGolParam);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
@@ -312,21 +247,14 @@ TEST_F(encodingParametersTest, binarization)
     EXPECT_TRUE(getContextInitializationValues(cabacContextParameters, &numContexts, &contextInitialization)==SUCCESS);
     EXPECT_TRUE(numContexts == expectedNumContexts);
     EXPECT_TRUE(contextInitialization == expectedContextInitialization);
-    EXPECT_TRUE(getSegmentCtxFlag(cabacContextParameters, &segmentCtxFlag)==SUCCESS);
-    EXPECT_TRUE(segmentCtxFlag == expectedSegmentCtxFlag);
-    EXPECT_TRUE(getSegmentCtxLen(cabacContextParameters, &segmentCtxLen)==SUCCESS);
-    EXPECT_TRUE(segmentCtxLen == expectedSegmentCtxLen);
-    EXPECT_TRUE(getSegmentCtxOffset(cabacContextParameters, &segmentCtxOffset) == SUCCESS);
-    EXPECT_TRUE(segmentCtxOffset == expectedSegmentCtxOffset);
 
 
     cabacBinarization =  constructCabacBinarizationTruncatedExponentialGolomb_Bypass(cTruncExpGolParam);
-    EXPECT_TRUE(cabacBinarization != NULL);
+    EXPECT_TRUE(cabacBinarization != nullptr);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_TruncatedExponentialGolomb);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == true);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == SUCCESS);
     EXPECT_TRUE(expectedCTruncExpGolParam == cTruncExpGolParam);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
@@ -338,17 +266,12 @@ TEST_F(encodingParametersTest, binarization)
             expectedAdaptive_mode_flag,
             expectedNumContexts,
             expectedContextInitialization,
-            expectedShareSubSymCtxFlag,
-            expectedSegmentCtxFlag,
-            expectedSegmentCtxLen,
-            expectedSegmentCtxOffset
-    );
-    EXPECT_TRUE(cabacBinarization != NULL);
+            expectedShareSubSymCtxFlag);
+    EXPECT_TRUE(cabacBinarization != nullptr);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_SignedTruncatedExponentialGolomb);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == false);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(!bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == SUCCESS);
     EXPECT_TRUE(cTruncExpGolParam == expectedCTruncExpGolParam);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
@@ -359,20 +282,13 @@ TEST_F(encodingParametersTest, binarization)
     EXPECT_TRUE(getContextInitializationValues(cabacContextParameters, &numContexts, &contextInitialization)==SUCCESS);
     EXPECT_TRUE(numContexts == expectedNumContexts);
     EXPECT_TRUE(contextInitialization == expectedContextInitialization);
-    EXPECT_TRUE(getSegmentCtxFlag(cabacContextParameters, &segmentCtxFlag)==SUCCESS);
-    EXPECT_TRUE(segmentCtxFlag == expectedSegmentCtxFlag);
-    EXPECT_TRUE(getSegmentCtxLen(cabacContextParameters, &segmentCtxLen)==SUCCESS);
-    EXPECT_TRUE(segmentCtxLen == expectedSegmentCtxLen);
-    EXPECT_TRUE(getSegmentCtxOffset(cabacContextParameters, &segmentCtxOffset) == SUCCESS);
-    EXPECT_TRUE(segmentCtxOffset == expectedSegmentCtxOffset);
 
     cabacBinarization =  constructCabacBinarizationSignedTruncatedExponentialGolomb_Bypass(cTruncExpGolParam);
-    EXPECT_TRUE(cabacBinarization != NULL);
+    EXPECT_TRUE(cabacBinarization != nullptr);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_SignedTruncatedExponentialGolomb);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == true);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == SUCCESS);
     EXPECT_TRUE(expectedCTruncExpGolParam == cTruncExpGolParam);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
@@ -384,17 +300,12 @@ TEST_F(encodingParametersTest, binarization)
             expectedAdaptive_mode_flag,
             expectedNumContexts,
             expectedContextInitialization,
-            expectedShareSubSymCtxFlag,
-            expectedSegmentCtxFlag,
-            expectedSegmentCtxLen,
-            expectedSegmentCtxOffset
-    );
-    EXPECT_TRUE(cabacBinarization != NULL);
+            expectedShareSubSymCtxFlag);
+    EXPECT_TRUE(cabacBinarization != nullptr);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_SplitUnitWiseTruncatedUnary);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == false);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(!bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getSplitUnitSize(cabacBinarization, &splitUnitSize) == SUCCESS);
@@ -405,20 +316,13 @@ TEST_F(encodingParametersTest, binarization)
     EXPECT_TRUE(getContextInitializationValues(cabacContextParameters, &numContexts, &contextInitialization)==SUCCESS);
     EXPECT_TRUE(numContexts == expectedNumContexts);
     EXPECT_TRUE(contextInitialization == expectedContextInitialization);
-    EXPECT_TRUE(getSegmentCtxFlag(cabacContextParameters, &segmentCtxFlag)==SUCCESS);
-    EXPECT_TRUE(segmentCtxFlag == expectedSegmentCtxFlag);
-    EXPECT_TRUE(getSegmentCtxLen(cabacContextParameters, &segmentCtxLen)==SUCCESS);
-    EXPECT_TRUE(segmentCtxLen == expectedSegmentCtxLen);
-    EXPECT_TRUE(getSegmentCtxOffset(cabacContextParameters, &segmentCtxOffset) == SUCCESS);
-    EXPECT_TRUE(segmentCtxOffset == expectedSegmentCtxOffset);
 
     cabacBinarization =  constructCabacBinarizationSplitUnitwiseTruncatedUnary_Bypass(expectedSplitUnitSize);
-    EXPECT_TRUE(cabacBinarization != NULL);
+    EXPECT_TRUE(cabacBinarization != nullptr);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_SplitUnitWiseTruncatedUnary);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == true);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(expectedCTruncExpGolParam == cTruncExpGolParam);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
@@ -431,17 +335,12 @@ TEST_F(encodingParametersTest, binarization)
             expectedAdaptive_mode_flag,
             expectedNumContexts,
             expectedContextInitialization,
-            expectedShareSubSymCtxFlag,
-            expectedSegmentCtxFlag,
-            expectedSegmentCtxLen,
-            expectedSegmentCtxOffset
-    );
-    EXPECT_TRUE(cabacBinarization != NULL);
+            expectedShareSubSymCtxFlag);
+    EXPECT_TRUE(cabacBinarization != nullptr);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_SignedSplitUnitWiseTruncatedUnary);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == false);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(!bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getSplitUnitSize(cabacBinarization, &splitUnitSize) == SUCCESS);
@@ -452,20 +351,13 @@ TEST_F(encodingParametersTest, binarization)
     EXPECT_TRUE(getContextInitializationValues(cabacContextParameters, &numContexts, &contextInitialization)==SUCCESS);
     EXPECT_TRUE(numContexts == expectedNumContexts);
     EXPECT_TRUE(contextInitialization == expectedContextInitialization);
-    EXPECT_TRUE(getSegmentCtxFlag(cabacContextParameters, &segmentCtxFlag)==SUCCESS);
-    EXPECT_TRUE(segmentCtxFlag == expectedSegmentCtxFlag);
-    EXPECT_TRUE(getSegmentCtxLen(cabacContextParameters, &segmentCtxLen)==SUCCESS);
-    EXPECT_TRUE(segmentCtxLen == expectedSegmentCtxLen);
-    EXPECT_TRUE(getSegmentCtxOffset(cabacContextParameters, &segmentCtxOffset) == SUCCESS);
-    EXPECT_TRUE(segmentCtxOffset == expectedSegmentCtxOffset);
 
     cabacBinarization =  constructCabacBinarizationSignedSplitUnitwiseTruncatedUnary_Bypass(expectedSplitUnitSize);
-    EXPECT_TRUE(cabacBinarization != NULL);
+    EXPECT_TRUE(cabacBinarization != nullptr);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_SignedSplitUnitWiseTruncatedUnary);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == true);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(expectedCTruncExpGolParam == cTruncExpGolParam);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
@@ -479,17 +371,12 @@ TEST_F(encodingParametersTest, binarization)
             expectedAdaptive_mode_flag,
             expectedNumContexts,
             expectedContextInitialization,
-            expectedShareSubSymCtxFlag,
-            expectedSegmentCtxFlag,
-            expectedSegmentCtxLen,
-            expectedSegmentCtxOffset
-    );
-    EXPECT_TRUE(cabacBinarization != NULL);
+            expectedShareSubSymCtxFlag);
+    EXPECT_TRUE(cabacBinarization != nullptr);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_DoubleTruncatedUnary);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == false);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(!bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == SUCCESS);
     EXPECT_TRUE(cMaxDTU == expectedCMaxDTU);
@@ -501,20 +388,13 @@ TEST_F(encodingParametersTest, binarization)
     EXPECT_TRUE(getContextInitializationValues(cabacContextParameters, &numContexts, &contextInitialization)==SUCCESS);
     EXPECT_TRUE(numContexts == expectedNumContexts);
     EXPECT_TRUE(contextInitialization == expectedContextInitialization);
-    EXPECT_TRUE(getSegmentCtxFlag(cabacContextParameters, &segmentCtxFlag)==SUCCESS);
-    EXPECT_TRUE(segmentCtxFlag == expectedSegmentCtxFlag);
-    EXPECT_TRUE(getSegmentCtxLen(cabacContextParameters, &segmentCtxLen)==SUCCESS);
-    EXPECT_TRUE(segmentCtxLen == expectedSegmentCtxLen);
-    EXPECT_TRUE(getSegmentCtxOffset(cabacContextParameters, &segmentCtxOffset) == SUCCESS);
-    EXPECT_TRUE(segmentCtxOffset == expectedSegmentCtxOffset);
 
     cabacBinarization =  constructCabacBinarizationDoubleTruncatedUnary_Bypass(expectedCMaxDTU, expectedSplitUnitSize);
-    EXPECT_TRUE(cabacBinarization != NULL);
+    EXPECT_TRUE(cabacBinarization != nullptr);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_DoubleTruncatedUnary);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == true);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(expectedCTruncExpGolParam == cTruncExpGolParam);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == SUCCESS);
@@ -533,17 +413,12 @@ TEST_F(encodingParametersTest, binarization)
             expectedAdaptive_mode_flag,
             expectedNumContexts,
             expectedContextInitialization,
-            expectedShareSubSymCtxFlag,
-            expectedSegmentCtxFlag,
-            expectedSegmentCtxLen,
-            expectedSegmentCtxOffset
-    );
-    EXPECT_TRUE(cabacBinarization != NULL);
+            expectedShareSubSymCtxFlag);
+    EXPECT_TRUE(cabacBinarization != nullptr);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_SignedDoubleTruncatedUnary);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == false);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(!bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == SUCCESS);
     EXPECT_TRUE(cMaxDTU == expectedCMaxDTU);
@@ -555,20 +430,13 @@ TEST_F(encodingParametersTest, binarization)
     EXPECT_TRUE(getContextInitializationValues(cabacContextParameters, &numContexts, &contextInitialization)==SUCCESS);
     EXPECT_TRUE(numContexts == expectedNumContexts);
     EXPECT_TRUE(contextInitialization == expectedContextInitialization);
-    EXPECT_TRUE(getSegmentCtxFlag(cabacContextParameters, &segmentCtxFlag)==SUCCESS);
-    EXPECT_TRUE(segmentCtxFlag == expectedSegmentCtxFlag);
-    EXPECT_TRUE(getSegmentCtxLen(cabacContextParameters, &segmentCtxLen)==SUCCESS);
-    EXPECT_TRUE(segmentCtxLen == expectedSegmentCtxLen);
-    EXPECT_TRUE(getSegmentCtxOffset(cabacContextParameters, &segmentCtxOffset) == SUCCESS);
-    EXPECT_TRUE(segmentCtxOffset == expectedSegmentCtxOffset);
 
     cabacBinarization =  constructCabacBinarizationSignedDoubleTruncatedUnary_Bypass(expectedCMaxDTU, expectedSplitUnitSize);
-    EXPECT_TRUE(cabacBinarization != NULL);
+    EXPECT_TRUE(cabacBinarization != nullptr);
     EXPECT_TRUE(getBinarizationId(cabacBinarization, &binarization_ID)==SUCCESS);
     EXPECT_TRUE(binarization_ID == BinarizationID_SignedDoubleTruncatedUnary);
     EXPECT_TRUE(getBypassFlag(cabacBinarization, &bypassFlag)==SUCCESS);
-    EXPECT_TRUE(bypassFlag == true);
-    EXPECT_TRUE(getBIFullCtxMode(cabacBinarization, &BIFullCtxMode) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
+    EXPECT_TRUE(bypassFlag);
     EXPECT_TRUE(getCTruncExpGolParam(cabacBinarization, &cTruncExpGolParam) == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
     EXPECT_TRUE(expectedCTruncExpGolParam == cTruncExpGolParam);
     EXPECT_TRUE(getcMaxDTU(cabacBinarization, &cMaxDTU) == SUCCESS);
@@ -580,7 +448,7 @@ TEST_F(encodingParametersTest, binarization)
 
 TEST_F(encodingParametersTest, decoderConfigurationTypeCABAC)
 {
-    TransformSubSymIdEnum** transformSubSymIdEnums = (TransformSubSymIdEnum**)malloc(20*sizeof(TransformSubSymIdEnum*));
+    auto ** transformSubSymIdEnums = (TransformSubSymIdEnum**)malloc(20*sizeof(TransformSubSymIdEnum*));
     for(int descriptor_i=0; descriptor_i<20; descriptor_i++) {
         transformSubSymIdEnums[descriptor_i]=(TransformSubSymIdEnum *)malloc(20*sizeof(TransformSubSymIdEnum));
         for(int transform_Id_subsym=0; transform_Id_subsym<3; transform_Id_subsym++){
@@ -593,7 +461,7 @@ TEST_F(encodingParametersTest, decoderConfigurationTypeCABAC)
 
     }
 
-    Support_valuesType*** supportValuesCollection = (Support_valuesType***)malloc(20*sizeof(Support_valuesType**));
+    auto *** supportValuesCollection = (Support_valuesType***)malloc(20*sizeof(Support_valuesType**));
     for(int descriptor_i=0; descriptor_i<20; descriptor_i++) {
         supportValuesCollection[descriptor_i] = (Support_valuesType **) malloc(3 * sizeof(Support_valuesType *));
     }
@@ -616,21 +484,21 @@ TEST_F(encodingParametersTest, decoderConfigurationTypeCABAC)
         }
     }
 
-    Cabac_binarizationsType*** cabacBinarizations = (Cabac_binarizationsType***)malloc(20*sizeof(Cabac_binarizationsType**));
+    auto *** cabacBinarizations = (Cabac_binarizationsType***)malloc(20*sizeof(Cabac_binarizationsType**));
     for(int descriptor_i=0; descriptor_i<20; descriptor_i++) {
         cabacBinarizations[descriptor_i] = (Cabac_binarizationsType **) malloc(3 * sizeof(Cabac_binarizationsType *));
     }
     for(int descriptor_i=0; descriptor_i<20; descriptor_i++) {
         for(int transform_Id_subsym=0; transform_Id_subsym<3; transform_Id_subsym++){
-            cabacBinarizations[descriptor_i][transform_Id_subsym]=constructCabacBinarizationTruncatedUnary_Bypass();
+            cabacBinarizations[descriptor_i][transform_Id_subsym]= constructCabacBinarizationTruncatedUnary_Bypass(0);
         }
     }
-    uint16_t* descriptor_subsequence_id = (uint16_t*)malloc(20*sizeof(uint16_t));
+    auto * descriptor_subsequence_id = (uint16_t*)malloc(20*sizeof(uint16_t));
     for(int descriptor_subsequence_i=0; descriptor_subsequence_i<20; descriptor_subsequence_i++){
         descriptor_subsequence_id[descriptor_subsequence_i] = (uint16_t) descriptor_subsequence_i;
     }
 
-    Transform_subseq_parametersType** transformSubseqParameters2
+    auto ** transformSubseqParameters2
             = (Transform_subseq_parametersType**)malloc(20*sizeof(Transform_subseq_parametersType*));
     for(int transformSubSeq = 0; transformSubSeq<5; transformSubSeq++) {
         for (int symbolSizeInequality = 0; symbolSizeInequality < 2; symbolSizeInequality++) {
@@ -646,12 +514,9 @@ TEST_F(encodingParametersTest, decoderConfigurationTypeCABAC)
                     case 2:
                         newOne = constructMatchCodingSubseqTransformSubseqParameters(40);
                         break;
+                    default:
                     case 3:
                         newOne = constructRLECodingSubseqTransformSubseqParameters(50);
-                        break;
-                    default:
-                    case 4:
-                        newOne = constructRLEQVCodingSubseqTransformSubseqParameters();
                         break;
 
                 }
@@ -680,7 +545,7 @@ TEST_F(encodingParametersTest, decoderConfigurationTypeCABAC)
         for (int symbolSizeInequality = 0; symbolSizeInequality < 2; symbolSizeInequality++) {
             for (uint8_t coding_order = 0; coding_order < 2; coding_order++) {
 
-                uint16_t descriptorSubSequence =
+                auto descriptorSubSequence =
                         (uint16_t) (transformSubSeq + 10 * symbolSizeInequality + 5 * coding_order);
 
                 uint16_t retrievedId;
@@ -720,38 +585,37 @@ TEST_F(encodingParametersTest, decoderConfigurationTypeCABAC)
 
                 EXPECT_TRUE(rcSubSeqId == SUCCESS);
                 switch(transformSubSeq){
-                    default:
                     case 0:
+                        EXPECT_EQ(SUCCESS, rcTransformSubSymCounter);
                         EXPECT_TRUE(resultSubSeqId == SubSeq_NO_TRANSFORM);
                         EXPECT_TRUE(rcBufferSize == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
                         EXPECT_TRUE(rcCodingguard == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
                         EXPECT_TRUE(transformSubseqCounter == 1);
                         break;
                     case 1:
+                        EXPECT_EQ(SUCCESS, rcTransformSubSymCounter);
                         EXPECT_TRUE(resultSubSeqId == SubSeq_EQUALITY_CODING);
                         EXPECT_TRUE(rcBufferSize == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
                         EXPECT_TRUE(rcCodingguard == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
                         EXPECT_TRUE(transformSubseqCounter == 2);
                         break;
                     case 2:
+                        EXPECT_EQ(SUCCESS, rcTransformSubSymCounter);
                         EXPECT_TRUE(resultSubSeqId == SubSeq_MATCH_CODING);
                         EXPECT_TRUE(rcBufferSize == SUCCESS);
                         EXPECT_TRUE(resultBufferSize == 40);
                         EXPECT_TRUE(rcCodingguard == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
                         EXPECT_TRUE(transformSubseqCounter == 3);
                         break;
+                    default:
                     case 3:
+                        EXPECT_EQ(SUCCESS, rcTransformSubSymCounter);
                         EXPECT_TRUE(resultSubSeqId == SubSeq_RLE_CODING);
                         EXPECT_TRUE(rcBufferSize == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
                         EXPECT_TRUE(rcCodingguard == SUCCESS);
                         EXPECT_TRUE(transformSubseqCounter == 2);
                         EXPECT_TRUE(resultCodingGuard == 50);
                         break;
-                    case 4:
-                        EXPECT_TRUE(resultSubSeqId == SubSeq_RLE_QV_CODING);
-                        EXPECT_TRUE(rcBufferSize == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
-                        EXPECT_TRUE(rcCodingguard == FIELDs_EXISTANCE_CONDITIONS_NOT_MET);
-                        EXPECT_TRUE(transformSubseqCounter == 1);
                 }
 
                 for(uint16_t transformSubsym_i = 0; transformSubsym_i < transformSubseqCounter; transformSubsym_i++){
@@ -769,7 +633,7 @@ TEST_F(encodingParametersTest, decoderConfigurationTypeCABAC)
                     }
 
                     uint8_t expected_outputSymbolSize = 4;
-                    uint8_t expected_codingSymbolSize = (uint8_t) (symbolSizeInequality ? 5 : 3);
+                    auto expected_codingSymbolSize = (uint8_t) (symbolSizeInequality ? 5 : 3);
                     uint8_t expected_coding_order = coding_order;
                     bool expected_shareSubSymLutFlag = true;
                     bool expected_shareSubsymPrvFlag = true;
@@ -864,7 +728,7 @@ TEST_F(encodingParametersTest, decoderConfigurationTokentypeCABAC)
     uint8_t expected_coding_order = 1;
     bool expected_share_subsym_lut_flag = true;
     bool expected_share_subsym_prv_flag = true;
-    Cabac_binarizationsType* expectedCabacBinarizations = constructCabacBinarizationTruncatedUnary_Bypass();
+    Cabac_binarizationsType* expectedCabacBinarizations = constructCabacBinarizationTruncatedUnary_Bypass(0);
 
     uint8_t retrieved_output_symbol_size_tokentype;
     uint8_t retrieved_output_symbol_size;
@@ -873,7 +737,6 @@ TEST_F(encodingParametersTest, decoderConfigurationTokentypeCABAC)
     uint8_t retrieved_coding_symbol_size;
     uint8_t retrieved_coding_order;
     bool retrieved_share_subsym_lut_flag;
-    bool retrieved_share_subsym_prv_flag;
     Cabac_binarizationsType* retrievedCabacBinarizations;
 
 
@@ -894,7 +757,7 @@ TEST_F(encodingParametersTest, decoderConfigurationTokentypeCABAC)
             expected_support_values,
             expectedCabacBinarizations
     );
-    EXPECT_TRUE(decoderConfigurationTokentypeCABAC != NULL);
+    EXPECT_TRUE(decoderConfigurationTokentypeCABAC != nullptr);
     EXPECT_TRUE(getOutputSymbolSizeToken(decoderConfigurationTokentypeCABAC, &retrieved_output_symbol_size_tokentype)==SUCCESS);
     EXPECT_TRUE(expected_output_symbol_size_tokentype == retrieved_output_symbol_size_tokentype);
     EXPECT_TRUE(getCodingSymbolsNumbers(decoderConfigurationTokentypeCABAC, &retrieved_coding_symbols_tokentype_numbers)==SUCCESS);
