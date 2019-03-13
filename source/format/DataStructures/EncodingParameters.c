@@ -217,6 +217,15 @@ EncodingParametersRC getCabacContextParameters(
     *cabac_context_parameters = cabac_binarizations->cabac_context_parameters;
     return SUCCESS;
 }
+EncodingParametersRC getCabacBinarizationParameters(
+        Cabac_binarizationsType* cabac_binarizations, Cabac_binarization_parametersType** cabac_binarization_parametersType
+){
+    if(cabac_binarizations == NULL){
+        return NULL_PTR;
+    }
+    *cabac_binarization_parametersType = cabac_binarizations->cabac_binarization_parameters;
+    return SUCCESS;
+}
 
 EncodingParametersRC getDatasetTypeParameters(Encoding_ParametersType* encodingParameters, uint8_t* datasetType){
     if(encodingParameters == NULL || datasetType == NULL){
@@ -739,7 +748,7 @@ EncodingParametersRC getSupportValueShareSubsymPRVFlag(
 
 EncodingParametersRC getCabacBinarizationsToken(
         Decoder_configuration_tokentype_cabac *decoder_configuration_tokentype_cabac,
-        Cabac_binarizationsType **cabacBinarizations
+        Cabac_binarizationsType** cabacBinarizations
 ){
     if(decoder_configuration_tokentype_cabac == NULL || cabacBinarizations == NULL ){
         return NULL_PTR;
@@ -1080,6 +1089,7 @@ bool writeDecoderConfigurationTokentypeCabac(
                 decoderConfigurationTokentypeCabac->support_values[transformSubseq_i]->output_symbol_size
         );
     }
+    return true;
 }
 
 bool writeDecoder_configuration_tokentype_TypeCABAC(

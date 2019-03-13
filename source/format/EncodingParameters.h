@@ -145,6 +145,10 @@ EncodingParametersRC getCabacContextParameters(
         Cabac_binarizationsType* cabac_binarizations,
         Cabac_context_parametersType** cabac_context_parameters
 );
+EncodingParametersRC getCabacBinarizationParameters(
+        Cabac_binarizationsType* cabac_binarizations,
+        Cabac_binarization_parametersType** Cabac_binarization_parameters
+);
 Cabac_binarizationsType *readCabacBinarization(InputBitstream *input,
                                                uint8_t coding_subsym_size,
                                                uint8_t output_symbol_size);

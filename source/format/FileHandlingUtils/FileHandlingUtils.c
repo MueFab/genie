@@ -38,7 +38,7 @@ Ref_information readRefInformation(char* refInfoFilePath){
         printf("> errno:%d feof:%d ferror:%d retval:%p s[0]:%d\n\n",
                errno, feof(refInfoInputFile), ferror(refInfoInputFile), returnedValue, ref_information.refUri[0]);
     }
-    fscanf(refInfoInputFile, "%i\n", &(ref_information.numberSequences));
+    fscanf(refInfoInputFile, "%hhu\n", &(ref_information.numberSequences));
     ref_information.sequenceName = (char**)calloc(ref_information.numberSequences, sizeof(char*));
     for(int i=0; i<ref_information.numberSequences; i++){
         ref_information.sequenceName[i] = (char*)calloc(1024, sizeof(char));
