@@ -73,6 +73,7 @@ int writeSymbol(
         }
 
     }
+    return 0;
 }
 
 int writeTerminator(SignatureIntegerOutputStream* signatureIntegerOutputStream){

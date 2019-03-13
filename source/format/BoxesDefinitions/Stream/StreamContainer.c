@@ -264,17 +264,17 @@ bool generateStreamSeekPoints(StreamContainer* streamContainer){
     fprintf(
             stdout,
             "\tstream @ %li-%li\n",
-            getStreamContainerSeekPosition(streamContainer),
-            getStreamContainerSeekPosition(streamContainer)
-            + getSizeContentStreamContainer(streamContainer)
+            (size_t)(getStreamContainerSeekPosition(streamContainer)),
+            (size_t)(getStreamContainerSeekPosition(streamContainer)
+            + getSizeContentStreamContainer(streamContainer))
     );
     if(streamContainer->streamHeader != NULL) {
         fprintf(
                 stdout,
                 "\t\tstream header @ %li-%li\n",
-                getStreamHeaderSeekPosition(streamContainer->streamHeader),
-                getStreamHeaderSeekPosition(streamContainer->streamHeader)
-                + getSizeContentStreamHeader()
+                (size_t)(getStreamHeaderSeekPosition(streamContainer->streamHeader)),
+                (size_t)(getStreamHeaderSeekPosition(streamContainer->streamHeader)
+                + getSizeContentStreamHeader())
         );
     }
     if(streamContainer->streamProtection != NULL) {
@@ -282,8 +282,8 @@ bool generateStreamSeekPoints(StreamContainer* streamContainer){
                 stdout,
                 "\t\tstream protection @ %li-%li\n",
                 getStreamProtectionSeekPosition(streamContainer->streamProtection),
-                getStreamProtectionSeekPosition(streamContainer->streamProtection)
-                + getSizeContentStreamProtection(streamContainer->streamProtection)
+                (size_t)(getStreamProtectionSeekPosition(streamContainer->streamProtection)
+                + getSizeContentStreamProtection(streamContainer->streamProtection))
         );
     }
     /*fprintf(

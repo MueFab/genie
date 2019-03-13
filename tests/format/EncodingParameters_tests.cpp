@@ -173,53 +173,370 @@ void testDecoderConfigurationCabac(DecoderConfigurationTypeCABAC* decoderConfigu
 
 
     Transform_subseq_parametersType* transform_subseq_parameters_buffer;
-
-    auto ** transform_subseq_parameters =
-            (Transform_subseq_parametersType**)malloc(sizeof(Transform_subseq_parametersType)*5);
-    transform_subseq_parameters[0] = constructNoTransformSubseqParameters();
-    transform_subseq_parameters[1] = constructEqualityCodingTransformSubseqParameters();
-    transform_subseq_parameters[2] = constructMatchCodingSubseqTransformSubseqParameters(255);
-    transform_subseq_parameters[3] = constructRLECodingSubseqTransformSubseqParameters(5);
-    auto * merge_coding_shift_size = (uint8_t*)malloc(sizeof(uint8_t)*2);
-    merge_coding_shift_size[0]=1;
-    merge_coding_shift_size[1]=2;
-    transform_subseq_parameters[4] = constructMergeCodingSubseqTransformSubseqParameters(
-            2, merge_coding_shift_size
+    TransformSubSeqIdEnum transform_ID_subseq_buffer;
+    uint16_t match_coding_buffer_size_buffer;
+    uint8_t merge_coding_subseq_count_buffer;
+    uint8_t* merge_coding_shift_size_buffer;
+    uint8_t rle_coding_guard_buffer;
+    EXPECT_EQ(
+            SUCCESS,
+            getTransformSubseqParameters(decoderConfigurationTypeCABAC, 0, &transform_subseq_parameters_buffer)
+    );
+    EXPECT_EQ(
+            SUCCESS,
+            getTransformSubSeqId(transform_subseq_parameters_buffer, &transform_ID_subseq_buffer)
+    );
+    EXPECT_EQ(SubSeq_NO_TRANSFORM, transform_ID_subseq_buffer);
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getMatchCodingBufferSize(transform_subseq_parameters_buffer, &match_coding_buffer_size_buffer)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getRLECodingGuard(transform_subseq_parameters_buffer, &rle_coding_guard_buffer)
     );
 
-    auto ** transform_id_subsyms = (TransformSubSymIdEnum**)malloc(5*sizeof(TransformSubSymIdEnum*));
-    transform_id_subsyms[0] = (TransformSubSymIdEnum*)malloc(1* sizeof(TransformSubSymIdEnum));
-    transform_id_subsyms[0][0] = SubSym_NO_TRANSFORM;
-    transform_id_subsyms[1] = (TransformSubSymIdEnum*)malloc(2* sizeof(TransformSubSymIdEnum));
-    transform_id_subsyms[1][0] = SubSym_NO_TRANSFORM;
-    transform_id_subsyms[1][1] = SubSym_DIFF_CODING;
-    transform_id_subsyms[2] = (TransformSubSymIdEnum*)malloc(3* sizeof(TransformSubSymIdEnum));
-    transform_id_subsyms[2][0] = SubSym_NO_TRANSFORM;
-    transform_id_subsyms[2][1] = SubSym_DIFF_CODING;
-    transform_id_subsyms[2][2] = SubSym_LUT_TRANSFORM;
-    transform_id_subsyms[3] = (TransformSubSymIdEnum*)malloc(2* sizeof(TransformSubSymIdEnum));
-    transform_id_subsyms[3][0] = SubSym_NO_TRANSFORM;
-    transform_id_subsyms[3][1] = SubSym_DIFF_CODING;
-    transform_id_subsyms[4] = (TransformSubSymIdEnum*)malloc(2* sizeof(TransformSubSymIdEnum));
-    transform_id_subsyms[4][0] = SubSym_NO_TRANSFORM;
-    transform_id_subsyms[4][1] = SubSym_DIFF_CODING;
+    EXPECT_EQ(
+            SUCCESS,
+            getTransformSubseqParameters(decoderConfigurationTypeCABAC, 1, &transform_subseq_parameters_buffer)
+    );
+    EXPECT_EQ(
+            SUCCESS,
+            getTransformSubSeqId(transform_subseq_parameters_buffer, &transform_ID_subseq_buffer)
+    );
+    EXPECT_EQ(SubSeq_EQUALITY_CODING, transform_ID_subseq_buffer);
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getMatchCodingBufferSize(transform_subseq_parameters_buffer, &match_coding_buffer_size_buffer)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getRLECodingGuard(transform_subseq_parameters_buffer, &rle_coding_guard_buffer)
+    );
 
-    auto *** support_values = (Support_valuesType***)malloc(5*sizeof(Support_valuesType**));
-    support_values[0] = (Support_valuesType**)malloc(1 * sizeof(Support_valuesType*));
-    support_values[0][0] = constructSupportValues(3,4,1,false,false);
-    support_values[1] = (Support_valuesType**)malloc(2 * sizeof(Support_valuesType*));
-    support_values[1][0] = constructSupportValues(3,4,1,false,false);
-    support_values[1][1] = constructSupportValues(3,4,1,false,false);
-    support_values[2] = (Support_valuesType**)malloc(3 * sizeof(Support_valuesType*));
-    support_values[2][0] = constructSupportValues(3,4,1,false,false);
-    support_values[2][1] = constructSupportValues(3,4,1,false,false);
-    support_values[2][2] = constructSupportValues(3,4,1,false,false);
-    support_values[3] = (Support_valuesType**)malloc(2 * sizeof(Support_valuesType*));
-    support_values[3][0] = constructSupportValues(3,4,1,false,false);
-    support_values[3][1] = constructSupportValues(3,4,1,false,false);
-    support_values[4] = (Support_valuesType**)malloc(2 * sizeof(Support_valuesType*));
-    support_values[4][0] = constructSupportValues(3,4,1,false,false);
-    support_values[4][1] = constructSupportValues(3,4,1,false,false);
+    EXPECT_EQ(
+            SUCCESS,
+            getTransformSubseqParameters(decoderConfigurationTypeCABAC, 2, &transform_subseq_parameters_buffer)
+    );
+    EXPECT_EQ(
+            SUCCESS,
+            getTransformSubSeqId(transform_subseq_parameters_buffer, &transform_ID_subseq_buffer)
+    );
+    EXPECT_EQ(SubSeq_MATCH_CODING, transform_ID_subseq_buffer);
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getMatchCodingBufferSize(transform_subseq_parameters_buffer, &match_coding_buffer_size_buffer)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getRLECodingGuard(transform_subseq_parameters_buffer, &rle_coding_guard_buffer)
+    );
+
+    EXPECT_EQ(
+            SUCCESS,
+            getTransformSubseqParameters(decoderConfigurationTypeCABAC, 3, &transform_subseq_parameters_buffer)
+    );
+    EXPECT_EQ(
+            SUCCESS,
+            getTransformSubSeqId(transform_subseq_parameters_buffer, &transform_ID_subseq_buffer)
+    );
+    EXPECT_EQ(SubSeq_RLE_CODING, transform_ID_subseq_buffer);
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getMatchCodingBufferSize(transform_subseq_parameters_buffer, &match_coding_buffer_size_buffer)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getRLECodingGuard(transform_subseq_parameters_buffer, &rle_coding_guard_buffer)
+    );
+
+
+
+    uint8_t output_symbol_size_buffer;
+    uint8_t coding_symbol_size_buffer;
+    uint8_t coding_order_buffer;
+    bool share_subsym_lut_flag_buffer;
+    bool share_subsym_prv_flag_buffer;
+
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueOutputSymbolSize(decoderConfigurationTypeCABAC, 0, 0, &output_symbol_size_buffer)
+    );
+    EXPECT_EQ(3, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueOutputSymbolSize(decoderConfigurationTypeCABAC, 1, 0, &output_symbol_size_buffer)
+    );
+    EXPECT_EQ(3, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueOutputSymbolSize(decoderConfigurationTypeCABAC, 1, 1, &output_symbol_size_buffer)
+    );
+    EXPECT_EQ(3, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueOutputSymbolSize(decoderConfigurationTypeCABAC, 2, 0, &output_symbol_size_buffer)
+    );
+    EXPECT_EQ(3, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueOutputSymbolSize(decoderConfigurationTypeCABAC, 2, 1, &output_symbol_size_buffer)
+    );
+    EXPECT_EQ(3, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueOutputSymbolSize(decoderConfigurationTypeCABAC, 2, 2, &output_symbol_size_buffer)
+    );
+    EXPECT_EQ(3, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueOutputSymbolSize(decoderConfigurationTypeCABAC, 3, 0, &output_symbol_size_buffer)
+    );
+    EXPECT_EQ(3, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueOutputSymbolSize(decoderConfigurationTypeCABAC, 3, 1, &output_symbol_size_buffer)
+    );
+    EXPECT_EQ(3, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueOutputSymbolSize(decoderConfigurationTypeCABAC, 4, 0, &output_symbol_size_buffer)
+    );
+    EXPECT_EQ(3, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueOutputSymbolSize(decoderConfigurationTypeCABAC, 4, 1, &output_symbol_size_buffer)
+    );
+    EXPECT_EQ(3, output_symbol_size_buffer);
+
+
+
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 0, 0, &coding_symbol_size_buffer)
+    );
+    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 1, 0, &coding_symbol_size_buffer)
+    );
+    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 1, 1, &coding_symbol_size_buffer)
+    );
+    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 2, 0, &coding_symbol_size_buffer)
+    );
+    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 2, 1, &coding_symbol_size_buffer)
+    );
+    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 2, 2, &coding_symbol_size_buffer)
+    );
+    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 3, 0, &coding_symbol_size_buffer)
+    );
+    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 3, 1, &coding_symbol_size_buffer)
+    );
+    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 4, 0, &coding_symbol_size_buffer)
+    );
+    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 4, 1, &coding_symbol_size_buffer)
+    );
+    EXPECT_EQ(4, output_symbol_size_buffer);
+
+
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 0, 0, &coding_order_buffer)
+    );
+    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 1, 0, &coding_order_buffer)
+    );
+    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 1, 1, &coding_order_buffer)
+    );
+    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 2, 0, &coding_order_buffer)
+    );
+    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 2, 1, &coding_order_buffer)
+    );
+    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 2, 2, &coding_order_buffer)
+    );
+    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 3, 0, &coding_order_buffer)
+    );
+    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 3, 1, &coding_order_buffer)
+    );
+    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 4, 0, &coding_order_buffer)
+    );
+    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(
+            SUCCESS,
+            getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 4, 1, &coding_order_buffer)
+    );
+    EXPECT_EQ(1, output_symbol_size_buffer);
+
+
+
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymLUTFlag(decoderConfigurationTypeCABAC, 0, 0, &share_subsym_lut_flag_buffer)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymLUTFlag(decoderConfigurationTypeCABAC, 1, 0, &share_subsym_lut_flag_buffer)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymLUTFlag(decoderConfigurationTypeCABAC, 1, 1, &share_subsym_lut_flag_buffer)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymLUTFlag(decoderConfigurationTypeCABAC, 2, 0, &share_subsym_lut_flag_buffer)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymLUTFlag(decoderConfigurationTypeCABAC, 2, 1, &share_subsym_lut_flag_buffer)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymLUTFlag(decoderConfigurationTypeCABAC, 2, 2, &share_subsym_lut_flag_buffer)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymLUTFlag(decoderConfigurationTypeCABAC, 3, 0, &share_subsym_lut_flag_buffer)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymLUTFlag(decoderConfigurationTypeCABAC, 3, 1, &share_subsym_lut_flag_buffer)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymLUTFlag(decoderConfigurationTypeCABAC, 4, 0, &share_subsym_lut_flag_buffer)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymLUTFlag(decoderConfigurationTypeCABAC, 4, 1, &share_subsym_lut_flag_buffer)
+    );
+
+
+    Cabac_binarizationsType* cabac_binarizations_buffer;
+    uint8_t binarizationId_buffer;
+    bool bypassFlag_buffer;
+    Cabac_binarization_parametersType* cabac_binarization_parameters_buffer;
+    bool adaptive_mode_flag_buffer;
+    uint16_t num_contexts_buffer;
+    uint8_t *context_initialization_value_buffer;
+    bool share_sub_sym_ctx_flag_buffer;
+
+
+    EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 0, 0, &cabac_binarizations_buffer));
+    EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
+    EXPECT_EQ(BinarizationID_BinaryCoding, binarizationId_buffer);
+    EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
+    EXPECT_TRUE(bypassFlag_buffer);
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getCabacBinarizationParameters(cabac_binarizations_buffer, &cabac_binarization_parameters_buffer)
+    );
+    EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 1, 0, &cabac_binarizations_buffer));
+    EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
+    EXPECT_EQ(BinarizationID_BinaryCoding, binarizationId_buffer);
+    EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
+    EXPECT_TRUE(bypassFlag_buffer);
+    EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 1, 1, &cabac_binarizations_buffer));
+    EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
+    EXPECT_EQ(BinarizationID_BinaryCoding, binarizationId_buffer);
+    EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
+    EXPECT_FALSE(bypassFlag_buffer);
+    EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 2, 0, &cabac_binarizations_buffer));
+    EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
+    EXPECT_EQ(BinarizationID_DoubleTruncatedUnary, binarizationId_buffer);
+    EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
+    EXPECT_FALSE(bypassFlag_buffer);
+    EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 2, 1, &cabac_binarizations_buffer));
+    EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
+    EXPECT_EQ(BinarizationID_ExponentialGolomb, binarizationId_buffer);
+    EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
+    EXPECT_TRUE(bypassFlag_buffer);
+    EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 2, 2, &cabac_binarizations_buffer));
+    EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
+    EXPECT_EQ(BinarizationID_ExponentialGolomb, binarizationId_buffer);
+    EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
+    EXPECT_FALSE(bypassFlag_buffer);
+    EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 3, 0, &cabac_binarizations_buffer));
+    EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
+    EXPECT_EQ(BinarizationID_SignedExponentialGolomb, binarizationId_buffer);
+    EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
+    EXPECT_TRUE(bypassFlag_buffer);
+    EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 3, 1, &cabac_binarizations_buffer));
+    EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
+    EXPECT_EQ(BinarizationID_SignedExponentialGolomb, binarizationId_buffer);
+    EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
+    EXPECT_FALSE(bypassFlag_buffer);
+    EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 4, 0, &cabac_binarizations_buffer));
+    EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
+    EXPECT_EQ(BinarizationID_TruncatedExponentialGolomb, binarizationId_buffer);
+    EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
+    EXPECT_FALSE(bypassFlag_buffer);
+    EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 4, 1, &cabac_binarizations_buffer));
+    EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
+    EXPECT_EQ(BinarizationID_SignedTruncatedExponentialGolomb, binarizationId_buffer);
+    EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
+    EXPECT_TRUE(bypassFlag_buffer);
+
+    EncodingParametersRC getCTruncExpGolParam(
+            Cabac_binarizationsType* cabac_binarizations,
+            uint8_t* cTruncExpGolParam
+    ){
+        if(cabac_binarizations == NULL || cabac_binarizations->cabac_binarization_parameters == NULL || cTruncExpGolParam == NULL){
+            return NULL_PTR;
+        }
+        return getCTruncExpGolParam_BinarizationParameters(
+                cabac_binarizations->cabac_binarization_parameters,
+                cabac_binarizations->binarization_ID,
+                cTruncExpGolParam
+        );
+    }
+
 
     auto *** cabac_binarizations = (Cabac_binarizationsType***)malloc(5*sizeof(Cabac_binarizationsType));
     cabac_binarizations[0] = (Cabac_binarizationsType**)malloc(1 * sizeof(Cabac_binarizationsType));

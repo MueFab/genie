@@ -16,7 +16,7 @@ FileHeader *initFileHeader(char *minorVersion) {
 }
 
 void freeFileHeader(FileHeader* fileHeader){
-    for(uint i=0; i<getSize(fileHeader->compatibleBrands); i++ ){
+    for(uint8_t i=0; i<getSize(fileHeader->compatibleBrands); i++ ){
         free(getValue(fileHeader->compatibleBrands,i));
     }
     freeVector(fileHeader->compatibleBrands);
@@ -53,7 +53,7 @@ bool writeFileHeaderContent(FileHeader* fileHeader, FILE* outputFile){
         fprintf(stderr, "Failed to write either major brand or minor version in file header.\n");
         return false;
     }
-    for(uint i=0; i<getSize(fileHeader->compatibleBrands); i++){
+    for(uint8_t i=0; i<getSize(fileHeader->compatibleBrands); i++){
         size_t compatibleBrandWrittenSize = fwrite(getValue(fileHeader->compatibleBrands,i),sizeof(char),
                                                    BRAND_SIZE,outputFile);
         if(compatibleBrandWrittenSize != BRAND_SIZE){

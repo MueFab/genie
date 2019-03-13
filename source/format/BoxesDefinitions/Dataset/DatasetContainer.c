@@ -574,16 +574,16 @@ bool generateDatasetSeekPoints(DatasetContainer* datasetContainer){
             stdout,
             "dataset @ %li-%li\n",
             getDatasetContainerSeekPosition(datasetContainer),
-            getDatasetContainerSeekPosition(datasetContainer) +
-                    getSizeContentDatasetContainer(datasetContainer)
+            (size_t)(getDatasetContainerSeekPosition(datasetContainer) +
+                    getSizeContentDatasetContainer(datasetContainer))
     );
     if (datasetContainer->datasetHeader!= NULL) {
         fprintf(
                 stdout,
                 "\tdataset header @ %li-%li\n",
                 getDatasetHeaderSeekPosition(datasetContainer->datasetHeader),
-                getDatasetHeaderSeekPosition(datasetContainer->datasetHeader) +
-                    getSizeContentDatasetHeader(datasetContainer->datasetHeader)
+                (size_t)(getDatasetHeaderSeekPosition(datasetContainer->datasetHeader) +
+                    getSizeContentDatasetHeader(datasetContainer->datasetHeader))
         );
     }
     if (datasetContainer->datasetMasterIndexTable!= NULL) {
@@ -591,8 +591,8 @@ bool generateDatasetSeekPoints(DatasetContainer* datasetContainer){
                 stdout,
                 "\tmaster index table: @ %li-%li\n",
                 getDatasetMasterIndexTableSeekPosition(datasetContainer->datasetMasterIndexTable),
-                getDatasetMasterIndexTableSeekPosition(datasetContainer->datasetMasterIndexTable) +
-                getSizeContentDatasetMasterIndexTable(datasetContainer->datasetMasterIndexTable)
+                (size_t)(getDatasetMasterIndexTableSeekPosition(datasetContainer->datasetMasterIndexTable) +
+                getSizeContentDatasetMasterIndexTable(datasetContainer->datasetMasterIndexTable))
         );
     }
     if (datasetContainer->datasetParameters!= NULL) {
@@ -607,8 +607,8 @@ bool generateDatasetSeekPoints(DatasetContainer* datasetContainer){
                         stdout,
                         "\tdataset parameters @ %li-%li\n",
                         getDatasetParametersSeekPosition(datasetParameters),
-                        getDatasetParametersSeekPosition(datasetParameters) +
-                        getSizeContentDatasetParameters(datasetParameters)
+                        (size_t)(getDatasetParametersSeekPosition(datasetParameters) +
+                        getSizeContentDatasetParameters(datasetParameters))
                 );
             }
         }
@@ -628,8 +628,8 @@ bool generateDatasetSeekPoints(DatasetContainer* datasetContainer){
                 stdout,
                 "\tdataset metadata @ %li-%li\n",
                 getDatasetMetadataSeekPosition(datasetContainer->datasetMetadata),
-                getDatasetMetadataSeekPosition(datasetContainer->datasetMetadata) +
-                getSizeContentDatasetMetadata(datasetContainer->datasetMetadata)
+                (size_t)(getDatasetMetadataSeekPosition(datasetContainer->datasetMetadata) +
+                getSizeContentDatasetMetadata(datasetContainer->datasetMetadata))
         );
     }
     if (datasetContainer->datasetProtection!= NULL){
@@ -637,8 +637,8 @@ bool generateDatasetSeekPoints(DatasetContainer* datasetContainer){
                 stdout,
                 "\tdataset protection @ %li-%li\n",
                 getDatasetProtectionSeekPosition(datasetContainer->datasetProtection),
-                getDatasetProtectionSeekPosition(datasetContainer->datasetProtection) +
-                getSizeContentDatasetProtection(datasetContainer->datasetProtection)
+                (size_t)(getDatasetProtectionSeekPosition(datasetContainer->datasetProtection) +
+                getSizeContentDatasetProtection(datasetContainer->datasetProtection))
         );
     }
     return true;

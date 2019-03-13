@@ -2,7 +2,7 @@
 // Created by gencom on 15/11/17.
 //
 
-#include <malloc.h>
+#include <stdlib.h>
 #include "vector.h"
 
 Vector* initVector(){

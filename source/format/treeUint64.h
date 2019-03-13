@@ -5,7 +5,6 @@
 #ifndef MPEGG_CAPSULATOR_TREEUINT64_H
 #define MPEGG_CAPSULATOR_TREEUINT64_H
 
-#include <stdint-gcc.h>
 #include <stdbool.h>
 
 typedef struct TreeNode_ TreeNode;

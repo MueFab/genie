@@ -136,6 +136,7 @@ int getNewInteger(SignatureArbitraryLengthIntegerInputStream *stream) {
             stream->buffer,
             stream->integerLength
     );
+    return 0;
 }
 
 void freeSignatureInputStream(SignatureArbitraryLengthIntegerInputStream* signatureArbitraryLengthIntegerInputStream){
