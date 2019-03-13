@@ -58,7 +58,7 @@ typedef enum {
 } CrAlgEnum;
 
 typedef struct{
-    TransformSubSeqIdEnum transform_ID_subseq;
+    uint8_t transform_ID_subseq;
     uint16_t match_coding_buffer_size;
     uint8_t rle_coding_guard;
     uint8_t merge_coding_subseq_count;
@@ -71,6 +71,9 @@ Transform_subseq_parametersType* constructNoTransformSubseqParameters();
 Transform_subseq_parametersType* constructEqualityCodingTransformSubseqParameters();
 Transform_subseq_parametersType* constructMatchCodingSubseqTransformSubseqParameters(uint16_t match_coding_buffer_size);
 Transform_subseq_parametersType* constructRLECodingSubseqTransformSubseqParameters(uint8_t rle_coding_guard);
+Transform_subseq_parametersType* constructMergeCodingSubseqTransformSubseqParameters(
+        uint8_t merge_coding_subseq_count, uint8_t* merge_coding_shift_size
+);
 EncodingParametersRC getTransformSubSeqId(
         Transform_subseq_parametersType* transformSubseqParameters,
         TransformSubSeqIdEnum* output
@@ -84,6 +87,7 @@ EncodingParametersRC getRLECodingGuard(
         uint8_t* output
 );
 Transform_subseq_parametersType * parseTransformSubseqParameters(InputBitstream *input);
+void freeTransformSubseqParameters(Transform_subseq_parametersType *parameters);
 
 typedef struct {
     uint8_t output_symbol_size;
@@ -207,6 +211,9 @@ Cabac_binarizationsType* constructCabacBinarizationSignedDoubleTruncatedUnary_By
         uint8_t splitUnitSize
 );
 Cabac_binarization_parametersType *readCabacBinarizationParameters(InputBitstream* input, uint8_t binarization_ID);
+void freeCabac_binarization(Cabac_binarizationsType *cabac_binarization);
+void freeCabac_binarization_parameters(Cabac_binarization_parametersType *parameters);
+void freeCabacContextParameters(Cabac_context_parametersType *parameters);
 
 typedef struct {
     uint8_t num_descriptor_subsequence_cfgs_minus1;
@@ -217,7 +224,11 @@ typedef struct {
     Cabac_binarizationsType*** cabac_binarizations; //13.1.2.3
 } DecoderConfigurationTypeCABAC;
 
-
+void freeDecoderConfigurationTypeCABAC(
+        DecoderConfigurationTypeCABAC* decoderConfigurationTypeCABAC,
+        uint16_t numTransformSubsym,
+        uint16_t numSupportValues
+    );
 
 EncodingParametersRC getNumDescriptorSubsequenceCfgsMinus1(
     DecoderConfigurationTypeCABAC* decoderConfigurationCABAC,
@@ -283,30 +294,32 @@ EncodingParametersRC getSupportValueShareSubsymPRVFlag(
 
 
 typedef struct {
-    uint8_t output_symbol_size;
-    uint8_t coding_symbols_numbers;
-    uint8_t coding_symbol_size[64];
-    Support_valuesType* support_values;
-    Cabac_binarizationsType* cabac_binarizations;
-    TransformSubSymIdEnum transformSubSym;
+    Transform_subseq_parametersType* transform_subseq_parametersType;
+    TransformSubSymIdEnum* transformSubSym;
+    Support_valuesType** support_values;
+    Cabac_binarizationsType** cabac_binarizations;
 } Decoder_configuration_tokentype_cabac;
 
-EncodingParametersRC getOutputSymbolSizeToken(
-    Decoder_configuration_tokentype_cabac* decoder_configuration_tokentype_cabac,
-    uint8_t* output_symbol_size
+Decoder_configuration_tokentype_cabac* constructDecoder_configuration_tokentype_cabac(
+    Transform_subseq_parametersType* transform_subseq_parametersType,
+    TransformSubSymIdEnum* transformSubSym,
+    Support_valuesType** support_values,
+    Cabac_binarizationsType** cabac_binarizations
 );
-EncodingParametersRC getCodingSymbolsNumbers(
-    Decoder_configuration_tokentype_cabac* decoder_configuration_tokentype_cabac,
-    uint8_t* coding_symbols_numbers
-);
-EncodingParametersRC getCodingSymbolSizes(
-    Decoder_configuration_tokentype_cabac* decoder_configuration_tokentype_cabac,
-    uint8_t* coding_symbols_numbers,
-    uint8_t** coding_symbol_size
-);
+
+
 EncodingParametersRC getCabacBinarizationsToken(
         Decoder_configuration_tokentype_cabac *decoder_configuration_tokentype_cabac,
         Cabac_binarizationsType **cabacBinarizations
+);
+EncodingParametersRC getTransformSubseqCounterTokenType(
+        Decoder_configuration_tokentype_cabac *decoder_configuration_tokentype_cabac,
+        uint8_t *transformSubseqCounter
+);
+
+bool writeDecoderConfigurationTokentypeCabac(
+        Decoder_configuration_tokentype_cabac* decoderConfigurationTokentypeCabac,
+        OutputBitstream* outputBitstream
 );
 
 typedef struct {
@@ -361,6 +374,8 @@ EncodingParametersRC getCrBufMaxSize(
     Parameter_set_crpsType* parameterSetCrps,
     uint32_t* cr_buf_max_size
 );
+Parameter_set_crpsType* constructParameterSetCrps(CrAlgEnum cr_alg_id, uint8_t cr_pad_size, uint32_t cr_buf_max_size);
+void freeParameterSetCrps(Parameter_set_crpsType* parameterSetCrps);
 
 typedef struct {
     uint8_t dataset_type;
@@ -481,65 +496,55 @@ Encoding_ParametersType* constructEncodingParametersSingleAlignmentNoComputed(
         uint32_t multipleSignatureBase,
         uint8_t U_signature_size
 );
-Encoding_ParametersType* constructEncodingParametersMultipleAlignmentNoComputed(
-        uint8_t datasetType,
-        uint8_t alphabetId,
-        uint32_t reads_length,
-        uint8_t number_of_template_segments_minus1,
-        uint32_t max_au_data_unit_size,
-        bool pos40bits,
-        uint8_t qv_depth,
-        uint8_t as_depth,
-        uint8_t numClasses,
-        uint8_t* classID,
-        uint16_t numGroups,
-        char** rgroupId,
-        bool splicedReadsFlag,
-        bool multipleSignatureFlag,
-        uint32_t multipleSignatureBase,
-        uint8_t U_signature_size,
-        uint8_t mscore_mantissa
-);
-Encoding_ParametersType* constructEncodingParametersSingleAlignmentComputedRef(
-        uint8_t datasetType,
-        uint8_t alphabetId,
-        uint32_t reads_length,
-        uint8_t number_of_template_segments_minus1,
-        uint32_t max_au_data_unit_size,
-        bool pos40bits,
-        uint8_t qv_depth,
-        uint8_t as_depth,
-        uint8_t numClasses,
-        uint8_t* classID,
-        uint16_t numGroups,
-        char** rgroupId,
-        bool splicedReadsFlag,
-        bool multipleSignatureFlag,
-        uint32_t multipleSignatureBase,
-        uint8_t U_signature_size,
-        Parameter_set_crpsType* parameter_set_crps
-);
-Encoding_ParametersType* constructEncodingParametersMultipleAlignmentComputedRef(
-        uint8_t datasetType,
-        uint8_t alphabetId,
-        uint32_t reads_length,
-        uint8_t number_of_template_segments_minus1,
-        uint32_t max_au_data_unit_size,
-        bool pos40bits,
-        uint8_t qv_depth,
-        uint8_t as_depth,
-        uint8_t numClasses,
-        uint8_t* classID,
-        uint16_t numGroups,
-        char** rgroupId,
-        bool splicedReadsFlag,
-        bool multipleSignatureFlag,
-        uint32_t multipleSignatureBase,
-        uint8_t U_signature_size,
-        uint8_t mscore_mantissa,
-        Parameter_set_crpsType* parameter_set_crps
-);
+Encoding_ParametersType *
+constructEncodingParametersMultipleAlignmentNoComputed(uint8_t datasetType, uint8_t alphabetId, uint32_t reads_length,
+                                                       uint8_t number_of_template_segments_minus1,
+                                                       uint32_t max_au_data_unit_size, bool pos40bits, uint8_t qv_depth,
+                                                       uint8_t as_depth, uint8_t numClasses, uint8_t *classID,
+                                                       uint16_t numGroups, char **rgroupId, bool splicedReadsFlag,
+                                                       uint32_t multipleSignatureBase, uint8_t U_signature_size);
+Encoding_ParametersType *
+constructEncodingParametersSingleAlignmentComputedRef(uint8_t datasetType, uint8_t alphabetId, uint32_t reads_length,
+                                                      uint8_t number_of_template_segments_minus1,
+                                                      uint32_t max_au_data_unit_size, bool pos40bits, uint8_t qv_depth,
+                                                      uint8_t as_depth, uint8_t numClasses, uint8_t *classID,
+                                                      uint16_t numGroups, char **rgroupId, bool splicedReadsFlag,
+                                                      uint32_t multipleSignatureBase, uint8_t U_signature_size,
+                                                      Parameter_set_crpsType *parameter_set_crps);
+Encoding_ParametersType *
+constructEncodingParametersMultipleAlignmentComputedRef(uint8_t datasetType, uint8_t alphabetId, uint32_t reads_length,
+                                                        uint8_t number_of_template_segments_minus1,
+                                                        uint32_t max_au_data_unit_size, bool pos40bits,
+                                                        uint8_t qv_depth, uint8_t as_depth, uint8_t numClasses,
+                                                        uint8_t *classID, uint16_t numGroups, char **rgroupId,
+                                                        bool splicedReadsFlag, uint32_t multipleSignatureBase,
+                                                        uint8_t U_signature_size,
+                                                        Parameter_set_crpsType *parameter_set_crps);
 Encoding_ParametersType* readEncodingParameters(InputBitstream* input);
+void freeEncodingParameters(Encoding_ParametersType* encodingParametersType);
+EncodingParametersRC setNonClassSpecificDescriptorConfigurationAndEncodingMode(
+        Encoding_ParametersType* encodingParameters,
+        uint8_t descId,
+        void* configuration,
+        uint8_t encodingMode
+);
+EncodingParametersRC setClassSpecificDescriptorConfigurationAndEncodingMode(
+        Encoding_ParametersType* encodingParameters,
+        uint8_t classId,
+        uint8_t descId,
+        void* configuration,
+        uint8_t encodingMode
+);
+EncodingParametersRC setDefaultQVPSId(
+        Encoding_ParametersType* encodingParameters,
+        uint8_t classId,
+        uint8_t defaultQVPSId
+);
+EncodingParametersRC setParameterSetQVPS(
+        Encoding_ParametersType* encodingParameters,
+        uint8_t classId,
+        Parameter_set_qvpsType* parameterSetQvps
+);
 
 
 Support_valuesType* constructSupportValues(
@@ -559,14 +564,6 @@ DecoderConfigurationTypeCABAC* constructDecoderConfigurationCABAC(
         Cabac_binarizationsType*** cabac_binarizations
 );
 
-Decoder_configuration_tokentype_cabac* contructDecoder_configuration_tokentypeCABAC(
-        uint8_t output_symbol_size,
-        uint8_t coding_symbols_numbers,
-        const uint8_t coding_symbol_size[64],
-        TransformSubSymIdEnum transformSubSymId,
-        Support_valuesType* support_values,
-        Cabac_binarizationsType* cabac_binarizations
-);
 Decoder_configuration_tokentype* constructDecoderConfigurationTokentype(
         uint8_t rle_guard_tokentype,
         Decoder_configuration_tokentype_cabac* decoder_configuration_tokentype_cabac0,
