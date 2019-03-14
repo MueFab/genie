@@ -994,12 +994,21 @@ bool writeTransformSubseqParameters(
                 16,
                 transform_subseq_parameters->match_coding_buffer_size
         );
-    } else if (transform_subseq_parameters->rle_coding_guard == SubSeq_RLE_CODING){
+    } else if (transform_subseq_parameters->transform_ID_subseq == SubSeq_RLE_CODING){
         rleCodingGuardSuccWrite = writeNBitsShift(
                 outputBitstream,
                 8,
                 (char*)&(transform_subseq_parameters->rle_coding_guard)
         );
+    } else if (transform_subseq_parameters->transform_ID_subseq == SubSeq_MERGE_CODING){
+        writeNBitsShift(outputBitstream, 4, (char*)&(transform_subseq_parameters->merge_coding_subseq_count));
+        for(
+                uint8_t merge_coding_i=0;
+                merge_coding_i < transform_subseq_parameters->merge_coding_subseq_count;
+                merge_coding_i++
+        ){
+            writeNBitsShift(outputBitstream, 5, (char*)&(transform_subseq_parameters->merge_coding_shift_size[merge_coding_i]));
+        }
     }
     return transIdSubseqSuccWrite && matchCodingBufferSizeSuccWrite && rleCodingGuardSuccWrite;
 };

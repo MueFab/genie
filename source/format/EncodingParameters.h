@@ -66,7 +66,10 @@ typedef struct{
 } Transform_subseq_parametersType;
 
 //METHODS START
-
+bool writeTransformSubseqParameters(
+        Transform_subseq_parametersType* transform_subseq_parameters,
+        OutputBitstream* outputBitstream
+);
 Transform_subseq_parametersType* constructNoTransformSubseqParameters();
 Transform_subseq_parametersType* constructEqualityCodingTransformSubseqParameters();
 Transform_subseq_parametersType* constructMatchCodingSubseqTransformSubseqParameters(uint16_t match_coding_buffer_size);

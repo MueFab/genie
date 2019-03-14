@@ -2492,6 +2492,105 @@ TEST_F(encodingParametersTest, writeAndReadSupportValues){
     EXPECT_EQ(support_values.share_subsym_prv_flag, read_support_values->share_subsym_prv_flag);
 }
 
+TEST_F(encodingParametersTest, writeAndReadTransformSubseqParameters){
+    Transform_subseq_parametersType transform_subseq_parameters;
+    transform_subseq_parameters.transform_ID_subseq = 0;
+
+    FILE* outputFile;
+    FILE* inputFile;
+    OutputBitstream outputBitstream;
+    InputBitstream inputBitstream;
+
+    outputFile = fopen("test","wb");
+    inputFile = fopen("test","rb");
+    initializeOutputBitstream(&outputBitstream, outputFile);
+    initializeInputBitstream(&inputBitstream, inputFile);
+    writeTransformSubseqParameters(&transform_subseq_parameters, &outputBitstream);
+    writeBuffer(&outputBitstream);
+    fflush(outputFile);
+    EXPECT_EQ(1, ftell(outputFile));
+    Transform_subseq_parametersType* readTransformSubseq = parseTransformSubseqParameters(&inputBitstream);
+    ASSERT_NE(nullptr, readTransformSubseq);
+    EXPECT_EQ(transform_subseq_parameters.transform_ID_subseq, readTransformSubseq->transform_ID_subseq);
+
+    //=============================
+
+    transform_subseq_parameters.transform_ID_subseq = 1;
+    outputFile = fopen("test","wb");
+    inputFile = fopen("test","rb");
+    initializeOutputBitstream(&outputBitstream, outputFile);
+    initializeInputBitstream(&inputBitstream, inputFile);
+    writeTransformSubseqParameters(&transform_subseq_parameters, &outputBitstream);
+    writeBuffer(&outputBitstream);
+    fflush(outputFile);
+    EXPECT_EQ(1, ftell(outputFile));
+    readTransformSubseq = parseTransformSubseqParameters(&inputBitstream);
+    ASSERT_NE(nullptr, readTransformSubseq);
+    EXPECT_EQ(transform_subseq_parameters.transform_ID_subseq, readTransformSubseq->transform_ID_subseq);
+
+    //=============================
+
+    transform_subseq_parameters.transform_ID_subseq = 2;
+    transform_subseq_parameters.match_coding_buffer_size = 312;
+    outputFile = fopen("test","wb");
+    inputFile = fopen("test","rb");
+    initializeOutputBitstream(&outputBitstream, outputFile);
+    initializeInputBitstream(&inputBitstream, inputFile);
+    writeTransformSubseqParameters(&transform_subseq_parameters, &outputBitstream);
+    writeBuffer(&outputBitstream);
+    fflush(outputFile);
+    EXPECT_EQ(3, ftell(outputFile));
+    readTransformSubseq = parseTransformSubseqParameters(&inputBitstream);
+    ASSERT_NE(nullptr, readTransformSubseq);
+    EXPECT_EQ(transform_subseq_parameters.transform_ID_subseq, readTransformSubseq->transform_ID_subseq);
+    EXPECT_EQ(transform_subseq_parameters.match_coding_buffer_size, readTransformSubseq->match_coding_buffer_size);
+
+    //=============================
+
+    transform_subseq_parameters.transform_ID_subseq = 3;
+    transform_subseq_parameters.rle_coding_guard = 127;
+    outputFile = fopen("test","wb");
+    inputFile = fopen("test","rb");
+    initializeOutputBitstream(&outputBitstream, outputFile);
+    initializeInputBitstream(&inputBitstream, inputFile);
+    writeTransformSubseqParameters(&transform_subseq_parameters, &outputBitstream);
+    writeBuffer(&outputBitstream);
+    fflush(outputFile);
+    EXPECT_EQ(2, ftell(outputFile));
+    readTransformSubseq = parseTransformSubseqParameters(&inputBitstream);
+    ASSERT_NE(nullptr, readTransformSubseq);
+    EXPECT_EQ(transform_subseq_parameters.transform_ID_subseq, readTransformSubseq->transform_ID_subseq);
+    EXPECT_EQ(transform_subseq_parameters.rle_coding_guard, readTransformSubseq->rle_coding_guard);
+
+    //=============================
+
+    transform_subseq_parameters.transform_ID_subseq = 4;
+    transform_subseq_parameters.merge_coding_subseq_count = 2;
+    uint8_t merge_coding_shift_size[2]={3,5};
+    transform_subseq_parameters.merge_coding_shift_size=merge_coding_shift_size;
+
+    outputFile = fopen("test","wb");
+    inputFile = fopen("test","rb");
+    initializeOutputBitstream(&outputBitstream, outputFile);
+    initializeInputBitstream(&inputBitstream, inputFile);
+    writeTransformSubseqParameters(&transform_subseq_parameters, &outputBitstream);
+    writeBuffer(&outputBitstream);
+    fflush(outputFile);
+    EXPECT_EQ(3, ftell(outputFile));
+    readTransformSubseq = parseTransformSubseqParameters(&inputBitstream);
+    ASSERT_NE(nullptr, readTransformSubseq);
+    EXPECT_EQ(transform_subseq_parameters.transform_ID_subseq, readTransformSubseq->transform_ID_subseq);
+    EXPECT_EQ(transform_subseq_parameters.merge_coding_subseq_count, readTransformSubseq->merge_coding_subseq_count);
+    EXPECT_EQ(transform_subseq_parameters.merge_coding_shift_size[0], readTransformSubseq->merge_coding_shift_size[0]);
+    EXPECT_EQ(transform_subseq_parameters.merge_coding_shift_size[1], readTransformSubseq->merge_coding_shift_size[1]);
+}
+
+TEST_F(encodingParametersTest, writeAndReadDecoderConfiguration){
+    uint8_t num_descriptor_subsequence_cfgs_minus1 = 0;
+    uint16_t descriptorSubsequenceID[] = {3};
+
+}
+
 /*TEST_F(encodingParametersTest, writeEncodingParametersSingleAlignmentNoComputedTest){
     uint8_t datasetType = 1;
     uint8_t alphabetId = 1;
