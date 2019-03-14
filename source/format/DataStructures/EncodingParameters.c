@@ -600,6 +600,50 @@ Decoder_configuration_tokentype_cabac* constructDecoder_configuration_tokentype_
     return result;
 }
 
+Decoder_configuration_tokentype_cabac* readDecoder_configuration_tokentype_cabac(InputBitstream* inputBitstream){
+    Decoder_configuration_tokentype_cabac* result = malloc(sizeof(Decoder_configuration_tokentype_cabac));
+    if(result == NULL){
+        return NULL;
+    }
+
+    Transform_subseq_parametersType* transform_subseq_parametersType =
+            parseTransformSubseqParameters(inputBitstream);
+    result->transform_subseq_parametersType = transform_subseq_parametersType;
+
+    uint8_t transformSubseqCounter;
+    getTransformSubseqCounterTokenType(result, &transformSubseqCounter);
+
+    result->transformSubSym = (TransformSubSymIdEnum*)malloc(sizeof(TransformSubSymIdEnum) * transformSubseqCounter);
+    result->support_values = (Support_valuesType**)malloc(sizeof(Support_valuesType*) * transformSubseqCounter);
+    result->cabac_binarizations = (Cabac_binarizationsType**)malloc(sizeof(Cabac_binarizationsType*) * transformSubseqCounter);
+
+    for(uint8_t j=0; j<transformSubseqCounter; j++){
+         uint8_t transform_ID_subsym;
+         readNBits8(inputBitstream, 3, &transform_ID_subsym);
+         switch (transform_ID_subsym){
+             case 0:
+                 result->transformSubSym[j] = SubSym_NO_TRANSFORM;
+                 break;
+             case 1:
+                 result->transformSubSym[j] = SubSym_LUT_TRANSFORM;
+                 break;
+             case 2:
+                 result->transformSubSym[j] = SubSym_DIFF_CODING;
+                 break;
+             default:
+                 return NULL;
+         }
+         result->support_values[j] = readSupportValuesType(inputBitstream, result->transformSubSym[j]);
+        result->cabac_binarizations[j] = readCabacBinarization(
+                inputBitstream,
+                result->support_values[j]->coding_symbol_size,
+                result->support_values[j]->output_symbol_size
+        );
+    }
+
+    return result;
+}
+
 EncodingParametersRC getTransformSubseqCounter(
         DecoderConfigurationTypeCABAC *decoderConfigurationTypeCABAC,
         uint16_t descriptorSubsequenceId,
