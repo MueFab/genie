@@ -2660,6 +2660,68 @@ TEST_F(encodingParametersTest, writeAndReadDecoderConfiguration){
 
 }
 
+TEST_F(encodingParametersTest, writeAndReadDecoderConfigurationTokenTypeCabac){
+    Decoder_configuration_tokentype_cabac decoder_configuration_tokentype_cabac;
+    decoder_configuration_tokentype_cabac.transform_subseq_parametersType
+        = constructNoTransformSubseqParameters();
+    TransformSubSymIdEnum transformSubSymId[] = {
+            SubSym_NO_TRANSFORM
+    };
+    decoder_configuration_tokentype_cabac.transformSubSym = transformSubSymId;
+    auto support_values = (Support_valuesType**)malloc(sizeof(Support_valuesType*));
+    support_values[0] = constructSupportValues(
+            4,3,1, false, false
+    );
+    decoder_configuration_tokentype_cabac.support_values = support_values;
+    auto cabacBinarizations = (Cabac_binarizationsType**)malloc(sizeof(Cabac_binarizationsType*));
+    cabacBinarizations[0] = constructCabacBinarizationBinaryCoding_Bypass();
+    decoder_configuration_tokentype_cabac.cabac_binarizations = cabacBinarizations;
+
+    FILE* output = fopen("test", "wb");
+    OutputBitstream outputBitstream;
+    initializeOutputBitstream(&outputBitstream, output);
+    writeDecoderConfigurationTokentypeCabac(&decoder_configuration_tokentype_cabac, &outputBitstream);
+    writeBuffer(&outputBitstream);
+    fflush(output);
+    EXPECT_EQ(4, ftell(output));
+    fclose(output);
+
+    FILE* input = fopen("test","rb");
+    InputBitstream inputBitstream;
+    initializeInputBitstream(&inputBitstream, input);
+    Decoder_configuration_tokentype_cabac* read_decoder_configuration_tokentype_cabac =
+            readDecoder_configuration_tokentype_cabac(&inputBitstream);
+    ASSERT_NE(nullptr, read_decoder_configuration_tokentype_cabac);
+
+    EXPECT_EQ(
+            decoder_configuration_tokentype_cabac.transform_subseq_parametersType->transform_ID_subseq,
+            read_decoder_configuration_tokentype_cabac->transform_subseq_parametersType->transform_ID_subseq
+    );
+
+    EXPECT_EQ(
+            decoder_configuration_tokentype_cabac.support_values[0]->coding_symbol_size,
+            read_decoder_configuration_tokentype_cabac->support_values[0]->coding_symbol_size
+    );
+    EXPECT_EQ(
+            decoder_configuration_tokentype_cabac.support_values[0]->output_symbol_size,
+            read_decoder_configuration_tokentype_cabac->support_values[0]->output_symbol_size
+    );
+    EXPECT_EQ(
+            decoder_configuration_tokentype_cabac.support_values[0]->coding_order,
+            read_decoder_configuration_tokentype_cabac->support_values[0]->coding_order
+    );
+
+    EXPECT_EQ(
+            decoder_configuration_tokentype_cabac.transformSubSym[0],
+            read_decoder_configuration_tokentype_cabac->transformSubSym[0]
+    );
+
+    EXPECT_EQ(
+            decoder_configuration_tokentype_cabac.cabac_binarizations[0]->binarization_ID,
+            read_decoder_configuration_tokentype_cabac->cabac_binarizations[0]->binarization_ID
+    );
+}
+
 /*TEST_F(encodingParametersTest, writeEncodingParametersSingleAlignmentNoComputedTest){
     uint8_t datasetType = 1;
     uint8_t alphabetId = 1;

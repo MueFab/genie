@@ -364,6 +364,8 @@ Decoder_configuration_tokentype_cabac* constructDecoder_configuration_tokentype_
     Cabac_binarizationsType** cabac_binarizations
 );
 
+Decoder_configuration_tokentype_cabac* readDecoder_configuration_tokentype_cabac(InputBitstream* inputBitstream);
+
 
 EncodingParametersRC getCabacBinarizationsToken(
         Decoder_configuration_tokentype_cabac *decoder_configuration_tokentype_cabac,
