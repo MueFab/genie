@@ -6,6 +6,7 @@
 #define MPEGG_CAPSULATOR_TREEUINT64_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 typedef struct TreeNode_ TreeNode;
 struct TreeNode_ {

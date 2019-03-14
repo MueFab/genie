@@ -96,6 +96,12 @@ typedef struct {
     bool share_subsym_lut_flag;
     bool share_subsym_prv_flag;
 } Support_valuesType;
+bool writeSupportValues(
+        Support_valuesType* supportValues,
+        OutputBitstream* outputBitstream,
+        TransformSubSymIdEnum transform_ID_subsym
+
+);
 
 typedef struct {
     uint8_t cmax;
@@ -103,6 +109,11 @@ typedef struct {
     uint8_t cMaxDTU;
     uint8_t splitUnitSize;
 } Cabac_binarization_parametersType;
+bool writeCABACBinarizationParameters(
+        Cabac_binarization_parametersType* cabac_binarization_parameters,
+        OutputBitstream* outputBitstream,
+        BinarizationIdEnum binarization_ID
+);
 
 typedef struct {
     bool adaptive_mode_flag;
@@ -110,7 +121,17 @@ typedef struct {
     uint8_t* context_initialization_value;
     bool share_sub_sym_ctx_flag;
 } Cabac_context_parametersType;
-
+Cabac_context_parametersType *readCabacContextParameters(
+        InputBitstream *input,
+        uint8_t coding_subsym_size,
+        uint8_t output_subsym_size
+);
+bool writeCABACContextParameters(
+        Cabac_context_parametersType* cabac_context_parameters,
+        OutputBitstream* outputBitstream,
+        uint8_t codingSubsymbolSize,
+        uint8_t outputSubsymbolSize
+);
 EncodingParametersRC getAdaptiveModeFlag(
     Cabac_context_parametersType* cabac_context_parameters,
     bool* adaptive_mode_flag
@@ -132,6 +153,30 @@ EncodingParametersRC getBypassFlag(Cabac_binarizationsType* cabac_binarizations,
 EncodingParametersRC getCTruncExpGolParam(
         Cabac_binarizationsType* cabac_binarizations,
         uint8_t* cTruncExpGolParam
+);
+bool writeCABACBinarizations(
+        Cabac_binarizationsType* cabac_binarizations,
+        OutputBitstream* outputBitstream,
+        uint8_t codingSymbolSize,
+        uint8_t outputSymbolSize
+);
+EncodingParametersRC getcMax_BinarizationParameters(
+        Cabac_binarization_parametersType* binarizationParameters,
+        BinarizationIdEnum binarization_ID,
+        uint8_t* cMax
+);
+EncodingParametersRC getcMax(
+        Cabac_binarizationsType* cabac_binarizations,
+        uint8_t* cMax
+);
+EncodingParametersRC getcMaxTeg_BinarizationParameters(
+        Cabac_binarization_parametersType* binarizationParameters,
+        BinarizationIdEnum binarization_ID,
+        uint8_t* cMaxTeg
+);
+EncodingParametersRC getcMaxTeg(
+        Cabac_binarizationsType* cabac_binarizations,
+        uint8_t* cMaxTeg
 );
 EncodingParametersRC getcMaxDTU(
         Cabac_binarizationsType* cabac_binarizations,
@@ -295,6 +340,7 @@ EncodingParametersRC getSupportValueShareSubsymPRVFlag(
         uint16_t transformSubseqIndex,
         bool* share_subsym_prv_flag
 );
+DecoderConfigurationTypeCABAC* readDecoderConfigurationTypeCABAC(InputBitstream* inputBitstream);
 
 
 typedef struct {
@@ -393,7 +439,7 @@ typedef struct {
     uint8_t num_classes;
     uint8_t* classID;
     bool class_specific_dec_cfg_flag[18];
-    bool** dec_cfg_preset;
+    uint8_t ** dec_cfg_preset;
     uint8_t** encoding_mode_id;
     void*** decoderConfiguration; //13.1.2 //todo correct getter
     uint16_t num_groups;

@@ -457,11 +457,59 @@ void testDecoderConfigurationCabac(DecoderConfigurationTypeCABAC* decoderConfigu
             getSupportValueShareSubsymLUTFlag(decoderConfigurationTypeCABAC, 4, 1, &share_subsym_lut_flag_buffer)
     );
 
+    bool share_subsym_prv_flag;
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymPRVFlag(decoderConfigurationTypeCABAC, 0, 0, &share_subsym_prv_flag)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymPRVFlag(decoderConfigurationTypeCABAC, 1, 0, &share_subsym_prv_flag)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymPRVFlag(decoderConfigurationTypeCABAC, 1, 1, &share_subsym_prv_flag)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymPRVFlag(decoderConfigurationTypeCABAC, 2, 0, &share_subsym_prv_flag)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymPRVFlag(decoderConfigurationTypeCABAC, 2, 1, &share_subsym_prv_flag)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymPRVFlag(decoderConfigurationTypeCABAC, 2, 2, &share_subsym_prv_flag)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymPRVFlag(decoderConfigurationTypeCABAC, 3, 0, &share_subsym_prv_flag)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymPRVFlag(decoderConfigurationTypeCABAC, 3, 1, &share_subsym_prv_flag)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymPRVFlag(decoderConfigurationTypeCABAC, 4, 0, &share_subsym_prv_flag)
+    );
+    EXPECT_EQ(
+            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            getSupportValueShareSubsymPRVFlag(decoderConfigurationTypeCABAC, 4, 1, &share_subsym_prv_flag)
+    );
+
 
     Cabac_binarizationsType* cabac_binarizations_buffer;
     uint8_t binarizationId_buffer;
     bool bypassFlag_buffer;
     Cabac_binarization_parametersType* cabac_binarization_parameters_buffer;
+    uint8_t cmax_buffer;
+    uint8_t cmax_teg_buffer;
+    uint8_t cmax_dtu_buffer;
+    uint8_t split_unit_size_buffer;
+
+
     bool adaptive_mode_flag_buffer;
     uint16_t num_contexts_buffer;
     uint8_t *context_initialization_value_buffer;
@@ -473,123 +521,90 @@ void testDecoderConfigurationCabac(DecoderConfigurationTypeCABAC* decoderConfigu
     EXPECT_EQ(BinarizationID_BinaryCoding, binarizationId_buffer);
     EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
     EXPECT_TRUE(bypassFlag_buffer);
-    EXPECT_EQ(
-            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
-            getCabacBinarizationParameters(cabac_binarizations_buffer, &cabac_binarization_parameters_buffer)
-    );
+    EXPECT_EQ(SUCCESS, getCabacBinarizationParameters(cabac_binarizations_buffer, &cabac_binarization_parameters_buffer));
+    EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
+    EXPECT_EQ(BinarizationID_BinaryCoding, binarizationId_buffer);
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMax(cabac_binarizations_buffer, &cmax_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxTeg(cabac_binarizations_buffer, &cmax_teg_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxDTU(cabac_binarizations_buffer, &cmax_dtu_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getSplitUnitSize(cabac_binarizations_buffer, &split_unit_size_buffer));
     EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 1, 0, &cabac_binarizations_buffer));
     EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
     EXPECT_EQ(BinarizationID_BinaryCoding, binarizationId_buffer);
     EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
     EXPECT_TRUE(bypassFlag_buffer);
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMax(cabac_binarizations_buffer, &cmax_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxTeg(cabac_binarizations_buffer, &cmax_teg_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxDTU(cabac_binarizations_buffer, &cmax_dtu_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getSplitUnitSize(cabac_binarizations_buffer, &split_unit_size_buffer));
     EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 1, 1, &cabac_binarizations_buffer));
     EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
     EXPECT_EQ(BinarizationID_BinaryCoding, binarizationId_buffer);
     EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
     EXPECT_FALSE(bypassFlag_buffer);
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMax(cabac_binarizations_buffer, &cmax_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxTeg(cabac_binarizations_buffer, &cmax_teg_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxDTU(cabac_binarizations_buffer, &cmax_dtu_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getSplitUnitSize(cabac_binarizations_buffer, &split_unit_size_buffer));
     EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 2, 0, &cabac_binarizations_buffer));
     EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
     EXPECT_EQ(BinarizationID_DoubleTruncatedUnary, binarizationId_buffer);
     EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
     EXPECT_FALSE(bypassFlag_buffer);
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMax(cabac_binarizations_buffer, &cmax_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxTeg(cabac_binarizations_buffer, &cmax_teg_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxDTU(cabac_binarizations_buffer, &cmax_dtu_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getSplitUnitSize(cabac_binarizations_buffer, &split_unit_size_buffer));
     EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 2, 1, &cabac_binarizations_buffer));
     EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
     EXPECT_EQ(BinarizationID_ExponentialGolomb, binarizationId_buffer);
     EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
     EXPECT_TRUE(bypassFlag_buffer);
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMax(cabac_binarizations_buffer, &cmax_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxTeg(cabac_binarizations_buffer, &cmax_teg_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxDTU(cabac_binarizations_buffer, &cmax_dtu_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getSplitUnitSize(cabac_binarizations_buffer, &split_unit_size_buffer));
     EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 2, 2, &cabac_binarizations_buffer));
     EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
     EXPECT_EQ(BinarizationID_ExponentialGolomb, binarizationId_buffer);
     EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
     EXPECT_FALSE(bypassFlag_buffer);
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMax(cabac_binarizations_buffer, &cmax_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxTeg(cabac_binarizations_buffer, &cmax_teg_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxDTU(cabac_binarizations_buffer, &cmax_dtu_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getSplitUnitSize(cabac_binarizations_buffer, &split_unit_size_buffer));
     EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 3, 0, &cabac_binarizations_buffer));
     EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
     EXPECT_EQ(BinarizationID_SignedExponentialGolomb, binarizationId_buffer);
     EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
     EXPECT_TRUE(bypassFlag_buffer);
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMax(cabac_binarizations_buffer, &cmax_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxTeg(cabac_binarizations_buffer, &cmax_teg_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxDTU(cabac_binarizations_buffer, &cmax_dtu_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getSplitUnitSize(cabac_binarizations_buffer, &split_unit_size_buffer));
     EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 3, 1, &cabac_binarizations_buffer));
     EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
     EXPECT_EQ(BinarizationID_SignedExponentialGolomb, binarizationId_buffer);
     EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
     EXPECT_FALSE(bypassFlag_buffer);
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMax(cabac_binarizations_buffer, &cmax_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxTeg(cabac_binarizations_buffer, &cmax_teg_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxDTU(cabac_binarizations_buffer, &cmax_dtu_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getSplitUnitSize(cabac_binarizations_buffer, &split_unit_size_buffer));
     EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 4, 0, &cabac_binarizations_buffer));
     EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
     EXPECT_EQ(BinarizationID_TruncatedExponentialGolomb, binarizationId_buffer);
     EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
     EXPECT_FALSE(bypassFlag_buffer);
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMax(cabac_binarizations_buffer, &cmax_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxTeg(cabac_binarizations_buffer, &cmax_teg_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxDTU(cabac_binarizations_buffer, &cmax_dtu_buffer));
+    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getSplitUnitSize(cabac_binarizations_buffer, &split_unit_size_buffer));
     EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 4, 1, &cabac_binarizations_buffer));
     EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
     EXPECT_EQ(BinarizationID_SignedTruncatedExponentialGolomb, binarizationId_buffer);
     EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
     EXPECT_TRUE(bypassFlag_buffer);
-
-    EncodingParametersRC getCTruncExpGolParam(
-            Cabac_binarizationsType* cabac_binarizations,
-            uint8_t* cTruncExpGolParam
-    ){
-        if(cabac_binarizations == NULL || cabac_binarizations->cabac_binarization_parameters == NULL || cTruncExpGolParam == NULL){
-            return NULL_PTR;
-        }
-        return getCTruncExpGolParam_BinarizationParameters(
-                cabac_binarizations->cabac_binarization_parameters,
-                cabac_binarizations->binarization_ID,
-                cTruncExpGolParam
-        );
-    }
-
-
-    auto *** cabac_binarizations = (Cabac_binarizationsType***)malloc(5*sizeof(Cabac_binarizationsType));
-    cabac_binarizations[0] = (Cabac_binarizationsType**)malloc(1 * sizeof(Cabac_binarizationsType));
-    cabac_binarizations[0][0] = constructCabacBinarizationBinaryCoding_Bypass();
-    cabac_binarizations[1] = (Cabac_binarizationsType**)malloc(2 * sizeof(Cabac_binarizationsType));
-    cabac_binarizations[1][0] = constructCabacBinarizationBinaryCoding_Bypass();
-    {
-        auto * contextInitVals = (uint8_t*) malloc(sizeof(uint8_t)*2);
-        contextInitVals[0] = 0;
-        contextInitVals[1] = 1;
-        cabac_binarizations[1][1] = constructCabacBinarizationBinaryCoding_NotBypass(
-                true, 2, contextInitVals, false
-        );
-    }
-    cabac_binarizations[2] = (Cabac_binarizationsType**)malloc(3 * sizeof(Cabac_binarizationsType));
-    {
-        auto * contextInitVals = (uint8_t*) malloc(sizeof(uint8_t)*2);
-        contextInitVals[0] = 0;
-        contextInitVals[1] = 1;
-        cabac_binarizations[2][0] = constructCabacBinarizationDoubleTruncatedUnary_NotBypass(
-                2,3, true, 2, contextInitVals, false
-        );
-    }
-    cabac_binarizations[2][1] = constructCabacBinarizationExponentialGolomb_Bypass();
-    {
-        auto * contextInitVals = (uint8_t*) malloc(sizeof(uint8_t)*2);
-        contextInitVals[0] = 0;
-        contextInitVals[1] = 1;
-        cabac_binarizations[2][2] = constructCabacBinarizationExponentialGolomb_NotBypass(
-                true, 2, contextInitVals, false
-        );
-    }
-    cabac_binarizations[3] = (Cabac_binarizationsType**)malloc(2 * sizeof(Cabac_binarizationsType));
-    cabac_binarizations[3][0] = constructCabacBinarizationSignedExponentialGolomb_Bypass();
-    {
-        auto * contextInitVals = (uint8_t*) malloc(sizeof(uint8_t)*2);
-        contextInitVals[0] = 0;
-        contextInitVals[1] = 1;
-        cabac_binarizations[3][1] = constructCabacBinarizationSignedExponentialGolomb_NotBypass(
-                true, 2, contextInitVals, false
-        );
-    }
-    cabac_binarizations[3][1] = constructCabacBinarizationTruncatedExponentialGolomb_Bypass(2);
-    cabac_binarizations[4] = (Cabac_binarizationsType**)malloc(2*sizeof(Cabac_binarizationsType));
-    {
-        auto * contextInitVals = (uint8_t*) malloc(sizeof(uint8_t)*2);
-        contextInitVals[0] = 0;
-        contextInitVals[1] = 1;
-        cabac_binarizations[4][0] = constructCabacBinarizationTruncatedExponentialGolomb_NotBypass(
-                2,true, 2, contextInitVals, false
-        );
-    }
-    cabac_binarizations[4][1] = constructCabacBinarizationSignedTruncatedExponentialGolomb_Bypass(2);
 }
 
 Decoder_configuration_tokentype* getTestingDecoderConfigurationTokenType(){
@@ -2162,7 +2177,322 @@ TEST_F(encodingParametersTest, constructEncodingParametersMultipleAlignmentCompu
 
 }
 
-TEST_F(encodingParametersTest, writeEncodingParametersSingleAlignmentNoComputedTest){
+TEST_F(encodingParametersTest, writeAndReadCabacBinarizationParameters){
+    Cabac_binarization_parametersType cabac_binarization_parameters;
+    cabac_binarization_parameters.cmax = 5;
+    cabac_binarization_parameters.cmax_teg = 6;
+    cabac_binarization_parameters.cMaxDTU = 7;
+    cabac_binarization_parameters.splitUnitSize = 3;
+
+    FILE* testOutput = fopen("test","wb");
+    OutputBitstream outputBitstream;
+    initializeOutputBitstream(&outputBitstream, testOutput);
+    writeCABACBinarizationParameters(&cabac_binarization_parameters, &outputBitstream, BinarizationID_BinaryCoding);
+    writeBuffer(&outputBitstream);
+    fflush(testOutput);
+    EXPECT_EQ(0, ftell(testOutput));
+    fclose(testOutput);
+
+    //==========================
+    testOutput = fopen("test","wb");
+    initializeOutputBitstream(&outputBitstream, testOutput);
+    writeCABACBinarizationParameters(&cabac_binarization_parameters, &outputBitstream, BinarizationID_TruncatedUnary);
+    writeBuffer(&outputBitstream);
+    fflush(testOutput);
+    EXPECT_EQ(1, ftell(testOutput));
+    fclose(testOutput);
+    FILE* testInput = fopen("test","rb");
+    InputBitstream inputBitstream;
+    initializeInputBitstream(&inputBitstream, testInput);
+    Cabac_binarization_parametersType* readValue = readCabacBinarizationParameters(&inputBitstream, BinarizationID_TruncatedUnary);
+    ASSERT_NE(nullptr, readValue);
+    ASSERT_EQ(cabac_binarization_parameters.cmax, readValue->cmax);
+
+    //==========================
+    testOutput = fopen("test","wb");
+    initializeOutputBitstream(&outputBitstream, testOutput);
+    writeCABACBinarizationParameters(&cabac_binarization_parameters, &outputBitstream, BinarizationID_ExponentialGolomb);
+    writeBuffer(&outputBitstream);
+    fflush(testOutput);
+    EXPECT_EQ(0, ftell(testOutput));
+    fclose(testOutput);
+    testInput = fopen("test","rb");
+
+    //==========================
+    testOutput = fopen("test","wb");
+    initializeOutputBitstream(&outputBitstream, testOutput);
+    writeCABACBinarizationParameters(&cabac_binarization_parameters, &outputBitstream, BinarizationID_SignedExponentialGolomb);
+    writeBuffer(&outputBitstream);
+    fflush(testOutput);
+    EXPECT_EQ(0, ftell(testOutput));
+    fclose(testOutput);
+
+    //==========================
+    testOutput = fopen("test","wb");
+    initializeOutputBitstream(&outputBitstream, testOutput);
+    writeCABACBinarizationParameters(&cabac_binarization_parameters, &outputBitstream, BinarizationID_TruncatedExponentialGolomb);
+    writeBuffer(&outputBitstream);
+    fflush(testOutput);
+    EXPECT_EQ(1, ftell(testOutput));
+    fclose(testOutput);
+    testInput = fopen("test","rb");
+    initializeInputBitstream(&inputBitstream, testInput);
+    readValue = readCabacBinarizationParameters(&inputBitstream, BinarizationID_TruncatedExponentialGolomb);
+    ASSERT_NE(nullptr, readValue);
+    ASSERT_EQ(cabac_binarization_parameters.cmax_teg, readValue->cmax_teg);
+    //==========================
+    testOutput = fopen("test","wb");
+    initializeOutputBitstream(&outputBitstream, testOutput);
+    writeCABACBinarizationParameters(&cabac_binarization_parameters, &outputBitstream, BinarizationID_SignedTruncatedExponentialGolomb);
+    writeBuffer(&outputBitstream);
+    fflush(testOutput);
+    EXPECT_EQ(1, ftell(testOutput));
+    fclose(testOutput);
+    testInput = fopen("test","rb");
+    initializeInputBitstream(&inputBitstream, testInput);
+    readValue = readCabacBinarizationParameters(&inputBitstream, BinarizationID_SignedTruncatedExponentialGolomb);
+    ASSERT_NE(nullptr, readValue);
+    ASSERT_EQ(cabac_binarization_parameters.cmax_teg, readValue->cmax_teg);
+    //==========================
+    testOutput = fopen("test","wb");
+    initializeOutputBitstream(&outputBitstream, testOutput);
+    writeCABACBinarizationParameters(&cabac_binarization_parameters, &outputBitstream, BinarizationID_SplitUnitWiseTruncatedUnary);
+    writeBuffer(&outputBitstream);
+    fflush(testOutput);
+    EXPECT_EQ(1, ftell(testOutput));
+    fclose(testOutput);
+    testInput = fopen("test","rb");
+    initializeInputBitstream(&inputBitstream, testInput);
+    readValue = readCabacBinarizationParameters(&inputBitstream, BinarizationID_SplitUnitWiseTruncatedUnary);
+    ASSERT_NE(nullptr, readValue);
+    ASSERT_EQ(cabac_binarization_parameters.splitUnitSize, readValue->splitUnitSize);
+    //==========================
+    testOutput = fopen("test","wb");
+    initializeOutputBitstream(&outputBitstream, testOutput);
+    writeCABACBinarizationParameters(&cabac_binarization_parameters, &outputBitstream, BinarizationID_SignedSplitUnitWiseTruncatedUnary);
+    writeBuffer(&outputBitstream);
+    fflush(testOutput);
+    EXPECT_EQ(1, ftell(testOutput));
+    fclose(testOutput);
+    testInput = fopen("test","rb");
+    initializeInputBitstream(&inputBitstream, testInput);
+    readValue = readCabacBinarizationParameters(&inputBitstream, BinarizationID_SignedSplitUnitWiseTruncatedUnary);
+    ASSERT_NE(nullptr, readValue);
+    ASSERT_EQ(cabac_binarization_parameters.splitUnitSize, readValue->splitUnitSize);
+    //==========================
+    testOutput = fopen("test","wb");
+    initializeOutputBitstream(&outputBitstream, testOutput);
+    writeCABACBinarizationParameters(&cabac_binarization_parameters, &outputBitstream, BinarizationID_DoubleTruncatedUnary);
+    writeBuffer(&outputBitstream);
+    fflush(testOutput);
+    EXPECT_EQ(2, ftell(testOutput));
+    fclose(testOutput);
+    testInput = fopen("test","rb");
+    initializeInputBitstream(&inputBitstream, testInput);
+    readValue = readCabacBinarizationParameters(&inputBitstream, BinarizationID_DoubleTruncatedUnary);
+    ASSERT_NE(nullptr, readValue);
+    ASSERT_EQ(cabac_binarization_parameters.cMaxDTU, readValue->cMaxDTU);
+    ASSERT_EQ(cabac_binarization_parameters.splitUnitSize, readValue->splitUnitSize);
+    //==========================
+    testOutput = fopen("test","wb");
+    initializeOutputBitstream(&outputBitstream, testOutput);
+    writeCABACBinarizationParameters(&cabac_binarization_parameters, &outputBitstream, BinarizationID_SignedDoubleTruncatedUnary);
+    writeBuffer(&outputBitstream);
+    fflush(testOutput);
+    EXPECT_EQ(2, ftell(testOutput));
+    fclose(testOutput);
+    testInput = fopen("test","rb");
+    initializeInputBitstream(&inputBitstream, testInput);
+    readValue = readCabacBinarizationParameters(&inputBitstream, BinarizationID_SignedDoubleTruncatedUnary);
+    ASSERT_NE(nullptr, readValue);
+    ASSERT_EQ(cabac_binarization_parameters.cMaxDTU, readValue->cMaxDTU);
+    ASSERT_EQ(cabac_binarization_parameters.splitUnitSize, readValue->splitUnitSize);
+    //==========================
+}
+
+TEST_F(encodingParametersTest, writeAndReadCabacContextParameters){
+    uint8_t contextInit[2]={1,2};
+    Cabac_context_parametersType cabac_context_parameters;
+    cabac_context_parameters.adaptive_mode_flag = true;
+    cabac_context_parameters.num_contexts = 2;
+    cabac_context_parameters.context_initialization_value = contextInit;
+    cabac_context_parameters.share_sub_sym_ctx_flag = true;
+
+
+    FILE* testOutput = fopen("test","wb");
+    OutputBitstream outputBitstream;
+    initializeOutputBitstream(&outputBitstream, testOutput);
+    writeCABACContextParameters(&cabac_context_parameters, &outputBitstream, 4, 3);
+    writeBuffer(&outputBitstream);
+    fflush(testOutput);
+    EXPECT_EQ(4, ftell(testOutput));
+    fclose(testOutput);
+
+    FILE* testInput = fopen("test","rb");
+    InputBitstream inputBitstream;
+    initializeInputBitstream(&inputBitstream, testInput);
+    Cabac_context_parametersType* read_cabac_context_parametersType = readCabacContextParameters(&inputBitstream, 4, 3);
+    ASSERT_NE(nullptr, read_cabac_context_parametersType);
+    EXPECT_EQ(cabac_context_parameters.adaptive_mode_flag, read_cabac_context_parametersType->adaptive_mode_flag);
+    EXPECT_EQ(cabac_context_parameters.num_contexts, read_cabac_context_parametersType->num_contexts);
+    EXPECT_EQ(
+            cabac_context_parameters.context_initialization_value[0],
+            read_cabac_context_parametersType->context_initialization_value[0]
+    );
+    EXPECT_EQ(
+            cabac_context_parameters.context_initialization_value[1],
+            read_cabac_context_parametersType->context_initialization_value[1]
+    );
+
+
+    testOutput = fopen("test","wb");
+    initializeOutputBitstream(&outputBitstream, testOutput);
+    writeCABACContextParameters(&cabac_context_parameters, &outputBitstream, 3, 4);
+    writeBuffer(&outputBitstream);
+    fflush(testOutput);
+    EXPECT_EQ(4, ftell(testOutput));
+    fclose(testOutput);
+
+    testInput = fopen("test","rb");
+    initializeInputBitstream(&inputBitstream, testInput);
+    read_cabac_context_parametersType = readCabacContextParameters(&inputBitstream, 3, 4);
+    ASSERT_NE(nullptr, read_cabac_context_parametersType);
+    EXPECT_EQ(cabac_context_parameters.adaptive_mode_flag, read_cabac_context_parametersType->adaptive_mode_flag);
+    EXPECT_EQ(cabac_context_parameters.num_contexts, read_cabac_context_parametersType->num_contexts);
+    EXPECT_EQ(
+            cabac_context_parameters.context_initialization_value[0],
+            read_cabac_context_parametersType->context_initialization_value[0]
+    );
+    EXPECT_EQ(
+            cabac_context_parameters.context_initialization_value[1],
+            read_cabac_context_parametersType->context_initialization_value[1]
+    );
+    EXPECT_EQ(
+            cabac_context_parameters.share_sub_sym_ctx_flag,
+            read_cabac_context_parametersType->share_sub_sym_ctx_flag
+    );
+}
+
+TEST_F(encodingParametersTest, writeAndReadCabacBinarization){
+    Cabac_binarizationsType* cabacBinarizations =
+            constructCabacBinarizationSignedTruncatedExponentialGolomb_Bypass(5);
+
+    FILE* testOutput = fopen("test","wb");
+    OutputBitstream outputBitstream;
+    initializeOutputBitstream(&outputBitstream, testOutput);
+    writeCABACBinarizations(cabacBinarizations, &outputBitstream, 4, 3);
+    writeBuffer(&outputBitstream);
+    fflush(testOutput);
+    EXPECT_EQ(2, ftell(testOutput));
+    fclose(testOutput);
+
+    FILE* testInput = fopen("test","rb");
+    InputBitstream inputBitstream;
+    initializeInputBitstream(&inputBitstream, testInput);
+    Cabac_binarizationsType* read_cabacBinarizations = readCabacBinarization(&inputBitstream, 4, 3);
+    ASSERT_NE(nullptr, read_cabacBinarizations);
+    EXPECT_EQ(cabacBinarizations->binarization_ID, read_cabacBinarizations->binarization_ID);
+    EXPECT_EQ(cabacBinarizations->bypass_flag, read_cabacBinarizations->bypass_flag);
+    EXPECT_EQ(
+            cabacBinarizations->cabac_binarization_parameters->cmax_teg,
+            read_cabacBinarizations->cabac_binarization_parameters->cmax_teg
+    );
+
+
+    uint8_t initValues[2]={3,6};
+    cabacBinarizations = constructCabacBinarizationSignedTruncatedExponentialGolomb_NotBypass(
+            5, true, 2, initValues, true
+    );
+
+    testOutput = fopen("test","wb");
+    initializeOutputBitstream(&outputBitstream, testOutput);
+    writeCABACBinarizations(cabacBinarizations, &outputBitstream, 4, 3);
+    writeBuffer(&outputBitstream);
+    fflush(testOutput);
+    EXPECT_EQ(6, ftell(testOutput));
+    fclose(testOutput);
+
+    testInput = fopen("test","rb");
+    initializeInputBitstream(&inputBitstream, testInput);
+    read_cabacBinarizations = readCabacBinarization(&inputBitstream, 4, 3);
+    ASSERT_NE(nullptr, read_cabacBinarizations);
+    EXPECT_EQ(cabacBinarizations->binarization_ID, read_cabacBinarizations->binarization_ID);
+    EXPECT_EQ(cabacBinarizations->bypass_flag, read_cabacBinarizations->bypass_flag);
+    EXPECT_EQ(
+            cabacBinarizations->cabac_binarization_parameters->cmax_teg,
+            read_cabacBinarizations->cabac_binarization_parameters->cmax_teg
+    );
+    EXPECT_EQ(
+            cabacBinarizations->cabac_context_parameters->num_contexts,
+            read_cabacBinarizations->cabac_context_parameters->num_contexts
+    );
+    EXPECT_EQ(
+            cabacBinarizations->cabac_context_parameters->context_initialization_value[0],
+            read_cabacBinarizations->cabac_context_parameters->context_initialization_value[0]
+    );
+    EXPECT_EQ(
+            cabacBinarizations->cabac_context_parameters->context_initialization_value[1],
+            read_cabacBinarizations->cabac_context_parameters->context_initialization_value[1]
+    );
+    EXPECT_EQ(
+            cabacBinarizations->cabac_context_parameters->adaptive_mode_flag,
+            read_cabacBinarizations->cabac_context_parameters->adaptive_mode_flag
+    );
+
+
+}
+
+TEST_F(encodingParametersTest, writeAndReadSupportValues){
+    Support_valuesType support_values;
+    support_values.coding_symbol_size = 4;
+    support_values.output_symbol_size = 3;
+    support_values.coding_order = 1;
+    support_values.share_subsym_lut_flag= true;
+    support_values.share_subsym_prv_flag= true;
+
+    FILE* testOutput = fopen("test","wb");
+    OutputBitstream outputBitstream;
+    initializeOutputBitstream(&outputBitstream, testOutput);
+    writeSupportValues(&support_values, &outputBitstream, SubSym_NO_TRANSFORM);
+    writeBuffer(&outputBitstream);
+    fflush(testOutput);
+    EXPECT_EQ(2, ftell(testOutput));
+    fclose(testOutput);
+
+    FILE* testInput = fopen("test","rb");
+    InputBitstream inputBitstream;
+    initializeInputBitstream(&inputBitstream, testInput);
+    Support_valuesType* read_support_values = readSupportValuesType(&inputBitstream, SubSym_NO_TRANSFORM);
+    ASSERT_NE(nullptr, read_support_values);
+
+    EXPECT_EQ(support_values.output_symbol_size, read_support_values->output_symbol_size);
+    EXPECT_EQ(support_values.coding_symbol_size, read_support_values->coding_symbol_size);
+    EXPECT_EQ(support_values.coding_order, read_support_values->coding_order);
+
+    //=============================================
+    support_values.coding_symbol_size = 3;
+    support_values.output_symbol_size = 4;
+    testOutput = fopen("test","wb");
+    initializeOutputBitstream(&outputBitstream, testOutput);
+    writeSupportValues(&support_values, &outputBitstream, SubSym_LUT_TRANSFORM);
+    writeBuffer(&outputBitstream);
+    fflush(testOutput);
+    EXPECT_EQ(2, ftell(testOutput));
+    fclose(testOutput);
+
+    testInput = fopen("test","rb");
+    initializeInputBitstream(&inputBitstream, testInput);
+    read_support_values = readSupportValuesType(&inputBitstream, SubSym_LUT_TRANSFORM);
+    ASSERT_NE(nullptr, read_support_values);
+
+    EXPECT_EQ(support_values.output_symbol_size, read_support_values->output_symbol_size);
+    EXPECT_EQ(support_values.coding_symbol_size, read_support_values->coding_symbol_size);
+    EXPECT_EQ(support_values.coding_order, read_support_values->coding_order);
+    EXPECT_EQ(support_values.share_subsym_lut_flag, read_support_values->share_subsym_lut_flag);
+    EXPECT_EQ(support_values.share_subsym_prv_flag, read_support_values->share_subsym_prv_flag);
+}
+
+/*TEST_F(encodingParametersTest, writeEncodingParametersSingleAlignmentNoComputedTest){
     uint8_t datasetType = 1;
     uint8_t alphabetId = 1;
     uint32_t reads_length = 100;
@@ -2262,6 +2592,8 @@ TEST_F(encodingParametersTest, writeEncodingParametersSingleAlignmentNoComputedT
     initializeInputBitstream(&inputBitstream, inputFile);
     Encoding_ParametersType* encodingParametersType = readEncodingParameters(&inputBitstream);
 
+    ASSERT_TRUE(encodingParametersType != nullptr);
+
 
     uint8_t datasetType_buffer;
     uint8_t alphabetId_buffer;
@@ -2280,54 +2612,55 @@ TEST_F(encodingParametersTest, writeEncodingParametersSingleAlignmentNoComputedT
     uint32_t multipleSignatureBase_buffer;
     uint8_t U_signature_size_buffer;
 
-    EXPECT_EQ(SUCCESS, getDatasetTypeParameters(encodingParameters, &datasetType_buffer));
+    EXPECT_EQ(SUCCESS, getDatasetTypeParameters(encodingParametersType, &datasetType_buffer));
     EXPECT_EQ(datasetType, datasetType_buffer);
-    EXPECT_EQ(SUCCESS, getAlphabetID(encodingParameters, &alphabetId_buffer));
+    EXPECT_EQ(SUCCESS, getAlphabetID(encodingParametersType, &alphabetId_buffer));
     EXPECT_EQ(alphabetId, alphabetId_buffer);
-    EXPECT_EQ(SUCCESS, getReadsLength(encodingParameters, &reads_length_buffer));
+    EXPECT_EQ(SUCCESS, getReadsLength(encodingParametersType, &reads_length_buffer));
     EXPECT_EQ(reads_length, reads_length_buffer);
     EXPECT_EQ(SUCCESS,
-            getNumberOfTemplateSegmentsMinus1(encodingParameters, &number_of_template_segments_minus1_buffer)
+            getNumberOfTemplateSegmentsMinus1(encodingParametersType, &number_of_template_segments_minus1_buffer)
     );
     EXPECT_EQ(number_of_template_segments_minus1, number_of_template_segments_minus1_buffer);
-    EXPECT_EQ(SUCCESS, getMaxAUDataUnitSize(encodingParameters, &max_au_data_unit_size_buffer));
+    EXPECT_EQ(SUCCESS, getMaxAUDataUnitSize(encodingParametersType, &max_au_data_unit_size_buffer));
     EXPECT_EQ(max_au_data_unit_size, max_au_data_unit_size_buffer);
-    EXPECT_EQ(SUCCESS, getPos40Bits(encodingParameters, &pos40bits_buffer));
+    EXPECT_EQ(SUCCESS, getPos40Bits(encodingParametersType, &pos40bits_buffer));
     EXPECT_EQ(pos40bits, pos40bits_buffer);
-    EXPECT_EQ(SUCCESS, getQVDepth(encodingParameters, &qv_depth_buffer));
+    EXPECT_EQ(SUCCESS, getQVDepth(encodingParametersType, &qv_depth_buffer));
     EXPECT_EQ(qv_depth, qv_depth_buffer);
-    EXPECT_EQ(SUCCESS, getASDepth(encodingParameters, &as_depth_buffer));
+    EXPECT_EQ(SUCCESS, getASDepth(encodingParametersType, &as_depth_buffer));
     EXPECT_EQ(as_depth, as_depth_buffer);
-    EXPECT_EQ(SUCCESS, getNumClasses(encodingParameters, &numClasses_buffer));
+    EXPECT_EQ(SUCCESS, getNumClasses(encodingParametersType, &numClasses_buffer));
     EXPECT_EQ(numClasses, numClasses_buffer);
-    EXPECT_EQ(SUCCESS, getClassIds(encodingParameters, &numClasses_buffer, &classIds_buffer));
+    EXPECT_EQ(SUCCESS, getClassIds(encodingParametersType, &numClasses_buffer, &classIds_buffer));
     EXPECT_EQ(numClasses, numClasses_buffer);
     for(uint8_t class_i=0; class_i<numClasses; class_i++){
         EXPECT_EQ(classIDs_check[class_i],classIds_buffer[class_i]);
     }
-    EXPECT_EQ(SUCCESS, getNumGroups(encodingParameters, &numGroups_buffer));
+    EXPECT_EQ(SUCCESS, getNumGroups(encodingParametersType, &numGroups_buffer));
     EXPECT_EQ(numGroups, numGroups_buffer);
     for(uint8_t rgroup_i=0; rgroup_i<numGroups; rgroup_i++){
-        EXPECT_EQ(SUCCESS, getReadGroupId(encodingParameters, rgroup_i, &rgroupId_buffer));
+        EXPECT_EQ(SUCCESS, getReadGroupId(encodingParametersType, rgroup_i, &rgroupId_buffer));
         EXPECT_STREQ(rgroupId_check[rgroup_i], rgroupId_buffer);
     }
 
-    EXPECT_EQ(SUCCESS, getSplicedReadsFlag(encodingParameters, &splicedReadsFlag_buffer));
+    EXPECT_EQ(SUCCESS, getSplicedReadsFlag(encodingParametersType, &splicedReadsFlag_buffer));
     EXPECT_EQ(splicedReadsFlag, splicedReadsFlag_buffer);
-    EXPECT_EQ(SUCCESS, getMultipleAlignments_flag(encodingParameters, &multipleSignatureFlag_buffer));
+    EXPECT_EQ(SUCCESS, getMultipleAlignments_flag(encodingParametersType, &multipleSignatureFlag_buffer));
     EXPECT_EQ(multipleSignatureFlag, multipleSignatureFlag_buffer);
-    EXPECT_EQ(SUCCESS, getMultipleSignatureBaseParameters(encodingParameters, &multipleSignatureBase_buffer));
+    EXPECT_EQ(SUCCESS, getMultipleSignatureBaseParameters(encodingParametersType, &multipleSignatureBase_buffer));
     EXPECT_EQ(multipleSignatureBase, multipleSignatureBase_buffer);
-    EXPECT_EQ(SUCCESS, getSignatureSize(encodingParameters, &U_signature_size_buffer));
+    EXPECT_EQ(SUCCESS, getSignatureSize(encodingParametersType, &U_signature_size_buffer));
     EXPECT_EQ(U_signature_size, U_signature_size_buffer);
 
 
     DecoderConfigurationTypeCABAC* decoder_configuration_cabac_buffer;
-    EXPECT_EQ(OUT_OF_BOUNDERIES, getCABACDecoderConfiguration(encodingParameters, 6, 0, &decoder_configuration_cabac_buffer));
-    EXPECT_EQ(OUT_OF_BOUNDERIES, getCABACDecoderConfiguration(encodingParameters, 0, 19, &decoder_configuration_cabac_buffer));
-    EXPECT_EQ(OUT_OF_BOUNDERIES, getCABACDecoderConfiguration(encodingParameters, 0, 11, &decoder_configuration_cabac_buffer));
+    EXPECT_EQ(OUT_OF_BOUNDERIES, getCABACDecoderConfiguration(encodingParametersType, 6, 0, &decoder_configuration_cabac_buffer));
+    EXPECT_EQ(OUT_OF_BOUNDERIES, getCABACDecoderConfiguration(encodingParametersType, 0, 19, &decoder_configuration_cabac_buffer));
+    EXPECT_EQ(OUT_OF_BOUNDERIES, getCABACDecoderConfiguration(encodingParametersType, 0, 11, &decoder_configuration_cabac_buffer));
 
-    EXPECT_EQ(SUCCESS, getCABACDecoderConfiguration(encodingParameters, 0, 0, &decoder_configuration_cabac_buffer));
+    EXPECT_EQ(SUCCESS, getCABACDecoderConfiguration(encodingParametersType, 0, 0, &decoder_configuration_cabac_buffer));
+    testDecoderConfigurationCabac(decoder_configuration_cabac_buffer);
 
 
     free(classIDs_check);
@@ -2335,6 +2668,6 @@ TEST_F(encodingParametersTest, writeEncodingParametersSingleAlignmentNoComputedT
         free(rgroupId_check[group_i]);
     }
     free(rgroupId_check);
-    freeEncodingParameters(encodingParameters);
+    freeEncodingParameters(encodingParametersType);
 
-}
+}*/

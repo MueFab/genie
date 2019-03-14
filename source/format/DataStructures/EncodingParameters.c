@@ -12,12 +12,6 @@ EncodingParametersRC getCorrectedTransform_subseq_counter(
         uint8_t* transform_subseq_counter
 );
 
-Cabac_context_parametersType *readCabacContextParameters(
-        InputBitstream *input,
-        uint8_t coding_subsym_size,
-        uint8_t output_subsym_size
-);
-
 EncodingParametersRC getCorrectedTransform_subseq_counter(
     Transform_subseq_parametersType* transform_subseq_parametersType,
     uint8_t* transform_subseq_counter
@@ -178,6 +172,70 @@ EncodingParametersRC getCTruncExpGolParam(
             cTruncExpGolParam
     );
 }
+
+EncodingParametersRC getcMax_BinarizationParameters(
+        Cabac_binarization_parametersType* binarizationParameters,
+        BinarizationIdEnum binarization_ID,
+        uint8_t* cMax
+){
+    if(binarizationParameters == NULL || cMax == NULL){
+        return NULL_PTR;
+    }
+    if(
+        binarization_ID == BinarizationID_TruncatedUnary
+    ){
+        *cMax = binarizationParameters->cmax_teg;
+        return SUCCESS;
+    }
+    return FIELDs_EXISTANCE_CONDITIONS_NOT_MET;
+}
+
+EncodingParametersRC getcMax(
+        Cabac_binarizationsType* cabac_binarizations,
+        uint8_t* cMax
+){
+    if(cabac_binarizations == NULL || cabac_binarizations->cabac_binarization_parameters == NULL || cMax == NULL){
+        return NULL_PTR;
+    }
+    return getcMax_BinarizationParameters(
+            cabac_binarizations->cabac_binarization_parameters,
+            cabac_binarizations->binarization_ID,
+            cMax
+    );
+}
+
+EncodingParametersRC getcMaxTeg_BinarizationParameters(
+        Cabac_binarization_parametersType* binarizationParameters,
+        BinarizationIdEnum binarization_ID,
+        uint8_t* cMaxTeg
+){
+    if(binarizationParameters == NULL || cMaxTeg == NULL){
+        return NULL_PTR;
+    }
+    if(
+            binarization_ID == BinarizationID_TruncatedExponentialGolomb
+            || binarization_ID == BinarizationID_SignedTruncatedExponentialGolomb
+    ){
+        *cMaxTeg = binarizationParameters->cmax_teg;
+        return SUCCESS;
+    }
+    return FIELDs_EXISTANCE_CONDITIONS_NOT_MET;
+}
+
+EncodingParametersRC getcMaxTeg(
+        Cabac_binarizationsType* cabac_binarizations,
+        uint8_t* cMaxTeg
+){
+    if(cabac_binarizations == NULL || cabac_binarizations->cabac_binarization_parameters == NULL || cMaxTeg == NULL){
+        return NULL_PTR;
+    }
+    return getcMaxTeg_BinarizationParameters(
+            cabac_binarizations->cabac_binarization_parameters,
+            cabac_binarizations->binarization_ID,
+            cMaxTeg
+    );
+}
+
 EncodingParametersRC getcMaxDTU(
         Cabac_binarizationsType* cabac_binarizations,
         uint8_t* cMaxDTU
@@ -746,6 +804,60 @@ EncodingParametersRC getSupportValueShareSubsymPRVFlag(
     return resultSupportValue;
 }
 
+DecoderConfigurationTypeCABAC* readDecoderConfigurationTypeCABAC(InputBitstream* inputBitstream){
+    uint8_t num_descriptor_subsequence_cfgs_minus1;
+    uint16_t* descriptor_subsequence_ID;
+    Transform_subseq_parametersType** transformSubseqParameters;
+    TransformSubSymIdEnum** transformSubSymIdEnum;
+    Support_valuesType*** supportValues;
+    Cabac_binarizationsType*** cabacBinarizations;
+
+    readNBits8(inputBitstream, 8, &num_descriptor_subsequence_cfgs_minus1);
+    descriptor_subsequence_ID = (uint16_t*)malloc(sizeof(uint16_t)*(num_descriptor_subsequence_cfgs_minus1+1));
+    transformSubseqParameters =
+            (Transform_subseq_parametersType**)malloc(
+                    sizeof(Transform_subseq_parametersType*)*(num_descriptor_subsequence_cfgs_minus1+1)
+            );
+    transformSubSymIdEnum = (TransformSubSymIdEnum**)malloc(sizeof(TransformSubSymIdEnum*)*(num_descriptor_subsequence_cfgs_minus1+1));
+    supportValues = (Support_valuesType***)malloc(sizeof(Support_valuesType**)*(num_descriptor_subsequence_cfgs_minus1+1));
+    cabacBinarizations = (Cabac_binarizationsType***)malloc(sizeof(Cabac_binarizationsType**)*(num_descriptor_subsequence_cfgs_minus1+1));
+
+    for(uint8_t subsequence_i=0; subsequence_i<=num_descriptor_subsequence_cfgs_minus1; subsequence_i++){
+        readNBitsBigToNativeEndian16(inputBitstream, 10, &(descriptor_subsequence_ID[subsequence_i]));
+        Transform_subseq_parametersType* transform_subseq_parametersType = parseTransformSubseqParameters(inputBitstream);
+        transformSubseqParameters[subsequence_i] = transform_subseq_parametersType;
+        uint8_t transform_subseq_counter;
+        getCorrectedTransform_subseq_counter(transform_subseq_parametersType, &transform_subseq_counter);
+
+        transformSubSymIdEnum[subsequence_i] =
+                (TransformSubSymIdEnum*)malloc(sizeof(TransformSubSymIdEnum)*(transform_subseq_counter));
+        supportValues[subsequence_i] =
+                (Support_valuesType**)malloc(sizeof(Support_valuesType*)*(transform_subseq_counter));
+        cabacBinarizations[subsequence_i] =
+                (Cabac_binarizationsType**)malloc(sizeof(Cabac_binarizationsType*)*(transform_subseq_counter));
+
+        for(uint8_t transform_subseq_i=0; transform_subseq_i < transform_subseq_counter; transform_subseq_i++ ){
+            uint8_t transform_ID_subsym;
+            readNBits8(inputBitstream, 3, &transform_ID_subsym);
+            transformSubSymIdEnum[subsequence_i][transform_subseq_i] = transform_ID_subsym;
+            supportValues[subsequence_i][transform_subseq_i] = readSupportValuesType(inputBitstream, transform_ID_subsym);
+            cabacBinarizations[subsequence_i][transform_subseq_i] = readCabacBinarization(
+                    inputBitstream,
+                    supportValues[subsequence_i][transform_subseq_i]->coding_symbol_size,
+                    supportValues[subsequence_i][transform_subseq_i]->output_symbol_size
+            );
+        }
+    }
+    return constructDecoderConfigurationCABAC(
+            num_descriptor_subsequence_cfgs_minus1,
+            descriptor_subsequence_ID,
+            transformSubseqParameters,
+            transformSubSymIdEnum,
+            supportValues,
+            cabacBinarizations
+    );
+}
+
 EncodingParametersRC getCabacBinarizationsToken(
         Decoder_configuration_tokentype_cabac *decoder_configuration_tokentype_cabac,
         Cabac_binarizationsType** cabacBinarizations
@@ -968,6 +1080,12 @@ bool writeCABACBinarizationParameters(
                 8,
                 (char *) &(cabac_binarization_parameters->cmax_teg)
         );
+    } else if (binarization_ID == 8 || binarization_ID == 9) {
+        cmax_dtuSuccWrite = writeNBitsShift(
+                outputBitstream,
+                8,
+                (char *) &(cabac_binarization_parameters->cMaxDTU)
+        );
     }
     if (
         binarization_ID == 6
@@ -1139,7 +1257,7 @@ bool writeParameterSetCrps(
     }
     if(parameter_set_crps->cr_alg_ID == CrAlg_PushIn || parameter_set_crps->cr_alg_ID == CrAlg_LocalAssembly){
         return writeNBitsShift(outputBitstream, 8, (char*)&(parameter_set_crps->cr_pad_size))
-            && writeNBitsShiftAndConvertToBigEndian32(outputBitstream, 24, parameter_set_crps->cr_buf_max_size);
+            && writeNBitsShiftAndConvertToBigEndian32_new(outputBitstream, 24, parameter_set_crps->cr_buf_max_size);
     }
     return true;
 }
@@ -1175,23 +1293,24 @@ bool writeEncoding_parameters(
         }
         int endLoop = encodingParameters->class_specific_dec_cfg_flag[desc_ID] ? encodingParameters->num_classes : 1;
         for(int c = 0; c < endLoop; c++){
+            writeNBitsShift(outputBitstream, 8, (char*)&(encodingParameters->dec_cfg_preset[desc_ID][c]));
             if(encodingParameters->encoding_mode_id[c][desc_ID] != 0){
                 //Only supports CABAC
                 return false;
             }
-            if (!writeNBitsShift(outputBitstream, 8, (char*) &(encodingParameters->encoding_mode_id[c][desc_ID]))){
+            if (!writeNBitsShift(outputBitstream, 8, (char*) &(encodingParameters->encoding_mode_id[desc_ID][c]))){
                 return false;
             }
             if(desc_ID != 11 && desc_ID != 15){
                 if(!writeDecoderConfigurationCABAC(
-                        (DecoderConfigurationTypeCABAC*)(encodingParameters->decoderConfiguration[c][desc_ID]),
+                        (DecoderConfigurationTypeCABAC*)(encodingParameters->decoderConfiguration[desc_ID][c]),
                         outputBitstream
                 )){
                     return false;
                 }
             }else {
                 if(!writeDecoder_configuration_tokentype_TypeCABAC(
-                        (Decoder_configuration_tokentype*)(encodingParameters->decoderConfiguration[c][desc_ID]),
+                        (Decoder_configuration_tokentype*)(encodingParameters->decoderConfiguration[desc_ID][c]),
                         outputBitstream
                 )){
                     return false;
@@ -1211,7 +1330,7 @@ bool writeEncoding_parameters(
     if(!(
             writeBit(outputBitstream, (uint8_t)(encodingParameters->multiple_alignments_flag))
             && writeBit(outputBitstream, (uint8_t)(encodingParameters->spliced_reads_flag?1:0))
-            && writeNBitsShiftAndConvertToBigEndian32(outputBitstream, 31, encodingParameters->multiple_signature_base))
+            && writeNBitsShiftAndConvertToBigEndian32_new(outputBitstream, 31, encodingParameters->multiple_signature_base))
     ){
         return false;
     }
@@ -1385,17 +1504,21 @@ Transform_subseq_parametersType * parseTransformSubseqParameters(InputBitstream 
         return NULL;
     }
     switch (buffer){
-        SubSeq_EQUALITY_CODING:
+        case SubSeq_NO_TRANSFORM:
+            transform_ID_subseq = SubSeq_NO_TRANSFORM;
+            break;
+        case SubSeq_EQUALITY_CODING:
             transform_ID_subseq = SubSeq_EQUALITY_CODING;
             break;
-        SubSeq_MATCH_CODING:
+        case SubSeq_MATCH_CODING:
             transform_ID_subseq = SubSeq_MATCH_CODING;
             readNBitsBigToNativeEndian16(input, 16, &match_coding_buffer_size);
             break;
-        SubSeq_RLE_CODING:
+        case SubSeq_RLE_CODING:
             transform_ID_subseq = SubSeq_RLE_CODING;
             readNBits8(input, 8, &rle_coding_guard);
-        SubSeq_MERGE_CODING:
+            break;
+        case SubSeq_MERGE_CODING:
             transform_ID_subseq = SubSeq_MERGE_CODING;
             readNBits8(input, 4, &merge_coding_subseq_count);
             merge_coding_shift_size = malloc(sizeof(uint8_t)*merge_coding_subseq_count);
@@ -2352,6 +2475,10 @@ Encoding_ParametersType *constructEncodingParameters(uint8_t datasetType, uint8_
     encodingParametersType->as_depth = as_depth;
     encodingParametersType->num_classes = numClasses;
     encodingParametersType->classID = classID;
+    encodingParametersType->dec_cfg_preset = (uint8_t**)malloc(sizeof(uint8_t*)*18);
+    for(uint8_t descriptor_i=0; descriptor_i < 18; descriptor_i++){
+        encodingParametersType->dec_cfg_preset[descriptor_i] = (uint8_t*)calloc(numClasses, sizeof(uint8_t));
+    }
     encodingParametersType->decoderConfiguration = (void***)malloc(sizeof(void**)*18);
     for(uint8_t descriptor_i=0; descriptor_i < 18; descriptor_i++){
         encodingParametersType->decoderConfiguration[descriptor_i] = (void**)malloc(sizeof(void*)*numClasses);
@@ -2367,10 +2494,10 @@ Encoding_ParametersType *constructEncodingParameters(uint8_t datasetType, uint8_
     encodingParametersType->multiple_signature_base = multipleSignatureBase;
     encodingParametersType->U_signature_size = U_signature_size;
     
-    encodingParametersType->qv_coding_mode = qv_coding_mode;
-    encodingParametersType->qvps_flag = qvps_flag;
-    encodingParametersType->parameter_set_qvps = parameter_set_qvps;
-    encodingParametersType->qvps_preset_ID = qvps_preset_ID;
+    encodingParametersType->qv_coding_mode = calloc(numClasses, sizeof(uint8_t));
+    encodingParametersType->qvps_flag = calloc(numClasses, sizeof(bool));
+    encodingParametersType->parameter_set_qvps = calloc(numClasses, sizeof(Parameter_set_qvpsType*));
+    encodingParametersType->qvps_preset_ID = calloc(numClasses, sizeof(uint8_t));
     
     encodingParametersType->crps_flag = crps_flag;
     encodingParametersType->parameter_set_crps = parameter_set_crps;
@@ -2754,13 +2881,14 @@ Encoding_ParametersType* readEncodingParameters(InputBitstream* input){
             encoding_mode_id[descriptor_i] = malloc(sizeof(uint8_t));
             decoderConfiguration[descriptor_i] = malloc(sizeof(void*));
 
-            readNBits8(input, 8, dec_cfg_preset[descriptor_i]);
+            readNBits8(input, 8, &(dec_cfg_preset[descriptor_i][0]));
             if(dec_cfg_preset[descriptor_i][0] != 0){
+                fprintf(stderr, "dec_cfg_preset must be equal to 0.\n");
                 return NULL;
             }
 
-            readNBits8(input, 8, encoding_mode_id[descriptor_i]);
-            //readDescriptorConfiguration
+            readNBits8(input, 8, &(encoding_mode_id[descriptor_i][0]));
+            decoderConfiguration[descriptor_i][0] = readDecoderConfigurationTypeCABAC(input);
 
 
         }else{
