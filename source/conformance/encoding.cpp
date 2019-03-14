@@ -9,9 +9,12 @@
 #include "conformance/exceptions.h"
 #include "conformance/fastq_file_reader.h"
 #include "conformance/fastq_record.h"
+#include "conformance/genie_gabac_output_stream.h"
 #include "conformance/log.h"
 
+extern "C" {
 #include "format/DataUnits/DataUnits.h"
+}
 
 #include "gabac/gabac.h"
 
@@ -76,7 +79,7 @@ void encode(const ProgramOptions &programOptions)
 
     // Interface to GABAC library
     gabac::BufferInputStream bufferInputStream(&inputDataBlock);
-    gabac::BufferOutputStream bufferOutputStream;
+    GenieGabacOutputStream bufferOutputStream;
 
     std::string defaultGabacConf = "{"
                                        "\"word_size\":\"1\","
@@ -100,66 +103,81 @@ void encode(const ProgramOptions &programOptions)
 
     gabac::encode(ioconf, enConf);
 
-    // Get the GABAC bitstream
+    // Get the GABAC bitstream(s)
     size_t outputDataBlockInitialSize = 0;
     size_t outputDataBlockWordSize = 1;
-    gabac::DataBlock outputDataBlock(outputDataBlockInitialSize, outputDataBlockWordSize);
-    bufferOutputStream.flush(&outputDataBlock);
-    GENIE_LOG_TRACE << "Block payload size: " << outputDataBlock.size();
+    std::vector<std::pair<size_t, uint8_t *>> data;
+    bufferOutputStream.flush(&data);
+    GENIE_LOG_TRACE << "Number of bitstreams: " << data.size();
+    for (const auto& bsp : data) {
+        size_t blockPayloadSize = bsp.first;
+        GENIE_LOG_TRACE << "Block payload size: " << blockPayloadSize;
+        GENIE_LOG_TRACE << "Block payload: ";
+        for (size_t i = 0; i < blockPayloadSize; i++) {
+            std::cout << std::hex << "0x" << static_cast<int>(bsp.second[i]) << " ";
+        }
+        std::cout << std::endl;
 
-    // TODO(Fabian): align this with the block payload syntax
-    // TODO(Tom): check GABAC's byte order
-    size_t blockPayloadSize = outputDataBlock.size() * outputDataBlock.getWordSize();
-    auto *blockPayload = static_cast<uint8_t *>(malloc(blockPayloadSize));
-    std::memcpy(blockPayload, static_cast<uint8_t*>(outputDataBlock.getData()), blockPayloadSize);
-
-    // GENIE_LOG_TRACE << "Block payload: ";
-    // for (size_t i = 0; i < blockPayloadSize; i++) {
-    //     std::cout << std::hex << "0x" << static_cast<int>(blockPayload[i]) << " ";
-    // }
-    // std::cout << std::endl;
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-    // CREATE PARAMETER SET
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // TODO(Daniel): rename parameterSSSSset
-    // TODO(Daniel): fill parameter set
-    ParametersSet* parameterSet = initParametersSet(0, 0);
+        // DONE(Fabian): align this with the block payload syntax
+        // TODO(Fabian): free allocated memory
+        // DONE(Tom): check GABAC's byte order - it's LSB
 
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-    // CREATE ACCESS UNIT
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+        // CREATE PARAMETER SET
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    DataUnitAccessUnit* accessUnit = initDataUnitAccessUnit(
-            0, 1, 0, 6, 1, 0, 0, 0, 0, 0, 0, 0);
+        // TODO(Daniel): rename parameterSSSSset
+        // TODO(Daniel, Jan, Tom): fill parameter set
+        //   - write a separate method
+        //   - example code: tests/format/EncodingParameters_tests.cpp [ TEST_F(encodingParametersTest, writeEncodingParametersSingleAlignmentNoComputedTest) ]
 
-    DatasetContainer* datasetContainer = initDatasetContainer();
-    // TODO(Daniel): add support for init block from byte array
-    Block* block = initBlock(datasetContainer, nullptr);
-    DataUnitBlockHeader* blockHeader = initDataUnitBlockHeader(6, blockPayloadSize);
 
-    bool success = addBlockToDataUnitAccessUnit(accessUnit, block, blockHeader);
-    if (!success) {
-        GENIE_DIE("addBlockToDataUnitAccessUnit() failed");
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+        // CREATE ACCESS UNIT
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        ClassType classType = { .classType = CLASS_TYPE_CLASS_U };
+        SequenceID sequenceId = { .sequenceID = 0 };
+        SequenceID refSequenceId = { .sequenceID = 0 };
+        DataUnitAccessUnit* accessUnit = initDataUnitAccessUnit(
+                0, 1, 0, classType, 1, 0, 0, sequenceId, 0, 0, refSequenceId, 0, 0, 0, 0);
+
+        DatasetContainer* datasetContainer = initDatasetContainer();
+        // DONE(Daniel): add support for init block from byte array
+        DataUnitBlockHeader* blockHeader = initDataUnitBlockHeader(6, blockPayloadSize);
+        Block* block = initBlockWithHeaderPayloadInMemory(
+            6,                                    // descriptorId
+            blockPayloadSize,                     // payloadSize
+            reinterpret_cast<char*>(bsp.second),  // payloadInMemory
+            bsp.first);                           // size_t payloadInMemorySize)
+
+        bool success = addBlockToDataUnitAccessUnit(accessUnit, block, blockHeader);
+        if (!success) {
+            GENIE_DIE("addBlockToDataUnitAccessUnit() failed");
+        }
+
+        freeDataUnitAccessUnit(accessUnit);
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+        // WRITE TO FILE
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // TODO(Jan): copy output_file and input_file classes from GABAC to genie
+        // TODO(Jan): get output file name from program options
+        // TODO(Daniel): get writeParametersSet() and writeDataUnitAccessUnit() up & running
+        // FILE* outputFilePointer = nullptr;
+        // writeParametersSet(parameterSet, outputFilePointer);
+        // writeDataUnitAccessUnit(accessUnit, false, outputFilePointer);
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+        // STUFF FOR LATER DISCUSSIONS
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // TODO(Fabian): copy bit_input_stream and bit_output_stream from GABAC to genie, use std::vector instead of DataBlock again
     }
-
-    freeDataUnitAccessUnit(accessUnit);
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-    // WRITE TO FILE
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // TODO(Fabian): copy bit_input_stream and bit_output_stream from GABAC to genie, use std::vector instead of DataBlock again,
-    // TODO(Fabian): copy output_file and input_file classes from GABAC to genie
-
-    // TODO(Jan): program options, get output file pointer (FILE*)
-    //FILE* outputFilePointer = nullptr;
-    //writeParametersSet(parameterSet, outputFilePointer);
-    //writeDataUnitAccessUnit(accessUnit, false, outputFilePointer);
 }
 
 
