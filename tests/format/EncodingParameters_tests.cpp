@@ -2586,8 +2586,77 @@ TEST_F(encodingParametersTest, writeAndReadTransformSubseqParameters){
 }
 
 TEST_F(encodingParametersTest, writeAndReadDecoderConfiguration){
+    Transform_subseq_parametersType transform_subseq_parameters;
+    transform_subseq_parameters.transform_ID_subseq = 0;
+    Transform_subseq_parametersType* arrayTransformSubseq[]={
+            &transform_subseq_parameters
+    };
+
+    auto ** transformSubSymId = (TransformSubSymIdEnum**)malloc(sizeof(TransformSubSymIdEnum*));
+    transformSubSymId[0] = (TransformSubSymIdEnum*)malloc(sizeof(TransformSubSymIdEnum));
+    transformSubSymId[0][0]=SubSym_NO_TRANSFORM;
+
+    auto supportValues = (Support_valuesType***)malloc(sizeof(Support_valuesType**));
+    supportValues[0] = (Support_valuesType**)malloc(sizeof(Support_valuesType*));
+    supportValues[0][0]=constructSupportValues(4,3,1,false, false);
+
+    auto cabacBinarizations = (Cabac_binarizationsType***)malloc(sizeof(Cabac_binarizationsType*));
+    cabacBinarizations[0] = (Cabac_binarizationsType**)malloc(sizeof(Cabac_binarizationsType*));
+    cabacBinarizations[0][0] = constructCabacBinarizationBinaryCoding_Bypass();
+
     uint8_t num_descriptor_subsequence_cfgs_minus1 = 0;
     uint16_t descriptorSubsequenceID[] = {3};
+
+    DecoderConfigurationTypeCABAC decoderConfigurationTypeCABAC;
+    decoderConfigurationTypeCABAC.num_descriptor_subsequence_cfgs_minus1 =
+            num_descriptor_subsequence_cfgs_minus1;
+    decoderConfigurationTypeCABAC.descriptor_subsequence_ID = descriptorSubsequenceID;
+    decoderConfigurationTypeCABAC.transform_subseq_parameters = arrayTransformSubseq;
+    decoderConfigurationTypeCABAC.transform_id_subsym = transformSubSymId;
+    decoderConfigurationTypeCABAC.support_values = supportValues;
+    decoderConfigurationTypeCABAC.cabac_binarizations = cabacBinarizations;
+
+    FILE* outputFile = fopen("test","wb");
+    OutputBitstream outputBitstream;
+    initializeOutputBitstream(&outputBitstream, outputFile);
+    writeDecoderConfigurationCABAC(&decoderConfigurationTypeCABAC, &outputBitstream);
+    writeBuffer(&outputBitstream);
+    EXPECT_EQ(7,ftell(outputFile));
+    fclose(outputFile);
+
+
+
+    FILE* inputFile = fopen("test","rb");
+    InputBitstream inputBitstream;
+    initializeInputBitstream(&inputBitstream, inputFile);
+    DecoderConfigurationTypeCABAC* read_DecoderConfigurationTypeCABAC = readDecoderConfigurationTypeCABAC(&inputBitstream);
+    ASSERT_NE(nullptr, read_DecoderConfigurationTypeCABAC);
+    EXPECT_EQ(
+            decoderConfigurationTypeCABAC.num_descriptor_subsequence_cfgs_minus1,
+            read_DecoderConfigurationTypeCABAC->num_descriptor_subsequence_cfgs_minus1
+    );
+    EXPECT_EQ(
+            decoderConfigurationTypeCABAC.descriptor_subsequence_ID[0],
+            read_DecoderConfigurationTypeCABAC->descriptor_subsequence_ID[0]
+    );
+    EXPECT_EQ(
+            (**decoderConfigurationTypeCABAC.support_values)->coding_symbol_size,
+                    (**(*read_DecoderConfigurationTypeCABAC->support_values)).coding_symbol_size
+    );
+    EXPECT_EQ(
+            (**decoderConfigurationTypeCABAC.support_values)->output_symbol_size,
+            (**(*read_DecoderConfigurationTypeCABAC->support_values)).output_symbol_size
+    );
+    EXPECT_EQ(
+            decoderConfigurationTypeCABAC.transform_id_subsym[0][0],
+            read_DecoderConfigurationTypeCABAC->transform_id_subsym[0][0]
+    );
+    EXPECT_EQ(
+            (**decoderConfigurationTypeCABAC.cabac_binarizations)->binarization_ID,
+            (**(*read_DecoderConfigurationTypeCABAC->cabac_binarizations)).binarization_ID
+    );
+
+
 
 }
 

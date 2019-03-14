@@ -1156,7 +1156,7 @@ bool writeDecoderConfigurationCABAC(
         i++
     ){
         if(
-            !writeNBitsShiftAndConvertToBigEndian16(outputBitstream, 10, i)
+            !writeNBitsShiftAndConvertToBigEndian16(outputBitstream, 10, decoderConfigurationCABAC->descriptor_subsequence_ID[i])
             || !writeTransformSubseqParameters(
                 decoderConfigurationCABAC->transform_subseq_parameters[i],
                 outputBitstream

@@ -275,6 +275,10 @@ typedef struct {
     Support_valuesType*** support_values; //13.1.2.2
     Cabac_binarizationsType*** cabac_binarizations; //13.1.2.3
 } DecoderConfigurationTypeCABAC;
+bool writeDecoderConfigurationCABAC(
+        DecoderConfigurationTypeCABAC* decoderConfigurationCABAC,
+        OutputBitstream* outputBitstream
+);
 
 void freeDecoderConfigurationTypeCABAC(
         DecoderConfigurationTypeCABAC* decoderConfigurationTypeCABAC,
