@@ -47,7 +47,7 @@ void packFile(const std::string& path, const std::string& file, FILE *fout){
 
         // Write block
         tmp = fwrite(buffer.data(), 1, tmp, fout);
-        if (tmp != std::min(buffer.size(), size - byteswritten)) {
+        if (tmp != std::min(buffer.size(), static_cast<size_t>(size - byteswritten))) {
             fclose(fin_desc);
             throw std::runtime_error("Could not write to output file");
         }
