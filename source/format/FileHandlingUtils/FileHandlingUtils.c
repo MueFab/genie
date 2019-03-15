@@ -18,6 +18,13 @@ uint8_t addParametersInformation(
         uint8_t parametersId,
         DatasetGroupId datasetGroupId
 );
+
+int extractAccessUnitsFromMIT(
+        DatasetGroupId datasetGroupId,
+        DatasetContainer* datasetContainer,
+        DatasetRequest datasetRequest,
+        DataUnits* dataUnits
+);
 int extractAccessUnitsNotFromMIT(
         DatasetGroupId datasetGroupId,
         DatasetContainer* datasetContainer,
@@ -1404,7 +1411,12 @@ void extractRequestedInformationFromDataset(DatasetGroupId datasetGroupId, Datas
                 dataUnits
         );
     }else{
-
+        extractAccessUnitsFromMIT(
+                datasetGroupId,
+                datasetContainer,
+                request,
+                dataUnits
+        );
     }
 }
 
@@ -1443,6 +1455,37 @@ void extractRequestedInformationFromDataset(DatasetGroupId datasetGroupId, Datas
     return 0;
 
 }*/
+
+
+int extractAccessUnitsFromMIT(
+        DatasetGroupId datasetGroupId,
+        DatasetContainer* datasetContainer,
+        DatasetRequest datasetRequest,
+        DataUnits* dataUnits
+){
+    uint16_t num_sequences = getSequencesCount(getDatasetHeader(datasetContainer));
+    for (uint16_t sequence_i = 0; sequence_i < num_sequences; sequence_i++) {
+        uint32_t numAUs = getBlocksInSequence(getDatasetHeader(datasetContainer), sequence_i);
+        for (uint32_t au_i = 0; au_i < numAUs; au_i++) {
+            uint8_t numClasses = getClassesCount(getDatasetHeader(datasetContainer));
+            for (uint8_t class_i = 0; class_i < numClasses; class_i++) {
+                SequenceID sequenceID = getSequenceId(datasetContainer->datasetHeader, sequence_i);
+                DataUnitAccessUnit *dataUnitAccessUnit = getDataUnitAccessUnit(
+                        datasetContainer,
+                        sequenceID,
+                        class_i,
+                        au_i
+                );
+                if (dataUnitAccessUnit == NULL) continue;
+
+                addDataUnitAccessUnitAndDependenciesIfRequired(
+                        dataUnitAccessUnit, dataUnits, datasetRequest, datasetGroupId, datasetContainer
+                );
+            }
+        }
+    }
+    return 0;
+}
 
 
 int extractAccessUnitsNotFromMIT(
@@ -1562,7 +1605,9 @@ bool dataUnitAccessUnitIntersects(DataUnitAccessUnit* dataUnitAccessUnit, Datase
 
             uint64_t maxStart = accessUnitStart > classRequestStart ? accessUnitStart : classRequestStart;
             uint64_t minEnd = accessUnitEnd < classRequestEnd ? accessUnitEnd : classRequestEnd;
-            return maxStart <= minEnd;
+            if(maxStart <= minEnd){
+                return true;
+            }
         }
     }
     return false;
