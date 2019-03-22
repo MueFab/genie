@@ -1,27 +1,27 @@
 {
-    "word_size": "8",
-    "sequence_transformation_id": "3",
-    "sequence_transformation_parameter": "255",
+    "word_size": 8,
+    "sequence_transformation_id": 3,
+    "sequence_transformation_parameter": 255,
     "transformed_sequences": [
         {
-            "lut_transformation_enabled": "1",
-            "lut_transformation_bits": "4",
-            "lut_transformation_order": "0",
-            "diff_coding_enabled": "0",
-            "binarization_id": "4",
+            "lut_transformation_enabled": true,
+            "lut_transformation_bits": 4,
+            "lut_transformation_order": 0,
+            "diff_coding_enabled": false,
+            "binarization_id": 4,
             "binarization_parameters": [
-                "2"
+                2
             ],
-            "context_selection_id": "2"
+            "context_selection_id": 2
         },
         {
-            "lut_transformation_enabled": "0",
-            "diff_coding_enabled": "0",
-            "binarization_id": "0",
+            "lut_transformation_enabled": false,
+            "diff_coding_enabled": false,
+            "binarization_id": 0,
             "binarization_parameters": [
-                "32"
+                32
             ],
-            "context_selection_id": "3"
+            "context_selection_id": 3
         }
     ]
 }
