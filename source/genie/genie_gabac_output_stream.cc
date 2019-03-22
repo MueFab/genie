@@ -1,30 +1,51 @@
 // Copyright 2018 The genie authors
 
 #include "genie/genie_gabac_output_stream.h"
+
 namespace dsg {
 
-    GenieGabacOutputStream::GenieGabacOutputStream() : bytes(0){
-    }
+GenieGabacOutputBuffer::GenieGabacOutputBuffer() : bytesLeft(0){
 
-    size_t GenieGabacOutputStream::writeStream(gabac::DataBlock *inbuffer){
-        size_t currSize = inbuffer->size() * inbuffer->getWordSize();
-        bytes += currSize;
-        streams.emplace_back(currSize, static_cast<uint8_t *>(malloc(currSize)));
-        memcpy(streams.back().second, inbuffer->getData(), currSize);
-        return currSize;
-    }
+}
 
-    size_t GenieGabacOutputStream::writeBytes(gabac::DataBlock *){
-        throw std::runtime_error("WriteBytes not supported by gabac-genie-outputstream!");
-    }
+int GenieGabacOutputBuffer::overflow(int c){
+    char c2 = c;
+    xsputn(&c2, sizeof(char));
+    return c;
+}
 
-    size_t GenieGabacOutputStream::bytesWritten(){
-        return bytes;
-    }
+std::streamsize GenieGabacOutputBuffer::xsputn(const char *s, std::streamsize n){
+    std::streamsize curPos = 0;
+    while (curPos < n) {
+        // Fill size buffer
+        while (bytesLeft == 0 && sizeBuf.size() != sizeof(uint64_t) && curPos < n) {
+            sizeBuf.push_back(s[curPos++]);
+        }
 
-    void GenieGabacOutputStream::flush(std::vector <std::pair<size_t, uint8_t *>> *dat){
-        dat->swap(streams);
-        bytes = 0;
-    }
+        // Size buffer full, create new stream
+        if (sizeBuf.size() == sizeof(uint64_t)) {
+            bytesLeft = *reinterpret_cast<uint64_t *>(sizeBuf.data());
+            sizeBuf.clear();
+            streams.emplace_back(bytesLeft, sizeof(uint8_t));
+        }
 
+        // Copy data if possible
+        size_t l = std::min(n - curPos, bytesLeft);
+        memcpy(static_cast<uint8_t *>(streams.back().getData()) + (streams.back().size() - bytesLeft), s + curPos, l);
+        curPos += l;
+        bytesLeft -= l;
+    }
+    return n;
+}
+
+void GenieGabacOutputBuffer::flush_blocks(std::vector<gabac::DataBlock> *dat){
+    if (bytesLeft) {
+        GABAC_THROW_RUNTIME_EXCEPTION("Stream not in flushable state, bytes left");
+    }
+    if (!sizeBuf.empty()) {
+        GABAC_THROW_RUNTIME_EXCEPTION("Stream not in flushable state, expecting size");
+    }
+    dat->clear();
+    dat->swap(streams);
+}
 }
