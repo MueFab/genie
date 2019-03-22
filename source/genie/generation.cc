@@ -45,6 +45,84 @@ void decompress(const std::string& temp_dir,
 
 namespace dsg {
 
+bool copyDir(
+        boost::filesystem::path const & source,
+        boost::filesystem::path const & destination
+)
+{
+    namespace fs = boost::filesystem;
+    try
+    {
+        // Check whether the function call is valid
+        if(
+                !fs::exists(source) ||
+                !fs::is_directory(source)
+                )
+        {
+            std::cerr << "Source directory " << source.string()
+                      << " does not exist or is not a directory." << '\n'
+                    ;
+            return false;
+        }
+        if(fs::exists(destination))
+        {
+            std::cerr << "Destination directory " << destination.string()
+                      << " already exists." << '\n'
+                    ;
+            return false;
+        }
+        // Create the destination directory
+        if(!fs::create_directory(destination))
+        {
+            std::cerr << "Unable to create destination directory"
+                      << destination.string() << '\n'
+                    ;
+            return false;
+        }
+    }
+    catch(fs::filesystem_error const & e)
+    {
+        std::cerr << e.what() << '\n';
+        return false;
+    }
+    // Iterate through the source directory
+    for(
+            fs::directory_iterator file(source);
+            file != fs::directory_iterator(); ++file
+            )
+    {
+        try
+        {
+            fs::path current(file->path());
+            if(fs::is_directory(current))
+            {
+                // Found directory: Recursion
+                if(
+                        !copyDir(
+                                current,
+                                destination / current.filename()
+                        )
+                        )
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                // Found file: Copy
+                fs::copy_file(
+                        current,
+                        destination / current.filename()
+                );
+            }
+        }
+        catch(fs::filesystem_error const & e)
+        {
+            std:: cerr << e.what() << '\n';
+        }
+    }
+    return true;
+}
 
 static void generationFromFasta(
         const ProgramOptions& programOptions
@@ -301,8 +379,12 @@ void decompression(
             unpackFiles(temp_dir, in);
     fclose(in);
 
+    //copyDir(temp_dir,temp_dir + "/../genie_comp");
+
     // Decompress
-    run_gabac(flist, true);
+    run_gabac(flist, programOptions.configPath, true, programOptions.numThreads);
+
+    //copyDir(temp_dir,temp_dir + "/../genie_uncomp");
 
     // Extract spring parameters
     spring::compression_params cp;
@@ -328,13 +410,17 @@ void decompression(
     // Finish fastq
     std::string outname = programOptions.inputFilePath;
     outname = outname.substr(0, outname.find_last_of('.'));
-    outname += "_decompressed";
-    int number = 0;
-    while (boost::filesystem::exists(outname + std::to_string(number) + ".fastq")) {
-        ++number;
+    if(cp.paired_end) {
+        outname += "_decompressed_1.fastq";
+        std::rename((temp_dir + "decompressed_1.fastq").c_str(), outname.c_str());
+        outname = programOptions.inputFilePath;
+        outname = outname.substr(0, outname.find_last_of('.'));
+        outname += "_decompressed_2.fastq";
+        std::rename((temp_dir + "decompressed_2.fastq").c_str(), outname.c_str());
+    } else {
+        outname += "_decompressed.fastq";
+        std::rename((temp_dir + "decompressed.fastq").c_str(), outname.c_str());
     }
-    outname += std::to_string(number) + ".fastq";
-    std::rename((temp_dir + "decompressed.fastq").c_str(), outname.c_str());
 
     boost::filesystem::remove_all(temp_dir);
 }
@@ -370,8 +456,11 @@ void generation(
                 }
             }
 
+           // copyDir(path,path + "/../genie_orig");
+
             // Compress
-            run_gabac(filelist, false);
+            run_gabac(filelist, programOptions.configPath, false, programOptions.numThreads);
+
 
             // Pack
             std::string outfile = (programOptions.inputFilePath.substr(0, programOptions.inputFilePath.find_last_of('.')) + ".genie");
@@ -384,11 +473,15 @@ void generation(
             packFiles(filelist, output);
             fclose(output);
 
+            size_t orgSize = boost::filesystem::file_size(programOptions.inputFilePath);
+            if(!programOptions.inputFilePairPath.empty()) {
+                orgSize += boost::filesystem::file_size(programOptions.inputFilePairPath);
+            }
+
             // Finish
             std::cout << "**** Finished ****" << std::endl;
-            std::cout
-                    << "Compressed "
-                    << boost::filesystem::file_size(programOptions.inputFilePath)
+            std::cout << "Compressed "
+                    << orgSize
                     << " to "
                     << boost::filesystem::file_size(outfile)
                     << ". Compression rate "
