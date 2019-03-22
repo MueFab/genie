@@ -37,6 +37,8 @@ void updateBin(gabac::EncodingConfiguration& c1, uint64_t max, unsigned index) {
                 c1.transformedSequenceConfigurations[index].binarizationParameters = {32};
             }
             break;
+        default:
+            return;
     }
 }
 
@@ -66,6 +68,8 @@ gabac::EncodingConfiguration updateConfig (const gabac::EncodingConfiguration& c
         case gabac::SequenceTransformationId::rle_coding:
             ret.transformedSequenceConfigurations[1].lutBits = 32;
             updateBin(ret, std::numeric_limits<uint32_t >::max(), 1);
+            break;
+        default:
             break;
     }
 
@@ -115,8 +119,8 @@ void compress_one_file(const std::string& file, const std::string& configfolder,
     }
 
     // Open input/output files
-    FILE *fin_desc = fopen(file.c_str(), "rb");
-    FILE *fout_desc = fopen((file + ".gabac").c_str(), "wb");
+    std::ifstream fin_desc(file, std::ios::binary);
+    std::ofstream fout_desc(file + ".gabac", std::ios::binary);
     if (!fin_desc) {
         throw std::runtime_error("Could not open " + file);
     }
@@ -125,10 +129,8 @@ void compress_one_file(const std::string& file, const std::string& configfolder,
     }
 
     // Configure gabac streams
-    gabac::FileInputStream fin(fin_desc);
-    gabac::FileOutputStream fout(fout_desc);
     gabac::IOConfiguration
-            ioconf = {&fin, &fout, 0, &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
+            ioconf = {&fin_desc, &fout_desc, 0, &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
     gabac::EncodingConfiguration enConf(config);
 
     std::cout << file << " ..." << std::endl;
@@ -142,8 +144,8 @@ void compress_one_file(const std::string& file, const std::string& configfolder,
     }
 
     // Close files
-    fclose(fin_desc);
-    fclose(fout_desc);
+    fin_desc.close();
+    fout_desc.close();
 
     // Replace input file with output
     std::cout << file << "\n(" << boost::filesystem::file_size(file) << " to\t";
@@ -222,23 +224,13 @@ void update_configs(const std::vector<std::string>& files, const std::string& co
         } else {
             std::cout << "Config " << configpath << " missing! Regenerating..." << std::endl;
 
-            gabac::BufferOutputStream outstream;
-            FILE* infile = fopen(file.c_str(), "rb");
-            gabac::FileInputStream instream(infile);
+            std::ofstream outstream(configpath, std::ios::binary);
+            std::ifstream instream(file,  std::ios::binary);
             gabac::IOConfiguration ioconf{&instream, &outstream, 0, &std::cout, gabac::IOConfiguration::LogLevel::WARNING};
             gabac::EncodingConfiguration enconf;
-            gabac::analyze(ioconf, gabac::getCandidateConfig(), &enconf);
-            fclose(infile);
-
-            FILE* outfile = fopen (configpath.c_str(), "wb");
-            std::string outstring = enconf.toJsonString();
-            if(!fwrite(outstring.c_str(), outstring.length(), 1, outfile)) {
-                throw std::runtime_error("Could not write new config");
-            }
-            fclose(outfile);
+            gabac::analyze(ioconf, gabac::getCandidateConfig());
 
             update_one_config(file, configpath);
-
         }
     }
 
