@@ -204,12 +204,11 @@ static void generationFromFastq(
 
     std::cout << "ureads: " << ureads << std::endl;
 
-    std::string defaultGabacConf = "{\"word_size\":\"1\",\"sequence_transformation_id\":\"0\",\""
-                                   "sequence_transformation_parameter\":\"0\",\"transformed_sequences\""
-                                   ":[{\"lut_transformation_enabled\":\"0\",\"lut_transformation_bits\""
-                                   ":\"0\",\"lut_transformation_order\":\"0\",\"diff_coding_enabled\":\""
-                                   "0\",\"binarization_id\":\"0\",\"binarization_parameters\":[\"8\"],\""
-                                   "context_selection_id\":\"2\"}]}";
+    std::string defaultGabacConf = "{\"word_size\": 1,\"sequence_transformation_id\": 0,\""
+                                   "sequence_transformation_parameter\": 0,\"transformed_sequences\""
+                                   ":[{\"lut_transformation_enabled\": false,\"diff_coding_enabled\": "
+                                   "false,\"binarization_id\": 0,\"binarization_parameters\":[8],\""
+                                   "context_selection_id\":2}]}";
 
     // Prepare input
     gabac::DataBlock inputDataBlock(ureads.size(), 1);
@@ -217,7 +216,7 @@ static void generationFromFastq(
     std::cout << "Input data block size: " << inputDataBlock.size() << std::endl;
 
     // Prepare streams
-    gabac::BufferInputStream bufferInputStream(&inputDataBlock);
+    gabac::IBufferStream bufferInputStream(&inputDataBlock);
     GenieGabacOutputStream bufferOutputStream;
     gabac::IOConfiguration ioconf = {&bufferInputStream, &bufferOutputStream, 0, &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
     gabac::EncodingConfiguration enConf(defaultGabacConf);
@@ -226,27 +225,24 @@ static void generationFromFastq(
     gabac::encode(ioconf, enConf);
 
     // Use output
-    std::vector<std::pair<size_t, uint8_t*>> outputData;
-    bufferOutputStream.flush(&outputData);
+    std::vector<gabac::DataBlock> outputData;
+    bufferOutputStream.flush_blocks(&outputData);
     std::cout << "Number of streams: " << outputData.size() << std::endl;
     for(const auto& s : outputData) {
-        std::cout << "Bitstream size: " << s.first << std::endl;
-        for(size_t i = 0; i < s.first; ++i) {
-            std::cout << static_cast<int>(s.second[i]) << " ";
+        std::cout << "Bitstream size: " << s.size() << std::endl;
+        for(size_t i = 0; i < s.size(); ++i) {
+            std::cout << static_cast<int>(s.get(i)) << " ";
         }
         std::cout << std::endl;
     }
 
-    size_t payloadSize = outputData[0].first;
-    uint8_t *payload = outputData[0].second;
+    size_t payloadSize = outputData[0].getRawSize();
+    uint8_t *payload = static_cast<uint8_t*> (outputData[0].getData());
 
     /*
      * Do stuff with payload ....
      */
 
-    for(const auto& s : outputData) {
-        free(s.second);
-    }
 
     // if (!programOptions.inputFilePairPath.empty()) {
     //     std::cout << "Paired file:\n";
