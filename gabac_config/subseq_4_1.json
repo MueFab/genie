@@ -1,16 +1,16 @@
 {
-    "word_size": "8",
-    "sequence_transformation_id": "0",
-    "sequence_transformation_parameter": "0",
+    "word_size": 8,
+    "sequence_transformation_id": 0,
+    "sequence_transformation_parameter": 0,
     "transformed_sequences": [
         {
-            "lut_transformation_enabled": "0",
-            "diff_coding_enabled": "0",
-            "binarization_id": "4",
+            "lut_transformation_enabled": false,
+            "diff_coding_enabled": false,
+            "binarization_id": 4,
             "binarization_parameters": [
-                "5"
+                5
             ],
-            "context_selection_id": "1"
+            "context_selection_id": 1
         }
     ]
 }
