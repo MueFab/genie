@@ -33,6 +33,8 @@
 #include "genie/genie_file_format.h"
 #include "genie/gabac_integration.h"
 
+#include "coding/alico/include/main.h"
+
 namespace spring {
 void decompress(const std::string& temp_dir,
                 const std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>>& ref_descriptorFilesPerAU,
@@ -265,42 +267,77 @@ static generated_aus generationFromFastq_SPRING(
 static void generationFromSam(
         const ProgramOptions& programOptions
 ){
-    std::cout << std::string(80, '-') << std::endl;
-    std::cout << "Descriptor stream generation from SAM file" << std::endl;
-    std::cout << std::string(80, '-') << std::endl;
-
-    // Initialize a SAM file reader.
-    input::sam::SamFileReader samFileReader(programOptions.inputFilePath);
-
-    // Get SAM header.
-    std::cout << "-- SAM header begin" << std::endl;
-    std::cout << samFileReader.header;
-    std::cout << "-- SAM header end" << std::endl;
-
-    // Read SAM records in blocks of 10 records.
-    size_t blockSize = 10;
-
+    std::cout << "Generating from sam " << programOptions.inputFilePath << std::endl;
+    std::string temp_dir;
     while (true) {
-        std::vector<input::sam::SamRecord> samRecords;
-        size_t numRecords = samFileReader.readRecords(blockSize, &samRecords);
-        if (numRecords != blockSize) {
-            std::cout << "Read only " << numRecords << " records (" << blockSize << " requested)." << std::endl;
-        }
-
-        // Iterate through the records.
-        for (const auto& samRecord : samRecords) {
-            std::cout << samRecord.qname << "\t";
-            std::cout << samRecord.rname << "\t";
-            std::cout << samRecord.pos << "\t";
-            std::cout << samRecord.cigar << "\t";
-            std::cout << samRecord.seq << "\t";
-            std::cout << samRecord.qual << std::endl;
-        }
-
-        if (numRecords != blockSize) {
+        std::string random_str = "tmp." + spring::random_string(10);
+        temp_dir = "./" + random_str + '/';
+        if (!boost::filesystem::exists(temp_dir)) {
             break;
         }
     }
+
+    if (!boost::filesystem::create_directory(temp_dir)) {
+        throw std::runtime_error("Cannot create temporary directory.");
+    }
+
+    std::vector<std::string> args = {"genie", programOptions.inputFilePath, temp_dir, "ecolik12.fa"};
+
+    std::vector<const char*> arg_ptrs(args.size());
+
+    for(size_t i = 0; i < args.size(); ++i) {
+        arg_ptrs[i] = args[i].c_str();
+        std::cout << " " << args[i];
+    }
+    std::cout << std::endl;
+
+    alico_main(args.size(), arg_ptrs.data());
+
+    boost::filesystem::path p(temp_dir);
+    p = boost::filesystem::absolute(p);
+    boost::filesystem::directory_iterator end_itr;
+    std::vector<std::string> filelist;
+
+    // Create list of all files
+    for (boost::filesystem::directory_iterator itr(p); itr != end_itr; ++itr) {
+        if (is_regular_file(itr->path())) {
+            std::string current_file = itr->path().string();
+            filelist.push_back(current_file);
+        }
+    }
+
+    run_gabac(filelist, programOptions.configPath, false, programOptions.numThreads);
+
+    std::string outfile = (programOptions.inputFilePath.substr(0, programOptions.inputFilePath.find_last_of('.')) + ".genie");
+    FILE *output = fopen(
+            outfile.c_str(), "wb"
+    );
+    if (!output) {
+        throw std::runtime_error("Could not open output file");
+    }
+    packFiles(filelist, output);
+    fclose(output);
+
+    size_t orgSize = boost::filesystem::file_size(programOptions.inputFilePath);
+    if(!programOptions.inputFilePairPath.empty()) {
+        orgSize += boost::filesystem::file_size(programOptions.inputFilePairPath);
+    }
+
+    // Finish
+    std::cout << "**** Finished ****" << std::endl;
+    std::cout << "Compressed "
+              << orgSize
+              << " to "
+              << boost::filesystem::file_size(outfile)
+              << ". Compression rate "
+              << float(boost::filesystem::file_size(outfile)) /
+                 boost::filesystem::file_size(programOptions.inputFilePath) *
+                 100
+              << "%"
+              << std::endl;
+
+    boost::filesystem::remove_all(temp_dir);
+
 }
 
 void decompression(
@@ -379,6 +416,7 @@ void decompression(
 void generation(
         const ProgramOptions& programOptions
 ){
+    std::cout << programOptions.inputFileType << std::endl;
     if (programOptions.inputFileType == "FASTA") {
         generationFromFasta(programOptions);
     } else if (programOptions.inputFileType == "FASTQ") {

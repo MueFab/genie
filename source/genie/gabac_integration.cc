@@ -134,14 +134,10 @@ void compress_one_file(const std::string& file, const std::string& configfolder,
     gabac::EncodingConfiguration enConf(config);
 
     std::cout << file << " ..." << std::endl;
-    // Coding
-    if (!decompress) {
-        gabac::encode(ioconf, enConf);
-        std::cout << "Sucessfully compressed ";
-    } else {
-        gabac::decode(ioconf, enConf);
-        std::cout << "Sucessfully decompressed ";
-    }
+
+    gabac::run(ioconf, enConf, decompress);
+
+    std::cout << "Gabac finished successfully" << std::endl;
 
     // Close files
     fin_desc.close();
@@ -223,12 +219,14 @@ void update_configs(const std::vector<std::string>& files, const std::string& co
             update_one_config(file, configpath);
         } else {
             std::cout << "Config " << configpath << " missing! Regenerating..." << std::endl;
-
-            std::ofstream outstream(configpath, std::ios::binary);
-            std::ifstream instream(file,  std::ios::binary);
-            gabac::IOConfiguration ioconf{&instream, &outstream, 0, &std::cout, gabac::IOConfiguration::LogLevel::WARNING};
-            gabac::EncodingConfiguration enconf;
-            gabac::analyze(ioconf, gabac::getCandidateConfig());
+            {
+                std::ofstream outstream(configpath, std::ios::binary);
+                std::ifstream instream(file, std::ios::binary);
+                gabac::IOConfiguration
+                        ioconf{&instream, &outstream, 0, &std::cout, gabac::IOConfiguration::LogLevel::WARNING};
+                gabac::EncodingConfiguration enconf;
+                gabac::analyze(ioconf, gabac::getCandidateConfig());
+            }
 
             update_one_config(file, configpath);
         }
