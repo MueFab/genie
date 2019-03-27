@@ -260,6 +260,7 @@ void ProgramOptions::validate(void)
     std::set<std::string> allowedInputFileTypes = {
         "GENIE",
         "FASTQ",
+        "SAM"
     };
 
 #ifndef GENIE_USE_OPENMP
@@ -370,21 +371,17 @@ void ProgramOptions::validate(void)
 
 void ProgramOptions::validateDependencies(void)
 {
-    if (readAlgorithm == "HARC") {
-        if ((inputFileType != "GENIE") && (inputFileType != "FASTQ")) {
+        if ((inputFileType != "GENIE") && (inputFileType != "FASTQ") && (inputFileType != "SAM")) {
             // LOG_S(ERROR) << "Read algorithm 'HARC' requires a FASTA file "
                          // "or a FASTQ file as input";
             throwRuntimeError("invalid dependency");
         }
-    }
 
-    if (readAlgorithm == "TSC") {
         if ((inputFileType != "SAM")) {
             // LOG_S(ERROR) << "Read algorithm 'TSC' requires a SAM file "
                          // "as input";
             throwRuntimeError("invalid dependency");
         }
-    }
 
     if (idAlgorithm == "TOK") {
         // Nothing to do here.
