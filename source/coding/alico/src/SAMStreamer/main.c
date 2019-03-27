@@ -84,7 +84,7 @@ void usage(const char *name) {
 void change_dir(char *dir) {
     if (chdir(dir) == -1) {
         fprintf(stderr, "Failed to change directories to %s\n", dir);
-        exit(1);
+        return;
     }
 }
 
@@ -378,7 +378,7 @@ int alico_main(int argc, const char * argv[]) {
                 default:
                     printf("Garbage argument \"%s\" detected.\n", argv[i]);
                     usage(argv[0]);
-                    exit(1);
+                    return 1;
             }
             i += 1;
             continue;
@@ -517,19 +517,19 @@ int alico_main(int argc, const char * argv[]) {
             default:
                 printf("Unrecognized option -%c.\n", argv[i][1]);
                 usage(argv[0]);
-                exit(1);
+                return 1;
         }
     }
 
     if (file_idx != 3 && mode == COMPRESSION) {
         printf("Missing required filenames.\n");
         usage(argv[0]);
-        exit(1);
+        return 1;
     }
     if (file_idx != 2 && mode == DECOMPRESSION && comp_info.decompress_ref == 1){
         printf("Missing required filenames.\n");
         usage(argv[0]);
-        exit(1);
+        return 1;
     }
 
     file_available = 0;
@@ -553,13 +553,13 @@ int alico_main(int argc, const char * argv[]) {
             if (calq) {
                 if ( comp_info.fsam == NULL ) {
                     fputs ("File error while opening sam file\n", stderr);
-                    exit (1);
+                    return 1;
                 }
             }
             else {
                 if ( comp_info.fref == NULL || comp_info.fsam == NULL ){
                     fputs ("File error while opening ref and sam files\n",stderr);
-                    exit (1);
+                    return 1;
                 }
             }
 
@@ -594,7 +594,7 @@ int alico_main(int argc, const char * argv[]) {
                 argv[3] = NULL;
                 execvp(argv[0], argv);
                 free(argv[0]);free(argv[1]);free(argv[2]);
-                exit(1);
+                return 1;
             }
             waitpid(pid, NULL, 0);
             fclose(comp_info.fsam);
@@ -631,7 +631,7 @@ int alico_main(int argc, const char * argv[]) {
             if ( comp_info.fref == NULL || comp_info.fsam == NULL ){
                 perror(output_name);
                 fputs ("File error while opening ref and sam files\n",stderr);
-                exit (1);
+                return 1;
             }
 
             if (comp_info.decompress_ref) {
@@ -653,7 +653,7 @@ int alico_main(int argc, const char * argv[]) {
                 argv[3] = NULL;
                 execvp(argv[0], argv);
                 free(argv[0]);free(argv[1]);free(argv[2]);
-                exit(1);
+                return 1;
             }
 
             FILE *headers_file = fopen(HEADERS, "r");
@@ -679,6 +679,7 @@ int alico_main(int argc, const char * argv[]) {
             fclose(comp_info.fcomp);
             file_closer((void *)&comp_info);
             time(&end_main);
+            change_dir("..");
             break;
                             }
         case REMOTE_DECOMPRESSION:
@@ -686,7 +687,7 @@ int alico_main(int argc, const char * argv[]) {
             comp_info.fref = fopen ( ref_name , "r" );
             comp_info.fcomp = NULL;
             if ( comp_info.fref == NULL || comp_info.fsam == NULL ){
-                fputs ("File error while opening ref and sam files\n",stderr); exit (1);
+                fputs ("File error while opening ref and sam files\n",stderr); return 1;
             }
             comp_info.qv_opts = &opts;
 
@@ -704,7 +705,7 @@ int alico_main(int argc, const char * argv[]) {
             comp_info.fsam = fopen( input_name, "r");
             comp_info.fref = fopen ( ref_name , "r" );
             if ( comp_info.fref == NULL || comp_info.fsam == NULL ){
-                fputs ("File error while opening ref and sam files\n",stderr); exit (1);
+                fputs ("File error while opening ref and sam files\n",stderr); return 1;
             }
             comp_info.qv_opts = &opts;
 
@@ -727,7 +728,7 @@ int alico_main(int argc, const char * argv[]) {
             comp_info.fsam = fopen(output_name, "w");
             comp_info.fref = fopen ( ref_name , "r" );
             if ( comp_info.fref == NULL || comp_info.fsam == NULL ){
-                fputs ("File error while opening ref and sam files\n",stderr); exit (1);
+                fputs ("File error while opening ref and sam files\n",stderr); return 1;
             }
             comp_info.qv_opts = &opts;
 
@@ -781,7 +782,7 @@ int alico_main(int argc, const char * argv[]) {
 
     printf("Total time elapsed: %ld seconds.\n",(end_main - begin_main));
 
-    return 1;
+    return 0;
 
 
 
