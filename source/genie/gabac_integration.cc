@@ -94,7 +94,7 @@ static std::string getConfigForFile(const std::string& file, const std::string& 
         streamName = streamName.substr(0, streamName.find_last_of('.'));
     }
 
-    std::string configpath = config +
+    std::string configpath = config + "/" +
                              streamName +
                              ".json";
     return configpath;
@@ -223,7 +223,7 @@ void update_configs(const std::vector<std::string>& files, const std::string& co
                 std::ofstream outstream(configpath, std::ios::binary);
                 std::ifstream instream(file, std::ios::binary);
                 gabac::IOConfiguration
-                        ioconf{&instream, &outstream, 1000000000, &std::cout, gabac::IOConfiguration::LogLevel::WARNING};
+                        ioconf{&instream, &outstream, 10000000, &std::cout, gabac::IOConfiguration::LogLevel::WARNING};
                 gabac::EncodingConfiguration enconf;
                 gabac::analyze(ioconf, gabac::getCandidateConfig());
             }
