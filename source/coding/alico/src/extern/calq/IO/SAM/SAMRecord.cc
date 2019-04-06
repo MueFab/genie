@@ -139,7 +139,7 @@ void SAMRecord::printShort(void) const {
     printf("%s\t", cigar.c_str());
     printf("%s\t", rnext.c_str());
     printf("%d\t", pnext);
-    printf("%" PRId64 "\t", tlen);
+    //printf("%" PRId64 "\t", tlen);
     printf("%s\t", seq.c_str());
     printf("%s\t", qual.c_str());
     printf("%s\t", opt.c_str());
