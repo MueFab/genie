@@ -21,10 +21,6 @@
 
 #include <pthread.h>
 
-// Interface for libssh
-#include <libssh/libssh.h>
-#include <libssh/sftp.h>
-
 #include "stream_model.h"
 #include "pmf.h"
 #include "qv_codebook.h"

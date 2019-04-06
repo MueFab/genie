@@ -22,9 +22,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-// Interface for libssh
-#include <libssh/libssh.h>
-#include <libssh/sftp.h>
 
 #define COMPRESSION 0
 #define DECOMPRESSION 1
@@ -101,13 +98,6 @@ void arithmetic_encoder_step(Arithmetic_stream a, uint32_t cumCountX_1, uint32_t
 uint64_t encoder_last_step(Arithmetic_stream a);
 void arithmetic_decoder_step(Arithmetic_stream a, uint32_t cumCountX,  uint32_t cumCountX_1, uint32_t n);
 uint32_t arithmetic_get_symbol_range(Arithmetic_stream a, uint32_t n);
-
-ssh_session open_ssh_session(char* host_name, char *username);
-int verify_knownhost(ssh_session session);
-int64_t write_to_remote_file(sftp_file file, char* buffer, uint32_t buff_len);
-sftp_file init_remote_write(ssh_session session, char* filename, sftp_session *sftp_ses);
-sftp_file init_remote_read(ssh_session session, char* filename, sftp_session *sftp_ses);
-int64_t read_from_remote_file(sftp_file file, char* buffer, uint32_t buff_len);
 
 void* download(void* remote_info);
 void* upload(void* remote_info);

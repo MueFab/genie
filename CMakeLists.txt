@@ -207,7 +207,6 @@ set(calq_common_dir ${calq_source_dir}/Common)
 
 message(STATUS "sam  source dir: ${sam_source_dir}")
 message(STATUS "sam include dir: ${sam_include_dir}")
-message(STATUS "sam     ssh dir: ${sam_include_ssh_dir}")
 
 set(sam_source_files ${sam_source_files} ${sam_source_dir}/Arithmetic_stream.c)
 set(sam_source_files ${sam_source_files} ${sam_source_dir}/aux_compression.c)
@@ -298,7 +297,7 @@ add_library(${coding} STATIC ${coding_source_files} ${calq_source_files} ${sam_s
 target_include_directories(${coding} PRIVATE ${coding_include_dir} ${sam_include_dir} ${calq_source_dir})
 target_link_libraries(${coding} Boost::program_options)
 target_link_libraries(${coding} Boost::filesystem)
-target_link_libraries(${coding} Boost::system ssh)
+target_link_libraries(${coding} Boost::system)
 
 
 #==============================================================================

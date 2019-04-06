@@ -8,6 +8,7 @@
 
 
 #include <sys/wait.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <time.h>
 #include <inttypes.h>
@@ -682,91 +683,6 @@ int alico_main(int argc, const char * argv[]) {
             change_dir("..");
             break;
                             }
-        case REMOTE_DECOMPRESSION:
-            comp_info.fsam = fopen(output_name, "w");
-            comp_info.fref = fopen ( ref_name , "r" );
-            comp_info.fcomp = NULL;
-            if ( comp_info.fref == NULL || comp_info.fsam == NULL ){
-                fputs ("File error while opening ref and sam files\n",stderr); return 1;
-            }
-            comp_info.qv_opts = &opts;
-
-            decompress((void *)&comp_info);
-            time(&end_main);
-            break;
-
-        case UPLOAD:
-            ptr = strtok((char*)output_name, "@");
-            strcpy(remote_info.username, ptr);
-            ptr = strtok(NULL, ":");
-            strcpy(remote_info.host_name, ptr);
-            ptr = strtok(NULL, "\0");
-            strcpy(remote_info.filename, ptr);
-            comp_info.fsam = fopen( input_name, "r");
-            comp_info.fref = fopen ( ref_name , "r" );
-            if ( comp_info.fref == NULL || comp_info.fsam == NULL ){
-                fputs ("File error while opening ref and sam files\n",stderr); return 1;
-            }
-            comp_info.qv_opts = &opts;
-
-            rc = pthread_create(&compressor_thread, NULL, compress , (void *)&comp_info);
-            upload((void *)&remote_info);
-
-            time(&end_main);
-            pthread_exit(NULL);
-
-
-            break;
-
-        case DOWNLOAD:
-            ptr = strtok((char*)input_name, "@");
-            strcpy(remote_info.username, ptr);
-            ptr = strtok(NULL, ":");
-            strcpy(remote_info.host_name, ptr);
-            ptr = strtok(NULL, "\0");
-            strcpy(remote_info.filename, ptr);
-            comp_info.fsam = fopen(output_name, "w");
-            comp_info.fref = fopen ( ref_name , "r" );
-            if ( comp_info.fref == NULL || comp_info.fsam == NULL ){
-                fputs ("File error while opening ref and sam files\n",stderr); return 1;
-            }
-            comp_info.qv_opts = &opts;
-
-            rc = pthread_create(&compressor_thread, NULL, download , (void *)&remote_info);
-            decompress((void *)&comp_info);
-
-            time(&end_main);
-            pthread_exit(NULL);
-
-            break;
-
-        case STREAMING:
-
-            comp_info.mode = UPLOAD;
-            ptr = strtok((char*)output_name, "@");
-            strcpy(remote_info.username, ptr);
-            ptr = strtok(NULL, ":");
-            strcpy(remote_info.host_name, ptr);
-            ptr = strtok(NULL, "\0");
-            strcpy(remote_info.filename, ptr);
-            comp_info.fsam = fopen( input_name, "r");
-            comp_info.fref = fopen ( ref_name , "r" );
-            if ( comp_info.fref == NULL || comp_info.fsam == NULL ){
-                fputs ("File error while opening ref and sam files\n",stderr); exit (1);
-            }
-            comp_info.qv_opts = &opts;
-
-            rc = pthread_create(&network_thread, NULL, remote_decompression , (void *)&comp_info);
-            rc = pthread_create(&compressor_thread, NULL, compress , (void *)&comp_info);
-            upload((void *)&remote_info);
-
-            time(&end_main);
-            pthread_exit(NULL);
-
-
-            break;
-
-
         default:
             break;
     }
