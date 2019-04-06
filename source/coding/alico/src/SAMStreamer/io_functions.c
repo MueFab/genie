@@ -150,7 +150,7 @@ void stream_write_buffer(struct io_stream_t *os) {
             strcat(lockname, "_ready");
             //
             
-            while ( (rc = access( lockname, F_OK )) == -1) ;
+//            while ( (rc = access( lockname, F_OK )) == -1) ;
             remove(lockname);
             
             os->fp = fopen(os->filePath, "r");
