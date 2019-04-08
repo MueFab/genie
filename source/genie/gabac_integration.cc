@@ -242,7 +242,6 @@ void update_configs(const std::vector<std::string>& files, const std::string& co
 void run_gabac(const std::vector<std::string>& files, const std::string& config, bool decompress, size_t threads){
 
     if (!decompress) {
-        exit(1);
         std::cout << "Testing if config is compatible..." << std::endl;
         update_configs(files, config);
         std::cout << "Testing of configs finished!" << std::endl;

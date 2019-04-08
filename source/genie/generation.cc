@@ -404,7 +404,7 @@ void decompression_sam(
 
     alico_main(args.size(), arg_ptrs.data());
 
-    boost::filesystem::remove_all(temp_dir);
+//    boost::filesystem::remove_all(temp_dir);
 }
 
 void decompression(
