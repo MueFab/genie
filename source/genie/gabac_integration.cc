@@ -49,7 +49,7 @@ gabac::EncodingConfiguration updateConfig (const gabac::EncodingConfiguration& c
 
     unsigned bits = uint8_t (std::ceil(std::log2(max + 1)));
 
-    ret.transformedSequenceConfigurations[0].lutBits = std::max(bits, ret.transformedSequenceConfigurations[0].lutBits);
+    ret.transformedSequenceConfigurations[0].lutBits = std::min(std::max(bits, ret.transformedSequenceConfigurations[0].lutBits), ret.wordSize*8);
     updateBin(ret, max, 0);
 
 
@@ -130,7 +130,7 @@ void compress_one_file(const std::string& file, const std::string& configfolder,
 
     // Configure gabac streams
     gabac::IOConfiguration
-            ioconf = {&fin_desc, &fout_desc, 10000000, &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
+            ioconf = {&fin_desc, &fout_desc, 1000000000, &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
     gabac::EncodingConfiguration enConf(config);
 
     std::cout << file << " ..." << std::endl;
@@ -192,6 +192,13 @@ void update_one_config(const std::string& file, const std::string& configpath){
 
     unsigned wordsize = std::min(config.wordSize, getWordsize(file));
     uint64_t maxval = getMaxValue(file, wordsize);
+
+    // avoid binarizations for large values
+    if(maxval >= std::numeric_limits<uint32_t >::max() && wordsize == 8) {
+        wordsize = 4;
+        maxval = getMaxValue(file, wordsize);
+    }
+
     gabac::EncodingConfiguration newconfig = updateConfig(config, maxval, wordsize);
 
     std::cout << file <<" : " << "wordsize " << wordsize << ", max " << maxval << std::endl;
