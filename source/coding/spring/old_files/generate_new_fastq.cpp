@@ -59,7 +59,7 @@ void generate_new_fastq_se(dsg::input::fastq::FastqFileReader *fastqFileReader1,
   return;
 }
 
-
+/*
 void generate_new_fastq_pe(dsg::input::fastq::FastqFileReader *fastqFileReader1,
   dsg::input::fastq::FastqFileReader *fastqFileReader2,
   const std::string &temp_dir, const compression_params &cp) {
@@ -99,20 +99,8 @@ void generate_new_fastq_pe(dsg::input::fastq::FastqFileReader *fastqFileReader1,
         if (order_array[j] >= start_read_bin && order_array[j] < end_read_bin) {
           uint32_t index = order_array[j] - start_read_bin;
           read_array[index] = fastqRecords[0].sequence;
+          id_array[index] = fastqRecords[0].title;
           quality_array[index] = fastqRecords[0].qualityScores;
-        }
-        // ids treated in a different way since we always store ids from file 1
-        // but we attach a /1 or /2 at end to distinguish (also done by decompress.cpp)
-        // so we can verify that it works
-        if (k == 0) {
-          if (order_array[j] >= start_read_bin && order_array[j] < end_read_bin) {
-            uint32_t index = order_array[j] - start_read_bin;
-            id_array[index] = fastqRecords[0].title+"/1";
-          } else if (order_array[numreads/2+j] >= start_read_bin 
-                  && order_array[numreads/2+j] < end_read_bin) {
-            uint32_t index = order_array[numreads/2+j] - start_read_bin;
-            id_array[index] = fastqRecords[0].title+"/2";
-          }
         }
       }
     }
@@ -130,6 +118,6 @@ void generate_new_fastq_pe(dsg::input::fastq::FastqFileReader *fastqFileReader1,
   delete[] quality_array;
   return;
 }
-
+*/
 
 } // namespace spring
