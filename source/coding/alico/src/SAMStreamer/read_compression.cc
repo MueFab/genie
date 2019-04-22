@@ -154,17 +154,20 @@ uint32_t compress_pos(Arithmetic_stream as, stream_model *P, stream_model *PA, u
 
     if (P[0]->alphaExist[x]){
         compress_int32tt(as, P[0], ((uint32_t) P[0]->alphaMap[x]), info->fpos);
+  
     }
     else{
         tmp = 0;
         compress_int32tt(as, P[0], 0, info->fpos);
-        //fwrite(&tmp, 1, 1, info->fpos);
-
+      
         // Send the new letter to the Arithmetic Stream using the alphabet model
         compress_pos_alpha(as, PA, x, thread_info);
 
         // Update the statistics of the alphabet for x
         P[0]->alphaExist[x] = 1;
+
+        if(x >= P[0]->alphaMap_size) {P[0]->alphaMap = ((int32_t*) realloc(P[0]->alphaMap, (x+1)*sizeof(int32_t))); P[0]->alphaMap_size=x+1;}
+
         P[0]->alphaMap[x] = P[0]->alphabetCard; // We reserve the bin 0 for the new symbol flag
         P[0]->alphabet[P[0]->alphabetCard] = x;
 

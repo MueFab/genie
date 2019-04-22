@@ -196,7 +196,7 @@ uint32_t decompress_read(Arithmetic_stream as, sam_block sb, uint8_t chr_change,
 
     // Decompress the read
     tempP = decompress_pos(as, models->pos, models->pos_alpha, chr_change, &sline->pos, thread_info);
-
+//cout<<"decoding pos\n"<<endl;
     invFlag = decompress_flag(as, models->flag, &sline->flag, thread_info);
 
     reconstruct_read(as, models, tempP, invFlag, sline->read, readLen, chr_change, sline->cigar, thread_info);
@@ -315,6 +315,7 @@ uint32_t decompress_pos_alpha(Arithmetic_stream as, stream_model *PA, void *thre
         info->fpos_alpha[3] = fopen("pos_alpha3", "rb");
         info->rpos_alpha[3] = 1;
     }
+//cout<<"decoding pos"<<endl;
     fread(&tmp, 1, 1, info->fpos_alpha[3]);
     Byte = ((uint32_t) tmp);
 
@@ -354,18 +355,16 @@ uint32_t decompress_pos(Arithmetic_stream as, stream_model *P, stream_model *PA,
 
     // Update the statistics
     update_model(P[0], alphaMapX);
-
+//cout<<"decoding pos"<<endl;
     // A new value of pos
     if (x == -1) {
-
         // Read from the AS to get the unknown alphabet letter alpha
         x = decompress_pos_alpha(as, PA, thread_info);
-
-        // Update the statistics of the alphabet for x
+        //Update the statistics of the alphabet for x
         P[0]->alphaExist[x] = 1;
+if(x >= P[0]->alphaMap_size) {P[0]->alphaMap = ((int32_t*) realloc(P[0]->alphaMap, (x+1)*sizeof(int32_t))); P[0]->alphaMap_size=x+1;}
         P[0]->alphaMap[x] = P[0]->alphabetCard; // We reserve the bin 0 for the new symbol flag
         P[0]->alphabet[P[0]->alphabetCard] = x;
-
         update_model(P[0], P[0]->alphabetCard++);
     }
 
