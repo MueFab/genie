@@ -187,7 +187,7 @@ int compress_line(Arithmetic_stream as, sam_block samBlock, FILE *funmapped, uin
     }
 
         // If read is unmapped and reference name is *, we assume that all the remaining
-        // lines are unmapped and have reference name *.
+        // lines are unmapped and have reference name
         // If the read is unmapped but has a position/reference name, we simply use that
         // information to compress it.
     if ( (samBlock->reads->lines->invFlag & 4) == 4 && *samBlock->rnames->rnames[0] == '*'){
@@ -340,7 +340,7 @@ int decompress_line(Arithmetic_stream as, sam_block samBlock, uint8_t lossiness,
     else {strcpy(sline.rname,prevname);}
 
     decompress_id(as, samBlock->IDs->models, sline.ID, thread_info);
-
+   
     decompress_mapq(as, samBlock->mapq->models, &sline.mapq, thread_info);
 
     decompress_rnext(as, samBlock->rnext->models, sline.rnext, thread_info);
@@ -765,7 +765,7 @@ void* compress(void *thread_info) {
 
     while (rc = compress_line(as, samBlock, info.funmapped, info.lossiness, info.calqmode, info.compress_ref, as1, context, prefix, info.fsinchr, samRecords, thread_info)) {
         ++lineCtr;
-
+       
         if (rc == 2 || lineCtr % 100000 == 0) {
             int i;
             if (info.calqmode){

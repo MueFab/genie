@@ -158,6 +158,7 @@ stream_model* initialize_stream_model_pos(uint32_t rescale){
     s[0]->counts = (uint32_t*) calloc(MAX_CARDINALITY, sizeof(uint32_t));
     s[0]->alphaExist = (uint8_t*) calloc(MAX_ALPHA, sizeof(uint8_t));
     s[0]->alphaMap = (int32_t*) calloc(MAX_ALPHA, sizeof(int32_t));
+    s[0]->alphaMap_size = MAX_ALPHA;
 
     // Initialize the alphabet assigning -1 to the bin 0 of the model
     s[0]->alphabetCard = 1;

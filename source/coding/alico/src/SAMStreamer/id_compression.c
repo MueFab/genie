@@ -582,8 +582,9 @@ int compress_id(Arithmetic_stream as, id_models models, char *id, void *thread_i
     char number[15];
 
     while (*id_ptr != 0) {
-        match_len += (*id_ptr == prev_ID[prev_tokens_ptr[token_ctr] + token_len]), token_len++;
-        id_ptr_tok = id_ptr + 1;
+      match_len += (*id_ptr == prev_ID[prev_tokens_ptr[token_ctr] + token_len]),
+      token_len++;
+id_ptr_tok = id_ptr + 1;
 
         // Check if the token is a alphabetic word
         if (isalpha(*id_ptr)) {
@@ -659,29 +660,39 @@ int compress_id(Arithmetic_stream as, id_models models, char *id, void *thread_i
         else if (isdigit(*id_ptr)) {
 
             digit_value = (*id_ptr - '0');
-            if (*prev_ID != 0){
-                prev_digit = prev_ID[prev_tokens_ptr[token_ctr] + token_len -1] - '0';
-            }
+            bool prev_token_digit_flag =
+          true;  // true if corresponding token in previous read is a digit
+      if (*prev_ID != 0) {
+        if (isdigit(prev_ID[prev_tokens_ptr[token_ctr] + token_len - 1]) &&
+            prev_ID[prev_tokens_ptr[token_ctr] + token_len - 1] != '0') {
+          prev_digit =
+              prev_ID[prev_tokens_ptr[token_ctr] + token_len - 1] - '0';}
+        else {
+          prev_token_digit_flag = false;}
+}
 
-            if (*prev_ID != 0){
-                tmp = 1;
-                while (isdigit(prev_ID[prev_tokens_ptr[token_ctr] + tmp])) {
-                    prev_digit = prev_digit * 10 + (prev_ID[prev_tokens_ptr[token_ctr] + tmp] - '0');
-                    tmp++;
-                }
+if (prev_token_digit_flag && *prev_ID != 0) {
+tmp = 1;
+while (isdigit(prev_ID[prev_tokens_ptr[token_ctr] + tmp]) &&
+   prev_digit < (1 << 28)) {
+prev_digit = prev_digit * 10 +
+           (prev_ID[prev_tokens_ptr[token_ctr] + tmp] - '0');
+tmp++;
+}
+}
 
-            }
-
-            while ( isdigit(*id_ptr_tok) && digit_value < (1<<30) ){
-                digit_value = digit_value * 10 + (*id_ptr_tok - '0');
-                //if (*prev_ID != 0){
-                //    prev_digit = prev_digit * 10 + (prev_ID[prev_tokens_ptr[token_ctr] + token_len] - '0');
-                //}
-                // compare with the same token from previous ID
-                match_len += (*id_ptr_tok == prev_ID[prev_tokens_ptr[token_ctr] + token_len]), token_len++, id_ptr_tok++;
-
-            }
-            if ( match_len == token_len && !isdigit(prev_ID[prev_tokens_ptr[token_ctr] + token_len]) ) {
+while (isdigit(*id_ptr_tok) && digit_value < (1 << 28)) {
+digit_value = digit_value * 10 + (*id_ptr_tok - '0');
+// if (*prev_ID != 0){
+//    prev_digit = prev_digit * 10 + (prev_ID[prev_tokens_ptr[token_ctr]
+//    + token_len] - '0');
+//}
+// compare with the same token from previous ID
+match_len +=
+(*id_ptr_tok == prev_ID[prev_tokens_ptr[token_ctr] + token_len]),
+token_len++, id_ptr_tok++;
+}
+            if (prev_token_digit_flag && match_len == token_len && !isdigit(prev_ID[prev_tokens_ptr[token_ctr] + token_len]) ) {
                 // The token is the same as last ID
                 // Encode a token_type ID_MATCH
                 strcpy(nm, "token_type");
@@ -689,7 +700,7 @@ int compress_id(Arithmetic_stream as, id_models models, char *id, void *thread_i
                 strcat(nm, number);
                 compress_uint8tt(as, models->token_type[token_ctr], ID_MATCH, &info->ftoken_type[token_ctr], &info->itoken_type[token_ctr], nm);
             }
-            else if ( (delta = (digit_value - prev_digit)) < 256 && delta > 0){
+            else if (prev_token_digit_flag && (delta = (digit_value - prev_digit)) < 256 && delta > 0){
                 strcpy(nm, "token_type");
                 sprintf(number, "%d", token_ctr);
                 strcat(nm, number);
@@ -761,11 +772,11 @@ int compress_id(Arithmetic_stream as, id_models models, char *id, void *thread_i
         }
 
         prev_tokens_ptr[token_ctr] = i;
-        i += token_len;
-        id_ptr = id_ptr_tok;
-        match_len = 0;
-        token_len = 0;
-        token_ctr++;
+    i += token_len;
+    id_ptr = id_ptr_tok;
+    match_len = 0;
+    token_len = 0;
+token_ctr++;
 
     }
     strcpy(prev_ID, id);
