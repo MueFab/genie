@@ -35,7 +35,7 @@ void reorder_compress_quality_id(const std::string &temp_dir,
   file_id[1] = basedir + "/id_2";
   file_quality[0] = basedir + "/quality_1";
   file_quality[1] = basedir + "/quality_2";
-  std::string outfile_quality  = basedir + "/quality";
+  std::string outfile_quality  = basedir + "/quality_1";
 
 #ifdef GENIE_USE_OPENMP
   omp_set_num_threads(num_thr);
@@ -75,9 +75,7 @@ void reorder_compress_quality_id(const std::string &temp_dir,
     delete[] order_array;
     delete[] str_array;
 
-  }
- /* 
-  else {
+  } else {
     // paired end
     std::string file_order_quality = basedir + "/order_quality.bin";
     std::string file_order_id = basedir + "/order_id.bin";
@@ -122,10 +120,9 @@ void reorder_compress_quality_id(const std::string &temp_dir,
     remove(file_blocks_quality.c_str());
     remove(file_blocks_quality.c_str());
   }
-  */
   return;
 }
-/*
+
 void read_block_start_end (const std::string &file_blocks, std::vector<uint32_t> &block_start, std::vector<uint32_t> &block_end) {
   std::ifstream f_blocks(file_blocks, std::ios::binary);
   uint32_t block_pos_temp;
@@ -138,7 +135,7 @@ void read_block_start_end (const std::string &file_blocks, std::vector<uint32_t>
   }
   f_blocks.close();
 }
-*/
+
 void generate_order(const std::string &file_order, uint32_t *order_array,
                        const uint32_t &numreads) {
   std::ifstream fin_order(file_order, std::ios::binary);
@@ -149,7 +146,7 @@ void generate_order(const std::string &file_order, uint32_t *order_array,
   }
   fin_order.close();
 }
-/*
+
 void reorder_compress_id_pe(std::string *id_array, const std::string &file_order_id, const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end, const std::string &file_name, const compression_params &cp) {
 #ifdef GENIE_USE_OPENMP
   #pragma omp parallel
@@ -166,33 +163,18 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &file_order
         break;
       std::ifstream f_order_id (file_order_id + "." + std::to_string(block_num), std::ios::binary);
       std::vector<int64_t> tokens[128][8];
-      char prev_ID[1024] = {0};
-      uint32_t prev_tokens_ptr[1024] = {0};
-      uint64_t index;
+      std::string *id_array_block = new std::string[block_end[block_num] - block_start[block_num]];
+      uint32_t index;
       for (uint32_t j = block_start[block_num]; j < block_end[block_num]; j++) {
-        f_order_id.read((char*)&index, sizeof(uint64_t));
-        if (j == block_start[block_num]) {
-          // first read in AU
-          tokens[0][0].push_back(1); // DIFF
-          tokens[0][1].push_back(0); // DIFF 0 for first id
-          generate_id_tokens(prev_ID, prev_tokens_ptr, id_array[index], tokens);
-        } else if (index < ((uint64_t)1<<32)) {
-          tokens[0][0].push_back(1); // DIFF
-          tokens[0][1].push_back(1); // DIFF 1 for rest of ids
-          generate_id_tokens(prev_ID, prev_tokens_ptr, id_array[index], tokens);
-        } else {
-          uint32_t gap = index>>32;
-          uint32_t ind = index & (((uint64_t)(1)<<32) - 1);
-          tokens[0][0].push_back(0); // DUP
-          tokens[0][0].push_back(gap); // gap to the exact matching read id
-          generate_id_tokens(prev_ID, prev_tokens_ptr, id_array[ind], tokens, true);
-          // only generate tokens for prev_tokens_ptr, do not write to tokens vector
-        }
+        f_order_id.read((char*)&index, sizeof(uint32_t));
+        id_array_block[j - block_start[block_num]] = id_array[index];
       }
+      generate_read_id_tokens(id_array_block, block_end[block_num] - block_start[block_num], tokens);
       std::string outfile_name =
             file_name + "." + std::to_string(block_num);
       write_read_id_tokens_to_file(outfile_name.c_str(), tokens);
       f_order_id.close();
+      delete[] id_array_block;
       block_num += cp.num_thr;
     }
   }
@@ -245,7 +227,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
     start_block_num = end_block_num;
   }
 }
-*/
+
 
 void reorder_compress(const std::string &file_name,
                       const uint32_t &num_reads_per_file, const int &num_thr,
@@ -279,9 +261,6 @@ void reorder_compress(const std::string &file_name,
 #endif
       uint64_t block_num_offset = start_read_bin / num_reads_per_block;
       uint64_t block_num = tid;
-      uint32_t *read_lengths_array = NULL;
-      if (mode == "quality")
-        read_lengths_array = new uint32_t[num_reads_per_block];
       bool done = false;
       while (!done) {
         uint64_t start_read_num = block_num * num_reads_per_block;
@@ -300,8 +279,6 @@ void reorder_compress(const std::string &file_name,
           generate_read_id_tokens(str_array + start_read_num, num_reads_block, tokens);
           write_read_id_tokens_to_file(outfile_name.c_str(), tokens);
         } else {
-//	  if(cp.qvz_flag)
-//            quantize_quality_qvz(str_array + start_read_num, num_reads_block, read_lengths_array, cp.qvz_ratio);
           std::ofstream fout_quality(outfile_name);
 	  for(uint32_t i = start_read_num; i < start_read_num + num_reads_block; i++)
 	    fout_quality << str_array[i];

@@ -173,7 +173,6 @@ set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/gener
 set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/generate_new_fastq.cpp)
 set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/decompress.cpp)
 set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/id_tokenization.cpp)
-set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/pe_encode.cpp)
 
 # List all header files
 set(coding_source_files ${coding_source_files} ${coding_source_dir}/ReturnStructures.h)
@@ -187,7 +186,6 @@ set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/gener
 set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/generate_read_streams.h)
 set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/id_tokenization.h)
 set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/params.h)
-set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/pe_encode.h)
 set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/preprocess.h)
 set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/reorder_compress_quality_id.h)
 set(coding_source_files ${coding_source_files} ${coding_source_dir}/spring/reorder.h)
