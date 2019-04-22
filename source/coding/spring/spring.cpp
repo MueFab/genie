@@ -12,7 +12,6 @@
 
 #include "spring/encoder.h"
 #include "spring/params.h"
-#include "spring/pe_encode.h"
 #include "spring/preprocess.h"
 #include "spring/reorder.h"
 #include "spring/reorder_compress_quality_id.h"
@@ -87,36 +86,6 @@ generated_aus generate_streams_SPRING(
                                                                 encoder_start)
                    .count()
             << " s\n";
-  /*
-  if (paired_end) {
-    std::cout << "Generating index for paired end ...\n";
-    auto pe_encode_start = std::chrono::steady_clock::now();
-    pe_encode(temp_dir, cp);
-    auto pe_encode_end = std::chrono::steady_clock::now();
-    std::cout << "Generating index for paired end done!\n";
-    std::cout << "Time for this step: "
-              << std::chrono::duration_cast<std::chrono::seconds>(pe_encode_end -
-                                                                  pe_encode_start)
-                     .count()
-              << " s\n";
-  }
-  */
-
-  std::cout << "Generating new FASTQ\n";
-  auto new_fq_start = std::chrono::steady_clock::now();
-  if (!cp.paired_end) {
-      generate_new_fastq_se(fastqFileReader1, temp_dir, cp);
-  } else {
-      generate_new_fastq_pe(fastqFileReader1, fastqFileReader2, temp_dir, cp);
-  }
-
-  auto new_fq_end = std::chrono::steady_clock::now();
-  std::cout << "Generating new FASTQ done\n";
-  std::cout << "Time for this step: "
-            << std::chrono::duration_cast<std::chrono::seconds>(new_fq_end -
-                                                                new_fq_start)
-                   .count()
-            << " s\n";
 
   std::cout << "Generating read streams ...\n";
   auto grs_start = std::chrono::steady_clock::now();
@@ -129,6 +98,22 @@ generated_aus generate_streams_SPRING(
                    .count()
             << " s\n";
 
+  cp.num_blocks = descriptorFilesPerAUs.size();
+  
+  std::cout << "Generating new FASTQ\n";
+  auto new_fq_start = std::chrono::steady_clock::now();
+  if (!cp.paired_end) {
+      generate_new_fastq_se(fastqFileReader1, temp_dir, cp);
+  } else {
+      generate_new_fastq_pe(fastqFileReader1, fastqFileReader2, temp_dir, cp);
+  }
+  auto new_fq_end = std::chrono::steady_clock::now();
+  std::cout << "Generating new FASTQ done (for testing)\n";
+  std::cout << "Time for this step: "
+            << std::chrono::duration_cast<std::chrono::seconds>(new_fq_end -
+                                                                new_fq_start)
+                   .count()
+            << " s\n";
 
   generated_aus result(descriptorFilesPerAUs);
   if (preserve_quality || preserve_id) {
@@ -168,7 +153,7 @@ generated_aus generate_streams_SPRING(
   decompress(temp_dir);
   auto decompression_end = std::chrono::steady_clock::now();
   std::cout << "Decompression done!\n";
-  std::cout << "Total time for compression: "
+  std::cout << "Total time for decompression: "
             << std::chrono::duration_cast<std::chrono::seconds>(
                    decompression_end - decompression_start)
                    .count()

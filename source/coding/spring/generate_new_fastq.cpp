@@ -1,7 +1,6 @@
 #include "spring/generate_new_fastq.h"
 #include "spring/util.h"
 #include "fileio/fastq_file_reader.h"
-
 namespace spring {
 
 void generate_new_fastq_se(dsg::input::fastq::FastqFileReader *fastqFileReader1,
@@ -16,6 +15,11 @@ void generate_new_fastq_se(dsg::input::fastq::FastqFileReader *fastqFileReader1,
   // position after reordering
   order_array = new uint32_t[numreads];
   generate_order_array(file_order, order_array, numreads);
+  
+  // verify that order_array is a permutation of 1...numreads
+  if (!is_permutation(order_array, numreads))
+    throw std::runtime_error("order_array not permutation of 1...numreads");
+
   uint32_t str_array_size = numreads/8+1;
   // numreads/8+1 chosen so that these many FASTQ records can be stored in
   // memory without exceeding the RAM consumption of reordering stage
@@ -74,6 +78,9 @@ void generate_new_fastq_pe(dsg::input::fastq::FastqFileReader *fastqFileReader1,
   // position after reordering
   order_array = new uint32_t[numreads];
   generate_order_array(file_order, order_array, numreads);
+  // verify that order_array is a permutation of 1...numreads
+  if (!is_permutation(order_array, numreads))
+    throw std::runtime_error("order_array not permutation of 1...numreads");
   uint32_t str_array_size = numreads/8+1;
   // numreads/8+1 chosen so that these many FASTQ records can be stored in
   // memory without exceeding the RAM consumption of reordering stage
@@ -108,7 +115,8 @@ void generate_new_fastq_pe(dsg::input::fastq::FastqFileReader *fastqFileReader1,
           if (order_array[j] >= start_read_bin && order_array[j] < end_read_bin) {
             uint32_t index = order_array[j] - start_read_bin;
             id_array[index] = fastqRecords[0].title+"/1";
-          } else if (order_array[numreads/2+j] >= start_read_bin 
+          }
+          if (order_array[numreads/2+j] >= start_read_bin 
                   && order_array[numreads/2+j] < end_read_bin) {
             uint32_t index = order_array[numreads/2+j] - start_read_bin;
             id_array[index] = fastqRecords[0].title+"/2";

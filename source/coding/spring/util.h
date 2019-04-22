@@ -76,6 +76,8 @@ std::string read_file_as_string(const std::string &file_seq);
 void generate_order_array(const std::string &file_order, uint32_t *order_array,
                        const uint32_t &numreads);
 
+bool is_permutation(uint32_t *order_array, const uint32_t &numreads);
+
 }  // namespace spring
 
 #endif  // SPRING_UTIL_H_

@@ -40,7 +40,7 @@ std::vector<dsg::input::fastq::FastqRecord> decode_streams(decoded_desc_t &dec, 
 
   for (; subseq_it[12][0] != dec.subseq_vector[12][0].end(); ++subseq_it[12][0]) {
     auto rtype = *subseq_it[12][0];
-    if (rtype == 6) {
+    if (rtype == 5) {
       // put in refBuf
       uint32_t rlen = (uint32_t)(*(subseq_it[7][0]++)); // rlen
       for (uint32_t i = 0; i < rlen; i++) {
@@ -51,8 +51,8 @@ std::vector<dsg::input::fastq::FastqRecord> decode_streams(decoded_desc_t &dec, 
       cur_ID = decode_id_tokens(prev_ID, prev_tokens_ptr, prev_tokens_len, dec.tokens, pos_in_tokens_array);
 	  // rtype can be 1 (P) or 3 (M)
 	  uint8_t number_of_record_segments;
-	  uint16_t delta;
-      bool read_1_first;
+	  uint16_t delta = 0;
+      bool read_1_first = true;
 	  if (paired_end) {
 		uint64_t pairing_decoding_case = (uint64_t)(*(subseq_it[8][0]++));
 		// note that we don't decode/use mateAUid and mateRecordIndex in this decoder 
@@ -104,12 +104,13 @@ std::vector<dsg::input::fastq::FastqRecord> decode_streams(decoded_desc_t &dec, 
             if (mmpos_flag == 1)
               break;
             uint32_t mmpos = (uint32_t)(*(subseq_it[3][1]++));
-            abs_mmpos += mmpos + 1;
+            abs_mmpos += mmpos;
             uint32_t mmtype_0 = (uint32_t)(*(subseq_it[4][0]++));
             if (mmtype_0 != 0) // i.e., not substitution
               throw std::runtime_error("Non zero mmtype encountered.");
             uint32_t mmtype_1 = (uint32_t)(*(subseq_it[4][1]++));
             cur_read[i][abs_mmpos] = int_to_char[mmtype_1];
+            abs_mmpos++;
           }
         }
       }
@@ -141,15 +142,6 @@ std::vector<dsg::input::fastq::FastqRecord> decode_streams(decoded_desc_t &dec, 
     }
   }
   return decoded_records;
-}
-
-std::string decode_type_U(std::vector<int64_t>::const_iterator &subseq_6_0_it, uint32_t rlen, char int_to_char[]) {
-  std::string cur_read;
-  cur_read.resize(rlen);
-  for (uint32_t i = 0; i < rlen; i++) {
-    cur_read[i] = int_to_char[*(subseq_6_0_it++)]; // ureads
-  }
-  return cur_read;
 }
 
 void decompress(const std::string &temp_dir) {
@@ -188,8 +180,8 @@ void decompress(const std::string &temp_dir) {
       {12,0} // rtype
   };
   
-  std::string file_quality = basedir + "/quality";
-  std::string file_id = basedir + "/id";
+  std::string file_quality = basedir + "/quality_1";
+  std::string file_id = basedir + "/id_1";
   std::string file_decompressed_fastq = basedir + "/decompressed.fastq";
 
   std::ofstream fout(file_decompressed_fastq);
