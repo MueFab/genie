@@ -61,8 +61,8 @@ std::vector<dsg::input::fastq::FastqRecord> decode_streams(decoded_desc_t &dec, 
         // one way to resolve this could be to use the R1_unpaired and R2_unpaired 
         // decoding cases, but we don't use those as they are not semantically correct
 	    switch (pairing_decoding_case) {
-		  case 0:	read_1_first = !(((uint16_t)(*(subseq_it[8][1])))&1);
-					delta = ((uint16_t)(*(subseq_it[8][1])))>>1;
+          case 0:   read_1_first = !(((uint16_t)(*(subseq_it[8][1])))&1);
+					delta = ((uint16_t)(*(subseq_it[8][1]++)))>>1;
 					number_of_record_segments = 2;
 					break;
 		  case 1:
