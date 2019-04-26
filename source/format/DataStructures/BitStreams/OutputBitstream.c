@@ -103,8 +103,15 @@ bool writeNBitsShiftAndConvertToLittleEndian64(OutputBitstream *outputBitstream,
 
 bool writeNBitsShiftAndConvertToBigEndian16(OutputBitstream *outputBitstream, uint8_t n, uint16_t value){
     uint16_t buffer = nativeToBigEndian16(value);
-    buffer <<= (16-n);
-    return writeNBits(outputBitstream, n, (char *) &buffer);
+
+    uint8_t invalid_bits = (uint8_t )16-n;
+    if(invalid_bits<=8){
+        writeNBitsShift(outputBitstream, (uint8_t) 8 - invalid_bits, (char *) (&buffer));
+        writeNBits(outputBitstream, 8, (char *) &buffer + 1);
+    }else{
+        writeNBitsShift(outputBitstream, (uint8_t) 8 - invalid_bits, (char *) (&buffer)+1);
+    }
+    return true;
 }
 
 bool writeNBitsShiftAndConvertToBigEndian32(OutputBitstream *outputBitstream, uint8_t n, uint32_t value){
