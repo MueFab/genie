@@ -553,7 +553,10 @@ Encoding_ParametersType* constructEncodingParametersSingleAlignmentNoComputed(
         bool splicedReadsFlag,
         bool multipleSignatureFlag,
         uint32_t multipleSignatureBase,
-        uint8_t U_signature_size
+        uint8_t U_signature_size,
+        uint8_t *qv_coding_mode, bool *qvps_flag,
+        Parameter_set_qvpsType **parameter_set_qvps,
+        uint8_t *qvps_preset_ID
 );
 Encoding_ParametersType *
 constructEncodingParametersMultipleAlignmentNoComputed(uint8_t datasetType, uint8_t alphabetId, uint32_t reads_length,
@@ -561,7 +564,10 @@ constructEncodingParametersMultipleAlignmentNoComputed(uint8_t datasetType, uint
                                                        uint32_t max_au_data_unit_size, bool pos40bits, uint8_t qv_depth,
                                                        uint8_t as_depth, uint8_t numClasses, uint8_t *classID,
                                                        uint16_t numGroups, char **rgroupId, bool splicedReadsFlag,
-                                                       uint32_t multipleSignatureBase, uint8_t U_signature_size);
+                                                       uint32_t multipleSignatureBase, uint8_t U_signature_size,
+                                                       uint8_t *qv_coding_mode, bool *qvps_flag,
+                                                       Parameter_set_qvpsType **parameter_set_qvps,
+                                                       uint8_t *qvps_preset_ID);
 Encoding_ParametersType *
 constructEncodingParametersSingleAlignmentComputedRef(uint8_t datasetType, uint8_t alphabetId, uint32_t reads_length,
                                                       uint8_t number_of_template_segments_minus1,
@@ -569,6 +575,9 @@ constructEncodingParametersSingleAlignmentComputedRef(uint8_t datasetType, uint8
                                                       uint8_t as_depth, uint8_t numClasses, uint8_t *classID,
                                                       uint16_t numGroups, char **rgroupId, bool splicedReadsFlag,
                                                       uint32_t multipleSignatureBase, uint8_t U_signature_size,
+                                                      uint8_t *qv_coding_mode, bool *qvps_flag,
+                                                      Parameter_set_qvpsType **parameter_set_qvps,
+                                                      uint8_t *qvps_preset_ID,
                                                       Parameter_set_crpsType *parameter_set_crps);
 Encoding_ParametersType *
 constructEncodingParametersMultipleAlignmentComputedRef(uint8_t datasetType, uint8_t alphabetId, uint32_t reads_length,
@@ -578,6 +587,9 @@ constructEncodingParametersMultipleAlignmentComputedRef(uint8_t datasetType, uin
                                                         uint8_t *classID, uint16_t numGroups, char **rgroupId,
                                                         bool splicedReadsFlag, uint32_t multipleSignatureBase,
                                                         uint8_t U_signature_size,
+                                                        uint8_t *qv_coding_mode, bool *qvps_flag,
+                                                        Parameter_set_qvpsType **parameter_set_qvps,
+                                                        uint8_t *qvps_preset_ID,
                                                         Parameter_set_crpsType *parameter_set_crps);
 Encoding_ParametersType* readEncodingParameters(InputBitstream* input);
 void freeEncodingParameters(Encoding_ParametersType* encodingParametersType);

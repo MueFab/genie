@@ -41,6 +41,8 @@ typedef struct{
 DataUnits* extractRequestedInformationFromMPEGGFile(char* fileName, DatasetGroupRequest request);
 void extractRequestedInformationFromDataset(DatasetGroupId datasetGroupId, DatasetContainer *datasetContainer,
                                             DatasetRequest request, DataUnits *dataUnits);
+void extractRequestedReferenceInformationFromDataset(DatasetGroupId datasetGroupId, DatasetContainer *datasetContainer,
+                                                     DatasetRequest request, DataUnits *dataUnits);
 
 Ref_information readRefInformation(char* refInfoFilePath);
 int readAndClone(char* filename, char* outputFileName);

@@ -26,10 +26,13 @@ EncodingParametersRC getCorrectedTransform_subseq_counter(
         *transform_subseq_counter = 3;
     }else if (transform_subseq_parametersType->transform_ID_subseq == SubSeq_RLE_CODING){
         *transform_subseq_counter = 2;
+    }else if (transform_subseq_parametersType->transform_ID_subseq == SubSeq_MERGE_CODING) {
+        *transform_subseq_counter = transform_subseq_parametersType->merge_coding_subseq_count;
     }else{
         /*DEFAULT*/
         *transform_subseq_counter = 1;
     }
+
     return SUCCESS;
 }
 
@@ -374,8 +377,12 @@ EncodingParametersRC getCABACDecoderConfiguration(
     if(descriptorID>= 18 || descriptorID==11 || descriptorID == 15){
         return OUT_OF_BOUNDERIES;
     }
-    *decoder_configuration_cabac =
-            (DecoderConfigurationTypeCABAC *) (encodingParameters->decoderConfiguration + descriptorID);
+
+    if(!encodingParameters->class_specific_dec_cfg_flag[descriptorID]){
+        classIndex = 0;
+    }
+
+    *decoder_configuration_cabac = encodingParameters->decoderConfiguration[descriptorID][classIndex];
     return SUCCESS;
 }
 EncodingParametersRC getCABACDecoderConfigurationTokenType(
@@ -1076,8 +1083,11 @@ bool writeSupportValues(
                 return false;
             }
         }
+        if(!writeBit(outputBitstream, (uint8_t)(supportValues->share_subsym_prv_flag ? 1:0))){
+            return false;
+        }
     }
-    return writeBit(outputBitstream, (uint8_t)(supportValues->share_subsym_prv_flag ? 1:0));
+    return true;
 }
 
 bool writeCABACContextParameters(
@@ -1201,7 +1211,11 @@ bool writeDecoderConfigurationCABAC(
     ){
         if(
             !writeNBitsShiftAndConvertToBigEndian16(outputBitstream, 10, decoderConfigurationCABAC->descriptor_subsequence_ID[i])
-            || !writeTransformSubseqParameters(
+        ){
+            return false;
+        }
+        if(
+            !writeTransformSubseqParameters(
                 decoderConfigurationCABAC->transform_subseq_parameters[i],
                 outputBitstream
             )
@@ -1279,6 +1293,25 @@ bool writeDecoder_configuration_tokentype_TypeCABAC(
     ;
 }
 
+Decoder_configuration_tokentype* readDecoder_configuration_tokentypeCABAC(
+    InputBitstream* inputBitstream
+){
+    uint8_t rle_guard;
+    if(
+        !readNBits8(inputBitstream, 8, &rle_guard)
+    ){
+        return NULL;
+    }
+    Decoder_configuration_tokentype_cabac* cabac0 = readDecoder_configuration_tokentype_cabac(inputBitstream);
+    Decoder_configuration_tokentype_cabac* cabac1 = readDecoder_configuration_tokentype_cabac(inputBitstream);
+
+    return constructDecoderConfigurationTokentype(
+            rle_guard,
+            cabac0,
+            cabac1
+    );
+}
+
 bool writeParameterSetQvps(
     Parameter_set_qvpsType* parameter_set_qvps,
     OutputBitstream* outputBitstream
@@ -1347,7 +1380,7 @@ bool writeEncoding_parameters(
         int endLoop = encodingParameters->class_specific_dec_cfg_flag[desc_ID] ? encodingParameters->num_classes : 1;
         for(int c = 0; c < endLoop; c++){
             writeNBitsShift(outputBitstream, 8, (char*)&(encodingParameters->dec_cfg_preset[desc_ID][c]));
-            if(encodingParameters->encoding_mode_id[c][desc_ID] != 0){
+            if(encodingParameters->encoding_mode_id[desc_ID][c] != 0){
                 //Only supports CABAC
                 return false;
             }
@@ -1377,6 +1410,9 @@ bool writeEncoding_parameters(
     for(int j=0; j<encodingParameters->num_groups; j++){
         size_t reagGroupId_len = strlen(encodingParameters->rgroup_ID[j]);
         if(!writeBytes(outputBitstream, reagGroupId_len, encodingParameters->rgroup_ID[j])){
+            return false;
+        }
+        if(!writeToBitstream(outputBitstream, 0)){
             return false;
         }
     }
@@ -2372,8 +2408,8 @@ Support_valuesType* readSupportValuesType(InputBitstream *input, uint8_t transfo
     uint8_t output_symbol_size;
     uint8_t coding_symbol_size;
     uint8_t coding_order;
-    bool share_subsym_lut_flag;
-    bool share_subsym_prv_flag;
+    bool share_subsym_lut_flag = false;
+    bool share_subsym_prv_flag = false;
 
     uint8_t buffer;
 
@@ -2547,10 +2583,10 @@ Encoding_ParametersType *constructEncodingParameters(uint8_t datasetType, uint8_
     encodingParametersType->multiple_signature_base = multipleSignatureBase;
     encodingParametersType->U_signature_size = U_signature_size;
     
-    encodingParametersType->qv_coding_mode = calloc(numClasses, sizeof(uint8_t));
-    encodingParametersType->qvps_flag = calloc(numClasses, sizeof(bool));
-    encodingParametersType->parameter_set_qvps = calloc(numClasses, sizeof(Parameter_set_qvpsType*));
-    encodingParametersType->qvps_preset_ID = calloc(numClasses, sizeof(uint8_t));
+    encodingParametersType->qv_coding_mode = qv_coding_mode;
+    encodingParametersType->qvps_flag = qvps_flag;
+    encodingParametersType->parameter_set_qvps = parameter_set_qvps;
+    encodingParametersType->qvps_preset_ID = qvps_preset_ID;
     
     encodingParametersType->crps_flag = crps_flag;
     encodingParametersType->parameter_set_crps = parameter_set_crps;
@@ -2574,7 +2610,11 @@ Encoding_ParametersType* constructEncodingParametersSingleAlignmentNoComputed(
         bool splicedReadsFlag,
         bool multipleSignatureFlag,
         uint32_t multipleSignatureBase,
-        uint8_t U_signature_size
+        uint8_t U_signature_size,
+        uint8_t *qv_coding_mode,
+        bool *qvps_flag,
+        Parameter_set_qvpsType **parameter_set_qvps,
+        uint8_t *qvps_preset_ID
 ){
     return constructEncodingParameters(
             datasetType,
@@ -2592,9 +2632,14 @@ Encoding_ParametersType* constructEncodingParametersSingleAlignmentNoComputed(
             false,
             splicedReadsFlag,
             multipleSignatureBase,
-            U_signature_size, NULL, NULL, NULL, NULL,
+            U_signature_size,
+            qv_coding_mode,
+            qvps_flag,
+            parameter_set_qvps,
+            qvps_preset_ID,
             false,
-            NULL);
+            NULL
+    );
 }
 
 Encoding_ParametersType *
@@ -2603,7 +2648,10 @@ constructEncodingParametersMultipleAlignmentNoComputed(uint8_t datasetType, uint
                                                        uint32_t max_au_data_unit_size, bool pos40bits, uint8_t qv_depth,
                                                        uint8_t as_depth, uint8_t numClasses, uint8_t *classID,
                                                        uint16_t numGroups, char **rgroupId, bool splicedReadsFlag,
-                                                       uint32_t multipleSignatureBase, uint8_t U_signature_size) {
+                                                       uint32_t multipleSignatureBase, uint8_t U_signature_size,
+                                                       uint8_t *qv_coding_mode, bool *qvps_flag,
+                                                       Parameter_set_qvpsType **parameter_set_qvps,
+                                                       uint8_t *qvps_preset_ID) {
     return constructEncodingParameters(
             datasetType,
             alphabetId,
@@ -2620,7 +2668,11 @@ constructEncodingParametersMultipleAlignmentNoComputed(uint8_t datasetType, uint
             true,
             splicedReadsFlag,
             multipleSignatureBase,
-            U_signature_size, NULL, NULL, NULL, NULL,
+            U_signature_size,
+            qv_coding_mode,
+            qvps_flag,
+            parameter_set_qvps,
+            qvps_preset_ID,
             false,
             NULL);
 }
@@ -2632,6 +2684,9 @@ constructEncodingParametersSingleAlignmentComputedRef(uint8_t datasetType, uint8
                                                       uint8_t as_depth, uint8_t numClasses, uint8_t *classID,
                                                       uint16_t numGroups, char **rgroupId, bool splicedReadsFlag,
                                                       uint32_t multipleSignatureBase, uint8_t U_signature_size,
+                                                      uint8_t *qv_coding_mode, bool *qvps_flag,
+                                                      Parameter_set_qvpsType **parameter_set_qvps,
+                                                      uint8_t *qvps_preset_ID,
                                                       Parameter_set_crpsType *parameter_set_crps) {
     return constructEncodingParameters(
             datasetType,
@@ -2649,7 +2704,11 @@ constructEncodingParametersSingleAlignmentComputedRef(uint8_t datasetType, uint8
             false,
             splicedReadsFlag,
             multipleSignatureBase,
-            U_signature_size, NULL, NULL, NULL, NULL,
+            U_signature_size,
+            qv_coding_mode,
+            qvps_flag,
+            parameter_set_qvps,
+            qvps_preset_ID,
             true,
             parameter_set_crps);
 }
@@ -2662,6 +2721,9 @@ constructEncodingParametersMultipleAlignmentComputedRef(uint8_t datasetType, uin
                                                         uint8_t *classID, uint16_t numGroups, char **rgroupId,
                                                         bool splicedReadsFlag, uint32_t multipleSignatureBase,
                                                         uint8_t U_signature_size,
+                                                        uint8_t *qv_coding_mode, bool *qvps_flag,
+                                                        Parameter_set_qvpsType **parameter_set_qvps,
+                                                        uint8_t *qvps_preset_ID,
                                                         Parameter_set_crpsType *parameter_set_crps) {
     return constructEncodingParameters(
             datasetType,
@@ -2679,7 +2741,11 @@ constructEncodingParametersMultipleAlignmentComputedRef(uint8_t datasetType, uin
             true,
             splicedReadsFlag,
             multipleSignatureBase,
-            U_signature_size, NULL, NULL, NULL, NULL,
+            U_signature_size,
+            qv_coding_mode,
+            qvps_flag,
+            parameter_set_qvps,
+            qvps_preset_ID,
             true,
             parameter_set_crps);
 }
@@ -2861,13 +2927,13 @@ Encoding_ParametersType* readEncodingParameters(InputBitstream* input){
     bool multiple_alignments_flag;
     bool spliced_reads_flag;
     uint32_t multiple_signature_base;
-    uint8_t u_signature_size;
+    uint8_t u_signature_size = 0;
     uint8_t* qv_coding_mode;
     bool* qvps_flag;
     Parameter_set_qvpsType** parameter_set_qvps; //8.1
     uint8_t* default_qvps_ID;
     bool crps_flag;
-    Parameter_set_crpsType* parameter_set_crps; //8.2
+    Parameter_set_crpsType* parameter_set_crps = NULL; //8.2
 
     bool datasetTypeSuccessfulRead = readNBits8(input, 4, &dataset_type);
     bool alphabetIdSuccessfulRead = readNBits8(input, 8, &alphabet_ID);
@@ -2941,7 +3007,11 @@ Encoding_ParametersType* readEncodingParameters(InputBitstream* input){
             }
 
             readNBits8(input, 8, &(encoding_mode_id[descriptor_i][0]));
-            decoderConfiguration[descriptor_i][0] = readDecoderConfigurationTypeCABAC(input);
+            if(descriptor_i != 11 && descriptor_i != 15) {
+                decoderConfiguration[descriptor_i][0] = readDecoderConfigurationTypeCABAC(input);
+            }else{
+                decoderConfiguration[descriptor_i][0] = readDecoder_configuration_tokentypeCABAC(input);
+            }
 
 
         }else{
@@ -2956,7 +3026,11 @@ Encoding_ParametersType* readEncodingParameters(InputBitstream* input){
                 }
 
                 readNBits8(input, 8, encoding_mode_id[descriptor_i]+class_i);
-                //readDescriptorConfiguration
+                if(descriptor_i != 11 && descriptor_i != 15) {
+                    decoderConfiguration[descriptor_i][class_i] = readDecoderConfigurationTypeCABAC(input);
+                }else{
+                    decoderConfiguration[descriptor_i][class_i] = readDecoder_configuration_tokentypeCABAC(input);
+                }
             }
         }
     }
@@ -2976,8 +3050,9 @@ Encoding_ParametersType* readEncodingParameters(InputBitstream* input){
 
         char currentChar;
         readNBits8(input, 8, (uint8_t *)&currentChar);
-        while (currentChar == '\0'){
+        while (currentChar != '\0'){
             rgroup_ID[group_i][currentLength] = currentChar;
+            readNBits8(input, 8, (uint8_t *)&currentChar);
             currentLength++;
             if(currentLength == allocatedLength){
                 rgroup_ID[group_i] = realloc(rgroup_ID[group_i], sizeof(char)*(allocatedLength + 1024));
@@ -3055,7 +3130,7 @@ Encoding_ParametersType* readEncodingParameters(InputBitstream* input){
                 //parse parameter_set_qvps
             }else{
                 readNBits8(input, 4, &buffer);
-                qvps_flag[num_classes] = buffer;
+                default_qvps_ID[num_classes] = buffer;
             }
         }else{
             fprintf(stderr, "unknown qv_coding_mode.\n");
@@ -3074,8 +3149,38 @@ Encoding_ParametersType* readEncodingParameters(InputBitstream* input){
         //parse parameter set crps;
     }
 
-    //TODO CHANGE THIS
-    return NULL;
+    Encoding_ParametersType* encodingParameters = malloc(sizeof(Encoding_ParametersType));
+
+    encodingParameters->dataset_type = dataset_type;
+    encodingParameters->alphabet_ID = alphabet_ID;
+    encodingParameters->read_length = read_length;
+    encodingParameters->number_of_template_segments_minus1 = number_of_template_segments_minus1;
+    encodingParameters->max_au_data_unit_size = max_au_data_unit_size;
+    encodingParameters->pos_40_bits = pos_40_bits_flag;
+    encodingParameters->qv_depth = qv_depth;
+    encodingParameters->as_depth = as_depth;
+    encodingParameters->num_classes = num_classes;
+    encodingParameters->classID = classIDs;
+    for(uint8_t descriptor_i = 0; descriptor_i < 18; descriptor_i++) {
+        encodingParameters->class_specific_dec_cfg_flag[descriptor_i] = class_specific_dec_cfg_flag[descriptor_i];
+    }
+    encodingParameters->dec_cfg_preset = dec_cfg_preset;
+    encodingParameters->encoding_mode_id = encoding_mode_id;
+    encodingParameters->decoderConfiguration = decoderConfiguration;
+    encodingParameters->num_groups = num_groups;
+    encodingParameters->rgroup_ID = rgroup_ID;
+    encodingParameters->multiple_alignments_flag = multiple_alignments_flag;
+    encodingParameters->spliced_reads_flag = spliced_reads_flag;
+    encodingParameters->multiple_signature_base = multiple_signature_base;
+    encodingParameters->U_signature_size = u_signature_size;
+    encodingParameters->qv_coding_mode = qv_coding_mode;
+    encodingParameters->qvps_flag = qvps_flag;
+    encodingParameters->parameter_set_qvps = parameter_set_qvps;
+    encodingParameters->qvps_preset_ID = default_qvps_ID;
+    encodingParameters->crps_flag = crps_flag;
+    encodingParameters->parameter_set_crps = parameter_set_crps;
+
+    return encodingParameters;
 }
 
 void freeEncodingParameters(Encoding_ParametersType* encodingParametersType){
