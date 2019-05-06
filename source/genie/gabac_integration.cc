@@ -52,6 +52,17 @@ gabac::EncodingConfiguration updateConfig (const gabac::EncodingConfiguration& c
     ret.transformedSequenceConfigurations[0].lutBits = std::min(std::max(bits, ret.transformedSequenceConfigurations[0].lutBits), ret.wordSize*8);
     updateBin(ret, max, 0);
 
+    const size_t MAX_LUT_SIZE = 1u << 20u;
+
+    if(ret.transformedSequenceConfigurations[0].lutTransformationEnabled) {
+        if (max > MAX_LUT_SIZE){
+            ret.transformedSequenceConfigurations[0].lutTransformationEnabled = false;
+        } else if(max > size_t(std::sqrt(MAX_LUT_SIZE))) {
+            ret.transformedSequenceConfigurations[0].lutOrder = 0;
+        } else if(max > size_t(std::pow(MAX_LUT_SIZE, 1.0/3.0))) {
+            ret.transformedSequenceConfigurations[0].lutOrder = std::min(1u, ret.transformedSequenceConfigurations[0].lutOrder);
+        }
+    }
 
     switch(ret.sequenceTransformationId) {
         case gabac::SequenceTransformationId::equality_coding:
