@@ -145,12 +145,12 @@ void ProgramOptions::processCommandLine(
         ("input-file-pair-path,p",
             po::value<std::string>(&inputFilePairPath),
             "Input file pair path")
-        ("input-file-type,t",
-            po::value<std::string>(&inputFileType),
-            "Input file type")
             ("config-file-path,c",
                     po::value<std::string>(&configPath)->default_value("../gabac_config/"),
-                            "config-file-path");
+                            "config-file-path")
+            ("numThreads,t",
+             po::value<int>(&numThreads)->default_value(1),
+             "config-file-path");
 
     // Declare an options_description instance which will include all the
     // options except for the basic options.
