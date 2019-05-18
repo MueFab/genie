@@ -15,79 +15,6 @@
 
 namespace dsg {
 
-void updateBin(gabac::EncodingConfiguration& c1, uint64_t max, unsigned index) {
-    unsigned bits = 0;
-    switch(c1.transformedSequenceConfigurations[index].binarizationId) {
-        case gabac::BinarizationId::BI:
-            bits = uint8_t (std::ceil(std::log2(max + 1)));
-            bits = std::max(bits, c1.transformedSequenceConfigurations[index].binarizationParameters[0]);
-            c1.transformedSequenceConfigurations[index].binarizationParameters = {bits};
-            break;
-        case gabac::BinarizationId::EG:
-            if(max > std::numeric_limits<int32_t>::max()) {
-                bits = uint8_t (std::ceil(std::log2(max + 1)));
-                bits = std::max(bits, c1.transformedSequenceConfigurations[index].binarizationParameters[0]);
-                c1.transformedSequenceConfigurations[index].binarizationParameters = {bits};
-                c1.transformedSequenceConfigurations[index].binarizationId = gabac::BinarizationId::BI;
-            }
-            break;
-        case gabac::BinarizationId::TU:
-            if(max >= 32) {
-                c1.transformedSequenceConfigurations[index].binarizationId = gabac::BinarizationId::TEG;
-                c1.transformedSequenceConfigurations[index].binarizationParameters = {32};
-            }
-            break;
-        default:
-            return;
-    }
-}
-
-gabac::EncodingConfiguration updateConfig (const gabac::EncodingConfiguration& c1, uint64_t max, unsigned wordsize) {
-    gabac::EncodingConfiguration ret = c1;
-
-    ret.wordSize = std::min(ret.wordSize, wordsize);
-
-    unsigned bits = uint8_t (std::ceil(std::log2(max + 1)));
-
-    ret.transformedSequenceConfigurations[0].lutBits = std::min(std::max(bits, ret.transformedSequenceConfigurations[0].lutBits), ret.wordSize*8);
-    updateBin(ret, max, 0);
-
-    const size_t MAX_LUT_SIZE = 1u << 20u;
-
-    if(ret.transformedSequenceConfigurations[0].lutTransformationEnabled) {
-        if (max > MAX_LUT_SIZE){
-            ret.transformedSequenceConfigurations[0].lutTransformationEnabled = false;
-        } else if(max > size_t(std::sqrt(MAX_LUT_SIZE))) {
-            ret.transformedSequenceConfigurations[0].lutOrder = 0;
-        } else if(max > size_t(std::pow(MAX_LUT_SIZE, 1.0/3.0))) {
-            ret.transformedSequenceConfigurations[0].lutOrder = std::min(1u, ret.transformedSequenceConfigurations[0].lutOrder);
-        }
-    }
-
-    switch(ret.sequenceTransformationId) {
-        case gabac::SequenceTransformationId::equality_coding:
-            ret.transformedSequenceConfigurations[1].lutBits = 1;
-            updateBin(ret, 1, 1);
-            break;
-        case gabac::SequenceTransformationId::match_coding:
-            bits = uint8_t (std::ceil(std::log2(ret.sequenceTransformationParameter + 1)));
-            ret.transformedSequenceConfigurations[1].lutBits = bits;
-            updateBin(ret, ret.sequenceTransformationParameter, 1);
-            ret.transformedSequenceConfigurations[2].lutBits = 32;
-            updateBin(ret, std::numeric_limits<uint32_t >::max(), 2);
-            break;
-        case gabac::SequenceTransformationId::rle_coding:
-            ret.transformedSequenceConfigurations[1].lutBits = 32;
-            updateBin(ret, std::numeric_limits<uint32_t >::max(), 1);
-            break;
-        default:
-            break;
-    }
-
-    return ret;
-
-}
-
 std::string defaultGabacConf = "{\"word_size\":\"1\",\"sequence_transformation_id\":\"0\",\""
                                "sequence_transformation_parameter\":\"0\",\"transformed_sequences\""
                                ":[{\"lut_transformation_enabled\":\"0\",\"lut_transformation_bits\""
@@ -210,7 +137,7 @@ void update_one_config(const std::string& file, const std::string& configpath){
         maxval = getMaxValue(file, wordsize);
     }
 
-    gabac::EncodingConfiguration newconfig = updateConfig(config, maxval, wordsize);
+    gabac::EncodingConfiguration newconfig = config.generalize(maxval, wordsize);
 
     std::cout << file <<" : " << "wordsize " << wordsize << ", max " << maxval << std::endl;
 
