@@ -64,18 +64,12 @@ static void parseConfigurationFile(
 }
 
 
-static void printHelp(
-    const boost::program_options::options_description& optionsDescription)
-{
-    std::cout << optionsDescription;
-}
-
-
 ProgramOptions::ProgramOptions(
     int argc,
     char *argv[])
     : force(false),
       verbose(false),
+      help(false),
       workingDirectory("./"),
       numThreads(1),
       inputFilePath(""),
@@ -121,10 +115,7 @@ void ProgramOptions::processCommandLine(
     namespace po = boost::program_options;
 
     // Declare the supported option groups.
-    po::options_description basicOptions("Basic");
-    po::options_description genericOptions("Generic");
-    po::options_description inputOptions("Input");
-    po::options_description algorithmOptions("Algorithm");
+    po::options_description allOptions("All");
     po::positional_options_description p;
 
     p.add("input-file", 1);
@@ -138,78 +129,52 @@ void ProgramOptions::processCommandLine(
     };
 
     // Add the input options.
-    inputOptions.add_options()
+    allOptions.add_options()
         ("input-file",
             po::value<std::string>(&inputFilePath),
-            "Input file path")
+            "First input file - fastq in fastq mode, sam in sam mode, genie/sgenie file in decompression mode. This argument is positional (first argument) and mandatory")
         ("input-file-pair-path,p",
             po::value<std::string>(&inputFilePairPath),
-            "Input file pair path")
+            "Second input file - paired fastq in fastq mode (optional), reference fasta file in sam mode (mandatory). This argument is also positional.")
             ("config-file-path,c",
-                    po::value<std::string>(&configPath)->default_value("../gabac_config/"),
-                            "config-file-path")
+                    po::value<std::string>(&configPath),
+                            "Path to directory with gabac configurations. Missing configuratons will be regenerated, which may take a while")
             ("numThreads,t",
              po::value<int>(&numThreads)->default_value(1),
-             "config-file-path");
+             "How many threads to launch for parallel execution of GABAC. Default is 1.")
+            ("help", "Print usage");
 
     // Declare an options_description instance which will include all the
     // options except for the basic options.
-    po::options_description allOptions("All");
-    allOptions.add(genericOptions);
-    allOptions.add(inputOptions);
-    allOptions.add(algorithmOptions);
+
 
     // Declare to maps for the options.
-    po::variables_map basicOptionsMap;
     po::variables_map allOptionsMap;
 
-    // Parse only the basic options from the command line.
-    po::store(po::command_line_parser(argc, argv).options(basicOptions).allow_unregistered().run(), basicOptionsMap);
-
-    // Now check if we shall load the other options from a configuration file.
-    if (basicOptionsMap.count("configuration-file-path")) {
-        const std::string& configurationFilePath = basicOptionsMap["configuration-file-path"].as<std::string>();
-        std::vector<std::string> args;
-        parseConfigurationFile(configurationFilePath, &args);
-        po::store(po::command_line_parser(args).options(allOptions).run(), allOptionsMap);
-    }
-    else
-        po::store(po::command_line_parser(argc, argv).
-                options(allOptions).positional(p).run(), allOptionsMap);
+    po::store(po::command_line_parser(argc, argv).
+            options(allOptions).positional(p).run(), allOptionsMap);
 
     // First thing to do is to print the help.
-    if (basicOptionsMap.count("help") || basicOptionsMap.count("h")) {
-        printHelp(basicOptions);
-        printHelp(allOptions);
-        return;
-    }
-
-    // Now check if we are to print the help for a given option group only.
-    if (basicOptionsMap.count("help-group")) {
-        const std::string& selectedOptionGroup = basicOptionsMap["help-group"].as<std::string>();
-
-        if (selectedOptionGroup == "basic") {
-            printHelp(basicOptions);
-        } else if (selectedOptionGroup == "generic") {
-            printHelp(genericOptions);
-        } else if (selectedOptionGroup == "input") {
-            printHelp(inputOptions);
-        } else if (selectedOptionGroup == "algorithm") {
-            printHelp(allOptions);
-        } else {
-            // LOG_S(ERROR) << "Unknown option group name '" << selectedOptionGroup << "'";
-            // LOG_S(ERROR) << "Allowed option group names are:";
-            for (const auto& allowedOptionGroupName : allowedOptionGroupNames) {
-                // LOG_S(ERROR) << "  " << allowedOptionGroupName;
-            }
-            throwRuntimeError("unknown option group name");
-        }
+    if (allOptionsMap.count("help") || allOptionsMap.count("h")) {
+        std::cout
+                << "Usage fastq encoding: \n genie [fastq] [optional: paired fastq] -c [Path to gabac config] [Optional: -t number of threads]"
+                << std::endl;
+        std::cout
+                << "Usage fastq decoding: \n genie [genie file] -c [Path to gabac config] [Optional: -t number of threads]"
+                << std::endl;
+        std::cout
+                << "Usage sam encoding: \n genie [sam] [fasta reference] -c [Path to gabac config] [Optional: -t number of threads]"
+                << std::endl;
+        std::cout
+                << "Usage sam decoding: \n genie [sgenie file] -c [Path to gabac config] [Optional: -t number of threads]"
+                << std::endl << std::endl;
+        std::cout << allOptions << std::endl;
+        help = true;
         return;
     }
 
     // This will throw on erroneous program options. Thus we call notify()
     // after printing the help.
-    po::notify(basicOptionsMap);
     po::notify(allOptionsMap);
 
     print();
