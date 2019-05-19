@@ -117,6 +117,7 @@ static generated_aus generationFromFastq_SPRING(
     std::cout << std::string(80, '-') << std::endl;
 
     bool paired_end = false;
+    const int SPRING_THREADS = 1; // programOptions.numThreads
     // Initialize a FASTQ file reader.
     input::fastq::FastqFileReader fastqFileReader1(programOptions.inputFilePath);
     std::cout << "Calling SPRING" << std::endl;
@@ -124,7 +125,7 @@ static generated_aus generationFromFastq_SPRING(
         return spring::generate_streams_SPRING(
                 &fastqFileReader1,
                 &fastqFileReader1,
-                programOptions.numThreads,
+                SPRING_THREADS,
                 paired_end,
                 programOptions.workingDirectory
         );
@@ -134,7 +135,7 @@ static generated_aus generationFromFastq_SPRING(
         return spring::generate_streams_SPRING(
                 &fastqFileReader1,
                 &fastqFileReader2,
-                programOptions.numThreads,
+                SPRING_THREADS,
                 paired_end,
                 programOptions.workingDirectory
         );
