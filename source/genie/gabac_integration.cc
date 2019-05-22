@@ -192,7 +192,8 @@ void run_gabac(const std::vector<std::string>& files, const std::string& config,
         std::cout << "Testing of configs finished!" << std::endl;
     }
 
-  //  throw std::runtime_error("exit");
+    std::cout << "Running gabac with " << threads << " threads..." << std::endl;
+    auto gabac_start = std::chrono::steady_clock::now();
 
     const size_t NUM_THREADS = threads;
     ThreadPool pool(NUM_THREADS);
@@ -206,6 +207,13 @@ void run_gabac(const std::vector<std::string>& files, const std::string& config,
     }
     pool.wait();
 
+    auto gabac_end = std::chrono::steady_clock::now();
+    std::cout << "Gabac done!\n";
+    std::cout << "Time for this step: "
+              << std::chrono::duration_cast<std::chrono::seconds>(
+                   gabac_end - gabac_start)
+                   .count()
+              << " s\n";
 }
 
 
