@@ -68,7 +68,7 @@ void compress_one_file(const std::string& file, const std::string& configfolder,
 
     // Configure gabac streams
     gabac::IOConfiguration
-            ioconf = {&fin_desc, &fout_desc, 1000000000, &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
+            ioconf = {&fin_desc, &fout_desc, std::min(unsigned(boost::filesystem::file_size(file)),1000000000u), &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
     gabac::EncodingConfiguration enConf(config);
 
     std::cout << file << " ..." << std::endl;
