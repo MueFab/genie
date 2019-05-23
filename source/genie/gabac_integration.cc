@@ -168,7 +168,7 @@ void update_configs(const std::vector<std::string>& files, const std::string& co
                 std::ofstream outstream(configpath, std::ios::binary);
                 std::ifstream instream(file, std::ios::binary);
                 gabac::IOConfiguration
-                        ioconf{&instream, &outstream, 10000000, &std::cout, gabac::IOConfiguration::LogLevel::WARNING};
+                        ioconf{&instream, &outstream, std::min(unsigned(boost::filesystem::file_size(file)),1000000000u), &std::cout, gabac::IOConfiguration::LogLevel::WARNING};
                 gabac::EncodingConfiguration enconf;
                 gabac::analyze(ioconf, gabac::getCandidateConfig());
             }
