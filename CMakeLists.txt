@@ -441,7 +441,9 @@ set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/gabac_int
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/generation.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/genie_file_format.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/ProgramOptions.cc)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/thread_pool.cc)
+if (NOT ${GENIE_USE_OPENMP})
+    set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/thread_pool.cc)
+endif ()
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/utilities.cc)
 
 # List all header files (alphabetically)
