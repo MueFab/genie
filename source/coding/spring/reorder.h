@@ -437,10 +437,16 @@ uint32_t tid = 0; // set thread ID to zero if not using OpenMP
 #endif
     {  // doing initial setup and first read
       current = firstread;
+      // some fix below to make sure no errors occurs when we have very few reads (comparable to num_threads).
+      // basically if read already taken, this thread just gives up
+      if (remainingreads[current] == 0) {
+          done = true;
+      } else {
+          remainingreads[current] = 0;
+          unmatched[tid]++;
+      }
       firstread +=
           rg.numreads / rg.num_thr;  // spread out first read equally
-      remainingreads[current] = 0;
-      unmatched[tid]++;
     }
 #ifdef GENIE_USE_OPENMP
 #pragma omp barrier

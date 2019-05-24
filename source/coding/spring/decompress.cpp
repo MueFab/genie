@@ -8,6 +8,7 @@
 #include "spring/util.h"
 #include "spring/decompress.h"
 #include "spring/id_tokenization.h"
+#include "spring/params.h"
 #include "fileio/fastq_record.h"
 
 namespace spring {
@@ -32,8 +33,8 @@ std::vector<dsg::input::fastq::FastqRecord> decode_streams(decoded_desc_t &dec, 
       pos_in_tokens_array[i][j] = 0;
   uint64_t pos_in_quality_arr = 0;
   std::string prev_ID;
-  uint32_t prev_tokens_ptr[256] = {0};
-  uint32_t prev_tokens_len[256] = {0};
+  uint32_t prev_tokens_ptr[MAX_NUM_TOKENS_ID] = {0};
+  uint32_t prev_tokens_len[MAX_NUM_TOKENS_ID] = {0};
 
   // some state variables
   uint64_t abs_pos = 0;

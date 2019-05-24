@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 
+#include "spring/params.h"
 #include "spring/reorder_compress_quality_id.h"
 #include "spring/id_tokenization.h"
 #include "spring/util.h"
@@ -291,8 +292,8 @@ void reorder_compress(const std::string &file_name,
 }
 
 void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std::vector<int64_t> tokens[128][8]) {
-  char prev_ID[1024] = {0};
-  uint32_t prev_tokens_ptr[1024] = {0};
+  char prev_ID[MAX_NUM_TOKENS_ID] = {0};
+  uint32_t prev_tokens_ptr[MAX_NUM_TOKENS_ID] = {0};
   for (uint32_t id_num = 0; id_num < num_ids; id_num++) {
     tokens[0][0].push_back(1); // DIFF
     if (id_num == 0)

@@ -1,3 +1,4 @@
+#include "spring/params.h"
 #include "spring/id_tokenization.h"
 #include "spring/util.h"
 #include <stdexcept>
@@ -144,12 +145,16 @@ void generate_id_tokens (char *prev_ID, uint32_t *prev_tokens_ptr, std::string &
     match_len = 0;
     token_len = 0;
     token_ctr++;
-    if(token_ctr > 126)
+    if(token_ctr > MAX_NUM_TOKENS_ID-2)
       throw std::runtime_error("Too many tokens in ID");
   }
   strcpy(prev_ID, current_id.c_str());
   if (!dont_write_to_vector)
     tokens[token_ctr+1][0].push_back(9); // END
+
+  // fill rest of prev_tokens_ptr to 0, otherwise we've bug due to garbage values
+  for (uint32_t i = 0; i < MAX_NUM_TOKENS_ID; i++)
+      prev_tokens_ptr[i] = 0;
 }
 
 std::string decode_id_tokens (std::string &prev_ID, uint32_t *prev_tokens_ptr, uint32_t *prev_tokens_len, const std::vector<int64_t> tokens[128][8], uint32_t pos_in_tokens_array[128][8]) {
