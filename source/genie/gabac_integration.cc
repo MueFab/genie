@@ -135,7 +135,7 @@ void update_one_config(const std::string& file, const std::string& configpath){
     uint64_t maxval = getMaxValue(file, wordsize);
 
     // avoid binarizations for large values
-    if(maxval >= std::numeric_limits<uint32_t >::max() && wordsize == 8) {
+    if(maxval > std::numeric_limits<uint32_t >::max()) {
         wordsize = 4;
         maxval = getMaxValue(file, wordsize);
     }
