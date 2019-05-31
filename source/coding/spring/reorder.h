@@ -296,13 +296,13 @@ bool search_match(const std::bitset<bitset_size> &ref,
       continue;
     // check if any other thread is modifying same dictpos
 #ifdef GENIE_USE_OPENMP
-    omp_set_lock(&dict_lock[startposidx & 0xFFFFFF]);
+    omp_set_lock(&dict_lock[startposidx & LOCKS_REORDER_MASK]);
 #endif
     dict[l].findpos(dictidx, startposidx);
     if (dict[l].empty_bin[startposidx])  // bin is empty
     {
 #ifdef GENIE_USE_OPENMP
-      omp_unset_lock(&dict_lock[startposidx & 0xFFFFFF]);
+      omp_unset_lock(&dict_lock[startposidx & LOCKS_REORDER_MASK]);
 #endif
       continue;
     }
@@ -328,7 +328,7 @@ bool search_match(const std::bitset<bitset_size> &ref,
                   .count();
         if (hamming <= thresh) {
 #ifdef GENIE_USE_OPENMP
-          omp_set_lock(&read_lock[rid & 0xFFFFFF]);
+          omp_set_lock(&read_lock[rid & LOCKS_REORDER_MASK]);
 #endif
           if (remainingreads[rid]) {
             remainingreads[rid] = 0;
@@ -336,14 +336,14 @@ bool search_match(const std::bitset<bitset_size> &ref,
             flag = 1;
           }
 #ifdef GENIE_USE_OPENMP
-          omp_unset_lock(&read_lock[rid & 0xFFFFFF]);
+          omp_unset_lock(&read_lock[rid & LOCKS_REORDER_MASK]);
 #endif
           if (flag == 1) break;
         }
       }
     }
 #ifdef GENIE_USE_OPENMP
-    omp_unset_lock(&dict_lock[startposidx & 0xFFFFFF]);
+    omp_unset_lock(&dict_lock[startposidx & LOCKS_REORDER_MASK]);
 #endif
     if (flag == 1) break;
   }
@@ -470,12 +470,12 @@ uint32_t tid = 0; // set thread ID to zero if not using OpenMP
           startposidx = dict[l].bphf->lookup(ull);
           // check if any other thread is modifying same dictpos
 #ifdef GENIE_USE_OPENMP
-          omp_set_lock(&dict_lock[startposidx & 0xFFFFFF]);
+          omp_set_lock(&dict_lock[startposidx & LOCKS_REORDER_MASK]);
 #endif
           dict[l].findpos(dictidx, startposidx);
           dict[l].remove(dictidx, startposidx, current);
 #ifdef GENIE_USE_OPENMP
-          omp_unset_lock(&dict_lock[startposidx & 0xFFFFFF]);
+          omp_unset_lock(&dict_lock[startposidx & LOCKS_REORDER_MASK]);
 #endif
         }
       } else {
@@ -597,7 +597,7 @@ uint32_t tid = 0; // set thread ID to zero if not using OpenMP
           for (int64_t j = remainingpos; j >= 0; j--) {
             if (remainingreads[j] == 1) {
 #ifdef GENIE_USE_OPENMP
-              omp_set_lock(&read_lock[j & 0xffffff]);
+              omp_set_lock(&read_lock[j & LOCKS_REORDER_MASK]);
 #endif
               if (remainingreads[j])  // checking again inside critical block
               {
@@ -608,7 +608,7 @@ uint32_t tid = 0; // set thread ID to zero if not using OpenMP
                 unmatched[tid]++;
               }
 #ifdef GENIE_USE_OPENMP
-              omp_unset_lock(&read_lock[j & 0xffffff]);
+              omp_unset_lock(&read_lock[j & LOCKS_REORDER_MASK]);
 #endif
               if (flag == 1) break;
             }
@@ -650,6 +650,10 @@ uint32_t tid = 0; // set thread ID to zero if not using OpenMP
 
   delete[] remainingreads;
 #ifdef GENIE_USE_OPENMP
+  for (unsigned int j = 0; j < num_locks; j++) {
+    omp_destroy_lock(&dict_lock[j]);
+    omp_destroy_lock(&read_lock[j]);
+  }
   delete[] dict_lock;
   delete[] read_lock;
 #endif
