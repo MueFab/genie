@@ -59,7 +59,6 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_str
   uint32_t num_reads = cp.num_reads, num_reads_aligned = 0, num_reads_unaligned;
   bool preserve_order = cp.preserve_order;
   bool paired_end = cp.paired_end;
-  int num_thr = cp.num_thr;
   char *RC_arr = new char[num_reads];
   uint16_t *read_length_arr = new uint16_t[num_reads];
   bool *flag_arr = new bool[num_reads];
@@ -67,19 +66,19 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_str
   uint64_t *pos_arr = new uint64_t[num_reads];
   uint16_t *noise_len_arr = new uint16_t[num_reads];
 
-  std::vector<int64_t> subseq_0_0[num_thr];
-  std::vector<int64_t> subseq_1_0[num_thr];
-  std::vector<int64_t> subseq_3_0[num_thr];
-  std::vector<int64_t> subseq_3_1[num_thr];
-  std::vector<int64_t> subseq_4_0[num_thr];
-  std::vector<int64_t> subseq_4_1[num_thr];
-  std::vector<int64_t> subseq_6_0[num_thr];
-  std::vector<int64_t> subseq_7_0[num_thr];
-  std::vector<int64_t> subseq_8_0[num_thr];
-  std::vector<int64_t> subseq_8_10[num_thr];
-  std::vector<int64_t> subseq_8_11[num_thr];
-  std::vector<int64_t> subseq_8_12[num_thr];
-  std::vector<int64_t> subseq_12_0[num_thr];
+  std::vector<int64_t> subseq_0_0[cp.num_thr];
+  std::vector<int64_t> subseq_1_0[cp.num_thr];
+  std::vector<int64_t> subseq_3_0[cp.num_thr];
+  std::vector<int64_t> subseq_3_1[cp.num_thr];
+  std::vector<int64_t> subseq_4_0[cp.num_thr];
+  std::vector<int64_t> subseq_4_1[cp.num_thr];
+  std::vector<int64_t> subseq_6_0[cp.num_thr];
+  std::vector<int64_t> subseq_7_0[cp.num_thr];
+  std::vector<int64_t> subseq_8_0[cp.num_thr];
+  std::vector<int64_t> subseq_8_10[cp.num_thr];
+  std::vector<int64_t> subseq_8_11[cp.num_thr];
+  std::vector<int64_t> subseq_8_12[cp.num_thr];
+  std::vector<int64_t> subseq_12_0[cp.num_thr];
 
   // read streams for aligned reads
   std::ifstream f_order;
@@ -162,20 +161,20 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_str
   remove(file_unaligned.c_str());
   remove(file_pos.c_str());
 
+  // this is actually number of read pairs per block for PE
+  uint32_t num_reads_per_block = cp.num_reads_per_block;
+
   // Now generate new streams and compress blocks in parallel
 #ifdef GENIE_USE_OPENMP
-  omp_set_num_threads(num_thr);
-#endif
-  uint32_t num_reads_per_block = cp.num_reads_per_block;
-// this is actually number of read pairs per block for PE
-#ifdef GENIE_USE_OPENMP
-#pragma omp parallel
+#pragma omp parallel num_threads(/*cp.num_thr*/ 1)
 #endif
   {
 #ifdef GENIE_USE_OPENMP
-    uint64_t tid = omp_get_thread_num();
+    int tid = omp_get_thread_num();
+    int num_thr = omp_get_num_threads();
 #else
-    uint64_t tid = 0;
+    int tid = 0;
+    int num_thr = 1;
 #endif
     uint64_t block_num = tid;
     bool done = false;

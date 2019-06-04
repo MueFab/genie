@@ -206,19 +206,21 @@ template <size_t bitset_size>
 void readDnaFile(std::bitset<bitset_size> *read, uint16_t *read_lengths,
                  const reorder_global<bitset_size> &rg) {
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel
+#pragma omp parallel num_threads(/*rg.num_thr*/ 1)
 #endif
   {
 #ifdef GENIE_USE_OPENMP
-    uint32_t tid = omp_get_thread_num();
+    int tid = omp_get_thread_num();
+    int num_thr = omp_get_num_threads();
 #else
-    uint32_t tid = 0; // set thread ID to zero if not using OpenMP
+    int tid = 0; // set thread ID to zero if not using OpenMP
+    int num_thr = 1;
 #endif
     std::ifstream f(rg.infile[0], std::ifstream::in);
     std::string s;
     uint32_t i = 0;
     while (std::getline(f, s)) {
-      if (i % rg.num_thr == tid) {
+      if (i % num_thr == tid) {
         read_lengths[i] = (uint16_t)s.length();
         stringtobitset<bitset_size>(s, read_lengths[i], read[i], rg.basemask);
         i++;
@@ -232,19 +234,21 @@ void readDnaFile(std::bitset<bitset_size> *read, uint16_t *read_lengths,
   remove(rg.infile[0].c_str());
   if (rg.paired_end) {
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel
+#pragma omp parallel num_threads(/*rg.num_thr*/ 1)
 #endif
     {
 #ifdef GENIE_USE_OPENMP
-uint32_t tid = omp_get_thread_num();
+      int tid = omp_get_thread_num();
+      int num_thr = omp_get_num_threads();
 #else
-uint32_t tid = 0; // set thread ID to zero if not using OpenMP
+      int tid = 0; // set thread ID to zero if not using OpenMP
+      int num_thr = 1;
 #endif
       std::ifstream f(rg.infile[1], std::ifstream::in);
       std::string s;
       uint32_t i = 0;
       while (std::getline(f, s)) {
-        if (i % rg.num_thr == tid) {
+        if (i % num_thr == tid) {
           read_lengths[rg.numreads_array[0] + i] = (uint16_t)s.length();
           stringtobitset<bitset_size>(s, read_lengths[rg.numreads_array[0] + i],
                                       read[rg.numreads_array[0] + i],
@@ -379,13 +383,15 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict,
   uint32_t firstread = 0;
   uint32_t *unmatched = new uint32_t[rg.num_thr];
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel
+#pragma omp parallel num_threads(/*rg.num_thr*/ 1)
 #endif
   {
 #ifdef GENIE_USE_OPENMP
-uint32_t tid = omp_get_thread_num();
+    int tid = omp_get_thread_num();
+    int num_thr = omp_get_num_threads();
 #else
-uint32_t tid = 0; // set thread ID to zero if not using OpenMP
+    int tid = 0; // set thread ID to zero if not using OpenMP
+    int num_thr = 1;
 #endif
     std::string tid_str = std::to_string(tid);
     std::ofstream foutRC(rg.outfileRC + '.' + tid_str, std::ofstream::out);
@@ -438,7 +444,7 @@ uint32_t tid = 0; // set thread ID to zero if not using OpenMP
     {  // doing initial setup and first read
       current = firstread;
       firstread +=
-          rg.numreads / rg.num_thr;  // spread out first read equally
+          rg.numreads / num_thr;  // spread out first read equally
       remainingreads[current] = 0;
       unmatched[tid]++;
     }
@@ -672,7 +678,7 @@ void writetofile(std::bitset<bitset_size> *read, uint16_t *read_lengths,
                  reorder_global<bitset_size> &rg) {
 // convert bitset to string for all num_thr files in parallel
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel
+#pragma omp parallel num_threads(/*rg.num_thr*/ 1)
 #endif
     {
 #ifdef GENIE_USE_OPENMP
@@ -779,9 +785,6 @@ void reorder_main(const std::string &temp_dir, const compression_params &cp) {
   rg.numreads_array[0] = cp.num_reads_clean[0];
   rg.numreads_array[1] = cp.num_reads_clean[1];
 
-#ifdef GENIE_USE_OPENMP
-  omp_set_num_threads(rg.num_thr);
-#endif
   setglobalarrays(rg);
   std::bitset<bitset_size> *read = new std::bitset<bitset_size>[rg.numreads];
   uint16_t *read_lengths = new uint16_t[rg.numreads];
