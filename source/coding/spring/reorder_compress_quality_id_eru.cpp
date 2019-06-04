@@ -41,9 +41,6 @@ void reorder_compress_quality_id(const std::string &temp_dir,
   std::string outfile_quality  = basedir + "/quality";
   std::string outfile_id = basedir + "/id";
 
-#ifdef GENIE_USE_OPENMP
-  omp_set_num_threads(num_thr);
-#endif
   uint32_t numreads_modified = numreads;
   if (paired_end)
     numreads_modified = numreads/2; // to make things simpler below
@@ -113,7 +110,7 @@ void reorder_compress_quality_id(const std::string &temp_dir,
 }
 
 void reorder_compress(const std::string &file_name, const std::string &outfilenameprefix,
-                      const uint32_t &num_reads_per_file, const int &num_thr,
+                      const uint32_t &num_reads_per_file, const int &num_threads,
                       const uint32_t &num_reads_per_block,
                       std::string *str_array, const uint32_t &str_array_size,
                       uint32_t *order_array, const std::string &mode) {
@@ -134,13 +131,15 @@ void reorder_compress(const std::string &file_name, const std::string &outfilena
     }
     f_in.close();
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel
+#pragma omp parallel num_threads(/*num_threads*/ 1)
 #endif
     {
 #ifdef GENIE_USE_OPENMP
-      uint64_t tid = omp_get_thread_num();
+      int tid = omp_get_thread_num();
+      int num_thr = omp_get_num_threads();
 #else
-      uint64_t tid = 0;
+      int tid = 0;
+      int num_thr = 1;
 #endif
       uint64_t block_num_offset = start_read_bin / num_reads_per_block;
       uint64_t block_num = tid;
@@ -174,7 +173,7 @@ void reorder_compress(const std::string &file_name, const std::string &outfilena
 }
 
 void reorder_compress_quality_pe(const std::string file_name[2], const std::string &outfilenameprefix,
-                      const uint32_t &num_reads, const int &num_thr,
+                      const uint32_t &num_reads, const int &num_threads,
                       const uint32_t &num_reads_per_block,
                       std::string *str_array_1, std::string *str_array_2, const uint32_t &str_array_size,
                       uint32_t *order_array) {
@@ -200,13 +199,15 @@ void reorder_compress_quality_pe(const std::string file_name[2], const std::stri
     f_in_1.close();
     f_in_2.close();
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel
+#pragma omp parallel num_threads(/*num_threads*/ 1)
 #endif
     {
 #ifdef GENIE_USE_OPENMP
-      uint64_t tid = omp_get_thread_num();
+      int tid = omp_get_thread_num();
+      int num_thr = omp_get_num_threads();
 #else
-      uint64_t tid = 0;
+      int tid = 0;
+      int num_thr = 1;
 #endif
       uint64_t block_num_offset = start_read_bin / num_reads_per_block;
       uint64_t block_num = tid;

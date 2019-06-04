@@ -96,16 +96,25 @@ void preprocess(dsg::input::fastq::FastqFileReader *fastqFileReader1,
       fastqFileReader[1]->seekFromSet(0);
     }
   }
-  uint64_t num_reads_per_step = (uint64_t)cp.num_thr * num_reads_per_block;
+
+  //
+  // FIXME
+  //
+  // The following loop is buggy, and only works with num_threads = 1.
+  // If you set num_threads = 2 and execute the omp parallel region with
+  // only a single thread, it still doesn't work, so there is probably
+  // a bug in the set up or post-parallel accumulation logic somewhere.
+  //
+  // OpenMP has a reduction clause to handle this sort of thing neatly.
+  //
+  //int num_threads = cp.num_thr;
+  int num_threads = 1; // remove after fixing bug(s)
+  //
+  uint64_t num_reads_per_step = (uint64_t)num_threads * num_reads_per_block;
   std::string *id_array_1 = new std::string[num_reads_per_step];
   bool *read_contains_N_array = new bool[num_reads_per_step];
   uint32_t *read_lengths_array = new uint32_t[num_reads_per_step];
-  bool *paired_id_match_array = new bool[cp.num_thr];
-
-#ifdef GENIE_USE_OPENMP
-  omp_set_num_threads(cp.num_thr);
-#endif
-
+  bool *paired_id_match_array = new bool[num_threads];
   uint32_t num_blocks_done = 0;
 
   while (true) {
@@ -121,7 +130,7 @@ void preprocess(dsg::input::fastq::FastqFileReader *fastqFileReader1,
         throw std::runtime_error("Too many reads.");
       }
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel
+#pragma omp parallel num_threads(/*cp.num_thr*/ 1)
 #endif
       {
         bool done = false;
@@ -251,7 +260,7 @@ void preprocess(dsg::input::fastq::FastqFileReader *fastqFileReader1,
       // if id match not found in any thread, set to false
       if (cp.paired_end && (j == 1)) {
         if (paired_id_match)
-          for (int tid = 0; tid < cp.num_thr; tid++)
+          for (int tid = 0; tid < num_threads; tid++)
             paired_id_match &= paired_id_match_array[tid];
         if (!paired_id_match) paired_id_code = 0;
       }
@@ -287,7 +296,7 @@ void preprocess(dsg::input::fastq::FastqFileReader *fastqFileReader1,
         throw std::runtime_error(
             "Number of reads in paired files do not match.");
     if (done[0] && done[1]) break;
-    num_blocks_done += cp.num_thr;
+    num_blocks_done += num_threads;
   }
 
   delete[] id_array_1;
