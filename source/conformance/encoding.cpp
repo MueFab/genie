@@ -72,12 +72,12 @@ void encode(const ProgramOptions &programOptions)
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Construct an input data block for GABAC
-    const size_t INPUT_DATABLOCK_INITIAL_SIZE = decodedUreads.size();
+    const size_t inputDataBlockInitialSize = decodedUreads.size();
     const size_t INPUT_DATABLOCK_WORDSIZE = 1;
     const size_t OUTPUT_DATABLOCK_INITIAL_SIZE = 0;
     const size_t OUTPUT_DATABLOCK_WORDSIZE = 1;
 
-    gabac::DataBlock inputDataBlock(decoded_symbols.data(), INPUT_DATABLOCK_INITIAL_SIZE, INPUT_DATABLOCK_WORDSIZE);
+    gabac::DataBlock inputDataBlock(decoded_symbols.data(), inputDataBlockInitialSize, INPUT_DATABLOCK_WORDSIZE);
     gabac::DataBlock outputDataBlock(OUTPUT_DATABLOCK_INITIAL_SIZE, OUTPUT_DATABLOCK_WORDSIZE);
 
     // Interface to GABAC library
@@ -118,13 +118,11 @@ void encode(const ProgramOptions &programOptions)
         GENIE_LOG_TRACE << "Block payload size: " << BLOCK_PAYLOAD_SIZE;
         GENIE_LOG_TRACE << "Block payload: ";
         for (size_t i = 0; i < BLOCK_PAYLOAD_SIZE; i++) {
-            std::cout << std::hex << "0x" << static_cast<int>(BLOCK_PAYLOAD[i]) << " ";
+            std::cout << std::hex << "0x" << static_cast<int>(static_cast<unsigned char>(BLOCK_PAYLOAD[i])) << " ";
         }
         std::cout << std::endl;
 
-        // DONE(Fabian): align this with the block payload syntax
         // DONE(Tom): check GABAC's byte order - it's LSB
-
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
         // CREATE PARAMETER SET
@@ -140,20 +138,49 @@ void encode(const ProgramOptions &programOptions)
         // CREATE ACCESS UNIT
         /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        ClassType classType = { .classType = CLASS_TYPE_CLASS_U };
-        SequenceID sequenceId = { .sequenceID = 0 };
-        SequenceID refSequenceId = { .sequenceID = 0 };
-        DataUnitAccessUnit* accessUnit = initDataUnitAccessUnit(
-                0, 1, 0, classType, 1, 0, 0, sequenceId, 0, 0, refSequenceId, 0, 0, 0, 0);
+        const uint32_t ACCESS_UNIT_ID = 0;
+        const uint8_t NUM_BLOCKS = 1;
+        const uint16_t PARAMETER_SET_ID = 0;
+        const ClassType CLASS_TYPE = { .classType = CLASS_TYPE_CLASS_U };
+        const uint32_t READS_COUNT = 1;
+        const uint16_t MM_THRESHOLD = 0;
+        const uint32_t MM_COUNT = 0;
+        const SequenceID SEQUENCE_ID = { .sequenceID = 0 };
+        const uint64_t REFERENCE_START_POS = 0;
+        const uint64_t REFERENCE_END_POS = 0;
+        const SequenceID REFSEQUENCE_ID = { .sequenceID = 0 };
+        const uint64_t AU_START_POSITION = 0;
+        const uint64_t AU_END_POSITION = 0;
+        const uint64_t EXTENDED_AU_START_POSITION = 0;
+        const uint64_t EXTENDED_AU_END_POSITION = 0;
 
-        DatasetContainer* datasetContainer = initDatasetContainer();
-        // DONE(Daniel): add support for init block from byte array
-        DataUnitBlockHeader* blockHeader = initDataUnitBlockHeader(6, BLOCK_PAYLOAD_SIZE);
-        Block* block = initBlockWithHeaderPayloadInMemory(
-            6,                                    // descriptorId
-            BLOCK_PAYLOAD_SIZE,                     // payloadSize
-            BLOCK_PAYLOAD,  // payloadInMemory TODO(Daniel): does this need to be non-const? Is the memory modified?
-            BLOCK_PAYLOAD_SIZE);                           // size_t payloadInMemorySize)
+        DataUnitAccessUnit* const accessUnit = initDataUnitAccessUnit(
+                ACCESS_UNIT_ID,
+                NUM_BLOCKS,
+                PARAMETER_SET_ID,
+                CLASS_TYPE,
+                READS_COUNT,
+                MM_THRESHOLD,
+                MM_COUNT,
+                SEQUENCE_ID,
+                REFERENCE_START_POS,
+                REFERENCE_END_POS,
+                REFSEQUENCE_ID,
+                AU_START_POSITION,
+                AU_END_POSITION,
+                EXTENDED_AU_START_POSITION,
+                EXTENDED_AU_END_POSITION
+         );
+
+        // DatasetContainer* const datasetContainer = initDatasetContainer();
+        const uint8_t DESCRIPTOR_ID = 6;
+        DataUnitBlockHeader* blockHeader = initDataUnitBlockHeader(DESCRIPTOR_ID, BLOCK_PAYLOAD_SIZE);
+        Block* const block = initBlockWithHeaderPayloadInMemory(
+                DESCRIPTOR_ID,
+                BLOCK_PAYLOAD_SIZE,
+                BLOCK_PAYLOAD,       // TODO(Daniel): does this need to be non-const? Is the memory modified?
+                BLOCK_PAYLOAD_SIZE
+        );
 
         bool success = addBlockToDataUnitAccessUnit(accessUnit, block, blockHeader);
         if (!success) {
