@@ -136,10 +136,10 @@ void compress_one_file(const std::string& file, const std::string& configfolder,
     std::cout << file << " ..." << std::endl;
     // Coding
     if (!decompress) {
-        gabac::encode(ioconf, enConf);
+        gabac::run(ioconf, enConf, false);
         std::cout << "Sucessfully compressed ";
     } else {
-        gabac::decode(ioconf, enConf);
+        gabac::run(ioconf, enConf, true);
         std::cout << "Sucessfully decompressed ";
     }
 

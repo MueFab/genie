@@ -7,20 +7,29 @@
 
 namespace genie {
 
-class GenieGabacOutputStream : public gabac::OutputStream
+class GenieGabacOutputBuffer : public std::streambuf
 {
- private:
-    std::vector <std::pair<size_t, uint8_t *>> streams;
-    size_t bytes;
  public:
-
-    GenieGabacOutputStream();
-    size_t writeStream(gabac::DataBlock *inbuffer) override;
-    size_t writeBytes(gabac::DataBlock *) override;
-    size_t bytesWritten() override;
-    void flush(std::vector <std::pair<size_t, uint8_t *>> *dat);
+    GenieGabacOutputBuffer();
+ protected:
+    int overflow(int c) override;
+    std::streamsize xsputn(const char *s, std::streamsize n) override;
+ private:
+    std::vector<gabac::DataBlock> streams;
+    std::streamsize bytesLeft;
+    std::vector<uint8_t> sizeBuf;
+ public:
+    void flush_blocks(std::vector<gabac::DataBlock> *dat);
 };
 
-}  // namespace genie
+class GenieGabacOutputStream : public GenieGabacOutputBuffer, public std::ostream
+{
+ public:
+    GenieGabacOutputStream() : GenieGabacOutputBuffer(), std::ostream(this){
+    }
+};
+
+
+}
 
 #endif //GENIE_GENIE_GABAC_OUTPUT_STREAM_H

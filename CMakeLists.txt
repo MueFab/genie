@@ -349,8 +349,8 @@ add_subdirectory(source/conformance)
 
 # Set the paths
 set(genie "genie")
-set(genie_source_dir ${CMAKE_SOURCE_DIR}/source)
-set(genie_header_dir ${CMAKE_SOURCE_DIR}/source)
+set(genie_source_dir ${CMAKE_SOURCE_DIR}/source )
+set(genie_header_dir ${CMAKE_SOURCE_DIR}/source ${CMAKE_CURRENT_BINARY_DIR}/gabac-src/source)
 set(genie_include_dir ${CMAKE_SOURCE_DIR}/source ${CMAKE_CURRENT_BINARY_DIR}/gabac-src/source)
 
 # List all source files

@@ -32,15 +32,15 @@ void encode(const ProgramOptions &programOptions)
     genie::FastqFileReader fastqFileReader(programOptions.inputFilePath);
 
     // Read FASTQ records in blocks of 10 records.
-    size_t blockSize = 10;
+    const size_t BLOCK_SIZE = 10;
 
     std::string decodedUreads;
 
     while (true) {
         std::vector<genie::FastqRecord> fastqRecords;
-        size_t numRecords = fastqFileReader.readRecords(blockSize, &fastqRecords);
-        if (numRecords != blockSize) {
-            GENIE_LOG_TRACE << "Read only " << numRecords << " records (" << blockSize << " requested)";
+        size_t numRecords = fastqFileReader.readRecords(BLOCK_SIZE, &fastqRecords);
+        if (numRecords != BLOCK_SIZE) {
+            GENIE_LOG_TRACE << "Read only " << numRecords << " records (" << BLOCK_SIZE << " requested)";
         }
 
         // Iterate through the records.
@@ -48,22 +48,22 @@ void encode(const ProgramOptions &programOptions)
             decodedUreads += fastqRecord.sequence;
         }
 
-        if (numRecords != blockSize) {
+        if (numRecords != BLOCK_SIZE) {
             break;
         }
     }
 
     // Alphabet
     // uint8_t alphabet_ID = 0;
-    std::vector<char> S_0 = { 'A', 'C', 'G', 'T', 'N' };
-    std::map<char, uint8_t> S_0_inverse= { { 'A', 0 }, { 'C', 1 }, { 'G', 2 }, { 'T', 3 }, { 'N', 4 } };
+    const std::vector<char> S_0 = { 'A', 'C', 'G', 'T', 'N' };
+    const std::map<char, uint8_t> S_0_INVERSE= { { 'A', 0 }, { 'C', 1 }, { 'G', 2 }, { 'T', 3 }, { 'N', 4 } };
 
     GENIE_LOG_TRACE << "decodedUreads (length: " << decodedUreads.size() << "): " << decodedUreads;
 
     // Lookup in the alphabet
     std::vector<uint8_t> decoded_symbols;
     for (const auto& decodedUreadsChar : decodedUreads) {
-        decoded_symbols.push_back(S_0_inverse[decodedUreadsChar]);
+        decoded_symbols.push_back(S_0_INVERSE.at(decodedUreadsChar));
     }
 
 
@@ -72,54 +72,57 @@ void encode(const ProgramOptions &programOptions)
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Construct an input data block for GABAC
-    size_t inputDataBlockInitialSize = decodedUreads.size();
-    size_t inputDataBlockWordSize = 1;
-    gabac::DataBlock inputDataBlock(inputDataBlockInitialSize, inputDataBlockWordSize);
-    std::memcpy(inputDataBlock.getData(), decoded_symbols.data(), (inputDataBlock.size() * inputDataBlock.getWordSize()));
+    const size_t INPUT_DATABLOCK_INITIAL_SIZE = decodedUreads.size();
+    const size_t INPUT_DATABLOCK_WORDSIZE = 1;
+    const size_t OUTPUT_DATABLOCK_INITIAL_SIZE = 0;
+    const size_t OUTPUT_DATABLOCK_WORDSIZE = 1;
+
+    gabac::DataBlock inputDataBlock(decoded_symbols.data(), INPUT_DATABLOCK_INITIAL_SIZE, INPUT_DATABLOCK_WORDSIZE);
+    gabac::DataBlock outputDataBlock(OUTPUT_DATABLOCK_INITIAL_SIZE, OUTPUT_DATABLOCK_WORDSIZE);
 
     // Interface to GABAC library
-    gabac::BufferInputStream bufferInputStream(&inputDataBlock);
+    gabac::IBufferStream bufferInputStream(&inputDataBlock);
     GenieGabacOutputStream bufferOutputStream;
 
-    std::string defaultGabacConf = "{"
-                                       "\"word_size\":\"1\","
-                                       "\"sequence_transformation_id\":\"0\","
-                                       "\"sequence_transformation_parameter\":\"0\","
+    const std::string DEFAULT_GABAC_CONF_JSON = "{"
+                                       "\"word_size\": 1,"
+                                       "\"sequence_transformation_id\": 0,"
+                                       "\"sequence_transformation_parameter\": 0,"
                                        "\"transformed_sequences\":"
                                        "[{"
-                                           "\"lut_transformation_enabled\":\"0\","
-                                           "\"lut_transformation_bits\":\"0\","
-                                           "\"lut_transformation_order\":\"0\","
-                                           "\"diff_coding_enabled\":\"0\","
-                                           "\"binarization_id\":\"0\","
-                                           "\"binarization_parameters\":[\"3\"],"
-                                           "\"context_selection_id\":\"0\""
+                                           "\"lut_transformation_enabled\": false,"
+                                           "\"diff_coding_enabled\": false,"
+                                           "\"binarization_id\": 0,"
+                                           "\"binarization_parameters\":[3],"
+                                           "\"context_selection_id\": 0"
                                        "}]"
                                    "}";
+    const gabac::EncodingConfiguration GABAC_CONFIG(DEFAULT_GABAC_CONF_JSON);
+    const size_t GABAC_BLOCK_SIZE = 0; // 0 means single block (block size is equal to input size)
+    std::ostream* const GABC_LOG_OUTPUT_STREAM = &std::cout;
+    const gabac::IOConfiguration GABAC_IO_SETUP = { &bufferInputStream, &bufferOutputStream,
+                                                    GABAC_BLOCK_SIZE,
+                                                    GABC_LOG_OUTPUT_STREAM, gabac::IOConfiguration::LogLevel::TRACE };
 
-    size_t gabacBlockSize = 0;
-    gabac::IOConfiguration ioconf = { &bufferInputStream, &bufferOutputStream, gabacBlockSize, &std::cout, gabac::IOConfiguration::LogLevel::TRACE };
-    gabac::EncodingConfiguration enConf(defaultGabacConf);
-
-    gabac::encode(ioconf, enConf);
+    const bool GABAC_DECODING_MODE = false;
+    gabac::run(GABAC_IO_SETUP, GABAC_CONFIG, GABAC_DECODING_MODE);
 
     // Get the GABAC bitstream(s)
-    size_t outputDataBlockInitialSize = 0;
-    size_t outputDataBlockWordSize = 1;
-    std::vector<std::pair<size_t, uint8_t *>> data;
-    bufferOutputStream.flush(&data);
-    GENIE_LOG_TRACE << "Number of bitstreams: " << data.size();
-    for (const auto& bsp : data) {
-        size_t blockPayloadSize = bsp.first;
-        GENIE_LOG_TRACE << "Block payload size: " << blockPayloadSize;
+    std::vector<gabac::DataBlock> generated_streams;
+    bufferOutputStream.flush_blocks(&generated_streams);
+
+    GENIE_LOG_TRACE << "Number of bitstreams: " << generated_streams.size();
+    for (auto& bsp : generated_streams) {
+        const size_t BLOCK_PAYLOAD_SIZE = bsp.getRawSize();
+        char* const BLOCK_PAYLOAD = static_cast<char *> (bsp.getData());
+        GENIE_LOG_TRACE << "Block payload size: " << BLOCK_PAYLOAD_SIZE;
         GENIE_LOG_TRACE << "Block payload: ";
-        for (size_t i = 0; i < blockPayloadSize; i++) {
-            std::cout << std::hex << "0x" << static_cast<int>(bsp.second[i]) << " ";
+        for (size_t i = 0; i < BLOCK_PAYLOAD_SIZE; i++) {
+            std::cout << std::hex << "0x" << static_cast<int>(BLOCK_PAYLOAD[i]) << " ";
         }
         std::cout << std::endl;
 
         // DONE(Fabian): align this with the block payload syntax
-        // TODO(Fabian): free allocated memory
         // DONE(Tom): check GABAC's byte order - it's LSB
 
 
@@ -145,12 +148,12 @@ void encode(const ProgramOptions &programOptions)
 
         DatasetContainer* datasetContainer = initDatasetContainer();
         // DONE(Daniel): add support for init block from byte array
-        DataUnitBlockHeader* blockHeader = initDataUnitBlockHeader(6, blockPayloadSize);
+        DataUnitBlockHeader* blockHeader = initDataUnitBlockHeader(6, BLOCK_PAYLOAD_SIZE);
         Block* block = initBlockWithHeaderPayloadInMemory(
             6,                                    // descriptorId
-            blockPayloadSize,                     // payloadSize
-            reinterpret_cast<char*>(bsp.second),  // payloadInMemory
-            bsp.first);                           // size_t payloadInMemorySize)
+            BLOCK_PAYLOAD_SIZE,                     // payloadSize
+            BLOCK_PAYLOAD,  // payloadInMemory TODO(Daniel): does this need to be non-const? Is the memory modified?
+            BLOCK_PAYLOAD_SIZE);                           // size_t payloadInMemorySize)
 
         bool success = addBlockToDataUnitAccessUnit(accessUnit, block, blockHeader);
         if (!success) {
