@@ -30,7 +30,7 @@
 #include "fileio/sam_file_reader.h"
 #include "fileio/sam_record.h"
 #include "coding/spring/spring.h"
-#include "genie/genie_gabac_output_stream.h"
+#include "conformance/genie_gabac_output_stream.h"
 #include "genie/genie_file_format.h"
 #include "genie/gabac_integration.h"
 
@@ -222,7 +222,7 @@ static void generationFromFastq(
     gabac::EncodingConfiguration enConf(defaultGabacConf);
 
     //Encode
-    gabac::encode(ioconf, enConf);
+    gabac::run(ioconf, enConf, false);
 
     // Use output
     std::vector<gabac::DataBlock> outputData;
@@ -238,6 +238,9 @@ static void generationFromFastq(
 
     size_t payloadSize = outputData[0].getRawSize();
     uint8_t *payload = static_cast<uint8_t*> (outputData[0].getData());
+
+
+
 
     /*
      * Do stuff with payload ....
