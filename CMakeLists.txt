@@ -20,13 +20,6 @@ message(STATUS "GENIE_USE_OPENMP=${GENIE_USE_OPENMP}")
 
 
 #==============================================================================
-# Boost
-#==============================================================================
-
-find_package(Boost 1.54 COMPONENTS filesystem REQUIRED)
-
-
-#==============================================================================
 # OpenMP
 #==============================================================================
 
@@ -300,8 +293,6 @@ source_group("Header Files" FILES ${coding_header_files} ${calq_header_files} ${
 # Set up the format target
 add_library(${coding} STATIC ${coding_source_files} ${calq_source_files} ${sam_source_files})
 target_include_directories(${coding} PRIVATE ${coding_include_dir} ${sam_include_dir} ${calq_source_dir})
-target_link_libraries(${coding} Boost::filesystem)
-
 
 #==============================================================================
 # format library
@@ -458,7 +449,6 @@ if (${GENIE_USE_OPENMP})
 endif ()
 target_include_directories(${genie} PRIVATE ${genie_include_dir})
 
-target_link_libraries(${genie} Boost::filesystem)
 target_link_libraries(${genie} ${format})
 target_link_libraries(${genie} ${file})
 target_link_libraries(${genie} ${MPEGGFileCreation})

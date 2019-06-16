@@ -82,11 +82,5 @@ bool fileExists(
     return ifs.good();
 }
 
-bool dirExists(const std::string &path) {
-    struct stat st;  //TODO: Find a portable way
-    return stat(path.c_str(), &st) == 0 && S_ISDIR(st.st_mode);
-}
-
-
 }  // namespace common
 }  // namespace dsg

@@ -16,11 +16,12 @@
 #include <vector>
 #include <utils/MPEGGFileCreation/MPEGGFileCreator.h>
 #include <fileio/gabac_file.h>
-#include <boost/filesystem.hpp>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
 #include <queue>
+
+#include <filesystem/filesystem.hpp>
 
 #include "genie/exceptions.h"
 #include "fileio/fasta_file_reader.h"
@@ -47,10 +48,10 @@ void decompress(const std::string& temp_dir,
 namespace dsg {
 
 bool copyDir(
-        boost::filesystem::path const& source,
-        boost::filesystem::path const& destination
+        ghc::filesystem::path const& source,
+        ghc::filesystem::path const& destination
 ){
-    namespace fs = boost::filesystem;
+    namespace fs = ghc::filesystem;
     try {
         // Check whether the function call is valid
         if (
@@ -150,15 +151,15 @@ static void generationFromFastq(
     std::vector<std::string> filelist;
     std::string path = generated_aus.getGeneratedAusRef().getRefAus().front().begin()->second.begin()->second;
     path = path.substr(0, path.find_last_of('/') + 1);
-    boost::filesystem::path p(path);
-    boost::filesystem::directory_iterator end_itr;
+    ghc::filesystem::path p(path);
+    ghc::filesystem::directory_iterator end_itr;
 
     // Remove temporary files
     std::remove((path + "read_order.bin").c_str());
     std::remove((path + "read_seq.txt").c_str());
 
     // Create list of all files
-    for (boost::filesystem::directory_iterator itr(p); itr != end_itr; ++itr) {
+    for (ghc::filesystem::directory_iterator itr(p); itr != end_itr; ++itr) {
         if (is_regular_file(itr->path())) {
             std::string current_file = itr->path().string();
             filelist.push_back(current_file);
@@ -183,9 +184,9 @@ static void generationFromFastq(
     packFiles(filelist, output);
     fclose(output);
 
-    size_t orgSize = boost::filesystem::file_size(programOptions.inputFilePath);
+    size_t orgSize = ghc::filesystem::file_size(programOptions.inputFilePath);
     if (!programOptions.inputFilePairPath.empty()) {
-        orgSize += boost::filesystem::file_size(programOptions.inputFilePairPath);
+        orgSize += ghc::filesystem::file_size(programOptions.inputFilePairPath);
     }
 
     // Finish
@@ -193,15 +194,15 @@ static void generationFromFastq(
     std::cout << "Compressed "
               << orgSize
               << " to "
-              << boost::filesystem::file_size(outfile)
+              << ghc::filesystem::file_size(outfile)
               << ". Compression rate "
-              << float(boost::filesystem::file_size(outfile)) /
-                 boost::filesystem::file_size(programOptions.inputFilePath) *
+              << float(ghc::filesystem::file_size(outfile)) /
+                      ghc::filesystem::file_size(programOptions.inputFilePath) *
                  100
               << "%"
               << std::endl;
 
-    boost::filesystem::remove_all(path);
+    ghc::filesystem::remove_all(path);
 }
 
 
@@ -213,12 +214,12 @@ static void generationFromSam(
     while (true) {
         std::string random_str = "tmp." + spring::random_string(10);
         temp_dir = "./" + random_str + '/';
-        if (!boost::filesystem::exists(temp_dir)) {
+        if (!ghc::filesystem::exists(temp_dir)) {
             break;
         }
     }
 
-    if (!boost::filesystem::create_directory(temp_dir)) {
+    if (!ghc::filesystem::create_directory(temp_dir)) {
         throw std::runtime_error("Cannot create temporary directory.");
     }
 
@@ -234,17 +235,17 @@ static void generationFromSam(
 
     if (alico_main(args.size(), arg_ptrs.data())) {
         std::cerr << "Error in alico" << std::endl;
-        boost::filesystem::remove_all(temp_dir);
+        ghc::filesystem::remove_all(temp_dir);
         return;
     }
 
-    boost::filesystem::path p(temp_dir);
-    p = boost::filesystem::absolute(p);
-    boost::filesystem::directory_iterator end_itr;
+    ghc::filesystem::path p(temp_dir);
+    p = ghc::filesystem::absolute(p);
+    ghc::filesystem::directory_iterator end_itr;
     std::vector<std::string> filelist;
 
     // Create list of all files
-    for (boost::filesystem::directory_iterator itr(p); itr != end_itr; ++itr) {
+    for (ghc::filesystem::directory_iterator itr(p); itr != end_itr; ++itr) {
         if (is_regular_file(itr->path())) {
             std::string current_file = itr->path().string();
             filelist.push_back(current_file);
@@ -264,9 +265,9 @@ static void generationFromSam(
     packFiles(filelist, output);
     fclose(output);
 
-    size_t orgSize = boost::filesystem::file_size(programOptions.inputFilePath);
+    size_t orgSize = ghc::filesystem::file_size(programOptions.inputFilePath);
     if (!programOptions.inputFilePairPath.empty()) {
-        orgSize += boost::filesystem::file_size(programOptions.inputFilePairPath);
+        orgSize += ghc::filesystem::file_size(programOptions.inputFilePairPath);
     }
 
     // Finish
@@ -274,15 +275,15 @@ static void generationFromSam(
     std::cout << "Compressed "
               << orgSize
               << " to "
-              << boost::filesystem::file_size(outfile)
+              << ghc::filesystem::file_size(outfile)
               << ". Compression rate "
-              << float(boost::filesystem::file_size(outfile)) /
-                 boost::filesystem::file_size(programOptions.inputFilePath) *
+              << float(ghc::filesystem::file_size(outfile)) /
+                      ghc::filesystem::file_size(programOptions.inputFilePath) *
                  100
               << "%"
               << std::endl;
 
-    boost::filesystem::remove_all(temp_dir);
+    ghc::filesystem::remove_all(temp_dir);
 
 }
 
@@ -298,11 +299,11 @@ void decompression_fastq(
     while (true) {
         std::string random_str = "tmp." + spring::random_string(10);
         temp_dir = "./" + random_str + '/';
-        if (!boost::filesystem::exists(temp_dir)) {
+        if (!ghc::filesystem::exists(temp_dir)) {
             break;
         }
     }
-    if (!boost::filesystem::create_directory(temp_dir)) {
+    if (!ghc::filesystem::create_directory(temp_dir)) {
         throw std::runtime_error("Cannot create temporary directory.");
     }
     std::cout << "Temporary directory: " << temp_dir << "\n";
@@ -356,7 +357,7 @@ void decompression_fastq(
         std::rename((temp_dir + "decompressed.fastq").c_str(), outname.c_str());
     }
 
-    boost::filesystem::remove_all(temp_dir);
+    ghc::filesystem::remove_all(temp_dir);
 }
 
 void decompression_sam(
@@ -371,11 +372,11 @@ void decompression_sam(
     while (true) {
         std::string random_str = "tmp." + spring::random_string(10);
         temp_dir = "./" + random_str + '/';
-        if (!boost::filesystem::exists(temp_dir)) {
+        if (!ghc::filesystem::exists(temp_dir)) {
             break;
         }
     }
-    if (!boost::filesystem::create_directory(temp_dir)) {
+    if (!ghc::filesystem::create_directory(temp_dir)) {
         throw std::runtime_error("Cannot create temporary directory.");
     }
     std::cout << "Temporary directory: " << temp_dir << "\n";
@@ -404,7 +405,7 @@ void decompression_sam(
 
     alico_main(args.size(), arg_ptrs.data());
 
-//    boost::filesystem::remove_all(temp_dir);
+//    ghc::filesystem::remove_all(temp_dir);
 }
 
 void decompression(

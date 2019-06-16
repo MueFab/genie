@@ -12,7 +12,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "boost/filesystem.hpp"
+#include <filesystem/filesystem.hpp>
 #include "gabac/gabac.h"
 #include "gabac/analysis.h"
 
@@ -71,7 +71,7 @@ void compress_one_file(const std::string& file, const std::string& configfolder,
 
     // Configure gabac streams
     gabac::IOConfiguration
-            ioconf = {&fin_desc, &fout_desc, std::min(unsigned(boost::filesystem::file_size(file)),1000000000u), &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
+            ioconf = {&fin_desc, &fout_desc, std::min(unsigned(ghc::filesystem::file_size(file)),1000000000u), &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
     gabac::EncodingConfiguration enConf(config);
 
     std::cout << file << " ..." << std::endl;
@@ -85,17 +85,17 @@ void compress_one_file(const std::string& file, const std::string& configfolder,
     fout_desc.close();
 
     // Replace input file with output
-    std::cout << file << "\n(" << boost::filesystem::file_size(file) << " to\t";
-    if (boost::filesystem::file_size(file) < 10000) {
+    std::cout << file << "\n(" << ghc::filesystem::file_size(file) << " to\t";
+    if (ghc::filesystem::file_size(file) < 10000) {
         std::cout << "\t";
     }
-    std::cout << boost::filesystem::file_size(file + ".gabac") << ")" << std::endl;
+    std::cout << ghc::filesystem::file_size(file + ".gabac") << ")" << std::endl;
     std::remove(file.c_str());
     std::rename((file + ".gabac").c_str(), file.c_str());
 }
 
 unsigned getWordsize(const std::string& file){
-    size_t size = boost::filesystem::file_size(boost::filesystem::path(file));
+    size_t size = ghc::filesystem::file_size(ghc::filesystem::path(file));
     unsigned wordsize = 1;
     if(!(size % 2)) {
         wordsize = 2;
@@ -163,7 +163,7 @@ void update_configs(const std::vector<std::string>& files, const std::string& co
 
     for (const auto& file : files) {
         std::string configpath = getConfigForFile(file, config);
-        if(boost::filesystem::exists(boost::filesystem::path(configpath))){
+        if(ghc::filesystem::exists(ghc::filesystem::path(configpath))){
             update_one_config(file, configpath);
         } else {
             std::cout << "Config " << configpath << " missing! Regenerating..." << std::endl;
@@ -171,7 +171,7 @@ void update_configs(const std::vector<std::string>& files, const std::string& co
                 std::ofstream outstream(configpath, std::ios::binary);
                 std::ifstream instream(file, std::ios::binary);
                 gabac::IOConfiguration
-                        ioconf{&instream, &outstream, std::min(unsigned(boost::filesystem::file_size(file)),1000000000u), &std::cout, gabac::IOConfiguration::LogLevel::WARNING};
+                        ioconf{&instream, &outstream, std::min(unsigned(ghc::filesystem::file_size(file)),1000000000u), &std::cout, gabac::IOConfiguration::LogLevel::WARNING};
                 gabac::EncodingConfiguration enconf;
                 gabac::analyze(ioconf, gabac::getCandidateConfig());
             }
