@@ -30,6 +30,7 @@ std::string fileBaseName(
 bool fileExists(
     const std::string &path);
 
+bool dirExists(const std::string &path);
 
 }  // namespace common
 }  // namespace dsg
