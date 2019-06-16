@@ -5,7 +5,7 @@ project(gabac-download NONE)
 include(ExternalProject)
 ExternalProject_Add(gabac CXX
   GIT_REPOSITORY    https://github.com/mitogen/gabac.git
-  GIT_TAG           master
+  GIT_TAG           develop
   SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/gabac-src"
   BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/gabac-build"
   CONFIGURE_COMMAND ""

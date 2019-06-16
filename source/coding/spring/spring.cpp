@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <boost/filesystem.hpp>
+#include <filesystem/filesystem.hpp>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
@@ -36,9 +36,9 @@ generated_aus generate_streams_SPRING(
   while (true) {
     std::string random_str = "tmp." + spring::random_string(10);
     temp_dir = working_dir + "/" + random_str + '/';
-    if (!boost::filesystem::exists(temp_dir)) break;
+    if (!ghc::filesystem::exists(temp_dir)) break;
   }
-  if (!boost::filesystem::create_directory(temp_dir)) {
+  if (!ghc::filesystem::create_directory(temp_dir)) {
     throw std::runtime_error("Cannot create temporary directory.");
   }
   std::cout << "Temporary directory: " << temp_dir << "\n";

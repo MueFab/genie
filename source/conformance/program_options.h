@@ -2,8 +2,6 @@
 #define GENIE_PROGRAM_OPTIONS_H_
 
 
-#include <boost/program_options.hpp>
-
 #include <string>
 #include <vector>
 
