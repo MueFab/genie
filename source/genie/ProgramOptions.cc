@@ -16,6 +16,7 @@
 #include <map>
 
 #include <cli11/CLI11.hpp>
+#include <filesystem/filesystem.hpp>
 
 #include "genie/exceptions.h"
 #include "genie/utilities.h"
@@ -90,7 +91,7 @@ void ProgramOptions::validate()
         throwRuntimeError("input file does not exist");
     }
 
-    if (!common::dirExists(configPath)) {
+    if (!ghc::filesystem::exists(configPath) || !ghc::filesystem::is_directory(configPath)) {
         throwRuntimeError("config dir does not exist");
     }
 
