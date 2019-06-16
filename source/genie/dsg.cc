@@ -12,8 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <boost/program_options.hpp>
-
 #include <iostream>
 
 #include "genie/generation.h"
@@ -47,14 +45,6 @@ static int dsg_main(
         } else if(programOptions.inputFileType == "GENIE"){
             decompression(programOptions);
         }
-    }
-    catch(boost::program_options::error& e) {
-        std::cerr << "Program options error";
-        if (strlen(e.what()) > 0) {
-            std::cerr << ": " << e.what();
-        }
-        std::cerr << std::endl;
-        return -1;
     }
     catch (const dsg::common::RuntimeErrorException& e) {
         std::cerr << "Runtime error";

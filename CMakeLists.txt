@@ -23,7 +23,7 @@ message(STATUS "GENIE_USE_OPENMP=${GENIE_USE_OPENMP}")
 # Boost
 #==============================================================================
 
-find_package(Boost 1.54 COMPONENTS filesystem log program_options system REQUIRED)
+find_package(Boost 1.54 COMPONENTS filesystem REQUIRED)
 
 
 #==============================================================================
@@ -201,11 +201,9 @@ source_group("Source Files" FILES ${coding_source_files})
 source_group("Header Files" FILES ${coding_header_files})
 
 # Set up the format target
-add_library(${coding} STATIC ${coding_source_files})
-target_include_directories(${coding} PRIVATE ${coding_include_dir})
-target_link_libraries(${coding} Boost::program_options)
+add_library(${coding} STATIC ${coding_source_files} ${calq_source_files} ${sam_source_files})
+target_include_directories(${coding} PRIVATE ${coding_include_dir} ${sam_include_dir} ${calq_source_dir})
 target_link_libraries(${coding} Boost::filesystem)
-target_link_libraries(${coding} Boost::system)
 
 
 #==============================================================================
@@ -386,19 +384,13 @@ if (${GENIE_USE_OPENMP})
 endif ()
 target_include_directories(${genie} PRIVATE ${genie_include_dir})
 
-target_link_libraries(${genie} Boost::program_options)
 target_link_libraries(${genie} Boost::filesystem)
-target_link_libraries(${genie} Boost::system)
 target_link_libraries(${genie} ${format})
 target_link_libraries(${genie} ${file})
 target_link_libraries(${genie} ${MPEGGFileCreation})
 target_link_libraries(${genie} ${coding})
 target_link_libraries(${genie} ${file})
 target_link_libraries(${genie} gabac)
-# target_link_libraries(${genie} ${boost_lib_dir}/libboost_program_options.a)
-# target_link_libraries(${genie} ${boost_lib_dir}/libboost_filesystem.a)
-# target_link_libraries(${genie} ${boost_lib_dir}/libboost_system.a)
-# target_link_libraries(${genie} ${CMAKE_DL_LIBS})
 
 
 #==============================================================================

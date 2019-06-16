@@ -14,6 +14,7 @@
 #include <time.h>
 
 #include <fstream>
+#include <sys/stat.h>
 
 #include "genie/exceptions.h"
 #include "genie/operating-system.h"
@@ -59,7 +60,7 @@ std::string dateTime(void)
 std::string fileBaseName(
     const std::string& path)
 {
-    if (path.empty() == true) {
+    if (path.empty()) {
         throwRuntimeError("path is empty");
     }
 
@@ -72,13 +73,18 @@ std::string fileBaseName(
 bool fileExists(
     const std::string& path)
 {
-    if (path.empty() == true) {
+    if (path.empty()) {
         throwRuntimeError("path is empty");
     }
 
     std::ifstream ifs(path.c_str());
 
     return ifs.good();
+}
+
+bool dirExists(const std::string &path) {
+    struct stat st;  //TODO: Find a portable way
+    return stat(path.c_str(), &st) == 0 && S_ISDIR(st.st_mode);
 }
 
 
