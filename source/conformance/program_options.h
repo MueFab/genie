@@ -15,6 +15,7 @@ public:
     ~ProgramOptions();
 public:
     std::string inputFilePath;
+    std::string outputFilePath;
 private:
     void processCommandLine(int argc, char *argv[]);
 };
