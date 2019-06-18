@@ -60,7 +60,7 @@ Block* initBlockWithHeader(uint8_t descriptorId, uint32_t payloadSize, FromFile*
 Block* initBlockWithHeaderPayloadInMemory(
         uint8_t descriptorId,
         uint32_t payloadSize,
-        char* payloadInMemory,
+        const char* payloadInMemory,
         size_t payloadInMemorySize
 ){
     Block* block = (Block*)malloc(sizeof(Block));

@@ -111,9 +111,9 @@ void encode(const ProgramOptions &programOptions)
     bufferOutputStream.flush_blocks(&generated_streams);
 
     GENIE_LOG_TRACE << "Number of bitstreams: " << generated_streams.size();
-    for (auto& bsp : generated_streams) {
+    for (const auto& bsp : generated_streams) {
         const size_t BLOCK_PAYLOAD_SIZE = bsp.getRawSize();
-        char* const BLOCK_PAYLOAD = static_cast<char *> (bsp.getData());
+        const char* const BLOCK_PAYLOAD = static_cast<const char *> (bsp.getData());
         GENIE_LOG_TRACE << "Block payload size: " << BLOCK_PAYLOAD_SIZE;
         GENIE_LOG_TRACE << "Block payload: ";
         for (size_t i = 0; i < BLOCK_PAYLOAD_SIZE; i++) {
@@ -171,7 +171,7 @@ void encode(const ProgramOptions &programOptions)
         Block* const block = initBlockWithHeaderPayloadInMemory(
                 DESCRIPTOR_ID,
                 BLOCK_PAYLOAD_SIZE,
-                BLOCK_PAYLOAD,       // TODO(Daniel): does this need to be non-const? Is the memory modified?
+                BLOCK_PAYLOAD,
                 BLOCK_PAYLOAD_SIZE
         );
 
