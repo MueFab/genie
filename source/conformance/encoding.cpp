@@ -66,7 +66,6 @@ void encode(const ProgramOptions &programOptions)
         decoded_symbols.push_back(S_0_INVERSE.at(decodedUreadsChar));
     }
 
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     // ENTROPY ENCODE
     /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,17 +121,11 @@ void encode(const ProgramOptions &programOptions)
         }
         std::cout << std::endl;
 
-        // DONE(Tom): check GABAC's byte order - it's LSB
-
         /////////////////////////////////////////////////////////////////////////////////////////////////////
         // CREATE PARAMETER SET
         /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        // TODO(Daniel): rename parameterSSSSset
-        // TODO(Daniel, Jan, Tom): fill parameter set
-        //   - write a separate method
-        //   - example code: tests/format/EncodingParameters_tests.cpp [ TEST_F(encodingParametersTest, writeEncodingParametersSingleAlignmentNoComputedTest) ]
-
+        // TODO
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
         // CREATE ACCESS UNIT
@@ -189,25 +182,19 @@ void encode(const ProgramOptions &programOptions)
 
         freeDataUnitAccessUnit(accessUnit);
 
-
         /////////////////////////////////////////////////////////////////////////////////////////////////////
         // WRITE TO FILE
         /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        // TODO(Jan): copy output_file and input_file classes from GABAC to genie
-        // TODO(Jan): get output file name from program options
-        // TODO(Daniel): get writeParametersSet() and writeDataUnitAccessUnit() up & running
-        // FILE* outputFilePointer = nullptr;
-        // writeParametersSet(parameterSet, outputFilePointer);
-        // writeDataUnitAccessUnit(accessUnit, false, outputFilePointer);
-
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
-        // STUFF FOR LATER DISCUSSIONS
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        // TODO(Fabian): copy bit_input_stream and bit_output_stream from GABAC to genie, use std::vector instead of DataBlock again
+        // TODO
     }
+
+    // PLAN
+    // #  name     ETA          description
+    // 1) Fabian   2019-06-19   get classes InputFile and OutputFile up and running
+    // 2) Daniel   2019-06-21   get encoding parameters generation function template up and running
+    // 3) Jan      2019-06-25   fill encoding parameters
+    // 4) Fabian   2019-06-28   x-check w/ ref SW
 }
 
 
