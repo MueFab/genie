@@ -1,4 +1,4 @@
-#include "gabacify/file.h"
+#include "conformance/file.h"
 
 #include <sys/stat.h>
 #include <cassert>
@@ -6,10 +6,10 @@
 
 #include <string>
 
-#include "gabacify/exceptions.h"
+#include "conformance/exceptions.h"
 
 
-namespace gabacify {
+namespace genie {
 
 
 File::File(
@@ -86,7 +86,7 @@ off_t File::tell() const{
 #endif
     if (offset == -1)
     {
-        GABACIFY_DIE("ftell failed on file: " + m_path);
+        GENIE_DIE("ftell failed on file: " + m_path);
     }
     return offset;
 }
@@ -98,13 +98,13 @@ void File::close(){
         int rc = fclose(m_fp);
         if (rc != 0)
         {
-            GABACIFY_DIE("Failed to close file: " + m_path);
+            GENIE_DIE("Failed to close file: " + m_path);
         }
         m_fp = nullptr;
     }
     else
     {
-        GABACIFY_DIE("Failed to close file: " + m_path);
+        GENIE_DIE("Failed to close file: " + m_path);
     }
 }
 
@@ -127,7 +127,7 @@ void File::open(
     m_fp = fopen(path.c_str(), mode);
     if (m_fp == nullptr)
     {
-        GABACIFY_DIE("Failed to open file: " + m_path);
+        GENIE_DIE("Failed to open file: " + m_path);
     }
 #endif
 
@@ -138,7 +138,7 @@ void File::open(
 #endif
     if (fd == -1)
     {
-        GABACIFY_DIE("Failed to get file descriptor of file: " + m_path);
+        GENIE_DIE("Failed to get file descriptor of file: " + m_path);
     }
 
     struct stat st{};
@@ -150,7 +150,7 @@ void File::open(
 #else
     if ((fstat(fd, &st) != 0) || (!S_ISREG(st.st_mode)))
     {
-        GABACIFY_DIE("Not a regular file: " + m_path);
+        GENIE_DIE("Not a regular file: " + m_path);
     }
 #endif
 }
@@ -167,7 +167,7 @@ void File::seek(
 #endif
     if (rc != 0)
     {
-        GABACIFY_DIE("fseek failed on file: " + m_path);
+        GENIE_DIE("fseek failed on file: " + m_path);
     }
 }
 

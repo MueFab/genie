@@ -1,12 +1,12 @@
-#include "gabacify/input_file.h"
+#include "conformance/input_file.h"
 
 #include <cassert>
 #include <string>
 
-#include "gabacify/exceptions.h"
+#include "conformance/exceptions.h"
 
 
-namespace gabacify {
+namespace genie {
 
 
 InputFile::InputFile(
@@ -33,9 +33,9 @@ void InputFile::read(
     {
         if (feof(m_fp) != 0)
         {
-            GABACIFY_DIE("Hit EOF while trying to read from file");
+            GENIE_DIE("Hit EOF while trying to read from file");
         }
-        GABACIFY_DIE("fread from '" + m_path + "' failed");
+        GENIE_DIE("fread from '" + m_path + "' failed");
     }
 }
 

@@ -6,10 +6,9 @@
 #include <vector>
 #include <iostream>
 
-#include "gabacify/file.h"
-#include "gabacify/log.h"
+#include "conformance/file.h"
 
-namespace gabacify {
+namespace genie {
 
 
 class OutputFile : public File
