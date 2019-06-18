@@ -1,12 +1,12 @@
-#include "gabacify/output_file.h"
+#include "conformance/output_file.h"
 
 #include <cassert>
 #include <string>
 
-#include "gabacify/exceptions.h"
+#include "conformance/exceptions.h"
 
 
-namespace gabacify {
+namespace genie {
 
 OutputFile::OutputFile(
         const std::string& path
@@ -16,7 +16,7 @@ OutputFile::OutputFile(
     // Check if file with content existed before by opening in append mode
     // and getting size
     if(size() != 0)
-        GABACIFY_DIE("Output file already exists: " + path);
+        GENIE_DIE("Output file already exists: " + path);
     close();
     open(path, "wb");
 }
@@ -38,9 +38,9 @@ void OutputFile::write(
     {
         if (feof(m_fp) != 0)
         {
-            GABACIFY_DIE("Hit EOF while trying to write to file: " + m_path);
+            GENIE_DIE("Hit EOF while trying to write to file: " + m_path);
         }
-        GABACIFY_DIE("fwrite to '" + m_path + "' failed");
+        GENIE_DIE("fwrite to '" + m_path + "' failed");
     }
 }
 

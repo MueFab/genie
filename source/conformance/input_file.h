@@ -4,10 +4,10 @@
 
 #include <string>
 
-#include "gabacify/file.h"
+#include "conformance/file.h"
 
 
-namespace gabacify {
+namespace genie {
 
 
 class InputFile : public File

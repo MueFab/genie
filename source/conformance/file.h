@@ -7,7 +7,7 @@
 
 using std::size_t;
 
-namespace gabacify {
+namespace genie {
 
 
 class File
