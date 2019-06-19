@@ -99,7 +99,6 @@ DecoderConfigurationTypeCABAC* getTestingDecoderConfigurationTypeCABAC(){
                 true, 2, contextInitVals, false
         );
     }
-    cabac_binarizations[3][1] = constructCabacBinarizationTruncatedExponentialGolomb_Bypass(2);
     cabac_binarizations[4] = (Cabac_binarizationsType**)malloc(2*sizeof(Cabac_binarizationsType));
     {
         auto * contextInitVals = (uint8_t*) malloc(sizeof(uint8_t)*2);
@@ -224,9 +223,10 @@ void testDecoderConfigurationCabac(DecoderConfigurationTypeCABAC* decoderConfigu
     );
     EXPECT_EQ(SubSeq_MATCH_CODING, transform_ID_subseq_buffer);
     EXPECT_EQ(
-            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            SUCCESS,
             getMatchCodingBufferSize(transform_subseq_parameters_buffer, &match_coding_buffer_size_buffer)
     );
+    EXPECT_EQ(255, match_coding_buffer_size_buffer);
     EXPECT_EQ(
             FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
             getRLECodingGuard(transform_subseq_parameters_buffer, &rle_coding_guard_buffer)
@@ -246,9 +246,10 @@ void testDecoderConfigurationCabac(DecoderConfigurationTypeCABAC* decoderConfigu
             getMatchCodingBufferSize(transform_subseq_parameters_buffer, &match_coding_buffer_size_buffer)
     );
     EXPECT_EQ(
-            FIELDs_EXISTANCE_CONDITIONS_NOT_MET,
+            SUCCESS,
             getRLECodingGuard(transform_subseq_parameters_buffer, &rle_coding_guard_buffer)
     );
+    EXPECT_EQ(5, rle_coding_guard_buffer);
 
 
 
@@ -307,7 +308,6 @@ void testDecoderConfigurationCabac(DecoderConfigurationTypeCABAC* decoderConfigu
             SUCCESS,
             getSupportValueOutputSymbolSize(decoderConfigurationTypeCABAC, 4, 1, &output_symbol_size_buffer)
     );
-    EXPECT_EQ(3, output_symbol_size_buffer);
 
 
 
@@ -315,104 +315,104 @@ void testDecoderConfigurationCabac(DecoderConfigurationTypeCABAC* decoderConfigu
             SUCCESS,
             getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 0, 0, &coding_symbol_size_buffer)
     );
-    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(4, coding_symbol_size_buffer);
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 1, 0, &coding_symbol_size_buffer)
     );
-    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(4, coding_symbol_size_buffer);
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 1, 1, &coding_symbol_size_buffer)
     );
-    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(4, coding_symbol_size_buffer);
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 2, 0, &coding_symbol_size_buffer)
     );
-    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(4, coding_symbol_size_buffer);
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 2, 1, &coding_symbol_size_buffer)
     );
-    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(4, coding_symbol_size_buffer);
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 2, 2, &coding_symbol_size_buffer)
     );
-    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(4, coding_symbol_size_buffer);
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 3, 0, &coding_symbol_size_buffer)
     );
-    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(4, coding_symbol_size_buffer);
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 3, 1, &coding_symbol_size_buffer)
     );
-    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(4, coding_symbol_size_buffer);
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 4, 0, &coding_symbol_size_buffer)
     );
-    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(4, coding_symbol_size_buffer);
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingSymbolSize(decoderConfigurationTypeCABAC, 4, 1, &coding_symbol_size_buffer)
     );
-    EXPECT_EQ(4, output_symbol_size_buffer);
+    EXPECT_EQ(4, coding_symbol_size_buffer);
 
 
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 0, 0, &coding_order_buffer)
     );
-    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(1, coding_order_buffer);
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 1, 0, &coding_order_buffer)
     );
-    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(1, coding_order_buffer);
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 1, 1, &coding_order_buffer)
     );
-    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(1, coding_order_buffer);
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 2, 0, &coding_order_buffer)
     );
-    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(1, coding_order_buffer);
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 2, 1, &coding_order_buffer)
     );
-    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(1, coding_order_buffer);
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 2, 2, &coding_order_buffer)
     );
-    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(1, coding_order_buffer);
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 3, 0, &coding_order_buffer)
     );
-    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(1, coding_order_buffer);
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 3, 1, &coding_order_buffer)
     );
-    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(1, coding_order_buffer);
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 4, 0, &coding_order_buffer)
     );
-    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(1, coding_order_buffer);
     EXPECT_EQ(
             SUCCESS,
             getSupportValueCodingOrder(decoderConfigurationTypeCABAC, 4, 1, &coding_order_buffer)
     );
-    EXPECT_EQ(1, output_symbol_size_buffer);
+    EXPECT_EQ(1, coding_order_buffer);
 
 
 
@@ -553,8 +553,10 @@ void testDecoderConfigurationCabac(DecoderConfigurationTypeCABAC* decoderConfigu
     EXPECT_FALSE(bypassFlag_buffer);
     EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMax(cabac_binarizations_buffer, &cmax_buffer));
     EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxTeg(cabac_binarizations_buffer, &cmax_teg_buffer));
-    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxDTU(cabac_binarizations_buffer, &cmax_dtu_buffer));
-    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getSplitUnitSize(cabac_binarizations_buffer, &split_unit_size_buffer));
+    EXPECT_EQ(SUCCESS, getcMaxDTU(cabac_binarizations_buffer, &cmax_dtu_buffer));
+    EXPECT_EQ(2, cmax_dtu_buffer);
+    EXPECT_EQ(SUCCESS, getSplitUnitSize(cabac_binarizations_buffer, &split_unit_size_buffer));
+    EXPECT_EQ(3, split_unit_size_buffer);
     EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 2, 1, &cabac_binarizations_buffer));
     EXPECT_EQ(SUCCESS, getBinarizationId(cabac_binarizations_buffer, &binarizationId_buffer));
     EXPECT_EQ(BinarizationID_ExponentialGolomb, binarizationId_buffer);
@@ -597,7 +599,8 @@ void testDecoderConfigurationCabac(DecoderConfigurationTypeCABAC* decoderConfigu
     EXPECT_EQ(SUCCESS, getBypassFlag(cabac_binarizations_buffer, &bypassFlag_buffer));
     EXPECT_FALSE(bypassFlag_buffer);
     EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMax(cabac_binarizations_buffer, &cmax_buffer));
-    EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxTeg(cabac_binarizations_buffer, &cmax_teg_buffer));
+    EXPECT_EQ(SUCCESS, getcMaxTeg(cabac_binarizations_buffer, &cmax_teg_buffer));
+    EXPECT_EQ(2, cmax_teg_buffer);
     EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getcMaxDTU(cabac_binarizations_buffer, &cmax_dtu_buffer));
     EXPECT_EQ(FIELDs_EXISTANCE_CONDITIONS_NOT_MET, getSplitUnitSize(cabac_binarizations_buffer, &split_unit_size_buffer));
     EXPECT_EQ(SUCCESS, getCABACBinarizations(decoderConfigurationTypeCABAC, 4, 1, &cabac_binarizations_buffer));
@@ -1602,6 +1605,22 @@ TEST_F(encodingParametersTest, constructEncodingParametersSingleAlignmentNoCompu
     bool crps_flag_buffer;
     Parameter_set_crpsType* parameterSetCrps_buffer;
 
+    uint8_t *qv_coding_mode = (uint8_t*) malloc(sizeof(uint8_t)*numClasses);
+    for(uint8_t class_i = 0; class_i < numClasses; class_i++){
+        qv_coding_mode[class_i] = 1;
+    }
+    bool *qvps_flag = (bool*) malloc(sizeof(bool)*numClasses);
+    for(uint8_t class_i = 0; class_i < numClasses; class_i++){
+        qvps_flag[class_i] = false;
+    }
+    Parameter_set_qvpsType **parameter_set_qvps =
+            (Parameter_set_qvpsType **)calloc(numClasses, sizeof(Parameter_set_qvpsType*));
+
+    uint8_t *qvps_preset_ID = (uint8_t*) malloc(sizeof(bool)*numClasses);
+    for(uint8_t class_i = 0; class_i < numClasses; class_i++){
+        qvps_preset_ID[class_i] = class_i;
+    }
+
     Encoding_ParametersType* encodingParameters = constructEncodingParametersSingleAlignmentNoComputed(
             datasetType,
             alphabetId,
@@ -1618,7 +1637,11 @@ TEST_F(encodingParametersTest, constructEncodingParametersSingleAlignmentNoCompu
             splicedReadsFlag,
             multipleSignatureFlag,
             multipleSignatureBase,
-            U_signature_size
+            U_signature_size,
+            qv_coding_mode,
+            qvps_flag,
+            parameter_set_qvps,
+            qvps_preset_ID
     );
 
     EXPECT_NE(nullptr, encodingParameters);
@@ -1760,6 +1783,22 @@ TEST_F(encodingParametersTest, constructEncodingParametersMultipleAlignmentNoCom
     bool crps_flag_buffer;
     Parameter_set_crpsType* parameterSetCrps_buffer;
 
+    uint8_t *qv_coding_mode = (uint8_t*) malloc(sizeof(uint8_t)*numClasses);
+    for(uint8_t class_i = 0; class_i < numClasses; class_i++){
+        qv_coding_mode[class_i] = 1;
+    }
+    bool *qvps_flag = (bool*) malloc(sizeof(bool)*numClasses);
+    for(uint8_t class_i = 0; class_i < numClasses; class_i++){
+        qvps_flag[class_i] = false;
+    }
+    Parameter_set_qvpsType **parameter_set_qvps =
+            (Parameter_set_qvpsType **)calloc(numClasses, sizeof(Parameter_set_qvpsType*));
+
+    uint8_t *qvps_preset_ID = (uint8_t*) malloc(sizeof(bool)*numClasses);
+    for(uint8_t class_i = 0; class_i < numClasses; class_i++){
+        qvps_preset_ID[class_i] = class_i;
+    }
+
     Encoding_ParametersType* encodingParameters = constructEncodingParametersMultipleAlignmentNoComputed(
             datasetType,
             alphabetId,
@@ -1775,7 +1814,12 @@ TEST_F(encodingParametersTest, constructEncodingParametersMultipleAlignmentNoCom
             (char **) rgroupId_argument,
             splicedReadsFlag,
             multipleSignatureBase,
-            U_signature_size);
+            U_signature_size,
+            qv_coding_mode,
+            qvps_flag,
+            parameter_set_qvps,
+            qvps_preset_ID
+    );
 
     EXPECT_NE(nullptr, encodingParameters);
     EXPECT_EQ(SUCCESS, getDatasetTypeParameters(encodingParameters, &datasetType_buffer));
@@ -1917,6 +1961,22 @@ TEST_F(encodingParametersTest, constructEncodingParametersSingleAlignmentCompute
     bool crps_flag_buffer;
     Parameter_set_crpsType* parameterSetCrps_buffer;
 
+    uint8_t *qv_coding_mode = (uint8_t*) malloc(sizeof(uint8_t)*numClasses);
+    for(uint8_t class_i = 0; class_i < numClasses; class_i++){
+        qv_coding_mode[class_i] = 1;
+    }
+    bool *qvps_flag = (bool*) malloc(sizeof(bool)*numClasses);
+    for(uint8_t class_i = 0; class_i < numClasses; class_i++){
+        qvps_flag[class_i] = false;
+    }
+    Parameter_set_qvpsType **parameter_set_qvps =
+            (Parameter_set_qvpsType **)calloc(numClasses, sizeof(Parameter_set_qvpsType*));
+
+    uint8_t *qvps_preset_ID = (uint8_t*) malloc(sizeof(bool)*numClasses);
+    for(uint8_t class_i = 0; class_i < numClasses; class_i++){
+        qvps_preset_ID[class_i] = class_i;
+    }
+
     Encoding_ParametersType* encodingParameters = constructEncodingParametersSingleAlignmentComputedRef(
             datasetType,
             alphabetId,
@@ -1932,7 +1992,13 @@ TEST_F(encodingParametersTest, constructEncodingParametersSingleAlignmentCompute
             (char **) rgroupId_argument,
             splicedReadsFlag,
             multipleSignatureBase,
-            U_signature_size, parameterSetCrps);
+            U_signature_size,
+            qv_coding_mode,
+            qvps_flag,
+            parameter_set_qvps,
+            qvps_preset_ID,
+            parameterSetCrps
+    );
 
     EXPECT_NE(nullptr, encodingParameters);
     EXPECT_EQ(SUCCESS, getDatasetTypeParameters(encodingParameters, &datasetType_buffer));
@@ -2075,6 +2141,22 @@ TEST_F(encodingParametersTest, constructEncodingParametersMultipleAlignmentCompu
     bool crps_flag_buffer;
     Parameter_set_crpsType* parameterSetCrps_buffer;
 
+    uint8_t *qv_coding_mode = (uint8_t*) malloc(sizeof(uint8_t)*numClasses);
+    for(uint8_t class_i = 0; class_i < numClasses; class_i++){
+        qv_coding_mode[class_i] = 1;
+    }
+    bool *qvps_flag = (bool*) malloc(sizeof(bool)*numClasses);
+    for(uint8_t class_i = 0; class_i < numClasses; class_i++){
+        qvps_flag[class_i] = false;
+    }
+    Parameter_set_qvpsType **parameter_set_qvps =
+            (Parameter_set_qvpsType **)calloc(numClasses, sizeof(Parameter_set_qvpsType*));
+
+    uint8_t *qvps_preset_ID = (uint8_t*) malloc(sizeof(bool)*numClasses);
+    for(uint8_t class_i = 0; class_i < numClasses; class_i++){
+        qvps_preset_ID[class_i] = class_i;
+    }
+
     Encoding_ParametersType* encodingParameters = constructEncodingParametersMultipleAlignmentComputedRef(
             datasetType,
             alphabetId,
@@ -2090,7 +2172,13 @@ TEST_F(encodingParametersTest, constructEncodingParametersMultipleAlignmentCompu
             (char **) rgroupId_argument,
             splicedReadsFlag,
             multipleSignatureBase,
-            U_signature_size, parameterSetCrps);
+            U_signature_size,
+            qv_coding_mode,
+            qvps_flag,
+            parameter_set_qvps,
+            qvps_preset_ID,
+            parameterSetCrps
+    );
 
     EXPECT_NE(nullptr, encodingParameters);
     EXPECT_EQ(SUCCESS, getDatasetTypeParameters(encodingParameters, &datasetType_buffer));
@@ -2722,7 +2810,7 @@ TEST_F(encodingParametersTest, writeAndReadDecoderConfigurationTokenTypeCabac){
     );
 }
 
-/*TEST_F(encodingParametersTest, writeEncodingParametersSingleAlignmentNoComputedTest){
+TEST_F(encodingParametersTest, writeEncodingParametersSingleAlignmentNoComputedTest){
     uint8_t datasetType = 1;
     uint8_t alphabetId = 1;
     uint32_t reads_length = 100;
@@ -2756,6 +2844,22 @@ TEST_F(encodingParametersTest, writeAndReadDecoderConfigurationTokenTypeCabac){
     uint32_t multipleSignatureBase = 32;
     uint8_t U_signature_size = 3;
 
+    uint8_t *qv_coding_mode = (uint8_t*) malloc(sizeof(uint8_t)*numClasses);
+    for(uint8_t class_i = 0; class_i < numClasses; class_i++){
+        qv_coding_mode[class_i] = 1;
+    }
+    bool *qvps_flag = (bool*) malloc(sizeof(bool)*numClasses);
+    for(uint8_t class_i = 0; class_i < numClasses; class_i++){
+        qvps_flag[class_i] = false;
+    }
+    Parameter_set_qvpsType **parameter_set_qvps =
+            (Parameter_set_qvpsType **)calloc(numClasses, sizeof(Parameter_set_qvpsType*));
+
+    uint8_t *qvps_preset_ID = (uint8_t*) malloc(sizeof(bool)*numClasses);
+    for(uint8_t class_i = 0; class_i < numClasses; class_i++){
+        qvps_preset_ID[class_i] = class_i;
+    }
+
     Encoding_ParametersType* encodingParameters = constructEncodingParametersSingleAlignmentNoComputed(
             datasetType,
             alphabetId,
@@ -2772,7 +2876,11 @@ TEST_F(encodingParametersTest, writeAndReadDecoderConfigurationTokenTypeCabac){
             splicedReadsFlag,
             multipleSignatureFlag,
             multipleSignatureBase,
-            U_signature_size
+            U_signature_size,
+            qv_coding_mode,
+            qvps_flag,
+            parameter_set_qvps,
+            qvps_preset_ID
     );
 
     for(uint8_t descriptor_i=0; descriptor_i<18; descriptor_i++){
@@ -2900,4 +3008,4 @@ TEST_F(encodingParametersTest, writeAndReadDecoderConfigurationTokenTypeCabac){
     free(rgroupId_check);
     freeEncodingParameters(encodingParametersType);
 
-}*/
+}

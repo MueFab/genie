@@ -9,14 +9,25 @@ int writeAccessUnitsFromMIT_seq_au_class(DatasetContainer* datasetContainer, FIL
 int writeAccessUnitsFromMIT_seq_class_au(DatasetContainer *datasetContainer, FILE *outputFile);
 int writeAccessUnitsNotFromMIT(DatasetContainer* datasetContainer, FILE* outputFile);
 bool dataUnitAccessUnitIntersects(DataUnitAccessUnit* dataUnitAccessUnit, DatasetRequest datasetRequest);
+bool referenceDataUnitAccessUnitIntersects(DataUnitAccessUnit* dataUnitAccessUnit, DatasetRequest datasetRequest);
 void addDataUnitAccessUnitAndDependenciesIfRequired(DataUnitAccessUnit *dataUnitAccessUnit, DataUnits *dataUnits,
                                                     DatasetRequest datasetRequest, DatasetGroupId datatasetGroupId,
                                                     DatasetContainer *datasetContainer);
+void addReferenceDataUnitAccessUnitAndDependenciesIfRequired(DataUnitAccessUnit *dataUnitAccessUnit, DataUnits *dataUnits,
+                                                             DatasetRequest datasetRequest, DatasetGroupId datatasetGroupId,
+                                                             DatasetContainer *datasetContainer);
 uint8_t addParametersInformation(
         DataUnits* dataUnits,
         DatasetContainer* datasetContainer,
         uint8_t parametersId,
         DatasetGroupId datasetGroupId
+);
+
+int extractAccessUnitsFromMIT(
+        DatasetGroupId datasetGroupId,
+        DatasetContainer* datasetContainer,
+        DatasetRequest datasetRequest,
+        DataUnits* dataUnits
 );
 int extractAccessUnitsNotFromMIT(
         DatasetGroupId datasetGroupId,
@@ -24,6 +35,19 @@ int extractAccessUnitsNotFromMIT(
         DatasetRequest datasetRequest,
         DataUnits* dataUnits
 );
+int extractReferenceAccessUnitsNotFromMIT(
+        DatasetGroupId datasetGroupId,
+        DatasetContainer* datasetContainer,
+        DatasetRequest datasetRequest,
+        DataUnits* dataUnits
+);
+int extractReferenceAccessUnitsFromMIT(
+        DatasetGroupId datasetGroupId,
+        DatasetContainer* datasetContainer,
+        DatasetRequest datasetRequest,
+        DataUnits* dataUnits
+);
+
 
 
 Ref_information readRefInformation(char* refInfoFilePath){
@@ -1404,7 +1428,31 @@ void extractRequestedInformationFromDataset(DatasetGroupId datasetGroupId, Datas
                 dataUnits
         );
     }else{
+        extractAccessUnitsFromMIT(
+                datasetGroupId,
+                datasetContainer,
+                request,
+                dataUnits
+        );
+    }
+}
 
+void extractRequestedReferenceInformationFromDataset(DatasetGroupId datasetGroupId, DatasetContainer *datasetContainer,
+                                            DatasetRequest request, DataUnits *dataUnits) {
+    if(isMITFlagSet(datasetContainer->datasetHeader)){
+        extractReferenceAccessUnitsNotFromMIT(
+                datasetGroupId,
+                datasetContainer,
+                request,
+                dataUnits
+        );
+    }else{
+        extractReferenceAccessUnitsFromMIT(
+                datasetGroupId,
+                datasetContainer,
+                request,
+                dataUnits
+        );
     }
 }
 
@@ -1444,6 +1492,122 @@ void extractRequestedInformationFromDataset(DatasetGroupId datasetGroupId, Datas
 
 }*/
 
+
+int extractAccessUnitsFromMIT(
+        DatasetGroupId datasetGroupId,
+        DatasetContainer* datasetContainer,
+        DatasetRequest datasetRequest,
+        DataUnits* dataUnits
+){
+    uint16_t num_sequences = getSequencesCount(getDatasetHeader(datasetContainer));
+    for (uint16_t sequence_i = 0; sequence_i < num_sequences; sequence_i++) {
+        uint32_t numAUs = getBlocksInSequence(getDatasetHeader(datasetContainer), sequence_i);
+        for (uint32_t au_i = 0; au_i < numAUs; au_i++) {
+            uint8_t numClasses = getClassesCount(getDatasetHeader(datasetContainer));
+            for (uint8_t class_i = 0; class_i < numClasses; class_i++) {
+                SequenceID sequenceID = getSequenceId(datasetContainer->datasetHeader, sequence_i);
+                DataUnitAccessUnit *dataUnitAccessUnit = getDataUnitAccessUnit(
+                        datasetContainer,
+                        sequenceID,
+                        class_i,
+                        au_i
+                );
+                if (dataUnitAccessUnit == NULL) continue;
+
+                addDataUnitAccessUnitAndDependenciesIfRequired(
+                        dataUnitAccessUnit, dataUnits, datasetRequest, datasetGroupId, datasetContainer
+                );
+            }
+        }
+    }
+    return 0;
+}
+
+int extractReferenceAccessUnitsFromMIT(
+        DatasetGroupId datasetGroupId,
+        DatasetContainer* datasetContainer,
+        DatasetRequest datasetRequest,
+        DataUnits* dataUnits
+){
+    uint16_t num_sequences = getSequencesCount(getDatasetHeader(datasetContainer));
+    for (uint16_t sequence_i = 0; sequence_i < num_sequences; sequence_i++) {
+        uint32_t numAUs = getBlocksInSequence(getDatasetHeader(datasetContainer), sequence_i);
+        for (uint32_t au_i = 0; au_i < numAUs; au_i++) {
+            uint8_t numClasses = getClassesCount(getDatasetHeader(datasetContainer));
+            for (uint8_t class_i = 0; class_i < numClasses; class_i++) {
+                SequenceID sequenceID = getSequenceId(datasetContainer->datasetHeader, sequence_i);
+                DataUnitAccessUnit *dataUnitAccessUnit = getDataUnitAccessUnit(
+                        datasetContainer,
+                        sequenceID,
+                        class_i,
+                        au_i
+                );
+                if (dataUnitAccessUnit == NULL) continue;
+
+                addReferenceDataUnitAccessUnitAndDependenciesIfRequired(
+                        dataUnitAccessUnit, dataUnits, datasetRequest, datasetGroupId, datasetContainer
+                );
+            }
+        }
+    }
+    return 0;
+}
+
+int extractReferenceAccessUnitsNotFromMIT(
+        DatasetGroupId datasetGroupId,
+        DatasetContainer* datasetContainer,
+        DatasetRequest datasetRequest,
+        DataUnits* dataUnits
+){
+    Vector* accessUnits = getDataUnitAccessUnits(datasetContainer);
+    size_t numberAccessUnits = getSize(accessUnits);
+    for(size_t accessUnit_i = 0; accessUnit_i < numberAccessUnits; accessUnit_i++){
+        AccessUnitContainer* accessUnitContainer = getValue(accessUnits, accessUnit_i);
+        AccessUnitHeader* accessUnitHeader = getAccessUnitHeader(accessUnitContainer);
+        DataUnitAccessUnit* dataUnitAccessUnit = initDataUnitAccessUnit(
+                getAccessUnitId(accessUnitHeader),
+                getNumBlocks(accessUnitHeader),
+                getParametersSetId(accessUnitHeader),
+                getAccessUnitType(accessUnitHeader),
+                getReadsCount(accessUnitHeader),
+                getMMThreshold(accessUnitHeader),
+                getMMCount(accessUnitHeader),
+                getReferenceSequence(accessUnitHeader),
+                getReferenceStart(accessUnitHeader),
+                getReferenceEnd(accessUnitHeader),
+                getAccessUnitSequenceID(accessUnitHeader),
+                getAccessUnitStart(accessUnitHeader),
+                getAccessUnitEnd(accessUnitHeader),
+                getExtendedAccessUnitStart(accessUnitHeader),
+                getExtendedAccessUnitEnd(accessUnitHeader)
+        );
+
+        uint8_t numBlocks = getNumBlocks(accessUnitHeader);
+        Vector* blocks = getBlocks(accessUnitContainer);
+        for(uint8_t block_i = 0; block_i<numBlocks; block_i++){
+            Block* block = getValue(blocks, block_i);
+            BlockHeader* blockHeader = block->blockHeader;
+            FromFile* data = cloneFromFile(block->payload);
+
+            Block* newBlock = initBlockWithHeader(
+                    blockHeader->descriptorId,
+                    blockHeader->payloadSize,
+                    data
+            );
+            DataUnitBlockHeader* dataUnitBlockHeader =
+                    initDataUnitBlockHeader(
+                            blockHeader->descriptorId,
+                            blockHeader->payloadSize
+                    );
+            addBlockToDataUnitAccessUnit(dataUnitAccessUnit, newBlock, dataUnitBlockHeader);
+        }
+
+        addDataUnitAccessUnitAndDependenciesIfRequired(
+                dataUnitAccessUnit, dataUnits, datasetRequest, datasetGroupId, datasetContainer
+        );
+    }
+    return 0;
+}
 
 int extractAccessUnitsNotFromMIT(
         DatasetGroupId datasetGroupId,
@@ -1518,6 +1682,23 @@ void addDataUnitAccessUnitAndDependenciesIfRequired(DataUnitAccessUnit *dataUnit
 
     }
 }
+void addReferenceDataUnitAccessUnitAndDependenciesIfRequired(DataUnitAccessUnit *dataUnitAccessUnit, DataUnits *dataUnits,
+                                                    DatasetRequest datasetRequest, DatasetGroupId datatasetGroupId,
+                                                    DatasetContainer *datasetContainer) {
+    if( referenceDataUnitAccessUnitIntersects(dataUnitAccessUnit, datasetRequest)){
+
+        uint8_t parameterIdDataUnitsScope = addParametersInformation(
+                dataUnits,
+                datasetContainer,
+                dataUnitAccessUnit->parameterSetId,
+                datatasetGroupId
+        );
+
+        dataUnitAccessUnit->parameterSetId = parameterIdDataUnitsScope;
+        addDataUnitAccessUnit(dataUnits, dataUnitAccessUnit);
+
+    }
+}
 
 uint8_t addParametersInformation(
         DataUnits* dataUnits,
@@ -1562,7 +1743,32 @@ bool dataUnitAccessUnitIntersects(DataUnitAccessUnit* dataUnitAccessUnit, Datase
 
             uint64_t maxStart = accessUnitStart > classRequestStart ? accessUnitStart : classRequestStart;
             uint64_t minEnd = accessUnitEnd < classRequestEnd ? accessUnitEnd : classRequestEnd;
-            return maxStart <= minEnd;
+            if(maxStart <= minEnd){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool referenceDataUnitAccessUnitIntersects(DataUnitAccessUnit* dataUnitAccessUnit, DatasetRequest datasetRequest){
+    for(uint16_t sequenceRequest_i=0; sequenceRequest_i < datasetRequest.numSequences; sequenceRequest_i++){
+        if(dataUnitAccessUnit->ref_sequenced_ID.sequenceID
+           == datasetRequest.sequenceRequest[sequenceRequest_i].sequenceID.sequenceID
+                ){
+            SequenceRequest sequenceRequest = datasetRequest.sequenceRequest[sequenceRequest_i];
+            ClassRequest classRequest = sequenceRequest.classRequest[dataUnitAccessUnit->AU_type.classType-1];
+
+            uint64_t accessUnitStart = dataUnitAccessUnit->auStartPosition;
+            uint64_t accessUnitEnd = dataUnitAccessUnit->auEndPosition;
+            uint64_t classRequestStart = classRequest.start;
+            uint64_t classRequestEnd = classRequest.end;
+
+            uint64_t maxStart = accessUnitStart > classRequestStart ? accessUnitStart : classRequestStart;
+            uint64_t minEnd = accessUnitEnd < classRequestEnd ? accessUnitEnd : classRequestEnd;
+            if(maxStart <= minEnd){
+                return true;
+            }
         }
     }
     return false;
