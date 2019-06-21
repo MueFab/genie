@@ -2811,6 +2811,7 @@ TEST_F(encodingParametersTest, writeAndReadDecoderConfigurationTokenTypeCabac){
 }
 
 TEST_F(encodingParametersTest, writeEncodingParametersSingleAlignmentNoComputedTest){
+    //Straightforward values
     uint8_t datasetType = 1;
     uint8_t alphabetId = 1;
     uint32_t reads_length = 100;
@@ -2820,20 +2821,24 @@ TEST_F(encodingParametersTest, writeEncodingParametersSingleAlignmentNoComputedT
     uint8_t qv_depth = 3;
     uint8_t as_depth = 1;
     uint8_t numClasses = 2;
+    //Setting the class ids present in the file
     auto * classIDs_argument = (uint8_t*)malloc(sizeof(uint8_t)*numClasses);
     for(uint8_t class_i=0; class_i<numClasses; class_i++){
         classIDs_argument[class_i] = (uint8_t)(class_i+1);
     }
+    //next variable only for checking
     auto * classIDs_check = (uint8_t*)malloc(sizeof(uint8_t)*numClasses);
     for(uint8_t class_i=0; class_i<numClasses; class_i++){
         classIDs_check[class_i] = (uint8_t)(class_i+1);
     }
+    //Setting the read group names
     uint16_t numGroups = 1;
     char** rgroupId_argument = (char**)malloc(sizeof(char*)*numGroups);
     for(uint16_t group_i=0; group_i < numGroups; group_i++){
         rgroupId_argument[group_i] = (char*)malloc(sizeof(char)*12);
         strncpy(rgroupId_argument[group_i],"testGroupId",12);
     }
+    //next variable only for checking
     char** rgroupId_check = (char**)malloc(sizeof(char*)*numGroups);
     for(uint16_t group_i=0; group_i < numGroups; group_i++){
         rgroupId_check[group_i] = (char*)malloc(sizeof(char)*12);
@@ -2844,17 +2849,22 @@ TEST_F(encodingParametersTest, writeEncodingParametersSingleAlignmentNoComputedT
     uint32_t multipleSignatureBase = 32;
     uint8_t U_signature_size = 3;
 
+    //Hard coding to the default qv_coding mode
     uint8_t *qv_coding_mode = (uint8_t*) malloc(sizeof(uint8_t)*numClasses);
     for(uint8_t class_i = 0; class_i < numClasses; class_i++){
         qv_coding_mode[class_i] = 1;
     }
+    //Selecting false in qvps means that we use one of the ID preset
     bool *qvps_flag = (bool*) malloc(sizeof(bool)*numClasses);
     for(uint8_t class_i = 0; class_i < numClasses; class_i++){
         qvps_flag[class_i] = false;
     }
+    //Instantiation to all nulls
     Parameter_set_qvpsType **parameter_set_qvps =
             (Parameter_set_qvpsType **)calloc(numClasses, sizeof(Parameter_set_qvpsType*));
 
+    //Selecting the preset ids, in this example we use the class_i as values in order to simplify testing accross
+    //different values, but it does not make sense in a real situation
     uint8_t *qvps_preset_ID = (uint8_t*) malloc(sizeof(bool)*numClasses);
     for(uint8_t class_i = 0; class_i < numClasses; class_i++){
         qvps_preset_ID[class_i] = class_i;
@@ -2883,9 +2893,14 @@ TEST_F(encodingParametersTest, writeEncodingParametersSingleAlignmentNoComputedT
             qvps_preset_ID
     );
 
+    //For all descriptors
     for(uint8_t descriptor_i=0; descriptor_i<18; descriptor_i++){
         if(descriptor_i != 11 && descriptor_i != 15){
+            //General descriptor
             if(descriptor_i%2 == 0){
+                //use this method if the same descriptor configuration must be used accross all classes
+                //the following call optains a decoder configuration for testing purposes, in a real applicatio
+                //this must be changed with something more meaningful
                 DecoderConfigurationTypeCABAC* testingDecoderConf = getTestingDecoderConfigurationTypeCABAC();
                 setNonClassSpecificDescriptorConfigurationAndEncodingMode(
                         encodingParameters,
@@ -2894,6 +2909,7 @@ TEST_F(encodingParametersTest, writeEncodingParametersSingleAlignmentNoComputedT
                         0
                 );
             }else{
+                //use this method if the descriptor configuration is different for all classes
                 for(uint8_t class_i=0; class_i<numClasses; class_i++){
                     DecoderConfigurationTypeCABAC* testingDecoderConf = getTestingDecoderConfigurationTypeCABAC();
                     setClassSpecificDescriptorConfigurationAndEncodingMode(
@@ -2906,6 +2922,7 @@ TEST_F(encodingParametersTest, writeEncodingParametersSingleAlignmentNoComputedT
                 }
             }
         }else{
+            //Token descriptor
             Decoder_configuration_tokentype* configurationTokentype = getTestingDecoderConfigurationTokenType();
             setNonClassSpecificDescriptorConfigurationAndEncodingMode(
                     encodingParameters, descriptor_i, configurationTokentype, 0

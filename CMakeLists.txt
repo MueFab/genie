@@ -392,6 +392,7 @@ target_link_libraries(${genie} gabac)
     # List all source files (alphabetically)
     set(tests_source_files ${tests_source_files} ${tests_source_dir}/main.cpp)
     set(tests_source_files ${tests_source_files} ${tests_source_dir}/example_test.cpp)
+    set(tests_source_files ${tests_source_files} ${tests_source_dir}/format/DataUnitsTest.cpp)
     set(tests_source_files ${tests_source_files} ${tests_source_dir}/format/EncodingParameters_tests.cpp)
     set(tests_source_files ${tests_source_files} ${tests_source_dir}/utils/MPEGGFileCreation/MPEGGFileCreatorTest.cpp)
 

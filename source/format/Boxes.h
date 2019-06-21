@@ -956,16 +956,14 @@ uint64_t getBlockHeaderSize(BlockHeader* blockHeader);
 struct Block_{
     BlockHeader* blockHeader;
     FromFile* payload;
-    size_t payloadInMemorySize;
-    char* payloadInMemory;
-    uint32_t padding_size;
+    const char* payloadInMemory;
     DatasetContainer *datasetContainer;
 };
 
 void freeBlock(Block* block);
 Block* initBlock(DatasetContainer* datasetContainer, FromFile* fromFile);
 Block* initBlockWithHeader(uint8_t descriptorId, uint32_t payloadSize, FromFile* payload);
-Block* initBlockWithHeaderPayloadInMemory(uint8_t descriptorId, uint32_t payloadSize, const char* payloadInMemory, size_t payloadInMemorySize);
+Block* initBlockWithHeaderPayloadInMemory(uint8_t descriptorId, uint32_t payloadSize, const char* payloadInMemory);
 void setBlockHeader(Block* block, BlockHeader* blockHeader);
 void setPaddingSize(Block* block, uint32_t paddingSize);
 bool writeBlock(Block* block, FILE* outputFile);
