@@ -3,11 +3,13 @@
 #include "conformance/exceptions.h"
 #include "conformance/log.h"
 
+#include <cli11/CLI11.hpp>
+#include <filesystem/filesystem.hpp>
 
 namespace genie {
 
 
-ProgramOptions::ProgramOptions(int argc, char* argv[]) : inputFilePath()
+ProgramOptions::ProgramOptions(int argc, char* argv[]) : inputFilePath(), outputFilePath()
 {
     processCommandLine(argc, argv);
 }
@@ -18,41 +20,24 @@ ProgramOptions::~ProgramOptions() = default;
 
 void ProgramOptions::processCommandLine(int argc, char* argv[])
 {
+
+    CLI::App app("Genie MPEG-G encoder, conformance version");
+
+    app.add_option("-i,--input_file_path", inputFilePath, "Input file path")->mandatory(true);
+    app.add_option("-o,--output_file_path", outputFilePath, "Output file path")->mandatory(true);
+
     try {
-        namespace po = boost::program_options;
+        app.parse(argc, argv);
+    } catch (const CLI::ParseError &e) {
+        GENIE_DIE("Program options error: " + std::to_string(app.exit(e)));
+    }
 
-        // Declare the supported options
-        po::options_description options("Options");
-        options.add_options()
-                (
-                        "help,h",
-                        "Help"
-                )
-                (
-                        "input_file_path,i",
-                        po::value<std::string>(&(this->inputFilePath))->required(),
-                        "Input file path"
-                );
+    if (!ghc::filesystem::exists(ghc::filesystem::path(inputFilePath))){
+        GENIE_DIE("Input file does not exist");
+    }
 
-        // Parse the command line
-        po::variables_map optionsMap;
-        po::store(po::command_line_parser(argc, argv).options(options).run(), optionsMap);
-
-        // First thing to do is to print the help
-        if (optionsMap.count("help") || optionsMap.count("h")) {
-            std::stringstream optionsStringStream;
-            optionsStringStream << options;
-            std::string optionsLine;
-            while (std::getline(optionsStringStream, optionsLine)) {
-                GENIE_LOG_INFO << optionsLine;
-            }
-            exit(0);  // Just get out here, quickly
-        }
-
-        // po::notify() will throw on erroneous program options, that's why we call it after printing the help
-        po::notify(optionsMap);
-    } catch (const boost::program_options::error& e) {
-        GENIE_DIE("Program options error: " + std::string(e.what()));
+    if (ghc::filesystem::exists(ghc::filesystem::path(outputFilePath))){
+        GENIE_DIE("Output file exists already");
     }
 }
 

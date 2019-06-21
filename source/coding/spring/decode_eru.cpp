@@ -195,8 +195,9 @@ void decompress(const std::string &temp_dir, const std::vector<std::map<uint8_t,
   std::string file_subseq_12_0 = basedir + "/subseq_12_0";
   std::string file_quality = basedir + "/quality";
   std::string file_id = basedir + "/id";
-  std::string file_decompressed_fastq = basedir + "/decompressed.fastq";
-  
+  std::string file_decompressed_fastq = paired_end ? basedir + "/decompressed_1.fastq" : basedir + "/decompressed.fastq";;
+  std::string file_decompressed_fastq2 = basedir + "/decompressed_2.fastq";
+
   // decode ref
   std::string ref;
   for (auto listDescriptorFiles: ref_descriptorFilesPerAU) {
@@ -205,6 +206,11 @@ void decompress(const std::string &temp_dir, const std::vector<std::map<uint8_t,
     ref.append(decode_ref_AU(subseq_6_0, subseq_7_0));
   }
   std::ofstream fout(file_decompressed_fastq);
+  std::ofstream fout2;
+
+  if(paired_end) {
+    fout2.open(file_decompressed_fastq2);
+  }
 
   subsequences_t subseq;
   for (uint32_t i = 0; i < num_blocks; i++) {
@@ -224,11 +230,16 @@ void decompress(const std::string &temp_dir, const std::vector<std::map<uint8_t,
     subseq.quality_arr = read_file_as_string(file_quality + '.' + std::to_string(i));
     read_read_id_tokens_from_file(file_id + '.' + std::to_string(i), subseq.tokens);
     auto decoded_records = decode_streams(subseq, ref, eru_abs_flag, paired_end);
+    bool fileswitch = true;
     for (auto record: decoded_records) {
-      fout << record.title << "\n";
-      fout << record.sequence << "\n";
-      fout << "+" << "\n";
-      fout << record.qualityScores << "\n";
+      std::ostream& tmpout = fileswitch ? fout : fout2;
+      tmpout << record.title << "\n";
+      tmpout << record.sequence << "\n";
+      tmpout << "+" << "\n";
+      tmpout << record.qualityScores << "\n";
+      if(paired_end) {
+        fileswitch = !fileswitch;
+      }
     }
   }
 }

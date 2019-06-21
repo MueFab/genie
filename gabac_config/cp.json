@@ -1,0 +1,16 @@
+{
+    "word_size": 1,
+    "sequence_transformation_id": 0,
+    "sequence_transformation_parameter": 0,
+    "transformed_sequences": [
+        {
+            "lut_transformation_enabled": false,
+            "diff_coding_enabled": false,
+            "binarization_id": 2,
+            "binarization_parameters": [
+                0
+            ],
+            "context_selection_id": 0
+        }
+    ]
+}

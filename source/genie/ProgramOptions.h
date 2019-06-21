@@ -38,6 +38,7 @@ class ProgramOptions {
 
     // Input
     std::string inputFilePath;
+    std::string configPath;
     std::string inputFilePairPath;
     std::string inputFileType;
 

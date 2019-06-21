@@ -20,13 +20,6 @@ message(STATUS "GENIE_USE_OPENMP=${GENIE_USE_OPENMP}")
 
 
 #==============================================================================
-# Boost
-#==============================================================================
-
-find_package(Boost 1.54 COMPONENTS filesystem log program_options system REQUIRED)
-
-
-#==============================================================================
 # OpenMP
 #==============================================================================
 
@@ -201,12 +194,8 @@ source_group("Source Files" FILES ${coding_source_files})
 source_group("Header Files" FILES ${coding_header_files})
 
 # Set up the format target
-add_library(${coding} STATIC ${coding_source_files})
-target_include_directories(${coding} PRIVATE ${coding_include_dir})
-target_link_libraries(${coding} Boost::program_options)
-target_link_libraries(${coding} Boost::filesystem)
-target_link_libraries(${coding} Boost::system)
-
+add_library(${coding} STATIC ${coding_source_files} ${calq_source_files} ${sam_source_files})
+target_include_directories(${coding} PRIVATE ${coding_include_dir} ${sam_include_dir} ${calq_source_dir})
 
 #==============================================================================
 # format library
@@ -337,7 +326,7 @@ target_link_libraries(${MPEGGFileCreation} ${format})
 # conformance
 #==============================================================================
 
-add_subdirectory(source/conformance)
+add_subdirectory(source/conformance ${CMAKE_CURRENT_BINARY_DIR}/conformance)
 
 #==============================================================================
 # genie
@@ -345,8 +334,8 @@ add_subdirectory(source/conformance)
 
 # Set the paths
 set(genie "genie")
-set(genie_source_dir ${CMAKE_SOURCE_DIR}/source)
-set(genie_header_dir ${CMAKE_SOURCE_DIR}/source)
+set(genie_source_dir ${CMAKE_SOURCE_DIR}/source )
+set(genie_header_dir ${CMAKE_SOURCE_DIR}/source ${CMAKE_CURRENT_BINARY_DIR}/gabac-src/source)
 set(genie_include_dir ${CMAKE_SOURCE_DIR}/source ${CMAKE_CURRENT_BINARY_DIR}/gabac-src/source)
 
 # List all source files
@@ -362,7 +351,6 @@ set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/dsg.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/exceptions.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/gabac_integration.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/generation.cc)
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/genie_gabac_output_stream.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/genie_file_format.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/ProgramOptions.cc)
 set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/thread_pool.cc)
@@ -382,19 +370,12 @@ if (${GENIE_USE_OPENMP})
 endif ()
 target_include_directories(${genie} PRIVATE ${genie_include_dir})
 
-target_link_libraries(${genie} Boost::program_options)
-target_link_libraries(${genie} Boost::filesystem)
-target_link_libraries(${genie} Boost::system)
 target_link_libraries(${genie} ${format})
 target_link_libraries(${genie} ${file})
 target_link_libraries(${genie} ${MPEGGFileCreation})
 target_link_libraries(${genie} ${coding})
 target_link_libraries(${genie} ${file})
 target_link_libraries(${genie} gabac)
-# target_link_libraries(${genie} ${boost_lib_dir}/libboost_program_options.a)
-# target_link_libraries(${genie} ${boost_lib_dir}/libboost_filesystem.a)
-# target_link_libraries(${genie} ${boost_lib_dir}/libboost_system.a)
-# target_link_libraries(${genie} ${CMAKE_DL_LIBS})
 
 
 #==============================================================================
