@@ -157,7 +157,7 @@ int parseDataUnitAccessUnit(DataUnitAccessUnit **dataUnitAccessUnit, DataUnits* 
         return false;
     }
 
-    ParametersSet* parametersSet;
+    DataUnitParametersSet* parametersSet;
     if (getDataUnitsParametersById(dataUnits, parameterSetId, &parametersSet) != 0){
         fprintf(stderr, "Error reading DataUnitAccessUnit: parameters could not be found.\n");
         return false;
@@ -180,7 +180,7 @@ int parseDataUnitAccessUnit(DataUnitAccessUnit **dataUnitAccessUnit, DataUnits* 
         remainingSize -= 32; //mmCount
     }
 
-    if(parametersSet->dataset_type == 2){
+    if(parametersSet->encodingParameters->dataset_type == 2){
         uint16_t refSequenceBuffer;
         if(
             !readNBitsBigToNativeEndian16(&inputBitstream, 16, &refSequenceBuffer)
@@ -188,7 +188,7 @@ int parseDataUnitAccessUnit(DataUnitAccessUnit **dataUnitAccessUnit, DataUnits* 
             fprintf(stderr, "Error reading DataUnitAccessUnit. ref_sequence_id could not be read.\n");
         }
         refSequence.sequenceID = refSequenceBuffer;
-        if(parametersSet->pos_40_bits){
+        if(parametersSet->encodingParameters->pos_40_bits){
             if(
                 !readNBitsBigToNativeEndian64(&inputBitstream, 40, &refStart) ||
                 !readNBitsBigToNativeEndian64(&inputBitstream, 40, &refEnd)
@@ -216,7 +216,7 @@ int parseDataUnitAccessUnit(DataUnitAccessUnit **dataUnitAccessUnit, DataUnits* 
 
         bool auStartPositionSuccessfulRead;
         bool auEndPositionSuccessfulRead;
-        if(parametersSet->pos_40_bits) {
+        if(parametersSet->encodingParameters->pos_40_bits) {
             auStartPositionSuccessfulRead= readNBitsBigToNativeEndian64(
                     &inputBitstream, 40, &auStartPosition
             );
@@ -248,7 +248,7 @@ int parseDataUnitAccessUnit(DataUnitAccessUnit **dataUnitAccessUnit, DataUnits* 
         if(multipleAlignmentsFlag) {
             bool extendedAuStartPositionSuccessfulRead;
             bool extendedAuEndPositionSuccessfulRead;
-            if(parametersSet->pos_40_bits){
+            if(parametersSet->encodingParameters->pos_40_bits){
                 extendedAuStartPositionSuccessfulRead = readNBitsBigToNativeEndian64(
                         &inputBitstream, 40, &extendedAuStartPosition
                 );
@@ -308,7 +308,7 @@ int parseDataUnitAccessUnit(DataUnitAccessUnit **dataUnitAccessUnit, DataUnits* 
         readNBitsShift(&inputBitstream, 8, (char*)&descriptorIdAndReserved);
         readNBitsBigToNativeEndian32(&inputBitstream, 32, &payloadSizeShifted);
 
-        uint8_t descriptorId = descriptorIdAndReserved >> 1;
+        uint8_t descriptorId = descriptorIdAndReserved;
         uint32_t payloadSize = payloadSizeShifted;
 
 

@@ -538,8 +538,8 @@ size_t getDatasetGroupContainerSeekPosition(DatasetsGroupContainer* datasetsGrou
 bool generateDatasetsGroupSeekPoints(DatasetsGroupContainer* datasetsGroupContainer){
     fprintf(stdout,"dataset group  @ %li - %li\n",
             getDatasetGroupContainerSeekPosition(datasetsGroupContainer),
-            (size_t)(getDatasetGroupContainerSeekPosition(datasetsGroupContainer)+
-                    getSizeContentDatasetsGroupContainer(datasetsGroupContainer))
+            getDatasetGroupContainerSeekPosition(datasetsGroupContainer)+
+                    getSizeContentDatasetsGroupContainer(datasetsGroupContainer)
     );
 
     if (datasetsGroupContainer->datasetsGroupHeader != NULL){
@@ -547,8 +547,8 @@ bool generateDatasetsGroupSeekPoints(DatasetsGroupContainer* datasetsGroupContai
             stdout,
             "dataset group  header @ %li - %li\n",
             getDatasetGroupHeaderSeekPosition(datasetsGroupContainer->datasetsGroupHeader),
-            (size_t)(getDatasetGroupHeaderSeekPosition(datasetsGroupContainer->datasetsGroupHeader)
-                + getSizeContentDatasetsGroupHeader(datasetsGroupContainer->datasetsGroupHeader))
+            getDatasetGroupHeaderSeekPosition(datasetsGroupContainer->datasetsGroupHeader)
+                + getSizeContentDatasetsGroupHeader(datasetsGroupContainer->datasetsGroupHeader)
         );
     }
     if (datasetsGroupContainer->datasetsGroupReferenceGenomes != NULL){
@@ -573,10 +573,10 @@ bool generateDatasetsGroupSeekPoints(DatasetsGroupContainer* datasetsGroupContai
                         "dataset group  reference genome @ %li - %li\n",
                         getDatasetGroupReferenceGenomeSeekPosition(
                                 referenceGenome),
-                        (size_t)(getDatasetGroupReferenceGenomeSeekPosition(
+                        getDatasetGroupReferenceGenomeSeekPosition(
                                 referenceGenome)
                         + getDatasetsGroupReferenceGenomeContentSize(
-                                referenceGenome))
+                                referenceGenome)
                 );
             }
         };
@@ -593,8 +593,8 @@ bool generateDatasetsGroupSeekPoints(DatasetsGroupContainer* datasetsGroupContai
                 stdout,
                 "dataset group  metadata @ %li - %li\n",
                 getDatasetGroupMetadataSeekPosition(datasetsGroupContainer->datasetsGroupMetadata),
-                (size_t)(getDatasetGroupMetadataSeekPosition(datasetsGroupContainer->datasetsGroupMetadata)
-                + getSizeContentDatasetsGroupMetadata(datasetsGroupContainer->datasetsGroupMetadata))
+                getDatasetGroupMetadataSeekPosition(datasetsGroupContainer->datasetsGroupMetadata)
+                + getSizeContentDatasetsGroupMetadata(datasetsGroupContainer->datasetsGroupMetadata)
         );
     }
 
@@ -603,8 +603,8 @@ bool generateDatasetsGroupSeekPoints(DatasetsGroupContainer* datasetsGroupContai
                 stdout,
                 "dataset group  protection @ %li - %li\n",
                 getDatasetGroupProtectionSeekPosition(datasetsGroupContainer->datasetsGroupProtection),
-                (size_t)(getDatasetGroupProtectionSeekPosition(datasetsGroupContainer->datasetsGroupProtection)
-                + getDatasetsGroupProtectionContentSize(datasetsGroupContainer->datasetsGroupProtection))
+                getDatasetGroupProtectionSeekPosition(datasetsGroupContainer->datasetsGroupProtection)
+                + getDatasetsGroupProtectionContentSize(datasetsGroupContainer->datasetsGroupProtection)
         );
     }
 

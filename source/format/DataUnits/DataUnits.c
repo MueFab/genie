@@ -106,7 +106,7 @@ void freeDataUnits(DataUnits* dataUnits){
     if(dataUnits->parameters != NULL){
         size_t numberParameters = getSize(dataUnits->parameters);
         for(size_t param_i=0; param_i < numberParameters; param_i++){
-            ParametersSet* parametersSet = getValue(dataUnits->parameters, param_i);
+            DataUnitParametersSet* parametersSet = getValue(dataUnits->parameters, param_i);
             if(parametersSet != NULL) {
                 freeDataUnitsParametersSet(parametersSet);
             }
@@ -136,26 +136,35 @@ int parseDataUnits(FILE* inputFile, DataUnits** dataUnits, char* filename){
     uint8_t dataUnitType;
     utils_read(&dataUnitType, inputFile);
     while(!feof(inputFile)){
-        uint32_t shiftedSize;
-        if(!readBigEndian32FromFile(&shiftedSize, inputFile)){
-            fprintf(stderr, "Error reading input\n.");
-            freeDataUnits(*dataUnits);
-            return -1;
-        }
         if(dataUnitType == 0){
             fprintf(stderr, "Unsupport data unit\n.");
             freeDataUnits(*dataUnits);
             return -1;
         }else if( dataUnitType == 1){
-            ParametersSet* parametersSet;
-            parseParametersSet(&parametersSet, inputFile, shiftedSize-5);
+            uint32_t size;
+            if(!readBigEndian32FromFile(&size, inputFile)){
+                fprintf(stderr, "Error reading input\n.");
+                freeDataUnits(*dataUnits);
+                return -1;
+            }
+
+            DataUnitParametersSet* parametersSet;
+            parseDataUnitsParametersSet(&parametersSet, inputFile, size - 5);
+            if(parametersSet == NULL){
+                return -1;
+            }
             addDataUnitParameters(*dataUnits, parametersSet);
 
 
         } else if(dataUnitType == 2){
-            uint64_t realSize = shiftedSize>>3;
+            uint32_t size;
+            if(!readBigEndian32FromFile(&size, inputFile)){
+                fprintf(stderr, "Error reading input\n.");
+                freeDataUnits(*dataUnits);
+                return -1;
+            }
             DataUnitAccessUnit* dataUnitAccessUnit;
-            parseDataUnitAccessUnit(&dataUnitAccessUnit, *dataUnits, false, inputFile, filename, realSize);
+            parseDataUnitAccessUnit(&dataUnitAccessUnit, *dataUnits, false, inputFile, filename, size);
             addDataUnitAccessUnit(*dataUnits, dataUnitAccessUnit);
         } else {
             fprintf(stderr, "Unknown data unit.\n");
@@ -188,24 +197,16 @@ int addDataUnitDatasetParameters(DataUnits *dataUnits, DatasetParameters *datase
     );
     *parametersIdDataUnitsScope = parameterIdScopeDataUnits;
 
-    ParametersSet* dataUnitParameterSet = initParametersSet(
+    DataUnitParametersSet* dataUnitParameterSet = initParametersSet(
             parentParameterIdScopeDataUnits,
             parameterIdScopeDataUnits,
-            datasetParameters->dataset_type,
-            datasetParameters->alphabet_ID,
-            datasetParameters->reads_length,
-            datasetParameters->number_of_template_segments_minus1,
-            datasetParameters->max_au_data_unit_size,
-            datasetParameters->pos_40_bits,
-            datasetParameters->qv_depth,
-            datasetParameters->as_depth,
-            datasetParameters->parameters
+            datasetParameters->encoding_parameters
     );
 
     return addDataUnitParameters(dataUnits, dataUnitParameterSet);
 }
 
-int addDataUnitParameters(DataUnits* dataUnits, ParametersSet* parametersSet){
+int addDataUnitParameters(DataUnits* dataUnits, DataUnitParametersSet* parametersSet){
     return pushBack(dataUnits->parameters, parametersSet);
 }
 
@@ -220,19 +221,51 @@ int getDataUnitsAccessUnits(DataUnits* dataUnits, Vector** dataUnitsAccessUnits)
     *dataUnitsAccessUnits = dataUnits->dataUnitsAccessUnits;
     return 0;
 }
-int getDataUnitsParametersById(DataUnits* dataUnits, uint16_t parameterSetId, ParametersSet** parametersSet){
+int getDataUnitsParametersById(DataUnits* dataUnits, uint16_t parameterSetId, DataUnitParametersSet** parametersSet){
     *parametersSet = NULL;
     if(dataUnits == NULL){
         return -1;
     }
     size_t parametersLength = getSize(dataUnits->parameters);
     for(uint16_t parameter_i = 0; parameter_i<parametersLength; parameter_i++){
-        ParametersSet* fetchedParameters = getValue(dataUnits->parameters, parameter_i);
+        DataUnitParametersSet* fetchedParameters = getValue(dataUnits->parameters, parameter_i);
         if(fetchedParameters->parameter_setId == parameterSetId){
             *parametersSet = fetchedParameters;
             return 0;
         }
     }
     return -1;
+}
+
+bool writeDataUnits(DataUnits* dataUnits, FILE* outputStream){
+    size_t numberDataUnitParameters = getSize(dataUnits->parameters);
+    for(size_t dataUnitParameter_i = 0; dataUnitParameter_i < numberDataUnitParameters; dataUnitParameter_i++){
+        DataUnitParametersSet *dataUnitParameterSet = getValue(dataUnits->parameters, dataUnitParameter_i);
+        bool parametersWriteSuccessful = writeParametersSet(dataUnitParameterSet, outputStream);
+        if(!parametersWriteSuccessful){
+            fprintf(stderr, "Could not write parameters\n");
+            return false;
+        }
+    }
+    size_t numberAccessUnits = getSize(dataUnits->dataUnitsAccessUnits);
+    for(size_t dataUnitAccessUnit_i = 0; dataUnitAccessUnit_i < numberAccessUnits; dataUnitAccessUnit_i++){
+        DataUnitAccessUnit* dataUnitAccessUnit = getValue(dataUnits->dataUnitsAccessUnits, dataUnitAccessUnit_i);
+        DataUnitParametersSet* parametersSet;
+        if(getDataUnitsParametersById(dataUnits, dataUnitAccessUnit->parameterSetId, &parametersSet)){
+            fprintf(stderr, "Could not obtain parameters\n");
+        }
+        bool accessUnitSuccessfulWrite = writeDataUnitAccessUnit(
+                dataUnitAccessUnit,
+                parametersSet->encodingParameters->multiple_alignments_flag,
+                parametersSet->encodingParameters->dataset_type,
+                parametersSet->encodingParameters->pos_40_bits,
+                outputStream
+        );
+        if(!accessUnitSuccessfulWrite){
+            fprintf(stderr, "Could not write Access Unit\n");
+            return false;
+        }
+    }
+    return true;
 }
 

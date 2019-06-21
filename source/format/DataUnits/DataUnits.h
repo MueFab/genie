@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include "DataStructures/FromFile.h"
+#include <DataStructures/FromFile.h>
 #include <Boxes.h>
 
 struct DataUnitAccessUnit_{
@@ -67,7 +67,7 @@ bool getParametersIdDataUnitsScope(
         uint8_t parameterIdDatasetScope,
         uint8_t *parameterIdDataUnitsScope
 );
-int addDataUnitParameters(DataUnits* dataUnits, ParametersSet* parametersSet);
+int addDataUnitParameters(DataUnits* dataUnits, DataUnitParametersSet* parametersSet);
 int addDataUnitAccessUnitContainer(
         DataUnits* dataUnits,
         DatasetContainer* datasetContainer,
@@ -76,34 +76,23 @@ int addDataUnitAccessUnitContainer(
 int addDataUnitAccessUnit(DataUnits* dataUnits, DataUnitAccessUnit* dataUnitAccessUnit);
 int getDataUnitsParameters(DataUnits* dataUnits, Vector** dataUnitsParameters);
 int getDataUnitsAccessUnits(DataUnits* dataUnits, Vector** dataUnitsAccessUnits);
-int getDataUnitsParametersById(DataUnits* dataUnits, uint16_t parameterSetId, ParametersSet** parametersSet);
+int getDataUnitsParametersById(DataUnits* dataUnits, uint16_t parameterSetId, DataUnitParametersSet** parametersSet);
+bool writeDataUnits(DataUnits* dataUnits, FILE* outputStream);
 
 DataUnitAccessUnit* getDataUnitAccessUnit(DatasetContainer *datasetContainer, SequenceID sequenceId,
                                           uint8_t class_index,
                                           uint32_t au_id);
 
-ParametersSet * initParametersSet(
-    uint16_t parent_parameter_setId,
-    uint16_t parameter_setId,
-    uint8_t dataset_type,
-    uint8_t alphabet_ID,
-    uint32_t reads_length,
-    uint8_t number_of_template_segments_minus1,
-    uint32_t max_au_data_unit_size,
-    bool pos_40_bits,
-    uint8_t qv_depth,
-    uint8_t as_depth,
-    ByteArray* data
+DataUnitParametersSet * initParametersSet(
+        uint16_t parent_parameter_setId,
+        uint16_t parameter_setId,
+        Encoding_ParametersType* encoding_parameters
 );
-void freeDataUnitsParametersSet(ParametersSet* parameters);
+void freeDataUnitsParametersSet(DataUnitParametersSet* parameters);
 
 typedef struct {
     FromFile* fromFile;
 } DataUnitRawReference;
-
-typedef struct {
-    FromFile* fromFile;
-} DataUnitParameterSet;
 
 
 

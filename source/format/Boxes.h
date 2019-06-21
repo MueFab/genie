@@ -13,6 +13,7 @@
 #include "ClassesSet.h"
 #include "vectorUint64.h"
 #include "treeUint64.h"
+#include "DataStructures/EncodingParameters.h"
 
 #define MAJOR_BRAND_SIZE 6
 #define MINOR_VERSION_SIZE 4
@@ -553,15 +554,7 @@ struct DatasetParameters_ {
     uint16_t dataset_ID;
     uint8_t parent_parameter_set_ID;
     uint8_t parameter_set_ID;
-    uint8_t dataset_type;
-    uint8_t alphabet_ID;
-    uint32_t reads_length;
-    uint8_t number_of_template_segments_minus1;
-    uint32_t max_au_data_unit_size;
-    bool pos_40_bits;
-    uint8_t qv_depth;
-    uint8_t as_depth;
-    ByteArray* parameters;
+    Encoding_ParametersType* encoding_parameters;
     size_t seekPosition;
     bool hasSeek;
 };
@@ -577,15 +570,7 @@ DatasetParameters *initDatasetParametersWithParameters(
         uint16_t dataset_ID,
         uint16_t parent_parameter_set_ID,
         uint16_t parameter_set_ID,
-        uint8_t dataset_type,
-        uint8_t alphabet_ID,
-        uint32_t reads_length,
-        uint8_t number_of_template_segments_minus1,
-        uint32_t max_au_data_unit_size,
-        bool pos_40_bits,
-        uint8_t qv_depth,
-        uint8_t as_depth,
-        ByteArray* parameters
+        Encoding_ParametersType* encoding_parameters
 );
 void freeDatasetParameters(DatasetParameters* datasetParameters);
 bool defineContentDatasetParameters(DatasetParameters* datasetParameters, char* filename);
@@ -955,12 +940,10 @@ long getAccessUnitInformationSeekPosition(AccessUnitInformation* accessUnitInfor
 typedef struct {
     DatasetContainer* datasetContainer;
     uint8_t descriptorId;
-    bool paddingFlag;
     uint32_t payloadSize;
 }BlockHeader;
 
-BlockHeader* initBlockHeader(DatasetContainer* datasetContainer, uint8_t descriptorId, bool paddingFlag, uint32_t payloadSize);
-bool isPaddingFlagSet(BlockHeader* blockHeader);
+BlockHeader* initBlockHeader(DatasetContainer* datasetContainer, uint8_t descriptorId, uint32_t payloadSize);
 uint8_t getBlocksDescriptorId(BlockHeader* blockHeader);
 uint32_t getPayloadSize(BlockHeader* blockHeader);
 BlockHeader* parseBlockHeader(DatasetContainer* datasetContainer, FILE* inputFile);
@@ -973,8 +956,6 @@ uint64_t getBlockHeaderSize(BlockHeader* blockHeader);
 struct Block_{
     BlockHeader* blockHeader;
     FromFile* payload;
-    size_t payloadInMemorySize;
-    char* payloadInMemory;
     uint32_t padding_size;
     DatasetContainer *datasetContainer;
 };
@@ -982,7 +963,6 @@ struct Block_{
 void freeBlock(Block* block);
 Block* initBlock(DatasetContainer* datasetContainer, FromFile* fromFile);
 Block* initBlockWithHeader(uint8_t descriptorId, uint32_t payloadSize, FromFile* payload);
-Block* initBlockWithHeaderPayloadInMemory(uint8_t descriptorId, uint32_t payloadSize, char* payloadInMemory, size_t payloadInMemorySize);
 void setBlockHeader(Block* block, BlockHeader* blockHeader);
 void setPaddingSize(Block* block, uint32_t paddingSize);
 bool writeBlock(Block* block, FILE* outputFile);
@@ -993,19 +973,10 @@ typedef struct {
     uint16_t parent_parameter_setId;
     uint16_t parameter_setId;
 
-    uint8_t dataset_type;
-    uint8_t alphabet_ID;
-    uint32_t reads_length;
-    uint8_t number_of_template_segments_minus1;
-    uint32_t max_au_data_unit_size;
-    bool pos_40_bits;
-    uint8_t qv_depth;
-    uint8_t as_depth;
-
-    ByteArray* data;
-} ParametersSet;
-bool parseParametersSet(ParametersSet** parametersSet, FILE* inputFile, uint32_t sizeContent);
-bool writeParametersSet(ParametersSet *parametersSet, FILE* outputFile);
+    Encoding_ParametersType* encodingParameters;
+} DataUnitParametersSet;
+bool parseDataUnitsParametersSet(DataUnitParametersSet **parametersSet, FILE *inputFile, uint32_t sizeContent);
+bool writeParametersSet(DataUnitParametersSet *parametersSet, FILE* outputFile);
 
 
 

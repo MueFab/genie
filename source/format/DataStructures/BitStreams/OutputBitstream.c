@@ -27,6 +27,7 @@ bool writeBuffer(OutputBitstream* outputBitstream){
             1) {
             return false;
         }
+        fflush(outputBitstream->output);
         outputBitstream->currentPositionInChar = 0;
         outputBitstream->currentChar = 0;
     }
@@ -108,7 +109,7 @@ bool writeNBitsShiftAndConvertToBigEndian16(OutputBitstream *outputBitstream, ui
     if(invalid_bits<=8){
         writeNBitsShift(outputBitstream, (uint8_t) 8 - invalid_bits, (char *) (&buffer));
         writeNBits(outputBitstream, 8, (char *) &buffer + 1);
-    }else{
+    } else {
         writeNBitsShift(outputBitstream, (uint8_t) 8 - invalid_bits, (char *) (&buffer)+1);
     }
     return true;
@@ -117,7 +118,7 @@ bool writeNBitsShiftAndConvertToBigEndian16(OutputBitstream *outputBitstream, ui
 bool writeNBitsShiftAndConvertToBigEndian32(OutputBitstream *outputBitstream, uint8_t n, uint32_t value){
     uint32_t buffer = nativeToBigEndian32(value);
 
-    //buffer <<= (32-n);
+    buffer <<= (32-n);
     return writeNBits(outputBitstream, n, (char *) &buffer);
 }
 

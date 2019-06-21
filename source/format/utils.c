@@ -3,7 +3,7 @@
 //
 
 #include <stdint.h>
-#ifdef __APPLE__
+#ifdef __APPLE_CC__
     #include <libkern/OSByteOrder.h>
 
     #define htobe16(x) OSSwapHostToBigInt16(x)
