@@ -14,6 +14,7 @@
 #include <time.h>
 
 #include <fstream>
+#include <sys/stat.h>
 
 #include "genie/exceptions.h"
 #include "genie/operating-system.h"
@@ -59,7 +60,7 @@ std::string dateTime(void)
 std::string fileBaseName(
     const std::string& path)
 {
-    if (path.empty() == true) {
+    if (path.empty()) {
         throwRuntimeError("path is empty");
     }
 
@@ -72,7 +73,7 @@ std::string fileBaseName(
 bool fileExists(
     const std::string& path)
 {
-    if (path.empty() == true) {
+    if (path.empty()) {
         throwRuntimeError("path is empty");
     }
 
@@ -80,7 +81,6 @@ bool fileExists(
 
     return ifs.good();
 }
-
 
 }  // namespace common
 }  // namespace dsg

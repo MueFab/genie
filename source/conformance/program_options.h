@@ -2,8 +2,6 @@
 #define GENIE_PROGRAM_OPTIONS_H_
 
 
-#include <boost/program_options.hpp>
-
 #include <string>
 #include <vector>
 
@@ -17,6 +15,7 @@ public:
     ~ProgramOptions();
 public:
     std::string inputFilePath;
+    std::string outputFilePath;
 private:
     void processCommandLine(int argc, char *argv[]);
 };

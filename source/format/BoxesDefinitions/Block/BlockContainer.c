@@ -1,9 +1,8 @@
 //
 // Created by bscuser on 7/02/18.
 //
-#include <Boxes.h>
-#include <utils.h>
 #include "Boxes.h"
+#include "utils.h"
 
 void freeBlock(Block* block){
     if(block->blockHeader != NULL){
@@ -25,6 +24,8 @@ Block* initBlock(
         return NULL;
     }
     block->blockHeader = NULL;
+    block->payloadInMemory = NULL;
+    block->payloadInMemorySize = 0;
     block->payload = fromFile;
     block->datasetContainer = datasetContainer;
 
@@ -48,6 +49,38 @@ Block* initBlockWithHeader(uint8_t descriptorId, uint32_t payloadSize, FromFile*
     block->blockHeader->datasetContainer = NULL;
 
     block->payload = payload;
+    block->payloadInMemory = NULL;
+    block->payloadInMemorySize = 0;
+    block->datasetContainer = NULL;
+
+    return block;
+}
+
+Block* initBlockWithHeaderPayloadInMemory(
+        uint8_t descriptorId,
+        uint32_t payloadSize,
+        const char* payloadInMemory,
+        size_t payloadInMemorySize
+){
+    Block* block = (Block*)malloc(sizeof(Block));
+    if(block == NULL){
+        fprintf(stderr,"Block could not be allocated.\n");
+        return NULL;
+    }
+    block->blockHeader = (BlockHeader*)malloc(sizeof(BlockHeader));
+    if(block->blockHeader == NULL){
+        fprintf(stderr, "Block header could not be allocated.\n");
+        free(block);
+        return NULL;
+    }
+    block->blockHeader->payloadSize = payloadSize;
+    block->blockHeader->descriptorId = descriptorId;
+    block->blockHeader->paddingFlag = false;
+    block->blockHeader->datasetContainer = NULL;
+
+    block->payload = NULL;
+    block->payloadInMemory = payloadInMemory;
+    block->payloadInMemorySize = payloadInMemorySize;
     block->datasetContainer = NULL;
 
     return block;
@@ -74,9 +107,13 @@ bool writeBlock(Block* block, FILE* outputFile){
         }
     }
     if(block->payload != NULL) {
-        if (!writeFromFile(block->payload, outputFile)) {
-            fprintf(stderr, "Block's payload: error writing.\n");
-            return false;
+        if(block->payload != NULL) {
+            if (!writeFromFile(block->payload, outputFile)) {
+                fprintf(stderr, "Block's payload: error writing.\n");
+                return false;
+            }
+        }else{
+            fwrite(block->payloadInMemory, sizeof(char), block->payloadInMemorySize, outputFile);
         }
     }
     return true;
@@ -133,6 +170,8 @@ uint64_t getBlockSize(Block* block){
     }
     if(block->payload != NULL) {
         blockSize += getFromFileSize(block->payload);
+    }else{
+        blockSize += block->payloadInMemorySize;
     }
 
     return blockSize;
