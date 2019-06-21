@@ -25,7 +25,6 @@ Block* initBlock(
     }
     block->blockHeader = NULL;
     block->payloadInMemory = NULL;
-    block->payloadInMemorySize = 0;
     block->payload = fromFile;
     block->datasetContainer = datasetContainer;
 
@@ -50,7 +49,6 @@ Block* initBlockWithHeader(uint8_t descriptorId, uint32_t payloadSize, FromFile*
 
     block->payload = payload;
     block->payloadInMemory = NULL;
-    block->payloadInMemorySize = 0;
     block->datasetContainer = NULL;
 
     return block;
@@ -59,8 +57,7 @@ Block* initBlockWithHeader(uint8_t descriptorId, uint32_t payloadSize, FromFile*
 Block* initBlockWithHeaderPayloadInMemory(
         uint8_t descriptorId,
         uint32_t payloadSize,
-        const char* payloadInMemory,
-        size_t payloadInMemorySize
+        const char* payloadInMemory
 ){
     Block* block = (Block*)malloc(sizeof(Block));
     if(block == NULL){
@@ -75,12 +72,10 @@ Block* initBlockWithHeaderPayloadInMemory(
     }
     block->blockHeader->payloadSize = payloadSize;
     block->blockHeader->descriptorId = descriptorId;
-    block->blockHeader->paddingFlag = false;
     block->blockHeader->datasetContainer = NULL;
 
     block->payload = NULL;
     block->payloadInMemory = payloadInMemory;
-    block->payloadInMemorySize = payloadInMemorySize;
     block->datasetContainer = NULL;
 
     return block;
@@ -88,10 +83,6 @@ Block* initBlockWithHeaderPayloadInMemory(
 
 void setBlockHeader(Block* block, BlockHeader* blockHeader){
     block->blockHeader = blockHeader;
-}
-
-void setPaddingSize(Block* block, uint32_t paddingSize){
-    block->padding_size = paddingSize;
 }
 
 bool writeBlock(Block* block, FILE* outputFile){
@@ -113,7 +104,7 @@ bool writeBlock(Block* block, FILE* outputFile){
                 return false;
             }
         }else{
-            fwrite(block->payloadInMemory, sizeof(char), block->payloadInMemorySize, outputFile);
+            fwrite(block->payloadInMemory, sizeof(char), block->blockHeader->payloadSize, outputFile);
         }
     }
     return true;
@@ -171,7 +162,7 @@ uint64_t getBlockSize(Block* block){
     if(block->payload != NULL) {
         blockSize += getFromFileSize(block->payload);
     }else{
-        blockSize += block->payloadInMemorySize;
+        blockSize += block->blockHeader->payloadSize;
     }
 
     return blockSize;

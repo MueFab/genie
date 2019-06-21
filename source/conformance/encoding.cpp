@@ -171,8 +171,7 @@ void encode(const ProgramOptions &programOptions)
         Block* const block = initBlockWithHeaderPayloadInMemory(
                 DESCRIPTOR_ID,
                 BLOCK_PAYLOAD_SIZE,
-                BLOCK_PAYLOAD,
-                BLOCK_PAYLOAD_SIZE
+                BLOCK_PAYLOAD
         );
 
         bool success = addBlockToDataUnitAccessUnit(accessUnit, block, blockHeader);
