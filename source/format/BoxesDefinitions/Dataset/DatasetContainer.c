@@ -574,16 +574,16 @@ bool generateDatasetSeekPoints(DatasetContainer* datasetContainer){
             stdout,
             "dataset @ %li-%li\n",
             getDatasetContainerSeekPosition(datasetContainer),
-            (size_t)(getDatasetContainerSeekPosition(datasetContainer) +
-                    getSizeContentDatasetContainer(datasetContainer))
+            getDatasetContainerSeekPosition(datasetContainer) +
+                    getSizeContentDatasetContainer(datasetContainer)
     );
     if (datasetContainer->datasetHeader!= NULL) {
         fprintf(
                 stdout,
                 "\tdataset header @ %li-%li\n",
                 getDatasetHeaderSeekPosition(datasetContainer->datasetHeader),
-                (size_t)(getDatasetHeaderSeekPosition(datasetContainer->datasetHeader) +
-                    getSizeContentDatasetHeader(datasetContainer->datasetHeader))
+                getDatasetHeaderSeekPosition(datasetContainer->datasetHeader) +
+                    getSizeContentDatasetHeader(datasetContainer->datasetHeader)
         );
     }
     if (datasetContainer->datasetMasterIndexTable!= NULL) {
@@ -591,8 +591,8 @@ bool generateDatasetSeekPoints(DatasetContainer* datasetContainer){
                 stdout,
                 "\tmaster index table: @ %li-%li\n",
                 getDatasetMasterIndexTableSeekPosition(datasetContainer->datasetMasterIndexTable),
-                (size_t)(getDatasetMasterIndexTableSeekPosition(datasetContainer->datasetMasterIndexTable) +
-                getSizeContentDatasetMasterIndexTable(datasetContainer->datasetMasterIndexTable))
+                getDatasetMasterIndexTableSeekPosition(datasetContainer->datasetMasterIndexTable) +
+                getSizeContentDatasetMasterIndexTable(datasetContainer->datasetMasterIndexTable)
         );
     }
     if (datasetContainer->datasetParameters!= NULL) {
@@ -607,8 +607,8 @@ bool generateDatasetSeekPoints(DatasetContainer* datasetContainer){
                         stdout,
                         "\tdataset parameters @ %li-%li\n",
                         getDatasetParametersSeekPosition(datasetParameters),
-                        (size_t)(getDatasetParametersSeekPosition(datasetParameters) +
-                        getSizeContentDatasetParameters(datasetParameters))
+                        getDatasetParametersSeekPosition(datasetParameters) +
+                        getSizeContentDatasetParameters(datasetParameters)
                 );
             }
         }
@@ -628,8 +628,8 @@ bool generateDatasetSeekPoints(DatasetContainer* datasetContainer){
                 stdout,
                 "\tdataset metadata @ %li-%li\n",
                 getDatasetMetadataSeekPosition(datasetContainer->datasetMetadata),
-                (size_t)(getDatasetMetadataSeekPosition(datasetContainer->datasetMetadata) +
-                getSizeContentDatasetMetadata(datasetContainer->datasetMetadata))
+                getDatasetMetadataSeekPosition(datasetContainer->datasetMetadata) +
+                getSizeContentDatasetMetadata(datasetContainer->datasetMetadata)
         );
     }
     if (datasetContainer->datasetProtection!= NULL){
@@ -637,8 +637,8 @@ bool generateDatasetSeekPoints(DatasetContainer* datasetContainer){
                 stdout,
                 "\tdataset protection @ %li-%li\n",
                 getDatasetProtectionSeekPosition(datasetContainer->datasetProtection),
-                (size_t)(getDatasetProtectionSeekPosition(datasetContainer->datasetProtection) +
-                getSizeContentDatasetProtection(datasetContainer->datasetProtection))
+                getDatasetProtectionSeekPosition(datasetContainer->datasetProtection) +
+                getSizeContentDatasetProtection(datasetContainer->datasetProtection)
         );
     }
     return true;
@@ -799,7 +799,7 @@ int getDatasetParametersById(DatasetContainer *datasetContainer, uint16_t id, Da
     size_t numberParameters;
     getNumberParameters(datasetContainer, &numberParameters);
     for(size_t parameter_i=0; parameter_i<numberParameters; parameter_i++){
-        if(getDatasetParameters(datasetContainer, parameter_i, datasetParameters)){
+        if(getDatasetParameters(datasetContainer, parameter_i, datasetParameters) == 0){
             if((*datasetParameters)->parameter_set_ID == id){
                 return 0;
             }

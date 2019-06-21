@@ -2,15 +2,300 @@
 // Created by daniel on 23/10/18.
 //
 
-#include "format/EncodingParameters.h"
 #include <stdlib.h>
-#include "format/DataStructures/BitStreams/OutputBitstream.h"
 #include <string.h>
+#include "EncodingParameters.h"
 
+size_t getSizeDecoderConfigurationCABAC(DecoderConfigurationTypeCABAC *decoderConfigurationTypeCABAC);
 EncodingParametersRC getCorrectedTransform_subseq_counter(
         Transform_subseq_parametersType* transform_subseq_parametersType,
         uint8_t* transform_subseq_counter
 );
+
+size_t getSizeSupportValues(Support_valuesType *ptr, TransformSubSymIdEnum param);
+
+size_t getSizeCABACBinarizations(
+        Cabac_binarizationsType* cabac_binarizationsType,
+        uint8_t coding_symbol_size,
+        uint8_t output_symbol_size
+);
+
+size_t
+getSizeCABACBinarizationParameters(Cabac_binarization_parametersType *cabac_binarizations, BinarizationIdEnum binarizationId);
+
+size_t getSizeCABAContextParameters(Cabac_context_parametersType *cabac_context_parameters, uint8_t coding_symbol_size,
+                                    uint8_t output_symbol_size);
+size_t getSizeDecoderConfigurationTokenTypeCABAC(
+        Decoder_configuration_tokentype_cabac* decoder_configuration_tokentype_cabac
+);
+
+size_t getSizeTransformSubseqParameters(Transform_subseq_parametersType *transform_subseq_parameters);
+
+Parameter_set_qvpsType *readParameterSetQvps(InputBitstream *input);
+
+size_t getSizeParameterSetQvps(Parameter_set_qvpsType *parameter_set_qvps);
+
+size_t getSizeDecoderConfigurationTokenType(Decoder_configuration_tokentype *decoder_configuration_tokentype);
+
+size_t getSizeEncodingParameters(Encoding_ParametersType* encodingParameters){
+    size_t sizeInBits = 0;
+    sizeInBits += 4; //dataset_type
+    sizeInBits += 8; //alphabet_ID
+    sizeInBits += 24; //read_length
+    sizeInBits += 2; //number_of_template_segments_minus1
+    sizeInBits += 6; //reserved
+    sizeInBits += 29; //max_au_data_unit_size
+    sizeInBits += 1; //pos_40_bits_flag
+    sizeInBits += 3; //qv_depth
+    sizeInBits += 3; //as_depth
+    sizeInBits += 4; //numClasses;
+
+    uint8_t numClasses;
+    getNumClasses(encodingParameters, &numClasses);
+    sizeInBits += numClasses * 4;
+
+
+    for(int desc_ID=0; desc_ID < 18; desc_ID++){
+        sizeInBits += 1; //class_specific_dec_cfg_flag
+
+        int endLoop = encodingParameters->class_specific_dec_cfg_flag[desc_ID] ? encodingParameters->num_classes : 1;
+        for(int c = 0; c < endLoop; c++){
+            sizeInBits += 8; //dec_cfg_preset
+            sizeInBits += 8; //encoding_mode_id
+            if(desc_ID != 11 && desc_ID != 15){
+                sizeInBits += getSizeDecoderConfigurationCABAC(
+                        (DecoderConfigurationTypeCABAC*)(encodingParameters->decoderConfiguration[desc_ID][c])
+                );
+            }else {
+                sizeInBits += getSizeDecoderConfigurationTokenType(
+                    (Decoder_configuration_tokentype*)(encodingParameters->decoderConfiguration[desc_ID][c])
+                );
+            }
+        }
+    }
+    sizeInBits += 16; //num_groups
+    for(int j=0; j<encodingParameters->num_groups; j++){
+        size_t reagGroupId_len = strlen(encodingParameters->rgroup_ID[j]);
+        sizeInBits += (reagGroupId_len+1)*8;
+    }
+    sizeInBits += 1; //multiple_alignments_flag
+    sizeInBits += 1; //spliced_reads_flag
+    sizeInBits += 31; //multiple_signature_base
+
+    if(encodingParameters->multiple_signature_base > 0){
+        sizeInBits += 6; //u_signature_size
+    }
+
+    for(int c=0; c<encodingParameters->num_classes; c++){
+        sizeInBits += 4; //qv_coding_mode
+        if(encodingParameters->qv_coding_mode[c] == 1){
+            sizeInBits += 1; //qvps_flag
+            if(encodingParameters->qvps_flag[c]){
+                sizeInBits += getSizeParameterSetQvps(encodingParameters->parameter_set_qvps[c]);
+            }else{
+                sizeInBits += 4; //qvps_preset_ID
+            }
+            sizeInBits += 1; //qv_reverse_flag
+        }
+    }
+    sizeInBits += 1; //crps_flag
+    if(encodingParameters->crps_flag){
+        sizeInBits += getSizeParametersCrps(encodingParameters->parameter_set_crps);
+    }
+    return 1 + ((sizeInBits - 1) / 8);
+}
+
+size_t getSizeDecoderConfigurationTokenType(Decoder_configuration_tokentype *decoder_configuration_tokentype_typeCABAC) {
+    size_t sizeInBits = 0;
+    sizeInBits += 8; //rle_guard_tokentype
+    sizeInBits += getSizeDecoderConfigurationTokenTypeCABAC(
+            decoder_configuration_tokentype_typeCABAC->decoder_configuration_tokentype_cabac0
+    );
+    sizeInBits += getSizeDecoderConfigurationTokenTypeCABAC(
+            decoder_configuration_tokentype_typeCABAC->decoder_configuration_tokentype_cabac1
+    );
+    return sizeInBits;
+}
+
+size_t getSizeDecoderConfigurationTokenTypeCABAC(
+        Decoder_configuration_tokentype_cabac* decoder_configuration_tokentype_cabac
+){
+    size_t sizeInBits = 0;
+    sizeInBits += getSizeTransformSubseqParameters(
+            decoder_configuration_tokentype_cabac->transform_subseq_parametersType
+    );
+
+    uint8_t transformSubseqCounter;
+
+    getTransformSubseqCounterTokenType(decoder_configuration_tokentype_cabac, &transformSubseqCounter);
+    for(uint8_t transformSubseq_i=0; transformSubseq_i<transformSubseqCounter; transformSubseq_i++){
+        sizeInBits += 3; // transformSubSym[transformSubseq_i];
+        sizeInBits += getSizeSupportValues(
+                decoder_configuration_tokentype_cabac->support_values[transformSubseq_i],
+                decoder_configuration_tokentype_cabac->transformSubSym[transformSubseq_i]
+        );
+
+        sizeInBits += getSizeCABACBinarizations(
+                decoder_configuration_tokentype_cabac->cabac_binarizations[transformSubseq_i],
+                decoder_configuration_tokentype_cabac->support_values[transformSubseq_i]->coding_symbol_size,
+                decoder_configuration_tokentype_cabac->support_values[transformSubseq_i]->output_symbol_size
+        );
+    }
+    return sizeInBits;
+}
+
+size_t getSizeParameterSetQvps(Parameter_set_qvpsType *parameter_set_qvps) {
+    size_t sizeInBits = 0;
+    sizeInBits += 4; //qv_num_codebooks_total
+    for(uint8_t b=0; b < parameter_set_qvps->qv_num_codebooks_total; b++){
+        sizeInBits += 8; //qv_num_codebook_entries
+        sizeInBits += parameter_set_qvps->qv_num_codebook_entries[b]*8;
+    }
+    return sizeInBits;
+}
+
+size_t getSizeDecoderConfigurationCABAC(DecoderConfigurationTypeCABAC *decoderConfigurationCABAC) {
+    size_t sizeInBits = 0;
+    sizeInBits += 8; //num_descriptor_subsequence_cfgs_minus1
+
+    for(
+        uint16_t i = 0;
+        i <= decoderConfigurationCABAC->num_descriptor_subsequence_cfgs_minus1;
+        i++
+    ){
+        sizeInBits += 10; //decoderConfigurationCABAC->descriptor_subsequence_ID[i])
+        sizeInBits += getSizeTransformSubseqParameters(decoderConfigurationCABAC->transform_subseq_parameters[i]);
+        uint8_t transform_subseq_counter;
+        if (
+            getCorrectedTransform_subseq_counter(
+                decoderConfigurationCABAC->transform_subseq_parameters[i],
+                &transform_subseq_counter
+            ) != SUCCESS
+        ){
+                return false;
+        }
+
+        for(int j=0; j<transform_subseq_counter; j++){
+            uint8_t transformIdSubSym = decoderConfigurationCABAC->transform_id_subsym[i][j];
+            sizeInBits += 3; //transformIdSubSym
+            sizeInBits += getSizeSupportValues(
+                decoderConfigurationCABAC->support_values[i][j],
+                decoderConfigurationCABAC->transform_id_subsym[i][j]
+            );
+            sizeInBits += getSizeCABACBinarizations(
+                    decoderConfigurationCABAC->cabac_binarizations[i][j],
+                    decoderConfigurationCABAC->support_values[i][j]->coding_symbol_size,
+                    decoderConfigurationCABAC->support_values[i][j]->output_symbol_size
+            );
+        }
+    }
+    return sizeInBits;
+}
+
+size_t getSizeTransformSubseqParameters(Transform_subseq_parametersType *transform_subseq_parameters) {
+    size_t sizeInBits = 0;
+
+    sizeInBits += 8; //transform_ID_subseq
+
+    if(transform_subseq_parameters->transform_ID_subseq == SubSeq_EQUALITY_CODING){
+        /*Nothing to write*/
+    } else if (transform_subseq_parameters->transform_ID_subseq == SubSeq_MATCH_CODING){
+        sizeInBits += 16; //match_coding_buffer_size
+    } else if (transform_subseq_parameters->transform_ID_subseq == SubSeq_RLE_CODING){
+        sizeInBits += 8; //rleCodingGuard
+    } else if (transform_subseq_parameters->transform_ID_subseq == SubSeq_MERGE_CODING){
+        sizeInBits += 4; //merge_coding_subseq_count
+        for(
+            uint8_t merge_coding_i=0;
+            merge_coding_i < transform_subseq_parameters->merge_coding_subseq_count;
+            merge_coding_i++
+        ){
+            sizeInBits += 5; //merge_coding_shift_size[merge_coding_i]
+        }
+    }
+    return sizeInBits;
+}
+
+size_t getSizeCABACBinarizations(
+        Cabac_binarizationsType* cabac_binarizationsType,
+        uint8_t coding_symbol_size,
+        uint8_t output_symbol_size
+) {
+    size_t sizeInBits = 0;
+
+    sizeInBits += 5; //binarizationId
+    sizeInBits += 1; //bypass_flag
+    sizeInBits += getSizeCABACBinarizationParameters(
+            cabac_binarizationsType->cabac_binarization_parameters,
+            cabac_binarizationsType->binarization_ID
+    );
+    uint8_t binarizationIdValue = (uint8_t)cabac_binarizationsType->binarization_ID;
+    if(!cabac_binarizationsType->bypass_flag) {
+        sizeInBits += getSizeCABAContextParameters(
+                cabac_binarizationsType->cabac_context_parameters,
+                coding_symbol_size,
+                output_symbol_size
+        );
+    }
+    return sizeInBits;
+}
+
+size_t getSizeCABAContextParameters(
+        Cabac_context_parametersType *cabac_context_parameters,
+        uint8_t codingSubsymbolSize,
+        uint8_t outputSubsymbolSize
+) {
+    size_t sizeInBits = 0;
+    sizeInBits += 1; //adaptive_mode_flag
+    sizeInBits += 16; //num_contexts
+
+    for(int i=0; i<cabac_context_parameters->num_contexts; i++){
+        sizeInBits += 7; //context_initialization_value;
+
+    }
+    if(codingSubsymbolSize < outputSubsymbolSize){
+        sizeInBits += 1; //share_sub_sym_ctx_flag
+    }
+    return sizeInBits;
+}
+
+size_t
+getSizeCABACBinarizationParameters(Cabac_binarization_parametersType *cabac_binarizations, BinarizationIdEnum binarization_ID) {
+    size_t sizeinBits = 0;
+
+    if (binarization_ID == 1) {
+        sizeinBits += 8; //cmax
+    } else if ( binarization_ID == 4 || binarization_ID == 5) {
+        sizeinBits += 8; //cmax_teg
+    } else if (binarization_ID == 8 || binarization_ID == 9) {
+        sizeinBits += 8; //cmax_dtu
+    }
+    if (
+            binarization_ID == 6
+            || binarization_ID == 7
+            || binarization_ID == 8
+            || binarization_ID == 9
+    ) {
+        sizeinBits += 4; //splitUnitSize
+    }
+
+    return sizeinBits;
+}
+
+size_t getSizeSupportValues(Support_valuesType *supportValues, TransformSubSymIdEnum transform_ID_subsym) {
+    size_t sizeInBits = 0;
+    sizeInBits += 6; //output_symbol_size
+    sizeInBits += 6; //coding_symbol_size
+    sizeInBits += 2; //coding_order
+
+    if(supportValues->coding_symbol_size < supportValues->output_symbol_size && supportValues->coding_order > 0){
+        if(transform_ID_subsym == SubSym_LUT_TRANSFORM){
+            sizeInBits += 1; //share_subsym_lut_flag
+        }
+        sizeInBits += 1; //share_subsym_prv_flag
+    }
+    return sizeInBits;
+}
 
 EncodingParametersRC getCorrectedTransform_subseq_counter(
     Transform_subseq_parametersType* transform_subseq_parametersType,
@@ -362,6 +647,147 @@ EncodingParametersRC getClassIds(Encoding_ParametersType* encodingParameters, ui
     *classID = encodingParameters->classID;
     return SUCCESS;
 }
+
+
+Support_valuesType* copySupportValues(
+    Support_valuesType* supportValuesType
+){
+    Support_valuesType* result = malloc(sizeof(Support_valuesType));
+    result->coding_order = supportValuesType->coding_order;
+    result->coding_symbol_size = supportValuesType->coding_symbol_size;
+    result->output_symbol_size = supportValuesType->output_symbol_size;
+    result->share_subsym_lut_flag = supportValuesType->share_subsym_lut_flag;
+    result->share_subsym_prv_flag = supportValuesType->share_subsym_prv_flag;
+    return result;
+}
+
+Parameter_set_crpsType* copyParameterSetCrps(Parameter_set_crpsType* parameterSetCrps){
+    Parameter_set_crpsType* result = malloc(sizeof(Parameter_set_crpsType));
+    result->cr_alg_ID = parameterSetCrps->cr_alg_ID;
+    result->cr_buf_max_size = parameterSetCrps->cr_buf_max_size;
+    result->cr_pad_size = parameterSetCrps->cr_pad_size;
+    return result;
+}
+
+Cabac_binarization_parametersType* copyCabac_binarization_parametersType(Cabac_binarization_parametersType* input){
+    Cabac_binarization_parametersType* result = malloc(sizeof(Cabac_binarization_parametersType));
+    result->cmax = input->cmax;
+    result->cmax_teg = input->cmax_teg;
+    result->cMaxDTU = input->cMaxDTU;
+    result->splitUnitSize = input->splitUnitSize;
+    return result;
+}
+
+Cabac_context_parametersType* copyCabac_context_parametersType(Cabac_context_parametersType* input){
+    Cabac_context_parametersType* result = malloc(sizeof(Cabac_context_parametersType));
+    result->adaptive_mode_flag = input->adaptive_mode_flag;
+    result->share_sub_sym_ctx_flag = input->share_sub_sym_ctx_flag;
+    result->num_contexts = input->num_contexts;
+    if(result->num_contexts == 0){
+        result->context_initialization_value = NULL;
+    }else{
+        result->context_initialization_value = malloc(sizeof(uint8_t)*result->num_contexts);
+        memccpy(
+                result->context_initialization_value,
+                input->context_initialization_value,
+                result->num_contexts,
+                sizeof(uint8_t)
+        );
+    }
+    return result;
+}
+
+Cabac_binarizationsType* copyCabacBinarizations(Cabac_binarizationsType* input){
+    Cabac_binarizationsType* result = malloc(sizeof(Cabac_binarizationsType));
+    result->binarization_ID = input->binarization_ID;
+    result->bypass_flag = input->bypass_flag;
+    result->cabac_binarization_parameters = copyCabac_binarization_parametersType(input->cabac_binarization_parameters);
+    result->cabac_context_parameters = copyCabac_context_parametersType(input->cabac_context_parameters);
+    return result;
+}
+
+Transform_subseq_parametersType* copySubseqParameters(Transform_subseq_parametersType* input){
+    Transform_subseq_parametersType* result = malloc(sizeof(Transform_subseq_parametersType));
+    result->match_coding_buffer_size = input->match_coding_buffer_size;
+    result->merge_coding_subseq_count = input->merge_coding_subseq_count;
+    result->rle_coding_guard = input->rle_coding_guard;
+    result->transform_ID_subseq = input->transform_ID_subseq;
+    result->merge_coding_shift_size = malloc(sizeof(uint8_t)*input->merge_coding_subseq_count);
+    memccpy(result->merge_coding_shift_size, input->merge_coding_shift_size, input->merge_coding_subseq_count, sizeof(uint8_t));
+    return result;
+}
+
+DecoderConfigurationTypeCABAC* copyDecoderConfigurationTypeCABAC(
+        DecoderConfigurationTypeCABAC* input
+){
+    DecoderConfigurationTypeCABAC* result = malloc(sizeof(DecoderConfigurationTypeCABAC));
+    result->num_descriptor_subsequence_cfgs_minus1 = input->num_descriptor_subsequence_cfgs_minus1;
+    result->descriptor_subsequence_ID = malloc(sizeof(uint16_t)*(input->num_descriptor_subsequence_cfgs_minus1+1));
+    result->transform_subseq_parameters = malloc(sizeof(Transform_subseq_parametersType*)*(input->num_descriptor_subsequence_cfgs_minus1+1));
+    result->transform_id_subsym = malloc(sizeof(TransformSubSymIdEnum*)*(input->num_descriptor_subsequence_cfgs_minus1+1));
+    result->support_values = malloc(sizeof(Support_valuesType**)*(input->num_descriptor_subsequence_cfgs_minus1+1));
+    result->cabac_binarizations = malloc(sizeof(Cabac_binarizationsType**)*(input->num_descriptor_subsequence_cfgs_minus1+1));
+
+    for(uint8_t subseq_i=0; subseq_i < (input->num_descriptor_subsequence_cfgs_minus1+1); subseq_i++){
+        result->descriptor_subsequence_ID[subseq_i] = input->descriptor_subsequence_ID[subseq_i];
+        result->transform_subseq_parameters[subseq_i] = copySubseqParameters(input->transform_subseq_parameters[subseq_i]);
+
+        uint8_t transformSubseqCounter;
+        getTransformSubseqCounter(input, subseq_i, &transformSubseqCounter);
+
+        result->transform_id_subsym[subseq_i] = (TransformSubSymIdEnum*)malloc(sizeof(TransformSubSymIdEnum) * transformSubseqCounter);
+        result->support_values[subseq_i] = (Support_valuesType**)malloc(sizeof(Support_valuesType*) * transformSubseqCounter);
+        result->cabac_binarizations[subseq_i] = (Cabac_binarizationsType**)malloc(sizeof(Cabac_binarizationsType*) * transformSubseqCounter);
+
+        for(uint8_t j=0; j<transformSubseqCounter; j++) {
+            result->transform_id_subsym[subseq_i][j] = input->transform_id_subsym[subseq_i][j];
+            result->support_values[subseq_i][j] = copySupportValues(input->support_values[subseq_i][j]);
+            result->cabac_binarizations[subseq_i][j] = copyCabacBinarizations(input->cabac_binarizations[subseq_i][j]);
+        }
+    }
+    return result;
+}
+
+Decoder_configuration_tokentype_cabac* copyDecoderConfigurationTokenTypeCABAC(
+        Decoder_configuration_tokentype_cabac* input
+){
+    Decoder_configuration_tokentype_cabac* result = malloc(sizeof(Decoder_configuration_tokentype_cabac));
+    if(result == NULL){
+        return NULL;
+    }
+
+    result->transform_subseq_parametersType = input->transform_subseq_parametersType;
+
+    uint8_t transformSubseqCounter;
+    getTransformSubseqCounterTokenType(result, &transformSubseqCounter);
+
+    result->transformSubSym = (TransformSubSymIdEnum*)malloc(sizeof(TransformSubSymIdEnum) * transformSubseqCounter);
+    result->support_values = (Support_valuesType**)malloc(sizeof(Support_valuesType*) * transformSubseqCounter);
+    result->cabac_binarizations = (Cabac_binarizationsType**)malloc(sizeof(Cabac_binarizationsType*) * transformSubseqCounter);
+
+    for(uint8_t j=0; j<transformSubseqCounter; j++){
+        result->transformSubSym[j] = input->transformSubSym[j];
+        result->support_values[j] = copySupportValues(input->support_values[j]);
+        result->cabac_binarizations[j] = copyCabacBinarizations( input->cabac_binarizations[j]);
+    }
+
+    return result;
+}
+
+Decoder_configuration_tokentype* copyDecoder_configuration_tokentypeCABAC(
+        Decoder_configuration_tokentype* input
+){
+    Decoder_configuration_tokentype* decoderConfigurationTokentype = malloc(sizeof(Decoder_configuration_tokentype));
+    decoderConfigurationTokentype->rle_guard_tokentype = input->rle_guard_tokentype;
+    decoderConfigurationTokentype->decoder_configuration_tokentype_cabac0 = copyDecoderConfigurationTokenTypeCABAC(
+            input->decoder_configuration_tokentype_cabac0
+    );
+    decoderConfigurationTokentype->decoder_configuration_tokentype_cabac1 = copyDecoderConfigurationTokenTypeCABAC(
+            input->decoder_configuration_tokentype_cabac1
+    );
+    return decoderConfigurationTokentype;
+}
+
 EncodingParametersRC getCABACDecoderConfiguration(
         Encoding_ParametersType* encodingParameters,
         uint8_t classIndex,
@@ -916,7 +1342,7 @@ EncodingParametersRC getCabacBinarizationsToken(
     if(decoder_configuration_tokentype_cabac == NULL || cabacBinarizations == NULL ){
         return NULL_PTR;
     }
-    *cabacBinarizations = decoder_configuration_tokentype_cabac->cabac_binarizations;
+    *cabacBinarizations = decoder_configuration_tokentype_cabac->cabac_binarizations[0];
     return SUCCESS;
 }
 
@@ -1448,6 +1874,9 @@ bool writeEncoding_parameters(
                 if(!writeNBitsShift(outputBitstream, 4, (char*)&(encodingParameters->qvps_preset_ID[c]))){
                     return false;
                 }
+            }
+            if(!writeBit(outputBitstream, (uint8_t)(encodingParameters->qv_reverse_flag[c] ? 1:0))){
+                return false;
             }
         }
     }
@@ -2421,6 +2850,7 @@ Support_valuesType* readSupportValuesType(InputBitstream *input, uint8_t transfo
             readBit(input, &buffer);
             share_subsym_lut_flag = buffer != 0;
         }
+        readBit(input, &buffer);
         share_subsym_prv_flag = buffer != 0;
     }
 
@@ -2496,46 +2926,33 @@ Parameter_set_qvpsType* constructParameterSetQvpsType(
     return parameter_set_qvpsType;
 }
 
-Parameter_set_crpsType* constructParameterSetCRPS(CrAlgEnum cr_alg_ID, uint8_t cr_pad_size, uint32_t cr_buf_max_size){
-    Parameter_set_crpsType* parameterSetCrps = (Parameter_set_crpsType*)malloc(sizeof(Parameter_set_crpsType));
-    if(parameterSetCrps == NULL){
-        return NULL;
-    }
-
-    parameterSetCrps->cr_alg_ID = cr_alg_ID;
-    parameterSetCrps->cr_pad_size = cr_pad_size;
-    parameterSetCrps->cr_buf_max_size = cr_buf_max_size;
-
-    return parameterSetCrps;
-}
-
 Parameter_set_crpsType* constructParameterSetCRPSNoComp(){
-    return constructParameterSetCRPS(CrAlg_NoComp, 0, 0);
+    return constructParameterSetCrps(CrAlg_NoComp, 0, 0);
 }
 
 Parameter_set_crpsType* constructParameterSetRefTransform(){
-    return constructParameterSetCRPS(CrAlg_RefTransform, 0, 0);
+    return constructParameterSetCrps(CrAlg_RefTransform, 0, 0);
 }
 
 Parameter_set_crpsType* constructParameterSetPushIn(
     uint8_t cr_pad_size,
     uint32_t cr_buf_max_size
 ){
-    return constructParameterSetCRPS(CrAlg_PushIn, cr_pad_size, cr_buf_max_size);
+    return constructParameterSetCrps(CrAlg_PushIn, cr_pad_size, cr_buf_max_size);
 }
 
 Parameter_set_crpsType* constructParameterSetLocalAssembly(
         uint8_t cr_pad_size,
         uint32_t cr_buf_max_size
 ){
-    return constructParameterSetCRPS(CrAlg_LocalAssembly, cr_pad_size, cr_buf_max_size);
+    return constructParameterSetCrps(CrAlg_LocalAssembly, cr_pad_size, cr_buf_max_size);
 }
 
 Parameter_set_crpsType* constructParameterSetGlobalAssembly(
         uint8_t cr_pad_size,
         uint32_t cr_buf_max_size
 ){
-    return constructParameterSetCRPS(CrAlg_GlobalAssembly, cr_pad_size, cr_buf_max_size);
+    return constructParameterSetCrps(CrAlg_GlobalAssembly, cr_pad_size, cr_buf_max_size);
 }
 
 Encoding_ParametersType *constructEncodingParameters(uint8_t datasetType, uint8_t alphabetId, uint32_t read_length,
@@ -2546,7 +2963,7 @@ Encoding_ParametersType *constructEncodingParameters(uint8_t datasetType, uint8_
                                                      bool splicedReadsFlag, uint32_t multipleSignatureBase,
                                                      uint8_t U_signature_size, uint8_t *qv_coding_mode, bool *qvps_flag,
                                                      Parameter_set_qvpsType **parameter_set_qvps,
-                                                     uint8_t *qvps_preset_ID, bool crps_flag,
+                                                     uint8_t *qvps_preset_ID, bool* qv_reverse_flag, bool crps_flag,
                                                      Parameter_set_crpsType *parameter_set_crps) {
     Encoding_ParametersType* encodingParametersType =
             (Encoding_ParametersType *)malloc(sizeof(Encoding_ParametersType));
@@ -2614,7 +3031,8 @@ Encoding_ParametersType* constructEncodingParametersSingleAlignmentNoComputed(
         uint8_t *qv_coding_mode,
         bool *qvps_flag,
         Parameter_set_qvpsType **parameter_set_qvps,
-        uint8_t *qvps_preset_ID
+        uint8_t *qvps_preset_ID,
+        bool* qv_reverse_flag
 ){
     return constructEncodingParameters(
             datasetType,
@@ -2637,6 +3055,7 @@ Encoding_ParametersType* constructEncodingParametersSingleAlignmentNoComputed(
             qvps_flag,
             parameter_set_qvps,
             qvps_preset_ID,
+            qv_reverse_flag,
             false,
             NULL
     );
@@ -2651,7 +3070,7 @@ constructEncodingParametersMultipleAlignmentNoComputed(uint8_t datasetType, uint
                                                        uint32_t multipleSignatureBase, uint8_t U_signature_size,
                                                        uint8_t *qv_coding_mode, bool *qvps_flag,
                                                        Parameter_set_qvpsType **parameter_set_qvps,
-                                                       uint8_t *qvps_preset_ID) {
+                                                       uint8_t *qvps_preset_ID, bool* qv_reverse_flag) {
     return constructEncodingParameters(
             datasetType,
             alphabetId,
@@ -2673,6 +3092,7 @@ constructEncodingParametersMultipleAlignmentNoComputed(uint8_t datasetType, uint
             qvps_flag,
             parameter_set_qvps,
             qvps_preset_ID,
+            qv_reverse_flag,
             false,
             NULL);
 }
@@ -2687,6 +3107,7 @@ constructEncodingParametersSingleAlignmentComputedRef(uint8_t datasetType, uint8
                                                       uint8_t *qv_coding_mode, bool *qvps_flag,
                                                       Parameter_set_qvpsType **parameter_set_qvps,
                                                       uint8_t *qvps_preset_ID,
+                                                      bool* qv_reverse_flag,
                                                       Parameter_set_crpsType *parameter_set_crps) {
     return constructEncodingParameters(
             datasetType,
@@ -2709,6 +3130,7 @@ constructEncodingParametersSingleAlignmentComputedRef(uint8_t datasetType, uint8
             qvps_flag,
             parameter_set_qvps,
             qvps_preset_ID,
+            qv_reverse_flag,
             true,
             parameter_set_crps);
 }
@@ -2724,6 +3146,7 @@ constructEncodingParametersMultipleAlignmentComputedRef(uint8_t datasetType, uin
                                                         uint8_t *qv_coding_mode, bool *qvps_flag,
                                                         Parameter_set_qvpsType **parameter_set_qvps,
                                                         uint8_t *qvps_preset_ID,
+                                                        bool* qv_reverse_flag,
                                                         Parameter_set_crpsType *parameter_set_crps) {
     return constructEncodingParameters(
             datasetType,
@@ -2746,6 +3169,7 @@ constructEncodingParametersMultipleAlignmentComputedRef(uint8_t datasetType, uin
             qvps_flag,
             parameter_set_qvps,
             qvps_preset_ID,
+            qv_reverse_flag,
             true,
             parameter_set_crps);
 }
@@ -2932,14 +3356,16 @@ Encoding_ParametersType* readEncodingParameters(InputBitstream* input){
     bool* qvps_flag;
     Parameter_set_qvpsType** parameter_set_qvps; //8.1
     uint8_t* default_qvps_ID;
+    bool* qv_reverse_flag;
     bool crps_flag;
     Parameter_set_crpsType* parameter_set_crps = NULL; //8.2
 
     bool datasetTypeSuccessfulRead = readNBits8(input, 4, &dataset_type);
     bool alphabetIdSuccessfulRead = readNBits8(input, 8, &alphabet_ID);
     bool readLengthSuccessfulRead = readNBitsBigToNativeEndian32(input, 24, &read_length);
-    bool numberTemplateSegmentsSuccessfulRead = readNBits8(input, 8, &number_of_template_segments_minus1);
-    number_of_template_segments_minus1 >>= 6;
+    bool numberTemplateSegmentsSuccessfulRead = readNBits8(input, 2, &number_of_template_segments_minus1);
+    uint8_t reserved;
+    readNBits8(input, 6, &reserved);
     bool maxAuDataUnitSuccessfulRead = readNBitsBigToNativeEndian32(input, 29, &max_au_data_unit_size);
     uint8_t buffer;
     bool pos40BitsSuccessfulRead = readBit(input, &buffer);
@@ -3007,6 +3433,11 @@ Encoding_ParametersType* readEncodingParameters(InputBitstream* input){
             }
 
             readNBits8(input, 8, &(encoding_mode_id[descriptor_i][0]));
+            if(encoding_mode_id[descriptor_i][0] != 0){
+                fprintf(stderr, "encoding mode must be equal to 0.\n");
+                return NULL;
+            }
+
             if(descriptor_i != 11 && descriptor_i != 15) {
                 decoderConfiguration[descriptor_i][0] = readDecoderConfigurationTypeCABAC(input);
             }else{
@@ -3015,11 +3446,10 @@ Encoding_ParametersType* readEncodingParameters(InputBitstream* input){
 
 
         }else{
+            dec_cfg_preset[descriptor_i] = malloc(sizeof(bool) * num_classes);
+            encoding_mode_id[descriptor_i] = malloc(sizeof(uint8_t) * num_classes);
+            decoderConfiguration[descriptor_i] = malloc(sizeof(void*) * num_classes);
             for(uint8_t class_i=0; class_i < num_classes; class_i++){
-                dec_cfg_preset[descriptor_i] = malloc(sizeof(bool) * num_classes);
-                encoding_mode_id[descriptor_i] = malloc(sizeof(uint8_t) * num_classes);
-                decoderConfiguration[descriptor_i] = malloc(sizeof(void*) * num_classes);
-
                 readNBits8(input, 8, dec_cfg_preset[descriptor_i]+class_i);
                 if(dec_cfg_preset[descriptor_i][class_i] != 0){
                     return NULL;
@@ -3107,7 +3537,8 @@ Encoding_ParametersType* readEncodingParameters(InputBitstream* input){
     qv_coding_mode = malloc(sizeof(uint8_t)*num_classes);
     qvps_flag = malloc(sizeof(bool)*num_classes);
     parameter_set_qvps = malloc(sizeof(Parameter_set_qvpsType*)*num_classes);
-    default_qvps_ID = malloc(sizeof(uint8_t)*num_classes);;
+    default_qvps_ID = malloc(sizeof(uint8_t)*num_classes);
+    qv_reverse_flag = malloc(sizeof(bool)*num_classes);
     if(qv_coding_mode == NULL){
         fprintf(stderr, "could not allocate qv coding mode.\n");
         for(uint16_t group_i=0; group_i<num_groups; group_i++){
@@ -3127,26 +3558,28 @@ Encoding_ParametersType* readEncodingParameters(InputBitstream* input){
             qvps_flag[class_i] = buffer!=0;
 
             if(qvps_flag[class_i]){
-                //parse parameter_set_qvps
+                parameter_set_qvps[class_i] = readParameterSetQvps(input);
             }else{
                 readNBits8(input, 4, &buffer);
                 default_qvps_ID[num_classes] = buffer;
             }
         }else{
             fprintf(stderr, "unknown qv_coding_mode.\n");
-            for(uint16_t group_i=0; group_i<num_groups; group_i++){
+            for(uint16_t group_i=0; group_i<num_classes; group_i++){
                 free(rgroup_ID[group_i]);
             }
             free(rgroup_ID);
             free(classIDs);
             return NULL;
         }
+        readBit(input, &buffer);
+        qv_reverse_flag[class_i] = buffer != 0;
     }
 
     readBit(input, &buffer);
     crps_flag = buffer!=0;
     if(crps_flag){
-        //parse parameter set crps;
+        parameter_set_crps = readParameterSetCrps(input);
     }
 
     Encoding_ParametersType* encodingParameters = malloc(sizeof(Encoding_ParametersType));
@@ -3177,10 +3610,55 @@ Encoding_ParametersType* readEncodingParameters(InputBitstream* input){
     encodingParameters->qvps_flag = qvps_flag;
     encodingParameters->parameter_set_qvps = parameter_set_qvps;
     encodingParameters->qvps_preset_ID = default_qvps_ID;
+    encodingParameters->qv_reverse_flag = qv_reverse_flag;
     encodingParameters->crps_flag = crps_flag;
     encodingParameters->parameter_set_crps = parameter_set_crps;
 
     return encodingParameters;
+}
+
+Parameter_set_qvpsType *readParameterSetQvps(InputBitstream *input) {
+    uint8_t qv_num_codebooks_total;
+    if(!readNBits8(input, 4, &qv_num_codebooks_total)){
+        fprintf(stderr, "Error reading number qv_num_codebooks_total");
+    };
+    uint8_t* qv_num_codebook_entries = (uint8_t*)malloc(qv_num_codebooks_total* sizeof(uint8_t));
+    uint8_t** qv_recon = (uint8_t**)malloc(qv_num_codebooks_total * sizeof(uint8_t*));
+
+    bool allCorrect = true;
+    for(uint8_t b=0; b<qv_num_codebooks_total; b++){
+        if(!readNBits8(input, 8, qv_num_codebook_entries+b)){
+            allCorrect = false;
+            break;
+        }
+        qv_recon[b] = (uint8_t*)malloc(qv_num_codebook_entries[b]* sizeof(uint8_t));
+        if(qv_recon[b] == NULL){
+            allCorrect = false;
+            break;
+        }
+        for(uint8_t e=0; e < qv_num_codebook_entries[b]; e++) {
+            if (!readNBits8(input, 8, &(qv_recon[b][e]))){
+                allCorrect = false;
+                break;
+            }
+        }
+    }
+    if(!allCorrect){
+        for(uint8_t b=0; b<qv_num_codebooks_total; b++){
+            free(qv_recon[b]);
+        }
+        free(qv_recon);
+        free(qv_num_codebook_entries);
+
+        return NULL;
+    }
+
+
+    return constructParameterSetQvpsType(
+            qv_num_codebooks_total,
+            qv_num_codebook_entries,
+            qv_recon
+    );
 }
 
 void freeEncodingParameters(Encoding_ParametersType* encodingParametersType){
@@ -3198,4 +3676,138 @@ void freeEncodingParameters(Encoding_ParametersType* encodingParametersType){
         freeParameterSetCrps(encodingParametersType->parameter_set_crps);
     }
     free(encodingParametersType);
+}
+
+Parameter_set_crpsType* readParameterSetCrps(InputBitstream* inputBitstream){
+    uint8_t cr_alg_ID;
+    if (!readNBits8(inputBitstream, 8, &cr_alg_ID)){
+        fprintf(stderr, "Could not read cr_alg_ID.\n");
+        return NULL;
+    }
+    uint8_t cr_pad_size = 0;
+    uint32_t cr_buf_max_size = 0;
+    if(cr_alg_ID == 2 || cr_alg_ID == 3){
+        if(
+            !readNBits8(inputBitstream, 8, &cr_pad_size)
+            || !readNBitsBigToNativeEndian32(inputBitstream, 32, &cr_buf_max_size)
+        ){
+            fprintf(stderr, "Could not read cr_pad_size or cr_buf_max_size.\n");
+            return NULL;
+        }
+    }
+    return constructParameterSetCrps(cr_alg_ID, cr_pad_size, cr_buf_max_size);
+}
+
+size_t getSizeParametersCrps(Parameter_set_crpsType* parameter_set_crpsType){
+    size_t sizeInBits = 0;
+    sizeInBits += 8; //cr_alg_ID
+    if(parameter_set_crpsType->cr_alg_ID == 2 || parameter_set_crpsType->cr_alg_ID == 3){
+        sizeInBits += 8; //cr_pad_size
+        sizeInBits += 24; //cr_buf_max_size
+    }
+    return sizeInBits;
+}
+
+Parameter_set_qvpsType* copyParameter_set_qvps(Parameter_set_qvpsType* input){
+    Parameter_set_qvpsType* result = malloc(sizeof(Parameter_set_qvpsType));
+    result->qv_num_codebooks_total = input->qv_num_codebooks_total;
+    result->qv_num_codebook_entries = malloc(sizeof(uint8_t) * input->qv_num_codebooks_total);
+    result->qv_recon = malloc(sizeof(uint8_t*)*input->qv_num_codebooks_total);
+    for(uint8_t qv_codebook_i=0; qv_codebook_i < input->qv_num_codebooks_total; qv_codebook_i++){
+        result->qv_num_codebook_entries[qv_codebook_i] = input->qv_num_codebook_entries[qv_codebook_i];
+        result->qv_recon[qv_codebook_i] = malloc(sizeof(uint8_t)*result->qv_num_codebook_entries[qv_codebook_i]);
+        for(uint8_t entry_i=0; entry_i < input->qv_num_codebook_entries[qv_codebook_i]; entry_i++){
+            result->qv_recon[qv_codebook_i][entry_i] = input->qv_recon[qv_codebook_i][entry_i];
+        }
+    }
+    return result;
+}
+
+Encoding_ParametersType* copyEncodingParameters(Encoding_ParametersType* encodingParametersType){
+    Encoding_ParametersType* encodingParametersTypeCopy = malloc(sizeof(Encoding_ParametersType));
+    uint8_t dataset_type;
+    encodingParametersTypeCopy->dataset_type = encodingParametersType->dataset_type;
+    encodingParametersTypeCopy->alphabet_ID = encodingParametersType->alphabet_ID;
+    encodingParametersTypeCopy->read_length = encodingParametersType->read_length;
+    encodingParametersTypeCopy->number_of_template_segments_minus1 =
+            encodingParametersType->number_of_template_segments_minus1;
+
+    encodingParametersTypeCopy->max_au_data_unit_size = encodingParametersType->max_au_data_unit_size;
+    encodingParametersTypeCopy->pos_40_bits = encodingParametersType->pos_40_bits;
+    encodingParametersTypeCopy->qv_depth = encodingParametersType->qv_depth;
+    encodingParametersTypeCopy->as_depth = encodingParametersType->as_depth;
+    encodingParametersTypeCopy->num_classes = encodingParametersType->num_classes;
+    encodingParametersTypeCopy->classID = malloc((sizeof(uint8_t)*encodingParametersType->num_classes));
+    for(size_t class_i = 0; class_i < encodingParametersType->num_classes; class_i++){
+        encodingParametersTypeCopy->classID[class_i] = encodingParametersType->classID[class_i];
+    }
+
+    encodingParametersTypeCopy->dec_cfg_preset = malloc(sizeof(uint8_t*)*18);
+    encodingParametersTypeCopy->encoding_mode_id = malloc(sizeof(uint8_t*)*18);
+    encodingParametersTypeCopy->decoderConfiguration = malloc(sizeof(void**)*18);
+    for(size_t descriptor_i=0; descriptor_i<18; descriptor_i++){
+        encodingParametersTypeCopy->class_specific_dec_cfg_flag[descriptor_i] =
+                encodingParametersType->class_specific_dec_cfg_flag[descriptor_i];
+        size_t endLoop = encodingParametersType->class_specific_dec_cfg_flag[descriptor_i] ?
+                         encodingParametersType->num_classes : 1;
+        encodingParametersTypeCopy->dec_cfg_preset[descriptor_i] = malloc(sizeof(uint8_t)*endLoop);
+        encodingParametersTypeCopy->encoding_mode_id[descriptor_i] = malloc(sizeof(uint8_t)*endLoop);
+        encodingParametersTypeCopy->decoderConfiguration[descriptor_i] = malloc(sizeof(void*)*endLoop);
+        for(size_t class_i=0; class_i < endLoop; class_i++){
+            encodingParametersTypeCopy->dec_cfg_preset[descriptor_i][class_i] =
+                    encodingParametersType->dec_cfg_preset[descriptor_i][class_i];
+            encodingParametersTypeCopy->encoding_mode_id[descriptor_i][class_i] =
+                    encodingParametersType->encoding_mode_id[descriptor_i][class_i];
+            if(descriptor_i != 11 && descriptor_i != 15) {
+                encodingParametersTypeCopy->decoderConfiguration[descriptor_i][class_i] = copyDecoderConfigurationTypeCABAC(
+                        encodingParametersType->decoderConfiguration[descriptor_i][class_i]
+                );
+            }else{
+                encodingParametersTypeCopy->decoderConfiguration[descriptor_i][class_i] =
+                        copyDecoder_configuration_tokentypeCABAC(
+                                encodingParametersType->decoderConfiguration[descriptor_i][class_i]
+                );
+            }
+        }
+    }
+
+    encodingParametersTypeCopy->num_groups = encodingParametersType->num_groups;
+    encodingParametersTypeCopy->rgroup_ID = malloc(sizeof(char*)*encodingParametersType->num_groups);
+    for(size_t group_i=0; group_i < encodingParametersType->num_groups; group_i++){
+        encodingParametersTypeCopy->rgroup_ID[group_i] = strdup(encodingParametersType->rgroup_ID[group_i]);
+    }
+    encodingParametersTypeCopy ->multiple_alignments_flag = encodingParametersType->multiple_alignments_flag;
+    encodingParametersTypeCopy ->spliced_reads_flag = encodingParametersType->spliced_reads_flag;
+    encodingParametersTypeCopy ->multiple_signature_base = encodingParametersType->multiple_signature_base;
+    encodingParametersTypeCopy ->U_signature_size = encodingParametersType->U_signature_size;
+
+    encodingParametersTypeCopy->qv_coding_mode = malloc(sizeof(uint8_t)*encodingParametersType->num_classes);
+    encodingParametersTypeCopy->qvps_flag = malloc(sizeof(bool)*encodingParametersType->num_classes);
+    encodingParametersTypeCopy->parameter_set_qvps = malloc(sizeof(Parameter_set_qvpsType*)*encodingParametersType->num_classes);
+    encodingParametersTypeCopy->qvps_preset_ID = malloc(sizeof(uint8_t *)*encodingParametersType->num_classes);
+    encodingParametersTypeCopy->qv_reverse_flag = malloc(sizeof(bool)*encodingParametersType->num_classes);
+
+    for(size_t class_i=0; class_i < encodingParametersType->num_classes; class_i++){
+        encodingParametersTypeCopy->qv_coding_mode[class_i] = encodingParametersType->qv_coding_mode[class_i];
+        encodingParametersTypeCopy->qvps_flag[class_i] = encodingParametersType->qvps_flag[class_i];
+        if(encodingParametersTypeCopy->qvps_flag[class_i]) {
+            encodingParametersTypeCopy->parameter_set_qvps[class_i] = copyParameter_set_qvps(
+                encodingParametersType->parameter_set_qvps[class_i]
+            );
+        }else{
+            encodingParametersTypeCopy->qvps_preset_ID[class_i] = encodingParametersType->qvps_preset_ID[class_i];
+            encodingParametersTypeCopy->parameter_set_qvps[class_i] = NULL;
+        }
+        encodingParametersTypeCopy->qv_reverse_flag[class_i] = encodingParametersType->qv_reverse_flag[class_i];
+    }
+
+    encodingParametersTypeCopy->crps_flag = encodingParametersType->crps_flag;
+    if(encodingParametersType->crps_flag){
+        encodingParametersTypeCopy->parameter_set_crps =
+                copyParameterSetCrps(encodingParametersType->parameter_set_crps);
+    } else {
+        encodingParametersTypeCopy->parameter_set_crps = NULL;
+    }
+
+    return encodingParametersTypeCopy;
 }

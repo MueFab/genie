@@ -13,7 +13,7 @@ bool writeDataUnitBlockHeader(FILE *outputFile, DataUnitBlockHeader *dataUnitBlo
     if(dataUnitBlockHeader == NULL){
         return false;
     }
-    uint8_t descriptorIdReservedPadding = dataUnitBlockHeader->descriptorId<<1;
+    uint8_t descriptorIdReservedPadding = dataUnitBlockHeader->descriptorId;
     bool descriptorIdReservedPaddingSuccessfulWrite = utils_write(descriptorIdReservedPadding, outputFile);
     bool blockSizeSuccessfulWrite = writeBigEndian32ToFile(dataUnitBlockHeader->blockSize, outputFile);
 

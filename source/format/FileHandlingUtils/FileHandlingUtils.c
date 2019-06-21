@@ -5,29 +5,33 @@
 #include <DescriptorTreeNode.h>
 #include "FileHandlingUtils.h"
 
-int writeAccessUnitsFromMIT_seq_au_class(DatasetContainer* datasetContainer, FILE* outputFile);
-int writeAccessUnitsFromMIT_seq_class_au(DatasetContainer *datasetContainer, FILE *outputFile);
-int writeAccessUnitsNotFromMIT(DatasetContainer* datasetContainer, FILE* outputFile);
+int writeAccessUnitsFromMIT_seq_au_class(
+        DatasetContainer* datasetContainer,
+        bool requiredDataUnitsParameters[],
+        Vector* dataUnitAccessUnits,
+        SequenceRequest sequenceRequest
+);
+int writeAccessUnitsFromMIT_seq_class_au(
+        DatasetContainer* datasetContainer,
+        bool requiredDataUnitsParameters[],
+        Vector* dataUnitAccessUnits,
+        SequenceRequest sequenceRequest
+);
+int writeAccessUnitsNotFromMIT(
+        DatasetContainer* datasetContainer,
+        bool requiredDataUnitsParameters[],
+        Vector* dataUnitAccessUnits,
+        SequenceRequest sequenceRequest
+);
 bool dataUnitAccessUnitIntersects(DataUnitAccessUnit* dataUnitAccessUnit, DatasetRequest datasetRequest);
-bool referenceDataUnitAccessUnitIntersects(DataUnitAccessUnit* dataUnitAccessUnit, DatasetRequest datasetRequest);
 void addDataUnitAccessUnitAndDependenciesIfRequired(DataUnitAccessUnit *dataUnitAccessUnit, DataUnits *dataUnits,
                                                     DatasetRequest datasetRequest, DatasetGroupId datatasetGroupId,
                                                     DatasetContainer *datasetContainer);
-void addReferenceDataUnitAccessUnitAndDependenciesIfRequired(DataUnitAccessUnit *dataUnitAccessUnit, DataUnits *dataUnits,
-                                                             DatasetRequest datasetRequest, DatasetGroupId datatasetGroupId,
-                                                             DatasetContainer *datasetContainer);
 uint8_t addParametersInformation(
         DataUnits* dataUnits,
         DatasetContainer* datasetContainer,
         uint8_t parametersId,
         DatasetGroupId datasetGroupId
-);
-
-int extractAccessUnitsFromMIT(
-        DatasetGroupId datasetGroupId,
-        DatasetContainer* datasetContainer,
-        DatasetRequest datasetRequest,
-        DataUnits* dataUnits
 );
 int extractAccessUnitsNotFromMIT(
         DatasetGroupId datasetGroupId,
@@ -35,20 +39,13 @@ int extractAccessUnitsNotFromMIT(
         DatasetRequest datasetRequest,
         DataUnits* dataUnits
 );
-int extractReferenceAccessUnitsNotFromMIT(
-        DatasetGroupId datasetGroupId,
-        DatasetContainer* datasetContainer,
-        DatasetRequest datasetRequest,
-        DataUnits* dataUnits
-);
-int extractReferenceAccessUnitsFromMIT(
-        DatasetGroupId datasetGroupId,
-        DatasetContainer* datasetContainer,
-        DatasetRequest datasetRequest,
-        DataUnits* dataUnits
-);
 
 
+bool matchesOneClassRequest(
+        SequenceRequest request,
+        DatasetContainer* datasetContainer,
+        DataUnitAccessUnit *dataUnitAccessUnit
+);
 
 Ref_information readRefInformation(char* refInfoFilePath){
     FILE* refInfoInputFile = fopen(refInfoFilePath, "r");
@@ -62,7 +59,7 @@ Ref_information readRefInformation(char* refInfoFilePath){
         printf("> errno:%d feof:%d ferror:%d retval:%p s[0]:%d\n\n",
                errno, feof(refInfoInputFile), ferror(refInfoInputFile), returnedValue, ref_information.refUri[0]);
     }
-    fscanf(refInfoInputFile, "%hhu\n", &(ref_information.numberSequences));
+    fscanf(refInfoInputFile, "%i\n", &(ref_information.numberSequences));
     ref_information.sequenceName = (char**)calloc(ref_information.numberSequences, sizeof(char*));
     for(int i=0; i<ref_information.numberSequences; i++){
         ref_information.sequenceName[i] = (char*)calloc(1024, sizeof(char));
@@ -111,75 +108,209 @@ int readAndClone(char* filename, char* outputFileName){
     return 0;
 }
 
-int writeAccessUnitsFromMIT_seq_au_class(DatasetContainer* datasetContainer, FILE* outputFile){
-    uint16_t num_sequences = getSequencesCount(getDatasetHeader(datasetContainer));
-    for (uint16_t sequence_i = 0; sequence_i < num_sequences; sequence_i++) {
-        uint32_t numAUs = getBlocksInSequence(getDatasetHeader(datasetContainer), sequence_i);
-        for (uint32_t au_i = 0; au_i < numAUs; au_i++) {
-            uint8_t numClasses = getClassesCount(getDatasetHeader(datasetContainer));
-            for (uint8_t class_i = 0; class_i < numClasses; class_i++) {
-                SequenceID sequenceID = getSequenceId(datasetContainer->datasetHeader, sequence_i);
-                DataUnitAccessUnit *dataUnitAccessUnit = getDataUnitAccessUnit(
-                        datasetContainer,
-                        sequenceID,
-                        class_i,
-                        au_i
-                );
-                if (dataUnitAccessUnit == NULL) continue;
+int readAndCloneBitstream(char* filename, char* outputFileName){
+    FILE* inputFile = fopen(filename,"rb");
+    if(inputFile == NULL){
+        fprintf(stderr,"File not found.\n");
+        return -1;
+    }
+    DataUnits* dataUnits;
+    parseDataUnits(inputFile, &dataUnits, filename);
+    fclose(inputFile);
 
-                uint8_t datasetType = getDatasetType(getDatasetHeader(datasetContainer));
-                bool pos40Bits = isPosOffsetUint40(getDatasetHeader(datasetContainer));
-                bool writeSuccessful = writeDataUnitAccessUnit(dataUnitAccessUnit, false, datasetType, pos40Bits, outputFile);
-                if (!writeSuccessful) {
-                    fprintf(stderr, "Error while writing.\n");
-                    return -1;
-                }
+    if (dataUnits == NULL){
+        fprintf(stderr, "data units could not be read.\n");
+        return -1;
+    }else{
 
-                freeDataUnitAccessUnit(dataUnitAccessUnit);
+        FILE* outputFile = fopen(outputFileName,"wb");
+        if(outputFile == NULL){
+            fprintf(stderr,"Output file could not be opened.\n");
+        }else{
+            bool writeSuccessful = writeDataUnits(dataUnits, outputFile);
+            if (!writeSuccessful){
+                fprintf(stderr, "Error while writing.\n");
             }
         }
+
+        freeDataUnits(dataUnits);
     }
     return 0;
 }
 
-int writeAccessUnitsFromMIT_seq_class_au(DatasetContainer *datasetContainer, FILE *outputFile){
-    uint16_t num_sequences = getSequencesCount(getDatasetHeader(datasetContainer));
-    for (uint16_t sequence_i = 0; sequence_i < num_sequences; sequence_i++) {
+void markedParametersAsRequired(
+    DatasetContainer* datasetContainer,
+    uint8_t datasetParametersId,
+    bool requiredDataUnits[]
+){
+    size_t numberParameters = getSize(datasetContainer->datasetParameters);
+    for(size_t parameter_i=0; parameter_i < numberParameters; parameter_i++){
+        DatasetParameters* datasetParameters = getValue(datasetContainer->datasetParameters, parameter_i);
+        if(datasetParameters->parameter_set_ID == datasetParametersId){
+            if(datasetParameters->parameter_set_ID != datasetParameters->parent_parameter_set_ID){
+                markedParametersAsRequired(
+                        datasetContainer,
+                        datasetParameters->parent_parameter_set_ID,
+                        requiredDataUnits
+                );
+            }
+            requiredDataUnits[parameter_i] = true;
+        }
+    }
+}
+
+int writeAccessUnitsFromMIT_seq_au_class(
+        DatasetContainer* datasetContainer,
+        bool requiredDataUnitsParameters[],
+        Vector* dataUnitAccessUnits,
+        SequenceRequest sequenceRequest
+){
+    uint16_t sequenceIndex;
+    getSequenceIndex(datasetContainer->datasetHeader, sequenceRequest.sequenceID, &sequenceIndex);
+
+    uint32_t numAUs = getBlocksInSequence(getDatasetHeader(datasetContainer), sequenceIndex);
+    for (uint32_t au_i = 0; au_i < numAUs; au_i++) {
         uint8_t numClasses = getClassesCount(getDatasetHeader(datasetContainer));
         for (uint8_t class_i = 0; class_i < numClasses; class_i++) {
-            uint32_t numAUs = getBlocksInSequence(getDatasetHeader(datasetContainer), sequence_i);
-            for (uint32_t au_i = 0; au_i < numAUs; au_i++) {
-                SequenceID sequenceID;
-                sequenceID.sequenceID = sequence_i;
-                DataUnitAccessUnit *dataUnitAccessUnit = getDataUnitAccessUnit(
-                        datasetContainer,
-                        sequenceID,
-                        class_i,
-                        au_i
-                );
-                if (dataUnitAccessUnit == NULL) continue;
+            DataUnitAccessUnit *dataUnitAccessUnit = getDataUnitAccessUnit(
+                    datasetContainer,
+                    sequenceRequest.sequenceID,
+                    class_i,
+                    au_i
+            );
+            if (dataUnitAccessUnit == NULL) continue;
 
-                uint8_t datasetType = getDatasetType(getDatasetHeader(datasetContainer));
-                bool pos40Bits = isPosOffsetUint40(getDatasetHeader(datasetContainer));
-                bool writeSuccessful = writeDataUnitAccessUnit(dataUnitAccessUnit, false, datasetType, pos40Bits, outputFile);
-                if (!writeSuccessful) {
-                    fprintf(stderr, "Error while writing.\n");
-                    return -1;
-                }
-
-                freeDataUnitAccessUnit(dataUnitAccessUnit);
+            if(
+                    !matchesOneClassRequest(
+                            sequenceRequest,
+                            datasetContainer,
+                            dataUnitAccessUnit
+                    )
+            ){
+                continue;
             }
+
+
+            markedParametersAsRequired(
+                    datasetContainer,
+                    dataUnitAccessUnit->parameterSetId,
+                    requiredDataUnitsParameters
+            );
+
+            pushBack(dataUnitAccessUnits, dataUnitAccessUnit);
         }
     }
     return 0;
 }
 
-int writeAccessUnitsNotFromMIT(DatasetContainer* datasetContainer, FILE* outputFile){
+bool matchesOneClassRequest(
+        SequenceRequest request,
+        DatasetContainer* datasetContainer,
+        DataUnitAccessUnit *dataUnitAccessUnit
+) {
+    if(request.sequenceID.sequenceID != dataUnitAccessUnit->sequenceId.sequenceID){
+        return false;
+    }
+    for(size_t classRequest_i=0; classRequest_i < request.numberClassesRequest; classRequest_i++){
+        ClassRequest classRequest = request.classRequest[classRequest_i];
+
+        if(classRequest.classType.classType != dataUnitAccessUnit->AU_type.classType){
+            continue;
+        }
+
+        DatasetParameters* datasetParameters;
+        getDatasetParametersById(
+                datasetContainer,
+                dataUnitAccessUnit->parameterSetId,
+                &datasetParameters
+        );
+        uint32_t readLength = datasetParameters->encoding_parameters->read_length;
+        uint32_t threshold;
+
+        uint16_t sequenceIndex;
+        getSequenceIndex(
+                datasetContainer->datasetHeader,
+                request.sequenceID,
+                &sequenceIndex
+        );
+
+        getThresholdForSequence(datasetContainer->datasetHeader, sequenceIndex, &threshold);
+
+        uint64_t startAccessUnit = dataUnitAccessUnit->auStartPosition;
+        uint64_t effectiveEndAccessUnit = dataUnitAccessUnit->auEndPosition + threshold + readLength;
+
+        uint64_t minEnd = classRequest.end < effectiveEndAccessUnit ? classRequest.end : effectiveEndAccessUnit;
+        uint64_t maxStart = classRequest.start > startAccessUnit ? classRequest.start : startAccessUnit;
+
+        if(maxStart <= minEnd){
+            return true;
+        }
+
+    }
+
+    return false;
+}
+
+int writeAccessUnitsFromMIT_seq_class_au(
+        DatasetContainer* datasetContainer,
+        bool requiredDataUnitsParameters[],
+        Vector* dataUnitAccessUnits,
+        SequenceRequest sequenceRequest
+){
+    uint16_t sequenceIndex;
+    getSequenceIndex(datasetContainer->datasetHeader, sequenceRequest.sequenceID, &sequenceIndex);
+
+    uint8_t numClasses = getClassesCount(getDatasetHeader(datasetContainer));
+    for (uint8_t class_i = 0; class_i < numClasses; class_i++) {
+        uint32_t numAUs = getBlocksInSequence(getDatasetHeader(datasetContainer), sequenceIndex);
+        for (uint32_t au_i = 0; au_i < numAUs; au_i++) {
+            DataUnitAccessUnit *dataUnitAccessUnit = getDataUnitAccessUnit(
+                    datasetContainer,
+                    sequenceRequest.sequenceID,
+                    class_i,
+                    au_i
+            );
+            if (dataUnitAccessUnit == NULL) continue;
+
+            if(
+                    !matchesOneClassRequest(
+                            sequenceRequest,
+                            datasetContainer,
+                            dataUnitAccessUnit
+                    )
+                    ){
+                continue;
+            }
+
+
+            markedParametersAsRequired(
+                    datasetContainer,
+                    dataUnitAccessUnit->parameterSetId,
+                    requiredDataUnitsParameters
+            );
+
+            pushBack(dataUnitAccessUnits, dataUnitAccessUnit);
+        }
+    }
+    return 0;
+}
+
+int writeAccessUnitsNotFromMIT(
+        DatasetContainer* datasetContainer,
+        bool requiredDataUnitsParameters[],
+        Vector* dataUnitAccessUnits,
+        SequenceRequest sequenceRequest
+){
     Vector* accessUnits = getDataUnitAccessUnits(datasetContainer);
     size_t numberAccessUnits = getSize(accessUnits);
     for(size_t accessUnit_i = 0; accessUnit_i < numberAccessUnits; accessUnit_i++){
         AccessUnitContainer* accessUnitContainer = getValue(accessUnits, accessUnit_i);
         AccessUnitHeader* accessUnitHeader = getAccessUnitHeader(accessUnitContainer);
+
+        if(sequenceRequest.sequenceID.sequenceID != getAccessUnitSequenceID(accessUnitHeader).sequenceID){
+            continue;
+        }
+
         DataUnitAccessUnit* dataUnitAccessUnit = initDataUnitAccessUnit(
                 getAccessUnitId(accessUnitHeader),
                 getNumBlocks(accessUnitHeader),
@@ -218,16 +349,22 @@ int writeAccessUnitsNotFromMIT(DatasetContainer* datasetContainer, FILE* outputF
             addBlockToDataUnitAccessUnit(dataUnitAccessUnit, newBlock, dataUnitBlockHeader);
         }
 
-        uint8_t datasetType = getDatasetType(getDatasetHeader(datasetContainer));
-        bool posIs40Bits = isPosOffsetUint40(getDatasetHeader(datasetContainer));
-
-        writeDataUnitAccessUnit(dataUnitAccessUnit, false, datasetType, posIs40Bits, outputFile);
-        freeDataUnitAccessUnit(dataUnitAccessUnit);
+        if(matchesOneClassRequest(sequenceRequest, datasetContainer, dataUnitAccessUnit)){
+            markedParametersAsRequired(
+                datasetContainer,
+                dataUnitAccessUnit->parameterSetId,
+                requiredDataUnitsParameters
+            );
+            pushBack(dataUnitAccessUnits, dataUnitAccessUnit);
+        }
     }
     return 0;
 }
 
-int createMPEG_GFileFromWriteByteStreams(char *inputFilename, char *outputFilename){
+/*int createMPEG_GFileFromWriteByteStreams(
+        char *inputFilename,
+        char *outputByteStreamFilename
+){
     FILE* inputFile = fopen(inputFilename,"rb");
     if(inputFile == NULL){
         fprintf(stderr,"File not found.\n");
@@ -240,7 +377,7 @@ int createMPEG_GFileFromWriteByteStreams(char *inputFilename, char *outputFilena
         fprintf(stderr, "file could not be read.\n");
         return -1;
     }else{
-        FILE* outputFile = fopen(outputFilename,"wb");
+        FILE* outputFile = fopen(outputByteStreamFilename,"wb");
 
 
         if(outputFile == NULL){
@@ -255,7 +392,7 @@ int createMPEG_GFileFromWriteByteStreams(char *inputFilename, char *outputFilena
             for(size_t parameters_i = 0; parameters_i<numberParameters; parameters_i++) {
                 DatasetParameters* datasetParameters;
                 getDatasetParameters(datasetContainer, parameters_i, &datasetParameters);
-                ParametersSet* dataUnitParameterSet = initParametersSet(
+                DataUnitParametersSet* dataUnitParameterSet = initParametersSet(
                         datasetParameters->parent_parameter_set_ID,
                         datasetParameters->parameter_set_ID,
                         datasetParameters->dataset_type,
@@ -279,7 +416,7 @@ int createMPEG_GFileFromWriteByteStreams(char *inputFilename, char *outputFilena
             }
         }
 
-        free(outputFilename);
+        free(outputByteStreamFilename);
         freeFile(file);
     }
     return 0;
@@ -314,7 +451,7 @@ int createMPEGGFileNoMITFromByteStream(char *fileName, char* refInfoPath, char* 
     size_t parametersCount = getSize(parameters);
     bool isAReferenceFile = false;
     for(size_t parameters_i = 0; parameters_i < parametersCount; parameters_i++){
-        ParametersSet* parametersSet = getValue(parameters, parameters_i);
+        DataUnitParametersSet* parametersSet = getValue(parameters, parameters_i);
         pushBack(datasetParameters, initDatasetParametersWithParameters(
                 0,0,parametersSet->parent_parameter_setId, parametersSet->parameter_setId,
                 parametersSet->dataset_type,
@@ -542,7 +679,6 @@ int createMPEGGFileNoMITFromByteStream(char *fileName, char* refInfoPath, char* 
             BlockHeader* blockHeader = initBlockHeader(
                     datasetContainer,
                     block->blockHeader->descriptorId,
-                    false,
                     block->blockHeader->payloadSize
             );
             setBlockHeader(blockToAdd, blockHeader);
@@ -736,7 +872,7 @@ int createMPEGGFileMIT_AUC_FromByteStream(char *fileName, char* outputFileName){
     }
 
     for(size_t parameters_i = 0; parameters_i < parametersCount; parameters_i++){
-        ParametersSet* parametersSet = getValue(parameters, parameters_i);
+        DataUnitParametersSet* parametersSet = getValue(parameters, parameters_i);
         pushBack(datasetParameters, initDatasetParametersWithParameters(
                 0,0,parametersSet->parent_parameter_setId, parametersSet->parameter_setId,
                 parametersSet->dataset_type,
@@ -833,7 +969,6 @@ int createMPEGGFileMIT_AUC_FromByteStream(char *fileName, char* outputFileName){
             BlockHeader* blockHeader = initBlockHeader(
                     datasetContainer,
                     block->blockHeader->descriptorId,
-                    false,
                     block->blockHeader->payloadSize
             );
             setBlockHeader(blockToAdd, blockHeader);
@@ -1127,7 +1262,7 @@ int createMPEGGFile_DSC_FromByteStream(char *fileName, char* outputFileName){
     }
 
     for(size_t parameters_i = 0; parameters_i < parametersCount; parameters_i++){
-        ParametersSet* parametersSet = getValue(parameters, parameters_i);
+        DataUnitParametersSet* parametersSet = getValue(parameters, parameters_i);
         pushBack(datasetParameters, initDatasetParametersWithParameters(
                 0,0,parametersSet->parent_parameter_setId, parametersSet->parameter_setId,
                 parametersSet->dataset_type,
@@ -1331,8 +1466,15 @@ int createMPEGGFile_DSC_FromByteStream(char *fileName, char* outputFileName){
 
     return 0;
 }
+*/
 
-int readAndWriteByteStreams(char *filename, char* outputFilename){
+int readAndWriteBitstreamNoFilter(
+        char *filename,
+        char *outputBitstreamFilename,
+        char *outputReferenceFilename,
+        DatasetGroupId datasetGroupId,
+        DatasetId datasetId
+){
     FILE* inputFile = fopen(filename,"rb");
     if(inputFile == NULL){
         fprintf(stderr,"File not found.\n");
@@ -1345,44 +1487,93 @@ int readAndWriteByteStreams(char *filename, char* outputFilename){
         fprintf(stderr, "mpeggFile could not be read.\n");
         return -1;
     }else{
-        FILE* outputFile = fopen(outputFilename,"wb");
+        FILE* outputFile = fopen(outputBitstreamFilename,"wb");
 
 
         if(outputFile == NULL){
             fprintf(stderr,"Output mpeggFile could not be opened.\n");
-        }else{
-            DatasetsGroupContainer* datasetsGroupContainer = getDatasetGroupContainerByIndex(mpeggFile, 0);
-            DatasetContainer* datasetContainer = getDatasetContainerByIndex(datasetsGroupContainer, 0);
+            return -1;
+        }
 
-            size_t numberParameters;
-            getNumberParameters(datasetContainer, &numberParameters);
+        DatasetsGroupContainer* datasetsGroupContainer = getDatasetGroupContainerById(mpeggFile, datasetGroupId);
+        if(datasetsGroupContainer == NULL){
+            fprintf(stderr, "Could not find dataset group.\n");
+            return -1;
+        }
+        DatasetContainer* datasetContainer = getDatasetContainerById(datasetsGroupContainer, datasetId);
+        if(datasetContainer == NULL){
+            fprintf(stderr, "Could not find dataset.\n");
+            return -1;
+        }
 
-            for(size_t parameters_i = 0; parameters_i<numberParameters; parameters_i++) {
-                DatasetParameters* datasetParameters;
-                getDatasetParameters(datasetContainer, parameters_i, &datasetParameters);
-                ParametersSet* dataUnitParameterSet = initParametersSet(
-                        datasetParameters->parent_parameter_set_ID,
-                        datasetParameters->parameter_set_ID,
-                        datasetParameters->dataset_type,
-                        datasetParameters->alphabet_ID,
-                        datasetParameters->reads_length,
-                        datasetParameters->number_of_template_segments_minus1,
-                        datasetParameters->max_au_data_unit_size,
-                        datasetParameters->pos_40_bits,
-                        datasetParameters->qv_depth,
-                        datasetParameters->as_depth,
-                        datasetParameters->parameters
-                );
-                writeParametersSet(dataUnitParameterSet, outputFile);
-                freeDataUnitsParametersSet(dataUnitParameterSet);
+        size_t numberParameters = getSize(datasetContainer->datasetParameters);
+        bool* requiredParameters = malloc(sizeof(bool)*numberParameters);
+
+
+        Vector* dataUnitParameters = initVector();
+        Vector* dataUnitAccessUnits = initVector();
+
+        for(
+                uint16_t sequence_index = 0;
+                sequence_index < datasetContainer->datasetHeader->sequencesCount;
+                sequence_index++
+        ){
+            SequenceID sequenceId = getSequenceId(
+                    datasetContainer->datasetHeader,
+                    sequence_index
+            );
+            SequenceRequest sequenceRequest;
+            sequenceRequest.sequenceID = sequenceId;
+            sequenceRequest.classRequest = malloc(sizeof(ClassRequest)*5);
+            sequenceRequest.numberClassesRequest = 5;
+            for(uint8_t i=0; i<5; i++){
+                sequenceRequest.classRequest[i].classType.classType = i+1;
+                sequenceRequest.classRequest[i].start = 0;
+                sequenceRequest.classRequest[i].end = ((uint64_t)1)<<40;
             }
 
             if(isMITFlagSet(getDatasetHeader(datasetContainer))) {
-                writeAccessUnitsFromMIT_seq_au_class(datasetContainer, outputFile);
+                writeAccessUnitsFromMIT_seq_au_class(
+                        datasetContainer,
+                        requiredParameters,
+                        dataUnitAccessUnits,
+                        sequenceRequest
+                );
             }else{
-                writeAccessUnitsNotFromMIT(datasetContainer, outputFile);
+                writeAccessUnitsNotFromMIT(
+                        datasetContainer,
+                        requiredParameters,
+                        dataUnitAccessUnits,
+                        sequenceRequest
+                );
+            }
+
+            free(sequenceRequest.classRequest);
+        }
+
+        for(size_t parameter_i=0; parameter_i < numberParameters; parameter_i++){
+            if(requiredParameters[parameter_i]){
+                DatasetParameters* datasetParameters = getValue(
+                        datasetContainer->datasetParameters,
+                        parameter_i
+                );
+                DataUnitParametersSet* dataUnitParametersSet = initParametersSet(
+                        datasetParameters->parent_parameter_set_ID,
+                        datasetParameters->parameter_set_ID,
+                        copyEncodingParameters(datasetParameters->encoding_parameters)
+                );
+                pushBack(dataUnitParameters, dataUnitParametersSet);
             }
         }
+
+        DataUnits* dataUnits = initDataUnits();
+        dataUnits->parameters = dataUnitParameters;
+        dataUnits->dataUnitsAccessUnits = dataUnitAccessUnits;
+
+
+        writeDataUnits(dataUnits, outputFile);
+        freeDataUnits(dataUnits);
+
         
         freeFile(mpeggFile);
     }
@@ -1428,31 +1619,7 @@ void extractRequestedInformationFromDataset(DatasetGroupId datasetGroupId, Datas
                 dataUnits
         );
     }else{
-        extractAccessUnitsFromMIT(
-                datasetGroupId,
-                datasetContainer,
-                request,
-                dataUnits
-        );
-    }
-}
 
-void extractRequestedReferenceInformationFromDataset(DatasetGroupId datasetGroupId, DatasetContainer *datasetContainer,
-                                            DatasetRequest request, DataUnits *dataUnits) {
-    if(isMITFlagSet(datasetContainer->datasetHeader)){
-        extractReferenceAccessUnitsNotFromMIT(
-                datasetGroupId,
-                datasetContainer,
-                request,
-                dataUnits
-        );
-    }else{
-        extractReferenceAccessUnitsFromMIT(
-                datasetGroupId,
-                datasetContainer,
-                request,
-                dataUnits
-        );
     }
 }
 
@@ -1492,122 +1659,6 @@ void extractRequestedReferenceInformationFromDataset(DatasetGroupId datasetGroup
 
 }*/
 
-
-int extractAccessUnitsFromMIT(
-        DatasetGroupId datasetGroupId,
-        DatasetContainer* datasetContainer,
-        DatasetRequest datasetRequest,
-        DataUnits* dataUnits
-){
-    uint16_t num_sequences = getSequencesCount(getDatasetHeader(datasetContainer));
-    for (uint16_t sequence_i = 0; sequence_i < num_sequences; sequence_i++) {
-        uint32_t numAUs = getBlocksInSequence(getDatasetHeader(datasetContainer), sequence_i);
-        for (uint32_t au_i = 0; au_i < numAUs; au_i++) {
-            uint8_t numClasses = getClassesCount(getDatasetHeader(datasetContainer));
-            for (uint8_t class_i = 0; class_i < numClasses; class_i++) {
-                SequenceID sequenceID = getSequenceId(datasetContainer->datasetHeader, sequence_i);
-                DataUnitAccessUnit *dataUnitAccessUnit = getDataUnitAccessUnit(
-                        datasetContainer,
-                        sequenceID,
-                        class_i,
-                        au_i
-                );
-                if (dataUnitAccessUnit == NULL) continue;
-
-                addDataUnitAccessUnitAndDependenciesIfRequired(
-                        dataUnitAccessUnit, dataUnits, datasetRequest, datasetGroupId, datasetContainer
-                );
-            }
-        }
-    }
-    return 0;
-}
-
-int extractReferenceAccessUnitsFromMIT(
-        DatasetGroupId datasetGroupId,
-        DatasetContainer* datasetContainer,
-        DatasetRequest datasetRequest,
-        DataUnits* dataUnits
-){
-    uint16_t num_sequences = getSequencesCount(getDatasetHeader(datasetContainer));
-    for (uint16_t sequence_i = 0; sequence_i < num_sequences; sequence_i++) {
-        uint32_t numAUs = getBlocksInSequence(getDatasetHeader(datasetContainer), sequence_i);
-        for (uint32_t au_i = 0; au_i < numAUs; au_i++) {
-            uint8_t numClasses = getClassesCount(getDatasetHeader(datasetContainer));
-            for (uint8_t class_i = 0; class_i < numClasses; class_i++) {
-                SequenceID sequenceID = getSequenceId(datasetContainer->datasetHeader, sequence_i);
-                DataUnitAccessUnit *dataUnitAccessUnit = getDataUnitAccessUnit(
-                        datasetContainer,
-                        sequenceID,
-                        class_i,
-                        au_i
-                );
-                if (dataUnitAccessUnit == NULL) continue;
-
-                addReferenceDataUnitAccessUnitAndDependenciesIfRequired(
-                        dataUnitAccessUnit, dataUnits, datasetRequest, datasetGroupId, datasetContainer
-                );
-            }
-        }
-    }
-    return 0;
-}
-
-int extractReferenceAccessUnitsNotFromMIT(
-        DatasetGroupId datasetGroupId,
-        DatasetContainer* datasetContainer,
-        DatasetRequest datasetRequest,
-        DataUnits* dataUnits
-){
-    Vector* accessUnits = getDataUnitAccessUnits(datasetContainer);
-    size_t numberAccessUnits = getSize(accessUnits);
-    for(size_t accessUnit_i = 0; accessUnit_i < numberAccessUnits; accessUnit_i++){
-        AccessUnitContainer* accessUnitContainer = getValue(accessUnits, accessUnit_i);
-        AccessUnitHeader* accessUnitHeader = getAccessUnitHeader(accessUnitContainer);
-        DataUnitAccessUnit* dataUnitAccessUnit = initDataUnitAccessUnit(
-                getAccessUnitId(accessUnitHeader),
-                getNumBlocks(accessUnitHeader),
-                getParametersSetId(accessUnitHeader),
-                getAccessUnitType(accessUnitHeader),
-                getReadsCount(accessUnitHeader),
-                getMMThreshold(accessUnitHeader),
-                getMMCount(accessUnitHeader),
-                getReferenceSequence(accessUnitHeader),
-                getReferenceStart(accessUnitHeader),
-                getReferenceEnd(accessUnitHeader),
-                getAccessUnitSequenceID(accessUnitHeader),
-                getAccessUnitStart(accessUnitHeader),
-                getAccessUnitEnd(accessUnitHeader),
-                getExtendedAccessUnitStart(accessUnitHeader),
-                getExtendedAccessUnitEnd(accessUnitHeader)
-        );
-
-        uint8_t numBlocks = getNumBlocks(accessUnitHeader);
-        Vector* blocks = getBlocks(accessUnitContainer);
-        for(uint8_t block_i = 0; block_i<numBlocks; block_i++){
-            Block* block = getValue(blocks, block_i);
-            BlockHeader* blockHeader = block->blockHeader;
-            FromFile* data = cloneFromFile(block->payload);
-
-            Block* newBlock = initBlockWithHeader(
-                    blockHeader->descriptorId,
-                    blockHeader->payloadSize,
-                    data
-            );
-            DataUnitBlockHeader* dataUnitBlockHeader =
-                    initDataUnitBlockHeader(
-                            blockHeader->descriptorId,
-                            blockHeader->payloadSize
-                    );
-            addBlockToDataUnitAccessUnit(dataUnitAccessUnit, newBlock, dataUnitBlockHeader);
-        }
-
-        addDataUnitAccessUnitAndDependenciesIfRequired(
-                dataUnitAccessUnit, dataUnits, datasetRequest, datasetGroupId, datasetContainer
-        );
-    }
-    return 0;
-}
 
 int extractAccessUnitsNotFromMIT(
         DatasetGroupId datasetGroupId,
@@ -1682,23 +1733,6 @@ void addDataUnitAccessUnitAndDependenciesIfRequired(DataUnitAccessUnit *dataUnit
 
     }
 }
-void addReferenceDataUnitAccessUnitAndDependenciesIfRequired(DataUnitAccessUnit *dataUnitAccessUnit, DataUnits *dataUnits,
-                                                    DatasetRequest datasetRequest, DatasetGroupId datatasetGroupId,
-                                                    DatasetContainer *datasetContainer) {
-    if( referenceDataUnitAccessUnitIntersects(dataUnitAccessUnit, datasetRequest)){
-
-        uint8_t parameterIdDataUnitsScope = addParametersInformation(
-                dataUnits,
-                datasetContainer,
-                dataUnitAccessUnit->parameterSetId,
-                datatasetGroupId
-        );
-
-        dataUnitAccessUnit->parameterSetId = parameterIdDataUnitsScope;
-        addDataUnitAccessUnit(dataUnits, dataUnitAccessUnit);
-
-    }
-}
 
 uint8_t addParametersInformation(
         DataUnits* dataUnits,
@@ -1743,32 +1777,7 @@ bool dataUnitAccessUnitIntersects(DataUnitAccessUnit* dataUnitAccessUnit, Datase
 
             uint64_t maxStart = accessUnitStart > classRequestStart ? accessUnitStart : classRequestStart;
             uint64_t minEnd = accessUnitEnd < classRequestEnd ? accessUnitEnd : classRequestEnd;
-            if(maxStart <= minEnd){
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool referenceDataUnitAccessUnitIntersects(DataUnitAccessUnit* dataUnitAccessUnit, DatasetRequest datasetRequest){
-    for(uint16_t sequenceRequest_i=0; sequenceRequest_i < datasetRequest.numSequences; sequenceRequest_i++){
-        if(dataUnitAccessUnit->ref_sequenced_ID.sequenceID
-           == datasetRequest.sequenceRequest[sequenceRequest_i].sequenceID.sequenceID
-                ){
-            SequenceRequest sequenceRequest = datasetRequest.sequenceRequest[sequenceRequest_i];
-            ClassRequest classRequest = sequenceRequest.classRequest[dataUnitAccessUnit->AU_type.classType-1];
-
-            uint64_t accessUnitStart = dataUnitAccessUnit->auStartPosition;
-            uint64_t accessUnitEnd = dataUnitAccessUnit->auEndPosition;
-            uint64_t classRequestStart = classRequest.start;
-            uint64_t classRequestEnd = classRequest.end;
-
-            uint64_t maxStart = accessUnitStart > classRequestStart ? accessUnitStart : classRequestStart;
-            uint64_t minEnd = accessUnitEnd < classRequestEnd ? accessUnitEnd : classRequestEnd;
-            if(maxStart <= minEnd){
-                return true;
-            }
+            return maxStart <= minEnd;
         }
     }
     return false;

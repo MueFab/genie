@@ -1,8 +1,9 @@
 //
 // Created by bscuser on 7/02/18.
 //
+#include <Boxes.h>
+#include <utils.h>
 #include "Boxes.h"
-#include "utils.h"
 
 void freeBlock(Block* block){
     if(block->blockHeader != NULL){
@@ -24,8 +25,6 @@ Block* initBlock(
         return NULL;
     }
     block->blockHeader = NULL;
-    block->payloadInMemory = NULL;
-    block->payloadInMemorySize = 0;
     block->payload = fromFile;
     block->datasetContainer = datasetContainer;
 
@@ -46,42 +45,9 @@ Block* initBlockWithHeader(uint8_t descriptorId, uint32_t payloadSize, FromFile*
     }
     block->blockHeader->payloadSize = payloadSize;
     block->blockHeader->descriptorId = descriptorId;
-    block->blockHeader->paddingFlag = false;
     block->blockHeader->datasetContainer = NULL;
 
     block->payload = payload;
-    block->payloadInMemory = NULL;
-    block->payloadInMemorySize = 0;
-    block->datasetContainer = NULL;
-
-    return block;
-}
-
-Block* initBlockWithHeaderPayloadInMemory(
-        uint8_t descriptorId,
-        uint32_t payloadSize,
-        char* payloadInMemory,
-        size_t payloadInMemorySize
-){
-    Block* block = (Block*)malloc(sizeof(Block));
-    if(block == NULL){
-        fprintf(stderr,"Block could not be allocated.\n");
-        return NULL;
-    }
-    block->blockHeader = (BlockHeader*)malloc(sizeof(BlockHeader));
-    if(block->blockHeader == NULL){
-        fprintf(stderr, "Block header could not be allocated.\n");
-        free(block);
-        return NULL;
-    }
-    block->blockHeader->payloadSize = payloadSize;
-    block->blockHeader->descriptorId = descriptorId;
-    block->blockHeader->paddingFlag = false;
-    block->blockHeader->datasetContainer = NULL;
-
-    block->payload = NULL;
-    block->payloadInMemory = payloadInMemory;
-    block->payloadInMemorySize = payloadInMemorySize;
     block->datasetContainer = NULL;
 
     return block;
@@ -108,34 +74,9 @@ bool writeBlock(Block* block, FILE* outputFile){
         }
     }
     if(block->payload != NULL) {
-        if(block->payload != NULL) {
-            if (!writeFromFile(block->payload, outputFile)) {
-                fprintf(stderr, "Block's payload: error writing.\n");
-                return false;
-            }
-        }else{
-            fwrite(block->payloadInMemory, sizeof(char), block->payloadInMemorySize, outputFile);
-        }
-    }
-    if(block->blockHeader != NULL){
-        if(isPaddingFlagSet(block->blockHeader)){
-            bool paddingSizeSuccessfulWrite = writeBigEndian32ToFile(block->padding_size, outputFile);
-            if(!paddingSizeSuccessfulWrite){
-                fprintf(stderr,"Padding size could not be writing.\n");
-                return false;
-            }
-            bool paddingBytesSuccessfulWrite = true;
-            for(uint32_t i=0; i<block->padding_size; i++){
-                bool paddingByteSuccessfulWrite = utils_write(0,outputFile);
-                if (!paddingByteSuccessfulWrite){
-                    paddingBytesSuccessfulWrite = false;
-                    break;
-                }
-            }
-            if(!paddingBytesSuccessfulWrite){
-                fprintf(stderr,"Error writing block's padding.\n");
-                return false;
-            }
+        if (!writeFromFile(block->payload, outputFile)) {
+            fprintf(stderr, "Block's payload: error writing.\n");
+            return false;
         }
     }
     return true;
@@ -166,16 +107,6 @@ Block* parseBlockContainerAUCmode(DatasetContainer *datasetContainer, FILE *inpu
         return NULL;
     }
 
-    uint32_t padding_size = 0;
-    if(isPaddingFlagSet(blockHeader)){
-        bool paddingSizeSuccessfulRead = readBigEndian32FromFile(&padding_size, inputFile);
-        if(!paddingSizeSuccessfulRead){
-            fprintf(stderr,"Padding size could not be read.\n");
-            return NULL;
-        }
-        fseek(inputFile, padding_size, SEEK_CUR);
-    }
-
     if(feof(inputFile)){
         fprintf(stderr, "Error reading block: reached EOF.\n");
         freeFromFile(blockPayload);
@@ -202,15 +133,7 @@ uint64_t getBlockSize(Block* block){
     }
     if(block->payload != NULL) {
         blockSize += getFromFileSize(block->payload);
-    }else{
-        blockSize += block->payloadInMemorySize;
     }
 
-    if(block->blockHeader != NULL){
-        if(isPaddingFlagSet(block->blockHeader)){
-            blockSize += 4;
-            blockSize += block->padding_size;
-        }
-    }
     return blockSize;
 }
