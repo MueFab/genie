@@ -2,6 +2,7 @@
 
 #include "genie/genie_file_format.h"
 
+#include <algorithm>
 #include <iostream>
 
 namespace dsg {
@@ -47,7 +48,7 @@ void packFile(const std::string& path, const std::string& file, FILE *fout){
 
         // Write block
         tmp = fwrite(buffer.data(), 1, tmp, fout);
-        if (tmp != std::min(buffer.size(), size - byteswritten)) {
+        if (tmp != std::min(static_cast<uint64_t>(buffer.size()), size - byteswritten)) {
             fclose(fin_desc);
             throw std::runtime_error("Could not write to output file");
         }
