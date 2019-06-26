@@ -37,15 +37,15 @@
 #include "coding/alico/include/main.h"
 
 namespace spring {
-    void decompress(const std::string& temp_dir);
+    bool decompress(const std::string &temp_dir);
 }
 
 namespace dsg {
 
     bool copyDir(
-            ghc::filesystem::path const& source,
-            ghc::filesystem::path const& destination
-    ){
+            ghc::filesystem::path const &source,
+            ghc::filesystem::path const &destination
+    ) {
         namespace fs = ghc::filesystem;
         try {
             // Check whether the function call is valid
@@ -69,7 +69,7 @@ namespace dsg {
                 return false;
             }
         }
-        catch (fs::filesystem_error const& e) {
+        catch (fs::filesystem_error const &e) {
             std::cerr << e.what() << '\n';
             return false;
         }
@@ -98,7 +98,7 @@ namespace dsg {
                     );
                 }
             }
-            catch (fs::filesystem_error const& e) {
+            catch (fs::filesystem_error const &e) {
                 std::cerr << e.what() << '\n';
             }
         }
@@ -106,8 +106,8 @@ namespace dsg {
     }
 
     static generated_aus generationFromFastq_SPRING(
-            const ProgramOptions& programOptions
-    ){
+            const ProgramOptions &programOptions
+    ) {
         std::cout << std::string(80, '-') << std::endl;
         std::cout << "Descriptor stream generation from FASTQ file" << std::endl;
         std::cout << std::string(80, '-') << std::endl;
@@ -138,74 +138,72 @@ namespace dsg {
     }
 
     static void generationFromFastq(
-            const ProgramOptions& programOptions
-    ){
-/*
-    auto generated_aus = generationFromFastq_SPRING(programOptions);
+            const ProgramOptions &programOptions
+    ) {
+        auto generated_aus = generationFromFastq_SPRING(programOptions);
 
-    // Open output directory of spring
-    std::vector<std::string> filelist;
-    std::string path = generated_aus.getGeneratedAusRef().getRefAus().front().begin()->second.begin()->second;
-    path = path.substr(0, path.find_last_of('/') + 1);
-    ghc::filesystem::path p(path);
-    ghc::filesystem::directory_iterator end_itr;
+        // Open output directory of spring
+        std::vector<std::string> filelist;
+        std::string path = generated_aus.getEncodedFastqAus().front().begin()->second.begin()->second;
+        path = path.substr(0, path.find_last_of('/') + 1);
+        ghc::filesystem::path p(path);
+        ghc::filesystem::directory_iterator end_itr;
 
-    // Remove temporary files
-    std::remove((path + "read_order.bin").c_str());
-    std::remove((path + "read_seq.txt").c_str());
+        // Remove temporary files
+        std::remove((path + "read_order.bin").c_str());
+        std::remove((path + "read_seq.txt").c_str());
 
-    // Create list of all files
-    for (ghc::filesystem::directory_iterator itr(p); itr != end_itr; ++itr) {
-        if (is_regular_file(itr->path())) {
-            std::string current_file = itr->path().string();
-            filelist.push_back(current_file);
+        // Create list of all files
+        for (ghc::filesystem::directory_iterator itr(p); itr != end_itr; ++itr) {
+            if (is_regular_file(itr->path())) {
+                std::string current_file = itr->path().string();
+                filelist.push_back(current_file);
+            }
         }
-    }
 
-    // copyDir(path,path + "/../genie_orig");
+        // copyDir(path,path + "/../genie_orig");
 
-    // Compress
-    run_gabac(filelist, programOptions.configPath, false, programOptions.numThreads);
+        // Compress
+        run_gabac(filelist, programOptions.configPath, false, programOptions.numThreads);
 
 
-    // Pack
-    std::string outfile =
-            (programOptions.inputFilePath.substr(0, programOptions.inputFilePath.find_last_of('.')) + ".genie");
-    FILE *output = fopen(
-            outfile.c_str(), "wb"
-    );
-    if (!output) {
-        throw std::runtime_error("Could not open output file");
-    }
-    packFiles(filelist, output);
-    fclose(output);
+        // Pack
+        std::string outfile =
+                (programOptions.inputFilePath.substr(0, programOptions.inputFilePath.find_last_of('.')) + ".genie");
+        FILE *output = fopen(
+                outfile.c_str(), "wb"
+        );
+        if (!output) {
+            throw std::runtime_error("Could not open output file");
+        }
+        packFiles(filelist, output);
+        fclose(output);
 
-    size_t orgSize = ghc::filesystem::file_size(programOptions.inputFilePath);
-    if (!programOptions.inputFilePairPath.empty()) {
-        orgSize += ghc::filesystem::file_size(programOptions.inputFilePairPath);
-    }
+        size_t orgSize = ghc::filesystem::file_size(programOptions.inputFilePath);
+        if (!programOptions.inputFilePairPath.empty()) {
+            orgSize += ghc::filesystem::file_size(programOptions.inputFilePairPath);
+        }
 
-    // Finish
-    std::cout << "**** Finished ****" << std::endl;
-    std::cout << "Compressed "
-              << orgSize
-              << " to "
-              << ghc::filesystem::file_size(outfile)
-              << ". Compression rate "
-              << float(ghc::filesystem::file_size(outfile)) /
-                      ghc::filesystem::file_size(programOptions.inputFilePath) *
-                 100
-              << "%"
-              << std::endl;
+        // Finish
+        std::cout << "**** Finished ****" << std::endl;
+        std::cout << "Compressed "
+                  << orgSize
+                  << " to "
+                  << ghc::filesystem::file_size(outfile)
+                  << ". Compression rate "
+                  << float(ghc::filesystem::file_size(outfile)) /
+                     ghc::filesystem::file_size(programOptions.inputFilePath) *
+                     100
+                  << "%"
+                  << std::endl;
 
-    ghc::filesystem::remove_all(path);
-*/
+     //   ghc::filesystem::remove_all(path);
     }
 
 
     static void generationFromSam(
-            const ProgramOptions& programOptions
-    ){
+            const ProgramOptions &programOptions
+    ) {
         std::cout << "Generating from sam " << programOptions.inputFilePath << std::endl;
         std::string temp_dir;
         while (true) {
@@ -220,7 +218,8 @@ namespace dsg {
             throw std::runtime_error("Cannot create temporary directory.");
         }
 
-        std::vector<std::string> args = {"genie", programOptions.inputFilePath, temp_dir, programOptions.inputFilePairPath};
+        std::vector<std::string> args = {"genie", programOptions.inputFilePath, temp_dir,
+                                         programOptions.inputFilePairPath};
 
         std::vector<const char *> arg_ptrs(args.size());
 
@@ -285,8 +284,8 @@ namespace dsg {
     }
 
     void decompression_fastq(
-            const ProgramOptions& programOptions
-    ){
+            const ProgramOptions &programOptions
+    ) {
         // Open file and create tmp directory with random name
         FILE *in = fopen(programOptions.inputFilePath.c_str(), "rb");
         if (!in) {
@@ -320,20 +319,31 @@ namespace dsg {
 
         // Extract spring parameters
         // Decode spring streams
-        spring::decompress(temp_dir);
+        bool paired = spring::decompress(temp_dir);
+
+        std::cout << paired << std::endl;
 
         // Finish fastq
         std::string outname = programOptions.inputFilePath;
         outname = outname.substr(0, outname.find_last_of('.'));
-        outname += "_decompressed.fastq";
-        std::rename((temp_dir + "decompressed.fastq").c_str(), outname.c_str());
+        if (paired) {
+            outname += "_decompressed_1.fastq";
+            std::rename((temp_dir + "decompressed_1.fastq").c_str(), outname.c_str());
+            outname = programOptions.inputFilePath;
+            outname = outname.substr(0, outname.find_last_of('.'));
+            outname += "_decompressed_2.fastq";
+            std::rename((temp_dir + "decompressed_2.fastq").c_str(), outname.c_str());
+        } else {
+            outname += "_decompressed.fastq";
+            std::rename((temp_dir + "decompressed.fastq").c_str(), outname.c_str());
+        }
 
         ghc::filesystem::remove_all(temp_dir);
     }
 
     void decompression_sam(
-            const ProgramOptions& programOptions
-    ){
+            const ProgramOptions &programOptions
+    ) {
         // Open file and create tmp directory with random name
         FILE *in = fopen(programOptions.inputFilePath.c_str(), "rb");
         if (!in) {
@@ -364,7 +374,8 @@ namespace dsg {
         run_gabac(flist, programOptions.configPath, true, programOptions.numThreads);
 
         std::vector<std::string>
-                args = {"genie", "-x", temp_dir, programOptions.inputFilePath + ".sam", programOptions.inputFilePairPath};
+                args = {"genie", "-x", temp_dir, programOptions.inputFilePath + ".sam",
+                        programOptions.inputFilePairPath};
 
         std::vector<const char *> arg_ptrs(args.size());
 
@@ -376,12 +387,12 @@ namespace dsg {
 
         alico_main(args.size(), arg_ptrs.data());
 
-//    ghc::filesystem::remove_all(temp_dir);
+        ghc::filesystem::remove_all(temp_dir);
     }
 
     void decompression(
-            const ProgramOptions& programOptions
-    ){
+            const ProgramOptions &programOptions
+    ) {
         if (programOptions.inputFileType == "GENIE") {
             decompression_fastq(programOptions);
         } else if (programOptions.inputFileType == "SGENIE") {
@@ -392,8 +403,8 @@ namespace dsg {
     }
 
     void generation(
-            const ProgramOptions& programOptions
-    ){
+            const ProgramOptions &programOptions
+    ) {
         if (programOptions.inputFileType == "FASTQ") {
             generationFromFastq(programOptions);
         } else if (programOptions.inputFileType == "SAM") {

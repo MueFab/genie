@@ -146,7 +146,7 @@ std::vector<dsg::input::fastq::FastqRecord> decode_streams(decoded_desc_t &dec, 
   return decoded_records;
 }
 
-void decompress(const std::string &temp_dir) {
+bool decompress(const std::string &temp_dir) {
   // decompress to temp_dir/decompressed.fastq
 
   std::string basedir = temp_dir;
@@ -184,11 +184,18 @@ void decompress(const std::string &temp_dir) {
 
   std::string file_quality = basedir + "/quality_1";
   std::string file_id = basedir + "/id_1";
-  std::string file_decompressed_fastq = basedir + "/decompressed.fastq";
+  std::string file_decompressed_fastq = cp.paired_end ? basedir + "/decompressed_1.fastq" : basedir + "/decompressed.fastq";;
+  std::string file_decompressed_fastq2 = basedir + "/decompressed_2.fastq";
 
   std::ofstream fout(file_decompressed_fastq);
+  std::ofstream fout2;
+
+  if(cp.paired_end) {
+      fout2.open(file_decompressed_fastq2);
+  }
 
   decoded_desc_t dec;
+  bool fileswitch = true;
   for (uint32_t block_num = 0; block_num < cp.num_blocks; block_num++) {
     for (auto arr : subseq_indices) {
         std::string filename = file_subseq_prefix + "." + std::to_string(block_num) + "." +
@@ -199,13 +206,20 @@ void decompress(const std::string &temp_dir) {
     read_read_id_tokens_from_file(file_id + '.' + std::to_string(block_num), dec.tokens);
     auto decoded_records = decode_streams(dec, subseq_indices, cp.paired_end);
     for (auto record: decoded_records) {
-      fout << record.title << "\n";
-      fout << record.sequence << "\n";
-      fout << "+" << "\n";
-      fout << record.qualityScores << "\n";
+        std::ostream& tmpout = fileswitch ? fout : fout2;
+        tmpout << record.title << "\n";
+        tmpout << record.sequence << "\n";
+        tmpout << "+" << "\n";
+        tmpout << record.qualityScores << "\n";
+        if(cp.paired_end) {
+            fileswitch = !fileswitch;
+        }
     }
   }
+  bool paired_end = cp.paired_end;
   delete cp_ptr;
+
+  return paired_end;
 }
 
 }  // namespace spring

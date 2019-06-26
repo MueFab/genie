@@ -5,12 +5,12 @@
         {
             "binarization_id": 4,
             "binarization_parameters": [
-                1
+                2
             ],
-            "context_selection_id": 1,
+            "context_selection_id": 3,
             "diff_coding_enabled": false,
             "lut_transformation_enabled": false
         }
     ],
-    "word_size": 1
+    "word_size": 8
 }
