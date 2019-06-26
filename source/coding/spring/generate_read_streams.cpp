@@ -1,6 +1,7 @@
 #ifdef GENIE_USE_OPENMP
     #include <omp.h>
 #endif
+#include <array>
 #include <cmath>  // abs
 #include <cstdio>
 #include <fstream>

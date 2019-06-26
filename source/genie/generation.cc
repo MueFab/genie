@@ -140,6 +140,7 @@ static generated_aus generationFromFastq_SPRING(
 static void generationFromFastq(
         const ProgramOptions& programOptions
 ){
+/*
     auto generated_aus = generationFromFastq_SPRING(programOptions);
 
     // Open output directory of spring
@@ -198,6 +199,7 @@ static void generationFromFastq(
               << std::endl;
 
     ghc::filesystem::remove_all(path);
+*/
 }
 
 

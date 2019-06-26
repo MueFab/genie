@@ -1,3 +1,4 @@
+#include <array>
 #include <string>
 #include <vector>
 #include <map>
@@ -56,10 +57,10 @@ std::vector<dsg::input::fastq::FastqRecord> decode_streams(decoded_desc_t &dec, 
       bool read_1_first = true;
 	  if (paired_end) {
 		uint64_t pairing_decoding_case = (uint64_t)(*(subseq_it[8][0]++));
-		// note that we don't decode/use mateAUid and mateRecordIndex in this decoder 
-        // the compressor still stores this information which can be a bit redundant 
+		// note that we don't decode/use mateAUid and mateRecordIndex in this decoder
+        // the compressor still stores this information which can be a bit redundant
         // given it is stored at two places and also the ids are stored at both places.
-        // one way to resolve this could be to use the R1_unpaired and R2_unpaired 
+        // one way to resolve this could be to use the R1_unpaired and R2_unpaired
         // decoding cases, but we don't use those as they are not semantically correct
 	    switch (pairing_decoding_case) {
           case 0:   read_1_first = !(((uint16_t)(*(subseq_it[8][1])))&1);
@@ -71,7 +72,7 @@ std::vector<dsg::input::fastq::FastqRecord> decode_streams(decoded_desc_t &dec, 
           case 6:   number_of_record_segments = 1;
                     read_1_first = false;
                     break;
-          case 2:   
+          case 2:
           case 4:
           case 5:   number_of_record_segments = 1;
                     read_1_first = true;
@@ -97,7 +98,7 @@ std::vector<dsg::input::fastq::FastqRecord> decode_streams(decoded_desc_t &dec, 
       for (int i = 0; i < number_of_record_segments; i++)
           reverseComp[i] = *(subseq_it[1][0]++); // rcomp
       if (rtype == 3) {
-        // type M  
+        // type M
         for (int i = 0; i < number_of_record_segments; i++) {
           uint32_t abs_mmpos = 0;
           while (true) {
@@ -129,7 +130,7 @@ std::vector<dsg::input::fastq::FastqRecord> decode_streams(decoded_desc_t &dec, 
 
       for (int i = 0; i < number_of_record_segments; i++) {
         if (paired_end) {
-          if ((i == 0 && read_1_first) || (i == 1 && !read_1_first))  
+          if ((i == 0 && read_1_first) || (i == 1 && !read_1_first))
             cur_record.title = cur_ID + "/1";
           else
             cur_record.title = cur_ID + "/2";
@@ -180,7 +181,7 @@ void decompress(const std::string &temp_dir) {
       {8,7}, // pair
       {12,0} // rtype
   };
-  
+
   std::string file_quality = basedir + "/quality_1";
   std::string file_id = basedir + "/id_1";
   std::string file_decompressed_fastq = basedir + "/decompressed.fastq";
