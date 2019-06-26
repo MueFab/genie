@@ -171,7 +171,7 @@ namespace dsg {
                     std::ofstream outstream(configpath, std::ios::binary);
                     std::ifstream instream(file, std::ios::binary);
                     gabac::IOConfiguration
-                            ioconf{&instream, &outstream, std::min(unsigned(ghc::filesystem::file_size(file)),1000000000u), &std::cout, gabac::IOConfiguration::LogLevel::WARNING};
+                            ioconf{&instream, &outstream, std::min(unsigned(ghc::filesystem::file_size(file)),10000000u), &std::cout, gabac::IOConfiguration::LogLevel::WARNING};
                     gabac::EncodingConfiguration enconf;
                     gabac::analyze(ioconf, gabac::getCandidateConfig());
                 }

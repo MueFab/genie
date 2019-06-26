@@ -268,4 +268,17 @@ void generate_order_array(const std::string &file_order, uint32_t *order_array,
   fin_order.close();
 }
 
+bool is_permutation(uint32_t *order_array, const uint32_t &numreads) {
+  bool *seen = new bool [numreads]();
+  for (uint32_t i = 0; i < numreads; i++) {
+    if (seen[order_array[i]] == true) {
+      delete[] seen;
+      return false;  
+    }
+    seen[order_array[i]] = true;
+  }
+  delete[] seen;
+  return true;
+}
+
 }  // namespace spring

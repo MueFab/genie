@@ -33,6 +33,7 @@ class ProgramOptions {
     // Generic
     bool force;
     bool verbose;
+    bool help;
     std::string workingDirectory;
     int numThreads;
 

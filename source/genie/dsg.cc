@@ -40,9 +40,13 @@ static int dsg_main(
 
         dsg::ProgramOptions programOptions(argc, argv);
 
-        if(programOptions.inputFileType == "FASTQ") {
+        if(programOptions.help) {
+            return 0;
+        }
+
+        if(programOptions.inputFileType != "GENIE" && programOptions.inputFileType != "SGENIE") {
             generation(programOptions);
-        } else if(programOptions.inputFileType == "GENIE"){
+        } else {
             decompression(programOptions);
         }
     }
