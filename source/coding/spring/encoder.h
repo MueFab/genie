@@ -131,7 +131,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
   generatemasks<bitset_size>(mask, eg.max_readlen, 3);
   std::cout << "Encoding reads\n";
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel
+#pragma omp parallel num_threads(/*eg.num_thr*/ 1)
 #endif
   {
 #ifdef GENIE_USE_OPENMP
@@ -591,9 +591,6 @@ void encoder_main(const std::string &temp_dir, const compression_params &cp) {
   eg.max_readlen = cp.max_readlen;
   eg.num_thr = cp.num_thr;
 
-#ifdef GENIE_USE_OPENMP
-  omp_set_num_threads(eg.num_thr);
-#endif
   getDataParams(eg, cp);  // populate numreads
   setglobalarrays<bitset_size>(eg, egb);
   std::bitset<bitset_size> *read =
@@ -601,6 +598,16 @@ void encoder_main(const std::string &temp_dir, const compression_params &cp) {
   uint32_t *order_s = new uint32_t[eg.numreads_s + eg.numreads_N];
   uint16_t *read_lengths_s = new uint16_t[eg.numreads_s + eg.numreads_N];
   readsingletons<bitset_size>(read, order_s, read_lengths_s, eg, egb);
+
+  //
+  // FIXME
+  //
+  // From here until the end of the routine, there is buggy code that only
+  // works with eg.num_thr = 1. If you set eg.num_thr = 2 and execute the
+  // omp parallel regions with only a single thread, it still doesn't work.
+  //
+  eg.num_thr = 1; // remove after fixing bug(s)
+
   correct_order(order_s, eg);
 
   bbhashdict *dict = new bbhashdict[eg.numdict_s];

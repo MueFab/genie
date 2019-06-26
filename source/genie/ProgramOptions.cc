@@ -31,6 +31,7 @@ ProgramOptions::ProgramOptions(
     char *argv[])
     : force(false),
       verbose(false),
+      help(false),
       workingDirectory("./"),
       numThreads(1),
       inputFilePath(""),
@@ -113,15 +114,11 @@ void ProgramOptions::validate()
 
     std::set<std::string> allowedInputFileTypes = {
         "GENIE",
+        "SGENIE",
         "FASTQ",
+        "SAM"
     };
 
-#ifndef GENIE_USE_OPENMP
-    if (numThreads != 1)
-    {
-        throwRuntimeError("invalid options: numThreads != 1 && !GENIE_USE_OPENMP");
-    }
-#endif
 
     // Check if the user input string for inputFileType is in the set of
     // allowed input file types.

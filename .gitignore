@@ -15,3 +15,5 @@ cmake-build-debug/
 external_tools/
 
 cmake-build-release/
+
+\.idea/

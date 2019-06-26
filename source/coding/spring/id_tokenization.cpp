@@ -1,3 +1,4 @@
+#include "spring/params.h"
 #include "spring/id_tokenization.h"
 #include "spring/util.h"
 #include <stdexcept>
@@ -71,20 +72,27 @@ void generate_id_tokens (char *prev_ID, uint32_t *prev_tokens_ptr, std::string &
     // Check if the token is a number smaller than (1<<29)
     else if (isdigit(*id_ptr)) {
       digit_value = (*id_ptr - '0');
+      bool prev_token_digit_flag =
+          true;  // true if corresponding token in previous read is a digit
       if (*prev_ID != 0) {
-        prev_digit = prev_ID[prev_tokens_ptr[token_ctr] + token_len - 1] - '0';
+        if (isdigit(prev_ID[prev_tokens_ptr[token_ctr] + token_len - 1]) &&
+                prev_ID[prev_tokens_ptr[token_ctr] + token_len - 1] != '0')
+          prev_digit = prev_ID[prev_tokens_ptr[token_ctr] + token_len - 1] - '0';
+        else
+          prev_token_digit_flag = false;
       }
 
-      if (*prev_ID != 0) {
+      if (prev_token_digit_flag && *prev_ID != 0) {
         tmp = 1;
-        while (isdigit(prev_ID[prev_tokens_ptr[token_ctr] + tmp])) {
+        while (isdigit(prev_ID[prev_tokens_ptr[token_ctr] + tmp]) && 
+                prev_digit < (1 << 26)) {
           prev_digit = prev_digit * 10 +
                        (prev_ID[prev_tokens_ptr[token_ctr] + tmp] - '0');
           tmp++;
         }
       }
 
-      while (isdigit(*id_ptr_tok) && digit_value < (1 << 29)) {
+      while (isdigit(*id_ptr_tok) && digit_value < (1 << 26)) {
         digit_value = digit_value * 10 + (*id_ptr_tok - '0');
         // if (*prev_ID != 0){
         //    prev_digit = prev_digit * 10 + (prev_ID[prev_tokens_ptr[token_ctr]
@@ -96,13 +104,14 @@ void generate_id_tokens (char *prev_ID, uint32_t *prev_tokens_ptr, std::string &
             token_len++, id_ptr_tok++;
       }
       if (!dont_write_to_vector) {
-        if (match_len == token_len &&
+        if (prev_token_digit_flag && match_len == token_len &&
             !isdigit(prev_ID[prev_tokens_ptr[token_ctr] + token_len])) {
           // The token is the same as last ID
           // Encode a token_type ID_MATCH
           tokens[token_ctr+1][0].push_back(8); // MATCH
 
-        } else if (*prev_ID != 0 && (delta = (digit_value - prev_digit)) < 256 && delta > 0) {
+        } else if (prev_token_digit_flag && 
+                *prev_ID != 0 && (delta = (digit_value - prev_digit)) < 256 && delta > 0) {
           // prev_ID condition to make sure that DDELTA is not used first time token appears
           tokens[token_ctr+1][0].push_back(5); // DDELTA
           tokens[token_ctr+1][5].push_back((int64_t)delta);
@@ -136,12 +145,16 @@ void generate_id_tokens (char *prev_ID, uint32_t *prev_tokens_ptr, std::string &
     match_len = 0;
     token_len = 0;
     token_ctr++;
-    if(token_ctr > 126)
+    if(token_ctr > MAX_NUM_TOKENS_ID-2)
       throw std::runtime_error("Too many tokens in ID");
   }
   strcpy(prev_ID, current_id.c_str());
   if (!dont_write_to_vector)
     tokens[token_ctr+1][0].push_back(9); // END
+
+  // fill rest of prev_tokens_ptr to 0, otherwise we've bug due to garbage values
+  for (uint32_t i = 0; i < MAX_NUM_TOKENS_ID; i++)
+      prev_tokens_ptr[i] = 0;
 }
 
 std::string decode_id_tokens (std::string &prev_ID, uint32_t *prev_tokens_ptr, uint32_t *prev_tokens_len, const std::vector<int64_t> tokens[128][8], uint32_t pos_in_tokens_array[128][8]) {

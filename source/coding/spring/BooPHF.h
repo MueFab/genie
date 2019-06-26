@@ -27,6 +27,8 @@ namespace spring {
 
 namespace boomphf {
 
+#ifdef BOOPHF_USE_PTHREADS
+
 static u_int64_t printPt(pthread_t pt) {
   unsigned char* ptc = (unsigned char*)(void*)(&pt);
   u_int64_t res = 0;
@@ -35,6 +37,8 @@ static u_int64_t printPt(pthread_t pt) {
   }
   return res;
 }
+
+#endif /* BOOPHF_USE_PTHREADS */
 
 // iterator from disk file of u_int64_t with buffered read,   todo template
 template <typename basetype>
@@ -843,7 +847,9 @@ class mphf {
     std::vector<elem_t>().swap(
         setLevelFastmode);  // clear setLevelFastmode reallocating
 
+#ifdef BOOPHF_USE_PTHREADS
     pthread_mutex_destroy(&_mutex);
+#endif /* BOOPHF_USE_PTHREADS */
 
     _built = true;
   }
@@ -919,13 +925,17 @@ class mphf {
 
     for (bool isRunning = true; isRunning;) {
       // safely copy n items into buffer
+#ifdef BOOPHF_USE_PTHREADS
       pthread_mutex_lock(&_mutex);
+#endif /* BOOPHF_USE_PTHREADS */
       for (; inbuff < NBBUFF && (*shared_it) != until; ++(*shared_it)) {
         buffer[inbuff] = *(*shared_it);
         inbuff++;
       }
       if ((*shared_it) == until) isRunning = false;
+#ifdef BOOPHF_USE_PTHREADS
       pthread_mutex_unlock(&_mutex);
+#endif /* BOOPHF_USE_PTHREADS */
 
       // do work on the n elems of the buffer
       //  printf("filling input  buff \n");
@@ -968,12 +978,16 @@ class mphf {
           {
             uint64_t hashidx = __sync_fetch_and_add(&_hashidx, 1);
 
+#ifdef BOOPHF_USE_PTHREADS
             pthread_mutex_lock(&_mutex);  // see later if possible to avoid
+#endif /* BOOPHF_USE_PTHREADS */
                                           // this, mais pas bcp item vont la
             // calc rank de fin  precedent level qq part, puis init hashidx avec
             // ce rank, direct minimal, pas besoin inser ds bitset et rank
             _final_hash[val] = hashidx;
+#ifdef BOOPHF_USE_PTHREADS
             pthread_mutex_unlock(&_mutex);
+#endif /* BOOPHF_USE_PTHREADS */
           } else {
             // ils ont reach ce level
             // insert elem into curr level on disk --> sera utilise au level+1 ,
@@ -1096,9 +1110,15 @@ class mphf {
 
  private:
   void setup() {
+#ifdef BOOPHF_USE_PTHREADS
     pthread_mutex_init(&_mutex, NULL);
+#endif /* BOOPHF_USE_PTHREADS */
 
-    _pid = getpid() + printPt(pthread_self());  // + pthread_self();
+    _pid = getpid()
+#ifdef BOOPHF_USE_PTHREADS
+      + printPt(pthread_self())  // + pthread_self();
+#endif /* BOOPHF_USE_PTHREADS */
+    ;
     // printf("pt self %llu  pid %i \n",printPt(pthread_self()),_pid);
 
     _cptTotalProcessed = 0;
@@ -1236,7 +1256,9 @@ class mphf {
     _idxLevelsetLevelFastmode = 0;
     _nb_living = 0;
     // create  threads
+#ifdef BOOPHF_USE_PTHREADS
     pthread_t* tab_threads = new pthread_t[_num_thread];
+#endif /* BOOPHF_USE_PTHREADS */
     typedef decltype(input_range.begin()) it_type;
     thread_args<Range, it_type> t_arg;  // meme arg pour tous
     t_arg.boophf = this;
@@ -1259,18 +1281,19 @@ class mphf {
       t_arg.until_p = std::static_pointer_cast<void>(
           std::make_shared<disklevel_it_type>(data_iterator_level.end()));
 
+#ifdef BOOPHF_USE_PTHREADS
       for (int ii = 0; ii < _num_thread; ii++)
-        pthread_create(
-            &tab_threads[ii], NULL,
-            thread_processLevel<elem_t, Hasher_t, Range, disklevel_it_type>,
-            &t_arg);  //&t_arg[ii]
+        pthread_create(&tab_threads[ii], NULL, thread_processLevel<elem_t,
+            Hasher_t, Range, disklevel_it_type>, &t_arg);  //&t_arg[ii]
 
       // must join here before the block is closed and file_binary is destroyed
       // (and closes the file)
       for (int ii = 0; ii < _num_thread; ii++) {
         pthread_join(tab_threads[ii], NULL);
       }
-
+#else /* !BOOPHF_USE_PTHREADS */
+      thread_processLevel<elem_t, Hasher_t, Range, disklevel_it_type>(&t_arg);
+#endif /* BOOPHF_USE_PTHREADS */
     }
 
     else {
@@ -1290,23 +1313,33 @@ class mphf {
          so, casting to (void*) because of that; and we remember the type in the
          template */
 
-        for (int ii = 0; ii < _num_thread; ii++)
-          pthread_create(
-              &tab_threads[ii], NULL,
-              thread_processLevel<elem_t, Hasher_t, Range, fastmode_it_type>,
-              &t_arg);  //&t_arg[ii]
+#ifdef BOOPHF_USE_PTHREADS
+        for (int ii = 0; ii < _num_thread; ii++) {
+          pthread_create(&tab_threads[ii], NULL, thread_processLevel<elem_t,
+              Hasher_t, Range, fastmode_it_type>, &t_arg);  //&t_arg[ii]
+        }
+#else /* ! BOOPHF_USE_PTHREADS */
+        thread_processLevel<elem_t, Hasher_t, Range, fastmode_it_type>(&t_arg);
+#endif /* BOOPHF_USE_PTHREADS */
 
       } else {
-        for (int ii = 0; ii < _num_thread; ii++)
-          pthread_create(&tab_threads[ii], NULL,
-                         thread_processLevel<elem_t, Hasher_t, Range,
-                                             decltype(input_range.begin())>,
-                         &t_arg);  //&t_arg[ii]
+#ifdef BOOPHF_USE_PTHREADS
+        for (int ii = 0; ii < _num_thread; ii++) {
+          pthread_create(&tab_threads[ii], NULL, thread_processLevel<elem_t,
+              Hasher_t, Range, decltype(input_range.begin())>, &t_arg);  //&t_arg[ii]
+        }
+#else /* !BOOPHF_USE_PTHREADS */
+        thread_processLevel<elem_t, Hasher_t, Range,
+            decltype(input_range.begin())>(&t_arg);
+#endif /* BOOPHF_USE_PTHREADS */
       }
+
+#ifdef BOOPHF_USE_PTHREADS
       // joining
       for (int ii = 0; ii < _num_thread; ii++) {
         pthread_join(tab_threads[ii], NULL);
       }
+#endif /* BOOPHF_USE_PTHREADS */
     }
     // printf("\ngoing to level %i  : %llu elems  %.2f %%  expected : %.2f %%
     // \n",i,_cptLevel,100.0* _cptLevel/(float)_nelem,100.0*
@@ -1320,7 +1353,9 @@ class mphf {
       // \n",_idxLevelsetLevelFastmode);
       setLevelFastmode.resize(_idxLevelsetLevelFastmode);
     }
+#ifdef BOOPHF_USE_PTHREADS
     delete[] tab_threads;
+#endif /* BOOPHF_USE_PTHREADS */
 
     if (_writeEachLevel) {
       if (i < _nb_levels - 1 && i > 0) {
@@ -1374,7 +1409,9 @@ class mphf {
   int _pid;
 
  public:
+#ifdef BOOPHF_USE_PTHREADS
   pthread_mutex_t _mutex;
+#endif /* BOOPHF_USE_PTHREADS */
 };
 
 template <typename elem_t, typename Hasher_t, typename Range, typename it_type>
@@ -1388,17 +1425,21 @@ void* thread_processLevel(void* args) {
   std::vector<elem_t> buffer;
   buffer.resize(NBBUFF);
 
+#ifdef BOOPHF_USE_PTHREADS
   pthread_mutex_t* mutex = &obw->_mutex;
 
   pthread_mutex_lock(mutex);  // from comment above: "//get starting iterator
                               // for this thread, must be protected (must not be
                               // currently used by other thread to copy elems in
                               // buff)"
+#endif /* BOOPHF_USE_PTHREADS */
   std::shared_ptr<it_type> startit =
       std::static_pointer_cast<it_type>(targ->it_p);
   std::shared_ptr<it_type> until_p =
       std::static_pointer_cast<it_type>(targ->until_p);
+#ifdef BOOPHF_USE_PTHREADS
   pthread_mutex_unlock(mutex);
+#endif /* BOOPHF_USE_PTHREADS */
 
   obw->pthread_processLevel(buffer, startit, until_p, level);
 

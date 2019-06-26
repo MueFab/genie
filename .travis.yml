@@ -1,0 +1,49 @@
+language: cpp
+
+# Notes on GCC:
+# - GCC support for ISO C11 reached a similar level of completeness as
+#   ISO C99 in 4.9 and that C++11 is feature-complete in 4.8.1, but support
+#   for <regex> does not exist until 4.9.
+# - Ubuntu 12.04 ships with GCC 4.6.3 and Ubuntu 14.04 ships with GCC 4.8.2.
+# - On macOS, gcc is an alias for clang, and g++ is an alias for clang++.
+#   So we must set CC and CXX to specific gcc/g++ versions.
+
+# Define the build matrix explicitly. Manually expanding the combinations
+# of (os, compiler) is more tedious, but grants far more flexibility.
+matrix:
+  include:
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+            - libboost-program-options-dev
+            - python-numpy
+      env:
+        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+    - os: osx
+      compiler: clang
+      homebrew:
+        # update: true
+        packages:
+        - boost
+
+before_install:
+  - eval "${MATRIX_EVAL}"
+
+before_script:
+  - mkdir build
+  - cd build
+  - cmake .. -DGABAC_BUILD_SHARED_LIB=ON -DCMAKE_BUILD_TYPE=Debug
+
+script:
+  - make
+  - make tests
+  - make gabacify
+  - ../ci/test_gabac.sh
+#  - ../ci/test_python_api.sh
+  - ../ci/test_roundtrips.sh

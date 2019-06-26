@@ -206,19 +206,21 @@ template <size_t bitset_size>
 void readDnaFile(std::bitset<bitset_size> *read, uint16_t *read_lengths,
                  const reorder_global<bitset_size> &rg) {
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel
+#pragma omp parallel num_threads(/*rg.num_thr*/ 1)
 #endif
   {
 #ifdef GENIE_USE_OPENMP
-    uint32_t tid = omp_get_thread_num();
+    int tid = omp_get_thread_num();
+    int num_thr = omp_get_num_threads();
 #else
-    uint32_t tid = 0; // set thread ID to zero if not using OpenMP
+    int tid = 0; // set thread ID to zero if not using OpenMP
+    int num_thr = 1;
 #endif
     std::ifstream f(rg.infile[0], std::ifstream::in);
     std::string s;
     uint32_t i = 0;
     while (std::getline(f, s)) {
-      if (i % rg.num_thr == tid) {
+      if (i % num_thr == tid) {
         read_lengths[i] = (uint16_t)s.length();
         stringtobitset<bitset_size>(s, read_lengths[i], read[i], rg.basemask);
         i++;
@@ -232,19 +234,21 @@ void readDnaFile(std::bitset<bitset_size> *read, uint16_t *read_lengths,
   remove(rg.infile[0].c_str());
   if (rg.paired_end) {
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel
+#pragma omp parallel num_threads(/*rg.num_thr*/ 1)
 #endif
     {
 #ifdef GENIE_USE_OPENMP
-uint32_t tid = omp_get_thread_num();
+      int tid = omp_get_thread_num();
+      int num_thr = omp_get_num_threads();
 #else
-uint32_t tid = 0; // set thread ID to zero if not using OpenMP
+      int tid = 0; // set thread ID to zero if not using OpenMP
+      int num_thr = 1;
 #endif
       std::ifstream f(rg.infile[1], std::ifstream::in);
       std::string s;
       uint32_t i = 0;
       while (std::getline(f, s)) {
-        if (i % rg.num_thr == tid) {
+        if (i % num_thr == tid) {
           read_lengths[rg.numreads_array[0] + i] = (uint16_t)s.length();
           stringtobitset<bitset_size>(s, read_lengths[rg.numreads_array[0] + i],
                                       read[rg.numreads_array[0] + i],
@@ -296,13 +300,13 @@ bool search_match(const std::bitset<bitset_size> &ref,
       continue;
     // check if any other thread is modifying same dictpos
 #ifdef GENIE_USE_OPENMP
-    omp_set_lock(&dict_lock[startposidx & 0xFFFFFF]);
+    omp_set_lock(&dict_lock[startposidx & LOCKS_REORDER_MASK]);
 #endif
     dict[l].findpos(dictidx, startposidx);
     if (dict[l].empty_bin[startposidx])  // bin is empty
     {
 #ifdef GENIE_USE_OPENMP
-      omp_unset_lock(&dict_lock[startposidx & 0xFFFFFF]);
+      omp_unset_lock(&dict_lock[startposidx & LOCKS_REORDER_MASK]);
 #endif
       continue;
     }
@@ -328,7 +332,7 @@ bool search_match(const std::bitset<bitset_size> &ref,
                   .count();
         if (hamming <= thresh) {
 #ifdef GENIE_USE_OPENMP
-          omp_set_lock(&read_lock[rid & 0xFFFFFF]);
+          omp_set_lock(&read_lock[rid & LOCKS_REORDER_MASK]);
 #endif
           if (remainingreads[rid]) {
             remainingreads[rid] = 0;
@@ -336,14 +340,14 @@ bool search_match(const std::bitset<bitset_size> &ref,
             flag = 1;
           }
 #ifdef GENIE_USE_OPENMP
-          omp_unset_lock(&read_lock[rid & 0xFFFFFF]);
+          omp_unset_lock(&read_lock[rid & LOCKS_REORDER_MASK]);
 #endif
           if (flag == 1) break;
         }
       }
     }
 #ifdef GENIE_USE_OPENMP
-    omp_unset_lock(&dict_lock[startposidx & 0xFFFFFF]);
+    omp_unset_lock(&dict_lock[startposidx & LOCKS_REORDER_MASK]);
 #endif
     if (flag == 1) break;
   }
@@ -379,13 +383,15 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict,
   uint32_t firstread = 0;
   uint32_t *unmatched = new uint32_t[rg.num_thr];
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel
+#pragma omp parallel num_threads(/*rg.num_thr*/ 1)
 #endif
   {
 #ifdef GENIE_USE_OPENMP
-uint32_t tid = omp_get_thread_num();
+    int tid = omp_get_thread_num();
+    int num_thr = omp_get_num_threads();
 #else
-uint32_t tid = 0; // set thread ID to zero if not using OpenMP
+    int tid = 0; // set thread ID to zero if not using OpenMP
+    int num_thr = 1;
 #endif
     std::string tid_str = std::to_string(tid);
     std::ofstream foutRC(rg.outfileRC + '.' + tid_str, std::ofstream::out);
@@ -437,10 +443,16 @@ uint32_t tid = 0; // set thread ID to zero if not using OpenMP
 #endif
     {  // doing initial setup and first read
       current = firstread;
+      // some fix below to make sure no errors occurs when we have very few reads (comparable to num_threads).
+      // basically if read already taken, this thread just gives up
+      if (remainingreads[current] == 0) {
+          done = true;
+      } else {
+          remainingreads[current] = 0;
+          unmatched[tid]++;
+      }
       firstread +=
           rg.numreads / rg.num_thr;  // spread out first read equally
-      remainingreads[current] = 0;
-      unmatched[tid]++;
     }
 #ifdef GENIE_USE_OPENMP
 #pragma omp barrier
@@ -470,12 +482,12 @@ uint32_t tid = 0; // set thread ID to zero if not using OpenMP
           startposidx = dict[l].bphf->lookup(ull);
           // check if any other thread is modifying same dictpos
 #ifdef GENIE_USE_OPENMP
-          omp_set_lock(&dict_lock[startposidx & 0xFFFFFF]);
+          omp_set_lock(&dict_lock[startposidx & LOCKS_REORDER_MASK]);
 #endif
           dict[l].findpos(dictidx, startposidx);
           dict[l].remove(dictidx, startposidx, current);
 #ifdef GENIE_USE_OPENMP
-          omp_unset_lock(&dict_lock[startposidx & 0xFFFFFF]);
+          omp_unset_lock(&dict_lock[startposidx & LOCKS_REORDER_MASK]);
 #endif
         }
       } else {
@@ -597,7 +609,7 @@ uint32_t tid = 0; // set thread ID to zero if not using OpenMP
           for (int64_t j = remainingpos; j >= 0; j--) {
             if (remainingreads[j] == 1) {
 #ifdef GENIE_USE_OPENMP
-              omp_set_lock(&read_lock[j & 0xffffff]);
+              omp_set_lock(&read_lock[j & LOCKS_REORDER_MASK]);
 #endif
               if (remainingreads[j])  // checking again inside critical block
               {
@@ -608,7 +620,7 @@ uint32_t tid = 0; // set thread ID to zero if not using OpenMP
                 unmatched[tid]++;
               }
 #ifdef GENIE_USE_OPENMP
-              omp_unset_lock(&read_lock[j & 0xffffff]);
+              omp_unset_lock(&read_lock[j & LOCKS_REORDER_MASK]);
 #endif
               if (flag == 1) break;
             }
@@ -650,6 +662,10 @@ uint32_t tid = 0; // set thread ID to zero if not using OpenMP
 
   delete[] remainingreads;
 #ifdef GENIE_USE_OPENMP
+  for (unsigned int j = 0; j < num_locks; j++) {
+    omp_destroy_lock(&dict_lock[j]);
+    omp_destroy_lock(&read_lock[j]);
+  }
   delete[] dict_lock;
   delete[] read_lock;
 #endif
@@ -668,7 +684,7 @@ void writetofile(std::bitset<bitset_size> *read, uint16_t *read_lengths,
                  reorder_global<bitset_size> &rg) {
 // convert bitset to string for all num_thr files in parallel
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel
+#pragma omp parallel num_threads(/*rg.num_thr*/ 1)
 #endif
     {
 #ifdef GENIE_USE_OPENMP
@@ -775,9 +791,6 @@ void reorder_main(const std::string &temp_dir, const compression_params &cp) {
   rg.numreads_array[0] = cp.num_reads_clean[0];
   rg.numreads_array[1] = cp.num_reads_clean[1];
 
-#ifdef GENIE_USE_OPENMP
-  omp_set_num_threads(rg.num_thr);
-#endif
   setglobalarrays(rg);
   std::bitset<bitset_size> *read = new std::bitset<bitset_size>[rg.numreads];
   uint16_t *read_lengths = new uint16_t[rg.numreads];

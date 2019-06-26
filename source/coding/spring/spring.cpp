@@ -12,13 +12,11 @@
 
 #include "spring/encoder.h"
 #include "spring/params.h"
-#include "spring/pe_encode.h"
 #include "spring/preprocess.h"
 #include "spring/reorder.h"
-#include "spring/reorder_compress_quality_id_eru.h"
-#include "spring/generate_read_streams_eru.h"
-#include "spring/generate_ref_streams_eru.h"
-#include "spring/decode_eru.h"
+#include "spring/reorder_compress_quality_id.h"
+#include "spring/generate_read_streams.h"
+#include "spring/decompress.h"
 #include "spring/generate_new_fastq.h"
 #include "spring/spring.h"
 #include "spring/util.h"
@@ -55,7 +53,6 @@ generated_aus generate_streams_SPRING(
   cp.preserve_quality = preserve_quality;
   cp.num_reads_per_block = NUM_READS_PER_BLOCK;
   cp.num_thr = num_thr;
-  cp.preserve_order = true;
 
   std::cout << "Preprocessing ...\n";
   auto preprocess_start = std::chrono::steady_clock::now();
@@ -68,80 +65,70 @@ generated_aus generate_streams_SPRING(
                    .count()
             << " s\n";
 
-//  if (!long_flag) {
-    std::cout << "Reordering ...\n";
-    auto reorder_start = std::chrono::steady_clock::now();
-    call_reorder(temp_dir, cp);
-    auto reorder_end = std::chrono::steady_clock::now();
-    std::cout << "Reordering done!\n";
+  std::cout << "Reordering ...\n";
+  auto reorder_start = std::chrono::steady_clock::now();
+  call_reorder(temp_dir, cp);
+  auto reorder_end = std::chrono::steady_clock::now();
+  std::cout << "Reordering done!\n";
+  std::cout << "Time for this step: "
+            << std::chrono::duration_cast<std::chrono::seconds>(reorder_end -
+                                                                reorder_start)
+                   .count()
+            << " s\n";
+
+  std::cout << "Encoding ...\n";
+  auto encoder_start = std::chrono::steady_clock::now();
+  call_encoder(temp_dir, cp);
+  auto encoder_end = std::chrono::steady_clock::now();
+  std::cout << "Encoding done!\n";
+  std::cout << "Time for this step: "
+            << std::chrono::duration_cast<std::chrono::seconds>(encoder_end -
+                                                                encoder_start)
+                   .count()
+            << " s\n";
+
+  std::cout << "Generating read streams ...\n";
+  auto grs_start = std::chrono::steady_clock::now();
+  auto descriptorFilesPerAUs = generate_read_streams(temp_dir, cp);
+  auto grs_end = std::chrono::steady_clock::now();
+  std::cout << "Generating read streams done!\n";
+  std::cout << "Time for this step: "
+            << std::chrono::duration_cast<std::chrono::seconds>(grs_end -
+                                                                grs_start)
+                   .count()
+            << " s\n";
+
+  cp.num_blocks = descriptorFilesPerAUs.size();
+  
+  std::cout << "Generating new FASTQ\n";
+  auto new_fq_start = std::chrono::steady_clock::now();
+  if (!cp.paired_end) {
+      generate_new_fastq_se(fastqFileReader1, temp_dir, cp);
+  } else {
+      generate_new_fastq_pe(fastqFileReader1, fastqFileReader2, temp_dir, cp);
+  }
+  auto new_fq_end = std::chrono::steady_clock::now();
+  std::cout << "Generating new FASTQ done (for testing)\n";
+  std::cout << "Time for this step: "
+            << std::chrono::duration_cast<std::chrono::seconds>(new_fq_end -
+                                                                new_fq_start)
+                   .count()
+            << " s\n";
+
+  generated_aus result(descriptorFilesPerAUs);
+  if (preserve_quality || preserve_id) {
+    std::cout << "Reordering and compressing quality and/or ids ...\n";
+    auto rcqi_start = std::chrono::steady_clock::now();
+    reorder_compress_quality_id(temp_dir, cp);
+    auto rcqi_end = std::chrono::steady_clock::now();
+    std::cout << "Reordering and compressing quality and/or ids done!\n";
     std::cout << "Time for this step: "
-              << std::chrono::duration_cast<std::chrono::seconds>(reorder_end -
-                                                                  reorder_start)
+              << std::chrono::duration_cast<std::chrono::seconds>(rcqi_end -
+                                                                  rcqi_start)
                      .count()
               << " s\n";
-
-    std::cout << "Encoding ...\n";
-    auto encoder_start = std::chrono::steady_clock::now();
-    call_encoder(temp_dir, cp);
-    auto encoder_end = std::chrono::steady_clock::now();
-    std::cout << "Encoding done!\n";
-    std::cout << "Time for this step: "
-              << std::chrono::duration_cast<std::chrono::seconds>(encoder_end -
-                                                                  encoder_start)
-                     .count()
-              << " s\n";
-    if (!cp.preserve_order && paired_end) {
-      std::cout << "Generating index for paired end ...\n";
-      auto pe_encode_start = std::chrono::steady_clock::now();
-      pe_encode(temp_dir, cp);
-      auto pe_encode_end = std::chrono::steady_clock::now();
-      std::cout << "Generating index for paired end done!\n";
-      std::cout << "Time for this step: "
-                << std::chrono::duration_cast<std::chrono::seconds>(pe_encode_end -
-                                                                    pe_encode_start)
-                       .count()
-                << " s\n";
-    }
-
-    std::cout << "Generating read streams ...\n";
-    auto grs_start = std::chrono::steady_clock::now();
-    auto descriptorFilesPerAUs = generate_read_streams(temp_dir, cp);
-    auto grs_end = std::chrono::steady_clock::now();
-    std::cout << "Generating read streams done!\n";
-    std::cout << "Time for this step: "
-              << std::chrono::duration_cast<std::chrono::seconds>(grs_end -
-                                                                  grs_start)
-                     .count()
-              << " s\n";
-
-
-
-    std::cout << "Generating ref streams ...\n";
-    auto grefs_start = std::chrono::steady_clock::now();
-    auto descriptorRefFilesPerAUs = generate_ref_streams(temp_dir, cp);
-    auto grefs_end = std::chrono::steady_clock::now();
-    std::cout << "Generating ref streams done!\n";
-    std::cout << "Time for this step: "
-              << std::chrono::duration_cast<std::chrono::seconds>(grefs_end -
-                                                                  grefs_start)
-                     .count()
-              << " s\n";
-    generated_aus result(descriptorRefFilesPerAUs, descriptorFilesPerAUs);
-    if (preserve_quality || preserve_id) {
-      std::cout << "Reordering and compressing quality and/or ids ...\n";
-      auto rcqi_start = std::chrono::steady_clock::now();
-      reorder_compress_quality_id(temp_dir, cp);
-      auto rcqi_end = std::chrono::steady_clock::now();
-      std::cout << "Reordering and compressing quality and/or ids done!\n";
-      std::cout << "Time for this step: "
-                << std::chrono::duration_cast<std::chrono::seconds>(rcqi_end -
-                                                                    rcqi_start)
-                       .count()
-                << " s\n";
-    }
+  }
     
-// }
-
   // Write compression params to a file
   std::string compression_params_file = temp_dir + "/cp.bin";
   std::ofstream f_cp(compression_params_file, std::ios::binary);
@@ -149,6 +136,10 @@ generated_aus generate_streams_SPRING(
   f_cp.close();
 
   delete cp_ptr;
+
+  // TODO: remove temporary files
+  remove((temp_dir+"/read_order.bin").c_str());  
+
   auto compression_end = std::chrono::steady_clock::now();
   std::cout << "Compression done!\n";
   std::cout << "Total time for compression: "
@@ -156,6 +147,18 @@ generated_aus generate_streams_SPRING(
                    compression_end - compression_start)
                    .count()
             << " s\n";
+  
+  // test decompression
+  auto decompression_start = std::chrono::steady_clock::now();
+  decompress(temp_dir);
+  auto decompression_end = std::chrono::steady_clock::now();
+  std::cout << "Decompression done!\n";
+  std::cout << "Total time for decompression: "
+            << std::chrono::duration_cast<std::chrono::seconds>(
+                   decompression_end - decompression_start)
+                   .count()
+            << " s\n";
+
   return result;
 }
 
