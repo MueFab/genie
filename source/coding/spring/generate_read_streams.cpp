@@ -8,27 +8,39 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <map>
+#include <numeric>
 
-#include "descriptors/spring/generate_read_streams.h"
-#include "descriptors/spring/decode_read_streams.h"
-#include "descriptors/spring/util.h"
+#include "spring/generate_read_streams.h"
+#include "spring/util.h"
 
 namespace spring {
 
-void generate_read_streams_se(const std::string &temp_dir,
-                              const compression_params &cp) {
+std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams(const std::string &temp_dir, const compression_params &cp) {
+  if (!cp.paired_end)
+    return generate_read_streams_se(temp_dir,cp);
+  else
+    return generate_read_streams_pe(temp_dir,cp);
+}
 
+std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams_se(const std::string &temp_dir, const compression_params &cp) {
+
+  std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> descriptorFilesPerAU;
   std::string basedir = temp_dir;
 
-  std::string file_subseq_0_0 = basedir + "/subseq_0_0"; // pos
-  std::string file_subseq_1_0 = basedir + "/subseq_1_0"; // rcomp
-  std::string file_subseq_3_0 = basedir + "/subseq_3_0"; // mmpos
-  std::string file_subseq_3_1 = basedir + "/subseq_3_1"; // mmpos
-  std::string file_subseq_4_0 = basedir + "/subseq_4_0"; // mmtype
-  std::string file_subseq_4_1 = basedir + "/subseq_4_1"; // mmtype
-  std::string file_subseq_6_0 = basedir + "/subseq_6_0"; // ureads
-  std::string file_subseq_7_0 = basedir + "/subseq_7_0"; // rlen
-  std::string file_subseq_12_0 = basedir + "/subseq_12_0"; // rtype
+  std::vector<std::array<uint8_t,2>> subseq_indices = {
+      {0,0}, // pos
+      {1,0}, // rcomp
+      {3,0}, // mmpos
+      {3,1}, // mmpos
+      {4,0}, // mmtype
+      {4,1}, // mmtype
+      {6,0}, // ureads
+      {7,0}, // rlen
+      {12,0} // rtype
+  };
+
+  std::string file_subseq_prefix = basedir + "/subseq";
 
   std::string file_seq = basedir + "/read_seq.txt";
   std::string file_pos = basedir + "/read_pos.bin";
@@ -61,18 +73,17 @@ void generate_read_streams_se(const std::string &temp_dir,
   uint64_t *pos_arr = new uint64_t[num_reads];
   uint16_t *noise_len_arr = new uint16_t[num_reads];
 
-  std::vector<int64_t> subseq_0_0[num_thr];
-  std::vector<int64_t> subseq_1_0[num_thr];
-  std::vector<int64_t> subseq_3_0[num_thr];
-  std::vector<int64_t> subseq_3_1[num_thr];
-  std::vector<int64_t> subseq_4_0[num_thr];
-  std::vector<int64_t> subseq_4_1[num_thr];
-  std::vector<int64_t> subseq_6_0[num_thr];
-  std::vector<int64_t> subseq_7_0[num_thr];
-  std::vector<int64_t> subseq_12_0[num_thr];
+
 
   // read streams for aligned reads
-  std::string seq = read_file_as_string(file_seq);
+  std::string seq;
+  std::ifstream f_seq(file_seq);
+  f_seq.seekg(0,f_seq.end);
+  uint64_t seq_len = f_seq.tellg();
+  seq.resize(seq_len);
+  f_seq.seekg(0);
+  f_seq.read(&seq[0], seq_len);
+  f_seq.close();
   std::ifstream f_order;
   std::ifstream f_RC(file_RC);
   std::ifstream f_readlength(file_readlength, std::ios::binary);
@@ -124,7 +135,13 @@ void generate_read_streams_se(const std::string &temp_dir,
 
   // Now start with unaligned reads
   num_reads_unaligned = num_reads - num_reads_aligned;
-  std::string unaligned_arr = read_file_as_string(file_unaligned);
+  std::ifstream f_unaligned(file_unaligned);
+  f_unaligned.seekg(0, f_unaligned.end);
+  uint64_t unaligned_array_size = f_unaligned.tellg();
+  f_unaligned.seekg(0, f_unaligned.beg);
+  char *unaligned_arr = new char[unaligned_array_size];
+  f_unaligned.read(unaligned_arr, unaligned_array_size);
+  f_unaligned.close();
   uint64_t current_pos_in_unaligned_arr = 0;
   for (uint32_t i = 0; i < num_reads_unaligned; i++) {
     f_readlength.read((char *)&read_length, sizeof(uint16_t));
@@ -162,17 +179,15 @@ void generate_read_streams_se(const std::string &temp_dir,
 #endif
     uint64_t block_num = tid;
     bool done = false;
+    std::map<uint8_t, std::map<uint8_t, std::vector<int64_t>>> subseq_vector;
+    for (auto arr : subseq_indices)
+        subseq_vector[arr[0]][arr[1]] = std::vector<int64_t> ();
+
     while (!done) {
+      std::map<uint8_t, std::map<uint8_t, std::string>> listDescriptorFiles;
       //clear vectors
-      subseq_0_0[tid].clear();
-      subseq_1_0[tid].clear();
-      subseq_3_0[tid].clear();
-      subseq_3_1[tid].clear();
-      subseq_4_0[tid].clear();
-      subseq_4_1[tid].clear();
-      subseq_6_0[tid].clear();
-      subseq_7_0[tid].clear();
-      subseq_12_0[tid].clear();
+      for (auto arr : subseq_indices)
+          subseq_vector[arr[0]][arr[1]].clear();
 
       uint64_t start_read_num = block_num * num_reads_per_block;
       uint64_t end_read_num = (block_num + 1) * num_reads_per_block;
@@ -198,71 +213,73 @@ void generate_read_streams_se(const std::string &temp_dir,
       }
       if (seq_start != seq_end) {
         // not all unaligned
-        subseq_7_0[tid].push_back(seq_end - seq_start); // rlen
-        subseq_12_0[tid].push_back(6); // rtype
+        subseq_vector[7][0].push_back(seq_end - seq_start); // rlen
+        subseq_vector[12][0].push_back(5); // rtype
         for (uint64_t i = seq_start; i < seq_end; i++)
-          subseq_6_0[tid].push_back(char_to_int[(uint8_t)seq[i]]); // ureads
+          subseq_vector[6][0].push_back(char_to_int[(uint8_t)seq[i]]); // ureads
       }
       uint64_t prevpos = 0, diffpos;
       // Write streams
       for (uint64_t i = start_read_num; i < end_read_num; i++) {
         if (flag_arr[i] == true) {
-          subseq_7_0[tid].push_back(read_length_arr[i]); // rlen
-          subseq_1_0[tid].push_back(rc_to_int[(uint8_t)RC_arr[i]]); // rcomp
+          subseq_vector[7][0].push_back(read_length_arr[i]); // rlen
+          subseq_vector[1][0].push_back(rc_to_int[(uint8_t)RC_arr[i]]); // rcomp
           if (i == start_read_num) {
             // Note: In order non-preserving mode, if the first read of
             // the block is a singleton, then the rest are too.
-            subseq_0_0[tid].push_back(0);
+            subseq_vector[0][0].push_back(0);
             prevpos = pos_arr[i];
           } else {
             diffpos = pos_arr[i] - prevpos;
-            subseq_0_0[tid].push_back(diffpos); // pos
+            subseq_vector[0][0].push_back(diffpos); // pos
             prevpos = pos_arr[i];
           }
           if (noise_len_arr[i] == 0)
-            subseq_12_0[tid].push_back(1); // rtype = P
+            subseq_vector[12][0].push_back(1); // rtype = P
           else {
-            subseq_12_0[tid].push_back(3); // rtype = M
+            subseq_vector[12][0].push_back(3); // rtype = M
             for (uint16_t j = 0; j < noise_len_arr[i]; j++) {
-              subseq_3_0[tid].push_back(0); // mmpos
-              subseq_3_1[tid].push_back(noisepos_arr[pos_in_noise_arr[i] + j]);
-              subseq_4_0[tid].push_back(0); // mmtype = Substitution
-              subseq_4_1[tid].push_back(char_to_int[(uint8_t)noise_arr[pos_in_noise_arr[i] + j]]);
+              subseq_vector[3][0].push_back(0); // mmpos
+              if (j == 0)
+                  subseq_vector[3][1].push_back(noisepos_arr[pos_in_noise_arr[i] + j]);
+              else
+                  subseq_vector[3][1].push_back(noisepos_arr[pos_in_noise_arr[i] + j]-1); // decoder adds +1
+              subseq_vector[4][0].push_back(0); // mmtype = Substitution
+              subseq_vector[4][1].push_back(char_to_int[(uint8_t)noise_arr[pos_in_noise_arr[i] + j]]);
             }
-            subseq_3_0[tid].push_back(1);
+            subseq_vector[3][0].push_back(1);
           }
         } else {
-          subseq_12_0[tid].push_back(6); // rtype
-          subseq_7_0[tid].push_back(read_length_arr[i]); // rlen
+          subseq_vector[12][0].push_back(5); // rtype
+          subseq_vector[7][0].push_back(read_length_arr[i]); // rlen
           for (uint64_t j = 0; j < read_length_arr[i]; j++) {
-            subseq_6_0[tid].push_back(char_to_int[(uint8_t)unaligned_arr[pos_arr[i] + j]]); // ureads
+            subseq_vector[6][0].push_back(char_to_int[(uint8_t)unaligned_arr[pos_arr[i] + j]]); // ureads
           }
-          subseq_0_0[tid].push_back(seq_end - prevpos); // pos
-          subseq_1_0[tid].push_back(0); // rcomp
-          subseq_7_0[tid].push_back(read_length_arr[i]); // rlen
-          subseq_12_0[tid].push_back(1); // rtype = P
+          subseq_vector[0][0].push_back(seq_end - prevpos); // pos
+          subseq_vector[1][0].push_back(0); // rcomp
+          subseq_vector[7][0].push_back(read_length_arr[i]); // rlen
+          subseq_vector[12][0].push_back(1); // rtype = P
           prevpos = seq_end;
           seq_end = prevpos + read_length_arr[i];
         }
       }
       // write vectors to files
-      write_vector_to_file(subseq_0_0[tid], file_subseq_0_0 + '.' + std::to_string(block_num));
-      write_vector_to_file(subseq_1_0[tid], file_subseq_1_0 + '.' + std::to_string(block_num));
-      write_vector_to_file(subseq_3_0[tid], file_subseq_3_0 + '.' + std::to_string(block_num));
-      write_vector_to_file(subseq_3_1[tid], file_subseq_3_1 + '.' + std::to_string(block_num));
-      write_vector_to_file(subseq_4_0[tid], file_subseq_4_0 + '.' + std::to_string(block_num));
-      write_vector_to_file(subseq_4_1[tid], file_subseq_4_1 + '.' + std::to_string(block_num));
-      write_vector_to_file(subseq_6_0[tid], file_subseq_6_0 + '.' + std::to_string(block_num));
-      write_vector_to_file(subseq_7_0[tid], file_subseq_7_0 + '.' + std::to_string(block_num));
-      write_vector_to_file(subseq_12_0[tid], file_subseq_12_0 + '.' + std::to_string(block_num));
+      for (auto arr : subseq_indices) {
+        std::string filename = file_subseq_prefix + "." + std::to_string(block_num) + "." +
+            std::to_string(arr[0]) + "." + std::to_string(arr[1]);
+        listDescriptorFiles[arr[0]][arr[1]] = filename;
+        write_vector_to_file(subseq_vector[arr[0]][arr[1]], filename);
+      }
 
       block_num += num_thr;
+#ifdef GENIE_USE_OPENMP
+#pragma omp critical
+#endif
+{
+      descriptorFilesPerAU.push_back(listDescriptorFiles);
+}
     }
   }  // end omp parallel
-
-  // decode and write the reads to a file (for testing purposes)
-  uint32_t num_blocks = 1 + (num_reads-1)/num_reads_per_block;
-  decompress_se_reads(temp_dir, num_blocks);
 
   // deallocate
   delete[] RC_arr;
@@ -273,11 +290,13 @@ void generate_read_streams_se(const std::string &temp_dir,
   delete[] noise_len_arr;
   delete[] noise_arr;
   delete[] noisepos_arr;
+  delete[] unaligned_arr;
 
-  return;
+  return descriptorFilesPerAU;
 }
 
-void generate_read_streams_pe(const std::string &temp_dir,
+
+std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams_pe(const std::string &temp_dir,
                               const compression_params &cp) {
 
 // basic approach: start looking at reads from left to right. If current is aligned but
@@ -289,25 +308,29 @@ void generate_read_streams_pe(const std::string &temp_dir,
 // genomic record. Finally when we come to unaligned reads whose pair is also unaligned, we store them
 // in same genomic record.
 
+  std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> descriptorFilesPerAU;
   std::string basedir = temp_dir;
 
-  std::string file_subseq_0_0 = basedir + "/subseq_0_0"; // pos
-  std::string file_subseq_1_0 = basedir + "/subseq_1_0"; // rcomp
-  std::string file_subseq_3_0 = basedir + "/subseq_3_0"; // mmpos
-  std::string file_subseq_3_1 = basedir + "/subseq_3_1"; // mmpos
-  std::string file_subseq_4_0 = basedir + "/subseq_4_0"; // mmtype
-  std::string file_subseq_4_1 = basedir + "/subseq_4_1"; // mmtype
-  std::string file_subseq_6_0 = basedir + "/subseq_6_0"; // ureads
-  std::string file_subseq_7_0 = basedir + "/subseq_7_0"; // rlen
-  std::string file_subseq_8_0 = basedir + "/subseq_8_0"; // pair
-  std::string file_subseq_8_1 = basedir + "/subseq_8_1"; // pair
-  std::string file_subseq_8_2 = basedir + "/subseq_8_2"; // pair
-  std::string file_subseq_8_3 = basedir + "/subseq_8_3"; // pair
-  std::string file_subseq_8_4 = basedir + "/subseq_8_4"; // pair
-  std::string file_subseq_8_5 = basedir + "/subseq_8_5"; // pair
-  std::string file_subseq_8_7 = basedir + "/subseq_8_7"; // pair
-  std::string file_subseq_8_8 = basedir + "/subseq_8_8"; // pair
-  std::string file_subseq_12_0 = basedir + "/subseq_12_0"; // rtype
+  std::vector<std::array<uint8_t,2>> subseq_indices = {
+      {0,0}, // pos
+      {1,0}, // rcomp
+      {3,0}, // mmpos
+      {3,1}, // mmpos
+      {4,0}, // mmtype
+      {4,1}, // mmtype
+      {6,0}, // ureads
+      {7,0}, // rlen
+	  {8,0}, // pair
+	  {8,1}, // pair
+	  {8,2}, // pair
+	  {8,3}, // pair
+	  {8,4}, // pair
+	  {8,5}, // pair
+	  {8,6}, // pair
+	  {8,7}, // pair
+      {12,0} // rtype
+  };
+  std::string file_subseq_prefix = basedir + "/subseq";
 
   std::string file_seq = basedir + "/read_seq.txt";
   std::string file_pos = basedir + "/read_pos.bin";
@@ -357,29 +380,17 @@ void generate_read_streams_pe(const std::string &temp_dir,
   std::vector<uint32_t> read_index_genomic_record; // read numbers in genomic records
   std::vector<uint32_t> block_seq_start, block_seq_end; // seq start and end positions for this block
 
-  std::vector<int64_t> subseq_0_0[num_thr];
-  std::vector<int64_t> subseq_1_0[num_thr];
-  std::vector<int64_t> subseq_3_0[num_thr];
-  std::vector<int64_t> subseq_3_1[num_thr];
-  std::vector<int64_t> subseq_4_0[num_thr];
-  std::vector<int64_t> subseq_4_1[num_thr];
-  std::vector<int64_t> subseq_6_0[num_thr];
-  std::vector<int64_t> subseq_7_0[num_thr];
-  std::vector<int64_t> subseq_8_0[num_thr];
-  std::vector<int64_t> subseq_8_1[num_thr];
-  std::vector<int64_t> subseq_8_2[num_thr];
-  std::vector<int64_t> subseq_8_3[num_thr];
-  std::vector<int64_t> subseq_8_4[num_thr];
-  std::vector<int64_t> subseq_8_5[num_thr];
-  std::vector<int64_t> subseq_8_7[num_thr];
-  std::vector<int64_t> subseq_8_8[num_thr];
-  std::vector<int64_t> subseq_12_0[num_thr];
-
-
   // PE step 1: read all streams indexed by original position in FASTQ, also read order array
 
   // read streams for aligned reads
-  std::string seq = read_file_as_string(file_seq);
+  std::string seq;
+  std::ifstream f_seq(file_seq);
+  f_seq.seekg(0,f_seq.end);
+  uint64_t seq_len = f_seq.tellg();
+  seq.resize(seq_len);
+  f_seq.seekg(0);
+  f_seq.read(&seq[0], seq_len);
+  f_seq.close();
   std::ifstream f_order;
   f_order.open(file_order, std::ios::binary);
   std::ifstream f_RC(file_RC);
@@ -433,7 +444,13 @@ void generate_read_streams_pe(const std::string &temp_dir,
 
   // Now start with unaligned reads
   num_reads_unaligned = num_reads - num_reads_aligned;
-  std::string unaligned_arr = read_file_as_string(file_unaligned);
+  std::ifstream f_unaligned(file_unaligned);
+  f_unaligned.seekg(0, f_unaligned.end);
+  uint64_t unaligned_array_size = f_unaligned.tellg();
+  f_unaligned.seekg(0, f_unaligned.beg);
+  char *unaligned_arr = new char[unaligned_array_size];
+  f_unaligned.read(unaligned_arr, unaligned_array_size);
+  f_unaligned.close();
   uint64_t current_pos_in_unaligned_arr = 0;
   for (uint32_t i = 0; i < num_reads_unaligned; i++) {
     f_order.read((char *)&order, sizeof(uint32_t));
@@ -480,7 +497,7 @@ void generate_read_streams_pe(const std::string &temp_dir,
       already_seen[current] = true;
       uint32_t pair = (current < num_reads_by_2)?(current + num_reads_by_2):(current - num_reads_by_2);
       if (already_seen[pair]) {
-        if (block_num[pair] == current_block_num && (pos_arr[current] >= pos_arr[pair] + read_length_arr[pair]) && (pos_arr[current] - pos_arr[pair] - read_length_arr[pair] < 32768)) {
+        if (block_num[pair] == current_block_num && (pos_arr[current] >= pos_arr[pair]) && (pos_arr[current] - pos_arr[pair] < 32768)) {
           // put in same record
           block_num[current] = current_block_num;
           genomic_record_index[current] = genomic_record_index[pair];
@@ -578,25 +595,21 @@ void generate_read_streams_pe(const std::string &temp_dir,
     f_blocks_id.write((char*)&block_start[i], sizeof(uint32_t));
     f_blocks_id.write((char*)&block_end[i], sizeof(uint32_t));
     std::ofstream f_order_id(file_order_id + "." + std::to_string(i), std::ios::binary);
-    // store order (uint64_t - < 2^32 means index while greater means DUP)
+    // store order
     for (uint32_t j = block_start[i]; j < block_end[i]; j++) {
       uint32_t current = read_index_genomic_record[j];
       uint32_t pair = (current < num_reads_by_2)?(current + num_reads_by_2):(current - num_reads_by_2);
-      if ((block_num[current] == block_num[pair]) && (genomic_record_index[pair] < genomic_record_index[current])) {
-        // DUP
-        uint64_t gap = genomic_record_index[current] - genomic_record_index[pair];
-        uint64_t min_index = (current > pair)?pair:current;
-        uint64_t val_to_write = (gap<<32)|min_index;
-        f_order_id.write((char*)&val_to_write, sizeof(uint64_t));
-      } else {
-        // just write the min of current and pair
-        uint64_t min_index = (current > pair)?pair:current;
-        f_order_id.write((char*)&min_index, sizeof(uint64_t));
-      }
+      // just write the min of current and pair
+      uint32_t min_index = (current > pair)?pair:current;
+      f_order_id.write((char*)&min_index, sizeof(uint32_t));
     }
     f_order_id.close();
   }
   f_blocks_id.close();
+
+  std::vector<uint32_t> count_same_rec (num_thr, 0);
+  std::vector<uint32_t> count_split_same_AU (num_thr, 0);
+  std::vector<uint32_t> count_split_diff_AU (num_thr, 0);
 
   // PE step 4: Now generate read streams and compress blocks in parallel
 #ifdef GENIE_USE_OPENMP
@@ -613,25 +626,14 @@ void generate_read_streams_pe(const std::string &temp_dir,
     uint64_t tid = 0;
 #endif
     uint64_t cur_block_num = tid;
+    std::map<uint8_t, std::map<uint8_t, std::vector<int64_t>>> subseq_vector;
+    for (auto arr : subseq_indices)
+	  subseq_vector[arr[0]][arr[1]] = std::vector<int64_t> ();
     while (true) {
+	  std::map<uint8_t, std::map<uint8_t, std::string>> listDescriptorFiles;
       //clear vectors
-      subseq_0_0[tid].clear();
-      subseq_1_0[tid].clear();
-      subseq_3_0[tid].clear();
-      subseq_3_1[tid].clear();
-      subseq_4_0[tid].clear();
-      subseq_4_1[tid].clear();
-      subseq_6_0[tid].clear();
-      subseq_7_0[tid].clear();
-      subseq_8_0[tid].clear();
-      subseq_8_1[tid].clear();
-      subseq_8_2[tid].clear();
-      subseq_8_3[tid].clear();
-      subseq_8_4[tid].clear();
-      subseq_8_5[tid].clear();
-      subseq_8_7[tid].clear();
-      subseq_8_8[tid].clear();
-      subseq_12_0[tid].clear();
+	  for (auto arr : subseq_indices)
+		subseq_vector[arr[0]][arr[1]].clear();
 
       if (cur_block_num >= block_start.size())
         break;
@@ -640,10 +642,10 @@ void generate_read_streams_pe(const std::string &temp_dir,
       uint64_t seq_start = block_seq_start[cur_block_num], seq_end = block_seq_end[cur_block_num];
       if (seq_start != seq_end) {
         // not all unaligned
-        subseq_7_0[tid].push_back(seq_end - seq_start); // rlen
-        subseq_12_0[tid].push_back(6); // rtype
+        subseq_vector[7][0].push_back(seq_end - seq_start); // rlen
+        subseq_vector[12][0].push_back(5); // rtype
         for (uint64_t i = seq_start; i < seq_end; i++)
-          subseq_6_0[tid].push_back(char_to_int[(uint8_t)seq[i]]); // ureads
+          subseq_vector[6][0].push_back(char_to_int[(uint8_t)seq[i]]); // ureads
       }
       uint64_t prevpos = 0, diffpos;
       // Write streams
@@ -655,11 +657,11 @@ void generate_read_streams_pe(const std::string &temp_dir,
           if (i == block_start[cur_block_num]) {
             // Note: In order non-preserving mode, if the first read of
             // the block is a singleton, then the rest are too.
-            subseq_0_0[tid].push_back(0); // pos
+            subseq_vector[0][0].push_back(0); // pos
             prevpos = pos_arr[current];
           } else {
             diffpos = pos_arr[current] - prevpos;
-            subseq_0_0[tid].push_back(diffpos); // pos
+            subseq_vector[0][0].push_back(diffpos); // pos
             prevpos = pos_arr[current];
           }
         }
@@ -667,135 +669,132 @@ void generate_read_streams_pe(const std::string &temp_dir,
           // both reads in same record
           if (flag_arr[current] == false) {
             // Case 1: both unaligned
-            subseq_12_0[tid].push_back(6); // rtype
-            subseq_7_0[tid].push_back(read_length_arr[current] + read_length_arr[pair]); // rlen
+            subseq_vector[12][0].push_back(5); // rtype
+            subseq_vector[7][0].push_back(read_length_arr[current] + read_length_arr[pair]); // rlen
             for (uint64_t j = 0; j < read_length_arr[current]; j++) {
-              subseq_6_0[tid].push_back(char_to_int[(uint8_t)unaligned_arr[pos_arr[current] + j]]); // ureads
+              subseq_vector[6][0].push_back(char_to_int[(uint8_t)unaligned_arr[pos_arr[current] + j]]); // ureads
             }
             for (uint64_t j = 0; j < read_length_arr[pair]; j++) {
-              subseq_6_0[tid].push_back(char_to_int[(uint8_t)unaligned_arr[pos_arr[pair] + j]]); // ureads
+              subseq_vector[6][0].push_back(char_to_int[(uint8_t)unaligned_arr[pos_arr[pair] + j]]); // ureads
             }
-            subseq_0_0[tid].push_back(seq_end - prevpos); // pos
-            subseq_1_0[tid].push_back(0+2*0); // rcomp
-            subseq_7_0[tid].push_back(read_length_arr[current]); // rlen
-            subseq_7_0[tid].push_back(read_length_arr[pair]); // rlen
-            subseq_12_0[tid].push_back(1); // rtype = P
-            subseq_8_0[tid].push_back(0); // pair decoding case same_rec
+            subseq_vector[0][0].push_back(seq_end - prevpos); // pos
+            subseq_vector[1][0].push_back(0); // rcomp
+			subseq_vector[1][0].push_back(0); // rcomp
+            subseq_vector[7][0].push_back(read_length_arr[current]); // rlen
+            subseq_vector[7][0].push_back(read_length_arr[pair]); // rlen
+            subseq_vector[12][0].push_back(1); // rtype = P
+            subseq_vector[8][0].push_back(0); // pair decoding case same_rec
             bool read_1_first = true;
-            uint16_t delta = 0;
-            subseq_8_1[tid].push_back(!(read_1_first)+2*delta); // pair
+            uint16_t delta = read_length_arr[current];
+            subseq_vector[8][1].push_back(!(read_1_first)+2*delta); // pair
             prevpos = seq_end;
             seq_end = prevpos + read_length_arr[current] + read_length_arr[pair];
           } else {
             // Case 2: both aligned
-            subseq_7_0[tid].push_back(read_length_arr[current]); // rlen
-            subseq_7_0[tid].push_back(read_length_arr[pair]); // rlen
-            subseq_1_0[tid].push_back(rc_to_int[(uint8_t)RC_arr[current]]+2*rc_to_int[(uint8_t)RC_arr[pair]]); // rcomp
+            subseq_vector[7][0].push_back(read_length_arr[current]); // rlen
+            subseq_vector[7][0].push_back(read_length_arr[pair]); // rlen
+			subseq_vector[1][0].push_back(rc_to_int[(uint8_t)RC_arr[current]]); // rcomp
+			subseq_vector[1][0].push_back(rc_to_int[(uint8_t)RC_arr[pair]]); // rcomp
             if (noise_len_arr[current] == 0 && noise_len_arr[pair] == 0)
-              subseq_12_0[tid].push_back(1); // rtype = P
+              subseq_vector[12][0].push_back(1); // rtype = P
             else {
-              subseq_12_0[tid].push_back(3); // rtype = M
-              uint16_t abs_noise_pos = 0;
-              for (uint16_t j = 0; j < noise_len_arr[current]; j++) {
-                subseq_3_0[tid].push_back(0); // mmpos
-                subseq_3_1[tid].push_back(noisepos_arr[pos_in_noise_arr[current] + j]); // mmpos
-                abs_noise_pos += noisepos_arr[pos_in_noise_arr[current] + j];
-                subseq_4_0[tid].push_back(0); // mmtype = Substitution
-                subseq_4_1[tid].push_back(char_to_int[(uint8_t)noise_arr[pos_in_noise_arr[current] + j]]);
-              }
-              for (uint16_t j = 0; j < noise_len_arr[pair]; j++) {
-                subseq_3_0[tid].push_back(0); // mmpos
-                if (j == 0)
-                  subseq_3_1[tid].push_back(read_length_arr[current] - abs_noise_pos + noisepos_arr[pos_in_noise_arr[pair] + j]); // mmpos
-                else
-                  subseq_3_1[tid].push_back(noisepos_arr[pos_in_noise_arr[pair] + j]); // mmpos
-                subseq_4_0[tid].push_back(0); // mmtype = Substitution
-                subseq_4_1[tid].push_back(char_to_int[(uint8_t)noise_arr[pos_in_noise_arr[pair] + j]]);
-              }
-              subseq_3_0[tid].push_back(1);
+              subseq_vector[12][0].push_back(3); // rtype = M
+			  for (int k = 0; k < 2; k++) {
+				uint32_t ind = k?pair:current;
+                for (uint16_t j = 0; j < noise_len_arr[ind]; j++) {
+                  subseq_vector[3][0].push_back(0); // mmpos
+				  if (j == 0)
+                  	subseq_vector[3][1].push_back(noisepos_arr[pos_in_noise_arr[ind] + j]); // mmpos
+				  else
+					subseq_vector[3][1].push_back(noisepos_arr[pos_in_noise_arr[ind] + j]-1); // mmpos
+                  subseq_vector[4][0].push_back(0); // mmtype = Substitution
+                  subseq_vector[4][1].push_back(char_to_int[(uint8_t)noise_arr[pos_in_noise_arr[ind] + j]]);
+                }
+			 	subseq_vector[3][0].push_back(1); // mmpos
+			  }
             }
             bool read_1_first = (current < pair);
-            uint16_t delta = pos_arr[pair] - pos_arr[current] - read_length_arr[current];
-            subseq_8_0[tid].push_back(0); // pair decoding case same_rec
-            subseq_8_1[tid].push_back(!(read_1_first)+2*delta); // pair
+            uint16_t delta = pos_arr[pair] - pos_arr[current];
+            subseq_vector[8][0].push_back(0); // pair decoding case same_rec
+            subseq_vector[8][1].push_back(!(read_1_first)+2*delta); // pair
+            count_same_rec[tid]++;
           }
         } else {
           // only one read in genomic record
           if (flag_arr[current] == true) {
-            subseq_7_0[tid].push_back(read_length_arr[current]); // rlen
-            subseq_1_0[tid].push_back(rc_to_int[(uint8_t)RC_arr[current]]); // rcomp
+            subseq_vector[7][0].push_back(read_length_arr[current]); // rlen
+            subseq_vector[1][0].push_back(rc_to_int[(uint8_t)RC_arr[current]]); // rcomp
             if (noise_len_arr[current] == 0)
-              subseq_12_0[tid].push_back(1); // rtype = P
+              subseq_vector[12][0].push_back(1); // rtype = P
             else {
-              subseq_12_0[tid].push_back(3); // rtype = M
+              subseq_vector[12][0].push_back(3); // rtype = M
               for (uint16_t j = 0; j < noise_len_arr[current]; j++) {
-                subseq_3_0[tid].push_back(0); // mmpos
-                subseq_3_1[tid].push_back(noisepos_arr[pos_in_noise_arr[current] + j]);
-                subseq_4_0[tid].push_back(0); // mmtype = Substitution
-                subseq_4_1[tid].push_back(char_to_int[(uint8_t)noise_arr[pos_in_noise_arr[current] + j]]);
+                subseq_vector[3][0].push_back(0); // mmpos
+				if (j == 0)
+                  subseq_vector[3][1].push_back(noisepos_arr[pos_in_noise_arr[current] + j]); // mmpos
+				else
+                  subseq_vector[3][1].push_back(noisepos_arr[pos_in_noise_arr[current] + j] - 1); // mmpos
+                subseq_vector[4][0].push_back(0); // mmtype = Substitution
+                subseq_vector[4][1].push_back(char_to_int[(uint8_t)noise_arr[pos_in_noise_arr[current] + j]]);
               }
-              subseq_3_0[tid].push_back(1);
+              subseq_vector[3][0].push_back(1);
             }
           } else {
-            subseq_12_0[tid].push_back(6); // rtype
-            subseq_7_0[tid].push_back(read_length_arr[current]); // rlen
+            subseq_vector[12][0].push_back(5); // rtype
+            subseq_vector[7][0].push_back(read_length_arr[current]); // rlen
             for (uint64_t j = 0; j < read_length_arr[current]; j++) {
-              subseq_6_0[tid].push_back(char_to_int[(uint8_t)unaligned_arr[pos_arr[current] + j]]); // ureads
+              subseq_vector[6][0].push_back(char_to_int[(uint8_t)unaligned_arr[pos_arr[current] + j]]); // ureads
             }
-            subseq_0_0[tid].push_back(seq_end - prevpos); // pos
-            subseq_1_0[tid].push_back(0); // rcomp
-            subseq_7_0[tid].push_back(read_length_arr[current]); // rlen
-            subseq_12_0[tid].push_back(1); // rtype = P
+            subseq_vector[0][0].push_back(seq_end - prevpos); // pos
+            subseq_vector[1][0].push_back(0); // rcomp
+            subseq_vector[7][0].push_back(read_length_arr[current]); // rlen
+            subseq_vector[12][0].push_back(1); // rtype = P
             prevpos = seq_end;
             seq_end = prevpos + read_length_arr[current];
           }
 
           // pair subsequences
           bool same_block = (block_num[current] == block_num[pair]);
+          if (same_block)
+              count_split_same_AU[tid]++;
+          else
+              count_split_diff_AU[tid]++;
+
           bool read_1_first = (current < pair);
           if (same_block && !read_1_first) {
-            subseq_8_0[tid].push_back(1); // R1_split
-            subseq_8_2[tid].push_back(genomic_record_index[pair]);
+            subseq_vector[8][0].push_back(1); // R1_split
+            subseq_vector[8][2].push_back(genomic_record_index[pair]);
           } else if (same_block && read_1_first) {
-            subseq_8_0[tid].push_back(2); // R2_split
-            subseq_8_3[tid].push_back(genomic_record_index[pair]);
+            subseq_vector[8][0].push_back(2); // R2_split
+            subseq_vector[8][3].push_back(genomic_record_index[pair]);
           } else if (!same_block && !read_1_first) {
-            subseq_8_0[tid].push_back(3); // R1_diff_ref_seq
-            subseq_8_4[tid].push_back(block_num[pair]);
-            subseq_8_7[tid].push_back(genomic_record_index[pair]);
+            subseq_vector[8][0].push_back(3); // R1_diff_ref_seq
+            subseq_vector[8][4].push_back(block_num[pair]);
+            subseq_vector[8][6].push_back(genomic_record_index[pair]);
           } else {
-            subseq_8_0[tid].push_back(4); // R2_diff_ref_seq
-            subseq_8_5[tid].push_back(block_num[pair]);
-            subseq_8_8[tid].push_back(genomic_record_index[pair]);
+            subseq_vector[8][0].push_back(4); // R2_diff_ref_seq
+            subseq_vector[8][5].push_back(block_num[pair]);
+            subseq_vector[8][7].push_back(genomic_record_index[pair]);
           }
         }
       }
       // write vectors to files
-      write_vector_to_file(subseq_0_0[tid], file_subseq_0_0 + '.' + std::to_string(cur_block_num));
-      write_vector_to_file(subseq_1_0[tid], file_subseq_1_0 + '.' + std::to_string(cur_block_num));
-      write_vector_to_file(subseq_3_0[tid], file_subseq_3_0 + '.' + std::to_string(cur_block_num));
-      write_vector_to_file(subseq_3_1[tid], file_subseq_3_1 + '.' + std::to_string(cur_block_num));
-      write_vector_to_file(subseq_4_0[tid], file_subseq_4_0 + '.' + std::to_string(cur_block_num));
-      write_vector_to_file(subseq_4_1[tid], file_subseq_4_1 + '.' + std::to_string(cur_block_num));
-      write_vector_to_file(subseq_6_0[tid], file_subseq_6_0 + '.' + std::to_string(cur_block_num));
-      write_vector_to_file(subseq_7_0[tid], file_subseq_7_0 + '.' + std::to_string(cur_block_num));
-      write_vector_to_file(subseq_8_0[tid], file_subseq_8_0 + '.' + std::to_string(cur_block_num));
-      write_vector_to_file(subseq_8_1[tid], file_subseq_8_1 + '.' + std::to_string(cur_block_num));
-      write_vector_to_file(subseq_8_2[tid], file_subseq_8_2 + '.' + std::to_string(cur_block_num));
-      write_vector_to_file(subseq_8_3[tid], file_subseq_8_3 + '.' + std::to_string(cur_block_num));
-      write_vector_to_file(subseq_8_4[tid], file_subseq_8_4 + '.' + std::to_string(cur_block_num));
-      write_vector_to_file(subseq_8_5[tid], file_subseq_8_5 + '.' + std::to_string(cur_block_num));
-      write_vector_to_file(subseq_8_7[tid], file_subseq_8_7 + '.' + std::to_string(cur_block_num));
-      write_vector_to_file(subseq_8_8[tid], file_subseq_8_8 + '.' + std::to_string(cur_block_num));
-      write_vector_to_file(subseq_12_0[tid], file_subseq_12_0 + '.' + std::to_string(cur_block_num));
+	  for (auto arr : subseq_indices) {
+		std::string filename = file_subseq_prefix + "." + std::to_string(cur_block_num) + "." +
+			std::to_string(arr[0]) + "." + std::to_string(arr[1]);
+		listDescriptorFiles[arr[0]][arr[1]] = filename;
+		write_vector_to_file(subseq_vector[arr[0]][arr[1]], filename);
+	  }
 
       cur_block_num += num_thr;
+#ifdef GENIE_USE_OPENMP
+#pragma omp critical
+#endif
+{
+      descriptorFilesPerAU.push_back(listDescriptorFiles);
+}
     }
   }  // end omp parallel
-
-  // decode and write the reads to a file (for testing purposes)
-  uint32_t num_blocks = block_start.size();
-  decompress_pe_reads(temp_dir, num_blocks);
 
   // deallocate
   delete[] RC_arr;
@@ -806,7 +805,13 @@ void generate_read_streams_pe(const std::string &temp_dir,
   delete[] noise_len_arr;
   delete[] noise_arr;
   delete[] noisepos_arr;
+  delete[] unaligned_arr;
 
-  return;
+  std::cout << "count_same_rec: " << std::accumulate(count_same_rec.begin(),count_same_rec.end(), 0) << "\n";
+  std::cout << "count_split_same_AU: " << std::accumulate(count_split_same_AU.begin(), count_split_same_AU.end(), 0) << "\n";
+  std::cout << "count_split_diff_AU: " << std::accumulate(count_split_diff_AU.begin(), count_split_diff_AU.end(), 0) << "\n";
+
+  return descriptorFilesPerAU;
 }
+
 }  // namespace spring

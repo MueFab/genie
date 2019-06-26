@@ -37,12 +37,7 @@
 #include "coding/alico/include/main.h"
 
 namespace spring {
-void decompress(const std::string& temp_dir,
-                const std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>>& ref_descriptorFilesPerAU,
-                uint32_t num_blocks,
-                bool eru_abs_flag,
-                bool paired_end
-);
+void decompress(const std::string& temp_dir);
 }
 
 namespace dsg {
@@ -322,40 +317,14 @@ void decompression_fastq(
     //copyDir(temp_dir,temp_dir + "/../genie_uncomp");
 
     // Extract spring parameters
-    spring::compression_params cp;
-    FILE *cpfile = fopen((temp_dir + "cp.bin").c_str(), "rb");
-    if (!cpfile) {
-        throw std::runtime_error("Cannot open config file");
-    }
-    if (fread((uint8_t *) &cp, sizeof(spring::compression_params), 1, cpfile) != 1) {
-        fclose(cpfile);
-        throw std::runtime_error("Cannot read config");
-    }
-    fclose(cpfile);
-    uint32_t num_blocks;
-    if (!cp.paired_end) {
-        num_blocks = 1 + (cp.num_reads - 1) / cp.num_reads_per_block;
-    } else {
-        num_blocks = 1 + (cp.num_reads / 2 - 1) / cp.num_reads_per_block;
-    }
-
     // Decode spring streams
-    spring::decompress(temp_dir, createMap(flist), num_blocks, cp.preserve_order, cp.paired_end);
+    spring::decompress(temp_dir);
 
     // Finish fastq
     std::string outname = programOptions.inputFilePath;
     outname = outname.substr(0, outname.find_last_of('.'));
-    if (cp.paired_end) {
-        outname += "_decompressed_1.fastq";
-        std::rename((temp_dir + "decompressed_1.fastq").c_str(), outname.c_str());
-        outname = programOptions.inputFilePath;
-        outname = outname.substr(0, outname.find_last_of('.'));
-        outname += "_decompressed_2.fastq";
-        std::rename((temp_dir + "decompressed_2.fastq").c_str(), outname.c_str());
-    } else {
-        outname += "_decompressed.fastq";
-        std::rename((temp_dir + "decompressed.fastq").c_str(), outname.c_str());
-    }
+    outname += "_decompressed.fastq";
+    std::rename((temp_dir + "decompressed.fastq").c_str(), outname.c_str());
 
     ghc::filesystem::remove_all(temp_dir);
 }
