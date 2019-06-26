@@ -2,12 +2,15 @@
 #define SPRING_REORDER_COMPRESS_QUALITY_ID_H_
 
 #include <string>
-#include "descriptors/spring/util.h"
+#include "spring/util.h"
 
 namespace spring {
 
 void reorder_compress_quality_id(const std::string &temp_dir,
                                  const compression_params &cp);
+
+void generate_order(const std::string &file_order, uint32_t *order_array,
+                       const uint32_t &numreads);
 
 void read_block_start_end (const std::string &file_blocks, std::vector<uint32_t> &block_start, std::vector<uint32_t> &block_end);
 
@@ -22,7 +25,7 @@ void reorder_compress(const std::string &file_name,
                       uint32_t *order_array, const std::string &mode);
 // mode can be "quality" or "id"
 
-void generate_read_id_tokens_se(std::string *id_array, const uint32_t &num_ids, std::vector<int64_t> tokens[128][8]);
+void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std::vector<int64_t> tokens[128][8]);
 
 }  // namespace spring
 

@@ -21,15 +21,11 @@ public:
 };
 
 class generated_aus{
-    generated_aus_ref generatedAusRef;
     std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> encodedFastqAus;
 
 
 public:
-    generated_aus(const generated_aus_ref &generatedAusRef,
-                  const std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> &encodedFastqAus);
-
-    const generated_aus_ref &getGeneratedAusRef() const;
+    generated_aus(const std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> &encodedFastqAus);
 
     const std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> &getEncodedFastqAus() const;
 

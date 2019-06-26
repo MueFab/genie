@@ -20,8 +20,8 @@ const int MAX_SEARCH_ENCODER = 1000;
 const int THRESH_ENCODER = 24;
 const int NUM_READS_PER_BLOCK = 256000;
 const int NUM_READS_PER_BLOCK_LONG = 10000;
-const uint64_t LEN_UREAD_REF = 1000;
-const uint64_t NUM_UREADS_IN_AU_REF = 100000;
+
+const uint32_t MAX_NUM_TOKENS_ID = 1024;
 }  // namespace spring
 
 #endif  // SPRING_PARAMS_H_
