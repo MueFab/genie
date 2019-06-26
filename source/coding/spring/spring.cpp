@@ -100,7 +100,7 @@ generated_aus generate_streams_SPRING(
 
   cp.num_blocks = descriptorFilesPerAUs.size();
   
-  std::cout << "Generating new FASTQ\n";
+ /* std::cout << "Generating new FASTQ\n";
   auto new_fq_start = std::chrono::steady_clock::now();
   if (!cp.paired_end) {
       generate_new_fastq_se(fastqFileReader1, temp_dir, cp);
@@ -113,7 +113,7 @@ generated_aus generate_streams_SPRING(
             << std::chrono::duration_cast<std::chrono::seconds>(new_fq_end -
                                                                 new_fq_start)
                    .count()
-            << " s\n";
+            << " s\n";*/
 
   generated_aus result(descriptorFilesPerAUs);
   if (preserve_quality || preserve_id) {
@@ -138,7 +138,7 @@ generated_aus generate_streams_SPRING(
   delete cp_ptr;
 
   // TODO: remove temporary files
-  remove((temp_dir+"/read_order.bin").c_str());  
+  remove((temp_dir+"/read_order.bin").c_str());
 
   auto compression_end = std::chrono::steady_clock::now();
   std::cout << "Compression done!\n";
@@ -148,7 +148,7 @@ generated_aus generate_streams_SPRING(
                    .count()
             << " s\n";
   
-  // test decompression
+  /*// test decompression
   auto decompression_start = std::chrono::steady_clock::now();
   decompress(temp_dir);
   auto decompression_end = std::chrono::steady_clock::now();
@@ -157,7 +157,7 @@ generated_aus generate_streams_SPRING(
             << std::chrono::duration_cast<std::chrono::seconds>(
                    decompression_end - decompression_start)
                    .count()
-            << " s\n";
+            << " s\n";*/
 
   return result;
 }

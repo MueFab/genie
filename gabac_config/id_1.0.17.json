@@ -3,7 +3,7 @@
     "sequence_transformation_parameter": 0,
     "transformed_sequences": [
         {
-            "binarization_id": 4,
+            "binarization_id": 5,
             "binarization_parameters": [
                 1
             ],
@@ -12,5 +12,5 @@
             "lut_transformation_enabled": false
         }
     ],
-    "word_size": 1
+    "word_size": 8
 }
