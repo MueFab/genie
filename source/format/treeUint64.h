@@ -5,11 +5,7 @@
 #ifndef MPEGG_CAPSULATOR_TREEUINT64_H
 #define MPEGG_CAPSULATOR_TREEUINT64_H
 
-#ifdef __APPLE_CC__
 #include <stdint.h>
-#else
-    #include <stdint-gcc.h>
-#endif
 #include <stdbool.h>
 
 typedef struct TreeNode_ TreeNode;
