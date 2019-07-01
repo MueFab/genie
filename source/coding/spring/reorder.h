@@ -206,7 +206,7 @@ template <size_t bitset_size>
 void readDnaFile(std::bitset<bitset_size> *read, uint16_t *read_lengths,
                  const reorder_global<bitset_size> &rg) {
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel num_threads(/*rg.num_thr*/ 1)
+#pragma omp parallel num_threads(rg.num_thr)
 #endif
   {
 #ifdef GENIE_USE_OPENMP
@@ -220,7 +220,7 @@ void readDnaFile(std::bitset<bitset_size> *read, uint16_t *read_lengths,
     std::string s;
     uint32_t i = 0;
     while (std::getline(f, s)) {
-      if (i % num_thr == tid) {
+      if (i % num_thr == (size_t)tid) {
         read_lengths[i] = (uint16_t)s.length();
         stringtobitset<bitset_size>(s, read_lengths[i], read[i], rg.basemask);
         i++;
@@ -234,7 +234,7 @@ void readDnaFile(std::bitset<bitset_size> *read, uint16_t *read_lengths,
   remove(rg.infile[0].c_str());
   if (rg.paired_end) {
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel num_threads(/*rg.num_thr*/ 1)
+#pragma omp parallel num_threads(rg.num_thr)
 #endif
     {
 #ifdef GENIE_USE_OPENMP
@@ -248,7 +248,7 @@ void readDnaFile(std::bitset<bitset_size> *read, uint16_t *read_lengths,
       std::string s;
       uint32_t i = 0;
       while (std::getline(f, s)) {
-        if (i % num_thr == tid) {
+        if (i % num_thr == (size_t)tid) {
           read_lengths[rg.numreads_array[0] + i] = (uint16_t)s.length();
           stringtobitset<bitset_size>(s, read_lengths[rg.numreads_array[0] + i],
                                       read[rg.numreads_array[0] + i],
@@ -388,10 +388,8 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict,
   {
 #ifdef GENIE_USE_OPENMP
     int tid = omp_get_thread_num();
-    int num_thr = omp_get_num_threads();
 #else
     int tid = 0; // set thread ID to zero if not using OpenMP
-    int num_thr = 1;
 #endif
     std::string tid_str = std::to_string(tid);
     std::ofstream foutRC(rg.outfileRC + '.' + tid_str, std::ofstream::out);
@@ -799,7 +797,12 @@ void reorder_main(const std::string &temp_dir, const compression_params &cp) {
 
   std::cout << "Constructing dictionaries\n";
   constructdictionary<bitset_size>(read, dict, read_lengths, rg.numdict,
-                                   rg.numreads, 2, rg.basedir, rg.num_thr);
+                                   rg.numreads, 2, rg.basedir
+#ifdef GENIE_USE_OPENMP                                   
+                                   , rg.num_thr);
+#else
+                                   );
+#endif                                    
   std::cout << "Reordering reads\n";
   reorder<bitset_size>(read, dict, read_lengths, rg);
   std::cout << "Writing to file\n";

@@ -607,6 +607,7 @@ void encoder_main(const std::string &temp_dir, const compression_params &cp) {
   // omp parallel regions with only a single thread, it still doesn't work.
   //
 //  eg.num_thr = 1; // remove after fixing bug(s)
+//  SEEMS TO BE WORKING NOW -SHUBHAM
 
   correct_order(order_s, eg);
 
@@ -624,8 +625,12 @@ void encoder_main(const std::string &temp_dir, const compression_params &cp) {
   }
 
   constructdictionary<bitset_size>(read, dict, read_lengths_s, eg.numdict_s,
-                                   eg.numreads_s + eg.numreads_N, 3, eg.basedir,
-                                   eg.num_thr);
+                                   eg.numreads_s + eg.numreads_N, 3, eg.basedir
+#ifdef GENIE_USE_OPENMP
+                                   , eg.num_thr);
+#else
+                                   );
+#endif
   encode<bitset_size>(read, dict, order_s, read_lengths_s, eg, egb);
   remove(eg.infile_N.c_str());
   delete[] read;
