@@ -452,7 +452,7 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict,
           unmatched[tid]++;
       }
       firstread +=
-          rg.numreads / rg.num_thr;  // spread out first read equally
+          rg.numreads / num_thr;  // spread out first read equally
     }
 #ifdef GENIE_USE_OPENMP
 #pragma omp barrier
