@@ -107,9 +107,9 @@ void preprocess(dsg::input::fastq::FastqFileReader *fastqFileReader1,
   //
   // OpenMP has a reduction clause to handle this sort of thing neatly.
   //
-  //int num_threads = cp.num_thr;
-  int num_threads = 1; // remove after fixing bug(s)
-  //
+  int num_threads = cp.num_thr;
+  // int num_threads = 1; // remove after fixing bug(s)
+  // SEEMS TO WORK FOR ME -SHUBHAM
   uint64_t num_reads_per_step = (uint64_t)num_threads * num_reads_per_block;
   std::string *id_array_1 = new std::string[num_reads_per_step];
   bool *read_contains_N_array = new bool[num_reads_per_step];
@@ -130,7 +130,7 @@ void preprocess(dsg::input::fastq::FastqFileReader *fastqFileReader1,
         throw std::runtime_error("Too many reads.");
       }
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel num_threads(/*cp.num_thr*/ 1)
+#pragma omp parallel num_threads(cp.num_thr)
 #endif
       {
         bool done = false;

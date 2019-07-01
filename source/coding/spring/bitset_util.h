@@ -62,13 +62,18 @@ template <size_t bitset_size>
 void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict,
                          uint16_t *read_lengths, const int numdict,
                          const uint32_t &numreads, const int bpb,
-                         const std::string &basedir, const int &num_threads) {
+                         const std::string &basedir
+#ifdef GENIE_USE_OPENMP
+                        , const int &num_threads) {
+#else
+                        ) {
+#endif
   std::bitset<bitset_size> *mask = new std::bitset<bitset_size>[numdict];
   generateindexmasks<bitset_size>(mask, dict, numdict, bpb);
   for (int j = 0; j < numdict; j++) {
     uint64_t *ull = new uint64_t[numreads];
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel num_threads(/*num_threads*/ 1)
+#pragma omp parallel num_threads(num_threads)
 #endif
     {
       std::bitset<bitset_size> b;
@@ -101,7 +106,7 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict,
 
 // write ull to file
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel num_threads(/*num_threads*/ 1)
+#pragma omp parallel num_threads(num_threads)
 #endif
     {
 #ifdef GENIE_USE_OPENMP
@@ -140,7 +145,7 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict,
 
 // compute hashes for all reads
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel num_threads(/*num_threads*/ 1)
+#pragma omp parallel num_threads(num_threads)
 #endif
     {
 #ifdef GENIE_USE_OPENMP
@@ -175,11 +180,11 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict,
 
   // for rest of the function, use numdict threads to parallelize
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel num_threads(/*num_threads*/ 1)
+#pragma omp parallel num_threads(std::min(numdict, num_threads))
 #endif
   {
 #ifdef GENIE_USE_OPENMP
-      int num_thr = omp_get_num_threads();
+      int num_thr = num_threads;
 #else
       int num_thr = 1;
 #endif
