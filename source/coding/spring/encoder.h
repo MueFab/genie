@@ -607,6 +607,7 @@ void encoder_main(const std::string &temp_dir, const compression_params &cp) {
   // omp parallel regions with only a single thread, it still doesn't work.
   //
 //  eg.num_thr = 1; // remove after fixing bug(s)
+//  SEEMS TO BE WORKING NOW -SHUBHAM
 
   correct_order(order_s, eg);
 
