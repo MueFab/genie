@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <tuple>
 #include <algorithm>
 #include <stdexcept>
 #include <fstream>
@@ -14,8 +15,9 @@
 
 namespace spring {
 
-std::vector<dsg::input::fastq::FastqRecord> decode_streams(decoded_desc_t &dec, const std::vector<std::array<uint8_t,2>> &subseq_indices, bool paired_end) {
+std::pair<std::vector<dsg::input::fastq::FastqRecord>,std::vector<bool>> decode_streams(decoded_desc_t &dec, const std::vector<std::array<uint8_t,2>> &subseq_indices, bool paired_end) {
   std::vector<dsg::input::fastq::FastqRecord> decoded_records;
+  std::vector<bool> first_file_flag_vec; 
   std::string cur_read[2];
   std::string cur_quality[2];
   std::string cur_ID;
@@ -130,10 +132,13 @@ std::vector<dsg::input::fastq::FastqRecord> decode_streams(decoded_desc_t &dec, 
 
       for (int i = 0; i < number_of_record_segments; i++) {
         if (paired_end) {
-          if ((i == 0 && read_1_first) || (i == 1 && !read_1_first))
+          if ((i == 0 && read_1_first) || (i == 1 && !read_1_first)) {
             cur_record.title = cur_ID + "/1";
-          else
+            first_file_flag_vec.push_back(true);
+          } else {
             cur_record.title = cur_ID + "/2";
+            first_file_flag_vec.push_back(false);
+          }
         } else {
           cur_record.title = cur_ID;
         }
@@ -143,7 +148,7 @@ std::vector<dsg::input::fastq::FastqRecord> decode_streams(decoded_desc_t &dec, 
       }
     }
   }
-  return decoded_records;
+  return std::make_pair(decoded_records, first_file_flag_vec);
 }
 
 bool decompress(const std::string &temp_dir) {
@@ -195,7 +200,6 @@ bool decompress(const std::string &temp_dir) {
   }
 
   decoded_desc_t dec;
-  bool fileswitch = true;
   for (uint32_t block_num = 0; block_num < cp.num_blocks; block_num++) {
     for (auto arr : subseq_indices) {
         std::string filename = file_subseq_prefix + "." + std::to_string(block_num) + "." +
@@ -205,15 +209,16 @@ bool decompress(const std::string &temp_dir) {
     dec.quality_arr = read_file_as_string(file_quality + '.' + std::to_string(block_num));
     read_read_id_tokens_from_file(file_id + '.' + std::to_string(block_num), dec.tokens);
     auto decoded_records = decode_streams(dec, subseq_indices, cp.paired_end);
-    for (auto record: decoded_records) {
-        std::ostream& tmpout = fileswitch ? fout : fout2;
-        tmpout << record.title << "\n";
-        tmpout << record.sequence << "\n";
+    for (size_t i = 0; i < decoded_records.first.size(); i++) {
+        bool first_file_flag = true;
+        if (cp.paired_end)
+          if (!decoded_records.second[i])
+            first_file_flag = false;
+        std::ostream& tmpout = first_file_flag ? fout : fout2;
+        tmpout << decoded_records.first[i].title << "\n";
+        tmpout << decoded_records.first[i].sequence << "\n";
         tmpout << "+" << "\n";
-        tmpout << record.qualityScores << "\n";
-        if(cp.paired_end) {
-            fileswitch = !fileswitch;
-        }
+        tmpout << decoded_records.first[i].qualityScores << "\n";
     }
   }
   bool paired_end = cp.paired_end;
