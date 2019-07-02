@@ -383,7 +383,7 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict,
   uint32_t firstread = 0;
   uint32_t *unmatched = new uint32_t[rg.num_thr];
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel num_threads(/*rg.num_thr*/ 1)
+#pragma omp parallel num_threads(rg.num_thr)
 #endif
   {
 #ifdef GENIE_USE_OPENMP
@@ -684,7 +684,7 @@ void writetofile(std::bitset<bitset_size> *read, uint16_t *read_lengths,
                  reorder_global<bitset_size> &rg) {
 // convert bitset to string for all num_thr files in parallel
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel num_threads(/*rg.num_thr*/ 1)
+#pragma omp parallel num_threads(rg.num_thr)
 #endif
     {
 #ifdef GENIE_USE_OPENMP

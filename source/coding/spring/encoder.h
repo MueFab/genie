@@ -131,7 +131,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
   generatemasks<bitset_size>(mask, eg.max_readlen, 3);
   std::cout << "Encoding reads\n";
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel num_threads(/*eg.num_thr*/ 1)
+#pragma omp parallel num_threads(eg.num_thr)
 #endif
   {
 #ifdef GENIE_USE_OPENMP
@@ -606,7 +606,7 @@ void encoder_main(const std::string &temp_dir, const compression_params &cp) {
   // works with eg.num_thr = 1. If you set eg.num_thr = 2 and execute the
   // omp parallel regions with only a single thread, it still doesn't work.
   //
-  eg.num_thr = 1; // remove after fixing bug(s)
+//  eg.num_thr = 1; // remove after fixing bug(s)
 
   correct_order(order_s, eg);
 
