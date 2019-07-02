@@ -1,4 +1,4 @@
-# Contributing to genie
+# Contributing to Genie
 
 First off, thanks for taking the time to contribute!
 
