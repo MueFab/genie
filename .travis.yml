@@ -21,8 +21,8 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-            - libboost-program-options-dev
-            - python-numpy
+            # - libboost-program-options-dev
+            # - python-numpy
       env:
         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
     - os: osx
@@ -30,20 +30,16 @@ matrix:
       homebrew:
         # update: true
         packages:
-        - boost
+        # - boost
 
 before_install:
   - eval "${MATRIX_EVAL}"
 
 before_script:
-  - mkdir build
-  - cd build
-  - cmake .. -DGABAC_BUILD_SHARED_LIB=ON -DCMAKE_BUILD_TYPE=Debug
+  - mkdir cmake-build
+  - cd cmake-build
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug
 
 script:
   - make
-  - make tests
-  - make gabacify
-  - ../ci/test_gabac.sh
-#  - ../ci/test_python_api.sh
-  - ../ci/test_roundtrips.sh
+  # - make tests
