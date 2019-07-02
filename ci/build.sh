@@ -11,7 +11,7 @@ if [ ! -d "$build_dir" ]; then
 fi
 
 # Build everything
-cd "$build_dir" || exit -1
+cd "$build_dir" || exit 1
 cmake .. \
     -G "Unix Makefiles" \
     -DCMAKE_BUILD_TYPE=Debug \
