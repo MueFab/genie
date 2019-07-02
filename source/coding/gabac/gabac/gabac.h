@@ -14,21 +14,21 @@
 #ifdef __cplusplus
 
 /* General */
-#include "gabac/constants.h"
-#include "gabac/exceptions.h"
+#include "constants.h"
+#include "exceptions.h"
 
 /* Encode / Decode */
-#include "gabac/analysis.h"
-#include "gabac/configuration.h"
-#include "gabac/run.h"
+#include "analysis.h"
+#include "configuration.h"
+#include "run.h"
 
 /* io */
-#include "gabac/block_stepper.h"
-#include "gabac/data_block.h"
-#include "gabac/streams.h"
+#include "block_stepper.h"
+#include "data_block.h"
+#include "streams.h"
 
 #endif  /* __cplusplus */
 
-#include "gabac/c_interface.h"
+#include "c_interface.h"
 
 #endif /* GABAC_GABAC_H_ */

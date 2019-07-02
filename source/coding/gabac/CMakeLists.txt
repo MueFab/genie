@@ -15,13 +15,13 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 if(BUILD_GABAC OR BUILD_GABACIFY)
-    add_subdirectory(source/gabac)
+    add_subdirectory(gabac)
 endif()
 
 if(BUILD_GABACIFY)
-    add_subdirectory(source/gabacify)
+    add_subdirectory(gabacify)
 endif()
 
-if(BUILD_TESTS AND BUILD_GABAC)
-    add_subdirectory(tests/)
-endif()
+# if(BUILD_TESTS AND BUILD_GABAC)
+#     add_subdirectory(tests/)
+# endif()
