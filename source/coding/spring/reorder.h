@@ -450,7 +450,7 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict,
           unmatched[tid]++;
       }
       firstread +=
-          rg.numreads / num_thr;  // spread out first read equally
+          rg.numreads / rg.num_thr;  // spread out first read equally
     }
 #ifdef GENIE_USE_OPENMP
 #pragma omp barrier
@@ -798,11 +798,11 @@ void reorder_main(const std::string &temp_dir, const compression_params &cp) {
   std::cout << "Constructing dictionaries\n";
   constructdictionary<bitset_size>(read, dict, read_lengths, rg.numdict,
                                    rg.numreads, 2, rg.basedir
-#ifdef GENIE_USE_OPENMP                                   
+#ifdef GENIE_USE_OPENMP
                                    , rg.num_thr);
 #else
                                    );
-#endif                                    
+#endif
   std::cout << "Reordering reads\n";
   reorder<bitset_size>(read, dict, read_lengths, rg);
   std::cout << "Writing to file\n";
