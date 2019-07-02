@@ -1,24 +1,14 @@
-# genie
+# Genie
 
 Open source MPEG-G codec
 
-[![Build Status](https://travis-ci.com/voges/genie.svg?token=GduwvyBbRmwxKZ5dTnUU&branch=master)](https://travis-ci.com/voges/genie)
+[![Build Status](https://travis-ci.com/voges/genie.svg?token=GduwvyBbRmwxKZ5dTnUU&branch=master)](https://travis-ci.com/mitogen/genie)
 
 ---
 
 ## Quick start on Linux
 
-Build the GABAC library and the gabacify application:
-
-    mkdir build
-    cd build
-    cmake ..
-    make
-
-Perform a test roundtrip from the ``build`` directory:
-
-    ./genie -t encode -i reads.fastq -o reads.mgf
-    ./genie -t decode -i reads.mgf -o reads.mgr
+TBD
 
 ## Build system
 
