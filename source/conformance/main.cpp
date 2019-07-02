@@ -8,6 +8,7 @@
 #include "conformance/encoding.h"
 #include "conformance/exceptions.h"
 #include "conformance/log.h"
+#include "conformance/logger.h"
 #include "conformance/program_options.h"
 
 
@@ -24,6 +25,10 @@ static void writeCommandLine(int argc, char* argv[])
 
 static int genie_main(int argc, char* argv[])
 {
+    genie::Logger::init("app.log");
+    genie::Logger &logger = genie::Logger::instance();
+    logger.out("test");
+
     try {
         genie::ProgramOptions programOptions(argc, argv);
         writeCommandLine(argc, argv);
