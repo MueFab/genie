@@ -2,9 +2,10 @@
 
 Open source MPEG-G codec
 
-``master``: [![Build Status](https://travis-ci.org/mitogen/genie.svg?branch=master)](https://travis-ci.com/mitogen/genie)
-
-``develop``: [![Build Status](https://travis-ci.org/mitogen/genie.svg?branch=master)](https://travis-ci.com/mitogen/genie)
+| Branch      | Build status |
+|-------------|--------------|
+| ``master``  | [![Build Status](https://travis-ci.org/mitogen/genie.svg?branch=master)](https://travis-ci.org/mitogen/genie) |
+| ``develop`` | [![Build Status](https://travis-ci.org/mitogen/genie.svg?branch=master)](https://travis-ci.org/mitogen/genie) |
 
 ---
 
