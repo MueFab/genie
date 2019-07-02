@@ -140,34 +140,7 @@ namespace dsg {
     static void generationFromFastq(
             const ProgramOptions &programOptions
     ) {
-        auto generated_aus = generationFromFastq_SPRING(programOptions);
 
-        // Open output directory of spring
-        std::vector<std::string> filelist;
-        std::string path = generated_aus.getEncodedFastqAus().front().begin()->second.begin()->second;
-        path = path.substr(0, path.find_last_of('/') + 1);
-        ghc::filesystem::path p(path);
-        ghc::filesystem::directory_iterator end_itr;
-
-        // Remove temporary files
-        std::remove((path + "read_order.bin").c_str());
-        std::remove((path + "read_seq.txt").c_str());
-
-        // Create list of all files
-        for (ghc::filesystem::directory_iterator itr(p); itr != end_itr; ++itr) {
-            if (is_regular_file(itr->path())) {
-                std::string current_file = itr->path().string();
-                filelist.push_back(current_file);
-            }
-        }
-
-        // copyDir(path,path + "/../genie_orig");
-
-        // Compress
-        run_gabac(filelist, programOptions.configPath, false, programOptions.numThreads);
-
-
-        // Pack
         std::string outfile =
                 (programOptions.inputFilePath.substr(0, programOptions.inputFilePath.find_last_of('.')) + ".genie");
         FILE *output = fopen(
@@ -176,13 +149,15 @@ namespace dsg {
         if (!output) {
             throw std::runtime_error("Could not open output file");
         }
-        packFiles(filelist, output);
+        auto generated_aus = generationFromFastq_SPRING(programOptions);
+
         fclose(output);
 
         size_t orgSize = ghc::filesystem::file_size(programOptions.inputFilePath);
         if (!programOptions.inputFilePairPath.empty()) {
             orgSize += ghc::filesystem::file_size(programOptions.inputFilePairPath);
         }
+
 
         // Finish
         std::cout << "**** Finished ****" << std::endl;
@@ -192,7 +167,7 @@ namespace dsg {
                   << ghc::filesystem::file_size(outfile)
                   << ". Compression rate "
                   << float(ghc::filesystem::file_size(outfile)) /
-                     ghc::filesystem::file_size(programOptions.inputFilePath) *
+                     orgSize *
                      100
                   << "%"
                   << std::endl;
@@ -338,7 +313,7 @@ namespace dsg {
             std::rename((temp_dir + "decompressed.fastq").c_str(), outname.c_str());
         }
 
-        ghc::filesystem::remove_all(temp_dir);
+      //  ghc::filesystem::remove_all(temp_dir);
     }
 
     void decompression_sam(

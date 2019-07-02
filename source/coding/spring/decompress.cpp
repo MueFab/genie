@@ -195,7 +195,6 @@ bool decompress(const std::string &temp_dir) {
   }
 
   decoded_desc_t dec;
-  bool fileswitch = true;
   for (uint32_t block_num = 0; block_num < cp.num_blocks; block_num++) {
     for (auto arr : subseq_indices) {
         std::string filename = file_subseq_prefix + "." + std::to_string(block_num) + "." +
@@ -206,14 +205,18 @@ bool decompress(const std::string &temp_dir) {
     read_read_id_tokens_from_file(file_id + '.' + std::to_string(block_num), dec.tokens);
     auto decoded_records = decode_streams(dec, subseq_indices, cp.paired_end);
     for (auto record: decoded_records) {
-        std::ostream& tmpout = fileswitch ? fout : fout2;
-        tmpout << record.title << "\n";
+        bool second = record.title.substr(record.title.size()-2, 2) == "/2";
+        bool first = record.title.substr(record.title.size()-2, 2) == "/1";
+        std::ostream& tmpout = second ? fout2 : fout;
+        if(!second && !first) {
+            tmpout << record.title << "\n";
+        } else {
+            std::string truncated = record.title.substr(0, record.title.length()-2);
+            tmpout << truncated << "\n";
+        }
         tmpout << record.sequence << "\n";
         tmpout << "+" << "\n";
         tmpout << record.qualityScores << "\n";
-        if(cp.paired_end) {
-            fileswitch = !fileswitch;
-        }
     }
   }
   bool paired_end = cp.paired_end;

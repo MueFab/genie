@@ -449,7 +449,7 @@ set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/ProgramOp
 if (NOT ${GENIE_USE_OPENMP})
     set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/thread_pool.cc)
 endif ()
-set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/utilities.cc)
+set(genie_source_files ${genie_source_files} ${genie_source_dir}/genie/utilities.cc source/genie/StreamStoreman.h source/genie/StreamStoreman.cc)
 
 # List all header files (alphabetically)
 # TBD
