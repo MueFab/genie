@@ -2,6 +2,7 @@
 
 #include "conformance/exceptions.h"
 #include "conformance/log.h"
+#include "conformance/logger.h"
 
 #include <cli11/CLI11.hpp>
 #include <filesystem/filesystem.hpp>
@@ -20,6 +21,8 @@ ProgramOptions::~ProgramOptions() = default;
 
 void ProgramOptions::processCommandLine(int argc, char* argv[])
 {
+    Logger &logger = Logger::instance();
+    logger.out("Processing command line options");
 
     CLI::App app("Genie MPEG-G encoder, conformance version");
 
