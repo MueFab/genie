@@ -1,0 +1,12 @@
+OUTPUT_DIRECTORY       = @CMAKE_BINARY_DIR@/doc_doxygen/
+INPUT                  = @CMAKE_SOURCE_DIR@/README.md @CMAKE_SOURCE_DIR@/docs @CMAKE_SOURCE_DIR@/source/gabac/gabac.h @CMAKE_SOURCE_DIR@/source/gabac/constants.h @CMAKE_SOURCE_DIR@/source/gabac/exceptions.h @CMAKE_SOURCE_DIR@/source/gabac/analysis.h @CMAKE_SOURCE_DIR@/source/gabac/configuration.h @CMAKE_SOURCE_DIR@/source/gabac/run.h @CMAKE_SOURCE_DIR@/source/gabac/block_stepper.h @CMAKE_SOURCE_DIR@/source/gabac/data_block.h @CMAKE_SOURCE_DIR@/source/gabac/streams.h @CMAKE_SOURCE_DIR@/source/gabac/c_interface.h
+ENABLE_PREPROCESSING = YES
+MACRO_EXPANSION = YES
+EXPAND_ONLY_PREDEF = YES
+PREDEFINED             = protected=private __cplusplus
+USE_MDFILE_AS_MAINPAGE = @CMAKE_SOURCE_DIR@/README.md
+PROJECT_NAME           = "@PROJECT_NAME@"
+PROJECT_NUMBER         = @PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@.@PROJECT_VERSION_PATCH@
+STRIP_FROM_PATH        = @PROJECT_SOURCE_DIR@ \
+                         @PROJECT_BINARY_DIR@
+IMAGE_PATH     = @CMAKE_SOURCE_DIR@/docs
