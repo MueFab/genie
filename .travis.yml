@@ -21,25 +21,15 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-            # - libboost-program-options-dev
-            # - python-numpy
       env:
         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
     - os: osx
       compiler: clang
-      homebrew:
-        # update: true
-        packages:
-        # - boost
 
 before_install:
   - eval "${MATRIX_EVAL}"
 
 before_script:
-  - mkdir cmake-build
-  - cd cmake-build
-  - cmake .. -DCMAKE_BUILD_TYPE=Debug
 
 script:
-  - make
-  # - make tests
+  - ./ci/cmake-build.sh
