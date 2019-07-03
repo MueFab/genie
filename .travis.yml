@@ -33,3 +33,5 @@ before_script:
 
 script:
   - ./ci/cmake-build.sh
+  - ./ci/test-genie-rountrip.sh
+  - ./ci/test-gabac-rountrips.sh
