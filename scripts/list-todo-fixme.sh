@@ -8,3 +8,9 @@ grep --color --line-number --recursive 'TODO' "${git_root_dir}/source"
 
 echo "TODOs in the tests/ tree:"
 grep --color --line-number --recursive 'TODO' "${git_root_dir}/tests"
+
+echo "FIXMEs in the source/ tree:"
+grep --color --line-number --recursive 'FIXME' "${git_root_dir}/source"
+
+echo "FIXMEs in the tests/ tree:"
+grep --color --line-number --recursive 'FIXME' "${git_root_dir}/tests"
