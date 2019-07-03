@@ -7,6 +7,8 @@ Open source MPEG-G codec
 | ``master``  | [![Build Status](https://travis-ci.org/mitogen/genie.svg?branch=master)](https://travis-ci.org/mitogen/genie) |
 | ``develop`` | [![Build Status](https://travis-ci.org/mitogen/genie.svg?branch=develop)](https://travis-ci.org/mitogen/genie) |
 
+**First off, we refer the reader to the ``USAGE_POLICY.md``.**
+
 ---
 
 ## Quick start on Linux
