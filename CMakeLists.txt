@@ -29,7 +29,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
 # OpenMP
 #==============================================================================
 
-set(GENIE_USE_OPENMP OFF CACHE BOOL "Use OpenMP parallelization.")
+option(GENIE_USE_OPENMP "Use OpenMP parallelization" OFF)
 message(STATUS "GENIE_USE_OPENMP=${GENIE_USE_OPENMP}")
 if(${GENIE_USE_OPENMP})
     find_package(OpenMP REQUIRED)
@@ -47,6 +47,15 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
     message(STATUS "Using fall-back build type '${CMAKE_BUILD_TYPE}'")
 endif()
+
+
+#==============================================================================
+# Include paths
+#==============================================================================
+
+include_directories("${CMAKE_SOURCE_DIR}/source/libs")
+include_directories("${CMAKE_SOURCE_DIR}/source/libs/gabac")
+include_directories("${CMAKE_SOURCE_DIR}/source/libs/third-party")
 
 
 #==============================================================================
