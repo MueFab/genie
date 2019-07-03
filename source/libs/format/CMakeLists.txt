@@ -1,0 +1,60 @@
+project("format")
+
+set(source_files
+        BoxesDefinitions/AccessUnit/AccessUnitContainer.c
+        BoxesDefinitions/AccessUnit/AccessUnitHeader.c
+        BoxesDefinitions/AccessUnit/AccessUnitInformation.c
+        BoxesDefinitions/AccessUnit/AccessUnitProtection.c
+        BoxesDefinitions/Block/BlockContainer.c
+        BoxesDefinitions/Block/BlockHeader.c
+        BoxesDefinitions/Dataset/DatasetContainer.c
+        BoxesDefinitions/Dataset/DatasetHeader.c
+        BoxesDefinitions/Dataset/DatasetMasterIndexTable.c
+        BoxesDefinitions/Dataset/DatasetMetadata.c
+        BoxesDefinitions/Dataset/DatasetParameters.c
+        BoxesDefinitions/Dataset/DatasetProtection.c
+        BoxesDefinitions/DatasetsGroup/DatasetsGroupContainer.c
+        BoxesDefinitions/DatasetsGroup/DatasetsGroupHeader.c
+        BoxesDefinitions/DatasetsGroup/DatasetsGroupLabel.c
+        BoxesDefinitions/DatasetsGroup/DatasetsGroupMetadata.c
+        BoxesDefinitions/DatasetsGroup/DatasetsGroupProtection.c
+        BoxesDefinitions/DatasetsGroup/DatasetsGroupReferenceGenome.c
+        BoxesDefinitions/DatasetsGroup/DatasetsGroupReferenceMetadata.c
+        BoxesDefinitions/File/File.c
+        BoxesDefinitions/File/FileHeader.c
+        BoxesDefinitions/Stream/StreamContainer.c
+        BoxesDefinitions/Stream/StreamHeader.c
+        BoxesDefinitions/Stream/StreamProtection.c
+        DataStructures/BitStreams/InputBitstream.c
+        DataStructures/BitStreams/OutputBitstream.c
+        DataStructures/Signatures/Signature.c
+        DataStructures/Signatures/SignatureInputInteger.c
+        DataStructures/Signatures/Signatures.c
+        DataStructures/Signatures/SignaturesInputStream.c
+        DataStructures/Signatures/SignatureSizeComputation.c
+        DataStructures/Signatures/SignaturesOutputStream.c
+        DataStructures/ByteArray.c
+        DataStructures/EncodingParameters.c
+        DataStructures/FromFile.c
+        DataStructures/Label.c
+        DataUnits/DataUnitAccessUnit.c
+        DataUnits/DataUnitBlockHeader.c
+        DataUnits/DataUnits.c
+        DataUnits/DataUnitsParametersSet.c
+        FileHandlingUtils/FileHandlingUtils.c
+        AccessUnitTree.c
+        AccessUnitTreeNode.c
+        Boxes.c
+        ClassesSet.c
+        DescriptorTreeNode.c
+        FastaReader.c
+        rbtree.c
+        treeUint64.c
+        utils.c
+        vector.c
+        VectorUint64.c
+)
+
+add_library(format ${source_files})
+
+target_include_directories(format PRIVATE "${PROJECT_SOURCE_DIR}")

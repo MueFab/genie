@@ -1,0 +1,6 @@
+add_subdirectory(alico)
+add_subdirectory(calq)
+add_subdirectory(fileio)
+add_subdirectory(format)
+add_subdirectory(gabac)
+add_subdirectory(spring)
