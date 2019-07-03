@@ -8,6 +8,5 @@ set(source_files
 )
 
 add_executable(gabac-app ${source_files})
-target_include_directories(gabac-app PRIVATE "${CMAKE_SOURCE_DIR}/source")
-target_include_directories(gabac-app PRIVATE "${CMAKE_SOURCE_DIR}/source/coding/gabac")
-target_link_libraries(gabac-app gabac)
+
+target_link_libraries(gabac-app PRIVATE gabac)
