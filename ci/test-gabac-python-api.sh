@@ -51,4 +51,4 @@ fi
 
 # Go to the folder of gabac.py and fire up the unit tests
 run cd "${git_root_dir}/source/libs/gabac/python-api/"
-LIBGABAC_PATH="${git_root_dir}/cmake-build/source/libs/gabac/gabac/libgabac.${shared_lib_extension}" python -m unittest discover -v "${git_root_dir}/tests/libs/gabac/python-api/"
+LIBGABAC_PATH="${git_root_dir}/cmake-build/lib/libgabac.${shared_lib_extension}" python -m unittest discover -v "${git_root_dir}/tests/libs/gabac/python-api/"

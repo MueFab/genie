@@ -26,7 +26,7 @@ run() {
 run git rev-parse --git-dir 1>/dev/null # exit if not inside Git repo
 readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
-readonly genie="${git_root_dir}/cmake-build/source/apps/genie/genie"
+readonly genie="${git_root_dir}/cmake-build/bin/genie"
 if [[ ! -x "${genie}" ]]; then
     fatal "Genie application '${genie}' is not executable"
     exit 1
