@@ -17,12 +17,14 @@ Clone the Genie repository:
 
     git clone https://github.com/mitogen/genie.git
 
-Build the Genie executable using CMake:
+Build all libraries and executables using CMake:
 
     mkdir cmake-build
     cd cmake-build
     cmake ..
     make
+
+This will generate the Genie application at ``cmake-build/bin/genie``.
 
 ## Continuous integration
 
