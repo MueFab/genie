@@ -36,7 +36,7 @@ fi
 info "Creating directory for GABAC roundtrips: ${tmp_dir}"
 run mkdir -p "${tmp_dir}"
 
-readonly gabac_app="${git_root_dir}/cmake-build/source/libs/gabac/app/gabac-app"
+readonly gabac_app="${git_root_dir}/cmake-build/bin/gabac-app"
 if [[ ! -x "${gabac_app}" ]]; then
     fatal "GABAC application '${gabac_app}' is not executable"
     exit 1
