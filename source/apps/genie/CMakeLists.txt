@@ -23,3 +23,5 @@ target_link_libraries(genie PRIVATE fileio)
 target_link_libraries(genie PRIVATE calq)
 target_link_libraries(genie PRIVATE gabac)
 target_link_libraries(genie PRIVATE spring)
+
+target_link_libraries(genie PRIVATE pthread)
