@@ -17,7 +17,8 @@
 namespace spring {
 
 void reorder_compress_quality_id(const std::string &temp_dir,
-                                 const compression_params &cp) {
+                                 const compression_params &cp,
+                                 dsg::StreamStoreman& st) {
   // Read some parameters
   uint32_t numreads = cp.num_reads;
   int num_thr = cp.num_thr;
@@ -36,7 +37,7 @@ void reorder_compress_quality_id(const std::string &temp_dir,
   file_id[1] = basedir + "/id_2";
   file_quality[0] = basedir + "/quality_1";
   file_quality[1] = basedir + "/quality_2";
-  std::string outfile_quality  = basedir + "/quality_1";
+  std::string outfile_quality  = "quality_1";
 
 #ifdef GENIE_USE_OPENMP
   omp_set_num_threads(num_thr);
@@ -61,7 +62,7 @@ void reorder_compress_quality_id(const std::string &temp_dir,
       uint32_t num_reads_per_file = numreads;
       reorder_compress(file_quality[0], num_reads_per_file, num_thr,
                        num_reads_per_block, str_array, str_array_size,
-                       order_array, "quality");
+                       order_array, "quality", st);
       remove(file_quality[0].c_str());
     }
     if (preserve_id) {
@@ -69,7 +70,7 @@ void reorder_compress_quality_id(const std::string &temp_dir,
       uint32_t num_reads_per_file = numreads;
       reorder_compress(file_id[0], num_reads_per_file, num_thr,
                        num_reads_per_block, str_array, str_array_size,
-                       order_array, "id");
+                       order_array, "id", st);
       remove(file_id[0].c_str());
     }
 
@@ -94,7 +95,7 @@ void reorder_compress_quality_id(const std::string &temp_dir,
       // numreads/4 so that memory consumption isn't too high
       // 3*num_reads_per_block added to ensure that we are done in 4 passes (needed because block
       // sizes are not exactly equal to num_reads_per_block
-      reorder_compress_quality_pe(file_quality, outfile_quality, quality_array, quality_array_size, order_array, block_start, block_end, cp);
+      reorder_compress_quality_pe(file_quality, outfile_quality, quality_array, quality_array_size, order_array, block_start, block_end, cp, st);
       delete[] quality_array;
       remove(file_quality[0].c_str());
       remove(file_quality[1].c_str());
@@ -107,7 +108,7 @@ void reorder_compress_quality_id(const std::string &temp_dir,
       std::ifstream f_id (file_id[0]);
       for (uint32_t i = 0; i < numreads/2; i++)
         std::getline(f_id, id_array[i]);
-      reorder_compress_id_pe(id_array, file_order_id, block_start, block_end, file_id[0], cp);
+      reorder_compress_id_pe(id_array, file_order_id, block_start, block_end, file_id[0], cp, st);
       delete[] id_array;
       for (uint32_t i = 0; i < block_start.size(); i++)
         remove((file_order_id + "." + std::to_string(i)).c_str());
@@ -148,7 +149,7 @@ void generate_order(const std::string &file_order, uint32_t *order_array,
   fin_order.close();
 }
 
-void reorder_compress_id_pe(std::string *id_array, const std::string &file_order_id, const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end, const std::string &file_name, const compression_params &cp) {
+void reorder_compress_id_pe(std::string *id_array, const std::string &file_order_id, const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end, const std::string &file_name, const compression_params &cp, dsg::StreamStoreman& st) {
 #ifdef GENIE_USE_OPENMP
   #pragma omp parallel
 #endif
@@ -173,7 +174,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &file_order
       generate_read_id_tokens(id_array_block, block_end[block_num] - block_start[block_num], tokens);
       std::string outfile_name =
             file_name + "." + std::to_string(block_num);
-      write_read_id_tokens_to_file(outfile_name.c_str(), tokens);
+      write_read_id_tokens_to_file(outfile_name.c_str(), tokens, st);
       f_order_id.close();
       delete[] id_array_block;
       block_num += cp.num_thr;
@@ -181,7 +182,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &file_order
   }
 }
 
-void reorder_compress_quality_pe(std::string file_quality[2], const std::string &outfile_quality, std::string *quality_array, const uint64_t &quality_array_size, uint32_t *order_array, const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end, const compression_params &cp) {
+void reorder_compress_quality_pe(std::string file_quality[2], const std::string &outfile_quality, std::string *quality_array, const uint64_t &quality_array_size, uint32_t *order_array, const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end, const compression_params &cp, dsg::StreamStoreman &st) {
   uint32_t start_block_num = 0;
   uint32_t end_block_num = 0;
   while(true)  {
@@ -219,9 +220,11 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
           break;
         std::string outfile_name =
             outfile_quality + "." + std::to_string(block_num);
-        std::ofstream fout_quality(outfile_name);
+        std::string buffer;
         for (uint32_t i = block_start[block_num]; i < block_end[block_num]; i++)
-          fout_quality << quality_array[i - block_start[start_block_num]];
+          buffer += quality_array[i - block_start[start_block_num]];
+        gabac::DataBlock d(&buffer);
+        st.store(outfile_name, &d);
         block_num += cp.num_thr;
       }
     }
@@ -234,7 +237,7 @@ void reorder_compress(const std::string &file_name,
                       const uint32_t &num_reads_per_file, const int &num_thr,
                       const uint32_t &num_reads_per_block,
                       std::string *str_array, const uint32_t &str_array_size,
-                      uint32_t *order_array, const std::string &mode) {
+                      uint32_t *order_array, const std::string &mode, dsg::StreamStoreman& st) {
   for (uint32_t i = 0; i <= num_reads_per_file / str_array_size; i++) {
     uint32_t num_reads_bin = str_array_size;
     if (i == num_reads_per_file / str_array_size)
@@ -278,7 +281,7 @@ void reorder_compress(const std::string &file_name,
         if (mode == "id") {
           std::vector<int64_t> tokens[128][8];
           generate_read_id_tokens(str_array + start_read_num, num_reads_block, tokens);
-          write_read_id_tokens_to_file(outfile_name.c_str(), tokens);
+          write_read_id_tokens_to_file(outfile_name.c_str(), tokens, st);
         } else {
           std::ofstream fout_quality(outfile_name);
 	  for(uint32_t i = start_read_num; i < start_read_num + num_reads_block; i++)

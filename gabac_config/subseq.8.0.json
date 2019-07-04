@@ -5,13 +5,11 @@
         {
             "binarization_id": 4,
             "binarization_parameters": [
-                5
+                3
             ],
             "context_selection_id": 2,
             "diff_coding_enabled": false,
-            "lut_transformation_bits": 3,
-            "lut_transformation_enabled": true,
-            "lut_transformation_order": 0
+            "lut_transformation_enabled": false
         }
     ],
     "word_size": 8

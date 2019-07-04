@@ -6,6 +6,7 @@
 #include <vector>
 #include <cstring>
 #include <iostream>
+#include <genie/StreamStoreman.h>
 
 namespace spring {
 
@@ -213,12 +214,13 @@ std::string decode_id_tokens (std::string &prev_ID, uint32_t *prev_tokens_ptr, u
   }
 }
 
-void write_read_id_tokens_to_file(const std::string &outfile_name, const std::vector<int64_t> tokens[128][8]) {
+void write_read_id_tokens_to_file(const std::string &outfile_name, std::vector<int64_t> tokens[128][8], dsg::StreamStoreman& st) {
   for (int i = 0; i < 128; i++) {
     for (int j = 0; j < 8; j++) {
       if (!tokens[i][j].empty()) {
-        std::string outfile_name_i_j = outfile_name + "." + std::to_string(i) + "." + std::to_string(j);
-        write_vector_to_file(tokens[i][j], outfile_name_i_j);
+        std::string outfile_name_i_j = outfile_name.substr(outfile_name.find_last_of('/')+1) + "." + std::to_string(i) + "." + std::to_string(j);
+          gabac::DataBlock block(&tokens[i][j]);
+          st.store(outfile_name_i_j, &block);
       }
     }
   }

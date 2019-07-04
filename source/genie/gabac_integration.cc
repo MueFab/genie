@@ -15,6 +15,7 @@
 #include <filesystem/filesystem.hpp>
 #include "gabac/gabac.h"
 #include "gabac/analysis.h"
+#include "StreamStoreman.h"
 
 namespace dsg {
 
@@ -42,8 +43,11 @@ namespace dsg {
     }
 
     void compress_one_file(const std::string& file, const std::string& configfolder, bool decompress){
+        if(ghc::filesystem::file_size(file) == 0)
+            return;
         std::string config;
-        std::string configpath = getConfigForFile(file, configfolder);
+        std::cout << file << std::endl;
+        std::string configpath = configfolder + dsg::StreamStoreman::getConfigName(file.substr(file.find_last_of('/')+1)) + ".json";
 
         // Read config or fall back to default
         try {
