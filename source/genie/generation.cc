@@ -106,7 +106,8 @@ namespace dsg {
     }
 
     static generated_aus generationFromFastq_SPRING(
-            const ProgramOptions &programOptions
+            const ProgramOptions &programOptions,
+            dsg::StreamStoreman& st
     ) {
         std::cout << std::string(80, '-') << std::endl;
         std::cout << "Descriptor stream generation from FASTQ file" << std::endl;
@@ -122,7 +123,8 @@ namespace dsg {
                     &fastqFileReader1,
                     programOptions.numThreads,
                     paired_end,
-                    programOptions.workingDirectory
+                    programOptions.workingDirectory,
+                    st
             );
         } else {
             paired_end = true;
@@ -132,7 +134,8 @@ namespace dsg {
                     &fastqFileReader2,
                     programOptions.numThreads,
                     paired_end,
-                    programOptions.workingDirectory
+                    programOptions.workingDirectory,
+                    st
             );
         }
     }
@@ -149,7 +152,11 @@ namespace dsg {
         if (!output) {
             throw std::runtime_error("Could not open output file");
         }
-        auto generated_aus = generationFromFastq_SPRING(programOptions);
+
+        dsg::StreamStoreman store(1, programOptions.configPath, output);
+        auto generated_aus = generationFromFastq_SPRING(programOptions, store);
+
+        store.wait();
 
         fclose(output);
 
@@ -157,20 +164,6 @@ namespace dsg {
         if (!programOptions.inputFilePairPath.empty()) {
             orgSize += ghc::filesystem::file_size(programOptions.inputFilePairPath);
         }
-
-
-        // Finish
-        std::cout << "**** Finished ****" << std::endl;
-        std::cout << "Compressed "
-                  << orgSize
-                  << " to "
-                  << ghc::filesystem::file_size(outfile)
-                  << ". Compression rate "
-                  << float(ghc::filesystem::file_size(outfile)) /
-                     orgSize *
-                     100
-                  << "%"
-                  << std::endl;
 
      //   ghc::filesystem::remove_all(path);
     }

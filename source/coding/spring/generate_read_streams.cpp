@@ -17,14 +17,14 @@
 
 namespace spring {
 
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams(const std::string &temp_dir, const compression_params &cp) {
+    std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>>  generate_read_streams(const std::string &temp_dir, const compression_params &cp, dsg::StreamStoreman& st) {
   if (!cp.paired_end)
-    return generate_read_streams_se(temp_dir,cp);
+    return generate_read_streams_se(temp_dir,cp, st);
   else
-    return generate_read_streams_pe(temp_dir,cp);
+    return generate_read_streams_pe(temp_dir,cp, st);
 }
 
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams_se(const std::string &temp_dir, const compression_params &cp) {
+    std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>>  generate_read_streams_se(const std::string &temp_dir, const compression_params &cp, dsg::StreamStoreman& st) {
 
   std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> descriptorFilesPerAU;
   std::string basedir = temp_dir;
@@ -41,7 +41,7 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_str
       {12,0} // rtype
   };
 
-  std::string file_subseq_prefix = basedir + "/subseq";
+  std::string file_subseq_prefix = "subseq";
 
   std::string file_seq = basedir + "/read_seq.txt";
   std::string file_pos = basedir + "/read_pos.bin";
@@ -269,7 +269,8 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_str
         std::string filename = file_subseq_prefix + "." + std::to_string(block_num) + "." +
             std::to_string(arr[0]) + "." + std::to_string(arr[1]);
         listDescriptorFiles[arr[0]][arr[1]] = filename;
-        write_vector_to_file(subseq_vector[arr[0]][arr[1]], filename);
+          gabac::DataBlock block(&subseq_vector[arr[0]][arr[1]]);
+          st.store(filename, &block);
       }
 
       block_num += num_thr;
@@ -294,11 +295,13 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_str
   delete[] unaligned_arr;
 
   return descriptorFilesPerAU;
+
 }
 
 
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams_pe(const std::string &temp_dir,
-                              const compression_params &cp) {
+    std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>>  generate_read_streams_pe(const std::string &temp_dir,
+                              const compression_params &cp,
+                              dsg::StreamStoreman& st ) {
 
 // basic approach: start looking at reads from left to right. If current is aligned but
 // pair is unaligned, pair is kept at the end current AU and stored in different record.
@@ -331,7 +334,7 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_str
 	  {8,7}, // pair
       {12,0} // rtype
   };
-  std::string file_subseq_prefix = basedir + "/subseq";
+  std::string file_subseq_prefix = "subseq";
 
   std::string file_seq = basedir + "/read_seq.txt";
   std::string file_pos = basedir + "/read_pos.bin";
@@ -784,7 +787,8 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_str
 		std::string filename = file_subseq_prefix + "." + std::to_string(cur_block_num) + "." +
 			std::to_string(arr[0]) + "." + std::to_string(arr[1]);
 		listDescriptorFiles[arr[0]][arr[1]] = filename;
-		write_vector_to_file(subseq_vector[arr[0]][arr[1]], filename);
+          gabac::DataBlock block(&subseq_vector[arr[0]][arr[1]]);
+		st.store(filename, &block);
 	  }
 
       cur_block_num += num_thr;
@@ -811,6 +815,7 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_str
   std::cout << "count_same_rec: " << std::accumulate(count_same_rec.begin(),count_same_rec.end(), 0) << "\n";
   std::cout << "count_split_same_AU: " << std::accumulate(count_split_same_AU.begin(), count_split_same_AU.end(), 0) << "\n";
   std::cout << "count_split_diff_AU: " << std::accumulate(count_split_diff_AU.begin(), count_split_diff_AU.end(), 0) << "\n";
+
 
   return descriptorFilesPerAU;
 }

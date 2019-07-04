@@ -22,13 +22,14 @@
 #include "spring/util.h"
 #include "fileio/fastq_file_reader.h"
 #include "fileio/gabac_file.h"
+#include "../../../cmake-build-release/gabac-src/source/gabac/data_block.h"
 
 namespace spring {
 
 generated_aus generate_streams_SPRING(
         dsg::input::fastq::FastqFileReader *fastqFileReader1,
         dsg::input::fastq::FastqFileReader *fastqFileReader2, int num_thr,
-        bool paired_end, const std::string &working_dir) {
+        bool paired_end, const std::string &working_dir, dsg::StreamStoreman& st) {
   // generate random temp directory in the working directory
   std::string temp_dir;
   while (true) {
@@ -89,7 +90,7 @@ generated_aus generate_streams_SPRING(
 
   std::cout << "Generating read streams ...\n";
   auto grs_start = std::chrono::steady_clock::now();
-  auto descriptorFilesPerAUs = generate_read_streams(temp_dir, cp);
+  auto descriptorFilesPerAUs = generate_read_streams(temp_dir, cp, st);
   auto grs_end = std::chrono::steady_clock::now();
   std::cout << "Generating read streams done!\n";
   std::cout << "Time for this step: "
@@ -119,7 +120,7 @@ generated_aus generate_streams_SPRING(
   if (preserve_quality || preserve_id) {
     std::cout << "Reordering and compressing quality and/or ids ...\n";
     auto rcqi_start = std::chrono::steady_clock::now();
-    reorder_compress_quality_id(temp_dir, cp);
+    reorder_compress_quality_id(temp_dir, cp, st);
     auto rcqi_end = std::chrono::steady_clock::now();
     std::cout << "Reordering and compressing quality and/or ids done!\n";
     std::cout << "Time for this step: "
@@ -130,10 +131,9 @@ generated_aus generate_streams_SPRING(
   }
     
   // Write compression params to a file
-  std::string compression_params_file = temp_dir + "/cp.bin";
-  std::ofstream f_cp(compression_params_file, std::ios::binary);
-  f_cp.write((char *)&cp, sizeof(compression_params));
-  f_cp.close();
+  std::string compression_params_file = "cp.bin";
+  gabac::DataBlock d((uint8_t *)&cp, sizeof(compression_params), 1);
+  st.store(compression_params_file, &d);
 
   delete cp_ptr;
 
