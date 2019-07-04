@@ -7,10 +7,10 @@ set(source_files
         generation.cc
         genie_file_format.cc
         ProgramOptions.cc
-        StreamStoreman.cc
+        StreamSaver.cc
         thread_pool.cc
         utilities.cc
-)
+        StreamLoader.cc StreamLoader.h)
 
 add_executable(genie ${source_files})
 

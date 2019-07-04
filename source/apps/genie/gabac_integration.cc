@@ -15,7 +15,7 @@
 #include <filesystem/filesystem.hpp>
 #include "gabac/gabac.h"
 #include "gabac/analysis.h"
-#include "StreamStoreman.h"
+#include "StreamSaver.h"
 
 namespace dsg {
 
@@ -47,7 +47,7 @@ namespace dsg {
             return;
         std::string config;
         std::cout << file << std::endl;
-        std::string configpath = configfolder + dsg::StreamStoreman::getConfigName(file.substr(file.find_last_of('/')+1)) + ".json";
+        std::string configpath = configfolder + dsg::StreamSaver::getConfigName(file.substr(file.find_last_of('/')+1)) + ".json";
 
         // Read config or fall back to default
         try {

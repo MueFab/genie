@@ -17,6 +17,7 @@
 #include "generation.h"
 #include "ProgramOptions.h"
 #include "exceptions.h"
+#include "ureads-encoder/logger.h"
 
 
 static void printProgramInformation(void);
@@ -109,6 +110,7 @@ static void loggerInitialization(
     int argc,
     char *argv[])
 {
+    genie::Logger::init("genie.log");
     // loguru::init(argc, argv);
     //
     // // Initialize logs for syslog protocol severity levels

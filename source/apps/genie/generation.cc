@@ -34,6 +34,7 @@
 #include "genie/gabac_integration.h"
 
 #include "alico/main.h"
+#include "StreamLoader.h"
 
 namespace spring {
     bool decompress(const std::string &temp_dir);
@@ -106,7 +107,7 @@ namespace dsg {
 
     static generated_aus generationFromFastq_SPRING(
             const ProgramOptions &programOptions,
-            dsg::StreamStoreman& st
+            dsg::StreamSaver& st
     ) {
         std::cout << std::string(80, '-') << std::endl;
         std::cout << "Descriptor stream generation from FASTQ file" << std::endl;
@@ -153,7 +154,7 @@ namespace dsg {
             throw std::runtime_error("Could not open output file");
         }
 
-        dsg::StreamStoreman store(24, programOptions.configPath, &output);
+        dsg::StreamSaver store(4, programOptions.configPath, &output);
         auto generated_aus = generationFromFastq_SPRING(programOptions, store);
 
         store.wait();
@@ -245,6 +246,11 @@ namespace dsg {
     void decompression_fastq(
             const ProgramOptions &programOptions
     ) {
+        {
+            std::ifstream ifile(programOptions.inputFilePath);
+            StreamLoader l(1, programOptions.configPath, &ifile);
+            l.buildIndex();
+        }
         // Open file and create tmp directory with random name
         FILE *in = fopen(programOptions.inputFilePath.c_str(), "rb");
         if (!in) {
@@ -297,7 +303,7 @@ namespace dsg {
             std::rename((temp_dir + "decompressed.fastq").c_str(), outname.c_str());
         }
 
-      //  ghc::filesystem::remove_all(temp_dir);
+        ghc::filesystem::remove_all(temp_dir);
     }
 
     void decompression_sam(

@@ -6,7 +6,7 @@
 #include <vector>
 #include <cstring>
 #include <iostream>
-#include <genie/StreamStoreman.h>
+#include <genie/StreamSaver.h>
 
 namespace spring {
 
@@ -214,7 +214,7 @@ std::string decode_id_tokens (std::string &prev_ID, uint32_t *prev_tokens_ptr, u
   }
 }
 
-void write_read_id_tokens_to_file(const std::string &outfile_name, std::vector<int64_t> tokens[128][8], dsg::StreamStoreman& st) {
+void write_read_id_tokens_to_file(const std::string &outfile_name, std::vector<int64_t> tokens[128][8], dsg::StreamSaver& st) {
   for (int i = 0; i < 128; i++) {
     for (int j = 0; j < 8; j++) {
       if (!tokens[i][j].empty()) {
