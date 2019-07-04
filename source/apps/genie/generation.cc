@@ -145,26 +145,18 @@ namespace dsg {
 
         std::string outfile =
                 (programOptions.inputFilePath.substr(0, programOptions.inputFilePath.find_last_of('.')) + ".genie");
-        FILE *output = fopen(
-                outfile.c_str(), "wb"
-        );
+
+        std::ofstream output(outfile);
+        output.exceptions(std::ios::badbit | std::ios::failbit);
+
         if (!output) {
             throw std::runtime_error("Could not open output file");
         }
 
-        dsg::StreamStoreman store(1, programOptions.configPath, output);
+        dsg::StreamStoreman store(24, programOptions.configPath, &output);
         auto generated_aus = generationFromFastq_SPRING(programOptions, store);
 
         store.wait();
-
-        fclose(output);
-
-        size_t orgSize = ghc::filesystem::file_size(programOptions.inputFilePath);
-        if (!programOptions.inputFilePairPath.empty()) {
-            orgSize += ghc::filesystem::file_size(programOptions.inputFilePairPath);
-        }
-
-     //   ghc::filesystem::remove_all(path);
     }
 
 
