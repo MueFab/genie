@@ -1,3 +1,0 @@
-/srv/data/cwh/Streamer_SAMfiles/CMakeFiles/SAMStreamer.dir
-/srv/data/cwh/Streamer_SAMfiles/CMakeFiles/rebuild_cache.dir
-/srv/data/cwh/Streamer_SAMfiles/CMakeFiles/edit_cache.dir
