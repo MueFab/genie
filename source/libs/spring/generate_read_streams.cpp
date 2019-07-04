@@ -17,14 +17,14 @@
 
 namespace spring {
 
-    std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>>  generate_read_streams(const std::string &temp_dir, const compression_params &cp, dsg::StreamStoreman& st) {
+    std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>>  generate_read_streams(const std::string &temp_dir, const compression_params &cp, dsg::StreamSaver& st) {
   if (!cp.paired_end)
     return generate_read_streams_se(temp_dir,cp, st);
   else
     return generate_read_streams_pe(temp_dir,cp, st);
 }
 
-    std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>>  generate_read_streams_se(const std::string &temp_dir, const compression_params &cp, dsg::StreamStoreman& st) {
+    std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>>  generate_read_streams_se(const std::string &temp_dir, const compression_params &cp, dsg::StreamSaver& st) {
 
   std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> descriptorFilesPerAU;
   std::string basedir = temp_dir;
@@ -301,7 +301,7 @@ namespace spring {
 
     std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>>  generate_read_streams_pe(const std::string &temp_dir,
                               const compression_params &cp,
-                              dsg::StreamStoreman& st ) {
+                              dsg::StreamSaver& st ) {
 
 // basic approach: start looking at reads from left to right. If current is aligned but
 // pair is unaligned, pair is kept at the end current AU and stored in different record.
