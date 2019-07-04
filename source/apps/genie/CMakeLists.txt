@@ -7,6 +7,7 @@ set(source_files
         generation.cc
         genie_file_format.cc
         ProgramOptions.cc
+        StreamStoreman.cc
         thread_pool.cc
         utilities.cc
 )
