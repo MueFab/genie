@@ -46,8 +46,10 @@ namespace dsg {
         std::mutex stateLock;
         std::atomic<bool> running;
         std::condition_variable wait_var;
+        std::condition_variable sleep_var;
+        std::condition_variable insert_var;
 
-        FILE* fout;
+        std::ostream* fout;
 
         std::set<std::string> configsInProgress;
         std::map<std::string, gabac::EncodingConfiguration> configs;
@@ -75,7 +77,7 @@ namespace dsg {
         void store(const std::string &stream_name, gabac::DataBlock* data);
         void wait ();
 
-        StreamStoreman(unsigned numThreads, const std::string& configp, FILE* f);
+        StreamStoreman(unsigned numThreads, const std::string& configp, std::ostream* f);
         ~StreamStoreman();
 
     };

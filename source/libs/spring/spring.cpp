@@ -159,6 +159,8 @@ generated_aus generate_streams_SPRING(
                    .count()
             << " s\n";*/
 
+  ghc::filesystem::remove_all(temp_dir);
+
   return result;
 }
 

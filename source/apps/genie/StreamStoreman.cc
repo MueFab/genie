@@ -72,26 +72,18 @@ namespace dsg {
 
         std::cout << "PACKING: " << stream_name << std::endl;
 
-        if (fwrite(&size, sizeof(uint64_t), 1, fout) != 1) {
-            throw std::runtime_error("Could not write to output file");
-        }
-        if (fwrite(stream_name.c_str(), 1, size, fout) != size) {
-            throw std::runtime_error("Could not write to output file");
-        }
+        fout->write(reinterpret_cast<char*>(&size), sizeof(uint64_t));
+        fout->write(stream_name.c_str(), size);
 
         // Get and write size of input file
         size = data.getRawSize();
-        if (fwrite(&size, sizeof(uint64_t), 1, fout) != 1) {
-            throw std::runtime_error("Could not write to output file");
-        }
+        fout->write(reinterpret_cast<char*>(&size), sizeof(uint64_t));
 
-        if (data.getRawSize()) {
-            if (fwrite(data.getData(), data.getRawSize(), 1, fout) != 1) {
-                throw std::runtime_error("Could not write to output file");
-            }
+        if (size) {
+            fout->write(reinterpret_cast<const char*>(data.getData()), data.getRawSize());
         }
     }
-
+    
     void StreamStoreman::work() {
         while (running) {
             JobState job;
@@ -99,6 +91,8 @@ namespace dsg {
             bool packPossible = false;
             bool compressPossible = false;
             bool loadNecessary = false;
+
+            std::cout << "cool" << std::endl;
 
             // Get Job and determine next possible step
             {
@@ -139,6 +133,10 @@ namespace dsg {
                         loadNecessary = true;
                         configsInProgress.insert(confname);
                     }
+                }
+                if(!packPossible && !compressPossible) {
+                    sleep_var.wait(guard);
+                    continue;
                 }
             }
             if (packPossible) {
@@ -209,6 +207,8 @@ namespace dsg {
                     compressedJobs.insert(std::upper_bound(compressedJobs.begin(), compressedJobs.end(), job),
                                           std::move(job));
                 }
+                sleep_var.notify_one();
+                insert_var.notify_one();
             }
         }
     }
@@ -251,8 +251,15 @@ namespace dsg {
         // Push back
         {
             std::unique_lock<std::mutex> guard(stateLock);
+            const size_t MAX_QUEUE_SIZE = 16;
+            if(uncompressedJobs.size() >= MAX_QUEUE_SIZE) {
+                insert_var.wait(guard, [this](){
+                    return uncompressedJobs.size() < MAX_QUEUE_SIZE;
+                });
+            }
             uncompressedJobs.emplace_back(data, stream_name, totalTicket++);
         }
+        sleep_var.notify_one();
     }
 
     void StreamStoreman::wait() {
@@ -266,7 +273,7 @@ namespace dsg {
         });
     }
 
-    StreamStoreman::StreamStoreman(unsigned numThreads, const std::string &configp, FILE *f) : running(true), fout(f),
+    StreamStoreman::StreamStoreman(unsigned numThreads, const std::string &configp, std::ostream *f) : running(true), fout(f),
                                                                                                writeTicket(0),
                                                                                                totalTicket(0),
                                                                                                configPath(configp) {
@@ -279,7 +286,11 @@ namespace dsg {
 
     StreamStoreman::~StreamStoreman() {
         wait();
-        running = false;
+        {
+            std::unique_lock<std::mutex> guard(stateLock);
+            running = false;
+            sleep_var.notify_all();
+        }
         for (auto &t : threads) {
             t.join();
         }
