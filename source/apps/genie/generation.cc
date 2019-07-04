@@ -14,7 +14,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <utils/MPEGGFileCreation/MPEGGFileCreator.h>
 #include <fileio/gabac_file.h>
 #include <thread>
 #include <mutex>
@@ -30,11 +29,11 @@
 #include "fileio/fastq_record.h"
 #include "fileio/sam_file_reader.h"
 #include "fileio/sam_record.h"
-#include "coding/spring/spring.h"
+#include "spring/spring.h"
 #include "genie/genie_file_format.h"
 #include "genie/gabac_integration.h"
 
-#include "coding/alico/include/main.h"
+#include "alico/main.h"
 
 namespace spring {
     bool decompress(const std::string &temp_dir);

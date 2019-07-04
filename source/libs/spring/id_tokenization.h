@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <genie/StreamStoreman.h>
+#include "genie/StreamStoreman.h"
 
 namespace spring {
 

@@ -22,7 +22,7 @@
 #include "spring/util.h"
 #include "fileio/fastq_file_reader.h"
 #include "fileio/gabac_file.h"
-#include "../../../cmake-build-release/gabac-src/source/gabac/data_block.h"
+#include "gabac/data_block.h"
 
 namespace spring {
 
