@@ -6,14 +6,9 @@
 
 # CMake build directories
 build/
+cmake-build/
 cmake-build-debug/
+cmake-build-release/
 
 # CLion project directory
 .idea/
-
-# External tools directory
-external_tools/
-
-cmake-build-release/
-
-\.idea/
