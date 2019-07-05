@@ -37,7 +37,7 @@
 #include "StreamLoader.h"
 
 namespace spring {
-    bool decompress(const std::string &temp_dir);
+    bool decompress(const std::string &temp_dir, dsg::StreamLoader *ld);
 }
 
 namespace dsg {
@@ -246,13 +246,8 @@ namespace dsg {
     void decompression_fastq(
             const ProgramOptions &programOptions
     ) {
-        {
-            std::ifstream ifile(programOptions.inputFilePath);
-            StreamLoader l(1, programOptions.configPath, &ifile);
-            l.buildIndex();
-        }
         // Open file and create tmp directory with random name
-        FILE *in = fopen(programOptions.inputFilePath.c_str(), "rb");
+        std::ifstream in(programOptions.inputFilePath);
         if (!in) {
             throw std::runtime_error("Could not open input file");
         }
@@ -269,22 +264,9 @@ namespace dsg {
         }
         std::cout << "Temporary directory: " << temp_dir << "\n";
 
-        // Unpack
-        std::cout << "Starting decompression...\n";
-        auto flist =
-                unpackFiles(temp_dir, in);
-        fclose(in);
+        dsg::StreamLoader loader(1, programOptions.configPath, &in);
 
-        //copyDir(temp_dir,temp_dir + "/../genie_comp");
-
-        // Decompress
-        run_gabac(flist, programOptions.configPath, true, programOptions.numThreads);
-
-        //copyDir(temp_dir,temp_dir + "/../genie_uncomp");
-
-        // Extract spring parameters
-        // Decode spring streams
-        bool paired = spring::decompress(temp_dir);
+        bool paired = spring::decompress(temp_dir, &loader);
 
         std::cout << paired << std::endl;
 

@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "genie/StreamSaver.h"
+#include "genie/StreamLoader.h"
 
 namespace spring {
 
@@ -13,7 +14,7 @@ std::string decode_id_tokens (std::string &prev_ID, uint32_t *prev_tokens_ptr, u
 
 void write_read_id_tokens_to_file(const std::string &outfile_name, std::vector<int64_t> tokens[128][8], dsg::StreamSaver& st);
 
-void read_read_id_tokens_from_file(const std::string &infile_name, std::vector<int64_t> tokens[128][8]);
+void read_read_id_tokens_from_file(const std::string &infile_name, std::vector<int64_t> tokens[128][8], dsg::StreamLoader* ld);
 
 }  // namespace spring
 
