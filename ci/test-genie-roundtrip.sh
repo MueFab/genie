@@ -40,10 +40,9 @@ run "${genie}" \
     resources/test-files/fastq/fourteen-gattaca-records.genie \
     --config-file-path resources/gabac-configs/
 
-"${git_root_dir}/scripts/cmp-reordered-fastq.sh" \
+run "${git_root_dir}/scripts/cmp-reordered-fastq.sh" \
     -1 resources/test-files/fastq/fourteen-gattaca-records.fastq \
     -2 resources/test-files/fastq/fourteen-gattaca-records.genie-decompressed.fastq
 
-info "Cleaning up"
 run rm resources/test-files/fastq/fourteen-gattaca-records.genie
 run rm resources/test-files/fastq/fourteen-gattaca-records.genie-decompressed.fastq
