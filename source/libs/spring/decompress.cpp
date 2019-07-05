@@ -151,21 +151,21 @@ std::pair<std::vector<dsg::input::fastq::FastqRecord>,std::vector<bool>> decode_
   return std::make_pair(decoded_records, first_file_flag_vec);
 }
 
-bool decompress(const std::string &temp_dir) {
+bool decompress(const std::string &temp_dir, dsg::StreamLoader* ld) {
   // decompress to temp_dir/decompressed.fastq
 
   std::string basedir = temp_dir;
-  std::string file_subseq_prefix = basedir + "/subseq";
+  std::string file_subseq_prefix = "subseq";
   compression_params *cp_ptr = new compression_params;
   compression_params &cp = *cp_ptr;
   // Read compression params
-  std::string compression_params_file = temp_dir + "/cp.bin";
-  std::ifstream f_cp(compression_params_file, std::ios::binary);
-  if (!f_cp.is_open()) throw std::runtime_error("Can't open parameter file.");
-  f_cp.read((char *)&cp, sizeof(compression_params));
-  if (!f_cp.good())
-    throw std::runtime_error("Can't read compression parameters.");
-  f_cp.close();
+  std::string compression_params_file =  "cp.bin";
+
+  gabac::DataBlock tmp(0, 1);
+  ld->load(compression_params_file, &tmp);
+  ld->wait();
+  std::memcpy(&cp, tmp.getData(), sizeof(compression_params));
+  tmp.clear();
 
   std::vector<std::array<uint8_t,2>> subseq_indices = {
       {0,0}, // pos
@@ -187,8 +187,8 @@ bool decompress(const std::string &temp_dir) {
       {12,0} // rtype
   };
 
-  std::string file_quality = basedir + "/quality_1";
-  std::string file_id = basedir + "/id_1";
+  std::string file_quality = "quality_1";
+  std::string file_id = "id_1";
   std::string file_decompressed_fastq = cp.paired_end ? basedir + "/decompressed_1.fastq" : basedir + "/decompressed.fastq";;
   std::string file_decompressed_fastq2 = basedir + "/decompressed_2.fastq";
 
@@ -205,9 +205,20 @@ bool decompress(const std::string &temp_dir) {
         std::string filename = file_subseq_prefix + "." + std::to_string(block_num) + "." +
             std::to_string(arr[0]) + "." + std::to_string(arr[1]);
         dec.subseq_vector[arr[0]][arr[1]] = read_vector_from_file(filename);
+        gabac::DataBlock tmp(0, 1);
+        ld->load(filename, &tmp);
+        ld->wait();
+        dec.subseq_vector[arr[0]][arr[1]].resize(tmp.getRawSize() / sizeof(int64_t));
+        std::memcpy(dec.subseq_vector[arr[0]][arr[1]].data(), tmp.getData(), tmp.getRawSize());
+        tmp.clear();
     }
-    dec.quality_arr = read_file_as_string(file_quality + '.' + std::to_string(block_num));
-    read_read_id_tokens_from_file(file_id + '.' + std::to_string(block_num), dec.tokens);
+
+    ld->load(file_quality + '.' + std::to_string(block_num), &tmp);
+    ld->wait();
+
+    dec.quality_arr = std::string(tmp.getRawSize(), '\0');
+    std::memcpy(const_cast<char*>(dec.quality_arr.data()), tmp.getData(), tmp.getRawSize());
+    read_read_id_tokens_from_file(file_id + '.' + std::to_string(block_num), dec.tokens, ld);
     auto decoded_records = decode_streams(dec, subseq_indices, cp.paired_end);
     for (size_t i = 0; i < decoded_records.first.size(); i++) {
         bool first_file_flag = true;

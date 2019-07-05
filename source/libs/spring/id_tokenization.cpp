@@ -7,6 +7,7 @@
 #include <cstring>
 #include <iostream>
 #include <genie/StreamSaver.h>
+#include <genie/StreamLoader.h>
 
 namespace spring {
 
@@ -226,11 +227,17 @@ void write_read_id_tokens_to_file(const std::string &outfile_name, std::vector<i
   }
 }
 
-void read_read_id_tokens_from_file(const std::string &infile_name, std::vector<int64_t> tokens[128][8]) {
+void read_read_id_tokens_from_file(const std::string &infile_name, std::vector<int64_t> tokens[128][8], dsg::StreamLoader* ld) {
   for (int i = 0; i < 128; i++) {
     for (int j = 0; j < 8; j++) {
         std::string infile_name_i_j = infile_name + "." + std::to_string(i) + "." + std::to_string(j);
-        tokens[i][j] = read_vector_from_file(infile_name_i_j);
+        gabac::DataBlock tmp(0, 1);
+        ld->load(infile_name_i_j, &tmp);
+        ld->wait();
+
+        tokens[i][j].resize(tmp.getRawSize() / sizeof(int64_t));
+        std::memcpy(tokens[i][j].data(), tmp.getData(), tmp.getRawSize());
+        tmp.clear();
     }
   }
 }
