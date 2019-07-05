@@ -1,4 +1,4 @@
-# C interface example #
+# C interface example
 
 See an example how to use the c interface below.
 
@@ -66,7 +66,7 @@ void print_block(const gabac_data_block* block) {
 
 /* Example how to use the transformation interface */
 int example_transformations(void) {
-    
+
     /* For parameters and necessary number of streams consult c_interface.h */
     gabac_data_block blocks[2];
     const uint64_t parameters_RLE[] = {255};
@@ -154,7 +154,7 @@ int example_transformations(void) {
 
     /********************************************/
     printf("***Releasing blocks...\n");
-    
+
     /* Every allocated ressource should be released again to avoid memory leaks. */
     gabac_data_block_release(&blocks[0]);
     gabac_data_block_release(&blocks[1]);
@@ -236,7 +236,7 @@ int example_run(void) {
     print_block(&in_block);
 
     printf("*** Release...\n");
-    
+
     /* Free all ressources */
     gabac_data_block_release(&in_block);
     gabac_stream_release(&io_config.input);
