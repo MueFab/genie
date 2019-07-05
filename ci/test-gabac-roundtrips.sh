@@ -48,20 +48,20 @@ configuration_files=()
 bytestream_files=()
 uncompressed_files=()
 #
-input_files+=("${git_root_dir}/resources/gabac-test-files/one_million_zero_bytes")
-configuration_files+=("${git_root_dir}/resources/gabac-example-configs/equality_coding.json")
-bytestream_files+=("${git_root_dir}/tmp/one_million_zero_bytes.gabac_bytestream")
-uncompressed_files+=("${git_root_dir}/tmp/one_million_zero_bytes.gabac_uncompressed")
+input_files+=("${git_root_dir}/resources/gabac-test-files/one-million-zero-bytes")
+configuration_files+=("${git_root_dir}/resources/gabac-example-configs/equality-coding.json")
+bytestream_files+=("${git_root_dir}/tmp/one-million-zero-bytes.gabac-bytestream")
+uncompressed_files+=("${git_root_dir}/tmp/one-million-zero-bytes.gabac-uncompressed")
 #
-input_files+=("${git_root_dir}/resources/gabac-test-files/one_million_zero_bytes")
-configuration_files+=("${git_root_dir}/resources/gabac-example-configs/match_coding.json")
-bytestream_files+=("${git_root_dir}/tmp/one_million_zero_bytes.gabac_bytestream")
-uncompressed_files+=("${git_root_dir}/tmp/one_million_zero_bytes.gabac_uncompressed")
+input_files+=("${git_root_dir}/resources/gabac-test-files/one-million-zero-bytes")
+configuration_files+=("${git_root_dir}/resources/gabac-example-configs/match-coding.json")
+bytestream_files+=("${git_root_dir}/tmp/one-million-zero-bytes.gabac-bytestream")
+uncompressed_files+=("${git_root_dir}/tmp/one-million-zero-bytes.gabac-uncompressed")
 #
-input_files+=("${git_root_dir}/resources/gabac-test-files/one_mebibyte_random")
-configuration_files+=("${git_root_dir}/resources/gabac-example-configs/rle_coding.json")
-bytestream_files+=("${git_root_dir}/tmp/one_mebibyte_random.gabac_bytestream")
-uncompressed_files+=("${git_root_dir}/tmp/one_mebibyte_random.gabac_uncompressed")
+input_files+=("${git_root_dir}/resources/gabac-test-files/one-mebibyte-random")
+configuration_files+=("${git_root_dir}/resources/gabac-example-configs/rle-coding.json")
+bytestream_files+=("${git_root_dir}/tmp/one-mebibyte-random.gabac-bytestream")
+uncompressed_files+=("${git_root_dir}/tmp/one-mebibyte-random.gabac-uncompressed")
 
 # Do the test roundtrips
 for i in "${!input_files[@]}"; do
