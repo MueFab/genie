@@ -17,3 +17,4 @@
 - Set up CMake for ``tests``
 - Use new logger
 - Add Autotools build system
+- Add code coverage report system
