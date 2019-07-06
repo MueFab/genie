@@ -11,14 +11,14 @@
 #include <string>
 #include "spring/params.h"
 #include "spring/util.h"
-#include "fileio/fastq_file_reader.h"
+#include "fio/fastq-file-reader.h"
 
 namespace spring {
 
-void preprocess(dsg::input::fastq::FastqFileReader *fastqFileReader1,
-		dsg::input::fastq::FastqFileReader *fastqFileReader2,
+void preprocess(fio::FastqFileReader *fastqFileReader1,
+		fio::FastqFileReader *fastqFileReader2,
                 const std::string &temp_dir, compression_params &cp) {
-  dsg::input::fastq::FastqFileReader *fastqFileReader[2] = {fastqFileReader1, fastqFileReader2};
+  fio::FastqFileReader *fastqFileReader[2] = {fastqFileReader1, fastqFileReader2};
   std::string outfileclean[2];
   std::string outfileN[2];
   std::string outfileorderN[2];
@@ -48,7 +48,7 @@ void preprocess(dsg::input::fastq::FastqFileReader *fastqFileReader1,
   std::ofstream fout_id[2];
   std::ofstream fout_quality[2];
 
-  std::vector<dsg::input::fastq::FastqRecord> fastqRecords;
+  std::vector<fio::FastqRecord> fastqRecords;
 //  if (cp.long_flag) {
 //    fin[0].open(infile_1);
 //    if (cp.paired_end) fin[1].open(infile_2);

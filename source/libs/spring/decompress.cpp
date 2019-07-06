@@ -7,21 +7,21 @@
 #include <stdexcept>
 #include <fstream>
 #include <iostream>
-#include "spring/util.h"
-#include "spring/decompress.h"
-#include "spring/id_tokenization.h"
-#include "spring/params.h"
-#include "fileio/fastq_record.h"
+#include "util.h"
+#include "decompress.h"
+#include "id_tokenization.h"
+#include "params.h"
+#include <fio/fastq-record.h>
 
 namespace spring {
 
-std::pair<std::vector<dsg::input::fastq::FastqRecord>,std::vector<bool>> decode_streams(decoded_desc_t &dec, const std::vector<std::array<uint8_t,2>> &subseq_indices, bool paired_end) {
-  std::vector<dsg::input::fastq::FastqRecord> decoded_records;
+std::pair<std::vector<fio::FastqRecord>,std::vector<bool>> decode_streams(decoded_desc_t &dec, const std::vector<std::array<uint8_t,2>> &subseq_indices, bool paired_end) {
+  std::vector<fio::FastqRecord> decoded_records;
   std::vector<bool> first_file_flag_vec; 
   std::string cur_read[2];
   std::string cur_quality[2];
   std::string cur_ID;
-  dsg::input::fastq::FastqRecord cur_record;
+  fio::FastqRecord cur_record;
   std::string refBuf;
   // int_to_char
   char int_to_char[5] = {'A','C','G','T','N'};
