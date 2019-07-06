@@ -16,6 +16,10 @@ Including of a library header should look like: ``#include <gabac/gabac.h>``.
 
 Including of an application or library internal header (i.e., including of headers from the same directory) should look like: ``#include "internal.h"``.
 
+# Macros
+
+Macros have a prefix, identifying the library to which they belong, e.g.  ``CALQ_``, ``GABAC_``, ``GENIE_``, ``SPRING_`` etc.
+
 # Namespaces
 
 Applications and libraries each have their own namespace, e.g. ``calq::``, ``gabac::``, ``genie::``, ``spring::`` etc. No further namespace hierarchies are allowed.
