@@ -19,7 +19,7 @@ endif()
 
 target_link_libraries(genie PRIVATE alico)
 target_link_libraries(genie PRIVATE format)
-target_link_libraries(genie PRIVATE fileio)
+target_link_libraries(genie PRIVATE fio)
 target_link_libraries(genie PRIVATE calq)
 target_link_libraries(genie PRIVATE gabac)
 target_link_libraries(genie PRIVATE spring)

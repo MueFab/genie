@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 // #include <utils/MPEGGFileCreation/MPEGGFileCreator.h>
-#include <fileio/gabac_file.h>
+// #include <fio/gabac_file.h>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -24,12 +24,12 @@
 #include <filesystem/filesystem.hpp>
 
 #include "exceptions.h"
-#include "fileio/fasta_file_reader.h"
-#include "fileio/fasta_record.h"
-#include "fileio/fastq_file_reader.h"
-#include "fileio/fastq_record.h"
-#include "fileio/sam_file_reader.h"
-#include "fileio/sam_record.h"
+#include "fio/fasta-file-reader.h"
+#include "fio/fasta-record.h"
+#include "fio/fastq-file-reader.h"
+#include "fio/fastq-record.h"
+#include "fio/sam-file-reader.h"
+#include "fio/sam-record.h"
 #include "spring/spring.h"
 #include "genie_file_format.h"
 #include "gabac_integration.h"
@@ -114,7 +114,7 @@ namespace dsg {
 
         bool paired_end = false;
         // Initialize a FASTQ file reader.
-        input::fastq::FastqFileReader fastqFileReader1(programOptions.inputFilePath);
+        fio::FastqFileReader fastqFileReader1(programOptions.inputFilePath);
         std::cout << "Calling SPRING" << std::endl;
         if (programOptions.inputFilePairPath.empty()) {
             return spring::generate_streams_SPRING(
@@ -126,7 +126,7 @@ namespace dsg {
             );
         } else {
             paired_end = true;
-            input::fastq::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath);
+            fio::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath);
             return spring::generate_streams_SPRING(
                     &fastqFileReader1,
                     &fastqFileReader2,

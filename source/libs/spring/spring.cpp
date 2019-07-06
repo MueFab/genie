@@ -20,14 +20,13 @@
 #include "spring/generate_new_fastq.h"
 #include "spring/spring.h"
 #include "spring/util.h"
-#include "fileio/fastq_file_reader.h"
-#include "fileio/gabac_file.h"
+#include "fio/fastq-file-reader.h"
 
 namespace spring {
 
 generated_aus generate_streams_SPRING(
-        dsg::input::fastq::FastqFileReader *fastqFileReader1,
-        dsg::input::fastq::FastqFileReader *fastqFileReader2, int num_thr,
+        fio::FastqFileReader *fastqFileReader1,
+        fio::FastqFileReader *fastqFileReader2, int num_thr,
         bool paired_end, const std::string &working_dir) {
   // generate random temp directory in the working directory
   std::string temp_dir;

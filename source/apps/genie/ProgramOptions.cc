@@ -20,7 +20,7 @@
 
 #include "exceptions.h"
 #include "utilities.h"
-#include "fileio/file_reader.h"
+#include <fio/file-reader.h>
 
 
 namespace dsg {
