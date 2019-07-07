@@ -12,7 +12,6 @@ namespace utils {
 
     const char *Exception::what() const noexcept { return msg_.c_str(); }
 
-
     RuntimeException::RuntimeException(const std::string &file, const std::string &function, int line,
                                        const std::string &msg) noexcept
             : Exception(/*file + ":" + function + ":" + std::to_string(line) + ": " + */msg) {

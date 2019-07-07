@@ -5,6 +5,8 @@
 
 #include "sam-record.h"
 
+#include <utils/string-helpers.h>
+
 namespace fio {
 
     static void parseLine(const std::string &line, std::vector<std::string> *const fields) {
@@ -20,6 +22,7 @@ namespace fio {
             }
 
             (*fields)[fieldCount] += c;
+            utils::trim((*fields)[fieldCount]);
         }
     }
 

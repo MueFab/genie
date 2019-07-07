@@ -11,3 +11,5 @@ set(source_files
 )
 
 add_library(fio ${source_files})
+
+target_link_libraries(fio utils)
