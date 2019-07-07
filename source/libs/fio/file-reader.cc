@@ -3,6 +3,8 @@
 #include <limits.h>
 #include <string.h>
 
+#include <stdexcept>
+
 namespace fio {
 
     FileReader::FileReader() : fp_(nullptr), fsize_(0), line_(nullptr) {}
