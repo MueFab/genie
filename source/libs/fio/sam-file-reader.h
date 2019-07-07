@@ -1,8 +1,8 @@
 #ifndef FIO_SAM_FILE_READER_H_
 #define FIO_SAM_FILE_READER_H_
 
+#include <list>
 #include <string>
-#include <vector>
 
 #include "file-reader.h"
 #include "sam-record.h"
@@ -11,17 +11,17 @@ namespace fio {
 
     class SamFileReader : public FileReader {
     public:
-        SamFileReader(const std::string &path);
+        explicit SamFileReader(const std::string &path);
 
-        ~SamFileReader();
+        ~SamFileReader() override;
 
-        size_t readRecords(const size_t numRecords, std::vector<SamRecord> *const records);
+        size_t readRecords(size_t numRecords, std::list<SamRecord> *records);
 
     public:
         std::string header;
 
     private:
-        void readHeader(void);
+        void readHeader();
     };
 
 
