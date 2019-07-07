@@ -34,10 +34,9 @@
 #include "genie/gabac_integration.h"
 
 #include "alico/main.h"
-#include "StreamLoader.h"
 
 namespace spring {
-    bool decompress(const std::string &temp_dir, dsg::StreamLoader *ld);
+    bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld);
 }
 
 namespace dsg {
@@ -154,10 +153,9 @@ namespace dsg {
             throw std::runtime_error("Could not open output file");
         }
 
-        dsg::StreamSaver store(4, programOptions.configPath, &output);
+        dsg::StreamSaver store(programOptions.configPath, &output, nullptr);
         auto generated_aus = generationFromFastq_SPRING(programOptions, store);
 
-        store.wait();
     }
 
 
@@ -264,9 +262,9 @@ namespace dsg {
         }
         std::cout << "Temporary directory: " << temp_dir << "\n";
 
-        dsg::StreamLoader loader(1, programOptions.configPath, &in);
+        dsg::StreamSaver saver(programOptions.configPath, nullptr, &in);
 
-        bool paired = spring::decompress(temp_dir, &loader);
+        bool paired = spring::decompress(temp_dir, &saver);
 
         std::cout << paired << std::endl;
 

@@ -10,7 +10,7 @@ set(source_files
         StreamSaver.cc
         thread_pool.cc
         utilities.cc
-        StreamLoader.cc StreamLoader.h)
+        )
 
 add_executable(genie ${source_files})
 

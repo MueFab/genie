@@ -1,39 +1,15 @@
+#include <cmath>
 #include "genie/StreamSaver.h"
 
 #include "ureads-encoder/logger.h"
 
 namespace dsg {
 
+    void StreamSaver::run_gabac(const std::string &name, gabac::DataBlock *data, bool decompression) {
+        gabac::EncodingConfiguration enConf = configs.at(getConfigName(name));
+        uint64_t insize = data->getRawSize();
 
-    StreamSaver::JobState::JobState(gabac::DataBlock *d, const std::string &n, uint32_t t) : name(n), ticket(t) {
-        data.swap(d);
-    }
-
-
-    StreamSaver::JobState::JobState(JobState &&state) noexcept : name(std::move(state.name)), ticket(state.ticket) {
-        data.swap(&state.data);
-    }
-
-    StreamSaver::JobState::JobState() : data(0, 1), name(""), ticket(0) {
-
-    }
-
-    StreamSaver::JobState &StreamSaver::JobState::operator=(JobState &&state) noexcept {
-        data.swap(&state.data);
-        name = std::move(state.name);
-        ticket = state.ticket;
-        return *this;
-    }
-
-    bool StreamSaver::JobState::operator<(const JobState &state) const {
-        return ticket < state.ticket;
-    }
-
-    void StreamSaver::compress(JobState *state) {
-        gabac::EncodingConfiguration enConf = configs.at(getConfigName(state->name));
-        uint64_t insize = state->data.getRawSize();
-
-        gabac::IBufferStream istream(&state->data, 0);
+        gabac::IBufferStream istream(data, 0);
         gabac::DataBlock out(0, 1);
         gabac::OBufferStream ostream(&out);
 
@@ -42,12 +18,20 @@ namespace dsg {
                 ioconf = {&istream, &ostream, insize, &std::cout,
                           gabac::IOConfiguration::LogLevel::TRACE};
 
-        gabac::run(ioconf, enConf, false);
+        gabac::run(ioconf, enConf, decompression);
 
-        ostream.flush(&state->data);
+        ostream.flush(data);
 
-        genie::Logger::instance().out("COMPRESS:" + state->name + " with CONFIG: " + getConfigName(state->name) +
-        " from " + std::to_string(insize) + " to " + std::to_string(state->data.getRawSize()));
+        genie::Logger::instance().out("COMPRESSED:" + name + " with CONFIG: " + getConfigName(name) +
+                                      " from " + std::to_string(insize) + " to " + std::to_string(data->getRawSize()) + " in thread " + std::to_string(omp_get_thread_num()));
+    }
+
+    void StreamSaver::compress(const std::string &name, gabac::DataBlock *data) {
+        run_gabac(name, data, false);
+    }
+
+    void StreamSaver::decompress(const std::string &name, gabac::DataBlock *data) {
+        run_gabac(name, data, true);
     }
 
     std::string StreamSaver::getConfigName(const std::string &stream) {
@@ -76,161 +60,32 @@ namespace dsg {
 
         genie::Logger::instance().out("PACKING: " + stream_name + " with size " + std::to_string(data.getRawSize()));
 
-        fout->write(reinterpret_cast<char*>(&size), sizeof(uint64_t));
+        fout->write(reinterpret_cast<char *>(&size), sizeof(uint64_t));
         fout->write(stream_name.c_str(), size);
 
         // Get and write size of input file
         size = data.getRawSize();
-        fout->write(reinterpret_cast<char*>(&size), sizeof(uint64_t));
+        fout->write(reinterpret_cast<char *>(&size), sizeof(uint64_t));
 
         if (size) {
-            fout->write(reinterpret_cast<const char*>(data.getData()), data.getRawSize());
+            fout->write(reinterpret_cast<const char *>(data.getData()), data.getRawSize());
         }
     }
 
-    void StreamSaver::getNextAction(dsg::StreamSaver::Action* a) {
-        a->compressPossible = false;
-        a->loadNecessary = false;
-        a->packPossible = false;
-        a->confname = "";
-        a->job = JobState();
-
-        std::unique_lock<std::mutex> guard(stateLock);
-
-        // Packing possible?
-        if (!compressedJobs.empty() && compressedJobs.front().ticket == writeTicket) {
-            a->job = std::move(compressedJobs.front());
-            compressedJobs.erase(compressedJobs.begin());
-            a->packPossible = true;
-
-            // Compression possible?
-        } else if (!uncompressedJobs.empty()) {
-            auto pos = uncompressedJobs.begin();
-            a->job = std::move(*(pos));
-            uncompressedJobs.erase(pos);
-
-            if (a->job.data.size() == 0) {
-                genie::Logger::instance().out("COMPRESS: SKIPPED" + a->job.name + " with CONFIG: " + getConfigName(a->job.name));
-                compressedJobs.insert(std::upper_bound(compressedJobs.begin(), compressedJobs.end(), a->job),
-                                      std::move(a->job));
-                return;
-            }
-
-            // Job is blocked
-            a->confname = getConfigName(a->job.name);
-            genie::Logger::instance().out("CONFIG NAME: " + a->confname + " for " + a->job.name);
-            if (configsInProgress.find(a->confname) != configsInProgress.end()) {
-                uncompressedJobsBlocked.emplace_back(std::move(a->job));
-                genie::Logger::instance().out("BLOCKED: " + a->job.name);
-                return;
-            }
-
-            a->compressPossible = true;
-
-            // Needs reload
-            if (configs.find(a->confname) == configs.end()) {
-                a->loadNecessary = true;
-                configsInProgress.insert(a->confname);
-            }
-        } else {
-            sleep_var.wait(guard);
+    void StreamSaver::unpack(const std::string &stream_name, gabac::DataBlock *data) {
+        auto position = file_index.find(stream_name);
+        if(position == file_index.end()){
+            data->clear();
+            return;
         }
+        data->resize(size_t(std::ceil(position->second.size / float(data->getWordSize()))));
+
+        fin->seekg(position->second.position);
+        fin->read(reinterpret_cast<char*>(data->getData()), position->second.size);
+
+        genie::Logger::instance().out("UNPACKING: " + stream_name + " with size " + std::to_string(data->getRawSize()));
+
     }
-
-    void StreamSaver::generateConfIfNeeded(Action *a) {
-        if (!ghc::filesystem::exists(ghc::filesystem::path(configPath + a->confname + ".json"))) {
-            genie::Logger::instance().out("ANALYZING:" + configPath + a->confname + ".json");
-            std::ofstream outstream(configPath + a->confname + ".json", std::ios::binary);
-            gabac::DataBlock d = a->job.data;
-            size_t rawSize = d.getRawSize();
-            gabac::IBufferStream instream(&d);
-            gabac::IOConfiguration
-                    ioconf{&instream, &outstream, std::min(uint64_t(rawSize), uint64_t(10000000u)),
-                           &std::cout, gabac::IOConfiguration::LogLevel::WARNING};
-
-            auto stream_params = getParams().find(a->confname);
-            if (stream_params == getParams().end()) {
-                GABAC_DIE("Config range " + a->confname + " for stream " + a->job.name + " not found");
-            }
-            gabac::AnalysisConfiguration analyze_conf = gabac::getCandidateConfig();
-            analyze_conf.wordSize = stream_params->second.wordsize;
-            analyze_conf.maxValue = stream_params->second.maxval;
-
-            gabac::analyze(ioconf, analyze_conf);
-        }
-    }
-
-    void StreamSaver::packIfNeeded(dsg::StreamSaver::Action *a) {
-        if (a->packPossible) {
-            pack(a->job.data, a->job.name);
-            a->job.data.clear();
-            std::unique_lock<std::mutex> guard(stateLock);
-            writeTicket++;
-            wait_var.notify_all();
-        }
-    }
-
-    void StreamSaver::loadConfIfNeeded(dsg::StreamSaver::Action *a) {
-        if (a->loadNecessary) {
-            generateConfIfNeeded(a);
-
-            // Load config from file
-            genie::Logger::instance().out("LOADING: " + configPath + a->confname + ".json " + "to " + a->confname);
-            std::ifstream t(configPath + a->confname + ".json");
-            if (!t) {
-                throw std::runtime_error("Config not existent");
-            }
-            std::string configstring = std::string((std::istreambuf_iterator<char>(t)),
-                                                   std::istreambuf_iterator<char>());
-
-            gabac::EncodingConfiguration enconf(configstring);
-
-            {
-                std::unique_lock<std::mutex> guard(stateLock);
-                configs.emplace(a->confname, enconf);
-                configsInProgress.erase(a->confname);
-
-                auto it = uncompressedJobsBlocked.begin();
-                while (it != uncompressedJobsBlocked.end()) {
-                    if (getConfigName(it->name) == a->confname) {
-                        uncompressedJobs.emplace_back(std::move(*it));
-                        it = uncompressedJobsBlocked.erase(it);
-                    } else {
-                        ++it;
-                    }
-                }
-            }
-        }
-    }
-
-    void StreamSaver::compressIfNeeded(dsg::StreamSaver::Action *a) {
-        if (a->compressPossible) {
-            compress(&a->job);
-
-            {
-                std::unique_lock<std::mutex> guard(stateLock);
-
-                compressedJobs.insert(std::upper_bound(compressedJobs.begin(), compressedJobs.end(), a->job),
-                                      std::move(a->job));
-            }
-            sleep_var.notify_one();
-            insert_var.notify_one();
-        }
-    }
-
-    void StreamSaver::work() {
-        while (running) {
-
-            StreamSaver::Action a;
-            // Get Job and determine next possible step
-            getNextAction(&a);
-
-            packIfNeeded(&a);
-            loadConfIfNeeded(&a);
-            compressIfNeeded(&a);
-        }
-    }
-
 
     const std::map<std::string, StreamSaver::gabac_stream_params> &StreamSaver::getParams() {
         static const std::map<std::string, gabac_stream_params> mapping = {
@@ -264,53 +119,72 @@ namespace dsg {
         return mapping;
     }
 
-    void StreamSaver::store(const std::string &stream_name, gabac::DataBlock *data) {
-        genie::Logger::instance().out("STREAM: " + stream_name + " with size " + std::to_string(data->getRawSize()));
-        // Push back
-        {
-            std::unique_lock<std::mutex> guard(stateLock);
-            const size_t MAX_QUEUE_SIZE = 4;
-            if(uncompressedJobs.size() + compressedJobs.size() >= MAX_QUEUE_SIZE) {
-                insert_var.wait(guard, [this](){
-                    return uncompressedJobs.size() < MAX_QUEUE_SIZE;
-                });
-            }
-            uncompressedJobs.emplace_back(data, stream_name, totalTicket++);
-        }
-        sleep_var.notify_one();
-    }
-
-    void StreamSaver::wait() {
-        std::unique_lock<std::mutex> guard(stateLock);
-
-        if (writeTicket == totalTicket)
-            return;
-
-        wait_var.wait(guard, [this]() {
-            return writeTicket == totalTicket;
-        });
-    }
-
-    StreamSaver::StreamSaver(unsigned numThreads, const std::string &configp, std::ostream *f) : running(true), fout(f),
-                                                                                               writeTicket(0),
-                                                                                               totalTicket(0),
+    StreamSaver::StreamSaver(const std::string &configp, std::ostream *f, std::istream *ifi) : fout(f), fin(ifi),
                                                                                                configPath(configp) {
-        for (size_t i = 0; i < numThreads; ++i) {
-            threads.emplace_back([this]() {
-                this->work();
-            });
+        for (const auto &e : getParams()) {
+            loadConfig(e.first);
         }
+        if(fin) {
+            buildIndex();
+        }
+    }
+
+    void StreamSaver::buildIndex() {
+        fin->seekg(0, std::ios::seekdir::_S_beg);
+
+        while (true) {
+            uint64_t size;
+            if (!fin->read(reinterpret_cast<char *>(&size), sizeof(uint64_t))) {
+                break;
+            }
+
+            std::string name(size, '\0');
+            fin->read(const_cast<char *>(name.data()), size);
+
+            fin->read(reinterpret_cast<char *>(&size), sizeof(uint64_t));
+
+            std::streampos pos = fin->tellg();
+
+            file_index[name] = {pos, size};
+
+            std::cout << "NAME: " << name << " POSITION: " << file_index[name].position << " SIZE: "
+                      << file_index[name].size << std::endl;
+
+            fin->seekg(size, std::ios::seekdir::_S_cur);
+        }
+        fin->clear();
+
+    }
+
+    void StreamSaver::loadConfig(const std::string &name) {
+        // Load config from file
+        std::ifstream t(configPath + name + ".json");
+        std::string configstring;
+        if (t) {
+            genie::Logger::instance().out("LOADING: " + configPath + name + ".json " + "to " + name);
+            configstring = std::string((std::istreambuf_iterator<char>(t)),
+                                       std::istreambuf_iterator<char>());
+        } else {
+            genie::Logger::instance().out("WARNING: Could not load config: " + name + " ; Falling back to default");
+            configstring = getDefaultConf();
+        }
+
+        gabac::EncodingConfiguration enconf(configstring);
+
+        configs.emplace(name, enconf);
+
+
     }
 
     StreamSaver::~StreamSaver() {
-        wait();
-        {
-            std::unique_lock<std::mutex> guard(stateLock);
-            running = false;
-            sleep_var.notify_all();
-        }
-        for (auto &t : threads) {
-            t.join();
-        }
+    }
+
+    const std::string &StreamSaver::getDefaultConf() {
+        static const std::string defaultGabacConf = "{\"word_size\":1,\"sequence_transformation_id\":0,\""
+                                                    "sequence_transformation_parameter\":0,\"transformed_sequences\""
+                                                    ":[{\"lut_transformation_enabled\":false,\"diff_coding_enabled\":"
+                                                    "false,\"binarization_id\":0,\"binarization_parameters\":[8],\""
+                                                    "context_selection_id\":1}]}";
+        return defaultGabacConf;
     }
 }

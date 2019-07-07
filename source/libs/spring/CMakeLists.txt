@@ -12,6 +12,6 @@ set(source_files
         reorder_compress_quality_id.cpp
         spring.cpp
         util.cpp
-)
+        )
 
 add_library(spring ${source_files})
