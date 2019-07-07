@@ -1,5 +1,6 @@
 #include "fasta-file-reader.h"
 
+#include <stdexcept>
 #include <string>
 
 namespace fio {

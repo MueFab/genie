@@ -14,6 +14,8 @@ namespace fio {
 
         ~SamRecord();
 
+        std::string str() const;
+
     public:
         std::string qname;  // Query template NAME
         uint16_t flag;      // bitwise FLAG (uint16_t)

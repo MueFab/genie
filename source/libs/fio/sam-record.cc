@@ -1,5 +1,7 @@
 #include "sam-record.h"
 
+#include <sstream>
+
 namespace fio {
 
     SamRecord::SamRecord(const std::vector<std::string> &fields)
@@ -17,5 +19,24 @@ namespace fio {
               opt(fields[11]) {}
 
     SamRecord::~SamRecord() = default;
+
+    std::string SamRecord::str() const {
+        std::stringstream ss;
+
+        ss << qname << " ";
+        ss << flag << " ";
+        ss << rname << " ";
+        ss << pos << " ";
+        ss << mapq << " ";
+        ss << cigar << " ";
+        ss << rnext << " ";
+        ss << pnext << " ";
+        ss << tlen << " ";
+        ss << seq << " ";
+        ss << qual << " ";
+        ss << opt;
+
+        return ss.str();
+    }
 
 }  // namespace fio

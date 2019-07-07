@@ -35,7 +35,7 @@ namespace fio {
     SamFileReader::~SamFileReader() = default;
 
 
-    size_t SamFileReader::readRecords(const size_t numRecords, std::vector<SamRecord> *const records) {
+    size_t SamFileReader::readRecords(const size_t numRecords, std::list<SamRecord> *const records) {
         for (size_t i = 0; i < numRecords; i++) {
             // Read a line
             std::string line;
