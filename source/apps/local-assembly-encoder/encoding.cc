@@ -26,13 +26,6 @@ namespace lae {
             int64_t prevPos = 0;
 
             for (const auto &samRecord : samRecords) {
-                // LOG_TRACE << "Encoding SAM record";
-                // LOG_TRACE << samRecord.str();
-
-                // LOG_TRACE << "Searching mate";
-                // LOG_TRACE << "RNAME:POS = " << samRecord.rname << ":" << samRecord.pos;
-                // LOG_TRACE << "RNEXT:PNEXT = " << samRecord.rnext << ":" << samRecord.pnext;
-
                 // Search for mate
                 std::string rnameSearchString;
                 if (samRecord.rnext == "=") {
@@ -40,20 +33,15 @@ namespace lae {
                 } else {
                     rnameSearchString = samRecord.rnext;
                 }
-
                 samRecordsCopy.erase(samRecordsCopy.begin()); // delete current record from the search space
                 bool foundMate = false;
                 for (auto it = samRecordsCopy.begin(); it != samRecordsCopy.end(); ++it) {
-                    // LOG_TRACE << "Searching for RNAME:POS = " << rnameSearchString << ":" << samRecord.pnext;
-                    // LOG_TRACE << "Current:      RNAME:POS = " << it->rname << ":" << it->pos;
-
                     if (it->rname == rnameSearchString && it->pos == samRecord.pnext) {
                         LOG_TRACE << "Found mate";
                         foundMate = true;
                         samRecordsCopy.erase(it);
                         break;
                     }
-
                 }
                 if (!foundMate) {
                     LOG_TRACE << "Did not find mate";
