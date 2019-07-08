@@ -1,10 +1,10 @@
 #include "sam-file-reader.h"
 
-#include <iostream>
 #include <string>
 
 #include "sam-record.h"
 
+#include <utils/log.h>
 #include <utils/string-helpers.h>
 
 namespace fio {
@@ -20,20 +20,19 @@ namespace fio {
                 fieldCount++;
                 fields->push_back("");
             }
-
             (*fields)[fieldCount] += c;
-            utils::trim((*fields)[fieldCount]);
+        }
+
+        for (auto &field : *fields) {
+            utils::trim(field);
         }
     }
-
 
     SamFileReader::SamFileReader(const std::string &path) : FileReader(path) {
         readHeader();
     }
 
-
     SamFileReader::~SamFileReader() = default;
-
 
     size_t SamFileReader::readRecords(const size_t numRecords, std::list<SamRecord> *const records) {
         for (size_t i = 0; i < numRecords; i++) {
@@ -49,12 +48,12 @@ namespace fio {
             parseLine(line, &fields);
             SamRecord samRecord(fields);
 
+            std::cout << samRecord.str();
             records->push_back(samRecord);
         }
 
         return records->size();
     }
-
 
     void SamFileReader::readHeader() {
         // Set file pointer to the beginning of the file
@@ -83,7 +82,7 @@ namespace fio {
         seekFromSet(fpos);
 
         if (header.empty()) {
-            std::cout << "SAM header not present" << std::endl;
+            LOG_WARNING << "SAM header not present";
         }
     }
 
