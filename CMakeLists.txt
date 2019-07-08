@@ -58,7 +58,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 #==============================================================================
 
 include_directories("${CMAKE_SOURCE_DIR}/source/libs")
-include_directories("${CMAKE_SOURCE_DIR}/source/libs/gabac")
 include_directories("${CMAKE_SOURCE_DIR}/source/libs/third-party")
 
 
