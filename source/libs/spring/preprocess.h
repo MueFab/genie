@@ -3,13 +3,13 @@
 
 #include <string>
 #include "util.h"
-#include <fio/fastq-file-reader.h>
+#include <utils/fastq-file-reader.h>
 
 namespace spring {
 
-void preprocess(fio::FastqFileReader *fastqFileReader1,
-		fio::FastqFileReader *fastqFileReader2,
-                const std::string &temp_dir, compression_params &cp);
+    void preprocess(utils::FastqFileReader *fastqFileReader1,
+                    utils::FastqFileReader *fastqFileReader2,
+                    const std::string &temp_dir, compression_params &cp);
 
 }  // namespace spring
 

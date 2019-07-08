@@ -186,7 +186,7 @@ class PythonApiTest(unittest.TestCase):
             GABAC_OPERATION.ENCODE,
             blocks
         ):
-            libc.printf(b"Diff coding failed!\n")
+            libc.printf(b"Diff libs failed!\n")
             libgabac.gabac_data_block_release(blocks[0])
             libgabac.gabac_data_block_release(blocks[1])
             return GABAC_RETURN.FAILURE
@@ -199,7 +199,7 @@ class PythonApiTest(unittest.TestCase):
             GABAC_OPERATION.ENCODE, 
             ct.byref(blocks[1])
         ):
-            libc.printf(b"Cabac coding failed!\n")
+            libc.printf(b"Cabac libs failed!\n")
             libgabac.gabac_data_block_release(blocks[0])
             libgabac.gabac_data_block_release(blocks[1])
             return GABAC_RETURN.FAILURE
@@ -242,7 +242,7 @@ class PythonApiTest(unittest.TestCase):
             GABAC_OPERATION.DECODE,
             blocks
         ):
-            libc.printf(b"Inverse diff coding failed!\n")
+            libc.printf(b"Inverse diff libs failed!\n")
             libgabac.gabac_data_block_release(blocks[0])
             libgabac.gabac_data_block_release(blocks[1])
             return GABAC_RETURN.FAILURE

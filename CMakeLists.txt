@@ -72,4 +72,4 @@ include_directories("${CMAKE_SOURCE_DIR}/source/libs/third-party")
 #==============================================================================
 
 add_subdirectory(source)
-# add_subdirectory(tests)
+add_subdirectory(tests)
