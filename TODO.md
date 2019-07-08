@@ -1,5 +1,7 @@
 # TODO
 
+## Urgent
+
 - Rename files
   - C and C++ header files should have the extension ``.h``
   - C source files should have the extension ``.c``.
@@ -12,9 +14,11 @@
   - Applications and libraries each should have their own namespace, e.g. ``calq::``, ``gabac::``, ``genie::``, ``spring::`` etc.
 - Make a ``utils``library containing constants, exceptions, log functionality, etc.
 - Fix compiler warnings
+- Add code coverage report system
+
+## For later
+
 - Check coding style with cpplint, clang-format and pycodestyle
 - Clean up ``source/libs/format/CMakeLists.txt``
 - Set up CMake for ``tests``
-- Use new logger
 - Add Autotools build system
-- Add code coverage report system
