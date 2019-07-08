@@ -1,10 +1,10 @@
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 class ExampleTestCase : public ::testing::Test {
 protected:
-    ExampleTestCase() {
-        // Do any necessary setup for your tests here
-    }
+
+    // Do any necessary setup for your tests here
+    ExampleTestCase() = default;
 
     ~ExampleTestCase() override = default;
 
@@ -41,25 +41,15 @@ protected:
         // Code here will be called immediately after each test
     }
 
-    void sharedSubroutine() {
-        // If needed, define subroutines for your tests to share
-    }
+//    void sharedSubroutine() {
+//        // If needed, define subroutines for your tests to share
+//    }
 };
 
-TEST_F(ExampleTestCase, ExampleTest) {
-// The rule of thumb is to use EXPECT_* when you want the test to continue
-// to reveal more errors after the assertion failure, and use ASSERT_*
-// when continuing after failure doesn't make sense.
-
-EXPECT_EQ(0, 0);
-ASSERT_EQ(0, 0);
-}
-
-TEST(SimpleExampleTestCase, SimpleExampleTest) {
-// The rule of thumb is to use EXPECT_* when you want the test to continue
-// to reveal more errors after the assertion failure, and use ASSERT_*
-// when continuing after failure doesn't make sense.
-
-EXPECT_EQ(0, 0);
-ASSERT_EQ(0, 0);
+TEST_F(ExampleTestCase, ExampleTest) {  // NOLINT(cert-err58-cpp)
+    // The rule of thumb is to use EXPECT_* when you want the test to continue
+    // to reveal more errors after the assertion failure, and use ASSERT_*
+    // when continuing after failure doesn't make sense.
+    EXPECT_EQ(0, 0);
+    ASSERT_EQ(0, 0);
 }
