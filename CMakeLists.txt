@@ -8,6 +8,11 @@ project("genie")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug)
+    message(STATUS "Using fall-back build type '${CMAKE_BUILD_TYPE}'")
+endif()
+
 include(AddGoogleTest)
 
 set(CMAKE_C_STANDARD 11)
@@ -36,16 +41,6 @@ if(${GENIE_USE_OPENMP})
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
     add_compile_definitions(GENIE_USE_OPENMP)
-endif()
-
-
-#==============================================================================
-# Build type
-#==============================================================================
-
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-    message(STATUS "Using fall-back build type '${CMAKE_BUILD_TYPE}'")
 endif()
 
 
