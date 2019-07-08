@@ -1,7 +1,7 @@
 #include "encoding.h"
 
-#include <fio/sam-file-reader.h>
-#include <fio/sam-record.h>
+#include <utils/sam-file-reader.h>
+#include <utils/sam-record.h>
 #include <utils/log.h>
 
 namespace lae {
@@ -10,15 +10,15 @@ namespace lae {
         LOG_DEBUG << "Encoding";
         LOG_INFO << "Input file: " << programOptions.inputFilePath;
 
-        fio::SamFileReader samFileReader(programOptions.inputFilePath);
+        utils::SamFileReader samFileReader(programOptions.inputFilePath);
 
         size_t blockSize = 10000;
 
         while (true) {
             // Read a block of SAM records
-            std::list<fio::SamRecord> samRecords;
+            std::list<utils::SamRecord> samRecords;
             samFileReader.readRecords(blockSize, &samRecords);
-            std::list<fio::SamRecord> samRecordsCopy(samRecords);
+            std::list<utils::SamRecord> samRecordsCopy(samRecords);
             LOG_TRACE << "Read " << samRecords.size() << " SAM record(s)";
 
             // Set up the decoded descriptor streams

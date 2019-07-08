@@ -80,9 +80,9 @@ static void decodeInverseLUT(unsigned bits0,
 static void doDiffCoding(bool enabled,
                          gabac::DataBlock *const lutTransformedSequence
 ){
-    // Diff coding
+    // Diff libs
     if (enabled) {
-        // GABACIFY_LOG_TRACE << "Diff coding *en*abled";
+        // GABACIFY_LOG_TRACE << "Diff libs *en*abled";
         std::vector<gabac::DataBlock> vec(1);
         vec[0].swap(lutTransformedSequence);
         gabac::getTransformation(gabac::SequenceTransformationId::diff_coding).inverseTransform({}, &vec);
@@ -90,7 +90,7 @@ static void doDiffCoding(bool enabled,
         return;
     }
 
-    // GABACIFY_LOG_TRACE << "Diff coding *dis*abled";
+    // GABACIFY_LOG_TRACE << "Diff libs *dis*abled";
 }
 
 //------------------------------------------------------------------------------

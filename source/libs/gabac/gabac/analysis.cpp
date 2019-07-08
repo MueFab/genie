@@ -67,7 +67,7 @@ const AnalysisConfiguration& getCandidateConfig(){
                           //gabac::SequenceTransformationId::match_coding,
                              gabac::SequenceTransformationId::rle_coding
             },
-            {  // Match coding window sizes
+            {  // Match libs window sizes
                     32,
                        256
             },

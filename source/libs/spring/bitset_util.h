@@ -8,8 +8,8 @@
 #include <bitset>
 #include <fstream>
 #include <string>
-#include "spring/BooPHF.h"
-#include "spring/params.h"
+#include "BooPHF.h"
+#include "params.h"
 namespace spring {
 
 typedef boomphf::SingleHashFunctor<u_int64_t> hasher_t;

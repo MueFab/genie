@@ -20,7 +20,7 @@ void transformDiffCoding(
 ){
     assert(transformedSymbols != nullptr);
 
-    // Do the diff coding
+    // Do the diff libs
     uint64_t previousSymbol = 0;
     BlockStepper r = transformedSymbols->getReader();
     while (r.isValid()) {

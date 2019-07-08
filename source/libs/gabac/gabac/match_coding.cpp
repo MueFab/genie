@@ -36,7 +36,7 @@ void transformMatchCoding(
         return;
     }
 
-    // Do the match coding
+    // Do the match libs
     const uint64_t symbolsSize = symbols->size();
     for (uint64_t i = 0; i < symbolsSize; i++) {
         uint64_t pointer = 0;

@@ -24,12 +24,12 @@
 #include <filesystem/filesystem.hpp>
 
 #include "exceptions.h"
-#include "fio/fasta-file-reader.h"
-#include "fio/fasta-record.h"
-#include "fio/fastq-file-reader.h"
-#include "fio/fastq-record.h"
-#include "fio/sam-file-reader.h"
-#include "fio/sam-record.h"
+#include "utils/fasta-file-reader.h"
+#include "utils/fasta-record.h"
+#include "utils/fastq-file-reader.h"
+#include "utils/fastq-record.h"
+#include "utils/sam-file-reader.h"
+#include "utils/sam-record.h"
 #include "spring/spring.h"
 #include "genie_file_format.h"
 #include "gabac_integration.h"
@@ -114,7 +114,7 @@ namespace dsg {
 
         bool paired_end = false;
         // Initialize a FASTQ file reader.
-        fio::FastqFileReader fastqFileReader1(programOptions.inputFilePath);
+        utils::FastqFileReader fastqFileReader1(programOptions.inputFilePath);
         std::cout << "Calling SPRING" << std::endl;
         if (programOptions.inputFilePairPath.empty()) {
             return spring::generate_streams_SPRING(
@@ -126,7 +126,7 @@ namespace dsg {
             );
         } else {
             paired_end = true;
-            fio::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath);
+            utils::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath);
             return spring::generate_streams_SPRING(
                     &fastqFileReader1,
                     &fastqFileReader2,

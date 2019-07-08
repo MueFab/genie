@@ -117,7 +117,7 @@ void doDiffTransform(std::vector<gabac::DataBlock> *const sequence
     // Put raw sequence in, get transformed sequence and lut tables
     getTransformation(SequenceTransformationId::diff_coding).transform({0}, sequence);
 
-    // GABACIFY_LOG_TRACE << "Diff coding *dis*abled";
+    // GABACIFY_LOG_TRACE << "Diff libs *dis*abled";
     // GABACIFY_LOG_DEBUG << "Got uncompressed stream after diff: "
     // << diffAndLutTransformedSequence->size() << " bytes";
 }
