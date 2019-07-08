@@ -1,24 +1,9 @@
-#include <vector>
+#include <gtest/gtest.h>
 
-#include "gabac/bit_output_stream.h"
-#include "gabac/data_block.h"
+#include <gabac/bit_output_stream.h>
+#include <gabac/data_block.h>
 
-#include "gtest/gtest.h"
-
-
-class BitOutputStreamTest : public ::testing::Test
-{
- protected:
-    void SetUp() override{
-    }
-
-    void TearDown() override{
-        // Code here will be called immediately after each test
-    }
-};
-
-
-TEST_F(BitOutputStreamTest, write){
+TEST(BitOutputStreamTest, write) { // NOLINT(cert-err58-cpp)
     gabac::DataBlock bitstream(0, 1);
     gabac::BitOutputStream bitOutputStream(&bitstream);
     EXPECT_NO_THROW(bitOutputStream.write(0xFF, 8));
@@ -27,7 +12,7 @@ TEST_F(BitOutputStreamTest, write){
     EXPECT_NO_THROW(bitOutputStream.write(0xFF, 2));
 }
 
-TEST_F(BitOutputStreamTest, writeAlignZero){
+TEST(BitOutputStreamTest, writeAlignZero) { // NOLINT(cert-err58-cpp)
     gabac::DataBlock bitstream(0, 1);
     gabac::BitOutputStream bitOutputStream(&bitstream);
     bitOutputStream.write(0xFF, 2);
