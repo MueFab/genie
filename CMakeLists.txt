@@ -44,7 +44,7 @@ endif()
 #==============================================================================
 
 if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug)
+    set(CMAKE_BUILD_TYPE Release)
     message(STATUS "Using fall-back build type '${CMAKE_BUILD_TYPE}'")
 endif()
 
