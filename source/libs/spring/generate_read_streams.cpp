@@ -631,7 +631,7 @@ namespace spring {
 #endif
 // this is actually number of read pairs per block for PE
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for ordered
+#pragma omp parallel for ordered schedule(dynamic)
 #endif
         for (uint64_t cur_block_num = 0; cur_block_num < block_start.size(); cur_block_num++) {
             dsg::AcessUnitStreams streamsAU;
@@ -709,18 +709,18 @@ namespace spring {
                         else {
                             subseq_vector[12][0].push_back(3); // rtype = M
                             for (int k = 0; k < 2; k++) {
-                                uint32_t ind = k ? pair : current;
-                                for (uint16_t j = 0; j < noise_len_arr[ind]; j++) {
+                                uint32_t index = k ? pair : current;
+                                for (uint16_t j = 0; j < noise_len_arr[index]; j++) {
                                     subseq_vector[3][0].push_back(0); // mmpos
                                     if (j == 0)
                                         subseq_vector[3][1].push_back(
-                                                noisepos_arr[pos_in_noise_arr[ind] + j]); // mmpos
+                                                noisepos_arr[pos_in_noise_arr[index] + j]); // mmpos
                                     else
                                         subseq_vector[3][1].push_back(
-                                                noisepos_arr[pos_in_noise_arr[ind] + j] - 1); // mmpos
+                                                noisepos_arr[pos_in_noise_arr[index] + j] - 1); // mmpos
                                     subseq_vector[4][0].push_back(0); // mmtype = Substitution
                                     subseq_vector[4][1].push_back(
-                                            char_to_int[(uint8_t) noise_arr[pos_in_noise_arr[ind] + j]]);
+                                            char_to_int[(uint8_t) noise_arr[pos_in_noise_arr[index] + j]]);
                                 }
                                 subseq_vector[3][0].push_back(1); // mmpos
                             }
