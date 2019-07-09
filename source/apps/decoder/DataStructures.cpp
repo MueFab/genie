@@ -24,6 +24,41 @@ namespace helper_functions {
         supported_symbols[1] = "ACGTRYSWKMBDHVN-";
     }
 
+    std::string extract_tok_value(data_structures::expandable_array<data_structures::expandable_array<uint8_t> > decoded_tokens,
+                                    uint64_t tokType,
+                                    uint64_t t,
+                                    uint64_t refIdx) {
+        uint64_t tokIdx = (t << 4) | tokType;
+        std::string tmp_str;
+        if(tokType == 2)      tmp_str = get_tok_string(decoded_tokens[tokIdx]);
+        else if(tokType == 3) tmp_str = get_tok_char(decoded_tokens[tokIdx]);
+        else if(tokType == 4) tmp_str = get_tok_digits(decoded_tokens[tokIdx]);
+        else if(tokType == 5) tmp_str = get_tok_delta(decoded_tokens[tokIdx], refIdx);
+        else if(tokType == 6) tmp_str = get_tok_digits0(decoded_tokens[tokIdx]);
+        else if(tokType == 7) tmp_str = get_tok_delta0(decoded_tokens[tokIdx], refIdx);
+        else if(tokType == 8) tmp_str = get_tok_match(refIdx);
+        return tmp_str;
+    }
+
+    /* ask about those: todo */
+    std::string get_tok_string(data_structures::expandable_array<uint8_t> decoded_tokens);
+    std::string get_tok_char(data_structures::expandable_array<uint8_t> decoded_tokens);
+    std::string get_tok_digits(data_structures::expandable_array<uint8_t> decoded_tokens);
+    std::string get_tok_delta(data_structures::expandable_array<uint8_t> decoded_tokens, uint64_t refIdx);
+    std::string get_tok_digits0(data_structures::expandable_array<uint8_t> decoded_tokens);
+    std::string get_tok_delta0(data_structures::expandable_array<uint8_t> decoded_tokens, uint64_t refIdx);
+    std::string get_tok_match(uint64_t refIdx);
+
+    template<typename T>
+    data_structures::expandable_array<T> get_non_empty(const data_structures::expandable_array<data_structures::expandable_array<T> >&decoded_tokens) {
+        for(size_t i=0; i<decoded_tokens.size(); ++i) { 
+            if(!decoded_tokens[i].empty())
+                return decoded_tokens[i];
+        }
+        return data_structures::expandable_array<T>();
+    }
+
+
 }
 
 namespace data_structures {
@@ -107,9 +142,22 @@ namespace data_structures {
         else assert(0);
     }
 
-    encoded_tokentype_sequence::encoded_tokentype_sequence()                                                {}
-    encoded_tokentype_sequence::encoded_tokentype_sequence(uint16_t i, uint8_t method_ID)                   { assert(method_ID == 0); cop = COP(i); } // will throw exception
-    encoded_tokentype_sequence::encoded_tokentype_sequence(uint16_t i, uint8_t method_ID, uint64_t nos)     { assert(method_ID != 0); dec_tt_seq = decode_tokentype_sequence(i, method_ID, nos); }  
+    encoded_tokentype_sequence::encoded_tokentype_sequence() {}
+
+    encoded_tokentype_sequence::encoded_tokentype_sequence(uint16_t i, uint8_t method_ID) { 
+        assert(method_ID == 0);
+        this->i = i;
+        this->method_ID = method_ID;
+        cop = COP(i); 
+    } // will throw exception
+
+    encoded_tokentype_sequence::encoded_tokentype_sequence(uint16_t i, uint8_t method_ID, uint64_t nos) { 
+        assert(method_ID != 0); 
+        this->i = i;
+        this->method_ID = method_ID;
+        this->num_output_symbols = nos;
+        dec_tt_seq = decode_tokentype_sequence(i, method_ID, nos); 
+    }  
 
     block_payload::block_payload()                          {}
     block_payload::block_payload(uint8_t descriptor_ID)     { /* TODO */ }

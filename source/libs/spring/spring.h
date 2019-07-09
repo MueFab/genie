@@ -2,8 +2,8 @@
 #define SPRING_SPRING_H_
 
 #include <string>
-#include "util.h"
-#include "fileio/fastq_file_reader.h"
+#include "spring/util.h"
+#include <utils/fastq-file-reader.h>
 #include <vector>
 #include <map>
 #include <genie/generation.h>

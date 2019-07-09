@@ -18,11 +18,8 @@ if(${GENIE_USE_OPENMP})
     target_compile_definitions(genie PRIVATE GENIE_USE_OPENMP)
 endif()
 
-target_link_libraries(genie PRIVATE alico)
-target_link_libraries(genie PRIVATE format)
-target_link_libraries(genie PRIVATE fileio)
-target_link_libraries(genie PRIVATE calq)
 target_link_libraries(genie PRIVATE gabac)
 target_link_libraries(genie PRIVATE spring)
+target_link_libraries(genie PRIVATE utils)
 
 target_link_libraries(genie PRIVATE pthread)

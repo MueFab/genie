@@ -7,11 +7,11 @@
 #include <stdexcept>
 #include <fstream>
 #include <iostream>
-#include "spring/util.h"
-#include "spring/decompress.h"
-#include "spring/id_tokenization.h"
-#include "spring/params.h"
-#include "fileio/fastq_record.h"
+#include "util.h"
+#include "decompress.h"
+#include "id_tokenization.h"
+#include "params.h"
+#include <utils/fastq-record.h>
 
 namespace spring {
 
