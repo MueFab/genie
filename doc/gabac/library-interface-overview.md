@@ -1,4 +1,4 @@
-# Library Interface Overview #
+# Library interface overview
 
 ## Configurations ##
 
@@ -16,7 +16,7 @@ struct IOConfiguration
     {
         TRACE = 0,
         DEBUG = 1,
-        INFO = 2, 
+        INFO = 2,
         WARNING = 3,
         ERROR = 4,
         FATAL = 5  
@@ -110,7 +110,7 @@ It is possible to execute single transformations from the GABAC codec by calling
 ```
 const TransformationProperties& getTransformation(const gabac::SequenceTransformationId& id);
 ```
-This function will return a reflection-like TransformationProperties object containing some information about the selected transformation: 
+This function will return a reflection-like TransformationProperties object containing some information about the selected transformation:
 ```
 struct TransformationProperties
 {
@@ -130,7 +130,7 @@ you can execute the transformations.
 using SequenceTransform = std::function<void(const std::vector<uint64_t>& param, std::vector<gabac::DataBlock> *const)>;
 ```
 
-Note that all transformation work in place, so your input data streams will get discarded and replaced by the transformed streams. 
+Note that all transformation work in place, so your input data streams will get discarded and replaced by the transformed streams.
 Create a copy before if you want to keep them.
 
 Sidenote: there is a version of TransformationProperties for binarizations:
@@ -178,7 +178,7 @@ b.push_back(42);  // Append new value
 
 ## Block stepper ##
 
-gabac::BlockStepper is basically a simple structure that allows you to traverse a data block as fast as possible. While you could also just use a range based loop or iterators, the block stepper is the fastest possibility. 
+gabac::BlockStepper is basically a simple structure that allows you to traverse a data block as fast as possible. While you could also just use a range based loop or iterators, the block stepper is the fastest possibility.
 
 ```
 BlockStepper s = dataBlock.getReader();

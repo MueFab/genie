@@ -5,8 +5,8 @@
 #include <string>
 #include <map>
 #include <genie/StreamSaver.h>
-#include "spring/util.h"
-#include "fileio/fastq_record.h"
+#include "util.h"
+#include <utils/fastq-record.h>
 
 namespace spring {
 

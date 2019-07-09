@@ -1,8 +1,8 @@
 #ifndef SPRING_GENERATE_NEW_FASTQ_H_
 #define SPRING_GENERATE_NEW_FASTQ_H_
 
-#include "spring/util.h"
-#include "fileio/fastq_file_reader.h"
+#include "util.h"
+#include <utils/fastq-file-reader.h>
 
 namespace spring {
 

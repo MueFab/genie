@@ -12,7 +12,7 @@ set(source_files
         log.cpp
         main.cpp
         output_file.cpp
-        program_options.cpp
+        program-options.cpp
 )
 
 add_executable(ureads-encoder ${source_files})

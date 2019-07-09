@@ -1,10 +1,10 @@
-#include "spring/generate_new_fastq.h"
-#include "spring/util.h"
-#include "fileio/fastq_file_reader.h"
+#include "generate_new_fastq.h"
+#include "util.h"
+#include <utils/fastq-file-reader.h>
 
 namespace spring {
 
-    void generate_new_fastq_se(dsg::input::fastq::FastqFileReader *fastqFileReader1,
+    void generate_new_fastq_se(utils::FastqFileReader *fastqFileReader1,
                                const std::string &temp_dir, const compression_params &cp) {
 
         uint32_t numreads = cp.num_reads;
@@ -39,7 +39,7 @@ namespace spring {
             uint32_t end_read_bin = i * str_array_size + num_reads_bin;
             // Read the file and pick up lines corresponding to this bin
             fastqFileReader1->seekFromSet(0);
-            std::vector<dsg::input::fastq::FastqRecord> fastqRecords;
+            std::vector<utils::FastqRecord> fastqRecords;
             for (uint32_t j = 0; j < numreads; j++) {
                 fastqFileReader1->readRecords(1, &fastqRecords);
                 if (order_array[j] >= start_read_bin && order_array[j] < end_read_bin) {
@@ -65,10 +65,10 @@ namespace spring {
     }
 
 
-    void generate_new_fastq_pe(dsg::input::fastq::FastqFileReader *fastqFileReader1,
-                               dsg::input::fastq::FastqFileReader *fastqFileReader2,
+    void generate_new_fastq_pe(utils::FastqFileReader *fastqFileReader1,
+                               utils::FastqFileReader *fastqFileReader2,
                                const std::string &temp_dir, const compression_params &cp) {
-        dsg::input::fastq::FastqFileReader *fastqFileReader[2] =
+        utils::FastqFileReader *fastqFileReader[2] =
                 {fastqFileReader1, fastqFileReader2};
         uint32_t numreads = cp.num_reads;
         std::string basedir = temp_dir;
@@ -104,7 +104,7 @@ namespace spring {
             // Read the file and pick up lines corresponding to this bin
             for (int k = 0; k < 2; k++) {
                 fastqFileReader[k]->seekFromSet(0);
-                std::vector<dsg::input::fastq::FastqRecord> fastqRecords;
+                std::vector<utils::FastqRecord> fastqRecords;
                 for (uint32_t j = k * numreads / 2; j < (k + 1) * numreads / 2; j++) {
                     fastqFileReader[k]->readRecords(1, &fastqRecords);
                     if (order_array[j] >= start_read_bin && order_array[j] < end_read_bin) {

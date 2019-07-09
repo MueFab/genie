@@ -165,7 +165,7 @@ void encode(const ProgramOptions &programOptions)
         // uint32_t multipleSignatureBase = 32;
         // uint8_t U_signature_size = 3;
         //
-        // //Hard coding to the default qv_coding mode
+        // //Hard libs to the default qv_coding mode
         // uint8_t *qv_coding_mode = (uint8_t*) malloc(sizeof(uint8_t)*numClasses);
         // for(uint8_t class_i = 0; class_i < numClasses; class_i++){
         //     qv_coding_mode[class_i] = 1;
