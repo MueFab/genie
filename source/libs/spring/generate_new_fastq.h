@@ -6,11 +6,11 @@
 
 namespace spring {
 
-    void generate_new_fastq_se(dsg::input::fastq::FastqFileReader *fastqFileReader1,
+    void generate_new_fastq_se(utils::FastqFileReader *fastqFileReader1,
                                const std::string &temp_dir, const compression_params &cp);
 
-    void generate_new_fastq_pe(dsg::input::fastq::FastqFileReader *fastqFileReader1,
-                               dsg::input::fastq::FastqFileReader *fastqFileReader2,
+    void generate_new_fastq_pe(utils::FastqFileReader *fastqFileReader1,
+                               utils::FastqFileReader *fastqFileReader2,
                                const std::string &temp_dir, const compression_params &cp);
 
     void generate_order_array(const std::string &file_order, uint32_t *order_array,

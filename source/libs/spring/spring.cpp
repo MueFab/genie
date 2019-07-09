@@ -26,8 +26,8 @@
 namespace spring {
 
     generated_aus generate_streams_SPRING(
-            dsg::input::fastq::FastqFileReader *fastqFileReader1,
-            dsg::input::fastq::FastqFileReader *fastqFileReader2, int num_thr,
+            utils::FastqFileReader *fastqFileReader1,
+            utils::FastqFileReader *fastqFileReader2, int num_thr,
             bool paired_end, const std::string &working_dir, dsg::StreamSaver &st) {
         // generate random temp directory in the working directory
         std::string temp_dir;

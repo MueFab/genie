@@ -15,14 +15,14 @@
 
 namespace spring {
 
-    std::pair<std::vector<dsg::input::fastq::FastqRecord>, std::vector<bool>>
+    std::pair<std::vector<utils::FastqRecord>, std::vector<bool>>
     decode_streams(decoded_desc_t &dec, const std::vector<std::array<uint8_t, 2>> &subseq_indices, bool paired_end) {
-        std::vector<dsg::input::fastq::FastqRecord> decoded_records;
+        std::vector<utils::FastqRecord> decoded_records;
         std::vector<bool> first_file_flag_vec;
         std::string cur_read[2];
         std::string cur_quality[2];
         std::string cur_ID;
-        dsg::input::fastq::FastqRecord cur_record;
+        utils::FastqRecord cur_record;
         std::string refBuf;
         // int_to_char
         char int_to_char[5] = {'A', 'C', 'G', 'T', 'N'};
