@@ -19,7 +19,19 @@ namespace helper_functions {
     void zero_order_complement(uint8_t);
     void first_order_complement(uint8_t);
     void initialize_supported_symbols(data_structures::expandable_array<std::string> &);
-
+    std::string extract_tok_value(data_structures::expandable_array<data_structures::expandable_array<uint64_t> >,
+                                    uint64_t,
+                                    uint64_t,
+                                    uint64_t);
+    std::string get_tok_string(data_structures::expandable_array<uint64_t>);
+    std::string get_tok_char(data_structures::expandable_array<uint64_t>);
+    std::string get_tok_digits(data_structures::expandable_array<uint64_t>);
+    std::string get_tok_delta(data_structures::expandable_array<uint64_t>, uint64_t);
+    std::string get_tok_digits0(data_structures::expandable_array<uint64_t>);
+    std::string get_tok_delta0(data_structures::expandable_array<uint64_t>, uint64_t);
+    std::string get_tok_match(uint64_t);
+    template<typename T>
+    data_structures::expandable_array<T> get_non_empty(const data_structures::expandable_array<data_structures::expandable_array<T> >&);
 }
 
 namespace data_structures {
@@ -81,6 +93,7 @@ namespace data_structures {
     }
 
     struct encoded_tokentype_sequence {
+        uint16_t        i;
         uint8_t         type_ID;
         uint8_t         method_ID;
 
@@ -125,6 +138,11 @@ namespace data_structures {
         block_payload(uint8_t);
     };
 
+    struct access_unit_block {
+        block_header        header;
+        block_payload       payload;
+    };
+
     struct access_unit_header {
         uint32_t        access_unit_ID;
         uint8_t         num_blocks;
@@ -148,11 +166,6 @@ namespace data_structures {
         expandable_array<uint64_t>  U_cluster_signature;
         uint16_t                    num_signatures;
         bool                        nesting_zero_bit;
-    };
-
-    struct access_unit_block {
-        block_header        header;
-        block_payload       payload;
     };
 
     struct access_unit {
@@ -253,9 +266,9 @@ namespace data_structures {
         uint8_t         alphabet_ID;
         uint32_t        read_length;
         uint8_t         number_of_template_segments_minus1
-        uint8_t         max_au_data_unit_size;
-        uint32_t        pos_40_bits_flag;
-        bool            qv_depth;
+        uint32_t        max_au_data_unit_size;
+        bool            pos_40_bits_flag;
+        uint8_t         qv_depth;
         uint8_t         as_depth;
         uint8_t         num_classes;
 
@@ -276,7 +289,7 @@ namespace data_structures {
         expandable_array<bool>                  qvps_flag;
         expandable_array<parameter_set_qvps>    param_set_qvps; // 7.3.2.2
         expandable_array<uint8_t>               qvps_preset_ID;
-
+        bool                                    qv_reverse_flag;
         bool                                    crps_flag;
         parameter_set_crps                      param_set_crps; // 7.3.2.3
 
@@ -288,6 +301,10 @@ namespace data_structures {
         uint8_t parent_parameter_set_ID;
 
         encoding_parameters enc_params;
+    };
+
+    struct mpegg_record {
+        // TODO
     };
 
 }
