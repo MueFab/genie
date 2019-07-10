@@ -25,10 +25,10 @@ matrix:
         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
     - os: osx
       compiler: clang
-      homebrew:
-#        update: true
-        packages:
-          - libomp
+      addons:
+        homebrew:
+          packages:
+            - libomp
 
 before_install:
   - eval "${MATRIX_EVAL}"
