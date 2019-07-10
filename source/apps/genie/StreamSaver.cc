@@ -130,7 +130,7 @@ namespace dsg {
     }
 
     void StreamSaver::buildIndex() {
-        fin->seekg(0, std::ios::seekdir::_S_beg);
+        fin->seekg(0, std::ios::seekdir::beg);
 
         while (true) {
             uint64_t size;
@@ -150,7 +150,7 @@ namespace dsg {
             std::cout << "NAME: " << name << " POSITION: " << file_index[name].position << " SIZE: "
                       << file_index[name].size << std::endl;
 
-            fin->seekg(size, std::ios::seekdir::_S_cur);
+            fin->seekg(size, std::ios::seekdir::cur);
         }
         fin->clear();
 
