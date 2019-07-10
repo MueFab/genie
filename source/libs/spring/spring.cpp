@@ -28,7 +28,7 @@ namespace spring {
     generated_aus generate_streams_SPRING(
             utils::FastqFileReader *fastqFileReader1,
             utils::FastqFileReader *fastqFileReader2, int num_thr,
-            bool paired_end, const std::string &working_dir, dsg::StreamSaver &st) {
+            bool paired_end, const std::string &working_dir, bool analyze, dsg::StreamSaver &st) {
         // generate random temp directory in the working directory
         std::string temp_dir;
         while (true) {
@@ -89,7 +89,7 @@ namespace spring {
 
         std::cout << "Generating read streams ...\n";
         auto grs_start = std::chrono::steady_clock::now();
-        auto descriptorFilesPerAUs = generate_read_streams(temp_dir, cp, st);
+        auto descriptorFilesPerAUs = generate_read_streams(temp_dir, cp, analyze, st);
         auto grs_end = std::chrono::steady_clock::now();
         std::cout << "Generating read streams done!\n";
         std::cout << "Time for this step: "
@@ -119,7 +119,7 @@ namespace spring {
         if (preserve_quality || preserve_id) {
             std::cout << "Reordering and compressing quality and/or ids ...\n";
             auto rcqi_start = std::chrono::steady_clock::now();
-            reorder_compress_quality_id(temp_dir, cp, st);
+            reorder_compress_quality_id(temp_dir, cp, analyze, st);
             auto rcqi_end = std::chrono::steady_clock::now();
             std::cout << "Reordering and compressing quality and/or ids done!\n";
             std::cout << "Time for this step: "
