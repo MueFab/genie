@@ -10,13 +10,9 @@ set(source_files
         StreamSaver.cc
         thread_pool.cc
         utilities.cc
-        )
+)
 
 add_executable(genie ${source_files})
-
-if(${GENIE_USE_OPENMP})
-    target_compile_definitions(genie PRIVATE GENIE_USE_OPENMP)
-endif()
 
 target_link_libraries(genie PRIVATE gabac)
 target_link_libraries(genie PRIVATE spring)
