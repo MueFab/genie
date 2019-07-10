@@ -43,6 +43,7 @@ namespace dsg {
 
         std::string configPath; // Path to gabac config directory
 
+        void analyze(const std::string &name, gabac::DataBlock *data);
         void compress(const std::string &name, gabac::DataBlock *data);
         void decompress(const std::string &name, gabac::DataBlock *data);
 
@@ -64,6 +65,8 @@ namespace dsg {
         static std::string getConfigName(const std::string &stream);
 
         void loadConfig(const std::string &name);
+
+        void reloadConfigSet();
 
 
         StreamSaver(const std::string &configp, std::ostream *f, std::istream *ifile);

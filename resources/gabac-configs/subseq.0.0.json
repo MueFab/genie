@@ -7,7 +7,7 @@
             "binarization_parameters": [
                 9
             ],
-            "context_selection_id": 1,
+            "context_selection_id": 0,
             "diff_coding_enabled": false,
             "lut_transformation_bits": 10,
             "lut_transformation_enabled": true,

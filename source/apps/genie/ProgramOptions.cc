@@ -32,6 +32,7 @@ ProgramOptions::ProgramOptions(
     : force(false),
       verbose(false),
       help(false),
+      analyze(false),
       workingDirectory("./"),
       numThreads(1),
       inputFilePath(""),
@@ -66,6 +67,9 @@ void ProgramOptions::processCommandLine(
     app.add_option("input-file", inputFilePath, "First input file - fastq in fastq mode, sam in sam mode, genie/sgenie file in decompression mode. This argument is positional (first argument) and mandatory")->mandatory(true);
     app.add_option("input-file-pair-path", inputFilePairPath, "Second input file - paired fastq in fastq mode (optional), reference fasta file in sam mode (mandatory). This argument is also positional.");
     app.add_option("-c,--config-file-path", configPath, "Path to directory with gabac configurations. Missing configuratons will be regenerated, which may take a while")->mandatory(true);
+
+    analyze = false;
+    app.add_flag("-g,--generate-configuration", analyze, "Generate a new set of configurations");
 
     numThreads = 1;
     app.add_option("-t,--numThreads", numThreads, "How many threads to launch for parallel execution of GABAC. Default is 1.");

@@ -3,13 +3,15 @@
     "sequence_transformation_parameter": 32,
     "transformed_sequences": [
         {
-            "binarization_id": 0,
+            "binarization_id": 4,
             "binarization_parameters": [
-                7
+                3
             ],
-            "context_selection_id": 3,
+            "context_selection_id": 0,
             "diff_coding_enabled": false,
-            "lut_transformation_enabled": false
+            "lut_transformation_bits": 7,
+            "lut_transformation_enabled": true,
+            "lut_transformation_order": 0
         },
         {
             "binarization_id": 0,
