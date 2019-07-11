@@ -1,4 +1,5 @@
 #include <cmath>
+#include <ios>
 #include "genie/StreamSaver.h"
 
 #include "ureads-encoder/logger.h"
@@ -24,6 +25,29 @@ namespace dsg {
 
         genie::Logger::instance().out("COMPRESSED:" + name + " with CONFIG: " + getConfigName(name) +
                                       " from " + std::to_string(insize) + " to " + std::to_string(data->getRawSize()) + " in thread " + std::to_string(omp_get_thread_num()));
+    }
+
+    void StreamSaver::analyze(const std::string &name, gabac::DataBlock *data) {
+        std::string configname = getConfigName(name);
+        uint64_t insize = data->getRawSize();
+
+        gabac::IBufferStream istream(data, 0);
+        gabac::DataBlock out(0, 1);
+        std::ofstream outfile(this->configPath + configname + ".json");
+        outfile.exceptions(std::ios::badbit | std::ios::failbit);
+
+        // Configure gabac streams
+        gabac::IOConfiguration
+                ioconf = {&istream, &outfile, std::min(insize, uint64_t(10000000)), &std::cout,
+                          gabac::IOConfiguration::LogLevel::TRACE};
+
+        auto aconf = gabac::getCandidateConfig();
+        const auto& params = getParams();
+        aconf.maxValue = params.at(configname).maxval;
+        aconf.wordSize = params.at(configname).wordsize;
+
+        genie::Logger::instance().out("ANALYZING: " + this->configPath + configname + ".json");
+        gabac::analyze(ioconf, aconf);
     }
 
     void StreamSaver::compress(const std::string &name, gabac::DataBlock *data) {
@@ -121,9 +145,7 @@ namespace dsg {
 
     StreamSaver::StreamSaver(const std::string &configp, std::ostream *f, std::istream *ifi) : fout(f), fin(ifi),
                                                                                                configPath(configp) {
-        for (const auto &e : getParams()) {
-            loadConfig(e.first);
-        }
+        reloadConfigSet();
         if(fin) {
             buildIndex();
         }
@@ -174,6 +196,13 @@ namespace dsg {
         configs.emplace(name, enconf);
 
 
+    }
+
+    void StreamSaver::reloadConfigSet() {
+        configs.clear();
+        for (const auto &e : getParams()) {
+            loadConfig(e.first);
+        }
     }
 
     StreamSaver::~StreamSaver() {

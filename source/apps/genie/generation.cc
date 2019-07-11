@@ -124,6 +124,7 @@ namespace dsg {
                     programOptions.numThreads,
                     paired_end,
                     programOptions.workingDirectory,
+                    programOptions.analyze,
                     st
             );
         } else {
@@ -135,6 +136,7 @@ namespace dsg {
                     programOptions.numThreads,
                     paired_end,
                     programOptions.workingDirectory,
+                    programOptions.analyze,
                     st
             );
         }

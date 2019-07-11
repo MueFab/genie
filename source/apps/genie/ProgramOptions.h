@@ -34,6 +34,7 @@ class ProgramOptions {
     bool force;
     bool verbose;
     bool help;
+    bool analyze;
     std::string workingDirectory;
     int numThreads;
 
