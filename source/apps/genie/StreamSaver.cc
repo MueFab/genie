@@ -130,11 +130,7 @@ namespace dsg {
     }
 
     void StreamSaver::buildIndex() {
-#if defined(__APPLE__)
-        fin->seekg(0, std::ios::seekdir::beg);
-#else
-        fin->seekg(0, std::ios::seekdir::_S_beg);
-#endif
+        fin->seekg(0, std::ios::beg);
 
         while (true) {
             uint64_t size;
@@ -153,11 +149,8 @@ namespace dsg {
 
             std::cout << "NAME: " << name << " POSITION: " << file_index[name].position << " SIZE: "
                       << file_index[name].size << std::endl;
-#if defined(__APPLE__)
-            fin->seekg(size, std::ios::seekdir::cur);
-#else
-            fin->seekg(0, std::ios::seekdir::_S_cur);
-#endif
+
+            fin->seekg(size, std::ios::cur);
         }
         fin->clear();
 
