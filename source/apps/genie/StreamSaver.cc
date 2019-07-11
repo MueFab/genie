@@ -26,7 +26,7 @@ namespace dsg {
         unsigned thread_num = 0;
 
 #ifdef GENIE_USE_OPENMP
-        thread_num = omp_get_thread_num()
+        thread_num = omp_get_thread_num();
 #endif
 
         genie::Logger::instance().out("COMPRESSED:" + name + " with CONFIG: " + getConfigName(name) +
