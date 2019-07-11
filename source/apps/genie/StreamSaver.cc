@@ -171,8 +171,11 @@ namespace dsg {
 
             std::cout << "NAME: " << name << " POSITION: " << file_index[name].position << " SIZE: "
                       << file_index[name].size << std::endl;
-
-            fin->seekg(size, std::ios::seekdir::_S_cur);
+#if defined(__APPLE__)
+            fin->seekg(size, std::ios::seekdir::cur);
+#else
+            fin->seekg(0, std::ios::seekdir::_S_cur);
+#endif
         }
         fin->clear();
 
