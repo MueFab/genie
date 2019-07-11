@@ -13,7 +13,6 @@
 #include <omp.h>
 #include <ureads-encoder/logger.h>
 
-#include "thread_pool.h"
 #include "gabac/streams.h"
 #include "gabac/configuration.h"
 #include "gabac/run.h"
@@ -60,6 +59,8 @@ namespace dsg {
         static const std::string &getDefaultConf();
 
         void buildIndex();
+
+        void finish ();
 
     public:
         static std::string getConfigName(const std::string &stream);
