@@ -161,6 +161,8 @@ namespace spring {
 
         ghc::filesystem::remove_all(temp_dir);
 
+        st.finish();
+
         return result;
     }
 

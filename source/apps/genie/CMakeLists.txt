@@ -3,12 +3,9 @@ project("genie")
 set(source_files
         dsg.cc
         exceptions.cc
-        gabac_integration.cc
         generation.cc
-        genie_file_format.cc
         ProgramOptions.cc
         StreamSaver.cc
-        thread_pool.cc
         utilities.cc
 )
 

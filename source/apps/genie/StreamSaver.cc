@@ -23,8 +23,14 @@ namespace dsg {
 
         ostream.flush(data);
 
+        unsigned thread_num = 0;
+
+#ifdef GENIE_USE_OPENMP
+        thread_num = omp_get_thread_num()
+#endif
+
         genie::Logger::instance().out("COMPRESSED:" + name + " with CONFIG: " + getConfigName(name) +
-                                      " from " + std::to_string(insize) + " to " + std::to_string(data->getRawSize()) + " in thread " + std::to_string(omp_get_thread_num()));
+                                      " from " + std::to_string(insize) + " to " + std::to_string(data->getRawSize()) + " in thread " + std::to_string(thread_num));
     }
 
     void StreamSaver::analyze(const std::string &name, gabac::DataBlock *data) {
@@ -145,10 +151,10 @@ namespace dsg {
 
     StreamSaver::StreamSaver(const std::string &configp, std::ostream *f, std::istream *ifi) : fout(f), fin(ifi),
                                                                                                configPath(configp) {
-        reloadConfigSet();
         if(fin) {
             buildIndex();
         }
+        reloadConfigSet();
     }
 
     void StreamSaver::buildIndex() {
@@ -171,40 +177,51 @@ namespace dsg {
 
             std::cout << "NAME: " << name << " POSITION: " << file_index[name].position << " SIZE: "
                       << file_index[name].size << std::endl;
-#if defined(__APPLE__)
-            fin->seekg(size, std::ios::seekdir::cur);
-#else
-            fin->seekg(0, std::ios::seekdir::_S_cur);
-#endif
+            fin->seekg(size, std::ios::cur);
         }
         fin->clear();
 
     }
 
     void StreamSaver::loadConfig(const std::string &name) {
-        // Load config from file
-        std::ifstream t(configPath + name + ".json");
-        std::string configstring;
-        if (t) {
-            genie::Logger::instance().out("LOADING: " + configPath + name + ".json " + "to " + name);
-            configstring = std::string((std::istreambuf_iterator<char>(t)),
-                                       std::istreambuf_iterator<char>());
-        } else {
-            genie::Logger::instance().out("WARNING: Could not load config: " + name + " ; Falling back to default");
-            configstring = getDefaultConf();
+        if(!this->fin) {
+            // Load config from file
+            std::ifstream t(configPath + name + ".json");
+            std::string configstring;
+            if (t) {
+                genie::Logger::instance().out("LOADING: " + configPath + name + ".json " + "to " + name);
+                configstring = std::string((std::istreambuf_iterator<char>(t)),
+                                           std::istreambuf_iterator<char>());
+            } else {
+                genie::Logger::instance().out("WARNING: Could not load config: " + name + " ; Falling back to default");
+                configstring = getDefaultConf();
+            }
+
+            gabac::EncodingConfiguration enconf(configstring);
+
+            configs.emplace(name, enconf);
+        } else{
+            gabac::DataBlock block(0,1);
+            unpack("conf_" + name + ".json", &block);
+            std::string json(block.getRawSize(), ' ');
+            std::memcpy(&json[0], block.getData(), block.getRawSize());
+            gabac::EncodingConfiguration enconf(json);
+            configs.emplace(name, enconf);
         }
-
-        gabac::EncodingConfiguration enconf(configstring);
-
-        configs.emplace(name, enconf);
-
-
     }
 
     void StreamSaver::reloadConfigSet() {
         configs.clear();
         for (const auto &e : getParams()) {
             loadConfig(e.first);
+        }
+    }
+
+    void StreamSaver::finish () {
+        for (const auto &e : getParams()) {
+            std::string params = configs.at(e.first).toJsonString();
+            gabac::DataBlock block(&params);
+            pack(block, "conf_" + e.first + ".json");
         }
     }
 
