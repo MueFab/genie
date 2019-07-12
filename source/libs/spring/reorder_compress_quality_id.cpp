@@ -44,9 +44,6 @@ namespace spring {
         file_quality[1] = basedir + "/quality_2";
         std::string outfile_quality = "quality_1";
 
-#ifdef GENIE_USE_OPENMP
-        omp_set_num_threads(num_thr);
-#endif
         if (!paired_end) {
             uint32_t *order_array;
             // array containing index mapping position in original fastq to
@@ -191,8 +188,7 @@ namespace spring {
                 }
             }
 #ifdef GENIE_USE_OPENMP
-            omp_set_num_threads(cp.num_thr);
-#pragma omp parallel for
+#pragma omp parallel for num_threads(cp.num_thr)
 #else
             (void)cp; // Suppress unused parameter warning
 #endif
@@ -207,7 +203,7 @@ namespace spring {
             delete[] id_array_block;
         }
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for ordered
+#pragma omp parallel for ordered num_threads(cp.num_thr)
 #endif
         for (uint64_t block_num = 0; block_num < block_start.size(); block_num++) {
             dsg::AcessUnitStreams AUStreams;
@@ -300,7 +296,7 @@ namespace spring {
             }
 
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for ordered
+#pragma omp parallel for ordered num_threads(cp.num_thr)
 #endif
             for (uint64_t block_num = start_block_num; block_num < end_block_num; block_num++) {
                 std::string outfile_name =
@@ -416,8 +412,7 @@ namespace spring {
                 st.reloadConfigSet();
             }
 #ifdef GENIE_USE_OPENMP
-            omp_set_num_threads(num_thr);
-#pragma omp parallel for ordered
+#pragma omp parallel for ordered num_threads(num_thr)
 #else
             (void)num_thr; // Suppress unused parameter warning
 #endif
