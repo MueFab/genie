@@ -54,6 +54,15 @@ namespace spring {
         cp.num_reads_per_block = NUM_READS_PER_BLOCK;
         cp.num_thr = num_thr;
 
+#if GENIE_USE_OPENMP
+       //
+       // Ensure that omp parallel regions are executed with the requested
+       // #threads.
+       //
+       int omp_dyn_var = omp_get_dynamic();
+       omp_set_dynamic(0);
+#endif
+
         std::cout << "Preprocessing ...\n";
         auto preprocess_start = std::chrono::steady_clock::now();
         preprocess(fastqFileReader1, fastqFileReader2, temp_dir, cp);
@@ -162,6 +171,13 @@ namespace spring {
         ghc::filesystem::remove_all(temp_dir);
 
         st.finish();
+
+#if GENIE_USE_OPENMP
+        //
+        // Restore the dyn-var omp variable.
+        //
+        omp_set_dynamic(omp_dyn_var);
+#endif
 
         return result;
     }
