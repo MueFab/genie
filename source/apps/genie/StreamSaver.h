@@ -10,7 +10,9 @@
 #include <regex>
 #include <map>
 #include <filesystem/filesystem.hpp>
-#include <omp.h>
+#ifdef GENIE_USE_OPENMP
+    #include <omp.h>
+#endif
 #include <ureads-encoder/logger.h>
 
 #include "gabac/gabac.h"
