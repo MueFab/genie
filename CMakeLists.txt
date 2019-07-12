@@ -34,7 +34,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
 # Options
 #==============================================================================
 
-option(GENIE_USE_OPENMP "Use OpenMP parallelization" ON)
+option(GENIE_USE_OPENMP "Use OpenMP parallelization" OFF)
 message(STATUS "GENIE_USE_OPENMP=${GENIE_USE_OPENMP}")
 if(${GENIE_USE_OPENMP})
     find_package(OpenMP REQUIRED)
