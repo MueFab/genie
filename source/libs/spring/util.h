@@ -32,7 +32,7 @@ namespace spring {
         uint32_t max_readlen;
         uint8_t paired_id_code;
         bool paired_id_match;
-        int num_reads_per_block;
+        uint32_t num_reads_per_block;
 //  int num_reads_per_block_long;
         int num_thr;
         uint32_t num_blocks;

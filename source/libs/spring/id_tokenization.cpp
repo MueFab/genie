@@ -155,8 +155,8 @@ namespace spring {
             tokens[token_ctr + 1][0].push_back(9); // END
 
         // fill rest of prev_tokens_ptr to 0, otherwise we've bug due to garbage values
-        for (uint32_t i = 0; i < MAX_NUM_TOKENS_ID; i++)
-            prev_tokens_ptr[i] = 0;
+        for (uint32_t id = 0; id < MAX_NUM_TOKENS_ID; id++)
+            prev_tokens_ptr[id] = 0;
     }
 
     std::string decode_id_tokens(std::string &prev_ID, uint32_t *prev_tokens_ptr, uint32_t *prev_tokens_len,

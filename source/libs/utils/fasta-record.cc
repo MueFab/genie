@@ -8,9 +8,9 @@
 
 namespace utils {
 
-    FastaRecord::FastaRecord(std::string header, std::string sequence)
-            : header(std::move(header)),
-              sequence(std::move(sequence)) {}
+    FastaRecord::FastaRecord(std::string head, std::string seq)
+            : header(std::move(head)),
+              sequence(std::move(seq)) {}
 
     FastaRecord::~FastaRecord() = default;
 

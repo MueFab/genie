@@ -135,19 +135,19 @@ namespace spring {
 #pragma omp parallel num_threads(cp.num_thr)
 #endif
                 {
-                    bool done = false;
+                    bool done_loop = false;
 #ifdef GENIE_USE_OPENMP
                     uint64_t tid = omp_get_thread_num();
 #else
                     uint64_t tid = 0;
 #endif
                     if (j == 1) paired_id_match_array[tid] = paired_id_match;
-                    if (tid * num_reads_per_block >= num_reads_read) done = true;
+                    if (tid * num_reads_per_block >= num_reads_read) done_loop = true;
                     uint32_t num_reads_thr = std::min((uint64_t) num_reads_read,
                                                       (tid + 1) * num_reads_per_block) -
                                              tid * num_reads_per_block;
 //        std::ofstream fout_readlength;
-                    if (!done) {
+                    if (!done_loop) {
 //          if (cp.long_flag)
 //            fout_readlength.open(outfilereadlength[j] + "." +
 //                                     std::to_string(num_blocks_done + tid),
@@ -326,13 +326,13 @@ namespace spring {
 
         if (cp.paired_end) {
             // merge input_N and input_order_N for the two files
-            std::ofstream fout_N(outfileN[0], std::ios::app);
-            std::ifstream fin_N(outfileN[1]);
-            fout_N << fin_N.rdbuf();
-            fout_N.close();
-            fin_N.close();
+            std::ofstream fout_N_PE(outfileN[0], std::ios::app);
+            std::ifstream fin_N_PE(outfileN[1]);
+            fout_N_PE << fin_N_PE.rdbuf();
+            fout_N_PE.close();
+            fin_N_PE.close();
             remove(outfileN[1].c_str());
-            std::ofstream fout_order_N(outfileorderN[0],
+            std::ofstream fout_order_N_PE(outfileorderN[0],
                                        std::ios::app | std::ios::binary);
             std::ifstream fin_order_N(outfileorderN[1], std::ios::binary);
             uint32_t num_N_file_2 = num_reads[1] - num_reads_clean[1];
@@ -340,10 +340,10 @@ namespace spring {
             for (uint32_t i = 0; i < num_N_file_2; i++) {
                 fin_order_N.read((char *) &order_N, sizeof(uint32_t));
                 order_N += num_reads[0];
-                fout_order_N.write((char *) &order_N, sizeof(uint32_t));
+                fout_order_N_PE.write((char *) &order_N, sizeof(uint32_t));
             }
             fin_order_N.close();
-            fout_order_N.close();
+            fout_order_N_PE.close();
             remove(outfileorderN[1].c_str());
         }
 

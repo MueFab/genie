@@ -196,8 +196,8 @@ namespace spring {
                 {
                     if (list_size != 0) {
                         // sort contig according to pos
-                        current_contig.sort([](const contig_reads &a, const contig_reads &b) {
-                            return a.pos < b.pos;
+                        current_contig.sort([](const contig_reads &ar, const contig_reads &br) {
+                            return ar.pos < br.pos;
                         });
                         // make first pos zero and shift all pos values accordingly
                         auto current_contig_it = current_contig.begin();
@@ -282,7 +282,7 @@ namespace spring {
                                                 {
                                                     flag = 0;
                                                     list_size++;
-                                                    char rc = rev ? 'r' : 'd';
+                                                    char l_rc = rev ? 'r' : 'd';
                                                     long pos =
                                                             rev ? (j + eg.max_readlen - read_lengths_s[rid])
                                                                 : j;
@@ -293,7 +293,7 @@ namespace spring {
                                                                     read_lengths_s[rid])
                                                                 : bitsettostring<bitset_size>(
                                                                     read[rid], read_lengths_s[rid], egb);
-                                                    current_contig.push_back({read_string, pos, rc,
+                                                    current_contig.push_back({read_string, pos, l_rc,
                                                                               order_s[rid],
                                                                               read_lengths_s[rid]});
                                                     for (int l1 = 0; l1 < eg.numdict_s; l1++) {
@@ -348,8 +348,8 @@ namespace spring {
                             }  // end for
                         }    // end if
                         // sort contig according to pos
-                        current_contig.sort([](const contig_reads &a, const contig_reads &b) {
-                            return a.pos < b.pos;
+                        current_contig.sort([](const contig_reads &ar, const contig_reads &br) {
+                            return ar.pos < br.pos;
                         });
                         writecontig(ref, current_contig, f_seq, f_pos, f_noise, f_noisepos,
                                     f_order, f_RC, f_readlength, abs_pos);

@@ -193,6 +193,8 @@ namespace spring {
 #ifdef GENIE_USE_OPENMP
             omp_set_num_threads(cp.num_thr);
 #pragma omp parallel for
+#else
+            (void)cp; // Suppress unused parameter warning
 #endif
             for(size_t i=0; i< str.size(); ++i){
                 auto it = str.begin();
@@ -345,13 +347,13 @@ namespace spring {
                           const uint32_t &num_reads_per_block,
                           std::string *str_array, const uint32_t &str_array_size,
                           uint32_t *order_array, const std::string &mode, bool analyze, dsg::StreamSaver &st) {
-        for (uint32_t i = 0; i <= num_reads_per_file / str_array_size; i++) {
+        for (uint32_t ndex = 0; ndex <= num_reads_per_file / str_array_size; ndex++) {
             uint32_t num_reads_bin = str_array_size;
-            if (i == num_reads_per_file / str_array_size)
+            if (ndex == num_reads_per_file / str_array_size)
                 num_reads_bin = num_reads_per_file % str_array_size;
             if (num_reads_bin == 0) break;
-            uint32_t start_read_bin = i * str_array_size;
-            uint32_t end_read_bin = i * str_array_size + num_reads_bin;
+            uint32_t start_read_bin = ndex * str_array_size;
+            uint32_t end_read_bin = ndex * str_array_size + num_reads_bin;
             // Read the file and pick up lines corresponding to this bin
             std::ifstream f_in(file_name);
             std::string temp_str;
@@ -414,7 +416,10 @@ namespace spring {
                 st.reloadConfigSet();
             }
 #ifdef GENIE_USE_OPENMP
+            omp_set_num_threads(num_thr);
 #pragma omp parallel for ordered
+#else
+            (void)num_thr; // Suppress unused parameter warning
 #endif
             for (uint64_t block_num = 0; block_num < blocks; ++block_num) {
                 dsg::AcessUnitStreams streams;
