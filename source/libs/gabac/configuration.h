@@ -56,7 +56,7 @@ struct TransformedSequenceConfiguration
 /**
  * @brief Specifies which gabac transformations to execute
  */
-class EncodingConfiguration
+struct EncodingConfiguration
 {
  public:
     /**

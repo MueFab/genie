@@ -5,23 +5,23 @@
 
 namespace spring {
 
-const uint16_t MAX_READ_LEN = 511;
-const uint32_t MAX_READ_LEN_LONG = 4294967290;
-const uint32_t MAX_NUM_READS = 4294967290;
-const int NUM_DICT_REORDER = 2;
-const int MAX_SEARCH_REORDER = 1000;
-const int THRESH_REORDER = 4;
-const int NUM_LOCKS_REORDER = 0x10000;  // # of locks (power of 2 for fast mod)
-const int LOCKS_REORDER_MASK = 0xffff;
-const float STOP_CRITERIA_REORDER = 0.5;
+    const uint16_t MAX_READ_LEN = 511;
+    const uint32_t MAX_READ_LEN_LONG = 4294967290;
+    const uint32_t MAX_NUM_READS = 4294967290;
+    const int NUM_DICT_REORDER = 2;
+    const int MAX_SEARCH_REORDER = 1000;
+    const int THRESH_REORDER = 4;
+    const int NUM_LOCKS_REORDER = 0x10000;  // # of locks (power of 2 for fast mod)
+    const int LOCKS_REORDER_MASK = 0xffff;
+    const float STOP_CRITERIA_REORDER = 0.5;
 // fraction of unmatched reads in last 1M for thread to give up on searching
-const int NUM_DICT_ENCODER = 2;
-const int MAX_SEARCH_ENCODER = 1000;
-const int THRESH_ENCODER = 24;
-const int NUM_READS_PER_BLOCK = 256000;
-const int NUM_READS_PER_BLOCK_LONG = 10000;
+    const int NUM_DICT_ENCODER = 2;
+    const int MAX_SEARCH_ENCODER = 1000;
+    const int THRESH_ENCODER = 24;
+    const int NUM_READS_PER_BLOCK = 256000;
+    const int NUM_READS_PER_BLOCK_LONG = 10000;
 
-const uint32_t MAX_NUM_TOKENS_ID = 1024;
+    const uint32_t MAX_NUM_TOKENS_ID = 1024;
 }  // namespace spring
 
 #endif  // SPRING_PARAMS_H_

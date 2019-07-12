@@ -1,0 +1,40 @@
+{
+    "sequence_transformation_id": 2,
+    "sequence_transformation_parameter": 256,
+    "transformed_sequences": [
+        {
+            "binarization_id": 0,
+            "binarization_parameters": [
+                32
+            ],
+            "context_selection_id": 3,
+            "diff_coding_enabled": false,
+            "lut_transformation_bits": 32,
+            "lut_transformation_enabled": true,
+            "lut_transformation_order": 0
+        },
+        {
+            "binarization_id": 0,
+            "binarization_parameters": [
+                32
+            ],
+            "context_selection_id": 2,
+            "diff_coding_enabled": false,
+            "lut_transformation_bits": 32,
+            "lut_transformation_enabled": true,
+            "lut_transformation_order": 0
+        },
+        {
+            "binarization_id": 0,
+            "binarization_parameters": [
+                32
+            ],
+            "context_selection_id": 3,
+            "diff_coding_enabled": false,
+            "lut_transformation_bits": 32,
+            "lut_transformation_enabled": true,
+            "lut_transformation_order": 1
+        }
+    ],
+    "word_size": 8
+}
