@@ -177,6 +177,7 @@ namespace dsg {
 
             std::cout << "NAME: " << name << " POSITION: " << file_index[name].position << " SIZE: "
                       << file_index[name].size << std::endl;
+
             fin->seekg(size, std::ios::cur);
         }
         fin->clear();
