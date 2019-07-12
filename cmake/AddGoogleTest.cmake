@@ -1,4 +1,4 @@
-# Download and unpack googletest at configure time
+# Download and unpack Google Test at configure time
 configure_file(
     ${CMAKE_SOURCE_DIR}/cmake/CMakeListsGoogleTest.txt.in
     ${CMAKE_BINARY_DIR}/googletest-download/CMakeLists.txt
