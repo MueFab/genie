@@ -19,7 +19,6 @@ namespace spring {
     decode_streams(decoded_desc_t &dec, const std::vector<std::array<uint8_t, 2>> &subseq_indices, bool paired_end) {
         std::vector<utils::FastqRecord> decoded_records;
         std::vector<bool> first_file_flag_vec;
-        std::string cur_read[2];
         std::string cur_quality[2];
         std::string cur_ID;
         utils::FastqRecord cur_record;

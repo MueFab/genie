@@ -186,6 +186,8 @@ namespace spring {
 #ifdef GENIE_USE_OPENMP
         omp_set_num_threads(num_thr);
 #pragma omp parallel for
+#else
+        (void)num_thr; // Suppress unused parameter warning
 #endif
         for (size_t i = 0; i< subseq_indices.size(); ++i) {
             const auto& arr = subseq_indices[i];
@@ -374,18 +376,6 @@ namespace spring {
         const std::string file_noise = temp_dir + "/read_noise.txt";
         const std::string file_noisepos = temp_dir + "/read_noisepos.bin";
         const std::string file_order = temp_dir + "/read_order.bin";
-
-        // char_to_int
-        int64_t char_to_int[128];
-        char_to_int[(uint8_t) 'A'] = 0;
-        char_to_int[(uint8_t) 'C'] = 1;
-        char_to_int[(uint8_t) 'G'] = 2;
-        char_to_int[(uint8_t) 'T'] = 3;
-        char_to_int[(uint8_t) 'N'] = 4;
-
-        int64_t rc_to_int[128];
-        rc_to_int[(uint8_t) 'd'] = 0;
-        rc_to_int[(uint8_t) 'r'] = 1;
 
         data->cp = cp;
 
@@ -660,6 +650,12 @@ namespace spring {
 
     void generate_streams_pe(const se_data& data, const pe_block_data& bdata, uint64_t cur_block_num, subseq_data* out, pe_statistics* stats){
 
+#ifdef GENIE_USE_OPENMP
+        const unsigned cur_thread_num = omp_get_thread_num();
+#else
+        const unsigned cur_thread_num = 0;
+#endif
+
         // char_to_int
         int64_t char_to_int[128];
         char_to_int[(uint8_t) 'A'] = 0;
@@ -766,7 +762,7 @@ namespace spring {
                     uint16_t delta = data.pos_arr[pair] - data.pos_arr[current];
                     out->subseq_vector[8][0].push_back(0); // pair decoding case same_rec
                     out->subseq_vector[8][1].push_back(!(read_1_first) + 2 * delta); // pair
-              //      stats->count_same_rec[omp_get_thread_num()]++;
+                    stats->count_same_rec[cur_thread_num]++;
                 }
             } else {
                 // only one read in genomic record
@@ -808,10 +804,10 @@ namespace spring {
 
                 // pair subsequences
                 bool same_block = (bdata.block_num[current] == bdata.block_num[pair]);
-         //       if (same_block)
-        //            stats->count_split_same_AU[omp_get_thread_num()]++;
-           //     else
-          //          stats->count_split_diff_AU[omp_get_thread_num()]++;
+                if (same_block)
+                    stats->count_split_same_AU[cur_thread_num]++;
+                else
+                    stats->count_split_diff_AU[cur_thread_num]++;
 
                 bool read_1_first = (current < pair);
                 if (same_block && !read_1_first) {
