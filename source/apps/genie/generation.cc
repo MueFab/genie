@@ -134,7 +134,7 @@ namespace dsg {
             outname += "_decompressed_2.fastq";
             std::rename((temp_dir + "decompressed_2.fastq").c_str(), outname.c_str());
         } else {
-            outname += "_decompressed.fastq";
+            outname += ".genie-decompressed.fastq";
             std::rename((temp_dir + "decompressed.fastq").c_str(), outname.c_str());
         }
 
