@@ -100,18 +100,15 @@ namespace spring {
         }
 
         //
-        // FIXME
+        // Disable parallelism for this loop.
+        // All real work is done by the master thread, and the worker threads
+        // just sit at an OpenMP barrier.  Running on a single thread speeds
+        // things up slightly.
         //
-        // The following loop is buggy, and only works with num_threads = 1.
-        // If you set num_threads = 2 and execute the omp parallel region with
-        // only a single thread, it still doesn't work, so there is probably
-        // a bug in the set up or post-parallel accumulation logic somewhere.
-        //
-        // OpenMP has a reduction clause to handle this sort of thing neatly.
-        //
-        int num_threads = cp.num_thr;
-        // int num_threads = 1; // remove after fixing bug(s)
-        // SEEMS TO WORK FOR ME -SHUBHAM
+        // int num_threads = cp.num_thr;
+        int num_threads = 1;
+#undef GENIE_USE_OPENMP
+
         uint64_t num_reads_per_step = (uint64_t) num_threads * num_reads_per_block;
         std::string *id_array_1 = new std::string[num_reads_per_step];
         bool *read_contains_N_array = new bool[num_reads_per_step];
