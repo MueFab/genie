@@ -69,12 +69,7 @@ namespace spring {
     void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict,
                              uint16_t *read_lengths, const int numdict,
                              const uint32_t &numreads, const int bpb,
-                             const std::string &basedir
-#ifdef GENIE_USE_OPENMP
-            , const int &num_threads) {
-#else
-        ) {
-#endif
+                             const std::string &basedir, const int &num_threads) {
         std::bitset<bitset_size> *mask = new std::bitset<bitset_size>[numdict];
         generateindexmasks<bitset_size>(mask, dict, numdict, bpb);
         for (int j = 0; j < numdict; j++) {
