@@ -184,8 +184,7 @@ namespace spring {
 
     void analyze_subseqs(size_t num_thr, subseq_data* data, dsg::StreamSaver &st) {
 #ifdef GENIE_USE_OPENMP
-        omp_set_num_threads(num_thr);
-#pragma omp parallel for
+#pragma omp parallel for num_threads(num_thr)
 #else
         (void)num_thr; // Suppress unused parameter warning
 #endif
@@ -229,8 +228,7 @@ namespace spring {
 
 // this is actually number of read pairs per block for PE
 #ifdef GENIE_USE_OPENMP
-        omp_set_num_threads(data.cp.num_thr);
-#pragma omp parallel for ordered
+#pragma omp parallel for ordered num_threads(data.cp.num_thr)
 #endif
         for (uint64_t block_num = 0; block_num < blocks; block_num++) {
             subseq_data sdata;
@@ -873,8 +871,7 @@ namespace spring {
         // PE step 4: Now generate read streams and compress blocks in parallel
 // this is actually number of read pairs per block for PE
 #ifdef GENIE_USE_OPENMP
-        omp_set_num_threads(cp.num_thr);
-#pragma omp parallel for ordered schedule(dynamic)
+#pragma omp parallel for ordered num_threads(cp.num_thr) schedule(dynamic)
 #endif
         for (uint64_t cur_block_num = 0; cur_block_num < bdata.block_start.size(); cur_block_num++) {
             subseq_data subseqs;
