@@ -801,12 +801,7 @@ namespace spring {
 
         std::cout << "Constructing dictionaries\n";
         constructdictionary<bitset_size>(read, dict, read_lengths, rg.numdict,
-                                         rg.numreads, 2, rg.basedir
-#ifdef GENIE_USE_OPENMP
-                , rg.num_thr);
-#else
-        );
-#endif
+                                         rg.numreads, 2, rg.basedir, rg.num_thr);
         std::cout << "Reordering reads\n";
         reorder<bitset_size>(read, dict, read_lengths, rg);
         std::cout << "Writing to file\n";
