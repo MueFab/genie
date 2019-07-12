@@ -5,9 +5,9 @@
         {
             "binarization_id": 4,
             "binarization_parameters": [
-                5
+                7
             ],
-            "context_selection_id": 1,
+            "context_selection_id": 3,
             "diff_coding_enabled": false,
             "lut_transformation_bits": 7,
             "lut_transformation_enabled": true,

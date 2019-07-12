@@ -20,6 +20,7 @@
 #include "spring/generate_new_fastq.h"
 #include "spring/spring.h"
 #include "spring/util.h"
+#include "gabac/gabac.h"
 #include "utils/fastq-file-reader.h"
 
 namespace spring {
@@ -27,7 +28,7 @@ namespace spring {
     generated_aus generate_streams_SPRING(
             utils::FastqFileReader *fastqFileReader1,
             utils::FastqFileReader *fastqFileReader2, int num_thr,
-            bool paired_end, const std::string &working_dir) {
+            bool paired_end, const std::string &working_dir, bool analyze, dsg::StreamSaver &st) {
         // generate random temp directory in the working directory
         std::string temp_dir;
         while (true) {
@@ -88,7 +89,7 @@ namespace spring {
 
         std::cout << "Generating read streams ...\n";
         auto grs_start = std::chrono::steady_clock::now();
-        auto descriptorFilesPerAUs = generate_read_streams(temp_dir, cp);
+        auto descriptorFilesPerAUs = generate_read_streams(temp_dir, cp, analyze, st);
         auto grs_end = std::chrono::steady_clock::now();
         std::cout << "Generating read streams done!\n";
         std::cout << "Time for this step: "
@@ -118,7 +119,7 @@ namespace spring {
         if (preserve_quality || preserve_id) {
             std::cout << "Reordering and compressing quality and/or ids ...\n";
             auto rcqi_start = std::chrono::steady_clock::now();
-            reorder_compress_quality_id(temp_dir, cp);
+            reorder_compress_quality_id(temp_dir, cp, analyze, st);
             auto rcqi_end = std::chrono::steady_clock::now();
             std::cout << "Reordering and compressing quality and/or ids done!\n";
             std::cout << "Time for this step: "
@@ -129,10 +130,10 @@ namespace spring {
         }
 
         // Write compression params to a file
-        std::string compression_params_file = temp_dir + "/cp.bin";
-        std::ofstream f_cp(compression_params_file, std::ios::binary);
-        f_cp.write((char *) &cp, sizeof(compression_params));
-        f_cp.close();
+        std::string compression_params_file = "cp.bin";
+        gabac::DataBlock d((uint8_t *) &cp, sizeof(compression_params), 1);
+        st.compress(compression_params_file, &d);
+        st.pack(d, compression_params_file);
 
         delete cp_ptr;
 
@@ -157,6 +158,10 @@ namespace spring {
                          decompression_end - decompression_start)
                          .count()
                   << " s\n";*/
+
+        ghc::filesystem::remove_all(temp_dir);
+
+        st.finish();
 
         return result;
     }

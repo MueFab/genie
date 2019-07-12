@@ -57,14 +57,14 @@ const AnalysisConfiguration& getCandidateConfig(){
     static const AnalysisConfiguration config = {
             {  // Wordsizes
                     1,
-                       //2,
-                          //4,
-                             //8
+                       2,
+                          4,
+                             8
             },
             {  // Sequence Transformations
                     gabac::SequenceTransformationId::no_transform,
                        gabac::SequenceTransformationId::equality_coding,
-                          //gabac::SequenceTransformationId::match_coding,
+                          gabac::SequenceTransformationId::match_coding,
                              gabac::SequenceTransformationId::rle_coding
             },
             {  // Match libs window sizes
@@ -83,8 +83,8 @@ const AnalysisConfiguration& getCandidateConfig(){
                        true
             },
             {  // Binarizations (unsigned)
-                    //gabac::BinarizationId::BI,
-                       //gabac::BinarizationId::TU,
+                    gabac::BinarizationId::BI,
+                       gabac::BinarizationId::TU,
                           gabac::BinarizationId::EG,
                              gabac::BinarizationId::TEG
             },

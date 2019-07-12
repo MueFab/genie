@@ -9,8 +9,8 @@
 
 namespace gabac {
 
-class IOConfiguration;
-class EncodingConfiguration;
+struct IOConfiguration;
+struct EncodingConfiguration;
 
 void encode(
         const IOConfiguration& conf,

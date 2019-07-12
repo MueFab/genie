@@ -19,7 +19,6 @@ namespace spring {
     decode_streams(decoded_desc_t &dec, const std::vector<std::array<uint8_t, 2>> &subseq_indices, bool paired_end) {
         std::vector<utils::FastqRecord> decoded_records;
         std::vector<bool> first_file_flag_vec;
-        std::string cur_read[2];
         std::string cur_quality[2];
         std::string cur_ID;
         utils::FastqRecord cur_record;
@@ -156,21 +155,21 @@ namespace spring {
         return std::make_pair(decoded_records, first_file_flag_vec);
     }
 
-    bool decompress(const std::string &temp_dir) {
+    bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld) {
         // decompress to temp_dir/decompressed.fastq
 
         std::string basedir = temp_dir;
-        std::string file_subseq_prefix = basedir + "/subseq";
+        std::string file_subseq_prefix = "subseq";
         compression_params *cp_ptr = new compression_params;
         compression_params &cp = *cp_ptr;
         // Read compression params
-        std::string compression_params_file = temp_dir + "/cp.bin";
-        std::ifstream f_cp(compression_params_file, std::ios::binary);
-        if (!f_cp.is_open()) throw std::runtime_error("Can't open parameter file.");
-        f_cp.read((char *) &cp, sizeof(compression_params));
-        if (!f_cp.good())
-            throw std::runtime_error("Can't read compression parameters.");
-        f_cp.close();
+        std::string compression_params_file = "cp.bin";
+
+        gabac::DataBlock tmp(0, 1);
+        ld->unpack(compression_params_file, &tmp);
+        ld->decompress(compression_params_file, &tmp);
+        std::memcpy(&cp, tmp.getData(), sizeof(compression_params));
+        tmp.clear();
 
         std::vector<std::array<uint8_t, 2>> subseq_indices = {
                 {0,  0}, // pos
@@ -192,8 +191,8 @@ namespace spring {
                 {12, 0} // rtype
         };
 
-        std::string file_quality = basedir + "/quality_1";
-        std::string file_id = basedir + "/id_1";
+        std::string file_quality = "quality_1";
+        std::string file_id = "id_1";
         std::string file_decompressed_fastq = cp.paired_end ? basedir + "/decompressed_1.fastq" : basedir +
                                                                                                   "/decompressed.fastq";;
         std::string file_decompressed_fastq2 = basedir + "/decompressed_2.fastq";
@@ -204,27 +203,89 @@ namespace spring {
         if (cp.paired_end) {
             fout2.open(file_decompressed_fastq2);
         }
-
-        decoded_desc_t dec;
+#ifdef GENIE_USE_OPENMP
+#pragma omp parallel for ordered num_threads(cp.num_thr)
+#endif
         for (uint32_t block_num = 0; block_num < cp.num_blocks; block_num++) {
+            dsg::AcessUnitStreams sstreams;
+            dsg::AcessUnitStreams tstreams;
+            gabac::DataBlock qualityBlock(0, 1);
+            decoded_desc_t dec;
+#ifdef GENIE_USE_OPENMP
+#pragma omp critical
+#endif
+            {
+                for (auto arr : subseq_indices) {
+                    std::string filename = file_subseq_prefix + "." + std::to_string(block_num) + "." +
+                                           std::to_string(arr[0]) + "." + std::to_string(arr[1]);
+                    dec.subseq_vector[arr[0]][arr[1]] = read_vector_from_file(filename);
+                    sstreams.streams[arr[0]][arr[1]] = gabac::DataBlock(0, 1);
+                    ld->unpack(filename, &sstreams.streams[arr[0]][arr[1]]);
+                }
+                ld->unpack(file_quality + '.' + std::to_string(block_num), &qualityBlock);
+
+                for (int i = 0; i < 128; i++) {
+                    for (int j = 0; j < 6; j++) {
+                        std::string infile_name_i_j =
+                                file_id + '.' + std::to_string(block_num) + "." + std::to_string(i) + "." +
+                                std::to_string(j);
+                        ld->unpack(infile_name_i_j, &tstreams.streams[i][j]);
+                    }
+                }
+            }
+
+            //Decompression gabac start
+
             for (auto arr : subseq_indices) {
                 std::string filename = file_subseq_prefix + "." + std::to_string(block_num) + "." +
                                        std::to_string(arr[0]) + "." + std::to_string(arr[1]);
-                dec.subseq_vector[arr[0]][arr[1]] = read_vector_from_file(filename);
+                ld->decompress(filename, &sstreams.streams[arr[0]][arr[1]]);
+                dec.subseq_vector[arr[0]][arr[1]].resize(
+                        sstreams.streams[arr[0]][arr[1]].getRawSize() / sizeof(int64_t));
+                std::memcpy(dec.subseq_vector[arr[0]][arr[1]].data(), sstreams.streams[arr[0]][arr[1]].getData(),
+                            sstreams.streams[arr[0]][arr[1]].getRawSize());
+                sstreams.streams[arr[0]][arr[1]].clear();
             }
-            dec.quality_arr = read_file_as_string(file_quality + '.' + std::to_string(block_num));
-            read_read_id_tokens_from_file(file_id + '.' + std::to_string(block_num), dec.tokens);
-            auto decoded_records = decode_streams(dec, subseq_indices, cp.paired_end);
-            for (size_t i = 0; i < decoded_records.first.size(); i++) {
-                bool first_file_flag = true;
-                if (cp.paired_end)
-                    if (!decoded_records.second[i])
-                        first_file_flag = false;
-                std::ostream &tmpout = first_file_flag ? fout : fout2;
-                tmpout << decoded_records.first[i].title << "\n";
-                tmpout << decoded_records.first[i].sequence << "\n";
-                tmpout << "+" << "\n";
-                tmpout << decoded_records.first[i].qualityScores << "\n";
+            ld->decompress(file_quality + '.' + std::to_string(block_num), &qualityBlock);
+            dec.quality_arr = std::string(qualityBlock.getRawSize(), '\0');
+            std::memcpy(const_cast<char *>(dec.quality_arr.data()), qualityBlock.getData(), qualityBlock.getRawSize());
+            qualityBlock.clear();
+
+            for (int i = 0; i < 128; i++) {
+                for (int j = 0; j < 6; j++) {
+                    std::string infile_name_i_j =
+                            file_id + '.' + std::to_string(block_num) + "." + std::to_string(i) + "." +
+                            std::to_string(j);
+
+                    if (!tstreams.streams[i][j].empty()) {
+                        ld->decompress(infile_name_i_j, &tstreams.streams[i][j]);
+                        dec.tokens[i][j].resize(tstreams.streams[i][j].getRawSize() / sizeof(int64_t));
+                        std::memcpy(dec.tokens[i][j].data(), tstreams.streams[i][j].getData(),
+                                    tstreams.streams[i][j].getRawSize());
+                        tstreams.streams[i][j].clear();
+                    } else {
+                        dec.tokens[i][j].clear();
+                    }
+                }
+            }
+
+            // Decompression gabac end
+#ifdef GENIE_USE_OPENMP
+#pragma omp ordered
+#endif
+            {
+                auto decoded_records = decode_streams(dec, subseq_indices, cp.paired_end);
+                for (size_t i = 0; i < decoded_records.first.size(); i++) {
+                    bool first_file_flag = true;
+                    if (cp.paired_end)
+                        if (!decoded_records.second[i])
+                            first_file_flag = false;
+                    std::ostream &tmpout = first_file_flag ? fout : fout2;
+                    tmpout << decoded_records.first[i].title << "\n";
+                    tmpout << decoded_records.first[i].sequence << "\n";
+                    tmpout << "+" << "\n";
+                    tmpout << decoded_records.first[i].qualityScores << "\n";
+                }
             }
         }
         bool paired_end = cp.paired_end;
