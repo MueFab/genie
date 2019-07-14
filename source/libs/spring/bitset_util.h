@@ -74,12 +74,17 @@ namespace spring {
         generateindexmasks<bitset_size>(mask, dict, numdict, bpb);
         for (int j = 0; j < numdict; j++) {
             uint64_t *ull = new uint64_t[numreads];
-#ifdef GENIE_USE_OPENMP
+
+            //
+            // It is not worth putting parallel region here.
+            // This loop barely shows up on the execution profile.
+            //
+#if 0 && GENIE_USE_OPENMP
 #pragma omp parallel num_threads(num_threads)
 #endif
             {
                 std::bitset<bitset_size> b;
-#ifdef GENIE_USE_OPENMP
+#if 0 && GENIE_USE_OPENMP
                 int tid = omp_get_thread_num();
                 int num_thr = omp_get_num_threads();
 #else
@@ -106,8 +111,16 @@ namespace spring {
                 }
             }
 
-// write ull to file
-#ifdef GENIE_USE_OPENMP
+            //
+            // write ull to file
+            //
+            // This region must be executed in parallel with num_threads
+            // threads, for correctness.
+            //
+            // FIXME - make this a parallel for loop that can easily have
+            // the OpenMP directive commented out && parallelism disabled.
+            //
+#if GENIE_USE_OPENMP
 #pragma omp parallel num_threads(num_threads)
 #endif
             {
@@ -145,7 +158,19 @@ namespace spring {
 
             delete[] ull;
 
-// compute hashes for all reads
+            //
+            // compute hashes for all reads
+            //
+            // This region must be executed in parallel with num_threads
+            // threads, for correctness.
+            //
+            // FIXME - make this a parallel for loop that can easily have
+            // the OpenMP directive commented out && parallelism disabled.
+            //
+            // The bphf lookup() call shows up in the execution profile,
+            // so there might be a small benefit from it being executed
+            // in parallel on large problem sizes.
+            //
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel num_threads(num_threads)
 #endif
@@ -170,6 +195,9 @@ namespace spring {
                 if (tid == num_thr - 1) stop = dict[j].dict_numreads;
                 for (; i < stop; i++) {
                     finkey.read((char *) &currentkey, sizeof(uint64_t));
+                    //
+                    // the following line shows up on the execution profile
+                    //
                     currenthash = (dict[j].bphf)->lookup(currentkey);
                     fouthash.write((char *) &currenthash, sizeof(uint64_t));
                 }
@@ -180,19 +208,18 @@ namespace spring {
             }  // parallel end
         }
 
+        //
         // for rest of the function, use numdict threads to parallelize
+        //
+        // This loops must be executed in parallel with num_threads
+        // threads, for correctness.
+        //
+        // When this region shows up in the execution profile, it is always
+        // because of a file I/O operation.
+        //
+	{
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel num_threads(std::min(numdict, num_threads))
-#endif
-        {
-#ifdef GENIE_USE_OPENMP
-            int num_thr = num_threads;
-#else
-            int num_thr = 1;
-#endif
-
-#ifdef GENIE_USE_OPENMP
-#pragma omp for
+#pragma omp parallel for num_threads(std::min(numdict, num_threads))
 #endif
             for (int j = 0; j < numdict; j++) {
                 // fill startpos by first storing numbers and then doing cumulative sum
@@ -200,7 +227,7 @@ namespace spring {
                         new uint32_t[dict[j].numkeys +
                                      1]();  // 1 extra to store end pos of last key
                 uint64_t currenthash;
-                for (int tid = 0; tid < num_thr; tid++) {
+                for (int tid = 0; tid < num_threads; tid++) {
                     std::ifstream finhash(basedir + std::string("/hash.bin.") +
                                           std::to_string(tid) + '.' + std::to_string(j),
                                           std::ios::binary);
@@ -219,7 +246,7 @@ namespace spring {
                 // insert elements in the dict array
                 dict[j].read_id = new uint32_t[dict[j].dict_numreads];
                 uint32_t i = 0;
-                for (int tid = 0; tid < num_thr; tid++) {
+                for (int tid = 0; tid < num_threads; tid++) {
                     std::ifstream finhash(basedir + std::string("/hash.bin.") +
                                           std::to_string(tid) + '.' + std::to_string(j),
                                           std::ios::binary);
@@ -240,8 +267,8 @@ namespace spring {
                 for (int64_t keynum = dict[j].numkeys; keynum >= 1; keynum--)
                     dict[j].startpos[keynum] = dict[j].startpos[keynum - 1];
                 dict[j].startpos[0] = 0;
-            }  // for end
-        }    // parallel end
+            }  // parallel for end
+        }
         delete[] mask;
         return;
     }
