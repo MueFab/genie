@@ -209,6 +209,15 @@ namespace spring {
     template<size_t bitset_size>
     void readDnaFile(std::bitset<bitset_size> *read, uint16_t *read_lengths,
                      const reorder_global<bitset_size> &rg) {
+        //
+        // In the following two parallel loops, each thread doesn't mostly
+        // redundant work in reading the entire contents of the input file(s).
+        //
+        // There is a small (1% ?) gain to be had in the stringtobitset<>()
+        // function, however, so parallelism is enabled.  This may not be the
+        // correct decision for all platforms, however, depending upon the
+        // filesystem implementation.
+        //
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel num_threads(rg.num_thr)
 #endif
@@ -270,6 +279,10 @@ namespace spring {
         return;
     }
 
+    //
+    // Note: the search_match() function is invoked from within the OpenMP
+    // parallel region in reorder().
+    //
     template<size_t bitset_size>
     bool search_match(const std::bitset<bitset_size> &ref,
                       std::bitset<bitset_size> *mask1,
@@ -384,6 +397,16 @@ namespace spring {
         // we go through remainingreads array from behind as that speeds up deletion
         // from bin arrays
 
+        //
+        // The following parallel region shows up in the execution profile
+        // as being the hottest in all of genie/spring.  The workload is
+        // well-balanced and it benefits nicely from parallelization.
+        //
+        // A lot of other loops / regions must be executed with exactly
+        // the same # of threads, as they access files created on a
+        // per-thread basis (with the tid as part of the name) between
+        // parallel regions.
+        //
         uint32_t firstread = 0;
         uint32_t *unmatched = new uint32_t[rg.num_thr];
 #ifdef GENIE_USE_OPENMP
@@ -681,10 +704,21 @@ namespace spring {
         return;
     }
 
+    //
+    // convert bitset to string for all num_thr files in parallel
+    //
     template<size_t bitset_size>
     void writetofile(std::bitset<bitset_size> *read, uint16_t *read_lengths,
                      reorder_global<bitset_size> &rg) {
-// convert bitset to string for all num_thr files in parallel
+        //
+        // This loop must be executed in parallel with the same #threads
+        // that was used for the hot loop in reorder(), for correctness.
+        // It also shows up in the execution profile, and is worth
+        // parallelizing anyway.
+        //
+        // FIXME re-code the loop so that is doesn't necessarily need to
+        // execute on the same #threads.
+        //
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel num_threads(rg.num_thr)
 #endif
