@@ -203,7 +203,7 @@ namespace spring {
             delete[] id_array_block;
         }
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for ordered num_threads(cp.num_thr)
+#pragma omp parallel for ordered num_threads(cp.num_thr) schedule(dynamic)
 #endif
         for (uint64_t block_num = 0; block_num < block_start.size(); block_num++) {
             dsg::AcessUnitStreams AUStreams;
@@ -296,7 +296,7 @@ namespace spring {
             }
 
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for ordered num_threads(cp.num_thr)
+#pragma omp parallel for ordered num_threads(cp.num_thr) schedule(dynamic)
 #endif
             for (uint64_t block_num = start_block_num; block_num < end_block_num; block_num++) {
                 std::string outfile_name =
@@ -411,8 +411,25 @@ namespace spring {
                 }
                 st.reloadConfigSet();
             }
+
+            //
+            // According to the execution profile, this is the 2nd hottest
+            // parallel region in genie when compressing a normal fastq
+            // file (not an analysis run).
+            //
+            // It is important that you specify a chunk size of 1 (which
+            // becomes the default when schedule=dynamic).  Without it,
+            // libgomp effectively serializes a loop with ordered sections.
+            //
+            // Right now, on a 4 thread run, the 3 worker threads spend
+            // ~1/3 of their time idling, waiting on the ordered section.
+            // That figure will get worse as we increase the #threads,
+            // but better with larger problem sizes.
+            //
+            // There might be a better way to parallelize the loop.
+            //
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for ordered num_threads(num_thr)
+#pragma omp parallel for ordered num_threads(num_thr) schedule(dynamic)
 #else
             (void)num_thr; // Suppress unused parameter warning
 #endif
