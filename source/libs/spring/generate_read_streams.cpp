@@ -217,6 +217,7 @@ namespace spring {
         std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> descriptorFilesPerAU;
 
         // Now generate new streams and compress blocks in parallel
+        // this is actually number of read pairs per block for PE
         uint64_t blocks = uint64_t(std::ceil(float(data.cp.num_reads) / data.cp.num_reads_per_block));
 
         if(analyze) {
@@ -226,9 +227,8 @@ namespace spring {
             analyze_subseqs(data.cp.num_thr, &sdata, st);
         }
 
-// this is actually number of read pairs per block for PE
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for ordered num_threads(data.cp.num_thr)
+#pragma omp parallel for ordered num_threads(data.cp.num_thr) schedule(dynamic)
 #endif
         for (uint64_t block_num = 0; block_num < blocks; block_num++) {
             subseq_data sdata;
