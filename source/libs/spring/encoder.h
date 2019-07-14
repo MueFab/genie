@@ -133,6 +133,12 @@ namespace spring {
         for (int i = 0; i < eg.max_readlen; i++)
             mask[i] = new std::bitset<bitset_size>[eg.max_readlen];
         generatemasks<bitset_size>(mask, eg.max_readlen, 3);
+
+        //
+        // This is the 3rd hottest parallel region in genie (behind gabac
+        // paralelization and 3rd parallel region in reorder.h).  It shows
+        // good load balancing and benefits from parallelization.
+        //
         std::cout << "Encoding reads\n";
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel num_threads(eg.num_thr)
@@ -437,6 +443,12 @@ namespace spring {
         f_readlength.open(eg.infile_readlength,
                           std::ios::binary | std::ofstream::app);
         uint32_t matched_s = eg.numreads_s;
+
+        //
+        // There is a little bit to be gained here (1%) by parallelizing the
+        // bitsettostring<>() calls in the following two loops.  Doing that
+        // efficiently while keeping the file writes in order is problematic.
+        //
         for (uint32_t i = 0; i < eg.numreads_s; i++)
             if (remainingreads[i] == 1) {
                 matched_s--;
@@ -602,17 +614,6 @@ namespace spring {
         uint32_t *order_s = new uint32_t[eg.numreads_s + eg.numreads_N];
         uint16_t *read_lengths_s = new uint16_t[eg.numreads_s + eg.numreads_N];
         readsingletons<bitset_size>(read, order_s, read_lengths_s, eg, egb);
-
-        //
-        // FIXME
-        //
-        // From here until the end of the routine, there is buggy code that only
-        // works with eg.num_thr = 1. If you set eg.num_thr = 2 and execute the
-        // omp parallel regions with only a single thread, it still doesn't work.
-        //
-//  eg.num_thr = 1; // remove after fixing bug(s)
-//  SEEMS TO BE WORKING NOW -SHUBHAM
-
         correct_order(order_s, eg);
 
         bbhashdict *dict = new bbhashdict[eg.numdict_s];
