@@ -13,10 +13,7 @@
 #include <omp.h>
 #include <ureads-encoder/logger.h>
 
-#include "gabac/streams.h"
-#include "gabac/configuration.h"
-#include "gabac/run.h"
-#include "gabac/analysis.h"
+#include "gabac/gabac.h"
 
 namespace dsg {
     struct AcessUnitStreams {

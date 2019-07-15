@@ -10,8 +10,8 @@
 
 namespace gabac {
 
-class EncodingConfiguration;
-class IOConfiguration;
+struct EncodingConfiguration;
+struct IOConfiguration;
 
 /**
  * @brief Start a run of gabac coding
