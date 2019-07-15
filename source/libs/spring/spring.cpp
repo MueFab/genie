@@ -20,7 +20,7 @@
 #include "spring/generate_new_fastq.h"
 #include "spring/spring.h"
 #include "spring/util.h"
-#include "gabac/data_block.h"
+#include "gabac/gabac.h"
 #include "utils/fastq-file-reader.h"
 
 namespace spring {
