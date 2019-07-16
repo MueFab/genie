@@ -47,6 +47,7 @@ namespace spring {
         std::string infile_1, infile_2, outfile;
         bool preserve_quality = true, preserve_id = true;
         compression_params *cp_ptr = new compression_params;
+        memset(cp_ptr, 0, sizeof(compression_params));
         compression_params &cp = *cp_ptr;
         cp.paired_end = paired_end;
         cp.preserve_id = preserve_id;
