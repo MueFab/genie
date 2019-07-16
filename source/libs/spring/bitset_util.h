@@ -27,7 +27,7 @@ namespace spring {
         uint32_t dict_numreads;  // number of reads in this dict (for variable length)
         uint32_t *startpos;
         uint32_t *read_id;
-        bool *empty_bin;
+        bool *empty_bin = NULL;
 
         void findpos(int64_t *dictidx, const uint64_t &startposidx);
 
@@ -41,10 +41,10 @@ namespace spring {
         }
 
         ~bbhashdict() {
-            delete[] startpos;
-            delete[] read_id;
-            delete[] empty_bin;
-            delete bphf;
+            if (startpos != NULL) delete[] startpos;
+            if (read_id != NULL) delete[] read_id;
+            if (empty_bin != NULL) delete[] empty_bin;
+            if (bphf != NULL) delete bphf;
         }
     };
 
