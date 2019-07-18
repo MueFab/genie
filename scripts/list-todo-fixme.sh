@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-git rev-parse --git-dir 1>/dev/null || exit 1 # exit if not inside Git repo
+set -euo pipefail
+
+git rev-parse --git-dir 1>/dev/null # exit if not inside Git repo
 readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
 echo "TODOs in the source/ tree:"

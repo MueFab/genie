@@ -4,9 +4,9 @@ This document explains how to compare GABAC to competing codecs.
 
 ## Step 1: running GABAC and competing codecs
 
-Given a test file named ``test``, roundtrips with ``gabacify`` (i.e., GABAC) and competing codecs can be performed by running the following command:
+Given a test file named ``test``, roundtrips with ``gabac-app`` and competing codecs can be performed by running the following command:
 
-    $ ./run_codecs.sh test
+    $ ./run-codecs.sh test
 
 This produces the following files:
 * ``test.codec_stats.txt``
