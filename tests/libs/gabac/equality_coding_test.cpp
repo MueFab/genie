@@ -1,7 +1,7 @@
 #include <vector>
 
-#include "gabac/data_block.h"
-#include "gabac/equality_coding.h"
+#include "gabac/data-block.h"
+#include "gabac/equality-coding.h"
 #include "iostream"
 #include "./test_common.h"
 

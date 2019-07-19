@@ -11,8 +11,8 @@
 #include <cstdint>
 #include <vector>
 
-#include "bit_input_stream.h"
-#include "binary_arithmetic_decoder.h"
+#include "bit-input-stream.h"
+#include "binary-arithmetic-decoder.h"
 
 namespace gabac {
 

@@ -7,8 +7,8 @@
 #include <vector>
 #include <map>
 #include <genie/generation.h>
-#include "ReturnStructures.h"
-#include "genie/StreamSaver.h"
+#include "return-structures.h"
+#include "genie/stream-saver.h"
 
 namespace spring {
 

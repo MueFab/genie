@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 extern "C" {
-#include "format/EncodingParameters.h"
+#include "format/encoding-parameters.h"
 }
 
 

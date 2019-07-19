@@ -1,6 +1,6 @@
 #include <vector>
 
-#include "gabac/rle_coding.h"
+#include "gabac/rle-coding.h"
 #include "iostream"
 
 #include "gtest/gtest.h"
