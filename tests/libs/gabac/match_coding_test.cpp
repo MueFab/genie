@@ -5,8 +5,8 @@
 #include <vector>
 #include <random>
 
-#include "gabac/data_block.h"
-#include "gabac/match_coding.h"
+#include "gabac/data-block.h"
+#include "gabac/match-coding.h"
 #include "./test_common.h"
 
 #include "gtest/gtest.h"

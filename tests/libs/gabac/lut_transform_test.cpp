@@ -1,7 +1,7 @@
 #include <vector>
 
-#include "gabac/data_block.h"
-#include "gabac/lut_transform.h"
+#include "gabac/data-block.h"
+#include "gabac/lut-transform.h"
 #include "iostream"
 #include "./test_common.h"
 

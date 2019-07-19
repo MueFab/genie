@@ -5,8 +5,8 @@
 #include <limits>
 #include <vector>
 
-#include "gabac/data_block.h"
-#include "gabac/diff_coding.h"
+#include "gabac/data-block.h"
+#include "gabac/diff-coding.h"
 #include "./test_common.h"
 
 #include "gtest/gtest.h"

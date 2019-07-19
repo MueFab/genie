@@ -23,12 +23,12 @@
 #include "run.h"
 
 /* io */
-#include "block_stepper.h"
-#include "data_block.h"
+#include "block-stepper.h"
+#include "data-block.h"
 #include "streams.h"
 
 #endif  /* __cplusplus */
 
-#include "c_interface.h"
+#include "c-interface.h"
 
 #endif /* GABAC_GABAC_H_ */

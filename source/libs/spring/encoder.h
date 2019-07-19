@@ -16,7 +16,7 @@
 #include <iostream>
 #include <list>
 #include <string>
-#include "spring/bitset_util.h"
+#include "spring/bitset-util.h"
 #include "spring/params.h"
 #include "spring/util.h"
 

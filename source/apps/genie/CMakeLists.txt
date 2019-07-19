@@ -4,8 +4,8 @@ set(source_files
         dsg.cc
         exceptions.cc
         generation.cc
-        ProgramOptions.cc
-        StreamSaver.cc
+        program-options.cc
+        stream-saver.cc
         utilities.cc
 )
 
