@@ -16,9 +16,10 @@
 #include <iostream>
 #include <list>
 #include <string>
-#include "spring/bitset-util.h"
-#include "spring/params.h"
-#include "spring/util.h"
+
+#include "bitset-util.h"
+#include "params.h"
+#include "util.h"
 
 namespace spring {
 

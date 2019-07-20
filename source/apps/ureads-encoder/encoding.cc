@@ -13,11 +13,11 @@
 #include "log.h"
 
 extern "C" {
-#include "format/DataUnits/data-units.h"
-#include "format/encoding-parameters.h"
+#include <format/DataUnits/data-units.h>
+#include <format/encoding-parameters.h>
 }
 
-#include "gabac/gabac.h"
+#include <gabac/gabac.h>
 
 
 namespace genie {

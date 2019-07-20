@@ -11,9 +11,11 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
-#include "spring/params.h"
-#include "spring/util.h"
-#include "utils/fastq-file-reader.h"
+
+#include "params.h"
+#include "util.h"
+
+#include <utils/fastq-file-reader.h>
 
 namespace spring {
 

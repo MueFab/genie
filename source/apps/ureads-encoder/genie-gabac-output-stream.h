@@ -3,7 +3,7 @@
 #ifndef GENIE_GENIE_GABAC_OUTPUT_STREAM_H
 #define GENIE_GENIE_GABAC_OUTPUT_STREAM_H
 
-#include "gabac/gabac.h"
+#include <gabac/gabac.h>
 
 namespace genie {
 

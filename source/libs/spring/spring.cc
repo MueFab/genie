@@ -10,18 +10,19 @@
 #include <string>
 #include <vector>
 
-#include "spring/encoder.h"
-#include "spring/params.h"
-#include "spring/preprocess.h"
-#include "spring/reorder.h"
-#include "spring/reorder-compress-quality-id.h"
-#include "spring/generate-read-streams.h"
-#include "spring/decompress.h"
-#include "spring/generate-new-fastq.h"
-#include "spring/spring.h"
-#include "spring/util.h"
-#include "gabac/gabac.h"
-#include "utils/fastq-file-reader.h"
+#include "encoder.h"
+#include "params.h"
+#include "preprocess.h"
+#include "reorder.h"
+#include "reorder-compress-quality-id.h"
+#include "generate-read-streams.h"
+#include "decompress.h"
+#include "generate-new-fastq.h"
+#include "spring.h"
+#include "util.h"
+
+#include <gabac/gabac.h>
+#include <utils/fastq-file-reader.h>
 
 namespace spring {
 

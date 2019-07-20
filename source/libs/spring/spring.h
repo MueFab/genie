@@ -2,13 +2,15 @@
 #define SPRING_SPRING_H_
 
 #include <string>
-#include "spring/util.h"
-#include <utils/fastq-file-reader.h>
 #include <vector>
 #include <map>
+
+#include <utils/fastq-file-reader.h>
 #include <genie/generation.h>
+#include <genie/stream-saver.h>
+
+#include "util.h"
 #include "return-structures.h"
-#include "genie/stream-saver.h"
 
 namespace spring {
 
