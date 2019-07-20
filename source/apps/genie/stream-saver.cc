@@ -1,8 +1,9 @@
 #include <cmath>
 #include <ios>
-#include "genie/stream-saver.h"
 
-#include "ureads-encoder/logger.h"
+#include <genie/stream-saver.h>
+
+#include <ureads-encoder/logger.h>
 
 namespace dsg {
 

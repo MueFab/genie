@@ -15,7 +15,7 @@
 #endif
 #include <ureads-encoder/logger.h>
 
-#include "gabac/gabac.h"
+#include <gabac/gabac.h>
 
 namespace dsg {
     struct AcessUnitStreams {

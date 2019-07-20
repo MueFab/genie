@@ -14,10 +14,10 @@
 #include <vector>
 #include <cmath>
 
-#include "spring/params.h"
-#include "spring/reorder-compress-quality-id.h"
-#include "spring/id-tokenization.h"
-#include "spring/util.h"
+#include "params.h"
+#include "reorder-compress-quality-id.h"
+#include "id-tokenization.h"
+#include "util.h"
 
 namespace spring {
 

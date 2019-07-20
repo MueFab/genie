@@ -2,9 +2,10 @@
 #define SPRING_REORDER_COMPRESS_QUALITY_ID_H_
 
 #include <string>
-#include "spring/util.h"
 
-#include "genie/stream-saver.h"
+#include "util.h"
+
+#include <genie/stream-saver.h>
 
 namespace spring {
 

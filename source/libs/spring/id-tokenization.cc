@@ -1,6 +1,7 @@
-#include "spring/params.h"
-#include "spring/id-tokenization.h"
-#include "spring/util.h"
+#include "params.h"
+#include "id-tokenization.h"
+#include "util.h"
+
 #include <stdexcept>
 #include <string>
 #include <vector>

@@ -15,8 +15,8 @@
 #include <map>
 #include <numeric>
 
-#include "spring/generate-read-streams.h"
-#include "spring/util.h"
+#include "generate-read-streams.h"
+#include "util.h"
 
 namespace spring {
 

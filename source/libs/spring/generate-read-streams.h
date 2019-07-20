@@ -3,9 +3,10 @@
 
 #include <string>
 #include <map>
-#include "spring/util.h"
 
-#include "genie/stream-saver.h"
+#include "util.h"
+
+#include <genie/stream-saver.h>
 
 namespace spring {
 

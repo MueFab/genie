@@ -1,7 +1,6 @@
-#include "fastq-file-reader.h"
-
 #include <string>
 
+#include "fastq-file-reader.h"
 #include "exceptions.h"
 
 
