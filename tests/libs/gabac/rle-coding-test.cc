@@ -1,10 +1,11 @@
 #include <vector>
 
-#include "gabac/rle-coding.h"
-#include "iostream"
+#include <gabac/rle-coding.h>
+#include <iostream>
 
-#include "gtest/gtest.h"
-#include "./test_common.h"
+#include <gtest/gtest.h>
+
+#include "test-common.h"
 
 
 class rleCodingTest : public ::testing::Test

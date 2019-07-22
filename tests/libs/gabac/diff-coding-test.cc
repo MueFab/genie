@@ -5,11 +5,12 @@
 #include <limits>
 #include <vector>
 
-#include "gabac/data-block.h"
-#include "gabac/diff-coding.h"
-#include "./test_common.h"
+#include <gabac/data-block.h>
+#include <gabac/diff-coding.h>
 
-#include "gtest/gtest.h"
+#include "test-common.h"
+
+#include <gtest/gtest.h>
 
 
 class DiffCodingTest : public ::testing::Test

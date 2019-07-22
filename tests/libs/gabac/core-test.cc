@@ -6,14 +6,14 @@
 #include <vector>
 #include <random>
 
-#include "gabac/constants.h"
-#include "gabac/data-block.h"
-#include "gabac/decode-cabac.h"
-#include "gabac/encode-cabac.h"
+#include <gabac/constants.h>
+#include <gabac/data-block.h>
+#include <gabac/decode-cabac.h>
+#include <gabac/encode-cabac.h>
 
-#include "./test_common.h"
+#include "test-common.h"
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 
 class coreTest : public ::testing::Test

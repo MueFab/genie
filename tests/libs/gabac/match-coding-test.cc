@@ -5,11 +5,12 @@
 #include <vector>
 #include <random>
 
-#include "gabac/data-block.h"
-#include "gabac/match-coding.h"
-#include "./test_common.h"
+#include <gabac/data-block.h>
+#include <gabac/match-coding.h>
 
-#include "gtest/gtest.h"
+#include "test-common.h"
+
+#include <gtest/gtest.h>
 
 
 class matchCodingTest : public ::testing::Test
