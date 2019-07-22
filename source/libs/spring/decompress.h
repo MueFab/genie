@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <genie/StreamSaver.h>
+#include <genie/stream-saver.h>
 #include "util.h"
 #include <utils/fastq-record.h>
 

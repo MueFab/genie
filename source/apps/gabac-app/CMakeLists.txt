@@ -1,10 +1,10 @@
 project("gabac-app")
 
 set(source_files
-        analyze.cpp
-        code.cpp
-        main.cpp
-        program_options.cpp
+        analyze.cc
+        code.cc
+        main.cc
+        program-options.cc
 )
 
 add_executable(gabac-app ${source_files})

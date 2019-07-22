@@ -2,7 +2,7 @@
 #define GENIE_ENCODING_H_
 
 
-#include "program_options.h"
+#include "program-options.h"
 
 
 namespace genie {
