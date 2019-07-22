@@ -1,18 +1,18 @@
 project("ureads-encoder")
 
 set(source_files
-        encoding.cpp
-        exceptions.cpp
-        fastq_file_reader.cpp
-        fastq_record.cpp
-        file.cpp
-        file_reader.cpp
-        genie_gabac_output_stream.cpp
-        input_file.cpp
-        log.cpp
-        main.cpp
-        output_file.cpp
-        program-options.cpp
+        encoding.cc
+        exceptions.cc
+        fastq-file-reader.cc
+        fastq-record.cc
+        file.cc
+        file-reader.cc
+        genie-gabac-output-stream.cc
+        input-file.cc
+        log.cc
+        main.cc
+        output-file.cc
+        program-options.cc
 )
 
 add_executable(ureads-encoder ${source_files})

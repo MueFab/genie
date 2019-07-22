@@ -15,7 +15,7 @@
 #include <iostream>
 
 #include "generation.h"
-#include "ProgramOptions.h"
+#include "program-options.h"
 #include "exceptions.h"
 #include "ureads-encoder/logger.h"
 

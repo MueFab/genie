@@ -13,7 +13,7 @@
 #define DSG_GENERATION_H_
 
 
-#include "ProgramOptions.h"
+#include "program-options.h"
 #include <vector>
 #include <map>
 

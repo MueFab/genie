@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <gabac/bit_output_stream.h>
-#include <gabac/data_block.h>
+#include <gabac/bit-output-stream.h>
+#include <gabac/data-block.h>
 
 TEST(BitOutputStreamTest, write) { // NOLINT(cert-err58-cpp)
     gabac::DataBlock bitstream(0, 1);

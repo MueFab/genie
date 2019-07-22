@@ -21,7 +21,7 @@
 #include <condition_variable>
 #include <queue>
 
-#include <filesystem/filesystem.hpp>
+#include <filesystem/filesystem.h>
 
 #include "exceptions.h"
 #include "utils/fasta-file-reader.h"
