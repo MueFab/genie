@@ -1,11 +1,12 @@
 #include <vector>
 
-#include "gabac/data-block.h"
-#include "gabac/lut-transform.h"
-#include "iostream"
-#include "./test_common.h"
+#include <gabac/data-block.h>
+#include <gabac/lut-transform.h>
+#include <iostream>
 
-#include "gtest/gtest.h"
+#include "test-common.h"
+
+#include <gtest/gtest.h>
 
 
 class lutTransformTest : public ::testing::Test

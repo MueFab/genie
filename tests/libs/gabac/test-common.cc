@@ -1,5 +1,6 @@
-#include "./test_common.h"
-#include "gabac/data-block.h"
+#include "test-common.h"
+
+#include <gabac/data-block.h>
 
 void fillVectorRandomUniform(uint64_t min, uint64_t max, gabac::DataBlock *const vector){
     // First create an instance of an engine.
