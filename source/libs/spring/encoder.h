@@ -116,12 +116,8 @@ namespace spring {
         static const int thresh_s = THRESH_ENCODER;
         static const int maxsearch = MAX_SEARCH_ENCODER;
 #ifdef GENIE_USE_OPENMP
-        omp_lock_t *read_lock = new omp_lock_t[eg.numreads_s + eg.numreads_N];
-        omp_lock_t *dict_lock = new omp_lock_t[eg.numreads_s + eg.numreads_N];
-        for (uint64_t j = 0; j < eg.numreads_s + eg.numreads_N; j++) {
-            omp_init_lock(&read_lock[j]);
-            omp_init_lock(&dict_lock[j]);
-        }
+        omp_lock *read_lock = new omp_lock[eg.numreads_s + eg.numreads_N];
+        omp_lock *dict_lock = new omp_lock[eg.numreads_s + eg.numreads_N];
 #endif
         bool *remainingreads = new bool[eg.numreads_s + eg.numreads_N];
         std::fill(remainingreads, remainingreads + eg.numreads_s + eg.numreads_N, 1);
@@ -237,7 +233,7 @@ namespace spring {
                                             continue;
                                         // check if any other thread is modifying same dictpos
 #ifdef GENIE_USE_OPENMP
-                                        if (!omp_test_lock(&dict_lock[startposidx])) continue;
+                                        if (!dict_lock[startposidx].test()) continue;
 #else
                                         // if we are single-threaded we do not need to continue
                                         // because nobody else could possibly try to modify the same
@@ -247,7 +243,7 @@ namespace spring {
                                         if (dict[l].empty_bin[startposidx])  // bin is empty
                                         {
 #ifdef GENIE_USE_OPENMP
-                                            omp_unset_lock(&dict_lock[startposidx]);
+                                            dict_lock[startposidx].unset();
 #endif
                                             continue;
                                         }
@@ -274,14 +270,14 @@ namespace spring {
                                                                     .count();
                                                 if (hamming <= thresh_s) {
 #ifdef GENIE_USE_OPENMP
-                                                    omp_set_lock(&read_lock[rid]);
+                                                    read_lock[rid].set();
 #endif
                                                     if (remainingreads[rid]) {
                                                         remainingreads[rid] = 0;
                                                         flag = 1;
                                                     }
 #ifdef GENIE_USE_OPENMP
-                                                    omp_unset_lock(&read_lock[rid]);
+                                                    read_lock[rid].unset();
 #endif
                                                 }
                                                 if (flag == 1)  // match found
@@ -310,7 +306,7 @@ namespace spring {
                                             }
                                         }
 #ifdef GENIE_USE_OPENMP
-                                        omp_unset_lock(&dict_lock[startposidx]);
+                                        dict_lock[startposidx].unset();
 #endif
                                         // delete from dictionaries
                                         for (int l1 = 0; l1 < eg.numdict_s; l1++)
@@ -320,7 +316,7 @@ namespace spring {
                                                 ull = (b >> 3 * dict[l1].start).to_ullong();
                                                 startposidx = dict[l1].bphf->lookup(ull);
 #ifdef GENIE_USE_OPENMP
-                                                if (!omp_test_lock(&dict_lock[startposidx])) {
+                                                if (!dict_lock[startposidx].test()) {
                                                     ++it;
                                                     continue;
                                                 }
@@ -331,7 +327,7 @@ namespace spring {
                                                 dict[l1].remove(dictidx, startposidx, *it);
                                                 it = deleted_rids[l1].erase(it);
 #ifdef GENIE_USE_OPENMP
-                                                omp_unset_lock(&dict_lock[startposidx]);
+                                                dict_lock[startposidx].unset();
 #endif
                                             }
                                     }
@@ -629,7 +625,7 @@ namespace spring {
             dict[1].end = 41 * eg.max_readlen / 50;
         }
 
-        if (eg.numreads_s + eg.numreads_N > 0)   
+        if (eg.numreads_s + eg.numreads_N > 0)
           constructdictionary<bitset_size>(read, dict, read_lengths_s, eg.numdict_s,
                                            eg.numreads_s + eg.numreads_N, 3,
                                            eg.basedir, eg.num_thr);
