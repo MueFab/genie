@@ -74,7 +74,7 @@ void ProgramOptions::processCommandLine(
     app.add_flag("-g,--generate-configuration", analyze, "Generate a new set of configurations");
 
     numThreads = 1;
-    app.add_option("-t,--numThreads", numThreads, "How many threads to launch for parallel execution of GABAC. Default is 1.");
+    app.add_option("-t,--numThreads", numThreads, "How many threads to launch for parallel execution of Genie. Default is 1.");
 
     try {
         app.parse(argc, argv);
@@ -97,29 +97,27 @@ void ProgramOptions::validate()
 #endif
 
     if (inputFilePath.empty()) {
-        throwRuntimeError("no input file path provided");
+        throwRuntimeError("No input file path provided");
     }
 
     if (!common::fileExists(inputFilePath)) {
-        throwRuntimeError("input file does not exist");
+        throwRuntimeError("Input file does not exist: " + inputFilePath);
     }
 
     if(inputFilePath.substr(inputFilePath.find_last_of('.')) != ".genie" && configPath.empty()) {
         throwRuntimeError("You need to pass a config directory when not in genie decompression mode!");
 
         if (!ghc::filesystem::exists(configPath) || !ghc::filesystem::is_directory(configPath)) {
-            throwRuntimeError("config dir does not exist");
+            throwRuntimeError("Config dir does not exist: " + configPath);
         }
     }
 
-
-
     if (!inputFilePairPath.empty()) {
         if (!common::fileExists(inputFilePairPath)) {
-            throwRuntimeError("input pair file does not exist");
+            throwRuntimeError("Input pair file does not exist: " + inputFilePairPath);
         }
         if (inputFilePairPath == inputFilePath) {
-            throwRuntimeError("Same file name for two files");
+            throwRuntimeError("Same name for two input files: " + inputFilePath);
         }
         std::cout << "paired mode activated" << std::endl;
     }
@@ -144,7 +142,7 @@ void ProgramOptions::validate()
     std::transform(inputFileType.begin(), inputFileType.end(),inputFileType.begin(), ::toupper);
 
     if (allowedInputFileTypes.find(inputFileType) == allowedInputFileTypes.end()) {
-        throwRuntimeError("input file type is invalid");
+        throwRuntimeError("Input file type is invalid: " + inputFilePath);
     }
 }
 

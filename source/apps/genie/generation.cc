@@ -88,7 +88,7 @@ namespace dsg {
         output.exceptions(std::ios::badbit | std::ios::failbit);
 
         if (!output) {
-            throw std::runtime_error("Could not open output file");
+            throw std::runtime_error("Could not open output file: " + outfile);
         }
 
         dsg::StreamSaver store(programOptions.configPath, &output, nullptr);
@@ -102,7 +102,7 @@ namespace dsg {
         // Open file and create tmp directory with random name
         std::ifstream in(programOptions.inputFilePath);
         if (!in) {
-            throw std::runtime_error("Could not open input file");
+            throw std::runtime_error("Could not open input file: " + programOptions.inputFilePath);
         }
         std::string temp_dir;
         while (true) {
@@ -113,7 +113,7 @@ namespace dsg {
             }
         }
         if (!ghc::filesystem::create_directory(temp_dir)) {
-            throw std::runtime_error("Cannot create temporary directory.");
+            throw std::runtime_error("Cannot create temporary directory: " + temp_dir);
         }
         std::cout << "Temporary directory: " << temp_dir << "\n";
 
@@ -150,7 +150,7 @@ namespace dsg {
         } else if (programOptions.inputFileType == "SGENIE") {
 //            decompression_sam(programOptions);
         } else {
-            throwRuntimeError("wrong input file type");
+            throwRuntimeError("Wrong input file type: " + programOptions.inputFilePath);
         }
     }
 
@@ -162,7 +162,7 @@ namespace dsg {
         } else if (programOptions.inputFileType == "SAM") {
 //            generationFromSam(programOptions);
         } else {
-            throwRuntimeError("wrong input file type");
+            throwRuntimeError("Wrong input file type: " + programOptions.inputFilePath);
         }
     }
 
