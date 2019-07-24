@@ -9,7 +9,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "third-party/nlohmann/json.h"
+#include <nlohmann/json.h>
 
 #include "constants.h"
 #include "exceptions.h"
