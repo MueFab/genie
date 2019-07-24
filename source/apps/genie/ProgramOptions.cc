@@ -104,12 +104,16 @@ void ProgramOptions::validate()
         throwRuntimeError("Input file does not exist: " + inputFilePath);
     }
 
-    if(inputFilePath.substr(inputFilePath.find_last_of('.')) != ".genie" && configPath.empty()) {
-        throwRuntimeError("You need to pass a config directory when not in genie decompression mode!");
-
-        if (!ghc::filesystem::exists(configPath) || !ghc::filesystem::is_directory(configPath)) {
-            throwRuntimeError("Config dir does not exist: " + configPath);
+    if (configPath.empty()) {
+        if (inputFilePath.substr(inputFilePath.find_last_of('.')) != ".genie") {
+            throwRuntimeError("You need to pass a config directory when not in genie decompression mode!");
         }
+    }
+    else if (configPath.back() != '/') {
+        configPath += "/";
+    }
+    if (!ghc::filesystem::exists(configPath) || !ghc::filesystem::is_directory(configPath)) {
+        throwRuntimeError("Config dir does not exist: " + configPath);
     }
 
     if (!inputFilePairPath.empty()) {
