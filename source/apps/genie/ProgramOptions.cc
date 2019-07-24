@@ -39,6 +39,7 @@ ProgramOptions::ProgramOptions(
       configPath(""),
       inputFilePairPath(""),
       inputFileType(""),
+      outputFilePath(""),
       idAlgorithm(""),
       qvAlgorithm(""),
       readAlgorithm("")
@@ -69,6 +70,8 @@ void ProgramOptions::processCommandLine(
 
     configPath = "";
     app.add_option("-c,--config-file-path", configPath, "Path to directory with gabac configurations. Missing configuratons will be regenerated, which may take a while");
+
+    app.add_option("-o,--output-file-path", outputFilePath, "Output file name (optional). Default is <input_file_name>.genie");
 
     analyze = false;
     app.add_flag("-g,--generate-configuration", analyze, "Generate a new set of configurations");
