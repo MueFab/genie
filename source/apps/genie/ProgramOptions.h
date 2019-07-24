@@ -44,6 +44,9 @@ class ProgramOptions {
     std::string inputFilePairPath;
     std::string inputFileType;
 
+    // Output
+    std::string outputFilePath;
+
     // Algorithm
     std::string idAlgorithm;
     std::string qvAlgorithm;

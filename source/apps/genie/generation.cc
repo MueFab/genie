@@ -80,20 +80,48 @@ namespace dsg {
     static void generationFromFastq(
             const ProgramOptions &programOptions
     ) {
+        std::string filename = programOptions.outputFilePath;
 
-        std::string outfile =
-                (programOptions.inputFilePath.substr(0, programOptions.inputFilePath.find_last_of('.')) + ".genie");
+        if (filename.empty()) {
+            size_t slash = programOptions.inputFilePath.find_last_of('/');
+            size_t dot = programOptions.inputFilePath.find_last_of('.');
 
-        std::ofstream output(outfile);
+            //
+            // Find the base name of the input file name.
+            // Ignore any dots directory path (before last slash).
+            //
+            if ((dot == std::string::npos)
+              || ((slash != std::string::npos) && (dot <= slash))) {
+                dot = programOptions.inputFilePath.back();
+            }
+            else {
+                dot--;         // Base name ends before the last dot
+            }
+
+            if (slash != std::string::npos) {
+                dot -= slash;  // dot is now length of base name
+                slash++;       // base name starts after slash
+            }
+            else {
+                slash = 0;     // base name starts at beginning of string
+                               // no need to adjust dot
+            }
+
+            filename = programOptions.inputFilePath.substr(slash, dot) + ".genie";
+        }
+        else {
+            // warn if string doesn't end in ".genie" ??
+        }
+
+        std::ofstream output(filename);
         output.exceptions(std::ios::badbit | std::ios::failbit);
 
         if (!output) {
-            throw std::runtime_error("Could not open output file: " + outfile);
+            throw std::runtime_error("Could not open output file: " + filename);
         }
 
         dsg::StreamSaver store(programOptions.configPath, &output, nullptr);
         auto generated_aus = generationFromFastq_SPRING(programOptions, store);
-
     }
 
     void decompression_fastq(
