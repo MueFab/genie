@@ -32,7 +32,7 @@ Note: you will need to use cmake version 3 or greater and gcc version 8. You may
 
     cmake .. -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Release
     cmake ../genie/ -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release
-    cmake /path/to/genie -DCMAKE_C_COMPILE=gcc (optional: -DGENIE_USE_OPEN_MP=ON)
+    cmake /path/to/genie -DCMAKE_C_COMPILE=gcc (optional: -DGENIE_USE_OPENMP=ON)
 
 Once the genie application is generated, you will first need to generate the config files
 
