@@ -24,11 +24,15 @@ Build all libraries and executables using CMake:
     cmake ..
     make
 
+Note that cmake will need to point to the genie directory.
+
 This will generate the Genie application at ``cmake-build/bin/genie``.
 
 Note: you will need to use cmake version 3 or greater and gcc version 8. You may need to declare your compilers with cmake flags, e.g., 
 
-    cmake .. -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release (optional: -DGENIE_USE_OPEN_MP=ON)
+    cmake .. -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Release
+    cmake ../genie/ -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release
+    cmake /path/to/genie -DCMAKE_C_COMPILE=gcc (optional: -DGENIE_USE_OPEN_MP=ON)
 
 Once the genie application is generated, you will first need to generate the config files
 
