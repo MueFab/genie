@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <gabac/bit_input_stream.h>
-#include <gabac/data_block.h>
+#include <gabac/bit-input-stream.h>
+#include <gabac/data-block.h>
 
 TEST(BitInputStreamTest, readByte) { // NOLINT(cert-err58-cpp)
     gabac::DataBlock bitstream(0, 1);

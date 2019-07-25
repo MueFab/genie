@@ -2,10 +2,10 @@
 
 #include <gtest/gtest.h>
 
-#include <gabac/binary_arithmetic_decoder.cpp>
-#include <gabac/context_tables.h>
-#include <gabac/context_selector.h>
-#include <gabac/data_block.h>
+#include <gabac/binary-arithmetic-decoder.cc>
+#include <gabac/context-tables.h>
+#include <gabac/context-selector.h>
+#include <gabac/data-block.h>
 
 class BinaryArithmeticDecoderTest : public ::testing::Test {
 protected:

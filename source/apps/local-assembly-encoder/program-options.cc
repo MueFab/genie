@@ -1,7 +1,7 @@
 #include "program-options.h"
 
-#include <cli11/CLI11.hpp>
-#include <filesystem/filesystem.hpp>
+#include <cli11/cli11.h>
+#include <filesystem/filesystem.h>
 #include <utils/exceptions.h>
 
 namespace lae {

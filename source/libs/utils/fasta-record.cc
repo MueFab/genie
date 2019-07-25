@@ -1,7 +1,5 @@
 #include <utility>
 
-#include <utility>
-
 #include "fasta-record.h"
 
 #include <iostream>
