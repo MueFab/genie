@@ -26,6 +26,21 @@ Build all libraries and executables using CMake:
 
 This will generate the Genie application at ``cmake-build/bin/genie``.
 
+Note: you will need to use cmake version 3 or greater and gcc version 8. You may need to declare your compilers with cmake flags, e.g., 
+
+    cmake .. -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release (optional: -DGENIE_USE_OPEN_MP=ON)
+
+Once the genie application is generated, you will first need to generate the config files
+
+    /path/to/genie [uncompressed_fastq] [optional: matched uncompressed_fastq] -g -c /path/to/config/output/
+
+the /path/to/config/output/ should be a directory you create that will store the config files. Once this command finishes running, you can then compress the files with the same command without -g:
+
+    /path/to/genie [uncompressed_fastq] [optional: matched uncompressed_fastq] -c /path/to/config/output/
+
+Where /path/to/config/output/ is the directory where the config files were generated
+
+
 ## Continuous integration
 
 Commits to this repository are continuously tested on **Travis CI** (https://travis-ci.org/mitogen/genie). Take a look at the file ``.travis.yml`` to see what is being done on Travis' (virtual) machines.
