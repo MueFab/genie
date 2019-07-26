@@ -1,7 +1,6 @@
 /**
  * @file
- * @brief Gabac data representation
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
@@ -20,21 +19,23 @@ namespace gabac {
 struct BlockStepper;
 
 /**
- * @brief Word size aware data structure similar to a std::vector. Memory efficient.
+ * @brief Word size aware data structure similar to a std::vector. Memory
+ * efficient.
  */
-class DataBlock
-{
- private:
+class DataBlock {
+   private:
     uint8_t wordSize;
 
     std::vector<uint8_t> data;
 
- public:
+   public:
     /**
      * @brief Creates a blockStepper for this DataBlock.
-     * @warning It will become invalid once you add or remove elements from the data block.
-     * @todo This has to be refactored. There should be a BlockStepper_Const. Currently it is
-     * possible to alter a const datablock via blockstepper which should not be possible.
+     * @warning It will become invalid once you add or remove elements from the
+     * data block.
+     * @todo This has to be refactored. There should be a BlockStepper_Const.
+     * Currently it is possible to alter a const datablock via blockstepper
+     * which should not be possible.
      * @return BlockStepper
      */
     BlockStepper getReader() const;
@@ -44,14 +45,14 @@ class DataBlock
      * @param d Other block
      * @return True if equal
      */
-    bool operator==(const DataBlock& d) const;
+    bool operator==(const DataBlock &d) const;
 
     /**
      * @brief Set contents to values from a list. Does not affect the word size.
      * @param il List
      * @return This data block.
      */
-    DataBlock& operator=(const std::initializer_list<uint64_t>& il);
+    DataBlock &operator=(const std::initializer_list<uint64_t> &il);
 
     /**
      * @brief Extract one symbol
@@ -80,22 +81,22 @@ class DataBlock
     void set(size_t index, uint64_t val);
 
     /**
-     * @brief A proxy object abstracting the get/set access using regular operators.
-     * This way it is possible to use for example range based for loops or
-     * std algorithms with iterators.
+     * @brief A proxy object abstracting the get/set access using regular
+     * operators. This way it is possible to use for example range based for
+     * loops or std algorithms with iterators.
      * @note Even though this is convenient you should avoid it. It's slow.
-     * @warning Adding or removing elements from the data block this object is referring to
-     * leads to undefined behaviour. Don't do it as long as a proxy object is existent.
+     * @warning Adding or removing elements from the data block this object is
+     * referring to leads to undefined behaviour. Don't do it as long as a proxy
+     * object is existent.
      * @tparam T Type of data block
      */
-    template<typename T>
-    class ProxyCore
-    {
-     private:
+    template <typename T>
+    class ProxyCore {
+       private:
         T stream;
         size_t position;
-     public:
 
+       public:
         /**
          * @brief Create access proxy
          * @param str Block we are referring to
@@ -112,25 +113,28 @@ class DataBlock
         /**
          * @brief Assign uint64_t - executes set() of data block
          * @param val New value
-         * @return *this, so that you can execute additional operations on this element.
+         * @return *this, so that you can execute additional operations on this
+         * element.
          */
-        ProxyCore& operator=(uint64_t val);
+        ProxyCore &operator=(uint64_t val);
     };
 
-    using Proxy = ProxyCore<DataBlock *>;  /**< Standard proxy */
-    using ConstProxy = ProxyCore<const DataBlock *>;  /**< Standard proxy for const */
+    using Proxy = ProxyCore<DataBlock *>; /**< Standard proxy */
+    using ConstProxy =
+        ProxyCore<const DataBlock *>; /**< Standard proxy for const */
 
     /**
-     * @brief Iterator for data blocks. Like for proxy object: only use if BlockStepper does not work.
+     * @brief Iterator for data blocks. Like for proxy object: only use if
+     * BlockStepper does not work.
      * @tparam T Data block type
      */
-    template<typename T>
-    class IteratorCore
-    {
-     private:
+    template <typename T>
+    class IteratorCore {
+       private:
         T stream;
         size_t position;
-     public:
+
+       public:
         /**
          * @brief Create iterator
          * @param str Data block
@@ -157,7 +161,7 @@ class DataBlock
          * @param offset Other iterator
          * @return Index offset
          */
-        size_t operator-(const IteratorCore& offset) const{
+        size_t operator-(const IteratorCore &offset) const {
             return position - offset.position;
         }
 
@@ -165,13 +169,13 @@ class DataBlock
          * @brief Increment prefix
          * @return *this
          */
-        IteratorCore& operator++();
+        IteratorCore &operator++();
 
         /**
          * @brief Decrement prefix
          * @return *this
          */
-        IteratorCore& operator--();
+        IteratorCore &operator--();
 
         /**
          * @brief Increment postfix
@@ -208,24 +212,27 @@ class DataBlock
          * @param c other Iterator
          * @return True if block and index equal
          */
-        bool operator==(const IteratorCore& c) const;
+        bool operator==(const IteratorCore &c) const;
 
         /**
          * @brief Compare
          * @param c other Iterator
          * @return False if block and index equal
          */
-        bool operator!=(const IteratorCore& c) const;
+        bool operator!=(const IteratorCore &c) const;
 
-        using iterator_category = std::random_access_iterator_tag;  /**< @brief Iterator category for STL */
+        using iterator_category =
+            std::random_access_iterator_tag; /**< @brief Iterator category for
+                                                STL */
         using reference = ProxyCore<T>;  /**< @brief Reference type for STL */
         using pointer = ProxyCore<T> *;  /**< @brief Pointer type for STL */
-        using value_type = ProxyCore<T>;  /**< @brief Value type for STL */
+        using value_type = ProxyCore<T>; /**< @brief Value type for STL */
         using difference_type = size_t;  /**< @brief Difference type for STL */
     };
 
     using Iterator = IteratorCore<DataBlock *>; /**< @brief Default iterator */
-    using ConstIterator = IteratorCore<const DataBlock *>; /**< @brief Default const iterator */
+    using ConstIterator =
+        IteratorCore<const DataBlock *>; /**< @brief Default const iterator */
 
     /**
      * @brief Get number of elements
@@ -234,13 +241,15 @@ class DataBlock
     size_t size() const;
 
     /**
-     * @brief Reserve more memory without expanding the actual data. Similar to vector.
+     * @brief Reserve more memory without expanding the actual data. Similar to
+     * vector.
      * @param size New memory size in elements
      */
     void reserve(size_t size);
 
     /**
-     * @brief Free unused memory without shrinking the actual data. Similar to vector.
+     * @brief Free unused memory without shrinking the actual data. Similar to
+     * vector.
      */
     void shrink_to_fit();
 
@@ -327,9 +336,7 @@ class DataBlock
      * wordsize * numberOfElements
      * @return Data size in bytes
      */
-    size_t getRawSize() const{
-        return getWordSize() * size();
-    }
+    size_t getRawSize() const { return getWordSize() * size(); }
 
     /**
      * @brief Swap the contents of two data blocks without copying of data.
@@ -345,8 +352,8 @@ class DataBlock
      * @param start Where the source buffer starts
      * @param end Where the source buffer ends
      */
-    template<typename IT1, typename IT2>
-    void insert(const IT1& pos, const IT2& start, const IT2& end);
+    template <typename IT1, typename IT2>
+    void insert(const IT1 &pos, const IT2 &start, const IT2 &end);
 
     /**
      * @brief Create Data block
@@ -360,7 +367,7 @@ class DataBlock
      * @tparam T Should be an integral type
      * @param vec Vector to process
      */
-    template<typename T>
+    template <typename T>
     explicit DataBlock(std::vector<T> *vec);
 
     /**
@@ -386,197 +393,198 @@ class DataBlock
     explicit DataBlock(const uint8_t *d, size_t size, uint8_t word_size);
 };
 
-
-inline uint64_t DataBlock::get(size_t index) const{
+inline uint64_t DataBlock::get(size_t index) const {
     switch (wordSize) {
         case 1:
             return *(data.data() + index);
         case 2:
-            return *reinterpret_cast<const uint16_t *> (data.data() + (index << 1u));
+            return *reinterpret_cast<const uint16_t *>(data.data() +
+                                                       (index << 1u));
         case 4:
-            return *reinterpret_cast<const uint32_t *> (data.data() + (index << 2u));
+            return *reinterpret_cast<const uint32_t *>(data.data() +
+                                                       (index << 2u));
         case 8:
-            return *reinterpret_cast<const uint64_t *> (data.data() + (index << 3u));
+            return *reinterpret_cast<const uint64_t *>(data.data() +
+                                                       (index << 3u));
         default:
             return 0;
     }
 }
 
-inline void DataBlock::set(size_t index, uint64_t val){
+inline void DataBlock::set(size_t index, uint64_t val) {
     switch (wordSize) {
         case 1:
             *(data.data() + index) = static_cast<uint8_t>(val);
             return;
         case 2:
-            *reinterpret_cast<uint16_t *> (data.data() + (index << 1u)) = static_cast<uint16_t>(val);
+            *reinterpret_cast<uint16_t *>(data.data() + (index << 1u)) =
+                static_cast<uint16_t>(val);
             return;
         case 4:
-            *reinterpret_cast<uint32_t *> (data.data() + (index << 2u)) = static_cast<uint32_t>(val);
+            *reinterpret_cast<uint32_t *>(data.data() + (index << 2u)) =
+                static_cast<uint32_t>(val);
             return;
         case 8:
-            *reinterpret_cast<uint64_t *> (data.data() + (index << 3u)) = static_cast<uint64_t>(val);
+            *reinterpret_cast<uint64_t *>(data.data() + (index << 3u)) =
+                static_cast<uint64_t>(val);
             return;
         default:
             return;
     }
 }
 
+inline DataBlock::ConstIterator DataBlock::begin() const { return {this, 0}; }
 
-inline DataBlock::ConstIterator DataBlock::begin() const{
-    return {this, 0};
-}
+inline DataBlock::Iterator DataBlock::begin() { return {this, 0}; }
 
-inline DataBlock::Iterator DataBlock::begin(){
-    return {this, 0};
-}
-
-inline DataBlock::ConstIterator DataBlock::end() const{
+inline DataBlock::ConstIterator DataBlock::end() const {
     return {this, data.size() / wordSize};
 }
 
-inline DataBlock::Iterator DataBlock::end(){
+inline DataBlock::Iterator DataBlock::end() {
     return {this, data.size() / wordSize};
 }
 
-inline void DataBlock::push_back(uint64_t val){
+inline void DataBlock::push_back(uint64_t val) {
     /*
       set(data.size() / wordSize - 1, val);*/
     data.resize(data.size() + wordSize);
     switch (wordSize) {
         case 1:
-            *reinterpret_cast<uint8_t *> (data.end().base() - 1) = static_cast<uint8_t>(val);
+            *reinterpret_cast<uint8_t *>(data.end().base() - 1) =
+                static_cast<uint8_t>(val);
             return;
         case 2:
-            *reinterpret_cast<uint16_t *> (data.end().base() - 2) = static_cast<uint16_t>(val);
+            *reinterpret_cast<uint16_t *>(data.end().base() - 2) =
+                static_cast<uint16_t>(val);
             return;
         case 4:
-            *reinterpret_cast<uint32_t *> (data.end().base() - 4) = static_cast<uint32_t>(val);
+            *reinterpret_cast<uint32_t *>(data.end().base() - 4) =
+                static_cast<uint32_t>(val);
             return;
         case 8:
-            *reinterpret_cast<uint64_t *> (data.end().base() - 8) = static_cast<uint64_t>(val);
+            *reinterpret_cast<uint64_t *>(data.end().base() - 8) =
+                static_cast<uint64_t>(val);
             return;
         default:
             break;
     }
 }
 
-inline void DataBlock::emplace_back(uint64_t val){
-    push_back(val);
-}
+inline void DataBlock::emplace_back(uint64_t val) { push_back(val); }
 
-inline const void *DataBlock::getData() const{
-    return data.data();
-}
+inline const void *DataBlock::getData() const { return data.data(); }
 
-inline void *DataBlock::getData(){
-    return data.data();
-}
+inline void *DataBlock::getData() { return data.data(); }
 
-inline uint8_t DataBlock::getWordSize() const{
-    return wordSize;
-}
+inline uint8_t DataBlock::getWordSize() const { return wordSize; }
 
-inline void DataBlock::setWordSize(uint8_t size){
+inline void DataBlock::setWordSize(uint8_t size) {
     wordSize = size;
     if (data.size() % size) {
         GABAC_DIE("Could not resize");
     }
 }
 
+template <typename T>
+inline DataBlock::ProxyCore<T>::ProxyCore(T str, size_t pos)
+    : stream(str), position(pos) {}
 
-template<typename T>
-inline DataBlock::ProxyCore<T>::ProxyCore(T str, size_t pos) : stream(str), position(pos){
-}
-
-template<typename T>
-inline DataBlock::ProxyCore<T>::operator uint64_t() const{
+template <typename T>
+inline DataBlock::ProxyCore<T>::operator uint64_t() const {
     return stream->get(position);
 }
 
-template<typename T>
-inline DataBlock::ProxyCore<T>& DataBlock::ProxyCore<T>::operator=(uint64_t val){
+template <typename T>
+inline DataBlock::ProxyCore<T> &DataBlock::ProxyCore<T>::operator=(
+    uint64_t val) {
     stream->set(position, val);
     return *this;
 }
 
-template<typename T>
-DataBlock::IteratorCore<T>::IteratorCore(T str, size_t pos) : stream(str), position(pos){
-}
+template <typename T>
+DataBlock::IteratorCore<T>::IteratorCore(T str, size_t pos)
+    : stream(str), position(pos) {}
 
-template<typename T>
-inline DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator+(size_t offset) const{
+template <typename T>
+inline DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator+(
+    size_t offset) const {
     return IteratorCore(stream, position + offset);
 }
 
-template<typename T>
-inline DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator-(size_t offset) const{
+template <typename T>
+inline DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator-(
+    size_t offset) const {
     return IteratorCore(stream, position - offset);
 }
 
-template<typename T>
-inline DataBlock::IteratorCore<T>& DataBlock::IteratorCore<T>::operator++(){
+template <typename T>
+inline DataBlock::IteratorCore<T> &DataBlock::IteratorCore<T>::operator++() {
     *this = *this + 1;
     return *this;
 }
 
-template<typename T>
-inline DataBlock::IteratorCore<T>& DataBlock::IteratorCore<T>::operator--(){
+template <typename T>
+inline DataBlock::IteratorCore<T> &DataBlock::IteratorCore<T>::operator--() {
     *this = *this + 1;
     return *this;
 }
 
-template<typename T>
-inline const DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator++(int){
+template <typename T>
+inline const DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator++(
+    int) {
     IteratorCore ret = *this;
     ++(*this);
     return ret;
 }
 
-template<typename T>
-inline const DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator--(int){
+template <typename T>
+inline const DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator--(
+    int) {
     IteratorCore ret = *this;
     ++(*this);
     return ret;
 }
 
-template<typename T>
-inline size_t DataBlock::IteratorCore<T>::getOffset() const{
+template <typename T>
+inline size_t DataBlock::IteratorCore<T>::getOffset() const {
     return position;
 }
 
-template<typename T>
-inline T DataBlock::IteratorCore<T>::getStream() const{
+template <typename T>
+inline T DataBlock::IteratorCore<T>::getStream() const {
     return stream;
 }
 
-template<typename T>
-inline DataBlock::ProxyCore<T> DataBlock::IteratorCore<T>::operator*() const{
+template <typename T>
+inline DataBlock::ProxyCore<T> DataBlock::IteratorCore<T>::operator*() const {
     return {stream, position};
 }
 
-template<typename T>
-inline bool DataBlock::IteratorCore<T>::operator==(const IteratorCore& c) const{
+template <typename T>
+inline bool DataBlock::IteratorCore<T>::operator==(
+    const IteratorCore &c) const {
     return this->stream == c.stream && this->position == c.position;
 }
 
-template<typename T>
-inline bool DataBlock::IteratorCore<T>::operator!=(const IteratorCore& c) const{
+template <typename T>
+inline bool DataBlock::IteratorCore<T>::operator!=(
+    const IteratorCore &c) const {
     return !(*this == c);
 }
 
-template<typename IT1, typename IT2>
-void DataBlock::insert(const IT1& pos, const IT2& start, const IT2& end){
+template <typename IT1, typename IT2>
+void DataBlock::insert(const IT1 &pos, const IT2 &start, const IT2 &end) {
     if (pos.getStream() != this || start.getStream() != end.getStream()) {
         return;
     }
-    data.insert(
-            data.begin() + pos.getOffset(),
-            start.getStream()->data.begin() + start.getOffset(),
-            end.getStream()->data.begin() + end.getOffset());
+    data.insert(data.begin() + pos.getOffset(),
+                start.getStream()->data.begin() + start.getOffset(),
+                end.getStream()->data.begin() + end.getOffset());
 }
 
-template<typename T>
-DataBlock::DataBlock(std::vector<T> *vec) : wordSize(sizeof(T)){
+template <typename T>
+DataBlock::DataBlock(std::vector<T> *vec) : wordSize(sizeof(T)) {
     size_t size = vec->size() * sizeof(T);
     this->data.resize(size);
     this->data.shrink_to_fit();
@@ -585,6 +593,5 @@ DataBlock::DataBlock(std::vector<T> *vec) : wordSize(sizeof(T)){
 }
 
 }  // namespace gabac
-
 
 #endif  // GABAC_DATA_BLOCK_H_

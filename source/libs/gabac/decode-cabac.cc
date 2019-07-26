@@ -1,6 +1,6 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
@@ -13,16 +13,12 @@
 #include "data-block.h"
 #include "reader.h"
 
-
 namespace gabac {
 
-void decode_cabac(
-        const BinarizationId& binarizationId,
-        const std::vector<unsigned int>& binarizationParameters,
-        const ContextSelectionId& contextSelectionId,
-        const uint8_t wordsize,
-        DataBlock *const bitstream
-){
+void decode_cabac(const BinarizationId& binarizationId,
+                  const std::vector<unsigned int>& binarizationParameters,
+                  const ContextSelectionId& contextSelectionId,
+                  const uint8_t wordsize, DataBlock* const bitstream) {
     DataBlock symbols(0, wordsize);
     if (bitstream == nullptr) {
         GABAC_DIE("Bitstream is null");
@@ -42,7 +38,7 @@ void decode_cabac(
     BlockStepper r = symbols.getReader();
 
     if (contextSelectionId == ContextSelectionId::bypass) {
-        uint64_t(Reader::*func)(unsigned int);
+        uint64_t (Reader::*func)(unsigned int);
         switch (binarizationId) {
             case BinarizationId::BI:
                 func = &Reader::readAsBIbypass;
@@ -66,9 +62,7 @@ void decode_cabac(
                 GABAC_DIE("Invalid binarization");
         }
         while (r.isValid()) {
-            uint64_t symbol = (reader.*func)(
-                    binarizationParameter
-            );
+            uint64_t symbol = (reader.*func)(binarizationParameter);
             r.set(symbol);
             r.inc();
         }
@@ -80,7 +74,7 @@ void decode_cabac(
         return;
     }
 
-    uint64_t(Reader::*func)(unsigned int, unsigned int);
+    uint64_t (Reader::*func)(unsigned int, unsigned int);
     switch (binarizationId) {
         case BinarizationId::BI:
             func = &Reader::readAsBIcabac;
@@ -104,24 +98,18 @@ void decode_cabac(
             GABAC_DIE("Invalid binarization");
     }
 
-    if (contextSelectionId
-        == ContextSelectionId::adaptive_coding_order_0) {
+    if (contextSelectionId == ContextSelectionId::adaptive_coding_order_0) {
         while (r.isValid()) {
-            uint64_t symbol = (reader.*func)(
-                    binarizationParameter,
-                    0
-            );
+            uint64_t symbol = (reader.*func)(binarizationParameter, 0);
             r.set(symbol);
             r.inc();
         }
-    } else if (contextSelectionId
-               == ContextSelectionId::adaptive_coding_order_1) {
+    } else if (contextSelectionId ==
+               ContextSelectionId::adaptive_coding_order_1) {
         unsigned int previousSymbol = 0;
         while (r.isValid()) {
-            uint64_t symbol = (reader.*func)(
-                    binarizationParameter,
-                    previousSymbol << 2u
-            );
+            uint64_t symbol =
+                (reader.*func)(binarizationParameter, previousSymbol << 2u);
             r.set(symbol);
             if (int64_t(symbol) < 0) {
                 symbol = uint64_t(-int64_t(symbol));
@@ -134,16 +122,15 @@ void decode_cabac(
             }
             r.inc();
         }
-    } else if (contextSelectionId
-               == ContextSelectionId::adaptive_coding_order_2) {
+    } else if (contextSelectionId ==
+               ContextSelectionId::adaptive_coding_order_2) {
         unsigned int previousSymbol = 0;
         unsigned int previousPreviousSymbol = 0;
 
         while (r.isValid()) {
-            uint64_t symbol = (reader.*func)(
-                    binarizationParameter,
-                    (previousSymbol << 2u) + previousPreviousSymbol
-            );
+            uint64_t symbol =
+                (reader.*func)(binarizationParameter,
+                               (previousSymbol << 2u) + previousPreviousSymbol);
             r.set(symbol);
             previousPreviousSymbol = previousSymbol;
             if (int64_t(symbol) < 0) {

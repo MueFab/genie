@@ -3,21 +3,15 @@
 
 #include <string>
 
-
 namespace gabacify {
 
-
-class ProgramOptions
-{
- public:
-    ProgramOptions(
-            int argc,
-            char *argv[]
-    );
+class ProgramOptions {
+   public:
+    ProgramOptions(int argc, char *argv[]);
 
     ~ProgramOptions();
 
- public:
+   public:
     std::string configurationFilePath;
     std::string logLevel;
     std::string inputFilePath;
@@ -28,17 +22,12 @@ class ProgramOptions
     uint64_t maxVal;
     uint8_t wordSize;
 
- private:
-    void processCommandLine(
-            int argc,
-            char *argv[]
-    );
+   private:
+    void processCommandLine(int argc, char *argv[]);
 
     void validate();
 };
 
-
 }  // namespace gabacify
-
 
 #endif  // GABACIFY_PROGRAM_OPTIONS_H_
