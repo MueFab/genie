@@ -1,6 +1,6 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
@@ -13,12 +13,9 @@ namespace gabac {
 
 class DataBlock;
 
-class BitInputStream
-{
- public:
-    explicit BitInputStream(
-            DataBlock *bitstream
-    );
+class BitInputStream {
+   public:
+    explicit BitInputStream(DataBlock *bitstream);
 
     ~BitInputStream();
 
@@ -28,10 +25,8 @@ class BitInputStream
 
     void reset();
 
- private:
-    unsigned int read(
-            unsigned int numBits
-    );
+   private:
+    unsigned int read(unsigned int numBits);
 
     gabac::DataBlock *m_bitstream;
 
@@ -42,8 +37,6 @@ class BitInputStream
     unsigned int m_numHeldBits;
 };
 
-
 }  // namespace gabac
-
 
 #endif  // GABAC_BIT_INPUT_STREAM_H_

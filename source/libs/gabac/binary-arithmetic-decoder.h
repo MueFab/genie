@@ -1,6 +1,6 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
@@ -13,28 +13,21 @@ namespace gabac {
 
 class ContextModel;
 
-class BinaryArithmeticDecoder
-{
- public:
-    explicit BinaryArithmeticDecoder(
-            const BitInputStream& bitInputStream
-    );
+class BinaryArithmeticDecoder {
+   public:
+    explicit BinaryArithmeticDecoder(const BitInputStream& bitInputStream);
 
     ~BinaryArithmeticDecoder();
 
-    unsigned int decodeBin(
-            ContextModel *contextModel
-    );
+    unsigned int decodeBin(ContextModel* contextModel);
 
-    unsigned int decodeBinsEP(
-            unsigned int numBins
-    );
+    unsigned int decodeBinsEP(unsigned int numBins);
 
     void decodeBinTrm();
 
     void reset();
 
- private:
+   private:
     void start();
 
     BitInputStream m_bitInputStream;
@@ -46,8 +39,6 @@ class BinaryArithmeticDecoder
     unsigned int m_value = 0;
 };
 
-
 }  // namespace gabac
-
 
 #endif  // GABAC_BINARY_ARITHMETIC_DECODER_H_

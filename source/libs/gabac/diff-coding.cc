@@ -1,6 +1,6 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
@@ -14,10 +14,7 @@
 
 namespace gabac {
 
-
-void transformDiffCoding(
-        DataBlock *const transformedSymbols
-){
+void transformDiffCoding(DataBlock *const transformedSymbols) {
     assert(transformedSymbols != nullptr);
 
     // Do the diff libs
@@ -32,10 +29,7 @@ void transformDiffCoding(
     }
 }
 
-
-void inverseTransformDiffCoding(
-        DataBlock *const symbols
-){
+void inverseTransformDiffCoding(DataBlock *const symbols) {
     assert(symbols != nullptr);
 
     // Re-compute the symbols from the differences
@@ -48,6 +42,5 @@ void inverseTransformDiffCoding(
         r.inc();
     }
 }
-
 
 }  // namespace gabac

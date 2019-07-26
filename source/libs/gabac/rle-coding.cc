@@ -1,6 +1,6 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
@@ -12,12 +12,8 @@
 
 namespace gabac {
 
-
-void transformRleCoding(
-        const uint64_t guard,
-        gabac::DataBlock *const rawValues,
-        gabac::DataBlock *const lengths
-){
+void transformRleCoding(const uint64_t guard, gabac::DataBlock *const rawValues,
+                        gabac::DataBlock *const lengths) {
     assert(guard > 0);
     assert(rawValues != nullptr);
     assert(lengths != nullptr);
@@ -30,7 +26,6 @@ void transformRleCoding(
 
     // input for rawValues is guaranteed to grow slower than reading process
     // -> in place possible
-
 
     BlockStepper r = rawValues->getReader();
     BlockStepper w = rawValues->getReader();
@@ -64,16 +59,12 @@ void transformRleCoding(
     }
     lengths->push_back(lengthValue - 1);
 
-
     rawValues->resize(rawValues->size() - (w.end - w.curr) / w.wordSize);
 }
 
-
-void inverseTransformRleCoding(
-        const uint64_t guard,
-        gabac::DataBlock *const rawValues,
-        gabac::DataBlock *const lengths
-){
+void inverseTransformRleCoding(const uint64_t guard,
+                               gabac::DataBlock *const rawValues,
+                               gabac::DataBlock *const lengths) {
     assert(rawValues != nullptr);
     assert(!rawValues->empty());
     assert(guard > 0);
@@ -108,6 +99,5 @@ void inverseTransformRleCoding(
     lengths->clear();
     lengths->shrink_to_fit();
 }
-
 
 }  // namespace gabac

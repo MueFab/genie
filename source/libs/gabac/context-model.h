@@ -1,6 +1,6 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
@@ -11,13 +11,9 @@
 
 namespace gabac {
 
-
-class ContextModel
-{
- public:
-    explicit ContextModel(
-            unsigned char state
-    );
+class ContextModel {
+   public:
+    explicit ContextModel(unsigned char state);
 
     ~ContextModel();
 
@@ -41,29 +37,24 @@ class ContextModel
      */
     void updateMps();
 
- private:
+   private:
     unsigned char m_state;
 };
 
+inline unsigned char ContextModel::getState() const { return m_state >> 1u; }
 
-inline unsigned char ContextModel::getState() const{
-    return m_state >> 1u;
-}
-
-inline unsigned char ContextModel::getMps() const{
+inline unsigned char ContextModel::getMps() const {
     return m_state & static_cast<unsigned char>(0x1u);
 }
 
-inline void ContextModel::updateLps(){
+inline void ContextModel::updateLps() {
     m_state = cabactables::nextStateLps[m_state];
 }
 
-inline void ContextModel::updateMps(){
+inline void ContextModel::updateMps() {
     m_state = cabactables::nextStateMps[m_state];
 }
 
-
 }  // namespace gabac
-
 
 #endif  // GABAC_CONTEXT_MODEL_H_
