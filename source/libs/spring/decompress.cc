@@ -15,10 +15,18 @@
 
 namespace spring {
 
-    std::pair<std::vector<utils::FastqRecord>, std::vector<bool>>
-    decode_streams(decoded_desc_t &dec, const std::vector<std::array<uint8_t, 2>> &subseq_indices, bool paired_end, bool preserve_quality, bool preserve_id) {
-        std::vector<utils::FastqRecord> decoded_records;
-        std::vector<bool> first_file_flag_vec;
+    void decode_streams(decoded_desc_t &dec, const std::vector<std::array<uint8_t, 2>> &subseq_indices, bool paired_end, bool preserve_quality, bool preserve_id, bool combine_pairs, std::vector<utils::FastqRecord> matched_records[2], std::vector<utils::FastqRecord> unmatched_records[2], std::vector<uint32_t> &mate_au_id, std::vector<uint32_t> &mate_record_index) {
+        /*
+         * return values are matched_records[2] (for pairs that are matched), unmatched_records[2] (for pairs that are unmatched), mate_au_id, mate_record_index (which store position of the pair of the unmatched_records[1]). For single end case, only matched_records[0] is populated, for paired end reads with combine_pairs false, only matched_records[0] and matched_records[1] are populated (unmatched records also put in these). For paired end with combine_pairs true, matched_records arrays contain the matched records and have equal size, unmatched_records have the records that don't have pair within the same AU, and mate_au_id & mate_au_id contain the information needed to match them together.
+         */
+        for (int j = 0; j < 2; j++) {
+            matched_records[j].clear();
+            unmatched_records[j].clear();
+        }
+        mate_au_id.clear();
+        mate_record_index.clear();
+        std::vector<uint32_t> mate_record_index_same_rec; // for sorting in the combine_pairs case
+        std::vector<utils::FastqRecord> unmatched_same_au[2];
         std::string cur_quality[2];
         std::string cur_ID;
         utils::FastqRecord cur_record;
@@ -61,6 +69,7 @@ namespace spring {
                 uint8_t number_of_record_segments;
                 uint16_t delta = 0;
                 bool read_1_first = true;
+                bool same_au_flag = false; // when combine_pairs true and pair is split: flag to indicate if mate in same AU
                 if (paired_end) {
                     uint64_t pairing_decoding_case = (uint64_t) (*(subseq_it[8][0]++));
                     // note that we don't decode/use mateAUid and mateRecordIndex in this decoder
@@ -79,12 +88,28 @@ namespace spring {
                         case 6:
                             number_of_record_segments = 1;
                             read_1_first = false;
+                            if (combine_pairs) {
+                                if (pairing_decoding_case == 1) {
+                                    mate_record_index_same_rec.push_back((uint32_t) (*(subseq_it[8][2]++)));
+                                    same_au_flag = true;
+                                } else if (pairing_decoding_case == 3) {
+                                    mate_au_id.push_back((uint32_t) (*(subseq_it[8][4]++)));
+                                    mate_record_index.push_back((uint32_t) (*(subseq_it[8][6]++)));
+                                    same_au_flag = false;
+                                }
+                            }
                             break;
                         case 2:
                         case 4:
                         case 5:
                             number_of_record_segments = 1;
                             read_1_first = true;
+                            if (combine_pairs) {
+                                if (pairing_decoding_case == 2)
+                                    same_au_flag = true;
+                                else if (pairing_decoding_case == 4)
+                                    same_au_flag = false;
+                            }
                             break;
                         default:
                             throw std::runtime_error("Invalid pair decoding case encountered");
@@ -138,26 +163,62 @@ namespace spring {
                         pos_in_quality_arr += rlen[i];
                     }
                 }
-
+                bool first_read_flag = true;
                 for (int i = 0; i < number_of_record_segments; i++) {
                     if (paired_end) {
                         if ((i == 0 && read_1_first) || (i == 1 && !read_1_first)) {
                             cur_record.title = cur_ID + "/1";
-                            first_file_flag_vec.push_back(true);
+                            first_read_flag = true;
                         } else {
                             cur_record.title = cur_ID + "/2";
-                            first_file_flag_vec.push_back(false);
+                            first_read_flag = false;
                         }
                     } else {
                         cur_record.title = cur_ID;
                     }
                     cur_record.sequence = cur_read[i];
                     cur_record.qualityScores = cur_quality[i];
-                    decoded_records.push_back(cur_record);
+                    if (!paired_end) {
+                        matched_records[0].push_back(cur_record);
+                    } else {
+                        if (!combine_pairs) {
+                            matched_records[first_read_flag?0:1].push_back(cur_record);
+                        } else {
+                            if (number_of_record_segments == 2) {
+                                matched_records[first_read_flag?0:1].push_back(cur_record);
+                            } else {
+                                if (same_au_flag)
+                                    unmatched_same_au[first_read_flag?0:1].push_back(cur_record);
+                                else
+                                    unmatched_records[first_read_flag?0:1].push_back(cur_record);
+                            }
+                        }
+                    }
                 }
             }
         }
-        return std::make_pair(decoded_records, first_file_flag_vec);
+        // if combine_pairs is true, reorder reads in unmatched_same_au so that pairs match, and
+        // push this to matched_records arrays
+        if (paired_end && combine_pairs) {
+            size_t size_unmatched = unmatched_same_au[0].size();
+            if (size_unmatched != unmatched_same_au[1].size() ||
+                    size_unmatched != mate_record_index_same_rec.size())
+                throw std::runtime_error("Sizes of unmatched same AU vectors don't match.");
+            if (size_unmatched > 0) {
+                matched_records[0].insert(matched_records[0].end(), unmatched_same_au[0].begin(), unmatched_same_au[0].end());
+                std::vector<std::pair<uint32_t,uint32_t>> record_index_for_sorting(size_unmatched);
+                for (size_t i = 0; i < size_unmatched; i++)
+                    record_index_for_sorting.push_back(std::make_pair(mate_record_index_same_rec[i],i));
+                std::sort(record_index_for_sorting.begin(), record_index_for_sorting.end(),
+                        [](std::pair<uint32_t,uint32_t> a, std::pair<uint32_t,uint32_t> b) {
+                            return a.first < b.first;
+                        }
+                );
+                for (size_t i = 0; i < size_unmatched; i++)
+                    matched_records[1].push_back(unmatched_same_au[1][record_index_for_sorting[i].second]);
+            }
+        }
+        return;
     }
 
     bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, bool combine_pairs) {
@@ -208,6 +269,14 @@ namespace spring {
         if (cp.paired_end) {
             fout2.open(file_decompressed_fastq2);
         }
+        std::vector<utils::FastqRecord> matched_records[2], unmatched_records[2];
+        std::vector<uint32_t> mate_au_id, mate_record_index;
+
+        // vectors to hold unmatched reads with mate in different AU (in combine_pairs case).
+        // also store vectors to hold the AUid and indices which will be used later for combining.
+        std::vector<utils::FastqRecord> unmatched_records_concat[2];
+        std::vector<uint32_t> mate_au_id_concat, mate_record_index_concat;
+
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel for ordered num_threads(cp.num_thr)
 #endif
@@ -260,7 +329,7 @@ namespace spring {
                 std::memcpy(const_cast<char *>(dec.quality_arr.data()), qualityBlock.getData(), qualityBlock.getRawSize());
                 qualityBlock.clear();
             }
-            
+
             if (cp.preserve_id) {
                 for (int i = 0; i < 128; i++) {
                     for (int j = 0; j < 6; j++) {
@@ -286,26 +355,63 @@ namespace spring {
 #pragma omp ordered
 #endif
             {
-                auto decoded_records = decode_streams(dec, subseq_indices, cp.paired_end, cp.preserve_quality, cp.preserve_id);
-                for (size_t i = 0; i < decoded_records.first.size(); i++) {
-                    bool first_file_flag = true;
-                    if (cp.paired_end)
-                        if (!decoded_records.second[i])
-                            first_file_flag = false;
-                    std::ostream &tmpout = first_file_flag ? fout : fout2;
-                    tmpout << decoded_records.first[i].title << "\n";
-                    tmpout << decoded_records.first[i].sequence << "\n";
-                    if (cp.preserve_quality) {
-                        tmpout << "+" << "\n";
-                        tmpout << decoded_records.first[i].qualityScores << "\n";
-                    }
+                decode_streams(dec, subseq_indices, cp.paired_end, cp.preserve_quality, cp.preserve_id, combine_pairs, matched_records, unmatched_records, mate_au_id, mate_record_index);
+                if (cp.paired_end && combine_pairs) {
+                    for (int j = 0; j < 2; j++)
+                        unmatched_records_concat[j].insert(unmatched_records_concat[j].end(), unmatched_records[j].begin(), unmatched_records[j].end());
+                    mate_au_id_concat.insert(mate_au_id_concat.end(), mate_au_id.begin(), mate_au_id.end());
+                    mate_record_index_concat.insert(mate_record_index_concat.end(), mate_record_index.begin(), mate_record_index.end());
+                }
+                for (int j = 0; j < 2; j++) {
+                    if (j == 1 && !cp.paired_end)
+                        break;
+                    std::ostream &tmpout = (j == 0) ? fout : fout2;
+                    for (auto fastqRecord : matched_records[j])
+                        write_fastq_record_to_ostream(tmpout, fastqRecord, cp.preserve_quality);
                 }
             }
         }
+
+        // now reorder the remaining unmatched reads so that they are paired and then write them to file.
+        if (cp.paired_end && combine_pairs) {
+            size_t size_unmatched = unmatched_records_concat[0].size();
+            if (size_unmatched != unmatched_records_concat[1].size() ||
+                    size_unmatched != mate_au_id_concat.size() ||
+                    size_unmatched != mate_record_index_concat.size())
+                throw std::runtime_error("Sizes of unmatched same AU vectors don't match.");
+            if (size_unmatched > 0) {
+                // write to file 1
+                for (auto fastqRecord : unmatched_records_concat[0])
+                    write_fastq_record_to_ostream(fout, fastqRecord, cp.preserve_quality);
+
+                std::vector<std::tuple<uint32_t,uint32_t,uint32_t>> au_id_index_for_sorting(size_unmatched);
+                for (size_t i = 0; i < size_unmatched; i++)
+                    au_id_index_for_sorting[i] = std::make_tuple(mate_au_id_concat[i],mate_record_index_concat[i],i);
+                std::sort(au_id_index_for_sorting.begin(), au_id_index_for_sorting.end(),
+                        [](std::tuple<uint32_t,uint32_t,uint32_t> a, std::tuple<uint32_t,uint32_t,uint32_t> b) {
+                            return (std::get<0>(a) == std::get<0>(b))?(std::get<1>(a) < std::get<1>(b)):(std::get<0>(a) < std::get<0>(b));
+                        }
+                );
+                for (size_t i = 0; i < size_unmatched; i++)
+                    write_fastq_record_to_ostream(fout2, unmatched_records_concat[1][std::get<2>(au_id_index_for_sorting[i])], cp.preserve_quality);
+            }
+        }
+        fout.close();
+        if (cp.paired_end)
+            fout2.close();
+
         bool paired_end = cp.paired_end;
         delete cp_ptr;
 
         return paired_end;
     }
 
+    void write_fastq_record_to_ostream(std::ostream &out, utils::FastqRecord &fastqRecord, bool preserve_quality) {
+        out << fastqRecord.title << "\n";
+        out << fastqRecord.sequence << "\n";
+        if (preserve_quality) {
+            out << "+" << "\n";
+            out << fastqRecord.qualityScores << "\n";
+        }
+    }
 }  // namespace spring
