@@ -35,7 +35,7 @@
 //#include "alico/main.h"
 
 namespace spring {
-    bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld);
+    bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, bool combine_pairs);
 }
 
 namespace dsg {
@@ -147,7 +147,7 @@ namespace dsg {
 
         dsg::StreamSaver saver(programOptions.configPath, nullptr, &in);
 
-        bool paired = spring::decompress(temp_dir, &saver);
+        bool paired = spring::decompress(temp_dir, &saver, false);
 
         std::cout << paired << std::endl;
 

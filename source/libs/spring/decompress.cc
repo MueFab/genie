@@ -16,7 +16,7 @@
 namespace spring {
 
     std::pair<std::vector<utils::FastqRecord>, std::vector<bool>>
-    decode_streams(decoded_desc_t &dec, const std::vector<std::array<uint8_t, 2>> &subseq_indices, bool paired_end) {
+    decode_streams(decoded_desc_t &dec, const std::vector<std::array<uint8_t, 2>> &subseq_indices, bool paired_end, bool preserve_quality, bool preserve_id) {
         std::vector<utils::FastqRecord> decoded_records;
         std::vector<bool> first_file_flag_vec;
         std::string cur_quality[2];
@@ -51,8 +51,12 @@ namespace spring {
                     refBuf.push_back(int_to_char[*(subseq_it[6][0]++)]); // ureads
                 }
             } else {
-                //get ID
-                cur_ID = decode_id_tokens(prev_ID, prev_tokens_ptr, prev_tokens_len, dec.tokens, pos_in_tokens_array);
+                if (preserve_id) {
+                    //get ID
+                    cur_ID = decode_id_tokens(prev_ID, prev_tokens_ptr, prev_tokens_len, dec.tokens, pos_in_tokens_array);
+                } else {
+                    cur_ID = "@";
+                }
                 // rtype can be 1 (P) or 3 (M)
                 uint8_t number_of_record_segments;
                 uint16_t delta = 0;
@@ -127,11 +131,12 @@ namespace spring {
                     if (reverseComp[i] == 1)
                         cur_read[i] = reverse_complement(cur_read[i], rlen[i]);
                 }
-
-                for (int i = 0; i < number_of_record_segments; i++) {
-                    // get quality
-                    cur_quality[i] = dec.quality_arr.substr(pos_in_quality_arr, rlen[i]);
-                    pos_in_quality_arr += rlen[i];
+                if (preserve_quality) {
+                    for (int i = 0; i < number_of_record_segments; i++) {
+                        // get quality
+                        cur_quality[i] = dec.quality_arr.substr(pos_in_quality_arr, rlen[i]);
+                        pos_in_quality_arr += rlen[i];
+                    }
                 }
 
                 for (int i = 0; i < number_of_record_segments; i++) {
@@ -155,7 +160,7 @@ namespace spring {
         return std::make_pair(decoded_records, first_file_flag_vec);
     }
 
-    bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld) {
+    bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, bool combine_pairs) {
         // decompress to temp_dir/decompressed.fastq
 
         std::string basedir = temp_dir;
@@ -222,14 +227,17 @@ namespace spring {
                     sstreams.streams[arr[0]][arr[1]] = gabac::DataBlock(0, 1);
                     ld->unpack(filename, &sstreams.streams[arr[0]][arr[1]]);
                 }
-                ld->unpack(file_quality + '.' + std::to_string(block_num), &qualityBlock);
-
-                for (int i = 0; i < 128; i++) {
-                    for (int j = 0; j < 6; j++) {
-                        std::string infile_name_i_j =
-                                file_id + '.' + std::to_string(block_num) + "." + std::to_string(i) + "." +
-                                std::to_string(j);
-                        ld->unpack(infile_name_i_j, &tstreams.streams[i][j]);
+                if (cp.preserve_quality) {
+                    ld->unpack(file_quality + '.' + std::to_string(block_num), &qualityBlock);
+                }
+                if (cp.preserve_id) {
+                    for (int i = 0; i < 128; i++) {
+                        for (int j = 0; j < 6; j++) {
+                            std::string infile_name_i_j =
+                                    file_id + '.' + std::to_string(block_num) + "." + std::to_string(i) + "." +
+                                    std::to_string(j);
+                            ld->unpack(infile_name_i_j, &tstreams.streams[i][j]);
+                        }
                     }
                 }
             }
@@ -246,25 +254,29 @@ namespace spring {
                             sstreams.streams[arr[0]][arr[1]].getRawSize());
                 sstreams.streams[arr[0]][arr[1]].clear();
             }
-            ld->decompress(file_quality + '.' + std::to_string(block_num), &qualityBlock);
-            dec.quality_arr = std::string(qualityBlock.getRawSize(), '\0');
-            std::memcpy(const_cast<char *>(dec.quality_arr.data()), qualityBlock.getData(), qualityBlock.getRawSize());
-            qualityBlock.clear();
+            if (cp.preserve_quality) {
+                ld->decompress(file_quality + '.' + std::to_string(block_num), &qualityBlock);
+                dec.quality_arr = std::string(qualityBlock.getRawSize(), '\0');
+                std::memcpy(const_cast<char *>(dec.quality_arr.data()), qualityBlock.getData(), qualityBlock.getRawSize());
+                qualityBlock.clear();
+            }
+            
+            if (cp.preserve_id) {
+                for (int i = 0; i < 128; i++) {
+                    for (int j = 0; j < 6; j++) {
+                        std::string infile_name_i_j =
+                                file_id + '.' + std::to_string(block_num) + "." + std::to_string(i) + "." +
+                                std::to_string(j);
 
-            for (int i = 0; i < 128; i++) {
-                for (int j = 0; j < 6; j++) {
-                    std::string infile_name_i_j =
-                            file_id + '.' + std::to_string(block_num) + "." + std::to_string(i) + "." +
-                            std::to_string(j);
-
-                    if (!tstreams.streams[i][j].empty()) {
-                        ld->decompress(infile_name_i_j, &tstreams.streams[i][j]);
-                        dec.tokens[i][j].resize(tstreams.streams[i][j].getRawSize() / sizeof(int64_t));
-                        std::memcpy(dec.tokens[i][j].data(), tstreams.streams[i][j].getData(),
-                                    tstreams.streams[i][j].getRawSize());
-                        tstreams.streams[i][j].clear();
-                    } else {
-                        dec.tokens[i][j].clear();
+                        if (!tstreams.streams[i][j].empty()) {
+                            ld->decompress(infile_name_i_j, &tstreams.streams[i][j]);
+                            dec.tokens[i][j].resize(tstreams.streams[i][j].getRawSize() / sizeof(int64_t));
+                            std::memcpy(dec.tokens[i][j].data(), tstreams.streams[i][j].getData(),
+                                        tstreams.streams[i][j].getRawSize());
+                            tstreams.streams[i][j].clear();
+                        } else {
+                            dec.tokens[i][j].clear();
+                        }
                     }
                 }
             }
@@ -274,7 +286,7 @@ namespace spring {
 #pragma omp ordered
 #endif
             {
-                auto decoded_records = decode_streams(dec, subseq_indices, cp.paired_end);
+                auto decoded_records = decode_streams(dec, subseq_indices, cp.paired_end, cp.preserve_quality, cp.preserve_id);
                 for (size_t i = 0; i < decoded_records.first.size(); i++) {
                     bool first_file_flag = true;
                     if (cp.paired_end)
@@ -283,8 +295,10 @@ namespace spring {
                     std::ostream &tmpout = first_file_flag ? fout : fout2;
                     tmpout << decoded_records.first[i].title << "\n";
                     tmpout << decoded_records.first[i].sequence << "\n";
-                    tmpout << "+" << "\n";
-                    tmpout << decoded_records.first[i].qualityScores << "\n";
+                    if (cp.preserve_quality) {
+                        tmpout << "+" << "\n";
+                        tmpout << decoded_records.first[i].qualityScores << "\n";
+                    }
                 }
             }
         }
