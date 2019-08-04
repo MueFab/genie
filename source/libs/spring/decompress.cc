@@ -46,7 +46,7 @@ namespace spring {
             auto rtype = *subseq_it[12][0];
             if (rtype == 5) {
                 // put in refBuf
-                uint32_t rlen = (uint32_t) (*(subseq_it[7][0]++)); // rlen
+                uint32_t rlen = (uint32_t) (*(subseq_it[7][0]++)) + 1; // rlen
                 for (uint32_t i = 0; i < rlen; i++) {
                     refBuf.push_back(int_to_char[*(subseq_it[6][0]++)]); // ureads
                 }
@@ -94,7 +94,7 @@ namespace spring {
                 }
                 uint32_t rlen[2];
                 for (int i = 0; i < number_of_record_segments; i++)
-                    rlen[i] = (uint32_t) (*(subseq_it[7][0]++)); // rlen
+                    rlen[i] = (uint32_t) (*(subseq_it[7][0]++)) + 1; // rlen
                 uint32_t pos = *(subseq_it[0][0]++); // pos
 
                 abs_pos += pos;
