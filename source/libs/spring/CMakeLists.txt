@@ -9,6 +9,7 @@ set(source_files
         generate-read-streams.cc
         id-tokenization.cc
         preprocess.cc
+        compress-ureads.cc
         reorder-compress-quality-id.cc
         spring.cc
         util.cc

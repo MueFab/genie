@@ -31,15 +31,13 @@ namespace spring {
         bool preserve_quality = cp.preserve_quality;
         bool paired_end = cp.paired_end;
         uint32_t num_reads_per_block = cp.num_reads_per_block;
-        bool paired_id_match = cp.paired_id_match;
 
         std::string basedir = temp_dir;
 
         std::string file_order = basedir + "/read_order.bin";
-        std::string file_id[2];
+        std::string file_id;
         std::string file_quality[2];
-        file_id[0] = basedir + "/id_1";
-        file_id[1] = basedir + "/id_2";
+        file_id = basedir + "/id_1";
         file_quality[0] = basedir + "/quality_1";
         file_quality[1] = basedir + "/quality_2";
         std::string outfile_quality = "quality_1";
@@ -70,10 +68,10 @@ namespace spring {
             if (preserve_id) {
                 std::cout << "Compressing ids\n";
                 uint32_t num_reads_per_file = numreads;
-                reorder_compress(file_id[0], num_reads_per_file, num_thr,
+                reorder_compress(file_id, num_reads_per_file, num_thr,
                                  num_reads_per_block, str_array, str_array_size,
                                  order_array, "id", analyze, st);
-                remove(file_id[0].c_str());
+                remove(file_id.c_str());
             }
 
             delete[] order_array;
@@ -108,16 +106,14 @@ namespace spring {
             if (preserve_id) {
                 read_block_start_end(file_blocks_id, block_start, block_end);
                 std::string *id_array = new std::string[numreads / 2];
-                std::ifstream f_id(file_id[0]);
+                std::ifstream f_id(file_id);
                 for (uint32_t i = 0; i < numreads / 2; i++)
                     std::getline(f_id, id_array[i]);
-                reorder_compress_id_pe(id_array, file_order_id, block_start, block_end, file_id[0], cp, analyze,st);
+                reorder_compress_id_pe(id_array, file_order_id, block_start, block_end, file_id, cp, analyze,st);
                 delete[] id_array;
                 for (uint32_t i = 0; i < block_start.size(); i++)
                     remove((file_order_id + "." + std::to_string(i)).c_str());
-                remove(file_id[0].c_str());
-                if (!paired_id_match)
-                    remove(file_id[1].c_str());
+                remove(file_id.c_str());
                 block_start.clear();
                 block_end.clear();
             }
