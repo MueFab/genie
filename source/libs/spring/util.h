@@ -19,7 +19,7 @@ namespace spring {
         bool paired_end;
         bool preserve_quality;
         bool preserve_id;
-//  bool long_flag;
+        bool ureads_flag;
 //  bool qvz_flag;
 //  bool ill_bin_flag;
 //  bool bin_thr_flag;
@@ -30,10 +30,7 @@ namespace spring {
         uint32_t num_reads;
         uint32_t num_reads_clean[2];
         uint32_t max_readlen;
-        uint8_t paired_id_code;
-        bool paired_id_match;
         uint32_t num_reads_per_block;
-//  int num_reads_per_block_long;
         int num_thr;
         uint32_t num_blocks;
     };
@@ -57,17 +54,6 @@ namespace spring {
 
     void generate_binary_binning_table(char *binary_binning_table, const unsigned int thr, const unsigned int high,
                                        const unsigned int low);
-
-    uint8_t find_id_pattern(const std::string &id_1, const std::string &id_2);
-
-    bool check_id_pattern(const std::string &id_1, const std::string &id_2,
-                          const uint8_t paired_id_code);
-
-    void modify_id(std::string &id, const uint8_t paired_id_code);
-
-    void write_dna_in_bits(const std::string &read, std::ofstream &fout);
-
-    void read_dna_from_bits(std::string &read, std::ifstream &fin);
 
     void reverse_complement(char *s, char *s1, const int readlen);
 

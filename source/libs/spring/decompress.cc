@@ -221,6 +221,76 @@ namespace spring {
         return;
     }
 
+    void decode_streams_ureads(decoded_desc_t &dec, const std::vector<std::array<uint8_t, 2>> &subseq_indices, bool paired_end, bool preserve_quality, bool preserve_id, std::vector<utils::FastqRecord> matched_records[2]) {
+        /*
+         * return value is matched_records[2]. For single end case, only matched_records[0] is populated, for paired end reads matched_records[0] and matched_records[1] are populated.
+         */
+        for (int j = 0; j < 2; j++) {
+            matched_records[j].clear();
+        }
+        std::string cur_quality[2];
+        std::string cur_ID;
+        utils::FastqRecord cur_record;
+        // int_to_char
+        char int_to_char[5] = {'A', 'C', 'G', 'T', 'N'};
+
+        std::map<uint8_t, std::map<uint8_t, std::vector<int64_t>::iterator>> subseq_it;
+        // intialize iterators for subsequences
+        for (auto arr : subseq_indices)
+            subseq_it[arr[0]][arr[1]] = (dec.subseq_vector[arr[0]][arr[1]]).begin();
+        uint32_t pos_in_tokens_array[128][8];
+        for (int i = 0; i < 128; i++)
+            for (int j = 0; j < 8; j++)
+                pos_in_tokens_array[i][j] = 0;
+        uint64_t pos_in_quality_arr = 0;
+        std::string prev_ID;
+        uint32_t prev_tokens_ptr[MAX_NUM_TOKENS_ID] = {0};
+        uint32_t prev_tokens_len[MAX_NUM_TOKENS_ID] = {0};
+        uint8_t number_of_record_segments = paired_end ? 2 : 1;
+
+        while (subseq_it[7][0] != dec.subseq_vector[7][0].end()) {
+            uint32_t rlen[2];
+            for (int i = 0; i < number_of_record_segments; i++)
+                rlen[i] = (uint32_t) (*(subseq_it[7][0]++)) + 1; // rlen
+
+            std::string cur_read[2];
+            for (int i = 0; i < number_of_record_segments; i++) {
+                for (uint32_t j = 0; j < rlen[i]; j++) {
+                    cur_read[i].push_back(int_to_char[*(subseq_it[6][0]++)]); // ureads
+                }
+            }
+            if (preserve_id) {
+                //get ID
+                cur_ID = decode_id_tokens(prev_ID, prev_tokens_ptr, prev_tokens_len, dec.tokens, pos_in_tokens_array);
+            } else {
+                cur_ID = "@";
+            }
+            if (preserve_quality) {
+                for (int i = 0; i < number_of_record_segments; i++) {
+                    // get quality
+                    cur_quality[i] = dec.quality_arr.substr(pos_in_quality_arr, rlen[i]);
+                    pos_in_quality_arr += rlen[i];
+                }
+            }
+            for (int i = 0; i < number_of_record_segments; i++) {
+                cur_record.title = cur_ID;
+                if (!paired_end && i == 1) {
+                    break;
+                } else {
+                    if ((i == 0)) {
+                        cur_record.title += "/1";
+                    } else {
+                        cur_record.title += "/2";
+                    }
+                }
+                cur_record.sequence = cur_read[i];
+                cur_record.qualityScores = cur_quality[i];
+                matched_records[i].push_back(cur_record);
+            }
+        }
+        return;
+    }
+
     bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, bool combine_pairs) {
         // decompress to temp_dir/decompressed.fastq
 
@@ -355,25 +425,36 @@ namespace spring {
 #pragma omp ordered
 #endif
             {
-                decode_streams(dec, subseq_indices, cp.paired_end, cp.preserve_quality, cp.preserve_id, combine_pairs, matched_records, unmatched_records, mate_au_id, mate_record_index);
-                if (cp.paired_end && combine_pairs) {
-                    for (int j = 0; j < 2; j++)
-                        unmatched_records_concat[j].insert(unmatched_records_concat[j].end(), unmatched_records[j].begin(), unmatched_records[j].end());
-                    mate_au_id_concat.insert(mate_au_id_concat.end(), mate_au_id.begin(), mate_au_id.end());
-                    mate_record_index_concat.insert(mate_record_index_concat.end(), mate_record_index.begin(), mate_record_index.end());
-                }
-                for (int j = 0; j < 2; j++) {
-                    if (j == 1 && !cp.paired_end)
-                        break;
-                    std::ostream &tmpout = (j == 0) ? fout : fout2;
-                    for (auto fastqRecord : matched_records[j])
-                        write_fastq_record_to_ostream(tmpout, fastqRecord, cp.preserve_quality);
+                if (cp.ureads_flag) {
+                    decode_streams_ureads(dec, subseq_indices, cp.paired_end, cp.preserve_quality, cp.preserve_id, matched_records);
+                    for (int j = 0; j < 2; j++) {
+                        if (j == 1 && !cp.paired_end)
+                            break;
+                        std::ostream &tmpout = (j == 0) ? fout : fout2;
+                        for (auto fastqRecord : matched_records[j])
+                            write_fastq_record_to_ostream(tmpout, fastqRecord, cp.preserve_quality);
+                    }
+                } else {
+                    decode_streams(dec, subseq_indices, cp.paired_end, cp.preserve_quality, cp.preserve_id, combine_pairs, matched_records, unmatched_records, mate_au_id, mate_record_index);
+                    if (cp.paired_end && combine_pairs) {
+                        for (int j = 0; j < 2; j++)
+                            unmatched_records_concat[j].insert(unmatched_records_concat[j].end(), unmatched_records[j].begin(), unmatched_records[j].end());
+                        mate_au_id_concat.insert(mate_au_id_concat.end(), mate_au_id.begin(), mate_au_id.end());
+                        mate_record_index_concat.insert(mate_record_index_concat.end(), mate_record_index.begin(), mate_record_index.end());
+                    }
+                    for (int j = 0; j < 2; j++) {
+                        if (j == 1 && !cp.paired_end)
+                            break;
+                        std::ostream &tmpout = (j == 0) ? fout : fout2;
+                        for (auto fastqRecord : matched_records[j])
+                            write_fastq_record_to_ostream(tmpout, fastqRecord, cp.preserve_quality);
+                    }
                 }
             }
         }
 
         // now reorder the remaining unmatched reads so that they are paired and then write them to file.
-        if (cp.paired_end && combine_pairs) {
+        if (!cp.ureads_flag && cp.paired_end && combine_pairs) {
             size_t size_unmatched = unmatched_records_concat[0].size();
             if (size_unmatched != unmatched_records_concat[1].size() ||
                     size_unmatched != mate_au_id_concat.size() ||
