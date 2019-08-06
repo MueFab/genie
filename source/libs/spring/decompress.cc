@@ -15,7 +15,7 @@
 
 namespace spring {
 
-    void decode_streams(decoded_desc_t &dec, const std::vector<std::array<uint8_t, 2>> &subseq_indices, bool paired_end, bool preserve_quality, bool preserve_id, bool combine_pairs, std::vector<utils::FastqRecord> matched_records[2], std::vector<utils::FastqRecord> unmatched_records[2], std::vector<uint32_t> &mate_au_id, std::vector<uint32_t> &mate_record_index) {
+    void decode_streams(decoded_desc_t &dec, bool paired_end, bool preserve_quality, bool preserve_id, bool combine_pairs, std::vector<utils::FastqRecord> matched_records[2], std::vector<utils::FastqRecord> unmatched_records[2], std::vector<uint32_t> &mate_au_id, std::vector<uint32_t> &mate_record_index) {
         /*
          * return values are matched_records[2] (for pairs that are matched), unmatched_records[2] (for pairs that are unmatched), mate_au_id, mate_record_index (which store position of the pair of the unmatched_records[1]). For single end case, only matched_records[0] is populated, for paired end reads with combine_pairs false, only matched_records[0] and matched_records[1] are populated (unmatched records also put in these). For paired end with combine_pairs true, matched_records arrays contain the matched records and have equal size, unmatched_records have the records that don't have pair within the same AU, and mate_au_id & mate_au_id contain the information needed to match them together.
          */
@@ -221,7 +221,7 @@ namespace spring {
         return;
     }
 
-    void decode_streams_ureads(decoded_desc_t &dec, const std::vector<std::array<uint8_t, 2>> &subseq_indices, bool paired_end, bool preserve_quality, bool preserve_id, std::vector<utils::FastqRecord> matched_records[2]) {
+    void decode_streams_ureads(decoded_desc_t &dec, bool paired_end, bool preserve_quality, bool preserve_id, std::vector<utils::FastqRecord> matched_records[2]) {
         /*
          * return value is matched_records[2]. For single end case, only matched_records[0] is populated, for paired end reads matched_records[0] and matched_records[1] are populated.
          */
@@ -405,7 +405,7 @@ namespace spring {
 #endif
             {
                 if (cp.ureads_flag) {
-                    decode_streams_ureads(dec, subseq_indices, cp.paired_end, cp.preserve_quality, cp.preserve_id, matched_records);
+                    decode_streams_ureads(dec, cp.paired_end, cp.preserve_quality, cp.preserve_id, matched_records);
                     for (int j = 0; j < 2; j++) {
                         if (j == 1 && !cp.paired_end)
                             break;
@@ -414,7 +414,7 @@ namespace spring {
                             write_fastq_record_to_ostream(tmpout, fastqRecord, cp.preserve_quality);
                     }
                 } else {
-                    decode_streams(dec, subseq_indices, cp.paired_end, cp.preserve_quality, cp.preserve_id, combine_pairs, matched_records, unmatched_records, mate_au_id, mate_record_index);
+                    decode_streams(dec, cp.paired_end, cp.preserve_quality, cp.preserve_id, combine_pairs, matched_records, unmatched_records, mate_au_id, mate_record_index);
                     if (cp.paired_end && combine_pairs) {
                         for (int j = 0; j < 2; j++)
                             unmatched_records_concat[j].insert(unmatched_records_concat[j].end(), unmatched_records[j].begin(), unmatched_records[j].end());

@@ -16,9 +16,11 @@ namespace spring {
         std::vector<int64_t> tokens[128][8];
     };
 
-    void decode_streams(decoded_desc_t &dec, const std::vector<std::array<uint8_t, 2>> &subseq_indices, bool paired_end, bool preserve_quality, bool preserve_id, bool combine_pairs, std::vector<utils::FastqRecord> matched_records[2], std::vector<utils::FastqRecord> unmatched_records[2], std::vector<uint32_t> &mate_au_id, std::vector<uint32_t> &mate_record_index);
+    void decode_streams(decoded_desc_t &dec, bool paired_end, bool preserve_quality, bool preserve_id, bool combine_pairs, std::vector<utils::FastqRecord> matched_records[2], std::vector<utils::FastqRecord> unmatched_records[2], std::vector<uint32_t> &mate_au_id, std::vector<uint32_t> &mate_record_index);
 
-    bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, bool combine_pairs);
+    void decode_streams_ureads(decoded_desc_t &dec, bool paired_end, bool preserve_quality, bool preserve_id, std::vector<utils::FastqRecord> matched_records[2]);
+
+    bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, bool combine_pairs = true);
 
     void write_fastq_record_to_ostream(std::ostream &out, utils::FastqRecord &fastqRecord, bool preserve_quality);
 
