@@ -4,8 +4,31 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <array>
 
 namespace spring {
+
+    const std::vector<std::array<uint8_t, 2>> subseq_indices = {
+            {0,  0}, // pos
+            {1,  0}, // rcomp
+            {3,  0}, // mmpos
+            {3,  1}, // mmpos
+            {4,  0}, // mmtype
+            {4,  1}, // mmtype
+            {6,  0}, // ureads
+            {7,  0}, // rlen
+            {8,  0}, // pair
+            {8,  1}, // pair
+            {8,  2}, // pair
+            {8,  3}, // pair
+            {8,  4}, // pair
+            {8,  5}, // pair
+            {8,  6}, // pair
+            {8,  7}, // pair
+            {12, 0} // rtype
+    };
+
+    const std::string file_subseq_prefix = "subseq";
 
     static const char chartorevchar[128] = {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

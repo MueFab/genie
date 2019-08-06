@@ -35,9 +35,8 @@ namespace spring {
         std::string basedir = temp_dir;
 
         std::string file_order = basedir + "/read_order.bin";
-        std::string file_id;
+        std::string file_id = basedir + "/id_1";;
         std::string file_quality[2];
-        file_id = basedir + "/id_1";
         file_quality[0] = basedir + "/quality_1";
         file_quality[1] = basedir + "/quality_2";
         std::string outfile_quality = "quality_1";

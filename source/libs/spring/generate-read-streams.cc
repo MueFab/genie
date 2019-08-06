@@ -20,29 +20,6 @@
 
 namespace spring {
 
-    const std::vector<std::array<uint8_t, 2>> subseq_indices = {
-            {0,  0}, // pos
-            {1,  0}, // rcomp
-            {3,  0}, // mmpos
-            {3,  1}, // mmpos
-            {4,  0}, // mmtype
-            {4,  1}, // mmtype
-            {6,  0}, // ureads
-            {7,  0}, // rlen
-            {8,  0}, // pair
-            {8,  1}, // pair
-            {8,  2}, // pair
-            {8,  3}, // pair
-            {8,  4}, // pair
-            {8,  5}, // pair
-            {8,  6}, // pair
-            {8,  7}, // pair
-            {12, 0} // rtype
-    };
-
-    const std::string file_subseq_prefix = "subseq";
-
-
     std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>>
     generate_read_streams(const std::string &temp_dir, const compression_params &cp,bool analyze, dsg::StreamSaver &st) {
         if (!cp.paired_end)
@@ -64,13 +41,6 @@ namespace spring {
         std::string seq;
         std::vector<char> RC_arr;
         std::vector<uint32_t> order_arr;
-    };
-
-    struct subseq_data {
-        uint32_t block_num;
-        std::map<uint8_t, std::map<uint8_t, std::string>> listDescriptorFiles;
-        std::map<uint8_t, std::map<uint8_t, std::vector<int64_t>>> subseq_vector;
-        dsg::AcessUnitStreams streamsAU;
     };
 
     void generate_subseqs(const se_data &data, uint64_t block_num, subseq_data* subseqData){

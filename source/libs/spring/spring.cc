@@ -55,9 +55,9 @@ namespace spring {
         cp.paired_end = paired_end;
         cp.preserve_id = preserve_id;
         cp.preserve_quality = preserve_quality;
-        cp.num_reads_per_block = NUM_READS_PER_BLOCK;
         cp.num_thr = num_thr;
         cp.ureads_flag = ureads_flag;
+        cp.num_reads_per_block = cp.ureads_flag ? NUM_READS_PER_BLOCK_UREADS : NUM_READS_PER_BLOCK;
 
 #if GENIE_USE_OPENMP
        //
