@@ -31,12 +31,9 @@
 #include "utils/sam-file-reader.h"
 #include "utils/sam-record.h"
 #include "spring/spring.h"
+#include "spring/decompress.h"
 
 //#include "alico/main.h"
-
-namespace spring {
-    bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, bool combine_pairs);
-}
 
 namespace dsg {
 
@@ -147,7 +144,7 @@ namespace dsg {
 
         dsg::StreamSaver saver(programOptions.configPath, nullptr, &in);
 
-        bool paired = spring::decompress(temp_dir, &saver, false);
+        bool paired = spring::decompress(temp_dir, &saver);
 
         std::cout << paired << std::endl;
 

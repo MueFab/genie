@@ -13,6 +13,7 @@ set(source_files
         reorder-compress-quality-id.cc
         spring.cc
         util.cc
+        call-template-functions.cc
         )
 
 add_library(spring ${source_files})
