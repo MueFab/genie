@@ -1,5 +1,3 @@
-#include "spring/preprocess.h"
-
 #ifdef GENIE_USE_OPENMP
 #include <omp.h>
 #endif
@@ -14,6 +12,7 @@
 
 #include "params.h"
 #include "util.h"
+#include "preprocess.h"
 
 #include <utils/fastq-file-reader.h>
 
@@ -28,7 +27,6 @@ namespace spring {
         std::string outfileorderN[2];
         std::string outfileid;
         std::string outfilequality[2];
-//  std::string outfileread[2];
         std::string outfilereadlength[2];
         std::string basedir = temp_dir;
         outfileclean[0] = basedir + "/input_clean_1.dna";
@@ -40,10 +38,6 @@ namespace spring {
         outfileid = basedir + "/id_1";
         outfilequality[0] = basedir + "/quality_1";
         outfilequality[1] = basedir + "/quality_2";
-//  outfileread[0] = basedir + "/read_1";
-//  outfileread[1] = basedir + "/read_2";
-//  outfilereadlength[0] = basedir + "/readlength_1";
-//  outfilereadlength[1] = basedir + "/readlength_2";
 
         std::ofstream fout_clean[2];
         std::ofstream fout_N[2];
@@ -82,7 +76,6 @@ namespace spring {
 #undef GENIE_USE_OPENMP
 
         uint64_t num_reads_per_step = (uint64_t) num_threads * num_reads_per_block;
-        std::string *id_array_1 = new std::string[num_reads_per_step];
         bool *read_contains_N_array = new bool[num_reads_per_step];
         uint32_t *read_lengths_array = new uint32_t[num_reads_per_step];
         uint32_t num_blocks_done = 0;
@@ -121,7 +114,7 @@ namespace spring {
                             if (len == 0)
                                 throw std::runtime_error("Read of length 0 detected.");
                             if (len > MAX_READ_LEN) {
-                                std::cerr << "Max read length without long mode is "
+                                std::cerr << "Max read length without ureads mode is "
                                           << MAX_READ_LEN << ", but found read of length " << len
                                           << "\n";
                                 throw std::runtime_error(
@@ -179,7 +172,6 @@ namespace spring {
             num_blocks_done += num_threads;
         }
 
-        delete[] id_array_1;
         delete[] read_contains_N_array;
         delete[] read_lengths_array;
 //  delete[] quality_binning_table;

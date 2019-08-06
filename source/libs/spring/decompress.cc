@@ -277,7 +277,7 @@ namespace spring {
                 if (!paired_end && i == 1) {
                     break;
                 } else {
-                    if ((i == 0)) {
+                    if (i == 0) {
                         cur_record.title += "/1";
                     } else {
                         cur_record.title += "/2";
@@ -295,7 +295,6 @@ namespace spring {
         // decompress to temp_dir/decompressed.fastq
 
         std::string basedir = temp_dir;
-        std::string file_subseq_prefix = "subseq";
         compression_params *cp_ptr = new compression_params;
         compression_params &cp = *cp_ptr;
         // Read compression params
@@ -306,26 +305,6 @@ namespace spring {
         ld->decompress(compression_params_file, &tmp);
         std::memcpy(&cp, tmp.getData(), sizeof(compression_params));
         tmp.clear();
-
-        std::vector<std::array<uint8_t, 2>> subseq_indices = {
-                {0,  0}, // pos
-                {1,  0}, // rcomp
-                {3,  0}, // mmpos
-                {3,  1}, // mmpos
-                {4,  0}, // mmtype
-                {4,  1}, // mmtype
-                {6,  0}, // ureads
-                {7,  0}, // rlen
-                {8,  0}, // pair
-                {8,  1}, // pair
-                {8,  2}, // pair
-                {8,  3}, // pair
-                {8,  4}, // pair
-                {8,  5}, // pair
-                {8,  6}, // pair
-                {8,  7}, // pair
-                {12, 0} // rtype
-        };
 
         std::string file_quality = "quality_1";
         std::string file_id = "id_1";
