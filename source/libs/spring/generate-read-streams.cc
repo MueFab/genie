@@ -76,13 +76,14 @@ namespace spring {
         if (data.flag_arr[start_read_num] == false)
             seq_start = seq_end = 0; // all reads unaligned
         else {
-            seq_start = data.pos_arr[start_read_num];
+            seq_end = seq_start = data.pos_arr[start_read_num];
             // find last read in AU that's aligned
             uint64_t i = start_read_num;
-            for (; i < end_read_num; i++)
+            for (; i < end_read_num; i++) {
                 if (data.flag_arr[i] == false)
                     break;
-            seq_end = data.pos_arr[i - 1] + data.read_length_arr[i - 1];
+                seq_end = std::max(seq_end, data.pos_arr[i] + data.read_length_arr[i]);
+            }
         }
         if (seq_start != seq_end) {
             // not all unaligned
@@ -100,7 +101,7 @@ namespace spring {
                 if (i == start_read_num) {
                     // Note: In order non-preserving mode, if the first read of
                     // the block is a singleton, then the rest are too.
-                    subseqData->subseq_vector[0][0].push_back(0);
+                    subseqData->subseq_vector[0][0].push_back(0); // pos
                     prevpos = data.pos_arr[i];
                 } else {
                     diffpos = data.pos_arr[i] - prevpos;
@@ -139,6 +140,7 @@ namespace spring {
                 seq_end = prevpos + data.read_length_arr[i];
             }
         }
+
     }
 
     void compress_subseqs(subseq_data* data, dsg::StreamSaver &st) {

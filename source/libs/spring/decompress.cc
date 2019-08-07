@@ -208,7 +208,7 @@ namespace spring {
                 matched_records[0].insert(matched_records[0].end(), unmatched_same_au[0].begin(), unmatched_same_au[0].end());
                 std::vector<std::pair<uint32_t,uint32_t>> record_index_for_sorting(size_unmatched);
                 for (size_t i = 0; i < size_unmatched; i++)
-                    record_index_for_sorting.push_back(std::make_pair(mate_record_index_same_rec[i],i));
+                    record_index_for_sorting[i] = std::make_pair(mate_record_index_same_rec[i],i);
                 std::sort(record_index_for_sorting.begin(), record_index_for_sorting.end(),
                         [](std::pair<uint32_t,uint32_t> a, std::pair<uint32_t,uint32_t> b) {
                             return a.first < b.first;
@@ -247,7 +247,6 @@ namespace spring {
         uint32_t prev_tokens_ptr[MAX_NUM_TOKENS_ID] = {0};
         uint32_t prev_tokens_len[MAX_NUM_TOKENS_ID] = {0};
         uint8_t number_of_record_segments = paired_end ? 2 : 1;
-
         while (subseq_it[7][0] != dec.subseq_vector[7][0].end()) {
             uint32_t rlen[2];
             for (int i = 0; i < number_of_record_segments; i++)
@@ -277,10 +276,12 @@ namespace spring {
                 if (!paired_end && i == 1) {
                     break;
                 } else {
-                    if (i == 0) {
-                        cur_record.title += "/1";
-                    } else {
-                        cur_record.title += "/2";
+                    if (paired_end) {
+                        if (i == 0) {
+                            cur_record.title += "/1";
+                        } else {
+                            cur_record.title += "/2";
+                        }
                     }
                 }
                 cur_record.sequence = cur_read[i];
@@ -305,7 +306,6 @@ namespace spring {
         ld->decompress(compression_params_file, &tmp);
         std::memcpy(&cp, tmp.getData(), sizeof(compression_params));
         tmp.clear();
-
         std::string file_quality = "quality_1";
         std::string file_id = "id_1";
         std::string file_decompressed_fastq = cp.paired_end ? basedir + "/decompressed_1.fastq" : basedir +

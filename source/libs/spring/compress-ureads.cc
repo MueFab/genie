@@ -46,10 +46,6 @@ namespace spring {
         uint32_t num_reads_per_block;
         num_reads_per_block = cp.num_reads_per_block;
 
-//  char *quality_binning_table = new char[128];
-//  if (cp.ill_bin_flag) generate_illumina_binning_table(quality_binning_table);
-//  if (cp.bin_thr_flag) generate_binary_binning_table(quality_binning_table, cp.bin_thr_thr, cp.bin_thr_high, cp.bin_thr_low);
-
         int num_threads = cp.num_thr;
 
         uint64_t num_reads_per_step = (uint64_t) num_threads * num_reads_per_block;
@@ -138,6 +134,7 @@ namespace spring {
                                         subseqData.subseq_vector[6][0].push_back(char_to_int[(uint8_t) fastqRecords[j][i].sequence[k]]); // rlen
                                 }
                             }
+
                             compress_subseqs(&subseqData, st);
 
                             // quality compression
@@ -163,6 +160,7 @@ namespace spring {
                                     "id_1." +
                                     std::to_string(block_num_thr);
                             if (cp.preserve_id) {
+
                                 std::vector<int64_t> tokens[128][8];
                                 generate_read_id_tokens(id_array_1 + tid * num_reads_per_block, num_reads_thr, tokens);
                                 for (int i = 0; i < 128; i++) {
@@ -173,6 +171,7 @@ namespace spring {
                                                     std::to_string(i) +
                                                     "." + std::to_string(j);
                                             streams.streams[i][j] = gabac::DataBlock(&tokens[i][j]);
+
                                             st.compress(outfile_name_i_j, &streams.streams[i][j]);
                                         }
                                     }
@@ -200,7 +199,6 @@ namespace spring {
             } // while(true)
 
         delete[] id_array_1;
-//  delete[] quality_binning_table;
 
         if (num_reads == 0) throw std::runtime_error("No reads found.");
 

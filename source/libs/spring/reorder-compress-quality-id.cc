@@ -97,6 +97,7 @@ namespace spring {
                 reorder_compress_quality_pe(file_quality, outfile_quality, quality_array, quality_array_size,
                                             order_array, block_start, block_end, cp, analyze, st);
                 delete[] quality_array;
+                delete[] order_array;
                 remove(file_quality[0].c_str());
                 remove(file_quality[1].c_str());
                 block_start.clear();
