@@ -71,9 +71,10 @@ namespace spring {
         std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> descriptorFilesPerAUs;
         if (cp.ureads_flag) {
             std::cout << "ureads_flag detected.\n";
-            // TODO: add support for analyze
+            // TODO: add support for analyze 
             descriptorFilesPerAUs =
                     compress_ureads(fastqFileReader1, fastqFileReader2, temp_dir, cp, st);
+            cp.num_blocks = descriptorFilesPerAUs.size();
         } else {
             std::cout << "Preprocessing ...\n";
             auto preprocess_start = std::chrono::steady_clock::now();
