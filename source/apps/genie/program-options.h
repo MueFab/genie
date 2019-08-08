@@ -35,6 +35,7 @@ class ProgramOptions {
     bool verbose;
     bool help;
     bool analyze;
+    bool gabacDebug;
     std::string workingDirectory;
     int numThreads;
 

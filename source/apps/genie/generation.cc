@@ -117,7 +117,7 @@ namespace dsg {
             throw std::runtime_error("Could not open output file: " + filename);
         }
 
-        dsg::StreamSaver store(programOptions.configPath, &output, nullptr);
+        dsg::StreamSaver store(programOptions.configPath, &output, nullptr, programOptions.gabacDebug);
         auto generated_aus = generationFromFastq_SPRING(programOptions, store);
     }
 

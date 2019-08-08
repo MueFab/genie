@@ -31,7 +31,8 @@ namespace dsg {
 #endif
 
         genie::Logger::instance().out("COMPRESSED:" + name + " with CONFIG: " + getConfigName(name) +
-                                      " from " + std::to_string(insize) + " to " + std::to_string(data->getRawSize()) + " in thread " + std::to_string(thread_num));
+                                      " from " + std::to_string(insize) + " to " + std::to_string(data->getRawSize()) +
+                                      " in thread " + std::to_string(thread_num));
     }
 
     void StreamSaver::analyze(const std::string &name, gabac::DataBlock *data) {
@@ -49,7 +50,7 @@ namespace dsg {
                           gabac::IOConfiguration::LogLevel::TRACE};
 
         auto aconf = gabac::getCandidateConfig();
-        const auto& params = getParams();
+        const auto &params = getParams();
         aconf.maxValue = params.at(configname).maxval;
         aconf.wordSize = params.at(configname).wordsize;
 
@@ -58,7 +59,38 @@ namespace dsg {
     }
 
     void StreamSaver::compress(const std::string &name, gabac::DataBlock *data) {
-        run_gabac(name, data, false);
+        gabac::DataBlock original;
+        gabac::DataBlock decompressed;
+        if (debug) {
+            original = *data;
+        }
+        try {
+            run_gabac(name, data, false);
+            if (debug) {
+                decompressed = *data;
+                run_gabac(name, &decompressed, true);
+                decompressed.setWordSize(original.getWordSize());
+
+                if (!(decompressed == original)) {
+                    genie::Logger::instance().out("GABAC FAIL DETECTED: " + name);
+                    std::ofstream origFile("gabac_" + name + "_original");
+                    origFile.write((char *) original.getData(), original.getRawSize());
+                    std::ofstream decFile("gabac_" + name + "_decoded");
+                    decFile.write((char *) decompressed.getData(), decompressed.getRawSize());
+                    std::ofstream encFile("gabac_" + name + "_encoded");
+                    encFile.write((char *) data->getData(), data->getRawSize());
+                }
+            }
+        } catch (const gabac::Exception &e) {
+            genie::Logger::instance().out("GABAC EXCEPTION DETECTED: " + name);
+            std::ofstream origFile("gabac_" + name + "_original");
+            origFile.write((char *) original.getData(), original.getRawSize());
+            std::ofstream decFile("gabac_" + name + "_decoded");
+            decFile.write((char *) decompressed.getData(), decompressed.getRawSize());
+            std::ofstream encFile("gabac_" + name + "_encoded");
+            encFile.write((char *) data->getData(), data->getRawSize());
+            throw e;
+        }
     }
 
     void StreamSaver::decompress(const std::string &name, gabac::DataBlock *data) {
@@ -105,14 +137,14 @@ namespace dsg {
 
     void StreamSaver::unpack(const std::string &stream_name, gabac::DataBlock *data) {
         auto position = file_index.find(stream_name);
-        if(position == file_index.end()){
+        if (position == file_index.end()) {
             data->clear();
             return;
         }
         data->resize(size_t(std::ceil(position->second.size / float(data->getWordSize()))));
 
         fin->seekg(position->second.position);
-        fin->read(reinterpret_cast<char*>(data->getData()), position->second.size);
+        fin->read(reinterpret_cast<char *>(data->getData()), position->second.size);
 
         genie::Logger::instance().out("UNPACKING: " + stream_name + " with size " + std::to_string(data->getRawSize()));
 
@@ -150,9 +182,15 @@ namespace dsg {
         return mapping;
     }
 
-    StreamSaver::StreamSaver(const std::string &configp, std::ostream *f, std::istream *ifi) : fout(f), fin(ifi),
-                                                                                               configPath(configp) {
-        if(fin) {
+    StreamSaver::StreamSaver(
+            const std::string &configp,
+            std::ostream *f,
+            std::istream *ifi,
+            bool deb) : debug(deb),
+                        fout(f),
+                        fin(ifi),
+                        configPath(configp) {
+        if (fin) {
             buildIndex();
         }
         reloadConfigSet();
@@ -186,7 +224,7 @@ namespace dsg {
     }
 
     void StreamSaver::loadConfig(const std::string &name) {
-        if(!this->fin) {
+        if (!this->fin) {
             // Load config from file
             std::ifstream t(configPath + name + ".json");
             std::string configstring;
@@ -202,8 +240,8 @@ namespace dsg {
             gabac::EncodingConfiguration enconf(configstring);
 
             configs.emplace(name, enconf);
-        } else{
-            gabac::DataBlock block(0,1);
+        } else {
+            gabac::DataBlock block(0, 1);
             unpack("conf_" + name + ".json", &block);
             std::string json(block.getRawSize(), ' ');
             std::memcpy(&json[0], block.getData(), block.getRawSize());
@@ -219,7 +257,7 @@ namespace dsg {
         }
     }
 
-    void StreamSaver::finish () {
+    void StreamSaver::finish() {
         for (const auto &e : getParams()) {
             std::string params = configs.at(e.first).toJsonString();
             gabac::DataBlock block(&params);
