@@ -33,6 +33,7 @@ ProgramOptions::ProgramOptions(
       verbose(false),
       help(false),
       analyze(false),
+      gabacDebug(false),
       workingDirectory("./"),
       numThreads(1),
       inputFilePath(""),
@@ -75,6 +76,9 @@ void ProgramOptions::processCommandLine(
 
     analyze = false;
     app.add_flag("-g,--generate-configuration", analyze, "Generate a new set of configurations");
+
+    gabacDebug = false;
+    app.add_flag("--gabac-debug", gabacDebug, "Check all gabac streams and write failing streams to hard drive");
 
     numThreads = 1;
     app.add_option("-t,--numThreads", numThreads, "How many threads to launch for parallel execution of Genie. Default is 1.");
