@@ -118,9 +118,9 @@ void ProgramOptions::validate()
     }
     else if (configPath.back() != '/') {
         configPath += "/";
-    }
-    if (!ghc::filesystem::exists(configPath) || !ghc::filesystem::is_directory(configPath)) {
-        throwRuntimeError("Config dir does not exist: " + configPath);
+        if (!ghc::filesystem::exists(configPath) || !ghc::filesystem::is_directory(configPath)) {
+            throwRuntimeError("Config dir does not exist: " + configPath);
+        }
     }
 
     if (!inputFilePairPath.empty()) {
