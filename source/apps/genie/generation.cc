@@ -142,7 +142,7 @@ namespace dsg {
         }
         std::cout << "Temporary directory: " << temp_dir << "\n";
 
-        dsg::StreamSaver saver(programOptions.configPath, nullptr, &in);
+        dsg::StreamSaver saver(programOptions.configPath, nullptr, &in, programOptions.gabacDebug);
 
         bool paired = spring::decompress(temp_dir, &saver);
 
