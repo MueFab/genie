@@ -141,7 +141,9 @@ namespace dsg {
             data->clear();
             return;
         }
-        data->resize(size_t(std::ceil(position->second.size / float(data->getWordSize()))));
+
+        data->setWordSize(1);
+        data->resize(position->second.size);
 
         fin->seekg(position->second.position);
         fin->read(reinterpret_cast<char *>(data->getData()), position->second.size);
