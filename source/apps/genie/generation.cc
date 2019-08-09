@@ -57,7 +57,10 @@ namespace dsg {
                     paired_end,
                     programOptions.workingDirectory,
                     programOptions.analyze,
-                    st
+                    st,
+                    programOptions.preserve_order,
+                    !programOptions.discard_quality,
+                    !programOptions.discard_ids
             );
         } else {
             paired_end = true;
@@ -69,7 +72,10 @@ namespace dsg {
                     paired_end,
                     programOptions.workingDirectory,
                     programOptions.analyze,
-                    st
+                    st,
+                    programOptions.preserve_order,
+                    !programOptions.discard_quality,
+                    !programOptions.discard_ids
             );
         }
     }
@@ -144,7 +150,7 @@ namespace dsg {
 
         dsg::StreamSaver saver(programOptions.configPath, nullptr, &in, programOptions.gabacDebug);
 
-        bool paired = spring::decompress(temp_dir, &saver);
+        bool paired = spring::decompress(temp_dir, &saver, programOptions.combine_pairs);
 
         std::cout << paired << std::endl;
 
