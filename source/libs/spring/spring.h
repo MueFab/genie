@@ -18,8 +18,8 @@ namespace spring {
           utils::FastqFileReader *fastqFileReader1,
           utils::FastqFileReader *fastqFileReader2, int num_thr,
           bool paired_end, const std::string &working_dir, bool analyze,
-          dsg::StreamSaver &st, bool ureads_flag = false,
-          bool preserve_quality = true, bool preserve_id = true);
+          dsg::StreamSaver &st, bool ureads_flag,
+          bool preserve_quality, bool preserve_id);
 
     void call_reorder(const std::string &temp_dir, compression_params &cp);
 
