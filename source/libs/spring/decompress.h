@@ -24,6 +24,8 @@ namespace spring {
 
     void write_fastq_record_to_ostream(std::ostream &out, utils::FastqRecord &fastqRecord, bool preserve_quality);
 
+    void read_fastq_record_from_ifstream(std::ifstream &in, utils::FastqRecord &fastqRecord, bool preserve_quality);
+
 }  // namespace spring
 
 #endif  // SPRING_DECOMPRESS_H_
