@@ -119,7 +119,7 @@ int main(int argc, char **argv) {
 			std::cout << du.access_unit.access_unit_header.num_signatures << std::endl;
 			*/
 			std::cout << "---------" << std::endl;
-			Decode(du.access_unit, collection, RR, previousMappingPos0);
+			decode(du.access_unit, collection, RR, previousMappingPos0);
 			std::cout << "---------" << std::endl;
 		} else if(du.data_unit_type == 0) {
 			std::cout << "RawReference" << std::endl;
