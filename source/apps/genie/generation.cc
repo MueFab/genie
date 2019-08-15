@@ -150,7 +150,7 @@ namespace dsg {
 
         dsg::StreamSaver saver(programOptions.configPath, nullptr, &in, programOptions.gabacDebug);
 
-        bool paired = spring::decompress(temp_dir, &saver, programOptions.combine_pairs);
+        bool paired = spring::decompress(temp_dir, &saver, programOptions.numThreads, programOptions.combine_pairs);
 
         std::cout << paired << std::endl;
 

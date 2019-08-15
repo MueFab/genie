@@ -20,9 +20,11 @@ namespace spring {
 
     void decode_streams_ureads(decoded_desc_t &dec, bool paired_end, bool preserve_quality, bool preserve_id, std::vector<utils::FastqRecord> matched_records[2]);
 
-    bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, bool combine_pairs);
+    bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, int num_thr, bool combine_pairs);
 
     void write_fastq_record_to_ostream(std::ostream &out, utils::FastqRecord &fastqRecord, bool preserve_quality);
+
+    void read_fastq_record_from_ifstream(std::ifstream &in, utils::FastqRecord &fastqRecord, bool preserve_quality);
 
 }  // namespace spring
 
