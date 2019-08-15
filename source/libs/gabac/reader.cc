@@ -1,6 +1,6 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
@@ -20,31 +20,19 @@
 
 namespace gabac {
 
-
-Reader::Reader(
-        DataBlock *const bitstream
-)
-        : m_bitInputStream(bitstream),
-        // m_contextSelector(),
-        m_decBinCabac(m_bitInputStream),
-        m_contextModels(contexttables::buildContextTable()){
-}
-
+Reader::Reader(DataBlock *const bitstream)
+    : m_bitInputStream(bitstream),
+      // m_contextSelector(),
+      m_decBinCabac(m_bitInputStream),
+      m_contextModels(contexttables::buildContextTable()) {}
 
 Reader::~Reader() = default;
 
-
-uint64_t Reader::readAsBIbypass(
-        unsigned int cLength
-){
+uint64_t Reader::readAsBIbypass(unsigned int cLength) {
     return m_decBinCabac.decodeBinsEP(cLength);
 }
 
-
-uint64_t Reader::readAsBIcabac(
-        unsigned int cLength,
-        unsigned int offset
-){
+uint64_t Reader::readAsBIcabac(unsigned int cLength, unsigned int offset) {
     unsigned int bins = 0;
     unsigned int cm = ContextSelector::getContextForBi(offset, 0);
     auto scan = m_contextModels.begin() + cm;
@@ -54,10 +42,7 @@ uint64_t Reader::readAsBIcabac(
     return static_cast<uint64_t>(bins);
 }
 
-
-uint64_t Reader::readAsTUbypass(
-        unsigned int cMax
-){
+uint64_t Reader::readAsTUbypass(unsigned int cMax) {
     unsigned int i = 0;
     while (readAsBIbypass(1) == 1) {
         i++;
@@ -68,11 +53,7 @@ uint64_t Reader::readAsTUbypass(
     return static_cast<uint64_t>(i);
 }
 
-
-uint64_t Reader::readAsTUcabac(
-        unsigned int cMax,
-        unsigned int offset
-){
+uint64_t Reader::readAsTUcabac(unsigned int cMax, unsigned int offset) {
     unsigned int i = 0;
     unsigned int cm = ContextSelector::getContextForTu(offset, i);
     auto scan = m_contextModels.begin() + cm;
@@ -87,10 +68,7 @@ uint64_t Reader::readAsTUcabac(
     return static_cast<uint64_t>(i);
 }
 
-
-uint64_t Reader::readAsEGbypass(
-        unsigned int
-){
+uint64_t Reader::readAsEGbypass(unsigned int) {
     unsigned int bins = 0;
     unsigned int i = 0;
     while (readAsBIbypass(1) == 0) {
@@ -104,11 +82,7 @@ uint64_t Reader::readAsEGbypass(
     return static_cast<uint64_t>(bins - 1);
 }
 
-
-uint64_t Reader::readAsEGcabac(
-        unsigned int,
-        unsigned int offset
-){
+uint64_t Reader::readAsEGcabac(unsigned int, unsigned int offset) {
     unsigned int cm = ContextSelector::getContextForEg(offset, 0);
     auto scan = m_contextModels.begin() + cm;
     unsigned int i = 0;
@@ -122,47 +96,38 @@ uint64_t Reader::readAsEGcabac(
     } else {
         return 0;
     }
-    return static_cast<uint64_t >(bins - 1);
+    return static_cast<uint64_t>(bins - 1);
 }
 
-
-uint64_t Reader::readAsSEGbypass(
-        unsigned int
-){
+uint64_t Reader::readAsSEGbypass(unsigned int) {
     uint64_t tmp = readAsEGbypass(0);
     // Save, only last bit
-    if ((static_cast<uint64_t> (tmp) & 0x1u) == 0) {
+    if ((static_cast<uint64_t>(tmp) & 0x1u) == 0) {
         if (tmp == 0) {
             return 0;
         } else {
-            return static_cast<uint64_t >(-1 * static_cast<int64_t>(tmp >> 1u));
+            return static_cast<uint64_t>(-1 * static_cast<int64_t>(tmp >> 1u));
         }
     } else {
         return (static_cast<uint64_t>(tmp + 1) >> 1u);
     }
 }
 
-
-uint64_t Reader::readAsSEGcabac(
-        unsigned int,
-        unsigned int offset
-){
+uint64_t Reader::readAsSEGcabac(unsigned int, unsigned int offset) {
     uint64_t tmp = readAsEGcabac(0, offset);
     if ((static_cast<uint64_t>(tmp) & 0x1u) == 0) {
         if (tmp == 0) {
             return 0;
         } else {
-            return (static_cast<uint64_t>(-1 * static_cast<int64_t>(tmp >> 1u)));
+            return (
+                static_cast<uint64_t>(-1 * static_cast<int64_t>(tmp >> 1u)));
         }
     } else {
         return (tmp + 1) >> 1u;
     }
 }
 
-
-uint64_t Reader::readAsTEGbypass(
-        unsigned int treshold
-){
+uint64_t Reader::readAsTEGbypass(unsigned int treshold) {
     uint64_t value = readAsTUbypass(treshold);
     if (static_cast<unsigned int>(value) == treshold) {
         value += readAsEGbypass(0);
@@ -170,11 +135,7 @@ uint64_t Reader::readAsTEGbypass(
     return value;
 }
 
-
-uint64_t Reader::readAsTEGcabac(
-        unsigned int treshold,
-        unsigned int offset
-){
+uint64_t Reader::readAsTEGcabac(unsigned int treshold, unsigned int offset) {
     uint64_t value = readAsTUcabac(treshold, offset);
     if (static_cast<unsigned int>(value) == treshold) {
         value += readAsEGcabac(0, offset);
@@ -182,10 +143,7 @@ uint64_t Reader::readAsTEGcabac(
     return value;
 }
 
-
-uint64_t Reader::readAsSTEGbypass(
-        unsigned int treshold
-){
+uint64_t Reader::readAsSTEGbypass(unsigned int treshold) {
     uint64_t value = readAsTEGbypass(treshold);
     if (value != 0) {
         if (readAsBIbypass(1) == 1) {
@@ -197,11 +155,7 @@ uint64_t Reader::readAsSTEGbypass(
     return value;
 }
 
-
-uint64_t Reader::readAsSTEGcabac(
-        unsigned int treshold,
-        unsigned int offset
-){
+uint64_t Reader::readAsSTEGcabac(unsigned int treshold, unsigned int offset) {
     uint64_t value = readAsTEGcabac(treshold, offset);
     if (value != 0) {
         if (readAsBIcabac(1, offset) == 1) {
@@ -213,22 +167,16 @@ uint64_t Reader::readAsSTEGcabac(
     return value;
 }
 
-
-size_t Reader::readNumSymbols(){
+size_t Reader::readNumSymbols() {
     auto result = readAsBIbypass(32);
     return static_cast<size_t>(result);
 }
 
+size_t Reader::start() { return readNumSymbols(); }
 
-size_t Reader::start(){
-    return readNumSymbols();
-}
-
-
-void Reader::reset(){
+void Reader::reset() {
     m_contextModels = contexttables::buildContextTable();
     m_decBinCabac.reset();
 }
-
 
 }  // namespace gabac

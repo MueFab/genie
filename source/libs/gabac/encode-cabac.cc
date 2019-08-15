@@ -1,6 +1,6 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
@@ -15,19 +15,18 @@
 
 namespace gabac {
 
-void encode_cabac(
-        const BinarizationId& binarizationId,
-        const std::vector<unsigned int>& binarizationParameters,
-        const ContextSelectionId& contextSelectionId,
-        DataBlock *const symbols,
-        size_t maxSize
-){
+void encode_cabac(const BinarizationId& binarizationId,
+                  const std::vector<unsigned int>& binarizationParameters,
+                  const ContextSelectionId& contextSelectionId,
+                  DataBlock* const symbols, size_t maxSize) {
     DataBlock bitstream(0, 1);
     assert(symbols != nullptr);
 #ifndef NDEBUG
-    const unsigned int paramSize[unsigned(BinarizationId::STEG) + 1u] = {1, 1, 0, 0, 1, 1};
+    const unsigned int paramSize[unsigned(BinarizationId::STEG) + 1u] = {
+        1, 1, 0, 0, 1, 1};
 #endif
-    assert(binarizationParameters.size() >= paramSize[static_cast<int>(binarizationId)]);
+    assert(binarizationParameters.size() >=
+           paramSize[static_cast<int>(binarizationId)]);
 
     Writer writer(&bitstream);
     writer.start(symbols->size());
@@ -67,10 +66,7 @@ void encode_cabac(
             if (maxSize <= bitstream.size()) {
                 break;
             }
-            (writer.*func)(
-                    r.get(),
-                    binarizationParameter
-            );
+            (writer.*func)(r.get(), binarizationParameter);
             r.inc();
         }
 
@@ -110,25 +106,19 @@ void encode_cabac(
             if (maxSize <= bitstream.size()) {
                 break;
             }
-            (writer.*func)(
-                    r.get(),
-                    binarizationParameter,
-                    0
-            );
+            (writer.*func)(r.get(), binarizationParameter, 0);
             r.inc();
         }
-    } else if (contextSelectionId == ContextSelectionId::adaptive_coding_order_1) {
+    } else if (contextSelectionId ==
+               ContextSelectionId::adaptive_coding_order_1) {
         unsigned int previousSymbol = 0;
         while (r.isValid()) {
             if (maxSize <= bitstream.size()) {
                 break;
             }
             uint64_t symbol = r.get();
-            (writer.*func)(
-                    r.get(),
-                    binarizationParameter,
-                    previousSymbol << 2u
-            );
+            (writer.*func)(r.get(), binarizationParameter,
+                           previousSymbol << 2u);
             if (int64_t(symbol) < 0) {
                 symbol = uint64_t(-int64_t(symbol));
             }
@@ -140,7 +130,8 @@ void encode_cabac(
             }
             r.inc();
         }
-    } else if (contextSelectionId == ContextSelectionId::adaptive_coding_order_2) {
+    } else if (contextSelectionId ==
+               ContextSelectionId::adaptive_coding_order_2) {
         unsigned int previousSymbol = 0;
         unsigned int previousPreviousSymbol = 0;
         while (r.isValid()) {
@@ -148,11 +139,8 @@ void encode_cabac(
                 break;
             }
             uint64_t symbol = r.get();
-            (writer.*func)(
-                    symbol,
-                    binarizationParameter,
-                    (previousSymbol << 2u) + previousPreviousSymbol
-            );
+            (writer.*func)(symbol, binarizationParameter,
+                           (previousSymbol << 2u) + previousPreviousSymbol);
             previousPreviousSymbol = previousSymbol;
             if (int64_t(symbol) < 0) {
                 symbol = uint64_t(-int64_t(symbol));

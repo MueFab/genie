@@ -1,6 +1,6 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
@@ -13,20 +13,11 @@
 
 namespace gabac {
 
+void transformRleCoding(uint64_t guard, DataBlock *rawValues,
+                        DataBlock *lengths);
 
-void transformRleCoding(
-        uint64_t guard,
-        DataBlock *rawValues,
-        DataBlock *lengths
-);
-
-
-void inverseTransformRleCoding(
-        uint64_t guard,
-        DataBlock *rawValues,
-        DataBlock *lengths
-);
-
+void inverseTransformRleCoding(uint64_t guard, DataBlock *rawValues,
+                               DataBlock *lengths);
 
 }  // namespace gabac
 
