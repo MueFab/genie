@@ -13,12 +13,11 @@
 #include "log.h"
 
 extern "C" {
-#include <format/DataUnits/data-units.h>
-#include <format/encoding-parameters.h>
+//#include <format/DataUnits/data-units.h>
+//#include <format/encoding-parameters.h>
 }
 
 #include <gabac/gabac.h>
-
 
 namespace genie {
 
@@ -348,20 +347,20 @@ void encode(const ProgramOptions &programOptions)
         const uint32_t ACCESS_UNIT_ID = 0;
         const uint8_t NUM_BLOCKS = 1;
         const uint16_t PARAMETER_SET_ID = 0;
-        const ClassType CLASS_TYPE = { .classType = CLASS_TYPE_CLASS_U };
+   //     const ClassType CLASS_TYPE = { .classType = CLASS_TYPE_CLASS_U };
         const uint32_t READS_COUNT = 1;
         const uint16_t MM_THRESHOLD = 0;
         const uint32_t MM_COUNT = 0;
-        const SequenceID SEQUENCE_ID = { .sequenceID = 0 };
+   //     const SequenceID SEQUENCE_ID = { .sequenceID = 0 };
         const uint64_t REFERENCE_START_POS = 0;
         const uint64_t REFERENCE_END_POS = 0;
-        const SequenceID REFSEQUENCE_ID = { .sequenceID = 0 };
+  //      const SequenceID REFSEQUENCE_ID = { .sequenceID = 0 };
         const uint64_t AU_START_POSITION = 0;
         const uint64_t AU_END_POSITION = 0;
         const uint64_t EXTENDED_AU_START_POSITION = 0;
         const uint64_t EXTENDED_AU_END_POSITION = 0;
 
-        DataUnitAccessUnit* const accessUnit = initDataUnitAccessUnit(
+  /*      DataUnitAccessUnit* const accessUnit = initDataUnitAccessUnit(
                 ACCESS_UNIT_ID,
                 NUM_BLOCKS,
                 PARAMETER_SET_ID,
@@ -377,11 +376,11 @@ void encode(const ProgramOptions &programOptions)
                 AU_END_POSITION,
                 EXTENDED_AU_START_POSITION,
                 EXTENDED_AU_END_POSITION
-         );
+         );*/
 
         // DatasetContainer* const datasetContainer = initDatasetContainer();
         const uint8_t DESCRIPTOR_ID = 6;
-        DataUnitBlockHeader* blockHeader = initDataUnitBlockHeader(DESCRIPTOR_ID, BLOCK_PAYLOAD_SIZE);
+     /*   DataUnitBlockHeader* blockHeader = initDataUnitBlockHeader(DESCRIPTOR_ID, BLOCK_PAYLOAD_SIZE);
         Block* const block = initBlockWithHeaderPayloadInMemory(
                 DESCRIPTOR_ID,
                 BLOCK_PAYLOAD_SIZE,
@@ -393,7 +392,7 @@ void encode(const ProgramOptions &programOptions)
             GENIE_DIE("addBlockToDataUnitAccessUnit() failed");
         }
 
-        freeDataUnitAccessUnit(accessUnit);
+        freeDataUnitAccessUnit(accessUnit);*/
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
         // WRITE TO FILE
