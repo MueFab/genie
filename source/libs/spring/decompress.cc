@@ -16,15 +16,9 @@
 namespace spring {
 
     void decode_streams(decoded_desc_t &dec, bool paired_end, bool preserve_quality, bool preserve_id, bool combine_pairs, std::vector<utils::FastqRecord> matched_records[2], std::vector<utils::FastqRecord> unmatched_records[2], std::vector<uint32_t> &mate_au_id, std::vector<uint32_t> &mate_record_index) {
-        /*
-         * return values are matched_records[2] (for pairs that are matched), unmatched_records[2] (for pairs that are unmatched), mate_au_id, mate_record_index (which store position of the pair of the unmatched_records[1]). For single end case, only matched_records[0] is populated, for paired end reads with combine_pairs false, only matched_records[0] and matched_records[1] are populated (unmatched records also put in these). For paired end with combine_pairs true, matched_records arrays contain the matched records and have equal size, unmatched_records have the records that don't have pair within the same AU, and mate_au_id & mate_au_id contain the information needed to match them together.
-         */
-        for (int j = 0; j < 2; j++) {
-            matched_records[j].clear();
-            unmatched_records[j].clear();
-        }
-        mate_au_id.clear();
-        mate_record_index.clear();
+       /*
+        * return values are matched_records[2] (for pairs that are matched), unmatched_records[2] (for pairs that are unmatched), mate_au_id, mate_record_index (which store position of the pair of the unmatched_records[1]). For single end case, only matched_records[0] is populated, for paired end reads with combine_pairs false, only matched_records[0] and matched_records[1] are populated (unmatched records also put in these). For paired end with combine_pairs true, matched_records arrays contain the matched records and have equal size, unmatched_records have the records that don't have pair within the same AU, and mate_au_id & mate_au_id contain the information needed to match them together.
+        */
         std::vector<uint32_t> mate_record_index_same_rec; // for sorting in the combine_pairs case
         std::vector<utils::FastqRecord> unmatched_same_au[2];
         std::string cur_quality[2];
@@ -292,7 +286,7 @@ namespace spring {
         return;
     }
 
-    bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, bool combine_pairs) {
+    bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, int num_thr, bool combine_pairs) {
         // decompress to temp_dir/decompressed.fastq
 
         std::string basedir = temp_dir;
@@ -318,16 +312,17 @@ namespace spring {
         if (cp.paired_end) {
             fout2.open(file_decompressed_fastq2);
         }
-        std::vector<utils::FastqRecord> matched_records[2], unmatched_records[2];
-        std::vector<uint32_t> mate_au_id, mate_record_index;
+        std::vector<utils::FastqRecord> (*matched_records)[2] = new std::vector<utils::FastqRecord> [num_thr][2];
+        std::vector<utils::FastqRecord> (*unmatched_records)[2] = new std::vector<utils::FastqRecord> [num_thr][2];
+        std::vector<uint32_t> *mate_au_id = new std::vector<uint32_t>[num_thr];
+        std::vector<uint32_t> *mate_record_index = new std::vector<uint32_t>[num_thr];
 
-        // vectors to hold unmatched reads with mate in different AU (in combine_pairs case).
-        // also store vectors to hold the AUid and indices which will be used later for combining.
+        // store vectors to hold the AUid and indices which will be used later for combining.
         std::vector<utils::FastqRecord> unmatched_records_concat[2];
         std::vector<uint32_t> mate_au_id_concat, mate_record_index_concat;
 
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for ordered num_threads(cp.num_thr)
+#pragma omp parallel for ordered num_threads(num_thr) schedule(dynamic)
 #endif
         for (uint32_t block_num = 0; block_num < cp.num_blocks; block_num++) {
             dsg::AcessUnitStreams sstreams;
@@ -335,7 +330,10 @@ namespace spring {
             gabac::DataBlock qualityBlock(0, 1);
             decoded_desc_t dec;
 #ifdef GENIE_USE_OPENMP
+            int tid = omp_get_thread_num();
 #pragma omp critical
+#else
+            int tid = 0;
 #endif
             {
                 for (auto arr : subseq_indices) {
@@ -400,36 +398,37 @@ namespace spring {
             }
 
             // Decompression gabac end
+                if (cp.ureads_flag) {
+                    decode_streams_ureads(dec, cp.paired_end, cp.preserve_quality, cp.preserve_id, matched_records[tid]);
+                } else {
+                    decode_streams(dec, cp.paired_end, cp.preserve_quality, cp.preserve_id, combine_pairs, matched_records[tid], unmatched_records[tid], mate_au_id[tid], mate_record_index[tid]);
+
+                }
 #ifdef GENIE_USE_OPENMP
 #pragma omp ordered
 #endif
             {
-                if (cp.ureads_flag) {
-                    decode_streams_ureads(dec, cp.paired_end, cp.preserve_quality, cp.preserve_id, matched_records);
-                    for (int j = 0; j < 2; j++) {
-                        if (j == 1 && !cp.paired_end)
-                            break;
-                        std::ostream &tmpout = (j == 0) ? fout : fout2;
-                        for (auto fastqRecord : matched_records[j])
-                            write_fastq_record_to_ostream(tmpout, fastqRecord, cp.preserve_quality);
-                    }
-                } else {
-                    decode_streams(dec, cp.paired_end, cp.preserve_quality, cp.preserve_id, combine_pairs, matched_records, unmatched_records, mate_au_id, mate_record_index);
-                    if (cp.paired_end && combine_pairs) {
-                        for (int j = 0; j < 2; j++)
-                            unmatched_records_concat[j].insert(unmatched_records_concat[j].end(), unmatched_records[j].begin(), unmatched_records[j].end());
-                        mate_au_id_concat.insert(mate_au_id_concat.end(), mate_au_id.begin(), mate_au_id.end());
-                        mate_record_index_concat.insert(mate_record_index_concat.end(), mate_record_index.begin(), mate_record_index.end());
-                    }
-                    for (int j = 0; j < 2; j++) {
-                        if (j == 1 && !cp.paired_end)
-                            break;
-                        std::ostream &tmpout = (j == 0) ? fout : fout2;
-                        for (auto fastqRecord : matched_records[j])
-                            write_fastq_record_to_ostream(tmpout, fastqRecord, cp.preserve_quality);
-                    }
+                for (int j = 0; j < 2; j++) {
+                    if (j == 1 && !cp.paired_end)
+                        break;
+                    std::ostream &tmpout = (j == 0) ? fout : fout2;
+                    for (auto fastqRecord : matched_records[tid][j])
+                        write_fastq_record_to_ostream(tmpout, fastqRecord, cp.preserve_quality);
+                }
+                if (cp.paired_end && combine_pairs) {
+                    for (int j = 0; j < 2; j++)
+                        unmatched_records_concat[j].insert(unmatched_records_concat[j].end(), unmatched_records[tid][j].begin(), unmatched_records[tid][j].end());
+                    mate_au_id_concat.insert(mate_au_id_concat.end(), mate_au_id[tid].begin(), mate_au_id[tid].end());
+                    mate_record_index_concat.insert(mate_record_index_concat.end(), mate_record_index[tid].begin(), mate_record_index[tid].end());
                 }
             }
+
+            for (int j = 0; j < 2; j++) {
+                matched_records[tid][j].clear();
+                unmatched_records[tid][j].clear();
+            }
+            mate_au_id[tid].clear();
+            mate_record_index[tid].clear();
         }
 
         // now reorder the remaining unmatched reads so that they are paired and then write them to file.
@@ -463,6 +462,10 @@ namespace spring {
         bool paired_end = cp.paired_end;
         delete cp_ptr;
 
+        delete[] matched_records;
+        delete[] unmatched_records;
+        delete[] mate_au_id;
+        delete[] mate_record_index;
         return paired_end;
     }
 
