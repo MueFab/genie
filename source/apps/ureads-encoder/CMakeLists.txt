@@ -13,9 +13,7 @@ set(source_files
         main.cc
         output-file.cc
         program-options.cc
-)
+        part2_format.h part2_format.cc part2_format_access_unit.cc part2_format_access_unit.h part2_format_parameter_set.cc part2_format_parameter_set.h part2_format_bitwriter.cc part2_format_bitwriter.h part2_format_raw_reference.cc part2_format_raw_reference.h part2_format_data_unit.cc part2_format_data_unit.h)
 
 add_executable(ureads-encoder ${source_files})
-
-target_link_libraries(ureads-encoder PRIVATE format)
 target_link_libraries(ureads-encoder PRIVATE gabac)
