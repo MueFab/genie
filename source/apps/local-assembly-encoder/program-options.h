@@ -5,18 +5,19 @@
 
 namespace lae {
 
-    class ProgramOptions {
-    public:
-        ProgramOptions(int argc, char *argv[]);
+class ProgramOptions {
+   public:
+    ProgramOptions(int argc, char *argv[]);
 
-        ~ProgramOptions();
+    ~ProgramOptions();
 
-    public:
-        std::string inputFilePath;
-        std::string outputFilePath;
-    private:
-        void processCommandLine(int argc, char *argv[]);
-    };
+   public:
+    std::string inputFilePath;
+    std::string outputFilePath;
+
+   private:
+    void processCommandLine(int argc, char *argv[]);
+};
 
 }  // namespace lae
 

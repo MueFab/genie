@@ -1,6 +1,6 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
@@ -10,29 +10,23 @@
 
 #include "cabac-tables.h"
 
-
 namespace gabac {
 
-
 BinaryArithmeticEncoder::BinaryArithmeticEncoder(
-        const BitOutputStream& bitOutputStream
-)
-        : m_bitOutputStream(bitOutputStream){
+    const BitOutputStream& bitOutputStream)
+    : m_bitOutputStream(bitOutputStream) {
     start();
 }
 
-
 BinaryArithmeticEncoder::~BinaryArithmeticEncoder() = default;
 
-
 inline void BinaryArithmeticEncoder::encodeBin(
-        unsigned int bin,
-        ContextModel *const contextModel
-){
+    unsigned int bin, ContextModel* const contextModel) {
     assert((bin == 0) || (bin == 1));
     assert(contextModel != nullptr);
 
-    unsigned int lps = cabactables::lpsTable[contextModel->getState()][(m_range >> 6u) & 3u];
+    unsigned int lps =
+        cabactables::lpsTable[contextModel->getState()][(m_range >> 6u) & 3u];
     m_range -= lps;
     if (bin != contextModel->getMps()) {
         unsigned int numBits = cabactables::renormTable[(lps >> 3u)];
@@ -54,10 +48,7 @@ inline void BinaryArithmeticEncoder::encodeBin(
     }
 }
 
-
-void BinaryArithmeticEncoder::encodeBinEP(
-        unsigned int bin
-){
+void BinaryArithmeticEncoder::encodeBinEP(unsigned int bin) {
     assert((bin == 0) || (bin == 1));
 
     m_low <<= 1;
@@ -70,11 +61,8 @@ void BinaryArithmeticEncoder::encodeBinEP(
     }
 }
 
-
-void BinaryArithmeticEncoder::encodeBinsEP(
-        unsigned int bins,
-        unsigned int numBins
-){
+void BinaryArithmeticEncoder::encodeBinsEP(unsigned int bins,
+                                           unsigned int numBins) {
     while (numBins > 8) {
         numBins -= 8;
         unsigned int pattern = bins >> numBins;
@@ -94,10 +82,7 @@ void BinaryArithmeticEncoder::encodeBinsEP(
     }
 }
 
-
-void BinaryArithmeticEncoder::encodeBinTrm(
-        unsigned int bin
-){
+void BinaryArithmeticEncoder::encodeBinTrm(unsigned int bin) {
     // Encode the least-significant bit of bin as a terminating bin
     m_range -= 2;
     if (bin != 0) {
@@ -117,8 +102,7 @@ void BinaryArithmeticEncoder::encodeBinTrm(
     }
 }
 
-
-void BinaryArithmeticEncoder::flush(){
+void BinaryArithmeticEncoder::flush() {
     encodeBinTrm(1);
     finish();
     m_bitOutputStream.write(1, 1);
@@ -127,8 +111,7 @@ void BinaryArithmeticEncoder::flush(){
     start();
 }
 
-
-void BinaryArithmeticEncoder::start(){
+void BinaryArithmeticEncoder::start() {
     m_bufferedByte = 0xff;
     m_low = 0;
     m_numBitsLeft = 23;
@@ -136,8 +119,7 @@ void BinaryArithmeticEncoder::start(){
     m_range = 510;
 }
 
-
-void BinaryArithmeticEncoder::finish(){
+void BinaryArithmeticEncoder::finish() {
     if ((m_low >> (32u - m_numBitsLeft)) > 0) {
         m_bitOutputStream.write((m_bufferedByte + 1), 8);
         while (m_numBufferedBytes > 1) {
@@ -157,8 +139,7 @@ void BinaryArithmeticEncoder::finish(){
     m_bitOutputStream.write(m_low >> 8u, (24u - m_numBitsLeft));
 }
 
-
-void BinaryArithmeticEncoder::writeOut(){
+void BinaryArithmeticEncoder::writeOut() {
     unsigned int leadByte = m_low >> (24u - m_numBitsLeft);
     m_numBitsLeft += 8;
     m_low &= 0xffffffffu >> m_numBitsLeft;
@@ -183,6 +164,5 @@ void BinaryArithmeticEncoder::writeOut(){
         }
     }
 }
-
 
 }  // namespace gabac

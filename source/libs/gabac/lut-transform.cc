@@ -1,6 +1,6 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
@@ -21,14 +21,11 @@ namespace gabac {
 
 const size_t MAX_LUT_SIZE = 1u << 20u;  // 8MB table
 
-
-// Inplace not reasonable, because symbols stream is reused 100% of time and lut is much smaller
-static void inferLut0(
-        const DataBlock& symbols,
-        std::vector<std::pair<uint64_t, uint64_t>> *const lut,
-        DataBlock *const fastlut,
-        DataBlock *const inverseLut
-){
+// Inplace not reasonable, because symbols stream is reused 100% of time and lut
+// is much smaller
+static void inferLut0(const DataBlock& symbols,
+                      std::vector<std::pair<uint64_t, uint64_t>>* const lut,
+                      DataBlock* const fastlut, DataBlock* const inverseLut) {
     uint64_t maxValue = 0;
 
     // At some point it is more efficient to use an hashmap instead of an array
@@ -40,7 +37,8 @@ static void inferLut0(
     } else if (symbols.getWordSize() == 2) {
         maxValue = std::numeric_limits<uint16_t>::max();
     } else {
-        // For greater wordsizes: find max and check if small enough for array counter
+        // For greater wordsizes: find max and check if small enough for array
+        // counter
         for (size_t i = 0; i < symbols.size(); ++i) {
             uint64_t val = symbols.get(i);
             if (val > maxValue) {
@@ -50,7 +48,8 @@ static void inferLut0(
                 break;
             }
         }
-        // Step 1: basic mapping for order 0. All symbols are now in a dense interval starting [0...N]
+        // Step 1: basic mapping for order 0. All symbols are now in a dense
+        // interval starting [0...N]
     }
 
     // Clear
@@ -59,7 +58,6 @@ static void inferLut0(
     if (symbols.empty()) {
         return;
     }
-
 
     std::vector<std::pair<uint64_t, uint64_t>> freqVec;
 
@@ -90,47 +88,36 @@ static void inferLut0(
         std::copy(freq.begin(), freq.end(), std::back_inserter(freqVec));
     }
 
-
     // Sort symbol frequencies in descending order
-    std::sort(
-            freqVec.begin(), freqVec.end(),
-            [](const std::pair<uint64_t, uint64_t>& a,
-               const std::pair<uint64_t, uint64_t>& b
-            )
-            {
-                if (a.second > b.second) {
-                    return true;
-                }
-                if (a.second < b.second) {
-                    return false;
-                }
-                return a.first < b.first;
-            }
-    );
-
+    std::sort(freqVec.begin(), freqVec.end(),
+              [](const std::pair<uint64_t, uint64_t>& a,
+                 const std::pair<uint64_t, uint64_t>& b) {
+                  if (a.second > b.second) {
+                      return true;
+                  }
+                  if (a.second < b.second) {
+                      return false;
+                  }
+                  return a.first < b.first;
+              });
 
     for (const auto& symbol : freqVec) {
         lut->emplace_back(symbol.first, inverseLut->size());
         inverseLut->emplace_back(symbol.first);
     }
 
-
     // Sort symbols
-    std::sort(
-            lut->begin(), lut->end(),
-            [](const std::pair<uint64_t, uint64_t>& a,
-               const std::pair<uint64_t, uint64_t>& b
-            )
-            {
-                if (a.first < b.first) {
-                    return true;
-                }
-                if (a.first > b.first) {
-                    return false;
-                }
-                return a.second > b.second;
-            }
-    );
+    std::sort(lut->begin(), lut->end(),
+              [](const std::pair<uint64_t, uint64_t>& a,
+                 const std::pair<uint64_t, uint64_t>& b) {
+                  if (a.first < b.first) {
+                      return true;
+                  }
+                  if (a.first > b.first) {
+                      return false;
+                  }
+                  return a.second > b.second;
+              });
 
     if (maxValue < CTR_THRESHOLD) {
         fastlut->resize(maxValue + 1);
@@ -140,44 +127,28 @@ static void inferLut0(
     }
 }
 
-// ----------------------------------------------------------------------------
-
 static uint64_t lut0SingleTransform(
-        const std::vector<std::pair<uint64_t, uint64_t>>& lut0,
-        uint64_t symbol
-){
-    auto it = std::lower_bound(
-            lut0.begin(), lut0.end(), std::make_pair(symbol, uint(0)),
-            [](const std::pair<uint64_t, uint64_t>& a,
-               const std::pair<uint64_t, uint64_t>& b
-            )
-            {
-                return a.first < b.first;
-            }
-    );
+    const std::vector<std::pair<uint64_t, uint64_t>>& lut0, uint64_t symbol) {
+    auto it = std::lower_bound(lut0.begin(), lut0.end(),
+                               std::make_pair(symbol, uint(0)),
+                               [](const std::pair<uint64_t, uint64_t>& a,
+                                  const std::pair<uint64_t, uint64_t>& b) {
+                                   return a.first < b.first;
+                               });
     assert(it != lut0.end());
     assert(it->first == symbol);
     return it->second;
 }
 
-// ----------------------------------------------------------------------------
-
-static uint64_t lut0SingleTransformFast(
-        const DataBlock& lut0,
-        uint64_t symbol
-){
+static uint64_t lut0SingleTransformFast(const DataBlock& lut0,
+                                        uint64_t symbol) {
     return lut0.get(symbol);
 }
 
-// ----------------------------------------------------------------------------
-
 static void transformLutTransform_core(
-        const size_t ORDER,
-        const std::vector<std::pair<uint64_t, uint64_t>>& lut0,
-        const DataBlock& fastlut,
-        const DataBlock& lut,
-        DataBlock *const transformedSymbols
-){
+    const size_t ORDER, const std::vector<std::pair<uint64_t, uint64_t>>& lut0,
+    const DataBlock& fastlut, const DataBlock& lut,
+    DataBlock* const transformedSymbols) {
     assert(transformedSymbols != nullptr);
 
     if (transformedSymbols->empty()) {
@@ -185,7 +156,6 @@ static void transformLutTransform_core(
     }
 
     std::vector<uint64_t> lastSymbols(ORDER + 1, 0);
-
 
     BlockStepper r = transformedSymbols->getReader();
     while (r.isValid()) {
@@ -218,16 +188,11 @@ static void transformLutTransform_core(
     }
 }
 
-// ----------------------------------------------------------------------------
-
-static void inverseTransformLutTransform_core(
-        const size_t ORDER,
-        DataBlock *const symbols,
-        DataBlock *const inverseLut0,
-        DataBlock *const inverseLut
-){
+static void inverseTransformLutTransform_core(const size_t ORDER,
+                                              DataBlock* const symbols,
+                                              DataBlock* const inverseLut0,
+                                              DataBlock* const inverseLut) {
     assert(symbols != nullptr);
-
 
     std::vector<uint64_t> lastSymbols(ORDER + 1, 0);
 
@@ -265,15 +230,10 @@ static void inverseTransformLutTransform_core(
     }
 }
 
-void inferLut(
-        const size_t ORDER,
-        const DataBlock& symbols,
-        std::vector<std::pair<uint64_t, uint64_t>> *const lut0,
-        DataBlock *const fastlut,
-        DataBlock *const inverseLut0,
-        DataBlock *const lut1,
-        DataBlock *const inverseLut1
-){
+void inferLut(const size_t ORDER, const DataBlock& symbols,
+              std::vector<std::pair<uint64_t, uint64_t>>* const lut0,
+              DataBlock* const fastlut, DataBlock* const inverseLut0,
+              DataBlock* const lut1, DataBlock* const inverseLut1) {
     // Clear
     lut1->clear();
     inverseLut1->clear();
@@ -298,7 +258,8 @@ void inferLut(
         return;
     }
 
-    std::vector<std::pair<uint64_t, uint64_t>> ctr(size, {std::numeric_limits<uint64_t>::max(), 0});
+    std::vector<std::pair<uint64_t, uint64_t>> ctr(
+        size, {std::numeric_limits<uint64_t>::max(), 0});
     std::vector<uint64_t> lastSymbols(ORDER + 1, 0);
 
     BlockStepper r = symbols.getReader();
@@ -322,7 +283,6 @@ void inferLut(
         index *= inverseLut0->size();
         index += lastSymbols[0];
 
-
         // Count
         ctr[index].second++;
         r.inc();
@@ -331,32 +291,30 @@ void inferLut(
     // Step through all single LUTs
     for (size_t i = 0; i < ctr.size(); i += inverseLut0->size()) {
         uint64_t counter = 0;
-        for (auto it = ctr.begin() + i; it != ctr.begin() + i + inverseLut0->size(); ++it) {
+        for (auto it = ctr.begin() + i;
+             it != ctr.begin() + i + inverseLut0->size(); ++it) {
             it->first = counter;
             counter++;
         }
 
         // Sort single LUT for frequency
-        std::sort(
-                ctr.begin() + i, ctr.begin() + i + inverseLut0->size(),
-                [](const std::pair<uint64_t, uint64_t>& a,
-                   const std::pair<uint64_t, uint64_t>& b
-                )
-                {
-                    if (a.second > b.second) {
-                        return true;
-                    }
-                    if (a.second < b.second) {
-                        return false;
-                    }
-                    return a.first < b.first;
-                }
-        );
+        std::sort(ctr.begin() + i, ctr.begin() + i + inverseLut0->size(),
+                  [](const std::pair<uint64_t, uint64_t>& a,
+                     const std::pair<uint64_t, uint64_t>& b) {
+                      if (a.second > b.second) {
+                          return true;
+                      }
+                      if (a.second < b.second) {
+                          return false;
+                      }
+                      return a.first < b.first;
+                  });
 
         // Fill inverseLUT and write rank into second field
         counter = 0;
         bool placed = false;
-        for (auto it = ctr.begin() + i; it != ctr.begin() + i + inverseLut0->size(); ++it) {
+        for (auto it = ctr.begin() + i;
+             it != ctr.begin() + i + inverseLut0->size(); ++it) {
             if (it->second == 0 && !placed) {
                 placed = true;
             }
@@ -369,42 +327,37 @@ void inferLut(
             counter++;
         }
 
-
         // Sort single LUT for symbol value
-        std::sort(
-                ctr.begin() + i, ctr.begin() + i + inverseLut0->size(),
-                [](const std::pair<uint64_t, uint64_t>& a,
-                   const std::pair<uint64_t, uint64_t>& b
-                )
-                {
-                    if (a.first < b.first) {
-                        return true;
-                    }
-                    if (a.first > b.first) {
-                        return false;
-                    }
-                    return a.second > b.second;
-                }
-        );
+        std::sort(ctr.begin() + i, ctr.begin() + i + inverseLut0->size(),
+                  [](const std::pair<uint64_t, uint64_t>& a,
+                     const std::pair<uint64_t, uint64_t>& b) {
+                      if (a.first < b.first) {
+                          return true;
+                      }
+                      if (a.first > b.first) {
+                          return false;
+                      }
+                      return a.second > b.second;
+                  });
 
         // Use previously set second field to fill LUT
-        for (auto it = ctr.begin() + i; it != ctr.begin() + i + inverseLut0->size(); ++it) {
+        for (auto it = ctr.begin() + i;
+             it != ctr.begin() + i + inverseLut0->size(); ++it) {
             lut1->emplace_back(it->second);
         }
     }
 }
-// ----------------------------------------------------------------------------
 
-void transformLutTransform(
-        unsigned order,
-        DataBlock *const transformedSymbols,
-        DataBlock *const inverseLUT,
-        DataBlock *const inverseLUT1
-){
+void transformLutTransform(unsigned order, DataBlock* const transformedSymbols,
+                           DataBlock* const inverseLUT,
+                           DataBlock* const inverseLUT1) {
     std::vector<std::pair<uint64_t, uint64_t>> lut;
-    DataBlock fastlut(0, transformedSymbols->getWordSize());  // For small, dense symbol spaces
+    DataBlock fastlut(
+        0,
+        transformedSymbols->getWordSize());  // For small, dense symbol spaces
     DataBlock lut1(0, transformedSymbols->getWordSize());
-    inferLut(order, *transformedSymbols, &lut, &fastlut, inverseLUT, &lut1, inverseLUT1);
+    inferLut(order, *transformedSymbols, &lut, &fastlut, inverseLUT, &lut1,
+             inverseLUT1);
     if (lut.empty()) {
         inverseLUT->clear();
         inverseLUT1->clear();
@@ -413,20 +366,10 @@ void transformLutTransform(
     transformLutTransform_core(order, lut, fastlut, lut1, transformedSymbols);
 }
 
-// ----------------------------------------------------------------------------
-
-void inverseTransformLutTransform(
-        unsigned order,
-        DataBlock *const symbols,
-        DataBlock *const inverseLUT,
-        DataBlock *const inverseLUT1
-){
+void inverseTransformLutTransform(unsigned order, DataBlock* const symbols,
+                                  DataBlock* const inverseLUT,
+                                  DataBlock* const inverseLUT1) {
     inverseTransformLutTransform_core(order, symbols, inverseLUT, inverseLUT1);
 }
 
-// ----------------------------------------------------------------------------
-
 }  // namespace gabac
-
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------

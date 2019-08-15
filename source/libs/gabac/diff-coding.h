@@ -1,6 +1,6 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
@@ -11,17 +11,10 @@ namespace gabac {
 
 class DataBlock;
 
-void transformDiffCoding(
-        DataBlock *transformedSymbols
-);
+void transformDiffCoding(DataBlock *transformedSymbols);
 
-
-void inverseTransformDiffCoding(
-        DataBlock *transformedSymbols
-);
-
+void inverseTransformDiffCoding(DataBlock *transformedSymbols);
 
 }  // namespace gabac
-
 
 #endif  // GABAC_DIFF_CODING_H_
