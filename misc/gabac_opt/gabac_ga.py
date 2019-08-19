@@ -19,7 +19,7 @@ from gabac_api import GABAC_OPERATION, GABAC_RETURN, GABAC_STREAM_MODE, GABAC_TR
 from gabac_api import root_path
 from test_python_api import array, libc
 
-from gabac_conf_gen import GabacConfiguration
+from .gabac_conf_gen import GabacConfiguration
 
 class GeneticAlgorithmForGabac(object):
 

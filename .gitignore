@@ -15,3 +15,6 @@ cmake-build-release/
 
 # Visual Studio Code configuration files
 .vscode/
+
+# Python
+__pycache__/
