@@ -19,8 +19,6 @@ from gabac_api import root_path
 from gabac_api import array, libc, get_block_values, are_blocks_equal
 
 class GabacConfiguration():
-    # TODO: Improve code for parameter with numerical value because json cannot accept numpy
-
     transformed_seq_conf_template = OrderedDict(
         lut_transformation_enabled = [
             False, 
@@ -40,8 +38,8 @@ class GabacConfiguration():
             GABAC_BINARIZATION.TEG
         ],
         # binarization_parameters = [ v.item() for v in np.power(2, np.arange(5)) ],
-        binarization_parameters = [ v.item() for v in np.arange(32) ],
-        #binarization_parameters = [1, 2, 3, 5, 7, 9, 15, 30, 255 ],
+        # binarization_parameters = [ v.item() for v in np.arange(32) ],
+        binarization_parameters = [1, 2, 3, 5, 7, 9, 15, 30, 255],
         context_selection_id = [
             GABAC_CONTEXT_SELECT.BYPASS,
             GABAC_CONTEXT_SELECT.ADAPTIVE_ORDER_0,
@@ -67,7 +65,8 @@ class GabacConfiguration():
 
     match_config_template = copy.deepcopy(main_conf_template)
     match_config_template["sequence_transformation_id"] = GABAC_TRANSFORM.MATCH
-    match_config_template["sequence_transformation_parameter"] = [ v.item() for v in np.power(2, np.arange(4)) ]
+    #match_config_template["sequence_transformation_parameter"] = [ v.item() for v in np.power(2, np.arange(4)) ]
+    match_config_template["sequence_transformation_parameter"] = [32, 256]
     
     rle_config_template = copy.deepcopy(main_conf_template)
     rle_config_template["sequence_transformation_id"] = GABAC_TRANSFORM.RLE 
@@ -85,10 +84,11 @@ class GabacConfiguration():
     }
 
     num_transformed_seq = {
-        GABAC_TRANSFORM.NONE : 1,
-        GABAC_TRANSFORM.EQUALITY : 2,
-        GABAC_TRANSFORM.MATCH : 3,
-        GABAC_TRANSFORM.RLE : 2 }
+        GABAC_TRANSFORM.NONE    : 1,
+        GABAC_TRANSFORM.EQUALITY: 2,
+        GABAC_TRANSFORM.MATCH   : 3,
+        GABAC_TRANSFORM.RLE     : 2 
+    }
 
     def __init__(
         self,

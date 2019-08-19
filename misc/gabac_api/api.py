@@ -18,38 +18,6 @@ libgabac = ct.cdll.LoadLibrary(os.path.join(
     'build/lib/libgabac.so'
 ))
 
-libc = ct.CDLL("libc.so.6")
-
-r"""
-c_bool 	    _Bool 	bool (1)
-c_char 	    char 	1-character string
-c_wchar 	    wchar_t 	1-character unicode string
-c_byte 	    char 	int/long
-c_ubyte 	    unsigned char 	int/long
-c_short 	    short 	int/long
-c_ushort 	    unsigned short 	int/long
-c_int 	    int 	int/long
-c_uint 	    unsigned int 	int/long
-c_long 	    long 	int/long
-c_ulong 	    unsigned long 	int/long
-c_longlong 	    __int64 or long long 	int/long
-c_ulonglong 	    unsigned __int64 or unsigned long long 	int/long
-c_float 	    float 	float
-c_double 	    double 	float
-c_longdouble 	    long double 	float
-c_char_p 	    char * (NUL terminated) 	string or None
-c_wchar_p 	    wchar_t * (NUL terminated) 	unicode or None
-c_void_p
-[ct.c_void_p,
-ct.c_size_t,
-ct.c_uint,
-ct.c_void_p,
-ct.c_size_t,
-ct.c_uint,
-ct.c_void_p,
-ct.c_void_p]
-"""
-
 ### As Input
 # unsigned char **const bitstream               bitstream = ct.pointer(ct.c_ubyte()
 #                                               ct.pointer(bitstream))               
@@ -59,114 +27,6 @@ ct.c_void_p]
 # unsigned int *const binarizationParameters    binarization_parameters.ctypes.data_as(ct.POINTER(ct.c_uint))
 
 STRONG_TYPE = True
-
-class GABAC_RETURN:
-    r"""Return Codes.
-    
-    Values:
-        SUCCESS : if success.
-        FAILURE : if failed.
-    """
-    SUCCESS = 0
-    FAILURE = 1
-
-class GABAC_LOG_LEVEL:
-    r"""
-    Different logging urgency
-
-    Values:
-        TRACE   : Log every step in great detail
-        DEBUG   : Intermediate results
-        INFO    : Expected Results
-        WARNING : Suspicious events (may be an error)
-        ERROR   : Handled errors
-        FATAL   : Error causing application to terminate
-    """
-    TRACE = 0
-    DEBUG = 1
-    INFO = 2
-    WARNING = 3
-    ERROR = 4
-    FATAL = 5
-
-class GABAC_TRANSFORM:
-    r"""
-    Gabac available transformations
-
-    Values:
-        gabac_transform_NONE        : Do nothing
-        gabac_transform_EQUALITY    : Find equal values sequentially
-        gabac_transform_MATCH       : Find larger sequence matches
-        gabac_transform_RLE         : Find run lengths
-        gabac_transform_LUT         : Remap symbols based on probability
-        gabac_transform_DIFF        : Use differences between symbol values instead of symbols
-        gabac_transform_CABAC       : coding based on cabac
-    """
-    NONE = 0
-    EQUALITY = 1
-    MATCH = 2
-    RLE = 3
-    LUT = 4
-    DIFF = 5
-    CABAC = 6
-
-class GABAC_BINARIZATION:
-    r"""
-    Binarizations for cabac transformation
-
-    Values:
-        BI : Binary
-        TU : Truncated Unary
-        EG : Exponential Golomb
-        SEG  : Signed Exponential Golomb
-        TEG  : Truncated Exponential Golomb
-        STEG : Signed Truncated Exponential Golomb
-    """
-    BI = 0
-    TU = 1
-    EG = 2
-    SEG = 3
-    TEG = 4
-    STEG = 5
-
-class GABAC_CONTEXT_SELECT:
-    r"""
-    Context selection modes for cabac transformation
-
-    Values:
-        BYPASS           : Do not use arithmetic coding
-        ADAPTIVE_ORDER_0 : Current symbol only
-        ADAPTIVE_ORDER_1 : Use current + previous symbol
-        ADAPTIVE_ORDER_2 : Use current + previous + before previous symbol
-    """
-    BYPASS = 0
-    ADAPTIVE_ORDER_0 = 1
-    ADAPTIVE_ORDER_1 = 2
-    ADAPTIVE_ORDER_2 = 3 
-
-class GABAC_OPERATION:
-    r"""
-    Enum for gabac operation
-
-    Values
-        ENCODE  : Use configuration to compress
-        DECODE  : Use configuration to decompress
-        ANALYZE : Find best configuration for input data
-    """
-    ENCODE = 0
-    DECODE = 1
-    ANALYZE = 2
-
-class GABAC_STREAM_MODE:
-    r"""
-    Flags for different data types
-
-    Values
-        FILE    : Read/write from file
-        BUFFER  : Read/write from data block
-    """
-    FILE = 0
-    BUFFER = 1
 
 ###-------Data Block-------###
 
@@ -190,7 +50,6 @@ class gabac_data_block(ct.Structure):
 # Return
 #   int gabac_data_block_init()
 libgabac.gabac_data_block_init.argtypes = [
-    #ct.c_void_p,
     ct.POINTER(gabac_data_block) if STRONG_TYPE else ct.c_void_p,
     ct.c_void_p,
     ct.c_size_t,
@@ -456,57 +315,5 @@ libgabac.gabac_config_is_general.argtypes = [
     ct.c_uint64,
     ct.c_uint8
 ]
-
-###=============================================================================================================
-### Additional functions
-
-def array(dtype, data):
-    if isinstance(data, int):
-        arr_dtype = data * dtype
-        return arr_dtype()
-    elif isinstance(data, (list, tuple, bytes)):
-        arr_dtype = dtype * len(data)
-        return arr_dtype(*data)
-    elif isinstance(data, str):
-        arr_dtype = dtype * len(data)
-        return arr_dtype(*data.encode())
-    elif isinstance(data, dict):
-        raise TypeError("Not yet implemented for type dictionary")
-    else:
-        raise TypeError("Incorrect datatype of data")
-
-def print_array(arr):
-    for val in arr:
-        if isinstance(val, bytes):
-            print("{}".format(val.decode()), end='')
-        else:
-            print("{}".format(val), end='')
-    print()
-
-def print_block(block):
-    for i in range(block.values_size):
-        # print("{:02d}".format(libgabac.gabac_data_block_get(ct.byref(block), i)), end='')
-        libc.printf(b"%lu ", libgabac.gabac_data_block_get(ct.byref(block), i))
-    # print()
-    libc.printf(b"\n")
-
-def get_block_values(block):
-    values = ""
-    for i in range(block.values_size):
-        values += "{:02d}".format(libgabac.gabac_data_block_get(ct.byref(block), i))
-    return values
-
-def are_blocks_equal(block1, block2):
-    # st = time.time()
-    if block1.values_size == block2.values_size:
-        for i in range(block1.values_size):
-            if libgabac.gabac_data_block_get(ct.byref(block1), i) != libgabac.gabac_data_block_get(ct.byref(block2), i):
-                print(i)
-                return False
-        # ~7 seconds
-        # et = time.time() - st
-        return True
-    else:
-        return False
 
 

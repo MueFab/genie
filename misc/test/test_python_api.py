@@ -5,17 +5,18 @@ import subprocess
 import unittest
 import copy
 
+process = subprocess.Popen("git rev-parse --show-toplevel".split(), stdout=subprocess.PIPE)
+output, error = process.communicate()
+root_path = output.strip().decode("utf-8")
+
 from gabac_api import libgabac
 from gabac_api import GABAC_BINARIZATION, GABAC_CONTEXT_SELECT, GABAC_LOG_LEVEL, GABAC_LOG_LEVEL
 from gabac_api import GABAC_OPERATION, GABAC_RETURN, GABAC_STREAM_MODE, GABAC_TRANSFORM
 from gabac_api import gabac_data_block
 from gabac_api import gabac_io_config
-from gabac_api import libc
 from gabac_api import array, print_array, print_block, get_block_values
 
-process = subprocess.Popen("git rev-parse --show-toplevel".split(), stdout=subprocess.PIPE)
-output, error = process.communicate()
-root_path = output.strip().decode("utf-8")
+libc = ct.CDLL("libc.so.6")
 
 class PythonApiTest(unittest.TestCase):
     input_data1 = array(
@@ -68,12 +69,6 @@ class PythonApiTest(unittest.TestCase):
             }
         ]
     }
-
-
-    # config_json = array(
-    #     ct.c_char,
-    #     json.dumps(config_json_py)
-    # )
 
     config_json_raw = json.dumps(config_json_py).encode(
         'utf-8'
