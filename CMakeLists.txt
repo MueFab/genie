@@ -43,6 +43,9 @@ if(${GENIE_USE_OPENMP})
     add_compile_definitions(GENIE_USE_OPENMP)
 endif()
 
+#option(GENIE_USE_OPENMP "Use OpenMP parallelization" OFF)
+set(GABAC_SHARED_LIB OFF CACHE BOOL "Build shared GABAC library.")
+
 
 #==============================================================================
 # Compiler
