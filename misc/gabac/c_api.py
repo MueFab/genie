@@ -1,4 +1,3 @@
-"""GABAC library."""
 import ctypes as ct
 import numpy as np
 import os
@@ -17,6 +16,8 @@ libgabac = ct.cdll.LoadLibrary(os.path.join(
     root_path,
     'build/lib/libgabac.so'
 ))
+
+from .const import GABAC_RETURN
 
 ### As Input
 # unsigned char **const bitstream               bitstream = ct.pointer(ct.c_ubyte()
@@ -242,28 +243,6 @@ libgabac.gabac_execute_transform.argtypes = [
 
 libgabac.gabac_execute_transform.restype = ct.c_int
 
-def gabac_execute_transform(
-    transformation_id,
-    params,
-    inverse,
-    input_gabac_data_block,
-):
-    # uint8_t transformationID,
-    # const uint64_t *param,
-    # int inverse,
-    # gabac_data_block *input
-    return_code = libgabac.gabac_execute_transform(
-        transformation_id,
-        params.ctypes.data_as(ct.POINTER(ct.c_uint64)),
-        inverse,
-        input_gabac_data_block.ctypes.data_as(ct.POINTER(gabac_data_block))
-    )
-
-    if return_code == GABAC_RETURN.FAILURE:
-        sys.exit("error: gabac_encode() failed")
-
-    return input_gabac_data_block
-
 # gabac_run
 # -----------------------------------------------------------------------------
 # Arguments
@@ -283,24 +262,6 @@ libgabac.gabac_run.argtypes = [
 
 libgabac.gabac_run.restype = ct.c_int
 
-def gabac_run(
-    operation,
-    io_config,
-    config_json
-):
-
-    io_config = ct.pointer(gabac_io_config)
-
-    return_code = libgabac.gabac_run(
-        operation,
-        io_config.ctypes.data_as(ct.POINTER(gabac_io_config)),
-        config_json.ctypes.data_as(ct.POINTER(ct.c_char)),
-        len(config_json)
-    )
-
-    if return_code == GABAC_RETURN.FAILURE:
-        sys.exit("error: gabac_run() failed")
-
 # gabac_config_is_general
 # Arguments
 #   const char* inconf, 
@@ -316,4 +277,17 @@ libgabac.gabac_config_is_general.argtypes = [
     ct.c_uint8
 ]
 
+# Function
+#   int gabac_config_is_general(
+#       const char *inconf, 
+#       size_t inconf_size,
+#       uint64_t max, 
+#       uint8_t wsize
+#   )
+libgabac.gabac_config_is_general.argtypes = [
+    ct.c_char_p if STRONG_TYPE else ct.c_void_p,
+    ct.c_size_t,
+    ct.c_uint64,
+    ct.c_uint8
+]
 
