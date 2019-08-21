@@ -14,9 +14,8 @@ from gabac_api import gabac_io_config
 from gabac_api import gabac_data_block
 from gabac_api import GABAC_BINARIZATION, GABAC_CONTEXT_SELECT, GABAC_LOG_LEVEL, GABAC_LOG_LEVEL
 from gabac_api import GABAC_OPERATION, GABAC_RETURN, GABAC_STREAM_MODE, GABAC_TRANSFORM
-from gabac_api import root_path
 
-from gabac_api import array, libc, get_block_values, are_blocks_equal
+from gabac_api import array, print_array, print_block, get_block_values, are_blocks_equal
 
 class GabacConfiguration():
     transformed_seq_conf_template = OrderedDict(
