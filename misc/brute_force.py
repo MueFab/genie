@@ -7,15 +7,15 @@ import multiprocessing as mp
 
 import numpy as np
 
-from gabac_api import libgabac
-from gabac_api import gabac_stream
-from gabac_api import gabac_io_config
-from gabac_api import gabac_data_block
-from gabac_api import GABAC_BINARIZATION, GABAC_CONTEXT_SELECT, GABAC_LOG_LEVEL, GABAC_LOG_LEVEL
-from gabac_api import GABAC_OPERATION, GABAC_RETURN, GABAC_STREAM_MODE, GABAC_TRANSFORM
-from gabac_api import array
+from gabac import libgabac
+from gabac import gabac_stream
+from gabac import gabac_io_config
+from gabac import gabac_data_block
+from gabac import GABAC_BINARIZATION, GABAC_CONTEXT_SELECT, GABAC_LOG_LEVEL, GABAC_LOG_LEVEL
+from gabac import GABAC_OPERATION, GABAC_RETURN, GABAC_STREAM_MODE, GABAC_TRANSFORM
+from gabac import array
 
-def transformed_seq_value_generator():
+def transformed_seq_generator():
     lut_transforms_noparam = [
         False
     ]
@@ -46,6 +46,7 @@ def transformed_seq_value_generator():
         GABAC_BINARIZATION.TEG
     ]
     binarizations_params = [1, 2, 3, 5, 7, 9, 15, 30, 255]
+    #binarizations_params = [1, 2, 3, 5, 7, 9, 15, 30]
 
     context_selections = [
         GABAC_CONTEXT_SELECT.BYPASS,
@@ -84,15 +85,6 @@ def transformed_seq_value_generator():
         for diff_coding in diff_coding_items():
             for binarization_id, binarization_param in binarization_items():
                 for context_selection_id in context_selection_items():
-                    # yield {
-                    #     'lut_transformation_enabled'    : lut_id,
-                    #     'lut_transformation_parameter'  : lut_param,
-                    #     'diff_coding_enabled'           : diff_coding, 
-                    #     'binarization_id'               : binarization_id, 
-                    #     'binarization_parameters'       : binarization_param,
-                    #     'context_selection_id'          : context_selection_id
-                    # }
-
                     yield [
                         lut_id,
                         lut_param,
@@ -140,6 +132,14 @@ def run_gabac(
 
         config_cchar = array(ct.c_char, json.dumps(config, indent=4).encode('utf-8'))
 
+        # if libgabac.gabac_config_is_general(
+        #     config_cchar,
+        #     len(config_cchar),
+        #     max(data),
+        #     8
+        # ):
+        #     return GABAC_RETURN.FAILURE, np.Infinity, np.Infinity
+
         io_config = gabac_io_config()
         in_block = gabac_data_block()
 
@@ -153,6 +153,7 @@ def run_gabac(
             len(data),
             ct.sizeof(ct.c_char)
         ):
+            libgabac.gabac_data_block_release(in_block)
             return GABAC_RETURN.FAILURE, np.Infinity, np.Infinity
 
         if roundtrip:
@@ -162,21 +163,25 @@ def run_gabac(
                 copy_in_block,
                 in_block
             ):
+                libgabac.gabac_data_block_release(in_block)
                 return GABAC_RETURN.FAILURE, np.Infinity, np.Infinity
-
-        #original_length = in_block.values_size * in_block.word_size
 
         if libgabac.gabac_stream_create_buffer(
             io_config.input,
             in_block
         ):
             libgabac.gabac_data_block_release(in_block)
+            if roundtrip:
+                libgabac.gabac_data_block_release(copy_in_block)
             return GABAC_RETURN.FAILURE, np.Infinity, np.Infinity
 
         if libgabac.gabac_stream_create_buffer(
             io_config.output, 
             None
         ):
+            if roundtrip:
+                libgabac.gabac_data_block_release(copy_in_block)
+            libgabac.gabac_data_block_release(in_block)
             libgabac.gabac_stream_release(io_config.input)
             return GABAC_RETURN.FAILURE, np.Infinity, np.Infinity
 
@@ -196,6 +201,9 @@ def run_gabac(
             io_config.log,
             None
         ):
+            if roundtrip:
+                libgabac.gabac_data_block_release(copy_in_block)
+            libgabac.gabac_data_block_release(in_block)
             libgabac.gabac_stream_release(io_config.input)
             libgabac.gabac_stream_release(io_config.output)
             return GABAC_RETURN.FAILURE, np.Infinity, np.Infinity
@@ -218,7 +226,8 @@ def run_gabac(
             libgabac.gabac_stream_release(io_config.input)
             libgabac.gabac_stream_release(io_config.output)
             libgabac.gabac_stream_release(io_config.log)
-            
+            if roundtrip:
+                libgabac.gabac_data_block_release(copy_in_block)
             return GABAC_RETURN.FAILURE, np.Infinity, np.Infinity
 
         encoding_time = time.time() - start_time
@@ -273,14 +282,18 @@ def main(args):
     with open(args.input, 'rb') as f:
         data = f.read()
 
-    with mp.Pool(processes=args.nproc) as pool:
-        res = pool.map(
-            callback_f_none, 
-            it.product(
-                transformed_seq_value_generator(),
-                data
-            )
-        )
+    #with mp.Pool(processes=args.nproc) as pool:
+    # with mp.Pool(processes=12) as pool:
+    #     res = pool.map(
+    #         callback_f_none, 
+    #         it.product(
+    #             transformed_seq_generator(),
+    #             data
+    #         )
+    #     )
+    for trans_seq in transformed_seq_generator():
+        res = callback_f_none(trans_seq, data)
+        print(res)
     
 
 if __name__ == '__main__':
