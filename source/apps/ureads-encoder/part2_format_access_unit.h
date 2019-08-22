@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 
+#include <gabac/gabac.h>
+
 #include "part2_format_data_unit.h"
 
 struct Mm_cfg {
@@ -90,6 +92,12 @@ private:
 
     uint64_t internalBitCounter;
 };
+
+Access_unit create_quick_access_unit(uint32_t access_unit_id,
+                                     uint8_t parameter_set_id,
+                                     uint32_t reads_count,
+                                     std::vector<std::vector<gabac::DataBlock>> *data
+);
 
 
 #endif //GENIE_PART2_FORMAT_ACCESS_UNIT_H

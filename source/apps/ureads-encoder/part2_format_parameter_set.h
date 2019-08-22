@@ -342,4 +342,11 @@ private:
     void addSize(uint64_t bits);
 };
 
+Parameter_set create_quick_parameter_set(uint8_t _parameter_set_id,
+        uint8_t _read_length,
+        bool paired_end,
+        bool qv_values_present,
+        std::vector<std::vector<gabac::EncodingConfiguration>>& parameters
+);
+
 #endif //GENIE_PART2_FORMAT_PARAMETER_SET_H
