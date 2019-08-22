@@ -528,7 +528,7 @@ subseqFromGabac(const gabac::EncodingConfiguration &conf, uint8_t descriptorInde
     return sub_conf;
 }
 
-Parameter_set create_quick_parameter_set(uint8_t _parameter_set_id, uint8_t _read_length, bool paired_end, bool qv_values_present, const std::vector<std::vector<gabac::EncodingConfiguration>> parameters) {
+Parameter_set create_quick_parameter_set(uint8_t _parameter_set_id, uint8_t _read_length, bool paired_end, bool qv_values_present, const std::vector<std::vector<gabac::EncodingConfiguration>>& parameters) {
     Parameter_set ret(_parameter_set_id,
                       _parameter_set_id,
                       Data_unit::Dataset_type::non_aligned,
