@@ -12,7 +12,7 @@
 namespace spring {
 
     void generate_id_tokens(char *prev_ID, uint32_t *prev_tokens_ptr, std::string &current_id,
-                            std::vector<int64_t> tokens[128][8]) {
+                            std::vector<int64_t> tokens[128][8], bool dont_write_to_vector) {
         uint8_t token_len = 0, match_len = 0;
         uint32_t i = 0, k = 0, tmp = 0, token_ctr = 0, digit_value = 0,
                 prev_digit = 0;
@@ -34,18 +34,20 @@ namespace spring {
                             (*id_ptr_tok == prev_ID[prev_tokens_ptr[token_ctr] + token_len]),
                             token_len++, id_ptr_tok++;
                 }
-                if (match_len == token_len &&
-                    !isalpha(prev_ID[prev_tokens_ptr[token_ctr] + token_len])) {
-                    // The token is the same as last ID
-                    // Encode a token_type ID_MATCH
-                    tokens[token_ctr + 1][0].push_back(8); // MATCH
+                if (!dont_write_to_vector) {
+                    if (match_len == token_len &&
+                        !isalpha(prev_ID[prev_tokens_ptr[token_ctr] + token_len])) {
+                        // The token is the same as last ID
+                        // Encode a token_type ID_MATCH
+                        tokens[token_ctr + 1][0].push_back(8); // MATCH
 
-                } else {
-                    tokens[token_ctr + 1][0].push_back(2); // STRING
-                    for (k = 0; k < token_len; k++) {
-                        tokens[token_ctr + 1][2].push_back((int64_t) (*(id_ptr + k)));
+                    } else {
+                        tokens[token_ctr + 1][0].push_back(2); // STRING
+                        for (k = 0; k < token_len; k++) {
+                            tokens[token_ctr + 1][2].push_back((int64_t) (*(id_ptr + k)));
+                        }
+                        tokens[token_ctr + 1][2].push_back((int64_t) '\0');
                     }
-                    tokens[token_ctr + 1][2].push_back((int64_t) '\0');
                 }
             }
                 // check if the token is a run of zeros
@@ -55,17 +57,19 @@ namespace spring {
                     match_len += ('0' == prev_ID[prev_tokens_ptr[token_ctr] + token_len]),
                             token_len++, id_ptr_tok++;
                 }
-                if (match_len == token_len &&
-                    prev_ID[prev_tokens_ptr[token_ctr] + token_len] != '0') {
-                    // The token is the same as last ID
-                    // Encode a token_type ID_MATCH
-                    tokens[token_ctr + 1][0].push_back(8); // MATCH
-                } else {
-                    tokens[token_ctr + 1][0].push_back(2); // STRING
-                    for (k = 0; k < token_len; k++) {
-                        tokens[token_ctr + 1][2].push_back((int64_t) '0');
+                if (!dont_write_to_vector) {
+                    if (match_len == token_len &&
+                        prev_ID[prev_tokens_ptr[token_ctr] + token_len] != '0') {
+                        // The token is the same as last ID
+                        // Encode a token_type ID_MATCH
+                        tokens[token_ctr + 1][0].push_back(8); // MATCH
+                    } else {
+                        tokens[token_ctr + 1][0].push_back(2); // STRING
+                        for (k = 0; k < token_len; k++) {
+                            tokens[token_ctr + 1][2].push_back((int64_t) '0');
+                        }
+                        tokens[token_ctr + 1][2].push_back((int64_t) '\0');
                     }
-                    tokens[token_ctr + 1][2].push_back((int64_t) '\0');
                 }
             }
                 // Check if the token is a number smaller than (1<<29)
@@ -102,35 +106,39 @@ namespace spring {
                             (*id_ptr_tok == prev_ID[prev_tokens_ptr[token_ctr] + token_len]),
                             token_len++, id_ptr_tok++;
                 }
-                if (prev_token_digit_flag && match_len == token_len &&
-                    !isdigit(prev_ID[prev_tokens_ptr[token_ctr] + token_len])) {
-                    // The token is the same as last ID
-                    // Encode a token_type ID_MATCH
-                    tokens[token_ctr + 1][0].push_back(8); // MATCH
+                if (!dont_write_to_vector) {
+                    if (prev_token_digit_flag && match_len == token_len &&
+                        !isdigit(prev_ID[prev_tokens_ptr[token_ctr] + token_len])) {
+                        // The token is the same as last ID
+                        // Encode a token_type ID_MATCH
+                        tokens[token_ctr + 1][0].push_back(8); // MATCH
 
-                } else if (prev_token_digit_flag &&
-                           *prev_ID != 0 && (delta = (digit_value - prev_digit)) < 256 && delta > 0) {
-                    // prev_ID condition to make sure that DDELTA is not used first time token appears
-                    tokens[token_ctr + 1][0].push_back(5); // DDELTA
-                    tokens[token_ctr + 1][5].push_back((int64_t) delta);
+                    } else if (prev_token_digit_flag &&
+                               *prev_ID != 0 && (delta = (digit_value - prev_digit)) < 256 && delta > 0) {
+                        // prev_ID condition to make sure that DDELTA is not used first time token appears
+                        tokens[token_ctr + 1][0].push_back(5); // DDELTA
+                        tokens[token_ctr + 1][5].push_back((int64_t) delta);
 
-                } else {
-                    // Encode a token type ID_DIGIT and the value (byte-based)
-                    tokens[token_ctr + 1][0].push_back(4); // DIGITS
-                    tokens[token_ctr + 1][4].push_back((int64_t) digit_value);
+                    } else {
+                        // Encode a token type ID_DIGIT and the value (byte-based)
+                        tokens[token_ctr + 1][0].push_back(4); // DIGITS
+                        tokens[token_ctr + 1][4].push_back((int64_t) digit_value);
+                    }
                 }
             } else {
                 // compare with the same token from previous ID
                 // match_len += (*id_ptr == prev_ID[prev_tokens_ptr[token_ctr]]);
-                if (match_len == token_len) {
-                    // The token is the same as last ID
-                    // Encode a token_type ID_MATCH
-                    tokens[token_ctr + 1][0].push_back(8); // MATCH
+                if (!dont_write_to_vector) {
+                    if (match_len == token_len) {
+                        // The token is the same as last ID
+                        // Encode a token_type ID_MATCH
+                        tokens[token_ctr + 1][0].push_back(8); // MATCH
 
-                } else {
-                    // Encode a token type ID_CHAR and the char
-                    tokens[token_ctr + 1][0].push_back(3); // CHAR
-                    tokens[token_ctr + 1][3].push_back((int64_t) (*id_ptr));
+                    } else {
+                        // Encode a token type ID_CHAR and the char
+                        tokens[token_ctr + 1][0].push_back(3); // CHAR
+                        tokens[token_ctr + 1][3].push_back((int64_t) (*id_ptr));
+                    }
                 }
             }
 
@@ -144,10 +152,11 @@ namespace spring {
                 throw std::runtime_error("Too many tokens in ID");
         }
         strcpy(prev_ID, current_id.c_str());
-        tokens[token_ctr + 1][0].push_back(9); // END
+        if (!dont_write_to_vector)
+            tokens[token_ctr + 1][0].push_back(9); // END
 
         // fill rest of prev_tokens_ptr to 0, otherwise we've bug due to garbage values
-        for (uint32_t id = token_ctr + 1; id < MAX_NUM_TOKENS_ID; id++)
+        for (uint32_t id = 0; id < MAX_NUM_TOKENS_ID; id++)
             prev_tokens_ptr[id] = 0;
     }
 

@@ -31,9 +31,12 @@
 #include "utils/sam-file-reader.h"
 #include "utils/sam-record.h"
 #include "spring/spring.h"
-#include "spring/decompress.h"
 
 //#include "alico/main.h"
+
+namespace spring {
+    bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld);
+}
 
 namespace dsg {
 
@@ -57,10 +60,7 @@ namespace dsg {
                     paired_end,
                     programOptions.workingDirectory,
                     programOptions.analyze,
-                    st,
-                    programOptions.preserve_order,
-                    !programOptions.discard_quality,
-                    !programOptions.discard_ids
+                    st
             );
         } else {
             paired_end = true;
@@ -72,10 +72,7 @@ namespace dsg {
                     paired_end,
                     programOptions.workingDirectory,
                     programOptions.analyze,
-                    st,
-                    programOptions.preserve_order,
-                    !programOptions.discard_quality,
-                    !programOptions.discard_ids
+                    st
             );
         }
     }
@@ -123,7 +120,7 @@ namespace dsg {
             throw std::runtime_error("Could not open output file: " + filename);
         }
 
-        dsg::StreamSaver store(programOptions.configPath, &output, nullptr, programOptions.gabacDebug);
+        dsg::StreamSaver store(programOptions.configPath, &output, nullptr);
         auto generated_aus = generationFromFastq_SPRING(programOptions, store);
     }
 
@@ -148,9 +145,9 @@ namespace dsg {
         }
         std::cout << "Temporary directory: " << temp_dir << "\n";
 
-        dsg::StreamSaver saver(programOptions.configPath, nullptr, &in, programOptions.gabacDebug);
+        dsg::StreamSaver saver(programOptions.configPath, nullptr, &in);
 
-        bool paired = spring::decompress(temp_dir, &saver, programOptions.numThreads, programOptions.combine_pairs);
+        bool paired = spring::decompress(temp_dir, &saver);
 
         std::cout << paired << std::endl;
 

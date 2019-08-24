@@ -30,8 +30,6 @@ namespace dsg {
             std::streampos position;
             uint64_t size;
         };
-
-        bool debug;
     public:
 
         std::ostream *fout; // Output file
@@ -71,7 +69,7 @@ namespace dsg {
         void reloadConfigSet();
 
 
-        StreamSaver(const std::string &configp, std::ostream *f, std::istream *ifile, bool deb=false);
+        StreamSaver(const std::string &configp, std::ostream *f, std::istream *ifile);
 
         ~StreamSaver();
 

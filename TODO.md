@@ -19,9 +19,7 @@
 
 ## For later
 
-- [ ] Check coding style with clang-format
+- [ ] Check coding style with clang-format and pycodestyle
 - [x] Clean up ``source/libs/format/CMakeLists.txt``
 - [x] Set up CMake for ``tests``
-- [ ] Unify I/O
-  - [ ] Bitstream R/W should be done using HM's bitstream classes adapted for 64 bits
-  - [ ] "Ordinary" file R/W (for e.g. SPRING's temporary files) should be done using the C++ standard library
+- [ ] Add Autotools build system
