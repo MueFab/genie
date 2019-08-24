@@ -33,7 +33,6 @@ ProgramOptions::ProgramOptions(
       verbose(false),
       help(false),
       analyze(false),
-      gabacDebug(false),
       workingDirectory("./"),
       numThreads(1),
       inputFilePath(""),
@@ -77,21 +76,6 @@ void ProgramOptions::processCommandLine(
     analyze = false;
     app.add_flag("-g,--generate-configuration", analyze, "Generate a new set of configurations");
 
-    discard_ids = false;
-    app.add_flag("--discard-ids", discard_ids, "Do not include read ids");
-
-    discard_quality = false;
-    app.add_flag("--discard-qualities", discard_quality, "Do not include qualities");
-
-    preserve_order = false;
-    app.add_flag("--preserve-order", preserve_order, "Do not reorder, preserve order but sacrifice compression ratio");
-
-    combine_pairs = false;
-    app.add_flag("--combine-pairs", combine_pairs, "Decompression: match read pairs");
-
-    gabacDebug = false;
-    app.add_flag("--gabac-debug", gabacDebug, "Check all gabac streams and write failing streams to hard drive");
-
     numThreads = 1;
     app.add_option("-t,--numThreads", numThreads, "How many threads to launch for parallel execution of Genie. Default is 1.");
 
@@ -130,9 +114,9 @@ void ProgramOptions::validate()
     }
     else if (configPath.back() != '/') {
         configPath += "/";
-        if (!ghc::filesystem::exists(configPath) || !ghc::filesystem::is_directory(configPath)) {
-            throwRuntimeError("Config dir does not exist: " + configPath);
-        }
+    }
+    if (!ghc::filesystem::exists(configPath) || !ghc::filesystem::is_directory(configPath)) {
+        throwRuntimeError("Config dir does not exist: " + configPath);
     }
 
     if (!inputFilePairPath.empty()) {

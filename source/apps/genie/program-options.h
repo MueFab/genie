@@ -35,11 +35,6 @@ class ProgramOptions {
     bool verbose;
     bool help;
     bool analyze;
-    bool gabacDebug;
-    bool discard_quality;
-    bool discard_ids;
-    bool preserve_order;
-    bool combine_pairs;
     std::string workingDirectory;
     int numThreads;
 

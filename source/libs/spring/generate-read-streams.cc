@@ -20,6 +20,29 @@
 
 namespace spring {
 
+    const std::vector<std::array<uint8_t, 2>> subseq_indices = {
+            {0,  0}, // pos
+            {1,  0}, // rcomp
+            {3,  0}, // mmpos
+            {3,  1}, // mmpos
+            {4,  0}, // mmtype
+            {4,  1}, // mmtype
+            {6,  0}, // ureads
+            {7,  0}, // rlen
+            {8,  0}, // pair
+            {8,  1}, // pair
+            {8,  2}, // pair
+            {8,  3}, // pair
+            {8,  4}, // pair
+            {8,  5}, // pair
+            {8,  6}, // pair
+            {8,  7}, // pair
+            {12, 0} // rtype
+    };
+
+    const std::string file_subseq_prefix = "subseq";
+
+
     std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>>
     generate_read_streams(const std::string &temp_dir, const compression_params &cp,bool analyze, dsg::StreamSaver &st) {
         if (!cp.paired_end)
@@ -41,6 +64,13 @@ namespace spring {
         std::string seq;
         std::vector<char> RC_arr;
         std::vector<uint32_t> order_arr;
+    };
+
+    struct subseq_data {
+        uint32_t block_num;
+        std::map<uint8_t, std::map<uint8_t, std::string>> listDescriptorFiles;
+        std::map<uint8_t, std::map<uint8_t, std::vector<int64_t>>> subseq_vector;
+        dsg::AcessUnitStreams streamsAU;
     };
 
     void generate_subseqs(const se_data &data, uint64_t block_num, subseq_data* subseqData){
@@ -76,18 +106,17 @@ namespace spring {
         if (data.flag_arr[start_read_num] == false)
             seq_start = seq_end = 0; // all reads unaligned
         else {
-            seq_end = seq_start = data.pos_arr[start_read_num];
+            seq_start = data.pos_arr[start_read_num];
             // find last read in AU that's aligned
             uint64_t i = start_read_num;
-            for (; i < end_read_num; i++) {
+            for (; i < end_read_num; i++)
                 if (data.flag_arr[i] == false)
                     break;
-                seq_end = std::max(seq_end, data.pos_arr[i] + data.read_length_arr[i]);
-            }
+            seq_end = data.pos_arr[i - 1] + data.read_length_arr[i - 1];
         }
         if (seq_start != seq_end) {
             // not all unaligned
-            subseqData->subseq_vector[7][0].push_back(seq_end - seq_start - 1); // rlen
+            subseqData->subseq_vector[7][0].push_back(seq_end - seq_start); // rlen
             subseqData->subseq_vector[12][0].push_back(5); // rtype
             for (uint64_t i = seq_start; i < seq_end; i++)
                 subseqData->subseq_vector[6][0].push_back(char_to_int[(uint8_t) data.seq[i]]); // ureads
@@ -96,12 +125,12 @@ namespace spring {
         // Write streams
         for (uint64_t i = start_read_num; i < end_read_num; i++) {
             if (data.flag_arr[i] == true) {
-                subseqData->subseq_vector[7][0].push_back(data.read_length_arr[i] - 1); // rlen
+                subseqData->subseq_vector[7][0].push_back(data.read_length_arr[i]); // rlen
                 subseqData->subseq_vector[1][0].push_back(rc_to_int[(uint8_t) data.RC_arr[i]]); // rcomp
                 if (i == start_read_num) {
                     // Note: In order non-preserving mode, if the first read of
                     // the block is a singleton, then the rest are too.
-                    subseqData->subseq_vector[0][0].push_back(0); // pos
+                    subseqData->subseq_vector[0][0].push_back(0);
                     prevpos = data.pos_arr[i];
                 } else {
                     diffpos = data.pos_arr[i] - prevpos;
@@ -127,20 +156,19 @@ namespace spring {
                 }
             } else {
                 subseqData->subseq_vector[12][0].push_back(5); // rtype
-                subseqData->subseq_vector[7][0].push_back(data.read_length_arr[i] - 1); // rlen
+                subseqData->subseq_vector[7][0].push_back(data.read_length_arr[i]); // rlen
                 for (uint64_t j = 0; j < data.read_length_arr[i]; j++) {
                     subseqData->subseq_vector[6][0].push_back(
                             char_to_int[(uint8_t) data.unaligned_arr[data.pos_arr[i] + j]]); // ureads
                 }
                 subseqData->subseq_vector[0][0].push_back(seq_end - prevpos); // pos
                 subseqData->subseq_vector[1][0].push_back(0); // rcomp
-                subseqData->subseq_vector[7][0].push_back(data.read_length_arr[i] - 1); // rlen
+                subseqData->subseq_vector[7][0].push_back(data.read_length_arr[i]); // rlen
                 subseqData->subseq_vector[12][0].push_back(1); // rtype = P
                 prevpos = seq_end;
                 seq_end = prevpos + data.read_length_arr[i];
             }
         }
-
     }
 
     void compress_subseqs(subseq_data* data, dsg::StreamSaver &st) {
@@ -650,7 +678,7 @@ namespace spring {
         uint64_t seq_start = bdata.block_seq_start[cur_block_num], seq_end = bdata.block_seq_end[cur_block_num];
         if (seq_start != seq_end) {
             // not all unaligned
-            out->subseq_vector[7][0].push_back(seq_end - seq_start - 1); // rlen
+            out->subseq_vector[7][0].push_back(seq_end - seq_start); // rlen
             out->subseq_vector[12][0].push_back(5); // rtype
             for (uint64_t i = seq_start; i < seq_end; i++)
                 out->subseq_vector[6][0].push_back(char_to_int[(uint8_t) data.seq[i]]); // ureads
@@ -680,7 +708,7 @@ namespace spring {
                 if (data.flag_arr[current] == false) {
                     // Case 1: both unaligned
                     out->subseq_vector[12][0].push_back(5); // rtype
-                    out->subseq_vector[7][0].push_back(data.read_length_arr[current] + data.read_length_arr[pair] - 1); // rlen
+                    out->subseq_vector[7][0].push_back(data.read_length_arr[current] + data.read_length_arr[pair]); // rlen
                     for (uint64_t j = 0; j < data.read_length_arr[current]; j++) {
                         out->subseq_vector[6][0].push_back(
                                 char_to_int[(uint8_t) data.unaligned_arr[data.pos_arr[current] + j]]); // ureads
@@ -692,8 +720,8 @@ namespace spring {
                     out->subseq_vector[0][0].push_back(seq_end - prevpos); // pos
                     out->subseq_vector[1][0].push_back(0); // rcomp
                     out->subseq_vector[1][0].push_back(0); // rcomp
-                    out->subseq_vector[7][0].push_back(data.read_length_arr[current] - 1); // rlen
-                    out->subseq_vector[7][0].push_back(data.read_length_arr[pair] - 1); // rlen
+                    out->subseq_vector[7][0].push_back(data.read_length_arr[current]); // rlen
+                    out->subseq_vector[7][0].push_back(data.read_length_arr[pair]); // rlen
                     out->subseq_vector[12][0].push_back(1); // rtype = P
                     out->subseq_vector[8][0].push_back(0); // pair decoding case same_rec
                     bool read_1_first = true;
@@ -703,8 +731,8 @@ namespace spring {
                     seq_end = prevpos + data.read_length_arr[current] + data.read_length_arr[pair];
                 } else {
                     // Case 2: both aligned
-                    out->subseq_vector[7][0].push_back(data.read_length_arr[current] - 1); // rlen
-                    out->subseq_vector[7][0].push_back(data.read_length_arr[pair] - 1); // rlen
+                    out->subseq_vector[7][0].push_back(data.read_length_arr[current]); // rlen
+                    out->subseq_vector[7][0].push_back(data.read_length_arr[pair]); // rlen
                     out->subseq_vector[1][0].push_back(rc_to_int[(uint8_t) data.RC_arr[current]]); // rcomp
                     out->subseq_vector[1][0].push_back(rc_to_int[(uint8_t) data.RC_arr[pair]]); // rcomp
                     if (data.noise_len_arr[current] == 0 && data.noise_len_arr[pair] == 0)
@@ -737,7 +765,7 @@ namespace spring {
             } else {
                 // only one read in genomic record
                 if (data.flag_arr[current] == true) {
-                    out->subseq_vector[7][0].push_back(data.read_length_arr[current] - 1); // rlen
+                    out->subseq_vector[7][0].push_back(data.read_length_arr[current]); // rlen
                     out->subseq_vector[1][0].push_back(rc_to_int[(uint8_t) data.RC_arr[current]]); // rcomp
                     if (data.noise_len_arr[current] == 0)
                         out->subseq_vector[12][0].push_back(1); // rtype = P
@@ -759,14 +787,14 @@ namespace spring {
                     }
                 } else {
                     out->subseq_vector[12][0].push_back(5); // rtype
-                    out->subseq_vector[7][0].push_back(data.read_length_arr[current] - 1); // rlen
+                    out->subseq_vector[7][0].push_back(data.read_length_arr[current]); // rlen
                     for (uint64_t j = 0; j < data.read_length_arr[current]; j++) {
                         out->subseq_vector[6][0].push_back(
                                 char_to_int[(uint8_t) data.unaligned_arr[data.pos_arr[current] + j]]); // ureads
                     }
                     out->subseq_vector[0][0].push_back(seq_end - prevpos); // pos
                     out->subseq_vector[1][0].push_back(0); // rcomp
-                    out->subseq_vector[7][0].push_back(data.read_length_arr[current] - 1); // rlen
+                    out->subseq_vector[7][0].push_back(data.read_length_arr[current]); // rlen
                     out->subseq_vector[12][0].push_back(1); // rtype = P
                     prevpos = seq_end;
                     seq_end = prevpos + data.read_length_arr[current];
