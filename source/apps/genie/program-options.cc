@@ -94,11 +94,6 @@ void ProgramOptions::processCommandLine(
 
     numThreads = 1;
     app.add_option("-t,--numThreads", numThreads, "How many threads to launch for parallel execution of Genie. Default is 1.");
-    
-    workingDirectory = "./";
-    app.add_option("--working-dir", workingDirectory, "Directory to store temporary files. Must have sufficient space and write permissions. "
-                                                        "genie/SPRING requires temporary storage close to original file size (except when preserve-order is specified). "
-                                                        "Default is ./");
 
     try {
         app.parse(argc, argv);

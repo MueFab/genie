@@ -138,7 +138,7 @@ namespace dsg {
         std::string temp_dir;
         while (true) {
             std::string random_str = "tmp." + spring::random_string(10);
-            temp_dir = programOptions.workingDirectory + "/" + random_str + '/';
+            temp_dir = "./" + random_str + '/';
             if (!ghc::filesystem::exists(temp_dir)) {
                 break;
             }
