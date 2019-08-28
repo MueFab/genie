@@ -1,4 +1,18 @@
-import os
+    # @staticmethod
+    # def json_to_cchar(
+    #     config
+    # ):
+    #     return array(ct.c_char, json.dumps(config, indent=4).encode('utf-8'))
+
+    # @staticmethod
+    # def generate_random_cchar_config(
+    #     seq_transform_id
+    # ):
+    #     return GabacConfiguration.json_to_cchar(
+    #         GabacConfiguration.generate_random_config(
+    #             seq_transform_id
+    #         )
+    #     )import os
 import json
 import argparse
 

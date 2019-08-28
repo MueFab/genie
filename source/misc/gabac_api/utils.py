@@ -1,6 +1,8 @@
+### Python built-in modules
+import json
 import ctypes as ct
-
-from .api import libgabac
+### Own modules
+from .c_api import libgabac
 
 libc = ct.CDLL("libc.so.6")
 
@@ -49,3 +51,6 @@ def are_blocks_equal(block1, block2):
         return True
     else:
         return False
+
+def json_to_array(config):
+    return array(ct.c_char, json.dumps(config, indent=4).encode('utf-8'))
