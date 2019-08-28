@@ -8,14 +8,25 @@ from collections import OrderedDict
 
 import numpy as np
 
-from gabac_api import libgabac
-from gabac_api import gabac_stream
-from gabac_api import gabac_io_config
-from gabac_api import gabac_data_block
-from gabac_api import GABAC_BINARIZATION, GABAC_CONTEXT_SELECT, GABAC_LOG_LEVEL, GABAC_LOG_LEVEL
-from gabac_api import GABAC_OPERATION, GABAC_RETURN, GABAC_STREAM_MODE, GABAC_TRANSFORM
-
-from gabac_api import array, print_array, print_block, get_block_values, are_blocks_equal
+from ..gabac_api import (
+    libgabac,
+    gabac_stream,
+    gabac_io_config,
+    gabac_data_block,
+    GABAC_BINARIZATION,
+    GABAC_CONTEXT_SELECT,
+    GABAC_LOG_LEVEL,
+    GABAC_LOG_LEVEL,
+    GABAC_OPERATION,
+    GABAC_RETURN,
+    GABAC_STREAM_MODE,
+    GABAC_TRANSFORM,
+    array,
+    print_array,
+    print_block,
+    get_block_values,
+    are_blocks_equal
+)
 
 class GabacConfiguration():
     transformed_seq_conf_template = OrderedDict(
@@ -305,22 +316,6 @@ class GabacConfiguration():
         config
     ):
         return array(ct.c_char, json.dumps(config, indent=4).encode('utf-8'))
-
-    # @staticmethod
-    # def json_to_cchar(
-    #     config
-    # ):
-    #     return array(ct.c_char, json.dumps(config, indent=4).encode('utf-8'))
-
-    # @staticmethod
-    # def generate_random_cchar_config(
-    #     seq_transform_id
-    # ):
-    #     return GabacConfiguration.json_to_cchar(
-    #         GabacConfiguration.generate_random_config(
-    #             seq_transform_id
-    #         )
-    #     )
 
     def run_gabac(
         self,

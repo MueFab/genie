@@ -1,23 +1,18 @@
-import ctypes as ct
-import numpy as np
+### Python built-in modules
 import os
 import sys
 import time
+import ctypes as ct
+### External modules (requires pip install)
+import numpy as np
+### Own modules
+from . import (
+    repo_path,
+    libgabac_fpath,
+    GABAC_RETURN,
+)
 
-#libgabac_path = os.environ['LIBGABAC_PATH']
-#libgabac = ct.cdll.LoadLibrary(libgabac_path)
-import subprocess
-
-process = subprocess.Popen("git rev-parse --show-toplevel".split(), stdout=subprocess.PIPE)
-output, error = process.communicate()
-root_path = output.strip().decode("utf-8")
-
-libgabac = ct.cdll.LoadLibrary(os.path.join(
-    root_path,
-    'build/lib/libgabac.so'
-))
-
-from .const import GABAC_RETURN
+libgabac = ct.cdll.LoadLibrary(libgabac_fpath)
 
 ### As Input
 # unsigned char **const bitstream               bitstream = ct.pointer(ct.c_ubyte()

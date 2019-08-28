@@ -10,12 +10,29 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from gabac_api import libgabac
-from gabac_api import gabac_stream
-from gabac_api import gabac_io_config
-from gabac_api import gabac_data_block
-from gabac_api import GABAC_BINARIZATION, GABAC_CONTEXT_SELECT, GABAC_LOG_LEVEL, GABAC_LOG_LEVEL
-from gabac_api import GABAC_OPERATION, GABAC_RETURN, GABAC_STREAM_MODE, GABAC_TRANSFORM
+from gabac_api.c_api import (
+    libgabac,
+    gabac_stream,
+    gabac_io_config,
+    gabac_data_block
+)
+from gabac_api.const import (
+    GABAC_BINARIZATION,
+    GABAC_CONTEXT_SELECT,
+    GABAC_LOG_LEVEL,
+    GABAC_LOG_LEVEL,
+    GABAC_OPERATION,
+    GABAC_RETURN,
+    GABAC_STREAM_MODE,
+    GABAC_TRANSFORM
+)
+from gabac_api.utils import (
+    array,
+    print_array,
+    print_block,
+    get_block_values,
+    are_blocks_equal
+)
 from gabac_api import root_path
 from test_python_api import array, libc
 

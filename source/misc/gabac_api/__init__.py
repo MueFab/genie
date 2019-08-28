@@ -1,3 +1,12 @@
+import os
+import subprocess
+
+process = subprocess.Popen("git rev-parse --show-toplevel".split(), stdout=subprocess.PIPE)
+output, error = process.communicate()
+repo_path = output.strip().decode("utf-8")
+
+libgabac_fpath = os.path.join(repo_path, 'build/lib/libgabac.so')
+
 class GABAC_RETURN:
     r"""Return Codes.
     
@@ -66,6 +75,7 @@ class GABAC_BINARIZATION:
     SEG = 3
     TEG = 4
     STEG = 5
+    
 class GABAC_CONTEXT_SELECT:
     r"""
     Context selection modes for cabac transformation
@@ -104,3 +114,22 @@ class GABAC_STREAM_MODE:
     """
     FILE = 0
     BUFFER = 1
+
+# from .const import GABAC_BINARIZATION, GABAC_CONTEXT_SELECT, GABAC_LOG_LEVEL
+# from .const import GABAC_OPERATION, GABAC_RETURN, GABAC_STREAM_MODE, GABAC_TRANSFORM
+
+from .c_api import (
+    libgabac,
+    gabac_data_block, 
+    gabac_stream, 
+    gabac_io_config
+)
+
+from .utils import (
+    libc, 
+    array, 
+    print_array, 
+    print_block, 
+    get_block_values, 
+    are_blocks_equal
+)
