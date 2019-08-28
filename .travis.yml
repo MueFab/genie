@@ -35,3 +35,4 @@ script:
   - ./ci/cmake-build.sh
   - ./ci/test-genie-roundtrip.sh
   - ./ci/test-gabac-roundtrips.sh
+  - ./ci/test-gabac-python-api.sh
