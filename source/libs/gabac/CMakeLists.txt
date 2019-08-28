@@ -29,11 +29,12 @@ set(source_files
         writer.cc
 )
 
-if (${GABAC_SHARED_LIB})
+if(${GABAC_BUILD_SHARED_LIB})
     message(STATUS "Configured build of GABAC as *shared* library")
     add_library(gabac SHARED ${source_files})
-else ()
+else()
     message(STATUS "Configured build of GABAC as *static* library")
     add_library(gabac STATIC ${source_files})
-endif ()
+endif()
+
 target_include_directories(gabac PRIVATE ${gabac_include_dir})

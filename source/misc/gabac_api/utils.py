@@ -3,8 +3,9 @@ import json
 import ctypes as ct
 ### Own modules
 from .c_api import libgabac
+from .platformutils import libc_path
 
-libc = ct.CDLL("libc.so.6")
+libc = ct.CDLL(libc_path())
 
 def array(dtype, data):
     if isinstance(data, int):

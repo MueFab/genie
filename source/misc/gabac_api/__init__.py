@@ -1,15 +1,18 @@
 import os
 import subprocess
 
+# Own modules
+from .platformutils import dynamic_lib_extension
+
 process = subprocess.Popen("git rev-parse --show-toplevel".split(), stdout=subprocess.PIPE)
 output, error = process.communicate()
 repo_path = output.strip().decode("utf-8")
 
-libgabac_fpath = os.path.join(repo_path, 'build/lib/libgabac.so')
+libgabac_fpath = os.path.join(repo_path, 'build/lib/libgabac' + dynamic_lib_extension())
 
 class GABAC_RETURN:
     r"""Return Codes.
-    
+
     Values:
         SUCCESS : if success.
         FAILURE : if failed.
@@ -75,7 +78,7 @@ class GABAC_BINARIZATION:
     SEG = 3
     TEG = 4
     STEG = 5
-    
+
 class GABAC_CONTEXT_SELECT:
     r"""
     Context selection modes for cabac transformation
@@ -89,7 +92,7 @@ class GABAC_CONTEXT_SELECT:
     BYPASS = 0
     ADAPTIVE_ORDER_0 = 1
     ADAPTIVE_ORDER_1 = 2
-    ADAPTIVE_ORDER_2 = 3 
+    ADAPTIVE_ORDER_2 = 3
 
 class GABAC_OPERATION:
     r"""
@@ -120,17 +123,17 @@ class GABAC_STREAM_MODE:
 
 from .c_api import (
     libgabac,
-    gabac_data_block, 
-    gabac_stream, 
+    gabac_data_block,
+    gabac_stream,
     gabac_io_config
 )
 
 from .utils import (
-    libc, 
-    array, 
-    print_array, 
-    print_block, 
-    get_block_values, 
+    libc,
+    array,
+    print_array,
+    print_block,
+    get_block_values,
     are_blocks_equal
 )
 
