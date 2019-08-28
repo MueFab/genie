@@ -326,7 +326,7 @@ class GabacConfiguration():
         io_config = gabac_io_config()
         in_block = gabac_data_block()
 
-        logfilename = array(ct.c_char, "log.txt")
+        # logfilename = array(ct.c_char, "log.txt")
 
         start_time = time.time()
 
@@ -364,22 +364,22 @@ class GabacConfiguration():
             return GABAC_RETURN.FAILURE, np.Infinity, np.Infinity
 
         # Create log stream from file. You could also pass stdout instead.
-        if libgabac.gabac_stream_create_file(
-            io_config.log,
-            logfilename,
-            len(logfilename),
-            1
-        ):
-            libgabac.gabac_stream_release(io_config.input)
-            libgabac.gabac_stream_release(io_config.output)
-            return GABAC_RETURN.FAILURE, np.Infinity, np.Infinity
-
-        # if libgabac.gabac_stream_create_buffer(
-        #     io_config.log, 
-        #     None
+        # if libgabac.gabac_stream_create_file(
+        #     io_config.log,
+        #     logfilename,
+        #     len(logfilename),
+        #     1
         # ):
         #     libgabac.gabac_stream_release(io_config.input)
+        #     libgabac.gabac_stream_release(io_config.output)
         #     return GABAC_RETURN.FAILURE, np.Infinity, np.Infinity
+
+        if libgabac.gabac_stream_create_buffer(
+            io_config.log, 
+            None
+        ):
+            libgabac.gabac_stream_release(io_config.input)
+            return GABAC_RETURN.FAILURE, np.Infinity, np.Infinity
 
         # Encode using config
         if libgabac.gabac_run(
@@ -433,8 +433,3 @@ class GabacConfiguration():
             libgabac.gabac_stream_release(io_config.output)
             libgabac.gabac_stream_release(io_config.log)
             return GABAC_RETURN.SUCCESS, encoded_length, encoding_time
-
-        # return encoded_length
-        # return encoded_length - original_length
-        #return encoded_length/original_length
-

@@ -21,6 +21,7 @@ from ..gabac_api import (
     print_array, 
     print_block, 
     get_block_values,
+    run_gabac
 )
 
 class PythonApiTest(unittest.TestCase):
@@ -58,29 +59,29 @@ class PythonApiTest(unittest.TestCase):
         )
     )
 
-    # config_json_py = {
-    #     "word_size" : 1,
-    #     "sequence_transformation_id" : 3,
-    #     "sequence_transformation_parameter": 2,
-    #     "transformed_sequences" : [
-    #         {
-    #             "lut_transformation_enabled" : True,
-    #             "lut_transformation_parameter": 0,
-    #             "diff_coding_enabled": False,
-    #             "binarization_id" : 2,
-    #             "binarization_parameters" : [],
-    #             "context_selection_id" : 2
-    #         },
-    #         {
-    #             "lut_transformation_enabled" : False,
-    #             "lut_transformation_parameter": 0,
-    #             "diff_coding_enabled": True,
-    #             "binarization_id" : 3,
-    #             "binarization_parameters" : [],
-    #             "context_selection_id" : 2
-    #         }
-    #     ]
-    # }
+    config_json_py = {
+        "word_size" : 1,
+        "sequence_transformation_id" : 3,
+        "sequence_transformation_parameter": 2,
+        "transformed_sequences" : [
+            {
+                "lut_transformation_enabled" : True,
+                "lut_transformation_parameter": 0,
+                "diff_coding_enabled": False,
+                "binarization_id" : 2,
+                "binarization_parameters" : [],
+                "context_selection_id" : 2
+            },
+            {
+                "lut_transformation_enabled" : False,
+                "lut_transformation_parameter": 0,
+                "diff_coding_enabled": True,
+                "binarization_id" : 3,
+                "binarization_parameters" : [],
+                "context_selection_id" : 2
+            }
+        ]
+    }
 
     # config_json_raw = json.dumps(config_json_py).encode(
     #     'utf-8'
@@ -115,13 +116,16 @@ class PythonApiTest(unittest.TestCase):
 
     def test_api(self):
         
+        print('Test transformation')
         self.assertEqual(GABAC_RETURN.SUCCESS, self._example_transformations(self.input_data1))
         self.assertEqual(GABAC_RETURN.SUCCESS, self._example_transformations(self.input_data2))
-        self.assertEqual(GABAC_RETURN.SUCCESS, self._example_run())
+        # print('Test run')
+        # self.assertEqual(GABAC_RETURN.SUCCESS, self._example_run())
+        print('Test run')
+        return_values = run_gabac(self.input_data1, self.config_json_py, ena_roundtrip=True)
+        self.assertEqual(GABAC_RETURN.SUCCESS, return_values[0])
 
     def _example_transformations(self, input_data):
-        print("Test transformation")
-
         blocks = array(gabac_data_block, 2)
         parameters_RLE = array(ct.c_uint64, [255])
         parameters_CABAC = array(
@@ -287,8 +291,6 @@ class PythonApiTest(unittest.TestCase):
             return GABAC_RETURN.FAILURE
 
     def _example_run(self):
-        print("Test run")
-
         # Init IO configuration
         io_config = gabac_io_config()
 

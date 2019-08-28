@@ -133,3 +133,9 @@ from .utils import (
     get_block_values, 
     are_blocks_equal
 )
+
+from .api import (
+    run_gabac,
+    GabacDataBlock,
+    GabacIoConfig
+)
