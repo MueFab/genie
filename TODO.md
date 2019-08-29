@@ -19,7 +19,7 @@
 
 ## For later
 
-- [ ] Check coding style with cpplint, clang-format and pycodestyle
+- [ ] Check coding style with clang-format and pycodestyle
 - [x] Clean up ``source/libs/format/CMakeLists.txt``
 - [x] Set up CMake for ``tests``
 - [ ] Add Autotools build system

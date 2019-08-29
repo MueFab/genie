@@ -1,6 +1,6 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
@@ -11,19 +11,11 @@ namespace gabac {
 
 class DataBlock;
 
-void transformEqualityCoding(
-        DataBlock *values,
-        DataBlock *equalityFlags
-);
+void transformEqualityCoding(DataBlock *values, DataBlock *equalityFlags);
 
-
-void inverseTransformEqualityCoding(
-        DataBlock *values,
-        DataBlock *equalityFlags
-);
-
+void inverseTransformEqualityCoding(DataBlock *values,
+                                    DataBlock *equalityFlags);
 
 }  // namespace gabac
-
 
 #endif  // GABAC_EQUALITY_CODING_H_

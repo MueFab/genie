@@ -1,6 +1,6 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
@@ -12,35 +12,18 @@
 
 namespace gabac {
 
-
-inline static void writeOut(
-        unsigned char byte,
-        DataBlock *const bitstream
-){
+inline static void writeOut(unsigned char byte, DataBlock *const bitstream) {
     bitstream->push_back(byte);
 }
 
-
-BitOutputStream::BitOutputStream(
-        DataBlock *const bitstream
-)
-        : m_bitstream(bitstream), m_heldBits(0), m_numHeldBits(0){
-    // Nothing to do here
-}
-
+BitOutputStream::BitOutputStream(DataBlock *const bitstream)
+    : m_bitstream(bitstream), m_heldBits(0), m_numHeldBits(0) {}
 
 BitOutputStream::~BitOutputStream() = default;
 
+void BitOutputStream::flush() { writeAlignZero(); }
 
-void BitOutputStream::flush(){
-    writeAlignZero();
-}
-
-
-void BitOutputStream::write(
-        unsigned int bits,
-        unsigned int numBits
-){
+void BitOutputStream::write(unsigned int bits, unsigned int numBits) {
     assert(numBits <= 32);
     // TODO(Jan): what does this assertions check?
     // assert((numBits == 32) || ((bits & (~0 << numBits)) == 0));
@@ -54,7 +37,8 @@ void BitOutputStream::write(
     // with the new bits, discarding the bits that will form the nextheldBits
 
     // Determine the nextHeldBits
-    auto nextHeldBits = static_cast<unsigned char>((bits << (8u - numNextHeldBits)) & static_cast<unsigned char>(0xff));
+    auto nextHeldBits = static_cast<unsigned char>(
+        (bits << (8u - numNextHeldBits)) & static_cast<unsigned char>(0xff));
     if (numTotalBits < 8) {
         // Insufficient bits accumulated to write out, append nextHeldBits to
         // current heldBits
@@ -81,22 +65,24 @@ void BitOutputStream::write(
         goto L0;
     }
 
-    writeOut(static_cast<unsigned char> ((writeBits >> 24u) & 0xffu), m_bitstream);
-    L3:
-    writeOut(static_cast<unsigned char> ((writeBits >> 16u) & 0xffu), m_bitstream);
-    L2:
-    writeOut(static_cast<unsigned char> ((writeBits >> 8u) & 0xffu), m_bitstream);
-    L1:
-    writeOut(static_cast<unsigned char> (writeBits & 0xffu), m_bitstream);
-    L0:
+    writeOut(static_cast<unsigned char>((writeBits >> 24u) & 0xffu),
+             m_bitstream);
+L3:
+    writeOut(static_cast<unsigned char>((writeBits >> 16u) & 0xffu),
+             m_bitstream);
+L2:
+    writeOut(static_cast<unsigned char>((writeBits >> 8u) & 0xffu),
+             m_bitstream);
+L1:
+    writeOut(static_cast<unsigned char>(writeBits & 0xffu), m_bitstream);
+L0:
 
     // Update output bitstream state
     m_heldBits = nextHeldBits;
     m_numHeldBits = numNextHeldBits;
 }
 
-
-void BitOutputStream::writeAlignZero(){
+void BitOutputStream::writeAlignZero() {
     if (m_numHeldBits == 0) {
         return;
     }
@@ -105,6 +91,5 @@ void BitOutputStream::writeAlignZero(){
     m_heldBits = 0x00;
     m_numHeldBits = 0;
 }
-
 
 }  // namespace gabac

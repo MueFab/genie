@@ -1,22 +1,22 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
 #include "stream-handler.h"
 #include "data-block.h"
 
-
 namespace gabac {
 
-size_t StreamHandler::readStream(std::istream& input, DataBlock *buffer){
+size_t StreamHandler::readStream(std::istream &input, DataBlock *buffer) {
     uint64_t streamSize = 0;
     input.read(reinterpret_cast<char *>(&streamSize), sizeof(uint64_t));
     return readBytes(input, streamSize, buffer);
 }
 
-size_t StreamHandler::readBytes(std::istream& input, size_t bytes, DataBlock *buffer){
+size_t StreamHandler::readBytes(std::istream &input, size_t bytes,
+                                DataBlock *buffer) {
     if (bytes % buffer->getWordSize()) {
         GABAC_DIE("Input stream length not a multiple of word size");
     }
@@ -25,7 +25,7 @@ size_t StreamHandler::readBytes(std::istream& input, size_t bytes, DataBlock *bu
     return bytes;
 }
 
-size_t StreamHandler::readFull(std::istream& input, DataBlock *buffer){
+size_t StreamHandler::readFull(std::istream &input, DataBlock *buffer) {
     auto safe = input.exceptions();
     input.exceptions(std::ios::badbit);
 
@@ -34,9 +34,9 @@ size_t StreamHandler::readFull(std::istream& input, DataBlock *buffer){
     while (input.good()) {
         size_t pos = buffer->size();
         buffer->resize(pos + BUFFER_SIZE);
-        input.read(
-                static_cast<char *>(buffer->getData()) + pos * buffer->getWordSize(),
-                BUFFER_SIZE * buffer->getWordSize());
+        input.read(static_cast<char *>(buffer->getData()) +
+                       pos * buffer->getWordSize(),
+                   BUFFER_SIZE * buffer->getWordSize());
     }
     if (!input.eof()) {
         GABAC_DIE("Error while reading input stream");
@@ -44,12 +44,14 @@ size_t StreamHandler::readFull(std::istream& input, DataBlock *buffer){
     if (input.gcount() % buffer->getWordSize()) {
         GABAC_DIE("Input stream length not a multiple of word size");
     }
-    buffer->resize(buffer->size() - (BUFFER_SIZE - input.gcount() / buffer->getWordSize()));
+    buffer->resize(buffer->size() -
+                   (BUFFER_SIZE - input.gcount() / buffer->getWordSize()));
     input.exceptions(safe);
     return buffer->size();
 }
 
-size_t StreamHandler::readBlock(std::istream& input, size_t bytes, DataBlock *buffer){
+size_t StreamHandler::readBlock(std::istream &input, size_t bytes,
+                                DataBlock *buffer) {
     auto safe = input.exceptions();
     input.exceptions(std::ios::badbit);
 
@@ -58,24 +60,26 @@ size_t StreamHandler::readBlock(std::istream& input, size_t bytes, DataBlock *bu
     }
     const size_t BUFFER_SIZE = bytes / buffer->getWordSize();
     buffer->resize(BUFFER_SIZE);
-    input.read(static_cast<char *>(buffer->getData()), BUFFER_SIZE * buffer->getWordSize());
+    input.read(static_cast<char *>(buffer->getData()),
+               BUFFER_SIZE * buffer->getWordSize());
     if (!input.good()) {
         if (!input.eof()) {
             GABAC_DIE("Error while reading input stream");
         }
-        buffer->resize(buffer->size() - (BUFFER_SIZE - input.gcount() / buffer->getWordSize()));
+        buffer->resize(buffer->size() -
+                       (BUFFER_SIZE - input.gcount() / buffer->getWordSize()));
     }
     input.exceptions(safe);
     return buffer->size();
 }
 
-size_t StreamHandler::writeStream(std::ostream& output, DataBlock *buffer){
+size_t StreamHandler::writeStream(std::ostream &output, DataBlock *buffer) {
     uint64_t size = buffer->getRawSize();
     output.write(reinterpret_cast<char *>(&size), sizeof(uint64_t));
     return writeBytes(output, buffer);
 }
 
-size_t StreamHandler::writeBytes(std::ostream& output, DataBlock *buffer){
+size_t StreamHandler::writeBytes(std::ostream &output, DataBlock *buffer) {
     size_t ret = buffer->getRawSize();
     output.write(static_cast<char *>(buffer->getData()), ret);
     buffer->clear();

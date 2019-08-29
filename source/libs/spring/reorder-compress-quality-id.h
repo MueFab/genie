@@ -40,6 +40,10 @@ namespace spring {
 
     void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std::vector<int64_t> tokens[128][8]);
 
+    void pack_id(const std::string &outfile_name, dsg::StreamSaver &st, dsg::AcessUnitStreams *streams);
+
+    void pack_qual(const std::string &outfile_name, dsg::StreamSaver &st, gabac::DataBlock *qualityBuffer);
+
 }  // namespace spring
 
 #endif  // SPRING_REORDER_COMPRESS_QUALITY_ID_H_
