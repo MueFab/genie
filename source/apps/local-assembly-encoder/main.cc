@@ -76,8 +76,10 @@ extern "C" void handleSignal(int sig) {
 
 int main(int argc, char *argv[]) {
     // Install signal handler for the following signal types:
-    //   SIGABRT  abnormal termination condition, as is e.g. initiated by std::abort()
-    //   SIGFPE   erroneous arithmetic operation such as divide by zero
+    //   SIGABRT  abnormal termination condition, as is e.g. initiated by
+    //            std::abort()
+    //   SIGFPE   erroneous arithmetic operation such as divide by
+    //            zero
     //   SIGILL   invalid program image, such as invalid instruction
     //   SIGINT   external interrupt, usually initiated by the user
     //   SIGSEGV  invalid memory access (segmentation fault)
@@ -95,10 +97,12 @@ int main(int argc, char *argv[]) {
         LOG_FATAL << "Failed to run";
     }
 
-    // The C standard makes no guarantees as to when output to stdout or stderr (standard error) is actually flushed.
-    // If e.g. stdout is directed to a file and an error occurs while flushing the data (after program termination),
-    // then the output may be lost. Thus we explicitly flush stdout and stderr. On failure, we notify the operating
-    // system by returning with EXIT_FAILURE.
+    // The C standard makes no guarantees as to when output to stdout or stderr
+    // (standard error) is actually flushed. If e.g. stdout is directed to a
+    // file and an error occurs while flushing the data (after program
+    // termination), then the output may be lost. Thus we explicitly flush
+    // stdout and stderr. On failure, we notify the operating system by
+    // returning with EXIT_FAILURE.
     if (fflush(stdout) == EOF) {
         return EXIT_FAILURE;
     }

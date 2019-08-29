@@ -5,7 +5,7 @@
 
 namespace lae {
 
-    void encode(const ProgramOptions &programOptions);
+void encode(const ProgramOptions &programOptions);
 
 }  // namespace lae
 

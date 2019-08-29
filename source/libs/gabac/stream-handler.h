@@ -1,6 +1,6 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
@@ -14,15 +14,16 @@ namespace gabac {
 
 class DataBlock;
 
-class StreamHandler
-{
- public:
-    static size_t readStream(std::istream& input, DataBlock *buffer);
-    static size_t readBytes(std::istream& input, size_t bytes, DataBlock *buffer);
-    static size_t readFull(std::istream& input, DataBlock *buffer);
-    static size_t readBlock(std::istream& input, size_t bytes, DataBlock *buffer);
-    static size_t writeStream(std::ostream& output, DataBlock *buffer);
-    static size_t writeBytes(std::ostream& output, DataBlock *buffer);
+class StreamHandler {
+   public:
+    static size_t readStream(std::istream& input, DataBlock* buffer);
+    static size_t readBytes(std::istream& input, size_t bytes,
+                            DataBlock* buffer);
+    static size_t readFull(std::istream& input, DataBlock* buffer);
+    static size_t readBlock(std::istream& input, size_t bytes,
+                            DataBlock* buffer);
+    static size_t writeStream(std::ostream& output, DataBlock* buffer);
+    static size_t writeBytes(std::ostream& output, DataBlock* buffer);
 };
 }  // namespace gabac
 

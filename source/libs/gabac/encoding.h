@@ -1,6 +1,6 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
@@ -12,10 +12,7 @@ namespace gabac {
 struct IOConfiguration;
 struct EncodingConfiguration;
 
-void encode(
-        const IOConfiguration& conf,
-        const EncodingConfiguration& enConf
-);
+void encode(const IOConfiguration& conf, const EncodingConfiguration& enConf);
 
 }  // namespace gabac
 

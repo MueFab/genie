@@ -1,13 +1,13 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
 #include "match-coding.h"
 
-#include <cassert>
 #include <algorithm>
+#include <cassert>
 #include <iostream>
 
 #include "block-stepper.h"
@@ -15,12 +15,10 @@
 
 namespace gabac {
 
-void transformMatchCoding(
-        const uint32_t windowSize,
-        gabac::DataBlock *const symbols,
-        gabac::DataBlock *const pointers,
-        gabac::DataBlock *const lengths
-){
+void transformMatchCoding(const uint32_t windowSize,
+                          gabac::DataBlock *const symbols,
+                          gabac::DataBlock *const pointers,
+                          gabac::DataBlock *const lengths) {
     assert(pointers != nullptr);
     assert(lengths != nullptr);
     assert(symbols != nullptr);
@@ -46,9 +44,8 @@ void transformMatchCoding(
 
         for (uint64_t w = windowStartIdx; w < windowEndIdx; w++) {
             uint64_t offset = i;
-            while (
-                    (offset < symbolsSize)
-                    && (symbols->get(offset) == (symbols->get(w + offset - i)))) {
+            while ((offset < symbolsSize) &&
+                   (symbols->get(offset) == (symbols->get(w + offset - i)))) {
                 offset++;
             }
             offset -= i;
@@ -69,13 +66,10 @@ void transformMatchCoding(
 
     rawValues.swap(symbols);
 }
-// ----------------------------------------------------------------------------
 
-void inverseTransformMatchCoding(
-        gabac::DataBlock *const rawValues,
-        gabac::DataBlock *const pointers,
-        gabac::DataBlock *const lengths
-){
+void inverseTransformMatchCoding(gabac::DataBlock *const rawValues,
+                                 gabac::DataBlock *const pointers,
+                                 gabac::DataBlock *const lengths) {
     gabac::DataBlock symbols(0, rawValues->getWordSize());
     assert(lengths->size() == pointers->size() + rawValues->size());
 
@@ -110,9 +104,4 @@ void inverseTransformMatchCoding(
     lengths->shrink_to_fit();
 }
 
-// ----------------------------------------------------------------------------
-
 }  // namespace gabac
-
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------

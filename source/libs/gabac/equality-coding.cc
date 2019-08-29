@@ -1,6 +1,6 @@
 /**
  * @file
- * @copyright This file is part of the GABAC encoder. See LICENCE and/or
+ * @copyright This file is part of GABAC. See LICENSE and/or
  * https://github.com/mitogen/gabac for more details.
  */
 
@@ -16,10 +16,8 @@
 namespace gabac {
 
 // Optimized for wordsize 1. In place for equality flags
-static void transformEqualityCoding0(
-        DataBlock *const values,
-        DataBlock *const equalityFlags
-){
+static void transformEqualityCoding0(DataBlock *const values,
+                                     DataBlock *const equalityFlags) {
     uint64_t previousSymbol = 0;
     *equalityFlags = DataBlock(0, values->getWordSize());
 
@@ -46,10 +44,8 @@ static void transformEqualityCoding0(
 }
 
 // Optimized for wordsize 1 > 0. In place for values
-static void transformEqualityCoding1(
-        DataBlock *const values,
-        DataBlock *const equalityFlags
-){
+static void transformEqualityCoding1(DataBlock *const values,
+                                     DataBlock *const equalityFlags) {
     uint64_t previousSymbol = 0;
 
     *equalityFlags = DataBlock(0, 1);
@@ -76,10 +72,8 @@ static void transformEqualityCoding1(
     values->resize(values->size() - (w.end - w.curr) / w.wordSize);
 }
 
-void transformEqualityCoding(
-        DataBlock *const values,
-        DataBlock *const equalityFlags
-){
+void transformEqualityCoding(DataBlock *const values,
+                             DataBlock *const equalityFlags) {
     assert(equalityFlags != nullptr);
     assert(values != nullptr);
 
@@ -90,12 +84,8 @@ void transformEqualityCoding(
     }
 }
 
-// ----------------------------------------------------------------------------
-
-void inverseTransformEqualityCoding(
-        DataBlock *const values,
-        DataBlock *const equalityFlags
-){
+void inverseTransformEqualityCoding(DataBlock *const values,
+                                    DataBlock *const equalityFlags) {
     assert(values != nullptr);
     assert(equalityFlags != nullptr);
     DataBlock output(0, values->getWordSize());
@@ -132,7 +122,8 @@ void inverseTransformEqualityCoding(
         rwrite.inc();
         rflag.inc();
     }
-    outputptr->resize(outputptr->size() - (rwrite.end - rwrite.curr) / rwrite.wordSize);
+    outputptr->resize(outputptr->size() -
+                      (rwrite.end - rwrite.curr) / rwrite.wordSize);
 
     // Swap memory to value buffer to meet conventions
     if (values->getWordSize() == 1) {
@@ -145,6 +136,5 @@ void inverseTransformEqualityCoding(
     equalityFlags->clear();
     equalityFlags->shrink_to_fit();
 }
-
 
 }  // namespace gabac
