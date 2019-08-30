@@ -2,13 +2,13 @@
 
 #include <gtest/gtest.h>
 
-#include <gabac/binary-arithmetic-decoder.cc>
-#include <gabac/context-tables.h>
 #include <gabac/context-selector.h>
+#include <gabac/context-tables.h>
 #include <gabac/data-block.h>
+#include <gabac/binary-arithmetic-decoder.cc>
 
 class BinaryArithmeticDecoderTest : public ::testing::Test {
-protected:
+   protected:
     BinaryArithmeticDecoderTest() = default;
 
     ~BinaryArithmeticDecoderTest() override = default;
@@ -27,8 +27,7 @@ protected:
     std::vector<gabac::ContextModel> contextModels_;
 };
 
-
-TEST_F(BinaryArithmeticDecoderTest, decodeBinsEP) { // NOLINT(cert-err58-cpp)
+TEST_F(BinaryArithmeticDecoderTest, decodeBinsEP) {  // NOLINT(cert-err58-cpp)
     gabac::DataBlock tmp = bitStream_;
     gabac::BitInputStream bitInputStream(&tmp);
     gabac::BinaryArithmeticDecoder bad(bitInputStream);
@@ -39,7 +38,7 @@ TEST_F(BinaryArithmeticDecoderTest, decodeBinsEP) { // NOLINT(cert-err58-cpp)
     EXPECT_ANY_THROW(bad.decodeBinsEP(8));
 }
 
-TEST_F(BinaryArithmeticDecoderTest, decodeBin) { // NOLINT(cert-err58-cpp)
+TEST_F(BinaryArithmeticDecoderTest, decodeBin) {  // NOLINT(cert-err58-cpp)
     gabac::DataBlock tmp = bitStream_;
     gabac::BitInputStream bitInputStream(&tmp);
     gabac::BinaryArithmeticDecoder bad(bitInputStream);
@@ -127,7 +126,7 @@ TEST_F(BinaryArithmeticDecoderTest, decodeBin) { // NOLINT(cert-err58-cpp)
     EXPECT_EQ(0, bad.decodeBin(&contextModels_[cm++]));
 }
 
-TEST_F(BinaryArithmeticDecoderTest, decodeBinTrm) { // NOLINT(cert-err58-cpp)
+TEST_F(BinaryArithmeticDecoderTest, decodeBinTrm) {  // NOLINT(cert-err58-cpp)
     gabac::DataBlock tmp = bitStream_;
     gabac::BitInputStream bitInputStream(&tmp);
     gabac::BinaryArithmeticDecoder bad(bitInputStream);

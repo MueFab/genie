@@ -48,7 +48,7 @@ using namespace std::filesystem;
 using ifstream = std::ifstream;
 using ofstream = std::ofstream;
 using fstream = std::fstream;
-}
+}  // namespace fs
 #else
 #define GHC_FILESYSTEM_FWD
 #include <ghc/filesystem.hpp>
@@ -57,7 +57,6 @@ using namespace ghc::filesystem;
 using ifstream = ghc::filesystem::ifstream;
 using ofstream = ghc::filesystem::ofstream;
 using fstream = ghc::filesystem::fstream;
-} 
+}  // namespace fs
 #endif
-#endif // GHC_FILESYSTEM_STD_FWD_H
-
+#endif  // GHC_FILESYSTEM_STD_FWD_H

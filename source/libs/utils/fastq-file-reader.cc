@@ -5,12 +5,11 @@
 
 namespace utils {
 
-FastqFileReader::FastqFileReader(    const std::string& path)    : FileReader(path) {}
+FastqFileReader::FastqFileReader(const std::string& path) : FileReader(path) {}
 
 FastqFileReader::~FastqFileReader() = default;
 
-size_t FastqFileReader::readRecords(    const size_t numRecords,    std::vector<FastqRecord> * const fastqRecords)
-{
+size_t FastqFileReader::readRecords(const size_t numRecords, std::vector<FastqRecord>* const fastqRecords) {
     fastqRecords->clear();
 
     while (true) {
@@ -27,19 +26,19 @@ size_t FastqFileReader::readRecords(    const size_t numRecords,    std::vector<
 
         readLine(&line);
         if (line.empty()) {
-            throw std::runtime_error{ "Truncated FASTQ record" };
+            throw std::runtime_error{"Truncated FASTQ record"};
         }
         fastqRecord.sequence = line;
 
         readLine(&line);
         if (line.empty()) {
-            throw std::runtime_error{ "Truncated FASTQ record" };
+            throw std::runtime_error{"Truncated FASTQ record"};
         }
         fastqRecord.optional = line;
 
         readLine(&line);
         if (line.empty()) {
-            throw std::runtime_error{ "Truncated FASTQ record" };
+            throw std::runtime_error{"Truncated FASTQ record"};
         }
         fastqRecord.qualityScores = line;
 

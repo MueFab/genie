@@ -22,16 +22,13 @@ enum class SequenceTransformationId;
  * @brief Parameters for single stream
  */
 struct TransformedSequenceConfiguration {
-    bool lutTransformationEnabled; /**< @brief LUT transformation switch */
-    unsigned int lutBits;          /**< @brief Bits/values in LUT table */
-    unsigned int lutOrder;         /**< @brief Context size for LUT */
-    bool diffCodingEnabled;        /**< @brief Diff coding switch */
-    gabac::BinarizationId
-        binarizationId; /**< @brief Which binarization to use */
-    std::vector<unsigned int>
-        binarizationParameters; /**< @brief Parameters for binarization */
-    gabac::ContextSelectionId
-        contextSelectionId; /**< @brief Which context to use in CABAC */
+    bool lutTransformationEnabled;                    /**< @brief LUT transformation switch */
+    unsigned int lutBits;                             /**< @brief Bits/values in LUT table */
+    unsigned int lutOrder;                            /**< @brief Context size for LUT */
+    bool diffCodingEnabled;                           /**< @brief Diff coding switch */
+    gabac::BinarizationId binarizationId;             /**< @brief Which binarization to use */
+    std::vector<unsigned int> binarizationParameters; /**< @brief Parameters for binarization */
+    gabac::ContextSelectionId contextSelectionId;     /**< @brief Which context to use in CABAC */
 
     /**
      * @brief Create a human readable string from this config
@@ -99,8 +96,7 @@ struct EncodingConfiguration {
      * Moreover the modified config is probably not optimal, but it will work.
      * @return Adapted configuration
      */
-    gabac::EncodingConfiguration generalize(uint64_t max,
-                                            unsigned wordsize) const;
+    gabac::EncodingConfiguration generalize(uint64_t max, unsigned wordsize) const;
 
     /**
      * Applies generalize() and checks if it changed the configuration, i.a. if
@@ -129,8 +125,7 @@ struct EncodingConfiguration {
      * @param wordsize Maximum allowed word size
      * @return An improved configuration
      */
-    gabac::EncodingConfiguration optimize(uint64_t max,
-                                          unsigned wordsize) const;
+    gabac::EncodingConfiguration optimize(uint64_t max, unsigned wordsize) const;
 
     /**
      * Applies optimize() and checks if it changed the configuration, i.a. if it
@@ -155,15 +150,11 @@ struct EncodingConfiguration {
      */
     bool operator!=(const EncodingConfiguration& conf) const;
 
-    unsigned int
-        wordSize; /**< @brief How many bytes are considered one symbol */
-    gabac::SequenceTransformationId
-        sequenceTransformationId; /**< @brief Which transformation to apply */
-    unsigned int
-        sequenceTransformationParameter; /**< @brief Parameter for input stream
-                                            transformation */
-    std::vector<TransformedSequenceConfiguration>
-        transformedSequenceConfigurations; /**< @brief Stream configs */
+    unsigned int wordSize;                                    /**< @brief How many bytes are considered one symbol */
+    gabac::SequenceTransformationId sequenceTransformationId; /**< @brief Which transformation to apply */
+    unsigned int sequenceTransformationParameter;             /**< @brief Parameter for input stream
+                                                                 transformation */
+    std::vector<TransformedSequenceConfiguration> transformedSequenceConfigurations; /**< @brief Stream configs */
 };
 
 /**
@@ -172,8 +163,8 @@ struct EncodingConfiguration {
 struct IOConfiguration {
     std::istream* inputStream;  /**< @brief Where to read from */
     std::ostream* outputStream; /**< @brief Where to write to */
-    size_t blocksize; /**< @brief How many bytes to read at once. Put 0 to read
-                         all in one go */
+    size_t blocksize;           /**< @brief How many bytes to read at once. Put 0 to read
+                                   all in one go */
 
     std::ostream* logStream; /**< @brief Where to write logging information*/
 
@@ -211,32 +202,23 @@ struct IOConfiguration {
  * TODO: Add json serialization
  */
 struct AnalysisConfiguration {
-    std::vector<unsigned>
-        candidateWordsizes; /**< @brief Which word sizes to test */
-    std::vector<gabac::SequenceTransformationId>
-        candidateSequenceTransformationIds; /**<  @brief Transformationlist */
-    std::vector<uint32_t>
-        candidateMatchCodingParameters; /**< @brief Which match coding window
-                                           sizes to test */
-    std::vector<uint32_t>
-        candidateRLECodingParameters; /**< @brief Which RLE guards to test */
-    std::vector<bool> candidateLUTCodingParameters; /**< @brief Which LUT states
-                                                       (true, false) to test */
-    std::vector<bool> candidateDiffParameters; /**< @brief Which diff states
-                                                  (true, false) to test */
-    std::vector<gabac::BinarizationId>
-        candidateUnsignedBinarizationIds; /**< @brief Which unsigned bins to
-                                             test */
-    std::vector<gabac::BinarizationId>
-        candidateSignedBinarizationIds; /**< @brief Which signed bins to test */
-    std::vector<unsigned>
-        candidateBinarizationParameters; /**< @brief Which bin parameters to
-                                            test */
-    std::vector<gabac::ContextSelectionId>
-        candidateContextSelectionIds; /**< @brief Which cabac contexts to test
-                                       */
-    std::vector<unsigned>
-        candidateLutOrder; /**< @brief Which LUT orders to test */
+    std::vector<unsigned> candidateWordsizes; /**< @brief Which word sizes to test */
+    std::vector<gabac::SequenceTransformationId> candidateSequenceTransformationIds; /**<  @brief Transformationlist */
+    std::vector<uint32_t> candidateMatchCodingParameters;                /**< @brief Which match coding window
+                                                                            sizes to test */
+    std::vector<uint32_t> candidateRLECodingParameters;                  /**< @brief Which RLE guards to test */
+    std::vector<bool> candidateLUTCodingParameters;                      /**< @brief Which LUT states
+                                                                            (true, false) to test */
+    std::vector<bool> candidateDiffParameters;                           /**< @brief Which diff states
+                                                                            (true, false) to test */
+    std::vector<gabac::BinarizationId> candidateUnsignedBinarizationIds; /**< @brief Which unsigned bins to
+                                                                            test */
+    std::vector<gabac::BinarizationId> candidateSignedBinarizationIds;   /**< @brief Which signed bins to test */
+    std::vector<unsigned> candidateBinarizationParameters;               /**< @brief Which bin parameters to
+                                                                            test */
+    std::vector<gabac::ContextSelectionId> candidateContextSelectionIds; /**< @brief Which cabac contexts to test
+                                                                          */
+    std::vector<unsigned> candidateLutOrder;                             /**< @brief Which LUT orders to test */
 
     uint64_t maxValue;
     uint8_t wordSize;

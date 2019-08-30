@@ -26,15 +26,15 @@
 
 namespace utils {
 
-    struct LazyLineBreakAndFlushStdout {
-        ~LazyLineBreakAndFlushStdout() { std::cout << std::endl; }  // this also flushes stdout
-    };
+struct LazyLineBreakAndFlushStdout {
+    ~LazyLineBreakAndFlushStdout() { std::cout << std::endl; }  // this also flushes stdout
+};
 
-    struct LazyLineBreakAndFlushStderr {
-        ~LazyLineBreakAndFlushStderr() { std::cerr << std::endl; }  // this also flushes stderr
-    };
+struct LazyLineBreakAndFlushStderr {
+    ~LazyLineBreakAndFlushStderr() { std::cerr << std::endl; }  // this also flushes stderr
+};
 
-    std::string currentDateAndTime();
+std::string currentDateAndTime();
 
 }  // namespace utils
 

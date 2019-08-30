@@ -71,10 +71,10 @@
 #define be64toh(x) OSSwapBigToHostInt64(x)
 #define le64toh(x) OSSwapLittleToHostInt64(x)
 
-#define __BYTE_ORDER    BYTE_ORDER
-#define __BIG_ENDIAN    BIG_ENDIAN
+#define __BYTE_ORDER BYTE_ORDER
+#define __BIG_ENDIAN BIG_ENDIAN
 #define __LITTLE_ENDIAN LITTLE_ENDIAN
-#define __PDP_ENDIAN    PDP_ENDIAN
+#define __PDP_ENDIAN PDP_ENDIAN
 
 #elif defined(__OpenBSD__)
 
@@ -95,8 +95,8 @@
 
 #elif defined(__WINDOWS__)
 
-#include <winsock2.h>
 #include <sys/param.h>
+#include <winsock2.h>
 
 #if BYTE_ORDER == LITTLE_ENDIAN
 
@@ -139,10 +139,10 @@
 
 #endif
 
-#define __BYTE_ORDER    BYTE_ORDER
-#define __BIG_ENDIAN    BIG_ENDIAN
+#define __BYTE_ORDER BYTE_ORDER
+#define __BIG_ENDIAN BIG_ENDIAN
 #define __LITTLE_ENDIAN LITTLE_ENDIAN
-#define __PDP_ENDIAN    PDP_ENDIAN
+#define __PDP_ENDIAN PDP_ENDIAN
 
 #else
 
@@ -157,7 +157,7 @@
 #if defined(_MSC_VER)
 #include "inttypes.h"
 #elif !defined(__CLANG_INTTYPES_H)
-# include <inttypes.h>
+#include <inttypes.h>
 #endif
 
 // Some printf macros for size_t, in the style of inttypes.h.
@@ -185,4 +185,4 @@
 #define PRIXS __PRIS_PREFIX "X"
 #define PRIoS __PRIS_PREFIX "o"
 
-#endif //MPEGG_REFERENCE_SW_PORTABILITY_H
+#endif  // MPEGG_REFERENCE_SW_PORTABILITY_H

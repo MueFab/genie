@@ -3,27 +3,22 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <fstream>
 #include <functional>
 #include <iomanip>
 #include <iostream>
 #include <limits>
 #include <utility>
 #include <vector>
-#include <fstream>
 
 #include "gabac/gabac.h"
-
 
 namespace gabacify {
 
 //------------------------------------------------------------------------------
 
-void code(const std::string& inputFilePath,
-          const std::string& configurationFilePath,
-          const std::string& outputFilePath,
-          size_t blocksize,
-          bool decode
-){
+void code(const std::string &inputFilePath, const std::string &configurationFilePath, const std::string &outputFilePath,
+          size_t blocksize, bool decode) {
     std::ifstream inputFile;
     std::ofstream outputFile;
     gabac::NullStream nullstream;
@@ -53,12 +48,7 @@ void code(const std::string& inputFilePath,
         logstream = &nullstream;
     }
 
-    gabac::IOConfiguration ioconf = {istream,
-                                     ostream,
-                                     blocksize,
-                                     logstream,
-                                     gabac::IOConfiguration::LogLevel::INFO
-    };
+    gabac::IOConfiguration ioconf = {istream, ostream, blocksize, logstream, gabac::IOConfiguration::LogLevel::INFO};
 
     // Read the entire configuration file as a string and convert the JSON
     // input string to the internal GABAC configuration

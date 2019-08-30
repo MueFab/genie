@@ -28,9 +28,7 @@ Reader::Reader(DataBlock *const bitstream)
 
 Reader::~Reader() = default;
 
-uint64_t Reader::readAsBIbypass(unsigned int cLength) {
-    return m_decBinCabac.decodeBinsEP(cLength);
-}
+uint64_t Reader::readAsBIbypass(unsigned int cLength) { return m_decBinCabac.decodeBinsEP(cLength); }
 
 uint64_t Reader::readAsBIcabac(unsigned int cLength, unsigned int offset) {
     unsigned int bins = 0;
@@ -119,8 +117,7 @@ uint64_t Reader::readAsSEGcabac(unsigned int, unsigned int offset) {
         if (tmp == 0) {
             return 0;
         } else {
-            return (
-                static_cast<uint64_t>(-1 * static_cast<int64_t>(tmp >> 1u)));
+            return (static_cast<uint64_t>(-1 * static_cast<int64_t>(tmp >> 1u)));
         }
     } else {
         return (tmp + 1) >> 1u;

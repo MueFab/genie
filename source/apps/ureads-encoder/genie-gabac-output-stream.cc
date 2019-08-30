@@ -4,17 +4,15 @@
 
 namespace genie {
 
-GenieGabacOutputBuffer::GenieGabacOutputBuffer() : bytesLeft(0){
+GenieGabacOutputBuffer::GenieGabacOutputBuffer() : bytesLeft(0) {}
 
-}
-
-int GenieGabacOutputBuffer::overflow(int c){
+int GenieGabacOutputBuffer::overflow(int c) {
     char c2 = c;
     xsputn(&c2, sizeof(char));
     return c;
 }
 
-std::streamsize GenieGabacOutputBuffer::xsputn(const char *s, std::streamsize n){
+std::streamsize GenieGabacOutputBuffer::xsputn(const char *s, std::streamsize n) {
     std::streamsize curPos = 0;
     while (curPos < n) {
         // Fill size buffer
@@ -38,7 +36,7 @@ std::streamsize GenieGabacOutputBuffer::xsputn(const char *s, std::streamsize n)
     return n;
 }
 
-void GenieGabacOutputBuffer::flush_blocks(std::vector<gabac::DataBlock> *dat){
+void GenieGabacOutputBuffer::flush_blocks(std::vector<gabac::DataBlock> *dat) {
     if (bytesLeft) {
         GABAC_DIE("Stream not in flushable state, bytes left");
     }
@@ -48,4 +46,4 @@ void GenieGabacOutputBuffer::flush_blocks(std::vector<gabac::DataBlock> *dat){
     dat->clear();
     dat->swap(streams);
 }
-}
+}  // namespace genie

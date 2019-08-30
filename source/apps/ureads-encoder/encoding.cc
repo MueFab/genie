@@ -19,12 +19,9 @@ extern "C" {
 
 #include <gabac/gabac.h>
 
-
 namespace genie {
 
-
-void encode(const ProgramOptions &programOptions)
-{
+void encode(const ProgramOptions& programOptions) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     // UREADS DESCRIPTOR GENERATION
     /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,7 +42,7 @@ void encode(const ProgramOptions &programOptions)
         }
 
         // Iterate through the records.
-        for (const auto &fastqRecord : fastqRecords) {
+        for (const auto& fastqRecord : fastqRecords) {
             decodedUreads += fastqRecord.sequence;
         }
 
@@ -56,8 +53,8 @@ void encode(const ProgramOptions &programOptions)
 
     // Alphabet
     // uint8_t alphabet_ID = 0;
-    const std::vector<char> S_0 = { 'A', 'C', 'G', 'T', 'N' };
-    const std::map<char, uint8_t> S_0_INVERSE= { { 'A', 0 }, { 'C', 1 }, { 'G', 2 }, { 'T', 3 }, { 'N', 4 } };
+    const std::vector<char> S_0 = {'A', 'C', 'G', 'T', 'N'};
+    const std::map<char, uint8_t> S_0_INVERSE = {{'A', 0}, {'C', 1}, {'G', 2}, {'T', 3}, {'N', 4}};
 
     GENIE_LOG_TRACE << "decodedUreads (length: " << decodedUreads.size() << "): " << decodedUreads;
 
@@ -84,25 +81,25 @@ void encode(const ProgramOptions &programOptions)
     gabac::IBufferStream bufferInputStream(&inputDataBlock);
     GenieGabacOutputStream bufferOutputStream;
 
-    const std::string DEFAULT_GABAC_CONF_JSON = "{"
-                                       "\"word_size\": 1,"
-                                       "\"sequence_transformation_id\": 0,"
-                                       "\"sequence_transformation_parameter\": 0,"
-                                       "\"transformed_sequences\":"
-                                       "[{"
-                                           "\"lut_transformation_enabled\": false,"
-                                           "\"diff_coding_enabled\": false,"
-                                           "\"binarization_id\": 0,"
-                                           "\"binarization_parameters\":[3],"
-                                           "\"context_selection_id\": 0"
-                                       "}]"
-                                   "}";
+    const std::string DEFAULT_GABAC_CONF_JSON =
+        "{"
+        "\"word_size\": 1,"
+        "\"sequence_transformation_id\": 0,"
+        "\"sequence_transformation_parameter\": 0,"
+        "\"transformed_sequences\":"
+        "[{"
+        "\"lut_transformation_enabled\": false,"
+        "\"diff_coding_enabled\": false,"
+        "\"binarization_id\": 0,"
+        "\"binarization_parameters\":[3],"
+        "\"context_selection_id\": 0"
+        "}]"
+        "}";
     const gabac::EncodingConfiguration GABAC_CONFIG(DEFAULT_GABAC_CONF_JSON);
-    const size_t GABAC_BLOCK_SIZE = 0; // 0 means single block (block size is equal to input size)
+    const size_t GABAC_BLOCK_SIZE = 0;  // 0 means single block (block size is equal to input size)
     std::ostream* const GABC_LOG_OUTPUT_STREAM = &std::cout;
-    const gabac::IOConfiguration GABAC_IO_SETUP = { &bufferInputStream, &bufferOutputStream,
-                                                    GABAC_BLOCK_SIZE,
-                                                    GABC_LOG_OUTPUT_STREAM, gabac::IOConfiguration::LogLevel::TRACE };
+    const gabac::IOConfiguration GABAC_IO_SETUP = {&bufferInputStream, &bufferOutputStream, GABAC_BLOCK_SIZE,
+                                                   GABC_LOG_OUTPUT_STREAM, gabac::IOConfiguration::LogLevel::TRACE};
 
     const bool GABAC_DECODING_MODE = false;
     gabac::run(GABAC_IO_SETUP, GABAC_CONFIG, GABAC_DECODING_MODE);
@@ -114,7 +111,7 @@ void encode(const ProgramOptions &programOptions)
     GENIE_LOG_TRACE << "Number of bitstreams: " << generated_streams.size();
     for (const auto& bsp : generated_streams) {
         const size_t BLOCK_PAYLOAD_SIZE = bsp.getRawSize();
-        const char* const BLOCK_PAYLOAD = static_cast<const char *> (bsp.getData());
+        const char* const BLOCK_PAYLOAD = static_cast<const char*>(bsp.getData());
         GENIE_LOG_TRACE << "Block payload size: " << BLOCK_PAYLOAD_SIZE;
         GENIE_LOG_TRACE << "Block payload: ";
         for (size_t i = 0; i < BLOCK_PAYLOAD_SIZE; i++) {
@@ -227,7 +224,8 @@ void encode(const ProgramOptions &programOptions)
         //         }else{
         //             //use this method if the descriptor configuration is different for all classes
         //             for(uint8_t class_i=0; class_i<numClasses; class_i++){
-        //                 DecoderConfigurationTypeCABAC* testingDecoderConf = getTestingDecoderConfigurationTypeCABAC();
+        //                 DecoderConfigurationTypeCABAC* testingDecoderConf =
+        //                 getTestingDecoderConfigurationTypeCABAC();
         //                 setClassSpecificDescriptorConfigurationAndEncodingMode(
         //                         encodingParameters,
         //                         class_i,
@@ -319,19 +317,21 @@ void encode(const ProgramOptions &programOptions)
         // EXPECT_EQ(splicedReadsFlag, splicedReadsFlag_buffer);
         // EXPECT_EQ(SUCCESS, getMultipleAlignments_flag(encodingParametersType, &multipleSignatureFlag_buffer));
         // EXPECT_EQ(multipleSignatureFlag, multipleSignatureFlag_buffer);
-        // EXPECT_EQ(SUCCESS, getMultipleSignatureBaseParameters(encodingParametersType, &multipleSignatureBase_buffer));
-        // EXPECT_EQ(multipleSignatureBase, multipleSignatureBase_buffer);
+        // EXPECT_EQ(SUCCESS, getMultipleSignatureBaseParameters(encodingParametersType,
+        // &multipleSignatureBase_buffer)); EXPECT_EQ(multipleSignatureBase, multipleSignatureBase_buffer);
         // EXPECT_EQ(SUCCESS, getSignatureSize(encodingParametersType, &U_signature_size_buffer));
         // EXPECT_EQ(U_signature_size, U_signature_size_buffer);
         //
         //
         // DecoderConfigurationTypeCABAC* decoder_configuration_cabac_buffer;
-        // EXPECT_EQ(OUT_OF_BOUNDERIES, getCABACDecoderConfiguration(encodingParametersType, 6, 0, &decoder_configuration_cabac_buffer));
-        // EXPECT_EQ(OUT_OF_BOUNDERIES, getCABACDecoderConfiguration(encodingParametersType, 0, 19, &decoder_configuration_cabac_buffer));
-        // EXPECT_EQ(OUT_OF_BOUNDERIES, getCABACDecoderConfiguration(encodingParametersType, 0, 11, &decoder_configuration_cabac_buffer));
+        // EXPECT_EQ(OUT_OF_BOUNDERIES, getCABACDecoderConfiguration(encodingParametersType, 6, 0,
+        // &decoder_configuration_cabac_buffer)); EXPECT_EQ(OUT_OF_BOUNDERIES,
+        // getCABACDecoderConfiguration(encodingParametersType, 0, 19, &decoder_configuration_cabac_buffer));
+        // EXPECT_EQ(OUT_OF_BOUNDERIES, getCABACDecoderConfiguration(encodingParametersType, 0, 11,
+        // &decoder_configuration_cabac_buffer));
         //
-        // EXPECT_EQ(SUCCESS, getCABACDecoderConfiguration(encodingParametersType, 0, 0, &decoder_configuration_cabac_buffer));
-        // testDecoderConfigurationCabac(decoder_configuration_cabac_buffer);
+        // EXPECT_EQ(SUCCESS, getCABACDecoderConfiguration(encodingParametersType, 0, 0,
+        // &decoder_configuration_cabac_buffer)); testDecoderConfigurationCabac(decoder_configuration_cabac_buffer);
         //
         //
         // free(classIDs_check);
@@ -348,45 +348,28 @@ void encode(const ProgramOptions &programOptions)
         const uint32_t ACCESS_UNIT_ID = 0;
         const uint8_t NUM_BLOCKS = 1;
         const uint16_t PARAMETER_SET_ID = 0;
-        const ClassType CLASS_TYPE = { .classType = CLASS_TYPE_CLASS_U };
+        const ClassType CLASS_TYPE = {.classType = CLASS_TYPE_CLASS_U};
         const uint32_t READS_COUNT = 1;
         const uint16_t MM_THRESHOLD = 0;
         const uint32_t MM_COUNT = 0;
-        const SequenceID SEQUENCE_ID = { .sequenceID = 0 };
+        const SequenceID SEQUENCE_ID = {.sequenceID = 0};
         const uint64_t REFERENCE_START_POS = 0;
         const uint64_t REFERENCE_END_POS = 0;
-        const SequenceID REFSEQUENCE_ID = { .sequenceID = 0 };
+        const SequenceID REFSEQUENCE_ID = {.sequenceID = 0};
         const uint64_t AU_START_POSITION = 0;
         const uint64_t AU_END_POSITION = 0;
         const uint64_t EXTENDED_AU_START_POSITION = 0;
         const uint64_t EXTENDED_AU_END_POSITION = 0;
 
         DataUnitAccessUnit* const accessUnit = initDataUnitAccessUnit(
-                ACCESS_UNIT_ID,
-                NUM_BLOCKS,
-                PARAMETER_SET_ID,
-                CLASS_TYPE,
-                READS_COUNT,
-                MM_THRESHOLD,
-                MM_COUNT,
-                SEQUENCE_ID,
-                REFERENCE_START_POS,
-                REFERENCE_END_POS,
-                REFSEQUENCE_ID,
-                AU_START_POSITION,
-                AU_END_POSITION,
-                EXTENDED_AU_START_POSITION,
-                EXTENDED_AU_END_POSITION
-         );
+            ACCESS_UNIT_ID, NUM_BLOCKS, PARAMETER_SET_ID, CLASS_TYPE, READS_COUNT, MM_THRESHOLD, MM_COUNT, SEQUENCE_ID,
+            REFERENCE_START_POS, REFERENCE_END_POS, REFSEQUENCE_ID, AU_START_POSITION, AU_END_POSITION,
+            EXTENDED_AU_START_POSITION, EXTENDED_AU_END_POSITION);
 
         // DatasetContainer* const datasetContainer = initDatasetContainer();
         const uint8_t DESCRIPTOR_ID = 6;
         DataUnitBlockHeader* blockHeader = initDataUnitBlockHeader(DESCRIPTOR_ID, BLOCK_PAYLOAD_SIZE);
-        Block* const block = initBlockWithHeaderPayloadInMemory(
-                DESCRIPTOR_ID,
-                BLOCK_PAYLOAD_SIZE,
-                BLOCK_PAYLOAD
-        );
+        Block* const block = initBlockWithHeaderPayloadInMemory(DESCRIPTOR_ID, BLOCK_PAYLOAD_SIZE, BLOCK_PAYLOAD);
 
         bool success = addBlockToDataUnitAccessUnit(accessUnit, block, blockHeader);
         if (!success) {
@@ -409,6 +392,5 @@ void encode(const ProgramOptions &programOptions)
     // 3) Jan      2019-06-25   fill encoding parameters
     // 4) Fabian   2019-06-28   x-check w/ ref SW
 }
-
 
 }  // namespace genie

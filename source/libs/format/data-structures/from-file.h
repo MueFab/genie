@@ -5,12 +5,11 @@
 #ifndef MPEGG_CAPSULATOR_FROMFILE_H
 #define MPEGG_CAPSULATOR_FROMFILE_H
 
-
-#include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
-typedef struct{
+typedef struct {
     char* filename;
     uint64_t startPos;
     uint64_t endPos;
@@ -19,13 +18,11 @@ typedef struct{
 
 FromFile* initFromFileWithFilename(char* filename);
 FromFile* initFromFile();
-FromFile* initFromFileWithFilenameAndBoundaries(char *filename, uint64_t startPos, uint64_t endPos);
+FromFile* initFromFileWithFilenameAndBoundaries(char* filename, uint64_t startPos, uint64_t endPos);
 uint64_t getFromFileSize(FromFile* fromFile);
 bool writeFromFile(FromFile* fromFile, FILE* outputFile);
 bool isFromFileInitiated(FromFile* fromFile);
 void freeFromFile(FromFile* fromFile);
 FromFile* cloneFromFile(FromFile* originalFromFile);
 
-
-
-#endif //MPEGG_CAPSULATOR_FROMFILE_H
+#endif  // MPEGG_CAPSULATOR_FROMFILE_H

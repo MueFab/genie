@@ -43,17 +43,11 @@ class ContextModel {
 
 inline unsigned char ContextModel::getState() const { return m_state >> 1u; }
 
-inline unsigned char ContextModel::getMps() const {
-    return m_state & static_cast<unsigned char>(0x1u);
-}
+inline unsigned char ContextModel::getMps() const { return m_state & static_cast<unsigned char>(0x1u); }
 
-inline void ContextModel::updateLps() {
-    m_state = cabactables::nextStateLps[m_state];
-}
+inline void ContextModel::updateLps() { m_state = cabactables::nextStateLps[m_state]; }
 
-inline void ContextModel::updateMps() {
-    m_state = cabactables::nextStateMps[m_state];
-}
+inline void ContextModel::updateMps() { m_state = cabactables::nextStateMps[m_state]; }
 
 }  // namespace gabac
 

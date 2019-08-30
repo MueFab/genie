@@ -1,322 +1,333 @@
-#include <vector>
-#include <string>
 #include <algorithm>
+#include <string>
+#include <vector>
 
-#define CLASS_P     1
-#define CLASS_N     2
-#define CLASS_M     3
-#define CLASS_I     4
-#define CLASS_HM    5
-#define CLASS_U     6
+#define CLASS_P 1
+#define CLASS_N 2
+#define CLASS_M 3
+#define CLASS_I 4
+#define CLASS_HM 5
+#define CLASS_U 6
 
-#define EQUALITY_CODING     7
-#define MATCH_CODING        8
-#define RLE_CODING          9
-#define MERGE_CODING        10
+#define EQUALITY_CODING 7
+#define MATCH_CODING 8
+#define RLE_CODING 9
+#define MERGE_CODING 10
 
 namespace data_structures {
 
-    template<typename T>
-    struct expandable_array : private std::vector<T> {
-    private:
-        std::vector<T> vec;
+template <typename T>
+struct expandable_array : private std::vector<T> {
+   private:
+    std::vector<T> vec;
 
-    public:
-        
-        using typename std::vector<T>::iterator;
-        using typename std::vector<T>::const_iterator;
-        using typename std::vector<T>::reverse_iterator;
-        using typename std::vector<T>::const_reverse_iterator;
+   public:
+    using typename std::vector<T>::iterator;
+    using typename std::vector<T>::const_iterator;
+    using typename std::vector<T>::reverse_iterator;
+    using typename std::vector<T>::const_reverse_iterator;
 
-        expandable_array();
-        expandable_array(size_t);
-        expandable_array(size_t, const T&);
-        expandable_array(expandable_array<T>::const_iterator, expandable_array<T>::const_iterator);
+    expandable_array();
+    expandable_array(size_t);
+    expandable_array(size_t, const T &);
+    expandable_array(expandable_array<T>::const_iterator, expandable_array<T>::const_iterator);
 
-        T&          operator[](size_t);
-        const T&    operator[](size_t) const;
+    T &operator[](size_t);
+    const T &operator[](size_t) const;
 
-        
-        size_t      size();
-        void        clear();
-        bool        empty();
+    size_t size();
+    void clear();
+    bool empty();
 
-        iterator        begin();
-        iterator        end();
-        const_iterator  begin() const;
-        const_iterator  end() const;
+    iterator begin();
+    iterator end();
+    const_iterator begin() const;
+    const_iterator end() const;
 
-        reverse_iterator        rbegin();
-        reverse_iterator        rend();
-        const_reverse_iterator  rbegin() const;
-        const_reverse_iterator  rend() const;
+    reverse_iterator rbegin();
+    reverse_iterator rend();
+    const_reverse_iterator rbegin() const;
+    const_reverse_iterator rend() const;
+};
 
-    };
+struct COP {
+    COP();
+    COP(uint16_t);
+};  // this one should raise an exception
+struct RLE {
+    RLE();
+    RLE(uint16_t, uint64_t);
+};  // this one should raise an exception
+struct CABAC_METHOD_0 {
+    CABAC_METHOD_0();
+    CABAC_METHOD_0(uint16_t, uint64_t);
+};  // this one should raise an exception
+struct CABAC_METHOD_1 {
+    CABAC_METHOD_1();
+    CABAC_METHOD_1(uint16_t, uint64_t);
+};  // this one should raise an exception
+struct X4 {
+    X4();
+    X4(uint16_t, uint64_t);
+};  // this one should raise an exception
 
-    struct COP              { COP(); COP(uint16_t); }; // this one should raise an exception
-    struct RLE              { RLE(); RLE(uint16_t, uint64_t); }; // this one should raise an exception
-    struct CABAC_METHOD_0   { CABAC_METHOD_0(); CABAC_METHOD_0(uint16_t, uint64_t); }; // this one should raise an exception
-    struct CABAC_METHOD_1   { CABAC_METHOD_1(); CABAC_METHOD_1(uint16_t, uint64_t); }; // this one should raise an exception
-    struct X4               { X4(); X4(uint16_t, uint64_t); }; // this one should raise an exception
-    
-    struct CAT { 
-        expandable_array<expandable_array<uint8_t> > decoded_tokens;
-        CAT(); 
-        CAT(uint16_t, uint64_t); 
-    };
+struct CAT {
+    expandable_array<expandable_array<uint8_t> > decoded_tokens;
+    CAT();
+    CAT(uint16_t, uint64_t);
+};
 
-    struct decode_tokentype_sequence {
-        CAT             cat;
-        RLE             rle;
-        CABAC_METHOD_0  cm0;
-        CABAC_METHOD_1  cm1;
-        X4              x4;
+struct decode_tokentype_sequence {
+    CAT cat;
+    RLE rle;
+    CABAC_METHOD_0 cm0;
+    CABAC_METHOD_1 cm1;
+    X4 x4;
 
-        decode_tokentype_sequence();
-        decode_tokentype_sequence(uint16_t, uint8_t, uint64_t); // might throw exception
-    };
+    decode_tokentype_sequence();
+    decode_tokentype_sequence(uint16_t, uint8_t, uint64_t);  // might throw exception
+};
 
-    struct encoded_tokentype_sequence {
-        uint16_t        i;
-        uint8_t         type_ID;
-        uint8_t         method_ID;
+struct encoded_tokentype_sequence {
+    uint16_t i;
+    uint8_t type_ID;
+    uint8_t method_ID;
 
-        uint16_t        ref_type_ID;    // reserved for future use, since we are currenty assuming method_ID = 1
-        COP             cop;            // same here
+    uint16_t ref_type_ID;  // reserved for future use, since we are currenty assuming method_ID = 1
+    COP cop;               // same here
 
-        uint64_t                    num_output_symbols;
-        decode_tokentype_sequence   dec_tt_seq;
+    uint64_t num_output_symbols;
+    decode_tokentype_sequence dec_tt_seq;
 
-        encoded_tokentype_sequence();
-        encoded_tokentype_sequence(uint16_t, uint8_t);  // reserved for future use
-                                                        // creates COP(i) object when method_ID = 0
-        encoded_tokentype_sequence(uint16_t, uint8_t, uint64_t);    // creates decode_tokentype_sequence object
-                                                                    // i, method_ID, num_output_symbols
-    };
+    encoded_tokentype_sequence();
+    encoded_tokentype_sequence(uint16_t, uint8_t);            // reserved for future use
+                                                              // creates COP(i) object when method_ID = 0
+    encoded_tokentype_sequence(uint16_t, uint8_t, uint64_t);  // creates decode_tokentype_sequence object
+                                                              // i, method_ID, num_output_symbols
+};
 
-    // 10.4.19.1
-    struct encoded_tokentype {
-        uint32_t        num_output_descriptors;
-        uint16_t        num_tokentype_sequences;
+// 10.4.19.1
+struct encoded_tokentype {
+    uint32_t num_output_descriptors;
+    uint16_t num_tokentype_sequences;
 
-        expandable_array<encoded_tokentype_sequence>    enc_tt_seq;
-    };
+    expandable_array<encoded_tokentype_sequence> enc_tt_seq;
+};
 
-    // 12.6.2.1
-    struct encoded_descriptor_sequences {
-        // Probably don't need to implement this for my purposes
-        // TODO ask to be sure
-    };
+// 12.6.2.1
+struct encoded_descriptor_sequences {
+    // Probably don't need to implement this for my purposes
+    // TODO ask to be sure
+};
 
-    struct block_header {
-        uint8_t         descriptor_ID;
-        uint32_t        block_payload_size;
-    };
+struct block_header {
+    uint8_t descriptor_ID;
+    uint32_t block_payload_size;
+};
 
-    struct block_payload {
-        encoded_tokentype               enc_tt;
-        encoded_descriptor_sequences    enc_desc_seq;
-        bool                            nesting_zero_bit;
+struct block_payload {
+    encoded_tokentype enc_tt;
+    encoded_descriptor_sequences enc_desc_seq;
+    bool nesting_zero_bit;
 
-        block_payload();
-        block_payload(uint8_t);
-    };
+    block_payload();
+    block_payload(uint8_t);
+};
 
-    struct access_unit_block {
-        block_header        header;
-        block_payload       payload;
-    };
+struct access_unit_block {
+    block_header header;
+    block_payload payload;
+};
 
-    struct access_unit_header {
-        uint32_t        access_unit_ID;
-        uint8_t         num_blocks;
-        uint8_t         parameter_set_ID;
-        uint8_t         AU_type;
-        uint32_t        read_count;
-        
-        uint16_t        mm_threshold;
-        uint32_t        mm_count;
-        
-        uint16_t        ref_sequence_ID;
-        uint64_t        ref_start_position;
-        uint64_t        ref_end_position;
-        
-        uint16_t        sequence_ID;
-        uint64_t        AU_start_position;
-        uint64_t        AU_end_position;
-        uint64_t        extended_AU_start_position;
-        uint64_t        extended_AU_end_position;
+struct access_unit_header {
+    uint32_t access_unit_ID;
+    uint8_t num_blocks;
+    uint8_t parameter_set_ID;
+    uint8_t AU_type;
+    uint32_t read_count;
 
-        expandable_array<uint64_t>  U_cluster_signature;
-        uint16_t                    num_signatures;
-        bool                        nesting_zero_bit;
-    };
+    uint16_t mm_threshold;
+    uint32_t mm_count;
 
-    struct access_unit {
-        access_unit_header                      header;
-        expandable_array<access_unit_block>     blocks;
+    uint16_t ref_sequence_ID;
+    uint64_t ref_start_position;
+    uint64_t ref_end_position;
 
-        // kinda different from the specification, however it serves my purpose better
-        expandable_array<expandable_array<expandable_array<uint64_t> > >        decoded_symbols;
-        expandable_array<expandable_array<uint64_t> >                           j;
-    };
+    uint16_t sequence_ID;
+    uint64_t AU_start_position;
+    uint64_t AU_end_position;
+    uint64_t extended_AU_start_position;
+    uint64_t extended_AU_end_position;
 
-    struct transform_subseq_parameters {
-        uint8_t                     transform_ID_subseq;
-        uint16_t                    match_coding_buffer_size;
-        uint8_t                     rle_coding_guard;
-        uint8_t                     merge_coding_subseq_count;
-        expandable_array<uint8_t>   merge_coding_shift_size;
-    };
+    expandable_array<uint64_t> U_cluster_signature;
+    uint16_t num_signatures;
+    bool nesting_zero_bit;
+};
 
-    struct support_values {
-        uint8_t         output_symbol_size;
-        uint8_t         coding_subsym_size;
-        uint8_t         coding_order;
+struct access_unit {
+    access_unit_header header;
+    expandable_array<access_unit_block> blocks;
 
-        bool        share_subsym_lut_flag;
-        bool        share_subsym_prv_flag;
-    };
+    // kinda different from the specification, however it serves my purpose better
+    expandable_array<expandable_array<expandable_array<uint64_t> > > decoded_symbols;
+    expandable_array<expandable_array<uint64_t> > j;
+};
 
-    struct cabac_binarization_parameters {
-        uint8_t         cmax;
-        uint8_t         cmax_teg;
-        uint8_t         cmax_dtu;
-        uint8_t         split_unit_size;
-    };
+struct transform_subseq_parameters {
+    uint8_t transform_ID_subseq;
+    uint16_t match_coding_buffer_size;
+    uint8_t rle_coding_guard;
+    uint8_t merge_coding_subseq_count;
+    expandable_array<uint8_t> merge_coding_shift_size;
+};
 
-    struct cabac_context_parameters {
-        bool                        adaptive_mode_flag;
-        uint16_t                    num_contexts;
-        expandable_array<uint8_t>   context_initialization_value;
-        bool                        share_subsym_ctx_flag;
-    };
+struct support_values {
+    uint8_t output_symbol_size;
+    uint8_t coding_subsym_size;
+    uint8_t coding_order;
 
-    struct cabac_binarization {
-        uint8_t         binarization_ID;
-        bool            bypass_flag;
+    bool share_subsym_lut_flag;
+    bool share_subsym_prv_flag;
+};
 
-        cabac_binarization_parameters       cabac_bin_params;
-        cabac_context_parameters            cabac_context_params;
-    };
+struct cabac_binarization_parameters {
+    uint8_t cmax;
+    uint8_t cmax_teg;
+    uint8_t cmax_dtu;
+    uint8_t split_unit_size;
+};
 
-    struct decoder_configuration {
-        uint8_t                                         num_descriptor_subsequence_cfgs_minus1;
-        expandable_array<uint16_t>                      descriptor_subsequence_ID;
-        expandable_array<transform_subseq_parameters>   transform_subseq_params;
+struct cabac_context_parameters {
+    bool adaptive_mode_flag;
+    uint16_t num_contexts;
+    expandable_array<uint8_t> context_initialization_value;
+    bool share_subsym_ctx_flag;
+};
 
-        expandable_array<expandable_array<uint8_t> >                transform_ID_subsym;
-        expandable_array<expandable_array<support_values> >         supp_vals;
-        expandable_array<expandable_array<cabac_binarization> >     cabac_bin;
-    };
+struct cabac_binarization {
+    uint8_t binarization_ID;
+    bool bypass_flag;
 
-    struct decoder_configuration_tokentype_cabac {
-        transform_subseq_parameters             transform_subseq_params;
-        expandable_array<uint8_t>               transform_ID_subsym;
-        expandable_array<support_values>        supp_vals;
-        expandable_array<cabac_binarization>    cabac_bin;
-    };
+    cabac_binarization_parameters cabac_bin_params;
+    cabac_context_parameters cabac_context_params;
+};
 
-    struct decoder_configuration_tokentype {
-        uint8_t                                 rle_guard_tokentype;
-        decoder_configuration_tokentype_cabac   cfg_cm0;
-        decoder_configuration_tokentype_cabac   cfg_cm1;
-    };
+struct decoder_configuration {
+    uint8_t num_descriptor_subsequence_cfgs_minus1;
+    expandable_array<uint16_t> descriptor_subsequence_ID;
+    expandable_array<transform_subseq_parameters> transform_subseq_params;
 
-    struct descriptor_configuration {
-        uint8_t         dec_cfg_preset;
-        uint8_t         encoding_mode_ID;
+    expandable_array<expandable_array<uint8_t> > transform_ID_subsym;
+    expandable_array<expandable_array<support_values> > supp_vals;
+    expandable_array<expandable_array<cabac_binarization> > cabac_bin;
+};
 
-        decoder_configuration               dec_cfg;
-        decoder_configuration_tokentype     dec_cfg_tt;
+struct decoder_configuration_tokentype_cabac {
+    transform_subseq_parameters transform_subseq_params;
+    expandable_array<uint8_t> transform_ID_subsym;
+    expandable_array<support_values> supp_vals;
+    expandable_array<cabac_binarization> cabac_bin;
+};
 
-        /* reserved for future use */
-    };
+struct decoder_configuration_tokentype {
+    uint8_t rle_guard_tokentype;
+    decoder_configuration_tokentype_cabac cfg_cm0;
+    decoder_configuration_tokentype_cabac cfg_cm1;
+};
 
-    struct parameter_set_qvps {
-        uint8_t                                         qv_num_codebooks_total;
-        expandable_array<uint8_t>                       qv_num_codebook_entries;
-        expandable_array<expandable_array<uint8_t> >    qv_recon;
-    };
+struct descriptor_configuration {
+    uint8_t dec_cfg_preset;
+    uint8_t encoding_mode_ID;
 
-    struct parameter_set_crps {
-        uint8_t         cr_alg_ID;
-        uint8_t         cr_pad_size;
-        uint8_t         cr_buf_max_size;
-    };
+    decoder_configuration dec_cfg;
+    decoder_configuration_tokentype dec_cfg_tt;
 
-    struct encoding_parameters {
-        uint8_t         dataset_type;
-        uint8_t         alphabet_ID;
-        uint32_t        read_length;
-        uint8_t         number_of_template_segments_minus1;
-        uint32_t        max_au_data_unit_size;
-        bool            pos_40_bits_flag;
-        uint8_t         qv_depth;
-        uint8_t         as_depth;
-        uint8_t         num_classes;
+    /* reserved for future use */
+};
 
-        expandable_array<uint8_t>       class_ID;
-        expandable_array<bool>          class_specific_dec_cfg_flag;
+struct parameter_set_qvps {
+    uint8_t qv_num_codebooks_total;
+    expandable_array<uint8_t> qv_num_codebook_entries;
+    expandable_array<expandable_array<uint8_t> > qv_recon;
+};
 
-        expandable_array<descriptor_configuration>                      desc_cfg;
-        expandable_array<expandable_array<descriptor_configuration> >   class_specific_desc_cfg; // 7.3.2.1
+struct parameter_set_crps {
+    uint8_t cr_alg_ID;
+    uint8_t cr_pad_size;
+    uint8_t cr_buf_max_size;
+};
 
-        uint16_t                        num_groups;
-        expandable_array<std::string>   rgroup_ID;
-        bool                            multiple_alignments_flag;
-        bool                            spliced_reads_flag;
-        uint32_t                        multiple_signature_base;
-        uint8_t                         U_signature_size;
+struct encoding_parameters {
+    uint8_t dataset_type;
+    uint8_t alphabet_ID;
+    uint32_t read_length;
+    uint8_t number_of_template_segments_minus1;
+    uint32_t max_au_data_unit_size;
+    bool pos_40_bits_flag;
+    uint8_t qv_depth;
+    uint8_t as_depth;
+    uint8_t num_classes;
 
-        expandable_array<uint8_t>               qv_coding_mode;
-        expandable_array<bool>                  qvps_flag;
-        expandable_array<parameter_set_qvps>    param_set_qvps; // 7.3.2.2
-        expandable_array<uint8_t>               qvps_preset_ID;
-        bool                                    qv_reverse_flag;
-        bool                                    crps_flag;
-        parameter_set_crps                      param_set_crps; // 7.3.2.3
+    expandable_array<uint8_t> class_ID;
+    expandable_array<bool> class_specific_dec_cfg_flag;
 
-        bool                            nesting_zero_bit;
-    };
+    expandable_array<descriptor_configuration> desc_cfg;
+    expandable_array<expandable_array<descriptor_configuration> > class_specific_desc_cfg;  // 7.3.2.1
 
-    struct parameter_set {
-        uint8_t parameter_set_ID;
-        uint8_t parent_parameter_set_ID;
+    uint16_t num_groups;
+    expandable_array<std::string> rgroup_ID;
+    bool multiple_alignments_flag;
+    bool spliced_reads_flag;
+    uint32_t multiple_signature_base;
+    uint8_t U_signature_size;
 
-        encoding_parameters enc_params;
-    };
+    expandable_array<uint8_t> qv_coding_mode;
+    expandable_array<bool> qvps_flag;
+    expandable_array<parameter_set_qvps> param_set_qvps;  // 7.3.2.2
+    expandable_array<uint8_t> qvps_preset_ID;
+    bool qv_reverse_flag;
+    bool crps_flag;
+    parameter_set_crps param_set_crps;  // 7.3.2.3
 
-    struct mpegg_record {
-        // TODO
-    };
+    bool nesting_zero_bit;
+};
 
-}
+struct parameter_set {
+    uint8_t parameter_set_ID;
+    uint8_t parent_parameter_set_ID;
+
+    encoding_parameters enc_params;
+};
+
+struct mpegg_record {
+    // TODO
+};
+
+}  // namespace data_structures
 
 namespace helper_functions {
 
-    uint8_t zero_order_complement(uint8_t);
-    uint8_t first_order_complement(uint8_t);
-    void initialize_supported_symbols(data_structures::expandable_array<std::string> &);
-    std::string extract_tok_value(data_structures::expandable_array<data_structures::expandable_array<uint8_t> >,
-                                    uint64_t,
-                                    uint64_t,
-                                    uint64_t);
-    uint8_t get_tok_type(data_structures::expandable_array<data_structures::expandable_array<uint8_t> >, data_structures::expandable_array<uint8_t>&, uint64_t);
-    uint8_t get_tok_int(data_structures::expandable_array<data_structures::expandable_array<uint8_t> >, data_structures::expandable_array<uint8_t>&, uint64_t);
-    std::string get_tok_string(data_structures::expandable_array<uint8_t>);
-    std::string get_tok_char(data_structures::expandable_array<uint8_t>);
-    std::string get_tok_digits(data_structures::expandable_array<uint8_t>);
-    std::string get_tok_delta(data_structures::expandable_array<uint8_t>, uint64_t);
-    std::string get_tok_digits0(data_structures::expandable_array<uint8_t>);
-    std::string get_tok_delta0(data_structures::expandable_array<uint8_t>, uint64_t);
-    std::string get_tok_match(uint64_t);
-    template<typename T>
-    data_structures::expandable_array<T> get_non_empty(const data_structures::expandable_array<data_structures::expandable_array<T> >&);
-}
+uint8_t zero_order_complement(uint8_t);
+uint8_t first_order_complement(uint8_t);
+void initialize_supported_symbols(data_structures::expandable_array<std::string> &);
+std::string extract_tok_value(data_structures::expandable_array<data_structures::expandable_array<uint8_t> >, uint64_t,
+                              uint64_t, uint64_t);
+uint8_t get_tok_type(data_structures::expandable_array<data_structures::expandable_array<uint8_t> >,
+                     data_structures::expandable_array<uint8_t> &, uint64_t);
+uint8_t get_tok_int(data_structures::expandable_array<data_structures::expandable_array<uint8_t> >,
+                    data_structures::expandable_array<uint8_t> &, uint64_t);
+std::string get_tok_string(data_structures::expandable_array<uint8_t>);
+std::string get_tok_char(data_structures::expandable_array<uint8_t>);
+std::string get_tok_digits(data_structures::expandable_array<uint8_t>);
+std::string get_tok_delta(data_structures::expandable_array<uint8_t>, uint64_t);
+std::string get_tok_digits0(data_structures::expandable_array<uint8_t>);
+std::string get_tok_delta0(data_structures::expandable_array<uint8_t>, uint64_t);
+std::string get_tok_match(uint64_t);
+template <typename T>
+data_structures::expandable_array<T> get_non_empty(
+    const data_structures::expandable_array<data_structures::expandable_array<T> > &);
+}  // namespace helper_functions
 
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -348,19 +359,18 @@ namespace helper_functions {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-uint8_t helper_functions::zero_order_complement(uint8_t idx)  {
-    if(idx == 4) return 4;
-    return 3-idx;
+uint8_t helper_functions::zero_order_complement(uint8_t idx) {
+    if (idx == 4) return 4;
+    return 3 - idx;
 }
 
 // Based on Table 36, page 49
 uint8_t helper_functions::first_order_complement(uint8_t idx) {
-    if(idx <= 3) return 3-idx;
-    if(idx <= 5) return 5-idx  + 4; 
-    if(idx <= 7) return idx;
-    if(idx <= 9) return 9-idx + 8;
-    if(idx <= 13) return 13-idx + 10;
+    if (idx <= 3) return 3 - idx;
+    if (idx <= 5) return 5 - idx + 4;
+    if (idx <= 7) return idx;
+    if (idx <= 9) return 9 - idx + 8;
+    if (idx <= 13) return 13 - idx + 10;
     return idx;
 }
 
@@ -373,144 +383,200 @@ void helper_functions::initialize_supported_symbols(data_structures::expandable_
 
 /* ask about those: todo */
 
-uint8_t get_tok_type(data_structures::expandable_array<data_structures::expandable_array<uint8_t> > decoded_tokens, data_structures::expandable_array<uint8_t>&indexer, uint64_t which) { return 0; }
-uint8_t get_tok_int(data_structures::expandable_array<data_structures::expandable_array<uint8_t> > decoded_tokens, data_structures::expandable_array<uint8_t>&indexer, uint64_t which)  { return 0; }
-    
+uint8_t get_tok_type(data_structures::expandable_array<data_structures::expandable_array<uint8_t> > decoded_tokens,
+                     data_structures::expandable_array<uint8_t> &indexer, uint64_t which) {
+    return 0;
+}
+uint8_t get_tok_int(data_structures::expandable_array<data_structures::expandable_array<uint8_t> > decoded_tokens,
+                    data_structures::expandable_array<uint8_t> &indexer, uint64_t which) {
+    return 0;
+}
 
-std::string helper_functions::get_tok_string(data_structures::expandable_array<uint8_t> decoded_tokens) { return std::string(); }
-std::string helper_functions::get_tok_char(data_structures::expandable_array<uint8_t> decoded_tokens) { return std::string(); }
-std::string helper_functions::get_tok_digits(data_structures::expandable_array<uint8_t> decoded_tokens) { return std::string(); }
-std::string helper_functions::get_tok_delta(data_structures::expandable_array<uint8_t> decoded_tokens, uint64_t refIdx) { return std::string(); }
-std::string helper_functions::get_tok_digits0(data_structures::expandable_array<uint8_t> decoded_tokens) { return std::string(); }
-std::string helper_functions::get_tok_delta0(data_structures::expandable_array<uint8_t> decoded_tokens, uint64_t refIdx) { return std::string(); }
+std::string helper_functions::get_tok_string(data_structures::expandable_array<uint8_t> decoded_tokens) {
+    return std::string();
+}
+std::string helper_functions::get_tok_char(data_structures::expandable_array<uint8_t> decoded_tokens) {
+    return std::string();
+}
+std::string helper_functions::get_tok_digits(data_structures::expandable_array<uint8_t> decoded_tokens) {
+    return std::string();
+}
+std::string helper_functions::get_tok_delta(data_structures::expandable_array<uint8_t> decoded_tokens,
+                                            uint64_t refIdx) {
+    return std::string();
+}
+std::string helper_functions::get_tok_digits0(data_structures::expandable_array<uint8_t> decoded_tokens) {
+    return std::string();
+}
+std::string helper_functions::get_tok_delta0(data_structures::expandable_array<uint8_t> decoded_tokens,
+                                             uint64_t refIdx) {
+    return std::string();
+}
 std::string helper_functions::get_tok_match(uint64_t refIdx) { return std::string(); }
 
-std::string helper_functions::extract_tok_value(data_structures::expandable_array<data_structures::expandable_array<uint8_t> > decoded_tokens,
-                                uint64_t tokType,
-                                uint64_t t,
-                                uint64_t refIdx) {
+std::string helper_functions::extract_tok_value(
+    data_structures::expandable_array<data_structures::expandable_array<uint8_t> > decoded_tokens, uint64_t tokType,
+    uint64_t t, uint64_t refIdx) {
     uint64_t tokIdx = (t << 4) | tokType;
     std::string tmp_str;
-    if(tokType == 2)      tmp_str = helper_functions::get_tok_string(decoded_tokens[tokIdx]);
-    else if(tokType == 3) tmp_str = helper_functions::get_tok_char(decoded_tokens[tokIdx]);
-    else if(tokType == 4) tmp_str = helper_functions::get_tok_digits(decoded_tokens[tokIdx]);
-    else if(tokType == 5) tmp_str = helper_functions::get_tok_delta(decoded_tokens[tokIdx], refIdx);
-    else if(tokType == 6) tmp_str = helper_functions::get_tok_digits0(decoded_tokens[tokIdx]);
-    else if(tokType == 7) tmp_str = helper_functions::get_tok_delta0(decoded_tokens[tokIdx], refIdx);
-    else if(tokType == 8) tmp_str = helper_functions::get_tok_match(refIdx);
+    if (tokType == 2)
+        tmp_str = helper_functions::get_tok_string(decoded_tokens[tokIdx]);
+    else if (tokType == 3)
+        tmp_str = helper_functions::get_tok_char(decoded_tokens[tokIdx]);
+    else if (tokType == 4)
+        tmp_str = helper_functions::get_tok_digits(decoded_tokens[tokIdx]);
+    else if (tokType == 5)
+        tmp_str = helper_functions::get_tok_delta(decoded_tokens[tokIdx], refIdx);
+    else if (tokType == 6)
+        tmp_str = helper_functions::get_tok_digits0(decoded_tokens[tokIdx]);
+    else if (tokType == 7)
+        tmp_str = helper_functions::get_tok_delta0(decoded_tokens[tokIdx], refIdx);
+    else if (tokType == 8)
+        tmp_str = helper_functions::get_tok_match(refIdx);
     return tmp_str;
 }
 
-
-template<typename T>
-data_structures::expandable_array<T> helper_functions::get_non_empty(const data_structures::expandable_array<data_structures::expandable_array<T> >&decoded_tokens) {
-    for(size_t i=0; i<decoded_tokens.size(); ++i) { 
-        if(!decoded_tokens[i].empty())
-            return decoded_tokens[i];
+template <typename T>
+data_structures::expandable_array<T> helper_functions::get_non_empty(
+    const data_structures::expandable_array<data_structures::expandable_array<T> > &decoded_tokens) {
+    for (size_t i = 0; i < decoded_tokens.size(); ++i) {
+        if (!decoded_tokens[i].empty()) return decoded_tokens[i];
     }
     return data_structures::expandable_array<T>();
 }
 
-template<typename T> 
-data_structures::expandable_array<T>::expandable_array()    
-    { vec = std::vector<T>(); }
-template<typename T> 
-data_structures::expandable_array<T>::expandable_array(size_t n)    
-    { vec = std::vector<T>(n, T()); }
-template<typename T> 
-data_structures::expandable_array<T>::expandable_array(size_t n, const T &val)  
-    { vec = std::vector<T>(n, val); }
-template<typename T> 
-data_structures::expandable_array<T>::expandable_array(expandable_array::const_iterator l, expandable_array::const_iterator r)  
-    { vec = std::vector<T>(l, r); }
+template <typename T>
+data_structures::expandable_array<T>::expandable_array() {
+    vec = std::vector<T>();
+}
+template <typename T>
+data_structures::expandable_array<T>::expandable_array(size_t n) {
+    vec = std::vector<T>(n, T());
+}
+template <typename T>
+data_structures::expandable_array<T>::expandable_array(size_t n, const T &val) {
+    vec = std::vector<T>(n, val);
+}
+template <typename T>
+data_structures::expandable_array<T>::expandable_array(expandable_array::const_iterator l,
+                                                       expandable_array::const_iterator r) {
+    vec = std::vector<T>(l, r);
+}
 
-template<typename T>
-T& data_structures::expandable_array<T>::operator[](size_t idx) {
-    while(vec.size() <= idx)
-        vec.push_back(T());
+template <typename T>
+T &data_structures::expandable_array<T>::operator[](size_t idx) {
+    while (vec.size() <= idx) vec.push_back(T());
     return vec[idx];
 }
 
-template<typename T>
-const T& data_structures::expandable_array<T>::operator[](size_t idx) const {
-    while(vec.size() <= idx)
-        vec.push_back(T());
+template <typename T>
+const T &data_structures::expandable_array<T>::operator[](size_t idx) const {
+    while (vec.size() <= idx) vec.push_back(T());
     return vec[idx];
 }
 
-template<typename T>
-size_t  data_structures::expandable_array<T>::size()        { return vec.size(); }
-template<typename T>
-void    data_structures::expandable_array<T>::clear()       { vec.clear(); }
-template<typename T>
-bool    data_structures::expandable_array<T>::empty()       { return vec.empty(); }
+template <typename T>
+size_t data_structures::expandable_array<T>::size() {
+    return vec.size();
+}
+template <typename T>
+void data_structures::expandable_array<T>::clear() {
+    vec.clear();
+}
+template <typename T>
+bool data_structures::expandable_array<T>::empty() {
+    return vec.empty();
+}
 
-template<typename T>
-typename data_structures::expandable_array<T>::iterator data_structures::expandable_array<T>::begin()                { return vec.begin(); }
-template<typename T>
-typename data_structures::expandable_array<T>::iterator data_structures::expandable_array<T>::end()                  { return vec.end(); }
-template<typename T>
-typename data_structures::expandable_array<T>::const_iterator data_structures::expandable_array<T>::begin() const    { return vec.begin(); }
-template<typename T>
-typename data_structures::expandable_array<T>::const_iterator data_structures::expandable_array<T>::end() const      { return vec.end(); }
+template <typename T>
+typename data_structures::expandable_array<T>::iterator data_structures::expandable_array<T>::begin() {
+    return vec.begin();
+}
+template <typename T>
+typename data_structures::expandable_array<T>::iterator data_structures::expandable_array<T>::end() {
+    return vec.end();
+}
+template <typename T>
+typename data_structures::expandable_array<T>::const_iterator data_structures::expandable_array<T>::begin() const {
+    return vec.begin();
+}
+template <typename T>
+typename data_structures::expandable_array<T>::const_iterator data_structures::expandable_array<T>::end() const {
+    return vec.end();
+}
 
-template<typename T>
-typename data_structures::expandable_array<T>::reverse_iterator data_structures::expandable_array<T>::rbegin()               { return vec.rbegin(); }
-template<typename T>
-typename data_structures::expandable_array<T>::reverse_iterator data_structures::expandable_array<T>::rend()                 { return vec.rend(); }
-template<typename T>
-typename data_structures::expandable_array<T>::const_reverse_iterator data_structures::expandable_array<T>::rbegin() const   { return vec.rbegin(); }
-template<typename T>
-typename data_structures::expandable_array<T>::const_reverse_iterator data_structures::expandable_array<T>::rend() const     { return vec.rend(); }
+template <typename T>
+typename data_structures::expandable_array<T>::reverse_iterator data_structures::expandable_array<T>::rbegin() {
+    return vec.rbegin();
+}
+template <typename T>
+typename data_structures::expandable_array<T>::reverse_iterator data_structures::expandable_array<T>::rend() {
+    return vec.rend();
+}
+template <typename T>
+typename data_structures::expandable_array<T>::const_reverse_iterator data_structures::expandable_array<T>::rbegin()
+    const {
+    return vec.rbegin();
+}
+template <typename T>
+typename data_structures::expandable_array<T>::const_reverse_iterator data_structures::expandable_array<T>::rend()
+    const {
+    return vec.rend();
+}
 
+data_structures::COP::COP() {}
+data_structures::RLE::RLE() {}
+data_structures::CABAC_METHOD_0::CABAC_METHOD_0() {}
+data_structures::CABAC_METHOD_1::CABAC_METHOD_1() {}
+data_structures::X4::X4() {}
 
-data_structures::COP::COP()                         {}
-data_structures::RLE::RLE()                         {}
-data_structures::CABAC_METHOD_0::CABAC_METHOD_0()   {}
-data_structures::CABAC_METHOD_1::CABAC_METHOD_1()   {}
-data_structures::X4::X4()                           {}
+data_structures::COP::COP(uint16_t i) { assert(0); }
+data_structures::RLE::RLE(uint16_t i, uint64_t nos) { assert(0); }
+data_structures::CABAC_METHOD_0::CABAC_METHOD_0(uint16_t i, uint64_t nos) { assert(0); }
+data_structures::CABAC_METHOD_1::CABAC_METHOD_1(uint16_t i, uint64_t nos) { assert(0); }
+data_structures::X4::X4(uint16_t i, uint64_t nos) { assert(0); }
 
-data_structures::COP::COP(uint16_t i)                                        { assert(0); }
-data_structures::RLE::RLE(uint16_t i, uint64_t nos)                          { assert(0); }
-data_structures::CABAC_METHOD_0::CABAC_METHOD_0(uint16_t i, uint64_t nos)    { assert(0); }
-data_structures::CABAC_METHOD_1::CABAC_METHOD_1(uint16_t i, uint64_t nos)    { assert(0); }
-data_structures::X4::X4(uint16_t i, uint64_t nos)                            { assert(0); }
+data_structures::CAT::CAT() {}
+data_structures::CAT::CAT(uint16_t i, uint64_t nos) { decoded_tokens[i] = expandable_array<uint8_t>(nos); }
 
-data_structures::CAT::CAT()                          {}
-data_structures::CAT::CAT(uint16_t i, uint64_t nos)  { decoded_tokens[i] = expandable_array<uint8_t>(nos); }
-
-data_structures::decode_tokentype_sequence::decode_tokentype_sequence()  {}
+data_structures::decode_tokentype_sequence::decode_tokentype_sequence() {}
 
 data_structures::decode_tokentype_sequence::decode_tokentype_sequence(uint16_t i, uint8_t method_ID, uint64_t nos) {
-    if(method_ID == 1)          cat = data_structures::CAT(i, nos);
-    else if(method_ID == 2)     rle = data_structures::RLE(i, nos);
-    else if(method_ID == 3)     cm0 = data_structures::CABAC_METHOD_0(i, nos);
-    else if(method_ID == 4)     cm1 = data_structures::CABAC_METHOD_1(i, nos);
-    else if(method_ID == 5)     x4  = data_structures::X4(i, nos);
-    else assert(0);
+    if (method_ID == 1)
+        cat = data_structures::CAT(i, nos);
+    else if (method_ID == 2)
+        rle = data_structures::RLE(i, nos);
+    else if (method_ID == 3)
+        cm0 = data_structures::CABAC_METHOD_0(i, nos);
+    else if (method_ID == 4)
+        cm1 = data_structures::CABAC_METHOD_1(i, nos);
+    else if (method_ID == 5)
+        x4 = data_structures::X4(i, nos);
+    else
+        assert(0);
 }
 
 data_structures::encoded_tokentype_sequence::encoded_tokentype_sequence() {}
 
-data_structures::encoded_tokentype_sequence::encoded_tokentype_sequence(uint16_t i, uint8_t method_ID) { 
+data_structures::encoded_tokentype_sequence::encoded_tokentype_sequence(uint16_t i, uint8_t method_ID) {
     assert(method_ID == 0);
     this->i = i;
     this->method_ID = method_ID;
-    cop = data_structures::COP(i); 
-} // will throw exception
+    cop = data_structures::COP(i);
+}  // will throw exception
 
-data_structures::encoded_tokentype_sequence::encoded_tokentype_sequence(uint16_t i, uint8_t method_ID, uint64_t nos) { 
-    assert(method_ID != 0); 
+data_structures::encoded_tokentype_sequence::encoded_tokentype_sequence(uint16_t i, uint8_t method_ID, uint64_t nos) {
+    assert(method_ID != 0);
     this->i = i;
     this->method_ID = method_ID;
     this->num_output_symbols = nos;
-    dec_tt_seq = data_structures::decode_tokentype_sequence(i, method_ID, nos); 
-}  
+    dec_tt_seq = data_structures::decode_tokentype_sequence(i, method_ID, nos);
+}
 
-data_structures::block_payload::block_payload()                          {}
-data_structures::block_payload::block_payload(uint8_t descriptor_ID)     { /* TODO */ }
+data_structures::block_payload::block_payload() {}
+data_structures::block_payload::block_payload(uint8_t descriptor_ID) { /* TODO */
+}
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -541,8 +607,6 @@ data_structures::block_payload::block_payload(uint8_t descriptor_ID)     { /* TO
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 
 using namespace helper_functions;
 using namespace data_structures;
@@ -551,566 +615,570 @@ using namespace data_structures;
 /* probably bad programming practise too */
 /* TODO make code less hacky */
 
-#define RNAME_DESCRIPTOR_ID     11
+#define RNAME_DESCRIPTOR_ID 11
 
-#define subsequence0(ID, POS)   decoded_symbols[ID][0][AU.j[ID][POS]]
-#define subsequence1(ID, POS)   decoded_symbols[ID][1][AU.j[ID][POS]]
-#define subsequence2(ID, POS)   decoded_symbols[ID][2][AU.j[ID][POS]]
-#define subsequence3(ID, POS)   decoded_symbols[ID][3][AU.j[ID][POS]]
-#define subsequence4(ID, POS)   decoded_symbols[ID][4][AU.j[ID][POS]]
-#define subsequence5(ID, POS)   decoded_symbols[ID][5][AU.j[ID][POS]]
-#define subsequence6(ID, POS)   decoded_symbols[ID][6][AU.j[ID][POS]]
-#define subsequence7(ID, POS)   decoded_symbols[ID][7][AU.j[ID][POS]]
-#define subsequence8(ID, POS)   decoded_symbols[ID][8][AU.j[ID][POS]]
-#define subsequence9(ID, POS)   decoded_symbols[ID][9][AU.j[ID][POS]]
+#define subsequence0(ID, POS) decoded_symbols[ID][0][AU.j[ID][POS]]
+#define subsequence1(ID, POS) decoded_symbols[ID][1][AU.j[ID][POS]]
+#define subsequence2(ID, POS) decoded_symbols[ID][2][AU.j[ID][POS]]
+#define subsequence3(ID, POS) decoded_symbols[ID][3][AU.j[ID][POS]]
+#define subsequence4(ID, POS) decoded_symbols[ID][4][AU.j[ID][POS]]
+#define subsequence5(ID, POS) decoded_symbols[ID][5][AU.j[ID][POS]]
+#define subsequence6(ID, POS) decoded_symbols[ID][6][AU.j[ID][POS]]
+#define subsequence7(ID, POS) decoded_symbols[ID][7][AU.j[ID][POS]]
+#define subsequence8(ID, POS) decoded_symbols[ID][8][AU.j[ID][POS]]
+#define subsequence9(ID, POS) decoded_symbols[ID][9][AU.j[ID][POS]]
 
-#define _subsequence0(ID)    decoded_symbols[ID][0]
-#define _subsequence1(ID)    decoded_symbols[ID][1]
-#define _subsequence2(ID)    decoded_symbols[ID][2]
-#define _subsequence3(ID)    decoded_symbols[ID][3]
-#define _subsequence4(ID)    decoded_symbols[ID][4]
-#define _subsequence5(ID)    decoded_symbols[ID][5]
-#define _subsequence6(ID)    decoded_symbols[ID][6]
-#define _subsequence7(ID)    decoded_symbols[ID][7]
-#define _subsequence8(ID)    decoded_symbols[ID][8]
-#define _subsequence9(ID)    decoded_symbols[ID][9]
+#define _subsequence0(ID) decoded_symbols[ID][0]
+#define _subsequence1(ID) decoded_symbols[ID][1]
+#define _subsequence2(ID) decoded_symbols[ID][2]
+#define _subsequence3(ID) decoded_symbols[ID][3]
+#define _subsequence4(ID) decoded_symbols[ID][4]
+#define _subsequence5(ID) decoded_symbols[ID][5]
+#define _subsequence6(ID) decoded_symbols[ID][6]
+#define _subsequence7(ID) decoded_symbols[ID][7]
+#define _subsequence8(ID) decoded_symbols[ID][8]
+#define _subsequence9(ID) decoded_symbols[ID][9]
 
-const uint64_t minus1 = -1; // cause we are using unsigned types, pls use for equality testing
+const uint64_t minus1 = -1;  // cause we are using unsigned types, pls use for equality testing
 
 namespace decoder {
 
-    void decode(access_unit AU, parameter_set PS, uint64_t &previousMappingPos0, uint64_t &genomicRecordIndex) {
-        ++genomicRecordIndex;
+void decode(access_unit AU, parameter_set PS, uint64_t &previousMappingPos0, uint64_t &genomicRecordIndex) {
+    ++genomicRecordIndex;
 
-        uint64_t currentRecordCount = 0;
+    uint64_t currentRecordCount = 0;
 
-        uint8_t classId                 = AU.header.AU_type; // 1
-        uint64_t AU_start_position      = AU.header.AU_start_position;
-        uint16_t seqId                  = AU.header.sequence_ID;
+    uint8_t classId = AU.header.AU_type;  // 1
+    uint64_t AU_start_position = AU.header.AU_start_position;
+    uint16_t seqId = AU.header.sequence_ID;
 
-        uint8_t numberOfTemplateSegments    = PS.enc_params.number_of_template_segments_minus1+1;
-        uint8_t alphabet_ID                 = PS.enc_params.alphabet_ID;
-        uint32_t read_length                = PS.enc_params.read_length;
-        uint8_t cr_alg_ID                   = PS.enc_params.param_set_crps.cr_alg_ID;
-        uint16_t num_groups                 = PS.enc_params.num_groups;
-        bool spliced_reads_flag             = PS.enc_params.spliced_reads_flag;
-        bool multiple_alignments_flag       = PS.enc_params.multiple_alignments_flag;
-        bool crps_flag                      = PS.enc_params.crps_flag;
-        uint8_t as_depth                    = PS.enc_params.as_depth;
-        uint8_t qv_depth                    = PS.enc_params.qv_depth;
-        bool qv_reverse_flag                = PS.enc_params.qv_reverse_flag;
-        uint8_t qv_num_codebooks_total      = PS.enc_params.param_set_qvps.qv_num_codebooks_total; // TODO ask
+    uint8_t numberOfTemplateSegments = PS.enc_params.number_of_template_segments_minus1 + 1;
+    uint8_t alphabet_ID = PS.enc_params.alphabet_ID;
+    uint32_t read_length = PS.enc_params.read_length;
+    uint8_t cr_alg_ID = PS.enc_params.param_set_crps.cr_alg_ID;
+    uint16_t num_groups = PS.enc_params.num_groups;
+    bool spliced_reads_flag = PS.enc_params.spliced_reads_flag;
+    bool multiple_alignments_flag = PS.enc_params.multiple_alignments_flag;
+    bool crps_flag = PS.enc_params.crps_flag;
+    uint8_t as_depth = PS.enc_params.as_depth;
+    uint8_t qv_depth = PS.enc_params.qv_depth;
+    bool qv_reverse_flag = PS.enc_params.qv_reverse_flag;
+    uint8_t qv_num_codebooks_total = PS.enc_params.param_set_qvps.qv_num_codebooks_total;  // TODO ask
 
-        // get decoded_tokens
+    // get decoded_tokens
 
-        expandable_array<expandable_array<uint8_t> > decoded_tokens;
-        access_unit_block rname_block;
-        bool has_rname_block = false;
+    expandable_array<expandable_array<uint8_t> > decoded_tokens;
+    access_unit_block rname_block;
+    bool has_rname_block = false;
 
-        for(size_t i=0; i<AU.blocks.size(); ++i) {
-            if(AU.blocks[i].header.descriptor_ID == RNAME_DESCRIPTOR_ID) {
-                has_rname_block = true;
-                rname_block = AU.blocks[i];
-                break;
-            }
+    for (size_t i = 0; i < AU.blocks.size(); ++i) {
+        if (AU.blocks[i].header.descriptor_ID == RNAME_DESCRIPTOR_ID) {
+            has_rname_block = true;
+            rname_block = AU.blocks[i];
+            break;
         }
+    }
 
-        for(size_t i=0; i<rname_block.payload.enc_tt.enc_tt_seq.size(); ++i) {
-            uint8_t method_ID = rname_block.payload.enc_tt.enc_tt_seq[i].method_ID;
-            expandable_array<uint8_t> inner_decoded_tokens;
-            if(method_ID == 0) assert(0);
-            if(method_ID == 1) inner_decoded_tokens = get_non_empty(rname_block.payload.enc_tt.enc_tt_seq[i].dec_tt_seq.cat.decoded_tokens);
-            if(method_ID == 2) assert(0);
-            if(method_ID == 3) assert(0);
-            if(method_ID == 4) assert(0);
-            if(method_ID == 5) assert(0);
-            decoded_tokens[i] = inner_decoded_tokens;
+    for (size_t i = 0; i < rname_block.payload.enc_tt.enc_tt_seq.size(); ++i) {
+        uint8_t method_ID = rname_block.payload.enc_tt.enc_tt_seq[i].method_ID;
+        expandable_array<uint8_t> inner_decoded_tokens;
+        if (method_ID == 0) assert(0);
+        if (method_ID == 1)
+            inner_decoded_tokens =
+                get_non_empty(rname_block.payload.enc_tt.enc_tt_seq[i].dec_tt_seq.cat.decoded_tokens);
+        if (method_ID == 2) assert(0);
+        if (method_ID == 3) assert(0);
+        if (method_ID == 4) assert(0);
+        if (method_ID == 5) assert(0);
+        decoded_tokens[i] = inner_decoded_tokens;
+    }
+
+    uint8_t numberOfRecordSegments;
+    uint8_t numberOfAlignedRecordSegments;
+    uint8_t unpairedRead;
+
+    // code that creates expandable_array onject decoded_symbols goes here
+
+    expandable_array<expandable_array<expandable_array<uint64_t> > > decoded_symbols =
+        AU.decoded_symbols;  // more to it
+
+    if (numberOfTemplateSegments == 1)
+        numberOfRecordSegments = 1;
+    else if (classId == CLASS_HM)
+        numberOfRecordSegments = 2;
+    else if (subsequence0(8, 0) == 0)
+        numberOfRecordSegments = 2;
+    else
+        numberOfRecordSegments = 1;  // 2.1
+
+    if (classId == CLASS_HM)
+        numberOfAlignedRecordSegments = 1;
+    else if (classId == CLASS_U)
+        numberOfAlignedRecordSegments = 0;
+    else
+        numberOfAlignedRecordSegments = numberOfRecordSegments;  // 2.2
+
+    if (classId == CLASS_HM)
+        unpairedRead = 0;
+    else if (numberOfTemplateSegments == 1 || subsequence0(8, 0) == 5 || subsequence0(8, 0) == 6)
+        unpairedRead = 1;
+    else
+        unpairedRead = 0;  // 2.3
+
+    expandable_array<expandable_array<std::string> > softClips;
+    expandable_array<expandable_array<uint64_t> > softClipSizes;
+    expandable_array<expandable_array<uint64_t> > hardClips;
+    expandable_array<std::string> S;
+
+    initialize_supported_symbols(S);
+
+    for (uint8_t i = 0; i < numberOfAlignedRecordSegments; ++i) {
+        for (uint8_t j = 0; j < 2; ++j) {
+            softClips[i][j] = "";
+            softClipSizes[i][j] = 0;
+            hardClips[i][j] = 0;
         }
+    }
 
-        uint8_t numberOfRecordSegments;
-        uint8_t numberOfAlignedRecordSegments;
-        uint8_t unpairedRead;
+    if (classId == CLASS_I || classId == CLASS_HM) {
+        if (AU.j[5][0] < _subsequence0(5).size() && currentRecordCount == subsequence0(5, 0)) {
+            bool end = 0;
 
-        // code that creates expandable_array onject decoded_symbols goes here
+            uint64_t j;
+            uint64_t segmentIdx;
+            uint64_t leftRightIdx;
 
-        expandable_array<expandable_array<expandable_array<uint64_t> > > decoded_symbols = AU.decoded_symbols; // more to it
+            do {
+                if (subsequence1(5, 1) <= 3) {
+                    j = 0;
+                    segmentIdx = subsequence1(5, 1) >> 1;
+                    leftRightIdx = subsequence1(5, 1) & 1;
 
-
-        if(numberOfTemplateSegments == 1)   numberOfRecordSegments = 1;
-        else if(classId == CLASS_HM)        numberOfRecordSegments = 2;
-        else if(subsequence0(8, 0) == 0)    numberOfRecordSegments = 2;
-        else                                numberOfRecordSegments = 1; // 2.1
-
-        if(classId == CLASS_HM)         numberOfAlignedRecordSegments = 1;
-        else if(classId == CLASS_U)     numberOfAlignedRecordSegments = 0;
-        else                            numberOfAlignedRecordSegments = numberOfRecordSegments; // 2.2
-        
-        if(classId == CLASS_HM)     unpairedRead = 0;
-        else if(numberOfTemplateSegments == 1 || subsequence0(8, 0) == 5 || subsequence0(8, 0) == 6)
-                                    unpairedRead = 1;
-        else                        unpairedRead = 0; // 2.3
-
-        expandable_array<expandable_array<std::string> >    softClips;
-        expandable_array<expandable_array<uint64_t> >       softClipSizes;
-        expandable_array<expandable_array<uint64_t> >       hardClips;
-        expandable_array<std::string>                       S;
-
-        initialize_supported_symbols(S);
-
-        for(uint8_t i=0; i<numberOfAlignedRecordSegments; ++i) {
-            for(uint8_t j=0; j<2; ++j) {
-                softClips[i][j]     = "";
-                softClipSizes[i][j] = 0;
-                hardClips[i][j]     = 0;
-            }
-        }
-        
-        if(classId == CLASS_I || classId == CLASS_HM) {
-            if(AU.j[5][0] < _subsequence0(5).size() && currentRecordCount == subsequence0(5, 0)) {
-                bool end = 0;
-
-                uint64_t j;
-                uint64_t segmentIdx;
-                uint64_t leftRightIdx;
-
-                do {
-                    if(subsequence1(5, 1) <= 3) {
-                        j               = 0;
-                        segmentIdx      = subsequence1(5, 1) >> 1;
-                        leftRightIdx    = subsequence1(5, 1) & 1;
-                        
-                        do {
-                            softClips[segmentIdx][leftRightIdx][j] = S[alphabet_ID][subsequence2(5 ,2)];
-                            AU.j[5][2]++;
-                            j++;
-                        } while(subsequence2(5, 2) != S[alphabet_ID].size());
-                        
+                    do {
+                        softClips[segmentIdx][leftRightIdx][j] = S[alphabet_ID][subsequence2(5, 2)];
                         AU.j[5][2]++;
-                        softClipSizes[segmentIdx][leftRightIdx] = j;
-                    } 
-                    else if(subsequence1(5, 1) <= 7) {
-                        segmentIdx                          = (subsequence1(5, 1) - 4) >> 1;
-                        leftRightIdx                        = (subsequence1(5, 1) - 5) & 1;
-                        hardClips[segmentIdx][leftRightIdx] = subsequence3(5, 3);
-                        AU.j[5][3]++;
-                    } 
-                    else if(subsequence1(5, 1) == 8)
-                        end = 1;
+                        j++;
+                    } while (subsequence2(5, 2) != S[alphabet_ID].size());
 
-                    AU.j[5][1]++;
-                } while(!end);
+                    AU.j[5][2]++;
+                    softClipSizes[segmentIdx][leftRightIdx] = j;
+                } else if (subsequence1(5, 1) <= 7) {
+                    segmentIdx = (subsequence1(5, 1) - 4) >> 1;
+                    leftRightIdx = (subsequence1(5, 1) - 5) & 1;
+                    hardClips[segmentIdx][leftRightIdx] = subsequence3(5, 3);
+                    AU.j[5][3]++;
+                } else if (subsequence1(5, 1) == 8)
+                    end = 1;
 
-                AU.j[5][0]++;
-            }
+                AU.j[5][1]++;
+            } while (!end);
 
-            currentRecordCount++;
-        } // 3
+            AU.j[5][0]++;
+        }
 
-        expandable_array<uint64_t>                      readLength;
-        expandable_array<uint64_t>                      numberOfSplicedSeg;
-        expandable_array<expandable_array<uint64_t> >   splicedSegLength;
+        currentRecordCount++;
+    }  // 3
 
-        if(read_length == 0) {
-            for(uint8_t i=0; i<numberOfRecordSegments; ++i) {
+    expandable_array<uint64_t> readLength;
+    expandable_array<uint64_t> numberOfSplicedSeg;
+    expandable_array<expandable_array<uint64_t> > splicedSegLength;
+
+    if (read_length == 0) {
+        for (uint8_t i = 0; i < numberOfRecordSegments; ++i) {
+            readLength[i] = subsequence0(7, 0) + 1;
+            AU.j[7][0]++;
+        }
+    } else {
+        for (uint8_t i = 0; i < numberOfRecordSegments; ++i) {
+            if (classId == CLASS_I)
+                readLength[i] = read_length - hardClips[i][0] - hardClips[i][1];
+            else if (classId == CLASS_HM && i == 0)
+                readLength[i] = read_length - hardClips[0][0] - hardClips[0][1];
+            else
+                readLength[i] = read_length;
+        }
+    }
+
+    for (uint8_t i = 0; i < numberOfRecordSegments; ++i) {
+        numberOfSplicedSeg[i] = 1;
+        splicedSegLength[i][0] = readLength[i];
+    }
+
+    if (spliced_reads_flag && (classId == CLASS_I || classId == CLASS_HM)) {
+        uint64_t remainingLen;
+        uint64_t spliceLen;
+        uint64_t j;
+
+        for (uint8_t i = 0; i < numberOfAlignedRecordSegments; ++i) {
+            if (read_length == 0) {
                 readLength[i] = subsequence0(7, 0) + 1;
                 AU.j[7][0]++;
             }
-        } 
+
+            remainingLen = readLength[i];
+            j = 0;
+
+            do {
+                spliceLen = subsequence0(7, 0);
+                AU.j[7][0]++;
+                remainingLen -= spliceLen;
+                splicedSegLength[i][j++] = spliceLen;
+            } while (remainingLen > 0);
+
+            numberOfSplicedSeg[i] = j;
+        }
+    }  // 4
+
+    uint64_t numberOfAlignments;
+    expandable_array<uint64_t> numberOfSegmentAlignments;
+    expandable_array<uint64_t> numberOfAlignmentPairs;
+    expandable_array<expandable_array<uint64_t> > alignPtr;
+    uint64_t moreAlignments;
+    uint64_t moreAlignmentsNextPos;
+    uint64_t moreAlignmentsNextSeqId;
+
+    if (classId != CLASS_U) {
+        if (multiple_alignments_flag == 0)
+            numberOfSegmentAlignments[0] = 1;
         else {
-            for(uint8_t i=0; i<numberOfRecordSegments; ++i) {
-                if(classId == CLASS_I)                  readLength[i] = read_length - hardClips[i][0] - hardClips[i][1];
-                else if(classId == CLASS_HM && i == 0)  readLength[i] = read_length - hardClips[0][0] - hardClips[0][1];
-                else                                    readLength[i] = read_length;
-            }
+            numberOfSegmentAlignments[0] = subsequence0(10, 0);
+            AU.j[10][0]++;
         }
+    } else
+        numberOfSegmentAlignments[0] = 0;
 
-        for(uint8_t i=0; i<numberOfRecordSegments; ++i) {
-            numberOfSplicedSeg[i]   = 1;
-            splicedSegLength[i][0]  = readLength[i];
-        }
+    moreAlignments = 0;
 
-        if(spliced_reads_flag && (classId == CLASS_I || classId == CLASS_HM)) {
-            uint64_t remainingLen;
-            uint64_t spliceLen;
-            uint64_t j;
+    if (unpairedRead || classId == CLASS_HM) {
+        numberOfAlignments = numberOfSegmentAlignments[0];
 
-            for(uint8_t i=0; i<numberOfAlignedRecordSegments; ++i) {
-                if(read_length == 0) {
-                    readLength[i] = subsequence0(7, 0) + 1;
-                    AU.j[7][0]++;
-                }
+        for (uint64_t i = 0; i < numberOfAlignments; ++i) alignPtr[i][0] = i;
+    } else if (classId == CLASS_U) {
+        if (numberOfRecordSegments > 1) numberOfSegmentAlignments[1] = 0;
+        numberOfAlignments = 0;
+    } else {
+        numberOfSegmentAlignments[1] = 0;
+        uint64_t k, i, j, ptr;
+        k = i = 0;
 
-                remainingLen = readLength[i];
-                j = 0;
-
-                do {
-                    spliceLen = subsequence0(7, 0);
-                    AU.j[7][0]++;
-                    remainingLen -= spliceLen;
-                    splicedSegLength[i][j++] = spliceLen;
-                } while(remainingLen > 0);
-
-                numberOfSplicedSeg[i] = j;
-            }
-        } // 4
-
-        uint64_t                                        numberOfAlignments;
-        expandable_array<uint64_t>                      numberOfSegmentAlignments;
-        expandable_array<uint64_t>                      numberOfAlignmentPairs;
-        expandable_array<expandable_array<uint64_t> >   alignPtr;
-        uint64_t                                        moreAlignments;
-        uint64_t                                        moreAlignmentsNextPos;
-        uint64_t                                        moreAlignmentsNextSeqId;
-
-        if(classId != CLASS_U) {
-            if(multiple_alignments_flag == 0)   
-                numberOfSegmentAlignments[0] = 1;
+        while (i < numberOfSegmentAlignments[0]) {
+            if (multiple_alignments_flag == 0)
+                numberOfAlignmentPairs[i] = 1;
             else {
-                numberOfSegmentAlignments[0] = subsequence0(10, 0);
+                numberOfAlignmentPairs[i] = subsequence0(10, 0);
                 AU.j[10][0]++;
             }
-        }
-        else numberOfSegmentAlignments[0] = 0;
 
-        moreAlignments = 0;
+            j = 0;
 
-        if(unpairedRead || classId == CLASS_HM) {
-            numberOfAlignments = numberOfSegmentAlignments[0];
+            while (j < numberOfAlignmentPairs[i]) {
+                if (i != 0) {
+                    ptr = subsequence1(10, 1);
+                    AU.j[10][1]++;
+                } else
+                    ptr = 0;
 
-            for(uint64_t i=0; i<numberOfAlignments; ++i)
-                alignPtr[i][0] = i;
-        }
-        else if(classId == CLASS_U) {
-            if(numberOfRecordSegments > 1)
-                numberOfSegmentAlignments[1] = 0;
-            numberOfAlignments = 0;
-        }
-        else {
-            numberOfSegmentAlignments[1] = 0;
-            uint64_t k, i, j, ptr;
-            k = i = 0;
+                alignPtr[k][1] = numberOfSegmentAlignments[1] - ptr;
+                alignPtr[k][0] = i;
 
-            while(i < numberOfSegmentAlignments[0]) {
-                if(multiple_alignments_flag == 0)   
-                    numberOfAlignmentPairs[i] = 1;
-                else {
-                    numberOfAlignmentPairs[i] = subsequence0(10, 0);
-                    AU.j[10][0]++;
-                }
+                if (ptr == 0) numberOfSegmentAlignments[1]++;
 
-                j = 0;
-
-                while(j < numberOfAlignmentPairs[i]) {
-                    if(i != 0) {
-                        ptr = subsequence1(10, 1);
-                        AU.j[10][1]++;
-                    }
-                    else ptr = 0;
-
-                    alignPtr[k][1] = numberOfSegmentAlignments[1] - ptr;
-                    alignPtr[k][0] = i;
-
-                    if(ptr == 0) numberOfSegmentAlignments[1]++;
-
-                    j++;
-                    k++;
-                }
-
-                i++;
+                j++;
+                k++;
             }
 
-            numberOfAlignments = k;
+            i++;
         }
 
-        if(multiple_alignments_flag == 1 && classId != CLASS_U && subsequence2(10, 2)) {
-            moreAlignments = 1;
-            moreAlignmentsNextSeqId = subsequence3(10, 3);
-            moreAlignmentsNextPos   = subsequence4(10, 4);
-            AU.j[10][3]++;
-            AU.j[10][4]++;
-        }
-
-        AU.j[10][2]++; // 5
-
-        expandable_array<expandable_array<uint64_t> > mappingPos;
-
-        if(AU.j[0][0] > 0)  mappingPos[0][0] = previousMappingPos0 + subsequence0(0, 0);
-        else                mappingPos[0][0] = AU_start_position + subsequence0(0, 0);
-
-        previousMappingPos0 = mappingPos[0][0];
-
-        for(uint64_t i=1; i<numberOfSegmentAlignments[0]; ++i) {
-            mappingPos[i][0] = mappingPos[i-1][0] + subsequence1(0, 1);
-            AU.j[0][1]++;
-        }
-
-        AU.j[0][0]++; // 6
-
-        uint8_t read1First, delta;
-        expandable_array<expandable_array<uint64_t> >   splitMate;
-        expandable_array<expandable_array<uint64_t> >   splicedSegMappingPos;
-        expandable_array<expandable_array<uint64_t> >   mateSeqId;
-        expandable_array<uint64_t>                      mateRecordIndex;
-        expandable_array<uint64_t>                      mateAuId;
-
-        splitMate[0][0] = 0;
-
-        if(classId != CLASS_HM) {
-            for(uint64_t i=1; i<numberOfTemplateSegments; ++i) {
-                if(subsequence0(8, 0) == 0) {
-                    splitMate[0][i] = 0;
-                    if(classId != CLASS_U) {
-                        read1First  = (subsequence1(8, 1) & 0x0001) ? 0 : 1;
-                        delta       = subsequence1(8, 1) >> 1;
-                        mappingPos[0][i] = mappingPos[0][0] + delta;
-                        mateSeqId[0][i]  = seqId;
-                        AU.j[8][1]++;
-                    }
-                    else {
-                        read1First          = 1;
-                        mateAuId[1]         = minus1;
-                        mateRecordIndex[i]  = minus1;
-                    }
-                }
-                else if(subsequence0(8, 0) == 1) {
-                    splitMate[0][i] = 1;
-                    read1First      = 0;
-                    if(classId != CLASS_U) {
-                        mappingPos[0][i]    = subsequence2(8, 2);
-                        mateSeqId[0][i]     = seqId;
-                    }
-                    else {
-                        mateAuId[1]         = minus1;
-                        mateRecordIndex[i]  = subsequence2(8, 2);
-                    }
-                    AU.j[8][2]++;
-                }
-                else if(subsequence0(8, 0) == 2) {
-                    splitMate[0][i] = 1;
-                    read1First      = 1;
-                    if(classId != CLASS_U) {
-                        mappingPos[0][i]    = subsequence3(8, 3);
-                        mateSeqId[0][i]     = seqId;
-                    } else {
-                        mateAuId[1] = minus1;
-                        mateRecordIndex[i] = subsequence2(8, 3);
-                    }
-                    AU.j[8][3]++;
-                }
-                else if(subsequence0(8, 0) == 3) {
-                    splitMate[0][i] = 1;
-                    read1First      = 0;
-                    if(classId != CLASS_U) {
-                        mateSeqId[0][i]     = subsequence4(8, 4);
-                        mappingPos[0][i]    = subsequence6(8, 6);
-                    }
-                }
-            }
-        } // 7
-
-        expandable_array<expandable_array<expandable_array<uint64_t> > > reverseComp;
-        expandable_array<uint64_t> numberOfSegmentMappings;
-        uint64_t numberOfMappedRecordSegments;
-
-        if(classId == CLASS_U && crps_flag != 0 && (cr_alg_ID == 2 || cr_alg_ID == 4)) {
-            numberOfMappedRecordSegments = numberOfRecordSegments;
-            for(uint64_t i=0; i<numberOfRecordSegments; ++i)
-                numberOfSegmentMappings[i] = 1;
-        }
-        else {
-            numberOfMappedRecordSegments = numberOfAlignedRecordSegments;
-            numberOfSegmentMappings = expandable_array<uint64_t>(numberOfSegmentAlignments.begin(), numberOfSegmentAlignments.end());
-        }
-
-
-        for(uint64_t i=0; i<numberOfMappedRecordSegments; ++i) {
-            for(uint64_t j=0; j<numberOfSegmentMappings[i]; ++j) {
-                if(splitMate[j][i] == 0) {
-                    for(uint64_t k=0; k<numberOfSplicedSeg[i]; ++k) {
-                        reverseComp[k][j][i] = subsequence0(1, 0);
-                        AU.j[1][0]++;
-                    }
-                }
-            }
-        } // 8
-
-        uint64_t    readGroupId;
-        bool        has_readGroupId = false;
-
-        if(num_groups > 0) {
-            has_readGroupId = true;
-            readGroupId = subsequence0(13, 0);
-            AU.j[13][0]++;
-        } // 9
-
-        uint64_t cIdx = 0;
-        uint64_t refIdx = 0;
-        uint64_t t = 0;
-        expandable_array<std::string> decodedStrings;
-
-        uint32_t num_output_descriptors = 0; 
-
-        do {
-            uint64_t tokType = 0; // get_tok_type(decoded_tokens[t<<4]);
-            uint64_t distance = 0; // get_tok_int(decoded_tokens[t<<4 | tokType]);
-            // get_tok_int(decoded_tokens[ ]) pops four bytes from data structure decoded_tokens[ ] and decodes them as a 32-bit integer as specified in subclause 6.2.
-            // however, decoded_tokens[i] is 8 bits ??? how to take 4 bytes out of that
-            uint64_t refIdx = cIdx - distance;
-            if(tokType == 0)
-                decodedStrings[cIdx] = decodedStrings[refIdx];
-            else {
-                uint16_t num_tokentype_sequences = 0; // TODO ask
-
-                for(t=1; t<num_tokentype_sequences; ++t) { // which one??
-                    tokType = 0; // get_tok_type(decoded_tokens[t<<4]);
-                    if(tokType == 9)
-                        break;
-                    std::string tokStr = extract_tok_value(decoded_tokens, tokType, t, refIdx);
-                    decodedStrings[cIdx] += tokStr;
-                }
-            }
-        } while(cIdx < num_output_descriptors && decodedStrings[cIdx++].size() > 0);
-
-        // 10 
-
-        expandable_array<expandable_array<expandable_array<uint64_t> > > mappingScores;
-        bool has_mappingScores = false;;
-
-        if(as_depth > 0) {
-            has_mappingScores = true;
-
-            for(uint64_t i=0; i<as_depth; ++i) {
-                for(uint64_t j=0; j<numberOfAlignedRecordSegments; ++j) {
-                    for(uint64_t k=0; k<numberOfSegmentAlignments[j]; ++k) {
-                        if(splitMate[k][j] == 0) {
-                            mappingScores[k][j][i] = subsequence0(9, 0);
-                            AU.j[9][0]++;
-                        }
-                    }
-                }
-            }
-        } // 11
-
-        expandable_array<expandable_array<std::string> > decodedMsar;
-        bool has_decodedMsar = false;
-
-        if(multiple_alignments_flag == 1) {
-            has_decodedMsar = true;
-            uint64_t k = 0;
-
-            for(uint64_t i=0; i<numberOfAlignedRecordSegments; ++i) {
-                for(uint64_t j=1; j<numberOfSegmentAlignments[i]; ++j) {
-                    if(splitMate[j-1][i] == 0) {
-                        decodedMsar[j-1][i] = decodedStrings[k++]; // todo: step 10
-                    }
-                }
-            }
-        } // 12
-
-        uint64_t decodedFlags;
-
-        decodedFlags |= subsequence0(2, 0) << 0;
-        decodedFlags |= subsequence1(2, 1) << 1;
-        decodedFlags |= subsequence2(2, 2) << 2;
-
-        AU.j[2][0]++;
-        AU.j[2][1]++;
-        AU.j[2][2]++; // 13.1
-
-        uint64_t qvPresentFlag;
-        uint64_t revComp;
-        uint64_t qvNumCodebooksAligned;
-        uint64_t qvCodeBookId;
-        uint64_t qvCodeBookSubSeq;
-        uint64_t qvIndex;
-
-        expandable_array<expandable_array<std::string> > qualityValues;
-        expandable_array<uint64_t> qvCodeBookIds;
-
-       //uint8_t qv_num_codebooks_total = 0; // TODO ask
-
-        // decode_quality_values() {
-            if(genomicRecordIndex-1 == 0) { /* where do i get that from? todo ask */
-                /* decode_qv_codebook_indexes() */
-                
-                if(classId == CLASS_I || classId == CLASS_HM)    qvNumCodebooksAligned = qv_num_codebooks_total - 1;
-                else if(classId != CLASS_U)                      qvNumCodebooksAligned = qv_num_codebooks_total;
-                else                                             qvNumCodebooksAligned = 0;
-               
-                if(qvNumCodebooksAligned > 1) {
-                    uint64_t pos = 0;
-
-                    for(AU.j[14][1]=0; AU.j[14][1]<_subsequence1(14).size(); ++AU.j[14][1]) {
-                        qvCodeBookIds[pos] = subsequence1(14, 1);
-                        pos++;
-                    }
-                }
-            }
-
-            for(uint8_t tSeg=0; tSeg<numberOfRecordSegments; ++tSeg) {
-                for(uint8_t qs=0; qs<qv_depth; ++qs) {
-                    if(AU.j[14][0] < _subsequence0(14).size()) {
-                        qvPresentFlag = subsequence0(14, 0);
-                        AU.j[14][0]++;
-                    } 
-                    else
-                        qvPresentFlag = 1;
-                    
-                    if(qvPresentFlag == 1) {
-                        /* decode_qvs() { */
-                            uint64_t numBases = 1000000; // TODO ask
-#define isAligned(x) true
-
-                            expandable_array<expandable_array<uint8_t> >    qv_recon; // TODO ask
-                            expandable_array<uint64_t> basePos; // TODO change
-                            // first position: pos descriptor
-                            // remaining: just increment by 1
-
-
-                            for(uint64_t baseIdx=0; baseIdx<numBases; baseIdx++) { /* how to calculate numBases??? not specified */
-                                if((classId == CLASS_I || classId == CLASS_HM) && !isAligned(baseIdx)) /* how do you implmenet this ??? isAligned */ qvCodeBookId = qv_num_codebooks_total - 1;
-                                else if(classId == CLASS_U)         qvCodeBookId = 0;
-                                else if(qvNumCodebooksAligned > 1)  qvCodeBookId = qvCodeBookIds[basePos[baseIdx]]; /* what about basePos */
-                                else                                qvCodeBookId = 0;
-                                
-                                qvCodeBookSubSeq = qvCodeBookId + 2;
-                                uint64_t j = AU.j[14][qvCodeBookSubSeq];
-                                AU.j[14][qvCodeBookSubSeq]++;
-                                qvIndex = decoded_symbols[14][qvCodeBookSubSeq][j];
-                                qualityValues[tSeg][qs][baseIdx] = qv_recon[qvCodeBookId][qvIndex];
-                            }
-                        /* } */
-
-
-                        std::string qvString;
-                        size_t len = 0;
-
-                        for(uint64_t i=0; i<numberOfSplicedSeg[tSeg]; ++i) {
-                            revComp = reverseComp[i][0][tSeg];
-                            std::string qvSplice = qualityValues[tSeg][qs].substr(len, splicedSegLength[tSeg][i]);
-                            
-                            if(qv_reverse_flag && revComp) {
-                                std::string temp_rev = qvSplice;
-                                std::reverse(temp_rev.begin(), temp_rev.end());
-                                qvString += temp_rev;
-                            }
-                            else {
-                                qvString += qvSplice;
-                            }
-                        }
-
-                        qualityValues[tSeg][qs] = qvString;
-                    } 
-                    else
-                        qualityValues[tSeg][qs] = std::string();
-                }
-            }
-        // } // 13.2
-
-        /* 14 goes here */ // 14
-
-        
+        numberOfAlignments = k;
     }
 
-} /* << end namespace decoder */
+    if (multiple_alignments_flag == 1 && classId != CLASS_U && subsequence2(10, 2)) {
+        moreAlignments = 1;
+        moreAlignmentsNextSeqId = subsequence3(10, 3);
+        moreAlignmentsNextPos = subsequence4(10, 4);
+        AU.j[10][3]++;
+        AU.j[10][4]++;
+    }
 
+    AU.j[10][2]++;  // 5
+
+    expandable_array<expandable_array<uint64_t> > mappingPos;
+
+    if (AU.j[0][0] > 0)
+        mappingPos[0][0] = previousMappingPos0 + subsequence0(0, 0);
+    else
+        mappingPos[0][0] = AU_start_position + subsequence0(0, 0);
+
+    previousMappingPos0 = mappingPos[0][0];
+
+    for (uint64_t i = 1; i < numberOfSegmentAlignments[0]; ++i) {
+        mappingPos[i][0] = mappingPos[i - 1][0] + subsequence1(0, 1);
+        AU.j[0][1]++;
+    }
+
+    AU.j[0][0]++;  // 6
+
+    uint8_t read1First, delta;
+    expandable_array<expandable_array<uint64_t> > splitMate;
+    expandable_array<expandable_array<uint64_t> > splicedSegMappingPos;
+    expandable_array<expandable_array<uint64_t> > mateSeqId;
+    expandable_array<uint64_t> mateRecordIndex;
+    expandable_array<uint64_t> mateAuId;
+
+    splitMate[0][0] = 0;
+
+    if (classId != CLASS_HM) {
+        for (uint64_t i = 1; i < numberOfTemplateSegments; ++i) {
+            if (subsequence0(8, 0) == 0) {
+                splitMate[0][i] = 0;
+                if (classId != CLASS_U) {
+                    read1First = (subsequence1(8, 1) & 0x0001) ? 0 : 1;
+                    delta = subsequence1(8, 1) >> 1;
+                    mappingPos[0][i] = mappingPos[0][0] + delta;
+                    mateSeqId[0][i] = seqId;
+                    AU.j[8][1]++;
+                } else {
+                    read1First = 1;
+                    mateAuId[1] = minus1;
+                    mateRecordIndex[i] = minus1;
+                }
+            } else if (subsequence0(8, 0) == 1) {
+                splitMate[0][i] = 1;
+                read1First = 0;
+                if (classId != CLASS_U) {
+                    mappingPos[0][i] = subsequence2(8, 2);
+                    mateSeqId[0][i] = seqId;
+                } else {
+                    mateAuId[1] = minus1;
+                    mateRecordIndex[i] = subsequence2(8, 2);
+                }
+                AU.j[8][2]++;
+            } else if (subsequence0(8, 0) == 2) {
+                splitMate[0][i] = 1;
+                read1First = 1;
+                if (classId != CLASS_U) {
+                    mappingPos[0][i] = subsequence3(8, 3);
+                    mateSeqId[0][i] = seqId;
+                } else {
+                    mateAuId[1] = minus1;
+                    mateRecordIndex[i] = subsequence2(8, 3);
+                }
+                AU.j[8][3]++;
+            } else if (subsequence0(8, 0) == 3) {
+                splitMate[0][i] = 1;
+                read1First = 0;
+                if (classId != CLASS_U) {
+                    mateSeqId[0][i] = subsequence4(8, 4);
+                    mappingPos[0][i] = subsequence6(8, 6);
+                }
+            }
+        }
+    }  // 7
+
+    expandable_array<expandable_array<expandable_array<uint64_t> > > reverseComp;
+    expandable_array<uint64_t> numberOfSegmentMappings;
+    uint64_t numberOfMappedRecordSegments;
+
+    if (classId == CLASS_U && crps_flag != 0 && (cr_alg_ID == 2 || cr_alg_ID == 4)) {
+        numberOfMappedRecordSegments = numberOfRecordSegments;
+        for (uint64_t i = 0; i < numberOfRecordSegments; ++i) numberOfSegmentMappings[i] = 1;
+    } else {
+        numberOfMappedRecordSegments = numberOfAlignedRecordSegments;
+        numberOfSegmentMappings =
+            expandable_array<uint64_t>(numberOfSegmentAlignments.begin(), numberOfSegmentAlignments.end());
+    }
+
+    for (uint64_t i = 0; i < numberOfMappedRecordSegments; ++i) {
+        for (uint64_t j = 0; j < numberOfSegmentMappings[i]; ++j) {
+            if (splitMate[j][i] == 0) {
+                for (uint64_t k = 0; k < numberOfSplicedSeg[i]; ++k) {
+                    reverseComp[k][j][i] = subsequence0(1, 0);
+                    AU.j[1][0]++;
+                }
+            }
+        }
+    }  // 8
+
+    uint64_t readGroupId;
+    bool has_readGroupId = false;
+
+    if (num_groups > 0) {
+        has_readGroupId = true;
+        readGroupId = subsequence0(13, 0);
+        AU.j[13][0]++;
+    }  // 9
+
+    uint64_t cIdx = 0;
+    uint64_t refIdx = 0;
+    uint64_t t = 0;
+    expandable_array<std::string> decodedStrings;
+
+    uint32_t num_output_descriptors = 0;
+
+    do {
+        uint64_t tokType = 0;   // get_tok_type(decoded_tokens[t<<4]);
+        uint64_t distance = 0;  // get_tok_int(decoded_tokens[t<<4 | tokType]);
+        // get_tok_int(decoded_tokens[ ]) pops four bytes from data structure decoded_tokens[ ] and decodes them as a
+        // 32-bit integer as specified in subclause 6.2. however, decoded_tokens[i] is 8 bits ??? how to take 4 bytes
+        // out of that
+        uint64_t refIdx = cIdx - distance;
+        if (tokType == 0)
+            decodedStrings[cIdx] = decodedStrings[refIdx];
+        else {
+            uint16_t num_tokentype_sequences = 0;  // TODO ask
+
+            for (t = 1; t < num_tokentype_sequences; ++t) {  // which one??
+                tokType = 0;                                 // get_tok_type(decoded_tokens[t<<4]);
+                if (tokType == 9) break;
+                std::string tokStr = extract_tok_value(decoded_tokens, tokType, t, refIdx);
+                decodedStrings[cIdx] += tokStr;
+            }
+        }
+    } while (cIdx < num_output_descriptors && decodedStrings[cIdx++].size() > 0);
+
+    // 10
+
+    expandable_array<expandable_array<expandable_array<uint64_t> > > mappingScores;
+    bool has_mappingScores = false;
+    ;
+
+    if (as_depth > 0) {
+        has_mappingScores = true;
+
+        for (uint64_t i = 0; i < as_depth; ++i) {
+            for (uint64_t j = 0; j < numberOfAlignedRecordSegments; ++j) {
+                for (uint64_t k = 0; k < numberOfSegmentAlignments[j]; ++k) {
+                    if (splitMate[k][j] == 0) {
+                        mappingScores[k][j][i] = subsequence0(9, 0);
+                        AU.j[9][0]++;
+                    }
+                }
+            }
+        }
+    }  // 11
+
+    expandable_array<expandable_array<std::string> > decodedMsar;
+    bool has_decodedMsar = false;
+
+    if (multiple_alignments_flag == 1) {
+        has_decodedMsar = true;
+        uint64_t k = 0;
+
+        for (uint64_t i = 0; i < numberOfAlignedRecordSegments; ++i) {
+            for (uint64_t j = 1; j < numberOfSegmentAlignments[i]; ++j) {
+                if (splitMate[j - 1][i] == 0) {
+                    decodedMsar[j - 1][i] = decodedStrings[k++];  // todo: step 10
+                }
+            }
+        }
+    }  // 12
+
+    uint64_t decodedFlags;
+
+    decodedFlags |= subsequence0(2, 0) << 0;
+    decodedFlags |= subsequence1(2, 1) << 1;
+    decodedFlags |= subsequence2(2, 2) << 2;
+
+    AU.j[2][0]++;
+    AU.j[2][1]++;
+    AU.j[2][2]++;  // 13.1
+
+    uint64_t qvPresentFlag;
+    uint64_t revComp;
+    uint64_t qvNumCodebooksAligned;
+    uint64_t qvCodeBookId;
+    uint64_t qvCodeBookSubSeq;
+    uint64_t qvIndex;
+
+    expandable_array<expandable_array<std::string> > qualityValues;
+    expandable_array<uint64_t> qvCodeBookIds;
+
+    // uint8_t qv_num_codebooks_total = 0; // TODO ask
+
+    // decode_quality_values() {
+    if (genomicRecordIndex - 1 == 0) { /* where do i get that from? todo ask */
+        /* decode_qv_codebook_indexes() */
+
+        if (classId == CLASS_I || classId == CLASS_HM)
+            qvNumCodebooksAligned = qv_num_codebooks_total - 1;
+        else if (classId != CLASS_U)
+            qvNumCodebooksAligned = qv_num_codebooks_total;
+        else
+            qvNumCodebooksAligned = 0;
+
+        if (qvNumCodebooksAligned > 1) {
+            uint64_t pos = 0;
+
+            for (AU.j[14][1] = 0; AU.j[14][1] < _subsequence1(14).size(); ++AU.j[14][1]) {
+                qvCodeBookIds[pos] = subsequence1(14, 1);
+                pos++;
+            }
+        }
+    }
+
+    for (uint8_t tSeg = 0; tSeg < numberOfRecordSegments; ++tSeg) {
+        for (uint8_t qs = 0; qs < qv_depth; ++qs) {
+            if (AU.j[14][0] < _subsequence0(14).size()) {
+                qvPresentFlag = subsequence0(14, 0);
+                AU.j[14][0]++;
+            } else
+                qvPresentFlag = 1;
+
+            if (qvPresentFlag == 1) {
+                /* decode_qvs() { */
+                uint64_t numBases = 1000000;  // TODO ask
+#define isAligned(x) true
+
+                expandable_array<expandable_array<uint8_t> > qv_recon;  // TODO ask
+                expandable_array<uint64_t> basePos;                     // TODO change
+                // first position: pos descriptor
+                // remaining: just increment by 1
+
+                for (uint64_t baseIdx = 0; baseIdx < numBases;
+                     baseIdx++) { /* how to calculate numBases??? not specified */
+                    if ((classId == CLASS_I || classId == CLASS_HM) &&
+                        !isAligned(baseIdx)) /* how do you implmenet this ??? isAligned */
+                        qvCodeBookId = qv_num_codebooks_total - 1;
+                    else if (classId == CLASS_U)
+                        qvCodeBookId = 0;
+                    else if (qvNumCodebooksAligned > 1)
+                        qvCodeBookId = qvCodeBookIds[basePos[baseIdx]]; /* what about basePos */
+                    else
+                        qvCodeBookId = 0;
+
+                    qvCodeBookSubSeq = qvCodeBookId + 2;
+                    uint64_t j = AU.j[14][qvCodeBookSubSeq];
+                    AU.j[14][qvCodeBookSubSeq]++;
+                    qvIndex = decoded_symbols[14][qvCodeBookSubSeq][j];
+                    qualityValues[tSeg][qs][baseIdx] = qv_recon[qvCodeBookId][qvIndex];
+                }
+                /* } */
+
+                std::string qvString;
+                size_t len = 0;
+
+                for (uint64_t i = 0; i < numberOfSplicedSeg[tSeg]; ++i) {
+                    revComp = reverseComp[i][0][tSeg];
+                    std::string qvSplice = qualityValues[tSeg][qs].substr(len, splicedSegLength[tSeg][i]);
+
+                    if (qv_reverse_flag && revComp) {
+                        std::string temp_rev = qvSplice;
+                        std::reverse(temp_rev.begin(), temp_rev.end());
+                        qvString += temp_rev;
+                    } else {
+                        qvString += qvSplice;
+                    }
+                }
+
+                qualityValues[tSeg][qs] = qvString;
+            } else
+                qualityValues[tSeg][qs] = std::string();
+        }
+    }
+    // } // 13.2
+
+    /* 14 goes here */  // 14
+}
+
+}  // namespace decoder
