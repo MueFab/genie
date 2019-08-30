@@ -13,11 +13,9 @@
 
 namespace gabac {
 
-void transformRleCoding(uint64_t guard, DataBlock *rawValues,
-                        DataBlock *lengths);
+void transformRleCoding(uint64_t guard, DataBlock *rawValues, DataBlock *lengths);
 
-void inverseTransformRleCoding(uint64_t guard, DataBlock *rawValues,
-                               DataBlock *lengths);
+void inverseTransformRleCoding(uint64_t guard, DataBlock *rawValues, DataBlock *lengths);
 
 }  // namespace gabac
 

@@ -1,6 +1,5 @@
 // Copyright 2018 The genie authors
 
-
 /**
  *  @file utilitiess.h
  *  @brief Utilities implementation
@@ -8,24 +7,20 @@
  *  @bug No known bugs
  */
 
-
 #include "utilities.h"
 
 #include <time.h>
 
-#include <fstream>
 #include <sys/stat.h>
+#include <fstream>
 
 #include "exceptions.h"
 #include "operating-system.h"
 
-
 namespace dsg {
 namespace common {
 
-
-std::string dateTime(void)
-{
+std::string dateTime(void) {
     // ISO 8601 format: 2007-04-05T14:30:21Z
     char timeString[] = "yyyy-mm-ddTHH:MM:SSZ";
 
@@ -41,14 +36,13 @@ std::string dateTime(void)
         throwRuntimeError("call to gmtime_s() failed");
     }
 #else
-    struct tm *ret = gmtime_r(&currentTime, &timeinfo);
+    struct tm* ret = gmtime_r(&currentTime, &timeinfo);
     if (ret == NULL) {
         throwRuntimeError("call to gmtime_r() failed");
     }
 #endif
 
-    if (strftime(timeString, sizeof(timeString), "%Y-%m-%dT%H:%M:%SZ",
-                 &timeinfo) == 0) {
+    if (strftime(timeString, sizeof(timeString), "%Y-%m-%dT%H:%M:%SZ", &timeinfo) == 0) {
         throwRuntimeError("call to strftime() failed");
     }
 
@@ -56,10 +50,7 @@ std::string dateTime(void)
     return result;
 }
 
-
-std::string fileBaseName(
-    const std::string& path)
-{
+std::string fileBaseName(const std::string& path) {
     if (path.empty()) {
         throwRuntimeError("path is empty");
     }
@@ -69,10 +60,7 @@ std::string fileBaseName(
     return path.substr(path.find_last_of(delimiters) + 1);
 }
 
-
-bool fileExists(
-    const std::string& path)
-{
+bool fileExists(const std::string& path) {
     if (path.empty()) {
         throwRuntimeError("path is empty");
     }

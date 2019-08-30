@@ -5,12 +5,14 @@
 
 namespace utils {
 
-    FastqRecord::FastqRecord() : title(""), sequence(""), optional(""), qualityScores("") {}
+FastqRecord::FastqRecord() : title(""), sequence(""), optional(""), qualityScores("") {}
 
-    FastqRecord::FastqRecord(std::string ptitle, std::string psequence, std::string poptional, std::string pqualityScores)
-            : title(std::move(ptitle)), sequence(std::move(psequence)), optional(std::move(poptional)),
-              qualityScores(std::move(pqualityScores)) {}
+FastqRecord::FastqRecord(std::string ptitle, std::string psequence, std::string poptional, std::string pqualityScores)
+    : title(std::move(ptitle)),
+      sequence(std::move(psequence)),
+      optional(std::move(poptional)),
+      qualityScores(std::move(pqualityScores)) {}
 
-    FastqRecord::~FastqRecord() = default;
+FastqRecord::~FastqRecord() = default;
 
 }  // namespace utils

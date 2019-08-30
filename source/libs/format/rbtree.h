@@ -43,9 +43,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-
 #ifndef LDNS_RBTREE_H_
-#define	LDNS_RBTREE_H_
+#define LDNS_RBTREE_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,39 +62,39 @@ typedef struct ldns_rbnode_t ldns_rbnode_t;
  */
 struct ldns_rbnode_t {
     /** parent in rbtree, RBTREE_NULL for root */
-    ldns_rbnode_t   *parent;
+    ldns_rbnode_t *parent;
     /** left node (smaller items) */
-    ldns_rbnode_t   *left;
+    ldns_rbnode_t *left;
     /** right node (larger items) */
-    ldns_rbnode_t   *right;
+    ldns_rbnode_t *right;
     /** pointer to sorting key */
     const void *key;
     /** pointer to data */
     const void *data;
     /** colour of this node */
-    uint8_t	    color;
+    uint8_t color;
 };
 
 /** The nullpointer, points to empty node */
-#define	LDNS_RBTREE_NULL &ldns_rbtree_null_node
+#define LDNS_RBTREE_NULL &ldns_rbtree_null_node
 /** the global empty node */
-extern	ldns_rbnode_t	ldns_rbtree_null_node;
+extern ldns_rbnode_t ldns_rbtree_null_node;
 
 /** An entire red black tree */
 typedef struct ldns_rbtree_t ldns_rbtree_t;
 /** definition for tree struct */
 struct ldns_rbtree_t {
     /** The root of the red-black tree */
-    ldns_rbnode_t    *root;
+    ldns_rbnode_t *root;
 
     /** The number of the nodes in the tree */
-    size_t       count;
+    size_t count;
 
     /**
      * Key compare function. <0,0,>0 like strcmp.
      * Return 0 on two NULL ptrs.
      */
-    int (*cmp) (const void *, const void *);
+    int (*cmp)(const void *, const void *);
 };
 
 /**
@@ -160,8 +159,7 @@ ldns_rbnode_t *ldns_rbtree_search(ldns_rbtree_t *rbtree, const void *key);
  * @return: true if exact match in result. Else result points to <= element,
  * or NULL if key is smaller than the smallest key.
  */
-int ldns_rbtree_find_less_equal(ldns_rbtree_t *rbtree, const void *key,
-                                ldns_rbnode_t **result);
+int ldns_rbtree_find_less_equal(ldns_rbtree_t *rbtree, const void *key, ldns_rbnode_t **result);
 
 /**
  * Returns first (smallest) node in the tree
@@ -208,10 +206,9 @@ void ldns_rbtree_join(ldns_rbtree_t *tree1, ldns_rbtree_t *tree2);
  * Call with node=variable of struct* with rbnode_t as first element.
  * with type is the type of a pointer to that struct.
  */
-#define LDNS_RBTREE_FOR(node, type, rbtree) \
-	for(node=(type)ldns_rbtree_first(rbtree); \
-		(ldns_rbnode_t*)node != LDNS_RBTREE_NULL; \
-		node = (type)ldns_rbtree_next((ldns_rbnode_t*)node))
+#define LDNS_RBTREE_FOR(node, type, rbtree)                                                 \
+    for (node = (type)ldns_rbtree_first(rbtree); (ldns_rbnode_t *)node != LDNS_RBTREE_NULL; \
+         node = (type)ldns_rbtree_next((ldns_rbnode_t *)node))
 
 /**
  * Call function for all elements in the redblack tree, such that
@@ -224,8 +221,7 @@ void ldns_rbtree_join(ldns_rbtree_t *tree1, ldns_rbtree_t *tree2);
  * 	The function must not alter the rbtree.
  * @param arg: user argument.
  */
-void ldns_traverse_postorder(ldns_rbtree_t* tree,
-                             void (*func)(ldns_rbnode_t*, void*), void* arg);
+void ldns_traverse_postorder(ldns_rbtree_t *tree, void (*func)(ldns_rbnode_t *, void *), void *arg);
 
 #ifdef __cplusplus
 }

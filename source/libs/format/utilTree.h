@@ -13,126 +13,114 @@
 #ifndef _UTILTREE_H
 #define _UTILTREE_H
 
-#include <time.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define dprintf(X,Y) fprintf(stderr, (X), (Y))
+#define dprintf(X, Y) fprintf(stderr, (X), (Y))
 /* #define	dprintf(X, Y)  */
 
 #define LDNS_VERSION "@PACKAGE_VERSION@"
-#define LDNS_REVISION ((@LDNS_VERSION_MAJOR@<<16)|(@LDNS_VERSION_MINOR@<<8)|(@LDNS_VERSION_MICRO@))
+#define LDNS_REVISION ((@LDNS_VERSION_MAJOR @ << 16) | (@LDNS_VERSION_MINOR @ << 8) | (@LDNS_VERSION_MICRO @))
 
 /**
  * splint static inline workaround
  */
 #ifdef S_SPLINT_S
-#  define INLINE
+#define INLINE
 #else
-#  ifdef SWIG
-#    define INLINE static
-#  else
-#    define INLINE static inline
-#  endif
+#ifdef SWIG
+#define INLINE static
+#else
+#define INLINE static inline
+#endif
 #endif
 
 /**
  * Memory management macros
  */
-#define LDNS_MALLOC(type)		LDNS_XMALLOC(type, 1)
+#define LDNS_MALLOC(type) LDNS_XMALLOC(type, 1)
 
-#define LDNS_XMALLOC(type, count)	((type *) malloc((count) * sizeof(type)))
+#define LDNS_XMALLOC(type, count) ((type *)malloc((count) * sizeof(type)))
 
-#define LDNS_CALLOC(type, count)	((type *) calloc((count), sizeof(type)))
+#define LDNS_CALLOC(type, count) ((type *)calloc((count), sizeof(type)))
 
-#define LDNS_REALLOC(ptr, type)		LDNS_XREALLOC((ptr), type, 1)
+#define LDNS_REALLOC(ptr, type) LDNS_XREALLOC((ptr), type, 1)
 
-#define LDNS_XREALLOC(ptr, type, count)				\
-	((type *) realloc((ptr), (count) * sizeof(type)))
+#define LDNS_XREALLOC(ptr, type, count) ((type *)realloc((ptr), (count) * sizeof(type)))
 
 #define LDNS_FREE(ptr) \
-	do { free((ptr)); (ptr) = NULL; } while (0)
+    do {               \
+        free((ptr));   \
+        (ptr) = NULL;  \
+    } while (0)
 
-#define LDNS_DEP     printf("DEPRECATED FUNCTION!\n");
-
-/*
- * Copy data allowing for unaligned accesses in network byte order
- * (big endian).
- */
-INLINE uint16_t
-ldns_read_uint16(const void *src)
-{
-#ifdef ALLOW_UNALIGNED_ACCESSES
-    return ntohs(*(const uint16_t *) src);
-#else
-    const uint8_t *p = (const uint8_t *) src;
-    return ((uint16_t) p[0] << 8) | (uint16_t) p[1];
-#endif
-}
-
-INLINE uint32_t
-ldns_read_uint32(const void *src)
-{
-#ifdef ALLOW_UNALIGNED_ACCESSES
-    return ntohl(*(const uint32_t *) src);
-#else
-    const uint8_t *p = (const uint8_t *) src;
-    return (  ((uint32_t) p[0] << 24)
-              | ((uint32_t) p[1] << 16)
-              | ((uint32_t) p[2] << 8)
-              |  (uint32_t) p[3]);
-#endif
-}
+#define LDNS_DEP printf("DEPRECATED FUNCTION!\n");
 
 /*
  * Copy data allowing for unaligned accesses in network byte order
  * (big endian).
  */
-INLINE void
-ldns_write_uint16(void *dst, uint16_t data)
-{
+INLINE uint16_t ldns_read_uint16(const void *src) {
 #ifdef ALLOW_UNALIGNED_ACCESSES
-    * (uint16_t *) dst = htons(data);
+    return ntohs(*(const uint16_t *)src);
 #else
-    uint8_t *p = (uint8_t *) dst;
-    p[0] = (uint8_t) ((data >> 8) & 0xff);
-    p[1] = (uint8_t) (data & 0xff);
+    const uint8_t *p = (const uint8_t *)src;
+    return ((uint16_t)p[0] << 8) | (uint16_t)p[1];
 #endif
 }
 
-INLINE void
-ldns_write_uint32(void *dst, uint32_t data)
-{
+INLINE uint32_t ldns_read_uint32(const void *src) {
 #ifdef ALLOW_UNALIGNED_ACCESSES
-    * (uint32_t *) dst = htonl(data);
+    return ntohl(*(const uint32_t *)src);
 #else
-    uint8_t *p = (uint8_t *) dst;
-    p[0] = (uint8_t) ((data >> 24) & 0xff);
-    p[1] = (uint8_t) ((data >> 16) & 0xff);
-    p[2] = (uint8_t) ((data >> 8) & 0xff);
-    p[3] = (uint8_t) (data & 0xff);
+    const uint8_t *p = (const uint8_t *)src;
+    return (((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16) | ((uint32_t)p[2] << 8) | (uint32_t)p[3]);
+#endif
+}
+
+/*
+ * Copy data allowing for unaligned accesses in network byte order
+ * (big endian).
+ */
+INLINE void ldns_write_uint16(void *dst, uint16_t data) {
+#ifdef ALLOW_UNALIGNED_ACCESSES
+    *(uint16_t *)dst = htons(data);
+#else
+    uint8_t *p = (uint8_t *)dst;
+    p[0] = (uint8_t)((data >> 8) & 0xff);
+    p[1] = (uint8_t)(data & 0xff);
+#endif
+}
+
+INLINE void ldns_write_uint32(void *dst, uint32_t data) {
+#ifdef ALLOW_UNALIGNED_ACCESSES
+    *(uint32_t *)dst = htonl(data);
+#else
+    uint8_t *p = (uint8_t *)dst;
+    p[0] = (uint8_t)((data >> 24) & 0xff);
+    p[1] = (uint8_t)((data >> 16) & 0xff);
+    p[2] = (uint8_t)((data >> 8) & 0xff);
+    p[3] = (uint8_t)(data & 0xff);
 #endif
 }
 
 /* warning. */
-INLINE void
-ldns_write_uint64_as_uint48(void *dst, uint64_t data)
-{
-    uint8_t *p = (uint8_t *) dst;
-    p[0] = (uint8_t) ((data >> 40) & 0xff);
-    p[1] = (uint8_t) ((data >> 32) & 0xff);
-    p[2] = (uint8_t) ((data >> 24) & 0xff);
-    p[3] = (uint8_t) ((data >> 16) & 0xff);
-    p[4] = (uint8_t) ((data >> 8) & 0xff);
-    p[5] = (uint8_t) (data & 0xff);
+INLINE void ldns_write_uint64_as_uint48(void *dst, uint64_t data) {
+    uint8_t *p = (uint8_t *)dst;
+    p[0] = (uint8_t)((data >> 40) & 0xff);
+    p[1] = (uint8_t)((data >> 32) & 0xff);
+    p[2] = (uint8_t)((data >> 24) & 0xff);
+    p[3] = (uint8_t)((data >> 16) & 0xff);
+    p[4] = (uint8_t)((data >> 8) & 0xff);
+    p[5] = (uint8_t)(data & 0xff);
 }
-
 
 /**
  * Structure to do a Schwartzian-like transformation, for instance when
@@ -164,8 +152,7 @@ typedef struct ldns_struct_lookup_table ldns_lookup_table;
  * \param[in] name what to search for
  * \return the item found
  */
-ldns_lookup_table *ldns_lookup_by_name(ldns_lookup_table table[],
-                                       const char *name);
+ldns_lookup_table *ldns_lookup_by_name(ldns_lookup_table table[], const char *name);
 
 /**
  * Looks up the table entry by id, returns NULL if not found.
@@ -184,7 +171,6 @@ ldns_lookup_table *ldns_lookup_by_id(ldns_lookup_table table[], int id);
  * \return
  */
 int ldns_get_bit(uint8_t bits[], size_t index);
-
 
 /**
  * Returns the value of the specified bit
@@ -213,8 +199,7 @@ void ldns_set_bit(uint8_t *byte, int bit_nr, bool value);
  * (or 1 of b < 1)
  */
 /*@unused@*/
-INLINE long
-ldns_power(long a, long b) {
+INLINE long ldns_power(long a, long b) {
     long result = 1;
     while (b > 0) {
         if (b & 1) {
@@ -250,16 +235,16 @@ char ldns_int_to_hexdigit(int ch);
  * At least strlen(str)/2 bytes should be allocated
  * \param[in] str The hex string to convert.
  * This string should not contain spaces
- * \return The number of bytes of converted data, or -1 if one of the arguments * is NULL, or -2 if the string length is not an even number
+ * \return The number of bytes of converted data, or -1 if one of the arguments * is NULL, or -2 if the string length is
+ * not an even number
  */
-int
-ldns_hexstring_to_data(uint8_t *data, const char *str);
+int ldns_hexstring_to_data(uint8_t *data, const char *str);
 
 /**
  * Show the internal library version
  * \return a string with the version in it
  */
-const char * ldns_version(void);
+const char *ldns_version(void);
 
 /**
  * Convert TM to seconds since epoch (midnight, January 1st, 1970).
@@ -285,7 +270,7 @@ time_t mktime_from_utc(const struct tm *tm);
  * \param[out] result the struct with the broken-out time information
  * \return result on success or NULL on error
  */
-struct tm * ldns_serial_arithmitics_gmtime_r(int32_t time, time_t now, struct tm *result);
+struct tm *ldns_serial_arithmitics_gmtime_r(int32_t time, time_t now, struct tm *result);
 
 /**
  * Seed the random function.
@@ -324,65 +309,50 @@ uint16_t ldns_get_random(void);
  */
 char *ldns_bubblebabble(uint8_t *data, size_t len);
 
-
 INLINE time_t ldns_time(time_t *t) { return time(t); }
-
 
 /**
  * calculates the size needed to store the result of b32_ntop
  */
 /*@unused@*/
-INLINE size_t ldns_b32_ntop_calculate_size(size_t src_data_length)
-{
+INLINE size_t ldns_b32_ntop_calculate_size(size_t src_data_length) {
     return src_data_length == 0 ? 0 : ((src_data_length - 1) / 5 + 1) * 8;
 }
 
-INLINE size_t ldns_b32_ntop_calculate_size_no_padding(size_t src_data_length)
-{
+INLINE size_t ldns_b32_ntop_calculate_size_no_padding(size_t src_data_length) {
     return ((src_data_length + 3) * 8 / 5) - 4;
 }
 
-int ldns_b32_ntop(const uint8_t* src_data, size_t src_data_length,
-                  char* target_text_buffer, size_t target_text_buffer_size);
+int ldns_b32_ntop(const uint8_t *src_data, size_t src_data_length, char *target_text_buffer,
+                  size_t target_text_buffer_size);
 
-int ldns_b32_ntop_extended_hex(const uint8_t* src_data, size_t src_data_length,
-                               char* target_text_buffer, size_t target_text_buffer_size);
+int ldns_b32_ntop_extended_hex(const uint8_t *src_data, size_t src_data_length, char *target_text_buffer,
+                               size_t target_text_buffer_size);
 
+int b32_ntop(const uint8_t *src_data, size_t src_data_length, char *target_text_buffer, size_t target_text_buffer_size);
 
-
-int b32_ntop(const uint8_t* src_data, size_t src_data_length,
-             char* target_text_buffer, size_t target_text_buffer_size);
-
-int b32_ntop_extended_hex(const uint8_t* src_data, size_t src_data_length,
-                          char* target_text_buffer, size_t target_text_buffer_size);
-
-
+int b32_ntop_extended_hex(const uint8_t *src_data, size_t src_data_length, char *target_text_buffer,
+                          size_t target_text_buffer_size);
 
 /**
  * calculates the size needed to store the result of b32_pton
  */
 /*@unused@*/
-INLINE size_t ldns_b32_pton_calculate_size(size_t src_text_length)
-{
-    return src_text_length * 5 / 8;
-}
+INLINE size_t ldns_b32_pton_calculate_size(size_t src_text_length) { return src_text_length * 5 / 8; }
 
-int ldns_b32_pton(const char* src_text, size_t src_text_length,
-                  uint8_t* target_data_buffer, size_t target_data_buffer_size);
+int ldns_b32_pton(const char *src_text, size_t src_text_length, uint8_t *target_data_buffer,
+                  size_t target_data_buffer_size);
 
-int ldns_b32_pton_extended_hex(const char* src_text, size_t src_text_length,
-                               uint8_t* target_data_buffer, size_t target_data_buffer_size);
+int ldns_b32_pton_extended_hex(const char *src_text, size_t src_text_length, uint8_t *target_data_buffer,
+                               size_t target_data_buffer_size);
 
-int b32_pton(const char* src_text, size_t src_text_length,
-             uint8_t* target_data_buffer, size_t target_data_buffer_size);
+int b32_pton(const char *src_text, size_t src_text_length, uint8_t *target_data_buffer, size_t target_data_buffer_size);
 
-int b32_pton_extended_hex(const char* src_text, size_t src_text_length,
-                          uint8_t* target_data_buffer, size_t target_data_buffer_size);
-
+int b32_pton_extended_hex(const char *src_text, size_t src_text_length, uint8_t *target_data_buffer,
+                          size_t target_data_buffer_size);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* !_UTILTREE_H */
-

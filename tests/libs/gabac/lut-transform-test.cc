@@ -8,20 +8,16 @@
 
 #include <gtest/gtest.h>
 
+class lutTransformTest : public ::testing::Test {
+   protected:
+    void SetUp() override {}
 
-class lutTransformTest : public ::testing::Test
-{
- protected:
-    void SetUp() override{
-    }
-
-    void TearDown() override{
+    void TearDown() override {
         // Code here will be called immediately after each test
     }
 };
 
-
-TEST_F(lutTransformTest, roundTripCoding0){
+TEST_F(lutTransformTest, roundTripCoding0) {
     // Void input
     gabac::DataBlock symbols(0, 1);
     symbols.resize(1024 * 1024);

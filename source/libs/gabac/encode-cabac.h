@@ -19,10 +19,8 @@ enum class ContextSelectionId;
 
 class DataBlock;
 
-void encode_cabac(const BinarizationId& binarizationId,
-                  const std::vector<uint32_t>& binarizationParameters,
-                  const ContextSelectionId& contextSelectionId,
-                  DataBlock* symbols,
+void encode_cabac(const BinarizationId& binarizationId, const std::vector<uint32_t>& binarizationParameters,
+                  const ContextSelectionId& contextSelectionId, DataBlock* symbols,
                   size_t maxsize = std::numeric_limits<size_t>::max());
 
 }  // namespace gabac

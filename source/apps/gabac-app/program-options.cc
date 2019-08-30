@@ -15,11 +15,7 @@ static bool fileExists(const std::string &path) {
 }
 
 ProgramOptions::ProgramOptions(int argc, char *argv[])
-    : configurationFilePath(),
-      logLevel(),
-      inputFilePath(),
-      outputFilePath(),
-      task() {
+    : configurationFilePath(), logLevel(), inputFilePath(), outputFilePath(), task() {
     processCommandLine(argc, argv);
 }
 
@@ -28,33 +24,25 @@ ProgramOptions::~ProgramOptions() = default;
 void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     CLI::App app{"Gabacify - GABAC entropy encoder application"};
 
-    app.add_option("-c,--configuration_file_path", this->configurationFilePath,
-                   "Configuration file path");
+    app.add_option("-c,--configuration_file_path", this->configurationFilePath, "Configuration file path");
 
     this->logLevel = "info";
     app.add_option("-l,--log_level", this->logLevel,
                    "Log level: 'trace', 'info' (default), 'debug', 'warning', "
                    "'error', or 'fatal'");
 
-    app.add_option("-i,--input_file_path", this->inputFilePath,
-                   "Input file path");
-    app.add_option("-o,--output_file_path", this->outputFilePath,
-                   "Output file path");
-    app.add_option("task,-t,--task", this->task,
-                   "Task ('encode' or 'decode' or 'analyze')")
-        ->required(true);
+    app.add_option("-i,--input_file_path", this->inputFilePath, "Input file path");
+    app.add_option("-o,--output_file_path", this->outputFilePath, "Output file path");
+    app.add_option("task,-t,--task", this->task, "Task ('encode' or 'decode' or 'analyze')")->required(true);
 
     this->blocksize = 0;
-    app.add_option("-b,--block_size", this->blocksize,
-                   "Block size - 0 means infinite");
+    app.add_option("-b,--block_size", this->blocksize, "Block size - 0 means infinite");
 
     this->maxVal = 0;
-    app.add_option("-v,--value_max", this->maxVal,
-                   "Maximum value - 0 means automatic");
+    app.add_option("-v,--value_max", this->maxVal, "Maximum value - 0 means automatic");
 
     this->wordSize = 0;
-    app.add_option("-w,--word_size", this->wordSize,
-                   "Word size - 0 means automatic");
+    app.add_option("-w,--word_size", this->wordSize, "Word size - 0 means automatic");
 
     app.positionals_at_end(false);
 
@@ -72,8 +60,7 @@ void ProgramOptions::validate(void) {
     if (this->task == "encode" || this->task == "decode") {
         // It's fine not to provide a configuration file path for encoding.
         // This will trigger the analysis.
-        if (this->configurationFilePath.empty() &&
-            this->inputFilePath.empty()) {
+        if (this->configurationFilePath.empty() && this->inputFilePath.empty()) {
             GABAC_DIE("Configuration and input file path both not provided!");
         }
 
@@ -81,8 +68,7 @@ void ProgramOptions::validate(void) {
         // user
         if (!this->outputFilePath.empty()) {
             if (fileExists(this->outputFilePath)) {
-                GABAC_DIE("Output file already existing: " +
-                          this->outputFilePath);
+                GABAC_DIE("Output file already existing: " + this->outputFilePath);
             }
         }
 
@@ -91,8 +77,7 @@ void ProgramOptions::validate(void) {
         // the user
         if (!this->outputFilePath.empty()) {
             if (fileExists(this->configurationFilePath)) {
-                GABAC_DIE("Config file already existing: " +
-                          this->outputFilePath);
+                GABAC_DIE("Config file already existing: " + this->outputFilePath);
             }
         }
 

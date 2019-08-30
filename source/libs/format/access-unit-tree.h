@@ -1,10 +1,10 @@
 #ifndef MPEGG_REFERENCE_SW_ACCESSUNITTREE_H
 #define MPEGG_REFERENCE_SW_ACCESSUNITTREE_H
 
-#include "rbtree.h"
 #include "access-unit-tree-node.h"
+#include "rbtree.h"
 
-typedef struct{
+typedef struct {
     ldns_rbtree_t* AccessUnitTree;
     DataUnitAccessUnitTreeNodeKey* keys;
     DataUnitAccessUnitTreeNodeData* data;
@@ -14,14 +14,9 @@ typedef struct{
 
 AccessUnitTree* initAccessUnitTree();
 void freeAccessUnitTree(AccessUnitTree* accessUnitTree);
-bool addElement(
-        AccessUnitTree* accessUnitTree,
-        DataUnitAccessUnitTreeNodeKey dataUnitAccessUnitTreeNodeKey,
-        DataUnitAccessUnitTreeNodeData dataUnitAccessUnitTreeNodeData
-);
+bool addElement(AccessUnitTree* accessUnitTree, DataUnitAccessUnitTreeNodeKey dataUnitAccessUnitTreeNodeKey,
+                DataUnitAccessUnitTreeNodeData dataUnitAccessUnitTreeNodeData);
 ldns_rbnode_t* getFirstAccessUnitNode(AccessUnitTree* accessUnitTree);
 ldns_rbnode_t* getNextAccessUnitNode(ldns_rbnode_t* currentNode);
 
-
-
-#endif //MPEGG_REFERENCE_SW_ACCESSUNITTREE_H
+#endif  // MPEGG_REFERENCE_SW_ACCESSUNITTREE_H

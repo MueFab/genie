@@ -1,20 +1,15 @@
 #include <string>
 
-#include "fastq-file-reader.h"
 #include "exceptions.h"
-
+#include "fastq-file-reader.h"
 
 namespace genie {
 
-
 FastqFileReader::FastqFileReader(const std::string& path) : FileReader(path) {}
-
 
 FastqFileReader::~FastqFileReader() = default;
 
-
-size_t FastqFileReader::readRecords(const size_t numRecords, std::vector<FastqRecord>* const fastqRecords)
-{
+size_t FastqFileReader::readRecords(const size_t numRecords, std::vector<FastqRecord>* const fastqRecords) {
     fastqRecords->clear();
 
     while (true) {
@@ -54,6 +49,5 @@ size_t FastqFileReader::readRecords(const size_t numRecords, std::vector<FastqRe
         }
     }
 }
-
 
 }  // namespace genie

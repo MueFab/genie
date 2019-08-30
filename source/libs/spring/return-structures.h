@@ -1,15 +1,16 @@
 #ifndef GENIE_RETURN_STRUCTURES_H
 #define GENIE_RETURN_STRUCTURES_H
 
-#include <vector>
 #include <map>
 #include <string>
+#include <vector>
 
 class generated_aus_ref {
     std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> refAus;
     std::vector<uint64_t> refStart;
     std::vector<uint64_t> refEnd;
-public:
+
+   public:
     generated_aus_ref(const std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> &refAus,
                       const std::vector<uint64_t> &refStart, const std::vector<uint64_t> &refEnd);
 
@@ -23,12 +24,10 @@ public:
 class generated_aus {
     std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> encodedFastqAus;
 
-
-public:
+   public:
     generated_aus(const std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> &encodedFastqAus);
 
     const std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> &getEncodedFastqAus() const;
-
 };
 
-#endif //GENIE_RETURN_STRUCTURES_H
+#endif  // GENIE_RETURN_STRUCTURES_H

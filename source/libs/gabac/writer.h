@@ -30,8 +30,7 @@ class Writer {
 
     void writeAsBIbypass(uint64_t input, unsigned int cLength);
 
-    void writeAsBIcabac(uint64_t input, unsigned int cLength,
-                        unsigned int offset);
+    void writeAsBIcabac(uint64_t input, unsigned int cLength, unsigned int offset);
 
     void writeAsTUbypass(uint64_t input, unsigned int cMax);
 
@@ -39,24 +38,19 @@ class Writer {
 
     void writeAsEGbypass(uint64_t input, unsigned int dummy);
 
-    void writeAsEGcabac(uint64_t input, unsigned int dummy,
-                        unsigned int offset);
+    void writeAsEGcabac(uint64_t input, unsigned int dummy, unsigned int offset);
 
     void writeAsSEGbypass(uint64_t input, unsigned int dummy);
 
-    void writeAsSEGcabac(uint64_t input, unsigned int dummy,
-                         unsigned int offset);
+    void writeAsSEGcabac(uint64_t input, unsigned int dummy, unsigned int offset);
 
     void writeAsTEGbypass(uint64_t input, unsigned int cTruncExpGolParam);
 
-    void writeAsTEGcabac(uint64_t input, unsigned int cTruncExpGolParam,
-                         unsigned int offset);
+    void writeAsTEGcabac(uint64_t input, unsigned int cTruncExpGolParam, unsigned int offset);
 
-    void writeAsSTEGbypass(uint64_t input,
-                           unsigned int cSignedTruncExpGolParam);
+    void writeAsSTEGbypass(uint64_t input, unsigned int cSignedTruncExpGolParam);
 
-    void writeAsSTEGcabac(uint64_t input, unsigned int cSignedTruncExpGolParam,
-                          unsigned int offset);
+    void writeAsSTEGcabac(uint64_t input, unsigned int cSignedTruncExpGolParam, unsigned int offset);
 
     void writeNumSymbols(unsigned int numSymbols);
 

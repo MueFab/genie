@@ -38,8 +38,7 @@ typedef struct gabac_data_block {
  * @return gabac_return_SUCCESS if no error occurred, gabac_return_FAILURE
  * otherwise
  */
-int gabac_data_block_init(gabac_data_block *block, const void *data,
-                          size_t size, uint8_t wordsize);
+int gabac_data_block_init(gabac_data_block *block, const void *data, size_t size, uint8_t wordsize);
 
 /**
  * @brief Free all ressources allocated inside a data block
@@ -112,8 +111,7 @@ uint64_t gabac_data_block_get(const gabac_data_block *block, size_t index);
  * @param index Must be smaller than values_size
  * @param val New value
  */
-void gabac_data_block_set(const gabac_data_block *block, size_t index,
-                          uint64_t val);
+void gabac_data_block_set(const gabac_data_block *block, size_t index, uint64_t val);
 
 /* Data block end*/
 
@@ -131,14 +129,12 @@ typedef enum gabac_return {
  * @brief Different logging urgency
  */
 typedef enum gabac_log_level {
-    gabac_log_level_TRACE = 0, /**< @brief Log every step in great detail */
-    gabac_log_level_DEBUG = 1, /**< @brief Intermediate results */
-    gabac_log_level_INFO = 2,  /**< @brief Expected Results */
-    gabac_log_level_WARNING =
-        3, /**< @brief Suspicious events (may be an error) */
-    gabac_log_level_ERROR = 4, /**< @brief Handled errors */
-    gabac_log_level_FATAL =
-        5 /**< @brief Error causing application to terminate */
+    gabac_log_level_TRACE = 0,   /**< @brief Log every step in great detail */
+    gabac_log_level_DEBUG = 1,   /**< @brief Intermediate results */
+    gabac_log_level_INFO = 2,    /**< @brief Expected Results */
+    gabac_log_level_WARNING = 3, /**< @brief Suspicious events (may be an error) */
+    gabac_log_level_ERROR = 4,   /**< @brief Handled errors */
+    gabac_log_level_FATAL = 5    /**< @brief Error causing application to terminate */
 } gabac_log_level;
 
 /**
@@ -149,10 +145,10 @@ typedef enum gabac_transform {
     gabac_transform_EQUALITY = 1, /**< @brief Find equal values sequentially */
     gabac_transform_MATCH = 2,    /**< @brief Find larger sequence matches */
     gabac_transform_RLE = 3,      /**< @brief Find run lengths */
-    gabac_transform_LUT = 4,  /**< @brief Remap symbols based on probability */
-    gabac_transform_DIFF = 5, /**< @brief Use differences between symbol values
-                                 instead of symbols */
-    gabac_transform_CABAC = 6 /**< @brief Entropy coding based on cabac */
+    gabac_transform_LUT = 4,      /**< @brief Remap symbols based on probability */
+    gabac_transform_DIFF = 5,     /**< @brief Use differences between symbol values
+                                     instead of symbols */
+    gabac_transform_CABAC = 6     /**< @brief Entropy coding based on cabac */
 } gabac_transform;
 
 /**
@@ -177,8 +173,7 @@ extern const uint8_t gabac_transform_WORD_SIZES[][3];
 typedef enum gabac_operation {
     gabac_operation_ENCODE = 0, /**< @brief Use configuration to compress */
     gabac_operation_DECODE = 1, /**< @brief Use configuration to decompress */
-    gabac_operation_ANALYZE =
-        2 /**< @brief Find best configuration for input data */
+    gabac_operation_ANALYZE = 2 /**< @brief Find best configuration for input data */
 } gabac_operation;
 
 /**
@@ -190,21 +185,17 @@ typedef enum gabac_binarization {
     gabac_binarization_EG = 2,  /**< @brief Exponential Golomb */
     gabac_binarization_SEG = 3, /**< @brief Signed Exponential Golomb */
     gabac_binarization_TEG = 4, /**< @brief Truncated Exponential Golomb */
-    gabac_binarization_STEG =
-        5 /**< @brief Signed Truncated Exponential Golomb */
+    gabac_binarization_STEG = 5 /**< @brief Signed Truncated Exponential Golomb */
 } gabac_binarization;
 
 /**
  * @brief Context selection modes for cabac transformation
  */
 typedef enum gabac_context_select {
-    gabac_context_select_BYPASS = 0, /**< @brief Do not use arithmetic coding */
-    gabac_context_select_ADAPTIVE_ORDER_0 =
-        1, /**< @brief Current symbol only */
-    gabac_context_select_ADAPTIVE_ORDER_1 =
-        2, /**< @brief Use current + previous symbol */
-    gabac_context_select_ADAPTIVE_ORDER_2 =
-        3 /**< @brief Use current + previous + before previous symbol */
+    gabac_context_select_BYPASS = 0,           /**< @brief Do not use arithmetic coding */
+    gabac_context_select_ADAPTIVE_ORDER_0 = 1, /**< @brief Current symbol only */
+    gabac_context_select_ADAPTIVE_ORDER_1 = 2, /**< @brief Use current + previous symbol */
+    gabac_context_select_ADAPTIVE_ORDER_2 = 3  /**< @brief Use current + previous + before previous symbol */
 } gabac_context_select;
 
 /* Constants end */
@@ -223,19 +214,15 @@ typedef enum gabac_stream_mode {
  * @brief An i/o-stream
  */
 typedef struct gabac_stream {
-    void *data; /**< @brief data_block* if input_mode == buffer and FILE* if
-                   input_mode == file */
+    void *data;                   /**< @brief data_block* if input_mode == buffer and FILE* if
+                                     input_mode == file */
     gabac_stream_mode input_mode; /**< @brief Flag for data type */
 } gabac_stream;
 
-extern const char
-    *gabac_stream_create_file_STDOUT; /**< @brief Constant for stdout */
-extern const char
-    *gabac_stream_create_file_STDERR; /**< @brief Constant for stderr */
-extern const char
-    *gabac_stream_create_file_STDIN; /**< @brief Constant for stdin */
-extern const char
-    *gabac_stream_create_file_TMP; /**< @brief Constant for tmpfile */
+extern const char *gabac_stream_create_file_STDOUT; /**< @brief Constant for stdout */
+extern const char *gabac_stream_create_file_STDERR; /**< @brief Constant for stderr */
+extern const char *gabac_stream_create_file_STDIN;  /**< @brief Constant for stdin */
+extern const char *gabac_stream_create_file_TMP;    /**< @brief Constant for tmpfile */
 
 /**
  * @brief Initialize a stream from a file
@@ -248,8 +235,7 @@ extern const char
  * @param write True to open in write mode instead of read mode
  * @return gabac_return_SUCCESS or gabac_return_FAILURE if an error occurred
  */
-int gabac_stream_create_file(gabac_stream *stream, const char *filename,
-                             size_t filename_size, int write);
+int gabac_stream_create_file(gabac_stream *stream, const char *filename, size_t filename_size, int write);
 
 /**
  * @brief Create a stream from a data block.
@@ -323,8 +309,7 @@ typedef struct gabac_io_config {
  * @param input Array of input data streams
  * @return gabac_return_SUCCESS or gabac_return_FAILURE if an error occurred
  */
-int gabac_execute_transform(uint8_t transformationID, const uint64_t *param,
-                            int inverse, gabac_data_block *input);
+int gabac_execute_transform(uint8_t transformationID, const uint64_t *param, int inverse, gabac_data_block *input);
 
 /**
  * @brief Execute a complete run of gabac
@@ -334,8 +319,7 @@ int gabac_execute_transform(uint8_t transformationID, const uint64_t *param,
  * @param json_length Length of json stream
  * @return gabac_return_SUCCESS or gabac_return_FAILURE if an error occurred
  */
-int gabac_run(gabac_operation operation, gabac_io_config *io_config,
-              const char *config_json, size_t json_length);
+int gabac_run(gabac_operation operation, gabac_io_config *io_config, const char *config_json, size_t json_length);
 
 /* Operations end */
 
@@ -350,8 +334,7 @@ int gabac_run(gabac_operation operation, gabac_io_config *io_config,
  * @param wsize Maximum word size
  * @return True if it is general
  */
-int gabac_config_is_general(const char *inconf, size_t inconf_size,
-                            uint64_t max, uint8_t wsize);
+int gabac_config_is_general(const char *inconf, size_t inconf_size, uint64_t max, uint8_t wsize);
 
 /**
  * Generalizes a configuration to a complete set of streams
@@ -364,8 +347,7 @@ int gabac_config_is_general(const char *inconf, size_t inconf_size,
  * @param outconf_size Where to put size of new config string
  * @return success
  */
-int gabac_config_generalize_create(const char *inconf, size_t inconf_size,
-                                   uint64_t max, uint8_t wsize, char **outconf,
+int gabac_config_generalize_create(const char *inconf, size_t inconf_size, uint64_t max, uint8_t wsize, char **outconf,
                                    size_t *outconf_size);
 
 /**
@@ -377,8 +359,7 @@ int gabac_config_generalize_create(const char *inconf, size_t inconf_size,
  * @param wsize Maximum word size
  * @return True if it is optimal
  */
-int gabac_config_is_optimal(const char *inconf, size_t inconf_size,
-                            uint64_t max, uint8_t wsize);
+int gabac_config_is_optimal(const char *inconf, size_t inconf_size, uint64_t max, uint8_t wsize);
 
 /**
  * Optimizes a configuration with small tweaks.
@@ -391,8 +372,7 @@ int gabac_config_is_optimal(const char *inconf, size_t inconf_size,
  * @param outconf_size Where to put size of new config string
  * @return success
  */
-int gabac_config_optimize_create(const char *inconf, size_t inconf_size,
-                                 uint64_t max, uint8_t wsize, char **outconf,
+int gabac_config_optimize_create(const char *inconf, size_t inconf_size, uint64_t max, uint8_t wsize, char **outconf,
                                  size_t *outconf_size);
 
 /**

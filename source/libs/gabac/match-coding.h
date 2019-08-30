@@ -13,11 +13,9 @@ namespace gabac {
 
 class DataBlock;
 
-void transformMatchCoding(uint32_t windowSize, DataBlock *rawValues,
-                          DataBlock *pointers, DataBlock *lengths);
+void transformMatchCoding(uint32_t windowSize, DataBlock *rawValues, DataBlock *pointers, DataBlock *lengths);
 
-void inverseTransformMatchCoding(DataBlock *rawValues, DataBlock *pointers,
-                                 DataBlock *lengths);
+void inverseTransformMatchCoding(DataBlock *rawValues, DataBlock *pointers, DataBlock *lengths);
 
 }  // namespace gabac
 

@@ -11,10 +11,10 @@
 //
 // CLI11 1.8 Copyright (c) 2017-2019 University of Cincinnati, developed by Henry
 // Schreiner under NSF AWARD 1414736. All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms of CLI11, with or without
 // modification, are permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this
 //    list of conditions and the following disclaimer.
 // 2. Redistributions in binary form must reproduce the above copyright notice,
@@ -23,7 +23,7 @@
 // 3. Neither the name of the copyright holder nor the names of its contributors
 //    may be used to endorse or promote products derived from this software without
 //    specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -35,9 +35,10 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 // Standard combined includes:
 
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <algorithm>
 #include <cmath>
 #include <deque>
@@ -56,27 +57,19 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-
 // Verbatim copy from CLI/Version.hpp:
-
 
 #define CLI11_VERSION_MAJOR 1
 #define CLI11_VERSION_MINOR 8
 #define CLI11_VERSION_PATCH 0
 #define CLI11_VERSION "1.8.0"
 
-
-
-
 // Verbatim copy from CLI/Macros.hpp:
-
 
 // The following version macro is very similar to the one in PyBind11
 #if !(defined(_MSC_VER) && __cplusplus == 199711L) && !defined(__INTEL_COMPILER)
@@ -111,11 +104,7 @@
 #define CLI11_DEPRECATED(reason) __attribute__((deprecated(reason)))
 #endif
 
-
-
-
 // Verbatim copy from CLI/Optional.hpp:
-
 
 // You can explicitly enable or disable support
 // by defining to 1 or 0. Extra check here to ensure it's in the stdlib too.
@@ -158,21 +147,17 @@
 #include <boost/optional/optional_io.hpp>
 #endif
 
-
 // From CLI/Version.hpp:
 
-
-
 // From CLI/Macros.hpp:
-
-
 
 // From CLI/Optional.hpp:
 
 namespace CLI {
 
 #if CLI11_STD_OPTIONAL
-template <typename T> std::istream &operator>>(std::istream &in, std::optional<T> &val) {
+template <typename T>
+std::istream &operator>>(std::istream &in, std::optional<T> &val) {
     T v;
     in >> v;
     val = v;
@@ -181,7 +166,8 @@ template <typename T> std::istream &operator>>(std::istream &in, std::optional<T
 #endif
 
 #if CLI11_EXPERIMENTAL_OPTIONAL
-template <typename T> std::istream &operator>>(std::istream &in, std::experimental::optional<T> &val) {
+template <typename T>
+std::istream &operator>>(std::istream &in, std::experimental::optional<T> &val) {
     T v;
     in >> v;
     val = v;
@@ -190,7 +176,8 @@ template <typename T> std::istream &operator>>(std::istream &in, std::experiment
 #endif
 
 #if CLI11_BOOST_OPTIONAL
-template <typename T> std::istream &operator>>(std::istream &in, boost::optional<T> &val) {
+template <typename T>
+std::istream &operator>>(std::istream &in, boost::optional<T> &val) {
     T v;
     in >> v;
     val = v;
@@ -212,7 +199,7 @@ using boost::optional;
 #define CLI11_OPTIONAL 1
 #endif
 
-} // namespace CLI
+}  // namespace CLI
 
 // From CLI/StringTools.hpp:
 
@@ -237,7 +224,7 @@ std::istream &operator>>(std::istream &in, T &item) {
     item = static_cast<T>(i);
     return in;
 }
-} // namespace enums
+}  // namespace enums
 
 /// Export to CLI namespace
 using namespace enums;
@@ -249,20 +236,21 @@ namespace detail {
 inline std::vector<std::string> split(const std::string &s, char delim) {
     std::vector<std::string> elems;
     // Check to see if empty string, give consistent result
-    if(s.empty())
+    if (s.empty())
         elems.emplace_back();
     else {
         std::stringstream ss;
         ss.str(s);
         std::string item;
-        while(std::getline(ss, item, delim)) {
+        while (std::getline(ss, item, delim)) {
             elems.push_back(item);
         }
     }
     return elems;
 }
 /// simple utility to convert various types to a string
-template <typename T> inline std::string as_string(const T &v) {
+template <typename T>
+inline std::string as_string(const T &v) {
     std::ostringstream s;
     s << v;
     return s.str();
@@ -274,40 +262,38 @@ inline auto as_string(T &&v) -> decltype(std::forward<T>(v)) {
 }
 
 /// Simple function to join a string
-template <typename T> std::string join(const T &v, std::string delim = ",") {
+template <typename T>
+std::string join(const T &v, std::string delim = ",") {
     std::ostringstream s;
     auto beg = std::begin(v);
     auto end = std::end(v);
-    if(beg != end)
-        s << *beg++;
-    while(beg != end) {
+    if (beg != end) s << *beg++;
+    while (beg != end) {
         s << delim << *beg++;
     }
     return s.str();
 }
 
 /// Simple function to join a string from processed elements
-template <typename T,
-          typename Callable,
+template <typename T, typename Callable,
           typename = typename std::enable_if<!std::is_constructible<std::string, Callable>::value>::type>
 std::string join(const T &v, Callable func, std::string delim = ",") {
     std::ostringstream s;
     auto beg = std::begin(v);
     auto end = std::end(v);
-    if(beg != end)
-        s << func(*beg++);
-    while(beg != end) {
+    if (beg != end) s << func(*beg++);
+    while (beg != end) {
         s << delim << func(*beg++);
     }
     return s.str();
 }
 
 /// Join a string in reverse order
-template <typename T> std::string rjoin(const T &v, std::string delim = ",") {
+template <typename T>
+std::string rjoin(const T &v, std::string delim = ",") {
     std::ostringstream s;
-    for(size_t start = 0; start < v.size(); start++) {
-        if(start > 0)
-            s << delim;
+    for (size_t start = 0; start < v.size(); start++) {
+        if (start > 0) s << delim;
         s << v[v.size() - start - 1];
     }
     return s.str();
@@ -365,12 +351,11 @@ inline std::string trim_copy(const std::string &str, const std::string &filter) 
 inline std::ostream &format_help(std::ostream &out, std::string name, std::string description, size_t wid) {
     name = "  " + name;
     out << std::setw(static_cast<int>(wid)) << std::left << name;
-    if(!description.empty()) {
-        if(name.length() >= wid)
-            out << "\n" << std::setw(static_cast<int>(wid)) << "";
-        for(const char c : description) {
+    if (!description.empty()) {
+        if (name.length() >= wid) out << "\n" << std::setw(static_cast<int>(wid)) << "";
+        for (const char c : description) {
             out.put(c);
-            if(c == '\n') {
+            if (c == '\n') {
                 out << std::setw(static_cast<int>(wid)) << "";
             }
         }
@@ -380,20 +365,22 @@ inline std::ostream &format_help(std::ostream &out, std::string name, std::strin
 }
 
 /// Verify the first character of an option
-template <typename T> bool valid_first_char(T c) {
+template <typename T>
+bool valid_first_char(T c) {
     return std::isalnum(c, std::locale()) || c == '_' || c == '?' || c == '@';
 }
 
 /// Verify following characters of an option
-template <typename T> bool valid_later_char(T c) { return valid_first_char(c) || c == '.' || c == '-'; }
+template <typename T>
+bool valid_later_char(T c) {
+    return valid_first_char(c) || c == '.' || c == '-';
+}
 
 /// Verify an option name
 inline bool valid_name_string(const std::string &str) {
-    if(str.empty() || !valid_first_char(str[0]))
-        return false;
-    for(auto c : str.substr(1))
-        if(!valid_later_char(c))
-            return false;
+    if (str.empty() || !valid_first_char(str[0])) return false;
+    for (auto c : str.substr(1))
+        if (!valid_later_char(c)) return false;
     return true;
 }
 
@@ -404,9 +391,8 @@ inline bool isalpha(const std::string &str) {
 
 /// Return a lower case version of a string
 inline std::string to_lower(std::string str) {
-    std::transform(std::begin(str), std::end(str), std::begin(str), [](const std::string::value_type &x) {
-        return std::tolower(x, std::locale());
-    });
+    std::transform(std::begin(str), std::end(str), std::begin(str),
+                   [](const std::string::value_type &x) { return std::tolower(x, std::locale()); });
     return str;
 }
 
@@ -418,10 +404,9 @@ inline std::string remove_underscore(std::string str) {
 
 /// Find and replace a substring with another substring
 inline std::string find_and_replace(std::string str, std::string from, std::string to) {
-
     size_t start_pos = 0;
 
-    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+    while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
         str.replace(start_pos, from.length(), to);
         start_pos += to.length();
     }
@@ -436,9 +421,9 @@ inline bool has_default_flag_values(const std::string &flags) {
 
 inline void remove_default_flag_values(std::string &flags) {
     auto loc = flags.find_first_of('{');
-    while(loc != std::string::npos) {
+    while (loc != std::string::npos) {
         auto finish = flags.find_first_of("},", loc + 1);
-        if((finish != std::string::npos) && (flags[finish] == '}')) {
+        if ((finish != std::string::npos) && (flags[finish] == '}')) {
             flags.erase(flags.begin() + static_cast<std::ptrdiff_t>(loc),
                         flags.begin() + static_cast<std::ptrdiff_t>(finish) + 1);
         }
@@ -448,29 +433,25 @@ inline void remove_default_flag_values(std::string &flags) {
 }
 
 /// Check if a string is a member of a list of strings and optionally ignore case or ignore underscores
-inline std::ptrdiff_t find_member(std::string name,
-                                  const std::vector<std::string> names,
-                                  bool ignore_case = false,
+inline std::ptrdiff_t find_member(std::string name, const std::vector<std::string> names, bool ignore_case = false,
                                   bool ignore_underscore = false) {
     auto it = std::end(names);
-    if(ignore_case) {
-        if(ignore_underscore) {
+    if (ignore_case) {
+        if (ignore_underscore) {
             name = detail::to_lower(detail::remove_underscore(name));
             it = std::find_if(std::begin(names), std::end(names), [&name](std::string local_name) {
                 return detail::to_lower(detail::remove_underscore(local_name)) == name;
             });
         } else {
             name = detail::to_lower(name);
-            it = std::find_if(std::begin(names), std::end(names), [&name](std::string local_name) {
-                return detail::to_lower(local_name) == name;
-            });
+            it = std::find_if(std::begin(names), std::end(names),
+                              [&name](std::string local_name) { return detail::to_lower(local_name) == name; });
         }
 
-    } else if(ignore_underscore) {
+    } else if (ignore_underscore) {
         name = detail::remove_underscore(name);
-        it = std::find_if(std::begin(names), std::end(names), [&name](std::string local_name) {
-            return detail::remove_underscore(local_name) == name;
-        });
+        it = std::find_if(std::begin(names), std::end(names),
+                          [&name](std::string local_name) { return detail::remove_underscore(local_name) == name; });
     } else
         it = std::find(std::begin(names), std::end(names), name);
 
@@ -479,9 +460,10 @@ inline std::ptrdiff_t find_member(std::string name,
 
 /// Find a trigger string and call a modify callable function that takes the current string and starting position of the
 /// trigger and returns the position in the string to search for the next trigger string
-template <typename Callable> inline std::string find_and_modify(std::string str, std::string trigger, Callable modify) {
+template <typename Callable>
+inline std::string find_and_modify(std::string str, std::string trigger, Callable modify) {
     size_t start_pos = 0;
-    while((start_pos = str.find(trigger, start_pos)) != std::string::npos) {
+    while ((start_pos = str.find(trigger, start_pos)) != std::string::npos) {
         start_pos = modify(str, start_pos);
     }
     return str;
@@ -490,7 +472,6 @@ template <typename Callable> inline std::string find_and_modify(std::string str,
 /// Split a string '"one two" "three"' into 'one two', 'three'
 /// Quote characters can be ` ' or "
 inline std::vector<std::string> split_up(std::string str) {
-
     const std::string delims("\'\"`");
     auto find_ws = [](char ch) { return std::isspace<char>(ch, std::locale()); };
     trim(str);
@@ -498,15 +479,15 @@ inline std::vector<std::string> split_up(std::string str) {
     std::vector<std::string> output;
     bool embeddedQuote = false;
     char keyChar = ' ';
-    while(!str.empty()) {
-        if(delims.find_first_of(str[0]) != std::string::npos) {
+    while (!str.empty()) {
+        if (delims.find_first_of(str[0]) != std::string::npos) {
             keyChar = str[0];
             auto end = str.find_first_of(keyChar, 1);
-            while((end != std::string::npos) && (str[end - 1] == '\\')) { // deal with escaped quotes
+            while ((end != std::string::npos) && (str[end - 1] == '\\')) {  // deal with escaped quotes
                 end = str.find_first_of(keyChar, end + 1);
                 embeddedQuote = true;
             }
-            if(end != std::string::npos) {
+            if (end != std::string::npos) {
                 output.push_back(str.substr(1, end - 1));
                 str = str.substr(end + 1);
             } else {
@@ -515,7 +496,7 @@ inline std::vector<std::string> split_up(std::string str) {
             }
         } else {
             auto it = std::find_if(std::begin(str), std::end(str), find_ws);
-            if(it != std::end(str)) {
+            if (it != std::end(str)) {
                 std::string value = std::string(str.begin(), it);
                 output.push_back(value);
                 str = std::string(it, str.end());
@@ -525,7 +506,7 @@ inline std::vector<std::string> split_up(std::string str) {
             }
         }
         // transform any embedded quotes into the regular character
-        if(embeddedQuote) {
+        if (embeddedQuote) {
             output.back() = find_and_replace(output.back(), std::string("\\") + keyChar, std::string(1, keyChar));
             embeddedQuote = false;
         }
@@ -540,9 +521,9 @@ inline std::vector<std::string> split_up(std::string str) {
 /// Can't use Regex, or this would be a subs.
 inline std::string fix_newlines(std::string leader, std::string input) {
     std::string::size_type n = 0;
-    while(n != std::string::npos && n < input.size()) {
+    while (n != std::string::npos && n < input.size()) {
         n = input.find('\n', n);
-        if(n != std::string::npos) {
+        if (n != std::string::npos) {
             input = input.substr(0, n + 1) + leader + input.substr(n + 1);
             n += leader.size();
         }
@@ -556,11 +537,11 @@ inline std::string fix_newlines(std::string leader, std::string input) {
 /// the return value is the offset+1 which is required by the find_and_modify function.
 inline size_t escape_detect(std::string &str, size_t offset) {
     auto next = str[offset + 1];
-    if((next == '\"') || (next == '\'') || (next == '`')) {
+    if ((next == '\"') || (next == '\'') || (next == '`')) {
         auto astart = str.find_last_of("-/ \"\'`", offset - 1);
-        if(astart != std::string::npos) {
-            if(str[astart] == ((str[offset] == '=') ? '-' : '/'))
-                str[offset] = ' '; // interpret this as a space so the split_up works properly
+        if (astart != std::string::npos) {
+            if (str[astart] == ((str[offset] == '=') ? '-' : '/'))
+                str[offset] = ' ';  // interpret this as a space so the split_up works properly
         }
     }
     return offset + 1;
@@ -568,9 +549,9 @@ inline size_t escape_detect(std::string &str, size_t offset) {
 
 /// Add quotes if the string contains spaces
 inline std::string &add_quotes_if_needed(std::string &str) {
-    if((str.front() != '"' && str.front() != '\'') || str.front() != str.back()) {
+    if ((str.front() != '"' && str.front() != '\'') || str.front() != str.back()) {
         char quote = str.find('"') < str.find('\'') ? '\'' : '"';
-        if(str.find(' ') != std::string::npos) {
+        if (str.find(' ') != std::string::npos) {
             str.insert(0, 1, quote);
             str.append(1, quote);
         }
@@ -578,9 +559,9 @@ inline std::string &add_quotes_if_needed(std::string &str) {
     return str;
 }
 
-} // namespace detail
+}  // namespace detail
 
-} // namespace CLI
+}  // namespace CLI
 
 // From CLI/Error.hpp:
 
@@ -588,18 +569,18 @@ namespace CLI {
 
 // Use one of these on all error classes.
 // These are temporary and are undef'd at the end of this file.
-#define CLI11_ERROR_DEF(parent, name)                                                                                  \
-  protected:                                                                                                           \
-    name(std::string ename, std::string msg, int exit_code) : parent(std::move(ename), std::move(msg), exit_code) {}   \
-    name(std::string ename, std::string msg, ExitCodes exit_code)                                                      \
-        : parent(std::move(ename), std::move(msg), exit_code) {}                                                       \
-                                                                                                                       \
-  public:                                                                                                              \
-    name(std::string msg, ExitCodes exit_code) : parent(#name, std::move(msg), exit_code) {}                           \
+#define CLI11_ERROR_DEF(parent, name)                                                                                \
+   protected:                                                                                                        \
+    name(std::string ename, std::string msg, int exit_code) : parent(std::move(ename), std::move(msg), exit_code) {} \
+    name(std::string ename, std::string msg, ExitCodes exit_code)                                                    \
+        : parent(std::move(ename), std::move(msg), exit_code) {}                                                     \
+                                                                                                                     \
+   public:                                                                                                           \
+    name(std::string msg, ExitCodes exit_code) : parent(#name, std::move(msg), exit_code) {}                         \
     name(std::string msg, int exit_code) : parent(#name, std::move(msg), exit_code) {}
 
 // This is added after the one above if a class is used directly and builds its own message
-#define CLI11_ERROR_SIMPLE(name)                                                                                       \
+#define CLI11_ERROR_SIMPLE(name) \
     explicit name(std::string msg) : name(#name, msg, ExitCodes::name) {}
 
 /// These codes are part of every error in CLI. They can be obtained from e using e.exit_code or as a quick shortcut,
@@ -637,7 +618,7 @@ class Error : public std::runtime_error {
     int actual_exit_code;
     std::string error_name{"Error"};
 
-  public:
+   public:
     int get_exit_code() const { return actual_exit_code; }
 
     std::string get_name() const { return error_name; }
@@ -734,8 +715,7 @@ class CallForHelp : public ParseError {
 /// Usually something like --help-all on command line
 class CallForAllHelp : public ParseError {
     CLI11_ERROR_DEF(ParseError, CallForAllHelp)
-    CallForAllHelp()
-        : CallForAllHelp("This should be caught in your main function, see example", ExitCodes::Success) {}
+    CallForAllHelp() : CallForAllHelp("This should be caught in your main function, see example", ExitCodes::Success) {}
 };
 
 /// Does not output a diagnostic in CLI11_PARSE, but allows to return from main() with a specific error code.
@@ -779,26 +759,26 @@ class RequiredError : public ParseError {
     CLI11_ERROR_DEF(ParseError, RequiredError)
     explicit RequiredError(std::string name) : RequiredError(name + " is required", ExitCodes::RequiredError) {}
     static RequiredError Subcommand(size_t min_subcom) {
-        if(min_subcom == 1)
+        if (min_subcom == 1)
             return RequiredError("A subcommand");
         else
             return RequiredError("Requires at least " + std::to_string(min_subcom) + " subcommands",
                                  ExitCodes::RequiredError);
     }
     static RequiredError Option(size_t min_option, size_t max_option, size_t used, const std::string &option_list) {
-        if((min_option == 1) && (max_option == 1) && (used == 0))
+        if ((min_option == 1) && (max_option == 1) && (used == 0))
             return RequiredError("Exactly 1 option from [" + option_list + "]");
-        else if((min_option == 1) && (max_option == 1) && (used > 1))
-            return RequiredError("Exactly 1 option from [" + option_list + "] is required and " + std::to_string(used) +
-                                     " were given",
-                                 ExitCodes::RequiredError);
-        else if((min_option == 1) && (used == 0))
+        else if ((min_option == 1) && (max_option == 1) && (used > 1))
+            return RequiredError(
+                "Exactly 1 option from [" + option_list + "] is required and " + std::to_string(used) + " were given",
+                ExitCodes::RequiredError);
+        else if ((min_option == 1) && (used == 0))
             return RequiredError("At least 1 option from [" + option_list + "]");
-        else if(used < min_option)
+        else if (used < min_option)
             return RequiredError("Requires at least " + std::to_string(min_option) + " options used and only " +
                                      std::to_string(used) + "were given from [" + option_list + "]",
                                  ExitCodes::RequiredError);
-        else if(max_option == 1)
+        else if (max_option == 1)
             return RequiredError("Requires at most 1 options be given from [" + option_list + "]",
                                  ExitCodes::RequiredError);
         else
@@ -892,7 +872,7 @@ class OptionNotFound : public Error {
 
 /// @}
 
-} // namespace CLI
+}  // namespace CLI
 
 // From CLI/TypeTools.hpp:
 
@@ -908,55 +888,75 @@ enum class enabler {};
 
 /// An instance to use in EnableIf
 constexpr enabler dummy = {};
-} // namespace detail
+}  // namespace detail
 
 /// A copy of enable_if_t from C++14, compatible with C++11.
 ///
 /// We could check to see if C++14 is being used, but it does not hurt to redefine this
 /// (even Google does this: https://github.com/google/skia/blob/master/include/private/SkTLogic.h)
 /// It is not in the std namespace anyway, so no harm done.
-template <bool B, class T = void> using enable_if_t = typename std::enable_if<B, T>::type;
+template <bool B, class T = void>
+using enable_if_t = typename std::enable_if<B, T>::type;
 
 /// A copy of std::void_t from C++17 (helper for C++11 and C++14)
-template <typename... Ts> struct make_void { using type = void; };
+template <typename... Ts>
+struct make_void {
+    using type = void;
+};
 
 /// A copy of std::void_t from C++17 - same reasoning as enable_if_t, it does not hurt to redefine
-template <typename... Ts> using void_t = typename make_void<Ts...>::type;
+template <typename... Ts>
+using void_t = typename make_void<Ts...>::type;
 
 /// A copy of std::conditional_t from C++14 - same reasoning as enable_if_t, it does not hurt to redefine
-template <bool B, class T, class F> using conditional_t = typename std::conditional<B, T, F>::type;
+template <bool B, class T, class F>
+using conditional_t = typename std::conditional<B, T, F>::type;
 
 /// Check to see if something is a vector (fail check by default)
-template <typename T> struct is_vector : std::false_type {};
+template <typename T>
+struct is_vector : std::false_type {};
 
 /// Check to see if something is a vector (true if actually a vector)
-template <class T, class A> struct is_vector<std::vector<T, A>> : std::true_type {};
+template <class T, class A>
+struct is_vector<std::vector<T, A>> : std::true_type {};
 
 /// Check to see if something is bool (fail check by default)
-template <typename T> struct is_bool : std::false_type {};
+template <typename T>
+struct is_bool : std::false_type {};
 
 /// Check to see if something is bool (true if actually a bool)
-template <> struct is_bool<bool> : std::true_type {};
+template <>
+struct is_bool<bool> : std::true_type {};
 
 /// Check to see if something is a shared pointer
-template <typename T> struct is_shared_ptr : std::false_type {};
+template <typename T>
+struct is_shared_ptr : std::false_type {};
 
 /// Check to see if something is a shared pointer (True if really a shared pointer)
-template <typename T> struct is_shared_ptr<std::shared_ptr<T>> : std::true_type {};
+template <typename T>
+struct is_shared_ptr<std::shared_ptr<T>> : std::true_type {};
 
 /// Check to see if something is a shared pointer (True if really a shared pointer)
-template <typename T> struct is_shared_ptr<const std::shared_ptr<T>> : std::true_type {};
+template <typename T>
+struct is_shared_ptr<const std::shared_ptr<T>> : std::true_type {};
 
 /// Check to see if something is copyable pointer
-template <typename T> struct is_copyable_ptr {
+template <typename T>
+struct is_copyable_ptr {
     static bool const value = is_shared_ptr<T>::value || std::is_pointer<T>::value;
 };
 
 /// This can be specialized to override the type deduction for IsMember.
-template <typename T> struct IsMemberType { using type = T; };
+template <typename T>
+struct IsMemberType {
+    using type = T;
+};
 
 /// The main custom type needed here is const char * should be a string.
-template <> struct IsMemberType<const char *> { using type = std::string; };
+template <>
+struct IsMemberType<const char *> {
+    using type = std::string;
+};
 
 namespace detail {
 
@@ -964,27 +964,34 @@ namespace detail {
 
 /// Handy helper to access the element_type generically. This is not part of is_copyable_ptr because it requires that
 /// pointer_traits<T> be valid.
-template <typename T> struct element_type {
+template <typename T>
+struct element_type {
     using type =
         typename std::conditional<is_copyable_ptr<T>::value, typename std::pointer_traits<T>::element_type, T>::type;
 };
 
 /// Combination of the element type and value type - remove pointer (including smart pointers) and get the value_type of
 /// the container
-template <typename T> struct element_value_type { using type = typename element_type<T>::type::value_type; };
+template <typename T>
+struct element_value_type {
+    using type = typename element_type<T>::type::value_type;
+};
 
 /// Adaptor for set-like structure: This just wraps a normal container in a few utilities that do almost nothing.
-template <typename T, typename _ = void> struct pair_adaptor : std::false_type {
+template <typename T, typename _ = void>
+struct pair_adaptor : std::false_type {
     using value_type = typename T::value_type;
     using first_type = typename std::remove_const<value_type>::type;
     using second_type = typename std::remove_const<value_type>::type;
 
     /// Get the first value (really just the underlying value)
-    template <typename Q> static auto first(Q &&pair_value) -> decltype(std::forward<Q>(pair_value)) {
+    template <typename Q>
+    static auto first(Q &&pair_value) -> decltype(std::forward<Q>(pair_value)) {
         return std::forward<Q>(pair_value);
     }
     /// Get the second value (really just the underlying value)
-    template <typename Q> static auto second(Q &&pair_value) -> decltype(std::forward<Q>(pair_value)) {
+    template <typename Q>
+    static auto second(Q &&pair_value) -> decltype(std::forward<Q>(pair_value)) {
         return std::forward<Q>(pair_value);
     }
 };
@@ -993,19 +1000,20 @@ template <typename T, typename _ = void> struct pair_adaptor : std::false_type {
 /// This wraps a mapped container in a few utilities access it in a general way.
 template <typename T>
 struct pair_adaptor<
-    T,
-    conditional_t<false, void_t<typename T::value_type::first_type, typename T::value_type::second_type>, void>>
+    T, conditional_t<false, void_t<typename T::value_type::first_type, typename T::value_type::second_type>, void>>
     : std::true_type {
     using value_type = typename T::value_type;
     using first_type = typename std::remove_const<typename value_type::first_type>::type;
     using second_type = typename std::remove_const<typename value_type::second_type>::type;
 
     /// Get the first value (really just the underlying value)
-    template <typename Q> static auto first(Q &&pair_value) -> decltype(std::get<0>(std::forward<Q>(pair_value))) {
+    template <typename Q>
+    static auto first(Q &&pair_value) -> decltype(std::get<0>(std::forward<Q>(pair_value))) {
         return std::get<0>(std::forward<Q>(pair_value));
     }
     /// Get the second value (really just the underlying value)
-    template <typename Q> static auto second(Q &&pair_value) -> decltype(std::get<1>(std::forward<Q>(pair_value))) {
+    template <typename Q>
+    static auto second(Q &&pair_value) -> decltype(std::get<1>(std::forward<Q>(pair_value))) {
         return std::get<1>(std::forward<Q>(pair_value));
     }
 };
@@ -1013,13 +1021,15 @@ struct pair_adaptor<
 // Check for streamability
 // Based on https://stackoverflow.com/questions/22758291/how-can-i-detect-if-a-type-can-be-streamed-to-an-stdostream
 
-template <typename S, typename T> class is_streamable {
+template <typename S, typename T>
+class is_streamable {
     template <typename SS, typename TT>
     static auto test(int) -> decltype(std::declval<SS &>() << std::declval<TT>(), std::true_type());
 
-    template <typename, typename> static auto test(...) -> std::false_type;
+    template <typename, typename>
+    static auto test(...) -> std::false_type;
 
-  public:
+   public:
     static const bool value = decltype(test<S, T>(0))::value;
 };
 
@@ -1082,10 +1092,9 @@ constexpr const char *type_name() {
 }
 
 /// Print for all other types
-template <typename T,
-          enable_if_t<!std::is_floating_point<T>::value && !std::is_integral<T>::value && !is_vector<T>::value &&
-                          !std::is_enum<T>::value,
-                      detail::enabler> = detail::dummy>
+template <typename T, enable_if_t<!std::is_floating_point<T>::value && !std::is_integral<T>::value &&
+                                      !is_vector<T>::value && !std::is_enum<T>::value,
+                                  detail::enabler> = detail::dummy>
 constexpr const char *type_name() {
     return "TEXT";
 }
@@ -1096,46 +1105,46 @@ constexpr const char *type_name() {
 inline int64_t to_flag_value(std::string val) {
     static const std::string trueString("true");
     static const std::string falseString("false");
-    if(val == trueString) {
+    if (val == trueString) {
         return 1;
     }
-    if(val == falseString) {
+    if (val == falseString) {
         return -1;
     }
     val = detail::to_lower(val);
     int64_t ret;
-    if(val.size() == 1) {
-        switch(val[0]) {
-        case '0':
-        case 'f':
-        case 'n':
-        case '-':
-            ret = -1;
-            break;
-        case '1':
-        case 't':
-        case 'y':
-        case '+':
-            ret = 1;
-            break;
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-            ret = val[0] - '0';
-            break;
-        default:
-            throw std::invalid_argument("unrecognized character");
+    if (val.size() == 1) {
+        switch (val[0]) {
+            case '0':
+            case 'f':
+            case 'n':
+            case '-':
+                ret = -1;
+                break;
+            case '1':
+            case 't':
+            case 'y':
+            case '+':
+                ret = 1;
+                break;
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                ret = val[0] - '0';
+                break;
+            default:
+                throw std::invalid_argument("unrecognized character");
         }
         return ret;
     }
-    if(val == trueString || val == "on" || val == "yes" || val == "enable") {
+    if (val == trueString || val == "on" || val == "yes" || val == "enable") {
         ret = 1;
-    } else if(val == falseString || val == "off" || val == "no" || val == "disable") {
+    } else if (val == falseString || val == "off" || val == "no" || val == "disable") {
         ret = -1;
     } else {
         ret = std::stoll(val);
@@ -1144,39 +1153,37 @@ inline int64_t to_flag_value(std::string val) {
 }
 
 /// Signed integers
-template <
-    typename T,
-    enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value && !is_bool<T>::value && !std::is_enum<T>::value,
-                detail::enabler> = detail::dummy>
+template <typename T, enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value && !is_bool<T>::value &&
+                                      !std::is_enum<T>::value,
+                                  detail::enabler> = detail::dummy>
 bool lexical_cast(std::string input, T &output) {
     try {
         size_t n = 0;
         long long output_ll = std::stoll(input, &n, 0);
         output = static_cast<T>(output_ll);
         return n == input.size() && static_cast<long long>(output) == output_ll;
-    } catch(const std::invalid_argument &) {
+    } catch (const std::invalid_argument &) {
         return false;
-    } catch(const std::out_of_range &) {
+    } catch (const std::out_of_range &) {
         return false;
     }
 }
 
 /// Unsigned integers
-template <typename T,
-          enable_if_t<std::is_integral<T>::value && std::is_unsigned<T>::value && !is_bool<T>::value, detail::enabler> =
-              detail::dummy>
+template <typename T, enable_if_t<std::is_integral<T>::value && std::is_unsigned<T>::value && !is_bool<T>::value,
+                                  detail::enabler> = detail::dummy>
 bool lexical_cast(std::string input, T &output) {
-    if(!input.empty() && input.front() == '-')
-        return false; // std::stoull happily converts negative values to junk without any errors.
+    if (!input.empty() && input.front() == '-')
+        return false;  // std::stoull happily converts negative values to junk without any errors.
 
     try {
         size_t n = 0;
         unsigned long long output_ll = std::stoull(input, &n, 0);
         output = static_cast<T>(output_ll);
         return n == input.size() && static_cast<unsigned long long>(output) == output_ll;
-    } catch(const std::invalid_argument &) {
+    } catch (const std::invalid_argument &) {
         return false;
-    } catch(const std::out_of_range &) {
+    } catch (const std::out_of_range &) {
         return false;
     }
 }
@@ -1188,7 +1195,7 @@ bool lexical_cast(std::string input, T &output) {
         auto out = to_flag_value(input);
         output = (out > 0);
         return true;
-    } catch(const std::invalid_argument &) {
+    } catch (const std::invalid_argument &) {
         return false;
     }
 }
@@ -1200,18 +1207,17 @@ bool lexical_cast(std::string input, T &output) {
         size_t n = 0;
         output = static_cast<T>(std::stold(input, &n));
         return n == input.size();
-    } catch(const std::invalid_argument &) {
+    } catch (const std::invalid_argument &) {
         return false;
-    } catch(const std::out_of_range &) {
+    } catch (const std::out_of_range &) {
         return false;
     }
 }
 
 /// String and similar
-template <typename T,
-          enable_if_t<!std::is_floating_point<T>::value && !std::is_integral<T>::value &&
-                          std::is_assignable<T &, std::string>::value,
-                      detail::enabler> = detail::dummy>
+template <typename T, enable_if_t<!std::is_floating_point<T>::value && !std::is_integral<T>::value &&
+                                      std::is_assignable<T &, std::string>::value,
+                                  detail::enabler> = detail::dummy>
 bool lexical_cast(std::string input, T &output) {
     output = input;
     return true;
@@ -1222,7 +1228,7 @@ template <typename T, enable_if_t<std::is_enum<T>::value, detail::enabler> = det
 bool lexical_cast(std::string input, T &output) {
     typename std::underlying_type<T>::type val;
     bool retval = detail::lexical_cast(input, val);
-    if(!retval) {
+    if (!retval) {
         return false;
     }
     output = static_cast<T>(val);
@@ -1230,10 +1236,9 @@ bool lexical_cast(std::string input, T &output) {
 }
 
 /// Non-string parsable
-template <typename T,
-          enable_if_t<!std::is_floating_point<T>::value && !std::is_integral<T>::value &&
-                          !std::is_assignable<T &, std::string>::value && !std::is_enum<T>::value,
-                      detail::enabler> = detail::dummy>
+template <typename T, enable_if_t<!std::is_floating_point<T>::value && !std::is_integral<T>::value &&
+                                      !std::is_assignable<T &, std::string>::value && !std::is_enum<T>::value,
+                                  detail::enabler> = detail::dummy>
 bool lexical_cast(std::string input, T &output) {
     std::istringstream is;
 
@@ -1250,7 +1255,7 @@ template <typename T,
           enable_if_t<std::is_integral<T>::value && std::is_unsigned<T>::value, detail::enabler> = detail::dummy>
 void sum_flag_vector(const std::vector<std::string> &flags, T &output) {
     int64_t count{0};
-    for(auto &flag : flags) {
+    for (auto &flag : flags) {
         count += detail::to_flag_value(flag);
     }
     output = (count > 0) ? static_cast<T>(count) : T{0};
@@ -1264,14 +1269,14 @@ template <typename T,
           enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value, detail::enabler> = detail::dummy>
 void sum_flag_vector(const std::vector<std::string> &flags, T &output) {
     int64_t count{0};
-    for(auto &flag : flags) {
+    for (auto &flag : flags) {
         count += detail::to_flag_value(flag);
     }
     output = static_cast<T>(count);
 }
 
-} // namespace detail
-} // namespace CLI
+}  // namespace detail
+}  // namespace CLI
 
 // From CLI/Split.hpp:
 
@@ -1280,7 +1285,7 @@ namespace detail {
 
 // Returns false if not a short option. Otherwise, sets opt name and rest and returns true
 inline bool split_short(const std::string &current, std::string &name, std::string &rest) {
-    if(current.size() > 1 && current[0] == '-' && valid_first_char(current[1])) {
+    if (current.size() > 1 && current[0] == '-' && valid_first_char(current[1])) {
         name = current.substr(1, 1);
         rest = current.substr(2);
         return true;
@@ -1290,9 +1295,9 @@ inline bool split_short(const std::string &current, std::string &name, std::stri
 
 // Returns false if not a long option. Otherwise, sets opt name and other side of = and returns true
 inline bool split_long(const std::string &current, std::string &name, std::string &value) {
-    if(current.size() > 2 && current.substr(0, 2) == "--" && valid_first_char(current[2])) {
+    if (current.size() > 2 && current.substr(0, 2) == "--" && valid_first_char(current[2])) {
         auto loc = current.find_first_of('=');
-        if(loc != std::string::npos) {
+        if (loc != std::string::npos) {
             name = current.substr(2, loc - 2);
             value = current.substr(loc + 1);
         } else {
@@ -1306,9 +1311,9 @@ inline bool split_long(const std::string &current, std::string &name, std::strin
 
 // Returns false if not a windows style option. Otherwise, sets opt name and value and returns true
 inline bool split_windows_style(const std::string &current, std::string &name, std::string &value) {
-    if(current.size() > 1 && current[0] == '/' && valid_first_char(current[1])) {
+    if (current.size() > 1 && current[0] == '/' && valid_first_char(current[1])) {
         auto loc = current.find_first_of(':');
-        if(loc != std::string::npos) {
+        if (loc != std::string::npos) {
             name = current.substr(1, loc - 1);
             value = current.substr(loc + 1);
         } else {
@@ -1324,7 +1329,7 @@ inline bool split_windows_style(const std::string &current, std::string &name, s
 inline std::vector<std::string> split_names(std::string current) {
     std::vector<std::string> output;
     size_t val;
-    while((val = current.find(",")) != std::string::npos) {
+    while ((val = current.find(",")) != std::string::npos) {
         output.push_back(trim_copy(current.substr(0, val)));
         current = current.substr(val + 1);
     }
@@ -1335,20 +1340,20 @@ inline std::vector<std::string> split_names(std::string current) {
 /// extract default flag values either {def} or starting with a !
 inline std::vector<std::pair<std::string, std::string>> get_default_flag_values(const std::string &str) {
     std::vector<std::string> flags = split_names(str);
-    flags.erase(std::remove_if(flags.begin(),
-                               flags.end(),
-                               [](const std::string &name) {
-                                   return ((name.empty()) || (!(((name.find_first_of('{') != std::string::npos) &&
-                                                                 (name.back() == '}')) ||
-                                                                (name[0] == '!'))));
-                               }),
-                flags.end());
+    flags.erase(
+        std::remove_if(flags.begin(), flags.end(),
+                       [](const std::string &name) {
+                           return ((name.empty()) ||
+                                   (!(((name.find_first_of('{') != std::string::npos) && (name.back() == '}')) ||
+                                      (name[0] == '!'))));
+                       }),
+        flags.end());
     std::vector<std::pair<std::string, std::string>> output;
     output.reserve(flags.size());
-    for(auto &flag : flags) {
+    for (auto &flag : flags) {
         auto def_start = flag.find_first_of('{');
         std::string defval = "false";
-        if((def_start != std::string::npos) && (flag.back() == '}')) {
+        if ((def_start != std::string::npos) && (flag.back() == '}')) {
             defval = flag.substr(def_start + 1);
             defval.pop_back();
             flag.erase(def_start, std::string::npos);
@@ -1360,42 +1365,40 @@ inline std::vector<std::pair<std::string, std::string>> get_default_flag_values(
 }
 
 /// Get a vector of short names, one of long names, and a single name
-inline std::tuple<std::vector<std::string>, std::vector<std::string>, std::string>
-get_names(const std::vector<std::string> &input) {
-
+inline std::tuple<std::vector<std::string>, std::vector<std::string>, std::string> get_names(
+    const std::vector<std::string> &input) {
     std::vector<std::string> short_names;
     std::vector<std::string> long_names;
     std::string pos_name;
 
-    for(std::string name : input) {
-        if(name.length() == 0)
+    for (std::string name : input) {
+        if (name.length() == 0)
             continue;
-        else if(name.length() > 1 && name[0] == '-' && name[1] != '-') {
-            if(name.length() == 2 && valid_first_char(name[1]))
+        else if (name.length() > 1 && name[0] == '-' && name[1] != '-') {
+            if (name.length() == 2 && valid_first_char(name[1]))
                 short_names.emplace_back(1, name[1]);
             else
                 throw BadNameString::OneCharName(name);
-        } else if(name.length() > 2 && name.substr(0, 2) == "--") {
+        } else if (name.length() > 2 && name.substr(0, 2) == "--") {
             name = name.substr(2);
-            if(valid_name_string(name))
+            if (valid_name_string(name))
                 long_names.push_back(name);
             else
                 throw BadNameString::BadLongName(name);
-        } else if(name == "-" || name == "--") {
+        } else if (name == "-" || name == "--") {
             throw BadNameString::DashesOnly(name);
         } else {
-            if(pos_name.length() > 0)
-                throw BadNameString::MultiPositionalNames(name);
+            if (pos_name.length() > 0) throw BadNameString::MultiPositionalNames(name);
             pos_name = name;
         }
     }
 
-    return std::tuple<std::vector<std::string>, std::vector<std::string>, std::string>(
-        short_names, long_names, pos_name);
+    return std::tuple<std::vector<std::string>, std::vector<std::string>, std::string>(short_names, long_names,
+                                                                                       pos_name);
 }
 
-} // namespace detail
-} // namespace CLI
+}  // namespace detail
+}  // namespace CLI
 
 // From CLI/ConfigFwd.hpp:
 
@@ -1409,14 +1412,13 @@ namespace detail {
 inline std::string ini_join(std::vector<std::string> args) {
     std::ostringstream s;
     size_t start = 0;
-    for(const auto &arg : args) {
-        if(start++ > 0)
-            s << " ";
+    for (const auto &arg : args) {
+        if (start++ > 0) s << " ";
 
         auto it = std::find_if(arg.begin(), arg.end(), [](char ch) { return std::isspace<char>(ch, std::locale()); });
-        if(it == arg.end())
+        if (it == arg.end())
             s << arg;
-        else if(arg.find_first_of('\"') == std::string::npos)
+        else if (arg.find_first_of('\"') == std::string::npos)
             s << '\"' << arg << '\"';
         else
             s << '\'' << arg << '\'';
@@ -1425,7 +1427,7 @@ inline std::string ini_join(std::vector<std::string> args) {
     return s.str();
 }
 
-} // namespace detail
+}  // namespace detail
 
 /// Holds values to load into Options
 struct ConfigItem {
@@ -1448,10 +1450,10 @@ struct ConfigItem {
 
 /// This class provides a converter for configuration files.
 class Config {
-  protected:
+   protected:
     std::vector<ConfigItem> items;
 
-  public:
+   public:
     /// Convert an app into a configuration
     virtual std::string to_config(const App *, bool, bool, std::string) const = 0;
 
@@ -1460,7 +1462,7 @@ class Config {
 
     /// Get a flag value
     virtual std::string to_flag(const ConfigItem &item) const {
-        if(item.inputs.size() == 1) {
+        if (item.inputs.size() == 1) {
             return item.inputs.at(0);
         }
         throw ConversionError::TooManyInputsFlag(item.fullname());
@@ -1469,8 +1471,7 @@ class Config {
     /// Parse a config file, throw an error (ParseError:ConfigParseError or FileError) on failure
     std::vector<ConfigItem> from_file(const std::string &name) {
         std::ifstream input{name};
-        if(!input.good())
-            throw FileError::Missing(name);
+        if (!input.good()) throw FileError::Missing(name);
 
         return from_config(input);
     }
@@ -1481,7 +1482,7 @@ class Config {
 
 /// This converter works with INI files
 class ConfigINI : public Config {
-  public:
+   public:
     std::string to_config(const App *, bool default_also, bool write_description, std::string prefix) const override;
 
     std::vector<ConfigItem> from_config(std::istream &input) const override {
@@ -1490,20 +1491,20 @@ class ConfigINI : public Config {
 
         std::vector<ConfigItem> output;
 
-        while(getline(input, line)) {
+        while (getline(input, line)) {
             std::vector<std::string> items_buffer;
 
             detail::trim(line);
             size_t len = line.length();
-            if(len > 1 && line[0] == '[' && line[len - 1] == ']') {
+            if (len > 1 && line[0] == '[' && line[len - 1] == ']') {
                 section = line.substr(1, len - 2);
-            } else if(len > 0 && line[0] != ';') {
+            } else if (len > 0 && line[0] != ';') {
                 output.emplace_back();
                 ConfigItem &out = output.back();
 
                 // Find = in string, split and recombine
                 auto pos = line.find('=');
-                if(pos != std::string::npos) {
+                if (pos != std::string::npos) {
                     out.name = detail::trim_copy(line.substr(0, pos));
                     std::string item = detail::trim_copy(line.substr(pos + 1));
                     items_buffer = detail::split_up(item);
@@ -1512,11 +1513,11 @@ class ConfigINI : public Config {
                     items_buffer = {"ON"};
                 }
 
-                if(detail::to_lower(section) != "default") {
+                if (detail::to_lower(section) != "default") {
                     out.parents = {section};
                 }
 
-                if(out.name.find('.') != std::string::npos) {
+                if (out.name.find('.') != std::string::npos) {
                     std::vector<std::string> plist = detail::split(out.name, '.');
                     out.name = plist.back();
                     plist.pop_back();
@@ -1530,7 +1531,7 @@ class ConfigINI : public Config {
     }
 };
 
-} // namespace CLI
+}  // namespace CLI
 
 // From CLI/Validators.hpp:
 
@@ -1549,7 +1550,7 @@ class Option;
 
 ///
 class Validator {
-  protected:
+   protected:
     /// This is the description function, if empty the description_ will be used
     std::function<std::string()> desc_function_{[]() { return std::string{}; }};
 
@@ -1563,13 +1564,14 @@ class Validator {
     /// specify that a validator should not modify the input
     bool non_modifying_{false};
 
-  public:
+   public:
     Validator() = default;
     /// Construct a Validator with just the description string
     explicit Validator(std::string validator_desc) : desc_function_([validator_desc]() { return validator_desc; }) {}
     // Construct Validator from basic information
     Validator(std::function<std::string(std::string &)> op, std::string validator_desc, std::string validator_name = "")
-        : desc_function_([validator_desc]() { return validator_desc; }), func_(std::move(op)),
+        : desc_function_([validator_desc]() { return validator_desc; }),
+          func_(std::move(op)),
           name_(std::move(validator_name)) {}
     /// Set the Validator operation function
     Validator &operation(std::function<std::string(std::string &)> op) {
@@ -1580,8 +1582,8 @@ class Validator {
     /// users (CLI11 uses the member `func` directly)
     std::string operator()(std::string &str) const {
         std::string retstring;
-        if(active_) {
-            if(non_modifying_) {
+        if (active_) {
+            if (non_modifying_) {
                 std::string value = str;
                 retstring = func_(value);
             } else {
@@ -1605,7 +1607,7 @@ class Validator {
     }
     /// Generate type description information for the Validator
     std::string get_description() const {
-        if(active_) {
+        if (active_) {
             return desc_function_();
         }
         return std::string{};
@@ -1649,7 +1651,7 @@ class Validator {
         newval.func_ = [f1, f2](std::string &input) {
             std::string s1 = f1(input);
             std::string s2 = f2(input);
-            if(!s1.empty() && !s2.empty())
+            if (!s1.empty() && !s2.empty())
                 return std::string("(") + s1 + ") AND (" + s2 + ")";
             else
                 return s1 + s2;
@@ -1673,7 +1675,7 @@ class Validator {
         newval.func_ = [f1, f2](std::string &input) {
             std::string s1 = f1(input);
             std::string s2 = f2(input);
-            if(s1.empty() || s2.empty())
+            if (s1.empty() || s2.empty())
                 return std::string();
             else
                 return std::string("(") + s1 + ") OR (" + s2 + ")";
@@ -1695,7 +1697,7 @@ class Validator {
 
         newval.func_ = [f1, dfunc1](std::string &test) -> std::string {
             std::string s1 = f1(test);
-            if(s1.empty()) {
+            if (s1.empty()) {
                 return std::string("check ") + dfunc1() + " succeeded improperly";
             } else
                 return std::string{};
@@ -1704,16 +1706,15 @@ class Validator {
         return newval;
     }
 
-  private:
+   private:
     void _merge_description(const Validator &val1, const Validator &val2, const std::string &merger) {
-
         const std::function<std::string()> &dfunc1 = val1.desc_function_;
         const std::function<std::string()> &dfunc2 = val2.desc_function_;
 
         desc_function_ = [=]() {
             std::string f1 = dfunc1();
             std::string f2 = dfunc2();
-            if((f1.empty()) || (f2.empty())) {
+            if ((f1.empty()) || (f2.empty())) {
                 return f1 + f2;
             }
             return std::string("(") + f1 + ")" + merger + "(" + f2 + ")";
@@ -1723,7 +1724,7 @@ class Validator {
 
 /// Class wrapping some of the accessors of Validator
 class CustomValidator : public Validator {
-  public:
+   public:
 };
 // The implementation of the built in validators is using the Validator class;
 // the user is only expected to use the const (static) versions (since there's no setup).
@@ -1732,15 +1733,15 @@ namespace detail {
 
 /// Check for an existing file (returns error message if check fails)
 class ExistingFileValidator : public Validator {
-  public:
+   public:
     ExistingFileValidator() : Validator("FILE") {
         func_ = [](std::string &filename) {
             struct stat buffer;
             bool exist = stat(filename.c_str(), &buffer) == 0;
             bool is_dir = (buffer.st_mode & S_IFDIR) != 0;
-            if(!exist) {
+            if (!exist) {
                 return "File does not exist: " + filename;
-            } else if(is_dir) {
+            } else if (is_dir) {
                 return "File is actually a directory: " + filename;
             }
             return std::string();
@@ -1750,15 +1751,15 @@ class ExistingFileValidator : public Validator {
 
 /// Check for an existing directory (returns error message if check fails)
 class ExistingDirectoryValidator : public Validator {
-  public:
+   public:
     ExistingDirectoryValidator() : Validator("DIR") {
         func_ = [](std::string &filename) {
             struct stat buffer;
             bool exist = stat(filename.c_str(), &buffer) == 0;
             bool is_dir = (buffer.st_mode & S_IFDIR) != 0;
-            if(!exist) {
+            if (!exist) {
                 return "Directory does not exist: " + filename;
-            } else if(!is_dir) {
+            } else if (!is_dir) {
                 return "Directory is actually a file: " + filename;
             }
             return std::string();
@@ -1768,12 +1769,12 @@ class ExistingDirectoryValidator : public Validator {
 
 /// Check for an existing path
 class ExistingPathValidator : public Validator {
-  public:
+   public:
     ExistingPathValidator() : Validator("PATH(existing)") {
         func_ = [](std::string &filename) {
             struct stat buffer;
             bool const exist = stat(filename.c_str(), &buffer) == 0;
-            if(!exist) {
+            if (!exist) {
                 return "Path does not exist: " + filename;
             }
             return std::string();
@@ -1783,12 +1784,12 @@ class ExistingPathValidator : public Validator {
 
 /// Check for an non-existing path
 class NonexistentPathValidator : public Validator {
-  public:
+   public:
     NonexistentPathValidator() : Validator("PATH(non-existing)") {
         func_ = [](std::string &filename) {
             struct stat buffer;
             bool exist = stat(filename.c_str(), &buffer) == 0;
-            if(exist) {
+            if (exist) {
                 return "Path already exists: " + filename;
             }
             return std::string();
@@ -1798,21 +1799,21 @@ class NonexistentPathValidator : public Validator {
 
 /// Validate the given string is a legal ipv4 address
 class IPV4Validator : public Validator {
-  public:
+   public:
     IPV4Validator() : Validator("IPV4") {
         func_ = [](std::string &ip_addr) {
             auto result = CLI::detail::split(ip_addr, '.');
-            if(result.size() != 4) {
+            if (result.size() != 4) {
                 return "Invalid IPV4 address must have four parts " + ip_addr;
             }
             int num;
             bool retval = true;
-            for(const auto &var : result) {
+            for (const auto &var : result) {
                 retval &= detail::lexical_cast(var, num);
-                if(!retval) {
+                if (!retval) {
                     return "Failed parsing number " + var;
                 }
-                if(num < 0 || num > 255) {
+                if (num < 0 || num > 255) {
                     return "Each IP number must be between 0 and 255 " + var;
                 }
             }
@@ -1823,14 +1824,14 @@ class IPV4Validator : public Validator {
 
 /// Validate the argument is a number and greater than or equal to 0
 class PositiveNumber : public Validator {
-  public:
+   public:
     PositiveNumber() : Validator("POSITIVE") {
         func_ = [](std::string &number_str) {
             int number;
-            if(!detail::lexical_cast(number_str, number)) {
+            if (!detail::lexical_cast(number_str, number)) {
                 return "Failed parsing number " + number_str;
             }
-            if(number < 0) {
+            if (number < 0) {
                 return "Number less then 0 " + number_str;
             }
             return std::string();
@@ -1840,11 +1841,11 @@ class PositiveNumber : public Validator {
 
 /// Validate the argument is a number and greater than or equal to 0
 class Number : public Validator {
-  public:
+   public:
     Number() : Validator("NUMBER") {
         func_ = [](std::string &number_str) {
             double number;
-            if(!detail::lexical_cast(number_str, number)) {
+            if (!detail::lexical_cast(number_str, number)) {
                 return "Failed parsing as a number " + number_str;
             }
             return std::string();
@@ -1852,7 +1853,7 @@ class Number : public Validator {
     }
 };
 
-} // namespace detail
+}  // namespace detail
 
 // Static is not needed here, because global const implies static.
 
@@ -1879,12 +1880,13 @@ const detail::Number Number;
 
 /// Produce a range (factory). Min and max are inclusive.
 class Range : public Validator {
-  public:
+   public:
     /// This produces a range with min and max inclusive.
     ///
     /// Note that the constructor is templated, but the struct is not, so C++17 is not
     /// needed to provide nice syntax for Range(a,b).
-    template <typename T> Range(T min, T max) {
+    template <typename T>
+    Range(T min, T max) {
         std::stringstream out;
         out << detail::type_name<T>() << " in [" << min << " - " << max << "]";
         description(out.str());
@@ -1892,7 +1894,7 @@ class Range : public Validator {
         func_ = [min, max](std::string &input) {
             T val;
             bool converted = detail::lexical_cast(input, val);
-            if((!converted) || (val < min || val > max))
+            if ((!converted) || (val < min || val > max))
                 return "Value " + input + " not in range " + std::to_string(min) + " to " + std::to_string(max);
 
             return std::string();
@@ -1900,17 +1902,19 @@ class Range : public Validator {
     }
 
     /// Range of one value is 0 to value
-    template <typename T> explicit Range(T max) : Range(static_cast<T>(0), max) {}
+    template <typename T>
+    explicit Range(T max) : Range(static_cast<T>(0), max) {}
 };
 
 /// Produce a bounded range (factory). Min and max are inclusive.
 class Bound : public Validator {
-  public:
+   public:
     /// This bounds a value with min and max inclusive.
     ///
     /// Note that the constructor is templated, but the struct is not, so C++17 is not
     /// needed to provide nice syntax for Range(a,b).
-    template <typename T> Bound(T min, T max) {
+    template <typename T>
+    Bound(T min, T max) {
         std::stringstream out;
         out << detail::type_name<T>() << " bounded to [" << min << " - " << max << "]";
         description(out.str());
@@ -1918,12 +1922,12 @@ class Bound : public Validator {
         func_ = [min, max](std::string &input) {
             T val;
             bool converted = detail::lexical_cast(input, val);
-            if(!converted) {
+            if (!converted) {
                 return "Value " + input + " could not be converted";
             }
-            if(val < min)
+            if (val < min)
                 input = detail::as_string(min);
-            else if(val > max)
+            else if (val > max)
                 input = detail::as_string(max);
 
             return std::string();
@@ -1931,7 +1935,8 @@ class Bound : public Validator {
     }
 
     /// Range of one value is 0 to value
-    template <typename T> explicit Bound(T max) : Bound(static_cast<T>(0), max) {}
+    template <typename T>
+    explicit Bound(T max) : Bound(static_cast<T>(0), max) {}
 };
 
 namespace detail {
@@ -1941,33 +1946,33 @@ auto smart_deref(T value) -> decltype(*value) {
     return *value;
 }
 
-template <
-    typename T,
-    enable_if_t<!is_copyable_ptr<typename std::remove_reference<T>::type>::value, detail::enabler> = detail::dummy>
+template <typename T, enable_if_t<!is_copyable_ptr<typename std::remove_reference<T>::type>::value, detail::enabler> =
+                          detail::dummy>
 typename std::remove_reference<T>::type &smart_deref(T &value) {
     return value;
 }
 /// Generate a string representation of a set
-template <typename T> std::string generate_set(const T &set) {
+template <typename T>
+std::string generate_set(const T &set) {
     using element_t = typename detail::element_type<T>::type;
-    using iteration_type_t = typename detail::pair_adaptor<element_t>::value_type; // the type of the object pair
+    using iteration_type_t = typename detail::pair_adaptor<element_t>::value_type;  // the type of the object pair
     std::string out(1, '{');
     out.append(detail::join(detail::smart_deref(set),
-                            [](const iteration_type_t &v) { return detail::pair_adaptor<element_t>::first(v); },
-                            ","));
+                            [](const iteration_type_t &v) { return detail::pair_adaptor<element_t>::first(v); }, ","));
     out.push_back('}');
     return out;
 }
 
 /// Generate a string representation of a map
-template <typename T> std::string generate_map(const T &map, bool key_only = false) {
+template <typename T>
+std::string generate_map(const T &map, bool key_only = false) {
     using element_t = typename detail::element_type<T>::type;
-    using iteration_type_t = typename detail::pair_adaptor<element_t>::value_type; // the type of the object pair
+    using iteration_type_t = typename detail::pair_adaptor<element_t>::value_type;  // the type of the object pair
     std::string out(1, '{');
     out.append(detail::join(detail::smart_deref(map),
                             [key_only](const iteration_type_t &v) {
                                 auto res = detail::as_string(detail::pair_adaptor<element_t>::first(v));
-                                if(!key_only) {
+                                if (!key_only) {
                                     res += "->" + detail::as_string(detail::pair_adaptor<element_t>::second(v));
                                 }
                                 return res;
@@ -1977,14 +1982,17 @@ template <typename T> std::string generate_map(const T &map, bool key_only = fal
     return out;
 }
 
-template <typename> struct sfinae_true : std::true_type {};
+template <typename>
+struct sfinae_true : std::true_type {};
 /// Function to check for the existence of a member find function which presumably is more efficient than looping over
 /// everything
 template <typename T, typename V>
 static auto test_find(int) -> sfinae_true<decltype(std::declval<T>().find(std::declval<V>()))>;
-template <typename, typename V> static auto test_find(long) -> std::false_type;
+template <typename, typename V>
+static auto test_find(long) -> std::false_type;
 
-template <typename T, typename V> struct has_find : decltype(test_find<T, V>(0)) {};
+template <typename T, typename V>
+struct has_find : decltype(test_find<T, V>(0)) {};
 
 /// A search function
 template <typename T, typename V, enable_if_t<!has_find<T, V>::value, detail::enabler> = detail::dummy>
@@ -2012,7 +2020,7 @@ auto search(const T &set, const V &val, const std::function<V(V)> &filter_functi
     using element_t = typename detail::element_type<T>::type;
     // do the potentially faster first search
     auto res = search(set, val);
-    if((res.first) || (!(filter_function))) {
+    if ((res.first) || (!(filter_function))) {
         return res;
     }
     // if we haven't found it do the longer linear search with all the element translations
@@ -2026,13 +2034,14 @@ auto search(const T &set, const V &val, const std::function<V(V)> &filter_functi
 }
 
 /// Performs a *= b; if it doesn't cause integer overflow. Returns false otherwise.
-template <typename T> typename std::enable_if<std::is_integral<T>::value, bool>::type checked_multiply(T &a, T b) {
-    if(a == 0 || b == 0) {
+template <typename T>
+typename std::enable_if<std::is_integral<T>::value, bool>::type checked_multiply(T &a, T b) {
+    if (a == 0 || b == 0) {
         a *= b;
         return true;
     }
     T c = a * b;
-    if(c / a != b) {
+    if (c / a != b) {
         return false;
     }
     a = c;
@@ -2043,17 +2052,17 @@ template <typename T> typename std::enable_if<std::is_integral<T>::value, bool>:
 template <typename T>
 typename std::enable_if<std::is_floating_point<T>::value, bool>::type checked_multiply(T &a, T b) {
     T c = a * b;
-    if(std::isinf(c) && !std::isinf(a) && !std::isinf(b)) {
+    if (std::isinf(c) && !std::isinf(a) && !std::isinf(b)) {
         return false;
     }
     a = c;
     return true;
 }
 
-} // namespace detail
+}  // namespace detail
 /// Verify items are in a set
 class IsMember : public Validator {
-  public:
+   public:
     using filter_fn_t = std::function<std::string(std::string)>;
 
     /// This allows in-place construction using an initializer list
@@ -2062,19 +2071,20 @@ class IsMember : public Validator {
         : IsMember(std::vector<T>(values), std::forward<Args>(args)...) {}
 
     /// This checks to see if an item is in a set (empty function)
-    template <typename T> explicit IsMember(T &&set) : IsMember(std::forward<T>(set), nullptr) {}
+    template <typename T>
+    explicit IsMember(T &&set) : IsMember(std::forward<T>(set), nullptr) {}
 
     /// This checks to see if an item is in a set: pointer or copy version. You can pass in a function that will filter
     /// both sides of the comparison before computing the comparison.
-    template <typename T, typename F> explicit IsMember(T set, F filter_function) {
-
+    template <typename T, typename F>
+    explicit IsMember(T set, F filter_function) {
         // Get the type of the contained item - requires a container have ::value_type
         // if the type does not have first_type and second_type, these are both value_type
-        using element_t = typename detail::element_type<T>::type;            // Removes (smart) pointers if needed
-        using item_t = typename detail::pair_adaptor<element_t>::first_type; // Is value_type if not a map
+        using element_t = typename detail::element_type<T>::type;             // Removes (smart) pointers if needed
+        using item_t = typename detail::pair_adaptor<element_t>::first_type;  // Is value_type if not a map
 
-        using local_item_t = typename IsMemberType<item_t>::type; // This will convert bad types to good ones
-                                                                  // (const char * to std::string)
+        using local_item_t = typename IsMemberType<item_t>::type;  // This will convert bad types to good ones
+                                                                   // (const char * to std::string)
 
         // Make a local copy of the filter function, using a std::function if not one already
         std::function<local_item_t(local_item_t)> filter_fn = filter_function;
@@ -2086,16 +2096,16 @@ class IsMember : public Validator {
         // It stores a copy of the set pointer-like, so shared_ptr will stay alive
         func_ = [set, filter_fn](std::string &input) {
             local_item_t b;
-            if(!detail::lexical_cast(input, b)) {
-                throw ValidationError(input); // name is added later
+            if (!detail::lexical_cast(input, b)) {
+                throw ValidationError(input);  // name is added later
             }
-            if(filter_fn) {
+            if (filter_fn) {
                 b = filter_fn(b);
             }
             auto res = detail::search(set, b, filter_fn);
-            if(res.first) {
+            if (res.first) {
                 // Make sure the version in the input string is identical to the one in the set
-                if(filter_fn) {
+                if (filter_fn) {
                     input = detail::as_string(detail::pair_adaptor<element_t>::first(*(res.second)));
                 }
 
@@ -2114,16 +2124,16 @@ class IsMember : public Validator {
     template <typename T, typename... Args>
     IsMember(T &&set, filter_fn_t filter_fn_1, filter_fn_t filter_fn_2, Args &&... other)
         : IsMember(std::forward<T>(set),
-                   [filter_fn_1, filter_fn_2](std::string a) { return filter_fn_2(filter_fn_1(a)); },
-                   other...) {}
+                   [filter_fn_1, filter_fn_2](std::string a) { return filter_fn_2(filter_fn_1(a)); }, other...) {}
 };
 
 /// definition of the default transformation object
-template <typename T> using TransformPairs = std::vector<std::pair<std::string, T>>;
+template <typename T>
+using TransformPairs = std::vector<std::pair<std::string, T>>;
 
 /// Translate named items to other or a value set
 class Transformer : public Validator {
-  public:
+   public:
     using filter_fn_t = std::function<std::string(std::string)>;
 
     /// This allows in-place construction
@@ -2132,20 +2142,21 @@ class Transformer : public Validator {
         : Transformer(TransformPairs<std::string>(values), std::forward<Args>(args)...) {}
 
     /// direct map of std::string to std::string
-    template <typename T> explicit Transformer(T &&mapping) : Transformer(std::forward<T>(mapping), nullptr) {}
+    template <typename T>
+    explicit Transformer(T &&mapping) : Transformer(std::forward<T>(mapping), nullptr) {}
 
     /// This checks to see if an item is in a set: pointer or copy version. You can pass in a function that will filter
     /// both sides of the comparison before computing the comparison.
-    template <typename T, typename F> explicit Transformer(T mapping, F filter_function) {
-
+    template <typename T, typename F>
+    explicit Transformer(T mapping, F filter_function) {
         static_assert(detail::pair_adaptor<typename detail::element_type<T>::type>::value,
                       "mapping must produce value pairs");
         // Get the type of the contained item - requires a container have ::value_type
         // if the type does not have first_type and second_type, these are both value_type
-        using element_t = typename detail::element_type<T>::type;            // Removes (smart) pointers if needed
-        using item_t = typename detail::pair_adaptor<element_t>::first_type; // Is value_type if not a map
-        using local_item_t = typename IsMemberType<item_t>::type;            // This will convert bad types to good ones
-                                                                             // (const char * to std::string)
+        using element_t = typename detail::element_type<T>::type;             // Removes (smart) pointers if needed
+        using item_t = typename detail::pair_adaptor<element_t>::first_type;  // Is value_type if not a map
+        using local_item_t = typename IsMemberType<item_t>::type;  // This will convert bad types to good ones
+                                                                   // (const char * to std::string)
 
         // Make a local copy of the filter function, using a std::function if not one already
         std::function<local_item_t(local_item_t)> filter_fn = filter_function;
@@ -2155,15 +2166,15 @@ class Transformer : public Validator {
 
         func_ = [mapping, filter_fn](std::string &input) {
             local_item_t b;
-            if(!detail::lexical_cast(input, b)) {
+            if (!detail::lexical_cast(input, b)) {
                 return std::string();
                 // there is no possible way we can match anything in the mapping if we can't convert so just return
             }
-            if(filter_fn) {
+            if (filter_fn) {
                 b = filter_fn(b);
             }
             auto res = detail::search(mapping, b, filter_fn);
-            if(res.first) {
+            if (res.first) {
                 input = detail::as_string(detail::pair_adaptor<element_t>::second(*res.second));
             }
             return std::string{};
@@ -2174,13 +2185,12 @@ class Transformer : public Validator {
     template <typename T, typename... Args>
     Transformer(T &&mapping, filter_fn_t filter_fn_1, filter_fn_t filter_fn_2, Args &&... other)
         : Transformer(std::forward<T>(mapping),
-                      [filter_fn_1, filter_fn_2](std::string a) { return filter_fn_2(filter_fn_1(a)); },
-                      other...) {}
+                      [filter_fn_1, filter_fn_2](std::string a) { return filter_fn_2(filter_fn_1(a)); }, other...) {}
 };
 
 /// translate named items to other or a value set
 class CheckedTransformer : public Validator {
-  public:
+   public:
     using filter_fn_t = std::function<std::string(std::string)>;
 
     /// This allows in-place construction
@@ -2189,22 +2199,24 @@ class CheckedTransformer : public Validator {
         : CheckedTransformer(TransformPairs<std::string>(values), std::forward<Args>(args)...) {}
 
     /// direct map of std::string to std::string
-    template <typename T> explicit CheckedTransformer(T mapping) : CheckedTransformer(std::move(mapping), nullptr) {}
+    template <typename T>
+    explicit CheckedTransformer(T mapping) : CheckedTransformer(std::move(mapping), nullptr) {}
 
     /// This checks to see if an item is in a set: pointer or copy version. You can pass in a function that will filter
     /// both sides of the comparison before computing the comparison.
-    template <typename T, typename F> explicit CheckedTransformer(T mapping, F filter_function) {
-
+    template <typename T, typename F>
+    explicit CheckedTransformer(T mapping, F filter_function) {
         static_assert(detail::pair_adaptor<typename detail::element_type<T>::type>::value,
                       "mapping must produce value pairs");
         // Get the type of the contained item - requires a container have ::value_type
         // if the type does not have first_type and second_type, these are both value_type
-        using element_t = typename detail::element_type<T>::type;            // Removes (smart) pointers if needed
-        using item_t = typename detail::pair_adaptor<element_t>::first_type; // Is value_type if not a map
-        using local_item_t = typename IsMemberType<item_t>::type;            // This will convert bad types to good ones
-                                                                             // (const char * to std::string)
-        using iteration_type_t = typename detail::pair_adaptor<element_t>::value_type; // the type of the object pair //
-                                                                                       // the type of the object pair
+        using element_t = typename detail::element_type<T>::type;             // Removes (smart) pointers if needed
+        using item_t = typename detail::pair_adaptor<element_t>::first_type;  // Is value_type if not a map
+        using local_item_t = typename IsMemberType<item_t>::type;  // This will convert bad types to good ones
+                                                                   // (const char * to std::string)
+        using iteration_type_t =
+            typename detail::pair_adaptor<element_t>::value_type;  // the type of the object pair //
+                                                                   // the type of the object pair
 
         // Make a local copy of the filter function, using a std::function if not one already
         std::function<local_item_t(local_item_t)> filter_fn = filter_function;
@@ -2225,19 +2237,19 @@ class CheckedTransformer : public Validator {
         func_ = [mapping, tfunc, filter_fn](std::string &input) {
             local_item_t b;
             bool converted = detail::lexical_cast(input, b);
-            if(converted) {
-                if(filter_fn) {
+            if (converted) {
+                if (filter_fn) {
                     b = filter_fn(b);
                 }
                 auto res = detail::search(mapping, b, filter_fn);
-                if(res.first) {
+                if (res.first) {
                     input = detail::as_string(detail::pair_adaptor<element_t>::second(*res.second));
                     return std::string{};
                 }
             }
-            for(const auto &v : detail::smart_deref(mapping)) {
+            for (const auto &v : detail::smart_deref(mapping)) {
                 auto output_string = detail::as_string(detail::pair_adaptor<element_t>::second(v));
-                if(output_string == input) {
+                if (output_string == input) {
                     return std::string();
                 }
             }
@@ -2279,7 +2291,7 @@ inline std::string ignore_space(std::string item) {
 /// Therefore, if it is required to interpret real inputs like "0.42 s",
 /// the mapping should be of a type <string, float> or <string, double>.
 class AsNumberWithUnit : public Validator {
-  public:
+   public:
     /// Adjust AsNumberWithUnit behavior.
     /// CASE_SENSITIVE/CASE_INSENSITIVE controls how units are matched.
     /// UNIT_OPTIONAL/UNIT_REQUIRED throws ValidationError
@@ -2293,8 +2305,7 @@ class AsNumberWithUnit : public Validator {
     };
 
     template <typename Number>
-    explicit AsNumberWithUnit(std::map<std::string, Number> mapping,
-                              Options opts = DEFAULT,
+    explicit AsNumberWithUnit(std::map<std::string, Number> mapping, Options opts = DEFAULT,
                               const std::string &unit_name = "UNIT") {
         description(generate_description<Number>(unit_name, opts));
         validate_mapping(mapping, opts);
@@ -2304,13 +2315,13 @@ class AsNumberWithUnit : public Validator {
             Number num;
 
             detail::rtrim(input);
-            if(input.empty()) {
+            if (input.empty()) {
                 throw ValidationError("Input is empty");
             }
 
             // Find split position between number and prefix
             auto unit_begin = input.end();
-            while(unit_begin > input.begin() && std::isalpha(*(unit_begin - 1), std::locale())) {
+            while (unit_begin > input.begin() && std::isalpha(*(unit_begin - 1), std::locale())) {
                 --unit_begin;
             }
 
@@ -2318,26 +2329,26 @@ class AsNumberWithUnit : public Validator {
             input.resize(static_cast<size_t>(std::distance(input.begin(), unit_begin)));
             detail::trim(input);
 
-            if(opts & UNIT_REQUIRED && unit.empty()) {
+            if (opts & UNIT_REQUIRED && unit.empty()) {
                 throw ValidationError("Missing mandatory unit");
             }
-            if(opts & CASE_INSENSITIVE) {
+            if (opts & CASE_INSENSITIVE) {
                 unit = detail::to_lower(unit);
             }
 
             bool converted = detail::lexical_cast(input, num);
-            if(!converted) {
+            if (!converted) {
                 throw ValidationError("Value " + input + " could not be converted to " + detail::type_name<Number>());
             }
 
-            if(unit.empty()) {
+            if (unit.empty()) {
                 // No need to modify input if no unit passed
                 return {};
             }
 
             // find corresponding factor
             auto it = mapping.find(unit);
-            if(it == mapping.end()) {
+            if (it == mapping.end()) {
                 throw ValidationError(unit +
                                       " unit not recognized. "
                                       "Allowed values: " +
@@ -2346,7 +2357,7 @@ class AsNumberWithUnit : public Validator {
 
             // perform safe multiplication
             bool ok = detail::checked_multiply(num, it->second);
-            if(!ok) {
+            if (!ok) {
                 throw ValidationError(detail::as_string(num) + " multiplied by " + unit +
                                       " factor would cause number overflow. Use smaller value.");
             }
@@ -2356,25 +2367,26 @@ class AsNumberWithUnit : public Validator {
         };
     }
 
-  private:
+   private:
     /// Check that mapping contains valid units.
     /// Update mapping for CASE_INSENSITIVE mode.
-    template <typename Number> static void validate_mapping(std::map<std::string, Number> &mapping, Options opts) {
-        for(auto &kv : mapping) {
-            if(kv.first.empty()) {
+    template <typename Number>
+    static void validate_mapping(std::map<std::string, Number> &mapping, Options opts) {
+        for (auto &kv : mapping) {
+            if (kv.first.empty()) {
                 throw ValidationError("Unit must not be empty.");
             }
-            if(!detail::isalpha(kv.first)) {
+            if (!detail::isalpha(kv.first)) {
                 throw ValidationError("Unit must contain only letters.");
             }
         }
 
         // make all units lowercase if CASE_INSENSITIVE
-        if(opts & CASE_INSENSITIVE) {
+        if (opts & CASE_INSENSITIVE) {
             std::map<std::string, Number> lower_mapping;
-            for(auto &kv : mapping) {
+            for (auto &kv : mapping) {
                 auto s = detail::to_lower(kv.first);
-                if(lower_mapping.count(s)) {
+                if (lower_mapping.count(s)) {
                     throw ValidationError("Several matching lowercase unit representations are found: " + s);
                 }
                 lower_mapping[detail::to_lower(kv.first)] = kv.second;
@@ -2384,10 +2396,11 @@ class AsNumberWithUnit : public Validator {
     }
 
     /// Generate description like this: NUMBER [UNIT]
-    template <typename Number> static std::string generate_description(const std::string &name, Options opts) {
+    template <typename Number>
+    static std::string generate_description(const std::string &name, Options opts) {
         std::stringstream out;
         out << detail::type_name<Number>() << ' ';
-        if(opts & UNIT_REQUIRED) {
+        if (opts & UNIT_REQUIRED) {
             out << name;
         } else {
             out << '[' << name << ']';
@@ -2408,7 +2421,7 @@ class AsNumberWithUnit : public Validator {
 ///   "2 MB" => 2097152
 ///   "2 EiB" => 2^61 // Units up to exibyte are supported
 class AsSizeValue : public AsNumberWithUnit {
-  public:
+   public:
     using result_t = uint64_t;
 
     /// If kb_is_1000 is true,
@@ -2419,14 +2432,14 @@ class AsSizeValue : public AsNumberWithUnit {
     /// the second interpretation is more wide-spread
     /// (see https://en.wikipedia.org/wiki/Binary_prefix).
     explicit AsSizeValue(bool kb_is_1000) : AsNumberWithUnit(get_mapping(kb_is_1000)) {
-        if(kb_is_1000) {
+        if (kb_is_1000) {
             description("SIZE [b, kb(=1000b), kib(=1024b), ...]");
         } else {
             description("SIZE [b, kb(=1024b), ...]");
         }
     }
 
-  private:
+   private:
     /// Get <size unit, factor> mapping
     static std::map<std::string, result_t> init_mapping(bool kb_is_1000) {
         std::map<std::string, result_t> m;
@@ -2435,7 +2448,7 @@ class AsSizeValue : public AsNumberWithUnit {
         result_t k = 1;
         result_t ki = 1;
         m["b"] = 1;
-        for(std::string p : {"k", "m", "g", "t", "p", "e"}) {
+        for (std::string p : {"k", "m", "g", "t", "p", "e"}) {
             k *= k_factor;
             ki *= ki_factor;
             m[p] = k;
@@ -2448,7 +2461,7 @@ class AsSizeValue : public AsNumberWithUnit {
 
     /// Cache calculated mapping
     static std::map<std::string, result_t> get_mapping(bool kb_is_1000) {
-        if(kb_is_1000) {
+        if (kb_is_1000) {
             static auto m = init_mapping(true);
             return m;
         } else {
@@ -2468,9 +2481,9 @@ inline std::pair<std::string, std::string> split_program_name(std::string comman
     std::pair<std::string, std::string> vals;
     trim(commandline);
     auto esp = commandline.find_first_of(' ', 1);
-    while(!ExistingFile(commandline.substr(0, esp)).empty()) {
+    while (!ExistingFile(commandline.substr(0, esp)).empty()) {
         esp = commandline.find_first_of(' ', esp + 1);
-        if(esp == std::string::npos) {
+        if (esp == std::string::npos) {
             // if we have reached the end and haven't found a valid file just assume the first argument is the
             // program name
             esp = commandline.find_first_of(' ', 1);
@@ -2485,10 +2498,10 @@ inline std::pair<std::string, std::string> split_program_name(std::string comman
     return vals;
 }
 
-} // namespace detail
+}  // namespace detail
 /// @}
 
-} // namespace CLI
+}  // namespace CLI
 
 // From CLI/FormatterFwd.hpp:
 
@@ -2503,9 +2516,9 @@ class App;
 /// the second argument.
 
 enum class AppFormatMode {
-    Normal, //< The normal, detailed help
-    All,    //< A fully expanded help
-    Sub,    //< Used when printed as part of expanded subcommand
+    Normal,  //< The normal, detailed help
+    All,     //< A fully expanded help
+    Sub,     //< Used when printed as part of expanded subcommand
 };
 
 /// This is the minimum requirements to run a formatter.
@@ -2513,7 +2526,7 @@ enum class AppFormatMode {
 /// A user can subclass this is if they do not care at all
 /// about the structure in CLI::Formatter.
 class FormatterBase {
-  protected:
+   protected:
     /// @name Options
     ///@{
 
@@ -2528,13 +2541,13 @@ class FormatterBase {
     /// @name Basic
     ///@{
 
-  public:
+   public:
     FormatterBase() = default;
     FormatterBase(const FormatterBase &) = default;
     FormatterBase(FormatterBase &&) = default;
 
     /// Adding a destructor in this form to work around bug in GCC 4.7
-    virtual ~FormatterBase() noexcept {} // NOLINT(modernize-use-equals-default)
+    virtual ~FormatterBase() noexcept {}  // NOLINT(modernize-use-equals-default)
 
     /// This is the key method that puts together help
     virtual std::string make_help(const App *, std::string, AppFormatMode) const = 0;
@@ -2555,7 +2568,7 @@ class FormatterBase {
 
     /// Get the current value of a name (REQUIRED, etc.)
     std::string get_label(std::string key) const {
-        if(labels_.find(key) == labels_.end())
+        if (labels_.find(key) == labels_.end())
             return key;
         else
             return labels_.at(key);
@@ -2574,12 +2587,12 @@ class FormatterLambda final : public FormatterBase {
     /// The lambda to hold and run
     funct_t lambda_;
 
-  public:
+   public:
     /// Create a FormatterLambda with a lambda function
     explicit FormatterLambda(funct_t funct) : lambda_(std::move(funct)) {}
 
     /// Adding a destructor (mostly to make GCC 4.7 happy)
-    ~FormatterLambda() noexcept override {} // NOLINT(modernize-use-equals-default)
+    ~FormatterLambda() noexcept override {}  // NOLINT(modernize-use-equals-default)
 
     /// This will simply call the lambda function
     std::string make_help(const App *app, std::string name, AppFormatMode mode) const override {
@@ -2590,7 +2603,7 @@ class FormatterLambda final : public FormatterBase {
 /// This is the default Formatter for CLI11. It pretty prints help output, and is broken into quite a few
 /// overridable methods, to be highly customizable with minimal effort.
 class Formatter : public FormatterBase {
-  public:
+   public:
     Formatter() = default;
     Formatter(const Formatter &) = default;
     Formatter(Formatter &&) = default;
@@ -2636,8 +2649,8 @@ class Formatter : public FormatterBase {
     /// This prints out an option help line, either positional or optional form
     virtual std::string make_option(const Option *opt, bool is_positional) const {
         std::stringstream out;
-        detail::format_help(
-            out, make_option_name(opt, is_positional) + make_option_opts(opt), make_option_desc(opt), column_width_);
+        detail::format_help(out, make_option_name(opt, is_positional) + make_option_opts(opt), make_option_desc(opt),
+                            column_width_);
         return out.str();
     }
 
@@ -2656,7 +2669,7 @@ class Formatter : public FormatterBase {
     ///@}
 };
 
-} // namespace CLI
+}  // namespace CLI
 
 // From CLI/Option.hpp:
 
@@ -2674,10 +2687,11 @@ enum class MultiOptionPolicy : char { Throw, TakeLast, TakeFirst, Join };
 
 /// This is the CRTP base class for Option and OptionDefaults. It was designed this way
 /// to share parts of the class; an OptionDefaults can copy to an Option.
-template <typename CRTP> class OptionBase {
+template <typename CRTP>
+class OptionBase {
     friend App;
 
-  protected:
+   protected:
     /// The group membership
     std::string group_ = std::string("Options");
 
@@ -2706,7 +2720,8 @@ template <typename CRTP> class OptionBase {
     MultiOptionPolicy multi_option_policy_{MultiOptionPolicy::Throw};
 
     /// Copy the contents to another similar class (one based on OptionBase)
-    template <typename T> void copy_to(T *other) const {
+    template <typename T>
+    void copy_to(T *other) const {
         other->group(group_);
         other->required(required_);
         other->ignore_case(ignore_case_);
@@ -2718,7 +2733,7 @@ template <typename CRTP> class OptionBase {
         other->multi_option_policy(multi_option_policy_);
     }
 
-  public:
+   public:
     // setters
 
     /// Changes the group membership
@@ -2809,7 +2824,7 @@ template <typename CRTP> class OptionBase {
 /// This is a version of OptionBase that only supports setting values,
 /// for defaults. It is stored as the default option in an App.
 class OptionDefaults : public OptionBase<OptionDefaults> {
-  public:
+   public:
     OptionDefaults() = default;
 
     // Methods here need a different implementation if they are Option vs. OptionDefault
@@ -2848,7 +2863,7 @@ class OptionDefaults : public OptionBase<OptionDefaults> {
 class Option : public OptionBase<Option> {
     friend App;
 
-  protected:
+   protected:
     /// @name Names
     ///@{
 
@@ -2933,15 +2948,13 @@ class Option : public OptionBase<Option> {
     ///@}
 
     /// Making an option by hand is not defined, it must be made by the App class
-    Option(std::string option_name,
-           std::string option_description,
-           std::function<bool(results_t)> callback,
+    Option(std::string option_name, std::string option_description, std::function<bool(results_t)> callback,
            App *parent)
         : description_(std::move(option_description)), parent_(parent), callback_(std::move(callback)) {
         std::tie(snames_, lnames_, pname_) = detail::get_names(detail::split_names(option_name));
     }
 
-  public:
+   public:
     /// @name Basic
     ///@{
 
@@ -2963,25 +2976,23 @@ class Option : public OptionBase<Option> {
 
     /// Set the number of expected arguments (Flags don't use this)
     Option *expected(int value) {
-
         // Break if this is a flag
-        if(type_size_ == 0)
-            throw IncorrectConstruction::SetFlag(get_name(true, true));
+        if (type_size_ == 0) throw IncorrectConstruction::SetFlag(get_name(true, true));
 
         // Setting 0 is not allowed
-        else if(value == 0)
+        else if (value == 0)
             throw IncorrectConstruction::Set0Opt(get_name());
 
         // No change is okay, quit now
-        else if(expected_ == value)
+        else if (expected_ == value)
             return this;
 
         // Type must be a vector
-        else if(type_size_ >= 0)
+        else if (type_size_ >= 0)
             throw IncorrectConstruction::ChangeNotVector(get_name());
 
         // TODO: Can support multioption for non-1 values (except for join)
-        else if(value != 1 && multi_option_policy_ != MultiOptionPolicy::Throw)
+        else if (value != 1 && multi_option_policy_ != MultiOptionPolicy::Throw)
             throw IncorrectConstruction::AfterMultiOpt(get_name());
 
         expected_ = value;
@@ -2992,14 +3003,12 @@ class Option : public OptionBase<Option> {
     Option *check(Validator validator, std::string validator_name = "") {
         validator.non_modifying();
         validators_.push_back(std::move(validator));
-        if(!validator_name.empty())
-            validators_.front().name(validator_name);
+        if (!validator_name.empty()) validators_.front().name(validator_name);
         return this;
     }
 
     /// Adds a Validator. Takes a const string& and returns an error message (empty if conversion/check is okay).
-    Option *check(std::function<std::string(const std::string &)> validator,
-                  std::string validator_description = "",
+    Option *check(std::function<std::string(const std::string &)> validator, std::string validator_description = "",
                   std::string validator_name = "") {
         validators_.emplace_back(validator, std::move(validator_description), std::move(validator_name));
         validators_.back().non_modifying();
@@ -3009,23 +3018,19 @@ class Option : public OptionBase<Option> {
     /// Adds a transforming validator with a built in type name
     Option *transform(Validator validator, std::string validator_name = "") {
         validators_.insert(validators_.begin(), std::move(validator));
-        if(!validator_name.empty())
-            validators_.front().name(validator_name);
+        if (!validator_name.empty()) validators_.front().name(validator_name);
         return this;
     }
 
     /// Adds a validator-like function that can change result
-    Option *transform(std::function<std::string(std::string)> func,
-                      std::string transform_description = "",
+    Option *transform(std::function<std::string(std::string)> func, std::string transform_description = "",
                       std::string transform_name = "") {
-        validators_.insert(validators_.begin(),
-                           Validator(
-                               [func](std::string &val) {
-                                   val = func(val);
-                                   return std::string{};
-                               },
-                               std::move(transform_description),
-                               std::move(transform_name)));
+        validators_.insert(validators_.begin(), Validator(
+                                                    [func](std::string &val) {
+                                                        val = func(val);
+                                                        return std::string{};
+                                                    },
+                                                    std::move(transform_description), std::move(transform_name)));
 
         return this;
     }
@@ -3042,12 +3047,12 @@ class Option : public OptionBase<Option> {
     }
     /// Get a named Validator
     Validator *get_validator(const std::string &validator_name = "") {
-        for(auto &validator : validators_) {
-            if(validator_name == validator.get_name()) {
+        for (auto &validator : validators_) {
+            if (validator_name == validator.get_name()) {
                 return &validator;
             }
         }
-        if((validator_name.empty()) && (!validators_.empty())) {
+        if ((validator_name.empty()) && (!validators_.empty())) {
             return &(validators_.front());
         }
         throw OptionNotFound(std::string("Validator ") + validator_name + " Not Found");
@@ -3055,21 +3060,21 @@ class Option : public OptionBase<Option> {
     /// Sets required options
     Option *needs(Option *opt) {
         auto tup = needs_.insert(opt);
-        if(!tup.second)
-            throw OptionAlreadyAdded::Requires(get_name(), opt->get_name());
+        if (!tup.second) throw OptionAlreadyAdded::Requires(get_name(), opt->get_name());
         return this;
     }
 
     /// Can find a string if needed
-    template <typename T = App> Option *needs(std::string opt_name) {
-        for(const Option_p &opt : dynamic_cast<T *>(parent_)->options_)
-            if(opt.get() != this && opt->check_name(opt_name))
-                return needs(opt.get());
+    template <typename T = App>
+    Option *needs(std::string opt_name) {
+        for (const Option_p &opt : dynamic_cast<T *>(parent_)->options_)
+            if (opt.get() != this && opt->check_name(opt_name)) return needs(opt.get());
         throw IncorrectConstruction::MissingOption(opt_name);
     }
 
     /// Any number supported, any mix of string and Opt
-    template <typename A, typename B, typename... ARG> Option *needs(A opt, B opt1, ARG... args) {
+    template <typename A, typename B, typename... ARG>
+    Option *needs(A opt, B opt1, ARG... args) {
         needs(opt);
         return needs(opt1, args...);
     }
@@ -3078,7 +3083,7 @@ class Option : public OptionBase<Option> {
     bool remove_needs(Option *opt) {
         auto iterator = std::find(std::begin(needs_), std::end(needs_), opt);
 
-        if(iterator != std::end(needs_)) {
+        if (iterator != std::end(needs_)) {
             needs_.erase(iterator);
             return true;
         } else {
@@ -3100,15 +3105,16 @@ class Option : public OptionBase<Option> {
     }
 
     /// Can find a string if needed
-    template <typename T = App> Option *excludes(std::string opt_name) {
-        for(const Option_p &opt : dynamic_cast<T *>(parent_)->options_)
-            if(opt.get() != this && opt->check_name(opt_name))
-                return excludes(opt.get());
+    template <typename T = App>
+    Option *excludes(std::string opt_name) {
+        for (const Option_p &opt : dynamic_cast<T *>(parent_)->options_)
+            if (opt.get() != this && opt->check_name(opt_name)) return excludes(opt.get());
         throw IncorrectConstruction::MissingOption(opt_name);
     }
 
     /// Any number supported, any mix of string and Opt
-    template <typename A, typename B, typename... ARG> Option *excludes(A opt, B opt1, ARG... args) {
+    template <typename A, typename B, typename... ARG>
+    Option *excludes(A opt, B opt1, ARG... args) {
         excludes(opt);
         return excludes(opt1, args...);
     }
@@ -3117,7 +3123,7 @@ class Option : public OptionBase<Option> {
     bool remove_excludes(Option *opt) {
         auto iterator = std::find(std::begin(excludes_), std::end(excludes_), opt);
 
-        if(iterator != std::end(excludes_)) {
+        if (iterator != std::end(excludes_)) {
             excludes_.erase(iterator);
             return true;
         } else {
@@ -3135,13 +3141,13 @@ class Option : public OptionBase<Option> {
     ///
     /// The template hides the fact that we don't have the definition of App yet.
     /// You are never expected to add an argument to the template here.
-    template <typename T = App> Option *ignore_case(bool value = true) {
+    template <typename T = App>
+    Option *ignore_case(bool value = true) {
         ignore_case_ = value;
         auto *parent = dynamic_cast<T *>(parent_);
 
-        for(const Option_p &opt : parent->options_)
-            if(opt.get() != this && *opt == *this)
-                throw OptionAlreadyAdded(opt->get_name(true, true));
+        for (const Option_p &opt : parent->options_)
+            if (opt.get() != this && *opt == *this) throw OptionAlreadyAdded(opt->get_name(true, true));
 
         return this;
     }
@@ -3150,21 +3156,19 @@ class Option : public OptionBase<Option> {
     ///
     /// The template hides the fact that we don't have the definition of App yet.
     /// You are never expected to add an argument to the template here.
-    template <typename T = App> Option *ignore_underscore(bool value = true) {
+    template <typename T = App>
+    Option *ignore_underscore(bool value = true) {
         ignore_underscore_ = value;
         auto *parent = dynamic_cast<T *>(parent_);
-        for(const Option_p &opt : parent->options_)
-            if(opt.get() != this && *opt == *this)
-                throw OptionAlreadyAdded(opt->get_name(true, true));
+        for (const Option_p &opt : parent->options_)
+            if (opt.get() != this && *opt == *this) throw OptionAlreadyAdded(opt->get_name(true, true));
 
         return this;
     }
 
     /// Take the last argument if given multiple times (or another policy)
     Option *multi_option_policy(MultiOptionPolicy value = MultiOptionPolicy::Throw) {
-
-        if(get_items_expected() < 0)
-            throw IncorrectConstruction::MultiOptionPolicy(get_name());
+        if (get_items_expected() < 0) throw IncorrectConstruction::MultiOptionPolicy(get_name());
         multi_option_policy_ = value;
         return this;
     }
@@ -3259,53 +3263,46 @@ class Option : public OptionBase<Option> {
     /// Will include / prefer the positional name if positional is true.
     /// If all_options is false, pick just the most descriptive name to show.
     /// Use `get_name(true)` to get the positional name (replaces `get_pname`)
-    std::string get_name(bool positional = false, //<[input] Show the positional name
-                         bool all_options = false //<[input] Show every option
+    std::string get_name(bool positional = false,  //<[input] Show the positional name
+                         bool all_options = false  //<[input] Show every option
                          ) const {
-
-        if(all_options) {
-
+        if (all_options) {
             std::vector<std::string> name_list;
 
             /// The all list will never include a positional unless asked or that's the only name.
-            if((positional && pname_.length()) || (snames_.empty() && lnames_.empty()))
-                name_list.push_back(pname_);
-            if((get_items_expected() == 0) && (!fnames_.empty())) {
-                for(const std::string &sname : snames_) {
+            if ((positional && pname_.length()) || (snames_.empty() && lnames_.empty())) name_list.push_back(pname_);
+            if ((get_items_expected() == 0) && (!fnames_.empty())) {
+                for (const std::string &sname : snames_) {
                     name_list.push_back("-" + sname);
-                    if(check_fname(sname)) {
+                    if (check_fname(sname)) {
                         name_list.back() += "{" + get_flag_value(sname, "") + "}";
                     }
                 }
 
-                for(const std::string &lname : lnames_) {
+                for (const std::string &lname : lnames_) {
                     name_list.push_back("--" + lname);
-                    if(check_fname(lname)) {
+                    if (check_fname(lname)) {
                         name_list.back() += "{" + get_flag_value(lname, "") + "}";
                     }
                 }
             } else {
-                for(const std::string &sname : snames_)
-                    name_list.push_back("-" + sname);
+                for (const std::string &sname : snames_) name_list.push_back("-" + sname);
 
-                for(const std::string &lname : lnames_)
-                    name_list.push_back("--" + lname);
+                for (const std::string &lname : lnames_) name_list.push_back("--" + lname);
             }
 
             return detail::join(name_list);
 
         } else {
-
             // This returns the positional name no matter what
-            if(positional)
-                return pname_;
+            if (positional) return pname_;
 
             // Prefer long name
-            else if(!lnames_.empty())
+            else if (!lnames_.empty())
                 return std::string("--") + lnames_[0];
 
             // Or short name if no long name
-            else if(!snames_.empty())
+            else if (!snames_.empty())
                 return std::string("-") + snames_[0];
 
             // If positional is the only name, it's okay to use that
@@ -3320,18 +3317,16 @@ class Option : public OptionBase<Option> {
 
     /// Process the callback
     void run_callback() {
-
         callback_run_ = true;
 
         // Run the validators (can change the string)
-        if(!validators_.empty()) {
-            for(std::string &result : results_) {
+        if (!validators_.empty()) {
+            for (std::string &result : results_) {
                 auto err_msg = _validate(result);
-                if(!err_msg.empty())
-                    throw ValidationError(get_name(), err_msg);
+                if (!err_msg.empty()) throw ValidationError(get_name(), err_msg);
             }
         }
-        if(!(callback_)) {
+        if (!(callback_)) {
             return;
         }
         bool local_result;
@@ -3342,73 +3337,67 @@ class Option : public OptionBase<Option> {
             std::min<int>(std::max<int>(std::abs(get_items_expected()), 1), static_cast<int>(results_.size()));
 
         // Operation depends on the policy setting
-        if(multi_option_policy_ == MultiOptionPolicy::TakeLast) {
+        if (multi_option_policy_ == MultiOptionPolicy::TakeLast) {
             // Allow multi-option sizes (including 0)
             results_t partial_result{results_.end() - trim_size, results_.end()};
             local_result = !callback_(partial_result);
 
-        } else if(multi_option_policy_ == MultiOptionPolicy::TakeFirst) {
+        } else if (multi_option_policy_ == MultiOptionPolicy::TakeFirst) {
             results_t partial_result{results_.begin(), results_.begin() + trim_size};
             local_result = !callback_(partial_result);
 
-        } else if(multi_option_policy_ == MultiOptionPolicy::Join) {
+        } else if (multi_option_policy_ == MultiOptionPolicy::Join) {
             results_t partial_result = {detail::join(results_, "\n")};
             local_result = !callback_(partial_result);
 
         } else {
             // Exact number required
-            if(get_items_expected() > 0) {
-                if(results_.size() != static_cast<size_t>(get_items_expected()))
+            if (get_items_expected() > 0) {
+                if (results_.size() != static_cast<size_t>(get_items_expected()))
                     throw ArgumentMismatch(get_name(), get_items_expected(), results_.size());
                 // Variable length list
-            } else if(get_items_expected() < 0) {
+            } else if (get_items_expected() < 0) {
                 // Require that this be a multiple of expected size and at least as many as expected
-                if(results_.size() < static_cast<size_t>(-get_items_expected()) ||
-                   results_.size() % static_cast<size_t>(std::abs(get_type_size())) != 0u)
+                if (results_.size() < static_cast<size_t>(-get_items_expected()) ||
+                    results_.size() % static_cast<size_t>(std::abs(get_type_size())) != 0u)
                     throw ArgumentMismatch(get_name(), get_items_expected(), results_.size());
             }
             local_result = !callback_(results_);
         }
 
-        if(local_result)
-            throw ConversionError(get_name(), results_);
+        if (local_result) throw ConversionError(get_name(), results_);
     }
 
     /// If options share any of the same names, they are equal (not counting positional)
     bool operator==(const Option &other) const {
-        for(const std::string &sname : snames_)
-            if(other.check_sname(sname))
-                return true;
-        for(const std::string &lname : lnames_)
-            if(other.check_lname(lname))
-                return true;
+        for (const std::string &sname : snames_)
+            if (other.check_sname(sname)) return true;
+        for (const std::string &lname : lnames_)
+            if (other.check_lname(lname)) return true;
 
-        if(ignore_case_ ||
-           ignore_underscore_) { // We need to do the inverse, in case we are ignore_case or ignore underscore
-            for(const std::string &sname : other.snames_)
-                if(check_sname(sname))
-                    return true;
-            for(const std::string &lname : other.lnames_)
-                if(check_lname(lname))
-                    return true;
+        if (ignore_case_ ||
+            ignore_underscore_) {  // We need to do the inverse, in case we are ignore_case or ignore underscore
+            for (const std::string &sname : other.snames_)
+                if (check_sname(sname)) return true;
+            for (const std::string &lname : other.lnames_)
+                if (check_lname(lname)) return true;
         }
         return false;
     }
 
     /// Check a name. Requires "-" or "--" for short / long, supports positional name
     bool check_name(std::string name) const {
-
-        if(name.length() > 2 && name[0] == '-' && name[1] == '-')
+        if (name.length() > 2 && name[0] == '-' && name[1] == '-')
             return check_lname(name.substr(2));
-        else if(name.length() > 1 && name.front() == '-')
+        else if (name.length() > 1 && name.front() == '-')
             return check_sname(name.substr(1));
         else {
             std::string local_pname = pname_;
-            if(ignore_underscore_) {
+            if (ignore_underscore_) {
                 local_pname = detail::remove_underscore(local_pname);
                 name = detail::remove_underscore(name);
             }
-            if(ignore_case_) {
+            if (ignore_case_) {
                 local_pname = detail::to_lower(local_pname);
                 name = detail::to_lower(name);
             }
@@ -3426,7 +3415,7 @@ class Option : public OptionBase<Option> {
 
     /// Requires "--" to be removed from string
     bool check_fname(std::string name) const {
-        if(fnames_.empty()) {
+        if (fnames_.empty()) {
             return false;
         }
         return (detail::find_member(name, fnames_, ignore_case_, ignore_underscore_) >= 0);
@@ -3437,33 +3426,33 @@ class Option : public OptionBase<Option> {
         static const std::string falseString{"false"};
         static const std::string emptyString{"{}"};
         // check for disable flag override_
-        if(disable_flag_override_) {
-            if(!((input_value.empty()) || (input_value == emptyString))) {
+        if (disable_flag_override_) {
+            if (!((input_value.empty()) || (input_value == emptyString))) {
                 auto default_ind = detail::find_member(name, fnames_, ignore_case_, ignore_underscore_);
-                if(default_ind >= 0) {
+                if (default_ind >= 0) {
                     // We can static cast this to size_t because it is more than 0 in this block
-                    if(default_flag_values_[static_cast<size_t>(default_ind)].second != input_value) {
+                    if (default_flag_values_[static_cast<size_t>(default_ind)].second != input_value) {
                         throw(ArgumentMismatch::FlagOverride(name));
                     }
                 } else {
-                    if(input_value != trueString) {
+                    if (input_value != trueString) {
                         throw(ArgumentMismatch::FlagOverride(name));
                     }
                 }
             }
         }
         auto ind = detail::find_member(name, fnames_, ignore_case_, ignore_underscore_);
-        if((input_value.empty()) || (input_value == emptyString)) {
+        if ((input_value.empty()) || (input_value == emptyString)) {
             return (ind < 0) ? trueString : default_flag_values_[static_cast<size_t>(ind)].second;
         }
-        if(ind < 0) {
+        if (ind < 0) {
             return input_value;
         }
-        if(default_flag_values_[static_cast<size_t>(ind)].second == falseString) {
+        if (default_flag_values_[static_cast<size_t>(ind)].second == falseString) {
             try {
                 auto val = detail::to_flag_value(input_value);
                 return (val == 1) ? falseString : (val == (-1) ? trueString : std::to_string(-val));
-            } catch(const std::invalid_argument &) {
+            } catch (const std::invalid_argument &) {
                 return input_value;
             }
         } else {
@@ -3487,7 +3476,7 @@ class Option : public OptionBase<Option> {
 
     /// Puts a result at the end
     Option *add_result(std::vector<std::string> s) {
-        for(auto &str : s) {
+        for (auto &str : s) {
             _add_result(std::move(str));
         }
         callback_run_ = false;
@@ -3502,47 +3491,49 @@ class Option : public OptionBase<Option> {
               enable_if_t<!is_vector<T>::value && !std::is_const<T>::value, detail::enabler> = detail::dummy>
     void results(T &output) const {
         bool retval;
-        if(results_.empty()) {
+        if (results_.empty()) {
             retval = detail::lexical_cast(default_str_, output);
-        } else if(results_.size() == 1) {
+        } else if (results_.size() == 1) {
             retval = detail::lexical_cast(results_[0], output);
         } else {
-            switch(multi_option_policy_) {
-            case MultiOptionPolicy::TakeFirst:
-                retval = detail::lexical_cast(results_.front(), output);
-                break;
-            case MultiOptionPolicy::TakeLast:
-            default:
-                retval = detail::lexical_cast(results_.back(), output);
-                break;
-            case MultiOptionPolicy::Throw:
-                throw ConversionError(get_name(), results_);
-            case MultiOptionPolicy::Join:
-                retval = detail::lexical_cast(detail::join(results_), output);
-                break;
+            switch (multi_option_policy_) {
+                case MultiOptionPolicy::TakeFirst:
+                    retval = detail::lexical_cast(results_.front(), output);
+                    break;
+                case MultiOptionPolicy::TakeLast:
+                default:
+                    retval = detail::lexical_cast(results_.back(), output);
+                    break;
+                case MultiOptionPolicy::Throw:
+                    throw ConversionError(get_name(), results_);
+                case MultiOptionPolicy::Join:
+                    retval = detail::lexical_cast(detail::join(results_), output);
+                    break;
             }
         }
-        if(!retval) {
+        if (!retval) {
             throw ConversionError(get_name(), results_);
         }
     }
     /// get the results as a vector of a particular type
-    template <typename T> void results(std::vector<T> &output) const {
+    template <typename T>
+    void results(std::vector<T> &output) const {
         output.clear();
         bool retval = true;
 
-        for(const auto &elem : results_) {
+        for (const auto &elem : results_) {
             output.emplace_back();
             retval &= detail::lexical_cast(elem, output.back());
         }
 
-        if(!retval) {
+        if (!retval) {
             throw ConversionError(get_name(), results_);
         }
     }
 
     /// return the results as a particular type
-    template <typename T> T as() const {
+    template <typename T>
+    T as() const {
         T output;
         results(output);
         return output;
@@ -3570,10 +3561,8 @@ class Option : public OptionBase<Option> {
     /// Set a custom option size
     Option *type_size(int option_type_size) {
         type_size_ = option_type_size;
-        if(type_size_ == 0)
-            required_ = false;
-        if(option_type_size < 0)
-            expected_ = -1;
+        if (type_size_ == 0) required_ = false;
+        if (option_type_size < 0) expected_ = -1;
         return this;
     }
 
@@ -3585,7 +3574,7 @@ class Option : public OptionBase<Option> {
 
     /// Capture the default value from the original value (if it can be captured)
     Option *capture_default_str() {
-        if(default_function_) {
+        if (default_function_) {
             default_str_ = default_function_();
         }
         return this;
@@ -3610,10 +3599,10 @@ class Option : public OptionBase<Option> {
     /// Get the full typename for this option
     std::string get_type_name() const {
         std::string full_type_name = type_name_();
-        if(!validators_.empty()) {
-            for(auto &validator : validators_) {
+        if (!validators_.empty()) {
+            for (auto &validator : validators_) {
                 std::string vtype = validator.get_description();
-                if(!vtype.empty()) {
+                if (!vtype.empty()) {
                     full_type_name += ":" + vtype;
                 }
             }
@@ -3621,31 +3610,30 @@ class Option : public OptionBase<Option> {
         return full_type_name;
     }
 
-  private:
+   private:
     // run through the validators
     std::string _validate(std::string &result) {
         std::string err_msg;
-        for(const auto &vali : validators_) {
+        for (const auto &vali : validators_) {
             try {
                 err_msg = vali(result);
-            } catch(const ValidationError &err) {
+            } catch (const ValidationError &err) {
                 err_msg = err.what();
             }
-            if(!err_msg.empty())
-                break;
+            if (!err_msg.empty()) break;
         }
         return err_msg;
     }
 
     int _add_result(std::string &&result) {
         int result_count = 0;
-        if(delimiter_ == '\0') {
+        if (delimiter_ == '\0') {
             results_.push_back(std::move(result));
             ++result_count;
         } else {
-            if((result.find_first_of(delimiter_) != std::string::npos)) {
-                for(const auto &var : CLI::detail::split(result, delimiter_)) {
-                    if(!var.empty()) {
+            if ((result.find_first_of(delimiter_) != std::string::npos)) {
+                for (const auto &var : CLI::detail::split(result, delimiter_)) {
+                    if (!var.empty()) {
                         results_.push_back(var);
                         ++result_count;
                     }
@@ -3659,30 +3647,30 @@ class Option : public OptionBase<Option> {
     }
 };
 
-} // namespace CLI
+}  // namespace CLI
 
 // From CLI/App.hpp:
 
 namespace CLI {
 
 #ifndef CLI11_PARSE
-#define CLI11_PARSE(app, argc, argv)                                                                                   \
-    try {                                                                                                              \
-        (app).parse((argc), (argv));                                                                                   \
-    } catch(const CLI::ParseError &e) {                                                                                \
-        return (app).exit(e);                                                                                          \
+#define CLI11_PARSE(app, argc, argv)     \
+    try {                                \
+        (app).parse((argc), (argv));     \
+    } catch (const CLI::ParseError &e) { \
+        return (app).exit(e);            \
     }
 #endif
 
 namespace detail {
 enum class Classifier { NONE, POSITIONAL_MARK, SHORT, LONG, WINDOWS, SUBCOMMAND, SUBCOMMAND_TERMINATOR };
 struct AppFriend;
-} // namespace detail
+}  // namespace detail
 
 namespace FailureMessage {
 std::string simple(const App *app, const Error &e);
 std::string help(const App *app, const Error &e);
-} // namespace FailureMessage
+}  // namespace FailureMessage
 
 class App;
 
@@ -3697,7 +3685,7 @@ class App {
     friend Option;
     friend detail::AppFriend;
 
-  protected:
+   protected:
     // This library follows the Google style guide for member names ending in underscores
 
     /// @name Basics
@@ -3869,10 +3857,10 @@ class App {
     App(std::string app_description, std::string app_name, App *parent)
         : name_(std::move(app_name)), description_(std::move(app_description)), parent_(parent) {
         // Inherit if not from a nullptr
-        if(parent_ != nullptr) {
-            if(parent_->help_ptr_ != nullptr)
+        if (parent_ != nullptr) {
+            if (parent_->help_ptr_ != nullptr)
                 set_help_flag(parent_->help_ptr_->get_name(false, true), parent_->help_ptr_->get_description());
-            if(parent_->help_all_ptr_ != nullptr)
+            if (parent_->help_all_ptr_ != nullptr)
                 set_help_all_flag(parent_->help_all_ptr_->get_name(false, true),
                                   parent_->help_all_ptr_->get_description());
 
@@ -3898,7 +3886,7 @@ class App {
         }
     }
 
-  public:
+   public:
     /// @name Basic
     ///@{
 
@@ -3996,9 +3984,9 @@ class App {
     /// Ignore case. Subcommands inherit value.
     App *ignore_case(bool value = true) {
         ignore_case_ = value;
-        if(parent_ != nullptr && !name_.empty()) {
-            for(const auto &subc : parent_->subcommands_) {
-                if(subc.get() != this && (this->check_name(subc->name_) || subc->check_name(this->name_)))
+        if (parent_ != nullptr && !name_.empty()) {
+            for (const auto &subc : parent_->subcommands_) {
+                if (subc.get() != this && (this->check_name(subc->name_) || subc->check_name(this->name_)))
                     throw OptionAlreadyAdded(subc->name_);
             }
         }
@@ -4020,9 +4008,9 @@ class App {
     /// Ignore underscore. Subcommands inherit value.
     App *ignore_underscore(bool value = true) {
         ignore_underscore_ = value;
-        if(parent_ != nullptr && !name_.empty()) {
-            for(const auto &subc : parent_->subcommands_) {
-                if(subc.get() != this && (this->check_name(subc->name_) || subc->check_name(this->name_)))
+        if (parent_ != nullptr && !name_.empty()) {
+            for (const auto &subc : parent_->subcommands_) {
+                if (subc.get() != this && (this->check_name(subc->name_) || subc->check_name(this->name_)))
                     throw OptionAlreadyAdded(subc->name_);
             }
         }
@@ -4071,16 +4059,12 @@ class App {
     ///     std::string filename;
     ///     program.add_option("filename", filename, "description of filename");
     ///
-    Option *add_option(std::string option_name,
-                       callback_t option_callback,
-                       std::string option_description = "",
-                       bool defaulted = false,
-                       std::function<std::string()> func = {}) {
+    Option *add_option(std::string option_name, callback_t option_callback, std::string option_description = "",
+                       bool defaulted = false, std::function<std::string()> func = {}) {
         Option myopt{option_name, option_description, option_callback, this};
 
-        if(std::find_if(std::begin(options_), std::end(options_), [&myopt](const Option_p &v) {
-               return *v == myopt;
-           }) == std::end(options_)) {
+        if (std::find_if(std::begin(options_), std::end(options_),
+                         [&myopt](const Option_p &v) { return *v == myopt; }) == std::end(options_)) {
             options_.emplace_back();
             Option_p &option = options_.back();
             option.reset(new Option(option_name, option_description, option_callback, this));
@@ -4089,15 +4073,13 @@ class App {
             option->default_function(func);
 
             // For compatibility with CLI11 1.7 and before, capture the default string here
-            if(defaulted)
-                option->capture_default_str();
+            if (defaulted) option->capture_default_str();
 
             // Transfer defaults to the new option
             option_defaults_.copy_to(option.get());
 
             // Don't bother to capture if we already did
-            if(!defaulted && option->get_always_capture_default())
-                option->capture_default_str();
+            if (!defaulted && option->get_always_capture_default()) option->capture_default_str();
 
             return option.get();
 
@@ -4108,15 +4090,12 @@ class App {
     /// Add option for non-vectors (duplicate copy needed without defaulted to avoid `iostream << value`)
     template <typename T, enable_if_t<!is_vector<T>::value & !std::is_const<T>::value, detail::enabler> = detail::dummy>
     Option *add_option(std::string option_name,
-                       T &variable, ///< The variable to set
-                       std::string option_description = "",
-                       bool defaulted = false) {
-
+                       T &variable,  ///< The variable to set
+                       std::string option_description = "", bool defaulted = false) {
         auto fun = [&variable](CLI::results_t res) { return detail::lexical_cast(res[0], variable); };
 
-        Option *opt = add_option(option_name, fun, option_description, defaulted, [&variable]() {
-            return std::string(CLI::detail::to_string(variable));
-        });
+        Option *opt = add_option(option_name, fun, option_description, defaulted,
+                                 [&variable]() { return std::string(CLI::detail::to_string(variable)); });
         opt->type_name(detail::type_name<T>());
 
         return opt;
@@ -4125,13 +4104,12 @@ class App {
     /// Add option for a callback of a specific type
     template <typename T, enable_if_t<!is_vector<T>::value, detail::enabler> = detail::dummy>
     Option *add_option_function(std::string option_name,
-                                const std::function<void(const T &)> &func, ///< the callback to execute
+                                const std::function<void(const T &)> &func,  ///< the callback to execute
                                 std::string option_description = "") {
-
         auto fun = [func](CLI::results_t res) {
             T variable;
             bool result = detail::lexical_cast(res[0], variable);
-            if(result) {
+            if (result) {
                 func(variable);
             }
             return result;
@@ -4148,9 +4126,8 @@ class App {
     }
 
     /// Add option with description but with no variable assignment or callback
-    template <typename T,
-              enable_if_t<std::is_const<T>::value && std::is_constructible<std::string, T>::value, detail::enabler> =
-                  detail::dummy>
+    template <typename T, enable_if_t<std::is_const<T>::value && std::is_constructible<std::string, T>::value,
+                                      detail::enabler> = detail::dummy>
     Option *add_option(std::string option_name, T &option_description) {
         return add_option(option_name, CLI::callback_t(), option_description, false);
     }
@@ -4158,16 +4135,13 @@ class App {
     /// Add option for vectors
     template <typename T>
     Option *add_option(std::string option_name,
-                       std::vector<T> &variable, ///< The variable vector to set
-                       std::string option_description = "",
-                       bool defaulted = false) {
-
+                       std::vector<T> &variable,  ///< The variable vector to set
+                       std::string option_description = "", bool defaulted = false) {
         auto fun = [&variable](CLI::results_t res) {
             bool retval = true;
             variable.clear();
             variable.reserve(res.size());
-            for(const auto &elem : res) {
-
+            for (const auto &elem : res) {
                 variable.emplace_back();
                 retval &= detail::lexical_cast(elem, variable.back());
             }
@@ -4177,9 +4151,8 @@ class App {
         auto default_function = [&variable]() {
             std::vector<std::string> defaults;
             defaults.resize(variable.size());
-            std::transform(variable.begin(), variable.end(), defaults.begin(), [](T &val) {
-                return std::string(CLI::detail::to_string(val));
-            });
+            std::transform(variable.begin(), variable.end(), defaults.begin(),
+                           [](T &val) { return std::string(CLI::detail::to_string(val)); });
             return std::string("[" + detail::join(defaults) + "]");
         };
 
@@ -4192,18 +4165,17 @@ class App {
     /// Add option for a vector callback of a specific type
     template <typename T, enable_if_t<is_vector<T>::value, detail::enabler> = detail::dummy>
     Option *add_option_function(std::string option_name,
-                                const std::function<void(const T &)> &func, ///< the callback to execute
+                                const std::function<void(const T &)> &func,  ///< the callback to execute
                                 std::string option_description = "") {
-
         CLI::callback_t fun = [func](CLI::results_t res) {
             T values;
             bool retval = true;
             values.reserve(res.size());
-            for(const auto &elem : res) {
+            for (const auto &elem : res) {
                 values.emplace_back();
                 retval &= detail::lexical_cast(elem, values.back());
             }
-            if(retval) {
+            if (retval) {
                 func(values);
             }
             return retval;
@@ -4217,13 +4189,13 @@ class App {
     /// Set a help flag, replace the existing one if present
     Option *set_help_flag(std::string flag_name = "", const std::string &help_description = "") {
         // take flag_description by const reference otherwise add_flag tries to assign to help_description
-        if(help_ptr_ != nullptr) {
+        if (help_ptr_ != nullptr) {
             remove_option(help_ptr_);
             help_ptr_ = nullptr;
         }
 
         // Empty name will simply remove the help flag
-        if(!flag_name.empty()) {
+        if (!flag_name.empty()) {
             help_ptr_ = add_flag(flag_name, help_description);
             help_ptr_->configurable(false);
         }
@@ -4234,13 +4206,13 @@ class App {
     /// Set a help all flag, replaced the existing one if present
     Option *set_help_all_flag(std::string help_name = "", const std::string &help_description = "") {
         // take flag_description by const reference otherwise add_flag tries to assign to flag_description
-        if(help_all_ptr_ != nullptr) {
+        if (help_all_ptr_ != nullptr) {
             remove_option(help_all_ptr_);
             help_all_ptr_ = nullptr;
         }
 
         // Empty name will simply remove the help all flag
-        if(!help_name.empty()) {
+        if (!help_name.empty()) {
             help_all_ptr_ = add_flag(help_name, help_description);
             help_all_ptr_->configurable(false);
         }
@@ -4248,23 +4220,22 @@ class App {
         return help_all_ptr_;
     }
 
-  private:
+   private:
     /// Internal function for adding a flag
     Option *_add_flag_internal(std::string flag_name, CLI::callback_t fun, std::string flag_description) {
         Option *opt;
-        if(detail::has_default_flag_values(flag_name)) {
+        if (detail::has_default_flag_values(flag_name)) {
             // check for default values and if it has them
             auto flag_defaults = detail::get_default_flag_values(flag_name);
             detail::remove_default_flag_values(flag_name);
             opt = add_option(std::move(flag_name), std::move(fun), std::move(flag_description), false);
-            for(const auto &fname : flag_defaults)
-                opt->fnames_.push_back(fname.first);
+            for (const auto &fname : flag_defaults) opt->fnames_.push_back(fname.first);
             opt->default_flag_values_ = std::move(flag_defaults);
         } else {
             opt = add_option(std::move(flag_name), std::move(fun), std::move(flag_description), false);
         }
         // flags cannot have positional values
-        if(opt->get_positional()) {
+        if (opt->get_positional()) {
             auto pos_name = opt->get_name(true);
             remove_option(opt);
             throw IncorrectConstruction::PositionalFlag(pos_name);
@@ -4274,16 +4245,15 @@ class App {
         return opt;
     }
 
-  public:
+   public:
     /// Add a flag with no description or variable assignment
     Option *add_flag(std::string flag_name) { return _add_flag_internal(flag_name, CLI::callback_t(), std::string{}); }
 
     /// Add flag with description but with no variable assignment or callback
     /// takes a constant string,  if a variable string is passed that variable will be assigned the results from the
     /// flag
-    template <typename T,
-              enable_if_t<std::is_const<T>::value && std::is_constructible<std::string, T>::value, detail::enabler> =
-                  detail::dummy>
+    template <typename T, enable_if_t<std::is_const<T>::value && std::is_constructible<std::string, T>::value,
+                                      detail::enabler> = detail::dummy>
     Option *add_flag(std::string flag_name, T &flag_description) {
         return _add_flag_internal(flag_name, CLI::callback_t(), flag_description);
     }
@@ -4293,13 +4263,13 @@ class App {
     template <typename T,
               enable_if_t<std::is_integral<T>::value && !is_bool<T>::value, detail::enabler> = detail::dummy>
     Option *add_flag(std::string flag_name,
-                     T &flag_count, ///< A variable holding the count
+                     T &flag_count,  ///< A variable holding the count
                      std::string flag_description = "") {
         flag_count = 0;
         CLI::callback_t fun = [&flag_count](CLI::results_t res) {
             try {
                 detail::sum_flag_vector(res, flag_count);
-            } catch(const std::invalid_argument &) {
+            } catch (const std::invalid_argument &) {
                 return false;
             }
             return true;
@@ -4309,17 +4279,15 @@ class App {
 
     /// Other type version accepts all other types that are not vectors such as bool, enum, string or other classes that
     /// can be converted from a string
-    template <typename T,
-              enable_if_t<!is_vector<T>::value && !std::is_const<T>::value &&
-                              (!std::is_integral<T>::value || is_bool<T>::value) &&
-                              !std::is_constructible<std::function<void(int)>, T>::value,
-                          detail::enabler> = detail::dummy>
+    template <typename T, enable_if_t<!is_vector<T>::value && !std::is_const<T>::value &&
+                                          (!std::is_integral<T>::value || is_bool<T>::value) &&
+                                          !std::is_constructible<std::function<void(int)>, T>::value,
+                                      detail::enabler> = detail::dummy>
     Option *add_flag(std::string flag_name,
-                     T &flag_result, ///< A variable holding true if passed
+                     T &flag_result,  ///< A variable holding true if passed
                      std::string flag_description = "") {
-
         CLI::callback_t fun = [&flag_result](CLI::results_t res) {
-            if(res.size() != 1) {
+            if (res.size() != 1) {
                 return false;
             }
             return CLI::detail::lexical_cast(res[0], flag_result);
@@ -4333,11 +4301,11 @@ class App {
     template <typename T,
               enable_if_t<!std::is_assignable<std::function<void(int64_t)>, T>::value, detail::enabler> = detail::dummy>
     Option *add_flag(std::string flag_name,
-                     std::vector<T> &flag_results, ///< A vector of values with the flag results
+                     std::vector<T> &flag_results,  ///< A vector of values with the flag results
                      std::string flag_description = "") {
         CLI::callback_t fun = [&flag_results](CLI::results_t res) {
             bool retval = true;
-            for(const auto &elem : res) {
+            for (const auto &elem : res) {
                 flag_results.emplace_back();
                 retval &= detail::lexical_cast(elem, flag_results.back());
             }
@@ -4348,17 +4316,15 @@ class App {
 
     /// Add option for callback that is triggered with a true flag and takes no arguments
     Option *add_flag_callback(std::string flag_name,
-                              std::function<void(void)> function, ///< A function to call, void(void)
+                              std::function<void(void)> function,  ///< A function to call, void(void)
                               std::string flag_description = "") {
-
         CLI::callback_t fun = [function](CLI::results_t res) {
-            if(res.size() != 1) {
+            if (res.size() != 1) {
                 return false;
             }
             bool trigger;
             auto result = CLI::detail::lexical_cast(res[0], trigger);
-            if(trigger)
-                function();
+            if (trigger) function();
             return result;
         };
         Option *opt = _add_flag_internal(flag_name, std::move(fun), std::move(flag_description));
@@ -4368,9 +4334,8 @@ class App {
 
     /// Add option for callback with an integer value
     Option *add_flag_function(std::string flag_name,
-                              std::function<void(int64_t)> function, ///< A function to call, void(int)
+                              std::function<void(int64_t)> function,  ///< A function to call, void(int)
                               std::string flag_description = "") {
-
         CLI::callback_t fun = [function](CLI::results_t res) {
             int64_t flag_count = 0;
             detail::sum_flag_vector(res, flag_count);
@@ -4383,7 +4348,7 @@ class App {
 #ifdef CLI11_CPP14
     /// Add option for callback (C++14 or better only)
     Option *add_flag(std::string flag_name,
-                     std::function<void(int64_t)> function, ///< A function to call, void(int64_t)
+                     std::function<void(int64_t)> function,  ///< A function to call, void(int64_t)
                      std::string flag_description = "") {
         return add_flag_function(std::move(flag_name), std::move(function), std::move(flag_description));
     }
@@ -4392,10 +4357,9 @@ class App {
     /// Add set of options (No default, temp reference, such as an inline set) DEPRECATED
     template <typename T>
     Option *add_set(std::string option_name,
-                    T &member,           ///< The selected member of the set
-                    std::set<T> options, ///< The set of possibilities
+                    T &member,            ///< The selected member of the set
+                    std::set<T> options,  ///< The set of possibilities
                     std::string option_description = "") {
-
         Option *opt = add_option(option_name, member, std::move(option_description));
         opt->check(IsMember{options});
         return opt;
@@ -4404,10 +4368,9 @@ class App {
     /// Add set of options (No default, set can be changed afterwards - do not destroy the set) DEPRECATED
     template <typename T>
     Option *add_mutable_set(std::string option_name,
-                            T &member,                  ///< The selected member of the set
-                            const std::set<T> &options, ///< The set of possibilities
+                            T &member,                   ///< The selected member of the set
+                            const std::set<T> &options,  ///< The set of possibilities
                             std::string option_description = "") {
-
         Option *opt = add_option(option_name, member, std::move(option_description));
         opt->check(IsMember{&options});
         return opt;
@@ -4416,11 +4379,9 @@ class App {
     /// Add set of options (with default, static set, such as an inline set) DEPRECATED
     template <typename T>
     Option *add_set(std::string option_name,
-                    T &member,           ///< The selected member of the set
-                    std::set<T> options, ///< The set of possibilities
-                    std::string option_description,
-                    bool defaulted) {
-
+                    T &member,            ///< The selected member of the set
+                    std::set<T> options,  ///< The set of possibilities
+                    std::string option_description, bool defaulted) {
         Option *opt = add_option(option_name, member, std::move(option_description), defaulted);
         opt->check(IsMember{options});
         return opt;
@@ -4429,11 +4390,9 @@ class App {
     /// Add set of options (with default, set can be changed afterwards - do not destroy the set) DEPRECATED
     template <typename T>
     Option *add_mutable_set(std::string option_name,
-                            T &member,                  ///< The selected member of the set
-                            const std::set<T> &options, ///< The set of possibilities
-                            std::string option_description,
-                            bool defaulted) {
-
+                            T &member,                   ///< The selected member of the set
+                            const std::set<T> &options,  ///< The set of possibilities
+                            std::string option_description, bool defaulted) {
         Option *opt = add_option(option_name, member, std::move(option_description), defaulted);
         opt->check(IsMember{&options});
         return opt;
@@ -4442,10 +4401,9 @@ class App {
     /// Add set of options, string only, ignore case (no default, static set) DEPRECATED
     CLI11_DEPRECATED("Use ->transform(CLI::IsMember(..., CLI::ignore_case)) instead")
     Option *add_set_ignore_case(std::string option_name,
-                                std::string &member,           ///< The selected member of the set
-                                std::set<std::string> options, ///< The set of possibilities
+                                std::string &member,            ///< The selected member of the set
+                                std::set<std::string> options,  ///< The set of possibilities
                                 std::string option_description = "") {
-
         Option *opt = add_option(option_name, member, std::move(option_description));
         opt->transform(IsMember{options, CLI::ignore_case});
         return opt;
@@ -4455,10 +4413,9 @@ class App {
     /// set) DEPRECATED
     CLI11_DEPRECATED("Use ->transform(CLI::IsMember(..., CLI::ignore_case)) with a (shared) pointer instead")
     Option *add_mutable_set_ignore_case(std::string option_name,
-                                        std::string &member,                  ///< The selected member of the set
-                                        const std::set<std::string> &options, ///< The set of possibilities
+                                        std::string &member,                   ///< The selected member of the set
+                                        const std::set<std::string> &options,  ///< The set of possibilities
                                         std::string option_description = "") {
-
         Option *opt = add_option(option_name, member, std::move(option_description));
         opt->transform(IsMember{&options, CLI::ignore_case});
         return opt;
@@ -4467,11 +4424,9 @@ class App {
     /// Add set of options, string only, ignore case (default, static set) DEPRECATED
     CLI11_DEPRECATED("Use ->transform(CLI::IsMember(..., CLI::ignore_case)) instead")
     Option *add_set_ignore_case(std::string option_name,
-                                std::string &member,           ///< The selected member of the set
-                                std::set<std::string> options, ///< The set of possibilities
-                                std::string option_description,
-                                bool defaulted) {
-
+                                std::string &member,            ///< The selected member of the set
+                                std::set<std::string> options,  ///< The set of possibilities
+                                std::string option_description, bool defaulted) {
         Option *opt = add_option(option_name, member, std::move(option_description), defaulted);
         opt->transform(IsMember{options, CLI::ignore_case});
         return opt;
@@ -4481,11 +4436,9 @@ class App {
     /// DEPRECATED
     CLI11_DEPRECATED("Use ->transform(CLI::IsMember(...)) with a (shared) pointer instead")
     Option *add_mutable_set_ignore_case(std::string option_name,
-                                        std::string &member,                  ///< The selected member of the set
-                                        const std::set<std::string> &options, ///< The set of possibilities
-                                        std::string option_description,
-                                        bool defaulted) {
-
+                                        std::string &member,                   ///< The selected member of the set
+                                        const std::set<std::string> &options,  ///< The set of possibilities
+                                        std::string option_description, bool defaulted) {
         Option *opt = add_option(option_name, member, std::move(option_description), defaulted);
         opt->transform(IsMember{&options, CLI::ignore_case});
         return opt;
@@ -4494,10 +4447,9 @@ class App {
     /// Add set of options, string only, ignore underscore (no default, static set) DEPRECATED
     CLI11_DEPRECATED("Use ->transform(CLI::IsMember(..., CLI::ignore_underscore)) instead")
     Option *add_set_ignore_underscore(std::string option_name,
-                                      std::string &member,           ///< The selected member of the set
-                                      std::set<std::string> options, ///< The set of possibilities
+                                      std::string &member,            ///< The selected member of the set
+                                      std::set<std::string> options,  ///< The set of possibilities
                                       std::string option_description = "") {
-
         Option *opt = add_option(option_name, member, std::move(option_description));
         opt->transform(IsMember{options, CLI::ignore_underscore});
         return opt;
@@ -4507,10 +4459,9 @@ class App {
     /// the set) DEPRECATED
     CLI11_DEPRECATED("Use ->transform(CLI::IsMember(..., CLI::ignore_underscore)) with a (shared) pointer instead")
     Option *add_mutable_set_ignore_underscore(std::string option_name,
-                                              std::string &member,                  ///< The selected member of the set
-                                              const std::set<std::string> &options, ///< The set of possibilities
+                                              std::string &member,                   ///< The selected member of the set
+                                              const std::set<std::string> &options,  ///< The set of possibilities
                                               std::string option_description = "") {
-
         Option *opt = add_option(option_name, member, std::move(option_description));
         opt->transform(IsMember{options, CLI::ignore_underscore});
         return opt;
@@ -4519,11 +4470,9 @@ class App {
     /// Add set of options, string only, ignore underscore (default, static set) DEPRECATED
     CLI11_DEPRECATED("Use ->transform(CLI::IsMember(..., CLI::ignore_underscore)) instead")
     Option *add_set_ignore_underscore(std::string option_name,
-                                      std::string &member,           ///< The selected member of the set
-                                      std::set<std::string> options, ///< The set of possibilities
-                                      std::string option_description,
-                                      bool defaulted) {
-
+                                      std::string &member,            ///< The selected member of the set
+                                      std::set<std::string> options,  ///< The set of possibilities
+                                      std::string option_description, bool defaulted) {
         Option *opt = add_option(option_name, member, std::move(option_description), defaulted);
         opt->transform(IsMember{options, CLI::ignore_underscore});
         return opt;
@@ -4533,11 +4482,9 @@ class App {
     /// set) DEPRECATED
     CLI11_DEPRECATED("Use ->transform(CLI::IsMember(..., CLI::ignore_underscore)) with a (shared) pointer instead")
     Option *add_mutable_set_ignore_underscore(std::string option_name,
-                                              std::string &member,                  ///< The selected member of the set
-                                              const std::set<std::string> &options, ///< The set of possibilities
-                                              std::string option_description,
-                                              bool defaulted) {
-
+                                              std::string &member,                   ///< The selected member of the set
+                                              const std::set<std::string> &options,  ///< The set of possibilities
+                                              std::string option_description, bool defaulted) {
         Option *opt = add_option(option_name, member, std::move(option_description), defaulted);
         opt->transform(IsMember{&options, CLI::ignore_underscore});
         return opt;
@@ -4546,10 +4493,9 @@ class App {
     /// Add set of options, string only, ignore underscore and case (no default, static set) DEPRECATED
     CLI11_DEPRECATED("Use ->transform(CLI::IsMember(..., CLI::ignore_case, CLI::ignore_underscore)) instead")
     Option *add_set_ignore_case_underscore(std::string option_name,
-                                           std::string &member,           ///< The selected member of the set
-                                           std::set<std::string> options, ///< The set of possibilities
+                                           std::string &member,            ///< The selected member of the set
+                                           std::set<std::string> options,  ///< The set of possibilities
                                            std::string option_description = "") {
-
         Option *opt = add_option(option_name, member, std::move(option_description));
         opt->transform(IsMember{options, CLI::ignore_underscore, CLI::ignore_case});
         return opt;
@@ -4560,10 +4506,9 @@ class App {
     CLI11_DEPRECATED(
         "Use ->transform(CLI::IsMember(..., CLI::ignore_case, CLI::ignore_underscore)) with a (shared) pointer instead")
     Option *add_mutable_set_ignore_case_underscore(std::string option_name,
-                                                   std::string &member, ///< The selected member of the set
-                                                   const std::set<std::string> &options, ///< The set of possibilities
+                                                   std::string &member,  ///< The selected member of the set
+                                                   const std::set<std::string> &options,  ///< The set of possibilities
                                                    std::string option_description = "") {
-
         Option *opt = add_option(option_name, member, std::move(option_description));
         opt->transform(IsMember{&options, CLI::ignore_underscore, CLI::ignore_case});
         return opt;
@@ -4572,11 +4517,9 @@ class App {
     /// Add set of options, string only, ignore underscore and case (default, static set) DEPRECATED
     CLI11_DEPRECATED("Use ->transform(CLI::IsMember(..., CLI::ignore_case, CLI::ignore_underscore)) instead")
     Option *add_set_ignore_case_underscore(std::string option_name,
-                                           std::string &member,           ///< The selected member of the set
-                                           std::set<std::string> options, ///< The set of possibilities
-                                           std::string option_description,
-                                           bool defaulted) {
-
+                                           std::string &member,            ///< The selected member of the set
+                                           std::set<std::string> options,  ///< The set of possibilities
+                                           std::string option_description, bool defaulted) {
         Option *opt = add_option(option_name, member, std::move(option_description), defaulted);
         opt->transform(IsMember{options, CLI::ignore_underscore, CLI::ignore_case});
         return opt;
@@ -4587,11 +4530,9 @@ class App {
     CLI11_DEPRECATED(
         "Use ->transform(CLI::IsMember(..., CLI::ignore_case, CLI::ignore_underscore)) with a (shared) pointer instead")
     Option *add_mutable_set_ignore_case_underscore(std::string option_name,
-                                                   std::string &member, ///< The selected member of the set
-                                                   const std::set<std::string> &options, ///< The set of possibilities
-                                                   std::string option_description,
-                                                   bool defaulted) {
-
+                                                   std::string &member,  ///< The selected member of the set
+                                                   const std::set<std::string> &options,  ///< The set of possibilities
+                                                   std::string option_description, bool defaulted) {
         Option *opt = add_option(option_name, member, std::move(option_description), defaulted);
         opt->transform(IsMember{&options, CLI::ignore_underscore, CLI::ignore_case});
         return opt;
@@ -4599,20 +4540,14 @@ class App {
 
     /// Add a complex number
     template <typename T>
-    Option *add_complex(std::string option_name,
-                        T &variable,
-                        std::string option_description = "",
-                        bool defaulted = false,
-                        std::string label = "COMPLEX") {
-
+    Option *add_complex(std::string option_name, T &variable, std::string option_description = "",
+                        bool defaulted = false, std::string label = "COMPLEX") {
         std::string simple_name = CLI::detail::split(option_name, ',').at(0);
         CLI::callback_t fun = [&variable, simple_name, label](results_t res) {
-            if(res[1].back() == 'i')
-                res[1].pop_back();
+            if (res[1].back() == 'i') res[1].pop_back();
             double x, y;
             bool worked = detail::lexical_cast(res[0], x) && detail::lexical_cast(res[1], y);
-            if(worked)
-                variable = T(x, y);
+            if (worked) variable = T(x, y);
             return worked;
         };
 
@@ -4630,17 +4565,13 @@ class App {
     }
 
     /// Set a configuration ini file option, or clear it if no name passed
-    Option *set_config(std::string option_name = "",
-                       std::string default_filename = "",
-                       std::string help_message = "Read an ini file",
-                       bool config_required = false) {
-
+    Option *set_config(std::string option_name = "", std::string default_filename = "",
+                       std::string help_message = "Read an ini file", bool config_required = false) {
         // Remove existing config if present
-        if(config_ptr_ != nullptr)
-            remove_option(config_ptr_);
+        if (config_ptr_ != nullptr) remove_option(config_ptr_);
 
         // Only add config if option passed
-        if(!option_name.empty()) {
+        if (!option_name.empty()) {
             config_name_ = default_filename;
             config_required_ = config_required;
             config_ptr_ = add_option(option_name, config_name_, help_message, !default_filename.empty());
@@ -4653,19 +4584,17 @@ class App {
     /// Removes an option from the App. Takes an option pointer. Returns true if found and removed.
     bool remove_option(Option *opt) {
         // Make sure no links exist
-        for(Option_p &op : options_) {
+        for (Option_p &op : options_) {
             op->remove_needs(opt);
             op->remove_excludes(opt);
         }
 
-        if(help_ptr_ == opt)
-            help_ptr_ = nullptr;
-        if(help_all_ptr_ == opt)
-            help_all_ptr_ = nullptr;
+        if (help_ptr_ == opt) help_ptr_ = nullptr;
+        if (help_all_ptr_ == opt) help_all_ptr_ = nullptr;
 
         auto iterator =
             std::find_if(std::begin(options_), std::end(options_), [opt](const Option_p &v) { return v.get() == opt; });
-        if(iterator != std::end(options_)) {
+        if (iterator != std::end(options_)) {
             options_.erase(iterator);
             return true;
         }
@@ -4695,11 +4624,10 @@ class App {
 
     /// Add a previously created app as a subcommand
     App *add_subcommand(CLI::App_p subcom) {
-        if(!subcom)
-            throw IncorrectConstruction("passed App is not valid");
-        if(!subcom->name_.empty()) {
-            for(const auto &subc : subcommands_)
-                if(subc->check_name(subcom->name_) || subcom->check_name(subc->name_))
+        if (!subcom) throw IncorrectConstruction("passed App is not valid");
+        if (!subcom->name_.empty()) {
+            for (const auto &subc : subcommands_)
+                if (subc->check_name(subcom->name_) || subcom->check_name(subc->name_))
                     throw OptionAlreadyAdded(subc->name_);
         }
         subcom->parent_ = this;
@@ -4710,13 +4638,13 @@ class App {
     /// Removes a subcommand from the App. Takes a subcommand pointer. Returns true if found and removed.
     bool remove_subcommand(App *subcom) {
         // Make sure no links exist
-        for(App_p &sub : subcommands_) {
+        for (App_p &sub : subcommands_) {
             sub->remove_excludes(subcom);
         }
 
-        auto iterator = std::find_if(
-            std::begin(subcommands_), std::end(subcommands_), [subcom](const App_p &v) { return v.get() == subcom; });
-        if(iterator != std::end(subcommands_)) {
+        auto iterator = std::find_if(std::begin(subcommands_), std::end(subcommands_),
+                                     [subcom](const App_p &v) { return v.get() == subcom; });
+        if (iterator != std::end(subcommands_)) {
             subcommands_.erase(iterator);
             return true;
         }
@@ -4725,63 +4653,55 @@ class App {
     /// Check to see if a subcommand is part of this command (doesn't have to be in command line)
     /// returns the first subcommand if passed a nullptr
     App *get_subcommand(App *subcom) const {
-        if(subcom == nullptr)
-            throw OptionNotFound("nullptr passed");
-        for(const App_p &subcomptr : subcommands_)
-            if(subcomptr.get() == subcom)
-                return subcom;
+        if (subcom == nullptr) throw OptionNotFound("nullptr passed");
+        for (const App_p &subcomptr : subcommands_)
+            if (subcomptr.get() == subcom) return subcom;
         throw OptionNotFound(subcom->get_name());
     }
 
     /// Check to see if a subcommand is part of this command (text version)
     App *get_subcommand(std::string subcom) const {
         auto subc = _find_subcommand(subcom, false, false);
-        if(subc == nullptr)
-            throw OptionNotFound(subcom);
+        if (subc == nullptr) throw OptionNotFound(subcom);
         return subc;
     }
     /// Get a pointer to subcommand by index
     App *get_subcommand(int index = 0) const {
-        if(index >= 0) {
+        if (index >= 0) {
             auto uindex = static_cast<unsigned>(index);
-            if(uindex < subcommands_.size())
-                return subcommands_[uindex].get();
+            if (uindex < subcommands_.size()) return subcommands_[uindex].get();
         }
         throw OptionNotFound(std::to_string(index));
     }
 
     /// Check to see if a subcommand is part of this command and get a shared_ptr to it
     CLI::App_p get_subcommand_ptr(App *subcom) const {
-        if(subcom == nullptr)
-            throw OptionNotFound("nullptr passed");
-        for(const App_p &subcomptr : subcommands_)
-            if(subcomptr.get() == subcom)
-                return subcomptr;
+        if (subcom == nullptr) throw OptionNotFound("nullptr passed");
+        for (const App_p &subcomptr : subcommands_)
+            if (subcomptr.get() == subcom) return subcomptr;
         throw OptionNotFound(subcom->get_name());
     }
 
     /// Check to see if a subcommand is part of this command (text version)
     CLI::App_p get_subcommand_ptr(std::string subcom) const {
-        for(const App_p &subcomptr : subcommands_)
-            if(subcomptr->check_name(subcom))
-                return subcomptr;
+        for (const App_p &subcomptr : subcommands_)
+            if (subcomptr->check_name(subcom)) return subcomptr;
         throw OptionNotFound(subcom);
     }
 
     /// Get an owning pointer to subcommand by index
     CLI::App_p get_subcommand_ptr(int index = 0) const {
-        if(index >= 0) {
+        if (index >= 0) {
             auto uindex = static_cast<unsigned>(index);
-            if(uindex < subcommands_.size())
-                return subcommands_[uindex];
+            if (uindex < subcommands_.size()) return subcommands_[uindex];
         }
         throw OptionNotFound(std::to_string(index));
     }
 
     /// Check to see if an option group is part of this App
     App *get_option_group(std::string group_name) const {
-        for(const App_p &app : subcommands_) {
-            if(app->name_.empty() && app->group_ == group_name) {
+        for (const App_p &app : subcommands_) {
+            if (app->name_.empty() && app->group_ == group_name) {
                 return app.get();
             }
         }
@@ -4797,13 +4717,13 @@ class App {
     /// treated as extras.
     size_t count_all() const {
         size_t cnt{0};
-        for(auto &opt : options_) {
+        for (auto &opt : options_) {
             cnt += opt->count();
         }
-        for(auto &sub : subcommands_) {
+        for (auto &sub : subcommands_) {
             cnt += sub->count_all();
         }
-        if(!get_name().empty()) { // for named subcommands add the number of times the subcommand was called
+        if (!get_name().empty()) {  // for named subcommands add the number of times the subcommand was called
             cnt += parsed_;
         }
         return cnt;
@@ -4826,7 +4746,7 @@ class App {
     /// The number required can be given. Negative values indicate maximum
     /// number allowed (0 for any number). Max number inheritable.
     App *require_subcommand(int value) {
-        if(value < 0) {
+        if (value < 0) {
             require_subcommand_min_ = 0;
             require_subcommand_max_ = static_cast<size_t>(-value);
         } else {
@@ -4855,7 +4775,7 @@ class App {
     /// The number required can be given. Negative values indicate maximum
     /// number allowed (0 for any number).
     App *require_option(int value) {
-        if(value < 0) {
+        if (value < 0) {
             require_option_min_ = 0;
             require_option_max_ = static_cast<size_t>(-value);
         } else {
@@ -4899,16 +4819,15 @@ class App {
     //
     /// Reset the parsed data
     void clear() {
-
         parsed_ = 0;
         pre_parse_called_ = false;
 
         missing_.clear();
         parsed_subcommands_.clear();
-        for(const Option_p &opt : options_) {
+        for (const Option_p &opt : options_) {
             opt->clear();
         }
-        for(const App_p &subc : subcommands_) {
+        for (const App_p &subc : subcommands_) {
             subc->clear();
         }
     }
@@ -4917,15 +4836,14 @@ class App {
     /// This must be called after the options are in but before the rest of the program.
     void parse(int argc, const char *const *argv) {
         // If the name is not set, read from command line
-        if(name_.empty() || has_automatic_name_) {
+        if (name_.empty() || has_automatic_name_) {
             has_automatic_name_ = true;
             name_ = argv[0];
         }
 
         std::vector<std::string> args;
         args.reserve(static_cast<size_t>(argc - 1));
-        for(int i = argc - 1; i > 0; i--)
-            args.emplace_back(argv[i]);
+        for (int i = argc - 1; i > 0; i--) args.emplace_back(argv[i]);
         parse(std::move(args));
     }
 
@@ -4934,10 +4852,9 @@ class App {
     /// the function takes an optional boolean argument specifying if the programName is included in the string to
     /// process
     void parse(std::string commandline, bool program_name_included = false) {
-
-        if(program_name_included) {
+        if (program_name_included) {
             auto nstr = detail::split_program_name(commandline);
-            if((name_.empty()) || (has_automatic_name_)) {
+            if ((name_.empty()) || (has_automatic_name_)) {
                 has_automatic_name_ = true;
                 name_ = nstr.first;
             }
@@ -4945,9 +4862,9 @@ class App {
         } else
             detail::trim(commandline);
         // the next section of code is to deal with quoted arguments after an '=' or ':' for windows like operations
-        if(!commandline.empty()) {
+        if (!commandline.empty()) {
             commandline = detail::find_and_modify(commandline, "=", detail::escape_detect);
-            if(allow_windows_style_options_)
+            if (allow_windows_style_options_)
                 commandline = detail::find_and_modify(commandline, ":", detail::escape_detect);
         }
 
@@ -4963,8 +4880,7 @@ class App {
     /// Changes the vector to the remaining options.
     void parse(std::vector<std::string> &args) {
         // Clear if parsed
-        if(parsed_ > 0)
-            clear();
+        if (parsed_ > 0) clear();
 
         // parsed_ is incremented in commands/subcommands,
         // but placed here to make sure this is cleared when
@@ -4983,8 +4899,7 @@ class App {
     /// The real work is done here. Expects a reversed vector.
     void parse(std::vector<std::string> &&args) {
         // Clear if parsed
-        if(parsed_ > 0)
-            clear();
+        if (parsed_ > 0) clear();
 
         // parsed_ is incremented in commands/subcommands,
         // but placed here to make sure this is cleared when
@@ -5007,24 +4922,21 @@ class App {
 
     /// Print a nice error message and return the exit code
     int exit(const Error &e, std::ostream &out = std::cout, std::ostream &err = std::cerr) const {
-
         /// Avoid printing anything if this is a CLI::RuntimeError
-        if(dynamic_cast<const CLI::RuntimeError *>(&e) != nullptr)
-            return e.get_exit_code();
+        if (dynamic_cast<const CLI::RuntimeError *>(&e) != nullptr) return e.get_exit_code();
 
-        if(dynamic_cast<const CLI::CallForHelp *>(&e) != nullptr) {
+        if (dynamic_cast<const CLI::CallForHelp *>(&e) != nullptr) {
             out << help();
             return e.get_exit_code();
         }
 
-        if(dynamic_cast<const CLI::CallForAllHelp *>(&e) != nullptr) {
+        if (dynamic_cast<const CLI::CallForAllHelp *>(&e) != nullptr) {
             out << help("", AppFormatMode::All);
             return e.get_exit_code();
         }
 
-        if(e.get_exit_code() != static_cast<int>(ExitCodes::Success)) {
-            if(failure_message_)
-                err << failure_message_(this, e) << std::flush;
+        if (e.get_exit_code() != static_cast<int>(ExitCodes::Success)) {
+            if (failure_message_) err << failure_message_(this, e) << std::flush;
         }
 
         return e.get_exit_code();
@@ -5045,13 +4957,11 @@ class App {
     /// subcommands (const)
     std::vector<const App *> get_subcommands(const std::function<bool(const App *)> &filter) const {
         std::vector<const App *> subcomms(subcommands_.size());
-        std::transform(std::begin(subcommands_), std::end(subcommands_), std::begin(subcomms), [](const App_p &v) {
-            return v.get();
-        });
+        std::transform(std::begin(subcommands_), std::end(subcommands_), std::begin(subcomms),
+                       [](const App_p &v) { return v.get(); });
 
-        if(filter) {
-            subcomms.erase(std::remove_if(std::begin(subcomms),
-                                          std::end(subcomms),
+        if (filter) {
+            subcomms.erase(std::remove_if(std::begin(subcomms), std::end(subcomms),
                                           [&filter](const App *app) { return !filter(app); }),
                            std::end(subcomms));
         }
@@ -5063,11 +4973,10 @@ class App {
     /// subcommands
     std::vector<App *> get_subcommands(const std::function<bool(App *)> &filter) {
         std::vector<App *> subcomms(subcommands_.size());
-        std::transform(std::begin(subcommands_), std::end(subcommands_), std::begin(subcomms), [](const App_p &v) {
-            return v.get();
-        });
+        std::transform(std::begin(subcommands_), std::end(subcommands_), std::begin(subcomms),
+                       [](const App_p &v) { return v.get(); });
 
-        if(filter) {
+        if (filter) {
             subcomms.erase(
                 std::remove_if(std::begin(subcomms), std::end(subcomms), [&filter](App *app) { return !filter(app); }),
                 std::end(subcomms));
@@ -5087,7 +4996,7 @@ class App {
 
     /// Sets excluded options for the subcommand
     App *excludes(Option *opt) {
-        if(opt == nullptr) {
+        if (opt == nullptr) {
             throw OptionNotFound("nullptr passed");
         }
         exclude_options_.insert(opt);
@@ -5096,12 +5005,12 @@ class App {
 
     /// Sets excluded subcommands for the subcommand
     App *excludes(App *app) {
-        if((app == this) || (app == nullptr)) {
+        if ((app == this) || (app == nullptr)) {
             throw OptionNotFound("nullptr passed");
         }
         auto res = exclude_subcommands_.insert(app);
         // subcommand exclusion should be symmetric
-        if(res.second) {
+        if (res.second) {
             app->exclude_subcommands_.insert(this);
         }
         return this;
@@ -5110,7 +5019,7 @@ class App {
     /// Removes an option from the excludes list of this subcommand
     bool remove_excludes(Option *opt) {
         auto iterator = std::find(std::begin(exclude_options_), std::end(exclude_options_), opt);
-        if(iterator != std::end(exclude_options_)) {
+        if (iterator != std::end(exclude_options_)) {
             exclude_options_.erase(iterator);
             return true;
         } else {
@@ -5121,7 +5030,7 @@ class App {
     /// Removes a subcommand from this excludes list of this subcommand
     bool remove_excludes(App *app) {
         auto iterator = std::find(std::begin(exclude_subcommands_), std::end(exclude_subcommands_), app);
-        if(iterator != std::end(exclude_subcommands_)) {
+        if (iterator != std::end(exclude_subcommands_)) {
             auto other_app = *iterator;
             exclude_subcommands_.erase(iterator);
             other_app->remove_excludes(this);
@@ -5150,14 +5059,14 @@ class App {
     /// Makes a help message, using the currently configured formatter
     /// Will only do one subcommand at a time
     std::string help(std::string prev = "", AppFormatMode mode = AppFormatMode::Normal) const {
-        if(prev.empty())
+        if (prev.empty())
             prev = get_name();
         else
             prev += " " + get_name();
 
         // Delegate to subcommand if needed
         auto selected_subcommands = get_subcommands();
-        if(!selected_subcommands.empty())
+        if (!selected_subcommands.empty())
             return selected_subcommands.at(0)->help(prev, mode);
         else
             return formatter_->make_help(this, prev, mode);
@@ -5185,13 +5094,11 @@ class App {
     /// Get the list of options (user facing function, so returns raw pointers), has optional filter function
     std::vector<const Option *> get_options(const std::function<bool(const Option *)> filter = {}) const {
         std::vector<const Option *> options(options_.size());
-        std::transform(std::begin(options_), std::end(options_), std::begin(options), [](const Option_p &val) {
-            return val.get();
-        });
+        std::transform(std::begin(options_), std::end(options_), std::begin(options),
+                       [](const Option_p &val) { return val.get(); });
 
-        if(filter) {
-            options.erase(std::remove_if(std::begin(options),
-                                         std::end(options),
+        if (filter) {
+            options.erase(std::remove_if(std::begin(options), std::end(options),
                                          [&filter](const Option *opt) { return !filter(opt); }),
                           std::end(options));
         }
@@ -5201,16 +5108,16 @@ class App {
 
     /// Get an option by name (noexcept non-const version)
     Option *get_option_no_throw(std::string option_name) noexcept {
-        for(Option_p &opt : options_) {
-            if(opt->check_name(option_name)) {
+        for (Option_p &opt : options_) {
+            if (opt->check_name(option_name)) {
                 return opt.get();
             }
         }
-        for(auto &subc : subcommands_) {
+        for (auto &subc : subcommands_) {
             // also check down into nameless subcommands
-            if(subc->get_name().empty()) {
+            if (subc->get_name().empty()) {
                 auto opt = subc->get_option_no_throw(option_name);
-                if(opt != nullptr) {
+                if (opt != nullptr) {
                     return opt;
                 }
             }
@@ -5220,16 +5127,16 @@ class App {
 
     /// Get an option by name (noexcept const version)
     const Option *get_option_no_throw(std::string option_name) const noexcept {
-        for(const Option_p &opt : options_) {
-            if(opt->check_name(option_name)) {
+        for (const Option_p &opt : options_) {
+            if (opt->check_name(option_name)) {
                 return opt.get();
             }
         }
-        for(const auto &subc : subcommands_) {
+        for (const auto &subc : subcommands_) {
             // also check down into nameless subcommands
-            if(subc->get_name().empty()) {
+            if (subc->get_name().empty()) {
                 auto opt = subc->get_option_no_throw(option_name);
-                if(opt != nullptr) {
+                if (opt != nullptr) {
                     return opt;
                 }
             }
@@ -5240,7 +5147,7 @@ class App {
     /// Get an option by name
     const Option *get_option(std::string option_name) const {
         auto opt = get_option_no_throw(option_name);
-        if(opt == nullptr) {
+        if (opt == nullptr) {
             throw OptionNotFound(option_name);
         }
         return opt;
@@ -5249,7 +5156,7 @@ class App {
     /// Get an option by name (non-const version)
     Option *get_option(std::string option_name) {
         auto opt = get_option_no_throw(option_name);
-        if(opt == nullptr) {
+        if (opt == nullptr) {
             throw OptionNotFound(option_name);
         }
         return opt;
@@ -5350,11 +5257,11 @@ class App {
     /// Check the name, case insensitive and underscore insensitive if set
     bool check_name(std::string name_to_check) const {
         std::string local_name = name_;
-        if(ignore_underscore_) {
+        if (ignore_underscore_) {
             local_name = detail::remove_underscore(name_);
             name_to_check = detail::remove_underscore(name_to_check);
         }
-        if(ignore_case_) {
+        if (ignore_case_) {
             local_name = detail::to_lower(name_);
             name_to_check = detail::to_lower(name_to_check);
         }
@@ -5366,9 +5273,9 @@ class App {
     std::vector<std::string> get_groups() const {
         std::vector<std::string> groups;
 
-        for(const Option_p &opt : options_) {
+        for (const Option_p &opt : options_) {
             // Add group if it is not already in there
-            if(std::find(groups.begin(), groups.end(), opt->get_group()) == groups.end()) {
+            if (std::find(groups.begin(), groups.end(), opt->get_group()) == groups.end()) {
                 groups.push_back(opt->get_group());
             }
         }
@@ -5382,15 +5289,15 @@ class App {
     /// This returns the missing options from the current subcommand
     std::vector<std::string> remaining(bool recurse = false) const {
         std::vector<std::string> miss_list;
-        for(const std::pair<detail::Classifier, std::string> &miss : missing_) {
+        for (const std::pair<detail::Classifier, std::string> &miss : missing_) {
             miss_list.push_back(std::get<1>(miss));
         }
         // Get from a subcommand that may allow extras
-        if(recurse) {
-            if(!allow_extras_) {
-                for(const auto &sub : subcommands_) {
-                    if(sub->name_.empty() && !sub->missing_.empty()) {
-                        for(const std::pair<detail::Classifier, std::string> &miss : sub->missing_) {
+        if (recurse) {
+            if (!allow_extras_) {
+                for (const auto &sub : subcommands_) {
+                    if (sub->name_.empty() && !sub->missing_.empty()) {
+                        for (const std::pair<detail::Classifier, std::string> &miss : sub->missing_) {
                             miss_list.push_back(std::get<1>(miss));
                         }
                     }
@@ -5398,7 +5305,7 @@ class App {
             }
             // Recurse into subcommands
 
-            for(const App *sub : parsed_subcommands_) {
+            for (const App *sub : parsed_subcommands_) {
                 std::vector<std::string> output = sub->remaining(recurse);
                 std::copy(std::begin(output), std::end(output), std::back_inserter(miss_list));
             }
@@ -5420,8 +5327,8 @@ class App {
                 return val.first != detail::Classifier::POSITIONAL_MARK;
             }));
 
-        if(recurse) {
-            for(const App_p &sub : subcommands_) {
+        if (recurse) {
+            for (const App_p &sub : subcommands_) {
                 remaining_options += sub->remaining_size(recurse);
             }
         }
@@ -5430,7 +5337,7 @@ class App {
 
     ///@}
 
-  protected:
+   protected:
     /// Check the options to make sure there are no conflicts.
     ///
     /// Currently checks to see if multiple positionals exist with -1 args and checks if the min and max options are
@@ -5439,24 +5346,22 @@ class App {
         auto pcount = std::count_if(std::begin(options_), std::end(options_), [](const Option_p &opt) {
             return opt->get_items_expected() < 0 && opt->get_positional();
         });
-        if(pcount > 1)
-            throw InvalidError(name_);
+        if (pcount > 1) throw InvalidError(name_);
 
         size_t nameless_subs{0};
-        for(const App_p &app : subcommands_) {
+        for (const App_p &app : subcommands_) {
             app->_validate();
-            if(app->get_name().empty())
-                ++nameless_subs;
+            if (app->get_name().empty()) ++nameless_subs;
         }
 
-        if(require_option_min_ > 0) {
-            if(require_option_max_ > 0) {
-                if(require_option_max_ < require_option_min_) {
+        if (require_option_min_ > 0) {
+            if (require_option_max_ > 0) {
+                if (require_option_max_ < require_option_min_) {
                     throw(InvalidError("Required min options greater than required max options",
                                        ExitCodes::InvalidError));
                 }
             }
-            if(require_option_min_ > (options_.size() + nameless_subs)) {
+            if (require_option_min_ > (options_.size() + nameless_subs)) {
                 throw(InvalidError("Required min options greater than number of available options",
                                    ExitCodes::InvalidError));
             }
@@ -5467,18 +5372,18 @@ class App {
     /// set the correct fallthrough and prefix for nameless subcommands and manage the automatic enable or disable
     /// makes sure parent is set correctly
     void _configure() {
-        if(disabled_by_default_) {
+        if (disabled_by_default_) {
             disabled_ = true;
         }
-        if(enabled_by_default_) {
+        if (enabled_by_default_) {
             disabled_ = false;
         }
-        for(const App_p &app : subcommands_) {
-            if(app->has_automatic_name_) {
+        for (const App_p &app : subcommands_) {
+            if (app->has_automatic_name_) {
                 app->name_.clear();
             }
-            if(app->name_.empty()) {
-                app->fallthrough_ = false; // make sure fallthrough_ is false to prevent infinite loop
+            if (app->name_.empty()) {
+                app->fallthrough_ = false;  // make sure fallthrough_ is false to prevent infinite loop
                 app->prefix_command_ = false;
             }
             // make sure the parent is set to be this object in preparation for parse
@@ -5490,19 +5395,18 @@ class App {
     void run_callback() {
         pre_callback();
         // run the callbacks for the received subcommands
-        for(App *subc : get_subcommands()) {
-            if(!subc->immediate_callback_)
-                subc->run_callback();
+        for (App *subc : get_subcommands()) {
+            if (!subc->immediate_callback_) subc->run_callback();
         }
         // now run callbacks for option_groups
-        for(auto &subc : subcommands_) {
-            if(!subc->immediate_callback_ && subc->name_.empty() && subc->count_all() > 0) {
+        for (auto &subc : subcommands_) {
+            if (!subc->immediate_callback_ && subc->name_.empty() && subc->count_all() > 0) {
                 subc->run_callback();
             }
         }
         // finally run the main callback
-        if(callback_ && (parsed_ > 0)) {
-            if(!name_.empty() || count_all() > 0) {
+        if (callback_ && (parsed_ > 0)) {
+            if (!name_.empty() || count_all() > 0) {
                 callback_();
             }
         }
@@ -5511,11 +5415,11 @@ class App {
     /// Check to see if a subcommand is valid. Give up immediately if subcommand max has been reached.
     bool _valid_subcommand(const std::string &current, bool ignore_used = true) const {
         // Don't match if max has been reached - but still check parents
-        if(require_subcommand_max_ != 0 && parsed_subcommands_.size() >= require_subcommand_max_) {
+        if (require_subcommand_max_ != 0 && parsed_subcommands_.size() >= require_subcommand_max_) {
             return parent_ != nullptr && parent_->_valid_subcommand(current, ignore_used);
         }
         auto com = _find_subcommand(current, true, ignore_used);
-        if(com != nullptr) {
+        if (com != nullptr) {
             return true;
         }
         // Check parent if exists, else return false
@@ -5526,18 +5430,13 @@ class App {
     detail::Classifier _recognize(const std::string &current, bool ignore_used_subcommands = true) const {
         std::string dummy1, dummy2;
 
-        if(current == "--")
-            return detail::Classifier::POSITIONAL_MARK;
-        if(_valid_subcommand(current, ignore_used_subcommands))
-            return detail::Classifier::SUBCOMMAND;
-        if(detail::split_long(current, dummy1, dummy2))
-            return detail::Classifier::LONG;
-        if(detail::split_short(current, dummy1, dummy2))
-            return detail::Classifier::SHORT;
-        if((allow_windows_style_options_) && (detail::split_windows_style(current, dummy1, dummy2)))
+        if (current == "--") return detail::Classifier::POSITIONAL_MARK;
+        if (_valid_subcommand(current, ignore_used_subcommands)) return detail::Classifier::SUBCOMMAND;
+        if (detail::split_long(current, dummy1, dummy2)) return detail::Classifier::LONG;
+        if (detail::split_short(current, dummy1, dummy2)) return detail::Classifier::SHORT;
+        if ((allow_windows_style_options_) && (detail::split_windows_style(current, dummy1, dummy2)))
             return detail::Classifier::WINDOWS;
-        if((current == "++") && !name_.empty() && parent_ != nullptr)
-            return detail::Classifier::SUBCOMMAND_TERMINATOR;
+        if ((current == "++") && !name_.empty() && parent_ != nullptr) return detail::Classifier::SUBCOMMAND_TERMINATOR;
         return detail::Classifier::NONE;
     }
 
@@ -5546,18 +5445,17 @@ class App {
     /// Read and process an ini file (main app only)
     void _process_ini() {
         // Process an INI file
-        if(config_ptr_ != nullptr) {
-            if(*config_ptr_) {
+        if (config_ptr_ != nullptr) {
+            if (*config_ptr_) {
                 config_ptr_->run_callback();
                 config_required_ = true;
             }
-            if(!config_name_.empty()) {
+            if (!config_name_.empty()) {
                 try {
                     std::vector<ConfigItem> values = config_formatter_->from_file(config_name_);
                     _parse_config(values);
-                } catch(const FileError &) {
-                    if(config_required_)
-                        throw;
+                } catch (const FileError &) {
+                    if (config_required_) throw;
                 }
             }
         }
@@ -5565,58 +5463,55 @@ class App {
 
     /// Get envname options if not yet passed. Runs on *all* subcommands.
     void _process_env() {
-        for(const Option_p &opt : options_) {
-            if(opt->count() == 0 && !opt->envname_.empty()) {
+        for (const Option_p &opt : options_) {
+            if (opt->count() == 0 && !opt->envname_.empty()) {
                 char *buffer = nullptr;
                 std::string ename_string;
 
 #ifdef _MSC_VER
                 // Windows version
                 size_t sz = 0;
-                if(_dupenv_s(&buffer, &sz, opt->envname_.c_str()) == 0 && buffer != nullptr) {
+                if (_dupenv_s(&buffer, &sz, opt->envname_.c_str()) == 0 && buffer != nullptr) {
                     ename_string = std::string(buffer);
                     free(buffer);
                 }
 #else
                 // This also works on Windows, but gives a warning
                 buffer = std::getenv(opt->envname_.c_str());
-                if(buffer != nullptr)
-                    ename_string = std::string(buffer);
+                if (buffer != nullptr) ename_string = std::string(buffer);
 #endif
 
-                if(!ename_string.empty()) {
+                if (!ename_string.empty()) {
                     opt->add_result(ename_string);
                 }
             }
         }
 
-        for(App_p &sub : subcommands_) {
-            if(sub->get_name().empty() || !sub->immediate_callback_)
-                sub->_process_env();
+        for (App_p &sub : subcommands_) {
+            if (sub->get_name().empty() || !sub->immediate_callback_) sub->_process_env();
         }
     }
 
     /// Process callbacks. Runs on *all* subcommands.
     void _process_callbacks() {
-
-        for(App_p &sub : subcommands_) {
+        for (App_p &sub : subcommands_) {
             // process the priority option_groups first
-            if(sub->get_name().empty() && sub->immediate_callback_) {
-                if(sub->count_all() > 0) {
+            if (sub->get_name().empty() && sub->immediate_callback_) {
+                if (sub->count_all() > 0) {
                     sub->_process_callbacks();
                     sub->run_callback();
                 }
             }
         }
 
-        for(const Option_p &opt : options_) {
-            if(opt->count() > 0 && !opt->get_callback_run()) {
+        for (const Option_p &opt : options_) {
+            if (opt->count() > 0 && !opt->get_callback_run()) {
                 opt->run_callback();
             }
         }
 
-        for(App_p &sub : subcommands_) {
-            if(!sub->immediate_callback_) {
+        for (App_p &sub : subcommands_) {
+            if (!sub->immediate_callback_) {
                 sub->_process_callbacks();
             }
         }
@@ -5629,20 +5524,17 @@ class App {
         const Option *help_ptr = get_help_ptr();
         const Option *help_all_ptr = get_help_all_ptr();
 
-        if(help_ptr != nullptr && help_ptr->count() > 0)
-            trigger_help = true;
-        if(help_all_ptr != nullptr && help_all_ptr->count() > 0)
-            trigger_all_help = true;
+        if (help_ptr != nullptr && help_ptr->count() > 0) trigger_help = true;
+        if (help_all_ptr != nullptr && help_all_ptr->count() > 0) trigger_all_help = true;
 
         // If there were parsed subcommands, call those. First subcommand wins if there are multiple ones.
-        if(!parsed_subcommands_.empty()) {
-            for(const App *sub : parsed_subcommands_)
-                sub->_process_help_flags(trigger_help, trigger_all_help);
+        if (!parsed_subcommands_.empty()) {
+            for (const App *sub : parsed_subcommands_) sub->_process_help_flags(trigger_help, trigger_all_help);
 
             // Only the final subcommand should call for help. All help wins over help.
-        } else if(trigger_all_help) {
+        } else if (trigger_all_help) {
             throw CallForAllHelp();
-        } else if(trigger_help) {
+        } else if (trigger_help) {
             throw CallForHelp();
         }
     }
@@ -5652,54 +5544,51 @@ class App {
         // check excludes
         bool excluded{false};
         std::string excluder;
-        for(auto &opt : exclude_options_) {
-            if(opt->count() > 0) {
+        for (auto &opt : exclude_options_) {
+            if (opt->count() > 0) {
                 excluded = true;
                 excluder = opt->get_name();
             }
         }
-        for(auto &subc : exclude_subcommands_) {
-            if(subc->count_all() > 0) {
+        for (auto &subc : exclude_subcommands_) {
+            if (subc->count_all() > 0) {
                 excluded = true;
                 excluder = subc->get_display_name();
             }
         }
-        if(excluded) {
-            if(count_all() > 0) {
+        if (excluded) {
+            if (count_all() > 0) {
                 throw ExcludesError(get_display_name(), excluder);
             }
             // if we are excluded but didn't receive anything, just return
             return;
         }
         size_t used_options = 0;
-        for(const Option_p &opt : options_) {
-
-            if(opt->count() != 0) {
+        for (const Option_p &opt : options_) {
+            if (opt->count() != 0) {
                 ++used_options;
             }
             // Required or partially filled
-            if(opt->get_required() || opt->count() != 0) {
+            if (opt->get_required() || opt->count() != 0) {
                 // Make sure enough -N arguments parsed (+N is already handled in parsing function)
-                if(opt->get_items_expected() < 0 && opt->count() < static_cast<size_t>(-opt->get_items_expected()))
+                if (opt->get_items_expected() < 0 && opt->count() < static_cast<size_t>(-opt->get_items_expected()))
                     throw ArgumentMismatch::AtLeast(opt->get_name(), -opt->get_items_expected());
 
                 // Required but empty
-                if(opt->get_required() && opt->count() == 0)
-                    throw RequiredError(opt->get_name());
+                if (opt->get_required() && opt->count() == 0) throw RequiredError(opt->get_name());
             }
             // Requires
-            for(const Option *opt_req : opt->needs_)
-                if(opt->count() > 0 && opt_req->count() == 0)
+            for (const Option *opt_req : opt->needs_)
+                if (opt->count() > 0 && opt_req->count() == 0)
                     throw RequiresError(opt->get_name(), opt_req->get_name());
             // Excludes
-            for(const Option *opt_ex : opt->excludes_)
-                if(opt->count() > 0 && opt_ex->count() != 0)
-                    throw ExcludesError(opt->get_name(), opt_ex->get_name());
+            for (const Option *opt_ex : opt->excludes_)
+                if (opt->count() > 0 && opt_ex->count() != 0) throw ExcludesError(opt->get_name(), opt_ex->get_name());
         }
         // check for the required number of subcommands
-        if(require_subcommand_min_ > 0) {
+        if (require_subcommand_min_ > 0) {
             auto selected_subcommands = get_subcommands();
-            if(require_subcommand_min_ > selected_subcommands.size())
+            if (require_subcommand_min_ > selected_subcommands.size())
                 throw RequiredError::Subcommand(require_subcommand_min_);
         }
 
@@ -5707,49 +5596,47 @@ class App {
 
         // run this loop to check how many unnamed subcommands were actually used since they are considered options from
         // the perspective of an App
-        for(App_p &sub : subcommands_) {
-            if(sub->disabled_)
-                continue;
-            if(sub->name_.empty() && sub->count_all() > 0) {
+        for (App_p &sub : subcommands_) {
+            if (sub->disabled_) continue;
+            if (sub->name_.empty() && sub->count_all() > 0) {
                 ++used_options;
             }
         }
 
-        if(require_option_min_ > used_options || (require_option_max_ > 0 && require_option_max_ < used_options)) {
+        if (require_option_min_ > used_options || (require_option_max_ > 0 && require_option_max_ < used_options)) {
             auto option_list = detail::join(options_, [](const Option_p &ptr) { return ptr->get_name(false, true); });
-            if(option_list.compare(0, 10, "-h,--help,") == 0) {
+            if (option_list.compare(0, 10, "-h,--help,") == 0) {
                 option_list.erase(0, 10);
             }
             auto subc_list = get_subcommands([](App *app) { return ((app->get_name().empty()) && (!app->disabled_)); });
-            if(!subc_list.empty()) {
+            if (!subc_list.empty()) {
                 option_list += "," + detail::join(subc_list, [](const App *app) { return app->get_display_name(); });
             }
             throw RequiredError::Option(require_option_min_, require_option_max_, used_options, option_list);
         }
 
         // now process the requirements for subcommands if needed
-        for(App_p &sub : subcommands_) {
-            if(sub->disabled_)
-                continue;
-            if(sub->name_.empty() && sub->required_ == false) {
-                if(sub->count_all() == 0) {
-                    if(require_option_min_ > 0 && require_option_min_ <= used_options) {
+        for (App_p &sub : subcommands_) {
+            if (sub->disabled_) continue;
+            if (sub->name_.empty() && sub->required_ == false) {
+                if (sub->count_all() == 0) {
+                    if (require_option_min_ > 0 && require_option_min_ <= used_options) {
                         continue;
                         // if we have met the requirement and there is nothing in this option group skip checking
                         // requirements
                     }
-                    if(require_option_max_ > 0 && used_options >= require_option_min_) {
+                    if (require_option_max_ > 0 && used_options >= require_option_min_) {
                         continue;
                         // if we have met the requirement and there is nothing in this option group skip checking
                         // requirements
                     }
                 }
             }
-            if(sub->count() > 0 || sub->name_.empty()) {
+            if (sub->count() > 0 || sub->name_.empty()) {
                 sub->_process_requirements();
             }
 
-            if(sub->required_ && sub->count_all() == 0) {
+            if (sub->required_ && sub->count_all() == 0) {
                 throw(CLI::RequiredError(sub->get_display_name()));
             }
         }
@@ -5766,42 +5653,39 @@ class App {
 
     /// Throw an error if anything is left over and should not be.
     void _process_extras() {
-        if(!(allow_extras_ || prefix_command_)) {
+        if (!(allow_extras_ || prefix_command_)) {
             size_t num_left_over = remaining_size();
-            if(num_left_over > 0) {
+            if (num_left_over > 0) {
                 throw ExtrasError(remaining(false));
             }
         }
 
-        for(App_p &sub : subcommands_) {
-            if(sub->count() > 0)
-                sub->_process_extras();
+        for (App_p &sub : subcommands_) {
+            if (sub->count() > 0) sub->_process_extras();
         }
     }
 
     /// Throw an error if anything is left over and should not be.
     /// Modifies the args to fill in the missing items before throwing.
     void _process_extras(std::vector<std::string> &args) {
-        if(!(allow_extras_ || prefix_command_)) {
+        if (!(allow_extras_ || prefix_command_)) {
             size_t num_left_over = remaining_size();
-            if(num_left_over > 0) {
+            if (num_left_over > 0) {
                 args = remaining(false);
                 throw ExtrasError(args);
             }
         }
 
-        for(App_p &sub : subcommands_) {
-            if(sub->count() > 0)
-                sub->_process_extras(args);
+        for (App_p &sub : subcommands_) {
+            if (sub->count() > 0) sub->_process_extras(args);
         }
     }
 
     /// Internal function to recursively increment the parsed counter on the current app as well unnamed subcommands
     void increment_parsed() {
         ++parsed_;
-        for(App_p &sub : subcommands_) {
-            if(sub->get_name().empty())
-                sub->increment_parsed();
+        for (App_p &sub : subcommands_) {
+            if (sub->get_name().empty()) sub->increment_parsed();
         }
     }
     /// Internal parse function
@@ -5810,13 +5694,13 @@ class App {
         _trigger_pre_parse(args.size());
         bool positional_only = false;
 
-        while(!args.empty()) {
-            if(!_parse_single(args, positional_only)) {
+        while (!args.empty()) {
+            if (!_parse_single(args, positional_only)) {
                 break;
             }
         }
 
-        if(parent_ == nullptr) {
+        if (parent_ == nullptr) {
             _process();
 
             // Throw error if any items are left over (depending on settings)
@@ -5824,7 +5708,7 @@ class App {
 
             // Convert missing (pairs) to extras (string only) ready for processing in another app
             args = remaining_for_passthrough(false);
-        } else if(immediate_callback_) {
+        } else if (immediate_callback_) {
             _process_env();
             _process_callbacks();
             _process_help_flags();
@@ -5841,7 +5725,7 @@ class App {
         _trigger_pre_parse(args.size());
         bool positional_only = false;
 
-        while(!args.empty()) {
+        while (!args.empty()) {
             _parse_single(args, positional_only);
         }
         _process();
@@ -5855,38 +5739,36 @@ class App {
     /// If this has more than one dot.separated.name, go into the subcommand matching it
     /// Returns true if it managed to find the option, if false you'll need to remove the arg manually.
     void _parse_config(std::vector<ConfigItem> &args) {
-        for(ConfigItem item : args) {
-            if(!_parse_single_config(item) && !allow_config_extras_)
-                throw ConfigError::Extras(item.fullname());
+        for (ConfigItem item : args) {
+            if (!_parse_single_config(item) && !allow_config_extras_) throw ConfigError::Extras(item.fullname());
         }
     }
 
     /// Fill in a single config option
     bool _parse_single_config(const ConfigItem &item, size_t level = 0) {
-        if(level < item.parents.size()) {
+        if (level < item.parents.size()) {
             try {
                 auto subcom = get_subcommand(item.parents.at(level));
                 return subcom->_parse_single_config(item, level + 1);
-            } catch(const OptionNotFound &) {
+            } catch (const OptionNotFound &) {
                 return false;
             }
         }
 
         Option *op = get_option_no_throw("--" + item.name);
-        if(op == nullptr) {
+        if (op == nullptr) {
             // If the option was not present
-            if(get_allow_config_extras())
+            if (get_allow_config_extras())
                 // Should we worry about classifying the extras properly?
                 missing_.emplace_back(detail::Classifier::NONE, item.fullname());
             return false;
         }
 
-        if(!op->get_configurable())
-            throw ConfigError::NotConfigurable(item.fullname());
+        if (!op->get_configurable()) throw ConfigError::NotConfigurable(item.fullname());
 
-        if(op->empty()) {
+        if (op->empty()) {
             // Flag parsing
-            if(op->get_type_size() == 0) {
+            if (op->get_type_size() == 0) {
                 auto res = config_formatter_->to_flag(item);
                 res = op->get_flag_value(item.name, res);
 
@@ -5906,42 +5788,42 @@ class App {
     bool _parse_single(std::vector<std::string> &args, bool &positional_only) {
         bool retval = true;
         detail::Classifier classifier = positional_only ? detail::Classifier::NONE : _recognize(args.back());
-        switch(classifier) {
-        case detail::Classifier::POSITIONAL_MARK:
-            args.pop_back();
-            positional_only = true;
-            if((!_has_remaining_positionals()) && (parent_ != nullptr)) {
-                retval = false;
-            } else {
-                _move_to_missing(classifier, "--");
-            }
-            break;
-        case detail::Classifier::SUBCOMMAND_TERMINATOR:
-            // treat this like a positional mark if in the parent app
-            args.pop_back();
-            retval = false;
-            break;
-        case detail::Classifier::SUBCOMMAND:
-            retval = _parse_subcommand(args);
-            break;
-        case detail::Classifier::LONG:
-        case detail::Classifier::SHORT:
-        case detail::Classifier::WINDOWS:
-            // If already parsed a subcommand, don't accept options_
-            _parse_arg(args, classifier);
-            break;
-        case detail::Classifier::NONE:
-            // Probably a positional or something for a parent (sub)command
-            retval = _parse_positional(args);
-            if(retval && positionals_at_end_) {
+        switch (classifier) {
+            case detail::Classifier::POSITIONAL_MARK:
+                args.pop_back();
                 positional_only = true;
-            }
-            break;
+                if ((!_has_remaining_positionals()) && (parent_ != nullptr)) {
+                    retval = false;
+                } else {
+                    _move_to_missing(classifier, "--");
+                }
+                break;
+            case detail::Classifier::SUBCOMMAND_TERMINATOR:
+                // treat this like a positional mark if in the parent app
+                args.pop_back();
+                retval = false;
+                break;
+            case detail::Classifier::SUBCOMMAND:
+                retval = _parse_subcommand(args);
+                break;
+            case detail::Classifier::LONG:
+            case detail::Classifier::SHORT:
+            case detail::Classifier::WINDOWS:
+                // If already parsed a subcommand, don't accept options_
+                _parse_arg(args, classifier);
+                break;
+            case detail::Classifier::NONE:
+                // Probably a positional or something for a parent (sub)command
+                retval = _parse_positional(args);
+                if (retval && positionals_at_end_) {
+                    positional_only = true;
+                }
+                break;
 
-            // LCOV_EXCL_START
-        default:
-            HorribleError("unrecognized classifier (you should not see this!)");
-            // LCOV_EXCL_END
+                // LCOV_EXCL_START
+            default:
+                HorribleError("unrecognized classifier (you should not see this!)");
+                // LCOV_EXCL_END
         }
         return retval;
     }
@@ -5949,9 +5831,9 @@ class App {
     /// Count the required remaining positional arguments
     size_t _count_remaining_positionals(bool required_only = false) const {
         size_t retval = 0;
-        for(const Option_p &opt : options_)
-            if(opt->get_positional() && (!required_only || opt->get_required()) && opt->get_items_expected() > 0 &&
-               static_cast<int>(opt->count()) < opt->get_items_expected())
+        for (const Option_p &opt : options_)
+            if (opt->get_positional() && (!required_only || opt->get_required()) && opt->get_items_expected() > 0 &&
+                static_cast<int>(opt->count()) < opt->get_items_expected())
                 retval = static_cast<size_t>(opt->get_items_expected()) - opt->count();
 
         return retval;
@@ -5959,9 +5841,9 @@ class App {
 
     /// Count the required remaining positional arguments
     bool _has_remaining_positionals() const {
-        for(const Option_p &opt : options_)
-            if(opt->get_positional() &&
-               ((opt->get_items_expected() < 0) || ((static_cast<int>(opt->count()) < opt->get_items_expected()))))
+        for (const Option_p &opt : options_)
+            if (opt->get_positional() &&
+                ((opt->get_items_expected() < 0) || ((static_cast<int>(opt->count()) < opt->get_items_expected()))))
                 return true;
 
         return false;
@@ -5970,16 +5852,15 @@ class App {
     /// Parse a positional, go up the tree to check
     /// Return true if the positional was used false otherwise
     bool _parse_positional(std::vector<std::string> &args) {
-
         const std::string &positional = args.back();
-        for(const Option_p &opt : options_) {
+        for (const Option_p &opt : options_) {
             // Eat options, one by one, until done
-            if(opt->get_positional() &&
-               (static_cast<int>(opt->count()) < opt->get_items_expected() || opt->get_items_expected() < 0)) {
-                if(validate_positionals_) {
+            if (opt->get_positional() &&
+                (static_cast<int>(opt->count()) < opt->get_items_expected() || opt->get_items_expected() < 0)) {
+                if (validate_positionals_) {
                     std::string pos = positional;
                     pos = opt->_validate(pos);
-                    if(!pos.empty()) {
+                    if (!pos.empty()) {
                         continue;
                     }
                 }
@@ -5990,10 +5871,10 @@ class App {
             }
         }
 
-        for(auto &subc : subcommands_) {
-            if((subc->name_.empty()) && (!subc->disabled_)) {
-                if(subc->_parse_positional(args)) {
-                    if(!subc->pre_parse_called_) {
+        for (auto &subc : subcommands_) {
+            if ((subc->name_.empty()) && (!subc->disabled_)) {
+                if (subc->_parse_positional(args)) {
+                    if (!subc->pre_parse_called_) {
                         subc->_trigger_pre_parse(args.size());
                     }
                     return true;
@@ -6001,12 +5882,11 @@ class App {
             }
         }
         // let the parent deal with it if possible
-        if(parent_ != nullptr && fallthrough_)
-            return _get_fallthrough_parent()->_parse_positional(args);
+        if (parent_ != nullptr && fallthrough_) return _get_fallthrough_parent()->_parse_positional(args);
 
         /// Try to find a local subcommand that is repeated
         auto com = _find_subcommand(args.back(), true, false);
-        if(com != nullptr && (require_subcommand_max_ == 0 || require_subcommand_max_ > parsed_subcommands_.size())) {
+        if (com != nullptr && (require_subcommand_max_ == 0 || require_subcommand_max_ > parsed_subcommands_.size())) {
             args.pop_back();
             com->_parse(args);
             return true;
@@ -6015,23 +5895,23 @@ class App {
         /// subcommand in a broader way, if one exists let the parent deal with it
         auto parent_app = (parent_ != nullptr) ? _get_fallthrough_parent() : this;
         com = parent_app->_find_subcommand(args.back(), true, false);
-        if(com != nullptr && (com->parent_->require_subcommand_max_ == 0 ||
-                              com->parent_->require_subcommand_max_ > com->parent_->parsed_subcommands_.size())) {
+        if (com != nullptr && (com->parent_->require_subcommand_max_ == 0 ||
+                               com->parent_->require_subcommand_max_ > com->parent_->parsed_subcommands_.size())) {
             return false;
         }
 
-        if(positionals_at_end_) {
+        if (positionals_at_end_) {
             throw CLI::ExtrasError(args);
         }
         /// If this is an option group don't deal with it
-        if(parent_ != nullptr && name_.empty()) {
+        if (parent_ != nullptr && name_.empty()) {
             return false;
         }
         /// We are out of other options this goes to missing
         _move_to_missing(detail::Classifier::NONE, positional);
         args.pop_back();
-        if(prefix_command_) {
-            while(!args.empty()) {
+        if (prefix_command_) {
+            while (!args.empty()) {
                 _move_to_missing(detail::Classifier::NONE, args.back());
                 args.pop_back();
             }
@@ -6043,17 +5923,15 @@ class App {
     /// Locate a subcommand by name with two conditions, should disabled subcommands be ignored, and should used
     /// subcommands be ignored
     App *_find_subcommand(const std::string &subc_name, bool ignore_disabled, bool ignore_used) const noexcept {
-        for(const App_p &com : subcommands_) {
-            if(com->disabled_ && ignore_disabled)
-                continue;
-            if(com->get_name().empty()) {
+        for (const App_p &com : subcommands_) {
+            if (com->disabled_ && ignore_disabled) continue;
+            if (com->get_name().empty()) {
                 auto subc = com->_find_subcommand(subc_name, ignore_disabled, ignore_used);
-                if(subc != nullptr) {
+                if (subc != nullptr) {
                     return subc;
                 }
-            } else if(com->check_name(subc_name)) {
-                if((!*com) || !ignore_used)
-                    return com.get();
+            } else if (com->check_name(subc_name)) {
+                if ((!*com) || !ignore_used) return com.get();
             }
         }
         return nullptr;
@@ -6064,17 +5942,17 @@ class App {
     /// Unlike the others, this one will always allow fallthrough
     /// return true if the subcommand was processed false otherwise
     bool _parse_subcommand(std::vector<std::string> &args) {
-        if(_count_remaining_positionals(/* required */ true) > 0) {
+        if (_count_remaining_positionals(/* required */ true) > 0) {
             _parse_positional(args);
             return true;
         }
         auto com = _find_subcommand(args.back(), true, true);
-        if(com != nullptr) {
+        if (com != nullptr) {
             args.pop_back();
             parsed_subcommands_.push_back(com);
             com->_parse(args);
             auto parent_app = com->parent_;
-            while(parent_app != this) {
+            while (parent_app != this) {
                 parent_app->_trigger_pre_parse(args.size());
                 parent_app->parsed_subcommands_.push_back(com);
                 parent_app = parent_app->parent_;
@@ -6082,57 +5960,53 @@ class App {
             return true;
         }
 
-        if(parent_ == nullptr)
-            throw HorribleError("Subcommand " + args.back() + " missing");
+        if (parent_ == nullptr) throw HorribleError("Subcommand " + args.back() + " missing");
         return false;
     }
 
     /// Parse a short (false) or long (true) argument, must be at the top of the list
     /// return true if the argument was processed or false if nothing was done
     bool _parse_arg(std::vector<std::string> &args, detail::Classifier current_type) {
-
         std::string current = args.back();
 
         std::string arg_name;
         std::string value;
         std::string rest;
 
-        switch(current_type) {
-        case detail::Classifier::LONG:
-            if(!detail::split_long(current, arg_name, value))
-                throw HorribleError("Long parsed but missing (you should not see this):" + args.back());
-            break;
-        case detail::Classifier::SHORT:
-            if(!detail::split_short(current, arg_name, rest))
-                throw HorribleError("Short parsed but missing! You should not see this");
-            break;
-        case detail::Classifier::WINDOWS:
-            if(!detail::split_windows_style(current, arg_name, value))
-                throw HorribleError("windows option parsed but missing! You should not see this");
-            break;
-        case detail::Classifier::SUBCOMMAND:
-        case detail::Classifier::POSITIONAL_MARK:
-        case detail::Classifier::NONE:
-        default:
-            throw HorribleError("parsing got called with invalid option! You should not see this");
+        switch (current_type) {
+            case detail::Classifier::LONG:
+                if (!detail::split_long(current, arg_name, value))
+                    throw HorribleError("Long parsed but missing (you should not see this):" + args.back());
+                break;
+            case detail::Classifier::SHORT:
+                if (!detail::split_short(current, arg_name, rest))
+                    throw HorribleError("Short parsed but missing! You should not see this");
+                break;
+            case detail::Classifier::WINDOWS:
+                if (!detail::split_windows_style(current, arg_name, value))
+                    throw HorribleError("windows option parsed but missing! You should not see this");
+                break;
+            case detail::Classifier::SUBCOMMAND:
+            case detail::Classifier::POSITIONAL_MARK:
+            case detail::Classifier::NONE:
+            default:
+                throw HorribleError("parsing got called with invalid option! You should not see this");
         }
 
         auto op_ptr =
             std::find_if(std::begin(options_), std::end(options_), [arg_name, current_type](const Option_p &opt) {
-                if(current_type == detail::Classifier::LONG)
-                    return opt->check_lname(arg_name);
-                if(current_type == detail::Classifier::SHORT)
-                    return opt->check_sname(arg_name);
+                if (current_type == detail::Classifier::LONG) return opt->check_lname(arg_name);
+                if (current_type == detail::Classifier::SHORT) return opt->check_sname(arg_name);
                 // this will only get called for detail::Classifier::WINDOWS
                 return opt->check_lname(arg_name) || opt->check_sname(arg_name);
             });
 
         // Option not found
-        if(op_ptr == std::end(options_)) {
-            for(auto &subc : subcommands_) {
-                if(subc->name_.empty() && !subc->disabled_) {
-                    if(subc->_parse_arg(args, current_type)) {
-                        if(!subc->pre_parse_called_) {
+        if (op_ptr == std::end(options_)) {
+            for (auto &subc : subcommands_) {
+                if (subc->name_.empty() && !subc->disabled_) {
+                    if (subc->_parse_arg(args, current_type)) {
+                        if (!subc->pre_parse_called_) {
                             subc->_trigger_pre_parse(args.size());
                         }
                         return true;
@@ -6140,10 +6014,9 @@ class App {
                 }
             }
             // If a subcommand, try the master command
-            if(parent_ != nullptr && fallthrough_)
-                return _get_fallthrough_parent()->_parse_arg(args, current_type);
+            if (parent_ != nullptr && fallthrough_) return _get_fallthrough_parent()->_parse_arg(args, current_type);
             // don't capture missing if this is a nameless subcommand
-            if(parent_ != nullptr && name_.empty()) {
+            if (parent_ != nullptr && name_.empty()) {
                 return false;
             }
             // Otherwise, add to missing
@@ -6163,40 +6036,37 @@ class App {
         int collected = 0;
         int result_count = 0;
         // deal with flag like things
-        if(num == 0) {
+        if (num == 0) {
             auto res = op->get_flag_value(arg_name, value);
             op->add_result(res);
             parse_order_.push_back(op.get());
         }
         // --this=value
-        else if(!value.empty()) {
+        else if (!value.empty()) {
             op->add_result(value, result_count);
             parse_order_.push_back(op.get());
             collected += result_count;
             // If exact number expected
-            if(num > 0)
-                num = (num >= result_count) ? num - result_count : 0;
+            if (num > 0) num = (num >= result_count) ? num - result_count : 0;
 
             // -Trest
-        } else if(!rest.empty()) {
+        } else if (!rest.empty()) {
             op->add_result(rest, result_count);
             parse_order_.push_back(op.get());
             rest = "";
             collected += result_count;
             // If exact number expected
-            if(num > 0)
-                num = (num >= result_count) ? num - result_count : 0;
+            if (num > 0) num = (num >= result_count) ? num - result_count : 0;
         }
 
         // Unlimited vector parser
-        if(num < 0) {
-            while(!args.empty() && _recognize(args.back(), false) == detail::Classifier::NONE) {
-                if(collected >= -num) {
+        if (num < 0) {
+            while (!args.empty() && _recognize(args.back(), false) == detail::Classifier::NONE) {
+                if (collected >= -num) {
                     // We could break here for allow extras, but we don't
 
                     // If any positionals remain, don't keep eating
-                    if(_count_remaining_positionals() > 0)
-                        break;
+                    if (_count_remaining_positionals() > 0) break;
                 }
                 op->add_result(args.back(), result_count);
                 parse_order_.push_back(op.get());
@@ -6205,11 +6075,10 @@ class App {
             }
 
             // Allow -- to end an unlimited list and "eat" it
-            if(!args.empty() && _recognize(args.back()) == detail::Classifier::POSITIONAL_MARK)
-                args.pop_back();
+            if (!args.empty() && _recognize(args.back()) == detail::Classifier::POSITIONAL_MARK) args.pop_back();
 
         } else {
-            while(num > 0 && !args.empty()) {
+            while (num > 0 && !args.empty()) {
                 std::string current_ = args.back();
                 args.pop_back();
                 op->add_result(current_, result_count);
@@ -6217,12 +6086,12 @@ class App {
                 num -= result_count;
             }
 
-            if(num > 0) {
+            if (num > 0) {
                 throw ArgumentMismatch::TypedAtLeast(op->get_name(), num, op->get_type_name());
             }
         }
 
-        if(!rest.empty()) {
+        if (!rest.empty()) {
             rest = "-" + rest;
             args.push_back(rest);
         }
@@ -6231,13 +6100,13 @@ class App {
 
     /// Trigger the pre_parse callback if needed
     void _trigger_pre_parse(size_t remaining_args) {
-        if(!pre_parse_called_) {
+        if (!pre_parse_called_) {
             pre_parse_called_ = true;
-            if(pre_parse_callback_) {
+            if (pre_parse_callback_) {
                 pre_parse_callback_(remaining_args);
             }
-        } else if(immediate_callback_) {
-            if(!name_.empty()) {
+        } else if (immediate_callback_) {
+            if (!name_.empty()) {
                 auto pcnt = parsed_;
                 auto extras = std::move(missing_);
                 clear();
@@ -6250,11 +6119,11 @@ class App {
 
     /// Get the appropriate parent to fallthrough to which is the first one that has a name or the main app
     App *_get_fallthrough_parent() {
-        if(parent_ == nullptr) {
+        if (parent_ == nullptr) {
             throw(HorribleError("No Valid parent"));
         }
         auto fallthrough_parent = parent_;
-        while((fallthrough_parent->parent_ != nullptr) && (fallthrough_parent->get_name().empty())) {
+        while ((fallthrough_parent->parent_ != nullptr) && (fallthrough_parent->get_name().empty())) {
             fallthrough_parent = fallthrough_parent->parent_;
         }
         return fallthrough_parent;
@@ -6262,13 +6131,13 @@ class App {
 
     /// Helper function to place extra values in the most appropriate position
     void _move_to_missing(detail::Classifier val_type, const std::string &val) {
-        if(allow_extras_ || subcommands_.empty()) {
+        if (allow_extras_ || subcommands_.empty()) {
             missing_.emplace_back(val_type, val);
             return;
         }
         // allow extra arguments to be places in an option group if it is allowed there
-        for(auto &subc : subcommands_) {
-            if(subc->name_.empty() && subc->allow_extras_) {
+        for (auto &subc : subcommands_) {
+            if (subc->name_.empty() && subc->allow_extras_) {
                 subc->missing_.emplace_back(val_type, val);
                 return;
             }
@@ -6277,36 +6146,33 @@ class App {
         missing_.emplace_back(val_type, val);
     }
 
-  public:
+   public:
     /// function that could be used by subclasses of App to shift options around into subcommands
     void _move_option(Option *opt, App *app) {
-        if(opt == nullptr) {
+        if (opt == nullptr) {
             throw OptionNotFound("the option is NULL");
         }
         // verify that the give app is actually a subcommand
         bool found = false;
-        for(auto &subc : subcommands_) {
-            if(app == subc.get()) {
+        for (auto &subc : subcommands_) {
+            if (app == subc.get()) {
                 found = true;
             }
         }
-        if(!found) {
+        if (!found) {
             throw OptionNotFound("The Given app is not a subcommand");
         }
 
-        if((help_ptr_ == opt) || (help_all_ptr_ == opt))
-            throw OptionAlreadyAdded("cannot move help options");
+        if ((help_ptr_ == opt) || (help_all_ptr_ == opt)) throw OptionAlreadyAdded("cannot move help options");
 
-        if(config_ptr_ == opt)
-            throw OptionAlreadyAdded("cannot move config file options");
+        if (config_ptr_ == opt) throw OptionAlreadyAdded("cannot move config file options");
 
         auto iterator =
             std::find_if(std::begin(options_), std::end(options_), [opt](const Option_p &v) { return v.get() == opt; });
-        if(iterator != std::end(options_)) {
+        if (iterator != std::end(options_)) {
             const auto &opt_p = *iterator;
-            if(std::find_if(std::begin(app->options_), std::end(app->options_), [&opt_p](const Option_p &v) {
-                   return (*v == *opt_p);
-               }) == std::end(app->options_)) {
+            if (std::find_if(std::begin(app->options_), std::end(app->options_),
+                             [&opt_p](const Option_p &v) { return (*v == *opt_p); }) == std::end(app->options_)) {
                 // only erase after the insertion was successful
                 app->options_.push_back(std::move(*iterator));
                 options_.erase(iterator);
@@ -6321,7 +6187,7 @@ class App {
 
 /// Extension of App to better manage groups of options
 class Option_group : public App {
-  public:
+   public:
     Option_group(std::string group_description, std::string group_name, App *parent)
         : App(std::move(group_description), "", parent) {
         group(group_name);
@@ -6330,7 +6196,7 @@ class Option_group : public App {
     using App::add_option;
     /// Add an existing option to the Option_group
     Option *add_option(Option *opt) {
-        if(get_parent() == nullptr) {
+        if (get_parent() == nullptr) {
             throw OptionNotFound("Unable to locate the specified option");
         }
         get_parent()->_move_option(opt, this);
@@ -6339,7 +6205,8 @@ class Option_group : public App {
     /// Add an existing option to the Option_group
     void add_options(Option *opt) { add_option(opt); }
     /// Add a bunch of options to the group
-    template <typename... Args> void add_options(Option *opt, Args... args) {
+    template <typename... Args>
+    void add_options(Option *opt, Args... args) {
         add_option(opt);
         add_options(args...);
     }
@@ -6361,13 +6228,13 @@ inline void TriggerOn(App *trigger_app, App *app_to_enable) {
 
 /// Helper function to enable one option group/subcommand when another is used
 inline void TriggerOn(App *trigger_app, std::vector<App *> apps_to_enable) {
-    for(auto &app : apps_to_enable) {
+    for (auto &app : apps_to_enable) {
         app->enabled_by_default(false);
         app->disabled_by_default();
     }
 
     trigger_app->preparse_callback([apps_to_enable](size_t) {
-        for(auto &app : apps_to_enable) {
+        for (auto &app : apps_to_enable) {
             app->disabled(false);
         }
     });
@@ -6382,13 +6249,13 @@ inline void TriggerOff(App *trigger_app, App *app_to_enable) {
 
 /// Helper function to disable one option group/subcommand when another is used
 inline void TriggerOff(App *trigger_app, std::vector<App *> apps_to_enable) {
-    for(auto &app : apps_to_enable) {
+    for (auto &app : apps_to_enable) {
         app->disabled_by_default(false);
         app->enabled_by_default();
     }
 
     trigger_app->preparse_callback([apps_to_enable](size_t) {
-        for(auto &app : apps_to_enable) {
+        for (auto &app : apps_to_enable) {
             app->disabled();
         }
     });
@@ -6402,15 +6269,12 @@ inline std::string simple(const App *app, const Error &e) {
     std::vector<std::string> names;
 
     // Collect names
-    if(app->get_help_ptr() != nullptr)
-        names.push_back(app->get_help_ptr()->get_name());
+    if (app->get_help_ptr() != nullptr) names.push_back(app->get_help_ptr()->get_name());
 
-    if(app->get_help_all_ptr() != nullptr)
-        names.push_back(app->get_help_all_ptr()->get_name());
+    if (app->get_help_all_ptr() != nullptr) names.push_back(app->get_help_all_ptr()->get_name());
 
     // If any names found, suggest those
-    if(!names.empty())
-        header += "Run with " + detail::join(names, " or ") + " for more information.\n";
+    if (!names.empty()) header += "Run with " + detail::join(names, " or ") + " for more information.\n";
 
     return header;
 }
@@ -6422,12 +6286,11 @@ inline std::string help(const App *app, const Error &e) {
     return header;
 }
 
-} // namespace FailureMessage
+}  // namespace FailureMessage
 
 namespace detail {
 /// This class is simply to allow tests access to App's protected functions
 struct AppFriend {
-
     /// Wrap _parse_short, perfectly forward arguments and return
     template <typename... Args>
     static auto parse_arg(App *app, Args &&... args) ->
@@ -6444,57 +6307,54 @@ struct AppFriend {
     /// Wrap the fallthrough parent function to make sure that is working correctly
     static App *get_fallthrough_parent(App *app) { return app->_get_fallthrough_parent(); }
 };
-} // namespace detail
+}  // namespace detail
 
-} // namespace CLI
+}  // namespace CLI
 
 // From CLI/Config.hpp:
 
 namespace CLI {
 
-inline std::string
-ConfigINI::to_config(const App *app, bool default_also, bool write_description, std::string prefix) const {
+inline std::string ConfigINI::to_config(const App *app, bool default_also, bool write_description,
+                                        std::string prefix) const {
     std::stringstream out;
-    for(const Option *opt : app->get_options({})) {
-
+    for (const Option *opt : app->get_options({})) {
         // Only process option with a long-name and configurable
-        if(!opt->get_lnames().empty() && opt->get_configurable()) {
+        if (!opt->get_lnames().empty() && opt->get_configurable()) {
             std::string name = prefix + opt->get_lnames()[0];
             std::string value;
 
             // Non-flags
-            if(opt->get_type_size() != 0) {
-
+            if (opt->get_type_size() != 0) {
                 // If the option was found on command line
-                if(opt->count() > 0)
-                    value = detail::ini_join(opt->results());
+                if (opt->count() > 0) value = detail::ini_join(opt->results());
 
                 // If the option has a default and is requested by optional argument
-                else if(default_also && !opt->get_default_str().empty())
+                else if (default_also && !opt->get_default_str().empty())
                     value = opt->get_default_str();
                 // Flag, one passed
-            } else if(opt->count() == 1) {
+            } else if (opt->count() == 1) {
                 value = "true";
 
                 // Flag, multiple passed
-            } else if(opt->count() > 1) {
+            } else if (opt->count() > 1) {
                 value = std::to_string(opt->count());
 
                 // Flag, not present
-            } else if(opt->count() == 0 && default_also) {
+            } else if (opt->count() == 0 && default_also) {
                 value = "false";
             }
 
-            if(!value.empty()) {
-                if(write_description && opt->has_description()) {
-                    if(static_cast<int>(out.tellp()) != 0) {
+            if (!value.empty()) {
+                if (write_description && opt->has_description()) {
+                    if (static_cast<int>(out.tellp()) != 0) {
                         out << std::endl;
                     }
                     out << "; " << detail::fix_newlines("; ", opt->get_description()) << std::endl;
                 }
 
                 // Don't try to quote anything that is not size 1
-                if(opt->get_items_expected() != 1)
+                if (opt->get_items_expected() != 1)
                     out << name << "=" << value << std::endl;
                 else
                     out << name << "=" << detail::add_quotes_if_needed(value) << std::endl;
@@ -6502,24 +6362,24 @@ ConfigINI::to_config(const App *app, bool default_also, bool write_description, 
         }
     }
 
-    for(const App *subcom : app->get_subcommands({}))
+    for (const App *subcom : app->get_subcommands({}))
         out << to_config(subcom, default_also, write_description, prefix + subcom->get_name() + ".");
 
     return out.str();
 }
 
-} // namespace CLI
+}  // namespace CLI
 
 // From CLI/Formatter.hpp:
 
 namespace CLI {
 
-inline std::string
-Formatter::make_group(std::string group, bool is_positional, std::vector<const Option *> opts) const {
+inline std::string Formatter::make_group(std::string group, bool is_positional,
+                                         std::vector<const Option *> opts) const {
     std::stringstream out;
 
     out << "\n" << group << ":\n";
-    for(const Option *opt : opts) {
+    for (const Option *opt : opts) {
         out << make_option(opt, is_positional);
     }
 
@@ -6530,7 +6390,7 @@ inline std::string Formatter::make_positionals(const App *app) const {
     std::vector<const Option *> opts =
         app->get_options([](const Option *opt) { return !opt->get_group().empty() && opt->get_positional(); });
 
-    if(opts.empty())
+    if (opts.empty())
         return std::string();
     else
         return make_group(get_label("Positionals"), true, opts);
@@ -6541,19 +6401,18 @@ inline std::string Formatter::make_groups(const App *app, AppFormatMode mode) co
     std::vector<std::string> groups = app->get_groups();
 
     // Options
-    for(const std::string &group : groups) {
+    for (const std::string &group : groups) {
         std::vector<const Option *> opts = app->get_options([app, mode, &group](const Option *opt) {
-            return opt->get_group() == group                    // Must be in the right group
-                   && opt->nonpositional()                      // Must not be a positional
-                   && (mode != AppFormatMode::Sub               // If mode is Sub, then
-                       || (app->get_help_ptr() != opt           // Ignore help pointer
-                           && app->get_help_all_ptr() != opt)); // Ignore help all pointer
+            return opt->get_group() == group                     // Must be in the right group
+                   && opt->nonpositional()                       // Must not be a positional
+                   && (mode != AppFormatMode::Sub                // If mode is Sub, then
+                       || (app->get_help_ptr() != opt            // Ignore help pointer
+                           && app->get_help_all_ptr() != opt));  // Ignore help all pointer
         });
-        if(!group.empty() && !opts.empty()) {
+        if (!group.empty() && !opts.empty()) {
             out << make_group(group, false, opts);
 
-            if(group != groups.back())
-                out << "\n";
+            if (group != groups.back()) out << "\n";
         }
     }
 
@@ -6564,23 +6423,23 @@ inline std::string Formatter::make_description(const App *app) const {
     std::string desc = app->get_description();
     auto min_options = app->get_require_option_min();
     auto max_options = app->get_require_option_max();
-    if(app->get_required()) {
+    if (app->get_required()) {
         desc += " REQUIRED ";
     }
-    if((max_options == min_options) && (min_options > 0)) {
-        if(min_options == 1) {
+    if ((max_options == min_options) && (min_options > 0)) {
+        if (min_options == 1) {
             desc += " \n[Exactly 1 of the following options is required]";
         } else {
             desc += " \n[Exactly " + std::to_string(min_options) + "options from the following list are required]";
         }
-    } else if(max_options > 0) {
-        if(min_options > 0) {
+    } else if (max_options > 0) {
+        if (min_options > 0) {
             desc += " \n[Between " + std::to_string(min_options) + " and " + std::to_string(max_options) +
                     " of the follow options are required]";
         } else {
             desc += " \n[At most " + std::to_string(max_options) + " of the following options are allowed]";
         }
-    } else if(min_options > 0) {
+    } else if (min_options > 0) {
         desc += " \n[At least " + std::to_string(min_options) + " of the following options are required]";
     }
     return (!desc.empty()) ? desc + "\n" : std::string{};
@@ -6596,27 +6455,25 @@ inline std::string Formatter::make_usage(const App *app, std::string name) const
     // Print an Options badge if any options exist
     std::vector<const Option *> non_pos_options =
         app->get_options([](const Option *opt) { return opt->nonpositional(); });
-    if(!non_pos_options.empty())
-        out << " [" << get_label("OPTIONS") << "]";
+    if (!non_pos_options.empty()) out << " [" << get_label("OPTIONS") << "]";
 
     // Positionals need to be listed here
     std::vector<const Option *> positionals = app->get_options([](const Option *opt) { return opt->get_positional(); });
 
     // Print out positionals if any are left
-    if(!positionals.empty()) {
+    if (!positionals.empty()) {
         // Convert to help names
         std::vector<std::string> positional_names(positionals.size());
-        std::transform(positionals.begin(), positionals.end(), positional_names.begin(), [this](const Option *opt) {
-            return make_option_usage(opt);
-        });
+        std::transform(positionals.begin(), positionals.end(), positional_names.begin(),
+                       [this](const Option *opt) { return make_option_usage(opt); });
 
         out << " " << detail::join(positional_names, " ");
     }
 
     // Add a marker if subcommands are expected or optional
-    if(!app->get_subcommands(
-               [](const CLI::App *subc) { return ((!subc->get_disabled()) && (!subc->get_name().empty())); })
-            .empty()) {
+    if (!app->get_subcommands(
+                [](const CLI::App *subc) { return ((!subc->get_disabled()) && (!subc->get_name().empty())); })
+             .empty()) {
         out << " " << (app->get_require_subcommand_min() == 0 ? "[" : "")
             << get_label(app->get_require_subcommand_max() < 2 || app->get_require_subcommand_min() > 1 ? "SUBCOMMAND"
                                                                                                         : "SUBCOMMANDS")
@@ -6630,22 +6487,20 @@ inline std::string Formatter::make_usage(const App *app, std::string name) const
 
 inline std::string Formatter::make_footer(const App *app) const {
     std::string footer = app->get_footer();
-    if(!footer.empty())
+    if (!footer.empty())
         return footer + "\n";
     else
         return "";
 }
 
 inline std::string Formatter::make_help(const App *app, std::string name, AppFormatMode mode) const {
-
     // This immediately forwards to the make_expanded method. This is done this way so that subcommands can
     // have overridden formatters
-    if(mode == AppFormatMode::Sub)
-        return make_expanded(app);
+    if (mode == AppFormatMode::Sub) return make_expanded(app);
 
     std::stringstream out;
-    if((app->get_name().empty()) && (app->get_parent() != nullptr)) {
-        if(app->get_group() != "Subcommands") {
+    if ((app->get_name().empty()) && (app->get_parent() != nullptr)) {
+        if (app->get_group() != "Subcommands") {
             out << app->get_group() << ':';
         }
     }
@@ -6667,28 +6522,27 @@ inline std::string Formatter::make_subcommands(const App *app, AppFormatMode mod
 
     // Make a list in definition order of the groups seen
     std::vector<std::string> subcmd_groups_seen;
-    for(const App *com : subcommands) {
-        if(com->get_name().empty()) {
+    for (const App *com : subcommands) {
+        if (com->get_name().empty()) {
             out << make_expanded(com);
             continue;
         }
         std::string group_key = com->get_group();
-        if(!group_key.empty() &&
-           std::find_if(subcmd_groups_seen.begin(), subcmd_groups_seen.end(), [&group_key](std::string a) {
-               return detail::to_lower(a) == detail::to_lower(group_key);
-           }) == subcmd_groups_seen.end())
+        if (!group_key.empty() &&
+            std::find_if(subcmd_groups_seen.begin(), subcmd_groups_seen.end(), [&group_key](std::string a) {
+                return detail::to_lower(a) == detail::to_lower(group_key);
+            }) == subcmd_groups_seen.end())
             subcmd_groups_seen.push_back(group_key);
     }
 
     // For each group, filter out and print subcommands
-    for(const std::string &group : subcmd_groups_seen) {
+    for (const std::string &group : subcmd_groups_seen) {
         out << "\n" << group << ":\n";
         std::vector<const App *> subcommands_group = app->get_subcommands(
             [&group](const App *sub_app) { return detail::to_lower(sub_app->get_group()) == detail::to_lower(group); });
-        for(const App *new_com : subcommands_group) {
-            if(new_com->get_name().empty())
-                continue;
-            if(mode != AppFormatMode::All) {
+        for (const App *new_com : subcommands_group) {
+            if (new_com->get_name().empty()) continue;
+            if (mode != AppFormatMode::All) {
                 out << make_subcommand(new_com);
             } else {
                 out << new_com->help(new_com->get_name(), AppFormatMode::Sub);
@@ -6717,14 +6571,14 @@ inline std::string Formatter::make_expanded(const App *sub) const {
 
     // Drop blank spaces
     std::string tmp = detail::find_and_replace(out.str(), "\n\n", "\n");
-    tmp = tmp.substr(0, tmp.size() - 1); // Remove the final '\n'
+    tmp = tmp.substr(0, tmp.size() - 1);  // Remove the final '\n'
 
     // Indent all but the first line (the name)
     return detail::find_and_replace(tmp, "\n", "\n  ") + "\n";
 }
 
 inline std::string Formatter::make_option_name(const Option *opt, bool is_positional) const {
-    if(is_positional)
+    if (is_positional)
         return opt->get_name(true, false);
     else
         return opt->get_name(false, true);
@@ -6733,29 +6587,21 @@ inline std::string Formatter::make_option_name(const Option *opt, bool is_positi
 inline std::string Formatter::make_option_opts(const Option *opt) const {
     std::stringstream out;
 
-    if(opt->get_type_size() != 0) {
-        if(!opt->get_type_name().empty())
-            out << " " << get_label(opt->get_type_name());
-        if(!opt->get_default_str().empty())
-            out << "=" << opt->get_default_str();
-        if(opt->get_expected() > 1)
-            out << " x " << opt->get_expected();
-        if(opt->get_expected() == -1)
-            out << " ...";
-        if(opt->get_required())
-            out << " " << get_label("REQUIRED");
+    if (opt->get_type_size() != 0) {
+        if (!opt->get_type_name().empty()) out << " " << get_label(opt->get_type_name());
+        if (!opt->get_default_str().empty()) out << "=" << opt->get_default_str();
+        if (opt->get_expected() > 1) out << " x " << opt->get_expected();
+        if (opt->get_expected() == -1) out << " ...";
+        if (opt->get_required()) out << " " << get_label("REQUIRED");
     }
-    if(!opt->get_envname().empty())
-        out << " (" << get_label("Env") << ":" << opt->get_envname() << ")";
-    if(!opt->get_needs().empty()) {
+    if (!opt->get_envname().empty()) out << " (" << get_label("Env") << ":" << opt->get_envname() << ")";
+    if (!opt->get_needs().empty()) {
         out << " " << get_label("Needs") << ":";
-        for(const Option *op : opt->get_needs())
-            out << " " << op->get_name();
+        for (const Option *op : opt->get_needs()) out << " " << op->get_name();
     }
-    if(!opt->get_excludes().empty()) {
+    if (!opt->get_excludes().empty()) {
         out << " " << get_label("Excludes") << ":";
-        for(const Option *op : opt->get_excludes())
-            out << " " << op->get_name();
+        for (const Option *op : opt->get_excludes()) out << " " << op->get_name();
     }
     return out.str();
 }
@@ -6767,12 +6613,11 @@ inline std::string Formatter::make_option_usage(const Option *opt) const {
     std::stringstream out;
     out << make_option_name(opt, true);
 
-    if(opt->get_expected() > 1)
+    if (opt->get_expected() > 1)
         out << "(" << std::to_string(opt->get_expected()) << "x)";
-    else if(opt->get_expected() < 0)
+    else if (opt->get_expected() < 0)
         out << "...";
     return opt->get_required() ? out.str() : "[" + out.str() + "]";
 }
 
-} // namespace CLI
-
+}  // namespace CLI

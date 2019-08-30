@@ -9,21 +9,20 @@
 
 namespace utils {
 
-    class SamFileReader : public FileReader {
-    public:
-        explicit SamFileReader(const std::string &path);
+class SamFileReader : public FileReader {
+   public:
+    explicit SamFileReader(const std::string &path);
 
-        ~SamFileReader() override;
+    ~SamFileReader() override;
 
-        size_t readRecords(size_t numRecords, std::list<SamRecord> *records);
+    size_t readRecords(size_t numRecords, std::list<SamRecord> *records);
 
-    public:
-        std::string header;
+   public:
+    std::string header;
 
-    private:
-        void readHeader();
-    };
-
+   private:
+    void readHeader();
+};
 
 }  // namespace utils
 

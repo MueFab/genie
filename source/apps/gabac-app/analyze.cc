@@ -6,8 +6,7 @@
 #include <iostream>
 
 namespace gabacify {
-void analyze(const std::string &inputFilePath,
-             const std::string &configurationFilePath, size_t blocksize,
+void analyze(const std::string &inputFilePath, const std::string &configurationFilePath, size_t blocksize,
              uint64_t max_val, uint8_t word_size) {
     std::ifstream inputFile;
     std::ofstream configurationFile;
@@ -25,8 +24,7 @@ void analyze(const std::string &inputFilePath,
         istream = &inputFile;
     }
     if (!configurationFilePath.empty()) {
-        configurationFile =
-            std::ofstream(configurationFilePath, std::ios::binary);
+        configurationFile = std::ofstream(configurationFilePath, std::ios::binary);
         if (!configurationFile) {
             GABAC_DIE("Could not open output file");
         }
@@ -35,8 +33,7 @@ void analyze(const std::string &inputFilePath,
         logstream = &nullstream;
     }
 
-    gabac::IOConfiguration ioConf = {istream, ostream, blocksize, logstream,
-                                     gabac::IOConfiguration::LogLevel::TRACE};
+    gabac::IOConfiguration ioConf = {istream, ostream, blocksize, logstream, gabac::IOConfiguration::LogLevel::TRACE};
 
     auto aconf = gabac::getCandidateConfig();
     aconf.wordSize = word_size;
