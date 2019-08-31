@@ -79,7 +79,7 @@ Access_unit::Access_unit(
     }
 
     std::stringstream s;
-    BitWriter bw(s);
+    BitWriter bw(&s);
     write(&bw);
 
     internalBitCounter = bw.getBitsWritten();
@@ -126,10 +126,5 @@ void Access_unit::addBlock(std::unique_ptr<Block> block) {
 
 Access_unit create_quick_access_unit(uint32_t access_unit_id, uint8_t parameter_set_id, uint32_t reads_count, std::vector<std::vector<gabac::DataBlock>> *data) {
     Access_unit au(access_unit_id, parameter_set_id, Data_unit::AU_type::U_TYPE_AU, reads_count, Data_unit::Dataset_type::non_aligned);
-    for(int desc = 0; desc < 18; ++desc) {
-        for(int subseq = 0; subseq < (*data)[desc].size(); ++subseq) {
-            Block b();
-            // TODO: fill in
-        }
-    }
+    return au;
 }

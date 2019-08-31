@@ -87,7 +87,7 @@ private:
     std::vector<uint8_t> context_initialization_value; // : 7;
     std::vector<uint8_t> share_subsym_ctx_flag; // : 1;
 public:
-    Cabac_context_parameters(bool adaptive_mode_flag, uint8_t coding_subsym_size, uint8_t output_symbol_size);
+    Cabac_context_parameters(bool adaptive_mode_flag, uint8_t coding_subsym_size, uint8_t output_symbol_size, bool _share_subsym_ctx_flag);
     Cabac_context_parameters();
     void addContextInitializationValue(uint8_t _context_initialization_value);
     virtual void write(BitWriter *writer) const;
@@ -346,7 +346,7 @@ Parameter_set create_quick_parameter_set(uint8_t _parameter_set_id,
         uint8_t _read_length,
         bool paired_end,
         bool qv_values_present,
-        std::vector<std::vector<gabac::EncodingConfiguration>>& parameters
+        const std::vector<std::vector<gabac::EncodingConfiguration>>& parameters
 );
 
 #endif //GENIE_PART2_FORMAT_PARAMETER_SET_H

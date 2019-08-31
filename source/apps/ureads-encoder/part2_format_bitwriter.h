@@ -6,13 +6,15 @@
 
 class BitWriter {
 private:
-    std::ostream& stream;
-    uint8_t rest;
-    uint8_t restSize;
-    uint64_t bitsWritten;
-    void addToRest(uint64_t value, uint8_t bits);
+    std::ostream* stream;
+    uint64_t m_heldBits;
+    uint8_t m_numHeldBits;
+    uint64_t m_bitsWritten;
+
+    void writeOut(uint8_t byte);
 public:
-    BitWriter(std::ostream& str);
+    explicit BitWriter(std::ostream* str);
+    ~BitWriter();
     void write (uint64_t value, uint8_t bits);
     void flush ();
     uint64_t getBitsWritten();
