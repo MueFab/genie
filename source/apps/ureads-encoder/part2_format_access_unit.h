@@ -52,8 +52,11 @@ private:
 public:
     virtual void write(BitWriter& writer);
     uint32_t getTotalSize() {
-        return block_payload_size + (1+7+3+29)/8;
+        return block_payload_size + 5;
     }
+    Block(uint8_t _descriptor_ID, std::vector<uint8_t>* _payload);
+
+    Block();
 };
 
 class Access_unit : public Data_unit{
