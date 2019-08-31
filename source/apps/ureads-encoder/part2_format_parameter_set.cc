@@ -131,6 +131,27 @@ Cabac_binarization_parameters::Cabac_binarization_parameters(
 
 }
 
+Cabac_context_parameters::Cabac_context_parameters(
+        bool _adaptive_mode_flag,
+        uint8_t _coding_subsym_size,
+        uint8_t _output_symbol_size,
+        bool _share_subsym_ctx_flag
+) : adaptive_mode_flag(_adaptive_mode_flag),
+    num_contexts(0),
+    context_initialization_value(0),
+    share_subsym_ctx_flag(0) {
+    if(_coding_subsym_size < _output_symbol_size) {
+        share_subsym_ctx_flag.push_back(_share_subsym_ctx_flag);
+    }
+}
+Cabac_context_parameters::Cabac_context_parameters() : Cabac_context_parameters(false, 8, 8, false){
+
+}
+void Cabac_context_parameters::addContextInitializationValue(uint8_t _context_initialization_value) {
+    ++num_contexts;
+    share_subsym_ctx_flag.push_back(_context_initialization_value);
+}
+
 void Cabac_context_parameters::write(BitWriter *writer) const {
     writer->write(adaptive_mode_flag, 1);
     writer->write(num_contexts, 16);
@@ -140,6 +161,27 @@ void Cabac_context_parameters::write(BitWriter *writer) const {
     for (auto &i : share_subsym_ctx_flag) {
         writer->write(i, 1);
     }
+}
+
+Cabac_binarization::Cabac_binarization(
+        const Binarization_ID& _binarization_ID,
+        const Cabac_binarization_parameters& _cabac_binarization_parameters
+) : binarization_ID(_binarization_ID),
+    bypass_flag(true),
+    cabac_binarization_parameters(_cabac_binarization_parameters),
+    cabac_context_parameters(0) {
+}
+
+Cabac_binarization::Cabac_binarization() : Cabac_binarization(
+        Binarization_ID::Binary_Coding,
+        Cabac_binarization_parameters(Binarization_ID::Binary_Coding, 0)
+) {
+
+}
+
+void Cabac_binarization::setContextParameters(const Cabac_context_parameters& _cabac_context_parameters){
+    bypass_flag = false;
+    cabac_context_parameters.push_back(_cabac_context_parameters);
 }
 
 void Cabac_binarization::write(BitWriter *writer) const {
@@ -222,7 +264,9 @@ Descriptor_configuration::Descriptor_configuration() : dec_cfg_preset(0),
                                                        encoding_mode_ID(0),
                                                        decoder_configuration(0),
                                                        decoder_configuration_tokentype(0) {
-
+    if(dec_cfg_preset == 0) {
+        encoding_mode_ID.push_back(0);
+    }
 }
 
 void Descriptor_configuration::set_decoder_configuration(const Decoder_configuration_cabac &conf) {
@@ -232,9 +276,11 @@ void Descriptor_configuration::set_decoder_configuration(const Decoder_configura
 }
 
 void Descriptor_configuration::set_decoder_configuration_tokentype(const Decoder_configuration_tokentype &conf) {
-    decoder_configuration_tokentype.resize(1);
+  /*  decoder_configuration_tokentype.resize(1);
     decoder_configuration_tokentype[0] = conf;
-    decoder_configuration.clear();
+    decoder_configuration.clear();*/
+    encoding_mode_ID.clear();
+    dec_cfg_preset = 255; // TODO: implement token type, don't rely on reserved values
 }
 
 void Descriptor_configuration::write(BitWriter *writer) const {
@@ -384,7 +430,7 @@ Parameter_set::Parameter_set(
     read_length(_read_length),
     number_of_template_segments_minus1(_paired_end),
     reserved_2(0),
-    max_au_data_unit_size(0), // TODO: check
+    max_au_data_unit_size(0),
     pos_40_bits_flag(_pos_40_bits_flag),
     qv_depth(_qv_depth),
     as_depth(_as_depth),
@@ -402,7 +448,7 @@ Parameter_set::Parameter_set(
     parameter_set_crps(0),
     internalBitCounter(0) {
     std::stringstream s;
-    BitWriter bw(s);
+    BitWriter bw(&s);
     write(&bw);
     addSize(bw.getBitsWritten());
 }
@@ -449,6 +495,7 @@ void Parameter_set::write(BitWriter *writer) {
     for (auto &i : parameter_set_crps) {
         i.write(*writer);
     }
+    writer->flush();
 }
 
 void Parameter_set::addCrps(const Parameter_set_crps &_parameter_set_crps) {
@@ -463,19 +510,19 @@ void Parameter_set::addClass(const AU_type class_id, const Class_config &conf) {
     class_configs.push_back(conf);
 
     std::stringstream s;
-    BitWriter bw(s);
+    BitWriter bw(&s);
     conf.write(&bw);
     addSize(bw.getBitsWritten());
 }
 
 void Parameter_set::setDescriptor(uint8_t index, const Descriptor &descriptor) {
     std::stringstream s;
-    BitWriter bw(s);
+    BitWriter bw(&s);
     descriptors[index].write(&bw);
     internalBitCounter -= bw.getBitsWritten();
 
     descriptors[index] = descriptor;
-    BitWriter bw2(s);
+    BitWriter bw2(&s);
     descriptors[index].write(&bw2);
     addSize(bw2.getBitsWritten());
 }
@@ -520,9 +567,9 @@ subseqFromGabac(const gabac::EncodingConfiguration &conf, uint8_t descriptorInde
                 )
         );
         if (i.contextSelectionId != gabac::ContextSelectionId::bypass) {
-            binarization.setContextParameters(Cabac_context_parameters(0, 0, 0)); //TODO
+            binarization.setContextParameters(Cabac_context_parameters(false, 8, 8, 0)); //TODO insert actual values
         }
-        TransformSubseq_cfg subcfg(transform, Support_values(0, 0, 0, transform), binarization); // TODO
+        TransformSubseq_cfg subcfg(transform, Support_values(8, 8, 0, transform), binarization); // TODO insert actual values
         sub_conf.addTransformSubseqCfg(subcfg);
     }
     return sub_conf;
@@ -549,7 +596,11 @@ Parameter_set create_quick_parameter_set(uint8_t _parameter_set_id, uint8_t _rea
             dcg.addSubsequenceCfg(subseqFromGabac(parameters[desc][subseq], desc, subseq));
         }
         Descriptor_configuration dc;
-        dc.set_decoder_configuration(dcg);
+        if(desc != 11 && desc != 15) {
+            dc.set_decoder_configuration(dcg);
+        } else {
+            dc.set_decoder_configuration_tokentype(Decoder_configuration_tokentype());
+        }
         Descriptor d(false, 1);
         d.setConfig(dc, 0);
         ret.setDescriptor(desc,d);
