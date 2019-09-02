@@ -1,5 +1,12 @@
 # TODO
 
+## New
+
+- [ ] Set up Doxygen documentation
+- [ ] Set up Google Test
+- [ ] Push doc to gh-pages
+- [ ] Compare with getspc and calq repos
+
 ## Urgent
 
 - [x] Rename files
