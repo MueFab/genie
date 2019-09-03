@@ -1,4 +1,4 @@
-#include "part2_format_raw_reference.h"
+#include "raw_reference.h"
 
 
 Raw_reference_Sequence::Raw_reference_Sequence() : ref_sequence(seq_end - seq_start + 1) {

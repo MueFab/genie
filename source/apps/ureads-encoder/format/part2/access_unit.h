@@ -1,5 +1,5 @@
-#ifndef GENIE_PART2_FORMAT_ACCESS_UNIT_H
-#define GENIE_PART2_FORMAT_ACCESS_UNIT_H
+#ifndef GENIE_ACCESS_UNIT_H
+#define GENIE_ACCESS_UNIT_H
 
 #include <cstdint>
 #include <memory>
@@ -7,7 +7,7 @@
 
 #include <gabac/gabac.h>
 
-#include "part2_format_data_unit.h"
+#include "data_unit.h"
 
 struct Mm_cfg {
     uint16_t mm_threshold : 16;
@@ -103,4 +103,4 @@ Access_unit create_quick_access_unit(uint32_t access_unit_id,
 );
 
 
-#endif //GENIE_PART2_FORMAT_ACCESS_UNIT_H
+#endif //GENIE_ACCESS_UNIT_H

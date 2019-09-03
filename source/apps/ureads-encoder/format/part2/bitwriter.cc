@@ -1,4 +1,4 @@
-#include "part2_format_bitwriter.h"
+#include "bitwriter.h"
 
 BitWriter::BitWriter(std::ostream *str) : stream(str), m_heldBits(0), m_numHeldBits(0), m_bitsWritten(0) {
 }

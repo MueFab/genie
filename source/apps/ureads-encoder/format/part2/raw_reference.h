@@ -1,10 +1,10 @@
-#ifndef GENIE_PART2_FORMAT_RAW_REFERENCE_H
-#define GENIE_PART2_FORMAT_RAW_REFERENCE_H
+#ifndef GENIE_RAW_REFERENCE_H
+#define GENIE_RAW_REFERENCE_H
 
 #include <vector>
 #include <cstdint>
 
-#include "part2_format_data_unit.h"
+#include "data_unit.h"
 
 /**
 * ISO 23092-2 Section 3.2 table 5, lines 4 to 7
@@ -43,4 +43,4 @@ public:
 };
 
 
-#endif //GENIE_PART2_FORMAT_RAW_REFERENCE_H
+#endif //GENIE_RAW_REFERENCE_H
