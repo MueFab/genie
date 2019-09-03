@@ -102,6 +102,25 @@ public:
 
 /* ----------------------------------------------------------------------------------------------------------- */
 
+/*class Decoder_configuration_cabac_tokentype : public Decoder_configuration_cabac {
+private:
+    Transform_subseq_parameters transform_subseq_parameters;
+    std::vector<TransformSubseq_cfg> transformSubseq_cfg;
+
+public:
+    void addSubsequenceCfg(const Descriptor_subsequence_cfg &cfg) override {
+        (void) cfg;
+    }
+
+    std::unique_ptr<Decoder_configuration> clone() const override {
+        return make_unique<Decoder_configuration_cabac_tokentype>();
+    }
+
+    void write(BitWriter *writer) const override;
+};*/
+
+/* ----------------------------------------------------------------------------------------------------------- */
+
 enum class Transform_ID_subsym : uint8_t {
     no_transform = 0,
     lut_transform = 1,
@@ -135,6 +154,60 @@ enum class Transform_ID_subseq : uint8_t {
 
 /* ----------------------------------------------------------------------------------------------------------- */
 
+enum class Genomic_descriptor : uint8_t {
+    pos = 0,
+    rcomp = 1,
+    flags = 2,
+    mmpos = 3,
+    mmtype = 4,
+    clips = 5,
+    ureads = 6,
+    rlen = 7,
+    pair = 8,
+    mscore = 9,
+    mmap = 10,
+    msar = 11,
+    rtype = 12,
+    rgroup = 13,
+    qv = 14,
+    rname = 15,
+    rftp = 16,
+    rftt = 17
+};
+
+struct Genomic_descriptor_properties {
+    std::string name;
+    uint8_t number_subsequences;
+};
+
+static const Genomic_descriptor_properties &getDescriptorProperties() {
+    constexpr size_t NUM_DESCRIPTORS = 18;
+    static std::array<Genomic_descriptor_properties, NUM_DESCRIPTORS> prop =
+            {{
+                     {"pos", 2},
+                     {"rcomp", 1},
+                     {"flags", 3},
+                     {"mmpos", 2},
+                     {"mmtype", 3},
+                     {"clips", 4},
+                     {"ureads", 1},
+                     {"rlen", 1},
+                     {"pair", 8},
+                     {"mscore", 1},
+                     {"mmap", 5},
+                     {"msar", 2},
+                     {"rtype", 1},
+                     {"rgroup", 1},
+                     {"qv", 0},
+                     {"rname", 2},
+                     {"rftp", 1},
+                     {"rftt", 1}
+             }};
+}
+
+
+/* ----------------------------------------------------------------------------------------------------------- */
+
 class Transform_subseq_parameters {
 public:
 
@@ -143,6 +216,16 @@ public:
     Transform_subseq_parameters();
 
     Transform_subseq_parameters(const Transform_ID_subseq &_transform_ID_subseq, uint16_t param);
+
+    std::unique_ptr<Transform_subseq_parameters> clone () const {
+        auto ret = make_unique<Transform_subseq_parameters>();
+        ret->transform_ID_subseq = transform_ID_subseq;
+        ret->match_coding_buffer_size = match_coding_buffer_size;
+        ret->rle_coding_guard = rle_coding_guard;
+        ret->merge_coding_subseq_count = merge_coding_subseq_count;
+        ret->merge_coding_shift_size = merge_coding_shift_size;
+        return ret;
+    }
 
 private:
     Transform_ID_subseq transform_ID_subseq; // : 8
@@ -238,7 +321,17 @@ public:
     TransformSubseq_cfg(const Transform_ID_subsym &_transform_ID_subsym, const Support_values &_support_values,
                         const Cabac_binarization &_cabac_binarization);
 
+
+
     virtual void write(BitWriter *writer) const;
+
+    std::unique_ptr<TransformSubseq_cfg> clone() const {
+        auto ret = make_unique<TransformSubseq_cfg>();
+        ret->transform_ID_subsym = transform_ID_subsym;
+        ret->support_values = support_values;
+        ret->cabac_binarization = cabac_binarization;
+        return ret;
+    }
 
 private:
     Transform_ID_subsym transform_ID_subsym; // : 3
@@ -248,73 +341,99 @@ private:
 
 /* ----------------------------------------------------------------------------------------------------------- */
 
+/**
+ * Base for ISO 23092-2 Section 8.3.1 table lines 5 to 12
+ */
 class Descriptor_subsequence_cfg {
 private:
-    uint16_t descriptor_subsequence_ID : 10;
-    Transform_subseq_parameters transform_subseq_parameters;
-    std::vector<TransformSubseq_cfg> transformSubseq_cfgs;
+    uint16_t descriptor_subsequence_ID : 10; //!< line 5
+    std::unique_ptr<Transform_subseq_parameters> transform_subseq_parameters; //!< lines 6 + 7
+    std::vector<std::unique_ptr<TransformSubseq_cfg>> transformSubseq_cfgs; //!< lines 8 to 12
 
 public:
     Descriptor_subsequence_cfg();
 
-    Descriptor_subsequence_cfg(uint16_t descriptor_subsequence_ID,
-                               const Transform_subseq_parameters &_transform_subseq_parameters);
+    Descriptor_subsequence_cfg(std::unique_ptr<Transform_subseq_parameters> _transform_subseq_parameters, uint16_t descriptor_subsequence_ID);
 
-    void addTransformSubseqCfg(const TransformSubseq_cfg &_transformSubseq_cfg);
+    void addTransformSubseqCfg(std::unique_ptr<TransformSubseq_cfg> _transformSubseq_cfg);
+
+    std::unique_ptr<Descriptor_subsequence_cfg> clone() const {
+        auto ret = make_unique<Descriptor_subsequence_cfg>();
+        ret->descriptor_subsequence_ID = descriptor_subsequence_ID;
+        ret->transform_subseq_parameters = transform_subseq_parameters->clone();
+        for(const auto& c : transformSubseq_cfgs) {
+            ret->transformSubseq_cfgs.push_back(c->clone());
+        }
+        return ret;
+    }
 
     virtual void write(BitWriter *writer) const;
 };
 
 /* ----------------------------------------------------------------------------------------------------------- */
 
+/**
+ * Base for ISO 23092-2 Section 3.3.2.1 table 8 lines 4 to 8
+ */
 class Decoder_configuration {
-private:
 public:
-    virtual void write(BitWriter *writer) const = 0;
+    enum class Encoding_mode_ID : uint8_t {
+        CABAC = 0 //!< See Text in section
+    };
 
-    virtual void addSubsequenceCfg(const Descriptor_subsequence_cfg &cfg) = 0;
+    virtual void write(BitWriter *writer) const {
+        writer->write(uint8_t (encoding_mode_ID), 8);
+    }
+
+    virtual void addSubsequenceCfg(std::unique_ptr<Descriptor_subsequence_cfg> cfg) = 0;
 
     virtual std::unique_ptr<Decoder_configuration> clone() const = 0;
 
+    explicit Decoder_configuration(Encoding_mode_ID _encoding_mode_id) : encoding_mode_ID(_encoding_mode_id) {
+
+    }
+
     virtual ~Decoder_configuration() = default;
+
+protected:
+    Encoding_mode_ID encoding_mode_ID; //!< : 8; Line 4
 };
 
 /* ----------------------------------------------------------------------------------------------------------- */
 
-class Decoder_configuration_cabac : public Decoder_configuration {
-private:
-    uint8_t num_descriptor_subsequence_cfgs_minus1 : 8;
-    std::vector<Descriptor_subsequence_cfg> descriptor_subsequence_cfgs;
-public:
-    Decoder_configuration_cabac();
+/**
+ * Base for ISO 23092-2 Section 8.3.1 and ISO 23092-2 Section 8.3.5
+ */
+class Decoder_configuration_cabac : public Decoder_configuration{
+protected:
 
-    void addSubsequenceCfg(const Descriptor_subsequence_cfg &cfg) override;
+public:
+    Decoder_configuration_cabac () : Decoder_configuration(Encoding_mode_ID::CABAC) {
+
+    }
+};
+
+/* ----------------------------------------------------------------------------------------------------------- */
+
+/**
+ * ISO 23092-2 Section 8.3.1 table line 3 to 13
+ */
+class Decoder_configuration_cabac_regular : public Decoder_configuration_cabac {
+private:
+    uint8_t num_descriptor_subsequence_cfgs_minus1 : 8; //!< Line 3
+    std::vector<std::unique_ptr<Descriptor_subsequence_cfg>> descriptor_subsequence_cfgs; //!< Line 4 to 13
+public:
+    Decoder_configuration_cabac_regular();
+
+    void addSubsequenceCfg(std::unique_ptr<Descriptor_subsequence_cfg> cfg) override;
 
     std::unique_ptr<Decoder_configuration> clone() const override {
-        auto ret = make_unique<Decoder_configuration_cabac>();
+        auto ret = make_unique<Decoder_configuration_cabac_regular>();
+        ret->encoding_mode_ID = encoding_mode_ID;
         for (const auto &i : descriptor_subsequence_cfgs) {
-            ret->addSubsequenceCfg(i);
+            ret->addSubsequenceCfg(i->clone());
         }
         return ret;
-    }
-
-    void write(BitWriter *writer) const override;
-};
-
-/* ----------------------------------------------------------------------------------------------------------- */
-
-class Decoder_configuration_cabac_tokentype : public Decoder_configuration {
-private:
-    Transform_subseq_parameters transform_subseq_parameters;
-    std::vector<TransformSubseq_cfg> transformSubseq_cfg;
-
-public:
-    void addSubsequenceCfg(const Descriptor_subsequence_cfg &cfg) override {
-        (void) cfg;
-    }
-
-    std::unique_ptr<Decoder_configuration> clone() const override {
-        return make_unique<Decoder_configuration_cabac_tokentype>();
     }
 
     void write(BitWriter *writer) const override;
@@ -328,7 +447,7 @@ public:
 class Descriptor_configuration {
 public:
     enum class Dec_cfg_preset : uint8_t {
-        ZERO = 0
+        PRESENT = 0 //!< See text in section 3.3.2.1
     };
 
     explicit Descriptor_configuration(Dec_cfg_preset _dec_cfg_preset) : dec_cfg_preset(_dec_cfg_preset) {
@@ -342,7 +461,7 @@ public:
     virtual ~Descriptor_configuration() = default;
 
 protected:
-    Dec_cfg_preset dec_cfg_preset : 8;
+    Dec_cfg_preset dec_cfg_preset : 8; //!< Line 2
 };
 
 /* ----------------------------------------------------------------------------------------------------------- */
@@ -350,40 +469,34 @@ protected:
 /**
 * ISO 23092-2 Section 3.3.2.1 table 8, lines 4 to 9
 */
-class Descriptor_configuration_0 : public Descriptor_configuration {
+class Descriptor_configuration_present : public Descriptor_configuration {
 private:
-    uint8_t encoding_mode_ID; // : 8
-    std::unique_ptr<Decoder_configuration> decoder_configuration;
+    std::unique_ptr<Decoder_configuration> decoder_configuration; //!< Line 5 to 9 (fused)
 public:
-    explicit Descriptor_configuration_0() : Descriptor_configuration(Dec_cfg_preset(255)),
-                                                                          encoding_mode_ID(0),
-                                                                          decoder_configuration(nullptr) {
-        decoder_configuration = make_unique<Decoder_configuration_cabac>();
+    explicit Descriptor_configuration_present() : Descriptor_configuration(Dec_cfg_preset::PRESENT),
+                                                  decoder_configuration(nullptr) {
+        decoder_configuration = make_unique<Decoder_configuration_cabac_regular>();
 
     }
 
     std::unique_ptr<Descriptor_configuration> clone() const override {
-        auto ret = make_unique<Descriptor_configuration_0>();
+        auto ret = make_unique<Descriptor_configuration_present>();
         ret->dec_cfg_preset = dec_cfg_preset;
-        ret->encoding_mode_ID = encoding_mode_ID;
         ret->decoder_configuration = decoder_configuration->clone();
         return ret;
     }
 
     void write(BitWriter *writer) const override {
         Descriptor_configuration::write(writer);
-        if(dec_cfg_preset != Dec_cfg_preset::ZERO) {
+        if (dec_cfg_preset != Dec_cfg_preset::PRESENT) {
             return;
         }
-        writer->write(encoding_mode_ID, 8);
-        if(decoder_configuration) {
-            decoder_configuration->write(writer);
-        }
+        decoder_configuration->write(writer);
     }
 
     void set_decoder_configuration(std::unique_ptr<Decoder_configuration> conf);
 
-    void _deactivate();
+    void _deactivate(); // TODO: get rid of this
 };
 
 /* ----------------------------------------------------------------------------------------------------------- */
