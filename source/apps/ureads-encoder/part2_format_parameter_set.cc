@@ -140,13 +140,15 @@ Cabac_context_parameters::Cabac_context_parameters(
     num_contexts(0),
     context_initialization_value(0),
     share_subsym_ctx_flag(0) {
-    if(_coding_subsym_size < _output_symbol_size) {
+    if (_coding_subsym_size < _output_symbol_size) {
         share_subsym_ctx_flag.push_back(_share_subsym_ctx_flag);
     }
 }
-Cabac_context_parameters::Cabac_context_parameters() : Cabac_context_parameters(false, 8, 8, false){
+
+Cabac_context_parameters::Cabac_context_parameters() : Cabac_context_parameters(false, 8, 8, false) {
 
 }
+
 void Cabac_context_parameters::addContextInitializationValue(uint8_t _context_initialization_value) {
     ++num_contexts;
     share_subsym_ctx_flag.push_back(_context_initialization_value);
@@ -164,8 +166,8 @@ void Cabac_context_parameters::write(BitWriter *writer) const {
 }
 
 Cabac_binarization::Cabac_binarization(
-        const Binarization_ID& _binarization_ID,
-        const Cabac_binarization_parameters& _cabac_binarization_parameters
+        const Binarization_ID &_binarization_ID,
+        const Cabac_binarization_parameters &_cabac_binarization_parameters
 ) : binarization_ID(_binarization_ID),
     bypass_flag(true),
     cabac_binarization_parameters(_cabac_binarization_parameters),
@@ -179,7 +181,7 @@ Cabac_binarization::Cabac_binarization() : Cabac_binarization(
 
 }
 
-void Cabac_binarization::setContextParameters(const Cabac_context_parameters& _cabac_context_parameters){
+void Cabac_binarization::setContextParameters(const Cabac_context_parameters &_cabac_context_parameters) {
     bypass_flag = false;
     cabac_context_parameters.push_back(_cabac_context_parameters);
 }
@@ -216,90 +218,93 @@ Descriptor_subsequence_cfg::Descriptor_subsequence_cfg() {
 
 }
 
-Descriptor_subsequence_cfg::Descriptor_subsequence_cfg(uint16_t _descriptor_subsequence_ID,
-                                                       const Transform_subseq_parameters &_transform_subseq_parameters
+Descriptor_subsequence_cfg::Descriptor_subsequence_cfg(
+        std::unique_ptr<Transform_subseq_parameters> _transform_subseq_parameters,
+        uint16_t _descriptor_subsequence_ID
 ) : descriptor_subsequence_ID(_descriptor_subsequence_ID),
-    transform_subseq_parameters(_transform_subseq_parameters),
+    transform_subseq_parameters(std::move(_transform_subseq_parameters)),
     transformSubseq_cfgs(0) {
 
 }
 
-void Descriptor_subsequence_cfg::addTransformSubseqCfg(const TransformSubseq_cfg &_transformSubseq_cfg) {
-    transformSubseq_cfgs.push_back(_transformSubseq_cfg);
+void Descriptor_subsequence_cfg::addTransformSubseqCfg(std::unique_ptr<TransformSubseq_cfg> _transformSubseq_cfg) {
+    transformSubseq_cfgs.push_back(std::move(_transformSubseq_cfg));
 }
 
 void Descriptor_subsequence_cfg::write(BitWriter *writer) const {
     writer->write(descriptor_subsequence_ID, 10);
-    transform_subseq_parameters.write(writer);
+    transform_subseq_parameters->write(writer);
     for (auto &i : transformSubseq_cfgs) {
-        i.write(writer);
+        i->write(writer);
     }
 }
 
-Decoder_configuration_cabac::Decoder_configuration_cabac() : num_descriptor_subsequence_cfgs_minus1(-1),
-                                                             descriptor_subsequence_cfgs(0) {
+Decoder_configuration_cabac_regular::Decoder_configuration_cabac_regular() : num_descriptor_subsequence_cfgs_minus1(-1),
+                                                                             descriptor_subsequence_cfgs(0) {
 
 }
 
-void Decoder_configuration_cabac::addSubsequenceCfg(const Descriptor_subsequence_cfg &cfg) {
+void Decoder_configuration_cabac_regular::addSubsequenceCfg(std::unique_ptr<Descriptor_subsequence_cfg> cfg) {
     num_descriptor_subsequence_cfgs_minus1 += 1;
-    descriptor_subsequence_cfgs.push_back(cfg);
+    descriptor_subsequence_cfgs.push_back(std::move(cfg));
 }
 
-void Decoder_configuration_cabac::write(BitWriter *writer) const {
+void Decoder_configuration_cabac_regular::write(BitWriter *writer) const {
+    Decoder_configuration_cabac::write(writer);
     writer->write(num_descriptor_subsequence_cfgs_minus1, 8);
     for (auto &i : descriptor_subsequence_cfgs) {
-        i.write(writer);
+        i->write(writer);
     }
 }
 
-void Decoder_configuration_cabac_tokentype::write(BitWriter *writer) const {
+/*void Decoder_configuration_cabac_tokentype::write(BitWriter *writer) const {
+    Decoder_configuration_cabac::write(writer);
     transform_subseq_parameters.write(writer);
     for (auto &i : transformSubseq_cfg) {
         i.write(writer);
     }
-}
+}*/
 
-void Descriptor_configuration_0::set_decoder_configuration(std::unique_ptr<Decoder_configuration> conf) {
+void Descriptor_configuration_present::set_decoder_configuration(std::unique_ptr<Decoder_configuration> conf) {
     decoder_configuration = std::move(conf);
 }
 
-void Descriptor_configuration_0::_deactivate() {
-  /*  decoder_configuration_tokentype.resize(1);
-    decoder_configuration_tokentype[0] = conf;
-    decoder_configuration.clear();*/
-    dec_cfg_preset = Dec_cfg_preset (255); // TODO: implement token type, don't rely on reserved values
+void Descriptor_configuration_present::_deactivate() {
+    /*  decoder_configuration_tokentype.resize(1);
+      decoder_configuration_tokentype[0] = conf;
+      decoder_configuration.clear();*/
+    dec_cfg_preset = Dec_cfg_preset(255); // TODO: implement token type, don't rely on reserved values
 }
 
 void Descriptor_configuration::write(BitWriter *writer) const {
-    writer->write(uint8_t (dec_cfg_preset), 8);
+    writer->write(uint8_t(dec_cfg_preset), 8);
 }
 
 Descriptor::Descriptor() : class_specific_dec_cfg_flag(false), descriptor_configurations(0) {
-    descriptor_configurations.push_back(make_unique<Descriptor_configuration_0>());
+    descriptor_configurations.push_back(make_unique<Descriptor_configuration_present>());
 }
 
 void Descriptor::setConfig(uint8_t index, std::unique_ptr<Descriptor_configuration> conf) {
-    if(index > descriptor_configurations.size()) {
+    if (index > descriptor_configurations.size()) {
         GENIE_THROW_RUNTIME_EXCEPTION("Config index out of bounds.");
     }
     descriptor_configurations[index] = std::move(conf);
 }
 
 void Descriptor::setConfig(std::unique_ptr<Descriptor_configuration> conf) {
-    if(class_specific_dec_cfg_flag) {
+    if (class_specific_dec_cfg_flag) {
         GENIE_THROW_RUNTIME_EXCEPTION("Invalid setConfig() for non class-specific descriptor config.");
     }
     descriptor_configurations[0] = std::move(conf);
 }
 
 void Descriptor::enableClassSpecificConfigs(uint8_t numClasses) {
-    if(class_specific_dec_cfg_flag) {
+    if (class_specific_dec_cfg_flag) {
         GENIE_THROW_RUNTIME_EXCEPTION("Class specific configs already enabled");
     }
     class_specific_dec_cfg_flag = true;
     descriptor_configurations.resize(numClasses);
-    for(size_t i = 1; i < descriptor_configurations.size(); ++i) {
+    for (size_t i = 1; i < descriptor_configurations.size(); ++i) {
         descriptor_configurations[i] = descriptor_configurations[0]->clone();
     }
 }
@@ -336,19 +341,21 @@ void Parameter_set_qvps::addCodeBook(const Qv_codebook &book) {
 }*/
 
 void Parameter_set_qvps::write(BitWriter *writer) const {
-  /*  writer->write(qv_num_codebooks_total, 4);
-    for (auto &i : qv_codebooks) {
-        i.write(writer);
-    } */
+    /*  writer->write(qv_num_codebooks_total, 4);
+      for (auto &i : qv_codebooks) {
+          i.write(writer);
+      } */
 }
 
-Qv_coding_config::Qv_coding_config(Qv_coding_mode _qv_coding_mode, bool _qv_reverse_flag) : qv_coding_mode(_qv_coding_mode), qv_reverse_flag(_qv_reverse_flag) {
+Qv_coding_config::Qv_coding_config(Qv_coding_mode _qv_coding_mode, bool _qv_reverse_flag) : qv_coding_mode(
+        _qv_coding_mode), qv_reverse_flag(_qv_reverse_flag) {
 }
 
 Qv_coding_config_1::Qv_coding_config_1() : Qv_coding_config_1(Qvps_preset_ID::ASCII, false) {
 }
 
-Qv_coding_config_1::Qv_coding_config_1(Qvps_preset_ID _qvps_preset_ID, bool _reverse_flag) : Qv_coding_config(Qv_coding_mode::ONE, _reverse_flag), qvps_flag(false), parameter_set_qvps(nullptr){
+Qv_coding_config_1::Qv_coding_config_1(Qvps_preset_ID _qvps_preset_ID, bool _reverse_flag) : Qv_coding_config(
+        Qv_coding_mode::ONE, _reverse_flag), qvps_flag(false), parameter_set_qvps(nullptr) {
     qvps_preset_ID = make_unique<Qvps_preset_ID>(_qvps_preset_ID);
 }
 
@@ -360,11 +367,11 @@ void Qv_coding_config_1::setQvps(std::unique_ptr<Parameter_set_qvps> _parameter_
 
 void Qv_coding_config_1::write(BitWriter *writer) const {
     writer->write(qvps_flag, 1);
-    if(parameter_set_qvps) {
+    if (parameter_set_qvps) {
         parameter_set_qvps->write(writer);
     }
-    if(qvps_preset_ID) {
-        writer->write(uint64_t (*qvps_preset_ID), 4);
+    if (qvps_preset_ID) {
+        writer->write(uint64_t(*qvps_preset_ID), 4);
     }
     writer->write(qv_reverse_flag, 1);
 }
@@ -422,7 +429,7 @@ Parameter_set::Parameter_set(
     crps_flag(false),
     parameter_set_crps(nullptr),
     internalBitCounter(0) {
-    for(auto& i : descriptors) {
+    for (auto &i : descriptors) {
         i = make_unique<Descriptor>();
     }
     std::stringstream s;
@@ -463,14 +470,14 @@ void Parameter_set::write(BitWriter *writer) {
     writer->write(multiple_alignments_flag, 1);
     writer->write(spliced_reads_flag, 1);
     writer->write(multiple_signature_base, 31);
-    if(u_signature_size) {
+    if (u_signature_size) {
         writer->write(*u_signature_size, 6);
     }
     for (auto &i : qv_coding_configs) {
         i->write(writer);
     }
     writer->write(crps_flag, 1);
-    if(parameter_set_crps) {
+    if (parameter_set_crps) {
         parameter_set_crps->write(*writer);
     }
     writer->flush();
@@ -526,11 +533,11 @@ void Parameter_set::addSize(uint64_t bits) {
         data_unit_size += 1;
 }
 
-Descriptor_subsequence_cfg
+std::unique_ptr<Descriptor_subsequence_cfg>
 subseqFromGabac(const gabac::EncodingConfiguration &conf, uint8_t subsequenceIndex) {
-    Transform_subseq_parameters transformParams(Transform_ID_subseq(conf.sequenceTransformationId),
+    auto transformParams = make_unique<Transform_subseq_parameters>(Transform_ID_subseq(conf.sequenceTransformationId),
                                                 conf.sequenceTransformationParameter);
-    Descriptor_subsequence_cfg sub_conf(subsequenceIndex, transformParams);
+    auto sub_conf = make_unique<Descriptor_subsequence_cfg>(std::move(transformParams), subsequenceIndex);
     for (const auto &i : conf.transformedSequenceConfigurations) {
         Transform_ID_subsym transform = Transform_ID_subsym::no_transform;
         if (i.lutTransformationEnabled && i.diffCodingEnabled) {
@@ -549,13 +556,16 @@ subseqFromGabac(const gabac::EncodingConfiguration &conf, uint8_t subsequenceInd
         if (i.contextSelectionId != gabac::ContextSelectionId::bypass) {
             binarization.setContextParameters(Cabac_context_parameters(false, 8, 8, 0)); //TODO insert actual values
         }
-        TransformSubseq_cfg subcfg(transform, Support_values(8, 8, 0, transform), binarization); // TODO insert actual values
-        sub_conf.addTransformSubseqCfg(subcfg);
+        auto subcfg = make_unique<TransformSubseq_cfg>(transform, Support_values(8, 8, 0, transform),
+                                   binarization); // TODO insert actual values
+        sub_conf->addTransformSubseqCfg(std::move(subcfg));
     }
     return sub_conf;
 }
 
-Parameter_set create_quick_parameter_set(uint8_t _parameter_set_id, uint8_t _read_length, bool paired_end, bool qv_values_present, const std::vector<std::vector<gabac::EncodingConfiguration>>& parameters) {
+Parameter_set
+create_quick_parameter_set(uint8_t _parameter_set_id, uint8_t _read_length, bool paired_end, bool qv_values_present,
+                           const std::vector<std::vector<gabac::EncodingConfiguration>> &parameters) {
     Parameter_set ret(_parameter_set_id,
                       _parameter_set_id,
                       Data_unit::Dataset_type::non_aligned,
@@ -568,20 +578,17 @@ Parameter_set create_quick_parameter_set(uint8_t _parameter_set_id, uint8_t _rea
                       false,
                       false
     );
-    ret.addClass(Data_unit::AU_type::U_TYPE_AU, make_unique<Qv_coding_config_1>(Qv_coding_config_1::Qvps_preset_ID::ASCII, false));
-    for(int desc = 0; desc < 18; ++desc) {
+    ret.addClass(Data_unit::AU_type::U_TYPE_AU,
+                 make_unique<Qv_coding_config_1>(Qv_coding_config_1::Qvps_preset_ID::ASCII, false));
+    for (int desc = 0; desc < 18; ++desc) {
 
         std::unique_ptr<Decoder_configuration> dcg;
-        if(desc != 11 && desc != 15) {
-            dcg = make_unique<Decoder_configuration_cabac>();
-        } else {
-            dcg = make_unique<Decoder_configuration_cabac_tokentype>();
-        }
-        for(size_t subseq = 0; subseq < parameters[desc].size(); ++subseq) {
+        dcg = make_unique<Decoder_configuration_cabac_regular>();
+        for (size_t subseq = 0; subseq < parameters[desc].size(); ++subseq) {
             dcg->addSubsequenceCfg(subseqFromGabac(parameters[desc][subseq], subseq));
         }
-        auto dc = make_unique<Descriptor_configuration_0>();
-        if(desc != 11 && desc != 15) {
+        auto dc = make_unique<Descriptor_configuration_present>();
+        if (desc != 11 && desc != 15) {
             dc->set_decoder_configuration(std::move(dcg));
         } else {
             dc->_deactivate();
