@@ -1,8 +1,10 @@
-#ifndef GENIE_PART2_FORMAT_BITWRITER_H
-#define GENIE_PART2_FORMAT_BITWRITER_H
+#ifndef GENIE_BITWRITER_H
+#define GENIE_BITWRITER_H
 
 #include <ostream>
 #include <cstdint>
+
+#include "ureads-encoder/exceptions.h"
 
 class BitWriter {
 private:
@@ -22,4 +24,4 @@ public:
 };
 
 
-#endif //GENIE_PART2_FORMAT_BITWRITER_H
+#endif //GENIE_BITWRITER_H

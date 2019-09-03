@@ -1,10 +1,10 @@
 
-#ifndef GENIE_PART2_FORMAT_DATA_UNIT_H
-#define GENIE_PART2_FORMAT_DATA_UNIT_H
+#ifndef GENIE_DATA_UNIT_H
+#define GENIE_DATA_UNIT_H
 
 #include <cstdint>
 
-#include "part2_format_bitwriter.h"
+#include "bitwriter.h"
 
 /**
  * ISO 23092-2 Section 3.1 table 3
@@ -54,4 +54,4 @@ public:
 };
 
 
-#endif //GENIE_PART2_FORMAT_DATA_UNIT_H
+#endif //GENIE_DATA_UNIT_H

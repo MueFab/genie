@@ -20,8 +20,9 @@ extern "C" {
 
 #include <gabac/gabac.h>
 
-#include "part2_format_access_unit.h"
-#include "part2_format_parameter_set.h"
+#include "ureads-encoder/format/part2/access_unit.h"
+#include "ureads-encoder/format/part2/parameter_set.h"
+#include "ureads-encoder/format/part2/clutter.h"
 
 namespace genie {
 
