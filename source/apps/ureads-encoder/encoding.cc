@@ -41,9 +41,9 @@ namespace genie {
                                                     "}]"
                                                     "}";
         std::vector<std::vector<gabac::EncodingConfiguration>> ret;
-        for(int i = 0; i < SEQUENCE_NUMS.size(); ++i) {
+        for(size_t i = 0; i < SEQUENCE_NUMS.size(); ++i) {
             ret.emplace_back();
-            for(int j = 0; j < SEQUENCE_NUMS[i]; ++j) {
+            for(size_t j = 0; j < SEQUENCE_NUMS[i]; ++j) {
                 ret[i].emplace_back(DEFAULT_GABAC_CONF_JSON);
             }
         }
@@ -53,7 +53,7 @@ namespace genie {
     std::vector<std::vector<gabac::DataBlock>> create_default_streams() {
         const std::vector<size_t> SEQUENCE_NUMS = {2, 1, 3, 2, 3, 4, 1, 1, 8, 1, 5, 2, 1, 1, 0, 2, 1, 1};
         std::vector<std::vector<gabac::DataBlock>> ret;
-        for(int i = 0; i < SEQUENCE_NUMS.size(); ++i) {
+        for(size_t i = 0; i < SEQUENCE_NUMS.size(); ++i) {
             ret.emplace_back();
         }
         return ret;

@@ -253,74 +253,65 @@ void Decoder_configuration_cabac::write(BitWriter *writer) const {
     }
 }
 
-void Decoder_configuration_tokentype::write(BitWriter *writer) const {
+void Decoder_configuration_cabac_tokentype::write(BitWriter *writer) const {
     transform_subseq_parameters.write(writer);
     for (auto &i : transformSubseq_cfg) {
         i.write(writer);
     }
 }
 
-Descriptor_configuration::Descriptor_configuration() : dec_cfg_preset(0),
-                                                       encoding_mode_ID(0),
-                                                       decoder_configuration(0),
-                                                       decoder_configuration_tokentype(0) {
-    if(dec_cfg_preset == 0) {
-        encoding_mode_ID.push_back(0);
-    }
+void Descriptor_configuration_0::set_decoder_configuration(std::unique_ptr<Decoder_configuration> conf) {
+    decoder_configuration = std::move(conf);
 }
 
-void Descriptor_configuration::set_decoder_configuration(const Decoder_configuration_cabac &conf) {
-    decoder_configuration.resize(1);
-    decoder_configuration[0] = conf;
-    decoder_configuration_tokentype.clear();
-}
-
-void Descriptor_configuration::set_decoder_configuration_tokentype(const Decoder_configuration_tokentype &conf) {
+void Descriptor_configuration_0::_deactivate() {
   /*  decoder_configuration_tokentype.resize(1);
     decoder_configuration_tokentype[0] = conf;
     decoder_configuration.clear();*/
-    encoding_mode_ID.clear();
-    dec_cfg_preset = 255; // TODO: implement token type, don't rely on reserved values
+    dec_cfg_preset = Dec_cfg_preset (255); // TODO: implement token type, don't rely on reserved values
 }
 
 void Descriptor_configuration::write(BitWriter *writer) const {
-    writer->write(dec_cfg_preset, 8);
-    for (auto &i : encoding_mode_ID) {
-        writer->write(i, 8);
-    }
-    for (auto &i : decoder_configuration) {
-        i.write(writer);
-    }
-    for (auto &i : decoder_configuration_tokentype) {
-        i.write(writer);
-    }
+    writer->write(uint8_t (dec_cfg_preset), 8);
 }
 
-Descriptor::Descriptor() : Descriptor(false, 1) {}
-
-Descriptor::Descriptor(bool _class_specific_dec_cfg_flag, uint8_t _num_classes) : num_classes(_num_classes),
-                                                                                  class_specific_dec_cfg_flag(
-                                                                                          _class_specific_dec_cfg_flag),
-                                                                                  descriptor_configurations(0) {
-    if (class_specific_dec_cfg_flag) {
-        GENIE_THROW_RUNTIME_EXCEPTION("Class specific config not supported");
-    } else {
-        descriptor_configurations.resize(1);
-    }
+Descriptor::Descriptor() : class_specific_dec_cfg_flag(false), descriptor_configurations(0) {
+    descriptor_configurations.push_back(make_unique<Descriptor_configuration_0>());
 }
 
-void Descriptor::setConfig(const Descriptor_configuration &conf, uint8_t index) {
-    descriptor_configurations[index] = conf;
+void Descriptor::setConfig(uint8_t index, std::unique_ptr<Descriptor_configuration> conf) {
+    if(index > descriptor_configurations.size()) {
+        GENIE_THROW_RUNTIME_EXCEPTION("Config index out of bounds.");
+    }
+    descriptor_configurations[index] = std::move(conf);
+}
+
+void Descriptor::setConfig(std::unique_ptr<Descriptor_configuration> conf) {
+    if(class_specific_dec_cfg_flag) {
+        GENIE_THROW_RUNTIME_EXCEPTION("Invalid setConfig() for non class-specific descriptor config.");
+    }
+    descriptor_configurations[0] = std::move(conf);
+}
+
+void Descriptor::enableClassSpecificConfigs(uint8_t numClasses) {
+    if(class_specific_dec_cfg_flag) {
+        GENIE_THROW_RUNTIME_EXCEPTION("Class specific configs already enabled");
+    }
+    class_specific_dec_cfg_flag = true;
+    descriptor_configurations.resize(numClasses);
+    for(size_t i = 1; i < descriptor_configurations.size(); ++i) {
+        descriptor_configurations[i] = descriptor_configurations[0]->clone();
+    }
 }
 
 void Descriptor::write(BitWriter *writer) const {
     writer->write(class_specific_dec_cfg_flag, 1);
     for (auto &i : descriptor_configurations) {
-        i.write(writer);
+        i->write(writer);
     }
 }
 
-Qv_codebook::Qv_codebook() : qv_num_codebook_entries(0), qv_recon(0) {
+/*Qv_codebook::Qv_codebook() : qv_num_codebook_entries(0), qv_recon(0) {
 
 }
 
@@ -334,77 +325,61 @@ void Qv_codebook::write(BitWriter *writer) const {
     for (auto &i : qv_recon) {
         writer->write(i, 8);
     }
-}
+}*/
 
-Parameter_set_qvps::Parameter_set_qvps() : qv_num_codebooks_total(0), qv_codebooks(0) {
+/*Parameter_set_qvps::Parameter_set_qvps() : qv_num_codebooks_total(0), qv_codebooks(0) {
 }
 
 void Parameter_set_qvps::addCodeBook(const Qv_codebook &book) {
     qv_codebooks.push_back(book);
     qv_num_codebooks_total += 1;
-}
+}*/
 
 void Parameter_set_qvps::write(BitWriter *writer) const {
-    writer->write(qv_num_codebooks_total, 4);
+  /*  writer->write(qv_num_codebooks_total, 4);
     for (auto &i : qv_codebooks) {
         i.write(writer);
-    }
+    } */
 }
 
-Qv_coding_config::Qv_coding_config() : Qv_coding_config(Qvps_preset_ID::ASCII) {
+Qv_coding_config::Qv_coding_config(Qv_coding_mode _qv_coding_mode, bool _qv_reverse_flag) : qv_coding_mode(_qv_coding_mode), qv_reverse_flag(_qv_reverse_flag) {
 }
 
-Qv_coding_config::Qv_coding_config(Qvps_preset_ID _qvps_preset_ID) : qvps_flag(false), parameter_set_qvps(0),
-                                                                     qvps_preset_ID(1) {
-    qvps_preset_ID[0] = _qvps_preset_ID;
+Qv_coding_config_1::Qv_coding_config_1() : Qv_coding_config_1(Qvps_preset_ID::ASCII, false) {
 }
 
-void Qv_coding_config::addQvps(const Parameter_set_qvps &_parameter_set_qvps) {
-    if (qvps_preset_ID.empty())
-        return;
-    qvps_preset_ID.clear();
-    parameter_set_qvps.push_back(_parameter_set_qvps);
+Qv_coding_config_1::Qv_coding_config_1(Qvps_preset_ID _qvps_preset_ID, bool _reverse_flag) : Qv_coding_config(Qv_coding_mode::ONE, _reverse_flag), qvps_flag(false), parameter_set_qvps(nullptr){
+    qvps_preset_ID = make_unique<Qvps_preset_ID>(_qvps_preset_ID);
 }
 
-void Qv_coding_config::write(BitWriter *writer) const {
+void Qv_coding_config_1::setQvps(std::unique_ptr<Parameter_set_qvps> _parameter_set_qvps) {
+    qvps_flag = true;
+    qvps_preset_ID = nullptr;
+    parameter_set_qvps = std::move(_parameter_set_qvps);
+}
+
+void Qv_coding_config_1::write(BitWriter *writer) const {
     writer->write(qvps_flag, 1);
-    for (auto &i : parameter_set_qvps) {
-        i.write(writer);
+    if(parameter_set_qvps) {
+        parameter_set_qvps->write(writer);
     }
-    for (auto &i : qvps_preset_ID) {
-        writer->write(uint8_t(i), 4);
-    }
-}
-
-Class_config::Class_config() : Class_config(false, Qv_coding_config()) {}
-
-Class_config::Class_config(
-        bool _qv_reverse_flag,
-        const Qv_coding_config &_qv_coding_config
-) : qv_coding_mode(1), qv_coding_config(0), qv_reverse_flag(_qv_reverse_flag) {
-    if (qv_coding_mode) {
-        qv_coding_config.push_back(_qv_coding_config);
-    }
-}
-
-void Class_config::write(BitWriter *writer) const {
-    writer->write(qv_coding_mode, 4);
-    for (auto &i : qv_coding_config) {
-        i.write(writer);
+    if(qvps_preset_ID) {
+        writer->write(uint64_t (*qvps_preset_ID), 4);
     }
     writer->write(qv_reverse_flag, 1);
 }
 
+
 void Cr_info::write(BitWriter &writer) {
-    writer.write(cr_pad_size, 8);
-    writer.write(cr_buf_max_size, 24);
+/*    writer.write(cr_pad_size, 8);
+    writer.write(cr_buf_max_size, 24); */
 }
 
 void Parameter_set_crps::write(BitWriter &writer) {
-    writer.write(uint8_t(cr_alg_ID), 8);
+    /*    writer.write(uint8_t(cr_alg_ID), 8);
     for (auto &i : cr_info) {
         i.write(writer);
-    }
+    }*/
 }
 
 
@@ -442,11 +417,14 @@ Parameter_set::Parameter_set(
     multiple_alignments_flag(_multiple_alignments_flag),
     spliced_reads_flag(_spliced_reads_flag),
     multiple_signature_base(0),
-    u_signature_size(0),
-    class_configs(0),
+    u_signature_size(nullptr),
+    qv_coding_configs(0),
     crps_flag(false),
-    parameter_set_crps(0),
+    parameter_set_crps(nullptr),
     internalBitCounter(0) {
+    for(auto& i : descriptors) {
+        i = make_unique<Descriptor>();
+    }
     std::stringstream s;
     BitWriter bw(&s);
     write(&bw);
@@ -473,11 +451,11 @@ void Parameter_set::write(BitWriter *writer) {
         writer->write(uint8_t(i), 4);
     }
     for (auto &i : descriptors) {
-        i.write(writer);
+        i->write(writer);
     }
     writer->write(num_groups, 16);
     for (auto &i : rgroup_IDs) {
-        for (auto &j : i) {
+        for (auto &j : *i) {
             writer->write(j, 8);
         }
         writer->write(0, 8); // NULL termination
@@ -485,57 +463,59 @@ void Parameter_set::write(BitWriter *writer) {
     writer->write(multiple_alignments_flag, 1);
     writer->write(spliced_reads_flag, 1);
     writer->write(multiple_signature_base, 31);
-    for (auto &i : u_signature_size) {
-        writer->write(i, 6);
+    if(u_signature_size) {
+        writer->write(*u_signature_size, 6);
     }
-    for (auto &i : class_configs) {
-        i.write(writer);
+    for (auto &i : qv_coding_configs) {
+        i->write(writer);
     }
     writer->write(crps_flag, 1);
-    for (auto &i : parameter_set_crps) {
-        i.write(*writer);
+    if(parameter_set_crps) {
+        parameter_set_crps->write(*writer);
     }
     writer->flush();
 }
 
-void Parameter_set::addCrps(const Parameter_set_crps &_parameter_set_crps) {
+void Parameter_set::setCrps(std::unique_ptr<Parameter_set_crps> _parameter_set_crps) {
     (void) _parameter_set_crps;
     GENIE_THROW_RUNTIME_EXCEPTION("crps not supported");
 }
 
-void Parameter_set::addClass(const AU_type class_id, const Class_config &conf) {
+void Parameter_set::addClass(AU_type class_id, std::unique_ptr<Qv_coding_config> conf) {
+    std::stringstream s;
+    BitWriter bw(&s);
+    conf->write(&bw);
+    addSize(bw.getBitsWritten());
+
     num_classes += 1;
     class_IDs.push_back(class_id);
     addSize(4);
-    class_configs.push_back(conf);
-
-    std::stringstream s;
-    BitWriter bw(&s);
-    conf.write(&bw);
-    addSize(bw.getBitsWritten());
+    qv_coding_configs.push_back(std::move(conf));
 }
 
-void Parameter_set::setDescriptor(uint8_t index, const Descriptor &descriptor) {
+void Parameter_set::setDescriptor(uint8_t index, std::unique_ptr<Descriptor> descriptor) {
     std::stringstream s;
     BitWriter bw(&s);
-    descriptors[index].write(&bw);
+    descriptors[index]->write(&bw);
     internalBitCounter -= bw.getBitsWritten();
 
-    descriptors[index] = descriptor;
+    descriptors[index] = std::move(descriptor);
     BitWriter bw2(&s);
-    descriptors[index].write(&bw2);
+    descriptors[index]->write(&bw2);
     addSize(bw2.getBitsWritten());
 }
 
-void Parameter_set::addGroup(const std::string &_rgroup_id) {
+void Parameter_set::addGroup(std::unique_ptr<std::string> rgroup_id) {
+    GENIE_THROW_RUNTIME_EXCEPTION("Groups not supported");
     num_groups += 1;
-    rgroup_IDs.push_back(_rgroup_id);
-    addSize((_rgroup_id.length() + 1) * 8);
+    rgroup_IDs.push_back(std::move(rgroup_id));
+    addSize((rgroup_id->length() + 1) * 8);
 }
 
-void Parameter_set::addMultipleSignatureBase(uint32_t _multiple_signature_base, uint8_t _U_signature_size) {
+void Parameter_set::setMultipleSignatureBase(uint32_t _multiple_signature_base, uint8_t _U_signature_size) {
+    GENIE_THROW_RUNTIME_EXCEPTION("Signature base not supported");
     multiple_signature_base = _multiple_signature_base;
-    u_signature_size.push_back(_U_signature_size);
+    u_signature_size = make_unique<uint8_t>(_U_signature_size);
     addSize(6);
 }
 
@@ -547,7 +527,7 @@ void Parameter_set::addSize(uint64_t bits) {
 }
 
 Descriptor_subsequence_cfg
-subseqFromGabac(const gabac::EncodingConfiguration &conf, uint8_t descriptorIndex, uint8_t subsequenceIndex) {
+subseqFromGabac(const gabac::EncodingConfiguration &conf, uint8_t subsequenceIndex) {
     Transform_subseq_parameters transformParams(Transform_ID_subseq(conf.sequenceTransformationId),
                                                 conf.sequenceTransformationParameter);
     Descriptor_subsequence_cfg sub_conf(subsequenceIndex, transformParams);
@@ -588,22 +568,27 @@ Parameter_set create_quick_parameter_set(uint8_t _parameter_set_id, uint8_t _rea
                       false,
                       false
     );
-    ret.addClass(Data_unit::AU_type::U_TYPE_AU, Class_config(false, Qv_coding_config(Qv_coding_config::Qvps_preset_ID::ASCII)));
+    ret.addClass(Data_unit::AU_type::U_TYPE_AU, make_unique<Qv_coding_config_1>(Qv_coding_config_1::Qvps_preset_ID::ASCII, false));
     for(int desc = 0; desc < 18; ++desc) {
 
-        Decoder_configuration_cabac dcg;
-        for(int subseq = 0; subseq < parameters[desc].size(); ++subseq) {
-            dcg.addSubsequenceCfg(subseqFromGabac(parameters[desc][subseq], desc, subseq));
-        }
-        Descriptor_configuration dc;
+        std::unique_ptr<Decoder_configuration> dcg;
         if(desc != 11 && desc != 15) {
-            dc.set_decoder_configuration(dcg);
+            dcg = make_unique<Decoder_configuration_cabac>();
         } else {
-            dc.set_decoder_configuration_tokentype(Decoder_configuration_tokentype());
+            dcg = make_unique<Decoder_configuration_cabac_tokentype>();
         }
-        Descriptor d(false, 1);
-        d.setConfig(dc, 0);
-        ret.setDescriptor(desc,d);
+        for(size_t subseq = 0; subseq < parameters[desc].size(); ++subseq) {
+            dcg->addSubsequenceCfg(subseqFromGabac(parameters[desc][subseq], subseq));
+        }
+        auto dc = make_unique<Descriptor_configuration_0>();
+        if(desc != 11 && desc != 15) {
+            dc->set_decoder_configuration(std::move(dcg));
+        } else {
+            dc->_deactivate();
+        }
+        auto d = make_unique<Descriptor>();
+        d->setConfig(std::move(dc));
+        ret.setDescriptor(desc, std::move(d));
     }
     return ret;
 }
