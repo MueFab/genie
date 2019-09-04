@@ -30,16 +30,16 @@ Cpp files with the same name as the documented header file just contain the impl
 * data_block.h -> DataBlock class for word size awareness
 * decode_cabac.h -> CABAC inverse transformation block
 * decoding.h -> Decode task - result: original file
-* diff_coding.h -> Diff coding transformation block
+* DIFF_CODING.h -> Diff coding transformation block
 * encode_cabac.h -> CABAC transformation block
 * encoding.h -> Encoding task - result: gabac file
-* equality_coding.h -> Equality coding transformation block
+* EQUALITY_CODING.h -> Equality coding transformation block
 * exceptions.h -> Simple exceptions for gabac error handling
 * gabac.h -> Meta header including all other public headers. External users of gabac should include only this file.
-* lut_transform.h -> Look up table coding transformation block
-* match_coding.h -> Match coding transformation block
+* LUT_TRANSFORM.h -> Look up table coding transformation block
+* MATCH_CODING.h -> Match coding transformation block
 * reader.h -> Binarizations: decoding
-* rle_coding.h -> Run length coding transformation block
+* RLE_CODING.h -> Run length coding transformation block
 * run.h -> Public wrapper around decoding / encoding
 * stream_handler.h -> Utilities for writing / reading data blocks, bytes, etc.. to output streams
 * streams.h -> Stream utilities for compatibility with FILE* / datablock, ...

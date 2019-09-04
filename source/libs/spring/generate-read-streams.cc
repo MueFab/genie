@@ -77,7 +77,7 @@ namespace spring {
             seq_start = seq_end = 0; // all reads unaligned
         else {
             seq_end = seq_start = data.pos_arr[start_read_num];
-            // find last read in AU that's aligned
+            // find last read in AU that's ALIGNED
             uint64_t i = start_read_num;
             for (; i < end_read_num; i++) {
                 if (data.flag_arr[i] == false)
@@ -236,7 +236,7 @@ namespace spring {
         data->pos_arr = std::vector<uint64_t>(cp.num_reads);
         data->noise_len_arr = std::vector<uint16_t>(cp.num_reads);
 
-        // read streams for aligned reads
+        // read streams for ALIGNED reads
         std::ifstream f_seq(file_seq);
         f_seq.seekg(0, f_seq.end);
         uint64_t seq_len = f_seq.tellg();
@@ -269,7 +269,7 @@ namespace spring {
             f_pos.read((char *) &pos, sizeof(uint64_t));
             data->RC_arr[order] = rc;
             data->read_length_arr[order] = read_length;
-            data->flag_arr[order] = true;  // aligned
+            data->flag_arr[order] = true;  // ALIGNED
             data->pos_arr[order] = pos;
             data->pos_in_noise_arr[order] = current_pos_noise_arr;
             num_noise_in_curr_read = 0;
@@ -361,7 +361,7 @@ namespace spring {
         data->order_arr = std::vector<uint32_t>(cp.num_reads);
         // PE step 1: read all streams indexed by original position in FASTQ, also read order array
 
-        // read streams for aligned reads
+        // read streams for ALIGNED reads
         std::ifstream f_seq(file_seq);
         f_seq.seekg(0, f_seq.end);
         uint64_t seq_len = f_seq.tellg();
@@ -397,7 +397,7 @@ namespace spring {
             f_pos.read((char *) &pos, sizeof(uint64_t));
             data->RC_arr[order] = rc;
             data->read_length_arr[order] = read_length;
-            data->flag_arr[order] = true;  // aligned
+            data->flag_arr[order] = true;  // ALIGNED
             data->pos_arr[order] = pos;
             data->pos_in_noise_arr[order] = current_pos_noise_arr;
             num_noise_in_curr_read = 0;
@@ -702,7 +702,7 @@ namespace spring {
                     prevpos = seq_end;
                     seq_end = prevpos + data.read_length_arr[current] + data.read_length_arr[pair];
                 } else {
-                    // Case 2: both aligned
+                    // Case 2: both ALIGNED
                     out->subseq_vector[7][0].push_back(data.read_length_arr[current] - 1); // rlen
                     out->subseq_vector[7][0].push_back(data.read_length_arr[pair] - 1); // rlen
                     out->subseq_vector[1][0].push_back(rc_to_int[(uint8_t) data.RC_arr[current]]); // rcomp
@@ -804,7 +804,7 @@ namespace spring {
                                                                                             bool analyze,
                                                                                             dsg::StreamSaver &st) {
 
-// basic approach: start looking at reads from left to right. If current is aligned but
+// basic approach: start looking at reads from left to right. If current is ALIGNED but
 // pair is unaligned, pair is kept at the end current AU and stored in different record.
 // We try to keep number of records in AU = num_reads_per_block (without counting the the unaligned
 // pairs above.
