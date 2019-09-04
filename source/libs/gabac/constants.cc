@@ -119,7 +119,7 @@ const BinarizationProperties& getBinarization(const gabac::BinarizationId& id){
 const TransformationProperties& getTransformation(const gabac::SequenceTransformationId& id){
     static const std::vector<TransformationProperties> transformationInformation = {
             {
-                    "NO_TRANSFORM",  // Name
+                    "no_transform",  // Name
                     {},
                     {"out"},  // StreamNames
                     {0},  // WordSizes (0: non fixed current stream wordsize)
@@ -137,7 +137,7 @@ const TransformationProperties& getTransformation(const gabac::SequenceTransform
                     }
             },
             {
-                    "EQUALITY_CODING",  // Name
+                    "equality_coding",  // Name
                     {},
                     {"raw_symbols", "eq_flags"},  // StreamNames
                     {0, 1},  // WordSizes (0: non fixed current stream wordsize)
@@ -164,7 +164,7 @@ const TransformationProperties& getTransformation(const gabac::SequenceTransform
                     }
             },
             {
-                    "MATCH_CODING",  // Name
+                    "match_coding",  // Name
                     {"window_size"},
                     {"raw_values",  "pointers", "lengths"},  // StreamNames
                     {0, 4, 4},  // WordSizes (0: non fixed current stream wordsize)
@@ -196,7 +196,7 @@ const TransformationProperties& getTransformation(const gabac::SequenceTransform
                     }
             },
             {
-                    "RLE_CODING",  // Name
+                    "rle_coding",  // Name
                     {"guard"},
                     {"raw_values",  "lengths"},  // StreamNames
                     {0, 1},  // WordSizes (0: non fixed current stream wordsize)
@@ -257,7 +257,7 @@ const TransformationProperties& getTransformation(const gabac::SequenceTransform
                     }
             },
             {
-                    "DIFF_CODING",  // Name
+                    "diff_coding",  // Name
                     {},
                     {"sequence"},  // StreamNames
                     {0},  // WordSizes (0: non fixed current stream wordsize)
@@ -321,3 +321,4 @@ bool BinarizationProperties::sbCheck(uint64_t minv, uint64_t maxv, uint64_t para
 // ------------------------------------------------------------------------------
 
 }  // namespace gabac
+

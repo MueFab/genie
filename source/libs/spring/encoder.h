@@ -497,8 +497,8 @@ namespace spring {
         delete[] file_len_seq_thr;
 
         std::cout << "Encoding done:\n";
-        std::cout << matched_s << " singleton reads were ALIGNED\n";
-        std::cout << matched_N << " reads with N were ALIGNED\n";
+        std::cout << matched_s << " singleton reads were aligned\n";
+        std::cout << matched_N << " reads with N were aligned\n";
         return;
     }
 
@@ -644,3 +644,4 @@ namespace spring {
 }  // namespace spring
 
 #endif  // SPRING_ENCODER_H_
+
