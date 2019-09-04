@@ -119,7 +119,7 @@ const BinarizationProperties& getBinarization(const gabac::BinarizationId& id){
 const TransformationProperties& getTransformation(const gabac::SequenceTransformationId& id){
     static const std::vector<TransformationProperties> transformationInformation = {
             {
-                    "no_transform",  // Name
+                    "NO_TRANSFORM",  // Name
                     {},
                     {"out"},  // StreamNames
                     {0},  // WordSizes (0: non fixed current stream wordsize)
@@ -137,7 +137,7 @@ const TransformationProperties& getTransformation(const gabac::SequenceTransform
                     }
             },
             {
-                    "equality_coding",  // Name
+                    "EQUALITY_CODING",  // Name
                     {},
                     {"raw_symbols", "eq_flags"},  // StreamNames
                     {0, 1},  // WordSizes (0: non fixed current stream wordsize)
@@ -164,7 +164,7 @@ const TransformationProperties& getTransformation(const gabac::SequenceTransform
                     }
             },
             {
-                    "match_coding",  // Name
+                    "MATCH_CODING",  // Name
                     {"window_size"},
                     {"raw_values",  "pointers", "lengths"},  // StreamNames
                     {0, 4, 4},  // WordSizes (0: non fixed current stream wordsize)
@@ -196,7 +196,7 @@ const TransformationProperties& getTransformation(const gabac::SequenceTransform
                     }
             },
             {
-                    "rle_coding",  // Name
+                    "RLE_CODING",  // Name
                     {"guard"},
                     {"raw_values",  "lengths"},  // StreamNames
                     {0, 1},  // WordSizes (0: non fixed current stream wordsize)
@@ -257,7 +257,7 @@ const TransformationProperties& getTransformation(const gabac::SequenceTransform
                     }
             },
             {
-                    "diff_coding",  // Name
+                    "DIFF_CODING",  // Name
                     {},
                     {"sequence"},  // StreamNames
                     {0},  // WordSizes (0: non fixed current stream wordsize)

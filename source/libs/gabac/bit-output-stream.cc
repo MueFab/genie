@@ -50,7 +50,7 @@ void BitOutputStream::write(
     unsigned int numTotalBits = numBits + m_numHeldBits;
     unsigned int numNextHeldBits = numTotalBits % 8;
 
-    // Next steps: form a byte-aligned word by concatenating any held bits
+    // Next steps: form a byte-ALIGNED word by concatenating any held bits
     // with the new bits, discarding the bits that will form the nextheldBits
 
     // Determine the nextHeldBits
