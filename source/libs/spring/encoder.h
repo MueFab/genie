@@ -644,3 +644,4 @@ namespace spring {
 }  // namespace spring
 
 #endif  // SPRING_ENCODER_H_
+
