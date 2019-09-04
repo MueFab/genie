@@ -15,7 +15,9 @@
   - [ ] Applications and libraries each should have their own namespace, e.g. ``calq::``, ``gabac::``, ``genie::``, ``spring::`` etc.
 - [x] Make a ``utils``library containing constants, exceptions, log functionality, etc.
 - [x] Fix compiler warnings
-- [ ] Add code coverage report system
+- [ ] Add code coverage report system (copy from CALQ)
+- [ ] apply-clang-format.sh (copy from CALQ)
+- [ ] Doxygen
 
 ## For later
 
