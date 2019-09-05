@@ -1,5 +1,5 @@
 #include "descriptor_configuration.h"
-#include "bitwriter.h"
+#include "ureads-encoder/format/part2/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 

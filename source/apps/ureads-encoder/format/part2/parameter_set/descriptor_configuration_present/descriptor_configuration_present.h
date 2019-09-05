@@ -3,7 +3,7 @@
 
 // -----------------------------------------------------------------------------------------------------------------
 
-#include "ureads-encoder/format/part2/descriptor_configuration.h"
+#include "ureads-encoder/format/part2/parameter_set/descriptor_configuration.h"
 #include "decoder_configuration.h"
 
 #include <memory>

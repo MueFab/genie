@@ -1,7 +1,7 @@
 #include "descriptor_configuration_container.h"
-#include "bitwriter.h"
-#include "make_unique.h"
-#include "ureads-encoder/format/part2/descriptor_configuration_present/descriptor_configuration_present.h"
+#include "ureads-encoder/format/part2/bitwriter.h"
+#include "ureads-encoder/format/part2/make_unique.h"
+#include "ureads-encoder/format/part2/parameter_set/descriptor_configuration_present/descriptor_configuration_present.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 

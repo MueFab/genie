@@ -6,77 +6,23 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include "ureads-encoder/format/part2/make_unique.h"
 
 #include <gabac/gabac.h>
 
-#include "data_unit.h"
+#include "ureads-encoder/format/part2/data_unit.h"
+#include "ureads-encoder/format/part2/access_unit/block.h"
+#include "ureads-encoder/format/part2/access_unit/mm_cfg.h"
+#include "ureads-encoder/format/part2/access_unit/ref_cfg.h"
+#include "ureads-encoder/format/part2/access_unit/au_type_cfg.h"
+#include "ureads-encoder/format/part2/access_unit/signature_cfg.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-    struct MmCfg {
-        uint16_t mm_threshold : 16;
-        uint32_t mm_count : 32;
-
-        virtual void write(BitWriter &writer);
-    };
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    struct RefCfg {
-        uint16_t ref_sequence_ID : 16;
-        uint64_t ref_start_position; // TODO: Size
-        uint64_t ref_end_position; // TODO: Size
-
-        virtual void write(BitWriter &writer);
-    };
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    struct ExtendedAu {
-        uint64_t extended_AU_start_position; // TODO: Size
-        uint64_t extended_AU_end_position; // TODO: Size
-
-        virtual void write(BitWriter &writer);
-    };
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    struct AuTypeCfg {
-        uint16_t sequence_ID : 16;
-        uint64_t AU_start_position; // TODO: Size;
-        uint64_t AU_end_position; // TODO: Size;
-        std::vector<ExtendedAu> extended_AU;
-
-        virtual void write(BitWriter &writer);
-    };
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    class Block {
-    private:
-        // Header
-        uint8_t reserved : 1;
-        uint8_t descriptor_ID : 7;
-        uint8_t reserved_2 : 3;
-        uint32_t block_payload_size : 29;
-
-        std::vector<uint8_t> payload; // TODO: adjust gabac stream size
-
-    public:
-        virtual void write(BitWriter &writer);
-
-        uint32_t getTotalSize() {
-            return block_payload_size + 5;
-        }
-
-        Block(uint8_t _descriptor_ID, std::vector<uint8_t> *_payload);
-
-        Block();
-    };
-
-    // -----------------------------------------------------------------------------------------------------------------
-
+    /**
+    * ISO 23092-2 Section 3.4.1.1 table 19
+    */
     class AccessUnit : public DataUnit {
     public:
         void write(BitWriter *writer) override;
@@ -90,28 +36,44 @@ namespace format {
         void addBlock(std::unique_ptr<Block> block);
 
     private:
-        // data unit
-        uint8_t reserved : 3;
-        uint32_t data_unit_size : 29;
 
-        // Header
-        uint32_t access_unit_ID : 32;
-        uint8_t num_blocks : 8;
-        uint8_t parameter_set_ID : 8;
-        AuType au_type; // : 4
-        uint32_t reads_count : 32;
-        std::vector<MmCfg> mm_cfg;
-        std::vector<RefCfg> ref_cfg;
-        std::vector<AuTypeCfg> au_Type_U_Cfg;
-        std::vector<uint16_t> num_signatures; //  : 16
-        std::vector<uint64_t> u_cluster_signatures; // TODO: size
+        /**
+         * Incorporated (Simplification): ISO 23092-2 Section 3.1 table 3
+         *
+         * ------------------------------------------------------------------------------------------------------------ */
+        uint8_t reserved : 3; //!< Line 13
+        uint32_t data_unit_size : 29; //!< Line 14
 
-        // --- padding ---
+        /** ----------------------------------------------------------------------------------------------------------- */
 
-        // Blocks
-        std::vector<std::unique_ptr<Block>> blocks;
+        /**
+        * ISO 23092-2 Section 3.4.1.1 table 19
+        *
+        * ------------------------------------------------------------------------------------------------------------- */
 
-        uint64_t internalBitCounter;
+        uint32_t access_unit_ID : 32; //!< Line 2
+        uint8_t num_blocks : 8; //!< Line 3
+        uint8_t parameter_set_ID : 8; //!< Line 4
+        AuType au_type; //!< : 4;  Line 5
+        uint32_t reads_count : 32; //!< Line 6
+        std::unique_ptr<MmCfg> mm_cfg; //!< Lines 7 to 10
+        std::unique_ptr<RefCfg> ref_cfg; //!< Lines 11 to 15
+        std::unique_ptr<AuTypeCfg> au_Type_U_Cfg; //!< Lines 16 to 25
+        std::unique_ptr<SignatureCfg> signature_config; //!< Lines 26 to 41
+
+        /** Padding in write() //!< Line 42 + 43 */
+
+        /** ----------------------------------------------------------------------------------------------------------- */
+
+        /**
+        * ISO 23092-2 Section 3.4.1 table 18
+        *
+        * ------------------------------------------------------------------------------------------------------------- */
+        std::vector<std::unique_ptr<Block>> blocks; //!< Lines 3 to 5
+
+        /** ----------------------------------------------------------------------------------------------------------- */
+
+        uint64_t internalBitCounter; // TODO: get rid of this
     };
 
     // -----------------------------------------------------------------------------------------------------------------

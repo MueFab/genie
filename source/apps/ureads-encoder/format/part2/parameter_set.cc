@@ -3,10 +3,10 @@
 
 #include <sstream>
 
-#include "make_unique.h"
-#include "descriptor_configuration.h"
-#include "descriptor_configuration_container.h"
-#include "qv_coding_config.h"
+#include "ureads-encoder/format/part2/make_unique.h"
+#include "ureads-encoder/format/part2/parameter_set/descriptor_configuration.h"
+#include "ureads-encoder/format/part2/parameter_set/descriptor_configuration_container.h"
+#include "ureads-encoder/format/part2/parameter_set/qv_coding_config.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 

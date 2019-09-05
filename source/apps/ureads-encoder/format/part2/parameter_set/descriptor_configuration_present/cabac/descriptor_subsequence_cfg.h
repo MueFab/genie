@@ -6,8 +6,8 @@
 #include <memory>
 #include <vector>
 
-#include "ureads-encoder/format/part2/descriptor_configuration_present/cabac/transform_subseq_parameters.h"
-#include "ureads-encoder/format/part2/descriptor_configuration_present/cabac/transform_subseq_cfg.h"
+#include "transform_subseq_parameters.h"
+#include "transform_subseq_cfg.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 
