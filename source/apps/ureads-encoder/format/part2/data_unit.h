@@ -1,4 +1,3 @@
-
 #ifndef GENIE_DATA_UNIT_H
 #define GENIE_DATA_UNIT_H
 

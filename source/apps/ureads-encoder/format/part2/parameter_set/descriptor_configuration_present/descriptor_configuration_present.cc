@@ -1,6 +1,6 @@
 #include "descriptor_configuration_present.h"
 #include "ureads-encoder/format/part2/make_unique.h"
-#include "ureads-encoder/format/part2/descriptor_configuration_present/cabac/decoder_configuration_cabac_regular.h"
+#include "ureads-encoder/format/part2/parameter_set/descriptor_configuration_present/cabac/decoder_configuration_cabac_regular.h"
 
 namespace format {
     namespace desc_conf_pres {
