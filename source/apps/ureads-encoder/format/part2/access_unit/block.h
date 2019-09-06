@@ -3,15 +3,18 @@
 
 // -----------------------------------------------------------------------------------------------------------------
 
-
+#include <cstdint>
+#include <vector>
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
 
-/**
-* ISO 23092-2 Section 3.4.1.2 table 20 + 3.4.1.2.1 table 21
-*/
+    class BitWriter;
+
+    /**
+    * ISO 23092-2 Section 3.4.1.2 table 20 + 3.4.1.2.1 table 21
+    */
     class Block {
     private:
         /**
@@ -33,9 +36,7 @@ namespace format {
     public:
         virtual void write(BitWriter *writer);
 
-        uint32_t getTotalSize() {
-            return block_payload_size + 5;
-        }
+        uint32_t getTotalSize();
 
         Block(uint8_t _descriptor_ID, std::vector <uint8_t> *_payload);
 

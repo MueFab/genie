@@ -1,5 +1,5 @@
-#ifndef GENIE_MM_CFG_H
-#define GENIE_MM_CFG_H
+#ifndef GENIE_CRPS_INFO_H
+#define GENIE_CRPS_INFO_H
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -9,22 +9,20 @@
 
 namespace format {
     class BitWriter;
-
     /**
-    * ISO 23092-2 Section 3.4.1.1 table 19 lines 7 to 10
+    * ISO 23092-2 Section 3.3.2.3 table 16 lines 3+4
     */
-    class MmCfg {
+    class CrpsInfo {
     private:
-        uint16_t mm_threshold : 16; //!< Line 8
-        uint32_t mm_count : 32; //!< Line 9
-
+        uint8_t cr_pad_size : 8; //!<< Line 3
+        uint32_t cr_buf_max_size : 24; //!<< Line 4
     public:
-        MmCfg(uint16_t _mm_threshold, uint32_t _mm_count);
+        explicit CrpsInfo(uint8_t cr_pad_size = 0, uint32_t cr_buf_max_size = 0);
 
-        virtual void write(BitWriter *writer);
+        virtual void write(BitWriter *writer) const;
     };
 }
 
 // -----------------------------------------------------------------------------------------------------------------
 
-#endif //GENIE_MM_CFG_H
+#endif //GENIE_CRPS_INFO_H

@@ -3,59 +3,9 @@
 
 #include <cstdint>
 #include "parameter_set.h"
+#include "access_unit.h"
 
 namespace format {
-
-/* ----------------------------------------------------------------------------------------------------------- */
-
-    struct CrInfo {
-        /*  uint8_t cr_pad_size : 8;
-          uint32_t cr_buf_max_size : 24;*/
-
-        virtual void write(BitWriter &writer);
-    };
-
-/* ----------------------------------------------------------------------------------------------------------- */
-
-    class QvCodebook {
-        /*
-    private:
-        uint8_t qv_num_codebook_entries : 8;
-        std::vector<uint8_t> qv_recon;
-
-    public:
-        QvCodebook();
-
-        void addEntry(uint8_t entry);
-
-        virtual void write(BitWriter *writer) const;*/
-    };
-
-/* ----------------------------------------------------------------------------------------------------------- */
-
-/* ----------------------------------------------------------------------------------------------------------- */
-
-/*class DecoderConfigurationCabacTokentype : public DecoderConfigurationCabac {
-private:
-    TransformSubseqParameters transform_subseq_parameters;
-    std::vector<TransformSubseqCfg> transformSubseq_cfg;
-
-public:
-    void addSubsequenceCfg(const DescriptorSubsequenceCfg &cfg) override {
-        (void) cfg;
-    }
-
-    std::unique_ptr<DecoderConfiguration> clone() const override {
-        return make_unique<Decoder_configuration_cabac_tokentype>();
-    }
-
-    void write(BitWriter *writer) const override;
-};*/
-
-/* ----------------------------------------------------------------------------------------------------------- */
-
-/* ----------------------------------------------------------------------------------------------------------- */
-
     enum class GenomicDescriptor : uint8_t {
         pos = 0,
         rcomp = 1,
@@ -92,6 +42,12 @@ public:
                                          bool paired_end,
                                          bool qv_values_present,
                                          const std::vector<std::vector<gabac::EncodingConfiguration>> &parameters
+    );
+
+    AccessUnit createQuickAccessUnit(uint32_t access_unit_id,
+                                     uint8_t parameter_set_id,
+                                     uint32_t reads_count,
+                                     std::vector<std::vector<gabac::DataBlock>> *data
     );
 
 }
