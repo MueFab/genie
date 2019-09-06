@@ -35,14 +35,5 @@ namespace format {
         void DescriptorConfigurationPresent::set_decoder_configuration(std::unique_ptr<DecoderConfiguration> conf) {
             decoder_configuration = std::move(conf);
         }
-
-        // -----------------------------------------------------------------------------------------------------------------
-
-        void DescriptorConfigurationPresent::_deactivate() {
-            /*  decoder_configuration_tokentype.resize(1);
-              decoder_configuration_tokentype[0] = conf;
-              decoder_configuration.clear();*/
-            dec_cfg_preset = DecCfgPreset(255); // TODO: implement token type, don't rely on reserved values
-        }
     }
 }

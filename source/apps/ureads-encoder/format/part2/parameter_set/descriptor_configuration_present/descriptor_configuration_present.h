@@ -26,8 +26,6 @@ namespace format {
             void write(BitWriter *writer) const override;
 
             void set_decoder_configuration(std::unique_ptr<DecoderConfiguration> conf);
-
-            void _deactivate(); // TODO: get rid of this
         };
     }
 }
