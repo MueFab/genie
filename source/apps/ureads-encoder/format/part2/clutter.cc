@@ -1,4 +1,5 @@
 #include <array>
+#include <ureads-encoder/format/part2/parameter_set/descriptor_configuration_present/cabac/decoder_configuration_cabac_tokentype.h>
 
 #include "clutter.h"
 #include "ureads-encoder/format/part2/parameter_set/qv_coding_config_1/qv_coding_config_1.h"
@@ -24,7 +25,7 @@ namespace format {
                          {"pair", 8},
                          {"mscore", 1},
                          {"mmap", 5},
-                         {"msar", 2},
+                         {"msar", 1},
                          {"rtype", 1},
                          {"rgroup", 1},
                          {"qv", 0},
@@ -40,7 +41,7 @@ namespace format {
         auto transformParams = make_unique<desc_conf_pres::cabac::TransformSubseqParameters>(
                 desc_conf_pres::cabac::TransformSubseqParameters::TransformIdSubseq(conf.sequenceTransformationId),
                 conf.sequenceTransformationParameter);
-        auto sub_conf = make_unique<desc_conf_pres::cabac::DescriptorSubsequenceCfg>(std::move(transformParams), subsequenceIndex);
+        auto sub_conf = make_unique<desc_conf_pres::cabac::DescriptorSubsequenceCfg>(std::move(transformParams), subsequenceIndex, false);
         for (const auto &i : conf.transformedSequenceConfigurations) {
             desc_conf_pres::cabac::SupportValues::TransformIdSubsym transform = desc_conf_pres::cabac::SupportValues::TransformIdSubsym::NO_TRANSFORM;
             if (i.lutTransformationEnabled && i.diffCodingEnabled) {
@@ -85,18 +86,17 @@ namespace format {
         ret.addClass(DataUnit::AuType::U_TYPE_AU,
                      make_unique<qv_coding1::QvCodingConfig1>(qv_coding1::QvCodingConfig1::QvpsPresetId::ASCII, false));
         for (int desc = 0; desc < 18; ++desc) {
-
             std::unique_ptr<desc_conf_pres::cabac::DecoderConfigurationCabac> dcg;
-            dcg = make_unique<desc_conf_pres::cabac::DecoderConfigurationCabacRegular>();
+            if (desc != 11 && desc != 15) {
+                dcg = make_unique<desc_conf_pres::cabac::DecoderConfigurationCabacRegular>();
+            } else {
+                dcg = make_unique<desc_conf_pres::cabac::DecoderConfigurationCabacTokentype>();
+            }
             for (size_t subseq = 0; subseq < parameters[desc].size(); ++subseq) {
                 dcg->addSubsequenceCfg(subseqFromGabac(parameters[desc][subseq], subseq));
             }
             auto dc = make_unique<desc_conf_pres::DescriptorConfigurationPresent>();
-            if (desc != 11 && desc != 15) {
-                dc->set_decoder_configuration(std::move(dcg));
-            } else {
-                dc->_deactivate();
-            }
+            dc->set_decoder_configuration(std::move(dcg));
             auto d = make_unique<DescriptorConfigurationContainer>();
             d->setConfig(std::move(dc));
             ret.setDescriptor(desc, std::move(d));
