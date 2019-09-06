@@ -1,11 +1,11 @@
 #include <array>
 
 #include "clutter.h"
-#include "ureads-encoder/format/part2/qv_coding_config_1/qv_coding_config_1.h"
-#include "ureads-encoder/format/part2/descriptor_configuration_present/cabac/descriptor_subsequence_cfg.h"
-#include "ureads-encoder/format/part2/descriptor_configuration_present/decoder_configuration.h"
-#include "ureads-encoder/format/part2/descriptor_configuration_present/cabac/decoder_configuration_cabac_regular.h"
-#include "ureads-encoder/format/part2/descriptor_configuration_present/descriptor_configuration_present.h"
+#include "ureads-encoder/format/part2/parameter_set/qv_coding_config_1/qv_coding_config_1.h"
+#include "ureads-encoder/format/part2/parameter_set/descriptor_configuration_present/cabac/descriptor_subsequence_cfg.h"
+#include "ureads-encoder/format/part2/parameter_set/descriptor_configuration_present/decoder_configuration.h"
+#include "ureads-encoder/format/part2/parameter_set/descriptor_configuration_present/cabac/decoder_configuration_cabac_regular.h"
+#include "ureads-encoder/format/part2/parameter_set/descriptor_configuration_present/descriptor_configuration_present.h"
 #include "make_unique.h"
 
 namespace format {
@@ -34,60 +34,6 @@ namespace format {
                  }};
         return prop;
     }
-
-/*void Decoder_configuration_cabac_tokentype::write(BitWriter *writer) const {
-    DecoderConfigurationCabac::write(writer);
-    transform_subseq_parameters.write(writer);
-    for (auto &i : transformSubseq_cfg) {
-        i.write(writer);
-    }
-}*/
-
-
-/*QvCodebook::QvCodebook() : qv_num_codebook_entries(0), qv_recon(0) {
-
-}
-
-void QvCodebook::addEntry(uint8_t entry) {
-    qv_num_codebook_entries += 1;
-    qv_recon.push_back(entry);
-}
-
-void QvCodebook::write(BitWriter *writer) const {
-    writer->write(qv_num_codebook_entries, 8);
-    for (auto &i : qv_recon) {
-        writer->write(i, 8);
-    }
-}*/
-
-/*ParameterSetQvps::ParameterSetQvps() : qv_num_codebooks_total(0), qv_codebooks(0) {
-}
-
-void ParameterSetQvps::addCodeBook(const QvCodebook &book) {
-    qv_codebooks.push_back(book);
-    qv_num_codebooks_total += 1;
-}*/
-
-    void qv_coding1::ParameterSetQvps::write(BitWriter *writer) const {
-        /*  writer->write(qv_num_codebooks_total, 4);
-          for (auto &i : qv_codebooks) {
-              i.write(writer);
-          } */
-    }
-
-
-    void CrInfo::write(BitWriter &writer) {
-/*    writer.write(cr_pad_size, 8);
-    writer.write(cr_buf_max_size, 24); */
-    }
-
-    void ParameterSetCrps::write(BitWriter &writer) {
-        /*    writer.write(uint8_t(cr_alg_ID), 8);
-        for (auto &i : cr_info) {
-            i.write(writer);
-        }*/
-    }
-
 
     std::unique_ptr<desc_conf_pres::cabac::DescriptorSubsequenceCfg>
     subseqFromGabac(const gabac::EncodingConfiguration &conf, uint8_t subsequenceIndex) {
@@ -157,5 +103,47 @@ void ParameterSetQvps::addCodeBook(const QvCodebook &book) {
         }
         return ret;
     }
+    std::vector<uint8_t> create_payload(const std::vector<gabac::DataBlock> &block) {
+        std::vector<uint8_t> ret;
+        uint64_t totalSize = 0;
+        for (auto &load : block) {
+            totalSize += load.getRawSize();
+            totalSize += sizeof(uint32_t);
+        }
+        if (block.size() > 0) {
+            totalSize -= sizeof(uint32_t);
+        }
+        ret.reserve(totalSize);
 
+        for (size_t i = 0; i < block.size(); ++i) {
+            auto &load = block[i];
+            if (i != block.size() - 1) {
+                uint32_t size = load.getRawSize();
+                ret.insert(ret.end(), reinterpret_cast<uint8_t *>(&size),
+                           reinterpret_cast<uint8_t *>(&size) + sizeof(uint32_t));
+            }
+            if (load.getRawSize()) {
+                ret.insert(ret.end(), reinterpret_cast<const uint8_t *>(load.getData()),
+                           reinterpret_cast<const uint8_t *>(load.getData()) + load.getRawSize());
+            }
+        }
+        return ret;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    AccessUnit createQuickAccessUnit(uint32_t access_unit_id, uint8_t parameter_set_id, uint32_t reads_count,
+                                     std::vector<std::vector<gabac::DataBlock>> *data) {
+        AccessUnit au(access_unit_id, parameter_set_id, DataUnit::AuType::U_TYPE_AU, reads_count,
+                      DataUnit::DatasetType::NON_ALIGNED);
+        for (size_t i = 0; i < data->size(); ++i) {
+            if (i == 11 || i == 15 || data->at(i).empty()) {
+                continue; // TODO: Token types
+            }
+            auto &desc = (*data)[i];
+            auto payload = create_payload(desc);
+            au.addBlock(std::unique_ptr<Block>(new Block(i, &payload)));
+        }
+        return au;
+    }
 }

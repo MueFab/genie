@@ -75,14 +75,6 @@ namespace format {
 
         uint64_t internalBitCounter; // TODO: get rid of this
     };
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    AccessUnit createQuickAccessUnit(uint32_t access_unit_id,
-                                     uint8_t parameter_set_id,
-                                     uint32_t reads_count,
-                                     std::vector<std::vector<gabac::DataBlock>> *data
-    );
 }
 
 // -----------------------------------------------------------------------------------------------------------------

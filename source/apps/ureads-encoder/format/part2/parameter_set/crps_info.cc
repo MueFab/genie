@@ -1,17 +1,18 @@
-#include "mm_cfg.h"
+#include "crps_info.h"
 #include "ureads-encoder/format/part2/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-    void MmCfg::write(BitWriter *writer) {
-        writer->write(mm_threshold, 16);
-        writer->write(mm_count, 32);
+    CrpsInfo::CrpsInfo(uint8_t _cr_pad_size, uint32_t _cr_buf_max_size)
+    : cr_pad_size(_cr_pad_size),
+      cr_buf_max_size(_cr_buf_max_size) {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    MmCfg::MmCfg(uint16_t _mm_threshold, uint32_t _mm_count) : mm_threshold(_mm_threshold), mm_count(_mm_count) {
-
+    void CrpsInfo::write(BitWriter *writer) const {
+        writer->write(cr_pad_size, 8);
+        writer->write(cr_buf_max_size, 24);
     }
 }
