@@ -25,7 +25,7 @@ namespace format {
     */
     class AccessUnit : public DataUnit {
     public:
-        void write(BitWriter *writer) override;
+        void write(BitWriter *writer) const override;
 
         AccessUnit(uint32_t _access_unit_ID,
                    uint8_t _parameter_set_ID,
@@ -36,6 +36,8 @@ namespace format {
         void addBlock(std::unique_ptr<Block> block);
 
     private:
+
+        void preWrite(BitWriter *writer) const;
 
         /**
          * Incorporated (Simplification): ISO 23092-2 Section 3.1 table 3
@@ -70,10 +72,6 @@ namespace format {
         *
         * ------------------------------------------------------------------------------------------------------------- */
         std::vector<std::unique_ptr<Block>> blocks; //!< Lines 3 to 5
-
-        /** ----------------------------------------------------------------------------------------------------------- */
-
-        uint64_t internalBitCounter; // TODO: get rid of this
     };
 }
 

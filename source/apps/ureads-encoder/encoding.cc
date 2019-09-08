@@ -19,6 +19,7 @@ extern "C" {
 }
 
 #include <gabac/gabac.h>
+#include <ureads-encoder/format/part2/raw_reference.h>
 
 #include "ureads-encoder/format/part2/access_unit.h"
 #include "ureads-encoder/format/part2/parameter_set.h"
@@ -158,6 +159,10 @@ void encode(const ProgramOptions &programOptions)
     const uint32_t ACCESS_UNIT_ID = 0;
     AccessUnit au = createQuickAccessUnit(ACCESS_UNIT_ID, PARAMETER_SET_ID, 0, &generated_streams); // TODO: reads_count = readNum, currently deativated because AU is empty
     au.write(&bw);
+
+    RawReference r;
+    r.addSequence(make_unique<RawReferenceSequence>(0, 0, 3, make_unique<std::string>("AAT")));
+    r.write(&bw);
 
     GENIE_LOG_TRACE << "Number of bitstreams: " << generated_streams.size();
 

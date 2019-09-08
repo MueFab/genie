@@ -56,7 +56,7 @@ namespace format {
 
         explicit DataUnit(const DataUnitType &t);
 
-        virtual void write(BitWriter *write);
+        virtual void write(BitWriter *write) const;
     };
 
 }

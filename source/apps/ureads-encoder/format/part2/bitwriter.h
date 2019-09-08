@@ -28,6 +28,7 @@ namespace format {
         ~BitWriter();
 
         void write(uint64_t value, uint8_t bits);
+        void write(std::istream* in);
 
         void flush();
 
