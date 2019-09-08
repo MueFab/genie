@@ -71,9 +71,11 @@ namespace format {
 
         void setMultipleSignatureBase(uint32_t _multiple_signature_base, uint8_t _U_signature_size);
 
-        void write(BitWriter *writer) override;
+        void write(BitWriter *writer) const override;
 
     private:
+
+        void preWrite(BitWriter *writer) const;
 
         /**
          * Incorporated (Simplification): ISO 23092-2 Section 3.1 table 3
@@ -126,8 +128,6 @@ namespace format {
 
         /** ----------------------------------------------------------------------------------------------------------- */
 
-        uint64_t internalBitCounter; // TODO: get rid of this
-        void addSize(uint64_t bits);
     };
 }
 

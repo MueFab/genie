@@ -25,8 +25,7 @@ namespace format {
         ref_cfg(nullptr),
         au_Type_U_Cfg(nullptr),
         signature_config(nullptr),
-        blocks(0),
-        internalBitCounter(0) {
+        blocks(0) {
         if (au_type == AuType::N_TYPE_AU || au_type == AuType::M_TYPE_AU) {
            // mm_cfg =make_unique<MmCfg>(); // TODO: Fill for types N and M
             GENIE_THROW_RUNTIME_EXCEPTION("Types N and M not supported");
@@ -44,23 +43,36 @@ namespace format {
         }*/
         }
 
-        std::stringstream s;
-        BitWriter bw(&s);
-        write(&bw);
-
-        internalBitCounter = bw.getBitsWritten();
-        data_unit_size = internalBitCounter / 8;
-        if (internalBitCounter % 8) {
-            data_unit_size += 1;
-        }
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    void AccessUnit::write(BitWriter *writer) {
+    void AccessUnit::write(BitWriter *writer) const {
         DataUnit::write(writer);
         writer->write(reserved, 3);
-        writer->write(data_unit_size, 29);
+
+        // Calculate size and write structure to tmp buffer
+        std::stringstream ss;
+        BitWriter tmp_writer(&ss);
+        preWrite(&tmp_writer);
+        tmp_writer.flush();
+        uint64_t bits = tmp_writer.getBitsWritten();
+        for (auto &i : blocks) {
+            bits += i->getTotalSize() * uint64_t (8);
+        }
+        const uint64_t TYPE_SIZE_SIZE = 8 + 3 + 29; // data_unit_type, reserved, data_unit_size
+        bits += TYPE_SIZE_SIZE;
+        const uint64_t bytes = bits / 8;
+
+        // Now size is known, write to final destination
+        writer->write(bytes, 29);
+        writer->write(&ss);
+        for (auto &i : blocks) {
+            i->write(writer);
+        }
+    }
+
+    void AccessUnit::preWrite(BitWriter *writer) const {
         writer->write(access_unit_ID, 32);
         writer->write(num_blocks, 8);
         writer->write(parameter_set_ID, 8);
@@ -77,10 +89,6 @@ namespace format {
         }
         if(signature_config) {
             signature_config->write(writer);
-        }
-        writer->flush(); // Zero bytes
-        for (auto &i : blocks) {
-            i->write(writer);
         }
     }
 

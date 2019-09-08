@@ -48,23 +48,36 @@ namespace format {
         u_signature_size(nullptr),
         qv_coding_configs(0),
         crps_flag(false),
-        parameter_set_crps(nullptr),
-        internalBitCounter(0) {
+        parameter_set_crps(nullptr) {
         for (auto &i : descriptors) {
             i = make_unique<DescriptorConfigurationContainer>();
         }
-        std::stringstream s;
-        BitWriter bw(&s);
-        write(&bw);
-        addSize(bw.getBitsWritten());
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    void ParameterSet::write(BitWriter *writer) {
+    void ParameterSet::write(BitWriter *writer) const {
         DataUnit::write(writer);
         writer->write(reserved, 10);
-        writer->write(data_unit_size, 22);
+
+        // Calculate size and write structure to tmp buffer
+        std::stringstream ss;
+        BitWriter tmp_writer(&ss);
+        preWrite(&tmp_writer);
+        tmp_writer.flush();
+        uint64_t bits = tmp_writer.getBitsWritten();
+        const uint64_t TYPE_SIZE_SIZE = 8 + 10 + 22; // data_unit_type, reserved, data_unit_size
+        bits += TYPE_SIZE_SIZE;
+        uint64_t bytes = bits / 8 + ((bits % 8) ? 1 : 0);
+
+        // Now size is known, write to final destination
+        writer->write(bytes, 22);
+        writer->write(&ss);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    void ParameterSet::preWrite(BitWriter *writer) const {
         writer->write(parameter_set_ID, 8);
         writer->write(parent_parameter_set_ID, 8);
         writer->write(uint8_t(dataset_type), 4);
@@ -103,7 +116,6 @@ namespace format {
         if (parameter_set_crps) {
             parameter_set_crps->write(*writer);
         }
-        writer->flush();
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -116,29 +128,16 @@ namespace format {
     // -----------------------------------------------------------------------------------------------------------------
 
     void ParameterSet::addClass(AuType class_id, std::unique_ptr<QvCodingConfig> conf) {
-        std::stringstream s;
-        BitWriter bw(&s);
-        conf->write(&bw);
-        addSize(bw.getBitsWritten());
 
         num_classes += 1;
         class_IDs.push_back(class_id);
-        addSize(4);
         qv_coding_configs.push_back(std::move(conf));
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
     void ParameterSet::setDescriptor(uint8_t index, std::unique_ptr<DescriptorConfigurationContainer> descriptor) {
-        std::stringstream s;
-        BitWriter bw(&s);
-        descriptors[index]->write(&bw);
-        internalBitCounter -= bw.getBitsWritten();
-
         descriptors[index] = std::move(descriptor);
-        BitWriter bw2(&s);
-        descriptors[index]->write(&bw2);
-        addSize(bw2.getBitsWritten());
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -147,7 +146,6 @@ namespace format {
         GENIE_THROW_RUNTIME_EXCEPTION("Groups not supported");
         num_groups += 1;
         rgroup_IDs.push_back(std::move(rgroup_id));
-        addSize((rgroup_id->length() + 1) * 8);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -156,15 +154,5 @@ namespace format {
         GENIE_THROW_RUNTIME_EXCEPTION("Signature base not supported");
         multiple_signature_base = _multiple_signature_base;
         u_signature_size = make_unique<uint8_t>(_U_signature_size);
-        addSize(6);
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    void ParameterSet::addSize(uint64_t bits) {
-        internalBitCounter += bits;
-        data_unit_size = internalBitCounter / 8;
-        if (internalBitCounter % 8)
-            data_unit_size += 1;
     }
 }
