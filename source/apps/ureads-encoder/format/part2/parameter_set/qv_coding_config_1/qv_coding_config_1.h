@@ -3,7 +3,8 @@
 
 // -----------------------------------------------------------------------------------------------------------------
 
-#include "ureads-encoder/format/part2/qv_coding_config.h"
+#include "ureads-encoder/format/part2/parameter_set/qv_coding_config.h"
+#include "parameter_set_qvps.h"
 #include <memory>
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -11,21 +12,6 @@
 namespace format {
     class BitWriter;
     namespace qv_coding1 {
-        class ParameterSetQvps {
-        private:
-    /*      uint8_t qv_num_codebooks_total : 4;
-            std::vector<QvCodebook> qv_codebooks;
-
-        public:
-            ParameterSetQvps();
-
-            void addCodeBook(const QvCodebook &book); */
-        public:
-            virtual void write(BitWriter *writer) const;
-        };
-
-        // -----------------------------------------------------------------------------------------------------------------
-
         /**
         * ISO 23092-2 Section 3.3.2 table 7 lines 34 to 38
         */
