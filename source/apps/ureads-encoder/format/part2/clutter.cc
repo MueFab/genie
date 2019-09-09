@@ -77,9 +77,9 @@ namespace format {
             ret->setContextParameters(
                     make_unique<desc_conf_pres::cabac::CabacContextParameters>(
                             false,
-                            8,
-                            8,
-                            0
+                            3,
+                            3,
+                            false
                     )
             ); //TODO insert actual values
         }
@@ -100,8 +100,8 @@ namespace format {
             auto subcfg =
                     make_unique<desc_conf_pres::cabac::TransformSubseqCfg>(transform,
                                                                            make_unique<desc_conf_pres::cabac::SupportValues>(
-                                                                                   8,
-                                                                                   8,
+                                                                                   3,
+                                                                                   3,
                                                                                    0,
                                                                                    transform
                                                                            ),
