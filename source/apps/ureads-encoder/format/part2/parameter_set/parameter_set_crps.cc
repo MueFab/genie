@@ -1,6 +1,7 @@
 #include <ureads-encoder/exceptions.h>
 #include "parameter_set_crps.h"
 #include "ureads-encoder/format/part2/make_unique.h"
+#include "ureads-encoder/format/part2/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -19,4 +20,12 @@ namespace format {
         }
         crps_info = std::move(_crps_info);
     }
-};
+    // -----------------------------------------------------------------------------------------------------------------
+
+    void ParameterSetCrps::write(format::BitWriter *writer) const {
+        writer->write(uint8_t (cr_alg_ID), 8);
+        if(crps_info){
+            crps_info->write(writer);
+        }
+    }
+}

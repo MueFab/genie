@@ -25,6 +25,7 @@ namespace format {
         // -----------------------------------------------------------------------------------------------------------------
 
         void QvCodingConfig1::write(BitWriter *writer) const {
+            writer->write(uint8_t (qv_coding_mode), 4);
             writer->write(qvps_flag, 1);
             if (parameter_set_qvps) {
                 parameter_set_qvps->write(writer);

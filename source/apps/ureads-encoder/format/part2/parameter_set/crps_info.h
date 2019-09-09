@@ -17,7 +17,8 @@ namespace format {
         uint8_t cr_pad_size : 8; //!<< Line 3
         uint32_t cr_buf_max_size : 24; //!<< Line 4
     public:
-        explicit CrpsInfo(uint8_t cr_pad_size = 0, uint32_t cr_buf_max_size = 0);
+        CrpsInfo(uint8_t cr_pad_size, uint32_t cr_buf_max_size);
+        CrpsInfo();
 
         virtual void write(BitWriter *writer) const;
     };

@@ -20,8 +20,9 @@ namespace format {
 
     public:
         MmCfg(uint16_t _mm_threshold, uint32_t _mm_count);
+        MmCfg();
 
-        virtual void write(BitWriter *writer);
+        virtual void write(BitWriter *writer) const;
     };
 }
 

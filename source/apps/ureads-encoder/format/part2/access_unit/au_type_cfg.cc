@@ -23,6 +23,13 @@ namespace format {
 
     // -----------------------------------------------------------------------------------------------------------------
 
+    AuTypeCfg::AuTypeCfg(uint8_t _posSize)
+            : AuTypeCfg(0, 0, 0, _posSize) {
+
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
     void AuTypeCfg::setExtendedAu(std::unique_ptr<ExtendedAu> _extended_AU) {
         extended_AU = std::move(_extended_AU);
     }
