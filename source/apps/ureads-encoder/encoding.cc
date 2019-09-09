@@ -34,7 +34,7 @@ namespace genie {
                                                     "\"lut_transformation_enabled\": false,"
                                                     "\"diff_coding_enabled\": false,"
                                                     "\"binarization_id\": 0,"
-                                                    "\"binarization_parameters\":[3],"
+                                                    "\"binarization_parameters\":[8],"
                                                     "\"context_selection_id\": 0"
                                                     "}]"
                                                     "}";
@@ -71,6 +71,7 @@ void encode(const ProgramOptions &programOptions)
     std::string decodedUreads;
 
     size_t readNum=0;
+    size_t readSize = 0;
 
     while (true) {
         std::vector<genie::FastqRecord> fastqRecords;
@@ -83,6 +84,7 @@ void encode(const ProgramOptions &programOptions)
         // Iterate through the records.
         for (const auto &fastqRecord : fastqRecords) {
             decodedUreads += fastqRecord.sequence;
+            readSize = fastqRecord.sequence.length();
         }
 
         if (numRecords != BLOCK_SIZE) {
@@ -134,7 +136,7 @@ void encode(const ProgramOptions &programOptions)
     // Get the GABAC bitstream(s)
     std::vector<std::vector<gabac::DataBlock>> generated_streams = create_default_streams();
     generated_streams[UREADS_DESC_ID].emplace_back();
-  //  bufferOutputStream.flush_blocks(&generated_streams[UREADS_DESC_ID]); // TODO: enable (crashes currently)
+    bufferOutputStream.flush_blocks(&generated_streams[UREADS_DESC_ID]);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     // CREATE Part 2 units
@@ -145,7 +147,7 @@ void encode(const ProgramOptions &programOptions)
     BitWriter bw(&ofstr);
 
     const uint8_t PARAMETER_SET_ID = 0;
-    const uint32_t READ_LENGTH = 0;
+    const uint32_t READ_LENGTH = readSize;
     const bool PAIRED_END = false;
     const bool QV_PRESENT = false;
 
@@ -160,7 +162,7 @@ void encode(const ProgramOptions &programOptions)
     ps2.write(&bw);
 
     const uint32_t ACCESS_UNIT_ID = 0;
-    AccessUnit au = createQuickAccessUnit(ACCESS_UNIT_ID, PARAMETER_SET_ID, 0, &generated_streams); // TODO: reads_count = readNum, currently deativated because AU is empty
+    AccessUnit au = createQuickAccessUnit(ACCESS_UNIT_ID, PARAMETER_SET_ID, readNum, &generated_streams);
     au.write(&bw);
 
 
