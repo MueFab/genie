@@ -7,8 +7,8 @@
 
 // -----------------------------------------------------------------------------------------------------------------
 
-#include "ureads-encoder/format/part2/descriptor_configuration_present/cabac/support_values.h"
-#include "ureads-encoder/format/part2/descriptor_configuration_present/cabac/cabac_binarization.h"
+#include "support_values.h"
+#include "cabac_binarization.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 

@@ -3,7 +3,7 @@
 
 // -----------------------------------------------------------------------------------------------------------------
 
-#include "ureads-encoder/format/part2/descriptor_configuration_present/cabac/descriptor_subsequence_cfg.h"
+#include "ureads-encoder/format/part2/parameter_set/descriptor_configuration_present/cabac/descriptor_subsequence_cfg.h"
 
 #include <memory>
 

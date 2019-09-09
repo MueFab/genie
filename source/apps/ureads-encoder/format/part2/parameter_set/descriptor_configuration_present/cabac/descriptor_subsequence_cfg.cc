@@ -15,7 +15,11 @@ namespace format {
 
             std::unique_ptr<DescriptorSubsequenceCfg> DescriptorSubsequenceCfg::clone() const {
                 auto ret = make_unique<DescriptorSubsequenceCfg>();
-                ret->descriptor_subsequence_ID = descriptor_subsequence_ID;
+                if(descriptor_subsequence_ID) {
+                    ret->descriptor_subsequence_ID = make_unique<uint16_t >(*descriptor_subsequence_ID);
+                } else {
+                    ret->descriptor_subsequence_ID = nullptr;
+                }
                 ret->transform_subseq_parameters = transform_subseq_parameters->clone();
                 for (const auto &c : transformSubseq_cfgs) {
                     ret->transformSubseq_cfgs.push_back(c->clone());
@@ -27,11 +31,14 @@ namespace format {
 
             DescriptorSubsequenceCfg::DescriptorSubsequenceCfg(
                     std::unique_ptr<TransformSubseqParameters> _transform_subseq_parameters,
-                    uint16_t _descriptor_subsequence_ID
-            ) : descriptor_subsequence_ID(_descriptor_subsequence_ID),
+                    uint16_t _descriptor_subsequence_ID,
+                    bool tokentype
+            ) : descriptor_subsequence_ID(nullptr),
                 transform_subseq_parameters(std::move(_transform_subseq_parameters)),
                 transformSubseq_cfgs(0) {
-
+                if(!tokentype){
+                    descriptor_subsequence_ID = make_unique<uint16_t >(_descriptor_subsequence_ID);
+                }
             }
 
             // -----------------------------------------------------------------------------------------------------------------
@@ -44,7 +51,9 @@ namespace format {
             // -----------------------------------------------------------------------------------------------------------------
 
             void DescriptorSubsequenceCfg::write(BitWriter *writer) const {
-                writer->write(descriptor_subsequence_ID, 10);
+                if(descriptor_subsequence_ID) {
+                    writer->write(*descriptor_subsequence_ID, 10);
+                }
                 transform_subseq_parameters->write(writer);
                 for (auto &i : transformSubseq_cfgs) {
                     i->write(writer);

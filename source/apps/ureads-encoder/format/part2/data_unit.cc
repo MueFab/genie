@@ -8,7 +8,7 @@ namespace format {
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    void DataUnit::write(BitWriter *writer) {
+    void DataUnit::write(BitWriter *writer) const {
         writer->write(uint8_t(data_unit_type), 8);
     }
 }
