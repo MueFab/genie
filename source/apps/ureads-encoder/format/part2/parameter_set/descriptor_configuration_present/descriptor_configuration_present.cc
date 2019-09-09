@@ -1,13 +1,13 @@
+#include <ureads-encoder/format/part2/parameter_set/descriptor_configuration_present/cabac/decoder_configuration_cabac.h>
 #include "descriptor_configuration_present.h"
 #include "ureads-encoder/format/part2/make_unique.h"
-#include "ureads-encoder/format/part2/parameter_set/descriptor_configuration_present/cabac/decoder_configuration_cabac_regular.h"
 
 namespace format {
     namespace desc_conf_pres {
         DescriptorConfigurationPresent::DescriptorConfigurationPresent() : DescriptorConfiguration(
                 DecCfgPreset::PRESENT),
-                                                                           decoder_configuration(nullptr) {
-            decoder_configuration = make_unique<cabac::DecoderConfigurationCabacRegular>();
+                decoder_configuration(nullptr) {
+            decoder_configuration = make_unique<cabac::DecoderConfigurationCabac>(GenomicDescriptor::ureads);
 
         }
 

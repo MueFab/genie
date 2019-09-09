@@ -36,6 +36,8 @@ namespace format {
 
                 std::unique_ptr<TransformSubseqParameters> clone() const;
 
+                size_t getNumStreams() const;
+
             private:
                 TransformIdSubseq transform_ID_subseq; //!< : 8; Line 2
                 std::unique_ptr<uint16_t> match_coding_buffer_size; //!< : 16; Line 6

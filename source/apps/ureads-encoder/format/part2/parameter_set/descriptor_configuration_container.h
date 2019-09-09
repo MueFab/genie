@@ -13,9 +13,9 @@
 namespace format {
     class BitWriter;
 
-/**
-* ISO 23092-2 Section 3.3.2 table 7 lines 15 to 21
-*/
+    /**
+    * ISO 23092-2 Section 3.3.2 table 7 lines 15 to 21
+    */
     class DescriptorConfigurationContainer {
     public:
         DescriptorConfigurationContainer();
@@ -23,6 +23,7 @@ namespace format {
         void setConfig(uint8_t index, std::unique_ptr<DescriptorConfiguration> conf); //!< For class specific config
         void setConfig(std::unique_ptr<DescriptorConfiguration> conf); //!< For non-class-specific config
         void enableClassSpecificConfigs(uint8_t numClasses); //!< Unlocks class specific config
+        bool isClassSpecific() const;
 
         virtual void write(BitWriter *writer) const;
 
