@@ -5,7 +5,7 @@ set(source_files
         bit-input-stream-test.cc
         bit-output-stream-test.cc
         main.cc
-)
+        ../utils/fast-file-reader-test.cc)
 
 add_executable(gabac-tests ${source_files})
 
