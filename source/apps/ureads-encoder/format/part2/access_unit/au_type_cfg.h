@@ -25,6 +25,7 @@ namespace format {
 
     public:
         AuTypeCfg(uint16_t _sequence_ID, uint64_t _AU_start_position, uint64_t _AU_end_position, uint8_t posSize);
+        AuTypeCfg(uint8_t posSize);
 
         void setExtendedAu(std::unique_ptr <ExtendedAu> _extended_AU);
 

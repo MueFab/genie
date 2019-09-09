@@ -9,6 +9,9 @@ namespace format {
       cr_buf_max_size(_cr_buf_max_size) {
     }
 
+    CrpsInfo::CrpsInfo() : CrpsInfo(0, 0) {
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
 
     void CrpsInfo::write(BitWriter *writer) const {

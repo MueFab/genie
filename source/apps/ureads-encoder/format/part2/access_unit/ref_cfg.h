@@ -22,6 +22,7 @@ namespace format {
         uint8_t posSize; //!< internal
     public:
         RefCfg(uint16_t _ref_sequence_ID, uint64_t _ref_start_position, uint64_t _ref_end_position, uint8_t _posSize);
+        RefCfg(uint8_t _posSize);
 
         virtual void write(BitWriter *writer);
     };

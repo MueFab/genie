@@ -135,7 +135,7 @@ namespace format {
     AccessUnit createQuickAccessUnit(uint32_t access_unit_id, uint8_t parameter_set_id, uint32_t reads_count,
                                      std::vector<std::vector<gabac::DataBlock>> *data) {
         AccessUnit au(access_unit_id, parameter_set_id, DataUnit::AuType::U_TYPE_AU, reads_count,
-                      DataUnit::DatasetType::NON_ALIGNED);
+                      DataUnit::DatasetType::NON_ALIGNED, 32, 32, 0);
         for (size_t i = 0; i < data->size(); ++i) {
             if (i == 11 || i == 15 || data->at(i).empty()) {
                 continue; // TODO: Token types

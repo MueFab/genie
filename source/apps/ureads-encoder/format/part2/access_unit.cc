@@ -12,7 +12,10 @@ namespace format {
             uint8_t _parameter_set_ID,
             AuType _au_type,
             uint32_t _reads_count,
-            DatasetType dataset_type
+            DatasetType dataset_type,
+            uint8_t posSize,
+            uint8_t signatureSize,
+            uint32_t multiple_signature_base
     ) : DataUnit(DataUnitType::ACCESS_UNIT),
         reserved(0),
         data_unit_size(0),
@@ -27,22 +30,47 @@ namespace format {
         signature_config(nullptr),
         blocks(0) {
         if (au_type == AuType::N_TYPE_AU || au_type == AuType::M_TYPE_AU) {
-           // mm_cfg =make_unique<MmCfg>(); // TODO: Fill for types N and M
-            GENIE_THROW_RUNTIME_EXCEPTION("Types N and M not supported");
+            mm_cfg = make_unique<MmCfg>();
         }
         if (dataset_type == DatasetType::REFERENCE) {
-         //   ref_cfg = make_unique<RefCfg>(); // TODO: Fill for dataset_type 2
-            GENIE_THROW_RUNTIME_EXCEPTION("Dataset type reference not supported");
+            ref_cfg = make_unique<RefCfg>(posSize);
         }
         if (au_type != AuType::U_TYPE_AU) {
-          //  au_Type_U_Cfg = make_unique<AuTypeCfg>(); // TODO: Fill for ALIGNED data
-            GENIE_THROW_RUNTIME_EXCEPTION("AU type != U not supported");
+            au_Type_U_Cfg = make_unique<AuTypeCfg>(posSize);
         } else {
-/*        if (multiple_signature_base != 0) { // TODO: Check
-            GENIE_THROW_RUNTIME_EXCEPTION("multiple_signature_base not supported");
-        }*/
+            if (multiple_signature_base != 0) {
+                signature_config = make_unique<SignatureCfg>(0, signatureSize);
+            }
         }
 
+    }
+
+    void AccessUnit::setMmCfg(std::unique_ptr<MmCfg> cfg) {
+        if (!mm_cfg) {
+            GENIE_THROW_RUNTIME_EXCEPTION("MmCfg not valid for this access unit");
+        }
+        mm_cfg = std::move(cfg);
+    }
+
+    void AccessUnit::setRefCfg(std::unique_ptr<RefCfg> cfg) {
+        if (!ref_cfg) {
+            GENIE_THROW_RUNTIME_EXCEPTION("RefCfg not valid for this access unit");
+        }
+        ref_cfg = std::move(cfg);
+    }
+
+    void AccessUnit::setAuTypeCfg(std::unique_ptr<AuTypeCfg> cfg) {
+        if (!au_Type_U_Cfg) {
+            GENIE_THROW_RUNTIME_EXCEPTION("au_type_u_cfg not valid for this access unit");
+        }
+        au_Type_U_Cfg = std::move(cfg);
+    }
+
+    void AccessUnit::setSignatureCfg(std::unique_ptr<SignatureCfg> cfg) {
+        if (!signature_config) {
+            GENIE_THROW_RUNTIME_EXCEPTION("signature config not valid for this access unit");
+        }
+        signature_config = std::move(cfg);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -58,7 +86,7 @@ namespace format {
         tmp_writer.flush();
         uint64_t bits = tmp_writer.getBitsWritten();
         for (auto &i : blocks) {
-            bits += i->getTotalSize() * uint64_t (8);
+            bits += i->getTotalSize() * uint64_t(8);
         }
         const uint64_t TYPE_SIZE_SIZE = 8 + 3 + 29; // data_unit_type, reserved, data_unit_size
         bits += TYPE_SIZE_SIZE;
@@ -72,22 +100,24 @@ namespace format {
         }
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
+
     void AccessUnit::preWrite(BitWriter *writer) const {
         writer->write(access_unit_ID, 32);
         writer->write(num_blocks, 8);
         writer->write(parameter_set_ID, 8);
         writer->write(uint8_t(au_type), 4);
         writer->write(reads_count, 32);
-        if(mm_cfg){
+        if (mm_cfg) {
             mm_cfg->write(writer);
         }
-        if(ref_cfg) {
+        if (ref_cfg) {
             ref_cfg->write(writer);
         }
-        if(au_Type_U_Cfg) {
+        if (au_Type_U_Cfg) {
             au_Type_U_Cfg->write(writer);
         }
-        if(signature_config) {
+        if (signature_config) {
             signature_config->write(writer);
         }
     }

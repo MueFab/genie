@@ -12,11 +12,7 @@
 #include "fastq-record.h"
 #include "genie-gabac-output-stream.h"
 #include "log.h"
-
-extern "C" {
-//#include <format/DataUnits/data-units.h>
-//#include <format/encoding-parameters.h>
-}
+#include "format/part2/parameter_set/qv_coding_config_1/qv_coding_config_1.h"
 
 #include <gabac/gabac.h>
 #include <ureads-encoder/format/part2/raw_reference.h>
@@ -153,6 +149,11 @@ void encode(const ProgramOptions &programOptions)
     const uint32_t READ_LENGTH = 0;
     const bool PAIRED_END = false;
     const bool QV_PRESENT = false;
+
+    RawReference r;
+    r.addSequence(make_unique<RawReferenceSequence>(0, 10, make_unique<std::string>("AAT")));
+    r.write(&bw);
+
     ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT, configs);
     ps.write(&bw);
 
@@ -160,9 +161,6 @@ void encode(const ProgramOptions &programOptions)
     AccessUnit au = createQuickAccessUnit(ACCESS_UNIT_ID, PARAMETER_SET_ID, 0, &generated_streams); // TODO: reads_count = readNum, currently deativated because AU is empty
     au.write(&bw);
 
-    RawReference r;
-    r.addSequence(make_unique<RawReferenceSequence>(0, 0, 3, make_unique<std::string>("AAT")));
-    r.write(&bw);
 
     GENIE_LOG_TRACE << "Number of bitstreams: " << generated_streams.size();
 

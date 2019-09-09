@@ -9,13 +9,7 @@ namespace format {
 
     RawReference::RawReference()
             : DataUnit(DataUnitType::RAW_REFERENCE),
-              data_unit_size(0),
-              seq_count(0),
               seqs(0) {
-
-        std::stringstream ss;
-        BitWriter bw(&ss);
-        write(&bw);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -26,14 +20,11 @@ namespace format {
                 GENIE_THROW_RUNTIME_EXCEPTION("Reference ID is not unique");
             }
         }
-        ++seq_count;
         seqs.push_back(std::move(ref));
     }
 
     std::unique_ptr<RawReference> RawReference::clone() const {
         auto ret = make_unique<RawReference>();
-        ret->data_unit_size = data_unit_size;
-        ret->seq_count = seq_count;
         for(const auto &a : seqs){
             ret->seqs.push_back(a->clone());
         }
@@ -49,7 +40,7 @@ namespace format {
         }
         size += (8 + 64 + 16) / 8; // data_unit_type, data_unit_size, seq_count
         writer->write(size, 64);
-        writer->write(seq_count, 16);
+        writer->write(seqs.size(), 16);
 
         for (auto &i : seqs) {
             i->write(writer);

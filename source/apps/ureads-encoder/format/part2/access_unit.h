@@ -31,9 +31,17 @@ namespace format {
                    uint8_t _parameter_set_ID,
                    AuType _au_type,
                    uint32_t _reads_count,
-                   DatasetType dataset_type);
+                   DatasetType dataset_type,
+                   uint8_t posSize,
+                   uint8_t signatureSize,
+                   uint32_t multiple_signature_base);
 
         void addBlock(std::unique_ptr<Block> block);
+
+        void setMmCfg(std::unique_ptr<MmCfg> cfg);
+        void setRefCfg(std::unique_ptr<RefCfg> cfg);
+        void setAuTypeCfg(std::unique_ptr<AuTypeCfg> cfg);
+        void setSignatureCfg(std::unique_ptr<SignatureCfg> cfg);
 
     private:
 
