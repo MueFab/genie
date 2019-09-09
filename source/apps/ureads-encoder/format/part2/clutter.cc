@@ -1,11 +1,10 @@
 #include <array>
-#include <ureads-encoder/format/part2/parameter_set/descriptor_configuration_present/cabac/decoder_configuration_cabac_tokentype.h>
+#include <ureads-encoder/format/part2/parameter_set/descriptor_configuration_present/cabac/decoder_configuration_cabac.h>
 
 #include "clutter.h"
 #include "ureads-encoder/format/part2/parameter_set/qv_coding_config_1/qv_coding_config_1.h"
 #include "ureads-encoder/format/part2/parameter_set/descriptor_configuration_present/cabac/descriptor_subsequence_cfg.h"
 #include "ureads-encoder/format/part2/parameter_set/descriptor_configuration_present/decoder_configuration.h"
-#include "ureads-encoder/format/part2/parameter_set/descriptor_configuration_present/cabac/decoder_configuration_cabac_regular.h"
 #include "ureads-encoder/format/part2/parameter_set/descriptor_configuration_present/descriptor_configuration_present.h"
 #include "make_unique.h"
 
@@ -25,10 +24,10 @@ namespace format {
                          {"pair", 8},
                          {"mscore", 1},
                          {"mmap", 5},
-                         {"msar", 1},
+                         {"msar", 2},
                          {"rtype", 1},
                          {"rgroup", 1},
-                         {"qv", 0},
+                         {"qv", 1},
                          {"rname", 2},
                          {"rftp", 1},
                          {"rftt", 1}
@@ -36,73 +35,125 @@ namespace format {
         return prop;
     }
 
-    std::unique_ptr<desc_conf_pres::cabac::DescriptorSubsequenceCfg>
-    subseqFromGabac(const gabac::EncodingConfiguration &conf, uint8_t subsequenceIndex) {
-        auto transformParams = make_unique<desc_conf_pres::cabac::TransformSubseqParameters>(
-                desc_conf_pres::cabac::TransformSubseqParameters::TransformIdSubseq(conf.sequenceTransformationId),
-                conf.sequenceTransformationParameter);
-        auto sub_conf = make_unique<desc_conf_pres::cabac::DescriptorSubsequenceCfg>(std::move(transformParams), subsequenceIndex, false);
-        for (const auto &i : conf.transformedSequenceConfigurations) {
-            desc_conf_pres::cabac::SupportValues::TransformIdSubsym transform = desc_conf_pres::cabac::SupportValues::TransformIdSubsym::NO_TRANSFORM;
-            if (i.lutTransformationEnabled && i.diffCodingEnabled) {
-                GENIE_THROW_RUNTIME_EXCEPTION("LUT and Diff coding at the same time not supported");
-            } else if (i.lutTransformationEnabled) {
-                transform = desc_conf_pres::cabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
-            } else if (i.diffCodingEnabled) {
-                transform = desc_conf_pres::cabac::SupportValues::TransformIdSubsym::DIFF_CODING;
-            }
-            auto binarization = make_unique<desc_conf_pres::cabac::CabacBinarization>(
-                    desc_conf_pres::cabac::CabacBinarizationParameters::BinarizationId(i.binarizationId),
-                    make_unique<desc_conf_pres::cabac::CabacBinarizationParameters>(
-                            desc_conf_pres::cabac::CabacBinarizationParameters::BinarizationId(i.binarizationId), i.binarizationParameters[0]
-                    )
-            );
-            if (i.contextSelectionId != gabac::ContextSelectionId::bypass) {
-                binarization->setContextParameters(
-                        make_unique<desc_conf_pres::cabac::CabacContextParameters>(false, 8, 8, 0)); //TODO insert actual values
-            }
-            auto subcfg = make_unique<desc_conf_pres::cabac::TransformSubseqCfg>(transform, make_unique<desc_conf_pres::cabac::SupportValues>(8, 8, 0, transform),
-                                                          std::move(binarization)); // TODO insert actual values
-            sub_conf->addTransformSubseqCfg(std::move(subcfg));
+    /**
+     * Extract transformation information from gabac config
+     * @param conf
+     * @return
+     */
+    std::unique_ptr<desc_conf_pres::cabac::TransformSubseqParameters> transParamsFromGabac(
+            const gabac::EncodingConfiguration &conf
+    ) {
+        return make_unique<desc_conf_pres::cabac::TransformSubseqParameters>(
+                desc_conf_pres::cabac::TransformSubseqParameters::TransformIdSubseq(
+                        conf.sequenceTransformationId
+                ),
+                conf.sequenceTransformationParameter
+        );
+    }
+
+    desc_conf_pres::cabac::SupportValues::TransformIdSubsym
+    inferTransform(const gabac::TransformedSequenceConfiguration &tSeqConf) {
+        desc_conf_pres::cabac::SupportValues::TransformIdSubsym transform = desc_conf_pres::cabac::SupportValues::TransformIdSubsym::NO_TRANSFORM;
+        if (tSeqConf.lutTransformationEnabled && tSeqConf.diffCodingEnabled) {
+            GENIE_THROW_RUNTIME_EXCEPTION("LUT and Diff coding at the same time not supported");
+        } else if (tSeqConf.lutTransformationEnabled) {
+            transform = desc_conf_pres::cabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM;
+        } else if (tSeqConf.diffCodingEnabled) {
+            transform = desc_conf_pres::cabac::SupportValues::TransformIdSubsym::DIFF_CODING;
         }
-        return sub_conf;
+        return transform;
+    }
+
+    std::unique_ptr<desc_conf_pres::cabac::CabacBinarization>
+    inferBinarization(const gabac::TransformedSequenceConfiguration &tSeqConf) {
+        auto ret = make_unique<desc_conf_pres::cabac::CabacBinarization>(
+                desc_conf_pres::cabac::CabacBinarizationParameters::BinarizationId(tSeqConf.binarizationId),
+                make_unique<desc_conf_pres::cabac::CabacBinarizationParameters>(
+                        desc_conf_pres::cabac::CabacBinarizationParameters::BinarizationId(tSeqConf.binarizationId),
+                        tSeqConf.binarizationParameters[0]
+                )
+        );
+        if (tSeqConf.contextSelectionId != gabac::ContextSelectionId::bypass) {
+            ret->setContextParameters(
+                    make_unique<desc_conf_pres::cabac::CabacContextParameters>(
+                            false,
+                            8,
+                            8,
+                            0
+                    )
+            ); //TODO insert actual values
+        }
+        return ret;
+    }
+
+    /**
+     * Fill subsequence information from gabac config
+     */
+    void fillSubseqFromGabac(
+            const gabac::EncodingConfiguration &conf,
+            desc_conf_pres::cabac::DescriptorSubsequenceCfg *sub_conf
+    ) {
+        size_t i = 0;
+        for (const auto &tSeqConf : conf.transformedSequenceConfigurations) {
+            auto transform = inferTransform(tSeqConf);
+            auto binarization = inferBinarization(tSeqConf);
+            auto subcfg =
+                    make_unique<desc_conf_pres::cabac::TransformSubseqCfg>(transform,
+                                                                           make_unique<desc_conf_pres::cabac::SupportValues>(
+                                                                                   8,
+                                                                                   8,
+                                                                                   0,
+                                                                                   transform
+                                                                           ),
+                                                                           std::move(binarization)
+                    ); // TODO insert actual values
+            sub_conf->setTransformSubseqCfg(i, std::move(subcfg));
+            ++i;
+        }
     }
 
     ParameterSet
     createQuickParameterSet(uint8_t _parameter_set_id, uint8_t _read_length, bool paired_end, bool qv_values_present,
                             const std::vector<std::vector<gabac::EncodingConfiguration>> &parameters) {
-        ParameterSet ret(_parameter_set_id,
-                         _parameter_set_id,
-                         DataUnit::DatasetType::NON_ALIGNED,
-                         ParameterSet::AlphabetID::ACGTN,
-                         _read_length,
-                         paired_end,
-                         false,
-                         qv_values_present,
-                         0,
-                         false,
-                         false
+        ParameterSet ret(
+                _parameter_set_id,
+                _parameter_set_id,
+                DataUnit::DatasetType::NON_ALIGNED,
+                ParameterSet::AlphabetID::ACGTN,
+                _read_length,
+                paired_end,
+                false,
+                qv_values_present,
+                0,
+                false,
+                false
         );
         ret.addClass(DataUnit::AuType::U_TYPE_AU,
-                     make_unique<qv_coding1::QvCodingConfig1>(qv_coding1::QvCodingConfig1::QvpsPresetId::ASCII, false));
-        for (int desc = 0; desc < 18; ++desc) {
-            std::unique_ptr<desc_conf_pres::cabac::DecoderConfigurationCabac> dcg;
-            if (desc != 11 && desc != 15) {
-                dcg = make_unique<desc_conf_pres::cabac::DecoderConfigurationCabacRegular>();
-            } else {
-                dcg = make_unique<desc_conf_pres::cabac::DecoderConfigurationCabacTokentype>();
+                     make_unique<qv_coding1::QvCodingConfig1>(
+                             qv_coding1::QvCodingConfig1::QvpsPresetId::ASCII,
+                             false
+                     )
+        );
+        for (size_t desc = 0; desc < NUM_DESCRIPTORS; ++desc) {
+            std::unique_ptr<desc_conf_pres::cabac::DecoderConfigurationCabac> dcg
+                    = make_unique<desc_conf_pres::cabac::DecoderConfigurationCabac>(GenomicDescriptor(desc));
+
+            for (size_t subseq = 0; subseq < getDescriptorProperties()[uint8_t(desc)].number_subsequences; ++subseq) {
+                dcg->setSubsequenceCfg(subseq, transParamsFromGabac(parameters[desc][subseq]));
+                fillSubseqFromGabac(parameters[desc][subseq], dcg->getSubsequenceCfg(subseq));
             }
-            for (size_t subseq = 0; subseq < parameters[desc].size(); ++subseq) {
-                dcg->addSubsequenceCfg(subseqFromGabac(parameters[desc][subseq], subseq));
-            }
+
             auto dc = make_unique<desc_conf_pres::DescriptorConfigurationPresent>();
             dc->set_decoder_configuration(std::move(dcg));
             auto d = make_unique<DescriptorConfigurationContainer>();
             d->setConfig(std::move(dc));
+
+
             ret.setDescriptor(desc, std::move(d));
         }
         return ret;
     }
+
     std::vector<uint8_t> create_payload(const std::vector<gabac::DataBlock> &block) {
         std::vector<uint8_t> ret;
         uint64_t totalSize = 0;
@@ -137,9 +188,8 @@ namespace format {
         AccessUnit au(access_unit_id, parameter_set_id, DataUnit::AuType::U_TYPE_AU, reads_count,
                       DataUnit::DatasetType::NON_ALIGNED, 32, 32, 0);
         for (size_t i = 0; i < data->size(); ++i) {
-            if (i == 11 || i == 15 || data->at(i).empty()) {
-                continue; // TODO: Token types
-            }
+            if(i != 6)
+                continue;
             auto &desc = (*data)[i];
             auto payload = create_payload(desc);
             au.addBlock(std::unique_ptr<Block>(new Block(i, &payload)));

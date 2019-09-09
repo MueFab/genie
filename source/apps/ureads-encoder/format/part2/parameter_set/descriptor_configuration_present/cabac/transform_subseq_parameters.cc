@@ -53,6 +53,13 @@ namespace format {
 
             // -----------------------------------------------------------------------------------------------------------------
 
+            size_t TransformSubseqParameters::getNumStreams() const {
+                static const std::vector<size_t> lut = {1, 2, 3, 2, 1};
+                return lut[uint8_t (transform_ID_subseq)];
+            }
+
+            // -----------------------------------------------------------------------------------------------------------------
+
             void TransformSubseqParameters::write(BitWriter *writer) const {
                 writer->write(uint8_t(transform_ID_subseq), 8);
                 if (match_coding_buffer_size) {

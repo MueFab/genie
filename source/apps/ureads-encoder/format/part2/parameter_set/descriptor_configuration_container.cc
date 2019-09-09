@@ -33,13 +33,19 @@ namespace format {
 
     void DescriptorConfigurationContainer::enableClassSpecificConfigs(uint8_t numClasses) {
         if (class_specific_dec_cfg_flag) {
-            GENIE_THROW_RUNTIME_EXCEPTION("Class specific configs already enabled");
+            return;
         }
         class_specific_dec_cfg_flag = true;
         descriptor_configurations.resize(numClasses);
         for (size_t i = 1; i < descriptor_configurations.size(); ++i) {
             descriptor_configurations[i] = descriptor_configurations[0]->clone();
         }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    bool DescriptorConfigurationContainer::isClassSpecific() const {
+        return class_specific_dec_cfg_flag;
     }
 
     // -----------------------------------------------------------------------------------------------------------------

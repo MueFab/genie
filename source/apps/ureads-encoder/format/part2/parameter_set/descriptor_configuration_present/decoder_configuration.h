@@ -26,7 +26,7 @@ namespace format {
 
             virtual std::unique_ptr<DecoderConfiguration> clone() const = 0;
 
-            DecoderConfiguration(EncodingModeId _encoding_mode_id);
+            explicit DecoderConfiguration(EncodingModeId _encoding_mode_id);
 
             virtual ~DecoderConfiguration() = default;
 

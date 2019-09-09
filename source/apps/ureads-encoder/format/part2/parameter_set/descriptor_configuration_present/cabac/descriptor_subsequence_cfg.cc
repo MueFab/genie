@@ -7,20 +7,15 @@
 namespace format {
     namespace desc_conf_pres {
         namespace cabac {
-            DescriptorSubsequenceCfg::DescriptorSubsequenceCfg() {
-
-            }
-
-            // -----------------------------------------------------------------------------------------------------------------
-
             std::unique_ptr<DescriptorSubsequenceCfg> DescriptorSubsequenceCfg::clone() const {
-                auto ret = make_unique<DescriptorSubsequenceCfg>();
+                auto ret = make_unique<DescriptorSubsequenceCfg>(transform_subseq_parameters->clone(), 0, false);
                 if(descriptor_subsequence_ID) {
                     ret->descriptor_subsequence_ID = make_unique<uint16_t >(*descriptor_subsequence_ID);
                 } else {
                     ret->descriptor_subsequence_ID = nullptr;
                 }
                 ret->transform_subseq_parameters = transform_subseq_parameters->clone();
+                ret->transformSubseq_cfgs.clear();
                 for (const auto &c : transformSubseq_cfgs) {
                     ret->transformSubseq_cfgs.push_back(c->clone());
                 }
@@ -35,7 +30,7 @@ namespace format {
                     bool tokentype
             ) : descriptor_subsequence_ID(nullptr),
                 transform_subseq_parameters(std::move(_transform_subseq_parameters)),
-                transformSubseq_cfgs(0) {
+                transformSubseq_cfgs(transform_subseq_parameters->getNumStreams()) {
                 if(!tokentype){
                     descriptor_subsequence_ID = make_unique<uint16_t >(_descriptor_subsequence_ID);
                 }
@@ -43,9 +38,14 @@ namespace format {
 
             // -----------------------------------------------------------------------------------------------------------------
 
-            void
-            DescriptorSubsequenceCfg::addTransformSubseqCfg(std::unique_ptr<TransformSubseqCfg> _transformSubseq_cfg) {
-                transformSubseq_cfgs.push_back(std::move(_transformSubseq_cfg));
+            void DescriptorSubsequenceCfg::setTransformSubseqCfg(size_t index, std::unique_ptr<TransformSubseqCfg> _transformSubseq_cfg) {
+                transformSubseq_cfgs[index] = std::move(_transformSubseq_cfg);
+            }
+
+            // -----------------------------------------------------------------------------------------------------------------
+
+            TransformSubseqCfg* DescriptorSubsequenceCfg::getTransformSubseqCfg(size_t index) const {
+                return transformSubseq_cfgs[index].get();
             }
 
             // -----------------------------------------------------------------------------------------------------------------

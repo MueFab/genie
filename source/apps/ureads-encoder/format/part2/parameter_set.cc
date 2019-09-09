@@ -123,6 +123,11 @@ namespace format {
     // -----------------------------------------------------------------------------------------------------------------
 
     void ParameterSet::addClass(AuType class_id, std::unique_ptr<QvCodingConfig> conf) {
+        for(auto& a : descriptors) {
+            if(a->isClassSpecific()){
+                GENIE_THROW_RUNTIME_EXCEPTION("Adding classes not allowed once class specific descriptor configs enabled");
+            }
+        }
         for(auto& a : class_IDs) {
             if(class_id == a){
                 GENIE_THROW_RUNTIME_EXCEPTION("Class already added");

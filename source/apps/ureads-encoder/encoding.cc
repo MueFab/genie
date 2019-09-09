@@ -49,9 +49,8 @@ namespace genie {
     }
 
     std::vector<std::vector<gabac::DataBlock>> create_default_streams() {
-        const std::vector<size_t> SEQUENCE_NUMS = {2, 1, 3, 2, 3, 4, 1, 1, 8, 1, 5, 2, 1, 1, 0, 2, 1, 1};
         std::vector<std::vector<gabac::DataBlock>> ret;
-        for(size_t i = 0; i < SEQUENCE_NUMS.size(); ++i) {
+        for(size_t i = 0; i < format::NUM_DESCRIPTORS; ++i) {
             ret.emplace_back();
         }
         return ret;
@@ -135,7 +134,7 @@ void encode(const ProgramOptions &programOptions)
     // Get the GABAC bitstream(s)
     std::vector<std::vector<gabac::DataBlock>> generated_streams = create_default_streams();
     generated_streams[UREADS_DESC_ID].emplace_back();
-    //bufferOutputStream.flush_blocks(&generated_streams[UREADS_DESC_ID]); // TODO: enable (crashes currently)
+  //  bufferOutputStream.flush_blocks(&generated_streams[UREADS_DESC_ID]); // TODO: enable (crashes currently)
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     // CREATE Part 2 units
@@ -156,6 +155,9 @@ void encode(const ProgramOptions &programOptions)
 
     ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT, configs);
     ps.write(&bw);
+
+    ParameterSet ps2 = createQuickParameterSet(1, READ_LENGTH, PAIRED_END, QV_PRESENT, configs);
+    ps2.write(&bw);
 
     const uint32_t ACCESS_UNIT_ID = 0;
     AccessUnit au = createQuickAccessUnit(ACCESS_UNIT_ID, PARAMETER_SET_ID, 0, &generated_streams); // TODO: reads_count = readNum, currently deativated because AU is empty

@@ -4,6 +4,7 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 #include "ureads-encoder/format/part2/parameter_set/descriptor_configuration_present/decoder_configuration.h"
+#include "ureads-encoder/format/part2/clutter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -15,10 +16,17 @@ namespace format {
             */
             class DecoderConfigurationCabac : public DecoderConfiguration {
             protected:
+                GenomicDescriptor desc;
+                uint8_t rle_guard_tokentype : 8; //!< line 4
+                std::vector<std::unique_ptr<DescriptorSubsequenceCfg>> descriptor_subsequence_cfgs; //!< Line 4 to 13
 
             public:
-                virtual void addSubsequenceCfg(std::unique_ptr<DescriptorSubsequenceCfg> cfg) = 0;
-                DecoderConfigurationCabac();
+                explicit DecoderConfigurationCabac(GenomicDescriptor _desc);
+                void setSubsequenceCfg(uint8_t index, std::unique_ptr<TransformSubseqParameters> cfg);
+                DescriptorSubsequenceCfg* getSubsequenceCfg(uint8_t index) const;
+                std::unique_ptr<DecoderConfiguration> clone() const override;
+
+                void write(BitWriter *writer) const override;
             };
         }
     }
