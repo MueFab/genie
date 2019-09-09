@@ -17,7 +17,7 @@ TEST(FastaFileReader, Minimal) { //NOLINT(cert-err-cpp)
     EXPECT_EQ(records.front().sequence, "GATTACA");
 }
 
-TEST(FastaFileReader, Empty) { //NOLINT(cert-err-cpp
+TEST(FastaFileReader, Empty) { //NOLINT(cert-err-cpp)
     std::string gitRootDir = exec("git rev-parse --show-toplevel");
     utils::rtrim(gitRootDir);
 
@@ -30,4 +30,19 @@ TEST(FastaFileReader, Empty) { //NOLINT(cert-err-cpp
     EXPECT_EQ(records.front().header, NULL);
     EXPECT_EQ(records.front().sequence, NULL);
 
-     }
+}
+
+TEST(FastaFileReader, OnlyHeaders) { //NOLINT(cert-err-cpp)
+    std::string gitRootDir = exec("git rev-parse --show-toplevel");
+    utils::rtrim(gitRootDir);
+
+    utils::FastaFileReader reader(gitRootDir + "/resources/test-files/fasta/only-headers.fasta");
+
+    std::vector<utils::FastaRecord> records;
+    reader.parse(&records);
+
+    EXPECT_EQ(records.size(), 1);
+    EXPECT_EQ(records.front().header, ">header1");
+    EXPECT_EQ(records.back().header, ">header2");
+
+}
