@@ -6,4 +6,4 @@ set(source_files
 add_executable(utils-tests ${source_files})
 
 target_link_libraries(utils-tests PRIVATE gtest_main)
-target_link_libraries(utils-tests PRIVATE gabac)
+target_link_libraries(utils-tests PRIVATE utils)
