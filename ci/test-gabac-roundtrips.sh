@@ -9,7 +9,7 @@ readonly tmp_dir="${git_root_dir}/tmp"
 if [[ -d "${tmp_dir}" ]]; then exit 1; fi
 mkdir -p "${tmp_dir}"
 
-readonly gabac_app="${git_root_dir}/cmake-build/bin/gabac-app"
+readonly gabac_app="${git_root_dir}/cmake-build-release/bin/gabac-app"
 if [[ ! -x "${gabac_app}" ]]; then exit 1; fi
 
 input_files=()

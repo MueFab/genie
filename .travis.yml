@@ -32,7 +32,7 @@ before_install:
 before_script:
 
 script:
-  - ./ci/cmake-build.sh
+  - ./ci/cmake-build-release.sh
   - ./ci/test-genie-roundtrip.sh
   - ./ci/test-gabac-roundtrips.sh
 

@@ -5,7 +5,7 @@ set -euxo pipefail
 git rev-parse --git-dir 1>/dev/null # exit if not inside Git repo
 readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
-readonly genie="${git_root_dir}/cmake-build/bin/genie"
+readonly genie="${git_root_dir}/cmake-build-release/bin/genie"
 if [[ ! -x "${genie}" ]]; then exit 1; fi
 
 "${genie}" \
