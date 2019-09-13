@@ -13,8 +13,8 @@ cmake-build-release/
 # CLion project directory
 .idea/
 
-# Visual Studio Code configuration files
-.vscode/
-
-# Python
+# Python byte-compiled / optimized / DLL files
 __pycache__/
+
+# Code coverage
+coverage.info

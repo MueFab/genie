@@ -1,5 +1,12 @@
 # TODO
 
+## New
+
+- [ ] Set up Doxygen documentation
+- [ ] Set up Google Test
+- [ ] Push doc to gh-pages
+- [ ] Compare with getspc and calq repos
+
 ## Urgent
 
 - [x] Rename files
@@ -7,7 +14,7 @@
   - [x] C source files should have the extension ``.c``.
   - [x] C++ source files should have the extension ``.cc``
   - [x] File names are *not* written in CamelCase and do *not* contain underscores (i.e., ``_``) Dashes (``-``) should be used instead, as e.g. in ``my-new-module.cc``
-- [ ] Rename directories
+- [x] Rename directories
 - [x] Clean up ``#include``s
   - [x] Including of a library header should look like: ``#include <gabac/gabac.h>``
   - [x] Including of an application or library internal header should look like: ``#include "internal.h"``
