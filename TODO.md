@@ -1,5 +1,25 @@
 # TODO
 
+## Folder and file status
+
+- [ ] ./
+  - [x] .git/
+  - [ ] .github/
+    - [ ] ISSUE_TEMPLATE
+      - [ ] bug_report.md
+      - [ ] custom.md
+      - [ ] feature_request.md
+  - [ ] ci/
+    - [x] cmake-build-release.sh
+    - [ ] test-gabac-roundtrips.sh
+    - [ ] test-genie-roundtrip.sh
+  - [ ] cmake/
+  - [ ] doc/
+  - [ ] resources/
+  - [ ] scripts/
+  - [ ] source/
+  - [ ] tests/
+
 ## New
 
 - [ ] Set up Doxygen documentation
@@ -34,3 +54,12 @@
 - [ ] Unify I/O
   - [ ] Bitstream R/W should be done using HM's bitstream classes adapted for 64 bits
   - [ ] "Ordinary" file R/W (for e.g. SPRING's temporary files) should be done using the C++ standard library
+
+## Development modules
+
+- Version control
+- Travis CI
+- GitHub
+- Doxygen
+- GitHub pages
+- codecov.io
