@@ -93,3 +93,4 @@ void BitOutputStream::writeAlignZero() {
 }
 
 }  // namespace gabac
+

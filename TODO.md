@@ -15,11 +15,15 @@
   - [ ] Applications and libraries each should have their own namespace, e.g. ``calq::``, ``gabac::``, ``genie::``, ``spring::`` etc.
 - [x] Make a ``utils``library containing constants, exceptions, log functionality, etc.
 - [x] Fix compiler warnings
-- [ ] Add code coverage report system
+- [ ] Add code coverage report system (copy from CALQ)
+- [ ] apply-clang-format.sh (copy from CALQ)
+- [ ] Doxygen
 
 ## For later
 
 - [ ] Check coding style with clang-format and pycodestyle
 - [x] Clean up ``source/libs/format/CMakeLists.txt``
 - [x] Set up CMake for ``tests``
-- [ ] Add Autotools build system
+- [ ] Unify I/O
+  - [ ] Bitstream R/W should be done using HM's bitstream classes adapted for 64 bits
+  - [ ] "Ordinary" file R/W (for e.g. SPRING's temporary files) should be done using the C++ standard library
