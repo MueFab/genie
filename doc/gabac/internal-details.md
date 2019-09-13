@@ -52,3 +52,4 @@ Cpp files with the same name as the documented header file just contain the impl
 * code.h -> Execute encode / decode
 * main.cpp -> Launching the application
 * program_options.h -> Command line parsing
+

@@ -237,3 +237,4 @@ bool BinarizationProperties::sbCheck(uint64_t minv, uint64_t maxv,
 }
 
 }  // namespace gabac
+
