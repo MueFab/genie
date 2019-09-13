@@ -4,8 +4,7 @@ set(source_files
         binary-arithmetic-decoder-test.cc
         bit-input-stream-test.cc
         bit-output-stream-test.cc
-        main.cc
-)
+        main.cc)
 
 add_executable(gabac-tests ${source_files})
 
