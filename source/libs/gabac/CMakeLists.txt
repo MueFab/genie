@@ -2,7 +2,7 @@ project("gabac")
 
 set(source_files
         analysis.cc
-        binary-arithmetic-decoder.cc
+        # binary-arithmetic-decoder.cc
         # binary_arithmetic_encoder.cc
         bit-input-stream.cc
         bit-output-stream.cc
@@ -29,4 +29,12 @@ set(source_files
         writer.cc
 )
 
-add_library(gabac ${source_files})
+if(${GABAC_BUILD_SHARED_LIB})
+    message(STATUS "Configured build of GABAC as *shared* library")
+    add_library(gabac SHARED ${source_files})
+else()
+    message(STATUS "Configured build of GABAC as *static* library")
+    add_library(gabac STATIC ${source_files})
+endif()
+
+target_include_directories(gabac PRIVATE ${gabac_include_dir})

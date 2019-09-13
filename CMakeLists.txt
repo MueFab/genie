@@ -35,7 +35,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
 #==============================================================================
 
 option(GENIE_USE_OPENMP "Use OpenMP parallelization" OFF)
-message(STATUS "GENIE_USE_OPENMP=${GENIE_USE_OPENMP}")
 if(${GENIE_USE_OPENMP})
     find_package(OpenMP REQUIRED)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp")
@@ -43,6 +42,11 @@ if(${GENIE_USE_OPENMP})
     add_definitions(-DGENIE_USE_OPENMP)
 endif()
 
+option(GABAC_BUILD_SHARED_LIB "Build shared GABAC library" OFF)
+
+message(STATUS "Options:")
+message(STATUS "  GENIE_USE_OPENMP=${GENIE_USE_OPENMP}")
+message(STATUS "  GABAC_BUILD_SHARED_LIB=${GABAC_BUILD_SHARED_LIB}")
 
 
 #==============================================================================

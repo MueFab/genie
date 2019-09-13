@@ -12,3 +12,9 @@ cmake-build-release/
 
 # CLion project directory
 .idea/
+
+# Visual Studio Code configuration files
+.vscode/
+
+# Python
+__pycache__/
