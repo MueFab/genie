@@ -12,4 +12,6 @@ fi
 
 cd "${cmake_build_dir}"
 cmake ..
+# cmake .. -DBUILD_DOCUMENTATION=ON
 make
+# make doc

@@ -102,3 +102,18 @@ include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/source/libs/third-party")
 
 add_subdirectory(source)
 add_subdirectory(tests)
+
+
+#==============================================================================
+# Doxygen documentation
+#==============================================================================
+
+option(GENIE_BUILD_DOCUMENTATION "Build Doxygen documentation" OFF)
+# message(STATUS "GENIE_BUILD_DOCUMENTATION=${GENIE_BUILD_DOCUMENTATION}")
+
+if(${GENIE_BUILD_DOCUMENTATION})
+    message(STATUS "Building Doxygen documentation")
+    include(AddDoxygen)
+else()
+    message(STATUS "*Not* building Doxygen documentation")
+endif()
