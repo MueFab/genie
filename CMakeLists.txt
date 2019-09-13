@@ -23,11 +23,11 @@ set(CMAKE_CXX_STANDARD 11)
 # Compiler
 #==============================================================================
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall --coverage")          #TODO
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra --coverage")        #TODO
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --coverage")      #TODO
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra --coverage")    #TODO
 
 
 #==============================================================================
@@ -39,7 +39,7 @@ if(${GENIE_USE_OPENMP})
     find_package(OpenMP REQUIRED)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
-    add_definitions(-DGENIE_USE_OPENMP)
+    add_compile_definitions(GENIE_USE_OPENMP)
 endif()
 
 option(GABAC_BUILD_SHARED_LIB "Build shared GABAC library" OFF)

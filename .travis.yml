@@ -35,3 +35,6 @@ script:
   - ./ci/cmake-build.sh
   - ./ci/test-genie-roundtrip.sh
   - ./ci/test-gabac-roundtrips.sh
+
+#after_success:
+  #- ./scripts/coverage-report-script.sh
