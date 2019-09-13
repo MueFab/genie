@@ -10,28 +10,47 @@
 
 namespace format {
 
-    const std::array<GenomicDescriptorProperties, NUM_DESCRIPTORS> &getDescriptorProperties() {
-        static std::array<GenomicDescriptorProperties, NUM_DESCRIPTORS> prop =
-                {{
-                         {"pos", 2},
-                         {"rcomp", 1},
-                         {"flags", 3},
-                         {"mmpos", 2},
-                         {"mmtype", 3},
-                         {"clips", 4},
-                         {"ureads", 1},
-                         {"rlen", 1},
-                         {"pair", 8},
-                         {"mscore", 1},
-                         {"mmap", 5},
-                         {"msar", 2},
-                         {"rtype", 1},
-                         {"rgroup", 1},
-                         {"qv", 1},
-                         {"rname", 2},
-                         {"rftp", 1},
-                         {"rftt", 1}
-                 }};
+    const std::vector<GenomicDescriptorProperties> &getDescriptorProperties() {
+        // static std::array<GenomicDescriptorProperties, NUM_DESCRIPTORS> prop =
+        //         {{
+        //                  {"pos", 2},
+        //                  {"rcomp", 1},
+        //                  {"flags", 3},
+        //                  {"mmpos", 2},
+        //                  {"mmtype", 3},
+        //                  {"clips", 4},
+        //                  {"ureads", 1},
+        //                  {"rlen", 1},
+        //                  {"pair", 8},
+        //                  {"mscore", 1},
+        //                  {"mmap", 5},
+        //                  {"msar", 2},
+        //                  {"rtype", 1},
+        //                  {"rgroup", 1},
+        //                  {"qv", 1},
+        //                  {"rname", 2},
+        //                  {"rftp", 1},
+        //                  {"rftt", 1}
+        //          }};
+        static std::vector<GenomicDescriptorProperties> prop;
+        prop.push_back({"pos", 2});
+        prop.push_back({"rcomp", 1});
+        prop.push_back({"flags", 3});
+        prop.push_back({"mmpos", 2});
+        prop.push_back({"mmtype", 3});
+        prop.push_back({"clips", 4});
+        prop.push_back({"ureads", 1});
+        prop.push_back({"rlen", 1});
+        prop.push_back({"pair", 8});
+        prop.push_back({"mscore", 1});
+        prop.push_back({"mmap", 5});
+        prop.push_back({"msar", 2});
+        prop.push_back({"rtype", 1});
+        prop.push_back({"rgroup", 1});
+        prop.push_back({"qv", 1});
+        prop.push_back({"rname", 2});
+        prop.push_back({"rftp", 1});
+        prop.push_back({"rftt", 1});
         return prop;
     }
 

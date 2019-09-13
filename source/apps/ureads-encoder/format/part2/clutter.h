@@ -33,7 +33,7 @@ namespace format {
     };
     constexpr size_t NUM_DESCRIPTORS = 18;
 
-    const std::array<GenomicDescriptorProperties, NUM_DESCRIPTORS> &getDescriptorProperties();
+    const std::vector<GenomicDescriptorProperties> &getDescriptorProperties();
 
 /* ----------------------------------------------------------------------------------------------------------- */
 
