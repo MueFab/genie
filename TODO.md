@@ -54,12 +54,29 @@
 - [ ] Unify I/O
   - [ ] Bitstream R/W should be done using HM's bitstream classes adapted for 64 bits
   - [ ] "Ordinary" file R/W (for e.g. SPRING's temporary files) should be done using the C++ standard library
+- Social media image (on GitHub)
+- Virtual dtor in all classes that something is being derived from (also applies to CALQ's File- class hierachy)
+- Remove Autotools stuff
+- Check correct use of smart pointers
+- Valgrind checks
+- Apps
+  - genie
+  - ureads-encoder
+  - local-assembly-encoder
+- Python interfaces
+  - Only use numpy arrays
+  - Just as the example "c-and-python"
+- Clean up branches & branch names
 
 ## Development modules
 
 - Version control
 - Travis CI
-- GitHub
+- GitHub pages
+  - Doxygen documentation: https://mitogen.github.io/genie/doc/
+  - Codecov report:
+    - https://mitogen.github.io/genie/codecov/
+    - codecov.io (both locations)
 - Doxygen
 - GitHub pages
 - codecov.io
