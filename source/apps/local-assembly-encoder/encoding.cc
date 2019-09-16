@@ -33,14 +33,10 @@ void encode(const ProgramOptions &programOptions) {
             } else {
                 rnameSearchString = samRecord.rnext;
             }
-            samRecordsCopy.erase(
-                samRecordsCopy
-                    .begin());  // delete current record from the search space
+            samRecordsCopy.erase(samRecordsCopy.begin());  // delete current record from the search space
             bool foundMate = false;
-            for (auto it = samRecordsCopy.begin(); it != samRecordsCopy.end();
-                 ++it) {
-                if (it->rname == rnameSearchString &&
-                    it->pos == samRecord.pnext) {
+            for (auto it = samRecordsCopy.begin(); it != samRecordsCopy.end(); ++it) {
+                if (it->rname == rnameSearchString && it->pos == samRecord.pnext) {
                     LOG_TRACE << "Found mate";
                     foundMate = true;
                     samRecordsCopy.erase(it);

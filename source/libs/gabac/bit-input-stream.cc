@@ -22,17 +22,14 @@ inline static unsigned char readIn(gabac::BlockStepper *reader) {
     return byte;
 }
 
-BitInputStream::BitInputStream(DataBlock *const bitstream)
-    : m_bitstream(bitstream), m_heldBits(0), m_numHeldBits(0) {
+BitInputStream::BitInputStream(DataBlock *const bitstream) : m_bitstream(bitstream), m_heldBits(0), m_numHeldBits(0) {
     m_reader = m_bitstream->getReader();
     reset();
 }
 
 BitInputStream::~BitInputStream() = default;
 
-unsigned int BitInputStream::getNumBitsUntilByteAligned() const {
-    return m_numHeldBits & 0x7u;
-}
+unsigned int BitInputStream::getNumBitsUntilByteAligned() const { return m_numHeldBits & 0x7u; }
 
 unsigned char BitInputStream::readByte() {
     unsigned int result = read(8);

@@ -1,6 +1,5 @@
 // Copyright 2018 The genie authors
 
-
 /**
  *  @file dsg.cc
  *  @brief dsg (descriptor stream generator) main file
@@ -8,25 +7,20 @@
  *  @bug No known bugs
  */
 
-
 #include <stdlib.h>
 #include <string.h>
 
 #include <iostream>
 
+#include "exceptions.h"
 #include "generation.h"
 #include "program-options.h"
-#include "exceptions.h"
 #include "ureads-encoder/logger.h"
-
 
 static void printProgramInformation();
 static void loggerInitialization();
 
-static int dsg_main(
-    int argc,
-    char *argv[])
-{
+static int dsg_main(int argc, char* argv[]) {
 #ifdef GENIE_USE_OPENMP
     std::cout << "Compiled with -DGENIE_USE_OPENMP" << std::endl;
 #else
@@ -39,28 +33,25 @@ static int dsg_main(
 
         dsg::ProgramOptions programOptions(argc, argv);
 
-        if(programOptions.help) {
+        if (programOptions.help) {
             return 0;
         }
 
-        if(programOptions.inputFileType != "GENIE" && programOptions.inputFileType != "SGENIE") {
+        if (programOptions.inputFileType != "GENIE" && programOptions.inputFileType != "SGENIE") {
             generation(programOptions);
         } else {
             decompression(programOptions);
         }
-    }
-    catch (const dsg::common::RuntimeErrorException& e) {
+    } catch (const dsg::common::RuntimeErrorException& e) {
         std::cerr << "Runtime error";
         if (strlen(e.what()) > 0) {
             std::cerr << ": " << e.what();
         }
         std::cerr << std::endl;
         return -1;
-    }
-    catch (const std::exception& e) {
+    } catch (const std::exception& e) {
         std::cerr << "STL error: " << e.what() << std::endl;
-    }
-    catch (...) {
+    } catch (...) {
         std::cerr << "Unkown error occurred" << std::endl;
         return -1;
     }
@@ -68,17 +59,13 @@ static int dsg_main(
     return 0;
 }
 
-
 /**
  *  @brief Main function
  *  @param argc Argument count
  *  @param argv Argument values
  *  @return EXIT_FAILURE on failure and EXIT_SUCCESS on success.
  */
-int main(
-    int argc,
-    char *argv[])
-{
+int main(int argc, char* argv[]) {
     int rc = dsg_main(argc, argv);
     if (rc != 0) {
         std::cerr << "Failed to run dsg" << std::endl;
@@ -104,14 +91,9 @@ int main(
     return (rc == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-static void loggerInitialization()
-{
-    genie::Logger::init("genie.log");
-}
+static void loggerInitialization() { genie::Logger::init("genie.log"); }
 
-
-static void printProgramInformation(void)
-{
+static void printProgramInformation(void) {
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "genie dsg (descriptor stream generator)" << std::endl;
     std::cout << "Copyright (c) 2018 The genie authors" << std::endl;

@@ -12,9 +12,7 @@
 
 namespace gabac {
 
-inline static void writeOut(unsigned char byte, DataBlock *const bitstream) {
-    bitstream->push_back(byte);
-}
+inline static void writeOut(unsigned char byte, DataBlock *const bitstream) { bitstream->push_back(byte); }
 
 BitOutputStream::BitOutputStream(DataBlock *const bitstream)
     : m_bitstream(bitstream), m_heldBits(0), m_numHeldBits(0) {}
@@ -37,8 +35,7 @@ void BitOutputStream::write(unsigned int bits, unsigned int numBits) {
     // with the new bits, discarding the bits that will form the nextheldBits
 
     // Determine the nextHeldBits
-    auto nextHeldBits = static_cast<unsigned char>(
-        (bits << (8u - numNextHeldBits)) & static_cast<unsigned char>(0xff));
+    auto nextHeldBits = static_cast<unsigned char>((bits << (8u - numNextHeldBits)) & static_cast<unsigned char>(0xff));
     if (numTotalBits < 8) {
         // Insufficient bits accumulated to write out, append nextHeldBits to
         // current heldBits
@@ -65,14 +62,11 @@ void BitOutputStream::write(unsigned int bits, unsigned int numBits) {
         goto L0;
     }
 
-    writeOut(static_cast<unsigned char>((writeBits >> 24u) & 0xffu),
-             m_bitstream);
+    writeOut(static_cast<unsigned char>((writeBits >> 24u) & 0xffu), m_bitstream);
 L3:
-    writeOut(static_cast<unsigned char>((writeBits >> 16u) & 0xffu),
-             m_bitstream);
+    writeOut(static_cast<unsigned char>((writeBits >> 16u) & 0xffu), m_bitstream);
 L2:
-    writeOut(static_cast<unsigned char>((writeBits >> 8u) & 0xffu),
-             m_bitstream);
+    writeOut(static_cast<unsigned char>((writeBits >> 8u) & 0xffu), m_bitstream);
 L1:
     writeOut(static_cast<unsigned char>(writeBits & 0xffu), m_bitstream);
 L0:
@@ -93,4 +87,3 @@ void BitOutputStream::writeAlignZero() {
 }
 
 }  // namespace gabac
-

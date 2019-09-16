@@ -5,11 +5,10 @@
 #ifndef READ_SIGNATURES_SIGNATURE_INTEGER_OUTPUT_STREAM_H
 #define READ_SIGNATURES_SIGNATURE_INTEGER_OUTPUT_STREAM_H
 
-
+#include <stdbool.h>
 #include "../BitStreams/output-bitstream.h"
 #include "signature.h"
 #include "signatures.h"
-#include <stdbool.h>
 
 typedef struct {
     OutputBitstream* outputBitstream;
@@ -18,17 +17,12 @@ typedef struct {
     uint8_t u_signature_length;
     uint32_t multipleSignatureBase;
     uint8_t alphabet;
-} SignaturesOutputStream ;
+} SignaturesOutputStream;
 
-SignaturesOutputStream* initSignaturesOutputStream(
-    OutputBitstream *outputFile,
-    uint32_t multipleSignatureBase,
-    uint8_t signatureSize,
-    uint8_t u_signature_length,
-    uint8_t alphabet
-);
+SignaturesOutputStream* initSignaturesOutputStream(OutputBitstream* outputFile, uint32_t multipleSignatureBase,
+                                                   uint8_t signatureSize, uint8_t u_signature_length, uint8_t alphabet);
 
 int writeSignatures(SignaturesOutputStream* signaturesOutputStream, Signatures* signatures);
 void freeSignaturesOutputStream(SignaturesOutputStream* signaturesOutputStream);
 
-#endif //READ_SIGNATURES_SIGNATURE_INTEGER_OUTPUT_STREAM_H_H
+#endif  // READ_SIGNATURES_SIGNATURE_INTEGER_OUTPUT_STREAM_H_H

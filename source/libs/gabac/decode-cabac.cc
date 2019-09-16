@@ -15,10 +15,8 @@
 
 namespace gabac {
 
-void decode_cabac(const BinarizationId& binarizationId,
-                  const std::vector<unsigned int>& binarizationParameters,
-                  const ContextSelectionId& contextSelectionId,
-                  const uint8_t wordsize, DataBlock* const bitstream) {
+void decode_cabac(const BinarizationId& binarizationId, const std::vector<unsigned int>& binarizationParameters,
+                  const ContextSelectionId& contextSelectionId, const uint8_t wordsize, DataBlock* const bitstream) {
     DataBlock symbols(0, wordsize);
     if (bitstream == nullptr) {
         GABAC_DIE("Bitstream is null");
@@ -104,12 +102,10 @@ void decode_cabac(const BinarizationId& binarizationId,
             r.set(symbol);
             r.inc();
         }
-    } else if (contextSelectionId ==
-               ContextSelectionId::adaptive_coding_order_1) {
+    } else if (contextSelectionId == ContextSelectionId::adaptive_coding_order_1) {
         unsigned int previousSymbol = 0;
         while (r.isValid()) {
-            uint64_t symbol =
-                (reader.*func)(binarizationParameter, previousSymbol << 2u);
+            uint64_t symbol = (reader.*func)(binarizationParameter, previousSymbol << 2u);
             r.set(symbol);
             if (int64_t(symbol) < 0) {
                 symbol = uint64_t(-int64_t(symbol));
@@ -122,15 +118,12 @@ void decode_cabac(const BinarizationId& binarizationId,
             }
             r.inc();
         }
-    } else if (contextSelectionId ==
-               ContextSelectionId::adaptive_coding_order_2) {
+    } else if (contextSelectionId == ContextSelectionId::adaptive_coding_order_2) {
         unsigned int previousSymbol = 0;
         unsigned int previousPreviousSymbol = 0;
 
         while (r.isValid()) {
-            uint64_t symbol =
-                (reader.*func)(binarizationParameter,
-                               (previousSymbol << 2u) + previousPreviousSymbol);
+            uint64_t symbol = (reader.*func)(binarizationParameter, (previousSymbol << 2u) + previousPreviousSymbol);
             r.set(symbol);
             previousPreviousSymbol = previousSymbol;
             if (int64_t(symbol) < 0) {

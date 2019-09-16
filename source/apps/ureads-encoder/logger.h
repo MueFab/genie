@@ -16,8 +16,8 @@
 namespace genie {
 
 class Logger {
- public:
-    static Logger &instance() {
+   public:
+    static Logger& instance() {
         static Logger logger;
         return logger;
     }
@@ -25,7 +25,7 @@ class Logger {
     static void init(const std::string& filename) {
         std::lock_guard<std::mutex> lock(instance().mtx);
         if (instance().f.is_open()) {
-             throw std::runtime_error{ "Logger already initialized" };
+            throw std::runtime_error{"Logger already initialized"};
         }
         instance().f.open(filename, std::ios::binary | std::ios::app);
     }
@@ -33,14 +33,11 @@ class Logger {
     void out(const std::string& msg) {
         std::lock_guard<std::mutex> lock(mtx);
         time_t t = time(nullptr);
-       // if (t == ((time_t) - 1)) { GENIE_DIE("time failed"); }
+        // if (t == ((time_t) - 1)) { GENIE_DIE("time failed"); }
         std::stringstream ss;
         struct tm timeinfo {};
         // ISO 8601 format: 2007-04-05T14:30:21Z
-        ss << "["
-           << std::put_time(gmtime_r(&t, &timeinfo), "%Y-%m-%dT%H:%M:%SZ")
-           << "] "
-           << msg << std::endl;
+        ss << "[" << std::put_time(gmtime_r(&t, &timeinfo), "%Y-%m-%dT%H:%M:%SZ") << "] " << msg << std::endl;
         f << ss.str();
         f.flush();
     }
@@ -50,7 +47,7 @@ class Logger {
         f.flush();
     }
 
- private:
+   private:
     std::mutex mtx;
     std::ofstream f;
 

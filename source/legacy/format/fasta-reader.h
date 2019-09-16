@@ -5,13 +5,13 @@
 
 #include <stdio.h>
 
-typedef struct{
+typedef struct {
     size_t numberSequences;
     char** sequenceNames;
     char** sequence;
 } FastaData;
 
-FastaData * getFASTA(char *filePath);
-void freeFastaData(FastaData *data);
+FastaData* getFASTA(char* filePath);
+void freeFastaData(FastaData* data);
 
-#endif //MPEGG_REFERENCE_SW_FASTAREADER_H
+#endif  // MPEGG_REFERENCE_SW_FASTAREADER_H

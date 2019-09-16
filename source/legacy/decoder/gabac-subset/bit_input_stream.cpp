@@ -13,10 +13,7 @@
 
 namespace gabac {
 
-
-inline static unsigned char readIn(
-        gabac::BlockStepper *reader
-){
+inline static unsigned char readIn(gabac::BlockStepper *reader) {
     if (!reader->isValid()) {
         GABAC_DIE("Index out of bounds");
     }
@@ -25,41 +22,28 @@ inline static unsigned char readIn(
     return byte;
 }
 
-
-BitInputStream::BitInputStream(
-        DataBlock *const bitstream
-)
-        : m_bitstream(bitstream), m_heldBits(0), m_numHeldBits(0){
+BitInputStream::BitInputStream(DataBlock *const bitstream) : m_bitstream(bitstream), m_heldBits(0), m_numHeldBits(0) {
     m_reader = m_bitstream->getReader();
     reset();
 }
 
-
 BitInputStream::~BitInputStream() = default;
 
+unsigned int BitInputStream::getNumBitsUntilByteAligned() const { return m_numHeldBits & 0x7u; }
 
-unsigned int BitInputStream::getNumBitsUntilByteAligned() const{
-    return m_numHeldBits & 0x7u;
-}
-
-
-unsigned char BitInputStream::readByte(){
+unsigned char BitInputStream::readByte() {
     unsigned int result = read(8);
     assert(result <= std::numeric_limits<unsigned char>::max());
     return static_cast<unsigned char>(result);
 }
 
-
-void BitInputStream::reset(){
+void BitInputStream::reset() {
     m_heldBits = 0;
     m_numHeldBits = 0;
     m_reader = m_bitstream->getReader();
 }
 
-
-unsigned int BitInputStream::read(
-        unsigned int numBits
-){
+unsigned int BitInputStream::read(unsigned int numBits) {
     assert(numBits <= 32);
 
     unsigned int bits = 0;
@@ -90,13 +74,13 @@ unsigned int BitInputStream::read(
     }
 
     alignedWord |= (readIn(&m_reader) << 24u);
-    L3:
+L3:
     alignedWord |= (readIn(&m_reader) << 16u);
-    L2:
+L2:
     alignedWord |= (readIn(&m_reader) << 8u);
-    L1:
+L1:
     alignedWord |= (readIn(&m_reader));
-    L0:
+L0:
 
     // Append requested bits and hold the remaining read bits
     unsigned int numNextHeldBits = (32 - numBits) % 8;
@@ -107,6 +91,5 @@ unsigned int BitInputStream::read(
 
     return bits;
 }
-
 
 }  // namespace gabac

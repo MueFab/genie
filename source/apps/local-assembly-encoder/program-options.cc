@@ -1,13 +1,12 @@
 #include "program-options.h"
 
-#include <cli11/cli11.h>
-#include <filesystem/filesystem.h>
+#include <cli11@13becad/CLI11.hpp>
+#include <filesystem@e980ed0/filesystem.hpp>
 #include <utils/exceptions.h>
 
 namespace lae {
 
-ProgramOptions::ProgramOptions(int argc, char *argv[])
-    : inputFilePath(), outputFilePath() {
+ProgramOptions::ProgramOptions(int argc, char *argv[]) : inputFilePath(), outputFilePath() {
     processCommandLine(argc, argv);
 }
 
@@ -16,8 +15,7 @@ ProgramOptions::~ProgramOptions() = default;
 void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     CLI::App app("Local assembly encoder");
 
-    app.add_option("-i,--input-file", inputFilePath, "Input file")
-        ->mandatory(true);
+    app.add_option("-i,--input-file", inputFilePath, "Input file")->mandatory(true);
     app.add_option("-o,--output-file", outputFilePath, "Output file");
 
     try {

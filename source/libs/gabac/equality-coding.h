@@ -13,8 +13,7 @@ class DataBlock;
 
 void transformEqualityCoding(DataBlock *values, DataBlock *equalityFlags);
 
-void inverseTransformEqualityCoding(DataBlock *values,
-                                    DataBlock *equalityFlags);
+void inverseTransformEqualityCoding(DataBlock *values, DataBlock *equalityFlags);
 
 }  // namespace gabac
 

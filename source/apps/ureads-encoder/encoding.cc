@@ -1,63 +1,63 @@
 #include "encoding.h"
 
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
-#include <fstream>
 
 #include "exceptions.h"
 #include "fastq-file-reader.h"
 #include "fastq-record.h"
+#include "format/part2/parameter_set/qv_coding_config_1/qv_coding_config_1.h"
 #include "genie-gabac-output-stream.h"
 #include "log.h"
-#include "format/part2/parameter_set/qv_coding_config_1/qv_coding_config_1.h"
 
 #include <gabac/gabac.h>
 #include <ureads-encoder/format/part2/raw_reference.h>
 
 #include "ureads-encoder/format/part2/access_unit.h"
-#include "ureads-encoder/format/part2/parameter_set.h"
 #include "ureads-encoder/format/part2/clutter.h"
+#include "ureads-encoder/format/part2/parameter_set.h"
 
 namespace genie {
 
-    std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
-        const std::vector<size_t> SEQUENCE_NUMS = {2, 1, 3, 2, 3, 4, 1, 1, 8, 1, 5, 2, 1, 1, 1, 2, 1, 1};
-        const std::string DEFAULT_GABAC_CONF_JSON = "{"
-                                                    "\"word_size\": 1,"
-                                                    "\"sequence_transformation_id\": 0,"
-                                                    "\"sequence_transformation_parameter\": 0,"
-                                                    "\"transformed_sequences\":"
-                                                    "[{"
-                                                    "\"lut_transformation_enabled\": false,"
-                                                    "\"diff_coding_enabled\": false,"
-                                                    "\"binarization_id\": 0,"
-                                                    "\"binarization_parameters\":[8],"
-                                                    "\"context_selection_id\": 0"
-                                                    "}]"
-                                                    "}";
-        std::vector<std::vector<gabac::EncodingConfiguration>> ret;
-        for(size_t i = 0; i < SEQUENCE_NUMS.size(); ++i) {
-            ret.emplace_back();
-            for(size_t j = 0; j < SEQUENCE_NUMS[i]; ++j) {
-                ret[i].emplace_back(DEFAULT_GABAC_CONF_JSON);
-            }
+std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
+    const std::vector<size_t> SEQUENCE_NUMS = {2, 1, 3, 2, 3, 4, 1, 1, 8, 1, 5, 2, 1, 1, 1, 2, 1, 1};
+    const std::string DEFAULT_GABAC_CONF_JSON =
+        "{"
+        "\"word_size\": 1,"
+        "\"sequence_transformation_id\": 0,"
+        "\"sequence_transformation_parameter\": 0,"
+        "\"transformed_sequences\":"
+        "[{"
+        "\"lut_transformation_enabled\": false,"
+        "\"diff_coding_enabled\": false,"
+        "\"binarization_id\": 0,"
+        "\"binarization_parameters\":[8],"
+        "\"context_selection_id\": 0"
+        "}]"
+        "}";
+    std::vector<std::vector<gabac::EncodingConfiguration>> ret;
+    for (size_t i = 0; i < SEQUENCE_NUMS.size(); ++i) {
+        ret.emplace_back();
+        for (size_t j = 0; j < SEQUENCE_NUMS[i]; ++j) {
+            ret[i].emplace_back(DEFAULT_GABAC_CONF_JSON);
         }
-        return ret;
     }
+    return ret;
+}
 
-    std::vector<std::vector<gabac::DataBlock>> create_default_streams() {
-        std::vector<std::vector<gabac::DataBlock>> ret;
-        for(size_t i = 0; i < format::NUM_DESCRIPTORS; ++i) {
-            ret.emplace_back();
-        }
-        return ret;
+std::vector<std::vector<gabac::DataBlock>> create_default_streams() {
+    std::vector<std::vector<gabac::DataBlock>> ret;
+    for (size_t i = 0; i < format::NUM_DESCRIPTORS; ++i) {
+        ret.emplace_back();
     }
+    return ret;
+}
 
-void encode(const ProgramOptions &programOptions)
-{
+void encode(const ProgramOptions& programOptions) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     // UREADS DESCRIPTOR GENERATION
     /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,7 +70,7 @@ void encode(const ProgramOptions &programOptions)
 
     std::string decodedUreads;
 
-    size_t readNum=0;
+    size_t readNum = 0;
     size_t readSize = 0;
 
     while (true) {
@@ -82,7 +82,7 @@ void encode(const ProgramOptions &programOptions)
         }
 
         // Iterate through the records.
-        for (const auto &fastqRecord : fastqRecords) {
+        for (const auto& fastqRecord : fastqRecords) {
             decodedUreads += fastqRecord.sequence;
             readSize = fastqRecord.sequence.length();
         }
@@ -94,8 +94,8 @@ void encode(const ProgramOptions &programOptions)
 
     // Alphabet
     // uint8_t alphabet_ID = 0;
-    const std::vector<char> S_0 = { 'A', 'C', 'G', 'T', 'N' };
-    const std::map<char, uint8_t> S_0_INVERSE= { { 'A', 0 }, { 'C', 1 }, { 'G', 2 }, { 'T', 3 }, { 'N', 4 } };
+    const std::vector<char> S_0 = {'A', 'C', 'G', 'T', 'N'};
+    const std::map<char, uint8_t> S_0_INVERSE = {{'A', 0}, {'C', 1}, {'G', 2}, {'T', 3}, {'N', 4}};
 
     GENIE_LOG_TRACE << "decodedUreads (length: " << decodedUreads.size() << "): " << decodedUreads;
 
@@ -124,11 +124,10 @@ void encode(const ProgramOptions &programOptions)
 
     const size_t UREADS_DESC_ID = 6;
     std::vector<std::vector<gabac::EncodingConfiguration>> configs = create_default_conf();
-    const size_t GABAC_BLOCK_SIZE = 0; // 0 means single block (block size is equal to input size)
+    const size_t GABAC_BLOCK_SIZE = 0;  // 0 means single block (block size is equal to input size)
     std::ostream* const GABC_LOG_OUTPUT_STREAM = &std::cout;
-    const gabac::IOConfiguration GABAC_IO_SETUP = { &bufferInputStream, &bufferOutputStream,
-                                                    GABAC_BLOCK_SIZE,
-                                                    GABC_LOG_OUTPUT_STREAM, gabac::IOConfiguration::LogLevel::TRACE };
+    const gabac::IOConfiguration GABAC_IO_SETUP = {&bufferInputStream, &bufferOutputStream, GABAC_BLOCK_SIZE,
+                                                   GABC_LOG_OUTPUT_STREAM, gabac::IOConfiguration::LogLevel::TRACE};
 
     const bool GABAC_DECODING_MODE = false;
     gabac::run(GABAC_IO_SETUP, configs[UREADS_DESC_ID].front(), GABAC_DECODING_MODE);
@@ -165,10 +164,7 @@ void encode(const ProgramOptions &programOptions)
     AccessUnit au = createQuickAccessUnit(ACCESS_UNIT_ID, PARAMETER_SET_ID, readNum, &generated_streams);
     au.write(&bw);
 
-
     GENIE_LOG_TRACE << "Number of bitstreams: " << generated_streams.size();
-
 }
-
 
 }  // namespace genie

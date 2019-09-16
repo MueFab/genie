@@ -10,8 +10,7 @@
 /**
  * @brief Throws a gabac exception containing the current position in the code.
  */
-#define GABAC_DIE(message) \
-    throw gabac::RuntimeException(__FILE__, __FUNCTION__, __LINE__, message)
+#define GABAC_DIE(message) throw gabac::RuntimeException(__FILE__, __FUNCTION__, __LINE__, message)
 
 #include <exception>
 #include <string>
@@ -62,8 +61,7 @@ class RuntimeException : public Exception {
      * @param line Line the error occurred
      * @param message Reason of error
      */
-    explicit RuntimeException(const std::string& file,
-                              const std::string& function, int line,
+    explicit RuntimeException(const std::string& file, const std::string& function, int line,
                               const std::string& message) noexcept;
 
     /**

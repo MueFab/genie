@@ -1,8 +1,7 @@
 #include <gtest/gtest.h>
 
 class ExampleTestCase : public ::testing::Test {
-protected:
-
+   protected:
     // Do any necessary setup for your tests here
     ExampleTestCase() = default;
 
@@ -41,9 +40,9 @@ protected:
         // Code here will be called immediately after each test
     }
 
-//    void sharedSubroutine() {
-//        // If needed, define subroutines for your tests to share
-//    }
+    //    void sharedSubroutine() {
+    //        // If needed, define subroutines for your tests to share
+    //    }
 };
 
 TEST_F(ExampleTestCase, ExampleTest) {  // NOLINT(cert-err58-cpp)
