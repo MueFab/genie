@@ -28,18 +28,18 @@ ProgramOptions::~ProgramOptions() = default;
 void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     CLI::App app{"Gabacify - GABAC entropy encoder application"};
 
-    app.add_option("-c,--configuration_file_path", this->configurationFilePath,
-                   "Configuration file path");
+    app.add_option("-c,--configuration_file", this->configurationFilePath,
+                   "Configuration file");
 
     this->logLevel = "info";
     app.add_option("-l,--log_level", this->logLevel,
                    "Log level: 'trace', 'info' (default), 'debug', 'warning', "
                    "'error', or 'fatal'");
 
-    app.add_option("-i,--input_file_path", this->inputFilePath,
-                   "Input file path");
-    app.add_option("-o,--output_file_path", this->outputFilePath,
-                   "Output file path");
+    app.add_option("-i,--input_file", this->inputFilePath,
+                   "Input file");
+    app.add_option("-o,--output_file", this->outputFilePath,
+                   "Output file");
     app.add_option("task,-t,--task", this->task,
                    "Task ('encode' or 'decode' or 'analyze')")
         ->required(true);
