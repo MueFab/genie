@@ -4,7 +4,7 @@
 # but in different orders
 
 # -----------------------------------------------------------------------------
-# Bash script setup
+# Setup
 # -----------------------------------------------------------------------------
 
 self="${0}"
@@ -21,11 +21,11 @@ fatal() { echo "[${self_name}] [${datetime}] [fatal] ${*}" 1>&2; }
 
 run() {
     local rc
-    info "Running: ${*}"
+    info "running: ${*}"
     "${@}"
     rc="${?}"
     if [[ ${rc} != 0 ]]; then
-        fatal "Command failed (RC=${rc}): ${*}"
+        fatal "command failed (RC=${rc}): ${*}"
         exit ${rc}
     fi
 }
@@ -35,9 +35,9 @@ run() {
 # -----------------------------------------------------------------------------
 
 print_usage () {
-    info "Usage: ${self_name} [options]"
+    info "usage: ${self_name} [options]"
     info ""
-    info "Options:"
+    info "options:"
     info "  -h,--help              print this help"
     info "  -1,--one FASTQ_FILE_1  1st FASTQ file"
     info "  -2,--two FASTQ_FILE_2  2nd FASTQ file"
@@ -51,7 +51,7 @@ while [[ "${#}" -gt 0 ]]; do
         -h|--help) print_usage; exit 1;;
         -1|--one) fastq_file_1="${2}"; shift;;
         -2|--two) fastq_file_2="${2}"; shift;;
-        *) error "Unknown parameter passed: ${1}"; print_usage; exit 1;;
+        *) error "unknown parameter passed: ${1}"; print_usage; exit 1;;
     esac
     shift
 done
@@ -60,17 +60,17 @@ done
 # Do it
 # -----------------------------------------------------------------------------
 
-info "Sorting 1st FASTQ file '${fastq_file_1}'"
+info "sorting 1st FASTQ file: ${fastq_file_1}"
 if [[ ! -f "${fastq_file_1}" ]]; then error "'${fastq_file_1}' is not a regular file"; exit 1; fi
 run paste -d" " - - - - < "${fastq_file_1}" > "${fastq_file_1}.one_record_per_line"
 run sort < "${fastq_file_1}.one_record_per_line" > "${fastq_file_1}.sorted"
 
-info "Sorting 2nd FASTQ file '${fastq_file_2}'"
+info "sorting 2nd FASTQ file: ${fastq_file_2}"
 if [[ ! -f "${fastq_file_2}" ]]; then error "'${fastq_file_2}' is not a regular file"; exit 1; fi
 run paste -d" " - - - - < "${fastq_file_2}" > "${fastq_file_2}.one_record_per_line"
 run sort < "${fastq_file_2}.one_record_per_line" > "${fastq_file_2}.sorted"
 
-info "Comparing FASTQ files '${fastq_file_1}.sorted' and '${fastq_file_2}.sorted'"
+info "comparing FASTQ files"
 run cmp "${fastq_file_1}.sorted" "${fastq_file_2}.sorted"
 
 info "FASTQ files '${fastq_file_1}.sorted' and '${fastq_file_2}.sorted' contain the same set of reads"
@@ -79,7 +79,7 @@ info "FASTQ files '${fastq_file_1}.sorted' and '${fastq_file_2}.sorted' contain 
 # Clean up
 # -----------------------------------------------------------------------------
 
-info "Cleaning up"
+info "cleaning up"
 run rm "${fastq_file_1}.one_record_per_line"
 run rm "${fastq_file_1}.sorted"
 run rm "${fastq_file_2}.one_record_per_line"
