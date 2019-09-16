@@ -5,10 +5,16 @@ if(DOXYGEN_FOUND)
     message(STATUS "Issue 'make doc' to build documentation")
 
     if(NOT DOXYGEN_DOT_FOUND)
-        message(WARNING
-            "'dot' tool from graphviz not found; "
+        message(
+            WARNING
+            "'dot' tool from Graphviz not found; "
             "Doxygen documentation will not include graphs"
         )
+    endif()
+
+    # For forward compatibility with newer versions of CMake
+    if(NOT DEFINED DOXYGEN_HAVE_DOT)
+        set(DOXYGEN_HAVE_DOT ${DOXYGEN_DOT_FOUND})
     endif()
 
     set(DOCUMENTATION_DIRECTORY "${CMAKE_BINARY_DIR}/doc")
@@ -17,7 +23,8 @@ if(DOXYGEN_FOUND)
 
     configure_file(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
 
-    add_custom_target(doc
+    add_custom_target(
+        doc
         COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT}
         WORKING_DIRECTORY ${DOCUMENTATION_DIRECTORY}
         COMMENT "Generating API documentation with Doxygen"
