@@ -5,16 +5,10 @@
 .DS_Store
 
 # CMake build directories
-build/
-cmake-build/
-cmake-build-debug/
-cmake-build-release/
+cmake-build-*/
 
 # CLion project directory
 .idea/
-
-# Python byte-compiled / optimized / DLL files
-__pycache__/
 
 # Code coverage
 coverage.info
