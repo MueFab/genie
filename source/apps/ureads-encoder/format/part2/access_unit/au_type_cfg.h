@@ -11,28 +11,28 @@
 
 namespace format {
 
-    /**
-    * ISO 23092-2 Section 3.4.1.1 table 19 lines 16 to 25
-    */
-    class AuTypeCfg {
-    private:
-        uint16_t sequence_ID : 16; //!< Line 18
-        uint64_t AU_start_position; //!< Line 19
-        uint64_t AU_end_position;  //!< Line 20
-        std::unique_ptr <ExtendedAu> extended_AU; //!< Lines 21 to 24
+/**
+ * ISO 23092-2 Section 3.4.1.1 table 19 lines 16 to 25
+ */
+class AuTypeCfg {
+   private:
+    uint16_t sequence_ID : 16;                //!< Line 18
+    uint64_t AU_start_position;               //!< Line 19
+    uint64_t AU_end_position;                 //!< Line 20
+    std::unique_ptr<ExtendedAu> extended_AU;  //!< Lines 21 to 24
 
-        uint8_t posSize; //!< internal
+    uint8_t posSize;  //!< internal
 
-    public:
-        AuTypeCfg(uint16_t _sequence_ID, uint64_t _AU_start_position, uint64_t _AU_end_position, uint8_t posSize);
-        AuTypeCfg(uint8_t posSize);
+   public:
+    AuTypeCfg(uint16_t _sequence_ID, uint64_t _AU_start_position, uint64_t _AU_end_position, uint8_t posSize);
+    AuTypeCfg(uint8_t posSize);
 
-        void setExtendedAu(std::unique_ptr <ExtendedAu> _extended_AU);
+    void setExtendedAu(std::unique_ptr<ExtendedAu> _extended_AU);
 
-        virtual void write(BitWriter *writer);
-    };
-}
+    virtual void write(BitWriter *writer);
+};
+}  // namespace format
 
 // -----------------------------------------------------------------------------------------------------------------
 
-#endif //GENIE_AU_TYPE_CFG_H
+#endif  // GENIE_AU_TYPE_CFG_H

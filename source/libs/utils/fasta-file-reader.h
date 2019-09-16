@@ -4,19 +4,19 @@
 #include <string>
 #include <vector>
 
-#include "file-reader.h"
 #include "fasta-record.h"
+#include "file-reader.h"
 
 namespace utils {
 
-    class FastaFileReader : public FileReader {
-    public:
-        FastaFileReader(const std::string &path);
+class FastaFileReader : public FileReader {
+   public:
+    FastaFileReader(const std::string &path);
 
-        ~FastaFileReader();
+    ~FastaFileReader();
 
-        void parse(std::vector<FastaRecord> *const fastaRecords);
-    };
+    void parse(std::vector<FastaRecord> *const fastaRecords);
+};
 
 }  // namespace utils
 

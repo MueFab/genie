@@ -4,20 +4,17 @@
 
 #include "exceptions.h"
 
-
 namespace genie {
 
-
-std::string currentDateAndTime()
-{
+std::string currentDateAndTime() {
     // ISO 8601 format: 2007-04-05T14:30:21Z
     char timeString[] = "yyyy-mm-ddTHH:MM:SSZ";
 
     time_t currentTime = time(nullptr);
-    if (currentTime == ((time_t) - 1)) {
+    if (currentTime == ((time_t)-1)) {
         GENIE_DIE("time failed");
     }
-    struct tm timeinfo{};
+    struct tm timeinfo {};
 
 #ifdef _WIN32
     errno_t err = gmtime_s(&timeinfo, &currentTime);
@@ -38,6 +35,5 @@ std::string currentDateAndTime()
     std::string result(timeString);
     return result;
 }
-
 
 }  // namespace genie

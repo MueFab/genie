@@ -15,8 +15,7 @@ size_t StreamHandler::readStream(std::istream &input, DataBlock *buffer) {
     return readBytes(input, streamSize, buffer);
 }
 
-size_t StreamHandler::readBytes(std::istream &input, size_t bytes,
-                                DataBlock *buffer) {
+size_t StreamHandler::readBytes(std::istream &input, size_t bytes, DataBlock *buffer) {
     if (bytes % buffer->getWordSize()) {
         GABAC_DIE("Input stream length not a multiple of word size");
     }
@@ -34,8 +33,7 @@ size_t StreamHandler::readFull(std::istream &input, DataBlock *buffer) {
     while (input.good()) {
         size_t pos = buffer->size();
         buffer->resize(pos + BUFFER_SIZE);
-        input.read(static_cast<char *>(buffer->getData()) +
-                       pos * buffer->getWordSize(),
+        input.read(static_cast<char *>(buffer->getData()) + pos * buffer->getWordSize(),
                    BUFFER_SIZE * buffer->getWordSize());
     }
     if (!input.eof()) {
@@ -44,14 +42,12 @@ size_t StreamHandler::readFull(std::istream &input, DataBlock *buffer) {
     if (input.gcount() % buffer->getWordSize()) {
         GABAC_DIE("Input stream length not a multiple of word size");
     }
-    buffer->resize(buffer->size() -
-                   (BUFFER_SIZE - input.gcount() / buffer->getWordSize()));
+    buffer->resize(buffer->size() - (BUFFER_SIZE - input.gcount() / buffer->getWordSize()));
     input.exceptions(safe);
     return buffer->size();
 }
 
-size_t StreamHandler::readBlock(std::istream &input, size_t bytes,
-                                DataBlock *buffer) {
+size_t StreamHandler::readBlock(std::istream &input, size_t bytes, DataBlock *buffer) {
     auto safe = input.exceptions();
     input.exceptions(std::ios::badbit);
 
@@ -60,14 +56,12 @@ size_t StreamHandler::readBlock(std::istream &input, size_t bytes,
     }
     const size_t BUFFER_SIZE = bytes / buffer->getWordSize();
     buffer->resize(BUFFER_SIZE);
-    input.read(static_cast<char *>(buffer->getData()),
-               BUFFER_SIZE * buffer->getWordSize());
+    input.read(static_cast<char *>(buffer->getData()), BUFFER_SIZE * buffer->getWordSize());
     if (!input.good()) {
         if (!input.eof()) {
             GABAC_DIE("Error while reading input stream");
         }
-        buffer->resize(buffer->size() -
-                       (BUFFER_SIZE - input.gcount() / buffer->getWordSize()));
+        buffer->resize(buffer->size() - (BUFFER_SIZE - input.gcount() / buffer->getWordSize()));
     }
     input.exceptions(safe);
     return buffer->size();

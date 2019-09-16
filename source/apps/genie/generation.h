@@ -1,6 +1,5 @@
 // Copyright 2018 The genie authors
 
-
 /**
  *  @file generation.h
  *  @brief Main entry point for descriptor stream generation algorithms
@@ -8,26 +7,19 @@
  *  @bug No known bugs
  */
 
-
 #ifndef DSG_GENERATION_H_
 #define DSG_GENERATION_H_
 
-
-#include "program-options.h"
-#include <vector>
 #include <map>
-
+#include <vector>
+#include "program-options.h"
 
 namespace dsg {
 
-void generation(
-    const ProgramOptions& programOptions);
+void generation(const ProgramOptions& programOptions);
 
-void decompression(
-        const ProgramOptions& programOptions);
-
+void decompression(const ProgramOptions& programOptions);
 
 }  // namespace dsg
-
 
 #endif  // DSG_GENERATION_H_

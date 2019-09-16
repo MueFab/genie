@@ -1,9 +1,9 @@
 #include <algorithm>
 #include <functional>
-#include <iterator>
 #include <iostream>
-#include <vector>
+#include <iterator>
 #include <random>
+#include <vector>
 
 #include <gabac/data-block.h>
 #include <gabac/match-coding.h>
@@ -12,26 +12,22 @@
 
 #include <gtest/gtest.h>
 
-
-class matchCodingTest : public ::testing::Test
-{
- protected:
+class matchCodingTest : public ::testing::Test {
+   protected:
     const unsigned int largeTestSize = 1 * 10 * 1024;
-    std::vector<int>
-            windowSizes = {1024};  // minimum value: 0,
+    std::vector<int> windowSizes = {1024};  // minimum value: 0,
     // which should not perform a search, maximum reasonable value: 32768
 
-    void SetUp() override{
+    void SetUp() override {
         // Code here will be called immediately before each test
     }
 
-    void TearDown() override{
+    void TearDown() override {
         // Code here will be called immediately after each test
     }
 };
 
-
-TEST_F(matchCodingTest, transformMatchCoding){
+TEST_F(matchCodingTest, transformMatchCoding) {
     gabac::DataBlock symbols(0, 8);
     gabac::DataBlock pointers(0, 4);
     gabac::DataBlock expectedPointers(0, 4);
@@ -79,7 +75,7 @@ TEST_F(matchCodingTest, transformMatchCoding){
     EXPECT_EQ(rawValues, expectedRawValues);
 }
 
-TEST_F(matchCodingTest, inverseTransformMatchCoding){
+TEST_F(matchCodingTest, inverseTransformMatchCoding) {
     gabac::DataBlock expectedSymbols(0, 8);
     gabac::DataBlock pointers(0, 4);
     gabac::DataBlock lengths(0, 4);
@@ -91,7 +87,6 @@ TEST_F(matchCodingTest, inverseTransformMatchCoding){
     rawValues = {};
     EXPECT_NO_THROW(gabac::inverseTransformMatchCoding(&rawValues, &pointers, &lengths));
     EXPECT_EQ(rawValues.size(), 0);
-
 
     // void rawValues (is not allowed) and lengths is not
     pointers = {};
@@ -115,22 +110,16 @@ TEST_F(matchCodingTest, inverseTransformMatchCoding){
     EXPECT_EQ(rawValues, expectedSymbols);
 }
 
-
-TEST_F(matchCodingTest, roundTripCoding){
+TEST_F(matchCodingTest, roundTripCoding) {
     gabac::DataBlock symbols(0, 8);
     gabac::DataBlock decodedSymbols(0, 8);
     gabac::DataBlock pointers(0, 4);
     gabac::DataBlock lengths(0, 4);
     gabac::DataBlock rawValues(0, 8);
 
-
     // test large file size word size 1
     symbols.resize(largeTestSize);
-    fillVectorRandomUniform(
-            std::numeric_limits<uint8_t>::min(),
-            std::numeric_limits<uint8_t>::max(),
-            &symbols
-    );
+    fillVectorRandomUniform(std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max(), &symbols);
 
     rawValues = symbols;
 
@@ -143,11 +132,7 @@ TEST_F(matchCodingTest, roundTripCoding){
 
     // test large file size word size 2
     symbols.resize(largeTestSize);
-    fillVectorRandomUniform(
-            std::numeric_limits<uint16_t>::min(),
-            std::numeric_limits<uint16_t>::max(),
-            &symbols
-    );
+    fillVectorRandomUniform(std::numeric_limits<uint16_t>::min(), std::numeric_limits<uint16_t>::max(), &symbols);
     rawValues = symbols;
     for (auto& windowSize : windowSizes) {
         EXPECT_NO_THROW(gabac::transformMatchCoding(windowSize, &rawValues, &pointers, &lengths));
@@ -157,11 +142,7 @@ TEST_F(matchCodingTest, roundTripCoding){
     }
     // test large file size word size 4
     symbols.resize(largeTestSize);
-    fillVectorRandomUniform(
-            std::numeric_limits<uint32_t>::min(),
-            std::numeric_limits<uint32_t>::max(),
-            &symbols
-    );
+    fillVectorRandomUniform(std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max(), &symbols);
     rawValues = symbols;
     for (auto& windowSize : windowSizes) {
         EXPECT_NO_THROW(gabac::transformMatchCoding(windowSize, &rawValues, &pointers, &lengths));

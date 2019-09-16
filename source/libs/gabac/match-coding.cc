@@ -15,9 +15,7 @@
 
 namespace gabac {
 
-void transformMatchCoding(const uint32_t windowSize,
-                          gabac::DataBlock *const symbols,
-                          gabac::DataBlock *const pointers,
+void transformMatchCoding(const uint32_t windowSize, gabac::DataBlock *const symbols, gabac::DataBlock *const pointers,
                           gabac::DataBlock *const lengths) {
     assert(pointers != nullptr);
     assert(lengths != nullptr);
@@ -44,8 +42,7 @@ void transformMatchCoding(const uint32_t windowSize,
 
         for (uint64_t w = windowStartIdx; w < windowEndIdx; w++) {
             uint64_t offset = i;
-            while ((offset < symbolsSize) &&
-                   (symbols->get(offset) == (symbols->get(w + offset - i)))) {
+            while ((offset < symbolsSize) && (symbols->get(offset) == (symbols->get(w + offset - i)))) {
                 offset++;
             }
             offset -= i;
@@ -67,8 +64,7 @@ void transformMatchCoding(const uint32_t windowSize,
     rawValues.swap(symbols);
 }
 
-void inverseTransformMatchCoding(gabac::DataBlock *const rawValues,
-                                 gabac::DataBlock *const pointers,
+void inverseTransformMatchCoding(gabac::DataBlock *const rawValues, gabac::DataBlock *const pointers,
                                  gabac::DataBlock *const lengths) {
     gabac::DataBlock symbols(0, rawValues->getWordSize());
     assert(lengths->size() == pointers->size() + rawValues->size());

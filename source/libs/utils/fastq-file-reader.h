@@ -1,7 +1,6 @@
 #ifndef FIO_FASTQ_FILE_READER_H_
 #define FIO_FASTQ_FILE_READER_H_
 
-
 #include <string>
 #include <vector>
 
@@ -10,14 +9,14 @@
 
 namespace utils {
 
-    class FastqFileReader : public FileReader {
-    public:
-        FastqFileReader(const std::string &path);
+class FastqFileReader : public FileReader {
+   public:
+    FastqFileReader(const std::string &path);
 
-        ~FastqFileReader();
+    ~FastqFileReader();
 
-        size_t readRecords(const size_t numRecords, std::vector<FastqRecord> *const records);
-    };
+    size_t readRecords(const size_t numRecords, std::vector<FastqRecord> *const records);
+};
 
 }  // namespace utils
 

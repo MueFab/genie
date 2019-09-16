@@ -6,14 +6,14 @@
 namespace utils {
 
 struct FastqRecord {
- public:
+   public:
     FastqRecord();
 
-    FastqRecord(std::string  title,std::string  sequence,std::string  optional,std::string  qualityScores);
+    FastqRecord(std::string title, std::string sequence, std::string optional, std::string qualityScores);
 
     ~FastqRecord();
 
- public:
+   public:
     std::string title;
     std::string sequence;
     std::string optional;
@@ -23,4 +23,3 @@ struct FastqRecord {
 }  // namespace utils
 
 #endif  // UTILS_FASTQ_RECORD_H_
-

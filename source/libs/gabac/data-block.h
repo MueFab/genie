@@ -119,9 +119,8 @@ class DataBlock {
         ProxyCore &operator=(uint64_t val);
     };
 
-    using Proxy = ProxyCore<DataBlock *>; /**< Standard proxy */
-    using ConstProxy =
-        ProxyCore<const DataBlock *>; /**< Standard proxy for const */
+    using Proxy = ProxyCore<DataBlock *>;            /**< Standard proxy */
+    using ConstProxy = ProxyCore<const DataBlock *>; /**< Standard proxy for const */
 
     /**
      * @brief Iterator for data blocks. Like for proxy object: only use if
@@ -161,9 +160,7 @@ class DataBlock {
          * @param offset Other iterator
          * @return Index offset
          */
-        size_t operator-(const IteratorCore &offset) const {
-            return position - offset.position;
-        }
+        size_t operator-(const IteratorCore &offset) const { return position - offset.position; }
 
         /**
          * @brief Increment prefix
@@ -221,18 +218,16 @@ class DataBlock {
          */
         bool operator!=(const IteratorCore &c) const;
 
-        using iterator_category =
-            std::random_access_iterator_tag; /**< @brief Iterator category for
-                                                STL */
-        using reference = ProxyCore<T>;  /**< @brief Reference type for STL */
-        using pointer = ProxyCore<T> *;  /**< @brief Pointer type for STL */
-        using value_type = ProxyCore<T>; /**< @brief Value type for STL */
-        using difference_type = size_t;  /**< @brief Difference type for STL */
+        using iterator_category = std::random_access_iterator_tag; /**< @brief Iterator category for
+                                                                      STL */
+        using reference = ProxyCore<T>;                            /**< @brief Reference type for STL */
+        using pointer = ProxyCore<T> *;                            /**< @brief Pointer type for STL */
+        using value_type = ProxyCore<T>;                           /**< @brief Value type for STL */
+        using difference_type = size_t;                            /**< @brief Difference type for STL */
     };
 
-    using Iterator = IteratorCore<DataBlock *>; /**< @brief Default iterator */
-    using ConstIterator =
-        IteratorCore<const DataBlock *>; /**< @brief Default const iterator */
+    using Iterator = IteratorCore<DataBlock *>;            /**< @brief Default iterator */
+    using ConstIterator = IteratorCore<const DataBlock *>; /**< @brief Default const iterator */
 
     /**
      * @brief Get number of elements
@@ -398,14 +393,11 @@ inline uint64_t DataBlock::get(size_t index) const {
         case 1:
             return *(data.data() + index);
         case 2:
-            return *reinterpret_cast<const uint16_t *>(data.data() +
-                                                       (index << 1u));
+            return *reinterpret_cast<const uint16_t *>(data.data() + (index << 1u));
         case 4:
-            return *reinterpret_cast<const uint32_t *>(data.data() +
-                                                       (index << 2u));
+            return *reinterpret_cast<const uint32_t *>(data.data() + (index << 2u));
         case 8:
-            return *reinterpret_cast<const uint64_t *>(data.data() +
-                                                       (index << 3u));
+            return *reinterpret_cast<const uint64_t *>(data.data() + (index << 3u));
         default:
             return 0;
     }
@@ -417,16 +409,13 @@ inline void DataBlock::set(size_t index, uint64_t val) {
             *(data.data() + index) = static_cast<uint8_t>(val);
             return;
         case 2:
-            *reinterpret_cast<uint16_t *>(data.data() + (index << 1u)) =
-                static_cast<uint16_t>(val);
+            *reinterpret_cast<uint16_t *>(data.data() + (index << 1u)) = static_cast<uint16_t>(val);
             return;
         case 4:
-            *reinterpret_cast<uint32_t *>(data.data() + (index << 2u)) =
-                static_cast<uint32_t>(val);
+            *reinterpret_cast<uint32_t *>(data.data() + (index << 2u)) = static_cast<uint32_t>(val);
             return;
         case 8:
-            *reinterpret_cast<uint64_t *>(data.data() + (index << 3u)) =
-                static_cast<uint64_t>(val);
+            *reinterpret_cast<uint64_t *>(data.data() + (index << 3u)) = static_cast<uint64_t>(val);
             return;
         default:
             return;
@@ -437,13 +426,9 @@ inline DataBlock::ConstIterator DataBlock::begin() const { return {this, 0}; }
 
 inline DataBlock::Iterator DataBlock::begin() { return {this, 0}; }
 
-inline DataBlock::ConstIterator DataBlock::end() const {
-    return {this, data.size() / wordSize};
-}
+inline DataBlock::ConstIterator DataBlock::end() const { return {this, data.size() / wordSize}; }
 
-inline DataBlock::Iterator DataBlock::end() {
-    return {this, data.size() / wordSize};
-}
+inline DataBlock::Iterator DataBlock::end() { return {this, data.size() / wordSize}; }
 
 inline void DataBlock::push_back(uint64_t val) {
     /*
@@ -451,20 +436,16 @@ inline void DataBlock::push_back(uint64_t val) {
     data.resize(data.size() + wordSize);
     switch (wordSize) {
         case 1:
-            *reinterpret_cast<uint8_t *>(data.end().base() - 1) =
-                static_cast<uint8_t>(val);
+            *reinterpret_cast<uint8_t *>(data.end().base() - 1) = static_cast<uint8_t>(val);
             return;
         case 2:
-            *reinterpret_cast<uint16_t *>(data.end().base() - 2) =
-                static_cast<uint16_t>(val);
+            *reinterpret_cast<uint16_t *>(data.end().base() - 2) = static_cast<uint16_t>(val);
             return;
         case 4:
-            *reinterpret_cast<uint32_t *>(data.end().base() - 4) =
-                static_cast<uint32_t>(val);
+            *reinterpret_cast<uint32_t *>(data.end().base() - 4) = static_cast<uint32_t>(val);
             return;
         case 8:
-            *reinterpret_cast<uint64_t *>(data.end().base() - 8) =
-                static_cast<uint64_t>(val);
+            *reinterpret_cast<uint64_t *>(data.end().base() - 8) = static_cast<uint64_t>(val);
             return;
         default:
             break;
@@ -487,8 +468,7 @@ inline void DataBlock::setWordSize(uint8_t size) {
 }
 
 template <typename T>
-inline DataBlock::ProxyCore<T>::ProxyCore(T str, size_t pos)
-    : stream(str), position(pos) {}
+inline DataBlock::ProxyCore<T>::ProxyCore(T str, size_t pos) : stream(str), position(pos) {}
 
 template <typename T>
 inline DataBlock::ProxyCore<T>::operator uint64_t() const {
@@ -496,25 +476,21 @@ inline DataBlock::ProxyCore<T>::operator uint64_t() const {
 }
 
 template <typename T>
-inline DataBlock::ProxyCore<T> &DataBlock::ProxyCore<T>::operator=(
-    uint64_t val) {
+inline DataBlock::ProxyCore<T> &DataBlock::ProxyCore<T>::operator=(uint64_t val) {
     stream->set(position, val);
     return *this;
 }
 
 template <typename T>
-DataBlock::IteratorCore<T>::IteratorCore(T str, size_t pos)
-    : stream(str), position(pos) {}
+DataBlock::IteratorCore<T>::IteratorCore(T str, size_t pos) : stream(str), position(pos) {}
 
 template <typename T>
-inline DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator+(
-    size_t offset) const {
+inline DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator+(size_t offset) const {
     return IteratorCore(stream, position + offset);
 }
 
 template <typename T>
-inline DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator-(
-    size_t offset) const {
+inline DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator-(size_t offset) const {
     return IteratorCore(stream, position - offset);
 }
 
@@ -531,16 +507,14 @@ inline DataBlock::IteratorCore<T> &DataBlock::IteratorCore<T>::operator--() {
 }
 
 template <typename T>
-inline const DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator++(
-    int) {
+inline const DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator++(int) {
     IteratorCore ret = *this;
     ++(*this);
     return ret;
 }
 
 template <typename T>
-inline const DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator--(
-    int) {
+inline const DataBlock::IteratorCore<T> DataBlock::IteratorCore<T>::operator--(int) {
     IteratorCore ret = *this;
     ++(*this);
     return ret;
@@ -562,14 +536,12 @@ inline DataBlock::ProxyCore<T> DataBlock::IteratorCore<T>::operator*() const {
 }
 
 template <typename T>
-inline bool DataBlock::IteratorCore<T>::operator==(
-    const IteratorCore &c) const {
+inline bool DataBlock::IteratorCore<T>::operator==(const IteratorCore &c) const {
     return this->stream == c.stream && this->position == c.position;
 }
 
 template <typename T>
-inline bool DataBlock::IteratorCore<T>::operator!=(
-    const IteratorCore &c) const {
+inline bool DataBlock::IteratorCore<T>::operator!=(const IteratorCore &c) const {
     return !(*this == c);
 }
 
@@ -578,8 +550,7 @@ void DataBlock::insert(const IT1 &pos, const IT2 &start, const IT2 &end) {
     if (pos.getStream() != this || start.getStream() != end.getStream()) {
         return;
     }
-    data.insert(data.begin() + pos.getOffset(),
-                start.getStream()->data.begin() + start.getOffset(),
+    data.insert(data.begin() + pos.getOffset(), start.getStream()->data.begin() + start.getOffset(),
                 end.getStream()->data.begin() + end.getOffset());
 }
 

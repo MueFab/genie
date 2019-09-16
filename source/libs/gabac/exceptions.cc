@@ -16,8 +16,7 @@ std::string Exception::message() const { return m_message; }
 
 const char* Exception::what() const noexcept { return m_message.c_str(); }
 
-RuntimeException::RuntimeException(const std::string& file,
-                                   const std::string& function, int line,
+RuntimeException::RuntimeException(const std::string& file, const std::string& function, int line,
                                    const std::string& message) noexcept
     : Exception(
           // file + ":"
@@ -30,8 +29,7 @@ RuntimeException::RuntimeException(const std::string& file,
     static_cast<void>(line);
 }
 
-RuntimeException::RuntimeException(const gabac::RuntimeException& e) noexcept
-    : Exception(e.what()) {}
+RuntimeException::RuntimeException(const gabac::RuntimeException& e) noexcept : Exception(e.what()) {}
 
 RuntimeException::~RuntimeException() noexcept = default;
 

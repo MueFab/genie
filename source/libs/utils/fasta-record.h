@@ -5,16 +5,16 @@
 
 namespace utils {
 
-    struct FastaRecord {
-    public:
-        FastaRecord(std::string header, std::string sequence);
+struct FastaRecord {
+   public:
+    FastaRecord(std::string header, std::string sequence);
 
-        ~FastaRecord();
+    ~FastaRecord();
 
-    public:
-        std::string header;
-        std::string sequence;
-    };
+   public:
+    std::string header;
+    std::string sequence;
+};
 
 }  // namespace utils
 

@@ -13,12 +13,9 @@ namespace gabac {
 
 class DataBlock;
 
-class BitInputStream
-{
- public:
-    explicit BitInputStream(
-            DataBlock *bitstream
-    );
+class BitInputStream {
+   public:
+    explicit BitInputStream(DataBlock *bitstream);
 
     ~BitInputStream();
 
@@ -28,11 +25,10 @@ class BitInputStream
 
     void reset();
 
- // private:
-    unsigned int read(
-            unsigned int numBits
-    );
- private: // i added this
+    // private:
+    unsigned int read(unsigned int numBits);
+
+   private:  // i added this
     gabac::DataBlock *m_bitstream;
 
     gabac::BlockStepper m_reader;
@@ -42,8 +38,6 @@ class BitInputStream
     unsigned int m_numHeldBits;
 };
 
-
 }  // namespace gabac
-
 
 #endif  // GABAC_BIT_INPUT_STREAM_H_

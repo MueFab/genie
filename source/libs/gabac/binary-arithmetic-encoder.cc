@@ -12,21 +12,18 @@
 
 namespace gabac {
 
-BinaryArithmeticEncoder::BinaryArithmeticEncoder(
-    const BitOutputStream& bitOutputStream)
+BinaryArithmeticEncoder::BinaryArithmeticEncoder(const BitOutputStream& bitOutputStream)
     : m_bitOutputStream(bitOutputStream) {
     start();
 }
 
 BinaryArithmeticEncoder::~BinaryArithmeticEncoder() = default;
 
-inline void BinaryArithmeticEncoder::encodeBin(
-    unsigned int bin, ContextModel* const contextModel) {
+inline void BinaryArithmeticEncoder::encodeBin(unsigned int bin, ContextModel* const contextModel) {
     assert((bin == 0) || (bin == 1));
     assert(contextModel != nullptr);
 
-    unsigned int lps =
-        cabactables::lpsTable[contextModel->getState()][(m_range >> 6u) & 3u];
+    unsigned int lps = cabactables::lpsTable[contextModel->getState()][(m_range >> 6u) & 3u];
     m_range -= lps;
     if (bin != contextModel->getMps()) {
         unsigned int numBits = cabactables::renormTable[(lps >> 3u)];
@@ -61,8 +58,7 @@ void BinaryArithmeticEncoder::encodeBinEP(unsigned int bin) {
     }
 }
 
-void BinaryArithmeticEncoder::encodeBinsEP(unsigned int bins,
-                                           unsigned int numBins) {
+void BinaryArithmeticEncoder::encodeBinsEP(unsigned int bins, unsigned int numBins) {
     while (numBins > 8) {
         numBins -= 8;
         unsigned int pattern = bins >> numBins;

@@ -728,14 +728,14 @@ class Success : public ParseError {
 /// -h or --help on command line
 class CallForHelp : public ParseError {
     CLI11_ERROR_DEF(ParseError, CallForHelp)
-    CallForHelp() : CallForHelp("This should be caught in your main function, see example", ExitCodes::Success) {}
+    CallForHelp() : CallForHelp("This should be caught in your main function, see examples", ExitCodes::Success) {}
 };
 
 /// Usually something like --help-all on command line
 class CallForAllHelp : public ParseError {
     CLI11_ERROR_DEF(ParseError, CallForAllHelp)
     CallForAllHelp()
-        : CallForAllHelp("This should be caught in your main function, see example", ExitCodes::Success) {}
+        : CallForAllHelp("This should be caught in your main function, see examples", ExitCodes::Success) {}
 };
 
 /// Does not output a diagnostic in CLI11_PARSE, but allows to return from main() with a specific error code.

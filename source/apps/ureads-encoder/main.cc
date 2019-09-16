@@ -11,9 +11,7 @@
 #include "logger.h"
 #include "program-options.h"
 
-
-static void writeCommandLine(int argc, char* argv[])
-{
+static void writeCommandLine(int argc, char* argv[]) {
     std::vector<std::string> args(argv, (argv + argc));
     std::stringstream commandLine;
     for (const auto& arg : args) {
@@ -22,11 +20,9 @@ static void writeCommandLine(int argc, char* argv[])
     GENIE_LOG_DEBUG << "Command line: " << commandLine.str();
 }
 
-
-static int genie_main(int argc, char* argv[])
-{
+static int genie_main(int argc, char* argv[]) {
     genie::Logger::init("app.log");
-    genie::Logger &logger = genie::Logger::instance();
+    genie::Logger& logger = genie::Logger::instance();
     logger.out("test");
 
     try {
@@ -47,9 +43,7 @@ static int genie_main(int argc, char* argv[])
     return 0;
 }
 
-
-extern "C" void handleSignal(int sig)
-{
+extern "C" void handleSignal(int sig) {
     // Ignore the signal
     std::signal(sig, SIG_IGN);
 
@@ -85,9 +79,7 @@ extern "C" void handleSignal(int sig)
     std::raise(sig);
 }
 
-
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     // Install signal handler for the following signal types:
     //   SIGABRT  abnormal termination condition, as is e.g. initiated by std::abort()
     //   SIGFPE   erroneous arithmetic operation such as divide by zero

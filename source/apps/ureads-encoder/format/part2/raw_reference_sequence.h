@@ -6,31 +6,29 @@
 
 namespace format {
 
-    class BitWriter;
+class BitWriter;
 
-    /**
-    * ISO 23092-2 Section 3.2 table 5, lines 4 to 7
-    */
-    class RawReferenceSequence {
-    private:
-        uint16_t sequence_ID : 16; //!< Line 4
-        uint64_t seq_start : 40; //!< Line 5
-        //!< uint64_t seq_end : 40; //!< Line 6 currently computed by length of string
-        std::unique_ptr<std::string> ref_sequence; //!< Line 7
+/**
+ * ISO 23092-2 Section 3.2 table 5, lines 4 to 7
+ */
+class RawReferenceSequence {
+   private:
+    uint16_t sequence_ID : 16;  //!< Line 4
+    uint64_t seq_start : 40;    //!< Line 5
+    //!< uint64_t seq_end : 40; //!< Line 6 currently computed by length of string
+    std::unique_ptr<std::string> ref_sequence;  //!< Line 7
 
-    public:
-        bool isIdUnique(const RawReferenceSequence *s) const;
+   public:
+    bool isIdUnique(const RawReferenceSequence *s) const;
 
-        RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_start,
-                             std::unique_ptr<std::string> _ref_sequence);
+    RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_start, std::unique_ptr<std::string> _ref_sequence);
 
-        virtual std::unique_ptr<RawReferenceSequence> clone() const;
+    virtual std::unique_ptr<RawReferenceSequence> clone() const;
 
-        void write(BitWriter *writer) const;
+    void write(BitWriter *writer) const;
 
-        uint64_t getTotalSize() const;
-    };
-}
+    uint64_t getTotalSize() const;
+};
+}  // namespace format
 
-
-#endif //GENIE_RAW_REFERENCE_SEQUENCE_H
+#endif  // GENIE_RAW_REFERENCE_SEQUENCE_H
