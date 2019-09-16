@@ -3,17 +3,22 @@
 ## Folder and file status
 
 - [ ] ./
-  - [x] .git/
-  - [ ] .github/
-    - [ ] ISSUE_TEMPLATE
-      - [ ] bug_report.md
-      - [ ] custom.md
-      - [ ] feature_request.md
-  - [ ] ci/
+  - [x] .github/
+    - [x] ISSUE_TEMPLATE
+      - [x] bug_report.md
+      - [x] custom.md
+      - [x] feature_request.md
+  - [x] ci/
+    - [x] cmake-build-debug-all.sh
     - [x] cmake-build-release.sh
-    - [ ] test-gabac-roundtrips.sh
-    - [ ] test-genie-roundtrip.sh
+    - [x] report-coverage.sh
+    - [x] run-gabac-roundtrips.sh
+    - [x] run-genie-roundtrip.sh
+    - [x] run-tests.sh
   - [ ] cmake/
+    - [ ] Doxygen.cmake
+    - [ ] GoogleTest.cmake
+    - [ ] CMakeListsGoogleTest.txt.in
   - [ ] doc/
   - [ ] resources/
   - [ ] scripts/
@@ -26,6 +31,10 @@
 - [ ] Set up Google Test
 - [ ] Push doc to gh-pages
 - [ ] Compare with getspc and calq repos
+- [ ] Check CLI options (should be something like: --input-file)
+- [ ] Don't let genie produce genie.log by default
+- [ ] Make genie work for void test file
+- [ ] Rename scripts/ to util/
 
 ## Urgent
 
