@@ -33,8 +33,5 @@ before_script:
 
 script:
   - ./ci/cmake-build-release.sh
-  - ./ci/test-genie-roundtrip.sh
-  - ./ci/test-gabac-roundtrips.sh
-
-#after_success:
-  #- ./scripts/coverage-report-script.sh
+  - ./ci/run-gabac-roundtrips.sh
+  - ./ci/run-genie-roundtrips.sh
