@@ -35,7 +35,7 @@
   - [ ] .clang-format
   - [ ] .gitignore
   - [ ] .travis.yml
-  - [ ] AUTHORS
+  - [x] AUTHORS
   - [x] CMakeLists.txt
   - [x] CODE_OF_CONDUCT.md
   - [x] CONTRIBUTING.md
