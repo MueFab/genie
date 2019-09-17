@@ -5,15 +5,17 @@ set -euo pipefail
 git rev-parse --git-dir 1>/dev/null # exit if not inside Git repo
 readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
-if not command -v autopep8 &>/dev/null; then
-    echo "error: command does not exist: autopep8"
-    exit 1
-fi
+cmds=()
+cmds+=("autopep8")
+cmds+=("pycodestyle")
 
-if not command -v pycodestyle &>/dev/null; then
-    echo "error: command does not exist: pycodestyle"
-    exit 1
-fi
+for i in "${!cmds[@]}"; do
+    cmd=${cmds[${i}]}
+    if not command -v "${cmd}" &>/dev/null; then
+        error "command does not exist: ${cmd}"
+        exit 1
+    fi
+done
 
 dirs=()
 dirs+=("${git_root_dir}/source")
