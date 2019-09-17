@@ -1,11 +1,10 @@
-#ifndef FIO_FILE_READER_H_
-#define FIO_FILE_READER_H_
+#ifndef UTIL_FILE_READER_H_
+#define UTIL_FILE_READER_H_
 
 #include <string>
-
 #include "constants.h"
 
-namespace utils {
+namespace util {
 
 class FileReader {
    public:
@@ -49,6 +48,6 @@ class FileReader {
     char *line_;
 };
 
-}  // namespace utils
+}  // namespace util
 
-#endif  // FIO_FILE_READER_H_
+#endif  // UTIL_FILE_READER_H_

@@ -1,9 +1,8 @@
 #include "sam-record.h"
-
 #include <iostream>
 #include <sstream>
 
-namespace utils {
+namespace util {
 
 SamRecord::SamRecord(const std::vector<std::string> &fields)
     : qname(fields[0]),
@@ -40,4 +39,4 @@ std::string SamRecord::str() const {
     return ss.str();
 }
 
-}  // namespace utils
+}  // namespace util

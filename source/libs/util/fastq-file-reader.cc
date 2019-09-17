@@ -1,9 +1,8 @@
 #include "fastq-file-reader.h"
-
 #include <stdexcept>
 #include <string>
 
-namespace utils {
+namespace util {
 
 FastqFileReader::FastqFileReader(const std::string& path) : FileReader(path) {}
 
@@ -50,4 +49,4 @@ size_t FastqFileReader::readRecords(const size_t numRecords, std::vector<FastqRe
     }
 }
 
-}  // namespace utils
+}  // namespace util

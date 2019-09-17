@@ -1,19 +1,16 @@
-#ifndef UTILS_SAM_RECORD_H_
-#define UTILS_SAM_RECORD_H_
+#ifndef UTIL_SAM_RECORD_H_
+#define UTIL_SAM_RECORD_H_
 
 #include <inttypes.h>
-
 #include <string>
 #include <vector>
 
-namespace utils {
+namespace util {
 
 struct SamRecord {
    public:
     SamRecord(const std::vector<std::string> &fields);
-
     ~SamRecord();
-
     std::string str() const;
 
    public:
@@ -31,6 +28,6 @@ struct SamRecord {
     std::string opt;    // OPTional information
 };
 
-}  // namespace utils
+}  // namespace util
 
-#endif  // UTILS_SAM_RECORD_H_
+#endif  // UTIL_SAM_RECORD_H_

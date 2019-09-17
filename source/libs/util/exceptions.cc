@@ -2,7 +2,7 @@
 
 #include "exceptions.h"
 
-namespace utils {
+namespace util {
 
 Exception::Exception(std::string msg) : msg_(std::move(msg)) {}
 
@@ -25,4 +25,4 @@ RuntimeException::RuntimeException(const RuntimeException &e) noexcept : Excepti
 
 RuntimeException::~RuntimeException() noexcept = default;
 
-}  // namespace utils
+}  // namespace util

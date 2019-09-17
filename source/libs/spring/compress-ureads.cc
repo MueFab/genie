@@ -4,7 +4,7 @@
 
 #include <algorithm>
 #include <array>
-#include <cmath>  // abs
+#include <cmath>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -13,30 +13,27 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-
 #include "compress-ureads.h"
 #include "generate-read-streams.h"
 #include "params.h"
 #include "reorder-compress-quality-id.h"
 #include "util.h"
 
-#include <utils/fastq-file-reader.h>
-
 namespace spring {
 
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> compress_ureads(utils::FastqFileReader *fastqFileReader1,
-                                                                               utils::FastqFileReader *fastqFileReader2,
+std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> compress_ureads(util::FastqFileReader *fastqFileReader1,
+                                                                               util::FastqFileReader *fastqFileReader2,
                                                                                const std::string &temp_dir,
                                                                                compression_params &cp,
                                                                                dsg::StreamSaver &st) {
     std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> descriptorFilesPerAU;
 
-    utils::FastqFileReader *fastqFileReader[2] = {fastqFileReader1, fastqFileReader2};
+    util::FastqFileReader *fastqFileReader[2] = {fastqFileReader1, fastqFileReader2};
     std::string basedir = temp_dir;
     std::string outfileid = basedir + "/id_1";
     std::string outfilequality = basedir + "/quality_1";
 
-    std::vector<utils::FastqRecord> fastqRecords[2];
+    std::vector<util::FastqRecord> fastqRecords[2];
 
     int number_of_record_segments = cp.paired_end ? 2 : 1;
     uint32_t max_readlen = 0;

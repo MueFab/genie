@@ -1,9 +1,9 @@
-#ifndef UTILS_STRING_HELPERS_H
-#define UTILS_STRING_HELPERS_H
+#ifndef UTIL_STRING_HELPERS_H
+#define UTIL_STRING_HELPERS_H
 
 #include <string>
 
-namespace utils {
+namespace util {
 
 const char *ws = " \t\n\r\f\v";
 
@@ -19,6 +19,6 @@ inline std::string &ltrim(std::string &s, const char *t = ws) {
 
 inline std::string &trim(std::string &s, const char *t = ws) { return ltrim(rtrim(s, t), t); }
 
-}  // namespace utils
+}  // namespace util
 
-#endif  // UTILS_STRING_HELPERS_H
+#endif  // UTIL_STRING_HELPERS_H

@@ -7,15 +7,15 @@
 
 #include <genie/generation.h>
 #include <genie/stream-saver.h>
-#include <utils/fastq-file-reader.h>
+#include <util/fastq-file-reader.h>
 
 #include "return-structures.h"
 #include "util.h"
 
 namespace spring {
 
-generated_aus generate_streams_SPRING(utils::FastqFileReader *fastqFileReader1,
-                                      utils::FastqFileReader *fastqFileReader2, int num_thr, bool paired_end,
+generated_aus generate_streams_SPRING(util::FastqFileReader *fastqFileReader1,
+                                      util::FastqFileReader *fastqFileReader2, int num_thr, bool paired_end,
                                       const std::string &working_dir, bool analyze, dsg::StreamSaver &st,
                                       bool ureads_flag, bool preserve_quality, bool preserve_id);
 
