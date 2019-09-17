@@ -20,7 +20,7 @@ void DecoderConfigurationCabac::setSubsequenceCfg(uint8_t index, std::unique_ptr
 }
 
 DescriptorSubsequenceCfg *DecoderConfigurationCabac::getSubsequenceCfg(uint8_t index) const {
-    descriptor_subsequence_cfgs[index].get();
+    return descriptor_subsequence_cfgs[index].get();
 }
 
 std::unique_ptr<DecoderConfiguration> DecoderConfigurationCabac::clone() const {
