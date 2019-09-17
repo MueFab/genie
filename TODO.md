@@ -37,7 +37,7 @@
   - [ ] .travis.yml
   - [ ] AUTHORS
   - [ ] CMakeLists.txt
-  - [ ] CODE_OF_CONDUCT.md
+  - [x] CODE_OF_CONDUCT.md
   - [x] CONTRIBUTING.md
   - [x] Doxyfile.in
   - [x] LICENSE
