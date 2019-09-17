@@ -28,8 +28,8 @@
     - [x] autopep8-pycodestyle.sh
     - [x] before-commit.sh
     - [x] clang-format.sh
-    - [ ] cmp-reordered-fastq.sh
-    - [ ] conformance-roundtrip.sh
+    - [x] cmp-reordered-fastq.sh
+    - [x] conformance-roundtrip.sh
     - [ ] list-tags.sh
     - [ ] shellcheck.sh
     - [ ] test-gabac-python-api.sh

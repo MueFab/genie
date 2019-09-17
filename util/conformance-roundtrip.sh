@@ -5,6 +5,17 @@ set -euo pipefail
 git rev-parse --git-dir 1>/dev/null # exit if not inside Git repo
 readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
+cmds=()
+cmds+=("rm")
+
+for i in "${!cmds[@]}"; do
+    cmd=${cmds[${i}]}
+    if not command -v "${cmd}" &>/dev/null; then
+        echo "error: command does not exist: ${cmd}"
+        exit 1
+    fi
+done
+
 readonly build_dir="${git_root_dir}/cmake-build-release"
 readonly ureads_encoder="${build_dir}/bin/ureads-encoder"
 if [[ ! -x "${ureads_encoder}" ]]; then
@@ -27,6 +38,7 @@ readonly decoded_file="${bitstream_file}.decoded"
 "${ureads_encoder}" \
     --input-file "${fastq_file}" \
     --output-file "${bitstream_file}"
+
 "${mpegg_decoder_p2}" \
     --verbose debug \
     --bitstream "${bitstream_file}" \
