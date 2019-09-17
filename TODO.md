@@ -27,7 +27,7 @@
     - [x] authors.sh
     - [x] autopep8-pycodestyle.sh
     - [x] before-commit.sh
-    - [ ] clang-format.sh
+    - [x] clang-format.sh
     - [ ] cmp-reordered-fastq.sh
     - [ ] conformance-roundtrip.sh
     - [ ] list-tags.sh
