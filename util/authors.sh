@@ -14,6 +14,6 @@ readonly authors_file="${git_root_dir}/AUTHORS"
 git shortlog --summary --email \
   | perl -spe 's/^\s+\d+\s+//' \
   | sed -e '/^CommitSyncScript.*$/d' \
-  > "${authors_file}"
+  >"${authors_file}"
 
 echo "created/updated authors file: ${authors_file}"
