@@ -26,7 +26,7 @@
   - [ ] util/
     - [x] authors.sh
     - [x] autopep8-pycodestyle.sh
-    - [ ] before-commit.sh
+    - [x] before-commit.sh
     - [ ] clang-format.sh
     - [ ] cmp-reordered-fastq.sh
     - [ ] conformance-roundtrip.sh
