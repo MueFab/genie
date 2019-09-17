@@ -39,7 +39,7 @@
   - [ ] CMakeLists.txt
   - [ ] CODE_OF_CONDUCT.md
   - [ ] CONTRIBUTING.md
-  - [ ] Doxyfile.in
+  - [x] Doxyfile.in
   - [x] LICENSE
   - [x] PULL_REQUEST_TEMPLATE.md
   - [ ] README.md
