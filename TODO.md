@@ -32,7 +32,7 @@
     - [ ] list-tags.sh
     - [ ] shellcheck.sh
     - [ ] test-gabac-python-api.sh
-  - [ ] .clang-format
+  - [x] .clang-format
   - [x] .gitignore
   - [ ] .travis.yml
   - [x] AUTHORS
