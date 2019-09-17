@@ -15,6 +15,7 @@
     - [x] run-gabac-roundtrips.sh
     - [x] run-genie-roundtrip.sh
     - [x] run-tests.sh
+    - [ ] test-gabac-python-api.sh
   - [ ] cmake/
     - [ ] Doxygen.cmake
     - [ ] GoogleTest.cmake
@@ -31,7 +32,6 @@
     - [x] cmp-reordered-fastq.sh
     - [x] conformance-roundtrip.sh
     - [x] shellcheck.sh
-    - [ ] test-gabac-python-api.sh
   - [x] .clang-format
   - [x] .gitignore
   - [ ] .travis.yml
