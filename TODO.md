@@ -24,6 +24,26 @@
   - [ ] source/
   - [ ] tests/
   - [ ] util/
+    - [ ] before-commit.sh
+    - [ ] clang-format.sh
+    - [ ] cmp-reordered-fastq.sh
+    - [ ] conformance-roundtrip.sh
+    - [ ] generate-authors-file.sh
+    - [ ] list-tags.sh
+    - [ ] shellcheck.sh
+    - [ ] test-gabac-python-api.sh
+  - [ ] .clang-format
+  - [ ] .gitignore
+  - [ ] .travis.yml
+  - [ ] AUTHORS
+  - [ ] CMakeLists.txt
+  - [ ] CODE_OF_CONDUCT.md
+  - [ ] CONTRIBUTING.md
+  - [ ] Doxyfile.in
+  - [ ] LICENSE
+  - [x] PULL_REQUEST_TEMPLATE.md
+  - [ ] README.md
+  - [ ] TODO.md
   - [x] USAGE_POLICY.md
 
 ## New
