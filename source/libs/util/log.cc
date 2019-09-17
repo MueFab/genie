@@ -1,10 +1,8 @@
 #include "log.h"
-
 #include <time.h>
-
 #include "exceptions.h"
 
-namespace utils {
+namespace util {
 
 std::string currentDateAndTime() {
     // ISO 8601 format: 2007-04-05T14:30:21Z
@@ -36,4 +34,4 @@ std::string currentDateAndTime() {
     return result;
 }
 
-}  // namespace utils
+}  // namespace util

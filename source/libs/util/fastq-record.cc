@@ -1,9 +1,8 @@
 #include "fastq-record.h"
-
 #include <string>
 #include <utility>
 
-namespace utils {
+namespace util {
 
 FastqRecord::FastqRecord() : title(""), sequence(""), optional(""), qualityScores("") {}
 
@@ -15,4 +14,4 @@ FastqRecord::FastqRecord(std::string ptitle, std::string psequence, std::string 
 
 FastqRecord::~FastqRecord() = default;
 
-}  // namespace utils
+}  // namespace util

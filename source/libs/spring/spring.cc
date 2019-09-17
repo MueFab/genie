@@ -4,12 +4,11 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
-#include <iomanip>  // std::setw
+#include <iomanip>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
-
 #include "call-template-functions.h"
 #include "compress-ureads.h"
 #include "encoder.h"
@@ -21,14 +20,12 @@
 #include "reorder.h"
 #include "spring.h"
 #include "util.h"
-
 #include <gabac/gabac.h>
-#include <utils/fastq-file-reader.h>
 
 namespace spring {
 
-generated_aus generate_streams_SPRING(utils::FastqFileReader *fastqFileReader1,
-                                      utils::FastqFileReader *fastqFileReader2, int num_thr, bool paired_end,
+generated_aus generate_streams_SPRING(util::FastqFileReader *fastqFileReader1,
+                                      util::FastqFileReader *fastqFileReader2, int num_thr, bool paired_end,
                                       const std::string &working_dir, bool analyze, dsg::StreamSaver &st,
                                       bool ureads_flag, bool preserve_quality, bool preserve_id) {
     // generate random temp directory in the working directory

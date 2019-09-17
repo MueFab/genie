@@ -17,6 +17,7 @@ set(source_files
         )
 
 add_library(spring ${source_files})
+target_link_libraries(spring util)
 
 if(${GENIE_USE_OPENMP})
     find_package(OpenMP REQUIRED)

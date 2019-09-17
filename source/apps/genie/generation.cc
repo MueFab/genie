@@ -7,31 +7,24 @@
  *  @bug No known bugs
  */
 
-#include "genie/generation.h"
-
+#include "generation.h"
 #include <iostream>
 #include <string>
 #include <vector>
-// #include <utils/MPEGGFileCreation/MPEGGFileCreator.h>
-// #include <fio/gabac_file.h>
 #include <condition_variable>
 #include <mutex>
 #include <queue>
 #include <thread>
-
 #include <filesystem@e980ed0/filesystem.hpp>
-
 #include "exceptions.h"
 #include "spring/decompress.h"
 #include "spring/spring.h"
-#include "utils/fasta-file-reader.h"
-#include "utils/fasta-record.h"
-#include "utils/fastq-file-reader.h"
-#include "utils/fastq-record.h"
-#include "utils/sam-file-reader.h"
-#include "utils/sam-record.h"
-
-//#include "alico/main.h"
+#include "util/fasta-file-reader.h"
+#include "util/fasta-record.h"
+#include "util/fastq-file-reader.h"
+#include "util/fastq-record.h"
+#include "util/sam-file-reader.h"
+#include "util/sam-record.h"
 
 namespace dsg {
 
@@ -42,7 +35,7 @@ static generated_aus generationFromFastq_SPRING(const ProgramOptions &programOpt
 
     bool paired_end = false;
     // Initialize a FASTQ file reader.
-    utils::FastqFileReader fastqFileReader1(programOptions.inputFilePath);
+    util::FastqFileReader fastqFileReader1(programOptions.inputFilePath);
     std::cout << "Calling SPRING" << std::endl;
     if (programOptions.inputFilePairPath.empty()) {
         return spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader1, programOptions.numThreads,
@@ -51,7 +44,7 @@ static generated_aus generationFromFastq_SPRING(const ProgramOptions &programOpt
                                                !programOptions.discard_ids);
     } else {
         paired_end = true;
-        utils::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath);
+        util::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath);
         return spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader2, programOptions.numThreads,
                                                paired_end, programOptions.workingDirectory, programOptions.analyze, st,
                                                programOptions.preserve_order, !programOptions.discard_quality,

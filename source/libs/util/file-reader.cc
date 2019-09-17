@@ -1,11 +1,9 @@
 #include "file-reader.h"
-
 #include <limits.h>
 #include <string.h>
-
 #include <stdexcept>
 
-namespace utils {
+namespace util {
 
 FileReader::FileReader() : fp_(nullptr), fsize_(0), line_(nullptr) {}
 
@@ -124,4 +122,4 @@ void FileReader::seek(const int64_t offset, const int whence) {
     }
 }
 
-}  // namespace utils
+}  // namespace util

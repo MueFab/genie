@@ -1,13 +1,10 @@
 #include "sam-file-reader.h"
-
 #include <string>
-
 #include "sam-record.h"
-
 #include "log.h"
 #include "string-helpers.h"
 
-namespace utils {
+namespace util {
 
 static void parseLine(const std::string &line, std::vector<std::string> *const fields) {
     fields->clear();
@@ -24,7 +21,7 @@ static void parseLine(const std::string &line, std::vector<std::string> *const f
     }
 
     for (auto &field : *fields) {
-        utils::trim(field);
+        util::trim(field);
     }
 }
 
@@ -84,4 +81,4 @@ void SamFileReader::readHeader() {
     }
 }
 
-}  // namespace utils
+}  // namespace util

@@ -1,15 +1,15 @@
-#ifndef UTILS_EXCEPTIONS_H_
-#define UTILS_EXCEPTIONS_H_
+#ifndef UTIL_EXCEPTIONS_H_
+#define UTIL_EXCEPTIONS_H_
 
 #define DIE(msg) UTILS_DIE(msg)
 #define UTILS_DIE(msg) UTILS_THROW_RUNTIME_EXCEPTION(msg)
-#define UTILS_THROW_RUNTIME_EXCEPTION(msg) throw utils::RuntimeException(__FILE__, __FUNCTION__, __LINE__, msg)
+#define UTILS_THROW_RUNTIME_EXCEPTION(msg) throw util::RuntimeException(__FILE__, __FUNCTION__, __LINE__, msg)
 
 #include <exception>
 #include <iostream>
 #include <string>
 
-namespace utils {
+namespace util {
 
 class Exception : public std::exception {
    public:
@@ -35,6 +35,6 @@ class RuntimeException : public Exception {
     ~RuntimeException() noexcept override;
 };
 
-}  // namespace utils
+}  // namespace util
 
-#endif  // UTILS_EXCEPTIONS_H_
+#endif  // UTIL_EXCEPTIONS_H_

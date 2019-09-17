@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace utils {
+namespace util {
 
 FastaFileReader::FastaFileReader(const std::string &path) : FileReader(path) {}
 
@@ -55,4 +55,4 @@ void FastaFileReader::parse(std::vector<FastaRecord> *const fastaRecords) {
     seekFromSet(fpos);
 }
 
-}  // namespace utils
+}  // namespace util

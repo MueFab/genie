@@ -1,20 +1,17 @@
-#ifndef UTILS_SAM_FILE_READER_H_
-#define UTILS_SAM_FILE_READER_H_
+#ifndef UTIL_SAM_FILE_READER_H_
+#define UTIL_SAM_FILE_READER_H_
 
 #include <list>
 #include <string>
-
 #include "file-reader.h"
 #include "sam-record.h"
 
-namespace utils {
+namespace util {
 
 class SamFileReader : public FileReader {
    public:
     explicit SamFileReader(const std::string &path);
-
     ~SamFileReader() override;
-
     size_t readRecords(size_t numRecords, std::list<SamRecord> *records);
 
    public:
@@ -24,6 +21,6 @@ class SamFileReader : public FileReader {
     void readHeader();
 };
 
-}  // namespace utils
+}  // namespace util
 
-#endif  // UTILS_SAM_FILE_READER_H_
+#endif  // UTIL_SAM_FILE_READER_H_

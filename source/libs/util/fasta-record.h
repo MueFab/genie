@@ -1,14 +1,13 @@
-#ifndef FIO_FASTA_RECORD_H_
-#define FIO_FASTA_RECORD_H_
+#ifndef UTIL_FASTA_RECORD_H_
+#define UTIL_FASTA_RECORD_H_
 
 #include <string>
 
-namespace utils {
+namespace util {
 
 struct FastaRecord {
    public:
     FastaRecord(std::string header, std::string sequence);
-
     ~FastaRecord();
 
    public:
@@ -16,6 +15,6 @@ struct FastaRecord {
     std::string sequence;
 };
 
-}  // namespace utils
+}  // namespace util
 
-#endif  // FIO_FASTA_RECORD_H_
+#endif  // UTIL_FASTA_RECORD_H_

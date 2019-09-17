@@ -9,18 +9,15 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
-
 #include "params.h"
 #include "preprocess.h"
 #include "util.h"
 
-#include <utils/fastq-file-reader.h>
-
 namespace spring {
 
-void preprocess(utils::FastqFileReader *fastqFileReader1, utils::FastqFileReader *fastqFileReader2,
+void preprocess(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
                 const std::string &temp_dir, compression_params &cp) {
-    utils::FastqFileReader *fastqFileReader[2] = {fastqFileReader1, fastqFileReader2};
+    util::FastqFileReader *fastqFileReader[2] = {fastqFileReader1, fastqFileReader2};
     std::string outfileclean[2];
     std::string outfileN[2];
     std::string outfileorderN[2];
@@ -44,7 +41,7 @@ void preprocess(utils::FastqFileReader *fastqFileReader1, utils::FastqFileReader
     std::ofstream fout_id;
     std::ofstream fout_quality[2];
 
-    std::vector<utils::FastqRecord> fastqRecords;
+    std::vector<util::FastqRecord> fastqRecords;
     for (int j = 0; j < 2; j++) {
         if (j == 1 && !cp.paired_end) continue;
         fout_clean[j].open(outfileclean[j]);

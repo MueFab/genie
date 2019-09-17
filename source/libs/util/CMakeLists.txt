@@ -1,4 +1,4 @@
-project("utils")
+project("util")
 
 set(source_files
         exceptions.cc
@@ -12,4 +12,4 @@ set(source_files
         sam-record.cc
 )
 
-add_library(utils ${source_files})
+add_library(util ${source_files})

@@ -1,22 +1,10 @@
-// Copyright 2018 The genie authors
-
-/**
- *  @file ProgramOptions.h
- *  @brief Program options implementation
- *  @author Jan Voges
- *  @bug No known bugs
- */
-
 #include "program-options.h"
-
 #include <iostream>
 #include <map>
 #include <set>
-
 #include <cli11@13becad/CLI11.hpp>
 #include <filesystem@e980ed0/filesystem.hpp>
-
-#include <utils/file-reader.h>
+#include <util/file-reader.h>
 #include "exceptions.h"
 #include "utilities.h"
 
