@@ -10,5 +10,5 @@ cmake-build-*/
 # CLion project directory
 .idea/
 
-# Code coverage
+# lcov report
 coverage.info
