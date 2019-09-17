@@ -40,7 +40,7 @@
   - [ ] CODE_OF_CONDUCT.md
   - [ ] CONTRIBUTING.md
   - [ ] Doxyfile.in
-  - [ ] LICENSE
+  - [x] LICENSE
   - [x] PULL_REQUEST_TEMPLATE.md
   - [ ] README.md
   - [ ] TODO.md
