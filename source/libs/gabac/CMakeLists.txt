@@ -34,5 +34,3 @@ if(${GABAC_BUILD_SHARED_LIB})
 else()
     add_library(gabac STATIC ${source_files})
 endif()
-
-target_include_directories(gabac PRIVATE ${gabac_include_dir})

@@ -15,11 +15,11 @@
 #include "log.h"
 
 #include <gabac/gabac.h>
-#include <ureads-encoder/format/part2/raw_reference.h>
+#include <format/part2/raw_reference.h>
 
-#include "ureads-encoder/format/part2/access_unit.h"
-#include "ureads-encoder/format/part2/clutter.h"
-#include "ureads-encoder/format/part2/parameter_set.h"
+#include "format/part2/access_unit.h"
+#include "format/part2/clutter.h"
+#include "format/part2/parameter_set.h"
 
 namespace genie {
 
