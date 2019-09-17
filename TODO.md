@@ -24,6 +24,7 @@
   - [ ] source/
   - [ ] tests/
   - [ ] util/
+    - [x] autopep8-pycodestyle.sh
     - [ ] before-commit.sh
     - [ ] clang-format.sh
     - [ ] cmp-reordered-fastq.sh
