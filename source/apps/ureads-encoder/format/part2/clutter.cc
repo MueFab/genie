@@ -32,25 +32,28 @@ const std::vector<GenomicDescriptorProperties> &getDescriptorProperties() {
     //                  {"rftp", 1},
     //                  {"rftt", 1}
     //          }};
-    static std::vector<GenomicDescriptorProperties> prop;
-    prop.push_back({"pos", 2});
-    prop.push_back({"rcomp", 1});
-    prop.push_back({"flags", 3});
-    prop.push_back({"mmpos", 2});
-    prop.push_back({"mmtype", 3});
-    prop.push_back({"clips", 4});
-    prop.push_back({"ureads", 1});
-    prop.push_back({"rlen", 1});
-    prop.push_back({"pair", 8});
-    prop.push_back({"mscore", 1});
-    prop.push_back({"mmap", 5});
-    prop.push_back({"msar", 2});
-    prop.push_back({"rtype", 1});
-    prop.push_back({"rgroup", 1});
-    prop.push_back({"qv", 1});
-    prop.push_back({"rname", 2});
-    prop.push_back({"rftp", 1});
-    prop.push_back({"rftt", 1});
+    static const auto prop = []() -> std::vector<GenomicDescriptorProperties> {
+        std::vector<GenomicDescriptorProperties> loc;
+        loc.push_back({"pos", 2});
+        loc.push_back({"rcomp", 1});
+        loc.push_back({"flags", 3});
+        loc.push_back({"mmpos", 2});
+        loc.push_back({"mmtype", 3});
+        loc.push_back({"clips", 4});
+        loc.push_back({"ureads", 1});
+        loc.push_back({"rlen", 1});
+        loc.push_back({"pair", 8});
+        loc.push_back({"mscore", 1});
+        loc.push_back({"mmap", 5});
+        loc.push_back({"msar", 2});
+        loc.push_back({"rtype", 1});
+        loc.push_back({"rgroup", 1});
+        loc.push_back({"qv", 1});
+        loc.push_back({"rname", 2});
+        loc.push_back({"rftp", 1});
+        loc.push_back({"rftt", 1});
+        return loc;
+    }();
     return prop;
 }
 
