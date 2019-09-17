@@ -21,8 +21,8 @@ void ProgramOptions::processCommandLine(int argc, char* argv[]) {
 
     CLI::App app("Genie MPEG-G encoder, conformance version");
 
-    app.add_option("-i,--input_file_path", inputFilePath, "Input file path")->mandatory(true);
-    app.add_option("-o,--output_file_path", outputFilePath, "Output file path")->mandatory(true);
+    app.add_option("-i,--input-file", inputFilePath, "Input file")->mandatory(true);
+    app.add_option("-o,--output-file", outputFilePath, "Output file")->mandatory(true);
 
     try {
         app.parse(argc, argv);
