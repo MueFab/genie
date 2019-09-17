@@ -30,7 +30,7 @@
     - [x] clang-format.sh
     - [x] cmp-reordered-fastq.sh
     - [x] conformance-roundtrip.sh
-    - [ ] shellcheck.sh
+    - [x] shellcheck.sh
     - [ ] test-gabac-python-api.sh
   - [x] .clang-format
   - [x] .gitignore
