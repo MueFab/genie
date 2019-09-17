@@ -21,9 +21,10 @@
     - [ ] CMakeListsGoogleTest.txt.in
   - [ ] doc/
   - [ ] resources/
-  - [ ] scripts/
   - [ ] source/
   - [ ] tests/
+  - [ ] util/
+  - [x] USAGE_POLICY.md
 
 ## New
 
