@@ -17,7 +17,7 @@ cmds+=("sed")
 for i in "${!cmds[@]}"; do
     cmd=${cmds[${i}]}
     if not command -v "${cmd}" &>/dev/null; then
-        error "command does not exist: ${cmd}"
+        echo "error: command does not exist: ${cmd}"
         exit 1
     fi
 done
