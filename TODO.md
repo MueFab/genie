@@ -48,7 +48,6 @@
 
 ## Current
 
-- [ ] Set project names as variable in CMakeLists.txt files
 - [ ] Set up GitHub pages for the repository
 - [ ] Add Doxygen file headers
 - [ ] Set up Doxygen documentation at https://mitogen.github.io/genie/doc/
