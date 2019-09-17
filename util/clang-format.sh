@@ -5,6 +5,11 @@ set -euo pipefail
 git rev-parse --git-dir 1>/dev/null # exit if not inside Git repo
 readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
+if not command -v clang-format &>/dev/null; then
+    echo "error: command does not exist: clang-format"
+    exit 1
+fi
+
 dirs=()
 dirs+=("${git_root_dir}/source")
 dirs+=("${git_root_dir}/tests")
@@ -31,7 +36,7 @@ done
 for i in "${!files[@]}"; do
     file=${files[${i}]}
     if [[ ! ${file} =~ "third-party" ]]; then
-        echo "processing: ${file}"
+        echo "running clang-format on: ${file}"
         clang-format -i "${file}"
     else
         echo "skipping: ${file}"
