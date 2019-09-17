@@ -33,7 +33,7 @@
     - [ ] shellcheck.sh
     - [ ] test-gabac-python-api.sh
   - [ ] .clang-format
-  - [ ] .gitignore
+  - [x] .gitignore
   - [ ] .travis.yml
   - [x] AUTHORS
   - [x] CMakeLists.txt
