@@ -5,10 +5,16 @@ set -euo pipefail
 git rev-parse --git-dir 1>/dev/null # exit if not inside Git repo
 readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
-if not command -v clang-format &>/dev/null; then
-    echo "error: command does not exist: clang-format"
-    exit 1
-fi
+cmds=()
+cmds+=("clang-format")
+
+for i in "${!cmds[@]}"; do
+    cmd=${cmds[${i}]}
+    if not command -v "${cmd}" &>/dev/null; then
+        error "command does not exist: ${cmd}"
+        exit 1
+    fi
+done
 
 dirs=()
 dirs+=("${git_root_dir}/source")
