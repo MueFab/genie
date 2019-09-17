@@ -24,11 +24,23 @@ cd "${git_root_dir}"
 # Capture coverage info
 lcov --directory . --capture --output-file coverage.info
 
-# Filter out files
+# Filter out Linux system files
 lcov \
     --remove coverage.info \
     --output-file coverage.info \
-    '/usr/*' \
+    '/usr/include/*' \
+    '/usr/lib/*'
+
+# Filter out macOS system files
+lcov \
+    --remove coverage.info \
+    --output-file coverage.info \
+    '/Applications/*'
+
+# Filter out own build and unit test files
+lcov \
+    --remove coverage.info \
+    --output-file coverage.info \
     '*/genie/cmake-build-*/*' \
     '*/genie/tests/*'
 
@@ -43,8 +55,7 @@ if [[ ! -z "${CI}" ]]; then
 else
     readonly local_codecov_dir="${build_dir}/codecov/html"
     genhtml coverage.info --output-directory "${local_codecov_dir}"
-    echo ""; echo "coverage report generated locally at: ${local_codecov_dir}"; echo ""
-    echo ""; echo "maybe you'd like to use this command: firefox ${local_codecov_dir}/index.html &"; echo ""
+    echo "coverage report generated locally at: ${local_codecov_dir}";
 
 fi
 set -u # treat unset variables as error again
