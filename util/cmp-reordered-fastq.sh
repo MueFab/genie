@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
+
 # Compare two FASTQ files which are assumed to contain the same set of reads,
 # but in different orders
+
 
 # -----------------------------------------------------------------------------
 # Setup
@@ -30,11 +32,31 @@ run() {
     fi
 }
 
+
+# -----------------------------------------------------------------------------
+# Commands
+# -----------------------------------------------------------------------------
+
+cmds=()
+cmds+=("cmp")
+cmds+=("paste")
+cmds+=("rm")
+cmds+=("sort")
+
+for i in "${!cmds[@]}"; do
+    cmd=${cmds[${i}]}
+    if not command -v "${cmd}" &>/dev/null; then
+        error "command does not exist: ${cmd}"
+        exit 1
+    fi
+done
+
+
 # -----------------------------------------------------------------------------
 # Command line
 # -----------------------------------------------------------------------------
 
-print_usage () {
+print_usage() {
     info "usage: ${self_name} [options]"
     info ""
     info "options:"
@@ -56,17 +78,26 @@ while [[ "${#}" -gt 0 ]]; do
     shift
 done
 
+if [[ ! -f "${fastq_file_1}" ]]; then
+    error "1st FASTQ file is not a regular file: ${fastq_file_1}"
+    exit 1
+fi
+
+if [[ ! -f "${fastq_file_2}" ]]; then
+    error "2nd FASTQ file is not a regular file: ${fastq_file_2}"
+    exit 1
+fi
+
+
 # -----------------------------------------------------------------------------
 # Do it
 # -----------------------------------------------------------------------------
 
 info "sorting 1st FASTQ file: ${fastq_file_1}"
-if [[ ! -f "${fastq_file_1}" ]]; then error "'${fastq_file_1}' is not a regular file"; exit 1; fi
 run paste -d" " - - - - < "${fastq_file_1}" > "${fastq_file_1}.one_record_per_line"
 run sort < "${fastq_file_1}.one_record_per_line" > "${fastq_file_1}.sorted"
 
 info "sorting 2nd FASTQ file: ${fastq_file_2}"
-if [[ ! -f "${fastq_file_2}" ]]; then error "'${fastq_file_2}' is not a regular file"; exit 1; fi
 run paste -d" " - - - - < "${fastq_file_2}" > "${fastq_file_2}.one_record_per_line"
 run sort < "${fastq_file_2}.one_record_per_line" > "${fastq_file_2}.sorted"
 
@@ -74,6 +105,7 @@ info "comparing FASTQ files"
 run cmp "${fastq_file_1}.sorted" "${fastq_file_2}.sorted"
 
 info "FASTQ files '${fastq_file_1}.sorted' and '${fastq_file_2}.sorted' contain the same set of reads"
+
 
 # -----------------------------------------------------------------------------
 # Clean up
