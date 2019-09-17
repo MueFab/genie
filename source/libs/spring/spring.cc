@@ -1,8 +1,10 @@
-#include <filesystem@e980ed0/filesystem.hpp>
+#include "spring.h"
+#include <gabac/gabac.h>
 #include <algorithm>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
+#include <filesystem@e980ed0/filesystem.hpp>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -18,16 +20,13 @@
 #include "preprocess.h"
 #include "reorder-compress-quality-id.h"
 #include "reorder.h"
-#include "spring.h"
 #include "util.h"
-#include <gabac/gabac.h>
 
 namespace spring {
 
-generated_aus generate_streams_SPRING(util::FastqFileReader *fastqFileReader1,
-                                      util::FastqFileReader *fastqFileReader2, int num_thr, bool paired_end,
-                                      const std::string &working_dir, bool analyze, dsg::StreamSaver &st,
-                                      bool ureads_flag, bool preserve_quality, bool preserve_id) {
+generated_aus generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
+                                      int num_thr, bool paired_end, const std::string &working_dir, bool analyze,
+                                      dsg::StreamSaver &st, bool ureads_flag, bool preserve_quality, bool preserve_id) {
     // generate random temp directory in the working directory
     std::string temp_dir;
     while (true) {

@@ -1,7 +1,7 @@
 #include <utility>
 
-#include "fasta-record.h"
 #include <iostream>
+#include "fasta-record.h"
 
 namespace util {
 
