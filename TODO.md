@@ -36,7 +36,7 @@
   - [ ] .gitignore
   - [ ] .travis.yml
   - [ ] AUTHORS
-  - [ ] CMakeLists.txt
+  - [x] CMakeLists.txt
   - [x] CODE_OF_CONDUCT.md
   - [x] CONTRIBUTING.md
   - [x] Doxyfile.in
