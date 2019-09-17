@@ -1,7 +1,7 @@
 #include "sam-file-reader.h"
 #include <string>
-#include "sam-record.h"
 #include "log.h"
+#include "sam-record.h"
 #include "string-helpers.h"
 
 namespace util {

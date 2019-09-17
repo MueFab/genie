@@ -1,9 +1,9 @@
 #ifndef GENIE_STREAM_SAVER_H
 #define GENIE_STREAM_SAVER_H
 
-#include <filesystem@e980ed0/filesystem.hpp>
 #include <stdint.h>
 #include <atomic>
+#include <filesystem@e980ed0/filesystem.hpp>
 #include <iostream>
 #include <map>
 #include <regex>

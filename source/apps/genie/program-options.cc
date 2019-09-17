@@ -1,10 +1,10 @@
 #include "program-options.h"
+#include <util/file-reader.h>
+#include <cli11@13becad/CLI11.hpp>
+#include <filesystem@e980ed0/filesystem.hpp>
 #include <iostream>
 #include <map>
 #include <set>
-#include <cli11@13becad/CLI11.hpp>
-#include <filesystem@e980ed0/filesystem.hpp>
-#include <util/file-reader.h>
 #include "exceptions.h"
 #include "utilities.h"
 
