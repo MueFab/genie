@@ -16,26 +16,17 @@ class ContextModel;
 class BinaryArithmeticDecoder {
    public:
     explicit BinaryArithmeticDecoder(const BitInputStream& bitInputStream);
-
-    ~BinaryArithmeticDecoder();
-
     unsigned int decodeBin(ContextModel* contextModel);
-
     unsigned int decodeBinsEP(unsigned int numBins);
-
     void decodeBinTrm();
-
     void reset();
 
    private:
     void start();
 
     BitInputStream m_bitInputStream;
-
     int m_numBitsNeeded = 0;
-
     unsigned int m_range = 0;
-
     unsigned int m_value = 0;
 };
 

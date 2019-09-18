@@ -17,8 +17,6 @@ BinaryArithmeticDecoder::BinaryArithmeticDecoder(const BitInputStream& bitInputS
     start();
 }
 
-BinaryArithmeticDecoder::~BinaryArithmeticDecoder() = default;
-
 inline unsigned int BinaryArithmeticDecoder::decodeBin(ContextModel* const contextModel) {
     assert(contextModel != nullptr);
 
