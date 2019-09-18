@@ -13,7 +13,7 @@
 #include "context-selector.h"
 
 //
-// #include binary_arithmetic_decoder.cc from here instead of compiling it
+// #include binary-arithmetic-decoder.cc from here instead of compiling it
 // separately, so that we may call inlined member functions of class
 // BinaryArithmeticDecoder in this file.
 //
