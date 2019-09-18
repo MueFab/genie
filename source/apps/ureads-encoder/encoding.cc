@@ -14,8 +14,8 @@
 #include "genie-gabac-output-stream.h"
 #include "log.h"
 
-#include <gabac/gabac.h>
 #include <format/part2/raw_reference.h>
+#include <gabac/gabac.h>
 
 #include "format/part2/access_unit.h"
 #include "format/part2/clutter.h"

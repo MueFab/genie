@@ -5,9 +5,7 @@
  */
 
 #include "binary-arithmetic-decoder.h"
-
 #include <cassert>
-
 #include "bit-input-stream.h"
 #include "cabac-tables.h"
 #include "context-model.h"

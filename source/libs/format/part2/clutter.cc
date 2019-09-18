@@ -1,5 +1,5 @@
-#include "parameter_set/descriptor_configuration_present/cabac/decoder_configuration_cabac.h"
 #include <array>
+#include "parameter_set/descriptor_configuration_present/cabac/decoder_configuration_cabac.h"
 
 #include "clutter.h"
 #include "make_unique.h"
