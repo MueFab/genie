@@ -5,10 +5,8 @@
  */
 
 #include "bit-input-stream.h"
-
 #include <cassert>
 #include <limits>
-
 #include "data-block.h"
 
 namespace gabac {

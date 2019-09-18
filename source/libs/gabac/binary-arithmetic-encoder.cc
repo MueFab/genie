@@ -5,9 +5,7 @@
  */
 
 #include "binary-arithmetic-encoder.h"
-
 #include <cassert>
-
 #include "cabac-tables.h"
 
 namespace gabac {

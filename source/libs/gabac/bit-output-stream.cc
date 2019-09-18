@@ -5,9 +5,7 @@
  */
 
 #include "bit-output-stream.h"
-
 #include <cassert>
-
 #include "data-block.h"
 
 namespace gabac {

@@ -1,6 +1,6 @@
 #include "descriptor_configuration_present.h"
-#include "cabac/decoder_configuration_cabac.h"
 #include "../../make_unique.h"
+#include "cabac/decoder_configuration_cabac.h"
 
 namespace format {
 namespace desc_conf_pres {

@@ -3,8 +3,8 @@
 
 // -----------------------------------------------------------------------------------------------------------------
 
-#include "decoder_configuration.h"
 #include "../descriptor_configuration.h"
+#include "decoder_configuration.h"
 
 #include <memory>
 

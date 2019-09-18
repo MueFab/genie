@@ -3,13 +3,13 @@
 
 /* ----------------------------------------------------------------------------------------------------------- */
 
-#include "parameter_set/parameter_set_crps.h"
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include "parameter_set/parameter_set_crps.h"
 
-#include "gabac/gabac.h"
 #include "data_unit.h"
+#include "gabac/gabac.h"
 #include "parameter_set/descriptor_configuration_container.h"
 #include "parameter_set/qv_coding_config.h"
 
