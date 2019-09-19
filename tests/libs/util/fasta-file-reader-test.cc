@@ -1,36 +1,11 @@
 #include <gtest/gtest.h>
-
 #include <util/fasta-file-reader.h>
-#include <util/string-helpers.h>
-
-std::string exec(const std::string &cmd) {
-    FILE *pipe = popen(cmd.c_str(), "r");
-    if (!pipe) {
-        return "<exec(" + cmd + ") failed>";
-    }
-
-    const int bufferSize = 256;
-    char buffer[bufferSize];
-    std::string result;
-
-    while (!feof(pipe)) {
-        if (fgets(buffer, bufferSize, pipe) != nullptr) {
-            result += buffer;
-        }
-    }
-
-    pclose(pipe);
-
-    util::rtrim(result);
-
-    return result;
-}
+#include "helpers.h"
 
 // May need to add some requirements on what counts as a valid FASTA in the documentation
 
 TEST(FastaFileReader, Minimal) {  // NOLINT(cert-err-cpp)
-    std::string gitRootDir = exec("git rev-parse --show-toplevel");
-    util::rtrim(gitRootDir);
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
     util::FastaFileReader reader(gitRootDir + "/resources/test-files/fasta/minimal.fasta");
 
@@ -43,8 +18,7 @@ TEST(FastaFileReader, Minimal) {  // NOLINT(cert-err-cpp)
 }
 
 TEST(FastaFileReader, Empty) {  // NOLINT(cert-err-cpp)
-    std::string gitRootDir = exec("git rev-parse --show-toplevel");
-    util::rtrim(gitRootDir);
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
     util::FastaFileReader reader(gitRootDir + "/resources/test-files/fasta/empty.fasta");
 
@@ -57,8 +31,7 @@ TEST(FastaFileReader, Empty) {  // NOLINT(cert-err-cpp)
 }
 
 TEST(FastaFileReader, OnlyHeaders) {  // NOLINT(cert-err-cpp)
-    std::string gitRootDir = exec("git rev-parse --show-toplevel");
-    util::rtrim(gitRootDir);
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
     util::FastaFileReader reader(gitRootDir + "/resources/test-files/fasta/only-headers.fasta");
 
@@ -73,8 +46,7 @@ TEST(FastaFileReader, OnlyHeaders) {  // NOLINT(cert-err-cpp)
 }
 
 TEST(FastaFileReader, SingleSequenceNoHeader) {  // NOLINT(cert-err-cpp)
-    std::string gitRootDir = exec("git rev-parse --show-toplevel");
-    util::rtrim(gitRootDir);
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
     util::FastaFileReader reader(gitRootDir + "/resources/test-files/fasta/single-sequence-no-header.fasta");
 
@@ -89,8 +61,7 @@ TEST(FastaFileReader, SingleSequenceNoHeader) {  // NOLINT(cert-err-cpp)
 }
 
 TEST(FastaFileReader, SupernumeraryNewlines) {  // NOLINT(cert-err-cpp)
-    std::string gitRootDir = exec("git rev-parse --show-toplevel");
-    util::rtrim(gitRootDir);
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
     util::FastaFileReader reader(gitRootDir + "/resources/test-files/fasta/supernumerary-newlines.fasta");
 
@@ -100,8 +71,7 @@ TEST(FastaFileReader, SupernumeraryNewlines) {  // NOLINT(cert-err-cpp)
 }
 
 TEST(FastaFileReader, TwoTimesGattaca) {  // NOLINT(cert-err-cpp)
-    std::string gitRootDir = exec("git rev-parse --show-toplevel");
-    util::rtrim(gitRootDir);
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
     util::FastaFileReader reader(gitRootDir + "/resources/test-files/fasta/two-times-gattaca.fasta");
 
@@ -116,8 +86,7 @@ TEST(FastaFileReader, TwoTimesGattaca) {  // NOLINT(cert-err-cpp)
 }
 
 TEST(FastaFileReader, BlankLineMiddle) {  // NOLINT(cert-err-cpp)
-    std::string gitRootDir = exec("git rev-parse --show-toplevel");
-    util::rtrim(gitRootDir);
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
     util::FastaFileReader reader(gitRootDir + "/resources/test-files/fasta/blank-line-middle.fasta");
 
@@ -133,8 +102,7 @@ TEST(FastaFileReader, BlankLineMiddle) {  // NOLINT(cert-err-cpp)
 }
 
 TEST(FastaFileReader, BlankLineBetween) {  // NOLINT(cert-err-cpp)
-    std::string gitRootDir = exec("git rev-parse --show-toplevel");
-    util::rtrim(gitRootDir);
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
     util::FastaFileReader reader(gitRootDir + "/resources/test-files/fasta/blank-line-between.fasta");
 
