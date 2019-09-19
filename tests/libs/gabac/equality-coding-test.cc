@@ -1,23 +1,11 @@
-#include <vector>
-
 #include <gabac/data-block.h>
 #include <gabac/equality-coding.h>
-#include <iostream>
-
-#include "test-common.h"
-
 #include <gtest/gtest.h>
+#include <iostream>
+#include <vector>
+#include "common.h"
 
-class equalityCodingTest : public ::testing::Test {
-   protected:
-    void SetUp() override {}
-
-    void TearDown() override {
-        // Code here will be called immediately after each test
-    }
-};
-
-TEST_F(equalityCodingTest, transformEqualityCoding) {
+TEST(EqualityCodingTest, transformEqualityCoding) {
     {
         // Void input
         gabac::DataBlock symbols(0, 8);
@@ -64,7 +52,7 @@ TEST_F(equalityCodingTest, transformEqualityCoding) {
     }
 }
 
-TEST_F(equalityCodingTest, inverseTransformEqualityCoding) {
+TEST(EqualityCodingTest, inverseTransformEqualityCoding) {
     {
         // Void input
         gabac::DataBlock flags(0, 1);
@@ -122,7 +110,7 @@ TEST_F(equalityCodingTest, inverseTransformEqualityCoding) {
     }
 }
 
-TEST_F(equalityCodingTest, roundTripCoding) {
+TEST(EqualityCodingTest, roundTripCoding) {
     gabac::DataBlock symbols(0, 8);
     gabac::DataBlock rawSymbols(0, 8);
     gabac::DataBlock flags(0, 1);
@@ -130,7 +118,7 @@ TEST_F(equalityCodingTest, roundTripCoding) {
 
     // A lot of input data - WordSize
     symbols.resize(1024 * 1024);
-    fillVectorRandomGeometric(&symbols);
+    gabac_tests::fillVectorRandomGeometric(&symbols);
     rawSymbols = symbols;
     EXPECT_NO_THROW(gabac::transformEqualityCoding(&symbols, &flags));
     EXPECT_NO_THROW(gabac::inverseTransformEqualityCoding(&symbols, &flags));

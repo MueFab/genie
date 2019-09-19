@@ -1,10 +1,16 @@
 project("gabac-tests")
 
 set(source_files
-        binary-arithmetic-decoder-test.cc
         bit-input-stream-test.cc
         bit-output-stream-test.cc
+        common.cc
+        core-test.cc
+        diff-coding-test.cc
+        equality-coding-test.cc
+        lut-transform-test.cc
         main.cc
+        match-coding-test.cc
+        rle-coding-test.cc
 )
 
 add_executable(gabac-tests ${source_files})
