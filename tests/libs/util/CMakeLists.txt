@@ -2,7 +2,8 @@ project("util-tests")
 
 set(source_files
         fasta-file-reader-test.cc
-        fastq-file-reader-test.cc
+        # fastq-file-reader-test.cc
+        helpers.cc
 )
 
 add_executable(util-tests ${source_files})

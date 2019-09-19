@@ -1,12 +1,12 @@
-#ifndef CALQ_TESTS_HELPERS_H_
-#define CALQ_TESTS_HELPERS_H_
+#ifndef UTIL_TESTS_HELPERS_H_
+#define UTIL_TESTS_HELPERS_H_
 
 #include <string>
 
-namespace calq_tests {
+namespace util_tests {
 
 std::string exec(const std::string &cmd);
 
-}  // namespace calq_tests
+}  // namespace util_tests
 
-#endif  // CALQ_TESTS_HELPERS_H_
+#endif  // UTIL_TESTS_HELPERS_H_
