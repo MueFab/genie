@@ -1,22 +1,10 @@
-#include <vector>
-
 #include <gabac/rle-coding.h>
-#include <iostream>
-
 #include <gtest/gtest.h>
+#include <iostream>
+#include <vector>
+#include "common.h"
 
-#include "test-common.h"
-
-class rleCodingTest : public ::testing::Test {
-   protected:
-    void SetUp() override {}
-
-    void TearDown() override {
-        // Code here will be called immediately after each test
-    }
-};
-
-TEST_F(rleCodingTest, transformRleCoding) {
+TEST(RleCodingTest, transformRleCoding) {
     {
         // Void input
         uint64_t guard = 42;
@@ -91,7 +79,7 @@ TEST_F(rleCodingTest, transformRleCoding) {
     }
 }
 
-TEST_F(rleCodingTest, inverseTransformRleCoding) {
+TEST(RleCodingTest, inverseTransformRleCoding) {
     {
         // Void input
         uint64_t guard = 42;
@@ -157,7 +145,7 @@ TEST_F(rleCodingTest, inverseTransformRleCoding) {
     }
 }
 
-TEST_F(rleCodingTest, roundTripCoding) {
+TEST(RleCodingTest, roundTripCoding) {
     gabac::DataBlock rawSymbols(0, 8);
     gabac::DataBlock lengths(0, 8);
     gabac::DataBlock decodedSymbols(0, 8);
@@ -165,7 +153,7 @@ TEST_F(rleCodingTest, roundTripCoding) {
 
     // A lot of input data - WordSize
     rawSymbols.resize(1 * 1024 * 1024);  // 256M symbols -> 1GB
-    fillVectorRandomGeometric(&rawSymbols);
+    gabac_tests::fillVectorRandomGeometric(&rawSymbols);
     lengths = {};
     decodedSymbols = rawSymbols;
     EXPECT_NO_THROW(gabac::transformRleCoding(guard, &rawSymbols, &lengths));

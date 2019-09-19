@@ -1,27 +1,15 @@
-#include <vector>
-
 #include <gabac/data-block.h>
 #include <gabac/lut-transform.h>
-#include <iostream>
-
-#include "test-common.h"
-
 #include <gtest/gtest.h>
+#include <iostream>
+#include <vector>
+#include "common.h"
 
-class lutTransformTest : public ::testing::Test {
-   protected:
-    void SetUp() override {}
-
-    void TearDown() override {
-        // Code here will be called immediately after each test
-    }
-};
-
-TEST_F(lutTransformTest, roundTripCoding0) {
+TEST(LutTransformTest, roundTripCoding0) {
     // Void input
     gabac::DataBlock symbols(0, 1);
     symbols.resize(1024 * 1024);
-    fillVectorRandomUniform(0, 64, &symbols);
+    gabac_tests::fillVectorRandomUniform(0, 64, &symbols);
     gabac::DataBlock transsymbols = symbols;
     gabac::DataBlock decodedSymbols(0, 1);
     gabac::DataBlock inverseLut0(0, 1);

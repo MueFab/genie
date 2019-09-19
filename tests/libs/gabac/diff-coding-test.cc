@@ -1,29 +1,15 @@
+#include <gabac/data-block.h>
+#include <gabac/diff-coding.h>
+#include <gtest/gtest.h>
 #include <algorithm>
 #include <functional>
 #include <iostream>
 #include <iterator>
 #include <limits>
 #include <vector>
+#include "common.h"
 
-#include <gabac/data-block.h>
-#include <gabac/diff-coding.h>
-
-#include "test-common.h"
-
-#include <gtest/gtest.h>
-
-class DiffCodingTest : public ::testing::Test {
-   protected:
-    DiffCodingTest() = default;
-
-    ~DiffCodingTest() override = default;
-
-    void SetUp() override {}
-
-    void TearDown() override {}
-};
-
-TEST_F(DiffCodingTest, transformDiffCoding) {
+TEST(DiffCodingTest, transformDiffCoding) {
     {
         // Void input
         gabac::DataBlock symbols(0, 8);
@@ -62,7 +48,7 @@ TEST_F(DiffCodingTest, transformDiffCoding) {
         gabac::DataBlock transformedSymbols(0, 8);
         size_t largeTestSize = 1024 * 1024;
         symbols.resize(largeTestSize);
-        fillVectorRandomUniform(0, std::numeric_limits<int64_t>::max(), &symbols);
+        gabac_tests::fillVectorRandomUniform(0, std::numeric_limits<int64_t>::max(), &symbols);
         EXPECT_NO_THROW(gabac::transformDiffCoding(&transformedSymbols));
     }
 
@@ -87,7 +73,7 @@ TEST_F(DiffCodingTest, transformDiffCoding) {
     }
 }
 
-TEST_F(DiffCodingTest, inverseTransformDiffCoding) {
+TEST(DiffCodingTest, inverseTransformDiffCoding) {
     {
         // Void input shall lead to void output
         gabac::DataBlock transformedSymbols(0, 8);
@@ -142,14 +128,14 @@ TEST_F(DiffCodingTest, inverseTransformDiffCoding) {
     }
 }
 
-TEST_F(DiffCodingTest, roundTripCoding) {
+TEST(DiffCodingTest, roundTripCoding) {
     gabac::DataBlock symbols(0, 8);
     gabac::DataBlock transformedSymbols(0, 8);
 
     size_t largeTestSize = 1024 * 1024;
 
     symbols.resize(largeTestSize);
-    fillVectorRandomUniform(0, std::numeric_limits<int64_t>::max(), &symbols);
+    gabac_tests::fillVectorRandomUniform(0, std::numeric_limits<int64_t>::max(), &symbols);
     transformedSymbols = symbols;
     EXPECT_NO_THROW(gabac::transformDiffCoding(&transformedSymbols));
     EXPECT_NO_THROW(gabac::inverseTransformDiffCoding(&transformedSymbols));

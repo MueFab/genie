@@ -40,9 +40,9 @@ class ExampleTestCase : public ::testing::Test {
         // Code here will be called immediately after each test
     }
 
-    //    void sharedSubroutine() {
-    //        // If needed, define subroutines for your tests to share
-    //    }
+    // void sharedSubroutine() {
+    //    // If needed, define subroutines for your tests to share
+    // }
 };
 
 TEST_F(ExampleTestCase, ExampleTest) {  // NOLINT(cert-err58-cpp)

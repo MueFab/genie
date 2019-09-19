@@ -1,6 +1,11 @@
-#include "test-common.h"
+#include "common.h"
+#include <algorithm>
+#include <iostream>
+#include <limits>
+#include <random>
+#include <vector>
 
-#include <gabac/data-block.h>
+namespace gabac_tests {
 
 void fillVectorRandomUniform(uint64_t min, uint64_t max, gabac::DataBlock *const vector) {
     // First create an instance of an engine.
@@ -35,3 +40,5 @@ void fillVectorRandomGeometric(gabac::DataBlock *const vector) {
         return dist(mersenne_engine);  // to keep the diff values within the 64-bit signed range
     });
 }
+
+}  // namespace gabac_tests
