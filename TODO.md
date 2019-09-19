@@ -60,6 +60,7 @@
 - [ ] Check conformance to development guidelines
 - [ ] Check use and linking of OpenMP
 - [ ] Run everything with util/autopep8-pycodestyle.sh and add util/autopep8-pycodestyle.sh to util/before-commit.sh
+- [ ] Check everything with CLion
 
 ## For later
 
