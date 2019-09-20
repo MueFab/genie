@@ -13,8 +13,8 @@ fi
 cd "${build_dir}"
 cmake .. \
     -DCMAKE_BUILD_TYPE=Debug \
-    -DBUILD_COVERAGE=ON \
-    -DBUILD_DOCUMENTATION=ON \
+    -DBUILD_COVERAGE=OFF \
+    -DBUILD_DOCUMENTATION=OFF \
     -DBUILD_TESTS=ON
 make
 make doc
