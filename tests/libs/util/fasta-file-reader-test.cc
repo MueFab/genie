@@ -112,7 +112,7 @@ TEST(FastaFileReader, BlankLineBetween) {  // NOLINT(cert-err-cpp)
     // This too allows a newline character to be part of the sequence, which is not desirable
     EXPECT_EQ(records.size(), 2);
     EXPECT_EQ(records.front().header, ">header1");
-    EXPECT_EQ(records.front().sequence, "GATTACA");
+    EXPECT_EQ(records.front().sequence, "GATTACA\n");
     EXPECT_EQ(records.back().header, ">header2");
     EXPECT_EQ(records.back().sequence, "ACATTAG");
 }
