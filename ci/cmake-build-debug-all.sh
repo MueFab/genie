@@ -17,4 +17,4 @@ cmake .. \
     -DBUILD_DOCUMENTATION=OFF \
     -DBUILD_TESTS=ON
 make
-make doc
+#make doc
