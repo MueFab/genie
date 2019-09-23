@@ -1,11 +1,15 @@
 #include <gtest/gtest.h>
 #include <util/sam-file-reader.h>
 #include "helpers.h"
+#include <iostream>
 
 TEST(SamFileReader, Simple) {  //NOLINT(cert-err-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     util::SamFileReader reader(gitRootDir + "/resources/test-files/sam/four-reads-with-header.sam");
     std::list<util::SamRecord> records;
+
+    EXPECT_EQ(reader.header, "@HD\tVN:1.3\tSO:coordinate\n@PG\tID:Illumina.SecondaryAnalysis.SortedToBamConverter\n@SQ\tSN:EcoliDH10B.fa\tLN:4686137\tM5:28d8562f2f99c047d792346835b20031\n@RG\tID:_5_1\tPL:ILLUMINA\tSM:DH10B_Sample1\n");
+
     reader.readRecords(4, &records);
 
     EXPECT_EQ(records.size(), 4);
@@ -33,36 +37,19 @@ TEST(SamFileReader, Simple) {  //NOLINT(cert-err-cpp)
     EXPECT_EQ(records.back().seq, "CTTTTGATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGCTTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAATTTTATTGACTTAGGTCACTAAATACTTTAACCAATATAGGCATACG");
     EXPECT_EQ(records.back().qual, ":23>>:::CDCDC>@:@>?<59C>4:>4:4(3CACA@@CAA@@CCBDDDDCA:CA??>A>CCCCADFFECDC:FEEAEEA@GC=GIIFJJJJJJIJIJJJJJJJJJJIIGIGHGJJJJJJJJGJJJJHGIJJJJIHJHHHHGFFFFF@@C");
     EXPECT_EQ(records.back().opt, "RG:Z:_5_1\tBC:Z:1\tXD:Z:150\tSM:i:831\tNM:i:0");
-    EXPECT_EQ(records., "");
+//    EXPECT_EQ(records.header, "");
 }
 
 TEST(SamFileReader, SimpleNoHeader) {  //NOLINT(cert-err-cpp)
+
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     util::SamFileReader reader(gitRootDir + "/resources/test-files/sam/four-reads-without-header.sam");
     std::list<util::SamRecord> records;
     reader.readRecords(4, &records);
+//    EXPECT_EQ(records.header, "");
 
 }
-//TEST(FastqFileReader, FourteenRecords) {  //NOLINT(cert-err-cpp)
-//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-//
-//    util::FastqFileReader reader(gitRootDir + "/resources/test-files/fastq/fourteen-gattaca-records.fastq");
-//
-//    std::vector<util::FastqRecord> records;
-//    reader.readRecords(14, &records);
-//
-//    EXPECT_EQ(records.size(), 14);
-//    EXPECT_EQ(records.front().title, "@title1");
-//    EXPECT_EQ(records.front().sequence, "GATTACA");
-//    EXPECT_EQ(records.front().optional, "+");
-//    EXPECT_EQ(records.front().qualityScores, "QUALITY");
-//
-//    EXPECT_EQ(records.back().title, "@title14");
-//    EXPECT_EQ(records.back().sequence, "ACATTAG");
-//    EXPECT_EQ(records.back().optional, "+");
-//    EXPECT_EQ(records.back().qualityScores, "YTILAUQ");
-//}
-//
+
 //TEST(FastqFileReader, BlankLine) {  //NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
