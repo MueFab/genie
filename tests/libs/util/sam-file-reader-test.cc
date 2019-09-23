@@ -4,7 +4,6 @@
 
 TEST(SamFileReader, Simple) {  //NOLINT(cert-err-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::cout << gitRootDir << "\n";
     util::SamFileReader reader(gitRootDir + "/resources/test-files/sam/four-reads-with-header.sam");
     std::list<util::SamRecord> records;
     reader.readRecords(4, &records);
