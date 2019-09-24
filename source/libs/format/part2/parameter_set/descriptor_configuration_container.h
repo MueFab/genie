@@ -4,6 +4,8 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 #include "descriptor_configuration.h"
+#include "util/bitwriter.h"
+
 
 #include <memory>
 #include <vector>
@@ -11,7 +13,7 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-class BitWriter;
+
 
 /**
  * ISO 23092-2 Section 3.3.2 table 7 lines 15 to 21
@@ -25,7 +27,7 @@ class DescriptorConfigurationContainer {
     void enableClassSpecificConfigs(uint8_t numClasses);                           //!< Unlocks class specific config
     bool isClassSpecific() const;
 
-    virtual void write(BitWriter *writer) const;
+    virtual void write(util::BitWriter *writer) const;
 
    private:
     bool class_specific_dec_cfg_flag : 1;  //!< Line 15

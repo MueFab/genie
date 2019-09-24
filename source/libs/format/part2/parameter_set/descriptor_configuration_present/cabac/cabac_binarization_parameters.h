@@ -4,11 +4,13 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 #include <memory>
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-class BitWriter;
+
 namespace desc_conf_pres {
 namespace cabac {
 
@@ -37,7 +39,7 @@ class CabacBinarizationParameters {
         SIGNED_DOUBLE_TRUNCATED_UNARY = 9,
     };
 
-    virtual void write(BitWriter *writer) const;
+    virtual void write(util::BitWriter *writer) const;
 
     CabacBinarizationParameters();
 

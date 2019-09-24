@@ -5,7 +5,9 @@
 
 #include <cstdint>
 
-#include "bitwriter.h"
+#include "util/bitwriter.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -55,7 +57,7 @@ class DataUnit {
    public:
     explicit DataUnit(const DataUnitType &t);
 
-    virtual void write(BitWriter *write) const;
+    virtual void write(util::BitWriter *write) const;
 };
 
 }  // namespace format

@@ -12,12 +12,14 @@
 #include "gabac/gabac.h"
 #include "parameter_set/descriptor_configuration_container.h"
 #include "parameter_set/qv_coding_config.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
 
-class BitWriter;
+
 
 /**
  * ISO 23092-2 Section 3.3.1 table 6 + 3.3.2 table 7 (fused for simplification)
@@ -46,10 +48,10 @@ class ParameterSet : public DataUnit {
 
     void setMultipleSignatureBase(uint32_t _multiple_signature_base, uint8_t _U_signature_size);
 
-    void write(BitWriter *writer) const override;
+    void write(util::BitWriter *writer) const override;
 
    private:
-    void preWrite(BitWriter *writer) const;
+    void preWrite(util::BitWriter *writer) const;
 
     /**
      * Incorporated (Simplification): ISO 23092-2 Section 3.1 table 3

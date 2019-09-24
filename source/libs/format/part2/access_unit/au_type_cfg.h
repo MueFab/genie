@@ -6,6 +6,8 @@
 #include <memory>
 
 #include "extended_au.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -29,7 +31,7 @@ class AuTypeCfg {
 
     void setExtendedAu(std::unique_ptr<ExtendedAu> _extended_AU);
 
-    virtual void write(BitWriter *writer);
+    virtual void write(util::BitWriter *writer);
 };
 }  // namespace format
 

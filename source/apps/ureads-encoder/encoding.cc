@@ -20,6 +20,8 @@
 #include "format/part2/access_unit.h"
 #include "format/part2/clutter.h"
 #include "format/part2/parameter_set.h"
+#include "util/bitwriter.h"
+
 
 namespace genie {
 
@@ -143,7 +145,7 @@ void encode(const ProgramOptions& programOptions) {
 
     using namespace format;
     std::ofstream ofstr(programOptions.outputFilePath);
-    BitWriter bw(&ofstr);
+    util::BitWriter bw(&ofstr);
 
     const uint8_t PARAMETER_SET_ID = 0;
     const uint32_t READ_LENGTH = readSize;

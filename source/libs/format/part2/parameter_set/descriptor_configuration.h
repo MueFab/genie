@@ -4,11 +4,13 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 #include <memory>
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-class BitWriter;
+
 
 /**
  * ISO 23092-2 Section 3.3.2.1 table 8
@@ -23,7 +25,7 @@ class DescriptorConfiguration {
 
     virtual std::unique_ptr<DescriptorConfiguration> clone() const = 0;
 
-    virtual void write(BitWriter *writer) const;
+    virtual void write(util::BitWriter *writer) const;
 
     virtual ~DescriptorConfiguration() = default;
 

@@ -8,6 +8,8 @@
 
 #include "data_unit.h"
 #include "raw_reference_sequence.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -35,7 +37,7 @@ class RawReference : public DataUnit {
 
     std::unique_ptr<RawReference> clone() const;
 
-    void write(BitWriter *writer) const override;
+    void write(util::BitWriter *writer) const override;
 };
 
 }  // namespace format

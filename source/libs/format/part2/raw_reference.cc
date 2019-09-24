@@ -1,5 +1,7 @@
 #include "raw_reference.h"
 #include "make_unique.h"
+#include "util/bitwriter.h"
+
 
 #include <sstream>
 // -----------------------------------------------------------------------------------------------------------------
@@ -28,7 +30,7 @@ std::unique_ptr<RawReference> RawReference::clone() const {
     return ret;
 }
 
-void RawReference::write(BitWriter *writer) const {
+void RawReference::write(util::BitWriter *writer) const {
     DataUnit::write(writer);
 
     uint64_t size = 0;

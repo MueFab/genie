@@ -1,5 +1,7 @@
 #include "signature_cfg.h"
-#include "../bitwriter.h"
+#include "util/bitwriter.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -22,7 +24,7 @@ void SignatureCfg::addSignature(uint64_t _U_cluster_signature) {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void SignatureCfg::write(BitWriter *writer) {
+void SignatureCfg::write(util::BitWriter *writer) {
     size_t i = 0;
 
     writer->write(U_cluster_signature[0], U_signature_size);  // todo: size;

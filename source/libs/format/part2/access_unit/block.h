@@ -5,12 +5,13 @@
 
 #include <cstdint>
 #include <vector>
+#include "util/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
 
-class BitWriter;
+
 
 /**
  * ISO 23092-2 Section 3.4.1.2 table 20 + 3.4.1.2.1 table 21
@@ -33,7 +34,7 @@ class Block {
     std::vector<uint8_t> payload;  // TODO: adjust gabac stream size
 
    public:
-    virtual void write(BitWriter *writer);
+    virtual void write(util::BitWriter *writer);
 
     uint32_t getTotalSize();
 

@@ -5,11 +5,13 @@
 
 #include <memory>
 #include <vector>
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-class BitWriter;
+
 namespace desc_conf_pres {
 namespace cabac {
 
@@ -30,7 +32,7 @@ class CabacContextParameters {
 
     void addContextInitializationValue(uint8_t _context_initialization_value);
 
-    virtual void write(BitWriter *writer) const;
+    virtual void write(util::BitWriter *writer) const;
 
     std::unique_ptr<CabacContextParameters> clone() const;
 };

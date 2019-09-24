@@ -1,6 +1,8 @@
 #include "cabac_context_parameters.h"
-#include "../../../bitwriter.h"
+#include "util/bitwriter.h"
 #include "../../../make_unique.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -31,7 +33,7 @@ void CabacContextParameters::addContextInitializationValue(uint8_t _context_init
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void CabacContextParameters::write(BitWriter *writer) const {
+void CabacContextParameters::write(util::BitWriter *writer) const {
     writer->write(adaptive_mode_flag, 1);
     writer->write(num_contexts, 16);
     for (auto &i : context_initialization_value) {

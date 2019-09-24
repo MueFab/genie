@@ -4,11 +4,13 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-class BitWriter;
+
 
 /**
  * ISO 23092-2 Section 3.4.1.1 table 19 lines 11 to 15
@@ -24,7 +26,7 @@ class RefCfg {
     RefCfg(uint16_t _ref_sequence_ID, uint64_t _ref_start_position, uint64_t _ref_end_position, uint8_t _posSize);
     RefCfg(uint8_t _posSize);
 
-    virtual void write(BitWriter *writer);
+    virtual void write(util::BitWriter *writer);
 };
 }  // namespace format
 

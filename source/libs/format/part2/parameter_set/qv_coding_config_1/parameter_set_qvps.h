@@ -7,11 +7,13 @@
 #include <vector>
 
 #include "qv_codebook.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-class BitWriter;
+
 namespace qv_coding1 {
 
 /**
@@ -27,7 +29,7 @@ class ParameterSetQvps {
 
     void addCodeBook(const QvCodebook &book);
 
-    virtual void write(BitWriter *writer) const;
+    virtual void write(util::BitWriter *writer) const;
 };
 }  // namespace qv_coding1
 }  // namespace format
