@@ -37,7 +37,6 @@ TEST(SamFileReader, Simple) {  //NOLINT(cert-err-cpp)
     EXPECT_EQ(records.back().seq, "CTTTTGATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGCTTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAATTTTATTGACTTAGGTCACTAAATACTTTAACCAATATAGGCATACG");
     EXPECT_EQ(records.back().qual, ":23>>:::CDCDC>@:@>?<59C>4:>4:4(3CACA@@CAA@@CCBDDDDCA:CA??>A>CCCCADFFECDC:FEEAEEA@GC=GIIFJJJJJJIJIJJJJJJJJJJIIGIGHGJJJJJJJJGJJJJHGIJJJJIHJHHHHGFFFFF@@C");
     EXPECT_EQ(records.back().opt, "RG:Z:_5_1\tBC:Z:1\tXD:Z:150\tSM:i:831\tNM:i:0");
-//    EXPECT_EQ(records.header, "");
 }
 
 TEST(SamFileReader, SimpleNoHeader) {  //NOLINT(cert-err-cpp)
@@ -45,37 +44,41 @@ TEST(SamFileReader, SimpleNoHeader) {  //NOLINT(cert-err-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     util::SamFileReader reader(gitRootDir + "/resources/test-files/sam/four-reads-without-header.sam");
     std::list<util::SamRecord> records;
-    reader.readRecords(4, &records);
-//    EXPECT_EQ(records.header, "");
+    EXPECT_EQ(reader.header, "");
 
 }
 
-//TEST(FastqFileReader, BlankLine) {  //NOLINT(cert-err-cpp)
-//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-//
-//    util::FastqFileReader reader(gitRootDir + "/resources/test-files/fastq/blank-line.fastq");
-//
-//    std::vector<util::FastqRecord> records;
-//    reader.readRecords(2, &records);
-//
-//    EXPECT_EQ(records.size(), 2);
-//    EXPECT_EQ(records.front().title, "@title1");
-//    EXPECT_EQ(records.front().sequence, "GATTACA");
-//    EXPECT_EQ(records.front().optional, "+");
-//    EXPECT_EQ(records.front().qualityScores, "QUALITY");
-//
-//    EXPECT_EQ(records.back().title, "\n");
-//    EXPECT_EQ(records.back().sequence, "GATTACA");
-//    EXPECT_EQ(records.back().optional, "+");
-//    EXPECT_EQ(records.back().qualityScores, "QUALITY");
-//}
-//
-//TEST(FastqFileReader, Truncated) {  //NOLINT(cert-err-cpp)
-//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-//
-//    util::FastqFileReader reader(gitRootDir + "/resources/test-files/fastq/fourteen-gattaca-records-truncated.fastq");
-//
-//    std::vector<util::FastqRecord> records;
-//    EXPECT_THROW(reader.readRecords(14, &records), std::runtime_error);
-//
-//}
+TEST(SamFileReader, BlankLine) {  //NOLINT(cert-err-cpp)
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+
+    util::SamFileReader reader(gitRootDir + "/resources/test-files/sam/extraneous-blank-line.sam");
+
+    std::list<util::SamRecord> records;
+
+    EXPECT_THROW(reader.readRecords(4, &records), std::invalid_argument);
+
+}
+
+
+TEST(SamFileReader, Truncated) {  //NOLINT(cert-err-cpp)
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+
+    util::SamFileReader reader(gitRootDir + "/resources/test-files/sam/truncated.sam");
+
+    std::list<util::SamRecord> records;
+    reader.readRecords(4, &records);
+
+    EXPECT_EQ(records.back().qname, "_5:1:10:7990:17938");
+    EXPECT_EQ(records.back().flag, 145);
+    EXPECT_EQ(records.back().rname, "EcoliDH10B.fa");
+    EXPECT_EQ(records.back().pos, 3);
+    EXPECT_EQ(records.back().mapq, 254);
+    EXPECT_EQ(records.back().cigar, "150M");
+    EXPECT_EQ(records.back().rnext, "=");
+    EXPECT_EQ(records.back().pnext, 4685941);
+    EXPECT_EQ(records.back().tlen, 4686090);
+    EXPECT_EQ(records.back().seq, "CTTTTGATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGCTTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAATTTTATTGACTTAGGTCACTAAATACTTTAACCAATATAGGCAT");
+    // The behavior of the next two lines makes very little sense.
+//    EXPECT_EQ(records.back().qual, "");
+//    EXPECT_EQ(records.back().opt, "");
+}
