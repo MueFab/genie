@@ -10,6 +10,7 @@ set(source_files
         log.cc
         sam-file-reader.cc
         sam-record.cc
+        string-helpers.cc
 )
 
 add_library(util ${source_files})
