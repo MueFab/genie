@@ -1,6 +1,8 @@
 #include "descriptor_configuration_present.h"
 #include "../../make_unique.h"
 #include "cabac/decoder_configuration_cabac.h"
+#include "util/bitwriter.h"
+
 
 namespace format {
 namespace desc_conf_pres {
@@ -20,7 +22,7 @@ std::unique_ptr<DescriptorConfiguration> DescriptorConfigurationPresent::clone()
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void DescriptorConfigurationPresent::write(BitWriter *writer) const {
+void DescriptorConfigurationPresent::write(util::BitWriter *writer) const {
     DescriptorConfiguration::write(writer);
     if (dec_cfg_preset != DecCfgPreset::PRESENT) {
         return;

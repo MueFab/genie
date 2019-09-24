@@ -5,6 +5,8 @@
 
 #include "../descriptor_configuration.h"
 #include "decoder_configuration.h"
+#include "util/bitwriter.h"
+
 
 #include <memory>
 
@@ -23,7 +25,7 @@ class DescriptorConfigurationPresent : public DescriptorConfiguration {
 
     std::unique_ptr<DescriptorConfiguration> clone() const override;
 
-    void write(BitWriter *writer) const override;
+    void write(util::BitWriter *writer) const override;
 
     void set_decoder_configuration(std::unique_ptr<DecoderConfiguration> conf);
 };

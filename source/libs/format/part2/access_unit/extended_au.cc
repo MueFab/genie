@@ -1,11 +1,13 @@
 #include "extended_au.h"
 
-#include "../bitwriter.h"
+#include "util/bitwriter.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-void ExtendedAu::write(BitWriter *writer) {
+void ExtendedAu::write(util::BitWriter *writer) {
     writer->write(extended_AU_start_position, posSize);
     writer->write(extended_AU_end_position, posSize);
 }

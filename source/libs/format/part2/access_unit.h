@@ -16,6 +16,8 @@
 #include "access_unit/ref_cfg.h"
 #include "access_unit/signature_cfg.h"
 #include "data_unit.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +27,7 @@ namespace format {
  */
 class AccessUnit : public DataUnit {
    public:
-    void write(BitWriter *writer) const override;
+    void write(util::BitWriter *writer) const override;
 
     AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, AuType _au_type, uint32_t _reads_count,
                DatasetType dataset_type, uint8_t posSize, uint8_t signatureSize, uint32_t multiple_signature_base);
@@ -38,7 +40,7 @@ class AccessUnit : public DataUnit {
     void setSignatureCfg(std::unique_ptr<SignatureCfg> cfg);
 
    private:
-    void preWrite(BitWriter *writer) const;
+    void preWrite(util::BitWriter *writer) const;
 
     /**
      * Incorporated (Simplification): ISO 23092-2 Section 3.1 table 3

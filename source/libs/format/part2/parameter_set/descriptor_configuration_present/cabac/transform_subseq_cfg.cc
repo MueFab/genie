@@ -1,6 +1,8 @@
 #include "transform_subseq_cfg.h"
-#include "../../../bitwriter.h"
+#include "util/bitwriter.h"
 #include "../../../make_unique.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +34,7 @@ std::unique_ptr<TransformSubseqCfg> TransformSubseqCfg::clone() const {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void TransformSubseqCfg::write(BitWriter *writer) const {
+void TransformSubseqCfg::write(util::BitWriter *writer) const {
     writer->write(uint8_t(transform_ID_subsym), 3);
     support_values->write(writer);
     cabac_binarization->write(writer);

@@ -5,6 +5,8 @@
 
 #include "../../../clutter.h"
 #include "../decoder_configuration.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +28,7 @@ class DecoderConfigurationCabac : public DecoderConfiguration {
     DescriptorSubsequenceCfg* getSubsequenceCfg(uint8_t index) const;
     std::unique_ptr<DecoderConfiguration> clone() const override;
 
-    void write(BitWriter* writer) const override;
+    void write(util::BitWriter* writer) const override;
 };
 }  // namespace cabac
 }  // namespace desc_conf_pres

@@ -3,10 +3,12 @@
 
 #include <memory>
 #include <string>
+#include "util/bitwriter.h"
+
 
 namespace format {
 
-class BitWriter;
+
 
 /**
  * ISO 23092-2 Section 3.2 table 5, lines 4 to 7
@@ -25,7 +27,7 @@ class RawReferenceSequence {
 
     virtual std::unique_ptr<RawReferenceSequence> clone() const;
 
-    void write(BitWriter *writer) const;
+    void write(util::BitWriter *writer) const;
 
     uint64_t getTotalSize() const;
 };

@@ -7,6 +7,8 @@
 #include "parameter_set/descriptor_configuration.h"
 #include "parameter_set/descriptor_configuration_container.h"
 #include "parameter_set/qv_coding_config.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -43,13 +45,13 @@ ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::write(BitWriter *writer) const {
+void ParameterSet::write(util::BitWriter *writer) const {
     DataUnit::write(writer);
     writer->write(0, 10);  // reserved
 
     // Calculate size and write structure to tmp buffer
     std::stringstream ss;
-    BitWriter tmp_writer(&ss);
+    util::BitWriter tmp_writer(&ss);
     preWrite(&tmp_writer);
     tmp_writer.flush();
     uint64_t bits = tmp_writer.getBitsWritten();
@@ -64,7 +66,7 @@ void ParameterSet::write(BitWriter *writer) const {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::preWrite(BitWriter *writer) const {
+void ParameterSet::preWrite(util::BitWriter *writer) const {
     writer->write(parameter_set_ID, 8);
     writer->write(parent_parameter_set_ID, 8);
     writer->write(uint8_t(dataset_type), 4);

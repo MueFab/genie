@@ -7,11 +7,13 @@
 
 #include "cabac_binarization_parameters.h"
 #include "cabac_context_parameters.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-class BitWriter;
+
 namespace desc_conf_pres {
 namespace cabac {
 
@@ -27,7 +29,7 @@ class CabacBinarization {
 
     void setContextParameters(std::unique_ptr<CabacContextParameters> _cabac_context_parameters);
 
-    virtual void write(BitWriter *writer) const;
+    virtual void write(util::BitWriter *writer) const;
 
     std::unique_ptr<CabacBinarization> clone() const;
 

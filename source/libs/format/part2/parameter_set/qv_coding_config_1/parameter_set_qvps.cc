@@ -1,4 +1,6 @@
 #include "parameter_set_qvps.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -16,7 +18,7 @@ void ParameterSetQvps::addCodeBook(const QvCodebook &book) {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void ParameterSetQvps::write(BitWriter *writer) const {
+void ParameterSetQvps::write(util::BitWriter *writer) const {
     // Todo
 }
 }  // namespace qv_coding1

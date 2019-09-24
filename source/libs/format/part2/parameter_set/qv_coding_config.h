@@ -4,12 +4,14 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
 
-class BitWriter;
+
 
 /**
  * ISO 23092-2 Section 3.3.2 table 7 lines 32 to 40
@@ -21,7 +23,7 @@ class QvCodingConfig {
      */
     enum class QvCodingMode : uint8_t { ONE = 1 };
 
-    virtual void write(BitWriter *writer) const = 0;
+    virtual void write(util::BitWriter *writer) const = 0;
 
     virtual ~QvCodingConfig() = default;
 

@@ -1,10 +1,12 @@
 #include "ref_cfg.h"
-#include "../bitwriter.h"
+#include "util/bitwriter.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-void RefCfg::write(BitWriter *writer) {
+void RefCfg::write(util::BitWriter *writer) {
     writer->write(ref_sequence_ID, 16);
     writer->write(ref_start_position, posSize);
     writer->write(ref_end_position, posSize);

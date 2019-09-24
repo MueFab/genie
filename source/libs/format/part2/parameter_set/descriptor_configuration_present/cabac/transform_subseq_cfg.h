@@ -9,6 +9,8 @@
 
 #include "cabac_binarization.h"
 #include "support_values.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +28,7 @@ class TransformSubseqCfg {
                        std::unique_ptr<SupportValues> _support_values,
                        std::unique_ptr<CabacBinarization> _cabac_binarization);
 
-    virtual void write(BitWriter *writer) const;
+    virtual void write(util::BitWriter *writer) const;
 
     std::unique_ptr<TransformSubseqCfg> clone() const;
 

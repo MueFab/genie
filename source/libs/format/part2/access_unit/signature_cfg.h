@@ -7,11 +7,13 @@
 #include <vector>
 
 #include "../make_unique.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-class BitWriter;
+
 
 /**
  * ISO 23092-2 Section 3.4.1.1 table 19 lines 26 to 39
@@ -27,7 +29,7 @@ class SignatureCfg {
 
     void addSignature(uint64_t _U_cluster_signature);
 
-    virtual void write(BitWriter *writer);
+    virtual void write(util::BitWriter *writer);
 };
 }  // namespace format
 

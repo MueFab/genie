@@ -1,5 +1,7 @@
 #include "crps_info.h"
-#include "../bitwriter.h"
+#include "util/bitwriter.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -11,7 +13,7 @@ CrpsInfo::CrpsInfo() : CrpsInfo(0, 0) {}
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void CrpsInfo::write(BitWriter *writer) const {
+void CrpsInfo::write(util::BitWriter *writer) const {
     writer->write(cr_pad_size, 8);
     writer->write(cr_buf_max_size, 24);
 }

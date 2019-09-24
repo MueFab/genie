@@ -1,6 +1,8 @@
 #include "block.h"
 
-#include "../bitwriter.h"
+#include "util/bitwriter.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -18,7 +20,7 @@ Block::Block() : reserved(0), descriptor_ID(0), reserved_2(0), block_payload_siz
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void Block::write(BitWriter *writer) {
+void Block::write(util::BitWriter *writer) {
     writer->write(reserved, 1);
     writer->write(descriptor_ID, 7);
     writer->write(reserved_2, 3);
