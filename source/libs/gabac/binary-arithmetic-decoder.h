@@ -20,10 +20,9 @@ class BinaryArithmeticDecoder {
     unsigned int decodeBinsEP(unsigned int numBins);
     void decodeBinTrm();
     void reset();
-
-   private:
     void start();
 
+   private:
     BitInputStream m_bitInputStream;
     int m_numBitsNeeded = 0;
     unsigned int m_range = 0;

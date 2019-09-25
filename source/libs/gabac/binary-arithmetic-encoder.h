@@ -27,12 +27,12 @@ class BinaryArithmeticEncoder {
 
     void encodeBinTrm(unsigned int bin);
 
+    void start();
+
     void flush();
 
    private:
     void finish();
-
-    void start();
 
     void writeOut();
 
