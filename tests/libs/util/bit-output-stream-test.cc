@@ -1,10 +1,9 @@
-#include <gabac/bit-output-stream.h>
-#include <gabac/data-block.h>
+#include <util/bitwriter.h>
 #include <gtest/gtest.h>
 
 TEST(BitOutputStreamTest, write) {  // NOLINT(cert-err58-cpp)
-    gabac::DataBlock bitstream(0, 1);
-    gabac::BitOutputStream bitOutputStream(&bitstream);
+    std::stringstream str;
+    util::BitWriter bitOutputStream(&str);
     EXPECT_NO_THROW(bitOutputStream.write(0xFF, 8));
     EXPECT_NO_THROW(bitOutputStream.write(0xFF, 16));
     EXPECT_NO_THROW(bitOutputStream.write(0xFF, 32));
@@ -12,9 +11,9 @@ TEST(BitOutputStreamTest, write) {  // NOLINT(cert-err58-cpp)
 }
 
 TEST(BitOutputStreamTest, writeAlignZero) {  // NOLINT(cert-err58-cpp)
-    gabac::DataBlock bitstream(0, 1);
-    gabac::BitOutputStream bitOutputStream(&bitstream);
+    std::stringstream str;
+    util::BitWriter bitOutputStream(&str);
     bitOutputStream.write(0xFF, 2);
-    EXPECT_NO_THROW(bitOutputStream.writeAlignZero());
-    EXPECT_NO_THROW(bitOutputStream.writeAlignZero());
+    EXPECT_NO_THROW(bitOutputStream.flush());
+    EXPECT_NO_THROW(bitOutputStream.flush());
 }

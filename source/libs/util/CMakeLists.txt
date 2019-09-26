@@ -1,6 +1,7 @@
 project("util")
 
 set(source_files
+        bitwriter.cc
         exceptions.cc
         fasta-file-reader.cc
         fasta-record.cc
