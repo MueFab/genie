@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+self="${0}"
+self_name="${self##*/}"
+
 git rev-parse --git-dir 1>/dev/null # exit if not inside Git repo
 readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
@@ -11,7 +14,7 @@ cmds+=("rm")
 for i in "${!cmds[@]}"; do
     cmd=${cmds[${i}]}
     if not command -v "${cmd}" &>/dev/null; then
-        echo "error: command does not exist: ${cmd}"
+        echo "[${self_name}] error: command does not exist: ${cmd}"
         exit 1
     fi
 done
@@ -19,15 +22,15 @@ done
 readonly build_dir="${git_root_dir}/cmake-build-release"
 readonly ureads_encoder="${build_dir}/bin/ureads-encoder"
 if [[ ! -x "${ureads_encoder}" ]]; then
-    echo "error: ureads-encoder application does not exist: ${ureads_encoder}"
+    echo "[${self_name}] error: ureads-encoder application does not exist: ${ureads_encoder}"
     exit 1
 fi
 
 # Adjust this path to point to your mpegg-decoder-p2 executable!
 #        vvvvvvvvvvvvvvvv
-readonly mpegg_decoder_p2="/Users/janvoges/Repositories/mpegg-reference-sw/build-debug/bin/decoder/mpegg-decoder-p2"
+readonly mpegg_decoder_p2="/home/voges/repos/mpegg-reference-sw/build-debug/bin/decoder/mpegg-decoder-p2"
 if [[ ! -x "${mpegg_decoder_p2}" ]]; then
-    echo "error: mpegg-decoder-p2 application does not exist: ${mpegg_decoder_p2}"
+    echo "[${self_name}] error: mpegg-decoder-p2 application does not exist: ${mpegg_decoder_p2}"
     exit 1
 fi
 
@@ -35,14 +38,22 @@ readonly fastq_file="${git_root_dir}/resources/test-files/fastq/simplest.fastq"
 readonly bitstream_file="${fastq_file}.bitstream"
 readonly decoded_file="${bitstream_file}.decoded"
 
+echo "[${self_name}] running ureads-encoder"
+
 "${ureads_encoder}" \
     --input-file "${fastq_file}" \
     --output-file "${bitstream_file}"
+
+echo "[${self_name}] running mpegg-decoder-p2"
 
 "${mpegg_decoder_p2}" \
     --verbose debug \
     --bitstream "${bitstream_file}" \
     --output "${decoded_file}"
 
-rm "${bitstream_file}"
-rm "${decoded_file}"
+echo "[${self_name}] success"
+echo "[${self_name}] used files:"
+echo "[${self_name}]     fastq file:     ${fastq_file}"
+echo "[${self_name}]     bitstream file: ${bitstream_file}"
+echo "[${self_name}]     decoded file:   ${decoded_file}"
+
