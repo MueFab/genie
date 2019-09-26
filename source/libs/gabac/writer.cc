@@ -18,6 +18,7 @@
 // BinaryArithmeticDecoder in this file.
 //
 #include "binary-arithmetic-encoder.cc"
+#include "gabac.h"
 
 namespace gabac {
 
@@ -51,9 +52,8 @@ static unsigned int bitLength(uint64_t value) {
     return numBits;
 }
 
-Writer::Writer(DataBlock *const bitstream)
+Writer::Writer(OBufferStream *const bitstream)
     : m_bitOutputStream(bitstream),
-      // m_contextSelector(),
       m_binaryArithmeticEncoder(m_bitOutputStream),
       m_contextModels(contexttables::buildContextTable()) {}
 

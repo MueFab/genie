@@ -12,7 +12,8 @@
 #include <vector>
 
 #include "binary-arithmetic-encoder.h"
-#include "bit-output-stream.h"
+#include "util/bitwriter.h"
+#include "streams.h"
 
 namespace gabac {
 
@@ -20,7 +21,7 @@ class DataBlock;
 
 class Writer {
    public:
-    explicit Writer(DataBlock *bitstream);
+    explicit Writer(OBufferStream *bitstream);
 
     ~Writer();
 
@@ -55,7 +56,7 @@ class Writer {
     void writeNumSymbols(unsigned int numSymbols);
 
    private:
-    BitOutputStream m_bitOutputStream;
+    util::BitWriter m_bitOutputStream;
 
     // ContextSelector m_contextSelector;
 

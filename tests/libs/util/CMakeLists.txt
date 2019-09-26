@@ -2,6 +2,7 @@ project("util-tests")
 
 set(source_files
         fasta-file-reader-test.cc
+        bit-output-stream-test.cc
         # fastq-file-reader-test.cc
         helpers.cc
 )

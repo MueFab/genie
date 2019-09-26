@@ -10,7 +10,7 @@
 
 namespace gabac {
 
-BinaryArithmeticEncoder::BinaryArithmeticEncoder(const BitOutputStream& bitOutputStream)
+BinaryArithmeticEncoder::BinaryArithmeticEncoder(const util::BitWriter& bitOutputStream)
     : m_bitOutputStream(bitOutputStream) {
     start();
 }
@@ -100,7 +100,6 @@ void BinaryArithmeticEncoder::flush() {
     encodeBinTrm(1);
     finish();
     m_bitOutputStream.write(1, 1);
-    m_bitOutputStream.writeAlignZero();
     m_bitOutputStream.flush();
     start();
 }
