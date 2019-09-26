@@ -890,7 +890,7 @@ class mphf {
         std::vector<elem_t> &myWriteBuff = bufferperThread[tid];
 
         for (bool isRunning = true; isRunning;) {
-            // safely copy n items into buffer
+        // safely copy n items into buffer
 #ifdef BOOPHF_USE_PTHREADS
             pthread_mutex_lock(&_mutex);
 #endif /* BOOPHF_USE_PTHREADS */

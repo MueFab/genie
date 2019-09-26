@@ -65,7 +65,7 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> compress_ureads(u
         if (num_reads_read[0] < num_reads_per_step) done = true;
 
         if (num_reads_read[0] != 0) {
-            // parallel portion starts, includes generation of streams and their compression
+        // parallel portion starts, includes generation of streams and their compression
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel for ordered num_threads(cp.num_thr) schedule(dynamic)
 #endif

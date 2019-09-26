@@ -219,8 +219,6 @@ void Writer::writeAsSTEGcabac(uint64_t input, unsigned int cSignedTruncExpGolPar
     }
 }
 
-void Writer::writeNumSymbols(unsigned int numSymbols) {
-    m_bitOutputStream.write(numSymbols, 32);
-}
+void Writer::writeNumSymbols(unsigned int numSymbols) { m_bitOutputStream.write(numSymbols, 32); }
 
 }  // namespace gabac

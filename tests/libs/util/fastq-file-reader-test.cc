@@ -2,7 +2,7 @@
 #include <util/fastq-file-reader.h>
 #include "helpers.h"
 
-TEST(FastqFileReader, Simplest) {  //NOLINT(cert-err-cpp)
+TEST(FastqFileReader, Simplest) {  // NOLINT(cert-err-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
     util::FastqFileReader reader(gitRootDir + "/resources/test-files/fastq/simplest.fastq");
