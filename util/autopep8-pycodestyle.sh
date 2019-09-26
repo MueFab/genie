@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+self="${0}"
+self_name="${self##*/}"
+
 git rev-parse --git-dir 1>/dev/null # exit if not inside Git repo
 readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
@@ -12,7 +15,7 @@ cmds+=("pycodestyle")
 for i in "${!cmds[@]}"; do
     cmd=${cmds[${i}]}
     if not command -v "${cmd}" &>/dev/null; then
-        echo "error: command does not exist: ${cmd}"
+        echo "[${self_name}] error: command does not exist: ${cmd}"
         exit 1
     fi
 done
@@ -39,11 +42,11 @@ done
 for i in "${!files[@]}"; do
     file=${files[${i}]}
     if [[ ! ${file} =~ "third-party" ]]; then
-        echo "running autopep8 on: ${file}"
+        echo "[${self_name}] running autopep8 on: ${file}"
         autopep8 --in-place "${file}"
-        echo "running pycodestyle on: ${file}"
+        echo "[${self_name}] running pycodestyle on: ${file}"
         pycodestyle "${file}"
     else
-        echo "skipping: ${file}"
+        echo "[${self_name}] skipping: ${file}"
     fi
 done
