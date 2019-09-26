@@ -105,15 +105,15 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint1
             }
         }
 
-        //
-        // write ull to file
-        //
-        // This region must be executed in parallel with num_threads
-        // threads, for correctness.
-        //
-        // FIXME - make this a parallel for loop that can easily have
-        // the OpenMP directive commented out && parallelism disabled.
-        //
+            //
+            // write ull to file
+            //
+            // This region must be executed in parallel with num_threads
+            // threads, for correctness.
+            //
+            // FIXME - make this a parallel for loop that can easily have
+            // the OpenMP directive commented out && parallelism disabled.
+            //
 #if GENIE_USE_OPENMP
 #pragma omp parallel num_threads(num_threads)
 #endif

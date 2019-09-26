@@ -13,10 +13,7 @@
 namespace gabac {
 
 BinaryArithmeticDecoder::BinaryArithmeticDecoder(const BitInputStream& bitInputStream)
-    : m_bitInputStream(bitInputStream),
-      m_numBitsNeeded(0),
-      m_range(0),
-      m_value(0) {}
+    : m_bitInputStream(bitInputStream), m_numBitsNeeded(0), m_range(0), m_value(0) {}
 
 inline unsigned int BinaryArithmeticDecoder::decodeBin(ContextModel* const contextModel) {
     assert(contextModel != nullptr);

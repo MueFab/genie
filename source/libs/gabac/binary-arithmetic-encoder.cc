@@ -18,7 +18,6 @@ BinaryArithmeticEncoder::BinaryArithmeticEncoder(const BitOutputStream& bitOutpu
       m_numBufferedBytes(0),
       m_range(0) {}
 
-
 BinaryArithmeticEncoder::~BinaryArithmeticEncoder() = default;
 
 inline void BinaryArithmeticEncoder::encodeBin(unsigned int bin, ContextModel* const contextModel) {

@@ -381,22 +381,22 @@ void reorder_compress(const std::string &file_name, const uint32_t &num_reads_pe
             st.reloadConfigSet();
         }
 
-        //
-        // According to the execution profile, this is the 2nd hottest
-        // parallel region in genie when compressing a normal fastq
-        // file (not an analysis run).
-        //
-        // It is important that you specify a chunk size of 1 (which
-        // becomes the default when schedule=dynamic).  Without it,
-        // libgomp effectively serializes a loop with ordered sections.
-        //
-        // Right now, on a 4 thread run, the 3 worker threads spend
-        // ~1/3 of their time idling, waiting on the ordered section.
-        // That figure will get worse as we increase the #threads,
-        // but better with larger problem sizes.
-        //
-        // There might be a better way to parallelize the loop.
-        //
+            //
+            // According to the execution profile, this is the 2nd hottest
+            // parallel region in genie when compressing a normal fastq
+            // file (not an analysis run).
+            //
+            // It is important that you specify a chunk size of 1 (which
+            // becomes the default when schedule=dynamic).  Without it,
+            // libgomp effectively serializes a loop with ordered sections.
+            //
+            // Right now, on a 4 thread run, the 3 worker threads spend
+            // ~1/3 of their time idling, waiting on the ordered section.
+            // That figure will get worse as we increase the #threads,
+            // but better with larger problem sizes.
+            //
+            // There might be a better way to parallelize the loop.
+            //
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel for ordered num_threads(num_thr) schedule(dynamic)
 #else

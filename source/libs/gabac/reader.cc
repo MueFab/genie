@@ -171,8 +171,7 @@ size_t Reader::readNumSymbols() {
 
 size_t Reader::start() {
     size_t numSymbols = readNumSymbols();
-    if(numSymbols > 0)
-        m_decBinCabac.start();
+    if (numSymbols > 0) m_decBinCabac.start();
     return numSymbols;
 }
 
