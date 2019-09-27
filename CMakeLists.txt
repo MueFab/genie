@@ -82,11 +82,6 @@ if(${BUILD_TESTS})
     include(GoogleTest)
 endif()
 
-if(${GENIE_USE_OPENMP})
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
-endif()
-
 
 #==============================================================================
 # Executable/library paths
