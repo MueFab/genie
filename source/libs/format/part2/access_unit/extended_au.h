@@ -4,12 +4,12 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-
-class BitWriter;
 
 /**
  * ISO 23092-2 Section 3.4.1.1 table 19 lines 21 to 24
@@ -23,7 +23,7 @@ class ExtendedAu {
    public:
     ExtendedAu(uint64_t _extended_AU_start_position, uint64_t _extended_AU_end_position, uint8_t _posSize);
 
-    virtual void write(BitWriter *writer);
+    virtual void write(util::BitWriter *writer);
 };
 }  // namespace format
 

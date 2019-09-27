@@ -1,4 +1,6 @@
 #include "decoder_configuration_cabac.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -33,7 +35,7 @@ std::unique_ptr<DecoderConfiguration> DecoderConfigurationCabac::clone() const {
     return ret;
 }
 
-void DecoderConfigurationCabac::write(BitWriter *writer) const {
+void DecoderConfigurationCabac::write(util::BitWriter *writer) const {
     DecoderConfiguration::write(writer);
     if (desc == GenomicDescriptor::rname || desc == GenomicDescriptor::msar) {
         writer->write(rle_guard_tokentype, 8);

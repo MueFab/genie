@@ -1,5 +1,7 @@
 #include "access_unit.h"
 #include "ureads-encoder/exceptions.h"
+#include "util/bitwriter.h"
+
 
 #include <gabac/data-block.h>
 #include <sstream>
@@ -68,13 +70,13 @@ void AccessUnit::setSignatureCfg(std::unique_ptr<SignatureCfg> cfg) {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::write(BitWriter *writer) const {
+void AccessUnit::write(util::BitWriter *writer) const {
     DataUnit::write(writer);
     writer->write(reserved, 3);
 
     // Calculate size and write structure to tmp buffer
     std::stringstream ss;
-    BitWriter tmp_writer(&ss);
+    util::BitWriter tmp_writer(&ss);
     preWrite(&tmp_writer);
     tmp_writer.flush();
     uint64_t bits = tmp_writer.getBitsWritten();
@@ -95,7 +97,7 @@ void AccessUnit::write(BitWriter *writer) const {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::preWrite(BitWriter *writer) const {
+void AccessUnit::preWrite(util::BitWriter *writer) const {
     writer->write(access_unit_ID, 32);
     writer->write(num_blocks, 8);
     writer->write(parameter_set_ID, 8);

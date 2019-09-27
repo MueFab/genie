@@ -1,6 +1,8 @@
 #include "cabac_binarization.h"
-#include "../../../bitwriter.h"
+#include "util/bitwriter.h"
 #include "../../../make_unique.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -41,7 +43,7 @@ void CabacBinarization::setContextParameters(std::unique_ptr<CabacContextParamet
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void CabacBinarization::write(BitWriter *writer) const {
+void CabacBinarization::write(util::BitWriter *writer) const {
     writer->write(uint8_t(binarization_ID), 5);
     writer->write(bypass_flag, 1);
     cabac_binarization_parameters->write(writer);

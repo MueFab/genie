@@ -5,7 +5,6 @@ set(source_files
         # binary-arithmetic-decoder.cc
         # binary-arithmetic-encoder.cc
         bit-input-stream.cc
-        bit-output-stream.cc
         c-interface.cc
         configuration.cc
         constants.cc
@@ -34,3 +33,5 @@ if(${GABAC_BUILD_SHARED_LIB})
 else()
     add_library(gabac STATIC ${source_files})
 endif()
+
+target_link_libraries(gabac PRIVATE util)

@@ -1,6 +1,8 @@
 #include "support_values.h"
-#include "../../../bitwriter.h"
+#include "util/bitwriter.h"
 #include "../../../make_unique.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -41,7 +43,7 @@ std::unique_ptr<SupportValues> SupportValues::clone() const {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void SupportValues::write(BitWriter *writer) const {
+void SupportValues::write(util::BitWriter *writer) const {
     writer->write(output_symbol_size, 6);
     writer->write(coding_subsym_size, 6);
     writer->write(coding_order, 2);

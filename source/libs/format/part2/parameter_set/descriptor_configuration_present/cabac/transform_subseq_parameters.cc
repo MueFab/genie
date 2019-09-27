@@ -1,6 +1,8 @@
 #include "transform_subseq_parameters.h"
-#include "../../../bitwriter.h"
+#include "util/bitwriter.h"
 #include "../../../make_unique.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -55,7 +57,7 @@ size_t TransformSubseqParameters::getNumStreams() const {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void TransformSubseqParameters::write(BitWriter *writer) const {
+void TransformSubseqParameters::write(util::BitWriter *writer) const {
     writer->write(uint8_t(transform_ID_subseq), 8);
     if (match_coding_buffer_size) {
         writer->write(*match_coding_buffer_size, 16);

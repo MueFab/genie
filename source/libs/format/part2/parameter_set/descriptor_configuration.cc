@@ -1,10 +1,12 @@
 #include "descriptor_configuration.h"
-#include "../bitwriter.h"
+#include "util/bitwriter.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-void DescriptorConfiguration::write(BitWriter *writer) const { writer->write(uint8_t(dec_cfg_preset), 8); }
+void DescriptorConfiguration::write(util::BitWriter *writer) const { writer->write(uint8_t(dec_cfg_preset), 8); }
 
 // -----------------------------------------------------------------------------------------------------------------
 

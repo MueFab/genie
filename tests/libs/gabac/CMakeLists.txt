@@ -2,7 +2,6 @@ project("gabac-tests")
 
 set(source_files
         bit-input-stream-test.cc
-        bit-output-stream-test.cc
         common.cc
         core-test.cc
         diff-coding-test.cc

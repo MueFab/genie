@@ -1,13 +1,15 @@
 #include "cabac_binarization_parameters.h"
-#include "../../../bitwriter.h"
+#include "util/bitwriter.h"
 #include "../../../make_unique.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
 namespace desc_conf_pres {
 namespace cabac {
-void CabacBinarizationParameters::write(BitWriter *writer) const {
+void CabacBinarizationParameters::write(util::BitWriter *writer) const {
     if (cmax) {
         writer->write(*cmax, 8);
     }

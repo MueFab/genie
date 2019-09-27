@@ -1,10 +1,12 @@
 #include "mm_cfg.h"
-#include "../bitwriter.h"
+#include "util/bitwriter.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-void MmCfg::write(BitWriter *writer) const {
+void MmCfg::write(util::BitWriter *writer) const {
     writer->write(mm_threshold, 16);
     writer->write(mm_count, 32);
 }

@@ -1,11 +1,13 @@
 #include "decoder_configuration.h"
-#include "../../bitwriter.h"
+#include "util/bitwriter.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
 namespace desc_conf_pres {
-void DecoderConfiguration::write(BitWriter *writer) const { writer->write(uint8_t(encoding_mode_ID), 8); }
+void DecoderConfiguration::write(util::BitWriter *writer) const { writer->write(uint8_t(encoding_mode_ID), 8); }
 
 // -----------------------------------------------------------------------------------------------------------------
 

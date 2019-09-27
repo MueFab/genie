@@ -4,13 +4,15 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 #include "cabac/descriptor_subsequence_cfg.h"
+#include "util/bitwriter.h"
+
 
 #include <memory>
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-class BitWriter;
+
 namespace desc_conf_pres {
 
 /**
@@ -22,7 +24,7 @@ class DecoderConfiguration {
         CABAC = 0  //!< See Text in section
     };
 
-    virtual void write(BitWriter *writer) const;
+    virtual void write(util::BitWriter *writer) const;
 
     virtual std::unique_ptr<DecoderConfiguration> clone() const = 0;
 

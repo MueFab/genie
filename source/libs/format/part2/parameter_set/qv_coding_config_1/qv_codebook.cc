@@ -1,4 +1,6 @@
 #include "qv_codebook.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -16,7 +18,7 @@ void QvCodebook::addEntry(uint8_t entry) {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void QvCodebook::write(BitWriter *writer) const {
+void QvCodebook::write(util::BitWriter *writer) const {
     // Todo
 }
 }  // namespace qv_coding1

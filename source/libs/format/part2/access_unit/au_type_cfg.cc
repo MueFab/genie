@@ -1,11 +1,13 @@
 #include "au_type_cfg.h"
 
-#include "../bitwriter.h"
+#include "util/bitwriter.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-void AuTypeCfg::write(BitWriter *writer) {
+void AuTypeCfg::write(util::BitWriter *writer) {
     writer->write(sequence_ID, 16);
     writer->write(AU_start_position, posSize);
     writer->write(AU_end_position, posSize);

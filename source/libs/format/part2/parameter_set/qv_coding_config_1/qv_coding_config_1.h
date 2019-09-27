@@ -6,11 +6,13 @@
 #include <memory>
 #include "../qv_coding_config.h"
 #include "parameter_set_qvps.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-class BitWriter;
+
 namespace qv_coding1 {
 /**
  * ISO 23092-2 Section 3.3.2 table 7 lines 34 to 38
@@ -32,7 +34,7 @@ class QvCodingConfig1 : public QvCodingConfig {
 
     void setQvps(std::unique_ptr<ParameterSetQvps> _parameter_set_qvps);
 
-    void write(BitWriter *writer) const override;
+    void write(util::BitWriter *writer) const override;
 
    private:
     uint8_t qvps_flag : 1;                                 //!< Line 34

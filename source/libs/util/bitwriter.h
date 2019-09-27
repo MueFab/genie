@@ -12,29 +12,29 @@
 
 // -----------------------------------------------------------------------------------------------------------------
 
-namespace format {
-class BitWriter {
-   private:
-    std::ostream *stream;
-    uint64_t m_heldBits;
-    uint8_t m_numHeldBits;
-    uint64_t m_bitsWritten;
+namespace util {
+    class BitWriter {
+    private:
+        std::ostream *stream;
+        uint64_t m_heldBits;
+        uint8_t m_numHeldBits;
+        uint64_t m_bitsWritten;
 
-    void writeOut(uint8_t byte);
+        void writeOut(uint8_t byte);
 
-   public:
-    explicit BitWriter(std::ostream *str);
+    public:
+        explicit BitWriter(std::ostream *str);
 
-    ~BitWriter();
+        ~BitWriter();
 
-    void write(uint64_t value, uint8_t bits);
-    void write(std::istream *in);
+        void write(uint64_t value, uint8_t bits);
+        void write(std::istream *in);
 
-    void flush();
+        void flush();
 
-    uint64_t getBitsWritten();
-};
-}  // namespace format
+        uint64_t getBitsWritten();
+    };
+}
 
 // -----------------------------------------------------------------------------------------------------------------
 
