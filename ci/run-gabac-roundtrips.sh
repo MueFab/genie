@@ -2,19 +2,22 @@
 
 set -euxo pipefail
 
+self="${0}"
+self_name="${self##*/}"
+
 git rev-parse --git-dir 1>/dev/null # exit if not inside Git repo
 readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
 readonly build_dir="${git_root_dir}/cmake-build-release"
 readonly gabac_app="${build_dir}/bin/gabac-app"
 if [[ ! -x "${gabac_app}" ]]; then
-    echo "error: gabac-app application does not exist: ${gabac_app}"
+    echo "[${self_name}] error: gabac-app application does not exist: ${gabac_app}"
     exit 1
 fi
 
 readonly tmp_dir="${git_root_dir}/tmp"
 if [[ -d "${tmp_dir}" ]]; then
-    echo "error: tmp directory exists already: ${tmp_dir}"
+    echo "[${self_name}] error: tmp directory exists already: ${tmp_dir}"
     exit 1
 fi
 mkdir -p "${tmp_dir}"

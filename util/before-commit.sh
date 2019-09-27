@@ -2,11 +2,14 @@
 
 set -euo pipefail
 
+self="${0}"
+self_name="${self##*/}"
+
 git rev-parse --git-dir 1>/dev/null # exit if not inside Git repo
 readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
 run() {
-    echo "-- running: ${1}"
+    echo "[${self_name}] running: ${1}"
     "${1}"
 }
 
