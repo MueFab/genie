@@ -82,3 +82,5 @@ for i in "${!input_files[@]}"; do
 done
 
 rm -rf "${tmp_dir}"
+
+echo "[${self_name}] success"
