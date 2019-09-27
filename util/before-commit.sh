@@ -14,5 +14,7 @@ run() {
 }
 
 run "${git_root_dir}/util/authors.sh"
+run "${git_root_dir}/util/autopep8-pycodestyle.sh"
 run "${git_root_dir}/util/clang-format.sh"
 run "${git_root_dir}/util/shellcheck.sh"
+run "${git_root_dir}/util/todo.sh"
