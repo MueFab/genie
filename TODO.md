@@ -2,6 +2,12 @@
 
 ## Current
 
+- [ ] add ./ci/run-* to .travis.yml
+- [ ] add ./ci/report-coverage.sh to .travis.yml
+- [ ] gabac-app: rename cl options to sth like --input-file instead of --input_file
+- [ ] genie: rename cl options to --output-file etc. instead of --output-file-path
+- [ ] Fix compilation warnings
+- [ ] Use libs from newest C++ standards (e.g. std::filesystem)
 - [ ] Resolve FIXMEs and TODOs
 - [ ] Resolve clang-tidy warnings
 - [ ] Check whether both SamRecord and MinSamRecord classes are needed
