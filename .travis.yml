@@ -20,7 +20,10 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - doxygen
+            - graphviz
             - g++-5
+            - lcov
       env:
         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
     - os: osx
