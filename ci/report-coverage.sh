@@ -45,7 +45,7 @@ lcov \
     --remove coverage.info \
     --output-file coverage.info \
     '*/genie/cmake-build-*/*' \
-    '*/genie/tests/*'
+    '*/genie/test/*'
 
 # Output coverage data on the console (optional)
 lcov --list coverage.info
