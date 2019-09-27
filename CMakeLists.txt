@@ -26,10 +26,14 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") # GNU Compiler Collection
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wshadow")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -Ofast")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wshadow")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -Ofast")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # Apple Clang or LLVM Clang
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
@@ -40,6 +44,14 @@ elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # Apple Clang or LLVM Clang
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wshadow")
 elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel") # Intel Compiler
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -Ofast")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -Ofast")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 else()
     message(WARNING "C++ compiler currently not supported by CMake build")
 endif()
@@ -76,6 +88,13 @@ endif()
 
 if(${BUILD_TESTS})
     include(GoogleTest)
+endif()
+
+if(${GENIE_USE_OPENMP})
+    find_package(OpenMP REQUIRED)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+    add_compile_definitions(GENIE_USE_OPENMP)
 endif()
 
 
