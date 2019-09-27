@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+self="${0}"
+self_name="${self##*/}"
+
 git rev-parse --git-dir 1>/dev/null # exit if not inside Git repo
 readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
@@ -11,15 +14,15 @@ cmds+=("shellcheck")
 for i in "${!cmds[@]}"; do
     cmd=${cmds[${i}]}
     if not command -v "${cmd}" &>/dev/null; then
-        echo "error: command does not exist: ${cmd}"
+        echo "[${self_name}] error: command does not exist: ${cmd}"
         exit 1
     fi
 done
 
 dirs=()
 dirs+=("${git_root_dir}/ci")
-dirs+=("${git_root_dir}/source")
-dirs+=("${git_root_dir}/tests")
+dirs+=("${git_root_dir}/src")
+dirs+=("${git_root_dir}/test")
 dirs+=("${git_root_dir}/util")
 
 extensions=()
@@ -39,6 +42,6 @@ done
 
 for i in "${!files[@]}"; do
     file=${files[${i}]}
-    echo "running shellcheck on: ${file}"
+    echo "[${self_name}] running shellcheck on: ${file}"
     shellcheck "${file}"
 done
