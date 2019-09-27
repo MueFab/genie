@@ -1,6 +1,8 @@
 #include "qv_coding_config_1.h"
-#include "../../bitwriter.h"
+#include "util/bitwriter.h"
 #include "../../make_unique.h"
+#include "util/bitwriter.h"
+
 
 namespace format {
 namespace qv_coding1 {
@@ -23,7 +25,7 @@ void QvCodingConfig1::setQvps(std::unique_ptr<ParameterSetQvps> _parameter_set_q
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void QvCodingConfig1::write(BitWriter *writer) const {
+void QvCodingConfig1::write(util::BitWriter *writer) const {
     writer->write(uint8_t(qv_coding_mode), 4);
     writer->write(qvps_flag, 1);
     if (parameter_set_qvps) {

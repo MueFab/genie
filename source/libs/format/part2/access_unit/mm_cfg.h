@@ -4,11 +4,13 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-class BitWriter;
+
 
 /**
  * ISO 23092-2 Section 3.4.1.1 table 19 lines 7 to 10
@@ -22,7 +24,7 @@ class MmCfg {
     MmCfg(uint16_t _mm_threshold, uint32_t _mm_count);
     MmCfg();
 
-    virtual void write(BitWriter *writer) const;
+    virtual void write(util::BitWriter *writer) const;
 };
 }  // namespace format
 

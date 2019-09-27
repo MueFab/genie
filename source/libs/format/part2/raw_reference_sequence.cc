@@ -1,6 +1,8 @@
 #include "raw_reference_sequence.h"
-#include "bitwriter.h"
+#include "util/bitwriter.h"
 #include "make_unique.h"
+#include "util/bitwriter.h"
+
 
 namespace format {
 RawReferenceSequence::RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_start,
@@ -11,7 +13,7 @@ std::unique_ptr<RawReferenceSequence> RawReferenceSequence::clone() const {
     return make_unique<RawReferenceSequence>(sequence_ID, seq_start, make_unique<std::string>(*ref_sequence));
 }
 
-void RawReferenceSequence::write(BitWriter *writer) const {
+void RawReferenceSequence::write(util::BitWriter *writer) const {
     writer->write(sequence_ID, 16);
     writer->write(seq_start, 40);
     writer->write(seq_start + ref_sequence->length(), 40);

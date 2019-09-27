@@ -1,8 +1,8 @@
-#include "bitwriter.h"
+#include "util/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 
-namespace format {
+namespace util {
 BitWriter::BitWriter(std::ostream *str) : stream(str), m_heldBits(0), m_numHeldBits(0), m_bitsWritten(0) {}
 
 // -----------------------------------------------------------------------------------------------------------------

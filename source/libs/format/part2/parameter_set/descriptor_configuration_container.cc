@@ -1,7 +1,9 @@
 #include "descriptor_configuration_container.h"
-#include "../bitwriter.h"
+#include "util/bitwriter.h"
 #include "../make_unique.h"
 #include "../parameter_set/descriptor_configuration_present/descriptor_configuration_present.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -48,7 +50,7 @@ bool DescriptorConfigurationContainer::isClassSpecific() const { return class_sp
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void DescriptorConfigurationContainer::write(BitWriter *writer) const {
+void DescriptorConfigurationContainer::write(util::BitWriter *writer) const {
     writer->write(class_specific_dec_cfg_flag, 1);
     for (auto &i : descriptor_configurations) {
         i->write(writer);

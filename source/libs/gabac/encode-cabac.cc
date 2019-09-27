@@ -17,13 +17,14 @@ namespace gabac {
 
 void encode_cabac(const BinarizationId& binarizationId, const std::vector<unsigned int>& binarizationParameters,
                   const ContextSelectionId& contextSelectionId, DataBlock* const symbols, size_t maxSize) {
-    DataBlock bitstream(0, 1);
+    DataBlock block(0, 1);
     assert(symbols != nullptr);
 #ifndef NDEBUG
     const unsigned int paramSize[unsigned(BinarizationId::STEG) + 1u] = {1, 1, 0, 0, 1, 1};
 #endif
     assert(binarizationParameters.size() >= paramSize[static_cast<int>(binarizationId)]);
 
+    OBufferStream bitstream(&block);
     Writer writer(&bitstream);
     writer.start(symbols->size());
 
@@ -68,7 +69,7 @@ void encode_cabac(const BinarizationId& binarizationId, const std::vector<unsign
 
         writer.reset();
 
-        symbols->swap(&bitstream);
+        bitstream.flush(symbols);
 
         return;
     }
@@ -151,7 +152,7 @@ void encode_cabac(const BinarizationId& binarizationId, const std::vector<unsign
 
     writer.reset();
 
-    symbols->swap(&bitstream);
+    bitstream.flush(symbols);
 }
 
 }  // namespace gabac

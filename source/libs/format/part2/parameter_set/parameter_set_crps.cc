@@ -1,7 +1,9 @@
 #include "parameter_set_crps.h"
 #include <ureads-encoder/exceptions.h>
-#include "../bitwriter.h"
+#include "util/bitwriter.h"
 #include "../make_unique.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -22,7 +24,7 @@ void ParameterSetCrps::setCrpsInfo(std::unique_ptr<CrpsInfo> _crps_info) {
 }
 // -----------------------------------------------------------------------------------------------------------------
 
-void ParameterSetCrps::write(format::BitWriter *writer) const {
+void ParameterSetCrps::write(util::BitWriter *writer) const {
     writer->write(uint8_t(cr_alg_ID), 8);
     if (crps_info) {
         crps_info->write(writer);

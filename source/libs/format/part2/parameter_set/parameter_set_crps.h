@@ -7,6 +7,8 @@
 #include <memory>
 
 #include "crps_info.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -34,7 +36,7 @@ class ParameterSetCrps {
    public:
     explicit ParameterSetCrps(CrAlgId _cr_alg_ID);
     void setCrpsInfo(std::unique_ptr<CrpsInfo> _crps_info);
-    virtual void write(BitWriter* bw) const;
+    virtual void write(util::BitWriter* bw) const;
 };
 }  // namespace format
 

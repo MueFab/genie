@@ -8,11 +8,13 @@
 
 #include "transform_subseq_cfg.h"
 #include "transform_subseq_parameters.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-class BitWriter;
+
 namespace desc_conf_pres {
 namespace cabac {
 /**
@@ -34,7 +36,7 @@ class DescriptorSubsequenceCfg {
 
     std::unique_ptr<DescriptorSubsequenceCfg> clone() const;
 
-    virtual void write(BitWriter* writer) const;
+    virtual void write(util::BitWriter* writer) const;
 };
 }  // namespace cabac
 }  // namespace desc_conf_pres

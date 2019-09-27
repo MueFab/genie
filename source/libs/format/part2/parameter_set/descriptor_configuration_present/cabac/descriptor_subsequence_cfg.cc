@@ -1,6 +1,8 @@
 #include "descriptor_subsequence_cfg.h"
-#include "../../../bitwriter.h"
+#include "util/bitwriter.h"
 #include "../../../make_unique.h"
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -50,7 +52,7 @@ TransformSubseqCfg *DescriptorSubsequenceCfg::getTransformSubseqCfg(size_t index
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void DescriptorSubsequenceCfg::write(BitWriter *writer) const {
+void DescriptorSubsequenceCfg::write(util::BitWriter *writer) const {
     if (descriptor_subsequence_ID) {
         writer->write(*descriptor_subsequence_ID, 10);
     }

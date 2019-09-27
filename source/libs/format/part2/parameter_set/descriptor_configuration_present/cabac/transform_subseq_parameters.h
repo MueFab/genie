@@ -5,11 +5,13 @@
 
 #include <memory>
 #include <vector>
+#include "util/bitwriter.h"
+
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-class BitWriter;
+
 namespace desc_conf_pres {
 namespace cabac {
 
@@ -26,7 +28,7 @@ class TransformSubseqParameters {
         MERGE_CODING = 4
     };
 
-    virtual void write(BitWriter *writer) const;
+    virtual void write(util::BitWriter *writer) const;
 
     TransformSubseqParameters();
 

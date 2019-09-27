@@ -3,7 +3,6 @@ project("format")
 set(source_files
         access_unit.cc
         clutter.cc
-        bitwriter.cc
         access_unit/block.cc
         access_unit/extended_au.cc
         access_unit/signature_cfg.cc

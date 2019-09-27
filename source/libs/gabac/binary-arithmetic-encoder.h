@@ -7,7 +7,7 @@
 #ifndef GABAC_BINARY_ARITHMETIC_ENCODER_H_
 #define GABAC_BINARY_ARITHMETIC_ENCODER_H_
 
-#include "bit-output-stream.h"
+#include "util/bitwriter.h"
 
 namespace gabac {
 
@@ -15,7 +15,7 @@ class ContextModel;
 
 class BinaryArithmeticEncoder {
    public:
-    explicit BinaryArithmeticEncoder(const BitOutputStream& bitOutputStream);
+    explicit BinaryArithmeticEncoder(const util::BitWriter& bitOutputStream);
 
     ~BinaryArithmeticEncoder();
 
@@ -36,7 +36,7 @@ class BinaryArithmeticEncoder {
 
     void writeOut();
 
-    BitOutputStream m_bitOutputStream;
+    util::BitWriter m_bitOutputStream;
 
     unsigned char m_bufferedByte;
 
