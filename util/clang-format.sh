@@ -20,8 +20,8 @@ for i in "${!cmds[@]}"; do
 done
 
 dirs=()
-dirs+=("${git_root_dir}/source")
-dirs+=("${git_root_dir}/tests")
+dirs+=("${git_root_dir}/src")
+dirs+=("${git_root_dir}/test")
 
 extensions=()
 extensions+=("*.h")
@@ -44,10 +44,6 @@ done
 
 for i in "${!files[@]}"; do
     file=${files[${i}]}
-    if [[ ! ${file} =~ "third-party" ]]; then
-        echo "[${self_name}] running clang-format on: ${file}"
-        clang-format -i "${file}"
-    else
-        echo "[${self_name}] skipping: ${file}"
-    fi
+    echo "[${self_name}] running clang-format on: ${file}"
+    clang-format -i "${file}"
 done
