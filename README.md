@@ -7,6 +7,10 @@ Open source MPEG-G codec
 | ``master``  | [![Build Status](https://travis-ci.org/mitogen/genie.svg?branch=master)](https://travis-ci.org/mitogen/genie) |
 | ``develop`` | [![Build Status](https://travis-ci.org/mitogen/genie.svg?branch=develop)](https://travis-ci.org/mitogen/genie) |
 
+[![build](https://travis-ci.org/mitogen/genie.svg?branch=master)](https://travis-ci.org/mitogen/genie)
+[![codecov](https://codecov.io/gh/voges/calq/branch/master/graph/badge.svg)](https://codecov.io/gh/voges/calq)
+[![doc](https://img.shields.io/badge/doc-online-blue)](https://voges.github.io/calq)
+
 **First off, we refer the reader to the ``USAGE_POLICY.md``.**
 
 ---
@@ -28,7 +32,7 @@ Note that cmake will need to point to the genie cepository directory.
 
 This will generate the Genie application at ``cmake-build/bin/genie``.
 
-Note: you will need to use cmake version 3 or greater and gcc version 8. You may need to declare your compilers with cmake flags, e.g., 
+Note: you will need to use cmake version 3 or greater and gcc version 8. You may need to declare your compilers with cmake flags, e.g.,
 
     cmake .. -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Release
     cmake ../genie/ -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release
@@ -47,7 +51,7 @@ Where /path/to/config/output/ is the directory where the config files were gener
 To uncompress a .genie file, run the command on a compressed file:
 
     /path/to/bin/genie [compressed_genie_file] -c /path/to/config/output
-    
+
 See the help file for full range of options:
 
     /path/to/bin/genie -h

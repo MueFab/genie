@@ -2,6 +2,20 @@
 
 ## Current
 
+
+FOLDERS & FILES TO RE-WORK NEXT
+doc/
+resources/ -> data/
+source/    -> src/
+tests/     -> test/
+           -> thirdparty/ (from source/libs/third-party/)
+README.md
+TODO.md
+USAGE_POLICY.md
+
+
+
+
 - [ ] add ./ci/run-* to .travis.yml
 - [ ] add ./ci/report-coverage.sh to .travis.yml
 - [ ] gabac-app: rename cl options to sth like --input-file instead of --input_file
