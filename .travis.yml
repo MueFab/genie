@@ -38,7 +38,7 @@ script:
   - ./ci/cmake-build-release.sh
   - ./ci/run-gabac-roundtrips.sh
   - ./ci/run-genie-roundtrips.sh
-  # - if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${TRAVIS_COMPILER}" == "gcc" ]]; then ./ci/cmake-build-debug-all.sh; fi
+  - if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${TRAVIS_COMPILER}" == "gcc" ]]; then ./ci/cmake-build-debug-all.sh; fi
   # - if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${TRAVIS_COMPILER}" == "gcc" ]]; then ./ci/run-tests.sh; fi
   # - if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${TRAVIS_COMPILER}" == "gcc" ]] && [[ "${TRAVIS_BRANCH}" == "master" ]]; then ./ci/report-code-coverage.sh; fi
 
