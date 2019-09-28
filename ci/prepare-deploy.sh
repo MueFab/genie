@@ -14,7 +14,7 @@ if [[ ! -d "${build_dir}" ]]; then
     exit 1
 fi
 
-# Check wether the documentation and the coverage report were generated
+# Check whether the documentation and the coverage report were generated
 readonly doc_dir="${build_dir}/doc"
 if [[ ! -d "${doc_dir}" ]]; then
     echo "[${self_name}] error: documentation directory does not exist: ${doc_dir}"
