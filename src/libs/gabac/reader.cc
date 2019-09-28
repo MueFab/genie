@@ -165,11 +165,15 @@ uint64_t Reader::readAsSTEGcabac(unsigned int treshold, unsigned int offset) {
 }
 
 size_t Reader::readNumSymbols() {
-    auto result = readAsBIbypass(32);
+    auto result = m_bitInputStream.read(32);
     return static_cast<size_t>(result);
 }
 
-size_t Reader::start() { return readNumSymbols(); }
+size_t Reader::start() {
+    size_t numSymbols = readNumSymbols();
+    if (numSymbols > 0) m_decBinCabac.start();
+    return numSymbols;
+}
 
 void Reader::reset() {
     m_contextModels = contexttables::buildContextTable();
