@@ -34,7 +34,7 @@ if [[ ! -x "${mpegg_decoder_p2}" ]]; then
     exit 1
 fi
 
-readonly fastq_file="${git_root_dir}/resources/test-files/fastq/simplest.fastq"
+readonly fastq_file="${git_root_dir}/data/fastq/simplest.fastq"
 readonly bitstream_file="${fastq_file}.bitstream"
 readonly decoded_file="${bitstream_file}.decoded"
 
