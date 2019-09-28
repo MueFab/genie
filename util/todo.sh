@@ -20,10 +20,8 @@ for i in "${!cmds[@]}"; do
 done
 
 dirs=()
-dirs+=("${git_root_dir}/ci")
 dirs+=("${git_root_dir}/src")
 dirs+=("${git_root_dir}/test")
-dirs+=("${git_root_dir}/util")
 
 for i in "${!dirs[@]}"; do
     dir=${dirs[${i}]}
