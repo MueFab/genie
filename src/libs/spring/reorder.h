@@ -652,15 +652,15 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
 //
 template <size_t bitset_size>
 void writetofile(std::bitset<bitset_size> *read, uint16_t *read_lengths, reorder_global<bitset_size> &rg) {
-    //
-    // This loop must be executed in parallel with the same #threads
-    // that was used for the hot loop in reorder(), for correctness.
-    // It also shows up in the execution profile, and is worth
-    // parallelizing anyway.
-    //
-    // FIXME re-code the loop so that is doesn't necessarily need to
-    // execute on the same #threads.
-    //
+//
+// This loop must be executed in parallel with the same #threads
+// that was used for the hot loop in reorder(), for correctness.
+// It also shows up in the execution profile, and is worth
+// parallelizing anyway.
+//
+// FIXME re-code the loop so that is doesn't necessarily need to
+// execute on the same #threads.
+//
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel num_threads(rg.num_thr)
 #endif
