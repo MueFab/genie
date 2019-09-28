@@ -15,6 +15,7 @@
 ### Jan
 
 - [ ] Clean repository with: https://rtyley.github.io/bfg-repo-cleaner/
+- [ ] Update setting on github.com and codecov.io and travis.com and travis.org
 - [ ] Write util/boilerplate.sh
 - [ ] Set up GitHub pages at: https://mitogen.github.io/genie/
 - [ ] Set up Doxygen documentation at: https://mitogen.github.io/genie/doc/
