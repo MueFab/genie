@@ -16,7 +16,7 @@ fi
 
 apps=()
 apps+=("${build_dir}/bin/gabac-tests")
-apps+=("${build_dir}/bin/util-tests")
+# apps+=("${build_dir}/bin/util-tests")
 
 for i in "${!apps[@]}"; do
     app=${apps[${i}]}
