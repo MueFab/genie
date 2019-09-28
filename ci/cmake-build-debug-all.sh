@@ -17,4 +17,5 @@ cmake .. \
     -DBUILD_DOCUMENTATION=ON \
     -DBUILD_TESTS=ON
 make
+# make --jobs=8
 make doc
