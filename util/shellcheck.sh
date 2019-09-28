@@ -21,8 +21,6 @@ done
 
 dirs=()
 dirs+=("${git_root_dir}/ci")
-dirs+=("${git_root_dir}/src")
-dirs+=("${git_root_dir}/test")
 dirs+=("${git_root_dir}/util")
 
 extensions=()
