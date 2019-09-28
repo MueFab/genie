@@ -41,13 +41,14 @@ script:
   - if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${TRAVIS_COMPILER}" == "gcc" ]]; then ./ci/cmake-build-debug-all.sh; fi
   # - if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${TRAVIS_COMPILER}" == "gcc" ]]; then ./ci/run-tests.sh; fi
   # - if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${TRAVIS_COMPILER}" == "gcc" ]] && [[ "${TRAVIS_BRANCH}" == "master" ]]; then ./ci/report-code-coverage.sh; fi
+  # - if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${TRAVIS_COMPILER}" == "gcc" ]] && [[ "${TRAVIS_BRANCH}" == "master" ]]; then ./ci/prepare-deploy.sh; fi
 
 # deploy:
 #   provider: pages
 #   skip_cleanup: true
 #   github_token: ${GITHUB_TOKEN}
 #   keep_history: true
-#   local_dir: ./cmake-build-debug-all/doc/html
+#   local_dir: pages
 #   target_branch: gh-pages
 #   on:
 #     branch: master
