@@ -1,4 +1,4 @@
-# Usage Policy
+# Usage policy
 
 The open source MPEG-G codec **Genie** is made available before scientific publication.
 
