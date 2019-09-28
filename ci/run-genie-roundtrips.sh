@@ -27,13 +27,13 @@ config_file_paths=()
 compressed_files=()
 decompressed_files=()
 
-input_files+=("${git_root_dir}/resources/test-files/fastq/fourteen-gattaca-records.fastq")
-config_file_paths+=("${git_root_dir}/resources/gabac-configs/")
+input_files+=("${git_root_dir}/data/test-files/fastq/fourteen-gattaca-records.fastq")
+config_file_paths+=("${git_root_dir}/data/gabac-configs/")
 compressed_files+=("${tmp_dir}/fourteen-gattaca-records.genie")
 decompressed_files+=("${tmp_dir}/fourteen-gattaca-records.genie-decompressed.fastq")
 
-input_files+=("${git_root_dir}/resources/test-files/fastq/simplest.fastq")
-config_file_paths+=("${git_root_dir}/resources/gabac-configs/")
+input_files+=("${git_root_dir}/data/test-files/fastq/simplest.fastq")
+config_file_paths+=("${git_root_dir}/data/gabac-configs/")
 compressed_files+=("${tmp_dir}/simplest.genie")
 decompressed_files+=("${tmp_dir}/simplest.genie-decompressed.fastq")
 
