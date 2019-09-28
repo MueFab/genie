@@ -16,6 +16,5 @@ cmake .. \
     -DBUILD_COVERAGE=ON \
     -DBUILD_DOCUMENTATION=ON \
     -DBUILD_TESTS=ON
-make
-# make --jobs=8
+make --jobs
 make doc
