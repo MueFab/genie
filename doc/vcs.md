@@ -1,8 +1,8 @@
 # Version control system
 
-## Branching
+## Workflow
 
-We use Git and we use a workflow similiar to Gitflow (https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow).
+We use Git and we use a workflow similar to Gitflow (https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow).
 
 That means:
 
