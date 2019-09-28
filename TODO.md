@@ -4,6 +4,8 @@
 
 ## Current
 
+### Brian
+
 ### Daniel/Jannis
 
 - [ ] Transcode part 1 en-/decapsulator fom Java to C++ (standalone + library)
@@ -14,9 +16,10 @@
 
 ### Jan
 
-- [ ] Clean repository with: https://rtyley.github.io/bfg-repo-cleaner/
+- [x] Clean repository with: https://rtyley.github.io/bfg-repo-cleaner/
+- [ ] Add boilerplate to all source code files
+- [ ] Document the generation of the conformance test items
 - [ ] Update setting on github.com and codecov.io and travis.com and travis.org
-- [ ] Write util/boilerplate.sh
 - [ ] Set up GitHub pages at: https://mitogen.github.io/genie/
 - [ ] Set up Doxygen documentation at: https://mitogen.github.io/genie/doc/
 - [ ] Re-enable util-tests in ci/run-tests.sh
@@ -44,6 +47,10 @@
   - [ ] "Ordinary" file I/O (for e.g. SPRING's temporary files) should be done using the C++ standard library
 - [ ] Use only numpy arrays in Python interfaces (just as in the example "c-and-python")
 
+### Josh
+
+- [ ] Write unit tests
+
 ### Junaid
 
 - [ ] Investigate GABAC roundtrip ("u(32) issue")
@@ -55,8 +62,11 @@
   - [ ] Write a parameter set and an access unit - which only contains e.g. the encoded read IDs - to a file using the functionality from the format library.
   - [ ] Try to decode that with the reference software.
 
+### Yeremia
+
 ## When everything is working
 
+- [ ] Clean repository with: https://rtyley.github.io/bfg-repo-cleaner/
 - [ ] Check conformance to doc/development-guidelines.md
 - [ ] Check everything with Valgrind
 - [ ] Resolve FIXMEs and TODOs

@@ -6,9 +6,9 @@ namespace genie {
 
 FastqRecord::FastqRecord() : title(""), sequence(""), optional(""), qualityScores("") {}
 
-FastqRecord::FastqRecord(const std::string& title, const std::string& sequence, const std::string& optional,
-                         const std::string& qualityScores)
-    : title(title), sequence(sequence), optional(optional), qualityScores(qualityScores) {
+FastqRecord::FastqRecord(const std::string& title_, const std::string& sequence_, const std::string& optional_,
+                         const std::string& qualityScores_)
+    : title(title_), sequence(sequence_), optional(optional_), qualityScores(qualityScores_) {
     // Nothing to do here.
 }
 
