@@ -22,7 +22,7 @@ done
 readonly build_dir="${git_root_dir}/cmake-build-release"
 readonly ureads_encoder="${build_dir}/bin/ureads-encoder"
 if [[ ! -x "${ureads_encoder}" ]]; then
-    echo "[${self_name}] error: ureads-encoder application does not exist: ${calq_tests_app}"
+    echo "[${self_name}] error: ureads-encoder application does not exist: ${ureads_encoder}"
     exit 1
 fi
 
