@@ -37,7 +37,7 @@ std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
         "\"lut_transformation_enabled\": false,"
         "\"diff_coding_enabled\": false,"
         "\"binarization_id\": 0,"
-        "\"binarization_parameters\":[8],"
+        "\"binarization_parameters\":[3],"
         "\"context_selection_id\": 0"
         "}]"
         "}";
