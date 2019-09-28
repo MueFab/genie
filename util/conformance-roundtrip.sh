@@ -28,13 +28,13 @@ fi
 
 # Adjust this path to point to your mpegg-decoder-p2 executable!
 #        vvvvvvvvvvvvvvvv
-readonly mpegg_decoder_p2="/path/to/mpegg-reference-sw/build-debug/bin/decoder/mpegg-decoder-p2"
+readonly mpegg_decoder_p2="/home/voges/repos/mpegg-reference-sw/build-debug/bin/decoder/mpegg-decoder-p2"
 if [[ ! -x "${mpegg_decoder_p2}" ]]; then
     echo "[${self_name}] error: mpegg-decoder-p2 application does not exist: ${mpegg_decoder_p2}"
     exit 1
 fi
 
-readonly fastq_file="${git_root_dir}/resources/test-files/fastq/simplest.fastq"
+readonly fastq_file="${git_root_dir}/data/test-files/fastq/simplest.fastq"
 readonly bitstream_file="${fastq_file}.bitstream"
 readonly decoded_file="${bitstream_file}.decoded"
 
