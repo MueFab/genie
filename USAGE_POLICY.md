@@ -1,6 +1,6 @@
 # Usage policy
 
-The open source MPEG-G codec **Genie** is made available before scientific publication.
+The open source MPEG-G codec Genie is made available before scientific publication.
 
 This pre-publication software is preliminary and may contain errors.
 The software is provided in good faith, but without any express or implied warranties.
