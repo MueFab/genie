@@ -9,12 +9,10 @@ resources/ -> data/
 source/    -> src/
 tests/     -> test/
            -> thirdparty/ (from source/libs/third-party/)
-README.md
 TODO.md
-USAGE_POLICY.md
 
 
-
+- [ ] make script util/boilerplate.sh
 
 - [ ] add ./ci/run-* to .travis.yml
 - [ ] add ./ci/report-coverage.sh to .travis.yml
@@ -28,7 +26,7 @@ USAGE_POLICY.md
 - [ ] Check comments
   - [ ] Sentences should start with an uppercase letter and end with a full stop.
   - [ ] Statements should start with an uppercase letter and not end with a full stop.
-- [ ] Update README.md once everything is working
+
 - [ ] Set up GitHub pages for the repository
 - [ ] Add Doxygen file headers
 - [ ] Set up Doxygen documentation at https://mitogen.github.io/genie/doc/
@@ -64,10 +62,12 @@ USAGE_POLICY.md
   - [ ] "Ordinary" file R/W (for e.g. SPRING's temporary files) should be done using the C++ standard library
 - [ ] Social media image (on GitHub)
 - [ ] Virtual dtor in all classes that something is being derived from (use 'override' in derived classes)
-- [ ] Check correct use of smart pointers
 - [ ] Python interfaces
   - [ ] Only use numpy arrays
   - [ ] Just as the example "c-and-python"
+
+
+- [ ] Update README.md once everything is working
 
 
 Shubham
