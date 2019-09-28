@@ -6,20 +6,24 @@
 
 namespace format {
 namespace qv_coding1 {
+
 ParameterSetQvps::ParameterSetQvps() {
-    // Todo
+    // TODO
 }
 
 // -----------------------------------------------------------------------------------------------------------------
 
 void ParameterSetQvps::addCodeBook(const QvCodebook &book) {
-    // Todo
+    // TODO
+    (void)book;  // Silence warning about unused variable
 }
 
 // -----------------------------------------------------------------------------------------------------------------
 
 void ParameterSetQvps::write(util::BitWriter *writer) const {
-    // Todo
+    // TODO
+    (void)writer;  // Silence warning about unused variable
 }
+
 }  // namespace qv_coding1
 }  // namespace format
