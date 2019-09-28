@@ -8,8 +8,8 @@ namespace genie {
 struct FastqRecord {
    public:
     FastqRecord();
-    FastqRecord(const std::string& title, const std::string& sequence, const std::string& optional,
-                const std::string& qualityScores);
+    FastqRecord(const std::string& title_, const std::string& sequence_, const std::string& optional_,
+                const std::string& qualityScores_);
     ~FastqRecord();
 
    public:

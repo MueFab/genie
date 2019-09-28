@@ -6,20 +6,24 @@
 
 namespace format {
 namespace qv_coding1 {
+
 QvCodebook::QvCodebook() {
-    // Todo
+    // TODO
 }
 
 // -----------------------------------------------------------------------------------------------------------------
 
 void QvCodebook::addEntry(uint8_t entry) {
-    // Todo
+    // TODO
+    (void)entry;  // Silence warning about unused variable
 }
 
 // -----------------------------------------------------------------------------------------------------------------
 
 void QvCodebook::write(util::BitWriter *writer) const {
-    // Todo
+    // TODO
+    (void)writer;  // Silence warning about unused variable
 }
+
 }  // namespace qv_coding1
 }  // namespace format
