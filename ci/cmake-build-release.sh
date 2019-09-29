@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-git rev-parse --git-dir 1>/dev/null # exit if not inside Git repo
+git rev-parse --git-dir 1>/dev/null # Exit if not inside Git repo
 readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
 readonly build_dir="${git_root_dir}/cmake-build-release"
@@ -12,4 +12,4 @@ fi
 
 cd "${build_dir}"
 cmake .. -DCMAKE_BUILD_TYPE=Release
-make
+make --jobs

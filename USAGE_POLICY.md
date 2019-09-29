@@ -1,9 +1,9 @@
-# Usage Policy
+# Usage policy
 
-As a public service, the open source MPEG-G codec **Genie** is made available before scientific publication.
+The open source MPEG-G codec Genie is made available before scientific publication.
 
 This pre-publication software is preliminary and may contain errors.
-This software is provided in good faith, but without any express or implied warranties.
+The software is provided in good faith, but without any express or implied warranties.
 We refer the reader to our ``LICENSE``.
 
 The goal of our policy is that early release should enable the progress of science.
