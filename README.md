@@ -2,99 +2,55 @@
 
 Open source MPEG-G codec
 
-| Branch      | Build status |
-|-------------|--------------|
-| ``master``  | [![Build Status](https://travis-ci.org/mitogen/genie.svg?branch=master)](https://travis-ci.org/mitogen/genie) |
-| ``develop`` | [![Build Status](https://travis-ci.org/mitogen/genie.svg?branch=develop)](https://travis-ci.org/mitogen/genie) |
+[![build](https://travis-ci.org/mitogen/genie.svg?branch=master)](https://travis-ci.org/mitogen/genie)
+[![codecov](https://codecov.io/gh/mitogen/genie/branch/master/graph/badge.svg)](https://codecov.io/gh/mitogen/genie)
+[![doc](https://img.shields.io/badge/doc-online-blue)](https://mitogen.github.io/genie)
 
-**First off, we refer the reader to the ``USAGE_POLICY.md``.**
+**First off, we refer the reader to our usage policy: ``USAGE_POLICY.md``**
 
 ---
 
-## Quick start on Linux
+## Quick start
 
-Clone the Genie repository:
+Clone the repository:
 
     git clone https://github.com/mitogen/genie.git
 
 Build all libraries and executables using CMake:
 
-    mkdir cmake-build
-    cd cmake-build
+    mkdir build
+    cd build
     cmake ..
     make
 
-Note that cmake will need to point to the genie cepository directory.
-
 This will generate the Genie application at ``cmake-build/bin/genie``.
 
-Note: you will need to use cmake version 3 or greater and gcc version 8. You may need to declare your compilers with cmake flags, e.g., 
+See the help for a full range of options: ``genie --help``
 
-    cmake .. -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Release
-    cmake ../genie/ -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release
-    cmake ../genie/ -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release -DGENIE_USE_OPENMP=ON
+Notes:
 
-Once the genie application is generated, you will first need to generate the config files:
+- CMake 3.1 or greater is required.
+- A compiler compliant to C++11 is required.
+- If multiple compilers are installed on your system, specific C and C++ compilers can be used by setting the CMake flags ``CMAKE_C_COMPILER`` and ``CMAKE_CXX_COMPILER``.
 
-    /path/to/bin/genie [uncompressed_fastq] [optional: matched uncompressed_fastq] -g -c /path/to/config/output/
+## Compressing and decompressing FASTQ data
 
-the /path/to/config/output/ should be a directory you create that will store the config files. Once this command finishes running, you can then compress the files with the same command without -g:
+The first step is to generate a set of configuration files:
 
-    /path/to/bin/genie [uncompressed_fastq] [optional: matched uncompressed_fastq] -c /path/to/config/output/
+    genie input_1.fastq [input_2.fastq] --generate --config-dir /path/to/config/dir/
 
-Where /path/to/config/output/ is the directory where the config files were generated.
+Note the ``--generate`` flag. The configuration files will be stored in the directory ``/path/to/config/dir/``.
 
-To uncompress a .genie file, run the command on a compressed file:
+The second step is to compress the FASTQ data:
 
-    /path/to/bin/genie [compressed_genie_file] -c /path/to/config/output
-    
-See the help file for full range of options:
+    genie input_1.fastq [input_2.fastq] --config-dir /path/to/config/dir/ --output-file compressed.genie
 
-    /path/to/bin/genie -h
+To uncompress a ``.genie`` file, run the following command:
 
-## Continuous integration
-
-Commits to this repository are continuously tested on **Travis CI** (https://travis-ci.org/mitogen/genie). Take a look at the file ``.travis.yml`` to see what is being done on Travis' (virtual) machines.
-
-## Build system
-
-We use **CMake** (https://cmake.org) as build system.
-
-## Version control system
-
-### Branching
-
-We use **Git** and we use the **Gitflow** workflow (https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow).
-
-That means:
-
-* The ``master`` branch contains only *release* commits.
-* Every commit on the master branch is *tagged* according to **Semantic Versioning 2.0.0** (see below).
-* Development generally takes place on the ``develop`` branch.
-* Actual development takes place in *feature* branches, e.g., ``feature/my_fancy_feature``.
-* Once a *feature* is completed, its branch can be merged back into the ``develop`` branch.
-
-### Version numbers
-
-We use the Semantic Versioning 2.0.0 (https://semver.org).
-
-That means:
-
-* The **release** version number format is: MAJOR.MINOR.PATCH
-* We increment the
-  * MAJOR version when making incompatible API changes,
-  * MINOR version when adding functionality in a backwards-compatible manner, and
-  * PATCH version when making backwards-compatible bug fixes.
-* **Pre-release** versions are denoted by appending a hyphen and a series of dot separated identifiers immediately following the patch version.
-  * Example 1: 1.0.0-alpha.1 ("alpha version 1 of the planned major release 1")
-  * Example 2: 1.0.0-beta.1 ("beta version 1 of the planned major release 1")
-  * Example 3: 1.0.0-rc.1 ("release candidate (rc) 1 of the planned major release 1")
-  * Note: 1.0.0-alpha.1 < 1.0.0-beta.1 < 1.0.0-rc.1 by definition (see https://semver.org)
+    genie compressed.genie --config-dir /path/to/config/dir/
 
 ## Who do I talk to?
 
 Jan Voges <[voges@tnt.uni-hannover.de](mailto:voges@tnt.uni-hannover.de)>
-
-Tom Paridaens <[tom.paridaens@ugent.be](mailto:tom.paridaens@ugent.be)>
 
 Mikel Hernaez <[mhernaez@illinois.edu](mailto:mhernaez@illinois.edu)>

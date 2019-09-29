@@ -1,0 +1,4 @@
+/**
+ * @file
+ * @copyright This file is part of Genie. See LICENSE for more details.
+ */

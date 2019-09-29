@@ -2,19 +2,22 @@
 
 set -euxo pipefail
 
-git rev-parse --git-dir 1>/dev/null # exit if not inside Git repo
+self="${0}"
+self_name="${self##*/}"
+
+git rev-parse --git-dir 1>/dev/null # Exit if not inside Git repo
 readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
 readonly build_dir="${git_root_dir}/cmake-build-release"
 readonly genie="${build_dir}/bin/genie"
 if [[ ! -x "${genie}" ]]; then
-    echo "error: genie application does not exist: ${genie}"
+    echo "[${self_name}] error: genie application does not exist: ${genie}"
     exit 1
 fi
 
 readonly tmp_dir="${git_root_dir}/tmp"
 if [[ -d "${tmp_dir}" ]]; then
-    echo "error: tmp directory exists already: ${tmp_dir}"
+    echo "[${self_name}] error: tmp directory exists already: ${tmp_dir}"
     exit 1
 fi
 mkdir -p "${tmp_dir}"
@@ -24,13 +27,13 @@ config_file_paths=()
 compressed_files=()
 decompressed_files=()
 
-input_files+=("${git_root_dir}/resources/test-files/fastq/fourteen-gattaca-records.fastq")
-config_file_paths+=("${git_root_dir}/resources/gabac-configs/")
+input_files+=("${git_root_dir}/data/fastq/fourteen-gattaca-records.fastq")
+config_file_paths+=("${git_root_dir}/data/gabac/default-configs/")
 compressed_files+=("${tmp_dir}/fourteen-gattaca-records.genie")
 decompressed_files+=("${tmp_dir}/fourteen-gattaca-records.genie-decompressed.fastq")
 
-input_files+=("${git_root_dir}/resources/test-files/fastq/simplest.fastq")
-config_file_paths+=("${git_root_dir}/resources/gabac-configs/")
+input_files+=("${git_root_dir}/data/fastq/simplest.fastq")
+config_file_paths+=("${git_root_dir}/data/gabac/default-configs/")
 compressed_files+=("${tmp_dir}/simplest.genie")
 decompressed_files+=("${tmp_dir}/simplest.genie-decompressed.fastq")
 
@@ -58,3 +61,5 @@ for i in "${!input_files[@]}"; do
 done
 
 rm -rf "${tmp_dir}"
+
+echo "[${self_name}] success"
