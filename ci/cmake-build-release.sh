@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-set -euxo pipefail
+if [[ ! -z "${CI}" ]]; then set -x; fi
+set -euo pipefail
 
 git rev-parse --git-dir 1>/dev/null # Exit if not inside Git repo
 readonly git_root_dir="$(git rev-parse --show-toplevel)"
