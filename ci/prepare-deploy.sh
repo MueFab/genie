@@ -13,7 +13,7 @@ readonly coverage_dir="${git_root_dir}/cmake-build-coverage/coverage"
 readonly documentation_dir="${git_root_dir}/cmake-build-documentation/documentation"
 readonly page_dir="${git_root_dir}/page"
 
-mkdir --parents "${page_dir}"
+mkdir -p "${page_dir}"
 cp --recursive "${coverage_dir}" "${page_dir}"
 cp --recursive "${documentation_dir}" "${page_dir}"
 cp "${git_root_dir}/data/misc/index.html" "${page_dir}"

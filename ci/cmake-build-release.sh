@@ -8,7 +8,7 @@ readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
 readonly build_dir="${git_root_dir}/cmake-build-release"
 
-mkdir --parents "${build_dir}"
+mkdir -p "${build_dir}"
 cd "${build_dir}"
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make --jobs
