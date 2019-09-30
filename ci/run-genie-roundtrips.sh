@@ -20,7 +20,7 @@ if [[ -d "${tmp_dir}" ]]; then
     echo "[${self_name}] error: tmp directory exists already: ${tmp_dir}"
     exit 1
 fi
-mkdir -p "${tmp_dir}"
+mkdir "${tmp_dir}"
 
 input_files=()
 config_file_paths=()
