@@ -30,12 +30,11 @@ class DescriptorSubsequenceCfg {
    public:
     DescriptorSubsequenceCfg(std::unique_ptr<TransformSubseqParameters> _transform_subseq_parameters,
                              uint16_t descriptor_subsequence_ID, bool tokentype);
+    virtual ~DescriptorSubsequenceCfg() = default;
 
     void setTransformSubseqCfg(size_t index, std::unique_ptr<TransformSubseqCfg> _transformSubseq_cfg);
     TransformSubseqCfg* getTransformSubseqCfg(size_t index) const;
-
     std::unique_ptr<DescriptorSubsequenceCfg> clone() const;
-
     virtual void write(util::BitWriter* writer) const;
 };
 }  // namespace cabac

@@ -35,6 +35,8 @@ class ParameterSetCrps {
 
    public:
     explicit ParameterSetCrps(CrAlgId _cr_alg_ID);
+    virtual ~ParameterSetCrps() = default;
+
     void setCrpsInfo(std::unique_ptr<CrpsInfo> _crps_info);
     virtual void write(util::BitWriter* bw) const;
 };
