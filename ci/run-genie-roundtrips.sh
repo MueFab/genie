@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-set -euxo pipefail
+if [[ ! -z "${CI}" ]]; then set -x; fi
+set -euo pipefail
 
 self="${0}"
 self_name="${self##*/}"
@@ -8,8 +9,7 @@ self_name="${self##*/}"
 git rev-parse --git-dir 1>/dev/null # Exit if not inside Git repo
 readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
-readonly build_dir="${git_root_dir}/cmake-build-release"
-readonly genie="${build_dir}/bin/genie"
+readonly genie="${git_root_dir}/cmake-build-release/bin/genie"
 if [[ ! -x "${genie}" ]]; then
     echo "[${self_name}] error: genie application does not exist: ${genie}"
     exit 1
