@@ -1,15 +1,5 @@
 language: cpp
 
-# Notes on GCC:
-# - GCC support for ISO C11 reached a similar level of completeness as
-#   ISO C99 in 4.9 and that C++11 is feature-complete in 4.8.1, but support
-#   for <regex> does not exist until 4.9.
-# - Ubuntu 12.04 ships with GCC 4.6.3 and Ubuntu 14.04 ships with GCC 4.8.2.
-# - On macOS, gcc is an alias for clang, and g++ is an alias for clang++.
-#   So we must set CC and CXX to specific gcc/g++ versions.
-
-# Define the build matrix explicitly. Manually expanding the combinations
-# of (os, compiler) is more tedious, but grants far more flexibility.
 matrix:
   include:
     - os: linux
@@ -38,18 +28,20 @@ script:
   - ./ci/cmake-build-release.sh
   - ./ci/run-gabac-roundtrips.sh
   - ./ci/run-genie-roundtrips.sh
-  - if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${TRAVIS_COMPILER}" == "gcc" ]]; then ./ci/cmake-build-debug-all.sh; fi
-  # - if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${TRAVIS_COMPILER}" == "gcc" ]]; then ./ci/run-tests.sh; fi
-  # - if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${TRAVIS_COMPILER}" == "gcc" ]] && [[ "${TRAVIS_BRANCH}" == "master" ]]; then ./ci/report-code-coverage.sh; fi
-  # - if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${TRAVIS_COMPILER}" == "gcc" ]] && [[ "${TRAVIS_BRANCH}" == "master" ]]; then ./ci/prepare-deploy.sh; fi
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${TRAVIS_BRANCH}" == "master" ]]; then
+        ./ci/generate-coverage-report.sh
+        ./ci/generate-documentation.sh
+        ./ci/prepare-deploy.sh
+    fi
 
-# deploy:
-#   provider: pages
-#   skip_cleanup: true
-#   github_token: ${GITHUB_TOKEN}
-#   keep_history: true
-#   local_dir: pages
-#   target_branch: gh-pages
-#   on:
-#     branch: master
-#     condition: "${TRAVIS_OS_NAME} = linux"
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: ${GITHUB_TOKEN}
+  keep_history: true
+  local_dir: page
+  target_branch: gh-pages
+  on:
+    branch: master
+    condition: "${TRAVIS_OS_NAME} = linux"
