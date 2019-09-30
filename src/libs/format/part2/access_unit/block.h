@@ -34,13 +34,11 @@ class Block {
     std::vector<uint8_t> payload;  // TODO: adjust gabac stream size
 
    public:
-    virtual void write(util::BitWriter *writer);
-
-    uint32_t getTotalSize();
-
-    Block(uint8_t _descriptor_ID, std::vector<uint8_t> *_payload);
-
     Block();
+    Block(uint8_t _descriptor_ID, std::vector<uint8_t> *_payload);
+    virtual ~Block() = default;
+    virtual void write(util::BitWriter *writer);
+    uint32_t getTotalSize();
 };
 }  // namespace format
 
