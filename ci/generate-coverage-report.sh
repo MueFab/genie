@@ -52,16 +52,15 @@ lcov \
 # Output coverage data on the console (optional)
 lcov --list "${coverage_info}"
 
-# Upload coverage report to codevio.io (if run on Travis) or generate local
-# HTML report
+# Generate HTML report
+readonly coverage_dir="${build_dir}/coverage/html"
+genhtml "${coverage_info}" --output-directory "${coverage_dir}"
+echo "[${self_name}] coverage report: ${coverage_dir}/index.html";
+
+# Upload coverage report to codevio.io (if run on Travis)
 set +u # In the following lines do *not* treat unset variables as an error
 # shellcheck disable=SC2236
 if [[ ! -z "${CI}" ]]; then
     bash <(curl -s https://codecov.io/bash) -f "${coverage_info}" -t "${CODECOV_TOKEN}"
-else
-    readonly coverage_dir="${build_dir}/coverage/html"
-    genhtml "${coverage_info}" --output-directory "${coverage_dir}"
-    echo "[${self_name}] coverage report: ${coverage_dir}/index.html";
-
 fi
 set -u # Treat unset variables as error again
