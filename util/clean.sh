@@ -25,4 +25,4 @@ readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
 # Remove all build directories
 cd "${git_root_dir}"
-rm --recursive cmake-build-* 2>/dev/null || echo "[${self_name}] nothing to clean"
+rm --recursive --force cmake-build-*
