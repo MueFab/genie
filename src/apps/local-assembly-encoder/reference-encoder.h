@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <util/sam-record.h>
 
 namespace lae {
 
@@ -12,26 +13,28 @@ namespace lae {
 
         std::vector <std::string> sequences;
         std::vector <uint64_t> offsets;
-        uint32_t lastOffsetVoted;
         uint32_t crBufSize;
-        uint32_t offsetSum;
+        uint32_t windowLength;
+        uint32_t lastReadPos;
 
+        uint32_t lastSamPos;
 
-        // Descriptors
-        std::string ref;
-
-        void generateRefToOffset(uint32_t off);
+        std::string generateRef(uint32_t offset, uint32_t len);
 
         char majorityVote(uint32_t offset_to_first);
 
         std::string preprocess(const std::string &read, const std::string &cigar);
 
+        uint32_t lengthFromCigar(const std::string& cigar);
+
     public:
         explicit LocalAssemblyReferenceEncoder(uint32_t _cr_buf_max_size);
 
-        void addRead(const std::string &read_raw, const std::string &cigar, uint32_t pos_offset);
+        void addRead(const util::SamRecord& rec);
 
-        void finish(std::string *str);
+        std::string getReference(uint32_t pos_offset, const std::string &cigar);
+
+        std::string getReference(uint32_t pos_offset, uint32_t len);
 
         void printWindow();
     };

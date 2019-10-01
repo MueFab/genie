@@ -11,56 +11,59 @@
 
 namespace lae {
 
-    void test() {
-        LocalAssemblyReferenceEncoder le(26 * 3);
-        le.addRead("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "26M", 0);
-        le.printWindow();
-        std::cout << "ref: " << le.ref << std::endl;
-        std::cout << std::endl;
-        le.addRead("BCDEFGHIJKLMNOPQRSTUVWXYZ", "25M", 30);
-        le.printWindow();
-        std::cout << "ref: " << le.ref << std::endl;
-        std::cout << std::endl;
-        le.addRead("CDEFGHIJKLMNOPQRSTUVWXYZ", "24M", 1);
-        le.printWindow();
-        std::cout << "ref: " << le.ref << std::endl;
-        std::cout << std::endl;
-        le.addRead("DEFGHIJKLMNOPQRSTUVWXYZ", "23M", 1);
-        le.printWindow();
-        std::cout << "ref: " << le.ref << std::endl;
-        std::cout << std::endl;
-
-        std::string ref;
-        le.finish(&ref);
-
+    void add(const util::SamRecord& rec,  LocalAssemblyReferenceEncoder* le, LocalAssemblyReadEncoder* lre) {
+        std::string ref = le->getReference(rec.pos, rec.cigar);
+        le->addRead(rec);
+        lre->addRead(rec, ref);
+        le->printWindow();
         std::cout << "ref: " << ref << std::endl;
+        std::cout << std::endl;
+    }
 
-        LocalAssemblyReadEncoder lre(&ref);
-        lre.addRead("AB123ZGHIJKLMNOPQRSTUVWXYZ", "2M3D3I21M", 0);
-        lre.addRead("BCDEFGHIJKLMNOPQRSTUVWXYZ", "25M", 30);
-        lre.addRead("EFGHIJKLMNOPQRSTUVWZZZ", "22M", 3);
-        lre.addRead("DEFGHIJKLMNOPQRSTUVWXYZ", "23M", 1);
+    void decode(LocalAssemblyReferenceEncoder* le, LocalAssemblyReadDecoder* lrd, util::SamRecord *s) {
+        static uint32_t abs_pos = 0;
+        abs_pos += lrd->offsetOfNextRead();
+        std::string ref = le->getReference(abs_pos, lrd->lengthOfNextRead());
+        lrd->decodeRead(ref, s);
+        le->addRead(*s);
+        std::cout << "R: " << s->seq << std::endl;
+        std::cout << "C: " << s->cigar << std::endl;
+        std::cout << "P: " << s->pos << std::endl << std::endl;
+    }
 
-        LocalAssemblyReadDecoder lrd(&ref, lre.pollStreams());
+    void test() {
 
-        std::string r, q;
-        uint64_t p;
-        lrd.decodeRead(&r, &q, &p);
-        std::cout << "R: " << r << std::endl;
-        std::cout << "C: " << q << std::endl;
-        std::cout << "P: " << p << std::endl << std::endl;
-        lrd.decodeRead(&r, &q, &p);
-        std::cout << "R: " << r << std::endl;
-        std::cout << "C: " << q << std::endl;
-        std::cout << "P: " << p << std::endl << std::endl;
-        lrd.decodeRead(&r, &q, &p);
-        std::cout << "R: " << r << std::endl;
-        std::cout << "C: " << q << std::endl;
-        std::cout << "P: " << p << std::endl << std::endl;
-        lrd.decodeRead(&r, &q, &p);
-        std::cout << "R: " << r << std::endl;
-        std::cout << "C: " << q << std::endl;
-        std::cout << "P: " << p << std::endl << std::endl;
+        LocalAssemblyReadEncoder lre;
+        LocalAssemblyReferenceEncoder le(26 * 3);
+        util::SamRecord s;
+
+        s.seq = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        s.cigar = "26M";
+        s.pos = 0;
+        add(s, &le, &lre);
+
+        s.seq = "BCDEFGHIJKLMNOPQRSTUVWXYZ";
+        s.cigar = "25M";
+        s.pos = 30;
+        add(s, &le, &lre);
+
+        s.seq = "CDEFGHIJKLMNOPQRSTUV123WXYZA6";
+        s.cigar = "20M10D3I3D5M5D1M";
+        s.pos = 31;
+        add(s, &le, &lre);
+
+        s.seq = "DEFGHIJKLMNOPQ8STUVWXYZAB";
+        s.cigar = "25M";
+        s.pos = 32;
+        add(s, &le, &lre);
+
+        LocalAssemblyReadDecoder lrd(lre.pollStreams());
+        le = LocalAssemblyReferenceEncoder(26 * 3);
+
+        decode(&le, &lrd, &s);
+        decode(&le, &lrd, &s);
+        decode(&le, &lrd, &s);
+        decode(&le, &lrd, &s);
     }
 
     void encode(const ProgramOptions &programOptions) {
@@ -113,6 +116,13 @@ namespace lae {
                 if (samRecordsCopy.empty()) {
                     break;
                 }
+            }
+
+            LocalAssemblyReadEncoder lre;
+            LocalAssemblyReferenceEncoder le(1000);
+
+            for (const auto &samRecord : samRecords) {
+                add(samRecord, &le, &lre);
             }
 
             // Break if less than blockSize records were read from the SAM file

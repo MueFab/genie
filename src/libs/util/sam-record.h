@@ -10,6 +10,7 @@ namespace util {
 struct SamRecord {
    public:
     SamRecord(const std::vector<std::string> &fields);
+    SamRecord();
     ~SamRecord();
     std::string str() const;
 
