@@ -8,9 +8,26 @@ project("genie")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+
+#==============================================================================
+# Build type
+#==============================================================================
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
     message(STATUS "Using fall-back build type: ${CMAKE_BUILD_TYPE}")
+endif()
+
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    #
+elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+    #
+elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+    message(WARNING "Build type not supported: ${CMAKE_BUILD_TYPE}")
+elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
+    message(WARNING "Build type not supported: ${CMAKE_BUILD_TYPE}")
+else()
+    message(WARNING "Build type not supported: ${CMAKE_BUILD_TYPE}")
 endif()
 
 
