@@ -15,7 +15,7 @@ Clone the repository:
 
     git clone https://github.com/mitogen/genie.git
 
-Build all libraries and executables using CMake:
+Build all libraries and executables:
 
     mkdir build
     cd build
@@ -30,7 +30,7 @@ Notes:
 
 - CMake 3.1 or greater is required.
 - A compiler compliant to C++11 is required.
-- If multiple compilers are installed on your system, specific C and C++ compilers can be used by setting the CMake flags ``CMAKE_C_COMPILER`` and ``CMAKE_CXX_COMPILER``.
+- If multiple C++ compilers are installed on your system, a specific C++ compiler can be used by setting the CMake variable ``CMAKE_CXX_COMPILER``.
 
 ## Compressing and decompressing FASTQ data
 
@@ -43,6 +43,8 @@ Note the ``--generate`` flag. The configuration files will be stored in the dire
 The second step is to compress the FASTQ data:
 
     genie input_1.fastq [input_2.fastq] --config-dir /path/to/config/dir/ --output-file compressed.genie
+
+Note the absence of the ``--generate`` flag.
 
 To uncompress a ``.genie`` file, run the following command:
 
