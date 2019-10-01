@@ -13,5 +13,5 @@ cmake-build-*/
 # lcov report
 coverage.info
 
-# GitHub pages directory
-pages/
+# Webpage directory
+page/

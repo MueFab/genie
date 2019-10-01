@@ -30,6 +30,8 @@ class CabacContextParameters {
 
     CabacContextParameters();
 
+    virtual ~CabacContextParameters() = default;
+
     void addContextInitializationValue(uint8_t _context_initialization_value);
 
     virtual void write(util::BitWriter *writer) const;

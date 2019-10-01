@@ -22,6 +22,7 @@ class ExtendedAu {
     uint8_t posSize;  //!< Internal
    public:
     ExtendedAu(uint64_t _extended_AU_start_position, uint64_t _extended_AU_end_position, uint8_t _posSize);
+    virtual ~ExtendedAu() = default;
 
     virtual void write(util::BitWriter *writer);
 };
