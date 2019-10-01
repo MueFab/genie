@@ -15,6 +15,7 @@ namespace lae {
                     break;
                 case 2:
                     read->erase(pos, 1);
+                    cigar->erase(cigar->length() - 1, 1);
                     cigar->insert(pos, 1, 'D');
                     break;
             }
@@ -27,15 +28,27 @@ namespace lae {
         return ret;
     }
 
-    void LocalAssemblyReadDecoder::decodeRead(std::string *read, std::string *cigar, uint64_t *ref_offset) {
+    uint32_t LocalAssemblyReadDecoder::lengthOfNextRead() {
+        return container->rlen_0.front();
+    }
+
+    uint32_t LocalAssemblyReadDecoder::offsetOfNextRead() {
+        return container->pos_0.front();
+    }
+
+    void LocalAssemblyReadDecoder::decodeRead(const std::string& ref, util::SamRecord* s) {
+        pop(&container->rlen_0);
         posCounter += pop(&container->pos_0);
-        uint64_t pos = posCounter;
-        *ref_offset = pos;
-        uint64_t len = pop(&container->rlen_0);
-        *read = ref->substr(pos, len);
-        *cigar = std::string(read->length(), 'M');
-        decodeVariants(read, cigar);
-        *cigar = compressCigar(*cigar);
+        s->pos = posCounter;
+        s->seq = ref;
+        s->cigar = std::string(s->seq.length(), 'M');
+        decodeVariants(&s->seq, &s->cigar);
+        s->cigar = compressCigar(s->cigar);
+        for(auto &c : s->seq) {
+            if(c == 0){
+                c = pop(&container->clips_0);
+            }
+        }
     }
 
     std::string LocalAssemblyReadDecoder::compressCigar(const std::string &cigar) {
@@ -60,10 +73,8 @@ namespace lae {
     }
 
     LocalAssemblyReadDecoder::LocalAssemblyReadDecoder(
-            const std::string *_ref,
             std::unique_ptr<StreamContainer> _container
-    ) : ref(_ref),
-        posCounter(0),
+    ) : posCounter(0),
         container(std::move(_container)) {
 
     }
