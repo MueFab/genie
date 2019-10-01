@@ -2,7 +2,7 @@
 
 ## Workflow
 
-We use Git and we use a workflow similar to Gitflow (https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow).
+We use Git and we use a workflow similar to [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow).
 
 That means:
 
@@ -13,7 +13,7 @@ That means:
 
 ## Version numbers
 
-We use the Semantic Versioning 2.0.0 (https://semver.org).
+We use the [Semantic Versioning 2.0.0](https://semver.org).
 
 That means:
 
@@ -26,4 +26,4 @@ That means:
   - Example 1: 1.0.0-alpha.1 ("alpha version 1 of the planned major release 1")
   - Example 2: 1.0.0-beta.1 ("beta version 1 of the planned major release 1")
   - Example 3: 1.0.0-rc.1 ("release candidate (rc) 1 of the planned major release 1")
-  - Note: 1.0.0-alpha.1 < 1.0.0-beta.1 < 1.0.0-rc.1 by definition (see https://semver.org)
+  - Note: 1.0.0-alpha.1 < 1.0.0-beta.1 < 1.0.0-rc.1 by definition

@@ -28,8 +28,8 @@ Applications and libraries each have their own namespace, e.g. ``calq::``, ``gab
 
 ### Coding style
 
-C++ code is formatted with clang-format (https://clang.llvm.org/docs/ClangFormat.html). See also the ``.clang-format`` file.
+C++ code is formatted with [clang-format](https://clang.llvm.org/docs/ClangFormat.html). See also the ``.clang-format`` file.
 
 ## Python
 
-Python code is formatted with **autopep8** (https://pypi.org/project/autopep8/0.8/).
+Python code is formatted with [autopep8](https://pypi.org/project/autopep8/0.8/).
