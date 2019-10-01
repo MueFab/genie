@@ -23,6 +23,7 @@ class MmCfg {
    public:
     MmCfg(uint16_t _mm_threshold, uint32_t _mm_count);
     MmCfg();
+    virtual ~MmCfg() = default;
 
     virtual void write(util::BitWriter *writer) const;
 };

@@ -21,14 +21,12 @@ class RawReferenceSequence {
     std::unique_ptr<std::string> ref_sequence;  //!< Line 7
 
    public:
-    bool isIdUnique(const RawReferenceSequence *s) const;
-
     RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_start, std::unique_ptr<std::string> _ref_sequence);
+    virtual ~RawReferenceSequence() = default;
 
+    bool isIdUnique(const RawReferenceSequence *s) const;
     virtual std::unique_ptr<RawReferenceSequence> clone() const;
-
     void write(util::BitWriter *writer) const;
-
     uint64_t getTotalSize() const;
 };
 }  // namespace format

@@ -28,6 +28,8 @@ class TransformSubseqCfg {
                        std::unique_ptr<SupportValues> _support_values,
                        std::unique_ptr<CabacBinarization> _cabac_binarization);
 
+    virtual ~TransformSubseqCfg() = default;
+
     virtual void write(util::BitWriter *writer) const;
 
     std::unique_ptr<TransformSubseqCfg> clone() const;
