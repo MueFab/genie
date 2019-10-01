@@ -11,11 +11,11 @@ readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
 readonly coverage_dir="${git_root_dir}/cmake-build-coverage/coverage"
 readonly documentation_dir="${git_root_dir}/cmake-build-documentation/documentation"
-readonly page_dir="${git_root_dir}/page"
+readonly page_input_dir="${git_root_dir}/data/misc/page"
+readonly page_output_dir="${git_root_dir}/page-output"
 
-mkdir -p "${page_dir}"
-cp --recursive "${coverage_dir}" "${page_dir}"
-cp --recursive "${documentation_dir}" "${page_dir}"
-cp "${git_root_dir}/data/misc/index.html" "${page_dir}"
+cp --recursive "${page_input_dir}" "${page_output_dir}"
+cp --recursive "${coverage_dir}" "${page_output_dir}"
+cp --recursive "${documentation_dir}" "${page_output_dir}"
 
-echo "[${self_name}] page: ${page_dir}/index.html";
+echo "[${self_name}] page output: ${page_output_dir}/index.html";

@@ -13,5 +13,5 @@ cmake-build-*/
 # lcov report
 coverage.info
 
-# Webpage directory
-page/
+# Webpage output directory
+page-output/
