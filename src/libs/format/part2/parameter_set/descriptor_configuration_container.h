@@ -21,6 +21,7 @@ namespace format {
 class DescriptorConfigurationContainer {
    public:
     DescriptorConfigurationContainer();
+    virtual ~DescriptorConfigurationContainer() = default;
 
     void setConfig(uint8_t index, std::unique_ptr<DescriptorConfiguration> conf);  //!< For class specific config
     void setConfig(std::unique_ptr<DescriptorConfiguration> conf);                 //!< For non-class-specific config

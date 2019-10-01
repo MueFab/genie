@@ -33,6 +33,8 @@ class RawReference : public DataUnit {
    public:
     RawReference();
 
+    virtual ~RawReference() = default;
+
     void addSequence(std::unique_ptr<RawReferenceSequence> ref);
 
     std::unique_ptr<RawReference> clone() const;

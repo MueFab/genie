@@ -33,6 +33,8 @@ class SupportValues {
 
     SupportValues();
 
+    virtual ~SupportValues() = default;
+
     std::unique_ptr<SupportValues> clone() const;
 
     virtual void write(util::BitWriter *writer) const;

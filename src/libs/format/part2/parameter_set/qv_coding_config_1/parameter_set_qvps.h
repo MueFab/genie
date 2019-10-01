@@ -21,14 +21,14 @@ namespace qv_coding1 {
  */
 class ParameterSetQvps {
    private:
-    uint8_t qv_num_codebooks_total : 4;    //!< Line 2
+    // uint8_t qv_num_codebooks_total : 4;    //!< Line 2
     std::vector<QvCodebook> qv_codebooks;  //!< Lines 3 to 8
 
    public:
     ParameterSetQvps();
+    virtual ~ParameterSetQvps() = default;
 
     void addCodeBook(const QvCodebook &book);
-
     virtual void write(util::BitWriter *writer) const;
 };
 }  // namespace qv_coding1

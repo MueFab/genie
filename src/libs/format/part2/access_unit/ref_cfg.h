@@ -25,6 +25,7 @@ class RefCfg {
    public:
     RefCfg(uint16_t _ref_sequence_ID, uint64_t _ref_start_position, uint64_t _ref_end_position, uint8_t _posSize);
     RefCfg(uint8_t _posSize);
+    virtual ~RefCfg() = default;
 
     virtual void write(util::BitWriter *writer);
 };

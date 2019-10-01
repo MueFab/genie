@@ -59,7 +59,6 @@ TEST(SamFileReader, BlankLine) {  //NOLINT(cert-err-cpp)
 
 }
 
-
 TEST(SamFileReader, Truncated) {  //NOLINT(cert-err-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 

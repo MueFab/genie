@@ -34,6 +34,8 @@ class TransformSubseqParameters {
 
     TransformSubseqParameters(const TransformIdSubseq &_transform_ID_subseq, uint16_t param);
 
+    virtual ~TransformSubseqParameters() = default;
+
     std::unique_ptr<TransformSubseqParameters> clone() const;
 
     size_t getNumStreams() const;
