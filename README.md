@@ -7,6 +7,7 @@ Open source MPEG-G codec
 [![page](https://img.shields.io/badge/page-online-blue)](https://mitogen.github.io/genie)
 
 **First off, we refer the reader to our [usage policy](USAGE_POLICY.md).**
+
 ---
 
 ## Quick start
@@ -30,7 +31,7 @@ Notes:
 
 - CMake 3.1 or greater is required.
 - A compiler compliant to C++11 is required.
-- If multiple C++ compilers are installed on your system, a specific C++ compiler can be used by setting the CMake variable ``CMAKE_CXX_COMPILER``.
+- A specific C++ compiler can be used by setting the CMake variable ``CMAKE_CXX_COMPILER``.
 
 ## Compressing and decompressing FASTQ data
 
