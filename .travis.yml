@@ -40,7 +40,7 @@ deploy:
   skip_cleanup: true
   github_token: ${GITHUB_TOKEN}
   keep_history: true
-  local_dir: page
+  local_dir: page-output
   target_branch: gh-pages
   on:
     branch: master
