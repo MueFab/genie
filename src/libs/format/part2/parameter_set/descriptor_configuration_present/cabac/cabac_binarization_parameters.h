@@ -45,6 +45,8 @@ class CabacBinarizationParameters {
 
     CabacBinarizationParameters(const BinarizationId &_binarization_id, uint8_t param);
 
+    virtual ~CabacBinarizationParameters() = default;
+
     std::unique_ptr<CabacBinarizationParameters> clone() const;
 };
 }  // namespace cabac

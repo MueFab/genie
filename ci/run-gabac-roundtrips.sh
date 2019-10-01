@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-set -euxo pipefail
+if [[ ! -z "${CI}" ]]; then set -x; fi
+set -euo pipefail
 
 self="${0}"
 self_name="${self##*/}"
@@ -8,8 +9,7 @@ self_name="${self##*/}"
 git rev-parse --git-dir 1>/dev/null # Exit if not inside Git repo
 readonly git_root_dir="$(git rev-parse --show-toplevel)"
 
-readonly build_dir="${git_root_dir}/cmake-build-release"
-readonly gabac_app="${build_dir}/bin/gabac-app"
+readonly gabac_app="${git_root_dir}/cmake-build-release/bin/gabac-app"
 if [[ ! -x "${gabac_app}" ]]; then
     echo "[${self_name}] error: gabac-app application does not exist: ${gabac_app}"
     exit 1
@@ -20,7 +20,7 @@ if [[ -d "${tmp_dir}" ]]; then
     echo "[${self_name}] error: tmp directory exists already: ${tmp_dir}"
     exit 1
 fi
-mkdir -p "${tmp_dir}"
+mkdir "${tmp_dir}"
 
 input_files=()
 configuration_files=()

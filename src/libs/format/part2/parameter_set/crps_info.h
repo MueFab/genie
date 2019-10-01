@@ -21,6 +21,7 @@ class CrpsInfo {
    public:
     CrpsInfo(uint8_t cr_pad_size, uint32_t cr_buf_max_size);
     CrpsInfo();
+    virtual ~CrpsInfo() = default;
 
     virtual void write(util::BitWriter *writer) const;
 };

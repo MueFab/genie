@@ -27,6 +27,8 @@ class CabacBinarization {
 
     CabacBinarization();
 
+    virtual ~CabacBinarization() = default;
+
     void setContextParameters(std::unique_ptr<CabacContextParameters> _cabac_context_parameters);
 
     virtual void write(util::BitWriter *writer) const;
