@@ -4,11 +4,10 @@
 
 namespace lae {
 
-    LocalAssemblyReferenceEncoder::LocalAssemblyReferenceEncoder(uint32_t _cr_buf_max_size) : cr_buf_max_size(
-            _cr_buf_max_size),
-                                                                                              lastOffsetVoted(0),
+    LocalAssemblyReferenceEncoder::LocalAssemblyReferenceEncoder(uint32_t _cr_buf_max_size) : cr_buf_max_size(_cr_buf_max_size),
                                                                                               crBufSize(0),
-                                                                                              offsetSum(0) {
+                                                                                              windowLength(0),
+                                                                                              lastReadPos(0){
 
     }
 
@@ -60,30 +59,32 @@ namespace lae {
         return result;
     }
 
-    void
-    LocalAssemblyReferenceEncoder::addRead(const std::string &read_raw, const std::string &cigar, uint32_t pos_offset) {
-        std::string read = preprocess(read_raw, cigar);
-        if (sequences.empty()) {
-            sequences.push_back(read);
-            crBufSize = read.length();
+    void LocalAssemblyReferenceEncoder::addRead(const util::SamRecord& s) {
+        uint32_t pos_offset = s.pos - lastSamPos;
+        lastSamPos = s.pos;
 
-            return;
+        std::string read = preprocess(s.seq, s.cigar);
+
+        if(!sequences.empty()) {
+            offsets.push_back(pos_offset);
+            lastReadPos += pos_offset;
         }
 
-        generateRefToOffset(offsetSum + pos_offset);
+        if(lastReadPos + read.length() > windowLength) {
+            windowLength = lastReadPos + read.length();
+        }
 
         sequences.push_back(read);
         crBufSize += read.length();
-        offsetSum += pos_offset;
-        offsets.push_back(pos_offset);
+
 
         while (crBufSize > cr_buf_max_size) {
             if (sequences.size() == 1) {
                 GENIE_THROW_RUNTIME_EXCEPTION("Read too long for current cr_buf_max_size");
             }
-            // Update to new reference position of first read
-            offsetSum -= offsets.front();
-            lastOffsetVoted -= offsets.front();
+
+            lastReadPos -= offsets.front();
+            windowLength -= offsets.front();
 
             // Erase oldest read
             crBufSize -= sequences.front().length();
@@ -92,11 +93,61 @@ namespace lae {
         }
     }
 
-    void LocalAssemblyReferenceEncoder::generateRefToOffset(uint32_t off) {
-        while (lastOffsetVoted < off) {
-            ref += majorityVote(lastOffsetVoted);
-            lastOffsetVoted++;
+    std::string LocalAssemblyReferenceEncoder::generateRef(uint32_t offset, uint32_t len) {
+        std::string ref;
+        for(size_t i = offset; i < offset + len; ++i) {
+            ref += majorityVote(i);
         }
+        return ref;
+    }
+
+    uint32_t LocalAssemblyReferenceEncoder::lengthFromCigar(const std::string& cigar) {
+        uint32_t len = 0;
+        uint32_t count = 0;
+        for (size_t cigar_pos = 0; cigar_pos < cigar.length(); ++cigar_pos) {
+            if (cigar[cigar_pos] >= '0' && cigar[cigar_pos] <= '9') {
+                count *= 10;
+                count += cigar[cigar_pos] - '0';
+                continue;
+            }
+            switch (cigar[cigar_pos]) {
+                case 'M':
+                case '=':
+                case 'X':
+                case 'D':
+                case 'N':
+                    len += count;
+                    count = 0;
+                    break;
+
+                case 'I':
+                case 'S':
+                case 'P':
+                case 'H':
+                    count = 0;
+                    break;
+                default:
+                    GENIE_THROW_RUNTIME_EXCEPTION("Unknown CIGAR character");
+            }
+            count = 0;
+        }
+        return len;
+    }
+
+    std::string LocalAssemblyReferenceEncoder::getReference(uint32_t abs_pos, const std::string &cigar) {
+        uint32_t pos = lastReadPos;
+        if(!sequences.empty()) {
+            pos += abs_pos - lastSamPos;
+        }
+        return generateRef(pos, lengthFromCigar(cigar));
+    }
+
+    std::string LocalAssemblyReferenceEncoder::getReference(uint32_t abs_pos, uint32_t len) {
+        uint32_t pos = lastReadPos;
+        if(!sequences.empty()) {
+            pos += abs_pos - lastSamPos;
+        }
+        return generateRef(pos, len);
     }
 
     char LocalAssemblyReferenceEncoder::majorityVote(uint32_t offset_to_first) {
@@ -120,7 +171,7 @@ namespace lae {
         }
 
         // Find max
-        char max = 'N';
+        char max = '\0';
         uint16_t max_value = 0;
         for (auto &v : votes) {
             if (max_value < v.second) {
@@ -132,19 +183,6 @@ namespace lae {
         }
 
         return max;
-    }
-
-    void LocalAssemblyReferenceEncoder::finish(std::string *str) {
-        uint32_t totalOffset = 0;
-        for (const auto &a : offsets) {
-            totalOffset += a;
-        }
-        totalOffset += sequences.back().length();
-        generateRefToOffset(totalOffset);
-        offsets.clear();
-        sequences.clear();
-        str->clear();
-        str->swap(ref);
     }
 
     void LocalAssemblyReferenceEncoder::printWindow() {
