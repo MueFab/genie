@@ -6,10 +6,10 @@
 
 #include "stream-container.h"
 #include <memory>
+#include <util/sam-record.h>
 
 namespace lae {
     class LocalAssemblyReadDecoder {
-        const std::string *ref;
         uint64_t posCounter;
 
         uint64_t pop(std::vector<uint64_t> *vec);
@@ -21,9 +21,13 @@ namespace lae {
         std::unique_ptr<StreamContainer> container;
     public:
 
-        explicit LocalAssemblyReadDecoder(const std::string *_ref, std::unique_ptr<StreamContainer> _container);
+        explicit LocalAssemblyReadDecoder(std::unique_ptr<StreamContainer> _container);
 
-        void decodeRead(std::string *read, std::string *cigar, uint64_t *ref_offset);
+        void decodeRead(const std::string& ref, util::SamRecord* s);
+
+        uint32_t lengthOfNextRead();
+
+        uint32_t offsetOfNextRead();
     };
 }
 

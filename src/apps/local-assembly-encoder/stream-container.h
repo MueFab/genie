@@ -6,6 +6,7 @@
 
 struct StreamContainer {
     std::vector<uint64_t> pos_0;
+    std::vector<uint64_t> rcomp_0;
     std::vector<uint64_t> mmpos_0;
     std::vector<uint64_t> mmpos_1;
     std::vector<uint64_t> mmtype_0;
