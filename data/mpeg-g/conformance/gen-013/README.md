@@ -1,6 +1,6 @@
 # Generation of the input SAM/BAM file
 
-Apply the following steps to the file ``wgs/h-sapiens/NA12878/NA12878.pacbio.bwa-sw.20140202.bam`` from the Sequencing Data Collection:
+Apply the following steps to the file ``wgs/h-sapiens/NA12878/NA12878.pacbio.bwa-sw.20140202.bam`` from the sequencing data collection:
 
 1. Select only those reads mapping to ``1:10000-11000``
 2. Select only primary alignments with ``samtools -F 256``
