@@ -22,9 +22,9 @@ static void loggerInitialization();
 
 static int dsg_main(int argc, char* argv[]) {
 #ifdef GENIE_USE_OPENMP
-    std::cout << "Compiled with -DGENIE_USE_OPENMP" << std::endl;
+    std::cout << "genie: built with OpenMP" << std::endl;
 #else
-    std::cout << "*Not* using OpenMP" << std::endl;
+    std::cout << "genie: *not* built with OpenMP" << std::endl;
 #endif
 
     try {

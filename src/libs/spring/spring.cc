@@ -27,6 +27,12 @@ namespace spring {
 generated_aus generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
                                       int num_thr, bool paired_end, const std::string &working_dir, bool analyze,
                                       dsg::StreamSaver &st, bool ureads_flag, bool preserve_quality, bool preserve_id) {
+#ifdef GENIE_USE_OPENMP
+    std::cout << "SPRING: built with OpenMP" << std::endl;
+#else
+    std::cout << "SPRING: *not* built with OpenMP" << std::endl;
+#endif
+
     // generate random temp directory in the working directory
     std::string temp_dir;
     while (true) {
