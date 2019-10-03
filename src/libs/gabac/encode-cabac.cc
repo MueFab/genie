@@ -24,9 +24,12 @@ void encode_cabac(const BinarizationId& binarizationId, const std::vector<unsign
 #endif
     assert(binarizationParameters.size() >= paramSize[static_cast<int>(binarizationId)]);
 
+    size_t numSymbols = symbols->size();
+    if(numSymbols <= 0) return;
+
     OBufferStream bitstream(&block);
     Writer writer(&bitstream);
-    writer.start(symbols->size());
+    writer.start(numSymbols);
 
     unsigned int binarizationParameter = 0;
     if (!binarizationParameters.empty()) {
