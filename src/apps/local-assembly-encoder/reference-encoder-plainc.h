@@ -156,19 +156,19 @@ int local_assembly_state_remove_oldest_read(LOCAL_ASSEMBLY_STATE *state) {
 
 int local_assembly_state_min_size(LOCAL_ASSEMBLY_STATE *state, uint32_t minimalSize) {
     if (state->num_sequences_capacity >= minimalSize) {
-        return -1;
+        return 0;
     }
     state->num_sequences_capacity *= 2;
     state->sequences = (char** )realloc(state->sequences, state->num_sequences_capacity * sizeof(char*));
-    if(state->sequences){
+    if(!state->sequences){
         return -1;
     }
     state->sequence_positions = (uint32_t*) realloc(state->sequence_positions, state->num_sequences_capacity * sizeof(uint32_t));
-    if(state->sequence_positions){
+    if(!state->sequence_positions){
         return -1;
     }
     state->sequence_lengths = (uint32_t*) realloc(state->sequence_lengths, state->num_sequences_capacity * sizeof(uint32_t));
-    if(state->sequence_lengths){
+    if(!state->sequence_lengths){
         return -1;
     }
     return 0;
@@ -197,11 +197,13 @@ int local_assembly_state_add_read(LOCAL_ASSEMBLY_STATE *state, const char *seq, 
     state->sequences[state->num_sequences] = processed_read;
     state->num_sequences++;
     state->crBufSize += processed_size;
+    return 0;
 }
 
 int local_assembly_state_vote(LOCAL_ASSEMBLY_STATE *state, uint32_t abs_position, char* max) {
 
     uint32_t votes[256];
+    memset(&votes, 0, sizeof(uint32_t) * 256);
 
     // Collect all alignments
     for (size_t i = 0; i < state->num_sequences; ++i) {
@@ -228,7 +230,7 @@ int local_assembly_state_vote(LOCAL_ASSEMBLY_STATE *state, uint32_t abs_position
 }
 
 int local_assembly_state_get_ref(LOCAL_ASSEMBLY_STATE *state, uint32_t startpos, uint32_t len, char** out) {
-    *out = (char*) calloc(len + 1, sizeof(char));
+    *out = (char*) calloc(len, sizeof(char));
     if(!*out) {
         return -1;
     }
@@ -238,7 +240,6 @@ int local_assembly_state_get_ref(LOCAL_ASSEMBLY_STATE *state, uint32_t startpos,
             return -1;
         }
     }
-    (*out)[outpos] = '\0';
     return 0;
 }
 
@@ -252,7 +253,9 @@ int local_assembly_state_get_window_border(LOCAL_ASSEMBLY_STATE *state, uint32_t
 
 int local_assembly_state_print_window(LOCAL_ASSEMBLY_STATE *state) {
     uint32_t minPos;
-    local_assembly_state_get_window_border(state, &minPos);
+    if(local_assembly_state_get_window_border(state, &minPos)) {
+        return -1;
+    }
 
     for (uint32_t i = 0; i < state->num_sequences; ++i) {
         uint64_t totalOffset = state->sequence_positions[i] - minPos;
@@ -261,6 +264,7 @@ int local_assembly_state_print_window(LOCAL_ASSEMBLY_STATE *state) {
         }
         printf("%.*s\n", state->sequence_lengths[i], state->sequences[i]);
     }
+    return 0;
 }
 
 #endif //GENIE_REFERENCE_ENCODER_PLAINC_H
