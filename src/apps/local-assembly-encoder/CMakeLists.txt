@@ -5,7 +5,12 @@ set(source_files
         exceptions.cc
         main.cc
         program-options.cc
-        reference-encoder.h reference-encoder.cc read-encoder.h read-encoder.cc read-decoder.h stream-container.h read-decoder.cc reference-encoder-plainc.h)
+        reference-encoder.cc
+        read-encoder.cc
+        read-decoder.cc
+        reference-encoder-plainc.c
+        full-local-assembly-encoder.cc
+        full-local-assembly-decoder.cc)
 
 add_executable(local-assembly-encoder ${source_files})
 
