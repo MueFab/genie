@@ -1,5 +1,5 @@
-#ifndef GENIE_FULL_LOCAL_ASSEMBLY_DECODER_H
-#define GENIE_FULL_LOCAL_ASSEMBLY_DECODER_H
+#ifndef GENIE_FULL_LOCAL_ASSEMBLY_ENCODER_H
+#define GENIE_FULL_LOCAL_ASSEMBLY_ENCODER_H
 
 #include "reference-encoder.h"
 #include "read-encoder.h"
@@ -20,5 +20,5 @@ namespace lae {
     };
 }
 
-#endif //GENIE_FULL_LOCAL_ASSEMBLY_DECODER_H
+#endif //GENIE_FULL_LOCAL_ASSEMBLY_ENCODER_H
 
