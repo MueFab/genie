@@ -16,11 +16,13 @@ size_t StreamHandler::readStream(std::istream &input, DataBlock *buffer) {
 }
 
 size_t StreamHandler::readBytes(std::istream &input, size_t bytes, DataBlock *buffer) {
-    if (bytes % buffer->getWordSize()) {
-        GABAC_DIE("Input stream length not a multiple of word size");
+    if(bytes > 0) {
+        if (bytes % buffer->getWordSize()) {
+            GABAC_DIE("Input stream length not a multiple of word size");
+        }
+        buffer->resize(bytes / buffer->getWordSize());
+        input.read(static_cast<char *>(buffer->getData()), bytes);
     }
-    buffer->resize(bytes / buffer->getWordSize());
-    input.read(static_cast<char *>(buffer->getData()), bytes);
     return bytes;
 }
 
@@ -75,8 +77,10 @@ size_t StreamHandler::writeStream(std::ostream &output, DataBlock *buffer) {
 
 size_t StreamHandler::writeBytes(std::ostream &output, DataBlock *buffer) {
     size_t ret = buffer->getRawSize();
-    output.write(static_cast<char *>(buffer->getData()), ret);
-    buffer->clear();
+    if(ret > 0) {
+        output.write(static_cast<char *>(buffer->getData()), ret);
+        buffer->clear();
+    }
     return ret;
 }
 

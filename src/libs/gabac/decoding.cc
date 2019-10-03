@@ -21,7 +21,9 @@ namespace gabac {
 
 static void decodeInverseLUT(unsigned bits0, unsigned order, std::istream *inStream, gabac::DataBlock *const inverseLut,
                              gabac::DataBlock *const inverseLut1) {
-    StreamHandler::readStream(*inStream, inverseLut);
+    size_t streamSize = StreamHandler::readStream(*inStream, inverseLut);
+    if(streamSize <= 0) return;
+
 
     size_t lutWordSize = 0;
     if (bits0 <= 8) {
@@ -38,7 +40,9 @@ static void decodeInverseLUT(unsigned bits0, unsigned order, std::istream *inStr
                         static_cast<uint8_t>(lutWordSize), inverseLut);
 
     if (order > 0) {
-        StreamHandler::readStream(*inStream, inverseLut1);
+        streamSize = StreamHandler::readStream(*inStream, inverseLut1);
+        if(streamSize <= 0) return;
+
         auto bits1 = unsigned(inverseLut->size());
 
         bits1 = unsigned(std::ceil(std::log2(bits1)));
@@ -89,7 +93,8 @@ static void doLUTCoding(bool enabled, unsigned order, std::vector<gabac::DataBlo
 static void doEntropyCoding(const gabac::TransformedSequenceConfiguration &transformedSequenceConfiguration,
                             uint8_t wordsize, std::istream *inStream,
                             gabac::DataBlock *const diffAndLutTransformedSequence) {
-    StreamHandler::readStream(*inStream, diffAndLutTransformedSequence);
+    size_t streamSize = StreamHandler::readStream(*inStream, diffAndLutTransformedSequence);
+    if(streamSize <= 0) return;
     // GABACIFY_LOG_TRACE << "Bitstream size: " <<
     // diffAndLutTransformedSequence->size();
 
