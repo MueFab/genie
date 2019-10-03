@@ -11,9 +11,12 @@
 namespace gabac {
 
 BinaryArithmeticEncoder::BinaryArithmeticEncoder(const util::BitWriter& bitOutputStream)
-    : m_bitOutputStream(bitOutputStream) {
-    start();
-}
+    : m_bitOutputStream(bitOutputStream),
+      m_bufferedByte(0),
+      m_low(0),
+      m_numBitsLeft(0),
+      m_numBufferedBytes(0),
+      m_range(0) {}
 
 BinaryArithmeticEncoder::~BinaryArithmeticEncoder() = default;
 
