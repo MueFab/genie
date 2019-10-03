@@ -1,11 +1,11 @@
 # Generation of the input SAM/BAM file
 
-Apply the following steps to the file ``wgs/h-sapiens/NA12878/NA12878.pacbio.bwa-sw.20140202.bam`` from the Sequencing Data Collection:
+Apply the following steps to the file ``wgs/e-coli/DH10B/MiSeq_Ecoli_DH10B_110721_PF.bam`` from the sequencing data collection:
 
-1. Select only those reads mapping to ``1:10000-11000``
-2. Select only primary alignments with ``samtools -F 256``
-3. Sort reads by mapping position
-4. Clean up some minor things manually
+1. Select only proper pairs with ``samtools view -f 2``
+2. Select only those reads mapping to ``EcoliDH10B.fa:1-10``
+4. Sort reads by mapping position
+5. Manually introduce variable lengths
 
 The resulting data exhibits the following properties:
 
