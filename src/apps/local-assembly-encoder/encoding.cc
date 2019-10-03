@@ -8,10 +8,11 @@
 #include "read-encoder.h"
 #include "read-decoder.h"
 #include "reference-encoder.h"
-
+#include "reference-encoder-plainc.h"
 namespace lae {
 
     static uint32_t abs_pos = 0;
+    static LOCAL_ASSEMBLY_STATE* state;
 
     void add(const util::SamRecord& rec,  LocalAssemblyReferenceEncoder* le, LocalAssemblyReadEncoder* lre) {
         std::string ref = le->getReference(rec.pos, rec.cigar);
@@ -30,8 +31,8 @@ namespace lae {
 
     void addPair(const util::SamRecord& rec1, const util::SamRecord& rec2,  LocalAssemblyReferenceEncoder* le, LocalAssemblyReadEncoder* lre) {
         std::string ref1 = le->getReference(rec1.pos, rec1.cigar);
-        le->addRead(rec1);
         std::string ref2 = le->getReference(rec2.pos, rec2.cigar);
+        le->addRead(rec1);
         le->addRead(rec2);
         lre->addPair(rec1, ref1, rec2, ref2);
         le->printWindow();
@@ -51,26 +52,41 @@ namespace lae {
         std::cout << std::endl;
     }
 
-    void decode(LocalAssemblyReferenceEncoder* le, LocalAssemblyReadDecoder* lrd, util::SamRecord *s) {
+    void decode(LocalAssemblyReferenceEncoder* letmp, LocalAssemblyReadDecoder* lrd, util::SamRecord *s) {
         abs_pos += lrd->offsetOfNextRead();
-        std::string ref = le->getReference(abs_pos, lrd->lengthOfNextRead());
+
+        char* refbuf;
+        local_assembly_state_get_ref(state, abs_pos, lrd->lengthOfNextRead(), &refbuf);
+        std::string ref = std::string(refbuf, refbuf + lrd->lengthOfNextRead());
+        free(refbuf);
+
         lrd->decodeRead(ref, s);
-        le->addRead(*s);
+
+        local_assembly_state_add_read(state, s->seq.c_str(), s->cigar.c_str(), s->pos);
+
         std::cout << "R: " << s->seq << std::endl;
         std::cout << "C: " << s->cigar << std::endl;
         std::cout << "P: " << s->pos << std::endl << std::endl;
     }
 
-    void decodePair(LocalAssemblyReferenceEncoder* le, LocalAssemblyReadDecoder* lrd, util::SamRecord *s, util::SamRecord *s2) {
+    void decodePair(LocalAssemblyReferenceEncoder* letmp, LocalAssemblyReadDecoder* lrd, util::SamRecord *s, util::SamRecord *s2) {
         abs_pos += lrd->offsetOfNextRead();
-        std::string ref1 = le->getReference(abs_pos, lrd->lengthOfNextRead());
+
+        char* refbuf;
+        local_assembly_state_get_ref(state, abs_pos, lrd->lengthOfNextRead(), &refbuf);
+        std::string ref1 = std::string(refbuf, refbuf + lrd->lengthOfNextRead());
+        free(refbuf);
+
         abs_pos += lrd->offsetOfSecondNextRead();
-        std::string ref2 = le->getReference(abs_pos, lrd->lengthOfSecondNextRead());
+        local_assembly_state_get_ref(state, abs_pos, lrd->lengthOfSecondNextRead(), &refbuf);
+        std::string ref2 = std::string(refbuf, refbuf + lrd->lengthOfSecondNextRead());
+        free(refbuf);
+
         uint32_t delta;
         bool first;
         lrd->decodePair(ref1, s, ref2, s2, &delta, &first);
-        le->addRead(*s);
-        le->addRead(*s2);
+        local_assembly_state_add_read(state, s->seq.c_str(), s->cigar.c_str(), s->pos);
+        local_assembly_state_add_read(state, s2->seq.c_str(), s2->cigar.c_str(), s2->pos);
         std::cout << "Decoded pair! First1: " << first << " Delta: " << delta << std::endl;
         std::cout << "R: " << s->seq << std::endl;
         std::cout << "C: " << s->cigar << std::endl;
@@ -109,10 +125,10 @@ namespace lae {
         LocalAssemblyReadDecoder lrd(lre.pollStreams());
         le = LocalAssemblyReferenceEncoder(26 * 3);
 
-        decode(&le, &lrd, &s);
-        decode(&le, &lrd, &s);
-        decode(&le, &lrd, &s);
-        decode(&le, &lrd, &s);
+    //    decode(&le, &lrd, &s);
+    //    decode(&le, &lrd, &s);
+    //    decode(&le, &lrd, &s);
+    //    decode(&le, &lrd, &s);
     }
 
     void encode(const ProgramOptions &programOptions) {
@@ -178,6 +194,8 @@ namespace lae {
 
             util::SamRecord s;
             util::SamRecord s2;
+            local_assembly_state_create(&state);
+            local_assembly_state_init(state, 1000, 5);
             abs_pos = 0;
             if(single) {
                 for (const auto &samRecord : samRecords) {
@@ -188,6 +206,8 @@ namespace lae {
                     decodePair(&le, &lrd, &s, &s2);
                 }
             }
+
+            local_assembly_state_destroy(state);
 
             // Break if less than blockSize records were read from the SAM file
             if (samRecords.size() < blockSize) {
