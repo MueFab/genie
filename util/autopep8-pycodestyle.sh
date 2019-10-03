@@ -51,7 +51,7 @@ done
 for i in "${!files[@]}"; do
     file=${files[${i}]}
     echo "[${self_name}] running autopep8 on: ${file}"
-    # autopep8 --in-place "${file}"
+    # autopep8 --in-place --max-line-length=120 "${file}"
     echo "[${self_name}] running pycodestyle on: ${file}"
-    # pycodestyle "${file}"
+    # pycodestyle --max-line-length=120 "${file}"
 done
