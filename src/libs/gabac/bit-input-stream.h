@@ -25,6 +25,8 @@ class BitInputStream {
 
     unsigned int read(unsigned int numBits);
 
+    void skipBytes(unsigned int numytes);
+
     void reset();
 
    private:

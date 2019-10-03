@@ -84,10 +84,21 @@ L0:
     unsigned int numNextHeldBits = (32 - numBits) % 8;
     bits |= alignedWord >> numNextHeldBits;
     m_numHeldBits = numNextHeldBits;
-    assert(alignedWord <= std::numeric_limits<unsigned char>::max());
+    /* FIXME @Jan: Can you please check, why this assert is needed?
+     * I checked in ref-soft file mpegg-stream.c (in mpegg_input_bitstream_read_ubits(...)),
+     * and did not see any such assert.
+     */
+    //assert(alignedWord <= std::numeric_limits<unsigned char>::max());
     m_heldBits = static_cast<unsigned char>(alignedWord);
 
     return bits;
 }
+
+void BitInputStream::skipBytes(unsigned int numBytes) {
+    for(unsigned int i = 0; i < numBytes; i++) {
+        readIn(&m_reader);
+    }
+}
+
 
 }  // namespace gabac
