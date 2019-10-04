@@ -6,66 +6,85 @@ namespace lae {
     FullLocalAssemblyDecoder::FullLocalAssemblyDecoder(
             std::unique_ptr<StreamContainer>
             container,
-            uint32_t _cr_buf_size,
-            bool _debug) : abs_pos(0),
+            uint32_t cr_buf_max_size,
+            bool _debug) : mapping_pos(0),
                            state(nullptr),
                            lrd(std::move(container)),
                            debug(_debug) {
-        const uint32_t CAPACITY = 16;
-        local_assembly_state_create(&state);
-        local_assembly_state_init(state, _cr_buf_size, CAPACITY);
+        init(cr_buf_max_size);
     }
 
     FullLocalAssemblyDecoder::~FullLocalAssemblyDecoder() {
         local_assembly_state_destroy(state);
     }
 
-    void FullLocalAssemblyDecoder::decode(util::SamRecord *s) {
-        abs_pos += lrd.offsetOfNextRead();
+    // !!! This is the function that we need to mimic in the MPEG-G reference software. !!!
+    void FullLocalAssemblyDecoder::init(const uint32_t cr_buf_max_size) {
+        const uint32_t CAPACITY = 16; // Starting capacity for memory memory management
+        local_assembly_state_create(&state);
+        local_assembly_state_init(state, cr_buf_max_size, CAPACITY);
+    }
 
-        char *refbuf;
-        local_assembly_state_get_ref(state, abs_pos, lrd.lengthOfNextRead(), &refbuf);
-        std::string ref = std::string(refbuf, refbuf + lrd.lengthOfNextRead());
-        free(refbuf);
+    // !!! This is the function that we need to mimic in the MPEG-G reference software. !!!
+    void FullLocalAssemblyDecoder::decode(util::SamRecord *mpegg_record) {
+        // We first need to decode the (absolute) mapping position from pos and the read length from rlen
+        mapping_pos += lrd.offsetOfNextRead();
+        uint32_t read_len = lrd.lengthOfNextRead();
 
-        lrd.decodeRead(ref, s);
+        char *refBuf;
+        local_assembly_state_get_ref(state, mapping_pos, read_len, &refBuf);
 
-        local_assembly_state_add_read(state, s->seq.c_str(), s->cigar.c_str(), s->pos);
+        // Usually, when decoding the first read, refBuf returned by local_assembly_state_get_ref() is empty. Empty
+        // in our implementation means, that it contains an arbitrary number of '\0' bytes. This however does not
+        // matter because refBuf is not needed for descriptor decoding in this case.
+
+        std::string ref_sequence = std::string(refBuf, refBuf + read_len); // ref_sequence[0]
+        free(refBuf);
+
+        lrd.decodeRead(ref_sequence, mpegg_record);
+
+        // seq=sequence[0], cigar=ecigar_string[0][0], pos=mapping_pos[0]
+        local_assembly_state_add_read(state, mpegg_record->seq.c_str(), mpegg_record->cigar.c_str(), mpegg_record->pos);
 
         if (debug) {
-            std::cout << "R: " << s->seq << std::endl;
-            std::cout << "C: " << s->cigar << std::endl;
-            std::cout << "P: " << s->pos << std::endl << std::endl;
+            std::cout << "sequence[0]         : " << mpegg_record->seq << std::endl;
+            std::cout << "ecigar_string[0][0] : " << mpegg_record->cigar << std::endl;
+            std::cout << "mapping_pos[0]      : " << mpegg_record->pos << std::endl << std::endl;
         }
     }
 
-    void FullLocalAssemblyDecoder::decodePair(util::SamRecord *s,
-                                              util::SamRecord *s2) {
-        abs_pos += lrd.offsetOfNextRead();
+    // !!! This is the function that we need to mimic in the MPEG-G reference software. !!!
+    void FullLocalAssemblyDecoder::decodePair(util::SamRecord *mpegg_record_segment_1,
+                                              util::SamRecord *mpegg_record_segment_2) {
+        mapping_pos += lrd.offsetOfNextRead();
+        uint32_t read_len = lrd.lengthOfNextRead();
 
-        char *refbuf;
-        local_assembly_state_get_ref(state, abs_pos, lrd.lengthOfNextRead(), &refbuf);
-        std::string ref1 = std::string(refbuf, refbuf + lrd.lengthOfNextRead());
-        free(refbuf);
+        char *refBuf;
 
-        abs_pos += lrd.offsetOfSecondNextRead();
-        local_assembly_state_get_ref(state, abs_pos, lrd.lengthOfSecondNextRead(), &refbuf);
-        std::string ref2 = std::string(refbuf, refbuf + lrd.lengthOfSecondNextRead());
-        free(refbuf);
+        local_assembly_state_get_ref(state, mapping_pos, read_len, &refBuf);
+        std::string ref1 = std::string(refBuf, refBuf + read_len);
+        free(refBuf);
 
-        uint32_t delta;
-        bool first;
-        lrd.decodePair(ref1, s, ref2, s2, &delta, &first);
-        local_assembly_state_add_read(state, s->seq.c_str(), s->cigar.c_str(), s->pos);
-        local_assembly_state_add_read(state, s2->seq.c_str(), s2->cigar.c_str(), s2->pos);
+        mapping_pos += lrd.offsetOfSecondNextRead();
+        read_len = lrd.lengthOfSecondNextRead();
+
+        local_assembly_state_get_ref(state, mapping_pos, read_len, &refBuf);
+        std::string ref2 = std::string(refBuf, refBuf + read_len);
+        free(refBuf);
+
+        // TODO: ref1 and ref2 need to be concatenated to form ref_sequence
+        lrd.decodePair(ref1, mpegg_record_segment_1, ref2, mpegg_record_segment_2);
+
+        local_assembly_state_add_read(state, mpegg_record_segment_1->seq.c_str(), mpegg_record_segment_1->cigar.c_str(), mpegg_record_segment_1->pos);
+        local_assembly_state_add_read(state, mpegg_record_segment_2->seq.c_str(), mpegg_record_segment_2->cigar.c_str(), mpegg_record_segment_2->pos);
+
         if (debug) {
-            std::cout << "Decoded pair! First1: " << first << " Delta: " << delta << std::endl;
-            std::cout << "R: " << s->seq << std::endl;
-            std::cout << "C: " << s->cigar << std::endl;
-            std::cout << "P: " << s->pos << std::endl << std::endl;
-            std::cout << "R: " << s2->seq << std::endl;
-            std::cout << "C: " << s2->cigar << std::endl;
-            std::cout << "P: " << s2->pos << std::endl << std::endl;
+            std::cout << "sequence[0]                  : " << mpegg_record_segment_1->seq << std::endl;
+            std::cout << "ecigar_string[0][0]          : " << mpegg_record_segment_1->cigar << std::endl;
+            std::cout << "mapping_pos[0]               : " << mpegg_record_segment_1->pos << std::endl << std::endl;
+            std::cout << "sequence[1]                  : " << mpegg_record_segment_2->seq << std::endl;
+            std::cout << "ecigar_string[0][1]          : " << mpegg_record_segment_2->cigar << std::endl;
+            std::cout << "mapping_pos[0] + delta[0][1] : " << mpegg_record_segment_2->pos << std::endl << std::endl;
         }
     }
 }

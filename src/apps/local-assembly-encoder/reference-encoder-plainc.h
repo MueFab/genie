@@ -8,11 +8,13 @@
 typedef struct {
     uint32_t cr_buf_max_size; /* Maximum sequence buffer size in bytes */
     uint32_t crBufSize; /* Current sequence buffer size */
-    char **sequences; /* Sequence buffer */
-    uint32_t num_sequences; /* Number of sequences in buffer */
-    uint32_t num_sequences_capacity; /* Maximum number of sequences before buffers have to be reallocated */
-    uint32_t *sequence_positions; /* Sequence starting positions */
-    uint32_t *sequence_lengths; /* Lengths of all sequences regarding the reference mapping */
+    char **crBuf; /* Sequence buffer */
+    uint32_t crBufNumReads; /* Number of sequences in buffer */
+
+    /* The following variables are auxiliary and not explicitly specified */
+    uint32_t crBufNumReadsCapacity; /* Maximum number of sequences before buffers have to be reallocated */
+    uint32_t *crBufReadMappingPos; /* Sequence starting positions */
+    uint32_t *crBufReadLen; /* Lengths of all sequences regarding the reference mapping */
 } LOCAL_ASSEMBLY_STATE;
 
 /**
