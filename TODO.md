@@ -19,6 +19,7 @@ N/A
 
 ### Jan
 
+- [ ] Add alphabet lookup for sclips descriptor
 - [ ] Update background image on the Genie page
 - [ ] Update MITOGEN page
 - [ ] Add boilerplate to all source code files
