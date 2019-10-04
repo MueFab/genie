@@ -20,7 +20,7 @@ namespace lae {
 
     // !!! This is the function that we need to mimic in the MPEG-G reference software. !!!
     void FullLocalAssemblyDecoder::init(const uint32_t cr_buf_max_size) {
-        const uint32_t CAPACITY = 16; // Starting capacity for memory memory management
+        const uint32_t CAPACITY = 16; // Starting capacity for memory management
         local_assembly_state_create(&state);
         local_assembly_state_init(state, cr_buf_max_size, CAPACITY);
     }
