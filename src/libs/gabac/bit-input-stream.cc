@@ -15,13 +15,14 @@ inline static unsigned char readIn(gabac::BlockStepper *reader) {
     if (!reader->isValid()) {
         GABAC_DIE("Index out of bounds");
     }
+    // TODO(Jan): We here rely on that get() returns exactly 1 byte. However, it might happen that it returns multiple bytes. Fix that.
     auto byte = static_cast<unsigned char>(reader->get());
     reader->inc();
     return byte;
 }
 
 BitInputStream::BitInputStream(DataBlock *const bitstream) : m_bitstream(bitstream), m_heldBits(0), m_numHeldBits(0) {
-    m_reader = m_bitstream->getReader();
+    m_reader = m_bitstream->getReader();  // TODO(Jan): This line is redundant.
     reset();
 }
 
