@@ -31,7 +31,7 @@ TransformSubseqParameters::TransformSubseqParameters(const TransformIdSubseq &_t
             match_coding_buffer_size = make_unique<uint16_t>(param);
             break;
         case TransformIdSubseq::MERGE_CODING:
-            GENIE_THROW_RUNTIME_EXCEPTION("Merge coding not supported");
+            UTILS_THROW_RUNTIME_EXCEPTION("Merge coding not supported");
             break;
     }
 }

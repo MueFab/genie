@@ -1,5 +1,5 @@
 #include "read-encoder.h"
-#include "exceptions.h"
+#include "util/exceptions.h"
 
 namespace lae {
     LocalAssemblyReadEncoder::LocalAssemblyReadEncoder() : container(new StreamContainer()), pos(0), readCounter(0){
@@ -59,7 +59,7 @@ namespace lae {
                 case 'X':
                     for (size_t i = 0; i < count; ++i) {
                         if (read_pos >= read.length()) {
-                            GENIE_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
+                            UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
                         }
                         if (read[read_pos] != ref[ref_offset]) {
                             if(ref[ref_offset] == 0) {
@@ -114,7 +114,7 @@ namespace lae {
                     // Hardclip
                     break;
                 default:
-                    GENIE_THROW_RUNTIME_EXCEPTION("Unknown CIGAR character");
+                    UTILS_THROW_RUNTIME_EXCEPTION("Unknown CIGAR character");
             }
             count = 0;
         }
@@ -126,7 +126,7 @@ namespace lae {
         }
 
         if (read_pos != read.length()) {
-            GENIE_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
+            UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
         }
     }
 

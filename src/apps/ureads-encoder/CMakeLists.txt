@@ -2,7 +2,6 @@ project("ureads-encoder")
 
 set(source_files
         encoding.cc
-        exceptions.cc
         fastq-file-reader.cc
         fastq-record.cc
         file.cc
@@ -18,4 +17,5 @@ set(source_files
 add_executable(ureads-encoder ${source_files})
 
 target_link_libraries(ureads-encoder PRIVATE format)
+target_link_libraries(ureads-encoder PRIVATE util)
 target_link_libraries(ureads-encoder PRIVATE gabac)

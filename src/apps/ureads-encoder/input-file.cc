@@ -3,7 +3,7 @@
 #include <cassert>
 #include <string>
 
-#include "exceptions.h"
+#include "util/exceptions.h"
 
 namespace genie {
 
@@ -20,9 +20,9 @@ void InputFile::read(void* items, size_t itemSize, size_t numItems) {
 
     if (rc != numItems) {
         if (feof(m_fp) != 0) {
-            GENIE_DIE("Hit EOF while trying to read from file");
+            UTILS_DIE("Hit EOF while trying to read from file");
         }
-        GENIE_DIE("fread from '" + m_path + "' failed");
+        UTILS_DIE("fread from '" + m_path + "' failed");
     }
 }
 

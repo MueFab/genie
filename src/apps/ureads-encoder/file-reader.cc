@@ -3,7 +3,7 @@
 #include <climits>
 #include <cstring>
 
-#include "exceptions.h"
+#include "util/exceptions.h"
 
 namespace genie {
 
@@ -11,7 +11,7 @@ FileReader::FileReader() : m_fp(nullptr), m_fsize(0) {}
 
 FileReader::FileReader(const std::string& path) : m_fp(nullptr), m_fsize(0) {
     if (path.empty()) {
-        GENIE_DIE("path is empty");
+        UTILS_DIE("path is empty");
     }
 
     open(path);
@@ -19,7 +19,7 @@ FileReader::FileReader(const std::string& path) : m_fp(nullptr), m_fsize(0) {
     // Usually, lines in a FASTA file should be limited to 80 chars, so 4 KB should be enough.
     m_line = reinterpret_cast<char*>(malloc(MAX_LINE_LENGTH));
     if (m_line == nullptr) {
-        GENIE_DIE("malloc failed");
+        UTILS_DIE("malloc failed");
     }
 }
 
@@ -30,11 +30,11 @@ FileReader::~FileReader() {
 
 void FileReader::open(const std::string& path) {
     if (path.empty()) {
-        GENIE_DIE("path is empty");
+        UTILS_DIE("path is empty");
     }
 
     if (m_fp != nullptr) {
-        GENIE_DIE("file pointer already in use");
+        UTILS_DIE("file pointer already in use");
     }
 
     const char* mode = "rb";
@@ -42,12 +42,12 @@ void FileReader::open(const std::string& path) {
 #ifdef _WIN32
     int rc = fopen_s(&m_fp, path.c_str(), mode);
     if (rc != 0) {
-        GENIE_DIE("failed to open file");
+        UTILS_DIE("failed to open file");
     }
 #else
     m_fp = fopen(path.c_str(), mode);
     if (m_fp == nullptr) {
-        GENIE_DIE("failed to open file");
+        UTILS_DIE("failed to open file");
     }
 #endif
 
@@ -62,7 +62,7 @@ void FileReader::close() {
         fclose(m_fp);
         m_fp = nullptr;
     } else {
-        GENIE_DIE("failed to close file");
+        UTILS_DIE("failed to close file");
     }
 }
 
@@ -119,7 +119,7 @@ int64_t FileReader::tell() const {
     auto offset = static_cast<int64_t>(ftell(m_fp));
 
     if (offset == -1) {
-        GENIE_DIE("ftell failed");
+        UTILS_DIE("ftell failed");
     }
 
     return offset;
@@ -127,12 +127,12 @@ int64_t FileReader::tell() const {
 
 void FileReader::seek(const int64_t offset, const int whence) {
     if (offset > LONG_MAX) {
-        GENIE_DIE("position out of range");
+        UTILS_DIE("position out of range");
     }
 
     int rc = fseek(m_fp, offset, whence);
     if (rc != 0) {
-        GENIE_DIE("fseek failed");
+        UTILS_DIE("fseek failed");
     }
 }
 
