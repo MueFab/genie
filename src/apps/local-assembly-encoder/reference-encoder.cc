@@ -1,5 +1,5 @@
 #include "reference-encoder.h"
-#include "exceptions.h"
+#include "util/exceptions.h"
 #include <map>
 #include <limits>
 
@@ -27,7 +27,7 @@ namespace lae {
                 case 'X':
                     for (size_t i = 0; i < count; ++i) {
                         if (read_pos >= read.length()) {
-                            GENIE_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
+                            UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
                         }
                         result += read[read_pos++];
                     }
@@ -47,13 +47,13 @@ namespace lae {
                     }
                     break;
                 default:
-                    GENIE_THROW_RUNTIME_EXCEPTION("Unknown CIGAR character");
+                    UTILS_THROW_RUNTIME_EXCEPTION("Unknown CIGAR character");
             }
             count = 0;
         }
 
         if (read_pos != read.length()) {
-            GENIE_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
+            UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
         }
         return result;
     }
@@ -66,7 +66,7 @@ namespace lae {
 
         while (crBufSize > cr_buf_max_size) {
             if (sequences.size() == 1) {
-                GENIE_THROW_RUNTIME_EXCEPTION("Read too long for current cr_buf_max_size");
+                UTILS_THROW_RUNTIME_EXCEPTION("Read too long for current cr_buf_max_size");
             }
             // Erase oldest read
             crBufSize -= sequences.front().length();
@@ -109,7 +109,7 @@ namespace lae {
                     count = 0;
                     break;
                 default:
-                    GENIE_THROW_RUNTIME_EXCEPTION("Unknown CIGAR character");
+                    UTILS_THROW_RUNTIME_EXCEPTION("Unknown CIGAR character");
             }
             count = 0;
         }

@@ -2,7 +2,7 @@
 
 #include <time.h>
 
-#include "exceptions.h"
+#include "util/exceptions.h"
 
 namespace genie {
 
@@ -12,24 +12,24 @@ std::string currentDateAndTime() {
 
     time_t currentTime = time(nullptr);
     if (currentTime == ((time_t)-1)) {
-        GENIE_DIE("time failed");
+        UTILS_DIE("time failed");
     }
     struct tm timeinfo {};
 
 #ifdef _WIN32
     errno_t err = gmtime_s(&timeinfo, &currentTime);
     if (err != 0) {
-        GENIE_DIE("gmtime_s failed");
+        UTILS_DIE("gmtime_s failed");
     }
 #else
     struct tm* ret = gmtime_r(&currentTime, &timeinfo);
     if (ret == nullptr) {
-        GENIE_DIE("gmtime_r failed");
+        UTILS_DIE("gmtime_r failed");
     }
 #endif
 
     if (strftime(timeString, sizeof(timeString), "%Y-%m-%dT%H:%M:%SZ", &timeinfo) == 0) {
-        GENIE_DIE("strftime failed");
+        UTILS_DIE("strftime failed");
     }
 
     std::string result(timeString);

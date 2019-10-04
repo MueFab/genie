@@ -2,7 +2,6 @@ project("local-assembly-encoder")
 
 set(source_files
         encoding.cc
-        exceptions.cc
         main.cc
         program-options.cc
         reference-encoder.cc
@@ -10,7 +9,8 @@ set(source_files
         read-decoder.cc
         reference-encoder-plainc.c
         full-local-assembly-encoder.cc
-        full-local-assembly-decoder.cc)
+        full-local-assembly-decoder.cc
+        genie-gabac-output-stream.cc)
 
 add_executable(local-assembly-encoder ${source_files})
 

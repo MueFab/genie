@@ -3,14 +3,14 @@
 #include <cassert>
 #include <string>
 
-#include "exceptions.h"
+#include "util/exceptions.h"
 
 namespace genie {
 
 OutputFile::OutputFile(const std::string& path) : File(path, "ab") {
     // Check if file with content existed before by opening in append mode
     // and getting size
-    if (size() != 0) GENIE_DIE("Output file already exists: " + path);
+    if (size() != 0) UTILS_DIE("Output file already exists: " + path);
     close();
     open(path, "wb");
 }
@@ -24,9 +24,9 @@ void OutputFile::write(void* const items, size_t itemSize, size_t numItems) {
 
     if (rc != numItems) {
         if (feof(m_fp) != 0) {
-            GENIE_DIE("Hit EOF while trying to write to file: " + m_path);
+            UTILS_DIE("Hit EOF while trying to write to file: " + m_path);
         }
-        GENIE_DIE("fwrite to '" + m_path + "' failed");
+        UTILS_DIE("fwrite to '" + m_path + "' failed");
     }
 }
 
