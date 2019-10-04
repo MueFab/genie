@@ -43,9 +43,15 @@ void BitInputStream::reset() {
 }
 
 unsigned int BitInputStream::read(unsigned int numBits) {
+// uint64_t BitInputStream::read(const unsigned int numBits) {
+    // TODO(Jan): Make this 64-bit compatible. See also:
+    //   mpegg-reference-sw/src/gm-common-v1/mpegg-stream.c:mpegg_input_bitstream_read_ubits()
     assert(numBits <= 32);
+    // assert(numBits <= 64);
 
+    // Bits are extracted from the MSB of each byte
     unsigned int bits = 0;
+    // uint64_t bits = 0;
     if (numBits <= m_numHeldBits) {
         // Get numBits most significant bits from heldBits as bits
         bits = m_heldBits >> (m_numHeldBits - numBits);
@@ -57,11 +63,13 @@ unsigned int BitInputStream::read(unsigned int numBits) {
     // More bits requested than currently held, flush all heldBits to bits
     numBits -= m_numHeldBits;
     bits = m_heldBits & ~(0xffu << m_numHeldBits);
+    // bits = static_cast<uint64_t>(m_heldBits & ~(0xffu << m_numHeldBits));
     bits <<= numBits;  // make room for the bits to come
 
     // Read in more bytes to satisfy the request
     unsigned int numBytesToLoad = ((numBits - 1u) >> 3u) + 1;
     unsigned int alignedWord = 0;
+    // uint64_t alignedWord = 0;
     if (numBytesToLoad == 1) {
         goto L1;
     } else if (numBytesToLoad == 2) {
@@ -81,9 +89,13 @@ L1:
     alignedWord |= (readIn(&m_reader));
 L0:
 
-    // Append requested bits and hold the remaining read bits
+    // Resolve remainder bits
     unsigned int numNextHeldBits = (32 - numBits) % 8;
+
+    // Copy required part of alignedWord into bits
     bits |= alignedWord >> numNextHeldBits;
+
+    // Store held bits
     m_numHeldBits = numNextHeldBits;
     m_heldBits = static_cast<unsigned char>(alignedWord & 0xffu);
 
