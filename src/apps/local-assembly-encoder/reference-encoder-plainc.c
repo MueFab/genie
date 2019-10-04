@@ -105,19 +105,19 @@ static int local_assembly_state_preprocess(const char *seq, const char *cigar, c
  * @return
  */
 static int local_assembly_state_remove_oldest_read(LOCAL_ASSEMBLY_STATE *state) {
-    if (state->num_sequences == 0) {
+    if (state->crBufNumReads == 0) {
         return -1;
     }
     /* Erase oldest read */
-    state->crBufSize -= state->sequence_lengths[0];
-    free(state->sequences[0]);
-    state->num_sequences--;
+    state->crBufSize -= state->crBufReadLen[0];
+    free(state->crBuf[0]);
+    state->crBufNumReads--;
 
     /* Shift all remaining reads in the buffer to fill the gap */
-    for (int i = 0; i < state->num_sequences; ++i) {
-        state->sequences[i] = state->sequences[i + 1];
-        state->sequence_lengths[i] = state->sequence_lengths[i + 1];
-        state->sequence_positions[i] = state->sequence_positions[i + 1];
+    for (int i = 0; i < state->crBufNumReads; ++i) {
+        state->crBuf[i] = state->crBuf[i + 1];
+        state->crBufReadLen[i] = state->crBufReadLen[i + 1];
+        state->crBufReadMappingPos[i] = state->crBufReadMappingPos[i + 1];
     }
     return 0;
 }
@@ -129,21 +129,21 @@ static int local_assembly_state_remove_oldest_read(LOCAL_ASSEMBLY_STATE *state) 
  * @return
  */
 static int local_assembly_state_min_size(LOCAL_ASSEMBLY_STATE *state, uint32_t minimalSize) {
-    if (state->num_sequences_capacity >= minimalSize) {
+    if (state->crBufNumReadsCapacity >= minimalSize) {
         /* Nothing to do */
         return 0;
     }
-    state->num_sequences_capacity *= 2;
-    state->sequences = (char** )realloc(state->sequences, state->num_sequences_capacity * sizeof(char*));
-    if(!state->sequences){
+    state->crBufNumReadsCapacity *= 2;
+    state->crBuf = (char** )realloc(state->crBuf, state->crBufNumReadsCapacity * sizeof(char*));
+    if(!state->crBuf){
         return -1;
     }
-    state->sequence_positions = (uint32_t*) realloc(state->sequence_positions, state->num_sequences_capacity * sizeof(uint32_t));
-    if(!state->sequence_positions){
+    state->crBufReadMappingPos = (uint32_t*) realloc(state->crBufReadMappingPos, state->crBufNumReadsCapacity * sizeof(uint32_t));
+    if(!state->crBufReadMappingPos){
         return -1;
     }
-    state->sequence_lengths = (uint32_t*) realloc(state->sequence_lengths, state->num_sequences_capacity * sizeof(uint32_t));
-    if(!state->sequence_lengths){
+    state->crBufReadLen = (uint32_t*) realloc(state->crBufReadLen, state->crBufNumReadsCapacity * sizeof(uint32_t));
+    if(!state->crBufReadLen){
         return -1;
     }
     return 0;
@@ -162,10 +162,10 @@ static int local_assembly_state_vote(LOCAL_ASSEMBLY_STATE *state, uint32_t abs_p
     memset(&votes, 0, sizeof(uint32_t) * CHAR_RANGE);
 
     /* Collect all alignments */
-    for (size_t i = 0; i < state->num_sequences; ++i) {
-        int64_t distance = abs_position - state->sequence_positions[i];
-        if(distance >= 0 && distance < state->sequence_lengths[i]){
-            char c = state->sequences[i][distance];
+    for (size_t i = 0; i < state->crBufNumReads; ++i) {
+        int64_t distance = abs_position - state->crBufReadMappingPos[i];
+        if(distance >= 0 && distance < state->crBufReadLen[i]){
+            char c = state->crBuf[i][distance];
             if (c != '0') {
                 votes[c]++;
             }
@@ -193,8 +193,8 @@ static int local_assembly_state_vote(LOCAL_ASSEMBLY_STATE *state, uint32_t abs_p
  */
 static int local_assembly_state_get_window_border(LOCAL_ASSEMBLY_STATE *state, uint32_t* border) {
     *border = -1; // Wrapping around to maximum value
-    for(int i = 0; i < state->num_sequences; ++i) {
-        *border = (state->sequence_positions[i] < *border) ? state->sequence_positions[i] : *border;
+    for(int i = 0; i < state->crBufNumReads; ++i) {
+        *border = (state->crBufReadMappingPos[i] < *border) ? state->crBufReadMappingPos[i] : *border;
     }
     return 0;
 }
@@ -211,18 +211,18 @@ int local_assembly_state_create(LOCAL_ASSEMBLY_STATE **state) {
 int local_assembly_state_init(LOCAL_ASSEMBLY_STATE *state, uint32_t _cr_buf_max_size, uint32_t initial_capacity) {
     state->cr_buf_max_size = _cr_buf_max_size;
     state->crBufSize = 0;
-    state->sequences = (char **) calloc(initial_capacity, sizeof(char *));
-    if(!state->sequences){
+    state->crBuf = (char **) calloc(initial_capacity, sizeof(char *));
+    if(!state->crBuf){
         return -1;
     }
-    state->num_sequences = 0;
-    state->num_sequences_capacity = initial_capacity;
-    state->sequence_positions = (uint32_t *) calloc(initial_capacity, sizeof(uint32_t));
-    if(!state->sequence_positions){
+    state->crBufNumReads = 0;
+    state->crBufNumReadsCapacity = initial_capacity;
+    state->crBufReadMappingPos = (uint32_t *) calloc(initial_capacity, sizeof(uint32_t));
+    if(!state->crBufReadMappingPos){
         return -1;
     }
-    state->sequence_lengths = (uint32_t *) calloc(initial_capacity, sizeof(uint32_t));;
-    if(!state->sequence_lengths){
+    state->crBufReadLen = (uint32_t *) calloc(initial_capacity, sizeof(uint32_t));;
+    if(!state->crBufReadLen){
         return -1;
     }
     return 0;
@@ -230,14 +230,14 @@ int local_assembly_state_init(LOCAL_ASSEMBLY_STATE *state, uint32_t _cr_buf_max_
 
 int local_assembly_state_destroy(LOCAL_ASSEMBLY_STATE *state) {
     /* Sequences */
-    for (uint32_t i = 0; i < state->num_sequences; ++i) {
-        free(state->sequences[i]);
+    for (uint32_t i = 0; i < state->crBufNumReads; ++i) {
+        free(state->crBuf[i]);
     }
 
     /* Administrative and mapping stuff */
-    free(state->sequences);
-    free(state->sequence_positions);
-    free(state->sequence_lengths);
+    free(state->crBuf);
+    free(state->crBufReadMappingPos);
+    free(state->crBufReadLen);
     return 0;
 }
 
@@ -258,15 +258,15 @@ int local_assembly_state_add_read(LOCAL_ASSEMBLY_STATE *state, const char *seq, 
     }
 
     /* Make sure there is enough administrative space */
-    if(local_assembly_state_min_size(state, state->num_sequences + 1)) {
+    if(local_assembly_state_min_size(state, state->crBufNumReads + 1)) {
         return -1;
     }
 
     /* Copy data */
-    state->sequence_positions[state->num_sequences] = pos;
-    state->sequence_lengths[state->num_sequences] = processed_size;
-    state->sequences[state->num_sequences] = processed_read;
-    state->num_sequences++;
+    state->crBufReadMappingPos[state->crBufNumReads] = pos;
+    state->crBufReadLen[state->crBufNumReads] = processed_size;
+    state->crBuf[state->crBufNumReads] = processed_read;
+    state->crBufNumReads++;
     state->crBufSize += processed_size;
     return 0;
 }
@@ -291,12 +291,12 @@ int local_assembly_state_print_window(LOCAL_ASSEMBLY_STATE *state) {
         return -1;
     }
 
-    for (uint32_t i = 0; i < state->num_sequences; ++i) {
-        uint64_t totalOffset = state->sequence_positions[i] - minPos;
+    for (uint32_t i = 0; i < state->crBufNumReads; ++i) {
+        uint64_t totalOffset = state->crBufReadMappingPos[i] - minPos;
         for (uint32_t s = 0; s < totalOffset; ++s) {
             printf(".");
         }
-        printf("%.*s\n", state->sequence_lengths[i], state->sequences[i]);
+        printf("%.*s\n", state->crBufReadLen[i], state->crBuf[i]);
     }
     return 0;
 }

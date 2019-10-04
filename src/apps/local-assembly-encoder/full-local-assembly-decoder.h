@@ -10,15 +10,17 @@ extern "C" {
 namespace lae {
     class FullLocalAssemblyDecoder {
     private:
-        uint32_t abs_pos;
+        uint32_t mapping_pos;
         LOCAL_ASSEMBLY_STATE* state;
         LocalAssemblyReadDecoder lrd;
         bool debug;
     public:
-        FullLocalAssemblyDecoder(std::unique_ptr<StreamContainer> container, uint32_t _cr_buf_size, bool _debug);
+        FullLocalAssemblyDecoder(std::unique_ptr<StreamContainer> container, uint32_t cr_buf_size, bool _debug);
         ~FullLocalAssemblyDecoder();
-        void decode(util::SamRecord *s);
-        void decodePair(util::SamRecord *s, util::SamRecord *s2);
+        void decode(util::SamRecord *mpegg_record);
+        void decodePair(util::SamRecord *mpegg_record_segment_1, util::SamRecord *mpegg_record_segment_2);
+    private:
+        void init(uint32_t cr_buf_max_size);
     };
 }
 

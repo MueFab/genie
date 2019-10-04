@@ -79,13 +79,13 @@ namespace lae {
         pop(&container->rtype_0);
     }
 
-    void LocalAssemblyReadDecoder::decodePair(const std::string& ref1, util::SamRecord* s1, const std::string& ref2, util::SamRecord* s2,  uint32_t* delta, bool* first1) {
+    void LocalAssemblyReadDecoder::decodePair(const std::string& ref1, util::SamRecord* s1, const std::string& ref2, util::SamRecord* s2) {
         this->decodeRead(ref1, s1);
         this->decodeRead(ref2, s2);
         pop(&container->pair_0);
-        *delta = pop(&container->pair_1);
-        *first1 = *delta & 0x1;
-        *delta >>= 1;
+        /*delta = */pop(&container->pair_1);
+//        *first1 = *delta & 0x1;
+//        *delta >>= 1;
     }
 
     std::string LocalAssemblyReadDecoder::compressCigar(const std::string &cigar) {
