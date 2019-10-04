@@ -42,6 +42,9 @@ N/A
   - [ ] Bitstream I/O should be done using HM's bitstream classes adapted for 64 bits
   - [ ] "Ordinary" file I/O (for e.g. SPRING's temporary files) should be done using the C++ standard library
 - [ ] Use only numpy arrays in Python interfaces (just as in the example "c-and-python")
+- [ ] In src/libs/gabac/binary-arithmetic-decoder.cc:112 4 bytes must be skipped. This would not be necessary if bitInputStream and binaryArithmeticDecoder would be using references to the same underlying bitstream.
+- [ ] Announce use of GitHub issues
+- [ ] Fix SamFileReader (exception 'stoi' while trying to read gen-013.sam)
 
 ### Joshua
 
