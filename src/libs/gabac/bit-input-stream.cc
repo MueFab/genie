@@ -84,8 +84,7 @@ L0:
     unsigned int numNextHeldBits = (32 - numBits) % 8;
     bits |= alignedWord >> numNextHeldBits;
     m_numHeldBits = numNextHeldBits;
-    assert(alignedWord <= std::numeric_limits<unsigned char>::max());
-    m_heldBits = static_cast<unsigned char>(alignedWord);
+    m_heldBits = static_cast<unsigned char>(alignedWord & 0xffu);
 
     return bits;
 }
