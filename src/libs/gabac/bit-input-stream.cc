@@ -97,9 +97,20 @@ L0:
 
     // Store held bits
     m_numHeldBits = numNextHeldBits;
+    /* FIXME @Jan: Can you please check, why this assert is needed?
+     * I checked in ref-soft file mpegg-stream.c (in mpegg_input_bitstream_read_ubits(...)),
+     * and did not see any such assert.
+     */
     m_heldBits = static_cast<unsigned char>(alignedWord & 0xffu);
 
     return bits;
 }
+
+void BitInputStream::skipBytes(unsigned int numBytes) {
+    for(unsigned int i = 0; i < numBytes; i++) {
+        readIn(&m_reader);
+    }
+}
+
 
 }  // namespace gabac
