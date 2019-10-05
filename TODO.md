@@ -22,6 +22,7 @@ N/A
 - [ ] Update background image on the Genie page
 - [ ] Update MITOGEN page
 - [ ] Add boilerplate to all source code files
+- [ ] Fix "warning: suggest braces around initialization of subobject [-Wmissing-braces]"
 - [ ] Double-check unit test 'SamFileReader.Truncated'
 - [ ] Check whether everything builds nicely on Travis CI
 - [ ] Enable all tests in .travis.yml
