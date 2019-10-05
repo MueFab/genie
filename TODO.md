@@ -79,6 +79,12 @@ N/A
 - [ ] Check LICENSE
 - [ ] Design social media image (for GitHub)
 
+## Issues
+
+- For LUTs, instead of encoding/decoding the symbols in the order of their frequency (as specified in the spec), their frequencies are encoded instead.
+- Though LUTs are encoded, I am not sure if they are used as specified in the spec.
+- In method BitInputStream::read(), all statements like this "readIn(&m_reader)" when they expect a byte to be returned are source of potential bug for wordSize > 1, because then the return value will not be a byte but could be of higher size corresponding to wordSize. There may be few other places to be checked.
+
 ## Futuristic things
 
 - [ ] Replace thirdparty/filesystem/ with std::filesystem (C++17-compliant compilers are needed for that)
