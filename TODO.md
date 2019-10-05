@@ -16,6 +16,10 @@ N/A
 ### Fabian
 
 - [ ] Implement local assembly encoder
+- [ ] Add support for > 1 transformed sequences to format part 2 library
+- [ ] Cleanup clutter files in part 2 library
+- [ ] Provide a clean way for descriptors -> block payloads (working right now, but messy)
+- [ ] Implement QV-Codebook in Part2 library
 
 ### Jan
 

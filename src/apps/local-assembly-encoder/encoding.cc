@@ -218,7 +218,7 @@ namespace lae {
             }
         }
 
-#if 1
+#if 0
         FullLocalAssemblyDecoder decoder(encoder.pollStreams(), SEQUENCE_BUFFER_SIZE, true);
         util::SamRecord s;
         util::SamRecord s2;
