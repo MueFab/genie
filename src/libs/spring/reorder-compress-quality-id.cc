@@ -22,7 +22,7 @@
 namespace spring {
 
 void reorder_compress_quality_id(const std::string &temp_dir, const compression_params &cp, bool analyze,
-                                 dsg::StreamSaver &st) {
+                                 dsg::StreamSaver &st, util::FastqStats *stats) {
     // Read some parameters
     uint32_t numreads = cp.num_reads;
     int num_thr = cp.num_thr;
@@ -60,14 +60,14 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
             std::cout << "Compressing qualities\n";
             uint32_t num_reads_per_file = numreads;
             reorder_compress(file_quality[0], num_reads_per_file, num_thr, num_reads_per_block, str_array,
-                             str_array_size, order_array, "quality", analyze, st);
+                             str_array_size, order_array, "quality", analyze, st, stats);
             remove(file_quality[0].c_str());
         }
         if (preserve_id) {
             std::cout << "Compressing ids\n";
             uint32_t num_reads_per_file = numreads;
             reorder_compress(file_id, num_reads_per_file, num_thr, num_reads_per_block, str_array, str_array_size,
-                             order_array, "id", analyze, st);
+                             order_array, "id", analyze, st, stats);
             remove(file_id.c_str());
         }
 
@@ -93,7 +93,7 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
             // 3*num_reads_per_block added to ensure that we are done in 4 passes (needed because block
             // sizes are not exactly equal to num_reads_per_block
             reorder_compress_quality_pe(file_quality, outfile_quality, quality_array, quality_array_size, order_array,
-                                        block_start, block_end, cp, analyze, st);
+                                        block_start, block_end, cp, analyze, st, stats);
             delete[] quality_array;
             delete[] order_array;
             remove(file_quality[0].c_str());
@@ -106,7 +106,7 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
             std::string *id_array = new std::string[numreads / 2];
             std::ifstream f_id(file_id);
             for (uint32_t i = 0; i < numreads / 2; i++) std::getline(f_id, id_array[i]);
-            reorder_compress_id_pe(id_array, file_order_id, block_start, block_end, file_id, cp, analyze, st);
+            reorder_compress_id_pe(id_array, file_order_id, block_start, block_end, file_id, cp, analyze, st, stats);
             delete[] id_array;
             for (uint32_t i = 0; i < block_start.size(); i++) remove((file_order_id + "." + std::to_string(i)).c_str());
             remove(file_id.c_str());
@@ -146,7 +146,7 @@ void generate_order(const std::string &file_order, uint32_t *order_array, const 
 void reorder_compress_id_pe(std::string *id_array, const std::string &file_order_id,
                             const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
                             const std::string &file_name, const compression_params &cp, bool analyze,
-                            dsg::StreamSaver &st) {
+                            dsg::StreamSaver &st, util::FastqStats *stats) {
     if (analyze) {
         uint32_t block_num = block_start.size() / 2;
         std::map<std::string, gabac::DataBlock> str;
@@ -229,7 +229,11 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &file_order
                     if (!AUStreams.streams[i][j].empty()) {
                         std::string outfile_name_i_j = outfile_name.substr(outfile_name.find_last_of('/') + 1) + "." +
                                                        std::to_string(i) + "." + std::to_string(j);
-                        st.pack(AUStreams.streams[i][j], outfile_name_i_j);
+                        uint64_t size = st.pack(AUStreams.streams[i][j], outfile_name_i_j);
+                        if (stats->enabled) {
+                            stats->cmprs_id_sz += size;
+                            stats->cmprs_total_sz += size;
+                        }
                     }
                 }
             }
@@ -240,7 +244,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &file_order
 void reorder_compress_quality_pe(std::string file_quality[2], const std::string &outfile_quality,
                                  std::string *quality_array, const uint64_t &quality_array_size, uint32_t *order_array,
                                  const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
-                                 const compression_params &cp, bool analyze, dsg::StreamSaver &st) {
+                                 const compression_params &cp, bool analyze, dsg::StreamSaver &st, util::FastqStats *stats) {
     uint32_t start_block_num = 0;
     uint32_t end_block_num = 0;
     bool analysis_done = false;
@@ -290,33 +294,49 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
 #ifdef GENIE_USE_OPENMP
 #pragma omp ordered
 #endif
-            { st.pack(d, outfile_name); }
+            {
+                st.pack(d, outfile_name);
+                if (stats->enabled) {
+                    size_t size = d.getRawSize();
+                    stats->cmprs_qual_sz += size;
+                    stats->cmprs_total_sz += size;
+                }
+             }
         }
         start_block_num = end_block_num;
     }
 }
 
-void pack_id(const std::string &outfile_name, dsg::StreamSaver &st, dsg::AcessUnitStreams *streams) {
+void pack_id(const std::string &outfile_name, dsg::StreamSaver &st, dsg::AcessUnitStreams *streams, util::FastqStats *stats) {
     for (int i = 0; i < 128; i++) {
         for (int j = 0; j < 8; j++) {
             std::string outfile_name_i_j = outfile_name.substr(outfile_name.find_last_of('/') + 1) + "." +
                                            std::to_string(i) + "." + std::to_string(j);
             if (streams->streams[i][j].getRawSize()) {
                 st.pack(streams->streams[i][j], outfile_name_i_j);
+                if (stats->enabled) {
+                    size_t size = streams->streams[i][j].getRawSize();
+                    stats->cmprs_id_sz += size;
+                    stats->cmprs_total_sz += size;
+                }
             }
         }
     }
 }
 
-void pack_qual(const std::string &outfile_name, dsg::StreamSaver &st, gabac::DataBlock *qualityBuffer) {
+void pack_qual(const std::string &outfile_name, dsg::StreamSaver &st, gabac::DataBlock *qualityBuffer, util::FastqStats *stats) {
     if (!qualityBuffer->empty()) {
         st.pack(*qualityBuffer, outfile_name);
+        size_t size = qualityBuffer->getRawSize();
+        stats->cmprs_qual_sz += size;
+        stats->cmprs_total_sz += size;
     }
 }
 
 void reorder_compress(const std::string &file_name, const uint32_t &num_reads_per_file, const int &num_thr,
                       const uint32_t &num_reads_per_block, std::string *str_array, const uint32_t &str_array_size,
-                      uint32_t *order_array, const std::string &mode, bool analyze, dsg::StreamSaver &st) {
+                      uint32_t *order_array, const std::string &mode, bool analyze, dsg::StreamSaver &st,
+                      util::FastqStats *stats) {
     for (uint32_t ndex = 0; ndex <= num_reads_per_file / str_array_size; ndex++) {
         uint32_t num_reads_bin = str_array_size;
         if (ndex == num_reads_per_file / str_array_size) num_reads_bin = num_reads_per_file % str_array_size;
@@ -441,9 +461,9 @@ void reorder_compress(const std::string &file_name, const uint32_t &num_reads_pe
 #endif
             {
                 if (mode == "id") {
-                    pack_id(outfile_name, st, &streams);
+                    pack_id(outfile_name, st, &streams, stats);
                 } else {
-                    pack_qual(outfile_name, st, &qualityBuffer);
+                    pack_qual(outfile_name, st, &qualityBuffer, stats);
                 }
             }
         }  // omp parallel

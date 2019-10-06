@@ -20,14 +20,13 @@
 
 namespace spring {
 
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams(const std::string &temp_dir,
-                                                                                     const compression_params &cp,
-                                                                                     bool analyze,
-                                                                                     dsg::StreamSaver &st) {
+std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams(
+  const std::string &temp_dir, const compression_params &cp, bool analyze,
+  dsg::StreamSaver &st, util::FastqStats *stats) {
     if (!cp.paired_end)
-        return generate_read_streams_se(temp_dir, cp, analyze, st);
+        return generate_read_streams_se(temp_dir, cp, analyze, st, stats);
     else
-        return generate_read_streams_pe(temp_dir, cp, analyze, st);
+        return generate_read_streams_pe(temp_dir, cp, analyze, st, stats);
 }
 
 struct se_data {
@@ -169,21 +168,25 @@ void analyze_subseqs(size_t num_thr, subseq_data *data, dsg::StreamSaver &st) {
 }
 
 void pack_subseqs(subseq_data *data, dsg::StreamSaver &st,
-                  std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> *descriptorFilesPerAU) {
+                  std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> *descriptorFilesPerAU,
+                  util::FastqStats *stats) {
     for (auto arr : subseq_indices) {
         std::string filename = file_subseq_prefix + "." + std::to_string(data->block_num) + "." +
                                std::to_string(arr[0]) + "." + std::to_string(arr[1]);
         data->listDescriptorFiles[arr[0]][arr[1]] = filename;
         if (data->streamsAU.streams[arr[0]][arr[1]].getRawSize()) {
-            st.pack(data->streamsAU.streams[arr[0]][arr[1]], filename);
+            uint64_t size = st.pack(data->streamsAU.streams[arr[0]][arr[1]], filename);
+            if (stats->enabled) {
+                stats->cmprs_seq_sz += size;
+                stats->cmprs_total_sz += size;
+            }
         }
     }
     descriptorFilesPerAU->push_back(data->listDescriptorFiles);
 }
 
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_and_compress_se(const se_data &data,
-                                                                                        dsg::StreamSaver &st,
-                                                                                        bool analyze) {
+std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_and_compress_se(
+  const se_data &data, dsg::StreamSaver &st, bool analyze, util::FastqStats *stats) {
     std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> descriptorFilesPerAU;
 
     // Now generate new streams and compress blocks in parallel
@@ -207,7 +210,7 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_and_comp
 #ifdef GENIE_USE_OPENMP
 #pragma omp ordered
 #endif
-        { pack_subseqs(&sdata, st, &descriptorFilesPerAU); }
+        { pack_subseqs(&sdata, st, &descriptorFilesPerAU, stats); }
     }  // end omp parallel
     return descriptorFilesPerAU;
 }
@@ -319,14 +322,13 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     remove(file_seq.c_str());
 }
 
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams_se(const std::string &temp_dir,
-                                                                                        const compression_params &cp,
-                                                                                        bool analyze,
-                                                                                        dsg::StreamSaver &st) {
+std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams_se(
+  const std::string &temp_dir, const compression_params &cp, bool analyze,
+  dsg::StreamSaver &st, util::FastqStats *stats) {
     se_data data;
     loadSE_Data(cp, temp_dir, &data);
 
-    auto ret = generate_and_compress_se(data, st, analyze);
+    auto ret = generate_and_compress_se(data, st, analyze, stats);
 
     return ret;
 }
@@ -795,10 +797,9 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
     }
 }
 
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams_pe(const std::string &temp_dir,
-                                                                                        const compression_params &cp,
-                                                                                        bool analyze,
-                                                                                        dsg::StreamSaver &st) {
+std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams_pe(
+  const std::string &temp_dir, const compression_params &cp, bool analyze,
+  dsg::StreamSaver &st, util::FastqStats *perfStats) {
     // basic approach: start looking at reads from left to right. If current is aligned but
     // pair is unaligned, pair is kept at the end current AU and stored in different record.
     // We try to keep number of records in AU = num_reads_per_block (without counting the the unaligned
@@ -849,7 +850,7 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_str
 #ifdef GENIE_USE_OPENMP
 #pragma omp ordered
 #endif
-        { pack_subseqs(&subseqs, st, &descriptorFilesPerAU); }
+        { pack_subseqs(&subseqs, st, &descriptorFilesPerAU, perfStats); }
     }  // end omp parallel
 
     std::cout << "count_same_rec: " << std::accumulate(stats.count_same_rec.begin(), stats.count_same_rec.end(), 0)

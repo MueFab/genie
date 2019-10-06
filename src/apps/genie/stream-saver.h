@@ -46,7 +46,7 @@ class StreamSaver {
     void compress(const std::string &name, gabac::DataBlock *data);
     void decompress(const std::string &name, gabac::DataBlock *data);
 
-    void pack(const gabac::DataBlock &data, const std::string &stream_name);  // Pack stream into file
+    uint64_t pack(const gabac::DataBlock &data, const std::string &stream_name);  // Pack stream into file
     void unpack(const std::string &stream_name, gabac::DataBlock *data);      // Pack stream into file
 
     struct gabac_stream_params {
@@ -60,7 +60,7 @@ class StreamSaver {
 
     void buildIndex();
 
-    void finish();
+    uint64_t finish();
 
    public:
     static std::string getConfigName(const std::string &stream);
