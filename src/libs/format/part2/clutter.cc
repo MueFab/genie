@@ -7,7 +7,7 @@
 #include "parameter_set/descriptor_configuration_present/decoder_configuration.h"
 #include "parameter_set/descriptor_configuration_present/descriptor_configuration_present.h"
 #include "parameter_set/qv_coding_config_1/qv_coding_config_1.h"
-
+#include <climits>
 namespace format {
 
     const std::vector<GenomicDescriptorProperties> &getDescriptorProperties() {
@@ -142,73 +142,57 @@ namespace format {
         return ret;
     }
 
-    uint32_t calcSize(const gabac::DataBlock &transformed_subsequence, bool last) {
-        return transformed_subsequence.getRawSize() + sizeof(uint32_t) * (!last);
-    }
-
-    uint32_t calcSize(const std::vector<gabac::DataBlock> &subsequence, bool last) {
-        uint32_t ret = 0;
-        for (size_t i = 0; i < subsequence.size(); ++i) {
-            ret += calcSize(subsequence[i], i == subsequence.size() - 1);
-        }
-
-        return ret + sizeof(uint32_t) * (!last);
-    }
-
-    uint32_t calcSize(const std::vector<std::vector<gabac::DataBlock>> &descriptor, bool last) {
-        uint32_t ret = 0;
-        for (size_t i = 0; i < descriptor.size(); ++i) {
-            ret += calcSize(descriptor[i], i == descriptor.size() - 1);
-        }
-
-        return ret + sizeof(uint32_t) * (!last);
-    }
-
-
-
-
-    void insert(gabac::DataBlock* transformed_subsequence, bool last, std::vector<uint8_t>* ret) {
-        if(!last) {
-            uint32_t size = transformed_subsequence->getRawSize();
-            ret->insert(ret->end(), reinterpret_cast<uint8_t *>(&size),
-                       reinterpret_cast<uint8_t *>(&size) + sizeof(uint32_t));
-        }
-        if (transformed_subsequence->getRawSize()) {
-            ret->insert(ret->end(), reinterpret_cast<const uint8_t *>(transformed_subsequence->getData()),
-                       reinterpret_cast<const uint8_t *>(transformed_subsequence->getData()) + transformed_subsequence->getRawSize());
+    void write32bit(uint32_t val, std::vector<uint8_t> *ret) {
+        for(int i = sizeof(uint32_t) - 1; i >= 0 ; --i) {
+            uint8_t writeVal = (val >> i*8) & 0xff;
+            ret->push_back(writeVal);
         }
     }
 
-    void insert(std::vector<gabac::DataBlock> *subsequence, bool last, std::vector<uint8_t>* ret) {
-        if(!last) {
-            uint32_t size = calcSize(*subsequence, last);
-            ret->insert(ret->end(), reinterpret_cast<uint8_t *>(&size),
-                        reinterpret_cast<uint8_t *>(&size) + sizeof(uint32_t));
-        }
+
+    void insert(gabac::DataBlock *transformed_subsequence, std::vector<uint8_t> *ret) {
+        ret->insert(ret->end(), reinterpret_cast<const uint8_t *>(transformed_subsequence->getData()),
+                    reinterpret_cast<const uint8_t *>(transformed_subsequence->getData()) +
+                    transformed_subsequence->getRawSize());
+    }
+
+    void insert(std::vector<gabac::DataBlock> *subsequence, std::vector<uint8_t> *ret) {
         for (size_t i = 0; i < subsequence->size(); ++i) {
-            insert(&(*subsequence)[i], i == subsequence->size() - 1, ret);
+            std::vector<uint8_t > tmp;
+            insert(&(*subsequence)[i], &tmp);
+            if(i != subsequence->size() - 1) {
+                write32bit(tmp.size(), ret);
+            }
+
+            // TODO: insert number of symbols in subsequence if more than one transformed subsequence
+            ret->insert(ret->end(), tmp.begin(), tmp.end());
         }
     }
 
-    void insert(std::vector<std::vector<gabac::DataBlock>> *descriptor, bool last, std::vector<uint8_t>* ret) {
-        if(!last) {
-            uint32_t size = calcSize(*descriptor, last);
-            ret->insert(ret->end(), reinterpret_cast<uint8_t *>(&size),
-                        reinterpret_cast<uint8_t *>(&size) + sizeof(uint32_t));
-        }
+    void insert(std::vector<std::vector<gabac::DataBlock>> *descriptor, std::vector<uint8_t> *ret) {
         for (size_t i = 0; i < descriptor->size(); ++i) {
-            insert(&(*descriptor)[i], i == descriptor->size() - 1, ret);
+            std::vector<uint8_t > tmp;
+            insert(&(*descriptor)[i], &tmp);
+            if(i != descriptor->size() - 1) {
+                write32bit(tmp.size(), ret);
+            }
+            ret->insert(ret->end(), tmp.begin(), tmp.end());
         }
     }
 
     std::vector<uint8_t> create_payload(std::vector<std::vector<gabac::DataBlock>> *block) {
         std::vector<uint8_t> ret;
-        uint64_t totalSize = calcSize(*block, true);
 
-        ret.reserve(totalSize);
-
-        insert(block, true, &ret);
+        insert(block, &ret);
         return ret;
+    }
+
+    bool descriptorEmpty(const std::vector<std::vector<gabac::DataBlock>>& data) {
+        for(auto &s : data) {
+            if(!s.empty())
+                return false;
+        }
+        return true;
     }
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -220,6 +204,9 @@ namespace format {
                       datatype, 32, 32, 0);
         for (size_t descriptor = 0; descriptor < data->size(); ++descriptor) {
             auto &desc = (*data)[descriptor];
+            if(descriptorEmpty(desc)){
+                continue;
+            }
             auto payload = create_payload(&desc);
             au.addBlock(std::unique_ptr<Block>(new Block(descriptor, &payload)));
         }

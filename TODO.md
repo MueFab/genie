@@ -16,9 +16,14 @@ N/A
 ### Fabian
 
 - [ ] Implement local assembly encoder
+- [ ] Add support for > 1 transformed sequences to format part 2 library
+- [ ] Cleanup clutter files in part 2 library
+- [ ] Provide a clean way for descriptors -> block payloads (working right now, but messy)
+- [ ] Implement QV-Codebook in Part2 library
 
 ### Jan
 
+- [ ] Add alphabet lookup for sclips descriptor
 - [ ] Update background image on the Genie page
 - [ ] Update MITOGEN page
 - [ ] Add boilerplate to all source code files
