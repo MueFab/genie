@@ -28,31 +28,31 @@
 
 namespace dsg {
 
-static generated_aus generationFromFastq_SPRING(const ProgramOptions &programOptions, dsg::StreamSaver &st) {
+static generated_aus generationFromFastq_SPRING(const ProgramOptions &programOptions, util::FastqStats *stats, dsg::StreamSaver &st) {
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Descriptor stream generation from FASTQ file" << std::endl;
     std::cout << std::string(80, '-') << std::endl;
 
     bool paired_end = false;
     // Initialize a FASTQ file reader.
-    util::FastqFileReader fastqFileReader1(programOptions.inputFilePath);
+    util::FastqFileReader fastqFileReader1(programOptions.inputFilePath, stats);
     std::cout << "Calling SPRING" << std::endl;
     if (programOptions.inputFilePairPath.empty()) {
         return spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader1, programOptions.numThreads,
                                                paired_end, programOptions.workingDirectory, programOptions.analyze, st,
                                                programOptions.preserve_order, !programOptions.discard_quality,
-                                               !programOptions.discard_ids);
+                                               !programOptions.discard_ids, stats);
     } else {
         paired_end = true;
-        util::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath);
+        util::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath, stats);
         return spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader2, programOptions.numThreads,
                                                paired_end, programOptions.workingDirectory, programOptions.analyze, st,
                                                programOptions.preserve_order, !programOptions.discard_quality,
-                                               !programOptions.discard_ids);
+                                               !programOptions.discard_ids, stats);
     }
 }
 
-static void generationFromFastq(const ProgramOptions &programOptions) {
+static void generationFromFastq(const ProgramOptions &programOptions, util::FastqStats *stats) {
     std::string filename = programOptions.outputFilePath;
 
     if (filename.empty()) {
@@ -90,10 +90,10 @@ static void generationFromFastq(const ProgramOptions &programOptions) {
     }
 
     dsg::StreamSaver store(programOptions.configPath, &output, nullptr, programOptions.gabacDebug);
-    auto generated_aus = generationFromFastq_SPRING(programOptions, store);
+    auto generated_aus = generationFromFastq_SPRING(programOptions, stats, store);
 }
 
-void decompression_fastq(const ProgramOptions &programOptions) {
+void decompression_fastq(const ProgramOptions &programOptions, util::FastqStats *stats) {
     // Open file and create tmp directory with random name
     std::ifstream in(programOptions.inputFilePath);
     if (!in) {
@@ -138,7 +138,19 @@ void decompression_fastq(const ProgramOptions &programOptions) {
 
 void decompression(const ProgramOptions &programOptions) {
     if (programOptions.inputFileType == "GENIE") {
-        decompression_fastq(programOptions);
+        util::FastqStats stats;
+        std::chrono::steady_clock::time_point start_t;
+        if (programOptions.verbose) {
+            stats.enabled = true;
+            start_t = std::chrono::steady_clock::now();
+        }
+
+        decompression_fastq(programOptions, &stats);
+
+        if (stats.enabled) {
+            stats.total_t = std::chrono::steady_clock::now() - start_t;
+            stats.printDecompressionStats();
+        }
     } else if (programOptions.inputFileType == "SGENIE") {
         //            decompression_sam(programOptions);
     } else {
@@ -148,7 +160,19 @@ void decompression(const ProgramOptions &programOptions) {
 
 void generation(const ProgramOptions &programOptions) {
     if (programOptions.inputFileType == "FASTQ") {
-        generationFromFastq(programOptions);
+        util::FastqStats stats;
+        std::chrono::steady_clock::time_point start_t;
+        if (programOptions.verbose) {
+            stats.enabled = true;
+            start_t = std::chrono::steady_clock::now();
+        }
+
+        generationFromFastq(programOptions, &stats);
+
+        if (stats.enabled) {
+            stats.total_t = std::chrono::steady_clock::now() - start_t;
+            stats.printCompressionStats();
+        }
     } else if (programOptions.inputFileType == "SAM") {
         //            generationFromSam(programOptions);
     } else {
