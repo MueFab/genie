@@ -2,7 +2,6 @@ project("genie")
 
 set(source_files
         dsg.cc
-        exceptions.cc
         generation.cc
         program-options.cc
         stream-saver.cc

@@ -16,7 +16,7 @@
 #include <string>
 #include <thread>
 #include <vector>
-#include "exceptions.h"
+#include "util/exceptions.h"
 #include "spring/decompress.h"
 #include "spring/spring.h"
 #include "util/fasta-file-reader.h"
@@ -154,7 +154,7 @@ void decompression(const ProgramOptions &programOptions) {
     } else if (programOptions.inputFileType == "SGENIE") {
         //            decompression_sam(programOptions);
     } else {
-        throwRuntimeError("Wrong input file type: " + programOptions.inputFilePath);
+        UTILS_DIE("Wrong input file type: " + programOptions.inputFilePath);
     }
 }
 
@@ -176,7 +176,7 @@ void generation(const ProgramOptions &programOptions) {
     } else if (programOptions.inputFileType == "SAM") {
         //            generationFromSam(programOptions);
     } else {
-        throwRuntimeError("Wrong input file type: " + programOptions.inputFilePath);
+        UTILS_DIE("Wrong input file type: " + programOptions.inputFilePath);
     }
 }
 

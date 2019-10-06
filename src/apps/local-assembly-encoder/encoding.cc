@@ -4,66 +4,135 @@
 #include <util/log.h>
 #include <util/sam-file-reader.h>
 #include <util/sam-record.h>
-#include "exceptions.h"
-#include "read-encoder.h"
-#include "read-decoder.h"
-#include "reference-encoder.h"
+#include "util/exceptions.h"
+#include "full-local-assembly-decoder.h"
+#include "full-local-assembly-encoder.h"
+#include "genie-gabac-output-stream.h"
+
+#include <fstream>
+#include <util/bitwriter.h>
+#include <format/part2/parameter_set.h>
+#include <format/part2/access_unit.h>
+#include <format/part2/clutter.h>
 
 namespace lae {
 
-    void add(const util::SamRecord& rec,  LocalAssemblyReferenceEncoder* le, LocalAssemblyReadEncoder* lre) {
-        std::string ref = le->getReference(rec.pos, rec.cigar);
-        le->addRead(rec);
-        lre->addRead(rec, ref);
-        le->printWindow();
-        std::cout << "ref: " << ref << std::endl;
-        std::cout << std::endl;
+    std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
+        const std::vector<size_t> SEQUENCE_NUMS = {2, 1, 3, 2, 3, 4, 1, 1, 8, 1, 5, 2, 1, 1, 1, 2, 1, 1};
+        const std::string DEFAULT_GABAC_CONF_JSON =
+                "{"
+                "\"word_size\": 1,"
+                "\"sequence_transformation_id\": 0,"
+                "\"sequence_transformation_parameter\": 0,"
+                "\"transformed_sequences\":"
+                "[{"
+                "\"lut_transformation_enabled\": false,"
+                "\"diff_coding_enabled\": false,"
+                "\"binarization_id\": 0,"
+                "\"binarization_parameters\":[32],"
+                "\"context_selection_id\": 0"
+                "}]"
+                "}";
+        std::vector<std::vector<gabac::EncodingConfiguration>> ret;
+        for (size_t i = 0; i < SEQUENCE_NUMS.size(); ++i) {
+            ret.emplace_back();
+            for (size_t j = 0; j < SEQUENCE_NUMS[i]; ++j) {
+                ret[i].emplace_back(DEFAULT_GABAC_CONF_JSON);
+            }
+        }
+        return ret;
     }
 
-    void decode(LocalAssemblyReferenceEncoder* le, LocalAssemblyReadDecoder* lrd, util::SamRecord *s) {
-        static uint32_t abs_pos = 0;
-        abs_pos += lrd->offsetOfNextRead();
-        std::string ref = le->getReference(abs_pos, lrd->lengthOfNextRead());
-        lrd->decodeRead(ref, s);
-        le->addRead(*s);
-        std::cout << "R: " << s->seq << std::endl;
-        std::cout << "C: " << s->cigar << std::endl;
-        std::cout << "P: " << s->pos << std::endl << std::endl;
+    std::vector<std::vector<std::vector<gabac::DataBlock>>> create_default_streams() {
+        std::vector<std::vector<std::vector<gabac::DataBlock>>> ret(format::NUM_DESCRIPTORS);
+        for(int descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
+            ret[descriptor].resize(format::getDescriptorProperties()[descriptor].number_subsequences);
+        }
+        return ret;
     }
 
-    void test() {
 
-        LocalAssemblyReadEncoder lre;
-        LocalAssemblyReferenceEncoder le(26 * 3);
-        util::SamRecord s;
+    std::vector<std::vector<gabac::DataBlock>> translateToSimpleArray(StreamContainer* container) {
+        std::vector<std::vector<gabac::DataBlock>> ret(format::NUM_DESCRIPTORS);
+        for(int descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
+            ret[descriptor].resize(format::getDescriptorProperties()[descriptor].number_subsequences);
+        }
 
-        s.seq = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        s.cigar = "26M";
-        s.pos = 0;
-        add(s, &le, &lre);
+        ret[uint8_t (format::GenomicDescriptor::pos)][0].swap(&container->pos_0);
+        ret[uint8_t (format::GenomicDescriptor::rcomp)][0].swap(&container->rcomp_0);
+        ret[uint8_t (format::GenomicDescriptor::flags)][0].swap(&container->flags_0);
+        ret[uint8_t (format::GenomicDescriptor::flags)][1].swap(&container->flags_1);
+        ret[uint8_t (format::GenomicDescriptor::flags)][2].swap(&container->flags_2);
+        ret[uint8_t (format::GenomicDescriptor::mmpos)][0].swap(&container->mmpos_0);
+        ret[uint8_t (format::GenomicDescriptor::mmpos)][1].swap(&container->mmpos_1);
+        ret[uint8_t (format::GenomicDescriptor::mmtype)][0].swap(&container->mmtype_0);
+        ret[uint8_t (format::GenomicDescriptor::mmtype)][1].swap(&container->mmtype_1);
+        ret[uint8_t (format::GenomicDescriptor::mmtype)][2].swap(&container->mmtype_2);
+        ret[uint8_t (format::GenomicDescriptor::clips)][0].swap(&container->clips_0);
+        ret[uint8_t (format::GenomicDescriptor::clips)][1].swap(&container->clips_1);
+        ret[uint8_t (format::GenomicDescriptor::clips)][2].swap(&container->clips_2);
+        ret[uint8_t (format::GenomicDescriptor::clips)][3].swap(&container->clips_3);
+        ret[uint8_t (format::GenomicDescriptor::pair)][0].swap(&container->pair_0);
+        ret[uint8_t (format::GenomicDescriptor::pair)][1].swap(&container->pair_1);
+        ret[uint8_t (format::GenomicDescriptor::mscore)][0].swap(&container->mscore_0);
+        ret[uint8_t (format::GenomicDescriptor::rlen)][0].swap(&container->rlen_0);
+        ret[uint8_t (format::GenomicDescriptor::rtype)][0].swap(&container->rtype_0);
 
-        s.seq = "BCDEFGHIJKLMNOPQRSTUVWXYZ";
-        s.cigar = "25M";
-        s.pos = 30;
-        add(s, &le, &lre);
+        return ret;
+    }
 
-        s.seq = "CDEFGHIJKLMNOPQRSTUV123WXYZA6";
-        s.cigar = "20M10D3I3D5M5D1M";
-        s.pos = 31;
-        add(s, &le, &lre);
+    void compress(const gabac::EncodingConfiguration& conf, gabac::DataBlock* in, std::vector<gabac::DataBlock>* out) {
 
-        s.seq = "DEFGHIJKLMNOPQ8STUVWXYZAB";
-        s.cigar = "25M";
-        s.pos = 32;
-        add(s, &le, &lre);
+        // Interface to GABAC library
+        gabac::IBufferStream bufferInputStream(in);
+        GenieGabacOutputStream bufferOutputStream;
 
-        LocalAssemblyReadDecoder lrd(lre.pollStreams());
-        le = LocalAssemblyReferenceEncoder(26 * 3);
+        const size_t GABAC_BLOCK_SIZE = 0;  // 0 means single block (block size is equal to input size)
+        std::ostream *const GABC_LOG_OUTPUT_STREAM = &std::cout;
+        const gabac::IOConfiguration GABAC_IO_SETUP = {&bufferInputStream, &bufferOutputStream, GABAC_BLOCK_SIZE,
+                                                       GABC_LOG_OUTPUT_STREAM,
+                                                       gabac::IOConfiguration::LogLevel::TRACE};
 
-        decode(&le, &lrd, &s);
-        decode(&le, &lrd, &s);
-        decode(&le, &lrd, &s);
-        decode(&le, &lrd, &s);
+        const bool GABAC_DECODING_MODE = false;
+        gabac::run(GABAC_IO_SETUP, conf, GABAC_DECODING_MODE);
+        bufferOutputStream.flush_blocks(out);
+    }
+
+    void pack(const ProgramOptions &programOptions, std::unique_ptr<StreamContainer> container, uint32_t read_length,
+              uint32_t readNum, bool paired) {
+        using namespace format;
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+        // ENTROPY ENCODE
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        std::vector<std::vector<std::vector<gabac::DataBlock>>> generated_streams = create_default_streams();
+        std::vector<std::vector<gabac::EncodingConfiguration>> configs = create_default_conf();
+        std::vector<std::vector<gabac::DataBlock>> raw_data = translateToSimpleArray(container.get());
+
+        for(size_t descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
+            for(size_t subdescriptor = 0; subdescriptor < format::getDescriptorProperties()[descriptor].number_subsequences; ++subdescriptor) {
+                compress(configs[descriptor][subdescriptor], &raw_data[descriptor][subdescriptor], &generated_streams[descriptor][subdescriptor]);
+            }
+        }
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+        // CREATE Part 2 units
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        std::ofstream ofstr(programOptions.outputFilePath);
+        util::BitWriter bw(&ofstr);
+
+        const uint8_t PARAMETER_SET_ID = 0;
+        const uint32_t READ_LENGTH = read_length;
+        const bool QV_PRESENT = false;
+
+        ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, paired, QV_PRESENT, DataUnit::DatasetType::ALIGNED, configs);
+        ps.write(&bw);
+
+        const uint32_t ACCESS_UNIT_ID = 0;
+        AccessUnit au = createQuickAccessUnit(ACCESS_UNIT_ID, PARAMETER_SET_ID, readNum, DataUnit::AuType::U_TYPE_AU, DataUnit::DatasetType::ALIGNED, &generated_streams);
+        au.write(&bw);
     }
 
     void encode(const ProgramOptions &programOptions) {
@@ -72,21 +141,20 @@ namespace lae {
 
         util::SamFileReader samFileReader(programOptions.inputFilePath);
 
-        test();
-
         size_t blockSize = 10000;
+        bool singleEnd = false;
+        const uint32_t SEQUENCE_BUFFER_SIZE = 1000;
+        FullLocalAssemblyEncoder encoder(SEQUENCE_BUFFER_SIZE, true);
+        uint32_t record_counter = 0;
+        uint32_t read_length = std::numeric_limits<uint32_t>::max();
         while (true) {
             // Read a block of SAM records
             std::list<util::SamRecord> samRecords;
             samFileReader.readRecords(blockSize, &samRecords);
             std::list<util::SamRecord> samRecordsCopy(samRecords);
             LOG_TRACE << "Read " << samRecords.size() << " SAM record(s)";
-
-            // Set up the decoded descriptor streams
-            std::vector<int64_t> decodedPos;
-            int64_t prevPos = 0;
-
             for (const auto &samRecord : samRecords) {
+                record_counter++;
                 // Search for mate
                 std::string rnameSearchString;
                 if (samRecord.rnext == "=") {
@@ -99,6 +167,25 @@ namespace lae {
                 for (auto it = samRecordsCopy.begin(); it != samRecordsCopy.end(); ++it) {
                     if (it->rname == rnameSearchString && it->pos == samRecord.pnext) {
                         LOG_TRACE << "Found mate";
+                        encoder.addPair(samRecord, *it);
+                        if (read_length != 0) {
+                            if (read_length == std::numeric_limits<uint32_t>::max()) {
+                                read_length = samRecord.seq.length();
+                            } else {
+                                if (samRecord.seq.length() != read_length) {
+                                    read_length = 0;
+                                }
+                            }
+                        }
+                        if (read_length != 0) {
+                            if (read_length == std::numeric_limits<uint32_t>::max()) {
+                                read_length = it->seq.length();
+                            } else {
+                                if (it->seq.length() != read_length) {
+                                    read_length = 0;
+                                }
+                            }
+                        }
                         foundMate = true;
                         samRecordsCopy.erase(it);
                         break;
@@ -106,11 +193,18 @@ namespace lae {
                 }
                 if (!foundMate) {
                     LOG_TRACE << "Did not find mate";
+                    singleEnd = true;
+                    encoder.add(samRecord);
+                    if (read_length != 0) {
+                        if (read_length == std::numeric_limits<uint32_t>::max()) {
+                            read_length = samRecord.seq.length();
+                        } else {
+                            if (samRecord.seq.length() != read_length) {
+                                read_length = 0;
+                            }
+                        }
+                    }
                 }
-
-                // pos
-                decodedPos.push_back(samRecord.pos - prevPos);
-                prevPos = samRecord.pos;
 
                 // Break if everything was processed
                 if (samRecordsCopy.empty()) {
@@ -118,18 +212,29 @@ namespace lae {
                 }
             }
 
-            LocalAssemblyReadEncoder lre;
-            LocalAssemblyReferenceEncoder le(1000);
-
-            for (const auto &samRecord : samRecords) {
-                add(samRecord, &le, &lre);
-            }
-
             // Break if less than blockSize records were read from the SAM file
             if (samRecords.size() < blockSize) {
                 break;
             }
         }
+
+#if 0
+        FullLocalAssemblyDecoder decoder(encoder.pollStreams(), SEQUENCE_BUFFER_SIZE, true);
+        util::SamRecord s;
+        util::SamRecord s2;
+        if (singleEnd) {
+            for (uint32_t i = 0; i < record_counter; ++i) {
+                decoder.decode(&s);
+            }
+        } else {
+            for (uint32_t i = 0; i < record_counter / 2; ++i) {
+                decoder.decodePair(&s, &s2);
+            }
+        }
+#else
+        pack(programOptions, encoder.pollStreams(), read_length, record_counter, !singleEnd);
+#endif
+
     }
 
 }  // namespace lae

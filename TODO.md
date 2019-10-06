@@ -6,50 +6,56 @@
 
 ### Brian
 
+N/A
+
 ### Daniel/Jannis
 
-- [ ] Transcode part 1 en-/decapsulator fom Java to C++ (standalone + library)
+- [ ] Implement part 1 en-/decapsulator
+- [ ] Write more unit tests
 
 ### Fabian
 
 - [ ] Implement local assembly encoder
+- [ ] Add support for > 1 transformed sequences to format part 2 library
+- [ ] Cleanup clutter files in part 2 library
+- [ ] Provide a clean way for descriptors -> block payloads (working right now, but messy)
+- [ ] Implement QV-Codebook in Part2 library
 
 ### Jan
 
-- [x] Clean repository with: https://rtyley.github.io/bfg-repo-cleaner/
+- [ ] Add alphabet lookup for sclips descriptor
+- [ ] Update background image on the Genie page
+- [ ] Update MITOGEN page
 - [ ] Add boilerplate to all source code files
-- [ ] Document the generation of the conformance test items
-- [ ] Update setting on github.com and codecov.io and travis.com and travis.org
-- [ ] Set up GitHub pages at: https://mitogen.github.io/genie/
-- [ ] Set up Doxygen documentation at: https://mitogen.github.io/genie/doc/
-- [ ] Re-enable util-tests in ci/run-tests.sh
-- [ ] Set up code coverage system (publish the reports at https://mitogen.github.io/genie/codecov/ and https://codecov.io/gh/mitogen/genie/)
+- [ ] Fix "warning: suggest braces around initialization of subobject [-Wmissing-braces]"
+- [ ] Double-check unit test 'SamFileReader.Truncated'
 - [ ] Check whether everything builds nicely on Travis CI
-  - [ ] Fix compilation warnings
-  - [ ] Enable all tests in .travis.yml
-  - [ ] Add autopep8-pycodestyle.sh to util/before-commit.sh
-  - [ ] Fix clang-tidy warnings
+- [ ] Enable all tests in .travis.yml
+- [ ] Enable util-tests in ci/generate-coverage-report.sh
+- [ ] Enable checks in util/autopep8-pycodestyle.sh
 - [ ] Check file and folder names in the src/ and test/ trees
 - [ ] Don't let genie produce genie.log by default
 - [ ] Rename command line options to something like --input-file instead of --input_file or --input-file-path (this applies to *all* applications)
 - [ ] Check comments
   - [ ] Sentences should start with an uppercase letter and end with a full stop.
   - [ ] Statements should start with an uppercase letter and not end with a full stop.
-- [ ] Check use and linking of OpenMP
 - [ ] Clean up exceptions (use only a simple class derived from std::exception - without all the special things)
 - [ ] Implement a unified logging solution
 - [ ] Format log and error messages uniformly
 - [ ] Check for correct usage of assertions versus exceptions
-- [ ] Implement C++ Core Guideline C.21 ("If you define or =delete any default operation, define or =delete them all")
 - [ ] Make destructors virtual in all classes that something is being derived from (use override in derived classes)
 - [ ] Unify I/O
   - [ ] Bitstream I/O should be done using HM's bitstream classes adapted for 64 bits
   - [ ] "Ordinary" file I/O (for e.g. SPRING's temporary files) should be done using the C++ standard library
 - [ ] Use only numpy arrays in Python interfaces (just as in the example "c-and-python")
+- [ ] In src/libs/gabac/binary-arithmetic-decoder.cc:112 4 bytes must be skipped. This would not be necessary if bitInputStream and binaryArithmeticDecoder would be using references to the same underlying bitstream.
+- [ ] Announce use of GitHub issues
+- [ ] Fix SamFileReader (exception 'stoi' while trying to read gen-013.sam)
 
-### Josh
+### Joshua
 
-- [ ] Write unit tests
+- [x] Write unit tests
+- [ ] Implement C++ Core Guideline C.21 ("If you define or =delete any default operation, define or =delete them all")
 
 ### Junaid
 
@@ -66,6 +72,9 @@
 
 ## When everything is working
 
+- [ ] Fix clang-tidy warnings
+- [ ] Fix compilation warnings
+- [ ] Fix Doxygen warnings
 - [ ] Clean repository with: https://rtyley.github.io/bfg-repo-cleaner/
 - [ ] Check conformance to doc/development-guidelines.md
 - [ ] Check everything with Valgrind
@@ -74,6 +83,12 @@
 - [ ] Update doc/gabac.md
 - [ ] Check LICENSE
 - [ ] Design social media image (for GitHub)
+
+## Issues
+
+- For LUTs, instead of encoding/decoding the symbols in the order of their frequency (as specified in the spec), their frequencies are encoded instead.
+- Though LUTs are encoded, I am not sure if they are used as specified in the spec.
+- In method BitInputStream::read(), all statements like this "readIn(&m_reader)" when they expect a byte to be returned are source of potential bug for wordSize > 1, because then the return value will not be a byte but could be of higher size corresponding to wordSize. There may be few other places to be checked.
 
 ## Futuristic things
 

@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include "exceptions.h"
+#include "util/exceptions.h"
 
 namespace genie {
 
@@ -46,7 +46,7 @@ off_t File::tell() const {
     off_t offset = ftello(m_fp);
 #endif
     if (offset == -1) {
-        GENIE_DIE("ftell failed on file: " + m_path);
+        UTILS_DIE("ftell failed on file: " + m_path);
     }
     return offset;
 }
@@ -55,11 +55,11 @@ void File::close() {
     if (m_fp != nullptr) {
         int rc = fclose(m_fp);
         if (rc != 0) {
-            GENIE_DIE("Failed to close file: " + m_path);
+            UTILS_DIE("Failed to close file: " + m_path);
         }
         m_fp = nullptr;
     } else {
-        GENIE_DIE("Failed to close file: " + m_path);
+        UTILS_DIE("Failed to close file: " + m_path);
     }
 }
 
@@ -76,7 +76,7 @@ void File::open(const std::string &path, const char *const mode) {
 #else
     m_fp = fopen(path.c_str(), mode);
     if (m_fp == nullptr) {
-        GENIE_DIE("Failed to open file: " + m_path);
+        UTILS_DIE("Failed to open file: " + m_path);
     }
 #endif
 
@@ -86,7 +86,7 @@ void File::open(const std::string &path, const char *const mode) {
     int fd = fileno(m_fp);
 #endif
     if (fd == -1) {
-        GENIE_DIE("Failed to get file descriptor of file: " + m_path);
+        UTILS_DIE("Failed to get file descriptor of file: " + m_path);
     }
 
     struct stat st {};
@@ -96,7 +96,7 @@ void File::open(const std::string &path, const char *const mode) {
     }
 #else
     if ((fstat(fd, &st) != 0) || (!S_ISREG(st.st_mode))) {
-        GENIE_DIE("Not a regular file: " + m_path);
+        UTILS_DIE("Not a regular file: " + m_path);
     }
 #endif
 }
@@ -108,7 +108,7 @@ void File::seek(off_t offset, int whence) {
     int rc = fseeko(m_fp, offset, whence);
 #endif
     if (rc != 0) {
-        GENIE_DIE("fseek failed on file: " + m_path);
+        UTILS_DIE("fseek failed on file: " + m_path);
     }
 }
 

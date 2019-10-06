@@ -23,11 +23,13 @@ class BitInputStream {
 
     unsigned char readByte();
 
+    unsigned int read(unsigned int numBits);
+
+    void skipBytes(unsigned int numytes);
+
     void reset();
 
    private:
-    unsigned int read(unsigned int numBits);
-
     gabac::DataBlock *m_bitstream;
 
     gabac::BlockStepper m_reader;

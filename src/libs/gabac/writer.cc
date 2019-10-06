@@ -60,8 +60,10 @@ Writer::Writer(OBufferStream *const bitstream)
 Writer::~Writer() = default;
 
 void Writer::start(size_t numSymbols) {
+    assert(numSymbols > 0);
     assert(numSymbols <= std::numeric_limits<unsigned>::max());
     writeNumSymbols(static_cast<unsigned>(numSymbols));
+    m_binaryArithmeticEncoder.start();
 }
 
 void Writer::reset() {
@@ -217,6 +219,6 @@ void Writer::writeAsSTEGcabac(uint64_t input, unsigned int cSignedTruncExpGolPar
     }
 }
 
-void Writer::writeNumSymbols(unsigned int numSymbols) { writeAsBIbypass(numSymbols, 32); }
+void Writer::writeNumSymbols(unsigned int numSymbols) { m_bitOutputStream.write(numSymbols, 32); }
 
 }  // namespace gabac

@@ -1,5 +1,5 @@
 #include "parameter_set.h"
-#include "ureads-encoder/exceptions.h"
+#include "util/exceptions.h"
 
 #include <sstream>
 
@@ -119,12 +119,12 @@ void ParameterSet::setCrps(std::unique_ptr<ParameterSetCrps> _parameter_set_crps
 void ParameterSet::addClass(AuType class_id, std::unique_ptr<QvCodingConfig> conf) {
     for (auto &a : descriptors) {
         if (a->isClassSpecific()) {
-            GENIE_THROW_RUNTIME_EXCEPTION("Adding classes not allowed once class specific descriptor configs enabled");
+            UTILS_THROW_RUNTIME_EXCEPTION("Adding classes not allowed once class specific descriptor configs enabled");
         }
     }
     for (auto &a : class_IDs) {
         if (class_id == a) {
-            GENIE_THROW_RUNTIME_EXCEPTION("Class already added");
+            UTILS_THROW_RUNTIME_EXCEPTION("Class already added");
         }
     }
     class_IDs.push_back(class_id);
