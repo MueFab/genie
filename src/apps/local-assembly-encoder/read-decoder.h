@@ -12,7 +12,7 @@ namespace lae {
     class LocalAssemblyReadDecoder {
         uint64_t posCounter;
 
-        uint64_t pop(std::vector<uint64_t> *vec);
+        uint64_t pop(gabac::DataBlock *vec);
 
         std::string compressCigar(const std::string &cigar);
 
@@ -24,10 +24,12 @@ namespace lae {
         explicit LocalAssemblyReadDecoder(std::unique_ptr<StreamContainer> _container);
 
         void decodeRead(const std::string& ref, util::SamRecord* s);
+        void decodePair(const std::string& ref1, util::SamRecord* s1, const std::string& ref2, util::SamRecord* s2);
 
         uint32_t lengthOfNextRead();
-
         uint32_t offsetOfNextRead();
+        uint32_t lengthOfSecondNextRead();
+        uint32_t offsetOfSecondNextRead();
     };
 }
 

@@ -5,7 +5,7 @@
 #include <iostream>
 #include <map>
 #include <set>
-#include "exceptions.h"
+#include "util/exceptions.h"
 #include "utilities.h"
 
 namespace dsg {
@@ -107,35 +107,35 @@ void ProgramOptions::validate() {
 
 #ifndef GENIE_USE_OPENMP
     if (numThreads > 1) {
-        throwRuntimeError("Genie was built without OpenMP. Only one thread is supported");
+        UTILS_DIE("Genie was built without OpenMP. Only one thread is supported");
     }
 #endif
 
     if (inputFilePath.empty()) {
-        throwRuntimeError("No input file path provided");
+        UTILS_DIE("No input file path provided");
     }
 
     if (!common::fileExists(inputFilePath)) {
-        throwRuntimeError("Input file does not exist: " + inputFilePath);
+        UTILS_DIE("Input file does not exist: " + inputFilePath);
     }
 
     if (configPath.empty()) {
         if (inputFilePath.substr(inputFilePath.find_last_of('.')) != ".genie") {
-            throwRuntimeError("You need to pass a config directory when not in genie decompression mode!");
+            UTILS_DIE("You need to pass a config directory when not in genie decompression mode!");
         }
     } else if (configPath.back() != '/') {
         configPath += "/";
         if (!ghc::filesystem::exists(configPath) || !ghc::filesystem::is_directory(configPath)) {
-            throwRuntimeError("Config dir does not exist: " + configPath);
+            UTILS_DIE("Config dir does not exist: " + configPath);
         }
     }
 
     if (!inputFilePairPath.empty()) {
         if (!common::fileExists(inputFilePairPath)) {
-            throwRuntimeError("Input pair file does not exist: " + inputFilePairPath);
+            UTILS_DIE("Input pair file does not exist: " + inputFilePairPath);
         }
         if (inputFilePairPath == inputFilePath) {
-            throwRuntimeError("Same name for two input files: " + inputFilePath);
+            UTILS_DIE("Same name for two input files: " + inputFilePath);
         }
         std::cout << "paired mode activated" << std::endl;
     }
@@ -154,7 +154,7 @@ void ProgramOptions::validate() {
     std::transform(inputFileType.begin(), inputFileType.end(), inputFileType.begin(), ::toupper);
 
     if (allowedInputFileTypes.find(inputFileType) == allowedInputFileTypes.end()) {
-        throwRuntimeError("Input file type is invalid: " + inputFilePath);
+        UTILS_DIE("Input file type is invalid: " + inputFilePath);
     }
 }
 

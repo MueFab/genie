@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <util/sam-record.h>
+#include <limits>
 
 namespace lae {
 
@@ -12,12 +13,8 @@ namespace lae {
         uint32_t cr_buf_max_size;
 
         std::vector <std::string> sequences;
-        std::vector <uint64_t> offsets;
+        std::vector <uint64_t> sequence_positions;
         uint32_t crBufSize;
-        uint32_t windowLength;
-        uint32_t lastReadPos;
-
-        uint32_t lastSamPos;
 
         std::string generateRef(uint32_t offset, uint32_t len);
 
@@ -35,6 +32,14 @@ namespace lae {
         std::string getReference(uint32_t pos_offset, const std::string &cigar);
 
         std::string getReference(uint32_t pos_offset, uint32_t len);
+
+        uint64_t getWindowBorder() {
+            uint64_t minPos = std::numeric_limits<uint64_t >::max();
+            for(auto &p : sequence_positions) {
+                minPos = std::min(minPos, p);
+            }
+            return minPos;
+        }
 
         void printWindow();
     };

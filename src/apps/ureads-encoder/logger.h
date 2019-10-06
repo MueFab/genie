@@ -11,7 +11,7 @@
 #include <mutex>
 #include <sstream>
 #include <string>
-#include "exceptions.h"
+#include "util/exceptions.h"
 
 namespace genie {
 
@@ -33,7 +33,7 @@ class Logger {
     void out(const std::string& msg) {
         std::lock_guard<std::mutex> lock(mtx);
         time_t t = time(nullptr);
-        // if (t == ((time_t) - 1)) { GENIE_DIE("time failed"); }
+        // if (t == ((time_t) - 1)) { UTILS_DIE("time failed"); }
         std::stringstream ss;
         struct tm timeinfo {};
         // ISO 8601 format: 2007-04-05T14:30:21Z

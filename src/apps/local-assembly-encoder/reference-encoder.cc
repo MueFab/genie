@@ -1,13 +1,12 @@
 #include "reference-encoder.h"
-#include "exceptions.h"
+#include "util/exceptions.h"
 #include <map>
+#include <limits>
 
 namespace lae {
 
     LocalAssemblyReferenceEncoder::LocalAssemblyReferenceEncoder(uint32_t _cr_buf_max_size) : cr_buf_max_size(_cr_buf_max_size),
-                                                                                              crBufSize(0),
-                                                                                              windowLength(0),
-                                                                                              lastReadPos(0){
+                                                                                              crBufSize(0){
 
     }
 
@@ -28,7 +27,7 @@ namespace lae {
                 case 'X':
                     for (size_t i = 0; i < count; ++i) {
                         if (read_pos >= read.length()) {
-                            GENIE_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
+                            UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
                         }
                         result += read[read_pos++];
                     }
@@ -48,48 +47,31 @@ namespace lae {
                     }
                     break;
                 default:
-                    GENIE_THROW_RUNTIME_EXCEPTION("Unknown CIGAR character");
+                    UTILS_THROW_RUNTIME_EXCEPTION("Unknown CIGAR character");
             }
             count = 0;
         }
 
         if (read_pos != read.length()) {
-            GENIE_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
+            UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
         }
         return result;
     }
 
     void LocalAssemblyReferenceEncoder::addRead(const util::SamRecord& s) {
-        uint32_t pos_offset = s.pos - lastSamPos;
-        lastSamPos = s.pos;
-
+        sequence_positions.push_back(s.pos);
         std::string read = preprocess(s.seq, s.cigar);
-
-        if(!sequences.empty()) {
-            offsets.push_back(pos_offset);
-            lastReadPos += pos_offset;
-        }
-
-        if(lastReadPos + read.length() > windowLength) {
-            windowLength = lastReadPos + read.length();
-        }
-
         sequences.push_back(read);
         crBufSize += read.length();
 
-
         while (crBufSize > cr_buf_max_size) {
             if (sequences.size() == 1) {
-                GENIE_THROW_RUNTIME_EXCEPTION("Read too long for current cr_buf_max_size");
+                UTILS_THROW_RUNTIME_EXCEPTION("Read too long for current cr_buf_max_size");
             }
-
-            lastReadPos -= offsets.front();
-            windowLength -= offsets.front();
-
             // Erase oldest read
             crBufSize -= sequences.front().length();
             sequences.erase(sequences.begin());
-            offsets.erase(offsets.begin());
+            sequence_positions.erase(sequence_positions.begin());
         }
     }
 
@@ -127,7 +109,7 @@ namespace lae {
                     count = 0;
                     break;
                 default:
-                    GENIE_THROW_RUNTIME_EXCEPTION("Unknown CIGAR character");
+                    UTILS_THROW_RUNTIME_EXCEPTION("Unknown CIGAR character");
             }
             count = 0;
         }
@@ -135,38 +117,24 @@ namespace lae {
     }
 
     std::string LocalAssemblyReferenceEncoder::getReference(uint32_t abs_pos, const std::string &cigar) {
-        uint32_t pos = lastReadPos;
-        if(!sequences.empty()) {
-            pos += abs_pos - lastSamPos;
-        }
-        return generateRef(pos, lengthFromCigar(cigar));
+        return generateRef(abs_pos, lengthFromCigar(cigar));
     }
 
     std::string LocalAssemblyReferenceEncoder::getReference(uint32_t abs_pos, uint32_t len) {
-        uint32_t pos = lastReadPos;
-        if(!sequences.empty()) {
-            pos += abs_pos - lastSamPos;
-        }
-        return generateRef(pos, len);
+        return generateRef(abs_pos, len);
     }
 
-    char LocalAssemblyReferenceEncoder::majorityVote(uint32_t offset_to_first) {
+    char LocalAssemblyReferenceEncoder::majorityVote(uint32_t abs_position) {
         std::map<char, uint16_t> votes;
-        uint32_t cur_read_off = 0;
 
         // Collect all alignments
         for (size_t i = 0; i < sequences.size(); ++i) {
-            if (offset_to_first - cur_read_off < sequences[i].length()) {
-                char c = sequences[i][offset_to_first - cur_read_off];
+            int64_t distance = abs_position - sequence_positions[i];
+            if(distance >= 0 && distance < sequences[i].length()){
+                char c = sequences[i][distance];
                 if (c != '0') {
                     votes[c]++;
                 }
-            }
-            if (i != sequences.size() - 1) {
-                cur_read_off += offsets[i];
-            }
-            if (cur_read_off > offset_to_first) {
-                break;
             }
         }
 
@@ -186,11 +154,10 @@ namespace lae {
     }
 
     void LocalAssemblyReferenceEncoder::printWindow() {
-        uint32_t totalOffset = 0;
+        uint64_t minPos = getWindowBorder();
+
         for (size_t i = 0; i < sequences.size(); ++i) {
-            if (i > 0) {
-                totalOffset += offsets[i - 1];
-            }
+            uint64_t totalOffset = sequence_positions[i] -minPos;
             for (size_t s = 0; s < totalOffset; ++s) {
                 std::cout << ".";
             }

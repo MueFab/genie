@@ -23,10 +23,11 @@ void decode_cabac(const BinarizationId& binarizationId, const std::vector<unsign
     }
 
     Reader reader(bitstream);
-    size_t symbolsSize = reader.start();
+    size_t numSymbols = reader.start();
+    if(numSymbols <= 0) return;
 
     // symbols->clear();
-    symbols.resize(symbolsSize);
+    symbols.resize(numSymbols);
 
     unsigned int binarizationParameter = 0;
     if (!binarizationParameters.empty()) {

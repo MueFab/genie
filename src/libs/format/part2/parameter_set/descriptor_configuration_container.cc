@@ -17,7 +17,7 @@ DescriptorConfigurationContainer::DescriptorConfigurationContainer()
 
 void DescriptorConfigurationContainer::setConfig(uint8_t index, std::unique_ptr<DescriptorConfiguration> conf) {
     if (index > descriptor_configurations.size()) {
-        GENIE_THROW_RUNTIME_EXCEPTION("Config index out of bounds.");
+        UTILS_THROW_RUNTIME_EXCEPTION("Config index out of bounds.");
     }
     descriptor_configurations[index] = std::move(conf);
 }
@@ -26,7 +26,7 @@ void DescriptorConfigurationContainer::setConfig(uint8_t index, std::unique_ptr<
 
 void DescriptorConfigurationContainer::setConfig(std::unique_ptr<DescriptorConfiguration> conf) {
     if (class_specific_dec_cfg_flag) {
-        GENIE_THROW_RUNTIME_EXCEPTION("Invalid setConfig() for non class-specific descriptor config.");
+        UTILS_THROW_RUNTIME_EXCEPTION("Invalid setConfig() for non class-specific descriptor config.");
     }
     descriptor_configurations[0] = std::move(conf);
 }

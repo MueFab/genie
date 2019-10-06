@@ -12,7 +12,7 @@
 
 #include <iostream>
 
-#include "exceptions.h"
+#include "util/exceptions.h"
 #include "generation.h"
 #include "program-options.h"
 #include "ureads-encoder/logger.h"
@@ -42,7 +42,7 @@ static int dsg_main(int argc, char* argv[]) {
         } else {
             decompression(programOptions);
         }
-    } catch (const dsg::common::RuntimeErrorException& e) {
+    } catch (const util::RuntimeException& e) {
         std::cerr << "Runtime error";
         if (strlen(e.what()) > 0) {
             std::cerr << ": " << e.what();

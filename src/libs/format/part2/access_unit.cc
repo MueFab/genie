@@ -1,5 +1,5 @@
 #include "access_unit.h"
-#include "ureads-encoder/exceptions.h"
+#include "util/exceptions.h"
 #include "util/bitwriter.h"
 
 
@@ -42,28 +42,28 @@ AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, AuTy
 
 void AccessUnit::setMmCfg(std::unique_ptr<MmCfg> cfg) {
     if (!mm_cfg) {
-        GENIE_THROW_RUNTIME_EXCEPTION("MmCfg not valid for this access unit");
+        UTILS_THROW_RUNTIME_EXCEPTION("MmCfg not valid for this access unit");
     }
     mm_cfg = std::move(cfg);
 }
 
 void AccessUnit::setRefCfg(std::unique_ptr<RefCfg> cfg) {
     if (!ref_cfg) {
-        GENIE_THROW_RUNTIME_EXCEPTION("RefCfg not valid for this access unit");
+        UTILS_THROW_RUNTIME_EXCEPTION("RefCfg not valid for this access unit");
     }
     ref_cfg = std::move(cfg);
 }
 
 void AccessUnit::setAuTypeCfg(std::unique_ptr<AuTypeCfg> cfg) {
     if (!au_Type_U_Cfg) {
-        GENIE_THROW_RUNTIME_EXCEPTION("au_type_u_cfg not valid for this access unit");
+        UTILS_THROW_RUNTIME_EXCEPTION("au_type_u_cfg not valid for this access unit");
     }
     au_Type_U_Cfg = std::move(cfg);
 }
 
 void AccessUnit::setSignatureCfg(std::unique_ptr<SignatureCfg> cfg) {
     if (!signature_config) {
-        GENIE_THROW_RUNTIME_EXCEPTION("signature config not valid for this access unit");
+        UTILS_THROW_RUNTIME_EXCEPTION("signature config not valid for this access unit");
     }
     signature_config = std::move(cfg);
 }

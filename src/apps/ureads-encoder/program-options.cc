@@ -1,6 +1,6 @@
 #include "program-options.h"
 
-#include "exceptions.h"
+#include "util/exceptions.h"
 #include "log.h"
 #include "logger.h"
 
@@ -27,15 +27,15 @@ void ProgramOptions::processCommandLine(int argc, char* argv[]) {
     try {
         app.parse(argc, argv);
     } catch (const CLI::ParseError& e) {
-        GENIE_DIE("Program options error: " + std::to_string(app.exit(e)));
+        UTILS_DIE("Program options error: " + std::to_string(app.exit(e)));
     }
 
     if (!ghc::filesystem::exists(ghc::filesystem::path(inputFilePath))) {
-        GENIE_DIE("Input file does not exist");
+        UTILS_DIE("Input file does not exist");
     }
 
     if (ghc::filesystem::exists(ghc::filesystem::path(outputFilePath))) {
-        GENIE_DIE("Output file exists already");
+        UTILS_DIE("Output file exists already");
     }
 }
 

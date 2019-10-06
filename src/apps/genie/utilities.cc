@@ -14,7 +14,7 @@
 #include <sys/stat.h>
 #include <fstream>
 
-#include "exceptions.h"
+#include "util/exceptions.h"
 #include "operating-system.h"
 
 namespace dsg {
@@ -26,24 +26,24 @@ std::string dateTime(void) {
 
     time_t currentTime = time(NULL);
     if (currentTime == ((time_t)-1)) {
-        throwRuntimeError("call to time() failed");
+        UTILS_DIE("call to time() failed");
     }
     struct tm timeinfo;
 
 #ifdef OS_WINDOWS
     errno_t err = gmtime_s(&timeinfo, &currentTime);
     if (err != 0) {
-        throwRuntimeError("call to gmtime_s() failed");
+        UTILS_DIE("call to gmtime_s() failed");
     }
 #else
     struct tm* ret = gmtime_r(&currentTime, &timeinfo);
     if (ret == NULL) {
-        throwRuntimeError("call to gmtime_r() failed");
+        UTILS_DIE("call to gmtime_r() failed");
     }
 #endif
 
     if (strftime(timeString, sizeof(timeString), "%Y-%m-%dT%H:%M:%SZ", &timeinfo) == 0) {
-        throwRuntimeError("call to strftime() failed");
+        UTILS_DIE("call to strftime() failed");
     }
 
     std::string result(timeString);
@@ -52,7 +52,7 @@ std::string dateTime(void) {
 
 std::string fileBaseName(const std::string& path) {
     if (path.empty()) {
-        throwRuntimeError("path is empty");
+        UTILS_DIE("path is empty");
     }
 
     std::string delimiters = "/\\";
@@ -62,7 +62,7 @@ std::string fileBaseName(const std::string& path) {
 
 bool fileExists(const std::string& path) {
     if (path.empty()) {
-        throwRuntimeError("path is empty");
+        UTILS_DIE("path is empty");
     }
 
     std::ifstream ifs(path.c_str());

@@ -13,9 +13,7 @@
 namespace gabac {
 
 BinaryArithmeticDecoder::BinaryArithmeticDecoder(const BitInputStream& bitInputStream)
-    : m_bitInputStream(bitInputStream) {
-    start();
-}
+    : m_bitInputStream(bitInputStream), m_numBitsNeeded(0), m_range(0), m_value(0) {}
 
 inline unsigned int BinaryArithmeticDecoder::decodeBin(ContextModel* const contextModel) {
     assert(contextModel != nullptr);
@@ -111,6 +109,7 @@ void BinaryArithmeticDecoder::reset() { decodeBinTrm(); }
 
 void BinaryArithmeticDecoder::start() {
     assert(m_bitInputStream.getNumBitsUntilByteAligned() == 0);
+    m_bitInputStream.skipBytes(4); // Corresponding the numSymbols already reader::start()
 
     m_numBitsNeeded = -8;
     m_range = 510;
