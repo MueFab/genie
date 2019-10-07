@@ -21,7 +21,7 @@ namespace lae {
         const std::vector<size_t> SEQUENCE_NUMS = {2, 1, 3, 2, 3, 4, 1, 1, 8, 1, 5, 2, 1, 1, 1, 2, 1, 1};
         const std::string DEFAULT_GABAC_CONF_JSON =
                 "{"
-                "\"word_size\": 1,"
+                "\"word_size\": 4,"
                 "\"sequence_transformation_id\": 0,"
                 "\"sequence_transformation_parameter\": 0,"
                 "\"transformed_sequences\":"
