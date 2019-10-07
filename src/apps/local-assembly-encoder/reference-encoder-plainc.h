@@ -2,7 +2,7 @@
 #define GENIE_REFERENCE_ENCODER_PLAINC_H_
 
 #include <stdint.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 
 typedef struct {
