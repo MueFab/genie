@@ -27,6 +27,7 @@ N/A
 - [ ] Update background image on the Genie page
 - [ ] Update MITOGEN page
 - [ ] Add boilerplate to all source code files
+- [ ] Fix "warning: suggest braces around initialization of subobject [-Wmissing-braces]"
 - [ ] Double-check unit test 'SamFileReader.Truncated'
 - [ ] Check whether everything builds nicely on Travis CI
 - [ ] Enable all tests in .travis.yml
@@ -82,6 +83,12 @@ N/A
 - [ ] Update doc/gabac.md
 - [ ] Check LICENSE
 - [ ] Design social media image (for GitHub)
+
+## Issues
+
+- For LUTs, instead of encoding/decoding the symbols in the order of their frequency (as specified in the spec), their frequencies are encoded instead.
+- Though LUTs are encoded, I am not sure if they are used as specified in the spec.
+- In method BitInputStream::read(), all statements like this "readIn(&m_reader)" when they expect a byte to be returned are source of potential bug for wordSize > 1, because then the return value will not be a byte but could be of higher size corresponding to wordSize. There may be few other places to be checked.
 
 ## Futuristic things
 
