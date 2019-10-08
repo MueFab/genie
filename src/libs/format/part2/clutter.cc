@@ -105,11 +105,16 @@ namespace format {
                              desc_conf_pres::cabac::DescriptorSubsequenceCfg *sub_conf) {
         size_t i = 0;
         for (const auto &tSeqConf : conf.transformedSequenceConfigurations) {
+            uint8_t size = gabac::getTransformation(conf.sequenceTransformationId).wordsizes[i] * 8;
+            if(!size) {
+                size = conf.wordSize * 8;
+            }
+
             auto transform = inferTransform(tSeqConf);
             auto binarization = inferBinarization(tSeqConf);
             auto subcfg = make_unique<desc_conf_pres::cabac::TransformSubseqCfg>(
-                    transform, make_unique<desc_conf_pres::cabac::SupportValues>(3, 3, 0, transform),
-                    std::move(binarization));  // TODO insert actual values
+                    transform, make_unique<desc_conf_pres::cabac::SupportValues>(size, size, 0, transform),
+                    std::move(binarization));
             sub_conf->setTransformSubseqCfg(i, std::move(subcfg));
             ++i;
         }
