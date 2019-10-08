@@ -16,13 +16,13 @@ std::streamsize GenieGabacOutputBuffer::xsputn(const char *s, std::streamsize n)
     std::streamsize curPos = 0;
     while (curPos < n) {
         // Fill size buffer
-        while (bytesLeft == 0 && sizeBuf.size() != sizeof(uint64_t) && curPos < n) {
+        while (bytesLeft == 0 && sizeBuf.size() != sizeof(uint32_t) && curPos < n) {
             sizeBuf.push_back(s[curPos++]);
         }
 
         // Size buffer full, create new stream
-        if (sizeBuf.size() == sizeof(uint64_t)) {
-            bytesLeft = *reinterpret_cast<uint64_t *>(sizeBuf.data());
+        if (sizeBuf.size() == sizeof(uint32_t)) {
+            bytesLeft = *reinterpret_cast<uint32_t *>(sizeBuf.data());
             sizeBuf.clear();
             streams.emplace_back(bytesLeft, sizeof(uint8_t));
         }
