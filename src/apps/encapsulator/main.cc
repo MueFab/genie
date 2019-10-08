@@ -8,6 +8,7 @@
 #include <vector>
 #include "exceptions.h"
 #include "program-options.h"
+#include "FileHandlingUtils.h"
 
 static std::string commandLineStr(int argc, char* argv[]) {
     std::vector<std::string> args(argv, (argv + argc));
@@ -25,6 +26,9 @@ static int encapsulator_main(int argc, char* argv[]) {
             return 0;
         }
         std::cout << "command line: " + commandLineStr(argc, argv) << std::endl;
+
+        //createMPEGGFileNoMITFromByteStream(argv[1],argv[2],argv[3]);
+
     } catch (const encapsulator::RuntimeError& runtimeError) {
         std::cerr << "error: encapsulator: " << runtimeError.what() << std::endl;
         return -1;
