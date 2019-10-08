@@ -39,7 +39,7 @@ struct StreamContainer {
               mmtype_2(0, 4),
               clips_0(0, 4),
               clips_1(0, 4),
-              clips_2(0, 1),
+              clips_2(0, 4),
               clips_3(0, 4),
               pair_0(0, 4),
               pair_1(0,4),
