@@ -153,7 +153,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &file_order
         std::map<std::string, std::string> strname;
         dsg::AcessUnitStreams AUStreams;
         std::ifstream f_order_id(file_order_id + "." + std::to_string(block_num), std::ios::binary);
-        std::vector<int64_t> tokens[128][8];
+        std::vector<int64_t> tokens[128][6];
         std::string *id_array_block = new std::string[block_end[block_num] - block_start[block_num]];
         uint32_t index;
         for (uint32_t j = block_start[block_num]; j < block_end[block_num]; j++) {
@@ -163,7 +163,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &file_order
         generate_read_id_tokens(id_array_block, block_end[block_num] - block_start[block_num], tokens);
         std::string outfile_name = file_name + "." + std::to_string(block_num);
         for (int i = 0; i < 128; i++) {
-            for (int j = 0; j < 8; j++) {
+            for (int j = 0; j < 6; j++) {
                 if (!tokens[i][j].empty()) {
                     std::string outfile_name_i_j = outfile_name.substr(outfile_name.find_last_of('/') + 1) + "." +
                                                    std::to_string(i) + "." + std::to_string(j);
@@ -197,7 +197,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &file_order
     for (uint64_t block_num = 0; block_num < block_start.size(); block_num++) {
         dsg::AcessUnitStreams AUStreams;
         std::ifstream f_order_id(file_order_id + "." + std::to_string(block_num), std::ios::binary);
-        std::vector<int64_t> tokens[128][8];
+        std::vector<int64_t> tokens[128][6];
         std::string *id_array_block = new std::string[block_end[block_num] - block_start[block_num]];
         uint32_t index;
         for (uint32_t j = block_start[block_num]; j < block_end[block_num]; j++) {
@@ -207,7 +207,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &file_order
         generate_read_id_tokens(id_array_block, block_end[block_num] - block_start[block_num], tokens);
         std::string outfile_name = file_name + "." + std::to_string(block_num);
         for (int i = 0; i < 128; i++) {
-            for (int j = 0; j < 8; j++) {
+            for (int j = 0; j < 6; j++) {
                 if (!tokens[i][j].empty()) {
                     std::string outfile_name_i_j = outfile_name.substr(outfile_name.find_last_of('/') + 1) + "." +
                                                    std::to_string(i) + "." + std::to_string(j);
@@ -224,7 +224,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &file_order
 #endif
         {
             for (int i = 0; i < 128; i++) {
-                for (int j = 0; j < 8; j++) {
+                for (int j = 0; j < 6; j++) {
                     ;
                     if (!AUStreams.streams[i][j].empty()) {
                         std::string outfile_name_i_j = outfile_name.substr(outfile_name.find_last_of('/') + 1) + "." +
@@ -298,7 +298,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
 
 void pack_id(const std::string &outfile_name, dsg::StreamSaver &st, dsg::AcessUnitStreams *streams) {
     for (int i = 0; i < 128; i++) {
-        for (int j = 0; j < 8; j++) {
+        for (int j = 0; j < 6; j++) {
             std::string outfile_name_i_j = outfile_name.substr(outfile_name.find_last_of('/') + 1) + "." +
                                            std::to_string(i) + "." + std::to_string(j);
             if (streams->streams[i][j].getRawSize()) {
@@ -351,12 +351,12 @@ void reorder_compress(const std::string &file_name, const uint32_t &num_reads_pe
             gabac::DataBlock qualityBuffer(0, 1);
 
             if (mode == "id") {
-                std::vector<int64_t> tokens[128][8];
+                std::vector<int64_t> tokens[128][6];
                 generate_read_id_tokens(str_array + start_read_num, num_reads_block, tokens);
                 std::map<std::string, gabac::DataBlock> str;
                 std::map<std::string, std::string> strname;
                 for (int i = 0; i < 128; i++) {
-                    for (int j = 0; j < 8; j++) {
+                    for (int j = 0; j < 6; j++) {
                         if (!tokens[i][j].empty()) {
                             std::string outfile_name_i_j = outfile_name.substr(outfile_name.find_last_of('/') + 1) +
                                                            "." + std::to_string(i) + "." + std::to_string(j);
@@ -417,10 +417,10 @@ void reorder_compress(const std::string &file_name, const uint32_t &num_reads_pe
             gabac::DataBlock qualityBuffer(0, 1);
 
             if (mode == "id") {
-                std::vector<int64_t> tokens[128][8];
+                std::vector<int64_t> tokens[128][6];
                 generate_read_id_tokens(str_array + start_read_num, num_reads_block, tokens);
                 for (int i = 0; i < 128; i++) {
-                    for (int j = 0; j < 8; j++) {
+                    for (int j = 0; j < 6; j++) {
                         if (!tokens[i][j].empty()) {
                             std::string outfile_name_i_j = outfile_name.substr(outfile_name.find_last_of('/') + 1) +
                                                            "." + std::to_string(i) + "." + std::to_string(j);
@@ -450,7 +450,7 @@ void reorder_compress(const std::string &file_name, const uint32_t &num_reads_pe
     }
 }
 
-void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std::vector<int64_t> tokens[128][8]) {
+void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std::vector<int64_t> tokens[128][6]) {
     char prev_ID[MAX_NUM_TOKENS_ID] = {0};
     uint32_t prev_tokens_ptr[MAX_NUM_TOKENS_ID] = {0};
     for (uint32_t id_num = 0; id_num < num_ids; id_num++) {
@@ -459,6 +459,20 @@ void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std
             tokens[0][1].push_back(0);  // DIFF 0 for first id
         else
             tokens[0][1].push_back(1);  // DIFF 1 for rest of ids
+        generate_id_tokens(prev_ID, prev_tokens_ptr, id_array[id_num], tokens);
+    }
+}
+
+void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std::vector<gabac::DataBlock> &tokens) {
+    char prev_ID[MAX_NUM_TOKENS_ID] = {0};
+    uint32_t prev_tokens_ptr[MAX_NUM_TOKENS_ID] = {0};
+    for (uint32_t id_num = 0; id_num < num_ids; id_num++) {
+        tokens[0*6+0].push_back(1);  // DIFF
+        if (id_num == 0) {
+            big_endian_push_uint32(0, &tokens[0*6+1]);  // DIFF 0 for first id
+        } else {
+            big_endian_push_uint32(1, &tokens[0*6+1]);  // DIFF 1 for rest of ids
+        }
         generate_id_tokens(prev_ID, prev_tokens_ptr, id_array[id_num], tokens);
     }
 }

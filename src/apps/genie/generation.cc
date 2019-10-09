@@ -28,7 +28,7 @@
 
 namespace dsg {
 
-static generated_aus generationFromFastq_SPRING(const ProgramOptions &programOptions, dsg::StreamSaver &st) {
+static void generationFromFastq_SPRING(const ProgramOptions &programOptions, const std::string &filename) {
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Descriptor stream generation from FASTQ file" << std::endl;
     std::cout << std::string(80, '-') << std::endl;
@@ -38,15 +38,15 @@ static generated_aus generationFromFastq_SPRING(const ProgramOptions &programOpt
     util::FastqFileReader fastqFileReader1(programOptions.inputFilePath);
     std::cout << "Calling SPRING" << std::endl;
     if (programOptions.inputFilePairPath.empty()) {
-        return spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader1, programOptions.numThreads,
-                                               paired_end, programOptions.workingDirectory, programOptions.analyze, st,
+        spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader1, programOptions.numThreads,
+                                               paired_end, programOptions.workingDirectory, programOptions.analyze, filename,
                                                programOptions.preserve_order, !programOptions.discard_quality,
                                                !programOptions.discard_ids);
     } else {
         paired_end = true;
         util::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath);
-        return spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader2, programOptions.numThreads,
-                                               paired_end, programOptions.workingDirectory, programOptions.analyze, st,
+        spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader2, programOptions.numThreads,
+                                               paired_end, programOptions.workingDirectory, programOptions.analyze, filename,
                                                programOptions.preserve_order, !programOptions.discard_quality,
                                                !programOptions.discard_ids);
     }
@@ -82,15 +82,16 @@ static void generationFromFastq(const ProgramOptions &programOptions) {
         // warn if string doesn't end in ".genie" ??
     }
 
-    std::ofstream output(filename);
-    output.exceptions(std::ios::badbit | std::ios::failbit);
+    // std::ofstream output(filename);
+    // output.exceptions(std::ios::badbit | std::ios::failbit);
+    //
+    // if (!output) {
+    //     throw std::runtime_error("Could not open output file: " + filename);
+    // }
 
-    if (!output) {
-        throw std::runtime_error("Could not open output file: " + filename);
-    }
-
-    dsg::StreamSaver store(programOptions.configPath, &output, nullptr, programOptions.gabacDebug);
-    auto generated_aus = generationFromFastq_SPRING(programOptions, store);
+//    dsg::StreamSaver store(programOptions.configPath, &output, nullptr, programOptions.gabacDebug);
+//    auto generated_aus = generationFromFastq_SPRING(programOptions, store);
+    generationFromFastq_SPRING(programOptions, filename);
 }
 
 void decompression_fastq(const ProgramOptions &programOptions) {

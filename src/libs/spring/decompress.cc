@@ -39,9 +39,9 @@ void decode_streams(decoded_desc_t &dec, bool paired_end, bool preserve_quality,
     std::map<uint8_t, std::map<uint8_t, std::vector<int64_t>::iterator>> subseq_it;
     // intialize iterators for subsequences
     for (auto arr : subseq_indices) subseq_it[arr[0]][arr[1]] = (dec.subseq_vector[arr[0]][arr[1]]).begin();
-    uint32_t pos_in_tokens_array[128][8];
+    uint32_t pos_in_tokens_array[128][6];
     for (int i = 0; i < 128; i++)
-        for (int j = 0; j < 8; j++) pos_in_tokens_array[i][j] = 0;
+        for (int j = 0; j < 6; j++) pos_in_tokens_array[i][j] = 0;
     uint64_t pos_in_quality_arr = 0;
     std::string prev_ID;
     uint32_t prev_tokens_ptr[MAX_NUM_TOKENS_ID] = {0};
@@ -234,9 +234,9 @@ void decode_streams_ureads(decoded_desc_t &dec, bool paired_end, bool preserve_q
     std::map<uint8_t, std::map<uint8_t, std::vector<int64_t>::iterator>> subseq_it;
     // intialize iterators for subsequences
     for (auto arr : subseq_indices) subseq_it[arr[0]][arr[1]] = (dec.subseq_vector[arr[0]][arr[1]]).begin();
-    uint32_t pos_in_tokens_array[128][8];
+    uint32_t pos_in_tokens_array[128][6];
     for (int i = 0; i < 128; i++)
-        for (int j = 0; j < 8; j++) pos_in_tokens_array[i][j] = 0;
+        for (int j = 0; j < 6; j++) pos_in_tokens_array[i][j] = 0;
     uint64_t pos_in_quality_arr = 0;
     std::string prev_ID;
     uint32_t prev_tokens_ptr[MAX_NUM_TOKENS_ID] = {0};

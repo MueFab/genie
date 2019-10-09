@@ -13,7 +13,7 @@ namespace spring {
 struct decoded_desc_t {
     std::map<uint8_t, std::map<uint8_t, std::vector<int64_t>>> subseq_vector;
     std::string quality_arr;
-    std::vector<int64_t> tokens[128][8];
+    std::vector<int64_t> tokens[128][6];
 };
 
 void decode_streams(decoded_desc_t &dec, bool paired_end, bool preserve_quality, bool preserve_id, bool combine_pairs,

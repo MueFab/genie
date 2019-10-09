@@ -32,7 +32,9 @@ void reorder_compress(const std::string &file_name, const uint32_t &num_reads_pe
                       uint32_t *order_array, const std::string &mode, bool analyze, dsg::StreamSaver &st);
 // mode can be "quality" or "id"
 
-void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std::vector<int64_t> tokens[128][8]);
+void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std::vector<int64_t> tokens[128][6]);
+
+void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std::vector<gabac::DataBlock> &tokens);
 
 void pack_id(const std::string &outfile_name, dsg::StreamSaver &st, dsg::AcessUnitStreams *streams);
 
