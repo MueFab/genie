@@ -23,7 +23,10 @@ N/A
 
 ### Jan
 
+- [ ] Remove GABAC optimization stuff
 - [ ] Add alphabet lookup for sclips descriptor
+- [ ] Rename 'genie' to 'global-assembly-encoder'
+- [ ] Add stubs for 'reference-based-encoder'
 - [ ] Update background image on the Genie page
 - [ ] Update MITOGEN page
 - [ ] Add boilerplate to all source code files
