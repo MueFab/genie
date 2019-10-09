@@ -8,11 +8,11 @@
 
 namespace spring {
 
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> compress_ureads(util::FastqFileReader *fastqFileReader1,
-                                                                               util::FastqFileReader *fastqFileReader2,
-                                                                               const std::string &temp_dir,
-                                                                               compression_params &cp,
-                                                                               dsg::StreamSaver &st);
+void compress_ureads(util::FastqFileReader *fastqFileReader1,
+                     util::FastqFileReader *fastqFileReader2,
+                     const std::string &temp_dir,
+                     compression_params &cp,
+                     const std::string &outputFilePath);
 
 }  // namespace spring
 
