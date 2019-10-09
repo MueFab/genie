@@ -33,6 +33,13 @@ struct GenomicDescriptorProperties {
 };
 constexpr size_t NUM_DESCRIPTORS = 18;
 
+struct Alphabet {
+    std::vector<char> lut;
+    std::vector<char> inverseLut;
+};
+
+const Alphabet &getAlphabetProperties(ParameterSet::AlphabetID id);
+
 const std::vector<GenomicDescriptorProperties> &getDescriptorProperties();
 
 /* ----------------------------------------------------------------------------------------------------------- */

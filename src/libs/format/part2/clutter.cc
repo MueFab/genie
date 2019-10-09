@@ -8,6 +8,8 @@
 #include "parameter_set/descriptor_configuration_present/descriptor_configuration_present.h"
 #include "parameter_set/qv_coding_config_1/qv_coding_config_1.h"
 #include <climits>
+#include <algorithm>
+
 namespace format {
 
     const std::vector<GenomicDescriptorProperties> &getDescriptorProperties() {
@@ -55,6 +57,24 @@ namespace format {
             return loc;
         }();
         return prop;
+    }
+
+    const Alphabet &getAlphabetProperties(ParameterSet::AlphabetID id) {
+        static const auto prop = []() -> std::vector<Alphabet> {
+            std::vector<Alphabet> loc;
+            loc.emplace_back();
+            loc.back().lut = {'A', 'C', 'G', 'T', 'N'};
+            loc.emplace_back();
+            loc.back().lut = {'A', 'C', 'G', 'T', 'R', 'Y', 'S', 'W', 'K', 'M', 'B', 'D', 'H', 'V', 'N', '-'};
+            for(auto &l : loc) {
+                l.inverseLut = std::vector<char>(*std::max_element(l.lut.begin(), l.lut.end()) + 1, 0);
+                for (size_t i = 0; i < l.lut.size(); ++i) {
+                    l.inverseLut[l.lut[i]] = i;
+                }
+            }
+            return loc;
+        }();
+        return prop[uint8_t(id)];
     }
 
 /**
