@@ -23,6 +23,7 @@ N/A
 
 ### Jan
 
+- [ ] Clean up collaborators on GitHub
 - [ ] Remove GABAC optimization stuff
 - [ ] Add alphabet lookup for sclips descriptor
 - [ ] Rename 'genie' to 'global-assembly-encoder'
