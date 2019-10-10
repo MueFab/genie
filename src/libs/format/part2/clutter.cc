@@ -173,7 +173,7 @@ namespace format {
         val >>= 7;
       } while (val != 0);
       for (int i = tmp.size() - 1; i > 0; i--)
-        ret->push_back(tmp[i]&0x80);
+        ret->push_back(tmp[i]|0x80);
       ret->push_back(tmp[0]);
     }
 
@@ -216,11 +216,19 @@ namespace format {
 
     std::vector<uint8_t> create_payload_tokentype(std::vector<std::vector<gabac::DataBlock>> *block, uint32_t records_count) {
         std::vector<uint8_t> ret;
-        write32bit(records_count, &ret);
-        write16bit(128*6, &ret); // assumes standard id_tokenization used
         if (block->size() != 128*6)
           throw std::runtime_error("tokentype: number of tokens not 128*6 as expected.");
+        write32bit(records_count, &ret);
+        uint16_t num_tokentype_sequences = 0;
+        // assumes standard id_tokenization used
         for (uint16_t i = 0; i < 128*6; i++) {
+          if ((*block)[i].size() != 0)
+            num_tokentype_sequences++;
+        }
+        write16bit(num_tokentype_sequences, &ret);
+        for (uint16_t i = 0; i < 128*6; i++) {
+          if ((*block)[i].size() == 0)
+            continue;
           uint8_t type_id = i%6;
           uint8_t method_id = 3; // CABAC_METHOD_0
           write8bit(16*type_id+method_id, &ret); // 4 bits each
