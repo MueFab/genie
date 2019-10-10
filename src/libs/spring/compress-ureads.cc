@@ -166,7 +166,6 @@ void compress_ureads(util::FastqFileReader *fastqFileReader1,
                           }
                         }
                     }
-                    std::cout << generated_streams[6][0].size()<<"\n";
                     if (cp.preserve_id) {
                         generate_read_id_tokens(id_array_1 + tid * num_reads_per_block, num_reads_thr, raw_data[15]);
                         for (int i = 0; i < 128; i++) {
