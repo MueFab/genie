@@ -13,12 +13,11 @@ namespace lae {
         std::unique_ptr<StreamContainer> container;
         uint32_t pos;
         uint32_t readCounter;
-        void codeVariants(const std::string &read, const std::string &cigar, const std::string& ref);
-        uint64_t pop(std::vector<uint64_t>* vec);
+        void codeVariants(const std::string &read, const std::string &cigar, const std::string& ref, bool isFirst);
     public:
         explicit LocalAssemblyReadEncoder();
 
-        void addRead(const util::SamRecord& rec, const std::string& ref);
+        void addRead(const util::SamRecord& rec, const std::string& ref, bool isFirst = true);
         void addPair(const util::SamRecord& rec1, const std::string& ref1, const util::SamRecord& rec2, const std::string& ref2);
 
         std::unique_ptr<StreamContainer> pollStreams();
