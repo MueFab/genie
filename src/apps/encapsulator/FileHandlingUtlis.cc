@@ -114,7 +114,7 @@ int createMPEGGFileNoMITFromByteStream(char *fileName, char* refInfoPath, char* 
     size_t parametersCount = getSize(parameters);
     bool isAReferenceFile = false;
     for(size_t parameters_i = 0; parameters_i < parametersCount; parameters_i++){
-        DataUnitParametersSet* parametersSet = getValue(parameters, parameters_i);
+        DataUnitParametersSet* parametersSet = (DataUnitParametersSet*)getValue(parameters, parameters_i);
         pushBack(datasetParameters, initDatasetParametersWithParameters(
                 0,0,parametersSet->parent_parameter_setId, parametersSet->parameter_setId,
                 parametersSet->dataset_type,
