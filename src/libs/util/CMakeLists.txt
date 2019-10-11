@@ -9,6 +9,7 @@ set(source_files
         fastq-record.cc
         file-reader.cc
         log.cc
+        perf-stats.cc
         sam-file-reader.cc
         sam-record.cc
         string-helpers.cc

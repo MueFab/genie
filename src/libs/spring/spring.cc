@@ -26,7 +26,8 @@ namespace spring {
 
 generated_aus generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
                                       int num_thr, bool paired_end, const std::string &working_dir, bool analyze,
-                                      dsg::StreamSaver &st, bool ureads_flag, bool preserve_quality, bool preserve_id) {
+                                      dsg::StreamSaver &st, bool ureads_flag, bool preserve_quality, bool preserve_id,
+                                      util::FastqStats *stats) {
 #ifdef GENIE_USE_OPENMP
     std::cout << "SPRING: built with OpenMP" << std::endl;
 #else
@@ -72,7 +73,7 @@ generated_aus generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, u
     if (cp.ureads_flag) {
         std::cout << "ureads_flag detected.\n";
         // TODO: add support for analyze
-        descriptorFilesPerAUs = compress_ureads(fastqFileReader1, fastqFileReader2, temp_dir, cp, st);
+        descriptorFilesPerAUs = compress_ureads(fastqFileReader1, fastqFileReader2, temp_dir, cp, st, stats);
         cp.num_blocks = descriptorFilesPerAUs.size();
     } else {
         std::cout << "Preprocessing ...\n";
@@ -83,6 +84,9 @@ generated_aus generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, u
         std::cout << "Time for this step: "
                   << std::chrono::duration_cast<std::chrono::seconds>(preprocess_end - preprocess_start).count()
                   << " s\n";
+        if (stats->enabled) {
+            stats->preprocess_t = preprocess_end - preprocess_start;
+        }
 
         std::cout << "Reordering ...\n";
         auto reorder_start = std::chrono::steady_clock::now();
@@ -91,6 +95,9 @@ generated_aus generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, u
         std::cout << "Reordering done!\n";
         std::cout << "Time for this step: "
                   << std::chrono::duration_cast<std::chrono::seconds>(reorder_end - reorder_start).count() << " s\n";
+        if (stats->enabled) {
+            stats->reorder_t = reorder_end - reorder_start;
+        }
 
         std::cout << "Encoding ...\n";
         auto encoder_start = std::chrono::steady_clock::now();
@@ -99,14 +106,20 @@ generated_aus generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, u
         std::cout << "Encoding done!\n";
         std::cout << "Time for this step: "
                   << std::chrono::duration_cast<std::chrono::seconds>(encoder_end - encoder_start).count() << " s\n";
+        if (stats->enabled) {
+            stats->encode_t = encoder_end - encoder_start;
+        }
 
         std::cout << "Generating read streams ...\n";
         auto grs_start = std::chrono::steady_clock::now();
-        descriptorFilesPerAUs = generate_read_streams(temp_dir, cp, analyze, st);
+        descriptorFilesPerAUs = generate_read_streams(temp_dir, cp, analyze, st, stats);
         auto grs_end = std::chrono::steady_clock::now();
         std::cout << "Generating read streams done!\n";
         std::cout << "Time for this step: "
                   << std::chrono::duration_cast<std::chrono::seconds>(grs_end - grs_start).count() << " s\n";
+        if (stats->enabled) {
+            stats->generation_t = grs_end - grs_start;
+        }
 
         cp.num_blocks = descriptorFilesPerAUs.size();
 
@@ -128,11 +141,14 @@ generated_aus generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, u
         if (preserve_quality || preserve_id) {
             std::cout << "Reordering and compressing quality and/or ids ...\n";
             auto rcqi_start = std::chrono::steady_clock::now();
-            reorder_compress_quality_id(temp_dir, cp, analyze, st);
+            reorder_compress_quality_id(temp_dir, cp, analyze, st, stats);
             auto rcqi_end = std::chrono::steady_clock::now();
             std::cout << "Reordering and compressing quality and/or ids done!\n";
             std::cout << "Time for this step: "
                       << std::chrono::duration_cast<std::chrono::seconds>(rcqi_end - rcqi_start).count() << " s\n";
+            if (stats->enabled) {
+                stats->qual_score_t = rcqi_end - rcqi_start;
+            }
         }
     }
     generated_aus result(descriptorFilesPerAUs);
@@ -140,7 +156,10 @@ generated_aus generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, u
     std::string compression_params_file = "cp.bin";
     gabac::DataBlock d((uint8_t *)&cp, sizeof(compression_params), 1);
     st.compress(compression_params_file, &d);
-    st.pack(d, compression_params_file);
+    uint64_t size = st.pack(d, compression_params_file);
+    if (stats->enabled) {
+        stats->cmprs_total_sz += size;
+    }
 
     delete cp_ptr;
 
@@ -152,7 +171,10 @@ generated_aus generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, u
 
     ghc::filesystem::remove_all(temp_dir);
 
-    st.finish();
+    size = st.finish();
+    if (stats->enabled) {
+        stats->cmprs_total_sz += size;
+    }
 
 #if GENIE_USE_OPENMP
     //

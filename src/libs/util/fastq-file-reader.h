@@ -5,12 +5,14 @@
 #include <vector>
 #include "fastq-record.h"
 #include "file-reader.h"
+#include "perf-stats.h"
 
 namespace util {
 
 class FastqFileReader : public FileReader {
+    FastqStats *stats;
    public:
-    FastqFileReader(const std::string &path);
+    FastqFileReader(const std::string &path, FastqStats *_stats);
     ~FastqFileReader();
     size_t readRecords(const size_t numRecords, std::vector<FastqRecord> *const records);
 };
