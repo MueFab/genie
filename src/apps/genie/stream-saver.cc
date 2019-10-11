@@ -111,7 +111,7 @@ std::string StreamSaver::getConfigName(const std::string &stream) {
     return stream;
 }
 
-void StreamSaver::pack(const gabac::DataBlock &data, const std::string &stream_name) {
+uint64_t StreamSaver::pack(const gabac::DataBlock &data, const std::string &stream_name) {
     // Write name of input file
     uint64_t size = stream_name.size();
 
@@ -127,6 +127,7 @@ void StreamSaver::pack(const gabac::DataBlock &data, const std::string &stream_n
     if (size) {
         fout->write(reinterpret_cast<const char *>(data.getData()), data.getRawSize());
     }
+    return size;
 }
 
 void StreamSaver::unpack(const std::string &stream_name, gabac::DataBlock *data) {
@@ -244,12 +245,14 @@ void StreamSaver::reloadConfigSet() {
     }
 }
 
-void StreamSaver::finish() {
+uint64_t StreamSaver::finish() {
+    off_t size = 0;
     for (const auto &e : getParams()) {
         std::string params = configs.at(e.first).toJsonString();
         gabac::DataBlock block(&params);
-        pack(block, "conf_" + e.first + ".json");
+        size += pack(block, "conf_" + e.first + ".json");
     }
+    return size;
 }
 
 StreamSaver::~StreamSaver() {}
