@@ -146,7 +146,7 @@ int createMPEGGFileNoMITFromByteStream(char *fileName, char* refInfoPath, char* 
         numBlocksPerClass[class_i] = 0;
     }
     for(size_t access_unit_i = 0; access_unit_i < numberDataUnitsAccessUnits; access_unit_i++) {
-        DataUnitAccessUnit* dataUnitAccessUnit = getValue(dataUnitsAcessUnits, access_unit_i);
+        DataUnitAccessUnit* dataUnitAccessUnit = (DataUnitAccessUnit*)getValue(dataUnitsAcessUnits, access_unit_i);
         numBlocksPerClass[dataUnitAccessUnit->AU_type.classType] += 1;
     }
     uint32_t numBlocksInSequence = 0;
@@ -273,7 +273,7 @@ int createMPEGGFileNoMITFromByteStream(char *fileName, char* refInfoPath, char* 
     size_t numberAccessUnits = getSize(dataUnitsAcessUnits);
 
     for(size_t access_unit_i = 0; access_unit_i < numberAccessUnits; access_unit_i++) {
-        DataUnitAccessUnit *dataUnitAccessUnit = getValue(dataUnitsAcessUnits, access_unit_i);
+        DataUnitAccessUnit *dataUnitAccessUnit = (DataUnitAccessUnit*)getValue(dataUnitsAcessUnits, access_unit_i);
 
         uint32_t accessUnitId;
         uint8_t numBlocks;
