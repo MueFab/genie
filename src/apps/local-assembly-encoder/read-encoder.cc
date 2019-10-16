@@ -81,7 +81,8 @@ namespace lae {
                         }
                         if (read[read_pos] != ref[ref_offset]) {
                             if (ref[ref_offset] == 0) {
-                                container->ureads_0.push_back(read[read_pos]);
+                                container->ureads_0.push_back(format::getAlphabetProperties(
+                                        format::ParameterSet::AlphabetID::ACGTN).inverseLut[read[read_pos]]);
                             } else {
                                 container->mmpos_0.push_back(0);
                                 container->mmpos_1.push_back(read_pos - lastMisMatch);
