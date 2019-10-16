@@ -147,7 +147,7 @@ namespace lae {
 
         size_t blockSize = 10000;
         bool singleEnd = false;
-        const uint32_t SEQUENCE_BUFFER_SIZE = 1000000;
+        const uint32_t SEQUENCE_BUFFER_SIZE = 1000;
         FullLocalAssemblyEncoder encoder(SEQUENCE_BUFFER_SIZE, true);
         uint32_t record_counter = 0;
         uint32_t read_length = std::numeric_limits<uint32_t>::max();
