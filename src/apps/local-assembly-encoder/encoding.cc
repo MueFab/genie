@@ -77,6 +77,7 @@ namespace lae {
         ret[uint8_t (format::GenomicDescriptor::mscore)][0].swap(&container->mscore_0);
         ret[uint8_t (format::GenomicDescriptor::rlen)][0].swap(&container->rlen_0);
         ret[uint8_t (format::GenomicDescriptor::rtype)][0].swap(&container->rtype_0);
+        ret[uint8_t (format::GenomicDescriptor::ureads)][0].swap(&container->ureads_0);
 
         return ret;
     }
@@ -146,7 +147,7 @@ namespace lae {
 
         size_t blockSize = 10000;
         bool singleEnd = false;
-        const uint32_t SEQUENCE_BUFFER_SIZE = 1000;
+        const uint32_t SEQUENCE_BUFFER_SIZE = 1000000;
         FullLocalAssemblyEncoder encoder(SEQUENCE_BUFFER_SIZE, true);
         uint32_t record_counter = 0;
         uint32_t read_length = std::numeric_limits<uint32_t>::max();
@@ -171,6 +172,7 @@ namespace lae {
                     if (it->rname == rnameSearchString && it->pos == samRecord.pnext) {
                         LOG_TRACE << "Found mate";
                         encoder.addPair(samRecord, *it);
+                        record_counter++;
                         if (read_length != 0) {
                             if (read_length == std::numeric_limits<uint32_t>::max()) {
                                 read_length = samRecord.seq.length();
