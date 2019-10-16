@@ -11,7 +11,7 @@ namespace lae {
     class LocalAssemblyReadEncoder {
     private:
         std::unique_ptr<StreamContainer> container;
-        uint32_t pos;
+        int32_t pos;
         uint32_t readCounter;
         void codeVariants(const std::string &read, const std::string &cigar, const std::string& ref, bool isFirst);
     public:

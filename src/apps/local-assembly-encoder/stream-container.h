@@ -25,6 +25,7 @@ struct StreamContainer {
     gabac::DataBlock mscore_0;
     gabac::DataBlock rlen_0;
     gabac::DataBlock rtype_0;
+    gabac::DataBlock ureads_0;
 
     StreamContainer()
             : pos_0(0, 4),
@@ -45,7 +46,8 @@ struct StreamContainer {
               pair_1(0,4),
               mscore_0(0,4),
               rlen_0(0, 4),
-              rtype_0(0, 4){
+              rtype_0(0, 4),
+              ureads_0(0, 4){
 
     }
 };
