@@ -27,7 +27,7 @@ static int encapsulator_main(int argc, char* argv[]) {
         }
         std::cout << "command line: " + commandLineStr(argc, argv) << std::endl;
 
-        //createMPEGGFileNoMITFromByteStream(argv[1],argv[2],argv[3]);
+        createMPEGGFileNoMITFromByteStream(programOptions.inputFilePath.c_str(), nullptr, nullptr);
 
     } catch (const encapsulator::RuntimeError& runtimeError) {
         std::cerr << "error: encapsulator: " << runtimeError.what() << std::endl;

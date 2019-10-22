@@ -25,7 +25,6 @@
 #endif
 #include <stdbool.h>
 #include <stdio.h>
-#include "portability.h"
 #include "utils.h"
 
 uint8_t generateMask(uint8_t numberBits);

@@ -2,10 +2,10 @@
 // Created by bscuser on 19/02/18.
 //
 
-#include <utils.h>
-#include <DataStructures/BitStreams/OutputBitstream.h>
-#include <Boxes.h>
-#include <DataStructures/BitStreams/InputBitstream.h>
+#include "../utils.h"
+#include "../DataStructures/BitStreams/OutputBitstream.h"
+#include "../Boxes.h"
+#include "../DataStructures/BitStreams/InputBitstream.h"
 #include "DataUnits.h"
 
 uint32_t getDataUnitAccessUnitSize(
