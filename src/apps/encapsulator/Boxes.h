@@ -969,6 +969,7 @@ struct Block_{
 };
 
 void freeBlock(Block* block);
+
 Block* initBlock(DatasetContainer* datasetContainer, FromFile* fromFile);
 Block* initBlockWithHeader(uint8_t descriptorId, uint32_t payloadSize, FromFile* payload);
 void setBlockHeader(Block* block, BlockHeader* blockHeader);

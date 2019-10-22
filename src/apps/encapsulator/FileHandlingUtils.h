@@ -21,6 +21,6 @@ typedef struct{
 
 Ref_information readRefInformation(char* refInfoFilePath);
 
-int createMPEGGFileNoMITFromByteStream(char *fileName, char* refInfoPath, char* outputFileName);
+int createMPEGGFileNoMITFromByteStream(const char *fileName, char* refInfoPath, char* outputFileName);
 
 #endif //GENIE_FILEHANDLINGUTILS_H
