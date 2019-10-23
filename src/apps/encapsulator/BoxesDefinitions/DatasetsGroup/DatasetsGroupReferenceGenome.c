@@ -4,9 +4,7 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <Boxes.h>
-#include <FastaReader.h>
-#include <FileHandlingUtils/FileHandlingUtils.h>
+#include "../../FastaReader.h"
 #include "../../Boxes.h"
 #include "../../utils.h"
 
