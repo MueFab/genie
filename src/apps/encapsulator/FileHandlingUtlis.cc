@@ -4,9 +4,9 @@
  */
 
 #include "FileHandlingUtils.h"
-#include "Boxes.h"
+//#include "Boxes.h"
 #include "DataUnits/DataUnits.h"
-#include "FastaReader.h"
+//#include "FastaReader.h"
 
 //DatasetHeader *
 //initDatasetHeaderNoMIT(DatasetGroupId datasetGroupId, DatasetId datasetId, char *version, bool multipleAlignmentFlag,
@@ -53,54 +53,54 @@
 //    return datasetHeader;
 //}
 
-Ref_information readRefInformation(char* refInfoFilePath){
-    FILE* refInfoInputFile = fopen(refInfoFilePath, "r");
-    Ref_information ref_information;
-    void* returnedValue = fgets(ref_information.refUri, 1024, refInfoInputFile);
-    if(returnedValue){
-        char *c = strchr(ref_information.refUri, '\n');
-        if (c)
-            *c = 0;
-    }else{
-        printf("> errno:%d feof:%d ferror:%d retval:%p s[0]:%d\n\n",
-               errno, feof(refInfoInputFile), ferror(refInfoInputFile), returnedValue, ref_information.refUri[0]);
-    }
-    fscanf(refInfoInputFile, "%i\n", &(ref_information.numberSequences));
-    ref_information.sequenceName = (char**)calloc(ref_information.numberSequences, sizeof(char*));
-    for(int i=0; i<ref_information.numberSequences; i++){
-        ref_information.sequenceName[i] = (char*)calloc(1024, sizeof(char));
-        if (fgets(ref_information.sequenceName[i], 1024, refInfoInputFile))
-        {
-            char *c = strchr(ref_information.sequenceName[i], '\n');
-            if (c)
-                *c = 0;
-        }
-    }
-    if (fgets(ref_information.refName, 1024, refInfoInputFile))
-    {
-        char *c = strchr(ref_information.refName, '\n');
-        if (c)
-            *c = 0;
-    }
-    return ref_information;
-}
+//Ref_information readRefInformation(char* refInfoFilePath){
+//    FILE* refInfoInputFile = fopen(refInfoFilePath, "r");
+//    Ref_information ref_information;
+//    void* returnedValue = fgets(ref_information.refUri, 1024, refInfoInputFile);
+//    if(returnedValue){
+//        char *c = strchr(ref_information.refUri, '\n');
+//        if (c)
+//            *c = 0;
+//    }else{
+//        printf("> errno:%d feof:%d ferror:%d retval:%p s[0]:%d\n\n",
+//               errno, feof(refInfoInputFile), ferror(refInfoInputFile), returnedValue, ref_information.refUri[0]);
+//    }
+//    fscanf(refInfoInputFile, "%i\n", &(ref_information.numberSequences));
+//    ref_information.sequenceName = (char**)calloc(ref_information.numberSequences, sizeof(char*));
+//    for(int i=0; i<ref_information.numberSequences; i++){
+//        ref_information.sequenceName[i] = (char*)calloc(1024, sizeof(char));
+//        if (fgets(ref_information.sequenceName[i], 1024, refInfoInputFile))
+//        {
+//            char *c = strchr(ref_information.sequenceName[i], '\n');
+//            if (c)
+//                *c = 0;
+//        }
+//    }
+//    if (fgets(ref_information.refName, 1024, refInfoInputFile))
+//    {
+//        char *c = strchr(ref_information.refName, '\n');
+//        if (c)
+//            *c = 0;
+//    }
+//    return ref_information;
+//}
 
-int createMPEGGFileNoMITFromByteStream(const char *fileName, char* refInfoPath, char* outputFileName) {
+int createMPEGGFileNoMITFromByteStream(const char* fileName, char* refInfoPath, char* outputFileName) {
     fprintf(stdout, "Bytestream file: %s\n", fileName);
 
     // Ref_information ref_information = readRefInformation(refInfoPath);
 
     FILE* inputFile = fopen(fileName, "rb");
-    if(inputFile == NULL){
+    if(inputFile == nullptr){
         fprintf(stderr, "Could not open file.\n");
         return -1;
     }
 
-    DataUnits* dataUnits = NULL;
-//    if(parseDataUnits(inputFile, &dataUnits, fileName)){
-//        fprintf(stderr, "DataUnits could not be read.\n");
-//        return -1;
-//    }
+    DataUnits* dataUnits = nullptr;
+    if(parseDataUnits(inputFile, &dataUnits, (char*) fileName)){
+        fprintf(stderr, "DataUnits could not be read.\n");
+        return -1;
+    }
 
 //    Vector* datasetParameters = initVector();
 //    if(datasetParameters == NULL){

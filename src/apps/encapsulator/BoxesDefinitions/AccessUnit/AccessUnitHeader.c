@@ -2,10 +2,10 @@
 // Created by gencom on 4/12/17.
 //
 
-#include <DataStructures/Signatures/SignaturesOutputStream.h>
-#include <DataStructures/Signatures/Signatures.h>
-#include <DataStructures/Signatures/SignaturesInputStream.h>
-#include <DataStructures/Signatures/SignatureSizeComputation.h>
+#include "../../DataStructures/Signatures/SignaturesOutputStream.h"
+#include "../../DataStructures/Signatures/Signatures.h"
+#include "../../DataStructures/Signatures/SignaturesInputStream.h"
+#include "../../DataStructures/Signatures/SignatureSizeComputation.h"
 #include "../../Boxes.h"
 #include "../../utils.h"
 #include "../../DataStructures/BitStreams/InputBitstream.h"
