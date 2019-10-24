@@ -43,7 +43,7 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> compress_ureads(u
     uint32_t num_reads_per_block;
     num_reads_per_block = cp.num_reads_per_block;
 
-    int num_threads = cp.num_thr;
+    size_t num_threads = cp.num_thr;
 
     uint64_t num_reads_per_step = (uint64_t)num_threads * num_reads_per_block;
     std::string *id_array_1 = new std::string[num_reads_per_step];
@@ -69,14 +69,19 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> compress_ureads(u
         if (num_reads_read[0] != 0) {
             // parallel portion starts, includes generation of streams and their compression
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for ordered num_threads(cp.num_thr) schedule(dynamic)
+#pragma omp parallel for ordered num_threads(num_threads) schedule(dynamic)
 #endif
-            for (size_t tid = 0; tid < (size_t)cp.num_thr; tid++) {
+            for (size_t tid = 0; tid < num_threads; tid++) {
                 size_t block_num_thr = num_blocks_done + tid;
                 bool done_loop = false;
                 if (tid * num_reads_per_block >= num_reads_read[0]) done_loop = true;
                 uint32_t num_reads_thr =
                     std::min((size_t)num_reads_read[0], (tid + 1) * num_reads_per_block) - tid * num_reads_per_block;
+                subseq_data subseqData;
+                std::string outfile_name_quality;
+                gabac::DataBlock qualityBuffer(0, 1);
+                dsg::AcessUnitStreams streams;
+                std::string outfile_name_id;
                 if (!done_loop) {
                     // check if reads and qualities have equal lengths (and more such checks)
                     for (int j = 0; j < number_of_record_segments; j++) {
@@ -100,7 +105,6 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> compress_ureads(u
                     }
 
                     // generate and compress subsequences
-                    subseq_data subseqData;
                     subseqData.block_num = block_num_thr;
                     for (auto arr : subseq_indices) {
                         subseqData.subseq_vector[arr[0]][arr[1]] = std::vector<int64_t>();
@@ -129,9 +133,8 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> compress_ureads(u
                     compress_subseqs(&subseqData, st);
 
                     // quality compression
-                    std::string outfile_name_quality = "quality_1." + std::to_string(block_num_thr);
+                    outfile_name_quality = "quality_1." + std::to_string(block_num_thr);
 
-                    gabac::DataBlock qualityBuffer(0, 1);
                     if (cp.preserve_quality) {
                         std::string buffer;
                         for (uint32_t i = tid * num_reads_per_block; i < tid * num_reads_per_block + num_reads_thr;
@@ -144,8 +147,7 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> compress_ureads(u
                     }
 
                     // compress ids
-                    dsg::AcessUnitStreams streams;
-                    std::string outfile_name_id = "id_1." + std::to_string(block_num_thr);
+                    outfile_name_id = "id_1." + std::to_string(block_num_thr);
                     if (cp.preserve_id) {
                         std::vector<int64_t> tokens[128][8];
                         generate_read_id_tokens(id_array_1 + tid * num_reads_per_block, num_reads_thr, tokens);
@@ -162,21 +164,22 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> compress_ureads(u
                             }
                         }
                     }
+                }  // if (!done_loop)
 
 #ifdef GENIE_USE_OPENMP
 #pragma omp ordered
 #endif
-                    {
-                        pack_subseqs(&subseqData, st, &descriptorFilesPerAU, stats);
-                        if (cp.preserve_quality) {
-                            pack_qual(outfile_name_quality, st, &qualityBuffer, stats);
-                        }
-                        if (cp.preserve_id) {
-                            pack_id(outfile_name_id, st, &streams, stats);
-                        }
+                if (!done_loop) {
+                    pack_subseqs(&subseqData, st, &descriptorFilesPerAU, stats);
+                    if (cp.preserve_quality) {
+                        pack_qual(outfile_name_quality, st, &qualityBuffer, stats);
+                    }
+                    if (cp.preserve_id) {
+                        pack_id(outfile_name_id, st, &streams, stats);
                     }
                 }  // if (!done_loop)
-            }      // omp parallel for
+            }  // omp parallel for
+
             num_reads += num_reads_read[0] + num_reads_read[1];
         }  // if (num_reads_read[0] != 0)
         if (done) break;
