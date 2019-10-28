@@ -1,3 +1,7 @@
+#add_subdirectory(BoxesDefinitions)
+#add_subdirectory(DataStructures)
+#add_subdirectory(DataUnits)
+
 project("encapsulator")
 
 set(source_files
@@ -50,6 +54,10 @@ set(source_files
         DataUnits/DataUnitRawReference.c
         DataUnits/DataUnits.c
         DataUnits/DataUnitsParametersSet.c
-)
+        )
 
 add_executable(encapsulator ${source_files})
+
+#target_link_libraries(encapsulator PRIVATE encapsulatorBoxesDefinitions)
+#target_link_libraries(encapsulator PRIVATE encapsulatorDataStructures)
+#target_link_libraries(encapsulator PRIVATE encapsulatorDataUnits)

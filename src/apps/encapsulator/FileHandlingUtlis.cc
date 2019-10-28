@@ -4,9 +4,12 @@
  */
 
 #include "FileHandlingUtils.h"
-//#include "Boxes.h"
-#include "DataUnits/DataUnits.h"
-//#include "FastaReader.h"
+extern "C" {
+    //#include "Boxes.h"
+    #include "DataUnits/DataUnits.h"
+    //#include "FastaReader.h"
+}
+
 
 //DatasetHeader *
 //initDatasetHeaderNoMIT(DatasetGroupId datasetGroupId, DatasetId datasetId, char *version, bool multipleAlignmentFlag,
@@ -97,45 +100,49 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* refInfoPath, 
     }
 
     DataUnits* dataUnits = nullptr;
+
     if(parseDataUnits(inputFile, &dataUnits, (char*) fileName)){
         fprintf(stderr, "DataUnits could not be read.\n");
         return -1;
     }
 
-//    Vector* datasetParameters = initVector();
-//    if(datasetParameters == NULL){
-//        freeDataUnits(dataUnits);
-//        return -1;
-//    }
-//
-//    Vector* parameters;
-//    if(getDataUnitsParameters(dataUnits, &parameters) != 0){
-//        freeDataUnits(dataUnits);
-//        return -1;
-//    }
-//    size_t parametersCount = getSize(parameters);
-//    bool isAReferenceFile = false;
-//    for(size_t parameters_i = 0; parameters_i < parametersCount; parameters_i++){
-//        DataUnitParametersSet* parametersSet = (DataUnitParametersSet*)getValue(parameters, parameters_i);
-//        pushBack(datasetParameters, initDatasetParametersWithParameters(
-//                0,0,parametersSet->parent_parameter_setId, parametersSet->parameter_setId,
-//                parametersSet->dataset_type,
-//                parametersSet->alphabet_ID,
-//                parametersSet->read_length,
-//                parametersSet->number_of_template_segments_minus1,
-//                parametersSet->max_au_data_unit_size,
-//                parametersSet->pos_40_bits,
-//                parametersSet->qv_depth,
-//                parametersSet->as_depth,
-//                initByteArrayCopying(parametersSet->data)
-//        ));
-//        if(parametersSet->dataset_type == 2){
-//            isAReferenceFile = true;
-//        }
-//    }
-//
-//
-//
+    Vector* datasetParameters = initVector();
+    if(datasetParameters == NULL){
+        freeDataUnits(dataUnits);
+        return -1;
+    }
+
+    Vector* parameters;
+    if(getDataUnitsParameters(dataUnits, &parameters) != 0){
+        freeDataUnits(dataUnits);
+        return -1;
+    }
+    size_t parametersCount = getSize(parameters);
+    bool isAReferenceFile = false;
+    for(size_t parameters_i = 0; parameters_i < parametersCount; parameters_i++){
+        DataUnitParametersSet* parametersSet = (DataUnitParametersSet*) getValue(parameters, parameters_i);
+
+        pushBack(datasetParameters, initDatasetParametersWithParameters(
+                0,0,parametersSet->parent_parameter_setId, parametersSet->parameter_setId,
+
+                // encoding_parameters
+                /*parametersSet->dataset_type,
+                parametersSet->alphabet_ID,
+                parametersSet->read_length,
+                parametersSet->number_of_template_segments_minus1,
+                parametersSet->max_au_data_unit_size,
+                parametersSet->pos_40_bits,
+                parametersSet->qv_depth,
+                parametersSet->as_depth,*/ //old code
+                parametersSet->encodingParameters
+
+                //initByteArrayCopying(parametersSet->data)  TODO: needed?
+        ));
+        if(parametersSet->encodingParameters->dataset_type == 2){
+            isAReferenceFile = true;
+        }
+    }
+
 //    Vector* dataUnitsAcessUnits;
 //    if(getDataUnitsAccessUnits(dataUnits, &dataUnitsAcessUnits) != 0 || dataUnitsAcessUnits == NULL){
 //        fprintf(stderr, "Error getting the data units access units.\n");
