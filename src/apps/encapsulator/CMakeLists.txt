@@ -35,6 +35,8 @@ set(source_files
         BoxesDefinitions/DatasetsGroup/DatasetsGroupProtection.c
         BoxesDefinitions/DatasetsGroup/DatasetsGroupReferenceGenome.c
         BoxesDefinitions/DatasetsGroup/DatasetsGroupReferenceMetadata.c
+        BoxesDefinitions/File/File.c
+        BoxesDefinitions/File/FileHeader.c
         BoxesDefinitions/Stream/StreamContainer.c
         BoxesDefinitions/Stream/StreamHeader.c
         BoxesDefinitions/Stream/StreamProtection.c
