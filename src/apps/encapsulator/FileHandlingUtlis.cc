@@ -107,7 +107,7 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* refInfoPath, 
     }
 
     Vector* datasetParameters = initVector();
-    if(datasetParameters == NULL){
+    if(datasetParameters == nullptr){
         freeDataUnits(dataUnits);
         return -1;
     }
@@ -143,19 +143,20 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* refInfoPath, 
         }
     }
 
-//    Vector* dataUnitsAcessUnits;
-//    if(getDataUnitsAccessUnits(dataUnits, &dataUnitsAcessUnits) != 0 || dataUnitsAcessUnits == NULL){
-//        fprintf(stderr, "Error getting the data units access units.\n");
-//        freeDataUnits(dataUnits);
-//    }
+    Vector* dataUnitsAccessUnits;
+    if(getDataUnitsAccessUnits(dataUnits, &dataUnitsAccessUnits) != 0 || dataUnitsAccessUnits == nullptr){
+        fprintf(stderr, "Error getting the data units access units.\n");
+        freeDataUnits(dataUnits);
+    }
+
 //
-//    size_t numberDataUnitsAccessUnits = getSize(dataUnitsAcessUnits);
+//    size_t numberDataUnitsAccessUnits = getSize(dataUnitsAccessUnits);
 //    uint32_t numBlocksPerClass[7]; //cell for 0 will remain empty
 //    for(uint8_t class_i = 0; class_i<7; class_i++){
 //        numBlocksPerClass[class_i] = 0;
 //    }
 //    for(size_t access_unit_i = 0; access_unit_i < numberDataUnitsAccessUnits; access_unit_i++) {
-//        DataUnitAccessUnit* dataUnitAccessUnit = (DataUnitAccessUnit*)getValue(dataUnitsAcessUnits, access_unit_i);
+//        DataUnitAccessUnit* dataUnitAccessUnit = (DataUnitAccessUnit*)getValue(dataUnitsAccessUnits, access_unit_i);
 //        numBlocksPerClass[dataUnitAccessUnit->AU_type.classType] += 1;
 //    }
 //    uint32_t numBlocksInSequence = 0;
@@ -165,27 +166,29 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* refInfoPath, 
 //        }
 //    }
 //
-//    MPEGGFile* mpeggFile = initFile();
-//    if(mpeggFile == NULL){
-//        fprintf(stderr, "Error creating mpeggFile.\n");
-//        freeDataUnits(dataUnits);
-//        return -1;
-//    }
-//    FileHeader* fileHeader = initFileHeader("1900");
-//    char* compatibleBrand = "\0\0\0\0";
-//    addCompatibleBrandToFileHeader(fileHeader, compatibleBrand);
-//    setFileHeaderToFile(mpeggFile, fileHeader);
-//
-//    DatasetsGroupContainer* datasetsGroupContainer = initDatasetsGroupContainer();
-//    if(datasetsGroupContainer == NULL){
-//        fprintf(stderr, "Error creating datasetsGroupContainer.\n");
-//        freeFile(mpeggFile);
-//        freeDataUnits(dataUnits);
-//        return -1;
-//    }
-//    addDatasetsGroupToFile(mpeggFile, datasetsGroupContainer);
-//    DatasetsGroupHeader* datasetsGroupHeader = initDatasetsGroupHeader(0,0);
-//    setDatasetsGroupHeader(datasetsGroupContainer, datasetsGroupHeader);
+
+    MPEGGFile* mpeggFile = initFile();
+    if(mpeggFile == nullptr){
+        fprintf(stderr, "Error creating mpeggFile.\n");
+        freeDataUnits(dataUnits);
+        return -1;
+    }
+    FileHeader* fileHeader = initFileHeader("1900");
+    char* compatibleBrand = "\0\0\0\0";
+    addCompatibleBrandToFileHeader(fileHeader, compatibleBrand);
+    setFileHeaderToFile(mpeggFile, fileHeader);
+
+    DatasetsGroupContainer* datasetsGroupContainer = initDatasetsGroupContainer();
+    if(datasetsGroupContainer == nullptr){
+        fprintf(stderr, "Error creating datasetsGroupContainer.\n");
+        freeFile(mpeggFile);
+        freeDataUnits(dataUnits);
+        return -1;
+    }
+    addDatasetsGroupToFile(mpeggFile, datasetsGroupContainer);
+    DatasetsGroupHeader* datasetsGroupHeader = initDatasetsGroupHeader(0,0);
+    setDatasetsGroupHeader(datasetsGroupContainer, datasetsGroupHeader);
+
 //
 //    char *ref_uri = ref_information.refUri;
 //    DatasetGroupId externalDatasetGroupId = 255;
@@ -229,14 +232,14 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* refInfoPath, 
 //    pushBack(referenceGenomes, referenceGenome);
 //    setDatasetsGroupReferenceGenomes(datasetsGroupContainer, referenceGenomes);
 //
-//
-//    DatasetContainer* datasetContainer = initDatasetContainer();
-//    if(datasetContainer == NULL){
-//        fprintf(stderr, "Error creating datasetContainer.\n");
-//        freeFile(mpeggFile);
-//        freeDataUnits(dataUnits);
-//        return -1;
-//    }
+
+    DatasetContainer* datasetContainer = initDatasetContainer();
+    if(datasetContainer == nullptr){
+        fprintf(stderr, "Error creating datasetContainer.\n");
+        freeFile(mpeggFile);
+        freeDataUnits(dataUnits);
+        return -1;
+    }
 //
 //    DatasetGroupId datasetGroupId = 0;
 //    DatasetId datasetId = 0;
@@ -278,93 +281,93 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* refInfoPath, 
 //    addDatasetsContainer(datasetsGroupContainer, datasetContainer);
 //    setDatasetParameters(datasetContainer, datasetParameters);
 //
-//
-//    size_t numberAccessUnits = getSize(dataUnitsAcessUnits);
-//
-//    for(size_t access_unit_i = 0; access_unit_i < numberAccessUnits; access_unit_i++) {
-//        DataUnitAccessUnit *dataUnitAccessUnit = (DataUnitAccessUnit*)getValue(dataUnitsAcessUnits, access_unit_i);
-//
-//        uint32_t accessUnitId;
-//        uint8_t numBlocks;
-//        uint8_t parameterSetId;
-//        ClassType auType;
-//        uint32_t readsCount;
-//        uint16_t mmThreshold;
-//        uint32_t mmCount;
-//        SequenceID sequenceId;
-//        uint64_t auStartPosition;
-//        uint64_t auEndPosition;
-//        SequenceID referenceSequenceID;
-//        uint64_t referenceStart;
-//        uint64_t referenceEnd;
-//        uint64_t extendedAuStartPosition;
-//        uint64_t extendedAuEndPosition;
-//
-//        if(
-//                getDataUnitAccessUnitId(dataUnitAccessUnit, &accessUnitId) != 0 ||
-//                getDataUnitNumBlocks(dataUnitAccessUnit, &numBlocks) != 0 ||
-//                getDataUnitParameterSetId(dataUnitAccessUnit, &parameterSetId) != 0 ||
-//                getDataUnitAUType(dataUnitAccessUnit, &auType) != 0 ||
-//                getDataUnitReadsCount(dataUnitAccessUnit, &readsCount) != 0 ||
-//                getDataUnitMMThreshold(dataUnitAccessUnit, &mmThreshold) != 0 ||
-//                getDataUnitMMCount(dataUnitAccessUnit, &mmCount) != 0 ||
-//                getDataUnitSequenceId(dataUnitAccessUnit, &sequenceId) != 0 ||
-//                getDataUnitAuStartPosition(dataUnitAccessUnit, &auStartPosition) != 0 ||
-//                getDataUnitAuEndPosition(dataUnitAccessUnit, &auEndPosition) != 0 ||
-//                getDataUnitReferenceSequenceId(dataUnitAccessUnit, &referenceSequenceID) != 0 ||
-//                getDataUnitReferenceStartPosition(dataUnitAccessUnit, &referenceStart) != 0 ||
-//                getDataUnitReferenceEndPosition(dataUnitAccessUnit, &referenceEnd) != 0 ||
-//                getDataUnitExtendedAuStartPosition(dataUnitAccessUnit, &extendedAuStartPosition) != 0 ||
-//                getDataUnitExtendedAuEndPosition(dataUnitAccessUnit, &extendedAuEndPosition) != 0
-//                ){
-//            freeFile(mpeggFile);
-//            freeDataUnits(dataUnits);
-//            return -1;
-//        }
-//        AccessUnitContainer *accessUnitContainer = initAccessUnitContainer(datasetContainer);
-//
-//        AccessUnitHeader* accessUnitHeader = initAccessUnitHeaderWithValues(
-//                datasetContainer,
-//                accessUnitId,
-//                numBlocks,
-//                parameterSetId,
-//                auType,
-//                readsCount,
-//                mmThreshold,
-//                mmCount
-//        );
-//        setAccessUnitHeaderSequence_ID(accessUnitHeader, sequenceId);
-//        setAccessUnitHeaderAuStartPosition(accessUnitHeader, auStartPosition);
-//        setAccessUnitHeaderAuEndPosition(accessUnitHeader, auEndPosition);
-//        setAccessUnitHeaderAuExtendedStartPosition(accessUnitHeader, extendedAuStartPosition);
-//        setAccessUnitHeaderAuExtendedEndPosition(accessUnitHeader, extendedAuEndPosition);
-//        setAccessUnitHeaderReferenceSequence_ID(accessUnitHeader, referenceSequenceID);
-//        setAccessUnitHeaderReferenceStartPosition(accessUnitHeader, referenceStart);
-//        setAccessUnitHeaderReferenceEndPosition(accessUnitHeader, referenceEnd);
-//        setAccessUnitContainerHeader(accessUnitContainer, accessUnitHeader);
-//
-//
-//        for(uint8_t block_i=0; block_i<numBlocks; block_i++){
-//            Block* block;
-//            getDataUnitBlock(dataUnitAccessUnit, block_i, &block);
-//            Block* blockToAdd = initBlock(datasetContainer, cloneFromFile(block->payload));
-//            BlockHeader* blockHeader = initBlockHeader(
-//                    datasetContainer,
-//                    block->blockHeader->descriptorId,
-//                    block->blockHeader->payloadSize
-//            );
-//            setBlockHeader(blockToAdd, blockHeader);
-//            addBlock(accessUnitContainer, blockToAdd);
-//        }
-//
-//        addAccessUnitToDataset(datasetContainer, accessUnitContainer);
-//    }
-//
-//    FILE* outputFile = fopen(outputFileName, "wb");
-//    writeFile(mpeggFile, outputFile);
-//
-//    freeDataUnits(dataUnits);
-//    freeFile(mpeggFile);
+
+    size_t numberAccessUnits = getSize(dataUnitsAccessUnits);
+
+    for(size_t access_unit_i = 0; access_unit_i < numberAccessUnits; access_unit_i++) {
+        DataUnitAccessUnit *dataUnitAccessUnit = (DataUnitAccessUnit*)getValue(dataUnitsAccessUnits, access_unit_i);
+
+        uint32_t accessUnitId;
+        uint8_t numBlocks;
+        uint8_t parameterSetId;
+        ClassType auType;
+        uint32_t readsCount;
+        uint16_t mmThreshold;
+        uint32_t mmCount;
+        SequenceID sequenceId;
+        uint64_t auStartPosition;
+        uint64_t auEndPosition;
+        SequenceID referenceSequenceID;
+        uint64_t referenceStart;
+        uint64_t referenceEnd;
+        uint64_t extendedAuStartPosition;
+        uint64_t extendedAuEndPosition;
+
+        if(
+                getDataUnitAccessUnitId(dataUnitAccessUnit, &accessUnitId) != 0 ||
+                getDataUnitNumBlocks(dataUnitAccessUnit, &numBlocks) != 0 ||
+                getDataUnitParameterSetId(dataUnitAccessUnit, &parameterSetId) != 0 ||
+                getDataUnitAUType(dataUnitAccessUnit, &auType) != 0 ||
+                getDataUnitReadsCount(dataUnitAccessUnit, &readsCount) != 0 ||
+                getDataUnitMMThreshold(dataUnitAccessUnit, &mmThreshold) != 0 ||
+                getDataUnitMMCount(dataUnitAccessUnit, &mmCount) != 0 ||
+                getDataUnitSequenceId(dataUnitAccessUnit, &sequenceId) != 0 ||
+                getDataUnitAuStartPosition(dataUnitAccessUnit, &auStartPosition) != 0 ||
+                getDataUnitAuEndPosition(dataUnitAccessUnit, &auEndPosition) != 0 ||
+                getDataUnitReferenceSequenceId(dataUnitAccessUnit, &referenceSequenceID) != 0 ||
+                getDataUnitReferenceStartPosition(dataUnitAccessUnit, &referenceStart) != 0 ||
+                getDataUnitReferenceEndPosition(dataUnitAccessUnit, &referenceEnd) != 0 ||
+                getDataUnitExtendedAuStartPosition(dataUnitAccessUnit, &extendedAuStartPosition) != 0 ||
+                getDataUnitExtendedAuEndPosition(dataUnitAccessUnit, &extendedAuEndPosition) != 0
+                ){
+            freeFile(mpeggFile);
+            freeDataUnits(dataUnits);
+            return -1;
+        }
+        AccessUnitContainer *accessUnitContainer = initAccessUnitContainer(datasetContainer);
+
+        AccessUnitHeader* accessUnitHeader = initAccessUnitHeaderWithValues(
+                datasetContainer,
+                accessUnitId,
+                numBlocks,
+                parameterSetId,
+                auType,
+                readsCount,
+                mmThreshold,
+                mmCount
+        );
+        setAccessUnitHeaderSequence_ID(accessUnitHeader, sequenceId);
+        setAccessUnitHeaderAuStartPosition(accessUnitHeader, auStartPosition);
+        setAccessUnitHeaderAuEndPosition(accessUnitHeader, auEndPosition);
+        setAccessUnitHeaderAuExtendedStartPosition(accessUnitHeader, extendedAuStartPosition);
+        setAccessUnitHeaderAuExtendedEndPosition(accessUnitHeader, extendedAuEndPosition);
+        setAccessUnitHeaderReferenceSequence_ID(accessUnitHeader, referenceSequenceID);
+        setAccessUnitHeaderReferenceStartPosition(accessUnitHeader, referenceStart);
+        setAccessUnitHeaderReferenceEndPosition(accessUnitHeader, referenceEnd);
+        setAccessUnitContainerHeader(accessUnitContainer, accessUnitHeader);
+
+
+        for(uint8_t block_i=0; block_i<numBlocks; block_i++){
+            Block* block;
+            getDataUnitBlock(dataUnitAccessUnit, block_i, &block);
+            Block* blockToAdd = initBlock(datasetContainer, cloneFromFile(block->payload));
+            BlockHeader* blockHeader = initBlockHeader(
+                    datasetContainer,
+                    block->blockHeader->descriptorId,
+                    block->blockHeader->payloadSize
+            );
+            setBlockHeader(blockToAdd, blockHeader);
+            addBlock(accessUnitContainer, blockToAdd);
+        }
+
+        addAccessUnitToDataset(datasetContainer, accessUnitContainer);
+    }
+
+    FILE* outputFile = fopen(outputFileName, "wb");
+    writeFile(mpeggFile, outputFile);
+
+    freeDataUnits(dataUnits);
+    freeFile(mpeggFile);
 
     return 0;
 }
