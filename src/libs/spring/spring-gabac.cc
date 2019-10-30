@@ -99,9 +99,9 @@ std::vector<std::vector<std::vector<gabac::DataBlock>>> create_default_streams()
 }
 
 void write_streams_to_file(const std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams,
-                           const std::string &outfile) {
+                           const std::string &outfile, const std::vector<uint8_t> &descriptors_to_write) {
     std::ofstream fout(outfile, std::ios::binary);
-    for (size_t descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
+    for (auto & descriptor : descriptors_to_write) {
         for (size_t subseq = 0; subseq < generated_streams[descriptor].size(); subseq++) {
             // write number of gabac data blocks
             uint32_t ndb = (uint32_t)generated_streams[descriptor][subseq].size();

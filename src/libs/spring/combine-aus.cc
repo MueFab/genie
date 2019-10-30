@@ -43,9 +43,6 @@ void combine_aus(const std::string &temp_dir, compression_params &cp, const std:
   const std::string read_desc_prefix = temp_dir + "/read_streams.";
   const std::string id_desc_prefix = temp_dir + "/id_streams.";
   const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
-  std::vector<uint8_t> read_descriptors = {0,1,3,4,6,7,8};
-  std::vector<uint8_t> id_descriptors = {15};
-  std::vector<uint8_t> quality_descriptors = {14};
 
   // now go over each block
   for (uint32_t auId = 0; auId < num_AUs; auId++) {
@@ -63,7 +60,6 @@ void combine_aus(const std::string &temp_dir, compression_params &cp, const std:
       filename = quality_desc_prefix + std::to_string(auId);
       read_streams_from_file(generated_streams, filename, quality_descriptors);
     }
-
     // create and write AU
     AccessUnit au = createQuickAccessUnit(
         auId, PARAMETER_SET_ID, num_reads_per_AU[auId], DataUnit::AuType::U_TYPE_AU,
