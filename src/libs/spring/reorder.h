@@ -429,8 +429,9 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
 #endif
         {  // doing initial setup and first read
             current = firstread;
-            // some fix below to make sure no errors occurs when we have very few reads (comparable to num_threads).
-            // basically if read already taken, this thread just gives up
+            // some fix below to make sure no errors occurs when we have very few
+            // reads (comparable to num_threads). basically if read already taken,
+            // this thread just gives up
             if (rg.numreads == 0) {
                 done = true;
             } else if (remainingreads[current] == 0) {

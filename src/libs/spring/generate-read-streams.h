@@ -17,25 +17,19 @@ struct subseq_data {
     dsg::AcessUnitStreams streamsAU;
 };
 
-void compress_subseqs(subseq_data *data, dsg::StreamSaver &st);
+void compress_subseqs(subseq_data *data, const std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
 
-void pack_subseqs(subseq_data *data, dsg::StreamSaver &st,
-                  std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> *descriptorFilesPerAU);
+void generate_read_streams(const std::string &temp_dir,
+                           const compression_params &cp,
+                           const std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
 
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams(const std::string &temp_dir,
-                                                                                     const compression_params &cp,
-                                                                                     bool analyze,
-                                                                                     dsg::StreamSaver &st);
+void generate_read_streams_se(const std::string &temp_dir,
+                              const compression_params &cp,
+                              const std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
 
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams_se(const std::string &temp_dir,
-                                                                                        const compression_params &cp,
-                                                                                        bool analyze,
-                                                                                        dsg::StreamSaver &st);
-
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams_pe(const std::string &temp_dir,
-                                                                                        const compression_params &cp,
-                                                                                        bool analyze,
-                                                                                        dsg::StreamSaver &st);
+void generate_read_streams_pe(const std::string &temp_dir,
+                              const compression_params &cp,
+                              const std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
 
 }  // namespace spring
 

@@ -29,9 +29,16 @@ class GenieGabacOutputStream : public GenieGabacOutputBuffer, public std::ostrea
     GenieGabacOutputStream() : GenieGabacOutputBuffer(), std::ostream(this) {}
 };
 
-void gabac_compress(const gabac::EncodingConfiguration& conf, gabac::DataBlock* in, std::vector<gabac::DataBlock>* out);
+void gabac_compress(const gabac::EncodingConfiguration &conf, gabac::DataBlock *in, std::vector<gabac::DataBlock> *out);
 
 std::vector<std::vector<std::vector<gabac::DataBlock>>> create_default_streams();
+
+std::vector<std::vector<gabac::DataBlock>> generate_empty_raw_data();
+
+void write_streams_to_file(const std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams,
+                           const std::string &outfile);
+
+void read_streams_from_file(std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams, const std::string &infile, const std::vector<uint8_t> &descriptors_to_read);
 
 std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf();
 

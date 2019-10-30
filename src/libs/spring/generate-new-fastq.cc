@@ -104,8 +104,8 @@ void generate_new_fastq_pe(util::FastqFileReader *fastqFileReader1, util::FastqF
                     quality_array[index] = fastqRecords[0].qualityScores;
                 }
                 // ids treated in a different way since we always store ids from file 1
-                // but we attach a /1 or /2 at end to distinguish (also done by decompress.cpp)
-                // so we can verify that it works
+                // but we attach a /1 or /2 at end to distinguish (also done by
+                // decompress.cpp) so we can verify that it works
                 if (k == 0) {
                     if (order_array[j] >= start_read_bin && order_array[j] < end_read_bin) {
                         uint32_t index = order_array[j] - start_read_bin;
