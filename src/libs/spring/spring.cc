@@ -115,35 +115,36 @@ void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::Fast
         std::cout << "Time for this step: "
                   << std::chrono::duration_cast<std::chrono::seconds>(grs_end - grs_start).count() << " s\n";
 
-        //        cp.num_blocks = descriptorFilesPerAUs.size();
+        std::cout << "Generating new FASTQ for testing purposes\n";
+        auto new_fq_start = std::chrono::steady_clock::now();
+        if (!cp.paired_end) {
+            std::cout << "File name: " << outputFilePath+".new.fastq\n";
+            generate_new_fastq_se(fastqFileReader1, temp_dir, cp, outputFilePath);
+        } else {
+            std::cout << "File name: " << outputFilePath+".new_1.fastq\n";
+            std::cout << "File name: " << outputFilePath+".new_2.fastq\n";
+            generate_new_fastq_pe(fastqFileReader1, fastqFileReader2, temp_dir,
+        cp, outputFilePath);
+        }
+        auto new_fq_end = std::chrono::steady_clock::now();
+        std::cout << "Generating new FASTQ done (for testing)\n";
+        std::cout << "Time for this step: "
+                  << std::chrono::duration_cast<std::chrono::seconds>(new_fq_end -
+                                                                      new_fq_start)
+                         .count()
+                  << " s\n";
 
-        /* std::cout << "Generating new FASTQ\n";
-         auto new_fq_start = std::chrono::steady_clock::now();
-         if (!cp.paired_end) {
-             generate_new_fastq_se(fastqFileReader1, temp_dir, cp);
-         } else {
-             generate_new_fastq_pe(fastqFileReader1, fastqFileReader2, temp_dir,
-         cp);
-         }
-         auto new_fq_end = std::chrono::steady_clock::now();
-         std::cout << "Generating new FASTQ done (for testing)\n";
-         std::cout << "Time for this step: "
-                   << std::chrono::duration_cast<std::chrono::seconds>(new_fq_end -
-                                                                       new_fq_start)
-                          .count()
-                   << " s\n";*/
-
-        // if (preserve_quality || preserve_id) {
-        //     std::cout << "Reordering and compressing quality and/or ids ...\n";
-        //     auto rcqi_start = std::chrono::steady_clock::now();
-        //     reorder_compress_quality_id(temp_dir, cp);
-        //     auto rcqi_end = std::chrono::steady_clock::now();
-        //     std::cout << "Reordering and compressing quality and/or ids done!\n";
-        //     std::cout << "Time for this step: "
-        //               <<
-        //               std::chrono::duration_cast<std::chrono::seconds>(rcqi_end -
-        //               rcqi_start).count() << " s\n";
-        // }
+        if (preserve_quality || preserve_id) {
+            std::cout << "Reordering and compressing quality and/or ids ...\n";
+            auto rcqi_start = std::chrono::steady_clock::now();
+            reorder_compress_quality_id(temp_dir, cp, configs);
+            auto rcqi_end = std::chrono::steady_clock::now();
+            std::cout << "Reordering and compressing quality and/or ids done!\n";
+            std::cout << "Time for this step: "
+                      <<
+                      std::chrono::duration_cast<std::chrono::seconds>(rcqi_end -
+                      rcqi_start).count() << " s\n";
+        }
 
         std::cout << "Combining AUs and writing compressed file ...\n";
         auto cau_start = std::chrono::steady_clock::now();
@@ -153,6 +154,7 @@ void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::Fast
         std::cout << "Time for this step: "
                   << std::chrono::duration_cast<std::chrono::seconds>(cau_end - cau_start).count() << " s\n";
     }
+
     // generated_aus result(descriptorFilesPerAUs);
     // // Write compression params to a file
     // std::string compression_params_file = "cp.bin";
