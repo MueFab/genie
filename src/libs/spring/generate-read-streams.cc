@@ -149,7 +149,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data, 
     uint64_t blocks = uint64_t(std::ceil(float(data.cp.num_reads) / data.cp.num_reads_per_block));
     std::vector<uint32_t> num_reads_per_block(blocks);
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for ordered num_threads(data.cp.num_thr) schedule(dynamic)
+#pragma omp parallel for num_threads(data.cp.num_thr) schedule(dynamic)
 #endif
     for (uint64_t block_num = 0; block_num < blocks; block_num++) {
         auto raw_data = generate_empty_raw_data();
@@ -782,7 +782,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
     // PE step 4: Now generate read streams and compress blocks in parallel
 // this is actually number of read pairs per block for PE
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for ordered num_threads(cp.num_thr) schedule(dynamic)
+#pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic)
 #endif
     for (uint64_t cur_block_num = 0; cur_block_num < bdata.block_start.size(); cur_block_num++) {
         auto raw_data = generate_empty_raw_data();
