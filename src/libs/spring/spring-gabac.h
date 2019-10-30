@@ -7,6 +7,11 @@
 
 namespace spring {
 
+// to use for writing compressed files to temporary files and reload them in combine-aus
+const std::vector<uint8_t> read_descriptors = {0,1,3,4,6,7,8,12};
+const std::vector<uint8_t> id_descriptors = {15};
+const std::vector<uint8_t> quality_descriptors = {14};
+
 class GenieGabacOutputBuffer : public std::streambuf {
    public:
     GenieGabacOutputBuffer();
@@ -36,7 +41,7 @@ std::vector<std::vector<std::vector<gabac::DataBlock>>> create_default_streams()
 std::vector<std::vector<gabac::DataBlock>> generate_empty_raw_data();
 
 void write_streams_to_file(const std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams,
-                           const std::string &outfile);
+                           const std::string &outfile, const std::vector<uint8_t> &descriptors_to_write);
 
 void read_streams_from_file(std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams, const std::string &infile, const std::vector<uint8_t> &descriptors_to_read);
 

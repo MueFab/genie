@@ -161,7 +161,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data, 
         compress_read_subseqs(raw_data, generated_streams, configs);
 
         std::string file_to_save_streams = temp_dir + "/read_streams." + std::to_string(block_num);
-        write_streams_to_file(generated_streams, file_to_save_streams);
+        write_streams_to_file(generated_streams, file_to_save_streams, read_descriptors);
 
     }  // end omp parallel
 
@@ -794,7 +794,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
         compress_read_subseqs(raw_data, generated_streams, configs);
 
         std::string file_to_save_streams = temp_dir + "/read_streams." + std::to_string(cur_block_num);
-        write_streams_to_file(generated_streams, file_to_save_streams);
+        write_streams_to_file(generated_streams, file_to_save_streams, read_descriptors);
     }  // end omp parallel
 
     std::cout << "count_same_rec: " << std::accumulate(stats.count_same_rec.begin(), stats.count_same_rec.end(), 0)
