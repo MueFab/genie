@@ -455,8 +455,8 @@ class XorshiftHashFunctors {
         s[0] = hset[0];
         s[1] = hset[1];
 
-        for (size_t ii = 2; ii < 10 /* it's much better have a constant here, for inlining; this
-                           loop is super performance critical*/
+        for (size_t ii = 2; ii < 10 /* it's much better have a constant here, for
+                           inlining; this loop is super performance critical*/
              ;
              ii++) {
             hset[ii] = next(s);

@@ -3,6 +3,7 @@ project("spring")
 set(source_files
         bitset-util.cc
         call-template-functions.cc
+        combine-aus.cc
         compress-ureads.cc
         decompress.cc
         encoder.cc

@@ -90,8 +90,9 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
             uint64_t quality_array_size = numreads / 4 + 3 * num_reads_per_block;
             std::string *quality_array = new std::string[quality_array_size];
             // numreads/4 so that memory consumption isn't too high
-            // 3*num_reads_per_block added to ensure that we are done in 4 passes (needed because block
-            // sizes are not exactly equal to num_reads_per_block
+            // 3*num_reads_per_block added to ensure that we are done in 4 passes
+            // (needed because block sizes are not exactly equal to
+            // num_reads_per_block
             reorder_compress_quality_pe(file_quality, outfile_quality, quality_array, quality_array_size, order_array,
                                         block_start, block_end, cp, analyze, st);
             delete[] quality_array;
@@ -467,11 +468,11 @@ void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std
     char prev_ID[MAX_NUM_TOKENS_ID] = {0};
     uint32_t prev_tokens_ptr[MAX_NUM_TOKENS_ID] = {0};
     for (uint32_t id_num = 0; id_num < num_ids; id_num++) {
-        tokens[0*6+0].push_back(1);  // DIFF
+        tokens[0 * 6 + 0].push_back(1);  // DIFF
         if (id_num == 0) {
-            big_endian_push_uint32(0, &tokens[0*6+1]);  // DIFF 0 for first id
+            big_endian_push_uint32(0, &tokens[0 * 6 + 1]);  // DIFF 0 for first id
         } else {
-            big_endian_push_uint32(1, &tokens[0*6+1]);  // DIFF 1 for rest of ids
+            big_endian_push_uint32(1, &tokens[0 * 6 + 1]);  // DIFF 1 for rest of ids
         }
         generate_id_tokens(prev_ID, prev_tokens_ptr, id_array[id_num], tokens);
     }

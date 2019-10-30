@@ -16,18 +16,28 @@
 #include <vector>
 
 #include "generate-read-streams.h"
+#include "spring-gabac.h"
 #include "util.h"
+#include <format/part2/clutter.h>
 
 namespace spring {
 
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams(const std::string &temp_dir,
-                                                                                     const compression_params &cp,
-                                                                                     bool analyze,
-                                                                                     dsg::StreamSaver &st) {
+void generate_read_streams(const std::string &temp_dir, const compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs) {
     if (!cp.paired_end)
-        return generate_read_streams_se(temp_dir, cp, analyze, st);
+        generate_read_streams_se(temp_dir, cp, configs);
     else
-        return generate_read_streams_pe(temp_dir, cp, analyze, st);
+        generate_read_streams_pe(temp_dir, cp, configs);
+}
+
+void compress_read_subseqs(std::vector<std::vector<gabac::DataBlock>> &raw_data,
+                           std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams,
+                           const std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
+    for (size_t descriptor = 0; descriptor < 13; ++descriptor) {
+        for (size_t subdescriptor = 0; subdescriptor < raw_data[descriptor].size(); ++subdescriptor) {
+            gabac_compress(configs[descriptor][subdescriptor], &raw_data[descriptor][subdescriptor],
+                           &generated_streams[descriptor][subdescriptor]);
+        }
+    }
 }
 
 struct se_data {
@@ -45,10 +55,7 @@ struct se_data {
     std::vector<uint32_t> order_arr;
 };
 
-void generate_subseqs(const se_data &data, uint64_t block_num, subseq_data *subseqData) {
-    subseqData->block_num = block_num;
-    for (auto arr : subseq_indices) subseqData->subseq_vector[arr[0]][arr[1]] = std::vector<int64_t>();
-
+void generate_subseqs(const se_data &data, uint64_t block_num, std::vector<std::vector<gabac::DataBlock>> &raw_data) {
     // char_to_int
     int64_t char_to_int[128];
     char_to_int[(uint8_t)'A'] = 0;
@@ -60,9 +67,6 @@ void generate_subseqs(const se_data &data, uint64_t block_num, subseq_data *subs
     int64_t rc_to_int[128];
     rc_to_int[(uint8_t)'d'] = 0;
     rc_to_int[(uint8_t)'r'] = 1;
-
-    // clear vectors
-    for (auto arr : subseq_indices) subseqData->subseq_vector[arr[0]][arr[1]].clear();
 
     uint64_t start_read_num = block_num * data.cp.num_reads_per_block;
     uint64_t end_read_num = (block_num + 1) * data.cp.num_reads_per_block;
@@ -86,130 +90,89 @@ void generate_subseqs(const se_data &data, uint64_t block_num, subseq_data *subs
     }
     if (seq_start != seq_end) {
         // not all unaligned
-        subseqData->subseq_vector[7][0].push_back(seq_end - seq_start - 1);  // rlen
-        subseqData->subseq_vector[12][0].push_back(5);                       // rtype
+        raw_data[7][0].push_back(seq_end - seq_start - 1);  // rlen
+        raw_data[12][0].push_back(5);                       // rtype
         for (uint64_t i = seq_start; i < seq_end; i++)
-            subseqData->subseq_vector[6][0].push_back(char_to_int[(uint8_t)data.seq[i]]);  // ureads
+            raw_data[6][0].push_back(char_to_int[(uint8_t)data.seq[i]]);  // ureads
     }
     uint64_t prevpos = 0, diffpos;
     // Write streams
     for (uint64_t i = start_read_num; i < end_read_num; i++) {
         if (data.flag_arr[i] == true) {
-            subseqData->subseq_vector[7][0].push_back(data.read_length_arr[i] - 1);         // rlen
-            subseqData->subseq_vector[1][0].push_back(rc_to_int[(uint8_t)data.RC_arr[i]]);  // rcomp
+            raw_data[7][0].push_back(data.read_length_arr[i] - 1);         // rlen
+            raw_data[1][0].push_back(rc_to_int[(uint8_t)data.RC_arr[i]]);  // rcomp
             if (i == start_read_num) {
                 // Note: In order non-preserving mode, if the first read of
                 // the block is a singleton, then the rest are too.
-                subseqData->subseq_vector[0][0].push_back(0);  // pos
+                raw_data[0][0].push_back(0);  // pos
                 prevpos = data.pos_arr[i];
             } else {
                 diffpos = data.pos_arr[i] - prevpos;
-                subseqData->subseq_vector[0][0].push_back(diffpos);  // pos
+                raw_data[0][0].push_back(diffpos);  // pos
                 prevpos = data.pos_arr[i];
             }
             if (data.noise_len_arr[i] == 0)
-                subseqData->subseq_vector[12][0].push_back(1);  // rtype = P
+                raw_data[12][0].push_back(1);  // rtype = P
             else {
-                subseqData->subseq_vector[12][0].push_back(3);  // rtype = M
+                raw_data[12][0].push_back(3);  // rtype = M
                 for (uint16_t j = 0; j < data.noise_len_arr[i]; j++) {
-                    subseqData->subseq_vector[3][0].push_back(0);  // mmpos
+                    raw_data[3][0].push_back(0);  // mmpos
                     if (j == 0)
-                        subseqData->subseq_vector[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[i] + j]);
+                        raw_data[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[i] + j]);
                     else
-                        subseqData->subseq_vector[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[i] + j] -
-                                                                  1);  // decoder adds +1
-                    subseqData->subseq_vector[4][0].push_back(0);      // mmtype = Substitution
-                    subseqData->subseq_vector[4][1].push_back(
-                        char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[i] + j]]);
+                        raw_data[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[i] + j] -
+                                                 1);  // decoder adds +1
+                    raw_data[4][0].push_back(0);      // mmtype = Substitution
+                    raw_data[4][1].push_back(char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[i] + j]]);
                 }
-                subseqData->subseq_vector[3][0].push_back(1);
+                raw_data[3][0].push_back(1);
             }
         } else {
-            subseqData->subseq_vector[12][0].push_back(5);                           // rtype
-            subseqData->subseq_vector[7][0].push_back(data.read_length_arr[i] - 1);  // rlen
+            raw_data[12][0].push_back(5);                           // rtype
+            raw_data[7][0].push_back(data.read_length_arr[i] - 1);  // rlen
             for (uint64_t j = 0; j < data.read_length_arr[i]; j++) {
-                subseqData->subseq_vector[6][0].push_back(
-                    char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[i] + j]]);  // ureads
+                raw_data[6][0].push_back(char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[i] + j]]);  // ureads
             }
-            subseqData->subseq_vector[0][0].push_back(seq_end - prevpos);            // pos
-            subseqData->subseq_vector[1][0].push_back(0);                            // rcomp
-            subseqData->subseq_vector[7][0].push_back(data.read_length_arr[i] - 1);  // rlen
-            subseqData->subseq_vector[12][0].push_back(1);                           // rtype = P
+            raw_data[0][0].push_back(seq_end - prevpos);            // pos
+            raw_data[1][0].push_back(0);                            // rcomp
+            raw_data[7][0].push_back(data.read_length_arr[i] - 1);  // rlen
+            raw_data[12][0].push_back(1);                           // rtype = P
             prevpos = seq_end;
             seq_end = prevpos + data.read_length_arr[i];
         }
     }
 }
 
-void compress_subseqs(subseq_data *data, dsg::StreamSaver &st) {
-    // write vectors to files
-    for (auto arr : subseq_indices) {
-        std::string filename = file_subseq_prefix + "." + std::to_string(data->block_num) + "." +
-                               std::to_string(arr[0]) + "." + std::to_string(arr[1]);
-        data->listDescriptorFiles[arr[0]][arr[1]] = filename;
-        data->streamsAU.streams[arr[0]][arr[1]] = gabac::DataBlock(&data->subseq_vector[arr[0]][arr[1]]);
-        st.compress(filename, &data->streamsAU.streams[arr[0]][arr[1]]);
-    }
-}
-
-void analyze_subseqs(size_t num_thr, subseq_data *data, dsg::StreamSaver &st) {
-#ifdef GENIE_USE_OPENMP
-#pragma omp parallel for num_threads(num_thr)
-#else
-    (void)num_thr;  // Suppress unused parameter warning
-#endif
-    for (size_t i = 0; i < subseq_indices.size(); ++i) {
-        const auto &arr = subseq_indices[i];
-        std::string filename = file_subseq_prefix + "." + std::to_string(data->block_num) + "." +
-                               std::to_string(arr[0]) + "." + std::to_string(arr[1]);
-        auto block = gabac::DataBlock(&data->subseq_vector[arr[0]][arr[1]]);
-        st.analyze(filename, &block);
-    }
-    st.reloadConfigSet();
-}
-
-void pack_subseqs(subseq_data *data, dsg::StreamSaver &st,
-                  std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> *descriptorFilesPerAU) {
-    for (auto arr : subseq_indices) {
-        std::string filename = file_subseq_prefix + "." + std::to_string(data->block_num) + "." +
-                               std::to_string(arr[0]) + "." + std::to_string(arr[1]);
-        data->listDescriptorFiles[arr[0]][arr[1]] = filename;
-        if (data->streamsAU.streams[arr[0]][arr[1]].getRawSize()) {
-            st.pack(data->streamsAU.streams[arr[0]][arr[1]], filename);
-        }
-    }
-    descriptorFilesPerAU->push_back(data->listDescriptorFiles);
-}
-
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_and_compress_se(const se_data &data,
-                                                                                        dsg::StreamSaver &st,
-                                                                                        bool analyze) {
-    std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> descriptorFilesPerAU;
-
+void generate_and_compress_se(const std::string &temp_dir, const se_data &data, const std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
     // Now generate new streams and compress blocks in parallel
     // this is actually number of read pairs per block for PE
     uint64_t blocks = uint64_t(std::ceil(float(data.cp.num_reads) / data.cp.num_reads_per_block));
-
-    if (analyze) {
-        u_int64_t block_to_analyze = blocks / 2;
-        subseq_data sdata;
-        generate_subseqs(data, block_to_analyze, &sdata);
-        analyze_subseqs(data.cp.num_thr, &sdata, st);
-    }
-
+    std::vector<uint32_t> num_reads_per_block(blocks);
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel for ordered num_threads(data.cp.num_thr) schedule(dynamic)
 #endif
     for (uint64_t block_num = 0; block_num < blocks; block_num++) {
-        subseq_data sdata;
-        generate_subseqs(data, block_num, &sdata);
-        compress_subseqs(&sdata, st);
-#ifdef GENIE_USE_OPENMP
-#pragma omp ordered
-#endif
-        { pack_subseqs(&sdata, st, &descriptorFilesPerAU); }
+        auto raw_data = generate_empty_raw_data();
+
+        generate_subseqs(data, block_num, raw_data);
+        num_reads_per_block[block_num] = raw_data[1][0].size(); // rcomp
+
+        std::vector<std::vector<std::vector<gabac::DataBlock>>> generated_streams = create_default_streams();
+        compress_read_subseqs(raw_data, generated_streams, configs);
+
+        std::string file_to_save_streams = temp_dir + "/read_streams." + std::to_string(block_num);
+        write_streams_to_file(generated_streams, file_to_save_streams);
+
     }  // end omp parallel
-    return descriptorFilesPerAU;
+
+    // write num blocks, reads per block to a file
+    const std::string block_info_file = temp_dir + "/block_info.bin";
+    std::ofstream f_block_info(block_info_file, std::ios::binary);
+    uint32_t num_blocks = (uint32_t)blocks;
+    f_block_info.write((char*)&num_blocks, sizeof(uint32_t));
+    f_block_info.write((char*)&num_reads_per_block[0],num_blocks*sizeof(uint32_t));
+
+    return;
 }
 
 void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data) {
@@ -319,16 +282,15 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     remove(file_seq.c_str());
 }
 
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams_se(const std::string &temp_dir,
-                                                                                        const compression_params &cp,
-                                                                                        bool analyze,
-                                                                                        dsg::StreamSaver &st) {
+void generate_read_streams_se(const std::string &temp_dir,
+                              const compression_params &cp,
+                              const std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
     se_data data;
     loadSE_Data(cp, temp_dir, &data);
 
-    auto ret = generate_and_compress_se(data, st, analyze);
+    generate_and_compress_se(temp_dir, data, configs);
 
-    return ret;
+    return;
 }
 
 void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data) {
@@ -355,7 +317,8 @@ void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     data->noise_len_arr = std::vector<uint16_t>(cp.num_reads);
 
     data->order_arr = std::vector<uint32_t>(cp.num_reads);
-    // PE step 1: read all streams indexed by original position in FASTQ, also read order array
+    // PE step 1: read all streams indexed by original position in FASTQ, also
+    // read order array
 
     // read streams for aligned reads
     std::ifstream f_seq(file_seq);
@@ -482,8 +445,8 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
                 bdata->block_seq_start.push_back(data.pos_arr[current]);
         }
         if (!already_seen[current]) {
-            // current is already seen when current is unaligned and its pair has already
-            // appeared before - in such cases we don't need to handle it now.
+            // current is already seen when current is unaligned and its pair has
+            // already appeared before - in such cases we don't need to handle it now.
             already_seen[current] = true;
             uint32_t pair = (current < data.cp.num_reads / 2) ? (current + data.cp.num_reads / 2)
                                                               : (current - data.cp.num_reads / 2);
@@ -514,7 +477,8 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
                             std::min(current, pair));  // always put read 1 first in this case
                     } else {
                         // pair is unaligned, put in same block at end (not in same record)
-                        // for now, put in to_push_at_end_of_block vector (processed at end of block)
+                        // for now, put in to_push_at_end_of_block vector (processed at end
+                        // of block)
                         bdata->read_index_genomic_record.push_back(current);
                         to_push_at_end_of_block.push_back(pair);
                     }
@@ -564,8 +528,8 @@ void generate_qual_id_pe(const std::string &temp_dir, const pe_block_data &bdata
     std::ofstream f_order_quality(file_order_quality, std::ios::binary);
     // store order (as usual in uint32_t)
     std::ofstream f_blocks_quality(file_blocks_quality, std::ios::binary);
-    // store block start and end positions (differs from the block_start and end because here we measure
-    // in terms of quality values rather than records
+    // store block start and end positions (differs from the block_start and end
+    // because here we measure in terms of quality values rather than records
     uint32_t quality_block_pos = 0;
     for (uint32_t i = 0; i < bdata.block_start.size(); i++) {
         f_blocks_quality.write((char *)&quality_block_pos, sizeof(uint32_t));
@@ -591,7 +555,8 @@ void generate_qual_id_pe(const std::string &temp_dir, const pe_block_data &bdata
     f_blocks_quality.close();
     // id:
     std::ofstream f_blocks_id(file_blocks_id, std::ios::binary);
-    // store block start and end positions (measured in terms of records since 1 record = 1 id)
+    // store block start and end positions (measured in terms of records since 1
+    // record = 1 id)
     for (uint32_t i = 0; i < bdata.block_start.size(); i++) {
         f_blocks_id.write((char *)&bdata.block_start[i], sizeof(uint32_t));
         f_blocks_id.write((char *)&bdata.block_end[i], sizeof(uint32_t));
@@ -615,8 +580,8 @@ struct pe_statistics {
     std::vector<uint32_t> count_split_diff_AU;
 };
 
-void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num, subseq_data *out,
-                         pe_statistics *stats) {
+void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num,
+                         std::vector<std::vector<gabac::DataBlock>> &raw_data, pe_statistics *stats) {
 #ifdef GENIE_USE_OPENMP
     const unsigned cur_thread_num = omp_get_thread_num();
 #else
@@ -635,20 +600,14 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
     rc_to_int[(uint8_t)'d'] = 0;
     rc_to_int[(uint8_t)'r'] = 1;
 
-    out->block_num = cur_block_num;
-
-    for (auto arr : subseq_indices) out->subseq_vector[arr[0]][arr[1]] = std::vector<int64_t>();
-    // clear vectors
-    for (auto arr : subseq_indices) out->subseq_vector[arr[0]][arr[1]].clear();
-
     // first find the seq
     uint64_t seq_start = bdata.block_seq_start[cur_block_num], seq_end = bdata.block_seq_end[cur_block_num];
     if (seq_start != seq_end) {
         // not all unaligned
-        out->subseq_vector[7][0].push_back(seq_end - seq_start - 1);  // rlen
-        out->subseq_vector[12][0].push_back(5);                       // rtype
+        raw_data[7][0].push_back(seq_end - seq_start - 1);  // rlen
+        raw_data[12][0].push_back(5);                       // rtype
         for (uint64_t i = seq_start; i < seq_end; i++)
-            out->subseq_vector[6][0].push_back(char_to_int[(uint8_t)data.seq[i]]);  // ureads
+            raw_data[6][0].push_back(char_to_int[(uint8_t)data.seq[i]]);  // ureads
     }
     uint64_t prevpos = 0, diffpos;
     // Write streams
@@ -661,11 +620,11 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
             if (i == bdata.block_start[cur_block_num]) {
                 // Note: In order non-preserving mode, if the first read of
                 // the block is a singleton, then the rest are too.
-                out->subseq_vector[0][0].push_back(0);  // pos
+                raw_data[0][0].push_back(0);  // pos
                 prevpos = data.pos_arr[current];
             } else {
                 diffpos = data.pos_arr[current] - prevpos;
-                out->subseq_vector[0][0].push_back(diffpos);  // pos
+                raw_data[0][0].push_back(diffpos);  // pos
                 prevpos = data.pos_arr[current];
             }
         }
@@ -674,96 +633,93 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
             // both reads in same record
             if (data.flag_arr[current] == false) {
                 // Case 1: both unaligned
-                out->subseq_vector[12][0].push_back(5);  // rtype
-                out->subseq_vector[7][0].push_back(data.read_length_arr[current] + data.read_length_arr[pair] -
-                                                   1);  // rlen
+                raw_data[12][0].push_back(5);                                                              // rtype
+                raw_data[7][0].push_back(data.read_length_arr[current] + data.read_length_arr[pair] - 1);  // rlen
                 for (uint64_t j = 0; j < data.read_length_arr[current]; j++) {
-                    out->subseq_vector[6][0].push_back(
+                    raw_data[6][0].push_back(
                         char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
                 }
                 for (uint64_t j = 0; j < data.read_length_arr[pair]; j++) {
-                    out->subseq_vector[6][0].push_back(
+                    raw_data[6][0].push_back(
                         char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[pair] + j]]);  // ureads
                 }
-                out->subseq_vector[0][0].push_back(seq_end - prevpos);                  // pos
-                out->subseq_vector[1][0].push_back(0);                                  // rcomp
-                out->subseq_vector[1][0].push_back(0);                                  // rcomp
-                out->subseq_vector[7][0].push_back(data.read_length_arr[current] - 1);  // rlen
-                out->subseq_vector[7][0].push_back(data.read_length_arr[pair] - 1);     // rlen
-                out->subseq_vector[12][0].push_back(1);                                 // rtype = P
-                out->subseq_vector[8][0].push_back(0);                                  // pair decoding case same_rec
+                raw_data[0][0].push_back(seq_end - prevpos);                  // pos
+                raw_data[1][0].push_back(0);                                  // rcomp
+                raw_data[1][0].push_back(0);                                  // rcomp
+                raw_data[7][0].push_back(data.read_length_arr[current] - 1);  // rlen
+                raw_data[7][0].push_back(data.read_length_arr[pair] - 1);     // rlen
+                raw_data[12][0].push_back(1);                                 // rtype = P
+                raw_data[8][0].push_back(0);                                  // pair decoding case same_rec
                 bool read_1_first = true;
                 uint16_t delta = data.read_length_arr[current];
-                out->subseq_vector[8][1].push_back(!(read_1_first) + 2 * delta);  // pair
+                raw_data[8][1].push_back(!(read_1_first) + 2 * delta);  // pair
                 prevpos = seq_end;
                 seq_end = prevpos + data.read_length_arr[current] + data.read_length_arr[pair];
             } else {
                 // Case 2: both aligned
-                out->subseq_vector[7][0].push_back(data.read_length_arr[current] - 1);         // rlen
-                out->subseq_vector[7][0].push_back(data.read_length_arr[pair] - 1);            // rlen
-                out->subseq_vector[1][0].push_back(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
-                out->subseq_vector[1][0].push_back(rc_to_int[(uint8_t)data.RC_arr[pair]]);     // rcomp
+                raw_data[7][0].push_back(data.read_length_arr[current] - 1);         // rlen
+                raw_data[7][0].push_back(data.read_length_arr[pair] - 1);            // rlen
+                raw_data[1][0].push_back(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
+                raw_data[1][0].push_back(rc_to_int[(uint8_t)data.RC_arr[pair]]);     // rcomp
                 if (data.noise_len_arr[current] == 0 && data.noise_len_arr[pair] == 0)
-                    out->subseq_vector[12][0].push_back(1);  // rtype = P
+                    raw_data[12][0].push_back(1);  // rtype = P
                 else {
-                    out->subseq_vector[12][0].push_back(3);  // rtype = M
+                    raw_data[12][0].push_back(3);  // rtype = M
                     for (int k = 0; k < 2; k++) {
                         uint32_t index = k ? pair : current;
                         for (uint16_t j = 0; j < data.noise_len_arr[index]; j++) {
-                            out->subseq_vector[3][0].push_back(0);  // mmpos
+                            raw_data[3][0].push_back(0);  // mmpos
                             if (j == 0)
-                                out->subseq_vector[3][1].push_back(
-                                    data.noisepos_arr[data.pos_in_noise_arr[index] + j]);  // mmpos
+                                raw_data[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[index] + j]);  // mmpos
                             else
-                                out->subseq_vector[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[index] + j] -
-                                                                   1);  // mmpos
-                            out->subseq_vector[4][0].push_back(0);      // mmtype = Substitution
-                            out->subseq_vector[4][1].push_back(
+                                raw_data[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[index] + j] -
+                                                         1);  // mmpos
+                            raw_data[4][0].push_back(0);      // mmtype = Substitution
+                            raw_data[4][1].push_back(
                                 char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[index] + j]]);
                         }
-                        out->subseq_vector[3][0].push_back(1);  // mmpos
+                        raw_data[3][0].push_back(1);  // mmpos
                     }
                 }
                 bool read_1_first = (current < pair);
                 uint16_t delta = data.pos_arr[pair] - data.pos_arr[current];
-                out->subseq_vector[8][0].push_back(0);                            // pair decoding case same_rec
-                out->subseq_vector[8][1].push_back(!(read_1_first) + 2 * delta);  // pair
+                raw_data[8][0].push_back(0);                            // pair decoding case same_rec
+                raw_data[8][1].push_back(!(read_1_first) + 2 * delta);  // pair
                 stats->count_same_rec[cur_thread_num]++;
             }
         } else {
             // only one read in genomic record
             if (data.flag_arr[current] == true) {
-                out->subseq_vector[7][0].push_back(data.read_length_arr[current] - 1);         // rlen
-                out->subseq_vector[1][0].push_back(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
+                raw_data[7][0].push_back(data.read_length_arr[current] - 1);         // rlen
+                raw_data[1][0].push_back(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
                 if (data.noise_len_arr[current] == 0)
-                    out->subseq_vector[12][0].push_back(1);  // rtype = P
+                    raw_data[12][0].push_back(1);  // rtype = P
                 else {
-                    out->subseq_vector[12][0].push_back(3);  // rtype = M
+                    raw_data[12][0].push_back(3);  // rtype = M
                     for (uint16_t j = 0; j < data.noise_len_arr[current]; j++) {
-                        out->subseq_vector[3][0].push_back(0);  // mmpos
+                        raw_data[3][0].push_back(0);  // mmpos
                         if (j == 0)
-                            out->subseq_vector[3][1].push_back(
-                                data.noisepos_arr[data.pos_in_noise_arr[current] + j]);  // mmpos
+                            raw_data[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[current] + j]);  // mmpos
                         else
-                            out->subseq_vector[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[current] + j] -
-                                                               1);  // mmpos
-                        out->subseq_vector[4][0].push_back(0);      // mmtype = Substitution
-                        out->subseq_vector[4][1].push_back(
+                            raw_data[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[current] + j] -
+                                                     1);  // mmpos
+                        raw_data[4][0].push_back(0);      // mmtype = Substitution
+                        raw_data[4][1].push_back(
                             char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[current] + j]]);
                     }
-                    out->subseq_vector[3][0].push_back(1);
+                    raw_data[3][0].push_back(1);
                 }
             } else {
-                out->subseq_vector[12][0].push_back(5);                                 // rtype
-                out->subseq_vector[7][0].push_back(data.read_length_arr[current] - 1);  // rlen
+                raw_data[12][0].push_back(5);                                 // rtype
+                raw_data[7][0].push_back(data.read_length_arr[current] - 1);  // rlen
                 for (uint64_t j = 0; j < data.read_length_arr[current]; j++) {
-                    out->subseq_vector[6][0].push_back(
+                    raw_data[6][0].push_back(
                         char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
                 }
-                out->subseq_vector[0][0].push_back(seq_end - prevpos);                  // pos
-                out->subseq_vector[1][0].push_back(0);                                  // rcomp
-                out->subseq_vector[7][0].push_back(data.read_length_arr[current] - 1);  // rlen
-                out->subseq_vector[12][0].push_back(1);                                 // rtype = P
+                raw_data[0][0].push_back(seq_end - prevpos);                  // pos
+                raw_data[1][0].push_back(0);                                  // rcomp
+                raw_data[7][0].push_back(data.read_length_arr[current] - 1);  // rlen
+                raw_data[12][0].push_back(1);                                 // rtype = P
                 prevpos = seq_end;
                 seq_end = prevpos + data.read_length_arr[current];
             }
@@ -777,36 +733,34 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
 
             bool read_1_first = (current < pair);
             if (same_block && !read_1_first) {
-                out->subseq_vector[8][0].push_back(1);  // R1_split
-                out->subseq_vector[8][2].push_back(bdata.genomic_record_index[pair]);
+                raw_data[8][0].push_back(1);  // R1_split
+                raw_data[8][2].push_back(bdata.genomic_record_index[pair]);
             } else if (same_block && read_1_first) {
-                out->subseq_vector[8][0].push_back(2);  // R2_split
-                out->subseq_vector[8][3].push_back(bdata.genomic_record_index[pair]);
+                raw_data[8][0].push_back(2);  // R2_split
+                raw_data[8][3].push_back(bdata.genomic_record_index[pair]);
             } else if (!same_block && !read_1_first) {
-                out->subseq_vector[8][0].push_back(3);  // R1_diff_ref_seq
-                out->subseq_vector[8][4].push_back(bdata.block_num[pair]);
-                out->subseq_vector[8][6].push_back(bdata.genomic_record_index[pair]);
+                raw_data[8][0].push_back(3);  // R1_diff_ref_seq
+                raw_data[8][4].push_back(bdata.block_num[pair]);
+                raw_data[8][6].push_back(bdata.genomic_record_index[pair]);
             } else {
-                out->subseq_vector[8][0].push_back(4);  // R2_diff_ref_seq
-                out->subseq_vector[8][5].push_back(bdata.block_num[pair]);
-                out->subseq_vector[8][7].push_back(bdata.genomic_record_index[pair]);
+                raw_data[8][0].push_back(4);  // R2_diff_ref_seq
+                raw_data[8][5].push_back(bdata.block_num[pair]);
+                raw_data[8][7].push_back(bdata.genomic_record_index[pair]);
             }
         }
     }
 }
 
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_streams_pe(const std::string &temp_dir,
-                                                                                        const compression_params &cp,
-                                                                                        bool analyze,
-                                                                                        dsg::StreamSaver &st) {
-    // basic approach: start looking at reads from left to right. If current is aligned but
-    // pair is unaligned, pair is kept at the end current AU and stored in different record.
-    // We try to keep number of records in AU = num_reads_per_block (without counting the the unaligned
-    // pairs above.
-    // As we scan to right, if we come across a read whose pair has already been seen in the same AU
-    // and the gap is < 32768 (and non-ovelapping since delta >= 0), then we add this to the paired read's
-    // genomic record. Finally when we come to unaligned reads whose pair is also unaligned, we store them
-    // in same genomic record.
+void generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
+    // basic approach: start looking at reads from left to right. If current is
+    // aligned but pair is unaligned, pair is kept at the end current AU and
+    // stored in different record. We try to keep number of records in AU =
+    // num_reads_per_block (without counting the the unaligned pairs above. As we
+    // scan to right, if we come across a read whose pair has already been seen in
+    // the same AU and the gap is < 32768 (and non-ovelapping since delta >= 0),
+    // then we add this to the paired read's genomic record. Finally when we come
+    // to unaligned reads whose pair is also unaligned, we store them in same
+    // genomic record.
 
     se_data data;
     loadPE_Data(cp, temp_dir, &data);
@@ -817,23 +771,13 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_str
 
     generate_qual_id_pe(temp_dir, bdata, cp.num_reads);
 
-    std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> descriptorFilesPerAU;
-
-    if (analyze) {
-        subseq_data subseqs;
-        pe_statistics stats;
-        stats.count_same_rec = std::vector<uint32_t>(cp.num_thr, 0);
-        stats.count_split_same_AU = std::vector<uint32_t>(cp.num_thr, 0);
-        stats.count_split_diff_AU = std::vector<uint32_t>(cp.num_thr, 0);
-
-        generate_streams_pe(data, bdata, bdata.block_start.size() / 2, &subseqs, &stats);
-        analyze_subseqs(cp.num_thr, &subseqs, st);
-    }
-
     pe_statistics stats;
     stats.count_same_rec = std::vector<uint32_t>(cp.num_thr, 0);
     stats.count_split_same_AU = std::vector<uint32_t>(cp.num_thr, 0);
     stats.count_split_diff_AU = std::vector<uint32_t>(cp.num_thr, 0);
+
+    std::vector<uint32_t> num_reads_per_block(bdata.block_start.size());
+    std::vector<uint32_t> num_records_per_block(bdata.block_start.size());
 
     // PE step 4: Now generate read streams and compress blocks in parallel
 // this is actually number of read pairs per block for PE
@@ -841,15 +785,16 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_str
 #pragma omp parallel for ordered num_threads(cp.num_thr) schedule(dynamic)
 #endif
     for (uint64_t cur_block_num = 0; cur_block_num < bdata.block_start.size(); cur_block_num++) {
-        subseq_data subseqs;
+        auto raw_data = generate_empty_raw_data();
 
-        generate_streams_pe(data, bdata, cur_block_num, &subseqs, &stats);
+        generate_streams_pe(data, bdata, cur_block_num, raw_data, &stats);
+        num_reads_per_block[cur_block_num] = raw_data[1][0].size(); // rcomp
+        num_records_per_block[cur_block_num] = bdata.block_end[cur_block_num] - bdata.block_start[cur_block_num]; // used later for ids
+        std::vector<std::vector<std::vector<gabac::DataBlock>>> generated_streams = create_default_streams();
+        compress_read_subseqs(raw_data, generated_streams, configs);
 
-        compress_subseqs(&subseqs, st);
-#ifdef GENIE_USE_OPENMP
-#pragma omp ordered
-#endif
-        { pack_subseqs(&subseqs, st, &descriptorFilesPerAU); }
+        std::string file_to_save_streams = temp_dir + "/read_streams." + std::to_string(cur_block_num);
+        write_streams_to_file(generated_streams, file_to_save_streams);
     }  // end omp parallel
 
     std::cout << "count_same_rec: " << std::accumulate(stats.count_same_rec.begin(), stats.count_same_rec.end(), 0)
@@ -859,7 +804,14 @@ std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> generate_read_str
     std::cout << "count_split_diff_AU: "
               << std::accumulate(stats.count_split_diff_AU.begin(), stats.count_split_diff_AU.end(), 0) << "\n";
 
-    return descriptorFilesPerAU;
+    // write num blocks, reads per block and records per block to a file
+    const std::string block_info_file = temp_dir + "/block_info.bin";
+    std::ofstream f_block_info(block_info_file, std::ios::binary);
+    uint32_t num_blocks = bdata.block_start.size();
+    f_block_info.write((char*)&num_blocks, sizeof(uint32_t));
+    f_block_info.write((char*)&num_reads_per_block[0],num_blocks*sizeof(uint32_t));
+    f_block_info.write((char*)&num_records_per_block[0],num_blocks*sizeof(uint32_t));
+    return;
 }
 
 }  // namespace spring
