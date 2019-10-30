@@ -4,11 +4,11 @@
 namespace spring {
 
 void generate_new_fastq_se(util::FastqFileReader *fastqFileReader1, const std::string &temp_dir,
-                           const compression_params &cp) {
+                           const compression_params &cp, const std::string &outputFilePath) {
     uint32_t numreads = cp.num_reads;
     std::string basedir = temp_dir;
     std::string file_order = basedir + "/read_order.bin";
-    std::string outfile_fastq = basedir + "/new.fastq";
+    std::string outfile_fastq = outputFilePath + ".new.fastq";
     uint32_t *order_array;
     // array containing index mapping position in original fastq to
     // position after reordering
@@ -61,13 +61,13 @@ void generate_new_fastq_se(util::FastqFileReader *fastqFileReader1, const std::s
 }
 
 void generate_new_fastq_pe(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
-                           const std::string &temp_dir, const compression_params &cp) {
+                           const std::string &temp_dir, const compression_params &cp, const std::string &outputFilePath) {
     util::FastqFileReader *fastqFileReader[2] = {fastqFileReader1, fastqFileReader2};
     uint32_t numreads = cp.num_reads;
     std::string basedir = temp_dir;
     std::string file_order = basedir + "/order_quality.bin";
-    std::string outfile_fastq_1 = basedir + "/new_1.fastq";
-    std::string outfile_fastq_2 = basedir + "/new_2.fastq";
+    std::string outfile_fastq_1 = outputFilePath + ".new_1.fastq";
+    std::string outfile_fastq_2 = outputFilePath + ".new_2.fastq";
     uint32_t *order_array;
     // array containing index mapping position in original fastq to
     // position after reordering
