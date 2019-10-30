@@ -149,7 +149,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
                             const compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for ordered num_threads(cp.num_thr) schedule(dynamic)
+#pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic)
 #endif
     for (uint64_t block_num = 0; block_num < block_start.size(); block_num++) {
         std::ifstream f_order_id(file_order_id + "." + std::to_string(block_num), std::ios::binary);
@@ -206,7 +206,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
         }
 
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for ordered num_threads(cp.num_thr) schedule(dynamic)
+#pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic)
 #endif
         for (uint64_t block_num = start_block_num; block_num < end_block_num; block_num++) {
             auto raw_data = generate_empty_raw_data();
@@ -265,12 +265,11 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
         // There might be a better way to parallelize the loop.
         //
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for ordered num_threads(num_thr) schedule(dynamic)
+#pragma omp parallel for num_threads(num_thr) schedule(dynamic)
 #else
         (void)num_thr;  // Suppress unused parameter warning
 #endif
         for (uint64_t block_num = 0; block_num < blocks; ++block_num) {
-            dsg::AcessUnitStreams streams;
             uint64_t block_num_offset = start_read_bin / num_reads_per_block;
             uint64_t start_read_num = block_num * num_reads_per_block;
             uint64_t end_read_num = (block_num + 1) * num_reads_per_block;
