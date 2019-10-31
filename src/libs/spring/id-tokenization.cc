@@ -134,7 +134,7 @@ void generate_id_tokens(char *prev_ID, uint32_t *prev_tokens_ptr, std::string &c
         if (token_ctr > MAX_NUM_TOKENS_ID - 2) throw std::runtime_error("Too many tokens in ID");
     }
     strcpy(prev_ID, current_id.c_str());
-    tokens[6 * (token_ctr + 1) + 0].push_back(9);  // END
+    tokens[6 * (token_ctr + 1) + 0].push_back(10);  // END
 
     // fill rest of prev_tokens_ptr to 0, otherwise we've bug due to garbage
     // values
@@ -264,7 +264,7 @@ void generate_id_tokens(char *prev_ID, uint32_t *prev_tokens_ptr, std::string &c
         if (token_ctr > MAX_NUM_TOKENS_ID - 2) throw std::runtime_error("Too many tokens in ID");
     }
     strcpy(prev_ID, current_id.c_str());
-    tokens[token_ctr + 1][0].push_back(9);  // END
+    tokens[token_ctr + 1][0].push_back(10);  // END
 
     // fill rest of prev_tokens_ptr to 0, otherwise we've bug due to garbage
     // values
@@ -295,7 +295,7 @@ std::string decode_id_tokens(std::string &prev_ID, uint32_t *prev_tokens_ptr, ui
             // 128 is the maximum number of tokens
             tokType = tokens[t][0][pos_in_tokens_array[t][0]++];
             std::string str_token;
-            if (tokType == 9) {
+            if (tokType == 10) {
                 end_token_found = true;
                 break;
             } else if (tokType == 2) {
