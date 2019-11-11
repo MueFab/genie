@@ -45,6 +45,11 @@ ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_
 
 // -----------------------------------------------------------------------------------------------------------------
 
+// void ParameterSet::read(util::BitReader *bitReader) {
+// }
+
+// -----------------------------------------------------------------------------------------------------------------
+
 void ParameterSet::write(util::BitWriter *writer) const {
     DataUnit::write(writer);
     writer->write(0, 10);  // reserved

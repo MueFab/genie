@@ -48,6 +48,8 @@ class ParameterSet : public DataUnit {
 
     void setMultipleSignatureBase(uint32_t _multiple_signature_base, uint8_t _U_signature_size);
 
+    // void read(util::BitReader *bitReader) override;
+
     void write(util::BitWriter *writer) const override;
 
    private:
