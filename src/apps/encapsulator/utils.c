@@ -157,7 +157,20 @@ bool readBoxHeader(FILE *input_file, char *type, uint64_t *boxSize) {
 }
 
 bool utils_read(uint8_t* value, FILE *inputFile){
-    return fread(value,sizeof(uint8_t),1,inputFile)==1;
+    int sucRead = fread(value,sizeof(uint8_t),1,inputFile)==1;
+    fprintf(stderr, "Position in Filestream:%li\n", ftell(inputFile));
+    fprintf(stderr, "value is:%u\n", *value);
+    if(*value != 1 && *value != 2){
+        fprintf(stderr, "Next 3 values are:\n");
+        fread(value,sizeof(uint8_t),1,inputFile)==1;
+        fprintf(stderr, "value is:%u\n", *value);
+        fread(value,sizeof(uint8_t),1,inputFile)==1;
+        fprintf(stderr, "value is:%u\n", *value);
+        fread(value,sizeof(uint8_t),1,inputFile)==1;
+        fprintf(stderr, "value is:%u\n", *value);
+    }
+    return sucRead;
+    //return fread(value,sizeof(uint8_t),1,inputFile)==1;
 }
 
 bool readLittleEndian16FromFile(uint16_t *value, FILE *inputFile) {

@@ -3427,10 +3427,13 @@ Encoding_ParametersType* readEncodingParameters(InputBitstream* input){
             free(classIDs);
             return NULL;
         }
+
+        //fprintf(stderr, "BufferContent:%u\n", buffer);
+
         class_specific_dec_cfg_flag[descriptor_i] = buffer!=0;
 
         if(!class_specific_dec_cfg_flag[descriptor_i]){
-            dec_cfg_preset[descriptor_i] = malloc(sizeof(bool));
+            dec_cfg_preset[descriptor_i] = malloc(sizeof(bool));                            //TODO:bool?
             encoding_mode_id[descriptor_i] = malloc(sizeof(uint8_t));
             decoderConfiguration[descriptor_i] = malloc(sizeof(void*));
 
@@ -3574,14 +3577,14 @@ Encoding_ParametersType* readEncodingParameters(InputBitstream* input){
         }
 
         readBit(input, &buffer);
-        qv_reverse_flag[class_i] = buffer != 0;
+        qv_reverse_flag[class_i] = buffer != 0;      //TODO:?
     }
 
     readBit(input, &buffer);
     crps_flag = buffer!=0;
     if(crps_flag){
         parameter_set_crps = readParameterSetCrps(input);
-    }
+    }                                                                              //TODO:byte_aligned?
 
     Encoding_ParametersType* encodingParameters = malloc(sizeof(Encoding_ParametersType));
 
