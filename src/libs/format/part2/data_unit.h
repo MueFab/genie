@@ -58,6 +58,8 @@ class DataUnit {
     explicit DataUnit(const DataUnitType &t);
 
     virtual void write(util::BitWriter *write) const;
+
+    // virtual void read(util::BitReader *bitReader);
 };
 
 }  // namespace format
