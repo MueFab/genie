@@ -18,8 +18,8 @@ void generate_new_fastq_se(util::FastqFileReader *fastqFileReader1, const std::s
     // verify that order_array is a permutation of 1...numreads
     if (!is_permutation(order_array, numreads)) throw std::runtime_error("order_array not permutation of 1...numreads");
 
-    uint32_t str_array_size = numreads / 8 + 1;
-    // numreads/8+1 chosen so that these many FASTQ records can be stored in
+    uint32_t str_array_size = numreads / 10 + 1;
+    // numreads/10+1 chosen so that these many FASTQ records can be stored in
     // memory without exceeding the RAM consumption of reordering stage
     std::string *read_array = new std::string[str_array_size];
     std::string *id_array = new std::string[str_array_size];
@@ -75,8 +75,8 @@ void generate_new_fastq_pe(util::FastqFileReader *fastqFileReader1, util::FastqF
     generate_order_array(file_order, order_array, numreads);
     // verify that order_array is a permutation of 1...numreads
     if (!is_permutation(order_array, numreads)) throw std::runtime_error("order_array not permutation of 1...numreads");
-    uint32_t str_array_size = numreads / 8 + 1;
-    // numreads/8+1 chosen so that these many FASTQ records can be stored in
+    uint32_t str_array_size = numreads / 10 + 1;
+    // numreads/10+1 chosen so that these many FASTQ records can be stored in
     // memory without exceeding the RAM consumption of reordering stage
     std::string *read_array = new std::string[str_array_size];
     std::string *id_array = new std::string[str_array_size];
@@ -104,19 +104,17 @@ void generate_new_fastq_pe(util::FastqFileReader *fastqFileReader1, util::FastqF
                     quality_array[index] = fastqRecords[0].qualityScores;
                 }
                 // ids treated in a different way since we always store ids from file 1
-                // but we attach a /1 or /2 at end to distinguish (also done by
-                // decompress.cpp) so we can verify that it works
                 if (k == 0) {
                     if (order_array[j] >= start_read_bin && order_array[j] < end_read_bin) {
                         uint32_t index = order_array[j] - start_read_bin;
                         first_file_flag_array[index] = true;
-                        id_array[index] = fastqRecords[0].title + "/1";
+                        id_array[index] = fastqRecords[0].title;
                     }
                     if (order_array[numreads / 2 + j] >= start_read_bin &&
                         order_array[numreads / 2 + j] < end_read_bin) {
                         uint32_t index = order_array[numreads / 2 + j] - start_read_bin;
                         first_file_flag_array[index] = false;
-                        id_array[index] = fastqRecords[0].title + "/2";
+                        id_array[index] = fastqRecords[0].title;
                     }
                 }
             }

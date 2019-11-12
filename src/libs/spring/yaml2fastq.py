@@ -31,15 +31,15 @@ with open(sys.argv[1]) as fin:
                 record_segments_mode = False
                 if PE:
                     if number_of_record_segments == 1 and read_1_first:
-                        fout1.write(read_name+'/1\n'+read_list[0]+'\n+\n'+quality_list[0]+'\n')
+                        fout1.write(read_name+'\n'+read_list[0]+'\n+\n'+quality_list[0]+'\n')
                     elif number_of_record_segments == 1 and not read_1_first:
-                        fout2.write(read_name+'/2\n'+read_list[0]+'\n+\n'+quality_list[0]+'\n')
+                        fout2.write(read_name+'\n'+read_list[0]+'\n+\n'+quality_list[0]+'\n')
                     elif number_of_record_segments == 2 and read_1_first:
-                        fout1.write(read_name+'/1\n'+read_list[0]+'\n+\n'+quality_list[0]+'\n')
-                        fout2.write(read_name+'/2\n'+read_list[1]+'\n+\n'+quality_list[1]+'\n')
+                        fout1.write(read_name+'\n'+read_list[0]+'\n+\n'+quality_list[0]+'\n')
+                        fout2.write(read_name+'\n'+read_list[1]+'\n+\n'+quality_list[1]+'\n')
                     else:
-                        fout1.write(read_name+'/1\n'+read_list[1]+'\n+\n'+quality_list[1]+'\n')
-                        fout2.write(read_name+'/2\n'+read_list[0]+'\n+\n'+quality_list[0]+'\n')
+                        fout1.write(read_name+'\n'+read_list[1]+'\n+\n'+quality_list[1]+'\n')
+                        fout2.write(read_name+'\n'+read_list[0]+'\n+\n'+quality_list[0]+'\n')
                 else:
                     fout1.write(read_name+'\n'+read_list[0]+'\n+\n'+quality_list[0]+'\n')
 
