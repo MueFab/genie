@@ -115,6 +115,7 @@ void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::Fast
         std::cout << "Time for this step: "
                   << std::chrono::duration_cast<std::chrono::seconds>(grs_end - grs_start).count() << " s\n";
 
+        // TODO: do this only when debugging, otherwise disable for speed 
         std::cout << "Generating new FASTQ for testing purposes\n";
         auto new_fq_start = std::chrono::steady_clock::now();
         if (!cp.paired_end) {
