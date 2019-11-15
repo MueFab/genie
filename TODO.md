@@ -18,7 +18,6 @@
 
 - [x] Clean repository with: https://rtyley.github.io/bfg-repo-cleaner/
 - [ ] Add boilerplate to all source code files
-- [ ] Document the generation of the conformance test items
 - [ ] Update setting on github.com and codecov.io and travis.com and travis.org
 - [ ] Set up GitHub pages at: https://mitogen.github.io/genie/
 - [ ] Set up Doxygen documentation at: https://mitogen.github.io/genie/doc/
