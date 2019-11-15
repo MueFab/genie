@@ -37,7 +37,6 @@
 - [ ] Check use and linking of OpenMP
 - [ ] Clean up exceptions (use only a simple class derived from std::exception - without all the special things)
 - [ ] Implement a unified logging solution
-- [ ] Format log and error messages uniformly
 - [ ] Check for correct usage of assertions versus exceptions
 - [ ] Implement C++ Core Guideline C.21 ("If you define or =delete any default operation, define or =delete them all")
 - [ ] Make destructors virtual in all classes that something is being derived from (use override in derived classes)
