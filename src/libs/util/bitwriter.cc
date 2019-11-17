@@ -113,4 +113,4 @@ void BitWriter::flush() {
 // -----------------------------------------------------------------------------------------------------------------
 
 uint64_t BitWriter::getBitsWritten() { return m_bitsWritten + m_numHeldBits; }
-}  // namespace format
+}  // namespace util

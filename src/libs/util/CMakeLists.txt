@@ -13,6 +13,6 @@ set(source_files
         sam-file-reader.cc
         sam-record.cc
         string-helpers.cc
-)
+        bitreader.cc)
 
 add_library(util ${source_files})
