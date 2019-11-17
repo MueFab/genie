@@ -6,13 +6,13 @@
 #ifndef GENIE_FILEHANDLINGUTILS_H
 #define GENIE_FILEHANDLINGUTILS_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <memory.h>
 #include <errno.h>
+#include <memory.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-typedef struct{
+typedef struct {
     char refUri[1024];
     uint8_t numberSequences;
     char** sequenceName;
@@ -21,6 +21,6 @@ typedef struct{
 
 Ref_information readRefInformation(char* refInfoFilePath);
 
-int createMPEGGFileNoMITFromByteStream(const char* fileName, char* refInfoPath, char* outputFileName);
+int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileName);
 
-#endif //GENIE_FILEHANDLINGUTILS_H
+#endif  // GENIE_FILEHANDLINGUTILS_H
