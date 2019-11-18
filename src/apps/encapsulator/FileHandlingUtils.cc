@@ -88,6 +88,8 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileNam
 
     // Ref_information ref_information = readRefInformation(refInfoPath);
 
+    (void)outputFileName;  // silence compiler warning
+
     std::ifstream inputFilestream;
     inputFilestream.open(fileName, std::ios::binary);
 
@@ -114,8 +116,13 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileNam
 //        }
 //    }
 
-    format::DataUnit testDataUnit(&inputFileBitReader);
-
+    // while (true) {
+    //     auto dataUnit = DataUnitFactory.createFromBitReader(bitReader);
+    //     if (dataUnit.getDataUnitType() == DataUnit::DataUnitType::ACCESS_UNIT) {
+    //         // Copy to MPEG-G file
+    //     }
+    // }
+    
     //
     //    FILE* inputFile = fopen(fileName, "rb");
     //    if(inputFile == nullptr){

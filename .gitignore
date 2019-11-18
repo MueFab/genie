@@ -15,3 +15,6 @@ coverage.info
 
 # Webpage output directory
 page-output/
+
+# Visual Studio Code workspace settings
+.vscode/
