@@ -1,6 +1,5 @@
 #include "reference-encoder-plainc.h"
 
-
 /**
  * Remove all insertions and clips from the sequence and account for deletions by inserting '0' into the sequence.
  * @param seq
@@ -9,7 +8,8 @@
  * @param output_length
  * @return
  */
-static int local_assembly_state_preprocess(const char *seq, const char *cigar, char **output_seq, uint32_t *output_length) {
+static int local_assembly_state_preprocess(const char *seq, const char *cigar, char **output_seq,
+                                           uint32_t *output_length) {
     *output_length = 0;
     uint32_t cigar_len = strlen(cigar);
     uint32_t seq_len = strlen(seq);
@@ -43,8 +43,8 @@ static int local_assembly_state_preprocess(const char *seq, const char *cigar, c
     }
 
     /* Allocate output */
-    *output_seq = (char*)calloc(*output_length, sizeof(char));
-    if(!*output_seq) {
+    *output_seq = (char *)calloc(*output_length, sizeof(char));
+    if (!*output_seq) {
         return -1;
     }
 
@@ -123,7 +123,8 @@ static int local_assembly_state_remove_oldest_read(LOCAL_ASSEMBLY_STATE *state) 
 }
 
 /**
- * Makes sure that the capacity is at least minimalSize reads. If not the buffers for positions / lengths are reallocated.
+ * Makes sure that the capacity is at least minimalSize reads. If not the buffers for positions / lengths are
+ * reallocated.
  * @param state
  * @param minimalSize
  * @return
@@ -134,16 +135,17 @@ static int local_assembly_state_min_size(LOCAL_ASSEMBLY_STATE *state, uint32_t m
         return 0;
     }
     state->crBufNumReadsCapacity *= 2;
-    state->crBuf = (char** )realloc(state->crBuf, state->crBufNumReadsCapacity * sizeof(char*));
-    if(!state->crBuf){
+    state->crBuf = (char **)realloc(state->crBuf, state->crBufNumReadsCapacity * sizeof(char *));
+    if (!state->crBuf) {
         return -1;
     }
-    state->crBufReadMappingPos = (uint32_t*) realloc(state->crBufReadMappingPos, state->crBufNumReadsCapacity * sizeof(uint32_t));
-    if(!state->crBufReadMappingPos){
+    state->crBufReadMappingPos =
+        (uint32_t *)realloc(state->crBufReadMappingPos, state->crBufNumReadsCapacity * sizeof(uint32_t));
+    if (!state->crBufReadMappingPos) {
         return -1;
     }
-    state->crBufReadLen = (uint32_t*) realloc(state->crBufReadLen, state->crBufNumReadsCapacity * sizeof(uint32_t));
-    if(!state->crBufReadLen){
+    state->crBufReadLen = (uint32_t *)realloc(state->crBufReadLen, state->crBufNumReadsCapacity * sizeof(uint32_t));
+    if (!state->crBufReadLen) {
         return -1;
     }
     return 0;
@@ -156,7 +158,7 @@ static int local_assembly_state_min_size(LOCAL_ASSEMBLY_STATE *state, uint32_t m
  * @param max
  * @return
  */
-static int local_assembly_state_vote(LOCAL_ASSEMBLY_STATE *state, uint32_t abs_position, char* max) {
+static int local_assembly_state_vote(LOCAL_ASSEMBLY_STATE *state, uint32_t abs_position, char *max) {
     const size_t CHAR_RANGE = 256;
     uint32_t votes[CHAR_RANGE];
     memset(&votes, 0, sizeof(uint32_t) * CHAR_RANGE);
@@ -164,7 +166,7 @@ static int local_assembly_state_vote(LOCAL_ASSEMBLY_STATE *state, uint32_t abs_p
     /* Collect all alignments */
     for (size_t i = 0; i < state->crBufNumReads; ++i) {
         int64_t distance = abs_position - state->crBufReadMappingPos[i];
-        if(distance >= 0 && distance < state->crBufReadLen[i]){
+        if (distance >= 0 && distance < state->crBufReadLen[i]) {
             char c = state->crBuf[i][distance];
             if (c != '0') {
                 votes[c]++;
@@ -191,18 +193,17 @@ static int local_assembly_state_vote(LOCAL_ASSEMBLY_STATE *state, uint32_t abs_p
  * @param border
  * @return
  */
-static int local_assembly_state_get_window_border(LOCAL_ASSEMBLY_STATE *state, uint32_t* border) {
-    *border = -1; // Wrapping around to maximum value
-    for(int i = 0; i < state->crBufNumReads; ++i) {
+static int local_assembly_state_get_window_border(LOCAL_ASSEMBLY_STATE *state, uint32_t *border) {
+    *border = -1;  // Wrapping around to maximum value
+    for (int i = 0; i < state->crBufNumReads; ++i) {
         *border = (state->crBufReadMappingPos[i] < *border) ? state->crBufReadMappingPos[i] : *border;
     }
     return 0;
 }
 
-
 int local_assembly_state_create(LOCAL_ASSEMBLY_STATE **state) {
-    *state = (LOCAL_ASSEMBLY_STATE *) calloc(1, sizeof(LOCAL_ASSEMBLY_STATE));
-    if(!*state){
+    *state = (LOCAL_ASSEMBLY_STATE *)calloc(1, sizeof(LOCAL_ASSEMBLY_STATE));
+    if (!*state) {
         return -1;
     }
     return 0;
@@ -211,18 +212,19 @@ int local_assembly_state_create(LOCAL_ASSEMBLY_STATE **state) {
 int local_assembly_state_init(LOCAL_ASSEMBLY_STATE *state, uint32_t _cr_buf_max_size, uint32_t initial_capacity) {
     state->cr_buf_max_size = _cr_buf_max_size;
     state->crBufSize = 0;
-    state->crBuf = (char **) calloc(initial_capacity, sizeof(char *));
-    if(!state->crBuf){
+    state->crBuf = (char **)calloc(initial_capacity, sizeof(char *));
+    if (!state->crBuf) {
         return -1;
     }
     state->crBufNumReads = 0;
     state->crBufNumReadsCapacity = initial_capacity;
-    state->crBufReadMappingPos = (uint32_t *) calloc(initial_capacity, sizeof(uint32_t));
-    if(!state->crBufReadMappingPos){
+    state->crBufReadMappingPos = (uint32_t *)calloc(initial_capacity, sizeof(uint32_t));
+    if (!state->crBufReadMappingPos) {
         return -1;
     }
-    state->crBufReadLen = (uint32_t *) calloc(initial_capacity, sizeof(uint32_t));;
-    if(!state->crBufReadLen){
+    state->crBufReadLen = (uint32_t *)calloc(initial_capacity, sizeof(uint32_t));
+    ;
+    if (!state->crBufReadLen) {
         return -1;
     }
     return 0;
@@ -245,20 +247,20 @@ int local_assembly_state_add_read(LOCAL_ASSEMBLY_STATE *state, const char *seq, 
     char *processed_read = 0;
     uint32_t processed_size = 0;
 
-    if(local_assembly_state_preprocess(seq, cigar, &processed_read, &processed_size)) {
+    if (local_assembly_state_preprocess(seq, cigar, &processed_read, &processed_size)) {
         return -1;
     }
 
     /* Remove reads until enough space available */
     while (state->crBufSize + processed_size > state->cr_buf_max_size) {
-        if(local_assembly_state_remove_oldest_read(state)) {
+        if (local_assembly_state_remove_oldest_read(state)) {
             /* Buffer to small even for this single read */
             return -1;
         }
     }
 
     /* Make sure there is enough administrative space */
-    if(local_assembly_state_min_size(state, state->crBufNumReads + 1)) {
+    if (local_assembly_state_min_size(state, state->crBufNumReads + 1)) {
         return -1;
     }
 
@@ -271,14 +273,14 @@ int local_assembly_state_add_read(LOCAL_ASSEMBLY_STATE *state, const char *seq, 
     return 0;
 }
 
-int local_assembly_state_get_ref(LOCAL_ASSEMBLY_STATE *state, uint32_t startpos, uint32_t len, char** out) {
-    *out = (char*) calloc(len, sizeof(char));
-    if(!*out) {
+int local_assembly_state_get_ref(LOCAL_ASSEMBLY_STATE *state, uint32_t startpos, uint32_t len, char **out) {
+    *out = (char *)calloc(len, sizeof(char));
+    if (!*out) {
         return -1;
     }
     uint32_t outpos = 0;
-    for(size_t i = startpos; i < startpos + len; ++i) {
-        if(local_assembly_state_vote(state, i, &(*out)[outpos++])) {
+    for (size_t i = startpos; i < startpos + len; ++i) {
+        if (local_assembly_state_vote(state, i, &(*out)[outpos++])) {
             return -1;
         }
     }
@@ -287,7 +289,7 @@ int local_assembly_state_get_ref(LOCAL_ASSEMBLY_STATE *state, uint32_t startpos,
 
 int local_assembly_state_print_window(LOCAL_ASSEMBLY_STATE *state) {
     uint32_t minPos;
-    if(local_assembly_state_get_window_border(state, &minPos)) {
+    if (local_assembly_state_get_window_border(state, &minPos)) {
         return -1;
     }
 

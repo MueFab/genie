@@ -3,7 +3,6 @@
 #include "cabac/decoder_configuration_cabac.h"
 #include "util/bitwriter.h"
 
-
 namespace format {
 namespace desc_conf_pres {
 DescriptorConfigurationPresent::DescriptorConfigurationPresent()

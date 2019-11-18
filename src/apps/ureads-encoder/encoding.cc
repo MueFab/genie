@@ -7,12 +7,12 @@
 #include <string>
 #include <vector>
 
-#include "util/exceptions.h"
 #include "fastq-file-reader.h"
 #include "fastq-record.h"
 #include "format/part2/parameter_set/qv_coding_config_1/qv_coding_config_1.h"
 #include "genie-gabac-output-stream.h"
 #include "log.h"
+#include "util/exceptions.h"
 
 #include <format/part2/raw_reference.h>
 #include <gabac/gabac.h>
@@ -21,7 +21,6 @@
 #include "format/part2/clutter.h"
 #include "format/part2/parameter_set.h"
 #include "util/bitwriter.h"
-
 
 namespace genie {
 
@@ -156,15 +155,18 @@ void encode(const ProgramOptions& programOptions) {
     r.addSequence(make_unique<RawReferenceSequence>(0, 10, make_unique<std::string>("AAT")));
     r.write(&bw);
 
-    ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT, DataUnit::DatasetType::NON_ALIGNED, configs);
+    ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT,
+                                              DataUnit::DatasetType::NON_ALIGNED, configs);
     ps.write(&bw);
 
-    ParameterSet ps2 = createQuickParameterSet(1, READ_LENGTH, PAIRED_END, QV_PRESENT, DataUnit::DatasetType::NON_ALIGNED, configs);
+    ParameterSet ps2 =
+        createQuickParameterSet(1, READ_LENGTH, PAIRED_END, QV_PRESENT, DataUnit::DatasetType::NON_ALIGNED, configs);
     ps2.write(&bw);
 
     const uint32_t ACCESS_UNIT_ID = 0;
-//    AccessUnit au = createQuickAccessUnit(ACCESS_UNIT_ID, PARAMETER_SET_ID, readNum, DataUnit::AuType::U_TYPE_AU, DataUnit::DatasetType::NON_ALIGNED, &generated_streams);
- //   au.write(&bw);
+    //    AccessUnit au = createQuickAccessUnit(ACCESS_UNIT_ID, PARAMETER_SET_ID, readNum, DataUnit::AuType::U_TYPE_AU,
+    //    DataUnit::DatasetType::NON_ALIGNED, &generated_streams);
+    //   au.write(&bw);
 
     GENIE_LOG_TRACE << "Number of bitstreams: " << generated_streams.size();
 }

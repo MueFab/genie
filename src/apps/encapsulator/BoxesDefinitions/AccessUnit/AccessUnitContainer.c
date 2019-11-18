@@ -6,9 +6,9 @@
 #include "../../Boxes.h"
 #include "../../utils.h"
 
-AccessUnitContainer* initAccessUnitContainer(DatasetContainer* datasetContainer){
+AccessUnitContainer* initAccessUnitContainer(DatasetContainer* datasetContainer) {
     AccessUnitContainer* accessUnitContainer = malloc(sizeof(AccessUnitContainer));
-    if (accessUnitContainer != NULL){
+    if (accessUnitContainer != NULL) {
         accessUnitContainer->accessUnitHeader = NULL;
         accessUnitContainer->accessUnitInformation = NULL;
         accessUnitContainer->accessUnitProtection = NULL;
@@ -19,74 +19,74 @@ AccessUnitContainer* initAccessUnitContainer(DatasetContainer* datasetContainer)
     return accessUnitContainer;
 }
 
-void freeAccessUnitContainer(AccessUnitContainer* accessUnitContainer){
-    if(accessUnitContainer->blocks != NULL && accessUnitContainer->accessUnitHeader){
-        for(uint8_t block_i=0; block_i<getNumBlocks(accessUnitContainer->accessUnitHeader); block_i++){
+void freeAccessUnitContainer(AccessUnitContainer* accessUnitContainer) {
+    if (accessUnitContainer->blocks != NULL && accessUnitContainer->accessUnitHeader) {
+        for (uint8_t block_i = 0; block_i < getNumBlocks(accessUnitContainer->accessUnitHeader); block_i++) {
             Block* block = getValue(accessUnitContainer->blocks, block_i);
-            if(block != NULL){
+            if (block != NULL) {
                 freeBlock(block);
             }
         }
         freeVector(accessUnitContainer->blocks);
     }
-    if (accessUnitContainer->accessUnitHeader != NULL){
+    if (accessUnitContainer->accessUnitHeader != NULL) {
         freeAccessUnitHeader(accessUnitContainer->accessUnitHeader);
     }
-    if (accessUnitContainer->accessUnitInformation != NULL){
+    if (accessUnitContainer->accessUnitInformation != NULL) {
         freeAccessUnitInformation(accessUnitContainer->accessUnitInformation);
     }
-    if (accessUnitContainer->accessUnitProtection != NULL){
+    if (accessUnitContainer->accessUnitProtection != NULL) {
         freeAccessUnitProtection(accessUnitContainer->accessUnitProtection);
     }
     free(accessUnitContainer);
 }
 
-bool isAccessUnitContainerValid(AccessUnitContainer* accessUnitContainer){
+bool isAccessUnitContainerValid(AccessUnitContainer* accessUnitContainer) {
     return accessUnitContainer->accessUnitHeader != NULL;
 }
 
-uint64_t getAccessUnitContainerContentSize(AccessUnitContainer* accessUnitContainer){
+uint64_t getAccessUnitContainerContentSize(AccessUnitContainer* accessUnitContainer) {
     uint64_t contentSize = 0;
-    if (accessUnitContainer->accessUnitHeader != NULL){
+    if (accessUnitContainer->accessUnitHeader != NULL) {
         contentSize += getAccessUnitHeaderSize(accessUnitContainer->accessUnitHeader);
     }
-    if(accessUnitContainer->blocks != NULL && accessUnitContainer->accessUnitHeader != NULL){
-        for(uint8_t block_i=0; block_i<getNumBlocks(accessUnitContainer->accessUnitHeader); block_i++){
+    if (accessUnitContainer->blocks != NULL && accessUnitContainer->accessUnitHeader != NULL) {
+        for (uint8_t block_i = 0; block_i < getNumBlocks(accessUnitContainer->accessUnitHeader); block_i++) {
             Block* block = getValue(accessUnitContainer->blocks, block_i);
-            if(block != NULL) {
+            if (block != NULL) {
                 contentSize += getBlockSize(block);
             }
         }
     }
-    if (accessUnitContainer->accessUnitInformation != NULL){
+    if (accessUnitContainer->accessUnitInformation != NULL) {
         contentSize += getSizeAccessUnitInformation(accessUnitContainer->accessUnitInformation);
     }
-    if (accessUnitContainer->accessUnitProtection != NULL){
+    if (accessUnitContainer->accessUnitProtection != NULL) {
         contentSize += getSizeAccessUnitProtection(accessUnitContainer->accessUnitProtection);
     }
-    //contentSize += 12;
+    // contentSize += 12;
     return contentSize;
 }
 
-uint64_t getAccessUnitContainerSize(AccessUnitContainer* accessUnitContainer){
+uint64_t getAccessUnitContainerSize(AccessUnitContainer* accessUnitContainer) {
     return BOX_HEADER_SIZE + getAccessUnitContainerContentSize(accessUnitContainer);
 }
 
-bool writeAccessUnitContainer(FILE *outputFile, AccessUnitContainer *accessUnitContainer) {
+bool writeAccessUnitContainer(FILE* outputFile, AccessUnitContainer* accessUnitContainer) {
     uint64_t contentSize = getAccessUnitContainerSize(accessUnitContainer);
     writeBoxHeader(outputFile, accessUnitContainerName, contentSize);
 
-    if (accessUnitContainer->accessUnitHeader != NULL){
-        if (!writeAccessUnitHeader(outputFile, accessUnitContainer->accessUnitHeader)){
+    if (accessUnitContainer->accessUnitHeader != NULL) {
+        if (!writeAccessUnitHeader(outputFile, accessUnitContainer->accessUnitHeader)) {
             fprintf(stderr, "Error writing access unit container's header.\n");
             return false;
         };
     }
 
-    if(isBlockHeaderFlagSet(getDatasetHeader(accessUnitContainer->datasetContainer))) {
+    if (isBlockHeaderFlagSet(getDatasetHeader(accessUnitContainer->datasetContainer))) {
         size_t numBlocks = getSize(accessUnitContainer->blocks);
         for (size_t block_i = 0; block_i < numBlocks; block_i++) {
-            Block *block = getValue(accessUnitContainer->blocks, block_i);
+            Block* block = getValue(accessUnitContainer->blocks, block_i);
             if (block == NULL) {
                 fprintf(stderr, "Error in memory initialization: block pointer null.\n");
                 return false;
@@ -99,14 +99,14 @@ bool writeAccessUnitContainer(FILE *outputFile, AccessUnitContainer *accessUnitC
         }
     }
 
-    if (accessUnitContainer->accessUnitInformation != NULL){
-        if (!writeAccessUnitInformation(outputFile, accessUnitContainer->accessUnitInformation)){
+    if (accessUnitContainer->accessUnitInformation != NULL) {
+        if (!writeAccessUnitInformation(outputFile, accessUnitContainer->accessUnitInformation)) {
             fprintf(stderr, "Error writing access unit container's information.\n");
             return false;
         };
     }
-    if (accessUnitContainer->accessUnitProtection != NULL){
-        if (!writeAccessUnitProtection(accessUnitContainer->accessUnitProtection, outputFile)){
+    if (accessUnitContainer->accessUnitProtection != NULL) {
+        if (!writeAccessUnitProtection(accessUnitContainer->accessUnitProtection, outputFile)) {
             fprintf(stderr, "Error writing access unit container's information.\n");
             return false;
         };
@@ -114,51 +114,45 @@ bool writeAccessUnitContainer(FILE *outputFile, AccessUnitContainer *accessUnitC
     return true;
 }
 
-AccessUnitHeader* getAccessUnitHeader(AccessUnitContainer* accessUnitContainer){
+AccessUnitHeader* getAccessUnitHeader(AccessUnitContainer* accessUnitContainer) {
     return accessUnitContainer->accessUnitHeader;
 }
 
-void setAccessUnitContainerHeader(AccessUnitContainer* accessUnitContainer, AccessUnitHeader* accessUnitHeader){
-    if(accessUnitContainer->accessUnitHeader != NULL){
+void setAccessUnitContainerHeader(AccessUnitContainer* accessUnitContainer, AccessUnitHeader* accessUnitHeader) {
+    if (accessUnitContainer->accessUnitHeader != NULL) {
         freeAccessUnitHeader(accessUnitContainer->accessUnitHeader);
     }
-    accessUnitContainer->accessUnitHeader=accessUnitHeader;
+    accessUnitContainer->accessUnitHeader = accessUnitHeader;
 }
 
-void setAccessUnitContainerProtection(AccessUnitContainer* accessUnitContainer, AccessUnitProtection* accessUnitProtection){
-    if(accessUnitContainer->accessUnitProtection != NULL){
+void setAccessUnitContainerProtection(AccessUnitContainer* accessUnitContainer,
+                                      AccessUnitProtection* accessUnitProtection) {
+    if (accessUnitContainer->accessUnitProtection != NULL) {
         freeAccessUnitProtection(accessUnitContainer->accessUnitProtection);
     }
-    accessUnitContainer->accessUnitProtection=accessUnitProtection;
+    accessUnitContainer->accessUnitProtection = accessUnitProtection;
 }
 
-void setAccessUnitContainerInformation(
-        AccessUnitContainer* accessUnitContainer,
-        AccessUnitInformation* accessUnitInformation
-){
-    if(accessUnitContainer->accessUnitInformation != NULL){
+void setAccessUnitContainerInformation(AccessUnitContainer* accessUnitContainer,
+                                       AccessUnitInformation* accessUnitInformation) {
+    if (accessUnitContainer->accessUnitInformation != NULL) {
         freeAccessUnitInformation(accessUnitContainer->accessUnitInformation);
     }
-    accessUnitContainer->accessUnitInformation=accessUnitInformation;
+    accessUnitContainer->accessUnitInformation = accessUnitInformation;
 }
 
-AccessUnitContainer *
-parseAccessUnitContainer(uint64_t boxContentSize, FILE *inputFile, char *fileName, DatasetContainer *datasetContainer) {
+AccessUnitContainer* parseAccessUnitContainer(uint64_t boxContentSize, FILE* inputFile, char* fileName,
+                                              DatasetContainer* datasetContainer) {
     char type[5];
     uint64_t boxSize;
-    AccessUnitContainer *accessUnitContainer = initAccessUnitContainer(datasetContainer);
-    if(accessUnitContainer == NULL){
+    AccessUnitContainer* accessUnitContainer = initAccessUnitContainer(datasetContainer);
+    if (accessUnitContainer == NULL) {
         fprintf(stderr, "Access unit container could not be allocated.\n");
         return accessUnitContainer;
     }
     accessUnitContainer->seekPosition = ftell(inputFile);
 
-    enum PreviousState {
-        init,
-        header,
-        information,
-        protection
-    } previousState = init;
+    enum PreviousState { init, header, information, protection } previousState = init;
 
     while (getAccessUnitContainerContentSize(accessUnitContainer) < boxContentSize) {
         if (!readBoxHeader(inputFile, type, &boxSize)) {
@@ -167,52 +161,52 @@ parseAccessUnitContainer(uint64_t boxContentSize, FILE *inputFile, char *fileNam
             return NULL;
         }
         if (strncmp(type, accessUnitHeaderName, 4) == 0) {
-            if(previousState != init){
-                fprintf(stderr,"Access unit container wrong order of components.\n");
+            if (previousState != init) {
+                fprintf(stderr, "Access unit container wrong order of components.\n");
                 return NULL;
             }
             previousState = header;
             AccessUnitHeader* accessUnitHeader = parseAccessUnitHeader(inputFile, datasetContainer);
-            if(accessUnitHeader == NULL){
+            if (accessUnitHeader == NULL) {
                 freeAccessUnitContainer(accessUnitContainer);
                 return NULL;
             }
             setAccessUnitContainerHeader(accessUnitContainer, accessUnitHeader);
 
         } else if (strncmp(type, accessUnitProtectionName, 4) == 0) {
-            if(!(previousState == header ||  previousState == protection)){
-                fprintf(stderr,"Access unit container wrong order of components.\n");
+            if (!(previousState == header || previousState == protection)) {
+                fprintf(stderr, "Access unit container wrong order of components.\n");
                 return NULL;
             }
             previousState = protection;
 
             AccessUnitProtection* accessUnitProtection = parseAccessUnitProtection(boxSize, inputFile);
-            if(accessUnitProtection == NULL){
+            if (accessUnitProtection == NULL) {
                 freeAccessUnitContainer(accessUnitContainer);
                 return NULL;
             }
             setAccessUnitContainerProtection(accessUnitContainer, accessUnitProtection);
-        }  else if (strncmp(type, accessUnitInformationName, 4) == 0) {
-            if(!(previousState == header)){
-                fprintf(stderr,"Access unit container wrong order of components.\n");
+        } else if (strncmp(type, accessUnitInformationName, 4) == 0) {
+            if (!(previousState == header)) {
+                fprintf(stderr, "Access unit container wrong order of components.\n");
                 return NULL;
             }
             previousState = information;
 
             AccessUnitInformation* accessUnitInformation = parseAccessUnitInformation(boxSize, inputFile);
-            if(accessUnitInformation == NULL){
+            if (accessUnitInformation == NULL) {
                 freeAccessUnitContainer(accessUnitContainer);
                 return NULL;
             }
             setAccessUnitContainerInformation(accessUnitContainer, accessUnitInformation);
         } else {
             fseek(inputFile, -BOX_HEADER_SIZE, SEEK_CUR);
-            if(isBlockHeaderFlagSet(getDatasetHeader(datasetContainer)) && previousState != init){
+            if (isBlockHeaderFlagSet(getDatasetHeader(datasetContainer)) && previousState != init) {
                 uint8_t numBlocks = getNumBlocks(accessUnitContainer->accessUnitHeader);
-                for(uint8_t block_i=0; block_i<numBlocks; block_i++){
+                for (uint8_t block_i = 0; block_i < numBlocks; block_i++) {
                     long blockStartingPosition = ftell(inputFile);
                     Block* block = parseBlockContainerAUCmode(datasetContainer, inputFile, fileName);
-                    if (block == NULL){
+                    if (block == NULL) {
                         freeAccessUnitContainer(accessUnitContainer);
                         return NULL;
                     }
@@ -227,17 +221,15 @@ parseAccessUnitContainer(uint64_t boxContentSize, FILE *inputFile, char *fileNam
     return accessUnitContainer;
 }
 
-long getAccessUnitContainerSeekPoint(AccessUnitContainer* accessUnitContainer){
+long getAccessUnitContainerSeekPoint(AccessUnitContainer* accessUnitContainer) {
     return accessUnitContainer->seekPosition;
 }
 
-void addBlock(AccessUnitContainer* accessUnitContainer, Block* block){
-    if(accessUnitContainer->blocks == NULL){
+void addBlock(AccessUnitContainer* accessUnitContainer, Block* block) {
+    if (accessUnitContainer->blocks == NULL) {
         accessUnitContainer->blocks = initVector();
     }
     pushBack(accessUnitContainer->blocks, block);
 }
 
-Vector* getBlocks(AccessUnitContainer* accessUnitContainer){
-    return accessUnitContainer->blocks;
-}
+Vector* getBlocks(AccessUnitContainer* accessUnitContainer) { return accessUnitContainer->blocks; }

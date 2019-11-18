@@ -108,7 +108,8 @@ TEST_F(MatchCodingTest, roundTripCoding) {
 
     // test large file size word size 1
     symbols.resize(largeTestSize);
-    gabac_tests::fillVectorRandomUniform(std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max(), &symbols);
+    gabac_tests::fillVectorRandomUniform(std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max(),
+                                         &symbols);
 
     rawValues = symbols;
 
@@ -121,7 +122,8 @@ TEST_F(MatchCodingTest, roundTripCoding) {
 
     // test large file size word size 2
     symbols.resize(largeTestSize);
-    gabac_tests::fillVectorRandomUniform(std::numeric_limits<uint16_t>::min(), std::numeric_limits<uint16_t>::max(), &symbols);
+    gabac_tests::fillVectorRandomUniform(std::numeric_limits<uint16_t>::min(), std::numeric_limits<uint16_t>::max(),
+                                         &symbols);
     rawValues = symbols;
     for (auto& windowSize : windowSizes) {
         EXPECT_NO_THROW(gabac::transformMatchCoding(windowSize, &rawValues, &pointers, &lengths));
@@ -131,7 +133,8 @@ TEST_F(MatchCodingTest, roundTripCoding) {
     }
     // test large file size word size 4
     symbols.resize(largeTestSize);
-    gabac_tests::fillVectorRandomUniform(std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max(), &symbols);
+    gabac_tests::fillVectorRandomUniform(std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max(),
+                                         &symbols);
     rawValues = symbols;
     for (auto& windowSize : windowSizes) {
         EXPECT_NO_THROW(gabac::transformMatchCoding(windowSize, &rawValues, &pointers, &lengths));

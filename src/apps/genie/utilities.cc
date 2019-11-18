@@ -14,8 +14,8 @@
 #include <sys/stat.h>
 #include <fstream>
 
-#include "util/exceptions.h"
 #include "operating-system.h"
+#include "util/exceptions.h"
 
 namespace dsg {
 namespace common {

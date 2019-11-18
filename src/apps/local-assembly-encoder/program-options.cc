@@ -29,7 +29,7 @@ void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     }
 
     if (ghc::filesystem::exists(ghc::filesystem::path(outputFilePath))) {
-   //     DIE("Output file exists already: " + outputFilePath);
+        //     DIE("Output file exists already: " + outputFilePath);
     }
 }
 

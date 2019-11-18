@@ -92,7 +92,6 @@ void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     verbose = false;
     app.add_flag("-v,--verbose,--stats", verbose, "Print compression ratios & speed");
 
-
     try {
         app.parse(argc, argv);
     } catch (const CLI::ParseError &e) {

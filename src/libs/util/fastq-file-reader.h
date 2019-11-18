@@ -11,6 +11,7 @@ namespace util {
 
 class FastqFileReader : public FileReader {
     FastqStats *stats;
+
    public:
     FastqFileReader(const std::string &path, FastqStats *_stats);
     ~FastqFileReader();

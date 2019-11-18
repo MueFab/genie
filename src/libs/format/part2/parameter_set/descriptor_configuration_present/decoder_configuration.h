@@ -6,7 +6,6 @@
 #include "cabac/descriptor_subsequence_cfg.h"
 #include "util/bitwriter.h"
 
-
 #include <memory>
 
 // -----------------------------------------------------------------------------------------------------------------

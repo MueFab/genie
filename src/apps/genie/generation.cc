@@ -16,9 +16,9 @@
 #include <string>
 #include <thread>
 #include <vector>
-#include "util/exceptions.h"
 #include "spring/decompress.h"
 #include "spring/spring.h"
+#include "util/exceptions.h"
 #include "util/fasta-file-reader.h"
 #include "util/fasta-record.h"
 #include "util/fastq-file-reader.h"
@@ -28,7 +28,8 @@
 
 namespace dsg {
 
-static generated_aus generationFromFastq_SPRING(const ProgramOptions &programOptions, util::FastqStats *stats, dsg::StreamSaver &st) {
+static generated_aus generationFromFastq_SPRING(const ProgramOptions &programOptions, util::FastqStats *stats,
+                                                dsg::StreamSaver &st) {
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Descriptor stream generation from FASTQ file" << std::endl;
     std::cout << std::string(80, '-') << std::endl;

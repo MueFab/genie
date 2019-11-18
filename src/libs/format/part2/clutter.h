@@ -48,7 +48,8 @@ ParameterSet createQuickParameterSet(uint8_t _parameter_set_id, uint8_t _read_le
                                      bool qv_values_present, DataUnit::DatasetType,
                                      const std::vector<std::vector<gabac::EncodingConfiguration>> &parameters);
 
-AccessUnit createQuickAccessUnit(uint32_t access_unit_id, uint8_t parameter_set_id, uint32_t reads_count, DataUnit::AuType autype, DataUnit::DatasetType datatype,
+AccessUnit createQuickAccessUnit(uint32_t access_unit_id, uint8_t parameter_set_id, uint32_t reads_count,
+                                 DataUnit::AuType autype, DataUnit::DatasetType datatype,
                                  std::vector<std::vector<std::vector<gabac::DataBlock>>> *data);
 
 }  // namespace format

@@ -7,7 +7,6 @@
 #include "../decoder_configuration.h"
 #include "util/bitwriter.h"
 
-
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {

@@ -28,9 +28,7 @@ int FileBuffer::underflow() { return fgetc(fileptr); }
 
 DataBlockBuffer::DataBlockBuffer(DataBlock *d, size_t pos_i) : block(0, 1), pos(pos_i) { block.swap(d); }
 
-size_t DataBlockBuffer::size() const {
-    return block.getRawSize();
-}
+size_t DataBlockBuffer::size() const { return block.getRawSize(); }
 
 int DataBlockBuffer::overflow(int c) {
     block.push_back(static_cast<uint64_t>(c));

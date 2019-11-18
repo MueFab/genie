@@ -1,7 +1,7 @@
 #include <string>
 
-#include "util/exceptions.h"
 #include "fastq-file-reader.h"
+#include "util/exceptions.h"
 
 namespace genie {
 

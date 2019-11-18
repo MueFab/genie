@@ -9,11 +9,9 @@
 #include "../make_unique.h"
 #include "util/bitwriter.h"
 
-
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-
 
 /**
  * ISO 23092-2 Section 3.4.1.1 table 19 lines 26 to 39

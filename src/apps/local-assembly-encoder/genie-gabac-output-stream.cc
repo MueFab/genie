@@ -46,4 +46,4 @@ void GenieGabacOutputBuffer::flush_blocks(std::vector<gabac::DataBlock> *dat) {
     dat->clear();
     dat->swap(streams);
 }
-}  // namespace genie
+}  // namespace lae

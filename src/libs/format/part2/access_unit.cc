@@ -1,7 +1,6 @@
 #include "access_unit.h"
-#include "util/exceptions.h"
 #include "util/bitwriter.h"
-
+#include "util/exceptions.h"
 
 #include <gabac/data-block.h>
 #include <sstream>

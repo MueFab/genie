@@ -29,6 +29,6 @@ class GenieGabacOutputStream : public GenieGabacOutputBuffer, public std::ostrea
     GenieGabacOutputStream() : GenieGabacOutputBuffer(), std::ostream(this) {}
 };
 
-}  // namespace genie
+}  // namespace lae
 
 #endif  // GENIE_GENIE_GABAC_OUTPUT_STREAM_H

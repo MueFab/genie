@@ -43,7 +43,7 @@ size_t SamFileReader::readRecords(const size_t numRecords, std::list<SamRecord> 
         parseLine(line, &fields);
         SamRecord samRecord(fields);
 
-//        std::cout << samRecord.str(); //Not sure if this line is needed or just debug
+        //        std::cout << samRecord.str(); //Not sure if this line is needed or just debug
         records->push_back(samRecord);
     }
 

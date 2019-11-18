@@ -1,7 +1,5 @@
 #include "descriptor_configuration.h"
 #include "util/bitwriter.h"
-#include "util/bitwriter.h"
-
 
 // -----------------------------------------------------------------------------------------------------------------
 

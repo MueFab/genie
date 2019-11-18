@@ -4,7 +4,13 @@
  * https://github.com/mitogen/gabac for more details.
  */
 
-// Equality coding is using a small hack to work as efficiently as possible in place. There are two implementations, one for wordsize 1 and one for other wordsizes. With wordsize 1, it is exploited, that there are as many equality flags as input symbol, so this version does only need to allocate memory for the raw values stream. To achieve this, the equality flags are written into the raw_values data block (containing the input values) and vice versa and swapped before returning. A user from outside will note notice this, but internally it is important to know that these two datablocks swap meaning. For wordsizes greater 1 this optimization is not possible, as the raw values do not fit into the same data block where input values are still inside (different word sizes)
+// Equality coding is using a small hack to work as efficiently as possible in place. There are two implementations, one
+// for wordsize 1 and one for other wordsizes. With wordsize 1, it is exploited, that there are as many equality flags
+// as input symbol, so this version does only need to allocate memory for the raw values stream. To achieve this, the
+// equality flags are written into the raw_values data block (containing the input values) and vice versa and swapped
+// before returning. A user from outside will note notice this, but internally it is important to know that these two
+// datablocks swap meaning. For wordsizes greater 1 this optimization is not possible, as the raw values do not fit into
+// the same data block where input values are still inside (different word sizes)
 
 #include "equality-coding.h"
 

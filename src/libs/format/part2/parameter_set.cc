@@ -9,7 +9,6 @@
 #include "parameter_set/qv_coding_config.h"
 #include "util/bitwriter.h"
 
-
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {

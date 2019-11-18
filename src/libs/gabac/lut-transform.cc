@@ -4,7 +4,9 @@
  * https://github.com/mitogen/gabac for more details.
  */
 
-// LUT encoding is also using a different algorithms for wordsizes 1 and 2. For these word sizes, the input values are in a small range and the algorithm can use a fast array look up when building the table. For greater word sizes this cannot be assumed so a slower hash table has to used
+// LUT encoding is also using a different algorithms for wordsizes 1 and 2. For these word sizes, the input values are
+// in a small range and the algorithm can use a fast array look up when building the table. For greater word sizes this
+// cannot be assumed so a slower hash table has to used
 
 #include "lut-transform.h"
 
