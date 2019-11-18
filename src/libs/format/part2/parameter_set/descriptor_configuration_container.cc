@@ -1,9 +1,7 @@
 #include "descriptor_configuration_container.h"
-#include "util/bitwriter.h"
 #include "../make_unique.h"
 #include "../parameter_set/descriptor_configuration_present/descriptor_configuration_present.h"
 #include "util/bitwriter.h"
-
 
 // -----------------------------------------------------------------------------------------------------------------
 

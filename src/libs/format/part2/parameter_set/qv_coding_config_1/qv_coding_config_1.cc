@@ -1,8 +1,6 @@
 #include "qv_coding_config_1.h"
-#include "util/bitwriter.h"
 #include "../../make_unique.h"
 #include "util/bitwriter.h"
-
 
 namespace format {
 namespace qv_coding1 {

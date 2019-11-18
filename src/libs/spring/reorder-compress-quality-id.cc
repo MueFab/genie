@@ -244,7 +244,8 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &file_order
 void reorder_compress_quality_pe(std::string file_quality[2], const std::string &outfile_quality,
                                  std::string *quality_array, const uint64_t &quality_array_size, uint32_t *order_array,
                                  const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
-                                 const compression_params &cp, bool analyze, dsg::StreamSaver &st, util::FastqStats *stats) {
+                                 const compression_params &cp, bool analyze, dsg::StreamSaver &st,
+                                 util::FastqStats *stats) {
     uint32_t start_block_num = 0;
     uint32_t end_block_num = 0;
     bool analysis_done = false;
@@ -301,13 +302,14 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
                     stats->cmprs_qual_sz += size;
                     stats->cmprs_total_sz += size;
                 }
-             }
+            }
         }
         start_block_num = end_block_num;
     }
 }
 
-void pack_id(const std::string &outfile_name, dsg::StreamSaver &st, dsg::AcessUnitStreams *streams, util::FastqStats *stats) {
+void pack_id(const std::string &outfile_name, dsg::StreamSaver &st, dsg::AcessUnitStreams *streams,
+             util::FastqStats *stats) {
     for (int i = 0; i < 128; i++) {
         for (int j = 0; j < 8; j++) {
             std::string outfile_name_i_j = outfile_name.substr(outfile_name.find_last_of('/') + 1) + "." +
@@ -324,7 +326,8 @@ void pack_id(const std::string &outfile_name, dsg::StreamSaver &st, dsg::AcessUn
     }
 }
 
-void pack_qual(const std::string &outfile_name, dsg::StreamSaver &st, gabac::DataBlock *qualityBuffer, util::FastqStats *stats) {
+void pack_qual(const std::string &outfile_name, dsg::StreamSaver &st, gabac::DataBlock *qualityBuffer,
+               util::FastqStats *stats) {
     if (!qualityBuffer->empty()) {
         st.pack(*qualityBuffer, outfile_name);
         size_t size = qualityBuffer->getRawSize();

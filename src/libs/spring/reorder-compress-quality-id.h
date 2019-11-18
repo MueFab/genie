@@ -5,8 +5,8 @@
 
 #include "util.h"
 
-#include <util/perf-stats.h>
 #include <genie/stream-saver.h>
+#include <util/perf-stats.h>
 
 namespace spring {
 
@@ -37,9 +37,11 @@ void reorder_compress(const std::string &file_name, const uint32_t &num_reads_pe
 
 void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std::vector<int64_t> tokens[128][8]);
 
-void pack_id(const std::string &outfile_name, dsg::StreamSaver &st, dsg::AcessUnitStreams *streams, util::FastqStats *stats);
+void pack_id(const std::string &outfile_name, dsg::StreamSaver &st, dsg::AcessUnitStreams *streams,
+             util::FastqStats *stats);
 
-void pack_qual(const std::string &outfile_name, dsg::StreamSaver &st, gabac::DataBlock *qualityBuffer, util::FastqStats *stats);
+void pack_qual(const std::string &outfile_name, dsg::StreamSaver &st, gabac::DataBlock *qualityBuffer,
+               util::FastqStats *stats);
 
 }  // namespace spring
 

@@ -8,7 +8,7 @@
 #ifdef __APPLE_CC__
 #include <stdint.h>
 #else
-    #include <stdint-gcc.h>
+#include <stdint-gcc.h>
 #endif
 #include <stdbool.h>
 
@@ -29,7 +29,7 @@ TreeNode* initTreeNode(uint64_t value);
 Tree* initTree();
 bool insert(Tree* tree, TreeNode* treeNode);
 int checkTree(Tree* tree);
-uint64_t numberElements(Tree *tree);
+uint64_t numberElements(Tree* tree);
 void freeTree(Tree* tree);
 TreeNode* findNode(Tree* tree, uint64_t value);
 TreeNode* getNext(TreeNode* treeNode);
@@ -37,5 +37,4 @@ TreeNode* findNodeInNode(TreeNode* treeNode, uint64_t value);
 TreeNode* getMinInTree(TreeNode* treeNode);
 TreeNode* getNextHigherInternalNode(TreeNode* treeNode);
 
-
-#endif //MPEGG_CAPSULATOR_TREEUINT64_H
+#endif  // MPEGG_CAPSULATOR_TREEUINT64_H

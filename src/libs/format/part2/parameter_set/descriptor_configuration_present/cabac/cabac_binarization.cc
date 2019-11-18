@@ -1,8 +1,6 @@
 #include "cabac_binarization.h"
-#include "util/bitwriter.h"
 #include "../../../make_unique.h"
 #include "util/bitwriter.h"
-
 
 // -----------------------------------------------------------------------------------------------------------------
 

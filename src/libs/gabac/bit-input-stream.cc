@@ -15,7 +15,8 @@ inline static unsigned char readIn(gabac::BlockStepper *reader) {
     if (!reader->isValid()) {
         GABAC_DIE("Index out of bounds");
     }
-    // TODO(Jan): We here rely on that get() returns exactly 1 byte. However, it might happen that it returns multiple bytes. Fix that.
+    // TODO(Jan): We here rely on that get() returns exactly 1 byte. However, it might happen that it returns multiple
+    // bytes. Fix that.
     auto byte = static_cast<unsigned char>(reader->get());
     reader->inc();
     return byte;
@@ -43,7 +44,7 @@ void BitInputStream::reset() {
 }
 
 unsigned int BitInputStream::read(unsigned int numBits) {
-// uint64_t BitInputStream::read(const unsigned int numBits) {
+    // uint64_t BitInputStream::read(const unsigned int numBits) {
     // TODO(Jan): Make this 64-bit compatible. See also:
     //   mpegg-reference-sw/src/gm-common-v1/mpegg-stream.c:mpegg_input_bitstream_read_ubits()
     assert(numBits <= 32);
@@ -107,10 +108,9 @@ L0:
 }
 
 void BitInputStream::skipBytes(unsigned int numBytes) {
-    for(unsigned int i = 0; i < numBytes; i++) {
+    for (unsigned int i = 0; i < numBytes; i++) {
         readIn(&m_reader);
     }
 }
-
 
 }  // namespace gabac

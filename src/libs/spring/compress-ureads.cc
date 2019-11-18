@@ -19,15 +19,11 @@
 #include "reorder-compress-quality-id.h"
 #include "util.h"
 
-
 namespace spring {
 
-std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> compress_ureads(util::FastqFileReader *fastqFileReader1,
-                                                                               util::FastqFileReader *fastqFileReader2,
-                                                                               const std::string &temp_dir,
-                                                                               compression_params &cp,
-                                                                               dsg::StreamSaver &st,
-                                                                               util::FastqStats *stats) {
+std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> compress_ureads(
+    util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2, const std::string &temp_dir,
+    compression_params &cp, dsg::StreamSaver &st, util::FastqStats *stats) {
     std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> descriptorFilesPerAU;
 
     util::FastqFileReader *fastqFileReader[2] = {fastqFileReader1, fastqFileReader2};

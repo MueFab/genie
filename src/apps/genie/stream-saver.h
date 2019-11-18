@@ -47,7 +47,7 @@ class StreamSaver {
     void decompress(const std::string &name, gabac::DataBlock *data);
 
     uint64_t pack(const gabac::DataBlock &data, const std::string &stream_name);  // Pack stream into file
-    void unpack(const std::string &stream_name, gabac::DataBlock *data);      // Pack stream into file
+    void unpack(const std::string &stream_name, gabac::DataBlock *data);          // Pack stream into file
 
     struct gabac_stream_params {
         uint64_t maxval;   // Maximum value in stream

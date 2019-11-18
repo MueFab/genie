@@ -12,10 +12,10 @@
 
 #include <iostream>
 
-#include "util/exceptions.h"
 #include "generation.h"
 #include "program-options.h"
 #include "ureads-encoder/logger.h"
+#include "util/exceptions.h"
 
 static void printProgramInformation();
 static void loggerInitialization();

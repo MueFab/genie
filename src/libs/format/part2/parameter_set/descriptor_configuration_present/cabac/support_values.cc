@@ -1,8 +1,6 @@
 #include "support_values.h"
-#include "util/bitwriter.h"
 #include "../../../make_unique.h"
 #include "util/bitwriter.h"
-
 
 // -----------------------------------------------------------------------------------------------------------------
 

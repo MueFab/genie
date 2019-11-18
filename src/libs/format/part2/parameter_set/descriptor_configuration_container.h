@@ -6,14 +6,12 @@
 #include "descriptor_configuration.h"
 #include "util/bitwriter.h"
 
-
 #include <memory>
 #include <vector>
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-
 
 /**
  * ISO 23092-2 Section 3.3.2 table 7 lines 15 to 21

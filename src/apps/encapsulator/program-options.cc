@@ -9,7 +9,9 @@
 
 namespace encapsulator {
 
-ProgramOptions::ProgramOptions(int argc, char *argv[]) : force(false), help(false), inputFilePath("") { processCommandLine(argc, argv); }
+ProgramOptions::ProgramOptions(int argc, char *argv[]) : force(false), help(false), inputFilePath("") {
+    processCommandLine(argc, argv);
+}
 
 void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     CLI::App app("encapsulator");

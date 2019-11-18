@@ -1,8 +1,6 @@
 #include "raw_reference_sequence.h"
-#include "util/bitwriter.h"
 #include "make_unique.h"
 #include "util/bitwriter.h"
-
 
 namespace format {
 RawReferenceSequence::RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_start,

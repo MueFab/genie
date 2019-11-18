@@ -14,12 +14,9 @@
 #include "parameter_set/qv_coding_config.h"
 #include "util/bitwriter.h"
 
-
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-
-
 
 /**
  * ISO 23092-2 Section 3.3.1 table 6 + 3.3.2 table 7 (fused for simplification)

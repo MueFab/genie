@@ -8,15 +8,10 @@
 #include <iostream>
 #include <string>
 
-
 namespace util {
 
-
-
 class PerfStats {
-
    public:
-
     bool enabled;
     size_t num_recs;
     std::chrono::steady_clock::duration total_t;
@@ -43,11 +38,8 @@ class PerfStats {
     virtual void printDecompressionStats(void) = 0;
 };
 
-
 class FastqStats : public PerfStats {
-
    public:
-
     off_t orig_id_sz;
     off_t cmprs_id_sz;
     off_t orig_seq_sz;
@@ -68,15 +60,12 @@ class FastqStats : public PerfStats {
         cmprs_qual_sz = 0;
     }
 
-    ~FastqStats() {};
+    ~FastqStats(){};
 
     void printCompressionStats(void);
     void printDecompressionStats(void);
 };
 
-
 }  // namespace util
 
-
 #endif  // PERF_STATS_H_
-
