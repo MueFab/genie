@@ -3,10 +3,8 @@
  * @copyright This file is part of Genie. See LICENSE for more details.
  */
 
+#include <format/part2/parameter_set.h>
 #include "FileHandlingUtils.h"
-
-#include <util/bitreader.h>
-#include <fstream>
 
 // DatasetHeader *
 // initDatasetHeaderNoMIT(DatasetGroupId datasetGroupId, DatasetId datasetId, char *version, bool multipleAlignmentFlag,
@@ -94,15 +92,29 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileNam
     inputFilestream.open(fileName, std::ios::binary);
 
     util::BitReader inputFileBitReader(&inputFilestream);
-    uint8_t value;
-    for (int j = 0; j < 6; ++j) {
-        fprintf(stdout, "\nByte %i:", j);
 
-        for (int i = 0; i < 8; i++) {
-            inputFileBitReader.readBit(&value);
-            fprintf(stdout, "%u ", value);
-        }
-    }
+
+    /*uint32_t value;
+    char buffer[256];
+    fprintf(stdout, "%s\n", buffer);
+    inputFileBitReader.readNBits(32, buffer);
+    fprintf(stdout, "%s\n", buffer);
+
+    inputFileBitReader.readNBits(8, &value);
+    fprintf(stdout, "%u\n", value);*/
+
+
+//    uint8_t value;
+//    for (int j = 0; j < 6; ++j) {
+//        fprintf(stdout, "\nByte %i:", j);
+//
+//        for (int i = 0; i < 8; i++) {
+//            inputFileBitReader.readBit(&value);
+//            fprintf(stdout, "%u ", value);
+//        }
+//    }
+
+    format::DataUnit testDataUnit(&inputFileBitReader);
 
     //
     //    FILE* inputFile = fopen(fileName, "rb");

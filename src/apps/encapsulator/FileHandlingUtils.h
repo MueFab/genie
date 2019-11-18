@@ -6,20 +6,24 @@
 #ifndef GENIE_FILEHANDLINGUTILS_H
 #define GENIE_FILEHANDLINGUTILS_H
 
-#include <errno.h>
+#include <cerrno>
 #include <memory.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 
-typedef struct {
-    char refUri[1024];
-    uint8_t numberSequences;
-    char** sequenceName;
-    char refName[1024];
-} Ref_information;
+#include "format/part2/data_unit.h"
+#include "util/bitreader.h"
+#include <fstream>
 
-Ref_information readRefInformation(char* refInfoFilePath);
+//typedef struct {
+//    char refUri[1024];
+//    uint8_t numberSequences;
+//    char** sequenceName;
+//    char refName[1024];
+//} Ref_information;
+//
+//Ref_information readRefInformation(char* refInfoFilePath);
 
 int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileName);
 

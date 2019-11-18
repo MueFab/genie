@@ -32,7 +32,6 @@ bool BitReader::readNBits(uint32_t n, char *value) {
     uint8_t bufferValue = 0;
 
     uint32_t current_bit = 0;
-    uint32_t current_byte = 0;
 
     for (uint32_t i = 0; i < n; i++) {
         if (!this->readBit(&bufferValue)) {
@@ -40,16 +39,32 @@ bool BitReader::readNBits(uint32_t n, char *value) {
         }
 
         if (bufferValue != 0) {
-            value[current_byte] |= ((uint8_t)1) << (7 - current_bit);
+            value[current_bit] = '1';
         } else {
-            value[current_byte] &= ~(((uint8_t)1) << (7 - current_bit));
+            value[current_bit] = '0';
         }
         current_bit++;
-        if (current_bit == 8) {
-            current_byte++;
-            current_bit = 0;
-        }
     }
+    return true;
+}
+
+bool BitReader::readNBits(uint32_t n, uint32_t *value){
+    char *buffer = (char*) malloc(sizeof(unsigned char) * (n + 1));
+    readNBits(n, buffer);
+    buffer[n] = '\0';
+    std::string str(buffer);
+    *value = std::stoi(str, nullptr, 10);
+    free(buffer);
+    return true;
+}
+
+bool BitReader::readNBitsDec(uint32_t n, uint32_t *value) {
+    char *buffer = (char*) malloc(sizeof(unsigned char) * (n + 1));
+    readNBits(n, buffer);
+    buffer[n] = '\0';
+    std::string str(buffer);
+    *value = std::stoi(str, nullptr, 2);
+    free(buffer);
     return true;
 }
 }  // namespace util

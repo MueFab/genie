@@ -8,6 +8,7 @@
 #include "parameter_set/descriptor_configuration_container.h"
 #include "parameter_set/qv_coding_config.h"
 #include "util/bitwriter.h"
+#include "util/bitreader.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -44,8 +45,9 @@ ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_
 
 // -----------------------------------------------------------------------------------------------------------------
 
-// void ParameterSet::read(util::BitReader *bitReader) {
-// }
+void ParameterSet::read(util::BitReader *bitReader) {
+
+}
 
 // -----------------------------------------------------------------------------------------------------------------
 
