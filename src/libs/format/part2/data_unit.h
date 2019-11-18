@@ -6,6 +6,7 @@
 #include <cstdint>
 
 #include "util/bitwriter.h"
+#include "util/bitreader.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -53,11 +54,13 @@ class DataUnit {
     DataUnitType data_unit_type;  //!< : 8; Line 2
 
    public:
+    explicit DataUnit(util::BitReader *bitReader);
+
     explicit DataUnit(const DataUnitType &t);
 
     virtual void write(util::BitWriter *write) const;
 
-    // virtual void read(util::BitReader *bitReader);
+    virtual void read(util::BitReader *bitReader);
 };
 
 }  // namespace format

@@ -1,6 +1,7 @@
 project("util")
 
 set(source_files
+        bitreader.cc
         bitwriter.cc
         exceptions.cc
         fasta-file-reader.cc
@@ -13,6 +14,6 @@ set(source_files
         sam-file-reader.cc
         sam-record.cc
         string-helpers.cc
-        bitreader.cc)
+)
 
 add_library(util ${source_files})
