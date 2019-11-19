@@ -13,6 +13,12 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
+ParameterSet::ParameterSet(format::DataUnit *dataUnit)
+:DataUnit(DataUnitType::PARAMETER_SET, dataUnit->getDataUnitSize())
+{}
+
+// -----------------------------------------------------------------------------------------------------------------
+
 ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, DatasetType _dataset_type,
                            AlphabetID _alphabet_id, uint32_t _read_length, bool _paired_end, bool _pos_40_bits_flag,
                            uint8_t _qv_depth, uint8_t _as_depth, bool _multiple_alignments_flag,
@@ -45,8 +51,10 @@ ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::read(util::BitReader *bitReader) {
-
+ParameterSet * ParameterSet::createFromBitReader(util::BitReader *bitReader, uint32_t size) {
+    (void)bitReader;// silence compiler warning
+    (void)size;// silence compiler warning
+    return (ParameterSet *)nullptr;// silence compiler warning
 }
 
 // -----------------------------------------------------------------------------------------------------------------

@@ -35,3 +35,4 @@ set(source_files
 
 add_library(format ${source_files})
 target_link_libraries(format util)
+target_link_libraries(format gabac)

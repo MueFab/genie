@@ -116,6 +116,10 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileNam
 //        }
 //    }
 
+    auto dataUnit = format::DataUnit::createFromBitReader(&inputFileBitReader);
+    fprintf(stdout, "data_unit_type:%u\n", (uint8_t)dataUnit->getDataUnitType());
+    fprintf(stdout, "data_unit_size:%u\n", dataUnit->getDataUnitSize());
+
     // while (true) {
     //     auto dataUnit = DataUnitFactory.createFromBitReader(bitReader);
     //     if (dataUnit.getDataUnitType() == DataUnit::DataUnitType::ACCESS_UNIT) {

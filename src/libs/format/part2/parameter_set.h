@@ -32,6 +32,8 @@ class ParameterSet : public DataUnit {
         ACGTRYSWKMBDHVN_ = 1  //!< Line 2
     };
 
+    explicit ParameterSet(format::DataUnit *dataUnit);
+
     ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, DatasetType _dataset_type,
                  AlphabetID _alphabet_id, uint32_t _read_length, bool _paired_end, bool _pos_40_bits_flag,
                  uint8_t _qv_depth, uint8_t _as_depth, bool _multiple_alignments_flag, bool _spliced_reads_flag);
@@ -46,7 +48,7 @@ class ParameterSet : public DataUnit {
 
     void setMultipleSignatureBase(uint32_t _multiple_signature_base, uint8_t _U_signature_size);
 
-    void read(util::BitReader *bitReader) override;
+    static ParameterSet * createFromBitReader(util::BitReader *bitReader, uint32_t size);
 
     void write(util::BitWriter *writer) const override;
 

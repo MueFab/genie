@@ -50,7 +50,8 @@ bool BitReader::readNBits(uint32_t n, char *value) {
 
 bool BitReader::readNBits(uint32_t n, uint32_t *value){
     char *buffer = (char*) malloc(sizeof(unsigned char) * (n + 1));
-    readNBits(n, buffer);
+    if(!readNBits(n, buffer))
+        return false;
     buffer[n] = '\0';
     std::string str(buffer);
     *value = std::stoi(str, nullptr, 10);
@@ -60,11 +61,21 @@ bool BitReader::readNBits(uint32_t n, uint32_t *value){
 
 bool BitReader::readNBitsDec(uint32_t n, uint32_t *value) {
     char *buffer = (char*) malloc(sizeof(unsigned char) * (n + 1));
-    readNBits(n, buffer);
+    if(!readNBits(n, buffer))
+        return false;
     buffer[n] = '\0';
     std::string str(buffer);
     *value = std::stoi(str, nullptr, 2);
     free(buffer);
+    return true;
+}
+
+bool BitReader::skipNBits(uint32_t bitsToSkip){
+    uint8_t value;
+    for (uint32_t i = 0; i < bitsToSkip; ++i) {
+        if(!this->readBit(&value))
+            return false;
+    }
     return true;
 }
 }  // namespace util

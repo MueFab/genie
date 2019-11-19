@@ -21,6 +21,8 @@ class BitReader {
     bool readNBits(uint32_t n, char *value);
     bool readNBits(uint32_t n, uint32_t *value);
     bool readNBitsDec(uint32_t n, u_int32_t *value);
+
+    bool skipNBits(uint32_t bitsToSkip);
 };
 }  // namespace util
 
