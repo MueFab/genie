@@ -148,7 +148,7 @@ namespace lae {
         size_t blockSize = 10000;
         bool singleEnd = false;
         const uint32_t SEQUENCE_BUFFER_SIZE = 1000;
-        FullLocalAssemblyEncoder encoder(SEQUENCE_BUFFER_SIZE, true);
+        FullLocalAssemblyEncoder encoder(SEQUENCE_BUFFER_SIZE, false);
         uint32_t record_counter = 0;
         uint32_t read_length = std::numeric_limits<uint32_t>::max();
         while (true) {
@@ -170,7 +170,7 @@ namespace lae {
                 bool foundMate = false;
                 for (auto it = samRecordsCopy.begin(); it != samRecordsCopy.end(); ++it) {
                     if (it->rname == rnameSearchString && it->pos == samRecord.pnext) {
-                        LOG_TRACE << "Found mate";
+                        // LOG_TRACE << "Found mate";
                         encoder.addPair(samRecord, *it);
                         record_counter++;
                         if (read_length != 0) {
@@ -197,7 +197,7 @@ namespace lae {
                     }
                 }
                 if (!foundMate) {
-                    LOG_TRACE << "Did not find mate";
+                    // LOG_TRACE << "Did not find mate";
                     singleEnd = true;
                     encoder.add(samRecord);
                     if (read_length != 0) {
