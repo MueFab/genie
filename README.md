@@ -2,8 +2,8 @@
 
 Open source MPEG-G codec
 
-[![ci](https://travis-ci.org/mitogen/genie.svg?branch=master)](https://travis-ci.org/mitogen/genie)
-[![codecov](https://codecov.io/gh/mitogen/genie/branch/master/graph/badge.svg)](https://codecov.io/gh/mitogen/genie)
+<!-- [![ci](https://travis-ci.org/mitogen/genie.svg?branch=master)](https://travis-ci.org/mitogen/genie) -->
+<!-- [![codecov](https://codecov.io/gh/mitogen/genie/branch/master/graph/badge.svg)](https://codecov.io/gh/mitogen/genie) -->
 [![page](https://img.shields.io/badge/page-online-blue)](https://mitogen.github.io/genie)
 
 **First off, we refer the reader to our [usage policy](USAGE_POLICY.md).**
