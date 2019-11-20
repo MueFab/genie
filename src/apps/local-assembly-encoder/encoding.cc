@@ -135,7 +135,7 @@ namespace lae {
         ps.write(&bw);
 
         const uint32_t ACCESS_UNIT_ID = 0;
-        AccessUnit au = createQuickAccessUnit(ACCESS_UNIT_ID, PARAMETER_SET_ID, readNum, DataUnit::AuType::U_TYPE_AU, DataUnit::DatasetType::ALIGNED, &generated_streams);
+        AccessUnit au = createQuickAccessUnit(ACCESS_UNIT_ID, PARAMETER_SET_ID, readNum, programOptions.type, DataUnit::DatasetType::ALIGNED, &generated_streams);
         au.write(&bw);
     }
 
