@@ -128,7 +128,7 @@ namespace lae {
         const uint32_t READ_LENGTH = read_length;
         const bool QV_PRESENT = false;
 
-        ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, paired, QV_PRESENT, DataUnit::DatasetType::ALIGNED, configs);
+        ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, paired, QV_PRESENT, programOptions.type, configs);
         auto crps = make_unique<ParameterSetCrps>(ParameterSetCrps::CrAlgId::LOCAL_ASSEMBLY);
         crps->setCrpsInfo(make_unique<CrpsInfo>(0, 1000));
         ps.setCrps(std::move(crps));
