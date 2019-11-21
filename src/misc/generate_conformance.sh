@@ -9,8 +9,8 @@ for file in "${files[@]}"
 do
     for unit in "${au[@]}"
     do
-        $lae --input-file $file.sam -o $file.$unit.mpegg -t $unit
-	$reference_sw -v debug -i $file.$unit.mpegg -o $file.$unit.mgr
+        $lae --input-file $file.sam -o $file.$unit.mbg -t $unit
+        $reference_sw -v debug -i $file.$unit.mbg -o $file.$unit.mgrecs
     done
 done
 
