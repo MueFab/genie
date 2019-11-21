@@ -110,6 +110,10 @@ namespace lae {
         std::vector<std::vector<gabac::EncodingConfiguration>> configs = create_default_conf();
         std::vector<std::vector<gabac::DataBlock>> raw_data = translateToSimpleArray(container.get());
 
+        if(read_length != 0) {
+            container->rlen_0.clear();
+        }
+
         for(size_t descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
             for(size_t subdescriptor = 0; subdescriptor < format::getDescriptorProperties()[descriptor].number_subsequences; ++subdescriptor) {
                 compress(configs[descriptor][subdescriptor], &raw_data[descriptor][subdescriptor], &generated_streams[descriptor][subdescriptor]);
