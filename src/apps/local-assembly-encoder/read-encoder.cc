@@ -7,21 +7,12 @@ namespace lae {
 
     }
 
-    void LocalAssemblyReadEncoder::addRead(const util::SamRecord &rec, const std::string &ref, bool isFirst) {
-        if(isFirst) {
-            container->pos_0.push_back(rec.pos - pos);
-            pos = rec.pos;
-            container->rtype_0.push_back(4);
-        }
-        codeVariants(rec.seq, rec.cigar, ref, isFirst);
-
-        if (!container->clips_0.empty() && container->clips_0.get(container->clips_0.size() - 1) == readCounter) {
-            container->clips_1.push_back(8);
-        }
-
+    void LocalAssemblyReadEncoder::addSingleRead(const util::SamRecord &rec, format::DataUnit::AuType type) {
         container->rlen_0.push_back(rec.seq.length() - 1);
 
-        container->mmpos_0.push_back(1);
+        if(type > format::DataUnit::AuType::P_TYPE_AU) {
+            container->mmpos_0.push_back(1);
+        }
         container->rcomp_0.push_back((rec.flag >> 4) & 0x1);
         container->flags_0.push_back((rec.flag >> 10) & 0x1);
         container->flags_1.push_back((rec.flag >> 9) & 0x1);
@@ -32,27 +23,51 @@ namespace lae {
         readCounter++;
     }
 
-    void
-    LocalAssemblyReadEncoder::addPair(const util::SamRecord &rec1, const std::string &ref1, const util::SamRecord &rec2,
-                                      const std::string &ref2) {
-        addRead(rec1, ref1, true);
+    format::DataUnit::AuType LocalAssemblyReadEncoder::addRead(const util::SamRecord &rec, const std::string &ref) {
+        auto t = getClass(rec.seq, rec.cigar, ref);
 
-        if (container->clips_0.size() && container->clips_0.get(container->clips_0.size() - 1) == readCounter - 1) {
-            container->clips_2.resize(container->clips_2.size() - 1);
+        container->rtype_0.push_back(uint8_t(t));
+        container->pos_0.push_back(rec.pos - pos);
+        pos = rec.pos;
+
+        codeVariants(rec.seq, rec.cigar, ref, t, true);
+        addSingleRead(rec, t);
+
+        if (!container->clips_0.empty() && container->clips_0.get(container->clips_0.size() - 1) == readCounter) {
+            container->clips_1.push_back(8);
         }
 
-        addRead(rec2, ref2, false);
-
-        container->pair_0.push_back(0);
-
-        uint32_t delta = std::max(rec1.pos, rec2.pos) - std::min(rec1.pos, rec2.pos);
-        bool first1 = rec1.pos < rec2.pos;
-
-        container->pair_1.push_back((delta << 1) | first1);
+        return t;
     }
 
-    void
-    LocalAssemblyReadEncoder::codeVariants(const std::string &read, const std::string &cigar, const std::string &ref,
+    format::DataUnit::AuType LocalAssemblyReadEncoder::addPair(const util::SamRecord &rec1, const std::string &ref1, const util::SamRecord &rec2,
+                                      const std::string &ref2) {
+        auto t = getClass(rec1.seq, rec1.cigar, ref1);
+        t = std::max(t, getClass(rec2.seq, rec2.cigar, ref2));
+
+        container->rtype_0.push_back(uint8_t(t));
+        container->pos_0.push_back(rec1.pos - pos);
+        pos = rec1.pos;
+
+        codeVariants(rec1.seq, rec1.cigar, ref1, t, true);
+        addSingleRead(rec1, t);
+
+        codeVariants(rec2.seq, rec2.cigar, ref2, t, false);
+        addSingleRead(rec2, t);
+
+        if (!container->clips_0.empty() && container->clips_0.get(container->clips_0.size() - 1) == readCounter) {
+            container->clips_1.push_back(8);
+        }
+
+        container->pair_0.push_back(0);
+        uint32_t delta = std::max(rec1.pos, rec2.pos) - std::min(rec1.pos, rec2.pos);
+        bool first1 = rec1.pos < rec2.pos;
+        container->pair_1.push_back((delta << 1) | first1);
+
+        return t;
+    }
+
+    void LocalAssemblyReadEncoder::codeVariants(const std::string &read, const std::string &cigar, const std::string &ref, format::DataUnit::AuType type,
                                            bool isFirst) {
         size_t count = 0;
         size_t read_pos = 0;
@@ -86,10 +101,13 @@ namespace lae {
                             } else {
                                 container->mmpos_0.push_back(0);
                                 container->mmpos_1.push_back(read_pos - lastMisMatch);
+
                                 lastMisMatch = read_pos + 1;
                                 container->mmtype_0.push_back(0);
-                                container->mmtype_1.push_back(format::getAlphabetProperties(
-                                        format::ParameterSet::AlphabetID::ACGTN).inverseLut[read[read_pos]]);
+                                if(type > format::DataUnit::AuType::N_TYPE_AU) {
+                                    container->mmtype_1.push_back(format::getAlphabetProperties(
+                                            format::ParameterSet::AlphabetID::ACGTN).inverseLut[read[read_pos]]);
+                                }
                             }
                         }
 
@@ -194,6 +212,89 @@ namespace lae {
             container->clips_2.push_back(
                     format::getAlphabetProperties(format::ParameterSet::AlphabetID::ACGTN).lut.size());
         }
+    }
+
+    format::DataUnit::AuType
+    LocalAssemblyReadEncoder::getClass(const std::string &read, const std::string &cigar, const std::string &ref) {
+        size_t count = 0;
+        size_t read_pos = 0;
+        size_t ref_offset = 0;
+        size_t num_of_deletions = 0;
+
+        format::DataUnit::AuType type = format::DataUnit::AuType::P_TYPE_AU;
+
+
+        for (size_t cigar_pos = 0; cigar_pos < cigar.length(); ++cigar_pos) {
+            if (cigar[cigar_pos] >= '0' && cigar[cigar_pos] <= '9') {
+                count *= 10;
+                count += cigar[cigar_pos] - '0';
+                continue;
+            }
+            switch (cigar[cigar_pos]) {
+                case 'M':
+                case '=':
+                case 'X':
+                    for (size_t i = 0; i < count; ++i) {
+                        if (read_pos >= read.length()) {
+                            UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
+                        }
+                        if (read[read_pos] != ref[ref_offset]) {
+                            if (ref[ref_offset] == 0) {
+                            } else {
+                                if(read[read_pos] == 'N') {
+                                    type = std::max(type, format::DataUnit::AuType::N_TYPE_AU);
+                                } else {
+                                    type = std::max(type, format::DataUnit::AuType::M_TYPE_AU);
+                                }
+                            }
+                        }
+
+                        read_pos++;
+                        ref_offset++;
+                    }
+                    break;
+
+                case 'I':
+                    for (size_t i = 0; i < count; ++i) {
+                        type = std::max(type, format::DataUnit::AuType::I_TYPE_AU);
+                        read_pos++;
+                    }
+                    break;
+                case 'S':
+                case 'P':
+                    type = std::max(type, format::DataUnit::AuType::I_TYPE_AU);
+                    for (size_t i = 0; i < count; ++i) {
+                        if (read_pos >= read.length()) {
+                            UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
+                        }
+                        read_pos++;
+                    }
+                    break;
+
+                case 'N':
+                case 'D':
+                    type = std::max(type, format::DataUnit::AuType::I_TYPE_AU);
+                    for (size_t i = 0; i < count; ++i) {
+                        num_of_deletions++;
+                        ref_offset++;
+                    }
+                    break;
+
+                case 'H':
+                    type = std::max(type, format::DataUnit::AuType::I_TYPE_AU);
+                    ref_offset += count;
+                    break;
+
+                default:
+                    UTILS_THROW_RUNTIME_EXCEPTION("Unknown CIGAR character");
+            }
+            count = 0;
+        }
+
+        if (read_pos != read.length()) {
+            UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
+        }
+        return type;
     }
 
     std::unique_ptr<StreamContainer> LocalAssemblyReadEncoder::pollStreams() {
