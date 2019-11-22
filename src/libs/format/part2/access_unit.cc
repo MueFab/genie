@@ -8,6 +8,20 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
+AccessUnit::AccessUnit(util::BitReader *bitReader)  // needs to be called by format::DataUnit::createFromBitReader
+    : DataUnit(DataUnitType::ACCESS_UNIT) {
+    uint32_t buffer;
+    bitReader->skipNBits(3);  // ISO 23092-2 Section 3.1 table 3
+    bitReader->readNBitsDec(29, &buffer);
+    this->setDataUnitSize(buffer);
+
+    for (uint32_t i = 0; i < (this->getDataUnitSize() - 5);
+         ++i) {  //-5 for DataUnitSize(4 byte) & Type(1 byte) ISO 23092-2 Section 3.1 table 3
+        bitReader->readNBitsDec(8, &buffer);
+        rawData.push_back(buffer);
+    }
+}
+
 AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, AuType _au_type, uint32_t _reads_count,
                        DatasetType dataset_type, uint8_t posSize, uint8_t signatureSize,
                        uint32_t multiple_signature_base)

@@ -5,7 +5,7 @@ BitReader::BitReader(std::istream *istream) : m_istream(istream), m_currentPosit
 
 bool BitReader::errorCheck() {
     if (!m_istream->good()) {
-        fprintf(stderr, "Error in Utils::BitReader!\n");
+        fprintf(stdout, "Error in Utils::BitReader!\n");
         return false;
     }
     return true;
@@ -48,33 +48,38 @@ bool BitReader::readNBits(uint32_t n, char *value) {
     return true;
 }
 
-bool BitReader::readNBits(uint32_t n, uint32_t *value){
-    char *buffer = (char*) malloc(sizeof(unsigned char) * (n + 1));
-    if(!readNBits(n, buffer))
-        return false;
+bool BitReader::readNBits(uint32_t n, uint32_t *value) {
+    char *buffer = (char *)malloc(sizeof(unsigned char) * (n + 1));
+    if (!readNBits(n, buffer)) return false;
     buffer[n] = '\0';
     std::string str(buffer);
-    *value = std::stoi(str, nullptr, 10);
+    *value = std::stoul(str, nullptr, 10);
     free(buffer);
     return true;
 }
 
 bool BitReader::readNBitsDec(uint32_t n, uint32_t *value) {
-    char *buffer = (char*) malloc(sizeof(unsigned char) * (n + 1));
-    if(!readNBits(n, buffer))
-        return false;
+    char *buffer = (char *)malloc(sizeof(unsigned char) * (n + 1));
+    if (!readNBits(n, buffer)) return false;
     buffer[n] = '\0';
     std::string str(buffer);
-    *value = std::stoi(str, nullptr, 2);
+    *value = std::stoul(str, nullptr, 2);
     free(buffer);
     return true;
 }
 
-bool BitReader::skipNBits(uint32_t bitsToSkip){
+bool BitReader::skipNBits(uint32_t bitsToSkip) {
     uint8_t value;
     for (uint32_t i = 0; i < bitsToSkip; ++i) {
-        if(!this->readBit(&value))
-            return false;
+        if (!this->readBit(&value)) return false;
+    }
+    return true;
+}
+
+bool BitReader::isGood() {
+    m_istream->peek();  // check for eof
+    if (!m_istream->good()) {
+        return false;
     }
     return true;
 }

@@ -12,8 +12,8 @@
 #include "gabac/gabac.h"
 #include "parameter_set/descriptor_configuration_container.h"
 #include "parameter_set/qv_coding_config.h"
-#include "util/bitwriter.h"
 #include "util/bitreader.h"
+#include "util/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ class ParameterSet : public DataUnit {
         ACGTRYSWKMBDHVN_ = 1  //!< Line 2
     };
 
-    explicit ParameterSet(format::DataUnit *dataUnit);
+    explicit ParameterSet(util::BitReader *bitReader);
 
     ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, DatasetType _dataset_type,
                  AlphabetID _alphabet_id, uint32_t _read_length, bool _paired_end, bool _pos_40_bits_flag,
@@ -47,8 +47,6 @@ class ParameterSet : public DataUnit {
     void addGroup(std::unique_ptr<std::string> rgroup_id);
 
     void setMultipleSignatureBase(uint32_t _multiple_signature_base, uint8_t _U_signature_size);
-
-    static ParameterSet * createFromBitReader(util::BitReader *bitReader, uint32_t size);
 
     void write(util::BitWriter *writer) const override;
 

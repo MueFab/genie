@@ -23,6 +23,10 @@ class BitReader {
     bool readNBitsDec(uint32_t n, u_int32_t *value);
 
     bool skipNBits(uint32_t bitsToSkip);
+
+    bool isGood();
+
+    void setFailBit() { m_istream->setstate(std::ios::failbit); }
 };
 }  // namespace util
 
