@@ -4,9 +4,11 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
+#include <memory>
+#include <vector>
 
-#include "util/bitwriter.h"
 #include "util/bitreader.h"
+#include "util/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -59,17 +61,19 @@ class DataUnit {
 
     explicit DataUnit(const DataUnitType &t, const uint32_t &s);
 
-    virtual ~DataUnit()= default;
+    virtual ~DataUnit() = default;
 
     virtual void write(util::BitWriter *write) const;
 
-    static DataUnit* createFromBitReader(util::BitReader *bitReader);
+    static std::unique_ptr<format::DataUnit> createFromBitReader(util::BitReader *bitReader);
 
-    void setDataUnitType(DataUnitType t){ data_unit_type = t; }
-    DataUnitType getDataUnitType(){return data_unit_type;}
+    void setDataUnitType(DataUnitType t) { data_unit_type = t; }
+    DataUnitType getDataUnitType() { return data_unit_type; }
 
-    void setDataUnitSize(uint32_t size){ data_unit_size = size; }
-    uint32_t getDataUnitSize(){ return data_unit_size; }
+    void setDataUnitSize(uint32_t size) { data_unit_size = size; }
+    uint32_t getDataUnitSize() { return data_unit_size; }
+
+    std::vector<uint8_t> rawData;  // dataUnitSize and DataUnitType not included!
 };
 
 }  // namespace format

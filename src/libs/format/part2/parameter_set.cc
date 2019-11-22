@@ -7,15 +7,25 @@
 #include "parameter_set/descriptor_configuration.h"
 #include "parameter_set/descriptor_configuration_container.h"
 #include "parameter_set/qv_coding_config.h"
-#include "util/bitwriter.h"
 #include "util/bitreader.h"
+#include "util/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-ParameterSet::ParameterSet(format::DataUnit *dataUnit)
-:DataUnit(DataUnitType::PARAMETER_SET, dataUnit->getDataUnitSize())
-{}
+ParameterSet::ParameterSet(util::BitReader *bitReader)  // needs to be called by format::DataUnit::createFromBitReader
+    : DataUnit(DataUnitType::PARAMETER_SET) {
+    uint32_t buffer;
+    bitReader->skipNBits(10);  // ISO 23092-2 Section 3.1 table 3
+    bitReader->readNBitsDec(22, &buffer);
+    this->setDataUnitSize(buffer);
+
+    for (uint32_t i = 0; i < (this->getDataUnitSize() - 5);
+         ++i) {  //-5 for DataUnitSize(4 byte) & Type(1 byte) ISO 23092-2 Section 3.1 table 3
+        bitReader->readNBitsDec(8, &buffer);
+        rawData.push_back(buffer);
+    }
+}
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -47,14 +57,6 @@ ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_
     for (auto &i : descriptors) {
         i = make_unique<DescriptorConfigurationContainer>();
     }
-}
-
-// -----------------------------------------------------------------------------------------------------------------
-
-ParameterSet * ParameterSet::createFromBitReader(util::BitReader *bitReader, uint32_t size) {
-    (void)bitReader;// silence compiler warning
-    (void)size;// silence compiler warning
-    return (ParameterSet *)nullptr;// silence compiler warning
 }
 
 // -----------------------------------------------------------------------------------------------------------------

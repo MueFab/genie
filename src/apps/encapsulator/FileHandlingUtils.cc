@@ -3,8 +3,8 @@
  * @copyright This file is part of Genie. See LICENSE for more details.
  */
 
-#include <format/part2/parameter_set.h>
 #include "FileHandlingUtils.h"
+#include <format/part2/parameter_set.h>
 
 // DatasetHeader *
 // initDatasetHeaderNoMIT(DatasetGroupId datasetGroupId, DatasetId datasetId, char *version, bool multipleAlignmentFlag,
@@ -95,7 +95,6 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileNam
 
     util::BitReader inputFileBitReader(&inputFilestream);
 
-
     /*uint32_t value;
     char buffer[256];
     fprintf(stdout, "%s\n", buffer);
@@ -105,20 +104,27 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileNam
     inputFileBitReader.readNBits(8, &value);
     fprintf(stdout, "%u\n", value);*/
 
+    /*    uint32_t value;
+        for (int j = 0; j < 6; ++j) {
+            fprintf(stdout, "Byte %i:", j);
 
-//    uint8_t value;
-//    for (int j = 0; j < 6; ++j) {
-//        fprintf(stdout, "\nByte %i:", j);
-//
-//        for (int i = 0; i < 8; i++) {
-//            inputFileBitReader.readBit(&value);
-//            fprintf(stdout, "%u ", value);
-//        }
-//    }
+            for (int i = 0; i < 1; i++) {
+                inputFileBitReader.readNBits(8, &value);
+                fprintf(stdout, "%u \n", value);
+            }
+        }*/
 
-    auto dataUnit = format::DataUnit::createFromBitReader(&inputFileBitReader);
-    fprintf(stdout, "data_unit_type:%u\n", (uint8_t)dataUnit->getDataUnitType());
-    fprintf(stdout, "data_unit_size:%u\n", dataUnit->getDataUnitSize());
+    std::vector<std::unique_ptr<format::DataUnit>> dataUnits;
+
+    while (inputFileBitReader.isGood()) {
+        dataUnits.push_back(format::DataUnit::createFromBitReader(&inputFileBitReader));
+    }
+    for (auto const& dataUnit : dataUnits) {
+        fprintf(stdout, "\ndata_unit_type:%u\n", (uint8_t)dataUnit->getDataUnitType());
+        fprintf(stdout, "data_unit_size:%u\n", dataUnit->getDataUnitSize());
+        fprintf(stdout, "Vector Size:%lu\n", dataUnit->rawData.size());
+        fprintf(stdout, "First byte:%u -> Last byte:%u\n", dataUnit->rawData.front(), dataUnit->rawData.back());
+    }
 
     // while (true) {
     //     auto dataUnit = DataUnitFactory.createFromBitReader(bitReader);
@@ -126,7 +132,7 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileNam
     //         // Copy to MPEG-G file
     //     }
     // }
-    
+
     //
     //    FILE* inputFile = fopen(fileName, "rb");
     //    if(inputFile == nullptr){
