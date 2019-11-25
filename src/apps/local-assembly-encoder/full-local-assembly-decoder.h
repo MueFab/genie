@@ -3,11 +3,7 @@
 
 #include "read-decoder.h"
 
-extern "C" {
-#include "reference-encoder-plainc.h"
-}
-
-namespace lae {
+/*namespace lae {
     class FullLocalAssemblyDecoder {
     private:
         uint32_t mapping_pos;
@@ -22,6 +18,6 @@ namespace lae {
     private:
         void init(uint32_t cr_buf_max_size);
     };
-}
+}*/
 
 #endif //GENIE_FULL_LOCAL_ASSEMBLY_DECODER_H_

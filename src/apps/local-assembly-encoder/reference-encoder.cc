@@ -130,7 +130,7 @@ namespace lae {
         // Collect all alignments
         for (size_t i = 0; i < sequences.size(); ++i) {
             int64_t distance = abs_position - sequence_positions[i];
-            if(distance >= 0 && distance < sequences[i].length()){
+            if(distance >= 0 && uint64_t(distance) < sequences[i].length()){
                 char c = sequences[i][distance];
                 if (c != '0') {
                     votes[c]++;

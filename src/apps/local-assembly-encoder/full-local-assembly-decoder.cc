@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+/*
 namespace lae {
     FullLocalAssemblyDecoder::FullLocalAssemblyDecoder(
             std::unique_ptr<StreamContainer>
@@ -87,4 +88,4 @@ namespace lae {
             std::cout << "mapping_pos[0] + delta[0][1] : " << mpegg_record_segment_2->pos << std::endl << std::endl;
         }
     }
-}
+} */
