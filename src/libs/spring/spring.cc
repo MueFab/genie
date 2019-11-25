@@ -27,7 +27,7 @@
 namespace spring {
 
 void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
-                             int num_thr, bool paired_end, const std::string &working_dir, bool analyze,
+                             int num_thr, bool paired_end, const std::string &working_dir, bool,
                              const std::string &outputFilePath, bool ureads_flag, bool preserve_quality,
                              bool preserve_id) {
 #ifdef GENIE_USE_OPENMP
@@ -114,7 +114,7 @@ void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::Fast
         std::cout << "Generating read streams done!\n";
         std::cout << "Time for this step: "
                   << std::chrono::duration_cast<std::chrono::seconds>(grs_end - grs_start).count() << " s\n";
-
+#if 0
         // TODO: do this only when debugging, otherwise disable for speed 
         std::cout << "Generating new FASTQ for testing purposes\n";
         auto new_fq_start = std::chrono::steady_clock::now();
@@ -134,7 +134,7 @@ void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::Fast
                                                                       new_fq_start)
                          .count()
                   << " s\n";
-
+#endif
         if (preserve_quality || preserve_id) {
             std::cout << "Reordering and compressing quality and/or ids ...\n";
             auto rcqi_start = std::chrono::steady_clock::now();

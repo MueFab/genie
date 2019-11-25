@@ -69,7 +69,7 @@ void gabac_compress(const gabac::EncodingConfiguration &conf, gabac::DataBlock *
 
 std::vector<std::vector<gabac::DataBlock>> generate_empty_raw_data() {
     std::vector<std::vector<gabac::DataBlock>> raw_data(format::NUM_DESCRIPTORS);
-    for (int descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
+    for (size_t descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
         if (descriptor == 15) {
             raw_data[descriptor].resize(128 * 6);
             for (int i = 0; i < 128; i++) {

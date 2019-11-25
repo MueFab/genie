@@ -148,6 +148,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
                             const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
                             const compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
+    (void) cp;
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic)
 #endif
@@ -184,7 +185,6 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
     uint32_t start_block_num = 0;
     uint32_t end_block_num = 0;
-    bool analysis_done = false;
     while (true) {
         // first find blocks to read from file
         if (start_block_num >= block_start.size()) break;
