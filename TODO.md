@@ -85,7 +85,7 @@ N/A
 - [ ] Resolve FIXMEs and TODOs
 - [ ] Update README.md
 - [ ] Update doc/gabac.md
-- [ ] Check LICENSE
+- [ ] Check LICENSE (check that it is compatible to SPRING's license)
 - [ ] Design social media image (for GitHub)
 
 ## Issues
