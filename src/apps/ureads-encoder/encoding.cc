@@ -156,14 +156,14 @@ void encode(const ProgramOptions& programOptions) {
     r.addSequence(make_unique<RawReferenceSequence>(0, 10, make_unique<std::string>("AAT")));
     r.write(&bw);
 
-    ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT, DataUnit::DatasetType::NON_ALIGNED, configs);
+    ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT, DataUnit::AuType::U_TYPE_AU, configs);
     ps.write(&bw);
 
-    ParameterSet ps2 = createQuickParameterSet(1, READ_LENGTH, PAIRED_END, QV_PRESENT, DataUnit::DatasetType::NON_ALIGNED, configs);
+    ParameterSet ps2 = createQuickParameterSet(1, READ_LENGTH, PAIRED_END, QV_PRESENT, DataUnit::AuType::U_TYPE_AU, configs);
     ps2.write(&bw);
 
     const uint32_t ACCESS_UNIT_ID = 0;
-//    AccessUnit au = createQuickAccessUnit(ACCESS_UNIT_ID, PARAMETER_SET_ID, readNum, DataUnit::AuType::U_TYPE_AU, DataUnit::DatasetType::NON_ALIGNED, &generated_streams);
+  //  AccessUnit au = createQuickAccessUnit(ACCESS_UNIT_ID, PARAMETER_SET_ID, readNum, DataUnit::AuType::U_TYPE_AU, DataUnit::DatasetType::NON_ALIGNED, &generated_streams);
  //   au.write(&bw);
 
     GENIE_LOG_TRACE << "Number of bitstreams: " << generated_streams.size();
