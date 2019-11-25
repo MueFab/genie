@@ -45,7 +45,7 @@ namespace lae {
 
     std::vector<std::vector<std::vector<gabac::DataBlock>>> create_default_streams() {
         std::vector<std::vector<std::vector<gabac::DataBlock>>> ret(format::NUM_DESCRIPTORS);
-        for(int descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
+        for(size_t descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
             ret[descriptor].resize(format::getDescriptorProperties()[descriptor].number_subsequences);
         }
         return ret;
@@ -54,7 +54,7 @@ namespace lae {
 
     std::vector<std::vector<gabac::DataBlock>> translateToSimpleArray(StreamContainer* container) {
         std::vector<std::vector<gabac::DataBlock>> ret(format::NUM_DESCRIPTORS);
-        for(int descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
+        for(size_t descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
             ret[descriptor].resize(format::getDescriptorProperties()[descriptor].number_subsequences);
         }
 
