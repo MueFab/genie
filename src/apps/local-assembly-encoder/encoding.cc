@@ -77,6 +77,7 @@ namespace lae {
         ret[uint8_t (format::GenomicDescriptor::mscore)][0].swap(&container->mscore_0);
         ret[uint8_t (format::GenomicDescriptor::rlen)][0].swap(&container->rlen_0);
         ret[uint8_t (format::GenomicDescriptor::rtype)][0].swap(&container->rtype_0);
+        ret[uint8_t (format::GenomicDescriptor::ureads)][0].swap(&container->ureads_0);
 
         return ret;
     }
@@ -109,6 +110,10 @@ namespace lae {
         std::vector<std::vector<gabac::EncodingConfiguration>> configs = create_default_conf();
         std::vector<std::vector<gabac::DataBlock>> raw_data = translateToSimpleArray(container.get());
 
+        if(read_length != 0) {
+            container->rlen_0.clear();
+        }
+
         for(size_t descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
             for(size_t subdescriptor = 0; subdescriptor < format::getDescriptorProperties()[descriptor].number_subsequences; ++subdescriptor) {
                 compress(configs[descriptor][subdescriptor], &raw_data[descriptor][subdescriptor], &generated_streams[descriptor][subdescriptor]);
@@ -127,14 +132,14 @@ namespace lae {
         const uint32_t READ_LENGTH = read_length;
         const bool QV_PRESENT = false;
 
-        ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, paired, QV_PRESENT, DataUnit::DatasetType::ALIGNED, configs);
+        ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, paired, QV_PRESENT, programOptions.type, configs);
         auto crps = make_unique<ParameterSetCrps>(ParameterSetCrps::CrAlgId::LOCAL_ASSEMBLY);
         crps->setCrpsInfo(make_unique<CrpsInfo>(0, 1000));
         ps.setCrps(std::move(crps));
         ps.write(&bw);
 
         const uint32_t ACCESS_UNIT_ID = 0;
-        AccessUnit au = createQuickAccessUnit(ACCESS_UNIT_ID, PARAMETER_SET_ID, readNum, DataUnit::AuType::U_TYPE_AU, DataUnit::DatasetType::ALIGNED, &generated_streams);
+        AccessUnit au = createQuickAccessUnit(ACCESS_UNIT_ID, PARAMETER_SET_ID, readNum, programOptions.type, DataUnit::DatasetType::ALIGNED, &generated_streams);
         au.write(&bw);
     }
 
@@ -147,7 +152,7 @@ namespace lae {
         size_t blockSize = 10000;
         bool singleEnd = false;
         const uint32_t SEQUENCE_BUFFER_SIZE = 1000;
-        FullLocalAssemblyEncoder encoder(SEQUENCE_BUFFER_SIZE, true);
+        FullLocalAssemblyEncoder encoder(SEQUENCE_BUFFER_SIZE, false);
         uint32_t record_counter = 0;
         uint32_t read_length = std::numeric_limits<uint32_t>::max();
         while (true) {
@@ -169,8 +174,9 @@ namespace lae {
                 bool foundMate = false;
                 for (auto it = samRecordsCopy.begin(); it != samRecordsCopy.end(); ++it) {
                     if (it->rname == rnameSearchString && it->pos == samRecord.pnext) {
-                        LOG_TRACE << "Found mate";
+                        // LOG_TRACE << "Found mate";
                         encoder.addPair(samRecord, *it);
+                        record_counter++;
                         if (read_length != 0) {
                             if (read_length == std::numeric_limits<uint32_t>::max()) {
                                 read_length = samRecord.seq.length();
@@ -195,7 +201,7 @@ namespace lae {
                     }
                 }
                 if (!foundMate) {
-                    LOG_TRACE << "Did not find mate";
+                    // LOG_TRACE << "Did not find mate";
                     singleEnd = true;
                     encoder.add(samRecord);
                     if (read_length != 0) {

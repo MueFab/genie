@@ -141,12 +141,13 @@ namespace format {
     }
 
     ParameterSet createQuickParameterSet(uint8_t _parameter_set_id, uint8_t _read_length, bool paired_end,
-                                         bool qv_values_present, DataUnit::DatasetType dataType,
+                                         bool qv_values_present, DataUnit::AuType type,
                                          const std::vector<std::vector<gabac::EncodingConfiguration>> &parameters) {
+        DataUnit::DatasetType dataType = (type == DataUnit::AuType::U_TYPE_AU) ? DataUnit::DatasetType::NON_ALIGNED : DataUnit::DatasetType::ALIGNED;
         ParameterSet ret(_parameter_set_id, _parameter_set_id, dataType,
                          ParameterSet::AlphabetID::ACGTN, _read_length, paired_end, false, qv_values_present, 0, false,
                          false);
-        ret.addClass(DataUnit::AuType::U_TYPE_AU,
+        ret.addClass(type,
                      make_unique<qv_coding1::QvCodingConfig1>(qv_coding1::QvCodingConfig1::QvpsPresetId::ASCII, false));
         for (size_t desc = 0; desc < NUM_DESCRIPTORS; ++desc) {
             std::unique_ptr<desc_conf_pres::cabac::DecoderConfigurationCabac> dcg =
