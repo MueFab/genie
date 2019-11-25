@@ -7,7 +7,6 @@ set(source_files
         reference-encoder.cc
         read-encoder.cc
         read-decoder.cc
-        reference-encoder-plainc.c
         full-local-assembly-encoder.cc
         full-local-assembly-decoder.cc
         genie-gabac-output-stream.cc)

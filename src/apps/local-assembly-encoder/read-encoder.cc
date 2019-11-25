@@ -1,3 +1,5 @@
+#include <array>
+
 #include <format/part2/clutter.h>
 #include "read-encoder.h"
 #include "util/exceptions.h"
