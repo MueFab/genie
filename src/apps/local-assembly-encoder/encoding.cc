@@ -18,7 +18,7 @@
 namespace lae {
 
     std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
-        const std::vector<size_t> SEQUENCE_NUMS = {2, 1, 3, 2, 3, 4, 1, 1, 8, 1, 5, 2, 1, 1, 1, 2, 1, 1};
+        const std::vector<size_t> SEQUENCE_NUMS = {2, 1, 3, 2, 3, 4, 1, 1, 8, 1, 5, 2, 1, 1, 3, 2, 1, 1};
         const std::string DEFAULT_GABAC_CONF_JSON =
                 "{"
                 "\"word_size\": 4,"
