@@ -88,9 +88,9 @@ void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::Fast
         std::cout << "Time for this step: "
                   << std::chrono::duration_cast<std::chrono::seconds>(preprocess_end - preprocess_start).count()
                   << " s\n";
-        if (stats->enabled) {
-            stats->preprocess_t = preprocess_end - preprocess_start;
-        }
+//        if (stats->enabled) {
+ //           stats->preprocess_t = preprocess_end - preprocess_start;
+  //      }
 
         std::cout << "Reordering ...\n";
         auto reorder_start = std::chrono::steady_clock::now();
@@ -99,9 +99,9 @@ void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::Fast
         std::cout << "Reordering done!\n";
         std::cout << "Time for this step: "
                   << std::chrono::duration_cast<std::chrono::seconds>(reorder_end - reorder_start).count() << " s\n";
-        if (stats->enabled) {
-            stats->reorder_t = reorder_end - reorder_start;
-        }
+   //     if (stats->enabled) {
+   //         stats->reorder_t = reorder_end - reorder_start;
+   //     }
 
         std::cout << "Encoding ...\n";
         auto encoder_start = std::chrono::steady_clock::now();
@@ -110,9 +110,9 @@ void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::Fast
         std::cout << "Encoding done!\n";
         std::cout << "Time for this step: "
                   << std::chrono::duration_cast<std::chrono::seconds>(encoder_end - encoder_start).count() << " s\n";
-        if (stats->enabled) {
-            stats->encode_t = encoder_end - encoder_start;
-        }
+    //    if (stats->enabled) {
+    //        stats->encode_t = encoder_end - encoder_start;
+    //    }
 
         std::vector<std::vector<gabac::EncodingConfiguration>> configs = create_default_conf();
 

@@ -35,24 +35,24 @@ static void generationFromFastq_SPRING(const ProgramOptions &programOptions, con
 
     bool paired_end = false;
     // Initialize a FASTQ file reader.
-    util::FastqFileReader fastqFileReader1(programOptions.inputFilePath, stats);
+    util::FastqFileReader fastqFileReader1(programOptions.inputFilePath);
     std::cout << "Calling SPRING" << std::endl;
     if (programOptions.inputFilePairPath.empty()) {
         spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader1, programOptions.numThreads,
                                                paired_end, programOptions.workingDirectory, programOptions.analyze, filename,
                                                programOptions.preserve_order, !programOptions.discard_quality,
-                                               !programOptions.discard_ids, stats);
+                                               !programOptions.discard_ids);
     } else {
         paired_end = true;
         util::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath);
         spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader2, programOptions.numThreads,
                                                paired_end, programOptions.workingDirectory, programOptions.analyze, filename,
                                                programOptions.preserve_order, !programOptions.discard_quality,
-                                               !programOptions.discard_ids, stats);
+                                               !programOptions.discard_ids);
     }
 }
 
-static void generationFromFastq(const ProgramOptions &programOptions, util::FastqStats *stats) {
+static void generationFromFastq(const ProgramOptions &programOptions) {
     std::string filename = programOptions.outputFilePath;
 
     if (filename.empty()) {
@@ -94,7 +94,7 @@ static void generationFromFastq(const ProgramOptions &programOptions, util::Fast
     generationFromFastq_SPRING(programOptions, filename);
 }
 
-void decompression_fastq(const ProgramOptions &programOptions, util::FastqStats *stats) {
+void decompression_fastq(const ProgramOptions &programOptions) {
     // Open file and create tmp directory with random name
     std::ifstream in(programOptions.inputFilePath);
     if (!in) {
@@ -146,7 +146,7 @@ void decompression(const ProgramOptions &programOptions) {
             start_t = std::chrono::steady_clock::now();
         }
 
-        decompression_fastq(programOptions, &stats);
+        decompression_fastq(programOptions);
 
         if (stats.enabled) {
             stats.total_t = std::chrono::steady_clock::now() - start_t;
@@ -168,7 +168,7 @@ void generation(const ProgramOptions &programOptions) {
             start_t = std::chrono::steady_clock::now();
         }
 
-        generationFromFastq(programOptions, &stats);
+        generationFromFastq(programOptions);
 
         if (stats.enabled) {
             stats.total_t = std::chrono::steady_clock::now() - start_t;
