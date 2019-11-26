@@ -45,11 +45,12 @@ const std::vector<GenomicDescriptorProperties> &getDescriptorProperties();
 /* ----------------------------------------------------------------------------------------------------------- */
 
 ParameterSet createQuickParameterSet(uint8_t _parameter_set_id, uint8_t _read_length, bool paired_end,
-                                     bool qv_values_present, DataUnit::AuType type,
-                                     const std::vector<std::vector<gabac::EncodingConfiguration>> &parameters);
+                                         bool qv_values_present, DataUnit::AuType type,
+                                         const std::vector<std::vector<gabac::EncodingConfiguration>> &parameters,
+                                         bool reverse_flag);
 
 AccessUnit createQuickAccessUnit(uint32_t access_unit_id, uint8_t parameter_set_id, uint32_t reads_count, DataUnit::AuType autype, DataUnit::DatasetType datatype,
-                                 std::vector<std::vector<std::vector<gabac::DataBlock>>> *data);
+                                 std::vector<std::vector<std::vector<gabac::DataBlock>>> *data, uint32_t records_count=0);
 
 }  // namespace format
 

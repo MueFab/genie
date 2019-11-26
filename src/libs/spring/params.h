@@ -23,11 +23,13 @@ const int MAX_SEARCH_ENCODER = 1000;
 const int THRESH_ENCODER = 24;
 const int NUM_READS_PER_BLOCK = 256000;
 const int NUM_READS_PER_BLOCK_UREADS = 256000;
-// might want NUM_READS_PER_BLOCK_UREADS to be a bit smaller since it can have longer reads
+// might want NUM_READS_PER_BLOCK_UREADS to be a bit smaller since it can have
+// longer reads
 const uint32_t MAX_NUM_TOKENS_ID = 1024;
 const uint32_t BIN_SIZE_COMBINE_PAIRS = 10000000;
-// BIN_SIZE_COMBINE_PAIRS is number of records put in memory at a time when decompressing
-// with combine_pairs on. Higher value uses more memory but is slightly faster.
+// BIN_SIZE_COMBINE_PAIRS is number of records put in memory at a time when
+// decompressing with combine_pairs on. Higher value uses more memory but is
+// slightly faster.
 #ifdef GENIE_USE_OPENMP
 
 const int NUM_LOCKS_REORDER = 0x10000;  // # of locks (power of 2)

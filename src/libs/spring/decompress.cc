@@ -19,13 +19,16 @@ void decode_streams(decoded_desc_t &dec, bool paired_end, bool preserve_quality,
                     std::vector<util::FastqRecord> unmatched_records[2], std::vector<uint32_t> &mate_au_id,
                     std::vector<uint32_t> &mate_record_index) {
     /*
-     * return values are matched_records[2] (for pairs that are matched), unmatched_records[2] (for pairs that are
-     * unmatched), mate_au_id, mate_record_index (which store position of the pair of the unmatched_records[1]). For
-     * single end case, only matched_records[0] is populated, for paired end reads with combine_pairs false, only
-     * matched_records[0] and matched_records[1] are populated (unmatched records also put in these). For paired end
-     * with combine_pairs true, matched_records arrays contain the matched records and have equal size,
-     * unmatched_records have the records that don't have pair within the same AU, and mate_au_id & mate_au_id contain
-     * the information needed to match them together.
+     * return values are matched_records[2] (for pairs that are matched),
+     * unmatched_records[2] (for pairs that are unmatched), mate_au_id,
+     * mate_record_index (which store position of the pair of the
+     * unmatched_records[1]). For single end case, only matched_records[0] is
+     * populated, for paired end reads with combine_pairs false, only
+     * matched_records[0] and matched_records[1] are populated (unmatched records
+     * also put in these). For paired end with combine_pairs true, matched_records
+     * arrays contain the matched records and have equal size, unmatched_records
+     * have the records that don't have pair within the same AU, and mate_au_id &
+     * mate_au_id contain the information needed to match them together.
      */
     std::vector<uint32_t> mate_record_index_same_rec;  // for sorting in the combine_pairs case
     std::vector<util::FastqRecord> unmatched_same_au[2];
@@ -39,9 +42,9 @@ void decode_streams(decoded_desc_t &dec, bool paired_end, bool preserve_quality,
     std::map<uint8_t, std::map<uint8_t, std::vector<int64_t>::iterator>> subseq_it;
     // intialize iterators for subsequences
     for (auto arr : subseq_indices) subseq_it[arr[0]][arr[1]] = (dec.subseq_vector[arr[0]][arr[1]]).begin();
-    uint32_t pos_in_tokens_array[128][8];
+    uint32_t pos_in_tokens_array[128][6];
     for (int i = 0; i < 128; i++)
-        for (int j = 0; j < 8; j++) pos_in_tokens_array[i][j] = 0;
+        for (int j = 0; j < 6; j++) pos_in_tokens_array[i][j] = 0;
     uint64_t pos_in_quality_arr = 0;
     std::string prev_ID;
     uint32_t prev_tokens_ptr[MAX_NUM_TOKENS_ID] = {0};
@@ -69,15 +72,16 @@ void decode_streams(decoded_desc_t &dec, bool paired_end, bool preserve_quality,
             uint8_t number_of_record_segments;
             uint16_t delta = 0;
             bool read_1_first = true;
-            bool same_au_flag =
-                false;  // when combine_pairs true and pair is split: flag to indicate if mate in same AU
+            bool same_au_flag = false;  // when combine_pairs true and pair is split:
+                                        // flag to indicate if mate in same AU
             if (paired_end) {
                 uint64_t pairing_decoding_case = (uint64_t)(*(subseq_it[8][0]++));
-                // note that we don't decode/use mateAUid and mateRecordIndex in this decoder
-                // the compressor still stores this information which can be a bit redundant
-                // given it is stored at two places and also the ids are stored at both places.
-                // one way to resolve this could be to use the R1_unpaired and R2_unpaired
-                // decoding cases, but we don't use those as they are not semantically correct
+                // note that we don't decode/use mateAUid and mateRecordIndex in this
+                // decoder the compressor still stores this information which can be a
+                // bit redundant given it is stored at two places and also the ids are
+                // stored at both places. one way to resolve this could be to use the
+                // R1_unpaired and R2_unpaired decoding cases, but we don't use those as
+                // they are not semantically correct
                 switch (pairing_decoding_case) {
                     case 0:
                         read_1_first = !(((uint16_t)(*(subseq_it[8][1]))) & 1);
@@ -194,8 +198,8 @@ void decode_streams(decoded_desc_t &dec, bool paired_end, bool preserve_quality,
             }
         }
     }
-    // if combine_pairs is true, reorder reads in unmatched_same_au so that pairs match, and
-    // push this to matched_records arrays
+    // if combine_pairs is true, reorder reads in unmatched_same_au so that pairs
+    // match, and push this to matched_records arrays
     if (paired_end && combine_pairs) {
         size_t size_unmatched = unmatched_same_au[0].size();
         if (size_unmatched != unmatched_same_au[1].size() || size_unmatched != mate_record_index_same_rec.size())
@@ -219,8 +223,9 @@ void decode_streams(decoded_desc_t &dec, bool paired_end, bool preserve_quality,
 void decode_streams_ureads(decoded_desc_t &dec, bool paired_end, bool preserve_quality, bool preserve_id,
                            std::vector<util::FastqRecord> matched_records[2]) {
     /*
-     * return value is matched_records[2]. For single end case, only matched_records[0] is populated, for paired end
-     * reads matched_records[0] and matched_records[1] are populated.
+     * return value is matched_records[2]. For single end case, only
+     * matched_records[0] is populated, for paired end reads matched_records[0]
+     * and matched_records[1] are populated.
      */
     for (int j = 0; j < 2; j++) {
         matched_records[j].clear();
@@ -234,9 +239,9 @@ void decode_streams_ureads(decoded_desc_t &dec, bool paired_end, bool preserve_q
     std::map<uint8_t, std::map<uint8_t, std::vector<int64_t>::iterator>> subseq_it;
     // intialize iterators for subsequences
     for (auto arr : subseq_indices) subseq_it[arr[0]][arr[1]] = (dec.subseq_vector[arr[0]][arr[1]]).begin();
-    uint32_t pos_in_tokens_array[128][8];
+    uint32_t pos_in_tokens_array[128][6];
     for (int i = 0; i < 128; i++)
-        for (int j = 0; j < 8; j++) pos_in_tokens_array[i][j] = 0;
+        for (int j = 0; j < 6; j++) pos_in_tokens_array[i][j] = 0;
     uint64_t pos_in_quality_arr = 0;
     std::string prev_ID;
     uint32_t prev_tokens_ptr[MAX_NUM_TOKENS_ID] = {0};
@@ -324,7 +329,8 @@ bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, int num_thr, 
     std::vector<uint32_t> *mate_au_id = new std::vector<uint32_t>[num_thr];
     std::vector<uint32_t> *mate_record_index = new std::vector<uint32_t>[num_thr];
 
-    // store vectors to hold the AUid and indices which will be used later for combining.
+    // store vectors to hold the AUid and indices which will be used later for
+    // combining.
     std::vector<uint32_t> mate_au_id_concat, mate_record_index_concat;
 
 #ifdef GENIE_USE_OPENMP
@@ -437,7 +443,8 @@ bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, int num_thr, 
         mate_record_index[tid].clear();
     }
 
-    // now reorder the remaining unmatched reads so that they are paired and then write them to file.
+    // now reorder the remaining unmatched reads so that they are paired and then
+    // write them to file.
     if (!cp.ureads_flag && cp.paired_end && combine_pairs) {
         fout_unmatched1.close();
         fout_unmatched2.close();
