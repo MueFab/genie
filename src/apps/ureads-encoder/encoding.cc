@@ -155,10 +155,10 @@ void encode(const ProgramOptions& programOptions) {
     r.addSequence(make_unique<RawReferenceSequence>(0, 10, make_unique<std::string>("AAT")));
     r.write(&bw);
 
-    ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT, DataUnit::AuType::U_TYPE_AU, configs);
+    ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT, DataUnit::AuType::U_TYPE_AU, configs, false);
     ps.write(&bw);
 
-    ParameterSet ps2 = createQuickParameterSet(1, READ_LENGTH, PAIRED_END, QV_PRESENT, DataUnit::AuType::U_TYPE_AU, configs);
+    ParameterSet ps2 = createQuickParameterSet(1, READ_LENGTH, PAIRED_END, QV_PRESENT, DataUnit::AuType::U_TYPE_AU, configs, false);
     ps2.write(&bw);
 
     const uint32_t ACCESS_UNIT_ID = 0;
