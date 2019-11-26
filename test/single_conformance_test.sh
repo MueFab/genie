@@ -2,6 +2,7 @@
 
 reference_sw="../../mpegg-reference-sw/bin/decoder/mpegg-decoder-p2"
 lae="../cmake-build-debug/bin/local-assembly-encoder"
+genie="../cmake-build-debug/bin/genie"
 
 tool=$1
 in=$2
@@ -28,8 +29,9 @@ function mytest {
 
 if [ "$tool" = "lae" ]; then
     mytest $lae $args -i $in -o $in.mbg
-elif [ "$tool" = "lae" ]; then
-    mytest $genie $args -i $in -o $in.mbg
+elif [ "$tool" = "genie" ]; then
+    mytest $genie $args $in -o $in.mbg
+    rm genie.log
 elif [ "$tool" = "ure" ]; then
     mytest $ure -i $in -o $in.mbg
 else

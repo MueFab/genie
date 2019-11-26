@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include "call-template-functions.h"
+#include "combine-aus.h"
 #include "compress-ureads.h"
 #include "encoder.h"
 #include "generate-new-fastq.h"
@@ -20,14 +21,15 @@
 #include "preprocess.h"
 #include "reorder-compress-quality-id.h"
 #include "reorder.h"
+#include "spring-gabac.h"
 #include "util.h"
 
 namespace spring {
 
-generated_aus generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
-                                      int num_thr, bool paired_end, const std::string &working_dir, bool analyze,
-                                      dsg::StreamSaver &st, bool ureads_flag, bool preserve_quality, bool preserve_id,
-                                      util::FastqStats *stats) {
+void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
+                             int num_thr, bool paired_end, const std::string &working_dir, bool,
+                             const std::string &outputFilePath, bool ureads_flag, bool preserve_quality,
+                             bool preserve_id) {
 #ifdef GENIE_USE_OPENMP
     std::cout << "SPRING: built with OpenMP" << std::endl;
 #else
@@ -73,8 +75,10 @@ generated_aus generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, u
     if (cp.ureads_flag) {
         std::cout << "ureads_flag detected.\n";
         // TODO: add support for analyze
-        descriptorFilesPerAUs = compress_ureads(fastqFileReader1, fastqFileReader2, temp_dir, cp, st, stats);
-        cp.num_blocks = descriptorFilesPerAUs.size();
+        compress_ureads(fastqFileReader1, fastqFileReader2, temp_dir, cp, outputFilePath);
+        //        descriptorFilesPerAUs = compress_ureads(fastqFileReader1,
+        //        fastqFileReader2, temp_dir, cp, st); cp.num_blocks =
+        //        descriptorFilesPerAUs.size();
     } else {
         std::cout << "Preprocessing ...\n";
         auto preprocess_start = std::chrono::steady_clock::now();
@@ -110,56 +114,63 @@ generated_aus generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, u
             stats->encode_t = encoder_end - encoder_start;
         }
 
+        std::vector<std::vector<gabac::EncodingConfiguration>> configs = create_default_conf();
+
         std::cout << "Generating read streams ...\n";
         auto grs_start = std::chrono::steady_clock::now();
-        descriptorFilesPerAUs = generate_read_streams(temp_dir, cp, analyze, st, stats);
+        generate_read_streams(temp_dir, cp, configs);
         auto grs_end = std::chrono::steady_clock::now();
         std::cout << "Generating read streams done!\n";
         std::cout << "Time for this step: "
                   << std::chrono::duration_cast<std::chrono::seconds>(grs_end - grs_start).count() << " s\n";
-        if (stats->enabled) {
-            stats->generation_t = grs_end - grs_start;
+#if 0
+        // TODO: do this only when debugging, otherwise disable for speed 
+        std::cout << "Generating new FASTQ for testing purposes\n";
+        auto new_fq_start = std::chrono::steady_clock::now();
+        if (!cp.paired_end) {
+            std::cout << "File name: " << outputFilePath+".new.fastq\n";
+            generate_new_fastq_se(fastqFileReader1, temp_dir, cp, outputFilePath);
+        } else {
+            std::cout << "File name: " << outputFilePath+".new_1.fastq\n";
+            std::cout << "File name: " << outputFilePath+".new_2.fastq\n";
+            generate_new_fastq_pe(fastqFileReader1, fastqFileReader2, temp_dir,
+        cp, outputFilePath);
         }
-
-        cp.num_blocks = descriptorFilesPerAUs.size();
-
-        /* std::cout << "Generating new FASTQ\n";
-         auto new_fq_start = std::chrono::steady_clock::now();
-         if (!cp.paired_end) {
-             generate_new_fastq_se(fastqFileReader1, temp_dir, cp);
-         } else {
-             generate_new_fastq_pe(fastqFileReader1, fastqFileReader2, temp_dir, cp);
-         }
-         auto new_fq_end = std::chrono::steady_clock::now();
-         std::cout << "Generating new FASTQ done (for testing)\n";
-         std::cout << "Time for this step: "
-                   << std::chrono::duration_cast<std::chrono::seconds>(new_fq_end -
-                                                                       new_fq_start)
-                          .count()
-                   << " s\n";*/
-
+        auto new_fq_end = std::chrono::steady_clock::now();
+        std::cout << "Generating new FASTQ done (for testing)\n";
+        std::cout << "Time for this step: "
+                  << std::chrono::duration_cast<std::chrono::seconds>(new_fq_end -
+                                                                      new_fq_start)
+                         .count()
+                  << " s\n";
+#endif
         if (preserve_quality || preserve_id) {
             std::cout << "Reordering and compressing quality and/or ids ...\n";
             auto rcqi_start = std::chrono::steady_clock::now();
-            reorder_compress_quality_id(temp_dir, cp, analyze, st, stats);
+            reorder_compress_quality_id(temp_dir, cp, configs);
             auto rcqi_end = std::chrono::steady_clock::now();
             std::cout << "Reordering and compressing quality and/or ids done!\n";
             std::cout << "Time for this step: "
-                      << std::chrono::duration_cast<std::chrono::seconds>(rcqi_end - rcqi_start).count() << " s\n";
-            if (stats->enabled) {
-                stats->qual_score_t = rcqi_end - rcqi_start;
-            }
+                      <<
+                      std::chrono::duration_cast<std::chrono::seconds>(rcqi_end -
+                      rcqi_start).count() << " s\n";
         }
+
+        std::cout << "Combining AUs and writing compressed file ...\n";
+        auto cau_start = std::chrono::steady_clock::now();
+        combine_aus(temp_dir, cp, configs, outputFilePath);
+        auto cau_end = std::chrono::steady_clock::now();
+        std::cout << "Combining AUs done!\n";
+        std::cout << "Time for this step: "
+                  << std::chrono::duration_cast<std::chrono::seconds>(cau_end - cau_start).count() << " s\n";
     }
-    generated_aus result(descriptorFilesPerAUs);
-    // Write compression params to a file
-    std::string compression_params_file = "cp.bin";
-    gabac::DataBlock d((uint8_t *)&cp, sizeof(compression_params), 1);
-    st.compress(compression_params_file, &d);
-    uint64_t size = st.pack(d, compression_params_file);
-    if (stats->enabled) {
-        stats->cmprs_total_sz += size;
-    }
+
+    // generated_aus result(descriptorFilesPerAUs);
+    // // Write compression params to a file
+    // std::string compression_params_file = "cp.bin";
+    // gabac::DataBlock d((uint8_t *)&cp, sizeof(compression_params), 1);
+    // st.compress(compression_params_file, &d);
+    // st.pack(d, compression_params_file);
 
     delete cp_ptr;
 
@@ -171,10 +182,7 @@ generated_aus generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, u
 
     ghc::filesystem::remove_all(temp_dir);
 
-    size = st.finish();
-    if (stats->enabled) {
-        stats->cmprs_total_sz += size;
-    }
+    //    st.finish();
 
 #if GENIE_USE_OPENMP
     //
@@ -183,7 +191,7 @@ generated_aus generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, u
     omp_set_dynamic(omp_dyn_var);
 #endif
 
-    return result;
+    return;
 }
 
 std::string random_string(size_t length) {
