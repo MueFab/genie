@@ -21,7 +21,7 @@ void combine_aus(const std::string &temp_dir, compression_params &cp, const std:
   const bool PAIRED_END = cp.paired_end;
   const bool QV_PRESENT = cp.preserve_quality;
   ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT,
-                                            DataUnit::DatasetType::NON_ALIGNED, configs, true);
+                                            DataUnit::AuType::U_TYPE_AU, configs, true);
   auto crps = make_unique<ParameterSetCrps>(ParameterSetCrps::CrAlgId::GLOBAL_ASSEMBLY);
   ps.setCrps(std::move(crps));
   ps.write(&bw);

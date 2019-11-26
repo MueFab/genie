@@ -39,7 +39,7 @@ void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileRea
     const bool PAIRED_END = cp.paired_end;
     const bool QV_PRESENT = cp.preserve_quality;
     ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT,
-                                              DataUnit::DatasetType::NON_ALIGNED, configs, true);
+                                              DataUnit::AuType::U_TYPE_AU, configs, true);
     ps.write(&bw);
 
     util::FastqFileReader *fastqFileReader[2] = {fastqFileReader1, fastqFileReader2};
@@ -166,7 +166,6 @@ void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileRea
                             }
                         }
                     }
-                }  // if (!done_loop)
 
                     uint32_t ACCESS_UNIT_ID = block_num_thr;
                     uint32_t num_reads_au = cp.paired_end ? num_reads_thr * 2 : num_reads_thr;

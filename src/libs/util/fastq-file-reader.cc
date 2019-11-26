@@ -4,7 +4,7 @@
 
 namespace util {
 
-FastqFileReader::FastqFileReader(const std::string& path, FastqStats *_stats) : FileReader(path), stats(_stats) {}
+FastqFileReader::FastqFileReader(const std::string& path) : FileReader(path) {}
 
 FastqFileReader::~FastqFileReader() = default;
 
@@ -43,14 +43,14 @@ size_t FastqFileReader::readRecords(const size_t numRecords, std::vector<FastqRe
 
         fastqRecords->push_back(fastqRecord);
 
-        if (stats->enabled) {
+  /*      if (stats->enabled) {
             stats->num_recs++;
             stats->orig_id_sz += fastqRecord.title.size();
             stats->orig_seq_sz += fastqRecord.sequence.size();
             stats->orig_qual_sz += fastqRecord.qualityScores.size();
             stats->orig_total_sz += (fastqRecord.title.size() + fastqRecord.sequence.size()
               + fastqRecord.optional.size() + fastqRecord.qualityScores.size() + 4);
-        }
+        } */
 
         if (fastqRecords->size() == numRecords) {
             return fastqRecords->size();
