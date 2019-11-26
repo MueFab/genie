@@ -1,7 +1,6 @@
 #include "decoder_configuration_cabac.h"
 #include "util/bitwriter.h"
 
-
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {

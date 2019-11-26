@@ -12,8 +12,8 @@
 #include <vector>
 
 #include "binary-arithmetic-encoder.h"
-#include "util/bitwriter.h"
 #include "streams.h"
+#include "util/bitwriter.h"
 
 namespace gabac {
 

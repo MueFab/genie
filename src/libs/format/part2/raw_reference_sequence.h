@@ -5,10 +5,7 @@
 #include <string>
 #include "util/bitwriter.h"
 
-
 namespace format {
-
-
 
 /**
  * ISO 23092-2 Section 3.2 table 5, lines 4 to 7

@@ -6,12 +6,9 @@
 #include <cstdint>
 #include "util/bitwriter.h"
 
-
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-
-
 
 /**
  * ISO 23092-2 Section 3.3.2 table 7 lines 32 to 40

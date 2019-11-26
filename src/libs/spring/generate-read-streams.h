@@ -4,9 +4,9 @@
 #include <map>
 #include <string>
 
-#include "util.h"
-#include <util/perf-stats.h>
 #include <genie/stream-saver.h>
+#include <util/perf-stats.h>
+#include "util.h"
 
 namespace spring {
 

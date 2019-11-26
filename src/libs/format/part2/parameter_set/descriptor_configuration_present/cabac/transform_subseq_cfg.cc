@@ -1,8 +1,6 @@
 #include "transform_subseq_cfg.h"
-#include "util/bitwriter.h"
 #include "../../../make_unique.h"
 #include "util/bitwriter.h"
-
 
 // -----------------------------------------------------------------------------------------------------------------
 

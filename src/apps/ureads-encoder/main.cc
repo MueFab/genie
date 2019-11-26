@@ -6,10 +6,10 @@
 #include <vector>
 
 #include "encoding.h"
-#include "util/exceptions.h"
 #include "log.h"
 #include "logger.h"
 #include "program-options.h"
+#include "util/exceptions.h"
 
 static void writeCommandLine(int argc, char* argv[]) {
     std::vector<std::string> args(argv, (argv + argc));

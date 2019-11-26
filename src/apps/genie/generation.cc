@@ -16,9 +16,9 @@
 #include <string>
 #include <thread>
 #include <vector>
-#include "util/exceptions.h"
 #include "spring/decompress.h"
 #include "spring/spring.h"
+#include "util/exceptions.h"
 #include "util/fasta-file-reader.h"
 #include "util/fasta-record.h"
 #include "util/fastq-file-reader.h"

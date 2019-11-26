@@ -10,7 +10,6 @@
 #include "transform_subseq_parameters.h"
 #include "util/bitwriter.h"
 
-
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {

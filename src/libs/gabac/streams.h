@@ -50,6 +50,7 @@ class DataBlockBuffer : public std::streambuf {
     explicit DataBlockBuffer(DataBlock *d, size_t pos_i = 0);
 
     size_t size() const;
+
    protected:
     int overflow(int c) override;
     std::streamsize xsputn(const char *s, std::streamsize n) override;

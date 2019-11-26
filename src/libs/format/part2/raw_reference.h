@@ -10,7 +10,6 @@
 #include "raw_reference_sequence.h"
 #include "util/bitwriter.h"
 
-
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {

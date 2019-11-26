@@ -7,12 +7,12 @@
 #include <string>
 #include <vector>
 
-#include "util/exceptions.h"
 #include "fastq-file-reader.h"
 #include "fastq-record.h"
 #include "format/part2/parameter_set/qv_coding_config_1/qv_coding_config_1.h"
 #include "genie-gabac-output-stream.h"
 #include "log.h"
+#include "util/exceptions.h"
 
 #include <format/part2/raw_reference.h>
 #include <gabac/gabac.h>
@@ -21,7 +21,6 @@
 #include "format/part2/clutter.h"
 #include "format/part2/parameter_set.h"
 #include "util/bitwriter.h"
-
 
 namespace genie {
 

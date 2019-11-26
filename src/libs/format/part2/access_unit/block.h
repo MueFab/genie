@@ -11,8 +11,6 @@
 
 namespace format {
 
-
-
 /**
  * ISO 23092-2 Section 3.4.1.2 table 20 + 3.4.1.2.1 table 21
  */

@@ -6,9 +6,9 @@
 #define READ_SIGNATURES_SIGNATURE_INTEGER_STREAM_H
 
 #include <stdio.h>
-#include "SignatureInputInteger.h"
-#include "Signature.h"
 #include "../BitStreams/InputBitstream.h"
+#include "Signature.h"
+#include "SignatureInputInteger.h"
 #include "Signatures.h"
 
 typedef struct {
@@ -21,16 +21,12 @@ typedef struct {
     uint8_t alphabet;
     uint64_t currentInteger;
     uint8_t posCurrentInteger;
-} SignaturesInputStream ;
+} SignaturesInputStream;
 
-SignaturesInputStream* initSignatureInputStream(
-    InputBitstream* inputBitstream,
-    uint8_t signatureSize,
-    uint8_t u_signature_length,
-    uint32_t multipleSignatureBase,
-    uint8_t alphabet
-);
+SignaturesInputStream* initSignatureInputStream(InputBitstream* inputBitstream, uint8_t signatureSize,
+                                                uint8_t u_signature_length, uint32_t multipleSignatureBase,
+                                                uint8_t alphabet);
 Signatures* readSignatures(SignaturesInputStream* signaturesInputStream);
 void freeSignatureInputStream(SignaturesInputStream* signaturesInputStream);
 
-#endif //READ_SIGNATURES_SIGNATURE_INTEGER_STREAM_H
+#endif  // READ_SIGNATURES_SIGNATURE_INTEGER_STREAM_H
