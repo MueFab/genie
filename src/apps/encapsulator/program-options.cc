@@ -9,12 +9,15 @@
 
 namespace encapsulator {
 
-ProgramOptions::ProgramOptions(int argc, char *argv[]) : force(false), help(false) { processCommandLine(argc, argv); }
+ProgramOptions::ProgramOptions(int argc, char *argv[]) : force(false), help(false), inputFilePath("") {
+    processCommandLine(argc, argv);
+}
 
 void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     CLI::App app("encapsulator");
 
     app.add_flag("-f,--force", force, "Force overwriting of output file(s)");
+    app.add_option("-i,--input-file", inputFilePath, "Input file")->mandatory(true);
 
     try {
         app.parse(argc, argv);

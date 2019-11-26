@@ -9,7 +9,6 @@
 #include "cabac_context_parameters.h"
 #include "util/bitwriter.h"
 
-
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {

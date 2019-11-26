@@ -15,14 +15,10 @@ typedef struct {
     uint8_t symbolSize;
     uint8_t currentIntegerContentLength;
     uint64_t totalSizeInBits;
-} SignatureSizeComputation ;
+} SignatureSizeComputation;
 
-void initSignatureSizeComputation(
-        SignatureSizeComputation *signatureSizeComputation,
-        uint32_t signatureLengthInSymbols,
-        uint8_t integerSize,
-        uint8_t symbolSize
-);
+void initSignatureSizeComputation(SignatureSizeComputation* signatureSizeComputation, uint32_t signatureLengthInSymbols,
+                                  uint8_t integerSize, uint8_t symbolSize);
 
 void simulateSignature(SignatureSizeComputation* signatureSizeComputation, Signature* signature);
 void simulateSymbol(SignatureSizeComputation* signatureSizeComputation);
@@ -30,4 +26,4 @@ void simulateTerminator(SignatureSizeComputation* signatureSizeComputation);
 uint64_t getTotalSizeInBits(SignatureSizeComputation* signatureSizeComputation);
 uint64_t getTotalSizeInBytes(SignatureSizeComputation* signatureSizeComputation);
 
-#endif //READ_SIGNATURES_SIGNATURE_SIZE_COMPUTATION_H
+#endif  // READ_SIGNATURES_SIGNATURE_SIZE_COMPUTATION_H

@@ -1,8 +1,6 @@
 #include "descriptor_subsequence_cfg.h"
-#include "util/bitwriter.h"
 #include "../../../make_unique.h"
 #include "util/bitwriter.h"
-
 
 // -----------------------------------------------------------------------------------------------------------------
 

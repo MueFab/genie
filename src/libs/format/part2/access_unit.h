@@ -18,7 +18,6 @@
 #include "data_unit.h"
 #include "util/bitwriter.h"
 
-
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
@@ -27,6 +26,8 @@ namespace format {
  */
 class AccessUnit : public DataUnit {
    public:
+    explicit AccessUnit(util::BitReader *bitReader);
+
     void write(util::BitWriter *writer) const override;
 
     AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, AuType _au_type, uint32_t _reads_count,

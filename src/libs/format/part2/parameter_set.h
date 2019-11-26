@@ -12,14 +12,12 @@
 #include "gabac/gabac.h"
 #include "parameter_set/descriptor_configuration_container.h"
 #include "parameter_set/qv_coding_config.h"
+#include "util/bitreader.h"
 #include "util/bitwriter.h"
-
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-
-
 
 /**
  * ISO 23092-2 Section 3.3.1 table 6 + 3.3.2 table 7 (fused for simplification)
@@ -33,6 +31,8 @@ class ParameterSet : public DataUnit {
         ACGTN = 0,            //!< Line 1
         ACGTRYSWKMBDHVN_ = 1  //!< Line 2
     };
+
+    explicit ParameterSet(util::BitReader *bitReader);
 
     ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, DatasetType _dataset_type,
                  AlphabetID _alphabet_id, uint32_t _read_length, bool _paired_end, bool _pos_40_bits_flag,

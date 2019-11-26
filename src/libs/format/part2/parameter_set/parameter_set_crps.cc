@@ -1,9 +1,7 @@
 #include "parameter_set_crps.h"
-#include "util/exceptions.h"
-#include "util/bitwriter.h"
 #include "../make_unique.h"
 #include "util/bitwriter.h"
-
+#include "util/exceptions.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 

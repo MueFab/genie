@@ -22,6 +22,7 @@ class ProgramOptions {
 
     bool force;
     bool help;
+    std::string inputFilePath;
 
    private:
     void processCommandLine(int argc, char *argv[]);
