@@ -52,7 +52,7 @@ std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
 
 std::vector<std::vector<gabac::DataBlock>> create_default_streams() {
     std::vector<std::vector<gabac::DataBlock>> ret;
-    for (size_t i = 0; i < format::NUM_DESCRIPTORS; ++i) {
+    for (size_t i = 0; i < format::mpegg_p2::NUM_DESCRIPTORS; ++i) {
         ret.emplace_back();
     }
     return ret;
@@ -142,7 +142,7 @@ void encode(const ProgramOptions& programOptions) {
     // CREATE Part 2 units
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    using namespace format;
+    using namespace format::mpegg_p2;
     std::ofstream ofstr(programOptions.outputFilePath);
     util::BitWriter bw(&ofstr);
 
@@ -155,10 +155,10 @@ void encode(const ProgramOptions& programOptions) {
     r.addSequence(util::make_unique<RawReferenceSequence>(0, 10, util::make_unique<std::string>("AAT")));
     r.write(&bw);
 
-    ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT, mpegg_rec::MpeggRecord::ClassType::CLASS_U, configs, false);
+    ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT, format::mpegg_rec::MpeggRecord::ClassType::CLASS_U, configs, false);
     ps.write(&bw);
 
-    ParameterSet ps2 = createQuickParameterSet(1, READ_LENGTH, PAIRED_END, QV_PRESENT, mpegg_rec::MpeggRecord::ClassType::CLASS_U, configs, false);
+    ParameterSet ps2 = createQuickParameterSet(1, READ_LENGTH, PAIRED_END, QV_PRESENT, format::mpegg_rec::MpeggRecord::ClassType::CLASS_U, configs, false);
     ps2.write(&bw);
 
     const uint32_t ACCESS_UNIT_ID = 0;

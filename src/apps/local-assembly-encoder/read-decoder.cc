@@ -48,7 +48,7 @@ namespace lae {
         return container->pos_0.get(1);
     }
 
-    void LocalAssemblyReadDecoder::decodeRead(const std::string& ref, util::SamRecord* s) {
+    void LocalAssemblyReadDecoder::decodeRead(const std::string& ref, format::sam::SamRecord* s) {
         bool usedClip = false;
 
         pop(&container->rlen_0);
@@ -79,7 +79,7 @@ namespace lae {
         pop(&container->rtype_0);
     }
 
-    void LocalAssemblyReadDecoder::decodePair(const std::string& ref1, util::SamRecord* s1, const std::string& ref2, util::SamRecord* s2) {
+    void LocalAssemblyReadDecoder::decodePair(const std::string& ref1, format::sam::SamRecord* s1, const std::string& ref2, format::sam::SamRecord* s2) {
         this->decodeRead(ref1, s1);
         this->decodeRead(ref2, s2);
         pop(&container->pair_0);

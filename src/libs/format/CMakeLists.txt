@@ -1,6 +1,12 @@
 project("format")
 
 set(source_files
+        fasta/fasta-file-reader.cc
+        fasta/fasta-record.cc
+
+        fastq/fastq-file-reader.cc
+        fastq/fastq-record.cc
+
         mpegg_rec/alignment.cc
         mpegg_rec/alignment-container.cc
         mpegg_rec/external-alignment.cc
@@ -44,6 +50,9 @@ set(source_files
         mpegg_p2/parameter_set/qv_coding_config_1/qv_coding_config_1.cc
         mpegg_p2/raw_reference.cc
         mpegg_p2/raw_reference_sequence.cc
+
+        sam/sam-file-reader.cc
+        sam/sam-record.cc
         )
 
 add_library(format ${source_files})
