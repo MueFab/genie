@@ -9,7 +9,7 @@ namespace lae {
 
     }
 
-    void LocalAssemblyReadEncoder::addSingleRead(const util::SamRecord &rec, format::mpegg_rec::MpeggRecord::ClassType type) {
+    void LocalAssemblyReadEncoder::addSingleRead(const format::sam::SamRecord &rec, format::mpegg_rec::MpeggRecord::ClassType type) {
         container->rlen_0.push_back(rec.seq.length() - 1);
 
         if(type > format::mpegg_rec::MpeggRecord::ClassType::CLASS_P) {
@@ -25,7 +25,7 @@ namespace lae {
         readCounter++;
     }
 
-    format::mpegg_rec::MpeggRecord::ClassType LocalAssemblyReadEncoder::addRead(const util::SamRecord &rec, const std::string &ref) {
+    format::mpegg_rec::MpeggRecord::ClassType LocalAssemblyReadEncoder::addRead(const format::sam::SamRecord &rec, const std::string &ref) {
         auto t = getClass(rec.seq, rec.cigar, ref);
 
         container->rtype_0.push_back(uint8_t(t));
@@ -42,7 +42,7 @@ namespace lae {
         return t;
     }
 
-    format::mpegg_rec::MpeggRecord::ClassType LocalAssemblyReadEncoder::addPair(const util::SamRecord &rec1, const std::string &ref1, const util::SamRecord &rec2,
+    format::mpegg_rec::MpeggRecord::ClassType LocalAssemblyReadEncoder::addPair(const format::sam::SamRecord &rec1, const std::string &ref1, const format::sam::SamRecord &rec2,
                                       const std::string &ref2) {
         auto t = getClass(rec1.seq, rec1.cigar, ref1);
         t = std::max(t, getClass(rec2.seq, rec2.cigar, ref2));
@@ -98,8 +98,8 @@ namespace lae {
                         }
                         if (read[read_pos] != ref[ref_offset]) {
                             if (ref[ref_offset] == 0) {
-                                container->ureads_0.push_back(format::getAlphabetProperties(
-                                        format::ParameterSet::AlphabetID::ACGTN).inverseLut[read[read_pos]]);
+                                container->ureads_0.push_back(format::mpegg_p2::getAlphabetProperties(
+                                        format::mpegg_p2::ParameterSet::AlphabetID::ACGTN).inverseLut[read[read_pos]]);
                             } else {
                                 container->mmpos_0.push_back(0);
                                 container->mmpos_1.push_back(read_pos - lastMisMatch);
@@ -107,8 +107,8 @@ namespace lae {
                                 lastMisMatch = read_pos + 1;
                                 container->mmtype_0.push_back(0);
                                 if(type > format::mpegg_rec::MpeggRecord::ClassType::CLASS_N) {
-                                    container->mmtype_1.push_back(format::getAlphabetProperties(
-                                            format::ParameterSet::AlphabetID::ACGTN).inverseLut[read[read_pos]]);
+                                    container->mmtype_1.push_back(format::mpegg_p2::getAlphabetProperties(
+                                            format::mpegg_p2::ParameterSet::AlphabetID::ACGTN).inverseLut[read[read_pos]]);
                                 }
                             }
                         }
@@ -124,8 +124,8 @@ namespace lae {
                         container->mmpos_1.push_back(read_pos - lastMisMatch);
                         lastMisMatch = read_pos + 1;
                         container->mmtype_0.push_back(1);
-                        container->mmtype_2.push_back(format::getAlphabetProperties(
-                                format::ParameterSet::AlphabetID::ACGTN).inverseLut[read[read_pos]]);
+                        container->mmtype_2.push_back(format::mpegg_p2::getAlphabetProperties(
+                                format::mpegg_p2::ParameterSet::AlphabetID::ACGTN).inverseLut[read[read_pos]]);
                         read_pos++;
                     }
                     break;
@@ -135,8 +135,8 @@ namespace lae {
                         if (read_pos >= read.length()) {
                             UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
                         }
-                        softClips[isRightClip] += format::getAlphabetProperties(
-                                format::ParameterSet::AlphabetID::ACGTN).inverseLut[read[read_pos]];
+                        softClips[isRightClip] += format::mpegg_p2::getAlphabetProperties(
+                                format::mpegg_p2::ParameterSet::AlphabetID::ACGTN).inverseLut[read[read_pos]];
                         read_pos++;
                     }
                     break;
@@ -200,7 +200,7 @@ namespace lae {
                 container->clips_2.push_back(c);
             }
             container->clips_2.push_back(
-                    format::getAlphabetProperties(format::ParameterSet::AlphabetID::ACGTN).lut.size());
+                    format::mpegg_p2::getAlphabetProperties(format::mpegg_p2::ParameterSet::AlphabetID::ACGTN).lut.size());
         }
         if (!softClips[1].empty() && !hardClips[1]) {
             if (isFirst) {
@@ -212,7 +212,7 @@ namespace lae {
                 container->clips_2.push_back(c);
             }
             container->clips_2.push_back(
-                    format::getAlphabetProperties(format::ParameterSet::AlphabetID::ACGTN).lut.size());
+                    format::mpegg_p2::getAlphabetProperties(format::mpegg_p2::ParameterSet::AlphabetID::ACGTN).lut.size());
         }
     }
 

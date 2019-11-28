@@ -27,9 +27,9 @@
 
 namespace spring {
 
-void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
+void compress_ureads(format::fastq::FastqFileReader *fastqFileReader1, format::fastq::FastqFileReader *fastqFileReader2,
                      const std::string &temp_dir, compression_params &cp, const std::string &outputFilePath) {
-    using namespace format;
+    using namespace format::mpegg_p2;
     std::ofstream ofstr(outputFilePath);
     util::BitWriter bw(&ofstr);
 
@@ -39,15 +39,15 @@ void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileRea
     const bool PAIRED_END = cp.paired_end;
     const bool QV_PRESENT = cp.preserve_quality;
     ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT,
-                                              mpegg_rec::MpeggRecord::ClassType::CLASS_U, configs, true);
+                                              format::mpegg_rec::MpeggRecord::ClassType::CLASS_U, configs, true);
     ps.write(&bw);
 
-    util::FastqFileReader *fastqFileReader[2] = {fastqFileReader1, fastqFileReader2};
+    format::fastq::FastqFileReader *fastqFileReader[2] = {fastqFileReader1, fastqFileReader2};
     std::string basedir = temp_dir;
     std::string outfileid = basedir + "/id_1";
     std::string outfilequality = basedir + "/quality_1";
 
-    std::vector<util::FastqRecord> fastqRecords[2];
+    std::vector<format::fastq::FastqRecord> fastqRecords[2];
 
     int number_of_record_segments = cp.paired_end ? 2 : 1;
     uint32_t max_readlen = 0;
@@ -147,10 +147,10 @@ void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileRea
 
                     std::vector<std::vector<std::vector<gabac::DataBlock>>> generated_streams =
                         create_default_streams();
-                    for (size_t descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
+                    for (size_t descriptor = 0; descriptor < format::mpegg_p2::NUM_DESCRIPTORS; ++descriptor) {
                         if (descriptor != 11) {  // rname
                             for (size_t subdescriptor = 0;
-                                 subdescriptor < format::getDescriptorProperties()[descriptor].number_subsequences;
+                                 subdescriptor < format::mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences;
                                  ++subdescriptor) {
                                 gabac_compress(configs[descriptor][subdescriptor], &raw_data[descriptor][subdescriptor],
                                                &generated_streams[descriptor][subdescriptor]);
@@ -170,7 +170,7 @@ void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileRea
                     uint32_t ACCESS_UNIT_ID = block_num_thr;
                     uint32_t num_reads_au = cp.paired_end ? num_reads_thr * 2 : num_reads_thr;
                     AccessUnit au = createQuickAccessUnit(
-                        ACCESS_UNIT_ID, PARAMETER_SET_ID, num_reads_au, mpegg_rec::MpeggRecord::ClassType::CLASS_U,
+                        ACCESS_UNIT_ID, PARAMETER_SET_ID, num_reads_au, format::mpegg_rec::MpeggRecord::ClassType::CLASS_U,
                         DataUnit::DatasetType::NON_ALIGNED, &generated_streams, num_reads_thr);
 
 #ifdef GENIE_USE_OPENMP

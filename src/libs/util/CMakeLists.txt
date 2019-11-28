@@ -4,15 +4,15 @@ set(source_files
         bitreader.cc
         bitwriter.cc
         exceptions.cc
-        fasta-file-reader.cc
-        fasta-record.cc
-        fastq-file-reader.cc
-        fastq-record.cc
+        ../format/fasta/fasta-file-reader.cc
+        ../format/fasta/fasta-record.cc
+        ../format/fastq/fastq-file-reader.cc
+        ../format/fastq/fastq-record.cc
         file-reader.cc
         log.cc
         perf-stats.cc
-        sam-file-reader.cc
-        sam-record.cc
+        ../format/sam/sam-file-reader.cc
+        ../format/sam/sam-record.cc
         string-helpers.cc
 )
 

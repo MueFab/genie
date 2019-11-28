@@ -11,7 +11,7 @@
 namespace spring {
 
 void combine_aus(const std::string &temp_dir, compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::string &outputFilePath) {
-  using namespace format;
+  using namespace format::mpegg_p2;
   std::ofstream ofstr(outputFilePath);
   util::BitWriter bw(&ofstr);
 
@@ -21,7 +21,7 @@ void combine_aus(const std::string &temp_dir, compression_params &cp, const std:
   const bool PAIRED_END = cp.paired_end;
   const bool QV_PRESENT = cp.preserve_quality;
   ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT,
-                                            mpegg_rec::MpeggRecord::ClassType::CLASS_U, configs, true);
+                                            format::mpegg_rec::MpeggRecord::ClassType::CLASS_U, configs, true);
   auto crps = util::make_unique<ParameterSetCrps>(ParameterSetCrps::CrAlgId::GLOBAL_ASSEMBLY);
   ps.setCrps(std::move(crps));
   ps.write(&bw);
@@ -62,7 +62,7 @@ void combine_aus(const std::string &temp_dir, compression_params &cp, const std:
     }
     // create and write AU
     AccessUnit au = createQuickAccessUnit(
-        auId, PARAMETER_SET_ID, num_reads_per_AU[auId], mpegg_rec::MpeggRecord::ClassType::CLASS_U,
+        auId, PARAMETER_SET_ID, num_reads_per_AU[auId], format::mpegg_rec::MpeggRecord::ClassType::CLASS_U,
         DataUnit::DatasetType::NON_ALIGNED, &generated_streams, num_records_per_AU[auId]);
     au.write(&bw);
   }

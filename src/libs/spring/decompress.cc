@@ -15,8 +15,8 @@
 namespace spring {
 
 void decode_streams(decoded_desc_t &dec, bool paired_end, bool preserve_quality, bool preserve_id, bool combine_pairs,
-                    std::vector<util::FastqRecord> matched_records[2],
-                    std::vector<util::FastqRecord> unmatched_records[2], std::vector<uint32_t> &mate_au_id,
+                    std::vector<format::fastq::FastqRecord> matched_records[2],
+                    std::vector<format::fastq::FastqRecord> unmatched_records[2], std::vector<uint32_t> &mate_au_id,
                     std::vector<uint32_t> &mate_record_index) {
     /*
      * return values are matched_records[2] (for pairs that are matched),
@@ -31,10 +31,10 @@ void decode_streams(decoded_desc_t &dec, bool paired_end, bool preserve_quality,
      * mate_au_id contain the information needed to match them together.
      */
     std::vector<uint32_t> mate_record_index_same_rec;  // for sorting in the combine_pairs case
-    std::vector<util::FastqRecord> unmatched_same_au[2];
+    std::vector<format::fastq::FastqRecord> unmatched_same_au[2];
     std::string cur_quality[2];
     std::string cur_ID;
-    util::FastqRecord cur_record;
+    format::fastq::FastqRecord cur_record;
     std::string refBuf;
     // int_to_char
     char int_to_char[5] = {'A', 'C', 'G', 'T', 'N'};
@@ -221,7 +221,7 @@ void decode_streams(decoded_desc_t &dec, bool paired_end, bool preserve_quality,
 }
 
 void decode_streams_ureads(decoded_desc_t &dec, bool paired_end, bool preserve_quality, bool preserve_id,
-                           std::vector<util::FastqRecord> matched_records[2]) {
+                           std::vector<format::fastq::FastqRecord> matched_records[2]) {
     /*
      * return value is matched_records[2]. For single end case, only
      * matched_records[0] is populated, for paired end reads matched_records[0]
@@ -232,7 +232,7 @@ void decode_streams_ureads(decoded_desc_t &dec, bool paired_end, bool preserve_q
     }
     std::string cur_quality[2];
     std::string cur_ID;
-    util::FastqRecord cur_record;
+    format::fastq::FastqRecord cur_record;
     // int_to_char
     char int_to_char[5] = {'A', 'C', 'G', 'T', 'N'};
 
@@ -324,8 +324,8 @@ bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, int num_thr, 
             fout_unmatched2.open(file_unmatched_fastq2);
         }
     }
-    std::vector<util::FastqRecord>(*matched_records)[2] = new std::vector<util::FastqRecord>[num_thr][2];
-    std::vector<util::FastqRecord>(*unmatched_records)[2] = new std::vector<util::FastqRecord>[num_thr][2];
+    std::vector<format::fastq::FastqRecord>(*matched_records)[2] = new std::vector<format::fastq::FastqRecord>[num_thr][2];
+    std::vector<format::fastq::FastqRecord>(*unmatched_records)[2] = new std::vector<format::fastq::FastqRecord>[num_thr][2];
     std::vector<uint32_t> *mate_au_id = new std::vector<uint32_t>[num_thr];
     std::vector<uint32_t> *mate_record_index = new std::vector<uint32_t>[num_thr];
 
@@ -470,8 +470,8 @@ bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, int num_thr, 
 
             // now reorder the unmatched records in file 2, by picking them in chunks
             uint32_t bin_size = std::min((size_t)BIN_SIZE_COMBINE_PAIRS, size_unmatched);
-            std::vector<util::FastqRecord> records_bin(bin_size);
-            util::FastqRecord tmpFastqRecord;
+            std::vector<format::fastq::FastqRecord> records_bin(bin_size);
+            format::fastq::FastqRecord tmpFastqRecord;
             for (uint32_t i = 0; i <= size_unmatched / bin_size; i++) {
                 uint32_t num_records_bin = bin_size;
                 if (i == size_unmatched / bin_size) num_records_bin = size_unmatched % bin_size;
@@ -504,7 +504,7 @@ bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, int num_thr, 
     return paired_end;
 }
 
-void write_fastq_record_to_ostream(std::ostream &out, util::FastqRecord &fastqRecord, bool preserve_quality) {
+void write_fastq_record_to_ostream(std::ostream &out, format::fastq::FastqRecord &fastqRecord, bool preserve_quality) {
     out << fastqRecord.title << "\n";
     out << fastqRecord.sequence << "\n";
     if (preserve_quality) {
@@ -514,7 +514,7 @@ void write_fastq_record_to_ostream(std::ostream &out, util::FastqRecord &fastqRe
     }
 }
 
-void read_fastq_record_from_ifstream(std::ifstream &in, util::FastqRecord &fastqRecord, bool preserve_quality) {
+void read_fastq_record_from_ifstream(std::ifstream &in, format::fastq::FastqRecord &fastqRecord, bool preserve_quality) {
     std::getline(in, fastqRecord.title);
     std::getline(in, fastqRecord.sequence);
     if (preserve_quality) {

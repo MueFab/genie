@@ -19,12 +19,12 @@
 #include "spring/decompress.h"
 #include "spring/spring.h"
 #include "util/exceptions.h"
-#include "util/fasta-file-reader.h"
-#include "util/fasta-record.h"
-#include "util/fastq-file-reader.h"
-#include "util/fastq-record.h"
-#include "util/sam-file-reader.h"
-#include "util/sam-record.h"
+#include "format/fasta/fasta-file-reader.h"
+#include "format/fasta/fasta-record.h"
+#include "format/fastq/fastq-file-reader.h"
+#include "format/fastq/fastq-record.h"
+#include "format/sam/sam-file-reader.h"
+#include "format/sam/sam-record.h"
 
 namespace dsg {
 
@@ -35,7 +35,7 @@ static void generationFromFastq_SPRING(const ProgramOptions &programOptions, con
 
     bool paired_end = false;
     // Initialize a FASTQ file reader.
-    util::FastqFileReader fastqFileReader1(programOptions.inputFilePath);
+    format::fastq::FastqFileReader fastqFileReader1(programOptions.inputFilePath);
     std::cout << "Calling SPRING" << std::endl;
     if (programOptions.inputFilePairPath.empty()) {
         spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader1, programOptions.numThreads,
@@ -44,7 +44,7 @@ static void generationFromFastq_SPRING(const ProgramOptions &programOptions, con
                                                !programOptions.discard_ids);
     } else {
         paired_end = true;
-        util::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath);
+        format::fastq::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath);
         spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader2, programOptions.numThreads,
                                                paired_end, programOptions.workingDirectory, programOptions.analyze, filename,
                                                programOptions.preserve_order, !programOptions.discard_quality,

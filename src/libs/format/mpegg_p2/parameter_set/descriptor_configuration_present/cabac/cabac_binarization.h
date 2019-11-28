@@ -12,34 +12,35 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-
+    namespace mpegg_p2 {
 namespace desc_conf_pres {
 namespace cabac {
 
 /**
  * ISO 23092-2 Section 8.3.3 table
  */
-class CabacBinarization {
-   public:
-    CabacBinarization(const CabacBinarizationParameters::BinarizationId &_binarization_ID,
-                      std::unique_ptr<CabacBinarizationParameters> _cabac_binarization_parameters);
+    class CabacBinarization {
+    public:
+        CabacBinarization(const CabacBinarizationParameters::BinarizationId &_binarization_ID,
+                          std::unique_ptr<CabacBinarizationParameters> _cabac_binarization_parameters);
 
-    CabacBinarization();
+        CabacBinarization();
 
-    virtual ~CabacBinarization() = default;
+        virtual ~CabacBinarization() = default;
 
-    void setContextParameters(std::unique_ptr<CabacContextParameters> _cabac_context_parameters);
+        void setContextParameters(std::unique_ptr<CabacContextParameters> _cabac_context_parameters);
 
-    virtual void write(util::BitWriter *writer) const;
+        virtual void write(util::BitWriter *writer) const;
 
-    std::unique_ptr<CabacBinarization> clone() const;
+        std::unique_ptr<CabacBinarization> clone() const;
 
-   private:
-    CabacBinarizationParameters::BinarizationId binarization_ID;                 //!< : 5; Line 2
-    uint8_t bypass_flag : 1;                                                     //!< Line 3
-    std::unique_ptr<CabacBinarizationParameters> cabac_binarization_parameters;  //!< Line 4
-    std::unique_ptr<CabacContextParameters> cabac_context_parameters;            //!< Line 6
-};
+    private:
+        CabacBinarizationParameters::BinarizationId binarization_ID;                 //!< : 5; Line 2
+        uint8_t bypass_flag : 1;                                                     //!< Line 3
+        std::unique_ptr<CabacBinarizationParameters> cabac_binarization_parameters;  //!< Line 4
+        std::unique_ptr<CabacContextParameters> cabac_context_parameters;            //!< Line 6
+    };
+}
 }  // namespace cabac
 }  // namespace desc_conf_pres
 }  // namespace format
