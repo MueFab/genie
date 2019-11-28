@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <climits>
 #include "clutter.h"
-#include "make_unique.h"
+#include "util/make_unique.h"
 #include "parameter_set/descriptor_configuration_present/cabac/descriptor_subsequence_cfg.h"
 #include "parameter_set/descriptor_configuration_present/decoder_configuration.h"
 #include "parameter_set/descriptor_configuration_present/descriptor_configuration_present.h"
@@ -88,7 +88,7 @@ namespace format {
  */
 std::unique_ptr<desc_conf_pres::cabac::TransformSubseqParameters> transParamsFromGabac(
     const gabac::EncodingConfiguration &conf) {
-    return make_unique<desc_conf_pres::cabac::TransformSubseqParameters>(
+    return util::make_unique<desc_conf_pres::cabac::TransformSubseqParameters>(
         desc_conf_pres::cabac::TransformSubseqParameters::TransformIdSubseq(conf.sequenceTransformationId),
         conf.sequenceTransformationParameter);
 }
@@ -109,14 +109,14 @@ desc_conf_pres::cabac::SupportValues::TransformIdSubsym inferTransform(
 
 std::unique_ptr<desc_conf_pres::cabac::CabacBinarization> inferBinarization(
     const gabac::TransformedSequenceConfiguration &tSeqConf) {
-    auto ret = make_unique<desc_conf_pres::cabac::CabacBinarization>(
+    auto ret = util::make_unique<desc_conf_pres::cabac::CabacBinarization>(
         desc_conf_pres::cabac::CabacBinarizationParameters::BinarizationId(tSeqConf.binarizationId),
-        make_unique<desc_conf_pres::cabac::CabacBinarizationParameters>(
+        util::make_unique<desc_conf_pres::cabac::CabacBinarizationParameters>(
             desc_conf_pres::cabac::CabacBinarizationParameters::BinarizationId(tSeqConf.binarizationId),
             tSeqConf.binarizationParameters[0]));
     if (tSeqConf.contextSelectionId != gabac::ContextSelectionId::bypass) {
         ret->setContextParameters(
-            make_unique<desc_conf_pres::cabac::CabacContextParameters>(false, 3, 3,
+            util::make_unique<desc_conf_pres::cabac::CabacContextParameters>(false, 3, 3,
                                                                        false));  // TODO insert actual values
     }
     return ret;
@@ -136,8 +136,8 @@ std::unique_ptr<desc_conf_pres::cabac::CabacBinarization> inferBinarization(
 
             auto transform = inferTransform(tSeqConf);
             auto binarization = inferBinarization(tSeqConf);
-            auto subcfg = make_unique<desc_conf_pres::cabac::TransformSubseqCfg>(
-                    transform, make_unique<desc_conf_pres::cabac::SupportValues>(size, size, 0, transform),
+            auto subcfg = util::make_unique<desc_conf_pres::cabac::TransformSubseqCfg>(
+                    transform, util::make_unique<desc_conf_pres::cabac::SupportValues>(size, size, 0, transform),
                     std::move(binarization));
             sub_conf->setTransformSubseqCfg(i, std::move(subcfg));
             ++i;
@@ -145,29 +145,29 @@ std::unique_ptr<desc_conf_pres::cabac::CabacBinarization> inferBinarization(
     }
 
     ParameterSet createQuickParameterSet(uint8_t _parameter_set_id, uint8_t _read_length, bool paired_end,
-                                         bool qv_values_present, DataUnit::AuType type,
+                                         bool qv_values_present, mpegg_rec::MpeggRecord::ClassType type,
                                          const std::vector<std::vector<gabac::EncodingConfiguration>> &parameters,
                                          const bool reverse_flag) {
-        DataUnit::DatasetType dataType = (type == DataUnit::AuType::U_TYPE_AU) ? DataUnit::DatasetType::NON_ALIGNED
+        DataUnit::DatasetType dataType = (type == mpegg_rec::MpeggRecord::ClassType::CLASS_U) ? DataUnit::DatasetType::NON_ALIGNED
                                                                                : DataUnit::DatasetType::ALIGNED;
         ParameterSet ret(_parameter_set_id, _parameter_set_id, dataType,
                          ParameterSet::AlphabetID::ACGTN, _read_length, paired_end, false, qv_values_present, 0, false,
                          false);
         ret.addClass(type,
-                     make_unique<qv_coding1::QvCodingConfig1>(qv_coding1::QvCodingConfig1::QvpsPresetId::ASCII,
+                     util::make_unique<qv_coding1::QvCodingConfig1>(qv_coding1::QvCodingConfig1::QvpsPresetId::ASCII,
                                                               reverse_flag));
         for (size_t desc = 0; desc < NUM_DESCRIPTORS; ++desc) {
             std::unique_ptr<desc_conf_pres::cabac::DecoderConfigurationCabac> dcg =
-                    make_unique<desc_conf_pres::cabac::DecoderConfigurationCabac>(GenomicDescriptor(desc));
+                    util::make_unique<desc_conf_pres::cabac::DecoderConfigurationCabac>(GenomicDescriptor(desc));
 
         for (size_t subseq = 0; subseq < getDescriptorProperties()[uint8_t(desc)].number_subsequences; ++subseq) {
             dcg->setSubsequenceCfg(subseq, transParamsFromGabac(parameters[desc][subseq]));
             fillSubseqFromGabac(parameters[desc][subseq], dcg->getSubsequenceCfg(subseq));
         }
 
-        auto dc = make_unique<desc_conf_pres::DescriptorConfigurationPresent>();
+        auto dc = util::make_unique<desc_conf_pres::DescriptorConfigurationPresent>();
         dc->set_decoder_configuration(std::move(dcg));
-        auto d = make_unique<DescriptorConfigurationContainer>();
+        auto d = util::make_unique<DescriptorConfigurationContainer>();
         d->setConfig(std::move(dc));
 
         ret.setDescriptor(desc, std::move(d));
@@ -298,10 +298,10 @@ bool descriptorEmpty(const std::vector<std::vector<gabac::DataBlock>> &data) {
 // -----------------------------------------------------------------------------------------------------------------
 
 AccessUnit createQuickAccessUnit(uint32_t access_unit_id, uint8_t parameter_set_id, uint32_t reads_count,
-                                 DataUnit::AuType autype, DataUnit::DatasetType datatype,
+                                 mpegg_rec::MpeggRecord::ClassType auType, DataUnit::DatasetType datatype,
                                  std::vector<std::vector<std::vector<gabac::DataBlock>>> *data,
                                  uint32_t records_count) {
-    AccessUnit au(access_unit_id, parameter_set_id, autype, reads_count,
+    AccessUnit au(access_unit_id, parameter_set_id, auType, reads_count,
                   datatype, 32, 32, 0);
     for (size_t descriptor = 0; descriptor < data->size(); ++descriptor) {
         auto &desc = (*data)[descriptor];

@@ -31,7 +31,7 @@ AccessUnitHeader* initAccessUnitHeader() {
         accessUnitHeader->ref_end_position = 0;
 
         // if MIT_flag == 0
-        // if AU_type != U_TYPE_AU || dataset_type == 2
+        // if AU_type != CLASS_U || dataset_type == 2
         accessUnitHeader->sequence_ID.sequenceID = 0;
         accessUnitHeader->AU_start_position = 0;
         accessUnitHeader->AU_end_position = 0;
@@ -64,7 +64,7 @@ AccessUnitHeader* initAccessUnitHeaderWithValues(DatasetContainer* datasetContai
         accessUnitHeader->ref_end_position = 0;
 
         // if MIT_flag == 0
-        // if AU_type != U_TYPE_AU || dataset_type == 2
+        // if AU_type != CLASS_U || dataset_type == 2
         accessUnitHeader->sequence_ID.sequenceID = 0;
         accessUnitHeader->AU_start_position = 0;
         accessUnitHeader->AU_end_position = 0;
@@ -197,11 +197,11 @@ bool writeAccessUnitHeaderContent(FILE* outputFile, AccessUnitHeader* accessUnit
     bool numBlocksSuccessfulWrite = writeToBitstream(&outputBitstream, accessUnitHeader->num_blocks);
     bool parameterSetIDSuccessfulWrite =
         writeNBitsShift(&outputBitstream, 8, (char*)&accessUnitHeader->parameter_set_ID);
-    bool auTypeSuccessfulWrite = writeNBitsShift(&outputBitstream, 4, (const char*)&(accessUnitHeader->au_type));
+    bool mpegg_rec::MpeggRecord::ClassTypeSuccessfulWrite = writeNBitsShift(&outputBitstream, 4, (const char*)&(accessUnitHeader->au_type));
     bool readsCountSuccessfulWrite = writeBigEndian32ToBitstream(&outputBitstream, accessUnitHeader->reads_count);
 
     if (!accessUnitIdSuccessfulWrite || !numBlocksSuccessfulWrite || !parameterSetIDSuccessfulWrite ||
-        !auTypeSuccessfulWrite || !readsCountSuccessfulWrite) {
+        !mpegg_rec::MpeggRecord::ClassTypeSuccessfulWrite || !readsCountSuccessfulWrite) {
         fprintf(stderr, "Error writing access unit header.\n");
         return false;
     }
@@ -308,7 +308,7 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
     uint32_t accessUnitIdBuffer;
     uint8_t numBlocksBuffer;
     uint8_t parameterSetIdBuffer;
-    uint8_t auTypeBuffer;
+    uint8_t mpegg_rec::MpeggRecord::ClassTypeBuffer;
     uint32_t readsCountBuffer;
     uint16_t mmThresholdBuffer = 0;
     uint32_t mmCountBuffer = 0;
@@ -316,15 +316,15 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
     bool accessUnitIdSuccessfulRead = readNBitsBigToNativeEndian32(&inputBitstream, 32, &accessUnitIdBuffer);
     bool numBlocksSuccessfulRead = readBytes(&inputBitstream, 1, (char*)&numBlocksBuffer);
     bool parameterSetIdSuccessfulRead = readNBitsShift(&inputBitstream, 8, (char*)&parameterSetIdBuffer);
-    bool auTypeSuccessfulRead = readNBitsShift(&inputBitstream, 4, (char*)&auTypeBuffer);
+    bool mpegg_rec::MpeggRecord::ClassTypeSuccessfulRead = readNBitsShift(&inputBitstream, 4, (char*)&mpegg_rec::MpeggRecord::ClassTypeBuffer);
     bool readsCountBufferSuccessfulRead = readNBitsBigToNativeEndian32(&inputBitstream, 32, &readsCountBuffer);
     if (!accessUnitIdSuccessfulRead || !numBlocksSuccessfulRead || !parameterSetIdSuccessfulRead ||
-        !auTypeSuccessfulRead || !readsCountBufferSuccessfulRead) {
+        !mpegg_rec::MpeggRecord::ClassTypeSuccessfulRead || !readsCountBufferSuccessfulRead) {
         fprintf(stderr, "Error parsing access unit header.\n");
         return false;
     }
 
-    if (auTypeBuffer == CLASS_TYPE_CLASS_N || auTypeBuffer == CLASS_TYPE_CLASS_M) {
+    if (mpegg_rec::MpeggRecord::ClassTypeBuffer == CLASS_TYPE_CLASS_N || mpegg_rec::MpeggRecord::ClassTypeBuffer == CLASS_TYPE_CLASS_M) {
         bool mmThresholdSuccessfulRead = readNBitsBigToNativeEndian16(&inputBitstream, 16, &mmThresholdBuffer);
         bool mmCountSuccessfulRead = readNBitsBigToNativeEndian32(&inputBitstream, 32, &mmCountBuffer);
         if (!mmThresholdSuccessfulRead || !mmCountSuccessfulRead) {
@@ -340,7 +340,7 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
     uint64_t ref_end_position = 0;
 
     // if MIT_flag == 0
-    // if AU_type != U_TYPE_AU || dataset_type == 2
+    // if AU_type != CLASS_U || dataset_type == 2
     SequenceID sequence_ID;
     sequence_ID.sequenceID = 0;
     uint64_t AU_start_position = 0;
@@ -365,7 +365,7 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
         }
     }
     if (!isMITFlagSet(getDatasetHeader(datasetContainer))) {
-        if (auTypeBuffer != CLASS_TYPE_CLASS_U
+        if (mpegg_rec::MpeggRecord::ClassTypeBuffer != CLASS_TYPE_CLASS_U
             /*|| getDatasetType(getDatasetHeader(datasetContainer)) == 2*/
         ) {
             bool sequence_ID_successfulRead =
@@ -457,7 +457,7 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
     accessUnitHeader->access_unit_ID = accessUnitIdBuffer;
     accessUnitHeader->num_blocks = numBlocksBuffer;
     accessUnitHeader->parameter_set_ID = parameterSetIdBuffer;
-    accessUnitHeader->au_type.classType = auTypeBuffer;
+    accessUnitHeader->au_type.classType = mpegg_rec::MpeggRecord::ClassTypeBuffer;
     accessUnitHeader->reads_count = readsCountBuffer;
     accessUnitHeader->mm_threshold = mmThresholdBuffer;
     accessUnitHeader->mm_count = mmCountBuffer;

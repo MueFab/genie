@@ -1,5 +1,5 @@
 #include "cabac_binarization.h"
-#include "../../../make_unique.h"
+#include "util/make_unique.h"
 #include "util/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -19,12 +19,12 @@ CabacBinarization::CabacBinarization(const CabacBinarizationParameters::Binariza
 CabacBinarization::CabacBinarization()
     : CabacBinarization(
           CabacBinarizationParameters::BinarizationId::BINARY_CODING,
-          make_unique<CabacBinarizationParameters>(CabacBinarizationParameters::BinarizationId::BINARY_CODING, 0)) {}
+          util::make_unique<CabacBinarizationParameters>(CabacBinarizationParameters::BinarizationId::BINARY_CODING, 0)) {}
 
 // -----------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<CabacBinarization> CabacBinarization::clone() const {
-    auto ret = make_unique<CabacBinarization>();
+    auto ret = util::make_unique<CabacBinarization>();
     ret->binarization_ID = binarization_ID;
     ret->bypass_flag = bypass_flag;
     ret->cabac_binarization_parameters = cabac_binarization_parameters->clone();

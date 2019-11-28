@@ -20,9 +20,9 @@
 #include "spring-gabac.h"
 #include "util.h"
 
-#include <format/part2/access_unit.h>
-#include <format/part2/clutter.h>
-#include <format/part2/parameter_set.h>
+#include <format/mpegg_p2/access_unit.h>
+#include <format/mpegg_p2/clutter.h>
+#include <format/mpegg_p2/parameter_set.h>
 #include <util/bitwriter.h>
 
 namespace spring {
@@ -39,7 +39,7 @@ void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileRea
     const bool PAIRED_END = cp.paired_end;
     const bool QV_PRESENT = cp.preserve_quality;
     ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT,
-                                              DataUnit::AuType::U_TYPE_AU, configs, true);
+                                              mpegg_rec::MpeggRecord::ClassType::CLASS_U, configs, true);
     ps.write(&bw);
 
     util::FastqFileReader *fastqFileReader[2] = {fastqFileReader1, fastqFileReader2};
@@ -170,7 +170,7 @@ void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileRea
                     uint32_t ACCESS_UNIT_ID = block_num_thr;
                     uint32_t num_reads_au = cp.paired_end ? num_reads_thr * 2 : num_reads_thr;
                     AccessUnit au = createQuickAccessUnit(
-                        ACCESS_UNIT_ID, PARAMETER_SET_ID, num_reads_au, DataUnit::AuType::U_TYPE_AU,
+                        ACCESS_UNIT_ID, PARAMETER_SET_ID, num_reads_au, mpegg_rec::MpeggRecord::ClassType::CLASS_U,
                         DataUnit::DatasetType::NON_ALIGNED, &generated_streams, num_reads_thr);
 
 #ifdef GENIE_USE_OPENMP

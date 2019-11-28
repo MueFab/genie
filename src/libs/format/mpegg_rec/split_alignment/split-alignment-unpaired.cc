@@ -1,5 +1,10 @@
-//
-// Created by fabian on 28.11.19.
-//
-
 #include "split-alignment-unpaired.h"
+
+namespace format {
+    namespace mpegg_rec {
+        SplitAlignmentUnpaired::SplitAlignmentUnpaired() : SplitAlignment(
+                SplitAlignment::SplitAlignmentType::UNPAIRED) {
+
+        }
+    }
+}

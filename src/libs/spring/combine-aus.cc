@@ -2,9 +2,9 @@
 #include <string>
 #include <fstream>
 #include "util.h"
-#include <format/part2/access_unit.h>
-#include <format/part2/clutter.h>
-#include <format/part2/parameter_set.h>
+#include <format/mpegg_p2/access_unit.h>
+#include <format/mpegg_p2/clutter.h>
+#include <format/mpegg_p2/parameter_set.h>
 #include <util/bitwriter.h>
 #include "spring-gabac.h"
 
@@ -21,8 +21,8 @@ void combine_aus(const std::string &temp_dir, compression_params &cp, const std:
   const bool PAIRED_END = cp.paired_end;
   const bool QV_PRESENT = cp.preserve_quality;
   ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT,
-                                            DataUnit::AuType::U_TYPE_AU, configs, true);
-  auto crps = make_unique<ParameterSetCrps>(ParameterSetCrps::CrAlgId::GLOBAL_ASSEMBLY);
+                                            mpegg_rec::MpeggRecord::ClassType::CLASS_U, configs, true);
+  auto crps = util::make_unique<ParameterSetCrps>(ParameterSetCrps::CrAlgId::GLOBAL_ASSEMBLY);
   ps.setCrps(std::move(crps));
   ps.write(&bw);
 
@@ -62,7 +62,7 @@ void combine_aus(const std::string &temp_dir, compression_params &cp, const std:
     }
     // create and write AU
     AccessUnit au = createQuickAccessUnit(
-        auId, PARAMETER_SET_ID, num_reads_per_AU[auId], DataUnit::AuType::U_TYPE_AU,
+        auId, PARAMETER_SET_ID, num_reads_per_AU[auId], mpegg_rec::MpeggRecord::ClassType::CLASS_U,
         DataUnit::DatasetType::NON_ALIGNED, &generated_streams, num_records_per_AU[auId]);
     au.write(&bw);
   }

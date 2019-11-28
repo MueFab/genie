@@ -1,5 +1,5 @@
 #include "transform_subseq_cfg.h"
-#include "../../../make_unique.h"
+#include "util/make_unique.h"
 #include "util/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -8,8 +8,8 @@ namespace format {
 namespace desc_conf_pres {
 namespace cabac {
 TransformSubseqCfg::TransformSubseqCfg()
-    : TransformSubseqCfg(SupportValues::TransformIdSubsym::NO_TRANSFORM, make_unique<SupportValues>(),
-                         make_unique<CabacBinarization>()) {}
+    : TransformSubseqCfg(SupportValues::TransformIdSubsym::NO_TRANSFORM, util::make_unique<SupportValues>(),
+                         util::make_unique<CabacBinarization>()) {}
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ TransformSubseqCfg::TransformSubseqCfg(SupportValues::TransformIdSubsym _transfo
 // -----------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<TransformSubseqCfg> TransformSubseqCfg::clone() const {
-    auto ret = make_unique<TransformSubseqCfg>();
+    auto ret = util::make_unique<TransformSubseqCfg>();
     ret->transform_ID_subsym = transform_ID_subsym;
     ret->support_values = support_values->clone();
     ret->cabac_binarization = cabac_binarization->clone();

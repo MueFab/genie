@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-#include "make_unique.h"
+#include "util/make_unique.h"
 #include "parameter_set/descriptor_configuration.h"
 #include "parameter_set/descriptor_configuration_container.h"
 #include "parameter_set/qv_coding_config.h"
@@ -55,7 +55,7 @@ ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_
       crps_flag(false),
       parameter_set_crps(nullptr) {
     for (auto &i : descriptors) {
-        i = make_unique<DescriptorConfigurationContainer>();
+        i = util::make_unique<DescriptorConfigurationContainer>();
     }
 }
 
@@ -132,7 +132,7 @@ void ParameterSet::setCrps(std::unique_ptr<ParameterSetCrps> _parameter_set_crps
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::addClass(AuType class_id, std::unique_ptr<QvCodingConfig> conf) {
+void ParameterSet::addClass(mpegg_rec::MpeggRecord::ClassType class_id, std::unique_ptr<QvCodingConfig> conf) {
     for (auto &a : descriptors) {
         if (a->isClassSpecific()) {
             UTILS_THROW_RUNTIME_EXCEPTION("Adding classes not allowed once class specific descriptor configs enabled");
@@ -161,6 +161,6 @@ void ParameterSet::addGroup(std::unique_ptr<std::string> rgroup_id) { rgroup_IDs
 
 void ParameterSet::setMultipleSignatureBase(uint32_t _multiple_signature_base, uint8_t _U_signature_size) {
     multiple_signature_base = _multiple_signature_base;
-    u_signature_size = make_unique<uint8_t>(_U_signature_size);
+    u_signature_size = util::make_unique<uint8_t>(_U_signature_size);
 }
 }  // namespace format

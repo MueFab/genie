@@ -1,5 +1,5 @@
 #include "raw_reference.h"
-#include "make_unique.h"
+#include "util/make_unique.h"
 #include "util/bitwriter.h"
 
 #include <sstream>
@@ -22,7 +22,7 @@ void RawReference::addSequence(std::unique_ptr<RawReferenceSequence> ref) {
 }
 
 std::unique_ptr<RawReference> RawReference::clone() const {
-    auto ret = make_unique<RawReference>();
+    auto ret = util::make_unique<RawReference>();
     for (const auto &a : seqs) {
         ret->seqs.push_back(a->clone());
     }

@@ -7,7 +7,7 @@
 
 // -----------------------------------------------------------------------------------------------------------------
 
-namespace format {
+namespace util {
 
 template <class T>
 struct _Unique_if {
@@ -38,7 +38,7 @@ typename _Unique_if<T>::_Unknown_bound make_unique(size_t n) {
 template <class T, class... Args>
 typename _Unique_if<T>::_Known_bound make_unique(Args &&...) = delete;
 
-}  // namespace format
+}  // namespace util
 
 // -----------------------------------------------------------------------------------------------------------------
 

@@ -1,9 +1,9 @@
 // Copyright 2018 The genie authors
 
 #include "spring-gabac.h"
-#include <format/part2/access_unit.h>
-#include <format/part2/clutter.h>
-#include <format/part2/parameter_set.h>
+#include <format/mpegg_p2/access_unit.h>
+#include <format/mpegg_p2/clutter.h>
+#include <format/mpegg_p2/parameter_set.h>
 #include <fstream>
 
 namespace spring {

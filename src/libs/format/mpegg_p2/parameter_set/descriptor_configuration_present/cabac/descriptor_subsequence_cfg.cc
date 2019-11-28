@@ -1,5 +1,5 @@
 #include "descriptor_subsequence_cfg.h"
-#include "../../../make_unique.h"
+#include "util/make_unique.h"
 #include "util/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -8,9 +8,9 @@ namespace format {
 namespace desc_conf_pres {
 namespace cabac {
 std::unique_ptr<DescriptorSubsequenceCfg> DescriptorSubsequenceCfg::clone() const {
-    auto ret = make_unique<DescriptorSubsequenceCfg>(transform_subseq_parameters->clone(), 0, false);
+    auto ret = util::make_unique<DescriptorSubsequenceCfg>(transform_subseq_parameters->clone(), 0, false);
     if (descriptor_subsequence_ID) {
-        ret->descriptor_subsequence_ID = make_unique<uint16_t>(*descriptor_subsequence_ID);
+        ret->descriptor_subsequence_ID = util::make_unique<uint16_t>(*descriptor_subsequence_ID);
     } else {
         ret->descriptor_subsequence_ID = nullptr;
     }
@@ -31,7 +31,7 @@ DescriptorSubsequenceCfg::DescriptorSubsequenceCfg(
       transform_subseq_parameters(std::move(_transform_subseq_parameters)),
       transformSubseq_cfgs(transform_subseq_parameters->getNumStreams()) {
     if (!tokentype) {
-        descriptor_subsequence_ID = make_unique<uint16_t>(_descriptor_subsequence_ID);
+        descriptor_subsequence_ID = util::make_unique<uint16_t>(_descriptor_subsequence_ID);
     }
 }
 

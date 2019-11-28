@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include <util/sam-record.h>
-#include "format/part2/data_unit.h"
+#include "format/mpegg_rec/mpegg-record.h"
 #include "stream-container.h"
 
 namespace lae {
@@ -14,16 +14,16 @@ namespace lae {
         std::unique_ptr<StreamContainer> container;
         int32_t pos;
         uint32_t readCounter;
-        void codeVariants(const std::string &read, const std::string &cigar, const std::string& ref, format::DataUnit::AuType type, bool isFirst);
+        void codeVariants(const std::string &read, const std::string &cigar, const std::string& ref, format::mpegg_rec::MpeggRecord::ClassType type, bool isFirst);
 
-        format::DataUnit::AuType getClass(const std::string &read, const std::string &cigar, const std::string &ref);
+        format::mpegg_rec::MpeggRecord::ClassType getClass(const std::string &read, const std::string &cigar, const std::string &ref);
 
-        void addSingleRead(const util::SamRecord& rec, format::DataUnit::AuType type);
+        void addSingleRead(const util::SamRecord& rec, format::mpegg_rec::MpeggRecord::ClassType type);
     public:
         explicit LocalAssemblyReadEncoder();
 
-        format::DataUnit::AuType addRead(const util::SamRecord& rec, const std::string& ref);
-        format::DataUnit::AuType addPair(const util::SamRecord& rec1, const std::string& ref1, const util::SamRecord& rec2, const std::string& ref2);
+        format::mpegg_rec::MpeggRecord::ClassType addRead(const util::SamRecord& rec, const std::string& ref);
+        format::mpegg_rec::MpeggRecord::ClassType addPair(const util::SamRecord& rec1, const std::string& ref1, const util::SamRecord& rec2, const std::string& ref2);
 
         std::unique_ptr<StreamContainer> pollStreams();
     };

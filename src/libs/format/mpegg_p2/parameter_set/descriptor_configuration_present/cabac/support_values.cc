@@ -1,5 +1,5 @@
 #include "support_values.h"
-#include "../../../make_unique.h"
+#include "util/make_unique.h"
 #include "util/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -17,9 +17,9 @@ SupportValues::SupportValues(uint8_t _output_symbol_size, uint8_t _coding_subsym
       share_subsym_prv_flag(nullptr) {
     if (coding_subsym_size < output_symbol_size && coding_order > 0) {
         if (transform_ID_subsym == TransformIdSubsym::LUT_TRANSFORM) {
-            share_subsym_lut_flag = make_unique<bool>(_share_subsym_lut_flag);
+            share_subsym_lut_flag = util::make_unique<bool>(_share_subsym_lut_flag);
         }
-        share_subsym_prv_flag = make_unique<bool>(_share_subsym_prv_flag);
+        share_subsym_prv_flag = util::make_unique<bool>(_share_subsym_prv_flag);
     }
 }
 
@@ -30,12 +30,12 @@ SupportValues::SupportValues() : SupportValues(0, 0, 0, TransformIdSubsym::NO_TR
 // -----------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<SupportValues> SupportValues::clone() const {
-    auto ret = make_unique<SupportValues>();
+    auto ret = util::make_unique<SupportValues>();
     ret->output_symbol_size = output_symbol_size;
     ret->coding_subsym_size = coding_subsym_size;
     ret->coding_order = coding_order;
-    ret->share_subsym_lut_flag = make_unique<bool>(*share_subsym_lut_flag);
-    ret->share_subsym_prv_flag = make_unique<bool>(*share_subsym_prv_flag);
+    ret->share_subsym_lut_flag = util::make_unique<bool>(*share_subsym_lut_flag);
+    ret->share_subsym_prv_flag = util::make_unique<bool>(*share_subsym_prv_flag);
     return ret;
 }
 

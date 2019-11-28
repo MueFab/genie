@@ -2,7 +2,7 @@
 #define LAE_PROGRAM_OPTIONS_H_
 
 #include <string>
-#include <format/part2/data_unit.h>
+#include <format/mpegg_rec/mpegg-record.h>
 
 namespace lae {
 
@@ -17,7 +17,7 @@ class ProgramOptions {
     std::string outputFilePath;
     std::string typeString;
 
-    format::DataUnit::AuType type;
+    format::mpegg_rec::MpeggRecord::ClassType type;
 
 
    private:

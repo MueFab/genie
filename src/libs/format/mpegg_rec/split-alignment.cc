@@ -1,5 +1,10 @@
-//
-// Created by fabian on 28.11.19.
-//
-
 #include "split-alignment.h"
+
+
+namespace format {
+    namespace mpegg_rec {
+        SplitAlignment::SplitAlignment(SplitAlignmentType _split_alignment) : split_alignment(_split_alignment) {
+
+        }
+    }
+}

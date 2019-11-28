@@ -7,7 +7,7 @@ namespace format {
 SignatureCfg::SignatureCfg(uint64_t _U_cluster_signature_0, uint8_t _U_signature_size)
     : num_signatures(nullptr), U_cluster_signature(1, _U_cluster_signature_0), U_signature_size(_U_signature_size) {
     if (U_cluster_signature[0] == (1u << U_signature_size) - 1) {
-        num_signatures = make_unique<uint16_t>(1);
+        num_signatures = util::make_unique<uint16_t>(1);
     }
 }
 

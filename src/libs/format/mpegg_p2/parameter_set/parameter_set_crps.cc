@@ -1,5 +1,5 @@
 #include "parameter_set_crps.h"
-#include "../make_unique.h"
+#include "util/make_unique.h"
 #include "util/bitwriter.h"
 #include "util/exceptions.h"
 
@@ -8,7 +8,7 @@
 namespace format {
 ParameterSetCrps::ParameterSetCrps(CrAlgId _cr_alg_ID) : cr_alg_ID(_cr_alg_ID) {
     if (cr_alg_ID == CrAlgId::PUSH_IN || cr_alg_ID == CrAlgId::LOCAL_ASSEMBLY) {
-        crps_info = make_unique<CrpsInfo>();
+        crps_info = util::make_unique<CrpsInfo>();
     }
 }
 

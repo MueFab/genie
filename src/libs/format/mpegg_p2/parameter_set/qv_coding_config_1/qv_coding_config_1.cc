@@ -1,5 +1,5 @@
 #include "qv_coding_config_1.h"
-#include "../../make_unique.h"
+#include "util/make_unique.h"
 #include "util/bitwriter.h"
 
 namespace format {
@@ -10,7 +10,7 @@ QvCodingConfig1::QvCodingConfig1() : QvCodingConfig1(QvpsPresetId::ASCII, false)
 
 QvCodingConfig1::QvCodingConfig1(QvpsPresetId _qvps_preset_ID, bool _reverse_flag)
     : QvCodingConfig(QvCodingMode::ONE, _reverse_flag), qvps_flag(false), parameter_set_qvps(nullptr) {
-    qvps_preset_ID = make_unique<QvpsPresetId>(_qvps_preset_ID);
+    qvps_preset_ID = util::make_unique<QvpsPresetId>(_qvps_preset_ID);
 }
 
 // -----------------------------------------------------------------------------------------------------------------

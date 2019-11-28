@@ -1,5 +1,5 @@
 #include "cabac_binarization_parameters.h"
-#include "../../../make_unique.h"
+#include "util/make_unique.h"
 #include "util/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -33,11 +33,11 @@ CabacBinarizationParameters::CabacBinarizationParameters(const BinarizationId &_
     : cmax(nullptr), cmax_teg(nullptr), cmax_dtu(nullptr), split_unit_size(nullptr) {
     switch (_binarization_id) {
         case BinarizationId::TRUNCATED_UNARY:
-            cmax = make_unique<uint8_t>(param);
+            cmax = util::make_unique<uint8_t>(param);
             break;
         case BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
         case BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
-            cmax_teg = make_unique<uint8_t>(param);
+            cmax_teg = util::make_unique<uint8_t>(param);
             break;
         case BinarizationId::BINARY_CODING:
         case BinarizationId::EXPONENTIAL_GOLOMB:
@@ -51,11 +51,11 @@ CabacBinarizationParameters::CabacBinarizationParameters(const BinarizationId &_
 // -----------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<CabacBinarizationParameters> CabacBinarizationParameters::clone() const {
-    auto r = make_unique<CabacBinarizationParameters>();
-    r->cmax = make_unique<uint8_t>(*cmax);
-    r->cmax_teg = make_unique<uint8_t>(*cmax_teg);
-    r->cmax_dtu = make_unique<uint8_t>(*cmax_dtu);
-    r->split_unit_size = make_unique<uint8_t>(*split_unit_size);
+    auto r = util::make_unique<CabacBinarizationParameters>();
+    r->cmax = util::make_unique<uint8_t>(*cmax);
+    r->cmax_teg = util::make_unique<uint8_t>(*cmax_teg);
+    r->cmax_dtu = util::make_unique<uint8_t>(*cmax_dtu);
+    r->split_unit_size = util::make_unique<uint8_t>(*split_unit_size);
     return r;
 }
 }  // namespace cabac
