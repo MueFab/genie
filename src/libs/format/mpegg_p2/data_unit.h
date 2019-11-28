@@ -42,16 +42,6 @@ class DataUnit {
         REFERENCE = 2     //!< Line 3
     };
 
-    enum class AuType : uint8_t {
-        NONE = 0,
-        P_TYPE_AU = 1,
-        N_TYPE_AU = 2,
-        M_TYPE_AU = 3,
-        I_TYPE_AU = 4,
-        HM_TYPE_AU = 5,
-        U_TYPE_AU = 6
-    };
-
    private:
     DataUnitType data_unit_type;  //!< : 8; Line 2
     uint32_t data_unit_size;

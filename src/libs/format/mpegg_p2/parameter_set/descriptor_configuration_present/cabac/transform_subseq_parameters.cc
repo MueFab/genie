@@ -1,5 +1,5 @@
 #include "transform_subseq_parameters.h"
-#include "../../../make_unique.h"
+#include "util/make_unique.h"
 #include "util/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -23,10 +23,10 @@ TransformSubseqParameters::TransformSubseqParameters(const TransformIdSubseq &_t
         case TransformIdSubseq::EQUALITY_CODING:
             break;
         case TransformIdSubseq::RLE_CODING:
-            rle_coding_guard = make_unique<uint8_t>(param);
+            rle_coding_guard = util::make_unique<uint8_t>(param);
             break;
         case TransformIdSubseq::MATCH_CODING:
-            match_coding_buffer_size = make_unique<uint16_t>(param);
+            match_coding_buffer_size = util::make_unique<uint16_t>(param);
             break;
         case TransformIdSubseq::MERGE_CODING:
             UTILS_THROW_RUNTIME_EXCEPTION("Merge coding not supported");
@@ -37,11 +37,11 @@ TransformSubseqParameters::TransformSubseqParameters(const TransformIdSubseq &_t
 // -----------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<TransformSubseqParameters> TransformSubseqParameters::clone() const {
-    auto ret = make_unique<TransformSubseqParameters>();
+    auto ret = util::make_unique<TransformSubseqParameters>();
     ret->transform_ID_subseq = transform_ID_subseq;
-    ret->match_coding_buffer_size = make_unique<uint16_t>(*match_coding_buffer_size);
-    ret->rle_coding_guard = make_unique<uint8_t>(*rle_coding_guard);
-    ret->merge_coding_subseq_count = make_unique<uint8_t>(*merge_coding_subseq_count);
+    ret->match_coding_buffer_size = util::make_unique<uint16_t>(*match_coding_buffer_size);
+    ret->rle_coding_guard = util::make_unique<uint8_t>(*rle_coding_guard);
+    ret->merge_coding_subseq_count = util::make_unique<uint8_t>(*merge_coding_subseq_count);
     ret->merge_coding_shift_size = merge_coding_shift_size;
     return ret;
 }

@@ -22,7 +22,7 @@ AccessUnit::AccessUnit(util::BitReader *bitReader)  // needs to be called by for
     }
 }
 
-AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, AuType _au_type, uint32_t _reads_count,
+AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, mpegg_rec::MpeggRecord::ClassType _au_type, uint32_t _reads_count,
                        DatasetType dataset_type, uint8_t posSize, uint8_t signatureSize,
                        uint32_t multiple_signature_base)
     : DataUnit(DataUnitType::ACCESS_UNIT),
@@ -38,17 +38,17 @@ AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, AuTy
       au_Type_U_Cfg(nullptr),
       signature_config(nullptr),
       blocks(0) {
-    if (au_type == AuType::N_TYPE_AU || au_type == AuType::M_TYPE_AU) {
-        mm_cfg = make_unique<MmCfg>();
+    if (au_type == mpegg_rec::MpeggRecord::ClassType::CLASS_N || au_type == mpegg_rec::MpeggRecord::ClassType::CLASS_M) {
+        mm_cfg = util::make_unique<MmCfg>();
     }
     if (dataset_type == DatasetType::REFERENCE) {
-        ref_cfg = make_unique<RefCfg>(posSize);
+        ref_cfg = util::make_unique<RefCfg>(posSize);
     }
-    if (au_type != AuType::U_TYPE_AU) {
-        au_Type_U_Cfg = make_unique<AuTypeCfg>(posSize);
+    if (au_type != mpegg_rec::MpeggRecord::ClassType::CLASS_U) {
+        au_Type_U_Cfg = util::make_unique<AuTypeCfg>(posSize);
     } else {
         if (multiple_signature_base != 0) {
-            signature_config = make_unique<SignatureCfg>(0, signatureSize);
+            signature_config = util::make_unique<SignatureCfg>(0, signatureSize);
         }
     }
 }

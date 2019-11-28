@@ -1,5 +1,5 @@
 #include "descriptor_configuration_container.h"
-#include "../make_unique.h"
+#include "util/make_unique.h"
 #include "../parameter_set/descriptor_configuration_present/descriptor_configuration_present.h"
 #include "util/bitwriter.h"
 
@@ -8,7 +8,7 @@
 namespace format {
 DescriptorConfigurationContainer::DescriptorConfigurationContainer()
     : class_specific_dec_cfg_flag(false), descriptor_configurations(0) {
-    descriptor_configurations.push_back(make_unique<desc_conf_pres::DescriptorConfigurationPresent>());
+    descriptor_configurations.push_back(util::make_unique<desc_conf_pres::DescriptorConfigurationPresent>());
 }
 
 // -----------------------------------------------------------------------------------------------------------------

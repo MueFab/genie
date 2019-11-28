@@ -1,6 +1,6 @@
 #include <array>
 
-#include <format/part2/clutter.h>
+#include <format/mpegg_p2/clutter.h>
 #include "read-encoder.h"
 #include "util/exceptions.h"
 
@@ -9,10 +9,10 @@ namespace lae {
 
     }
 
-    void LocalAssemblyReadEncoder::addSingleRead(const util::SamRecord &rec, format::DataUnit::AuType type) {
+    void LocalAssemblyReadEncoder::addSingleRead(const util::SamRecord &rec, format::mpegg_rec::MpeggRecord::ClassType type) {
         container->rlen_0.push_back(rec.seq.length() - 1);
 
-        if(type > format::DataUnit::AuType::P_TYPE_AU) {
+        if(type > format::mpegg_rec::MpeggRecord::ClassType::CLASS_P) {
             container->mmpos_0.push_back(1);
         }
         container->rcomp_0.push_back((rec.flag >> 4) & 0x1);
@@ -25,7 +25,7 @@ namespace lae {
         readCounter++;
     }
 
-    format::DataUnit::AuType LocalAssemblyReadEncoder::addRead(const util::SamRecord &rec, const std::string &ref) {
+    format::mpegg_rec::MpeggRecord::ClassType LocalAssemblyReadEncoder::addRead(const util::SamRecord &rec, const std::string &ref) {
         auto t = getClass(rec.seq, rec.cigar, ref);
 
         container->rtype_0.push_back(uint8_t(t));
@@ -42,7 +42,7 @@ namespace lae {
         return t;
     }
 
-    format::DataUnit::AuType LocalAssemblyReadEncoder::addPair(const util::SamRecord &rec1, const std::string &ref1, const util::SamRecord &rec2,
+    format::mpegg_rec::MpeggRecord::ClassType LocalAssemblyReadEncoder::addPair(const util::SamRecord &rec1, const std::string &ref1, const util::SamRecord &rec2,
                                       const std::string &ref2) {
         auto t = getClass(rec1.seq, rec1.cigar, ref1);
         t = std::max(t, getClass(rec2.seq, rec2.cigar, ref2));
@@ -69,7 +69,7 @@ namespace lae {
         return t;
     }
 
-    void LocalAssemblyReadEncoder::codeVariants(const std::string &read, const std::string &cigar, const std::string &ref, format::DataUnit::AuType type,
+    void LocalAssemblyReadEncoder::codeVariants(const std::string &read, const std::string &cigar, const std::string &ref, format::mpegg_rec::MpeggRecord::ClassType type,
                                            bool isFirst) {
         size_t count = 0;
         size_t read_pos = 0;
@@ -106,7 +106,7 @@ namespace lae {
 
                                 lastMisMatch = read_pos + 1;
                                 container->mmtype_0.push_back(0);
-                                if(type > format::DataUnit::AuType::N_TYPE_AU) {
+                                if(type > format::mpegg_rec::MpeggRecord::ClassType::CLASS_N) {
                                     container->mmtype_1.push_back(format::getAlphabetProperties(
                                             format::ParameterSet::AlphabetID::ACGTN).inverseLut[read[read_pos]]);
                                 }
@@ -216,14 +216,14 @@ namespace lae {
         }
     }
 
-    format::DataUnit::AuType
+    format::mpegg_rec::MpeggRecord::ClassType
     LocalAssemblyReadEncoder::getClass(const std::string &read, const std::string &cigar, const std::string &ref) {
         size_t count = 0;
         size_t read_pos = 0;
         size_t ref_offset = 0;
         size_t num_of_deletions = 0;
 
-        format::DataUnit::AuType type = format::DataUnit::AuType::P_TYPE_AU;
+        format::mpegg_rec::MpeggRecord::ClassType type = format::mpegg_rec::MpeggRecord::ClassType::CLASS_P;
 
 
         for (size_t cigar_pos = 0; cigar_pos < cigar.length(); ++cigar_pos) {
@@ -244,9 +244,9 @@ namespace lae {
                             if (ref[ref_offset] == 0) {
                             } else {
                                 if(read[read_pos] == 'N') {
-                                    type = std::max(type, format::DataUnit::AuType::N_TYPE_AU);
+                                    type = std::max(type, format::mpegg_rec::MpeggRecord::ClassType::CLASS_N);
                                 } else {
-                                    type = std::max(type, format::DataUnit::AuType::M_TYPE_AU);
+                                    type = std::max(type, format::mpegg_rec::MpeggRecord::ClassType::CLASS_M);
                                 }
                             }
                         }
@@ -258,13 +258,13 @@ namespace lae {
 
                 case 'I':
                     for (size_t i = 0; i < count; ++i) {
-                        type = std::max(type, format::DataUnit::AuType::I_TYPE_AU);
+                        type = std::max(type, format::mpegg_rec::MpeggRecord::ClassType::CLASS_I);
                         read_pos++;
                     }
                     break;
                 case 'S':
                 case 'P':
-                    type = std::max(type, format::DataUnit::AuType::I_TYPE_AU);
+                    type = std::max(type, format::mpegg_rec::MpeggRecord::ClassType::CLASS_I);
                     for (size_t i = 0; i < count; ++i) {
                         if (read_pos >= read.length()) {
                             UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
@@ -275,7 +275,7 @@ namespace lae {
 
                 case 'N':
                 case 'D':
-                    type = std::max(type, format::DataUnit::AuType::I_TYPE_AU);
+                    type = std::max(type, format::mpegg_rec::MpeggRecord::ClassType::CLASS_I);
                     for (size_t i = 0; i < count; ++i) {
                         num_of_deletions++;
                         ref_offset++;
@@ -283,7 +283,7 @@ namespace lae {
                     break;
 
                 case 'H':
-                    type = std::max(type, format::DataUnit::AuType::I_TYPE_AU);
+                    type = std::max(type, format::mpegg_rec::MpeggRecord::ClassType::CLASS_I);
                     ref_offset += count;
                     break;
 

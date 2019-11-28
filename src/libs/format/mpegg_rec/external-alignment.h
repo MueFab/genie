@@ -1,33 +1,37 @@
-//
-// Created by fabian on 28.11.19.
-//
-
 #ifndef GENIE_EXTERNAL_ALIGNMENT_H
 #define GENIE_EXTERNAL_ALIGNMENT_H
 
+#include <cstdint>
+#include <memory>
 
-class ExternalAlignment {
-public:
-    enum class MoreAlignmentInfoType : uint8_t {
-        NONE,
-        OTHER_REC
-    };
+namespace util {
+    class BitWriter;
 
-    explicit ExternalAlignment(MoreAlignmentInfoType _moreAlignmentInfoType) : moreAlignmentInfoType(
-            _moreAlignmentInfoType) {
+    class BitReader;
+}
 
+namespace format {
+    namespace mpegg_rec {
+        class ExternalAlignment {
+        public:
+            enum class MoreAlignmentInfoType : uint8_t {
+                NONE,
+                OTHER_REC
+            };
+
+            explicit ExternalAlignment(MoreAlignmentInfoType _moreAlignmentInfoType);
+
+            virtual ~ExternalAlignment() = default;
+
+            virtual void write(util::BitWriter *writer) const;
+
+            static std::unique_ptr<ExternalAlignment> factory(util::BitReader *reader);
+
+        protected:
+            MoreAlignmentInfoType moreAlignmentInfoType;
+        };
     }
-
-    virtual ~ExternalAlignment() = default;
-
-    virtual void write(util::BitWriter *writer) const {
-
-    }
-
-    static std::unique_ptr<ExternalAlignment> factory(util::BitReader *reader);
-protected:
-    MoreAlignmentInfoType moreAlignmentInfoType;
-};
+}
 
 
 #endif //GENIE_EXTERNAL_ALIGNMENT_H

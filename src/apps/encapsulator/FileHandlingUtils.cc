@@ -4,7 +4,7 @@
  */
 
 #include "FileHandlingUtils.h"
-#include <format/part2/parameter_set.h>
+#include <format/mpegg_p2/parameter_set.h>
 
 // DatasetHeader *
 // initDatasetHeaderNoMIT(DatasetGroupId datasetGroupId, DatasetId datasetId, char *version, bool multipleAlignmentFlag,
@@ -332,7 +332,7 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileNam
     //        uint32_t accessUnitId;
     //        uint8_t numBlocks;
     //        uint8_t parameterSetId;
-    //        ClassType auType;
+    //        ClassType mpegg_rec::MpeggRecord::ClassType;
     //        uint32_t readsCount;
     //        uint16_t mmThreshold;
     //        uint32_t mmCount;
@@ -349,7 +349,7 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileNam
     //                getDataUnitAccessUnitId(dataUnitAccessUnit, &accessUnitId) != 0 ||
     //                getDataUnitNumBlocks(dataUnitAccessUnit, &numBlocks) != 0 ||
     //                getDataUnitParameterSetId(dataUnitAccessUnit, &parameterSetId) != 0 ||
-    //                getDataUnitAUType(dataUnitAccessUnit, &auType) != 0 ||
+    //                getDataUnitmpegg_rec::MpeggRecord::ClassType(dataUnitAccessUnit, &mpegg_rec::MpeggRecord::ClassType) != 0 ||
     //                getDataUnitReadsCount(dataUnitAccessUnit, &readsCount) != 0 ||
     //                getDataUnitMMThreshold(dataUnitAccessUnit, &mmThreshold) != 0 ||
     //                getDataUnitMMCount(dataUnitAccessUnit, &mmCount) != 0 ||
@@ -373,7 +373,7 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileNam
     //                accessUnitId,
     //                numBlocks,
     //                parameterSetId,
-    //                auType,
+    //                mpegg_rec::MpeggRecord::ClassType,
     //                readsCount,
     //                mmThreshold,
     //                mmCount

@@ -18,7 +18,7 @@
 #include "generate-read-streams.h"
 #include "spring-gabac.h"
 #include "util.h"
-#include <format/part2/clutter.h>
+#include <format/mpegg_p2/clutter.h>
 
 namespace spring {
 

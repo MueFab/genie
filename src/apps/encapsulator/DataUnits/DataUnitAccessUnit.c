@@ -106,7 +106,7 @@ int parseDataUnitAccessUnit(DataUnitAccessUnit** dataUnitAccessUnit, DataUnits* 
     uint32_t accessUnitId;
     uint8_t numBlocks;
     uint16_t parameterSetId = 0;
-    uint8_t auType;
+    uint8_t mpegg_rec::MpeggRecord::ClassType;
     uint32_t readsCount;
     uint16_t mmThreshold = 0;
     uint32_t mmCount = 0;
@@ -125,7 +125,7 @@ int parseDataUnitAccessUnit(DataUnitAccessUnit** dataUnitAccessUnit, DataUnits* 
     if (!readNBitsBigToNativeEndian32(&inputBitstream, 32, &accessUnitId) ||
         !readBytes(&inputBitstream, 1, (char*)&numBlocks) ||
         !readNBitsShift(&inputBitstream, 8, (char*)&parameterSetId) ||
-        !(readNBitsShift(&inputBitstream, 4, (char*)&auType)) ||
+        !(readNBitsShift(&inputBitstream, 4, (char*)&mpegg_rec::MpeggRecord::ClassType)) ||
         !(readNBitsBigToNativeEndian32(&inputBitstream, 32, &readsCount))) {
         fprintf(stderr,
                 "Error reading DataUnitAccessUnit (either in access unit id, num_blocks, parameter_set_id, "
@@ -142,9 +142,9 @@ int parseDataUnitAccessUnit(DataUnitAccessUnit** dataUnitAccessUnit, DataUnits* 
     remainingSize -= 32;  // accessUnitId
     remainingSize -= 8;   // numBlocks
     remainingSize -= 8;   // parameterSetId
-    remainingSize -= 4;   // auType
+    remainingSize -= 4;   // mpegg_rec::MpeggRecord::ClassType
     remainingSize -= 32;  // readsCount
-    if (auType == CLASS_TYPE_CLASS_N || auType == CLASS_TYPE_CLASS_M) {
+    if (mpegg_rec::MpeggRecord::ClassType == CLASS_TYPE_CLASS_N || mpegg_rec::MpeggRecord::ClassType == CLASS_TYPE_CLASS_M) {
         if (!readNBitsBigToNativeEndian16(&inputBitstream, 16, &mmThreshold) ||
             !readNBitsBigToNativeEndian32(&inputBitstream, 32, &mmCount)) {
             fprintf(stderr, "Error reading DataUnitAccessUnit (either in mmThreshold or mmCount).\n");
@@ -173,7 +173,7 @@ int parseDataUnitAccessUnit(DataUnitAccessUnit** dataUnitAccessUnit, DataUnits* 
         }
     }
 
-    if (auType != CLASS_TYPE_CLASS_U) {
+    if (mpegg_rec::MpeggRecord::ClassType != CLASS_TYPE_CLASS_U) {
         if (!readNBitsBigToNativeEndian16(&inputBitstream, 16, &(sequenceId.sequenceID))) {
             fprintf(stderr, "Error reading DataUnitAccessUnit. SequenceId could not be read.\n");
             return false;
@@ -227,7 +227,7 @@ int parseDataUnitAccessUnit(DataUnitAccessUnit** dataUnitAccessUnit, DataUnits* 
     }
 
     ClassType classType;
-    classType.classType = auType;
+    classType.classType = mpegg_rec::MpeggRecord::ClassType;
 
     *dataUnitAccessUnit = initDataUnitAccessUnit(
         accessUnitId, numBlocks, parameterSetId, classType, readsCount, mmThreshold, mmCount, refSequence, refStart,
@@ -405,9 +405,9 @@ int getDataUnitParameterSetId(DataUnitAccessUnit* dataUnitAccessUnit, uint8_t* p
     return 0;
 }
 
-int getDataUnitAUType(DataUnitAccessUnit* dataUnitAccessUnit, ClassType* auType) {
+int getDataUnitmpegg_rec::MpeggRecord::ClassType(DataUnitAccessUnit* dataUnitAccessUnit, ClassType* mpegg_rec::MpeggRecord::ClassType) {
     if (dataUnitAccessUnit == NULL) return -1;
-    *auType = dataUnitAccessUnit->AU_type;
+    *mpegg_rec::MpeggRecord::ClassType = dataUnitAccessUnit->AU_type;
     return 0;
 }
 

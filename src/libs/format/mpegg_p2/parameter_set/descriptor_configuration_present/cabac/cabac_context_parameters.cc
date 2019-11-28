@@ -1,5 +1,5 @@
 #include "cabac_context_parameters.h"
-#include "../../../make_unique.h"
+#include "util/make_unique.h"
 #include "util/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ CabacContextParameters::CabacContextParameters(bool _adaptive_mode_flag, uint8_t
       context_initialization_value(0),
       share_subsym_ctx_flag(nullptr) {
     if (_coding_subsym_size < _output_symbol_size) {
-        share_subsym_ctx_flag = make_unique<bool>(_share_subsym_ctx_flag);
+        share_subsym_ctx_flag = util::make_unique<bool>(_share_subsym_ctx_flag);
     }
 }
 
@@ -45,11 +45,11 @@ void CabacContextParameters::write(util::BitWriter *writer) const {
 // -----------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<CabacContextParameters> CabacContextParameters::clone() const {
-    auto ret = make_unique<CabacContextParameters>();
+    auto ret = util::make_unique<CabacContextParameters>();
     ret->adaptive_mode_flag = adaptive_mode_flag;
     ret->num_contexts = num_contexts;
     ret->context_initialization_value = context_initialization_value;
-    ret->share_subsym_ctx_flag = make_unique<bool>(*share_subsym_ctx_flag);
+    ret->share_subsym_ctx_flag = util::make_unique<bool>(*share_subsym_ctx_flag);
     return ret;
 }
 }  // namespace cabac

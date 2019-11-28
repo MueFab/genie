@@ -6,9 +6,10 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
-#include "make_unique.h"
+#include "util/make_unique.h"
 
 #include <gabac/gabac.h>
+#include <format/mpegg_rec/mpegg-record.h>
 
 #include "access_unit/au_type_cfg.h"
 #include "access_unit/block.h"
@@ -30,7 +31,7 @@ class AccessUnit : public DataUnit {
 
     void write(util::BitWriter *writer) const override;
 
-    AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, AuType _au_type, uint32_t _reads_count,
+    AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, mpegg_rec::MpeggRecord::ClassType _au_type, uint32_t _reads_count,
                DatasetType dataset_type, uint8_t posSize, uint8_t signatureSize, uint32_t multiple_signature_base);
 
     void addBlock(std::unique_ptr<Block> block);
@@ -60,7 +61,7 @@ class AccessUnit : public DataUnit {
     uint32_t access_unit_ID : 32;                    //!< Line 2
     uint8_t num_blocks : 8;                          //!< Line 3
     uint8_t parameter_set_ID : 8;                    //!< Line 4
-    AuType au_type;                                  //!< : 4;  Line 5
+    mpegg_rec::MpeggRecord::ClassType au_type;                                  //!< : 4;  Line 5
     uint32_t reads_count : 32;                       //!< Line 6
     std::unique_ptr<MmCfg> mm_cfg;                   //!< Lines 7 to 10
     std::unique_ptr<RefCfg> ref_cfg;                 //!< Lines 11 to 15

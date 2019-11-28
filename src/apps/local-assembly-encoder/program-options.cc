@@ -26,15 +26,15 @@ void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     }
 
     if(typeString == "U") {
-        type = format::DataUnit::AuType::U_TYPE_AU;
+        type = format::mpegg_rec::MpeggRecord::ClassType::CLASS_U;
     } else if(typeString == "P") {
-        type = format::DataUnit::AuType::P_TYPE_AU;
+        type = format::mpegg_rec::MpeggRecord::ClassType::CLASS_P;
     } else if(typeString == "N") {
-        type = format::DataUnit::AuType::N_TYPE_AU;
+        type = format::mpegg_rec::MpeggRecord::ClassType::CLASS_N;
     } else if(typeString == "M") {
-        type = format::DataUnit::AuType::M_TYPE_AU;
+        type = format::mpegg_rec::MpeggRecord::ClassType::CLASS_M;
     } else if(typeString == "I") {
-        type = format::DataUnit::AuType::I_TYPE_AU;
+        type = format::mpegg_rec::MpeggRecord::ClassType::CLASS_I;
     } else {
         DIE("Invalid AU Type");
     }
