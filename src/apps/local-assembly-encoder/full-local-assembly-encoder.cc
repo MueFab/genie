@@ -12,7 +12,7 @@ namespace lae {
 
     }
 
-    void FullLocalAssemblyEncoder::add(const util::SamRecord &rec) {
+    void FullLocalAssemblyEncoder::add(const format::sam::SamRecord &rec) {
         std::string ref = refCoder.getReference(rec.pos, rec.cigar);
         refCoder.addRead(rec);
         readCoder.addRead(rec, ref);
@@ -29,7 +29,7 @@ namespace lae {
         }
     }
 
-    void FullLocalAssemblyEncoder::addPair(const util::SamRecord &rec1, const util::SamRecord &rec2) {
+    void FullLocalAssemblyEncoder::addPair(const format::sam::SamRecord &rec1, const format::sam::SamRecord &rec2) {
         std::string ref1 = refCoder.getReference(rec1.pos, rec1.cigar);
         std::string ref2 = refCoder.getReference(rec2.pos, rec2.cigar);
         refCoder.addRead(rec1);

@@ -26,7 +26,7 @@
 
 namespace spring {
 
-void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
+void generate_streams_SPRING(format::fastq::FastqFileReader *fastqFileReader1, format::fastq::FastqFileReader *fastqFileReader2,
                              int num_thr, bool paired_end, const std::string &working_dir, bool,
                              const std::string &outputFilePath, bool ureads_flag, bool preserve_quality,
                              bool preserve_id) {

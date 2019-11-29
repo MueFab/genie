@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
-#include <util/sam-file-reader.h>
+#include <format/sam/sam-file-reader.h>
 #include <iostream>
 #include "helpers.h"
 
 TEST(SamFileReader, Simple) {  // NOLINT(cert-err-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     util::SamFileReader reader(gitRootDir + "/resources/test-files/sam/four-reads-with-header.sam");
-    std::list<util::SamRecord> records;
+    std::list<format::sam::SamRecord> records;
 
     EXPECT_EQ(reader.header,
               "@HD\tVN:1.3\tSO:coordinate\n@PG\tID:Illumina.SecondaryAnalysis.SortedToBamConverter\n@SQ\tSN:EcoliDH10B."
@@ -53,7 +53,7 @@ TEST(SamFileReader, SimpleNoHeader) {  // NOLINT(cert-err-cpp)
 
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     util::SamFileReader reader(gitRootDir + "/resources/test-files/sam/four-reads-without-header.sam");
-    std::list<util::SamRecord> records;
+    std::list<format::sam::SamRecord> records;
     EXPECT_EQ(reader.header, "");
 }
 
@@ -62,7 +62,7 @@ TEST(SamFileReader, BlankLine) {  // NOLINT(cert-err-cpp)
 
     util::SamFileReader reader(gitRootDir + "/resources/test-files/sam/extraneous-blank-line.sam");
 
-    std::list<util::SamRecord> records;
+    std::list<format::sam::SamRecord> records;
 
     EXPECT_THROW(reader.readRecords(4, &records), std::invalid_argument);
 }
@@ -72,7 +72,7 @@ TEST(SamFileReader, Truncated) {  // NOLINT(cert-err-cpp)
 
     util::SamFileReader reader(gitRootDir + "/resources/test-files/sam/truncated.sam");
 
-    std::list<util::SamRecord> records;
+    std::list<format::sam::SamRecord> records;
     reader.readRecords(4, &records);
 
     EXPECT_EQ(records.back().qname, "_5:1:10:7990:17938");

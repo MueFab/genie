@@ -9,17 +9,17 @@
 
 #include "fastq-file-reader.h"
 #include "fastq-record.h"
-#include "format/part2/parameter_set/qv_coding_config_1/qv_coding_config_1.h"
+#include "format/mpegg_p2/parameter_set/qv_coding_config_1/qv_coding_config_1.h"
 #include "genie-gabac-output-stream.h"
 #include "log.h"
 #include "util/exceptions.h"
 
-#include <format/part2/raw_reference.h>
+#include <format/mpegg_p2/raw_reference.h>
 #include <gabac/gabac.h>
 
-#include "format/part2/access_unit.h"
-#include "format/part2/clutter.h"
-#include "format/part2/parameter_set.h"
+#include "format/mpegg_p2/access_unit.h"
+#include "format/mpegg_p2/clutter.h"
+#include "format/mpegg_p2/parameter_set.h"
 #include "util/bitwriter.h"
 
 namespace genie {
@@ -52,7 +52,7 @@ std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
 
 std::vector<std::vector<gabac::DataBlock>> create_default_streams() {
     std::vector<std::vector<gabac::DataBlock>> ret;
-    for (size_t i = 0; i < format::NUM_DESCRIPTORS; ++i) {
+    for (size_t i = 0; i < format::mpegg_p2::NUM_DESCRIPTORS; ++i) {
         ret.emplace_back();
     }
     return ret;
@@ -142,7 +142,7 @@ void encode(const ProgramOptions& programOptions) {
     // CREATE Part 2 units
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    using namespace format;
+    using namespace format::mpegg_p2;
     std::ofstream ofstr(programOptions.outputFilePath);
     util::BitWriter bw(&ofstr);
 
@@ -152,17 +152,17 @@ void encode(const ProgramOptions& programOptions) {
     const bool QV_PRESENT = false;
 
     RawReference r;
-    r.addSequence(make_unique<RawReferenceSequence>(0, 10, make_unique<std::string>("AAT")));
+    r.addSequence(util::make_unique<RawReferenceSequence>(0, 10, util::make_unique<std::string>("AAT")));
     r.write(&bw);
 
-    ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT, DataUnit::AuType::U_TYPE_AU, configs, false);
+    ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT, format::mpegg_rec::MpeggRecord::ClassType::CLASS_U, configs, false);
     ps.write(&bw);
 
-    ParameterSet ps2 = createQuickParameterSet(1, READ_LENGTH, PAIRED_END, QV_PRESENT, DataUnit::AuType::U_TYPE_AU, configs, false);
+    ParameterSet ps2 = createQuickParameterSet(1, READ_LENGTH, PAIRED_END, QV_PRESENT, format::mpegg_rec::MpeggRecord::ClassType::CLASS_U, configs, false);
     ps2.write(&bw);
 
     const uint32_t ACCESS_UNIT_ID = 0;
-  //  AccessUnit au = createQuickAccessUnit(ACCESS_UNIT_ID, PARAMETER_SET_ID, readNum, DataUnit::AuType::U_TYPE_AU, DataUnit::DatasetType::NON_ALIGNED, &generated_streams);
+  //  AccessUnit au = createQuickAccessUnit(ACCESS_UNIT_ID, PARAMETER_SET_ID, readNum, DataUnit::mpegg_rec::MpeggRecord::ClassType::CLASS_U, DataUnit::DatasetType::NON_ALIGNED, &generated_streams);
  //   au.write(&bw);
 
     GENIE_LOG_TRACE << "Number of bitstreams: " << generated_streams.size();

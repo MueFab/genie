@@ -107,7 +107,7 @@ void freeDataUnitAccessUnit(DataUnitAccessUnit* dataUnitAccessUnit);
 int getDataUnitAccessUnitId(DataUnitAccessUnit* dataUnitAccessUnit, uint32_t* accessUnitId);
 int getDataUnitNumBlocks(DataUnitAccessUnit* dataUnitAccessUnit, uint8_t* numBlocks);
 int getDataUnitParameterSetId(DataUnitAccessUnit* dataUnitAccessUnit, uint8_t* parameterSetId);
-int getDataUnitAUType(DataUnitAccessUnit* dataUnitAccessUnit, ClassType* auType);
+int getDataUnitmpegg_rec::MpeggRecord::ClassType(DataUnitAccessUnit* dataUnitAccessUnit, ClassType* mpegg_rec::MpeggRecord::ClassType);
 int getDataUnitReadsCount(DataUnitAccessUnit* dataUnitAccessUnit, uint32_t* readsCount);
 int getDataUnitMMThreshold(DataUnitAccessUnit* dataUnitAccessUnit, uint16_t* mmThreshold);
 int getDataUnitMMCount(DataUnitAccessUnit* dataUnitAccessUnit, uint32_t* mmCount);

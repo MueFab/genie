@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <util/sam-record.h>
+#include <format/sam/sam-record.h>
 #include <limits>
 
 namespace lae {
@@ -27,7 +27,7 @@ namespace lae {
     public:
         explicit LocalAssemblyReferenceEncoder(uint32_t _cr_buf_max_size);
 
-        void addRead(const util::SamRecord& rec);
+        void addRead(const format::sam::SamRecord& rec);
 
         std::string getReference(uint32_t pos_offset, const std::string &cigar);
 

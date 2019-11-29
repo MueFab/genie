@@ -27,7 +27,7 @@ namespace lae {
     }
 
     // !!! This is the function that we need to mimic in the MPEG-G reference software. !!!
-    void FullLocalAssemblyDecoder::decode(util::SamRecord *mpegg_record) {
+    void FullLocalAssemblyDecoder::decode(format::sam::SamRecord *mpegg_record) {
         // We first need to decode the (absolute) mapping position from pos and the read length from rlen
         mapping_pos += lrd.offsetOfNextRead();
         uint32_t read_len = lrd.lengthOfNextRead();
@@ -55,8 +55,8 @@ namespace lae {
     }
 
     // !!! This is the function that we need to mimic in the MPEG-G reference software. !!!
-    void FullLocalAssemblyDecoder::decodePair(util::SamRecord *mpegg_record_segment_1,
-                                              util::SamRecord *mpegg_record_segment_2) {
+    void FullLocalAssemblyDecoder::decodePair(format::sam::SamRecord *mpegg_record_segment_1,
+                                              format::sam::SamRecord *mpegg_record_segment_2) {
         mapping_pos += lrd.offsetOfNextRead();
         uint32_t read_len = lrd.lengthOfNextRead();
 
