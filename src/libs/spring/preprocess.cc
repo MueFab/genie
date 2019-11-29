@@ -15,9 +15,9 @@
 
 namespace spring {
 
-void preprocess(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
+void preprocess(format::fastq::FastqFileReader *fastqFileReader1, format::fastq::FastqFileReader *fastqFileReader2,
                 const std::string &temp_dir, compression_params &cp) {
-    util::FastqFileReader *fastqFileReader[2] = {fastqFileReader1, fastqFileReader2};
+    format::fastq::FastqFileReader *fastqFileReader[2] = {fastqFileReader1, fastqFileReader2};
     std::string outfileclean[2];
     std::string outfileN[2];
     std::string outfileorderN[2];
@@ -41,7 +41,7 @@ void preprocess(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *
     std::ofstream fout_id;
     std::ofstream fout_quality[2];
 
-    std::vector<util::FastqRecord> fastqRecords;
+    std::vector<format::fastq::FastqRecord> fastqRecords;
     for (int j = 0; j < 2; j++) {
         if (j == 1 && !cp.paired_end) continue;
         fout_clean[j].open(outfileclean[j]);

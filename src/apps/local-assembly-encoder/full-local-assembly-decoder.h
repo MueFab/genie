@@ -13,8 +13,8 @@
     public:
         FullLocalAssemblyDecoder(std::unique_ptr<StreamContainer> container, uint32_t cr_buf_size, bool _debug);
         ~FullLocalAssemblyDecoder();
-        void decode(util::SamRecord *mpegg_record);
-        void decodePair(util::SamRecord *mpegg_record_segment_1, util::SamRecord *mpegg_record_segment_2);
+        void decode(format::sam::SamRecord *mpegg_record);
+        void decodePair(format::sam::SamRecord *mpegg_record_segment_1, format::sam::SamRecord *mpegg_record_segment_2);
     private:
         void init(uint32_t cr_buf_max_size);
     };

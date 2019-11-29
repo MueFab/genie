@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
-#include <util/fastq-file-reader.h>
+#include <format/fastq/fastq-file-reader.h>
 #include "helpers.h"
 
 TEST(FastqFileReader, Simplest) {  // NOLINT(cert-err-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
-    util::FastqFileReader reader(gitRootDir + "/resources/test-files/fastq/simplest.fastq");
+    format::fastq::FastqFileReader reader(gitRootDir + "/resources/test-files/fastq/simplest.fastq");
 
-    std::vector<util::FastqRecord> records;
+    std::vector<format::fastq::FastqRecord> records;
     reader.readRecords(1, &records);
 
     EXPECT_EQ(records.size(), 1);
@@ -20,9 +20,9 @@ TEST(FastqFileReader, Simplest) {  // NOLINT(cert-err-cpp)
 TEST(FastqFileReader, FourteenRecords) {  // NOLINT(cert-err-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
-    util::FastqFileReader reader(gitRootDir + "/resources/test-files/fastq/fourteen-gattaca-records.fastq");
+    format::fastq::FastqFileReader reader(gitRootDir + "/resources/test-files/fastq/fourteen-gattaca-records.fastq");
 
-    std::vector<util::FastqRecord> records;
+    std::vector<format::fastq::FastqRecord> records;
     reader.readRecords(14, &records);
 
     EXPECT_EQ(records.size(), 14);
@@ -40,9 +40,9 @@ TEST(FastqFileReader, FourteenRecords) {  // NOLINT(cert-err-cpp)
 TEST(FastqFileReader, BlankLine) {  // NOLINT(cert-err-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
-    util::FastqFileReader reader(gitRootDir + "/resources/test-files/fastq/blank-line.fastq");
+    format::fastq::FastqFileReader reader(gitRootDir + "/resources/test-files/fastq/blank-line.fastq");
 
-    std::vector<util::FastqRecord> records;
+    std::vector<format::fastq::FastqRecord> records;
     reader.readRecords(2, &records);
 
     EXPECT_EQ(records.size(), 2);
@@ -60,8 +60,8 @@ TEST(FastqFileReader, BlankLine) {  // NOLINT(cert-err-cpp)
 TEST(FastqFileReader, Truncated) {  // NOLINT(cert-err-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
-    util::FastqFileReader reader(gitRootDir + "/resources/test-files/fastq/fourteen-gattaca-records-truncated.fastq");
+    format::fastq::FastqFileReader reader(gitRootDir + "/resources/test-files/fastq/fourteen-gattaca-records-truncated.fastq");
 
-    std::vector<util::FastqRecord> records;
+    std::vector<format::fastq::FastqRecord> records;
     EXPECT_THROW(reader.readRecords(14, &records), std::runtime_error);
 }

@@ -480,9 +480,9 @@ DatasetContainer* parseDatasetContainer(uint64_t boxContentSize, FILE* inputFile
                 return NULL;
             }
             addAccessUnitToDataset(datasetContainer, accessUnitContainer);
-            ClassType auType = accessUnitContainer->accessUnitHeader->au_type;
+            ClassType mpegg_rec::MpeggRecord::ClassType = accessUnitContainer->accessUnitHeader->au_type;
             uint8_t class_index;
-            getClassIndexForType(datasetContainer->datasetHeader, auType, &class_index);
+            getClassIndexForType(datasetContainer->datasetHeader, mpegg_rec::MpeggRecord::ClassType, &class_index);
             uint32_t accessUnitID = accessUnitContainer->accessUnitHeader->access_unit_ID;
 
             uint16_t sequencesCount = getSequencesCount(datasetContainer->datasetHeader);

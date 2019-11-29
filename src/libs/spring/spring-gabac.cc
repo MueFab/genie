@@ -1,9 +1,9 @@
 // Copyright 2018 The genie authors
 
 #include "spring-gabac.h"
-#include <format/part2/access_unit.h>
-#include <format/part2/clutter.h>
-#include <format/part2/parameter_set.h>
+#include <format/mpegg_p2/access_unit.h>
+#include <format/mpegg_p2/clutter.h>
+#include <format/mpegg_p2/parameter_set.h>
 #include <fstream>
 
 namespace spring {
@@ -68,8 +68,8 @@ void gabac_compress(const gabac::EncodingConfiguration &conf, gabac::DataBlock *
 }
 
 std::vector<std::vector<gabac::DataBlock>> generate_empty_raw_data() {
-    std::vector<std::vector<gabac::DataBlock>> raw_data(format::NUM_DESCRIPTORS);
-    for (size_t descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
+    std::vector<std::vector<gabac::DataBlock>> raw_data(format::mpegg_p2::NUM_DESCRIPTORS);
+    for (size_t descriptor = 0; descriptor < format::mpegg_p2::NUM_DESCRIPTORS; ++descriptor) {
         if (descriptor == 15) {
             raw_data[descriptor].resize(128 * 6);
             for (int i = 0; i < 128; i++) {
@@ -78,8 +78,8 @@ std::vector<std::vector<gabac::DataBlock>> generate_empty_raw_data() {
                 }
             }
         } else {
-            raw_data[descriptor].resize(format::getDescriptorProperties()[descriptor].number_subsequences);
-            for (int subseq = 0; subseq < format::getDescriptorProperties()[descriptor].number_subsequences; subseq++) {
+            raw_data[descriptor].resize(format::mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences);
+            for (int subseq = 0; subseq < format::mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences; subseq++) {
                 raw_data[descriptor][subseq].setWordSize(4);
             }
         }
@@ -88,12 +88,12 @@ std::vector<std::vector<gabac::DataBlock>> generate_empty_raw_data() {
 }
 
 std::vector<std::vector<std::vector<gabac::DataBlock>>> create_default_streams() {
-    std::vector<std::vector<std::vector<gabac::DataBlock>>> ret(format::NUM_DESCRIPTORS);
-    for (size_t descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
+    std::vector<std::vector<std::vector<gabac::DataBlock>>> ret(format::mpegg_p2::NUM_DESCRIPTORS);
+    for (size_t descriptor = 0; descriptor < format::mpegg_p2::NUM_DESCRIPTORS; ++descriptor) {
         if (descriptor == 15)
             ret[descriptor].resize(128 * 6);
         else
-            ret[descriptor].resize(format::getDescriptorProperties()[descriptor].number_subsequences);
+            ret[descriptor].resize(format::mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences);
     }
     return ret;
 }

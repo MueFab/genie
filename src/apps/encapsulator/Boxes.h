@@ -807,7 +807,7 @@ struct AccessUnitHeader_ {
     uint64_t ref_end_position;
 
     // if MIT_flag == 0
-    // if AU_type != U_TYPE_AU || dataset_type == 2
+    // if AU_type != CLASS_U || dataset_type == 2
     SequenceID sequence_ID;
     uint64_t AU_start_position;
     uint64_t AU_end_position;

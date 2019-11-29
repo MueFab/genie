@@ -2,8 +2,8 @@
 
 #include <map>
 #include <util/log.h>
-#include <util/sam-file-reader.h>
-#include <util/sam-record.h>
+#include <format/sam/sam-file-reader.h>
+#include <format/sam/sam-record.h>
 #include "util/exceptions.h"
 #include "full-local-assembly-decoder.h"
 #include "full-local-assembly-encoder.h"
@@ -11,9 +11,9 @@
 
 #include <fstream>
 #include <util/bitwriter.h>
-#include <format/part2/parameter_set.h>
-#include <format/part2/access_unit.h>
-#include <format/part2/clutter.h>
+#include <format/mpegg_p2/parameter_set.h>
+#include <format/mpegg_p2/access_unit.h>
+#include <format/mpegg_p2/clutter.h>
 
 namespace lae {
 
@@ -44,40 +44,40 @@ namespace lae {
     }
 
     std::vector<std::vector<std::vector<gabac::DataBlock>>> create_default_streams() {
-        std::vector<std::vector<std::vector<gabac::DataBlock>>> ret(format::NUM_DESCRIPTORS);
-        for(size_t descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
-            ret[descriptor].resize(format::getDescriptorProperties()[descriptor].number_subsequences);
+        std::vector<std::vector<std::vector<gabac::DataBlock>>> ret(format::mpegg_p2::NUM_DESCRIPTORS);
+        for(size_t descriptor = 0; descriptor < format::mpegg_p2::NUM_DESCRIPTORS; ++descriptor) {
+            ret[descriptor].resize(format::mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences);
         }
         return ret;
     }
 
 
     std::vector<std::vector<gabac::DataBlock>> translateToSimpleArray(StreamContainer* container) {
-        std::vector<std::vector<gabac::DataBlock>> ret(format::NUM_DESCRIPTORS);
-        for(size_t descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
-            ret[descriptor].resize(format::getDescriptorProperties()[descriptor].number_subsequences);
+        std::vector<std::vector<gabac::DataBlock>> ret(format::mpegg_p2::NUM_DESCRIPTORS);
+        for(size_t descriptor = 0; descriptor < format::mpegg_p2::NUM_DESCRIPTORS; ++descriptor) {
+            ret[descriptor].resize(format::mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences);
         }
 
-        ret[uint8_t (format::GenomicDescriptor::pos)][0].swap(&container->pos_0);
-        ret[uint8_t (format::GenomicDescriptor::rcomp)][0].swap(&container->rcomp_0);
-        ret[uint8_t (format::GenomicDescriptor::flags)][0].swap(&container->flags_0);
-        ret[uint8_t (format::GenomicDescriptor::flags)][1].swap(&container->flags_1);
-        ret[uint8_t (format::GenomicDescriptor::flags)][2].swap(&container->flags_2);
-        ret[uint8_t (format::GenomicDescriptor::mmpos)][0].swap(&container->mmpos_0);
-        ret[uint8_t (format::GenomicDescriptor::mmpos)][1].swap(&container->mmpos_1);
-        ret[uint8_t (format::GenomicDescriptor::mmtype)][0].swap(&container->mmtype_0);
-        ret[uint8_t (format::GenomicDescriptor::mmtype)][1].swap(&container->mmtype_1);
-        ret[uint8_t (format::GenomicDescriptor::mmtype)][2].swap(&container->mmtype_2);
-        ret[uint8_t (format::GenomicDescriptor::clips)][0].swap(&container->clips_0);
-        ret[uint8_t (format::GenomicDescriptor::clips)][1].swap(&container->clips_1);
-        ret[uint8_t (format::GenomicDescriptor::clips)][2].swap(&container->clips_2);
-        ret[uint8_t (format::GenomicDescriptor::clips)][3].swap(&container->clips_3);
-        ret[uint8_t (format::GenomicDescriptor::pair)][0].swap(&container->pair_0);
-        ret[uint8_t (format::GenomicDescriptor::pair)][1].swap(&container->pair_1);
-        ret[uint8_t (format::GenomicDescriptor::mscore)][0].swap(&container->mscore_0);
-        ret[uint8_t (format::GenomicDescriptor::rlen)][0].swap(&container->rlen_0);
-        ret[uint8_t (format::GenomicDescriptor::rtype)][0].swap(&container->rtype_0);
-        ret[uint8_t (format::GenomicDescriptor::ureads)][0].swap(&container->ureads_0);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::pos)][0].swap(&container->pos_0);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::rcomp)][0].swap(&container->rcomp_0);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::flags)][0].swap(&container->flags_0);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::flags)][1].swap(&container->flags_1);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::flags)][2].swap(&container->flags_2);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::mmpos)][0].swap(&container->mmpos_0);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::mmpos)][1].swap(&container->mmpos_1);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::mmtype)][0].swap(&container->mmtype_0);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::mmtype)][1].swap(&container->mmtype_1);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::mmtype)][2].swap(&container->mmtype_2);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::clips)][0].swap(&container->clips_0);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::clips)][1].swap(&container->clips_1);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::clips)][2].swap(&container->clips_2);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::clips)][3].swap(&container->clips_3);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::pair)][0].swap(&container->pair_0);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::pair)][1].swap(&container->pair_1);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::mscore)][0].swap(&container->mscore_0);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::rlen)][0].swap(&container->rlen_0);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::rtype)][0].swap(&container->rtype_0);
+        ret[uint8_t (format::mpegg_p2::GenomicDescriptor::ureads)][0].swap(&container->ureads_0);
 
         return ret;
     }
@@ -101,7 +101,7 @@ namespace lae {
 
     void pack(const ProgramOptions &programOptions, std::unique_ptr<StreamContainer> container, uint32_t read_length,
               uint32_t readNum, bool paired) {
-        using namespace format;
+        using namespace format::mpegg_p2;
         /////////////////////////////////////////////////////////////////////////////////////////////////////
         // ENTROPY ENCODE
         /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,8 +114,8 @@ namespace lae {
             container->rlen_0.clear();
         }
 
-        for(size_t descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
-            for(size_t subdescriptor = 0; subdescriptor < format::getDescriptorProperties()[descriptor].number_subsequences; ++subdescriptor) {
+        for(size_t descriptor = 0; descriptor < format::mpegg_p2::NUM_DESCRIPTORS; ++descriptor) {
+            for(size_t subdescriptor = 0; subdescriptor < format::mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences; ++subdescriptor) {
                 compress(configs[descriptor][subdescriptor], &raw_data[descriptor][subdescriptor], &generated_streams[descriptor][subdescriptor]);
             }
         }
@@ -133,8 +133,8 @@ namespace lae {
         const bool QV_PRESENT = false;
 
         ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, paired, QV_PRESENT, programOptions.type, configs, false);
-        auto crps = make_unique<ParameterSetCrps>(ParameterSetCrps::CrAlgId::LOCAL_ASSEMBLY);
-        crps->setCrpsInfo(make_unique<CrpsInfo>(0, 1000));
+        auto crps = util::make_unique<ParameterSetCrps>(ParameterSetCrps::CrAlgId::LOCAL_ASSEMBLY);
+        crps->setCrpsInfo(util::make_unique<CrpsInfo>(0, 1000));
         ps.setCrps(std::move(crps));
         ps.write(&bw);
 
@@ -147,7 +147,7 @@ namespace lae {
         LOG_DEBUG << "Encoding";
         LOG_INFO << "Input file: " << programOptions.inputFilePath;
 
-        util::SamFileReader samFileReader(programOptions.inputFilePath);
+        format::sam::SamFileReader samFileReader(programOptions.inputFilePath);
 
         size_t blockSize = 10000;
         bool singleEnd = false;
@@ -157,9 +157,9 @@ namespace lae {
         uint32_t read_length = std::numeric_limits<uint32_t>::max();
         while (true) {
             // Read a block of SAM records
-            std::list<util::SamRecord> samRecords;
+            std::list<format::sam::SamRecord> samRecords;
             samFileReader.readRecords(blockSize, &samRecords);
-            std::list<util::SamRecord> samRecordsCopy(samRecords);
+            std::list<format::sam::SamRecord> samRecordsCopy(samRecords);
             LOG_TRACE << "Read " << samRecords.size() << " SAM record(s)";
             for (const auto &samRecord : samRecords) {
                 record_counter++;
@@ -229,8 +229,8 @@ namespace lae {
 
 #if 0
         FullLocalAssemblyDecoder decoder(encoder.pollStreams(), SEQUENCE_BUFFER_SIZE, true);
-        util::SamRecord s;
-        util::SamRecord s2;
+        format::mpegg_p2::sam::SamRecord s;
+        format::mpegg_p2::sam::SamRecord s2;
         if (singleEnd) {
             for (uint32_t i = 0; i < record_counter; ++i) {
                 decoder.decode(&s);

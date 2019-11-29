@@ -58,7 +58,7 @@ namespace lae {
         return result;
     }
 
-    void LocalAssemblyReferenceEncoder::addRead(const util::SamRecord& s) {
+    void LocalAssemblyReferenceEncoder::addRead(const format::sam::SamRecord& s) {
         sequence_positions.push_back(s.pos);
         std::string read = preprocess(s.seq, s.cigar);
         sequences.push_back(read);

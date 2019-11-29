@@ -24,6 +24,9 @@ class BitReader {
 
     bool skipNBits(uint32_t bitsToSkip);
 
+    uint64_t read(uint8_t bits);
+    void read(std::istream *in);
+
     bool isGood();
 
     void setFailBit() { m_istream->setstate(std::ios::failbit); }
