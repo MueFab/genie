@@ -27,6 +27,8 @@ namespace format {
 
             static std::unique_ptr<ExternalAlignment> factory(util::BitReader *reader);
 
+            virtual std::unique_ptr<ExternalAlignment> clone () const = 0;
+
         protected:
             MoreAlignmentInfoType moreAlignmentInfoType;
         };

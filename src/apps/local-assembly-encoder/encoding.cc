@@ -14,6 +14,11 @@
 #include <format/mpegg_p2/parameter_set.h>
 #include <format/mpegg_p2/access_unit.h>
 #include <format/mpegg_p2/clutter.h>
+#include <format/sam/sam-importer.h>
+#include <coding/local-assembly-encoder.h>
+#include <coding/gabac-compressor.h>
+#include <format/mpegg_p2/mpegg-p-2-exporter.h>
+#include <coding/stream-container.h>
 
 namespace lae {
 
@@ -144,7 +149,24 @@ namespace lae {
     }
 
     void encode(const ProgramOptions &programOptions) {
-        LOG_DEBUG << "Encoding";
+
+        std::ifstream infile("test.sam");
+        SamImporter samimporter(10000, &infile);
+        LocalAssemblyEncoder laencoder(1000);
+        GabacCompressor gabacCompressor;
+
+        std::ofstream file("test.sam");
+        MpeggP2Exporter exporter;
+
+        samimporter.setDrain(&laencoder);
+        laencoder.setDrain(&gabacCompressor);
+        gabacCompressor.setDrain(&exporter);
+
+        samimporter.go();
+
+
+
+      /*  LOG_DEBUG << "Encoding";
         LOG_INFO << "Input file: " << programOptions.inputFilePath;
 
         format::sam::SamFileReader samFileReader(programOptions.inputFilePath);
@@ -242,7 +264,7 @@ namespace lae {
         }
 #else
         pack(programOptions, encoder.pollStreams(), read_length, record_counter, !singleEnd);
-#endif
+#endif */
 
     }
 

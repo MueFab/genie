@@ -5,6 +5,7 @@
 #include <vector>
 #include <format/sam/sam-record.h>
 #include <limits>
+#include <format/mpegg_rec/mpegg-record.h>
 
 namespace lae {
 
@@ -27,7 +28,7 @@ namespace lae {
     public:
         explicit LocalAssemblyReferenceEncoder(uint32_t _cr_buf_max_size);
 
-        void addRead(const format::sam::SamRecord& rec);
+        void addRead(const format::mpegg_rec::MpeggRecord* s);
 
         std::string getReference(uint32_t pos_offset, const std::string &cigar);
 

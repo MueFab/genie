@@ -21,6 +21,16 @@ namespace format {
                     uint64_t _split_pos,
                     uint16_t _split_seq_ID
             );
+
+            explicit SplitAlignmentOtherRec(
+                    util::BitReader* reader
+            );
+
+            SplitAlignmentOtherRec();
+
+            void write(util::BitWriter *writer) const override;
+
+            virtual std::unique_ptr<SplitAlignment> clone () const;
         };
     }
 }

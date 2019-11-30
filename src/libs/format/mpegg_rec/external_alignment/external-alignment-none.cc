@@ -1,5 +1,7 @@
 #include "external-alignment-none.h"
 
+#include <util/make_unique.h>
+
 namespace format {
     namespace mpegg_rec {
         ExternalAlignmentNone::ExternalAlignmentNone()
@@ -7,13 +9,13 @@ namespace format {
 
         }
 
-        ExternalAlignmentNone::ExternalAlignmentNone(util::BitReader *reader)
-                : ExternalAlignment(ExternalAlignment::MoreAlignmentInfoType::NONE) {
-
+        void ExternalAlignmentNone::write(util::BitWriter *writer) const {
+            ExternalAlignment::write(writer);
         }
 
-        void ExternalAlignmentNone::write(util::BitWriter *writer) const {
-
+        std::unique_ptr<ExternalAlignment> ExternalAlignmentNone::clone () const {
+            auto ret = util::make_unique<ExternalAlignmentNone>();
+            return ret;
         }
 
     }

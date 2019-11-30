@@ -5,11 +5,6 @@
 #include <memory>
 #include <vector>
 
-#include "alignment-container.h"
-#include "external-alignment.h"
-#include "meta-alignment.h"
-#include "segment.h"
-
 namespace util {
     class BitWriter;
     class BitReader;
@@ -17,6 +12,10 @@ namespace util {
 
 namespace format {
     namespace mpegg_rec {
+        class MetaAlignment;
+        class Segment;
+        class AlignmentContainer;
+        class ExternalAlignment;
         class MpeggRecord {
         public:
             enum class ClassType : uint8_t {
@@ -32,7 +31,7 @@ namespace format {
             uint8_t number_of_template_segments : 8;
             //uint8_t number_of_record_segments : 8;
             //uint16_t number_of_alignments : 16;
-            ClassType class_ID : 8;
+            ClassType class_ID;
             //uint8_t read_group_len : 8;
             uint8_t read_1_first : 8;
             // if(number_of_alignments > 0)
@@ -53,10 +52,8 @@ namespace format {
             uint8_t flags : 8;
 
             std::unique_ptr<ExternalAlignment> moreAlignmentInfo;
-
-            MpeggRecord();
-
         public:
+            MpeggRecord();
             MpeggRecord(
                     uint8_t _number_of_template_segments,
                     ClassType _auTypeCfg,
@@ -71,12 +68,27 @@ namespace format {
 
             void addAlignment(uint16_t _seq_id, std::unique_ptr<AlignmentContainer> rec);
 
+            const Segment* getRecordSegment(size_t index) const;
+
+            size_t getNumberOfRecords() const;
+
+            size_t getNumberOfAlignments() const;
+
+            const AlignmentContainer* getAlignment(size_t index) const;
+
             virtual void write(util::BitWriter *writer) const;
 
             std::unique_ptr<MpeggRecord> clone() const;
+
+            uint8_t getFlags() const;
+
+            ClassType getClassID() const;
         };
+
+        typedef std::vector<std::unique_ptr<MpeggRecord>> MpeggChunk;
     }
 }
+
 
 
 #endif //GENIE_MPEGG_RECORD_H

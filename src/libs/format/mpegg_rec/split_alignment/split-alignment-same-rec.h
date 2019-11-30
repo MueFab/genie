@@ -3,9 +3,8 @@
 
 #include <cstdint>
 #include <memory>
+#include <format/mpegg_rec/alignment.h>
 
-#include "alignment.h"
-#include "split-alignment.h"
 
 namespace util {
     class BitWriter;
@@ -20,10 +19,25 @@ namespace format {
             std::unique_ptr<Alignment> alignment;
 
         public:
+            SplitAlignmentSameRec();
+
             SplitAlignmentSameRec(
                     int64_t _delta,
                     std::unique_ptr<Alignment> _alignment
             );
+
+            explicit SplitAlignmentSameRec(
+                    uint8_t as_depth,
+                    util::BitReader* reader
+            );
+
+            void write(util::BitWriter *writer) const override;
+
+            const Alignment* getAlignment() const;
+
+            int64_t getDelta() const;
+
+            std::unique_ptr<SplitAlignment> clone () const override;
         };
     }
 }

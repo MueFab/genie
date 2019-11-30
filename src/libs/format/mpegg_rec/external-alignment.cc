@@ -1,6 +1,7 @@
 #include "external-alignment.h"
 
 #include <util/bitreader.h>
+#include <util/bitwriter.h>
 #include <util/exceptions.h>
 #include <util/make_unique.h>
 
@@ -15,14 +16,14 @@ namespace format {
         }
 
         void ExternalAlignment::write(util::BitWriter *writer) const {
-
+            writer->write(uint8_t (moreAlignmentInfoType), 8);
         }
 
         std::unique_ptr<ExternalAlignment> ExternalAlignment::factory(util::BitReader *reader) {
             auto type = MoreAlignmentInfoType(reader->read(8));
             switch (type) {
                 case MoreAlignmentInfoType::NONE:
-                    return util::make_unique<ExternalAlignmentNone>(reader);
+                    return util::make_unique<ExternalAlignmentNone>();
                 case MoreAlignmentInfoType::OTHER_REC:
                     return util::make_unique<ExternalAlignmentOtherRec>(reader);
                 default:

@@ -13,8 +13,7 @@ namespace lae {
     public:
         explicit FullLocalAssemblyEncoder(uint32_t cr_buf_max_size, bool _debug);
 
-        void add(const format::sam::SamRecord &rec);
-        void addPair(const format::sam::SamRecord &rec1, const format::sam::SamRecord &rec2);
+        void add(const format::mpegg_rec::MpeggRecord *rec);
 
         std::unique_ptr<StreamContainer> pollStreams();
     };

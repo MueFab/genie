@@ -1,10 +1,11 @@
 #ifndef GENIE_FORMAT_EXPORTER_H
 #define GENIE_FORMAT_EXPORTER_H
 
-class FormatExport {
+#include "block-payload.h"
+#include <memory>
+
+class FormatExporter : public Drain<std::unique_ptr<BlockPayload>>{
 public:
-    ~FormatExport() = default;
-    virtual void exportBlock(std::vector<MpeggRecord>* vec) = 0;
 };
 
 #endif //GENIE_FORMAT_EXPORTER_H
