@@ -13,9 +13,10 @@ namespace format {
         class ExternalAlignmentNone : public ExternalAlignment {
         public:
             ExternalAlignmentNone();
-            explicit ExternalAlignmentNone(util::BitReader *reader);
 
             void write(util::BitWriter *writer) const override;
+
+            virtual std::unique_ptr<ExternalAlignment> clone () const;
         };
     }
 }

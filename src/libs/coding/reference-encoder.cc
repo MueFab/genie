@@ -2,6 +2,9 @@
 #include "util/exceptions.h"
 #include <map>
 #include <limits>
+#include <format/mpegg_rec/mpegg-record.h>
+#include <format/mpegg_rec/alignment-container.h>
+#include <format/mpegg_rec/segment.h>
 
 namespace lae {
 
@@ -22,9 +25,12 @@ namespace lae {
                 continue;
             }
             switch (cigar[cigar_pos]) {
-                case 'M':
                 case '=':
-                case 'X':
+                case 'A':
+                case 'C':
+                case 'T':
+                case 'G':
+                case 'N':
                     for (size_t i = 0; i < count; ++i) {
                         if (read_pos >= read.length()) {
                             UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
@@ -33,15 +39,12 @@ namespace lae {
                     }
                     break;
 
-                case 'I':
-                case 'S':
-                case 'P':
+                case '+':
                     read_pos += count;
                     break;
 
-                case 'N':
-                case 'D':
-                case 'H':
+                case '-':
+                case '*':
                     for (size_t i = 0; i < count; ++i) {
                         result += '0';
                     }
@@ -58,9 +61,34 @@ namespace lae {
         return result;
     }
 
-    void LocalAssemblyReferenceEncoder::addRead(const format::sam::SamRecord& s) {
-        sequence_positions.push_back(s.pos);
-        std::string read = preprocess(s.seq, s.cigar);
+    void LocalAssemblyReferenceEncoder::addRead(const format::mpegg_rec::MpeggRecord* s) {
+        sequence_positions.push_back(s->getAlignment(0)->getPosition());
+        std::string read = preprocess(*s->getRecordSegment(0)->getSequence(), *s->getAlignment(0)->getAlignment()->getECigar());
+        sequences.push_back(read);
+        crBufSize += read.length();
+
+        while (crBufSize > cr_buf_max_size) {
+            if (sequences.size() == 1) {
+                UTILS_THROW_RUNTIME_EXCEPTION("Read too long for current cr_buf_max_size");
+            }
+            // Erase oldest read
+            crBufSize -= sequences.front().length();
+            sequences.erase(sequences.begin());
+            sequence_positions.erase(sequence_positions.begin());
+        }
+
+        if(s->getNumberOfRecords() == 1) {
+            return;
+        }
+
+        const format::mpegg_rec::SplitAlignmentSameRec* rec;
+        if(s->getAlignment(0)->getSplitAlignment(0)->getType() == format::mpegg_rec::SplitAlignment::SplitAlignmentType::SAME_REC) {
+            rec = dynamic_cast<const format::mpegg_rec::SplitAlignmentSameRec*>(s->getAlignment(0)->getSplitAlignment(0));
+        } else {
+            UTILS_DIE("Only same record split alignments supported");
+        }
+        sequence_positions.push_back(s->getAlignment(0)->getPosition() + rec->getDelta());
+        read = preprocess(*s->getRecordSegment(1)->getSequence(), *rec->getAlignment()->getECigar());
         sequences.push_back(read);
         crBufSize += read.length();
 
@@ -93,11 +121,8 @@ namespace lae {
                 continue;
             }
             switch (cigar[cigar_pos]) {
-                case 'M':
                 case '=':
-                case 'X':
-                case 'D':
-                case 'N':
+                case '-':
                     len += count;
                     count = 0;
                     break;

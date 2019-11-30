@@ -26,7 +26,10 @@ namespace format {
             }
         }
 
-        SamFileReader::SamFileReader(const std::string &path) : FileReader(path) { readHeader(); }
+        SamFileReader::SamFileReader(std::istream* _in)  : in(_in)
+        {
+            readHeader();
+        }
 
         SamFileReader::~SamFileReader() = default;
 
@@ -34,7 +37,7 @@ namespace format {
             for (size_t i = 0; i < numRecords; i++) {
                 // Read a line
                 std::string line;
-                readLine(&line);
+                std::getline(*in, line);
                 if (line.empty()) {
                     break;
                 }
@@ -53,17 +56,17 @@ namespace format {
 
         void SamFileReader::readHeader() {
             // Set file pointer to the beginning of the file
-            seekFromSet(0);
+            in->seekg(0, std::ios::seekdir::_S_beg);
 
             size_t fpos = 0;
 
             while (true) {
                 // Remember the file pointer position
-                fpos = tell();
+                fpos = in->tellg();
 
                 // Read a line
                 std::string line;
-                readLine(&line);
+                std::getline(*in, line);
 
                 // Add the line contents to the header
                 if (line[0] == '@') {
@@ -75,7 +78,7 @@ namespace format {
             }
 
             // Rewind to the beginning of the the alignment section
-            seekFromSet(fpos);
+            in->seekg(fpos);
 
             if (header.empty()) {
                 LOG_WARNING << "SAM header not present";

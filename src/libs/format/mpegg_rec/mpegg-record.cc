@@ -1,11 +1,14 @@
 #include "mpegg-record.h"
 
-#include "external_alignment/external-alignment-none.h"
-
 #include <util/bitreader.h>
 #include <util/bitwriter.h>
 #include <util/exceptions.h>
 #include <util/make_unique.h>
+
+#include "alignment-container.h"
+#include "external_alignment/external-alignment-none.h"
+#include "meta-alignment.h"
+#include "segment.h"
 
 namespace format {
     namespace mpegg_rec {
@@ -69,11 +72,11 @@ namespace format {
 
             size_t index = 0;
             for (auto &r : reads) {
-                r = util::make_unique<Segment>(readSizes[index], reader);
+                r = util::make_unique<Segment>(readSizes[index], uint8_t (qv_depth), reader);
                 ++index;
             }
             for (auto &a : alignmentInfo) {
-                a = util::make_unique<AlignmentContainer>(reader);
+                a = util::make_unique<AlignmentContainer>(class_ID,  sharedAlignmentInfo->getAsDepth(), uint8_t (number_of_template_segments), reader);
             }
             flags = reader->read(8);
             moreAlignmentInfo = ExternalAlignment::factory(reader);
@@ -92,7 +95,10 @@ namespace format {
         void MpeggRecord::addAlignment(uint16_t _seq_id, std::unique_ptr <AlignmentContainer> rec) {
             if (sharedAlignmentInfo) {
                 if (rec->getAsDepth() != sharedAlignmentInfo->getAsDepth()) {
-                    UTILS_DIE("Incompatible as depth");
+                    UTILS_DIE("Incompatible AS depth");
+                }
+                if (rec->getNumberOfTemplateSegments() != number_of_template_segments) {
+                    UTILS_DIE("Incompatible number_of_template_segments");
                 }
                 if (_seq_id != sharedAlignmentInfo->getSeqID()) {
                     UTILS_DIE("Incompatible seq id");
@@ -101,6 +107,28 @@ namespace format {
                 sharedAlignmentInfo = util::make_unique<MetaAlignment>(_seq_id, rec->getAsDepth());
             }
             alignmentInfo.push_back(std::move(rec));
+        }
+
+        const Segment* MpeggRecord::getRecordSegment(size_t index) const {
+            if (index != reads.size()) {
+                UTILS_DIE("Index out of bounds");
+            }
+            return reads[index].get();
+        }
+
+        size_t MpeggRecord::getNumberOfRecords() const {
+            return reads.size();
+        }
+
+        size_t MpeggRecord::getNumberOfAlignments() const {
+            return alignmentInfo.size();
+        }
+
+        const AlignmentContainer* MpeggRecord::getAlignment(size_t index) const {
+            if (index != alignmentInfo.size()) {
+                UTILS_DIE("Index out of bounds");
+            }
+            return alignmentInfo[index].get();
         }
 
         void MpeggRecord::write(util::BitWriter *writer) const {
@@ -135,9 +163,40 @@ namespace format {
         }
 
         std::unique_ptr <MpeggRecord> MpeggRecord::clone() const {
-            std::unique_ptr <MpeggRecord> ret;
+            auto ret = util::make_unique<MpeggRecord>();
+            ret->number_of_template_segments = this->number_of_template_segments;
+            ret->class_ID = this->class_ID;
+            ret->read_1_first = this->read_1_first;
+
+            if(this->sharedAlignmentInfo) {
+                ret->sharedAlignmentInfo = this->sharedAlignmentInfo->clone();
+            }
+
+            ret->qv_depth = this->qv_depth;
+            ret->read_name = util::make_unique<std::string>(*this->read_name);
+            ret->read_group = util::make_unique<std::string>(*this->read_group);
+
+            for(const auto& s : reads) {
+                ret->reads.push_back(s->clone());
+            }
+
+            for(const auto& a : alignmentInfo) {
+                ret->alignmentInfo.push_back(a->clone());
+            }
+
+            ret->flags = flags;
+
+            ret->moreAlignmentInfo = this->moreAlignmentInfo->clone();
 
             return ret;
+        }
+
+        uint8_t MpeggRecord::getFlags() const {
+            return flags;
+        }
+
+        MpeggRecord::ClassType MpeggRecord::getClassID() const {
+            return class_ID;
         }
     }
 }

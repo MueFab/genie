@@ -3,17 +3,18 @@
 
 #include <list>
 #include <string>
+#include <istream>
 #include "util/file-reader.h"
 #include "sam-record.h"
 
 namespace format {
     namespace sam {
 
-    class SamFileReader : public util::FileReader {
+    class SamFileReader {
         public:
-            explicit SamFileReader(const std::string &path);
+            explicit SamFileReader(std::istream* _in);
 
-            ~SamFileReader() override;
+            ~SamFileReader();
 
             size_t readRecords(size_t numRecords, std::list<SamRecord> *records);
 
@@ -22,6 +23,7 @@ namespace format {
 
         private:
             void readHeader();
+            std::istream* in;
         };
 
     }

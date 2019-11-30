@@ -2,6 +2,7 @@
 #define GENIE_SPLIT_ALIGNMENT_H
 
 #include <cstdint>
+#include <memory>
 
 namespace util {
     class BitWriter;
@@ -22,7 +23,17 @@ namespace format {
 
             virtual ~SplitAlignment() = default;
 
-        private:
+            virtual void write(util::BitWriter *writer) const;
+
+            static std::unique_ptr<SplitAlignment> factory(uint8_t as_depth, util::BitReader *reader);
+
+            virtual std::unique_ptr<SplitAlignment> clone () const = 0;
+
+            SplitAlignmentType getType () const {
+                return split_alignment;
+            }
+
+        protected:
             SplitAlignmentType split_alignment : 8;
 
         };

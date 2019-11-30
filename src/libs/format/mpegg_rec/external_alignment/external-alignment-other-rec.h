@@ -21,9 +21,13 @@ namespace format {
                     uint16_t _next_seq_ID
             );
 
+            ExternalAlignmentOtherRec();
+
             explicit ExternalAlignmentOtherRec(util::BitReader *reader);
 
             void write(util::BitWriter *writer) const override;
+
+            virtual std::unique_ptr<ExternalAlignment> clone () const;
         };
     }
 }
