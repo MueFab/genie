@@ -42,6 +42,8 @@ namespace format {
                          uint8_t _qv_depth, uint8_t _as_depth, bool _multiple_alignments_flag,
                          bool _spliced_reads_flag);
 
+            ParameterSet();
+
             void setCrps(std::unique_ptr<ParameterSetCrps> parameter_set_crps);
 
             void addClass(mpegg_rec::MpeggRecord::ClassType class_id, std::unique_ptr<QvCodingConfig> conf);

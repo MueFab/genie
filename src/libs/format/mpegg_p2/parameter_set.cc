@@ -63,6 +63,31 @@ namespace format {
             }
         }
 
+        ParameterSet::ParameterSet()
+                : DataUnit(DataUnitType::PARAMETER_SET),
+                  parameter_set_ID(0),
+                  parent_parameter_set_ID(0),
+                  dataset_type(DatasetType::ALIGNED),
+                  alphabet_ID(AlphabetID::ACGTN),
+                  read_length(0),
+                  number_of_template_segments_minus1(0),
+                  max_au_data_unit_size(0),
+                  pos_40_bits_flag(false),
+                  qv_depth(0),
+                  as_depth(0),
+                  class_IDs(0),
+                  descriptors(18),
+                  rgroup_IDs(0),
+                  multiple_alignments_flag(false),
+                  spliced_reads_flag(false),
+                  multiple_signature_base(0),
+                  u_signature_size(nullptr),
+                  qv_coding_configs(0),
+                  crps_flag(false),
+                  parameter_set_crps(nullptr) {
+
+        }
+
 // -----------------------------------------------------------------------------------------------------------------
 
         void ParameterSet::write(util::BitWriter *writer) const {

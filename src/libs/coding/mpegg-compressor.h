@@ -9,7 +9,7 @@
 #include <util/source.h>
 #include <format/block-payload.h>
 
-class MpeggCompressor : public Source<std::unique_ptr<BlockPayload>>, public Drain<std::unique_ptr<MpeggRawAu>>{
+class MpeggCompressor : public Source<std::unique_ptr<BlockPayloadSet>>, public Drain<std::unique_ptr<MpeggRawAu>>{
 public:
     void flowIn(std::unique_ptr<MpeggRawAu> t, size_t id) override = 0;
     void dryIn() override = 0;

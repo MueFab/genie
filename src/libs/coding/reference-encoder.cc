@@ -190,4 +190,12 @@ namespace lae {
         }
     }
 
+    uint64_t LocalAssemblyReferenceEncoder::getWindowBorder() {
+        uint64_t minPos = std::numeric_limits<uint64_t >::max();
+        for(auto &p : sequence_positions) {
+            minPos = std::min(minPos, p);
+        }
+        return minPos;
+    }
+
 }

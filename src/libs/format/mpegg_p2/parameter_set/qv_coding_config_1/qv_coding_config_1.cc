@@ -4,8 +4,8 @@
 
 namespace format {
     namespace mpegg_p2 {
-namespace qv_coding1 {
-    QvCodingConfig1::QvCodingConfig1() : QvCodingConfig1(QvpsPresetId::ASCII, false) {}
+        namespace qv_coding1 {
+            QvCodingConfig1::QvCodingConfig1() : QvCodingConfig1(QvpsPresetId::ASCII, false) {}
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -36,5 +36,5 @@ namespace qv_coding1 {
                 writer->write(qv_reverse_flag, 1);
             }
         }
-}  // namespace qv_coding1
+    }  // namespace qv_coding1
 }  // namespace format

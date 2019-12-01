@@ -30,7 +30,6 @@ namespace format {
                                uint32_t multiple_signature_base)
                 : DataUnit(DataUnitType::ACCESS_UNIT),
                   reserved(0),
-                  data_unit_size(0),
                   access_unit_ID(_access_unit_ID),
                   num_blocks(0),
                   parameter_set_ID(_parameter_set_ID),
@@ -95,11 +94,11 @@ namespace format {
             std::stringstream ss;
             util::BitWriter tmp_writer(&ss);
             preWrite(&tmp_writer);
+            for (auto &i : blocks) {
+                i->write(&tmp_writer);
+            }
             tmp_writer.flush();
             uint64_t bits = tmp_writer.getBitsWritten();
-            for (auto &i : blocks) {
-                bits += i->getTotalSize() * uint64_t(8);
-            }
             const uint64_t TYPE_SIZE_SIZE = 8 + 3 + 29;  // data_unit_type, reserved, data_unit_size
             bits += TYPE_SIZE_SIZE;
             const uint64_t bytes = bits / 8;
@@ -107,9 +106,6 @@ namespace format {
             // Now size is known, write to final destination
             writer->write(bytes, 29);
             writer->write(&ss);
-            for (auto &i : blocks) {
-                i->write(writer);
-            }
         }
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -137,7 +133,6 @@ namespace format {
 // -----------------------------------------------------------------------------------------------------------------
 
         void AccessUnit::addBlock(std::unique_ptr<Block> block) {
-            data_unit_size += block->getTotalSize();
             ++num_blocks;
             blocks.push_back(std::move(block));
         }

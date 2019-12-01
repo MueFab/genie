@@ -24,8 +24,8 @@ class BitReader {
 
     bool skipNBits(uint32_t bitsToSkip);
 
-    uint64_t read(uint8_t bits);
-    void read(std::istream *in);
+    uint64_t read(uint8_t){return 0;}
+    void read(std::istream *){}
 
     bool isGood();
 

@@ -19,7 +19,9 @@ public:
         drain = d;
     }
 
-    virtual void go(){};
+    virtual bool pump(){
+        return false;
+    }
 
     virtual ~Source () = default;
 };
