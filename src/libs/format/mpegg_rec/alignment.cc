@@ -70,7 +70,8 @@ namespace format {
         }
 
         std::unique_ptr<Alignment> Alignment::clone() const {
-
+            //TODO
+            return std::unique_ptr<Alignment>();
         }
     }
 }

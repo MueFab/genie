@@ -1,3 +1,5 @@
+#if 0
+
 #include <array>
 #include "parameter_set/descriptor_configuration_present/cabac/decoder_configuration_cabac.h"
 
@@ -255,9 +257,10 @@ namespace format {
                 } else {
                     payload = create_payload(&desc);
                 }
-                au.addBlock(std::unique_ptr<Block>(new Block(descriptor, &payload)));
+//                au.addBlock(std::unique_ptr<Block>(new Block(descriptor, &payload)));
             }
             return au;
         }
     }
 }  // namespace format
+#endif

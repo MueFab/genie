@@ -34,13 +34,7 @@ namespace lae {
 
         std::string getReference(uint32_t pos_offset, uint32_t len);
 
-        uint64_t getWindowBorder() {
-            uint64_t minPos = std::numeric_limits<uint64_t >::max();
-            for(auto &p : sequence_positions) {
-                minPos = std::min(minPos, p);
-            }
-            return minPos;
-        }
+        uint64_t getWindowBorder();
 
         void printWindow();
     };

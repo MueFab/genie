@@ -124,6 +124,10 @@ namespace format {
             return alignmentInfo.size();
         }
 
+        size_t MpeggRecord::getNumberOfTemplateSegments() const {
+            return number_of_template_segments;
+        }
+
         const AlignmentContainer* MpeggRecord::getAlignment(size_t index) const {
             if (index != alignmentInfo.size()) {
                 UTILS_DIE("Index out of bounds");

@@ -8,7 +8,7 @@ namespace format {
 namespace desc_conf_pres {
     DescriptorConfigurationPresent::DescriptorConfigurationPresent()
             : DescriptorConfiguration(DecCfgPreset::PRESENT), decoder_configuration(nullptr) {
-        decoder_configuration = util::make_unique<cabac::DecoderConfigurationCabac>(GenomicDescriptor::ureads);
+        decoder_configuration = util::make_unique<cabac::DecoderConfigurationCabac>(MpeggRawAu::GenomicDescriptor::UREADS);
     }
 
 // -----------------------------------------------------------------------------------------------------------------

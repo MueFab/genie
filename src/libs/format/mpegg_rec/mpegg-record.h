@@ -74,6 +74,8 @@ namespace format {
 
             size_t getNumberOfAlignments() const;
 
+            size_t getNumberOfTemplateSegments() const;
+
             const AlignmentContainer* getAlignment(size_t index) const;
 
             virtual void write(util::BitWriter *writer) const;

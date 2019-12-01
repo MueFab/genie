@@ -94,61 +94,60 @@ SamImporter::convert(const format::sam::SamRecord &r1, const format::sam::SamRec
     return ret;
 }
 
-SamImporter::SamImporter(size_t _blockSize, std::istream *_file) : file(_file), blockSize(_blockSize) {
+SamImporter::SamImporter(size_t _blockSize, std::istream *_file) : file(_file), blockSize(_blockSize),
+                                                                   samFileReader(_file), record_counter(0) {
 }
 
-void SamImporter::go() {
-    format::sam::SamFileReader samFileReader(file);
-    uint32_t record_counter = 0;
-    while (true) {
-        // Read a block of SAM records
-        auto chunk = util::make_unique<format::mpegg_rec::MpeggChunk>();
-        std::list<format::sam::SamRecord> samRecords;
-        samFileReader.readRecords(blockSize, &samRecords);
-        std::list<format::sam::SamRecord> samRecordsCopy(samRecords);
-        LOG_TRACE << "Read " << samRecords.size() << " SAM record(s)";
-        for (const auto &samRecord : samRecords) {
-            // Search for mate
-            std::string rnameSearchString;
-            if (samRecord.rnext == "=") {
-                rnameSearchString = samRecord.rname;
-            } else {
-                rnameSearchString = samRecord.rnext;
-            }
-            samRecordsCopy.erase(samRecordsCopy.begin());  // delete current record from the search space
-            bool foundMate = false;
-            for (auto it = samRecordsCopy.begin(); it != samRecordsCopy.end(); ++it) {
-                if (it->rname == rnameSearchString && it->pos == samRecord.pnext) {
-                    // LOG_TRACE << "Found mate";
+bool SamImporter::pump() {
+    // Read a block of SAM records
+    auto chunk = util::make_unique<format::mpegg_rec::MpeggChunk>();
+    std::list<format::sam::SamRecord> samRecords;
+    samFileReader.readRecords(blockSize, &samRecords);
+    std::list<format::sam::SamRecord> samRecordsCopy(samRecords);
+    LOG_TRACE << "Read " << samRecords.size() << " SAM record(s)";
+    for (const auto &samRecord : samRecords) {
+        // Search for mate
+        std::string rnameSearchString;
+        if (samRecord.rnext == "=") {
+            rnameSearchString = samRecord.rname;
+        } else {
+            rnameSearchString = samRecord.rnext;
+        }
+        samRecordsCopy.erase(samRecordsCopy.begin());  // delete current record from the search space
+        bool foundMate = false;
+        for (auto it = samRecordsCopy.begin(); it != samRecordsCopy.end(); ++it) {
+            if (it->rname == rnameSearchString && it->pos == samRecord.pnext) {
+                // LOG_TRACE << "Found mate";
 
-                    chunk->push_back(convert(samRecord, *it));
+                chunk->push_back(convert(samRecord, *it));
 
-                    record_counter++;
-                    foundMate = true;
-                    samRecordsCopy.erase(it);
-                    break;
-                }
-            }
-            if (!foundMate) {
-                // LOG_TRACE << "Did not find mate";
-                chunk->push_back(convert(samRecord));
                 record_counter++;
-            }
-
-            // Break if everything was processed
-            if (samRecordsCopy.empty()) {
+                foundMate = true;
+                samRecordsCopy.erase(it);
                 break;
             }
         }
-
-        if (!chunk->empty()) {
-            flowOut(std::move(chunk), record_counter);
+        if (!foundMate) {
+            // LOG_TRACE << "Did not find mate";
+            chunk->push_back(convert(samRecord));
+            record_counter++;
         }
 
-        // Break if less than blockSize records were read from the SAM file
-        if (samRecords.size() < blockSize) {
+        // Break if everything was processed
+        if (samRecordsCopy.empty()) {
             break;
         }
     }
-    dryOut();
+
+    if (!chunk->empty()) {
+        flowOut(std::move(chunk), record_counter);
+    }
+
+    // Break if less than blockSize records were read from the SAM file
+    if (samRecords.size() < blockSize) {
+        dryOut();
+        return false;
+    }
+
+    return true;
 }

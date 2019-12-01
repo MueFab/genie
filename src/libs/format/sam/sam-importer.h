@@ -20,6 +20,8 @@ class SamImporter : public Source<std::unique_ptr<format::mpegg_rec::MpeggChunk>
 private:
     std::istream *file;
     size_t blockSize;
+    format::sam::SamFileReader samFileReader;
+    size_t record_counter;
 
     static std::unique_ptr<std::string> convertCigar2eCigar(const std::string &cigar);
 
@@ -33,7 +35,7 @@ private:
 public:
     SamImporter(size_t _blockSize, std::istream *_file);
 
-    void go() override;
+    bool pump() override;
 };
 
 

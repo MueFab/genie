@@ -8,7 +8,7 @@
 
 class MpeggDecompressor {
 public:
-    virtual std::unique_ptr<MpeggRawAu> decompress(std::unique_ptr<BlockPayload> payload) = 0;
+    virtual std::unique_ptr<MpeggRawAu> decompress(std::unique_ptr<BlockPayloadSet> payload) = 0;
     virtual ~MpeggDecompressor() = default;
 };
 

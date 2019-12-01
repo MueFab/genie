@@ -4,13 +4,36 @@
 #include <util/drain.h>
 
 #include <memory>
+#include <vector>
+#include <coding/mpegg-raw-au.h>
 
-#include "block-payload.h"
+#include <format/block-payload.h>
+#include "access_unit.h"
 
-class MpeggP2Exporter : public Drain<std::unique_ptr<BlockPayload>>{
+class MpeggP2Exporter : public Drain<std::unique_ptr<BlockPayloadSet>>{
+private:
+    util::BitWriter writer;
 public:
-    virtual void flowIn(std::unique_ptr<BlockPayload> t, size_t id) override;
-    virtual void dryIn() override;
+
+
+    explicit MpeggP2Exporter(std::ostream *_file) : writer(_file) {
+
+    }
+    void flowIn(std::unique_ptr<BlockPayloadSet> t, size_t id) override {
+
+        t->getParameters()->write(&writer);
+
+        format::mpegg_p2::AccessUnit au(id, 0, format::mpegg_rec::MpeggRecord::ClassType::CLASS_I, t->getRecordNum(), format::mpegg_p2::DataUnit::DatasetType::ALIGNED, 32, 32, 0);
+        for (size_t descriptor = 0; descriptor < MpeggRawAu::NUM_DESCRIPTORS; ++descriptor) {
+            if(!t->getPayload(descriptor)) {
+                continue;
+            }
+            au.addBlock(util::make_unique<format::Block>(descriptor, t->movePayload(descriptor)));
+        }
+        au.write(&writer);
+    }
+    void dryIn() override {
+    }
 };
 
 

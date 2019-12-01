@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <memory>
 #include <format/mpegg_rec/alignment.h>
-
+#include <format/mpegg_rec/split-alignment.h>
 
 namespace util {
     class BitWriter;
