@@ -126,6 +126,31 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileNam
         fprintf(stdout, "First byte:%u -> Last byte:%u\n", dataUnit->rawData.front(), dataUnit->rawData.back());
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
+
+    // Dataset consists of:
+    // - DatasetHeader
+    // - DatasetParameterSet
+    // - AccessUnit[]
+
+    // std::vector<std::unique_ptr<format::mpegg_p1::Dataset>> datasets;
+    // datasets.push_back(format::mpegg_p1::Dataset::createFromDataUnits(dataUnits)));
+
+    // DatasetGroup consists of:
+    // - DatasetGroupHeader
+    // - Dataset[]
+
+    // std::vector<std::unique_ptr<format::mpegg_p1::DatasetGroup>> datasetGroups;
+    // datasetGroups.push_back(format::mpegg_p1::DatasetGroup::createFromDatasets(datasets);
+
+    // MpeggFile consists of:
+    // - FileHeader
+    // - DatasetGroup[]
+
+    // auto mpeggFile = format::mpegg_p1::MpeggFile::createFromDatasetGroups(datasetGroups);
+
+    // -----------------------------------------------------------------------------------------------------------------
+
     // while (true) {
     //     auto dataUnit = DataUnitFactory.createFromBitReader(bitReader);
     //     if (dataUnit.getDataUnitType() == DataUnit::DataUnitType::ACCESS_UNIT) {
