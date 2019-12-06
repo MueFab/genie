@@ -92,6 +92,10 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileNam
 
     std::ifstream inputFilestream;
     inputFilestream.open(fileName, std::ios::binary);
+    if(!inputFilestream.good()){
+        fprintf(stderr, "File could not be opened!\n");
+        return -1;
+    }
 
     util::BitReader inputFileBitReader(&inputFilestream);
 
