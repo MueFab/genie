@@ -4,7 +4,8 @@
  */
 
 #include "FileHandlingUtils.h"
-#include <format/mpegg_p2/parameter_set.h>
+#include "format/mpegg_p2/parameter_set.h"
+#include "format/mpegg_p1/dataset.h"
 
 // DatasetHeader *
 // initDatasetHeaderNoMIT(DatasetGroupId datasetGroupId, DatasetId datasetId, char *version, bool multipleAlignmentFlag,
@@ -137,7 +138,7 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileNam
     // - DatasetParameterSet
     // - AccessUnit[]
 
-    // std::vector<std::unique_ptr<format::mpegg_p1::Dataset>> datasets;
+    std::vector<std::unique_ptr<format::mpegg_p1::Dataset>> datasets;
     // datasets.push_back(format::mpegg_p1::Dataset::createFromDataUnits(dataUnits)));
 
     // DatasetGroup consists of:
