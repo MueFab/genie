@@ -20,16 +20,18 @@ class PerfStats {
     std::chrono::steady_clock::duration encode_t;
     std::chrono::steady_clock::duration generation_t;
     std::chrono::steady_clock::duration qual_score_t;
+    std::chrono::steady_clock::duration combine_t;
 
     PerfStats() {
         enabled = false;
         num_recs = 0;
+        total_t = std::chrono::steady_clock::duration::zero();
         preprocess_t = std::chrono::steady_clock::duration::zero();
         reorder_t = std::chrono::steady_clock::duration::zero();
         encode_t = std::chrono::steady_clock::duration::zero();
         generation_t = std::chrono::steady_clock::duration::zero();
         qual_score_t = std::chrono::steady_clock::duration::zero();
-        total_t = std::chrono::steady_clock::duration::zero();
+        combine_t = std::chrono::steady_clock::duration::zero();
     }
 
     virtual ~PerfStats() = 0;

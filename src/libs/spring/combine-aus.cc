@@ -6,11 +6,12 @@
 #include <format/part2/clutter.h>
 #include <format/part2/parameter_set.h>
 #include <util/bitwriter.h>
+#include <util/perf-stats.h>
 #include "spring-gabac.h"
 
 namespace spring {
 
-void combine_aus(const std::string &temp_dir, compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::string &outputFilePath) {
+void combine_aus(const std::string &temp_dir, compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::string &outputFilePath, util::FastqStats *stats) {
   using namespace format;
   std::ofstream ofstr(outputFilePath);
   util::BitWriter bw(&ofstr);
@@ -24,6 +25,7 @@ void combine_aus(const std::string &temp_dir, compression_params &cp, const std:
                                             DataUnit::AuType::U_TYPE_AU, configs, true);
   auto crps = make_unique<ParameterSetCrps>(ParameterSetCrps::CrAlgId::GLOBAL_ASSEMBLY);
   ps.setCrps(std::move(crps));
+  // FIXME add in size written to stats->cmprs_total_sz
   ps.write(&bw);
 
   // read info about number of blocks (AUs) and the number of reads and records in those
@@ -64,6 +66,7 @@ void combine_aus(const std::string &temp_dir, compression_params &cp, const std:
     AccessUnit au = createQuickAccessUnit(
         auId, PARAMETER_SET_ID, num_reads_per_AU[auId], DataUnit::AuType::U_TYPE_AU,
         DataUnit::DatasetType::NON_ALIGNED, &generated_streams, num_records_per_AU[auId]);
+    // FIXME add in size written to stats
     au.write(&bw);
   }
 }
