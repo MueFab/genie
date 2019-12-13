@@ -28,31 +28,32 @@
 
 namespace dsg {
 
-static void generationFromFastq_SPRING(const ProgramOptions &programOptions, const std::string &filename) {
+static void generationFromFastq_SPRING(const ProgramOptions &programOptions, util::FastqStats *stats, const std::string &filename) {
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Descriptor stream generation from FASTQ file" << std::endl;
+    std::cout << "Output filename = " << filename << std::endl;
     std::cout << std::string(80, '-') << std::endl;
 
     bool paired_end = false;
     // Initialize a FASTQ file reader.
-    util::FastqFileReader fastqFileReader1(programOptions.inputFilePath);
+    util::FastqFileReader fastqFileReader1(programOptions.inputFilePath, stats);
     std::cout << "Calling SPRING" << std::endl;
     if (programOptions.inputFilePairPath.empty()) {
         spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader1, programOptions.numThreads,
                                                paired_end, programOptions.workingDirectory, programOptions.analyze, filename,
                                                programOptions.preserve_order, !programOptions.discard_quality,
-                                               !programOptions.discard_ids);
+                                               !programOptions.discard_ids, stats);
     } else {
         paired_end = true;
-        util::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath);
+        util::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath, stats);
         spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader2, programOptions.numThreads,
                                                paired_end, programOptions.workingDirectory, programOptions.analyze, filename,
                                                programOptions.preserve_order, !programOptions.discard_quality,
-                                               !programOptions.discard_ids);
+                                               !programOptions.discard_ids, stats);
     }
 }
 
-static void generationFromFastq(const ProgramOptions &programOptions) {
+static void generationFromFastq(const ProgramOptions &programOptions, util::FastqStats *stats) {
     std::string filename = programOptions.outputFilePath;
 
     if (filename.empty()) {
@@ -91,10 +92,10 @@ static void generationFromFastq(const ProgramOptions &programOptions) {
 
 //    dsg::StreamSaver store(programOptions.configPath, &output, nullptr, programOptions.gabacDebug);
 //    auto generated_aus = generationFromFastq_SPRING(programOptions, store);
-    generationFromFastq_SPRING(programOptions, filename);
+    generationFromFastq_SPRING(programOptions, stats, filename);
 }
 
-void decompression_fastq(const ProgramOptions &programOptions) {
+void decompression_fastq(const ProgramOptions &programOptions, util::FastqStats *stats) {
     // Open file and create tmp directory with random name
     std::ifstream in(programOptions.inputFilePath);
     if (!in) {
@@ -146,7 +147,7 @@ void decompression(const ProgramOptions &programOptions) {
             start_t = std::chrono::steady_clock::now();
         }
 
-        decompression_fastq(programOptions);
+        decompression_fastq(programOptions, &stats);
 
         if (stats.enabled) {
             stats.total_t = std::chrono::steady_clock::now() - start_t;
@@ -168,7 +169,7 @@ void generation(const ProgramOptions &programOptions) {
             start_t = std::chrono::steady_clock::now();
         }
 
-        generationFromFastq(programOptions);
+        generationFromFastq(programOptions, &stats);
 
         if (stats.enabled) {
             stats.total_t = std::chrono::steady_clock::now() - start_t;
