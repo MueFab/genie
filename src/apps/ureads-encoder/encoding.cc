@@ -16,6 +16,9 @@
 
 #include <format/mpegg_p2/raw_reference.h>
 #include <gabac/gabac.h>
+#include <format/fastq/fastq-importer.h>
+#include <format/fastq/fastq-exporter.h>
+#include <format/mpegg_rec/mgrecs-exporter.h>
 
 #include "format/mpegg_p2/access_unit.h"
 #include "format/mpegg_p2/clutter.h"
@@ -24,7 +27,7 @@
 
 namespace genie {
 
-std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
+/*std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
     const std::vector<size_t> SEQUENCE_NUMS = {2, 1, 3, 2, 3, 4, 1, 1, 8, 1, 5, 2, 1, 1, 1, 2, 1, 1};
     const std::string DEFAULT_GABAC_CONF_JSON =
         "{"
@@ -56,10 +59,30 @@ std::vector<std::vector<gabac::DataBlock>> create_default_streams() {
         ret.emplace_back();
     }
     return ret;
-}
+}*/
 
 void encode(const ProgramOptions& programOptions) {
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        {
+            std::ifstream infile1(programOptions.inputFilePath), infile2(programOptions.pairFilePath);
+            std::ofstream outfile1(programOptions.outputFilePath), outfile2(programOptions.outputPairFilePath);
+            FastqImporter importer(1000, &infile1, &infile2);
+            FastqExporter exporter(&outfile1, &outfile2);
+            importer.setDrain(&exporter);
+
+            while (importer.pump()) {}
+        }
+
+        {
+            std::ifstream infile1(programOptions.inputFilePath), infile2(programOptions.pairFilePath);
+            std::ofstream outfile1(programOptions.outputFilePath + ".mgrec");
+            FastqImporter importer(1000, &infile1, &infile2);
+            MgrecsExporter exporter(&outfile1);
+            importer.setDrain(&exporter);
+
+            while (importer.pump()) {}
+        }
+   /* /////////////////////////////////////////////////////////////////////////////////////////////////////
     // UREADS DESCRIPTOR GENERATION
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -165,7 +188,7 @@ void encode(const ProgramOptions& programOptions) {
   //  AccessUnit au = createQuickAccessUnit(ACCESS_UNIT_ID, PARAMETER_SET_ID, readNum, DataUnit::mpegg_rec::MpeggRecord::ClassType::CLASS_U, DataUnit::DatasetType::NON_ALIGNED, &generated_streams);
  //   au.write(&bw);
 
-    GENIE_LOG_TRACE << "Number of bitstreams: " << generated_streams.size();
+    GENIE_LOG_TRACE << "Number of bitstreams: " << generated_streams.size();*/
 }
 
 }  // namespace genie

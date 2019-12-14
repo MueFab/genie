@@ -30,6 +30,8 @@ namespace format {
 
             const std::string* getSequence() const;
 
+            const std::string* getQuality(size_t index) const;
+
             void addQualityValues(std::unique_ptr <std::string> qv);
 
             virtual void write(util::BitWriter *write) const;

@@ -22,7 +22,9 @@ void ProgramOptions::processCommandLine(int argc, char* argv[]) {
     CLI::App app("Genie MPEG-G encoder, conformance version");
 
     app.add_option("-i,--input-file", inputFilePath, "Input file")->mandatory(true);
+    app.add_option("-p,--pair-file", pairFilePath, "pair file");
     app.add_option("-o,--output-file", outputFilePath, "Output file")->mandatory(true);
+    app.add_option("-q,--pair-output-file", outputPairFilePath, "pair file");
 
     try {
         app.parse(argc, argv);
@@ -34,9 +36,10 @@ void ProgramOptions::processCommandLine(int argc, char* argv[]) {
         UTILS_DIE("Input file does not exist");
     }
 
-    if (ghc::filesystem::exists(ghc::filesystem::path(outputFilePath))) {
-        UTILS_DIE("Output file exists already");
+    if (!ghc::filesystem::exists(ghc::filesystem::path(pairFilePath))) {
+        UTILS_DIE("pair file does not exist");
     }
+
 }
 
 }  // namespace genie

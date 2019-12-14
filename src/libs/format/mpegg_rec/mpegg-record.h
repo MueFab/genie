@@ -85,6 +85,8 @@ namespace format {
             uint8_t getFlags() const;
 
             ClassType getClassID() const;
+
+            const std::string& getReadName() const;
         };
 
         typedef std::vector<std::unique_ptr<MpeggRecord>> MpeggChunk;

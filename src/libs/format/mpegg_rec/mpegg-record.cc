@@ -86,6 +86,9 @@ namespace format {
             if (reads.size() == number_of_template_segments) {
                 UTILS_DIE("Record already full");
             }
+            if(reads.empty()) {
+                qv_depth = rec->getQvDepth();
+            }
             if (!reads.empty() && rec->getQvDepth() != qv_depth) {
                 UTILS_DIE("Incompatible qv depth");
             }
@@ -110,7 +113,7 @@ namespace format {
         }
 
         const Segment* MpeggRecord::getRecordSegment(size_t index) const {
-            if (index != reads.size()) {
+            if (index >= reads.size()) {
                 UTILS_DIE("Index out of bounds");
             }
             return reads[index].get();
@@ -201,6 +204,10 @@ namespace format {
 
         MpeggRecord::ClassType MpeggRecord::getClassID() const {
             return class_ID;
+        }
+
+        const std::string& MpeggRecord::getReadName() const {
+            return *read_name;
         }
     }
 }

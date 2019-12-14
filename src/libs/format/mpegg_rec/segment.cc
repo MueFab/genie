@@ -49,7 +49,9 @@ namespace format {
             return sequence.get();
         }
 
-
+        const std::string* Segment::getQuality(size_t index) const {
+            return quality_values[index].get();
+        }
 
         void Segment::addQualityValues(std::unique_ptr<std::string> qv) {
             if (qv->length() != sequence->length()) {

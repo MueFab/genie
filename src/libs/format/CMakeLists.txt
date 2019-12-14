@@ -4,6 +4,7 @@ set(source_files
         fasta/fasta-file-reader.cc
         fasta/fasta-record.cc
 
+        fastq/fastq-exporter.cc
         fastq/fastq-importer.cc
         fastq/fastq-file-reader.cc
         fastq/fastq-record.cc
@@ -55,9 +56,12 @@ set(source_files
         mpegg_p2/raw_reference.cc
         mpegg_p2/raw_reference_sequence.cc
 
+        sam/sam-exporter.cc
         sam/sam-importer.cc
         sam/sam-file-reader.cc
+        sam/sam-line.cc
         sam/sam-record.cc
+        sam/sam-tag.cc
         )
 
 add_library(format ${source_files})
