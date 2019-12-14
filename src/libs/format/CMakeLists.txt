@@ -64,6 +64,11 @@ set(source_files
         sam/sam-tag.cc
         )
 
+        mpegg_p1/dataset.cc
+        mpegg_p1/dataset_header.cc
+        mpegg_p1/dataset_parameter_set.cc
+        mpegg_p1/access_unit_p1.cc)
+
 add_library(format ${source_files})
 target_include_directories(format PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/mpegg_rec")
 target_link_libraries(format util)
