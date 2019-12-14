@@ -37,6 +37,7 @@ namespace format {
 
         std::unique_ptr<SplitAlignment> SplitAlignmentOtherRec::clone() const {
             auto ret = util::make_unique<SplitAlignmentOtherRec>();
+            return ret;
         }
     }
 }

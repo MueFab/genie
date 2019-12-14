@@ -1,13 +1,15 @@
 #ifndef UTIL_SAM_RECORD_H_
 #define UTIL_SAM_RECORD_H_
 
-#include <inttypes.h>
 #include <string>
 #include <vector>
 
+#include <regex>
+
+#include <util/exceptions.h>
+
 namespace format {
     namespace sam {
-
         struct SamRecord {
         public:
             SamRecord(const std::vector<std::string> &fields);

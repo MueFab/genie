@@ -13,7 +13,9 @@ class ProgramOptions {
 
    public:
     std::string inputFilePath;
+    std::string pairFilePath;
     std::string outputFilePath;
+    std::string outputPairFilePath;
 
    private:
     void processCommandLine(int argc, char *argv[]);
