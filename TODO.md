@@ -2,11 +2,34 @@
 
 ---
 
+## New (December 9, 2019)
+
+- Re-use ID and QV compression code from SPRING
+- Set up ref SW x-check scripts
+- Re-enable CI on Travis CI
+- Tools
+    - Implement FASTQ/SAM -to- MPEG-G records tool
+    - Implement tool to compare two MPEG-G records arrays with different orders
+    - Implement tool to reconstruct pairs from MPEG-G records array
+- Genie encoder should work as follows: FASTQ/SAM > Genie > MPEG-G bitstream
+- Genie decoder should work as follows: MPEG-G bitstream > Genie > MPEG-G records
+- Nice to have:
+    - Lossy ID compression
+    - Support for descriptor specific GABAC configurations
+    - Reference-based encoder
+    - Implement LZMA coding of auxiliary fields
+- Code cleanup:
+    - Unify data structures
+    - Unify I/O
+- Checks:
+    - Check whether adaptive entropy coding (including binarization et al.) is conformant
+    - Check whether LUTs are conformant
+    - Check BitInputStream::read(): all statements like readIn(&m_reader) are source of potential bug for wordSize > 1
+    - Check support fot > 1 transformed subsequence in part 2 library
+- Use GitHub issues
+- Use clang-format
+
 ## Current
-
-### Brian
-
-N/A
 
 ### Daniel/Jannis
 

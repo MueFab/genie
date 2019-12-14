@@ -9,8 +9,9 @@
 
 namespace spring {
 
-void compress_ureads(format::fastq::FastqFileReader *fastqFileReader1, format::fastq::FastqFileReader *fastqFileReader2,
-                     const std::string &temp_dir, compression_params &cp, const std::string &outputFilePath);
+void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
+                     const std::string &temp_dir, compression_params &cp,
+                     const std::string &outputFilePath, util::FastqStats *stats);
 
 }  // namespace spring
 

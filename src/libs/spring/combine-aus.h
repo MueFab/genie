@@ -3,10 +3,11 @@
 
 #include <string>
 #include "util.h"
+#include <util/perf-stats.h>
 
 namespace spring {
 
-void combine_aus(const std::string &temp_dir, compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::string &outputFilePath);
+void combine_aus(const std::string &temp_dir, compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::string &outputFilePath, util::FastqStats *stats);
 
 }  // namespace spring
 

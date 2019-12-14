@@ -27,9 +27,10 @@
 
 namespace spring {
 
-void compress_ureads(format::fastq::FastqFileReader *fastqFileReader1, format::fastq::FastqFileReader *fastqFileReader2,
-                     const std::string &temp_dir, compression_params &cp, const std::string &outputFilePath) {
-    using namespace format::mpegg_p2;
+void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
+                     const std::string &temp_dir, compression_params &cp,
+                     const std::string &outputFilePath, util::FastqStats *stats) {
+    using namespace format;
     std::ofstream ofstr(outputFilePath);
     util::BitWriter bw(&ofstr);
 
@@ -39,7 +40,9 @@ void compress_ureads(format::fastq::FastqFileReader *fastqFileReader1, format::f
     const bool PAIRED_END = cp.paired_end;
     const bool QV_PRESENT = cp.preserve_quality;
     ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT,
-                                              format::mpegg_rec::MpeggRecord::ClassType::CLASS_U, configs, true);
+                                              DataUnit::AuType::U_TYPE_AU, configs, true);
+
+    // FIXME - add in size written to stats->cmprs_total_sz
     ps.write(&bw);
 
     format::fastq::FastqFileReader *fastqFileReader[2] = {fastqFileReader1, fastqFileReader2};

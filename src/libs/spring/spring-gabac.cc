@@ -98,14 +98,16 @@ std::vector<std::vector<std::vector<gabac::DataBlock>>> create_default_streams()
     return ret;
 }
 
-void write_streams_to_file(const std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams,
+uint64_t write_streams_to_file(const std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams,
                            const std::string &outfile, const std::vector<uint8_t> &descriptors_to_write) {
+    uint64_t retval = 0;
     std::ofstream fout(outfile, std::ios::binary);
     for (auto & descriptor : descriptors_to_write) {
         for (size_t subseq = 0; subseq < generated_streams[descriptor].size(); subseq++) {
             // write number of gabac data blocks
             uint32_t ndb = (uint32_t)generated_streams[descriptor][subseq].size();
             fout.write((char *)&ndb, sizeof(uint32_t));
+            retval += sizeof(uint32_t);
             // now write each data block
             for (uint32_t db = 0; db < generated_streams[descriptor][subseq].size(); db++) {
                 uint8_t wordSize = generated_streams[descriptor][subseq][db].getWordSize();
@@ -113,39 +115,49 @@ void write_streams_to_file(const std::vector<std::vector<std::vector<gabac::Data
                 size_t len_data_in_bytes = size * wordSize;
                 // first write word size
                 fout.write((char *)&wordSize, sizeof(uint8_t));
+                retval += sizeof(uint8_t);
                 // size
                 fout.write((char *)&size, sizeof(size_t));
+                retval += sizeof(size_t);
                 // data
                 fout.write((char *)generated_streams[descriptor][subseq][db].getData(), len_data_in_bytes);
+                retval += len_data_in_bytes;
             }
         }
     }
     fout.close();
+    return retval;
 }
 
 // assumes that the generated_streams vector is already initialized with
 // create_default_streams.
-void read_streams_from_file(std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams, const std::string &infile, const std::vector<uint8_t> &descriptors_to_read) {
+uint64_t read_streams_from_file(std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams, const std::string &infile, const std::vector<uint8_t> &descriptors_to_read) {
+    uint64_t retval = 0;
     std::ifstream fin(infile, std::ios::binary);
     for (auto &descriptor : descriptors_to_read) {
         for (size_t subseq = 0; subseq < generated_streams[descriptor].size(); subseq++) {
             // read number of gabac data blocks
             uint32_t num_data_blocks;
             fin.read((char *)&(num_data_blocks), sizeof(uint32_t));
+            retval += sizeof(uint32_t);
             generated_streams[descriptor][subseq].resize(num_data_blocks);
             // now read each data block
             for (uint32_t db = 0; db < generated_streams[descriptor][subseq].size(); db++) {
                 uint8_t wordSize;
                 fin.read((char *)&wordSize, sizeof(uint8_t));
+                retval += sizeof(uint8_t);
                 size_t size;
                 fin.read((char *)&size, sizeof(size_t));
+                retval += sizeof(size_t);
                 size_t len_data_in_bytes = size * wordSize;
                 generated_streams[descriptor][subseq][db].resize(size);
                 fin.read((char *)generated_streams[descriptor][subseq][db].getData(), len_data_in_bytes);
+                retval += len_data_in_bytes;
             }
         }
     }
     fin.close();
+    return retval;
 }
 
 std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
