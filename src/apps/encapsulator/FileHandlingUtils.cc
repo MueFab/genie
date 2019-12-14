@@ -4,7 +4,8 @@
  */
 
 #include "FileHandlingUtils.h"
-#include <format/mpegg_p2/parameter_set.h>
+#include "format/mpegg_p2/parameter_set.h"
+#include "format/mpegg_p1/dataset.h"
 
 // DatasetHeader *
 // initDatasetHeaderNoMIT(DatasetGroupId datasetGroupId, DatasetId datasetId, char *version, bool multipleAlignmentFlag,
@@ -92,6 +93,10 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileNam
 
     std::ifstream inputFilestream;
     inputFilestream.open(fileName, std::ios::binary);
+    if(!inputFilestream.good()){
+        fprintf(stderr, "File could not be opened!\n");
+        return -1;
+    }
 
     util::BitReader inputFileBitReader(&inputFilestream);
 
@@ -125,6 +130,31 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileNam
         fprintf(stdout, "Vector Size:%lu\n", dataUnit->rawData.size());
         fprintf(stdout, "First byte:%u -> Last byte:%u\n", dataUnit->rawData.front(), dataUnit->rawData.back());
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    // Dataset consists of:
+    // - DatasetHeader
+    // - DatasetParameterSet
+    // - AccessUnit[]
+
+    std::vector<std::unique_ptr<format::mpegg_p1::Dataset>> datasets;
+    datasets.push_back(format::mpegg_p1::Dataset::createFromDataUnits(&dataUnits)); //TODO call by pointer
+
+    // DatasetGroup consists of:
+    // - DatasetGroupHeader
+    // - Dataset[]
+
+    // std::vector<std::unique_ptr<format::mpegg_p1::DatasetGroup>> datasetGroups;
+    // datasetGroups.push_back(format::mpegg_p1::DatasetGroup::createFromDatasets(datasets);
+
+    // MpeggFile consists of:
+    // - FileHeader
+    // - DatasetGroup[]
+
+    // auto mpeggFile = format::mpegg_p1::MpeggFile::createFromDatasetGroups(datasetGroups);
+
+    // -----------------------------------------------------------------------------------------------------------------
 
     // while (true) {
     //     auto dataUnit = DataUnitFactory.createFromBitReader(bitReader);
