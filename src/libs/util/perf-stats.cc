@@ -37,6 +37,8 @@ void FastqStats::printCompressionStats(void) {
               << " msec" << std::endl;
     std::cerr << "Quality scores: " << std::chrono::duration_cast<std::chrono::milliseconds>(qual_score_t).count()
               << " msec" << std::endl;
+    std::cerr << "Combine AUs:    " << std::chrono::duration_cast<std::chrono::milliseconds>(combine_t).count()
+              << " msec" << std::endl;
     std::cerr << "Total time:     " << std::chrono::duration_cast<std::chrono::milliseconds>(total_t).count() << " msec"
               << std::endl;
 }
