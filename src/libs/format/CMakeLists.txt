@@ -6,7 +6,6 @@ set(source_files
 
         fastq/fastq-exporter.cc
         fastq/fastq-importer.cc
-        fastq/fastq-file-reader.cc
         fastq/fastq-record.cc
 
         mpegg_rec/mgrecs-exporter.cc
@@ -62,7 +61,6 @@ set(source_files
         sam/sam-line.cc
         sam/sam-record.cc
         sam/sam-tag.cc
-        )
 
         mpegg_p1/dataset.cc
         mpegg_p1/dataset_header.cc

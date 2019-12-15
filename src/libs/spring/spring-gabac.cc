@@ -8,7 +8,7 @@
 
 namespace spring {
 
-GenieGabacOutputBuffer::GenieGabacOutputBuffer() : bytesLeft(0) {}
+/*GenieGabacOutputBuffer::GenieGabacOutputBuffer() : bytesLeft(0) {}
 
 int GenieGabacOutputBuffer::overflow(int c) {
     char c2 = c;
@@ -201,6 +201,6 @@ std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
         }
     }
     return ret;
-}
+}*/
 
 }  // namespace spring

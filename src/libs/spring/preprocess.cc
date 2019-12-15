@@ -15,7 +15,7 @@
 
 namespace spring {
 
-void preprocess(format::fastq::FastqFileReader *fastqFileReader1, format::fastq::FastqFileReader *fastqFileReader2,
+/*void preprocess(format::fastq::FastqFileReader *fastqFileReader1, format::fastq::FastqFileReader *fastqFileReader2,
                 const std::string &temp_dir, compression_params &cp) {
     format::fastq::FastqFileReader *fastqFileReader[2] = {fastqFileReader1, fastqFileReader2};
     std::string outfileclean[2];
@@ -203,6 +203,6 @@ void preprocess(format::fastq::FastqFileReader *fastqFileReader1, format::fastq:
     std::cout << "Total number of reads: " << cp.num_reads << "\n";
 
     std::cout << "Total number of reads without N: " << cp.num_reads_clean[0] + cp.num_reads_clean[1] << "\n";
-}
+}*/
 
 }  // namespace spring
