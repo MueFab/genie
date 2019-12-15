@@ -11,7 +11,7 @@
 
 namespace spring {
 
-void combine_aus(const std::string &temp_dir, compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::string &outputFilePath, util::FastqStats *stats) {
+/*void combine_aus(const std::string &temp_dir, compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::string &outputFilePath, util::FastqStats *stats) {
   using namespace format;
   std::ofstream ofstr(outputFilePath);
   util::BitWriter bw(&ofstr);
@@ -69,6 +69,6 @@ void combine_aus(const std::string &temp_dir, compression_params &cp, const std:
     // FIXME add in size written to stats
     au.write(&bw);
   }
-}
+}*/
 
 }  // namespace spring

@@ -22,40 +22,14 @@
 
 namespace spring {
 
-void generate_read_streams(const std::string &temp_dir, const compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs, util::FastqStats *stats) {
-    if (!cp.paired_end)
-        generate_read_streams_se(temp_dir, cp, configs, stats);
-    else
-        generate_read_streams_pe(temp_dir, cp, configs, stats);
-}
 
-void compress_read_subseqs(std::vector<std::vector<gabac::DataBlock>> &raw_data,
-                           std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams,
-                           const std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
-    for (size_t descriptor = 0; descriptor < 13; ++descriptor) {
-        for (size_t subdescriptor = 0; subdescriptor < raw_data[descriptor].size(); ++subdescriptor) {
-            gabac_compress(configs[descriptor][subdescriptor], &raw_data[descriptor][subdescriptor],
-                           &generated_streams[descriptor][subdescriptor]);
-        }
+    uint64_t getNumBlocks(const compression_params& data) {
+        return uint64_t(std::ceil(float(data.num_reads) / data.num_reads_per_block));
     }
-}
 
-struct se_data {
-    compression_params cp;
-    std::vector<bool> flag_arr;
-    std::vector<uint64_t> pos_arr;
-    std::vector<uint16_t> read_length_arr;
-    std::vector<char> noise_arr;
-    std::vector<uint16_t> noisepos_arr;
-    std::vector<uint64_t> pos_in_noise_arr;
-    std::vector<uint16_t> noise_len_arr;
-    std::vector<char> unaligned_arr;
-    std::string seq;
-    std::vector<char> RC_arr;
-    std::vector<uint32_t> order_arr;
-};
+    std::unique_ptr<MpeggRawAu> generate_subseqs(const se_data &data, uint64_t block_num) {
+        auto rdata = util::make_unique<MpeggRawAu>();
 
-void generate_subseqs(const se_data &data, uint64_t block_num, std::vector<std::vector<gabac::DataBlock>> &raw_data) {
     // char_to_int
     int64_t char_to_int[128];
     char_to_int[(uint8_t)'A'] = 0;
@@ -90,98 +64,58 @@ void generate_subseqs(const se_data &data, uint64_t block_num, std::vector<std::
     }
     if (seq_start != seq_end) {
         // not all unaligned
-        raw_data[7][0].push_back(seq_end - seq_start - 1);  // rlen
-        raw_data[12][0].push_back(5);                       // rtype
+        rdata->get(MpeggRawAu::GenomicDescriptor::RLEN, 0).push(seq_end - seq_start - 1);  // rlen
+        rdata->get(MpeggRawAu::GenomicDescriptor::RTYPE, 0).push(5);                       // rtype
         for (uint64_t i = seq_start; i < seq_end; i++)
-            raw_data[6][0].push_back(char_to_int[(uint8_t)data.seq[i]]);  // ureads
+            rdata->get(MpeggRawAu::GenomicDescriptor::UREADS, 0).push(char_to_int[(uint8_t)data.seq[i]]);  // ureads
     }
     uint64_t prevpos = 0, diffpos;
     // Write streams
     for (uint64_t i = start_read_num; i < end_read_num; i++) {
         if (data.flag_arr[i] == true) {
-            raw_data[7][0].push_back(data.read_length_arr[i] - 1);         // rlen
-            raw_data[1][0].push_back(rc_to_int[(uint8_t)data.RC_arr[i]]);  // rcomp
+            rdata->get(MpeggRawAu::GenomicDescriptor::RLEN, 0).push(data.read_length_arr[i] - 1);         // rlen
+            rdata->get(MpeggRawAu::GenomicDescriptor::RCOMP, 0).push(rc_to_int[(uint8_t)data.RC_arr[i]]);  // rcomp
             if (i == start_read_num) {
                 // Note: In order non-preserving mode, if the first read of
                 // the block is a singleton, then the rest are too.
-                raw_data[0][0].push_back(0);  // pos
+                rdata->get(MpeggRawAu::GenomicDescriptor::POS, 0).push(0);  // pos
                 prevpos = data.pos_arr[i];
             } else {
                 diffpos = data.pos_arr[i] - prevpos;
-                raw_data[0][0].push_back(diffpos);  // pos
+                rdata->get(MpeggRawAu::GenomicDescriptor::POS, 0).push(diffpos);  // pos
                 prevpos = data.pos_arr[i];
             }
             if (data.noise_len_arr[i] == 0)
-                raw_data[12][0].push_back(1);  // rtype = P
+                rdata->get(MpeggRawAu::GenomicDescriptor::RTYPE, 0).push(1);  // rtype = P
             else {
-                raw_data[12][0].push_back(3);  // rtype = M
+                rdata->get(MpeggRawAu::GenomicDescriptor::RTYPE, 0).push(3);  // rtype = M
                 for (uint16_t j = 0; j < data.noise_len_arr[i]; j++) {
-                    raw_data[3][0].push_back(0);  // mmpos
+                    rdata->get(MpeggRawAu::GenomicDescriptor::MMPOS, 0).push(0);  // mmpos
                     if (j == 0)
-                        raw_data[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[i] + j]);
+                        rdata->get(MpeggRawAu::GenomicDescriptor::MMPOS, 1).push(data.noisepos_arr[data.pos_in_noise_arr[i] + j]);
                     else
-                        raw_data[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[i] + j] -
+                        rdata->get(MpeggRawAu::GenomicDescriptor::MMPOS, 1).push(data.noisepos_arr[data.pos_in_noise_arr[i] + j] -
                                                  1);  // decoder adds +1
-                    raw_data[4][0].push_back(0);      // mmtype = Substitution
-                    raw_data[4][1].push_back(char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[i] + j]]);
+                    rdata->get(MpeggRawAu::GenomicDescriptor::MMTYPE, 0).push(0);      // mmtype = Substitution
+                    rdata->get(MpeggRawAu::GenomicDescriptor::MMTYPE, 1).push(char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[i] + j]]);
                 }
-                raw_data[3][0].push_back(1);
+                rdata->get(MpeggRawAu::GenomicDescriptor::MMPOS, 0).push(1);
             }
         } else {
-            raw_data[12][0].push_back(5);                           // rtype
-            raw_data[7][0].push_back(data.read_length_arr[i] - 1);  // rlen
+            rdata->get(MpeggRawAu::GenomicDescriptor::RTYPE, 0).push(5);                           // rtype
+            rdata->get(MpeggRawAu::GenomicDescriptor::RLEN, 0).push(data.read_length_arr[i] - 1);  // rlen
             for (uint64_t j = 0; j < data.read_length_arr[i]; j++) {
-                raw_data[6][0].push_back(char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[i] + j]]);  // ureads
+                rdata->get(MpeggRawAu::GenomicDescriptor::UREADS, 0).push(char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[i] + j]]);  // ureads
             }
-            raw_data[0][0].push_back(seq_end - prevpos);            // pos
-            raw_data[1][0].push_back(0);                            // rcomp
-            raw_data[7][0].push_back(data.read_length_arr[i] - 1);  // rlen
-            raw_data[12][0].push_back(1);                           // rtype = P
+            rdata->get(MpeggRawAu::GenomicDescriptor::POS, 0).push(seq_end - prevpos);            // pos
+            rdata->get(MpeggRawAu::GenomicDescriptor::RCOMP, 0).push(0);                            // rcomp
+            rdata->get(MpeggRawAu::GenomicDescriptor::RLEN, 0).push(data.read_length_arr[i] - 1);  // rlen
+            rdata->get(MpeggRawAu::GenomicDescriptor::RTYPE, 0).push(1);                           // rtype = P
             prevpos = seq_end;
             seq_end = prevpos + data.read_length_arr[i];
         }
     }
-}
-
-void generate_and_compress_se(const std::string &temp_dir, const se_data &data, const std::vector<std::vector<gabac::EncodingConfiguration>> &configs, util::FastqStats *stats) {
-    // Now generate new streams and compress blocks in parallel
-    // this is actually number of read pairs per block for PE
-    uint64_t blocks = uint64_t(std::ceil(float(data.cp.num_reads) / data.cp.num_reads_per_block));
-    std::vector<uint32_t> num_reads_per_block(blocks);
-    uint64_t size = 0;
-#ifdef GENIE_USE_OPENMP
-#pragma omp parallel for num_threads(data.cp.num_thr) schedule(dynamic) reduction(+:size)
-#endif
-    for (uint64_t block_num = 0; block_num < blocks; block_num++) {
-        auto raw_data = generate_empty_raw_data();
-
-        generate_subseqs(data, block_num, raw_data);
-        num_reads_per_block[block_num] = raw_data[1][0].size(); // rcomp
-
-        std::vector<std::vector<std::vector<gabac::DataBlock>>> generated_streams = create_default_streams();
-        compress_read_subseqs(raw_data, generated_streams, configs);
-
-        std::string file_to_save_streams = temp_dir + "/read_streams." + std::to_string(block_num);
-        size += write_streams_to_file(generated_streams, file_to_save_streams, read_descriptors);
-
-    }  // end omp parallel
-
-    if (stats->enabled) {
-       stats->cmprs_seq_sz += size;
-       stats->cmprs_total_sz += size;
-    }
-
-    // write num blocks, reads per block to a file
-    const std::string block_info_file = temp_dir + "/block_info.bin";
-    std::ofstream f_block_info(block_info_file, std::ios::binary);
-    uint32_t num_blocks = (uint32_t)blocks;
-    f_block_info.write((char*)&num_blocks, sizeof(uint32_t));
-    f_block_info.write((char*)&num_reads_per_block[0],num_blocks*sizeof(uint32_t));
-    if (stats->enabled) {
-       stats->cmprs_total_sz += (num_blocks+1)*sizeof(uint32_t);
-    }
-
-    return;
+    return rdata;
 }
 
 void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data) {
@@ -289,18 +223,6 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     remove(file_unaligned.c_str());
     remove(file_pos.c_str());
     remove(file_seq.c_str());
-}
-
-void generate_read_streams_se(const std::string &temp_dir,
-                              const compression_params &cp,
-                              const std::vector<std::vector<gabac::EncodingConfiguration>> &configs,
-                              util::FastqStats *stats) {
-    se_data data;
-    loadSE_Data(cp, temp_dir, &data);
-
-    generate_and_compress_se(temp_dir, data, configs, stats);
-
-    return;
 }
 
 void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data) {
@@ -421,15 +343,7 @@ void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     remove(file_seq.c_str());
 }
 
-struct pe_block_data {
-    std::vector<uint32_t> block_start;
-    std::vector<uint32_t> block_end;  // block start and end positions wrt
-    std::vector<uint32_t> block_num;
-    std::vector<uint32_t> genomic_record_index;
-    std::vector<uint32_t> read_index_genomic_record;
-    std::vector<uint32_t> block_seq_start;
-    std::vector<uint32_t> block_seq_end;
-};
+
 
 void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
     bdata->block_num = std::vector<uint32_t>(data.cp.num_reads);
@@ -526,77 +440,14 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
     already_seen.clear();
 }
 
-void generate_qual_id_pe(const std::string &temp_dir, const pe_block_data &bdata, uint32_t num_reads) {
-    // PE step 3: generate index for ids and quality
-
-    const std::string file_order_quality = temp_dir + "/order_quality.bin";
-    const std::string file_blocks_quality = temp_dir + "/blocks_quality.bin";
-    const std::string file_order_id = temp_dir + "/order_id.bin";
-    const std::string file_blocks_id = temp_dir + "/blocks_id.bin";
-
-    // quality:
-    std::ofstream f_order_quality(file_order_quality, std::ios::binary);
-    // store order (as usual in uint32_t)
-    std::ofstream f_blocks_quality(file_blocks_quality, std::ios::binary);
-    // store block start and end positions (differs from the block_start and end
-    // because here we measure in terms of quality values rather than records
-    uint32_t quality_block_pos = 0;
-    for (uint32_t i = 0; i < bdata.block_start.size(); i++) {
-        f_blocks_quality.write((char *)&quality_block_pos, sizeof(uint32_t));
-        for (uint32_t j = bdata.block_start[i]; j < bdata.block_end[i]; j++) {
-            uint32_t current = bdata.read_index_genomic_record[j];
-            uint32_t pair = (current < num_reads / 2) ? (current + num_reads / 2) : (current - num_reads / 2);
-            if ((bdata.block_num[current] == bdata.block_num[pair]) &&
-                (bdata.genomic_record_index[pair] == bdata.genomic_record_index[current])) {
-                // pair in genomic record
-                f_order_quality.write((char *)&current, sizeof(uint32_t));
-                quality_block_pos++;
-                f_order_quality.write((char *)&pair, sizeof(uint32_t));
-                quality_block_pos++;
-            } else {
-                // only single read in genomic record
-                f_order_quality.write((char *)&current, sizeof(uint32_t));
-                quality_block_pos++;
-            }
-        }
-        f_blocks_quality.write((char *)&quality_block_pos, sizeof(uint32_t));
-    }
-    f_order_quality.close();
-    f_blocks_quality.close();
-    // id:
-    std::ofstream f_blocks_id(file_blocks_id, std::ios::binary);
-    // store block start and end positions (measured in terms of records since 1
-    // record = 1 id)
-    for (uint32_t i = 0; i < bdata.block_start.size(); i++) {
-        f_blocks_id.write((char *)&bdata.block_start[i], sizeof(uint32_t));
-        f_blocks_id.write((char *)&bdata.block_end[i], sizeof(uint32_t));
-        std::ofstream f_order_id(file_order_id + "." + std::to_string(i), std::ios::binary);
-        // store order
-        for (uint32_t j = bdata.block_start[i]; j < bdata.block_end[i]; j++) {
-            uint32_t current = bdata.read_index_genomic_record[j];
-            uint32_t pair = (current < num_reads / 2) ? (current + num_reads / 2) : (current - num_reads / 2);
-            // just write the min of current and pair
-            uint32_t min_index = (current > pair) ? pair : current;
-            f_order_id.write((char *)&min_index, sizeof(uint32_t));
-        }
-        f_order_id.close();
-    }
-    f_blocks_id.close();
-}
-
-struct pe_statistics {
-    std::vector<uint32_t> count_same_rec;
-    std::vector<uint32_t> count_split_same_AU;
-    std::vector<uint32_t> count_split_diff_AU;
-};
-
-void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num,
-                         std::vector<std::vector<gabac::DataBlock>> &raw_data, pe_statistics *pest) {
+std::unique_ptr<MpeggRawAu> generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num, pe_statistics *pest) {
 #ifdef GENIE_USE_OPENMP
     const unsigned cur_thread_num = omp_get_thread_num();
 #else
     const unsigned cur_thread_num = 0;
 #endif
+
+    auto rdata = util::make_unique<MpeggRawAu>();
 
     // char_to_int
     int64_t char_to_int[128];
@@ -614,10 +465,10 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
     uint64_t seq_start = bdata.block_seq_start[cur_block_num], seq_end = bdata.block_seq_end[cur_block_num];
     if (seq_start != seq_end) {
         // not all unaligned
-        raw_data[7][0].push_back(seq_end - seq_start - 1);  // rlen
-        raw_data[12][0].push_back(5);                       // rtype
+        rdata->get(MpeggRawAu::GenomicDescriptor::RLEN, 0).push(seq_end - seq_start - 1);  // rlen
+        rdata->get(MpeggRawAu::GenomicDescriptor::RTYPE, 0).push(5);                       // rtype
         for (uint64_t i = seq_start; i < seq_end; i++)
-            raw_data[6][0].push_back(char_to_int[(uint8_t)data.seq[i]]);  // ureads
+            rdata->get(MpeggRawAu::GenomicDescriptor::UREADS, 0).push(char_to_int[(uint8_t)data.seq[i]]);  // ureads
     }
     uint64_t prevpos = 0, diffpos;
     // Write streams
@@ -630,11 +481,11 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
             if (i == bdata.block_start[cur_block_num]) {
                 // Note: In order non-preserving mode, if the first read of
                 // the block is a singleton, then the rest are too.
-                raw_data[0][0].push_back(0);  // pos
+                rdata->get(MpeggRawAu::GenomicDescriptor::POS, 0).push(0);  // pos
                 prevpos = data.pos_arr[current];
             } else {
                 diffpos = data.pos_arr[current] - prevpos;
-                raw_data[0][0].push_back(diffpos);  // pos
+                rdata->get(MpeggRawAu::GenomicDescriptor::POS, 0).push(diffpos);  // pos
                 prevpos = data.pos_arr[current];
             }
         }
@@ -643,93 +494,93 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
             // both reads in same record
             if (data.flag_arr[current] == false) {
                 // Case 1: both unaligned
-                raw_data[12][0].push_back(5);                                                              // rtype
-                raw_data[7][0].push_back(data.read_length_arr[current] + data.read_length_arr[pair] - 1);  // rlen
+                rdata->get(MpeggRawAu::GenomicDescriptor::RTYPE, 0).push(5);                                                              // rtype
+                rdata->get(MpeggRawAu::GenomicDescriptor::RLEN, 0).push(data.read_length_arr[current] + data.read_length_arr[pair] - 1);  // rlen
                 for (uint64_t j = 0; j < data.read_length_arr[current]; j++) {
-                    raw_data[6][0].push_back(
+                    rdata->get(MpeggRawAu::GenomicDescriptor::UREADS, 0).push(
                         char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
                 }
                 for (uint64_t j = 0; j < data.read_length_arr[pair]; j++) {
-                    raw_data[6][0].push_back(
+                    rdata->get(MpeggRawAu::GenomicDescriptor::UREADS, 0).push(
                         char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[pair] + j]]);  // ureads
                 }
-                raw_data[0][0].push_back(seq_end - prevpos);                  // pos
-                raw_data[1][0].push_back(0);                                  // rcomp
-                raw_data[1][0].push_back(0);                                  // rcomp
-                raw_data[7][0].push_back(data.read_length_arr[current] - 1);  // rlen
-                raw_data[7][0].push_back(data.read_length_arr[pair] - 1);     // rlen
-                raw_data[12][0].push_back(1);                                 // rtype = P
-                raw_data[8][0].push_back(0);                                  // pair decoding case same_rec
+                rdata->get(MpeggRawAu::GenomicDescriptor::POS, 0).push(seq_end - prevpos);                  // pos
+                rdata->get(MpeggRawAu::GenomicDescriptor::RCOMP, 0).push(0);                                  // rcomp
+                rdata->get(MpeggRawAu::GenomicDescriptor::RCOMP, 0).push(0);                                  // rcomp
+                rdata->get(MpeggRawAu::GenomicDescriptor::RLEN, 0).push(data.read_length_arr[current] - 1);  // rlen
+                rdata->get(MpeggRawAu::GenomicDescriptor::RLEN, 0).push(data.read_length_arr[pair] - 1);     // rlen
+                rdata->get(MpeggRawAu::GenomicDescriptor::RTYPE, 0).push(1);                                 // rtype = P
+                rdata->get(MpeggRawAu::GenomicDescriptor::PAIR, 0).push(0);                                  // pair decoding case same_rec
                 bool read_1_first = true;
                 uint16_t delta = data.read_length_arr[current];
-                raw_data[8][1].push_back(!(read_1_first) + 2 * delta);  // pair
+                rdata->get(MpeggRawAu::GenomicDescriptor::PAIR, 1).push(!(read_1_first) + 2 * delta);  // pair
                 prevpos = seq_end;
                 seq_end = prevpos + data.read_length_arr[current] + data.read_length_arr[pair];
             } else {
                 // Case 2: both aligned
-                raw_data[7][0].push_back(data.read_length_arr[current] - 1);         // rlen
-                raw_data[7][0].push_back(data.read_length_arr[pair] - 1);            // rlen
-                raw_data[1][0].push_back(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
-                raw_data[1][0].push_back(rc_to_int[(uint8_t)data.RC_arr[pair]]);     // rcomp
+                rdata->get(MpeggRawAu::GenomicDescriptor::RLEN, 0).push(data.read_length_arr[current] - 1);         // rlen
+                rdata->get(MpeggRawAu::GenomicDescriptor::RLEN, 0).push(data.read_length_arr[pair] - 1);            // rlen
+                rdata->get(MpeggRawAu::GenomicDescriptor::RCOMP, 0).push(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
+                rdata->get(MpeggRawAu::GenomicDescriptor::RCOMP, 0).push(rc_to_int[(uint8_t)data.RC_arr[pair]]);     // rcomp
                 if (data.noise_len_arr[current] == 0 && data.noise_len_arr[pair] == 0)
-                    raw_data[12][0].push_back(1);  // rtype = P
+                    rdata->get(MpeggRawAu::GenomicDescriptor::RTYPE, 0).push(1);  // rtype = P
                 else {
-                    raw_data[12][0].push_back(3);  // rtype = M
+                    rdata->get(MpeggRawAu::GenomicDescriptor::RTYPE, 0).push(3);  // rtype = M
                     for (int k = 0; k < 2; k++) {
                         uint32_t index = k ? pair : current;
                         for (uint16_t j = 0; j < data.noise_len_arr[index]; j++) {
-                            raw_data[3][0].push_back(0);  // mmpos
+                            rdata->get(MpeggRawAu::GenomicDescriptor::MMPOS, 0).push(0);  // mmpos
                             if (j == 0)
-                                raw_data[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[index] + j]);  // mmpos
+                                rdata->get(MpeggRawAu::GenomicDescriptor::MMPOS, 1).push(data.noisepos_arr[data.pos_in_noise_arr[index] + j]);  // mmpos
                             else
-                                raw_data[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[index] + j] -
+                                rdata->get(MpeggRawAu::GenomicDescriptor::MMPOS, 1).push(data.noisepos_arr[data.pos_in_noise_arr[index] + j] -
                                                          1);  // mmpos
-                            raw_data[4][0].push_back(0);      // mmtype = Substitution
-                            raw_data[4][1].push_back(
+                            rdata->get(MpeggRawAu::GenomicDescriptor::MMTYPE, 0).push(0);      // mmtype = Substitution
+                            rdata->get(MpeggRawAu::GenomicDescriptor::MMTYPE, 1).push(
                                 char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[index] + j]]);
                         }
-                        raw_data[3][0].push_back(1);  // mmpos
+                        rdata->get(MpeggRawAu::GenomicDescriptor::MMPOS, 0).push(1);  // mmpos
                     }
                 }
                 bool read_1_first = (current < pair);
                 uint16_t delta = data.pos_arr[pair] - data.pos_arr[current];
-                raw_data[8][0].push_back(0);                            // pair decoding case same_rec
-                raw_data[8][1].push_back(!(read_1_first) + 2 * delta);  // pair
+                rdata->get(MpeggRawAu::GenomicDescriptor::PAIR, 0).push(0);                            // pair decoding case same_rec
+                rdata->get(MpeggRawAu::GenomicDescriptor::PAIR, 1).push(!(read_1_first) + 2 * delta);  // pair
                 pest->count_same_rec[cur_thread_num]++;
             }
         } else {
             // only one read in genomic record
             if (data.flag_arr[current] == true) {
-                raw_data[7][0].push_back(data.read_length_arr[current] - 1);         // rlen
-                raw_data[1][0].push_back(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
+                rdata->get(MpeggRawAu::GenomicDescriptor::RLEN, 0).push(data.read_length_arr[current] - 1);         // rlen
+                rdata->get(MpeggRawAu::GenomicDescriptor::RCOMP, 0).push(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
                 if (data.noise_len_arr[current] == 0)
-                    raw_data[12][0].push_back(1);  // rtype = P
+                    rdata->get(MpeggRawAu::GenomicDescriptor::RTYPE, 0).push(1);  // rtype = P
                 else {
-                    raw_data[12][0].push_back(3);  // rtype = M
+                    rdata->get(MpeggRawAu::GenomicDescriptor::RTYPE, 0).push(3);  // rtype = M
                     for (uint16_t j = 0; j < data.noise_len_arr[current]; j++) {
-                        raw_data[3][0].push_back(0);  // mmpos
+                        rdata->get(MpeggRawAu::GenomicDescriptor::MMPOS, 0).push(0);  // mmpos
                         if (j == 0)
-                            raw_data[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[current] + j]);  // mmpos
+                            rdata->get(MpeggRawAu::GenomicDescriptor::MMPOS, 1).push(data.noisepos_arr[data.pos_in_noise_arr[current] + j]);  // mmpos
                         else
-                            raw_data[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[current] + j] -
+                            rdata->get(MpeggRawAu::GenomicDescriptor::MMPOS, 1).push(data.noisepos_arr[data.pos_in_noise_arr[current] + j] -
                                                      1);  // mmpos
-                        raw_data[4][0].push_back(0);      // mmtype = Substitution
-                        raw_data[4][1].push_back(
+                        rdata->get(MpeggRawAu::GenomicDescriptor::MMTYPE, 0).push(0);      // mmtype = Substitution
+                        rdata->get(MpeggRawAu::GenomicDescriptor::MMTYPE, 1).push(
                             char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[current] + j]]);
                     }
-                    raw_data[3][0].push_back(1);
+                    rdata->get(MpeggRawAu::GenomicDescriptor::MMPOS, 0).push(1);
                 }
             } else {
-                raw_data[12][0].push_back(5);                                 // rtype
-                raw_data[7][0].push_back(data.read_length_arr[current] - 1);  // rlen
+                rdata->get(MpeggRawAu::GenomicDescriptor::RTYPE, 0).push(5);                                 // rtype
+                rdata->get(MpeggRawAu::GenomicDescriptor::RLEN, 0).push(data.read_length_arr[current] - 1);  // rlen
                 for (uint64_t j = 0; j < data.read_length_arr[current]; j++) {
-                    raw_data[6][0].push_back(
+                    rdata->get(MpeggRawAu::GenomicDescriptor::UREADS, 0).push(
                         char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
                 }
-                raw_data[0][0].push_back(seq_end - prevpos);                  // pos
-                raw_data[1][0].push_back(0);                                  // rcomp
-                raw_data[7][0].push_back(data.read_length_arr[current] - 1);  // rlen
-                raw_data[12][0].push_back(1);                                 // rtype = P
+                rdata->get(MpeggRawAu::GenomicDescriptor::POS, 0).push(seq_end - prevpos);                  // pos
+                rdata->get(MpeggRawAu::GenomicDescriptor::RCOMP, 0).push(0);                                  // rcomp
+                rdata->get(MpeggRawAu::GenomicDescriptor::RLEN, 0).push(data.read_length_arr[current] - 1);  // rlen
+                rdata->get(MpeggRawAu::GenomicDescriptor::RTYPE, 0).push(1);                                 // rtype = P
                 prevpos = seq_end;
                 seq_end = prevpos + data.read_length_arr[current];
             }
@@ -743,95 +594,25 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
 
             bool read_1_first = (current < pair);
             if (same_block && !read_1_first) {
-                raw_data[8][0].push_back(1);  // R1_split
-                raw_data[8][2].push_back(bdata.genomic_record_index[pair]);
+                rdata->get(MpeggRawAu::GenomicDescriptor::PAIR, 0).push(1);  // R1_split
+                rdata->get(MpeggRawAu::GenomicDescriptor::PAIR, 2).push(bdata.genomic_record_index[pair]);
             } else if (same_block && read_1_first) {
-                raw_data[8][0].push_back(2);  // R2_split
-                raw_data[8][3].push_back(bdata.genomic_record_index[pair]);
+                rdata->get(MpeggRawAu::GenomicDescriptor::PAIR, 0).push(2);  // R2_split
+                rdata->get(MpeggRawAu::GenomicDescriptor::PAIR, 3).push(bdata.genomic_record_index[pair]);
             } else if (!same_block && !read_1_first) {
-                raw_data[8][0].push_back(3);  // R1_diff_ref_seq
-                raw_data[8][4].push_back(bdata.block_num[pair]);
-                raw_data[8][6].push_back(bdata.genomic_record_index[pair]);
+                rdata->get(MpeggRawAu::GenomicDescriptor::PAIR, 0).push(3);  // R1_diff_ref_seq
+                rdata->get(MpeggRawAu::GenomicDescriptor::PAIR, 4).push(bdata.block_num[pair]);
+                rdata->get(MpeggRawAu::GenomicDescriptor::PAIR, 6).push(bdata.genomic_record_index[pair]);
             } else {
-                raw_data[8][0].push_back(4);  // R2_diff_ref_seq
-                raw_data[8][5].push_back(bdata.block_num[pair]);
-                raw_data[8][7].push_back(bdata.genomic_record_index[pair]);
+                rdata->get(MpeggRawAu::GenomicDescriptor::PAIR, 0).push(4);  // R2_diff_ref_seq
+                rdata->get(MpeggRawAu::GenomicDescriptor::PAIR, 5).push(bdata.block_num[pair]);
+                rdata->get(MpeggRawAu::GenomicDescriptor::PAIR, 7).push(bdata.genomic_record_index[pair]);
             }
         }
     }
+
+    return rdata;
 }
 
-void generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>> &configs, util::FastqStats *stats) {
-    // basic approach: start looking at reads from left to right. If current is
-    // aligned but pair is unaligned, pair is kept at the end current AU and
-    // stored in different record. We try to keep number of records in AU =
-    // num_reads_per_block (without counting the the unaligned pairs above. As we
-    // scan to right, if we come across a read whose pair has already been seen in
-    // the same AU and the gap is < 32768 (and non-ovelapping since delta >= 0),
-    // then we add this to the paired read's genomic record. Finally when we come
-    // to unaligned reads whose pair is also unaligned, we store them in same
-    // genomic record.
-
-    se_data data;
-    loadPE_Data(cp, temp_dir, &data);
-
-    pe_block_data bdata;
-    generateBlocksPE(data, &bdata);
-    data.order_arr.clear();
-
-    generate_qual_id_pe(temp_dir, bdata, cp.num_reads);
-
-    pe_statistics pest;
-    pest.count_same_rec = std::vector<uint32_t>(cp.num_thr, 0);
-    pest.count_split_same_AU = std::vector<uint32_t>(cp.num_thr, 0);
-    pest.count_split_diff_AU = std::vector<uint32_t>(cp.num_thr, 0);
-
-    std::vector<uint32_t> num_reads_per_block(bdata.block_start.size());
-    std::vector<uint32_t> num_records_per_block(bdata.block_start.size());
-
-    uint64_t size = 0;
-
-    // PE step 4: Now generate read streams and compress blocks in parallel
-// this is actually number of read pairs per block for PE
-#ifdef GENIE_USE_OPENMP
-#pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic) reduction(+:size)
-#endif
-    for (uint64_t cur_block_num = 0; cur_block_num < bdata.block_start.size(); cur_block_num++) {
-        auto raw_data = generate_empty_raw_data();
-
-        generate_streams_pe(data, bdata, cur_block_num, raw_data, &pest);
-        num_reads_per_block[cur_block_num] = raw_data[1][0].size(); // rcomp
-        num_records_per_block[cur_block_num] = bdata.block_end[cur_block_num] - bdata.block_start[cur_block_num]; // used later for ids
-        std::vector<std::vector<std::vector<gabac::DataBlock>>> generated_streams = create_default_streams();
-        compress_read_subseqs(raw_data, generated_streams, configs);
-
-        std::string file_to_save_streams = temp_dir + "/read_streams." + std::to_string(cur_block_num);
-        size += write_streams_to_file(generated_streams, file_to_save_streams, read_descriptors);
-    }  // end omp parallel
-
-    if (stats->enabled) {
-       stats->cmprs_seq_sz += size;
-       stats->cmprs_total_sz += size;
-    }
-
-    std::cout << "count_same_rec: " << std::accumulate(pest.count_same_rec.begin(), pest.count_same_rec.end(), 0)
-              << "\n";
-    std::cout << "count_split_same_AU: "
-              << std::accumulate(pest.count_split_same_AU.begin(), pest.count_split_same_AU.end(), 0) << "\n";
-    std::cout << "count_split_diff_AU: "
-              << std::accumulate(pest.count_split_diff_AU.begin(), pest.count_split_diff_AU.end(), 0) << "\n";
-
-    // write num blocks, reads per block and records per block to a file
-    const std::string block_info_file = temp_dir + "/block_info.bin";
-    std::ofstream f_block_info(block_info_file, std::ios::binary);
-    uint32_t num_blocks = bdata.block_start.size();
-    f_block_info.write((char*)&num_blocks, sizeof(uint32_t));
-    f_block_info.write((char*)&num_reads_per_block[0],num_blocks*sizeof(uint32_t));
-    f_block_info.write((char*)&num_records_per_block[0],num_blocks*sizeof(uint32_t));
-    if (stats->enabled) {
-       stats->cmprs_total_sz += (2*num_blocks+1)*sizeof(uint32_t);
-    }
-    return;
-}
 
 }  // namespace spring

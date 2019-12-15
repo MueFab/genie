@@ -27,7 +27,7 @@
 
 namespace spring {
 
-void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
+/*void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
                      const std::string &temp_dir, compression_params &cp,
                      const std::string &outputFilePath, util::FastqStats *stats) {
     using namespace format;
@@ -199,6 +199,6 @@ void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileRea
     std::cout << "Max Read length: " << cp.max_readlen << "\n";
     std::cout << "Total number of reads: " << cp.num_reads << "\n";
     return;
-}
+}*/
 
 }  // namespace spring

@@ -2,16 +2,15 @@
 #define SPRING_COMPRESS_UREADS_H_
 
 #include <genie/stream-saver.h>
-#include <format/fastq/fastq-file-reader.h>
 #include <util/perf-stats.h>
 #include <string>
 #include "util.h"
 
 namespace spring {
 
-void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
+/*void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
                      const std::string &temp_dir, compression_params &cp,
-                     const std::string &outputFilePath, util::FastqStats *stats);
+                     const std::string &outputFilePath, util::FastqStats *stats);*/
 
 }  // namespace spring
 

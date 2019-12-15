@@ -3,7 +3,7 @@
 
 namespace spring {
 
-void generate_new_fastq_se(format::fastq::FastqFileReader *fastqFileReader1, const std::string &temp_dir,
+/*void generate_new_fastq_se(format::fastq::FastqFileReader *fastqFileReader1, const std::string &temp_dir,
                            const compression_params &cp, const std::string &outputFilePath) {
     uint32_t numreads = cp.num_reads;
     std::string basedir = temp_dir;
@@ -141,6 +141,6 @@ void generate_new_fastq_pe(format::fastq::FastqFileReader *fastqFileReader1, for
     delete[] quality_array;
     delete[] first_file_flag_array;
     return;
-}
+}*/
 
 }  // namespace spring

@@ -7,7 +7,6 @@
 
 #include <genie/generation.h>
 #include <genie/stream-saver.h>
-#include <format/fastq/fastq-file-reader.h>
 #include <util/perf-stats.h>
 
 #include "return-structures.h"
@@ -15,10 +14,6 @@
 
 namespace spring {
 
-void generate_streams_SPRING(format::fastq::FastqFileReader *fastqFileReader1, format::fastq::FastqFileReader *fastqFileReader2,
-                             int num_thr, bool paired_end, const std::string &working_dir, bool analyze,
-                             const std::string &outputFilePath, bool ureads_flag, bool preserve_quality,
-                             bool preserve_id, util::FastqStats *stats);
 
 void call_reorder(const std::string &temp_dir, compression_params &cp);
 
