@@ -40,10 +40,10 @@ std::vector<std::vector<std::vector<gabac::DataBlock>>> create_default_streams()
 
 std::vector<std::vector<gabac::DataBlock>> generate_empty_raw_data();
 
-void write_streams_to_file(const std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams,
+uint64_t write_streams_to_file(const std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams,
                            const std::string &outfile, const std::vector<uint8_t> &descriptors_to_write);
 
-void read_streams_from_file(std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams, const std::string &infile, const std::vector<uint8_t> &descriptors_to_read);
+uint64_t read_streams_from_file(std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams, const std::string &infile, const std::vector<uint8_t> &descriptors_to_read);
 
 std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf();
 

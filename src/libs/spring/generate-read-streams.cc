@@ -22,11 +22,11 @@
 
 namespace spring {
 
-void generate_read_streams(const std::string &temp_dir, const compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs) {
+void generate_read_streams(const std::string &temp_dir, const compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs, util::FastqStats *stats) {
     if (!cp.paired_end)
-        generate_read_streams_se(temp_dir, cp, configs);
+        generate_read_streams_se(temp_dir, cp, configs, stats);
     else
-        generate_read_streams_pe(temp_dir, cp, configs);
+        generate_read_streams_pe(temp_dir, cp, configs, stats);
 }
 
 void compress_read_subseqs(std::vector<std::vector<gabac::DataBlock>> &raw_data,
@@ -143,13 +143,14 @@ void generate_subseqs(const se_data &data, uint64_t block_num, std::vector<std::
     }
 }
 
-void generate_and_compress_se(const std::string &temp_dir, const se_data &data, const std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
+void generate_and_compress_se(const std::string &temp_dir, const se_data &data, const std::vector<std::vector<gabac::EncodingConfiguration>> &configs, util::FastqStats *stats) {
     // Now generate new streams and compress blocks in parallel
     // this is actually number of read pairs per block for PE
     uint64_t blocks = uint64_t(std::ceil(float(data.cp.num_reads) / data.cp.num_reads_per_block));
     std::vector<uint32_t> num_reads_per_block(blocks);
+    uint64_t size = 0;
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for num_threads(data.cp.num_thr) schedule(dynamic)
+#pragma omp parallel for num_threads(data.cp.num_thr) schedule(dynamic) reduction(+:size)
 #endif
     for (uint64_t block_num = 0; block_num < blocks; block_num++) {
         auto raw_data = generate_empty_raw_data();
@@ -161,9 +162,14 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data, 
         compress_read_subseqs(raw_data, generated_streams, configs);
 
         std::string file_to_save_streams = temp_dir + "/read_streams." + std::to_string(block_num);
-        write_streams_to_file(generated_streams, file_to_save_streams, read_descriptors);
+        size += write_streams_to_file(generated_streams, file_to_save_streams, read_descriptors);
 
     }  // end omp parallel
+
+    if (stats->enabled) {
+       stats->cmprs_seq_sz += size;
+       stats->cmprs_total_sz += size;
+    }
 
     // write num blocks, reads per block to a file
     const std::string block_info_file = temp_dir + "/block_info.bin";
@@ -171,6 +177,9 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data, 
     uint32_t num_blocks = (uint32_t)blocks;
     f_block_info.write((char*)&num_blocks, sizeof(uint32_t));
     f_block_info.write((char*)&num_reads_per_block[0],num_blocks*sizeof(uint32_t));
+    if (stats->enabled) {
+       stats->cmprs_total_sz += (num_blocks+1)*sizeof(uint32_t);
+    }
 
     return;
 }
@@ -284,11 +293,12 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
 
 void generate_read_streams_se(const std::string &temp_dir,
                               const compression_params &cp,
-                              const std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
+                              const std::vector<std::vector<gabac::EncodingConfiguration>> &configs,
+                              util::FastqStats *stats) {
     se_data data;
     loadSE_Data(cp, temp_dir, &data);
 
-    generate_and_compress_se(temp_dir, data, configs);
+    generate_and_compress_se(temp_dir, data, configs, stats);
 
     return;
 }
@@ -581,7 +591,7 @@ struct pe_statistics {
 };
 
 void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num,
-                         std::vector<std::vector<gabac::DataBlock>> &raw_data, pe_statistics *stats) {
+                         std::vector<std::vector<gabac::DataBlock>> &raw_data, pe_statistics *pest) {
 #ifdef GENIE_USE_OPENMP
     const unsigned cur_thread_num = omp_get_thread_num();
 #else
@@ -685,7 +695,7 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                 uint16_t delta = data.pos_arr[pair] - data.pos_arr[current];
                 raw_data[8][0].push_back(0);                            // pair decoding case same_rec
                 raw_data[8][1].push_back(!(read_1_first) + 2 * delta);  // pair
-                stats->count_same_rec[cur_thread_num]++;
+                pest->count_same_rec[cur_thread_num]++;
             }
         } else {
             // only one read in genomic record
@@ -727,9 +737,9 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
             // pair subsequences
             bool same_block = (bdata.block_num[current] == bdata.block_num[pair]);
             if (same_block)
-                stats->count_split_same_AU[cur_thread_num]++;
+                pest->count_split_same_AU[cur_thread_num]++;
             else
-                stats->count_split_diff_AU[cur_thread_num]++;
+                pest->count_split_diff_AU[cur_thread_num]++;
 
             bool read_1_first = (current < pair);
             if (same_block && !read_1_first) {
@@ -751,7 +761,7 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
     }
 }
 
-void generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
+void generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>> &configs, util::FastqStats *stats) {
     // basic approach: start looking at reads from left to right. If current is
     // aligned but pair is unaligned, pair is kept at the end current AU and
     // stored in different record. We try to keep number of records in AU =
@@ -771,38 +781,45 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
 
     generate_qual_id_pe(temp_dir, bdata, cp.num_reads);
 
-    pe_statistics stats;
-    stats.count_same_rec = std::vector<uint32_t>(cp.num_thr, 0);
-    stats.count_split_same_AU = std::vector<uint32_t>(cp.num_thr, 0);
-    stats.count_split_diff_AU = std::vector<uint32_t>(cp.num_thr, 0);
+    pe_statistics pest;
+    pest.count_same_rec = std::vector<uint32_t>(cp.num_thr, 0);
+    pest.count_split_same_AU = std::vector<uint32_t>(cp.num_thr, 0);
+    pest.count_split_diff_AU = std::vector<uint32_t>(cp.num_thr, 0);
 
     std::vector<uint32_t> num_reads_per_block(bdata.block_start.size());
     std::vector<uint32_t> num_records_per_block(bdata.block_start.size());
 
+    uint64_t size = 0;
+
     // PE step 4: Now generate read streams and compress blocks in parallel
 // this is actually number of read pairs per block for PE
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic)
+#pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic) reduction(+:size)
 #endif
     for (uint64_t cur_block_num = 0; cur_block_num < bdata.block_start.size(); cur_block_num++) {
         auto raw_data = generate_empty_raw_data();
 
-        generate_streams_pe(data, bdata, cur_block_num, raw_data, &stats);
+        generate_streams_pe(data, bdata, cur_block_num, raw_data, &pest);
         num_reads_per_block[cur_block_num] = raw_data[1][0].size(); // rcomp
         num_records_per_block[cur_block_num] = bdata.block_end[cur_block_num] - bdata.block_start[cur_block_num]; // used later for ids
         std::vector<std::vector<std::vector<gabac::DataBlock>>> generated_streams = create_default_streams();
         compress_read_subseqs(raw_data, generated_streams, configs);
 
         std::string file_to_save_streams = temp_dir + "/read_streams." + std::to_string(cur_block_num);
-        write_streams_to_file(generated_streams, file_to_save_streams, read_descriptors);
+        size += write_streams_to_file(generated_streams, file_to_save_streams, read_descriptors);
     }  // end omp parallel
 
-    std::cout << "count_same_rec: " << std::accumulate(stats.count_same_rec.begin(), stats.count_same_rec.end(), 0)
+    if (stats->enabled) {
+       stats->cmprs_seq_sz += size;
+       stats->cmprs_total_sz += size;
+    }
+
+    std::cout << "count_same_rec: " << std::accumulate(pest.count_same_rec.begin(), pest.count_same_rec.end(), 0)
               << "\n";
     std::cout << "count_split_same_AU: "
-              << std::accumulate(stats.count_split_same_AU.begin(), stats.count_split_same_AU.end(), 0) << "\n";
+              << std::accumulate(pest.count_split_same_AU.begin(), pest.count_split_same_AU.end(), 0) << "\n";
     std::cout << "count_split_diff_AU: "
-              << std::accumulate(stats.count_split_diff_AU.begin(), stats.count_split_diff_AU.end(), 0) << "\n";
+              << std::accumulate(pest.count_split_diff_AU.begin(), pest.count_split_diff_AU.end(), 0) << "\n";
 
     // write num blocks, reads per block and records per block to a file
     const std::string block_info_file = temp_dir + "/block_info.bin";
@@ -811,6 +828,9 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
     f_block_info.write((char*)&num_blocks, sizeof(uint32_t));
     f_block_info.write((char*)&num_reads_per_block[0],num_blocks*sizeof(uint32_t));
     f_block_info.write((char*)&num_records_per_block[0],num_blocks*sizeof(uint32_t));
+    if (stats->enabled) {
+       stats->cmprs_total_sz += (2*num_blocks+1)*sizeof(uint32_t);
+    }
     return;
 }
 
