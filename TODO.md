@@ -2,6 +2,12 @@
 
 ---
 
+## New (December 16, 2019)
+
+- Josh, Brian: validation of user input in Genie
+- Fix git tags
+- Better error message on invalid CIGAR string
+
 ## New (December 9, 2019)
 
 - Re-use ID and QV compression code from SPRING
