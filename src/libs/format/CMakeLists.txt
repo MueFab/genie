@@ -6,7 +6,6 @@ set(source_files
 
         fastq/fastq-exporter.cc
         fastq/fastq-importer.cc
-        fastq/fastq-record.cc
 
         mpegg_rec/mgrecs-exporter.cc
         mpegg_rec/mgrecs-importer.cc

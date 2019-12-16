@@ -66,8 +66,8 @@ void encode(const ProgramOptions& programOptions) {
         {
             std::ifstream infile1(programOptions.inputFilePath), infile2(programOptions.pairFilePath);
             std::ofstream outfile1(programOptions.outputFilePath), outfile2(programOptions.outputPairFilePath);
-            FastqImporter importer(1000, &infile1, &infile2);
-            FastqExporter exporter(&outfile1, &outfile2);
+            format::fastq::FastqImporter importer(1000, &infile1, &infile2);
+            format::fastq::FastqExporter exporter(&outfile1, &outfile2);
             importer.setDrain(&exporter);
 
             while (importer.pump()) {}
@@ -76,7 +76,7 @@ void encode(const ProgramOptions& programOptions) {
         {
             std::ifstream infile1(programOptions.inputFilePath), infile2(programOptions.pairFilePath);
             std::ofstream outfile1(programOptions.outputFilePath + ".mgrec");
-            FastqImporter importer(1000, &infile1, &infile2);
+            format::fastq::FastqImporter importer(1000, &infile1, &infile2);
             MgrecsExporter exporter(&outfile1);
             importer.setDrain(&exporter);
 
