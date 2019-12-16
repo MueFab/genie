@@ -12,6 +12,7 @@ set(source_files
         gabac-compressor.cc
         genie-gabac-output-stream.cc
         spring-encoder.cc
+        gabac-seq-conf-set.cc
         )
 
 add_library(coding ${source_files})

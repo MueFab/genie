@@ -1,33 +1,53 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #ifndef GENIE_GABAC_COMPRESSOR_H
 #define GENIE_GABAC_COMPRESSOR_H
 
-#include "mpegg-compressor.h"
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include <gabac/gabac.h>
-
-#include "genie-gabac-output-stream.h"
 #include <util/make_unique.h>
+#include "gabac-seq-conf-set.h"
+#include "genie-gabac-output-stream.h"
+#include "mpegg-compressor.h"
 
-class GabacSeqConfSet {
-    typedef std::vector<gabac::EncodingConfiguration> SeqConf;
-    std::vector<SeqConf> conf;
-
-public:
-    GabacSeqConfSet();
-
-    const gabac::EncodingConfiguration* getConf(MpeggRawAu::GenomicDescriptor desc, size_t sub);
-
-
-};
-
+/**
+ *
+ */
 class GabacCompressor : public MpeggCompressor {
-private:
-    void compress(const gabac::EncodingConfiguration& conf, gabac::DataBlock* in, std::vector<gabac::DataBlock>* out);
-public:
-    GabacSeqConfSet configSet;
+   private:
+    /**
+     *
+     * @param conf
+     * @param in
+     * @param out
+     */
+    static void compress(const gabac::EncodingConfiguration& conf, gabac::DataBlock* in,
+                         std::vector<gabac::DataBlock>* out);
 
-    void flowIn(std::unique_ptr<MpeggRawAu> t, size_t id) override;
+   public:
+    GabacSeqConfSet configSet;  //!<
+
+    /**
+     *
+     * @param raw_aus
+     * @param id
+     */
+    void flowIn(std::unique_ptr<MpeggRawAu> raw_aus, size_t id) override;
+
+    /**
+     *
+     */
     void dryIn() override;
 };
 
+// ---------------------------------------------------------------------------------------------------------------------
 
-#endif //GENIE_GABAC_COMPRESSOR_H
+#endif  // GENIE_GABAC_COMPRESSOR_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
