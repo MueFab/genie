@@ -1,7 +1,7 @@
 project("coding-tests")
 
 set(source_files
-        gabac-compressor.cc
+        gabac-compressor-test.cc
         helpers.cc
 )
 
