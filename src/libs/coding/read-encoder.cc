@@ -8,7 +8,7 @@
 #include <format/mpegg_rec/segment.h>
 
 namespace lae {
-    LocalAssemblyReadEncoder::LocalAssemblyReadEncoder() : container(util::make_unique<MpeggRawAu>()), pos(0),
+    LocalAssemblyReadEncoder::LocalAssemblyReadEncoder() : container(util::make_unique<MpeggRawAu>(util::make_unique<format::mpegg_p2::ParameterSet>())), pos(0),
                                                            readCounter(0) {
 
     }
@@ -189,7 +189,7 @@ namespace lae {
 
     std::unique_ptr<MpeggRawAu> LocalAssemblyReadEncoder::pollStreams() {
         auto tmp = std::move(container);
-        container = util::make_unique<MpeggRawAu>();
+        container = util::make_unique<MpeggRawAu>(util::make_unique<format::mpegg_p2::ParameterSet>());
         return tmp;
     }
 

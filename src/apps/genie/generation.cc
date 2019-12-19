@@ -21,11 +21,9 @@
 #include "util/exceptions.h"
 #include "format/fasta/fasta-file-reader.h"
 #include "format/fasta/fasta-record.h"
-#include "format/fastq/fastq-file-reader.h"
-#include "format/fastq/fastq-record.h"
 #include "format/sam/sam-file-reader.h"
 #include "format/sam/sam-record.h"
-
+#if 0
 namespace dsg {
 
 static void generationFromFastq_SPRING(const ProgramOptions &programOptions, util::FastqStats *stats, const std::string &filename) {
@@ -181,5 +179,6 @@ void generation(const ProgramOptions &programOptions) {
         UTILS_DIE("Wrong input file type: " + programOptions.inputFilePath);
     }
 }
-
 }  // namespace dsg
+
+#endif

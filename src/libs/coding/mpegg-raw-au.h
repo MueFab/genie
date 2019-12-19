@@ -1,37 +1,91 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #ifndef GENIE_MPEGG_RAW_AU_H
 #define GENIE_MPEGG_RAW_AU_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <format/mpegg_p2/parameter_set.h>
 #include <cstdint>
 #include <string>
 #include <vector>
-#include <format/mpegg_p2/parameter_set.h>
 
-
+/**
+ *
+ */
 class MpeggRawAu {
-public:
+   public:
+    /**
+     *
+     */
     struct SubDescriptor {
-    private:
-        gabac::DataBlock data;
-        size_t position;
-    public:
+       private:
+        gabac::DataBlock data;  //!<
+        size_t position;        //!<
+
+       public:
+        /**
+         *
+         * @param wordsize
+         */
         explicit SubDescriptor(size_t wordsize);
+
+        /**
+         *
+         * @param d
+         */
         explicit SubDescriptor(gabac::DataBlock* d);
+
+        /**
+         *
+         * @param val
+         */
         void push(uint64_t val);
 
+        /**
+         *
+         */
         void inc();
 
+        /**
+         *
+         * @return
+         */
         uint64_t get() const;
 
+        /**
+         *
+         * @return
+         */
         bool end() const;
 
-        size_t rawSize () const;
+        /**
+         *
+         * @return
+         */
+        size_t rawSize() const;
 
+        /**
+         *
+         * @return
+         */
         size_t getWordSize() const;
 
-        const void* getData () const;
+        /**
+         *
+         * @return
+         */
+        const void* getData() const;
     };
-    typedef std::vector<SubDescriptor> Descriptor;
+    typedef std::vector<SubDescriptor> Descriptor;  //!<
 
+    /**
+     *
+     */
     enum class GenomicDescriptor : uint8_t {
         POS = 0,
         RCOMP = 1,
@@ -53,46 +107,92 @@ public:
         RFTT = 17
     };
 
+    /**
+     *
+     */
     struct GenomicDescriptorProperties {
-        std::string name;
-        uint8_t number_subsequences;
+        std::string name;             //!<
+        uint8_t number_subsequences;  //!<
     };
-    static constexpr size_t NUM_DESCRIPTORS = 18;
+    static constexpr size_t NUM_DESCRIPTORS = 18;  //!<
 
+    /**
+     *
+     */
     struct Alphabet {
-        std::vector<char> lut;
-        std::vector<char> inverseLut;
+        std::vector<char> lut;         //!<
+        std::vector<char> inverseLut;  //!<
     };
 
-    static const std::vector<GenomicDescriptorProperties> &getDescriptorProperties();
+    /**
+     *
+     * @return
+     */
+    static const std::vector<GenomicDescriptorProperties>& getDescriptorProperties();
 
+    /**
+     *
+     * @param desc
+     * @param sub
+     * @return
+     */
     SubDescriptor& get(GenomicDescriptor desc, size_t sub);
 
+    /**
+     *
+     * @param desc
+     * @param sub
+     * @return
+     */
     const SubDescriptor& get(GenomicDescriptor desc, size_t sub) const;
 
-    static const Alphabet &getAlphabetProperties(format::mpegg_p2::ParameterSet::AlphabetID id);
+    /**
+     *
+     * @param id
+     * @return
+     */
+    static const Alphabet& getAlphabetProperties(format::mpegg_p2::ParameterSet::AlphabetID id);
 
-    MpeggRawAu();
+    /**
+     *
+     * @param set
+     */
+    explicit MpeggRawAu(std::unique_ptr<format::mpegg_p2::ParameterSet> set);
 
+    /**
+     *
+     * @param _parameters
+     */
     void setParameters(std::unique_ptr<format::mpegg_p2::ParameterSet> _parameters) {
         parameters = std::move(_parameters);
     }
 
-    format::mpegg_p2::ParameterSet* getParameters() {
-        return parameters.get();
-    }
+    /**
+     *
+     * @return
+     */
+    format::mpegg_p2::ParameterSet* getParameters() { return parameters.get(); }
 
-    std::unique_ptr<format::mpegg_p2::ParameterSet> moveParameters() {
-        return std::move(parameters);
-    }
+    /**
+     *
+     * @return
+     */
+    std::unique_ptr<format::mpegg_p2::ParameterSet> moveParameters() { return std::move(parameters); }
 
-    const format::mpegg_p2::ParameterSet* getParameters() const {
-        return parameters.get();
-    }
+    /**
+     *
+     * @return
+     */
+    const format::mpegg_p2::ParameterSet* getParameters() const { return parameters.get(); }
 
-private:
-    std::vector<Descriptor> descriptors;
-    std::unique_ptr<format::mpegg_p2::ParameterSet> parameters;
+   private:
+    std::vector<Descriptor> descriptors;                         //!<
+    std::unique_ptr<format::mpegg_p2::ParameterSet> parameters;  //!<
 };
 
-#endif //GENIE_MPEGG_RAW_AU_H
+// ---------------------------------------------------------------------------------------------------------------------
+
+#endif  // GENIE_MPEGG_RAW_AU_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
