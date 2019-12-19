@@ -38,9 +38,9 @@ static int dsg_main(int argc, char* argv[]) {
         }
 
         if (programOptions.inputFileType != "GENIE" && programOptions.inputFileType != "SGENIE") {
-            generation(programOptions);
+//            generation(programOptions);
         } else {
-            decompression(programOptions);
+  //          decompression(programOptions);
         }
     } catch (const util::RuntimeException& e) {
         std::cerr << "Runtime error";

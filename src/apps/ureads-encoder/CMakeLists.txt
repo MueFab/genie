@@ -16,6 +16,8 @@ set(source_files
 
 add_executable(ureads-encoder ${source_files})
 
+target_link_libraries(ureads-encoder PRIVATE spring)
+target_link_libraries(ureads-encoder PRIVATE coding)
 target_link_libraries(ureads-encoder PRIVATE format)
 target_link_libraries(ureads-encoder PRIVATE util)
 target_link_libraries(ureads-encoder PRIVATE gabac)

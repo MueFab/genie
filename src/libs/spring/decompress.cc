@@ -13,7 +13,7 @@
 #include "util.h"
 
 namespace spring {
-
+#if 0
 void decode_streams(decoded_desc_t &dec, bool paired_end, bool preserve_quality, bool preserve_id, bool combine_pairs,
                     std::vector<format::fastq::FastqRecord> matched_records[2],
                     std::vector<format::fastq::FastqRecord> unmatched_records[2], std::vector<uint32_t> &mate_au_id,
@@ -522,5 +522,5 @@ void read_fastq_record_from_ifstream(std::ifstream &in, format::fastq::FastqReco
         std::getline(in, fastqRecord.qualityScores);
     }
 }
-
+#endif
 }  // namespace spring

@@ -1,7 +1,8 @@
 #ifndef GENIE_SPRING_ENCODER_H
 #define GENIE_SPRING_ENCODER_H
 
-
+#include <spring/util.h>
+#include <util/perf-stats.h>
 #include "mpegg-encoder.h"
 
 class SpringEncoder : public MpeggEncoder{
