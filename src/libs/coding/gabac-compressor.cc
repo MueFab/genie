@@ -42,7 +42,7 @@ void GabacCompressor::flowIn(std::unique_ptr<MpeggRawAu> raw_aus, size_t id) {
         for (size_t sub_desc = 0; sub_desc < NUM_SUBSEQS; ++sub_desc) {
             // Do the compression
             auto &input = raw_aus->get(MpeggRawAu::GenomicDescriptor(desc), sub_desc);
-            gabac::DataBlock input_block((const uint8_t *)input.getData(), input.getWordSize(), input.rawSize());
+            gabac::DataBlock input_block((const uint8_t *)input.getData(), input.rawSize(), input.getWordSize());
             std::vector<gabac::DataBlock> out;
             compress(configSet.getConfAsGabac(MpeggRawAu::GenomicDescriptor(desc), sub_desc), &input_block, &out);
 

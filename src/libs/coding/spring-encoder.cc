@@ -1,13 +1,13 @@
-#include <chrono>
-#include <spring/spring.h>
-#include <spring/params.h>
 #include "spring-encoder.h"
+#include <spring/params.h>
+#include <spring/spring.h>
+#include <chrono>
 
+#include <format/mpegg_rec/alignment-container.h>
+#include <format/mpegg_rec/external-alignment.h>
+#include <format/mpegg_rec/meta-alignment.h>
 #include <format/mpegg_rec/mpegg-record.h>
 #include <format/mpegg_rec/segment.h>
-#include <format/mpegg_rec/meta-alignment.h>
-#include <format/mpegg_rec/external-alignment.h>
-#include <format/mpegg_rec/alignment-container.h>
 #include <spring/generate-read-streams.h>
 
 void SpringEncoder::preprocessInit() {
@@ -43,21 +43,9 @@ void SpringEncoder::preprocessInit() {
     uint32_t num_reads_per_block;
     num_reads_per_block = cp.num_reads_per_block;
 
-    //  char *quality_binning_table = new char[128];
-    //  if (cp.ill_bin_flag) generate_illumina_binning_table(quality_binning_table);
-    //  if (cp.bin_thr_flag) generate_binary_binning_table(quality_binning_table, cp.bin_thr_thr, cp.bin_thr_high,
-    //  cp.bin_thr_low);
-
-    //
-    // Disable parallelism for this loop.
-    // All real work is done by the master thread, and the worker threads
-    // just sit at an OpenMP barrier.  Running on a single thread speeds
-    // things up slightly.
-    //
-    // int num_threads = cp.num_thr;
     num_threads = 1;
 
-    uint64_t num_reads_per_step = (uint64_t) num_threads * num_reads_per_block;
+    uint64_t num_reads_per_step = (uint64_t)num_threads * num_reads_per_block;
     read_contains_N_array = new bool[num_reads_per_step];
     read_lengths_array = new uint32_t[num_reads_per_step];
     num_blocks_done = 0;
@@ -84,12 +72,12 @@ void SpringEncoder::preprocessIteration(std::unique_ptr<format::mpegg_rec::Mpegg
                     throw std::runtime_error("Read length does not match quality length.");
                 if (cp.preserve_id && ((*t)[i]->getReadName().length() == 0) && j == 0)
                     throw std::runtime_error("Identifier of length 0 detected.");
-                read_lengths_array[i] = (uint32_t) len;
+                read_lengths_array[i] = (uint32_t)len;
 
-                read_contains_N_array[i] = ((*t)[i]->getRecordSegment(j)->getSequence()->find('N') !=
-                                            std::string::npos);
+                read_contains_N_array[i] =
+                    ((*t)[i]->getRecordSegment(j)->getSequence()->find('N') != std::string::npos);
             }
-        }      // omp parallel
+        }  // omp parallel
         // write reads and read_order_N to respective files
         for (uint32_t i = 0; i < t->size(); i++) {
             if (!read_contains_N_array[i]) {
@@ -97,7 +85,7 @@ void SpringEncoder::preprocessIteration(std::unique_ptr<format::mpegg_rec::Mpegg
                 num_reads_clean[j]++;
             } else {
                 uint32_t pos_N = num_reads[j] + i;
-                fout_order_N[j].write((char *) &pos_N, sizeof(uint32_t));
+                fout_order_N[j].write((char *)&pos_N, sizeof(uint32_t));
                 fout_N[j] << *(*t)[i]->getRecordSegment(j)->getSequence() << "\n";
             }
         }
@@ -108,8 +96,7 @@ void SpringEncoder::preprocessIteration(std::unique_ptr<format::mpegg_rec::Mpegg
         if (j == 0)
             for (uint32_t i = 0; i < t->size(); i++) fout_id << (*t)[i]->getReadName() << "\n";
         num_reads[j] += t->size();
-        max_readlen =
-                std::max(max_readlen, *(std::max_element(read_lengths_array, read_lengths_array + t->size())));
+        max_readlen = std::max(max_readlen, *(std::max_element(read_lengths_array, read_lengths_array + t->size())));
     }
     if (cp.paired_end)
         if (num_reads[0] != num_reads[1]) throw std::runtime_error("Number of reads in paired files do not match.");
@@ -145,9 +132,9 @@ void SpringEncoder::preprocessClean() {
         uint32_t num_N_file_2 = num_reads[1] - num_reads_clean[1];
         uint32_t order_N;
         for (uint32_t i = 0; i < num_N_file_2; i++) {
-            fin_order_N.read((char *) &order_N, sizeof(uint32_t));
+            fin_order_N.read((char *)&order_N, sizeof(uint32_t));
             order_N += num_reads[0];
-            fout_order_N_PE.write((char *) &order_N, sizeof(uint32_t));
+            fout_order_N_PE.write((char *)&order_N, sizeof(uint32_t));
         }
         fin_order_N.close();
         fout_order_N_PE.close();
@@ -165,19 +152,12 @@ void SpringEncoder::preprocessClean() {
     std::cout << "Total number of reads without N: " << cp.num_reads_clean[0] + cp.num_reads_clean[1] << "\n";
 }
 
-
-SpringEncoder::SpringEncoder(
-        int _num_thr,
-        std::string _working_dir,
-        bool _ureads_flag,
-        bool _preserve_quality,
-        bool _preserve_id,
-        util::FastqStats *_stats
-) : num_thr(_num_thr),
-    working_dir(std::move(_working_dir)),
-    preserve_quality(_preserve_quality),
-    preserve_id(_preserve_id) {
-
+SpringEncoder::SpringEncoder(int _num_thr, std::string _working_dir, bool _ureads_flag, bool _preserve_quality,
+                             bool _preserve_id, util::FastqStats *_stats)
+    : num_thr(_num_thr),
+      working_dir(std::move(_working_dir)),
+      preserve_quality(_preserve_quality),
+      preserve_id(_preserve_id) {
     // generate random temp directory in the working directory
     while (true) {
         std::string random_str = "tmp." + spring::random_string(10);
@@ -217,8 +197,7 @@ void SpringEncoder::dryIn() {
     auto preprocess_end = std::chrono::steady_clock::now();
     std::cout << "Preprocessing done!\n";
     std::cout << "Time for this step: "
-              << std::chrono::duration_cast<std::chrono::seconds>(preprocess_end - preprocess_start).count()
-              << " s\n";
+              << std::chrono::duration_cast<std::chrono::seconds>(preprocess_end - preprocess_start).count() << " s\n";
     if (stats->enabled) {
         stats->preprocess_t = preprocess_end - preprocess_start;
     }
@@ -253,7 +232,7 @@ void SpringEncoder::dryIn() {
     if (!cp.paired_end) {
         spring::se_data data;
         spring::loadSE_Data(cp, temp_dir, &data);
-        for(size_t i = 0; i < spring::getNumBlocks(cp); ++i) {
+        for (size_t i = 0; i < spring::getNumBlocks(cp); ++i) {
             flowOut(spring::generate_subseqs(data, i), i);
         }
     } else {
@@ -263,43 +242,17 @@ void SpringEncoder::dryIn() {
         spring::loadPE_Data(cp, temp_dir, &data);
         generateBlocksPE(data, &block_data);
         data.order_arr.clear();
-        for(size_t i = 0; i < spring::getNumBlocks(cp); ++i) {
-            flowOut(spring::generate_streams_pe(data,block_data, i, &statistics), i);
+        for (size_t i = 0; i < spring::getNumBlocks(cp); ++i) {
+            flowOut(spring::generate_streams_pe(data, block_data, i, &statistics), i);
         }
     }
     auto grs_end = std::chrono::steady_clock::now();
     std::cout << "Generating read streams done!\n";
-    std::cout << "Time for this step: "
-              << std::chrono::duration_cast<std::chrono::seconds>(grs_end - grs_start).count() << " s\n";
+    std::cout << "Time for this step: " << std::chrono::duration_cast<std::chrono::seconds>(grs_end - grs_start).count()
+              << " s\n";
     if (stats->enabled) {
         stats->generation_t = grs_end - grs_start;
     }
-
-   /* if (preserve_quality || preserve_id) {
-        std::cout << "Reordering and compressing quality and/or ids ...\n";
-        auto rcqi_start = std::chrono::steady_clock::now();
-        reorder_compress_quality_id(temp_dir, cp, configs, stats);
-        auto rcqi_end = std::chrono::steady_clock::now();
-        std::cout << "Reordering and compressing quality and/or ids done!\n";
-        std::cout << "Time for this step: "
-                  <<
-                  std::chrono::duration_cast<std::chrono::seconds>(rcqi_end -
-                                                                   rcqi_start).count() << " s\n";
-        if (stats->enabled) {
-            stats->qual_score_t = rcqi_end - rcqi_start;
-        }
-    }
-
-    std::cout << "Combining AUs and writing compressed file ...\n";
-    auto cau_start = std::chrono::steady_clock::now();
-    combine_aus(temp_dir, cp, configs, outputFilePath, stats);
-    auto cau_end = std::chrono::steady_clock::now();
-    std::cout << "Combining AUs done!\n";
-    std::cout << "Time for this step: "
-              << std::chrono::duration_cast<std::chrono::seconds>(cau_end - cau_start).count() << " s\n";
-    if (stats->enabled) {
-        stats->combine_t = cau_end - cau_start;
-    }*/
 
     auto compression_end = std::chrono::steady_clock::now();
     std::cout << "Compression done!\n";
@@ -307,16 +260,14 @@ void SpringEncoder::dryIn() {
               << std::chrono::duration_cast<std::chrono::seconds>(compression_end - compression_start).count()
               << " s\n";
 
-
     ghc::filesystem::remove_all(temp_dir);
 
 #if GENIE_USE_OPENMP
     //
-        // Restore the dyn-var omp variable.
-        //
-        omp_set_dynamic(omp_dyn_var);
+    // Restore the dyn-var omp variable.
+    //
+    omp_set_dynamic(omp_dyn_var);
 #endif
 
-        dryOut();
-
+    dryOut();
 }
