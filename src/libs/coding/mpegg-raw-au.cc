@@ -1,7 +1,15 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #include "mpegg-raw-au.h"
 
-#include <algorithm>
 #include <util/make_unique.h>
+#include <algorithm>
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 const std::vector<MpeggRawAu::GenomicDescriptorProperties> &MpeggRawAu::getDescriptorProperties() {
     static const auto prop = []() -> std::vector<GenomicDescriptorProperties> {
@@ -29,6 +37,8 @@ const std::vector<MpeggRawAu::GenomicDescriptorProperties> &MpeggRawAu::getDescr
     return prop;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 const MpeggRawAu::Alphabet &MpeggRawAu::getAlphabetProperties(format::mpegg_p2::ParameterSet::AlphabetID id) {
     static const auto prop = []() -> std::vector<Alphabet> {
         std::vector<Alphabet> loc;
@@ -47,53 +57,58 @@ const MpeggRawAu::Alphabet &MpeggRawAu::getAlphabetProperties(format::mpegg_p2::
     return prop[uint8_t(id)];
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
 
-MpeggRawAu::SubDescriptor::SubDescriptor(size_t wordsize) : data(0, wordsize), position(0) {
+MpeggRawAu::SubDescriptor::SubDescriptor(size_t wordsize) : data(0, wordsize), position(0) {}
 
-}
+// ---------------------------------------------------------------------------------------------------------------------
 
-MpeggRawAu::SubDescriptor::SubDescriptor(gabac::DataBlock *d) : data(0, 1), position(0) {
-    d->swap(d);
-}
+MpeggRawAu::SubDescriptor::SubDescriptor(gabac::DataBlock *d) : data(0, 1), position(0) { d->swap(d); }
 
-void MpeggRawAu::SubDescriptor::push(uint64_t val) {
-    data.push_back(val);
-}
+// ---------------------------------------------------------------------------------------------------------------------
 
-void MpeggRawAu::SubDescriptor::inc() {
-    position++;
-}
+void MpeggRawAu::SubDescriptor::push(uint64_t val) { data.push_back(val); }
 
-uint64_t MpeggRawAu::SubDescriptor::get() const {
-    return data.get(position);
-}
+// ---------------------------------------------------------------------------------------------------------------------
 
-bool MpeggRawAu::SubDescriptor::end() const {
-    return data.size() == position;
-}
+void MpeggRawAu::SubDescriptor::inc() { position++; }
 
-size_t MpeggRawAu::SubDescriptor::rawSize() const {
-    return data.getRawSize();
-}
+// ---------------------------------------------------------------------------------------------------------------------
 
-size_t MpeggRawAu::SubDescriptor::getWordSize() const {
-    return data.getWordSize();
-}
+uint64_t MpeggRawAu::SubDescriptor::get() const { return data.get(position); }
 
-const void *MpeggRawAu::SubDescriptor::getData() const {
-    return data.getData();
-}
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool MpeggRawAu::SubDescriptor::end() const { return data.size() == position; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+size_t MpeggRawAu::SubDescriptor::rawSize() const { return data.getRawSize(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+size_t MpeggRawAu::SubDescriptor::getWordSize() const { return data.getWordSize(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const void *MpeggRawAu::SubDescriptor::getData() const { return data.getData(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 MpeggRawAu::SubDescriptor &MpeggRawAu::get(GenomicDescriptor desc, size_t sub) {
     return descriptors[uint8_t(desc)][sub];
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 const MpeggRawAu::SubDescriptor &MpeggRawAu::get(GenomicDescriptor desc, size_t sub) const {
     return descriptors[uint8_t(desc)][sub];
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
 
-MpeggRawAu::MpeggRawAu() : descriptors(NUM_DESCRIPTORS) {
+MpeggRawAu::MpeggRawAu(std::unique_ptr<format::mpegg_p2::ParameterSet> set)
+    : descriptors(NUM_DESCRIPTORS), parameters(std::move(set)) {
     const size_t WORDSIZE = 4;
     size_t idx = 0;
     for (const auto &s : getDescriptorProperties()) {
@@ -102,3 +117,5 @@ MpeggRawAu::MpeggRawAu() : descriptors(NUM_DESCRIPTORS) {
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

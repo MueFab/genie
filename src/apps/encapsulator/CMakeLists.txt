@@ -62,6 +62,8 @@ add_executable(encapsulator ${source_files})
 
 target_link_libraries(encapsulator PRIVATE util)
 target_link_libraries(encapsulator PRIVATE format)
+target_link_libraries(encapsulator PRIVATE coding)
+target_link_libraries(encapsulator PRIVATE spring)
 
 #target_link_libraries(encapsulator PRIVATE encapsulatorBoxesDefinitions)
 #target_link_libraries(encapsulator PRIVATE encapsulatorDataStructures)
