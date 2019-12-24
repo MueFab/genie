@@ -34,6 +34,22 @@ namespace cabac {
 
         std::unique_ptr<CabacBinarization> clone() const;
 
+
+        CabacBinarizationParameters::BinarizationId getBinarizationID() const {
+            return binarization_ID;
+        }
+
+        bool getBypassFlag() const {
+            return bypass_flag;
+        }
+
+        const CabacBinarizationParameters* getCabacBinarizationParameters() const {
+            return cabac_binarization_parameters.get();
+        }
+
+        const CabacContextParameters* getCabacContextParameters() const {
+            return cabac_context_parameters.get();
+        }
     private:
         CabacBinarizationParameters::BinarizationId binarization_ID;                 //!< : 5; Line 2
         uint8_t bypass_flag : 1;                                                     //!< Line 3

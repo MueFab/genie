@@ -10,36 +10,44 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-    namespace mpegg_p2 {
+namespace mpegg_p2 {
 namespace desc_conf_pres {
 namespace cabac {
 
 /**
  * ISO 23092-2 Section 8.3.3.2 table 99
  */
-    class CabacContextParameters {
-    private:
-        uint8_t adaptive_mode_flag : 1;                     //!< Line 2
-        uint16_t num_contexts : 16;                         //!< Line 3
-        std::vector<uint8_t> context_initialization_value;  //!< : 7; Lines 4-6
-        std::unique_ptr<bool> share_subsym_ctx_flag;        //!< : 1; Line 8
-    public:
-        CabacContextParameters(bool adaptive_mode_flag, uint8_t coding_subsym_size, uint8_t output_symbol_size,
-                               bool _share_subsym_ctx_flag);
+class CabacContextParameters {
+   private:
+    uint8_t adaptive_mode_flag : 1;                     //!< Line 2
+    uint16_t num_contexts : 16;                         //!< Line 3
+    std::vector<uint8_t> context_initialization_value;  //!< : 7; Lines 4-6
+    std::unique_ptr<bool> share_subsym_ctx_flag;        //!< : 1; Line 8
+   public:
+    CabacContextParameters(bool adaptive_mode_flag, uint8_t coding_subsym_size, uint8_t output_symbol_size,
+                           bool _share_subsym_ctx_flag);
 
-        CabacContextParameters();
+    CabacContextParameters();
 
-        virtual ~CabacContextParameters() = default;
+    virtual ~CabacContextParameters() = default;
 
-        void addContextInitializationValue(uint8_t _context_initialization_value);
+    void addContextInitializationValue(uint8_t _context_initialization_value);
 
-        virtual void write(util::BitWriter *writer) const;
+    virtual void write(util::BitWriter* writer) const;
 
-        std::unique_ptr<CabacContextParameters> clone() const;
-    };
-}
+    std::unique_ptr<CabacContextParameters> clone() const;
+
+    uint8_t getAdaptiveModeFlag() const { return adaptive_mode_flag; }
+
+    uint16_t getNumContexts() const { return num_contexts; }
+
+    bool getShareSubsymCtxFlag() const { return *share_subsym_ctx_flag; }
+
+    const std::vector<uint8_t>* getContextInitializationValue() const { return &context_initialization_value; }
+};
 }  // namespace cabac
 }  // namespace desc_conf_pres
+}  // namespace mpegg_p2
 }  // namespace format
 
 // -----------------------------------------------------------------------------------------------------------------

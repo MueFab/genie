@@ -34,6 +34,18 @@ namespace cabac {
 
         std::unique_ptr<TransformSubseqCfg> clone() const;
 
+        SupportValues::TransformIdSubsym getTransformID() const {
+            return transform_ID_subsym;
+        }
+
+        const SupportValues* getSupportValues() const {
+            return support_values.get();
+        }
+
+        const CabacBinarization* getBinarization() const {
+            return cabac_binarization.get();
+        }
+
     private:
         SupportValues::TransformIdSubsym transform_ID_subsym;   //!< : 3; Line 9
         std::unique_ptr<SupportValues> support_values;          //!< Line 10

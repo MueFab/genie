@@ -1,6 +1,7 @@
 project("coding")
 
 set(source_files
+        constants.cc
         gabac-compressor.cc
         gabac-decompressor.cc
         local-assembly-encoder.cc

@@ -27,6 +27,10 @@ namespace format {
 
             virtual ~DescriptorConfiguration() = default;
 
+            DecCfgPreset getType() const {
+                return dec_cfg_preset;
+            }
+
         protected:
             DecCfgPreset dec_cfg_preset : 8;  //!< Line 2
         };

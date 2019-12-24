@@ -21,34 +21,34 @@
 namespace format {
 namespace fastq {
 /**
- *
+ * @brief Module to export MPEG-G record to fastq files
  */
 class FastqExporter : public Drain<std::unique_ptr<format::mpegg_rec::MpeggChunk>> {
-    std::vector<std::ostream *> file;  //!<
+    std::vector<std::ostream *> file;  //!< @brief Support for paired output files
 
    public:
     /**
-     *
-     * @param _file_1
+     * @brief Unpaired mode
+     * @param _file_1 Output file
      */
     explicit FastqExporter(std::ostream *_file_1);
 
     /**
-     *
-     * @param _file_1
-     * @param _file_2
+     * @brief Paired mode
+     * @param _file_1 Output file #1
+     * @param _file_2 Output file #2
      */
     FastqExporter(std::ostream *_file_1, std::ostream *_file_2);
 
     /**
-     *
-     * @param t
-     * @param id
+     * @brief Process one chunk of MPEGG records
+     * @param records Input records
+     * @param id Block identifier (for multithreading)
      */
-    void flowIn(std::unique_ptr<format::mpegg_rec::MpeggChunk> t, size_t id) override;
+    void flowIn(std::unique_ptr<format::mpegg_rec::MpeggChunk> records, size_t id) override;
 
     /**
-     *
+     * @brief Accepts end of file marker
      */
     void dryIn() override;
 };

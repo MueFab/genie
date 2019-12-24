@@ -36,15 +36,13 @@ void GabacCompressor::compress(const gabac::EncodingConfiguration &conf, gabac::
 void GabacCompressor::flowIn(std::unique_ptr<MpeggRawAu> raw_aus, size_t id) {
     auto payload = util::make_unique<BlockPayloadSet>(raw_aus->moveParameters());
 
-    for (size_t desc = 0; desc < MpeggRawAu::NUM_DESCRIPTORS; ++desc) {
+    for (const auto& desc : getDescriptors()) {
         auto descriptor_payload = util::make_unique<DescriptorPayload>();
-        const auto NUM_SUBSEQS = MpeggRawAu::getDescriptorProperties()[desc].number_subsequences;
-        for (size_t sub_desc = 0; sub_desc < NUM_SUBSEQS; ++sub_desc) {
-            // Do the compression
-            auto &input = raw_aus->get(MpeggRawAu::GenomicDescriptor(desc), sub_desc);
-            gabac::DataBlock input_block((const uint8_t *)input.getData(), input.rawSize(), input.getWordSize());
+        for (const auto& subseq : desc.subseqs) {
+            auto &input = raw_aus->get(desc.id, subseq.id);
+            gabac::DataBlock input_block((const uint8_t *)input.getData(), input.rawSize() / input.getWordSize(), input.getWordSize());
             std::vector<gabac::DataBlock> out;
-            compress(configSet.getConfAsGabac(MpeggRawAu::GenomicDescriptor(desc), sub_desc), &input_block, &out);
+            compress(configSet.getConfAsGabac(desc.id, subseq.id), &input_block, &out);
 
             // Add to payload
             auto subsequence_payload = util::make_unique<SubDescriptorPayload>();
@@ -54,7 +52,7 @@ void GabacCompressor::flowIn(std::unique_ptr<MpeggRawAu> raw_aus, size_t id) {
             descriptor_payload->add(std::move(subsequence_payload));
         }
         if (!descriptor_payload->isEmpty()) {
-            payload->setPayload(desc, std::move(descriptor_payload));
+            payload->setPayload(desc.id, std::move(descriptor_payload));
         }
     }
 

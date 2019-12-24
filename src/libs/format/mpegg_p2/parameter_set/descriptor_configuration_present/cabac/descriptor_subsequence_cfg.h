@@ -34,11 +34,32 @@ namespace cabac {
 
         void setTransformSubseqCfg(size_t index, std::unique_ptr<TransformSubseqCfg> _transformSubseq_cfg);
 
-        TransformSubseqCfg *getTransformSubseqCfg(size_t index) const;
-
         std::unique_ptr<DescriptorSubsequenceCfg> clone() const;
 
         virtual void write(util::BitWriter *writer) const;
+
+        uint16_t getDescriptorSubsequenceID () const {
+            if(!descriptor_subsequence_ID){
+                UTILS_DIE("descriptor_subsequence_ID not present");
+            }
+            return *descriptor_subsequence_ID.get();
+        };
+
+        const TransformSubseqParameters* getTransformParameters() const {
+            return transform_subseq_parameters.get();
+        }
+
+        const TransformSubseqCfg* getTransformSubseqCfg (uint8_t index) const {
+            return transformSubseq_cfgs[index].get();
+        }
+
+        size_t getNumTransformSubseqCfgs () const {
+            return transformSubseq_cfgs.size();
+        }
+
+        const std::vector<std::unique_ptr<TransformSubseqCfg>>& getTransformSubseqCfgs() const {
+            return transformSubseq_cfgs;
+        }
     };
 }
 }  // namespace cabac
