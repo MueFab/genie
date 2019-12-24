@@ -80,7 +80,7 @@ void LocalAssemblyEncoder::flowIn(std::unique_ptr<format::mpegg_rec::MpeggChunk>
             id,
             id,
             dataType,
-            format::mpegg_p2::ParameterSet::AlphabetID::ACGTN,
+            AlphabetID::ACGTN,
             read_length,
             paired_end,
             false,

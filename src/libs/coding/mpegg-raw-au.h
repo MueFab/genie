@@ -23,7 +23,7 @@ class MpeggRawAu {
      *
      */
     struct SubDescriptor {
-       private:
+       public:
         gabac::DataBlock data;  //!<
         size_t position;        //!<
 
@@ -83,52 +83,7 @@ class MpeggRawAu {
     };
     typedef std::vector<SubDescriptor> Descriptor;  //!<
 
-    /**
-     *
-     */
-    enum class GenomicDescriptor : uint8_t {
-        POS = 0,
-        RCOMP = 1,
-        FLAGS = 2,
-        MMPOS = 3,
-        MMTYPE = 4,
-        CLIPS = 5,
-        UREADS = 6,
-        RLEN = 7,
-        PAIR = 8,
-        MSCORE = 9,
-        MMAP = 10,
-        MSAR = 11,
-        RTYPE = 12,
-        RGROUP = 13,
-        QV = 14,
-        RNAME = 15,
-        RFTP = 16,
-        RFTT = 17
-    };
 
-    /**
-     *
-     */
-    struct GenomicDescriptorProperties {
-        std::string name;             //!<
-        uint8_t number_subsequences;  //!<
-    };
-    static constexpr size_t NUM_DESCRIPTORS = 18;  //!<
-
-    /**
-     *
-     */
-    struct Alphabet {
-        std::vector<char> lut;         //!<
-        std::vector<char> inverseLut;  //!<
-    };
-
-    /**
-     *
-     * @return
-     */
-    static const std::vector<GenomicDescriptorProperties>& getDescriptorProperties();
 
     /**
      *
@@ -136,7 +91,11 @@ class MpeggRawAu {
      * @param sub
      * @return
      */
-    SubDescriptor& get(GenomicDescriptor desc, size_t sub);
+    SubDescriptor& get(GenomicDescriptor desc, GenomicSubsequence sub);
+
+    void set(GenomicDescriptor desc, GenomicSubsequence sub, SubDescriptor* data) {
+        descriptors[uint8_t(desc)][uint8_t (sub)] = SubDescriptor(&data->data);
+    }
 
     /**
      *
@@ -144,14 +103,11 @@ class MpeggRawAu {
      * @param sub
      * @return
      */
-    const SubDescriptor& get(GenomicDescriptor desc, size_t sub) const;
+    const SubDescriptor& get(GenomicDescriptor desc, GenomicSubsequence sub) const;
 
-    /**
-     *
-     * @param id
-     * @return
-     */
-    static const Alphabet& getAlphabetProperties(format::mpegg_p2::ParameterSet::AlphabetID id);
+    SubDescriptor& get(GenomicDescriptor desc, uint8_t sub) {
+        return get(desc, GenomicSubsequence(sub));
+    }
 
     /**
      *

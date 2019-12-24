@@ -16,31 +16,31 @@
 #include "mpegg-compressor.h"
 
 /**
- *
+ * @brief Module to compress raw access units into blockpayloads using GABAC
  */
 class GabacCompressor : public MpeggCompressor {
    private:
     /**
-     *
-     * @param conf
-     * @param in
-     * @param out
+     * @brief Run the actual gabac compression
+     * @param conf GABAC configuration to use
+     * @param in Uncompressed data
+     * @param out Where to put compressed data. A set of transformed subsequences is generated
      */
     static void compress(const gabac::EncodingConfiguration& conf, gabac::DataBlock* in,
                          std::vector<gabac::DataBlock>* out);
 
    public:
-    GabacSeqConfSet configSet;  //!<
+    GabacSeqConfSet configSet;  //!< @brief Config set to use. In contrast to decompression it's static over time
 
     /**
-     *
-     * @param raw_aus
-     * @param id
+     * @brief Process one raw access unit
+     * @param raw_aus Input data
+     * @param id Block identifier (for multithreading).
      */
     void flowIn(std::unique_ptr<MpeggRawAu> raw_aus, size_t id) override;
 
     /**
-     *
+     * @brief Propagate end of data signal
      */
     void dryIn() override;
 };

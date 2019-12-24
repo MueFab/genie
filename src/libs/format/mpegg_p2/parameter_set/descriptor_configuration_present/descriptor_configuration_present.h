@@ -28,6 +28,10 @@ namespace desc_conf_pres {
         void write(util::BitWriter *writer) const override;
 
         void set_decoder_configuration(std::unique_ptr<DecoderConfiguration> conf);
+
+        const DecoderConfiguration* getDecoderConfiguration() const {
+            return decoder_configuration.get();
+        }
     };
 }
 }  // namespace desc_conf_pres

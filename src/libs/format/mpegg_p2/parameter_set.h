@@ -3,6 +3,7 @@
 
 /* ----------------------------------------------------------------------------------------------------------- */
 
+#include <coding/constants.h>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -27,13 +28,6 @@ namespace format {
  */
         class ParameterSet : public DataUnit {
         public:
-            /**
-             * ISO 23092-2 Section 5.1 table 34
-             */
-            enum class AlphabetID : uint8_t {
-                ACGTN = 0,            //!< Line 1
-                ACGTRYSWKMBDHVN_ = 1  //!< Line 2
-            };
 
             explicit ParameterSet(util::BitReader *bitReader);
 
@@ -48,7 +42,11 @@ namespace format {
 
             void addClass(mpegg_rec::MpeggRecord::ClassType class_id, std::unique_ptr<QvCodingConfig> conf);
 
-            void setDescriptor(uint8_t index, std::unique_ptr<DescriptorConfigurationContainer> descriptor);
+            void setDescriptor(GenomicDescriptor index, std::unique_ptr<DescriptorConfigurationContainer> descriptor);
+
+            const DescriptorConfigurationContainer* getDescriptor(GenomicDescriptor index) const {
+                return descriptors[uint8_t (index)].get();
+            }
 
             void addGroup(std::unique_ptr<std::string> rgroup_id);
 

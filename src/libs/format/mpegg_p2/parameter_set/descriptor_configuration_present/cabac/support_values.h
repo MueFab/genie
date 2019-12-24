@@ -39,6 +39,26 @@ namespace cabac {
         std::unique_ptr<SupportValues> clone() const;
 
         virtual void write(util::BitWriter *writer) const;
+
+        uint8_t getOutputSymbolSize () const {
+            return output_symbol_size;
+        }
+
+        uint8_t getCodingSubsymSize () const {
+            return coding_subsym_size;
+        }
+
+        uint8_t getCodingOrder () const {
+            return coding_order;
+        }
+
+        bool getShareSubsymLutFlag () const {
+            return *share_subsym_lut_flag;
+        }
+
+        bool getShareSubsymPrvFlag () const {
+            return *share_subsym_prv_flag;
+        }
     };
 }
 }  // namespace cabac

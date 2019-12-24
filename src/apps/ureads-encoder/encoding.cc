@@ -15,6 +15,7 @@
 #include "util/exceptions.h"
 
 #include <coding/gabac-compressor.h>
+#include <coding/gabac-decompressor.h>
 #include <format/fastq/fastq-exporter.h>
 #include <format/fastq/fastq-importer.h>
 #include <format/mpegg_p2/raw_reference.h>
@@ -62,9 +63,9 @@ std::vector<std::vector<gabac::DataBlock>> create_default_streams() {
     return ret;
 }*/
 
-class DummyModule : public Drain<std::unique_ptr<BlockPayloadSet>> {
+class DummyModule : public Drain<std::unique_ptr<MpeggRawAu>> {
    public:
-    void flowIn(std::unique_ptr<BlockPayloadSet> t, size_t id) override { /* Collect information */
+    void flowIn(std::unique_ptr<MpeggRawAu> t, size_t id) override { /* Collect information */
     }
 
     void dryIn() override { /* Collect information */
@@ -77,13 +78,15 @@ class DummyModule : public Drain<std::unique_ptr<BlockPayloadSet>> {
 void encode(const ProgramOptions& programOptions) {
     // Setup
     GabacCompressor compressor;
+    GabacDecompressor decompressor;
     DummyModule dummy;
-    compressor.setDrain(&dummy);
+    compressor.setDrain(&decompressor);
+    decompressor.setDrain(&dummy);
 
     // Create input data
     auto raw_aus = util::make_unique<MpeggRawAu>(util::make_unique<format::mpegg_p2::ParameterSet>());
     for (size_t i = 0; i < 42; ++i) {
-        raw_aus->get(MpeggRawAu::GenomicDescriptor::RLEN, 0).push(i);  // Just some random data
+        raw_aus->get(GenomicDescriptor::RLEN, 0).push(i);  // Just some random data
     }
 
     // Execute

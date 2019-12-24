@@ -38,6 +38,22 @@ namespace cabac {
                 SIGNED_DOUBLE_TRUNCATED_UNARY = 9,
             };
 
+            uint8_t getParameter () const {
+                if (cmax) {
+                   return *cmax;
+                }
+                if (cmax_teg) {
+                    return *cmax_teg;
+                }
+                if (cmax_dtu) {
+                    return *cmax_dtu;
+                }
+                if (split_unit_size) {
+                    return *split_unit_size;
+                }
+                return 0;
+            }
+
             virtual void write(util::BitWriter *writer) const;
 
             CabacBinarizationParameters();
