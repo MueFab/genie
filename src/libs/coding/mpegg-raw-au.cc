@@ -11,8 +11,6 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------------------------------------------------
-
 MpeggRawAu::SubDescriptor::SubDescriptor(size_t wordsize) : data(0, wordsize), position(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -50,24 +48,25 @@ const void *MpeggRawAu::SubDescriptor::getData() const { return data.getData(); 
 // ---------------------------------------------------------------------------------------------------------------------
 
 MpeggRawAu::SubDescriptor &MpeggRawAu::get(GenomicDescriptor desc, GenomicSubsequence sub) {
-    return descriptors[uint8_t(desc)][uint8_t (sub)];
+    return *(*descriptors[uint8_t(desc)])[uint8_t(sub)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const MpeggRawAu::SubDescriptor &MpeggRawAu::get(GenomicDescriptor desc, GenomicSubsequence sub) const {
-    return descriptors[uint8_t(desc)][uint8_t(sub)];
+    return *(*descriptors[uint8_t(desc)])[uint8_t(sub)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 MpeggRawAu::MpeggRawAu(std::unique_ptr<format::mpegg_p2::ParameterSet> set)
-    : descriptors(getDescriptors().size()), parameters(std::move(set)) {
+    : descriptors(0), parameters(std::move(set)) {
     const size_t WORDSIZE = 4;
-    size_t idx = 0;
-    for (const auto &s : getDescriptors()) {
-        descriptors[idx].resize(s.subseqs.size(), SubDescriptor(WORDSIZE));
-        idx++;
+    for (const auto &desc : getDescriptors()) {
+        descriptors.emplace_back(util::make_unique<std::vector<std::unique_ptr<SubDescriptor>>>());
+        for (size_t i = 0; i < desc.subseqs.size(); ++i) {
+            descriptors.back()->emplace_back(util::make_unique<SubDescriptor>(WORDSIZE));
+        }
     }
 }
 

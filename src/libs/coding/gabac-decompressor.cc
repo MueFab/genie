@@ -44,12 +44,12 @@ void GabacDecompressor::flowIn(std::unique_ptr<BlockPayloadSet> t, size_t id) {
             std::vector<gabac::DataBlock> input;
             gabac::DataBlock output(0, 4);
             for (const auto& trans : t->getPayload(desc.id)->getSubDescriptorPayload(sub_desc.id)->get()) {
-                input.emplace_back((uint8_t*)trans->get()->getData(), trans->get()->getRawSize(),
-                                   trans->get()->getWordSize());
+                input.emplace_back(0, 1);
+                input.back().swap(trans->get());
             }
             decompress(configSet.getConfAsGabac(desc.id, sub_desc.id), &input, &output);
-            MpeggRawAu::SubDescriptor tmp(&output);
-            raw_aus->set(desc.id, sub_desc.id, &tmp);
+            auto tmp = util::make_unique<MpeggRawAu::SubDescriptor>(&output);
+            raw_aus->set(desc.id, sub_desc.id, std::move(tmp));
         }
     }
 
