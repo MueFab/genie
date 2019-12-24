@@ -36,11 +36,12 @@ void GabacCompressor::compress(const gabac::EncodingConfiguration &conf, gabac::
 void GabacCompressor::flowIn(std::unique_ptr<MpeggRawAu> raw_aus, size_t id) {
     auto payload = util::make_unique<BlockPayloadSet>(raw_aus->moveParameters());
 
-    for (const auto& desc : getDescriptors()) {
+    for (const auto &desc : getDescriptors()) {
         auto descriptor_payload = util::make_unique<DescriptorPayload>();
-        for (const auto& subseq : desc.subseqs) {
+        for (const auto &subseq : desc.subseqs) {
             auto &input = raw_aus->get(desc.id, subseq.id);
-            gabac::DataBlock input_block((const uint8_t *)input.getData(), input.rawSize() / input.getWordSize(), input.getWordSize());
+            gabac::DataBlock input_block(0, 4);
+            input.swap(&input_block);
             std::vector<gabac::DataBlock> out;
             compress(configSet.getConfAsGabac(desc.id, subseq.id), &input_block, &out);
 

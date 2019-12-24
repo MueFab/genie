@@ -23,7 +23,7 @@ class MpeggRawAu {
      *
      */
     struct SubDescriptor {
-       public:
+       private:
         gabac::DataBlock data;  //!<
         size_t position;        //!<
 
@@ -80,10 +80,10 @@ class MpeggRawAu {
          * @return
          */
         const void* getData() const;
+
+        void swap(gabac::DataBlock* block) { block->swap(&data); }
     };
-    typedef std::vector<SubDescriptor> Descriptor;  //!<
-
-
+    typedef std::vector<std::unique_ptr<SubDescriptor>> Descriptor;  //!<
 
     /**
      *
@@ -93,8 +93,8 @@ class MpeggRawAu {
      */
     SubDescriptor& get(GenomicDescriptor desc, GenomicSubsequence sub);
 
-    void set(GenomicDescriptor desc, GenomicSubsequence sub, SubDescriptor* data) {
-        descriptors[uint8_t(desc)][uint8_t (sub)] = SubDescriptor(&data->data);
+    void set(GenomicDescriptor desc, GenomicSubsequence sub, std::unique_ptr<SubDescriptor> data) {
+        (*descriptors[uint8_t(desc)])[uint8_t(sub)] = std::move(data);
     }
 
     /**
@@ -105,9 +105,7 @@ class MpeggRawAu {
      */
     const SubDescriptor& get(GenomicDescriptor desc, GenomicSubsequence sub) const;
 
-    SubDescriptor& get(GenomicDescriptor desc, uint8_t sub) {
-        return get(desc, GenomicSubsequence(sub));
-    }
+    SubDescriptor& get(GenomicDescriptor desc, uint8_t sub) { return get(desc, GenomicSubsequence(sub)); }
 
     /**
      *
@@ -142,7 +140,7 @@ class MpeggRawAu {
     const format::mpegg_p2::ParameterSet* getParameters() const { return parameters.get(); }
 
    private:
-    std::vector<Descriptor> descriptors;                         //!<
+    std::vector<std::unique_ptr<Descriptor>> descriptors;        //!<
     std::unique_ptr<format::mpegg_p2::ParameterSet> parameters;  //!<
 };
 
