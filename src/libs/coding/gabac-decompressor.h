@@ -25,16 +25,16 @@ class GabacDecompressor : public MpeggDecompressor {
      * @param in Compressed set of transformed sequences
      * @param out Where to put uncompressed sequence
      */
-    static void decompress(const gabac::EncodingConfiguration& conf, std::vector<gabac::DataBlock>* in,
-                           gabac::DataBlock* out);
+    static void decompress(const gabac::EncodingConfiguration& conf, const BlockPayloadSet::SubsequencePayload& in,
+                           MpeggRawAu::SubDescriptor* out);
 
    public:
     /**
      * @brief Process BlockPayload and execute gabac decompression
-     * @param blockPayload Input payload
+     * @param payloadSet Input payload
      * @param id Block identification (for multithreading)
      */
-    void flowIn(std::unique_ptr<BlockPayloadSet> blockPayload, size_t id) override;
+    void flowIn(std::unique_ptr<BlockPayloadSet> payloadSet, size_t id) override;
 
     /**
      * @brief Propagate end of data signal

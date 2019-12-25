@@ -15,133 +15,196 @@
 #include <vector>
 
 /**
- *
+ * @brief
  */
 class MpeggRawAu {
    public:
     /**
-     *
+     * @brief
      */
-    struct SubDescriptor {
+    class SubDescriptor {
        private:
-        gabac::DataBlock data;  //!<
-        size_t position;        //!<
+        gabac::DataBlock data;  //!< @brief
+        size_t position;        //!< @brief
+
+        GenomicSubsequence id;  //!< @brief
 
        public:
         /**
-         *
+         * @brief
          * @param wordsize
          */
-        explicit SubDescriptor(size_t wordsize);
+        SubDescriptor(size_t wordsize, GenomicSubsequence _id);
 
         /**
-         *
+         * @brief
          * @param d
          */
-        explicit SubDescriptor(gabac::DataBlock* d);
+        SubDescriptor(gabac::DataBlock* d, GenomicSubsequence _id);
 
         /**
-         *
+         * @brief
          * @param val
          */
         void push(uint64_t val);
 
         /**
-         *
+         * @brief
          */
         void inc();
 
         /**
-         *
+         * @brief
          * @return
          */
         uint64_t get() const;
 
         /**
-         *
+         * @brief
          * @return
          */
         bool end() const;
 
         /**
-         *
-         * @return
+         * @brief
+         * @param block
          */
-        size_t rawSize() const;
+        void swap(gabac::DataBlock* block);
 
         /**
-         *
+         * @brief
          * @return
          */
-        size_t getWordSize() const;
-
-        /**
-         *
-         * @return
-         */
-        const void* getData() const;
-
-        void swap(gabac::DataBlock* block) { block->swap(&data); }
+        GenomicSubsequence getID() const;
     };
-    typedef std::vector<std::unique_ptr<SubDescriptor>> Descriptor;  //!<
 
     /**
-     *
-     * @param desc
-     * @param sub
-     * @return
+     * @brief
      */
-    SubDescriptor& get(GenomicDescriptor desc, GenomicSubsequence sub);
+    class Descriptor {
+       private:
+        std::vector<std::unique_ptr<SubDescriptor>> subdesc;  //!< @brief
+        GenomicDescriptor id;                                 //!< @brief
 
-    void set(GenomicDescriptor desc, GenomicSubsequence sub, std::unique_ptr<SubDescriptor> data) {
-        (*descriptors[uint8_t(desc)])[uint8_t(sub)] = std::move(data);
-    }
+       public:
+        /**
+         * @brief
+         * @return
+         */
+        const std::vector<std::unique_ptr<SubDescriptor>>& getSubsequences() const;
+
+        /**
+         * @brief
+         * @param sub
+         * @return
+         */
+        SubDescriptor* getSubsequence(GenomicSubsequence sub);
+
+        /**
+         * @brief
+         * @return
+         */
+        GenomicDescriptor getID() const;
+
+        /**
+         * @brief
+         * @param sub
+         */
+        void add(std::unique_ptr<SubDescriptor> sub);
+
+        /**
+         * @brief
+         * @param _id
+         * @param sub
+         */
+        void set(GenomicSubsequence _id, std::unique_ptr<SubDescriptor> sub);
+
+        /**
+         * @brief
+         * @param _id
+         */
+        explicit Descriptor(GenomicDescriptor _id);
+    };
 
     /**
-     *
+     * @brief
      * @param desc
      * @param sub
      * @return
      */
     const SubDescriptor& get(GenomicDescriptor desc, GenomicSubsequence sub) const;
 
-    SubDescriptor& get(GenomicDescriptor desc, uint8_t sub) { return get(desc, GenomicSubsequence(sub)); }
+    /**
+     * @brief
+     * @param desc
+     * @param sub
+     * @return
+     */
+    SubDescriptor& get(GenomicDescriptor desc, GenomicSubsequence sub);
 
     /**
-     *
+     * @brief
+     * @param desc
+     * @param sub
+     * @return
+     */
+    SubDescriptor& get(GenomicDescriptor desc, uint8_t sub);
+
+    /**
+     * @brief
+     * @return
+     */
+    const std::vector<std::unique_ptr<Descriptor>>& getDescriptorStreams() const;
+
+    /**
+     * @brief
+     * @param desc
+     * @param sub
+     * @param data
+     */
+    void set(GenomicDescriptor desc, GenomicSubsequence sub, std::unique_ptr<SubDescriptor> data);
+
+    /**
+     * @brief
      * @param set
      */
-    explicit MpeggRawAu(std::unique_ptr<format::mpegg_p2::ParameterSet> set);
+    explicit MpeggRawAu(std::unique_ptr<format::mpegg_p2::ParameterSet> set, size_t _numRecords);
 
     /**
-     *
+     * @brief
      * @param _parameters
      */
-    void setParameters(std::unique_ptr<format::mpegg_p2::ParameterSet> _parameters) {
-        parameters = std::move(_parameters);
-    }
+    void setParameters(std::unique_ptr<format::mpegg_p2::ParameterSet> _parameters);
 
     /**
-     *
+     * @brief
      * @return
      */
-    format::mpegg_p2::ParameterSet* getParameters() { return parameters.get(); }
+    const format::mpegg_p2::ParameterSet* getParameters() const;
 
     /**
-     *
+     * @brief
      * @return
      */
-    std::unique_ptr<format::mpegg_p2::ParameterSet> moveParameters() { return std::move(parameters); }
+    format::mpegg_p2::ParameterSet* getParameters();
 
     /**
-     *
+     * @brief
      * @return
      */
-    const format::mpegg_p2::ParameterSet* getParameters() const { return parameters.get(); }
+    std::unique_ptr<format::mpegg_p2::ParameterSet> moveParameters();
+
+    /**
+     * @brief
+     * @return
+     */
+    size_t getNumRecords() const;
 
    private:
-    std::vector<std::unique_ptr<Descriptor>> descriptors;        //!<
-    std::unique_ptr<format::mpegg_p2::ParameterSet> parameters;  //!<
+    std::vector<std::unique_ptr<Descriptor>> descriptors;        //!< @brief
+    std::unique_ptr<format::mpegg_p2::ParameterSet> parameters;  //!< @brief
+
+    size_t numRecords;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

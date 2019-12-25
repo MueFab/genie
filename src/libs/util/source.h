@@ -12,42 +12,36 @@
 #include "drain.h"
 
 /**
- *
- * @tparam TYPE
+ * @brief Implementing this interface signals the ability to putput data chunks of type TYPE
+ * @tparam TYPE Data chunk type
  */
 template <typename TYPE>
 class Source {
    private:
-    Drain<TYPE>* drain;  //!<
+    Drain<TYPE>* drain;  //!< @brief Where to propagate output to
 
    protected:
     /**
-     *
-     * @param t
-     * @param id
+     * @brief Propagate data to drain set before
+     * @param t Current chunk of data
+     * @param id Block identifier (for multithreading)
      */
     void flowOut(TYPE t, size_t id) { drain->flowIn(std::move(t), id); }
 
     /**
-     *
+     * @brief Propagates end-of-data signal to drain set before
      */
     void dryOut() { drain->dryIn(); }
 
    public:
     /**
-     *
-     * @param d
+     * @brief Current data output will be propagated to a new destination
+     * @param d New destination for output data
      */
     virtual void setDrain(Drain<TYPE>* d) { drain = d; }
 
     /**
-     *
-     * @return
-     */
-    virtual bool pump() { return false; }
-
-    /**
-     *
+     * @brief For inheritance
      */
     virtual ~Source() = default;
 };

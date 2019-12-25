@@ -4,7 +4,6 @@
 #include <list>
 #include <string>
 #include <istream>
-#include "util/file-reader.h"
 #include "sam-record.h"
 
 namespace format {

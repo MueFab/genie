@@ -4,7 +4,6 @@ set(source_files
         bitreader.cc
         bitwriter.cc
         exceptions.cc
-        file-reader.cc
         log.cc
         perf-stats.cc
         ../format/sam/sam-file-reader.cc

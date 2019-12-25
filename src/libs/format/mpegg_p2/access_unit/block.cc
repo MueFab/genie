@@ -6,7 +6,7 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-    Block::Block(uint8_t _descriptor_ID, std::unique_ptr<DescriptorPayload> _payload)
+    Block::Block(uint8_t _descriptor_ID, std::unique_ptr<BlockPayloadSet::DescriptorPayload> _payload)
             : reserved(0),
               descriptor_ID(_descriptor_ID),
               reserved_2(0),

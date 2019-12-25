@@ -5,8 +5,8 @@
 #include <util/perf-stats.h>
 #include "mpegg-encoder.h"
 
-class SpringEncoder : public MpeggEncoder{
-private:
+class SpringEncoder : public MpeggEncoder {
+   private:
     int num_thr;
     std::string working_dir;
     bool preserve_quality;
@@ -15,7 +15,6 @@ private:
     util::FastqStats *stats;
     std::string temp_dir;
     std::chrono::time_point<std::chrono::steady_clock> compression_start;
-
 
     uint32_t max_readlen;
     uint64_t num_reads[2];
@@ -36,14 +35,15 @@ private:
     std::ofstream fout_quality[2];
 
     std::chrono::time_point<std::chrono::steady_clock> preprocess_start;
-public:
+
+   public:
     void preprocessInit();
     void preprocessIteration(std::unique_ptr<format::mpegg_rec::MpeggChunk> t);
     void preprocessClean();
-    SpringEncoder(int _num_thr, std::string _working_dir, bool _ureads_flag, bool _preserve_quality, bool _preserve_id, util::FastqStats *_stats);
+    SpringEncoder(int _num_thr, std::string _working_dir, bool _ureads_flag, bool _preserve_quality, bool _preserve_id,
+                  util::FastqStats *_stats);
     void flowIn(std::unique_ptr<format::mpegg_rec::MpeggChunk> t, size_t id) override;
     void dryIn() override;
 };
 
-
-#endif //GENIE_SPRING_ENCODER_H
+#endif  // GENIE_SPRING_ENCODER_H

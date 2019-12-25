@@ -3,9 +3,9 @@
 
 // -----------------------------------------------------------------------------------------------------------------
 
+#include <format/block-payload.h>
 #include <cstdint>
 #include <vector>
-#include <format/block-payload.h>
 #include "util/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -30,11 +30,11 @@ class Block {
      * Incorporated (Simplification): ISO 23092-2 Section 3.4.1.2.1 table 21
      *
      * ------------------------------------------------------------------------------------------------------------ */
-    std::unique_ptr<DescriptorPayload> payload;
+    std::unique_ptr<BlockPayloadSet::DescriptorPayload> payload;
 
    public:
     Block();
-    Block(uint8_t _descriptor_ID, std::unique_ptr<DescriptorPayload> _payload);
+    Block(uint8_t _descriptor_ID, std::unique_ptr<BlockPayloadSet::DescriptorPayload> _payload);
     virtual ~Block() = default;
     virtual void write(util::BitWriter *writer);
 };

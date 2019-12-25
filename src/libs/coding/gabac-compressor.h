@@ -26,8 +26,8 @@ class GabacCompressor : public MpeggCompressor {
      * @param in Uncompressed data
      * @param out Where to put compressed data. A set of transformed subsequences is generated
      */
-    static void compress(const gabac::EncodingConfiguration& conf, gabac::DataBlock* in,
-                         std::vector<gabac::DataBlock>* out);
+    static void compress(const gabac::EncodingConfiguration &conf, MpeggRawAu::SubDescriptor *in,
+                         BlockPayloadSet::SubsequencePayload *out);
 
    public:
     GabacSeqConfSet configSet;  //!< @brief Config set to use. In contrast to decompression it's static over time

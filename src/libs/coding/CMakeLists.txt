@@ -14,7 +14,7 @@ set(source_files
         genie-gabac-output-stream.cc
         spring-encoder.cc
         gabac-seq-conf-set.cc
-)
+        )
 
 add_library(coding ${source_files})
 target_include_directories(coding PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")

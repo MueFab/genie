@@ -6,16 +6,16 @@
 #include <vector>
 
 /**
-             * ISO 23092-2 Section 5.1 table 34
-             */
+ * ISO 23092-2 Section 5.1 table 34
+ */
 enum class AlphabetID : uint8_t {
     ACGTN = 0,            //!< Line 1
     ACGTRYSWKMBDHVN_ = 1  //!< Line 2
 };
 
 /**
-     *
-     */
+ *
+ */
 enum class GenomicDescriptor : uint8_t {
     POS = 0,
     RCOMP = 1,
@@ -117,9 +117,7 @@ struct GenomicDescriptorProperties {
     std::string name;      //!<
     bool tokentype;
     std::vector<GenomicSubDescriptorProperties> subseqs;
-    const GenomicSubDescriptorProperties& getSubSeq(GenomicSubsequence sub) const {
-        return subseqs[uint8_t(sub)];
-    }
+    const GenomicSubDescriptorProperties& getSubSeq(GenomicSubsequence sub) const { return subseqs[uint8_t(sub)]; }
 };
 
 /**
@@ -139,6 +137,6 @@ const std::vector<GenomicDescriptorProperties>& getDescriptors();
 const GenomicDescriptorProperties& getDescriptor(GenomicDescriptor desc);
 const GenomicSubDescriptorProperties& getSubsequence(GenomicDescriptor desc, GenomicSubsequence sub);
 
-const Alphabet &getAlphabetProperties(AlphabetID id);
+const Alphabet& getAlphabetProperties(AlphabetID id);
 
 #endif  // GENIE_CONSTANTS_H
