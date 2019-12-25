@@ -11,10 +11,13 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void GabacCompressor::compress(const gabac::EncodingConfiguration &conf, gabac::DataBlock *in,
-                               std::vector<gabac::DataBlock> *out) {
+void GabacCompressor::compress(const gabac::EncodingConfiguration &conf, MpeggRawAu::SubDescriptor *in,
+                               BlockPayloadSet::SubsequencePayload *out) {
     // Interface to GABAC library
-    gabac::IBufferStream bufferInputStream(in);
+    gabac::DataBlock buffer(0, 4);
+    in->swap(&buffer);
+    gabac::IBufferStream bufferInputStream(&buffer);
+
     lae::GenieGabacOutputStream bufferOutputStream;
 
     // Setup
@@ -28,32 +31,30 @@ void GabacCompressor::compress(const gabac::EncodingConfiguration &conf, gabac::
     gabac::run(GABAC_IO_SETUP, conf, GABAC_DECODING_MODE);
 
     // Translate to GENIE-Payload TODO: change gabac to directly output the right format
-    bufferOutputStream.flush_blocks(out);
+    std::vector<gabac::DataBlock> outbuffer;
+    bufferOutputStream.flush_blocks(&outbuffer);
+    for (auto &o : outbuffer) {
+        out->add(util::make_unique<BlockPayloadSet::TransformedPayload>(&o));
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void GabacCompressor::flowIn(std::unique_ptr<MpeggRawAu> raw_aus, size_t id) {
-    auto payload = util::make_unique<BlockPayloadSet>(raw_aus->moveParameters());
+    auto payload = util::make_unique<BlockPayloadSet>(raw_aus->moveParameters(), raw_aus->getNumRecords());
 
-    for (const auto &desc : getDescriptors()) {
-        auto descriptor_payload = util::make_unique<DescriptorPayload>();
-        for (const auto &subseq : desc.subseqs) {
-            auto &input = raw_aus->get(desc.id, subseq.id);
-            gabac::DataBlock input_block(0, 4);
-            input.swap(&input_block);
-            std::vector<gabac::DataBlock> out;
-            compress(configSet.getConfAsGabac(desc.id, subseq.id), &input_block, &out);
+    for (const auto &desc : raw_aus->getDescriptorStreams()) {
+        auto descriptor_payload = util::make_unique<BlockPayloadSet::DescriptorPayload>(desc->getID());
+        for (const auto &subdesc : desc->getSubsequences()) {
+            auto &input = raw_aus->get(desc->getID(), subdesc->getID());
+            const auto &conf = configSet.getConfAsGabac(desc->getID(), subdesc->getID());
+            auto subsequence_payload = util::make_unique<BlockPayloadSet::SubsequencePayload>(subdesc->getID());
+            compress(conf, &input, subsequence_payload.get());
 
-            // Add to payload
-            auto subsequence_payload = util::make_unique<SubDescriptorPayload>();
-            for (auto &o : out) {
-                subsequence_payload->add(util::make_unique<TransformedPayload>(&o));
-            }
             descriptor_payload->add(std::move(subsequence_payload));
         }
         if (!descriptor_payload->isEmpty()) {
-            payload->setPayload(desc.id, std::move(descriptor_payload));
+            payload->setPayload(desc->getID(), std::move(descriptor_payload));
         }
     }
 

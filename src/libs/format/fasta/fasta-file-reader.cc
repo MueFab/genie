@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace format {
+/*namespace format {
     namespace fasta {
 
         FastaFileReader::FastaFileReader(const std::string &path) : FileReader(path) {}
@@ -57,4 +57,4 @@ namespace format {
         }
 
     }
-}  // namespace util
+}  // namespace util */

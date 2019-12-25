@@ -4,9 +4,8 @@
 #include <string>
 #include <vector>
 #include "fasta-record.h"
-#include "util/file-reader.h"
 
-namespace format {
+/*namespace format {
     namespace fasta {
 
     class FastaFileReader : public util::FileReader {
@@ -19,6 +18,6 @@ namespace format {
         };
 
     }
-}  // namespace util
+}  // namespace util */
 
 #endif  // UTIL_FASTA_FILE_READER_H_

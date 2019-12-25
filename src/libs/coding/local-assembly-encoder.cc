@@ -2,10 +2,10 @@
 
 #include <util/make_unique.h>
 
+#include <format/mpegg_p2/parameter_set/qv_coding_config_1/qv_coding_config_1.h>
+#include <format/mpegg_rec/alignment-container.h>
 #include <format/mpegg_rec/segment.h>
 #include <format/mpegg_rec/split_alignment/split-alignment-same-rec.h>
-#include <format/mpegg_rec/alignment-container.h>
-#include <format/mpegg_p2/parameter_set/qv_coding_config_1/qv_coding_config_1.h>
 
 void LocalAssemblyEncoder::flowIn(std::unique_ptr<format::mpegg_rec::MpeggChunk> t, size_t id) {
     refCoder = lae::LocalAssemblyReferenceEncoder(cr_buf_max_size);
@@ -30,8 +30,8 @@ void LocalAssemblyEncoder::flowIn(std::unique_ptr<format::mpegg_rec::MpeggChunk>
         if (r->getNumberOfRecords() > 1) {
             if (r->getAlignment(0)->getSplitAlignment(0)->getType() ==
                 format::mpegg_rec::SplitAlignment::SplitAlignmentType::SAME_REC) {
-                srec = dynamic_cast<const format::mpegg_rec::SplitAlignmentSameRec *>(r->getAlignment(
-                        0)->getSplitAlignment(0));
+                srec = dynamic_cast<const format::mpegg_rec::SplitAlignmentSameRec *>(
+                    r->getAlignment(0)->getSplitAlignment(0));
             } else {
                 UTILS_DIE("Only same record split alignments supported");
             }
@@ -39,19 +39,14 @@ void LocalAssemblyEncoder::flowIn(std::unique_ptr<format::mpegg_rec::MpeggChunk>
             if (r->getRecordSegment(1)->getLength() != read_length) {
                 read_length = 0;
             }
-
         }
 
-        std::string ref1 = refCoder.getReference(
-                r->getAlignment(0)->getPosition(),
-                *r->getAlignment(0)->getAlignment()->getECigar()
-        );
+        std::string ref1 =
+            refCoder.getReference(r->getAlignment(0)->getPosition(), *r->getAlignment(0)->getAlignment()->getECigar());
         std::string ref2;
         if (r->getNumberOfRecords() > 1) {
-            ref2 = refCoder.getReference(
-                    r->getAlignment(0)->getPosition() + srec->getDelta(),
-                    *srec->getAlignment()->getECigar()
-            );
+            ref2 = refCoder.getReference(r->getAlignment(0)->getPosition() + srec->getDelta(),
+                                         *srec->getAlignment()->getECigar());
         }
 
         refCoder.addRead(r.get());
@@ -76,26 +71,10 @@ void LocalAssemblyEncoder::flowIn(std::unique_ptr<format::mpegg_rec::MpeggChunk>
     }
 
     format::mpegg_p2::DataUnit::DatasetType dataType = format::mpegg_p2::DataUnit::DatasetType::ALIGNED;
-    auto ret = util::make_unique<format::mpegg_p2::ParameterSet>(
-            id,
-            id,
-            dataType,
-            AlphabetID::ACGTN,
-            read_length,
-            paired_end,
-            false,
-            false,
-            0,
-            false,
-            false
-    );
-    ret->addClass(
-            classType,
-            util::make_unique<format::mpegg_p2::qv_coding1::QvCodingConfig1>(
-                    format::mpegg_p2::qv_coding1::QvCodingConfig1::QvpsPresetId::ASCII,
-                    false
-            )
-    );
+    auto ret = util::make_unique<format::mpegg_p2::ParameterSet>(id, id, dataType, AlphabetID::ACGTN, read_length,
+                                                                 paired_end, false, false, 0, false, false);
+    ret->addClass(classType, util::make_unique<format::mpegg_p2::qv_coding1::QvCodingConfig1>(
+                                 format::mpegg_p2::qv_coding1::QvCodingConfig1::QvpsPresetId::ASCII, false));
 
     auto rawAU = readCoder.pollStreams();
 
@@ -109,11 +88,5 @@ void LocalAssemblyEncoder::dryIn() {
     dryOut();
 }
 
-LocalAssemblyEncoder::LocalAssemblyEncoder(
-        uint32_t _cr_buf_max_size,
-        bool _debug
-) : refCoder(_cr_buf_max_size),
-    readCoder(),
-    debug(_debug),
-    cr_buf_max_size(_cr_buf_max_size) {
-}
+LocalAssemblyEncoder::LocalAssemblyEncoder(uint32_t _cr_buf_max_size, bool _debug)
+    : refCoder(_cr_buf_max_size), readCoder(), debug(_debug), cr_buf_max_size(_cr_buf_max_size) {}

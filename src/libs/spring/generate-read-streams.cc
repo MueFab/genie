@@ -28,7 +28,7 @@ namespace spring {
     }
 
     std::unique_ptr<MpeggRawAu> generate_subseqs(const se_data &data, uint64_t block_num) {
-        auto rdata = util::make_unique<MpeggRawAu>(util::make_unique<format::mpegg_p2::ParameterSet>());
+        auto rdata = util::make_unique<MpeggRawAu>(util::make_unique<format::mpegg_p2::ParameterSet>(), 0);
 
     // char_to_int
     int64_t char_to_int[128];
@@ -447,7 +447,7 @@ std::unique_ptr<MpeggRawAu> generate_streams_pe(const se_data &data, const pe_bl
     const unsigned cur_thread_num = 0;
 #endif
 
-    auto rdata = util::make_unique<MpeggRawAu>(util::make_unique<format::mpegg_p2::ParameterSet>());
+    auto rdata = util::make_unique<MpeggRawAu>(util::make_unique<format::mpegg_p2::ParameterSet>(), 0);
 
     // char_to_int
     int64_t char_to_int[128];

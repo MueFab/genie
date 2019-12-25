@@ -84,7 +84,7 @@ void encode(const ProgramOptions& programOptions) {
     decompressor.setDrain(&dummy);
 
     // Create input data
-    auto raw_aus = util::make_unique<MpeggRawAu>(util::make_unique<format::mpegg_p2::ParameterSet>());
+    auto raw_aus = util::make_unique<MpeggRawAu>(util::make_unique<format::mpegg_p2::ParameterSet>(), 0);
     for (size_t i = 0; i < 42; ++i) {
         raw_aus->get(GenomicDescriptor::RLEN, 0).push(i);  // Just some random data
     }

@@ -12,26 +12,26 @@
 #include <cstddef>
 
 /**
- *
- * @tparam TYPE
+ * @brief By implementing this interface, a genie module signals the ability to process data of type TYPE.
+ * @tparam TYPE Input data type which is accepted
  */
 template <typename TYPE>
 class Drain {
    public:
     /**
-     *
-     * @param t
-     * @param id
+     * @brief Accept one chunk of data.
+     * @param t Input data chunk
+     * @param id Current block identifier (for multithreading)
      */
     virtual void flowIn(TYPE t, size_t id) = 0;
 
     /**
-     *
+     * @brief Signals that no further data (and calls to flowIn) will be available
      */
     virtual void dryIn() = 0;
 
     /**
-     *
+     * @brief For inheritance
      */
     virtual ~Drain() = default;
 };
