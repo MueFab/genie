@@ -5,6 +5,7 @@
  */
 
 #include "fastq-importer.h"
+#include <util/ordered-section.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,22 +24,22 @@ FastqImporter::FastqImporter(size_t _blockSize, std::istream *_file_1, std::istr
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool FastqImporter::pump() {
+bool FastqImporter::pump(size_t id) {
     auto chunk = util::make_unique<format::mpegg_rec::MpeggChunk>();
     bool eof = false;
-    for (size_t cur_record = 0; cur_record < blockSize; ++cur_record) {
-        auto data = readData(file_list);
-        if (data.empty()) {
-            eof = true;
-            break;
+    {
+        OrderedSection section(&lock, id);
+        for (size_t cur_record = 0; cur_record < blockSize; ++cur_record) {
+            auto data = readData(file_list);
+            if (data.empty()) {
+                eof = true;
+                break;
+            }
+            chunk->push_back(buildRecord(data));
         }
-        chunk->push_back(buildRecord(data));
     }
     flowOut(std::move(chunk), record_counter++);
 
-    if (eof) {
-        dryOut();
-    }
     return !eof;
 }
 
@@ -95,6 +96,10 @@ void FastqImporter::sanityCheck(const std::array<std::string, LINES_PER_RECORD> 
         UTILS_DIE("Qual and Seq in fastq do not match in length");
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void FastqImporter::dryIn() { dryOut(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -1,8 +1,8 @@
 #include "sam-exporter.h"
-
+#include <util/ordered-section.h>
 
 void SamExporter::flowIn(std::unique_ptr<format::mpegg_rec::MpeggChunk> t, size_t id) {
-
+    OrderedSection section(&lock, id);
 }
 
 void SamExporter::dryIn() {

@@ -9,6 +9,7 @@
 #include <util/bitreader.h>
 #include <util/exceptions.h>
 #include <util/make_unique.h>
+#include <util/ordered-lock.h>
 #include <util/original-source.h>
 #include <util/source.h>
 
@@ -17,11 +18,14 @@ class MgrecsImporter : public Source<std::unique_ptr<format::mpegg_rec::MpeggChu
     size_t blockSize;
     util::BitReader reader;
     size_t record_counter;
+    OrderedLock lock;  //!< @brief Lock to ensure in order execution
 
    public:
     MgrecsImporter(size_t _blockSize, std::istream *_file_1);
 
-    bool pump() override;
+    bool pump(size_t id) override;
+
+    void dryIn() override;
 };
 
 #endif  // GENIE_MGRECS_IMPORTER_H

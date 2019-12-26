@@ -16,6 +16,7 @@
 #include <format/mpegg_rec/segment.h>
 #include <util/exceptions.h>
 #include <util/make_unique.h>
+#include <util/ordered-lock.h>
 #include <util/original-source.h>
 #include <util/source.h>
 
@@ -33,13 +34,14 @@ class FastqImporter : public Source<std::unique_ptr<format::mpegg_rec::MpeggChun
     size_t blockSize;                              //!< @brief How many records to read in one pump() run
     std::vector<std::istream *> file_list;         //!< @brief Input streams (paired files supported)
     size_t record_counter;                         //!< @brief ID of next data chunk
+    OrderedLock lock;                              //!< @brief Lock to ensure in order execution
 
     enum Lines { ID = 0, SEQUENCE = 1, RESERVED = 2, QUALITY = 3 };  //!< @brief FASTQ format lines
     enum Files { FIRST = 0, SECOND = 1 };                            //!< @brief File shortcuts
 
     /**
      * @brief Read one chunk of fastq data
-     * @param _file_list
+     * @param _file_list Where to read data from (2 streams in paired mode)
      * @return Data extracted from the fastq files, not converted yet
      */
     static std::vector<std::array<std::string, LINES_PER_RECORD>> readData(
@@ -77,9 +79,15 @@ class FastqImporter : public Source<std::unique_ptr<format::mpegg_rec::MpeggChun
 
     /**
      * @brief Process one block of data and propagate it to the next module in the chain
+     * @param id Current block identifier
      * @return True if more data is available, false otherwise
      */
-    bool pump() override;
+    bool pump(size_t id) override;
+
+    /**
+     * @brief Cleanup, end of data
+     */
+    void dryIn() override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

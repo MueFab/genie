@@ -8,11 +8,14 @@
 #include <coding/mpegg-raw-au.h>
 
 #include <format/block-payload.h>
+#include <util/ordered-lock.h>
+#include <util/ordered-section.h>
 #include "access_unit.h"
 
 class MpeggP2Exporter : public Drain<std::unique_ptr<BlockPayloadSet>>{
 private:
     util::BitWriter writer;
+    OrderedLock lock;
 public:
 
 
@@ -20,7 +23,7 @@ public:
 
     }
     void flowIn(std::unique_ptr<BlockPayloadSet> t, size_t id) override {
-
+        OrderedSection section(&lock, id);
         t->getParameters()->write(&writer);
 
         format::mpegg_p2::AccessUnit au(id, 0, format::mpegg_rec::MpeggRecord::ClassType::CLASS_I, t->getRecordNum(), format::mpegg_p2::DataUnit::DatasetType::ALIGNED, 32, 32, 0);
