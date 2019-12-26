@@ -1,54 +1,53 @@
 #include "sam-importer.h"
-
+#include <util/ordered-section.h>
 
 std::string SamImporter::convertCigar2eCigar(const std::string &cigar) {
-    static const std::array<char, 256> lut =
-            []() -> std::array<char, 256> {
-                std::array<char, 256> ret{};
-                ret['M'] = '=';
-                ret['X'] = '=';
-                ret['='] = '=';
-                ret['I'] = '+';
-                ret['D'] = '-';
-                ret['N'] = '*';
-                ret['S'] = ')';
-                ret['H'] = ']';
-                for(char c = '0'; c <= '9'; ++c) {
-                    ret[c] = c;
-                }
-                return ret;
-            }();
-    const size_t CLIPS_EXPECTED = 2; // +2: Expect a grow of 2 from a clip on each end of the cigar
+    static const std::array<char, 256> lut = []() -> std::array<char, 256> {
+        std::array<char, 256> ret{};
+        ret['M'] = '=';
+        ret['X'] = '=';
+        ret['='] = '=';
+        ret['I'] = '+';
+        ret['D'] = '-';
+        ret['N'] = '*';
+        ret['S'] = ')';
+        ret['H'] = ']';
+        for (char c = '0'; c <= '9'; ++c) {
+            ret[c] = c;
+        }
+        return ret;
+    }();
+    const size_t CLIPS_EXPECTED = 2;  // +2: Expect a grow of 2 from a clip on each end of the cigar
 
     std::string ret;
     ret.reserve(cigar.length() + CLIPS_EXPECTED);
     size_t lasttok = 0;
-    for(size_t pos = 0; pos < cigar.length(); ++pos) {
+    for (size_t pos = 0; pos < cigar.length(); ++pos) {
         char transformed = lut[cigar[pos]];
-        if(transformed == ')') {
+        if (transformed == ')') {
             ret.insert(lasttok, 1, '(');
             lasttok = pos;
-        } else if(transformed == ']'){
+        } else if (transformed == ']') {
             ret.insert(lasttok, 1, '[');
             lasttok = pos;
-        } else if(transformed == 0 ){
+        } else if (transformed == 0) {
             UTILS_DIE("Unknown CIGAR character");
-        } else if(transformed < '0' || transformed > '9') {
+        } else if (transformed < '0' || transformed > '9') {
             lasttok = pos;
         }
         ret.push_back(transformed);
     }
 
-    //TODO: How to handle substitutions?
+    // TODO: How to handle substitutions?
 
     return ret;
 }
 
 bool SamImporter::convertFlags2Mpeg(uint16_t flags, uint8_t *flags_mpeg) {
     *flags_mpeg = 0;
-    *flags_mpeg |= (flags & 1024u) >> 10u; // PCR / duplicate
-    *flags_mpeg |= (flags & 512u) >> 8u; // vendor quality check failed
-    *flags_mpeg |= (flags & 2u) << 1u; // proper pair
+    *flags_mpeg |= (flags & 1024u) >> 10u;  // PCR / duplicate
+    *flags_mpeg |= (flags & 512u) >> 8u;    // vendor quality check failed
+    *flags_mpeg |= (flags & 2u) << 1u;      // proper pair
 
     return flags & 16u;  // rcomp
 }
@@ -59,41 +58,34 @@ std::unique_ptr<format::mpegg_rec::MpeggRecord> SamImporter::convert(const forma
     uint8_t flags = 0;
     bool rcomp = convertFlags2Mpeg(r1.flag, &flags);
     auto ret = util::make_unique<format::mpegg_rec::MpeggRecord>(
-            NUM_TEMPLATE_SEGMENTS,
-            format::mpegg_rec::MpeggRecord::ClassType::CLASS_I,
-            util::make_unique<std::string>(r1.qname),
-            util::make_unique<std::string>("Genie"),
-            flags
-    );
+        NUM_TEMPLATE_SEGMENTS, format::mpegg_rec::MpeggRecord::ClassType::CLASS_I,
+        util::make_unique<std::string>(r1.qname), util::make_unique<std::string>("Genie"), flags);
     auto segment = util::make_unique<format::mpegg_rec::Segment>(util::make_unique<std::string>(r1.seq));
     if (!r1.qual.empty()) {
         segment->addQualityValues(util::make_unique<std::string>(r1.qual));
     }
     ret->addRecordSegment(std::move(segment));
 
-    auto alignment = util::make_unique<format::mpegg_rec::Alignment>(util::make_unique<std::string>(convertCigar2eCigar(r1.cigar)), rcomp);
+    auto alignment = util::make_unique<format::mpegg_rec::Alignment>(
+        util::make_unique<std::string>(convertCigar2eCigar(r1.cigar)), rcomp);
     alignment->addMappingScore(r1.mapq);
-    auto alignmentContainer = util::make_unique<format::mpegg_rec::AlignmentContainer>(stoi(r1.rname),
-                                                                                       std::move(alignment));
+    auto alignmentContainer =
+        util::make_unique<format::mpegg_rec::AlignmentContainer>(stoi(r1.rname), std::move(alignment));
 
     ret->addAlignment(stoi(r1.rname), std::move(alignmentContainer));
 
     return ret;
 }
 
-std::unique_ptr<format::mpegg_rec::MpeggRecord>
-SamImporter::convert(const format::sam::SamRecord &r1, const format::sam::SamRecord &r2) {
+std::unique_ptr<format::mpegg_rec::MpeggRecord> SamImporter::convert(const format::sam::SamRecord &r1,
+                                                                     const format::sam::SamRecord &r2) {
     const uint8_t NUM_TEMPLATE_SEGMENTS = 2;
 
     uint8_t flags = 0;
     bool rcomp = convertFlags2Mpeg(r1.flag, &flags);
     auto ret = util::make_unique<format::mpegg_rec::MpeggRecord>(
-            NUM_TEMPLATE_SEGMENTS,
-            format::mpegg_rec::MpeggRecord::ClassType::CLASS_I,
-            util::make_unique<std::string>(r1.qname),
-            util::make_unique<std::string>("Genie"),
-            flags
-    );
+        NUM_TEMPLATE_SEGMENTS, format::mpegg_rec::MpeggRecord::ClassType::CLASS_I,
+        util::make_unique<std::string>(r1.qname), util::make_unique<std::string>("Genie"), flags);
 
     // Sequences
 
@@ -111,15 +103,17 @@ SamImporter::convert(const format::sam::SamRecord &r1, const format::sam::SamRec
 
     // Alignments
 
-    auto alignment = util::make_unique<format::mpegg_rec::Alignment>(util::make_unique<std::string>(convertCigar2eCigar(r1.cigar)), rcomp);
+    auto alignment = util::make_unique<format::mpegg_rec::Alignment>(
+        util::make_unique<std::string>(convertCigar2eCigar(r1.cigar)), rcomp);
     alignment->addMappingScore(r1.mapq);
-    auto alignmentContainer = util::make_unique<format::mpegg_rec::AlignmentContainer>(stoi(r1.rname),
-                                                                                       std::move(alignment));
+    auto alignmentContainer =
+        util::make_unique<format::mpegg_rec::AlignmentContainer>(stoi(r1.rname), std::move(alignment));
 
-    alignment = util::make_unique<format::mpegg_rec::Alignment>(util::make_unique<std::string>(convertCigar2eCigar(r2.cigar)), rcomp);
+    alignment = util::make_unique<format::mpegg_rec::Alignment>(
+        util::make_unique<std::string>(convertCigar2eCigar(r2.cigar)), rcomp);
     alignment->addMappingScore(r2.mapq);
-    auto splitAlignment = util::make_unique<format::mpegg_rec::SplitAlignmentSameRec>(r2.pos - r1.pos,
-                                                                                      std::move(alignment));
+    auto splitAlignment =
+        util::make_unique<format::mpegg_rec::SplitAlignmentSameRec>(r2.pos - r1.pos, std::move(alignment));
     alignmentContainer->addSplitAlignment(std::move(splitAlignment));
 
     ret->addAlignment(stoi(r2.rname), std::move(alignmentContainer));
@@ -127,15 +121,17 @@ SamImporter::convert(const format::sam::SamRecord &r1, const format::sam::SamRec
     return ret;
 }
 
-SamImporter::SamImporter(size_t _blockSize, std::istream *_file) : file(_file), blockSize(_blockSize),
-                                                                   samFileReader(_file), record_counter(0) {
-}
+SamImporter::SamImporter(size_t _blockSize, std::istream *_file)
+    : file(_file), blockSize(_blockSize), samFileReader(_file), record_counter(0) {}
 
-bool SamImporter::pump() {
+bool SamImporter::pump(size_t id) {
     // Read a block of SAM records
     auto chunk = util::make_unique<format::mpegg_rec::MpeggChunk>();
     std::list<format::sam::SamRecord> samRecords;
-    samFileReader.readRecords(blockSize, &samRecords);
+    {
+        OrderedSection sextion(&lock, id);
+        samFileReader.readRecords(blockSize, &samRecords);
+    }
     std::list<format::sam::SamRecord> samRecordsCopy(samRecords);
     LOG_TRACE << "Read " << samRecords.size() << " SAM record(s)";
     for (const auto &samRecord : samRecords) {
@@ -177,22 +173,17 @@ bool SamImporter::pump() {
     }
 
     // Break if less than blockSize records were read from the SAM file
-    if (samRecords.size() < blockSize) {
-        dryOut();
-        return false;
-    }
-
-    return true;
+    return samRecords.size() >= blockSize;
 }
 
 std::string SamImporter::inflateCigar(const std::string &cigar) {
     std::string ret;
     size_t count = 0;
     for (char cigar_pos : cigar) {
-        if (cigar_pos == '(' || cigar_pos == '[') {     // Skip opening braces
+        if (cigar_pos == '(' || cigar_pos == '[') {  // Skip opening braces
             continue;
         }
-        if (cigar_pos >= '0' && cigar_pos <= '9') {   // Process number
+        if (cigar_pos >= '0' && cigar_pos <= '9') {  // Process number
             count *= 10;
             count += cigar_pos - '0';
             continue;
@@ -201,7 +192,7 @@ std::string SamImporter::inflateCigar(const std::string &cigar) {
         char c = cigar_pos;
         if (count == 0) {
             count = 1;
-            if (c == '-') {      // Distinguish deletions from character '-'
+            if (c == '-') {  // Distinguish deletions from character '-'
                 c = '_';
             }
         }
@@ -210,7 +201,6 @@ std::string SamImporter::inflateCigar(const std::string &cigar) {
     }
     return ret;
 }
-
 
 std::string SamImporter::deflateCigar(const std::string &cigar) {
     std::string ret;
@@ -247,26 +237,25 @@ std::string SamImporter::deflateEcigar(const std::string &cigar) {
 }
 
 void SamImporter::deflateEcigarElement(std::string *cigar, size_t count, char cur) {
-    static const std::array<bool, 256> lut =
-            []() -> std::array<bool, 256> {
-                std::array<bool, 256> ret{};
-                ret['='] = true;
-                ret['+'] = true;
-                ret['-'] = true;
-                ret[')'] = true;
-                ret[']'] = true;
-                ret['*'] = true;
-                ret['/'] = true;
-                ret['%'] = true;
-                return ret;
-            }();
+    static const std::array<bool, 256> lut = []() -> std::array<bool, 256> {
+        std::array<bool, 256> ret{};
+        ret['='] = true;
+        ret['+'] = true;
+        ret['-'] = true;
+        ret[')'] = true;
+        ret[']'] = true;
+        ret['*'] = true;
+        ret['/'] = true;
+        ret['%'] = true;
+        return ret;
+    }();
 
     if (cur == ']') {
         *cigar += '[';
     } else if (cur == ')') {
         *cigar += '(';
     }
-    if(lut[cur]) {
+    if (lut[cur]) {
         *cigar += std::to_string(count);
     }
     if (cur == '_') {
@@ -274,3 +263,4 @@ void SamImporter::deflateEcigarElement(std::string *cigar, size_t count, char cu
     }
     *cigar += cur;
 }
+void SamImporter::dryIn() { dryOut(); }

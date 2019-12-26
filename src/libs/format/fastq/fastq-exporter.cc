@@ -5,6 +5,7 @@
  */
 
 #include "fastq-exporter.h"
+#include <util/ordered-section.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,7 +23,7 @@ FastqExporter::FastqExporter(std::ostream *_file_1, std::ostream *_file_2) : fil
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FastqExporter::flowIn(std::unique_ptr<format::mpegg_rec::MpeggChunk> t, size_t id) {
-    (void)id;
+    OrderedSection section(&lock, id);
     for (auto &i : *t) {
         for (size_t j = 0; j < i->getNumberOfRecords(); ++j) {
             // ID

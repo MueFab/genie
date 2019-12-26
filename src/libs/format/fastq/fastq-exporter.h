@@ -15,6 +15,7 @@
 #include <format/mpegg_rec/segment.h>
 #include <util/drain.h>
 #include <util/make_unique.h>
+#include <util/ordered-lock.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +26,7 @@ namespace fastq {
  */
 class FastqExporter : public Drain<std::unique_ptr<format::mpegg_rec::MpeggChunk>> {
     std::vector<std::ostream *> file;  //!< @brief Support for paired output files
-
+    OrderedLock lock;                  //!< @brief Lock to ensure in order execution
    public:
     /**
      * @brief Unpaired mode

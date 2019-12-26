@@ -14,9 +14,15 @@ class OriginalSource {
    public:
     /**
      * @brief Spawn some data
+     * @param current block id
      * @return True if more data is available, false otherwise
      */
-    virtual bool pump() = 0;
+    virtual bool pump(size_t id) = 0;
+
+    /**
+     * @brief Signal end of data.
+     */
+    virtual void dryIn() = 0;
 
     /**
      * @brief For inheritance
@@ -24,4 +30,9 @@ class OriginalSource {
     virtual ~OriginalSource() = default;
 };
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #endif  // GENIE_ORIGINAL_SOURCE_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

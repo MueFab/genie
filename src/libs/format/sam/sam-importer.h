@@ -12,6 +12,7 @@
 #include <util/original-source.h>
 #include <util/source.h>
 
+#include <util/ordered-lock.h>
 #include <algorithm>
 #include <list>
 #include "sam-file-reader.h"
@@ -23,6 +24,7 @@ class SamImporter : public Source<std::unique_ptr<format::mpegg_rec::MpeggChunk>
     size_t blockSize;
     format::sam::SamFileReader samFileReader;
     size_t record_counter;
+    OrderedLock lock;  //!< @brief Lock to ensure in order execution
 
     static bool convertFlags2Mpeg(uint16_t flags, uint8_t *flags_mpeg);
 
@@ -42,7 +44,9 @@ class SamImporter : public Source<std::unique_ptr<format::mpegg_rec::MpeggChunk>
     static std::string deflateCigar(const std::string &cigar);
     static std::string deflateEcigar(const std::string &cigar);
 
-    bool pump() override;
+    bool pump(size_t id) override;
+
+    void dryIn() override;
 };
 
 #endif  // GENIE_SAM_IMPORTER_H

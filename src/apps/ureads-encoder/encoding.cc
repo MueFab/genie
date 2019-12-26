@@ -21,6 +21,7 @@
 #include <format/mpegg_p2/raw_reference.h>
 #include <format/mpegg_rec/mgrecs-exporter.h>
 #include <gabac/gabac.h>
+#include <util/thread-manager.h>
 
 #include "format/mpegg_p2/access_unit.h"
 #include "format/mpegg_p2/clutter.h"
@@ -77,49 +78,49 @@ class DummyModule : public Drain<std::unique_ptr<MpeggRawAu>> {
 
 void encode(const ProgramOptions& programOptions) {
     // Setup
-    GabacCompressor compressor;
-    GabacDecompressor decompressor;
-    DummyModule dummy;
-    compressor.setDrain(&decompressor);
-    decompressor.setDrain(&dummy);
+    /*   GabacCompressor compressor;
+       GabacDecompressor decompressor;
+       DummyModule dummy;
+       compressor.setDrain(&decompressor);
+       decompressor.setDrain(&dummy);
 
-    // Create input data
-    auto raw_aus = util::make_unique<MpeggRawAu>(util::make_unique<format::mpegg_p2::ParameterSet>(), 0);
-    for (size_t i = 0; i < 42; ++i) {
-        raw_aus->get(GenomicDescriptor::RLEN, 0).push(i);  // Just some random data
-    }
-
-    // Execute
-    compressor.flowIn(std::move(raw_aus), 0);
-    compressor.dryIn();
-
-    // Test if all conditions are met
-    if (dummy.veryImportantExampleInformation() != 42) {
-        // ERROR!
-    }
-    if (!dummy.veryImportantExampleTest()) {
-        // ERROR!
-    }
-
-    /*   {
-           std::ifstream infile1(programOptions.inputFilePath), infile2(programOptions.pairFilePath);
-           std::ofstream outfile1(programOptions.outputFilePath), outfile2(programOptions.outputPairFilePath);
-           format::fastq::FastqImporter importer(1000, &infile1, &infile2);
-           format::fastq::FastqExporter exporter(&outfile1, &outfile2);
-           importer.setDrain(&exporter);
-
-           while (importer.pump()) {}
+       // Create input data
+       auto raw_aus = util::make_unique<MpeggRawAu>(util::make_unique<format::mpegg_p2::ParameterSet>(), 0);
+       for (size_t i = 0; i < 42; ++i) {
+           raw_aus->get(GenomicDescriptor::RLEN, 0).push(i);  // Just some random data
        }
 
-       {
-           std::ifstream infile1(programOptions.inputFilePath), infile2(programOptions.pairFilePath);
-           std::ofstream outfile1(programOptions.outputFilePath + ".mgrec");
-           format::fastq::FastqImporter importer(1000, &infile1, &infile2);
-           MgrecsExporter exporter(&outfile1);
-           importer.setDrain(&exporter);
+       // Execute
+       compressor.flowIn(std::move(raw_aus), 0);
+       compressor.dryIn();
 
-           while (importer.pump()) {}
+       // Test if all conditions are met
+       if (dummy.veryImportantExampleInformation() != 42) {
+           // ERROR!
+       }
+       if (!dummy.veryImportantExampleTest()) {
+           // ERROR!
        }*/
+
+    {
+        std::ifstream infile1(programOptions.inputFilePath), infile2(programOptions.pairFilePath);
+        std::ofstream outfile1(programOptions.outputFilePath), outfile2(programOptions.outputPairFilePath);
+        format::fastq::FastqImporter importer(2, &infile1, &infile2);
+        format::fastq::FastqExporter exporter(&outfile1, &outfile2);
+        importer.setDrain(&exporter);
+        ThreadManager threadManager(4, &importer);
+        threadManager.run();
+    }
+
+    {
+        std::ifstream infile1(programOptions.inputFilePath), infile2(programOptions.pairFilePath);
+        std::ofstream outfile1(programOptions.outputFilePath + ".mgrec");
+        format::fastq::FastqImporter importer(2, &infile1, &infile2);
+        MgrecsExporter exporter(&outfile1);
+        importer.setDrain(&exporter);
+        ThreadManager threadManager(4, &importer);
+        threadManager.run();
+    }
     /* /////////////////////////////////////////////////////////////////////////////////////////////////////
      // UREADS DESCRIPTOR GENERATION
      /////////////////////////////////////////////////////////////////////////////////////////////////////
