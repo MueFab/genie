@@ -79,7 +79,7 @@ class GabacSeqConfSet {
      * input parameter set
      */
     static const DecoderConfigurationCabac* loadDescriptorDecoderCfg(const ParameterSet& parameterSet,
-                                                                     GenomicDescriptor descriptor_id);
+                                                                     GenDesc descriptor_id);
 
     /**
      * @brief Convert format::mpegg_p2::desc_conf_pres::cabac::TransformSubseqCfg to
@@ -97,7 +97,7 @@ class GabacSeqConfSet {
      * @param sub Which subsequence
      * @return Gabac configuration
      */
-    const gabac::EncodingConfiguration& getConfAsGabac(GenomicDescriptor desc, GenomicSubsequence sub) const;
+    const gabac::EncodingConfiguration& getConfAsGabac(GenSubIndex sub) const;
 
     /**
      *  @brief Create a default config guaranteed to work (bypass, no transformation, binary binarization)

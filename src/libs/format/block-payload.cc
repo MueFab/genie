@@ -121,13 +121,13 @@ BlockPayloadSet::BlockPayloadSet(std::unique_ptr<format::mpegg_p2::ParameterSet>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BlockPayloadSet::setPayload(GenomicDescriptor i, std::unique_ptr<DescriptorPayload> p) {
+void BlockPayloadSet::setPayload(GenDesc i, std::unique_ptr<DescriptorPayload> p) {
     desc_pay[uint8_t(i)] = std::move(p);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BlockPayloadSet::DescriptorPayload* BlockPayloadSet::getPayload(GenomicDescriptor i) {
+BlockPayloadSet::DescriptorPayload* BlockPayloadSet::getPayload(GenDesc i) {
     return desc_pay[uint8_t(i)].get();
 }
 

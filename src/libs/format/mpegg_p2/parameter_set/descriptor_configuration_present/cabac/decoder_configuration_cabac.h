@@ -18,16 +18,16 @@ namespace cabac {
  */
 class DecoderConfigurationCabac : public DecoderConfiguration {
    protected:
-    GenomicDescriptor desc;
+    GenDesc desc;
     uint8_t rle_guard_tokentype : 8;                                                     //!< line 4
     std::vector<std::unique_ptr<DescriptorSubsequenceCfg>> descriptor_subsequence_cfgs;  //!< Line 4 to 13
 
    public:
-    explicit DecoderConfigurationCabac(GenomicDescriptor _desc);
+    explicit DecoderConfigurationCabac(GenDesc _desc);
 
-    void setSubsequenceCfg(GenomicSubsequence index, std::unique_ptr<TransformSubseqParameters> cfg);
+    void setSubsequenceCfg(uint8_t index, std::unique_ptr<TransformSubseqParameters> cfg);
 
-    DescriptorSubsequenceCfg *getSubsequenceCfg(GenomicSubsequence index) const {
+    DescriptorSubsequenceCfg *getSubsequenceCfg(uint8_t index) const {
         return descriptor_subsequence_cfgs[uint8_t(index)].get();
     }
 

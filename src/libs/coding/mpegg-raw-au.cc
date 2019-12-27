@@ -10,13 +10,11 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MpeggRawAu::SubDescriptor::SubDescriptor(size_t wordsize, GenomicSubsequence _id)
-    : data(0, wordsize), position(0), id(_id) {}
+MpeggRawAu::SubDescriptor::SubDescriptor(size_t wordsize, GenSubIndex _id) : data(0, wordsize), position(0), id(_id) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MpeggRawAu::SubDescriptor::SubDescriptor(gabac::DataBlock *d, GenomicSubsequence _id)
-    : data(0, 1), position(0), id(_id) {
+MpeggRawAu::SubDescriptor::SubDescriptor(gabac::DataBlock *d, GenSubIndex _id) : data(0, 1), position(0), id(_id) {
     data.swap(d);
 }
 
@@ -42,7 +40,7 @@ void MpeggRawAu::SubDescriptor::swap(gabac::DataBlock *block) { block->swap(&dat
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-GenomicSubsequence MpeggRawAu::SubDescriptor::getID() const { return id; }
+GenSubIndex MpeggRawAu::SubDescriptor::getID() const { return id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -52,13 +50,11 @@ const std::vector<std::unique_ptr<MpeggRawAu::SubDescriptor>> &MpeggRawAu::Descr
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MpeggRawAu::SubDescriptor *MpeggRawAu::Descriptor::getSubsequence(GenomicSubsequence sub) {
-    return subdesc[uint8_t(sub)].get();
-}
+MpeggRawAu::SubDescriptor *MpeggRawAu::Descriptor::getSubsequence(uint8_t sub) { return subdesc[uint8_t(sub)].get(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-GenomicDescriptor MpeggRawAu::Descriptor::getID() const { return id; }
+GenDesc MpeggRawAu::Descriptor::getID() const { return id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -66,31 +62,29 @@ void MpeggRawAu::Descriptor::add(std::unique_ptr<SubDescriptor> sub) { subdesc.p
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MpeggRawAu::Descriptor::set(GenomicSubsequence _id, std::unique_ptr<SubDescriptor> sub) {
+void MpeggRawAu::Descriptor::set(uint8_t _id, std::unique_ptr<SubDescriptor> sub) {
     subdesc[uint8_t(_id)] = std::move(sub);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MpeggRawAu::Descriptor::Descriptor(GenomicDescriptor _id) : id(_id) {}
+MpeggRawAu::Descriptor::Descriptor(GenDesc _id) : id(_id) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MpeggRawAu::SubDescriptor &MpeggRawAu::get(GenomicDescriptor desc, GenomicSubsequence sub) {
-    return *descriptors[uint8_t(desc)]->getSubsequence(sub);
+MpeggRawAu::SubDescriptor &MpeggRawAu::get(GenSubIndex sub) {
+    return *descriptors[uint8_t(sub.first)]->getSubsequence(sub.second);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const MpeggRawAu::SubDescriptor &MpeggRawAu::get(GenomicDescriptor desc, GenomicSubsequence sub) const {
-    return *descriptors[uint8_t(desc)]->getSubsequence(sub);
+const MpeggRawAu::SubDescriptor &MpeggRawAu::get(GenSubIndex sub) const {
+    return *descriptors[uint8_t(sub.first)]->getSubsequence(sub.second);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MpeggRawAu::SubDescriptor &MpeggRawAu::get(GenomicDescriptor desc, uint8_t sub) {
-    return get(desc, GenomicSubsequence(sub));
-}
+MpeggRawAu::SubDescriptor &MpeggRawAu::get(GenDesc desc, uint8_t sub) { return get(GenSubIndex(desc, sub)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -100,8 +94,8 @@ const std::vector<std::unique_ptr<MpeggRawAu::Descriptor>> &MpeggRawAu::getDescr
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MpeggRawAu::set(GenomicDescriptor desc, GenomicSubsequence sub, std::unique_ptr<SubDescriptor> data) {
-    descriptors[uint8_t(desc)]->set(sub, std::move(data));
+void MpeggRawAu::set(GenSubIndex sub, std::unique_ptr<SubDescriptor> data) {
+    descriptors[uint8_t(sub.first)]->set(sub.second, std::move(data));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

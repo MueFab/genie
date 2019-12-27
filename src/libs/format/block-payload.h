@@ -56,20 +56,20 @@ class BlockPayloadSet {
     class SubsequencePayload {
        private:
         std::vector<std::unique_ptr<TransformedPayload>> transformedPayloads;  //!< @brief
-        GenomicSubsequence id;                                                 //!< @brief
+        GenSubIndex id;                                                 //!< @brief
 
        public:
         /**
          * @brief
          * @param _id
          */
-        explicit SubsequencePayload(GenomicSubsequence _id) : id(_id) {}
+        explicit SubsequencePayload(GenSubIndex _id) : id(_id) {}
 
         /**
          * @brief
          * @return
          */
-        GenomicSubsequence getID() const { return id; }
+        GenSubIndex getID() const { return id; }
 
         /**
          * @brief
@@ -102,20 +102,20 @@ class BlockPayloadSet {
     class DescriptorPayload {
        private:
         std::vector<std::unique_ptr<SubsequencePayload>> subsequencePayloads;  //!< @brief
-        GenomicDescriptor id;                                                  //!< @brief
+        GenDesc id;                                                  //!< @brief
 
        public:
         /**
          * @brief
          * @param _id
          */
-        explicit DescriptorPayload(GenomicDescriptor _id) : id(_id) {}
+        explicit DescriptorPayload(GenDesc _id) : id(_id) {}
 
         /**
          * @brief
          * @return
          */
-        GenomicDescriptor getID() const { return id; }
+        GenDesc getID() const { return id; }
 
         /**
          * @brief
@@ -154,14 +154,14 @@ class BlockPayloadSet {
      * @param i
      * @param p
      */
-    void setPayload(GenomicDescriptor i, std::unique_ptr<DescriptorPayload> p);
+    void setPayload(GenDesc i, std::unique_ptr<DescriptorPayload> p);
 
     /**
      * @brief
      * @param i
      * @return
      */
-    DescriptorPayload* getPayload(GenomicDescriptor i);
+    DescriptorPayload* getPayload(GenDesc i);
 
     /**
      * @brief

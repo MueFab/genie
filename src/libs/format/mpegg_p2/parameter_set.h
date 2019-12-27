@@ -42,9 +42,9 @@ namespace format {
 
             void addClass(mpegg_rec::MpeggRecord::ClassType class_id, std::unique_ptr<QvCodingConfig> conf);
 
-            void setDescriptor(GenomicDescriptor index, std::unique_ptr<DescriptorConfigurationContainer> descriptor);
+            void setDescriptor(GenDesc index, std::unique_ptr<DescriptorConfigurationContainer> descriptor);
 
-            const DescriptorConfigurationContainer* getDescriptor(GenomicDescriptor index) const {
+            const DescriptorConfigurationContainer* getDescriptor(GenDesc index) const {
                 return descriptors[uint8_t (index)].get();
             }
 

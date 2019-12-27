@@ -49,8 +49,8 @@ void GabacDecompressor::flowIn(std::unique_ptr<BlockPayloadSet> payloadSet, size
                 continue;
             }
             auto subseqData = util::make_unique<MpeggRawAu::SubDescriptor>(4, subseq->getID());
-            decompress(configSet.getConfAsGabac(desc->getID(), subseq->getID()), *subseq, subseqData.get());
-            raw_aus->set(desc->getID(), subseq->getID(), std::move(subseqData));
+            decompress(configSet.getConfAsGabac(subseq->getID()), *subseq, subseqData.get());
+            raw_aus->set(subseq->getID(), std::move(subseqData));
         }
     }
 

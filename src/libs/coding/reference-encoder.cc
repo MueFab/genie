@@ -1,3 +1,9 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #include "reference-encoder.h"
 #include <format/mpegg_rec/alignment-container.h>
 #include <format/mpegg_rec/mpegg-record.h>
@@ -6,10 +12,16 @@
 #include <map>
 #include "util/exceptions.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace lae {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 LocalAssemblyReferenceEncoder::LocalAssemblyReferenceEncoder(uint32_t _cr_buf_max_size)
     : cr_buf_max_size(_cr_buf_max_size), crBufSize(0) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 std::string LocalAssemblyReferenceEncoder::preprocess(const std::string &read, const std::string &cigar) {
     std::string result;
@@ -59,6 +71,8 @@ std::string LocalAssemblyReferenceEncoder::preprocess(const std::string &read, c
     return result;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void LocalAssemblyReferenceEncoder::addRead(const format::mpegg_rec::MpeggRecord *s) {
     sequence_positions.push_back(s->getAlignment(0)->getPosition());
     std::string read =
@@ -103,6 +117,8 @@ void LocalAssemblyReferenceEncoder::addRead(const format::mpegg_rec::MpeggRecord
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::string LocalAssemblyReferenceEncoder::generateRef(uint32_t offset, uint32_t len) {
     std::string ref;
     for (size_t i = offset; i < offset + len; ++i) {
@@ -110,6 +126,8 @@ std::string LocalAssemblyReferenceEncoder::generateRef(uint32_t offset, uint32_t
     }
     return ref;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 uint32_t LocalAssemblyReferenceEncoder::lengthFromCigar(const std::string &cigar) {
     uint32_t len = 0;
@@ -141,13 +159,19 @@ uint32_t LocalAssemblyReferenceEncoder::lengthFromCigar(const std::string &cigar
     return len;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::string LocalAssemblyReferenceEncoder::getReference(uint32_t abs_pos, const std::string &cigar) {
     return generateRef(abs_pos, lengthFromCigar(cigar));
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::string LocalAssemblyReferenceEncoder::getReference(uint32_t abs_pos, uint32_t len) {
     return generateRef(abs_pos, len);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 char LocalAssemblyReferenceEncoder::majorityVote(uint32_t abs_position) {
     std::map<char, uint16_t> votes;
@@ -178,7 +202,9 @@ char LocalAssemblyReferenceEncoder::majorityVote(uint32_t abs_position) {
     return max;
 }
 
-void LocalAssemblyReferenceEncoder::printWindow() {
+// ---------------------------------------------------------------------------------------------------------------------
+
+void LocalAssemblyReferenceEncoder::printWindow() const {
     uint64_t minPos = getWindowBorder();
 
     for (size_t i = 0; i < sequences.size(); ++i) {
@@ -190,7 +216,9 @@ void LocalAssemblyReferenceEncoder::printWindow() {
     }
 }
 
-uint64_t LocalAssemblyReferenceEncoder::getWindowBorder() {
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t LocalAssemblyReferenceEncoder::getWindowBorder() const {
     uint64_t minPos = std::numeric_limits<uint64_t>::max();
     for (auto &p : sequence_positions) {
         minPos = std::min(minPos, p);
@@ -198,4 +226,9 @@ uint64_t LocalAssemblyReferenceEncoder::getWindowBorder() {
     return minPos;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace lae
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

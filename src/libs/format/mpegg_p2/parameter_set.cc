@@ -179,7 +179,7 @@ namespace format {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-        void ParameterSet::setDescriptor(GenomicDescriptor index, std::unique_ptr<DescriptorConfigurationContainer> descriptor) {
+        void ParameterSet::setDescriptor(GenDesc index, std::unique_ptr<DescriptorConfigurationContainer> descriptor) {
             descriptors[uint8_t (index)] = std::move(descriptor);
         }
 

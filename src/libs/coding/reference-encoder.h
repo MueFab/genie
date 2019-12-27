@@ -1,11 +1,21 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #ifndef GENIE_REFERENCE_ENCODER_H
 #define GENIE_REFERENCE_ENCODER_H
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include <format/mpegg_rec/mpegg-record.h>
 #include <format/sam/sam-record.h>
 #include <limits>
 #include <string>
 #include <vector>
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace lae {
 
@@ -34,10 +44,15 @@ class LocalAssemblyReferenceEncoder {
 
     std::string getReference(uint32_t pos_offset, uint32_t len);
 
-    uint64_t getWindowBorder();
+    uint64_t getWindowBorder() const;
 
-    void printWindow();
+    void printWindow() const;
 };
 }  // namespace lae
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #endif  // GENIE_REFERENCE_ENCODER_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
