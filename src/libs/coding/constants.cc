@@ -1,107 +1,173 @@
 #include "constants.h"
 #include <algorithm>
 
+constexpr GenSubIndex GenSub::POS_MAPPING_FIRST;
+constexpr GenSubIndex GenSub::POS_MAPPING_ADDITIONAL;
+
+constexpr GenSubIndex GenSub::RCOMP;
+
+constexpr GenSubIndex GenSub::FLAGS_PCR_DUPLICATE;
+constexpr GenSubIndex GenSub::FLAGS_QUALITY_FAIL;
+constexpr GenSubIndex GenSub::FLAGS_PROPER_PAIR;
+
+constexpr GenSubIndex GenSub::MMPOS_TERMINATOR;
+constexpr GenSubIndex GenSub::MMPOS_POSITION;
+
+constexpr GenSubIndex GenSub::MMTYPE_TYPE;
+constexpr GenSubIndex GenSub::MMTYPE_SUBSTITUTION;
+constexpr GenSubIndex GenSub::MMTYPE_INSERTION;
+
+constexpr GenSubIndex GenSub::CLIPS_RECORD_ID;
+constexpr GenSubIndex GenSub::CLIPS_TYPE;
+constexpr GenSubIndex GenSub::CLIPS_SOFT_STRING;
+constexpr GenSubIndex GenSub::CLIPS_HARD_LENGTH;
+
+constexpr GenSubIndex GenSub::UREADS;
+
+constexpr GenSubIndex GenSub::RLEN;
+
+constexpr GenSubIndex GenSub::PAIR_DECODING_CASE;
+constexpr GenSubIndex GenSub::PAIR_SAME_REC;
+constexpr GenSubIndex GenSub::PAIR_R1_SPLIT;
+constexpr GenSubIndex GenSub::PAIR_R2_SPLIT;
+constexpr GenSubIndex GenSub::PAIR_R1_DIFF_SEQ;
+constexpr GenSubIndex GenSub::PAIR_R2_DIFF_SEQ;
+constexpr GenSubIndex GenSub::PAIR_R1_DIFF_POS;
+constexpr GenSubIndex GenSub::PAIR_R2_DIFF_POS;
+
+constexpr GenSubIndex GenSub::MSCORE;
+
+constexpr GenSubIndex GenSub::MMAP_NUMBER_ALIGN;
+constexpr GenSubIndex GenSub::MMAP_RIGHT_ALIGN_ID;
+constexpr GenSubIndex GenSub::MMAP_OTHER_REC_FLAG;
+constexpr GenSubIndex GenSub::MMAP_REF_SEQ;
+constexpr GenSubIndex GenSub::MMAP_REF_POS;
+
+constexpr GenSubIndex GenSub::MSAR_CABAC_0;
+constexpr GenSubIndex GenSub::MSAR_CABAC_1;
+
+constexpr GenSubIndex GenSub::RTYPE;
+
+constexpr GenSubIndex GenSub::RGROUP;
+
+constexpr GenSubIndex GenSub::QV_PRESENT;
+constexpr GenSubIndex GenSub::QV_CODEBOOK;
+constexpr GenSubIndex GenSub::QV_STEPS_0;
+constexpr GenSubIndex GenSub::QV_STEPS_1;
+constexpr GenSubIndex GenSub::QV_STEPS_2;
+constexpr GenSubIndex GenSub::QV_STEPS_3;
+constexpr GenSubIndex GenSub::QV_STEPS_4;
+constexpr GenSubIndex GenSub::QV_STEPS_5;
+constexpr GenSubIndex GenSub::QV_STEPS_6;
+
+constexpr GenSubIndex GenSub::RNAME;
+
+constexpr GenSubIndex GenSub::RFTP;
+
+constexpr GenSubIndex GenSub::RFTT;
+
+
 const std::vector<GenomicDescriptorProperties> &getDescriptors() {
     static const std::vector<GenomicDescriptorProperties> prop = {
-        {GenomicDescriptor::POS,
+        {GenDesc::POS,
          "pos",
          false,
-         {{GenomicSubsequence::POS_MAPPING_FIRST, "first"},
-          {GenomicSubsequence::POS_MAPPING_ADDITIONAL, "additional"}}},
+         {{GenSub::POS_MAPPING_FIRST, "first"},
+          {GenSub::POS_MAPPING_ADDITIONAL, "additional"}}},
 
-        {GenomicDescriptor::RCOMP, "rcomp", false, {{GenomicSubsequence::RCOMP, "rcomp"}}},
+        {GenDesc::RCOMP, "rcomp", false, {{GenSub::RCOMP, "rcomp"}}},
 
-        {GenomicDescriptor::FLAGS,
+        {GenDesc::FLAGS,
          "flags",
          false,
-         {{GenomicSubsequence::FLAGS_PCR_DUPLICATE, "pcr_duplicate"},
-          {GenomicSubsequence::FLAGS_QUALITY_FAIL, "quality_flag"},
-          {GenomicSubsequence::FLAGS_PROPER_PAIR, "proper_pair"}}},
+         {{GenSub::FLAGS_PCR_DUPLICATE, "pcr_duplicate"},
+          {GenSub::FLAGS_QUALITY_FAIL, "quality_flag"},
+          {GenSub::FLAGS_PROPER_PAIR, "proper_pair"}}},
 
-        {GenomicDescriptor::MMPOS,
+        {GenDesc::MMPOS,
          "mmpos",
          false,
-         {{GenomicSubsequence::MMPOS_TERMINATOR, "terminator"}, {GenomicSubsequence::MMPOS_POSITION, "position"}}},
+         {{GenSub::MMPOS_TERMINATOR, "terminator"}, {GenSub::MMPOS_POSITION, "position"}}},
 
-        {GenomicDescriptor::MMTYPE,
+        {GenDesc::MMTYPE,
          "mmtype",
          false,
-         {{GenomicSubsequence::MMTYPE_TYPE, "type"},
-          {GenomicSubsequence::MMTYPE_SUBSTITUTION, "substitution"},
-          {GenomicSubsequence::MMTYPE_SUBSTITUTION, "insertion"}}},
+         {{GenSub::MMTYPE_TYPE, "type"},
+          {GenSub::MMTYPE_SUBSTITUTION, "substitution"},
+          {GenSub::MMTYPE_SUBSTITUTION, "insertion"}}},
 
-        {GenomicDescriptor::CLIPS,
+        {GenDesc::CLIPS,
          "clips",
          false,
-         {{GenomicSubsequence::CLIPS_RECORD_ID, "record_id"},
-          {GenomicSubsequence::CLIPS_TYPE, "type"},
-          {GenomicSubsequence::CLIPS_SOFT_STRING, "soft_string"},
-          {GenomicSubsequence::CLIPS_HARD_LENGTH, "hard_length"}}},
+         {{GenSub::CLIPS_RECORD_ID, "record_id"},
+          {GenSub::CLIPS_TYPE, "type"},
+          {GenSub::CLIPS_SOFT_STRING, "soft_string"},
+          {GenSub::CLIPS_HARD_LENGTH, "hard_length"}}},
 
-        {GenomicDescriptor::UREADS, "ureads", false, {{GenomicSubsequence::UREADS, "ureads"}}},
+        {GenDesc::UREADS, "ureads", false, {{GenSub::UREADS, "ureads"}}},
 
-        {GenomicDescriptor::RLEN, "rlen", false, {{GenomicSubsequence::RLEN, "rlen"}}},
+        {GenDesc::RLEN, "rlen", false, {{GenSub::RLEN, "rlen"}}},
 
-        {GenomicDescriptor::PAIR,
+        {GenDesc::PAIR,
          "pair",
          false,
-         {{GenomicSubsequence::PAIR_DECODING_CASE, "decoding_case"},
-          {GenomicSubsequence::PAIR_SAME_REC, "same_rec"},
-          {GenomicSubsequence::PAIR_R1_SPLIT, "r1_split"},
-          {GenomicSubsequence::PAIR_R2_SPLIT, "r2_split"},
-          {GenomicSubsequence::PAIR_R1_DIFF_SEQ, "r1_diff_seq"},
-          {GenomicSubsequence::PAIR_R2_DIFF_SEQ, "r2_diff_seq"},
-          {GenomicSubsequence::PAIR_R1_DIFF_POS, "r1_diff_pos"},
-          {GenomicSubsequence::PAIR_R2_DIFF_POS, "r2_diff_pos"}}},
+         {{GenSub::PAIR_DECODING_CASE, "decoding_case"},
+          {GenSub::PAIR_SAME_REC, "same_rec"},
+          {GenSub::PAIR_R1_SPLIT, "r1_split"},
+          {GenSub::PAIR_R2_SPLIT, "r2_split"},
+          {GenSub::PAIR_R1_DIFF_SEQ, "r1_diff_seq"},
+          {GenSub::PAIR_R2_DIFF_SEQ, "r2_diff_seq"},
+          {GenSub::PAIR_R1_DIFF_POS, "r1_diff_pos"},
+          {GenSub::PAIR_R2_DIFF_POS, "r2_diff_pos"}}},
 
-        {GenomicDescriptor::MSCORE, "mscore", false, {{GenomicSubsequence::MSCORE, "mscore"}}},
+        {GenDesc::MSCORE, "mscore", false, {{GenSub::MSCORE, "mscore"}}},
 
-        {GenomicDescriptor::MMAP,
+        {GenDesc::MMAP,
          "mmap",
          false,
-         {{GenomicSubsequence::MMAP_NUMBER_ALIGN, "number_alignments"},
-          {GenomicSubsequence::MMAP_RIGHT_ALIGN_ID, "right_alignment_id"},
-          {GenomicSubsequence::MMAP_OTHER_REC_FLAG, "other_rec_flag"},
-          {GenomicSubsequence::MMAP_REF_SEQ, "reference_seq"},
-          {GenomicSubsequence::MMAP_REF_POS, "reference_pos"}}},
+         {{GenSub::MMAP_NUMBER_ALIGN, "number_alignments"},
+          {GenSub::MMAP_RIGHT_ALIGN_ID, "right_alignment_id"},
+          {GenSub::MMAP_OTHER_REC_FLAG, "other_rec_flag"},
+          {GenSub::MMAP_REF_SEQ, "reference_seq"},
+          {GenSub::MMAP_REF_POS, "reference_pos"}}},
 
-        {GenomicDescriptor::MSAR,
+        {GenDesc::MSAR,
          "msar",
          true,
-         {{GenomicSubsequence::MSAR_CABAC_0, "cabac_0"}, {GenomicSubsequence::MSAR_CABAC_1, "cabac_1"}}},
+         {{GenSub::MSAR_CABAC_0, "cabac_0"}, {GenSub::MSAR_CABAC_1, "cabac_1"}}},
 
-        {GenomicDescriptor::RTYPE, "rtype", false, {{GenomicSubsequence::RTYPE, "rtype"}}},
+        {GenDesc::RTYPE, "rtype", false, {{GenSub::RTYPE, "rtype"}}},
 
-        {GenomicDescriptor::RGROUP, "rgroup", false, {{GenomicSubsequence::RGROUP, "rgroup"}}},
+        {GenDesc::RGROUP, "rgroup", false, {{GenSub::RGROUP, "rgroup"}}},
 
-        {GenomicDescriptor::QV,
+        {GenDesc::QV,
          "qv",
          false,
-         {{GenomicSubsequence::QV_PRESENT, "present"},
-          {GenomicSubsequence::QV_CODEBOOK, "codebook"},
-          {GenomicSubsequence::QV_STEPS_0, "steps_0"},
-          {GenomicSubsequence::QV_STEPS_1, "steps_1"},
-          {GenomicSubsequence::QV_STEPS_2, "steps_2"},
-          {GenomicSubsequence::QV_STEPS_3, "steps_3"},
-          {GenomicSubsequence::QV_STEPS_4, "steps_4"},
-          {GenomicSubsequence::QV_STEPS_5, "steps_5"},
-          {GenomicSubsequence::QV_STEPS_6, "steps_6"}}},
+         {{GenSub::QV_PRESENT, "present"},
+          {GenSub::QV_CODEBOOK, "codebook"},
+          {GenSub::QV_STEPS_0, "steps_0"},
+          {GenSub::QV_STEPS_1, "steps_1"},
+          {GenSub::QV_STEPS_2, "steps_2"},
+          {GenSub::QV_STEPS_3, "steps_3"},
+          {GenSub::QV_STEPS_4, "steps_4"},
+          {GenSub::QV_STEPS_5, "steps_5"},
+          {GenSub::QV_STEPS_6, "steps_6"}}},
 
-        {GenomicDescriptor::RNAME, "rname", true, {{GenomicSubsequence::RNAME, "rname"}}},
+        {GenDesc::RNAME, "rname", true, {{GenSub::RNAME, "rname"}}},
 
-        {GenomicDescriptor::RFTP, "rftp", false, {{GenomicSubsequence::RFTP, "rftp"}}},
+        {GenDesc::RFTP, "rftp", false, {{GenSub::RFTP, "rftp"}}},
 
-        {GenomicDescriptor ::RFTT, "rftt", false, {{GenomicSubsequence::RFTT, "rftt"}}}};
+        {GenDesc ::RFTT, "rftt", false, {{GenSub::RFTT, "rftt"}}}};
     return prop;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const GenomicDescriptorProperties &getDescriptor(GenomicDescriptor desc) { return getDescriptors()[uint8_t(desc)]; }
+const GenomicDescriptorProperties &getDescriptor(GenDesc desc) { return getDescriptors()[uint8_t(desc)]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const GenomicSubDescriptorProperties &getSubsequence(GenomicDescriptor desc, GenomicSubsequence sub) {
+const GenomicSubDescriptorProperties &getSubsequence(GenDesc desc, uint8_t sub) {
     return getDescriptors()[uint8_t(desc)].subseqs[uint8_t(sub)];
 }
 

@@ -46,8 +46,8 @@ void GabacCompressor::flowIn(std::unique_ptr<MpeggRawAu> raw_aus, size_t id) {
     for (const auto &desc : raw_aus->getDescriptorStreams()) {
         auto descriptor_payload = util::make_unique<BlockPayloadSet::DescriptorPayload>(desc->getID());
         for (const auto &subdesc : desc->getSubsequences()) {
-            auto &input = raw_aus->get(desc->getID(), subdesc->getID());
-            const auto &conf = configSet.getConfAsGabac(desc->getID(), subdesc->getID());
+            auto &input = raw_aus->get(subdesc->getID());
+            const auto &conf = configSet.getConfAsGabac(subdesc->getID());
             auto subsequence_payload = util::make_unique<BlockPayloadSet::SubsequencePayload>(subdesc->getID());
             compress(conf, &input, subsequence_payload.get());
 

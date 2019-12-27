@@ -7,19 +7,19 @@ namespace format {
 namespace mpegg_p2 {
 namespace desc_conf_pres {
 namespace cabac {
-DecoderConfigurationCabac::DecoderConfigurationCabac(GenomicDescriptor _desc)
+DecoderConfigurationCabac::DecoderConfigurationCabac(GenDesc _desc)
     : DecoderConfiguration(EncodingModeId::CABAC), desc(_desc), rle_guard_tokentype(0), descriptor_subsequence_cfgs(0) {
     for (size_t i = 0; i < getDescriptors()[uint8_t(desc)].subseqs.size(); ++i) {
         descriptor_subsequence_cfgs.push_back(util::make_unique<DescriptorSubsequenceCfg>(
             util::make_unique<TransformSubseqParameters>(), i,
-            desc == GenomicDescriptor::MSAR || desc == GenomicDescriptor::RNAME));
+            desc == GenDesc::MSAR || desc == GenDesc::RNAME));
     }
 }
 
-void DecoderConfigurationCabac::setSubsequenceCfg(GenomicSubsequence index, std::unique_ptr<TransformSubseqParameters> cfg) {
+void DecoderConfigurationCabac::setSubsequenceCfg(uint8_t index, std::unique_ptr<TransformSubseqParameters> cfg) {
     descriptor_subsequence_cfgs[uint8_t (index)] = util::make_unique<DescriptorSubsequenceCfg>(
         std::move(cfg), uint8_t (index),
-        desc == GenomicDescriptor::MSAR || desc == GenomicDescriptor::RNAME);
+        desc == GenDesc::MSAR || desc == GenDesc::RNAME);
 }
 
 std::unique_ptr<DecoderConfiguration> DecoderConfigurationCabac::clone() const {
@@ -34,7 +34,7 @@ std::unique_ptr<DecoderConfiguration> DecoderConfigurationCabac::clone() const {
 
 void DecoderConfigurationCabac::write(util::BitWriter *writer) const {
     DecoderConfiguration::write(writer);
-    if (desc == GenomicDescriptor::RNAME || desc == GenomicDescriptor::MSAR) {
+    if (desc == GenDesc::RNAME || desc == GenDesc::MSAR) {
         writer->write(rle_guard_tokentype, 8);
     } else {
         writer->write(descriptor_subsequence_cfgs.size() - 1, 8);

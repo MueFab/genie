@@ -39,9 +39,8 @@ GabacSeqConfSet::GabacSeqConfSet() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const gabac::EncodingConfiguration &GabacSeqConfSet::getConfAsGabac(GenomicDescriptor desc,
-                                                                    GenomicSubsequence sub) const {
-    return conf[uint8_t(desc)][uint8_t(sub)];
+const gabac::EncodingConfiguration &GabacSeqConfSet::getConfAsGabac(GenSubIndex sub) const {
+    return conf[uint8_t(sub.first)][uint8_t(sub.second)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -122,12 +121,12 @@ void GabacSeqConfSet::storeParameters(format::mpegg_p2::ParameterSet *parameterS
         auto decoder_config = util::make_unique<cabac::DecoderConfigurationCabac>(desc.id);
 
         for (const auto &subdesc : desc.subseqs) {
-            auto transform_params = storeTransParams(getConfAsGabac(desc.id, subdesc.id));
-            decoder_config->setSubsequenceCfg(subdesc.id, std::move(transform_params));
+            auto transform_params = storeTransParams(getConfAsGabac(subdesc.id));
+            decoder_config->setSubsequenceCfg(subdesc.id.second, std::move(transform_params));
 
             // This is where actual translation of one gabac config to MPEGG takes place
-            auto subseq_cfg = decoder_config->getSubsequenceCfg(subdesc.id);
-            storeSubseq(getConfAsGabac(desc.id, subdesc.id), subseq_cfg);
+            auto subseq_cfg = decoder_config->getSubsequenceCfg(subdesc.id.second);
+            storeSubseq(getConfAsGabac(subdesc.id), subseq_cfg);
         }
         auto descriptor_configuration = util::make_unique<DescriptorConfigurationPresent>();
         descriptor_configuration->set_decoder_configuration(std::move(decoder_config));
@@ -142,7 +141,7 @@ void GabacSeqConfSet::storeParameters(format::mpegg_p2::ParameterSet *parameterS
 // ---------------------------------------------------------------------------------------------------------------------
 
 const GabacSeqConfSet::DecoderConfigurationCabac *GabacSeqConfSet::loadDescriptorDecoderCfg(
-    const GabacSeqConfSet::ParameterSet &parameterSet, GenomicDescriptor descriptor_id) {
+    const GabacSeqConfSet::ParameterSet &parameterSet, GenDesc descriptor_id) {
     using namespace format::mpegg_p2::desc_conf_pres;
     using namespace format::mpegg_p2;
 
@@ -205,7 +204,7 @@ void GabacSeqConfSet::loadParameters(const format::mpegg_p2::ParameterSet &param
     for (const auto &desc : getDescriptors()) {
         auto descConfig = loadDescriptorDecoderCfg(parameterSet, desc.id);
         for (const auto &subdesc : getDescriptor(desc.id).subseqs) {
-            auto sub_desc = descConfig->getSubsequenceCfg(subdesc.id);
+            auto sub_desc = descConfig->getSubsequenceCfg(subdesc.id.second);
             auto sub_desc_id = desc.tokentype ? 0 : sub_desc->getDescriptorSubsequenceID();
 
             auto &gabac_conf = conf[uint8_t(desc.id)][sub_desc_id];

@@ -27,20 +27,20 @@ class MpeggRawAu {
         gabac::DataBlock data;  //!< @brief
         size_t position;        //!< @brief
 
-        GenomicSubsequence id;  //!< @brief
+        GenSubIndex id;  //!< @brief
 
        public:
         /**
          * @brief
          * @param wordsize
          */
-        SubDescriptor(size_t wordsize, GenomicSubsequence _id);
+        SubDescriptor(size_t wordsize, GenSubIndex _id);
 
         /**
          * @brief
          * @param d
          */
-        SubDescriptor(gabac::DataBlock* d, GenomicSubsequence _id);
+        SubDescriptor(gabac::DataBlock* d, GenSubIndex _id);
 
         /**
          * @brief
@@ -75,7 +75,7 @@ class MpeggRawAu {
          * @brief
          * @return
          */
-        GenomicSubsequence getID() const;
+        GenSubIndex getID() const;
     };
 
     /**
@@ -84,7 +84,7 @@ class MpeggRawAu {
     class Descriptor {
        private:
         std::vector<std::unique_ptr<SubDescriptor>> subdesc;  //!< @brief
-        GenomicDescriptor id;                                 //!< @brief
+        GenDesc id;                                           //!< @brief
 
        public:
         /**
@@ -98,13 +98,13 @@ class MpeggRawAu {
          * @param sub
          * @return
          */
-        SubDescriptor* getSubsequence(GenomicSubsequence sub);
+        SubDescriptor* getSubsequence(uint8_t sub);
 
         /**
          * @brief
          * @return
          */
-        GenomicDescriptor getID() const;
+        GenDesc getID() const;
 
         /**
          * @brief
@@ -117,13 +117,13 @@ class MpeggRawAu {
          * @param _id
          * @param sub
          */
-        void set(GenomicSubsequence _id, std::unique_ptr<SubDescriptor> sub);
+        void set(uint8_t _id, std::unique_ptr<SubDescriptor> sub);
 
         /**
          * @brief
          * @param _id
          */
-        explicit Descriptor(GenomicDescriptor _id);
+        explicit Descriptor(GenDesc _id);
     };
 
     /**
@@ -132,7 +132,7 @@ class MpeggRawAu {
      * @param sub
      * @return
      */
-    const SubDescriptor& get(GenomicDescriptor desc, GenomicSubsequence sub) const;
+    const SubDescriptor& get(GenSubIndex sub) const;
 
     /**
      * @brief
@@ -140,7 +140,7 @@ class MpeggRawAu {
      * @param sub
      * @return
      */
-    SubDescriptor& get(GenomicDescriptor desc, GenomicSubsequence sub);
+    SubDescriptor& get(GenSubIndex sub);
 
     /**
      * @brief
@@ -148,7 +148,11 @@ class MpeggRawAu {
      * @param sub
      * @return
      */
-    SubDescriptor& get(GenomicDescriptor desc, uint8_t sub);
+    SubDescriptor& get(GenDesc desc, uint8_t sub);
+
+    void push(GenSubIndex sub, uint64_t value) {
+        get(sub).push(value);
+    }
 
     /**
      * @brief
@@ -162,7 +166,7 @@ class MpeggRawAu {
      * @param sub
      * @param data
      */
-    void set(GenomicDescriptor desc, GenomicSubsequence sub, std::unique_ptr<SubDescriptor> data);
+    void set(GenSubIndex sub, std::unique_ptr<SubDescriptor> data);
 
     /**
      * @brief
