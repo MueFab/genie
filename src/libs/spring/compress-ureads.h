@@ -11,8 +11,8 @@ namespace spring {
 
 void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
                      const std::string &temp_dir, compression_params &cp,
-                     const std::string &outputFilePath, util::FastqStats *stats);
-
+                     dsg::StreamSaver *st, const std::string &outputFilePath,
+                     util::FastqStats *stats);
 }  // namespace spring
 
 #endif  // SPRING_COMPRESS_UREADS_H_

@@ -28,7 +28,7 @@
 
 namespace dsg {
 
-static void generationFromFastq_SPRING(const ProgramOptions &programOptions, util::FastqStats *stats, const std::string &filename) {
+static void generationFromFastq_SPRING(const ProgramOptions &programOptions, util::FastqStats *stats, dsg::StreamSaver *st, const std::string &filename) {
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Descriptor stream generation from FASTQ file" << std::endl;
     std::cout << "Output filename = " << filename << std::endl;
@@ -40,14 +40,14 @@ static void generationFromFastq_SPRING(const ProgramOptions &programOptions, uti
     std::cout << "Calling SPRING" << std::endl;
     if (programOptions.inputFilePairPath.empty()) {
         spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader1, programOptions.numThreads,
-                                               paired_end, programOptions.workingDirectory, programOptions.analyze, filename,
+                                               paired_end, programOptions.workingDirectory, programOptions.analyze, st, filename,
                                                programOptions.preserve_order, !programOptions.discard_quality,
                                                !programOptions.discard_ids, stats);
     } else {
         paired_end = true;
         util::FastqFileReader fastqFileReader2(programOptions.inputFilePairPath, stats);
         spring::generate_streams_SPRING(&fastqFileReader1, &fastqFileReader2, programOptions.numThreads,
-                                               paired_end, programOptions.workingDirectory, programOptions.analyze, filename,
+                                               paired_end, programOptions.workingDirectory, programOptions.analyze, st, filename,
                                                programOptions.preserve_order, !programOptions.discard_quality,
                                                !programOptions.discard_ids, stats);
     }
@@ -92,7 +92,14 @@ static void generationFromFastq(const ProgramOptions &programOptions, util::Fast
 
 //    dsg::StreamSaver store(programOptions.configPath, &output, nullptr, programOptions.gabacDebug);
 //    auto generated_aus = generationFromFastq_SPRING(programOptions, store);
-    generationFromFastq_SPRING(programOptions, stats, filename);
+
+    if (programOptions.configPath.empty()) {
+        generationFromFastq_SPRING(programOptions, stats, nullptr, filename);
+    }
+    else {
+        dsg::StreamSaver store(programOptions.configPath, nullptr, nullptr, programOptions.gabacDebug);
+        generationFromFastq_SPRING(programOptions, stats, &store, filename);
+    }
 }
 
 void decompression_fastq(const ProgramOptions &programOptions, util::FastqStats *stats) {

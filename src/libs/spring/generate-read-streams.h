@@ -17,20 +17,33 @@ struct subseq_data {
     dsg::AcessUnitStreams streamsAU;
 };
 
-void compress_subseqs(subseq_data *data, const std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
+void compress_subseqs(std::vector<std::vector<gabac::DataBlock>> &raw_data,
+                           std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams,
+                           uint64_t block_num,
+                           dsg::StreamSaver *st);
+
+void compress_read_subseqs(std::vector<std::vector<gabac::DataBlock>> &raw_data,
+                           std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams,
+                           const std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
 
 void generate_read_streams(const std::string &temp_dir,
                            const compression_params &cp,
+                           bool analyze,
+                           dsg::StreamSaver *st,
                            const std::vector<std::vector<gabac::EncodingConfiguration>> &configs,
                            util::FastqStats *stats);
 
 void generate_read_streams_se(const std::string &temp_dir,
                               const compression_params &cp,
+                              bool analyze,
+                              dsg::StreamSaver *st,
                               const std::vector<std::vector<gabac::EncodingConfiguration>> &configs,
                               util::FastqStats *stats);
 
 void generate_read_streams_pe(const std::string &temp_dir,
                               const compression_params &cp,
+                              bool analyze,
+                              dsg::StreamSaver *st,
                               const std::vector<std::vector<gabac::EncodingConfiguration>> &configs,
                               util::FastqStats *stats);
 

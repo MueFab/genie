@@ -27,7 +27,8 @@
 namespace spring {
 
 void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
-                             int num_thr, bool paired_end, const std::string &working_dir, bool,
+                             int num_thr, bool paired_end, const std::string &working_dir,
+                             bool analyze, dsg::StreamSaver *st,
                              const std::string &outputFilePath, bool ureads_flag, bool preserve_quality,
                              bool preserve_id, util::FastqStats *stats) {
 #ifdef GENIE_USE_OPENMP
@@ -75,7 +76,10 @@ void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::Fast
     if (cp.ureads_flag) {
         std::cout << "ureads_flag detected.\n";
         // TODO: add support for analyze
-        compress_ureads(fastqFileReader1, fastqFileReader2, temp_dir, cp, outputFilePath, stats);
+        if (analyze) {
+            throw std::runtime_error("Cannot currently analyze in ureads mode.");
+        }
+        compress_ureads(fastqFileReader1, fastqFileReader2, temp_dir, cp, st, outputFilePath, stats);
         //        descriptorFilesPerAUs = compress_ureads(fastqFileReader1,
         //        fastqFileReader2, temp_dir, cp, st); cp.num_blocks =
         //        descriptorFilesPerAUs.size();
@@ -118,7 +122,7 @@ void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::Fast
 
         std::cout << "Generating read streams ...\n";
         auto grs_start = std::chrono::steady_clock::now();
-        generate_read_streams(temp_dir, cp, configs, stats);
+        generate_read_streams(temp_dir, cp, analyze, st, configs, stats);
         auto grs_end = std::chrono::steady_clock::now();
         std::cout << "Generating read streams done!\n";
         std::cout << "Time for this step: "
@@ -128,7 +132,7 @@ void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::Fast
         }
 
 #if 0
-        // TODO: do this only when debugging, otherwise disable for speed 
+        // TODO: do this only when debugging, otherwise disable for speed
         std::cout << "Generating new FASTQ for testing purposes\n";
         auto new_fq_start = std::chrono::steady_clock::now();
         if (!cp.paired_end) {
@@ -151,7 +155,7 @@ void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::Fast
         if (preserve_quality || preserve_id) {
             std::cout << "Reordering and compressing quality and/or ids ...\n";
             auto rcqi_start = std::chrono::steady_clock::now();
-            reorder_compress_quality_id(temp_dir, cp, configs, stats);
+            reorder_compress_quality_id(temp_dir, cp, analyze, st, configs, stats);
             auto rcqi_end = std::chrono::steady_clock::now();
             std::cout << "Reordering and compressing quality and/or ids done!\n";
             std::cout << "Time for this step: "

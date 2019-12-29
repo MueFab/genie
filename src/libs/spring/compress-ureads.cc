@@ -29,7 +29,8 @@ namespace spring {
 
 void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
                      const std::string &temp_dir, compression_params &cp,
-                     const std::string &outputFilePath, util::FastqStats *stats) {
+                     dsg::StreamSaver *st, const std::string &outputFilePath,
+                     util::FastqStats *stats) {
     using namespace format;
     std::ofstream ofstr(outputFilePath);
     util::BitWriter bw(&ofstr);
@@ -151,20 +152,49 @@ void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileRea
                     std::vector<std::vector<std::vector<gabac::DataBlock>>> generated_streams =
                         create_default_streams();
                     for (size_t descriptor = 0; descriptor < format::NUM_DESCRIPTORS; ++descriptor) {
-                        if (descriptor != 11) {  // rname
-                            for (size_t subdescriptor = 0;
-                                 subdescriptor < format::getDescriptorProperties()[descriptor].number_subsequences;
-                                 ++subdescriptor) {
-                                gabac_compress(configs[descriptor][subdescriptor], &raw_data[descriptor][subdescriptor],
-                                               &generated_streams[descriptor][subdescriptor]);
+                        if (descriptor == 11) {  // rname
+                            continue;
+                        }
+                        std::string name;
+                        if (descriptor == 14) { // quality
+                           // FIXME - check for preserve_quality?
+                           name = "quality_1." + std::to_string(block_num_thr);
+                        }
+                        else {
+                           name = file_subseq_prefix + "." + std::to_string(block_num_thr);
+                        }
+                        for (size_t subdescriptor = 0;
+                          subdescriptor < format::getDescriptorProperties()[descriptor].number_subsequences;
+                          ++subdescriptor) {
+                            if (raw_data[descriptor][subdescriptor].size() == 0) {
+                                continue;
                             }
+                            const gabac::EncodingConfiguration *config;
+                            if ((st == NULL) || ((config = st->getConfig(
+                              name + "." + std::to_string(descriptor) + "."
+                              + std::to_string(subdescriptor))) == NULL)) {
+                                config = &configs[descriptor][subdescriptor];
+                            }
+                             gabac_compress(*config, &raw_data[descriptor][subdescriptor],
+                                            &generated_streams[descriptor][subdescriptor]);
                         }
                     }
                     if (cp.preserve_id) {
                         generate_read_id_tokens(id_array_1 + tid * num_reads_per_block, num_reads_thr, raw_data[15]);
                         for (int i = 0; i < 128; i++) {
                             for (int j = 0; j < 6; j++) {
-                                gabac_compress(configs[15][0], &raw_data[15][6 * i + j],
+                                if (raw_data[15][6 * i + j].size() == 0) {
+                                    continue;
+                                }
+                                const gabac::EncodingConfiguration *config;
+                                if ((st == NULL) || ((config = st->getConfig(
+                                  "id_1." + std::to_string(block_num_thr)))
+                                  == NULL)) {
+                                    config = &configs[15][0];
+                                }
+                                // FIXME - &configs[15][0]is loop invariant,
+                                // but getConfig(name) is not.  suspicious.
+                                gabac_compress(*config, &raw_data[15][6 * i + j],
                                                &generated_streams[15][6 * i + j]);
                             }
                         }
