@@ -118,16 +118,19 @@ void ProgramOptions::validate() {
         UTILS_DIE("Input file does not exist: " + inputFilePath);
     }
 
-    // if (configPath.empty()) {
-    //     if (inputFilePath.substr(inputFilePath.find_last_of('.')) != ".genie") {
-    //         UTILS_DIE("You need to pass a config directory when not in genie decompression mode!");
-    //     }
-    // } else if (configPath.back() != '/') {
-    //     configPath += "/";
-    //     if (!ghc::filesystem::exists(configPath) || !ghc::filesystem::is_directory(configPath)) {
-    //         UTILS_DIE("Config dir does not exist: " + configPath);
-    //     }
-    // }
+    if (configPath.empty()) {
+        if (analyze) {
+            UTILS_DIE("You need to pass a config directory (with -c) in analyze mode (-g)");
+        }
+    }
+    else {
+        if (configPath.back() != '/') {
+            configPath += "/";
+        }
+        if (!ghc::filesystem::exists(configPath) || !ghc::filesystem::is_directory(configPath)) {
+            UTILS_DIE("Config dir does not exist: " + configPath);
+        }
+    }
 
     if (!inputFilePairPath.empty()) {
         if (!common::fileExists(inputFilePairPath)) {

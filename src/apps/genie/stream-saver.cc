@@ -111,6 +111,15 @@ std::string StreamSaver::getConfigName(const std::string &stream) {
     return stream;
 }
 
+gabac::EncodingConfiguration *StreamSaver::getConfig(const std::string &name) {
+    std::string configName = getConfigName(name);
+    std::map<std::string, gabac::EncodingConfiguration>::iterator iter = configs.find(configName);
+    if (iter == configs.end())  {
+        return NULL;
+    }
+    return &configs.at(configName);  // FIXME - get value from iterator
+}
+
 uint64_t StreamSaver::pack(const gabac::DataBlock &data, const std::string &stream_name) {
     // Write name of input file
     uint64_t size = stream_name.size();
@@ -221,8 +230,8 @@ void StreamSaver::loadConfig(const std::string &name) {
             genie::Logger::instance().out("LOADING: " + configPath + name + ".json " + "to " + name);
             configstring = std::string((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
         } else {
-            genie::Logger::instance().out("WARNING: Could not load config: " + name + " ; Falling back to default");
-            configstring = getDefaultConf();
+            genie::Logger::instance().out("WARNING: Could not load config: " + name + " ;");
+            return;
         }
 
         gabac::EncodingConfiguration enconf(configstring);
@@ -257,13 +266,13 @@ uint64_t StreamSaver::finish() {
 
 StreamSaver::~StreamSaver() {}
 
-const std::string &StreamSaver::getDefaultConf() {
-    static const std::string defaultGabacConf =
-        "{\"word_size\":1,\"sequence_transformation_id\":0,\""
-        "sequence_transformation_parameter\":0,\"transformed_sequences\""
-        ":[{\"lut_transformation_enabled\":false,\"diff_coding_enabled\":"
-        "false,\"binarization_id\":0,\"binarization_parameters\":[8],\""
-        "context_selection_id\":1}]}";
-    return defaultGabacConf;
-}
+//const std::string &StreamSaver::getDefaultConf() {
+//    static const std::string defaultGabacConf =
+//        "{\"word_size\":1,\"sequence_transformation_id\":0,\""
+//        "sequence_transformation_parameter\":0,\"transformed_sequences\""
+//        ":[{\"lut_transformation_enabled\":false,\"diff_coding_enabled\":"
+//        "false,\"binarization_id\":0,\"binarization_parameters\":[8],\""
+//        "context_selection_id\":1}]}";
+//    return defaultGabacConf;
+//}
 }  // namespace dsg

@@ -22,19 +22,32 @@
 
 namespace spring {
 
-void generate_read_streams(const std::string &temp_dir, const compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs, util::FastqStats *stats) {
+void generate_read_streams(const std::string &temp_dir, const compression_params &cp, bool analyze, dsg::StreamSaver *st, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs, util::FastqStats *stats) {
     if (!cp.paired_end)
-        generate_read_streams_se(temp_dir, cp, configs, stats);
+        generate_read_streams_se(temp_dir, cp, analyze, st, configs, stats);
     else
-        generate_read_streams_pe(temp_dir, cp, configs, stats);
+        generate_read_streams_pe(temp_dir, cp, analyze, st, configs, stats);
 }
 
 void compress_read_subseqs(std::vector<std::vector<gabac::DataBlock>> &raw_data,
                            std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams,
+                           uint64_t block_num, dsg::StreamSaver *st,
                            const std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
     for (size_t descriptor = 0; descriptor < 13; ++descriptor) {
         for (size_t subdescriptor = 0; subdescriptor < raw_data[descriptor].size(); ++subdescriptor) {
-            gabac_compress(configs[descriptor][subdescriptor], &raw_data[descriptor][subdescriptor],
+            // This used to be a filename.  Now it's just a name that we
+            // contruct to pass to StreamSaver::compress() so that it can
+            // figure out which config to use.
+            if (raw_data[descriptor][subdescriptor].size() == 0) {
+                continue;
+            }
+            const gabac::EncodingConfiguration *config;
+            if ((st == NULL) || ((config = st->getConfig(file_subseq_prefix + "."
+              + std::to_string(block_num) + "." + std::to_string(descriptor) + "."
+              + std::to_string(subdescriptor))) == NULL)) {
+                config = &configs[descriptor][subdescriptor];
+            }
+            gabac_compress(*config, &raw_data[descriptor][subdescriptor],
                            &generated_streams[descriptor][subdescriptor]);
         }
     }
@@ -54,6 +67,102 @@ struct se_data {
     std::vector<char> RC_arr;
     std::vector<uint32_t> order_arr;
 };
+
+void generate_subseqs(const se_data &data, uint64_t block_num, subseq_data *subseqData) {
+    subseqData->block_num = block_num;
+    for (auto arr : subseq_indices) subseqData->subseq_vector[arr[0]][arr[1]] = std::vector<int64_t>();
+
+    // char_to_int
+    int64_t char_to_int[128];
+    char_to_int[(uint8_t)'A'] = 0;
+    char_to_int[(uint8_t)'C'] = 1;
+    char_to_int[(uint8_t)'G'] = 2;
+    char_to_int[(uint8_t)'T'] = 3;
+    char_to_int[(uint8_t)'N'] = 4;
+
+    int64_t rc_to_int[128];
+    rc_to_int[(uint8_t)'d'] = 0;
+    rc_to_int[(uint8_t)'r'] = 1;
+
+    // clear vectors
+    for (auto arr : subseq_indices) subseqData->subseq_vector[arr[0]][arr[1]].clear();
+
+    uint64_t start_read_num = block_num * data.cp.num_reads_per_block;
+    uint64_t end_read_num = (block_num + 1) * data.cp.num_reads_per_block;
+
+    if (end_read_num >= data.cp.num_reads) {
+        end_read_num = data.cp.num_reads;
+    }
+
+    // first find the seq
+    uint64_t seq_start, seq_end;
+    if (data.flag_arr[start_read_num] == false)
+        seq_start = seq_end = 0;  // all reads unaligned
+    else {
+        seq_end = seq_start = data.pos_arr[start_read_num];
+        // find last read in AU that's aligned
+        uint64_t i = start_read_num;
+        for (; i < end_read_num; i++) {
+            if (data.flag_arr[i] == false) break;
+            seq_end = std::max(seq_end, data.pos_arr[i] + data.read_length_arr[i]);
+        }
+    }
+    if (seq_start != seq_end) {
+        // not all unaligned
+        subseqData->subseq_vector[7][0].push_back(seq_end - seq_start - 1);  // rlen
+        subseqData->subseq_vector[12][0].push_back(5);                       // rtype
+        for (uint64_t i = seq_start; i < seq_end; i++)
+            subseqData->subseq_vector[6][0].push_back(char_to_int[(uint8_t)data.seq[i]]);  // ureads
+    }
+    uint64_t prevpos = 0, diffpos;
+    // Write streams
+    for (uint64_t i = start_read_num; i < end_read_num; i++) {
+        if (data.flag_arr[i] == true) {
+            subseqData->subseq_vector[7][0].push_back(data.read_length_arr[i] - 1);         // rlen
+            subseqData->subseq_vector[1][0].push_back(rc_to_int[(uint8_t)data.RC_arr[i]]);  // rcomp
+            if (i == start_read_num) {
+                // Note: In order non-preserving mode, if the first read of
+                // the block is a singleton, then the rest are too.
+                subseqData->subseq_vector[0][0].push_back(0);  // pos
+                prevpos = data.pos_arr[i];
+            } else {
+                diffpos = data.pos_arr[i] - prevpos;
+                subseqData->subseq_vector[0][0].push_back(diffpos);  // pos
+                prevpos = data.pos_arr[i];
+            }
+            if (data.noise_len_arr[i] == 0)
+                subseqData->subseq_vector[12][0].push_back(1);  // rtype = P
+            else {
+                subseqData->subseq_vector[12][0].push_back(3);  // rtype = M
+                for (uint16_t j = 0; j < data.noise_len_arr[i]; j++) {
+                    subseqData->subseq_vector[3][0].push_back(0);  // mmpos
+                    if (j == 0)
+                        subseqData->subseq_vector[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[i] + j]);
+                    else
+                        subseqData->subseq_vector[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[i] + j] -
+                                                                  1);  // decoder adds +1
+                    subseqData->subseq_vector[4][0].push_back(0);      // mmtype = Substitution
+                    subseqData->subseq_vector[4][1].push_back(
+                        char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[i] + j]]);
+                }
+                subseqData->subseq_vector[3][0].push_back(1);
+            }
+        } else {
+            subseqData->subseq_vector[12][0].push_back(5);                           // rtype
+            subseqData->subseq_vector[7][0].push_back(data.read_length_arr[i] - 1);  // rlen
+            for (uint64_t j = 0; j < data.read_length_arr[i]; j++) {
+                subseqData->subseq_vector[6][0].push_back(
+                    char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[i] + j]]);  // ureads
+            }
+            subseqData->subseq_vector[0][0].push_back(seq_end - prevpos);            // pos
+            subseqData->subseq_vector[1][0].push_back(0);                            // rcomp
+            subseqData->subseq_vector[7][0].push_back(data.read_length_arr[i] - 1);  // rlen
+            subseqData->subseq_vector[12][0].push_back(1);                           // rtype = P
+            prevpos = seq_end;
+            seq_end = prevpos + data.read_length_arr[i];
+        }
+    }
+}
 
 void generate_subseqs(const se_data &data, uint64_t block_num, std::vector<std::vector<gabac::DataBlock>> &raw_data) {
     // char_to_int
@@ -143,10 +252,37 @@ void generate_subseqs(const se_data &data, uint64_t block_num, std::vector<std::
     }
 }
 
-void generate_and_compress_se(const std::string &temp_dir, const se_data &data, const std::vector<std::vector<gabac::EncodingConfiguration>> &configs, util::FastqStats *stats) {
+void analyze_subseqs(size_t num_thr, subseq_data *data, dsg::StreamSaver *st) {
+#ifdef GENIE_USE_OPENMP
+#pragma omp parallel for num_threads(num_thr)
+#else
+    (void)num_thr;  // Suppress unused parameter warning
+#endif
+    for (size_t i = 0; i < subseq_indices.size(); ++i) {
+        const auto &arr = subseq_indices[i];
+        std::string filename = file_subseq_prefix + "." + std::to_string(data->block_num) + "." +
+                               std::to_string(arr[0]) + "." + std::to_string(arr[1]);
+        auto block = gabac::DataBlock(&data->subseq_vector[arr[0]][arr[1]]);
+        st->analyze(filename, &block);
+    }
+    st->reloadConfigSet();
+}
+
+void generate_and_compress_se(const std::string &temp_dir, const se_data &data, bool analyze, dsg::StreamSaver *st,  const std::vector<std::vector<gabac::EncodingConfiguration>> &configs, util::FastqStats *stats) {
+
     // Now generate new streams and compress blocks in parallel
     // this is actually number of read pairs per block for PE
     uint64_t blocks = uint64_t(std::ceil(float(data.cp.num_reads) / data.cp.num_reads_per_block));
+    if (analyze) {
+        if (st == NULL) {
+            throw std::runtime_error("No config in analyze mode.");
+        }
+        u_int64_t block_to_analyze = blocks / 2;
+        subseq_data sdata;
+        generate_subseqs(data, block_to_analyze, &sdata);
+        analyze_subseqs(data.cp.num_thr, &sdata, st);
+    }
+
     std::vector<uint32_t> num_reads_per_block(blocks);
     uint64_t size = 0;
 #ifdef GENIE_USE_OPENMP
@@ -159,12 +295,11 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data, 
         num_reads_per_block[block_num] = raw_data[1][0].size(); // rcomp
 
         std::vector<std::vector<std::vector<gabac::DataBlock>>> generated_streams = create_default_streams();
-        compress_read_subseqs(raw_data, generated_streams, configs);
+        compress_read_subseqs(raw_data, generated_streams, block_num, st, configs);
 
         std::string file_to_save_streams = temp_dir + "/read_streams." + std::to_string(block_num);
         size += write_streams_to_file(generated_streams, file_to_save_streams, read_descriptors);
-
-    }  // end omp parallel
+    }  // end omp parallel for
 
     if (stats->enabled) {
        stats->cmprs_seq_sz += size;
@@ -293,12 +428,14 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
 
 void generate_read_streams_se(const std::string &temp_dir,
                               const compression_params &cp,
+                              bool analyze,
+                              dsg::StreamSaver *st,
                               const std::vector<std::vector<gabac::EncodingConfiguration>> &configs,
                               util::FastqStats *stats) {
     se_data data;
     loadSE_Data(cp, temp_dir, &data);
 
-    generate_and_compress_se(temp_dir, data, configs, stats);
+    generate_and_compress_se(temp_dir, data, analyze, st, configs, stats);
 
     return;
 }
@@ -761,7 +898,7 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
     }
 }
 
-void generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>> &configs, util::FastqStats *stats) {
+void generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp, bool analyze, dsg::StreamSaver *st, const std::vector<std::vector<gabac::EncodingConfiguration>> &configs, util::FastqStats *stats) {
     // basic approach: start looking at reads from left to right. If current is
     // aligned but pair is unaligned, pair is kept at the end current AU and
     // stored in different record. We try to keep number of records in AU =
@@ -780,6 +917,20 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
     data.order_arr.clear();
 
     generate_qual_id_pe(temp_dir, bdata, cp.num_reads);
+
+    if (analyze) {
+        throw std::runtime_error("Cannot currently analyze paired end inputs.");
+#if 0
+        subseq_data subseqs;
+        pe_statistics pest;
+        pest.count_same_rec = std::vector<uint32_t>(cp.num_thr, 0);
+        pest.count_split_same_AU = std::vector<uint32_t>(cp.num_thr, 0);
+        pest.count_split_diff_AU = std::vector<uint32_t>(cp.num_thr, 0);
+
+        generate_streams_pe(data, bdata, bdata.block_start.size() / 2, &subseqs, &pest);
+        analyze_subseqs(cp.num_thr, &subseqs, st);
+#endif
+    }
 
     pe_statistics pest;
     pest.count_same_rec = std::vector<uint32_t>(cp.num_thr, 0);
@@ -803,7 +954,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
         num_reads_per_block[cur_block_num] = raw_data[1][0].size(); // rcomp
         num_records_per_block[cur_block_num] = bdata.block_end[cur_block_num] - bdata.block_start[cur_block_num]; // used later for ids
         std::vector<std::vector<std::vector<gabac::DataBlock>>> generated_streams = create_default_streams();
-        compress_read_subseqs(raw_data, generated_streams, configs);
+        compress_read_subseqs(raw_data, generated_streams, cur_block_num, st, configs);
 
         std::string file_to_save_streams = temp_dir + "/read_streams." + std::to_string(cur_block_num);
         size += write_streams_to_file(generated_streams, file_to_save_streams, read_descriptors);

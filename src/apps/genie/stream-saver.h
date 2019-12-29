@@ -56,7 +56,7 @@ class StreamSaver {
 
     static const std::map<std::string, gabac_stream_params> &getParams();  // Get reference to hardcoded map.
 
-    static const std::string &getDefaultConf();
+    //static const std::string &getDefaultConf();
 
     void buildIndex();
 
@@ -64,6 +64,8 @@ class StreamSaver {
 
    public:
     static std::string getConfigName(const std::string &stream);
+
+    gabac::EncodingConfiguration *getConfig(const std::string &name);
 
     void loadConfig(const std::string &name);
 
