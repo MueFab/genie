@@ -23,7 +23,7 @@ class Drain {
      * @param t Input data chunk
      * @param id Current block identifier (for multithreading)
      */
-    virtual void flowIn(TYPE t, size_t id) = 0;
+    virtual void flowIn(TYPE&& t, size_t id) = 0;
 
     /**
      * @brief Signals that no further data (and calls to flowIn) will be available

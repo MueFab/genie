@@ -9,10 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <format/mpegg_rec/alignment-container.h>
-#include <format/mpegg_rec/external-alignment.h>
-#include <format/mpegg_rec/meta-alignment.h>
-#include <format/mpegg_rec/segment.h>
+#include <format/mpegg_rec/mpegg-record.h>
 #include <util/drain.h>
 #include <util/make_unique.h>
 #include <util/ordered-lock.h>
@@ -24,7 +21,7 @@ namespace fastq {
 /**
  * @brief Module to export MPEG-G record to fastq files
  */
-class FastqExporter : public Drain<std::unique_ptr<format::mpegg_rec::MpeggChunk>> {
+class FastqExporter : public Drain<format::mpegg_rec::MpeggChunk> {
     std::vector<std::ostream *> file;  //!< @brief Support for paired output files
     OrderedLock lock;                  //!< @brief Lock to ensure in order execution
    public:
@@ -46,7 +43,7 @@ class FastqExporter : public Drain<std::unique_ptr<format::mpegg_rec::MpeggChunk
      * @param records Input records
      * @param id Block identifier (for multithreading)
      */
-    void flowIn(std::unique_ptr<format::mpegg_rec::MpeggChunk> records, size_t id) override;
+    void flowIn(format::mpegg_rec::MpeggChunk&& records, size_t id) override;
 
     /**
      * @brief Accepts end of file marker

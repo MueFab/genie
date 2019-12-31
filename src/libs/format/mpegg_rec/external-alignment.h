@@ -1,39 +1,76 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #ifndef GENIE_EXTERNAL_ALIGNMENT_H
 #define GENIE_EXTERNAL_ALIGNMENT_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <util/bitreader.h>
+#include <util/bitwriter.h>
 #include <cstdint>
 #include <memory>
 
-namespace util {
-    class BitWriter;
-
-    class BitReader;
-}
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace format {
-    namespace mpegg_rec {
-        class ExternalAlignment {
-        public:
-            enum class MoreAlignmentInfoType : uint8_t {
-                NONE,
-                OTHER_REC
-            };
+namespace mpegg_rec {
 
-            explicit ExternalAlignment(MoreAlignmentInfoType _moreAlignmentInfoType);
+/**
+ *
+ */
+class ExternalAlignment {
+   public:
+    /**
+     *
+     */
+    enum class MoreAlignmentInfoType : uint8_t { NONE, OTHER_REC };
 
-            virtual ~ExternalAlignment() = default;
+    /**
+     *
+     * @param _moreAlignmentInfoType
+     */
+    explicit ExternalAlignment(MoreAlignmentInfoType _moreAlignmentInfoType);
 
-            virtual void write(util::BitWriter *writer) const;
+    /**
+     *
+     */
+    virtual ~ExternalAlignment() = default;
 
-            static std::unique_ptr<ExternalAlignment> factory(util::BitReader *reader);
+    /**
+     *
+     * @param writer
+     */
+    virtual void write(util::BitWriter &writer) const;
 
-            virtual std::unique_ptr<ExternalAlignment> clone () const = 0;
+    /**
+     *
+     * @param reader
+     * @return
+     */
+    static std::unique_ptr<ExternalAlignment> factory(util::BitReader &reader);
 
-        protected:
-            MoreAlignmentInfoType moreAlignmentInfoType;
-        };
-    }
-}
+    /**
+     *
+     * @return
+     */
+    virtual std::unique_ptr<ExternalAlignment> clone() const = 0;
 
+   protected:
+    MoreAlignmentInfoType moreAlignmentInfoType;  //!<
+};
 
-#endif //GENIE_EXTERNAL_ALIGNMENT_H
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace mpegg_rec
+}  // namespace format
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#endif  // GENIE_EXTERNAL_ALIGNMENT_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

@@ -16,9 +16,8 @@ void BlockPayloadSet::TransformedPayload::write(util::BitWriter* writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BlockPayloadSet::TransformedPayload::TransformedPayload(gabac::DataBlock* _data) : payloadData(0, 1) {
-    payloadData.swap(_data);
-}
+BlockPayloadSet::TransformedPayload::TransformedPayload(gabac::DataBlock _data, size_t pos)
+    : payloadData(std::move(_data)), position(pos) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +25,7 @@ bool BlockPayloadSet::TransformedPayload::isEmpty() const { return payloadData.e
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BlockPayloadSet::TransformedPayload::swap(gabac::DataBlock* _data) { payloadData.swap(_data); }
+gabac::DataBlock&& BlockPayloadSet::TransformedPayload::move() { return std::move(payloadData); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,7 +33,7 @@ void BlockPayloadSet::SubsequencePayload::write(util::BitWriter* writer) const {
     for (size_t i = 0; i < transformedPayloads.size(); ++i) {
         std::stringstream ss;
         util::BitWriter tmp_writer(&ss);
-        transformedPayloads[i]->write(writer);
+        transformedPayloads[i].write(writer);
         tmp_writer.flush();
         uint64_t bits = tmp_writer.getBitsWritten();
         if (i != transformedPayloads.size() - 1) {
@@ -46,9 +45,7 @@ void BlockPayloadSet::SubsequencePayload::write(util::BitWriter* writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BlockPayloadSet::SubsequencePayload::add(std::unique_ptr<TransformedPayload> p) {
-    transformedPayloads.push_back(std::move(p));
-}
+void BlockPayloadSet::SubsequencePayload::add(TransformedPayload p) { transformedPayloads.emplace_back(std::move(p)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -57,7 +54,7 @@ bool BlockPayloadSet::SubsequencePayload::isEmpty() const {
         return true;
     }
     for (const auto& p : transformedPayloads) {
-        if (!p->isEmpty()) {
+        if (!p.isEmpty()) {
             return false;
         }
     }
@@ -66,8 +63,8 @@ bool BlockPayloadSet::SubsequencePayload::isEmpty() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<std::unique_ptr<BlockPayloadSet::TransformedPayload>>&
-BlockPayloadSet::SubsequencePayload::getTransformedPayloads() const {
+std::vector<BlockPayloadSet::TransformedPayload>& BlockPayloadSet::SubsequencePayload::getTransformedPayloads()
+     {
     return transformedPayloads;
 }
 
@@ -77,7 +74,7 @@ void BlockPayloadSet::DescriptorPayload::write(util::BitWriter* writer) const {
     for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
         std::stringstream ss;
         util::BitWriter tmp_writer(&ss);
-        subsequencePayloads[i]->write(writer);
+        subsequencePayloads[i].write(writer);
         tmp_writer.flush();
         uint64_t bits = tmp_writer.getBitsWritten();
         if (i != subsequencePayloads.size() - 1) {
@@ -89,9 +86,7 @@ void BlockPayloadSet::DescriptorPayload::write(util::BitWriter* writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BlockPayloadSet::DescriptorPayload::add(std::unique_ptr<SubsequencePayload> p) {
-    subsequencePayloads.push_back(std::move(p));
-}
+void BlockPayloadSet::DescriptorPayload::add(SubsequencePayload p) { subsequencePayloads.emplace_back(std::move(p)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -100,7 +95,7 @@ bool BlockPayloadSet::DescriptorPayload::isEmpty() const {
         return true;
     }
     for (const auto& p : subsequencePayloads) {
-        if (!p->isEmpty()) {
+        if (!p.isEmpty()) {
             return false;
         }
     }
@@ -109,33 +104,26 @@ bool BlockPayloadSet::DescriptorPayload::isEmpty() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<std::unique_ptr<BlockPayloadSet::SubsequencePayload>>&
-BlockPayloadSet::DescriptorPayload::getSubsequencePayloads() const {
+std::vector<BlockPayloadSet::SubsequencePayload>& BlockPayloadSet::DescriptorPayload::getSubsequencePayloads() {
     return subsequencePayloads;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BlockPayloadSet::BlockPayloadSet(std::unique_ptr<format::mpegg_p2::ParameterSet> param, size_t _record_num)
+BlockPayloadSet::BlockPayloadSet(format::mpegg_p2::ParameterSet param, size_t _record_num)
     : desc_pay(getDescriptors().size()), record_num(_record_num), parameters(std::move(param)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BlockPayloadSet::setPayload(GenDesc i, std::unique_ptr<DescriptorPayload> p) {
-    desc_pay[uint8_t(i)] = std::move(p);
-}
+void BlockPayloadSet::setPayload(GenDesc i, DescriptorPayload p) { desc_pay[uint8_t(i)] = std::move(p); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BlockPayloadSet::DescriptorPayload* BlockPayloadSet::getPayload(GenDesc i) {
-    return desc_pay[uint8_t(i)].get();
-}
+BlockPayloadSet::DescriptorPayload& BlockPayloadSet::getPayload(GenDesc i) { return desc_pay[uint8_t(i)]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<BlockPayloadSet::DescriptorPayload> BlockPayloadSet::movePayload(size_t i) {
-    return std::move(desc_pay[i]);
-}
+BlockPayloadSet::DescriptorPayload&& BlockPayloadSet::movePayload(size_t i) { return std::move(desc_pay[i]); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -143,21 +131,19 @@ size_t BlockPayloadSet::getRecordNum() const { return record_num; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-format::mpegg_p2::ParameterSet* BlockPayloadSet::getParameters() { return parameters.get(); }
+format::mpegg_p2::ParameterSet& BlockPayloadSet::getParameters() { return parameters; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const format::mpegg_p2::ParameterSet* BlockPayloadSet::getParameters() const { return parameters.get(); }
+const format::mpegg_p2::ParameterSet& BlockPayloadSet::getParameters() const { return parameters; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<format::mpegg_p2::ParameterSet> BlockPayloadSet::moveParameters() { return std::move(parameters); }
+format::mpegg_p2::ParameterSet&& BlockPayloadSet::moveParameters() { return std::move(parameters); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<std::unique_ptr<BlockPayloadSet::DescriptorPayload>>& BlockPayloadSet::getPayloads() const {
-    return desc_pay;
-}
+std::vector<BlockPayloadSet::DescriptorPayload>& BlockPayloadSet::getPayloads() { return desc_pay; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

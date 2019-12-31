@@ -2,13 +2,13 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void GabacDecompressor::decompress(const gabac::EncodingConfiguration& conf,
-                                   const BlockPayloadSet::SubsequencePayload& in, MpeggRawAu::SubDescriptor* out) {
+MpeggRawAu::SubDescriptor GabacDecompressor::decompress(const gabac::EncodingConfiguration& conf,
+                                   BlockPayloadSet::SubsequencePayload&& data) {
+    BlockPayloadSet::SubsequencePayload in = std::move(data);
     // Interface to GABAC library
     std::stringstream in_stream;
-    for (const auto& payload : in.getTransformedPayloads()) {
-        gabac::DataBlock buffer(0, 1);
-        payload->swap(&buffer);
+    for (auto& payload : in.getTransformedPayloads()) {
+        gabac::DataBlock buffer = payload.move();
 
         uint32_t size = buffer.getRawSize();
         in_stream.write(reinterpret_cast<char*>(&size), sizeof(uint32_t));
@@ -29,31 +29,33 @@ void GabacDecompressor::decompress(const gabac::EncodingConfiguration& conf,
     gabac::run(GABAC_IO_SETUP, conf, GABAC_DECODING_MODE);
 
     outbuffer.flush(&tmp);
-    out->swap(&tmp);
+    return MpeggRawAu::SubDescriptor(std::move(tmp), in.getID());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void GabacDecompressor::flowIn(std::unique_ptr<BlockPayloadSet> payloadSet, size_t id) {
+void GabacDecompressor::flowIn(BlockPayloadSet&& t, size_t id) {
+    BlockPayloadSet payloadSet = std::move(t);
     GabacSeqConfSet configSet;
-    auto raw_aus = util::make_unique<MpeggRawAu>(payloadSet->moveParameters(), payloadSet->getRecordNum());
+    auto raw_aus = MpeggRawAu(payloadSet.moveParameters(), payloadSet.getRecordNum());
 
-    configSet.loadParameters(*raw_aus->getParameters());
+    configSet.loadParameters(raw_aus.getParameters());
 
-    for (const auto& desc : payloadSet->getPayloads()) {
-        if (!desc) {
+    for (auto& desc : payloadSet.getPayloads()) {
+        if (desc.isEmpty()) {
             continue;
         }
-        for (const auto& subseq : desc->getSubsequencePayloads()) {
-            if (!subseq) {
+        for (auto& subseq : desc.getSubsequencePayloads()) {
+            if (subseq.isEmpty()) {
                 continue;
             }
-            auto subseqData = util::make_unique<MpeggRawAu::SubDescriptor>(4, subseq->getID());
-            decompress(configSet.getConfAsGabac(subseq->getID()), *subseq, subseqData.get());
-            raw_aus->set(subseq->getID(), std::move(subseqData));
+            auto d_id = subseq.getID();
+            MpeggRawAu::SubDescriptor subseqData = decompress(configSet.getConfAsGabac(subseq.getID()), std::move(subseq));
+            raw_aus.set(d_id, std::move(subseqData));
         }
     }
 
+    payloadSet.clear();
     flowOut(std::move(raw_aus), id);
 }
 

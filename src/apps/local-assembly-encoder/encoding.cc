@@ -1,12 +1,10 @@
 #include "encoding.h"
 
-#include <format/sam/sam-record.h>
 #include <util/log.h>
 
 #include <coding/gabac-compressor.h>
 #include <coding/local-assembly-encoder.h>
 #include <format/mpegg_p2/mpegg-p-2-exporter.h>
-#include <format/sam/sam-importer.h>
 #include <util/thread-manager.h>
 #include <fstream>
 
@@ -40,7 +38,7 @@ namespace lae {
    } */
 
 void encode(const ProgramOptions &programOptions) {
-    std::ifstream infile("test.sam");
+ /*   std::ifstream infile("test.sam");
     SamImporter samimporter(10000, &infile);
     LocalAssemblyEncoder laencoder(1000, false);
     GabacCompressor gabacCompressor;
@@ -54,7 +52,7 @@ void encode(const ProgramOptions &programOptions) {
 
     ThreadManager threads(1, &samimporter);
 
-    threads.run();
+    threads.run();*/
 }
 
 }  // namespace lae

@@ -154,6 +154,15 @@ struct GenomicDescriptorProperties {
 struct Alphabet {
     std::vector<char> lut;         //!<
     std::vector<char> inverseLut;  //!<
+
+    bool isIncluded(char c) const{
+        for(const char& lc : lut) {
+            if(lc == c) {
+                return true;
+            }
+        }
+        return false;
+    }
 };
 
 /**

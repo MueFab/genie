@@ -6,12 +6,13 @@ set(source_files
         exceptions.cc
         log.cc
         perf-stats.cc
-        ../format/sam/sam-file-reader.cc
-        ../format/sam/sam-record.cc
         string-helpers.cc
         thread-manager.cc
         ordered-lock.cc
         ordered-section.cc
+        date.cc
+        tokenize.cc
+        locus.cc
 )
 
 

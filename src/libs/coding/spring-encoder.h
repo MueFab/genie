@@ -38,11 +38,11 @@ class SpringEncoder : public MpeggEncoder {
 
    public:
     void preprocessInit();
-    void preprocessIteration(std::unique_ptr<format::mpegg_rec::MpeggChunk> t);
+    void preprocessIteration(format::mpegg_rec::MpeggChunk&& t);
     void preprocessClean();
     SpringEncoder(int _num_thr, std::string _working_dir, bool _ureads_flag, bool _preserve_quality, bool _preserve_id,
-                  util::FastqStats *_stats);
-    void flowIn(std::unique_ptr<format::mpegg_rec::MpeggChunk> t, size_t id) override;
+                  util::FastqStats &_stats);
+    void flowIn(format::mpegg_rec::MpeggChunk&& t, size_t id) override;
     void dryIn() override;
 };
 

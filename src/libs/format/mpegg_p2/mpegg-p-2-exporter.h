@@ -3,41 +3,38 @@
 
 #include <util/drain.h>
 
+#include <coding/mpegg-raw-au.h>
 #include <memory>
 #include <vector>
-#include <coding/mpegg-raw-au.h>
 
 #include <format/block-payload.h>
 #include <util/ordered-lock.h>
 #include <util/ordered-section.h>
 #include "access_unit.h"
 
-class MpeggP2Exporter : public Drain<std::unique_ptr<BlockPayloadSet>>{
-private:
+class MpeggP2Exporter : public Drain<BlockPayloadSet> {
+   private:
     util::BitWriter writer;
     OrderedLock lock;
-public:
 
-
-    explicit MpeggP2Exporter(std::ostream *_file) : writer(_file) {
-
-    }
-    void flowIn(std::unique_ptr<BlockPayloadSet> t, size_t id) override {
+   public:
+    explicit MpeggP2Exporter(std::ostream *_file) : writer(_file) {}
+    void flowIn(BlockPayloadSet&& t, size_t id) override {
+        BlockPayloadSet data = std::move(t);
         OrderedSection section(&lock, id);
-        t->getParameters()->write(&writer);
+        data.getParameters().write(&writer);
 
-        format::mpegg_p2::AccessUnit au(id, 0, format::mpegg_rec::MpeggRecord::ClassType::CLASS_I, t->getRecordNum(), format::mpegg_p2::DataUnit::DatasetType::ALIGNED, 32, 32, 0);
+        format::mpegg_p2::AccessUnit au(id, 0, format::mpegg_rec::ClassType::CLASS_I, data.getRecordNum(),
+                                        format::mpegg_p2::DataUnit::DatasetType::ALIGNED, 32, 32, 0);
         for (size_t descriptor = 0; descriptor < getDescriptors().size(); ++descriptor) {
-            if(!t->getPayload(GenDesc(descriptor))) {
+            if (data.getPayload(GenDesc(descriptor)).isEmpty()) {
                 continue;
             }
-            au.addBlock(util::make_unique<format::Block>(descriptor, t->movePayload(descriptor)));
+            au.addBlock(format::Block(descriptor, data.movePayload(descriptor)));
         }
         au.write(&writer);
     }
-    void dryIn() override {
-    }
+    void dryIn() override {}
 };
 
-
-#endif //GENIE_MPEGG_P_2_EXPORTER_H
+#endif  // GENIE_MPEGG_P_2_EXPORTER_H

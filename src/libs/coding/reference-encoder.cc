@@ -73,10 +73,10 @@ std::string LocalAssemblyReferenceEncoder::preprocess(const std::string &read, c
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LocalAssemblyReferenceEncoder::addRead(const format::mpegg_rec::MpeggRecord *s) {
-    sequence_positions.push_back(s->getAlignment(0)->getPosition());
+void LocalAssemblyReferenceEncoder::addRead(const format::mpegg_rec::MpeggRecord &s) {
+    sequence_positions.push_back(s.getAlignments().front().getPosition());
     std::string read =
-        preprocess(*s->getRecordSegment(0)->getSequence(), *s->getAlignment(0)->getAlignment()->getECigar());
+        preprocess(s.getRecordSegments().front().getSequence(), s.getAlignments().front().getAlignment().getECigar());
     sequences.push_back(read);
     crBufSize += read.length();
 
@@ -90,19 +90,19 @@ void LocalAssemblyReferenceEncoder::addRead(const format::mpegg_rec::MpeggRecord
         sequence_positions.erase(sequence_positions.begin());
     }
 
-    if (s->getNumberOfRecords() == 1) {
+    if (s.getRecordSegments().size() == 1) {
         return;
     }
 
     const format::mpegg_rec::SplitAlignmentSameRec *rec;
-    if (s->getAlignment(0)->getSplitAlignment(0)->getType() ==
+    if (s.getAlignments().front().getSplitAlignments().front()->getType() ==
         format::mpegg_rec::SplitAlignment::SplitAlignmentType::SAME_REC) {
-        rec = dynamic_cast<const format::mpegg_rec::SplitAlignmentSameRec *>(s->getAlignment(0)->getSplitAlignment(0));
+        rec = dynamic_cast<const format::mpegg_rec::SplitAlignmentSameRec *>(s.getAlignments().front().getSplitAlignments().front().get());
     } else {
         UTILS_DIE("Only same record split alignments supported");
     }
-    sequence_positions.push_back(s->getAlignment(0)->getPosition() + rec->getDelta());
-    read = preprocess(*s->getRecordSegment(1)->getSequence(), *rec->getAlignment()->getECigar());
+    sequence_positions.push_back(s.getAlignments().front().getPosition() + rec->getDelta());
+    read = preprocess(s.getRecordSegments()[1].getSequence(), rec->getAlignment().getECigar());
     sequences.push_back(read);
     crBufSize += read.length();
 

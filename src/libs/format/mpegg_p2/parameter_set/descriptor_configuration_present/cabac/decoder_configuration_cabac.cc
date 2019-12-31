@@ -8,7 +8,7 @@ namespace mpegg_p2 {
 namespace desc_conf_pres {
 namespace cabac {
 DecoderConfigurationCabac::DecoderConfigurationCabac(GenDesc _desc)
-    : DecoderConfiguration(EncodingModeId::CABAC), desc(_desc), rle_guard_tokentype(0), descriptor_subsequence_cfgs(0) {
+    : DecoderConfiguration(EncodingModeId::CABAC), desc(_desc), rle_guard_tokentype(0), descriptor_subsequence_cfgs() {
     for (size_t i = 0; i < getDescriptors()[uint8_t(desc)].subseqs.size(); ++i) {
         descriptor_subsequence_cfgs.push_back(util::make_unique<DescriptorSubsequenceCfg>(
             util::make_unique<TransformSubseqParameters>(), i,

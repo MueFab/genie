@@ -1,56 +1,93 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #ifndef GENIE_ALIGNMENT_H
 #define GENIE_ALIGNMENT_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <util/bitreader.h>
+#include <util/bitwriter.h>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
 
-namespace util {
-    class BitWriter;
-
-    class BitReader;
-}
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace format {
-    namespace mpegg_rec {
-        class Alignment {
-            std::unique_ptr<std::string> ecigar_string;
-            uint8_t reverse_comp : 8;
+namespace mpegg_rec {
 
-            // for (as=0; as < as_depth; as++)
-            std::vector<int32_t> mapping_score;
+/**
+ *
+ */
+class Alignment {
+    std::string ecigar_string;           //!<
+    uint8_t reverse_comp;                //!<
+    std::vector<int32_t> mapping_score;  //!<
 
-        public:
-            Alignment(
-                    std::unique_ptr<std::string> _ecigar_string,
-                    uint8_t _reverse_comp
-            );
+   public:
+    /**
+     *
+     * @param _ecigar_string
+     * @param _reverse_comp
+     */
+    Alignment(std::string&& _ecigar_string, uint8_t _reverse_comp);
 
-            Alignment(
-                    uint8_t as_depth,
-                    util::BitReader* reader
-            );
+    /**
+     *
+     * @param as_depth
+     * @param reader
+     */
+    Alignment(uint8_t as_depth, util::BitReader& reader);
 
-            Alignment(
-            );
+    /**
+     *
+     */
+    Alignment();
 
-            size_t getAsDepth() const;
+    /**
+     *
+     * @param score
+     */
+    void addMappingScore(int32_t score);
 
-            void addMappingScore(int32_t score);
+    /**
+     *
+     * @return
+     */
+    const std::vector<int32_t>& getMappingScores() const;
 
-            int32_t getMappingScore(size_t index) const;
+    /**
+     *
+     * @return
+     */
+    const std::string& getECigar() const;
 
-            const std::string* getECigar() const;
+    /**
+     *
+     * @return
+     */
+    uint8_t getRComp() const;
 
-            uint8_t getRComp() const;
+    /**
+     *
+     * @param writer
+     */
+    virtual void write(util::BitWriter& writer) const;
+};
 
-            virtual void write(util::BitWriter *writer) const;
+// ---------------------------------------------------------------------------------------------------------------------
 
-            virtual std::unique_ptr<Alignment> clone() const;
-        };
-    }
-}
+}  // namespace mpegg_rec
+}  // namespace format
 
+// ---------------------------------------------------------------------------------------------------------------------
 
-#endif //GENIE_ALIGNMENT_H
+#endif  // GENIE_ALIGNMENT_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

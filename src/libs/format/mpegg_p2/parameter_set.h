@@ -40,7 +40,7 @@ namespace format {
 
             void setCrps(std::unique_ptr<ParameterSetCrps> parameter_set_crps);
 
-            void addClass(mpegg_rec::MpeggRecord::ClassType class_id, std::unique_ptr<QvCodingConfig> conf);
+            void addClass(mpegg_rec::ClassType class_id, std::unique_ptr<QvCodingConfig> conf);
 
             void setDescriptor(GenDesc index, std::unique_ptr<DescriptorConfigurationContainer> descriptor);
 
@@ -92,7 +92,7 @@ namespace format {
             uint8_t qv_depth : 3;                 //!< Line 9
             uint8_t as_depth : 3;                 //!< Line 10
             //!< uint8_t num_classes : 4; //!< Line 11, currently infered from vector
-            std::vector<mpegg_rec::MpeggRecord::ClassType> class_IDs;                                               //!< : 4; For loop Lines 12 + 13
+            std::vector<mpegg_rec::ClassType> class_IDs;                                               //!< : 4; For loop Lines 12 + 13
             std::vector<std::unique_ptr<DescriptorConfigurationContainer>> descriptors;  //!< For loop lines 14 - 22
             //!< uint16_t num_groups : 16; //!< Line 23 currently infered from vector
             std::vector<std::unique_ptr<std::string>> rgroup_IDs;            //!< For Loop lines 24 + 25

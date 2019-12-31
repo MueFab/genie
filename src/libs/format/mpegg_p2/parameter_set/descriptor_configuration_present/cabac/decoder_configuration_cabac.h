@@ -31,6 +31,16 @@ class DecoderConfigurationCabac : public DecoderConfiguration {
         return descriptor_subsequence_cfgs[uint8_t(index)].get();
     }
 
+    DecoderConfigurationCabac(const DecoderConfigurationCabac &c)
+        : DecoderConfiguration(EncodingModeId::CABAC), desc(c.desc), rle_guard_tokentype(c.rle_guard_tokentype) {
+        if(this == &c) {
+           return;
+        }
+        for(const auto& a : c.descriptor_subsequence_cfgs)  {
+            descriptor_subsequence_cfgs.emplace_back(a->clone());
+        }
+    }
+
     std::unique_ptr<DecoderConfiguration> clone() const override;
 
     void write(util::BitWriter *writer) const override;
