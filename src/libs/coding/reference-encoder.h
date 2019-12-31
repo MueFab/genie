@@ -10,7 +10,6 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <format/mpegg_rec/mpegg-record.h>
-#include <format/sam/sam-record.h>
 #include <limits>
 #include <string>
 #include <vector>
@@ -38,7 +37,7 @@ class LocalAssemblyReferenceEncoder {
    public:
     explicit LocalAssemblyReferenceEncoder(uint32_t _cr_buf_max_size);
 
-    void addRead(const format::mpegg_rec::MpeggRecord *s);
+    void addRead(const format::mpegg_rec::MpeggRecord &s);
 
     std::string getReference(uint32_t pos_offset, const std::string &cigar);
 

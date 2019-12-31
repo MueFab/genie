@@ -1,25 +1,54 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #ifndef GENIE_EXTERNAL_ALIGNMENT_NONE_H
 #define GENIE_EXTERNAL_ALIGNMENT_NONE_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <util/bitreader.h>
+#include <util/bitwriter.h>
 #include "external-alignment.h"
 
-namespace util {
-    class BitWriter;
-    class BitReader;
-}
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace format {
-    namespace mpegg_rec {
-        class ExternalAlignmentNone : public ExternalAlignment {
-        public:
-            ExternalAlignmentNone();
+namespace mpegg_rec {
 
-            void write(util::BitWriter *writer) const override;
+/**
+ *
+ */
+class ExternalAlignmentNone : public ExternalAlignment {
+   public:
+    /**
+     *
+     */
+    ExternalAlignmentNone();
 
-            virtual std::unique_ptr<ExternalAlignment> clone () const;
-        };
-    }
-}
+    /**
+     *
+     * @param writer
+     */
+    void write(util::BitWriter &writer) const override;
 
+    /**
+     *
+     * @return
+     */
+    std::unique_ptr<ExternalAlignment> clone() const override;
+};
 
-#endif //GENIE_EXTERNAL_ALIGNMENT_NONE_H
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace mpegg_rec
+}  // namespace format
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#endif  // GENIE_EXTERNAL_ALIGNMENT_NONE_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

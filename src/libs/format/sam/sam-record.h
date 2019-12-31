@@ -1,41 +1,70 @@
-#ifndef UTIL_SAM_RECORD_H_
-#define UTIL_SAM_RECORD_H_
+#ifndef GENIE_SAM_RECORD_H
+#define GENIE_SAM_RECORD_H
 
-#include <string>
-#include <vector>
-
-#include <regex>
-
-#include <util/exceptions.h>
+#include <util/tokenize.h>
+#include "sam-tag.h"
 
 namespace format {
-    namespace sam {
-        struct SamRecord {
-        public:
-            SamRecord(const std::vector<std::string> &fields);
+namespace sam {
+class SamRecord {
+   private:
+    std::string qname;
+    uint16_t flag;
+    std::string rname;
+    uint32_t pos;
+    uint8_t mapq;
+    std::string cigar;
+    std::string rnext;
+    uint32_t pnext;
+    int32_t tlen;
+    std::string seq;
+    std::string qual;
+    // TODO: Tags
+   public:
+    enum class FlagPos : uint16_t {
+        MULTI_SEGMENT_TEMPLATE = 0,
+        PROPERLY_ALIGNED = 1,
+        SEGMENT_UNMAPPED = 2,
+        NEXT_SEGMENT_UNMAPPED = 3,
+        SEQ_REVERSE = 4,
+        NEXT_SEQ_REVERSE = 5,
+        FIRST_SEGMENT = 6,
+        LAST_SEGMENT = 7,
+        SECONDARY_ALIGNMENT = 8,
+        QUALITY_FAIL = 9,
+        PCR_DUPLICATE = 10,
+        SUPPLEMENTARY_ALIGNMENT = 11
+    };
 
-            SamRecord();
+    SamRecord(std::string _qname, uint16_t _flag, std::string _rname, uint32_t _pos, uint8_t _mapq, std::string _cigar,
+              std::string _rnext, uint32_t _pnext, int32_t _tlen, std::string _seq, std::string _qual);
 
-            ~SamRecord();
+    explicit SamRecord(const std::string& string);
 
-            std::string str() const;
+    void check() const;
 
-        public:
-            std::string qname;  // Query template NAME
-            uint16_t flag;      // bitwise FLAG (uint16_t)
-            std::string rname;  // Reference sequence NAME
-            uint32_t pos;       // 1-based leftmost mapping POSition (uint32_t)
-            uint8_t mapq;       // MAPping Quality (uint8_t)
-            std::string cigar;  // CIGAR string
-            std::string rnext;  // Ref. name of the mate/NEXT read
-            uint32_t pnext;     // Position of the mate/NEXT read (uint32_t)
-            int64_t tlen;       // observed Template LENgth (int64_t)
-            std::string seq;    // segment SEQuence
-            std::string qual;   // QUALity scores
-            std::string opt;    // OPTional information
-        };
+    const std::string& getQname() const;
+    std::string&& moveQname() { return std::move(qname); }
+    uint16_t getFlags() const;
+    bool checkFlag(FlagPos f) const;
+    const std::string& getRname() const;
+    std::string&& moveRname() { return std::move(rname); }
+    uint32_t getPos() const;
+    uint8_t getMapQ() const;
 
-    }
-}  // namespace util
+    const std::string& getCigar() const;
+    std::string&& moveCigar() { return std::move(cigar); }
+    const std::string& getRnext() const;
+    std::string&& moveRnext() { return std::move(rnext); }
+    uint32_t getPnext() const;
+    int32_t getTlen() const;
+    const std::string& getSeq() const;
+    std::string&& moveSeq() { return std::move(seq); }
+    const std::string& getQual() const;
+    std::string&& moveQual() { return std::move(qual); }
+    std::string toString() const;
+};
+}  // namespace sam
+}  // namespace format
 
-#endif  // UTIL_SAM_RECORD_H_
+#endif  // GENIE_SAM_RECORD_H

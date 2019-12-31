@@ -13,9 +13,9 @@
 #include <util/source.h>
 #include <memory>
 
-class MpeggDecompressor : public Drain<std::unique_ptr<BlockPayloadSet>>, public Source<std::unique_ptr<MpeggRawAu>> {
+class MpeggDecompressor : public Drain<BlockPayloadSet>, public Source<MpeggRawAu> {
    public:
-    void flowIn(std::unique_ptr<BlockPayloadSet> t, size_t id) override = 0;
+    void flowIn(BlockPayloadSet&& t, size_t id) override = 0;
     void dryIn() override = 0;
     ~MpeggDecompressor() override = default;
 };

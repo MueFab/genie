@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <istream>
 #include <string>
+#include <type_traits>
 
 namespace util {
 class BitReader {
@@ -30,8 +31,24 @@ class BitReader {
 
     bool skipNBits(uint32_t bitsToSkip);
 
-    uint64_t read(uint8_t){return 0;}
-    void read(std::istream *){}
+    uint64_t read(size_t) { return 0; }
+    void read(std::istream *) {}
+
+    template <typename T, typename = std::enable_if<std::is_integral<T>::value>>
+    T read() {
+        return sizeof(T) * 8;
+    }
+
+    template <typename T, typename = std::enable_if<std::is_integral<T>::value>>
+    T read(size_t s) {
+        return sizeof(T) * 8 * s;
+    }
+
+    void read(std::string &str) {
+        for (auto &c : str) {
+            c = char(read(8));
+        }
+    }
 
     bool isGood();
 

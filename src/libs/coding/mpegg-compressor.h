@@ -9,9 +9,9 @@
 #include <format/block-payload.h>
 #include <util/source.h>
 
-class MpeggCompressor : public Source<std::unique_ptr<BlockPayloadSet>>, public Drain<std::unique_ptr<MpeggRawAu>> {
+class MpeggCompressor : public Source<BlockPayloadSet>, public Drain<MpeggRawAu> {
    public:
-    void flowIn(std::unique_ptr<MpeggRawAu> t, size_t id) override = 0;
+    void flowIn(MpeggRawAu&& t, size_t id) override = 0;
     void dryIn() override = 0;
     ~MpeggCompressor() override = default;
 };

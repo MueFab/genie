@@ -1,5 +1,13 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #ifndef GENIE_MGRECS_IMPORTER_H
 #define GENIE_MGRECS_IMPORTER_H
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include <format/mpegg_rec/alignment-container.h>
 #include <format/mpegg_rec/external-alignment.h>
@@ -13,7 +21,9 @@
 #include <util/original-source.h>
 #include <util/source.h>
 
-class MgrecsImporter : public Source<std::unique_ptr<format::mpegg_rec::MpeggChunk>>, public OriginalSource {
+// ---------------------------------------------------------------------------------------------------------------------
+
+class MgrecsImporter : public Source<format::mpegg_rec::MpeggChunk>, public OriginalSource {
    private:
     size_t blockSize;
     util::BitReader reader;
@@ -21,11 +31,16 @@ class MgrecsImporter : public Source<std::unique_ptr<format::mpegg_rec::MpeggChu
     OrderedLock lock;  //!< @brief Lock to ensure in order execution
 
    public:
-    MgrecsImporter(size_t _blockSize, std::istream *_file_1);
+    MgrecsImporter(size_t _blockSize, std::istream &_file_1);
 
     bool pump(size_t id) override;
 
     void dryIn() override;
 };
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #endif  // GENIE_MGRECS_IMPORTER_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

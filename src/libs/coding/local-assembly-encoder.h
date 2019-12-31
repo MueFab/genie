@@ -31,11 +31,11 @@ class LocalAssemblyEncoder : public MpeggEncoder {
          * @param cr_buf_max_size Buffer size for local assembly reference memory
          */
         explicit LaeState(size_t cr_buf_max_size);
-        lae::LocalAssemblyReferenceEncoder refCoder;          //!< @brief Building the local reference
-        lae::LocalAssemblyReadEncoder readCoder;              //!< @brief Generating the descriptor streams
-        bool pairedEnd;                                       //!< @brief Current guess regarding pairing
-        size_t readLength;                                    //!< @brief Current guess regarding read length
-        format::mpegg_rec::MpeggRecord::ClassType classType;  //!< @brief Current guess regarding class type
+        lae::LocalAssemblyReferenceEncoder refCoder;  //!< @brief Building the local reference
+        lae::LocalAssemblyReadEncoder readCoder;      //!< @brief Generating the descriptor streams
+        bool pairedEnd;                               //!< @brief Current guess regarding pairing
+        size_t readLength;                            //!< @brief Current guess regarding read length
+        format::mpegg_rec::ClassType classType;       //!< @brief Current guess regarding class type
     };
 
     /**
@@ -55,7 +55,7 @@ class LocalAssemblyEncoder : public MpeggEncoder {
      * @param state Current local assembly state
      */
     void updateAssembly(const format::mpegg_rec::MpeggRecord& r, const format::mpegg_rec::SplitAlignmentSameRec& srec,
-                        LocalAssemblyEncoder::LaeState* state) const;
+                        LocalAssemblyEncoder::LaeState& state) const;
 
     /**
      * @brief Checks if there is an additional alignment available and converts it into the correct format
@@ -63,7 +63,7 @@ class LocalAssemblyEncoder : public MpeggEncoder {
      * @param r Current record
      * @return Preprocessed alignment for pair
      */
-    const format::mpegg_rec::SplitAlignmentSameRec* getPairedAlignment(const LocalAssemblyEncoder::LaeState& state,
+    const format::mpegg_rec::SplitAlignmentSameRec& getPairedAlignment(const LocalAssemblyEncoder::LaeState& state,
                                                                        const format::mpegg_rec::MpeggRecord& r) const;
 
     /**
@@ -71,7 +71,7 @@ class LocalAssemblyEncoder : public MpeggEncoder {
      * @param state Current local assembly state
      * @param r Current input record
      */
-    void updateGuesses(LocalAssemblyEncoder::LaeState* state, const format::mpegg_rec::MpeggRecord& r) const;
+    void updateGuesses(const format::mpegg_rec::MpeggRecord& r, LocalAssemblyEncoder::LaeState& state) const;
 
     /**
      * @brief Generate a full MpeggRawAu and parameter set as a last step of encoding
@@ -79,7 +79,7 @@ class LocalAssemblyEncoder : public MpeggEncoder {
      * @param state The state used throughout the current encoding
      * @return MpeggRawAu ready for entropy coding
      */
-    std::unique_ptr<MpeggRawAu> pack(size_t id, LocalAssemblyEncoder::LaeState* state) const;
+    MpeggRawAu pack(size_t id, LocalAssemblyEncoder::LaeState& state) const;
 
    public:
     /**
@@ -87,7 +87,7 @@ class LocalAssemblyEncoder : public MpeggEncoder {
      * @param t The input data
      * @param id The current block identifier
      */
-    void flowIn(std::unique_ptr<format::mpegg_rec::MpeggChunk> t, size_t id) override;
+    void flowIn(format::mpegg_rec::MpeggChunk&& t, size_t id) override;
 
     /**
      * @brief Propagate end-of-data signal.

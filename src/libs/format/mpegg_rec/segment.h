@@ -1,45 +1,87 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #ifndef GENIE_SEGMENT_H
 #define GENIE_SEGMENT_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <util/bitreader.h>
+#include <util/bitwriter.h>
 #include <memory>
 #include <string>
 #include <vector>
 
-namespace util {
-    class BitWriter;
-    class BitReader;
-}
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace format {
-    namespace mpegg_rec {
-        class Segment {
-            std::unique_ptr <std::string> sequence;
-            // for (qs=0; qs < qv_depth; qs++)
-            std::vector <std::unique_ptr<std::string>> quality_values; // or c(1), as specified in subclause 9.2.15
+namespace mpegg_rec {
 
-        public:
-            Segment();
+// ---------------------------------------------------------------------------------------------------------------------
 
-            explicit Segment(std::unique_ptr <std::string> _sequence);
+/**
+ *
+ */
+class Segment {
+    std::string sequence;                     //!<
+    std::vector<std::string> quality_values;  //!<
 
-            Segment(uint32_t length, uint8_t qv_depth, util::BitReader *reader);
+   public:
+    /**
+     *
+     */
+    Segment();
 
-            size_t getQvDepth() const;
+    /**
+     *
+     * @param _sequence
+     */
+    explicit Segment(std::string&& _sequence);
 
-            size_t getLength() const;
+    /**
+     *
+     * @param length
+     * @param qv_depth
+     * @param reader
+     */
+    Segment(uint32_t length, uint8_t qv_depth, util::BitReader& reader);
 
-            const std::string* getSequence() const;
+    /**
+     *
+     * @return
+     */
+    const std::string& getSequence() const;
 
-            const std::string* getQuality(size_t index) const;
+    /**
+     *
+     * @return
+     */
+    const std::vector<std::string>& getQualities() const;
 
-            void addQualityValues(std::unique_ptr <std::string> qv);
+    /**
+     *
+     * @param qv
+     */
+    void addQualityValues(std::string&& qv);
 
-            virtual void write(util::BitWriter *write) const;
+    /**
+     *
+     * @param write
+     */
+    virtual void write(util::BitWriter& write) const;
+};
 
-            virtual std::unique_ptr<Segment> clone () const;
-        };
-    }
-}
+// ---------------------------------------------------------------------------------------------------------------------
 
+}  // namespace mpegg_rec
+}  // namespace format
 
-#endif //GENIE_SEGMENT_H
+// ---------------------------------------------------------------------------------------------------------------------
+
+#endif  // GENIE_SEGMENT_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

@@ -20,6 +20,11 @@
 #include <format/fastq/fastq-importer.h>
 #include <format/mpegg_p2/raw_reference.h>
 #include <format/mpegg_rec/mgrecs-exporter.h>
+#include <format/sam/sam-exporter.h>
+#include <format/sam/sam-header.h>
+#include <format/sam/sam-importer.h>
+#include <format/sam/sam-reader.h>
+#include <format/sam/sam-writer.h>
 #include <gabac/gabac.h>
 #include <util/thread-manager.h>
 
@@ -64,9 +69,10 @@ std::vector<std::vector<gabac::DataBlock>> create_default_streams() {
     return ret;
 }*/
 
-class DummyModule : public Drain<std::unique_ptr<MpeggRawAu>> {
+class DummyModule : public Drain<MpeggRawAu> {
    public:
-    void flowIn(std::unique_ptr<MpeggRawAu> t, size_t id) override { /* Collect information */
+    void flowIn(MpeggRawAu&& t, size_t id) override { /* Collect information */
+        MpeggRawAu data = std::move(t);
     }
 
     void dryIn() override { /* Collect information */
@@ -101,26 +107,33 @@ void encode(const ProgramOptions& programOptions) {
        if (!dummy.veryImportantExampleTest()) {
            // ERROR!
        }*/
+    std::ifstream input("test.sam");
+    std::ofstream output("test_out.sam");
+    format::sam::SamImporter importer(1000,input);
+    SamExporter exporter(format::sam::SamFileHeader::createDefaultHeader(),output);
+    importer.setDrain(&exporter);
+    ThreadManager manager(1, &importer);
+    manager.run();
 
-    {
-        std::ifstream infile1(programOptions.inputFilePath), infile2(programOptions.pairFilePath);
-        std::ofstream outfile1(programOptions.outputFilePath), outfile2(programOptions.outputPairFilePath);
-        format::fastq::FastqImporter importer(2, &infile1, &infile2);
-        format::fastq::FastqExporter exporter(&outfile1, &outfile2);
-        importer.setDrain(&exporter);
-        ThreadManager threadManager(4, &importer);
-        threadManager.run();
-    }
+    /*  {
+          std::ifstream infile1(programOptions.inputFilePath), infile2(programOptions.pairFilePath);
+          std::ofstream outfile1(programOptions.outputFilePath), outfile2(programOptions.outputPairFilePath);
+          format::fastq::FastqImporter importer(2, &infile1, &infile2);
+          format::fastq::FastqExporter exporter(&outfile1, &outfile2);
+          importer.setDrain(&exporter);
+          ThreadManager threadManager(4, &importer);
+          threadManager.run();
+      }
 
-    {
-        std::ifstream infile1(programOptions.inputFilePath), infile2(programOptions.pairFilePath);
-        std::ofstream outfile1(programOptions.outputFilePath + ".mgrec");
-        format::fastq::FastqImporter importer(2, &infile1, &infile2);
-        MgrecsExporter exporter(&outfile1);
-        importer.setDrain(&exporter);
-        ThreadManager threadManager(4, &importer);
-        threadManager.run();
-    }
+      {
+          std::ifstream infile1(programOptions.inputFilePath), infile2(programOptions.pairFilePath);
+          std::ofstream outfile1(programOptions.outputFilePath + ".mgrec");
+          format::fastq::FastqImporter importer(2, &infile1, &infile2);
+          MgrecsExporter exporter(&outfile1);
+          importer.setDrain(&exporter);
+          ThreadManager threadManager(4, &importer);
+          threadManager.run();
+      }*/
     /* /////////////////////////////////////////////////////////////////////////////////////////////////////
      // UREADS DESCRIPTOR GENERATION
      /////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -51,52 +51,53 @@ void SpringEncoder::preprocessInit() {
     num_blocks_done = 0;
 }
 
-void SpringEncoder::preprocessIteration(std::unique_ptr<format::mpegg_rec::MpeggChunk> t) {
+void SpringEncoder::preprocessIteration(format::mpegg_rec::MpeggChunk&& data) {
+    format::mpegg_rec::MpeggChunk t = std::move(data);
     for (int j = 0; j < 2; j++) {
         if (j == 1 && !cp.paired_end) continue;
-        if (num_reads[0] + num_reads[1] + (cp.paired_end ? t->size() * 2 : t->size()) > spring::MAX_NUM_READS) {
+        if (num_reads[0] + num_reads[1] + (cp.paired_end ? t.size() * 2 : t.size()) > spring::MAX_NUM_READS) {
             std::cerr << "Max number of reads allowed is " << spring::MAX_NUM_READS << "\n";
             throw std::runtime_error("Too many reads.");
         }
         {
             // check if reads and qualities have equal lengths
-            for (uint32_t i = 0; i < t->size(); i++) {
-                size_t len = (*t)[i]->getRecordSegment(j)->getSequence()->length();
+            for (uint32_t i = 0; i < t.size(); i++) {
+                size_t len = (t)[i].getRecordSegments()[j].getSequence().length();
                 if (len == 0) throw std::runtime_error("Read of length 0 detected.");
                 if (len > spring::MAX_READ_LEN) {
                     std::cerr << "Max read length without ureads mode is " << spring::MAX_READ_LEN
                               << ", but found read of length " << len << "\n";
                     throw std::runtime_error("Too long read length");  // (please try --long/-l flag).");
                 }
-                if (cp.preserve_quality && ((*t)[i]->getRecordSegment(j)->getQuality(0)->length() != len))
+                if (cp.preserve_quality && ((t)[i].getRecordSegments()[j].getQualities().front().length() != len))
                     throw std::runtime_error("Read length does not match quality length.");
-                if (cp.preserve_id && ((*t)[i]->getReadName().length() == 0) && j == 0)
+                if (cp.preserve_id && ((t)[i].getReadName().length() == 0) && j == 0)
                     throw std::runtime_error("Identifier of length 0 detected.");
                 read_lengths_array[i] = (uint32_t)len;
 
                 read_contains_N_array[i] =
-                    ((*t)[i]->getRecordSegment(j)->getSequence()->find('N') != std::string::npos);
+                    ((t)[i].getRecordSegments()[j].getSequence().find('N') != std::string::npos);
             }
         }  // omp parallel
         // write reads and read_order_N to respective files
-        for (uint32_t i = 0; i < t->size(); i++) {
+        for (uint32_t i = 0; i < t.size(); i++) {
             if (!read_contains_N_array[i]) {
-                fout_clean[j] << *(*t)[i]->getRecordSegment(j)->getSequence() << "\n";
+                fout_clean[j] << (t)[i].getRecordSegments()[j].getSequence() << "\n";
                 num_reads_clean[j]++;
             } else {
                 uint32_t pos_N = num_reads[j] + i;
                 fout_order_N[j].write((char *)&pos_N, sizeof(uint32_t));
-                fout_N[j] << *(*t)[i]->getRecordSegment(j)->getSequence() << "\n";
+                fout_N[j] << (t)[i].getRecordSegments()[j].getSequence() << "\n";
             }
         }
         //          // write qualities to file
-        for (uint32_t i = 0; i < t->size(); i++)
-            fout_quality[j] << *(*t)[i]->getRecordSegment(j)->getQuality(0) << "\n";
+        for (uint32_t i = 0; i < t.size(); i++)
+            fout_quality[j] << (t)[i].getRecordSegments()[j].getQualities().front() << "\n";
         // write ids to file
         if (j == 0)
-            for (uint32_t i = 0; i < t->size(); i++) fout_id << (*t)[i]->getReadName() << "\n";
-        num_reads[j] += t->size();
-        max_readlen = std::max(max_readlen, *(std::max_element(read_lengths_array, read_lengths_array + t->size())));
+            for (uint32_t i = 0; i < t.size(); i++) fout_id << (t)[i].getReadName() << "\n";
+        num_reads[j] += t.size();
+        max_readlen = std::max(max_readlen, *(std::max_element(read_lengths_array, read_lengths_array + t.size())));
     }
     if (cp.paired_end)
         if (num_reads[0] != num_reads[1]) throw std::runtime_error("Number of reads in paired files do not match.");
@@ -153,7 +154,7 @@ void SpringEncoder::preprocessClean() {
 }
 
 SpringEncoder::SpringEncoder(int _num_thr, std::string _working_dir, bool _ureads_flag, bool _preserve_quality,
-                             bool _preserve_id, util::FastqStats *_stats)
+                             bool _preserve_id, util::FastqStats &_stats)
     : num_thr(_num_thr),
       working_dir(std::move(_working_dir)),
       preserve_quality(_preserve_quality),
@@ -185,9 +186,9 @@ SpringEncoder::SpringEncoder(int _num_thr, std::string _working_dir, bool _uread
     preprocessInit();
 }
 
-void SpringEncoder::flowIn(std::unique_ptr<format::mpegg_rec::MpeggChunk> t, size_t id) {
+void SpringEncoder::flowIn(format::mpegg_rec::MpeggChunk&& t, size_t id) {
     if (!id) {
-        cp.paired_end = (*t)[0]->getNumberOfRecords() > 1;
+        cp.paired_end = t[0].getRecordSegments().size() > 1;
     }
     preprocessIteration(std::move(t));
 }

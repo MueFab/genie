@@ -67,8 +67,7 @@ class GabacSeqConfSet {
      * @param gabac_configuration Input gabac config
      * @param sub_conf Output where to put the converted data
      */
-    static void storeSubseq(const gabac::EncodingConfiguration& gabac_configuration,
-                            DescriptorSubsequenceCfg* sub_conf);
+    static void storeSubseq(const gabac::EncodingConfiguration& gabac_configuration, DescriptorSubsequenceCfg& sub_conf);
 
     /**
      * @brief Extract the format::mpegg_p2::desc_conf_pres::cabac::DecoderConfigurationCabac from a
@@ -78,7 +77,7 @@ class GabacSeqConfSet {
      * @return A properly casted DecoderConfigurationCabac. No new object is created, the object was already inside the
      * input parameter set
      */
-    static const DecoderConfigurationCabac* loadDescriptorDecoderCfg(const ParameterSet& parameterSet,
+    static const DecoderConfigurationCabac& loadDescriptorDecoderCfg(const ParameterSet& parameterSet,
                                                                      GenDesc descriptor_id);
 
     /**
@@ -87,8 +86,7 @@ class GabacSeqConfSet {
      * @param transformedDesc Input subsequence configuration
      * @param gabacTransCfg Where to write the output data.
      */
-    static void loadTransformedSequence(const TransformSubseqCfg* transformedDesc,
-                                        gabac::TransformedSequenceConfiguration* gabacTransCfg);
+    static gabac::TransformedSequenceConfiguration loadTransformedSequence(const TransformSubseqCfg& transformedDesc);
 
    public:
     /**
@@ -108,7 +106,7 @@ class GabacSeqConfSet {
      * @brief Store the complete set of gabac configurations in an MPEG-G parameter set
      * @param parameterSet Output object
      */
-    void storeParameters(ParameterSet* parameterSet) const;
+    void storeParameters(ParameterSet& parameterSet) const;
 
     /**
      * @brief Load a complete set of gabac configurations to the internal memory of gabac configurations

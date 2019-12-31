@@ -1,39 +1,83 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #ifndef GENIE_SPLIT_ALIGNMENT_OTHER_REC_H
 #define GENIE_SPLIT_ALIGNMENT_OTHER_REC_H
 
-#include <cstdint>
+// ---------------------------------------------------------------------------------------------------------------------
 
+#include <util/bitreader.h>
+#include <util/bitwriter.h>
+#include <cstdint>
 #include "split-alignment.h"
 
-namespace util {
-    class BitWriter;
-    class BitReader;
-}
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace format {
-    namespace mpegg_rec {
-        class SplitAlignmentOtherRec : public SplitAlignment {
-            uint64_t split_pos : 40;
-            uint16_t split_seq_ID : 16;
+namespace mpegg_rec {
 
-        public:
-            SplitAlignmentOtherRec(
-                    uint64_t _split_pos,
-                    uint16_t _split_seq_ID
-            );
+/**
+ *
+ */
+class SplitAlignmentOtherRec : public SplitAlignment {
+    uint64_t split_pos;     //!<
+    uint16_t split_seq_ID;  //!<
 
-            explicit SplitAlignmentOtherRec(
-                    util::BitReader* reader
-            );
+   public:
+    /**
+     *
+     * @param _split_pos
+     * @param _split_seq_ID
+     */
+    SplitAlignmentOtherRec(uint64_t _split_pos, uint16_t _split_seq_ID);
 
-            SplitAlignmentOtherRec();
+    /**
+     *
+     * @return
+     */
+    uint64_t getNextPos() const;
 
-            void write(util::BitWriter *writer) const override;
+    /**
+     *
+     * @return
+     */
+    uint16_t getNextSeq() const;
 
-            virtual std::unique_ptr<SplitAlignment> clone () const;
-        };
-    }
-}
+    /**
+     *
+     * @param reader
+     */
+    explicit SplitAlignmentOtherRec(util::BitReader& reader);
 
+    /**
+     *
+     */
+    SplitAlignmentOtherRec();
 
-#endif //GENIE_SPLIT_ALIGNMENT_OTHER_REC_H
+    /**
+     *
+     * @param writer
+     */
+    void write(util::BitWriter& writer) const override;
+
+    /**
+     *
+     * @return
+     */
+    std::unique_ptr<SplitAlignment> clone() const override;
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace mpegg_rec
+}  // namespace format
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#endif  // GENIE_SPLIT_ALIGNMENT_OTHER_REC_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

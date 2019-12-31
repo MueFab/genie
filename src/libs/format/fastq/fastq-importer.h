@@ -58,8 +58,7 @@ class FastqImporter : public Source<std::unique_ptr<format::mpegg_rec::MpeggChun
      * @param data Raw fastq data
      * @return Finished MPEG-G record
      */
-    static std::unique_ptr<format::mpegg_rec::MpeggRecord> buildRecord(
-        const std::vector<std::array<std::string, LINES_PER_RECORD>> &data);
+    static format::mpegg_rec::MpeggRecord buildRecord(std::vector<std::array<std::string, LINES_PER_RECORD>> data);
 
    public:
     /**

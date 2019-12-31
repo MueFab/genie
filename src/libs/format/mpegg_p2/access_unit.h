@@ -32,12 +32,12 @@ namespace format {
 
             void write(util::BitWriter *writer) const override;
 
-            AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, mpegg_rec::MpeggRecord::ClassType _au_type,
+            AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, mpegg_rec::ClassType _au_type,
                        uint32_t _reads_count,
                        DatasetType dataset_type, uint8_t posSize, uint8_t signatureSize,
                        uint32_t multiple_signature_base);
 
-            void addBlock(std::unique_ptr<Block> block);
+            void addBlock(Block block);
 
             void setMmCfg(std::unique_ptr<MmCfg> cfg);
 
@@ -67,7 +67,7 @@ namespace format {
             uint32_t access_unit_ID : 32;                    //!< Line 2
             uint8_t num_blocks : 8;                          //!< Line 3
             uint8_t parameter_set_ID : 8;                    //!< Line 4
-            mpegg_rec::MpeggRecord::ClassType au_type;                                  //!< : 4;  Line 5
+            mpegg_rec::ClassType au_type;                                  //!< : 4;  Line 5
             uint32_t reads_count : 32;                       //!< Line 6
             std::unique_ptr<MmCfg> mm_cfg;                   //!< Lines 7 to 10
             std::unique_ptr<RefCfg> ref_cfg;                 //!< Lines 11 to 15
@@ -82,7 +82,7 @@ namespace format {
              * ISO 23092-2 Section 3.4.1 table 18
              *
              * ------------------------------------------------------------------------------------------------------------- */
-            std::vector<std::unique_ptr<Block>> blocks;  //!< Lines 3 to 5
+            std::vector<Block> blocks;  //!< Lines 3 to 5
         };
     }
 }  // namespace format

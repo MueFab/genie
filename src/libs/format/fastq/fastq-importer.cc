@@ -5,6 +5,7 @@
  */
 
 #include "fastq-importer.h"
+#include <format/mpegg_rec/class-type.h>
 #include <util/ordered-section.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -45,20 +46,16 @@ bool FastqImporter::pump(size_t id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<format::mpegg_rec::MpeggRecord> FastqImporter::buildRecord(
-    const std::vector<std::array<std::string, LINES_PER_RECORD>> &data) {
-    auto ret = util::make_unique<format::mpegg_rec::MpeggRecord>(
-        data.size(), format::mpegg_rec::MpeggRecord::ClassType::CLASS_U,
-        util::make_unique<std::string>(data[Files::FIRST][Lines::ID].substr(1)),
-        util::make_unique<std::string>("Genie"), 0);
+format::mpegg_rec::MpeggRecord FastqImporter::buildRecord(std::vector<std::array<std::string, LINES_PER_RECORD>> data) {
+    auto ret = format::mpegg_rec::MpeggRecord(data.size(), format::mpegg_rec::ClassType::CLASS_U,
+                                              data[Files::FIRST][Lines::ID].substr(1), "Genie", 0);
 
-    for (const auto &cur_rec : data) {
-        auto seg =
-            util::make_unique<format::mpegg_rec::Segment>(util::make_unique<std::string>(cur_rec[Lines::SEQUENCE]));
+    for (auto &cur_rec : data) {
+        auto seg = format::mpegg_rec::Segment(std::move(cur_rec[Lines::SEQUENCE]));
         if (!cur_rec[Lines::QUALITY].empty()) {
-            seg->addQualityValues(util::make_unique<std::string>(cur_rec[Lines::QUALITY]));
+            seg.addQualityValues(std::move(cur_rec[Lines::QUALITY]));
         }
-        ret->addRecordSegment(std::move(seg));
+        ret.addRecordSegment(std::move(seg));
     }
     return ret;
 }

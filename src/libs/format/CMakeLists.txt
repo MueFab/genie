@@ -54,12 +54,18 @@ set(source_files
         mpegg_p2/raw_reference.cc
         mpegg_p2/raw_reference_sequence.cc
 
-        sam/sam-exporter.cc
-        sam/sam-importer.cc
-        sam/sam-file-reader.cc
-        sam/sam-line.cc
+        sam/sam-header.cc
         sam/sam-record.cc
+        sam/sam-header-info.cc
         sam/sam-tag.cc
+        sam/tag-number.cc
+        sam/tag-string.cc
+        sam/tag-string-list.cc
+        sam/tag-version.cc
+        sam/sam-importer.cc
+        sam/sam-reader.cc
+        sam/sam-exporter.cc
+        sam/sam-writer.cc
 
         mpegg_p1/dataset.cc
         mpegg_p1/dataset_header.cc

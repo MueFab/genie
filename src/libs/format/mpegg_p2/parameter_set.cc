@@ -161,7 +161,7 @@ namespace format {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-        void ParameterSet::addClass(mpegg_rec::MpeggRecord::ClassType class_id, std::unique_ptr<QvCodingConfig> conf) {
+        void ParameterSet::addClass(mpegg_rec::ClassType class_id, std::unique_ptr<QvCodingConfig> conf) {
             for (auto &a : descriptors) {
                 if (a->isClassSpecific()) {
                     UTILS_THROW_RUNTIME_EXCEPTION(

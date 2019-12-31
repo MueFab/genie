@@ -1,77 +1,70 @@
-#include "alignment.h"
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
+#include "alignment.h"
 #include <util/bitreader.h>
 #include <util/bitwriter.h>
-#include <util/make_unique.h>
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace format {
-    namespace mpegg_rec {
-        Alignment::Alignment(
-                std::unique_ptr<std::string> _ecigar_string,
-                uint8_t _reverse_comp
-        ) : ecigar_string(std::move(_ecigar_string)),
-            reverse_comp(_reverse_comp),
-            mapping_score() {
+namespace mpegg_rec {
 
-        }
+// ---------------------------------------------------------------------------------------------------------------------
 
-        Alignment::Alignment(
-                uint8_t as_depth,
-                util::BitReader *reader
-        ) {
-            ecigar_string = util::make_unique<std::string>(reader->read(24), '\0');
-            for (auto &c : *ecigar_string) {
-                c = reader->read(8);
-            }
+Alignment::Alignment(std::string &&_ecigar_string, uint8_t _reverse_comp)
+    : ecigar_string(std::move(_ecigar_string)), reverse_comp(_reverse_comp), mapping_score() {}
 
-            reverse_comp = reader->read(8);
-            for (size_t a = 0; a < as_depth; ++a) {
-                mapping_score.push_back(reader->read(32));
-            }
-        }
+// ---------------------------------------------------------------------------------------------------------------------
 
-        Alignment::Alignment(
-        ) : ecigar_string(),
-            reverse_comp(0),
-            mapping_score(0) {
+Alignment::Alignment(uint8_t as_depth, util::BitReader &reader) {
+    ecigar_string.resize(reader.read(24));
+    reader.read(ecigar_string);
 
-        }
-
-        size_t Alignment::getAsDepth() const {
-            return mapping_score.size();
-        }
-
-        void Alignment::addMappingScore(int32_t score) {
-            mapping_score.push_back(score);
-        }
-
-        int32_t Alignment::getMappingScore(size_t index) const {
-            return mapping_score[index];
-        }
-
-        const std::string* Alignment::getECigar() const {
-            return ecigar_string.get();
-        }
-
-        uint8_t Alignment::getRComp() const {
-            return this->reverse_comp;
-        }
-
-        void Alignment::write(util::BitWriter *writer) const {
-            writer->write(ecigar_string->length(), 24);
-            for (const auto &c : *ecigar_string) {
-                writer->write(c, 8);
-            }
-
-            writer->write(reverse_comp, 8);
-            for (const auto &q : mapping_score) {
-                writer->write(q, 32);
-            }
-        }
-
-        std::unique_ptr<Alignment> Alignment::clone() const {
-            //TODO
-            return std::unique_ptr<Alignment>();
-        }
+    reverse_comp = reader.read<uint8_t>();
+    for (size_t a = 0; a < as_depth; ++a) {
+        mapping_score.push_back(reader.read<int32_t>());
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Alignment::Alignment() : ecigar_string(), reverse_comp(0), mapping_score(0) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Alignment::addMappingScore(int32_t score) { mapping_score.push_back(score); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::vector<int32_t> &Alignment::getMappingScores() const { return mapping_score; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::string &Alignment::getECigar() const { return ecigar_string; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t Alignment::getRComp() const { return this->reverse_comp; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Alignment::write(util::BitWriter &writer) const {
+    writer.write(ecigar_string.length(), 24);
+    writer.write(ecigar_string);
+    writer.write(reverse_comp, 8);
+    for (const auto &q : mapping_score) {
+        writer.write(uint32_t(q), 32);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace mpegg_rec
+}  // namespace format
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

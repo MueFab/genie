@@ -23,6 +23,7 @@ class BlockPayloadSet {
     class TransformedPayload {
        private:
         gabac::DataBlock payloadData;  //!< @brief
+        size_t position;
 
        public:
         /**
@@ -35,7 +36,7 @@ class BlockPayloadSet {
          * @brief
          * @param _data
          */
-        explicit TransformedPayload(gabac::DataBlock* _data);
+        explicit TransformedPayload(gabac::DataBlock _data, size_t pos);
 
         /**
          * @brief
@@ -47,7 +48,9 @@ class BlockPayloadSet {
          * @brief
          * @param _data
          */
-        void swap(gabac::DataBlock* _data);
+        gabac::DataBlock&& move();
+
+        size_t getIndex() const { return position; }
     };
 
     /**
@@ -55,8 +58,8 @@ class BlockPayloadSet {
      */
     class SubsequencePayload {
        private:
-        std::vector<std::unique_ptr<TransformedPayload>> transformedPayloads;  //!< @brief
-        GenSubIndex id;                                                 //!< @brief
+        std::vector<TransformedPayload> transformedPayloads;  //!< @brief
+        GenSubIndex id;                                       //!< @brief
 
        public:
         /**
@@ -81,7 +84,7 @@ class BlockPayloadSet {
          * @brief
          * @param p
          */
-        void add(std::unique_ptr<TransformedPayload> p);
+        void add(TransformedPayload p);
 
         /**
          * @brief
@@ -93,7 +96,9 @@ class BlockPayloadSet {
          * @brief
          * @return
          */
-        const std::vector<std::unique_ptr<TransformedPayload>>& getTransformedPayloads() const;
+        std::vector<TransformedPayload>& getTransformedPayloads();
+
+        TransformedPayload& getTransformedPayload(size_t index) { return transformedPayloads[index]; }
     };
 
     /**
@@ -101,8 +106,8 @@ class BlockPayloadSet {
      */
     class DescriptorPayload {
        private:
-        std::vector<std::unique_ptr<SubsequencePayload>> subsequencePayloads;  //!< @brief
-        GenDesc id;                                                  //!< @brief
+        std::vector<SubsequencePayload> subsequencePayloads;  //!< @brief
+        GenDesc id;                                           //!< @brief
 
        public:
         /**
@@ -110,6 +115,8 @@ class BlockPayloadSet {
          * @param _id
          */
         explicit DescriptorPayload(GenDesc _id) : id(_id) {}
+
+        explicit DescriptorPayload() : id(GenDesc(0)) {}
 
         /**
          * @brief
@@ -127,7 +134,7 @@ class BlockPayloadSet {
          * @brief
          * @param p
          */
-        void add(std::unique_ptr<SubsequencePayload> p);
+        void add(SubsequencePayload p);
 
         /**
          * @brief
@@ -139,7 +146,7 @@ class BlockPayloadSet {
          * @brief
          * @return
          */
-        const std::vector<std::unique_ptr<SubsequencePayload>>& getSubsequencePayloads() const;
+        std::vector<SubsequencePayload>& getSubsequencePayloads();
     };
 
     /**
@@ -147,28 +154,28 @@ class BlockPayloadSet {
      * @param param
      * @param _record_num
      */
-    explicit BlockPayloadSet(std::unique_ptr<format::mpegg_p2::ParameterSet> param, size_t _record_num);
+    explicit BlockPayloadSet(format::mpegg_p2::ParameterSet param, size_t _record_num);
 
     /**
      * @brief
      * @param i
      * @param p
      */
-    void setPayload(GenDesc i, std::unique_ptr<DescriptorPayload> p);
+    void setPayload(GenDesc i, DescriptorPayload p);
 
     /**
      * @brief
      * @param i
      * @return
      */
-    DescriptorPayload* getPayload(GenDesc i);
+    DescriptorPayload& getPayload(GenDesc i);
 
     /**
      * @brief
      * @param i
      * @return
      */
-    std::unique_ptr<DescriptorPayload> movePayload(size_t i);
+    DescriptorPayload&& movePayload(size_t i);
 
     /**
      * @brief
@@ -180,31 +187,33 @@ class BlockPayloadSet {
      * @brief
      * @return
      */
-    format::mpegg_p2::ParameterSet* getParameters();
+    format::mpegg_p2::ParameterSet& getParameters();
 
     /**
      * @brief
      * @return
      */
-    const format::mpegg_p2::ParameterSet* getParameters() const;
+    const format::mpegg_p2::ParameterSet& getParameters() const;
 
     /**
      * @brief
      * @return
      */
-    std::unique_ptr<format::mpegg_p2::ParameterSet> moveParameters();
+    format::mpegg_p2::ParameterSet&& moveParameters();
 
     /**
      * @brief
      * @return
      */
-    const std::vector<std::unique_ptr<DescriptorPayload>>& getPayloads() const;
+    std::vector<DescriptorPayload>& getPayloads();
+
+    void clear() { *this = BlockPayloadSet(format::mpegg_p2::ParameterSet(), 0); }
 
    private:
-    std::vector<std::unique_ptr<DescriptorPayload>> desc_pay;  //!< @brief
+    std::vector<DescriptorPayload> desc_pay;  //!< @brief
 
-    size_t record_num;                                           //!< @brief
-    std::unique_ptr<format::mpegg_p2::ParameterSet> parameters;  //!< @brief
+    size_t record_num;                          //!< @brief
+    format::mpegg_p2::ParameterSet parameters;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

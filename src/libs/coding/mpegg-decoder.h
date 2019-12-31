@@ -8,10 +8,9 @@
 
 #include <util/source.h>
 
-class MpeggDecoder : public Source<std::unique_ptr<format::mpegg_rec::MpeggChunk>>,
-                     public Drain<std::unique_ptr<MpeggRawAu>> {
+class MpeggDecoder : public Source<format::mpegg_rec::MpeggChunk>, public Drain<MpeggRawAu> {
    public:
-    void flowIn(std::unique_ptr<MpeggRawAu> t, size_t id) override = 0;
+    void flowIn(MpeggRawAu&& t, size_t id) override = 0;
     void dryIn() override = 0;
     ~MpeggDecoder() override = default;
 };

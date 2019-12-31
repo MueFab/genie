@@ -8,10 +8,9 @@
 #include <util/drain.h>
 #include <util/source.h>
 
-class MpeggEncoder : public Drain<std::unique_ptr<format::mpegg_rec::MpeggChunk>>,
-                     public Source<std::unique_ptr<MpeggRawAu>> {
+class MpeggEncoder : public Drain<format::mpegg_rec::MpeggChunk>, public Source<MpeggRawAu> {
    public:
-    void flowIn(std::unique_ptr<format::mpegg_rec::MpeggChunk> t, size_t id) override = 0;
+    void flowIn(format::mpegg_rec::MpeggChunk&& t, size_t id) override = 0;
     void dryIn() override = 0;
     ~MpeggEncoder() override = default;
 };

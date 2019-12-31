@@ -1,40 +1,77 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #ifndef GENIE_META_ALIGNMENT_H
 #define GENIE_META_ALIGNMENT_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <util/bitreader.h>
+#include <util/bitwriter.h>
 #include <cstdint>
 #include <memory>
 
-namespace util {
-    class BitWriter;
-
-    class BitReader;
-}
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace format {
-    namespace mpegg_rec {
-        class MetaAlignment {
-            uint16_t seq_ID : 16;
-            uint8_t as_depth : 8;
+namespace mpegg_rec {
 
-        public:
-            MetaAlignment();
-            MetaAlignment(
-                    uint16_t _seq_ID,
-                    uint8_t _as_depth
-            );
+/**
+ *
+ */
+class MetaAlignment {
+    uint16_t seq_ID;   //!<
+    uint8_t as_depth;  //!<
 
-            explicit MetaAlignment(util::BitReader *reader);
+   public:
+    /**
+     *
+     */
+    MetaAlignment();
 
-            virtual void write(util::BitWriter *write) const;
+    /**
+     *
+     * @param _seq_ID
+     * @param _as_depth
+     */
+    MetaAlignment(uint16_t _seq_ID, uint8_t _as_depth);
 
-            uint16_t getSeqID() const;
+    /**
+     *
+     * @param reader
+     */
+    explicit MetaAlignment(util::BitReader &reader);
 
-            uint8_t getAsDepth() const;
+    /**
+     *
+     * @param write
+     */
+    virtual void write(util::BitWriter &write) const;
 
-            std::unique_ptr<MetaAlignment> clone() const;
-        };
-    }
-}
+    /**
+     *
+     * @return
+     */
+    uint16_t getSeqID() const;
 
+    /**
+     *
+     * @return
+     */
+    uint8_t getAsDepth() const;
+};
 
-#endif //GENIE_META_ALIGNMENT_H
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace mpegg_rec
+}  // namespace format
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#endif  // GENIE_META_ALIGNMENT_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

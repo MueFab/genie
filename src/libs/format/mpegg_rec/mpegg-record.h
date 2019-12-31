@@ -9,67 +9,37 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <util/bitreader.h>
+#include <util/bitwriter.h>
 #include <cstdint>
 #include <memory>
 #include <vector>
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-namespace util {
-class BitWriter;
-class BitReader;
-}  // namespace util
+#include "alignment-container.h"
+#include "class-type.h"
+#include "external-alignment.h"
+#include "meta-alignment.h"
+#include "segment.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace format {
 namespace mpegg_rec {
-class MetaAlignment;
-class Segment;
-class AlignmentContainer;
-class ExternalAlignment;
 
 /**
  *
  */
 class MpeggRecord {
-   public:
-    /**
-     *
-     */
-    enum class ClassType : uint8_t {
-        NONE = 0,      //!<
-        CLASS_P = 1,   //!<
-        CLASS_N = 2,   //!<
-        CLASS_M = 3,   //!<
-        CLASS_I = 4,   //!<
-        CLASS_HM = 5,  //!<
-        CLASS_U = 6    //!<
-    };
-
    private:
-    uint8_t number_of_template_segments : 8;  //!<
-    // uint8_t number_of_record_segments : 8; //!<
-    // uint16_t number_of_alignments : 16; //!<
-    ClassType class_ID;  //!<
-    // uint8_t read_group_len : 8; //!<
-    uint8_t read_1_first : 8;  //!<
-    // if(number_of_alignments > 0) //!<
-    std::unique_ptr<MetaAlignment> sharedAlignmentInfo;  //!<
-
-    //  for (rSeg=0; rSeg < number_of_record_segments; rSeg++) //!<
-    // std::vector<uint32_t> read_len; //: 24;  //!<
-
-    uint8_t qv_depth : 8;  //!<
-    // uint8_t read_name_len : 8; //!<
-    std::unique_ptr<std::string> read_name;   //!<
-    std::unique_ptr<std::string> read_group;  //!<
-    // for (rSeg=0; rSeg < number_of_record_segments; rSeg++) //!<
-    std::vector<std::unique_ptr<Segment>> reads;  //!<
-
-    // for (noa=0; noa < number_of_alignments; noa++) //!<
-    std::vector<std::unique_ptr<AlignmentContainer>> alignmentInfo;  //!<
-    uint8_t flags : 8;                                               //!<
+    uint8_t number_of_template_segments{};          //!<
+    ClassType class_ID{ClassType::NONE};            //!<
+    bool read_1_first{};                            //!<
+    MetaAlignment sharedAlignmentInfo;              //!<
+    uint8_t qv_depth{};                             //!<
+    std::string read_name;                          //!<
+    std::string read_group;                         //!<
+    std::vector<Segment> reads;                     //!<
+    std::vector<AlignmentContainer> alignmentInfo;  //!<
+    uint8_t flags{};                                //!<
 
     std::unique_ptr<ExternalAlignment> moreAlignmentInfo;  //!<
 
@@ -87,46 +57,65 @@ class MpeggRecord {
      * @param _read_group
      * @param _flags
      */
-    MpeggRecord(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::unique_ptr<std::string> _read_name,
-                std::unique_ptr<std::string> _read_group, uint8_t _flags);
-
-    /**
-     *
-     * @param reader
-     */
-    explicit MpeggRecord(util::BitReader* reader);
+    MpeggRecord(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::string&& _read_name,
+                std::string&& _read_group, uint8_t _flags);
 
     /**
      *
      * @param rec
      */
-    void addRecordSegment(std::unique_ptr<Segment> rec);
+    MpeggRecord(const MpeggRecord& rec);
+
+    /**
+     *
+     * @param rec
+     */
+    MpeggRecord(MpeggRecord&& rec) noexcept;
+
+    /**
+     *
+     */
+    ~MpeggRecord() = default;
+
+    /**
+     *
+     * @param rec
+     * @return
+     */
+    MpeggRecord& operator=(const MpeggRecord& rec);
+
+    /**
+     *
+     * @param rec
+     * @return
+     */
+    MpeggRecord& operator=(MpeggRecord&& rec) noexcept;
+
+    /**
+     *
+     * @param reader
+     */
+    explicit MpeggRecord(util::BitReader& reader);
+
+    /**
+     *
+     * @param rec
+     */
+    void addRecordSegment(Segment&& rec);
 
     /**
      *
      * @param _seq_id
      * @param rec
      */
-    void addAlignment(uint16_t _seq_id, std::unique_ptr<AlignmentContainer> rec);
+    void addAlignment(uint16_t _seq_id, AlignmentContainer&& rec);
 
     /**
      *
      * @param index
      * @return
      */
-    const Segment* getRecordSegment(size_t index) const;
-
-    /**
-     *
-     * @return
-     */
-    size_t getNumberOfRecords() const;
-
-    /**
-     *
-     * @return
-     */
-    size_t getNumberOfAlignments() const;
+    const std::vector<Segment>& getRecordSegments() const;
 
     /**
      *
@@ -139,13 +128,13 @@ class MpeggRecord {
      * @param index
      * @return
      */
-    const AlignmentContainer* getAlignment(size_t index) const;
+    const std::vector<AlignmentContainer>& getAlignments() const;
 
     /**
      *
      * @param writer
      */
-    virtual void write(util::BitWriter* writer) const;
+    virtual void write(util::BitWriter& writer) const;
 
     /**
      *
@@ -170,12 +159,30 @@ class MpeggRecord {
      * @return
      */
     const std::string& getReadName() const;
+
+    /**
+     *
+     * @return
+     */
+    const std::string& getGroupName() const {
+        return read_group;
+    }
+
+    const MetaAlignment& getMetaAlignment() const {
+        return sharedAlignmentInfo;
+    }
+
+    const ExternalAlignment& getExternalAlignmentInfo() const{
+        return *moreAlignmentInfo;
+    }
 };
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 /**
  *
  */
-typedef std::vector<std::unique_ptr<MpeggRecord>> MpeggChunk;
+typedef std::vector<MpeggRecord> MpeggChunk;
 
 // ---------------------------------------------------------------------------------------------------------------------
 

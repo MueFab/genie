@@ -1,44 +1,80 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #ifndef GENIE_SPLIT_ALIGNMENT_H
 #define GENIE_SPLIT_ALIGNMENT_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <util/bitreader.h>
+#include <util/bitwriter.h>
 #include <cstdint>
 #include <memory>
 
-namespace util {
-    class BitWriter;
-    class BitReader;
-}
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace format {
-    namespace mpegg_rec {
-        class SplitAlignment {
-        public:
-            enum class SplitAlignmentType : uint8_t {
-                SAME_REC = 0,
-                OTHER_REC = 1,
-                UNPAIRED = 2
-            };
+namespace mpegg_rec {
 
-            explicit SplitAlignment(SplitAlignmentType _split_alignment);
+/**
+ *
+ */
+class SplitAlignment {
+   public:
+    /**
+     *
+     */
+    enum class SplitAlignmentType : uint8_t { SAME_REC = 0, OTHER_REC = 1, UNPAIRED = 2 };
 
-            virtual ~SplitAlignment() = default;
+    /**
+     *
+     * @param _split_alignment
+     */
+    explicit SplitAlignment(SplitAlignmentType _split_alignment);
 
-            virtual void write(util::BitWriter *writer) const;
+    /**
+     *
+     */
+    virtual ~SplitAlignment() = default;
 
-            static std::unique_ptr<SplitAlignment> factory(uint8_t as_depth, util::BitReader *reader);
+    /**
+     *
+     * @param writer
+     */
+    virtual void write(util::BitWriter &writer) const;
 
-            virtual std::unique_ptr<SplitAlignment> clone () const = 0;
+    /**
+     *
+     * @param as_depth
+     * @param reader
+     * @return
+     */
+    static std::unique_ptr<SplitAlignment> factory(uint8_t as_depth, util::BitReader &reader);
 
-            SplitAlignmentType getType () const {
-                return split_alignment;
-            }
+    /**
+     *
+     * @return
+     */
+    virtual std::unique_ptr<SplitAlignment> clone() const = 0;
 
-        protected:
-            SplitAlignmentType split_alignment : 8;
+    /**
+     *
+     * @return
+     */
+    SplitAlignmentType getType() const;
 
-        };
-    }
-}
+   protected:
+    SplitAlignmentType split_alignment;  //!<
+};
+}  // namespace mpegg_rec
+}  // namespace format
 
+// ---------------------------------------------------------------------------------------------------------------------
 
-#endif //GENIE_SPLIT_ALIGNMENT_H
+#endif  // GENIE_SPLIT_ALIGNMENT_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

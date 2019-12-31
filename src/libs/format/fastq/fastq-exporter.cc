@@ -22,36 +22,37 @@ FastqExporter::FastqExporter(std::ostream *_file_1, std::ostream *_file_2) : fil
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FastqExporter::flowIn(std::unique_ptr<format::mpegg_rec::MpeggChunk> t, size_t id) {
+void FastqExporter::flowIn(format::mpegg_rec::MpeggChunk &&t, size_t id) {
+    format::mpegg_rec::MpeggChunk data = std::move(t);
     OrderedSection section(&lock, id);
-    for (auto &i : *t) {
-        for (size_t j = 0; j < i->getNumberOfRecords(); ++j) {
+    for (const auto &i : data) {
+        auto file_ptr = *file.data();
+        for (const auto &rec : i.getRecordSegments()) {
             // ID
             constexpr const char *ID_TOKEN = "@";
-            file[j]->write(ID_TOKEN, 1);
-            file[j]->write(i->getReadName().c_str(), i->getReadName().length());
-            file[j]->write("\n", 1);
+            file_ptr->write(ID_TOKEN, 1);
+            file_ptr->write(i.getReadName().c_str(), i.getReadName().length());
+            file_ptr->write("\n", 1);
 
             // Sequence
-            file[j]->write(i->getRecordSegment(j)->getSequence()->c_str(),
-                           i->getRecordSegment(j)->getSequence()->length());
-            file[j]->write("\n", 1);
+            file_ptr->write(rec.getSequence().c_str(), rec.getSequence().length());
+            file_ptr->write("\n", 1);
 
             // Reserved Line
             constexpr const char *RESERVED_TOKEN = "+";
-            file[j]->write(RESERVED_TOKEN, 1);
-            file[j]->write("\n", 1);
+            file_ptr->write(RESERVED_TOKEN, 1);
+            file_ptr->write("\n", 1);
 
             // Qualities
-            if (i->getRecordSegment(j)->getQvDepth()) {
-                file[j]->write(i->getRecordSegment(j)->getQuality(0)->c_str(),
-                               i->getRecordSegment(j)->getQuality(0)->length());
+            if (!rec.getQualities().empty()) {
+                file_ptr->write(rec.getQualities().front().c_str(), rec.getQualities().front().length());
             } else {
                 // Make up default quality values
-                std::string qual(i->getRecordSegment(j)->getSequence()->length(), '#');
-                file[j]->write(qual.c_str(), qual.length());
+                std::string qual(rec.getSequence().length(), '#');
+                file_ptr->write(qual.c_str(), qual.length());
             }
-            file[j]->write("\n", 1);
+            file_ptr->write("\n", 1);
+            file_ptr++;
         }
     }
 }
