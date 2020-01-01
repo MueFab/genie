@@ -154,13 +154,8 @@ void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileRea
                         if (descriptor == 11) {  // rname
                             continue;
                         }
-                        std::string name;
-                        if (descriptor == 14) { // quality
-                           // FIXME - check for preserve_quality?
-                           name = "quality_1." + std::to_string(block_num_thr);
-                        }
-                        else {
-                           name = file_subseq_prefix + "." + std::to_string(block_num_thr);
+                        if ((descriptor == 14) && (! cp.preserve_quality)) {
+                              continue;
                         }
                         for (size_t subdescriptor = 0;
                           subdescriptor < format::getDescriptorProperties()[descriptor].number_subsequences;
@@ -168,14 +163,27 @@ void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileRea
                             if (raw_data[descriptor][subdescriptor].size() == 0) {
                                 continue;
                             }
+                            std::string name;
                             const gabac::EncodingConfiguration *config;
-                            if ((st == NULL) || ((config = st->getConfig(
-                              name + "." + std::to_string(descriptor) + "."
-                              + std::to_string(subdescriptor))) == NULL)) {
+                            if (st == NULL) {
                                 config = &configs[descriptor][subdescriptor];
                             }
-                             gabac_compress(*config, &raw_data[descriptor][subdescriptor],
-                                            &generated_streams[descriptor][subdescriptor]);
+                            else {
+                                if (descriptor == 14) { // quality
+                                    name =  "quality_1";
+                                }
+                                else {
+                                    name = file_subseq_prefix + "."
+                                         + std::to_string(block_num_thr) + "."
+                                         + std::to_string(descriptor) + "."
+                                         + std::to_string(subdescriptor);
+                                }
+                                if ((st == NULL) || ((config = st->getConfig(name)) == NULL)) {
+                                    config = &configs[descriptor][subdescriptor];
+                                }
+                            }
+                            gabac_compress(*config, &raw_data[descriptor][subdescriptor],
+                                           &generated_streams[descriptor][subdescriptor]);
                         }
                     }
                     if (cp.preserve_id) {
