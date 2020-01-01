@@ -284,9 +284,8 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data, 
     }
 
     std::vector<uint32_t> num_reads_per_block(blocks);
-    uint64_t size = 0;
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for num_threads(data.cp.num_thr) schedule(dynamic) reduction(+:size)
+#pragma omp parallel for num_threads(data.cp.num_thr) schedule(dynamic)
 #endif
     for (uint64_t block_num = 0; block_num < blocks; block_num++) {
         auto raw_data = generate_empty_raw_data();
@@ -298,7 +297,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data, 
         compress_read_subseqs(raw_data, generated_streams, block_num, st, configs);
 
         std::string file_to_save_streams = temp_dir + "/read_streams." + std::to_string(block_num);
-        size += write_streams_to_file(generated_streams, file_to_save_streams, read_descriptors);
+        write_streams_to_file(generated_streams, file_to_save_streams, read_descriptors);
     }  // end omp parallel for
 
     // write num blocks, reads per block to a file
@@ -927,12 +926,10 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
     std::vector<uint32_t> num_reads_per_block(bdata.block_start.size());
     std::vector<uint32_t> num_records_per_block(bdata.block_start.size());
 
-    uint64_t size = 0;
-
     // PE step 4: Now generate read streams and compress blocks in parallel
 // this is actually number of read pairs per block for PE
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic) reduction(+:size)
+#pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic)
 #endif
     for (uint64_t cur_block_num = 0; cur_block_num < bdata.block_start.size(); cur_block_num++) {
         auto raw_data = generate_empty_raw_data();
@@ -944,7 +941,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
         compress_read_subseqs(raw_data, generated_streams, cur_block_num, st, configs);
 
         std::string file_to_save_streams = temp_dir + "/read_streams." + std::to_string(cur_block_num);
-        size += write_streams_to_file(generated_streams, file_to_save_streams, read_descriptors);
+        write_streams_to_file(generated_streams, file_to_save_streams, read_descriptors);
     }  // end omp parallel
 
     std::cout << "count_same_rec: " << std::accumulate(pest.count_same_rec.begin(), pest.count_same_rec.end(), 0)
