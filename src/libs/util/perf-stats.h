@@ -8,6 +8,8 @@
 #include <iostream>
 #include <string>
 
+#include "gabac/data-block.h"
+
 namespace util {
 
 class PerfStats {
@@ -36,6 +38,7 @@ class PerfStats {
 
     virtual ~PerfStats() = 0;
 
+    virtual void recordStreamSizes(const std::vector<std::vector<std::vector<gabac::DataBlock>>> &streams) = 0;
     virtual void printCompressionStats(void) = 0;
     virtual void printDecompressionStats(void) = 0;
 };
@@ -64,6 +67,7 @@ class FastqStats : public PerfStats {
 
     ~FastqStats(){};
 
+    void recordStreamSizes(const std::vector<std::vector<std::vector<gabac::DataBlock>>> &streams);
     void printCompressionStats(void);
     void printDecompressionStats(void);
 };

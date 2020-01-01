@@ -30,7 +30,7 @@ namespace spring {
 void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
                      const std::string &temp_dir, compression_params &cp,
                      dsg::StreamSaver *st, const std::string &outputFilePath,
-                     util::FastqStats *stats) {
+                     util::PerfStats *stats) {
     using namespace format;
     std::ofstream ofstr(outputFilePath);
     util::BitWriter bw(&ofstr);
@@ -43,7 +43,6 @@ void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileRea
     ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT,
                                               DataUnit::AuType::U_TYPE_AU, configs, true);
 
-    // FIXME - add in size written to stats->cmprs_total_sz
     ps.write(&bw);
 
     util::FastqFileReader *fastqFileReader[2] = {fastqFileReader1, fastqFileReader2};
@@ -209,7 +208,12 @@ void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileRea
 #ifdef GENIE_USE_OPENMP
 #pragma omp ordered
 #endif
-                    { au.write(&bw); }
+                    {
+                        if (stats != NULL) {
+                            stats->recordStreamSizes(generated_streams);
+                        }
+                        au.write(&bw);
+                    }
                 }  // if (!done_loop)
             }  // omp parallel for
 

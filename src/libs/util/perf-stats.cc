@@ -4,12 +4,48 @@
 #include <iostream>
 #include <string>
 
+#include "format/part2/clutter.h"
 #include "perf-stats.h"
 
 namespace util {
 
 PerfStats::~PerfStats(void) {
     // pure virtual ; can't be inlined
+}
+
+void FastqStats::recordStreamSizes(const std::vector<std::vector<std::vector<gabac::DataBlock>>> &streams) {
+    for (size_t descriptor = 0; descriptor < streams.size(); descriptor++) {
+        for (size_t subseq = 0; subseq < streams[descriptor].size(); subseq++) {
+            for (uint32_t db = 0; db < streams[descriptor][subseq].size(); db++) {
+                size_t size = streams[descriptor][subseq][db].size();
+                if (size == 0) {
+                    continue;
+                }
+                switch (descriptor) {
+                    default:
+                        // emit warning and fall through
+                        std:: cerr << "Unknown stream descriptor: " << descriptor << "\n";
+                        //throw std::runtime_error("Uknown stream descriptor.");
+                    case 0: /* pos */
+                    case 1: /* rcomp */
+                    case 3: /* flags */
+                    case 4: /* mmpos */
+                    case 6: /* ureads */
+                    case 7: /* rlen */
+                    case 12:
+                        cmprs_seq_sz += size;
+                        break;
+                    case 14 /* qv */:
+                        cmprs_qual_sz += size;
+                        break;
+                    case 15 /* rname */:
+                        cmprs_id_sz += size;
+                        break;
+                }
+                cmprs_total_sz += size;
+            }
+        }
+    }
 }
 
 void FastqStats::printCompressionStats(void) {

@@ -5,7 +5,6 @@
 #include <string>
 
 #include <genie/stream-saver.h>
-#include <util/perf-stats.h>
 #include "util.h"
 
 namespace spring {
@@ -30,22 +29,19 @@ void generate_read_streams(const std::string &temp_dir,
                            const compression_params &cp,
                            bool analyze,
                            dsg::StreamSaver *st,
-                           const std::vector<std::vector<gabac::EncodingConfiguration>> &configs,
-                           util::FastqStats *stats);
+                           const std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
 
 void generate_read_streams_se(const std::string &temp_dir,
                               const compression_params &cp,
                               bool analyze,
                               dsg::StreamSaver *st,
-                              const std::vector<std::vector<gabac::EncodingConfiguration>> &configs,
-                              util::FastqStats *stats);
+                              const std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
 
 void generate_read_streams_pe(const std::string &temp_dir,
                               const compression_params &cp,
                               bool analyze,
                               dsg::StreamSaver *st,
-                              const std::vector<std::vector<gabac::EncodingConfiguration>> &configs,
-                              util::FastqStats *stats);
+                              const std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
 
 }  // namespace spring
 
