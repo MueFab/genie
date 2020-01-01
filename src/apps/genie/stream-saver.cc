@@ -115,6 +115,7 @@ gabac::EncodingConfiguration *StreamSaver::getConfig(const std::string &name) {
     std::string configName = getConfigName(name);
     std::map<std::string, gabac::EncodingConfiguration>::iterator iter = configs.find(configName);
     if (iter == configs.end())  {
+        std::cerr << "Warning: cannot locate config file \"" << configName << "\", using default." << std::endl;
         return NULL;
     }
     return &configs.at(configName);  // FIXME - get value from iterator
