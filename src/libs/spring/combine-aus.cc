@@ -11,7 +11,7 @@
 
 namespace spring {
 
-void combine_aus(const std::string &temp_dir, compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::string &outputFilePath, util::FastqStats *stats) {
+void combine_aus(const std::string &temp_dir, compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::string &outputFilePath, util::PerfStats *stats) {
   using namespace format;
   std::ofstream ofstr(outputFilePath);
   util::BitWriter bw(&ofstr);
@@ -25,7 +25,6 @@ void combine_aus(const std::string &temp_dir, compression_params &cp, const std:
                                             DataUnit::AuType::U_TYPE_AU, configs, true);
   auto crps = make_unique<ParameterSetCrps>(ParameterSetCrps::CrAlgId::GLOBAL_ASSEMBLY);
   ps.setCrps(std::move(crps));
-  // FIXME add in size written to stats->cmprs_total_sz
   ps.write(&bw);
 
   // read info about number of blocks (AUs) and the number of reads and records in those
@@ -62,11 +61,14 @@ void combine_aus(const std::string &temp_dir, compression_params &cp, const std:
       filename = quality_desc_prefix + std::to_string(auId);
       read_streams_from_file(generated_streams, filename, quality_descriptors);
     }
+    // update stats
+    if (stats != NULL) {
+        stats->recordStreamSizes(generated_streams);
+    }
     // create and write AU
     AccessUnit au = createQuickAccessUnit(
         auId, PARAMETER_SET_ID, num_reads_per_AU[auId], DataUnit::AuType::U_TYPE_AU,
         DataUnit::DatasetType::NON_ALIGNED, &generated_streams, num_records_per_AU[auId]);
-    // FIXME add in size written to stats
     au.write(&bw);
   }
 }

@@ -30,7 +30,7 @@ void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::Fast
                              int num_thr, bool paired_end, const std::string &working_dir,
                              bool analyze, dsg::StreamSaver *st,
                              const std::string &outputFilePath, bool ureads_flag, bool preserve_quality,
-                             bool preserve_id, util::FastqStats *stats) {
+                             bool preserve_id, util::PerfStats *stats) {
 #ifdef GENIE_USE_OPENMP
     std::cout << "SPRING: built with OpenMP" << std::endl;
 #else
@@ -122,7 +122,7 @@ void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::Fast
 
         std::cout << "Generating read streams ...\n";
         auto grs_start = std::chrono::steady_clock::now();
-        generate_read_streams(temp_dir, cp, analyze, st, configs, stats);
+        generate_read_streams(temp_dir, cp, analyze, st, configs);
         auto grs_end = std::chrono::steady_clock::now();
         std::cout << "Generating read streams done!\n";
         std::cout << "Time for this step: "
@@ -155,7 +155,7 @@ void generate_streams_SPRING(util::FastqFileReader *fastqFileReader1, util::Fast
         if (preserve_quality || preserve_id) {
             std::cout << "Reordering and compressing quality and/or ids ...\n";
             auto rcqi_start = std::chrono::steady_clock::now();
-            reorder_compress_quality_id(temp_dir, cp, analyze, st, configs, stats);
+            reorder_compress_quality_id(temp_dir, cp, analyze, st, configs);
             auto rcqi_end = std::chrono::steady_clock::now();
             std::cout << "Reordering and compressing quality and/or ids done!\n";
             std::cout << "Time for this step: "

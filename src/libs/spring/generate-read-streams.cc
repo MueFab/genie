@@ -22,11 +22,11 @@
 
 namespace spring {
 
-void generate_read_streams(const std::string &temp_dir, const compression_params &cp, bool analyze, dsg::StreamSaver *st, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs, util::FastqStats *stats) {
+void generate_read_streams(const std::string &temp_dir, const compression_params &cp, bool analyze, dsg::StreamSaver *st, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs) {
     if (!cp.paired_end)
-        generate_read_streams_se(temp_dir, cp, analyze, st, configs, stats);
+        generate_read_streams_se(temp_dir, cp, analyze, st, configs);
     else
-        generate_read_streams_pe(temp_dir, cp, analyze, st, configs, stats);
+        generate_read_streams_pe(temp_dir, cp, analyze, st, configs);
 }
 
 void compress_read_subseqs(std::vector<std::vector<gabac::DataBlock>> &raw_data,
@@ -268,7 +268,7 @@ void analyze_subseqs(size_t num_thr, subseq_data *data, dsg::StreamSaver *st) {
     st->reloadConfigSet();
 }
 
-void generate_and_compress_se(const std::string &temp_dir, const se_data &data, bool analyze, dsg::StreamSaver *st,  const std::vector<std::vector<gabac::EncodingConfiguration>> &configs, util::FastqStats *stats) {
+void generate_and_compress_se(const std::string &temp_dir, const se_data &data, bool analyze, dsg::StreamSaver *st,  const std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
 
     // Now generate new streams and compress blocks in parallel
     // this is actually number of read pairs per block for PE
@@ -301,22 +301,12 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data, 
         size += write_streams_to_file(generated_streams, file_to_save_streams, read_descriptors);
     }  // end omp parallel for
 
-    if (stats->enabled) {
-       stats->cmprs_seq_sz += size;
-       stats->cmprs_total_sz += size;
-    }
-
     // write num blocks, reads per block to a file
     const std::string block_info_file = temp_dir + "/block_info.bin";
     std::ofstream f_block_info(block_info_file, std::ios::binary);
     uint32_t num_blocks = (uint32_t)blocks;
     f_block_info.write((char*)&num_blocks, sizeof(uint32_t));
     f_block_info.write((char*)&num_reads_per_block[0],num_blocks*sizeof(uint32_t));
-    if (stats->enabled) {
-       stats->cmprs_total_sz += (num_blocks+1)*sizeof(uint32_t);
-    }
-
-    return;
 }
 
 void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data) {
@@ -430,14 +420,11 @@ void generate_read_streams_se(const std::string &temp_dir,
                               const compression_params &cp,
                               bool analyze,
                               dsg::StreamSaver *st,
-                              const std::vector<std::vector<gabac::EncodingConfiguration>> &configs,
-                              util::FastqStats *stats) {
+                              const std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
     se_data data;
     loadSE_Data(cp, temp_dir, &data);
 
-    generate_and_compress_se(temp_dir, data, analyze, st, configs, stats);
-
-    return;
+    generate_and_compress_se(temp_dir, data, analyze, st, configs);
 }
 
 void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data) {
@@ -898,7 +885,7 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
     }
 }
 
-void generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp, bool analyze, dsg::StreamSaver *st, const std::vector<std::vector<gabac::EncodingConfiguration>> &configs, util::FastqStats *stats) {
+void generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp, bool analyze, dsg::StreamSaver *st, const std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
     // basic approach: start looking at reads from left to right. If current is
     // aligned but pair is unaligned, pair is kept at the end current AU and
     // stored in different record. We try to keep number of records in AU =
@@ -960,11 +947,6 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
         size += write_streams_to_file(generated_streams, file_to_save_streams, read_descriptors);
     }  // end omp parallel
 
-    if (stats->enabled) {
-       stats->cmprs_seq_sz += size;
-       stats->cmprs_total_sz += size;
-    }
-
     std::cout << "count_same_rec: " << std::accumulate(pest.count_same_rec.begin(), pest.count_same_rec.end(), 0)
               << "\n";
     std::cout << "count_split_same_AU: "
@@ -979,10 +961,6 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
     f_block_info.write((char*)&num_blocks, sizeof(uint32_t));
     f_block_info.write((char*)&num_reads_per_block[0],num_blocks*sizeof(uint32_t));
     f_block_info.write((char*)&num_records_per_block[0],num_blocks*sizeof(uint32_t));
-    if (stats->enabled) {
-       stats->cmprs_total_sz += (2*num_blocks+1)*sizeof(uint32_t);
-    }
-    return;
 }
 
 }  // namespace spring
