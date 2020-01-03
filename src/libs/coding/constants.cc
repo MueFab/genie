@@ -94,7 +94,7 @@ const std::vector<GenomicDescriptorProperties> &getDescriptors() {
          false,
          {{GenSub::MMTYPE_TYPE, "type"},
           {GenSub::MMTYPE_SUBSTITUTION, "substitution"},
-          {GenSub::MMTYPE_SUBSTITUTION, "insertion"}}},
+          {GenSub::MMTYPE_INSERTION, "insertion"}}},
 
         {GenDesc::CLIPS,
          "clips",

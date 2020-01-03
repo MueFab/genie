@@ -44,7 +44,7 @@ BlockPayloadSet::SubsequencePayload GabacCompressor::compress(const gabac::Encod
 // ---------------------------------------------------------------------------------------------------------------------
 
 void GabacCompressor::flowIn(MpeggRawAu&& t, size_t id) {
-    MpeggRawAu&& raw_aus = std::move(t);
+    MpeggRawAu raw_aus = std::move(t);
     auto payload = BlockPayloadSet(raw_aus.moveParameters(), raw_aus.getNumRecords());
 
     for (const auto &desc : raw_aus.getDescriptorStreams()) {
