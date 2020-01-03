@@ -14,6 +14,8 @@ set(source_files
         genie-gabac-output-stream.cc
         spring-encoder.cc
         gabac-seq-conf-set.cc
+        local-assembly-decoder.cc
+        read-decoder.cc
         )
 
 add_library(coding ${source_files})

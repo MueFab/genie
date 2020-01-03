@@ -49,6 +49,9 @@ void LocalAssemblyReadEncoder::encodeFirstSegment(const format::mpegg_rec::Mpegg
 
     const auto MSCORE = ALIGNMENT.getAlignment().getMappingScores().front();  // TODO: Multiple mapping scores
     container.push(GenSub::MSCORE, MSCORE);
+
+    const auto RGROUP = 0; // TODO
+    container.push(GenSub::RGROUP, RGROUP);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -113,6 +116,8 @@ void LocalAssemblyReadEncoder::add(const format::mpegg_rec::MpeggRecord &rec, co
     }
 
     encodeClips(clips);
+
+    container.addRecord();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -142,7 +147,7 @@ void LocalAssemblyReadEncoder::encodeDeletion(CodingState &state) {
         const auto POSITION = state.read_pos - state.lastMisMatch;
         state.lastMisMatch = state.read_pos;
         container.push(GenSub::MMPOS_POSITION, POSITION);
-        container.push(GenSub::MMPOS_POSITION, GenConst::MMTYPE_DELETION);
+        container.push(GenSub::MMTYPE_TYPE, GenConst::MMTYPE_DELETION);
         state.ref_offset++;
     }
 }
@@ -151,7 +156,6 @@ void LocalAssemblyReadEncoder::encodeDeletion(CodingState &state) {
 
 void LocalAssemblyReadEncoder::encodeHardClip(CodingState &state) {
     state.clips.hardClips[state.isRightClip] += state.count;
-    state.ref_offset += state.count;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -300,11 +304,7 @@ bool LocalAssemblyReadEncoder::encodeSingleClip(const ClipInformation &inf, bool
     }
 
     for (size_t index = 0; index < inf.softClips.size(); ++index) {
-        if (inf.hardClips[index]) {
-            const auto TYPE = 0x4u | (uint32_t(last) << 1u) | index;
-            container.push(GenSub::CLIPS_TYPE, TYPE);
-            container.push(GenSub::CLIPS_HARD_LENGTH, inf.hardClips[index]);
-        } else if (!inf.softClips[index].empty()) {
+        if (!inf.softClips[index].empty()) {
             const auto TYPE = (uint32_t(last) << 1u) | index;
             container.push(GenSub::CLIPS_TYPE, TYPE);
             for (const auto &c : inf.softClips[index]) {
@@ -312,6 +312,10 @@ bool LocalAssemblyReadEncoder::encodeSingleClip(const ClipInformation &inf, bool
             }
             const auto TERMINATOR = getAlphabetProperties(AlphabetID::ACGTN).lut.size();  // TODO: other alphabets
             container.push(GenSub::CLIPS_SOFT_STRING, TERMINATOR);
+        } else if (inf.hardClips[index]) {
+            const auto TYPE = 0x4u | (uint32_t(last) << 1u) | index;
+            container.push(GenSub::CLIPS_TYPE, TYPE);
+            container.push(GenSub::CLIPS_HARD_LENGTH, inf.hardClips[index]);
         }
     }
 
@@ -328,7 +332,7 @@ void LocalAssemblyReadEncoder::encodeClips(const std::pair<ClipInformation, Clip
         container.push(GenSub::CLIPS_TYPE, GenConst::CLIPS_RECORD_END);
     }
 
-    readCounter += 2;  // TODO: Check if this applies to unpaired situations
+    readCounter += 1;  // TODO: Check if this applies to unpaired situations
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

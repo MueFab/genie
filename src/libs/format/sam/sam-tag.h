@@ -33,6 +33,7 @@ class TagBase {
     explicit TagBase(std::string _name);
     const std::string& getName() const;
     virtual std::string toString() const = 0;
+    virtual ~TagBase() = default;
 };
 
 const std::vector<std::string>& getSortingOrderString();

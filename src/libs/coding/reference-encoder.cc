@@ -10,6 +10,7 @@
 #include <format/mpegg_rec/segment.h>
 #include <limits>
 #include <map>
+#include "constants.h"
 #include "util/exceptions.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -28,19 +29,21 @@ std::string LocalAssemblyReferenceEncoder::preprocess(const std::string &read, c
     size_t count = 0;
     size_t read_pos = 0;
 
-    for (size_t cigar_pos = 0; cigar_pos < cigar.length(); ++cigar_pos) {
-        if (cigar[cigar_pos] >= '0' && cigar[cigar_pos] <= '9') {
+    for (char cigar_pos : cigar) {
+        if (std::isdigit(cigar_pos)) {
             count *= 10;
-            count += cigar[cigar_pos] - '0';
+            count += cigar_pos - '0';
             continue;
         }
-        switch (cigar[cigar_pos]) {
+        if(cigar_pos == '(' || cigar_pos == '[') {
+            continue;
+        }
+        if (getAlphabetProperties(AlphabetID::ACGTN).isIncluded(cigar_pos) && count == 0) {
+            result += read[read_pos++];
+            continue;
+        }
+        switch (cigar_pos) {
             case '=':
-            case 'A':
-            case 'C':
-            case 'T':
-            case 'G':
-            case 'N':
                 for (size_t i = 0; i < count; ++i) {
                     if (read_pos >= read.length()) {
                         UTILS_THROW_RUNTIME_EXCEPTION("CIGAR and Read lengths do not match");
@@ -50,11 +53,17 @@ std::string LocalAssemblyReferenceEncoder::preprocess(const std::string &read, c
                 break;
 
             case '+':
+            case ')':
                 read_pos += count;
+                break;
+
+            case ']':
                 break;
 
             case '-':
             case '*':
+            case '/':
+            case '%':
                 for (size_t i = 0; i < count; ++i) {
                     result += '0';
                 }
@@ -71,12 +80,10 @@ std::string LocalAssemblyReferenceEncoder::preprocess(const std::string &read, c
     return result;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void LocalAssemblyReferenceEncoder::addRead(const format::mpegg_rec::MpeggRecord &s) {
-    sequence_positions.push_back(s.getAlignments().front().getPosition());
-    std::string read =
-        preprocess(s.getRecordSegments().front().getSequence(), s.getAlignments().front().getAlignment().getECigar());
+void LocalAssemblyReferenceEncoder::addSingleRead(const std::string &record, const std::string &ecigar,
+                                                  uint64_t position) {
+    sequence_positions.push_back(position);
+    std::string read = preprocess(record, ecigar);
     sequences.push_back(read);
     crBufSize += read.length();
 
@@ -89,32 +96,32 @@ void LocalAssemblyReferenceEncoder::addRead(const format::mpegg_rec::MpeggRecord
         sequences.erase(sequences.begin());
         sequence_positions.erase(sequence_positions.begin());
     }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void LocalAssemblyReferenceEncoder::addRead(const format::mpegg_rec::MpeggRecord &s) {
+    const auto &seq1 = s.getRecordSegments().front().getSequence();
+    const auto &cigar1 = s.getAlignments().front().getAlignment().getECigar();
+    const auto pos1 = s.getAlignments().front().getPosition();
+    addSingleRead(seq1, cigar1, pos1);
 
     if (s.getRecordSegments().size() == 1) {
         return;
     }
 
-    const format::mpegg_rec::SplitAlignmentSameRec *rec;
-    if (s.getAlignments().front().getSplitAlignments().front()->getType() ==
+    if (s.getAlignments().front().getSplitAlignments().front()->getType() !=
         format::mpegg_rec::SplitAlignment::SplitAlignmentType::SAME_REC) {
-        rec = dynamic_cast<const format::mpegg_rec::SplitAlignmentSameRec *>(s.getAlignments().front().getSplitAlignments().front().get());
-    } else {
         UTILS_DIE("Only same record split alignments supported");
     }
-    sequence_positions.push_back(s.getAlignments().front().getPosition() + rec->getDelta());
-    read = preprocess(s.getRecordSegments()[1].getSequence(), rec->getAlignment().getECigar());
-    sequences.push_back(read);
-    crBufSize += read.length();
 
-    while (crBufSize > cr_buf_max_size) {
-        if (sequences.size() == 1) {
-            UTILS_THROW_RUNTIME_EXCEPTION("Read too long for current cr_buf_max_size");
-        }
-        // Erase oldest read
-        crBufSize -= sequences.front().length();
-        sequences.erase(sequences.begin());
-        sequence_positions.erase(sequence_positions.begin());
-    }
+    const auto ptr = s.getAlignments().front().getSplitAlignments().front().get();
+    const auto &rec = dynamic_cast<const format::mpegg_rec::SplitAlignmentSameRec &>(*ptr);
+
+    const auto &seq2 = s.getRecordSegments()[1].getSequence();
+    const auto &cigar2 = rec.getAlignment().getECigar();
+    const auto pos2 = s.getAlignments().front().getPosition() + rec.getDelta();
+    addSingleRead(seq2, cigar2, pos2);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -132,23 +139,32 @@ std::string LocalAssemblyReferenceEncoder::generateRef(uint32_t offset, uint32_t
 uint32_t LocalAssemblyReferenceEncoder::lengthFromCigar(const std::string &cigar) {
     uint32_t len = 0;
     uint32_t count = 0;
-    for (size_t cigar_pos = 0; cigar_pos < cigar.length(); ++cigar_pos) {
-        if (cigar[cigar_pos] >= '0' && cigar[cigar_pos] <= '9') {
+    for (char cigar_pos : cigar) {
+        if (std::isdigit(cigar_pos)) {
             count *= 10;
-            count += cigar[cigar_pos] - '0';
+            count += cigar_pos - '0';
             continue;
         }
-        switch (cigar[cigar_pos]) {
+        if(cigar_pos == '(' || cigar_pos == '[') {
+            continue;
+        }
+        if (getAlphabetProperties(AlphabetID::ACGTN).isIncluded(cigar_pos) && count == 0) {
+            len += 1;
+            continue;
+        }
+        switch (cigar_pos) {
             case '=':
             case '-':
+            case '*':
+            case '/':
+            case '%':
                 len += count;
                 count = 0;
                 break;
 
-            case 'I':
-            case 'S':
-            case 'P':
-            case 'H':
+            case '+':
+            case ')':
+            case ']':
                 count = 0;
                 break;
             default:

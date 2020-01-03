@@ -30,12 +30,14 @@ class LocalAssemblyReferenceEncoder {
 
     char majorityVote(uint32_t offset_to_first);
 
-    std::string preprocess(const std::string &read, const std::string &cigar);
+    static std::string preprocess(const std::string &read, const std::string &cigar);
 
-    uint32_t lengthFromCigar(const std::string &cigar);
+    static uint32_t lengthFromCigar(const std::string &cigar);
 
    public:
     explicit LocalAssemblyReferenceEncoder(uint32_t _cr_buf_max_size);
+
+    void addSingleRead(const std::string &record, const std::string &ecigar, uint64_t position);
 
     void addRead(const format::mpegg_rec::MpeggRecord &s);
 

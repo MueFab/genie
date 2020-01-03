@@ -40,6 +40,10 @@ namespace format {
 
             void setCrpsInfo(std::unique_ptr<CrpsInfo> _crps_info);
 
+            const CrpsInfo& getCrpsInfo() const {
+                return *crps_info;
+            }
+
             virtual void write(util::BitWriter *bw) const;
         };
     }

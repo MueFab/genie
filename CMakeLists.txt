@@ -43,6 +43,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") # GNU Compiler Collection
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wshadow")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     #
 elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # Apple Clang or LLVM Clang
     #

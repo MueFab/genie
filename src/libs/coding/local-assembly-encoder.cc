@@ -46,12 +46,12 @@ void LocalAssemblyEncoder::printDebug(const LocalAssemblyEncoder::LaeState& stat
 // ---------------------------------------------------------------------------------------------------------------------
 
 void LocalAssemblyEncoder::updateAssembly(const format::mpegg_rec::MpeggRecord& r,
-                                          const format::mpegg_rec::SplitAlignmentSameRec& srec,
                                           LocalAssemblyEncoder::LaeState& state) const {
     std::string ref1 = state.refCoder.getReference(r.getAlignments().front().getPosition(),
                                                     r.getAlignments().front().getAlignment().getECigar());
     std::string ref2;
     if (state.pairedEnd) {
+        const auto& srec = getPairedAlignment(state, r);
         ref2 = state.refCoder.getReference(r.getAlignments().front().getPosition() + srec.getDelta(),
                                             srec.getAlignment().getECigar());
     }
@@ -106,6 +106,9 @@ MpeggRawAu LocalAssemblyEncoder::pack(size_t id, LocalAssemblyEncoder::LaeState&
                                                                  state.pairedEnd, false, 0, 0, false, false);
     const auto ALPHABET = format::mpegg_p2::qv_coding1::QvCodingConfig1::QvpsPresetId::ASCII;
     ret.addClass(state.classType, util::make_unique<format::mpegg_p2::qv_coding1::QvCodingConfig1>(ALPHABET, false));
+    auto crps = util::make_unique<format::mpegg_p2::ParameterSetCrps>(format::mpegg_p2::ParameterSetCrps::CrAlgId::LOCAL_ASSEMBLY);
+    crps->setCrpsInfo(util::make_unique<format::mpegg_p2::CrpsInfo>(0, cr_buf_max_size));
+    ret.setCrps(std::move(crps));
 
     auto rawAU = state.readCoder.moveStreams();
 
@@ -126,9 +129,7 @@ void LocalAssemblyEncoder::flowIn(format::mpegg_rec::MpeggChunk&& t, size_t id) 
     for (auto& r : data) {
         updateGuesses(r, state);
 
-        const auto& srec = getPairedAlignment(state, r);
-
-        updateAssembly(r, srec, state);
+        updateAssembly(r, state);
     }
 
     auto rawAU = pack(id, state);

@@ -25,6 +25,10 @@ namespace format {
 
             virtual ~CrpsInfo() = default;
 
+            uint32_t getBufMaxSize() const {
+                return cr_buf_max_size;
+            }
+
             virtual void write(util::BitWriter *writer) const;
         };
     }

@@ -39,6 +39,8 @@ class SamRecord {
     SamRecord(std::string _qname, uint16_t _flag, std::string _rname, uint32_t _pos, uint8_t _mapq, std::string _cigar,
               std::string _rnext, uint32_t _pnext, int32_t _tlen, std::string _seq, std::string _qual);
 
+    SamRecord() : SamRecord("", 0, "", 0, 0, "", "", 0, 0, "", "") {}
+
     explicit SamRecord(const std::string& string);
 
     void check() const;

@@ -54,8 +54,7 @@ class LocalAssemblyEncoder : public MpeggEncoder {
      * @param srec Paired alignment extracted from the record
      * @param state Current local assembly state
      */
-    void updateAssembly(const format::mpegg_rec::MpeggRecord& r, const format::mpegg_rec::SplitAlignmentSameRec& srec,
-                        LocalAssemblyEncoder::LaeState& state) const;
+    void updateAssembly(const format::mpegg_rec::MpeggRecord& r, LocalAssemblyEncoder::LaeState& state) const;
 
     /**
      * @brief Checks if there is an additional alignment available and converts it into the correct format
