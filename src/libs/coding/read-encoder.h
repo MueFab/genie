@@ -41,11 +41,11 @@ class LocalAssemblyReadEncoder {
     };
 
     ClipInformation encodeCigar(const std::string &read, const std::string &cigar, const std::string &ref,
-                      format::mpegg_rec::ClassType type);
+                                format::mpegg_rec::ClassType type);
 
     bool encodeSingleClip(const ClipInformation &inf, bool last);
 
-    void encodeClips(const std::pair<ClipInformation, ClipInformation>& clips);
+    void encodeClips(const std::pair<ClipInformation, ClipInformation> &clips);
 
     struct CodingState {
         CodingState(const std::string &_read, const std::string &_ref, format::mpegg_rec::ClassType _type)
@@ -96,7 +96,7 @@ class LocalAssemblyReadEncoder {
 
     void add(const format::mpegg_rec::MpeggRecord &rec, const std::string &ref1, const std::string &ref2);
 
-    MpeggRawAu&& moveStreams();
+    MpeggRawAu &&moveStreams();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

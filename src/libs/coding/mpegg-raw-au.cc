@@ -11,7 +11,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MpeggRawAu::SubDescriptor::SubDescriptor(size_t wordsize, GenSubIndex _id) : data(0, wordsize), position(0), id(std::move(_id)) {}
+MpeggRawAu::SubDescriptor::SubDescriptor(size_t wordsize, GenSubIndex _id)
+    : data(0, wordsize), position(0), id(std::move(_id)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,11 +29,11 @@ void MpeggRawAu::SubDescriptor::inc() { position++; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t MpeggRawAu::SubDescriptor::get() const { return data.get(position); }
+uint64_t MpeggRawAu::SubDescriptor::get(size_t lookahead) const { return data.get(position + lookahead); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool MpeggRawAu::SubDescriptor::end() const { return data.size() == position; }
+bool MpeggRawAu::SubDescriptor::end() const { return data.size() <= position; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -56,11 +57,11 @@ GenDesc MpeggRawAu::Descriptor::getID() const { return id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MpeggRawAu::Descriptor::add(SubDescriptor&& sub) { subdesc.push_back(std::move(sub)); }
+void MpeggRawAu::Descriptor::add(SubDescriptor &&sub) { subdesc.push_back(std::move(sub)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MpeggRawAu::Descriptor::set(uint8_t _id, SubDescriptor&& sub) { subdesc[uint8_t(_id)] = std::move(sub); }
+void MpeggRawAu::Descriptor::set(uint8_t _id, SubDescriptor &&sub) { subdesc[uint8_t(_id)] = std::move(sub); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -88,13 +89,13 @@ const std::vector<MpeggRawAu::Descriptor> &MpeggRawAu::getDescriptorStreams() co
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MpeggRawAu::set(GenSubIndex sub, SubDescriptor&& data) {
+void MpeggRawAu::set(GenSubIndex sub, SubDescriptor &&data) {
     descriptors[uint8_t(sub.first)].set(sub.second, std::move(data));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MpeggRawAu::MpeggRawAu(format::mpegg_p2::ParameterSet&& set, size_t _numRecords)
+MpeggRawAu::MpeggRawAu(format::mpegg_p2::ParameterSet &&set, size_t _numRecords)
     : descriptors(), parameters(std::move(set)), numRecords(_numRecords) {
     const size_t WORDSIZE = 4;
     for (const auto &desc : getDescriptors()) {
@@ -108,7 +109,7 @@ MpeggRawAu::MpeggRawAu(format::mpegg_p2::ParameterSet&& set, size_t _numRecords)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MpeggRawAu::setParameters(format::mpegg_p2::ParameterSet&& _parameters) { parameters = std::move(_parameters); }
+void MpeggRawAu::setParameters(format::mpegg_p2::ParameterSet &&_parameters) { parameters = std::move(_parameters); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

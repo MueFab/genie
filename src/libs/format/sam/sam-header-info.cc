@@ -56,7 +56,7 @@ const std::vector<HeaderLineInfo>& getHeaderInfo() {
         {"PG",
          {{"ID", true, getSAMRegex(), &TagString::fromString},
           {"PN", false, getSAMRegex(), &TagString::fromString},
-          {"CL", false, getSAMRegex(), &TagString::fromString},
+          {"CL", false, "", &TagString::fromString},
           {"PP", false, getSAMRegex(), &TagString::fromString},
           {"DS", false, getSAMRegex(), &TagString::fromString},
           {"VN", false, getSAMRegex(), &TagString::fromString}}}};

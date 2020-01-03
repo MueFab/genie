@@ -57,7 +57,7 @@ class MpeggRawAu {
          * @brief
          * @return
          */
-        uint64_t get() const;
+        uint64_t get(size_t lookahead = 0) const;
 
         /**
          * @brief
@@ -76,6 +76,13 @@ class MpeggRawAu {
          * @return
          */
         GenSubIndex getID() const;
+
+        uint64_t pull() {
+            if(end()) {
+                UTILS_DIE("Tried to read descriptor that has already ended");
+            }
+            return data.get(position++);
+        }
     };
 
     /**
@@ -165,6 +172,17 @@ class MpeggRawAu {
      */
     void push(GenSubIndex sub, uint64_t value) { get(sub).push(value); }
 
+    bool isEnd(GenSubIndex sub) { return get(sub).end(); }
+
+    uint64_t peek(GenSubIndex sub, size_t lookahead = 0) { return get(sub).get(lookahead); }
+
+    /**
+     *
+     * @param sub
+     * @return
+     */
+    uint64_t pull(GenSubIndex sub) { return get(sub).pull(); }
+
     /**
      * @brief
      * @return
@@ -207,9 +225,9 @@ class MpeggRawAu {
      */
     size_t getNumRecords() const;
 
-    void clear() {
-        *this = MpeggRawAu(format::mpegg_p2::ParameterSet(), 0);
-    }
+    void clear() { *this = MpeggRawAu(format::mpegg_p2::ParameterSet(), 0); }
+
+    void addRecord() { numRecords++; }
 
    private:
     std::vector<Descriptor> descriptors;        //!< @brief

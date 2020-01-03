@@ -101,7 +101,11 @@ class SamExporter : public Drain<format::mpegg_rec::MpeggChunk> {
         Stash ret;
         ret.position = alignment.getPosition();
         ret.seq = rec.getRecordSegments().front().getSequence();
-        ret.qual = rec.getRecordSegments().front().getQualities().front();
+        if (rec.getRecordSegments().front().getQualities().empty()) {
+            ret.qual = "*";
+        } else {
+            ret.qual = rec.getRecordSegments().front().getQualities().front();
+        }
         ret.cigar = eCigar2Cigar(alignment.getAlignment().getECigar());
         ret.mappingScore = alignment.getAlignment().getMappingScores().front();
         ret.rcomp = alignment.getAlignment().getRComp();
@@ -131,12 +135,17 @@ class SamExporter : public Drain<format::mpegg_rec::MpeggChunk> {
         std::string cigar;
         cigar.reserve(ecigar.size());
         size_t mismatchCount = 0;
+        std::string mismatchDigits;
         for (const auto& c : ecigar) {
             if ((c == '[') || (c == '(')) {
                 continue;
             }
             if (std::isdigit(c)) {
-                cigar.push_back(c);
+                if (mismatchCount) {
+                    mismatchDigits += c;
+                } else {
+                    cigar.push_back(c);
+                }
                 continue;
             }
             if (getAlphabetProperties(AlphabetID::ACGTN).isIncluded(c)) {
@@ -144,6 +153,8 @@ class SamExporter : public Drain<format::mpegg_rec::MpeggChunk> {
             } else {
                 if (mismatchCount) {
                     cigar += std::to_string(mismatchCount) + 'X';
+                    cigar += mismatchDigits;
+                    mismatchDigits.clear();
                     mismatchCount = 0;
                 }
                 cigar.push_back(convertECigar2CigarChar(c));
@@ -194,14 +205,16 @@ class SamExporter : public Drain<format::mpegg_rec::MpeggChunk> {
             if (stash[i + 1].rcomp) {
                 stash[i].flags |= 32;
             }
-            out.emplace_back(rec.getReadName(), stash[i].flags, "GenieRef", stash[i].position, stash[i].mappingScore,
-                             stash[i].cigar, "=", stash[i + 1].position, tlen, stash[i].seq, stash[i].qual);
+            std::string name = rec.getReadName().empty() ? "*" : rec.getReadName();
+            out.emplace_back(name, stash[i].flags, "GenieRef", stash[i].position, stash[i].mappingScore, stash[i].cigar,
+                             "=", stash[i + 1].position, tlen, stash[i].seq, stash[i].qual);
         }
         if (stash.front().rcomp) {
             stash[i].flags |= 32;
         }
-        out.emplace_back(rec.getReadName(), stash[i].flags, "GenieRef", stash[i].position, stash[i].mappingScore,
-                         stash[i].cigar, "=", stash.front().position, -tlen, stash[i].seq, stash[i].qual);
+        std::string name = rec.getReadName().empty() ? "*" : rec.getReadName();
+        out.emplace_back(name, stash[i].flags, "GenieRef", stash[i].position, stash[i].mappingScore, stash[i].cigar,
+                         "=", stash.front().position, -tlen, stash[i].seq, stash[i].qual);
     }
 
     std::vector<format::sam::SamRecord> convert(format::mpegg_rec::MpeggRecord&& rec) {

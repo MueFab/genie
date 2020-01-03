@@ -16,6 +16,8 @@
 
 #include <coding/gabac-compressor.h>
 #include <coding/gabac-decompressor.h>
+#include <coding/local-assembly-decoder.h>
+#include <coding/local-assembly-encoder.h>
 #include <format/fastq/fastq-exporter.h>
 #include <format/fastq/fastq-importer.h>
 #include <format/mpegg_p2/raw_reference.h>
@@ -109,9 +111,13 @@ void encode(const ProgramOptions& programOptions) {
        }*/
     std::ifstream input("test.sam");
     std::ofstream output("test_out.sam");
-    format::sam::SamImporter importer(1000,input);
-    SamExporter exporter(format::sam::SamFileHeader::createDefaultHeader(),output);
-    importer.setDrain(&exporter);
+    format::sam::SamImporter importer(1000000, input);
+    LocalAssemblyEncoder encoder(1000, false);
+    LocalAssemblyDecoder decoder;
+    SamExporter exporter(format::sam::SamFileHeader::createDefaultHeader(), output);
+    importer.setDrain(&encoder);
+    encoder.setDrain(&decoder);
+    decoder.setDrain(&exporter);
     ThreadManager manager(1, &importer);
     manager.run();
 
