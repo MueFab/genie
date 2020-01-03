@@ -204,7 +204,7 @@ void GabacSeqConfSet::loadParameters(const format::mpegg_p2::ParameterSet &param
     using namespace format::mpegg_p2::desc_conf_pres::cabac;
 
     for (const auto &desc : getDescriptors()) {
-        auto descConfig = loadDescriptorDecoderCfg(parameterSet, desc.id);
+        auto& descConfig = loadDescriptorDecoderCfg(parameterSet, desc.id);
         for (const auto &subdesc : getDescriptor(desc.id).subseqs) {
             auto sub_desc = descConfig.getSubsequenceCfg(subdesc.id.second);
             auto sub_desc_id = desc.tokentype ? 0 : sub_desc->getDescriptorSubsequenceID();

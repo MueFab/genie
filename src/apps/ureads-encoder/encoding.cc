@@ -111,14 +111,18 @@ void encode(const ProgramOptions& programOptions) {
        }*/
     std::ifstream input("test.sam");
     std::ofstream output("test_out.sam");
-    format::sam::SamImporter importer(1000000, input);
+    format::sam::SamImporter importer(1000, input);
     LocalAssemblyEncoder encoder(1000, false);
     LocalAssemblyDecoder decoder;
     SamExporter exporter(format::sam::SamFileHeader::createDefaultHeader(), output);
+    GabacCompressor compressor;
+    GabacDecompressor decompressor;
     importer.setDrain(&encoder);
-    encoder.setDrain(&decoder);
+    encoder.setDrain(&compressor);
+    compressor.setDrain(&decompressor);
+    decompressor.setDrain(&decoder);
     decoder.setDrain(&exporter);
-    ThreadManager manager(1, &importer);
+    ThreadManager manager(8, &importer);
     manager.run();
 
     /*  {
