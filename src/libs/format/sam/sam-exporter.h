@@ -107,7 +107,7 @@ class SamExporter : public Drain<format::mpegg_rec::MpeggChunk> {
             ret.qual = rec.getRecordSegments().front().getQualities().front();
         }
         ret.cigar = eCigar2Cigar(alignment.getAlignment().getECigar());
-        ret.mappingScore = alignment.getAlignment().getMappingScores().front();
+        ret.mappingScore = alignment.getAlignment().getMappingScores().empty() ? 0 : alignment.getAlignment().getMappingScores().front();
         ret.rcomp = alignment.getAlignment().getRComp();
         ret.flags = mpeggFlagsToSamFlags(rec.getFlags(), ret.rcomp);
 

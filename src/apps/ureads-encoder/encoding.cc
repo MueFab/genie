@@ -24,6 +24,7 @@
 #include <format/mpegg_p2/mpegg-p-2-importer.h>
 #include <format/mpegg_p2/raw_reference.h>
 #include <format/mpegg_rec/mgrecs-exporter.h>
+#include <format/mpegg_rec/mgrecs-importer.h>
 #include <format/sam/sam-exporter.h>
 #include <format/sam/sam-header.h>
 #include <format/sam/sam-importer.h>
@@ -41,6 +42,18 @@ namespace genie {
 
 void encode(const ProgramOptions& programOptions) {
     (void) programOptions;
+#if 1
+    {
+        std::ifstream input("test_out.mgrec");
+        std::ofstream output("test_out.sam");
+
+        MgrecsImporter importer(1000, input);
+        SamExporter exporter(format::sam::SamFileHeader::createDefaultHeader(), output);
+        importer.setDrain(&exporter);
+        ThreadManager manager(1, &importer);
+        manager.run();
+    }
+#else
     {
         std::stringstream buffer;
         util::BitWriter writer(&buffer);
@@ -87,7 +100,7 @@ void encode(const ProgramOptions& programOptions) {
         manager.run();
 
     }
-
+#endif
 }
 
 }  // namespace genie

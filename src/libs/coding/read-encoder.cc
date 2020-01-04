@@ -126,8 +126,8 @@ void LocalAssemblyReadEncoder::encodeInsertion(CodingState &state) {
     for (size_t i = 0; i < state.count; ++i) {
         container.push(GenSub::MMPOS_TERMINATOR, GenConst::MMPOS_PERSIST);
 
-        const auto POSITION = state.read_pos - state.lastMisMatch;
-        state.lastMisMatch = state.read_pos + 1;
+        const auto POSITION = state.read_pos - state.lastMisMatch - state.clips.softClips[0].length();
+        state.lastMisMatch = state.read_pos + 1 - state.clips.softClips[0].length();
         container.push(GenSub::MMPOS_POSITION, POSITION);
 
         container.push(GenSub::MMTYPE_TYPE, GenConst::MMTYPE_INSERTION);
@@ -144,8 +144,8 @@ void LocalAssemblyReadEncoder::encodeDeletion(CodingState &state) {
     for (size_t i = 0; i < state.count; ++i) {
         container.push(GenSub::MMPOS_TERMINATOR, GenConst::MMPOS_PERSIST);
 
-        const auto POSITION = state.read_pos - state.lastMisMatch;
-        state.lastMisMatch = state.read_pos;
+        const auto POSITION = state.read_pos - state.lastMisMatch - state.clips.softClips[0].length();
+        state.lastMisMatch = state.read_pos - state.clips.softClips[0].length();
         container.push(GenSub::MMPOS_POSITION, POSITION);
         container.push(GenSub::MMTYPE_TYPE, GenConst::MMTYPE_DELETION);
         state.ref_offset++;
@@ -181,8 +181,8 @@ void LocalAssemblyReadEncoder::encodeSubstitution(CodingState &state) {
     }
     container.push(GenSub::MMPOS_TERMINATOR, GenConst::MMPOS_PERSIST);
 
-    const auto POSITION = state.read_pos - state.lastMisMatch;
-    state.lastMisMatch = state.read_pos + 1;
+    const auto POSITION = state.read_pos - state.lastMisMatch - state.clips.softClips[0].length();
+    state.lastMisMatch = state.read_pos + 1 - state.clips.softClips[0].length();
     container.push(GenSub::MMPOS_POSITION, POSITION);
 
     container.push(GenSub::MMTYPE_TYPE, GenConst::MMTYPE_SUBSTITUTION);

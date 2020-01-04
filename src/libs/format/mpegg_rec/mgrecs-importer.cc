@@ -19,12 +19,17 @@ bool MgrecsImporter::pump(size_t id) {
     {
         OrderedSection section(&lock, id);
         for (size_t i = 0; i < blockSize; ++i) {
-            chunk.emplace_back(reader);
+            format::mpegg_rec::MpeggRecord rec(reader);
+            if(!reader.isGood()) {
+                flowOut(std::move(chunk), record_counter++);
+                return false;
+            }
+            chunk.emplace_back(std::move(rec));
         }
     }
     flowOut(std::move(chunk), record_counter++);
 
-    return reader.isGood();
+    return true;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
