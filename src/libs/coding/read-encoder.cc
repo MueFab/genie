@@ -338,6 +338,7 @@ void LocalAssemblyReadEncoder::encodeClips(const std::pair<ClipInformation, Clip
 // ---------------------------------------------------------------------------------------------------------------------
 
 void LocalAssemblyReadEncoder::encodeSplice(LocalAssemblyReadEncoder::CodingState &state) {
+    (void) state;
     UTILS_DIE("Splicing is currently not supported");
 }
 

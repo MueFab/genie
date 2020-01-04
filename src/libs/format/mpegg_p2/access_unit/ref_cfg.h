@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include "util/bitwriter.h"
+#include "util/bitreader.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -15,7 +16,7 @@ namespace format {
  */
 class RefCfg {
    private:
-    uint16_t ref_sequence_ID : 16;  //!< Line 12
+    uint16_t ref_sequence_ID;  //!< Line 12
     uint64_t ref_start_position;    //!< Line 13
     uint64_t ref_end_position;      //!< Line 14
 
@@ -23,9 +24,14 @@ class RefCfg {
    public:
     RefCfg(uint16_t _ref_sequence_ID, uint64_t _ref_start_position, uint64_t _ref_end_position, uint8_t _posSize);
     RefCfg(uint8_t _posSize);
+    RefCfg(uint8_t _posSize, util::BitReader &reader) : posSize(_posSize){
+        ref_sequence_ID = reader.read(16);
+        ref_start_position = reader.read(posSize);
+        ref_end_position = reader.read(posSize);
+    }
     virtual ~RefCfg() = default;
 
-    virtual void write(util::BitWriter *writer);
+    virtual void write(util::BitWriter &writer);
 };
 }  // namespace format
 

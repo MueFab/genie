@@ -41,9 +41,15 @@ namespace cabac {
         std::unique_ptr<TransformSubseqParameters> TransformSubseqParameters::clone() const {
             auto ret = util::make_unique<TransformSubseqParameters>();
             ret->transform_ID_subseq = transform_ID_subseq;
-            ret->match_coding_buffer_size = util::make_unique<uint16_t>(*match_coding_buffer_size);
-            ret->rle_coding_guard = util::make_unique<uint8_t>(*rle_coding_guard);
-            ret->merge_coding_subseq_count = util::make_unique<uint8_t>(*merge_coding_subseq_count);
+            if(match_coding_buffer_size) {
+                ret->match_coding_buffer_size = util::make_unique<uint16_t>(*match_coding_buffer_size);
+            }
+            if(rle_coding_guard) {
+                ret->rle_coding_guard = util::make_unique<uint8_t>(*rle_coding_guard);
+            }
+            if(merge_coding_subseq_count) {
+                ret->merge_coding_subseq_count = util::make_unique<uint8_t>(*merge_coding_subseq_count);
+            }
             ret->merge_coding_shift_size = merge_coding_shift_size;
             return ret;
         }
@@ -57,19 +63,19 @@ namespace cabac {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-        void TransformSubseqParameters::write(util::BitWriter *writer) const {
-            writer->write(uint8_t(transform_ID_subseq), 8);
+        void TransformSubseqParameters::write(util::BitWriter &writer) const {
+            writer.write(uint8_t(transform_ID_subseq), 8);
             if (match_coding_buffer_size) {
-                writer->write(*match_coding_buffer_size, 16);
+                writer.write(*match_coding_buffer_size, 16);
             }
             if (rle_coding_guard) {
-                writer->write(*rle_coding_guard, 8);
+                writer.write(*rle_coding_guard, 8);
             }
             if (merge_coding_subseq_count) {
-                writer->write(*merge_coding_subseq_count, 4);
+                writer.write(*merge_coding_subseq_count, 4);
             }
             for (auto &i : merge_coding_shift_size) {
-                writer->write(i, 5);
+                writer.write(i, 5);
             }
         }
     }

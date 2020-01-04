@@ -5,6 +5,8 @@
 
 #include <memory>
 #include "util/bitwriter.h"
+#include "util/bitreader.h"
+#include "util/make_unique.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -54,9 +56,30 @@ namespace cabac {
                 return 0;
             }
 
-            virtual void write(util::BitWriter *writer) const;
+            virtual void write(util::BitWriter &writer) const;
 
             CabacBinarizationParameters();
+
+            CabacBinarizationParameters(BinarizationId binID, util::BitReader &reader) {
+                switch(binID) {
+                    case BinarizationId::TRUNCATED_UNARY:
+                        cmax = util::make_unique<uint8_t >(reader.read(8));
+                        break;
+                    case BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
+                    case BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
+                        cmax_teg = util::make_unique<uint8_t >(reader.read(8));
+                        break;
+                    case BinarizationId::DOUBLE_TRUNCATED_UNARY:
+                    case BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
+                        cmax_dtu = util::make_unique<uint8_t >(reader.read(8)); // Fall-through
+                    case BinarizationId::SPLIT_UNIT_WISE_TRUNCATED_UNARY:
+                    case BinarizationId::SIGNED_SPLIT_UNIT_WISE_TRUNCATED_UNARY:
+                        split_unit_size = util::make_unique<uint8_t >(reader.read(4));
+                        break;
+                    default:
+                        break;
+                }
+            }
 
             CabacBinarizationParameters(const BinarizationId &_binarization_id, uint8_t param);
 

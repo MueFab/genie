@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include "util/bitwriter.h"
+#include "util/bitreader.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -15,15 +16,19 @@ namespace format {
  */
 class MmCfg {
    private:
-    uint16_t mm_threshold : 16;  //!< Line 8
-    uint32_t mm_count : 32;      //!< Line 9
+    uint16_t mm_threshold;  //!< Line 8
+    uint32_t mm_count;      //!< Line 9
 
    public:
     MmCfg(uint16_t _mm_threshold, uint32_t _mm_count);
     MmCfg();
+    MmCfg(util::BitReader &reader) {
+        mm_threshold = reader.read(16);
+        mm_count = reader.read(32);
+    }
     virtual ~MmCfg() = default;
 
-    virtual void write(util::BitWriter *writer) const;
+    virtual void write(util::BitWriter &writer) const;
 };
 }  // namespace format
 

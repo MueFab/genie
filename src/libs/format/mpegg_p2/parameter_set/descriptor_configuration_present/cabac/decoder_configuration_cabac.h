@@ -25,6 +25,14 @@ class DecoderConfigurationCabac : public DecoderConfiguration {
    public:
     explicit DecoderConfigurationCabac(GenDesc _desc);
 
+    explicit DecoderConfigurationCabac(GenDesc _desc, util::BitReader &reader) : DecoderConfiguration(DecoderConfiguration::EncodingModeId::CABAC){
+        uint8_t num_descriptor_subsequence_cfgs = reader.read(8) + 1;
+        desc = _desc;
+        for(size_t i = 0; i < num_descriptor_subsequence_cfgs; ++i) {
+            descriptor_subsequence_cfgs.emplace_back(util::make_unique<DescriptorSubsequenceCfg>(reader));
+        }
+    }
+
     void setSubsequenceCfg(uint8_t index, std::unique_ptr<TransformSubseqParameters> cfg);
 
     DescriptorSubsequenceCfg *getSubsequenceCfg(uint8_t index) const {
@@ -43,7 +51,7 @@ class DecoderConfigurationCabac : public DecoderConfiguration {
 
     std::unique_ptr<DecoderConfiguration> clone() const override;
 
-    void write(util::BitWriter *writer) const override;
+    void write(util::BitWriter &writer) const override;
 
     uint8_t getRleGuardTokentype() const { return rle_guard_tokentype; }
 };

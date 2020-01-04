@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <format/mpegg_rec/split_alignment/split-alignment-same-rec.h>
+#include <mutex>
 #include "mpegg-encoder.h"
 #include "read-encoder.h"
 #include "reference-encoder.h"
@@ -21,6 +22,8 @@ class LocalAssemblyEncoder : public MpeggEncoder {
    private:
     bool debug;                //!< @brief If true, debugging information will be printed to std::cout
     uint32_t cr_buf_max_size;  //!< @brief Buffer size for local assembly reference memory
+
+
 
     /**
      * @brief Internal local assembly state (not exposed publicly)
@@ -78,7 +81,7 @@ class LocalAssemblyEncoder : public MpeggEncoder {
      * @param state The state used throughout the current encoding
      * @return MpeggRawAu ready for entropy coding
      */
-    MpeggRawAu pack(size_t id, LocalAssemblyEncoder::LaeState& state) const;
+    MpeggRawAu pack(size_t id, uint16_t ref, LocalAssemblyEncoder::LaeState& state) const;
 
    public:
     /**

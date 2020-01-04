@@ -1,25 +1,47 @@
 #include "access_unit.h"
+#include "parameter_set.h"
 #include "util/bitwriter.h"
 #include "util/exceptions.h"
 
 #include <gabac/data-block.h>
+#include <map>
 #include <sstream>
 
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
 namespace mpegg_p2 {
-AccessUnit::AccessUnit(util::BitReader *bitReader)  // needs to be called by format::DataUnit::createFromBitReader
+AccessUnit::AccessUnit(const std::map<size_t, std::unique_ptr<format::mpegg_p2::ParameterSet>> &parameterSets,
+                       util::BitReader &bitReader)  // needs to be called by format::DataUnit::createFromBitReader
     : DataUnit(DataUnitType::ACCESS_UNIT) {
-    uint32_t buffer;
-    bitReader->skipNBits(3);  // ISO 23092-2 Section 3.1 table 3
-    bitReader->readNBitsDec(29, &buffer);
-    this->setDataUnitSize(buffer);
+    reserved = bitReader.read(3);
+    bitReader.read(29);
 
-    for (uint32_t i = 0; i < (this->getDataUnitSize() - 5);
-         ++i) {  //-5 for DataUnitSize(4 byte) & Type(1 byte) ISO 23092-2 Section 3.1 table 3
-        bitReader->readNBitsDec(8, &buffer);
-        rawData.push_back(buffer);
+    access_unit_ID = bitReader.read(32);
+    num_blocks = bitReader.read(8);
+    parameter_set_ID = bitReader.read(8);
+    au_type = mpegg_rec::ClassType(bitReader.read(4));
+    reads_count = bitReader.read(32);
+    if (au_type == mpegg_rec::ClassType::CLASS_N || au_type == mpegg_rec::ClassType::CLASS_M) {
+        this->mm_cfg = util::make_unique<MmCfg>(bitReader);
+    }
+
+    if (parameterSets.at(parameter_set_ID)->getDatasetType() == ParameterSet::DatasetType::REFERENCE) {
+        this->ref_cfg = util::make_unique<RefCfg>(parameterSets.at(parameter_set_ID)->getPosSize(), bitReader);
+    }
+
+    if (au_type != mpegg_rec::ClassType::CLASS_U) {
+        this->au_Type_U_Cfg =
+            util::make_unique<AuTypeCfg>(parameterSets.at(parameter_set_ID)->getPosSize(),
+                                         parameterSets.at(parameter_set_ID)->hasMultipleAlignments(), bitReader);
+    } else {
+        this->signature_config =
+            util::make_unique<SignatureCfg>(parameterSets.at(parameter_set_ID)->getSignatureSize(),
+                                            parameterSets.at(parameter_set_ID)->getMultipleSignatureBase(), bitReader);
+    }
+
+    for (size_t i = 0; i < num_blocks; ++i) {
+        blocks.emplace_back(bitReader);
     }
 }
 
@@ -82,17 +104,16 @@ void AccessUnit::setSignatureCfg(std::unique_ptr<SignatureCfg> cfg) {
 }
 
 // -----------------------------------------------------------------------------------------------------------------
-
-void AccessUnit::write(util::BitWriter *writer) const {
+void AccessUnit::write(util::BitWriter &writer) const {
     DataUnit::write(writer);
-    writer->write(reserved, 3);
+    writer.write(reserved, 3);
 
     // Calculate size and write structure to tmp buffer
     std::stringstream ss;
     util::BitWriter tmp_writer(&ss);
-    preWrite(&tmp_writer);
+    preWrite(tmp_writer);
     for (auto &i : blocks) {
-        i.write(&tmp_writer);
+        i.write(tmp_writer);
     }
     tmp_writer.flush();
     uint64_t bits = tmp_writer.getBitsWritten();
@@ -101,18 +122,18 @@ void AccessUnit::write(util::BitWriter *writer) const {
     const uint64_t bytes = bits / 8;
 
     // Now size is known, write to final destination
-    writer->write(bytes, 29);
-    writer->write(&ss);
+    writer.write(bytes, 29);
+    writer.write(&ss);
 }
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::preWrite(util::BitWriter *writer) const {
-    writer->write(access_unit_ID, 32);
-    writer->write(num_blocks, 8);
-    writer->write(parameter_set_ID, 8);
-    writer->write(uint8_t(au_type), 4);
-    writer->write(reads_count, 32);
+void AccessUnit::preWrite(util::BitWriter &writer) const {
+    writer.write(access_unit_ID, 32);
+    writer.write(num_blocks, 8);
+    writer.write(parameter_set_ID, 8);
+    writer.write(uint8_t(au_type), 4);
+    writer.write(reads_count, 32);
     if (mm_cfg) {
         mm_cfg->write(writer);
     }

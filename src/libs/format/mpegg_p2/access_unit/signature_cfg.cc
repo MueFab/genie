@@ -22,16 +22,16 @@ void SignatureCfg::addSignature(uint64_t _U_cluster_signature) {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void SignatureCfg::write(util::BitWriter *writer) {
+void SignatureCfg::write(util::BitWriter &writer) {
     size_t i = 0;
 
-    writer->write(U_cluster_signature[0], U_signature_size);  // todo: size;
+    writer.write(U_cluster_signature[0], U_signature_size);  // todo: size;
     if (num_signatures) {
-        writer->write(*num_signatures, 16);
+        writer.write(*num_signatures, 16);
         i = 1;
     }
     for (; i < U_cluster_signature.size(); ++i) {
-        writer->write(U_cluster_signature[i], U_signature_size);  // todo: size;
+        writer.write(U_cluster_signature[i], U_signature_size);  // todo: size;
     }
 }
 }  // namespace format

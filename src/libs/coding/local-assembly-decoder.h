@@ -11,6 +11,7 @@ class LocalAssemblyDecoder : public MpeggDecoder {
         size_t numRecords = t.getNumRecords();
         size_t bufSize = t.getParameters().getParameterSetCrps().getCrpsInfo().getBufMaxSize();
         size_t segments = t.getParameters().getNumberTemplateSegments();
+        uint16_t ref = t.getReference();
         lae::LocalAssemblyReferenceEncoder refEncoder(bufSize);
         lae::LocalAssemblyReadDecoder decoder(std::move(t), segments);
         format::mpegg_rec::MpeggChunk chunk;
@@ -21,7 +22,7 @@ class LocalAssemblyDecoder : public MpeggDecoder {
             for (const auto& m : meta) {
                 refs.emplace_back(refEncoder.getReference(m.position, m.length));
             }
-            auto rec = decoder.pull(std::move(refs));
+            auto rec = decoder.pull(ref, std::move(refs));
             refEncoder.addRead(rec);
             chunk.emplace_back(std::move(rec));
         }

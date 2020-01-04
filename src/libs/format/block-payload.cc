@@ -8,9 +8,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BlockPayloadSet::TransformedPayload::write(util::BitWriter* writer) const {
+void BlockPayloadSet::TransformedPayload::write(util::BitWriter& writer) const {
     for (size_t i = 0; i < payloadData.size(); ++i) {
-        writer->write(payloadData.get(i), payloadData.getWordSize() * 8);
+        writer.write(payloadData.get(i), payloadData.getWordSize() * 8);
     }
 }
 
@@ -29,7 +29,7 @@ gabac::DataBlock&& BlockPayloadSet::TransformedPayload::move() { return std::mov
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BlockPayloadSet::SubsequencePayload::write(util::BitWriter* writer) const {
+void BlockPayloadSet::SubsequencePayload::write(util::BitWriter& writer) const {
     for (size_t i = 0; i < transformedPayloads.size(); ++i) {
         std::stringstream ss;
         util::BitWriter tmp_writer(&ss);
@@ -37,9 +37,9 @@ void BlockPayloadSet::SubsequencePayload::write(util::BitWriter* writer) const {
         tmp_writer.flush();
         uint64_t bits = tmp_writer.getBitsWritten();
         if (i != transformedPayloads.size() - 1) {
-            writer->write(bits / 8, 32);
+            writer.write(bits / 8, 32);
         }
-        writer->write(&ss);
+        writer.write(&ss);
     }
 }
 
@@ -70,7 +70,7 @@ std::vector<BlockPayloadSet::TransformedPayload>& BlockPayloadSet::SubsequencePa
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BlockPayloadSet::DescriptorPayload::write(util::BitWriter* writer) const {
+void BlockPayloadSet::DescriptorPayload::write(util::BitWriter& writer) const {
     for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
         std::stringstream ss;
         util::BitWriter tmp_writer(&ss);
@@ -78,9 +78,9 @@ void BlockPayloadSet::DescriptorPayload::write(util::BitWriter* writer) const {
         tmp_writer.flush();
         uint64_t bits = tmp_writer.getBitsWritten();
         if (i != subsequencePayloads.size() - 1) {
-            writer->write(bits / 8, 32);
+            writer.write(bits / 8, 32);
         }
-        writer->write(&ss);
+        writer.write(&ss);
     }
 }
 

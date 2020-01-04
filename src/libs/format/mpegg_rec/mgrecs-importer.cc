@@ -10,7 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 MgrecsImporter::MgrecsImporter(size_t _blockSize, std::istream &_file_1)
-    : blockSize(_blockSize), reader(&_file_1), record_counter(0) {}
+    : blockSize(_blockSize), reader(_file_1), record_counter(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

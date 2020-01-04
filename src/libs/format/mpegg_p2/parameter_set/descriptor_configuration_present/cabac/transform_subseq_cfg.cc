@@ -33,8 +33,8 @@ namespace cabac {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-        void TransformSubseqCfg::write(util::BitWriter *writer) const {
-            writer->write(uint8_t(transform_ID_subsym), 3);
+        void TransformSubseqCfg::write(util::BitWriter &writer) const {
+            writer.write(uint8_t(transform_ID_subsym), 3);
             support_values->write(writer);
             cabac_binarization->write(writer);
         }

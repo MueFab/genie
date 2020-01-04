@@ -49,8 +49,8 @@ namespace format {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-        void DescriptorConfigurationContainer::write(util::BitWriter *writer) const {
-            writer->write(class_specific_dec_cfg_flag, 1);
+        void DescriptorConfigurationContainer::write(util::BitWriter &writer) const {
+            writer.write(class_specific_dec_cfg_flag, 1);
             for (auto &i : descriptor_configurations) {
                 i->write(writer);
             }

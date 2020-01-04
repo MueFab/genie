@@ -19,7 +19,7 @@ namespace qv_coding1 {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-        void ParameterSetQvps::write(util::BitWriter *writer) const {
+        void ParameterSetQvps::write(util::BitWriter &writer) const {
             // TODO
             (void) writer;  // Silence warning about unused variable
         }

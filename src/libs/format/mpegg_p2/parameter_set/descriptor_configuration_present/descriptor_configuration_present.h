@@ -6,7 +6,9 @@
 #include "../descriptor_configuration.h"
 #include "decoder_configuration.h"
 #include "util/bitwriter.h"
+#include "util/bitreader.h"
 
+#include <util/make_unique.h>
 #include <memory>
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -23,9 +25,13 @@ namespace desc_conf_pres {
     public:
         explicit DescriptorConfigurationPresent();
 
+        explicit DescriptorConfigurationPresent(GenDesc desc, util::BitReader &reader) : DescriptorConfiguration(DecCfgPreset::PRESENT) {
+            decoder_configuration = DecoderConfiguration::factory(desc, reader);
+        }
+
         std::unique_ptr<DescriptorConfiguration> clone() const override;
 
-        void write(util::BitWriter *writer) const override;
+        void write(util::BitWriter &writer) const override;
 
         void set_decoder_configuration(std::unique_ptr<DecoderConfiguration> conf);
 
