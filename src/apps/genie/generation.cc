@@ -21,7 +21,6 @@
 #include "util/exceptions.h"
 #include "format/fasta/fasta-file-reader.h"
 #include "format/fasta/fasta-record.h"
-#include "format/sam/sam-file-reader.h"
 #include "format/sam/sam-record.h"
 #if 0
 namespace dsg {

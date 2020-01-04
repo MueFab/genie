@@ -17,7 +17,7 @@ class ProgramOptions {
     std::string outputFilePath;
     std::string typeString;
 
-    format::mpegg_rec::MpeggRecord::ClassType type;
+    format::mpegg_rec::ClassType type;
 
 
    private:
