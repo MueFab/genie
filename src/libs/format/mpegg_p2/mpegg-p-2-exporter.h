@@ -33,7 +33,7 @@ class MpeggP2Exporter : public Drain<BlockPayloadSet> {
             }
             au.addBlock(format::Block(descriptor, data.movePayload(descriptor)));
         }
-      //  au.write(writer);
+        au.write(writer);
     }
     void dryIn() override {}
 };
