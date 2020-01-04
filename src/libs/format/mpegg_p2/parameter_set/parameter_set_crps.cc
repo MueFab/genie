@@ -23,8 +23,8 @@ namespace format {
         }
 // -----------------------------------------------------------------------------------------------------------------
 
-        void ParameterSetCrps::write(util::BitWriter *writer) const {
-            writer->write(uint8_t(cr_alg_ID), 8);
+        void ParameterSetCrps::write(util::BitWriter &writer) const {
+            writer.write(uint8_t(cr_alg_ID), 8);
             if (crps_info) {
                 crps_info->write(writer);
             }

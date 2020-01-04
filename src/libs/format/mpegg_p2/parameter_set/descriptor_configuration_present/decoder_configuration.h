@@ -5,6 +5,8 @@
 
 #include "cabac/descriptor_subsequence_cfg.h"
 #include "util/bitwriter.h"
+#include "util/bitreader.h"
+#include <coding/constants.h>
 
 #include <memory>
 
@@ -23,13 +25,15 @@ class DecoderConfiguration {
         CABAC = 0  //!< See Text in section
     };
 
-    virtual void write(util::BitWriter *writer) const;
+    virtual void write(util::BitWriter &writer) const;
 
     virtual std::unique_ptr<DecoderConfiguration> clone() const = 0;
 
     explicit DecoderConfiguration(EncodingModeId _encoding_mode_id);
 
     virtual ~DecoderConfiguration() = default;
+
+    static std::unique_ptr<DecoderConfiguration> factory(GenDesc desc, util::BitReader& reader);
 
     EncodingModeId getEncodingMode() const { return encoding_mode_ID; }
 

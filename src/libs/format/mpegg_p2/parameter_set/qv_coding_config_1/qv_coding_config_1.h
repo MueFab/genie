@@ -30,11 +30,31 @@ namespace qv_coding1 {
 
         QvCodingConfig1();
 
+        QvCodingConfig1(util::BitReader& reader) : QvCodingConfig(QvCodingMode::ONE, false ){
+            qvps_flag = reader.read(1);
+            if(qvps_flag) {
+                UTILS_DIE("Parameter-set-qvps not supported yet");
+            } else {
+                qvps_preset_ID = util::make_unique<QvpsPresetId>(QvpsPresetId(reader.read(4)));
+            }
+            qv_reverse_flag = reader.read(1);
+        }
+
         explicit QvCodingConfig1(QvpsPresetId _qvps_preset_ID, bool _reverse_flag);
 
         void setQvps(std::unique_ptr<ParameterSetQvps> _parameter_set_qvps);
 
-        void write(util::BitWriter *writer) const override;
+        void write(util::BitWriter &writer) const override;
+
+        virtual std::unique_ptr<QvCodingConfig> clone() const {
+            auto ret = util::make_unique<QvCodingConfig1>();
+            ret->qv_coding_mode = qv_coding_mode;
+            ret->qv_reverse_flag = qv_reverse_flag;
+            ret->qvps_flag = qvps_flag;
+            ret->parameter_set_qvps = parameter_set_qvps->clone();
+            ret->qvps_preset_ID = util::make_unique<QvpsPresetId>(*qvps_preset_ID);
+            return ret;
+        }
 
     private:
         uint8_t qvps_flag : 1;                                 //!< Line 34

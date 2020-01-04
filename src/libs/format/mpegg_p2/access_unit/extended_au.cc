@@ -5,9 +5,9 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-void ExtendedAu::write(util::BitWriter *writer) {
-    writer->write(extended_AU_start_position, posSize);
-    writer->write(extended_AU_end_position, posSize);
+void ExtendedAu::write(util::BitWriter &writer) {
+    writer.write(extended_AU_start_position, posSize);
+    writer.write(extended_AU_end_position, posSize);
 }
 
 // -----------------------------------------------------------------------------------------------------------------

@@ -12,9 +12,9 @@ namespace format {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-        void CrpsInfo::write(util::BitWriter *writer) const {
-            writer->write(cr_pad_size, 8);
-            writer->write(cr_buf_max_size, 24);
+        void CrpsInfo::write(util::BitWriter &writer) const {
+            writer.write(cr_pad_size, 8);
+            writer.write(cr_buf_max_size, 24);
         }
     }
 }  // namespace format

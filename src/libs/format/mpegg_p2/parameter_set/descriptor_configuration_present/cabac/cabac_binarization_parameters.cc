@@ -8,18 +8,18 @@ namespace format {
     namespace mpegg_p2 {
 namespace desc_conf_pres {
 namespace cabac {
-    void CabacBinarizationParameters::write(util::BitWriter *writer) const {
+    void CabacBinarizationParameters::write(util::BitWriter &writer) const {
         if (cmax) {
-            writer->write(*cmax, 8);
+            writer.write(*cmax, 8);
         }
         if (cmax_teg) {
-            writer->write(*cmax_teg, 8);
+            writer.write(*cmax_teg, 8);
         }
         if (cmax_dtu) {
-            writer->write(*cmax_dtu, 8);
+            writer.write(*cmax_dtu, 8);
         }
         if (split_unit_size) {
-            writer->write(*split_unit_size, 4);
+            writer.write(*split_unit_size, 4);
         }
     }
 

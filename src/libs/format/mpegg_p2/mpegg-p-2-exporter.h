@@ -22,9 +22,9 @@ class MpeggP2Exporter : public Drain<BlockPayloadSet> {
     void flowIn(BlockPayloadSet&& t, size_t id) override {
         BlockPayloadSet data = std::move(t);
         OrderedSection section(&lock, id);
-        data.getParameters().write(&writer);
+        data.getParameters().write(writer);
 
-        format::mpegg_p2::AccessUnit au(id, 0, format::mpegg_rec::ClassType::CLASS_I, data.getRecordNum(),
+        format::mpegg_p2::AccessUnit au(id, id, format::mpegg_rec::ClassType::CLASS_I, data.getRecordNum(),
                                         format::mpegg_p2::DataUnit::DatasetType::ALIGNED, 32, 32, 0);
         for (size_t descriptor = 0; descriptor < getDescriptors().size(); ++descriptor) {
             if (data.getPayload(GenDesc(descriptor)).isEmpty()) {
@@ -32,7 +32,7 @@ class MpeggP2Exporter : public Drain<BlockPayloadSet> {
             }
             au.addBlock(format::Block(descriptor, data.movePayload(descriptor)));
         }
-        au.write(&writer);
+        au.write(writer);
     }
     void dryIn() override {}
 };

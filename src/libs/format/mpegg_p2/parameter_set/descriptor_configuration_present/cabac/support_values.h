@@ -5,6 +5,8 @@
 
 #include <memory>
 #include "util/bitwriter.h"
+#include "util/bitreader.h"
+#include "util/make_unique.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -34,11 +36,23 @@ namespace cabac {
 
         SupportValues();
 
+        SupportValues(TransformIdSubsym transformIdSubsym, util::BitReader &reader) {
+            output_symbol_size = reader.read(6);
+            coding_subsym_size = reader.read(6);
+            coding_order = reader.read(2);
+            if(coding_subsym_size < output_symbol_size && coding_order > 0) {
+                if(transformIdSubsym == TransformIdSubsym::LUT_TRANSFORM) {
+                    share_subsym_lut_flag = util::make_unique<bool>(reader.read(1));
+                }
+                share_subsym_prv_flag = util::make_unique<bool>(reader.read(1));
+            }
+        }
+
         virtual ~SupportValues() = default;
 
         std::unique_ptr<SupportValues> clone() const;
 
-        virtual void write(util::BitWriter *writer) const;
+        virtual void write(util::BitWriter &writer) const;
 
         uint8_t getOutputSymbolSize () const {
             return output_symbol_size;

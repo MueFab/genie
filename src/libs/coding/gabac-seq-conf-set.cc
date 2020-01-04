@@ -162,6 +162,8 @@ const GabacSeqConfSet::DecoderConfigurationCabac &GabacSeqConfSet::loadDescripto
     return reinterpret_cast<const cabac::DecoderConfigurationCabac &>(*decoder_conf);
 }
 
+
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 gabac::TransformedSequenceConfiguration GabacSeqConfSet::loadTransformedSequence(const TransformSubseqCfg& transformedDesc) {

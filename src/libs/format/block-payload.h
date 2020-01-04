@@ -30,13 +30,19 @@ class BlockPayloadSet {
          * @brief
          * @param writer
          */
-        void write(util::BitWriter* writer) const;
+        void write(util::BitWriter& writer) const;
 
         /**
          * @brief
          * @param _data
          */
         explicit TransformedPayload(gabac::DataBlock _data, size_t pos);
+
+        TransformedPayload(size_t pos, util::BitReader &reader) {
+            (void) pos;
+            (void) reader;
+            UTILS_DIE("Not_implemented");
+        }
 
         /**
          * @brief
@@ -68,6 +74,19 @@ class BlockPayloadSet {
          */
         explicit SubsequencePayload(GenSubIndex _id) : id(_id) {}
 
+        explicit SubsequencePayload(GenSubIndex _id, size_t subseq_ctr, size_t remainingSize, util::BitReader& reader) : id(_id) {
+            for (size_t i = 0; i < subseq_ctr; ++i) {
+                size_t s = 0;
+                if (i != subseq_ctr - 1) {
+                    s = reader.read(32);
+                    remainingSize -= (s + 4);
+                } else {
+                    s = remainingSize;
+                }
+                UTILS_DIE("Not implemented");
+            }
+        }
+
         /**
          * @brief
          * @return
@@ -78,7 +97,7 @@ class BlockPayloadSet {
          * @brief
          * @param writer
          */
-        void write(util::BitWriter* writer) const;
+        void write(util::BitWriter& writer) const;
 
         /**
          * @brief
@@ -118,6 +137,20 @@ class BlockPayloadSet {
 
         explicit DescriptorPayload() : id(GenDesc(0)) {}
 
+        explicit DescriptorPayload(GenDesc _id,  size_t remainingSize, util::BitReader& reader) : id(_id) {
+            size_t count = getDescriptor(_id).subseqs.size();
+            for (size_t i = 0; i < count; ++i) {
+                size_t s = 0;
+                if (i != count - 1) {
+                    s = reader.read(32);
+                    remainingSize -= (s + 4);
+                } else {
+                    s = remainingSize;
+                }
+                UTILS_DIE("Not implemented");
+            }
+        }
+
         /**
          * @brief
          * @return
@@ -128,7 +161,7 @@ class BlockPayloadSet {
          * @brief
          * @param writer
          */
-        void write(util::BitWriter* writer) const;
+        void write(util::BitWriter& writer) const;
 
         /**
          * @brief
@@ -209,11 +242,17 @@ class BlockPayloadSet {
 
     void clear() { *this = BlockPayloadSet(format::mpegg_p2::ParameterSet(), 0); }
 
+    uint16_t getReference() const { return reference; }
+
+    void setReference(uint16_t ref) { reference = ref; }
+
    private:
     std::vector<DescriptorPayload> desc_pay;  //!< @brief
 
     size_t record_num;                          //!< @brief
     format::mpegg_p2::ParameterSet parameters;  //!< @brief
+
+    uint16_t reference;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

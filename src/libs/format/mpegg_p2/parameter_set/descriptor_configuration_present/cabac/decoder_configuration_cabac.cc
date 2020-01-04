@@ -32,12 +32,12 @@ std::unique_ptr<DecoderConfiguration> DecoderConfigurationCabac::clone() const {
     return ret;
 }
 
-void DecoderConfigurationCabac::write(util::BitWriter *writer) const {
+void DecoderConfigurationCabac::write(util::BitWriter &writer) const {
     DecoderConfiguration::write(writer);
     if (desc == GenDesc::RNAME || desc == GenDesc::MSAR) {
-        writer->write(rle_guard_tokentype, 8);
+        writer.write(rle_guard_tokentype, 8);
     } else {
-        writer->write(descriptor_subsequence_cfgs.size() - 1, 8);
+        writer.write(descriptor_subsequence_cfgs.size() - 1, 8);
     }
     for (auto &i : descriptor_subsequence_cfgs) {
         i->write(writer);

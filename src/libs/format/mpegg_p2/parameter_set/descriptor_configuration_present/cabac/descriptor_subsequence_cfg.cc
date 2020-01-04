@@ -45,9 +45,9 @@ void DescriptorSubsequenceCfg::setTransformSubseqCfg(size_t index,
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void DescriptorSubsequenceCfg::write(util::BitWriter *writer) const {
+void DescriptorSubsequenceCfg::write(util::BitWriter &writer) const {
     if (descriptor_subsequence_ID) {
-        writer->write(*descriptor_subsequence_ID, 10);
+        writer.write(*descriptor_subsequence_ID, 10);
     }
     transform_subseq_parameters->write(writer);
     for (auto &i : transformSubseq_cfgs) {

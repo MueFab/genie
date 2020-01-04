@@ -61,6 +61,7 @@ void GabacCompressor::flowIn(MpeggRawAu&& t, size_t id) {
 
     configSet.storeParameters(payload.getParameters());
 
+    payload.setReference(raw_aus.getReference());
     raw_aus.clear();
     flowOut(std::move(payload), id);
 }

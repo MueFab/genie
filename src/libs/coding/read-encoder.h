@@ -92,6 +92,7 @@ class LocalAssemblyReadEncoder {
         const format::mpegg_rec::MpeggRecord &rec) const;
 
    public:
+
     explicit LocalAssemblyReadEncoder();
 
     void add(const format::mpegg_rec::MpeggRecord &rec, const std::string &ref1, const std::string &ref2);

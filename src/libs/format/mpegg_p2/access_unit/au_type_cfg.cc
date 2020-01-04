@@ -5,10 +5,10 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 namespace format {
-void AuTypeCfg::write(util::BitWriter *writer) {
-    writer->write(sequence_ID, 16);
-    writer->write(AU_start_position, posSize);
-    writer->write(AU_end_position, posSize);
+void AuTypeCfg::write(util::BitWriter &writer) {
+    writer.write(sequence_ID, 16);
+    writer.write(AU_start_position, posSize);
+    writer.write(AU_end_position, posSize);
     if (extended_AU) {
         extended_AU->write(writer);
     }

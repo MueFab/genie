@@ -28,7 +28,7 @@ namespace mpegg_p2 {
  */
 class ParameterSet : public DataUnit {
    public:
-    explicit ParameterSet(util::BitReader *bitReader);
+    explicit ParameterSet(util::BitReader &bitReader);
 
     ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, DatasetType _dataset_type,
                  AlphabetID _alphabet_id, uint32_t _read_length, bool _paired_end, bool _pos_40_bits_flag,
@@ -54,10 +54,85 @@ class ParameterSet : public DataUnit {
 
     void setMultipleSignatureBase(uint32_t _multiple_signature_base, uint8_t _U_signature_size);
 
-    void write(util::BitWriter *writer) const override;
+    void write(util::BitWriter &writer) const override;
+
+    DatasetType getDatasetType() const { return dataset_type; }
+
+    uint8_t getPosSize() const { return pos_40_bits_flag ? 40 : 32; }
+
+    bool hasMultipleAlignments() const { return multiple_alignments_flag; }
+
+    uint32_t getMultipleSignatureBase() const { return multiple_signature_base; }
+
+    uint8_t getSignatureSize() const { return *u_signature_size; }
+
+    uint8_t getID() const { return parameter_set_ID; }
+
+    ParameterSet& operator=(const ParameterSet &other) {
+        if(this == &other) {
+            return *this;
+        }
+        parameter_set_ID = other.parameter_set_ID;
+        parent_parameter_set_ID = other.parent_parameter_set_ID;
+        dataset_type = other.dataset_type;
+        alphabet_ID = other.alphabet_ID;
+        read_length = other.read_length;
+        number_of_template_segments_minus1 = other.number_of_template_segments_minus1;
+        max_au_data_unit_size = other.max_au_data_unit_size;
+        pos_40_bits_flag = other.pos_40_bits_flag;
+        qv_depth = other.qv_depth;
+        as_depth = other.as_depth;
+        class_IDs = other.class_IDs;
+        for(const auto&d : other.descriptors) {
+            descriptors.emplace_back(d->clone());
+        }
+        rgroup_IDs = other.rgroup_IDs;
+        multiple_alignments_flag = other.multiple_alignments_flag;
+        spliced_reads_flag = other.spliced_reads_flag;
+        multiple_signature_base = other.multiple_signature_base;
+        u_signature_size = util::make_unique<uint8_t>(*other.u_signature_size);
+        for(const auto&c : other.qv_coding_configs) {
+            qv_coding_configs.emplace_back(c->clone());
+        }
+        crps_flag = other.crps_flag;
+        parameter_set_crps = other.parameter_set_crps->clone();
+        return *this;
+    }
+
+    ParameterSet& operator=(ParameterSet &&other) noexcept {
+        parameter_set_ID = other.parameter_set_ID;
+        parent_parameter_set_ID = other.parent_parameter_set_ID;
+        dataset_type = other.dataset_type;
+        alphabet_ID = other.alphabet_ID;
+        read_length = other.read_length;
+        number_of_template_segments_minus1 = other.number_of_template_segments_minus1;
+        max_au_data_unit_size = other.max_au_data_unit_size;
+        pos_40_bits_flag = other.pos_40_bits_flag;
+        qv_depth = other.qv_depth;
+        as_depth = other.as_depth;
+        class_IDs = std::move(other.class_IDs);
+        descriptors = std::move(other.descriptors);
+        rgroup_IDs = std::move(other.rgroup_IDs);
+        multiple_alignments_flag = other.multiple_alignments_flag;
+        spliced_reads_flag = other.spliced_reads_flag;
+        multiple_signature_base = other.multiple_signature_base;
+        u_signature_size = std::move(other.u_signature_size);
+        qv_coding_configs = std::move(other.qv_coding_configs);
+        crps_flag = other.crps_flag;
+        parameter_set_crps = std::move(other.parameter_set_crps);
+        return *this;
+    }
+
+    ParameterSet(const ParameterSet &other) : DataUnit(DataUnitType::PARAMETER_SET) {
+        *this = other;
+    }
+
+    ParameterSet(ParameterSet &&other) noexcept : DataUnit(DataUnitType::PARAMETER_SET) {
+        *this = std::move(other);
+    }
 
    private:
-    void preWrite(util::BitWriter *writer) const;
+    void preWrite(util::BitWriter &writer) const;
 
     /**
      * Incorporated (Simplification): ISO 23092-2 Section 3.1 table 3
@@ -97,7 +172,7 @@ class ParameterSet : public DataUnit {
     std::vector<mpegg_rec::ClassType> class_IDs;                                 //!< : 4; For loop Lines 12 + 13
     std::vector<std::unique_ptr<DescriptorConfigurationContainer>> descriptors;  //!< For loop lines 14 - 22
     //!< uint16_t num_groups : 16; //!< Line 23 currently infered from vector
-    std::vector<std::unique_ptr<std::string>> rgroup_IDs;            //!< For Loop lines 24 + 25
+    std::vector<std::string> rgroup_IDs;            //!< For Loop lines 24 + 25
     bool multiple_alignments_flag : 1;                               //!< Line 26
     bool spliced_reads_flag : 1;                                     //!< Line 27
     uint32_t multiple_signature_base : 31;                           //!< Line 28

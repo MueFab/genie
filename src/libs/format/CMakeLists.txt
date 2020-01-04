@@ -31,7 +31,9 @@ set(source_files
         mpegg_p2/access_unit/signature_cfg.cc
         mpegg_p2/clutter.cc
         mpegg_p2/data_unit.cc
+        mpegg_p2/data-unit-factory.cc
         mpegg_p2/mpegg-p-2-exporter.cc
+        mpegg_p2/mpegg-p-2-importer.cc
         mpegg_p2/parameter_set.cc
         mpegg_p2/parameter_set/crps_info.cc
         mpegg_p2/parameter_set/descriptor_configuration.cc

@@ -55,6 +55,7 @@ void GabacDecompressor::flowIn(BlockPayloadSet&& t, size_t id) {
         }
     }
 
+    raw_aus.setReference(payloadSet.getReference());
     payloadSet.clear();
     flowOut(std::move(raw_aus), id);
 }

@@ -100,7 +100,7 @@ void LocalAssemblyEncoder::updateGuesses(const format::mpegg_rec::MpeggRecord& r
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MpeggRawAu LocalAssemblyEncoder::pack(size_t id, LocalAssemblyEncoder::LaeState& state) const {
+MpeggRawAu LocalAssemblyEncoder::pack(size_t id, uint16_t ref, LocalAssemblyEncoder::LaeState& state) const {
     format::mpegg_p2::DataUnit::DatasetType dataType = format::mpegg_p2::DataUnit::DatasetType::ALIGNED;
     format::mpegg_p2::ParameterSet ret (id, id, dataType, AlphabetID::ACGTN, state.readLength,
                                                                  state.pairedEnd, false, 0, 0, false, false);
@@ -113,6 +113,7 @@ MpeggRawAu LocalAssemblyEncoder::pack(size_t id, LocalAssemblyEncoder::LaeState&
     auto rawAU = state.readCoder.moveStreams();
 
     rawAU.setParameters(std::move(ret));
+    rawAU.setReference(ref);
 
     return rawAU;
 }
@@ -126,13 +127,18 @@ void LocalAssemblyEncoder::flowIn(format::mpegg_rec::MpeggChunk&& t, size_t id) 
     state.pairedEnd = data.front().getNumberOfTemplateSegments() > 1;
     state.readLength = data.front().getRecordSegments().front().getSequence().length();
 
+    auto ref = data.front().getMetaAlignment().getSeqID();
     for (auto& r : data) {
         updateGuesses(r, state);
+
+        if(r.getMetaAlignment().getSeqID() != ref) {
+            UTILS_DIE("Records belonging to different reference sequences in one access unit");
+        }
 
         updateAssembly(r, state);
     }
 
-    auto rawAU = pack(id, state);
+    auto rawAU = pack(id, ref, state);
 
     data.clear();
     flowOut(std::move(rawAU), id);

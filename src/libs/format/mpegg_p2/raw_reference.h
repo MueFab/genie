@@ -39,7 +39,7 @@ namespace format {
 
             std::unique_ptr<RawReference> clone() const;
 
-            void write(util::BitWriter *writer) const override;
+            void write(util::BitWriter &writer) const override;
         };
     }
 }  // namespace format

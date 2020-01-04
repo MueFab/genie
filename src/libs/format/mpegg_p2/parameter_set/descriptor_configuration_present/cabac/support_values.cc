@@ -42,15 +42,15 @@ namespace cabac {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-        void SupportValues::write(util::BitWriter *writer) const {
-            writer->write(output_symbol_size, 6);
-            writer->write(coding_subsym_size, 6);
-            writer->write(coding_order, 2);
+        void SupportValues::write(util::BitWriter &writer) const {
+            writer.write(output_symbol_size, 6);
+            writer.write(coding_subsym_size, 6);
+            writer.write(coding_order, 2);
             if (share_subsym_lut_flag) {
-                writer->write(*share_subsym_lut_flag, 1);
+                writer.write(*share_subsym_lut_flag, 1);
             }
             if (share_subsym_prv_flag) {
-                writer->write(*share_subsym_prv_flag, 1);
+                writer.write(*share_subsym_prv_flag, 1);
             }
         }
     }

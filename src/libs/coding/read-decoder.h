@@ -22,7 +22,7 @@ class LocalAssemblyReadDecoder {
    public:
     LocalAssemblyReadDecoder(MpeggRawAu &&au, size_t segments)
         : container(std::move(au)), position(0), length(0), recordCounter(0), number_template_segments(segments) {}
-    format::mpegg_rec::MpeggRecord pull(std::vector<std::string> &&vec) {
+    format::mpegg_rec::MpeggRecord pull(uint16_t ref, std::vector<std::string> &&vec) {
         std::vector<std::string> sequences = std::move(vec);
         std::vector<std::string> cigars;
         cigars.reserve(sequences.size());
@@ -35,7 +35,7 @@ class LocalAssemblyReadDecoder {
             decodeAdditional(std::move(sequences[i]), std::move(cigars[i]), state);
         }
 
-        std::get<1>(state).addAlignment(0, std::move(std::get<0>(state)));
+        std::get<1>(state).addAlignment(ref, std::move(std::get<0>(state)));
         return std::get<1>(state);
     }
 
@@ -158,7 +158,7 @@ class LocalAssemblyReadDecoder {
         }
 
         const auto SAME_REC_DATA = container.pull(GenSub::PAIR_SAME_REC);
-        const bool FIRST1 = SAME_REC_DATA & 1u;
+        //        const bool FIRST1 = SAME_REC_DATA & 1u;
         const uint32_t DELTA = SAME_REC_DATA >> 1u;
 
         format::mpegg_rec::Alignment alignment(contractECigar(ecigar), RCOMP);
@@ -247,7 +247,7 @@ class LocalAssemblyReadDecoder {
                                             : cigar_extended[record_no].find_first_not_of(']');
                 size_t seq_position = end ? sequences[record_no].length() : 0;
                 sequences[record_no].insert(seq_position, softClip);
-                for (const char &b : softClip) {
+                for (size_t i = 0; i < softClip.size(); ++i) {
                     cigar_extended[record_no][cigar_position++] = ')';
                 }
             }

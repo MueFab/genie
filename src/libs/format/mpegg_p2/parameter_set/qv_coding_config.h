@@ -3,7 +3,10 @@
 
 // -----------------------------------------------------------------------------------------------------------------
 
+#include <util/bitreader.h>
+#include <util/make_unique.h>
 #include <cstdint>
+#include <memory>
 #include "util/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -23,11 +26,15 @@ namespace format {
                 ONE = 1
             };
 
-            virtual void write(util::BitWriter *writer) const = 0;
+            virtual void write(util::BitWriter &writer) const = 0;
 
             virtual ~QvCodingConfig() = default;
 
             QvCodingConfig(QvCodingMode _qv_coding_mode, bool _qv_reverse_flag);
+
+            static std::unique_ptr<QvCodingConfig> factory(util::BitReader &reader);
+
+            virtual std::unique_ptr<QvCodingConfig> clone() const = 0;
 
         protected:
             QvCodingMode qv_coding_mode;  //!< : 4; Line 32

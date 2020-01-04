@@ -15,10 +15,10 @@ Block::Block() : reserved(0), descriptor_ID(0), reserved_2(0), block_payload_siz
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void Block::write(util::BitWriter *writer) const {
-    writer->write(reserved, 1);
-    writer->write(descriptor_ID, 7);
-    writer->write(reserved_2, 3);
+void Block::write(util::BitWriter &writer) const {
+    writer.write(reserved, 1);
+    writer.write(descriptor_ID, 7);
+    writer.write(reserved_2, 3);
 
     std::stringstream ss;
     util::BitWriter tmp_writer(&ss);
@@ -26,8 +26,8 @@ void Block::write(util::BitWriter *writer) const {
     tmp_writer.flush();
     uint64_t bits = tmp_writer.getBitsWritten();
 
-    writer->write(bits, 29);
-    writer->write(&ss);
-    writer->flush();
+    writer.write(bits, 29);
+    writer.write(&ss);
+    writer.flush();
 }
 }  // namespace format

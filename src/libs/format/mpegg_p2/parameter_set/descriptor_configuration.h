@@ -5,6 +5,8 @@
 
 #include <memory>
 #include "util/bitwriter.h"
+#include "util/bitreader.h"
+#include <coding/constants.h>
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +25,9 @@ namespace format {
 
             virtual std::unique_ptr<DescriptorConfiguration> clone() const = 0;
 
-            virtual void write(util::BitWriter *writer) const;
+            virtual void write(util::BitWriter &writer) const;
+
+            static std::unique_ptr<DescriptorConfiguration> factory(GenDesc desc, util::BitReader &reader);
 
             virtual ~DescriptorConfiguration() = default;
 

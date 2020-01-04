@@ -13,14 +13,14 @@ namespace format {
                                                            util::make_unique<std::string>(*ref_sequence));
         }
 
-        void RawReferenceSequence::write(util::BitWriter *writer) const {
-            writer->write(sequence_ID, 16);
-            writer->write(seq_start, 40);
-            writer->write(seq_start + ref_sequence->length(), 40);
+        void RawReferenceSequence::write(util::BitWriter &writer) const {
+            writer.write(sequence_ID, 16);
+            writer.write(seq_start, 40);
+            writer.write(seq_start + ref_sequence->length(), 40);
             for (const auto &a : *ref_sequence) {
-                writer->write(a, 8);
+                writer.write(a, 8);
             }
-            writer->write('\0', 8);
+            writer.write('\0', 8);
         }
 
         bool RawReferenceSequence::isIdUnique(const RawReferenceSequence *s) const {

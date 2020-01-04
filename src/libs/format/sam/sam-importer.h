@@ -24,7 +24,7 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
     OrderedLock lock;  //!< @brief Lock to ensure in order execution
 
    public:
-    SamImporter(size_t _blockSize, std::istream &_file) : blockSize(_blockSize), samReader(_file), lock() {}
+    SamImporter(size_t _blockSize, std::istream &_file) : blockSize(_blockSize), samReader(_file), lock(), ref_counter(0) {}
 
     static std::tuple<bool, uint8_t> convertFlags2Mpeg(uint16_t flags) {
         uint8_t flags_mpeg = 0;
@@ -39,7 +39,7 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
     }
 
     static char convertCigar2ECigarChar(char token) {
-        static const auto lut = []() -> std::string {
+        static const auto lut_loc = []() -> std::string {
             std::string lut(128, 0);
             lut['M'] = '=';
             lut['='] = '=';
@@ -55,7 +55,7 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
         if (token < 0) {
             UTILS_DIE("Invalid cigar token");
         }
-        char ret = lut[token];
+        char ret = lut_loc[token];
         if (ret == 0) {
             UTILS_DIE("Invalid cigar token");
         }
@@ -63,7 +63,7 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
     }
 
     static int stepSequence(char token) {
-        static const auto lut = []() -> std::string {
+        static const auto lut_loc = []() -> std::string {
             std::string lut(128, 0);
             lut['M'] = 1;
             lut['='] = 1;
@@ -79,7 +79,7 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
         if (token < 0) {
             UTILS_DIE("Invalid cigar token");
         }
-        return lut[token];
+        return lut_loc[token];
     }
 
     static std::string convertCigar2ECigar(const std::string &cigar, const std::string &seq) {
@@ -117,7 +117,10 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
         return ecigar;
     }
 
-    static format::mpegg_rec::MpeggRecord convert(format::sam::SamRecord &&_r1, format::sam::SamRecord *_r2) {
+    std::map<std::string, size_t> refs;
+    size_t ref_counter;
+
+    static format::mpegg_rec::MpeggRecord convert(uint16_t ref, format::sam::SamRecord &&_r1, format::sam::SamRecord *_r2) {
         format::sam::SamRecord r1 = std::move(_r1);
         auto flag_tuple = convertFlags2Mpeg(r1.getFlags());
         format::mpegg_rec::MpeggRecord ret(_r2 ? 2 : 1, format::mpegg_rec::ClassType::CLASS_I, r1.moveQname(), "Genie",
@@ -129,7 +132,7 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
         format::mpegg_rec::AlignmentContainer alignmentContainer(r1.getPos(), std::move(alignment));
 
         format::mpegg_rec::Segment segment(r1.moveSeq());
-        if(r1.getQual() != "*") {
+        if (r1.getQual() != "*") {
             segment.addQualityValues(r1.moveQual());
         }
         ret.addRecordSegment(std::move(segment));
@@ -142,7 +145,7 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
             alignment2.addMappingScore(r2.getMapQ());
 
             format::mpegg_rec::Segment segment2(r2.moveSeq());
-            if(r2.getQual() != "*") {
+            if (r2.getQual() != "*") {
                 segment2.addQualityValues(r2.moveQual());
             }
             ret.addRecordSegment(std::move(segment2));
@@ -153,7 +156,7 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
         } else {
         }
 
-        ret.addAlignment(0, std::move(alignmentContainer));  // TODO
+        ret.addAlignment(ref, std::move(alignmentContainer));  // TODO
         return ret;
     }
 
@@ -161,11 +164,19 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
         format::mpegg_rec::MpeggChunk chunk;
         std::vector<format::sam::SamRecord> s;
         std::list<format::sam::SamRecord> samRecords;
+        uint16_t local_ref_num = 0;
         {
             OrderedSection section(&lock, id);
             samReader.read(blockSize, s);
+            auto it = refs.find(s.front().getRname());
+            if(it == refs.end()) {
+                local_ref_num = ref_counter;
+                refs.insert(std::make_pair(s.front().getRname(), ref_counter++));
+            } else {
+                local_ref_num = it->second;
+            }
         }
-        std::copy( s.begin(), s.end(), std::back_inserter( samRecords ) );
+        std::copy(s.begin(), s.end(), std::back_inserter(samRecords));
 
         LOG_TRACE << "Read " << samRecords.size() << " SAM record(s)";
         while (!samRecords.empty()) {
@@ -176,7 +187,7 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
                 samRecord.getRnext() == "=" ? samRecord.getRname() : samRecord.getRnext();
             auto mate = samRecords.begin();
             mate = samRecords.end();
-            if(samRecord.getPnext() == samRecord.getPos() && samRecord.getRname() == rnameSearchString) {
+            if (samRecord.getPnext() == samRecord.getPos() && samRecord.getRname() == rnameSearchString) {
                 mate = samRecords.end();
             }
             for (; mate != samRecords.end(); ++mate) {
@@ -187,9 +198,9 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
             }
             if (mate == samRecords.end()) {
                 // LOG_TRACE << "Did not find mate";
-                chunk.emplace_back(convert(std::move(samRecord), nullptr));
+                chunk.emplace_back(convert(local_ref_num, std::move(samRecord), nullptr));
             } else {
-                chunk.emplace_back(convert(std::move(samRecord), &*mate));
+                chunk.emplace_back(convert(local_ref_num, std::move(samRecord), &*mate));
                 samRecords.erase(mate);
             }
         }

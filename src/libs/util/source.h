@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include "drain.h"
+#include <memory>
 
 /**
  * @brief Implementing this interface signals the ability to putput data chunks of type TYPE

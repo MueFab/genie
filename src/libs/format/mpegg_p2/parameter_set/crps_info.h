@@ -3,7 +3,9 @@
 
 // -----------------------------------------------------------------------------------------------------------------
 
+#include <util/make_unique.h>
 #include <cstdint>
+#include <memory>
 #include "util/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -29,7 +31,13 @@ namespace format {
                 return cr_buf_max_size;
             }
 
-            virtual void write(util::BitWriter *writer) const;
+            virtual void write(util::BitWriter &writer) const;
+
+            std::unique_ptr<CrpsInfo> clone() const {
+                auto ret = util::make_unique<CrpsInfo>();
+                *ret = *this;
+                return ret;
+            }
         };
     }
 }  // namespace format

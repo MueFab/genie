@@ -27,7 +27,7 @@ namespace format {
 
             virtual std::unique_ptr<RawReferenceSequence> clone() const;
 
-            void write(util::BitWriter *writer) const;
+            void write(util::BitWriter &writer) const;
 
             uint64_t getTotalSize() const;
         };

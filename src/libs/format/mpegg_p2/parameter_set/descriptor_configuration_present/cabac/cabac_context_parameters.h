@@ -6,6 +6,8 @@
 #include <memory>
 #include <vector>
 #include "util/bitwriter.h"
+#include "util/bitreader.h"
+#include "util/make_unique.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -29,11 +31,21 @@ class CabacContextParameters {
 
     CabacContextParameters();
 
+    CabacContextParameters(uint8_t coding_subsym_size, uint8_t output_symbol_size, util::BitReader& reader) {
+        adaptive_mode_flag = reader.read(1);
+        num_contexts = reader.read(16);
+        for (size_t i = 0; i < num_contexts; ++i) {
+            context_initialization_value.emplace_back(reader.read(7));
+        }
+        if (coding_subsym_size < output_symbol_size) {
+            share_subsym_ctx_flag = util::make_unique<bool>(reader.read(1));
+        }
+    }
     virtual ~CabacContextParameters() = default;
 
     void addContextInitializationValue(uint8_t _context_initialization_value);
 
-    virtual void write(util::BitWriter* writer) const;
+    virtual void write(util::BitWriter& writer) const;
 
     std::unique_ptr<CabacContextParameters> clone() const;
 

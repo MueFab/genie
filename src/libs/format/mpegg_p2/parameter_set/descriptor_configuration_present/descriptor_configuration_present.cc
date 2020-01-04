@@ -22,7 +22,7 @@ std::unique_ptr<DescriptorConfiguration> DescriptorConfigurationPresent::clone()
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void DescriptorConfigurationPresent::write(util::BitWriter *writer) const {
+void DescriptorConfigurationPresent::write(util::BitWriter &writer) const {
     DescriptorConfiguration::write(writer);
     if (dec_cfg_preset != DecCfgPreset::PRESENT) {
         return;

@@ -24,7 +24,7 @@ class SamExporter : public Drain<format::mpegg_rec::MpeggChunk> {
 
    public:
     static int stepRef(char token) {
-        static const auto lut = []() -> std::string {
+        static const auto lut_loc = []() -> std::string {
             std::string lut(128, 0);
             lut['M'] = 1;
             lut['='] = 1;
@@ -40,11 +40,11 @@ class SamExporter : public Drain<format::mpegg_rec::MpeggChunk> {
         if (token < 0) {
             UTILS_DIE("Invalid cigar token");
         }
-        return lut[token];
+        return lut_loc[token];
     }
 
     static char convertECigar2CigarChar(char token) {
-        static const auto lut = []() -> std::string {
+        static const auto lut_loc = []() -> std::string {
             std::string lut(128, 0);
             lut['='] = '=';
             lut['+'] = 'I';
@@ -59,7 +59,7 @@ class SamExporter : public Drain<format::mpegg_rec::MpeggChunk> {
         if (token < 0) {
             UTILS_DIE("Invalid cigar token");
         }
-        char ret = lut[token];
+        char ret = lut_loc[token];
         if (ret == 0) {
             UTILS_DIE("Invalid cigar token");
         }
@@ -206,14 +206,14 @@ class SamExporter : public Drain<format::mpegg_rec::MpeggChunk> {
                 stash[i].flags |= 32;
             }
             std::string name = rec.getReadName().empty() ? "*" : rec.getReadName();
-            out.emplace_back(name, stash[i].flags, "GenieRef", stash[i].position, stash[i].mappingScore, stash[i].cigar,
+            out.emplace_back(name, stash[i].flags, "ref" + std::to_string(rec.getMetaAlignment().getSeqID()), stash[i].position, stash[i].mappingScore, stash[i].cigar,
                              "=", stash[i + 1].position, tlen, stash[i].seq, stash[i].qual);
         }
         if (stash.front().rcomp) {
             stash[i].flags |= 32;
         }
         std::string name = rec.getReadName().empty() ? "*" : rec.getReadName();
-        out.emplace_back(name, stash[i].flags, "GenieRef", stash[i].position, stash[i].mappingScore, stash[i].cigar,
+        out.emplace_back(name, stash[i].flags, "ref" + std::to_string(rec.getMetaAlignment().getSeqID()), stash[i].position, stash[i].mappingScore, stash[i].cigar,
                          "=", stash.front().position, -tlen, stash[i].seq, stash[i].qual);
     }
 

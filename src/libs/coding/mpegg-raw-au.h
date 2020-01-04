@@ -78,7 +78,7 @@ class MpeggRawAu {
         GenSubIndex getID() const;
 
         uint64_t pull() {
-            if(end()) {
+            if (end()) {
                 UTILS_DIE("Tried to read descriptor that has already ended");
             }
             return data.get(position++);
@@ -229,11 +229,17 @@ class MpeggRawAu {
 
     void addRecord() { numRecords++; }
 
+    void setReference(uint16_t ref) { referenceSequence = ref; }
+
+    uint16_t getReference() { return referenceSequence; }
+
    private:
     std::vector<Descriptor> descriptors;        //!< @brief
     format::mpegg_p2::ParameterSet parameters;  //!< @brief
 
     size_t numRecords;  //!< @brief
+
+    uint16_t referenceSequence;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
