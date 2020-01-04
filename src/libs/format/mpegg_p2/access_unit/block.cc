@@ -22,11 +22,11 @@ void Block::write(util::BitWriter &writer) const {
 
     std::stringstream ss;
     util::BitWriter tmp_writer(&ss);
-    payload.write(writer);
+    payload.write(tmp_writer);
     tmp_writer.flush();
     uint64_t bits = tmp_writer.getBitsWritten();
 
-    writer.write(bits, 29);
+    writer.write(bits / 8, 29);
     writer.write(&ss);
     writer.flush();
 }

@@ -41,7 +41,13 @@ class Block {
         reserved_2 = reader.read(3);
         block_payload_size = reader.read(29);
 
+     /*   for(size_t i = 0; i < block_payload_size; ++i) {
+            reader.read(8);
+        } */
+
         payload = BlockPayloadSet::DescriptorPayload(GenDesc (descriptor_ID), block_payload_size, reader);
+
+        reader.flush();
 
     }
     virtual ~Block() = default;

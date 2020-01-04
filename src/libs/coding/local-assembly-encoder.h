@@ -23,8 +23,6 @@ class LocalAssemblyEncoder : public MpeggEncoder {
     bool debug;                //!< @brief If true, debugging information will be printed to std::cout
     uint32_t cr_buf_max_size;  //!< @brief Buffer size for local assembly reference memory
 
-
-
     /**
      * @brief Internal local assembly state (not exposed publicly)
      */
@@ -39,6 +37,8 @@ class LocalAssemblyEncoder : public MpeggEncoder {
         bool pairedEnd;                               //!< @brief Current guess regarding pairing
         size_t readLength;                            //!< @brief Current guess regarding read length
         format::mpegg_rec::ClassType classType;       //!< @brief Current guess regarding class type
+        uint64_t minPos;
+        uint64_t maxPos;
     };
 
     /**
@@ -102,6 +102,34 @@ class LocalAssemblyEncoder : public MpeggEncoder {
      * @param _debug If additional debugging information shall be printed
      */
     LocalAssemblyEncoder(uint32_t _cr_buf_max_size, bool _debug);
+
+    static uint64_t getLengthOfCigar(const std::string& cigar) {
+        std::string digits;
+        size_t length = 0;
+        for (const auto& c : cigar) {
+            if (isdigit(c)) {
+                digits += c;
+                continue;
+            }
+            if (getAlphabetProperties(AlphabetID::ACGTN).isIncluded(c)) {
+                length++;
+                digits.clear();
+                continue;
+            }
+            if(c == '=' || c == '-' || c == '*' || c == '/' || c== '%') {
+                length += std::stoi(digits);
+                digits.clear();
+            } else {
+                digits.clear();
+            }
+        }
+        return length;
+    }
+
+    void updateAUBoundaries(uint64_t position, const std::string& cigar, LaeState& state) const {
+        state.minPos = std::min(position, state.minPos);
+        state.maxPos = std::max(position + getLengthOfCigar(cigar), state.maxPos);
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

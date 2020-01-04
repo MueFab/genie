@@ -30,7 +30,9 @@ namespace cabac {
             ret->binarization_ID = binarization_ID;
             ret->bypass_flag = bypass_flag;
             ret->cabac_binarization_parameters = cabac_binarization_parameters->clone();
-            ret->cabac_context_parameters = cabac_context_parameters->clone();
+            if (cabac_context_parameters) {
+                ret->cabac_context_parameters = cabac_context_parameters->clone();
+            }
             return ret;
         }
 

@@ -35,8 +35,12 @@ namespace cabac {
             ret->output_symbol_size = output_symbol_size;
             ret->coding_subsym_size = coding_subsym_size;
             ret->coding_order = coding_order;
-            ret->share_subsym_lut_flag = util::make_unique<bool>(*share_subsym_lut_flag);
-            ret->share_subsym_prv_flag = util::make_unique<bool>(*share_subsym_prv_flag);
+            if(share_subsym_lut_flag) {
+                ret->share_subsym_lut_flag = util::make_unique<bool>(*share_subsym_lut_flag);
+            }
+            if(share_subsym_prv_flag) {
+                ret->share_subsym_prv_flag = util::make_unique<bool>(*share_subsym_prv_flag);
+            }
             return ret;
         }
 

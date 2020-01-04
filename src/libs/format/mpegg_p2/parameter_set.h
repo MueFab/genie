@@ -90,7 +90,9 @@ class ParameterSet : public DataUnit {
         multiple_alignments_flag = other.multiple_alignments_flag;
         spliced_reads_flag = other.spliced_reads_flag;
         multiple_signature_base = other.multiple_signature_base;
-        u_signature_size = util::make_unique<uint8_t>(*other.u_signature_size);
+        if(other.u_signature_size) {
+            u_signature_size = util::make_unique<uint8_t>(*other.u_signature_size);
+        }
         for(const auto&c : other.qv_coding_configs) {
             qv_coding_configs.emplace_back(c->clone());
         }

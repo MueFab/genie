@@ -74,7 +74,7 @@ void BlockPayloadSet::DescriptorPayload::write(util::BitWriter& writer) const {
     for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
         std::stringstream ss;
         util::BitWriter tmp_writer(&ss);
-        subsequencePayloads[i].write(writer);
+        subsequencePayloads[i].write(tmp_writer);
         tmp_writer.flush();
         uint64_t bits = tmp_writer.getBitsWritten();
         if (i != subsequencePayloads.size() - 1) {

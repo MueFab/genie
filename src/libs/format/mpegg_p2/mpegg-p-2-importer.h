@@ -35,6 +35,10 @@ class MpeggP2Importer : public Source<BlockPayloadSet>, public OriginalSource{
         for(auto& b : unit->getBlocks()) {
             set.setPayload(GenDesc(b.getDescriptorID()), b.movePayload());
         }
+        set.setReference(unit->getAlignmentInfo().getRefID());
+        set.setMinPos(unit->getAlignmentInfo().getStartPos());
+        set.setMaxPos(unit->getAlignmentInfo().getEndPos());
+        set.setRecordNum(unit->getReadCount());
         unit.reset();
         flowOut(std::move(set), id);
         return true;
