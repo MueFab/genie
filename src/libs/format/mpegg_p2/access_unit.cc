@@ -40,6 +40,8 @@ AccessUnit::AccessUnit(const std::map<size_t, std::unique_ptr<format::mpegg_p2::
                                             parameterSets.at(parameter_set_ID)->getMultipleSignatureBase(), bitReader);
     }
 
+    bitReader.flush();
+
     for (size_t i = 0; i < num_blocks; ++i) {
         blocks.emplace_back(bitReader);
     }
@@ -112,6 +114,7 @@ void AccessUnit::write(util::BitWriter &writer) const {
     std::stringstream ss;
     util::BitWriter tmp_writer(&ss);
     preWrite(tmp_writer);
+    tmp_writer.flush();
     for (auto &i : blocks) {
         i.write(tmp_writer);
     }

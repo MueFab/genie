@@ -18,6 +18,9 @@ class DataUnitFactory {
         DataUnit::DataUnitType type;
         do {
             type = DataUnit::DataUnitType(bitReader.read(8));
+            if(!bitReader.isGood()) {
+                return nullptr;
+            }
             switch (type) {
                 case DataUnit::DataUnitType::RAW_REFERENCE: {
                     UTILS_DIE("DataUnitFactory RAW_REFERENCE not supported yet!");

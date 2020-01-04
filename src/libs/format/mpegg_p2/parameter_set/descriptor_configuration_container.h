@@ -44,11 +44,12 @@ class DescriptorConfigurationContainer {
 
     virtual void write(util::BitWriter& writer) const;
 
-    std::unique_ptr<DescriptorConfigurationContainer> clone() {
+    std::unique_ptr<DescriptorConfigurationContainer> clone() const {
         auto ret = util::make_unique<DescriptorConfigurationContainer>();
+        ret->descriptor_configurations.clear();
         ret->class_specific_dec_cfg_flag = class_specific_dec_cfg_flag;
         for (const auto& d : descriptor_configurations) {
-            ret->descriptor_configurations.emplace_back(d->clone());
+            ret->descriptor_configurations.push_back(d->clone());
         }
         return ret;
     }

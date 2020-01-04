@@ -51,7 +51,9 @@ namespace qv_coding1 {
             ret->qv_coding_mode = qv_coding_mode;
             ret->qv_reverse_flag = qv_reverse_flag;
             ret->qvps_flag = qvps_flag;
-            ret->parameter_set_qvps = parameter_set_qvps->clone();
+            if(parameter_set_qvps) {
+                ret->parameter_set_qvps = parameter_set_qvps->clone();
+            }
             ret->qvps_preset_ID = util::make_unique<QvpsPresetId>(*qvps_preset_ID);
             return ret;
         }

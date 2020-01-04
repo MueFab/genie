@@ -18,7 +18,9 @@ LocalAssemblyEncoder::LaeState::LaeState(size_t cr_buf_max_size)
       readCoder(),
       pairedEnd(false),
       readLength(0),
-      classType(format::mpegg_rec::ClassType::NONE) {}
+      classType(format::mpegg_rec::ClassType::NONE),
+      minPos(std::numeric_limits<uint64_t>::max()),
+      maxPos(std::numeric_limits<uint64_t>::min()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -48,12 +50,17 @@ void LocalAssemblyEncoder::printDebug(const LocalAssemblyEncoder::LaeState& stat
 void LocalAssemblyEncoder::updateAssembly(const format::mpegg_rec::MpeggRecord& r,
                                           LocalAssemblyEncoder::LaeState& state) const {
     std::string ref1 = state.refCoder.getReference(r.getAlignments().front().getPosition(),
-                                                    r.getAlignments().front().getAlignment().getECigar());
+                                                   r.getAlignments().front().getAlignment().getECigar());
     std::string ref2;
+
+    updateAUBoundaries(r.getAlignments().front().getPosition(), r.getAlignments().front().getAlignment().getECigar(),
+                       state);
     if (state.pairedEnd) {
         const auto& srec = getPairedAlignment(state, r);
         ref2 = state.refCoder.getReference(r.getAlignments().front().getPosition() + srec.getDelta(),
-                                            srec.getAlignment().getECigar());
+                                           srec.getAlignment().getECigar());
+        updateAUBoundaries(r.getAlignments().front().getPosition() + srec.getDelta(), srec.getAlignment().getECigar(),
+                           state);
     }
 
     state.refCoder.addRead(r);
@@ -80,7 +87,8 @@ const format::mpegg_rec::SplitAlignmentSameRec& LocalAssemblyEncoder::getPairedA
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LocalAssemblyEncoder::updateGuesses(const format::mpegg_rec::MpeggRecord& r, LocalAssemblyEncoder::LaeState& state) const {
+void LocalAssemblyEncoder::updateGuesses(const format::mpegg_rec::MpeggRecord& r,
+                                         LocalAssemblyEncoder::LaeState& state) const {
     if ((r.getNumberOfTemplateSegments() > 1) != state.pairedEnd) {
         UTILS_DIE("Mix of paired / unpaired not supported");
     }
@@ -102,11 +110,12 @@ void LocalAssemblyEncoder::updateGuesses(const format::mpegg_rec::MpeggRecord& r
 
 MpeggRawAu LocalAssemblyEncoder::pack(size_t id, uint16_t ref, LocalAssemblyEncoder::LaeState& state) const {
     format::mpegg_p2::DataUnit::DatasetType dataType = format::mpegg_p2::DataUnit::DatasetType::ALIGNED;
-    format::mpegg_p2::ParameterSet ret (id, id, dataType, AlphabetID::ACGTN, state.readLength,
-                                                                 state.pairedEnd, false, 0, 0, false, false);
+    format::mpegg_p2::ParameterSet ret(id, id, dataType, AlphabetID::ACGTN, state.readLength, state.pairedEnd, false, 0,
+                                       0, false, false);
     const auto ALPHABET = format::mpegg_p2::qv_coding1::QvCodingConfig1::QvpsPresetId::ASCII;
     ret.addClass(state.classType, util::make_unique<format::mpegg_p2::qv_coding1::QvCodingConfig1>(ALPHABET, false));
-    auto crps = util::make_unique<format::mpegg_p2::ParameterSetCrps>(format::mpegg_p2::ParameterSetCrps::CrAlgId::LOCAL_ASSEMBLY);
+    auto crps = util::make_unique<format::mpegg_p2::ParameterSetCrps>(
+        format::mpegg_p2::ParameterSetCrps::CrAlgId::LOCAL_ASSEMBLY);
     crps->setCrpsInfo(util::make_unique<format::mpegg_p2::CrpsInfo>(0, cr_buf_max_size));
     ret.setCrps(std::move(crps));
 
@@ -114,6 +123,8 @@ MpeggRawAu LocalAssemblyEncoder::pack(size_t id, uint16_t ref, LocalAssemblyEnco
 
     rawAU.setParameters(std::move(ret));
     rawAU.setReference(ref);
+    rawAU.setMinPos(state.minPos);
+    rawAU.setMaxPos(state.maxPos);
 
     return rawAU;
 }
@@ -131,7 +142,7 @@ void LocalAssemblyEncoder::flowIn(format::mpegg_rec::MpeggChunk&& t, size_t id) 
     for (auto& r : data) {
         updateGuesses(r, state);
 
-        if(r.getMetaAlignment().getSeqID() != ref) {
+        if (r.getMetaAlignment().getSeqID() != ref) {
             UTILS_DIE("Records belonging to different reference sequences in one access unit");
         }
 

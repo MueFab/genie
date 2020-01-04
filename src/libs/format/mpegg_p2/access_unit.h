@@ -60,6 +60,14 @@ class AccessUnit : public DataUnit {
         return parameter_set_ID;
     }
 
+    const AuTypeCfg& getAlignmentInfo() const {
+        return *au_Type_U_Cfg;
+    }
+
+    uint32_t getReadCount () const {
+        return reads_count;
+    }
+
    private:
     void preWrite(util::BitWriter &writer) const;
 

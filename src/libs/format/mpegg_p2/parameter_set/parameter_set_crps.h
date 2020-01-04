@@ -41,7 +41,9 @@ class ParameterSetCrps {
     explicit ParameterSetCrps(util::BitReader &reader) {
         cr_alg_ID = CrAlgId(reader.read(8));
         if (cr_alg_ID == CrAlgId::PUSH_IN || cr_alg_ID == CrAlgId::LOCAL_ASSEMBLY) {
-            crps_info = util::make_unique<CrpsInfo>(reader.read(8), reader.read(24));
+            auto pad = reader.read(8);
+            auto buffer = reader.read(24);
+            crps_info = util::make_unique<CrpsInfo>(pad, buffer);
         }
     }
 

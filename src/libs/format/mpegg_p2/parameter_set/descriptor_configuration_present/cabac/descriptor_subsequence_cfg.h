@@ -30,8 +30,10 @@ class DescriptorSubsequenceCfg {
     DescriptorSubsequenceCfg(std::unique_ptr<TransformSubseqParameters> _transform_subseq_parameters,
                              uint16_t descriptor_subsequence_ID, bool tokentype);
 
-    DescriptorSubsequenceCfg(util::BitReader& reader) {
-        descriptor_subsequence_ID = util::make_unique<uint16_t>(reader.read(10));
+    DescriptorSubsequenceCfg(bool tokentype, util::BitReader& reader) {
+        if(!tokentype) {
+            descriptor_subsequence_ID = util::make_unique<uint16_t>(reader.read(10));
+        }
         transform_subseq_parameters = util::make_unique<TransformSubseqParameters>(reader);
         uint8_t numSubseq = 0;
         switch (transform_subseq_parameters->getTransformIdSubseq()) {
