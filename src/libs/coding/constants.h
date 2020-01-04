@@ -98,7 +98,8 @@ struct GenSub {
     static constexpr GenSubIndex QV_STEPS_5 = {GenDesc::QV, 7};
     static constexpr GenSubIndex QV_STEPS_6 = {GenDesc::QV, 8};
 
-    static constexpr GenSubIndex RNAME = {GenDesc::RNAME, 0};
+    static constexpr GenSubIndex RNAME_CABAC_0 = {GenDesc::RNAME, 0};
+    static constexpr GenSubIndex RNAME_CABAC_1 = {GenDesc::RNAME, 1};
 
     static constexpr GenSubIndex RFTP = {GenDesc::RFTP, 0};
 

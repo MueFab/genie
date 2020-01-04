@@ -60,7 +60,8 @@ constexpr GenSubIndex GenSub::QV_STEPS_4;
 constexpr GenSubIndex GenSub::QV_STEPS_5;
 constexpr GenSubIndex GenSub::QV_STEPS_6;
 
-constexpr GenSubIndex GenSub::RNAME;
+constexpr GenSubIndex GenSub::RNAME_CABAC_0;
+constexpr GenSubIndex GenSub::RNAME_CABAC_1;
 
 constexpr GenSubIndex GenSub::RFTP;
 
@@ -153,7 +154,7 @@ const std::vector<GenomicDescriptorProperties> &getDescriptors() {
           {GenSub::QV_STEPS_5, "steps_5"},
           {GenSub::QV_STEPS_6, "steps_6"}}},
 
-        {GenDesc::RNAME, "rname", true, {{GenSub::RNAME, "rname"}}},
+        {GenDesc::RNAME, "rname", true, {{GenSub::RNAME_CABAC_0, "cabac0"}, {GenSub::RNAME_CABAC_1, "cabac1"}}},
 
         {GenDesc::RFTP, "rftp", false, {{GenSub::RFTP, "rftp"}}},
 
