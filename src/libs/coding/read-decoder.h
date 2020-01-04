@@ -29,10 +29,10 @@ class LocalAssemblyReadDecoder {
         for (auto &sequence : sequences) {
             cigars.emplace_back(sequence.size(), '=');
         }
-        decodeClips(sequences, cigars);
-        auto state = decode(std::move(sequences.front()), std::move(cigars.front()));
+        auto clip_offset = decodeClips(sequences, cigars);
+        auto state = decode(std::get<0>(clip_offset), std::move(sequences.front()), std::move(cigars.front()));
         for (size_t i = 1; i < sequences.size(); ++i) {
-            decodeAdditional(std::move(sequences[i]), std::move(cigars[i]), state);
+            decodeAdditional(std::get<1>(clip_offset), std::move(sequences[i]), std::move(cigars[i]), state);
         }
 
         std::get<1>(state).addAlignment(ref, std::move(std::get<0>(state)));
@@ -62,7 +62,7 @@ class LocalAssemblyReadDecoder {
         return metaData;
     }
 
-    std::tuple<format::mpegg_rec::AlignmentContainer, format::mpegg_rec::MpeggRecord> decode(std::string &&seq,
+    std::tuple<format::mpegg_rec::AlignmentContainer, format::mpegg_rec::MpeggRecord> decode(size_t clip_offset, std::string &&seq,
                                                                                              std::string &&cigar) {
         auto sequence = std::move(seq);
 
@@ -83,7 +83,7 @@ class LocalAssemblyReadDecoder {
         const auto POSITION = position;
 
         std::string ecigar = std::move(cigar);
-        decodeMismatches(sequence, ecigar);
+        decodeMismatches(clip_offset, sequence, ecigar);
 
         format::mpegg_rec::Alignment alignment(contractECigar(ecigar), RCOMP);
         alignment.addMappingScore(MSCORE);
@@ -141,7 +141,7 @@ class LocalAssemblyReadDecoder {
         return result;
     }
 
-    void decodeAdditional(std::string &&seq, std::string &&cigar,
+    void decodeAdditional(size_t softclip_offset, std::string &&seq, std::string &&cigar,
                           std::tuple<format::mpegg_rec::AlignmentContainer, format::mpegg_rec::MpeggRecord> &state) {
         auto sequence = std::move(seq);
 
@@ -150,7 +150,7 @@ class LocalAssemblyReadDecoder {
         const auto MSCORE = container.pull(GenSub::MSCORE);
 
         std::string ecigar = std::move(cigar);
-        decodeMismatches(sequence, ecigar);
+        decodeMismatches(softclip_offset, sequence, ecigar);
 
         const auto PAIRING_CASE = container.pull(GenSub::PAIR_DECODING_CASE);
         if (PAIRING_CASE != GenConst::PAIR_SAME_RECORD) {
@@ -186,12 +186,12 @@ class LocalAssemblyReadDecoder {
         return counters;
     }
 
-    void decodeMismatches(std::string &sequence, std::string &cigar_extended) {
+    void decodeMismatches(size_t clip_offset, std::string &sequence, std::string &cigar_extended) {
         uint64_t mismatchPosition = 0;
         uint64_t cigarOffset = cigar_extended.find_first_not_of(']');
         while (!container.pull(GenSub::MMPOS_TERMINATOR)) {
             mismatchPosition += container.pull((GenSub::MMPOS_POSITION)) + 1;
-            const auto POSITION = mismatchPosition - 1;
+            const auto POSITION = mismatchPosition - 1 + clip_offset;
             const auto TYPE = container.pull((GenSub::MMTYPE_TYPE));
             if (TYPE == GenConst::MMTYPE_SUBSTITUTION) {
                 const auto SUBSTITUTION = container.pull((GenSub::MMTYPE_SUBSTITUTION));
@@ -218,10 +218,11 @@ class LocalAssemblyReadDecoder {
         }
     }
 
-    void decodeClips(std::vector<std::string> &sequences, std::vector<std::string> &cigar_extended) {
+    std::tuple<size_t, size_t> decodeClips(std::vector<std::string> &sequences, std::vector<std::string> &cigar_extended) {
         size_t num = recordCounter++;
+        std::tuple<size_t, size_t> softclip_offset = {0,0};
         if (container.isEnd(GenSub::CLIPS_RECORD_ID) || num != container.peek(GenSub::CLIPS_RECORD_ID)) {
-            return;
+            return softclip_offset;
         }
         container.pull(GenSub::CLIPS_RECORD_ID);
         auto clipType = container.pull(GenSub::CLIPS_TYPE);
@@ -250,9 +251,20 @@ class LocalAssemblyReadDecoder {
                 for (size_t i = 0; i < softClip.size(); ++i) {
                     cigar_extended[record_no][cigar_position++] = ')';
                 }
+
+                if (seq_position == 0) {
+                    if(record_no == 0) {
+                        std::get<0>(softclip_offset) = softClip.length();  // TODO: not working for paired
+                    }
+                    else {
+                        std::get<1>(softclip_offset) = softClip.length();
+                    }
+                }
             }
             clipType = container.pull(GenSub::CLIPS_TYPE);
         }
+
+        return softclip_offset;
     }
 };
 }  // namespace lae
