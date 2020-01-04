@@ -173,7 +173,7 @@ namespace spring {
                     uint32_t ACCESS_UNIT_ID = block_num_thr;
                     uint32_t num_reads_au = cp.paired_end ? num_reads_thr * 2 : num_reads_thr;
                     AccessUnit au = createQuickAccessUnit(
-                        ACCESS_UNIT_ID, PARAMETER_SET_ID, num_reads_au, format::mpegg_rec::MpeggRecord::ClassType::CLASS_U,
+                        ACCESS_UNIT_ID, PARAMETER_SET_ID, num_reads_au, .format::mpegg_rec::ClassType::CLASS_U,
                         DataUnit::DatasetType::NON_ALIGNED, &generated_streams, num_reads_thr);
 
 #ifdef GENIE_USE_OPENMP

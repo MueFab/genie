@@ -22,7 +22,7 @@ namespace spring {
   const bool PAIRED_END = cp.paired_end;
   const bool QV_PRESENT = cp.preserve_quality;
   ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT,
-                                            format::mpegg_rec::MpeggRecord::ClassType::CLASS_U, configs, true);
+                                            .format::mpegg_rec::ClassType::CLASS_U, configs, true);
   auto crps = util::make_unique<ParameterSetCrps>(ParameterSetCrps::CrAlgId::GLOBAL_ASSEMBLY);
   ps.setCrps(std::move(crps));
   // FIXME add in size written to stats->cmprs_total_sz
@@ -64,7 +64,7 @@ namespace spring {
     }
     // create and write AU
     AccessUnit au = createQuickAccessUnit(
-        auId, PARAMETER_SET_ID, num_reads_per_AU[auId], format::mpegg_rec::MpeggRecord::ClassType::CLASS_U,
+        auId, PARAMETER_SET_ID, num_reads_per_AU[auId], .format::mpegg_rec::ClassType::CLASS_U,
         DataUnit::DatasetType::NON_ALIGNED, &generated_streams, num_records_per_AU[auId]);
     // FIXME add in size written to stats
     au.write(&bw);
