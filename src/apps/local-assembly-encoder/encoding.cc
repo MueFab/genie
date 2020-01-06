@@ -33,8 +33,7 @@ void encode(const ProgramOptions &programOptions) {
         encoder.setDrain(&compressor);
         compressor.setDrain(&exporter);
 
-        const size_t NUM_THREADS = 8;
-        ThreadManager threads(NUM_THREADS, &importer);
+        ThreadManager threads(programOptions.num_threads, &importer);
 
         threads.run();
     } else {
