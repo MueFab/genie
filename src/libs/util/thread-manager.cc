@@ -13,7 +13,6 @@
 void ThreadManager::action() {
     try {
         while (!stopFlag && source->pump(counter++)) {
-            UTILS_DIE("Dead");
         }
     } catch (std::exception& e) {
         std::cerr << e.what() << std::endl;
