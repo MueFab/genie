@@ -10,7 +10,9 @@ protected:
     ~GabacCompressorTest() override = default;
 
     void SetUp() override {
-        // Code here will be called immediately before each test
+        std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+        const size_t RECORDS_PER_BLOCK = 10000;
+        std::ifstream myFastqInput(gitRootDir + "/resources/test-files/fastq/minimal.fastq")
     }
 
     void TearDown() override {
@@ -22,7 +24,7 @@ protected:
     // }
 };
 
-TEST(GabacCompressorTest, NonEmpty) {  // NOLINT(cert-err58-cpp)
+TEST_F(GabacCompressorTest, NonEmpty) {  // NOLINT(cert-err58-cpp)
 // The rule of thumb is to use EXPECT_* when you want the test to continue
 // to reveal more errors after the assertion failure, and use ASSERT_*
 // when continuing after failure doesn't make sense.
