@@ -53,11 +53,11 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
             return lut;
         }();
         if (token < 0) {
-            UTILS_DIE("Invalid cigar token");
+            UTILS_DIE("Invalid cigar token " + std::to_string(token));
         }
         char ret = lut_loc[token];
         if (ret == 0) {
-            UTILS_DIE("Invalid cigar token");
+            UTILS_DIE("Invalid cigar token" + std::to_string(token));
         }
         return ret;
     }
@@ -77,7 +77,7 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
             return lut;
         }();
         if (token < 0) {
-            UTILS_DIE("Invalid cigar token");
+            UTILS_DIE("Invalid cigar token " + std::to_string(token));
         }
         return lut_loc[token];
     }
@@ -178,7 +178,7 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
         }
         std::copy(s.begin(), s.end(), std::back_inserter(samRecords));
 
-        LOG_TRACE << "Read " << samRecords.size() << " SAM record(s)";
+        std::cout << "Read " << samRecords.size() << " SAM record(s) for access unit " << id << std::endl;
         while (!samRecords.empty()) {
             format::sam::SamRecord samRecord = std::move(samRecords.front());
             samRecords.erase(samRecords.begin());
