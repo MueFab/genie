@@ -5,11 +5,19 @@
  */
 
 #include "thread-manager.h"
+#include <iostream>
+#include "exceptions.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ThreadManager::action() {
-    while (!stopFlag && source->pump(counter++)) {
+    try {
+        while (!stopFlag && source->pump(counter++)) {
+            UTILS_DIE("Dead");
+        }
+    } catch (std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        throw(e);
     }
 }
 
