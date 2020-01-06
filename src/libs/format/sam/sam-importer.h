@@ -199,7 +199,7 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
             }
             if (mate == samRecords.end()) {
                 // LOG_TRACE << "Did not find mate";
-                if((mate->getFlags() & (1u << uint16_t(SamRecord::FlagPos::SEGMENT_UNMAPPED))) || mate->getCigar() == "*" || mate->getPos() == 0 || mate->getRname() == "*") {
+                if((samRecord.getFlags() & (1u << uint16_t(SamRecord::FlagPos::SEGMENT_UNMAPPED))) || samRecord.getCigar() == "*" || samRecord.getPos() == 0 || samRecord.getRname() == "*") {
                     skipped++;
                 } else {
                     chunk.emplace_back(convert(local_ref_num, std::move(samRecord), nullptr));
