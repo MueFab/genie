@@ -80,7 +80,12 @@ std::vector<std::vector<gabac::DataBlock>> generate_empty_raw_data() {
         } else {
             raw_data[descriptor].resize(format::getDescriptorProperties()[descriptor].number_subsequences);
             for (int subseq = 0; subseq < format::getDescriptorProperties()[descriptor].number_subsequences; subseq++) {
-                raw_data[descriptor][subseq].setWordSize(4);
+                if ((descriptor == 6 /*ureads*/) || (descriptor == 14/*qv*/)) {
+                   raw_data[descriptor][subseq].setWordSize(1);
+                }
+                else {
+                   raw_data[descriptor][subseq].setWordSize(4);
+                }
             }
         }
     }
@@ -162,9 +167,9 @@ uint64_t read_streams_from_file(std::vector<std::vector<std::vector<gabac::DataB
 
 std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
     const std::vector<size_t> SEQUENCE_NUMS = {2, 1, 3, 2, 3, 4, 1, 1, 8, 1, 5, 2, 1, 1, 3, 2, 1, 1};
-    const std::string DEFAULT_GABAC_CONF_JSON =
+    const std::string DEFAULT_GABAC_CONF_SEQ =
         "{"
-        "\"word_size\": 4,"
+        "\"word_size\": 1,"
         "\"sequence_transformation_id\": 0,"
         "\"sequence_transformation_parameter\": 0,"
         "\"transformed_sequences\":"
@@ -176,7 +181,21 @@ std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
         "\"context_selection_id\": 0"
         "}]"
         "}";
-    const std::string DEFAULT_GABAC_CONF_TOKENTYPE_JSON =
+    const std::string DEFAULT_GABAC_CONF_QUAL =
+        "{"
+        "\"word_size\": 1,"
+        "\"sequence_transformation_id\": 0,"
+        "\"sequence_transformation_parameter\": 0,"
+        "\"transformed_sequences\":"
+        "[{"
+        "\"lut_transformation_enabled\": false,"
+        "\"diff_coding_enabled\": false,"
+        "\"binarization_id\": 0,"
+        "\"binarization_parameters\":[32],"
+        "\"context_selection_id\": 0"
+        "}]"
+        "}";
+    const std::string DEFAULT_GABAC_CONF_ID =
         "{"
         "\"word_size\": 1,"
         "\"sequence_transformation_id\": 0,"
@@ -190,14 +209,36 @@ std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
         "\"context_selection_id\": 0"
         "}]"
         "}";
+    const std::string DEFAULT_GABAC_CONF_OTHER =
+        "{"
+        "\"word_size\": 4,"
+        "\"sequence_transformation_id\": 0,"
+        "\"sequence_transformation_parameter\": 0,"
+        "\"transformed_sequences\":"
+        "[{"
+        "\"lut_transformation_enabled\": false,"
+        "\"diff_coding_enabled\": false,"
+        "\"binarization_id\": 0,"
+        "\"binarization_parameters\":[32],"
+        "\"context_selection_id\": 0"
+        "}]"
+        "}";
     std::vector<std::vector<gabac::EncodingConfiguration>> ret;
     for (size_t i = 0; i < SEQUENCE_NUMS.size(); ++i) {
         ret.emplace_back();
         for (size_t j = 0; j < SEQUENCE_NUMS[i]; ++j) {
-            if (i == 11 || i == 15)  // msar or rname
-                ret[i].emplace_back(DEFAULT_GABAC_CONF_TOKENTYPE_JSON);
-            else
-                ret[i].emplace_back(DEFAULT_GABAC_CONF_JSON);
+            if (i == 6) {  // ureads
+                ret[i].emplace_back(DEFAULT_GABAC_CONF_SEQ);
+            }
+            else if (i == 14) {  // qv
+                ret[i].emplace_back(DEFAULT_GABAC_CONF_QUAL);
+            }
+            else if (i == 15) {  // 
+                ret[i].emplace_back(DEFAULT_GABAC_CONF_ID);
+            }
+            else {
+                ret[i].emplace_back(DEFAULT_GABAC_CONF_OTHER);
+            }
         }
     }
     return ret;
