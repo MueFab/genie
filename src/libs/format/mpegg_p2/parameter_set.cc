@@ -62,6 +62,11 @@ ParameterSet::ParameterSet(util::BitReader &bitReader)  // needs to be called by
     bitReader.flush();
 }
 
+//------------------------------------------------------------------------------------------------------------------
+
+// TODO: create copy constructor to call from P1 DatasetParameterSet (same for P2 AccessUnits)
+ParameterSet::ParameterSet(const ParameterSet &parameterSet)
+    : DataUnit(DataUnitType::PARAMETER_SET, parameterSet.getDataUnitSize()) {}
 // -----------------------------------------------------------------------------------------------------------------
 
 ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, DatasetType _dataset_type,
@@ -236,5 +241,6 @@ void ParameterSet::setMultipleSignatureBase(uint32_t _multiple_signature_base, u
     multiple_signature_base = _multiple_signature_base;
     u_signature_size = util::make_unique<uint8_t>(_U_signature_size);
 }
+
 }  // namespace mpegg_p2
 }  // namespace format
