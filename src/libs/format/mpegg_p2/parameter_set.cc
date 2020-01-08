@@ -140,6 +140,21 @@ void ParameterSet::write(util::BitWriter &writer) const {
 
 // -----------------------------------------------------------------------------------------------------------------
 
+void ParameterSet::preWrite(util::BitWriter *writer) const {
+    writer->write(parameter_set_ID, 8);
+    writer->write(parent_parameter_set_ID, 8);
+    writer->write(uint8_t(dataset_type), 4);
+    writer->write(uint8_t(alphabet_ID), 8);
+    writer->write(read_length, 24);
+    writer->write(number_of_template_segments_minus1, 2);
+    writer->write(0, 6);  // reserved_2
+    writer->write(max_au_data_unit_size, 29);
+    writer->write(pos_40_bits_flag, 1);
+    writer->write(qv_depth, 3);
+    writer->write(as_depth, 3);
+    writer->write(class_IDs.size(), 4);  // num_classes
+    for (const auto &i : class_IDs) {
+        writer->write(uint8_t(i), 4);
 void ParameterSet::preWrite(util::BitWriter &writer) const {
     writer.write(parameter_set_ID, 8);
     writer.write(parent_parameter_set_ID, 8);
@@ -196,7 +211,7 @@ void ParameterSet::addClass(mpegg_rec::ClassType class_id, std::unique_ptr<QvCod
             UTILS_THROW_RUNTIME_EXCEPTION("Adding classes not allowed once class specific descriptor configs enabled");
         }
     }
-    for (auto &a : class_IDs) {
+    for (const auto &a : class_IDs) {
         if (class_id == a) {
             UTILS_THROW_RUNTIME_EXCEPTION("Class already added");
         }
