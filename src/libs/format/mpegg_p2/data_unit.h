@@ -55,7 +55,11 @@ class DataUnit {
 
     void setDataUnitType(DataUnitType t) { data_unit_type = t; }
 
-    DataUnitType getDataUnitType() { return data_unit_type; }
+    DataUnitType getDataUnitType() const { return data_unit_type; }
+
+    void setDataUnitSize(uint32_t size) { data_unit_size = size; }
+
+    uint32_t getDataUnitSize() const { return data_unit_size; }
 
     std::vector<uint8_t> rawData;  // dataUnitSize and DataUnitType not included!
 };
