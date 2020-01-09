@@ -168,8 +168,8 @@ const GenomicDescriptorProperties &getDescriptor(GenDesc desc) { return getDescr
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const GenomicSubDescriptorProperties &getSubsequence(GenDesc desc, uint8_t sub) {
-    return getDescriptors()[uint8_t(desc)].subseqs[uint8_t(sub)];
+const GenomicSubDescriptorProperties &getSubsequence(GenSubIndex idx) {
+    return getDescriptors()[uint8_t(idx.first)].subseqs[uint8_t(idx.second)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
