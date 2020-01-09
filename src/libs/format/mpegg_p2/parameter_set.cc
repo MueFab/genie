@@ -64,11 +64,6 @@ ParameterSet::ParameterSet(util::BitReader &bitReader)  // needs to be called by
 
 //------------------------------------------------------------------------------------------------------------------
 
-// TODO: create copy constructor to call from P1 DatasetParameterSet (same for P2 AccessUnits)
-ParameterSet::ParameterSet(const ParameterSet &parameterSet)
-    : DataUnit(DataUnitType::PARAMETER_SET, parameterSet.getDataUnitSize()) {}
-// -----------------------------------------------------------------------------------------------------------------
-
 ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, DatasetType _dataset_type,
                            AlphabetID _alphabet_id, uint32_t _read_length, bool _paired_end, bool _pos_40_bits_flag,
                            uint8_t _qv_depth, uint8_t _as_depth, bool _multiple_alignments_flag,
@@ -145,21 +140,7 @@ void ParameterSet::write(util::BitWriter &writer) const {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::preWrite(util::BitWriter *writer) const {
-    writer->write(parameter_set_ID, 8);
-    writer->write(parent_parameter_set_ID, 8);
-    writer->write(uint8_t(dataset_type), 4);
-    writer->write(uint8_t(alphabet_ID), 8);
-    writer->write(read_length, 24);
-    writer->write(number_of_template_segments_minus1, 2);
-    writer->write(0, 6);  // reserved_2
-    writer->write(max_au_data_unit_size, 29);
-    writer->write(pos_40_bits_flag, 1);
-    writer->write(qv_depth, 3);
-    writer->write(as_depth, 3);
-    writer->write(class_IDs.size(), 4);  // num_classes
-    for (const auto &i : class_IDs) {
-        writer->write(uint8_t(i), 4);
+
 void ParameterSet::preWrite(util::BitWriter &writer) const {
     writer.write(parameter_set_ID, 8);
     writer.write(parent_parameter_set_ID, 8);
