@@ -53,11 +53,11 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
             return lut;
         }();
         if (token < 0) {
-            UTILS_DIE("Invalid cigar token");
+            UTILS_DIE("Invalid cigar token " + std::to_string(token));
         }
         char ret = lut_loc[token];
         if (ret == 0) {
-            UTILS_DIE("Invalid cigar token");
+            UTILS_DIE("Invalid cigar token" + std::to_string(token));
         }
         return ret;
     }
@@ -77,7 +77,7 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
             return lut;
         }();
         if (token < 0) {
-            UTILS_DIE("Invalid cigar token");
+            UTILS_DIE("Invalid cigar token " + std::to_string(token));
         }
         return lut_loc[token];
     }
@@ -178,7 +178,8 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
         }
         std::copy(s.begin(), s.end(), std::back_inserter(samRecords));
 
-        LOG_TRACE << "Read " << samRecords.size() << " SAM record(s)";
+        std::cout << "Read " << samRecords.size() << " SAM record(s) for access unit " << id << std::endl;
+        size_t skipped = 0;
         while (!samRecords.empty()) {
             format::sam::SamRecord samRecord = std::move(samRecords.front());
             samRecords.erase(samRecords.begin());
@@ -186,7 +187,7 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
             const std::string &rnameSearchString =
                 samRecord.getRnext() == "=" ? samRecord.getRname() : samRecord.getRnext();
             auto mate = samRecords.begin();
-            mate = samRecords.end();
+            mate = samRecords.end(); // Disable pairs for now TODO: implement
             if (samRecord.getPnext() == samRecord.getPos() && samRecord.getRname() == rnameSearchString) {
                 mate = samRecords.end();
             }
@@ -198,13 +199,20 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
             }
             if (mate == samRecords.end()) {
                 // LOG_TRACE << "Did not find mate";
-                chunk.emplace_back(convert(local_ref_num, std::move(samRecord), nullptr));
+                if((samRecord.getFlags() & (1u << uint16_t(SamRecord::FlagPos::SEGMENT_UNMAPPED))) || samRecord.getCigar() == "*" || samRecord.getPos() == 0 || samRecord.getRname() == "*") {
+                    skipped++;
+                } else {
+                    chunk.emplace_back(convert(local_ref_num, std::move(samRecord), nullptr));
+                }
             } else {
+                // TODO: note the filtering of unaligned reads above. Move this to the encoder
                 chunk.emplace_back(convert(local_ref_num, std::move(samRecord), &*mate));
                 samRecords.erase(mate);
             }
         }
-
+        if(skipped) {
+            std::cerr << "Skipped " << skipped << " unmapped reads! Those are currently not supported." << std::endl;
+        }
         if (!chunk.empty()) {
             flowOut(std::move(chunk), id);
         }

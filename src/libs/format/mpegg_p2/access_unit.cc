@@ -77,6 +77,8 @@ AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, mpeg
     }
 }
 
+// -----------------------------------------------------------------------------------------------------------------
+
 void AccessUnit::setMmCfg(std::unique_ptr<MmCfg> cfg) {
     if (!mm_cfg) {
         UTILS_THROW_RUNTIME_EXCEPTION("MmCfg not valid for this access unit");

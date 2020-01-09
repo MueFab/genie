@@ -15,9 +15,9 @@ class ProgramOptions {
    public:
     std::string inputFilePath;
     std::string outputFilePath;
-    std::string typeString;
-
-    format::mpegg_rec::ClassType type;
+    bool decompression;
+    uint8_t num_threads;
+    bool forceOverride;
 
 
    private:
