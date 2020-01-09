@@ -62,7 +62,7 @@ ParameterSet::ParameterSet(util::BitReader &bitReader)  // needs to be called by
     bitReader.flush();
 }
 
-// -----------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------
 
 ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, DatasetType _dataset_type,
                            AlphabetID _alphabet_id, uint32_t _read_length, bool _paired_end, bool _pos_40_bits_flag,
@@ -140,6 +140,7 @@ void ParameterSet::write(util::BitWriter &writer) const {
 
 // -----------------------------------------------------------------------------------------------------------------
 
+
 void ParameterSet::preWrite(util::BitWriter &writer) const {
     writer.write(parameter_set_ID, 8);
     writer.write(parent_parameter_set_ID, 8);
@@ -196,7 +197,7 @@ void ParameterSet::addClass(mpegg_rec::ClassType class_id, std::unique_ptr<QvCod
             UTILS_THROW_RUNTIME_EXCEPTION("Adding classes not allowed once class specific descriptor configs enabled");
         }
     }
-    for (auto &a : class_IDs) {
+    for (const auto &a : class_IDs) {
         if (class_id == a) {
             UTILS_THROW_RUNTIME_EXCEPTION("Class already added");
         }
@@ -221,5 +222,6 @@ void ParameterSet::setMultipleSignatureBase(uint32_t _multiple_signature_base, u
     multiple_signature_base = _multiple_signature_base;
     u_signature_size = util::make_unique<uint8_t>(_U_signature_size);
 }
+
 }  // namespace mpegg_p2
 }  // namespace format

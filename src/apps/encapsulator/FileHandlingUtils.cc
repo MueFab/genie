@@ -139,7 +139,7 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileNam
     // - AccessUnit[]
 
     std::vector<std::unique_ptr<format::mpegg_p1::Dataset>> datasets;
-    datasets.push_back(format::mpegg_p1::Dataset::createFromDataUnits(&dataUnits)); //TODO call by pointer
+    datasets.push_back(format::mpegg_p1::Dataset::createFromDataUnits(dataUnits));
 
     // DatasetGroup consists of:
     // - DatasetGroupHeader
