@@ -15,7 +15,8 @@ void SamHeaderLine::parseSingleTag(const std::string& value, const TagInfo& info
     if (!info.regex.empty()) {
         const std::regex regex(info.regex);
         if (!std::regex_match(value, regex)) {
-            UTILS_DIE("Sam header regex fail");
+            std::cerr << "Sam header regex fail: skipping tag " << info.name << std::endl;
+            return;
         }
     }
     auto tag = info.create(info.name, value);

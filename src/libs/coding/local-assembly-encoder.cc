@@ -139,7 +139,15 @@ void LocalAssemblyEncoder::flowIn(format::mpegg_rec::MpeggChunk&& t, size_t id) 
     state.readLength = data.front().getRecordSegments().front().getSequence().length();
 
     auto ref = data.front().getMetaAlignment().getSeqID();
+    uint64_t lastPos = 0;
     for (auto& r : data) {
+
+        if(r.getAlignments().front().getPosition() < lastPos) {
+            UTILS_DIE("Data seems to be unsorted. Local assembly encoding needs sorted input data.");
+        }
+
+        lastPos = r.getAlignments().front().getPosition();
+
         updateGuesses(r, state);
 
         if (r.getMetaAlignment().getSeqID() != ref) {

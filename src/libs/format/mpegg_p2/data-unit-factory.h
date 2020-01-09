@@ -26,14 +26,14 @@ class DataUnitFactory {
                     UTILS_DIE("DataUnitFactory RAW_REFERENCE not supported yet!");
                 }
                 case DataUnit::DataUnitType::PARAMETER_SET: {
-                    fprintf(stdout, "DataUnitFactory PARAMETER_SET detected!\n");
                     auto p =  util::make_unique<ParameterSet>(bitReader);
                     parameters.insert(std::make_pair(p->getID(), std::move(p)));
                     break;
                 }
                 case DataUnit::DataUnitType::ACCESS_UNIT: {
-                    fprintf(stdout, "DataUnitFactory ACCESS_UNIT detected!\n");
-                    return util::make_unique<AccessUnit>(parameters, bitReader);
+                    auto ret = util::make_unique<AccessUnit>(parameters, bitReader);
+                    std::cout << "Decompressing AU " << ret->getID() << "..." << std::endl;
+                    return ret;
                 }
                 default: {
                     UTILS_DIE("DataUnitFactory invalid DataUnitType!");

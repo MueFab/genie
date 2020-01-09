@@ -38,7 +38,7 @@ class SamExporter : public Drain<format::mpegg_rec::MpeggChunk> {
             return lut;
         }();
         if (token < 0) {
-            UTILS_DIE("Invalid cigar token");
+            UTILS_DIE("Invalid cigar token" + std::to_string(token));
         }
         return lut_loc[token];
     }
@@ -57,11 +57,11 @@ class SamExporter : public Drain<format::mpegg_rec::MpeggChunk> {
             return lut;
         }();
         if (token < 0) {
-            UTILS_DIE("Invalid cigar token");
+            UTILS_DIE("Invalid cigar token" + std::to_string(token));
         }
         char ret = lut_loc[token];
         if (ret == 0) {
-            UTILS_DIE("Invalid cigar token");
+            UTILS_DIE("Invalid cigar token" + std::to_string(token));
         }
         return ret;
     }
