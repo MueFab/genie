@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 
+#include "access_unit_p1.h"
 #include "dataset_header.h"
 #include "dataset_parameter_set.h"
 #include "format/mpegg_p2/data_unit.h"
