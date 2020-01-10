@@ -173,7 +173,7 @@ struct Alphabet {
 const std::vector<GenomicDescriptorProperties>& getDescriptors();
 
 const GenomicDescriptorProperties& getDescriptor(GenDesc desc);
-const GenomicSubDescriptorProperties& getSubsequence(GenDesc desc, GenSub sub);
+const GenomicSubDescriptorProperties& getSubsequence(GenSubIndex idx);
 
 const Alphabet& getAlphabetProperties(AlphabetID id);
 
