@@ -51,9 +51,25 @@ void GenieGabacOutputBuffer::flush_blocks(std::vector<gabac::DataBlock> *dat) {
     dat->swap(streams);
 }
 
-void gabac_compress(const gabac::EncodingConfiguration &conf, gabac::DataBlock *in,
+void gabac_compress(gabac::EncodingConfiguration config, gabac::DataBlock *in,
                     std::vector<gabac::DataBlock> *out) {
+
+    // Use the word size that was used when constructing the data block
+    // for compression.  The word_size value that is specified in the config
+    // is not used for anything by genie when compressing - it is just passed
+    // to the decompressor as part of the config specs.
+    if (in->getWordSize() != config.wordSize) {
+        std::cout << "Word size spec in config (" << config.wordSize << ") ignored. " << (int)(in->getWordSize()) << " bytes used instead.\n";
+        std::cerr << "Word size spec in config (" << config.wordSize << ") ignored. " << (int)(in->getWordSize()) << " bytes used instead.\n";
+
+        // config is a value param.  The change is not propagated to caller.
+        config.wordSize = in->getWordSize();
+    }
+
     // Interface to GABAC library
+    // Note: the creation of the IBufferSTream object destructively
+    // modifies *in, modifying the word size.  The previous check must
+    // appear before this statement.
     gabac::IBufferStream bufferInputStream(in);
     GenieGabacOutputStream bufferOutputStream;
 
@@ -63,7 +79,7 @@ void gabac_compress(const gabac::EncodingConfiguration &conf, gabac::DataBlock *
                                                    GABC_LOG_OUTPUT_STREAM, gabac::IOConfiguration::LogLevel::TRACE};
 
     const bool GABAC_DECODING_MODE = false;
-    gabac::run(GABAC_IO_SETUP, conf, GABAC_DECODING_MODE);
+    gabac::run(GABAC_IO_SETUP, config, GABAC_DECODING_MODE);
     bufferOutputStream.flush_blocks(out);
 }
 
@@ -80,6 +96,11 @@ std::vector<std::vector<gabac::DataBlock>> generate_empty_raw_data() {
         } else {
             raw_data[descriptor].resize(format::getDescriptorProperties()[descriptor].number_subsequences);
             for (int subseq = 0; subseq < format::getDescriptorProperties()[descriptor].number_subsequences; subseq++) {
+                // Set the word size to the value we expect when populating
+                // the data block for this stream.  This does not necessarily
+                // match the word_size field in the configs below, which is
+                // what passed to the decompressor.  Note: we DO pay attention
+                // to the rest of the config when compressing.
                 if ((descriptor == 6 /*ureads*/) || (descriptor == 14/*qv*/)) {
                    raw_data[descriptor][subseq].setWordSize(1);
                 }
@@ -167,9 +188,13 @@ uint64_t read_streams_from_file(std::vector<std::vector<std::vector<gabac::DataB
 
 std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
     const std::vector<size_t> SEQUENCE_NUMS = {2, 1, 3, 2, 3, 4, 1, 1, 8, 1, 5, 2, 1, 1, 3, 2, 1, 1};
+
+    // Note: word_size must be 4 to work with the current reference decoder!
+    // (except for the id configs, where 1 byte is expected / functional.
+    // This value is ignored internally by genie when compressing.
     const std::string DEFAULT_GABAC_CONF_SEQ =
         "{"
-        "\"word_size\": 1,"
+        "\"word_size\": 4,"
         "\"sequence_transformation_id\": 0,"
         "\"sequence_transformation_parameter\": 0,"
         "\"transformed_sequences\":"
@@ -183,7 +208,7 @@ std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
         "}";
     const std::string DEFAULT_GABAC_CONF_QUAL =
         "{"
-        "\"word_size\": 1,"
+        "\"word_size\": 4,"
         "\"sequence_transformation_id\": 0,"
         "\"sequence_transformation_parameter\": 0,"
         "\"transformed_sequences\":"
@@ -233,7 +258,7 @@ std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
             else if (i == 14) {  // qv
                 ret[i].emplace_back(DEFAULT_GABAC_CONF_QUAL);
             }
-            else if (i == 15) {  // 
+            else if ((i == 11) || (i == 15)) {  // msar or rname
                 ret[i].emplace_back(DEFAULT_GABAC_CONF_ID);
             }
             else {

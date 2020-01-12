@@ -22,7 +22,7 @@
 
 namespace spring {
 
-void reorder_compress_quality_id(const std::string &temp_dir, const compression_params &cp, bool analyze, dsg::StreamSaver *st, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs) {
+void reorder_compress_quality_id(const std::string &temp_dir, const compression_params &cp, bool analyze, dsg::StreamSaver *st, std::vector<std::vector<gabac::EncodingConfiguration>>& configs) {
     // Read some parameters
     uint32_t numreads = cp.num_reads;
     int num_thr = cp.num_thr;
@@ -147,7 +147,7 @@ void generate_order(const std::string &file_order, uint32_t *order_array, const 
 void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, const std::string &file_order_id,
                             const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
                             const std::string &file_name, const compression_params &cp, bool analyze, dsg::StreamSaver *st,
-                            const std::vector<std::vector<gabac::EncodingConfiguration>>& configs) {
+                            std::vector<std::vector<gabac::EncodingConfiguration>>& configs) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
     (void) cp;
 
@@ -220,16 +220,17 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
                 if (raw_data[15][6 * i + j].size() == 0) {
                     continue;
                 }
-                const gabac::EncodingConfiguration *config;
-                if ((st == NULL) || ((config = st->getConfig(
+                gabac::EncodingConfiguration *config;
+                if ((st != NULL) && ((config = st->getConfig(
                   name.substr(name.find_last_of('/') + 1) + "."
                   + std::to_string(i) + "." + std::to_string(j)))
-                  == NULL)) {
-                    config = &configs[15][0];
+                  != NULL)) {
+                    configs[15][0] = *config;
                 }
                 // FIXME - &configs[15][0]is loop invariant,
                 // but getConfig(name) is not.  suspicious.
-                gabac_compress(*config, &raw_data[15][6 * i + j],
+                gabac_compress(configs[15][0],
+                               &raw_data[15][6 * i + j],
                                &generated_streams[15][6 * i + j]);
             }
         }
@@ -247,7 +248,7 @@ void reorder_compress_quality_pe(std::string file_quality[2],
                                  std::string *quality_array, const uint64_t &quality_array_size, uint32_t *order_array,
                                  const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
                                  const compression_params &cp, bool analyze, dsg::StreamSaver *st,
-                                 const std::vector<std::vector<gabac::EncodingConfiguration>>& configs) {
+                                 std::vector<std::vector<gabac::EncodingConfiguration>>& configs) {
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
     uint32_t start_block_num = 0;
     uint32_t end_block_num = 0;
@@ -304,11 +305,12 @@ void reorder_compress_quality_pe(std::string file_quality[2],
                 if (raw_data[14][subseq].size() == 0) {
                     continue;
                 }
-                const gabac::EncodingConfiguration *config;
-                if ((st == NULL) || ((config = st->getConfig(name)) == NULL)) {
-                    config = &configs[14][subseq];
+                gabac::EncodingConfiguration *config;
+                if ((st != NULL) && ((config = st->getConfig(name)) != NULL)) {
+                    configs[14][subseq] = *config;
                 }
-                gabac_compress(*config, &raw_data[14][subseq],
+                gabac_compress(configs[14][subseq],
+                               &raw_data[14][subseq],
                                &generated_streams[14][subseq]);
             }
             std::string file_to_save_streams = quality_desc_prefix + std::to_string(block_num);
@@ -322,7 +324,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                       const uint32_t &num_reads_per_block, std::string *str_array, const uint32_t &str_array_size,
                       uint32_t *order_array, const std::string &mode,
                       bool analyze, dsg::StreamSaver *st,
-                      const std::vector<std::vector<gabac::EncodingConfiguration>>& configs) {
+                      std::vector<std::vector<gabac::EncodingConfiguration>>& configs) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
     for (uint32_t ndex = 0; ndex <= num_reads_per_file / str_array_size; ndex++) {
@@ -433,16 +435,17 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                         if (raw_data[15][6 * i + j].size() == 0) {
                             continue;
                         }
-                        const gabac::EncodingConfiguration *config;
-                        if ((st == NULL) || ((config = st->getConfig(
+                        gabac::EncodingConfiguration *config;
+                        if ((st != NULL) && ((config = st->getConfig(
                           name.substr(name.find_last_of('/') + 1) + "."
                           + std::to_string(i) + "." + std::to_string(j)))
-                          == NULL)) {
-                            config = &configs[15][0];
+                          != NULL)) {
+                            configs[15][0] = *config;
                         }
                         // FIXME - &configs[15][0]is loop invariant,
                         // but getConfig(name) is not.  suspicious.
-                        gabac_compress(*config, &raw_data[15][6 * i + j],
+                        gabac_compress(configs[15][0],
+                                       &raw_data[15][6 * i + j],
                                        &generated_streams[15][6 * i + j]);
                     }
                 }
@@ -456,11 +459,12 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                     if (raw_data[14][subseq].size() == 0) {
                         continue;
                     }
-                    const gabac::EncodingConfiguration *config;
-                    if ((st == NULL) || ((config = st->getConfig(name)) == NULL)) {
-                        config = &configs[14][subseq];
+                    gabac::EncodingConfiguration *config;
+                    if ((st != NULL) && ((config = st->getConfig(name)) != NULL)) {
+                        configs[14][subseq] = *config;
                     }
-                    gabac_compress(*config, &raw_data[14][subseq],
+                    gabac_compress(configs[14][subseq],
+                                   &raw_data[14][subseq],
                                    &generated_streams[14][subseq]);
                 }
                 std::string file_to_save_streams = quality_desc_prefix + std::to_string(block_num_offset + block_num);
