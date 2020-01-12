@@ -64,7 +64,7 @@ class ParameterSet : public DataUnit {
 
     uint32_t getMultipleSignatureBase() const { return multiple_signature_base; }
 
-    uint8_t getSignatureSize() const { return *u_signature_size; }
+    uint8_t getSignatureSize() const { return u_signature_size ? *u_signature_size : 0; }
 
     uint8_t getID() const { return parameter_set_ID; }
 
