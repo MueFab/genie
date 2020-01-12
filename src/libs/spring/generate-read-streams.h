@@ -23,25 +23,25 @@ void compress_subseqs(std::vector<std::vector<gabac::DataBlock>> &raw_data,
 
 void compress_read_subseqs(std::vector<std::vector<gabac::DataBlock>> &raw_data,
                            std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams,
-                           const std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
+                           std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
 
 void generate_read_streams(const std::string &temp_dir,
                            const compression_params &cp,
                            bool analyze,
                            dsg::StreamSaver *st,
-                           const std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
+                           std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
 
 void generate_read_streams_se(const std::string &temp_dir,
                               const compression_params &cp,
                               bool analyze,
                               dsg::StreamSaver *st,
-                              const std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
+                              std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
 
 void generate_read_streams_pe(const std::string &temp_dir,
                               const compression_params &cp,
                               bool analyze,
                               dsg::StreamSaver *st,
-                              const std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
+                              std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
 
 }  // namespace spring
 

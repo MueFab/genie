@@ -22,7 +22,7 @@
 
 namespace spring {
 
-void generate_read_streams(const std::string &temp_dir, const compression_params &cp, bool analyze, dsg::StreamSaver *st, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs) {
+void generate_read_streams(const std::string &temp_dir, const compression_params &cp, bool analyze, dsg::StreamSaver *st, std::vector<std::vector<gabac::EncodingConfiguration>>& configs) {
     if (!cp.paired_end)
         generate_read_streams_se(temp_dir, cp, analyze, st, configs);
     else
@@ -32,7 +32,7 @@ void generate_read_streams(const std::string &temp_dir, const compression_params
 void compress_read_subseqs(std::vector<std::vector<gabac::DataBlock>> &raw_data,
                            std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams,
                            uint64_t block_num, dsg::StreamSaver *st,
-                           const std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
+                           std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
     for (size_t descriptor = 0; descriptor < 13; ++descriptor) {
         for (size_t subdescriptor = 0; subdescriptor < raw_data[descriptor].size(); ++subdescriptor) {
             // This used to be a filename.  Now it's just a name that we
@@ -41,13 +41,14 @@ void compress_read_subseqs(std::vector<std::vector<gabac::DataBlock>> &raw_data,
             if (raw_data[descriptor][subdescriptor].size() == 0) {
                 continue;
             }
-            const gabac::EncodingConfiguration *config;
-            if ((st == NULL) || ((config = st->getConfig(file_subseq_prefix + "."
+            gabac::EncodingConfiguration *config;
+            if ((st != NULL) && ((config = st->getConfig(file_subseq_prefix + "."
               + std::to_string(block_num) + "." + std::to_string(descriptor) + "."
-              + std::to_string(subdescriptor))) == NULL)) {
-                config = &configs[descriptor][subdescriptor];
+              + std::to_string(subdescriptor))) != NULL)) {
+                configs[descriptor][subdescriptor] = *config;
             }
-            gabac_compress(*config, &raw_data[descriptor][subdescriptor],
+            gabac_compress(configs[descriptor][subdescriptor],
+                           &raw_data[descriptor][subdescriptor],
                            &generated_streams[descriptor][subdescriptor]);
         }
     }
@@ -268,7 +269,7 @@ void analyze_subseqs(size_t num_thr, subseq_data *data, dsg::StreamSaver *st) {
     st->reloadConfigSet();
 }
 
-void generate_and_compress_se(const std::string &temp_dir, const se_data &data, bool analyze, dsg::StreamSaver *st,  const std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
+void generate_and_compress_se(const std::string &temp_dir, const se_data &data, bool analyze, dsg::StreamSaver *st, std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
 
     // Now generate new streams and compress blocks in parallel
     // this is actually number of read pairs per block for PE
@@ -419,7 +420,7 @@ void generate_read_streams_se(const std::string &temp_dir,
                               const compression_params &cp,
                               bool analyze,
                               dsg::StreamSaver *st,
-                              const std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
+                              std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
     se_data data;
     loadSE_Data(cp, temp_dir, &data);
 
@@ -884,7 +885,7 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
     }
 }
 
-void generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp, bool analyze, dsg::StreamSaver *st, const std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
+void generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp, bool analyze, dsg::StreamSaver *st, std::vector<std::vector<gabac::EncodingConfiguration>> &configs) {
     // basic approach: start looking at reads from left to right. If current is
     // aligned but pair is unaligned, pair is kept at the end current AU and
     // stored in different record. We try to keep number of records in AU =

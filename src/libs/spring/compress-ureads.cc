@@ -164,11 +164,8 @@ void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileRea
                                 continue;
                             }
                             std::string name;
-                            const gabac::EncodingConfiguration *config;
-                            if (st == NULL) {
-                                config = &configs[descriptor][subdescriptor];
-                            }
-                            else {
+                            gabac::EncodingConfiguration *config;
+                            if (st != NULL) {
                                 if (descriptor == 14) { // quality
                                     name =  "quality_1";
                                 }
@@ -178,11 +175,12 @@ void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileRea
                                          + std::to_string(descriptor) + "."
                                          + std::to_string(subdescriptor);
                                 }
-                                if ((st == NULL) || ((config = st->getConfig(name)) == NULL)) {
-                                    config = &configs[descriptor][subdescriptor];
+                                if ((config = st->getConfig(name)) != NULL) {
+                                    configs[descriptor][subdescriptor] = *config;
                                 }
                             }
-                            gabac_compress(*config, &raw_data[descriptor][subdescriptor],
+                            gabac_compress(configs[descriptor][subdescriptor],
+                                           &raw_data[descriptor][subdescriptor],
                                            &generated_streams[descriptor][subdescriptor]);
                         }
                     }
@@ -193,15 +191,16 @@ void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileRea
                                 if (raw_data[15][6 * i + j].size() == 0) {
                                     continue;
                                 }
-                                const gabac::EncodingConfiguration *config;
-                                if ((st == NULL) || ((config = st->getConfig(
+                                gabac::EncodingConfiguration *config;
+                                if ((st != NULL) && ((config = st->getConfig(
                                   "id_1." + std::to_string(block_num_thr)))
-                                  == NULL)) {
-                                    config = &configs[15][0];
+                                  != NULL)) {
+                                    configs[15][0] = *config;
                                 }
                                 // FIXME - &configs[15][0]is loop invariant,
                                 // but getConfig(name) is not.  suspicious.
-                                gabac_compress(*config, &raw_data[15][6 * i + j],
+                                gabac_compress(configs[15][0],
+                                               &raw_data[15][6 * i + j],
                                                &generated_streams[15][6 * i + j]);
                             }
                         }
