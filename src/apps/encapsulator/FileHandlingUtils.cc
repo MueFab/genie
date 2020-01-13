@@ -85,7 +85,7 @@
 //    return ref_information;
 //}
 
-int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileName) {
+int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputFileName) {
     fprintf(stdout, "Bytestream file: %s\n", fileName);
 
     // Ref_information ref_information = readRefInformation(refInfoPath);

@@ -12,7 +12,7 @@
 namespace format {
 namespace mpegg_p2 {
 AccessUnit::AccessUnit(const std::map<size_t, std::unique_ptr<format::mpegg_p2::ParameterSet>> &parameterSets,
-                       util::BitReader &bitReader)  // needs to be called by format::DataUnit::createFromBitReader
+                       util::BitReader &bitReader)
     : DataUnit(DataUnitType::ACCESS_UNIT) {
     reserved = bitReader.read(3);
     bitReader.read(29);
