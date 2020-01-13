@@ -123,17 +123,12 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileNam
     std::vector<std::unique_ptr<format::mpegg_p2::DataUnit>> dataUnits;
 
     format::mpegg_p2::DataUnitFactory dataUnitFactory;
-    dataUnits.push_back(dataUnitFactory.read(inputFileBitReader));
-
     //while (inputFileBitReader.isGood()) {
-    //      dataUnits.push_back(format::mpegg_p2::DataUnit::createFromBitReader(&inputFileBitReader));  // FIXME UnifiedEncoder
+        dataUnits.push_back(dataUnitFactory.read(inputFileBitReader));
     //}
-   /* for (auto const& dataUnit : dataUnits) {
+    for (auto const& dataUnit : dataUnits) {
         fprintf(stdout, "\ndata_unit_type:%u\n", (uint8_t)dataUnit->getDataUnitType());
-  //      fprintf(stdout, "data_unit_size:%u\n", dataUnit->getDataUnitSize()); // FIXME UnifiedEncoder
-        fprintf(stdout, "Vector Size:%lu\n", dataUnit->rawData.size());
-        fprintf(stdout, "First byte:%u -> Last byte:%u\n", dataUnit->rawData.front(), dataUnit->rawData.back());
-    }*/
+    }
 
     // -----------------------------------------------------------------------------------------------------------------
 
