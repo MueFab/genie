@@ -14,7 +14,7 @@
 
 namespace format {
 namespace mpegg_p2 {
-ParameterSet::ParameterSet(util::BitReader &bitReader)  // needs to be called by format::DataUnit::createFromBitReader
+ParameterSet::ParameterSet(util::BitReader &bitReader)
     : DataUnit(DataUnitType::PARAMETER_SET) {
     bitReader.read(10);  // ISO 23092-2 Section 3.1 table 3
     bitReader.read(22);
