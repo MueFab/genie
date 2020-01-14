@@ -1,13 +1,11 @@
 #include "program-options.h"
 
-#include "log.h"
-#include "logger.h"
 #include "util/exceptions.h"
 
 #include <cli11@13becad/CLI11.hpp>
 #include <filesystem@e980ed0/filesystem.hpp>
 
-namespace genie {
+namespace ureads_encoder {
 
 ProgramOptions::ProgramOptions(int argc, char* argv[]) : inputFilePath(), outputFilePath() {
     processCommandLine(argc, argv);
@@ -16,8 +14,7 @@ ProgramOptions::ProgramOptions(int argc, char* argv[]) : inputFilePath(), output
 ProgramOptions::~ProgramOptions() = default;
 
 void ProgramOptions::processCommandLine(int argc, char* argv[]) {
-    Logger& logger = Logger::instance();
-    logger.out("Processing command line options");
+    std::cout << "Processing command line options" << std::endl;
 
     CLI::App app("Genie MPEG-G encoder, conformance version");
 
@@ -41,4 +38,4 @@ void ProgramOptions::processCommandLine(int argc, char* argv[]) {
     }
 }
 
-}  // namespace genie
+}  // namespace ureads_encoder

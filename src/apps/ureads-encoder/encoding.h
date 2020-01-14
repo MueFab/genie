@@ -3,10 +3,10 @@
 
 #include "program-options.h"
 
-namespace genie {
+namespace ureads_encoder {
 
 void encode(const ProgramOptions& programOptions);
 
-}  // namespace genie
+}  // namespace ureads_encoder
 
 #endif  // GENIE_LOG_H_
