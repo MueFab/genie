@@ -16,7 +16,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace lae {
+namespace coding {
 
 class LocalAssemblyReferenceEncoder {
    public:
@@ -49,7 +49,7 @@ class LocalAssemblyReferenceEncoder {
 
     void printWindow() const;
 };
-}  // namespace lae
+}  // namespace coding
 
 // ---------------------------------------------------------------------------------------------------------------------
 

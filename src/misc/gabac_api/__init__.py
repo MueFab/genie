@@ -10,6 +10,7 @@ repo_path = output.strip().decode("utf-8")
 
 libgabac_fpath = os.path.join(repo_path, 'build/lib/libgabac' + dynamic_lib_extension())
 
+
 class GABAC_RETURN:
     r"""Return Codes.
 
@@ -19,6 +20,7 @@ class GABAC_RETURN:
     """
     SUCCESS = 0
     FAILURE = 1
+
 
 class GABAC_LOG_LEVEL:
     r"""
@@ -38,6 +40,7 @@ class GABAC_LOG_LEVEL:
     WARNING = 3
     ERROR = 4
     FATAL = 5
+
 
 class GABAC_TRANSFORM:
     r"""
@@ -60,6 +63,7 @@ class GABAC_TRANSFORM:
     DIFF = 5
     CABAC = 6
 
+
 class GABAC_BINARIZATION:
     r"""
     Binarizations for cabac transformation
@@ -79,6 +83,7 @@ class GABAC_BINARIZATION:
     TEG = 4
     STEG = 5
 
+
 class GABAC_CONTEXT_SELECT:
     r"""
     Context selection modes for cabac transformation
@@ -94,6 +99,7 @@ class GABAC_CONTEXT_SELECT:
     ADAPTIVE_ORDER_1 = 2
     ADAPTIVE_ORDER_2 = 3
 
+
 class GABAC_OPERATION:
     r"""
     Enum for gabac operation
@@ -107,6 +113,7 @@ class GABAC_OPERATION:
     DECODE = 1
     ANALYZE = 2
 
+
 class GABAC_STREAM_MODE:
     r"""
     Flags for different data types
@@ -117,6 +124,7 @@ class GABAC_STREAM_MODE:
     """
     FILE = 0
     BUFFER = 1
+
 
 # from .const import GABAC_BINARIZATION, GABAC_CONTEXT_SELECT, GABAC_LOG_LEVEL
 # from .const import GABAC_OPERATION, GABAC_RETURN, GABAC_STREAM_MODE, GABAC_TRANSFORM

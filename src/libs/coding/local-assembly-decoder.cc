@@ -3,3 +3,5 @@
 //
 
 #include "local-assembly-decoder.h"
+
+namespace coding {}

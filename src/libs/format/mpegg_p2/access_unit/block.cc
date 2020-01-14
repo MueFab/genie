@@ -11,7 +11,7 @@ Block::Block(uint8_t _descriptor_ID, BlockPayloadSet::DescriptorPayload _payload
 
 // -----------------------------------------------------------------------------------------------------------------
 
-Block::Block() : reserved(0), descriptor_ID(0), reserved_2(0), block_payload_size(0), payload(GenDesc(0)) {}
+Block::Block() : reserved(0), descriptor_ID(0), reserved_2(0), block_payload_size(0), payload(coding::GenDesc(0)) {}
 
 // -----------------------------------------------------------------------------------------------------------------
 

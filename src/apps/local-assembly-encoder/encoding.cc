@@ -22,9 +22,9 @@ void encode(const ProgramOptions &programOptions) {
         format::sam::SamImporter importer(RECORDS_PER_BLOCK, infile);
 
         const size_t LOCAL_ASSEMBLY_BUFFER_SIZE = 2000;
-        LocalAssemblyEncoder encoder(LOCAL_ASSEMBLY_BUFFER_SIZE, false);
+        coding::LocalAssemblyEncoder encoder(LOCAL_ASSEMBLY_BUFFER_SIZE, false);
 
-        GabacCompressor compressor;
+        coding::GabacCompressor compressor;
 
         std::ofstream outfile(programOptions.outputFilePath);
         MpeggP2Exporter exporter(&outfile);
@@ -40,9 +40,9 @@ void encode(const ProgramOptions &programOptions) {
         std::ifstream infile(programOptions.inputFilePath);
         MpeggP2Importer importer(infile);
 
-        LocalAssemblyDecoder decoder;
+        coding::LocalAssemblyDecoder decoder;
 
-        GabacDecompressor decompressor;
+        coding::GabacDecompressor decompressor;
 
         std::ofstream outfile(programOptions.outputFilePath);
         SamExporter exporter(format::sam::SamFileHeader::createDefaultHeader(), outfile);

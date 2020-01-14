@@ -31,7 +31,7 @@ class ParameterSet : public DataUnit {
     explicit ParameterSet(util::BitReader &bitReader);
 
     ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, DatasetType _dataset_type,
-                 AlphabetID _alphabet_id, uint32_t _read_length, bool _paired_end, bool _pos_40_bits_flag,
+                 coding::AlphabetID _alphabet_id, uint32_t _read_length, bool _paired_end, bool _pos_40_bits_flag,
                  uint8_t _qv_depth, uint8_t _as_depth, bool _multiple_alignments_flag, bool _spliced_reads_flag);
 
     ParameterSet();
@@ -44,9 +44,9 @@ class ParameterSet : public DataUnit {
 
     void addClass(mpegg_rec::ClassType class_id, std::unique_ptr<QvCodingConfig> conf);
 
-    void setDescriptor(GenDesc index, std::unique_ptr<DescriptorConfigurationContainer> descriptor);
+    void setDescriptor(coding::GenDesc index, std::unique_ptr<DescriptorConfigurationContainer> descriptor);
 
-    const DescriptorConfigurationContainer *getDescriptor(GenDesc index) const {
+    const DescriptorConfigurationContainer *getDescriptor(coding::GenDesc index) const {
         return descriptors[uint8_t(index)].get();
     }
 
@@ -158,7 +158,7 @@ class ParameterSet : public DataUnit {
      * ------------------------------------------------------------------------------------------------------------- */
 
     DatasetType dataset_type;                        //!< : 4; Line 2
-    AlphabetID alphabet_ID : 8;                      //!< Line 3
+    coding::AlphabetID alphabet_ID : 8;              //!< Line 3
     uint32_t read_length : 24;                       //!< Line 4
     uint8_t number_of_template_segments_minus1 : 2;  //!< Line 5
     //!< uint8_t reserved_2 : 6; //!< Line 6, currently set to 0

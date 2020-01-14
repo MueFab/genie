@@ -20,7 +20,7 @@ ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::
     parameter_set_ID = bitReader.read(8);
     parent_parameter_set_ID = bitReader.read(8);
     dataset_type = DatasetType(bitReader.read(4));
-    alphabet_ID = AlphabetID(bitReader.read(8));
+    alphabet_ID = coding::AlphabetID(bitReader.read(8));
     read_length = bitReader.read(24);
     number_of_template_segments_minus1 = bitReader.read(2);
     bitReader.read(6);
@@ -32,9 +32,9 @@ ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::
     for (size_t i = 0; i < num_classes; ++i) {
         class_IDs.push_back(mpegg_rec::ClassType(bitReader.read(4)));
     }
-    for (size_t i = 0; i < getDescriptors().size(); ++i) {
+    for (size_t i = 0; i < coding::getDescriptors().size(); ++i) {
         descriptors.emplace_back(
-            util::make_unique<DescriptorConfigurationContainer>(num_classes, GenDesc(i), bitReader));
+            util::make_unique<DescriptorConfigurationContainer>(num_classes, coding::GenDesc(i), bitReader));
     }
     uint8_t num_groups = bitReader.read(16);
     for (size_t i = 0; i < num_groups; ++i) {
@@ -64,8 +64,8 @@ ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::
 //------------------------------------------------------------------------------------------------------------------
 
 ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, DatasetType _dataset_type,
-                           AlphabetID _alphabet_id, uint32_t _read_length, bool _paired_end, bool _pos_40_bits_flag,
-                           uint8_t _qv_depth, uint8_t _as_depth, bool _multiple_alignments_flag,
+                           coding::AlphabetID _alphabet_id, uint32_t _read_length, bool _paired_end,
+                           bool _pos_40_bits_flag, uint8_t _qv_depth, uint8_t _as_depth, bool _multiple_alignments_flag,
                            bool _spliced_reads_flag)
     : DataUnit(DataUnitType::PARAMETER_SET),
       parameter_set_ID(_parameter_set_ID),
@@ -98,7 +98,7 @@ ParameterSet::ParameterSet()
       parameter_set_ID(0),
       parent_parameter_set_ID(0),
       dataset_type(DatasetType::ALIGNED),
-      alphabet_ID(AlphabetID::ACGTN),
+      alphabet_ID(coding::AlphabetID::ACGTN),
       read_length(0),
       number_of_template_segments_minus1(0),
       max_au_data_unit_size(0),
@@ -206,7 +206,7 @@ void ParameterSet::addClass(mpegg_rec::ClassType class_id, std::unique_ptr<QvCod
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::setDescriptor(GenDesc index, std::unique_ptr<DescriptorConfigurationContainer> descriptor) {
+void ParameterSet::setDescriptor(coding::GenDesc index, std::unique_ptr<DescriptorConfigurationContainer> descriptor) {
     descriptors[uint8_t(index)] = std::move(descriptor);
 }
 

@@ -22,7 +22,7 @@ class DescriptorConfigurationContainer {
    public:
     DescriptorConfigurationContainer();
 
-    DescriptorConfigurationContainer(size_t num_classes, GenDesc desc, util::BitReader& reader) {
+    DescriptorConfigurationContainer(size_t num_classes, coding::GenDesc desc, util::BitReader& reader) {
         class_specific_dec_cfg_flag = reader.read(1);
         if (class_specific_dec_cfg_flag == 0) {
             descriptor_configurations.emplace_back(DescriptorConfiguration::factory(desc, reader));

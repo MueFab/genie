@@ -33,7 +33,7 @@ class MpeggP2Importer : public Source<BlockPayloadSet>, public OriginalSource {
         BlockPayloadSet set(factory.getParams(unit->getParameterID()), id);
 
         for (auto& b : unit->getBlocks()) {
-            set.setPayload(GenDesc(b.getDescriptorID()), b.movePayload());
+            set.setPayload(coding::GenDesc(b.getDescriptorID()), b.movePayload());
         }
         set.setReference(unit->getAlignmentInfo().getRefID());
         set.setMinPos(unit->getAlignmentInfo().getStartPos());

@@ -5,7 +5,7 @@
 
 #include <gabac/gabac.h>
 
-namespace lae {
+namespace coding {
 
 class GenieGabacOutputBuffer : public std::streambuf {
    public:
@@ -29,6 +29,6 @@ class GenieGabacOutputStream : public GenieGabacOutputBuffer, public std::ostrea
     GenieGabacOutputStream() : GenieGabacOutputBuffer(), std::ostream(this) {}
 };
 
-}  // namespace lae
+}  // namespace coding
 
 #endif  // GENIE_GENIE_GABAC_OUTPUT_STREAM_H

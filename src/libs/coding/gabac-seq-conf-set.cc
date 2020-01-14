@@ -10,6 +10,8 @@
 #include <format/mpegg_p2/parameter_set/descriptor_configuration_present/descriptor_configuration_present.h>
 #include <util/make_unique.h>
 
+namespace coding {
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 GabacSeqConfSet::GabacSeqConfSet() {
@@ -162,11 +164,10 @@ const GabacSeqConfSet::DecoderConfigurationCabac &GabacSeqConfSet::loadDescripto
     return reinterpret_cast<const cabac::DecoderConfigurationCabac &>(*decoder_conf);
 }
 
-
-
 // ---------------------------------------------------------------------------------------------------------------------
 
-gabac::TransformedSequenceConfiguration GabacSeqConfSet::loadTransformedSequence(const TransformSubseqCfg& transformedDesc) {
+gabac::TransformedSequenceConfiguration GabacSeqConfSet::loadTransformedSequence(
+    const TransformSubseqCfg &transformedDesc) {
     using namespace format::mpegg_p2::desc_conf_pres;
     using namespace format::mpegg_p2::desc_conf_pres::cabac;
     gabac::TransformedSequenceConfiguration gabacTransCfg;
@@ -206,7 +207,7 @@ void GabacSeqConfSet::loadParameters(const format::mpegg_p2::ParameterSet &param
     using namespace format::mpegg_p2::desc_conf_pres::cabac;
 
     for (const auto &desc : getDescriptors()) {
-        auto& descConfig = loadDescriptorDecoderCfg(parameterSet, desc.id);
+        auto &descConfig = loadDescriptorDecoderCfg(parameterSet, desc.id);
         for (const auto &subdesc : getDescriptor(desc.id).subseqs) {
             auto sub_desc = descConfig.getSubsequenceCfg(subdesc.id.second);
             auto sub_desc_id = desc.tokentype ? 0 : sub_desc->getDescriptorSubsequenceID();
@@ -227,6 +228,8 @@ void GabacSeqConfSet::loadParameters(const format::mpegg_p2::ParameterSet &param
         }
     }
 }
+
+}  // namespace coding
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

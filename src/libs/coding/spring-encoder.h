@@ -4,7 +4,7 @@
 #include <spring/util.h>
 #include <util/perf-stats.h>
 #include "mpegg-encoder.h"
-
+namespace coding {
 class SpringEncoder : public MpeggEncoder {
    private:
     int num_thr;
@@ -45,5 +45,6 @@ class SpringEncoder : public MpeggEncoder {
     void flowIn(format::mpegg_rec::MpeggChunk &&t, size_t id) override;
     void dryIn() override;
 };
+}  // namespace coding
 
 #endif  // GENIE_SPRING_ENCODER_H

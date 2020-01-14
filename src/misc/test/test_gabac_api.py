@@ -1,34 +1,29 @@
-#from new_gabac import gabac_execute_transform
-import copy
-import json
-import unittest
+# from new_gabac import gabac_execute_transform
 import ctypes as ct
+import unittest
 
 from ..gabac_api import (
     libgabac,
     libc,
     gabac_data_block,
     gabac_io_config,
-    GABAC_BINARIZATION, 
-    GABAC_CONTEXT_SELECT, 
-    GABAC_LOG_LEVEL, 
-    GABAC_LOG_LEVEL,
-    GABAC_OPERATION, 
-    GABAC_RETURN, 
-    GABAC_STREAM_MODE, 
-    GABAC_TRANSFORM,    
-    array, 
-    print_array, 
-    print_block, 
+    GABAC_BINARIZATION,
+    GABAC_CONTEXT_SELECT,
+    GABAC_OPERATION,
+    GABAC_RETURN,
+    GABAC_TRANSFORM,
+    array,
+    print_block,
     get_block_values,
     run_gabac
 )
+
 
 class PythonApiTest(unittest.TestCase):
     DEBUG_LEVEL = 1
 
     input_data1 = array(
-        ct.c_char, 
+        ct.c_char,
         (
             b"\x01\x00\x00\x00"
             b"\x02\x00\x00\x00"
@@ -60,25 +55,25 @@ class PythonApiTest(unittest.TestCase):
     )
 
     config_json_py = {
-        "word_size" : 1,
-        "sequence_transformation_id" : 3,
+        "word_size": 1,
+        "sequence_transformation_id": 3,
         "sequence_transformation_parameter": 2,
-        "transformed_sequences" : [
+        "transformed_sequences": [
             {
-                "lut_transformation_enabled" : True,
+                "lut_transformation_enabled": True,
                 "lut_transformation_parameter": 0,
                 "diff_coding_enabled": False,
-                "binarization_id" : 2,
-                "binarization_parameters" : [],
-                "context_selection_id" : 2
+                "binarization_id": 2,
+                "binarization_parameters": [],
+                "context_selection_id": 2
             },
             {
-                "lut_transformation_enabled" : False,
+                "lut_transformation_enabled": False,
                 "lut_transformation_parameter": 0,
                 "diff_coding_enabled": True,
-                "binarization_id" : 3,
-                "binarization_parameters" : [],
-                "context_selection_id" : 2
+                "binarization_id": 3,
+                "binarization_parameters": [],
+                "context_selection_id": 2
             }
         ]
     }
@@ -115,7 +110,7 @@ class PythonApiTest(unittest.TestCase):
     )
 
     def test_api(self):
-        
+
         print('Test transformation')
         self.assertEqual(GABAC_RETURN.SUCCESS, self._example_transformations(self.input_data1))
         self.assertEqual(GABAC_RETURN.SUCCESS, self._example_transformations(self.input_data2))
@@ -129,11 +124,11 @@ class PythonApiTest(unittest.TestCase):
         blocks = array(gabac_data_block, 2)
         parameters_RLE = array(ct.c_uint64, [255])
         parameters_CABAC = array(
-            ct.c_uint64, 
+            ct.c_uint64,
             [
-                GABAC_BINARIZATION.TU, 
-                2, 
-                GABAC_CONTEXT_SELECT.ADAPTIVE_ORDER_0, 
+                GABAC_BINARIZATION.TU,
+                2,
+                GABAC_CONTEXT_SELECT.ADAPTIVE_ORDER_0,
                 ct.sizeof(ct.c_int)
             ]
         )
@@ -144,20 +139,20 @@ class PythonApiTest(unittest.TestCase):
         # Allocate data block with 4 byte block size and the appriate length. 
         # The example data is copied 
         if libgabac.gabac_data_block_init(
-            ct.byref(blocks[0]),
-            input_data,
-            ct.sizeof(input_data) // ct.sizeof(ct.c_int),
-            ct.sizeof(ct.c_int)
+                ct.byref(blocks[0]),
+                input_data,
+                ct.sizeof(input_data) // ct.sizeof(ct.c_int),
+                ct.sizeof(ct.c_int)
         ):
             libc.printf(b"Block 0 init failed!\n")
             return -1
 
         # Allocate an empty data block (will be used to contain the second stream of RLE-Coding)
         if libgabac.gabac_data_block_init(
-            ct.byref(blocks[1]), 
-            None, 
-            0, 
-            ct.sizeof(ct.c_uint8)
+                ct.byref(blocks[1]),
+                None,
+                0,
+                ct.sizeof(ct.c_uint8)
         ):
             libgabac.gabac_data_block_release(blocks[0])
             libc.printf(b"Block 1 init failed!")
@@ -179,12 +174,12 @@ class PythonApiTest(unittest.TestCase):
         # Execute the actual RLE transformation. 
         # blocks[0] and blocks[1] will now contain the transformed streams
         if libgabac.gabac_execute_transform(
-            GABAC_TRANSFORM.RLE,
-            parameters_RLE,
-            #GABAC_TRANSFORM.EQUALITY,
-            #array(ct.c_uint64, []),
-            GABAC_OPERATION.ENCODE,
-            blocks
+                GABAC_TRANSFORM.RLE,
+                parameters_RLE,
+                # GABAC_TRANSFORM.EQUALITY,
+                # array(ct.c_uint64, []),
+                GABAC_OPERATION.ENCODE,
+                blocks
         ) == GABAC_RETURN.FAILURE:
             libc.printf(b"RLE transform failed!\n")
             libgabac.gabac_data_block_release(blocks[0])
@@ -198,10 +193,10 @@ class PythonApiTest(unittest.TestCase):
         if self.DEBUG_LEVEL > 1:
             libc.printf(b"***Executing Diff-Coding on block 0!\n")
         if libgabac.gabac_execute_transform(
-            GABAC_TRANSFORM.DIFF, 
-            None, 
-            GABAC_OPERATION.ENCODE,
-            blocks
+                GABAC_TRANSFORM.DIFF,
+                None,
+                GABAC_OPERATION.ENCODE,
+                blocks
         ):
             libc.printf(b"Diff coding failed!\n")
             libgabac.gabac_data_block_release(blocks[0])
@@ -214,10 +209,10 @@ class PythonApiTest(unittest.TestCase):
         if self.DEBUG_LEVEL > 1:
             libc.printf(b"***Executing CABAC-Coding on block 1!\n")
         if libgabac.gabac_execute_transform(
-            GABAC_TRANSFORM.CABAC,
-            parameters_CABAC,
-            GABAC_OPERATION.ENCODE, 
-            ct.byref(blocks[1])
+                GABAC_TRANSFORM.CABAC,
+                parameters_CABAC,
+                GABAC_OPERATION.ENCODE,
+                ct.byref(blocks[1])
         ):
             libc.printf(b"Cabac coding failed!\n")
             libgabac.gabac_data_block_release(blocks[0])
@@ -230,10 +225,10 @@ class PythonApiTest(unittest.TestCase):
         if self.DEBUG_LEVEL > 1:
             libc.printf(b"***Executing CABAC-Decoding on block 1!\n")
         if libgabac.gabac_execute_transform(
-            GABAC_TRANSFORM.CABAC,
-            parameters_CABAC,
-            GABAC_OPERATION.DECODE,
-            ct.byref(blocks[1])
+                GABAC_TRANSFORM.CABAC,
+                parameters_CABAC,
+                GABAC_OPERATION.DECODE,
+                ct.byref(blocks[1])
         ):
             libc.printf(b"Cabac decoding failed!\n")
             libgabac.gabac_data_block_release(blocks[0])
@@ -247,10 +242,10 @@ class PythonApiTest(unittest.TestCase):
         if self.DEBUG_LEVEL > 1:
             libc.printf(b"***Executing Diff-Decoding on block 0!\n")
         if libgabac.gabac_execute_transform(
-            GABAC_TRANSFORM.DIFF,
-            None,
-            GABAC_OPERATION.DECODE,
-            blocks
+                GABAC_TRANSFORM.DIFF,
+                None,
+                GABAC_OPERATION.DECODE,
+                blocks
         ):
             libc.printf(b"Inverse diff transform failed!\n")
             libgabac.gabac_data_block_release(blocks[0])
@@ -264,10 +259,10 @@ class PythonApiTest(unittest.TestCase):
             libc.printf(b"***Executing RLE-Decoding!\n")
         # After this last decoding step you should retrieve the raw example data again
         if libgabac.gabac_execute_transform(
-            GABAC_TRANSFORM.RLE,
-            parameters_RLE,
-            GABAC_OPERATION.DECODE,
-            blocks
+                GABAC_TRANSFORM.RLE,
+                parameters_RLE,
+                GABAC_OPERATION.DECODE,
+                blocks
         ):
             libc.printf(b"Inverse diff coding failed!\n")
             libgabac.gabac_data_block_release(blocks[0])
@@ -306,15 +301,15 @@ class PythonApiTest(unittest.TestCase):
         # We will let gabac compress its own configuration.
         # Notice that offset -1 is to cut of the \0 at the end of the stream
         if libgabac.gabac_data_block_init(
-            in_block,
-            ### With cchar
-            self.config_json_ptr,
-            ct.sizeof(self.config_json_ptr),
-            ct.sizeof(ct.c_char)
-            # ### With raw
-            # self.config_json_raw,
-            # len(self.config_json_raw),
-            # ct.sizeof(ct.c_char),
+                in_block,
+                ### With cchar
+                self.config_json_ptr,
+                ct.sizeof(self.config_json_ptr),
+                ct.sizeof(ct.c_char)
+                # ### With raw
+                # self.config_json_raw,
+                # len(self.config_json_raw),
+                # ct.sizeof(ct.c_char),
         ):
             libc.printf(b"*** Could not allocate buffer!\n")
             return GABAC_RETURN.FAILURE
@@ -325,8 +320,8 @@ class PythonApiTest(unittest.TestCase):
 
         # Swap newly created input data block into a newly created input stream
         if libgabac.gabac_stream_create_buffer(
-            io_config.input,
-            in_block
+                io_config.input,
+                in_block
         ):
             libc.printf(b"*** Could not allocate in stream!\n")
             libgabac.gabac_data_block_release(in_block)
@@ -334,8 +329,8 @@ class PythonApiTest(unittest.TestCase):
 
         # Create empty output stream
         if libgabac.gabac_stream_create_buffer(
-            io_config.output, 
-            None
+                io_config.output,
+                None
         ):
             libc.printf(b"*** Could not allocate out stream!\n")
             libgabac.gabac_stream_release(io_config.input)
@@ -343,10 +338,10 @@ class PythonApiTest(unittest.TestCase):
 
         # Create log stream from file. You could also pass stdout instead.
         if libgabac.gabac_stream_create_file(
-            io_config.log,
-            logfilename, 
-            len(logfilename), 
-            1
+                io_config.log,
+                logfilename,
+                len(logfilename),
+                1
         ):
             libc.printf(b"*** Could not allocate log stream!\n")
             libgabac.gabac_stream_release(io_config.input)
@@ -358,14 +353,14 @@ class PythonApiTest(unittest.TestCase):
 
         # Encode using config
         if libgabac.gabac_run(
-            GABAC_OPERATION.ENCODE,
-            io_config,
-            ### With cchar
-            self.config_json_ptr,
-            len(self.config_json_ptr),            
-            # ### With ptr
-            # self.config_json_raw,
-            # len(self.config_json_raw)-1,
+                GABAC_OPERATION.ENCODE,
+                io_config,
+                ### With cchar
+                self.config_json_ptr,
+                len(self.config_json_ptr),
+                # ### With ptr
+                # self.config_json_raw,
+                # len(self.config_json_raw)-1,
         ):
             libc.printf(b"*** Gabac encode failed!\n")
             libgabac.gabac_data_block_release(in_block)
@@ -384,11 +379,11 @@ class PythonApiTest(unittest.TestCase):
         if self.DEBUG_LEVEL > 1:
             libc.printf(b"*** Run gabac decode...\n")
         if libgabac.gabac_run(
-            GABAC_OPERATION.DECODE, 
-            io_config,
-            ### With cchar
-            self.config_json_ptr,
-            len(self.config_json_ptr),   
+                GABAC_OPERATION.DECODE,
+                io_config,
+                ### With cchar
+                self.config_json_ptr,
+                len(self.config_json_ptr),
         ):
             libc.printf(b"*** Gabac decode failed!\n")
             libgabac.gabac_data_block_release(in_block)
@@ -396,7 +391,6 @@ class PythonApiTest(unittest.TestCase):
             libgabac.gabac_stream_release(io_config.output)
             libgabac.gabac_stream_release(io_config.log)
             return GABAC_RETURN.FAILURE
-            
 
         # Retrieve results, you should end up with your input data again
         libgabac.gabac_stream_swap_block(io_config.output, in_block)
@@ -412,11 +406,12 @@ class PythonApiTest(unittest.TestCase):
         libgabac.gabac_stream_release(io_config.input)
         libgabac.gabac_stream_release(io_config.output)
         libgabac.gabac_stream_release(io_config.log)
-        
+
         if enc_dec_values == original_values:
             return GABAC_RETURN.SUCCESS
         else:
             return GABAC_RETURN.FAILURE
+
 
 if __name__ == '__main__':
     unittest.main()

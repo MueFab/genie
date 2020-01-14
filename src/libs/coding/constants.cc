@@ -1,6 +1,8 @@
 #include "constants.h"
 #include <algorithm>
 
+namespace coding {
+
 constexpr GenSubIndex GenSub::POS_MAPPING_FIRST;
 constexpr GenSubIndex GenSub::POS_MAPPING_ADDITIONAL;
 
@@ -67,14 +69,12 @@ constexpr GenSubIndex GenSub::RFTP;
 
 constexpr GenSubIndex GenSub::RFTT;
 
-
 const std::vector<GenomicDescriptorProperties> &getDescriptors() {
     static const std::vector<GenomicDescriptorProperties> prop = {
         {GenDesc::POS,
          "pos",
          false,
-         {{GenSub::POS_MAPPING_FIRST, "first"},
-          {GenSub::POS_MAPPING_ADDITIONAL, "additional"}}},
+         {{GenSub::POS_MAPPING_FIRST, "first"}, {GenSub::POS_MAPPING_ADDITIONAL, "additional"}}},
 
         {GenDesc::RCOMP, "rcomp", false, {{GenSub::RCOMP, "rcomp"}}},
 
@@ -132,10 +132,7 @@ const std::vector<GenomicDescriptorProperties> &getDescriptors() {
           {GenSub::MMAP_REF_SEQ, "reference_seq"},
           {GenSub::MMAP_REF_POS, "reference_pos"}}},
 
-        {GenDesc::MSAR,
-         "msar",
-         true,
-         {{GenSub::MSAR_CABAC_0, "cabac_0"}, {GenSub::MSAR_CABAC_1, "cabac_1"}}},
+        {GenDesc::MSAR, "msar", true, {{GenSub::MSAR_CABAC_0, "cabac_0"}, {GenSub::MSAR_CABAC_1, "cabac_1"}}},
 
         {GenDesc::RTYPE, "rtype", false, {{GenSub::RTYPE, "rtype"}}},
 
@@ -191,3 +188,4 @@ const Alphabet &getAlphabetProperties(AlphabetID id) {
     }();
     return prop[uint8_t(id)];
 }
+}  // namespace coding

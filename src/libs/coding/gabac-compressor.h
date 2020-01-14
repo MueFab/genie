@@ -15,6 +15,8 @@
 #include "genie-gabac-output-stream.h"
 #include "mpegg-compressor.h"
 
+namespace coding {
+
 /**
  * @brief Module to compress raw access units into blockpayloads using GABAC
  */
@@ -44,6 +46,7 @@ class GabacCompressor : public MpeggCompressor {
      */
     void dryIn() override;
 };
+}  // namespace coding
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -8,6 +8,7 @@ class GABAC_RETURN:
     SUCCESS = 0
     FAILURE = 1
 
+
 class GABAC_LOG_LEVEL:
     r"""
     Different logging urgency
@@ -26,6 +27,7 @@ class GABAC_LOG_LEVEL:
     WARNING = 3
     ERROR = 4
     FATAL = 5
+
 
 class GABAC_TRANSFORM:
     r"""
@@ -48,6 +50,7 @@ class GABAC_TRANSFORM:
     DIFF = 5
     CABAC = 6
 
+
 class GABAC_BINARIZATION:
     r"""
     Binarizations for cabac transformation
@@ -66,7 +69,8 @@ class GABAC_BINARIZATION:
     SEG = 3
     TEG = 4
     STEG = 5
-    
+
+
 class GABAC_CONTEXT_SELECT:
     r"""
     Context selection modes for cabac transformation
@@ -80,7 +84,8 @@ class GABAC_CONTEXT_SELECT:
     BYPASS = 0
     ADAPTIVE_ORDER_0 = 1
     ADAPTIVE_ORDER_1 = 2
-    ADAPTIVE_ORDER_2 = 3 
+    ADAPTIVE_ORDER_2 = 3
+
 
 class GABAC_OPERATION:
     r"""
@@ -94,6 +99,7 @@ class GABAC_OPERATION:
     ENCODE = 0
     DECODE = 1
     ANALYZE = 2
+
 
 class GABAC_STREAM_MODE:
     r"""

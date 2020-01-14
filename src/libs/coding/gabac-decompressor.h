@@ -14,6 +14,8 @@
 #include "gabac-seq-conf-set.h"
 #include "mpegg-decompressor.h"
 
+namespace coding {
+
 /**
  * @brief Module to decompress a BlockPayload back into a raw access unit using Gabac
  */
@@ -41,6 +43,8 @@ class GabacDecompressor : public MpeggDecompressor {
      */
     void dryIn() override;
 };
+
+}  // namespace coding
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,6 +4,9 @@
 #include "mpegg-decoder.h"
 #include "read-decoder.h"
 #include "reference-encoder.h"
+
+namespace coding {
+
 class LocalAssemblyDecoder : public MpeggDecoder {
    private:
    public:
@@ -12,8 +15,8 @@ class LocalAssemblyDecoder : public MpeggDecoder {
         size_t bufSize = t.getParameters().getParameterSetCrps().getCrpsInfo().getBufMaxSize();
         size_t segments = t.getParameters().getNumberTemplateSegments();
         uint16_t ref = t.getReference();
-        lae::LocalAssemblyReferenceEncoder refEncoder(bufSize);
-        lae::LocalAssemblyReadDecoder decoder(std::move(t), segments);
+        LocalAssemblyReferenceEncoder refEncoder(bufSize);
+        LocalAssemblyReadDecoder decoder(std::move(t), segments);
         format::mpegg_rec::MpeggChunk chunk;
         for (size_t recID = 0; recID < numRecords; ++recID) {
             auto meta = decoder.readSegmentMeta();
@@ -30,5 +33,7 @@ class LocalAssemblyDecoder : public MpeggDecoder {
     }
     void dryIn() override { dryOut(); }
 };
+
+}  // namespace coding
 
 #endif  // GENIE_LOCAL_ASSEMBLY_DECODER_H
