@@ -43,7 +43,7 @@ class FastqExporter : public Drain<format::mpegg_rec::MpeggChunk> {
      * @param records Input records
      * @param id Block identifier (for multithreading)
      */
-    void flowIn(format::mpegg_rec::MpeggChunk&& records, size_t id) override;
+    void flowIn(format::mpegg_rec::MpeggChunk &&records, size_t id) override;
 
     /**
      * @brief Accepts end of file marker

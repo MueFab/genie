@@ -4,20 +4,20 @@
 #include <string>
 
 namespace format {
-    namespace fasta {
+namespace fasta {
 
-        struct FastaRecord {
-        public:
-            FastaRecord(std::string header, std::string sequence);
+struct FastaRecord {
+   public:
+    FastaRecord(std::string header, std::string sequence);
 
-            ~FastaRecord();
+    ~FastaRecord();
 
-        public:
-            std::string header;
-            std::string sequence;
-        };
+   public:
+    std::string header;
+    std::string sequence;
+};
 
-    }
-}  // namespace util
+}  // namespace fasta
+}  // namespace format
 
 #endif  // UTIL_FASTA_RECORD_H_

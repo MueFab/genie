@@ -13,6 +13,7 @@ class SamReader {
     SamFileHeader header;
     SamRecord save;
     bool rec_saved;
+
    public:
     explicit SamReader(std::istream& _stream) : stream(_stream), header(stream), rec_saved(false) {}
 
@@ -21,13 +22,13 @@ class SamReader {
     void read(size_t num, std::vector<SamRecord>& vec) {
         std::string string;
         vec.clear();
-        if(rec_saved) {
+        if (rec_saved) {
             rec_saved = false;
             vec.emplace_back(std::move(save));
         }
         while (num && std::getline(stream, string)) {
             vec.emplace_back(string);
-            if(vec.front().getRname() != vec.back().getRname()) {
+            if (vec.front().getRname() != vec.back().getRname()) {
                 save = std::move(vec.back());
                 vec.pop_back();
                 rec_saved = true;
@@ -37,9 +38,7 @@ class SamReader {
         }
     }
 
-    bool isEnd() {
-        return stream.eof();
-    }
+    bool isEnd() { return stream.eof(); }
 };
 }  // namespace sam
 }  // namespace format

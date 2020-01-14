@@ -107,7 +107,9 @@ class SamExporter : public Drain<format::mpegg_rec::MpeggChunk> {
             ret.qual = rec.getRecordSegments().front().getQualities().front();
         }
         ret.cigar = eCigar2Cigar(alignment.getAlignment().getECigar());
-        ret.mappingScore = alignment.getAlignment().getMappingScores().empty() ? 0 : alignment.getAlignment().getMappingScores().front();
+        ret.mappingScore = alignment.getAlignment().getMappingScores().empty()
+                               ? 0
+                               : alignment.getAlignment().getMappingScores().front();
         ret.rcomp = alignment.getAlignment().getRComp();
         ret.flags = mpeggFlagsToSamFlags(rec.getFlags(), ret.rcomp);
 
@@ -206,15 +208,17 @@ class SamExporter : public Drain<format::mpegg_rec::MpeggChunk> {
                 stash[i].flags |= 32;
             }
             std::string name = rec.getReadName().empty() ? "*" : rec.getReadName();
-            out.emplace_back(name, stash[i].flags, "ref" + std::to_string(rec.getMetaAlignment().getSeqID()), stash[i].position, stash[i].mappingScore, stash[i].cigar,
-                             "=", stash[i + 1].position, tlen, stash[i].seq, stash[i].qual);
+            out.emplace_back(name, stash[i].flags, "ref" + std::to_string(rec.getMetaAlignment().getSeqID()),
+                             stash[i].position, stash[i].mappingScore, stash[i].cigar, "=", stash[i + 1].position, tlen,
+                             stash[i].seq, stash[i].qual);
         }
         if (stash.front().rcomp) {
             stash[i].flags |= 32;
         }
         std::string name = rec.getReadName().empty() ? "*" : rec.getReadName();
-        out.emplace_back(name, stash[i].flags, "ref" + std::to_string(rec.getMetaAlignment().getSeqID()), stash[i].position, stash[i].mappingScore, stash[i].cigar,
-                         "=", stash.front().position, -tlen, stash[i].seq, stash[i].qual);
+        out.emplace_back(name, stash[i].flags, "ref" + std::to_string(rec.getMetaAlignment().getSeqID()),
+                         stash[i].position, stash[i].mappingScore, stash[i].cigar, "=", stash.front().position, -tlen,
+                         stash[i].seq, stash[i].qual);
     }
 
     std::vector<format::sam::SamRecord> convert(format::mpegg_rec::MpeggRecord&& rec) {

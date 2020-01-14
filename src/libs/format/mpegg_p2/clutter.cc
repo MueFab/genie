@@ -6,15 +6,14 @@
 #include <algorithm>
 #include <climits>
 #include "clutter.h"
-#include "util/make_unique.h"
 #include "parameter_set/descriptor_configuration_present/cabac/descriptor_subsequence_cfg.h"
 #include "parameter_set/descriptor_configuration_present/decoder_configuration.h"
 #include "parameter_set/descriptor_configuration_present/descriptor_configuration_present.h"
 #include "parameter_set/qv_coding_config_1/qv_coding_config_1.h"
-#include <climits>
+#include "util/make_unique.h"
 
 #include <algorithm>
-#include <iterator>     // std::advance
+#include <iterator>  // std::advance
 
 namespace format {
     namespace mpegg_p2 {

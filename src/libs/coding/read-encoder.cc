@@ -50,7 +50,7 @@ void LocalAssemblyReadEncoder::encodeFirstSegment(const format::mpegg_rec::Mpegg
     const auto MSCORE = ALIGNMENT.getAlignment().getMappingScores().front();  // TODO: Multiple mapping scores
     container.push(GenSub::MSCORE, MSCORE);
 
-    const auto RGROUP = 0; // TODO
+    const auto RGROUP = 0;  // TODO
     container.push(GenSub::RGROUP, RGROUP);
 }
 
@@ -262,8 +262,10 @@ void LocalAssemblyReadEncoder::encodeCigarToken(char cigar_char, CodingState &st
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-LocalAssemblyReadEncoder::ClipInformation LocalAssemblyReadEncoder::encodeCigar(const std::string &read, const std::string &cigar, const std::string &ref,
-                                           format::mpegg_rec::ClassType type) {
+LocalAssemblyReadEncoder::ClipInformation LocalAssemblyReadEncoder::encodeCigar(const std::string &read,
+                                                                                const std::string &cigar,
+                                                                                const std::string &ref,
+                                                                                format::mpegg_rec::ClassType type) {
     CodingState state(read, ref, type);
     for (char cigar_char : cigar) {
         if (updateCount(cigar_char, state)) {
@@ -338,7 +340,7 @@ void LocalAssemblyReadEncoder::encodeClips(const std::pair<ClipInformation, Clip
 // ---------------------------------------------------------------------------------------------------------------------
 
 void LocalAssemblyReadEncoder::encodeSplice(LocalAssemblyReadEncoder::CodingState &state) {
-    (void) state;
+    (void)state;
     UTILS_DIE("Splicing is currently not supported");
 }
 

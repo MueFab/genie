@@ -18,26 +18,25 @@ class BitReader {
     std::istream &istream;
     uint8_t m_heldBits;
     uint8_t m_numHeldBits;
-   public:
-    explicit BitReader(std::istream &_istream) : istream(_istream), m_heldBits(0), m_numHeldBits(0) {
 
-    }
+   public:
+    explicit BitReader(std::istream &_istream) : istream(_istream), m_heldBits(0), m_numHeldBits(0) {}
 
     uint64_t getByte() {
-        char c=0;
+        char c = 0;
         istream.read(&c, 1);
-        return uint8_t (c);
+        return uint8_t(c);
     }
 
-    uint64_t flush () {
+    uint64_t flush() {
         auto ret = m_heldBits;
         m_heldBits = 0;
         m_numHeldBits = 0;
         return ret;
     }
 
-    uint64_t read(uint8_t numBits){
-       uint64_t bits = 0;
+    uint64_t read(uint8_t numBits) {
+        uint64_t bits = 0;
         // uint64_t bits = 0;
         if (numBits <= m_numHeldBits) {
             // Get numBits most significant bits from heldBits as bits
@@ -76,21 +75,21 @@ class BitReader {
         }
 
         alignedWord |= (getByte() << 56u);
-        L7:
+    L7:
         alignedWord |= (getByte() << 48u);
-        L6:
+    L6:
         alignedWord |= (getByte() << 40u);
-        L5:
+    L5:
         alignedWord |= (getByte() << 32u);
-        L4:
+    L4:
         alignedWord |= (getByte() << 24u);
-        L3:
+    L3:
         alignedWord |= (getByte() << 16u);
-        L2:
+    L2:
         alignedWord |= (getByte() << 8u);
-        L1:
+    L1:
         alignedWord |= (getByte());
-        L0:
+    L0:
 
         // Resolve remainder bits
         uint8_t numNextHeldBits = (64 - numBits) % 8;
@@ -107,8 +106,6 @@ class BitReader {
         m_heldBits = static_cast<uint8_t>(alignedWord & 0xffu);
 
         return bits;
-
-
     }
     template <typename T, typename = std::enable_if<std::is_integral<T>::value>>
     T read() {
@@ -126,9 +123,7 @@ class BitReader {
         }
     }
 
-    bool isGood()  const {
-        return bool(istream);
-    }
+    bool isGood() const { return bool(istream); }
 };
 }  // namespace util
 

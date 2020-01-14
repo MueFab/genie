@@ -8,8 +8,8 @@
 #include <memory>
 
 #include "crps_info.h"
-#include "util/bitwriter.h"
 #include "util/bitreader.h"
+#include "util/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 

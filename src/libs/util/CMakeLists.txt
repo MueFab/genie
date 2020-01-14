@@ -13,10 +13,10 @@ set(source_files
         date.cc
         tokenize.cc
         locus.cc
-)
+        )
 
 
-find_package (Threads)
+find_package(Threads)
 
 add_library(util ${source_files})
-target_link_libraries (util Threads::Threads)
+target_link_libraries(util Threads::Threads)

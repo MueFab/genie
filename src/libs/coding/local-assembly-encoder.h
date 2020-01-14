@@ -116,7 +116,7 @@ class LocalAssemblyEncoder : public MpeggEncoder {
                 digits.clear();
                 continue;
             }
-            if(c == '=' || c == '-' || c == '*' || c == '/' || c== '%') {
+            if (c == '=' || c == '-' || c == '*' || c == '/' || c == '%') {
                 length += std::stoi(digits);
                 digits.clear();
             } else {

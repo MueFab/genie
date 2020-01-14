@@ -11,14 +11,12 @@ class DataUnitFactory {
     std::map<size_t, std::unique_ptr<ParameterSet>> parameters;
 
    public:
-    const ParameterSet& getParams(size_t id) const {
-        return *parameters.at(id).get();
-    }
-    std::unique_ptr<AccessUnit> read(util::BitReader &bitReader) {
+    const ParameterSet& getParams(size_t id) const { return *parameters.at(id).get(); }
+    std::unique_ptr<AccessUnit> read(util::BitReader& bitReader) {
         DataUnit::DataUnitType type;
         do {
             type = DataUnit::DataUnitType(bitReader.read(8));
-            if(!bitReader.isGood()) {
+            if (!bitReader.isGood()) {
                 return nullptr;
             }
             switch (type) {
@@ -26,7 +24,7 @@ class DataUnitFactory {
                     UTILS_DIE("DataUnitFactory RAW_REFERENCE not supported yet!");
                 }
                 case DataUnit::DataUnitType::PARAMETER_SET: {
-                    auto p =  util::make_unique<ParameterSet>(bitReader);
+                    auto p = util::make_unique<ParameterSet>(bitReader);
                     parameters.insert(std::make_pair(p->getID(), std::move(p)));
                     break;
                 }

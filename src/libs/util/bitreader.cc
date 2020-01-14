@@ -6,5 +6,4 @@
 
 #include "bitreader.h"
 
-namespace util {
-}  // namespace util
+namespace util {}  // namespace util

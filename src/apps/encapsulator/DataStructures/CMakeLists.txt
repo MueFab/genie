@@ -10,6 +10,6 @@ set(source_files
         Signatures/Signature.c
         Signatures/Signatures.c
         Signatures/SignatureSizeComputation.c
-)
+        )
 
 add_library(encapsulatorDataStructures ${source_files})

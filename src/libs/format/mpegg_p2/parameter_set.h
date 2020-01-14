@@ -68,8 +68,8 @@ class ParameterSet : public DataUnit {
 
     uint8_t getID() const { return parameter_set_ID; }
 
-    ParameterSet& operator=(const ParameterSet &other) {
-        if(this == &other) {
+    ParameterSet &operator=(const ParameterSet &other) {
+        if (this == &other) {
             return *this;
         }
         parameter_set_ID = other.parameter_set_ID;
@@ -83,17 +83,17 @@ class ParameterSet : public DataUnit {
         qv_depth = other.qv_depth;
         as_depth = other.as_depth;
         class_IDs = other.class_IDs;
-        for(const auto&d : other.descriptors) {
+        for (const auto &d : other.descriptors) {
             descriptors.emplace_back(d->clone());
         }
         rgroup_IDs = other.rgroup_IDs;
         multiple_alignments_flag = other.multiple_alignments_flag;
         spliced_reads_flag = other.spliced_reads_flag;
         multiple_signature_base = other.multiple_signature_base;
-        if(other.u_signature_size) {
+        if (other.u_signature_size) {
             u_signature_size = util::make_unique<uint8_t>(*other.u_signature_size);
         }
-        for(const auto&c : other.qv_coding_configs) {
+        for (const auto &c : other.qv_coding_configs) {
             qv_coding_configs.emplace_back(c->clone());
         }
         crps_flag = other.crps_flag;
@@ -101,7 +101,7 @@ class ParameterSet : public DataUnit {
         return *this;
     }
 
-    ParameterSet& operator=(ParameterSet &&other) noexcept {
+    ParameterSet &operator=(ParameterSet &&other) noexcept {
         parameter_set_ID = other.parameter_set_ID;
         parent_parameter_set_ID = other.parent_parameter_set_ID;
         dataset_type = other.dataset_type;
@@ -125,13 +125,9 @@ class ParameterSet : public DataUnit {
         return *this;
     }
 
-    ParameterSet(const ParameterSet &other) : DataUnit(DataUnitType::PARAMETER_SET) {
-        *this = other;
-    }
+    ParameterSet(const ParameterSet &other) : DataUnit(DataUnitType::PARAMETER_SET) { *this = other; }
 
-    ParameterSet(ParameterSet &&other) noexcept : DataUnit(DataUnitType::PARAMETER_SET) {
-        *this = std::move(other);
-    }
+    ParameterSet(ParameterSet &&other) noexcept : DataUnit(DataUnitType::PARAMETER_SET) { *this = std::move(other); }
 
    private:
     void preWrite(util::BitWriter &writer) const;
@@ -174,7 +170,7 @@ class ParameterSet : public DataUnit {
     std::vector<mpegg_rec::ClassType> class_IDs;                                 //!< : 4; For loop Lines 12 + 13
     std::vector<std::unique_ptr<DescriptorConfigurationContainer>> descriptors;  //!< For loop lines 14 - 22
     //!< uint16_t num_groups : 16; //!< Line 23 currently infered from vector
-    std::vector<std::string> rgroup_IDs;            //!< For Loop lines 24 + 25
+    std::vector<std::string> rgroup_IDs;                             //!< For Loop lines 24 + 25
     bool multiple_alignments_flag : 1;                               //!< Line 26
     bool spliced_reads_flag : 1;                                     //!< Line 27
     uint32_t multiple_signature_base : 31;                           //!< Line 28

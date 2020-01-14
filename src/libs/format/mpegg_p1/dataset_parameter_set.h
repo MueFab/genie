@@ -16,9 +16,9 @@ class DatasetParameterSet : public format::mpegg_p2::ParameterSet {
      * ------------------------------------------------------------------------------------------------------------- */
     uint8_t dataset_group_ID : 8;
     uint16_t dataset_ID : 16;
-    };
+};
 
-    }//namespace mpegg_p1
-}// namespace format
+}  // namespace mpegg_p1
+}  // namespace format
 
-#endif //GENIE_PARAMETER_SET_H
+#endif  // GENIE_PARAMETER_SET_H

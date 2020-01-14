@@ -31,7 +31,7 @@ class DescriptorSubsequenceCfg {
                              uint16_t descriptor_subsequence_ID, bool tokentype);
 
     DescriptorSubsequenceCfg(bool tokentype, util::BitReader& reader) {
-        if(!tokentype) {
+        if (!tokentype) {
             descriptor_subsequence_ID = util::make_unique<uint16_t>(reader.read(10));
         }
         transform_subseq_parameters = util::make_unique<TransformSubseqParameters>(reader);
@@ -53,7 +53,7 @@ class DescriptorSubsequenceCfg {
                 UTILS_DIE("MERGE coding unsupported");
                 break;
         }
-        for(size_t i = 0; i < numSubseq; ++i) {
+        for (size_t i = 0; i < numSubseq; ++i) {
             transformSubseq_cfgs.emplace_back(util::make_unique<TransformSubseqCfg>(reader));
         }
     }

@@ -164,17 +164,11 @@ class MpeggRecord {
      *
      * @return
      */
-    const std::string& getGroupName() const {
-        return read_group;
-    }
+    const std::string& getGroupName() const { return read_group; }
 
-    const MetaAlignment& getMetaAlignment() const {
-        return sharedAlignmentInfo;
-    }
+    const MetaAlignment& getMetaAlignment() const { return sharedAlignmentInfo; }
 
-    const ExternalAlignment& getExternalAlignmentInfo() const{
-        return *moreAlignmentInfo;
-    }
+    const ExternalAlignment& getExternalAlignmentInfo() const { return *moreAlignmentInfo; }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

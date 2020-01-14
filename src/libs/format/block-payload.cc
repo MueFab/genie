@@ -63,8 +63,7 @@ bool BlockPayloadSet::SubsequencePayload::isEmpty() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<BlockPayloadSet::TransformedPayload>& BlockPayloadSet::SubsequencePayload::getTransformedPayloads()
-     {
+std::vector<BlockPayloadSet::TransformedPayload>& BlockPayloadSet::SubsequencePayload::getTransformedPayloads() {
     return transformedPayloads;
 }
 

@@ -18,7 +18,7 @@ class MpeggP2Exporter : public Drain<BlockPayloadSet> {
     OrderedLock lock;
 
    public:
-    explicit MpeggP2Exporter(std::ostream *_file) : writer(_file) {}
+    explicit MpeggP2Exporter(std::ostream* _file) : writer(_file) {}
     void flowIn(BlockPayloadSet&& t, size_t id) override {
         BlockPayloadSet data = std::move(t);
         OrderedSection section(&lock, id);
@@ -26,7 +26,8 @@ class MpeggP2Exporter : public Drain<BlockPayloadSet> {
 
         format::mpegg_p2::AccessUnit au(id, id, format::mpegg_rec::ClassType::CLASS_I, data.getRecordNum(),
                                         format::mpegg_p2::DataUnit::DatasetType::ALIGNED, 32, 32, 0);
-        au.setAuTypeCfg(util::make_unique<format::AuTypeCfg>(data.getReference(), data.getMinPos(), data.getMaxPos(), data.getParameters().getPosSize()));
+        au.setAuTypeCfg(util::make_unique<format::AuTypeCfg>(data.getReference(), data.getMinPos(), data.getMaxPos(),
+                                                             data.getParameters().getPosSize()));
         for (size_t descriptor = 0; descriptor < getDescriptors().size(); ++descriptor) {
             if (data.getPayload(GenDesc(descriptor)).isEmpty()) {
                 continue;

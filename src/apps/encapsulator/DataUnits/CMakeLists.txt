@@ -6,6 +6,6 @@ set(source_files
         DataUnitRawReference.c
         DataUnits.c
         DataUnitsParametersSet.c
-)
+        )
 
 add_library(encapsulatorDataUnits ${source_files})

@@ -12,7 +12,7 @@ set(source_files
         main.cc
         output-file.cc
         program-options.cc
-)
+        )
 
 add_executable(ureads-encoder ${source_files})
 

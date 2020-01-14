@@ -1,6 +1,5 @@
 #include "tokenize.h"
 
-
 std::vector<std::string> tokenize(std::string const& str, const char delim) {
     size_t start;
     size_t end = 0;

@@ -46,4 +46,4 @@ class DatasetHeader {
 }  // namespace mpegg_p1
 }  // namespace format
 
-#endif //GENIE_DATASET_HEADER_H
+#endif  // GENIE_DATASET_HEADER_H

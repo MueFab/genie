@@ -16,12 +16,12 @@
 #include <string>
 #include <thread>
 #include <vector>
-#include "spring/decompress.h"
-#include "spring/spring.h"
-#include "util/exceptions.h"
 #include "format/fasta/fasta-file-reader.h"
 #include "format/fasta/fasta-record.h"
 #include "format/sam/sam-record.h"
+#include "spring/decompress.h"
+#include "spring/spring.h"
+#include "util/exceptions.h"
 #if 0
 namespace dsg {
 

@@ -1,9 +1,9 @@
 #ifndef GENIE_STREAM_CONTAINER_H
 #define GENIE_STREAM_CONTAINER_H
 
-#include <vector>
-#include <cstdint>
 #include <gabac/gabac.h>
+#include <cstdint>
+#include <vector>
 
 struct StreamContainer {
     gabac::DataBlock pos_0;
@@ -28,28 +28,26 @@ struct StreamContainer {
     gabac::DataBlock ureads_0;
 
     StreamContainer()
-            : pos_0(0, 4),
-              rcomp_0(0, 4),
-              flags_0(0, 4),
-              flags_1(0, 4),
-              flags_2(0, 4),
-              mmpos_0(0, 4),
-              mmpos_1(0, 4),
-              mmtype_0(0, 4),
-              mmtype_1(0, 4),
-              mmtype_2(0, 4),
-              clips_0(0, 4),
-              clips_1(0, 4),
-              clips_2(0, 4),
-              clips_3(0, 4),
-              pair_0(0, 4),
-              pair_1(0,4),
-              mscore_0(0,4),
-              rlen_0(0, 4),
-              rtype_0(0, 4),
-              ureads_0(0, 4){
-
-    }
+        : pos_0(0, 4),
+          rcomp_0(0, 4),
+          flags_0(0, 4),
+          flags_1(0, 4),
+          flags_2(0, 4),
+          mmpos_0(0, 4),
+          mmpos_1(0, 4),
+          mmtype_0(0, 4),
+          mmtype_1(0, 4),
+          mmtype_2(0, 4),
+          clips_0(0, 4),
+          clips_1(0, 4),
+          clips_2(0, 4),
+          clips_3(0, 4),
+          pair_0(0, 4),
+          pair_1(0, 4),
+          mscore_0(0, 4),
+          rlen_0(0, 4),
+          rtype_0(0, 4),
+          ureads_0(0, 4) {}
 };
 
-#endif //GENIE_STREAM_CONTAINER_H
+#endif  // GENIE_STREAM_CONTAINER_H

@@ -233,21 +233,13 @@ class MpeggRawAu {
 
     uint16_t getReference() { return referenceSequence; }
 
-    void setMaxPos(uint64_t pos) {
-        maxPos = pos;
-    }
+    void setMaxPos(uint64_t pos) { maxPos = pos; }
 
-    void setMinPos(uint64_t pos) {
-        minPos = pos;
-    }
+    void setMinPos(uint64_t pos) { minPos = pos; }
 
-    uint64_t getMaxPos() const {
-        return maxPos;
-    }
+    uint64_t getMaxPos() const { return maxPos; }
 
-    uint64_t getMinPos() const {
-        return minPos;
-    }
+    uint64_t getMinPos() const { return minPos; }
 
    private:
     std::vector<Descriptor> descriptors;        //!< @brief

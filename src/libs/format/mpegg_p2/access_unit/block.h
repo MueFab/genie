@@ -21,9 +21,9 @@ class Block {
      * Incorporated (Simplification): ISO 23092-2 Section 3.4.1.2 table 20
      *
      * ------------------------------------------------------------------------------------------------------------ */
-    uint8_t reserved;              //!< Line 2
-    uint8_t descriptor_ID;         //!< Line 3
-    uint8_t reserved_2;            //!< Line 4
+    uint8_t reserved;             //!< Line 2
+    uint8_t descriptor_ID;        //!< Line 3
+    uint8_t reserved_2;           //!< Line 4
     uint32_t block_payload_size;  //!< Line 5
 
     /**
@@ -41,25 +41,20 @@ class Block {
         reserved_2 = reader.read(3);
         block_payload_size = reader.read(29);
 
-     /*   for(size_t i = 0; i < block_payload_size; ++i) {
-            reader.read(8);
-        } */
+        /*   for(size_t i = 0; i < block_payload_size; ++i) {
+               reader.read(8);
+           } */
 
-        payload = BlockPayloadSet::DescriptorPayload(GenDesc (descriptor_ID), block_payload_size, reader);
+        payload = BlockPayloadSet::DescriptorPayload(GenDesc(descriptor_ID), block_payload_size, reader);
 
         reader.flush();
-
     }
     virtual ~Block() = default;
     virtual void write(util::BitWriter &writer) const;
 
-    BlockPayloadSet::DescriptorPayload&& movePayload() {
-        return std::move(payload);
-    }
+    BlockPayloadSet::DescriptorPayload &&movePayload() { return std::move(payload); }
 
-    uint8_t getDescriptorID () const {
-        return descriptor_ID;
-    };
+    uint8_t getDescriptorID() const { return descriptor_ID; };
 };
 }  // namespace format
 

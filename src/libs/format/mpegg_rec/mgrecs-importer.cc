@@ -20,7 +20,7 @@ bool MgrecsImporter::pump(size_t id) {
         OrderedSection section(&lock, id);
         for (size_t i = 0; i < blockSize; ++i) {
             format::mpegg_rec::MpeggRecord rec(reader);
-            if(!reader.isGood()) {
+            if (!reader.isGood()) {
                 flowOut(std::move(chunk), record_counter++);
                 return false;
             }

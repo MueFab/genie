@@ -38,7 +38,7 @@ class BlockPayloadSet {
          */
         explicit TransformedPayload(gabac::DataBlock _data, size_t pos);
 
-        TransformedPayload(size_t size, util::BitReader &reader) {
+        TransformedPayload(size_t size, util::BitReader& reader) {
             payloadData = gabac::DataBlock(0, 1);
             payloadData.reserve(size);
             for (size_t i = 0; i < size; ++i) {
@@ -76,7 +76,8 @@ class BlockPayloadSet {
          */
         explicit SubsequencePayload(GenSubIndex _id) : id(_id) {}
 
-        explicit SubsequencePayload(GenSubIndex _id, size_t remainingSize, size_t subseq_ctr, util::BitReader& reader) : id(_id) {
+        explicit SubsequencePayload(GenSubIndex _id, size_t remainingSize, size_t subseq_ctr, util::BitReader& reader)
+            : id(_id) {
             for (size_t i = 0; i < subseq_ctr; ++i) {
                 size_t s = 0;
                 if (i != subseq_ctr - 1) {
@@ -85,7 +86,7 @@ class BlockPayloadSet {
                 } else {
                     s = remainingSize;
                 }
-                if(s) {
+                if (s) {
                     transformedPayloads.emplace_back(s, reader);
                 }
             }
@@ -141,7 +142,7 @@ class BlockPayloadSet {
 
         explicit DescriptorPayload() : id(GenDesc(0)) {}
 
-        explicit DescriptorPayload(GenDesc _id,  size_t remainingSize, util::BitReader& reader) : id(_id) {
+        explicit DescriptorPayload(GenDesc _id, size_t remainingSize, util::BitReader& reader) : id(_id) {
             size_t count = getDescriptor(_id).subseqs.size();
             for (size_t i = 0; i < count; ++i) {
                 size_t s = 0;
@@ -151,7 +152,7 @@ class BlockPayloadSet {
                 } else {
                     s = remainingSize;
                 }
-                if(s) {
+                if (s) {
                     subsequencePayloads.emplace_back(GenSubIndex{_id, i}, s, 1, reader);
                 }
             }
@@ -252,25 +253,15 @@ class BlockPayloadSet {
 
     void setReference(uint16_t ref) { reference = ref; }
 
-    void setMaxPos(uint64_t pos) {
-        maxPos = pos;
-    }
+    void setMaxPos(uint64_t pos) { maxPos = pos; }
 
-    void setMinPos(uint64_t pos) {
-        minPos = pos;
-    }
+    void setMinPos(uint64_t pos) { minPos = pos; }
 
-    uint64_t getMaxPos() const {
-        return maxPos;
-    }
+    uint64_t getMaxPos() const { return maxPos; }
 
-    uint64_t getMinPos() const {
-        return minPos;
-    }
+    uint64_t getMinPos() const { return minPos; }
 
-    void setRecordNum(size_t num)  {
-        record_num = num;
-    }
+    void setRecordNum(size_t num) { record_num = num; }
 
    private:
     std::vector<DescriptorPayload> desc_pay;  //!< @brief

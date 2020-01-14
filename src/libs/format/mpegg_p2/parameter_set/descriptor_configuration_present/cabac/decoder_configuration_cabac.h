@@ -25,16 +25,18 @@ class DecoderConfigurationCabac : public DecoderConfiguration {
    public:
     explicit DecoderConfigurationCabac(GenDesc _desc);
 
-    explicit DecoderConfigurationCabac(GenDesc _desc, util::BitReader &reader) : DecoderConfiguration(DecoderConfiguration::EncodingModeId::CABAC){
+    explicit DecoderConfigurationCabac(GenDesc _desc, util::BitReader &reader)
+        : DecoderConfiguration(DecoderConfiguration::EncodingModeId::CABAC) {
         desc = _desc;
         uint8_t num_descriptor_subsequence_cfgs = getDescriptor(desc).subseqs.size();
-        if(_desc != GenDesc::MSAR && _desc != GenDesc::RNAME) {
+        if (_desc != GenDesc::MSAR && _desc != GenDesc::RNAME) {
             num_descriptor_subsequence_cfgs = reader.read(8) + 1;
         } else {
             rle_guard_tokentype = reader.read(8);
         }
-        for(size_t i = 0; i < num_descriptor_subsequence_cfgs; ++i) {
-            descriptor_subsequence_cfgs.emplace_back(util::make_unique<DescriptorSubsequenceCfg>(_desc == GenDesc::MSAR || _desc == GenDesc::RNAME, reader));
+        for (size_t i = 0; i < num_descriptor_subsequence_cfgs; ++i) {
+            descriptor_subsequence_cfgs.emplace_back(
+                util::make_unique<DescriptorSubsequenceCfg>(_desc == GenDesc::MSAR || _desc == GenDesc::RNAME, reader));
         }
     }
 
@@ -46,10 +48,10 @@ class DecoderConfigurationCabac : public DecoderConfiguration {
 
     DecoderConfigurationCabac(const DecoderConfigurationCabac &c)
         : DecoderConfiguration(EncodingModeId::CABAC), desc(c.desc), rle_guard_tokentype(c.rle_guard_tokentype) {
-        if(this == &c) {
-           return;
+        if (this == &c) {
+            return;
         }
-        for(const auto& a : c.descriptor_subsequence_cfgs)  {
+        for (const auto &a : c.descriptor_subsequence_cfgs) {
             descriptor_subsequence_cfgs.emplace_back(a->clone());
         }
     }

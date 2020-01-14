@@ -35,7 +35,7 @@ std::string LocalAssemblyReferenceEncoder::preprocess(const std::string &read, c
             count += cigar_pos - '0';
             continue;
         }
-        if(cigar_pos == '(' || cigar_pos == '[') {
+        if (cigar_pos == '(' || cigar_pos == '[') {
             continue;
         }
         if (getAlphabetProperties(AlphabetID::ACGTN).isIncluded(cigar_pos) && count == 0) {
@@ -145,7 +145,7 @@ uint32_t LocalAssemblyReferenceEncoder::lengthFromCigar(const std::string &cigar
             count += cigar_pos - '0';
             continue;
         }
-        if(cigar_pos == '(' || cigar_pos == '[') {
+        if (cigar_pos == '(' || cigar_pos == '[') {
             continue;
         }
         if (getAlphabetProperties(AlphabetID::ACGTN).isIncluded(cigar_pos) && count == 0) {

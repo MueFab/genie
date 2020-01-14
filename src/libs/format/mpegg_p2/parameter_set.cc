@@ -14,8 +14,7 @@
 
 namespace format {
 namespace mpegg_p2 {
-ParameterSet::ParameterSet(util::BitReader &bitReader)
-    : DataUnit(DataUnitType::PARAMETER_SET) {
+ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::PARAMETER_SET) {
     bitReader.read(10);  // ISO 23092-2 Section 3.1 table 3
     bitReader.read(22);
     parameter_set_ID = bitReader.read(8);
@@ -139,7 +138,6 @@ void ParameterSet::write(util::BitWriter &writer) const {
 }
 
 // -----------------------------------------------------------------------------------------------------------------
-
 
 void ParameterSet::preWrite(util::BitWriter &writer) const {
     writer.write(parameter_set_ID, 8);

@@ -1,20 +1,19 @@
-#include <stdexcept>
-#include <string>
-#include <fstream>
-#include "util.h"
 #include <format/mpegg_p2/access_unit.h>
 #include <format/mpegg_p2/clutter.h>
 #include <format/mpegg_p2/parameter_set.h>
 #include <util/bitwriter.h>
 #include <util/perf-stats.h>
+#include <fstream>
+#include <stdexcept>
+#include <string>
 #include "spring-gabac.h"
+#include "util.h"
 
 namespace spring {
 
-/*void combine_aus(const std::string &temp_dir, compression_params &cp, const std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::string &outputFilePath, util::FastqStats *stats) {
-  using namespace format;
-  std::ofstream ofstr(outputFilePath);
-  util::BitWriter bw(&ofstr);
+/*void combine_aus(const std::string &temp_dir, compression_params &cp, const
+std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::string &outputFilePath, util::FastqStats
+*stats) { using namespace format; std::ofstream ofstr(outputFilePath); util::BitWriter bw(&ofstr);
 
   // write parameter set
   const uint8_t PARAMETER_SET_ID = 0;

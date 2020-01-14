@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 MpeggRawAu::SubDescriptor GabacDecompressor::decompress(const gabac::EncodingConfiguration& conf,
-                                   BlockPayloadSet::SubsequencePayload&& data) {
+                                                        BlockPayloadSet::SubsequencePayload&& data) {
     BlockPayloadSet::SubsequencePayload in = std::move(data);
     // Interface to GABAC library
     std::stringstream in_stream;
@@ -50,7 +50,8 @@ void GabacDecompressor::flowIn(BlockPayloadSet&& t, size_t id) {
                 continue;
             }
             auto d_id = subseq.getID();
-            MpeggRawAu::SubDescriptor subseqData = decompress(configSet.getConfAsGabac(subseq.getID()), std::move(subseq));
+            MpeggRawAu::SubDescriptor subseqData =
+                decompress(configSet.getConfAsGabac(subseq.getID()), std::move(subseq));
             raw_aus.set(d_id, std::move(subseqData));
         }
     }

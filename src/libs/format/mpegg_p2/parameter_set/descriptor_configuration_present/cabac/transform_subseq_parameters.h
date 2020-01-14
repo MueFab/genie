@@ -5,8 +5,8 @@
 
 #include <memory>
 #include <vector>
-#include "util/bitwriter.h"
 #include "util/bitreader.h"
+#include "util/bitwriter.h"
 #include "util/make_unique.h"
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -41,10 +41,10 @@ class TransformSubseqParameters {
             case TransformIdSubseq::EQUALITY_CODING:
                 break;
             case TransformIdSubseq::MATCH_CODING:
-                match_coding_buffer_size = util::make_unique<uint16_t >(reader.read(16));
+                match_coding_buffer_size = util::make_unique<uint16_t>(reader.read(16));
                 break;
             case TransformIdSubseq::RLE_CODING:
-                rle_coding_guard = util::make_unique<uint8_t >(reader.read(8));
+                rle_coding_guard = util::make_unique<uint8_t>(reader.read(8));
                 break;
             case TransformIdSubseq::MERGE_CODING:
                 UTILS_DIE("Merge coding not supported");
@@ -76,9 +76,7 @@ class TransformSubseqParameters {
         }
     }
 
-    const std::vector<uint8_t>* getMergeCodingShiftSize() const {
-        return &merge_coding_shift_size;
-    }
+    const std::vector<uint8_t> *getMergeCodingShiftSize() const { return &merge_coding_shift_size; }
 
    private:
     TransformIdSubseq transform_ID_subseq;               //!< : 8; Line 2

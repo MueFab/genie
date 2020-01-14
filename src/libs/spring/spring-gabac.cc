@@ -79,8 +79,8 @@ std::vector<std::vector<gabac::DataBlock>> generate_empty_raw_data() {
             }
         } else {
             raw_data[descriptor].resize(format::mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences);
-            for (int subseq = 0; subseq < format::mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences; subseq++) {
-                raw_data[descriptor][subseq].setWordSize(4);
+            for (int subseq = 0; subseq < format::mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences;
+subseq++) { raw_data[descriptor][subseq].setWordSize(4);
             }
         }
     }
@@ -131,11 +131,10 @@ uint64_t write_streams_to_file(const std::vector<std::vector<std::vector<gabac::
 
 // assumes that the generated_streams vector is already initialized with
 // create_default_streams.
-uint64_t read_streams_from_file(std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams, const std::string &infile, const std::vector<uint8_t> &descriptors_to_read) {
-    uint64_t retval = 0;
-    std::ifstream fin(infile, std::ios::binary);
-    for (auto &descriptor : descriptors_to_read) {
-        for (size_t subseq = 0; subseq < generated_streams[descriptor].size(); subseq++) {
+uint64_t read_streams_from_file(std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams, const
+std::string &infile, const std::vector<uint8_t> &descriptors_to_read) { uint64_t retval = 0; std::ifstream fin(infile,
+std::ios::binary); for (auto &descriptor : descriptors_to_read) { for (size_t subseq = 0; subseq <
+generated_streams[descriptor].size(); subseq++) {
             // read number of gabac data blocks
             uint32_t num_data_blocks;
             fin.read((char *)&(num_data_blocks), sizeof(uint32_t));
