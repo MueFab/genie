@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace genie {
+namespace ureads_encoder {
 
 class ProgramOptions {
    public:
@@ -21,6 +21,6 @@ class ProgramOptions {
     void processCommandLine(int argc, char *argv[]);
 };
 
-}  // namespace genie
+}  // namespace ureads_encoder
 
 #endif  // GENIE_PROGRAM_OPTIONS_H_

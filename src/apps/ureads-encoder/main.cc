@@ -6,8 +6,6 @@
 #include <vector>
 
 #include "encoding.h"
-#include "log.h"
-#include "logger.h"
 #include "program-options.h"
 #include "util/exceptions.h"
 
@@ -17,26 +15,22 @@ static void writeCommandLine(int argc, char* argv[]) {
     for (const auto& arg : args) {
         commandLine << arg << " ";
     }
-    GENIE_LOG_DEBUG << "Command line: " << commandLine.str();
+    std::cout << "Command line: " << commandLine.str() << std::endl;
 }
 
 static int genie_main(int argc, char* argv[]) {
-    genie::Logger::init("app.log");
-    genie::Logger& logger = genie::Logger::instance();
-    logger.out("test");
-
     try {
-        genie::ProgramOptions programOptions(argc, argv);
+        ureads_encoder::ProgramOptions programOptions(argc, argv);
         writeCommandLine(argc, argv);
-        genie::encode(programOptions);
+        ureads_encoder::encode(programOptions);
     } catch (const util::RuntimeException& e) {
-        GENIE_LOG_ERROR << "Runtime error: " << e.msg();
+        std::cerr << "Runtime error: " << e.msg() << std::endl;
         return -1;
     } catch (const std::exception& e) {
-        GENIE_LOG_ERROR << "Standard library error: " << e.what();
+        std::cerr << "Standard library error: " << e.what() << std::endl;
         return -1;
     } catch (...) {
-        GENIE_LOG_ERROR << "Unknown error occurred";
+        std::cerr << "Unknown error occurred" << std::endl;
         return -1;
     }
 
@@ -72,7 +66,7 @@ extern "C" void handleSignal(int sig) {
             signalString = "unknown";
             break;
     }
-    GENIE_LOG_WARNING << "Caught signal: " << sig << " (" << signalString << ")";
+    std::cerr << "Caught signal: " << sig << " (" << signalString << ")" << std::endl;
 
     // Invoke the default signal action
     std::signal(sig, SIG_DFL);
@@ -97,7 +91,7 @@ int main(int argc, char* argv[]) {
     // Fire up main method
     int rc = genie_main(argc, argv);
     if (rc != 0) {
-        GENIE_LOG_FATAL << "Failed to run";
+        std::cerr << "Failed to run" << std::endl;
     }
 
     // The C standard makes no guarantees as to when output to stdout or stderr (standard error) is actually flushed.

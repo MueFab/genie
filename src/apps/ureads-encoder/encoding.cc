@@ -1,44 +1,13 @@
 #include "encoding.h"
 
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <map>
-#include <string>
-#include <vector>
-
-#include "fastq-file-reader.h"
-#include "fastq-record.h"
-#include "format/mpegg_p2/parameter_set/qv_coding_config_1/qv_coding_config_1.h"
-#include "genie-gabac-output-stream.h"
-#include "log.h"
-#include "util/exceptions.h"
-
-#include <coding/gabac-compressor.h>
-#include <coding/gabac-decompressor.h>
-#include <coding/local-assembly-decoder.h>
-#include <coding/local-assembly-encoder.h>
-#include <format/fastq/fastq-exporter.h>
-#include <format/fastq/fastq-importer.h>
-#include <format/mpegg_p2/mpegg-p-2-exporter.h>
-#include <format/mpegg_p2/mpegg-p-2-importer.h>
-#include <format/mpegg_p2/raw_reference.h>
-#include <format/mpegg_rec/mgrecs-exporter.h>
 #include <format/mpegg_rec/mgrecs-importer.h>
 #include <format/sam/sam-exporter.h>
 #include <format/sam/sam-header.h>
-#include <format/sam/sam-importer.h>
-#include <format/sam/sam-reader.h>
-#include <format/sam/sam-writer.h>
-#include <gabac/gabac.h>
 #include <util/thread-manager.h>
+#include <fstream>
+#include <string>
 
-#include "format/mpegg_p2/access_unit.h"
-#include "format/mpegg_p2/clutter.h"
-#include "format/mpegg_p2/parameter_set.h"
-#include "util/bitwriter.h"
-
-namespace genie {
+namespace ureads_encoder {
 
 void encode(const ProgramOptions& programOptions) {
     (void)programOptions;
@@ -102,4 +71,4 @@ void encode(const ProgramOptions& programOptions) {
 #endif
 }
 
-}  // namespace genie
+}  // namespace ureads_encoder

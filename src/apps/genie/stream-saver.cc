@@ -3,8 +3,6 @@
 
 #include <genie/stream-saver.h>
 
-#include <ureads-encoder/logger.h>
-
 namespace dsg {
 
 void StreamSaver::run_gabac(const std::string &name, gabac::DataBlock *data, bool decompression) {
@@ -28,9 +26,9 @@ void StreamSaver::run_gabac(const std::string &name, gabac::DataBlock *data, boo
     thread_num = omp_get_thread_num();
 #endif
 
-    genie::Logger::instance().out("COMPRESSED:" + name + " with CONFIG: " + getConfigName(name) + " from " +
-                                  std::to_string(insize) + " to " + std::to_string(data->getRawSize()) + " in thread " +
-                                  std::to_string(thread_num));
+    std::cout << "COMPRESSED:" + name + " with CONFIG: " + getConfigName(name) + " from " + std::to_string(insize) +
+                     " to " + std::to_string(data->getRawSize()) + " in thread " + std::to_string(thread_num)
+              << std::endl;
 }
 
 void StreamSaver::analyze(const std::string &name, gabac::DataBlock *data) {
@@ -51,7 +49,7 @@ void StreamSaver::analyze(const std::string &name, gabac::DataBlock *data) {
     aconf.maxValue = params.at(configname).maxval;
     aconf.wordSize = params.at(configname).wordsize;
 
-    genie::Logger::instance().out("ANALYZING: " + this->configPath + configname + ".json");
+    std::cout << "ANALYZING: " + this->configPath + configname + ".json" << std::endl;
     gabac::analyze(ioconf, aconf);
 }
 
@@ -69,7 +67,7 @@ void StreamSaver::compress(const std::string &name, gabac::DataBlock *data) {
             decompressed.setWordSize(original.getWordSize());
 
             if (!(decompressed == original)) {
-                genie::Logger::instance().out("GABAC FAIL DETECTED: " + name);
+                std::cout << "GABAC FAIL DETECTED: " + name << std::endl;
                 std::ofstream origFile("gabac_" + name + "_original");
                 origFile.write((char *)original.getData(), original.getRawSize());
                 std::ofstream decFile("gabac_" + name + "_decoded");
@@ -79,7 +77,7 @@ void StreamSaver::compress(const std::string &name, gabac::DataBlock *data) {
             }
         }
     } catch (const gabac::Exception &e) {
-        genie::Logger::instance().out("GABAC EXCEPTION DETECTED: " + name);
+        std::cout << "GABAC EXCEPTION DETECTED: " + name << std::endl;
         std::ofstream origFile("gabac_" + name + "_original");
         origFile.write((char *)original.getData(), original.getRawSize());
         std::ofstream decFile("gabac_" + name + "_decoded");
@@ -115,7 +113,7 @@ uint64_t StreamSaver::pack(const gabac::DataBlock &data, const std::string &stre
     // Write name of input file
     uint64_t size = stream_name.size();
 
-    genie::Logger::instance().out("PACKING: " + stream_name + " with size " + std::to_string(data.getRawSize()));
+    std::cout << "PACKING: " + stream_name + " with size " + std::to_string(data.getRawSize()) << std::endl;
 
     fout->write(reinterpret_cast<char *>(&size), sizeof(uint64_t));
     fout->write(stream_name.c_str(), size);
@@ -143,7 +141,7 @@ void StreamSaver::unpack(const std::string &stream_name, gabac::DataBlock *data)
     fin->seekg(position->second.position);
     fin->read(reinterpret_cast<char *>(data->getData()), position->second.size);
 
-    genie::Logger::instance().out("UNPACKING: " + stream_name + " with size " + std::to_string(data->getRawSize()));
+    std::cout << "UNPACKING: " + stream_name + " with size " + std::to_string(data->getRawSize()) << std::endl;
 }
 
 const std::map<std::string, StreamSaver::gabac_stream_params> &StreamSaver::getParams() {
@@ -218,10 +216,10 @@ void StreamSaver::loadConfig(const std::string &name) {
         std::ifstream t(configPath + name + ".json");
         std::string configstring;
         if (t) {
-            genie::Logger::instance().out("LOADING: " + configPath + name + ".json " + "to " + name);
+            std::cout << "LOADING: " + configPath + name + ".json " + "to " + name << std::endl;
             configstring = std::string((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
         } else {
-            genie::Logger::instance().out("WARNING: Could not load config: " + name + " ; Falling back to default");
+            std::cout << "WARNING: Could not load config: " + name + " ; Falling back to default" << std::endl;
             configstring = getDefaultConf();
         }
 

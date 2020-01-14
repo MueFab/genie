@@ -14,11 +14,9 @@
 
 #include "generation.h"
 #include "program-options.h"
-#include "ureads-encoder/logger.h"
 #include "util/exceptions.h"
 
 static void printProgramInformation();
-static void loggerInitialization();
 
 static int dsg_main(int argc, char* argv[]) {
 #ifdef GENIE_USE_OPENMP
@@ -28,7 +26,6 @@ static int dsg_main(int argc, char* argv[]) {
 #endif
 
     try {
-        loggerInitialization();
         printProgramInformation();
 
         dsg::ProgramOptions programOptions(argc, argv);
@@ -90,8 +87,6 @@ int main(int argc, char* argv[]) {
     std::cerr << std::endl;
     return (rc == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
-
-static void loggerInitialization() { genie::Logger::init("genie.log"); }
 
 static void printProgramInformation(void) {
     std::cout << std::string(80, '-') << std::endl;
