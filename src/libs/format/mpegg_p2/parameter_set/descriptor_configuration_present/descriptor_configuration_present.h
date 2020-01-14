@@ -25,7 +25,7 @@ class DescriptorConfigurationPresent : public DescriptorConfiguration {
    public:
     explicit DescriptorConfigurationPresent();
 
-    explicit DescriptorConfigurationPresent(GenDesc desc, util::BitReader &reader)
+    explicit DescriptorConfigurationPresent(coding::GenDesc desc, util::BitReader &reader)
         : DescriptorConfiguration(DecCfgPreset::PRESENT) {
         decoder_configuration = DecoderConfiguration::factory(desc, reader);
     }

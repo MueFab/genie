@@ -67,16 +67,17 @@ class BlockPayloadSet {
     class SubsequencePayload {
        private:
         std::vector<TransformedPayload> transformedPayloads;  //!< @brief
-        GenSubIndex id;                                       //!< @brief
+        coding::GenSubIndex id;                               //!< @brief
 
        public:
         /**
          * @brief
          * @param _id
          */
-        explicit SubsequencePayload(GenSubIndex _id) : id(_id) {}
+        explicit SubsequencePayload(coding::GenSubIndex _id) : id(_id) {}
 
-        explicit SubsequencePayload(GenSubIndex _id, size_t remainingSize, size_t subseq_ctr, util::BitReader& reader)
+        explicit SubsequencePayload(coding::GenSubIndex _id, size_t remainingSize, size_t subseq_ctr,
+                                    util::BitReader& reader)
             : id(_id) {
             for (size_t i = 0; i < subseq_ctr; ++i) {
                 size_t s = 0;
@@ -96,7 +97,7 @@ class BlockPayloadSet {
          * @brief
          * @return
          */
-        GenSubIndex getID() const { return id; }
+        coding::GenSubIndex getID() const { return id; }
 
         /**
          * @brief
@@ -131,18 +132,18 @@ class BlockPayloadSet {
     class DescriptorPayload {
        private:
         std::vector<SubsequencePayload> subsequencePayloads;  //!< @brief
-        GenDesc id;                                           //!< @brief
+        coding::GenDesc id;                                   //!< @brief
 
        public:
         /**
          * @brief
          * @param _id
          */
-        explicit DescriptorPayload(GenDesc _id) : id(_id) {}
+        explicit DescriptorPayload(coding::GenDesc _id) : id(_id) {}
 
-        explicit DescriptorPayload() : id(GenDesc(0)) {}
+        explicit DescriptorPayload() : id(coding::GenDesc(0)) {}
 
-        explicit DescriptorPayload(GenDesc _id, size_t remainingSize, util::BitReader& reader) : id(_id) {
+        explicit DescriptorPayload(coding::GenDesc _id, size_t remainingSize, util::BitReader& reader) : id(_id) {
             size_t count = getDescriptor(_id).subseqs.size();
             for (size_t i = 0; i < count; ++i) {
                 size_t s = 0;
@@ -153,7 +154,7 @@ class BlockPayloadSet {
                     s = remainingSize;
                 }
                 if (s) {
-                    subsequencePayloads.emplace_back(GenSubIndex{_id, i}, s, 1, reader);
+                    subsequencePayloads.emplace_back(coding::GenSubIndex{_id, i}, s, 1, reader);
                 }
             }
         }
@@ -162,7 +163,7 @@ class BlockPayloadSet {
          * @brief
          * @return
          */
-        GenDesc getID() const { return id; }
+        coding::GenDesc getID() const { return id; }
 
         /**
          * @brief
@@ -201,14 +202,14 @@ class BlockPayloadSet {
      * @param i
      * @param p
      */
-    void setPayload(GenDesc i, DescriptorPayload p);
+    void setPayload(coding::GenDesc i, DescriptorPayload p);
 
     /**
      * @brief
      * @param i
      * @return
      */
-    DescriptorPayload& getPayload(GenDesc i);
+    DescriptorPayload& getPayload(coding::GenDesc i);
 
     /**
      * @brief

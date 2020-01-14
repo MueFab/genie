@@ -2,6 +2,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+namespace coding {
+
 MpeggRawAu::SubDescriptor GabacDecompressor::decompress(const gabac::EncodingConfiguration& conf,
                                                         BlockPayloadSet::SubsequencePayload&& data) {
     BlockPayloadSet::SubsequencePayload in = std::move(data);
@@ -64,6 +66,7 @@ void GabacDecompressor::flowIn(BlockPayloadSet&& t, size_t id) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void GabacDecompressor::dryIn() { dryOut(); }
+}  // namespace coding
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

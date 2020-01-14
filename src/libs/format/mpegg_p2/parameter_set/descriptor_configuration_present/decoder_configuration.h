@@ -33,7 +33,7 @@ class DecoderConfiguration {
 
     virtual ~DecoderConfiguration() = default;
 
-    static std::unique_ptr<DecoderConfiguration> factory(GenDesc desc, util::BitReader& reader);
+    static std::unique_ptr<DecoderConfiguration> factory(coding::GenDesc desc, util::BitReader& reader);
 
     EncodingModeId getEncodingMode() const { return encoding_mode_ID; }
 

@@ -45,7 +45,7 @@ class Block {
                reader.read(8);
            } */
 
-        payload = BlockPayloadSet::DescriptorPayload(GenDesc(descriptor_ID), block_payload_size, reader);
+        payload = BlockPayloadSet::DescriptorPayload(coding::GenDesc(descriptor_ID), block_payload_size, reader);
 
         reader.flush();
     }

@@ -11,7 +11,7 @@ namespace mpegg_p2 {
 namespace desc_conf_pres {
 void DecoderConfiguration::write(util::BitWriter& writer) const { writer.write(uint8_t(encoding_mode_ID), 8); }
 
-std::unique_ptr<DecoderConfiguration> DecoderConfiguration::factory(GenDesc desc, util::BitReader& reader) {
+std::unique_ptr<DecoderConfiguration> DecoderConfiguration::factory(coding::GenDesc desc, util::BitReader& reader) {
     auto mode = EncodingModeId(reader.read(8));
     switch (mode) {
         case EncodingModeId::CABAC:

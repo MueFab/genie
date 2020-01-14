@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 
+namespace coding {
+
 /**
  * @brief
  */
@@ -252,7 +254,7 @@ class MpeggRawAu {
 
     uint16_t referenceSequence;
 };
-
+}  // namespace coding
 // ---------------------------------------------------------------------------------------------------------------------
 
 #endif  // GENIE_MPEGG_RAW_AU_H

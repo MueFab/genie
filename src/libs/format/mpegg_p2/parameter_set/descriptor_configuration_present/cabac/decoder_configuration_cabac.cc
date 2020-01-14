@@ -7,17 +7,18 @@ namespace format {
 namespace mpegg_p2 {
 namespace desc_conf_pres {
 namespace cabac {
-DecoderConfigurationCabac::DecoderConfigurationCabac(GenDesc _desc)
+DecoderConfigurationCabac::DecoderConfigurationCabac(coding::GenDesc _desc)
     : DecoderConfiguration(EncodingModeId::CABAC), desc(_desc), rle_guard_tokentype(0), descriptor_subsequence_cfgs() {
-    for (size_t i = 0; i < getDescriptors()[uint8_t(desc)].subseqs.size(); ++i) {
+    for (size_t i = 0; i < coding::getDescriptors()[uint8_t(desc)].subseqs.size(); ++i) {
         descriptor_subsequence_cfgs.push_back(util::make_unique<DescriptorSubsequenceCfg>(
-            util::make_unique<TransformSubseqParameters>(), i, desc == GenDesc::MSAR || desc == GenDesc::RNAME));
+            util::make_unique<TransformSubseqParameters>(), i,
+            desc == coding::GenDesc::MSAR || desc == coding::GenDesc::RNAME));
     }
 }
 
 void DecoderConfigurationCabac::setSubsequenceCfg(uint8_t index, std::unique_ptr<TransformSubseqParameters> cfg) {
     descriptor_subsequence_cfgs[uint8_t(index)] = util::make_unique<DescriptorSubsequenceCfg>(
-        std::move(cfg), uint8_t(index), desc == GenDesc::MSAR || desc == GenDesc::RNAME);
+        std::move(cfg), uint8_t(index), desc == coding::GenDesc::MSAR || desc == coding::GenDesc::RNAME);
 }
 
 std::unique_ptr<DecoderConfiguration> DecoderConfigurationCabac::clone() const {
@@ -32,7 +33,7 @@ std::unique_ptr<DecoderConfiguration> DecoderConfigurationCabac::clone() const {
 
 void DecoderConfigurationCabac::write(util::BitWriter &writer) const {
     DecoderConfiguration::write(writer);
-    if (desc == GenDesc::RNAME || desc == GenDesc::MSAR) {
+    if (desc == coding::GenDesc::RNAME || desc == coding::GenDesc::MSAR) {
         writer.write(rle_guard_tokentype, 8);
     } else {
         writer.write(descriptor_subsequence_cfgs.size() - 1, 8);

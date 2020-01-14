@@ -110,15 +110,15 @@ std::vector<BlockPayloadSet::SubsequencePayload>& BlockPayloadSet::DescriptorPay
 // ---------------------------------------------------------------------------------------------------------------------
 
 BlockPayloadSet::BlockPayloadSet(format::mpegg_p2::ParameterSet param, size_t _record_num)
-    : desc_pay(getDescriptors().size()), record_num(_record_num), parameters(std::move(param)) {}
+    : desc_pay(coding::getDescriptors().size()), record_num(_record_num), parameters(std::move(param)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BlockPayloadSet::setPayload(GenDesc i, DescriptorPayload p) { desc_pay[uint8_t(i)] = std::move(p); }
+void BlockPayloadSet::setPayload(coding::GenDesc i, DescriptorPayload p) { desc_pay[uint8_t(i)] = std::move(p); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BlockPayloadSet::DescriptorPayload& BlockPayloadSet::getPayload(GenDesc i) { return desc_pay[uint8_t(i)]; }
+BlockPayloadSet::DescriptorPayload& BlockPayloadSet::getPayload(coding::GenDesc i) { return desc_pay[uint8_t(i)]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

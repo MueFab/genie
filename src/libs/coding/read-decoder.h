@@ -8,7 +8,7 @@
 #include <memory>
 #include "mpegg-raw-au.h"
 
-namespace lae {
+namespace coding {
 class LocalAssemblyReadDecoder {
    private:
     MpeggRawAu container;
@@ -268,6 +268,6 @@ class LocalAssemblyReadDecoder {
         return softclip_offset;
     }
 };
-}  // namespace lae
+}  // namespace coding
 
 #endif  // GENIE_READ_DECODER_H

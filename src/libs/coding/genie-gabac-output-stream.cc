@@ -2,7 +2,7 @@
 
 #include "genie-gabac-output-stream.h"
 
-namespace lae {
+namespace coding {
 
 GenieGabacOutputBuffer::GenieGabacOutputBuffer() : bytesLeft(0) {}
 
@@ -46,4 +46,4 @@ void GenieGabacOutputBuffer::flush_blocks(std::vector<gabac::DataBlock> *dat) {
     dat->clear();
     dat->swap(streams);
 }
-}  // namespace lae
+}  // namespace coding

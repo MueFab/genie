@@ -9,6 +9,8 @@
 #include <format/mpegg_p2/parameter_set/descriptor_configuration_present/descriptor_configuration_present.h>
 #include <util/make_unique.h>
 
+namespace coding {
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 BlockPayloadSet::SubsequencePayload GabacCompressor::compress(const gabac::EncodingConfiguration &conf,
@@ -18,7 +20,7 @@ BlockPayloadSet::SubsequencePayload GabacCompressor::compress(const gabac::Encod
     gabac::DataBlock buffer = data.move();
     gabac::IBufferStream bufferInputStream(&buffer);
 
-    lae::GenieGabacOutputStream bufferOutputStream;
+    GenieGabacOutputStream bufferOutputStream;
 
     // Setup
     const size_t GABAC_BLOCK_SIZE = 0;  // 0 means single block (block size is equal to input size)
@@ -71,6 +73,8 @@ void GabacCompressor::flowIn(MpeggRawAu &&t, size_t id) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void GabacCompressor::dryIn() { dryOut(); }
+
+}  // namespace coding
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

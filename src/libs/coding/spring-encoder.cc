@@ -10,6 +10,8 @@
 #include <format/mpegg_rec/segment.h>
 #include <spring/generate-read-streams.h>
 
+namespace coding {
+
 void SpringEncoder::preprocessInit() {
     std::string outfileclean[2];
     std::string outfileid;
@@ -271,3 +273,4 @@ void SpringEncoder::dryIn() {
 
     dryOut();
 }
+}  // namespace coding

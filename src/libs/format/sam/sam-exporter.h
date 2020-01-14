@@ -150,7 +150,7 @@ class SamExporter : public Drain<format::mpegg_rec::MpeggChunk> {
                 }
                 continue;
             }
-            if (getAlphabetProperties(AlphabetID::ACGTN).isIncluded(c)) {
+            if (coding::getAlphabetProperties(coding::AlphabetID::ACGTN).isIncluded(c)) {
                 ++mismatchCount;
             } else {
                 if (mismatchCount) {

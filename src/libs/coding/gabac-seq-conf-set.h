@@ -19,6 +19,8 @@
 
 #include "mpegg-raw-au.h"
 
+namespace coding {
+
 /**
  * @brief Manages the current set of gabac configurations and handles the translation to MPEG-G P2 parameter sets.
  */
@@ -67,7 +69,8 @@ class GabacSeqConfSet {
      * @param gabac_configuration Input gabac config
      * @param sub_conf Output where to put the converted data
      */
-    static void storeSubseq(const gabac::EncodingConfiguration& gabac_configuration, DescriptorSubsequenceCfg& sub_conf);
+    static void storeSubseq(const gabac::EncodingConfiguration& gabac_configuration,
+                            DescriptorSubsequenceCfg& sub_conf);
 
     /**
      * @brief Extract the format::mpegg_p2::desc_conf_pres::cabac::DecoderConfigurationCabac from a
@@ -114,6 +117,8 @@ class GabacSeqConfSet {
      */
     void loadParameters(const ParameterSet& parameterSet);
 };
+
+}  // namespace coding
 
 // ---------------------------------------------------------------------------------------------------------------------
 

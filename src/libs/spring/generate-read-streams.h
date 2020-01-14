@@ -53,17 +53,20 @@ uint64_t getNumBlocks(const compression_params &data);
 
 void compress_subseqs(subseq_data *data, const std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
 
-MpeggRawAu generate_read_streams(const std::string &temp_dir, const compression_params &cp, util::FastqStats *stats);
+coding::MpeggRawAu generate_read_streams(const std::string &temp_dir, const compression_params &cp,
+                                         util::FastqStats *stats);
 
-MpeggRawAu generate_read_streams_se(const std::string &temp_dir, const compression_params &cp, util::FastqStats *stats);
+coding::MpeggRawAu generate_read_streams_se(const std::string &temp_dir, const compression_params &cp,
+                                            util::FastqStats *stats);
 
-MpeggRawAu generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp, util::FastqStats *stats);
+coding::MpeggRawAu generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp,
+                                            util::FastqStats *stats);
 
 void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data);
 void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data);
-MpeggRawAu generate_subseqs(const se_data &data, uint64_t block_num);
-MpeggRawAu generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num,
-                               pe_statistics *pest);
+coding::MpeggRawAu generate_subseqs(const se_data &data, uint64_t block_num);
+coding::MpeggRawAu generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num,
+                                       pe_statistics *pest);
 void generateBlocksPE(const se_data &data, pe_block_data *bdata);
 
 }  // namespace spring

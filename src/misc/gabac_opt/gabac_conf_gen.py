@@ -1,47 +1,38 @@
-import os
 import copy
-import json
-import time
-import random
 import ctypes as ct
-from collections import OrderedDict
-
+import json
 import numpy as np
+import random
+import time
+from collections import OrderedDict
 
 from ..gabac_api import (
     libgabac,
-    gabac_stream,
     gabac_io_config,
     gabac_data_block,
     GABAC_BINARIZATION,
     GABAC_CONTEXT_SELECT,
-    GABAC_LOG_LEVEL,
-    GABAC_LOG_LEVEL,
     GABAC_OPERATION,
     GABAC_RETURN,
-    GABAC_STREAM_MODE,
     GABAC_TRANSFORM,
-    array,
-    print_array,
-    print_block,
-    get_block_values,
-    are_blocks_equal
+    array
 )
+
 
 class GabacConfiguration():
     transformed_seq_conf_template = OrderedDict(
-        lut_transformation_enabled = [
-            False, 
+        lut_transformation_enabled=[
+            False,
             True
         ],
-        lut_transformation_parameter = [0, 1],
-        diff_coding_enabled = [
-            False, 
+        lut_transformation_parameter=[0, 1],
+        diff_coding_enabled=[
+            False,
             True
         ],
-        binarization_id = [
-            #GABAC_BINARIZATION.BI, 
-            #GABAC_BINARIZATION.TU,
+        binarization_id=[
+            # GABAC_BINARIZATION.BI,
+            # GABAC_BINARIZATION.TU,
             GABAC_BINARIZATION.SEG,
             GABAC_BINARIZATION.EG,
             GABAC_BINARIZATION.STEG,
@@ -49,8 +40,8 @@ class GabacConfiguration():
         ],
         # binarization_parameters = [ v.item() for v in np.power(2, np.arange(5)) ],
         # binarization_parameters = [ v.item() for v in np.arange(32) ],
-        binarization_parameters = [1, 2, 3, 5, 7, 9, 15, 30, 255],
-        context_selection_id = [
+        binarization_parameters=[1, 2, 3, 5, 7, 9, 15, 30, 255],
+        context_selection_id=[
             GABAC_CONTEXT_SELECT.BYPASS,
             GABAC_CONTEXT_SELECT.ADAPTIVE_ORDER_0,
             GABAC_CONTEXT_SELECT.ADAPTIVE_ORDER_1,
@@ -63,10 +54,10 @@ class GabacConfiguration():
     ]
 
     main_conf_template = {
-        "word_size" : 1,
-        "sequence_transformation_id" : None,
-        "sequence_transformation_parameter" : None,
-        "transformed_sequences" : None
+        "word_size": 1,
+        "sequence_transformation_id": None,
+        "sequence_transformation_parameter": None,
+        "transformed_sequences": None
     }
 
     equality_config_template = copy.deepcopy(main_conf_template)
@@ -75,36 +66,36 @@ class GabacConfiguration():
 
     match_config_template = copy.deepcopy(main_conf_template)
     match_config_template["sequence_transformation_id"] = GABAC_TRANSFORM.MATCH
-    #match_config_template["sequence_transformation_parameter"] = [ v.item() for v in np.power(2, np.arange(4)) ]
+    # match_config_template["sequence_transformation_parameter"] = [ v.item() for v in np.power(2, np.arange(4)) ]
     match_config_template["sequence_transformation_parameter"] = [32, 256]
-    
+
     rle_config_template = copy.deepcopy(main_conf_template)
-    rle_config_template["sequence_transformation_id"] = GABAC_TRANSFORM.RLE 
+    rle_config_template["sequence_transformation_id"] = GABAC_TRANSFORM.RLE
     rle_config_template["sequence_transformation_parameter"] = 255
 
     none_config_template = copy.deepcopy(main_conf_template)
-    none_config_template["sequence_transformation_id"] = GABAC_TRANSFORM.NONE 
+    none_config_template["sequence_transformation_id"] = GABAC_TRANSFORM.NONE
     none_config_template["sequence_transformation_parameter"] = 0
 
     available_variant = {
-        GABAC_TRANSFORM.NONE : none_config_template,
-        GABAC_TRANSFORM.EQUALITY : equality_config_template,
-        GABAC_TRANSFORM.MATCH : match_config_template,
-        GABAC_TRANSFORM.RLE : rle_config_template,
+        GABAC_TRANSFORM.NONE: none_config_template,
+        GABAC_TRANSFORM.EQUALITY: equality_config_template,
+        GABAC_TRANSFORM.MATCH: match_config_template,
+        GABAC_TRANSFORM.RLE: rle_config_template,
     }
 
     num_transformed_seq = {
-        GABAC_TRANSFORM.NONE    : 1,
+        GABAC_TRANSFORM.NONE: 1,
         GABAC_TRANSFORM.EQUALITY: 2,
-        GABAC_TRANSFORM.MATCH   : 3,
-        GABAC_TRANSFORM.RLE     : 2 
+        GABAC_TRANSFORM.MATCH: 3,
+        GABAC_TRANSFORM.RLE: 2
     }
 
     def __init__(
-        self,
-        seq_transform_id,
-        data,
-        ena_roundtrip=True,
+            self,
+            seq_transform_id,
+            data,
+            ena_roundtrip=True,
     ):
 
         self.seq_transform_id = seq_transform_id
@@ -150,16 +141,17 @@ class GabacConfiguration():
 
             elif config["transformed_sequences"][trans_seq_idx]['binarization_id'] == GABAC_BINARIZATION.TU:
                 config["transformed_sequences"][trans_seq_idx]['binarization_parameters'] = [self.tu_param_value]
-            
+
             else:
-                if not config["transformed_sequences"][trans_seq_idx]['binarization_parameters'] in self.transformed_seq_conf_template['binarization_parameters']:
+                if not config["transformed_sequences"][trans_seq_idx]['binarization_parameters'] in \
+                       self.transformed_seq_conf_template['binarization_parameters']:
                     config["transformed_sequences"][trans_seq_idx]['binarization_parameters'] = [
                         random.choice(self.transformed_seq_conf_template['binarization_parameters'])
                     ]
 
-    def generate_random_neighbor(self, 
-        config
-    ):
+    def generate_random_neighbor(self,
+                                 config
+                                 ):
         """
         For config optimization such as Simulated Annealing
         """
@@ -179,13 +171,13 @@ class GabacConfiguration():
 
                 if param_value != new_config["transformed_sequences"][chosen_param[1]][chosen_param[0]]:
                     new_config["transformed_sequences"][chosen_param[1]][chosen_param[0]] = param_value
-                    
+
                     new_config_cchar = self.json_to_cchar(new_config)
                     if libgabac.gabac_config_is_general(
-                        new_config_cchar, 
-                        len(new_config_cchar),
-                        self.max_val,
-                        1,
+                            new_config_cchar,
+                            len(new_config_cchar),
+                            self.max_val,
+                            1,
                     ):
                         break
 
@@ -199,19 +191,19 @@ class GabacConfiguration():
 
                     new_config_cchar = self.json_to_cchar(new_config)
                     if libgabac.gabac_config_is_general(
-                        new_config_cchar, 
-                        len(new_config_cchar),
-                        self.max_val,
-                        1,
+                            new_config_cchar,
+                            len(new_config_cchar),
+                            self.max_val,
+                            1,
                     ):
                         break
 
         return new_config
 
     def mutate_nparams(self,
-        config,
-        nparams=None
-    ):
+                       config,
+                       nparams=None
+                       ):
         i_param = 0
 
         new_config = copy.deepcopy(config)
@@ -268,13 +260,12 @@ class GabacConfiguration():
 
         return new_config
 
-
     def generate_random_config(self):
 
         is_new_config_valid = False
         while not is_new_config_valid:
             conf = copy.deepcopy(self.variant_config_template)
-            
+
             for key in self.main_config_params_w_var_values:
                 conf[key] = random.choice(self.variant_config_template[key])
 
@@ -295,7 +286,7 @@ class GabacConfiguration():
                             transformed_seq_conf[key] = random.choice(
                                 GabacConfiguration.transformed_seq_conf_template[key]
                             )
-                
+
                 conf["transformed_sequences"].append(transformed_seq_conf)
 
             self.adjust_config(conf)
@@ -307,20 +298,20 @@ class GabacConfiguration():
             #     self.max_val,
             #     1,
             # )
-        
+
             is_new_config_valid = True
         return conf
 
     def json_to_cchar(
-        self,
-        config
+            self,
+            config
     ):
         return array(ct.c_char, json.dumps(config, indent=4).encode('utf-8'))
 
     def run_gabac(
-        self,
-        data,
-        config_cchar
+            self,
+            data,
+            config_cchar
     ):
 
         io_config = gabac_io_config()
@@ -331,10 +322,10 @@ class GabacConfiguration():
         start_time = time.time()
 
         if libgabac.gabac_data_block_init(
-            in_block,
-            data,
-            len(data),
-            ct.sizeof(ct.c_char)
+                in_block,
+                data,
+                len(data),
+                ct.sizeof(ct.c_char)
         ):
             return GABAC_RETURN.FAILURE, np.Infinity, np.Infinity
 
@@ -342,23 +333,23 @@ class GabacConfiguration():
             copy_in_block = gabac_data_block()
 
             if libgabac.gabac_data_block_copy(
-                copy_in_block,
-                in_block
+                    copy_in_block,
+                    in_block
             ):
                 return GABAC_RETURN.FAILURE, np.Infinity, np.Infinity
 
-        #original_length = in_block.values_size * in_block.word_size
+        # original_length = in_block.values_size * in_block.word_size
 
         if libgabac.gabac_stream_create_buffer(
-            io_config.input,
-            in_block
+                io_config.input,
+                in_block
         ):
             libgabac.gabac_data_block_release(in_block)
             return GABAC_RETURN.FAILURE, np.Infinity, np.Infinity
 
         if libgabac.gabac_stream_create_buffer(
-            io_config.output, 
-            None
+                io_config.output,
+                None
         ):
             libgabac.gabac_stream_release(io_config.input)
             return GABAC_RETURN.FAILURE, np.Infinity, np.Infinity
@@ -375,24 +366,24 @@ class GabacConfiguration():
         #     return GABAC_RETURN.FAILURE, np.Infinity, np.Infinity
 
         if libgabac.gabac_stream_create_buffer(
-            io_config.log, 
-            None
+                io_config.log,
+                None
         ):
             libgabac.gabac_stream_release(io_config.input)
             return GABAC_RETURN.FAILURE, np.Infinity, np.Infinity
 
         # Encode using config
         if libgabac.gabac_run(
-            GABAC_OPERATION.ENCODE,
-            io_config,
-            config_cchar,
-            len(config_cchar),
+                GABAC_OPERATION.ENCODE,
+                io_config,
+                config_cchar,
+                len(config_cchar),
         ):
             libgabac.gabac_data_block_release(in_block)
             libgabac.gabac_stream_release(io_config.input)
             libgabac.gabac_stream_release(io_config.output)
             libgabac.gabac_stream_release(io_config.log)
-            
+
             return GABAC_RETURN.FAILURE, np.Infinity, np.Infinity
 
         encoding_time = time.time() - start_time
@@ -405,10 +396,10 @@ class GabacConfiguration():
             libgabac.gabac_stream_swap_block(io_config.input, in_block)
 
             if libgabac.gabac_run(
-                GABAC_OPERATION.DECODE, 
-                io_config,
-                config_cchar,
-                len(config_cchar),   
+                    GABAC_OPERATION.DECODE,
+                    io_config,
+                    config_cchar,
+                    len(config_cchar),
             ):
                 libgabac.gabac_data_block_release(in_block)
                 libgabac.gabac_stream_release(io_config.input)

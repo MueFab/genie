@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+namespace coding {
+
 /**
  * ISO 23092-2 Section 5.1 table 34
  */
@@ -176,5 +178,6 @@ const GenomicDescriptorProperties& getDescriptor(GenDesc desc);
 const GenomicSubDescriptorProperties& getSubsequence(GenSubIndex idx);
 
 const Alphabet& getAlphabetProperties(AlphabetID id);
+}  // namespace coding
 
 #endif  // GENIE_CONSTANTS_H

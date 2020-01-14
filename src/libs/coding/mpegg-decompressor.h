@@ -13,11 +13,15 @@
 #include <util/source.h>
 #include <memory>
 
+namespace coding {
+
 class MpeggDecompressor : public Drain<BlockPayloadSet>, public Source<MpeggRawAu> {
    public:
     void flowIn(BlockPayloadSet&& t, size_t id) override = 0;
     void dryIn() override = 0;
     ~MpeggDecompressor() override = default;
 };
+
+}  // namespace coding
 
 #endif  // GENIE_MPEGG_DECOMPRESSOR_H

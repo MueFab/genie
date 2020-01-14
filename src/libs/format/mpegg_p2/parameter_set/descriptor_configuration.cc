@@ -9,7 +9,8 @@
 namespace format {
 namespace mpegg_p2 {
 void DescriptorConfiguration::write(util::BitWriter &writer) const { writer.write(uint8_t(dec_cfg_preset), 8); }
-std::unique_ptr<DescriptorConfiguration> DescriptorConfiguration::factory(GenDesc desc, util::BitReader &reader) {
+std::unique_ptr<DescriptorConfiguration> DescriptorConfiguration::factory(coding::GenDesc desc,
+                                                                          util::BitReader &reader) {
     auto preset = DecCfgPreset(reader.read(8));
     switch (preset) {
         case DecCfgPreset::PRESENT:

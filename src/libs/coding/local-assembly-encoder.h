@@ -15,6 +15,8 @@
 #include "read-encoder.h"
 #include "reference-encoder.h"
 
+namespace coding {
+
 /**
  * @brief Module using local assembly to encode aligned reads
  */
@@ -32,11 +34,11 @@ class LocalAssemblyEncoder : public MpeggEncoder {
          * @param cr_buf_max_size Buffer size for local assembly reference memory
          */
         explicit LaeState(size_t cr_buf_max_size);
-        lae::LocalAssemblyReferenceEncoder refCoder;  //!< @brief Building the local reference
-        lae::LocalAssemblyReadEncoder readCoder;      //!< @brief Generating the descriptor streams
-        bool pairedEnd;                               //!< @brief Current guess regarding pairing
-        size_t readLength;                            //!< @brief Current guess regarding read length
-        format::mpegg_rec::ClassType classType;       //!< @brief Current guess regarding class type
+        LocalAssemblyReferenceEncoder refCoder;  //!< @brief Building the local reference
+        LocalAssemblyReadEncoder readCoder;      //!< @brief Generating the descriptor streams
+        bool pairedEnd;                          //!< @brief Current guess regarding pairing
+        size_t readLength;                       //!< @brief Current guess regarding read length
+        format::mpegg_rec::ClassType classType;  //!< @brief Current guess regarding class type
         uint64_t minPos;
         uint64_t maxPos;
     };
@@ -131,6 +133,8 @@ class LocalAssemblyEncoder : public MpeggEncoder {
         state.maxPos = std::max(position + getLengthOfCigar(cigar), state.maxPos);
     }
 };
+
+}  // namespace coding
 
 // ---------------------------------------------------------------------------------------------------------------------
 

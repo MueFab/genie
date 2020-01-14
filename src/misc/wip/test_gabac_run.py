@@ -1,23 +1,15 @@
-import os
-import copy
-import json
-import subprocess
-import unittest
 import ctypes as ct
-
 import numpy as np
-
-from new_gabac import libgabac
-from new_gabac import GABAC_BINARIZATION, GABAC_CONTEXT_SELCT, GABAC_LOG_LEVEL, GABAC_LOG_LEVEL
-from new_gabac import GABAC_OPERATION, GABAC_RETURN, GABAC_STREAM_MODE, GABAC_TRANSFORM
+import os
+import subprocess
+from new_gabac import GABAC_LOG_LEVEL
+from new_gabac import GABAC_OPERATION
+from new_gabac import GABAC_STREAM_MODE
 from new_gabac import gabac_data_block
 from new_gabac import gabac_io_config
-
-from new_gabac import GABAC_STREAM_MODE
 from new_gabac import gabac_stream
-
+from new_gabac import libgabac
 from test_python_api import array
-
 
 process = subprocess.Popen("git rev-parse --show-toplevel".split(), stdout=subprocess.PIPE)
 output, error = process.communicate()
@@ -67,7 +59,7 @@ input_g_data_block = libgabac.gabac_data_block_init(
 #     bytes(blocks[0].values),
 #     order='C'
 # )
-    
+
 g_stream_input = gabac_stream(
     # data=ct.cast(input_bitstream_raw, ct.c_void_p),
     # data=ct.cast(input_bitstream_ctype, ct.c_void_p),

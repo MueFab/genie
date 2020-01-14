@@ -11,6 +11,8 @@
 #include <format/mpegg_rec/split_alignment/split-alignment-same-rec.h>
 #include <util/make_unique.h>
 
+namespace coding {
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 LocalAssemblyEncoder::LaeState::LaeState(size_t cr_buf_max_size)
@@ -173,6 +175,8 @@ void LocalAssemblyEncoder::dryIn() {
 
 LocalAssemblyEncoder::LocalAssemblyEncoder(uint32_t _cr_buf_max_size, bool _debug)
     : debug(_debug), cr_buf_max_size(_cr_buf_max_size) {}
+
+}  // namespace coding
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

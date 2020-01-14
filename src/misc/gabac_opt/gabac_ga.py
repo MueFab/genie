@@ -26,31 +26,25 @@ from gabac_api.const import (
     GABAC_STREAM_MODE,
     GABAC_TRANSFORM
 )
-from gabac_api.utils import (
-    array,
-    print_array,
-    print_block,
-    get_block_values,
-    are_blocks_equal
-)
 from gabac_api import root_path
 from test_python_api import array, libc
 
 from .gabac_conf_gen import GabacConfiguration
 
+
 class GeneticAlgorithmForGabac(object):
 
     def __init__(
-        self,
-        data,
-        seq_transform_id,
-        mutation_prob=None,
-        mutation_nparam=None,
-        num_populations=100,
-        num_generations=100,
-        ena_roundtrip=True,
-        verbose=True,
-        debug=False,
+            self,
+            data,
+            seq_transform_id,
+            mutation_prob=None,
+            mutation_nparam=None,
+            num_populations=100,
+            num_generations=100,
+            ena_roundtrip=True,
+            verbose=True,
+            debug=False,
     ):
 
         self.verbose = verbose
@@ -88,18 +82,17 @@ class GeneticAlgorithmForGabac(object):
         self.fitness = np.zeros((
             self.num_populations, 3
         ))
-       
+
         self.result = np.zeros((self.num_generations, 6))
 
-
     def evaluate_fitness(self):
-        
+
         for idx, config in enumerate(self.populations):
 
             if self.debug:
                 with open('curr_config.json', 'w') as f:
                     json.dump(config, f, indent=4)
-                
+
             __, enc_length, enc_time = self.gc.run_gabac(self.data, self.gc.json_to_cchar(config))
             enc_ratio = enc_length / len(self.data)
 
@@ -139,11 +132,11 @@ class GeneticAlgorithmForGabac(object):
                     self.populations[idx] = self.gc.mutate_nparams(local_max_config, self.mutation_nparam)
 
             self.evaluate_fitness()
-            local_max_config_idx = np.argmin(self.fitness[:,0])
+            local_max_config_idx = np.argmin(self.fitness[:, 0])
 
             local_max_enc_len, local_max_enc_ratio = self.fitness[local_max_config_idx, 0:2]
             local_max_config = self.populations[local_max_config_idx]
-            
+
             if local_max_enc_len < global_max_enc_len:
                 global_max_config = local_max_config
                 global_max_enc_len = local_max_enc_len
@@ -163,8 +156,8 @@ class GeneticAlgorithmForGabac(object):
         return global_max_config, global_max_enc_ratio
 
     def show_plot(self):
-        plt.plot(np.arange(self.num_generations), self.result[:,2], 'r')
-        plt.plot(np.arange(self.num_generations), self.result[:,3], 'k')
+        plt.plot(np.arange(self.num_generations), self.result[:, 2], 'r')
+        plt.plot(np.arange(self.num_generations), self.result[:, 3], 'k')
         plt.show()
 
     def result_as_csv(self, path, filename):
@@ -178,16 +171,14 @@ class GeneticAlgorithmForGabac(object):
                 'best_encoded_ratio',
                 'encoding_time',
                 'total_encoding_time']
-            )
+        )
 
         df['filename'] = pd.Series([filename] * self.num_generations, index=df.index)
-        df['iter'] = pd.Series([i_gen * self.num_populations for i_gen in range(1, self.num_generations+1)], index=df.index)
+        df['iter'] = pd.Series([i_gen * self.num_populations for i_gen in range(1, self.num_generations + 1)],
+                               index=df.index)
 
         df.to_csv(
             path,
             index=False,
-            #header=None, 
+            # header=None,
         )
-        
-
-

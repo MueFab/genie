@@ -8,7 +8,7 @@ namespace mpegg_p2 {
 namespace desc_conf_pres {
 DescriptorConfigurationPresent::DescriptorConfigurationPresent()
     : DescriptorConfiguration(DecCfgPreset::PRESENT), decoder_configuration(nullptr) {
-    decoder_configuration = util::make_unique<cabac::DecoderConfigurationCabac>(GenDesc::UREADS);
+    decoder_configuration = util::make_unique<cabac::DecoderConfigurationCabac>(coding::GenDesc::UREADS);
 }
 
 // -----------------------------------------------------------------------------------------------------------------

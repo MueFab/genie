@@ -27,7 +27,7 @@ class DescriptorConfiguration {
 
     virtual void write(util::BitWriter &writer) const;
 
-    static std::unique_ptr<DescriptorConfiguration> factory(GenDesc desc, util::BitReader &reader);
+    static std::unique_ptr<DescriptorConfiguration> factory(coding::GenDesc desc, util::BitReader &reader);
 
     virtual ~DescriptorConfiguration() = default;
 

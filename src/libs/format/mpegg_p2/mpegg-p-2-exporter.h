@@ -28,8 +28,8 @@ class MpeggP2Exporter : public Drain<BlockPayloadSet> {
                                         format::mpegg_p2::DataUnit::DatasetType::ALIGNED, 32, 32, 0);
         au.setAuTypeCfg(util::make_unique<format::AuTypeCfg>(data.getReference(), data.getMinPos(), data.getMaxPos(),
                                                              data.getParameters().getPosSize()));
-        for (size_t descriptor = 0; descriptor < getDescriptors().size(); ++descriptor) {
-            if (data.getPayload(GenDesc(descriptor)).isEmpty()) {
+        for (size_t descriptor = 0; descriptor < coding::getDescriptors().size(); ++descriptor) {
+            if (data.getPayload(coding::GenDesc(descriptor)).isEmpty()) {
                 continue;
             }
             au.addBlock(format::Block(descriptor, data.movePayload(descriptor)));
