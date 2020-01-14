@@ -26,12 +26,12 @@ set(source_files
         stream-handler.cc
         streams.cc
         writer.cc
-)
+        )
 
-if(${GABAC_BUILD_SHARED_LIB})
+if (${GABAC_BUILD_SHARED_LIB})
     add_library(gabac SHARED ${source_files})
-else()
+else ()
     add_library(gabac STATIC ${source_files})
-endif()
+endif ()
 
 target_link_libraries(gabac PRIVATE util)

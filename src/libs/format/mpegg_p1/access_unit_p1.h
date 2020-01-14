@@ -47,4 +47,4 @@ class AccessUnit : public format::mpegg_p2::AccessUnit {
 }  // namespace mpegg_p1
 }  // namespace format
 
-#endif //GENIE_ACCESS_UNIT_P1_H
+#endif  // GENIE_ACCESS_UNIT_P1_H

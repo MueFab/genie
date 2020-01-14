@@ -4,9 +4,9 @@
  */
 
 #include "FileHandlingUtils.h"
-#include "format/mpegg_p2/parameter_set.h"
 #include "format/mpegg_p1/dataset.h"
 #include "format/mpegg_p2/data-unit-factory.h"
+#include "format/mpegg_p2/parameter_set.h"
 
 // DatasetHeader *
 // initDatasetHeaderNoMIT(DatasetGroupId datasetGroupId, DatasetId datasetId, char *version, bool multipleAlignmentFlag,
@@ -94,7 +94,7 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
 
     std::ifstream inputFilestream;
     inputFilestream.open(fileName, std::ios::binary);
-    if(!inputFilestream.good()){
+    if (!inputFilestream.good()) {
         fprintf(stderr, "File could not be opened!\n");
         return -1;
     }
@@ -123,8 +123,8 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
     std::vector<std::unique_ptr<format::mpegg_p2::DataUnit>> dataUnits;
 
     format::mpegg_p2::DataUnitFactory dataUnitFactory;
-    //while (inputFileBitReader.isGood()) {
-        dataUnits.push_back(dataUnitFactory.read(inputFileBitReader));
+    // while (inputFileBitReader.isGood()) {
+    dataUnits.push_back(dataUnitFactory.read(inputFileBitReader));
     //}
     for (auto const& dataUnit : dataUnits) {
         fprintf(stdout, "\ndata_unit_type:%u\n", (uint8_t)dataUnit->getDataUnitType());
@@ -378,9 +378,9 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
     //                getDataUnitAccessUnitId(dataUnitAccessUnit, &accessUnitId) != 0 ||
     //                getDataUnitNumBlocks(dataUnitAccessUnit, &numBlocks) != 0 ||
     //                getDataUnitParameterSetId(dataUnitAccessUnit, &parameterSetId) != 0 ||
-    //                getDataUnitmpegg_rec::MpeggRecord::ClassType(dataUnitAccessUnit, &mpegg_rec::MpeggRecord::ClassType) != 0 ||
-    //                getDataUnitReadsCount(dataUnitAccessUnit, &readsCount) != 0 ||
-    //                getDataUnitMMThreshold(dataUnitAccessUnit, &mmThreshold) != 0 ||
+    //                getDataUnitmpegg_rec::MpeggRecord::ClassType(dataUnitAccessUnit,
+    //                &mpegg_rec::MpeggRecord::ClassType) != 0 || getDataUnitReadsCount(dataUnitAccessUnit, &readsCount)
+    //                != 0 || getDataUnitMMThreshold(dataUnitAccessUnit, &mmThreshold) != 0 ||
     //                getDataUnitMMCount(dataUnitAccessUnit, &mmCount) != 0 ||
     //                getDataUnitSequenceId(dataUnitAccessUnit, &sequenceId) != 0 ||
     //                getDataUnitAuStartPosition(dataUnitAccessUnit, &auStartPosition) != 0 ||

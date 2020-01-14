@@ -39,7 +39,6 @@ void ProgramOptions::processCommandLine(int argc, char* argv[]) {
     if (!ghc::filesystem::exists(ghc::filesystem::path(pairFilePath))) {
         UTILS_DIE("pair file does not exist");
     }
-
 }
 
 }  // namespace genie

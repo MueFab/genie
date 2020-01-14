@@ -34,7 +34,7 @@ SamRecord::SamRecord(const std::string& string) {
     tlen = std::stoi(tokens[8]);
     seq = tokens[9];
     qual = tokens[10];
-//    check();
+    //    check();
 }
 
 void SamRecord::check() const {

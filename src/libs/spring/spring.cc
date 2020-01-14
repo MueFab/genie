@@ -26,15 +26,11 @@
 
 namespace spring {
 
-/*void generate_streams_SPRING(format::fastq::FastqFileReader *fastqFileReader1, format::fastq::FastqFileReader *fastqFileReader2,
-                             int num_thr, bool paired_end, const std::string &working_dir, bool,
-                             const std::string &outputFilePath, bool ureads_flag, bool preserve_quality,
-                             bool preserve_id, util::FastqStats *stats) {
-#ifdef GENIE_USE_OPENMP
-    std::cout << "SPRING: built with OpenMP" << std::endl;
-#else
-    std::cout << "SPRING: *not* built with OpenMP" << std::endl;
-#endif
+/*void generate_streams_SPRING(format::fastq::FastqFileReader *fastqFileReader1, format::fastq::FastqFileReader
+*fastqFileReader2, int num_thr, bool paired_end, const std::string &working_dir, bool, const std::string
+&outputFilePath, bool ureads_flag, bool preserve_quality, bool preserve_id, util::FastqStats *stats) { #ifdef
+GENIE_USE_OPENMP std::cout << "SPRING: built with OpenMP" << std::endl; #else std::cout << "SPRING: *not* built with
+OpenMP" << std::endl; #endif
 
     // generate random temp directory in the working directory
     std::string temp_dir;
@@ -128,7 +124,7 @@ namespace spring {
         }
 
 #if 0
-        // TODO: do this only when debugging, otherwise disable for speed 
+        // TODO: do this only when debugging, otherwise disable for speed
         std::cout << "Generating new FASTQ for testing purposes\n";
         auto new_fq_start = std::chrono::steady_clock::now();
         if (!cp.paired_end) {

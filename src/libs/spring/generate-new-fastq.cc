@@ -60,8 +60,8 @@ namespace spring {
     return;
 }
 
-void generate_new_fastq_pe(format::fastq::FastqFileReader *fastqFileReader1, format::fastq::FastqFileReader *fastqFileReader2,
-                           const std::string &temp_dir, const compression_params &cp, const std::string &outputFilePath) {
+void generate_new_fastq_pe(format::fastq::FastqFileReader *fastqFileReader1, format::fastq::FastqFileReader
+*fastqFileReader2, const std::string &temp_dir, const compression_params &cp, const std::string &outputFilePath) {
     format::fastq::FastqFileReader *fastqFileReader[2] = {fastqFileReader1, fastqFileReader2};
     uint32_t numreads = cp.num_reads;
     std::string basedir = temp_dir;

@@ -4,12 +4,11 @@
 #include "fasta-record.h"
 
 namespace format {
-    namespace fasta {
+namespace fasta {
 
-        FastaRecord::FastaRecord(std::string head, std::string seq) : header(std::move(head)),
-                                                                      sequence(std::move(seq)) {}
+FastaRecord::FastaRecord(std::string head, std::string seq) : header(std::move(head)), sequence(std::move(seq)) {}
 
-        FastaRecord::~FastaRecord() = default;
+FastaRecord::~FastaRecord() = default;
 
-    }
-}  // namespace util
+}  // namespace fasta
+}  // namespace format

@@ -16,7 +16,7 @@ set(source_files
         return-structures.cc
         spring.cc
         util.cc
-)
+        )
 
 add_library(spring ${source_files})
 
@@ -25,7 +25,7 @@ target_link_libraries(spring PRIVATE format)
 target_link_libraries(spring PRIVATE util)
 target_link_libraries(spring PRIVATE gabac)
 
-if(${GENIE_USE_OPENMP})
+if (${GENIE_USE_OPENMP})
     target_compile_definitions(spring PRIVATE GENIE_USE_OPENMP)
     target_link_libraries(spring PRIVATE ${OpenMP_CXX_LIBRARIES})
-endif()
+endif ()

@@ -24,7 +24,8 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
     OrderedLock lock;  //!< @brief Lock to ensure in order execution
 
    public:
-    SamImporter(size_t _blockSize, std::istream &_file) : blockSize(_blockSize), samReader(_file), lock(), ref_counter(0) {}
+    SamImporter(size_t _blockSize, std::istream &_file)
+        : blockSize(_blockSize), samReader(_file), lock(), ref_counter(0) {}
 
     static std::tuple<bool, uint8_t> convertFlags2Mpeg(uint16_t flags) {
         uint8_t flags_mpeg = 0;
@@ -120,7 +121,8 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
     std::map<std::string, size_t> refs;
     size_t ref_counter;
 
-    static format::mpegg_rec::MpeggRecord convert(uint16_t ref, format::sam::SamRecord &&_r1, format::sam::SamRecord *_r2) {
+    static format::mpegg_rec::MpeggRecord convert(uint16_t ref, format::sam::SamRecord &&_r1,
+                                                  format::sam::SamRecord *_r2) {
         format::sam::SamRecord r1 = std::move(_r1);
         auto flag_tuple = convertFlags2Mpeg(r1.getFlags());
         format::mpegg_rec::MpeggRecord ret(_r2 ? 2 : 1, format::mpegg_rec::ClassType::CLASS_I, r1.moveQname(), "Genie",
@@ -169,7 +171,7 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
             OrderedSection section(&lock, id);
             samReader.read(blockSize, s);
             auto it = refs.find(s.front().getRname());
-            if(it == refs.end()) {
+            if (it == refs.end()) {
                 local_ref_num = ref_counter;
                 refs.insert(std::make_pair(s.front().getRname(), ref_counter++));
             } else {
@@ -187,7 +189,7 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
             const std::string &rnameSearchString =
                 samRecord.getRnext() == "=" ? samRecord.getRname() : samRecord.getRnext();
             auto mate = samRecords.begin();
-            mate = samRecords.end(); // Disable pairs for now TODO: implement
+            mate = samRecords.end();  // Disable pairs for now TODO: implement
             if (samRecord.getPnext() == samRecord.getPos() && samRecord.getRname() == rnameSearchString) {
                 mate = samRecords.end();
             }
@@ -199,7 +201,8 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
             }
             if (mate == samRecords.end()) {
                 // LOG_TRACE << "Did not find mate";
-                if((samRecord.getFlags() & (1u << uint16_t(SamRecord::FlagPos::SEGMENT_UNMAPPED))) || samRecord.getCigar() == "*" || samRecord.getPos() == 0 || samRecord.getRname() == "*") {
+                if ((samRecord.getFlags() & (1u << uint16_t(SamRecord::FlagPos::SEGMENT_UNMAPPED))) ||
+                    samRecord.getCigar() == "*" || samRecord.getPos() == 0 || samRecord.getRname() == "*") {
                     skipped++;
                 } else {
                     chunk.emplace_back(convert(local_ref_num, std::move(samRecord), nullptr));
@@ -210,7 +213,7 @@ class SamImporter : public Source<format::mpegg_rec::MpeggChunk>, public Origina
                 samRecords.erase(mate);
             }
         }
-        if(skipped) {
+        if (skipped) {
             std::cerr << "Skipped " << skipped << " unmapped reads! Those are currently not supported." << std::endl;
         }
         if (!chunk.empty()) {

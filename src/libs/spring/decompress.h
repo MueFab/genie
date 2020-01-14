@@ -27,7 +27,8 @@ bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, int num_thr, 
 
 void write_fastq_record_to_ostream(std::ostream &out, format::fastq::FastqRecord &fastqRecord, bool preserve_quality);
 
-void read_fastq_record_from_ifstream(std::ifstream &in, format::fastq::FastqRecord &fastqRecord, bool preserve_quality);*/
+void read_fastq_record_from_ifstream(std::ifstream &in, format::fastq::FastqRecord &fastqRecord, bool
+preserve_quality);*/
 
 }  // namespace spring
 

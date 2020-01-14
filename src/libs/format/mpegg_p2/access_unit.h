@@ -4,9 +4,9 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <vector>
-#include <map>
 #include "util/make_unique.h"
 
 #include <format/mpegg_rec/mpegg-record.h>
@@ -48,25 +48,15 @@ class AccessUnit : public DataUnit {
 
     void setSignatureCfg(std::unique_ptr<SignatureCfg> cfg);
 
-    std::vector<Block> getBlocks() const {
-        return blocks;
-    }
+    std::vector<Block> getBlocks() const { return blocks; }
 
-    uint32_t getID() const {
-        return access_unit_ID;
-    }
+    uint32_t getID() const { return access_unit_ID; }
 
-    uint8_t getParameterID() const {
-        return parameter_set_ID;
-    }
+    uint8_t getParameterID() const { return parameter_set_ID; }
 
-    const AuTypeCfg& getAlignmentInfo() const {
-        return *au_Type_U_Cfg;
-    }
+    const AuTypeCfg &getAlignmentInfo() const { return *au_Type_U_Cfg; }
 
-    uint32_t getReadCount () const {
-        return reads_count;
-    }
+    uint32_t getReadCount() const { return reads_count; }
 
    private:
     void preWrite(util::BitWriter &writer) const;
@@ -76,7 +66,7 @@ class AccessUnit : public DataUnit {
      *
      * ------------------------------------------------------------------------------------------------------------ */
     uint8_t reserved : 3;  //!< Line 13
-    //uint32_t data_unit_size : 29;  //!< Line 14
+    // uint32_t data_unit_size : 29;  //!< Line 14
 
     /** ----------------------------------------------------------------------------------------------------------- */
 

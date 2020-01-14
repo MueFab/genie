@@ -95,7 +95,7 @@ MpeggRawAu generate_subseqs(const se_data &data, uint64_t block_num) {
                     else
                         rdata.get(GenDesc::MMPOS, 1)
                             .push(data.noisepos_arr[data.pos_in_noise_arr[i] + j] - 1);  // decoder adds +1
-                    rdata.get(GenDesc::MMTYPE, 0).push(0);                              // mmtype = Substitution
+                    rdata.get(GenDesc::MMTYPE, 0).push(0);                               // mmtype = Substitution
                     rdata.get(GenDesc::MMTYPE, 1)
                         .push(char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[i] + j]]);
                 }
@@ -440,14 +440,14 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
 }
 
 MpeggRawAu generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num,
-                                                pe_statistics *pest) {
+                               pe_statistics *pest) {
 #ifdef GENIE_USE_OPENMP
     const unsigned cur_thread_num = omp_get_thread_num();
 #else
     const unsigned cur_thread_num = 0;
 #endif
 
-    MpeggRawAu rdata (format::mpegg_p2::ParameterSet(), 0);
+    MpeggRawAu rdata(format::mpegg_p2::ParameterSet(), 0);
 
     // char_to_int
     int64_t char_to_int[128];

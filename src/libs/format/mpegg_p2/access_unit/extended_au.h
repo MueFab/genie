@@ -4,8 +4,8 @@
 // -----------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
-#include "util/bitwriter.h"
 #include "util/bitreader.h"
+#include "util/bitwriter.h"
 
 // -----------------------------------------------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ class ExtendedAu {
     }
     virtual ~ExtendedAu() = default;
 
-    virtual void write(util::BitWriter &writer);
+    virtual void write(util::BitWriter& writer);
 };
 }  // namespace format
 

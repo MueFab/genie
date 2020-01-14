@@ -153,7 +153,8 @@ namespace spring {
                     for (size_t descriptor = 0; descriptor < format::mpegg_p2::NUM_DESCRIPTORS; ++descriptor) {
                         if (descriptor != 11) {  // rname
                             for (size_t subdescriptor = 0;
-                                 subdescriptor < format::mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences;
+                                 subdescriptor <
+format::mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences;
                                  ++subdescriptor) {
                                 gabac_compress(configs[descriptor][subdescriptor], &raw_data[descriptor][subdescriptor],
                                                &generated_streams[descriptor][subdescriptor]);

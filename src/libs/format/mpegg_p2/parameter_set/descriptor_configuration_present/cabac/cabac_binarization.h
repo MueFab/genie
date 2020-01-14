@@ -30,7 +30,7 @@ class CabacBinarization {
         binarization_ID = CabacBinarizationParameters::BinarizationId(reader.read(5));
         bypass_flag = reader.read(1);
         cabac_binarization_parameters = util::make_unique<CabacBinarizationParameters>(binarization_ID, reader);
-        if(!bypass_flag) {
+        if (!bypass_flag) {
             cabac_context_parameters =
                 util::make_unique<CabacContextParameters>(coding_subsym_size, output_symbol_size, reader);
         }

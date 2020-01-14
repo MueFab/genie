@@ -197,7 +197,8 @@ bool writeAccessUnitHeaderContent(FILE* outputFile, AccessUnitHeader* accessUnit
     bool numBlocksSuccessfulWrite = writeToBitstream(&outputBitstream, accessUnitHeader->num_blocks);
     bool parameterSetIDSuccessfulWrite =
         writeNBitsShift(&outputBitstream, 8, (char*)&accessUnitHeader->parameter_set_ID);
-    bool mpegg_rec::MpeggRecord::ClassTypeSuccessfulWrite = writeNBitsShift(&outputBitstream, 4, (const char*)&(accessUnitHeader->au_type));
+    bool mpegg_rec::MpeggRecord::ClassTypeSuccessfulWrite =
+        writeNBitsShift(&outputBitstream, 4, (const char*)&(accessUnitHeader->au_type));
     bool readsCountSuccessfulWrite = writeBigEndian32ToBitstream(&outputBitstream, accessUnitHeader->reads_count);
 
     if (!accessUnitIdSuccessfulWrite || !numBlocksSuccessfulWrite || !parameterSetIDSuccessfulWrite ||
@@ -316,7 +317,8 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
     bool accessUnitIdSuccessfulRead = readNBitsBigToNativeEndian32(&inputBitstream, 32, &accessUnitIdBuffer);
     bool numBlocksSuccessfulRead = readBytes(&inputBitstream, 1, (char*)&numBlocksBuffer);
     bool parameterSetIdSuccessfulRead = readNBitsShift(&inputBitstream, 8, (char*)&parameterSetIdBuffer);
-    bool mpegg_rec::MpeggRecord::ClassTypeSuccessfulRead = readNBitsShift(&inputBitstream, 4, (char*)&mpegg_rec::MpeggRecord::ClassTypeBuffer);
+    bool mpegg_rec::MpeggRecord::ClassTypeSuccessfulRead =
+        readNBitsShift(&inputBitstream, 4, (char*)&mpegg_rec::MpeggRecord::ClassTypeBuffer);
     bool readsCountBufferSuccessfulRead = readNBitsBigToNativeEndian32(&inputBitstream, 32, &readsCountBuffer);
     if (!accessUnitIdSuccessfulRead || !numBlocksSuccessfulRead || !parameterSetIdSuccessfulRead ||
         !mpegg_rec::MpeggRecord::ClassTypeSuccessfulRead || !readsCountBufferSuccessfulRead) {
@@ -324,7 +326,8 @@ AccessUnitHeader* parseAccessUnitHeader(FILE* inputFile, DatasetContainer* datas
         return false;
     }
 
-    if (mpegg_rec::MpeggRecord::ClassTypeBuffer == CLASS_TYPE_CLASS_N || mpegg_rec::MpeggRecord::ClassTypeBuffer == CLASS_TYPE_CLASS_M) {
+    if (mpegg_rec::MpeggRecord::ClassTypeBuffer == CLASS_TYPE_CLASS_N ||
+        mpegg_rec::MpeggRecord::ClassTypeBuffer == CLASS_TYPE_CLASS_M) {
         bool mmThresholdSuccessfulRead = readNBitsBigToNativeEndian16(&inputBitstream, 16, &mmThresholdBuffer);
         bool mmCountSuccessfulRead = readNBitsBigToNativeEndian32(&inputBitstream, 32, &mmCountBuffer);
         if (!mmThresholdSuccessfulRead || !mmCountSuccessfulRead) {

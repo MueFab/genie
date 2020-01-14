@@ -55,9 +55,9 @@ class BitWriter {
      */
     void write(uint64_t value, uint8_t bits);
 
-    void write(const std::string& string) {
-        for (const auto& a : string) {
-            write(uint8_t (a), 8);
+    void write(const std::string &string) {
+        for (const auto &a : string) {
+            write(uint8_t(a), 8);
         }
     }
 

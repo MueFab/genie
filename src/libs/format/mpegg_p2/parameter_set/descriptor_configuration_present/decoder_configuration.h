@@ -3,10 +3,10 @@
 
 // -----------------------------------------------------------------------------------------------------------------
 
-#include "cabac/descriptor_subsequence_cfg.h"
-#include "util/bitwriter.h"
-#include "util/bitreader.h"
 #include <coding/constants.h>
+#include "cabac/descriptor_subsequence_cfg.h"
+#include "util/bitreader.h"
+#include "util/bitwriter.h"
 
 #include <memory>
 
@@ -25,7 +25,7 @@ class DecoderConfiguration {
         CABAC = 0  //!< See Text in section
     };
 
-    virtual void write(util::BitWriter &writer) const;
+    virtual void write(util::BitWriter& writer) const;
 
     virtual std::unique_ptr<DecoderConfiguration> clone() const = 0;
 

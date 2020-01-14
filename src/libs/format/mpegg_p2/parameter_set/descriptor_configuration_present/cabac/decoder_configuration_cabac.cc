@@ -11,15 +11,13 @@ DecoderConfigurationCabac::DecoderConfigurationCabac(GenDesc _desc)
     : DecoderConfiguration(EncodingModeId::CABAC), desc(_desc), rle_guard_tokentype(0), descriptor_subsequence_cfgs() {
     for (size_t i = 0; i < getDescriptors()[uint8_t(desc)].subseqs.size(); ++i) {
         descriptor_subsequence_cfgs.push_back(util::make_unique<DescriptorSubsequenceCfg>(
-            util::make_unique<TransformSubseqParameters>(), i,
-            desc == GenDesc::MSAR || desc == GenDesc::RNAME));
+            util::make_unique<TransformSubseqParameters>(), i, desc == GenDesc::MSAR || desc == GenDesc::RNAME));
     }
 }
 
 void DecoderConfigurationCabac::setSubsequenceCfg(uint8_t index, std::unique_ptr<TransformSubseqParameters> cfg) {
-    descriptor_subsequence_cfgs[uint8_t (index)] = util::make_unique<DescriptorSubsequenceCfg>(
-        std::move(cfg), uint8_t (index),
-        desc == GenDesc::MSAR || desc == GenDesc::RNAME);
+    descriptor_subsequence_cfgs[uint8_t(index)] = util::make_unique<DescriptorSubsequenceCfg>(
+        std::move(cfg), uint8_t(index), desc == GenDesc::MSAR || desc == GenDesc::RNAME);
 }
 
 std::unique_ptr<DecoderConfiguration> DecoderConfigurationCabac::clone() const {

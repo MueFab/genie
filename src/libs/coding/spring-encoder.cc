@@ -51,7 +51,7 @@ void SpringEncoder::preprocessInit() {
     num_blocks_done = 0;
 }
 
-void SpringEncoder::preprocessIteration(format::mpegg_rec::MpeggChunk&& data) {
+void SpringEncoder::preprocessIteration(format::mpegg_rec::MpeggChunk &&data) {
     format::mpegg_rec::MpeggChunk t = std::move(data);
     for (int j = 0; j < 2; j++) {
         if (j == 1 && !cp.paired_end) continue;
@@ -75,8 +75,7 @@ void SpringEncoder::preprocessIteration(format::mpegg_rec::MpeggChunk&& data) {
                     throw std::runtime_error("Identifier of length 0 detected.");
                 read_lengths_array[i] = (uint32_t)len;
 
-                read_contains_N_array[i] =
-                    ((t)[i].getRecordSegments()[j].getSequence().find('N') != std::string::npos);
+                read_contains_N_array[i] = ((t)[i].getRecordSegments()[j].getSequence().find('N') != std::string::npos);
             }
         }  // omp parallel
         // write reads and read_order_N to respective files
@@ -186,7 +185,7 @@ SpringEncoder::SpringEncoder(int _num_thr, std::string _working_dir, bool _uread
     preprocessInit();
 }
 
-void SpringEncoder::flowIn(format::mpegg_rec::MpeggChunk&& t, size_t id) {
+void SpringEncoder::flowIn(format::mpegg_rec::MpeggChunk &&t, size_t id) {
     if (!id) {
         cp.paired_end = t[0].getRecordSegments().size() > 1;
     }

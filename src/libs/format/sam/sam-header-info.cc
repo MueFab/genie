@@ -1,12 +1,12 @@
 #include "sam-header-info.h"
 #include <util/date.h>
 #include <util/locus.h>
+#include "sam-tag-enum.h"
+#include "sam-tag-object.h"
 #include "tag-number.h"
 #include "tag-string-list.h"
 #include "tag-string.h"
 #include "tag-version.h"
-#include "sam-tag-object.h"
-#include "sam-tag-enum.h"
 
 namespace format {
 namespace sam {

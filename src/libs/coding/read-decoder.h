@@ -62,7 +62,8 @@ class LocalAssemblyReadDecoder {
         return metaData;
     }
 
-    std::tuple<format::mpegg_rec::AlignmentContainer, format::mpegg_rec::MpeggRecord> decode(size_t clip_offset, std::string &&seq,
+    std::tuple<format::mpegg_rec::AlignmentContainer, format::mpegg_rec::MpeggRecord> decode(size_t clip_offset,
+                                                                                             std::string &&seq,
                                                                                              std::string &&cigar) {
         auto sequence = std::move(seq);
 
@@ -218,9 +219,10 @@ class LocalAssemblyReadDecoder {
         }
     }
 
-    std::tuple<size_t, size_t> decodeClips(std::vector<std::string> &sequences, std::vector<std::string> &cigar_extended) {
+    std::tuple<size_t, size_t> decodeClips(std::vector<std::string> &sequences,
+                                           std::vector<std::string> &cigar_extended) {
         size_t num = recordCounter++;
-        std::tuple<size_t, size_t> softclip_offset = {0,0};
+        std::tuple<size_t, size_t> softclip_offset = {0, 0};
         if (container.isEnd(GenSub::CLIPS_RECORD_ID) || num != container.peek(GenSub::CLIPS_RECORD_ID)) {
             return softclip_offset;
         }
@@ -253,10 +255,9 @@ class LocalAssemblyReadDecoder {
                 }
 
                 if (seq_position == 0) {
-                    if(record_no == 0) {
+                    if (record_no == 0) {
                         std::get<0>(softclip_offset) = softClip.length();  // TODO: not working for paired
-                    }
-                    else {
+                    } else {
                         std::get<1>(softclip_offset) = softClip.length();
                     }
                 }

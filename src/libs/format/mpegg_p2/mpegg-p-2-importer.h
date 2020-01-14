@@ -11,15 +11,15 @@
 #include <util/ordered-section.h>
 #include <map>
 
-class MpeggP2Importer : public Source<BlockPayloadSet>, public OriginalSource{
+class MpeggP2Importer : public Source<BlockPayloadSet>, public OriginalSource {
    private:
     util::BitReader reader;
     std::map<size_t, format::mpegg_p2::ParameterSet> parameterSets;
     OrderedLock lock;
     format::mpegg_p2::DataUnitFactory factory;
+
    public:
-    explicit MpeggP2Importer(std::istream &_file) : reader(_file){
-    }
+    explicit MpeggP2Importer(std::istream& _file) : reader(_file) {}
 
     bool pump(size_t id) override {
         std::unique_ptr<format::mpegg_p2::AccessUnit> unit;
@@ -27,12 +27,12 @@ class MpeggP2Importer : public Source<BlockPayloadSet>, public OriginalSource{
             OrderedSection section(&lock, id);
             unit = factory.read(reader);
         }
-        if(!unit) {
+        if (!unit) {
             return false;
         }
         BlockPayloadSet set(factory.getParams(unit->getParameterID()), id);
 
-        for(auto& b : unit->getBlocks()) {
+        for (auto& b : unit->getBlocks()) {
             set.setPayload(GenDesc(b.getDescriptorID()), b.movePayload());
         }
         set.setReference(unit->getAlignmentInfo().getRefID());
@@ -47,9 +47,7 @@ class MpeggP2Importer : public Source<BlockPayloadSet>, public OriginalSource{
     /**
      * @brief Signal end of data.
      */
-    void dryIn() override {
-        dryOut();
-    }
+    void dryIn() override { dryOut(); }
 };
 
 #endif  // GENIE_MPEGG_P_2_IMPORTER_H

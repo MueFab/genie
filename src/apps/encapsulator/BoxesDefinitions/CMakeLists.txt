@@ -23,6 +23,6 @@ set(source_files
         Stream/StreamContainer.c
         Stream/StreamHeader.c
         Stream/StreamProtection.c
-)
+        )
 
 add_library(encapsulatorBoxesDefinitions ${source_files})

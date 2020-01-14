@@ -59,4 +59,4 @@ class Dataset {
 }  // namespace mpegg_p1
 }  // namespace format
 
-#endif //GENIE_DATASET_H
+#endif  // GENIE_DATASET_H
