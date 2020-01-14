@@ -1,5 +1,7 @@
 #include "tokenize.h"
 
+namespace util {
+
 std::vector<std::string> tokenize(std::string const& str, const char delim) {
     size_t start;
     size_t end = 0;
@@ -10,3 +12,5 @@ std::vector<std::string> tokenize(std::string const& str, const char delim) {
     }
     return out;
 }
+
+}  // namespace util

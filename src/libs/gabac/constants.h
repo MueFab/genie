@@ -11,9 +11,12 @@
 #include <string>
 #include <vector>
 
-namespace gabac {
-
+namespace util {
 class DataBlock;
+}
+
+namespace genie {
+namespace gabac {
 
 /**
  * @brief Supported transformations
@@ -26,7 +29,7 @@ enum class SequenceTransformationId {
     lut_transform = 4,   /**< @brief Remap symbols based on probability */
     diff_coding = 5,     /**< @brief Use differences between symbol values instead
                             of symbols */
-    cabac_coding = 6     /**< @brief Entropy coding based on cabac */
+    cabac_coding = 6     /**< @brief Entropy backbone based on cabac */
 };
 
 /**
@@ -45,7 +48,7 @@ enum class BinarizationId {
  * @brief Supported cabac contexts
  */
 enum class ContextSelectionId {
-    bypass = 0,                  /**< @brief Do not use arithmetic coding */
+    bypass = 0,                  /**< @brief Do not use arithmetic backbone */
     adaptive_coding_order_0 = 1, /**< @brief Current symbol only */
     adaptive_coding_order_1 = 2, /**< @brief Use current + previous symbol */
     adaptive_coding_order_2 = 3  /**< @brief Use current + previous + before previous symbol */
@@ -54,7 +57,7 @@ enum class ContextSelectionId {
 /**
  * @brief Transformation signature
  */
-using SequenceTransform = std::function<void(const std::vector<uint64_t>& param, std::vector<gabac::DataBlock>* const)>;
+using SequenceTransform = std::function<void(const std::vector<uint64_t>& param, std::vector<util::DataBlock>* const)>;
 
 /**
  * @brief Get property based on binarization parameter
@@ -114,5 +117,6 @@ const TransformationProperties& getTransformation(const gabac::SequenceTransform
 const BinarizationProperties& getBinarization(const gabac::BinarizationId& id);
 
 }  // namespace gabac
+}  // namespace genie
 
 #endif  // GABAC_CONSTANTS_H_

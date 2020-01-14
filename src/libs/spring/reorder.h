@@ -21,6 +21,7 @@
 #include "params.h"
 #include "util.h"
 
+namespace genie {
 namespace spring {
 
 template <size_t bitset_size>
@@ -779,7 +780,7 @@ void reorder_main(const std::string &temp_dir, const compression_params &cp) {
     delete rg_pointer;
     std::cout << "Done!\n";
 }
-
 }  // namespace spring
+}  // namespace genie
 
 #endif  // SPRING_REORDER_H_

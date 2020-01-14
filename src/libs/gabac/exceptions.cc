@@ -6,6 +6,7 @@
 
 #include "exceptions.h"
 
+namespace genie {
 namespace gabac {
 
 Exception::Exception(const std::string& message) : m_message(message) {}
@@ -34,3 +35,4 @@ RuntimeException::RuntimeException(const gabac::RuntimeException& e) noexcept : 
 RuntimeException::~RuntimeException() noexcept = default;
 
 }  // namespace gabac
+}  // namespace genie

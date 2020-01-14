@@ -40,7 +40,7 @@ class GABAC_TRANSFORM:
         gabac_transform_RLE         : Find run lengths
         gabac_transform_LUT         : Remap symbols based on probability
         gabac_transform_DIFF        : Use differences between symbol values instead of symbols
-        gabac_transform_CABAC       : coding based on cabac
+        gabac_transform_CABAC       : backbone based on cabac
     """
     NONE = 0
     EQUALITY = 1
@@ -76,7 +76,7 @@ class GABAC_CONTEXT_SELECT:
     Context selection modes for cabac transformation
 
     Values:
-        BYPASS           : Do not use arithmetic coding
+        BYPASS           : Do not use arithmetic backbone
         ADAPTIVE_ORDER_0 : Current symbol only
         ADAPTIVE_ORDER_1 : Use current + previous symbol
         ADAPTIVE_ORDER_2 : Use current + previous + before previous symbol

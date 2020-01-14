@@ -13,9 +13,9 @@
 #include <cstdlib>
 #include <vector>
 
+#include <mpegg_p2/data_unit.h>
+#include <util/bitreader.h>
 #include <fstream>
-#include "format/mpegg_p2/data_unit.h"
-#include "util/bitreader.h"
 
 // typedef struct {
 //    char refUri[1024];

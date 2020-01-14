@@ -9,6 +9,7 @@
 
 #include <vector>
 
+namespace genie {
 namespace gabac {
 namespace cabactables {
 
@@ -47,5 +48,6 @@ const std::vector<unsigned char> nextStateMps = {
 
 }  // namespace cabactables
 }  // namespace gabac
+}  // namespace genie
 
 #endif  // GABAC_CABAC_TABLES_H_

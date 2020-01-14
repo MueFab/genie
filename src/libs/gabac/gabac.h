@@ -19,9 +19,9 @@
 #include "run.h"
 
 /* io */
-#include "block-stepper.h"
-#include "data-block.h"
 #include "streams.h"
+#include "util/block-stepper.h"
+#include "util/data-block.h"
 
 #endif /* __cplusplus */
 

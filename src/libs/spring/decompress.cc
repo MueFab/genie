@@ -12,6 +12,7 @@
 #include "params.h"
 #include "util.h"
 
+namespace genie {
 namespace spring {
 #if 0
 void decode_streams(decoded_desc_t &dec, bool paired_end, bool preserve_quality, bool preserve_id, bool combine_pairs,
@@ -300,7 +301,7 @@ bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, int num_thr, 
     // Read compression params
     std::string compression_params_file = "cp.bin";
 
-    gabac::DataBlock tmp(0, 1);
+    util::DataBlock tmp(0, 1);
     ld->unpack(compression_params_file, &tmp);
     ld->decompress(compression_params_file, &tmp);
     std::memcpy(&cp, tmp.getData(), sizeof(compression_params));
@@ -339,7 +340,7 @@ bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, int num_thr, 
     for (uint32_t block_num = 0; block_num < cp.num_blocks; block_num++) {
         dsg::AcessUnitStreams sstreams;
         dsg::AcessUnitStreams tstreams;
-        gabac::DataBlock qualityBlock(0, 1);
+        util::DataBlock qualityBlock(0, 1);
         decoded_desc_t dec;
 #ifdef GENIE_USE_OPENMP
         int tid = omp_get_thread_num();
@@ -352,7 +353,7 @@ bool decompress(const std::string &temp_dir, dsg::StreamSaver *ld, int num_thr, 
                 std::string filename = file_subseq_prefix + "." + std::to_string(block_num) + "." +
                                        std::to_string(arr[0]) + "." + std::to_string(arr[1]);
                 dec.subseq_vector[arr[0]][arr[1]] = read_vector_from_file(filename);
-                sstreams.streams[arr[0]][arr[1]] = gabac::DataBlock(0, 1);
+                sstreams.streams[arr[0]][arr[1]] = util::DataBlock(0, 1);
                 ld->unpack(filename, &sstreams.streams[arr[0]][arr[1]]);
             }
             if (cp.preserve_quality) {
@@ -524,3 +525,4 @@ void read_fastq_record_from_ifstream(std::ifstream &in, format::fastq::FastqReco
 }
 #endif
 }  // namespace spring
+}  // namespace genie

@@ -11,6 +11,8 @@
 
 #include "ordered-lock.h"
 
+namespace util {
+
 /**
  * @brief Protects a section of code using an ordered lock
  */
@@ -32,6 +34,7 @@ class OrderedSection {
     ~OrderedSection();
 };
 
+}  // namespace util
 // ---------------------------------------------------------------------------------------------------------------------
 
 #endif  // GENIE_ORDERED_SECTION_H

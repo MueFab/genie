@@ -2,14 +2,14 @@
 
 #include <util/log.h>
 
-#include <coding/gabac-compressor.h>
-#include <coding/gabac-decompressor.h>
-#include <coding/local-assembly-decoder.h>
-#include <coding/local-assembly-encoder.h>
-#include <format/mpegg_p2/mpegg-p-2-exporter.h>
-#include <format/mpegg_p2/mpegg-p-2-importer.h>
-#include <format/sam/sam-exporter.h>
-#include <format/sam/sam-importer.h>
+#include <gabac/gabac-compressor.h>
+#include <gabac/gabac-decompressor.h>
+#include <local_assembly/local-assembly-decoder.h>
+#include <local_assembly/local-assembly-encoder.h>
+#include <mpegg_p2/mpegg-p-2-exporter.h>
+#include <mpegg_p2/mpegg-p-2-importer.h>
+#include <sam/sam-exporter.h>
+#include <sam/sam-importer.h>
 #include <util/thread-manager.h>
 #include <fstream>
 
@@ -19,39 +19,39 @@ void encode(const ProgramOptions &programOptions) {
     if (!programOptions.decompression) {
         std::ifstream infile(programOptions.inputFilePath);
         const size_t RECORDS_PER_BLOCK = 10000;
-        format::sam::SamImporter importer(RECORDS_PER_BLOCK, infile);
+        genie::sam::SamImporter importer(RECORDS_PER_BLOCK, infile);
 
         const size_t LOCAL_ASSEMBLY_BUFFER_SIZE = 2000;
-        coding::LocalAssemblyEncoder encoder(LOCAL_ASSEMBLY_BUFFER_SIZE, false);
+        genie::local_assembly::LocalAssemblyEncoder encoder(LOCAL_ASSEMBLY_BUFFER_SIZE, false);
 
-        coding::GabacCompressor compressor;
+        genie::gabac::GabacCompressor compressor;
 
         std::ofstream outfile(programOptions.outputFilePath);
-        MpeggP2Exporter exporter(&outfile);
+        genie::mpegg_p2::MpeggP2Exporter exporter(&outfile);
 
         importer.setDrain(&encoder);
         encoder.setDrain(&compressor);
         compressor.setDrain(&exporter);
 
-        ThreadManager threads(programOptions.num_threads, &importer);
+        util::ThreadManager threads(programOptions.num_threads, &importer);
 
         threads.run();
     } else {
         std::ifstream infile(programOptions.inputFilePath);
-        MpeggP2Importer importer(infile);
+        genie::MpeggP2Importer importer(infile);
 
-        coding::LocalAssemblyDecoder decoder;
+        genie::local_assembly::LocalAssemblyDecoder decoder;
 
-        coding::GabacDecompressor decompressor;
+        genie::gabac::GabacDecompressor decompressor;
 
         std::ofstream outfile(programOptions.outputFilePath);
-        SamExporter exporter(format::sam::SamFileHeader::createDefaultHeader(), outfile);
+        genie::sam::SamExporter exporter(genie::sam::SamFileHeader::createDefaultHeader(), outfile);
 
         importer.setDrain(&decompressor);
         decompressor.setDrain(&decoder);
         decoder.setDrain(&exporter);
 
-        ThreadManager threads(programOptions.num_threads, &importer);
+        util::ThreadManager threads(programOptions.num_threads, &importer);
 
         threads.run();
     }

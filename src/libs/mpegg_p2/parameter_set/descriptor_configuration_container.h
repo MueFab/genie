@@ -1,0 +1,48 @@
+#ifndef GENIE_DESCRIPTOR_CONFIGURATION_CONTAINER_H
+#define GENIE_DESCRIPTOR_CONFIGURATION_CONTAINER_H
+
+// -----------------------------------------------------------------------------------------------------------------
+
+#include "descriptor_configuration.h"
+#include "util/bitwriter.h"
+
+#include <util/make_unique.h>
+#include <memory>
+#include <vector>
+
+// -----------------------------------------------------------------------------------------------------------------
+namespace genie {
+namespace mpegg_p2 {
+
+/**
+ * ISO 23092-2 Section 3.3.2 table 7 lines 15 to 21
+ */
+class DescriptorConfigurationContainer {
+   public:
+    DescriptorConfigurationContainer();
+
+    DescriptorConfigurationContainer(size_t num_classes, genie::GenDesc desc, util::BitReader& reader);
+
+    virtual ~DescriptorConfigurationContainer() = default;
+
+    void setConfig(uint8_t index, std::unique_ptr<DescriptorConfiguration> conf);  //!< For class specific config
+    void setConfig(std::unique_ptr<DescriptorConfiguration> conf);                 //!< For non-class-specific config
+    const DescriptorConfiguration* getConfig() const;
+    const DescriptorConfiguration* getConfig(uint8_t index) const;
+    void enableClassSpecificConfigs(uint8_t numClasses);  //!< Unlocks class specific config
+    bool isClassSpecific() const;
+
+    virtual void write(util::BitWriter& writer) const;
+
+    std::unique_ptr<DescriptorConfigurationContainer> clone() const;
+
+   private:
+    bool class_specific_dec_cfg_flag : 1;  //!< Line 15
+    std::vector<std::unique_ptr<DescriptorConfiguration>> descriptor_configurations;
+};
+}  // namespace mpegg_p2
+}  // namespace genie
+
+// -----------------------------------------------------------------------------------------------------------------
+
+#endif  // GENIE_DESCRIPTOR_CONFIGURATION_CONTAINER_H

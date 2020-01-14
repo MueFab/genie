@@ -7,6 +7,10 @@
 #ifndef GENIE_ORIGINAL_SOURCE_H
 #define GENIE_ORIGINAL_SOURCE_H
 
+#include <cstddef>
+
+namespace util {
+
 /**
  * @brief Implementing this interface signals the ability to introduce new data into the application without any input
  */
@@ -29,6 +33,8 @@ class OriginalSource {
      */
     virtual ~OriginalSource() = default;
 };
+
+}  // namespace util
 
 // ---------------------------------------------------------------------------------------------------------------------
 

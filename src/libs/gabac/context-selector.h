@@ -11,6 +11,7 @@
 
 #include <cassert>
 
+namespace genie {
 namespace gabac {
 
 class ContextSelector {
@@ -60,5 +61,6 @@ inline unsigned int ContextSelector::getContextForEg(unsigned int contextSetIdx,
 }
 
 }  // namespace gabac
+}  // namespace genie
 
 #endif  // GABAC_CONTEXT_SELECTOR_H_

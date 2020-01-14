@@ -106,7 +106,7 @@ int example_transformations(void) {
     /********************************************/
     printf("***Executing Diff-Coding on block 0!\n");
     if (gabac_execute_transform(gabac_transform_DIFF, NULL, FALSE, blocks)) {
-        printf("Diff coding failed!\n");
+        printf("Diff backbone failed!\n");
         goto ERROR;
     }
     print_block(&blocks[0]);
@@ -114,7 +114,7 @@ int example_transformations(void) {
     /********************************************/
     printf("***Executing CABAC-Coding on block 1!\n");
     if (gabac_execute_transform(gabac_transform_CABAC, parameters_CABAC, FALSE, &blocks[1])) {
-        printf("Cabac coding failed!\n");
+        printf("Cabac backbone failed!\n");
         goto ERROR;
     }
     print_block(&blocks[1]);
@@ -142,7 +142,7 @@ int example_transformations(void) {
 
     /* After this last decoding step you should retrieve the raw example data again */
     if (gabac_execute_transform(gabac_transform_RLE, parameters_RLE, TRUE, blocks)) {
-        printf("Inverse diff coding failed!\n");
+        printf("Inverse diff backbone failed!\n");
         goto ERROR;
     }
     print_block(&blocks[0]);

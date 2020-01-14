@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
         } else {
             GABAC_DIE("Invalid task: " + std::string(programOptions.task));
         }
-    } catch (const gabac::RuntimeException& e) {
+    } catch (const genie::gabac::RuntimeException& e) {
         std::cerr << e.message() << std::endl;
         return EXIT_FAILURE;
     } catch (const std::exception& e) {

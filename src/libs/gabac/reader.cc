@@ -18,9 +18,10 @@
 
 #include "context-selector.h"
 
+namespace genie {
 namespace gabac {
 
-Reader::Reader(DataBlock *const bitstream)
+Reader::Reader(util::DataBlock *const bitstream)
     : m_bitInputStream(bitstream),
       // m_contextSelector(),
       m_decBinCabac(m_bitInputStream),
@@ -179,5 +180,5 @@ void Reader::reset() {
     m_contextModels = contexttables::buildContextTable();
     m_decBinCabac.reset();
 }
-
 }  // namespace gabac
+}  // namespace genie

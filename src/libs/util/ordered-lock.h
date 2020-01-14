@@ -13,6 +13,8 @@
 #include <cstdint>
 #include <mutex>
 
+namespace util {
+
 /**
  * @brief Allows to synchronize concurrent threads that the execution order is enforced
  */
@@ -38,6 +40,8 @@ class OrderedLock {
      */
     void finished();
 };
+
+}  // namespace util
 
 // ---------------------------------------------------------------------------------------------------------------------
 

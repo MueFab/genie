@@ -12,6 +12,8 @@
 #include <memory>
 #include "drain.h"
 
+namespace util {
+
 /**
  * @brief Implementing this interface signals the ability to putput data chunks of type TYPE
  * @tparam TYPE Data chunk type
@@ -46,6 +48,8 @@ class Source {
      */
     virtual ~Source() = default;
 };
+
+}  // namespace util
 
 // ---------------------------------------------------------------------------------------------------------------------
 

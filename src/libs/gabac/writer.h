@@ -15,9 +15,12 @@
 #include "streams.h"
 #include "util/bitwriter.h"
 
-namespace gabac {
-
+namespace util {
 class DataBlock;
+}
+
+namespace genie {
+namespace gabac {
 
 class Writer {
    public:
@@ -66,5 +69,6 @@ class Writer {
 };
 
 }  // namespace gabac
+}  // namespace genie
 
 #endif  // GABAC_WRITER_H_

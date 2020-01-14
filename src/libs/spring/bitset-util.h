@@ -13,6 +13,8 @@
 #include <string>
 #include "boo-phf.h"
 #include "params.h"
+
+namespace genie {
 namespace spring {
 
 typedef boomphf::SingleHashFunctor<u_int64_t> hasher_t;
@@ -277,5 +279,6 @@ void chartobitset(char *s, const int readlen, std::bitset<bitset_size> &b, std::
 }
 
 }  // namespace spring
+}  // namespace genie
 
 #endif  // SPRING_BITSET_UTIL_H_

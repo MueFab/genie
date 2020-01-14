@@ -9,10 +9,11 @@
 #include <string>
 #include <vector>
 
+namespace genie {
 namespace spring {
 
 void generate_id_tokens(char *prev_ID, uint32_t *prev_tokens_ptr, std::string &current_id,
-                        std::vector<gabac::DataBlock> &tokens) {
+                        std::vector<util::DataBlock> &tokens) {
     uint8_t token_len = 0, match_len = 0;
     uint32_t i = 0, k = 0, tmp = 0, token_ctr = 0, digit_value = 0, prev_digit = 0;
     int delta = 0;
@@ -328,11 +329,11 @@ std::string decode_id_tokens(std::string &prev_ID, uint32_t *prev_tokens_ptr, ui
     }
 }
 
-void big_endian_push_uint32(uint32_t val, gabac::DataBlock *vec) {
+void big_endian_push_uint32(uint32_t val, util::DataBlock *vec) {
     vec->push_back((uint8_t)((val >> 24) & 0xff));
     vec->push_back((uint8_t)((val >> 16) & 0xff));
     vec->push_back((uint8_t)((val >> 8) & 0xff));
     vec->push_back((uint8_t)((val)&0xff));
 }
-
 }  // namespace spring
+}  // namespace genie

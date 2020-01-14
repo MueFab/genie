@@ -23,6 +23,7 @@
 #include <unordered_map>
 #include <vector>
 
+namespace genie {
 namespace spring {
 
 namespace boomphf {
@@ -1395,5 +1396,6 @@ void *thread_processLevel(void *args) {
 }  // namespace boomphf
 
 }  // namespace spring
+}  // namespace genie
 
 #endif  // SPRING_BOOPHF_H_

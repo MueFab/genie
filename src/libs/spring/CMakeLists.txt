@@ -20,10 +20,9 @@ set(source_files
 
 add_library(spring ${source_files})
 
-target_link_libraries(spring PRIVATE util)
-target_link_libraries(spring PRIVATE format)
-target_link_libraries(spring PRIVATE util)
-target_link_libraries(spring PRIVATE gabac)
+target_link_libraries(spring PUBLIC gabac)
+
+target_link_libraries(spring PUBLIC backbone)
 
 if (${GENIE_USE_OPENMP})
     target_compile_definitions(spring PRIVATE GENIE_USE_OPENMP)

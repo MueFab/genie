@@ -5,17 +5,17 @@
  */
 
 #include "stream-handler.h"
-#include "data-block.h"
-
+#include "util/data-block.h"
+namespace genie {
 namespace gabac {
 
-size_t StreamHandler::readStream(std::istream &input, DataBlock *buffer) {
+size_t StreamHandler::readStream(std::istream &input, util::DataBlock *buffer) {
     uint32_t streamSize = 0;
     input.read(reinterpret_cast<char *>(&streamSize), sizeof(uint32_t));
     return readBytes(input, streamSize, buffer);
 }
 
-size_t StreamHandler::readBytes(std::istream &input, size_t bytes, DataBlock *buffer) {
+size_t StreamHandler::readBytes(std::istream &input, size_t bytes, util::DataBlock *buffer) {
     if (bytes > 0) {
         if (bytes % buffer->getWordSize()) {
             GABAC_DIE("Input stream length not a multiple of word size");
@@ -26,7 +26,7 @@ size_t StreamHandler::readBytes(std::istream &input, size_t bytes, DataBlock *bu
     return bytes;
 }
 
-size_t StreamHandler::readFull(std::istream &input, DataBlock *buffer) {
+size_t StreamHandler::readFull(std::istream &input, util::DataBlock *buffer) {
     auto safe = input.exceptions();
     input.exceptions(std::ios::badbit);
 
@@ -49,7 +49,7 @@ size_t StreamHandler::readFull(std::istream &input, DataBlock *buffer) {
     return buffer->size();
 }
 
-size_t StreamHandler::readBlock(std::istream &input, size_t bytes, DataBlock *buffer) {
+size_t StreamHandler::readBlock(std::istream &input, size_t bytes, util::DataBlock *buffer) {
     auto safe = input.exceptions();
     input.exceptions(std::ios::badbit);
 
@@ -69,13 +69,13 @@ size_t StreamHandler::readBlock(std::istream &input, size_t bytes, DataBlock *bu
     return buffer->size();
 }
 
-size_t StreamHandler::writeStream(std::ostream &output, DataBlock *buffer) {
+size_t StreamHandler::writeStream(std::ostream &output, util::DataBlock *buffer) {
     uint32_t size = buffer->getRawSize();
     output.write(reinterpret_cast<char *>(&size), sizeof(uint32_t));
     return writeBytes(output, buffer);
 }
 
-size_t StreamHandler::writeBytes(std::ostream &output, DataBlock *buffer) {
+size_t StreamHandler::writeBytes(std::ostream &output, util::DataBlock *buffer) {
     size_t ret = buffer->getRawSize();
     if (ret > 0) {
         output.write(static_cast<char *>(buffer->getData()), ret);
@@ -83,5 +83,5 @@ size_t StreamHandler::writeBytes(std::ostream &output, DataBlock *buffer) {
     }
     return ret;
 }
-
 }  // namespace gabac
+}  // namespace genie

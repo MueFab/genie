@@ -21,6 +21,7 @@
 #include "params.h"
 #include "util.h"
 
+namespace genie {
 namespace spring {
 
 template <size_t bitset_size>
@@ -595,7 +596,7 @@ void encoder_main(const std::string &temp_dir, const compression_params &cp) {
     delete eg_ptr;
     delete egb_ptr;
 }
-
 }  // namespace spring
+}  // namespace genie
 
 #endif  // SPRING_ENCODER_H_

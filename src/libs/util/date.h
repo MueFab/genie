@@ -7,6 +7,8 @@
 #include "exceptions.h"
 #include "tokenize.h"
 
+namespace util {
+
 class Date {
    private:
     uint16_t year;
@@ -38,5 +40,7 @@ class Date {
     Date(uint16_t _year, uint8_t _month, uint8_t _day, uint8_t _hour, uint8_t _minute, uint8_t _second);
     std::string toString() const;
 };
+
+}  // namespace util
 
 #endif  // GENIE_DATE_H

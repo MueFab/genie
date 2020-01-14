@@ -24,6 +24,7 @@
 #include "spring-gabac.h"
 #include "util.h"
 
+namespace genie {
 namespace spring {
 
 /*void generate_streams_SPRING(format::fastq::FastqFileReader *fastqFileReader1, format::fastq::FastqFileReader
@@ -174,7 +175,7 @@ OpenMP" << std::endl; #endif
     // generated_aus result(descriptorFilesPerAUs);
     // // Write compression params to a file
     // std::string compression_params_file = "cp.bin";
-    // gabac::DataBlock d((uint8_t *)&cp, sizeof(compression_params), 1);
+    // util::DataBlock d((uint8_t *)&cp, sizeof(compression_params), 1);
     // st.compress(compression_params_file, &d);
     // st.pack(d, compression_params_file);
 
@@ -214,5 +215,5 @@ std::string random_string(size_t length) {
     std::generate_n(str.begin(), length, randchar);
     return str;
 }
-
 }  // namespace spring
+}  // namespace genie

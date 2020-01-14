@@ -5,6 +5,7 @@
 
 #include <gabac/gabac.h>
 
+namespace genie {
 namespace spring {
 
 // to use for writing compressed files to temporary files and reload them in combine-aus
@@ -21,12 +22,12 @@ class GenieGabacOutputBuffer : public std::streambuf {
     std::streamsize xsputn(const char *s, std::streamsize n) override;
 
    private:
-    std::vector<gabac::DataBlock> streams;
+    std::vector<util::DataBlock> streams;
     std::streamsize bytesLeft;
     std::vector<uint8_t> sizeBuf;
 
    public:
-    void flush_blocks(std::vector<gabac::DataBlock> *dat);
+    void flush_blocks(std::vector<util::DataBlock> *dat);
 };
 
 class GenieGabacOutputStream : public GenieGabacOutputBuffer, public std::ostream {
@@ -34,20 +35,21 @@ class GenieGabacOutputStream : public GenieGabacOutputBuffer, public std::ostrea
     GenieGabacOutputStream() : GenieGabacOutputBuffer(), std::ostream(this) {}
 };
 
-void gabac_compress(const gabac::EncodingConfiguration &conf, gabac::DataBlock *in, std::vector<gabac::DataBlock> *out);
+void gabac_compress(const gabac::EncodingConfiguration &conf, util::DataBlock *in, std::vector<util::DataBlock> *out);
 
-std::vector<std::vector<std::vector<gabac::DataBlock>>> create_default_streams();
+std::vector<std::vector<std::vector<util::DataBlock>>> create_default_streams();
 
-std::vector<std::vector<gabac::DataBlock>> generate_empty_raw_data();
+std::vector<std::vector<util::DataBlock>> generate_empty_raw_data();
 
-uint64_t write_streams_to_file(const std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams,
+uint64_t write_streams_to_file(const std::vector<std::vector<std::vector<util::DataBlock>>> &generated_streams,
                                const std::string &outfile, const std::vector<uint8_t> &descriptors_to_write);
 
-uint64_t read_streams_from_file(std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams,
+uint64_t read_streams_from_file(std::vector<std::vector<std::vector<util::DataBlock>>> &generated_streams,
                                 const std::string &infile, const std::vector<uint8_t> &descriptors_to_read);
 
 std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf();
 
 }  // namespace spring
+}  // namespace genie
 
 #endif  // GENIE_GENIE_GABAC_OUTPUT_STREAM_H

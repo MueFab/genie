@@ -7,14 +7,17 @@
 #ifndef GABAC_DIFF_CODING_H_
 #define GABAC_DIFF_CODING_H_
 
+namespace util {
+class DataBlock;
+}
+
+namespace genie {
 namespace gabac {
 
-class DataBlock;
+void transformDiffCoding(util::DataBlock *transformedSymbols);
 
-void transformDiffCoding(DataBlock *transformedSymbols);
-
-void inverseTransformDiffCoding(DataBlock *transformedSymbols);
+void inverseTransformDiffCoding(util::DataBlock *transformedSymbols);
 
 }  // namespace gabac
-
+}  // namespace genie
 #endif  // GABAC_DIFF_CODING_H_

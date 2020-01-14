@@ -7,14 +7,17 @@
 #ifndef GABAC_EQUALITY_CODING_H_
 #define GABAC_EQUALITY_CODING_H_
 
+namespace util {
+class DataBlock;
+}
+namespace genie {
 namespace gabac {
 
-class DataBlock;
+void transformEqualityCoding(util::DataBlock *values, util::DataBlock *equalityFlags);
 
-void transformEqualityCoding(DataBlock *values, DataBlock *equalityFlags);
-
-void inverseTransformEqualityCoding(DataBlock *values, DataBlock *equalityFlags);
+void inverseTransformEqualityCoding(util::DataBlock *values, util::DataBlock *equalityFlags);
 
 }  // namespace gabac
+}  // namespace genie
 
 #endif  // GABAC_EQUALITY_CODING_H_

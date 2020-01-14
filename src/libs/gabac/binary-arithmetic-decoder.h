@@ -9,6 +9,7 @@
 
 #include "bit-input-stream.h"
 
+namespace genie {
 namespace gabac {
 
 class ContextModel;
@@ -30,5 +31,6 @@ class BinaryArithmeticDecoder {
 };
 
 }  // namespace gabac
+}  // namespace genie
 
 #endif  // GABAC_BINARY_ARITHMETIC_DECODER_H_

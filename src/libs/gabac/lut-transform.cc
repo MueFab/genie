@@ -18,17 +18,18 @@
 #include <utility>
 #include <vector>
 
-#include "block-stepper.h"
-#include "data-block.h"
+#include "util/block-stepper.h"
+#include "util/data-block.h"
 
+namespace genie {
 namespace gabac {
 
 const size_t MAX_LUT_SIZE = 1u << 20u;  // 8MB table
 
 // Inplace not reasonable, because symbols stream is reused 100% of time and lut
 // is much smaller
-static void inferLut0(const DataBlock& symbols, std::vector<std::pair<uint64_t, uint64_t>>* const lut,
-                      DataBlock* const fastlut, DataBlock* const inverseLut) {
+static void inferLut0(const util::DataBlock& symbols, std::vector<std::pair<uint64_t, uint64_t>>* const lut,
+                      util::DataBlock* const fastlut, util::DataBlock* const inverseLut) {
     uint64_t maxValue = 0;
 
     // At some point it is more efficient to use an hashmap instead of an array
@@ -66,7 +67,7 @@ static void inferLut0(const DataBlock& symbols, std::vector<std::pair<uint64_t, 
 
     if (maxValue < CTR_THRESHOLD) {
         std::vector<uint64_t> freq(maxValue + 1);
-        BlockStepper r = symbols.getReader();
+        util::BlockStepper r = symbols.getReader();
         while (r.isValid()) {
             uint64_t symbol = r.get();
             freq[symbol]++;
@@ -79,7 +80,7 @@ static void inferLut0(const DataBlock& symbols, std::vector<std::pair<uint64_t, 
         }
     } else {
         std::unordered_map<uint64_t, uint64_t> freq;
-        BlockStepper r = symbols.getReader();
+        util::BlockStepper r = symbols.getReader();
         while (r.isValid()) {
             uint64_t symbol = r.get();
             freq[symbol]++;
@@ -138,11 +139,11 @@ static uint64_t lut0SingleTransform(const std::vector<std::pair<uint64_t, uint64
     return it->second;
 }
 
-static uint64_t lut0SingleTransformFast(const DataBlock& lut0, uint64_t symbol) { return lut0.get(symbol); }
+static uint64_t lut0SingleTransformFast(const util::DataBlock& lut0, uint64_t symbol) { return lut0.get(symbol); }
 
 static void transformLutTransform_core(const size_t ORDER, const std::vector<std::pair<uint64_t, uint64_t>>& lut0,
-                                       const DataBlock& fastlut, const DataBlock& lut,
-                                       DataBlock* const transformedSymbols) {
+                                       const util::DataBlock& fastlut, const util::DataBlock& lut,
+                                       util::DataBlock* const transformedSymbols) {
     assert(transformedSymbols != nullptr);
 
     if (transformedSymbols->empty()) {
@@ -151,7 +152,7 @@ static void transformLutTransform_core(const size_t ORDER, const std::vector<std
 
     std::vector<uint64_t> lastSymbols(ORDER + 1, 0);
 
-    BlockStepper r = transformedSymbols->getReader();
+    util::BlockStepper r = transformedSymbols->getReader();
     while (r.isValid()) {
         uint64_t symbol = r.get();
         // Update history
@@ -182,13 +183,13 @@ static void transformLutTransform_core(const size_t ORDER, const std::vector<std
     }
 }
 
-static void inverseTransformLutTransform_core(const size_t ORDER, DataBlock* const symbols,
-                                              DataBlock* const inverseLut0, DataBlock* const inverseLut) {
+static void inverseTransformLutTransform_core(const size_t ORDER, util::DataBlock* const symbols,
+                                              util::DataBlock* const inverseLut0, util::DataBlock* const inverseLut) {
     assert(symbols != nullptr);
 
     std::vector<uint64_t> lastSymbols(ORDER + 1, 0);
 
-    BlockStepper r = symbols->getReader();
+    util::BlockStepper r = symbols->getReader();
 
     // Do the LUT transform
     while (r.isValid()) {
@@ -222,9 +223,9 @@ static void inverseTransformLutTransform_core(const size_t ORDER, DataBlock* con
     }
 }
 
-void inferLut(const size_t ORDER, const DataBlock& symbols, std::vector<std::pair<uint64_t, uint64_t>>* const lut0,
-              DataBlock* const fastlut, DataBlock* const inverseLut0, DataBlock* const lut1,
-              DataBlock* const inverseLut1) {
+void inferLut(const size_t ORDER, const util::DataBlock& symbols,
+              std::vector<std::pair<uint64_t, uint64_t>>* const lut0, util::DataBlock* const fastlut,
+              util::DataBlock* const inverseLut0, util::DataBlock* const lut1, util::DataBlock* const inverseLut1) {
     // Clear
     lut1->clear();
     inverseLut1->clear();
@@ -252,7 +253,7 @@ void inferLut(const size_t ORDER, const DataBlock& symbols, std::vector<std::pai
     std::vector<std::pair<uint64_t, uint64_t>> ctr(size, {std::numeric_limits<uint64_t>::max(), 0});
     std::vector<uint64_t> lastSymbols(ORDER + 1, 0);
 
-    BlockStepper r = symbols.getReader();
+    util::BlockStepper r = symbols.getReader();
     while (r.isValid()) {
         uint64_t symbol = r.get();
         // Update history
@@ -333,12 +334,12 @@ void inferLut(const size_t ORDER, const DataBlock& symbols, std::vector<std::pai
     }
 }
 
-void transformLutTransform(unsigned order, DataBlock* const transformedSymbols, DataBlock* const inverseLUT,
-                           DataBlock* const inverseLUT1) {
+void transformLutTransform(unsigned order, util::DataBlock* const transformedSymbols, util::DataBlock* const inverseLUT,
+                           util::DataBlock* const inverseLUT1) {
     std::vector<std::pair<uint64_t, uint64_t>> lut;
-    DataBlock fastlut(0,
-                      transformedSymbols->getWordSize());  // For small, dense symbol spaces
-    DataBlock lut1(0, transformedSymbols->getWordSize());
+    util::DataBlock fastlut(0,
+                            transformedSymbols->getWordSize());  // For small, dense symbol spaces
+    util::DataBlock lut1(0, transformedSymbols->getWordSize());
     inferLut(order, *transformedSymbols, &lut, &fastlut, inverseLUT, &lut1, inverseLUT1);
     if (lut.empty()) {
         inverseLUT->clear();
@@ -348,9 +349,9 @@ void transformLutTransform(unsigned order, DataBlock* const transformedSymbols, 
     transformLutTransform_core(order, lut, fastlut, lut1, transformedSymbols);
 }
 
-void inverseTransformLutTransform(unsigned order, DataBlock* const symbols, DataBlock* const inverseLUT,
-                                  DataBlock* const inverseLUT1) {
+void inverseTransformLutTransform(unsigned order, util::DataBlock* const symbols, util::DataBlock* const inverseLUT,
+                                  util::DataBlock* const inverseLUT1) {
     inverseTransformLutTransform_core(order, symbols, inverseLUT, inverseLUT1);
 }
-
 }  // namespace gabac
+}  // namespace genie

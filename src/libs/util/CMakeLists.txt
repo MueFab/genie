@@ -1,18 +1,19 @@
 project("util")
 
 set(source_files
-        bitreader.cc
         bitwriter.cc
+        data-block.cc
         exceptions.cc
-        log.cc
-        perf-stats.cc
+        bitreader.cc
         string-helpers.cc
-        thread-manager.cc
-        ordered-lock.cc
-        ordered-section.cc
+        ../backbone/locus.cc
+        log.cc
         date.cc
+        ordered-lock.cc
+        thread-manager.cc
+        ordered-section.cc
+        perf-stats.cc
         tokenize.cc
-        locus.cc
         )
 
 

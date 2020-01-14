@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 
+namespace genie {
 namespace spring {
 
 std::string buildcontig(std::list<contig_reads> &current_contig, const uint32_t &list_size) {
@@ -147,5 +148,5 @@ void correct_order(uint32_t *order_s, const encoder_global &eg) {
     delete[] cumulative_N_reads;
     return;
 }
-
 }  // namespace spring
+}  // namespace genie

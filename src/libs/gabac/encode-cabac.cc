@@ -8,16 +8,17 @@
 
 #include <cassert>
 
-#include "block-stepper.h"
 #include "constants.h"
-#include "data-block.h"
+#include "util/block-stepper.h"
+#include "util/data-block.h"
 #include "writer.h"
 
+namespace genie {
 namespace gabac {
 
 void encode_cabac(const BinarizationId& binarizationId, const std::vector<unsigned int>& binarizationParameters,
-                  const ContextSelectionId& contextSelectionId, DataBlock* const symbols, size_t maxSize) {
-    DataBlock block(0, 1);
+                  const ContextSelectionId& contextSelectionId, util::DataBlock* const symbols, size_t maxSize) {
+    util::DataBlock block(0, 1);
     assert(symbols != nullptr);
 #ifndef NDEBUG
     const unsigned int paramSize[unsigned(BinarizationId::STEG) + 1u] = {1, 1, 0, 0, 1, 1};
@@ -36,7 +37,7 @@ void encode_cabac(const BinarizationId& binarizationId, const std::vector<unsign
         binarizationParameter = binarizationParameters[0];
     }
 
-    BlockStepper r = symbols->getReader();
+    util::BlockStepper r = symbols->getReader();
 
     if (contextSelectionId == ContextSelectionId::bypass) {
         void (Writer::*func)(uint64_t, unsigned int);
@@ -157,5 +158,5 @@ void encode_cabac(const BinarizationId& binarizationId, const std::vector<unsign
 
     bitstream.flush(symbols);
 }
-
 }  // namespace gabac
+}  // namespace genie

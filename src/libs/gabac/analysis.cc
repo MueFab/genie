@@ -17,17 +17,18 @@
 #include <string>
 #include <vector>
 
-#include "block-stepper.h"
 #include "configuration.h"
 #include "constants.h"
-#include "data-block.h"
 #include "encode-cabac.h"
 #include "stream-handler.h"
+#include "util/block-stepper.h"
+#include "util/data-block.h"
 
+namespace genie {
 namespace gabac {
 
 struct Snapshot {
-    std::vector<DataBlock> streams;
+    std::vector<util::DataBlock> streams;
 };
 
 struct TraversalInfo {
@@ -107,8 +108,8 @@ void getOptimumOfBinarizationParameter(const AnalysisConfiguration& aconf, Trave
     }
 }
 
-static void getMinMax(const gabac::DataBlock& b, uint64_t* umin, uint64_t* umax, int64_t* smin, int64_t* smax) {
-    gabac::BlockStepper r = b.getReader();
+static void getMinMax(const util::DataBlock& b, uint64_t* umin, uint64_t* umax, int64_t* smin, int64_t* smax) {
+    util::BlockStepper r = b.getReader();
     *umin = std::numeric_limits<uint64_t>::max();
     *umax = std::numeric_limits<uint64_t>::min();
     *smin = std::numeric_limits<int64_t>::max();
@@ -373,7 +374,7 @@ void analyze(const IOConfiguration& ioconf, const AnalysisConfiguration& aconf) 
     }
 
     std::string confString = info.bestConfig.toJsonString();
-    DataBlock confBlock(&confString);
+    util::DataBlock confBlock(&confString);
     gabac::StreamHandler::writeBytes(*ioconf.outputStream, &confBlock);
 
     // ioconf.log(gabac::IOConfiguration::LogLevel::INFO)
@@ -386,5 +387,5 @@ void analyze(const IOConfiguration& ioconf, const AnalysisConfiguration& aconf) 
     ioconf.log(gabac::IOConfiguration::LogLevel::INFO)
         << "filesize:" << info.bestTotalSize << ",num_configs:" << info.numConfigs;
 }
-
 }  // namespace gabac
+}  // namespace genie

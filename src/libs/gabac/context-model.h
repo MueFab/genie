@@ -9,6 +9,7 @@
 
 #include "cabac-tables.h"
 
+namespace genie {
 namespace gabac {
 
 class ContextModel {
@@ -50,5 +51,5 @@ inline void ContextModel::updateLps() { m_state = cabactables::nextStateLps[m_st
 inline void ContextModel::updateMps() { m_state = cabactables::nextStateMps[m_state]; }
 
 }  // namespace gabac
-
+}  // namespace genie
 #endif  // GABAC_CONTEXT_MODEL_H_

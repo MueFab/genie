@@ -10,6 +10,7 @@
 
 #include "exceptions.h"
 
+namespace genie {
 namespace gabac {
 
 FileBuffer::FileBuffer(FILE *f) : fileptr(f) {}
@@ -26,7 +27,7 @@ std::streamsize FileBuffer::xsgetn(char *s, std::streamsize n) { return fread(s,
 
 int FileBuffer::underflow() { return fgetc(fileptr); }
 
-DataBlockBuffer::DataBlockBuffer(DataBlock *d, size_t pos_i) : block(0, 1), pos(pos_i) { block.swap(d); }
+DataBlockBuffer::DataBlockBuffer(util::DataBlock *d, size_t pos_i) : block(0, 1), pos(pos_i) { block.swap(d); }
 
 size_t DataBlockBuffer::size() const { return block.getRawSize(); }
 
@@ -69,16 +70,17 @@ int DataBlockBuffer::uflow() {
     return static_cast<int>(block.get(pos++));
 }
 
-void DataBlockBuffer::flush_block(gabac::DataBlock *blk) { block.swap(blk); }
+void DataBlockBuffer::flush_block(util::DataBlock *blk) { block.swap(blk); }
 
 IFileStream::IFileStream(FILE *f) : FileBuffer(f), std::istream(this) {}
 
 OFileStream::OFileStream(FILE *f) : FileBuffer(f), std::ostream(this) {}
 
-IBufferStream::IBufferStream(DataBlock *d, size_t pos_i) : DataBlockBuffer(d, pos_i), std::istream(this) {}
+IBufferStream::IBufferStream(util::DataBlock *d, size_t pos_i) : DataBlockBuffer(d, pos_i), std::istream(this) {}
 
-OBufferStream::OBufferStream(DataBlock *d) : DataBlockBuffer(d, 0), std::ostream(this) {}
+OBufferStream::OBufferStream(util::DataBlock *d) : DataBlockBuffer(d, 0), std::ostream(this) {}
 
 NullStream::NullStream() : std::ostream(&m_sb) {}
 
 }  // namespace gabac
+}  // namespace genie

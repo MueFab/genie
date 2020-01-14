@@ -10,11 +10,12 @@
 /**
  * @brief Throws a gabac exception containing the current position in the code.
  */
-#define GABAC_DIE(message) throw gabac::RuntimeException(__FILE__, __FUNCTION__, __LINE__, message)
+#define GABAC_DIE(message) throw genie::gabac::RuntimeException(__FILE__, __FUNCTION__, __LINE__, message)
 
 #include <exception>
 #include <string>
 
+namespace genie {
 namespace gabac {
 
 /**
@@ -77,5 +78,6 @@ class RuntimeException : public Exception {
 };
 
 }  // namespace gabac
+}  // namespace genie
 
 #endif  // GABAC_EXCEPTIONS_H_

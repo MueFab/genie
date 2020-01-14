@@ -10,19 +10,22 @@
 #include <istream>
 #include <ostream>
 
-namespace gabac {
-
+namespace util {
 class DataBlock;
+}
+namespace genie {
+namespace gabac {
 
 class StreamHandler {
    public:
-    static size_t readStream(std::istream& input, DataBlock* buffer);
-    static size_t readBytes(std::istream& input, size_t bytes, DataBlock* buffer);
-    static size_t readFull(std::istream& input, DataBlock* buffer);
-    static size_t readBlock(std::istream& input, size_t bytes, DataBlock* buffer);
-    static size_t writeStream(std::ostream& output, DataBlock* buffer);
-    static size_t writeBytes(std::ostream& output, DataBlock* buffer);
+    static size_t readStream(std::istream& input, util::DataBlock* buffer);
+    static size_t readBytes(std::istream& input, size_t bytes, util::DataBlock* buffer);
+    static size_t readFull(std::istream& input, util::DataBlock* buffer);
+    static size_t readBlock(std::istream& input, size_t bytes, util::DataBlock* buffer);
+    static size_t writeStream(std::ostream& output, util::DataBlock* buffer);
+    static size_t writeBytes(std::ostream& output, util::DataBlock* buffer);
 };
 }  // namespace gabac
+}  // namespace genie
 
 #endif  // GABAC_STREAM_HANDLER_H_

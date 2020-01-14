@@ -1,11 +1,11 @@
 // Copyright 2018 The genie authors
 
 #include "spring-gabac.h"
-#include <format/mpegg_p2/access_unit.h>
-#include <format/mpegg_p2/clutter.h>
-#include <format/mpegg_p2/parameter_set.h>
+#include <mpegg_p2/access_unit.h>
+#include <mpegg_p2/parameter_set.h>
 #include <fstream>
 
+namespace genie {
 namespace spring {
 
 /*GenieGabacOutputBuffer::GenieGabacOutputBuffer() : bytesLeft(0) {}
@@ -40,7 +40,7 @@ std::streamsize GenieGabacOutputBuffer::xsputn(const char *s, std::streamsize n)
     return n;
 }
 
-void GenieGabacOutputBuffer::flush_blocks(std::vector<gabac::DataBlock> *dat) {
+void GenieGabacOutputBuffer::flush_blocks(std::vector<util::DataBlock> *dat) {
     if (bytesLeft) {
         GABAC_DIE("Stream not in flushable state, bytes left");
     }
@@ -51,8 +51,8 @@ void GenieGabacOutputBuffer::flush_blocks(std::vector<gabac::DataBlock> *dat) {
     dat->swap(streams);
 }
 
-void gabac_compress(const gabac::EncodingConfiguration &conf, gabac::DataBlock *in,
-                    std::vector<gabac::DataBlock> *out) {
+void gabac_compress(const gabac::EncodingConfiguration &conf, util::DataBlock *in,
+                    std::vector<util::DataBlock> *out) {
     // Interface to GABAC library
     gabac::IBufferStream bufferInputStream(in);
     GenieGabacOutputStream bufferOutputStream;
@@ -67,9 +67,9 @@ void gabac_compress(const gabac::EncodingConfiguration &conf, gabac::DataBlock *
     bufferOutputStream.flush_blocks(out);
 }
 
-std::vector<std::vector<gabac::DataBlock>> generate_empty_raw_data() {
-    std::vector<std::vector<gabac::DataBlock>> raw_data(format::mpegg_p2::NUM_DESCRIPTORS);
-    for (size_t descriptor = 0; descriptor < format::mpegg_p2::NUM_DESCRIPTORS; ++descriptor) {
+std::vector<std::vector<util::DataBlock>> generate_empty_raw_data() {
+    std::vector<std::vector<util::DataBlock>> raw_data(mpegg_p2::NUM_DESCRIPTORS);
+    for (size_t descriptor = 0; descriptor < mpegg_p2::NUM_DESCRIPTORS; ++descriptor) {
         if (descriptor == 15) {
             raw_data[descriptor].resize(128 * 6);
             for (int i = 0; i < 128; i++) {
@@ -78,8 +78,8 @@ std::vector<std::vector<gabac::DataBlock>> generate_empty_raw_data() {
                 }
             }
         } else {
-            raw_data[descriptor].resize(format::mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences);
-            for (int subseq = 0; subseq < format::mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences;
+            raw_data[descriptor].resize(mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences);
+            for (int subseq = 0; subseq < mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences;
 subseq++) { raw_data[descriptor][subseq].setWordSize(4);
             }
         }
@@ -87,18 +87,18 @@ subseq++) { raw_data[descriptor][subseq].setWordSize(4);
     return raw_data;
 }
 
-std::vector<std::vector<std::vector<gabac::DataBlock>>> create_default_streams() {
-    std::vector<std::vector<std::vector<gabac::DataBlock>>> ret(format::mpegg_p2::NUM_DESCRIPTORS);
-    for (size_t descriptor = 0; descriptor < format::mpegg_p2::NUM_DESCRIPTORS; ++descriptor) {
+std::vector<std::vector<std::vector<util::DataBlock>>> create_default_streams() {
+    std::vector<std::vector<std::vector<util::DataBlock>>> ret(mpegg_p2::NUM_DESCRIPTORS);
+    for (size_t descriptor = 0; descriptor < mpegg_p2::NUM_DESCRIPTORS; ++descriptor) {
         if (descriptor == 15)
             ret[descriptor].resize(128 * 6);
         else
-            ret[descriptor].resize(format::mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences);
+            ret[descriptor].resize(mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences);
     }
     return ret;
 }
 
-uint64_t write_streams_to_file(const std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams,
+uint64_t write_streams_to_file(const std::vector<std::vector<std::vector<util::DataBlock>>> &generated_streams,
                            const std::string &outfile, const std::vector<uint8_t> &descriptors_to_write) {
     uint64_t retval = 0;
     std::ofstream fout(outfile, std::ios::binary);
@@ -131,7 +131,7 @@ uint64_t write_streams_to_file(const std::vector<std::vector<std::vector<gabac::
 
 // assumes that the generated_streams vector is already initialized with
 // create_default_streams.
-uint64_t read_streams_from_file(std::vector<std::vector<std::vector<gabac::DataBlock>>> &generated_streams, const
+uint64_t read_streams_from_file(std::vector<std::vector<std::vector<util::DataBlock>>> &generated_streams, const
 std::string &infile, const std::vector<uint8_t> &descriptors_to_read) { uint64_t retval = 0; std::ifstream fin(infile,
 std::ios::binary); for (auto &descriptor : descriptors_to_read) { for (size_t subseq = 0; subseq <
 generated_streams[descriptor].size(); subseq++) {
@@ -203,3 +203,4 @@ std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
 }*/
 
 }  // namespace spring
+}  // namespace genie

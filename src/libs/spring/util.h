@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+namespace genie {
 namespace spring {
 
 const std::vector<std::array<uint8_t, 2>> subseq_indices = {
@@ -84,5 +85,5 @@ void generate_order_array(const std::string &file_order, uint32_t *order_array, 
 bool is_permutation(uint32_t *order_array, const uint32_t &numreads);
 
 }  // namespace spring
-
+}  // namespace genie
 #endif  // SPRING_UTIL_H_

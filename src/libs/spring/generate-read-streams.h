@@ -4,11 +4,12 @@
 #include <map>
 #include <string>
 
-#include <coding/mpegg-raw-au.h>
+#include <backbone/mpegg-raw-au.h>
 #include <genie/stream-saver.h>
 #include <util/perf-stats.h>
 #include "util.h"
 
+namespace genie {
 namespace spring {
 
 struct se_data {
@@ -46,29 +47,30 @@ struct subseq_data {
     uint32_t block_num;
     std::map<uint8_t, std::map<uint8_t, std::string>> listDescriptorFiles;
     std::map<uint8_t, std::map<uint8_t, std::vector<int64_t>>> subseq_vector;
-    dsg::AcessUnitStreams streamsAU;
+    AcessUnitStreams streamsAU;
 };
 
 uint64_t getNumBlocks(const compression_params &data);
 
 void compress_subseqs(subseq_data *data, const std::vector<std::vector<gabac::EncodingConfiguration>> &configs);
 
-coding::MpeggRawAu generate_read_streams(const std::string &temp_dir, const compression_params &cp,
-                                         util::FastqStats *stats);
+genie::MpeggRawAu generate_read_streams(const std::string &temp_dir, const compression_params &cp,
+                                        util::FastqStats *stats);
 
-coding::MpeggRawAu generate_read_streams_se(const std::string &temp_dir, const compression_params &cp,
-                                            util::FastqStats *stats);
+genie::MpeggRawAu generate_read_streams_se(const std::string &temp_dir, const compression_params &cp,
+                                           util::FastqStats *stats);
 
-coding::MpeggRawAu generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp,
-                                            util::FastqStats *stats);
+genie::MpeggRawAu generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp,
+                                           util::FastqStats *stats);
 
 void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data);
 void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data);
-coding::MpeggRawAu generate_subseqs(const se_data &data, uint64_t block_num);
-coding::MpeggRawAu generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num,
-                                       pe_statistics *pest);
+genie::MpeggRawAu generate_subseqs(const se_data &data, uint64_t block_num);
+genie::MpeggRawAu generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num,
+                                      pe_statistics *pest);
 void generateBlocksPE(const se_data &data, pe_block_data *bdata);
 
 }  // namespace spring
+}  // namespace genie
 
 #endif  // SPRING_GENERATE_READ_STREAMS_H_

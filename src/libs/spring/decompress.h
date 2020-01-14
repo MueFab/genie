@@ -7,6 +7,7 @@
 #include <vector>
 #include "util.h"
 
+namespace genie {
 namespace spring {
 
 struct decoded_desc_t {
@@ -31,5 +32,5 @@ void read_fastq_record_from_ifstream(std::ifstream &in, format::fastq::FastqReco
 preserve_quality);*/
 
 }  // namespace spring
-
+}  // namespace genie
 #endif  // SPRING_DECOMPRESS_H_

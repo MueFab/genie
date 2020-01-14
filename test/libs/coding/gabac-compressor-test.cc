@@ -1,4 +1,4 @@
-#include <coding/gabac-compressor.h>
+#include <gabac/gabac-compressor.h>
 #include <gtest/gtest.h>
 #include <util/drain.h>
 #include <iostream>
@@ -27,8 +27,8 @@ TEST(GabacCompressor, NonEmpty) {  // NOLINT(cert-err58-cpp)
                     }
                     std::cout << "\tSubSequence " << getSubsequence(subseqpayload.getID()).name << ":" << std::endl;
                     for (auto& transformedPayload : subseqpayload.getTransformedPayloads()) {
-                        auto datablock = transformedPayload.move(); // Extract the data
-                        std::cout << "\t\tTransformedSequence " << datablock.getRawSize() << " bytes" << std::endl;
+                        auto util::DataBlock = transformedPayload.move(); // Extract the data
+                        std::cout << "\t\tTransformedSequence " << util::DataBlock.getRawSize() << " bytes" << std::endl;
                     }
                 }
                 std::cout << std::endl;
@@ -52,7 +52,7 @@ TEST(GabacCompressor, NonEmpty) {  // NOLINT(cert-err58-cpp)
 
     for (size_t i = 0; i < 50; ++i) {
         raw_aus.get(GenSub::RLEN).push(i);  // Append some data for one selected subsequence
-        // See coding/constants.cpp/getDescriptors() or coding/constants.h/GenSub for all valid descriptors and how many
+        // See backbone/constants.cpp/getDescriptors() or backbone/constants.h/GenSub for all valid descriptors and how many
         // subsequences there are for each descriptor (here we are only populating sequence 0). Maybe even use different,
         // random data for each run? You should vary test data a little bit to cover more cases and also use different
         // descriptor streams

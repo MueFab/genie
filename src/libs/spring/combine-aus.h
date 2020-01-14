@@ -5,6 +5,7 @@
 #include <string>
 #include "util.h"
 
+namespace genie {
 namespace spring {
 
 void combine_aus(const std::string &temp_dir, compression_params &cp,
@@ -12,5 +13,6 @@ void combine_aus(const std::string &temp_dir, compression_params &cp,
                  const std::string &outputFilePath, util::FastqStats *stats);
 
 }  // namespace spring
+}  // namespace genie
 
 #endif  // SPRING_COMBINE_AUS_H_

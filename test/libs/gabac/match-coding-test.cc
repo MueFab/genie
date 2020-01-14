@@ -1,6 +1,6 @@
-#include <gabac/data-block.h>
 #include <gabac/match-coding.h>
 #include <gtest/gtest.h>
+#include <util/data-block.h>
 #include <algorithm>
 #include <functional>
 #include <iostream>
@@ -17,13 +17,13 @@ class MatchCodingTest : public ::testing::Test {
 };
 
 TEST_F(MatchCodingTest, transformMatchCoding) {
-    gabac::DataBlock symbols(0, 8);
-    gabac::DataBlock pointers(0, 4);
-    gabac::DataBlock expectedPointers(0, 4);
-    gabac::DataBlock lengths(0, 4);
-    gabac::DataBlock expectedLengths(0, 4);
-    gabac::DataBlock rawValues(0, 8);
-    gabac::DataBlock expectedRawValues(0, 8);
+    util::DataBlock symbols(0, 8);
+    util::DataBlock pointers(0, 4);
+    util::DataBlock expectedPointers(0, 4);
+    util::DataBlock lengths(0, 4);
+    util::DataBlock expectedLengths(0, 4);
+    util::DataBlock rawValues(0, 8);
+    util::DataBlock expectedRawValues(0, 8);
     int windowSize;
 
     for (auto& windowSizeIt : windowSizes) {
@@ -65,10 +65,10 @@ TEST_F(MatchCodingTest, transformMatchCoding) {
 }
 
 TEST_F(MatchCodingTest, inverseTransformMatchCoding) {
-    gabac::DataBlock expectedSymbols(0, 8);
-    gabac::DataBlock pointers(0, 4);
-    gabac::DataBlock lengths(0, 4);
-    gabac::DataBlock rawValues(0, 8);
+    util::DataBlock expectedSymbols(0, 8);
+    util::DataBlock pointers(0, 4);
+    util::DataBlock lengths(0, 4);
+    util::DataBlock rawValues(0, 8);
 
     // Void input shall lead to void output
     pointers = {};
@@ -100,11 +100,11 @@ TEST_F(MatchCodingTest, inverseTransformMatchCoding) {
 }
 
 TEST_F(MatchCodingTest, roundTripCoding) {
-    gabac::DataBlock symbols(0, 8);
-    gabac::DataBlock decodedSymbols(0, 8);
-    gabac::DataBlock pointers(0, 4);
-    gabac::DataBlock lengths(0, 4);
-    gabac::DataBlock rawValues(0, 8);
+    util::DataBlock symbols(0, 8);
+    util::DataBlock decodedSymbols(0, 8);
+    util::DataBlock pointers(0, 4);
+    util::DataBlock lengths(0, 4);
+    util::DataBlock rawValues(0, 8);
 
     // test large file size word size 1
     symbols.resize(largeTestSize);

@@ -1,6 +1,7 @@
 #include "bitset-util.h"
 #include "params.h"
 
+namespace genie {
 namespace spring {
 
 void bbhashdict::findpos(int64_t *dictidx, const uint64_t &startposidx) {
@@ -40,5 +41,5 @@ void bbhashdict::remove(int64_t *dictidx, const uint64_t &startposidx, const int
 
     return;
 }
-
 }  // namespace spring
+}  // namespace genie

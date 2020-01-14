@@ -7,6 +7,7 @@
 #include <omp.h>
 #endif
 
+namespace genie {
 namespace spring {
 
 const uint16_t MAX_READ_LEN = 511;
@@ -55,5 +56,6 @@ class omp_lock {
 #endif /* GENIE_USE_OPENMP */
 
 }  // namespace spring
+}  // namespace genie
 
 #endif  // SPRING_PARAMS_H_
