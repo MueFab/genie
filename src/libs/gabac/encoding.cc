@@ -10,19 +10,20 @@
 #include <cmath>
 #include <vector>
 
-#include "block-stepper.h"
 #include "configuration.h"
 #include "constants.h"
-#include "data-block.h"
 #include "encode-cabac.h"
 #include "stream-handler.h"
+#include "util/block-stepper.h"
+#include "util/data-block.h"
 #include "writer.h"
 
+namespace genie {
 namespace gabac {
 
-static uint64_t getMax(const gabac::DataBlock &b) {
+static uint64_t getMax(const util::DataBlock &b) {
     uint64_t max = 0;
-    gabac::BlockStepper r = b.getReader();
+    util::BlockStepper r = b.getReader();
     while (r.isValid()) {
         max = std::max(max, r.get());
     }
@@ -30,7 +31,7 @@ static uint64_t getMax(const gabac::DataBlock &b) {
 }
 
 void doSequenceTransform(const gabac::SequenceTransformationId &transID, uint64_t param,
-                         std::vector<gabac::DataBlock> *const transformedSequences) {
+                         std::vector<util::DataBlock> *const transformedSequences) {
     // GABACIFY_LOG_TRACE << "Encoding sequence of length: " <<
     // (*transformedSequences)[0].size();
 
@@ -48,7 +49,7 @@ void doSequenceTransform(const gabac::SequenceTransformationId &transID, uint64_
 }
 
 static void encodeStream(const gabac::TransformedSequenceConfiguration &conf,
-                         gabac::DataBlock *const diffAndLutTransformedSequence, std::ostream *out) {
+                         util::DataBlock *const diffAndLutTransformedSequence, std::ostream *out) {
     // Encoding
     gabac::encode_cabac(conf.binarizationId, conf.binarizationParameters, conf.contextSelectionId,
                         diffAndLutTransformedSequence);
@@ -56,7 +57,7 @@ static void encodeStream(const gabac::TransformedSequenceConfiguration &conf,
     gabac::StreamHandler::writeStream(*out, diffAndLutTransformedSequence);
 }
 
-void doLutTransform(unsigned int order, std::vector<gabac::DataBlock> *const lutSequences, unsigned *bits0,
+void doLutTransform(unsigned int order, std::vector<util::DataBlock> *const lutSequences, unsigned *bits0,
                     std::ostream *out) {
     // GABACIFY_LOG_TRACE << "LUT transform *en*abled";
 
@@ -88,7 +89,7 @@ void doLutTransform(unsigned int order, std::vector<gabac::DataBlock> *const lut
     }
 }
 
-void doDiffTransform(std::vector<gabac::DataBlock> *const sequence) {
+void doDiffTransform(std::vector<util::DataBlock> *const sequence) {
     // GABACIFY_LOG_TRACE << "LUT transform *en*abled";
 
     // Put raw sequence in, get transformed sequence and lut tables
@@ -100,8 +101,8 @@ void doDiffTransform(std::vector<gabac::DataBlock> *const sequence) {
 }
 
 static void encodeSingleSequence(const gabac::TransformedSequenceConfiguration &configuration,
-                                 gabac::DataBlock *const seq, std::ostream *out) {
-    std::vector<gabac::DataBlock> lutTransformedSequences;
+                                 util::DataBlock *const seq, std::ostream *out) {
+    std::vector<util::DataBlock> lutTransformedSequences;
 
     // Symbol/transformed symbols, lut0 bytestream, lut1 bytestream
     lutTransformedSequences.resize(1);
@@ -123,7 +124,7 @@ static void encodeSingleSequence(const gabac::TransformedSequenceConfiguration &
 
 void encode(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
     conf.validate();
-    gabac::DataBlock sequence(0, 1);
+    util::DataBlock sequence(0, 1);
     sequence.setWordSize(static_cast<uint8_t>(enConf.wordSize));
     size_t size = 0;
     if (!conf.blocksize) {
@@ -133,7 +134,7 @@ void encode(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
     }
     while (size) {
         // Insert sequence into vector
-        std::vector<gabac::DataBlock> transformedSequences;
+        std::vector<util::DataBlock> transformedSequences;
         transformedSequences.resize(1);
         transformedSequences[0].swap(&sequence);
 
@@ -155,5 +156,5 @@ void encode(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
         }
     }
 }
-
 }  // namespace gabac
+}  // namespace genie

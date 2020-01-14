@@ -3,14 +3,14 @@
 
 #include <genie/stream-saver.h>
 
-namespace dsg {
+namespace genie {
 
-void StreamSaver::run_gabac(const std::string &name, gabac::DataBlock *data, bool decompression) {
+void StreamSaver::run_gabac(const std::string &name, util::DataBlock *data, bool decompression) {
     gabac::EncodingConfiguration enConf = configs.at(getConfigName(name));
     uint64_t insize = data->getRawSize();
 
     gabac::IBufferStream istream(data, 0);
-    gabac::DataBlock out(0, 1);
+    util::DataBlock out(0, 1);
     gabac::OBufferStream ostream(&out);
 
     // Configure gabac streams
@@ -31,12 +31,12 @@ void StreamSaver::run_gabac(const std::string &name, gabac::DataBlock *data, boo
               << std::endl;
 }
 
-void StreamSaver::analyze(const std::string &name, gabac::DataBlock *data) {
+void StreamSaver::analyze(const std::string &name, util::DataBlock *data) {
     std::string configname = getConfigName(name);
     uint64_t insize = data->getRawSize();
 
     gabac::IBufferStream istream(data, 0);
-    gabac::DataBlock out(0, 1);
+    util::DataBlock out(0, 1);
     std::ofstream outfile(this->configPath + configname + ".json");
     outfile.exceptions(std::ios::badbit | std::ios::failbit);
 
@@ -53,9 +53,9 @@ void StreamSaver::analyze(const std::string &name, gabac::DataBlock *data) {
     gabac::analyze(ioconf, aconf);
 }
 
-void StreamSaver::compress(const std::string &name, gabac::DataBlock *data) {
-    gabac::DataBlock original;
-    gabac::DataBlock decompressed;
+void StreamSaver::compress(const std::string &name, util::DataBlock *data) {
+    util::DataBlock original;
+    util::DataBlock decompressed;
     if (debug) {
         original = *data;
     }
@@ -88,7 +88,7 @@ void StreamSaver::compress(const std::string &name, gabac::DataBlock *data) {
     }
 }
 
-void StreamSaver::decompress(const std::string &name, gabac::DataBlock *data) { run_gabac(name, data, true); }
+void StreamSaver::decompress(const std::string &name, util::DataBlock *data) { run_gabac(name, data, true); }
 
 std::string StreamSaver::getConfigName(const std::string &stream) {
     std::regex subseq("^subseq\\.[0-9]+\\.[0-9]+\\.[0-9]+$");
@@ -109,7 +109,7 @@ std::string StreamSaver::getConfigName(const std::string &stream) {
     return stream;
 }
 
-uint64_t StreamSaver::pack(const gabac::DataBlock &data, const std::string &stream_name) {
+uint64_t StreamSaver::pack(const util::DataBlock &data, const std::string &stream_name) {
     // Write name of input file
     uint64_t size = stream_name.size();
 
@@ -128,7 +128,7 @@ uint64_t StreamSaver::pack(const gabac::DataBlock &data, const std::string &stre
     return size;
 }
 
-void StreamSaver::unpack(const std::string &stream_name, gabac::DataBlock *data) {
+void StreamSaver::unpack(const std::string &stream_name, util::DataBlock *data) {
     auto position = file_index.find(stream_name);
     if (position == file_index.end()) {
         data->clear();
@@ -227,7 +227,7 @@ void StreamSaver::loadConfig(const std::string &name) {
 
         configs.emplace(name, enconf);
     } else {
-        gabac::DataBlock block(0, 1);
+        util::DataBlock block(0, 1);
         unpack("conf_" + name + ".json", &block);
         std::string json(block.getRawSize(), ' ');
         std::memcpy(&json[0], block.getData(), block.getRawSize());
@@ -247,7 +247,7 @@ uint64_t StreamSaver::finish() {
     off_t size = 0;
     for (const auto &e : getParams()) {
         std::string params = configs.at(e.first).toJsonString();
-        gabac::DataBlock block(&params);
+        util::DataBlock block(&params);
         size += pack(block, "conf_" + e.first + ".json");
     }
     return size;
@@ -264,4 +264,4 @@ const std::string &StreamSaver::getDefaultConf() {
         "context_selection_id\":1}]}";
     return defaultGabacConf;
 }
-}  // namespace dsg
+}  // namespace genie

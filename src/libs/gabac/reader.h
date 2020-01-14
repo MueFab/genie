@@ -14,13 +14,15 @@
 #include "binary-arithmetic-decoder.h"
 #include "bit-input-stream.h"
 
-namespace gabac {
-
+namespace util {
 class DataBlock;
+}
+namespace genie {
+namespace gabac {
 
 class Reader {
    public:
-    explicit Reader(DataBlock *bitstream);
+    explicit Reader(util::DataBlock *bitstream);
 
     ~Reader();
 
@@ -63,7 +65,7 @@ class Reader {
 
     std::vector<ContextModel> m_contextModels;
 };
-
 }  // namespace gabac
+}  // namespace genie
 
 #endif  // GABAC_READER_H_

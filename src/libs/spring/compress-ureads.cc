@@ -20,11 +20,11 @@
 #include "spring-gabac.h"
 #include "util.h"
 
-#include <format/mpegg_p2/access_unit.h>
-#include <format/mpegg_p2/clutter.h>
-#include <format/mpegg_p2/parameter_set.h>
+#include <mpegg_p2/access_unit.h>
+#include <mpegg_p2/parameter_set.h>
 #include <util/bitwriter.h>
 
+namespace genie {
 namespace spring {
 
 /*void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
@@ -95,7 +95,7 @@ namespace spring {
                     std::min((size_t)num_reads_read[0], (tid + 1) * num_reads_per_block) - tid * num_reads_per_block;
                 subseq_data subseqData;
                 std::string outfile_name_quality;
-                gabac::DataBlock qualityBuffer(0, 1);
+                util::DataBlock qualityBuffer(0, 1);
                 dsg::AcessUnitStreams streams;
                 std::string outfile_name_id;
                 if (!done_loop) {
@@ -148,13 +148,13 @@ namespace spring {
                         if (cp.paired_end) raw_data[8][0].push_back(0);  // pair (in same record)
                     }
 
-                    std::vector<std::vector<std::vector<gabac::DataBlock>>> generated_streams =
+                    std::vector<std::vector<std::vector<util::DataBlock>>> generated_streams =
                         create_default_streams();
-                    for (size_t descriptor = 0; descriptor < format::mpegg_p2::NUM_DESCRIPTORS; ++descriptor) {
+                    for (size_t descriptor = 0; descriptor < mpegg_p2::NUM_DESCRIPTORS; ++descriptor) {
                         if (descriptor != 11) {  // rname
                             for (size_t subdescriptor = 0;
                                  subdescriptor <
-format::mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences;
+mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences;
                                  ++subdescriptor) {
                                 gabac_compress(configs[descriptor][subdescriptor], &raw_data[descriptor][subdescriptor],
                                                &generated_streams[descriptor][subdescriptor]);
@@ -174,7 +174,7 @@ format::mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences;
                     uint32_t ACCESS_UNIT_ID = block_num_thr;
                     uint32_t num_reads_au = cp.paired_end ? num_reads_thr * 2 : num_reads_thr;
                     AccessUnit au = createQuickAccessUnit(
-                        ACCESS_UNIT_ID, PARAMETER_SET_ID, num_reads_au, .format::mpegg_rec::ClassType::CLASS_U,
+                        ACCESS_UNIT_ID, PARAMETER_SET_ID, num_reads_au, .backbone::mpegg_rec::ClassType::CLASS_U,
                         DataUnit::DatasetType::NON_ALIGNED, &generated_streams, num_reads_thr);
 
 #ifdef GENIE_USE_OPENMP
@@ -203,3 +203,4 @@ format::mpegg_p2::getDescriptorProperties()[descriptor].number_subsequences;
 }*/
 
 }  // namespace spring
+}  // namespace genie

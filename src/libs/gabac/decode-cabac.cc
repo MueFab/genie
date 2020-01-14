@@ -10,14 +10,16 @@
 #include <limits>
 
 #include "constants.h"
-#include "data-block.h"
 #include "reader.h"
+#include "util/data-block.h"
 
+namespace genie {
 namespace gabac {
 
 void decode_cabac(const BinarizationId& binarizationId, const std::vector<unsigned int>& binarizationParameters,
-                  const ContextSelectionId& contextSelectionId, const uint8_t wordsize, DataBlock* const bitstream) {
-    DataBlock symbols(0, wordsize);
+                  const ContextSelectionId& contextSelectionId, const uint8_t wordsize,
+                  util::DataBlock* const bitstream) {
+    util::DataBlock symbols(0, wordsize);
     if (bitstream == nullptr) {
         GABAC_DIE("Bitstream is null");
     }
@@ -34,7 +36,7 @@ void decode_cabac(const BinarizationId& binarizationId, const std::vector<unsign
         binarizationParameter = binarizationParameters[0];
     }
 
-    BlockStepper r = symbols.getReader();
+    util::BlockStepper r = symbols.getReader();
 
     if (contextSelectionId == ContextSelectionId::bypass) {
         uint64_t (Reader::*func)(unsigned int);
@@ -148,3 +150,4 @@ void decode_cabac(const BinarizationId& binarizationId, const std::vector<unsign
 }
 
 }  // namespace gabac
+}  // namespace genie

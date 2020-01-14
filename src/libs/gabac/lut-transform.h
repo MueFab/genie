@@ -7,15 +7,20 @@
 #ifndef GABAC_LUT_TRANSFORM_H_
 #define GABAC_LUT_TRANSFORM_H_
 
+namespace util {
+class DataBlock;
+}
+
+namespace genie {
 namespace gabac {
 
-class DataBlock;
+void transformLutTransform(unsigned order, util::DataBlock *transformedSymbols, util::DataBlock *inverseLUT,
+                           util::DataBlock *inverseLUT1);
 
-void transformLutTransform(unsigned order, DataBlock *transformedSymbols, DataBlock *inverseLUT,
-                           DataBlock *inverseLUT1);
-
-void inverseTransformLutTransform(unsigned order, DataBlock *symbols, DataBlock *inverseLUT, DataBlock *inverseLUT1);
+void inverseTransformLutTransform(unsigned order, util::DataBlock *symbols, util::DataBlock *inverseLUT,
+                                  util::DataBlock *inverseLUT1);
 
 }  // namespace gabac
+}  // namespace genie
 
 #endif  // GABAC_LUT_TRANSFORM_H_

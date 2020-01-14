@@ -1,8 +1,8 @@
 #include <gabac/constants.h>
-#include <gabac/data-block.h>
 #include <gabac/decode-cabac.h>
 #include <gabac/encode-cabac.h>
 #include <gtest/gtest.h>
+#include <util/data-block.h>
 #include <algorithm>
 #include <functional>
 #include <iostream>
@@ -20,9 +20,9 @@ class CoreTest : public ::testing::Test {
 constexpr unsigned int CoreTest::params[];
 
 TEST_F(CoreTest, encode) {
-    std::vector<gabac::DataBlock> symbols = {gabac::DataBlock(0, 8), gabac::DataBlock(0, 8)};
+    std::vector<util::DataBlock> symbols = {util::DataBlock(0, 8), util::DataBlock(0, 8)};
     symbols[1] = {1, 2, 3};
-    gabac::DataBlock bitstream;
+    util::DataBlock bitstream;
     bitstream = {1, 3, 4};
 
     // Check parameter lengths
@@ -49,15 +49,15 @@ TEST_F(CoreTest, roundTrip) {
 
     std::vector<std::string> ctxNames = {"bypass", "order0", "order1", "order2"};
 
-    gabac::DataBlock bitstream;
-    gabac::DataBlock decodedSymbols(0, 8);
+    util::DataBlock bitstream;
+    util::DataBlock decodedSymbols(0, 8);
 
     // Roundtrips
     for (int c = 0; c < 4; ++c) {
         for (int b = 0; b < 6; ++b) {
-            gabac::DataBlock ran(1024, 8);
+            util::DataBlock ran(1024, 8);
             gabac_tests::fillVectorRandomUniform(intervals[b][0], intervals[b][1], &ran);
-            gabac::DataBlock sym(ran);
+            util::DataBlock sym(ran);
             std::cout << "---> Testing binarization " + binNames[b] + " and context selection " + ctxNames[c] + "..."
                       << std::endl;
             EXPECT_NO_THROW(gabac::encode_cabac(gabac::BinarizationId(b), binarizationParameters[b],

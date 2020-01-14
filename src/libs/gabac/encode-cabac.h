@@ -12,17 +12,20 @@
 #include <limits>
 #include <vector>
 
+namespace util {
+class DataBlock;
+}
+
+namespace genie {
 namespace gabac {
 
 enum class BinarizationId;
 enum class ContextSelectionId;
 
-class DataBlock;
-
 void encode_cabac(const BinarizationId& binarizationId, const std::vector<uint32_t>& binarizationParameters,
-                  const ContextSelectionId& contextSelectionId, DataBlock* symbols,
+                  const ContextSelectionId& contextSelectionId, util::DataBlock* symbols,
                   size_t maxsize = std::numeric_limits<size_t>::max());
 
 }  // namespace gabac
-
+}  // namespace genie
 #endif  // GABAC_ENCODE_CABAC_H_

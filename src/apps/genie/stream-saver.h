@@ -16,13 +16,13 @@
 
 #include <gabac/gabac.h>
 
-namespace dsg {
+namespace genie {
 struct AcessUnitStreams {
-    std::map<uint8_t, std::map<uint8_t, gabac::DataBlock>> streams;
+    std::map<uint8_t, std::map<uint8_t, util::DataBlock>> streams;
 };
 class StreamSaver {
    private:
-    void run_gabac(const std::string &stream_name, gabac::DataBlock *data, bool decompression);
+    void run_gabac(const std::string &stream_name, util::DataBlock *data, bool decompression);
 
     struct Streampos {
         std::streampos position;
@@ -41,12 +41,12 @@ class StreamSaver {
 
     std::string configPath;  // Path to gabac config directory
 
-    void analyze(const std::string &name, gabac::DataBlock *data);
-    void compress(const std::string &name, gabac::DataBlock *data);
-    void decompress(const std::string &name, gabac::DataBlock *data);
+    void analyze(const std::string &name, util::DataBlock *data);
+    void compress(const std::string &name, util::DataBlock *data);
+    void decompress(const std::string &name, util::DataBlock *data);
 
-    uint64_t pack(const gabac::DataBlock &data, const std::string &stream_name);  // Pack stream into file
-    void unpack(const std::string &stream_name, gabac::DataBlock *data);          // Pack stream into file
+    uint64_t pack(const util::DataBlock &data, const std::string &stream_name);  // Pack stream into file
+    void unpack(const std::string &stream_name, util::DataBlock *data);          // Pack stream into file
 
     struct gabac_stream_params {
         uint64_t maxval;   // Maximum value in stream
@@ -72,5 +72,5 @@ class StreamSaver {
 
     ~StreamSaver();
 };
-}  // namespace dsg
+}  // namespace genie
 #endif  // GENIE_STREAM_SAVER_H

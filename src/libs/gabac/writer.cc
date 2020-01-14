@@ -20,6 +20,7 @@
 #include "binary-arithmetic-encoder.cc"
 #include "gabac.h"
 
+namespace genie {
 namespace gabac {
 
 static unsigned int bitLength(uint64_t value) {
@@ -222,3 +223,4 @@ void Writer::writeAsSTEGcabac(uint64_t input, unsigned int cSignedTruncExpGolPar
 void Writer::writeNumSymbols(unsigned int numSymbols) { m_bitOutputStream.write(numSymbols, 32); }
 
 }  // namespace gabac
+}  // namespace genie

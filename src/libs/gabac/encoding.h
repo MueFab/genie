@@ -7,6 +7,7 @@
 #ifndef GABAC_ENCODING_H_
 #define GABAC_ENCODING_H_
 
+namespace genie {
 namespace gabac {
 
 struct IOConfiguration;
@@ -15,5 +16,6 @@ struct EncodingConfiguration;
 void encode(const IOConfiguration& conf, const EncodingConfiguration& enConf);
 
 }  // namespace gabac
+}  // namespace genie
 
 #endif  // GABAC_ENCODING_H_

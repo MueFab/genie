@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 #include <vector>
-
+namespace genie {
 class generated_aus_ref {
     std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> refAus;
     std::vector<uint64_t> refStart;
@@ -29,5 +29,5 @@ class generated_aus {
 
     const std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> &getEncodedFastqAus() const;
 };
-
+}  // namespace genie
 #endif  // GENIE_RETURN_STRUCTURES_H

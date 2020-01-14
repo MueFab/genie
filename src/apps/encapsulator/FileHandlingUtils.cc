@@ -4,9 +4,9 @@
  */
 
 #include "FileHandlingUtils.h"
-#include "format/mpegg_p1/dataset.h"
-#include "format/mpegg_p2/data-unit-factory.h"
-#include "format/mpegg_p2/parameter_set.h"
+#include <mpegg_p1/dataset.h>
+#include <mpegg_p2/data-unit-factory.h>
+#include <mpegg_p2/parameter_set.h>
 
 // DatasetHeader *
 // initDatasetHeaderNoMIT(DatasetGroupId datasetGroupId, DatasetId datasetId, char *version, bool multipleAlignmentFlag,
@@ -120,9 +120,9 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
             }
         }*/
 
-    std::vector<std::unique_ptr<format::mpegg_p2::DataUnit>> dataUnits;
+    std::vector<std::unique_ptr<genie::mpegg_p2::DataUnit>> dataUnits;
 
-    format::mpegg_p2::DataUnitFactory dataUnitFactory;
+    genie::mpegg_p2::DataUnitFactory dataUnitFactory;
     // while (inputFileBitReader.isGood()) {
     dataUnits.push_back(dataUnitFactory.read(inputFileBitReader));
     //}
@@ -137,8 +137,8 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
     // - DatasetParameterSet
     // - AccessUnit[]
 
-    std::vector<std::unique_ptr<format::mpegg_p1::Dataset>> datasets;
-    datasets.push_back(format::mpegg_p1::Dataset::createFromDataUnits(dataUnits));
+    std::vector<std::unique_ptr<genie::mpegg_p1::Dataset>> datasets;
+    datasets.push_back(genie::mpegg_p1::Dataset::createFromDataUnits(dataUnits));
 
     // DatasetGroup consists of:
     // - DatasetGroupHeader

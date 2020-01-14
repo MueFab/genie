@@ -20,6 +20,7 @@
 #include "spring-gabac.h"
 #include "util.h"
 
+namespace genie {
 namespace spring {
 
 void reorder_compress_quality_id(const std::string &temp_dir, const compression_params &cp,
@@ -168,7 +169,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
             id_array_block[j - block_start[block_num]] = id_array[index];
         }
         auto raw_data = generate_empty_raw_data();
-        std::vector<std::vector<std::vector<gabac::DataBlock>>> generated_streams = create_default_streams();
+        std::vector<std::vector<std::vector<util::DataBlock>>> generated_streams = create_default_streams();
         generate_read_id_tokens(id_array_block, block_end[block_num] - block_start[block_num], raw_data[15]);
         for (int i = 0; i < 128; i++) {
             for (int j = 0; j < 6; j++) {
@@ -224,7 +225,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
 #endif
         for (uint64_t block_num = start_block_num; block_num < end_block_num; block_num++) {
             auto raw_data = generate_empty_raw_data();
-            std::vector<std::vector<std::vector<gabac::DataBlock>>> generated_streams = create_default_streams();
+            std::vector<std::vector<std::vector<util::DataBlock>>> generated_streams = create_default_streams();
             for (uint32_t i = block_start[block_num]; i < block_end[block_num]; i++)
                 for (size_t pos_in_read = 0; pos_in_read < quality_array[i - block_start[start_block_num]].size();
                      pos_in_read++)
@@ -302,7 +303,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
             uint32_t num_reads_block = (uint32_t)(end_read_num - start_read_num);
 
             auto raw_data = generate_empty_raw_data();
-            std::vector<std::vector<std::vector<gabac::DataBlock>>> generated_streams = create_default_streams();
+            std::vector<std::vector<std::vector<util::DataBlock>>> generated_streams = create_default_streams();
             if (mode == "id") {
                 generate_read_id_tokens(str_array + start_read_num, num_reads_block, raw_data[15]);
                 for (int i = 0; i < 128; i++) {
@@ -344,7 +345,7 @@ void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std
     }
 }
 
-void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std::vector<gabac::DataBlock> &tokens) {
+void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std::vector<util::DataBlock> &tokens) {
     char prev_ID[MAX_NUM_TOKENS_ID] = {0};
     uint32_t prev_tokens_ptr[MAX_NUM_TOKENS_ID] = {0};
     for (uint32_t id_num = 0; id_num < num_ids; id_num++) {
@@ -357,5 +358,5 @@ void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std
         generate_id_tokens(prev_ID, prev_tokens_ptr, id_array[id_num], tokens);
     }
 }
-
 }  // namespace spring
+}  // namespace genie

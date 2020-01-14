@@ -13,6 +13,7 @@
 #include "preprocess.h"
 #include "util.h"
 
+namespace genie {
 namespace spring {
 
 /*void preprocess(format::fastq::FastqFileReader *fastqFileReader1, format::fastq::FastqFileReader *fastqFileReader2,
@@ -206,3 +207,4 @@ namespace spring {
 }*/
 
 }  // namespace spring
+}  // namespace genie

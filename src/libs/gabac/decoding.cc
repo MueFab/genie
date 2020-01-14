@@ -12,15 +12,16 @@
 
 #include "configuration.h"
 #include "constants.h"
-#include "data-block.h"
 #include "decode-cabac.h"
 #include "reader.h"
 #include "stream-handler.h"
+#include "util/data-block.h"
 
+namespace genie {
 namespace gabac {
 
-static void decodeInverseLUT(unsigned bits0, unsigned order, std::istream *inStream, gabac::DataBlock *const inverseLut,
-                             gabac::DataBlock *const inverseLut1) {
+static void decodeInverseLUT(unsigned bits0, unsigned order, std::istream *inStream, util::DataBlock *const inverseLut,
+                             util::DataBlock *const inverseLut1) {
     size_t streamSize = StreamHandler::readStream(*inStream, inverseLut);
     if (streamSize <= 0) return;
 
@@ -62,11 +63,11 @@ static void decodeInverseLUT(unsigned bits0, unsigned order, std::istream *inStr
     }
 }
 
-static void doDiffCoding(bool enabled, gabac::DataBlock *const lutTransformedSequence) {
+static void doDiffCoding(bool enabled, util::DataBlock *const lutTransformedSequence) {
     // Diff libs
     if (enabled) {
         // GABACIFY_LOG_TRACE << "Diff libs *en*abled";
-        std::vector<gabac::DataBlock> vec(1);
+        std::vector<util::DataBlock> vec(1);
         vec[0].swap(lutTransformedSequence);
         gabac::getTransformation(gabac::SequenceTransformationId::diff_coding).inverseTransform({}, &vec);
         vec[0].swap(lutTransformedSequence);
@@ -76,7 +77,7 @@ static void doDiffCoding(bool enabled, gabac::DataBlock *const lutTransformedSeq
     // GABACIFY_LOG_TRACE << "Diff libs *dis*abled";
 }
 
-static void doLUTCoding(bool enabled, unsigned order, std::vector<gabac::DataBlock> *const lutSequences) {
+static void doLUTCoding(bool enabled, unsigned order, std::vector<util::DataBlock> *const lutSequences) {
     if (enabled) {
         // GABACIFY_LOG_TRACE << "LUT transform *en*abled";
 
@@ -91,7 +92,7 @@ static void doLUTCoding(bool enabled, unsigned order, std::vector<gabac::DataBlo
 
 static void doEntropyCoding(const gabac::TransformedSequenceConfiguration &transformedSequenceConfiguration,
                             uint8_t wordsize, std::istream *inStream,
-                            gabac::DataBlock *const diffAndLutTransformedSequence) {
+                            util::DataBlock *const diffAndLutTransformedSequence) {
     size_t streamSize = StreamHandler::readStream(*inStream, diffAndLutTransformedSequence);
     if (streamSize <= 0) return;
     // GABACIFY_LOG_TRACE << "Bitstream size: " <<
@@ -109,12 +110,12 @@ void decode(const IOConfiguration &ioConf, const EncodingConfiguration &enConf) 
         size_t numTransformedSequences = gabac::getTransformation(enConf.sequenceTransformationId).wordsizes.size();
 
         // Loop through the transformed sequences
-        std::vector<gabac::DataBlock> transformedSequences;
+        std::vector<util::DataBlock> transformedSequences;
         for (size_t i = 0; i < numTransformedSequences; i++) {
             // GABACIFY_LOG_TRACE << "Processing transformed sequence: " << i;
             auto transformedSequenceConfiguration = enConf.transformedSequenceConfigurations.at(i);
 
-            std::vector<gabac::DataBlock> lutTransformedSequences(3);
+            std::vector<util::DataBlock> lutTransformedSequences(3);
             if (transformedSequenceConfiguration.lutTransformationEnabled) {
                 decodeInverseLUT(enConf.transformedSequenceConfigurations[i].lutBits,
                                  enConf.transformedSequenceConfigurations[i].lutOrder, ioConf.inputStream,
@@ -148,3 +149,5 @@ void decode(const IOConfiguration &ioConf, const EncodingConfiguration &enConf) 
 }
 
 }  // namespace gabac
+
+}  // namespace genie

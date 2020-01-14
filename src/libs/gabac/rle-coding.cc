@@ -8,11 +8,11 @@
 
 #include <cassert>
 
-#include "block-stepper.h"
-
+#include "util/block-stepper.h"
+namespace genie {
 namespace gabac {
 
-void transformRleCoding(const uint64_t guard, gabac::DataBlock *const rawValues, gabac::DataBlock *const lengths) {
+void transformRleCoding(const uint64_t guard, util::DataBlock *const rawValues, util::DataBlock *const lengths) {
     assert(guard > 0);
     assert(rawValues != nullptr);
     assert(lengths != nullptr);
@@ -26,8 +26,8 @@ void transformRleCoding(const uint64_t guard, gabac::DataBlock *const rawValues,
     // input for rawValues is guaranteed to grow slower than reading process
     // -> in place possible
 
-    BlockStepper r = rawValues->getReader();
-    BlockStepper w = rawValues->getReader();
+    util::BlockStepper r = rawValues->getReader();
+    util::BlockStepper w = rawValues->getReader();
 
     uint64_t cur = r.get();
     r.inc();
@@ -61,8 +61,7 @@ void transformRleCoding(const uint64_t guard, gabac::DataBlock *const rawValues,
     rawValues->resize(rawValues->size() - (w.end - w.curr) / w.wordSize);
 }
 
-void inverseTransformRleCoding(const uint64_t guard, gabac::DataBlock *const rawValues,
-                               gabac::DataBlock *const lengths) {
+void inverseTransformRleCoding(const uint64_t guard, util::DataBlock *const rawValues, util::DataBlock *const lengths) {
     assert(rawValues != nullptr);
     assert(!rawValues->empty());
     assert(guard > 0);
@@ -70,10 +69,10 @@ void inverseTransformRleCoding(const uint64_t guard, gabac::DataBlock *const raw
     // input for rawValues is not guaranteed to grow slower than reading process
     // -> in place not possible
 
-    gabac::DataBlock symbols(0, rawValues->getWordSize());
+    util::DataBlock symbols(0, rawValues->getWordSize());
 
-    BlockStepper rVal = rawValues->getReader();
-    BlockStepper rLen = lengths->getReader();
+    util::BlockStepper rVal = rawValues->getReader();
+    util::BlockStepper rLen = lengths->getReader();
     // Re-compute the symbol sequence
     while (rVal.isValid()) {
         uint64_t rawValue = rVal.get();
@@ -97,5 +96,5 @@ void inverseTransformRleCoding(const uint64_t guard, gabac::DataBlock *const raw
     lengths->clear();
     lengths->shrink_to_fit();
 }
-
 }  // namespace gabac
+}  // namespace genie

@@ -95,16 +95,16 @@ int gabac_data_block_resize(gabac_data_block *block, size_t size) {
 }
 
 int gabac_data_block_equals(gabac_data_block *block1, gabac_data_block *block2) {
-    return gabac::DataBlock(block1->values, block1->values_size, block1->word_size) ==
-           gabac::DataBlock(block2->values, block2->values_size, block2->word_size);
+    return util::DataBlock(block1->values, block1->values_size, block1->word_size) ==
+           util::DataBlock(block2->values, block2->values_size, block2->word_size);
 }
 
 uint64_t gabac_data_block_max(gabac_data_block *block) {
-    return gabac::DataBlock(block->values, block->values_size, block->word_size).getMaximum();
+    return util::DataBlock(block->values, block->values_size, block->word_size).getMaximum();
 }
 
 uint8_t gabac_data_block_max_wordsize(gabac_data_block *block) {
-    return gabac::DataBlock(block->values, block->values_size, block->word_size).getMaxWordSize();
+    return util::DataBlock(block->values, block->values_size, block->word_size).getMaxWordSize();
 }
 
 uint64_t gabac_data_block_get(const gabac_data_block *block, size_t index) {
@@ -219,11 +219,11 @@ int gabac_stream_release(gabac_stream *stream) {
 
 int gabac_execute_transform(uint8_t transformationID, const uint64_t *param, int inverse, gabac_data_block *input) {
     try {
-        auto transID = gabac::SequenceTransformationId(transformationID);
-        std::vector<gabac::DataBlock> blocks(gabac::getTransformation(transID).wordsizes.size());
+        auto transID = genie::gabac::SequenceTransformationId(transformationID);
+        std::vector<util::DataBlock> blocks(genie::gabac::getTransformation(transID).wordsizes.size());
         std::vector<uint64_t> params_vec(gabac_sequence_transform_params[transformationID]);
         for (size_t i = 0; i < blocks.size(); ++i) {
-            blocks[i] = gabac::DataBlock(input[i].values, input[i].values_size, input[i].word_size);
+            blocks[i] = util::DataBlock(input[i].values, input[i].values_size, input[i].word_size);
             if (gabac_data_block_release(&input[i])) {
                 GABAC_DIE("C interface error");
             }
@@ -234,9 +234,9 @@ int gabac_execute_transform(uint8_t transformationID, const uint64_t *param, int
         }
 
         if (inverse) {
-            gabac::getTransformation(transID).inverseTransform(params_vec, &blocks);
+            genie::gabac::getTransformation(transID).inverseTransform(params_vec, &blocks);
         } else {
-            gabac::getTransformation(transID).transform(params_vec, &blocks);
+            genie::gabac::getTransformation(transID).transform(params_vec, &blocks);
         }
 
         for (size_t i = 0; i < blocks.size(); ++i) {
@@ -254,67 +254,68 @@ int gabac_execute_transform(uint8_t transformationID, const uint64_t *param, int
 
 int gabac_run(gabac_operation operation, gabac_io_config *io_config, const char *config_json, size_t json_length) {
     try {
-        gabac::IOConfiguration ioconf_cpp = {nullptr, nullptr, 0, nullptr, gabac::IOConfiguration::LogLevel::TRACE};
+        genie::gabac::IOConfiguration ioconf_cpp = {nullptr, nullptr, 0, nullptr,
+                                                    genie::gabac::IOConfiguration::LogLevel::TRACE};
         ioconf_cpp.blocksize = io_config->blocksize;
-        ioconf_cpp.level = static_cast<gabac::IOConfiguration::LogLevel>(io_config->log_level);
+        ioconf_cpp.level = static_cast<genie::gabac::IOConfiguration::LogLevel>(io_config->log_level);
         std::unique_ptr<std::ostream> output;
         std::unique_ptr<std::ostream> log;
         std::string config(config_json, json_length);
 
         if (io_config->output.input_mode == gabac_stream_mode_FILE) {
-            output.reset(new gabac::OFileStream(static_cast<FILE *>(io_config->output.data)));
+            output.reset(new genie::gabac::OFileStream(static_cast<FILE *>(io_config->output.data)));
         } else {
             auto *ptr = static_cast<gabac_data_block *>(io_config->output.data);
-            gabac::DataBlock tmp(0, ptr->word_size);
-            output.reset(new gabac::OBufferStream(&tmp));
+            util::DataBlock tmp(0, ptr->word_size);
+            output.reset(new genie::gabac::OBufferStream(&tmp));
         }
         ioconf_cpp.outputStream = output.get();
 
         if (io_config->log.input_mode == gabac_stream_mode_FILE) {
-            log.reset(new gabac::OFileStream(static_cast<FILE *>(io_config->log.data)));
+            log.reset(new genie::gabac::OFileStream(static_cast<FILE *>(io_config->log.data)));
         } else {
             auto *ptr = static_cast<gabac_data_block *>(io_config->log.data);
-            gabac::DataBlock tmp(0, ptr->word_size);
-            log.reset(new gabac::OBufferStream(&tmp));
+            util::DataBlock tmp(0, ptr->word_size);
+            log.reset(new genie::gabac::OBufferStream(&tmp));
         }
         ioconf_cpp.logStream = log.get();
 
         {
             std::unique_ptr<std::istream> input;
             if (io_config->input.input_mode == gabac_stream_mode_FILE) {
-                input.reset(new gabac::IFileStream(static_cast<FILE *>(io_config->input.data)));
+                input.reset(new genie::gabac::IFileStream(static_cast<FILE *>(io_config->input.data)));
             } else {
                 auto *cblock = static_cast<gabac_data_block *>(io_config->input.data);
-                gabac::DataBlock tmp(cblock->values, cblock->values_size, cblock->word_size);
+                util::DataBlock tmp(cblock->values, cblock->values_size, cblock->word_size);
                 if (gabac_data_block_resize(cblock, 0)) {
                     GABAC_DIE("Resize failed - input");
                 }
-                input.reset(new gabac::IBufferStream(&tmp));
+                input.reset(new genie::gabac::IBufferStream(&tmp));
             }
             ioconf_cpp.inputStream = input.get();
 
-            gabac::EncodingConfiguration enConf;
-            gabac::AnalysisConfiguration analyseConfig;
+            genie::gabac::EncodingConfiguration enConf;
+            genie::gabac::AnalysisConfiguration analyseConfig;
             switch (operation) {
                 case gabac_operation_ANALYZE:
                     // analyseConfig = ...
-                    gabac::analyze(ioconf_cpp, analyseConfig);
+                    genie::gabac::analyze(ioconf_cpp, analyseConfig);
                     break;
                 case gabac_operation_ENCODE:
-                    enConf = gabac::EncodingConfiguration(config);
-                    gabac::run(ioconf_cpp, enConf, false);
+                    enConf = genie::gabac::EncodingConfiguration(config);
+                    genie::gabac::run(ioconf_cpp, enConf, false);
                     break;
                 case gabac_operation_DECODE:
-                    enConf = gabac::EncodingConfiguration(config);
-                    gabac::run(ioconf_cpp, enConf, true);
+                    enConf = genie::gabac::EncodingConfiguration(config);
+                    genie::gabac::run(ioconf_cpp, enConf, true);
                     break;
             }
         }
 
         if (io_config->output.input_mode == gabac_stream_mode_BUFFER) {
-            gabac::DataBlock b(0, 1);
+            util::DataBlock b(0, 1);
             auto *cblock = static_cast<gabac_data_block *>(io_config->output.data);
-            dynamic_cast<gabac::OBufferStream *>(output.get())->flush(&b);
+            dynamic_cast<genie::gabac::OBufferStream *>(output.get())->flush(&b);
             cblock->word_size = b.getWordSize();
             if (gabac_data_block_resize(cblock, b.size())) {
                 GABAC_DIE("Resize failed - output");
@@ -323,9 +324,9 @@ int gabac_run(gabac_operation operation, gabac_io_config *io_config, const char 
         }
 
         if (io_config->log.input_mode == gabac_stream_mode_BUFFER) {
-            gabac::DataBlock b(0, 1);
+            util::DataBlock b(0, 1);
             auto *cblock = static_cast<gabac_data_block *>(io_config->log.data);
-            dynamic_cast<gabac::OBufferStream *>(log.get())->flush(&b);
+            dynamic_cast<genie::gabac::OBufferStream *>(log.get())->flush(&b);
             cblock->word_size = b.getWordSize();
             if (gabac_data_block_resize(cblock, b.size())) {
                 GABAC_DIE("Resize failed - log");
@@ -333,19 +334,19 @@ int gabac_run(gabac_operation operation, gabac_io_config *io_config, const char 
             memcpy(cblock->values, b.getData(), b.getRawSize());
         }
         return gabac_return_SUCCESS;
-    } catch (gabac::Exception &e) {
+    } catch (genie::gabac::Exception &e) {
         return gabac_return_FAILURE;
     }
 }
 
 int gabac_config_is_general(const char *inconf, size_t inconf_size, uint64_t max, uint8_t wsize) {
-    gabac::EncodingConfiguration conf(std::string(inconf, inconf_size));
+    genie::gabac::EncodingConfiguration conf(std::string(inconf, inconf_size));
     return conf.isGeneral(max, wsize);
 }
 
 int gabac_config_generalize_create(const char *inconf, size_t inconf_size, uint64_t max, uint8_t wsize, char **outconf,
                                    size_t *outconf_size) {
-    gabac::EncodingConfiguration conf(std::string(inconf, inconf_size));
+    genie::gabac::EncodingConfiguration conf(std::string(inconf, inconf_size));
     auto nconf = conf.generalize(max, wsize);
     auto str = nconf.toJsonString();
     *outconf = static_cast<char *>(malloc(sizeof(char) * (str.size() + 1)));
@@ -355,13 +356,13 @@ int gabac_config_generalize_create(const char *inconf, size_t inconf_size, uint6
 }
 
 int gabac_config_is_optimal(const char *inconf, size_t inconf_size, uint64_t max, uint8_t wsize) {
-    gabac::EncodingConfiguration conf(std::string(inconf, inconf_size));
+    genie::gabac::EncodingConfiguration conf(std::string(inconf, inconf_size));
     return conf.isOptimal(max, wsize);
 }
 
 int gabac_config_optimize_create(const char *inconf, size_t inconf_size, uint64_t max, uint8_t wsize, char **outconf,
                                  size_t *outconf_size) {
-    gabac::EncodingConfiguration conf(std::string(inconf, inconf_size));
+    genie::gabac::EncodingConfiguration conf(std::string(inconf, inconf_size));
     auto nconf = conf.optimize(max, wsize);
     auto str = nconf.toJsonString();
     *outconf = static_cast<char *>(malloc(sizeof(char) * (str.size() + 1)));

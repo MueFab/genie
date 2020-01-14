@@ -9,6 +9,7 @@
 
 #include "util/bitwriter.h"
 
+namespace genie {
 namespace gabac {
 
 class ContextModel;
@@ -50,5 +51,6 @@ class BinaryArithmeticEncoder {
 };
 
 }  // namespace gabac
+}  // namespace genie
 
 #endif  // GABAC_BINARY_ARITHMETIC_ENCODER_H_

@@ -9,8 +9,8 @@
 // as input symbol, so this version does only need to allocate memory for the raw values stream. To achieve this, the
 // equality flags are written into the raw_values data block (containing the input values) and vice versa and swapped
 // before returning. A user from outside will note notice this, but internally it is important to know that these two
-// datablocks swap meaning. For wordsizes greater 1 this optimization is not possible, as the raw values do not fit into
-// the same data block where input values are still inside (different word sizes)
+// util::DataBlocks swap meaning. For wordsizes greater 1 this optimization is not possible, as the raw values do not
+// fit into the same data block where input values are still inside (different word sizes)
 
 #include "equality-coding.h"
 
@@ -18,17 +18,18 @@
 #include <cassert>
 #include <iostream>
 
-#include "block-stepper.h"
-#include "data-block.h"
+#include "util/block-stepper.h"
+#include "util/data-block.h"
 
+namespace genie {
 namespace gabac {
 
 // Optimized for wordsize 1. In place for equality flags
-static void transformEqualityCoding0(DataBlock *const values, DataBlock *const equalityFlags) {
+static void transformEqualityCoding0(util::DataBlock *const values, util::DataBlock *const equalityFlags) {
     uint64_t previousSymbol = 0;
-    *equalityFlags = DataBlock(0, values->getWordSize());
+    *equalityFlags = util::DataBlock(0, values->getWordSize());
 
-    BlockStepper r = values->getReader();
+    util::BlockStepper r = values->getReader();
     // Treat value as equalityFlags and vice versa
     while (r.isValid()) {
         uint64_t symbol = r.get();
@@ -51,12 +52,12 @@ static void transformEqualityCoding0(DataBlock *const values, DataBlock *const e
 }
 
 // Optimized for wordsize 1 > 0. In place for values
-static void transformEqualityCoding1(DataBlock *const values, DataBlock *const equalityFlags) {
+static void transformEqualityCoding1(util::DataBlock *const values, util::DataBlock *const equalityFlags) {
     uint64_t previousSymbol = 0;
 
-    *equalityFlags = DataBlock(0, 1);
-    BlockStepper r = values->getReader();
-    BlockStepper w = values->getReader();
+    *equalityFlags = util::DataBlock(0, 1);
+    util::BlockStepper r = values->getReader();
+    util::BlockStepper w = values->getReader();
     // Treat value as equalityFlags and vice versa
     while (r.isValid()) {
         uint64_t symbol = r.get();
@@ -78,7 +79,7 @@ static void transformEqualityCoding1(DataBlock *const values, DataBlock *const e
     values->resize(values->size() - (w.end - w.curr) / w.wordSize);
 }
 
-void transformEqualityCoding(DataBlock *const values, DataBlock *const equalityFlags) {
+void transformEqualityCoding(util::DataBlock *const values, util::DataBlock *const equalityFlags) {
     assert(equalityFlags != nullptr);
     assert(values != nullptr);
 
@@ -89,11 +90,11 @@ void transformEqualityCoding(DataBlock *const values, DataBlock *const equalityF
     }
 }
 
-void inverseTransformEqualityCoding(DataBlock *const values, DataBlock *const equalityFlags) {
+void inverseTransformEqualityCoding(util::DataBlock *const values, util::DataBlock *const equalityFlags) {
     assert(values != nullptr);
     assert(equalityFlags != nullptr);
-    DataBlock output(0, values->getWordSize());
-    DataBlock *outputptr;
+    util::DataBlock output(0, values->getWordSize());
+    util::DataBlock *outputptr;
 
     // Wordsize 1 allows in place operation in equality flag buffer
     if (values->getWordSize() == 1) {
@@ -107,9 +108,9 @@ void inverseTransformEqualityCoding(DataBlock *const values, DataBlock *const eq
     // Re-compute the symbols from the equality flags and values
     uint64_t previousSymbol = 0;
 
-    BlockStepper rflag = equalityFlags->getReader();
-    BlockStepper rval = values->getReader();
-    BlockStepper rwrite = outputptr->getReader();
+    util::BlockStepper rflag = equalityFlags->getReader();
+    util::BlockStepper rval = values->getReader();
+    util::BlockStepper rwrite = outputptr->getReader();
 
     while (rflag.isValid()) {
         if (rflag.get() == 0) {
@@ -139,5 +140,5 @@ void inverseTransformEqualityCoding(DataBlock *const values, DataBlock *const eq
     equalityFlags->clear();
     equalityFlags->shrink_to_fit();
 }
-
 }  // namespace gabac
+}  // namespace genie

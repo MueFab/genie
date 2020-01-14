@@ -10,6 +10,7 @@
 #include "cabac-tables.h"
 #include "context-model.h"
 
+namespace genie {
 namespace gabac {
 
 BinaryArithmeticDecoder::BinaryArithmeticDecoder(const BitInputStream& bitInputStream)
@@ -116,5 +117,5 @@ void BinaryArithmeticDecoder::start() {
     m_value = (m_bitInputStream.readByte() << 8u);
     m_value |= m_bitInputStream.readByte();
 }
-
 }  // namespace gabac
+}  // namespace genie

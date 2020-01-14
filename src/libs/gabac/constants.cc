@@ -19,6 +19,7 @@
 #include "match-coding.h"
 #include "rle-coding.h"
 
+namespace genie {
 namespace gabac {
 
 const BinarizationProperties &getBinarization(const gabac::BinarizationId &id) {
@@ -82,22 +83,22 @@ const TransformationProperties &getTransformation(const gabac::SequenceTransform
          {},
          {"out"},  // StreamNames
          {0},      // WordSizes (0: non fixed current stream wordsize)
-         [](const std::vector<uint64_t> &, std::vector<DataBlock> *const transformedSequences) {
+         [](const std::vector<uint64_t> &, std::vector<util::DataBlock> *const transformedSequences) {
              transformedSequences->resize(1);
          },
-         [](const std::vector<uint64_t> &, std::vector<DataBlock> *const transformedSequences) {
+         [](const std::vector<uint64_t> &, std::vector<util::DataBlock> *const transformedSequences) {
              transformedSequences->resize(1);
          }},
         {"equality_coding",  // Name
          {},
          {"raw_symbols", "eq_flags"},  // StreamNames
          {0, 1},                       // WordSizes (0: non fixed current stream wordsize)
-         [](const std::vector<uint64_t> &, std::vector<DataBlock> *const transformedSequences) {
+         [](const std::vector<uint64_t> &, std::vector<util::DataBlock> *const transformedSequences) {
              transformedSequences->resize(2);
-             (*transformedSequences)[1] = gabac::DataBlock(0, 1);
+             (*transformedSequences)[1] = util::DataBlock(0, 1);
              gabac::transformEqualityCoding(&(*transformedSequences)[0], &(*transformedSequences)[1]);
          },
-         [](const std::vector<uint64_t> &, std::vector<DataBlock> *const transformedSequences) {
+         [](const std::vector<uint64_t> &, std::vector<util::DataBlock> *const transformedSequences) {
              gabac::inverseTransformEqualityCoding(&(*transformedSequences)[0], &(*transformedSequences)[1]);
              transformedSequences->resize(1);
          }},
@@ -105,15 +106,15 @@ const TransformationProperties &getTransformation(const gabac::SequenceTransform
          {"window_size"},
          {"raw_values", "pointers", "lengths"},  // StreamNames
          {0, 4, 4},                              // WordSizes (0: non fixed current stream wordsize)
-         [](const std::vector<uint64_t> &param, std::vector<DataBlock> *const transformedSequences) {
+         [](const std::vector<uint64_t> &param, std::vector<util::DataBlock> *const transformedSequences) {
              transformedSequences->resize(3);
              assert(param[0] <= std::numeric_limits<uint32_t>::max());
-             (*transformedSequences)[1] = gabac::DataBlock(0, 4);
-             (*transformedSequences)[2] = gabac::DataBlock(0, 4);
+             (*transformedSequences)[1] = util::DataBlock(0, 4);
+             (*transformedSequences)[2] = util::DataBlock(0, 4);
              gabac::transformMatchCoding(static_cast<uint32_t>(param[0]), &(*transformedSequences)[0],
                                          &(*transformedSequences)[1], &(*transformedSequences)[2]);
          },
-         [](const std::vector<uint64_t> &, std::vector<DataBlock> *const transformedSequences) {
+         [](const std::vector<uint64_t> &, std::vector<util::DataBlock> *const transformedSequences) {
              gabac::inverseTransformMatchCoding(&(*transformedSequences)[0], &(*transformedSequences)[1],
                                                 &(*transformedSequences)[2]);
              transformedSequences->resize(1);
@@ -122,12 +123,12 @@ const TransformationProperties &getTransformation(const gabac::SequenceTransform
          {"guard"},
          {"raw_values", "lengths"},  // StreamNames
          {0, 1},                     // WordSizes (0: non fixed current stream wordsize)
-         [](const std::vector<uint64_t> &param, std::vector<DataBlock> *const transformedSequences) {
+         [](const std::vector<uint64_t> &param, std::vector<util::DataBlock> *const transformedSequences) {
              transformedSequences->resize(2);
-             (*transformedSequences)[1] = gabac::DataBlock(0, 1);
+             (*transformedSequences)[1] = util::DataBlock(0, 1);
              gabac::transformRleCoding(param[0], &(*transformedSequences)[0], &(*transformedSequences)[1]);
          },
-         [](const std::vector<uint64_t> &param, std::vector<DataBlock> *const transformedSequences) {
+         [](const std::vector<uint64_t> &param, std::vector<util::DataBlock> *const transformedSequences) {
              gabac::inverseTransformRleCoding(param[0], &(*transformedSequences)[0], &(*transformedSequences)[1]);
              transformedSequences->resize(1);
          }},
@@ -135,14 +136,14 @@ const TransformationProperties &getTransformation(const gabac::SequenceTransform
          {"context_order"},
          {"sequence", "lut0", "lut1"},  // StreamNames
          {0, 0, 0},                     // WordSizes (0: non fixed current stream wordsize)
-         [](const std::vector<uint64_t> &order, std::vector<DataBlock> *const transformedSequences) {
+         [](const std::vector<uint64_t> &order, std::vector<util::DataBlock> *const transformedSequences) {
              transformedSequences->resize(3);
-             (*transformedSequences)[1] = gabac::DataBlock(0, (*transformedSequences)[0].getWordSize());
-             (*transformedSequences)[2] = gabac::DataBlock(0, (*transformedSequences)[0].getWordSize());
+             (*transformedSequences)[1] = util::DataBlock(0, (*transformedSequences)[0].getWordSize());
+             (*transformedSequences)[2] = util::DataBlock(0, (*transformedSequences)[0].getWordSize());
              gabac::transformLutTransform(static_cast<unsigned int>(order[0]), &(*transformedSequences)[0],
                                           &(*transformedSequences)[1], &(*transformedSequences)[2]);
          },
-         [](const std::vector<uint64_t> &order, std::vector<DataBlock> *const transformedSequences) {
+         [](const std::vector<uint64_t> &order, std::vector<util::DataBlock> *const transformedSequences) {
              gabac::inverseTransformLutTransform(static_cast<unsigned int>(order[0]), &(*transformedSequences)[0],
                                                  &(*transformedSequences)[1], &(*transformedSequences)[2]);
              transformedSequences->resize(1);
@@ -151,11 +152,11 @@ const TransformationProperties &getTransformation(const gabac::SequenceTransform
          {},
          {"sequence"},  // StreamNames
          {0},           // WordSizes (0: non fixed current stream wordsize)
-         [](const std::vector<uint64_t> &, std::vector<DataBlock> *const transformedSequences) {
+         [](const std::vector<uint64_t> &, std::vector<util::DataBlock> *const transformedSequences) {
              transformedSequences->resize(1);
              gabac::transformDiffCoding(&(*transformedSequences)[0]);
          },
-         [](const std::vector<uint64_t> &, std::vector<DataBlock> *const transformedSequences) {
+         [](const std::vector<uint64_t> &, std::vector<util::DataBlock> *const transformedSequences) {
              transformedSequences->resize(1);
              gabac::inverseTransformDiffCoding(&(*transformedSequences)[0]);
          }},
@@ -163,12 +164,12 @@ const TransformationProperties &getTransformation(const gabac::SequenceTransform
          {"binarization_id", "binarization_parameter", "context_selection_id", "word_size"},
          {"sequence"},  // StreamNames
          {0},           // WordSizes (0: non fixed current stream wordsize)
-         [](const std::vector<uint64_t> &param, std::vector<DataBlock> *const transformedSequences) {
+         [](const std::vector<uint64_t> &param, std::vector<util::DataBlock> *const transformedSequences) {
              transformedSequences->resize(1);
              gabac::encode_cabac(gabac::BinarizationId(param[0]), {static_cast<unsigned>(param[1])},
                                  gabac::ContextSelectionId(param[2]), &(*transformedSequences)[0]);
          },
-         [](const std::vector<uint64_t> &param, std::vector<DataBlock> *const transformedSequences) {
+         [](const std::vector<uint64_t> &param, std::vector<util::DataBlock> *const transformedSequences) {
              transformedSequences->resize(1);
              gabac::decode_cabac(gabac::BinarizationId(param[0]), {static_cast<unsigned>(param[1])},
                                  gabac::ContextSelectionId(param[2]), static_cast<uint8_t>(param[3]),
@@ -185,3 +186,4 @@ bool BinarizationProperties::sbCheck(uint64_t minv, uint64_t maxv, uint64_t para
 }
 
 }  // namespace gabac
+}  // namespace genie

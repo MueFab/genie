@@ -9,14 +9,14 @@
 
 #include <cstdint>
 
-#include "data-block.h"
-
+#include "util/data-block.h"
+namespace genie {
 namespace gabac {
 
-void transformRleCoding(uint64_t guard, DataBlock *rawValues, DataBlock *lengths);
+void transformRleCoding(uint64_t guard, util::DataBlock *rawValues, util::DataBlock *lengths);
 
-void inverseTransformRleCoding(uint64_t guard, DataBlock *rawValues, DataBlock *lengths);
+void inverseTransformRleCoding(uint64_t guard, util::DataBlock *rawValues, util::DataBlock *lengths);
 
 }  // namespace gabac
-
+}  // namespace genie
 #endif  // GABAC_RLE_CODING_H_

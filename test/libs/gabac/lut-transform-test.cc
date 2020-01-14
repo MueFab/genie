@@ -1,19 +1,19 @@
-#include <gabac/data-block.h>
 #include <gabac/lut-transform.h>
 #include <gtest/gtest.h>
+#include <util/data-block.h>
 #include <iostream>
 #include <vector>
 #include "common.h"
 
 TEST(LutTransformTest, roundTripCoding0) {
     // Void input
-    gabac::DataBlock symbols(0, 1);
+    util::DataBlock symbols(0, 1);
     symbols.resize(1024 * 1024);
     gabac_tests::fillVectorRandomUniform(0, 64, &symbols);
-    gabac::DataBlock transsymbols = symbols;
-    gabac::DataBlock decodedSymbols(0, 1);
-    gabac::DataBlock inverseLut0(0, 1);
-    gabac::DataBlock inverseLut1(0, 1);
+    util::DataBlock transsymbols = symbols;
+    util::DataBlock decodedSymbols(0, 1);
+    util::DataBlock inverseLut0(0, 1);
+    util::DataBlock inverseLut1(0, 1);
 
     EXPECT_NO_THROW(gabac::transformLutTransform(0, &transsymbols, &inverseLut0, &inverseLut1));
     decodedSymbols = transsymbols;

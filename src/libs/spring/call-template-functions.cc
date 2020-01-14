@@ -4,6 +4,7 @@
 #include "reorder.h"
 #include "util.h"
 
+namespace genie {
 namespace spring {
 
 void call_reorder(const std::string &temp_dir, compression_params &cp) {
@@ -142,3 +143,4 @@ void call_encoder(const std::string &temp_dir, compression_params &cp) {
     }
 }
 }  // namespace spring
+}  // namespace genie

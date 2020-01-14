@@ -10,8 +10,9 @@
 #include <istream>
 #include <ostream>
 
-#include "data-block.h"
+#include "util/data-block.h"
 
+namespace genie {
 namespace gabac {
 
 /**
@@ -47,7 +48,7 @@ class DataBlockBuffer : public std::streambuf {
      * @param d Data block to operate on
      * @param pos_i Position to start in the block (mainly for input)
      */
-    explicit DataBlockBuffer(DataBlock *d, size_t pos_i = 0);
+    explicit DataBlockBuffer(util::DataBlock *d, size_t pos_i = 0);
 
     size_t size() const;
 
@@ -57,10 +58,10 @@ class DataBlockBuffer : public std::streambuf {
     std::streamsize xsgetn(char *s, std::streamsize n) override;
     int underflow() override;
     int uflow() override;
-    virtual void flush_block(gabac::DataBlock *blk);
+    virtual void flush_block(util::DataBlock *blk);
 
    private:
-    DataBlock block;
+    util::DataBlock block;
     size_t pos;
 };
 
@@ -98,7 +99,7 @@ class IBufferStream : public DataBlockBuffer, public std::istream {
      * @param d Data block to operate on.
      * @param pos_i Input starting position.
      */
-    explicit IBufferStream(DataBlock *d, size_t pos_i = 0);
+    explicit IBufferStream(util::DataBlock *d, size_t pos_i = 0);
 };
 
 /**
@@ -111,13 +112,13 @@ class OBufferStream : public DataBlockBuffer, public std::ostream {
      * @param d data block to operate on
      * @todo check if parameter necessary
      */
-    explicit OBufferStream(DataBlock *d);
+    explicit OBufferStream(util::DataBlock *d);
 
     /**
      * @brief Swap internal block with external one
      * @param blk Block to fill with data
      */
-    virtual void flush(gabac::DataBlock *blk) { flush_block(blk); }
+    virtual void flush(util::DataBlock *blk) { flush_block(blk); }
 };
 
 /**
@@ -143,5 +144,5 @@ class NullStream : public std::ostream {
 };
 
 }  // namespace gabac
-
+}  // namespace genie
 #endif  // GABAC_STREAMS_H_

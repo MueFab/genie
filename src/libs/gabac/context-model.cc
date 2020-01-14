@@ -6,6 +6,7 @@
 
 #include "context-model.h"
 
+namespace genie {
 namespace gabac {
 
 ContextModel::ContextModel(unsigned char state) : m_state(state) {}
@@ -13,3 +14,4 @@ ContextModel::ContextModel(unsigned char state) : m_state(state) {}
 ContextModel::~ContextModel() = default;
 
 }  // namespace gabac
+}  // namespace genie

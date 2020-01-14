@@ -6,6 +6,7 @@
 #include <string>
 #include "util.h"
 
+namespace genie {
 namespace spring {
 
 /*void compress_ureads(util::FastqFileReader *fastqFileReader1, util::FastqFileReader *fastqFileReader2,
@@ -13,5 +14,6 @@ namespace spring {
                      const std::string &outputFilePath, util::FastqStats *stats);*/
 
 }  // namespace spring
+}  // namespace genie
 
 #endif  // SPRING_COMPRESS_UREADS_H_

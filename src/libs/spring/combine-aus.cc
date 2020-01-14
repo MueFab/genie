@@ -1,6 +1,5 @@
-#include <format/mpegg_p2/access_unit.h>
-#include <format/mpegg_p2/clutter.h>
-#include <format/mpegg_p2/parameter_set.h>
+#include <mpegg_p2/access_unit.h>
+#include <mpegg_p2/parameter_set.h>
 #include <util/bitwriter.h>
 #include <util/perf-stats.h>
 #include <fstream>
@@ -9,6 +8,7 @@
 #include "spring-gabac.h"
 #include "util.h"
 
+namespace genie {
 namespace spring {
 
 /*void combine_aus(const std::string &temp_dir, compression_params &cp, const
@@ -21,7 +21,7 @@ std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::stri
   const bool PAIRED_END = cp.paired_end;
   const bool QV_PRESENT = cp.preserve_quality;
   ParameterSet ps = createQuickParameterSet(PARAMETER_SET_ID, READ_LENGTH, PAIRED_END, QV_PRESENT,
-                                            .format::mpegg_rec::ClassType::CLASS_U, configs, true);
+                                            .backbone::mpegg_rec::ClassType::CLASS_U, configs, true);
   auto crps = util::make_unique<ParameterSetCrps>(ParameterSetCrps::CrAlgId::GLOBAL_ASSEMBLY);
   ps.setCrps(std::move(crps));
   // FIXME add in size written to stats->cmprs_total_sz
@@ -63,11 +63,11 @@ std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::stri
     }
     // create and write AU
     AccessUnit au = createQuickAccessUnit(
-        auId, PARAMETER_SET_ID, num_reads_per_AU[auId], .format::mpegg_rec::ClassType::CLASS_U,
+        auId, PARAMETER_SET_ID, num_reads_per_AU[auId], .backbone::mpegg_rec::ClassType::CLASS_U,
         DataUnit::DatasetType::NON_ALIGNED, &generated_streams, num_records_per_AU[auId]);
     // FIXME add in size written to stats
     au.write(&bw);
   }
 }*/
-
-}  // namespace spring
+}
+}  // namespace genie

@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 
+namespace genie {
 namespace gabac {
 
 enum class BinarizationId;
@@ -25,7 +26,7 @@ struct TransformedSequenceConfiguration {
     bool lutTransformationEnabled;                    /**< @brief LUT transformation switch */
     unsigned int lutBits;                             /**< @brief Bits/values in LUT table */
     unsigned int lutOrder;                            /**< @brief Context size for LUT */
-    bool diffCodingEnabled;                           /**< @brief Diff coding switch */
+    bool diffCodingEnabled;                           /**< @brief Diff backbone switch */
     gabac::BinarizationId binarizationId;             /**< @brief Which binarization to use */
     std::vector<unsigned int> binarizationParameters; /**< @brief Parameters for binarization */
     gabac::ContextSelectionId contextSelectionId;     /**< @brief Which context to use in CABAC */
@@ -92,7 +93,7 @@ struct EncodingConfiguration {
      * @param max Maximum value in the stream
      * @param wordsize Maximum word size in the stream
      * @warning You can still break gabac if there is a sequence of more than
-     * 4GBs of the same symbol while being in match coding or run length coding.
+     * 4GBs of the same symbol while being in match backbone or run length backbone.
      * Moreover the modified config is probably not optimal, but it will work.
      * @return Adapted configuration
      */
@@ -204,7 +205,7 @@ struct IOConfiguration {
 struct AnalysisConfiguration {
     std::vector<unsigned> candidateWordsizes; /**< @brief Which word sizes to test */
     std::vector<gabac::SequenceTransformationId> candidateSequenceTransformationIds; /**<  @brief Transformationlist */
-    std::vector<uint32_t> candidateMatchCodingParameters;                /**< @brief Which match coding window
+    std::vector<uint32_t> candidateMatchCodingParameters;                /**< @brief Which match backbone window
                                                                             sizes to test */
     std::vector<uint32_t> candidateRLECodingParameters;                  /**< @brief Which RLE guards to test */
     std::vector<bool> candidateLUTCodingParameters;                      /**< @brief Which LUT states
@@ -225,5 +226,6 @@ struct AnalysisConfiguration {
 };
 
 }  // namespace gabac
+}  // namespace genie
 
 #endif  // GABAC_CONFIGURATION_H_

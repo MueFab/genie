@@ -8,6 +8,7 @@
 #include <cassert>
 #include "cabac-tables.h"
 
+namespace genie {
 namespace gabac {
 
 BinaryArithmeticEncoder::BinaryArithmeticEncoder(const util::BitWriter& bitOutputStream)
@@ -160,5 +161,5 @@ void BinaryArithmeticEncoder::writeOut() {
         }
     }
 }
-
 }  // namespace gabac
+}  // namespace genie

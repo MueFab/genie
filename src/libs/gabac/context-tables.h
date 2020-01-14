@@ -11,6 +11,7 @@
 
 #include "context-model.h"
 
+namespace genie {
 namespace gabac {
 namespace contexttables {
 
@@ -42,5 +43,6 @@ std::vector<ContextModel> buildContextTable();
 
 }  // namespace contexttables
 }  // namespace gabac
+}  // namespace genie
 
 #endif  // GABAC_CONTEXT_TABLES_H_

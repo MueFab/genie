@@ -1,6 +1,7 @@
 #include "generate-new-fastq.h"
 #include "util.h"
 
+namespace genie {
 namespace spring {
 
 /*void generate_new_fastq_se(format::fastq::FastqFileReader *fastqFileReader1, const std::string &temp_dir,
@@ -144,3 +145,4 @@ void generate_new_fastq_pe(format::fastq::FastqFileReader *fastqFileReader1, for
 }*/
 
 }  // namespace spring
+}  // namespace genie

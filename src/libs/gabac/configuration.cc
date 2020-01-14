@@ -16,6 +16,7 @@
 #include "stream-handler.h"
 #include "streams.h"
 
+namespace genie {
 namespace gabac {
 
 EncodingConfiguration::EncodingConfiguration()
@@ -480,3 +481,4 @@ std::ostream& IOConfiguration::log(const LogLevel& l) const {
 }
 
 }  // namespace gabac
+}  // namespace genie

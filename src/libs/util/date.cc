@@ -1,5 +1,7 @@
 #include "date.h"
 
+namespace util {
+
 bool Date::checkValidity() const {
     size_t days_per_month[] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     if (year < 1900 || year > 2100) {
@@ -96,3 +98,5 @@ std::string Date::toString() const {
     ret + std::to_string(second);
     return ret;
 }
+
+}  // namespace util

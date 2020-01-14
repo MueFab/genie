@@ -7,15 +7,19 @@
 #ifndef GABAC_BIT_INPUT_STREAM_H_
 #define GABAC_BIT_INPUT_STREAM_H_
 
-#include "block-stepper.h"
+#include <util/block-stepper.h>
+#include <util/data-block.h>
 
-namespace gabac {
-
+namespace util {
 class DataBlock;
+}
+
+namespace genie {
+namespace gabac {
 
 class BitInputStream {
    public:
-    explicit BitInputStream(DataBlock *bitstream);
+    explicit BitInputStream(util::DataBlock *bitstream);
 
     ~BitInputStream();
 
@@ -30,15 +34,15 @@ class BitInputStream {
     void reset();
 
    private:
-    gabac::DataBlock *m_bitstream;
+    util::DataBlock *m_bitstream;
 
-    gabac::BlockStepper m_reader;
+    util::BlockStepper m_reader;
 
     unsigned char m_heldBits;
 
     unsigned int m_numHeldBits;
 };
-
 }  // namespace gabac
+}  // namespace genie
 
 #endif  // GABAC_BIT_INPUT_STREAM_H_

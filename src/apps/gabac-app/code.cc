@@ -21,7 +21,7 @@ void code(const std::string &inputFilePath, const std::string &configurationFile
           size_t blocksize, bool decode) {
     std::ifstream inputFile;
     std::ofstream outputFile;
-    gabac::NullStream nullstream;
+    genie::gabac::NullStream nullstream;
 
     std::istream *istream = &std::cin;
     std::istream *confstream = &std::cin;
@@ -48,11 +48,12 @@ void code(const std::string &inputFilePath, const std::string &configurationFile
         logstream = &nullstream;
     }
 
-    gabac::IOConfiguration ioconf = {istream, ostream, blocksize, logstream, gabac::IOConfiguration::LogLevel::INFO};
+    genie::gabac::IOConfiguration ioconf = {istream, ostream, blocksize, logstream,
+                                            genie::gabac::IOConfiguration::LogLevel::INFO};
 
     // Read the entire configuration file as a string and convert the JSON
     // input string to the internal GABAC configuration
-    gabac::EncodingConfiguration configuration;
+    genie::gabac::EncodingConfiguration configuration;
     {
         std::ifstream configurationFile;
         if (!configurationFilePath.empty()) {
@@ -63,10 +64,10 @@ void code(const std::string &inputFilePath, const std::string &configurationFile
             confstream = &configurationFile;
         }
         std::string jsonInput = std::string(std::istreambuf_iterator<char>(*confstream), {});
-        configuration = gabac::EncodingConfiguration(jsonInput);
+        configuration = genie::gabac::EncodingConfiguration(jsonInput);
     }
 
-    gabac::run(ioconf, configuration, decode);
+    genie::gabac::run(ioconf, configuration, decode);
 
     /* GABACIFY_LOG_INFO << "Wrote buffer of size "
                       << outStream.bytesWritten()

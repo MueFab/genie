@@ -1,18 +1,14 @@
 import os
-import copy
 import json
-import random
 import math
-from collections import OrderedDict
 
 import matplotlib.pyplot as plt
 
 from gabac_api import libgabac
 from gabac_api import gabac_io_config
 from gabac_api import gabac_data_block
-from gabac_api import GABAC_OPERATION, GABAC_RETURN, GABAC_STREAM_MODE, GABAC_TRANSFORM
+from gabac_api import GABAC_OPERATION, GABAC_RETURN, GABAC_TRANSFORM
 from gabac_api import root_path
-from test_python_api import array, libc
 
 from gabac_ga import GeneticAlgorithmForGabac
 

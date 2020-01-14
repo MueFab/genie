@@ -10,17 +10,18 @@
 #include <cassert>
 #include <iostream>
 
-#include "block-stepper.h"
-#include "data-block.h"
+#include "util/block-stepper.h"
+#include "util/data-block.h"
 
+namespace genie {
 namespace gabac {
 
-void transformMatchCoding(const uint32_t windowSize, gabac::DataBlock *const symbols, gabac::DataBlock *const pointers,
-                          gabac::DataBlock *const lengths) {
+void transformMatchCoding(const uint32_t windowSize, util::DataBlock *const symbols, util::DataBlock *const pointers,
+                          util::DataBlock *const lengths) {
     assert(pointers != nullptr);
     assert(lengths != nullptr);
     assert(symbols != nullptr);
-    gabac::DataBlock rawValues(0, symbols->getWordSize());
+    util::DataBlock rawValues(0, symbols->getWordSize());
 
     // Prepare the output vectors
     pointers->clear();
@@ -64,18 +65,18 @@ void transformMatchCoding(const uint32_t windowSize, gabac::DataBlock *const sym
     rawValues.swap(symbols);
 }
 
-void inverseTransformMatchCoding(gabac::DataBlock *const rawValues, gabac::DataBlock *const pointers,
-                                 gabac::DataBlock *const lengths) {
-    gabac::DataBlock symbols(0, rawValues->getWordSize());
+void inverseTransformMatchCoding(util::DataBlock *const rawValues, util::DataBlock *const pointers,
+                                 util::DataBlock *const lengths) {
+    util::DataBlock symbols(0, rawValues->getWordSize());
     assert(lengths->size() == pointers->size() + rawValues->size());
 
     // In-place probably not possible
 
     // Re-compute the symbols from the pointer, lengths and raw values
     size_t n = 0;
-    BlockStepper t0 = pointers->getReader();
-    BlockStepper t1 = lengths->getReader();
-    BlockStepper t2 = rawValues->getReader();
+    util::BlockStepper t0 = pointers->getReader();
+    util::BlockStepper t1 = lengths->getReader();
+    util::BlockStepper t2 = rawValues->getReader();
     while (t1.isValid()) {
         uint64_t length = t1.get();
         t1.inc();
@@ -99,5 +100,5 @@ void inverseTransformMatchCoding(gabac::DataBlock *const rawValues, gabac::DataB
     lengths->clear();
     lengths->shrink_to_fit();
 }
-
 }  // namespace gabac
+}  // namespace genie

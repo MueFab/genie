@@ -7,11 +7,12 @@
 #include "bit-input-stream.h"
 #include <cassert>
 #include <limits>
-#include "data-block.h"
+#include "util/data-block.h"
 
+namespace genie {
 namespace gabac {
 
-inline static unsigned char readIn(gabac::BlockStepper *reader) {
+inline static unsigned char readIn(util::BlockStepper *reader) {
     if (!reader->isValid()) {
         GABAC_DIE("Index out of bounds");
     }
@@ -22,7 +23,8 @@ inline static unsigned char readIn(gabac::BlockStepper *reader) {
     return byte;
 }
 
-BitInputStream::BitInputStream(DataBlock *const bitstream) : m_bitstream(bitstream), m_heldBits(0), m_numHeldBits(0) {
+BitInputStream::BitInputStream(util::DataBlock *const bitstream)
+    : m_bitstream(bitstream), m_heldBits(0), m_numHeldBits(0) {
     m_reader = m_bitstream->getReader();  // TODO(Jan): This line is redundant.
     reset();
 }
@@ -112,5 +114,5 @@ void BitInputStream::skipBytes(unsigned int numBytes) {
         readIn(&m_reader);
     }
 }
-
 }  // namespace gabac
+}  // namespace genie

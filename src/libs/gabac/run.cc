@@ -8,7 +8,7 @@
 
 #include "decoding.h"
 #include "encoding.h"
-
+namespace genie {
 namespace gabac {
 
 void run(const IOConfiguration& conf, const EncodingConfiguration& enConf, bool decode) {
@@ -18,5 +18,5 @@ void run(const IOConfiguration& conf, const EncodingConfiguration& enConf, bool 
         gabac::encode(conf, enConf);
     }
 }
-
 }  // namespace gabac
+}  // namespace genie

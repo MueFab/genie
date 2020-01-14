@@ -1,6 +1,6 @@
-#include <gabac/data-block.h>
 #include <gabac/diff-coding.h>
 #include <gtest/gtest.h>
+#include <util/data-block.h>
 #include <algorithm>
 #include <functional>
 #include <iostream>
@@ -12,14 +12,14 @@
 TEST(DiffCodingTest, transformDiffCoding) {
     {
         // Void input
-        gabac::DataBlock symbols(0, 8);
-        gabac::DataBlock transformedSymbols(0, 8);
+        util::DataBlock symbols(0, 8);
+        util::DataBlock transformedSymbols(0, 8);
         EXPECT_NO_THROW(gabac::transformDiffCoding(&transformedSymbols));
         EXPECT_EQ(transformedSymbols.size(), 0);
     }
 
     {
-        gabac::DataBlock transformedSymbols(0, 8);
+        util::DataBlock transformedSymbols(0, 8);
         transformedSymbols = {42};
         EXPECT_NO_THROW(gabac::transformDiffCoding(&transformedSymbols));
         EXPECT_EQ(transformedSymbols.size(), 1);
@@ -28,10 +28,10 @@ TEST(DiffCodingTest, transformDiffCoding) {
 
     {
         // Corner cases
-        gabac::DataBlock transformedSymbols(0, 8);
+        util::DataBlock transformedSymbols(0, 8);
         transformedSymbols = {0, static_cast<uint64_t>(std::numeric_limits<int64_t>::max()),
                               static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1, 0};
-        gabac::DataBlock expectedTransformedSymbols(0, 8);
+        util::DataBlock expectedTransformedSymbols(0, 8);
         expectedTransformedSymbols = {
             0,
             std::numeric_limits<int64_t>::max(),
@@ -44,8 +44,8 @@ TEST(DiffCodingTest, transformDiffCoding) {
     }
     {
         // Large input
-        gabac::DataBlock symbols(0, 8);
-        gabac::DataBlock transformedSymbols(0, 8);
+        util::DataBlock symbols(0, 8);
+        util::DataBlock transformedSymbols(0, 8);
         size_t largeTestSize = 1024 * 1024;
         symbols.resize(largeTestSize);
         gabac_tests::fillVectorRandomUniform(0, std::numeric_limits<int64_t>::max(), &symbols);
@@ -54,7 +54,7 @@ TEST(DiffCodingTest, transformDiffCoding) {
 
     {
         // Too small symbol diff
-        gabac::DataBlock transformedSymbols(0, 8);
+        util::DataBlock transformedSymbols(0, 8);
         transformedSymbols = {uint64_t(std::numeric_limits<int64_t>::max()) + 2, 0};
         EXPECT_NO_THROW(gabac::transformDiffCoding(&transformedSymbols));
         EXPECT_NO_THROW(gabac::inverseTransformDiffCoding(&transformedSymbols));
@@ -64,7 +64,7 @@ TEST(DiffCodingTest, transformDiffCoding) {
 
     {
         // Too great symbol diff
-        gabac::DataBlock transformedSymbols(0, 8);
+        util::DataBlock transformedSymbols(0, 8);
         transformedSymbols = {0, uint64_t(std::numeric_limits<int64_t>::max()) + 1};
         EXPECT_NO_THROW(gabac::transformDiffCoding(&transformedSymbols));
         EXPECT_NO_THROW(gabac::inverseTransformDiffCoding(&transformedSymbols));
@@ -76,14 +76,14 @@ TEST(DiffCodingTest, transformDiffCoding) {
 TEST(DiffCodingTest, inverseTransformDiffCoding) {
     {
         // Void input shall lead to void output
-        gabac::DataBlock transformedSymbols(0, 8);
+        util::DataBlock transformedSymbols(0, 8);
         EXPECT_NO_THROW(gabac::inverseTransformDiffCoding(&transformedSymbols));
         EXPECT_EQ(transformedSymbols.size(), 0);
     }
 
     {
         // Correct libs of a single positive-valued symbol
-        gabac::DataBlock transformedSymbols(0, 8);
+        util::DataBlock transformedSymbols(0, 8);
         transformedSymbols = {42};
         EXPECT_NO_THROW(gabac::inverseTransformDiffCoding(&transformedSymbols));
         EXPECT_EQ(transformedSymbols.size(), 1);
@@ -91,7 +91,7 @@ TEST(DiffCodingTest, inverseTransformDiffCoding) {
     }
     {
         // Correct libs of a negative-valued symbol
-        gabac::DataBlock transformedSymbols(0, 8);
+        util::DataBlock transformedSymbols(0, 8);
         transformedSymbols = {43, uint64_t(-42)};
         EXPECT_NO_THROW(gabac::inverseTransformDiffCoding(&transformedSymbols));
         EXPECT_EQ(transformedSymbols.size(), 2);
@@ -99,9 +99,9 @@ TEST(DiffCodingTest, inverseTransformDiffCoding) {
     }
     {
         // pos/neg sequence
-        gabac::DataBlock expected(0, 8);
+        util::DataBlock expected(0, 8);
         expected = {100, 90, 80, 70, 60, 50};
-        gabac::DataBlock transformedSymbols(0, 8);
+        util::DataBlock transformedSymbols(0, 8);
         transformedSymbols = {100, uint64_t(-10), uint64_t(-10), uint64_t(-10), uint64_t(-10), uint64_t(-10)};
         EXPECT_NO_THROW(gabac::inverseTransformDiffCoding(&transformedSymbols));
         EXPECT_EQ(transformedSymbols.size(), 6);
@@ -110,14 +110,14 @@ TEST(DiffCodingTest, inverseTransformDiffCoding) {
     {
         // Cornercases
         // Edges of symbol range
-        gabac::DataBlock expected(0, 8);
+        util::DataBlock expected(0, 8);
         expected = {std::numeric_limits<int64_t>::max(),
                     uint64_t(std::numeric_limits<int64_t>::max()) + 1,
                     0,
                     std::numeric_limits<int64_t>::max(),
                     std::numeric_limits<uint64_t>::max() - 1,
                     uint64_t(std::numeric_limits<int64_t>::max()) - 1};
-        gabac::DataBlock transformedSymbols(0, 8);
+        util::DataBlock transformedSymbols(0, 8);
         transformedSymbols = {
             std::numeric_limits<int64_t>::max(),           1,
             uint64_t(std::numeric_limits<int64_t>::min()), std::numeric_limits<int64_t>::max(),
@@ -129,8 +129,8 @@ TEST(DiffCodingTest, inverseTransformDiffCoding) {
 }
 
 TEST(DiffCodingTest, roundTripCoding) {
-    gabac::DataBlock symbols(0, 8);
-    gabac::DataBlock transformedSymbols(0, 8);
+    util::DataBlock symbols(0, 8);
+    util::DataBlock transformedSymbols(0, 8);
 
     size_t largeTestSize = 1024 * 1024;
 

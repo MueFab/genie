@@ -14,8 +14,6 @@ from gabac_api import libgabac
 from gabac_api import gabac_stream
 from gabac_api import gabac_io_config
 from gabac_api import gabac_data_block
-from gabac_api import GABAC_BINARIZATION, GABAC_CONTEXT_SELECT, GABAC_LOG_LEVEL, GABAC_LOG_LEVEL
-from gabac_api import root_path
 from test_python_api import array, libc
 
 from gabac_conf_gen import GabacConfiguration

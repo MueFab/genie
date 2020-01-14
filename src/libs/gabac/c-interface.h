@@ -148,7 +148,7 @@ typedef enum gabac_transform {
     gabac_transform_LUT = 4,      /**< @brief Remap symbols based on probability */
     gabac_transform_DIFF = 5,     /**< @brief Use differences between symbol values
                                      instead of symbols */
-    gabac_transform_CABAC = 6     /**< @brief Entropy coding based on cabac */
+    gabac_transform_CABAC = 6     /**< @brief Entropy backbone based on cabac */
 } gabac_transform;
 
 /**
@@ -192,7 +192,7 @@ typedef enum gabac_binarization {
  * @brief Context selection modes for cabac transformation
  */
 typedef enum gabac_context_select {
-    gabac_context_select_BYPASS = 0,           /**< @brief Do not use arithmetic coding */
+    gabac_context_select_BYPASS = 0,           /**< @brief Do not use arithmetic backbone */
     gabac_context_select_ADAPTIVE_ORDER_0 = 1, /**< @brief Current symbol only */
     gabac_context_select_ADAPTIVE_ORDER_1 = 2, /**< @brief Use current + previous symbol */
     gabac_context_select_ADAPTIVE_ORDER_2 = 3  /**< @brief Use current + previous + before previous symbol */

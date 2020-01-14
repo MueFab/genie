@@ -1,12 +1,12 @@
 #ifndef GABAC_TESTS_COMMON_H_
 #define GABAC_TESTS_COMMON_H_
 
-#include <gabac/data-block.h>
+#include <util/data-block.h>
 
 namespace gabac_tests {
 
-void fillVectorRandomUniform(uint64_t min, uint64_t max, gabac::DataBlock *vector);
-void fillVectorRandomGeometric(gabac::DataBlock *vector);
+void fillVectorRandomUniform(uint64_t min, uint64_t max, util::DataBlock *vector);
+void fillVectorRandomGeometric(util::DataBlock *vector);
 
 }  // namespace gabac_tests
 

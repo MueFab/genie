@@ -15,6 +15,8 @@
 #include <vector>
 #include "original-source.h"
 
+namespace util {
+
 /**
  * @brief Allows to run the genie pipeline with multiple threads
  */
@@ -57,6 +59,8 @@ class ThreadManager {
      */
     ~ThreadManager();
 };
+
+}  // namespace util
 
 // ---------------------------------------------------------------------------------------------------------------------
 

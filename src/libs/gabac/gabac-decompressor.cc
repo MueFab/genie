@@ -1,0 +1,74 @@
+#include "gabac-decompressor.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+namespace genie {
+namespace gabac {
+
+genie::MpeggRawAu::SubDescriptor GabacDecompressor::decompress(const gabac::EncodingConfiguration& conf,
+                                                               genie::BlockPayloadSet::SubsequencePayload&& data) {
+    genie::BlockPayloadSet::SubsequencePayload in = std::move(data);
+    // Interface to GABAC library
+    std::stringstream in_stream;
+    for (auto& payload : in.getTransformedPayloads()) {
+        util::DataBlock buffer = payload.move();
+
+        uint32_t size = buffer.getRawSize();
+        in_stream.write(reinterpret_cast<char*>(&size), sizeof(uint32_t));
+        in_stream.write(reinterpret_cast<char*>(buffer.getData()), buffer.getRawSize());
+    }
+
+    util::DataBlock tmp(0, 4);
+    gabac::OBufferStream outbuffer(&tmp);
+
+    // Setup
+    const size_t GABAC_BLOCK_SIZE = 0;  // 0 means single block (block size is equal to input size)
+    std::ostream* const GABC_LOG_OUTPUT_STREAM = &std::cout;
+    const gabac::IOConfiguration GABAC_IO_SETUP = {&in_stream, &outbuffer, GABAC_BLOCK_SIZE, GABC_LOG_OUTPUT_STREAM,
+                                                   gabac::IOConfiguration::LogLevel::TRACE};
+    const bool GABAC_DECODING_MODE = true;
+
+    // Run
+    gabac::run(GABAC_IO_SETUP, conf, GABAC_DECODING_MODE);
+
+    outbuffer.flush(&tmp);
+    return genie::MpeggRawAu::SubDescriptor(std::move(tmp), in.getID());
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void GabacDecompressor::flowIn(genie::BlockPayloadSet&& t, size_t id) {
+    genie::BlockPayloadSet payloadSet = std::move(t);
+    GabacSeqConfSet configSet;
+    auto raw_aus = genie::MpeggRawAu(payloadSet.moveParameters(), payloadSet.getRecordNum());
+
+    configSet.loadParameters(raw_aus.getParameters());
+
+    for (auto& desc : payloadSet.getPayloads()) {
+        if (desc.isEmpty()) {
+            continue;
+        }
+        for (auto& subseq : desc.getSubsequencePayloads()) {
+            if (subseq.isEmpty()) {
+                continue;
+            }
+            auto d_id = subseq.getID();
+            genie::MpeggRawAu::SubDescriptor subseqData =
+                decompress(configSet.getConfAsGabac(subseq.getID()), std::move(subseq));
+            raw_aus.set(d_id, std::move(subseqData));
+        }
+    }
+
+    raw_aus.setReference(payloadSet.getReference());
+    payloadSet.clear();
+    flowOut(std::move(raw_aus), id);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void GabacDecompressor::dryIn() { dryOut(); }
+}  // namespace gabac
+}  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

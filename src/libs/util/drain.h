@@ -11,6 +11,8 @@
 
 #include <cstddef>
 
+namespace util {
+
 /**
  * @brief By implementing this interface, a genie module signals the ability to process data of type TYPE.
  * @tparam TYPE Input data type which is accepted
@@ -35,6 +37,8 @@ class Drain {
      */
     virtual ~Drain() = default;
 };
+
+}  // namespace util
 
 // ---------------------------------------------------------------------------------------------------------------------
 

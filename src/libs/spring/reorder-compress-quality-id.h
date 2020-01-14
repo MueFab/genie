@@ -6,6 +6,7 @@
 #include <util/perf-stats.h>
 #include "util.h"
 
+namespace genie {
 namespace spring {
 
 void reorder_compress_quality_id(const std::string &temp_dir, const compression_params &cp,
@@ -38,8 +39,8 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
 
 void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std::vector<int64_t> tokens[128][6]);
 
-void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std::vector<gabac::DataBlock> &tokens);
+void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std::vector<util::DataBlock> &tokens);
 
 }  // namespace spring
-
+}  // namespace genie
 #endif  // SPRING_REORDER_COMPRESS_QUALITY_ID_H_

@@ -1,8 +1,15 @@
 #include "encoding.h"
 
-#include <format/mpegg_rec/mgrecs-importer.h>
-#include <format/sam/sam-exporter.h>
-#include <format/sam/sam-header.h>
+#include <gabac/gabac-compressor.h>
+#include <gabac/gabac-decompressor.h>
+#include <local_assembly/local-assembly-decoder.h>
+#include <local_assembly/local-assembly-encoder.h>
+#include <mpegg_p2/mpegg-p-2-exporter.h>
+#include <mpegg_p2/mpegg-p-2-importer.h>
+#include <mpegg_rec/mgrecs-importer.h>
+#include <sam/sam-exporter.h>
+#include <sam/sam-header.h>
+#include <sam/sam-importer.h>
 #include <util/thread-manager.h>
 #include <fstream>
 #include <string>
@@ -11,15 +18,15 @@ namespace ureads_encoder {
 
 void encode(const ProgramOptions& programOptions) {
     (void)programOptions;
-#if 1
+#if 0
     {
         std::ifstream input("test_out.mgrec");
         std::ofstream output("test_out.sam");
 
-        MgrecsImporter importer(1000, input);
-        SamExporter exporter(format::sam::SamFileHeader::createDefaultHeader(), output);
+        genie::mpegg_rec::MgrecsImporter importer(1000, input);
+        genie::sam::SamExporter exporter(genie::sam::SamFileHeader::createDefaultHeader(), output);
         importer.setDrain(&exporter);
-        ThreadManager manager(1, &importer);
+        util::ThreadManager manager(1, &importer);
         manager.run();
     }
 #else
@@ -43,29 +50,29 @@ void encode(const ProgramOptions& programOptions) {
     {
         std::ifstream input("test.sam");
         std::ofstream output("test_out.mgb");
-        format::sam::SamImporter importer(1000, input);
-        LocalAssemblyEncoder encoder(1000, false);
-        GabacCompressor compressor;
-        MpeggP2Exporter exporter(&output);
+        genie::sam::SamImporter importer(1000, input);
+        genie::local_assembly::LocalAssemblyEncoder encoder(1000, false);
+        genie::gabac::GabacCompressor compressor;
+        genie::mpegg_p2::MpeggP2Exporter exporter(&output);
 
         importer.setDrain(&encoder);
         encoder.setDrain(&compressor);
         compressor.setDrain(&exporter);
-        ThreadManager manager(1, &importer);
+        util::ThreadManager manager(1, &importer);
         manager.run();
     }
     {
         std::ifstream input("test_out.mgb");
         std::ofstream output("test_out.sam");
-        MpeggP2Importer importer(input);
-        LocalAssemblyDecoder decoder;
-        GabacDecompressor decompressor;
-        SamExporter exporter(format::sam::SamFileHeader::createDefaultHeader(), output);
+        genie::MpeggP2Importer importer(input);
+        genie::local_assembly::LocalAssemblyDecoder decoder;
+        genie::gabac::GabacDecompressor decompressor;
+        genie::sam::SamExporter exporter(genie::sam::SamFileHeader::createDefaultHeader(), output);
         importer.setDrain(&decompressor);
         decompressor.setDrain(&decoder);
         decoder.setDrain(&exporter);
 
-        ThreadManager manager(1, &importer);
+        util::ThreadManager manager(1, &importer);
         manager.run();
     }
 #endif

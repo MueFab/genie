@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+namespace genie {
 namespace spring {
 
 uint32_t read_fastq_block(std::ifstream &fin, std::string *id_array, std::string *read_array,
@@ -127,5 +128,5 @@ bool is_permutation(uint32_t *order_array, const uint32_t &numreads) {
     delete[] seen;
     return true;
 }
-
 }  // namespace spring
+}  // namespace genie

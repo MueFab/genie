@@ -9,17 +9,18 @@
 #include <algorithm>
 #include <cassert>
 
-#include "block-stepper.h"
-#include "data-block.h"
+#include "util/block-stepper.h"
+#include "util/data-block.h"
 
+namespace genie {
 namespace gabac {
 
-void transformDiffCoding(DataBlock *const transformedSymbols) {
+void transformDiffCoding(util::DataBlock *const transformedSymbols) {
     assert(transformedSymbols != nullptr);
 
     // Do the diff libs
     uint64_t previousSymbol = 0;
-    BlockStepper r = transformedSymbols->getReader();
+    util::BlockStepper r = transformedSymbols->getReader();
     while (r.isValid()) {
         uint64_t symbol = r.get();
         uint64_t diff = symbol - previousSymbol;
@@ -29,12 +30,12 @@ void transformDiffCoding(DataBlock *const transformedSymbols) {
     }
 }
 
-void inverseTransformDiffCoding(DataBlock *const symbols) {
+void inverseTransformDiffCoding(util::DataBlock *const symbols) {
     assert(symbols != nullptr);
 
     // Re-compute the symbols from the differences
     uint64_t previousSymbol = 0;
-    BlockStepper r = symbols->getReader();
+    util::BlockStepper r = symbols->getReader();
     while (r.isValid()) {
         uint64_t symbol = r.get();
         r.set(previousSymbol + symbol);
@@ -42,5 +43,5 @@ void inverseTransformDiffCoding(DataBlock *const symbols) {
         r.inc();
     }
 }
-
 }  // namespace gabac
+}  // namespace genie

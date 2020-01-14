@@ -1,4 +1,3 @@
-import os
 # import copy
 import json
 # import random
@@ -16,18 +15,6 @@ from gabac_api.c_api import (
     gabac_io_config,
     gabac_data_block
 )
-from gabac_api.const import (
-    GABAC_BINARIZATION,
-    GABAC_CONTEXT_SELECT,
-    GABAC_LOG_LEVEL,
-    GABAC_LOG_LEVEL,
-    GABAC_OPERATION,
-    GABAC_RETURN,
-    GABAC_STREAM_MODE,
-    GABAC_TRANSFORM
-)
-from gabac_api import root_path
-from test_python_api import array, libc
 
 from .gabac_conf_gen import GabacConfiguration
 
