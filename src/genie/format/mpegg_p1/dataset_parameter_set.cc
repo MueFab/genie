@@ -9,9 +9,9 @@
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
-DatasetParameterSet::DatasetParameterSet(const core::parameter::ParameterSet& parameterSet){
+DatasetParameterSet::DatasetParameterSet(const core::parameter::ParameterSet& parameterSet) {
     parameterSet_p2 = parameterSet;
-    //TODO: add dataset_group_ID and dataset_ID
+    // TODO: add dataset_group_ID and dataset_ID
 }
 }  // namespace mpegg_p1
 }  // namespace format

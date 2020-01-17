@@ -1,9 +1,9 @@
-#include <gtest/gtest.h>
 #include <genie/format/sam/reader.h>
+#include <gtest/gtest.h>
 #include <iostream>
 #include "helpers.h"
 
-//TEST(SamFileReader, Simple) {  // NOLINT(cert-err-cpp)
+// TEST(SamFileReader, Simple) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //    genie::util::SamFileReader reader(gitRootDir + "/data/sam/four-reads-with-header.sam");
 //    std::list<format::sam::SamRecord> records;
@@ -49,7 +49,7 @@
 //    EXPECT_EQ(records.back().opt, "RG:Z:_5_1\tBC:Z:1\tXD:Z:150\tSM:i:831\tNM:i:0");
 //}
 //
-//TEST(SamFileReader, SimpleNoHeader) {  // NOLINT(cert-err-cpp)
+// TEST(SamFileReader, SimpleNoHeader) {  // NOLINT(cert-err-cpp)
 //
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //    genie::util::SamFileReader reader(gitRootDir + "/data/sam/four-reads-without-header.sam");
@@ -57,7 +57,7 @@
 //    EXPECT_EQ(reader.header, "");
 //}
 //
-//TEST(SamFileReader, BlankLine) {  // NOLINT(cert-err-cpp)
+// TEST(SamFileReader, BlankLine) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
 //    genie::util::SamFileReader reader(gitRootDir + "/data/sam/extraneous-blank-line.sam");
@@ -67,7 +67,7 @@
 //    EXPECT_THROW(reader.readRecords(4, &records), std::invalid_argument);
 //}
 //
-//TEST(SamFileReader, Truncated) {  // NOLINT(cert-err-cpp)
+// TEST(SamFileReader, Truncated) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
 //    genie::util::SamFileReader reader(gitRootDir + "/data/sam/truncated.sam");

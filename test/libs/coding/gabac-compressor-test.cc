@@ -1,12 +1,12 @@
 #include <genie/entropy/gabac/gabac-compressor.h>
-#include <gtest/gtest.h>
 #include <genie/util/drain.h>
+#include <gtest/gtest.h>
 #include <iostream>
 #include "helpers.h"
 
 TEST(GabacCompressor, NonEmpty) {  // NOLINT(cert-err58-cpp)
 
-   class DummyModule : public genie::util::Drain<genie::core::AccessUnitPayload> {
+    class DummyModule : public genie::util::Drain<genie::core::AccessUnitPayload> {
        public:
         void flowIn(genie::core::AccessUnitPayload&& t, size_t id) override {
             auto data = std::move(t);  // Needed to "consume" the data and move it into local scope
@@ -27,7 +27,7 @@ TEST(GabacCompressor, NonEmpty) {  // NOLINT(cert-err58-cpp)
                     }
                     std::cout << "\tSubSequence " << getSubsequence(subseqpayload.getID()).name << ":" << std::endl;
                     for (auto& transformedPayload : subseqpayload.getTransformedPayloads()) {
-                        auto dataBlock = transformedPayload.move(); // Extract the data
+                        auto dataBlock = transformedPayload.move();  // Extract the data
                         std::cout << "\t\tTransformedSequence " << dataBlock.getRawSize() << " bytes" << std::endl;
                     }
                 }
@@ -53,9 +53,9 @@ TEST(GabacCompressor, NonEmpty) {  // NOLINT(cert-err58-cpp)
     for (size_t i = 0; i < 50; ++i) {
         raw_aus.get(genie::core::GenSub::RLEN).push(i);  // Append some data for one selected subsequence
         // See core/constants.cpp/getDescriptors() or core/constants.h/GenSub for all valid descriptors and how many
-        // subsequences there are for each descriptor (here we are only populating sequence 0). Maybe even use different,
-        // random data for each run? You should vary test data a little bit to cover more cases and also use different
-        // descriptor streams
+        // subsequences there are for each descriptor (here we are only populating sequence 0). Maybe even use
+        // different, random data for each run? You should vary test data a little bit to cover more cases and also use
+        // different descriptor streams
 
         //  Example how to iterate descriptors, here we append data to every subsequence
         for (const auto& descriptor : genie::core::getDescriptors()) {

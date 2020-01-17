@@ -1,6 +1,6 @@
 #include <genie/entropy/gabac/match-coding.h>
-#include <gtest/gtest.h>
 #include <genie/util/data-block.h>
+#include <gtest/gtest.h>
 #include <algorithm>
 #include <functional>
 #include <iostream>

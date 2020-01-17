@@ -1,10 +1,10 @@
-#include <gtest/gtest.h>
 #include <genie/format/fasta/reader.h>
+#include <gtest/gtest.h>
 #include "helpers.h"
 
 // May need to add some requirements on what counts as a valid FASTA in the documentation
 
-//TEST(FastaFileReader, Minimal) {  // NOLINT(cert-err-cpp)
+// TEST(FastaFileReader, Minimal) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
 //    genie::util::FastaFileReader reader(gitRootDir + "/data/fasta/minimal.fasta");
@@ -17,7 +17,7 @@
 //    EXPECT_EQ(records.front().sequence, "GATTACA");
 //}
 //
-//TEST(FastaFileReader, Empty) {  // NOLINT(cert-err-cpp)
+// TEST(FastaFileReader, Empty) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
 //    genie::util::FastaFileReader reader(gitRootDir + "/data/fasta/empty.fasta");
@@ -30,7 +30,7 @@
 //    EXPECT_EQ(records.front().sequence, "");
 //}
 //
-//TEST(FastaFileReader, OnlyHeaders) {  // NOLINT(cert-err-cpp)
+// TEST(FastaFileReader, OnlyHeaders) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
 //    genie::util::FastaFileReader reader(gitRootDir + "/data/fasta/only-headers.fasta");
@@ -45,7 +45,7 @@
 //    EXPECT_EQ(records.front().sequence, "");
 //}
 //
-//TEST(FastaFileReader, SingleSequenceNoHeader) {  // NOLINT(cert-err-cpp)
+// TEST(FastaFileReader, SingleSequenceNoHeader) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
 //    genie::util::FastaFileReader reader(gitRootDir + "/data/fasta/single-sequence-no-header.fasta");
@@ -60,7 +60,7 @@
 //    EXPECT_EQ(records.front().sequence, "GATTACA");
 //}
 //
-//TEST(FastaFileReader, SupernumeraryNewlines) {  // NOLINT(cert-err-cpp)
+// TEST(FastaFileReader, SupernumeraryNewlines) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
 //    genie::util::FastaFileReader reader(gitRootDir + "/data/fasta/supernumerary-newlines.fasta");
@@ -70,7 +70,7 @@
 //    EXPECT_THROW(reader.parse(&records), std::runtime_error);
 //}
 //
-//TEST(FastaFileReader, TwoTimesGattaca) {  // NOLINT(cert-err-cpp)
+// TEST(FastaFileReader, TwoTimesGattaca) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
 //    genie::util::FastaFileReader reader(gitRootDir + "/data/fasta/two-times-gattaca.fasta");
@@ -85,7 +85,7 @@
 //    EXPECT_EQ(records.back().sequence, "GATTACA");
 //}
 //
-//TEST(FastaFileReader, BlankLineMiddle) {  // NOLINT(cert-err-cpp)
+// TEST(FastaFileReader, BlankLineMiddle) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
 //    genie::util::FastaFileReader reader(gitRootDir + "/data/fasta/blank-line-middle.fasta");
@@ -101,7 +101,7 @@
 //    //    EXPECT_THROW(reader.parse(&records), std::runtime_error);
 //}
 //
-//TEST(FastaFileReader, BlankLineBetween) {  // NOLINT(cert-err-cpp)
+// TEST(FastaFileReader, BlankLineBetween) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
 //    genie::util::FastaFileReader reader(gitRootDir + "/data/fasta/blank-line-between.fasta");

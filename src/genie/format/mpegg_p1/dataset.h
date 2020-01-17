@@ -10,10 +10,10 @@
 #include <memory>
 #include <vector>
 
-#include "genie/format/mgb/data-unit-factory.h"
 #include "access_unit_p1.h"
 #include "dataset_header.h"
 #include "dataset_parameter_set.h"
+#include "genie/format/mgb/data-unit-factory.h"
 
 namespace genie {
 namespace format {
@@ -45,8 +45,8 @@ class DT_protection {
 
 class Dataset {
    public:
-    Dataset(const std::unique_ptr<genie::format::mgb::DataUnitFactory>& dataUnitFactory
-        ,std::vector<std::unique_ptr<genie::format::mgb::AccessUnit>>* accessUnits_p2);
+    Dataset(const std::unique_ptr<genie::format::mgb::DataUnitFactory>& dataUnitFactory,
+            std::vector<std::unique_ptr<genie::format::mgb::AccessUnit>>* accessUnits_p2);
 
    private:
     /**

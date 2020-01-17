@@ -1,6 +1,6 @@
 #include <genie/entropy/gabac/equality-coding.h>
-#include <gtest/gtest.h>
 #include <genie/util/data-block.h>
+#include <gtest/gtest.h>
 #include <iostream>
 #include <vector>
 #include "common.h"

@@ -18,12 +18,7 @@
 namespace genie {
 namespace core {
 
-
-enum class AlphabetID : uint8_t {
-    ACGTN = 0,
-    ACGTRYSWKMBDHVN_ = 1
-};
-
+enum class AlphabetID : uint8_t { ACGTN = 0, ACGTRYSWKMBDHVN_ = 1 };
 
 enum class GenDesc : uint8_t {
     POS = 0,
@@ -147,7 +142,6 @@ struct GenomicSubDescriptorProperties {
     std::string name;
 };
 
-
 struct GenomicDescriptorProperties {
     GenDesc id;
     std::string name;
@@ -155,7 +149,6 @@ struct GenomicDescriptorProperties {
     std::vector<GenomicSubDescriptorProperties> subseqs;
     const GenomicSubDescriptorProperties& getSubSeq(uint8_t sub) const;
 };
-
 
 struct Alphabet {
     std::vector<char> lut;

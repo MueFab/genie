@@ -1,8 +1,8 @@
 #include <genie/entropy/gabac/constants.h>
 #include <genie/entropy/gabac/decode-cabac.h>
 #include <genie/entropy/gabac/encode-cabac.h>
-#include <gtest/gtest.h>
 #include <genie/util/data-block.h>
+#include <gtest/gtest.h>
 #include <algorithm>
 #include <functional>
 #include <iostream>
@@ -31,8 +31,9 @@ TEST_F(CoreTest, encode) {
             std::vector<unsigned int> binpam;
             if (params[b] > 0) {
                 binpam.resize(params[b] - 1u, 1);
-                EXPECT_DEATH(genie::entropy::gabac::encode_cabac(genie::entropy::gabac::BinarizationId(b), binpam,
-                                                 genie::entropy::gabac::ContextSelectionId::adaptive_coding_order_0, &s),
+                EXPECT_DEATH(genie::entropy::gabac::encode_cabac(
+                                 genie::entropy::gabac::BinarizationId(b), binpam,
+                                 genie::entropy::gabac::ContextSelectionId::adaptive_coding_order_0, &s),
                              "");
             }
         }
@@ -60,10 +61,12 @@ TEST_F(CoreTest, roundTrip) {
             genie::util::DataBlock sym(ran);
             std::cout << "---> Testing binarization " + binNames[b] + " and context selection " + ctxNames[c] + "..."
                       << std::endl;
-            EXPECT_NO_THROW(genie::entropy::gabac::encode_cabac(genie::entropy::gabac::BinarizationId(b), binarizationParameters[b],
-                                                genie::entropy::gabac::ContextSelectionId(c), &sym));
-            EXPECT_NO_THROW(genie::entropy::gabac::decode_cabac(genie::entropy::gabac::BinarizationId(b), binarizationParameters[b],
-                                                genie::entropy::gabac::ContextSelectionId(c), ran.getWordSize(), &sym));
+            EXPECT_NO_THROW(genie::entropy::gabac::encode_cabac(genie::entropy::gabac::BinarizationId(b),
+                                                                binarizationParameters[b],
+                                                                genie::entropy::gabac::ContextSelectionId(c), &sym));
+            EXPECT_NO_THROW(genie::entropy::gabac::decode_cabac(
+                genie::entropy::gabac::BinarizationId(b), binarizationParameters[b],
+                genie::entropy::gabac::ContextSelectionId(c), ran.getWordSize(), &sym));
             EXPECT_EQ(sym, ran);
         }
     }
