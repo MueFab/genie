@@ -206,7 +206,6 @@ mgb::getDescriptorProperties()[descriptor].number_subsequences;
     std::cout << "Total number of reads: " << cp.num_reads << "\n";
     return;
 }*/
-
 }
 }  // namespace read
 }  // namespace genie

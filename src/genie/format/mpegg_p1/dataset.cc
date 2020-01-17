@@ -10,16 +10,16 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-Dataset::Dataset(const std::unique_ptr<genie::format::mgb::DataUnitFactory>& dataUnitFactory
-    , std::vector<std::unique_ptr<genie::format::mgb::AccessUnit>>* accessUnits_p2){
+Dataset::Dataset(const std::unique_ptr<genie::format::mgb::DataUnitFactory>& dataUnitFactory,
+                 std::vector<std::unique_ptr<genie::format::mgb::AccessUnit>>* accessUnits_p2) {
     //(void)dataUnitFactory;  // silence compiler warning
 
-    //TODO multiple params?
+    // TODO multiple params?
     dataset_parameter_sets.push_back(genie::util::make_unique<DatasetParameterSet>(dataUnitFactory->getParams(0)));
 
-    for (auto &au : *accessUnits_p2) {
-        (void) au; //silence compiler warnings
-        //access_units.push_back(util::make_unique<mpegg_p1::AccessUnit>(au)); //TODO!!!
+    for (auto& au : *accessUnits_p2) {
+        (void)au;  // silence compiler warnings
+        // access_units.push_back(util::make_unique<mpegg_p1::AccessUnit>(au)); //TODO!!!
     }
     // TODO: add dt_metadata and dt_protection, dataset_header, dataset_parametersets, accessunits(p1)
 }

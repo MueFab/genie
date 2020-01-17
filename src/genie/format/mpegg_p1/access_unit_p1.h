@@ -38,7 +38,7 @@ class AU_protection {
     std::vector<uint8_t> AU_protection_value;
 };
 
-class AccessUnit{
+class AccessUnit {
    public:
     explicit AccessUnit(std::unique_ptr<genie::format::mgb::AccessUnit> au_p2);
 

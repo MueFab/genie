@@ -1,6 +1,6 @@
 #include <genie/entropy/gabac/lut-transform.h>
-#include <gtest/gtest.h>
 #include <genie/util/data-block.h>
+#include <gtest/gtest.h>
 #include <iostream>
 #include <vector>
 #include "common.h"
@@ -17,7 +17,8 @@ TEST(LutTransformTest, roundTripCoding0) {
 
     EXPECT_NO_THROW(genie::entropy::gabac::transformLutTransform(0, &transsymbols, &inverseLut0, &inverseLut1));
     decodedSymbols = transsymbols;
-    EXPECT_NO_THROW(genie::entropy::gabac::inverseTransformLutTransform(0, &decodedSymbols, &inverseLut0, &inverseLut1));
+    EXPECT_NO_THROW(
+        genie::entropy::gabac::inverseTransformLutTransform(0, &decodedSymbols, &inverseLut0, &inverseLut1));
     EXPECT_EQ(decodedSymbols.size(), symbols.size());
     EXPECT_EQ(decodedSymbols, symbols);
 

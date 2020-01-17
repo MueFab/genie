@@ -24,7 +24,7 @@ class DatasetParameterSet {
     uint8_t dataset_group_ID : 8;
     uint16_t dataset_ID : 16;
 
-    //std::unique_ptr<core::parameter::ParameterSet> parameterSet_p2;
+    // std::unique_ptr<core::parameter::ParameterSet> parameterSet_p2;
     core::parameter::ParameterSet parameterSet_p2;
 };
 }  // namespace mpegg_p1
