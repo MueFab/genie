@@ -206,7 +206,6 @@ std::vector<std::vector<gabac::EncodingConfiguration>> create_default_conf() {
     }
     return ret;
 }*/
-
 }
 }  // namespace read
 }  // namespace genie

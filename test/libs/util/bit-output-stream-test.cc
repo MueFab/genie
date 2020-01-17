@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include <genie/util/bitwriter.h>
+#include <gtest/gtest.h>
 
 TEST(BitOutputStreamTest, write) {  // NOLINT(cert-err58-cpp)
     std::stringstream str;

@@ -1,6 +1,6 @@
 #include <genie/entropy/gabac/bit-input-stream.h>
-#include <gtest/gtest.h>
 #include <genie/util/data-block.h>
+#include <gtest/gtest.h>
 
 TEST(BitInputStreamTest, readByte) {  // NOLINT(cert-err58-cpp)
     genie::util::DataBlock bitstream(0, 1);

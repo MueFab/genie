@@ -40,9 +40,7 @@ std::unique_ptr<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                 std::cout << "Decompressing AU " << ret->getID() << "..." << std::endl;
                 return ret;
             }
-            default: {
-                UTILS_DIE("DataUnitFactory invalid DataUnitType!");
-            }
+            default: { UTILS_DIE("DataUnitFactory invalid DataUnitType!"); }
         }
     } while (type != core::parameter::DataUnit::DataUnitType::ACCESS_UNIT);
     return std::unique_ptr<AccessUnit>();
