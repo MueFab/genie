@@ -1,8 +1,8 @@
-#include <gtest/gtest.h>
 #include <genie/format/fastq/importer.h>
+#include <gtest/gtest.h>
 #include "helpers.h"
 
-//TEST(FastqFileReader, Simplest) {  // NOLINT(cert-err-cpp)
+// TEST(FastqFileReader, Simplest) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
 //    format::fastq::FastqFileReader reader(gitRootDir + "/data/fastq/simplest.fastq");
@@ -17,7 +17,7 @@
 //    EXPECT_EQ(records.front().qualityScores, "QUAL");
 //}
 //
-//TEST(FastqFileReader, FourteenRecords) {  // NOLINT(cert-err-cpp)
+// TEST(FastqFileReader, FourteenRecords) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
 //    format::fastq::FastqFileReader reader(gitRootDir + "/data/fastq/fourteen-gattaca-records.fastq");
@@ -37,7 +37,7 @@
 //    EXPECT_EQ(records.back().qualityScores, "YTILAUQ");
 //}
 //
-//TEST(FastqFileReader, BlankLine) {  // NOLINT(cert-err-cpp)
+// TEST(FastqFileReader, BlankLine) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
 //    format::fastq::FastqFileReader reader(gitRootDir + "/data/fastq/blank-line.fastq");
@@ -57,7 +57,7 @@
 //    EXPECT_EQ(records.back().qualityScores, "QUALITY");
 //}
 //
-//TEST(FastqFileReader, Truncated) {  // NOLINT(cert-err-cpp)
+// TEST(FastqFileReader, Truncated) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
 //    format::fastq::FastqFileReader reader(gitRootDir + "/data/fastq/fourteen-gattaca-records-truncated.fastq");

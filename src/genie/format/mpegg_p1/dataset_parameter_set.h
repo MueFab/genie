@@ -12,9 +12,9 @@
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
-class DatasetParameterSet : public core::parameter::ParameterSet {
+class DatasetParameterSet {
    public:
-    DatasetParameterSet(core::parameter::ParameterSet&);
+    explicit DatasetParameterSet(const core::parameter::ParameterSet&);
 
    private:
     /**
@@ -23,6 +23,9 @@ class DatasetParameterSet : public core::parameter::ParameterSet {
      * ------------------------------------------------------------------------------------------------------------- */
     uint8_t dataset_group_ID : 8;
     uint16_t dataset_ID : 16;
+
+    // std::unique_ptr<core::parameter::ParameterSet> parameterSet_p2;
+    core::parameter::ParameterSet parameterSet_p2;
 };
 }  // namespace mpegg_p1
 }  // namespace format

@@ -23,7 +23,6 @@ namespace core {
  */
 class ReadEncoder : public util::Drain<record::MpeggChunk>, public util::Source<AccessUnitRaw> {
    public:
-
     /**
      * @Brief For polymorphic destruction
      */

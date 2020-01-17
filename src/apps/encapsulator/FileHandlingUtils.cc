@@ -120,14 +120,14 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
             }
         }*/
 
-    std::vector<std::unique_ptr<genie::core::parameter::DataUnit>> dataUnits;
+    std::vector<std::unique_ptr<genie::format::mgb::AccessUnit>> accessUnits;
 
-    genie::format::mgb::DataUnitFactory dataUnitFactory;
+    auto dataUnitFactory = genie::util::make_unique<genie::format::mgb::DataUnitFactory>();
     // while (inputFileBitReader.isGood()) {
-    dataUnits.push_back(dataUnitFactory.read(inputFileBitReader));
+    accessUnits.push_back(dataUnitFactory->read(inputFileBitReader));
     //}
-    for (auto const& dataUnit : dataUnits) {
-        fprintf(stdout, "\ndata_unit_type:%u\n", (uint8_t)dataUnit->getDataUnitType());
+    for (auto const& au : accessUnits) {
+        fprintf(stdout, "\ndata_unit_type:%u\n", (uint8_t)au->getDataUnitType());
     }
 
     // ---------------------------------------------------------------------------------------------------------------------
@@ -138,7 +138,7 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
     // - AccessUnit[]
 
     std::vector<std::unique_ptr<genie::format::mpegg_p1::Dataset>> datasets;
-    datasets.push_back(genie::format::mpegg_p1::Dataset::createFromDataUnits(dataUnits));
+    datasets.push_back(genie::util::make_unique<genie::format::mpegg_p1::Dataset>(dataUnitFactory, &accessUnits));
 
     // DatasetGroup consists of:
     // - DatasetGroupHeader
