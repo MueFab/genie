@@ -198,7 +198,7 @@ class PythonApiTest(unittest.TestCase):
                 GABAC_OPERATION.ENCODE,
                 blocks
         ):
-            libc.printf(b"Diff backbone failed!\n")
+            libc.printf(b"Diff core failed!\n")
             libgabac.gabac_data_block_release(blocks[0])
             libgabac.gabac_data_block_release(blocks[1])
             return GABAC_RETURN.FAILURE
@@ -214,7 +214,7 @@ class PythonApiTest(unittest.TestCase):
                 GABAC_OPERATION.ENCODE,
                 ct.byref(blocks[1])
         ):
-            libc.printf(b"Cabac backbone failed!\n")
+            libc.printf(b"Cabac core failed!\n")
             libgabac.gabac_data_block_release(blocks[0])
             libgabac.gabac_data_block_release(blocks[1])
             return GABAC_RETURN.FAILURE
@@ -264,7 +264,7 @@ class PythonApiTest(unittest.TestCase):
                 GABAC_OPERATION.DECODE,
                 blocks
         ):
-            libc.printf(b"Inverse diff backbone failed!\n")
+            libc.printf(b"Inverse diff core failed!\n")
             libgabac.gabac_data_block_release(blocks[0])
             libgabac.gabac_data_block_release(blocks[1])
             return GABAC_RETURN.FAILURE

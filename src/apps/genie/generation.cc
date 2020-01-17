@@ -16,12 +16,6 @@
 #include <string>
 #include <thread>
 #include <vector>
-#include "fasta/fasta-file-reader.h"
-#include "fasta/fasta-record.h"
-#include "sam/sam-record.h"
-#include "spring/decompress.h"
-#include "spring/spring.h"
-#include "util/exceptions.h"
 #if 0
 namespace dsg {
 

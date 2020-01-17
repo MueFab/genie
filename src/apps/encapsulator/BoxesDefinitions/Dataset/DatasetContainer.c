@@ -418,7 +418,7 @@ DatasetContainer* parseDatasetContainer(uint64_t boxContentSize, FILE* inputFile
 
             DatasetParameters* datasetParameters = parseDatasetParameters(boxSize - 12, inputFile);
             if (datasetParameters == NULL) {
-                fprintf(stderr, "Error reading dataset parameters.\n");
+                fprintf(stderr, "Error reading dataset parameter.\n");
                 freeDatasetContainer(datasetContainer);
                 return NULL;
             }
@@ -551,7 +551,7 @@ bool generateDatasetSeekPoints(DatasetContainer* datasetContainer) {
              datasetParameter_i++) {
             DatasetParameters* datasetParameters = getValue(datasetContainer->datasetParameters, datasetParameter_i);
             if (datasetParameters == NULL) {
-                fprintf(stdout, "\tdataset parameters @ %li-%li\n", getDatasetParametersSeekPosition(datasetParameters),
+                fprintf(stdout, "\tdataset parameter @ %li-%li\n", getDatasetParametersSeekPosition(datasetParameters),
                         getDatasetParametersSeekPosition(datasetParameters) +
                             getSizeContentDatasetParameters(datasetParameters));
             }

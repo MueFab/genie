@@ -12,9 +12,9 @@
 
 #include <iostream>
 
+#include <genie/util/exceptions.h>
 #include "generation.h"
 #include "program-options.h"
-#include "util/exceptions.h"
 
 static void printProgramInformation();
 
@@ -39,7 +39,7 @@ static int dsg_main(int argc, char* argv[]) {
         } else {
             //          decompression(programOptions);
         }
-    } catch (const util::RuntimeException& e) {
+    } catch (const genie::util::RuntimeException& e) {
         std::cerr << "Runtime error";
         if (strlen(e.what()) > 0) {
             std::cerr << ": " << e.what();

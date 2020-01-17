@@ -4,9 +4,9 @@
  */
 
 #include "FileHandlingUtils.h"
-#include <mpegg_p1/dataset.h>
-#include <mpegg_p2/data-unit-factory.h>
-#include <mpegg_p2/parameter_set.h>
+#include <genie/core/parameter/parameter_set.h>
+#include <genie/format/mgb/data-unit-factory.h>
+#include <genie/format/mpegg_p1/dataset.h>
 
 // DatasetHeader *
 // initDatasetHeaderNoMIT(DatasetGroupId datasetGroupId, DatasetId datasetId, char *version, bool multipleAlignmentFlag,
@@ -99,7 +99,7 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
         return -1;
     }
 
-    util::BitReader inputFileBitReader(inputFilestream);
+    genie::util::BitReader inputFileBitReader(inputFilestream);
 
     /*uint32_t value;
     char buffer[256];
@@ -120,9 +120,9 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
             }
         }*/
 
-    std::vector<std::unique_ptr<genie::mpegg_p2::DataUnit>> dataUnits;
+    std::vector<std::unique_ptr<genie::core::parameter::DataUnit>> dataUnits;
 
-    genie::mpegg_p2::DataUnitFactory dataUnitFactory;
+    genie::format::mgb::DataUnitFactory dataUnitFactory;
     // while (inputFileBitReader.isGood()) {
     dataUnits.push_back(dataUnitFactory.read(inputFileBitReader));
     //}
@@ -130,15 +130,15 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
         fprintf(stdout, "\ndata_unit_type:%u\n", (uint8_t)dataUnit->getDataUnitType());
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------
 
     // Dataset consists of:
     // - DatasetHeader
     // - DatasetParameterSet
     // - AccessUnit[]
 
-    std::vector<std::unique_ptr<genie::mpegg_p1::Dataset>> datasets;
-    datasets.push_back(genie::mpegg_p1::Dataset::createFromDataUnits(dataUnits));
+    std::vector<std::unique_ptr<genie::format::mpegg_p1::Dataset>> datasets;
+    datasets.push_back(genie::format::mpegg_p1::Dataset::createFromDataUnits(dataUnits));
 
     // DatasetGroup consists of:
     // - DatasetGroupHeader
@@ -153,7 +153,7 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
 
     // auto mpeggFile = format::mpegg_p1::MpeggFile::createFromDatasetGroups(datasetGroups);
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------
 
     // while (true) {
     //     auto dataUnit = DataUnitFactory.createFromBitReader(bitReader);
@@ -182,15 +182,15 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
     //        return -1;
     //    }
     //
-    //    Vector* parameters;
-    //    if(getDataUnitsParameters(dataUnits, &parameters) != 0){
+    //    Vector* parameter;
+    //    if(getDataUnitsParameters(dataUnits, &parameter) != 0){
     //        freeDataUnits(dataUnits);
     //        return -1;
     //    }
-    //    size_t parametersCount = getSize(parameters);
+    //    size_t parametersCount = getSize(parameter);
     //    bool isAReferenceFile = false;
     //    for(size_t parameters_i = 0; parameters_i < parametersCount; parameters_i++){
-    //        DataUnitParametersSet* parametersSet = (DataUnitParametersSet*) getValue(parameters, parameters_i);
+    //        DataUnitParametersSet* parametersSet = (DataUnitParametersSet*) getValue(parameter, parameters_i);
     //
     //        pushBack(datasetParameters, initDatasetParametersWithParameters(
     //                0,0,parametersSet->parent_parameter_setId, parametersSet->parameter_setId,
@@ -361,7 +361,7 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
     //        uint32_t accessUnitId;
     //        uint8_t numBlocks;
     //        uint8_t parameterSetId;
-    //        ClassType mpegg_rec::MpeggRecord::ClassType;
+    //        ClassType mgrec::MpeggRecord::ClassType;
     //        uint32_t readsCount;
     //        uint16_t mmThreshold;
     //        uint32_t mmCount;
@@ -379,7 +379,7 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
     //                getDataUnitNumBlocks(dataUnitAccessUnit, &numBlocks) != 0 ||
     //                getDataUnitParameterSetId(dataUnitAccessUnit, &parameterSetId) != 0 ||
     //                getDataUnitmpegg_rec::MpeggRecord::ClassType(dataUnitAccessUnit,
-    //                &mpegg_rec::MpeggRecord::ClassType) != 0 || getDataUnitReadsCount(dataUnitAccessUnit, &readsCount)
+    //                &mgrec::MpeggRecord::ClassType) != 0 || getDataUnitReadsCount(dataUnitAccessUnit, &readsCount)
     //                != 0 || getDataUnitMMThreshold(dataUnitAccessUnit, &mmThreshold) != 0 ||
     //                getDataUnitMMCount(dataUnitAccessUnit, &mmCount) != 0 ||
     //                getDataUnitSequenceId(dataUnitAccessUnit, &sequenceId) != 0 ||
@@ -402,7 +402,7 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
     //                accessUnitId,
     //                numBlocks,
     //                parameterSetId,
-    //                mpegg_rec::MpeggRecord::ClassType,
+    //                mgrec::MpeggRecord::ClassType,
     //                readsCount,
     //                mmThreshold,
     //                mmCount

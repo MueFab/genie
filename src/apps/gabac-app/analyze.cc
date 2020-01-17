@@ -1,6 +1,6 @@
 #include "analyze.h"
 
-#include <gabac/gabac.h>
+#include <genie/entropy/gabac/gabac.h>
 
 #include <fstream>
 #include <iostream>
@@ -10,7 +10,7 @@ void analyze(const std::string &inputFilePath, const std::string &configurationF
              uint64_t max_val, uint8_t word_size) {
     std::ifstream inputFile;
     std::ofstream configurationFile;
-    genie::gabac::NullStream nullstream;
+    genie::entropy::gabac::NullStream nullstream;
 
     std::istream *istream = &std::cin;
     std::ostream *ostream = &std::cout;
@@ -33,13 +33,13 @@ void analyze(const std::string &inputFilePath, const std::string &configurationF
         logstream = &nullstream;
     }
 
-    genie::gabac::IOConfiguration ioConf = {istream, ostream, blocksize, logstream,
-                                            genie::gabac::IOConfiguration::LogLevel::TRACE};
+    genie::entropy::gabac::IOConfiguration ioConf = {istream, ostream, blocksize, logstream,
+                                                     genie::entropy::gabac::IOConfiguration::LogLevel::TRACE};
 
-    auto aconf = genie::gabac::getCandidateConfig();
+    auto aconf = genie::entropy::gabac::getCandidateConfig();
     aconf.wordSize = word_size;
     aconf.maxValue = max_val;
-    genie::gabac::analyze(ioConf, aconf);
+    genie::entropy::gabac::analyze(ioConf, aconf);
     /* GABACIFY_LOG_INFO << "Wrote smallest bytestream of size "
                       << bestByteStream.size()
                       << " to: "

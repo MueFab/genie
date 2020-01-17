@@ -20,7 +20,7 @@ bool parseDataUnitsParametersSet(DataUnitParametersSet** parametersSet, FILE* in
 
     Encoding_ParametersType* encoding_parameters = readEncodingParameters(&inputBitstream);
     if (encoding_parameters == NULL) {
-        fprintf(stderr, "Encoding parameters could not be read.\n");
+        fprintf(stderr, "Encoding parameter could not be read.\n");
         return NULL;
     }
 
@@ -46,7 +46,7 @@ bool writeParametersSet(DataUnitParametersSet* parametersSet, FILE* outputFile) 
         writeBuffer(&outputBitstream);
         return true;
     } else {
-        fprintf(stderr, "Error writing parameters set.\n");
+        fprintf(stderr, "Error writing parameter set.\n");
         return false;
     }
 }

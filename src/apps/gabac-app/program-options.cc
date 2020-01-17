@@ -1,9 +1,8 @@
 #include "program-options.h"
 
-#include <gabac/gabac.h>
-
 #include <cli11@13becad/CLI11.hpp>
 
+#include <genie/util/exceptions.h>
 #include <cassert>
 #include <fstream>
 
@@ -49,7 +48,7 @@ void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     try {
         app.parse(argc, argv);
     } catch (const CLI::ParseError &e) {
-        GABAC_DIE("Program options error: " + std::to_string(app.exit(e)));
+        UTILS_DIE("Program options error: " + std::to_string(app.exit(e)));
     }
 
     validate();
@@ -61,14 +60,14 @@ void ProgramOptions::validate(void) {
         // It's fine not to provide a configuration file path for encoding.
         // This will trigger the analysis.
         if (this->configurationFilePath.empty() && this->inputFilePath.empty()) {
-            GABAC_DIE("Configuration and input file path both not provided!");
+            UTILS_DIE("Configuration and input file path both not provided!");
         }
 
         // We need an output file path - generate one if not provided by the
         // user
         if (!this->outputFilePath.empty()) {
             if (fileExists(this->outputFilePath)) {
-                GABAC_DIE("Output file already existing: " + this->outputFilePath);
+                UTILS_DIE("Output file already existing: " + this->outputFilePath);
             }
         }
 
@@ -77,16 +76,16 @@ void ProgramOptions::validate(void) {
         // the user
         if (!this->outputFilePath.empty()) {
             if (fileExists(this->configurationFilePath)) {
-                GABAC_DIE("Config file already existing: " + this->outputFilePath);
+                UTILS_DIE("Config file already existing: " + this->outputFilePath);
             }
         }
 
         if (!this->configurationFilePath.empty()) {
-            GABAC_DIE("Analyze does not accept config file paths");
+            UTILS_DIE("Analyze does not accept config file paths");
         }
 
     } else {
-        GABAC_DIE("Task '" + this->task + "' is invaid");
+        UTILS_DIE("Task '" + this->task + "' is invaid");
     }
 }
 

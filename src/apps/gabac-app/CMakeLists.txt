@@ -9,4 +9,4 @@ set(source_files
 
 add_executable(gabac-app ${source_files})
 
-target_link_libraries(gabac-app PRIVATE gabac)
+target_link_libraries(gabac-app PRIVATE genie-gabac)

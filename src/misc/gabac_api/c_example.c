@@ -64,7 +64,7 @@ void print_block(const gabac_data_block* block) {
 
 /* Example how to use the transformation interface */
 int example_transformations(void) {
-    /* For parameters and necessary number of streams consult c_interface.h */
+    /* For parameter and necessary number of streams consult c_interface.h */
     gabac_data_block blocks[2];
     const uint64_t parameters_RLE[] = {255};
     const uint64_t parameters_CABAC[] = {gabac_binarization_TU, 2, gabac_context_select_ADAPTIVE_ORDER_0, sizeof(int)};
@@ -106,7 +106,7 @@ int example_transformations(void) {
     /********************************************/
     printf("***Executing Diff-Coding on block 0!\n");
     if (gabac_execute_transform(gabac_transform_DIFF, NULL, FALSE, blocks)) {
-        printf("Diff backbone failed!\n");
+        printf("Diff core failed!\n");
         goto ERROR;
     }
     print_block(&blocks[0]);
@@ -114,7 +114,7 @@ int example_transformations(void) {
     /********************************************/
     printf("***Executing CABAC-Coding on block 1!\n");
     if (gabac_execute_transform(gabac_transform_CABAC, parameters_CABAC, FALSE, &blocks[1])) {
-        printf("Cabac backbone failed!\n");
+        printf("Cabac core failed!\n");
         goto ERROR;
     }
     print_block(&blocks[1]);
@@ -142,7 +142,7 @@ int example_transformations(void) {
 
     /* After this last decoding step you should retrieve the raw example data again */
     if (gabac_execute_transform(gabac_transform_RLE, parameters_RLE, TRUE, blocks)) {
-        printf("Inverse diff backbone failed!\n");
+        printf("Inverse diff core failed!\n");
         goto ERROR;
     }
     print_block(&blocks[0]);

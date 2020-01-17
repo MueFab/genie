@@ -7,8 +7,8 @@
 #include "encoding.h"
 #include "program-options.h"
 
-#include <util/exceptions.h>
-#include <util/log.h>
+#include <genie/util/exceptions.h>
+#include <genie/util/log.h>
 
 static void writeCommandLine(int argc, char *argv[]) {
     std::vector<std::string> args(argv, (argv + argc));
@@ -24,7 +24,7 @@ static int lae_main(int argc, char *argv[]) {
         lae::ProgramOptions programOptions(argc, argv);
         writeCommandLine(argc, argv);
         lae::encode(programOptions);
-    } catch (const util::RuntimeException &e) {
+    } catch (const genie::util::RuntimeException &e) {
         LOG_ERROR << "Internal runtime error: " << e.msg();
         return -1;
     } catch (const std::exception &e) {

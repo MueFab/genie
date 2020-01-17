@@ -135,14 +135,14 @@ int parseDataUnitAccessUnit(DataUnitAccessUnit** dataUnitAccessUnit, DataUnits* 
 
     DataUnitParametersSet* parametersSet;
     if (getDataUnitsParametersById(dataUnits, parameterSetId, &parametersSet) != 0) {
-        fprintf(stderr, "Error reading DataUnitAccessUnit: parameters could not be found.\n");
+        fprintf(stderr, "Error reading DataUnitAccessUnit: parameter could not be found.\n");
         return false;
     }
 
     remainingSize -= 32;  // accessUnitId
     remainingSize -= 8;   // numBlocks
     remainingSize -= 8;   // parameterSetId
-    remainingSize -= 4;   // mpegg_rec::MpeggRecord::ClassType
+    remainingSize -= 4;   // mgrec::MpeggRecord::ClassType
     remainingSize -= 32;  // readsCount
     if (mpegg_rec::MpeggRecord::ClassType == CLASS_TYPE_CLASS_N ||
         mpegg_rec::MpeggRecord::ClassType == CLASS_TYPE_CLASS_M) {

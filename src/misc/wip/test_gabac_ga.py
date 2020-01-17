@@ -1,15 +1,7 @@
-import os
 import json
-import math
-
-import matplotlib.pyplot as plt
-
-from gabac_api import libgabac
-from gabac_api import gabac_io_config
-from gabac_api import gabac_data_block
-from gabac_api import GABAC_OPERATION, GABAC_RETURN, GABAC_TRANSFORM
+import os
+from gabac_api import GABAC_TRANSFORM
 from gabac_api import root_path
-
 from gabac_ga import GeneticAlgorithmForGabac
 
 with open(os.path.join(root_path, 'resources', 'input_files', 'one_mebibyte_random'), 'rb') as f:

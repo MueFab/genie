@@ -1,7 +1,7 @@
 #ifndef LAE_PROGRAM_OPTIONS_H_
 #define LAE_PROGRAM_OPTIONS_H_
 
-#include <backbone/mpegg_rec/mpegg-record.h>
+#include <genie/core/record/record.h>
 #include <string>
 
 namespace lae {

@@ -1,22 +1,15 @@
-import os
 # import copy
 import json
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import random
+from gabac_conf_gen import GabacConfiguration
+
+
 # import math
 # import ctypes as ct
 # from collections import OrderedDict
-
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-
-from gabac_api import libgabac
-from gabac_api import gabac_stream
-from gabac_api import gabac_io_config
-from gabac_api import gabac_data_block
-from test_python_api import array, libc
-
-from gabac_conf_gen import GabacConfiguration
 
 
 class SimulatedAnnealingForGabac(object):

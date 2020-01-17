@@ -47,7 +47,7 @@ bool writeDatasetParameters(DatasetParameters* datasetParameters, FILE* outputFi
     uint64_t sizeDatasetParametersBigEndian = nativeToBigEndian64(sizeDatasetParameters);
     bool sizeSuccessfulWrite = fwrite(&sizeDatasetParametersBigEndian, sizeof(uint64_t), 1, outputFile) == 1;
     if (!typeWriteSuccessfulWrite || !sizeSuccessfulWrite) {
-        fprintf(stderr, "Error writing type or size of dataset parameters.\n");
+        fprintf(stderr, "Error writing type or size of dataset parameter.\n");
         return false;
     }
     return writeContentDatasetParameters(datasetParameters, outputFile);

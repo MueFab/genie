@@ -53,7 +53,7 @@ class GABAC_TRANSFORM:
         gabac_transform_RLE         : Find run lengths
         gabac_transform_LUT         : Remap symbols based on probability
         gabac_transform_DIFF        : Use differences between symbol values instead of symbols
-        gabac_transform_CABAC       : backbone based on cabac
+        gabac_transform_CABAC       : core based on paramcabac
     """
     NONE = 0
     EQUALITY = 1
@@ -66,7 +66,7 @@ class GABAC_TRANSFORM:
 
 class GABAC_BINARIZATION:
     r"""
-    Binarizations for cabac transformation
+    Binarizations for paramcabac transformation
 
     Values:
         BI : Binary
@@ -86,10 +86,10 @@ class GABAC_BINARIZATION:
 
 class GABAC_CONTEXT_SELECT:
     r"""
-    Context selection modes for cabac transformation
+    Context selection modes for paramcabac transformation
 
     Values:
-        BYPASS           : Do not use arithmetic backbone
+        BYPASS           : Do not use arithmetic core
         ADAPTIVE_ORDER_0 : Current symbol only
         ADAPTIVE_ORDER_1 : Use current + previous symbol
         ADAPTIVE_ORDER_2 : Use current + previous + before previous symbol
