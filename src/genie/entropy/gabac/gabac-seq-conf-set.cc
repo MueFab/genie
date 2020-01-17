@@ -124,7 +124,7 @@ void GabacSeqConfSet::storeParameters(core::parameter::ParameterSet &parameterSe
     for (const auto &desc : core::getDescriptors()) {
         auto descriptor_configuration = util::make_unique<core::parameter::desc_pres::DescriptorPresent>();
 
-        if(desc.id == core::GenDesc::RNAME || desc.id == core::GenDesc::MSAR) {
+        if (desc.id == core::GenDesc::RNAME || desc.id == core::GenDesc::MSAR) {
             auto decoder_config = util::make_unique<DecoderTokenType>();
             fillDecoder(desc, decoder_config.get());
             descriptor_configuration->setDecoder(std::move(decoder_config));

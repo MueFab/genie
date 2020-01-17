@@ -9,9 +9,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/util/bitwriter.h>
 #include <memory>
 #include <vector>
-#include <genie/util/bitwriter.h>
 #include "transformed-seq.h"
 #include "transformed_parameters.h"
 

@@ -9,8 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <memory>
 #include <genie/util/bitwriter.h>
+#include <memory>
 #include "binarization_parameters.h"
 #include "context.h"
 

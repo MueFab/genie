@@ -42,7 +42,7 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
 
     std::unique_ptr<core::parameter::desc_pres::Decoder> clone() const override;
 
-    static std::unique_ptr<core::parameter::desc_pres::DecoderTokentype> create(util::BitReader& reader) {
+    static std::unique_ptr<core::parameter::desc_pres::DecoderTokentype> create(util::BitReader &reader) {
         return util::make_unique<DecoderTokenType>(reader);
     }
 
@@ -50,10 +50,6 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
 
     uint8_t getRleGuardTokentype() const;
 };
-
-
-
-
 
 /**
  * Base for ISO 23092-2 Section 8.3.1 and ISO 23092-2 Section 8.3.5
@@ -65,9 +61,7 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
    public:
     static const uint8_t MODE_CABAC = 0;
 
-    DecoderRegular() : core::parameter::desc_pres::DecoderRegular(MODE_CABAC){
-
-    }
+    DecoderRegular() : core::parameter::desc_pres::DecoderRegular(MODE_CABAC) {}
 
     explicit DecoderRegular(core::GenDesc desc);
 
@@ -81,7 +75,7 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
 
     std::unique_ptr<core::parameter::desc_pres::Decoder> clone() const override;
 
-    static std::unique_ptr<core::parameter::desc_pres::DecoderRegular> create(util::BitReader& reader) {
+    static std::unique_ptr<core::parameter::desc_pres::DecoderRegular> create(util::BitReader &reader) {
         return util::make_unique<DecoderRegular>(reader);
     }
 

@@ -21,8 +21,10 @@ namespace module {
 void detect() {
     core::GlobalCfg::getSingleton().getIndustrialPark().registerConstructor<core::parameter::desc_pres::DecoderRegular>(
         entropy::paramcabac::DecoderRegular::MODE_CABAC, &entropy::paramcabac::DecoderRegular::create);
-    core::GlobalCfg::getSingleton().getIndustrialPark().registerConstructor<core::parameter::desc_pres::DecoderTokentype>(
-        entropy::paramcabac::DecoderRegular::MODE_CABAC, &entropy::paramcabac::DecoderTokenType::create);
+    core::GlobalCfg::getSingleton()
+        .getIndustrialPark()
+        .registerConstructor<core::parameter::desc_pres::DecoderTokentype>(
+            entropy::paramcabac::DecoderRegular::MODE_CABAC, &entropy::paramcabac::DecoderTokenType::create);
 
     core::GlobalCfg::getSingleton().getIndustrialPark().registerConstructor<core::parameter::QualityValues>(
         quality::paramqv1::QvCodingConfig1::MODE_QV1, &quality::paramqv1::QvCodingConfig1::create);
