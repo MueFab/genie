@@ -8,8 +8,12 @@
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
-// TODO: add constructor and au_information and au_protection
 
+AccessUnit::AccessUnit(std::unique_ptr<genie::format::mgb::AccessUnit> au_p2)
+{
+    au_p1 = std::move(au_p2);
+    // TODO: add au_information and au_protection
+}
 }
 }  // namespace format
 }  // namespace genie

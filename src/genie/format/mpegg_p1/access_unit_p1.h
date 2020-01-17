@@ -7,7 +7,8 @@
 #ifndef GENIE_ACCESS_UNIT_P1_H
 #define GENIE_ACCESS_UNIT_P1_H
 
-#include <genie/format/mgb/access_unit.h>
+#include "genie/format/mgb/access_unit.h"
+#include "genie/format/mgb/data-unit-factory.h"
 
 namespace genie {
 namespace format {
@@ -37,15 +38,17 @@ class AU_protection {
     std::vector<uint8_t> AU_protection_value;
 };
 
-class AccessUnit : public mgb::AccessUnit {
+class AccessUnit{
    public:
-    AccessUnit(const mgb::AccessUnit&);
+    explicit AccessUnit(std::unique_ptr<genie::format::mgb::AccessUnit> au_p2);
 
    private:
     /**
      * ISO 23092-1 Section 6.5.3 table 24
      *
      * ------------------------------------------------------------------------------------------------------------- */
+
+    std::unique_ptr<genie::format::mgb::AccessUnit> au_p1;
 
     std::unique_ptr<AU_information> au_information;
     std::unique_ptr<AU_protection> au_protection;
