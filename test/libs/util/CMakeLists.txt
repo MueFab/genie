@@ -12,3 +12,5 @@ add_executable(util-tests ${source_files})
 
 target_link_libraries(util-tests PRIVATE gtest_main)
 target_link_libraries(util-tests PRIVATE util)
+target_link_libraries(util-tests PRIVATE genie-core)
+target_link_libraries(util-tests PRIVATE genie-util)

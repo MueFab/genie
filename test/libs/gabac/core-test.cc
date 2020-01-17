@@ -1,8 +1,8 @@
-#include <gabac/constants.h>
-#include <gabac/decode-cabac.h>
-#include <gabac/encode-cabac.h>
+#include <genie/entropy/gabac/constants.h>
+#include <genie/entropy/gabac/decode-cabac.h>
+#include <genie/entropy/gabac/encode-cabac.h>
 #include <gtest/gtest.h>
-#include <util/data-block.h>
+#include <genie/util/data-block.h>
 #include <algorithm>
 #include <functional>
 #include <iostream>
@@ -20,19 +20,19 @@ class CoreTest : public ::testing::Test {
 constexpr unsigned int CoreTest::params[];
 
 TEST_F(CoreTest, encode) {
-    std::vector<util::DataBlock> symbols = {util::DataBlock(0, 8), util::DataBlock(0, 8)};
+    std::vector<genie::util::DataBlock> symbols = {genie::util::DataBlock(0, 8), genie::util::DataBlock(0, 8)};
     symbols[1] = {1, 2, 3};
-    util::DataBlock bitstream;
+    genie::util::DataBlock bitstream;
     bitstream = {1, 3, 4};
 
     // Check parameter lengths
     for (auto& s : symbols) {
-        for (unsigned int b = 0; b < unsigned(gabac::BinarizationId::STEG) + 1u; ++b) {
+        for (unsigned int b = 0; b < unsigned(genie::entropy::gabac::BinarizationId::STEG) + 1u; ++b) {
             std::vector<unsigned int> binpam;
             if (params[b] > 0) {
                 binpam.resize(params[b] - 1u, 1);
-                EXPECT_DEATH(gabac::encode_cabac(gabac::BinarizationId(b), binpam,
-                                                 gabac::ContextSelectionId::adaptive_coding_order_0, &s),
+                EXPECT_DEATH(genie::entropy::gabac::encode_cabac(genie::entropy::gabac::BinarizationId(b), binpam,
+                                                 genie::entropy::gabac::ContextSelectionId::adaptive_coding_order_0, &s),
                              "");
             }
         }
@@ -49,21 +49,21 @@ TEST_F(CoreTest, roundTrip) {
 
     std::vector<std::string> ctxNames = {"bypass", "order0", "order1", "order2"};
 
-    util::DataBlock bitstream;
-    util::DataBlock decodedSymbols(0, 8);
+    genie::util::DataBlock bitstream;
+    genie::util::DataBlock decodedSymbols(0, 8);
 
     // Roundtrips
     for (int c = 0; c < 4; ++c) {
         for (int b = 0; b < 6; ++b) {
-            util::DataBlock ran(1024, 8);
+            genie::util::DataBlock ran(1024, 8);
             gabac_tests::fillVectorRandomUniform(intervals[b][0], intervals[b][1], &ran);
-            util::DataBlock sym(ran);
+            genie::util::DataBlock sym(ran);
             std::cout << "---> Testing binarization " + binNames[b] + " and context selection " + ctxNames[c] + "..."
                       << std::endl;
-            EXPECT_NO_THROW(gabac::encode_cabac(gabac::BinarizationId(b), binarizationParameters[b],
-                                                gabac::ContextSelectionId(c), &sym));
-            EXPECT_NO_THROW(gabac::decode_cabac(gabac::BinarizationId(b), binarizationParameters[b],
-                                                gabac::ContextSelectionId(c), ran.getWordSize(), &sym));
+            EXPECT_NO_THROW(genie::entropy::gabac::encode_cabac(genie::entropy::gabac::BinarizationId(b), binarizationParameters[b],
+                                                genie::entropy::gabac::ContextSelectionId(c), &sym));
+            EXPECT_NO_THROW(genie::entropy::gabac::decode_cabac(genie::entropy::gabac::BinarizationId(b), binarizationParameters[b],
+                                                genie::entropy::gabac::ContextSelectionId(c), ran.getWordSize(), &sym));
             EXPECT_EQ(sym, ran);
         }
     }

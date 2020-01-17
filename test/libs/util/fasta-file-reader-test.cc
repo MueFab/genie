@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <format/fasta/fasta-file-reader.h>
+#include <genie/format/fasta/reader.h>
 #include "helpers.h"
 
 // May need to add some requirements on what counts as a valid FASTA in the documentation
@@ -7,9 +7,9 @@
 //TEST(FastaFileReader, Minimal) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
-//    util::FastaFileReader reader(gitRootDir + "/data/fasta/minimal.fasta");
+//    genie::util::FastaFileReader reader(gitRootDir + "/data/fasta/minimal.fasta");
 //
-//    std::vector<util::FastaRecord> records;
+//    std::vector<genie::util::FastaRecord> records;
 //    reader.parse(&records);
 //
 //    EXPECT_EQ(records.size(), 1);
@@ -20,9 +20,9 @@
 //TEST(FastaFileReader, Empty) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
-//    util::FastaFileReader reader(gitRootDir + "/data/fasta/empty.fasta");
+//    genie::util::FastaFileReader reader(gitRootDir + "/data/fasta/empty.fasta");
 //
-//    std::vector<util::FastaRecord> records;
+//    std::vector<genie::util::FastaRecord> records;
 //    reader.parse(&records);
 //
 //    EXPECT_EQ(records.size(), 1);
@@ -33,9 +33,9 @@
 //TEST(FastaFileReader, OnlyHeaders) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
-//    util::FastaFileReader reader(gitRootDir + "/data/fasta/only-headers.fasta");
+//    genie::util::FastaFileReader reader(gitRootDir + "/data/fasta/only-headers.fasta");
 //
-//    std::vector<util::FastaRecord> records;
+//    std::vector<genie::util::FastaRecord> records;
 //    reader.parse(&records);
 //
 //    // This is the behavior the code offers - might make more sense if it skipped any blank
@@ -48,9 +48,9 @@
 //TEST(FastaFileReader, SingleSequenceNoHeader) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
-//    util::FastaFileReader reader(gitRootDir + "/data/fasta/single-sequence-no-header.fasta");
+//    genie::util::FastaFileReader reader(gitRootDir + "/data/fasta/single-sequence-no-header.fasta");
 //
-//    std::vector<util::FastaRecord> records;
+//    std::vector<genie::util::FastaRecord> records;
 //    reader.parse(&records);
 //
 //    // There isn't a definitive answer on whether a bare sequence is allowed,
@@ -63,9 +63,9 @@
 //TEST(FastaFileReader, SupernumeraryNewlines) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
-//    util::FastaFileReader reader(gitRootDir + "/data/fasta/supernumerary-newlines.fasta");
+//    genie::util::FastaFileReader reader(gitRootDir + "/data/fasta/supernumerary-newlines.fasta");
 //
-//    std::vector<util::FastaRecord> records;
+//    std::vector<genie::util::FastaRecord> records;
 //
 //    EXPECT_THROW(reader.parse(&records), std::runtime_error);
 //}
@@ -73,9 +73,9 @@
 //TEST(FastaFileReader, TwoTimesGattaca) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
-//    util::FastaFileReader reader(gitRootDir + "/data/fasta/two-times-gattaca.fasta");
+//    genie::util::FastaFileReader reader(gitRootDir + "/data/fasta/two-times-gattaca.fasta");
 //
-//    std::vector<util::FastaRecord> records;
+//    std::vector<genie::util::FastaRecord> records;
 //    reader.parse(&records);
 //
 //    EXPECT_EQ(records.size(), 2);
@@ -88,9 +88,9 @@
 //TEST(FastaFileReader, BlankLineMiddle) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
-//    util::FastaFileReader reader(gitRootDir + "/data/fasta/blank-line-middle.fasta");
+//    genie::util::FastaFileReader reader(gitRootDir + "/data/fasta/blank-line-middle.fasta");
 //
-//    std::vector<util::FastaRecord> records;
+//    std::vector<genie::util::FastaRecord> records;
 //    reader.parse(&records);
 //
 //    // This seems like a problem since it inserts the blank line character into the sequence
@@ -104,9 +104,9 @@
 //TEST(FastaFileReader, BlankLineBetween) {  // NOLINT(cert-err-cpp)
 //    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 //
-//    util::FastaFileReader reader(gitRootDir + "/data/fasta/blank-line-between.fasta");
+//    genie::util::FastaFileReader reader(gitRootDir + "/data/fasta/blank-line-between.fasta");
 //
-//    std::vector<util::FastaRecord> records;
+//    std::vector<genie::util::FastaRecord> records;
 //    reader.parse(&records);
 //
 //    // This too allows a newline character to be part of the sequence, which is not desirable

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <format/fastq/fastq-importer.h>
+#include <genie/format/fastq/importer.h>
 #include "helpers.h"
 
 //TEST(FastqFileReader, Simplest) {  // NOLINT(cert-err-cpp)
