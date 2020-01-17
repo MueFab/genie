@@ -1,22 +1,16 @@
 # import copy
 import json
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+from .gabac_conf_gen import GabacConfiguration
+
+
 # import random
 # import math
 # import ctypes as ct
 # from collections import OrderedDict
-
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-
-from gabac_api.c_api import (
-    libgabac,
-    gabac_stream,
-    gabac_io_config,
-    gabac_data_block
-)
-
-from .gabac_conf_gen import GabacConfiguration
 
 
 class GeneticAlgorithmForGabac(object):

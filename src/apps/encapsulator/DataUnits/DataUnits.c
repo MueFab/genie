@@ -154,7 +154,7 @@ bool writeDataUnits(DataUnits* dataUnits, FILE* outputStream) {
         DataUnitParametersSet* dataUnitParameterSet = getValue(dataUnits->parameters, dataUnitParameter_i);
         bool parametersWriteSuccessful = writeParametersSet(dataUnitParameterSet, outputStream);
         if (!parametersWriteSuccessful) {
-            fprintf(stderr, "Could not write parameters\n");
+            fprintf(stderr, "Could not write parameter\n");
             return false;
         }
     }
@@ -163,7 +163,7 @@ bool writeDataUnits(DataUnits* dataUnits, FILE* outputStream) {
         DataUnitAccessUnit* dataUnitAccessUnit = getValue(dataUnits->dataUnitsAccessUnits, dataUnitAccessUnit_i);
         DataUnitParametersSet* parametersSet;
         if (getDataUnitsParametersById(dataUnits, dataUnitAccessUnit->parameterSetId, &parametersSet)) {
-            fprintf(stderr, "Could not obtain parameters\n");
+            fprintf(stderr, "Could not obtain parameter\n");
             return false;
         }
         bool accessUnitSuccessfulWrite =

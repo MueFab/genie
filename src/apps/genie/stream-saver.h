@@ -14,7 +14,7 @@
 #include <omp.h>
 #endif
 
-#include <gabac/gabac.h>
+#include <genie/entropy/gabac/gabac.h>
 
 namespace genie {
 struct AcessUnitStreams {
@@ -35,7 +35,7 @@ class StreamSaver {
     std::ostream *fout;  // Output file
     std::istream *fin;   // Output file
 
-    std::map<std::string, gabac::EncodingConfiguration> configs;  // Already loaded configurations
+    std::map<std::string, entropy::gabac::EncodingConfiguration> configs;  // Already loaded configurations
 
     std::map<std::string, Streampos> file_index;
 

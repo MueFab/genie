@@ -8,7 +8,13 @@ set(source_files
 
 add_executable(local-assembly-encoder ${source_files})
 
-target_link_libraries(local-assembly-encoder PRIVATE gabac)
-target_link_libraries(local-assembly-encoder PRIVATE mpegg_p2)
-target_link_libraries(local-assembly-encoder PRIVATE sam)
-target_link_libraries(local-assembly-encoder PRIVATE local_assembly)
+target_link_libraries(local-assembly-encoder PRIVATE genie-gabac)
+target_link_libraries(local-assembly-encoder PRIVATE genie-mgb)
+target_link_libraries(local-assembly-encoder PRIVATE genie-sam)
+target_link_libraries(local-assembly-encoder PRIVATE genie-localassembly)
+target_link_libraries(local-assembly-encoder PRIVATE genie-module)
+
+get_filename_component(THIS_DIR ./ ABSOLUTE)
+get_filename_component(TOP_DIR ../../ ABSOLUTE)
+target_include_directories(local-assembly-encoder PUBLIC "${THIS_DIR}")
+target_include_directories(local-assembly-encoder PUBLIC "${TOP_DIR}")

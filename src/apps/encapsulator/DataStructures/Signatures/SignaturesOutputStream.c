@@ -2,8 +2,8 @@
 // Created by gencom on 6/10/17.
 //
 #include "SignaturesOutputStream.h"
+#include <genie/utils.h>
 #include <stdlib.h>
-#include <utils.h>
 
 int writeConstantLengthSignature(SignaturesOutputStream* signaturesOutputStream, Signature* signatureToWrite);
 int writeVariableLengthSignature(SignaturesOutputStream* signaturesOutputStream, Signature* signatureToWrite);

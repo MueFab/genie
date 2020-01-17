@@ -2713,7 +2713,7 @@ Encoding_ParametersType* readEncodingParameters(InputBitstream* input) {
     if (!datasetTypeSuccessfulRead || !alphabetIdSuccessfulRead || !readLengthSuccessfulRead ||
         !numberTemplateSegmentsSuccessfulRead || !maxAuDataUnitSuccessfulRead || !pos40BitsSuccessfulRead ||
         !qvDepthSuccessfulRead || !asDepthSuccessfulRead || !numClassesSuccessfulRead) {
-        fprintf(stderr, "Error reading encoding parameters.\n");
+        fprintf(stderr, "Error reading encoding parameter.\n");
         return NULL;
     }
 
@@ -2860,7 +2860,7 @@ Encoding_ParametersType* readEncodingParameters(InputBitstream* input) {
     default_qvps_ID = malloc(sizeof(uint8_t) * num_classes);
     qv_reverse_flag = malloc(sizeof(bool) * num_classes);
     if (qv_coding_mode == NULL) {
-        fprintf(stderr, "could not allocate qv backbone mode.\n");
+        fprintf(stderr, "could not allocate qv core mode.\n");
         for (uint16_t group_i = 0; group_i < num_groups; group_i++) {
             free(rgroup_ID[group_i]);
         }

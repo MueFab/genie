@@ -5,9 +5,9 @@
 #include <string>
 #include <vector>
 
+#include <genie/util/exceptions.h>
 #include "encoding.h"
 #include "program-options.h"
-#include "util/exceptions.h"
 
 static void writeCommandLine(int argc, char* argv[]) {
     std::vector<std::string> args(argv, (argv + argc));
@@ -23,7 +23,7 @@ static int genie_main(int argc, char* argv[]) {
         ureads_encoder::ProgramOptions programOptions(argc, argv);
         writeCommandLine(argc, argv);
         ureads_encoder::encode(programOptions);
-    } catch (const util::RuntimeException& e) {
+    } catch (const genie::util::RuntimeException& e) {
         std::cerr << "Runtime error: " << e.msg() << std::endl;
         return -1;
     } catch (const std::exception& e) {

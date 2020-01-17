@@ -13,8 +13,7 @@
 #include <cstdlib>
 #include <vector>
 
-#include <mpegg_p2/data_unit.h>
-#include <util/bitreader.h>
+#include <genie/util/bitreader.h>
 #include <fstream>
 
 // typedef struct {

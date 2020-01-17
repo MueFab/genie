@@ -1,0 +1,43 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
+#ifndef GENIE_RETURN_STRUCTURES_H
+#define GENIE_RETURN_STRUCTURES_H
+
+#include <map>
+#include <string>
+#include <vector>
+namespace genie {
+namespace read {
+namespace spring {
+class generated_aus_ref {
+    std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> refAus;
+    std::vector<uint64_t> refStart;
+    std::vector<uint64_t> refEnd;
+
+   public:
+    generated_aus_ref(const std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> &refAus,
+                      const std::vector<uint64_t> &refStart, const std::vector<uint64_t> &refEnd);
+
+    const std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> &getRefAus() const;
+
+    const std::vector<uint64_t> &getRefStart() const;
+
+    const std::vector<uint64_t> &getRefEnd() const;
+};
+
+class generated_aus {
+    std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> encodedFastqAus;
+
+   public:
+    generated_aus(const std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> &encodedFastqAus);
+
+    const std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> &getEncodedFastqAus() const;
+};
+}  // namespace spring
+}  // namespace read
+}  // namespace genie
+#endif  // GENIE_RETURN_STRUCTURES_H

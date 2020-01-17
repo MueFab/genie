@@ -6,17 +6,18 @@
 namespace genie {
 
 void StreamSaver::run_gabac(const std::string &name, util::DataBlock *data, bool decompression) {
-    gabac::EncodingConfiguration enConf = configs.at(getConfigName(name));
+    entropy::gabac::EncodingConfiguration enConf = configs.at(getConfigName(name));
     uint64_t insize = data->getRawSize();
 
-    gabac::IBufferStream istream(data, 0);
+    entropy::gabac::IBufferStream istream(data, 0);
     util::DataBlock out(0, 1);
-    gabac::OBufferStream ostream(&out);
+    entropy::gabac::OBufferStream ostream(&out);
 
     // Configure gabac streams
-    gabac::IOConfiguration ioconf = {&istream, &ostream, insize, &std::cout, gabac::IOConfiguration::LogLevel::TRACE};
+    entropy::gabac::IOConfiguration ioconf = {&istream, &ostream, insize, &std::cout,
+                                              entropy::gabac::IOConfiguration::LogLevel::TRACE};
 
-    gabac::run(ioconf, enConf, decompression);
+    entropy::gabac::run(ioconf, enConf, decompression);
 
     ostream.flush(data);
 
@@ -35,22 +36,22 @@ void StreamSaver::analyze(const std::string &name, util::DataBlock *data) {
     std::string configname = getConfigName(name);
     uint64_t insize = data->getRawSize();
 
-    gabac::IBufferStream istream(data, 0);
+    entropy::gabac::IBufferStream istream(data, 0);
     util::DataBlock out(0, 1);
     std::ofstream outfile(this->configPath + configname + ".json");
     outfile.exceptions(std::ios::badbit | std::ios::failbit);
 
     // Configure gabac streams
-    gabac::IOConfiguration ioconf = {&istream, &outfile, std::min(insize, uint64_t(10000000)), &std::cout,
-                                     gabac::IOConfiguration::LogLevel::TRACE};
+    entropy::gabac::IOConfiguration ioconf = {&istream, &outfile, std::min(insize, uint64_t(10000000)), &std::cout,
+                                              entropy::gabac::IOConfiguration::LogLevel::TRACE};
 
-    auto aconf = gabac::getCandidateConfig();
+    auto aconf = entropy::gabac::getCandidateConfig();
     const auto &params = getParams();
     aconf.maxValue = params.at(configname).maxval;
     aconf.wordSize = params.at(configname).wordsize;
 
     std::cout << "ANALYZING: " + this->configPath + configname + ".json" << std::endl;
-    gabac::analyze(ioconf, aconf);
+    entropy::gabac::analyze(ioconf, aconf);
 }
 
 void StreamSaver::compress(const std::string &name, util::DataBlock *data) {
@@ -76,7 +77,7 @@ void StreamSaver::compress(const std::string &name, util::DataBlock *data) {
                 encFile.write((char *)data->getData(), data->getRawSize());
             }
         }
-    } catch (const gabac::Exception &e) {
+    } catch (const entropy::gabac::Exception &e) {
         std::cout << "GABAC EXCEPTION DETECTED: " + name << std::endl;
         std::ofstream origFile("gabac_" + name + "_original");
         origFile.write((char *)original.getData(), original.getRawSize());
@@ -223,7 +224,7 @@ void StreamSaver::loadConfig(const std::string &name) {
             configstring = getDefaultConf();
         }
 
-        gabac::EncodingConfiguration enconf(configstring);
+        entropy::gabac::EncodingConfiguration enconf(configstring);
 
         configs.emplace(name, enconf);
     } else {
@@ -231,7 +232,7 @@ void StreamSaver::loadConfig(const std::string &name) {
         unpack("conf_" + name + ".json", &block);
         std::string json(block.getRawSize(), ' ');
         std::memcpy(&json[0], block.getData(), block.getRawSize());
-        gabac::EncodingConfiguration enconf(json);
+        entropy::gabac::EncodingConfiguration enconf(json);
         configs.emplace(name, enconf);
     }
 }

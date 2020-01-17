@@ -52,7 +52,7 @@ TEST(GabacCompressor, NonEmpty) {  // NOLINT(cert-err58-cpp)
 
     for (size_t i = 0; i < 50; ++i) {
         raw_aus.get(GenSub::RLEN).push(i);  // Append some data for one selected subsequence
-        // See backbone/constants.cpp/getDescriptors() or backbone/constants.h/GenSub for all valid descriptors and how many
+        // See core/constants.cpp/getDescriptors() or core/constants.h/GenSub for all valid descriptors and how many
         // subsequences there are for each descriptor (here we are only populating sequence 0). Maybe even use different,
         // random data for each run? You should vary test data a little bit to cover more cases and also use different
         // descriptor streams

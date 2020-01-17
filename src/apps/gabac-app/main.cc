@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include <gabac/gabac.h>
+#include <genie/entropy/gabac/gabac.h>
 
 #include "analyze.h"
 #include "code.h"
@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
         } else {
             GABAC_DIE("Invalid task: " + std::string(programOptions.task));
         }
-    } catch (const genie::gabac::RuntimeException& e) {
+    } catch (const genie::entropy::gabac::RuntimeException& e) {
         std::cerr << e.message() << std::endl;
         return EXIT_FAILURE;
     } catch (const std::exception& e) {

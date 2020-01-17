@@ -10,9 +10,9 @@ set(source_files
 
 add_executable(genie ${source_files})
 
-target_link_libraries(genie PRIVATE gabac)
-target_link_libraries(genie PRIVATE spring)
-target_link_libraries(genie PRIVATE util)
+target_link_libraries(genie PRIVATE genie-gabac)
+target_link_libraries(genie PRIVATE genie-spring)
+target_link_libraries(genie PRIVATE genie-util)
 target_link_libraries(genie PRIVATE pthread)
 
 if (${GENIE_USE_OPENMP})
