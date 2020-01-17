@@ -15,8 +15,7 @@ namespace paramcabac {
 // ---------------------------------------------------------------------------------------------------------------------
 
 DecoderRegular::DecoderRegular(core::GenDesc desc)
-    : core::parameter::desc_pres::DecoderRegular(MODE_CABAC),
-      descriptor_subsequence_cfgs() {
+    : core::parameter::desc_pres::DecoderRegular(MODE_CABAC), descriptor_subsequence_cfgs() {
     for (size_t i = 0; i < core::getDescriptors()[uint8_t(desc)].subseqs.size(); ++i) {
         descriptor_subsequence_cfgs.push_back(
             util::make_unique<Subsequence>(util::make_unique<TransformedParameters>(), i, false));
@@ -25,21 +24,17 @@ DecoderRegular::DecoderRegular(core::GenDesc desc)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DecoderRegular::DecoderRegular(util::BitReader &reader)
-    : core::parameter::desc_pres::DecoderRegular(MODE_CABAC) {
-
+DecoderRegular::DecoderRegular(util::BitReader &reader) : core::parameter::desc_pres::DecoderRegular(MODE_CABAC) {
     uint8_t num_descriptor_subsequence_cfgs = reader.read(8) + 1;
     for (size_t i = 0; i < num_descriptor_subsequence_cfgs; ++i) {
-        descriptor_subsequence_cfgs.emplace_back(
-            util::make_unique<Subsequence>(false, reader));
+        descriptor_subsequence_cfgs.emplace_back(util::make_unique<Subsequence>(false, reader));
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DecoderRegular::setSubsequenceCfg(uint8_t index, std::unique_ptr<TransformedParameters> cfg) {
-    descriptor_subsequence_cfgs[uint8_t(index)] = util::make_unique<Subsequence>(
-        std::move(cfg), uint8_t(index), false);
+    descriptor_subsequence_cfgs[uint8_t(index)] = util::make_unique<Subsequence>(std::move(cfg), uint8_t(index), false);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -50,8 +45,7 @@ Subsequence *DecoderRegular::getSubsequenceCfg(uint8_t index) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DecoderRegular::DecoderRegular(const DecoderRegular &c)
-    : core::parameter::desc_pres::DecoderRegular(MODE_CABAC) {
+DecoderRegular::DecoderRegular(const DecoderRegular &c) : core::parameter::desc_pres::DecoderRegular(MODE_CABAC) {
     for (const auto &a : c.descriptor_subsequence_cfgs) {
         descriptor_subsequence_cfgs.emplace_back(a->clone());
     }
@@ -81,32 +75,27 @@ void DecoderRegular::write(util::BitWriter &writer) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 DecoderTokenType::DecoderTokenType()
-    : core::parameter::desc_pres::DecoderTokentype(MODE_CABAC),
-      rle_guard_tokentype(0),
-      descriptor_subsequence_cfgs() {
+    : core::parameter::desc_pres::DecoderTokentype(MODE_CABAC), rle_guard_tokentype(0), descriptor_subsequence_cfgs() {
     for (size_t i = 0; i < 2; ++i) {
         descriptor_subsequence_cfgs.push_back(
-            util::make_unique<Subsequence>(util::make_unique<TransformedParameters>(), i,true));
+            util::make_unique<Subsequence>(util::make_unique<TransformedParameters>(), i, true));
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DecoderTokenType::DecoderTokenType(util::BitReader &reader)
-    : core::parameter::desc_pres::DecoderTokentype(MODE_CABAC) {
+DecoderTokenType::DecoderTokenType(util::BitReader &reader) : core::parameter::desc_pres::DecoderTokentype(MODE_CABAC) {
     uint8_t num_descriptor_subsequence_cfgs = 2;
     rle_guard_tokentype = reader.read(8);
     for (size_t i = 0; i < num_descriptor_subsequence_cfgs; ++i) {
-        descriptor_subsequence_cfgs.emplace_back(
-            util::make_unique<Subsequence>(true, reader));
+        descriptor_subsequence_cfgs.emplace_back(util::make_unique<Subsequence>(true, reader));
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DecoderTokenType::setSubsequenceCfg(uint8_t index, std::unique_ptr<TransformedParameters> cfg) {
-    descriptor_subsequence_cfgs[uint8_t(index)] = util::make_unique<Subsequence>(
-        std::move(cfg), uint8_t(index), true);
+    descriptor_subsequence_cfgs[uint8_t(index)] = util::make_unique<Subsequence>(std::move(cfg), uint8_t(index), true);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -9,11 +9,11 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/util/bitreader.h>
+#include <genie/util/bitwriter.h>
 #include <genie/util/make-unique.h>
 #include <cstdint>
 #include <memory>
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
 #include "computed_ref_extended.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -10,14 +10,14 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/core/constants.h>
-#include <cstdint>
-#include <memory>
-#include <vector>
-#include "computed_ref.h"
 #include <genie/core/record/record.h>
 #include <genie/entropy/gabac/gabac.h>
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
+#include <cstdint>
+#include <memory>
+#include <vector>
+#include "computed_ref.h"
 #include "data_unit.h"
 #include "descriptor_box.h"
 #include "quality-values.h"

@@ -26,7 +26,6 @@ namespace parameter {
  */
 class QualityValues {
    public:
-
     virtual void write(util::BitWriter &writer) const = 0;
 
     virtual ~QualityValues() = default;
@@ -36,7 +35,7 @@ class QualityValues {
     virtual std::unique_ptr<QualityValues> clone() const = 0;
 
    protected:
-    uint8_t qv_coding_mode;       //!< : 4; Line 32
+    uint8_t qv_coding_mode;    //!< : 4; Line 32
     bool qv_reverse_flag : 1;  //!< Line 40
 };
 

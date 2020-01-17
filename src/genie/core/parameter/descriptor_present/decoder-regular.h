@@ -10,9 +10,7 @@ namespace desc_pres {
 
 class DecoderRegular : public Decoder {
    public:
-    explicit DecoderRegular(uint8_t _encoding_mode_id) : Decoder(_encoding_mode_id) {
-
-    }
+    explicit DecoderRegular(uint8_t _encoding_mode_id) : Decoder(_encoding_mode_id) {}
     ~DecoderRegular() override = default;
 };
 
@@ -22,6 +20,5 @@ class DecoderRegular : public Decoder {
 }  // namespace parameter
 }  // namespace core
 }  // namespace genie
-
 
 #endif  // GENIE_DECODER_REGULAR_H

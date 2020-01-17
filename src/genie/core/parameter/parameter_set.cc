@@ -61,7 +61,8 @@ ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::
     }
     for (size_t i = 0; i < num_classes; ++i) {
         uint8_t mode = bitReader.read(4);
-        qv_coding_configs.emplace_back(GlobalCfg::getSingleton().getIndustrialPark().construct<QualityValues>(mode, bitReader));
+        qv_coding_configs.emplace_back(
+            GlobalCfg::getSingleton().getIndustrialPark().construct<QualityValues>(mode, bitReader));
     }
     crps_flag = bitReader.read(1);
     if (crps_flag) {

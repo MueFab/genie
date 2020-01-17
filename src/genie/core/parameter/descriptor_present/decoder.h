@@ -26,7 +26,6 @@ namespace desc_pres {
  */
 class Decoder {
    public:
-
     virtual void write(util::BitWriter& writer) const;
 
     virtual std::unique_ptr<Decoder> clone() const = 0;

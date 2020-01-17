@@ -9,11 +9,11 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/util/bitreader.h>
+#include <genie/util/bitwriter.h>
 #include <cstdint>
 #include <memory>
 #include <vector>
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
