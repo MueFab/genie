@@ -3,6 +3,7 @@
  * @copyright This file is part of Genie. See LICENSE for more details.
  */
 
+#include <genie/module/manager.h>
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -27,6 +28,7 @@ static int encapsulator_main(int argc, char* argv[]) {
         }
         std::cout << "command line: " + commandLineStr(argc, argv) << std::endl;
 
+        genie::module::detect();
         createMPEGGFileNoMITFromByteStream(programOptions.inputFilePath.c_str(), nullptr);
 
     } catch (const encapsulator::RuntimeError& runtimeError) {
