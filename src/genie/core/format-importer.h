@@ -9,18 +9,18 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/record/record.h>
 #include <genie/util/original-source.h>
 #include <genie/util/source.h>
-#include <vector>
+#include "record/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+/**
+ * @brief Interface for importers of various file formats. Note that each importer has to convert to mpegg-records
+ */
 class FormatImporter : public util::Source<record::MpeggChunk>, public util::OriginalSource {};
 
 // ---------------------------------------------------------------------------------------------------------------------

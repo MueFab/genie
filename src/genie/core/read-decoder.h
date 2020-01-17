@@ -9,25 +9,23 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/access-unit-payload.h>
-#include <genie/core/record/record.h>
-#include <memory>
-#include <vector>
-#include "access-unit-raw.h"
-
 #include <genie/util/source.h>
+#include "access-unit-raw.h"
+#include "record/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+/**
+ * @brief The basic interface for modules decoding the plain read data
+ */
 class ReadDecoder : public util::Source<record::MpeggChunk>, public util::Drain<AccessUnitRaw> {
    public:
-    void flowIn(AccessUnitRaw&& t, size_t id) override = 0;
-    void dryIn() override = 0;
+    /**
+     * @Brief For polymorphic destruction
+     */
     ~ReadDecoder() override = default;
 };
 

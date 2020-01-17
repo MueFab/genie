@@ -18,17 +18,13 @@
 namespace genie {
 namespace core {
 
-/**
- * ISO 23092-2 Section 5.1 table 34
- */
+
 enum class AlphabetID : uint8_t {
-    ACGTN = 0,            //!< Line 1
-    ACGTRYSWKMBDHVN_ = 1  //!< Line 2
+    ACGTN = 0,
+    ACGTRYSWKMBDHVN_ = 1
 };
 
-/**
- *
- */
+
 enum class GenDesc : uint8_t {
     POS = 0,
     RCOMP = 1,
@@ -147,35 +143,27 @@ struct GenConst {
 };
 
 struct GenomicSubDescriptorProperties {
-    GenSubIndex id;    //!<
-    std::string name;  //!<
+    GenSubIndex id;
+    std::string name;
 };
 
-/**
- *
- */
+
 struct GenomicDescriptorProperties {
-    GenDesc id;        //!<
-    std::string name;  //!<
+    GenDesc id;
+    std::string name;
     bool tokentype;
     std::vector<GenomicSubDescriptorProperties> subseqs;
     const GenomicSubDescriptorProperties& getSubSeq(uint8_t sub) const;
 };
 
-/**
- *
- */
+
 struct Alphabet {
-    std::vector<char> lut;         //!<
-    std::vector<char> inverseLut;  //!<
+    std::vector<char> lut;
+    std::vector<char> inverseLut;
 
     bool isIncluded(char c) const;
 };
 
-/**
- *
- * @return
- */
 const std::vector<GenomicDescriptorProperties>& getDescriptors();
 
 const GenomicDescriptorProperties& getDescriptor(GenDesc desc);

@@ -1,6 +1,9 @@
 #ifndef GENIE_FACTORY_H
 #define GENIE_FACTORY_H
 
+#include "exceptions.h"
+#include <memory>
+
 namespace genie {
 namespace util {
 
