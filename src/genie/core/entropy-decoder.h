@@ -9,23 +9,21 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "access-unit-raw.h"
-
-#include <genie/core/access-unit-payload.h>
 #include <genie/util/source.h>
 #include <memory>
+#include "access-unit-payload.h"
+#include "access-unit-raw.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+/**
+ * @brief Interface for entropy decoders. They convert access unit payloads to raw access units
+ */
 class EntropyDecoder : public util::Drain<AccessUnitPayload>, public util::Source<AccessUnitRaw> {
    public:
-    void flowIn(AccessUnitPayload&& t, size_t id) override = 0;
-    void dryIn() override = 0;
     ~EntropyDecoder() override = default;
 };
 

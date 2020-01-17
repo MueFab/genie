@@ -11,8 +11,6 @@
 
 #include <genie/util/drain.h>
 #include <genie/util/source.h>
-#include <memory>
-#include <vector>
 #include "access-unit-raw.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -25,6 +23,10 @@ namespace core {
  */
 class ReadEncoder : public util::Drain<record::MpeggChunk>, public util::Source<AccessUnitRaw> {
    public:
+
+    /**
+     * @Brief For polymorphic destruction
+     */
     ~ReadEncoder() override = default;
 };
 
