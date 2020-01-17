@@ -1,5 +1,5 @@
 #include "helpers.h"
-#include <util/string-helpers.h>
+#include <genie/util/string-helpers.h>
 
 namespace util_tests {
 
@@ -21,7 +21,7 @@ std::string exec(const std::string &cmd) {
 
     pclose(pipe);
 
-    util::rtrim(result);
+    genie::util::rtrim(result);
 
     return result;
 }

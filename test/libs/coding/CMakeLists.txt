@@ -8,4 +8,5 @@ set(source_files
 add_executable(coding-tests ${source_files})
 
 target_link_libraries(coding-tests PRIVATE gtest_main)
-target_link_libraries(coding-tests PRIVATE coding)
+target_link_libraries(coding-tests PRIVATE genie-core)
+target_link_libraries(coding-tests PRIVATE genie-gabac)

@@ -7,7 +7,7 @@
 
 namespace gabac_tests {
 
-void fillVectorRandomUniform(uint64_t min, uint64_t max, util::DataBlock *const vector) {
+void fillVectorRandomUniform(uint64_t min, uint64_t max, genie::util::DataBlock *const vector) {
     // First create an instance of an engine.
     std::random_device rnd_device;
     // Specify the engine and distribution.
@@ -26,7 +26,7 @@ void fillVectorRandomUniform(uint64_t min, uint64_t max, util::DataBlock *const 
     });
 }
 
-void fillVectorRandomGeometric(util::DataBlock *const vector) {
+void fillVectorRandomGeometric(genie::util::DataBlock *const vector) {
     // First create an instance of an engine.
     std::random_device rnd_device;
     // Specify the engine and distribution.
