@@ -56,6 +56,7 @@ DecoderRegular::DecoderRegular(const DecoderRegular &c) : core::parameter::desc_
 std::unique_ptr<core::parameter::desc_pres::Decoder> DecoderRegular::clone() const {
     auto ret = util::make_unique<DecoderRegular>();
     ret->encoding_mode_ID = encoding_mode_ID;
+    ret->descriptor_subsequence_cfgs.resize(this->descriptor_subsequence_cfgs.size());
     for (size_t i = 0; i < descriptor_subsequence_cfgs.size(); ++i) {
         ret->descriptor_subsequence_cfgs[i] = descriptor_subsequence_cfgs[i]->clone();
     }
