@@ -15,7 +15,7 @@ Dataset::Dataset(const std::unique_ptr<genie::format::mgb::DataUnitFactory>& dat
     //(void)dataUnitFactory;  // silence compiler warning
 
     // TODO multiple params?
-    dataset_parameter_sets.push_back(genie::util::make_unique<DatasetParameterSet>(dataUnitFactory->getParams(0)));
+    dataset_parameter_sets.push_back(util::make_unique<DatasetParameterSet>(dataUnitFactory->getParams(0)));
 
     for (auto& au : *accessUnits_p2) {
         (void)au;  // silence compiler warnings
