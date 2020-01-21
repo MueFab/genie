@@ -18,8 +18,7 @@ Dataset::Dataset(const std::unique_ptr<genie::format::mgb::DataUnitFactory>& dat
     dataset_parameter_sets.push_back(util::make_unique<DatasetParameterSet>(dataUnitFactory->getParams(0)));
 
     for (auto& au : *accessUnits_p2) {
-        (void)au;  // silence compiler warnings
-        // access_units.push_back(util::make_unique<mpegg_p1::AccessUnit>(au)); //TODO!!!
+        access_units.push_back(util::make_unique<mpegg_p1::AccessUnit>(std::move(au)));
     }
     // TODO: add dataset_header, dataset_parametersets, accessunits(p1)
 }
