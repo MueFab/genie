@@ -21,7 +21,7 @@ Dataset::Dataset(const std::unique_ptr<genie::format::mgb::DataUnitFactory>& dat
         (void)au;  // silence compiler warnings
         // access_units.push_back(util::make_unique<mpegg_p1::AccessUnit>(au)); //TODO!!!
     }
-    // TODO: add dt_metadata and dt_protection, dataset_header, dataset_parametersets, accessunits(p1)
+    // TODO: add dataset_header, dataset_parametersets, accessunits(p1)
 }
 
 }  // namespace mpegg_p1
