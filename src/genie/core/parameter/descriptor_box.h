@@ -21,12 +21,34 @@ namespace genie {
 namespace core {
 namespace parameter {
 
-/**
- * ISO 23092-2 Section 3.3.2 table 7 lines 15 to 21
- */
 class DescriptorBox {
    public:
     DescriptorBox();
+
+    DescriptorBox(const DescriptorBox& box) : class_specific_dec_cfg_flag(false){
+        *this = box;
+    }
+
+    DescriptorBox(DescriptorBox&& box) noexcept : class_specific_dec_cfg_flag(false) {
+        *this = std::move(box);
+    }
+
+    DescriptorBox& operator=(const DescriptorBox& box) {
+        if(this == &box) {
+            return *this;
+        }
+        class_specific_dec_cfg_flag = box.class_specific_dec_cfg_flag;
+        for(const auto& b : box.descriptor_configurations) {
+            descriptor_configurations.emplace_back(b->clone());
+        }
+        return *this;
+    }
+
+    DescriptorBox& operator=(DescriptorBox&& box) noexcept {
+        class_specific_dec_cfg_flag = box.class_specific_dec_cfg_flag;
+        descriptor_configurations = std::move(box.descriptor_configurations);
+        return *this;
+    }
 
     DescriptorBox(size_t num_classes, GenDesc desc, util::BitReader& reader);
 
@@ -41,10 +63,8 @@ class DescriptorBox {
 
     virtual void write(util::BitWriter& writer) const;
 
-    std::unique_ptr<DescriptorBox> clone() const;
-
    private:
-    bool class_specific_dec_cfg_flag : 1;  //!< Line 15
+    bool class_specific_dec_cfg_flag;
     std::vector<std::unique_ptr<Descriptor>> descriptor_configurations;
 };
 

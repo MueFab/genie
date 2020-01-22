@@ -134,8 +134,8 @@ void GabacSeqConfSet::storeParameters(core::parameter::ParameterSet &parameterSe
             descriptor_configuration->setDecoder(std::move(decoder_config));
         }
 
-        auto descriptor_container = util::make_unique<core::parameter::DescriptorBox>();
-        descriptor_container->set(std::move(descriptor_configuration));
+        auto descriptor_container = core::parameter::DescriptorBox();
+        descriptor_container.set(std::move(descriptor_configuration));
 
         parameterSet.setDescriptor(desc.id, std::move(descriptor_container));
     }
@@ -147,12 +147,12 @@ const GabacSeqConfSet::DecoderConfigurationCabac &GabacSeqConfSet::loadDescripto
     const GabacSeqConfSet::ParameterSet &parameterSet, core::GenDesc descriptor_id) {
     using namespace entropy::paramcabac;
 
-    auto curDesc = parameterSet.getDescriptor(descriptor_id);
-    if (curDesc->isClassSpecific()) {
+    auto& curDesc = parameterSet.getDescriptor(descriptor_id);
+    if (curDesc.isClassSpecific()) {
         UTILS_DIE("Class specific config not supported");
     }
-    auto PRESENT = core::parameter::Descriptor::Preset::PRESENT;
-    auto base_conf = curDesc->get();
+    auto PRESENT = core::parameter::desc_pres::DescriptorPresent::PRESENT;
+    auto base_conf = curDesc.get();
     if (base_conf->getPreset() != PRESENT) {
         UTILS_DIE("Config not present");
     }

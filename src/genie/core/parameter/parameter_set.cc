@@ -42,7 +42,7 @@ ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::
         class_IDs.push_back(record::ClassType(bitReader.read(4)));
     }
     for (size_t i = 0; i < getDescriptors().size(); ++i) {
-        descriptors.emplace_back(util::make_unique<DescriptorBox>(num_classes, GenDesc(i), bitReader));
+        descriptors.emplace_back(DescriptorBox(num_classes, GenDesc(i), bitReader));
     }
     uint8_t num_groups = bitReader.read(16);
     for (size_t i = 0; i < num_groups; ++i) {
@@ -64,7 +64,7 @@ ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::
         qv_coding_configs.emplace_back(
             GlobalCfg::getSingleton().getIndustrialPark().construct<QualityValues>(mode, bitReader));
     }
-    crps_flag = bitReader.read(1);
+    bool crps_flag = bitReader.read(1);
     if (crps_flag) {
         parameter_set_crps = util::make_unique<ComputedRef>(bitReader);
     }
@@ -96,11 +96,7 @@ ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_
       multiple_signature_base(0),
       u_signature_size(nullptr),
       qv_coding_configs(0),
-      crps_flag(false),
       parameter_set_crps(nullptr) {
-    for (auto &i : descriptors) {
-        i = util::make_unique<DescriptorBox>();
-    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -125,7 +121,6 @@ ParameterSet::ParameterSet()
       multiple_signature_base(0),
       u_signature_size(nullptr),
       qv_coding_configs(0),
-      crps_flag(false),
       parameter_set_crps(nullptr) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -168,7 +163,7 @@ void ParameterSet::preWrite(util::BitWriter &writer) const {
         writer.write(uint8_t(i), 4);
     }
     for (auto &i : descriptors) {
-        i->write(writer);
+        i.write(writer);
     }
     writer.write(rgroup_IDs.size(), 16);  // num_groups
     for (auto &i : rgroup_IDs) {
@@ -186,7 +181,7 @@ void ParameterSet::preWrite(util::BitWriter &writer) const {
     for (auto &i : qv_coding_configs) {
         i->write(writer);
     }
-    writer.write(crps_flag, 1);
+    writer.write((bool)parameter_set_crps, 1);
     if (parameter_set_crps) {
         parameter_set_crps->write(writer);
     }
@@ -203,7 +198,6 @@ size_t ParameterSet::getNumberTemplateSegments() const { return number_of_templa
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ParameterSet::setComputedRef(std::unique_ptr<ComputedRef> _parameter_set_crps) {
-    crps_flag = true;
     parameter_set_crps = std::move(_parameter_set_crps);
 }
 
@@ -211,7 +205,7 @@ void ParameterSet::setComputedRef(std::unique_ptr<ComputedRef> _parameter_set_cr
 
 void ParameterSet::addClass(record::ClassType class_id, std::unique_ptr<QualityValues> conf) {
     for (auto &a : descriptors) {
-        if (a->isClassSpecific()) {
+        if (a.isClassSpecific()) {
             UTILS_THROW_RUNTIME_EXCEPTION("Adding classes not allowed once class specific descriptor configs enabled");
         }
     }
@@ -226,13 +220,13 @@ void ParameterSet::addClass(record::ClassType class_id, std::unique_ptr<QualityV
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::setDescriptor(GenDesc index, std::unique_ptr<DescriptorBox> descriptor) {
+void ParameterSet::setDescriptor(GenDesc index, DescriptorBox&& descriptor) {
     descriptors[uint8_t(index)] = std::move(descriptor);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const DescriptorBox *ParameterSet::getDescriptor(GenDesc index) const { return descriptors[uint8_t(index)].get(); }
+const DescriptorBox &ParameterSet::getDescriptor(GenDesc index) const { return descriptors[uint8_t(index)]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -287,7 +281,7 @@ ParameterSet &ParameterSet::operator=(const ParameterSet &other) {
     as_depth = other.as_depth;
     class_IDs = other.class_IDs;
     for (const auto &d : other.descriptors) {
-        descriptors.emplace_back(d->clone());
+        descriptors.emplace_back(d);
     }
     rgroup_IDs = other.rgroup_IDs;
     multiple_alignments_flag = other.multiple_alignments_flag;
@@ -299,7 +293,6 @@ ParameterSet &ParameterSet::operator=(const ParameterSet &other) {
     for (const auto &c : other.qv_coding_configs) {
         qv_coding_configs.emplace_back(c->clone());
     }
-    crps_flag = other.crps_flag;
     parameter_set_crps = other.parameter_set_crps->clone();
     return *this;
 }
@@ -325,7 +318,6 @@ ParameterSet &ParameterSet::operator=(ParameterSet &&other) noexcept {
     multiple_signature_base = other.multiple_signature_base;
     u_signature_size = std::move(other.u_signature_size);
     qv_coding_configs = std::move(other.qv_coding_configs);
-    crps_flag = other.crps_flag;
     parameter_set_crps = std::move(other.parameter_set_crps);
     return *this;
 }

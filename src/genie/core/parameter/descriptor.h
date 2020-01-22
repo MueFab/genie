@@ -20,16 +20,11 @@ namespace genie {
 namespace core {
 namespace parameter {
 
-/**
- * ISO 23092-2 Section 3.3.2.1 table 8
- */
+
 class Descriptor {
    public:
-    enum class Preset : uint8_t {
-        PRESENT = 0  //!< See text in section 3.3.2.1
-    };
 
-    explicit Descriptor(Preset _dec_cfg_preset);
+    explicit Descriptor(uint8_t _dec_cfg_preset);
 
     virtual std::unique_ptr<Descriptor> clone() const = 0;
 
@@ -39,10 +34,10 @@ class Descriptor {
 
     virtual ~Descriptor() = default;
 
-    Preset getPreset() const;
+    uint8_t getPreset() const;
 
    protected:
-    Preset dec_cfg_preset : 8;  //!< Line 2
+    uint8_t dec_cfg_preset;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

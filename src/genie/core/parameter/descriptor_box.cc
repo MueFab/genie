@@ -91,18 +91,6 @@ void DescriptorBox::write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<DescriptorBox> DescriptorBox::clone() const {
-    auto ret = util::make_unique<DescriptorBox>();
-    ret->descriptor_configurations.clear();
-    ret->class_specific_dec_cfg_flag = class_specific_dec_cfg_flag;
-    for (const auto& d : descriptor_configurations) {
-        ret->descriptor_configurations.push_back(d->clone());
-    }
-    return ret;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 }  // namespace parameter
 }  // namespace core
 }  // namespace genie

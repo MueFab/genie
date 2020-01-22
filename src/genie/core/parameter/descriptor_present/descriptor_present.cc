@@ -20,13 +20,13 @@ namespace desc_pres {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorPresent::DescriptorPresent() : Descriptor(Preset::PRESENT), decoder_configuration(nullptr) {
+DescriptorPresent::DescriptorPresent() : Descriptor(PRESENT), decoder_configuration(nullptr) {
     decoder_configuration = nullptr;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorPresent::DescriptorPresent(GenDesc desc, util::BitReader &reader) : Descriptor(Preset::PRESENT) {
+DescriptorPresent::DescriptorPresent(GenDesc desc, util::BitReader &reader) : Descriptor(PRESENT) {
     uint8_t mode = reader.read(8);
     if (desc == GenDesc::MSAR || desc == GenDesc::RNAME) {
         decoder_configuration = GlobalCfg::getSingleton().getIndustrialPark().construct<DecoderTokentype>(mode, reader);
@@ -48,7 +48,7 @@ std::unique_ptr<Descriptor> DescriptorPresent::clone() const {
 
 void DescriptorPresent::write(util::BitWriter &writer) const {
     Descriptor::write(writer);
-    if (dec_cfg_preset != Preset::PRESENT) {
+    if (dec_cfg_preset != PRESENT) {
         return;
     }
     decoder_configuration->write(writer);

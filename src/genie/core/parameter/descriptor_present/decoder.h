@@ -21,9 +21,6 @@ namespace core {
 namespace parameter {
 namespace desc_pres {
 
-/**
- * ISO 23092-2 Section 3.3.2.1 table 8 lines 4 to 8
- */
 class Decoder {
    public:
     virtual void write(util::BitWriter& writer) const;
@@ -37,7 +34,7 @@ class Decoder {
     uint8_t getMode() const;
 
    protected:
-    uint8_t encoding_mode_ID;  //!< : 8; Line 4
+    uint8_t encoding_mode_ID;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

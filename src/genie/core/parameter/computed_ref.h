@@ -22,14 +22,8 @@ namespace genie {
 namespace core {
 namespace parameter {
 
-/**
- * ISO 23092-2 Section 3.3.2.3 table 16
- */
 class ComputedRef {
    public:
-    /**
-     * ISO 23092-2 Section 3.3.2.3 table 17
-     */
     enum class Algorithm : uint8_t {
         RESERVED = 0,
         REF_TRANSFORM = 1,
@@ -39,8 +33,8 @@ class ComputedRef {
     };
 
    private:
-    Algorithm cr_alg_ID;                             //!<< : 8; Line 2
-    std::unique_ptr<ComputedRefExtended> extension;  //!<< Lines 3 to 6
+    Algorithm cr_alg_ID;
+    std::unique_ptr<ComputedRefExtended> extension;  // TODO: std::optional
 
    public:
     explicit ComputedRef(Algorithm _cr_alg_ID);
