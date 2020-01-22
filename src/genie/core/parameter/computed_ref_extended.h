@@ -20,13 +20,11 @@ namespace genie {
 namespace core {
 namespace parameter {
 
-/**
- * ISO 23092-2 Section 3.3.2.3 table 16 lines 3+4
- */
+
 class ComputedRefExtended {
    private:
-    uint8_t cr_pad_size : 8;        //!<< Line 3
-    uint32_t cr_buf_max_size : 24;  //!<< Line 4
+    uint8_t cr_pad_size;
+    uint32_t cr_buf_max_size;
    public:
     ComputedRefExtended(uint8_t cr_pad_size, uint32_t cr_buf_max_size);
 

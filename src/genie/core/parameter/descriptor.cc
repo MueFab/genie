@@ -21,9 +21,9 @@ namespace parameter {
 
 void Descriptor::write(util::BitWriter &writer) const { writer.write(uint8_t(dec_cfg_preset), 8); }
 std::unique_ptr<Descriptor> Descriptor::factory(GenDesc desc, util::BitReader &reader) {
-    auto preset = Preset(reader.read(8));
+    auto preset = reader.read(8);
     switch (preset) {
-        case Preset::PRESENT:
+        case 0: // TODO move factory
             return util::make_unique<desc_pres::DescriptorPresent>(desc, reader);
         default:
             UTILS_DIE("Invalid DecCfgPreset");
@@ -32,11 +32,11 @@ std::unique_ptr<Descriptor> Descriptor::factory(GenDesc desc, util::BitReader &r
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Descriptor::Preset Descriptor::getPreset() const { return dec_cfg_preset; }
+uint8_t Descriptor::getPreset() const { return dec_cfg_preset; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Descriptor::Descriptor(Preset _dec_cfg_preset) : dec_cfg_preset(_dec_cfg_preset) {}
+Descriptor::Descriptor(uint8_t _dec_cfg_preset) : dec_cfg_preset(_dec_cfg_preset) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
