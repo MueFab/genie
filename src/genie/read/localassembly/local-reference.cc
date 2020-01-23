@@ -109,10 +109,9 @@ void LocalReference::addRead(const core::record::Record &s) {
         return;
     }
 
-    if (s.getAlignments().front().getAlignmentSplits().front()->getType() !=
-        core::record::AlignmentSplit::Type::SAME_REC) {
-        UTILS_DIE("Only same record split alignments supported");
-    }
+    UTILS_DIE_IF(s.getAlignments().front().getAlignmentSplits().front()->getType() !=
+                     core::record::AlignmentSplit::Type::SAME_REC,
+                 "Only same record split alignments supported");
 
     const auto ptr = s.getAlignments().front().getAlignmentSplits().front().get();
     const auto &rec = dynamic_cast<const core::record::alignment_split::SameRec &>(*ptr);

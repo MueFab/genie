@@ -49,10 +49,9 @@ AlignmentBox::AlignmentBox() : mapping_pos(0), alignment(), splitAlignmentInfo(0
 
 void AlignmentBox::addAlignmentSplit(std::unique_ptr<AlignmentSplit> _alignment) {
     if (_alignment->getType() == AlignmentSplit::Type::SAME_REC) {
-        if (dynamic_cast<alignment_split::SameRec&>(*_alignment).getAlignment().getMappingScores().size() !=
-            alignment.getMappingScores().size()) {
-            UTILS_DIE("AS depth incompatible");
-        }
+        UTILS_DIE_IF(dynamic_cast<alignment_split::SameRec&>(*_alignment).getAlignment().getMappingScores().size() !=
+                         alignment.getMappingScores().size(),
+                     "AS depth incompatible");
     }
     splitAlignmentInfo.push_back(std::move(_alignment));
 }

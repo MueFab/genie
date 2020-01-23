@@ -490,9 +490,7 @@ inline uint8_t DataBlock::getWordSize() const { return wordSize; }
 
 inline void DataBlock::setWordSize(uint8_t size) {
     wordSize = size;
-    if (data.size() % size) {
-        UTILS_DIE("Could not resize");
-    }
+    UTILS_DIE_IF(data.size() % size, "Could not resize");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

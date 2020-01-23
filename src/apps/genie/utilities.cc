@@ -25,9 +25,7 @@ std::string dateTime(void) {
     char timeString[] = "yyyy-mm-ddTHH:MM:SSZ";
 
     time_t currentTime = time(NULL);
-    if (currentTime == ((time_t)-1)) {
-        UTILS_DIE("call to time() failed");
-    }
+    UTILS_DIE_IF(currentTime == ((time_t)-1), "call to time() failed");
     struct tm timeinfo;
 
 #ifdef OS_WINDOWS
@@ -37,23 +35,18 @@ std::string dateTime(void) {
     }
 #else
     struct tm* ret = gmtime_r(&currentTime, &timeinfo);
-    if (ret == NULL) {
-        UTILS_DIE("call to gmtime_r() failed");
-    }
+    UTILS_DIE_IF(ret == NULL, "call to gmtime_r() failed");
 #endif
 
-    if (strftime(timeString, sizeof(timeString), "%Y-%m-%dT%H:%M:%SZ", &timeinfo) == 0) {
-        UTILS_DIE("call to strftime() failed");
-    }
+    UTILS_DIE_IF(!strftime(timeString, sizeof(timeString), "%Y-%m-%dT%H:%M:%SZ", &timeinfo),
+                 "call to strftime() failed");
 
     std::string result(timeString);
     return result;
 }
 
 std::string fileBaseName(const std::string& path) {
-    if (path.empty()) {
-        UTILS_DIE("path is empty");
-    }
+    UTILS_DIE_IF(path.empty(), "path is empty");
 
     std::string delimiters = "/\\";
 
@@ -61,9 +54,7 @@ std::string fileBaseName(const std::string& path) {
 }
 
 bool fileExists(const std::string& path) {
-    if (path.empty()) {
-        UTILS_DIE("path is empty");
-    }
+    UTILS_DIE_IF(path.empty(), "path is empty");
 
     std::ifstream ifs(path.c_str());
 

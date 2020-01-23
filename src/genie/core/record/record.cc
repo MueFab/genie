@@ -136,15 +136,11 @@ Record &Record::operator=(Record &&rec) noexcept {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Record::addSegment(Segment &&rec) {
-    if (reads.size() == number_of_template_segments) {
-        UTILS_DIE("Record already full");
-    }
+    UTILS_DIE_IF(reads.size() == number_of_template_segments, "Record already full");
     if (reads.empty()) {
         qv_depth = uint8_t(rec.getQualities().size());
     }
-    if (!reads.empty() && rec.getQualities().size() != qv_depth) {
-        UTILS_DIE("Incompatible qv depth");
-    }
+    UTILS_DIE_IF(!reads.empty() && rec.getQualities().size() != qv_depth, "Incompatible qv depth");
     reads.push_back(std::move(rec));
 }
 
@@ -154,15 +150,11 @@ void Record::addAlignment(uint16_t _seq_id, AlignmentBox &&rec) {
     if (alignmentInfo.empty()) {
         sharedAlignmentInfo = AlignmentSharedData(_seq_id, uint8_t(rec.getAlignment().getMappingScores().size()));
     } else {
-        if (rec.getAlignment().getMappingScores().size() != sharedAlignmentInfo.getAsDepth()) {
-            UTILS_DIE("Incompatible AS depth");
-        }
-        if (rec.getNumberOfTemplateSegments() != number_of_template_segments) {
-            UTILS_DIE("Incompatible number_of_template_segments");
-        }
-        if (_seq_id != sharedAlignmentInfo.getSeqID()) {
-            UTILS_DIE("Incompatible seq id");
-        }
+        UTILS_DIE_IF(rec.getAlignment().getMappingScores().size() != sharedAlignmentInfo.getAsDepth(),
+                     "Incompatible AS depth");
+        UTILS_DIE_IF(rec.getNumberOfTemplateSegments() != number_of_template_segments,
+                     "Incompatible number_of_template_segments");
+        UTILS_DIE_IF(_seq_id != sharedAlignmentInfo.getSeqID(), "Incompatible seq id");
     }
     alignmentInfo.push_back(std::move(rec));
 }

@@ -90,16 +90,12 @@ bool Date::leapYear() const {
 Date Date::fromString(const std::string& string) {
     auto date_time = tokenize(string, 'T');
     auto date = tokenize(date_time.front(), '-');
-    if (date.size() != 3) {
-        UTILS_DIE("Invalid date");
-    }
+        UTILS_DIE_IF(date.size() != 3, "Invalid date");
     if (date_time.size() == 1) {
         return Date(std::stoi(date[0]), std::stoi(date[1]), std::stoi(date[2]));
     } else if (date_time.size() == 2) {
         auto time = tokenize(date_time.back(), ':');
-        if (time.size() != 3) {
-            UTILS_DIE("Invalid time");
-        }
+        UTILS_DIE_IF(time.size() != 3, "Invalid time");
         return Date(std::stoi(date[0]), std::stoi(date[1]), std::stoi(date[2]), std::stoi(time[0]), std::stoi(time[1]),
                     std::stoi(time[2]));
     } else {
@@ -111,18 +107,14 @@ Date Date::fromString(const std::string& string) {
 
 Date::Date(uint16_t _year, uint8_t _month, uint8_t _day)
     : year(_year), month(_month), day(_day), timePresent(false), hour(0), minute(0), second(0) {
-    if (!checkValidity()) {
-        UTILS_DIE("Invalid date");
-    }
+    UTILS_DIE_IF(!checkValidity(), "Invalid date");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 Date::Date(uint16_t _year, uint8_t _month, uint8_t _day, uint8_t _hour, uint8_t _minute, uint8_t _second)
     : year(_year), month(_month), day(_day), timePresent(true), hour(_hour), minute(_minute), second(_second) {
-    if (!checkValidity()) {
-        UTILS_DIE("Invalid date");
-    }
+    UTILS_DIE_IF(!checkValidity(), "Invalid date");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

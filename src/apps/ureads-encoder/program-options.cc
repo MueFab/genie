@@ -29,13 +29,9 @@ void ProgramOptions::processCommandLine(int argc, char* argv[]) {
         UTILS_DIE("Program options error: " + std::to_string(app.exit(e)));
     }
 
-    if (!ghc::filesystem::exists(ghc::filesystem::path(inputFilePath))) {
-        UTILS_DIE("Input file does not exist");
-    }
+    UTILS_DIE_IF(!ghc::filesystem::exists(ghc::filesystem::path(inputFilePath)), "Input file does not exist");
 
-    if (!ghc::filesystem::exists(ghc::filesystem::path(pairFilePath))) {
-        UTILS_DIE("pair file does not exist");
-    }
+    UTILS_DIE_IF(!ghc::filesystem::exists(ghc::filesystem::path(pairFilePath)), "pair file does not exist");
 }
 
 }  // namespace ureads_encoder

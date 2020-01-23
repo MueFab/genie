@@ -50,13 +50,9 @@ char Importer::convertCigar2ECigarChar(char token) {
         lut['P'] = ']';
         return lut;
     }();
-    if (token < 0) {
-        UTILS_DIE("Invalid cigar token " + std::to_string(token));
-    }
+    UTILS_DIE_IF(token < 0, "Invalid cigar token " + std::to_string(token));
     char ret = lut_loc[token];
-    if (ret == 0) {
-        UTILS_DIE("Invalid cigar token" + std::to_string(token));
-    }
+    UTILS_DIE_IF(ret == 0, "Invalid cigar token" + std::to_string(token));
     return ret;
 }
 
@@ -76,9 +72,7 @@ int Importer::stepSequence(char token) {
         lut['P'] = 0;
         return lut;
     }();
-    if (token < 0) {
-        UTILS_DIE("Invalid cigar token " + std::to_string(token));
-    }
+    UTILS_DIE_IF(token < 0, "Invalid cigar token " + std::to_string(token));
     return lut_loc[token];
 }
 
@@ -97,9 +91,7 @@ std::string Importer::convertCigar2ECigar(const std::string &cigar, const std::s
         }
         if (a == 'X') {
             size_t end = std::stoi(digits) + seq_pos;
-            if (end >= seq.length()) {
-                UTILS_DIE("CIGAR not valid for seq");
-            }
+            UTILS_DIE_IF(end >= seq.length(), "CIGAR not valid for seq");
             for (; seq_pos < end; ++seq_pos) {
                 ecigar += std::toupper(seq[seq_pos]);
             }

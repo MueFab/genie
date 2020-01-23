@@ -95,9 +95,7 @@ void Subsequence::write(util::BitWriter& writer) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint16_t Subsequence::getDescriptorSubsequenceID() const {
-    if (!descriptor_subsequence_ID) {
-        UTILS_DIE("descriptor_subsequence_ID not present");
-    }
+    UTILS_DIE_IF(!descriptor_subsequence_ID, "descriptor_subsequence_ID not present");
     return *descriptor_subsequence_ID.get();
 }
 

@@ -59,31 +59,21 @@ void ProgramOptions::validate(void) {
     if (this->task == "encode" || this->task == "decode") {
         // It's fine not to provide a configuration file path for encoding.
         // This will trigger the analysis.
-        if (this->configurationFilePath.empty() && this->inputFilePath.empty()) {
-            UTILS_DIE("Configuration and input file path both not provided!");
-        }
+        UTILS_DIE_IF(this->configurationFilePath.empty() && this->inputFilePath.empty(),
+                     "Configuration and input file path both not provided!");
 
         // We need an output file path - generate one if not provided by the
         // user
-        if (!this->outputFilePath.empty()) {
-            if (fileExists(this->outputFilePath)) {
-                UTILS_DIE("Output file already existing: " + this->outputFilePath);
-            }
-        }
+        UTILS_DIE_IF(!this->outputFilePath.empty() && fileExists(this->outputFilePath),
+                     "Output file already existing: " + this->outputFilePath);
 
     } else if (this->task == "analyze") {
         // We need a configuration file path - guess one if not provided by
         // the user
-        if (!this->outputFilePath.empty()) {
-            if (fileExists(this->configurationFilePath)) {
-                UTILS_DIE("Config file already existing: " + this->outputFilePath);
-            }
-        }
+        UTILS_DIE_IF(!this->outputFilePath.empty() && fileExists(this->configurationFilePath),
+                     "Config file already existing: " + this->outputFilePath);
 
-        if (!this->configurationFilePath.empty()) {
-            UTILS_DIE("Analyze does not accept config file paths");
-        }
-
+        UTILS_DIE_IF(!this->configurationFilePath.empty(), "Analyze does not accept config file paths");
     } else {
         UTILS_DIE("Task '" + this->task + "' is invaid");
     }

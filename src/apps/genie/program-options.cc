@@ -104,18 +104,12 @@ void ProgramOptions::validate() {
     std::set<std::string>::iterator it;
 
 #ifndef GENIE_USE_OPENMP
-    if (numThreads > 1) {
-        UTILS_DIE("Genie was built without OpenMP. Only one thread is supported");
-    }
+    UTILS_DIE_IF(numThreads > 1, "Genie was built without OpenMP. Only one thread is supported");
 #endif
 
-    if (inputFilePath.empty()) {
-        UTILS_DIE("No input file path provided");
-    }
+    UTILS_DIE_IF(inputFilePath.empty(), "No input file path provided");
 
-    if (!common::fileExists(inputFilePath)) {
-        UTILS_DIE("Input file does not exist: " + inputFilePath);
-    }
+    UTILS_DIE_IF(!common::fileExists(inputFilePath), "Input file does not exist: " + inputFilePath);
 
     // if (configPath.empty()) {
     //     if (inputFilePath.substr(inputFilePath.find_last_of('.')) != ".genie") {
@@ -129,12 +123,8 @@ void ProgramOptions::validate() {
     // }
 
     if (!inputFilePairPath.empty()) {
-        if (!common::fileExists(inputFilePairPath)) {
-            UTILS_DIE("Input pair file does not exist: " + inputFilePairPath);
-        }
-        if (inputFilePairPath == inputFilePath) {
-            UTILS_DIE("Same name for two input files: " + inputFilePath);
-        }
+        UTILS_DIE_IF(!common::fileExists(inputFilePairPath), "Input pair file does not exist: " + inputFilePairPath);
+        UTILS_DIE_IF(inputFilePairPath == inputFilePath, "Same name for two input files: " + inputFilePath);
         std::cout << "paired mode activated" << std::endl;
     }
 
@@ -151,9 +141,8 @@ void ProgramOptions::validate() {
 
     std::transform(inputFileType.begin(), inputFileType.end(), inputFileType.begin(), ::toupper);
 
-    if (allowedInputFileTypes.find(inputFileType) == allowedInputFileTypes.end()) {
-        UTILS_DIE("Input file type is invalid: " + inputFilePath);
-    }
+    UTILS_DIE_IF(allowedInputFileTypes.find(inputFileType) == allowedInputFileTypes.end(),
+                 "Input file type is invalid: " + inputFilePath);
 }
 
 }  // namespace dsg

@@ -31,9 +31,7 @@ int Exporter::stepRef(char token) {
         lut['P'] = 0;
         return lut;
     }();
-    if (token < 0) {
-        UTILS_DIE("Invalid cigar token" + std::to_string(token));
-    }
+    UTILS_DIE_IF(token < 0, "Invalid cigar token" + std::to_string(token));
     return lut_loc[token];
 }
 
@@ -52,13 +50,9 @@ char Exporter::convertECigar2CigarChar(char token) {
         lut['/'] = 'N';
         return lut;
     }();
-    if (token < 0) {
-        UTILS_DIE("Invalid cigar token" + std::to_string(token));
-    }
+    UTILS_DIE_IF(token < 0, "Invalid cigar token" + std::to_string(token));
     char ret = lut_loc[token];
-    if (ret == 0) {
-        UTILS_DIE("Invalid cigar token" + std::to_string(token));
-    }
+    UTILS_DIE_IF(ret == 0, "Invalid cigar token" + std::to_string(token));
     return ret;
 }
 
@@ -228,9 +222,8 @@ std::vector<sam::Record> Exporter::convert(core::record::Record&& rec) {
         uint64_t master_position = alignment.getPosition();
         size_t rec_count = 1;
         for (const auto& split_alignment : alignment.getAlignmentSplits()) {
-            if (split_alignment->getType() != core::record::AlignmentSplit::Type::SAME_REC) {
-                UTILS_DIE("Only same rec split alignments supported");
-            }
+            UTILS_DIE_IF(split_alignment->getType() != core::record::AlignmentSplit::Type::SAME_REC,
+                         "Only same rec split alignments supported");
             const auto& split = dynamic_cast<core::record::alignment_split::SameRec&>(*split_alignment);
             stash.emplace_back(stashFromSplitAlignment(split, rec, master_position, rec_count));
             rec_count++;

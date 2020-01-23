@@ -74,24 +74,18 @@ void Encoder::updateAssembly(const core::record::Record& r, Encoder::LaeState& s
 
 const core::record::alignment_split::SameRec& Encoder::getPairedAlignment(const Encoder::LaeState& state,
                                                                           const core::record::Record& r) const {
-    if (!state.pairedEnd) {
-        UTILS_DIE("Record is single ended");
-    }
-    if (r.getAlignments().front().getAlignmentSplits().front()->getType() ==
-        core::record::AlignmentSplit::Type::SAME_REC) {
-        return *reinterpret_cast<const core::record::alignment_split::SameRec*>(
-            r.getAlignments().front().getAlignmentSplits().front().get());
-    } else {
-        UTILS_DIE("Only same record split alignments supported");
-    }
+    UTILS_DIE_IF(!state.pairedEnd, "Record is single ended");
+    UTILS_DIE_IF(r.getAlignments().front().getAlignmentSplits().front()->getType() !=
+                     core::record::AlignmentSplit::Type::SAME_REC,
+                 "Only same record split alignments supported");
+    return *reinterpret_cast<const core::record::alignment_split::SameRec*>(
+        r.getAlignments().front().getAlignmentSplits().front().get());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Encoder::updateGuesses(const core::record::Record& r, Encoder::LaeState& state) const {
-    if ((r.getNumberOfTemplateSegments() > 1) != state.pairedEnd) {
-        UTILS_DIE("Mix of paired / unpaired not supported");
-    }
+    UTILS_DIE_IF((r.getNumberOfTemplateSegments() > 1) != state.pairedEnd, "Mix of paired / unpaired not supported");
 
     state.classType = std::max(state.classType, r.getClassID());
 
@@ -141,17 +135,15 @@ void Encoder::flowIn(core::record::Chunk&& t, size_t id) {
     auto ref = data.front().getAlignmentSharedData().getSeqID();
     uint64_t lastPos = 0;
     for (auto& r : data) {
-        if (r.getAlignments().front().getPosition() < lastPos) {
-            UTILS_DIE("Data seems to be unsorted. Local assembly encoding needs sorted input data.");
-        }
+        UTILS_DIE_IF(r.getAlignments().front().getPosition() < lastPos,
+                     "Data seems to be unsorted. Local assembly encoding needs sorted input data.");
 
         lastPos = r.getAlignments().front().getPosition();
 
         updateGuesses(r, state);
 
-        if (r.getAlignmentSharedData().getSeqID() != ref) {
-            UTILS_DIE("Records belonging to different reference sequences in one access unit");
-        }
+        UTILS_DIE_IF(r.getAlignmentSharedData().getSeqID() != ref,
+                     "Records belonging to different reference sequences in one access unit");
 
         updateAssembly(r, state);
     }

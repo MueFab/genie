@@ -6,6 +6,7 @@
 #include <genie/format/mgb/importer.h>
 #include <genie/format/sam/exporter.h>
 #include <genie/format/sam/importer.h>
+#include <genie/module/manager.h>
 #include <genie/read/localassembly/decoder.h>
 #include <genie/read/localassembly/encoder.h>
 #include <genie/util/bitreader.h>
@@ -32,6 +33,7 @@ void encode(const ProgramOptions& programOptions) {
         manager.run();
     }
 #else
+    genie::module::detect();
     {
         std::stringstream buffer;
         genie::util::BitWriter writer(&buffer);
@@ -42,9 +44,8 @@ void encode(const ProgramOptions& programOptions) {
             }
             writer.flush();
             for (size_t number = 0; number < (1u << bits) && number < 100; ++number) {
-                if (reader.read(bits) != number) {
-                    UTILS_DIE("Fail at bits " + std::to_string(bits) + " number " + std::to_string(number));
-                }
+                UTILS_DIE_IF(reader.read(bits) != number,
+                             "Fail at bits " + std::to_string(bits) + " number " + std::to_string(number));
             }
             reader.flush();
         }

@@ -149,9 +149,7 @@ void Decoder::decodeAdditional(size_t softclip_offset, std::string &&seq, std::s
     decodeMismatches(softclip_offset, sequence, ecigar);
 
     const auto PAIRING_CASE = container.pull(core::GenSub::PAIR_DECODING_CASE);
-    if (PAIRING_CASE != core::GenConst::PAIR_SAME_RECORD) {
-        UTILS_DIE("Same-Record pair decoding supported only!");
-    }
+    UTILS_DIE_IF(PAIRING_CASE != core::GenConst::PAIR_SAME_RECORD, "Same-Record pair decoding supported only!");
 
     const auto SAME_REC_DATA = container.pull(core::GenSub::PAIR_SAME_REC);
     //        const bool FIRST1 = SAME_REC_DATA & 1u;

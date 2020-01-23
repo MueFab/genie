@@ -59,9 +59,7 @@ void HeaderLine::parseTags(const std::vector<std::string>& _tags, const HeaderLi
             continue;
         }
         auto separator = t.find(':');
-        if (separator == std::string::npos) {
-            UTILS_DIE("Tag separator not found in sam header");
-        }
+        UTILS_DIE_IF(separator == std::string::npos, "Tag separator not found in sam header");
         std::string tagname = t.substr(0, separator);
         std::string tagvalue = t.substr(separator + 1);
         bool found = false;
@@ -71,9 +69,7 @@ void HeaderLine::parseTags(const std::vector<std::string>& _tags, const HeaderLi
                 parseSingleTag(tagvalue, taginfo);
             }
         }
-        if (!found) {
-            UTILS_DIE("Tag unknown in sam header");
-        }
+        UTILS_DIE_IF(!found, "Tag unknown in sam header");
     }
 }
 
@@ -94,9 +90,7 @@ HeaderLine::HeaderLine(const std::string& line) {
             parseTags(ret, header);
         }
     }
-    if (!found) {
-        UTILS_DIE("Unknown Sam header line");
-    }
+    UTILS_DIE_IF(!found, "Unknown Sam header line");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

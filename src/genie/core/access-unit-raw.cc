@@ -51,9 +51,7 @@ GenSubIndex AccessUnitRaw::Subsequence::getID() const { return id; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t AccessUnitRaw::Subsequence::pull() {
-    if (end()) {
-        UTILS_DIE("Tried to read descriptor that has already ended");
-    }
+    UTILS_DIE_IF(end(), "Tried to read descriptor that has already ended");
     return data.get(position++);
 }
 
