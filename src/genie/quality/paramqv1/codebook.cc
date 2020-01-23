@@ -5,7 +5,9 @@
  */
 
 #include "codebook.h"
+#include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
+#include <genie/util/exceptions.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -13,24 +15,28 @@ namespace genie {
 namespace quality {
 namespace paramqv1 {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-QvCodebook::QvCodebook() {
-    // TODO
+Codebook::Codebook(util::BitReader &reader) {
+    qv_recon.resize(reader.read<uint8_t >());
+    for(auto& v : qv_recon) {
+        v = reader.read<uint8_t >();
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void QvCodebook::addEntry(uint8_t entry) {
-    // TODO
-    (void)entry;  // Silence warning about unused variable
+void Codebook::addEntry(uint8_t entry) {
+    constexpr size_t BOOK_MAX_SIZE = 94;
+    UTILS_DIE_IF(qv_recon.size() == BOOK_MAX_SIZE, "Maximum codebook size exceeded");
+    qv_recon.emplace_back(entry);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void QvCodebook::write(util::BitWriter *writer) const {
-    // TODO
-    (void)writer;  // Silence warning about unused variable
+void Codebook::write(util::BitWriter &writer) const {
+    writer.write(qv_recon.size(), 8);
+    for(const auto& v : qv_recon) {
+        writer.write(v, 8);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

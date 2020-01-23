@@ -21,7 +21,7 @@ namespace core {
 /**
  * @brief The basic interface for modules decoding the plain read data
  */
-class ReadDecoder : public util::Source<record::MpeggChunk>, public util::Drain<AccessUnitRaw> {
+class ReadDecoder : public util::Source<record::Chunk>, public util::Drain<AccessUnitRaw> {
    public:
     /**
      * @Brief For polymorphic destruction

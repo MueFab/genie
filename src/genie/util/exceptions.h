@@ -11,6 +11,7 @@
 
 #define DIE(msg) UTILS_DIE(msg)
 #define UTILS_DIE(msg) UTILS_THROW_RUNTIME_EXCEPTION(msg)
+#define UTILS_DIE_IF(cond, msg) do{if(cond) { UTILS_THROW_RUNTIME_EXCEPTION(msg); }}while(false)
 #define UTILS_THROW_RUNTIME_EXCEPTION(msg) throw genie::util::RuntimeException(__FILE__, __FUNCTION__, __LINE__, msg)
 
 // ---------------------------------------------------------------------------------------------------------------------

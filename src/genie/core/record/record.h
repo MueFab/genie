@@ -175,7 +175,7 @@ class Record {
 /**
  *
  */
-typedef std::vector<Record> MpeggChunk;
+typedef std::vector<Record> Chunk;
 
 // ---------------------------------------------------------------------------------------------------------------------
 

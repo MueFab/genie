@@ -244,8 +244,8 @@ std::vector<sam::Record> Exporter::convert(core::record::Record&& rec) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Exporter::flowIn(core::record::MpeggChunk&& records, size_t id) {
-    core::record::MpeggChunk recs = std::move(records);
+void Exporter::flowIn(core::record::Chunk&& records, size_t id) {
+    core::record::Chunk recs = std::move(records);
     util::OrderedSection section(&lock, id);
     for (auto& rec : recs) {
         auto sam_recs = convert(std::move(rec));

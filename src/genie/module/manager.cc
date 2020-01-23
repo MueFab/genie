@@ -5,6 +5,7 @@
  */
 
 #include "manager.h"
+#include <genie/core/format-importer.h>
 #include <genie/core/global-cfg.h>
 #include <genie/core/parameter/descriptor_present/decoder.h>
 #include <genie/core/parameter/quality-values.h>
@@ -19,15 +20,15 @@ namespace module {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void detect() {
-    core::GlobalCfg::getSingleton().getIndustrialPark().registerConstructor<core::parameter::desc_pres::DecoderRegular>(
+    auto& indPark = core::GlobalCfg::getSingleton().getIndustrialPark();
+    indPark.registerConstructor<core::parameter::desc_pres::DecoderRegular>(
         entropy::paramcabac::DecoderRegular::MODE_CABAC, &entropy::paramcabac::DecoderRegular::create);
-    core::GlobalCfg::getSingleton()
-        .getIndustrialPark()
-        .registerConstructor<core::parameter::desc_pres::DecoderTokentype>(
+    indPark.registerConstructor<core::parameter::desc_pres::DecoderTokentype>(
             entropy::paramcabac::DecoderRegular::MODE_CABAC, &entropy::paramcabac::DecoderTokenType::create);
+    indPark.registerConstructor<core::parameter::QualityValues>(
+        quality::paramqv1::QualityValues1::MODE_QV1, &quality::paramqv1::QualityValues1::create);
 
-    core::GlobalCfg::getSingleton().getIndustrialPark().registerConstructor<core::parameter::QualityValues>(
-        quality::paramqv1::QvCodingConfig1::MODE_QV1, &quality::paramqv1::QvCodingConfig1::create);
+  //  indPark.registerConstructor<core::FormatImporter>()
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -15,48 +15,70 @@
 #include <memory>
 #include "parameter_set.h"
 
+#include <boost/optional/optional.hpp>
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace quality {
 namespace paramqv1 {
 
-/**
- * ISO 23092-2 Section 3.3.2 table 7 lines 34 to 38
- */
-class QvCodingConfig1 : public core::parameter::QualityValues {
+class QualityValues1 : public core::parameter::QualityValues {
    public:
     static const uint8_t MODE_QV1 = 1;
 
-    /**
-     * ISO 23092-2 Section 3.3.2.2.1
-     */
     enum class QvpsPresetId {
-        ASCII = 0,             //!< 3.3.2.2.1.1
-        OFFSET33_RANGE41 = 1,  //!< 3.3.2.2.1.2
-        OFFSET64_RANGE40 = 2   //!< 3.3.2.2.1.3
+        ASCII = 0,
+        OFFSET33_RANGE41 = 1,
+        OFFSET64_RANGE40 = 2
     };
 
-    QvCodingConfig1();
+    QualityValues1();
 
-    QvCodingConfig1(util::BitReader& reader);
+    explicit QualityValues1(util::BitReader& reader);
 
-    explicit QvCodingConfig1(QvpsPresetId _qvps_preset_ID, bool _reverse_flag);
+    explicit QualityValues1(QvpsPresetId _qvps_preset_ID, bool _reverse_flag);
 
-    void setQvps(std::unique_ptr<ParameterSetQvps> _parameter_set_qvps);
+    void setQvps(ParameterSet&& _parameter_set_qvps);
 
     void write(util::BitWriter& writer) const override;
 
-    virtual std::unique_ptr<QualityValues> clone() const;
+    std::unique_ptr<QualityValues> clone() const override;
 
     static std::unique_ptr<QualityValues> create(util::BitReader& reader) {
-        return util::make_unique<QvCodingConfig1>(reader);
+        return util::make_unique<QualityValues1>(reader);
+    }
+
+    static const Codebook& getPresetCodebook(QvpsPresetId id) {
+        const static std::vector<Codebook> pSet = []() -> std::vector<Codebook> {
+          std::vector<Codebook> ret;
+          Codebook set(33, 34);
+          for(uint8_t p = 2; p <  94 ; ++p) {
+              set.addEntry(p + 33);
+          }
+          ret.emplace_back(std::move(set));
+
+          set = Codebook(33, 41);
+          for(uint8_t p = 46; p <=  66 ; p+=5) {
+              set.addEntry(p);
+          }
+          set.addEntry(74);
+          ret.emplace_back(std::move(set));
+
+          set = Codebook(64, 72);
+          for(uint8_t p = 77; p <=  97 ; p+=5) {
+              set.addEntry(p);
+          }
+          set.addEntry(104);
+          ret.emplace_back(std::move(set));
+          return ret;
+        }();
+        return pSet[uint8_t(id)];
     }
 
    private:
-    uint8_t qvps_flag : 1;                                 //!< Line 34
-    std::unique_ptr<ParameterSetQvps> parameter_set_qvps;  //!< Line 36
-    std::unique_ptr<QvpsPresetId> qvps_preset_ID;          //!< : 4; Line 38
+    boost::optional<ParameterSet> parameter_set_qvps;
+    boost::optional<QvpsPresetId> qvps_preset_ID;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

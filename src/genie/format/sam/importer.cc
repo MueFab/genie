@@ -164,7 +164,7 @@ core::record::Record Importer::convert(uint16_t ref, sam::Record &&_r1, sam::Rec
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Importer::pump(size_t id) {
-    core::record::MpeggChunk chunk;
+    core::record::Chunk chunk;
     std::vector<sam::Record> s;
     std::list<sam::Record> samRecords;
     uint16_t local_ref_num = 0;

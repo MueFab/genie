@@ -23,7 +23,7 @@ namespace mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-class MgrecsImporter : public util::Source<core::record::MpeggChunk>, public util::OriginalSource {
+class MgrecsImporter : public util::Source<core::record::Chunk>, public util::OriginalSource {
    private:
     size_t blockSize;
     util::BitReader reader;
