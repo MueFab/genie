@@ -75,12 +75,10 @@ const core::record::alignment_split::SameRec &Encoder::extractPairedAlignment(co
     // TODO: More than 2 split alignments (even supported by standard?)
     // TODO: Multialignments
     const auto SAME_REC = core::record::AlignmentSplit::Type::SAME_REC;
-    if (rec.getAlignments().front().getAlignmentSplits().front()->getType() == SAME_REC) {
-        const auto ALIGNMENT = rec.getAlignments().front().getAlignmentSplits().front().get();
-        return *reinterpret_cast<const core::record::alignment_split::SameRec *>(ALIGNMENT);
-    } else {
-        UTILS_DIE("Only same record split alignments supported");
-    }
+    UTILS_DIE_IF(rec.getAlignments().front().getAlignmentSplits().front()->getType() != SAME_REC,
+                 "Only same record split alignments supported");
+    const auto ALIGNMENT = rec.getAlignments().front().getAlignmentSplits().front().get();
+    return *reinterpret_cast<const core::record::alignment_split::SameRec *>(ALIGNMENT);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

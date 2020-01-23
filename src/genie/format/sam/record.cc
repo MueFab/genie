@@ -40,9 +40,7 @@ Record::Record() : Record("", 0, "", 0, 0, "", "", 0, 0, "", "") {}
 
 Record::Record(const std::string& string) {
     auto tokens = util::tokenize(string, '\t');
-    if (tokens.size() < 11) {
-        UTILS_DIE("Invalid SAM record");
-    }
+    UTILS_DIE_IF(tokens.size() < 11, "Invalid SAM record");
     qname = tokens[0];
     flag = std::stoi(tokens[1]);
     rname = tokens[2];
@@ -66,11 +64,10 @@ void Record::check() const {
     static const std::regex REGEX_RNEXT("\\*|=|" + header::getSAMRegex());
     static const std::regex REGEX_SEQ("\\*|[A-Za-z=.]+");
     static const std::regex REGEX_QUAL("[!-~]+");
-    if (!std::regex_match(qname, REGEX_QNAME) || !std::regex_match(rname, REGEX_RNAME) ||
-        !std::regex_match(cigar, REGEX_CIGAR) || !std::regex_match(rnext, REGEX_RNEXT) ||
-        !std::regex_match(seq, REGEX_SEQ) || !std::regex_match(qual, REGEX_QUAL)) {
-        UTILS_DIE("Invalid SAM record");
-    }
+    UTILS_DIE_IF(!std::regex_match(qname, REGEX_QNAME) || !std::regex_match(rname, REGEX_RNAME) ||
+                     !std::regex_match(cigar, REGEX_CIGAR) || !std::regex_match(rnext, REGEX_RNEXT) ||
+                     !std::regex_match(seq, REGEX_SEQ) || !std::regex_match(qual, REGEX_QUAL),
+                 "Invalid SAM record");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

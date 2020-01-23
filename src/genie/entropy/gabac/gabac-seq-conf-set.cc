@@ -147,20 +147,14 @@ const GabacSeqConfSet::DecoderConfigurationCabac &GabacSeqConfSet::loadDescripto
     const GabacSeqConfSet::ParameterSet &parameterSet, core::GenDesc descriptor_id) {
     using namespace entropy::paramcabac;
 
-    auto& curDesc = parameterSet.getDescriptor(descriptor_id);
-    if (curDesc.isClassSpecific()) {
-        UTILS_DIE("Class specific config not supported");
-    }
+    auto &curDesc = parameterSet.getDescriptor(descriptor_id);
+    UTILS_DIE_IF(curDesc.isClassSpecific(), "Class specific config not supported");
     auto PRESENT = core::parameter::desc_pres::DescriptorPresent::PRESENT;
     auto base_conf = curDesc.get();
-    if (base_conf->getPreset() != PRESENT) {
-        UTILS_DIE("Config not present");
-    }
+    UTILS_DIE_IF(base_conf->getPreset() != PRESENT, "Config not present");
     auto decoder_conf =
         reinterpret_cast<const core::parameter::desc_pres::DescriptorPresent &>(*base_conf).getDecoder();
-    if (decoder_conf->getMode() != paramcabac::DecoderRegular::MODE_CABAC) {
-        UTILS_DIE("Config is not paramcabac");
-    }
+    UTILS_DIE_IF(decoder_conf->getMode() != paramcabac::DecoderRegular::MODE_CABAC, "Config is not paramcabac");
 
     return reinterpret_cast<const DecoderRegular &>(*decoder_conf);
 }
@@ -179,9 +173,7 @@ gabac::TransformedSequenceConfiguration GabacSeqConfSet::loadTransformedSequence
     gabacTransCfg.lutTransformationEnabled = transformedDesc.getTransformID() == LUT;
 
     const auto MAX_BIN = BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB;
-    if (transformedDesc.getBinarization()->getBinarizationID() > MAX_BIN) {
-        UTILS_DIE("Binarization unsupported");
-    }
+    UTILS_DIE_IF(transformedDesc.getBinarization()->getBinarizationID() > MAX_BIN, "Binarization unsupported");
 
     const auto CUR_BIN = transformedDesc.getBinarization()->getBinarizationID();
     gabacTransCfg.binarizationId = gabac::BinarizationId(CUR_BIN);

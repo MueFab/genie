@@ -34,9 +34,7 @@ class Factory : public GenericFactory {
 
     std::unique_ptr<T> create(uint8_t id, util::BitReader& reader) {
         auto it = factories.find(id);
-        if (it == factories.end()) {
-            UTILS_DIE("Unknown implementation in factory");
-        }
+        UTILS_DIE_IF(it == factories.end(), "Unknown implementation in factory");
         return it->second(reader);
     }
 };

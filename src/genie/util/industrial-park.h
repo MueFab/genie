@@ -30,9 +30,7 @@ class IndustrialPark {
     Factory<T>* findAndFail() const {
         auto type = std::type_index(typeid(T));
         auto it = factories.find(type);
-        if (it == factories.end()) {
-            UTILS_DIE("Unknown factory type");
-        }
+        UTILS_DIE_IF(it == factories.end(), "Unknown factory type");
         return reinterpret_cast<Factory<T>*>(it->second.get());
     }
 

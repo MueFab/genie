@@ -46,9 +46,7 @@ const std::vector<std::string>& Segment::getQualities() const { return quality_v
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Segment::addQualities(std::string&& qv) {
-    if (qv.length() != sequence.length()) {
-        UTILS_DIE("QV and sequence lengths do not match");
-    }
+    UTILS_DIE_IF(qv.length() != sequence.length(), "QV and sequence lengths do not match");
     quality_values.emplace_back(std::move(qv));
 }
 

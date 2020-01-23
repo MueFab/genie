@@ -27,7 +27,7 @@ FastqImporter::FastqImporter(size_t _blockSize, std::istream *_file_1, std::istr
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool FastqImporter::pump(size_t id) {
-    auto chunk = util::make_unique<core::record::Chunk>();
+    core::record::Chunk chunk;
     bool eof = false;
     {
         util::OrderedSection section(&lock, id);
@@ -37,7 +37,7 @@ bool FastqImporter::pump(size_t id) {
                 eof = true;
                 break;
             }
-            chunk->push_back(buildRecord(data));
+            chunk.push_back(buildRecord(data));
         }
     }
     flowOut(std::move(chunk), record_counter++);
@@ -83,16 +83,11 @@ std::vector<std::array<std::string, FastqImporter::LINES_PER_RECORD>> FastqImpor
 
 void FastqImporter::sanityCheck(const std::array<std::string, LINES_PER_RECORD> &data) {
     constexpr char ID_TOKEN = '@';
-    if (data[Lines::ID].front() != ID_TOKEN) {
-        UTILS_DIE("Invald fastq identifier");
-    }
+    UTILS_DIE_IF(data[Lines::ID].front() != ID_TOKEN, "Invald fastq identifier");
     constexpr char RESERVED_TOKEN = '+';
-    if (data[Lines::RESERVED].front() != RESERVED_TOKEN) {
-        UTILS_DIE("Invald fastq line 3");
-    }
-    if (data[Lines::SEQUENCE].size() != data[Lines::QUALITY].size()) {
-        UTILS_DIE("Qual and Seq in fastq do not match in length");
-    }
+    UTILS_DIE_IF(data[Lines::RESERVED].front() != RESERVED_TOKEN, "Invald fastq line 3");
+    UTILS_DIE_IF(data[Lines::SEQUENCE].size() != data[Lines::QUALITY].size(),
+                 "Qual and Seq in fastq do not match in length");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

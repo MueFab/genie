@@ -85,10 +85,6 @@ namespace fastq {
      * @brief Cleanup, end of data
      */
     void dryIn() override;
-
-    static std::unique_ptr<core::FormatImporter> create(util::BitReader &reader) {
-        return util::make_unique<FastqImporter>(reader);
-    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

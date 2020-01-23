@@ -21,7 +21,7 @@ namespace core {
 /**
  * @brief The basic interface for modules encoding the plain read data
  */
-class ReadEncoder : public util::Drain<record::MpeggChunk>, public util::Source<AccessUnitRaw> {
+class ReadEncoder : public util::Drain<record::Chunk>, public util::Source<AccessUnitRaw> {
    public:
     /**
      * @Brief For polymorphic destruction
