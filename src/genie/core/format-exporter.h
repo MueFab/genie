@@ -20,7 +20,7 @@ namespace core {
 /**
  * @brief Interface for exporters of various file formats. Note that each importer has to convert from mpegg-records
  */
-class FormatExporter : public util::Drain<record::MpeggChunk> {};
+class FormatExporter : public util::Drain<record::Chunk> {};
 
 // ---------------------------------------------------------------------------------------------------------------------
 

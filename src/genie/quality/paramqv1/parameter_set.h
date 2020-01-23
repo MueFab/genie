@@ -23,24 +23,26 @@ namespace genie {
 namespace quality {
 namespace paramqv1 {
 
-/**
- * ISO 23092-2 Section 3.3.2.2 table 9
- */
-class ParameterSetQvps {
+class ParameterSet {
    private:
-    // uint8_t qv_num_codebooks_total : 4;    //!< Line 2
-    std::vector<QvCodebook> qv_codebooks;  //!< Lines 3 to 8
+    std::vector<Codebook> qv_codebooks;
 
    public:
-    ParameterSetQvps();
+    explicit ParameterSet(util::BitReader &reader) {
+        for(int c = reader.read(4); c > 0; --c) {
+            qv_codebooks.emplace_back(Codebook(reader));
+        }
+    }
+    explicit ParameterSet() = default;
+    const std::vector<Codebook>& getCodebooks() const {
+        return qv_codebooks;
+    }
 
-    virtual ~ParameterSetQvps() = default;
+    virtual ~ParameterSet() = default;
 
-    void addCodeBook(const QvCodebook &book);
+    void addCodeBook(Codebook &&book);
 
     virtual void write(util::BitWriter &writer) const;
-
-    std::unique_ptr<ParameterSetQvps> clone() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

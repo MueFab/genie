@@ -23,8 +23,8 @@ FastqExporter::FastqExporter(std::ostream *_file_1, std::ostream *_file_2) : fil
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FastqExporter::flowIn(core::record::MpeggChunk &&t, size_t id) {
-    core::record::MpeggChunk data = std::move(t);
+void FastqExporter::flowIn(core::record::Chunk &&t, size_t id) {
+    core::record::Chunk data = std::move(t);
     util::OrderedSection section(&lock, id);
     for (const auto &i : data) {
         auto file_ptr = *file.data();

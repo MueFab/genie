@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/util/bitwriter.h>
+#include <genie/util/bitreader.h>
 #include <cstdint>
 #include <vector>
 
@@ -22,19 +23,27 @@ namespace paramqv1 {
 /**
  * ISO 23092-2 Section 3.3.2.2 table 9 Lines 4 to 7
  */
-class QvCodebook {
+class Codebook {
    private:
     // uint8_t qv_num_codebook_entries : 8;  //!< Line 4
     std::vector<uint8_t> qv_recon;  //!< Lines 5 to 7
 
    public:
-    QvCodebook();
+    explicit Codebook(util::BitReader &reader);
+    Codebook(uint8_t v1, uint8_t v2) {
+        qv_recon.push_back(v1);
+        qv_recon.push_back(v2);
+    }
 
-    virtual ~QvCodebook() = default;
+    virtual ~Codebook() = default;
 
     void addEntry(uint8_t entry);
 
-    virtual void write(util::BitWriter *writer) const;
+    const std::vector<uint8_t>& getEntries() const {
+        return qv_recon;
+    }
+
+    virtual void write(util::BitWriter &writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

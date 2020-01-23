@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <format-importer.h>
 #include <genie/core/record/record.h>
 #include <genie/util/exceptions.h>
 #include <genie/util/make-unique.h>
@@ -25,7 +26,7 @@ namespace fastq {
 /**
  * @brief Module to reads fastq files and convert them into MPEGG-Record format
  */
-class FastqImporter : public util::Source<std::unique_ptr<core::record::MpeggChunk>>, public util::OriginalSource {
+   class FastqImporter : public core::FormatImporter {
    private:
     static constexpr size_t LINES_PER_RECORD = 4;  //!< @brief How many lines in a fastq file belong to one record
     size_t blockSize;                              //!< @brief How many records to read in one pump() run
@@ -84,6 +85,10 @@ class FastqImporter : public util::Source<std::unique_ptr<core::record::MpeggChu
      * @brief Cleanup, end of data
      */
     void dryIn() override;
+
+    static std::unique_ptr<core::FormatImporter> create(util::BitReader &reader) {
+        return util::make_unique<FastqImporter>(reader);
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

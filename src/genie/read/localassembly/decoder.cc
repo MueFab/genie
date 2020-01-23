@@ -22,7 +22,7 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, size_t id) {
     uint16_t ref = t.getReference();
     LocalReference refEncoder(bufSize);
     basecoder::Decoder decoder(std::move(t), segments);
-    core::record::MpeggChunk chunk;
+    core::record::Chunk chunk;
     for (size_t recID = 0; recID < numRecords; ++recID) {
         auto meta = decoder.readSegmentMeta();
         std::vector<std::string> refs;

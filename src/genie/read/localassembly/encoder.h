@@ -95,7 +95,7 @@ class Encoder : public core::ReadEncoder {
      * @param t The input data
      * @param id The current block identifier
      */
-    void flowIn(core::record::MpeggChunk&& t, size_t id) override;
+    void flowIn(core::record::Chunk&& t, size_t id) override;
 
     /**
      * @brief Propagate end-of-data signal.

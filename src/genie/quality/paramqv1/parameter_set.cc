@@ -15,30 +15,17 @@ namespace paramqv1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ParameterSetQvps::ParameterSetQvps() {
-    // TODO
+void ParameterSet::addCodeBook(Codebook &&book) {
+    qv_codebooks.emplace_back(std::move(book));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ParameterSetQvps::addCodeBook(const QvCodebook &book) {
-    // TODO
-    (void)book;  // Silence warning about unused variable
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void ParameterSetQvps::write(util::BitWriter &writer) const {
-    // TODO
-    (void)writer;  // Silence warning about unused variable
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::unique_ptr<ParameterSetQvps> ParameterSetQvps::clone() const {
-    auto ret = util::make_unique<ParameterSetQvps>();
-    ret->qv_codebooks = qv_codebooks;
-    return ret;
+void ParameterSet::write(util::BitWriter &writer) const {
+    writer.write(qv_codebooks.size(), 4);
+    for(const auto& q : qv_codebooks) {
+        q.write(writer);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

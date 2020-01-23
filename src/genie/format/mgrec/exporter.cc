@@ -19,8 +19,8 @@ MgrecsExporter::MgrecsExporter(std::ostream &_file_1) : writer(&_file_1) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MgrecsExporter::flowIn(core::record::MpeggChunk &&t, size_t id) {
-    core::record::MpeggChunk data = std::move(t);
+void MgrecsExporter::flowIn(core::record::Chunk &&t, size_t id) {
+    core::record::Chunk data = std::move(t);
     util::OrderedSection section(&lock, id);
     for (auto &i : data) {
         i.write(writer);

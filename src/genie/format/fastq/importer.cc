@@ -27,7 +27,7 @@ FastqImporter::FastqImporter(size_t _blockSize, std::istream *_file_1, std::istr
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool FastqImporter::pump(size_t id) {
-    auto chunk = util::make_unique<core::record::MpeggChunk>();
+    auto chunk = util::make_unique<core::record::Chunk>();
     bool eof = false;
     {
         util::OrderedSection section(&lock, id);

@@ -112,8 +112,8 @@ core::AccessUnitRaw Encoder::pack(size_t id, uint16_t ref, Encoder::LaeState& st
     core::parameter::DataUnit::DatasetType dataType = core::parameter::DataUnit::DatasetType::ALIGNED;
     core::parameter::ParameterSet ret(id, id, dataType, core::AlphabetID::ACGTN, state.readLength, state.pairedEnd,
                                       false, 0, 0, false, false);
-    const auto ALPHABET = quality::paramqv1::QvCodingConfig1::QvpsPresetId::ASCII;
-    ret.addClass(state.classType, util::make_unique<quality::paramqv1::QvCodingConfig1>(ALPHABET, false));
+    const auto ALPHABET = quality::paramqv1::QualityValues1::QvpsPresetId::ASCII;
+    ret.addClass(state.classType, util::make_unique<quality::paramqv1::QualityValues1>(ALPHABET, false));
     auto crps =
         util::make_unique<core::parameter::ComputedRef>(core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY);
     crps->setExtension(util::make_unique<core::parameter::ComputedRefExtended>(0, cr_buf_max_size));
@@ -131,8 +131,8 @@ core::AccessUnitRaw Encoder::pack(size_t id, uint16_t ref, Encoder::LaeState& st
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Encoder::flowIn(core::record::MpeggChunk&& t, size_t id) {
-    core::record::MpeggChunk data = std::move(t);
+void Encoder::flowIn(core::record::Chunk&& t, size_t id) {
+    core::record::Chunk data = std::move(t);
     LaeState state(cr_buf_max_size);
 
     state.pairedEnd = data.front().getNumberOfTemplateSegments() > 1;

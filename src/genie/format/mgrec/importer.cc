@@ -21,7 +21,7 @@ MgrecsImporter::MgrecsImporter(size_t _blockSize, std::istream &_file_1)
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool MgrecsImporter::pump(size_t id) {
-    core::record::MpeggChunk chunk;
+    core::record::Chunk chunk;
     {
         util::OrderedSection section(&lock, id);
         for (size_t i = 0; i < blockSize; ++i) {

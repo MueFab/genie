@@ -23,7 +23,7 @@ namespace fastq {
 /**
  * @brief Module to export MPEG-G record to fastq files
  */
-class FastqExporter : public util::Drain<core::record::MpeggChunk> {
+class FastqExporter : public util::Drain<core::record::Chunk> {
     std::vector<std::ostream *> file;  //!< @brief Support for paired output files
     util::OrderedLock lock;            //!< @brief Lock to ensure in order execution
    public:
@@ -45,7 +45,7 @@ class FastqExporter : public util::Drain<core::record::MpeggChunk> {
      * @param records Input records
      * @param id Block identifier (for multithreading)
      */
-    void flowIn(core::record::MpeggChunk &&records, size_t id) override;
+    void flowIn(core::record::Chunk &&records, size_t id) override;
 
     /**
      * @brief Accepts end of file marker

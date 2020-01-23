@@ -21,7 +21,7 @@ namespace core {
 /**
  * @brief Interface for importers of various file formats. Note that each importer has to convert to mpegg-records
  */
-class FormatImporter : public util::Source<record::MpeggChunk>, public util::OriginalSource {};
+class FormatImporter : public util::Source<record::Chunk>, public util::OriginalSource {};
 
 // ---------------------------------------------------------------------------------------------------------------------
 

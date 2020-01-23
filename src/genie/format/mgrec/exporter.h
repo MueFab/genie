@@ -23,7 +23,7 @@ namespace mgrec {
 /**
  *
  */
-class MgrecsExporter : public util::Drain<core::record::MpeggChunk> {
+class MgrecsExporter : public util::Drain<core::record::Chunk> {
     util::BitWriter writer;  //!<
     util::OrderedLock lock;  //!<
 
@@ -39,7 +39,7 @@ class MgrecsExporter : public util::Drain<core::record::MpeggChunk> {
      * @param t
      * @param id
      */
-    void flowIn(core::record::MpeggChunk&& t, size_t id) override;
+    void flowIn(core::record::Chunk&& t, size_t id) override;
 
     /**
      *

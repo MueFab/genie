@@ -64,7 +64,7 @@ class Exporter : public core::FormatExporter {
 
     std::vector<sam::Record> convert(core::record::Record&& rec);
 
-    void flowIn(core::record::MpeggChunk&& records, size_t id) override;
+    void flowIn(core::record::Chunk&& records, size_t id) override;
 
     /**
      * @brief Accepts end of file marker
