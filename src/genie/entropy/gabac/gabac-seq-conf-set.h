@@ -42,7 +42,7 @@ class GabacSeqConfSet {
      * @param gabac_configuration Input gabac config
      * @return Newly created transform parameter object
      */
-    static std::unique_ptr<TransformSubseqParameters> storeTransParams(
+    static TransformSubseqParameters storeTransParams(
         const gabac::EncodingConfiguration& gabac_configuration);
 
     /**
@@ -59,7 +59,7 @@ class GabacSeqConfSet {
      * @param tSeqConf Input gabac config
      * @return Newly created MPEG-G Binarization object
      */
-    static std::unique_ptr<CabacBinarization> storeBinarization(
+    static CabacBinarization storeBinarization(
         const gabac::TransformedSequenceConfiguration& tSeqConf);
 
     /**
@@ -118,14 +118,14 @@ class GabacSeqConfSet {
     void loadParameters(const ParameterSet& parameterSet);
 
     template <typename T>
-    void fillDecoder(const core::GenomicDescriptorProperties& desc, T* decoder_config) const {
+    void fillDecoder(const core::GenomicDescriptorProperties& desc, T& decoder_config) const {
         for (const auto& subdesc : desc.subseqs) {
             auto transform_params = storeTransParams(getConfAsGabac(subdesc.id));
-            decoder_config->setSubsequenceCfg(subdesc.id.second, std::move(transform_params));
+            decoder_config.setSubsequenceCfg(subdesc.id.second, std::move(transform_params));
 
             // This is where actual translation of one gabac config to MPEGG takes place
-            auto subseq_cfg = decoder_config->getSubsequenceCfg(subdesc.id.second);
-            storeSubseq(getConfAsGabac(subdesc.id), *subseq_cfg);
+            auto subseq_cfg = decoder_config.getSubsequenceCfg(subdesc.id.second);
+            storeSubseq(getConfAsGabac(subdesc.id), subseq_cfg);
         }
     }
 };

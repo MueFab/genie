@@ -57,7 +57,7 @@ ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::
     spliced_reads_flag = bitReader.read<bool>(1);
     multiple_signature_base = bitReader.read<uint32_t>(31);
     if (multiple_signature_base > 0) {
-        u_signature_size = util::make_unique<uint8_t>(bitReader.read(6));
+        u_signature_size = bitReader.read<uint8_t >(6);
     }
     for (size_t i = 0; i < num_classes; ++i) {
         auto mode = bitReader.read<uint8_t>(4);
@@ -66,7 +66,7 @@ ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::
     }
     auto crps_flag = bitReader.read<bool>(1);
     if (crps_flag) {
-        parameter_set_crps = util::make_unique<ComputedRef>(bitReader);
+        parameter_set_crps = ComputedRef(bitReader);
     }
     bitReader.flush();
 }
@@ -94,9 +94,9 @@ ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_
       multiple_alignments_flag(_multiple_alignments_flag),
       spliced_reads_flag(_spliced_reads_flag),
       multiple_signature_base(0),
-      u_signature_size(nullptr),
+      u_signature_size(),
       qv_coding_configs(0),
-      parameter_set_crps(nullptr) {}
+      parameter_set_crps() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -118,9 +118,9 @@ ParameterSet::ParameterSet()
       multiple_alignments_flag(false),
       spliced_reads_flag(false),
       multiple_signature_base(0),
-      u_signature_size(nullptr),
+      u_signature_size(),
       qv_coding_configs(0),
-      parameter_set_crps(nullptr) {}
+      parameter_set_crps() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -196,7 +196,7 @@ size_t ParameterSet::getNumberTemplateSegments() const { return number_of_templa
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::setComputedRef(std::unique_ptr<ComputedRef> _parameter_set_crps) {
+void ParameterSet::setComputedRef(ComputedRef&& _parameter_set_crps) {
     parameter_set_crps = std::move(_parameter_set_crps);
 }
 
@@ -229,13 +229,13 @@ const DescriptorBox &ParameterSet::getDescriptor(GenDesc index) const { return d
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::addGroup(std::unique_ptr<std::string> rgroup_id) { rgroup_IDs.push_back(std::move(*rgroup_id)); }
+void ParameterSet::addGroup(std::string&& rgroup_id) { rgroup_IDs.emplace_back(std::move(rgroup_id)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ParameterSet::setMultipleSignatureBase(uint32_t _multiple_signature_base, uint8_t _U_signature_size) {
     multiple_signature_base = _multiple_signature_base;
-    u_signature_size = util::make_unique<uint8_t>(_U_signature_size);
+    u_signature_size = _U_signature_size;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -285,13 +285,13 @@ ParameterSet &ParameterSet::operator=(const ParameterSet &other) {
     spliced_reads_flag = other.spliced_reads_flag;
     multiple_signature_base = other.multiple_signature_base;
     if (other.u_signature_size) {
-        u_signature_size = util::make_unique<uint8_t>(*other.u_signature_size);
+        u_signature_size = other.u_signature_size;
     }
     qv_coding_configs.clear();
     for (const auto &c : other.qv_coding_configs) {
         qv_coding_configs.emplace_back(c->clone());
     }
-    parameter_set_crps = other.parameter_set_crps->clone();
+    parameter_set_crps = other.parameter_set_crps;
     return *this;
 }
 
@@ -314,7 +314,7 @@ ParameterSet &ParameterSet::operator=(ParameterSet &&other) noexcept {
     multiple_alignments_flag = other.multiple_alignments_flag;
     spliced_reads_flag = other.spliced_reads_flag;
     multiple_signature_base = other.multiple_signature_base;
-    u_signature_size = std::move(other.u_signature_size);
+    u_signature_size = other.u_signature_size;
     qv_coding_configs = std::move(other.qv_coding_configs);
     parameter_set_crps = std::move(other.parameter_set_crps);
     return *this;
@@ -340,9 +340,9 @@ ParameterSet::ParameterSet(const ParameterSet &other)
       multiple_alignments_flag(false),
       spliced_reads_flag(false),
       multiple_signature_base(0),
-      u_signature_size(nullptr),
+      u_signature_size(),
       qv_coding_configs(0),
-      parameter_set_crps(nullptr) {
+      parameter_set_crps() {
     *this = other;
 }
 
@@ -366,9 +366,9 @@ ParameterSet::ParameterSet(ParameterSet &&other) noexcept
       multiple_alignments_flag(false),
       spliced_reads_flag(false),
       multiple_signature_base(0),
-      u_signature_size(nullptr),
+      u_signature_size(),
       qv_coding_configs(0),
-      parameter_set_crps(nullptr) {
+      parameter_set_crps() {
     *this = std::move(other);
 }
 

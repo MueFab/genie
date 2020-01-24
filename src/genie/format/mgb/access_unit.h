@@ -33,7 +33,7 @@ namespace mgb {
 
 class AccessUnit : public core::parameter::DataUnit {
    public:
-    explicit AccessUnit(const std::map<size_t, std::unique_ptr<core::parameter::ParameterSet>> &parameterSets,
+    explicit AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &parameterSets,
                         util::BitReader &bitReader);
 
     void write(util::BitWriter &writer) const override;
@@ -44,13 +44,13 @@ class AccessUnit : public core::parameter::DataUnit {
 
     void addBlock(Block block);
 
-    void setMmCfg(std::unique_ptr<MmCfg> cfg);
+    void setMmCfg(MmCfg&& cfg);
 
-    void setRefCfg(std::unique_ptr<RefCfg> cfg);
+    void setRefCfg(RefCfg&& cfg);
 
-    void setAuTypeCfg(std::unique_ptr<AuTypeCfg> cfg);
+    void setAuTypeCfg(AuTypeCfg&& cfg);
 
-    void setSignatureCfg(std::unique_ptr<SignatureCfg> cfg);
+    void setSignatureCfg(SignatureCfg&& cfg);
 
     std::vector<Block> getBlocks() const;
 
@@ -71,10 +71,10 @@ class AccessUnit : public core::parameter::DataUnit {
     uint8_t parameter_set_ID;
     core::record::ClassType au_type;
     uint32_t reads_count;
-    std::unique_ptr<MmCfg> mm_cfg;
-    std::unique_ptr<RefCfg> ref_cfg;
-    std::unique_ptr<AuTypeCfg> au_Type_U_Cfg;
-    std::unique_ptr<SignatureCfg> signature_config;
+    boost::optional<MmCfg> mm_cfg;
+    boost::optional<RefCfg> ref_cfg;
+    boost::optional<AuTypeCfg> au_Type_U_Cfg;
+    boost::optional<SignatureCfg> signature_config;
 
     std::vector<Block> blocks;
 };

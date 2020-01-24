@@ -15,7 +15,7 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void RefCfg::write(util::BitWriter &writer) {
+void RefCfg::write(util::BitWriter &writer) const{
     writer.write(ref_sequence_ID, 16);
     writer.write(ref_start_position, posSize);
     writer.write(ref_end_position, posSize);

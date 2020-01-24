@@ -16,9 +16,9 @@ namespace mgb {
 // ---------------------------------------------------------------------------------------------------------------------
 
 SignatureCfg::SignatureCfg(uint64_t _U_cluster_signature_0, uint8_t _U_signature_size)
-    : num_signatures(nullptr), U_cluster_signature(1, _U_cluster_signature_0), U_signature_size(_U_signature_size) {
+    : num_signatures(), U_cluster_signature(1, _U_cluster_signature_0), U_signature_size(_U_signature_size) {
     if (U_cluster_signature[0] == (1u << U_signature_size) - 1) {
-        num_signatures = util::make_unique<uint16_t>(1);
+        num_signatures = 1;
     }
 }
 
@@ -33,7 +33,7 @@ SignatureCfg::SignatureCfg(uint8_t _U_signature_size, uint32_t multiple_signatur
                 U_cluster_signature.emplace_back(reader.read<uint64_t>(U_signature_size));
             }
         } else {
-            num_signatures = util::make_unique<uint16_t>(reader.read<uint16_t>());
+            num_signatures = reader.read<uint16_t>();
             for (size_t i = 0; i < *num_signatures; ++i) {
                 U_cluster_signature.emplace_back(reader.read<uint64_t>(U_signature_size));
             }
@@ -52,7 +52,7 @@ void SignatureCfg::addSignature(uint64_t _U_cluster_signature) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SignatureCfg::write(util::BitWriter& writer) {
+void SignatureCfg::write(util::BitWriter& writer) const{
     size_t i = 0;
 
     writer.write(U_cluster_signature[0], U_signature_size);  // todo: size;

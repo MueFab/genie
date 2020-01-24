@@ -21,9 +21,9 @@ Context::Context(bool _adaptive_mode_flag, uint8_t _coding_subsym_size, uint8_t 
     : adaptive_mode_flag(_adaptive_mode_flag),
       num_contexts(0),
       context_initialization_value(0),
-      share_subsym_ctx_flag(nullptr) {
+      share_subsym_ctx_flag() {
     if (_coding_subsym_size < _output_symbol_size) {
-        share_subsym_ctx_flag = util::make_unique<bool>(_share_subsym_ctx_flag);
+        share_subsym_ctx_flag = _share_subsym_ctx_flag;
     }
 }
 
@@ -40,7 +40,7 @@ Context::Context(uint8_t coding_subsym_size, uint8_t output_symbol_size, util::B
         context_initialization_value.emplace_back(reader.read<uint8_t>(7));
     }
     if (coding_subsym_size < output_symbol_size) {
-        share_subsym_ctx_flag = util::make_unique<bool>(reader.read<bool>(1));
+        share_subsym_ctx_flag = reader.read<bool>(1);
     }
 }
 
@@ -66,17 +66,6 @@ void Context::write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<Context> Context::clone() const {
-    auto ret = util::make_unique<Context>();
-    ret->adaptive_mode_flag = adaptive_mode_flag;
-    ret->num_contexts = num_contexts;
-    ret->context_initialization_value = context_initialization_value;
-    ret->share_subsym_ctx_flag = util::make_unique<bool>(*share_subsym_ctx_flag);
-    return ret;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 uint8_t Context::getAdaptiveModeFlag() const { return adaptive_mode_flag; }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -89,7 +78,7 @@ bool Context::getShareSubsymCtxFlag() const { return *share_subsym_ctx_flag; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<uint8_t>* Context::getContextInitializationValue() const { return &context_initialization_value; }
+const std::vector<uint8_t>& Context::getContextInitializationValue() const { return context_initialization_value; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -5,10 +5,10 @@
 
 #include <memory>
 #include <vector>
-
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 #include <genie/util/make-unique.h>
+#include <boost/optional/optional.hpp>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -16,22 +16,19 @@ namespace genie {
 namespace format {
 namespace mgb {
 
-/**
- * ISO 23092-2 Section 3.4.1.1 table 19 lines 26 to 39
- */
 class SignatureCfg {
    private:
-    std::unique_ptr<uint16_t> num_signatures;   //!< : 16; Line 33
-    std::vector<uint64_t> U_cluster_signature;  //!< Lines 29 and 25 joined
+    boost::optional<uint16_t> num_signatures;
+    std::vector<uint64_t> U_cluster_signature;
 
-    uint8_t U_signature_size;  //!< Internal
+    uint8_t U_signature_size;
    public:
     SignatureCfg(uint64_t _U_cluster_signature_0, uint8_t _U_signature_size);
     SignatureCfg(uint8_t _U_signature_size, uint32_t multiple_signature_base, util::BitReader& reader);
     virtual ~SignatureCfg() = default;
 
     void addSignature(uint64_t _U_cluster_signature);
-    virtual void write(util::BitWriter& writer);
+    virtual void write(util::BitWriter& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

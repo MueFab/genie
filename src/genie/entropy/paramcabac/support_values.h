@@ -13,6 +13,7 @@
 #include <genie/util/bitwriter.h>
 #include <genie/util/make-unique.h>
 #include <memory>
+#include <boost/optional/optional.hpp>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,11 +26,11 @@ namespace paramcabac {
  */
 class SupportValues {
    private:
-    uint8_t output_symbol_size : 6;               //!< Line 2
-    uint8_t coding_subsym_size : 6;               //!< Line 3
-    uint8_t coding_order : 2;                     //!< Line 4
-    std::unique_ptr<bool> share_subsym_lut_flag;  //!< : 1; Line 7
-    std::unique_ptr<bool> share_subsym_prv_flag;  //!< : 1; Line 8
+    uint8_t output_symbol_size;
+    uint8_t coding_subsym_size;
+    uint8_t coding_order;
+    boost::optional<bool> share_subsym_lut_flag;
+    boost::optional<bool> share_subsym_prv_flag;
    public:
     enum class TransformIdSubsym : uint8_t { NO_TRANSFORM = 0, LUT_TRANSFORM = 1, DIFF_CODING = 2 };
 
@@ -42,8 +43,6 @@ class SupportValues {
     SupportValues(TransformIdSubsym transformIdSubsym, util::BitReader &reader);
 
     virtual ~SupportValues() = default;
-
-    std::unique_ptr<SupportValues> clone() const;
 
     virtual void write(util::BitWriter &writer) const;
 

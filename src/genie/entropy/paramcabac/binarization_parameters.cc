@@ -59,18 +59,18 @@ BinarizationParameters::BinarizationParameters() : BinarizationParameters(Binari
 BinarizationParameters::BinarizationParameters(BinarizationId binID, util::BitReader &reader) {
     switch (binID) {
         case BinarizationId::TRUNCATED_UNARY:
-            cmax = util::make_unique<uint8_t>(reader.read<uint8_t>());
+            cmax = reader.read<uint8_t>();
             break;
         case BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
         case BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
-            cmax_teg = util::make_unique<uint8_t>(reader.read<uint8_t>());
+            cmax_teg = reader.read<uint8_t>();
             break;
         case BinarizationId::DOUBLE_TRUNCATED_UNARY:
         case BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
-            cmax_dtu = util::make_unique<uint8_t>(reader.read<uint8_t>());  // Fall-through
+            cmax_dtu = reader.read<uint8_t>();  // Fall-through
         case BinarizationId::SPLIT_UNIT_WISE_TRUNCATED_UNARY:
         case BinarizationId::SIGNED_SPLIT_UNIT_WISE_TRUNCATED_UNARY:
-            split_unit_size = util::make_unique<uint8_t>(reader.read<uint8_t>(4));
+            split_unit_size = reader.read<uint8_t>(4);
             break;
         default:
             break;
@@ -80,14 +80,14 @@ BinarizationParameters::BinarizationParameters(BinarizationId binID, util::BitRe
 // ---------------------------------------------------------------------------------------------------------------------
 
 BinarizationParameters::BinarizationParameters(const BinarizationId &_binarization_id, uint8_t param)
-    : cmax(nullptr), cmax_teg(nullptr), cmax_dtu(nullptr), split_unit_size(nullptr) {
+    : cmax(), cmax_teg(), cmax_dtu(), split_unit_size() {
     switch (_binarization_id) {
         case BinarizationId::TRUNCATED_UNARY:
-            cmax = util::make_unique<uint8_t>(param);
+            cmax = param;
             break;
         case BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
         case BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
-            cmax_teg = util::make_unique<uint8_t>(param);
+            cmax_teg = param;
             break;
         case BinarizationId::BINARY_CODING:
         case BinarizationId::EXPONENTIAL_GOLOMB:
@@ -96,25 +96,6 @@ BinarizationParameters::BinarizationParameters(const BinarizationId &_binarizati
         default:
             UTILS_THROW_RUNTIME_EXCEPTION("Binarization not supported");
     }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::unique_ptr<BinarizationParameters> BinarizationParameters::clone() const {
-    auto r = util::make_unique<BinarizationParameters>();
-    if (cmax) {
-        r->cmax = util::make_unique<uint8_t>(*cmax);
-    }
-    if (cmax_teg) {
-        r->cmax_teg = util::make_unique<uint8_t>(*cmax_teg);
-    }
-    if (cmax_dtu) {
-        r->cmax_dtu = util::make_unique<uint8_t>(*cmax_dtu);
-    }
-    if (split_unit_size) {
-        r->split_unit_size = util::make_unique<uint8_t>(*split_unit_size);
-    }
-    return r;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

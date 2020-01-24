@@ -29,7 +29,7 @@ class TransformedSeq {
     TransformedSeq();
 
     TransformedSeq(SupportValues::TransformIdSubsym _transform_ID_subsym,
-                   std::unique_ptr<SupportValues> _support_values, std::unique_ptr<Binarization> _cabac_binarization);
+                   SupportValues&& _support_values, Binarization&& _cabac_binarization);
 
     TransformedSeq(util::BitReader& reader);
 
@@ -37,18 +37,16 @@ class TransformedSeq {
 
     virtual void write(util::BitWriter& writer) const;
 
-    std::unique_ptr<TransformedSeq> clone() const;
-
     SupportValues::TransformIdSubsym getTransformID() const;
 
-    const SupportValues* getSupportValues() const;
+    const SupportValues& getSupportValues() const;
 
-    const Binarization* getBinarization() const;
+    const Binarization& getBinarization() const;
 
    private:
     SupportValues::TransformIdSubsym transform_ID_subsym;  //!< : 3; Line 9
-    std::unique_ptr<SupportValues> support_values;         //!< Line 10
-    std::unique_ptr<Binarization> cabac_binarization;      //!< Line 11
+    SupportValues support_values;         //!< Line 10
+    Binarization cabac_binarization;      //!< Line 11
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -35,14 +35,6 @@ void ComputedRefExtended::write(util::BitWriter &writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<ComputedRefExtended> ComputedRefExtended::clone() const {
-    auto ret = util::make_unique<ComputedRefExtended>();
-    *ret = *this;
-    return ret;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 }  // namespace parameter
 }  // namespace core
 }  // namespace genie

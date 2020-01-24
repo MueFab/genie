@@ -12,6 +12,7 @@
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 #include <genie/util/make-unique.h>
+#include <boost/optional/optional.hpp>
 #include <memory>
 #include <vector>
 
@@ -44,8 +45,6 @@ class TransformedParameters {
 
     virtual ~TransformedParameters() = default;
 
-    std::unique_ptr<TransformedParameters> clone() const;
-
     size_t getNumStreams() const;
 
     TransformIdSubseq getTransformIdSubseq() const;
@@ -56,9 +55,9 @@ class TransformedParameters {
 
    private:
     TransformIdSubseq transform_ID_subseq;               //!< : 8; Line 2
-    std::unique_ptr<uint16_t> match_coding_buffer_size;  //!< : 16; Line 6
-    std::unique_ptr<uint8_t> rle_coding_guard;           //!< : 8; Line 9
-    std::unique_ptr<uint8_t> merge_coding_subseq_count;  //!< : 4; Line 12
+    boost::optional<uint16_t> match_coding_buffer_size;  //!< : 16; Line 6
+    boost::optional<uint8_t> rle_coding_guard;           //!< : 8; Line 9
+    boost::optional<uint8_t> merge_coding_subseq_count;  //!< : 4; Line 12
     std::vector<uint8_t> merge_coding_shift_size;        //!< : 5; Line 15
 };
 

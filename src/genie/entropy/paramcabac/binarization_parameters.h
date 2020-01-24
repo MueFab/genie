@@ -12,6 +12,7 @@
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 #include <genie/util/make-unique.h>
+#include <boost/optional/optional.hpp>
 #include <memory>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -27,10 +28,10 @@ namespace paramcabac {
  */
 class BinarizationParameters {
    private:
-    std::unique_ptr<uint8_t> cmax;             //!< : 8; Line 3
-    std::unique_ptr<uint8_t> cmax_teg;         //!< : 8; Line 5
-    std::unique_ptr<uint8_t> cmax_dtu;         //!< : 8; Line 7
-    std::unique_ptr<uint8_t> split_unit_size;  //!< : 4; Line 10
+    boost::optional<uint8_t> cmax;             //!< : 8; Line 3
+    boost::optional<uint8_t> cmax_teg;         //!< : 8; Line 5
+    boost::optional<uint8_t> cmax_dtu;         //!< : 8; Line 7
+    boost::optional<uint8_t> split_unit_size;  //!< : 4; Line 10
    public:
     enum class BinarizationId : uint8_t {
         BINARY_CODING = 0,
@@ -56,8 +57,6 @@ class BinarizationParameters {
     BinarizationParameters(const BinarizationId &_binarization_id, uint8_t param);
 
     virtual ~BinarizationParameters() = default;
-
-    std::unique_ptr<BinarizationParameters> clone() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

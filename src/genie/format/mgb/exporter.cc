@@ -25,7 +25,7 @@ void Exporter::flowIn(core::AccessUnitPayload&& t, size_t id) {
 
     mgb::AccessUnit au(id, id, core::record::ClassType::CLASS_I, data.getRecordNum(),
                        core::parameter::DataUnit::DatasetType::ALIGNED, 32, 32, 0);
-    au.setAuTypeCfg(util::make_unique<AuTypeCfg>(data.getReference(), data.getMinPos(), data.getMaxPos(),
+    au.setAuTypeCfg(AuTypeCfg(data.getReference(), data.getMinPos(), data.getMaxPos(),
                                                  data.getParameters().getPosSize()));
     for (size_t descriptor = 0; descriptor < core::getDescriptors().size(); ++descriptor) {
         if (data.getPayload(core::GenDesc(descriptor)).isEmpty()) {

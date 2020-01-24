@@ -13,6 +13,7 @@
 
 #include <genie/util/bitwriter.h>
 #include <genie/util/make-unique.h>
+#include <boost/optional/optional.hpp>
 #include "extended_au.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -29,7 +30,7 @@ class AuTypeCfg {
     uint16_t sequence_ID;                     //!< Line 18
     uint64_t AU_start_position;               //!< Line 19
     uint64_t AU_end_position;                 //!< Line 20
-    std::unique_ptr<ExtendedAu> extended_AU;  //!< Lines 21 to 24
+    boost::optional<ExtendedAu> extended_AU;  //!< Lines 21 to 24
 
     uint8_t posSize;  //!< internal
 
@@ -39,7 +40,7 @@ class AuTypeCfg {
     AuTypeCfg(uint8_t _posSize, bool multiple_alignments, util::BitReader &reader);
     virtual ~AuTypeCfg() = default;
 
-    void setExtendedAu(std::unique_ptr<ExtendedAu> _extended_AU);
+    void setExtendedAu(ExtendedAu&& _extended_AU);
 
     uint16_t getRefID() const;
 
@@ -47,7 +48,7 @@ class AuTypeCfg {
 
     uint64_t getEndPos() const;
 
-    virtual void write(util::BitWriter &writer);
+    virtual void write(util::BitWriter &writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

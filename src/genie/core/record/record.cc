@@ -202,35 +202,6 @@ void Record::write(util::BitWriter &writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<Record> Record::clone() const {
-    auto ret = util::make_unique<Record>();
-    ret->number_of_template_segments = this->number_of_template_segments;
-    ret->class_ID = this->class_ID;
-    ret->read_1_first = this->read_1_first;
-
-    ret->sharedAlignmentInfo = this->sharedAlignmentInfo;
-
-    ret->qv_depth = this->qv_depth;
-    ret->read_name = this->read_name;
-    ret->read_group = this->read_group;
-
-    for (const auto &s : reads) {
-        ret->reads.push_back(s);
-    }
-
-    for (const auto &a : alignmentInfo) {
-        ret->alignmentInfo.push_back(a);
-    }
-
-    ret->flags = flags;
-
-    ret->moreAlignmentInfo = this->moreAlignmentInfo->clone();
-
-    return ret;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 uint8_t Record::getFlags() const { return flags; }
 
 // ---------------------------------------------------------------------------------------------------------------------

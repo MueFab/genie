@@ -23,11 +23,11 @@ namespace mgb {
 
 class DataUnitFactory {
    private:
-    std::map<size_t, std::unique_ptr<core::parameter::ParameterSet>> parameters;
+    std::map<size_t, core::parameter::ParameterSet> parameters;
 
    public:
     const core::parameter::ParameterSet& getParams(size_t id) const;
-    std::unique_ptr<AccessUnit> read(util::BitReader& bitReader);
+    boost::optional<AccessUnit> read(util::BitReader& bitReader);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

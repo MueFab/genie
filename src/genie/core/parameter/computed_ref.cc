@@ -19,7 +19,7 @@ namespace parameter {
 
 ComputedRef::ComputedRef(Algorithm _cr_alg_ID) : cr_alg_ID(_cr_alg_ID) {
     if (cr_alg_ID == Algorithm::PUSH_IN || cr_alg_ID == Algorithm::LOCAL_ASSEMBLY) {
-        extension = util::make_unique<ComputedRefExtended>();
+        extension = ComputedRefExtended();
     }
 }
 
@@ -30,13 +30,13 @@ ComputedRef::ComputedRef(util::BitReader &reader) {
     if (cr_alg_ID == Algorithm::PUSH_IN || cr_alg_ID == Algorithm::LOCAL_ASSEMBLY) {
         auto pad = reader.read<uint8_t>();
         auto buffer = reader.read<uint32_t>(24);
-        extension = util::make_unique<ComputedRefExtended>(pad, buffer);
+        extension = ComputedRefExtended(pad, buffer);
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ComputedRef::setExtension(std::unique_ptr<ComputedRefExtended> _crps_info) {
+void ComputedRef::setExtension(ComputedRefExtended&& _crps_info) {
     if (!extension) {
         UTILS_THROW_RUNTIME_EXCEPTION("Invalid crps mode for crps info");
     }
@@ -54,14 +54,6 @@ void ComputedRef::write(util::BitWriter &writer) const {
     if (extension) {
         extension->write(writer);
     }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::unique_ptr<ComputedRef> ComputedRef::clone() const {
-    auto ret = util::make_unique<ComputedRef>(cr_alg_ID);
-    ret->setExtension(extension->clone());
-    return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

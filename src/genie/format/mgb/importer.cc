@@ -20,7 +20,7 @@ Importer::Importer(std::istream& _file) : reader(_file) {}
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Importer::pump(size_t id) {
-    std::unique_ptr<mgb::AccessUnit> unit;
+    boost::optional<mgb::AccessUnit> unit;
     {
         util::OrderedSection section(&lock, id);
         unit = factory.read(reader);

@@ -27,16 +27,14 @@ class RawReferenceSequence {
     uint16_t sequence_ID : 16;  //!< Line 4
     uint64_t seq_start : 40;    //!< Line 5
     //!< uint64_t seq_end : 40; //!< Line 6 currently computed by length of string
-    std::unique_ptr<std::string> ref_sequence;  //!< Line 7
+    std::string ref_sequence;  //!< Line 7
 
    public:
-    RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_start, std::unique_ptr<std::string> _ref_sequence);
+    RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_start, std::string&& _ref_sequence);
 
     virtual ~RawReferenceSequence() = default;
 
-    bool isIdUnique(const RawReferenceSequence *s) const;
-
-    virtual std::unique_ptr<RawReferenceSequence> clone() const;
+    bool isIdUnique(const RawReferenceSequence &s) const;
 
     void write(util::BitWriter &writer) const;
 

@@ -12,6 +12,7 @@
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 #include <genie/util/make-unique.h>
+#include <boost/optional/optional.hpp>
 #include <memory>
 #include <vector>
 
@@ -29,7 +30,7 @@ class Context {
     uint8_t adaptive_mode_flag : 1;                     //!< Line 2
     uint16_t num_contexts : 16;                         //!< Line 3
     std::vector<uint8_t> context_initialization_value;  //!< : 7; Lines 4-6
-    std::unique_ptr<bool> share_subsym_ctx_flag;        //!< : 1; Line 8
+    boost::optional<bool> share_subsym_ctx_flag;        //!< : 1; Line 8
    public:
     Context(bool adaptive_mode_flag, uint8_t coding_subsym_size, uint8_t output_symbol_size,
             bool _share_subsym_ctx_flag);
@@ -43,15 +44,13 @@ class Context {
 
     virtual void write(util::BitWriter& writer) const;
 
-    std::unique_ptr<Context> clone() const;
-
     uint8_t getAdaptiveModeFlag() const;
 
     uint16_t getNumContexts() const;
 
     bool getShareSubsymCtxFlag() const;
 
-    const std::vector<uint8_t>* getContextInitializationValue() const;
+    const std::vector<uint8_t>& getContextInitializationValue() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
