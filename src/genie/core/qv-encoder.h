@@ -9,21 +9,20 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <core/record/record.h>
-#include <util/drain.h>
-#include <util/source.h>
+#include <genie/util/drain.h>
+#include <genie/util/source.h>
 #include "access-unit-raw.h"
+#include "record/record.h"
 
 #include <utility>
 
 namespace genie {
 namespace core {
 
-
 /**
  * @brief The basic interface for modules encoding quality values
  */
-class QVEncoder{
+class QVEncoder {
    public:
     using QVCoded = std::pair<std::unique_ptr<core::parameter::QualityValues>, core::AccessUnitRaw::Descriptor>;
     virtual QVCoded encode(const record::Chunk& rec) = 0;

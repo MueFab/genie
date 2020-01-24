@@ -194,7 +194,7 @@ const Alphabet &getAlphabetProperties(AlphabetID id) {
         for (auto &l : loc) {
             l.inverseLut = std::vector<char>(*std::max_element(l.lut.begin(), l.lut.end()) + 1, 0);
             for (size_t i = 0; i < l.lut.size(); ++i) {
-                l.inverseLut[l.lut[i]] = i;
+                l.inverseLut[l.lut[i]] = static_cast<char>(i);
             }
         }
         return loc;

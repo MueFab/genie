@@ -30,7 +30,7 @@ void AlignmentBox::write(util::BitWriter& writer) const {
 
 AlignmentBox::AlignmentBox(ClassType type, uint8_t as_depth, uint8_t number_of_template_segments,
                            util::BitReader& reader) {
-    mapping_pos = reader.read(40);
+    mapping_pos = reader.read<uint64_t>(40);
     alignment = Alignment(as_depth, reader);
 
     if (type == ClassType::CLASS_HM) {

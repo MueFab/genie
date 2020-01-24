@@ -18,25 +18,29 @@ namespace mgb {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Block::Block(uint8_t _descriptor_ID, core::AccessUnitPayload::DescriptorPayload _payload)
-    : reserved(0), descriptor_ID(_descriptor_ID), reserved_2(0), payload(std::move(_payload)) {}
+    :  descriptor_ID(_descriptor_ID), payload(std::move(_payload)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Block::Block() : reserved(0), descriptor_ID(0), reserved_2(0), block_payload_size(0), payload(core::GenDesc(0)) {}
+Block::Block() : descriptor_ID(0), block_payload_size(0), payload(core::GenDesc(0)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Block::Block(util::BitReader &reader) {
-    reserved = reader.read(1);
-    descriptor_ID = reader.read(7);
-    reserved_2 = reader.read(3);
-    block_payload_size = reader.read(29);
+Block::Block(size_t qv_count, util::BitReader &reader) {
+    reader.read(1);
+    descriptor_ID = reader.read<uint8_t>(7);
+    reader.read(3);
+    block_payload_size = reader.read<uint32_t>(29);
 
     /*   for(size_t i = 0; i < block_payload_size; ++i) {
            reader.read(8);
        } */
 
-    payload = core::AccessUnitPayload::DescriptorPayload(core::GenDesc(descriptor_ID), block_payload_size, reader);
+    auto count = core::GenDesc(descriptor_ID) == core::GenDesc::QV
+                     ? qv_count
+                     : core::getDescriptor(core::GenDesc(descriptor_ID)).subseqs.size();
+    payload =
+        core::AccessUnitPayload::DescriptorPayload(core::GenDesc(descriptor_ID), count, block_payload_size, reader);
 
     reader.flush();
 }
@@ -44,9 +48,9 @@ Block::Block(util::BitReader &reader) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Block::write(util::BitWriter &writer) const {
-    writer.write(reserved, 1);
+    writer.write(0, 1);
     writer.write(descriptor_ID, 7);
-    writer.write(reserved_2, 3);
+    writer.write(0, 3);
 
     std::stringstream ss;
     util::BitWriter tmp_writer(&ss);

@@ -31,7 +31,7 @@ class AccessUnitPayload {
     class TransformedPayload {
        private:
         util::DataBlock payloadData;  //!< @brief
-        size_t position;
+        size_t position{};
 
        public:
         /**
@@ -130,7 +130,7 @@ class AccessUnitPayload {
 
         explicit DescriptorPayload();
 
-        explicit DescriptorPayload(GenDesc _id, size_t remainingSize, util::BitReader& reader);
+        explicit DescriptorPayload(GenDesc _id, size_t count, size_t remainingSize, util::BitReader& reader);
 
         /**
          * @brief
@@ -243,9 +243,9 @@ class AccessUnitPayload {
     size_t record_num;                   //!< @brief
     parameter::ParameterSet parameters;  //!< @brief
 
-    uint16_t reference;
-    uint64_t minPos;
-    uint64_t maxPos;
+    uint16_t reference{};
+    uint64_t minPos{};
+    uint64_t maxPos{};
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -11,6 +11,7 @@
 
 #include <genie/util/source.h>
 #include "access-unit-raw.h"
+#include "qv-decoder.h"
 #include "record/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -22,6 +23,7 @@ namespace core {
  * @brief The basic interface for modules decoding the plain read data
  */
 class ReadDecoder : public util::Source<record::Chunk>, public util::Drain<AccessUnitRaw> {
+   protected:
    public:
     /**
      * @Brief For polymorphic destruction

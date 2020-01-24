@@ -50,8 +50,8 @@ class AccessUnit {
 
     std::unique_ptr<genie::format::mgb::AccessUnit> au_p1;
 
-    //std::unique_ptr<AU_information> au_information;   //optional
-    //std::unique_ptr<AU_protection> au_protection;     //optional
+    // std::unique_ptr<AU_information> au_information;   //optional
+    // std::unique_ptr<AU_protection> au_protection;     //optional
 };
 
 }  // namespace mpegg_p1

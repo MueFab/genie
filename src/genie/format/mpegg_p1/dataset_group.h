@@ -37,18 +37,16 @@ class DG_protection {
 
 class DatasetGroup {
    public:
-
    private:
     /**
      * ISO 23092-1 Section 6.5.1 table 8
      *
      * ------------------------------------------------------------------------------------------------------------- */
     std::unique_ptr<mpegg_p1::DatasetGroupHeader> dataset_group_header;
-    std::unique_ptr<DG_metadata> dg_metadata;       //optional
-    std::unique_ptr<DG_protection> dg_protection;   //optional
+    std::unique_ptr<DG_metadata> dg_metadata;      // optional
+    std::unique_ptr<DG_protection> dg_protection;  // optional
     /** reference[] and reference_metadata[] and label_list is optional and not yet implemented */
     std::vector<std::unique_ptr<Dataset>> dataset;
-
 };
 
 }  // namespace mpegg_p1

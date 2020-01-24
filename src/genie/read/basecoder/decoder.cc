@@ -6,6 +6,7 @@
 
 #include "decoder.h"
 #include <genie/core/record/alignment_split/same-rec.h>
+#include <qv-decoder.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,7 +21,7 @@ Decoder::Decoder(core::AccessUnitRaw &&au, size_t segments)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec) {
+core::record::Record Decoder::pull(uint16_t ref, core::QVDecoder &qvdecoder, std::vector<std::string> &&vec) {
     std::vector<std::string> sequences = std::move(vec);
     std::vector<std::string> cigars;
     cigars.reserve(sequences.size());
@@ -28,9 +29,9 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec)
         cigars.emplace_back(sequence.size(), '=');
     }
     auto clip_offset = decodeClips(sequences, cigars);
-    auto state = decode(std::get<0>(clip_offset), std::move(sequences.front()), std::move(cigars.front()));
+    auto state = decode(std::get<0>(clip_offset), qvdecoder, std::move(sequences.front()), std::move(cigars.front()));
     for (size_t i = 1; i < sequences.size(); ++i) {
-        decodeAdditional(std::get<1>(clip_offset), std::move(sequences[i]), std::move(cigars[i]), state);
+        decodeAdditional(std::get<1>(clip_offset), qvdecoder, std::move(sequences[i]), std::move(cigars[i]), state);
     }
 
     std::get<1>(state).addAlignment(ref, std::move(std::get<0>(state)));
@@ -54,8 +55,9 @@ std::vector<Decoder::SegmentMeta> Decoder::readSegmentMeta() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(size_t clip_offset, std::string &&seq,
-                                                                             std::string &&cigar) {
+std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(size_t clip_offset,
+                                                                             core::QVDecoder &qvdecoder,
+                                                                             std::string &&seq, std::string &&cigar) {
     auto sequence = std::move(seq);
 
     const auto RTYPE = container.pull(core::GenSub::RTYPE);
@@ -87,6 +89,8 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(siz
                                             std::to_string(RGROUP), FLAGS);
 
     core::record::Segment segment(std::move(sequence));
+    segment.addQualities(qvdecoder.decode(container.getParameters().getQVConfig(core::record::ClassType::CLASS_I),
+                                          segment.getSequence().length(), container.get(core::GenDesc::QV)));
     std::get<1>(ret).addSegment(std::move(segment));
     return ret;
 }
@@ -137,7 +141,8 @@ std::string Decoder::contractECigar(const std::string &cigar_long) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::decodeAdditional(size_t softclip_offset, std::string &&seq, std::string &&cigar,
+void Decoder::decodeAdditional(size_t softclip_offset, core::QVDecoder &qvdecoder, std::string &&seq,
+                               std::string &&cigar,
                                std::tuple<core::record::AlignmentBox, core::record::Record> &state) {
     auto sequence = std::move(seq);
 
@@ -161,6 +166,8 @@ void Decoder::decodeAdditional(size_t softclip_offset, std::string &&seq, std::s
     std::get<0>(state).addAlignmentSplit(std::move(srec));
 
     core::record::Segment segment(std::move(sequence));
+    segment.addQualities(qvdecoder.decode(container.getParameters().getQVConfig(core::record::ClassType::CLASS_I),
+                                          segment.getSequence().length(), container.get(core::GenDesc::QV)));
     std::get<1>(state).addSegment(std::move(segment));
 }
 

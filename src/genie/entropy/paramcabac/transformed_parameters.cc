@@ -22,17 +22,17 @@ TransformedParameters::TransformedParameters() : TransformedParameters(Transform
 // ---------------------------------------------------------------------------------------------------------------------
 
 TransformedParameters::TransformedParameters(util::BitReader &reader) {
-    transform_ID_subseq = TransformIdSubseq(reader.read(8));
+    transform_ID_subseq = reader.read<TransformIdSubseq>();
     switch (transform_ID_subseq) {
         case TransformIdSubseq::NO_TRANSFORM:
             break;
         case TransformIdSubseq::EQUALITY_CODING:
             break;
         case TransformIdSubseq::MATCH_CODING:
-            match_coding_buffer_size = util::make_unique<uint16_t>(reader.read(16));
+            match_coding_buffer_size = util::make_unique<uint16_t>(reader.read<uint16_t >());
             break;
         case TransformIdSubseq::RLE_CODING:
-            rle_coding_guard = util::make_unique<uint8_t>(reader.read(8));
+            rle_coding_guard = util::make_unique<uint8_t>(reader.read<uint8_t >());
             break;
         case TransformIdSubseq::MERGE_CODING:
             UTILS_DIE("Merge core not supported");

@@ -7,6 +7,8 @@
 #include <genie/format/sam/exporter.h>
 #include <genie/format/sam/importer.h>
 #include <genie/module/manager.h>
+#include <genie/quality/paramqv1/null-encoder.h>
+#include <genie/quality/qvwriteout/encoder.h>
 #include <genie/read/localassembly/decoder.h>
 #include <genie/read/localassembly/encoder.h>
 #include <genie/util/bitreader.h>
@@ -44,7 +46,7 @@ void encode(const ProgramOptions& programOptions) {
             }
             writer.flush();
             for (size_t number = 0; number < (1u << bits) && number < 100; ++number) {
-                UTILS_DIE_IF(reader.read(bits) != number,
+                UTILS_DIE_IF(reader.read<size_t>(bits) != number,
                              "Fail at bits " + std::to_string(bits) + " number " + std::to_string(number));
             }
             reader.flush();
@@ -54,7 +56,8 @@ void encode(const ProgramOptions& programOptions) {
         std::ifstream input("test.sam");
         std::ofstream output("test_out.mgb");
         genie::format::sam::Importer importer(1000, input);
-        genie::read::localassembly::Encoder encoder(1000, false);
+        genie::quality::qvwriteout::Encoder qualcoder;
+        genie::read::localassembly::Encoder encoder(1000, false, &qualcoder);
         genie::entropy::gabac::GabacCompressor compressor;
         genie::format::mgb::Exporter exporter(&output);
 

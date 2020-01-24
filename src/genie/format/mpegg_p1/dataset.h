@@ -54,8 +54,8 @@ class Dataset {
      *
      * ------------------------------------------------------------------------------------------------------------- */
     std::unique_ptr<mpegg_p1::DatasetHeader> dataset_header;
-    //std::unique_ptr<DT_metadata> dt_metadata;     //optional
-    //std::unique_ptr<DT_protection> dt_protection; //optional
+    // std::unique_ptr<DT_metadata> dt_metadata;     //optional
+    // std::unique_ptr<DT_protection> dt_protection; //optional
     std::vector<std::unique_ptr<DatasetParameterSet>> dataset_parameter_sets;
     /** master_index_table is optional and not yet implemented */
     std::vector<std::unique_ptr<mpegg_p1::AccessUnit>> access_units;

@@ -14,6 +14,7 @@
 
 #include <genie/core/access-unit-raw.h>
 #include <genie/core/record/record.h>
+#include <qv-decoder.h>
 #include <memory>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -36,7 +37,7 @@ class Decoder {
 
    public:
     Decoder(core::AccessUnitRaw &&au, size_t segments);
-    core::record::Record pull(uint16_t ref, std::vector<std::string> &&vec);
+    core::record::Record pull(uint16_t ref, core::QVDecoder &qvdecoder, std::vector<std::string> &&vec);
 
     struct SegmentMeta {
         uint64_t position;
@@ -50,12 +51,12 @@ class Decoder {
 
     std::vector<SegmentMeta> readSegmentMeta();
 
-    std::tuple<core::record::AlignmentBox, core::record::Record> decode(size_t clip_offset, std::string &&seq,
-                                                                        std::string &&cigar);
+    std::tuple<core::record::AlignmentBox, core::record::Record> decode(size_t clip_offset, core::QVDecoder &qvdecoder,
+                                                                        std::string &&seq, std::string &&cigar);
 
     static std::string contractECigar(const std::string &cigar_long);
 
-    void decodeAdditional(size_t softclip_offset, std::string &&seq, std::string &&cigar,
+    void decodeAdditional(size_t softclip_offset, core::QVDecoder &qvdecoder, std::string &&seq, std::string &&cigar,
                           std::tuple<core::record::AlignmentBox, core::record::Record> &state);
 
     std::vector<int32_t> numberDeletions(size_t number);

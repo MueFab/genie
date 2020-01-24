@@ -26,7 +26,7 @@ namespace fastq {
 /**
  * @brief Module to reads fastq files and convert them into MPEGG-Record format
  */
-   class FastqImporter : public core::FormatImporter {
+class FastqImporter : public core::FormatImporter {
    private:
     static constexpr size_t LINES_PER_RECORD = 4;  //!< @brief How many lines in a fastq file belong to one record
     size_t blockSize;                              //!< @brief How many records to read in one pump() run

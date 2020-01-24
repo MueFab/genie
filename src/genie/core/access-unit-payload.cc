@@ -6,6 +6,7 @@
 
 #include "access-unit-payload.h"
 #include <sstream>
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -16,7 +17,7 @@ namespace core {
 
 void AccessUnitPayload::TransformedPayload::write(util::BitWriter& writer) const {
     for (size_t i = 0; i < payloadData.size(); ++i) {
-        writer.write(payloadData.get(i), payloadData.getWordSize() * 8);
+        writer.write(payloadData.get(i), static_cast<uint8_t>(payloadData.getWordSize() * 8));
     }
 }
 
@@ -49,13 +50,13 @@ size_t AccessUnitPayload::TransformedPayload::getIndex() const { return position
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id) : id(_id) {}
+AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id) : id(std::move(_id)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id, size_t remainingSize, size_t subseq_ctr,
                                                           util::BitReader& reader)
-    : id(_id) {
+    : id(std::move(_id)) {
     for (size_t i = 0; i < subseq_ctr; ++i) {
         size_t s = 0;
         if (i != subseq_ctr - 1) {
@@ -241,9 +242,9 @@ AccessUnitPayload::DescriptorPayload::DescriptorPayload() : id(GenDesc(0)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnitPayload::DescriptorPayload::DescriptorPayload(GenDesc _id, size_t remainingSize, util::BitReader& reader)
+AccessUnitPayload::DescriptorPayload::DescriptorPayload(GenDesc _id, size_t count, size_t remainingSize,
+                                                        util::BitReader& reader)
     : id(_id) {
-    size_t count = getDescriptor(_id).subseqs.size();
     for (size_t i = 0; i < count; ++i) {
         size_t s = 0;
         if (i != count - 1) {

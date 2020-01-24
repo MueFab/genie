@@ -9,8 +9,10 @@
 #include <genie/core/global-cfg.h>
 #include <genie/core/parameter/descriptor_present/decoder.h>
 #include <genie/core/parameter/quality-values.h>
+#include <genie/core/qv-decoder.h>
 #include <genie/entropy/paramcabac/decoder.h>
 #include <genie/quality/paramqv1/qv_coding_config_1.h>
+#include <genie/quality/qvwriteout/decoder.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,11 +26,14 @@ void detect() {
     indPark.registerConstructor<core::parameter::desc_pres::DecoderRegular>(
         entropy::paramcabac::DecoderRegular::MODE_CABAC, &entropy::paramcabac::DecoderRegular::create);
     indPark.registerConstructor<core::parameter::desc_pres::DecoderTokentype>(
-            entropy::paramcabac::DecoderRegular::MODE_CABAC, &entropy::paramcabac::DecoderTokenType::create);
-    indPark.registerConstructor<core::parameter::QualityValues>(
-        quality::paramqv1::QualityValues1::MODE_QV1, &quality::paramqv1::QualityValues1::create);
+        entropy::paramcabac::DecoderRegular::MODE_CABAC, &entropy::paramcabac::DecoderTokenType::create);
+    indPark.registerConstructor<core::parameter::QualityValues>(quality::paramqv1::QualityValues1::MODE_QV1,
+                                                                &quality::paramqv1::QualityValues1::create);
 
-  //  indPark.registerConstructor<core::FormatImporter>()
+    indPark.registerConstructor<core::QVDecoder>(quality::paramqv1::QualityValues1::MODE_QV1,
+                                                 &quality::qvwriteout::Decoder::create);
+
+    //  indPark.registerConstructor<core::FormatImporter>()
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

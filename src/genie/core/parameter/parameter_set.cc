@@ -24,47 +24,47 @@ namespace parameter {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::PARAMETER_SET) {
-    bitReader.read(10);  // ISO 23092-2 Section 3.1 table 3
-    bitReader.read(22);
-    parameter_set_ID = bitReader.read(8);
-    parent_parameter_set_ID = bitReader.read(8);
-    dataset_type = DatasetType(bitReader.read(4));
-    alphabet_ID = AlphabetID(bitReader.read(8));
-    read_length = bitReader.read(24);
-    number_of_template_segments_minus1 = bitReader.read(2);
+    bitReader.read<uint16_t>(10);  // ISO 23092-2 Section 3.1 table 3
+    bitReader.read<uint32_t>(22);
+    parameter_set_ID = bitReader.read<uint8_t>();
+    parent_parameter_set_ID = bitReader.read<uint8_t>();
+    dataset_type = bitReader.read<DatasetType>(4);
+    alphabet_ID = bitReader.read<AlphabetID>();
+    read_length = bitReader.read<uint32_t>(24);
+    number_of_template_segments_minus1 = bitReader.read<uint8_t>(2);
     bitReader.read(6);
-    max_au_data_unit_size = bitReader.read(29);
-    pos_40_bits_flag = bitReader.read(1);
-    qv_depth = bitReader.read(3);
-    as_depth = bitReader.read(3);
-    uint8_t num_classes = bitReader.read(4);
+    max_au_data_unit_size = bitReader.read<uint32_t>(29);
+    pos_40_bits_flag = bitReader.read<bool>(1);
+    qv_depth = bitReader.read<uint8_t>(3);
+    as_depth = bitReader.read<uint8_t>(3);
+    auto num_classes = bitReader.read<uint8_t>(4);
     for (size_t i = 0; i < num_classes; ++i) {
-        class_IDs.push_back(record::ClassType(bitReader.read(4)));
+        class_IDs.push_back(bitReader.read<record::ClassType>(4));
     }
     for (size_t i = 0; i < getDescriptors().size(); ++i) {
         descriptors.emplace_back(DescriptorBox(num_classes, GenDesc(i), bitReader));
     }
-    uint8_t num_groups = bitReader.read(16);
+    auto num_groups = bitReader.read<uint16_t>();
     for (size_t i = 0; i < num_groups; ++i) {
         rgroup_IDs.emplace_back();
         char c = 0;
         do {
-            c = bitReader.read(8);
+            c = bitReader.read<uint8_t >();
             rgroup_IDs.back().push_back(c);
         } while (c);
     }
-    multiple_alignments_flag = bitReader.read(1);
-    spliced_reads_flag = bitReader.read(1);
-    multiple_signature_base = bitReader.read(31);
+    multiple_alignments_flag = bitReader.read<bool>(1);
+    spliced_reads_flag = bitReader.read<bool>(1);
+    multiple_signature_base = bitReader.read<uint32_t>(31);
     if (multiple_signature_base > 0) {
         u_signature_size = util::make_unique<uint8_t>(bitReader.read(6));
     }
     for (size_t i = 0; i < num_classes; ++i) {
-        uint8_t mode = bitReader.read(4);
+        auto mode = bitReader.read<uint8_t>(4);
         qv_coding_configs.emplace_back(
             GlobalCfg::getSingleton().getIndustrialPark().construct<QualityValues>(mode, bitReader));
     }
-    bool crps_flag = bitReader.read(1);
+    auto crps_flag = bitReader.read<bool>(1);
     if (crps_flag) {
         parameter_set_crps = util::make_unique<ComputedRef>(bitReader);
     }
@@ -83,7 +83,7 @@ ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_
       dataset_type(_dataset_type),
       alphabet_ID(_alphabet_id),
       read_length(_read_length),
-      number_of_template_segments_minus1(_paired_end),
+      number_of_template_segments_minus1(static_cast<uint8_t>(_paired_end)),
       max_au_data_unit_size(0),
       pos_40_bits_flag(_pos_40_bits_flag),
       qv_depth(_qv_depth),
@@ -96,8 +96,7 @@ ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_
       multiple_signature_base(0),
       u_signature_size(nullptr),
       qv_coding_configs(0),
-      parameter_set_crps(nullptr) {
-}
+      parameter_set_crps(nullptr) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -155,7 +154,7 @@ void ParameterSet::preWrite(util::BitWriter &writer) const {
     writer.write(number_of_template_segments_minus1, 2);
     writer.write(0, 6);  // reserved_2
     writer.write(max_au_data_unit_size, 29);
-    writer.write(pos_40_bits_flag, 1);
+    writer.write(static_cast<uint8_t>(pos_40_bits_flag), 1);
     writer.write(qv_depth, 3);
     writer.write(as_depth, 3);
     writer.write(class_IDs.size(), 4);  // num_classes
@@ -168,12 +167,12 @@ void ParameterSet::preWrite(util::BitWriter &writer) const {
     writer.write(rgroup_IDs.size(), 16);  // num_groups
     for (auto &i : rgroup_IDs) {
         for (auto &j : i) {
-            writer.write(j, 8);
+            writer.write(static_cast<uint8_t >(j), 8);
         }
         writer.write('\0', 8);  // NULL termination
     }
-    writer.write(multiple_alignments_flag, 1);
-    writer.write(spliced_reads_flag, 1);
+    writer.write(static_cast<uint8_t>(multiple_alignments_flag), 1);
+    writer.write(static_cast<uint8_t>(spliced_reads_flag), 1);
     writer.write(multiple_signature_base, 31);
     if (u_signature_size) {
         writer.write(*u_signature_size, 6);
@@ -181,7 +180,7 @@ void ParameterSet::preWrite(util::BitWriter &writer) const {
     for (auto &i : qv_coding_configs) {
         i->write(writer);
     }
-    writer.write((bool)parameter_set_crps, 1);
+    writer.write(static_cast<uint8_t>(static_cast<bool>(parameter_set_crps)), 1);
     if (parameter_set_crps) {
         parameter_set_crps->write(writer);
     }
@@ -220,7 +219,7 @@ void ParameterSet::addClass(record::ClassType class_id, std::unique_ptr<QualityV
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::setDescriptor(GenDesc index, DescriptorBox&& descriptor) {
+void ParameterSet::setDescriptor(GenDesc index, DescriptorBox &&descriptor) {
     descriptors[uint8_t(index)] = std::move(descriptor);
 }
 
@@ -245,7 +244,7 @@ ParameterSet::DatasetType ParameterSet::getDatasetType() const { return dataset_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ParameterSet::getPosSize() const { return pos_40_bits_flag ? 40 : 32; }
+uint8_t ParameterSet::getPosSize() const { return pos_40_bits_flag ? uint8_t (40) : uint8_t (32); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -257,7 +256,7 @@ uint32_t ParameterSet::getMultipleSignatureBase() const { return multiple_signat
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ParameterSet::getSignatureSize() const { return u_signature_size ? *u_signature_size : 0; }
+uint8_t ParameterSet::getSignatureSize() const { return u_signature_size ? *u_signature_size : uint8_t (0); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -280,9 +279,7 @@ ParameterSet &ParameterSet::operator=(const ParameterSet &other) {
     qv_depth = other.qv_depth;
     as_depth = other.as_depth;
     class_IDs = other.class_IDs;
-    for (const auto &d : other.descriptors) {
-        descriptors.emplace_back(d);
-    }
+    descriptors = other.descriptors;
     rgroup_IDs = other.rgroup_IDs;
     multiple_alignments_flag = other.multiple_alignments_flag;
     spliced_reads_flag = other.spliced_reads_flag;
@@ -290,6 +287,7 @@ ParameterSet &ParameterSet::operator=(const ParameterSet &other) {
     if (other.u_signature_size) {
         u_signature_size = util::make_unique<uint8_t>(*other.u_signature_size);
     }
+    qv_coding_configs.clear();
     for (const auto &c : other.qv_coding_configs) {
         qv_coding_configs.emplace_back(c->clone());
     }
@@ -324,12 +322,65 @@ ParameterSet &ParameterSet::operator=(ParameterSet &&other) noexcept {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ParameterSet::ParameterSet(const ParameterSet &other) : DataUnit(DataUnitType::PARAMETER_SET) { *this = other; }
+ParameterSet::ParameterSet(const ParameterSet &other)
+    : DataUnit(DataUnitType::PARAMETER_SET),
+      parameter_set_ID(0),
+      parent_parameter_set_ID(0),
+      dataset_type(DatasetType::ALIGNED),
+      alphabet_ID(AlphabetID::ACGTN),
+      read_length(0),
+      number_of_template_segments_minus1(0),
+      max_au_data_unit_size(0),
+      pos_40_bits_flag(false),
+      qv_depth(0),
+      as_depth(0),
+      class_IDs(0),
+      descriptors(18),
+      rgroup_IDs(0),
+      multiple_alignments_flag(false),
+      spliced_reads_flag(false),
+      multiple_signature_base(0),
+      u_signature_size(nullptr),
+      qv_coding_configs(0),
+      parameter_set_crps(nullptr) {
+    *this = other;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ParameterSet::ParameterSet(ParameterSet &&other) noexcept : DataUnit(DataUnitType::PARAMETER_SET) {
+ParameterSet::ParameterSet(ParameterSet &&other) noexcept
+    : DataUnit(DataUnitType::PARAMETER_SET),
+      parameter_set_ID(0),
+      parent_parameter_set_ID(0),
+      dataset_type(DatasetType::ALIGNED),
+      alphabet_ID(AlphabetID::ACGTN),
+      read_length(0),
+      number_of_template_segments_minus1(0),
+      max_au_data_unit_size(0),
+      pos_40_bits_flag(false),
+      qv_depth(0),
+      as_depth(0),
+      class_IDs(0),
+      descriptors(18),
+      rgroup_IDs(0),
+      multiple_alignments_flag(false),
+      spliced_reads_flag(false),
+      multiple_signature_base(0),
+      u_signature_size(nullptr),
+      qv_coding_configs(0),
+      parameter_set_crps(nullptr) {
     *this = std::move(other);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const QualityValues &ParameterSet::getQVConfig(record::ClassType type) const {
+    for (size_t i = 0; i < class_IDs.size(); ++i) {
+        if (class_IDs[i] == type) {
+            return *(qv_coding_configs[i]);
+        }
+    }
+    UTILS_DIE("No matching qv config in parameter set");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

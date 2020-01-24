@@ -102,12 +102,13 @@ void Encoder::updateGuesses(const core::record::Record& r, Encoder::LaeState& st
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AccessUnitRaw Encoder::pack(size_t id, uint16_t ref, Encoder::LaeState& state) const {
+core::AccessUnitRaw Encoder::pack(size_t id, uint16_t ref, uint8_t qv_depth,
+                                  std::unique_ptr<core::parameter::QualityValues> qvparam,
+                                  Encoder::LaeState& state) const {
     core::parameter::DataUnit::DatasetType dataType = core::parameter::DataUnit::DatasetType::ALIGNED;
     core::parameter::ParameterSet ret(id, id, dataType, core::AlphabetID::ACGTN, state.readLength, state.pairedEnd,
-                                      false, 0, 0, false, false);
-    const auto ALPHABET = quality::paramqv1::QualityValues1::QvpsPresetId::ASCII;
-    ret.addClass(state.classType, util::make_unique<quality::paramqv1::QualityValues1>(ALPHABET, false));
+                                      false, qv_depth, 0, false, false);
+    ret.addClass(state.classType, std::move(qvparam));
     auto crps =
         util::make_unique<core::parameter::ComputedRef>(core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY);
     crps->setExtension(util::make_unique<core::parameter::ComputedRefExtended>(0, cr_buf_max_size));
@@ -134,7 +135,13 @@ void Encoder::flowIn(core::record::Chunk&& t, size_t id) {
 
     auto ref = data.front().getAlignmentSharedData().getSeqID();
     uint64_t lastPos = 0;
+    core::QVEncoder::QVCoded qv(nullptr, core::AccessUnitRaw::Descriptor(core::GenDesc::QV));
+    uint8_t qvdepth = data.front().getSegments().front().getQualities().size();
+    if (qvcoder) {
+        qv = qvcoder->encode(data);
+    }
     for (auto& r : data) {
+        UTILS_DIE_IF(r.getSegments().front().getQualities().size() != qvdepth, "QV_depth not compatible");
         UTILS_DIE_IF(r.getAlignments().front().getPosition() < lastPos,
                      "Data seems to be unsorted. Local assembly encoding needs sorted input data.");
 
@@ -148,8 +155,8 @@ void Encoder::flowIn(core::record::Chunk&& t, size_t id) {
         updateAssembly(r, state);
     }
 
-    auto rawAU = pack(id, ref, state);
-
+    auto rawAU = pack(id, ref, qvdepth, std::move(qv.first), state);
+    rawAU.get(core::GenDesc::QV) = std::move(qv.second);
     data.clear();
     flowOut(std::move(rawAU), id);
 }
@@ -163,7 +170,8 @@ void Encoder::dryIn() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder(uint32_t _cr_buf_max_size, bool _debug) : debug(_debug), cr_buf_max_size(_cr_buf_max_size) {}
+Encoder::Encoder(uint32_t _cr_buf_max_size, bool _debug, core::QVEncoder* coder)
+    : ReadEncoder(coder), debug(_debug), cr_buf_max_size(_cr_buf_max_size) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

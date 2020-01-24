@@ -87,7 +87,8 @@ class Encoder : public core::ReadEncoder {
      * @param state The state used throughout the current encoding
      * @return RawAccessUnit ready for entropy core
      */
-    core::AccessUnitRaw pack(size_t id, uint16_t ref, Encoder::LaeState& state) const;
+    core::AccessUnitRaw pack(size_t id, uint16_t ref, uint8_t qv_depth,
+                             std::unique_ptr<core::parameter::QualityValues> qvparam, Encoder::LaeState& state) const;
 
    public:
     /**
@@ -107,7 +108,7 @@ class Encoder : public core::ReadEncoder {
      * @param _cr_buf_max_size Buffer size for local assembly reference memory. Will end up in parameter set
      * @param _debug If additional debugging information shall be printed
      */
-    Encoder(uint32_t _cr_buf_max_size, bool _debug);
+    Encoder(uint32_t _cr_buf_max_size, bool _debug, core::QVEncoder* coder);
 
     static uint64_t getLengthOfCigar(const std::string& cigar);
 

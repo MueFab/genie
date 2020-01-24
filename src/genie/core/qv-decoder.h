@@ -8,8 +8,8 @@ namespace core {
 
 class QVDecoder {
    public:
-    virtual std::string&& decode(const parameter::QualityValues& param, AccessUnitRaw::Descriptor&& desc) = 0;
-
+    virtual std::string decode(const parameter::QualityValues& param, size_t length,
+                               AccessUnitRaw::Descriptor& desc) = 0;
     /**
      * @Brief For polymorphic destruction
      */
@@ -20,6 +20,5 @@ class QVDecoder {
 
 }  // namespace core
 }  // namespace genie
-
 
 #endif  // GENIE_QV_DECODER_H

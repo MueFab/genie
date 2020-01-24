@@ -33,8 +33,8 @@ Binarization::Binarization()
 // ---------------------------------------------------------------------------------------------------------------------
 
 Binarization::Binarization(uint8_t coding_subsym_size, uint8_t output_symbol_size, util::BitReader& reader) {
-    binarization_ID = BinarizationParameters::BinarizationId(reader.read(5));
-    bypass_flag = reader.read(1);
+    binarization_ID = reader.read<BinarizationParameters::BinarizationId>(5);
+    bypass_flag = reader.read<bool>(1);
     cabac_binarization_parameters = util::make_unique<BinarizationParameters>(binarization_ID, reader);
     if (!bypass_flag) {
         cabac_context_parameters = util::make_unique<Context>(coding_subsym_size, output_symbol_size, reader);

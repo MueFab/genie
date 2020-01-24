@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "encoder.h"
+#include "null-encoder.h"
 // #include <omp.h>
 #include <algorithm>
 #include <array>

@@ -21,21 +21,11 @@ namespace genie {
 namespace core {
 namespace parameter {
 
-
 class DataUnit {
    public:
+    enum class DataUnitType : uint8_t { RAW_REFERENCE = 0, PARAMETER_SET = 1, ACCESS_UNIT = 2 };
 
-    enum class DataUnitType : uint8_t {
-        RAW_REFERENCE = 0,
-        PARAMETER_SET = 1,
-        ACCESS_UNIT = 2
-    };
-
-    enum class DatasetType : uint8_t {
-        NON_ALIGNED = 0,
-        ALIGNED = 1,
-        REFERENCE = 2
-    };
+    enum class DatasetType : uint8_t { NON_ALIGNED = 0, ALIGNED = 1, REFERENCE = 2 };
 
    private:
     DataUnitType data_unit_type;

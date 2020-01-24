@@ -20,10 +20,8 @@ namespace genie {
 namespace core {
 namespace parameter {
 
-
 class Descriptor {
    public:
-
     explicit Descriptor(uint8_t _dec_cfg_preset);
 
     virtual std::unique_ptr<Descriptor> clone() const = 0;

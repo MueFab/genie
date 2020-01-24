@@ -32,7 +32,7 @@ TransformedSeq::TransformedSeq(SupportValues::TransformIdSubsym _transform_ID_su
 // ---------------------------------------------------------------------------------------------------------------------
 
 TransformedSeq::TransformedSeq(util::BitReader& reader) {
-    transform_ID_subsym = SupportValues::TransformIdSubsym(reader.read(3));
+    transform_ID_subsym = reader.read<SupportValues::TransformIdSubsym>(3);
     support_values = util::make_unique<SupportValues>(transform_ID_subsym, reader);
     cabac_binarization = util::make_unique<Binarization>(support_values->getCodingSubsymSize(),
                                                          support_values->getOutputSymbolSize(), reader);

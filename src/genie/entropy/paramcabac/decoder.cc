@@ -25,7 +25,7 @@ DecoderRegular::DecoderRegular(core::GenDesc desc)
 // ---------------------------------------------------------------------------------------------------------------------
 
 DecoderRegular::DecoderRegular(util::BitReader &reader) : core::parameter::desc_pres::DecoderRegular(MODE_CABAC) {
-    uint8_t num_descriptor_subsequence_cfgs = reader.read(8) + 1;
+    uint8_t num_descriptor_subsequence_cfgs = reader.read<uint8_t>() + 1;
     for (size_t i = 0; i < num_descriptor_subsequence_cfgs; ++i) {
         descriptor_subsequence_cfgs.emplace_back(util::make_unique<Subsequence>(false, reader));
     }
@@ -87,7 +87,7 @@ DecoderTokenType::DecoderTokenType()
 
 DecoderTokenType::DecoderTokenType(util::BitReader &reader) : core::parameter::desc_pres::DecoderTokentype(MODE_CABAC) {
     uint8_t num_descriptor_subsequence_cfgs = 2;
-    rle_guard_tokentype = reader.read(8);
+    rle_guard_tokentype = reader.read<uint8_t>();
     for (size_t i = 0; i < num_descriptor_subsequence_cfgs; ++i) {
         descriptor_subsequence_cfgs.emplace_back(util::make_unique<Subsequence>(true, reader));
     }

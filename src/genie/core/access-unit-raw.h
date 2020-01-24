@@ -156,6 +156,8 @@ class AccessUnitRaw {
      */
     Subsequence& get(GenDesc desc, uint8_t sub);
 
+    Descriptor& get(GenDesc desc) { return descriptors[uint8_t(desc)]; }
+
     /**
      * @brief
      * @param desc

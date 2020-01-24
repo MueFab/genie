@@ -10,12 +10,11 @@ namespace mpegg_p1 {
 
 class DatasetGroupHeader {
    public:
-
    private:
     /**
-    * ISO 23092-1 Section 6.5.1.2 table 19
-    *
-    * ------------------------------------------------------------------------------------------------------------- */
+     * ISO 23092-1 Section 6.5.1.2 table 19
+     *
+     * ------------------------------------------------------------------------------------------------------------- */
     uint8_t dataset_group_ID : 8;
     uint8_t version_number : 8;
     std::vector<uint16_t> dataset_ID;

@@ -29,7 +29,7 @@ void AlignmentExternal::write(util::BitWriter &writer) const { writer.write(uint
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<AlignmentExternal> AlignmentExternal::factory(util::BitReader &reader) {
-    auto type = Type(reader.read(8));
+    auto type = reader.read<Type>();
     switch (type) {
         case Type::NONE:
             return util::make_unique<alignment_external::None>();

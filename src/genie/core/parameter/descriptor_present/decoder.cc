@@ -7,8 +7,6 @@
 #include "decoder.h"
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
-#include <genie/util/exceptions.h>
-#include <genie/util/make-unique.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -27,7 +27,7 @@ DescriptorPresent::DescriptorPresent() : Descriptor(PRESENT), decoder_configurat
 // ---------------------------------------------------------------------------------------------------------------------
 
 DescriptorPresent::DescriptorPresent(GenDesc desc, util::BitReader &reader) : Descriptor(PRESENT) {
-    uint8_t mode = reader.read(8);
+    auto mode = reader.read<uint8_t>();
     if (desc == GenDesc::MSAR || desc == GenDesc::RNAME) {
         decoder_configuration = GlobalCfg::getSingleton().getIndustrialPark().construct<DecoderTokentype>(mode, reader);
     } else {

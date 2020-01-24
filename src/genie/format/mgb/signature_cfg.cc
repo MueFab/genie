@@ -27,15 +27,15 @@ SignatureCfg::SignatureCfg(uint64_t _U_cluster_signature_0, uint8_t _U_signature
 SignatureCfg::SignatureCfg(uint8_t _U_signature_size, uint32_t multiple_signature_base, util::BitReader& reader)
     : U_signature_size(_U_signature_size) {
     if (multiple_signature_base != 0) {
-        U_cluster_signature.emplace_back(reader.read(U_signature_size));
+        U_cluster_signature.emplace_back(reader.read<uint64_t >(U_signature_size));
         if (U_cluster_signature[0] != (1u << U_signature_size) - 1u) {
             for (size_t i = 1; i < multiple_signature_base; ++i) {
-                U_cluster_signature.emplace_back(reader.read(U_signature_size));
+                U_cluster_signature.emplace_back(reader.read<uint64_t>(U_signature_size));
             }
         } else {
-            num_signatures = util::make_unique<uint16_t>(reader.read(16));
+            num_signatures = util::make_unique<uint16_t>(reader.read<uint16_t>());
             for (size_t i = 0; i < *num_signatures; ++i) {
-                U_cluster_signature.emplace_back(reader.read(U_signature_size));
+                U_cluster_signature.emplace_back(reader.read<uint64_t>(U_signature_size));
             }
         }
     }

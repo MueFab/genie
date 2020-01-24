@@ -24,8 +24,40 @@ DescriptorBox::DescriptorBox() : class_specific_dec_cfg_flag(false), descriptor_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+DescriptorBox::DescriptorBox(const DescriptorBox& box) : class_specific_dec_cfg_flag(false) { *this = box; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+DescriptorBox::DescriptorBox(DescriptorBox&& box) noexcept : class_specific_dec_cfg_flag(false) {
+    *this = std::move(box);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+DescriptorBox& DescriptorBox::operator=(const DescriptorBox& box) {
+    if (this == &box) {
+        return *this;
+    }
+    class_specific_dec_cfg_flag = box.class_specific_dec_cfg_flag;
+    descriptor_configurations.clear();
+    for (const auto& b : box.descriptor_configurations) {
+        descriptor_configurations.emplace_back(b->clone());
+    }
+    return *this;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+DescriptorBox& DescriptorBox::operator=(DescriptorBox&& box) noexcept {
+    class_specific_dec_cfg_flag = box.class_specific_dec_cfg_flag;
+    descriptor_configurations = std::move(box.descriptor_configurations);
+    return *this;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 DescriptorBox::DescriptorBox(size_t num_classes, GenDesc desc, util::BitReader& reader) {
-    class_specific_dec_cfg_flag = reader.read(1);
+    class_specific_dec_cfg_flag = reader.read<bool>(1);
     if (class_specific_dec_cfg_flag == 0) {
         descriptor_configurations.emplace_back(Descriptor::factory(desc, reader));
     } else {
@@ -83,7 +115,7 @@ bool DescriptorBox::isClassSpecific() const { return class_specific_dec_cfg_flag
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DescriptorBox::write(util::BitWriter& writer) const {
-    writer.write(class_specific_dec_cfg_flag, 1);
+    writer.write(static_cast<uint8_t>(class_specific_dec_cfg_flag), 1);
     for (auto& i : descriptor_configurations) {
         i->write(writer);
     }
