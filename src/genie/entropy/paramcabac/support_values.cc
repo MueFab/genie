@@ -22,13 +22,13 @@ SupportValues::SupportValues(uint8_t _output_symbol_size, uint8_t _coding_subsym
     : output_symbol_size(_output_symbol_size),
       coding_subsym_size(_coding_subsym_size),
       coding_order(_coding_order),
-      share_subsym_lut_flag(nullptr),
-      share_subsym_prv_flag(nullptr) {
+      share_subsym_lut_flag(),
+      share_subsym_prv_flag() {
     if (coding_subsym_size < output_symbol_size && coding_order > 0) {
         if (transform_ID_subsym == TransformIdSubsym::LUT_TRANSFORM) {
-            share_subsym_lut_flag = util::make_unique<bool>(_share_subsym_lut_flag);
+            share_subsym_lut_flag = _share_subsym_lut_flag;
         }
-        share_subsym_prv_flag = util::make_unique<bool>(_share_subsym_prv_flag);
+        share_subsym_prv_flag = _share_subsym_prv_flag;
     }
 }
 
@@ -44,26 +44,10 @@ SupportValues::SupportValues(TransformIdSubsym transformIdSubsym, util::BitReade
     coding_order = reader.read<uint8_t>(2);
     if (coding_subsym_size < output_symbol_size && coding_order > 0) {
         if (transformIdSubsym == TransformIdSubsym::LUT_TRANSFORM) {
-            share_subsym_lut_flag = util::make_unique<bool>(reader.read(1));
+            share_subsym_lut_flag = reader.read(1);
         }
-        share_subsym_prv_flag = util::make_unique<bool>(reader.read(1));
+        share_subsym_prv_flag = reader.read(1);
     }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::unique_ptr<SupportValues> SupportValues::clone() const {
-    auto ret = util::make_unique<SupportValues>();
-    ret->output_symbol_size = output_symbol_size;
-    ret->coding_subsym_size = coding_subsym_size;
-    ret->coding_order = coding_order;
-    if (share_subsym_lut_flag) {
-        ret->share_subsym_lut_flag = util::make_unique<bool>(*share_subsym_lut_flag);
-    }
-    if (share_subsym_prv_flag) {
-        ret->share_subsym_prv_flag = util::make_unique<bool>(*share_subsym_prv_flag);
-    }
-    return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

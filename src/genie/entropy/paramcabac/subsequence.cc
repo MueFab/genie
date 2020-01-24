@@ -17,30 +17,13 @@ namespace paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<Subsequence> Subsequence::clone() const {
-    auto ret = util::make_unique<Subsequence>(transform_subseq_parameters->clone(), 0, false);
-    if (descriptor_subsequence_ID) {
-        ret->descriptor_subsequence_ID = util::make_unique<uint16_t>(*descriptor_subsequence_ID);
-    } else {
-        ret->descriptor_subsequence_ID = nullptr;
-    }
-    ret->transform_subseq_parameters = transform_subseq_parameters->clone();
-    ret->transformSubseq_cfgs.clear();
-    for (const auto& c : transformSubseq_cfgs) {
-        ret->transformSubseq_cfgs.push_back(c->clone());
-    }
-    return ret;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-Subsequence::Subsequence(std::unique_ptr<TransformedParameters> _transform_subseq_parameters,
+Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters,
                          uint16_t _descriptor_subsequence_ID, bool tokentype)
-    : descriptor_subsequence_ID(nullptr),
+    : descriptor_subsequence_ID(),
       transform_subseq_parameters(std::move(_transform_subseq_parameters)),
-      transformSubseq_cfgs(transform_subseq_parameters->getNumStreams()) {
+      transformSubseq_cfgs(transform_subseq_parameters.getNumStreams()) {
     if (!tokentype) {
-        descriptor_subsequence_ID = util::make_unique<uint16_t>(_descriptor_subsequence_ID);
+        descriptor_subsequence_ID = _descriptor_subsequence_ID;
     }
 }
 
@@ -48,11 +31,11 @@ Subsequence::Subsequence(std::unique_ptr<TransformedParameters> _transform_subse
 
 Subsequence::Subsequence(bool tokentype, util::BitReader& reader) {
     if (!tokentype) {
-        descriptor_subsequence_ID = util::make_unique<uint16_t>(reader.read<uint16_t>(10));
+        descriptor_subsequence_ID = reader.read<uint16_t>(10);
     }
-    transform_subseq_parameters = util::make_unique<TransformedParameters>(reader);
+    transform_subseq_parameters = TransformedParameters(reader);
     uint8_t numSubseq = 0;
-    switch (transform_subseq_parameters->getTransformIdSubseq()) {
+    switch (transform_subseq_parameters.getTransformIdSubseq()) {
         case TransformedParameters::TransformIdSubseq::NO_TRANSFORM:
             numSubseq = 1;
             break;
@@ -70,13 +53,13 @@ Subsequence::Subsequence(bool tokentype, util::BitReader& reader) {
             break;
     }
     for (size_t i = 0; i < numSubseq; ++i) {
-        transformSubseq_cfgs.emplace_back(util::make_unique<TransformedSeq>(reader));
+        transformSubseq_cfgs.emplace_back(TransformedSeq(reader));
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Subsequence::setTransformSubseqCfg(size_t index, std::unique_ptr<TransformedSeq> _transformSubseq_cfg) {
+void Subsequence::setTransformSubseqCfg(size_t index, TransformedSeq&& _transformSubseq_cfg) {
     transformSubseq_cfgs[index] = std::move(_transformSubseq_cfg);
 }
 
@@ -86,9 +69,9 @@ void Subsequence::write(util::BitWriter& writer) const {
     if (descriptor_subsequence_ID) {
         writer.write(*descriptor_subsequence_ID, 10);
     }
-    transform_subseq_parameters->write(writer);
+    transform_subseq_parameters.write(writer);
     for (auto& i : transformSubseq_cfgs) {
-        i->write(writer);
+        i.write(writer);
     }
 }
 
@@ -96,17 +79,17 @@ void Subsequence::write(util::BitWriter& writer) const {
 
 uint16_t Subsequence::getDescriptorSubsequenceID() const {
     UTILS_DIE_IF(!descriptor_subsequence_ID, "descriptor_subsequence_ID not present");
-    return *descriptor_subsequence_ID.get();
+    return descriptor_subsequence_ID.get();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const TransformedParameters* Subsequence::getTransformParameters() const { return transform_subseq_parameters.get(); }
+const TransformedParameters& Subsequence::getTransformParameters() const { return transform_subseq_parameters; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const TransformedSeq* Subsequence::getTransformSubseqCfg(uint8_t index) const {
-    return transformSubseq_cfgs[index].get();
+const TransformedSeq& Subsequence::getTransformSubseqCfg(uint8_t index) const {
+    return transformSubseq_cfgs[index];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -115,7 +98,7 @@ size_t Subsequence::getNumTransformSubseqCfgs() const { return transformSubseq_c
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<std::unique_ptr<TransformedSeq>>& Subsequence::getTransformSubseqCfgs() const {
+const std::vector<TransformedSeq>& Subsequence::getTransformSubseqCfgs() const {
     return transformSubseq_cfgs;
 }
 

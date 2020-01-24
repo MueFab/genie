@@ -12,6 +12,7 @@
 #include <genie/util/bitwriter.h>
 #include <memory>
 #include "binarization_parameters.h"
+#include <boost/optional/optional.hpp>
 #include "context.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -25,8 +26,8 @@ namespace paramcabac {
  */
 class Binarization {
    public:
-    Binarization(const BinarizationParameters::BinarizationId& _binarization_ID,
-                 std::unique_ptr<BinarizationParameters> _cabac_binarization_parameters);
+    Binarization(BinarizationParameters::BinarizationId _binarization_ID,
+                 BinarizationParameters&& _cabac_binarization_parameters);
 
     Binarization();
 
@@ -34,25 +35,23 @@ class Binarization {
 
     virtual ~Binarization() = default;
 
-    void setContextParameters(std::unique_ptr<Context> _cabac_context_parameters);
+    void setContextParameters(Context&& _cabac_context_parameters);
 
     virtual void write(util::BitWriter& writer) const;
-
-    std::unique_ptr<Binarization> clone() const;
 
     BinarizationParameters::BinarizationId getBinarizationID() const;
 
     bool getBypassFlag() const;
 
-    const BinarizationParameters* getCabacBinarizationParameters() const;
+    const BinarizationParameters& getCabacBinarizationParameters() const;
 
-    const Context* getCabacContextParameters() const;
+    const Context& getCabacContextParameters() const;
 
    private:
-    BinarizationParameters::BinarizationId binarization_ID;                 //!< : 5; Line 2
-    uint8_t bypass_flag : 1;                                                //!< Line 3
-    std::unique_ptr<BinarizationParameters> cabac_binarization_parameters;  //!< Line 4
-    std::unique_ptr<Context> cabac_context_parameters;                      //!< Line 6
+    BinarizationParameters::BinarizationId binarization_ID;
+    uint8_t bypass_flag ;
+    BinarizationParameters cabac_binarization_parameters;
+    boost::optional<Context> cabac_context_parameters;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

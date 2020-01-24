@@ -50,14 +50,14 @@ const gabac::EncodingConfiguration &GabacSeqConfSet::getConfAsGabac(core::GenSub
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<GabacSeqConfSet::TransformSubseqParameters> GabacSeqConfSet::storeTransParams(
+GabacSeqConfSet::TransformSubseqParameters GabacSeqConfSet::storeTransParams(
     const gabac::EncodingConfiguration &gabac_configuration) {
     using namespace entropy::paramcabac;
 
     // Build parameter
     auto mpeg_transform_id = TransformedParameters::TransformIdSubseq(gabac_configuration.sequenceTransformationId);
     auto trans_param = gabac_configuration.sequenceTransformationParameter;
-    return util::make_unique<TransformedParameters>(mpeg_transform_id, trans_param);
+    return TransformedParameters(mpeg_transform_id, trans_param);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -79,19 +79,19 @@ GabacSeqConfSet::TransformIdSubsym GabacSeqConfSet::storeTransform(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<GabacSeqConfSet::CabacBinarization> GabacSeqConfSet::storeBinarization(
+GabacSeqConfSet::CabacBinarization GabacSeqConfSet::storeBinarization(
     const gabac::TransformedSequenceConfiguration &tSeqConf) {
     using namespace entropy::paramcabac;
 
     auto bin_ID = BinarizationParameters::BinarizationId(tSeqConf.binarizationId);
-    auto bin_params = util::make_unique<BinarizationParameters>(bin_ID, tSeqConf.binarizationParameters[0]);
-    auto binarization = util::make_unique<Binarization>(bin_ID, std::move(bin_params));
+    auto bin_params =BinarizationParameters(bin_ID, tSeqConf.binarizationParameters[0]);
+    auto binarization = Binarization(bin_ID, std::move(bin_params));
 
     // Additional parameter for context adaptive modes
     if (tSeqConf.contextSelectionId != gabac::ContextSelectionId::bypass) {
         // TODO insert actual values when adaptive core ready
-        auto context_params = util::make_unique<Context>(false, 3, 3, false);
-        binarization->setContextParameters(std::move(context_params));
+        auto context_params = Context(false, 3, 3, false);
+        binarization.setContextParameters(std::move(context_params));
     }
     return binarization;
 }
@@ -109,8 +109,8 @@ void GabacSeqConfSet::storeSubseq(const gabac::EncodingConfiguration &gabac_conf
 
         auto transform = storeTransform(tSeqConf);
         auto binarization = storeBinarization(tSeqConf);
-        auto supp_vals = util::make_unique<SupportValues>(size, size, 0, transform);
-        auto subcfg = util::make_unique<TransformedSeq>(transform, std::move(supp_vals), std::move(binarization));
+        auto supp_vals =SupportValues(size, size, 0, transform);
+        auto subcfg = TransformedSeq(transform, std::move(supp_vals), std::move(binarization));
         sub_conf.setTransformSubseqCfg(trans_seq_id, std::move(subcfg));
         ++trans_seq_id;
     }
@@ -126,11 +126,11 @@ void GabacSeqConfSet::storeParameters(core::parameter::ParameterSet &parameterSe
 
         if (desc.id == core::GenDesc::RNAME || desc.id == core::GenDesc::MSAR) {
             auto decoder_config = util::make_unique<DecoderTokenType>();
-            fillDecoder(desc, decoder_config.get());
+            fillDecoder(desc, *decoder_config);
             descriptor_configuration->setDecoder(std::move(decoder_config));
         } else {
             auto decoder_config = util::make_unique<DecoderRegular>(desc.id);
-            fillDecoder(desc, decoder_config.get());
+            fillDecoder(desc, *decoder_config);
             descriptor_configuration->setDecoder(std::move(decoder_config));
         }
 
@@ -173,16 +173,16 @@ gabac::TransformedSequenceConfiguration GabacSeqConfSet::loadTransformedSequence
     gabacTransCfg.lutTransformationEnabled = transformedDesc.getTransformID() == LUT;
 
     const auto MAX_BIN = BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB;
-    UTILS_DIE_IF(transformedDesc.getBinarization()->getBinarizationID() > MAX_BIN, "Binarization unsupported");
+    UTILS_DIE_IF(transformedDesc.getBinarization().getBinarizationID() > MAX_BIN, "Binarization unsupported");
 
-    const auto CUR_BIN = transformedDesc.getBinarization()->getBinarizationID();
+    const auto CUR_BIN = transformedDesc.getBinarization().getBinarizationID();
     gabacTransCfg.binarizationId = gabac::BinarizationId(CUR_BIN);
 
     gabacTransCfg.binarizationParameters.push_back(32);  // TODO Remove hardcoded value
-    if (transformedDesc.getBinarization()->getBypassFlag()) {
+    if (transformedDesc.getBinarization().getBypassFlag()) {
         gabacTransCfg.contextSelectionId = gabac::ContextSelectionId::bypass;
     } else {
-        const auto CODING_ORDER = transformedDesc.getSupportValues()->getCodingOrder();
+        const auto CODING_ORDER = transformedDesc.getSupportValues().getCodingOrder();
         gabacTransCfg.contextSelectionId = gabac::ContextSelectionId(CODING_ORDER + 1);
     }
 
@@ -201,20 +201,20 @@ void GabacSeqConfSet::loadParameters(const core::parameter::ParameterSet &parame
         auto &descConfig = loadDescriptorDecoderCfg(parameterSet, desc.id);
         for (const auto &subdesc : getDescriptor(desc.id).subseqs) {
             auto sub_desc = descConfig.getSubsequenceCfg(subdesc.id.second);
-            auto sub_desc_id = desc.tokentype ? 0 : sub_desc->getDescriptorSubsequenceID();
+            auto sub_desc_id = desc.tokentype ? 0 : sub_desc.getDescriptorSubsequenceID();
 
             auto &gabac_conf = conf[uint8_t(desc.id)][sub_desc_id];
 
             gabac_conf.wordSize = 4;  // TODO Remove hardcoded value
 
-            const auto TRANS_ID = sub_desc->getTransformParameters()->getTransformIdSubseq();
+            const auto TRANS_ID = sub_desc.getTransformParameters().getTransformIdSubseq();
             gabac_conf.sequenceTransformationId = gabac::SequenceTransformationId(TRANS_ID);
 
-            for (const auto &transformedDesc : sub_desc->getTransformSubseqCfgs()) {
+            for (const auto &transformedDesc : sub_desc.getTransformSubseqCfgs()) {
                 gabac_conf.transformedSequenceConfigurations.emplace_back();
                 auto &gabacTransCfg = gabac_conf.transformedSequenceConfigurations.back();
 
-                gabacTransCfg = loadTransformedSequence(*transformedDesc);
+                gabacTransCfg = loadTransformedSequence(transformedDesc);
             }
         }
     }

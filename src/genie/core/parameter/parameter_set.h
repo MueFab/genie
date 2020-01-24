@@ -14,6 +14,7 @@
 #include <genie/entropy/gabac/gabac.h>
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
+#include <boost/optional/optional.hpp>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -42,7 +43,7 @@ class ParameterSet : public DataUnit {
 
     size_t getNumberTemplateSegments() const;
 
-    void setComputedRef(std::unique_ptr<ComputedRef> parameter_set_crps);
+    void setComputedRef(ComputedRef&& parameter_set_crps);
 
     void addClass(record::ClassType class_id, std::unique_ptr<QualityValues> conf);
 
@@ -50,7 +51,7 @@ class ParameterSet : public DataUnit {
 
     const DescriptorBox &getDescriptor(GenDesc index) const;
 
-    void addGroup(std::unique_ptr<std::string> rgroup_id);
+    void addGroup(std::string&& rgroup_id);
 
     void setMultipleSignatureBase(uint32_t _multiple_signature_base, uint8_t _U_signature_size);
 
@@ -98,9 +99,9 @@ class ParameterSet : public DataUnit {
     bool multiple_alignments_flag;
     bool spliced_reads_flag;
     uint32_t multiple_signature_base;
-    std::unique_ptr<uint8_t> u_signature_size;  // Todo: std::optional
+    boost::optional<uint8_t> u_signature_size;
     std::vector<std::unique_ptr<QualityValues>> qv_coding_configs;
-    std::unique_ptr<ComputedRef> parameter_set_crps;  // TODO: std::optional
+    boost::optional<ComputedRef> parameter_set_crps;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

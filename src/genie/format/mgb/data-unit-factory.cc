@@ -15,37 +15,36 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const core::parameter::ParameterSet& DataUnitFactory::getParams(size_t id) const { return *parameters.at(id).get(); }
+const core::parameter::ParameterSet& DataUnitFactory::getParams(size_t id) const { return parameters.at(id); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
+boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
     core::parameter::DataUnit::DataUnitType type;
     do {
         type = bitReader.read<core::parameter::DataUnit::DataUnitType>();
         if (!bitReader.isGood()) {
-            return nullptr;
+            return boost::none;
         }
         switch (type) {
             case core::parameter::DataUnit::DataUnitType::RAW_REFERENCE: {
-                UTILS_DIE("DataUnitFactory RAW_REFERENCE not supported yet!");
+                UTILS_DIE("DataUnitFactory RAW_REFERENCE not yet supported!");
             }
             case core::parameter::DataUnit::DataUnitType::PARAMETER_SET: {
-                auto p = util::make_unique<core::parameter::ParameterSet>(bitReader);
-                parameters.insert(std::make_pair(p->getID(), std::move(p)));
+                auto p = core::parameter::ParameterSet(bitReader);
+                parameters.insert(std::make_pair(p.getID(), std::move(p)));
                 break;
             }
             case core::parameter::DataUnit::DataUnitType::ACCESS_UNIT: {
-                auto ret = util::make_unique<AccessUnit>(parameters, bitReader);
-                std::cout << "Decompressing AU " << ret->getID() << "..." << std::endl;
+                auto ret = AccessUnit(parameters, bitReader);
+                std::cout << "Decompressing AU " << ret.getID() << "..." << std::endl;
                 return ret;
             }
             default: {
                 UTILS_DIE("DataUnitFactory invalid DataUnitType!");
             }
         }
-    } while (type != core::parameter::DataUnit::DataUnitType::ACCESS_UNIT);
-    return std::unique_ptr<AccessUnit>();
+    } while (true);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

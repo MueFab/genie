@@ -45,20 +45,20 @@ class DT_protection {
 
 class Dataset {
    public:
-    Dataset(const std::unique_ptr<genie::format::mgb::DataUnitFactory>& dataUnitFactory,
-            std::vector<std::unique_ptr<genie::format::mgb::AccessUnit>>* accessUnits_p2);
+    Dataset(const genie::format::mgb::DataUnitFactory& dataUnitFactory,
+            std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2);
 
    private:
     /**
      * ISO 23092-1 Section 6.5.2 table 18
      *
      * ------------------------------------------------------------------------------------------------------------- */
-    std::unique_ptr<mpegg_p1::DatasetHeader> dataset_header;
+    mpegg_p1::DatasetHeader dataset_header;
     // std::unique_ptr<DT_metadata> dt_metadata;     //optional
     // std::unique_ptr<DT_protection> dt_protection; //optional
-    std::vector<std::unique_ptr<DatasetParameterSet>> dataset_parameter_sets;
+    std::vector<DatasetParameterSet> dataset_parameter_sets;
     /** master_index_table is optional and not yet implemented */
-    std::vector<std::unique_ptr<mpegg_p1::AccessUnit>> access_units;
+    std::vector<mpegg_p1::AccessUnit> access_units;
     /** descriptor_stream[] is optional and not yet implemented */
 };
 

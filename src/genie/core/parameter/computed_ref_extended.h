@@ -35,8 +35,6 @@ class ComputedRefExtended {
     uint32_t getBufMaxSize() const;
 
     virtual void write(util::BitWriter &writer) const;
-
-    std::unique_ptr<ComputedRefExtended> clone() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

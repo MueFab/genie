@@ -35,7 +35,7 @@ class RefCfg {
     RefCfg(uint8_t _posSize, util::BitReader &reader);
     virtual ~RefCfg() = default;
 
-    virtual void write(util::BitWriter &writer);
+    virtual void write(util::BitWriter &writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

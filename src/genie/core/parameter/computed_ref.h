@@ -15,6 +15,7 @@
 #include <cstdint>
 #include <memory>
 #include "computed_ref_extended.h"
+#include <boost/optional/optional.hpp>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,7 +35,7 @@ class ComputedRef {
 
    private:
     Algorithm cr_alg_ID;
-    std::unique_ptr<ComputedRefExtended> extension;  // TODO: std::optional
+    boost::optional<ComputedRefExtended> extension;  // TODO: std::optional
 
    public:
     explicit ComputedRef(Algorithm _cr_alg_ID);
@@ -43,13 +44,11 @@ class ComputedRef {
 
     virtual ~ComputedRef() = default;
 
-    void setExtension(std::unique_ptr<ComputedRefExtended> _crps_info);
+    void setExtension(ComputedRefExtended&& _crps_info);
 
     const ComputedRefExtended &getExtension() const;
 
     virtual void write(util::BitWriter &bw) const;
-
-    std::unique_ptr<ComputedRef> clone() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -29,10 +29,10 @@ TransformedParameters::TransformedParameters(util::BitReader &reader) {
         case TransformIdSubseq::EQUALITY_CODING:
             break;
         case TransformIdSubseq::MATCH_CODING:
-            match_coding_buffer_size = util::make_unique<uint16_t>(reader.read<uint16_t >());
+            match_coding_buffer_size = reader.read<uint16_t >();
             break;
         case TransformIdSubseq::RLE_CODING:
-            rle_coding_guard = util::make_unique<uint8_t>(reader.read<uint8_t >());
+            rle_coding_guard = reader.read<uint8_t >();
             break;
         case TransformIdSubseq::MERGE_CODING:
             UTILS_DIE("Merge core not supported");
@@ -44,42 +44,24 @@ TransformedParameters::TransformedParameters(util::BitReader &reader) {
 
 TransformedParameters::TransformedParameters(const TransformIdSubseq &_transform_ID_subseq, uint16_t param)
     : transform_ID_subseq(_transform_ID_subseq),
-      match_coding_buffer_size(nullptr),
-      rle_coding_guard(nullptr),
-      merge_coding_subseq_count(nullptr),
+      match_coding_buffer_size(),
+      rle_coding_guard(),
+      merge_coding_subseq_count(),
       merge_coding_shift_size(0) {
     switch (transform_ID_subseq) {
         case TransformIdSubseq::NO_TRANSFORM:
         case TransformIdSubseq::EQUALITY_CODING:
             break;
         case TransformIdSubseq::RLE_CODING:
-            rle_coding_guard = util::make_unique<uint8_t>(param);
+            rle_coding_guard = param;
             break;
         case TransformIdSubseq::MATCH_CODING:
-            match_coding_buffer_size = util::make_unique<uint16_t>(param);
+            match_coding_buffer_size = param;
             break;
         case TransformIdSubseq::MERGE_CODING:
             UTILS_THROW_RUNTIME_EXCEPTION("Merge core not supported");
             break;
     }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::unique_ptr<TransformedParameters> TransformedParameters::clone() const {
-    auto ret = util::make_unique<TransformedParameters>();
-    ret->transform_ID_subseq = transform_ID_subseq;
-    if (match_coding_buffer_size) {
-        ret->match_coding_buffer_size = util::make_unique<uint16_t>(*match_coding_buffer_size);
-    }
-    if (rle_coding_guard) {
-        ret->rle_coding_guard = util::make_unique<uint8_t>(*rle_coding_guard);
-    }
-    if (merge_coding_subseq_count) {
-        ret->merge_coding_subseq_count = util::make_unique<uint8_t>(*merge_coding_subseq_count);
-    }
-    ret->merge_coding_shift_size = merge_coding_shift_size;
-    return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -33,7 +33,7 @@ class ExtendedAu {
     ExtendedAu(uint8_t _posSize, util::BitReader& reader);
     virtual ~ExtendedAu() = default;
 
-    virtual void write(util::BitWriter& writer);
+    virtual void write(util::BitWriter& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

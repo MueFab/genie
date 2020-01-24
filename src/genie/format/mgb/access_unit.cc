@@ -20,7 +20,7 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(const std::map<size_t, std::unique_ptr<core::parameter::ParameterSet>> &parameterSets,
+AccessUnit::AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &parameterSets,
                        util::BitReader &bitReader)
     : DataUnit(DataUnitType::ACCESS_UNIT) {
     bitReader.read(3);
@@ -32,27 +32,27 @@ AccessUnit::AccessUnit(const std::map<size_t, std::unique_ptr<core::parameter::P
     au_type = bitReader.read<core::record::ClassType>(4);
     reads_count = bitReader.read<uint32_t>();
     if (au_type == core::record::ClassType::CLASS_N || au_type == core::record::ClassType::CLASS_M) {
-        this->mm_cfg = util::make_unique<MmCfg>(bitReader);
+        this->mm_cfg = MmCfg(bitReader);
     }
 
-    if (parameterSets.at(parameter_set_ID)->getDatasetType() == core::parameter::ParameterSet::DatasetType::REFERENCE) {
-        this->ref_cfg = util::make_unique<RefCfg>(parameterSets.at(parameter_set_ID)->getPosSize(), bitReader);
+    if (parameterSets.at(parameter_set_ID).getDatasetType() == core::parameter::ParameterSet::DatasetType::REFERENCE) {
+        this->ref_cfg = RefCfg(parameterSets.at(parameter_set_ID).getPosSize(), bitReader);
     }
 
     if (au_type != core::record::ClassType::CLASS_U) {
         this->au_Type_U_Cfg =
-            util::make_unique<AuTypeCfg>(parameterSets.at(parameter_set_ID)->getPosSize(),
-                                         parameterSets.at(parameter_set_ID)->hasMultipleAlignments(), bitReader);
+            AuTypeCfg(parameterSets.at(parameter_set_ID).getPosSize(),
+                                         parameterSets.at(parameter_set_ID).hasMultipleAlignments(), bitReader);
     } else {
         this->signature_config =
-            util::make_unique<SignatureCfg>(parameterSets.at(parameter_set_ID)->getSignatureSize(),
-                                            parameterSets.at(parameter_set_ID)->getMultipleSignatureBase(), bitReader);
+            SignatureCfg(parameterSets.at(parameter_set_ID).getSignatureSize(),
+                                            parameterSets.at(parameter_set_ID).getMultipleSignatureBase(), bitReader);
     }
 
     bitReader.flush();
 
     for (size_t i = 0; i < num_blocks; ++i) {
-        blocks.emplace_back(parameterSets.at(parameter_set_ID)->getQVConfig(au_type).getNumSubsequences(), bitReader);
+        blocks.emplace_back(parameterSets.at(parameter_set_ID).getQVConfig(au_type).getNumSubsequences(), bitReader);
     }
 }
 
@@ -67,29 +67,29 @@ AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core
       parameter_set_ID(_parameter_set_ID),
       au_type(_au_type),
       reads_count(_reads_count),
-      mm_cfg(nullptr),
-      ref_cfg(nullptr),
-      au_Type_U_Cfg(nullptr),
-      signature_config(nullptr),
+      mm_cfg(),
+      ref_cfg(),
+      au_Type_U_Cfg(),
+      signature_config(),
       blocks(0) {
     if (au_type == core::record::ClassType::CLASS_N || au_type == core::record::ClassType::CLASS_M) {
-        mm_cfg = util::make_unique<MmCfg>();
+        mm_cfg = MmCfg();
     }
     if (dataset_type == DatasetType::REFERENCE) {
-        ref_cfg = util::make_unique<RefCfg>(posSize);
+        ref_cfg = RefCfg(posSize);
     }
     if (au_type != core::record::ClassType::CLASS_U) {
-        au_Type_U_Cfg = util::make_unique<AuTypeCfg>(posSize);
+        au_Type_U_Cfg = AuTypeCfg(posSize);
     } else {
         if (multiple_signature_base != 0) {
-            signature_config = util::make_unique<SignatureCfg>(0, signatureSize);
+            signature_config = SignatureCfg(0, signatureSize);
         }
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setMmCfg(std::unique_ptr<MmCfg> cfg) {
+void AccessUnit::setMmCfg(MmCfg&& cfg) {
     if (!mm_cfg) {
         UTILS_THROW_RUNTIME_EXCEPTION("MmCfg not valid for this access unit");
     }
@@ -98,7 +98,7 @@ void AccessUnit::setMmCfg(std::unique_ptr<MmCfg> cfg) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setRefCfg(std::unique_ptr<RefCfg> cfg) {
+void AccessUnit::setRefCfg(RefCfg&& cfg) {
     if (!ref_cfg) {
         UTILS_THROW_RUNTIME_EXCEPTION("RefCfg not valid for this access unit");
     }
@@ -107,7 +107,7 @@ void AccessUnit::setRefCfg(std::unique_ptr<RefCfg> cfg) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setAuTypeCfg(std::unique_ptr<AuTypeCfg> cfg) {
+void AccessUnit::setAuTypeCfg(AuTypeCfg&& cfg) {
     if (!au_Type_U_Cfg) {
         UTILS_THROW_RUNTIME_EXCEPTION("au_type_u_cfg not valid for this access unit");
     }
@@ -116,7 +116,7 @@ void AccessUnit::setAuTypeCfg(std::unique_ptr<AuTypeCfg> cfg) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setSignatureCfg(std::unique_ptr<SignatureCfg> cfg) {
+void AccessUnit::setSignatureCfg(SignatureCfg&& cfg) {
     if (!signature_config) {
         UTILS_THROW_RUNTIME_EXCEPTION("signature config not valid for this access unit");
     }

@@ -109,9 +109,8 @@ core::AccessUnitRaw Encoder::pack(size_t id, uint16_t ref, uint8_t qv_depth,
     core::parameter::ParameterSet ret(id, id, dataType, core::AlphabetID::ACGTN, state.readLength, state.pairedEnd,
                                       false, qv_depth, 0, false, false);
     ret.addClass(state.classType, std::move(qvparam));
-    auto crps =
-        util::make_unique<core::parameter::ComputedRef>(core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY);
-    crps->setExtension(util::make_unique<core::parameter::ComputedRefExtended>(0, cr_buf_max_size));
+    auto crps = core::parameter::ComputedRef(core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY);
+    crps.setExtension(core::parameter::ComputedRefExtended(0, cr_buf_max_size));
     ret.setComputedRef(std::move(crps));
 
     auto rawAU = state.readCoder.moveStreams();

@@ -15,7 +15,7 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AuTypeCfg::write(util::BitWriter &writer) {
+void AuTypeCfg::write(util::BitWriter &writer) const {
     writer.write(sequence_ID, 16);
     writer.write(AU_start_position, posSize);
     writer.write(AU_end_position, posSize);
@@ -43,13 +43,13 @@ AuTypeCfg::AuTypeCfg(uint8_t _posSize, bool multiple_alignments, util::BitReader
     AU_start_position = reader.read<uint64_t >(posSize);
     AU_end_position = reader.read<uint64_t>(posSize);
     if (multiple_alignments) {
-        extended_AU = util::make_unique<ExtendedAu>(_posSize, reader);
+        extended_AU = ExtendedAu(_posSize, reader);
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AuTypeCfg::setExtendedAu(std::unique_ptr<ExtendedAu> _extended_AU) { extended_AU = std::move(_extended_AU); }
+void AuTypeCfg::setExtendedAu(ExtendedAu&& _extended_AU) { extended_AU = std::move(_extended_AU); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

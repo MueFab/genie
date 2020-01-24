@@ -26,7 +26,7 @@ namespace paramcabac {
 class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
    protected:
     uint8_t rle_guard_tokentype : 8;                                        //!< line 4
-    std::vector<std::unique_ptr<Subsequence>> descriptor_subsequence_cfgs;  //!< Line 4 to 13
+    std::vector<Subsequence> descriptor_subsequence_cfgs;  //!< Line 4 to 13
    public:
     static const uint8_t MODE_CABAC = 0;
 
@@ -34,11 +34,9 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
 
     explicit DecoderTokenType(util::BitReader &reader);
 
-    void setSubsequenceCfg(uint8_t index, std::unique_ptr<TransformedParameters> cfg);
+    void setSubsequenceCfg(uint8_t index, TransformedParameters&& cfg);
 
-    Subsequence *getSubsequenceCfg(uint8_t index) const;
-
-    DecoderTokenType(const DecoderTokenType &c);
+    const Subsequence &getSubsequenceCfg(uint8_t index) const;
 
     std::unique_ptr<core::parameter::desc_pres::Decoder> clone() const override;
 
@@ -56,7 +54,7 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
  */
 class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
    protected:
-    std::vector<std::unique_ptr<Subsequence>> descriptor_subsequence_cfgs;  //!< Line 4 to 13
+    std::vector<Subsequence> descriptor_subsequence_cfgs;  //!< Line 4 to 13
 
    public:
     static const uint8_t MODE_CABAC = 0;
@@ -67,11 +65,9 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
 
     explicit DecoderRegular(util::BitReader &reader);
 
-    void setSubsequenceCfg(uint8_t index, std::unique_ptr<TransformedParameters> cfg);
+    void setSubsequenceCfg(uint8_t index, TransformedParameters&& cfg);
 
-    Subsequence *getSubsequenceCfg(uint8_t index) const;
-
-    DecoderRegular(const DecoderRegular &c);
+    const Subsequence& getSubsequenceCfg(uint8_t index) const;
 
     std::unique_ptr<core::parameter::desc_pres::Decoder> clone() const override;
 
