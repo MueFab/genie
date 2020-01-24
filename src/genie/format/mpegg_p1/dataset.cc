@@ -17,8 +17,8 @@ Dataset::Dataset(const genie::format::mgb::DataUnitFactory& dataUnitFactory,
     // TODO multiple params?
     dataset_parameter_sets.emplace_back(dataUnitFactory.getParams(0));
 
-    for (auto& au : *accessUnits_p2) {
-        access_units.push_back(util::make_unique<mpegg_p1::AccessUnit>(std::move(au)));
+    for (auto& au : accessUnits_p2) {
+        access_units.emplace_back(std::move(au));
     }
     // TODO: add dataset_header, dataset_parametersets, accessunits(p1)
 }
