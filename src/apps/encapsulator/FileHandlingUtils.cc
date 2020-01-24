@@ -122,10 +122,13 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
 
     std::vector<genie::format::mgb::AccessUnit> accessUnits;
 
-    auto dataUnitFactory = genie::format::mgb::DataUnitFactory();
-    // while (inputFileBitReader.isGood()) {
-    accessUnits.push_back(dataUnitFactory.read(inputFileBitReader).get());
-    //}
+    auto dataUnitFactory = genie::util::make_unique<genie::format::mgb::DataUnitFactory>();
+    while (true) {
+        auto au = dataUnitFactory->read(inputFileBitReader);
+        if (au == nullptr) { break; }
+        accessUnits.push_back(std::move(au));
+    }
+
     for (auto const& au : accessUnits) {
         fprintf(stdout, "\ndata_unit_type:%u\n", (uint8_t)au.getDataUnitType());
     }
