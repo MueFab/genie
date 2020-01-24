@@ -28,8 +28,6 @@ class ComputedRefExtended {
    public:
     ComputedRefExtended(uint8_t cr_pad_size, uint32_t cr_buf_max_size);
 
-    ComputedRefExtended();
-
     virtual ~ComputedRefExtended() = default;
 
     uint32_t getBufMaxSize() const;

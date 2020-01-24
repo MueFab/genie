@@ -3,7 +3,7 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-
+#if 0
 #ifdef GENIE_USE_OPENMP
 
 #include <omp.h>
@@ -627,3 +627,5 @@ core::AccessUnitRaw generate_streams_pe(const se_data &data, const pe_block_data
 }  // namespace spring
 }  // namespace read
 }  // namespace genie
+
+#endif

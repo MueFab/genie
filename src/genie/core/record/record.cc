@@ -65,7 +65,7 @@ Record::Record(util::BitReader &reader) {
     }
     std::vector<uint32_t> readSizes(reads.size());
     for (auto &a : readSizes) {
-        a = reader.read<uint32_t >(24);
+        a = reader.read<uint32_t>(24);
     }
     qv_depth = reader.read<uint8_t>();
     read_name.resize(reader.read<uint8_t>());

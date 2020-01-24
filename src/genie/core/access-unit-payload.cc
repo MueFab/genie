@@ -113,18 +113,6 @@ bool AccessUnitPayload::SubsequencePayload::isEmpty() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<AccessUnitPayload::TransformedPayload>& AccessUnitPayload::SubsequencePayload::getTransformedPayloads() {
-    return transformedPayloads;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-AccessUnitPayload::TransformedPayload& AccessUnitPayload::SubsequencePayload::getTransformedPayload(size_t index) {
-    return transformedPayloads[index];
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void AccessUnitPayload::DescriptorPayload::write(util::BitWriter& writer) const {
     for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
         std::stringstream ss;
@@ -159,12 +147,6 @@ bool AccessUnitPayload::DescriptorPayload::isEmpty() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<AccessUnitPayload::SubsequencePayload>& AccessUnitPayload::DescriptorPayload::getSubsequencePayloads() {
-    return subsequencePayloads;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 AccessUnitPayload::AccessUnitPayload(parameter::ParameterSet param, size_t _record_num)
     : desc_pay(getDescriptors().size()), record_num(_record_num), parameters(std::move(param)) {}
 
@@ -195,10 +177,6 @@ const parameter::ParameterSet& AccessUnitPayload::getParameters() const { return
 // ---------------------------------------------------------------------------------------------------------------------
 
 parameter::ParameterSet&& AccessUnitPayload::moveParameters() { return std::move(parameters); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::vector<AccessUnitPayload::DescriptorPayload>& AccessUnitPayload::getPayloads() { return desc_pay; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

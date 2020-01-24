@@ -17,8 +17,8 @@ namespace paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters,
-                         uint16_t _descriptor_subsequence_ID, bool tokentype)
+Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters, uint16_t _descriptor_subsequence_ID,
+                         bool tokentype)
     : descriptor_subsequence_ID(),
       transform_subseq_parameters(std::move(_transform_subseq_parameters)),
       transformSubseq_cfgs(transform_subseq_parameters.getNumStreams()) {
@@ -88,9 +88,7 @@ const TransformedParameters& Subsequence::getTransformParameters() const { retur
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const TransformedSeq& Subsequence::getTransformSubseqCfg(uint8_t index) const {
-    return transformSubseq_cfgs[index];
-}
+const TransformedSeq& Subsequence::getTransformSubseqCfg(uint8_t index) const { return transformSubseq_cfgs[index]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -98,9 +96,7 @@ size_t Subsequence::getNumTransformSubseqCfgs() const { return transformSubseq_c
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<TransformedSeq>& Subsequence::getTransformSubseqCfgs() const {
-    return transformSubseq_cfgs;
-}
+const std::vector<TransformedSeq>& Subsequence::getTransformSubseqCfgs() const { return transformSubseq_cfgs; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

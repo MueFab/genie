@@ -57,11 +57,7 @@ uint64_t AccessUnitRaw::Subsequence::pull() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<AccessUnitRaw::Subsequence> &AccessUnitRaw::Descriptor::getSubsequences() const { return subdesc; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-AccessUnitRaw::Subsequence &AccessUnitRaw::Descriptor::getSubsequence(uint8_t sub) { return subdesc[uint8_t(sub)]; }
+AccessUnitRaw::Subsequence &AccessUnitRaw::Descriptor::get(uint8_t sub) { return subdesc[uint8_t(sub)]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -82,22 +78,14 @@ AccessUnitRaw::Descriptor::Descriptor(GenDesc _id) : id(_id) {}
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnitRaw::Subsequence &AccessUnitRaw::get(GenSubIndex sub) {
-    return descriptors[uint8_t(sub.first)].getSubsequence(sub.second);
+    return descriptors[uint8_t(sub.first)].get(sub.second);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const AccessUnitRaw::Subsequence &AccessUnitRaw::get(GenSubIndex sub) const {
-    return descriptors[uint8_t(sub.first)].getSubsequences()[sub.second];
+    return descriptors[uint8_t(sub.first)].get(sub.second);
 }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-AccessUnitRaw::Subsequence &AccessUnitRaw::get(GenDesc desc, uint8_t sub) { return get(GenSubIndex(desc, sub)); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const std::vector<AccessUnitRaw::Descriptor> &AccessUnitRaw::getDescriptorStreams() const { return descriptors; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

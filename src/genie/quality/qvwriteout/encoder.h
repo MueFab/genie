@@ -33,7 +33,7 @@ class Encoder : public core::QVEncoder {
                 for (const auto &q : s.getQualities()) {
                     for (const auto &c : q) {
                         UTILS_DIE_IF(c < 33 || c > 126, "Invalid quality score");
-                        desc.getSubsequence(2).push(c - 33);
+                        desc.get(2).push(c - 33);
                     }
                 }
             }

@@ -21,7 +21,6 @@ namespace genie {
 namespace entropy {
 namespace paramcabac {
 
-
 class Subsequence {
    private:
     boost::optional<uint16_t> descriptor_subsequence_ID;

@@ -10,9 +10,9 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/util/bitwriter.h>
+#include <boost/optional/optional.hpp>
 #include <memory>
 #include "binarization_parameters.h"
-#include <boost/optional/optional.hpp>
 #include "context.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -49,7 +49,7 @@ class Binarization {
 
    private:
     BinarizationParameters::BinarizationId binarization_ID;
-    uint8_t bypass_flag ;
+    uint8_t bypass_flag;
     BinarizationParameters cabac_binarization_parameters;
     boost::optional<Context> cabac_context_parameters;
 };

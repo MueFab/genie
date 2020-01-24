@@ -49,7 +49,7 @@ ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::
         rgroup_IDs.emplace_back();
         char c = 0;
         do {
-            c = bitReader.read<uint8_t >();
+            c = bitReader.read<uint8_t>();
             rgroup_IDs.back().push_back(c);
         } while (c);
     }
@@ -57,7 +57,7 @@ ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::
     spliced_reads_flag = bitReader.read<bool>(1);
     multiple_signature_base = bitReader.read<uint32_t>(31);
     if (multiple_signature_base > 0) {
-        u_signature_size = bitReader.read<uint8_t >(6);
+        u_signature_size = bitReader.read<uint8_t>(6);
     }
     for (size_t i = 0; i < num_classes; ++i) {
         auto mode = bitReader.read<uint8_t>(4);
@@ -167,7 +167,7 @@ void ParameterSet::preWrite(util::BitWriter &writer) const {
     writer.write(rgroup_IDs.size(), 16);  // num_groups
     for (auto &i : rgroup_IDs) {
         for (auto &j : i) {
-            writer.write(static_cast<uint8_t >(j), 8);
+            writer.write(static_cast<uint8_t>(j), 8);
         }
         writer.write('\0', 8);  // NULL termination
     }
@@ -196,7 +196,7 @@ size_t ParameterSet::getNumberTemplateSegments() const { return number_of_templa
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::setComputedRef(ComputedRef&& _parameter_set_crps) {
+void ParameterSet::setComputedRef(ComputedRef &&_parameter_set_crps) {
     parameter_set_crps = std::move(_parameter_set_crps);
 }
 
@@ -229,7 +229,7 @@ const DescriptorBox &ParameterSet::getDescriptor(GenDesc index) const { return d
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::addGroup(std::string&& rgroup_id) { rgroup_IDs.emplace_back(std::move(rgroup_id)); }
+void ParameterSet::addGroup(std::string &&rgroup_id) { rgroup_IDs.emplace_back(std::move(rgroup_id)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -244,7 +244,7 @@ ParameterSet::DatasetType ParameterSet::getDatasetType() const { return dataset_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ParameterSet::getPosSize() const { return pos_40_bits_flag ? uint8_t (40) : uint8_t (32); }
+uint8_t ParameterSet::getPosSize() const { return pos_40_bits_flag ? uint8_t(40) : uint8_t(32); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -256,7 +256,7 @@ uint32_t ParameterSet::getMultipleSignatureBase() const { return multiple_signat
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ParameterSet::getSignatureSize() const { return u_signature_size ? *u_signature_size : uint8_t (0); }
+uint8_t ParameterSet::getSignatureSize() const { return u_signature_size ? *u_signature_size : uint8_t(0); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

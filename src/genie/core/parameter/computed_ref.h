@@ -12,10 +12,10 @@
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 #include <genie/util/make-unique.h>
+#include <boost/optional/optional.hpp>
 #include <cstdint>
 #include <memory>
 #include "computed_ref_extended.h"
-#include <boost/optional/optional.hpp>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ class ComputedRef {
 
     virtual ~ComputedRef() = default;
 
-    void setExtension(ComputedRefExtended&& _crps_info);
+    void setExtension(ComputedRefExtended &&_crps_info);
 
     const ComputedRefExtended &getExtension() const;
 

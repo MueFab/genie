@@ -20,8 +20,7 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &parameterSets,
-                       util::BitReader &bitReader)
+AccessUnit::AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &parameterSets, util::BitReader &bitReader)
     : DataUnit(DataUnitType::ACCESS_UNIT) {
     bitReader.read(3);
     bitReader.read(29);
@@ -40,13 +39,11 @@ AccessUnit::AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &pa
     }
 
     if (au_type != core::record::ClassType::CLASS_U) {
-        this->au_Type_U_Cfg =
-            AuTypeCfg(parameterSets.at(parameter_set_ID).getPosSize(),
-                                         parameterSets.at(parameter_set_ID).hasMultipleAlignments(), bitReader);
+        this->au_Type_U_Cfg = AuTypeCfg(parameterSets.at(parameter_set_ID).getPosSize(),
+                                        parameterSets.at(parameter_set_ID).hasMultipleAlignments(), bitReader);
     } else {
-        this->signature_config =
-            SignatureCfg(parameterSets.at(parameter_set_ID).getSignatureSize(),
-                                            parameterSets.at(parameter_set_ID).getMultipleSignatureBase(), bitReader);
+        this->signature_config = SignatureCfg(parameterSets.at(parameter_set_ID).getSignatureSize(),
+                                              parameterSets.at(parameter_set_ID).getMultipleSignatureBase(), bitReader);
     }
 
     bitReader.flush();
@@ -89,7 +86,7 @@ AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setMmCfg(MmCfg&& cfg) {
+void AccessUnit::setMmCfg(MmCfg &&cfg) {
     if (!mm_cfg) {
         UTILS_THROW_RUNTIME_EXCEPTION("MmCfg not valid for this access unit");
     }
@@ -98,7 +95,7 @@ void AccessUnit::setMmCfg(MmCfg&& cfg) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setRefCfg(RefCfg&& cfg) {
+void AccessUnit::setRefCfg(RefCfg &&cfg) {
     if (!ref_cfg) {
         UTILS_THROW_RUNTIME_EXCEPTION("RefCfg not valid for this access unit");
     }
@@ -107,7 +104,7 @@ void AccessUnit::setRefCfg(RefCfg&& cfg) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setAuTypeCfg(AuTypeCfg&& cfg) {
+void AccessUnit::setAuTypeCfg(AuTypeCfg &&cfg) {
     if (!au_Type_U_Cfg) {
         UTILS_THROW_RUNTIME_EXCEPTION("au_type_u_cfg not valid for this access unit");
     }
@@ -116,7 +113,7 @@ void AccessUnit::setAuTypeCfg(AuTypeCfg&& cfg) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setSignatureCfg(SignatureCfg&& cfg) {
+void AccessUnit::setSignatureCfg(SignatureCfg &&cfg) {
     if (!signature_config) {
         UTILS_THROW_RUNTIME_EXCEPTION("signature config not valid for this access unit");
     }

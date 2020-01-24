@@ -20,10 +20,6 @@ ComputedRefExtended::ComputedRefExtended(uint8_t _cr_pad_size, uint32_t _cr_buf_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ComputedRefExtended::ComputedRefExtended() : ComputedRefExtended(0, 0) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 uint32_t ComputedRefExtended::getBufMaxSize() const { return cr_buf_max_size; }
 
 // ---------------------------------------------------------------------------------------------------------------------

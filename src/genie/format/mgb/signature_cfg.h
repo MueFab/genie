@@ -3,12 +3,12 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <memory>
-#include <vector>
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 #include <genie/util/make-unique.h>
 #include <boost/optional/optional.hpp>
+#include <memory>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,6 +22,7 @@ class SignatureCfg {
     std::vector<uint64_t> U_cluster_signature;
 
     uint8_t U_signature_size;
+
    public:
     SignatureCfg(uint64_t _U_cluster_signature_0, uint8_t _U_signature_size);
     SignatureCfg(uint8_t _U_signature_size, uint32_t multiple_signature_base, util::BitReader& reader);

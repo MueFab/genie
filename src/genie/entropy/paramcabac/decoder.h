@@ -25,7 +25,7 @@ namespace paramcabac {
  */
 class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
    protected:
-    uint8_t rle_guard_tokentype : 8;                                        //!< line 4
+    uint8_t rle_guard_tokentype : 8;                       //!< line 4
     std::vector<Subsequence> descriptor_subsequence_cfgs;  //!< Line 4 to 13
    public:
     static const uint8_t MODE_CABAC = 0;
@@ -34,7 +34,7 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
 
     explicit DecoderTokenType(util::BitReader &reader);
 
-    void setSubsequenceCfg(uint8_t index, TransformedParameters&& cfg);
+    void setSubsequenceCfg(uint8_t index, TransformedParameters &&cfg);
 
     const Subsequence &getSubsequenceCfg(uint8_t index) const;
 
@@ -65,9 +65,9 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
 
     explicit DecoderRegular(util::BitReader &reader);
 
-    void setSubsequenceCfg(uint8_t index, TransformedParameters&& cfg);
+    void setSubsequenceCfg(uint8_t index, TransformedParameters &&cfg);
 
-    const Subsequence& getSubsequenceCfg(uint8_t index) const;
+    const Subsequence &getSubsequenceCfg(uint8_t index) const;
 
     std::unique_ptr<core::parameter::desc_pres::Decoder> clone() const override;
 

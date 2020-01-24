@@ -87,13 +87,11 @@ void DescriptorBox::set(std::unique_ptr<Descriptor> conf) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const Descriptor* DescriptorBox::get() const { return descriptor_configurations.front().get(); }
+const Descriptor& DescriptorBox::get() const { return *descriptor_configurations.front(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const Descriptor* DescriptorBox::getClassSpecific(uint8_t index) const {
-    return descriptor_configurations[index].get();
-}
+const Descriptor& DescriptorBox::getClassSpecific(uint8_t index) const { return *descriptor_configurations[index]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

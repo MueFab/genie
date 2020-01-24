@@ -23,7 +23,6 @@ namespace mgb {
 
 class RawReference : public core::parameter::DataUnit {
    private:
-
     std::vector<RawReferenceSequence> seqs;
 
    public:
@@ -33,7 +32,7 @@ class RawReference : public core::parameter::DataUnit {
 
     void addSequence(RawReferenceSequence&& ref);
 
-    void write(util::BitWriter &writer) const override;
+    void write(util::BitWriter& writer) const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
