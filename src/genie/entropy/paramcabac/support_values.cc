@@ -39,9 +39,9 @@ SupportValues::SupportValues() : SupportValues(0, 0, 0, TransformIdSubsym::NO_TR
 // ---------------------------------------------------------------------------------------------------------------------
 
 SupportValues::SupportValues(TransformIdSubsym transformIdSubsym, util::BitReader &reader) {
-    output_symbol_size = reader.read(6);
-    coding_subsym_size = reader.read(6);
-    coding_order = reader.read(2);
+    output_symbol_size = reader.read<uint8_t>(6);
+    coding_subsym_size = reader.read<uint8_t>(6);
+    coding_order = reader.read<uint8_t>(2);
     if (coding_subsym_size < output_symbol_size && coding_order > 0) {
         if (transformIdSubsym == TransformIdSubsym::LUT_TRANSFORM) {
             share_subsym_lut_flag = util::make_unique<bool>(reader.read(1));

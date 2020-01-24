@@ -22,7 +22,7 @@ const core::parameter::ParameterSet& DataUnitFactory::getParams(size_t id) const
 std::unique_ptr<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
     core::parameter::DataUnit::DataUnitType type;
     do {
-        type = core::parameter::DataUnit::DataUnitType(bitReader.read(8));
+        type = bitReader.read<core::parameter::DataUnit::DataUnitType>();
         if (!bitReader.isGood()) {
             return nullptr;
         }
@@ -40,7 +40,9 @@ std::unique_ptr<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                 std::cout << "Decompressing AU " << ret->getID() << "..." << std::endl;
                 return ret;
             }
-            default: { UTILS_DIE("DataUnitFactory invalid DataUnitType!"); }
+            default: {
+                UTILS_DIE("DataUnitFactory invalid DataUnitType!");
+            }
         }
     } while (type != core::parameter::DataUnit::DataUnitType::ACCESS_UNIT);
     return std::unique_ptr<AccessUnit>();

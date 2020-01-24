@@ -31,8 +31,8 @@ MmCfg::MmCfg() : mm_threshold(0), mm_count(0) {}
 // ---------------------------------------------------------------------------------------------------------------------
 
 MmCfg::MmCfg(util::BitReader &reader) {
-    mm_threshold = reader.read(16);
-    mm_count = reader.read(32);
+    mm_threshold = reader.read<uint16_t>();
+    mm_count = reader.read<uint32_t>();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

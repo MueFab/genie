@@ -21,7 +21,6 @@ namespace genie {
 namespace core {
 namespace parameter {
 
-
 class QualityValues {
    public:
     virtual void write(util::BitWriter &writer) const = 0;
@@ -31,6 +30,10 @@ class QualityValues {
     QualityValues(uint8_t _qv_coding_mode, bool _qv_reverse_flag);
 
     virtual std::unique_ptr<QualityValues> clone() const = 0;
+
+    uint8_t getMode() const;
+
+    virtual size_t getNumSubsequences() const = 0;
 
    protected:
     uint8_t qv_coding_mode;

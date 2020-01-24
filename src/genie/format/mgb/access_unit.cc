@@ -23,14 +23,14 @@ namespace mgb {
 AccessUnit::AccessUnit(const std::map<size_t, std::unique_ptr<core::parameter::ParameterSet>> &parameterSets,
                        util::BitReader &bitReader)
     : DataUnit(DataUnitType::ACCESS_UNIT) {
-    reserved = bitReader.read(3);
+    bitReader.read(3);
     bitReader.read(29);
 
-    access_unit_ID = bitReader.read(32);
-    num_blocks = bitReader.read(8);
-    parameter_set_ID = bitReader.read(8);
-    au_type = core::record::ClassType(bitReader.read(4));
-    reads_count = bitReader.read(32);
+    access_unit_ID = bitReader.read<uint32_t>();
+    num_blocks = bitReader.read<uint8_t>();
+    parameter_set_ID = bitReader.read<uint8_t>();
+    au_type = bitReader.read<core::record::ClassType>(4);
+    reads_count = bitReader.read<uint32_t>();
     if (au_type == core::record::ClassType::CLASS_N || au_type == core::record::ClassType::CLASS_M) {
         this->mm_cfg = util::make_unique<MmCfg>(bitReader);
     }
@@ -52,7 +52,7 @@ AccessUnit::AccessUnit(const std::map<size_t, std::unique_ptr<core::parameter::P
     bitReader.flush();
 
     for (size_t i = 0; i < num_blocks; ++i) {
-        blocks.emplace_back(bitReader);
+        blocks.emplace_back(parameterSets.at(parameter_set_ID)->getQVConfig(au_type).getNumSubsequences(), bitReader);
     }
 }
 
@@ -62,7 +62,6 @@ AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core
                        uint32_t _reads_count, DatasetType dataset_type, uint8_t posSize, uint8_t signatureSize,
                        uint32_t multiple_signature_base)
     : DataUnit(DataUnitType::ACCESS_UNIT),
-      reserved(0),
       access_unit_ID(_access_unit_ID),
       num_blocks(0),
       parameter_set_ID(_parameter_set_ID),
@@ -148,7 +147,7 @@ uint32_t AccessUnit::getReadCount() const { return reads_count; }
 
 void AccessUnit::write(util::BitWriter &writer) const {
     DataUnit::write(writer);
-    writer.write(reserved, 3);
+    writer.write(0, 3);
 
     // Calculate size and write structure to tmp buffer
     std::stringstream ss;

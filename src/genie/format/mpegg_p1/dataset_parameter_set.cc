@@ -10,7 +10,6 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 DatasetParameterSet::DatasetParameterSet(const core::parameter::ParameterSet& parameterSet) {
-
     parameterSet_p2 = util::make_unique<core::parameter::ParameterSet>(parameterSet);
 
     // TODO: add dataset_group_ID and dataset_ID

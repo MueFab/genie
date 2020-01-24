@@ -39,9 +39,9 @@ AuTypeCfg::AuTypeCfg(uint8_t _posSize) : AuTypeCfg(0, 0, 0, _posSize) {}
 // ---------------------------------------------------------------------------------------------------------------------
 
 AuTypeCfg::AuTypeCfg(uint8_t _posSize, bool multiple_alignments, util::BitReader &reader) : posSize(_posSize) {
-    sequence_ID = reader.read(16);
-    AU_start_position = reader.read(posSize);
-    AU_end_position = reader.read(posSize);
+    sequence_ID = reader.read<uint16_t >();
+    AU_start_position = reader.read<uint64_t >(posSize);
+    AU_end_position = reader.read<uint64_t>(posSize);
     if (multiple_alignments) {
         extended_AU = util::make_unique<ExtendedAu>(_posSize, reader);
     }

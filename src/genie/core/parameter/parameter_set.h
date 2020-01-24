@@ -28,7 +28,6 @@ namespace genie {
 namespace core {
 namespace parameter {
 
-
 class ParameterSet : public DataUnit {
    public:
     explicit ParameterSet(util::BitReader &bitReader);
@@ -47,7 +46,7 @@ class ParameterSet : public DataUnit {
 
     void addClass(record::ClassType class_id, std::unique_ptr<QualityValues> conf);
 
-    void setDescriptor(GenDesc index, DescriptorBox&& descriptor);
+    void setDescriptor(GenDesc index, DescriptorBox &&descriptor);
 
     const DescriptorBox &getDescriptor(GenDesc index) const;
 
@@ -77,13 +76,13 @@ class ParameterSet : public DataUnit {
 
     ParameterSet(ParameterSet &&other) noexcept;
 
+    const QualityValues &getQVConfig(record::ClassType type) const;
+
    private:
     void preWrite(util::BitWriter &writer) const;
 
-
     uint8_t parameter_set_ID;
     uint8_t parent_parameter_set_ID;
-
 
     DatasetType dataset_type;
     AlphabetID alphabet_ID;
@@ -96,13 +95,12 @@ class ParameterSet : public DataUnit {
     std::vector<record::ClassType> class_IDs;
     std::vector<DescriptorBox> descriptors;
     std::vector<std::string> rgroup_IDs;
-    bool multiple_alignments_flag ;
+    bool multiple_alignments_flag;
     bool spliced_reads_flag;
     uint32_t multiple_signature_base;
-    std::unique_ptr<uint8_t> u_signature_size; // Todo: std::optional
+    std::unique_ptr<uint8_t> u_signature_size;  // Todo: std::optional
     std::vector<std::unique_ptr<QualityValues>> qv_coding_configs;
-    std::unique_ptr<ComputedRef> parameter_set_crps; // TODO: std::optional
-
+    std::unique_ptr<ComputedRef> parameter_set_crps;  // TODO: std::optional
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -26,10 +26,10 @@ ComputedRef::ComputedRef(Algorithm _cr_alg_ID) : cr_alg_ID(_cr_alg_ID) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ComputedRef::ComputedRef(util::BitReader &reader) {
-    cr_alg_ID = Algorithm(reader.read(8));
+    cr_alg_ID = Algorithm(reader.read<uint8_t>());
     if (cr_alg_ID == Algorithm::PUSH_IN || cr_alg_ID == Algorithm::LOCAL_ASSEMBLY) {
-        auto pad = reader.read(8);
-        auto buffer = reader.read(24);
+        auto pad = reader.read<uint8_t>();
+        auto buffer = reader.read<uint32_t>(24);
         extension = util::make_unique<ComputedRefExtended>(pad, buffer);
     }
 }

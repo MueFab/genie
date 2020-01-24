@@ -5,7 +5,9 @@
  */
 
 #include "decoder.h"
+#include <genie/core/global-cfg.h>
 #include <genie/read/basecoder/decoder.h>
+#include <sstream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,8 +23,12 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, size_t id) {
     size_t segments = t.getParameters().getNumberTemplateSegments();
     uint16_t ref = t.getReference();
     LocalReference refEncoder(bufSize);
-    basecoder::Decoder decoder(std::move(t), segments);
+    std::stringstream str;
+    util::BitReader reader(str);
+    auto qvdecoder = core::GlobalCfg::getSingleton().getIndustrialPark().construct<core::QVDecoder>(
+        t.getParameters().getQVConfig(core::record::ClassType::CLASS_I).getMode(), reader);
     core::record::Chunk chunk;
+    basecoder::Decoder decoder(std::move(t), segments);
     for (size_t recID = 0; recID < numRecords; ++recID) {
         auto meta = decoder.readSegmentMeta();
         std::vector<std::string> refs;
@@ -30,7 +36,7 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, size_t id) {
         for (const auto& m : meta) {
             refs.emplace_back(refEncoder.getReference(m.position, m.length));
         }
-        auto rec = decoder.pull(ref, std::move(refs));
+        auto rec = decoder.pull(ref, *qvdecoder, std::move(refs));
         refEncoder.addRead(rec);
         chunk.emplace_back(std::move(rec));
     }

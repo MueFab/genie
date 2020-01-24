@@ -30,7 +30,7 @@ void AlignmentSplit::write(util::BitWriter &writer) const { writer.write(uint8_t
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<AlignmentSplit> AlignmentSplit::factory(uint8_t as_depth, util::BitReader &reader) {
-    auto type = Type(reader.read(8));
+    auto type = reader.read<Type>();
     switch (type) {
         case Type::SAME_REC:
             return util::make_unique<alignment_split::SameRec>(as_depth, reader);

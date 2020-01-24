@@ -65,7 +65,7 @@ Record::Record(util::BitReader &reader) {
     }
     std::vector<uint32_t> readSizes(reads.size());
     for (auto &a : readSizes) {
-        a = uint32_t(reader.read(24));
+        a = reader.read<uint32_t >(24);
     }
     qv_depth = reader.read<uint8_t>();
     read_name.resize(reader.read<uint8_t>());
@@ -240,6 +240,18 @@ ClassType Record::getClassID() const { return class_ID; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::string &Record::getName() const { return read_name; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::string &Record::getGroup() const { return read_group; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const AlignmentSharedData &Record::getAlignmentSharedData() const { return sharedAlignmentInfo; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const AlignmentExternal &Record::getAlignmentExternal() const { return *moreAlignmentInfo; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

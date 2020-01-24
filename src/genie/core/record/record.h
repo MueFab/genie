@@ -165,11 +165,11 @@ class Record {
      *
      * @return
      */
-    const std::string& getGroup() const { return read_group; }
+    const std::string& getGroup() const;
 
-    const AlignmentSharedData& getAlignmentSharedData() const { return sharedAlignmentInfo; }
+    const AlignmentSharedData& getAlignmentSharedData() const;
 
-    const AlignmentExternal& getAlignmentExternal() const { return *moreAlignmentInfo; }
+    const AlignmentExternal& getAlignmentExternal() const;
 };
 
 /**

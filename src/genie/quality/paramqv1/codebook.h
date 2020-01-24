@@ -9,8 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitwriter.h>
 #include <genie/util/bitreader.h>
+#include <genie/util/bitwriter.h>
 #include <cstdint>
 #include <vector>
 
@@ -39,9 +39,7 @@ class Codebook {
 
     void addEntry(uint8_t entry);
 
-    const std::vector<uint8_t>& getEntries() const {
-        return qv_recon;
-    }
+    const std::vector<uint8_t> &getEntries() const { return qv_recon; }
 
     virtual void write(util::BitWriter &writer) const;
 };

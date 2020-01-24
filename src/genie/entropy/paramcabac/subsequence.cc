@@ -48,7 +48,7 @@ Subsequence::Subsequence(std::unique_ptr<TransformedParameters> _transform_subse
 
 Subsequence::Subsequence(bool tokentype, util::BitReader& reader) {
     if (!tokentype) {
-        descriptor_subsequence_ID = util::make_unique<uint16_t>(reader.read(10));
+        descriptor_subsequence_ID = util::make_unique<uint16_t>(reader.read<uint16_t>(10));
     }
     transform_subseq_parameters = util::make_unique<TransformedParameters>(reader);
     uint8_t numSubseq = 0;

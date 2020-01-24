@@ -26,8 +26,8 @@ namespace desc_pres {
 class DescriptorPresent : public Descriptor {
    private:
     std::unique_ptr<Decoder> decoder_configuration;
-   public:
 
+   public:
     static constexpr int8_t PRESENT = 0;
 
     explicit DescriptorPresent();

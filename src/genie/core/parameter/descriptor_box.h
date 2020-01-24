@@ -25,30 +25,13 @@ class DescriptorBox {
    public:
     DescriptorBox();
 
-    DescriptorBox(const DescriptorBox& box) : class_specific_dec_cfg_flag(false){
-        *this = box;
-    }
+    DescriptorBox(const DescriptorBox& box);
 
-    DescriptorBox(DescriptorBox&& box) noexcept : class_specific_dec_cfg_flag(false) {
-        *this = std::move(box);
-    }
+    DescriptorBox(DescriptorBox&& box) noexcept;
 
-    DescriptorBox& operator=(const DescriptorBox& box) {
-        if(this == &box) {
-            return *this;
-        }
-        class_specific_dec_cfg_flag = box.class_specific_dec_cfg_flag;
-        for(const auto& b : box.descriptor_configurations) {
-            descriptor_configurations.emplace_back(b->clone());
-        }
-        return *this;
-    }
+    DescriptorBox& operator=(const DescriptorBox& box);
 
-    DescriptorBox& operator=(DescriptorBox&& box) noexcept {
-        class_specific_dec_cfg_flag = box.class_specific_dec_cfg_flag;
-        descriptor_configurations = std::move(box.descriptor_configurations);
-        return *this;
-    }
+    DescriptorBox& operator=(DescriptorBox&& box) noexcept;
 
     DescriptorBox(size_t num_classes, GenDesc desc, util::BitReader& reader);
 

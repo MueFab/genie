@@ -15,15 +15,13 @@ namespace paramqv1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::addCodeBook(Codebook &&book) {
-    qv_codebooks.emplace_back(std::move(book));
-}
+void ParameterSet::addCodeBook(Codebook &&book) { qv_codebooks.emplace_back(std::move(book)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ParameterSet::write(util::BitWriter &writer) const {
     writer.write(qv_codebooks.size(), 4);
-    for(const auto& q : qv_codebooks) {
+    for (const auto &q : qv_codebooks) {
         q.write(writer);
     }
 }

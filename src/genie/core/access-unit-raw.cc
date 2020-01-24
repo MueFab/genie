@@ -124,7 +124,7 @@ uint64_t AccessUnitRaw::pull(GenSubIndex sub) { return get(sub).pull(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnitRaw::AccessUnitRaw(parameter::ParameterSet &&set, size_t _numRecords)
-    : descriptors(), parameters(std::move(set)), numRecords(_numRecords) {
+    : descriptors(), parameters(std::move(set)), numRecords(_numRecords), minPos(0), maxPos(0), referenceSequence(0) {
     const size_t WORDSIZE = 4;
     for (const auto &desc : getDescriptors()) {
         Descriptor desc_data(desc.id);

@@ -36,9 +36,9 @@ RefCfg::RefCfg(uint8_t _posSize) : RefCfg(0, 0, 0, _posSize) {}
 // ---------------------------------------------------------------------------------------------------------------------
 
 RefCfg::RefCfg(uint8_t _posSize, util::BitReader &reader) : posSize(_posSize) {
-    ref_sequence_ID = reader.read(16);
-    ref_start_position = reader.read(posSize);
-    ref_end_position = reader.read(posSize);
+    ref_sequence_ID = reader.read<uint16_t>();
+    ref_start_position = reader.read<uint64_t >(posSize);
+    ref_end_position = reader.read<uint64_t >(posSize);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

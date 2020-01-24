@@ -6,7 +6,7 @@
 
 #include <stdexcept>
 #include <string>
-#include "encoder.h"
+#include "null-encoder.h"
 #include "reorder.h"
 #include "util.h"
 

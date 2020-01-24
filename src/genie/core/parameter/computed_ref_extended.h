@@ -20,11 +20,11 @@ namespace genie {
 namespace core {
 namespace parameter {
 
-
 class ComputedRefExtended {
    private:
     uint8_t cr_pad_size;
     uint32_t cr_buf_max_size;
+
    public:
     ComputedRefExtended(uint8_t cr_pad_size, uint32_t cr_buf_max_size);
 

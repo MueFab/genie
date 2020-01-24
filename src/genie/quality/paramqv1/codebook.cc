@@ -15,10 +15,10 @@ namespace genie {
 namespace quality {
 namespace paramqv1 {
 
-Codebook::Codebook(util::BitReader &reader) {
-    qv_recon.resize(reader.read<uint8_t >());
-    for(auto& v : qv_recon) {
-        v = reader.read<uint8_t >();
+Codebook::Codebook(util::BitReader& reader) {
+    qv_recon.resize(reader.read<uint8_t>());
+    for (auto& v : qv_recon) {
+        v = reader.read<uint8_t>();
     }
 }
 
@@ -32,9 +32,9 @@ void Codebook::addEntry(uint8_t entry) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Codebook::write(util::BitWriter &writer) const {
+void Codebook::write(util::BitWriter& writer) const {
     writer.write(qv_recon.size(), 8);
-    for(const auto& v : qv_recon) {
+    for (const auto& v : qv_recon) {
         writer.write(v, 8);
     }
 }

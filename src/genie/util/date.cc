@@ -90,7 +90,7 @@ bool Date::leapYear() const {
 Date Date::fromString(const std::string& string) {
     auto date_time = tokenize(string, 'T');
     auto date = tokenize(date_time.front(), '-');
-        UTILS_DIE_IF(date.size() != 3, "Invalid date");
+    UTILS_DIE_IF(date.size() != 3, "Invalid date");
     if (date_time.size() == 1) {
         return Date(std::stoi(date[0]), std::stoi(date[1]), std::stoi(date[2]));
     } else if (date_time.size() == 2) {

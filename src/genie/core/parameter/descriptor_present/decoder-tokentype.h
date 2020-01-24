@@ -11,7 +11,7 @@ namespace desc_pres {
 class DecoderTokentype : public Decoder {
    public:
     explicit DecoderTokentype(uint8_t _encoding_mode_id) : Decoder(_encoding_mode_id) {}
-    virtual ~DecoderTokentype() = default;
+    ~DecoderTokentype() override = default;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
