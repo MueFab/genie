@@ -16,7 +16,7 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ExtendedAu::write(util::BitWriter& writer) const{
+void ExtendedAu::write(util::BitWriter& writer) const {
     writer.write(extended_AU_start_position, posSize);
     writer.write(extended_AU_end_position, posSize);
 }

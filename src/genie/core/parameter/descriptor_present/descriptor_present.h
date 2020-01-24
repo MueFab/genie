@@ -40,7 +40,7 @@ class DescriptorPresent : public Descriptor {
 
     void setDecoder(std::unique_ptr<Decoder> conf);
 
-    const Decoder *getDecoder() const;
+    const Decoder &getDecoder() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

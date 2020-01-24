@@ -30,7 +30,7 @@ class RawReferenceSequence {
     std::string ref_sequence;  //!< Line 7
 
    public:
-    RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_start, std::string&& _ref_sequence);
+    RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_start, std::string &&_ref_sequence);
 
     virtual ~RawReferenceSequence() = default;
 

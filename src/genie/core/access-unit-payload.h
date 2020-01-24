@@ -104,13 +104,13 @@ class AccessUnitPayload {
          */
         bool isEmpty() const;
 
-        /**
-         * @brief
-         * @return
-         */
-        std::vector<TransformedPayload>& getTransformedPayloads();
+        TransformedPayload* begin() { return &transformedPayloads.front(); }
 
-        TransformedPayload& getTransformedPayload(size_t index);
+        TransformedPayload* end() { return &transformedPayloads.back() + 1; }
+
+        const TransformedPayload* begin() const { return &transformedPayloads.front(); }
+
+        const TransformedPayload* end() const { return &transformedPayloads.back() + 1; }
     };
 
     /**
@@ -156,11 +156,13 @@ class AccessUnitPayload {
          */
         bool isEmpty() const;
 
-        /**
-         * @brief
-         * @return
-         */
-        std::vector<SubsequencePayload>& getSubsequencePayloads();
+        SubsequencePayload* begin() { return &subsequencePayloads.front(); }
+
+        SubsequencePayload* end() { return &subsequencePayloads.back() + 1; }
+
+        const SubsequencePayload* begin() const { return &subsequencePayloads.front(); }
+
+        const SubsequencePayload* end() const { return &subsequencePayloads.back() + 1; }
     };
 
     /**
@@ -215,12 +217,6 @@ class AccessUnitPayload {
      */
     parameter::ParameterSet&& moveParameters();
 
-    /**
-     * @brief
-     * @return
-     */
-    std::vector<DescriptorPayload>& getPayloads();
-
     void clear();
 
     uint16_t getReference() const;
@@ -236,6 +232,14 @@ class AccessUnitPayload {
     uint64_t getMinPos() const;
 
     void setRecordNum(size_t num);
+
+    DescriptorPayload* begin() { return &desc_pay.front(); }
+
+    DescriptorPayload* end() { return &desc_pay.back() + 1; }
+
+    const DescriptorPayload* begin() const { return &desc_pay.front(); }
+
+    const DescriptorPayload* end() const { return &desc_pay.back() + 1; }
 
    private:
     std::vector<DescriptorPayload> desc_pay;  //!< @brief

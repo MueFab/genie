@@ -28,8 +28,8 @@ class TransformedSeq {
    public:
     TransformedSeq();
 
-    TransformedSeq(SupportValues::TransformIdSubsym _transform_ID_subsym,
-                   SupportValues&& _support_values, Binarization&& _cabac_binarization);
+    TransformedSeq(SupportValues::TransformIdSubsym _transform_ID_subsym, SupportValues&& _support_values,
+                   Binarization&& _cabac_binarization);
 
     TransformedSeq(util::BitReader& reader);
 
@@ -45,8 +45,8 @@ class TransformedSeq {
 
    private:
     SupportValues::TransformIdSubsym transform_ID_subsym;  //!< : 3; Line 9
-    SupportValues support_values;         //!< Line 10
-    Binarization cabac_binarization;      //!< Line 11
+    SupportValues support_values;                          //!< Line 10
+    Binarization cabac_binarization;                       //!< Line 11
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

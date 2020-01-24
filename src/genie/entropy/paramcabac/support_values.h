@@ -12,8 +12,8 @@
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 #include <genie/util/make-unique.h>
-#include <memory>
 #include <boost/optional/optional.hpp>
+#include <memory>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -31,6 +31,7 @@ class SupportValues {
     uint8_t coding_order;
     boost::optional<bool> share_subsym_lut_flag;
     boost::optional<bool> share_subsym_prv_flag;
+
    public:
     enum class TransformIdSubsym : uint8_t { NO_TRANSFORM = 0, LUT_TRANSFORM = 1, DIFF_CODING = 2 };
 

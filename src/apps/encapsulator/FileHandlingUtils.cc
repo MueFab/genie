@@ -125,7 +125,9 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
     auto dataUnitFactory = genie::format::mgb::DataUnitFactory();
     while (true) {
         auto au = dataUnitFactory.read(inputFileBitReader);
-        if (!au) { break; }
+        if (!au) {
+            break;
+        }
         accessUnits.push_back(std::move(au.get()));
     }
 

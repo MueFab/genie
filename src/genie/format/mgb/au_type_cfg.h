@@ -40,7 +40,7 @@ class AuTypeCfg {
     AuTypeCfg(uint8_t _posSize, bool multiple_alignments, util::BitReader &reader);
     virtual ~AuTypeCfg() = default;
 
-    void setExtendedAu(ExtendedAu&& _extended_AU);
+    void setExtendedAu(ExtendedAu &&_extended_AU);
 
     uint16_t getRefID() const;
 

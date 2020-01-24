@@ -18,7 +18,7 @@ namespace mgb {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Block::Block(uint8_t _descriptor_ID, core::AccessUnitPayload::DescriptorPayload _payload)
-    :  descriptor_ID(_descriptor_ID), payload(std::move(_payload)) {}
+    : descriptor_ID(_descriptor_ID), payload(std::move(_payload)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

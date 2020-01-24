@@ -29,10 +29,10 @@ TransformedParameters::TransformedParameters(util::BitReader &reader) {
         case TransformIdSubseq::EQUALITY_CODING:
             break;
         case TransformIdSubseq::MATCH_CODING:
-            match_coding_buffer_size = reader.read<uint16_t >();
+            match_coding_buffer_size = reader.read<uint16_t>();
             break;
         case TransformIdSubseq::RLE_CODING:
-            rle_coding_guard = reader.read<uint8_t >();
+            rle_coding_guard = reader.read<uint8_t>();
             break;
         case TransformIdSubseq::MERGE_CODING:
             UTILS_DIE("Merge core not supported");

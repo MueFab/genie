@@ -42,8 +42,7 @@ class GabacSeqConfSet {
      * @param gabac_configuration Input gabac config
      * @return Newly created transform parameter object
      */
-    static TransformSubseqParameters storeTransParams(
-        const gabac::EncodingConfiguration& gabac_configuration);
+    static TransformSubseqParameters storeTransParams(const gabac::EncodingConfiguration& gabac_configuration);
 
     /**
      * @brief Convert gabac::TransformedSequenceConfiguration to
@@ -59,8 +58,7 @@ class GabacSeqConfSet {
      * @param tSeqConf Input gabac config
      * @return Newly created MPEG-G Binarization object
      */
-    static CabacBinarization storeBinarization(
-        const gabac::TransformedSequenceConfiguration& tSeqConf);
+    static CabacBinarization storeBinarization(const gabac::TransformedSequenceConfiguration& tSeqConf);
 
     /**
      * @brief Convert gabac::EncodingConfiguration to mgb::desc_conf_pres::paramcabac::DescriptorSubsequenceCfg.

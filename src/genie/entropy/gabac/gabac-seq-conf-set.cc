@@ -84,7 +84,7 @@ GabacSeqConfSet::CabacBinarization GabacSeqConfSet::storeBinarization(
     using namespace entropy::paramcabac;
 
     auto bin_ID = BinarizationParameters::BinarizationId(tSeqConf.binarizationId);
-    auto bin_params =BinarizationParameters(bin_ID, tSeqConf.binarizationParameters[0]);
+    auto bin_params = BinarizationParameters(bin_ID, tSeqConf.binarizationParameters[0]);
     auto binarization = Binarization(bin_ID, std::move(bin_params));
 
     // Additional parameter for context adaptive modes
@@ -109,7 +109,7 @@ void GabacSeqConfSet::storeSubseq(const gabac::EncodingConfiguration &gabac_conf
 
         auto transform = storeTransform(tSeqConf);
         auto binarization = storeBinarization(tSeqConf);
-        auto supp_vals =SupportValues(size, size, 0, transform);
+        auto supp_vals = SupportValues(size, size, 0, transform);
         auto subcfg = TransformedSeq(transform, std::move(supp_vals), std::move(binarization));
         sub_conf.setTransformSubseqCfg(trans_seq_id, std::move(subcfg));
         ++trans_seq_id;
@@ -150,13 +150,13 @@ const GabacSeqConfSet::DecoderConfigurationCabac &GabacSeqConfSet::loadDescripto
     auto &curDesc = parameterSet.getDescriptor(descriptor_id);
     UTILS_DIE_IF(curDesc.isClassSpecific(), "Class specific config not supported");
     auto PRESENT = core::parameter::desc_pres::DescriptorPresent::PRESENT;
-    auto base_conf = curDesc.get();
-    UTILS_DIE_IF(base_conf->getPreset() != PRESENT, "Config not present");
-    auto decoder_conf =
-        reinterpret_cast<const core::parameter::desc_pres::DescriptorPresent &>(*base_conf).getDecoder();
-    UTILS_DIE_IF(decoder_conf->getMode() != paramcabac::DecoderRegular::MODE_CABAC, "Config is not paramcabac");
+    auto &base_conf = curDesc.get();
+    UTILS_DIE_IF(base_conf.getPreset() != PRESENT, "Config not present");
+    auto &decoder_conf =
+        reinterpret_cast<const core::parameter::desc_pres::DescriptorPresent &>(base_conf).getDecoder();
+    UTILS_DIE_IF(decoder_conf.getMode() != paramcabac::DecoderRegular::MODE_CABAC, "Config is not paramcabac");
 
-    return reinterpret_cast<const DecoderRegular &>(*decoder_conf);
+    return reinterpret_cast<const DecoderRegular &>(decoder_conf);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

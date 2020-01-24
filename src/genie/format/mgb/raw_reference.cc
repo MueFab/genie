@@ -22,7 +22,7 @@ RawReference::RawReference() : DataUnit(DataUnitType::RAW_REFERENCE), seqs() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void RawReference::addSequence(RawReferenceSequence&& ref) {
+void RawReference::addSequence(RawReferenceSequence &&ref) {
     for (const auto &a : seqs) {
         if (!a.isIdUnique(ref)) {
             UTILS_THROW_RUNTIME_EXCEPTION("Reference ID is not unique");

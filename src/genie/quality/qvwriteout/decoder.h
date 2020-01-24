@@ -14,13 +14,13 @@ class Decoder : public core::QVDecoder {
                        core::AccessUnitRaw::Descriptor& desc) override {
         std::string qv;
         const auto& param_casted = dynamic_cast<const quality::paramqv1::QualityValues1&>(param);
-        if (!desc.getSubsequence(0).end() && !desc.getSubsequence(0).pull()) {
+        if (!desc.get(0).end() && !desc.get(0).pull()) {
             return qv;
         }
         qv.resize(length);
         for (auto& q : qv) {
-            uint8_t codebook = desc.getSubsequence(1).end() ? 0 : desc.getSubsequence(1).pull();
-            uint8_t index = desc.getSubsequence(codebook + 2).pull();
+            uint8_t codebook = desc.get(1).end() ? 0 : desc.get(1).pull();
+            uint8_t index = desc.get(codebook + 2).pull();
             q = param_casted.getCodebook(codebook).getEntries()[index];
         }
         return qv;

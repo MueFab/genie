@@ -39,8 +39,8 @@ class DescriptorBox {
 
     void setClassSpecific(uint8_t index, std::unique_ptr<Descriptor> conf);  //!< For class specific config
     void set(std::unique_ptr<Descriptor> conf);                              //!< For non-class-specific config
-    const Descriptor* get() const;
-    const Descriptor* getClassSpecific(uint8_t index) const;
+    const Descriptor& get() const;
+    const Descriptor& getClassSpecific(uint8_t index) const;
     void enableClassSpecific(uint8_t numClasses);  //!< Unlocks class specific config
     bool isClassSpecific() const;
 

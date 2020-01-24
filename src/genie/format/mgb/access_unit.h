@@ -30,7 +30,6 @@ namespace genie {
 namespace format {
 namespace mgb {
 
-
 class AccessUnit : public core::parameter::DataUnit {
    public:
     explicit AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &parameterSets,
@@ -44,13 +43,13 @@ class AccessUnit : public core::parameter::DataUnit {
 
     void addBlock(Block block);
 
-    void setMmCfg(MmCfg&& cfg);
+    void setMmCfg(MmCfg &&cfg);
 
-    void setRefCfg(RefCfg&& cfg);
+    void setRefCfg(RefCfg &&cfg);
 
-    void setAuTypeCfg(AuTypeCfg&& cfg);
+    void setAuTypeCfg(AuTypeCfg &&cfg);
 
-    void setSignatureCfg(SignatureCfg&& cfg);
+    void setSignatureCfg(SignatureCfg &&cfg);
 
     std::vector<Block> getBlocks() const;
 
@@ -64,7 +63,6 @@ class AccessUnit : public core::parameter::DataUnit {
 
    private:
     void preWrite(util::BitWriter &writer) const;
-
 
     uint32_t access_unit_ID;
     uint8_t num_blocks;

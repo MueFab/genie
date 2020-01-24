@@ -95,16 +95,12 @@ class AccessUnitRaw {
        public:
         /**
          * @brief
-         * @return
-         */
-        const std::vector<Subsequence>& getSubsequences() const;
-
-        /**
-         * @brief
          * @param sub
          * @return
          */
-        Subsequence& getSubsequence(uint8_t sub);
+        Subsequence& get(uint8_t sub);
+
+        const Subsequence& get(uint8_t sub) const { return subdesc[sub]; }
 
         /**
          * @brief
@@ -130,6 +126,14 @@ class AccessUnitRaw {
          * @param _id
          */
         explicit Descriptor(GenDesc _id);
+
+        Subsequence* begin() { return &subdesc.front(); }
+
+        Subsequence* end() { return &subdesc.back() + 1; }
+
+        const Subsequence* begin() const { return &subdesc.front(); }
+
+        const Subsequence* end() const { return &subdesc.back() + 1; }
     };
 
     /**
@@ -148,15 +152,8 @@ class AccessUnitRaw {
      */
     Subsequence& get(GenSubIndex sub);
 
-    /**
-     * @brief
-     * @param desc
-     * @param sub
-     * @return
-     */
-    Subsequence& get(GenDesc desc, uint8_t sub);
-
     Descriptor& get(GenDesc desc) { return descriptors[uint8_t(desc)]; }
+    const Descriptor& get(GenDesc desc) const { return descriptors[uint8_t(desc)]; }
 
     /**
      * @brief
@@ -183,12 +180,6 @@ class AccessUnitRaw {
      * @return
      */
     uint64_t pull(GenSubIndex sub);
-
-    /**
-     * @brief
-     * @return
-     */
-    const std::vector<Descriptor>& getDescriptorStreams() const;
 
     /**
      * @brief
@@ -241,6 +232,14 @@ class AccessUnitRaw {
     uint64_t getMaxPos() const;
 
     uint64_t getMinPos() const;
+
+    Descriptor* begin() { return &descriptors.front(); }
+
+    Descriptor* end() { return &descriptors.back() + 1; }
+
+    const Descriptor* begin() const { return &descriptors.front(); }
+
+    const Descriptor* end() const { return &descriptors.back() + 1; }
 
    private:
     std::vector<Descriptor> descriptors;  //!< @brief

@@ -20,7 +20,6 @@ namespace genie {
 namespace format {
 namespace mgb {
 
-
 class Block {
    private:
     uint8_t descriptor_ID;

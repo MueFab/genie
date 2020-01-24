@@ -16,17 +16,17 @@ TEST(GabacCompressor, NonEmpty) {  // NOLINT(cert-err58-cpp)
 
             // Example how to iterate BlockPayloadSet. Gabac compressor generates at least one transformed payload for
             // every Subsequence that contained data.
-            for (auto& payload : data.getPayloads()) {
+            for (auto& payload : data) {
                 if (payload.isEmpty()) {
                     continue;
                 }
                 std::cout << "Descriptor " << getDescriptor(payload.getID()).name << ":" << std::endl;
-                for (auto& subseqpayload : payload.getSubsequencePayloads()) {
+                for (auto& subseqpayload : payload) {
                     if (subseqpayload.isEmpty()) {
                         continue;
                     }
                     std::cout << "\tSubSequence " << getSubsequence(subseqpayload.getID()).name << ":" << std::endl;
-                    for (auto& transformedPayload : subseqpayload.getTransformedPayloads()) {
+                    for (auto& transformedPayload : subseqpayload) {
                         auto dataBlock = transformedPayload.move();  // Extract the data
                         std::cout << "\t\tTransformedSequence " << dataBlock.getRawSize() << " bytes" << std::endl;
                     }

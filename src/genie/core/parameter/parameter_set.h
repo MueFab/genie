@@ -43,7 +43,7 @@ class ParameterSet : public DataUnit {
 
     size_t getNumberTemplateSegments() const;
 
-    void setComputedRef(ComputedRef&& parameter_set_crps);
+    void setComputedRef(ComputedRef &&parameter_set_crps);
 
     void addClass(record::ClassType class_id, std::unique_ptr<QualityValues> conf);
 
@@ -51,7 +51,7 @@ class ParameterSet : public DataUnit {
 
     const DescriptorBox &getDescriptor(GenDesc index) const;
 
-    void addGroup(std::string&& rgroup_id);
+    void addGroup(std::string &&rgroup_id);
 
     void setMultipleSignatureBase(uint32_t _multiple_signature_base, uint8_t _U_signature_size);
 

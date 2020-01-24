@@ -19,7 +19,7 @@ namespace parameter {
 
 ComputedRef::ComputedRef(Algorithm _cr_alg_ID) : cr_alg_ID(_cr_alg_ID) {
     if (cr_alg_ID == Algorithm::PUSH_IN || cr_alg_ID == Algorithm::LOCAL_ASSEMBLY) {
-        extension = ComputedRefExtended();
+        extension = ComputedRefExtended(0, 0);
     }
 }
 
@@ -36,7 +36,7 @@ ComputedRef::ComputedRef(util::BitReader &reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ComputedRef::setExtension(ComputedRefExtended&& _crps_info) {
+void ComputedRef::setExtension(ComputedRefExtended &&_crps_info) {
     if (!extension) {
         UTILS_THROW_RUNTIME_EXCEPTION("Invalid crps mode for crps info");
     }

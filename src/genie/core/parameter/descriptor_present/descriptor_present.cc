@@ -60,7 +60,7 @@ void DescriptorPresent::setDecoder(std::unique_ptr<Decoder> conf) { decoder_conf
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const Decoder *DescriptorPresent::getDecoder() const { return decoder_configuration.get(); }
+const Decoder &DescriptorPresent::getDecoder() const { return *decoder_configuration; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

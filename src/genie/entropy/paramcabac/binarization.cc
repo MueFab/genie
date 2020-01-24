@@ -26,9 +26,8 @@ Binarization::Binarization(BinarizationParameters::BinarizationId _binarization_
 // ---------------------------------------------------------------------------------------------------------------------
 
 Binarization::Binarization()
-    : Binarization(
-          BinarizationParameters::BinarizationId::BINARY_CODING,
-          BinarizationParameters(BinarizationParameters::BinarizationId::BINARY_CODING, 0)) {}
+    : Binarization(BinarizationParameters::BinarizationId::BINARY_CODING,
+                   BinarizationParameters(BinarizationParameters::BinarizationId::BINARY_CODING, 0)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -17,7 +17,7 @@ core::AccessUnitRaw::Subsequence GabacDecompressor::decompress(const gabac::Enco
     core::AccessUnitPayload::SubsequencePayload in = std::move(data);
     // Interface to GABAC library
     std::stringstream in_stream;
-    for (auto& payload : in.getTransformedPayloads()) {
+    for (auto& payload : in) {
         util::DataBlock buffer = payload.move();
 
         uint32_t size = buffer.getRawSize();
@@ -51,11 +51,11 @@ void GabacDecompressor::flowIn(core::AccessUnitPayload&& t, size_t id) {
 
     configSet.loadParameters(raw_aus.getParameters());
 
-    for (auto& desc : payloadSet.getPayloads()) {
+    for (auto& desc : payloadSet) {
         if (desc.isEmpty()) {
             continue;
         }
-        for (auto& subseq : desc.getSubsequencePayloads()) {
+        for (auto& subseq : desc) {
             if (subseq.isEmpty()) {
                 continue;
             }

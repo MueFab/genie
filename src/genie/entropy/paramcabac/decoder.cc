@@ -32,7 +32,7 @@ DecoderRegular::DecoderRegular(util::BitReader &reader) : core::parameter::desc_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DecoderRegular::setSubsequenceCfg(uint8_t index, TransformedParameters&& cfg) {
+void DecoderRegular::setSubsequenceCfg(uint8_t index, TransformedParameters &&cfg) {
     descriptor_subsequence_cfgs[uint8_t(index)] = Subsequence(std::move(cfg), index, false);
 }
 
@@ -79,7 +79,7 @@ DecoderTokenType::DecoderTokenType(util::BitReader &reader) : core::parameter::d
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DecoderTokenType::setSubsequenceCfg(uint8_t index, TransformedParameters&& cfg) {
+void DecoderTokenType::setSubsequenceCfg(uint8_t index, TransformedParameters &&cfg) {
     descriptor_subsequence_cfgs[uint8_t(index)] = Subsequence(std::move(cfg), index, true);
 }
 

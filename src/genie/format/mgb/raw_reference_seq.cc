@@ -16,7 +16,7 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-RawReferenceSequence::RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_start, std::string&& _ref_sequence)
+RawReferenceSequence::RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_start, std::string &&_ref_sequence)
     : sequence_ID(_sequence_ID), seq_start(_seq_start), ref_sequence(std::move(_ref_sequence)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ bool RawReferenceSequence::isIdUnique(const RawReferenceSequence &s) const { ret
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t RawReferenceSequence::getTotalSize() const {
-    uint64_t HEADER_SIZE = (16 + 40 + 40) / 8;          // sequence_ID, seq_start, seq_end
+    uint64_t HEADER_SIZE = (16 + 40 + 40) / 8;         // sequence_ID, seq_start, seq_end
     return (ref_sequence.length() + 1) + HEADER_SIZE;  // Including \0
 }
 
