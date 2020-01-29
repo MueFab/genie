@@ -12,7 +12,6 @@ namespace mpegg_p1 {
 
 Dataset::Dataset(const genie::format::mgb::DataUnitFactory& dataUnitFactory,
                  std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2) {
-
     // TODO multiple params?
     for (unsigned int i = 0;; ++i) {
         try {
