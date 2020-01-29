@@ -1,8 +1,8 @@
 #ifndef GENIE_FILE_HEADER_H
 #define GENIE_FILE_HEADER_H
 
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace genie {
 namespace format {

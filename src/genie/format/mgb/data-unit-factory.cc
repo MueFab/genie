@@ -40,9 +40,7 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                 std::cout << "Decompressing AU " << ret.getID() << "..." << std::endl;
                 return ret;
             }
-            default: {
-                UTILS_DIE("DataUnitFactory invalid DataUnitType!");
-            }
+            default: { UTILS_DIE("DataUnitFactory invalid DataUnitType!"); }
         }
     } while (true);
 }
