@@ -1,6 +1,9 @@
 #ifndef GENIE_FILE_HEADER_H
 #define GENIE_FILE_HEADER_H
+
 #include <vector>
+#include <string>
+
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
@@ -14,7 +17,7 @@ class FileHeader {
      * ------------------------------------------------------------------------------------------------------------- */
     const char* const major_brand = "MPEG-G";
     const char* const minor_brand = "2000";  // FIXME: 19 or 20?
-    std::vector<char[4]> compatible_brand;   // TODO: use std::string?
+    std::vector<std::string> compatible_brand;
 };
 
 }  // namespace mpegg_p1
