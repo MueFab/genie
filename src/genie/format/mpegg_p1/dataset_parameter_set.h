@@ -14,7 +14,15 @@ namespace format {
 namespace mpegg_p1 {
 class DatasetParameterSet {
    public:
-    explicit DatasetParameterSet(const core::parameter::ParameterSet&);
+    explicit DatasetParameterSet(const core::parameter::ParameterSet&&);
+
+    explicit DatasetParameterSet(const core::parameter::ParameterSet&&, const uint8_t x_dataset_group_ID,
+                                 const uint16_t x_dataset_ID);
+
+    explicit DatasetParameterSet(const core::parameter::ParameterSet&&, const uint16_t x_dataset_ID);
+
+    uint16_t getDatasetID() { return dataset_ID; }
+    uint8_t getDatasetGroupID() { return dataset_group_ID; }
 
    private:
     /**

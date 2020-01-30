@@ -43,8 +43,8 @@ class DatasetGroup {
      *
      * ------------------------------------------------------------------------------------------------------------- */
     mpegg_p1::DatasetGroupHeader dataset_group_header;
-    DG_metadata dg_metadata;      // optional
-    DG_protection dg_protection;  // optional
+    // DG_metadata dg_metadata;      // optional
+    // DG_protection dg_protection;  // optional
     /** reference[] and reference_metadata[] and label_list is optional and not yet implemented */
     std::vector<Dataset> dataset;
 };
