@@ -7,12 +7,17 @@
 #ifndef GENIE_DATASET_HEADER_H
 #define GENIE_DATASET_HEADER_H
 
+#include <cstdint>
 #include <vector>
 
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
 class DatasetHeader {
+   public:
+    DatasetHeader(const uint16_t x_dataset_ID);
+
+   private:
     /**
      * ISO 23092-1 Section 6.5.2 table 19
      *

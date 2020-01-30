@@ -46,7 +46,11 @@ class DT_protection {
 class Dataset {
    public:
     Dataset(const genie::format::mgb::DataUnitFactory& dataUnitFactory,
-            std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2);
+            std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2, const uint16_t dataset_ID);
+
+    uint16_t getDatasetParameterSetDatasetID() {
+        return dataset_parameter_sets.front().getDatasetID();
+    }  // only returns ID of first ps in vector
 
    private:
     /**

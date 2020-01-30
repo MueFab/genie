@@ -11,13 +11,14 @@ namespace format {
 namespace mpegg_p1 {
 
 Dataset::Dataset(const genie::format::mgb::DataUnitFactory& dataUnitFactory,
-                 std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2) {
-    // TODO multiple params?
+                 std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2, const uint16_t dataset_ID)
+    : dataset_header(dataset_ID)  // TODO: dataset_header constructor
+{
     for (unsigned int i = 0;; ++i) {
-        try {
-            dataset_parameter_sets.emplace_back(dataUnitFactory.getParams(i));
+        try { //to iterate over dataUnitFactory.getParams(i)
+            dataset_parameter_sets.emplace_back(std::move(dataUnitFactory.getParams(i)), dataset_ID);
         } catch (const std::out_of_range&) {
-            std::cout << "Got " << i << " ParameterSet/s from DataUnitFactory" << std::endl;
+            // std::cout << "Got " << i << " ParameterSet/s from DataUnitFactory" << std::endl; //debuginfo
             break;
         }
     }
@@ -25,7 +26,6 @@ Dataset::Dataset(const genie::format::mgb::DataUnitFactory& dataUnitFactory,
     for (auto& au : accessUnits_p2) {
         access_units.emplace_back(std::move(au));
     }
-    // TODO: add dataset_header, dataset_parametersets, accessunits(p1)
 }
 
 }  // namespace mpegg_p1
