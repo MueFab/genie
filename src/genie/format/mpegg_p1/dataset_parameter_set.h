@@ -24,6 +24,8 @@ class DatasetParameterSet {
     uint16_t getDatasetID() { return dataset_ID; }
     uint8_t getDatasetGroupID() { return dataset_group_ID; }
 
+    void setDatasetGroupID(uint8_t x_dataset_group_ID) { dataset_group_ID = x_dataset_group_ID; }
+
    private:
     /**
      * ISO 23092-1 Section 6.5.2 table 23
