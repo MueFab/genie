@@ -114,10 +114,21 @@ std::unique_ptr<desc_conf_pres::cabac::CabacBinarization> inferBinarization(
         make_unique<desc_conf_pres::cabac::CabacBinarizationParameters>(
             desc_conf_pres::cabac::CabacBinarizationParameters::BinarizationId(tSeqConf.binarizationId),
             tSeqConf.binarizationParameters[0]));
-    if (tSeqConf.contextSelectionId != gabac::ContextSelectionId::bypass) {
-        ret->setContextParameters(
-            make_unique<desc_conf_pres::cabac::CabacContextParameters>(false, 3, 3,
-                                                                       false));  // TODO insert actual values
+    switch (tSeqConf.contextSelectionId) {
+        case gabac::ContextSelectionId::bypass:
+            break;
+        case gabac::ContextSelectionId::adaptive_coding_order_0:
+            ret->setContextParameters(make_unique<desc_conf_pres::cabac::CabacContextParameters>(false, 0, 8, 8, false));
+            break;
+        case gabac::ContextSelectionId::adaptive_coding_order_1:
+            ret->setContextParameters(make_unique<desc_conf_pres::cabac::CabacContextParameters>(false, 1, 8, 8, false));
+            break;
+        case gabac::ContextSelectionId::adaptive_coding_order_2:
+            ret->setContextParameters(make_unique<desc_conf_pres::cabac::CabacContextParameters>(false, 2, 8, 8, false));
+            break;
+        default:
+            // FIXME - error
+            break;
     }
     return ret;
 }

@@ -45,7 +45,8 @@ void CabacBinarization::write(util::BitWriter *writer) const {
     writer->write(uint8_t(binarization_ID), 5);
     writer->write(bypass_flag, 1);
     cabac_binarization_parameters->write(writer);
-    if (cabac_context_parameters) {
+    if (! bypass_flag) {
+        //FIXME assert(cabac_context_parameters != NULL);
         cabac_context_parameters->write(writer);
     }
 }
