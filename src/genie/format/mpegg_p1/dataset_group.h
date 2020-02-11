@@ -37,6 +37,11 @@ class DG_protection {
 
 class DatasetGroup {
    public:
+    DatasetGroup(std::vector<genie::format::mpegg_p1::Dataset>);
+
+    const DatasetGroupHeader& getDatasetGroupHeader() const { return dataset_group_header; }
+    const std::vector<Dataset>& getDatasets() const { return datasets; }
+
    private:
     /**
      * ISO 23092-1 Section 6.5.1 table 8
@@ -46,7 +51,7 @@ class DatasetGroup {
     // DG_metadata dg_metadata;      // optional
     // DG_protection dg_protection;  // optional
     /** reference[] and reference_metadata[] and label_list is optional and not yet implemented */
-    std::vector<Dataset> dataset;
+    std::vector<Dataset> datasets;
 };
 
 }  // namespace mpegg_p1

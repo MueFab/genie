@@ -48,9 +48,19 @@ class Dataset {
     Dataset(const genie::format::mgb::DataUnitFactory& dataUnitFactory,
             std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2, const uint16_t dataset_ID);
 
-    uint16_t getDatasetParameterSetDatasetID() {
+    uint16_t getDatasetParameterSetDatasetID() const {
         return dataset_parameter_sets.front().getDatasetID();
     }  // only returns ID of first ps in vector
+
+    uint8_t getDatasetParameterSetDatasetGroupID() const {
+        return dataset_parameter_sets.front().getDatasetGroupID();
+    }  // only returns ID of first ps in vector
+
+    const DatasetHeader& getDatasetHeader() const { return dataset_header; }
+    const std::vector<DatasetParameterSet>& getDatasetParameterSets() const { return dataset_parameter_sets; }
+
+    void setDatasetHeaderGroupId(uint8_t GroupId) { dataset_header.setDatasetGroupId(GroupId); }
+    void setDatasetParameterSetsGroupId(uint8_t GroupId);
 
    private:
     /**
