@@ -21,10 +21,10 @@ class DatasetParameterSet {
 
     explicit DatasetParameterSet(const core::parameter::ParameterSet&&, const uint16_t x_dataset_ID);
 
-    uint16_t getDatasetID() { return dataset_ID; }
-    uint8_t getDatasetGroupID() { return dataset_group_ID; }
+    uint16_t getDatasetID() const { return dataset_ID; }
+    uint8_t getDatasetGroupID() const { return dataset_group_ID; }
 
-    void setDatasetGroupID(uint8_t x_dataset_group_ID) { dataset_group_ID = x_dataset_group_ID; }
+    void setDatasetGroupId(uint8_t datasetGroupId) { dataset_group_ID = datasetGroupId; }
 
    private:
     /**

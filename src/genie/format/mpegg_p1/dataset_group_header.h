@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <vector>
+#include "dataset.h"
 
 namespace genie {
 namespace format {
@@ -10,6 +11,12 @@ namespace mpegg_p1 {
 
 class DatasetGroupHeader {
    public:
+    DatasetGroupHeader(const std::vector<genie::format::mpegg_p1::Dataset>& datasetId);
+
+    uint8_t getDatasetGroupId() const { return dataset_group_ID; }
+    uint8_t getVersionNumber() const { return version_number; }
+    const std::vector<uint16_t>& getDatasetId() const { return dataset_ID; }
+
    private:
     /**
      * ISO 23092-1 Section 6.5.1.2 table 19

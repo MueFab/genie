@@ -8,6 +8,7 @@
 #define GENIE_DATASET_HEADER_H
 
 #include <cstdint>
+#include <iostream>
 #include <vector>
 
 namespace genie {
@@ -15,9 +16,22 @@ namespace format {
 namespace mpegg_p1 {
 class DatasetHeader {
    public:
-    DatasetHeader(const uint16_t x_dataset_ID);
+    explicit DatasetHeader(const uint16_t datasetID);
 
-    void setDatasetGroupID(uint8_t x_dataset_group_ID) { dataset_group_ID = x_dataset_group_ID; }
+    DatasetHeader(uint8_t datasetGroupId, uint16_t datasetId/*, char *version, uint8_t byteOffsetSizeFlag,
+                  uint8_t nonOverlappingAuRangeFlag, uint8_t pos40BitsFlag, uint8_t blockHeaderFlag, uint8_t mitFlag,
+                  uint8_t ccModeFlag, uint8_t orderedBlocksFlag, uint16_t seqCount, uint8_t referenceId,
+                  const std::vector<uint16_t> &seqId, const std::vector<uint32_t> &seqBlocks, uint8_t datasetType,
+                  uint8_t numClasses, const std::vector<uint8_t> &clid, const std::vector<uint8_t> &numDescriptors,
+                  const std::vector<std::vector<uint8_t>> &descriptorId, uint8_t alphabetId, uint32_t numUAccessUnits,
+                  uint32_t numUClusters, uint32_t multipleSignatureBase, uint8_t uSignatureSize,
+                  uint8_t uSignatureConstantLength, uint8_t uSignatureLength, const std::vector<uint8_t> &tflag,
+                  const std::vector<uint32_t> &thres*/);
+
+    void setDatasetGroupId(uint8_t datasetGroupId) { dataset_group_ID = datasetGroupId; }
+
+    uint16_t getDatasetId() const { return dataset_ID; }
+    uint8_t getDatasetGroupId() const { return dataset_group_ID; }
 
    private:
     /**

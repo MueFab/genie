@@ -4,9 +4,10 @@
  */
 
 #include "FileHandlingUtils.h"
-#include <genie/core/parameter/parameter_set.h>
-#include <genie/format/mgb/data-unit-factory.h>
-#include <genie/format/mpegg_p1/dataset.h>
+#include "genie/core/parameter/parameter_set.h"
+#include "genie/format//mpegg_p1/dataset_group.h"
+#include "genie/format/mgb/data-unit-factory.h"
+#include "genie/format/mpegg_p1/dataset.h"
 
 // DatasetHeader *
 // initDatasetHeaderNoMIT(DatasetGroupId datasetGroupId, DatasetId datasetId, char *version, bool multipleAlignmentFlag,
@@ -143,15 +144,20 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
     // - AccessUnit[]
 
     std::vector<genie::format::mpegg_p1::Dataset> datasets;
-    datasets.emplace_back(dataUnitFactory, accessUnits, 0);
-    //std::cout << datasets.front().getDatasetParameterSetDatasetID() << std::endl;
-    
+    datasets.emplace_back(dataUnitFactory, accessUnits, 22);
+    // std::cout << datasets.front().getDatasetParameterSetDatasetID() << std::endl;
+
     // DatasetGroup consists of:
     // - DatasetGroupHeader
     // - Dataset[]
 
-    // std::vector<std::unique_ptr<format::mpegg_p1::DatasetGroup>> datasetGroups;
-    // datasetGroups.push_back(format::mpegg_p1::DatasetGroup::createFromDatasets(datasets);
+    std::vector<genie::format::mpegg_p1::DatasetGroup> datasetGroups;
+    datasetGroups.emplace_back(datasets);
+
+    fprintf(stdout, "%u\n", datasetGroups.front().getDatasets().front().getDatasetHeader().getDatasetId());
+    fprintf(stdout, "%u\n", datasetGroups.front().getDatasets().front().getDatasetHeader().getDatasetGroupId());
+    fprintf(stdout, "%u\n", datasetGroups.front().getDatasets().front().getDatasetParameterSetDatasetID());
+    fprintf(stdout, "%u\n", datasetGroups.front().getDatasets().front().getDatasetParameterSetDatasetGroupID());
 
     // MpeggFile consists of:
     // - FileHeader
