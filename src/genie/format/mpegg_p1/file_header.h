@@ -10,6 +10,15 @@ namespace mpegg_p1 {
 
 class FileHeader {
    public:
+    explicit FileHeader() = default;
+    explicit FileHeader(std::vector<std::string>*);
+
+    void addCompatibleBrand(std::string brand) { compatible_brand.push_back(brand); }
+
+    const char* getMajorBrand() const { return major_brand; }
+    const char* getMinorBrand() const { return minor_brand; }
+    const std::vector<std::string>& getCompatibleBrand() const { return compatible_brand; }
+
    private:
     /**
      * ISO 23092-1 Section 6.6.2 table 30

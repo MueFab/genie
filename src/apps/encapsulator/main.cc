@@ -29,7 +29,7 @@ static int encapsulator_main(int argc, char* argv[]) {
         std::cout << "command line: " + commandLineStr(argc, argv) << std::endl;
 
         genie::module::detect();
-        createMPEGGFileNoMITFromByteStream(programOptions.inputFilePath.c_str(), nullptr);
+        createMPEGGFileNoMITFromByteStream(programOptions.inputFilePath, programOptions.outputFilePath);
 
     } catch (const encapsulator::RuntimeError& runtimeError) {
         std::cerr << "error: encapsulator: " << runtimeError.what() << std::endl;

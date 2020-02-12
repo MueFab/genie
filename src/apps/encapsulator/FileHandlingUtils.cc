@@ -8,6 +8,7 @@
 #include "genie/format//mpegg_p1/dataset_group.h"
 #include "genie/format/mgb/data-unit-factory.h"
 #include "genie/format/mpegg_p1/dataset.h"
+#include "genie/format/mpegg_p1/mpegg_file.h"
 
 // DatasetHeader *
 // initDatasetHeaderNoMIT(DatasetGroupId datasetGroupId, DatasetId datasetId, char *version, bool multipleAlignmentFlag,
@@ -86,12 +87,10 @@
 //    return ref_information;
 //}
 
-int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputFileName) {
-    fprintf(stdout, "Bytestream file: %s\n", fileName);
+int createMPEGGFileNoMITFromByteStream(const std::string& fileName, const std::string& outputFileName) {
+    fprintf(stdout, "Bytestream file: %s\n", fileName.c_str());
 
     // Ref_information ref_information = readRefInformation(refInfoPath);
-
-    (void)outputFileName;  // silence compiler warning
 
     std::ifstream inputFilestream;
     inputFilestream.open(fileName, std::ios::binary);
@@ -152,7 +151,7 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
     // - Dataset[]
 
     std::vector<genie::format::mpegg_p1::DatasetGroup> datasetGroups;
-    datasetGroups.emplace_back(datasets);
+    datasetGroups.emplace_back(&datasets);
 
     fprintf(stdout, "%u\n", datasetGroups.front().getDatasets().front().getDatasetHeader().getDatasetId());
     fprintf(stdout, "%u\n", datasetGroups.front().getDatasets().front().getDatasetHeader().getDatasetGroupId());
@@ -163,7 +162,11 @@ int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputF
     // - FileHeader
     // - DatasetGroup[]
 
-    // auto mpeggFile = format::mpegg_p1::MpeggFile::createFromDatasetGroups(datasetGroups);
+    genie::format::mpegg_p1::MpeggFile mpeggFile(&datasetGroups);
+    fprintf(stdout, "%u\n",
+            mpeggFile.getDatasetGroups().front().getDatasets().front().getDatasetHeader().getDatasetGroupId());
+
+    mpeggFile.writeToFile(outputFileName);
 
     // ---------------------------------------------------------------------------------------------------------------------
 

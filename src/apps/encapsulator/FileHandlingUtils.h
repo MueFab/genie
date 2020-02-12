@@ -25,6 +25,6 @@
 //
 // Ref_information readRefInformation(char* refInfoFilePath);
 
-int createMPEGGFileNoMITFromByteStream(const char* fileName, const char* outputFileName);
+int createMPEGGFileNoMITFromByteStream(const std::string& fileName, const std::string& outputFileName);
 
 #endif  // GENIE_FILEHANDLINGUTILS_H
