@@ -9,7 +9,8 @@
 
 namespace encapsulator {
 
-ProgramOptions::ProgramOptions(int argc, char *argv[]) : force(false), help(false), inputFilePath("") {
+ProgramOptions::ProgramOptions(int argc, char *argv[])
+    : force(false), help(false), inputFilePath(""), outputFilePath("") {
     processCommandLine(argc, argv);
 }
 
@@ -18,6 +19,7 @@ void ProgramOptions::processCommandLine(int argc, char *argv[]) {
 
     app.add_flag("-f,--force", force, "Force overwriting of output file(s)");
     app.add_option("-i,--input-file", inputFilePath, "Input file")->mandatory(true);
+    app.add_option("-o,--output-file", outputFilePath, "Output file")->mandatory(false);
 
     try {
         app.parse(argc, argv);
