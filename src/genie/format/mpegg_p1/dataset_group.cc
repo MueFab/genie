@@ -15,6 +15,10 @@ DatasetGroup::DatasetGroup(std::vector<genie::format::mpegg_p1::Dataset>* x_data
     }
 }
 
+void DatasetGroup::writeToFile(genie::util::BitWriter& bitWriter) const {
+    // TODO
+}
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie

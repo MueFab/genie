@@ -8,6 +8,10 @@ FileHeader::FileHeader(std::vector<std::string>* const x_compatible_brand) {
     compatible_brand = std::move(*x_compatible_brand);
 }
 
+void FileHeader::writeToFile(genie::util::BitWriter& bitWriter) const {
+    // TODO
+}
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie
