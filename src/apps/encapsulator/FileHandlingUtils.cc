@@ -166,8 +166,27 @@ int createMPEGGFileNoMITFromByteStream(const std::string& fileName, const std::s
     fprintf(stdout, "%u\n",
             mpeggFile.getDatasetGroups().front().getDatasets().front().getDatasetHeader().getDatasetGroupId());
 
-    mpeggFile.writeToFile(outputFileName);
+    // FIXME: try to open file at function start to avoid decompressing without writing?!?
+    std::string outputFileNameNew(outputFileName);
+    if (outputFileNameNew.empty()) {
+        fprintf(stdout, "empty outputFileName!!!\n");
+        outputFileNameNew = "";  // FIXME: add default path/filename and remove else clause?!?
+    } else {
+        fprintf(stdout, "Writing to file %s...\n", outputFileNameNew.c_str());
 
+        std::filebuf fb;
+        fb.open(outputFileNameNew, std::ios::out);
+        if (!fb.is_open()) {
+            fprintf(stdout, "File is not open!!!\n");
+        }
+        std::ostream os(&fb);
+        genie::util::BitWriter outputFileBitReader(&os);
+
+        mpeggFile.writeToFile(outputFileBitReader);
+
+        fb.close();
+        fprintf(stdout, "Writing to file %s done!!!\n", outputFileNameNew.c_str());
+    }
     // ---------------------------------------------------------------------------------------------------------------------
 
     // while (true) {

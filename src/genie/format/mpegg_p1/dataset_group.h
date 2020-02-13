@@ -42,6 +42,8 @@ class DatasetGroup {
     const DatasetGroupHeader& getDatasetGroupHeader() const { return dataset_group_header; }
     const std::vector<Dataset>& getDatasets() const { return datasets; }
 
+    void writeToFile(genie::util::BitWriter& bitWriter) const;
+
    private:
     /**
      * ISO 23092-1 Section 6.5.1 table 8

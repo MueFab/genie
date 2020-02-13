@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include "genie/util/bitwriter.h"
 
 namespace genie {
 namespace format {
@@ -18,6 +19,8 @@ class FileHeader {
     const char* getMajorBrand() const { return major_brand; }
     const char* getMinorBrand() const { return minor_brand; }
     const std::vector<std::string>& getCompatibleBrand() const { return compatible_brand; }
+
+    void writeToFile(genie::util::BitWriter& bitWriter) const;
 
    private:
     /**
