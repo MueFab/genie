@@ -19,12 +19,12 @@ namespace util {
 
 BlockStepper util::DataBlock::getReader() const {
     return {const_cast<uint8_t *>(data.data()), const_cast<uint8_t *>(data.end().base()),
-            wordSize};  // TODO(Fabian): Add BlockStepper for const
+            static_cast<uint8_t>(getWordSize())};  // TODO(Fabian): Add BlockStepper for const
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool util::DataBlock::operator==(const util::DataBlock &d) const { return wordSize == d.wordSize && data == d.data; }
+bool util::DataBlock::operator==(const util::DataBlock &d) const { return lgWordSize == d.lgWordSize && data == d.data; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -40,11 +40,11 @@ DataBlock &DataBlock::operator=(const std::initializer_list<uint64_t> &il) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t util::DataBlock::size() const { return data.size() / wordSize; }
+size_t util::DataBlock::size() const { return divByWordSize(data.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void util::DataBlock::reserve(size_t size) { data.reserve(size * wordSize); }
+void util::DataBlock::reserve(size_t size) { data.reserve(mulByWordSize(size)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -56,7 +56,7 @@ void util::DataBlock::clear() { data.clear(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void util::DataBlock::resize(size_t size) { data.resize(size * wordSize); }
+void util::DataBlock::resize(size_t size) { data.resize(mulByWordSize(size)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -65,23 +65,26 @@ bool util::DataBlock::empty() const { return data.empty(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void util::DataBlock::swap(util::DataBlock *const d) {
-    size_t tmp = wordSize;
-    wordSize = d->wordSize;
-    d->wordSize = static_cast<uint8_t>(tmp);
+    size_t tmp = lgWordSize;
+    lgWordSize = d->lgWordSize;
+    d->lgWordSize = static_cast<uint8_t>(tmp);
     data.swap(d->data);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DataBlock::DataBlock(size_t size, size_t wsize) : wordSize(static_cast<uint8_t>(wsize)), data(size * wsize) {}
+DataBlock::DataBlock(size_t size, size_t wsize) {
+    setWordSize(wsize);
+    data.resize(size * wsize);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DataBlock::DataBlock(std::vector<uint8_t> *vec) : wordSize(1) { this->data.swap(*vec); }
+DataBlock::DataBlock(std::vector<uint8_t> *vec) : lgWordSize(1) { this->data.swap(*vec); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DataBlock::DataBlock(std::string *vec) : wordSize(1) {
+DataBlock::DataBlock(std::string *vec) : lgWordSize(1) {
     size_t size = vec->size() * sizeof(char);
     this->data.resize(size);
     this->data.shrink_to_fit();
@@ -91,7 +94,8 @@ DataBlock::DataBlock(std::string *vec) : wordSize(1) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DataBlock::DataBlock(const uint8_t *d, size_t size, uint8_t word_size) : wordSize(word_size) {
+DataBlock::DataBlock(const uint8_t *d, size_t size, uint8_t word_size) {
+    setWordSize(word_size);
     size_t s = size * word_size;
     this->data.resize(s);
     this->data.shrink_to_fit();
