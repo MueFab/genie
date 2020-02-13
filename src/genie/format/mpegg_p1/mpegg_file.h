@@ -1,6 +1,7 @@
 #ifndef GENIE_MPEGG_FILE_H
 #define GENIE_MPEGG_FILE_H
 
+#include <string>
 #include <vector>
 #include "genie/format/mpegg_p1/dataset_group.h"
 #include "genie/format/mpegg_p1/file_header.h"
@@ -11,7 +12,8 @@ namespace mpegg_p1 {
 
 class MpeggFile {
    public:
-    MpeggFile(std::vector<DatasetGroup>*);
+    explicit MpeggFile(std::vector<DatasetGroup>*);
+    explicit MpeggFile(std::vector<DatasetGroup>*, std::vector<std::string>*);
 
     const FileHeader& getFileHeader() const { return fileHeader; }
     const std::vector<DatasetGroup>& getDatasetGroups() const { return datasetGroups; }

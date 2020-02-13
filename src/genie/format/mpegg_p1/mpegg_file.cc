@@ -4,7 +4,14 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-MpeggFile::MpeggFile(std::vector<DatasetGroup>* x_datasetGroups) { datasetGroups = std::move(*x_datasetGroups); }
+MpeggFile::MpeggFile(std::vector<DatasetGroup>* x_datasetGroups) : fileHeader() {
+    datasetGroups = std::move(*x_datasetGroups);
+}
+
+MpeggFile::MpeggFile(std::vector<DatasetGroup>* x_datasetGroups, std::vector<std::string>* compatible_brand)
+    : fileHeader(compatible_brand) {
+    datasetGroups = std::move(*x_datasetGroups);
+}
 
 void MpeggFile::writeToFile(const std::string& outputFileName) {
     if (outputFileName.empty()) {
