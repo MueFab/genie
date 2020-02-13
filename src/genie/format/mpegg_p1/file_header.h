@@ -13,7 +13,7 @@ class FileHeader {
     explicit FileHeader() = default;
     explicit FileHeader(std::vector<std::string>*);
 
-    void addCompatibleBrand(std::string brand) { compatible_brand.push_back(brand); }
+    void addCompatibleBrand(const std::string& brand) { compatible_brand.push_back(brand); }
 
     const char* getMajorBrand() const { return major_brand; }
     const char* getMinorBrand() const { return minor_brand; }
