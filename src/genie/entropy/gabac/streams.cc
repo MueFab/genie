@@ -38,22 +38,22 @@ int DataBlockBuffer::overflow(int c) {
 }
 
 std::streamsize DataBlockBuffer::xsputn(const char *s, std::streamsize n) {
-    if (n % block.getWordSize()) {
+    if (block.modByWordSize(n)) {
         GABAC_DIE("Invalid Data length");
     }
     size_t oldSize = block.size();
-    block.resize(block.size() + n / block.getWordSize());
-    memcpy(static_cast<uint8_t *>(block.getData()) + oldSize * block.getWordSize(), s, static_cast<size_t>(n));
+    block.resize(block.size() + block.divByWordSize(n));
+    memcpy(static_cast<uint8_t *>(block.getData()) + block.mulByWordSize(oldSize), s, static_cast<size_t>(n));
     return n;
 }
 
 std::streamsize DataBlockBuffer::xsgetn(char *s, std::streamsize n) {
-    if (n % block.getWordSize()) {
+    if (block.modByWordSize(n)) {
         GABAC_DIE("Invalid Data length");
     }
-    size_t bytesRead = std::min(block.getRawSize() - pos * block.getWordSize(), size_t(n));
-    memcpy(s, static_cast<uint8_t *>(block.getData()) + pos * block.getWordSize(), bytesRead);
-    pos += bytesRead / block.getWordSize();
+    size_t bytesRead = std::min(block.getRawSize() - block.mulByWordSize(pos), size_t(n));
+    memcpy(s, static_cast<uint8_t *>(block.getData()) + block.mulByWordSize(pos), bytesRead);
+    pos += block.divByWordSize(bytesRead);
     return bytesRead;
 }
 
