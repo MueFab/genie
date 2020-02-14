@@ -122,7 +122,7 @@ class GabacSeqConfSet {
             decoder_config.setSubsequenceCfg(subdesc.id.second, std::move(transform_params));
 
             // This is where actual translation of one gabac config to MPEGG takes place
-            auto subseq_cfg = decoder_config.getSubsequenceCfg(subdesc.id.second);
+            auto& subseq_cfg = decoder_config.getSubsequenceCfg(subdesc.id.second);
             storeSubseq(getConfAsGabac(subdesc.id), subseq_cfg);
         }
     }
