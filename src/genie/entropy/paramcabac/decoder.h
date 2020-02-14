@@ -38,6 +38,10 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
 
     const Subsequence &getSubsequenceCfg(uint8_t index) const;
 
+    Subsequence &getSubsequenceCfg(uint8_t index) {
+        return descriptor_subsequence_cfgs[index];
+    }
+
     std::unique_ptr<core::parameter::desc_pres::Decoder> clone() const override;
 
     static std::unique_ptr<core::parameter::desc_pres::DecoderTokentype> create(util::BitReader &reader) {
@@ -68,6 +72,10 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
     void setSubsequenceCfg(uint8_t index, TransformedParameters &&cfg);
 
     const Subsequence &getSubsequenceCfg(uint8_t index) const;
+
+    Subsequence &getSubsequenceCfg(uint8_t index) {
+        return descriptor_subsequence_cfgs[index];
+    }
 
     std::unique_ptr<core::parameter::desc_pres::Decoder> clone() const override;
 
