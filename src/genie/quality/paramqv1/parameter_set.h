@@ -29,7 +29,8 @@ class ParameterSet {
 
    public:
     explicit ParameterSet(util::BitReader &reader) {
-        for (auto c = reader.read<int>(4); c > 0; --c) {
+        const size_t num_codebooks = reader.read<int>(4);
+        for (auto c = num_codebooks; c > 0; --c) {
             qv_codebooks.emplace_back(Codebook(reader));
         }
     }
