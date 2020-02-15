@@ -11,6 +11,7 @@ set(source_files
         ordered-section.cc
         perf-stats.cc
         string-helpers.cc
+        stringview.cc
         thread-manager.cc
         tokenize.cc
         )

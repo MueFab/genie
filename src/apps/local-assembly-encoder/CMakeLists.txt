@@ -13,6 +13,7 @@ target_link_libraries(local-assembly-encoder PRIVATE genie-mgb)
 target_link_libraries(local-assembly-encoder PRIVATE genie-sam)
 target_link_libraries(local-assembly-encoder PRIVATE genie-localassembly)
 target_link_libraries(local-assembly-encoder PRIVATE genie-module)
+target_link_libraries(local-assembly-encoder PRIVATE genie-qvwriteout)
 
 get_filename_component(THIS_DIR ./ ABSOLUTE)
 get_filename_component(TOP_DIR ../../ ABSOLUTE)

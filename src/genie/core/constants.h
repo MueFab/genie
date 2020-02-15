@@ -164,6 +164,15 @@ const GenomicSubDescriptorProperties& getSubsequence(GenSubIndex idx);
 
 const Alphabet& getAlphabetProperties(AlphabetID id);
 
+struct CigarFormatInfo {
+    std::vector<uint8_t> lut_step_ref;
+    std::vector<uint8_t> lut_step_bases;
+    std::vector<uint8_t> lut_ignore;
+    bool explicitSubstitution;
+};
+
+const CigarFormatInfo& getECigarInfo();
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace core

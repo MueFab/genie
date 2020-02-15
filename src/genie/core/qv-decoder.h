@@ -8,7 +8,7 @@ namespace core {
 
 class QVDecoder {
    public:
-    virtual std::string decode(const parameter::QualityValues& param, size_t length,
+    virtual std::string decode(const parameter::QualityValues& param, const std::string& ecigar,
                                AccessUnitRaw::Descriptor& desc) = 0;
     /**
      * @Brief For polymorphic destruction
