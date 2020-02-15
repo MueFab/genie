@@ -1,45 +1,27 @@
 #ifndef GENIE_QVOUTENCODER_H
 #define GENIE_QVOUTENCODER_H
 
+#include <genie/core/cigar-tokenizer.h>
 #include <genie/core/qv-encoder.h>
 #include <genie/quality/paramqv1/qv_coding_config_1.h>
+#include <genie/util/stringview.h>
 
 namespace genie {
 namespace quality {
 namespace qvwriteout {
 
 class Encoder : public core::QVEncoder {
-    core::QVEncoder::QVCoded encode(const core::record::Chunk &rec) override {
-        auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
-        paramqv1::ParameterSet set;
+   private:
+    static void setUpParameters(const core::record::Chunk& rec, paramqv1::QualityValues1& param,
+                                core::AccessUnitRaw::Descriptor& desc);
 
-        auto codebook = paramqv1::QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);
-        set.addCodeBook(std::move(codebook));
+    static void encodeAlignedSegment(const core::record::Segment& s, const std::string& ecigar,
+                                     core::AccessUnitRaw::Descriptor& desc);
 
-        core::AccessUnitRaw::Descriptor desc(core::GenDesc::QV);
-        desc.add(core::AccessUnitRaw::Subsequence(4, core::GenSub::QV_PRESENT));
-        desc.add(core::AccessUnitRaw::Subsequence(4, core::GenSub::QV_CODEBOOK));
-        desc.add(core::AccessUnitRaw::Subsequence(4, core::GenSub::QV_STEPS_0));
-        if (rec.front().getClassID() == core::record::ClassType::CLASS_I ||
-            rec.front().getClassID() == core::record::ClassType::CLASS_HM) {
-            desc.add(core::AccessUnitRaw::Subsequence(4, core::GenSub::QV_STEPS_1));
+    static void encodeUnalignedSegment(const core::record::Segment& s, core::AccessUnitRaw::Descriptor& desc);
 
-            codebook = paramqv1::QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);
-            set.addCodeBook(std::move(codebook));
-        }
-        param->setQvps(std::move(set));
-        for (const auto &r : rec) {
-            for (const auto &s : r.getSegments()) {
-                for (const auto &q : s.getQualities()) {
-                    for (const auto &c : q) {
-                        UTILS_DIE_IF(c < 33 || c > 126, "Invalid quality score");
-                        desc.get(2).push(c - 33);
-                    }
-                }
-            }
-        }
-        return std::make_pair(std::move(param), std::move(desc));
-    }
+   public:
+    core::QVEncoder::QVCoded encode(const core::record::Chunk& rec) override;
 };
 
 }  // namespace qvwriteout
