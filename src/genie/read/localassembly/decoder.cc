@@ -26,7 +26,7 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, size_t id) {
     std::stringstream str;
     util::BitReader reader(str);
     auto qvdecoder = core::GlobalCfg::getSingleton().getIndustrialPark().construct<core::QVDecoder>(
-        t.getParameters().getQVConfig(core::record::ClassType::CLASS_I).getMode(), reader);
+        t.getParameters().getQVConfig(core::record::ClassType::CLASS_U).getMode(), reader);
     core::record::Chunk chunk;
     basecoder::Decoder decoder(std::move(t), segments);
     for (size_t recID = 0; recID < numRecords; ++recID) {

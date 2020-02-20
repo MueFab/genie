@@ -31,7 +31,7 @@ Encoder::CodingState::CodingState(const std::string &_read, const std::string &_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder() : container(core::parameter::ParameterSet(), 0), pos(0), readCounter(0) {}
+Encoder::Encoder(uint64_t startingMappingPos) : container(core::parameter::ParameterSet(), 0), pos(startingMappingPos), readCounter(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
