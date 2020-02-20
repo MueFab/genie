@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <istream>
 #include <ostream>
+#include "exceptions.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -72,6 +73,31 @@ class BitWriter {
      * @return m_bitsWritten is returned
      */
     uint64_t getBitsWritten();
+
+    bool isAligned() const {
+        return m_numHeldBits == 0;
+    }
+
+    void writeBypass(std::istream *in) {
+        if(!isAligned()) {
+            UTILS_DIE("Writer not aligned when it should be");
+        }
+        const size_t BUFFERSIZE = 100;
+        char byte[BUFFERSIZE];
+        do {
+            in->read(byte, BUFFERSIZE);
+            stream->write(byte, in->gcount());
+            this->m_bitsWritten += in->gcount() * 8;
+        } while(in->gcount() == BUFFERSIZE);
+    }
+
+    void writeBypass(const void *in, size_t size) {
+        this->m_bitsWritten += size * 8;
+        if(!isAligned()) {
+            UTILS_DIE("Writer not aligned when it should be");
+        }
+        stream->write((char*)in, size);
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
