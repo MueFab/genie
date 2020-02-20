@@ -59,7 +59,7 @@ void Block::write(util::BitWriter &writer) const {
     uint64_t bits = tmp_writer.getBitsWritten();
 
     writer.write(bits / 8, 29);
-    writer.write(&ss);
+    writer.writeBypass(&ss);
     writer.flush();
 }
 

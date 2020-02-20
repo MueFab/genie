@@ -16,9 +16,10 @@ namespace core {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnitPayload::TransformedPayload::write(util::BitWriter& writer) const {
-    for (size_t i = 0; i < payloadData.size(); ++i) {
+    writer.writeBypass(payloadData.getData(), payloadData.getRawSize());
+ /*   for (size_t i = 0; i < payloadData.size(); ++i) {
         writer.write(payloadData.get(i), static_cast<uint8_t>(payloadData.getWordSize() * 8));
-    }
+    }*/
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -87,7 +88,7 @@ void AccessUnitPayload::SubsequencePayload::write(util::BitWriter& writer) const
         if (i != transformedPayloads.size() - 1) {
             writer.write(bits / 8, 32);
         }
-        writer.write(&ss);
+        writer.writeBypass(&ss);
     }
 }
 
@@ -123,7 +124,7 @@ void AccessUnitPayload::DescriptorPayload::write(util::BitWriter& writer) const 
         if (i != subsequencePayloads.size() - 1) {
             writer.write(bits / 8, 32);
         }
-        writer.write(&ss);
+        writer.writeBypass(&ss);
     }
 }
 
