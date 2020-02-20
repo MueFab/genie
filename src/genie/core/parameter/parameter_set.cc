@@ -380,7 +380,7 @@ const QualityValues &ParameterSet::getQVConfig(record::ClassType type) const {
             return *(qv_coding_configs[i]);
         }
     }
-    UTILS_DIE("No matching qv config in parameter set");
+    UTILS_DIE("No matching qv config "+ std::to_string(int(type)) +" in parameter set");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -81,7 +81,7 @@ class Encoder {
     const core::record::alignment_split::SameRec &extractPairedAlignment(const core::record::Record &rec) const;
 
    public:
-    explicit Encoder();
+    explicit Encoder(uint64_t startingMappingPos);
 
     void add(const core::record::Record &rec, const std::string &ref1, const std::string &ref2);
 

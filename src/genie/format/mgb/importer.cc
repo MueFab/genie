@@ -33,9 +33,15 @@ bool Importer::pump(size_t id) {
     for (auto& b : unit->getBlocks()) {
         set.setPayload(core::GenDesc(b.getDescriptorID()), b.movePayload());
     }
-    set.setReference(unit->getAlignmentInfo().getRefID());
-    set.setMinPos(unit->getAlignmentInfo().getStartPos());
-    set.setMaxPos(unit->getAlignmentInfo().getEndPos());
+    if(unit->getClass() != core::record::ClassType::CLASS_U) {
+        set.setReference(unit->getAlignmentInfo().getRefID());
+        set.setMinPos(unit->getAlignmentInfo().getStartPos());
+        set.setMaxPos(unit->getAlignmentInfo().getEndPos());
+    } else {
+        set.setReference(0);
+        set.setMinPos(0);
+        set.setMaxPos(0);
+    }
     set.setRecordNum(unit->getReadCount());
     unit.reset();
     flowOut(std::move(set), id);

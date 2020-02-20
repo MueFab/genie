@@ -36,8 +36,9 @@ class Encoder : public core::ReadEncoder {
         /**
          * @brief Construct internal variables with default values
          * @param cr_buf_max_size Buffer size for local assembly reference memory
+         * @param startingPos Starting position of access unit
          */
-        explicit LaeState(size_t cr_buf_max_size);
+        explicit LaeState(size_t cr_buf_max_size, uint64_t startingPos);
         LocalReference refCoder;            //!< @brief Building the local reference
         basecoder::Encoder readCoder;       //!< @brief Generating the descriptor streams
         bool pairedEnd;                     //!< @brief Current guess regarding pairing

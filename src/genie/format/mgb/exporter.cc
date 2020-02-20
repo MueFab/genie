@@ -23,10 +23,10 @@ void Exporter::flowIn(core::AccessUnitPayload&& t, size_t id) {
     util::OrderedSection section(&lock, id);
     data.getParameters().write(writer);
 
-    mgb::AccessUnit au(id, id, core::record::ClassType::CLASS_I, data.getRecordNum(),
+    mgb::AccessUnit au(id, id, core::record::ClassType::CLASS_U, data.getRecordNum(),
                        core::parameter::DataUnit::DatasetType::ALIGNED, 32, 32, 0);
-    au.setAuTypeCfg(
-        AuTypeCfg(data.getReference(), data.getMinPos(), data.getMaxPos(), data.getParameters().getPosSize()));
+    /*au.setAuTypeCfg(
+        AuTypeCfg(data.getReference(), data.getMinPos(), data.getMaxPos(), data.getParameters().getPosSize()));*/
     for (size_t descriptor = 0; descriptor < core::getDescriptors().size(); ++descriptor) {
         if (data.getPayload(core::GenDesc(descriptor)).isEmpty()) {
             continue;

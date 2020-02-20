@@ -80,7 +80,7 @@ Exporter::Exporter(header::Header&& header, std::ostream& _file_1) : writer(std:
 Exporter::Stash Exporter::stashFromMainAlignment(const core::record::AlignmentBox& alignment,
                                                  const core::record::Record& rec) {
     Stash ret;
-    ret.position = alignment.getPosition();
+    ret.position = alignment.getPosition() + 1;
     ret.seq = rec.getSegments().front().getSequence();
     if (rec.getSegments().front().getQualities().empty()) {
         ret.qual = "*";
@@ -166,7 +166,6 @@ Exporter::Stash Exporter::stashFromSplitAlignment(const core::record::alignment_
     ret.mappingScore = split.getAlignment().getMappingScores().front();
     ret.rcomp = split.getAlignment().getRComp();
     ret.flags = mpeggFlagsToSamFlags(rec.getFlags(), ret.rcomp);
-    ;
     return ret;
 }
 
@@ -219,7 +218,7 @@ std::vector<sam::Record> Exporter::convert(core::record::Record&& rec) {
     bool primaryAlignment = true;
     for (const auto& alignment : rec.getAlignments()) {
         stash.emplace_back(stashFromMainAlignment(alignment, rec));
-        uint64_t master_position = alignment.getPosition();
+        uint64_t master_position = alignment.getPosition() + 1;
         size_t rec_count = 1;
         for (const auto& split_alignment : alignment.getAlignmentSplits()) {
             UTILS_DIE_IF(split_alignment->getType() != core::record::AlignmentSplit::Type::SAME_REC,
