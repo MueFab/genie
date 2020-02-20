@@ -37,6 +37,10 @@ class Block {
     core::AccessUnitPayload::DescriptorPayload &&movePayload();
 
     uint8_t getDescriptorID() const;
+
+    size_t getWrittenSize() const {
+        return payload.getWrittenSize() + 5;
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

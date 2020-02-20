@@ -80,15 +80,10 @@ GenSubIndex AccessUnitPayload::SubsequencePayload::getID() const { return id; }
 
 void AccessUnitPayload::SubsequencePayload::write(util::BitWriter& writer) const {
     for (size_t i = 0; i < transformedPayloads.size(); ++i) {
-        std::stringstream ss;
-        util::BitWriter tmp_writer(&ss);
         transformedPayloads[i].write(writer);
-        tmp_writer.flush();
-        uint64_t bits = tmp_writer.getBitsWritten();
         if (i != transformedPayloads.size() - 1) {
-            writer.write(bits / 8, 32);
+            writer.write(transformedPayloads[i].getWrittenSize(), 32);
         }
-        writer.writeBypass(&ss);
     }
 }
 
@@ -116,15 +111,10 @@ bool AccessUnitPayload::SubsequencePayload::isEmpty() const {
 
 void AccessUnitPayload::DescriptorPayload::write(util::BitWriter& writer) const {
     for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
-        std::stringstream ss;
-        util::BitWriter tmp_writer(&ss);
-        subsequencePayloads[i].write(tmp_writer);
-        tmp_writer.flush();
-        uint64_t bits = tmp_writer.getBitsWritten();
         if (i != subsequencePayloads.size() - 1) {
-            writer.write(bits / 8, 32);
+            writer.write(subsequencePayloads[i].getWrittenSize(), 32);
         }
-        writer.writeBypass(&ss);
+        subsequencePayloads[i].write(writer);
     }
 }
 
