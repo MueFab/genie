@@ -61,6 +61,10 @@ class AccessUnitPayload {
         util::DataBlock&& move();
 
         size_t getIndex() const;
+
+        size_t getWrittenSize() const {
+            return payloadData.getRawSize();
+        }
     };
 
     /**
@@ -111,6 +115,17 @@ class AccessUnitPayload {
         const TransformedPayload* begin() const { return &transformedPayloads.front(); }
 
         const TransformedPayload* end() const { return &transformedPayloads.back() + 1; }
+
+        size_t getWrittenSize() const {
+            size_t size = 0;
+            for (size_t i = 0; i < transformedPayloads.size(); ++i) {
+                size += transformedPayloads[i].getWrittenSize();
+                if (i != transformedPayloads.size() - 1) {
+                    size += 4;
+                }
+            }
+            return size;
+        }
     };
 
     /**
@@ -163,6 +178,17 @@ class AccessUnitPayload {
         const SubsequencePayload* begin() const { return &subsequencePayloads.front(); }
 
         const SubsequencePayload* end() const { return &subsequencePayloads.back() + 1; }
+
+        size_t getWrittenSize() const {
+            size_t size = 0;
+            for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
+                if (i != subsequencePayloads.size() - 1) {
+                    size+=4;
+                }
+                size += subsequencePayloads[i].getWrittenSize();
+            }
+            return size;
+        }
     };
 
     /**

@@ -151,18 +151,21 @@ void AccessUnit::write(util::BitWriter &writer) const {
     util::BitWriter tmp_writer(&ss);
     preWrite(tmp_writer);
     tmp_writer.flush();
-    for (auto &i : blocks) {
-        i.write(tmp_writer);
-    }
-    tmp_writer.flush();
     uint64_t bits = tmp_writer.getBitsWritten();
     const uint64_t TYPE_SIZE_SIZE = 8 + 3 + 29;  // data_unit_type, reserved, data_unit_size
     bits += TYPE_SIZE_SIZE;
-    const uint64_t bytes = bits / 8;
+    uint64_t bytes = bits / 8;
+
+    for (auto &i : blocks) {
+        bytes += i.getWrittenSize();
+    }
 
     // Now size is known, write to final destination
     writer.write(bytes, 29);
     writer.writeBypass(&ss);
+    for (auto &i : blocks) {
+        i.write(writer);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -52,14 +52,8 @@ void Block::write(util::BitWriter &writer) const {
     writer.write(descriptor_ID, 7);
     writer.write(0, 3);
 
-    std::stringstream ss;
-    util::BitWriter tmp_writer(&ss);
-    payload.write(tmp_writer);
-    tmp_writer.flush();
-    uint64_t bits = tmp_writer.getBitsWritten();
-
-    writer.write(bits / 8, 29);
-    writer.writeBypass(&ss);
+    writer.write(payload.getWrittenSize(), 29);
+    payload.write(writer);
     writer.flush();
 }
 
