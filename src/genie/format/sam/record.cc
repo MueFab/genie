@@ -21,33 +21,33 @@ namespace sam {
 
 const core::CigarFormatInfo& getSAMCigarInfo() {
     const static auto formatInfo = []() -> core::CigarFormatInfo {
-      const auto ref_step2 = []() -> std::vector<uint8_t> {
-        std::vector<uint8_t> lut(128, 0);
-        lut['M'] = 1;
-        lut['='] = 1;
-        lut['X'] = 1;
-        lut['I'] = 0;
-        lut['D'] = 1;
-        lut['N'] = 1;
-        lut['S'] = 0;
-        lut['H'] = 0;
-        lut['P'] = 0;
-        return lut;
-      }();
-      const auto seq_step2 = []() -> std::vector<uint8_t> {
-        std::vector<uint8_t> lut(128, 0);
-        lut['M'] = 1;
-        lut['='] = 1;
-        lut['X'] = 1;
-        lut['I'] = 1;
-        lut['D'] = 0;
-        lut['N'] = 0;
-        lut['S'] = 1;
-        lut['H'] = 0;
-        lut['P'] = 0;
-        return lut;
-      }();
-      return {ref_step2, seq_step2, {}, false};
+        const auto ref_step2 = []() -> std::vector<uint8_t> {
+            std::vector<uint8_t> lut(128, 0);
+            lut['M'] = 1;
+            lut['='] = 1;
+            lut['X'] = 1;
+            lut['I'] = 0;
+            lut['D'] = 1;
+            lut['N'] = 1;
+            lut['S'] = 0;
+            lut['H'] = 0;
+            lut['P'] = 0;
+            return lut;
+        }();
+        const auto seq_step2 = []() -> std::vector<uint8_t> {
+            std::vector<uint8_t> lut(128, 0);
+            lut['M'] = 1;
+            lut['='] = 1;
+            lut['X'] = 1;
+            lut['I'] = 1;
+            lut['D'] = 0;
+            lut['N'] = 0;
+            lut['S'] = 1;
+            lut['H'] = 0;
+            lut['P'] = 0;
+            return lut;
+        }();
+        return {ref_step2, seq_step2, {}, false};
     }();
     return formatInfo;
 }

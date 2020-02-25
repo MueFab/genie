@@ -90,7 +90,8 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(siz
 
     core::record::Segment segment(std::move(sequence));
     segment.addQualities(qvdecoder.decode(container.getParameters().getQVConfig(core::record::ClassType::CLASS_U),
-                                          std::get<0>(ret).getAlignment().getECigar(), container.get(core::GenDesc::QV)));
+                                          std::get<0>(ret).getAlignment().getECigar(),
+                                          container.get(core::GenDesc::QV)));
     std::get<1>(ret).addSegment(std::move(segment));
     return ret;
 }

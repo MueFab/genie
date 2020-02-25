@@ -33,7 +33,7 @@ bool Importer::pump(size_t id) {
     for (auto& b : unit->getBlocks()) {
         set.setPayload(core::GenDesc(b.getDescriptorID()), b.movePayload());
     }
-    if(unit->getClass() != core::record::ClassType::CLASS_U) {
+    if (unit->getClass() != core::record::ClassType::CLASS_U) {
         set.setReference(unit->getAlignmentInfo().getRefID());
         set.setMinPos(unit->getAlignmentInfo().getStartPos());
         set.setMaxPos(unit->getAlignmentInfo().getEndPos());

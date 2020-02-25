@@ -4,7 +4,6 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-
 #ifndef GENIE_STRINGVIEW_H
 #define GENIE_STRINGVIEW_H
 
@@ -36,8 +35,8 @@ struct StringView {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}
-}
+}  // namespace util
+}  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 

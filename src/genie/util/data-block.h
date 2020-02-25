@@ -472,11 +472,11 @@ inline DataBlock::Iterator DataBlock::begin() { return {this, 0}; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline DataBlock::ConstIterator DataBlock::end() const { return {this, divByWordSize(data.size()) }; }
+inline DataBlock::ConstIterator DataBlock::end() const { return {this, divByWordSize(data.size())}; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline DataBlock::Iterator DataBlock::end() { return {this, divByWordSize(data.size()) }; }
+inline DataBlock::Iterator DataBlock::end() { return {this, divByWordSize(data.size())}; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -516,11 +516,20 @@ inline void *DataBlock::getData() { return data.data(); }
 
 inline void DataBlock::setWordSize(uint8_t size) {
     switch (size) {
-        case 1:  lgWordSize = 0; break;
-        case 2:  lgWordSize = 1; break;
-        case 4:  lgWordSize = 2; break;
-        case 8:  lgWordSize = 3; break;
-        default: UTILS_DIE("Bad DataBlock word size");
+        case 1:
+            lgWordSize = 0;
+            break;
+        case 2:
+            lgWordSize = 1;
+            break;
+        case 4:
+            lgWordSize = 2;
+            break;
+        case 8:
+            lgWordSize = 3;
+            break;
+        default:
+            UTILS_DIE("Bad DataBlock word size");
     }
     if (modByWordSize(data.size())) {
         UTILS_DIE("Bad DataBlock word size");

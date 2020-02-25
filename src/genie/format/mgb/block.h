@@ -38,9 +38,7 @@ class Block {
 
     uint8_t getDescriptorID() const;
 
-    size_t getWrittenSize() const {
-        return payload.getWrittenSize() + 5;
-    }
+    size_t getWrittenSize() const { return payload.getWrittenSize() + 5; }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
