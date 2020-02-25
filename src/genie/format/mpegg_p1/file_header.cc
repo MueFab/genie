@@ -9,7 +9,7 @@ FileHeader::FileHeader(std::vector<std::string>* const x_compatible_brand) {
 }
 
 void FileHeader::writeToFile(genie::util::BitWriter& bitWriter) const {
-    (void) bitWriter; //silence compiler warnings
+    (void)bitWriter;  // silence compiler warnings
     // TODO
 }
 

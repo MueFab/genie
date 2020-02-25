@@ -62,9 +62,7 @@ class AccessUnitPayload {
 
         size_t getIndex() const;
 
-        size_t getWrittenSize() const {
-            return payloadData.getRawSize();
-        }
+        size_t getWrittenSize() const { return payloadData.getRawSize(); }
     };
 
     /**
@@ -183,7 +181,7 @@ class AccessUnitPayload {
             size_t size = 0;
             for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
                 if (i != subsequencePayloads.size() - 1) {
-                    size+=4;
+                    size += 4;
                 }
                 size += subsequencePayloads[i].getWrittenSize();
             }

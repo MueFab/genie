@@ -24,7 +24,9 @@ BlockStepper util::DataBlock::getReader() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool util::DataBlock::operator==(const util::DataBlock &d) const { return lgWordSize == d.lgWordSize && data == d.data; }
+bool util::DataBlock::operator==(const util::DataBlock &d) const {
+    return lgWordSize == d.lgWordSize && data == d.data;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

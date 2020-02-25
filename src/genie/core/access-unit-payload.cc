@@ -17,9 +17,9 @@ namespace core {
 
 void AccessUnitPayload::TransformedPayload::write(util::BitWriter& writer) const {
     writer.writeBypass(payloadData.getData(), payloadData.getRawSize());
- /*   for (size_t i = 0; i < payloadData.size(); ++i) {
-        writer.write(payloadData.get(i), static_cast<uint8_t>(payloadData.getWordSize() * 8));
-    }*/
+    /*   for (size_t i = 0; i < payloadData.size(); ++i) {
+           writer.write(payloadData.get(i), static_cast<uint8_t>(payloadData.getWordSize() * 8));
+       }*/
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

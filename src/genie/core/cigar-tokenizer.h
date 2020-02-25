@@ -9,14 +9,13 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/stringview.h>
 #include <genie/core/constants.h>
+#include <genie/util/stringview.h>
 
 namespace genie {
 namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
-
 
 class CigarTokenizer {
    public:
@@ -37,7 +36,7 @@ class CigarTokenizer {
 
             auto old_pos_bases = pos_bases;
             auto old_pos_ref = pos_bases;
-            if(size == 0) {
+            if (size == 0) {
                 pos_bases += 1;
                 pos_ref += 1;
             } else {

@@ -221,39 +221,39 @@ bool Alphabet::isIncluded(char c) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const CigarFormatInfo& getECigarInfo() {
+const CigarFormatInfo &getECigarInfo() {
     const static auto formatInfo = []() -> CigarFormatInfo {
-      const auto ref_step2 = []() -> std::vector<uint8_t> {
-        std::vector<uint8_t> lut(128, 0);
-        lut['='] = 1;
-        lut['+'] = 0;
-        lut['-'] = 1;
-        lut['*'] = 1;
-        lut['/'] = 1;
-        lut['%'] = 1;
-        lut[')'] = 0;
-        lut[']'] = 0;
-        return lut;
-      }();
-      const auto seq_step2 = []() -> std::vector<uint8_t> {
-        std::vector<uint8_t> lut(128, 0);
-        lut['='] = 1;
-        lut['+'] = 1;
-        lut['-'] = 0;
-        lut['%'] = 1;
-        lut['/'] = 1;
-        lut['*'] = 1;
-        lut[')'] = 1;
-        lut[']'] = 0;
-        return lut;
-      }();
-      const auto ignore2 = []() -> std::vector<uint8_t> {
-        std::vector<uint8_t> lut(128, 0);
-        lut['('] = 1;
-        lut['['] = 1;
-        return lut;
-      }();
-      return {ref_step2, seq_step2, ignore2, true};
+        const auto ref_step2 = []() -> std::vector<uint8_t> {
+            std::vector<uint8_t> lut(128, 0);
+            lut['='] = 1;
+            lut['+'] = 0;
+            lut['-'] = 1;
+            lut['*'] = 1;
+            lut['/'] = 1;
+            lut['%'] = 1;
+            lut[')'] = 0;
+            lut[']'] = 0;
+            return lut;
+        }();
+        const auto seq_step2 = []() -> std::vector<uint8_t> {
+            std::vector<uint8_t> lut(128, 0);
+            lut['='] = 1;
+            lut['+'] = 1;
+            lut['-'] = 0;
+            lut['%'] = 1;
+            lut['/'] = 1;
+            lut['*'] = 1;
+            lut[')'] = 1;
+            lut[']'] = 0;
+            return lut;
+        }();
+        const auto ignore2 = []() -> std::vector<uint8_t> {
+            std::vector<uint8_t> lut(128, 0);
+            lut['('] = 1;
+            lut['['] = 1;
+            return lut;
+        }();
+        return {ref_step2, seq_step2, ignore2, true};
     }();
     return formatInfo;
 }

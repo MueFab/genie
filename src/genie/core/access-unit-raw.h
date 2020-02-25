@@ -135,9 +135,7 @@ class AccessUnitRaw {
 
         const Subsequence* end() const { return &subdesc.back() + 1; }
 
-        size_t getSize() const {
-            return subdesc.size();
-        }
+        size_t getSize() const { return subdesc.size(); }
     };
 
     /**
