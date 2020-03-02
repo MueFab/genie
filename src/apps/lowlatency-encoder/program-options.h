@@ -4,23 +4,26 @@
 #include <string>
 #include <vector>
 
-namespace ureads_encoder {
+namespace lowlatency_encoder {
 
 class ProgramOptions {
    public:
     ProgramOptions(int argc, char *argv[]);
+
     ~ProgramOptions();
 
    public:
     std::string inputFilePath;
-    std::string pairFilePath;
+    std::string pairedPath;
     std::string outputFilePath;
-    std::string outputPairFilePath;
+    bool decompression;
+    uint8_t num_threads;
+    bool forceOverride;
 
    private:
     void processCommandLine(int argc, char *argv[]);
 };
 
-}  // namespace ureads_encoder
+}  // namespace lowlatency_encoder
 
 #endif  // GENIE_PROGRAM_OPTIONS_H_
