@@ -11,6 +11,7 @@
 #include <regex>
 #include "header/tag.h"
 
+#include <algorithm>
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -88,12 +89,14 @@ Record::Record(const std::string& string) {
     tlen = std::stoi(tokens[8]);
     seq = tokens[9];
     qual = tokens[10];
-    //    check();
+
+    checkValuesUsingRegex();
+    checkValuesUsingCondition();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Record::check() const {
+void Record::checkValuesUsingRegex() const {
     static const std::regex REGEX_QNAME("[!-?A-~]{1,254}");
     static const std::regex REGEX_RNAME("\\*|" + header::getSAMRegex());
     static const std::regex REGEX_CIGAR("\\*|([0-9]+[MIDNSHPX=])+");
@@ -104,6 +107,61 @@ void Record::check() const {
                      !std::regex_match(cigar, REGEX_CIGAR) || !std::regex_match(rnext, REGEX_RNEXT) ||
                      !std::regex_match(seq, REGEX_SEQ) || !std::regex_match(qual, REGEX_QUAL),
                  "Invalid SAM record");
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Record::checkValuesUsingCondition(){
+
+    // TODO: Check all conditions in SAM specification
+    // Value of certain field may not be set to certain value because:
+    //  > No assumption can be made does not mean default value
+    //  > Round trip test may not possible
+
+    // If read is pair and assigned as first and last segment at the same time
+    UTILS_DIE_IF(isMultiSeg() && isFirstSeg() && isLastSeg(), "Invalid first & last segment flags");
+
+    // True unmapped
+    //   File : "simulation.1.homoINDELs.homoCEUsnps.reads2.fq.sam.samelength.sam"
+//    if (isUnmapped()) {
+//        rname = "*";
+//        pos = 0;
+//        cigar = "*";
+//        mapq = 255; // TODO: Check default value of mapq
+//
+//        flag &= ~(1u << uint16_t(Record::FlagPos::PROPERLY_ALIGNED));
+//        flag &= ~(1u << uint16_t(Record::FlagPos::SECONDARY_ALIGNMENT));
+//        flag &= ~(1u << uint16_t(Record::FlagPos::SUPPLEMENTARY_ALIGNMENT));
+//    }
+
+    // TODO: Should the value of mapq set to default and unset flags just like using reliable unmapped condition?
+    //       Case can be found in "simulation.1.homoINDELs.homoCEUsnps.reads2.fq.sam.samelength.sam"
+    // Secondary unmapped condition - no assumption can be made
+//    if (rname == "*" || pos == 0 || cigar == "*") {
+//        rname = "*";
+//        pos = 0;
+//        cigar = "*";
+//    }
+
+    // Single-ended read
+//    if (!isMultiSeg()) {
+//        flag &= ~(1u << uint16_t(Record::FlagPos::PROPERLY_ALIGNED));       // 0x2
+//        flag &= ~(1u << uint16_t(Record::FlagPos::NEXT_SEGMENT_UNMAPPED));  // 0x8
+//        flag &= ~(1u << uint16_t(Record::FlagPos::NEXT_SEQ_REVERSE));       // 0x20
+//        flag &= ~(1u << uint16_t(Record::FlagPos::FIRST_SEGMENT));          // 0x40
+//        flag &= ~(1u << uint16_t(Record::FlagPos::LAST_SEGMENT));           // 0x80
+//    }
+
+    // Unknown pair
+//    if (rnext == "*" || pnext == 0) {
+//        // No assumption can be made
+//        rnext = "*";
+//        pnext = 0;
+//        flag &= ~(1u << uint16_t(Record::FlagPos::NEXT_SEQ_REVERSE));
+//    }
+
+    // Special character
+
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -187,6 +245,101 @@ std::string Record::toString() const {
     ret += std::to_string(tlen) + '\t' + seq + '\t' + qual;
     return ret;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// The only reliable condition to tell if read is unmapped
+bool Record::isUnmapped() const {
+    return flag & (1u << uint16_t(Record::FlagPos::SEGMENT_UNMAPPED));
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Record::isSecondary() const {
+    return flag & (1u << uint16_t(Record::FlagPos::SECONDARY_ALIGNMENT));
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Record::isSupplementary() const {
+    return flag & (1u << uint16_t(Record::FlagPos::SUPPLEMENTARY_ALIGNMENT));
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Record::isPrimaryLine() const {
+    return !(isSecondary() && isSupplementary());
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Record::isMultiSeg() const {
+    return flag & (1u << uint16_t(Record::FlagPos::MULTI_SEGMENT_TEMPLATE));
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Record::isFirstSeg() const {
+    return flag & (1u << uint16_t(Record::FlagPos::FIRST_SEGMENT));
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Record::isLastSeg() const {
+    return flag & (1u << uint16_t(Record::FlagPos::LAST_SEGMENT));
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Record::isPairOf(Record &other) const {
+//    const std::string &selfRnext = rnext == "=" ? rname : rnext;
+//    const std::string &otherRnext = other.rnext == "=" ? other.rname : other.rnext;
+
+    // If any read is non-multi segments
+    if (!(isMultiSeg() && other.isMultiSeg())){
+        return false;
+    }
+
+    // If next is mapped or data for assumption if complete, check others fields
+    if (!(isNextUnmapped() || rnext == "*" || pnext == 0)) {
+//        if (!(selfRnext == other.rname && pnext == other.pos && isNextSeqReverse() == other.isSeqReverse())) {
+        if (!((rnext == "=" ? rname : rnext) == other.rname && pnext == other.pos && isNextSeqReverse() == other.isSeqReverse())) {
+            return false;
+        }
+    }
+
+    // If self is mapped or data for assumption if complete, check fields
+    if (!(isUnmapped() || other.rnext == "*" || other.pnext == 0)){
+//        if (!(otherRnext == rname && other.pnext == pos && other.isSeqReverse() == isNextSeqReverse())) {
+        if (!((other.rnext == "=" ? other.rname : other.rnext) == rname && other.pnext == pos && other.isSeqReverse() == isNextSeqReverse())) {
+            return false;
+        }
+    }
+
+    // Only one of it is the first segment and one of it is the last segment
+    // Condition which both FirstSeg & LastSeg flags are set is already checked during construction
+    return (!(isFirstSeg() && other.isFirstSeg()) || (isLastSeg() && other.isLastSeg()));
+}
+
+bool Record::isNextUnmapped() const {
+    return flag & (1u << uint16_t(Record::FlagPos::NEXT_SEGMENT_UNMAPPED));
+}
+
+bool Record::isSeqReverse() const {
+    return flag & (1u << uint16_t(Record::FlagPos::SEQ_REVERSE));
+}
+
+bool Record::isNextSeqReverse() const {
+    return flag & (1u << uint16_t(Record::FlagPos::NEXT_SEQ_REVERSE));
+}
+
+//const std::string &Record::getReverseSeq() const {
+//    std::string revSeq = seq;
+//    std::reverse(revSeq.begin(), revSeq.end())
+//    return &revSeq;
+//}
+
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
