@@ -11,7 +11,6 @@
 
 #include <string>
 #include <genie/core/cigar-tokenizer.h>
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -23,7 +22,6 @@ namespace sam {
 const core::CigarFormatInfo& getSAMCigarInfo();
 
 // ---------------------------------------------------------------------------------------------------------------------
-
 class Record {
    private:
     std::string qname;
@@ -61,8 +59,6 @@ class Record {
 
     explicit Record(const std::string& string);
 
-    void check() const;
-
     const std::string& getQname() const;
     std::string&& moveQname();
     uint16_t getFlags() const;
@@ -83,6 +79,29 @@ class Record {
     const std::string& getQual() const;
     std::string&& moveQual();
     std::string toString() const;
+
+//    const std::string &getReverseSeq() const;
+
+    void checkValuesUsingRegex() const;
+    void checkValuesUsingCondition();
+
+    bool isUnmapped() const;
+
+    bool isPrimaryLine() const;
+    bool isSecondary() const;
+    bool isSupplementary() const;
+
+    bool isMultiSeg() const;
+    bool isFirstSeg() const;
+    bool isLastSeg() const;
+
+
+    bool isNextUnmapped() const;
+    bool isSeqReverse() const;
+    bool isNextSeqReverse() const;
+
+    bool isPairOf(Record &other) const;
+
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
