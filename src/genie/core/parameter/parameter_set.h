@@ -69,6 +69,8 @@ class ParameterSet : public DataUnit {
 
     uint8_t getID() const;
 
+    uint32_t getReadLength() const;
+
     ParameterSet &operator=(const ParameterSet &other);
 
     ParameterSet &operator=(ParameterSet &&other) noexcept;
