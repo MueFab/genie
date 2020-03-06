@@ -264,6 +264,10 @@ uint8_t ParameterSet::getID() const { return parameter_set_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+uint32_t ParameterSet::getReadLength() const { return read_length; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 ParameterSet &ParameterSet::operator=(const ParameterSet &other) {
     if (this == &other) {
         return *this;

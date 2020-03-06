@@ -3,10 +3,10 @@
 
 #include "program-options.h"
 
-namespace ureads_encoder {
+namespace lowlatency_encoder {
 
 void encode(const ProgramOptions& programOptions);
 
-}  // namespace ureads_encoder
+}  // namespace lowlatency_encoder
 
 #endif  // GENIE_LOG_H_
