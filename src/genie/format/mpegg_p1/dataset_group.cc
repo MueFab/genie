@@ -15,8 +15,7 @@ DatasetGroup::DatasetGroup(std::vector<genie::format::mpegg_p1::Dataset>* x_data
     }
 }
 
-void DatasetGroup::writeToFile(genie::util::BitWriter& bitWriter) const {
-    (void)bitWriter;  // silence compiler warnings
+void DatasetGroup::writeToFile(genie::util::BitWriter&) const {
     // TODO
 }
 

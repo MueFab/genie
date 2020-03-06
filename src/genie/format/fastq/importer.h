@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_IMPORTER_H
-#define GENIE_IMPORTER_H
+#ifndef GENIE_FASTQ_IMPORTER_H
+#define GENIE_FASTQ_IMPORTER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ namespace fastq {
 /**
  * @brief Module to reads fastq files and convert them into MPEGG-Record format
  */
-class FastqImporter : public core::FormatImporter {
+class Importer : public core::FormatImporter {
    private:
     static constexpr size_t LINES_PER_RECORD = 4;  //!< @brief How many lines in a fastq file belong to one record
     size_t blockSize;                              //!< @brief How many records to read in one pump() run
@@ -64,7 +64,7 @@ class FastqImporter : public core::FormatImporter {
      * @param _blockSize How many records to extract per pump()
      * @param _file_1 Input file
      */
-    FastqImporter(size_t _blockSize, std::istream *_file_1);
+    Importer(size_t _blockSize, std::istream &_file_1);
 
     /**
      * @brief Paired input
@@ -72,7 +72,7 @@ class FastqImporter : public core::FormatImporter {
      * @param _file_1 Input file #1
      * @param _file_2 Input file #2
      */
-    FastqImporter(size_t _blockSize, std::istream *_file_1, std::istream *_file_2);
+    Importer(size_t _blockSize, std::istream &_file_1, std::istream &_file_2);
 
     /**
      * @brief Process one block of data and propagate it to the next module in the chain
