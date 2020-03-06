@@ -248,89 +248,38 @@ std::string Record::toString() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// The only reliable condition to tell if read is unmapped
-bool Record::isUnmapped() const {
-    return flag & (1u << uint16_t(Record::FlagPos::SEGMENT_UNMAPPED));
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool Record::isSecondary() const {
-    return flag & (1u << uint16_t(Record::FlagPos::SECONDARY_ALIGNMENT));
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool Record::isSupplementary() const {
-    return flag & (1u << uint16_t(Record::FlagPos::SUPPLEMENTARY_ALIGNMENT));
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 bool Record::isPrimaryLine() const {
-    return !(isSecondary() && isSupplementary());
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool Record::isMultiSeg() const {
-    return flag & (1u << uint16_t(Record::FlagPos::MULTI_SEGMENT_TEMPLATE));
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool Record::isFirstSeg() const {
-    return flag & (1u << uint16_t(Record::FlagPos::FIRST_SEGMENT));
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool Record::isLastSeg() const {
-    return flag & (1u << uint16_t(Record::FlagPos::LAST_SEGMENT));
+    return !(checkFlag(FlagPos::SECONDARY_ALIGNMENT) && checkFlag(FlagPos::SUPPLEMENTARY_ALIGNMENT));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Record::isPairOf(Record &other) const {
-//    const std::string &selfRnext = rnext == "=" ? rname : rnext;
-//    const std::string &otherRnext = other.rnext == "=" ? other.rname : other.rnext;
-
     // If any read is non-multi segments
-    if (!(isMultiSeg() && other.isMultiSeg())){
+    if (!(checkFlag(FlagPos::MULTI_SEGMENT_TEMPLATE) && other.checkFlag(FlagPos::MULTI_SEGMENT_TEMPLATE))){
         return false;
     }
 
     // If next is mapped or data for assumption if complete, check others fields
-    if (!(isNextUnmapped() || rnext == "*" || pnext == 0)) {
-//        if (!(selfRnext == other.rname && pnext == other.pos && isNextSeqReverse() == other.isSeqReverse())) {
-        if (!((rnext == "=" ? rname : rnext) == other.rname && pnext == other.pos && isNextSeqReverse() == other.isSeqReverse())) {
+    if (!(checkFlag(FlagPos::NEXT_SEGMENT_UNMAPPED) || rnext == "*" || pnext == 0)) {
+        if (!((rnext == "=" ? rname : rnext) == other.rname && pnext == other.pos &&
+            checkFlag(FlagPos::NEXT_SEQ_REVERSE) == other.checkFlag(FlagPos::SEQ_REVERSE))) {
             return false;
         }
     }
 
     // If self is mapped or data for assumption if complete, check fields
-    if (!(isUnmapped() || other.rnext == "*" || other.pnext == 0)){
-//        if (!(otherRnext == rname && other.pnext == pos && other.isSeqReverse() == isNextSeqReverse())) {
-        if (!((other.rnext == "=" ? other.rname : other.rnext) == rname && other.pnext == pos && other.isSeqReverse() == isNextSeqReverse())) {
+    if (!(checkFlag(FlagPos::SEGMENT_UNMAPPED) || other.rnext == "*" || other.pnext == 0)){
+        if (!((other.rnext == "=" ? other.rname : other.rnext) == rname && other.pnext == pos &&
+            other.checkFlag(FlagPos::NEXT_SEQ_REVERSE) == checkFlag(FlagPos::SEQ_REVERSE))) {
             return false;
         }
     }
 
     // Only one of it is the first segment and one of it is the last segment
-    // Condition which both FirstSeg & LastSeg flags are set is already checked during construction
-    return (!(isFirstSeg() && other.isFirstSeg()) || (isLastSeg() && other.isLastSeg()));
-}
-
-bool Record::isNextUnmapped() const {
-    return flag & (1u << uint16_t(Record::FlagPos::NEXT_SEGMENT_UNMAPPED));
-}
-
-bool Record::isSeqReverse() const {
-    return flag & (1u << uint16_t(Record::FlagPos::SEQ_REVERSE));
-}
-
-bool Record::isNextSeqReverse() const {
-    return flag & (1u << uint16_t(Record::FlagPos::NEXT_SEQ_REVERSE));
+    // Condition where both FirstSeg & LastSeg flags are set is already checked during construction
+    return !((checkFlag(FlagPos::FIRST_SEGMENT) && other.checkFlag(FlagPos::FIRST_SEGMENT)) ||
+        (checkFlag(FlagPos::LAST_SEGMENT) && other.checkFlag(FlagPos::LAST_SEGMENT)));
 }
 
 //const std::string &Record::getReverseSeq() const {
