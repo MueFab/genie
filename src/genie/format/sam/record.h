@@ -35,7 +35,6 @@ class Record {
     int32_t tlen;
     std::string seq;
     std::string qual;
-    // TODO: Tags
    public:
     enum class FlagPos : uint16_t {
         MULTI_SEGMENT_TEMPLATE = 0,
@@ -85,20 +84,7 @@ class Record {
     void checkValuesUsingRegex() const;
     void checkValuesUsingCondition();
 
-    bool isUnmapped() const;
-
     bool isPrimaryLine() const;
-    bool isSecondary() const;
-    bool isSupplementary() const;
-
-    bool isMultiSeg() const;
-    bool isFirstSeg() const;
-    bool isLastSeg() const;
-
-
-    bool isNextUnmapped() const;
-    bool isSeqReverse() const;
-    bool isNextSeqReverse() const;
 
     bool isPairOf(Record &other) const;
 
