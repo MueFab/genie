@@ -14,6 +14,7 @@
 #include <vector>
 #include "header-info.h"
 #include "tag.h"
+#include <map>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +28,8 @@ namespace header {
 class HeaderLine {
    private:
     std::string name;
-    std::string comment;
+    // TODO: Remove comment
+//    std::string comment;
     std::vector<std::unique_ptr<TagBase>> tags;
 
     void parseSingleTag(const std::string& value, const TagInfo& info);
@@ -35,9 +37,11 @@ class HeaderLine {
 
    public:
     const std::string& getName() const;
-    const std::string& getComment() const;
+    // TODO: Remove comment
+//    const std::string& getComment() const;
     const std::vector<std::unique_ptr<TagBase>>& getTags() const;
     void addTag(std::unique_ptr<TagBase> tag);
+    std::vector<std::unique_ptr<TagBase>>&& moveTags();
 
     explicit HeaderLine(const std::string& line);
     HeaderLine(HeaderLine&& line) noexcept;
@@ -48,9 +52,12 @@ class HeaderLine {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+// Store parsed header lines
 class Header {
    private:
     std::vector<HeaderLine> lines;
+    std::vector<std::string> comments;
+    std::map<std::string, std::vector<std::unique_ptr<TagBase>>> references;
 
     void globalChecks() const;
 
@@ -61,6 +68,9 @@ class Header {
     void print(std::ostream& stream) const;
 
     const std::vector<HeaderLine>& getLines() const;
+    void addReference(HeaderLine&& line);
+    bool isReferenceExists(const std::string& _rname);
+    void addComment(std::string&& _str);
     void addLine(HeaderLine&& line);
 
     static Header createDefaultHeader();
