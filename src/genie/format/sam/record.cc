@@ -119,7 +119,8 @@ void Record::checkValuesUsingCondition(){
     //  > Round trip test may not possible
 
     // If read is pair and assigned as first and last segment at the same time
-    UTILS_DIE_IF(isMultiSeg() && isFirstSeg() && isLastSeg(), "Invalid first & last segment flags");
+    UTILS_DIE_IF(checkFlag(FlagPos::MULTI_SEGMENT_TEMPLATE) && checkFlag(FlagPos::FIRST_SEGMENT) && checkFlag(FlagPos::LAST_SEGMENT),
+        "Invalid first & last segment flags");
 
     // True unmapped
     //   File : "simulation.1.homoINDELs.homoCEUsnps.reads2.fq.sam.samelength.sam"
