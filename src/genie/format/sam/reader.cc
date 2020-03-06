@@ -49,6 +49,8 @@ void Reader::read() {
         // TODO: Store values for other constraints such as BY_SIZE
         num_records++;
 
+        UTILS_DIE_IF(!header.isReferenceExists(record.getRname()), "No reference in header");
+
         const auto& qname = record.getQname();
 
         auto entry = data.find(qname);

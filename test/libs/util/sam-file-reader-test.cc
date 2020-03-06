@@ -14,28 +14,48 @@
 
 #include <genie/format/sam/reader.h>
 
-TEST(SamFileReader, ReferenceWithAlias) {  // NOLINT(cert-err-cpp)
-    // Test Reference with alternative alias
+// TODO @Yeremia: Add support for reference with alternative alias
+//TEST(SamFileReader, PairReferenceWithAlternativeAlias) {  // NOLINT(cert-err-cpp)
+//    // Test Reference with alternative alias
+//
+//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+//    std::ifstream f(gitRootDir + "/data/sam/sample01.sam");
+//    genie::format::sam::Reader reader(f);
+//    EXPECT_NO_THROW(reader.read());
+//}
 
-    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::ifstream f(gitRootDir + "/data/sam/sample01.sam");
-    genie::format::sam::Reader reader(f);
-    EXPECT_NO_THROW(reader.read());
-}
-
-TEST(SamFileReader, HeaderInvalid) {  // NOLINT(cert-err-cpp)
+TEST(SamFileReader, PairHeaderInvalid) {  // NOLINT(cert-err-cpp)
     // Test sam file with invalid SAM header tag
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::ifstream f(gitRootDir + "/data/sam/sample02.sam");
     ASSERT_THROW(genie::format::sam::Reader reader(f);, genie::util::RuntimeException);
 }
 
-TEST(SamFileReader, IncompleteReference) {  // NOLINT(cert-err-cpp)
+TEST(SamFileReader, PairReferenceNotExists) {  // NOLINT(cert-err-cpp)
     // Test sam file with record, which reference does not exist in header
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::ifstream f(gitRootDir + "/data/sam/sample03.sam");
-    ASSERT_THROW(genie::format::sam::Reader reader(f);, genie::util::RuntimeException);
+    genie::format::sam::Reader reader(f);
+    ASSERT_THROW(reader.read(), genie::util::RuntimeException);
 }
+
+TEST(SamFileReader, PairInvalidFlags) {  // NOLINT(cert-err-cpp)
+    // Test sam file containing alignments with invalid flags
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    {
+        // Paired-end but no MultiSeg flag
+        std::ifstream f(gitRootDir + "/data/sam/sample04.sam");
+        genie::format::sam::Reader reader(f);
+        ASSERT_THROW(reader.read(), genie::util::RuntimeException);
+    }
+    {
+        // FirstSegment & LastSegment
+        std::ifstream f(gitRootDir + "/data/sam/sample05.sam");
+        genie::format::sam::Reader reader(f);
+        ASSERT_THROW(reader.read(), genie::util::RuntimeException);
+    }
+}
+
 
 TEST(SamFileReader, main) {  // NOLINT(cert-err-cpp)
 //    std::vector<std::string> fnames = {
