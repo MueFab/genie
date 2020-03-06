@@ -133,8 +133,7 @@ core::record::Record Importer::convert(uint16_t ref, sam::Record &&_r1, sam::Rec
     if (_r2) {
         sam::Record r2 = std::move(*_r2);
 
-        auto ecigar = convertCigar2ECigar(r2.getCigar(), r2.getSeq());
-        core::record::Alignment alignment2(std::move(ecigar), r2.checkFlag(Record::FlagPos::SEQ_REVERSE));
+        core::record::Alignment alignment2(std::move(convertCigar2ECigar(r2.getCigar(), r2.getSeq())), r2.checkFlag(Record::FlagPos::SEQ_REVERSE));
         alignment2.addMappingScore(r2.getMapQ());
 
         core::record::Segment segment2(r2.moveSeq());
@@ -156,65 +155,67 @@ core::record::Record Importer::convert(uint16_t ref, sam::Record &&_r1, sam::Rec
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Importer::pump(size_t id) {
-    core::record::Chunk chunk;
-    std::vector<sam::Record> s;
-    std::list<sam::Record> samRecords;
-    uint16_t local_ref_num = 0;
-    {
-        util::OrderedSection section(&lock, id);
-        samReader.read(blockSize, s);
-        auto it = refs.find(s.front().getRname());
-        if (it == refs.end()) {
-            local_ref_num = ref_counter;
-            refs.insert(std::make_pair(s.front().getRname(), ref_counter++));
-        } else {
-            local_ref_num = it->second;
-        }
-    }
-    std::copy(s.begin(), s.end(), std::back_inserter(samRecords));
-
-    std::cout << "Read " << samRecords.size() << " SAM record(s) for access unit " << id << std::endl;
-    size_t skipped = 0;
-    while (!samRecords.empty()) {
-        sam::Record samRecord = std::move(samRecords.front());
-        samRecords.erase(samRecords.begin());
-        // Search for mate
-        const std::string &rnameSearchString =
-            samRecord.getRnext() == "=" ? samRecord.getRname() : samRecord.getRnext();
-        auto mate = samRecords.begin();
-        mate = samRecords.end();  // Disable pairs for now TODO: implement
-        if (samRecord.getPnext() == samRecord.getPos() && samRecord.getRname() == rnameSearchString) {
-            mate = samRecords.end();
-        }
-        for (; mate != samRecords.end(); ++mate) {
-            if (mate->getRname() == rnameSearchString && mate->getPos() == samRecord.getPnext()) {
-                // LOG_TRACE << "Found mate";
-                break;
-            }
-        }
-        if (mate == samRecords.end()) {
-            // LOG_TRACE << "Did not find mate";
-            if ((samRecord.getFlags() & (1u << uint16_t(Record::FlagPos::SEGMENT_UNMAPPED))) ||
-                samRecord.getCigar() == "*" || samRecord.getPos() == 0 || samRecord.getRname() == "*") {
-                skipped++;
-            } else {
-                chunk.emplace_back(convert(local_ref_num, std::move(samRecord), nullptr));
-            }
-        } else {
-            // TODO: note the filtering of unaligned reads above. Move this to the encoder
-            chunk.emplace_back(convert(local_ref_num, std::move(samRecord), &*mate));
-            samRecords.erase(mate);
-        }
-    }
-    if (skipped) {
-        std::cerr << "Skipped " << skipped << " unmapped reads! Those are currently not supported." << std::endl;
-    }
-    if (!chunk.empty()) {
-        flowOut(std::move(chunk), id);
-    }
-
-    // Break if less than blockSize records were read from the SAM file
-    return !samReader.isEnd();
+//    core::record::Chunk chunk;
+//    std::vector<sam::Record> s;
+//    std::list<sam::Record> samRecords;
+//    uint16_t local_ref_num = 0;
+//    {
+//        util::OrderedSection section(&lock, id);
+//        samReader.read(blockSize, s);
+//        auto it = refs.find(s.front().getRname());
+//        if (it == refs.end()) {
+//            local_ref_num = ref_counter;
+//            refs.insert(std::make_pair(s.front().getRname(), ref_counter++));
+//        } else {
+//            local_ref_num = it->second;
+//        }
+//    }
+//    std::copy(s.begin(), s.end(), std::back_inserter(samRecords));
+//
+//    std::cout << "Read " << samRecords.size() << " SAM record(s) for access unit " << id << std::endl;
+//    size_t skipped = 0;
+//    while (!samRecords.empty()) {
+//
+//        sam::Record samRecord = std::move(samRecords.front());
+//        samRecords.erase(samRecords.begin());
+//        // Search for mate
+//        const std::string &rnameSearchString =
+//            samRecord.getRnext() == "=" ? samRecord.getRname() : samRecord.getRnext();
+//        auto mate = samRecords.begin();
+//        mate = samRecords.end();  // Disable pairs for now TODO: implement
+//        if (samRecord.getPnext() == samRecord.getPos() && samRecord.getRname() == rnameSearchString) {
+//            mate = samRecords.end();
+//        }
+//        for (; mate != samRecords.end(); ++mate) {
+//            if (mate->getRname() == rnameSearchString && mate->getPos() == samRecord.getPnext()) {
+//                // LOG_TRACE << "Found mate";
+//                break;
+//            }
+//        }
+//        if (mate == samRecords.end()) {
+//            // LOG_TRACE << "Did not find mate";
+//            if ((samRecord.getFlags() & (1u << uint16_t(Record::FlagPos::SEGMENT_UNMAPPED))) ||
+//                samRecord.getCigar() == "*" || samRecord.getPos() == 0 || samRecord.getRname() == "*") {
+//                skipped++;
+//            } else {
+//                chunk.emplace_back(convert(local_ref_num, std::move(samRecord), nullptr));
+//            }
+//        } else {
+//            // TODO: note the filtering of unaligned reads above. Move this to the encoder
+//            chunk.emplace_back(convert(local_ref_num, std::move(samRecord), &*mate));
+//            samRecords.erase(mate);
+//        }
+//    }
+//    if (skipped) {
+//        std::cerr << "Skipped " << skipped << " unmapped reads! Those are currently not supported." << std::endl;
+//    }
+//    if (!chunk.empty()) {
+//        flowOut(std::move(chunk), id);
+//    }
+//
+//    // Break if less than blockSize records were read from the SAM file
+//    return !samReader.isEnd();
+//    return createTree(id);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

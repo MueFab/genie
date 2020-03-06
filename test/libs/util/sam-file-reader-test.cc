@@ -56,6 +56,18 @@ TEST(SamFileReader, PairInvalidFlags) {  // NOLINT(cert-err-cpp)
     }
 }
 
+TEST(SamFileReader, SingleUnmapped) {  // NOLINT(cert-err-cpp)
+    // Test sam file containing alignments with invalid flags
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::ifstream f(gitRootDir + "/data/sam/sample06.sam");
+    genie::format::sam::Reader reader(f);
+    reader.read();
+    EXPECT_EQ(reader.data.size(), 5);
+    for (auto iter = reader.data.begin(); iter != reader.data.end(); iter++){
+        EXPECT_EQ(iter->second[uint8_t(genie::format::sam::Reader::Index::SINGLE_UNMAPPED)].size(), 1);
+    }
+}
+
 
 TEST(SamFileReader, main) {  // NOLINT(cert-err-cpp)
 //    std::vector<std::string> fnames = {

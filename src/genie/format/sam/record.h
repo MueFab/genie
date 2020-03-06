@@ -23,7 +23,7 @@ const core::CigarFormatInfo& getSAMCigarInfo();
 
 // ---------------------------------------------------------------------------------------------------------------------
 class Record {
-   private:
+private:
     std::string qname;
     uint16_t flag;
     std::string rname;
@@ -35,7 +35,7 @@ class Record {
     int32_t tlen;
     std::string seq;
     std::string qual;
-   public:
+public:
     enum class FlagPos : uint16_t {
         MULTI_SEGMENT_TEMPLATE = 0,
         PROPERLY_ALIGNED = 1,
@@ -56,38 +56,59 @@ class Record {
 
     Record();
 
-    explicit Record(const std::string& string);
+    explicit Record(const std::string &string);
 
-    const std::string& getQname() const;
-    std::string&& moveQname();
+    const std::string &getQname() const;
+
+    std::string &&moveQname();
+
     uint16_t getFlags() const;
+
     bool checkFlag(FlagPos f) const;
-    const std::string& getRname() const;
-    std::string&& moveRname();
+
+    const std::string &getRname() const;
+
+    std::string &&moveRname();
+
     uint32_t getPos() const;
+
     uint8_t getMapQ() const;
 
-    const std::string& getCigar() const;
-    std::string&& moveCigar();
-    const std::string& getRnext() const;
-    std::string&& moveRnext();
+    const std::string &getCigar() const;
+
+    std::string &&moveCigar();
+
+    const std::string &getRnext() const;
+
+    std::string &&moveRnext();
+
     uint32_t getPnext() const;
+
     int32_t getTlen() const;
-    const std::string& getSeq() const;
-    std::string&& moveSeq();
-    const std::string& getQual() const;
-    std::string&& moveQual();
+
+    const std::string &getSeq() const;
+
+    std::string &&moveSeq();
+
+    const std::string &getQual() const;
+
+    std::string &&moveQual();
+
     std::string toString() const;
 
 //    const std::string &getReverseSeq() const;
 
     void checkValuesUsingRegex() const;
+
     void checkValuesUsingCondition();
 
     bool isPrimaryLine() const;
 
-    bool isPairOf(Record &other) const;
+    bool isUnmapped() const;
 
+    bool isNextUnmapped() const;
+
+    bool isPairOf(Record &other) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
