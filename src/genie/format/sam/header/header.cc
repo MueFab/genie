@@ -25,7 +25,8 @@ const std::string& HeaderLine::getName() const { return name; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::string& HeaderLine::getComment() const { return comment; }
+// TODO: Remove comment
+//const std::string& HeaderLine::getComment() const { return comment; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,6 +35,12 @@ const std::vector<std::unique_ptr<TagBase>>& HeaderLine::getTags() const { retur
 // ---------------------------------------------------------------------------------------------------------------------
 
 void HeaderLine::addTag(std::unique_ptr<TagBase> tag) { tags.push_back(std::move(tag)); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::vector<std::unique_ptr<TagBase>> &&HeaderLine::moveTags() {
+    return std::move(tags);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -78,16 +85,13 @@ void HeaderLine::parseTags(const std::vector<std::string>& _tags, const HeaderLi
 HeaderLine::HeaderLine(const std::string& line) {
     auto ret = util::tokenize(line, '\t');
     name = ret.front().substr(1);
-    const std::string COMMENT = "CO";
-    if (name == COMMENT) {
-        comment = line.substr(4);
-        return;
-    }
+
     bool found = false;
     for (const auto& header : getHeaderInfo()) {
         if (header.name == name) {
             found = true;
             parseTags(ret, header);
+            break;
         }
     }
     UTILS_DIE_IF(!found, "Unknown Sam header line");
@@ -96,12 +100,14 @@ HeaderLine::HeaderLine(const std::string& line) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 HeaderLine::HeaderLine(HeaderLine&& line) noexcept
-    : name(std::move(line.name)), comment(std::move(line.comment)), tags(std::move(line.tags)) {}
+//    : name(std::move(line.name)), comment(std::move(line.comment)), tags(std::move(line.tags)) {}
+    : name(std::move(line.name)), tags(std::move(line.tags)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 HeaderLine::HeaderLine(std::string&& _name, std::string&& _comment)
-    : name(std::move(_name)), comment(std::move(_comment)) {}
+//    : name(std::move(_name)), comment(std::move(_comment)) {}
+    : name(std::move(_name)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -116,13 +122,25 @@ void HeaderLine::print(std::ostream& stream) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Header::Header(std::istream& stream) {
-    while (true) {
-        if (stream.peek() != '@') {
-            break;
+
+    std::string strLine;
+    while (stream.peek() == '@') {
+        std::getline(stream, strLine);
+
+        // Handle comment
+        if (strLine.substr(1, 2) == "CO"){
+            addComment(strLine.substr(4));
+        } else {
+            HeaderLine headerLine(strLine);
+
+            if (headerLine.getName() == "SQ"){
+                addReference(std::move(headerLine));
+            } else {
+                lines.emplace_back(strLine);
+            }
+
         }
-        std::string samline;
-        std::getline(stream, samline);
-        lines.emplace_back(samline);
+
     }
 }
 
@@ -141,6 +159,31 @@ void Header::print(std::ostream& stream) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::vector<HeaderLine>& Header::getLines() const { return lines; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Header::addReference(HeaderLine&& line){
+    // TODO: move implementation
+    auto tags = line.moveTags();
+    auto refName = tags[0].get()->toString();
+
+    UTILS_DIE_IF(references.find(refName) != references.end(),
+                 "Reference name " + refName + " is not unique");
+    tags.erase(tags.begin());
+    references.emplace(std::move(refName), std::move(tags));
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Header::isReferenceExists(const std::string& rname) {
+    return references.find(rname) != references.end();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Header::addComment(std::string&& _str) {
+    comments.push_back(std::move(_str.substr(4)));
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
