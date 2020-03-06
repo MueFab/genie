@@ -20,9 +20,9 @@ static void writeCommandLine(int argc, char* argv[]) {
 
 static int genie_main(int argc, char* argv[]) {
     try {
-        ureads_encoder::ProgramOptions programOptions(argc, argv);
+        lowlatency_encoder::ProgramOptions programOptions(argc, argv);
         writeCommandLine(argc, argv);
-        ureads_encoder::encode(programOptions);
+        lowlatency_encoder::encode(programOptions);
     } catch (const genie::util::RuntimeException& e) {
         std::cerr << "Runtime error: " << e.msg() << std::endl;
         return -1;
