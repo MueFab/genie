@@ -16,17 +16,17 @@ namespace fastq {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FastqImporter::FastqImporter(size_t _blockSize, std::istream *_file_1)
-    : blockSize(_blockSize), file_list{_file_1}, record_counter(0) {}
+Importer::Importer(size_t _blockSize, std::istream &_file_1)
+    : blockSize(_blockSize), file_list{&_file_1}, record_counter(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FastqImporter::FastqImporter(size_t _blockSize, std::istream *_file_1, std::istream *_file_2)
-    : blockSize(_blockSize), file_list{_file_1, _file_2}, record_counter(0) {}
+Importer::Importer(size_t _blockSize, std::istream &_file_1, std::istream &_file_2)
+    : blockSize(_blockSize), file_list{&_file_1, &_file_2}, record_counter(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool FastqImporter::pump(size_t id) {
+bool Importer::pump(size_t id) {
     core::record::Chunk chunk;
     bool eof = false;
     {
@@ -47,7 +47,7 @@ bool FastqImporter::pump(size_t id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::record::Record FastqImporter::buildRecord(std::vector<std::array<std::string, LINES_PER_RECORD>> data) {
+core::record::Record Importer::buildRecord(std::vector<std::array<std::string, LINES_PER_RECORD>> data) {
     auto ret = core::record::Record(data.size(), core::record::ClassType::CLASS_U,
                                     data[Files::FIRST][Lines::ID].substr(1), "Genie", 0);
 
@@ -63,7 +63,7 @@ core::record::Record FastqImporter::buildRecord(std::vector<std::array<std::stri
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<std::array<std::string, FastqImporter::LINES_PER_RECORD>> FastqImporter::readData(
+std::vector<std::array<std::string, Importer::LINES_PER_RECORD>> Importer::readData(
     const std::vector<std::istream *> &_file_list) {
     std::vector<std::array<std::string, LINES_PER_RECORD>> data(_file_list.size());
     for (size_t cur_file = 0; cur_file < _file_list.size(); ++cur_file) {
@@ -81,7 +81,7 @@ std::vector<std::array<std::string, FastqImporter::LINES_PER_RECORD>> FastqImpor
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FastqImporter::sanityCheck(const std::array<std::string, LINES_PER_RECORD> &data) {
+void Importer::sanityCheck(const std::array<std::string, LINES_PER_RECORD> &data) {
     constexpr char ID_TOKEN = '@';
     UTILS_DIE_IF(data[Lines::ID].front() != ID_TOKEN, "Invald fastq identifier");
     constexpr char RESERVED_TOKEN = '+';
@@ -92,7 +92,7 @@ void FastqImporter::sanityCheck(const std::array<std::string, LINES_PER_RECORD> 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FastqImporter::dryIn() { dryOut(); }
+void Importer::dryIn() { dryOut(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
