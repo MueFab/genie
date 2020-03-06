@@ -255,24 +255,38 @@ bool Record::isPrimaryLine() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool Record::isUnmapped() const {
+    return checkFlag(FlagPos::SEGMENT_UNMAPPED) || rname == "*" || pos == 0;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Record::isNextUnmapped() const {
+    return checkFlag(FlagPos::NEXT_SEGMENT_UNMAPPED) || rnext == "*" || pnext == 0;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool Record::isPairOf(Record &other) const {
     // If any read is non-multi segments
-    if (!(checkFlag(FlagPos::MULTI_SEGMENT_TEMPLATE) && other.checkFlag(FlagPos::MULTI_SEGMENT_TEMPLATE))){
+    if (!(checkFlag(FlagPos::MULTI_SEGMENT_TEMPLATE) && other.checkFlag(FlagPos::MULTI_SEGMENT_TEMPLATE))) {
         return false;
     }
 
-    // If next is mapped or data for assumption if complete, check others fields
-    if (!(checkFlag(FlagPos::NEXT_SEGMENT_UNMAPPED) || rnext == "*" || pnext == 0)) {
+    // If next segment is mapped or data of other is complete, check others fields
+    //if (!isNextUnmapped()){
+    if (!(isNextUnmapped() || other.isUnmapped())){
         if (!((rnext == "=" ? rname : rnext) == other.rname && pnext == other.pos &&
-            checkFlag(FlagPos::NEXT_SEQ_REVERSE) == other.checkFlag(FlagPos::SEQ_REVERSE))) {
+              checkFlag(FlagPos::NEXT_SEQ_REVERSE) == other.checkFlag(FlagPos::SEQ_REVERSE))) {
             return false;
         }
     }
 
     // If self is mapped or data for assumption if complete, check fields
-    if (!(checkFlag(FlagPos::SEGMENT_UNMAPPED) || other.rnext == "*" || other.pnext == 0)){
+    //if (!other.isNextUnmapped()){
+    if (!(other.isNextUnmapped() || isUnmapped())){
         if (!((other.rnext == "=" ? other.rname : other.rnext) == rname && other.pnext == pos &&
-            other.checkFlag(FlagPos::NEXT_SEQ_REVERSE) == checkFlag(FlagPos::SEQ_REVERSE))) {
+              other.checkFlag(FlagPos::NEXT_SEQ_REVERSE) == checkFlag(FlagPos::SEQ_REVERSE))) {
             return false;
         }
     }
@@ -280,9 +294,8 @@ bool Record::isPairOf(Record &other) const {
     // Only one of it is the first segment and one of it is the last segment
     // Condition where both FirstSeg & LastSeg flags are set is already checked during construction
     return !((checkFlag(FlagPos::FIRST_SEGMENT) && other.checkFlag(FlagPos::FIRST_SEGMENT)) ||
-        (checkFlag(FlagPos::LAST_SEGMENT) && other.checkFlag(FlagPos::LAST_SEGMENT)));
+             (checkFlag(FlagPos::LAST_SEGMENT) && other.checkFlag(FlagPos::LAST_SEGMENT)));
 }
-
 //const std::string &Record::getReverseSeq() const {
 //    std::string revSeq = seq;
 //    std::reverse(revSeq.begin(), revSeq.end())
