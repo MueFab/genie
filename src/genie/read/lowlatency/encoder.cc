@@ -5,7 +5,8 @@
  */
 
 #include "encoder.h"
-
+#include <genie/name/tokenizer/detokenizer.h>
+#include "genie/name/tokenizer/encoder.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -20,6 +21,21 @@ Encoder::Encoder(core::QVEncoder* coder) : core::ReadEncoder(coder) {}
 
 void Encoder::flowIn(core::record::Chunk&& t, size_t id)  {
     core::record::Chunk data = std::move(t);
+
+    // ------------------------------------------------------------------- TEST
+
+    auto toks = genie::name::tokenizer::generate_id_tokens(data);
+
+    std::vector<std::string> out;
+    genie::name::tokenizer::NameDecoder decoder(std::move(toks));
+    for(size_t c = 0; c < data.size(); ++c) {
+        std::cout << decoder.decode() << std::endl;
+    }
+
+    std::terminate();
+
+    // ------------------------------------------------------------------- TEST
+
     core::parameter::ParameterSet set;
     LLState state{data.front().getSegments().front().getSequence().length(),
                   data.front().getNumberOfTemplateSegments() > 1,
