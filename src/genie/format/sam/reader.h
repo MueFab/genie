@@ -11,6 +11,7 @@
 
 #include <istream>
 #include <map>
+#include <list>
 #include "header/header.h"
 #include "record.h"
 
@@ -45,14 +46,15 @@ class Reader {
    private:
     std::istream& stream;
     header::Header header;
-//    Record save;
     bool rec_saved;
 
     Constraint constraint;
     uint64_t constraint_val;
     uint64_t num_records;
 
+    std::map<std::string, std::vector<int>> cache;
     std::map<std::string, std::vector<std::vector<Record>>> data;
+
    public:
     explicit Reader(std::istream& _stream, Constraint _constraint = Constraint::NONE, uint64_t _constraint_val = UINT64_MAX);
 
@@ -60,7 +62,11 @@ class Reader {
 
     bool isConstrainReached() const; //
 
-    void read();
+    void addRecord(std::string& str);
+
+    void read(int num);
+
+    bool getSortedRecord(std::list<Record>& unmappedRead, std::list<Record>& read1, std::list<Record>& read2);
 
     bool isEnd();
 

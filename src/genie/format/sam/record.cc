@@ -250,7 +250,7 @@ std::string Record::toString() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Record::isPrimaryLine() const {
-    return !(checkFlag(FlagPos::SECONDARY_ALIGNMENT) && checkFlag(FlagPos::SUPPLEMENTARY_ALIGNMENT));
+    return !(checkFlag(FlagPos::SECONDARY_ALIGNMENT) || checkFlag(FlagPos::SUPPLEMENTARY_ALIGNMENT));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
