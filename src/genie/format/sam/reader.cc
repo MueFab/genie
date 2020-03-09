@@ -7,7 +7,9 @@
 #include "reader.h"
 #include <map>
 #include <genie/util/exceptions.h>
-//#include <hdf5_hl.h>
+#include <list>
+
+#define WITH_CACHE true
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -18,7 +20,32 @@ namespace sam {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Reader::Reader(std::istream& _stream, Constraint _constraint, uint64_t _constraint_val):
-    stream(_stream), header(stream), rec_saved(false), constraint(_constraint), constraint_val(_constraint_val), num_records(0){}
+    stream(_stream), header(stream), rec_saved(false), constraint(_constraint), constraint_val(_constraint_val), num_records(0){
+
+#if WITH_CACHE
+    int init_pos = stream.tellg();
+    std::string str;
+
+    int pos = stream.tellg();
+    while(std::getline(stream, str)){
+        auto qname = str.substr(0, str.find('\t'));
+
+        auto search = cache.find(qname);
+        if (search == cache.end()){
+            cache.emplace(std::move(qname), std::move(std::vector<int>({pos})));
+        }
+        else {
+            search->second.push_back(pos);
+        }
+
+        pos = stream.tellg();
+    }
+    stream.clear();
+    stream.seekg(init_pos);
+
+    UTILS_DIE_IF(stream.tellg() != init_pos, "Unable to move file pointer");
+#endif
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -42,85 +69,149 @@ bool Reader::isConstrainReached() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Reader::read() {
-    std::string string;
-    while (!isConstrainReached() && std::getline(stream, string)){
-        Record record(string);
-        // TODO: Store values for other constraints such as BY_SIZE (Yeremia)
-        num_records++;
+void Reader::addRecord(std::string& str) {
+    Record record(str);
+    // TODO: Store values for other constraints such as BY_SIZE (Yeremia)
+    num_records++;
 
-        if (!record.isUnmapped()){
-            UTILS_DIE_IF(!header.isReferenceExists(record.getRname()), "No reference in header");
+    if (!record.isUnmapped()){
+        UTILS_DIE_IF(!header.isReferenceExists(record.getRname()), "No reference in header");
+    }
+
+    const auto& qname = record.getQname();
+
+    auto entry = data.find(qname);
+    if (entry == data.end()) {
+        data.emplace(qname, std::vector<std::vector<Record>>());
+
+        for (uint8_t i = 0; i < uint8_t(Index::TOTAL_TYPES); i++) {
+            data[qname].emplace_back(std::vector<Record>());
         }
+    }
 
-        const auto& qname = record.getQname();
+    Reader::Index idx;
 
-        auto entry = data.find(qname);
-        if (entry == data.end()) {
-            data.emplace(qname, std::vector<std::vector<Record>>());
-
-            for (uint8_t i = 0; i < uint8_t(Index::TOTAL_TYPES); i++) {
-                data[qname].emplace_back(std::vector<Record>());
-            }
-        }
-
-        Reader::Index idx;
-
-        // Paired-end read / multi segments
-        if (record.checkFlag(Record::FlagPos::MULTI_SEGMENT_TEMPLATE)) {
-            if (record.checkFlag(Record::FlagPos::FIRST_SEGMENT)) {
-                idx = record.isPrimaryLine() ? Index::PAIR_FIRST_PRIMARY : Index::PAIR_FIRST_NONPRIMARY;
-            } else if (record.checkFlag(Record::FlagPos::LAST_SEGMENT)) {
-                idx = record.isPrimaryLine() ? Index::PAIR_LAST_PRIMARY : Index::PAIR_LAST_NONPRIMARY;
-            } else {
-                UTILS_DIE("Unknown type of template found");
-            }
-        // Single-end read / single segment
-        } else if (!record.checkFlag(Record::FlagPos::FIRST_SEGMENT) && !record.checkFlag(Record::FlagPos::LAST_SEGMENT)) {
-            idx = record.checkFlag(Record::FlagPos::SEGMENT_UNMAPPED) ? Index::SINGLE_UNMAPPED : Index::SINGLE_MAPPED;
+    // Paired-end read / multi segments
+    if (record.checkFlag(Record::FlagPos::MULTI_SEGMENT_TEMPLATE)) {
+        if (record.checkFlag(Record::FlagPos::FIRST_SEGMENT)) {
+            idx = record.isPrimaryLine() ? Index::PAIR_FIRST_PRIMARY : Index::PAIR_FIRST_NONPRIMARY;
+        } else if (record.checkFlag(Record::FlagPos::LAST_SEGMENT)) {
+            idx = record.isPrimaryLine() ? Index::PAIR_LAST_PRIMARY : Index::PAIR_LAST_NONPRIMARY;
         } else {
             UTILS_DIE("Unknown type of template found");
         }
-
-        data[qname][uint8_t(idx)].push_back(std::move(record));
+        // Single-end read / single segment
+    } else if (!record.checkFlag(Record::FlagPos::FIRST_SEGMENT) && !record.checkFlag(Record::FlagPos::LAST_SEGMENT)) {
+        idx = record.checkFlag(Record::FlagPos::SEGMENT_UNMAPPED) ? Index::SINGLE_UNMAPPED : Index::SINGLE_MAPPED;
+    } else {
+        UTILS_DIE("Unknown type of template found");
     }
 
-//    for (auto iter = data.begin(); iter != data.end(); iter++){
-    for (auto iter : data){
+    data[qname][uint8_t(idx)].push_back(std::move(record));
+}
 
-        auto isSingleEnd  = !(iter.second[uint8_t(Index::SINGLE_MAPPED)].empty() && iter.second[uint8_t(Index::SINGLE_UNMAPPED)].empty());
-        auto isPairedEnd1 = !(iter.second[uint8_t(Index::PAIR_FIRST_PRIMARY)].empty() || iter.second[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].empty());
-        auto isPairedEnd2 = !(iter.second[uint8_t(Index::PAIR_LAST_PRIMARY)].empty() || iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].empty());
-        //auto isPairedEnd = isPairedEnd1 || isPairedEnd2;
+// ---------------------------------------------------------------------------------------------------------------------
 
-        // Check if template is either single or paired-end using xor operation
-        UTILS_DIE_IF(!((isSingleEnd || (isPairedEnd1 || isPairedEnd2)) && !(isSingleEnd && (isPairedEnd1 || isPairedEnd2))),
-                     "Template with both single- and paired-end reads found");
+// TODO: Change type of num to size_t, prevent over-/underflow (yeremia)
+void Reader::read(int num) {
+    std::string str;
 
+#if WITH_CACHE
+    for (auto iter = cache.begin(); iter != cache.end(); iter++){
+        for (auto iter_pos = iter->second.begin(); iter_pos != iter->second.end(); iter_pos++){
+            stream.seekg(*iter_pos);
+            std::getline(stream, str);
+            addRecord(str);
+            num--;
+        }
 
+        cache.erase(iter);
+
+        if (num <= 0) {
+            break;
+        }
+    }
+#else
+    while (num && std::getline(stream, str)) {
+        addRecord(str);
+        num--;
+    }
+#endif
+
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Reader::getSortedRecord(std::list<Record>& unmappedRead, std::list<Record>& read1, std::list<Record>& read2) {
+
+    unmappedRead.clear();
+    read1.clear();
+    read2.clear();
+
+    if (num_records) {
+        for (auto & iter : data) {
+
+            auto isSingleEndUnmapped = !(iter.second[uint8_t(Index::SINGLE_UNMAPPED)].empty());
+            auto isSingleEndMapped = !iter.second[uint8_t(Index::SINGLE_MAPPED)].empty();
+            auto isPairedEndPrimary = !(iter.second[uint8_t(Index::PAIR_FIRST_PRIMARY)].empty() &&
+                                  iter.second[uint8_t(Index::PAIR_LAST_PRIMARY)].empty());
+            auto isPairedEndNonPrimary = !(iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].empty() &&
+                                  iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].empty());
+
+            // Check if template is either single or paired-end using xor operation
+            UTILS_DIE_IF(!(((isSingleEndUnmapped || isSingleEndMapped) || (isPairedEndPrimary || isPairedEndNonPrimary)) &&
+                           !((isSingleEndUnmapped || isSingleEndMapped) && (isPairedEndPrimary || isPairedEndNonPrimary))),
+                         "Template with both single- and paired-end reads found");
+
+            UTILS_DIE_IF(isSingleEndUnmapped && isSingleEndMapped, "Invalid single-ended read");
+
+            if (isSingleEndUnmapped) {
+                num_records -= iter.second[uint8_t(Index::SINGLE_UNMAPPED)].size();
+                std::move(iter.second[uint8_t(Index::SINGLE_UNMAPPED)].begin(),
+                          iter.second[uint8_t(Index::SINGLE_UNMAPPED)].end(),
+                          std::back_inserter(unmappedRead));
+
+            } else if (isSingleEndMapped) {
+                num_records -= iter.second[uint8_t(Index::SINGLE_MAPPED)].size();
+
+                std::move(iter.second[uint8_t(Index::SINGLE_MAPPED)].begin(),
+                          iter.second[uint8_t(Index::SINGLE_MAPPED)].end(),
+                          std::back_inserter(read1));
+
+            } else if (isPairedEndPrimary) {
+                num_records -= iter.second[uint8_t(Index::PAIR_FIRST_PRIMARY)].size();
+                num_records -= iter.second[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].size();
+                num_records -= iter.second[uint8_t(Index::PAIR_LAST_PRIMARY)].size();
+                num_records -= iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].size();
+
+                std::move(iter.second[uint8_t(Index::PAIR_FIRST_PRIMARY)].begin(),
+                          iter.second[uint8_t(Index::PAIR_FIRST_PRIMARY)].end(),
+                          std::back_inserter(read1));
+
+                std::move(iter.second[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].begin(),
+                          iter.second[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].end(),
+                          std::back_inserter(read1));
+
+                std::move(iter.second[uint8_t(Index::PAIR_LAST_PRIMARY)].begin(),
+                          iter.second[uint8_t(Index::PAIR_LAST_PRIMARY)].end(),
+                          std::back_inserter(read2));
+
+                std::move(iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].begin(),
+                          iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].end(),
+                          std::back_inserter(read2));
+            } else {
+#if WITH_CACHE
+                UTILS_DIE("Invalid alignment with QNAME " + iter.first);
+#else
+                continue;
+#endif
+            }
+            data.erase(iter.first);
+            return true;
+        }
     }
 
-//    std::string string;
-//    vec.clear();
-//    if (rec_saved) {
-//        rec_saved = false;
-//        vec.emplace_back(std::move(save));
-//    }
-//    while (num && std::getline(stream, string)) {
-//        vec.emplace_back(string);
-//        if (vec.front().getRname() != vec.back().getRname()) {
-//            save = std::move(vec.back());
-//            vec.pop_back();
-//            rec_saved = true;
-//            return;
-//        }
-//        num--;
-//    }
-    
-
-//    vec.clear();
-
-
+    return false;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

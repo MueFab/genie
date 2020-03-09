@@ -125,7 +125,7 @@ TEST(SamReader, PairedEndReferenceNotExists) {  // NOLINT(cert-err-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::ifstream f(gitRootDir + "/data/sam/sample03.sam");
     genie::format::sam::Reader reader(f);
-    ASSERT_THROW(reader.read(), genie::util::RuntimeException);
+    ASSERT_THROW(reader.read(10), genie::util::RuntimeException);
 }
 
 TEST(SamReader, PairedEndInvalidFlags) {  // NOLINT(cert-err-cpp)
@@ -135,13 +135,13 @@ TEST(SamReader, PairedEndInvalidFlags) {  // NOLINT(cert-err-cpp)
         // Paired-end but no MultiSeg flag
         std::ifstream f(gitRootDir + "/data/sam/sample04.sam");
         genie::format::sam::Reader reader(f);
-        ASSERT_THROW(reader.read(), genie::util::RuntimeException);
+        ASSERT_THROW(reader.read(10), genie::util::RuntimeException);
     }
     {
         // FirstSegment & LastSegment
         std::ifstream f(gitRootDir + "/data/sam/sample05.sam");
         genie::format::sam::Reader reader(f);
-        ASSERT_THROW(reader.read(), genie::util::RuntimeException);
+        ASSERT_THROW(reader.read(10), genie::util::RuntimeException);
     }
 }
 
@@ -150,7 +150,7 @@ TEST(SamReader, SingleEndUnmapped) {  // NOLINT(cert-err-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::ifstream f(gitRootDir + "/data/sam/sample06.sam");
     genie::format::sam::Reader reader(f);
-    reader.read();
+    reader.read(10);
 
     auto data = reader.getData();
     EXPECT_EQ(data.size(), 5);
@@ -161,82 +161,80 @@ TEST(SamReader, SingleEndUnmapped) {  // NOLINT(cert-err-cpp)
 
 
 TEST(SamFileReader, main) {  // NOLINT(cert-err-cpp)
-//    std::vector<std::string> fnames = {
-//            "9799_7#3.sam",  // 0 - TODO: As an example for header
-//            "9827_2#49.sam", // 1 - OK
-//            "dm3PacBio.sam", // 2 - OK
-//            "ERR174310.aln.sort.dupmark.rg.recal.sam", // 3 - OK
-//            "ERR174310.mult.sorted.sam",    // 4 - TODO: ERROR due to invalid SAM Record
-//            "G15511.HCC1143.1.sam",         // 5 - TODO: As an example for header
-//            "HCC1954.mix1.n80t20.sam",      // 6 - TODO: As an example for header
-//            "K562_cytosol_LID8465_GEM_v3.sam",      // 7 - pair multi_allignment - TODO: Create smaller data
-//            "K562_cytosol_LID8465_TopHat_v2.sam",   // 8 - OK
-//            "MiSeq_Ecoli_DH10B_110721_PF.sam",      // 9 - OK
-//            "NA12877_S1.sam",   // 10 - TODO: tag ID PP
-//            "NA12878_S1.sam",   // 11
-//            "NA12878-Rep-1_S1_L001_2.aln.sort.dupmark.rg.sam",  // 12 - TODO: tag PL
-//            "NA12878.pacbio.bwa-sw.20140202.sam",               // 13
-//            "NA12879_S1.sam",         // 14 - (incomplete) pair - TODO: test
-//            "NA12882_S1.sam",         // 15 - pair - TODO: tag ID, PP
-//            "NA12890_S1.sam",         // 16 - incomplete pairs - ok
-//            "NA21144.chrom11.ILLUMINA.bwa.GIH.low_coverage.20130415.sam", // 17 - TODO: tag VN
-//            "sample-2-10_sorted.sam", // 18 - single - ok
-//            "sample-2-11_sorted.sam", // 19 - single - ok
-//            "sample-2-12_sorted.sam", // 20 - single - ok
-//            "simulation.1.homoINDELs.homoCEUsnps.reads2.fq.sam.samelength.sam", // 21 - pair - ok
-//            "SRR327342.sam"           // 22 - single unmapped - TODO: Check converter for unmapped
-//    };
-//
-//    std::vector<std::string> fnames2 = {
-//            "aux#aux.sam",          // 0
-//            "aux#special.sam",      // 1
-//            "c1#bounds.sam",        // 2 - single mapped
-//            "c1#clip.sam",          // 3 -
-//            "c1#pad1.sam",          // 4
-//            "c1#pad2.sam",          // 5
-//            "c1#pad3.sam",          // 6
-//            "ce#1.sam",             // 7
-//            "ce#2.sam",             // 8
-//            "ce#5b.sam",            // 9
-//            "ce#5.sam",             // 10
-//            "ce#large_seq.sam",     // 11
-//            "ce#tag_depadded.sam",  // 12
-//            "ce#tag_padded.sam",    // 13
-//            "ce#unmap1.sam",        // 14
-//            "ce#unmap2.sam",        // 15
-//            "ce#unmap.sam",         // 16
-//            "list.txt",             // 17
-//            "small.sam",            // 18
-//            "text.sam",             // 19
-//            "xx#blank.sam",         // 20
-//            "xx#large_aux2.sam",    // 21
-//            "xx#large_aux.sam",     // 22
-//            "xx#minimal.sam",       // 23
-//            "xx#pair.sam",          // 24
-//            "xx#rg.sam",            // 25
-//            "xx#triplet.sam",       // 26
-//            "xx#unsorted.sam",      // 27
-//            "mappingOperations.sam",// 28
-//            "readNameTest1.sam",    // 29
-//            "readNameTest2.sam",    // 30
-//            "readNameTest3.sam",    // 31
-//            "readNameTest4.sam",    // 32
-//            "readNameTest5.sam"     // 33
-//    };
-//
-////    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-//    std::ifstream f("/home/adhisant/tmp/data/SAM_TEST/" + fnames[7]);
-////    std::ifstream f("/home/adhisant/tmp/data/testdata/" + fnames2[3]);
-//
-//    genie::format::sam::Reader reader(f);
-//
-//    std::vector<genie::format::sam::Record> recs;
-//    reader.read();
-//
-//
-//    genie::format::sam::Importer sam((std::size_t) 10000, f);
-//
-//    sam.pump(size_t(0));
+    std::vector<std::string> fnames = {
+            "9799_7#3.sam",  // 0 - TODO: As an example for header
+            "9827_2#49.sam", // 1 - OK
+            "dm3PacBio.sam", // 2 - OK
+            "ERR174310.aln.sort.dupmark.rg.recal.sam", // 3 - OK
+            "ERR174310.mult.sorted.sam",    // 4 - TODO: ERROR due to invalid SAM Record
+            "G15511.HCC1143.1.sam",         // 5 - TODO: As an example for header
+            "HCC1954.mix1.n80t20.sam",      // 6 - TODO: As an example for header
+            "K562_cytosol_LID8465_GEM_v3.sam",      // 7 - pair multi_allignment - TODO: Create smaller data
+            "K562_cytosol_LID8465_TopHat_v2.sam",   // 8 - OK
+            "MiSeq_Ecoli_DH10B_110721_PF.sam",      // 9 - OK
+            "NA12877_S1.sam",   // 10 - TODO: tag ID PP
+            "NA12878_S1.sam",   // 11
+            "NA12878-Rep-1_S1_L001_2.aln.sort.dupmark.rg.sam",  // 12 - TODO: tag PL
+            "NA12878.pacbio.bwa-sw.20140202.sam",               // 13
+            "NA12879_S1.sam",         // 14 - (incomplete) pair - TODO: test
+            "NA12882_S1.sam",         // 15 - pair - TODO: tag ID, PP
+            "NA12890_S1.sam",         // 16 - incomplete pairs - ok
+            "NA21144.chrom11.ILLUMINA.bwa.GIH.low_coverage.20130415.sam", // 17 - TODO: tag VN
+            "sample-2-10_sorted.sam", // 18 - single - ok
+            "sample-2-11_sorted.sam", // 19 - single - ok
+            "sample-2-12_sorted.sam", // 20 - single - ok
+            "simulation.1.homoINDELs.homoCEUsnps.reads2.fq.sam.samelength.sam", // 21 - pair - ok
+            "SRR327342.sam"           // 22 - single unmapped - TODO: Check converter for unmapped
+    };
+
+    std::vector<std::string> fnames2 = {
+            "aux#aux.sam",          // 0
+            "aux#special.sam",      // 1
+            "c1#bounds.sam",        // 2 - single mapped
+            "c1#clip.sam",          // 3 -
+            "c1#pad1.sam",          // 4
+            "c1#pad2.sam",          // 5
+            "c1#pad3.sam",          // 6
+            "ce#1.sam",             // 7
+            "ce#2.sam",             // 8
+            "ce#5b.sam",            // 9
+            "ce#5.sam",             // 10
+            "ce#large_seq.sam",     // 11
+            "ce#tag_depadded.sam",  // 12
+            "ce#tag_padded.sam",    // 13
+            "ce#unmap1.sam",        // 14
+            "ce#unmap2.sam",        // 15
+            "ce#unmap.sam",         // 16
+            "list.txt",             // 17
+            "small.sam",            // 18
+            "text.sam",             // 19
+            "xx#blank.sam",         // 20
+            "xx#large_aux2.sam",    // 21
+            "xx#large_aux.sam",     // 22
+            "xx#minimal.sam",       // 23
+            "xx#pair.sam",          // 24
+            "xx#rg.sam",            // 25
+            "xx#triplet.sam",       // 26
+            "xx#unsorted.sam",      // 27
+            "mappingOperations.sam",// 28
+            "readNameTest1.sam",    // 29
+            "readNameTest2.sam",    // 30
+            "readNameTest3.sam",    // 31
+            "readNameTest4.sam",    // 32
+            "readNameTest5.sam"     // 33
+    };
+
+//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::ifstream f("/home/adhisant/tmp/data/SAM_TEST/" + fnames[7]);
+//    std::ifstream f("/home/adhisant/tmp/data/testdata/" + fnames2[3]);
+
+    std::list<genie::format::sam::Record> unmappedRead, read1, read2;
+    genie::format::sam::Reader reader(f);
+    reader.read(1);
+
+    auto success = reader.getSortedRecord(unmappedRead, read1, read2);
+
+    std::string x("AAA");
 }
 
 

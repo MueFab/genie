@@ -215,7 +215,12 @@ bool Importer::pump(size_t id) {
 //
 //    // Break if less than blockSize records were read from the SAM file
 //    return !samReader.isEnd();
-//    return createTree(id);
+    std::list<genie::format::sam::Record> unmappedRead, read1, read2;
+    samReader.read(blockSize);
+    while (samReader.getSortedRecord(unmappedRead, read1, read2)){
+
+    }
+    return !samReader.isEnd();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
