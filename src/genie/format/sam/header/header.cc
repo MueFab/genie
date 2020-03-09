@@ -25,11 +25,6 @@ const std::string& HeaderLine::getName() const { return name; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO: Remove comment
-//const std::string& HeaderLine::getComment() const { return comment; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 const std::vector<std::unique_ptr<TagBase>>& HeaderLine::getTags() const { return tags; }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -163,7 +158,6 @@ const std::vector<HeaderLine>& Header::getLines() const { return lines; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Header::addReference(HeaderLine&& line){
-    // TODO: move implementation
     auto tags = line.moveTags();
     auto refName = tags[0].get()->toString();
 
@@ -171,7 +165,7 @@ void Header::addReference(HeaderLine&& line){
                  "Reference name " + refName + " is not unique");
     tags.erase(tags.begin());
     references.emplace(std::move(refName), std::move(tags));
-};
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

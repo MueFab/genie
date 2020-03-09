@@ -28,8 +28,6 @@ namespace header {
 class HeaderLine {
    private:
     std::string name;
-    // TODO: Remove comment
-//    std::string comment;
     std::vector<std::unique_ptr<TagBase>> tags;
 
     void parseSingleTag(const std::string& value, const TagInfo& info);
@@ -37,8 +35,7 @@ class HeaderLine {
 
    public:
     const std::string& getName() const;
-    // TODO: Remove comment
-//    const std::string& getComment() const;
+
     const std::vector<std::unique_ptr<TagBase>>& getTags() const;
     void addTag(std::unique_ptr<TagBase> tag);
     std::vector<std::unique_ptr<TagBase>>&& moveTags();

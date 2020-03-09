@@ -14,24 +14,113 @@
 
 #include <genie/format/sam/reader.h>
 
-// TODO @Yeremia: Add support for reference with alternative alias
-//TEST(SamFileReader, PairReferenceWithAlternativeAlias) {  // NOLINT(cert-err-cpp)
-//    // Test Reference with alternative alias
-//
-//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-//    std::ifstream f(gitRootDir + "/data/sam/sample01.sam");
-//    genie::format::sam::Reader reader(f);
-//    EXPECT_NO_THROW(reader.read());
-//}
+TEST(SamRecord, Simple) {  // NOLINT(cert-err-cpp)
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
-TEST(SamFileReader, PairHeaderInvalid) {  // NOLINT(cert-err-cpp)
+    std::ifstream f(gitRootDir + "/data/sam/four-reads-with-header.sam");
+    genie::format::sam::Reader reader(f);
+
+//    EXPECT_EQ(reader.header,
+//              "@HD\tVN:1.3\tSO:coordinate\n@PG\tID:Illumina.SecondaryAnalysis.SortedToBamConverter\n@SQ\tSN:EcoliDH10B."
+//              "fa\tLN:4686137\tM5:28d8562f2f99c047d792346835b20031\n@RG\tID:_5_1\tPL:ILLUMINA\tSM:DH10B_Sample1\n");
+
+    std::string line;
+    std::getline(f, line);
+    genie::format::sam::Record rec(line);
+
+    EXPECT_EQ(rec.getQname(), "_5:1:1:23848:21362");
+    EXPECT_EQ(rec.getFlags(), 99);
+    EXPECT_EQ(rec.getRname(), "EcoliDH10B.fa");
+    EXPECT_EQ(rec.getPos(), 1);
+    EXPECT_EQ(rec.getMapQ(), 254);
+    EXPECT_EQ(rec.getCigar(), "150M");
+    EXPECT_EQ(rec.getRnext(), "=");
+    EXPECT_EQ(rec.getPnext(), 224);
+    EXPECT_EQ(rec.getTlen(), 373);
+    EXPECT_EQ(rec.getSeq(),
+              "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGCTTCTGAACTGGTTACCTGCCGTGAGTAAATTAAA"
+              "ATTTTATTGACTTAGGTCACTAAATACTTTAACCAATATAGGCATA");
+    EXPECT_EQ(rec.getQual(),
+              "@@CDFFFFHHHHHJJJJIJJJJJJJJJJIJIJFIGIJGGGDHIGIIIJEIJGJJBHAGEHHHGHHFFFFFEEEDEEEDDDDCDDDDDDDDD?BDDCCDDEED:"
+              "ACEDDDEDDCDDDDDDD>CDCCDCDDEDDDDDCDCD@CCDCDCCCDD");
+//    EXPECT_EQ(records.front().opt, "RG:Z:_5_1\tBC:Z:1\tXD:Z:150\tSM:i:833\tNM:i:0\tAS:i:1610");
+
+    for (auto i = 0; i < 3; i++){
+        std::getline(f, line);
+    }
+    genie::format::sam::Record lastRec(line);
+    EXPECT_EQ(lastRec.getQname(), "_5:1:10:7990:17938");
+    EXPECT_EQ(lastRec.getFlags(), 145);
+    EXPECT_EQ(lastRec.getRname(), "EcoliDH10B.fa");
+    EXPECT_EQ(lastRec.getPos(), 3);
+    EXPECT_EQ(lastRec.getMapQ(), 254);
+    EXPECT_EQ(lastRec.getCigar(), "150M");
+    EXPECT_EQ(lastRec.getRnext(), "=");
+    EXPECT_EQ(lastRec.getPnext(), 4685941);
+    EXPECT_EQ(lastRec.getTlen(), 4686090);
+    EXPECT_EQ(lastRec.getSeq(),
+              "CTTTTGATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGCTTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAAT"
+              "TTTATTGACTTAGGTCACTAAATACTTTAACCAATATAGGCATACG");
+    // TODO: Use string literal? (Yeremia)
+    EXPECT_EQ(lastRec.getQual(),
+              ":23>>:::CDCDC>@:@>?<59C>4:>4:4(3CACA@@CAA@@CCBDDDDCA:CA??>A>CCCCADFFECDC:FEEAEEA@GC="
+              "GIIFJJJJJJIJIJJJJJJJJJJIIGIGHGJJJJJJJJGJJJJHGIJJJJIHJHHHHGFFFFF@@C");
+//    EXPECT_EQ(records.back().opt, "RG:Z:_5_1\tBC:Z:1\tXD:Z:150\tSM:i:831\tNM:i:0");
+}
+
+ TEST(SamFileReader, Truncated) {  // NOLINT(cert-err-cpp)
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+
+    std::string line;
+    std::ifstream f(gitRootDir + "/data/sam/truncated.sam");
+    genie::format::sam::Reader reader(f);
+
+    for (auto i = 0; i < 4; i++){
+        std::getline(f, line);
+    }
+
+    //TODO: Ask whether truncated sam record should be supported (Yeremia)
+#if true
+    ASSERT_THROW(genie::format::sam::Record rec(line), genie::util::RuntimeException);
+#else
+    EXPECT_EQ(rec.getQname(), "_5:1:10:7990:17938");
+    EXPECT_EQ(rec.getFlags(), 145);
+    EXPECT_EQ(rec.getRname(), "EcoliDH10B.fa");
+    EXPECT_EQ(rec.getPos(), 3);
+    EXPECT_EQ(rec.getMapQ(), 254);
+    EXPECT_EQ(rec.getCigar(), "150M");
+    EXPECT_EQ(rec.getRnext(), "=");
+    EXPECT_EQ(rec.getPnext(), 4685941);
+    EXPECT_EQ(rec.getTlen(), 4686090);
+    EXPECT_EQ(rec.getSeq(),
+              "CTTTTGATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGCTTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAAT"
+              "TTTATTGACTTAGGTCACTAAATACTTTAACCAATATAGGCAT");
+    // The behavior of the next two lines makes very little sense.
+    EXPECT_EQ(rec.getQual(), "");
+    //    EXPECT_EQ(records.back().opt, "");
+#endif
+}
+
+// TODO: Add support for reference with alternative alias, otherwise disable this test (Yeremia)
+#if false
+TEST(SamFileReader, PairReferenceWithAlternativeAlias) {  // NOLINT(cert-err-cpp)
+    // Test Reference with alternative alias
+
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::ifstream f(gitRootDir + "/data/sam/sample01.sam");
+    genie::format::sam::Reader reader(f);
+    EXPECT_NO_THROW(reader.read());
+}
+#endif
+
+TEST(SamReader, PairedEndHeaderInvalid) {  // NOLINT(cert-err-cpp)
     // Test sam file with invalid SAM header tag
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::ifstream f(gitRootDir + "/data/sam/sample02.sam");
     ASSERT_THROW(genie::format::sam::Reader reader(f);, genie::util::RuntimeException);
 }
 
-TEST(SamFileReader, PairReferenceNotExists) {  // NOLINT(cert-err-cpp)
+TEST(SamReader, PairedEndReferenceNotExists) {  // NOLINT(cert-err-cpp)
     // Test sam file with record, which reference does not exist in header
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::ifstream f(gitRootDir + "/data/sam/sample03.sam");
@@ -39,7 +128,7 @@ TEST(SamFileReader, PairReferenceNotExists) {  // NOLINT(cert-err-cpp)
     ASSERT_THROW(reader.read(), genie::util::RuntimeException);
 }
 
-TEST(SamFileReader, PairInvalidFlags) {  // NOLINT(cert-err-cpp)
+TEST(SamReader, PairedEndInvalidFlags) {  // NOLINT(cert-err-cpp)
     // Test sam file containing alignments with invalid flags
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     {
@@ -56,14 +145,16 @@ TEST(SamFileReader, PairInvalidFlags) {  // NOLINT(cert-err-cpp)
     }
 }
 
-TEST(SamFileReader, SingleUnmapped) {  // NOLINT(cert-err-cpp)
+TEST(SamReader, SingleEndUnmapped) {  // NOLINT(cert-err-cpp)
     // Test sam file containing alignments with invalid flags
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
     std::ifstream f(gitRootDir + "/data/sam/sample06.sam");
     genie::format::sam::Reader reader(f);
     reader.read();
-    EXPECT_EQ(reader.data.size(), 5);
-    for (auto iter = reader.data.begin(); iter != reader.data.end(); iter++){
+
+    auto data = reader.getData();
+    EXPECT_EQ(data.size(), 5);
+    for (auto iter = data.begin(); iter != data.end(); iter++){
         EXPECT_EQ(iter->second[uint8_t(genie::format::sam::Reader::Index::SINGLE_UNMAPPED)].size(), 1);
     }
 }
@@ -203,51 +294,6 @@ TEST(SamFileReader, main) {  // NOLINT(cert-err-cpp)
 //    }
 //}
 
-// TEST(SamFileReader, Simple) {  // NOLINT(cert-err-cpp)
-//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-//    genie::util::SamFileReader reader(gitRootDir + "/data/sam/four-reads-with-header.sam");
-//    std::list<format::sam::SamRecord> records;
-//
-//    EXPECT_EQ(reader.header,
-//              "@HD\tVN:1.3\tSO:coordinate\n@PG\tID:Illumina.SecondaryAnalysis.SortedToBamConverter\n@SQ\tSN:EcoliDH10B."
-//              "fa\tLN:4686137\tM5:28d8562f2f99c047d792346835b20031\n@RG\tID:_5_1\tPL:ILLUMINA\tSM:DH10B_Sample1\n");
-//
-//    reader.readRecords(4, &records);
-//
-//    EXPECT_EQ(records.size(), 4);
-//    EXPECT_EQ(records.front().qname, "_5:1:1:23848:21362");
-//    EXPECT_EQ(records.front().flag, 99);
-//    EXPECT_EQ(records.front().rname, "EcoliDH10B.fa");
-//    EXPECT_EQ(records.front().pos, 1);
-//    EXPECT_EQ(records.front().mapq, 254);
-//    EXPECT_EQ(records.front().cigar, "150M");
-//    EXPECT_EQ(records.front().rnext, "=");
-//    EXPECT_EQ(records.front().pnext, 224);
-//    EXPECT_EQ(records.front().tlen, 373);
-//    EXPECT_EQ(records.front().seq,
-//              "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGCTTCTGAACTGGTTACCTGCCGTGAGTAAATTAAA"
-//              "ATTTTATTGACTTAGGTCACTAAATACTTTAACCAATATAGGCATA");
-//    EXPECT_EQ(records.front().qual,
-//              "@@CDFFFFHHHHHJJJJIJJJJJJJJJJIJIJFIGIJGGGDHIGIIIJEIJGJJBHAGEHHHGHHFFFFFEEEDEEEDDDDCDDDDDDDDD?BDDCCDDEED:"
-//              "ACEDDDEDDCDDDDDDD>CDCCDCDDEDDDDDCDCD@CCDCDCCCDD");
-//    EXPECT_EQ(records.front().opt, "RG:Z:_5_1\tBC:Z:1\tXD:Z:150\tSM:i:833\tNM:i:0\tAS:i:1610");
-//    EXPECT_EQ(records.back().qname, "_5:1:10:7990:17938");
-//    EXPECT_EQ(records.back().flag, 145);
-//    EXPECT_EQ(records.back().rname, "EcoliDH10B.fa");
-//    EXPECT_EQ(records.back().pos, 3);
-//    EXPECT_EQ(records.back().mapq, 254);
-//    EXPECT_EQ(records.back().cigar, "150M");
-//    EXPECT_EQ(records.back().rnext, "=");
-//    EXPECT_EQ(records.back().pnext, 4685941);
-//    EXPECT_EQ(records.back().tlen, 4686090);
-//    EXPECT_EQ(records.back().seq,
-//              "CTTTTGATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGCTTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAAT"
-//              "TTTATTGACTTAGGTCACTAAATACTTTAACCAATATAGGCATACG");
-//    EXPECT_EQ(records.back().qual,
-//              ":23>>:::CDCDC>@:@>?<59C>4:>4:4(3CACA@@CAA@@CCBDDDDCA:CA??>A>CCCCADFFECDC:FEEAEEA@GC="
-//              "GIIFJJJJJJIJIJJJJJJJJJJIIGIGHGJJJJJJJJGJJJJHGIJJJJIHJHHHHGFFFFF@@C");
-//    EXPECT_EQ(records.back().opt, "RG:Z:_5_1\tBC:Z:1\tXD:Z:150\tSM:i:831\tNM:i:0");
-//}
 //
 // TEST(SamFileReader, SimpleNoHeader) {  // NOLINT(cert-err-cpp)
 //
@@ -257,51 +303,6 @@ TEST(SamFileReader, main) {  // NOLINT(cert-err-cpp)
 //    EXPECT_EQ(reader.header, "");
 //}
 
-// TEST(SamFileReader, Simple) {  // NOLINT(cert-err-cpp)
-//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-//    genie::util::SamFileReader reader(gitRootDir + "/data/sam/four-reads-with-header.sam");
-//    std::list<format::sam::SamRecord> records;
-//
-//    EXPECT_EQ(reader.header,
-//              "@HD\tVN:1.3\tSO:coordinate\n@PG\tID:Illumina.SecondaryAnalysis.SortedToBamConverter\n@SQ\tSN:EcoliDH10B."
-//              "fa\tLN:4686137\tM5:28d8562f2f99c047d792346835b20031\n@RG\tID:_5_1\tPL:ILLUMINA\tSM:DH10B_Sample1\n");
-//
-//    reader.readRecords(4, &records);
-//
-//    EXPECT_EQ(records.size(), 4);
-//    EXPECT_EQ(records.front().qname, "_5:1:1:23848:21362");
-//    EXPECT_EQ(records.front().flag, 99);
-//    EXPECT_EQ(records.front().rname, "EcoliDH10B.fa");
-//    EXPECT_EQ(records.front().pos, 1);
-//    EXPECT_EQ(records.front().mapq, 254);
-//    EXPECT_EQ(records.front().cigar, "150M");
-//    EXPECT_EQ(records.front().rnext, "=");
-//    EXPECT_EQ(records.front().pnext, 224);
-//    EXPECT_EQ(records.front().tlen, 373);
-//    EXPECT_EQ(records.front().seq,
-//              "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGCTTCTGAACTGGTTACCTGCCGTGAGTAAATTAAA"
-//              "ATTTTATTGACTTAGGTCACTAAATACTTTAACCAATATAGGCATA");
-//    EXPECT_EQ(records.front().qual,
-//              "@@CDFFFFHHHHHJJJJIJJJJJJJJJJIJIJFIGIJGGGDHIGIIIJEIJGJJBHAGEHHHGHHFFFFFEEEDEEEDDDDCDDDDDDDDD?BDDCCDDEED:"
-//              "ACEDDDEDDCDDDDDDD>CDCCDCDDEDDDDDCDCD@CCDCDCCCDD");
-//    EXPECT_EQ(records.front().opt, "RG:Z:_5_1\tBC:Z:1\tXD:Z:150\tSM:i:833\tNM:i:0\tAS:i:1610");
-//    EXPECT_EQ(records.back().qname, "_5:1:10:7990:17938");
-//    EXPECT_EQ(records.back().flag, 145);
-//    EXPECT_EQ(records.back().rname, "EcoliDH10B.fa");
-//    EXPECT_EQ(records.back().pos, 3);
-//    EXPECT_EQ(records.back().mapq, 254);
-//    EXPECT_EQ(records.back().cigar, "150M");
-//    EXPECT_EQ(records.back().rnext, "=");
-//    EXPECT_EQ(records.back().pnext, 4685941);
-//    EXPECT_EQ(records.back().tlen, 4686090);
-//    EXPECT_EQ(records.back().seq,
-//              "CTTTTGATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGCTTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAAT"
-//              "TTTATTGACTTAGGTCACTAAATACTTTAACCAATATAGGCATACG");
-//    EXPECT_EQ(records.back().qual,
-//              ":23>>:::CDCDC>@:@>?<59C>4:>4:4(3CACA@@CAA@@CCBDDDDCA:CA??>A>CCCCADFFECDC:FEEAEEA@GC="
-//              "GIIFJJJJJJIJIJJJJJJJJJJIIGIGHGJJJJJJJJGJJJJHGIJJJJIHJHHHHGFFFFF@@C");
-//    EXPECT_EQ(records.back().opt, "RG:Z:_5_1\tBC:Z:1\tXD:Z:150\tSM:i:831\tNM:i:0");
-//}
 //
 // TEST(SamFileReader, SimpleNoHeader) {  // NOLINT(cert-err-cpp)
 //
@@ -321,27 +322,4 @@ TEST(SamFileReader, main) {  // NOLINT(cert-err-cpp)
 //    EXPECT_THROW(reader.readRecords(4, &records), std::invalid_argument);
 //}
 //
-// TEST(SamFileReader, Truncated) {  // NOLINT(cert-err-cpp)
-//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-//
-//    genie::util::SamFileReader reader(gitRootDir + "/data/sam/truncated.sam");
-//
-//    std::list<format::sam::SamRecord> records;
-//    reader.readRecords(4, &records);
-//
-//    EXPECT_EQ(records.back().qname, "_5:1:10:7990:17938");
-//    EXPECT_EQ(records.back().flag, 145);
-//    EXPECT_EQ(records.back().rname, "EcoliDH10B.fa");
-//    EXPECT_EQ(records.back().pos, 3);
-//    EXPECT_EQ(records.back().mapq, 254);
-//    EXPECT_EQ(records.back().cigar, "150M");
-//    EXPECT_EQ(records.back().rnext, "=");
-//    EXPECT_EQ(records.back().pnext, 4685941);
-//    EXPECT_EQ(records.back().tlen, 4686090);
-//    EXPECT_EQ(records.back().seq,
-//              "CTTTTGATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGCTTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAAT"
-//              "TTTATTGACTTAGGTCACTAAATACTTTAACCAATATAGGCAT");
-//    // The behavior of the next two lines makes very little sense.
-//    //    EXPECT_EQ(records.back().qual, "");
-//    //    EXPECT_EQ(records.back().opt, "");
-//}
+
