@@ -4,41 +4,32 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_READ_ENCODER_H
-#define GENIE_READ_ENCODER_H
+#ifndef GENIE_NAME_ENCODER_H
+#define GENIE_NAME_ENCODER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/util/drain.h>
 #include <genie/util/source.h>
 #include "access-unit-raw.h"
-#include "qv-encoder.h"
-#include "name-encoder.h"
+#include "record/record.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+#include <utility>
 
 namespace genie {
 namespace core {
 
 /**
- * @brief The basic interface for modules encoding the plain read data
+ * @brief The basic interface for modules encoding quality values
  */
-class ReadEncoder : public util::Drain<record::Chunk>, public util::Source<AccessUnitRaw> {
-   protected:
-    QVEncoder* qvcoder;
-    NameEncoder* namecoder;
-
+class NameEncoder {
    public:
-    explicit ReadEncoder(QVEncoder* coder, NameEncoder* ncoder) : qvcoder(coder), namecoder(ncoder) {}
-
-    virtual void setQVCoder(QVEncoder* coder) { qvcoder = coder; }
-
-    virtual void setNameCoder(NameEncoder* coder) { namecoder = coder; }
+    virtual core::AccessUnitRaw::Descriptor encode(const record::Chunk& rec) = 0;
 
     /**
      * @Brief For polymorphic destruction
      */
-    ~ReadEncoder() override = default;
+    ~NameEncoder() = default;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -48,7 +39,7 @@ class ReadEncoder : public util::Drain<record::Chunk>, public util::Source<Acces
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_READ_ENCODER_H
+#endif  // GENIE_QV_ENCODER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

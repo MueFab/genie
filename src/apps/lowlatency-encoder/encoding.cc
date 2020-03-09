@@ -7,6 +7,7 @@
 #include <genie/format/mgb/exporter.h>
 #include <genie/format/mgb/importer.h>
 #include <genie/module/manager.h>
+#include <genie/name/tokenizer/encoder.h>
 #include <genie/quality/qvwriteout/encoder.h>
 #include <genie/read/lowlatency/decoder.h>
 #include <genie/read/lowlatency/encoder.h>
@@ -23,7 +24,8 @@ void encode(const ProgramOptions& programOptions) {
         const size_t RECORDS_PER_BLOCK = 10000;
 
         genie::quality::qvwriteout::Encoder qvencoder;
-        genie::read::lowlatency::Encoder encoder(&qvencoder);
+        genie::name::tokenizer::Encoder nameencoder;
+        genie::read::lowlatency::Encoder encoder(&qvencoder, &nameencoder);
 
         genie::entropy::gabac::GabacCompressor compressor;
 

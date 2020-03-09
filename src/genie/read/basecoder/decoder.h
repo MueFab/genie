@@ -37,7 +37,8 @@ class Decoder {
 
    public:
     Decoder(core::AccessUnitRaw &&au, size_t segments);
-    core::record::Record pull(uint16_t ref, core::QVDecoder &qvdecoder, std::vector<std::string> &&vec);
+    core::record::Record pull(uint16_t ref, core::QVDecoder &qvdecoder, std::string &&name,
+                              std::vector<std::string> &&vec);
 
     struct SegmentMeta {
         uint64_t position;
@@ -52,7 +53,8 @@ class Decoder {
     std::vector<SegmentMeta> readSegmentMeta();
 
     std::tuple<core::record::AlignmentBox, core::record::Record> decode(size_t clip_offset, core::QVDecoder &qvdecoder,
-                                                                        std::string &&seq, std::string &&cigar);
+                                                                        std::string &&seq, std::string &&cigar,
+                                                                        std::string &&rname);
 
     static std::string contractECigar(const std::string &cigar_long);
 

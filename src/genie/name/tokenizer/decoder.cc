@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "detokenizer.h"
+#include "decoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -14,31 +14,7 @@ namespace tokenizer {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t NameDecoder::get(size_t i, size_t j) { return seq[i][j].get(position[i][j]); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint32_t NameDecoder::pull(size_t i, size_t j) {
-    auto ret = get(i, j);
-    position[i][j]++;
-    return ret;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-NameDecoder::NameDecoder(std::vector<std::vector<genie::util::DataBlock>>&& sequences)
-    : seq(std::move(sequences)) {
-    for (const auto& i : seq) {
-        position.emplace_back();
-        for (size_t j = 0; j < i.size(); ++j) {
-            position.back().push_back(0);
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::string NameDecoder::inflate(const std::vector<SingleToken>& rec) {
+std::string Decoder::inflate(const std::vector<SingleToken>& rec) {
     std::string ret;
     for (const auto& st : rec) {
         switch (st.token) {
@@ -75,41 +51,46 @@ std::string NameDecoder::inflate(const std::vector<SingleToken>& rec) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string NameDecoder::decode() {
-    size_t cur_pos = 0;
+std::vector<std::string> Decoder::decode(core::AccessUnitRaw::Descriptor& desc)  {
+    std::vector<std::string> ret;
+    std::vector<SingleToken> oldRec;
+    while(!desc.getTokenType(0, TYPE_SEQ).end()) {
+        size_t cur_pos = 0;
 
-    std::vector<SingleToken> rec;
+        std::vector<SingleToken> rec;
 
-    if (position[0][TYPE_SEQ] == 0) {
-        UTILS_DIE_IF(Tokens(get(0, TYPE_SEQ)) != Tokens::DIFF, "First token in AU must be DIFF");
-        UTILS_DIE_IF(get(0, getTokenInfo(Tokens::DIFF).paramSeq) != 0, "First DIFF in AU must be 0");
-    }
-
-    auto type = Tokens(pull(cur_pos, TYPE_SEQ));
-
-    while (type != Tokens::END) {
-        SingleToken t(type, 0, "");
-
-        if (type == Tokens::STRING) {
-            char c = pull(cur_pos, getTokenInfo(Tokens::STRING).paramSeq);
-            while (c != '\0') {
-                t.paramString += c;
-                c = pull(cur_pos, getTokenInfo(Tokens::STRING).paramSeq);
-            }
-        } else if (getTokenInfo(type).paramSeq > 0) {
-            t.param = pull(cur_pos, getTokenInfo(type).paramSeq);
+        if (ret.empty()) {
+            UTILS_DIE_IF(Tokens(desc.getTokenType(0, TYPE_SEQ).get()) != Tokens::DIFF, "First token in AU must be DIFF");
+            UTILS_DIE_IF(desc.getTokenType(0, getTokenInfo(Tokens::DIFF).paramSeq).get() != 0, "First DIFF in AU must be 0");
         }
 
-        rec.push_back(t);
+        auto type = Tokens(desc.getTokenType(cur_pos, TYPE_SEQ).pull());
 
-        cur_pos++;
-        type = Tokens(pull(cur_pos, TYPE_SEQ));
+        while (type != Tokens::END) {
+            SingleToken t(type, 0, "");
+
+            if (type == Tokens::STRING) {
+                char c = desc.getTokenType(cur_pos, getTokenInfo(Tokens::STRING).paramSeq).pull();
+                while (c != '\0') {
+                    t.paramString += c;
+                    c = desc.getTokenType(cur_pos, getTokenInfo(Tokens::STRING).paramSeq).pull();
+                }
+            } else if (getTokenInfo(type).paramSeq > 0) {
+                t.param = desc.getTokenType(cur_pos, getTokenInfo(type).paramSeq).pull();
+            }
+
+            rec.push_back(t);
+
+            cur_pos++;
+            type = Tokens(desc.getTokenType(cur_pos, TYPE_SEQ).pull());
+        }
+
+        rec = patch(oldRec, rec);
+        oldRec = rec;
+
+        ret.emplace_back(inflate(rec));
     }
-
-    rec = patch(oldRec, rec);
-    oldRec = rec;
-
-    return inflate(rec);
+    return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

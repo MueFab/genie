@@ -40,6 +40,15 @@ class AccessUnitPayload {
          */
         void write(util::BitWriter& writer) const;
 
+        void writeTokenType(util::BitWriter& writer) const {
+            uint32_t num_output_symbols = payloadData.empty() ? 0 :
+                  256 * (256 * (256 * payloadData.get(0) + payloadData.get(1)) + payloadData.get(2)) + payloadData.get(3);
+            writer.writeVInt(num_output_symbols);
+            if(!payloadData.empty()) {
+                writer.writeBypass((uint8_t *)payloadData.getData() + 4, payloadData.getRawSize() - 4);
+            }
+        }
+
         /**
          * @brief
          * @param _data
@@ -93,6 +102,14 @@ class AccessUnitPayload {
          * @param writer
          */
         void write(util::BitWriter& writer) const;
+
+
+        void writeTokentype(util::BitWriter& writer, uint8_t type) const {
+            writer.write(type, 4);
+            writer.write(3, 4);
+
+            transformedPayloads[0].writeTokenType(writer);
+        }
 
         /**
          * @brief

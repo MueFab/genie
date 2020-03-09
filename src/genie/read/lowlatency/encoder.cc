@@ -5,7 +5,7 @@
  */
 
 #include "encoder.h"
-#include <genie/name/tokenizer/detokenizer.h>
+#include <genie/name/tokenizer/decoder.h>
 #include "genie/name/tokenizer/encoder.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -15,26 +15,12 @@ namespace lowlatency {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder(core::QVEncoder* coder) : core::ReadEncoder(coder) {}
+Encoder::Encoder(core::QVEncoder* coder, core::NameEncoder* ncoder) : core::ReadEncoder(coder, ncoder) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Encoder::flowIn(core::record::Chunk&& t, size_t id)  {
     core::record::Chunk data = std::move(t);
-
-    // ------------------------------------------------------------------- TEST
-
-    auto toks = genie::name::tokenizer::generate_id_tokens(data);
-
-    std::vector<std::string> out;
-    genie::name::tokenizer::NameDecoder decoder(std::move(toks));
-    for(size_t c = 0; c < data.size(); ++c) {
-        std::cout << decoder.decode() << std::endl;
-    }
-
-    std::terminate();
-
-    // ------------------------------------------------------------------- TEST
 
     core::parameter::ParameterSet set;
     LLState state{data.front().getSegments().front().getSequence().length(),
@@ -62,6 +48,11 @@ void Encoder::flowIn(core::record::Chunk&& t, size_t id)  {
     core::QVEncoder::QVCoded qv(nullptr, core::AccessUnitRaw::Descriptor(core::GenDesc::QV));
     if (qvcoder) {
         qv = qvcoder->encode(data);
+    }
+
+    if(namecoder) {
+        auto rname = namecoder->encode(data);
+        state.streams.get(core::GenDesc::RNAME) = std::move(rname);
     }
 
     state.streams.get(core::GenDesc::QV) = std::move(qv.second);
