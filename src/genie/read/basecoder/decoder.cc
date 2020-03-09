@@ -21,7 +21,7 @@ Decoder::Decoder(core::AccessUnitRaw &&au, size_t segments)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::record::Record Decoder::pull(uint16_t ref, core::QVDecoder &qvdecoder, std::vector<std::string> &&vec) {
+core::record::Record Decoder::pull(uint16_t ref, core::QVDecoder &qvdecoder, std::string&& name, std::vector<std::string> &&vec) {
     std::vector<std::string> sequences = std::move(vec);
     std::vector<std::string> cigars;
     cigars.reserve(sequences.size());
@@ -29,7 +29,7 @@ core::record::Record Decoder::pull(uint16_t ref, core::QVDecoder &qvdecoder, std
         cigars.emplace_back(sequence.size(), '=');
     }
     auto clip_offset = decodeClips(sequences, cigars);
-    auto state = decode(std::get<0>(clip_offset), qvdecoder, std::move(sequences.front()), std::move(cigars.front()));
+    auto state = decode(std::get<0>(clip_offset), qvdecoder, std::move(sequences.front()), std::move(cigars.front()), std::move(name));
     for (size_t i = 1; i < sequences.size(); ++i) {
         decodeAdditional(std::get<1>(clip_offset), qvdecoder, std::move(sequences[i]), std::move(cigars[i]), state);
     }
@@ -57,7 +57,7 @@ std::vector<Decoder::SegmentMeta> Decoder::readSegmentMeta() {
 
 std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(size_t clip_offset,
                                                                              core::QVDecoder &qvdecoder,
-                                                                             std::string &&seq, std::string &&cigar) {
+                                                                             std::string &&seq, std::string &&cigar, std::string&& rname) {
     auto sequence = std::move(seq);
 
     const auto RTYPE = container.pull(core::GenSub::RTYPE);
@@ -85,7 +85,7 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(siz
     std::tuple<core::record::AlignmentBox, core::record::Record> ret;
     std::get<0>(ret) = core::record::AlignmentBox(POSITION, std::move(alignment));
 
-    std::get<1>(ret) = core::record::Record(number_template_segments, core::record::ClassType(RTYPE), "",
+    std::get<1>(ret) = core::record::Record(number_template_segments, core::record::ClassType(RTYPE), std::move(rname),
                                             std::to_string(RGROUP), FLAGS);
 
     core::record::Segment segment(std::move(sequence));

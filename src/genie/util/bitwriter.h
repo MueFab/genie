@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <istream>
 #include <ostream>
+#include <vector>
 #include "exceptions.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -55,6 +56,17 @@ class BitWriter {
     void write(uint64_t value, uint8_t bits);
 
     void write(const std::string &string);
+
+    void writeVInt(uint64_t val) {
+        std::vector<uint8_t> tmp;
+        do {
+            tmp.push_back(val & 0x7f);
+            val >>= 7;
+        } while (val != 0);
+        for (int i = tmp.size() - 1; i > 0; i--)
+            write(tmp[i] | 0x80, 8);
+        write(tmp[0], 8);
+    }
 
     /**
      * @brief Write the whole data from an other stream. Basically appending the data to this stream.

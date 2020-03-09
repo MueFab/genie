@@ -16,6 +16,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include "genie/core/record/record.h"
+#include "genie/core/name-encoder.h"
 #include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -30,18 +31,21 @@ namespace tokenizer {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<std::vector<genie::util::DataBlock>> generate_id_tokens(const genie::core::record::Chunk& recs) {
-    std::vector<std::vector<genie::util::DataBlock>> ret;
-    std::vector<SingleToken> old;
+class Encoder : public core::NameEncoder {
+   public:
+    core::AccessUnitRaw::Descriptor encode(const core::record::Chunk& recs) override {
+        core::AccessUnitRaw::Descriptor ret(core::GenDesc::RNAME);
+        std::vector<SingleToken> old;
 
-    for (const auto& r : recs) {
-        TokenState state(old, r.getName());
-        auto newTok = state.run();
-        TokenState::encode(newTok, ret);
-        old = patch(old, newTok);
+        for (const auto& r : recs) {
+            TokenState state(old, r.getName());
+            auto newTok = state.run();
+            TokenState::encode(newTok, ret);
+            old = patch(old, newTok);
+        }
+        return ret;
     }
-    return ret;
-}
+};
 
 // ---------------------------------------------------------------------------------------------------------------------
 

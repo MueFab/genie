@@ -57,7 +57,7 @@ uint64_t AccessUnitRaw::Subsequence::pull() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnitRaw::Subsequence &AccessUnitRaw::Descriptor::get(uint8_t sub) { return subdesc[uint8_t(sub)]; }
+AccessUnitRaw::Subsequence &AccessUnitRaw::Descriptor::get(uint16_t sub) { return subdesc[uint8_t(sub)]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

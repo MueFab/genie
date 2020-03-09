@@ -5,6 +5,7 @@
 #include <genie/format/sam/exporter.h>
 #include <genie/format/sam/importer.h>
 #include <genie/module/manager.h>
+#include <genie/name/tokenizer/encoder.h>
 #include <genie/quality/qvwriteout/encoder.h>
 #include <genie/read/localassembly/decoder.h>
 #include <genie/read/localassembly/encoder.h>
@@ -22,7 +23,8 @@ void encode(const ProgramOptions &programOptions) {
 
         const size_t LOCAL_ASSEMBLY_BUFFER_SIZE = 2000;
         genie::quality::qvwriteout::Encoder qvencoder;
-        genie::read::localassembly::Encoder encoder(LOCAL_ASSEMBLY_BUFFER_SIZE, false, &qvencoder);
+        genie::name::tokenizer::Encoder namecoder;
+        genie::read::localassembly::Encoder encoder(LOCAL_ASSEMBLY_BUFFER_SIZE, false, &qvencoder, &namecoder);
 
         genie::entropy::gabac::GabacCompressor compressor;
 

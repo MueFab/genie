@@ -53,7 +53,11 @@ void GabacCompressor::flowIn(core::AccessUnitRaw &&t, size_t id) {
         core::AccessUnitPayload::DescriptorPayload descriptor_payload(desc.getID());
         for (const auto &subdesc : desc) {
             auto &input = raw_aus.get(subdesc.getID());
-            const auto &conf = configSet.getConfAsGabac(subdesc.getID());
+            auto s_id = subdesc.getID();
+            if(desc.getID() == core::GenDesc::RNAME || desc.getID() == core::GenDesc::MSAR) {
+                s_id.second = 0;
+            }
+            const auto &conf = configSet.getConfAsGabac(s_id);
             descriptor_payload.add(compress(conf, std::move(input)));
         }
         if (!descriptor_payload.isEmpty()) {

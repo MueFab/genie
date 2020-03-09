@@ -10,6 +10,7 @@ add_library(genie-module ${source_files})
 target_link_libraries(genie-module PUBLIC genie-core)
 target_link_libraries(genie-module PUBLIC genie-paramqv1)
 target_link_libraries(genie-module PUBLIC genie-paramcabac)
+target_link_libraries(genie-module PUBLIC genie-nametoken)
 
 get_filename_component(THIS_DIR ./ ABSOLUTE)
 get_filename_component(TOP_DIR ../../ ABSOLUTE)

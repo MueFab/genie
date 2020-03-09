@@ -5,6 +5,7 @@
  */
 
 #include "tokenizer.h"
+#include <access-unit-raw.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -163,24 +164,23 @@ std::vector<SingleToken>&& TokenState::run() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void TokenState::encode(const std::vector<SingleToken>& tokens,
-                        std::vector<std::vector<genie::util::DataBlock>>& streams) {
+void TokenState::encode(const std::vector<SingleToken>& tokens, core::AccessUnitRaw::Descriptor& streams) {
     for (size_t i = 0; i < tokens.size(); ++i) {
-        while (streams.size() <= i) {
-            streams.emplace_back(getTokenInfo(Tokens::DZLEN).paramSeq + 1, util::DataBlock(0, 4));
-        }
-        streams[i][TYPE_SEQ].push_back((uint8_t)tokens[i].token);
+        //   while (streams.size() <= i) {
+        //       streams.emplace_back(getTokenInfo(Tokens::DZLEN).paramSeq + 1, util::DataBlock(0, 4));
+        //   }
+        streams.getTokenType(i, TYPE_SEQ).push((uint8_t)tokens[i].token);
         if (getTokenInfo(tokens[i].token).paramSeq < 0) {
             continue;
         }
 
         if (tokens[i].token == Tokens::STRING) {
             for (const auto& c : tokens[i].paramString) {
-                streams[i][getTokenInfo(tokens[i].token).paramSeq].push_back(c);
+                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push(c);
             }
-            streams[i][getTokenInfo(tokens[i].token).paramSeq].push_back('\0');
+            streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push('\0');
         } else {
-            streams[i][getTokenInfo(tokens[i].token).paramSeq].push_back(tokens[i].param);
+            streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push(tokens[i].param);
         }
     }
 }

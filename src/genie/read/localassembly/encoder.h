@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ENCODER_H
-#define GENIE_ENCODER_H
+#ifndef GENIE_LA_ENCODER_H
+#define GENIE_LA_ENCODER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -109,7 +109,7 @@ class Encoder : public core::ReadEncoder {
      * @param _cr_buf_max_size Buffer size for local assembly reference memory. Will end up in parameter set
      * @param _debug If additional debugging information shall be printed
      */
-    Encoder(uint32_t _cr_buf_max_size, bool _debug, core::QVEncoder* coder);
+    Encoder(uint32_t _cr_buf_max_size, bool _debug, core::QVEncoder* coder, core::NameEncoder* ncoder);
 
     static uint64_t getLengthOfCigar(const std::string& cigar);
 

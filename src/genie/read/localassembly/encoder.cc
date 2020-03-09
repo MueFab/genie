@@ -139,6 +139,10 @@ void Encoder::flowIn(core::record::Chunk&& t, size_t id) {
     if (qvcoder) {
         qv = qvcoder->encode(data);
     }
+    core::AccessUnitRaw::Descriptor rname(core::GenDesc::RNAME);
+    if (namecoder) {
+        rname = namecoder->encode(data);
+    }
     for (auto& r : data) {
         UTILS_DIE_IF(r.getSegments().front().getQualities().size() != qvdepth, "QV_depth not compatible");
         UTILS_DIE_IF(r.getAlignments().front().getPosition() < lastPos,
@@ -156,6 +160,7 @@ void Encoder::flowIn(core::record::Chunk&& t, size_t id) {
 
     auto rawAU = pack(id, ref, qvdepth, std::move(qv.first), state);
     rawAU.get(core::GenDesc::QV) = std::move(qv.second);
+    rawAU.get(core::GenDesc::RNAME) = std::move(rname);
     data.clear();
     flowOut(std::move(rawAU), id);
 }
@@ -169,8 +174,8 @@ void Encoder::dryIn() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder(uint32_t _cr_buf_max_size, bool _debug, core::QVEncoder* coder)
-    : ReadEncoder(coder), debug(_debug), cr_buf_max_size(_cr_buf_max_size) {}
+Encoder::Encoder(uint32_t _cr_buf_max_size, bool _debug, core::QVEncoder* coder, core::NameEncoder* ncoder)
+    : ReadEncoder(coder, ncoder), debug(_debug), cr_buf_max_size(_cr_buf_max_size) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

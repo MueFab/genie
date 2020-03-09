@@ -17,9 +17,6 @@ namespace core {
 
 void AccessUnitPayload::TransformedPayload::write(util::BitWriter& writer) const {
     writer.writeBypass(payloadData.getData(), payloadData.getRawSize());
-    /*   for (size_t i = 0; i < payloadData.size(); ++i) {
-           writer.write(payloadData.get(i), static_cast<uint8_t>(payloadData.getWordSize() * 8));
-       }*/
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -110,6 +107,22 @@ bool AccessUnitPayload::SubsequencePayload::isEmpty() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnitPayload::DescriptorPayload::write(util::BitWriter& writer) const {
+    if(this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
+        size_t num_streams = 0;
+        for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
+            if(!subsequencePayloads[i].isEmpty()) {
+                num_streams++;
+            }
+        }
+        writer.write(2000, 32);  // TODO: get # of records here
+        writer.write(num_streams, 16);
+        for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
+            if(!subsequencePayloads[i].isEmpty()) {
+                subsequencePayloads[i].writeTokentype(writer, i % 10);
+            }
+        }
+        return;
+    }
     for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
         if (i != subsequencePayloads.size() - 1) {
             writer.write(subsequencePayloads[i].getWrittenSize(), 32);

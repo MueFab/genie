@@ -7,6 +7,7 @@
 #include "decoder.h"
 #include <genie/core/global-cfg.h>
 #include <genie/read/basecoder/decoder.h>
+#include <name-decoder.h>
 #include <sstream>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -25,10 +26,11 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, size_t id) {
     util::BitReader reader(str);
     auto qvdecoder = core::GlobalCfg::getSingleton().getIndustrialPark().construct<core::QVDecoder>(
         data.getParameters().getQVConfig(core::record::ClassType::CLASS_U).getMode(), reader);
-
+    auto namedecoder = core::GlobalCfg::getSingleton().getIndustrialPark().construct<core::NameDecoder>(0, reader);
+    auto names = namedecoder->decode(t.get(core::GenDesc::RNAME));
     for (size_t i = 0; i < data.getNumRecords() / data.getParameters().getNumberTemplateSegments(); ++i) {
-        core::record::Record rec(data.getParameters().getNumberTemplateSegments(), core::record::ClassType::CLASS_U, "",
-                                 "", 0);
+        core::record::Record rec(data.getParameters().getNumberTemplateSegments(), core::record::ClassType::CLASS_U,
+                                 std::move(names[i]), "", 0);
 
         if (data.getParameters().getNumberTemplateSegments() > 1) {
             UTILS_DIE_IF(data.pull(core::GenSub::PAIR_DECODING_CASE) != core::GenConst::PAIR_SAME_RECORD,
