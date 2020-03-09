@@ -113,7 +113,7 @@ void Record::checkValuesUsingRegex() const {
 
 void Record::checkValuesUsingCondition(){
 
-    // TODO: Check all conditions in SAM specification
+    // TODO: Check all conditions in SAM specification (Yeremia)
     // Value of certain field may not be set to certain value because:
     //  > No assumption can be made does not mean default value
     //  > Round trip test may not possible
@@ -128,7 +128,7 @@ void Record::checkValuesUsingCondition(){
 //        rname = "*";
 //        pos = 0;
 //        cigar = "*";
-//        mapq = 255; // TODO: Check default value of mapq
+//        mapq = 255; // TODO: Check default value of mapq (Yeremia)
 //
 //        flag &= ~(1u << uint16_t(Record::FlagPos::PROPERLY_ALIGNED));
 //        flag &= ~(1u << uint16_t(Record::FlagPos::SECONDARY_ALIGNMENT));
@@ -136,7 +136,7 @@ void Record::checkValuesUsingCondition(){
 //    }
 
     // TODO: Should the value of mapq set to default and unset flags just like using reliable unmapped condition?
-    //       Case can be found in "simulation.1.homoINDELs.homoCEUsnps.reads2.fq.sam.samelength.sam"
+    //       Case can be found in "simulation.1.homoINDELs.homoCEUsnps.reads2.fq.sam.samelength.sam" (Yeremia)
     // Secondary unmapped condition - no assumption can be made
 //    if (rname == "*" || pos == 0 || cigar == "*") {
 //        rname = "*";

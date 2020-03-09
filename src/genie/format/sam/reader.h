@@ -52,10 +52,8 @@ class Reader {
     uint64_t constraint_val;
     uint64_t num_records;
 
-   public:
-    // TODO: Set as private, temporary public for debugging purpose
     std::map<std::string, std::vector<std::vector<Record>>> data;
-
+   public:
     explicit Reader(std::istream& _stream, Constraint _constraint = Constraint::NONE, uint64_t _constraint_val = UINT64_MAX);
 
     const header::Header& getHeader() const;
@@ -65,6 +63,8 @@ class Reader {
     void read();
 
     bool isEnd();
+
+    const std::map<std::string, std::vector<std::vector<Record>>> & getData() const;
 
     // TODO: Discusssion - Implement isConstrainReached as pointer to avoid if-case / switch evaluation
 //    bool (&isConstrainReached)();

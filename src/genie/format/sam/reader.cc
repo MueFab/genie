@@ -7,7 +7,7 @@
 #include "reader.h"
 #include <map>
 #include <genie/util/exceptions.h>
-#include <hdf5_hl.h>
+//#include <hdf5_hl.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ bool Reader::isConstrainReached() const {
     switch (constraint){
         case Constraint::BY_NUM_RECORDS :
             return num_records > constraint_val;
-        // TODO: Constraint BY_SIZE
+        // TODO: Constraint BY_SIZE (Yeremia)
         case Constraint::BY_SIZE :
             UTILS_DIE(" Not yet implemented : Constraint BY_SIZE");
         case Constraint::NONE:
@@ -46,7 +46,7 @@ void Reader::read() {
     std::string string;
     while (!isConstrainReached() && std::getline(stream, string)){
         Record record(string);
-        // TODO: Store values for other constraints such as BY_SIZE
+        // TODO: Store values for other constraints such as BY_SIZE (Yeremia)
         num_records++;
 
         if (!record.isUnmapped()){
@@ -65,52 +65,37 @@ void Reader::read() {
         }
 
         Reader::Index idx;
-        // Paired-end Read
-        if (record.checkFlag(Record::FlagPos::MULTI_SEGMENT_TEMPLATE)){
-            if (record.checkFlag(Record::FlagPos::FIRST_SEGMENT)){
-                if (record.isPrimaryLine()){
-                    idx = Index::PAIR_FIRST_PRIMARY;
-                } else {
-                    idx = Index::PAIR_FIRST_NONPRIMARY;
-                }
-            } else if (record.checkFlag(Record::FlagPos::LAST_SEGMENT)){
-                if (record.isPrimaryLine()){
-                    idx = Index::PAIR_LAST_PRIMARY;
-                } else {
-                    idx = Index::PAIR_LAST_NONPRIMARY;
-                }
+
+        // Paired-end read / multi segments
+        if (record.checkFlag(Record::FlagPos::MULTI_SEGMENT_TEMPLATE)) {
+            if (record.checkFlag(Record::FlagPos::FIRST_SEGMENT)) {
+                idx = record.isPrimaryLine() ? Index::PAIR_FIRST_PRIMARY : Index::PAIR_FIRST_NONPRIMARY;
+            } else if (record.checkFlag(Record::FlagPos::LAST_SEGMENT)) {
+                idx = record.isPrimaryLine() ? Index::PAIR_LAST_PRIMARY : Index::PAIR_LAST_NONPRIMARY;
             } else {
-                idx = Index::UNKNOWN;
+                UTILS_DIE("Unknown type of template found");
             }
+        // Single-end read / single segment
+        } else if (!record.checkFlag(Record::FlagPos::FIRST_SEGMENT) && !record.checkFlag(Record::FlagPos::LAST_SEGMENT)) {
+            idx = record.checkFlag(Record::FlagPos::SEGMENT_UNMAPPED) ? Index::SINGLE_UNMAPPED : Index::SINGLE_MAPPED;
         } else {
-            if (record.checkFlag(Record::FlagPos::SEGMENT_UNMAPPED)) {
-                idx = Index::SINGLE_UNMAPPED;
-            } else {
-                idx = Index::SINGLE_MAPPED;
-            }
+            UTILS_DIE("Unknown type of template found");
         }
 
         data[qname][uint8_t(idx)].push_back(std::move(record));
     }
 
-    for (auto iter = data.begin(); iter != data.end(); iter++){
+//    for (auto iter = data.begin(); iter != data.end(); iter++){
+    for (auto iter : data){
 
-        // Use If-Case with UTILS_DIE for debugging purpose
-        // TODO @Yeremia : Change to UTILS_DIE_IF
-        if (iter->second[uint8_t(Index::UNKNOWN)].size() > 0){
-            UTILS_DIE("Uncategorized SAM record found");
-        }
+        auto isSingleEnd  = !(iter.second[uint8_t(Index::SINGLE_MAPPED)].empty() && iter.second[uint8_t(Index::SINGLE_UNMAPPED)].empty());
+        auto isPairedEnd1 = !(iter.second[uint8_t(Index::PAIR_FIRST_PRIMARY)].empty() || iter.second[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].empty());
+        auto isPairedEnd2 = !(iter.second[uint8_t(Index::PAIR_LAST_PRIMARY)].empty() || iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].empty());
+        //auto isPairedEnd = isPairedEnd1 || isPairedEnd2;
 
-        auto isSingleEnd = (iter->second[uint8_t(Index::SINGLE_MAPPED)].size() + iter->second[uint8_t(Index::SINGLE_UNMAPPED)].size()) > 0;
-        auto isPairedEnd1 = iter->second[uint8_t(Index::PAIR_FIRST_PRIMARY)].size() + iter->second[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].size() > 0;
-        auto isPairedEnd2 = iter->second[uint8_t(Index::PAIR_LAST_PRIMARY)].size() + iter->second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].size() > 0;
-
-        // Check if template is either single or paired-end using XNOR Operation
-        // Use If-Case with UTILS_DIE for debugging purpose
-        // TODO @Yeremia : Change to UTILS_DIE_IF
-        if (!((isSingleEnd || (isPairedEnd1 || isPairedEnd2)) && !(isSingleEnd && (isPairedEnd1 || isPairedEnd2)))){
-            UTILS_DIE("Template with both single- and paired-end reads found");
-        }
+        // Check if template is either single or paired-end using xor operation
+        UTILS_DIE_IF(!((isSingleEnd || (isPairedEnd1 || isPairedEnd2)) && !(isSingleEnd && (isPairedEnd1 || isPairedEnd2))),
+                     "Template with both single- and paired-end reads found");
 
 
     }
@@ -141,6 +126,10 @@ void Reader::read() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Reader::isEnd() { return stream.eof(); }
+
+const std::map<std::string, std::vector<std::vector<Record>>>& Reader::getData() const {
+    return data;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
