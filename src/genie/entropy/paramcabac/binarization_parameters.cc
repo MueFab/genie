@@ -68,8 +68,8 @@ BinarizationParameters::BinarizationParameters(BinarizationId binID, util::BitRe
         case BinarizationId::DOUBLE_TRUNCATED_UNARY:
         case BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
             cmax_dtu = reader.read<uint8_t>();  // Fall-through
-        case BinarizationId::SPLIT_UNIT_WISE_TRUNCATED_UNARY:
-        case BinarizationId::SIGNED_SPLIT_UNIT_WISE_TRUNCATED_UNARY:
+        case BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY:
+        case BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
             split_unit_size = reader.read<uint8_t>(4);
             break;
         default:
