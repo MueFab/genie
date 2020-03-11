@@ -154,20 +154,20 @@ std::string Importer::convertCigar2ECigar(const std::string &cigar, const std::s
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::record::Record&& Importer::convert(uint16_t ref, std::list<sam::Record>&& recs1, std::list<sam::Record>&& recs2){
+core::record::Record&& Importer::convert(uint16_t ref, std::list<sam::Record>&& records1, std::list<sam::Record>&& records2){
 
-    auto r1 = std::move(recs1.front());
-    recs1.pop_front();
+    auto r1 = std::move(records1.front());
+    records1.pop_front();
 
-    auto r2 = std::move(recs2.front());
-    recs2.pop_front();
+    auto r2 = std::move(records2.front());
+    records2.pop_front();
 
     // TODO: read_1_first (yeremia)
 
     auto flag_tuple = convertFlags2Mpeg(r1.getFlags());
 
     core::record::Record mpegRec(1, core::record::ClassType::CLASS_I, r1.moveQname()
-            , "Genie", std::get<1>(flag_tuple));
+            , "Genie", std::get<1>(flag_tuple), true);
 
 //    core::record::Segment segmentR1(r1.moveSeq());
 //    if (r1.getQual() != "*") {
@@ -187,18 +187,18 @@ core::record::Record&& Importer::convert(uint16_t ref, std::list<sam::Record>&& 
 //
 //    core::record::AlignmentBox alignmentContainer(primaryRec.getPos(), std::move(alignment));
 //
-////    for (auto &r : _r1){
-////        auto splitAlign =
-////            util::make_unique<core::record::alignment_split::SameRec>(r2.getPos() - r1.getPos(), std::move(alignment2));
-////
-////
-////    }
+//    for (auto &r : _r1){
+//        auto splitAlign =
+//            util::make_unique<core::record::alignment_split::SameRec>(r2.getPos() - r1.getPos(), std::move(alignment2));
+//
+//
+//    }
 
     return std::move(mpegRec);
 }
 
-//// ---------------------------------------------------------------------------------------------------------------------
-//
+// ---------------------------------------------------------------------------------------------------------------------
+
 //core::record::Record&& Importer::convertSingleEnded(uint16_t ref, sam::Record&& _r1) {
 //
 //}

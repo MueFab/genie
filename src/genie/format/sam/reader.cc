@@ -235,6 +235,10 @@ bool Reader::getSortedTemplate(std::list<Record>& unmappedRead, std::list<Record
                           std::back_inserter(read1));
 
             } else if (isPairedEndPrimary) {
+                UTILS_DIE_IF(
+                        iter.second[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].size() != iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].size(),
+                        "Number of alignment for first and last segment must be equal!");
+
                 num_records -= iter.second[uint8_t(Index::PAIR_FIRST_PRIMARY)].size();
                 num_records -= iter.second[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].size();
                 num_records -= iter.second[uint8_t(Index::PAIR_LAST_PRIMARY)].size();
@@ -256,10 +260,6 @@ bool Reader::getSortedTemplate(std::list<Record>& unmappedRead, std::list<Record
 //                std::move(iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].begin(),
 //                          iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].end(),
 //                          std::back_inserter(read2));
-
-                UTILS_DIE_IF(
-                    iter.second[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].size() != iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].size(),
-                    "Number of alignment for first and last segment must be equal!");
 
                 while (!iter.second[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].empty()){
 
