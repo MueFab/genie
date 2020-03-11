@@ -149,7 +149,7 @@ bool Reader::getSortedRecord(std::list<Record>& unmappedRead, std::list<Record>&
     read2.clear();
 
     if (num_records) {
-        for (auto & iter : data) {
+        for (auto& iter : data) {
 
             auto isSingleEndUnmapped = !(iter.second[uint8_t(Index::SINGLE_UNMAPPED)].empty());
             auto isSingleEndMapped = !iter.second[uint8_t(Index::SINGLE_MAPPED)].empty();
@@ -188,17 +188,45 @@ bool Reader::getSortedRecord(std::list<Record>& unmappedRead, std::list<Record>&
                           iter.second[uint8_t(Index::PAIR_FIRST_PRIMARY)].end(),
                           std::back_inserter(read1));
 
-                std::move(iter.second[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].begin(),
-                          iter.second[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].end(),
-                          std::back_inserter(read1));
-
                 std::move(iter.second[uint8_t(Index::PAIR_LAST_PRIMARY)].begin(),
                           iter.second[uint8_t(Index::PAIR_LAST_PRIMARY)].end(),
                           std::back_inserter(read2));
 
-                std::move(iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].begin(),
-                          iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].end(),
-                          std::back_inserter(read2));
+                // Without pair sorting
+//                std::move(iter.second[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].begin(),
+//                          iter.second[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].end(),
+//                          std::back_inserter(read1));
+//
+//                std::move(iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].begin(),
+//                          iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].end(),
+//                          std::back_inserter(read2));
+
+                UTILS_DIE_IF(
+                    iter.second[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].size() != iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].size(),
+                    "Number of alignment for first and last segment must be equal!");
+
+                while (!iter.second[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].empty()){
+
+                    bool pairFound = false;
+                    auto iter_r1 = iter.second[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].begin();
+                    auto iter_r2 = iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].begin();
+
+                    while (iter_r2 != iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].end()){
+                        if (iter_r1->isPairOf(*iter_r2)){
+                            pairFound = true;
+
+                            read1.push_back(std::move(*iter_r1));
+                            read2.push_back(std::move(*iter_r2));
+
+                            iter.second[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].erase(iter_r1);
+                            iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].erase(iter_r2);
+                            break;
+                        } else {
+                            iter_r2++;
+                        }
+                    }
+                    UTILS_DIE_IF(!pairFound, "No pair for alignment found!");
+                }
             } else {
 #if WITH_CACHE
                 UTILS_DIE("Invalid alignment with QNAME " + iter.first);
@@ -209,9 +237,10 @@ bool Reader::getSortedRecord(std::list<Record>& unmappedRead, std::list<Record>&
             data.erase(iter.first);
             return true;
         }
+    } else {
+        return false;
     }
 
-    return false;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

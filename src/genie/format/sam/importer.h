@@ -36,14 +36,15 @@ class Importer : public core::FormatImporter {
 
     static char convertCigar2ECigarChar(char token);
 
-    static int stepSequence(char token);
 
+    static int stepSequence(char token);
     static std::string convertCigar2ECigar(const std::string &cigar, const std::string &seq);
 
     std::map<std::string, size_t> refs;
     size_t ref_counter;
 
-    static core::record::Record convert(uint16_t ref, sam::Record &&_r1, sam::Record *_r2);
+//    static core::record::Record convert(uint16_t ref, sam::Record &&_r1, sam::Record *_r2);
+    static core::record::Record&& convert(uint16_t ref, std::list<sam::Record>&& rs1, std::list<sam::Record>&& rs2);
 
     bool pump(size_t id) override;
 
