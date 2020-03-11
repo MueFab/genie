@@ -154,7 +154,10 @@ std::string Importer::convertCigar2ECigar(const std::string &cigar, const std::s
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::record::Record&& Importer::convert(uint16_t ref, std::list<sam::Record>&& records1, std::list<sam::Record>&& records2){
+core::record::Record&& Importer::convertPairedEndedSameRec(
+        std::map<std::string, uint16_t> &ref, std::list<sam::Record>&& records1, std::list<sam::Record>&& records2){
+
+    UTILS_DIE_IF(records1.size() != records2.size(), "!Number of alignments of read1 and read2 are different");
 
     auto r1 = std::move(records1.front());
     records1.pop_front();
@@ -162,12 +165,25 @@ core::record::Record&& Importer::convert(uint16_t ref, std::list<sam::Record>&& 
     auto r2 = std::move(records2.front());
     records2.pop_front();
 
-    // TODO: read_1_first (yeremia)
-
     auto flag_tuple = convertFlags2Mpeg(r1.getFlags());
 
-    core::record::Record mpegRec(1, core::record::ClassType::CLASS_I, r1.moveQname()
-            , "Genie", std::get<1>(flag_tuple), true);
+    // TODO: check read_1_first (yeremia)
+    auto read_1_first = r1.getPos() <= r2.getPos();
+    core::record::Record mpegRec(1, core::record::ClassType::CLASS_I, r1.moveQname(),
+             "Genie", std::get<1>(flag_tuple), read_1_first);
+
+    core::record::Segment r1Segment(r1.moveSeq());
+    if (r1.getQual() != "*") {
+        r1Segment.addQualities(r1.moveQual());
+    }
+    mpegRec.addSegment(std::move(r1Segment));
+
+    core::record::Segment r2Segment(r2.moveSeq());
+    if (r2.getQual() != "*") {
+        r2Segment.addQualities(r2.moveQual());
+    }
+    mpegRec.addSegment(std::move(r2Segment));
+
 
 //    core::record::Segment segmentR1(r1.moveSeq());
 //    if (r1.getQual() != "*") {
@@ -195,6 +211,28 @@ core::record::Record&& Importer::convert(uint16_t ref, std::list<sam::Record>&& 
 //    }
 
     return std::move(mpegRec);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Importer::addAlignmentContainer(core::record::Record mpegRec, uint16_t seqID, bool isRead1First,sam::Record &r1, sam::Record *r2) {
+    core::record::Alignment r1Alignment(convertCigar2ECigar(r1.getCigar(), r1.getSeq()),
+                                        r1.checkFlag(Record::FlagPos::SEQ_REVERSE));
+    r1Alignment.addMappingScore(r1.getMapQ());
+
+    core::record::AlignmentBox alignmentContainer(r1.getPos(), std::move(r1Alignment));
+
+    // Create object of AlignmentSplit SameRec
+    core::record::Alignment r2Alignment(convertCigar2ECigar(r2->getCigar(), r2->getSeq()),
+                                        r2->checkFlag(Record::FlagPos::SEQ_REVERSE));
+    r2Alignment.addMappingScore(r2->getMapQ());
+
+    auto delta = isRead1First ? r2->getPos() - r1.getPos() : r1.getPos() - r2->getPos();
+    auto splitAlign = util::make_unique<core::record::alignment_split::SameRec>(delta, std::move(r2Alignment));
+
+    alignmentContainer.addAlignmentSplit(std::move(splitAlign));
+
+    mpegRec.addAlignment(seqID, std::move(alignmentContainer));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -32,6 +32,7 @@ namespace record {
 class AlignmentBox {
     uint64_t mapping_pos{};                                           //!<
     Alignment alignment;                                              //!<
+    // TODO: Check whether a vector is required (yeremia)
     std::vector<std::unique_ptr<AlignmentSplit>> splitAlignmentInfo;  //!<
 
    public:
