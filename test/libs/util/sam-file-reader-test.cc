@@ -174,14 +174,14 @@ TEST(SamImporter, PairedEndMultiAlignment) {  // NOLINT(cert-err-cpp)
 
     reader.read(1);
 
-    if (reader.getSortedRecord(unmappedRead, read1, read2)){
+    if (reader.getSortedTemplate(unmappedRead, read1, read2)){
         EXPECT_EQ(unmappedRead.size(), 0);
         EXPECT_EQ(read1.size(), 7);
         EXPECT_EQ(read2.size(), 7);
 //        auto mpegRec = genie::format::sam::Importer::convert(0, std::move(read1), &read2);
     }
 
-    EXPECT_EQ(reader.getSortedRecord(unmappedRead, read1, read2), false);
+    EXPECT_EQ(reader.getSortedTemplate(unmappedRead, read1, read2), false);
     EXPECT_EQ(unmappedRead.size(), 0);
     EXPECT_EQ(read1.size(), 0);
     EXPECT_EQ(read2.size(), 0);

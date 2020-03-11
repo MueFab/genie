@@ -58,7 +58,7 @@ public:
 
     explicit Record(const std::string &string);
 
-    // explicit Record(const std::string &_qname, const std::string &string);
+    explicit Record(const std::string &_qname, const std::string &string);
 
     const std::string &getQname() const;
 

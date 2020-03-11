@@ -94,6 +94,26 @@ Record::Record(const std::string& string) {
     checkValuesUsingCondition();
 }
 
+Record::Record(const std::string &_qname, const std::string &string) {
+    auto tokens = util::tokenize(string, '\t');
+    UTILS_DIE_IF(tokens.size() < 10, "Invalid SAM record");
+
+    qname = _qname;
+    flag = std::stoi(tokens[0]);
+    rname = tokens[1];
+    pos = std::stoi(tokens[2]);
+    mapq = std::stoi(tokens[3]);
+    cigar = tokens[4];
+    rnext = tokens[5];
+    pnext = std::stoi(tokens[6]);
+    tlen = std::stoi(tokens[7]);
+    seq = tokens[8];
+    qual = tokens[9];
+
+    checkValuesUsingRegex();
+    checkValuesUsingCondition();
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Record::checkValuesUsingRegex() const {
@@ -296,6 +316,7 @@ bool Record::isPairOf(Record &other) const {
     return !((checkFlag(FlagPos::FIRST_SEGMENT) && other.checkFlag(FlagPos::FIRST_SEGMENT)) ||
              (checkFlag(FlagPos::LAST_SEGMENT) && other.checkFlag(FlagPos::LAST_SEGMENT)));
 }
+
 //const std::string &Record::getReverseSeq() const {
 //    std::string revSeq = seq;
 //    std::reverse(revSeq.begin(), revSeq.end())
