@@ -30,8 +30,44 @@ void Reader::addCacheEntry(std::string &qname, size_t &pos) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool Reader::isReferenceExists(const std::string& rname) {
+    return ref_sequences.find(rname) != ref_sequences.end();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Reader::getSeqID(const std::string &rname, uint16_t &seqID) const {
+    auto search =  ref_sequences.find(rname);
+
+    if (search != ref_sequences.end()){
+        seqID = search->second;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 Reader::Reader(std::istream& _stream, Constraint _constraint, uint64_t _constraint_val):
     stream(_stream), header(stream), rec_saved(false), constraint(_constraint), constraint_val(_constraint_val), num_records(0){
+
+    uint16_t seqID = 0;
+    for (auto &headerLine : header.getLines()){
+        if (headerLine.getName() == "SQ") {
+            for (auto &tag : headerLine.getTags()) {
+                auto tagName = tag->getName();
+
+                if (tagName == "SN"){
+                    ref_sequences.emplace(tag->toString(), seqID);
+                } else if(tagName == "AN"){
+                    // TODO : value of tag AN is comma-separated list (yeremia)
+                    ref_sequences.emplace(tag->toString(), seqID);
+                }
+            }
+            seqID++;
+        }
+    }
 
 #if WITH_CACHE
     int init_pos = stream.tellg();
@@ -40,11 +76,14 @@ Reader::Reader(std::istream& _stream, Constraint _constraint, uint64_t _constrai
         std::string str;
         std::getline(stream, str, '\t');
 
-        size_t pos = stream.tellg();
+        if (str[0] != '@'){
+            size_t pos = stream.tellg();
 
-        addCacheEntry(str, pos);
+            addCacheEntry(str, pos);
 
-        std::getline(stream, str);
+            std::getline(stream, str);
+        }
+
     }
 
 //    while(std::getline(stream, str)){
@@ -57,6 +96,8 @@ Reader::Reader(std::istream& _stream, Constraint _constraint, uint64_t _constrai
     stream.seekg(init_pos);
 
     UTILS_DIE_IF(stream.tellg() != init_pos, "Unable to move file pointer");
+#else
+
 #endif
 }
 
@@ -87,7 +128,7 @@ void Reader::addRecord(Record& record) {
     num_records++;
 
     if (!record.isUnmapped()){
-        UTILS_DIE_IF(!header.isReferenceExists(record.getRname()), "No reference in header");
+        UTILS_DIE_IF(!isReferenceExists(record.getRname()), "No reference in header");
     }
 
     const auto& qname = record.getQname();
@@ -229,6 +270,10 @@ bool Reader::getSortedTemplate(std::list<Record>& unmappedRead, std::list<Record
                     while (iter_r2 != iter.second[uint8_t(Index::PAIR_LAST_NONPRIMARY)].end()){
                         if (iter_r1->isPairOf(*iter_r2)){
                             pairFound = true;
+
+                            // TODO: Split alignment (Yeremia)
+                            UTILS_DIE_IF(iter_r1->getRname() != iter_r2->getRname(),
+                                         "Not yet implemented : Split alignment for SAM record");
 
                             read1.push_back(std::move(*iter_r1));
                             read2.push_back(std::move(*iter_r2));

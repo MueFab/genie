@@ -38,10 +38,10 @@ Record::Record()
 // ---------------------------------------------------------------------------------------------------------------------
 
 Record::Record(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::string &&_read_name,
-               std::string &&_read_group, uint8_t _flags)
+               std::string &&_read_group, uint8_t _flags, bool _is_read_1_first=true)
     : number_of_template_segments(_number_of_template_segments),
       class_ID(_auTypeCfg),
-      read_1_first(true),
+      read_1_first(_is_read_1_first),
       sharedAlignmentInfo(),
       qv_depth(0),
       read_name(std::move(_read_name)),

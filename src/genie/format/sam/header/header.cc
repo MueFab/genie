@@ -117,23 +117,15 @@ void HeaderLine::print(std::ostream& stream) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Header::Header(std::istream& stream) {
-
-    std::string strLine;
+    std::string str;
     while (stream.peek() == '@') {
-        std::getline(stream, strLine);
+        std::getline(stream, str);
 
         // Handle comment
-        if (strLine.substr(1, 2) == "CO"){
-            addComment(strLine.substr(4));
+        if (str.substr(1, 2) == "CO"){
+            addComment(str.substr(4));
         } else {
-            HeaderLine headerLine(strLine);
-
-            if (headerLine.getName() == "SQ"){
-                addReference(std::move(headerLine));
-            } else {
-                lines.emplace_back(strLine);
-            }
-
+            lines.emplace_back(str);
         }
 
     }
@@ -154,24 +146,6 @@ void Header::print(std::ostream& stream) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::vector<HeaderLine>& Header::getLines() const { return lines; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Header::addReference(HeaderLine&& line){
-    auto tags = line.moveTags();
-    auto refName = tags[0].get()->toString();
-
-    UTILS_DIE_IF(references.find(refName) != references.end(),
-                 "Reference name " + refName + " is not unique");
-    tags.erase(tags.begin());
-    references.emplace(std::move(refName), std::move(tags));
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool Header::isReferenceExists(const std::string& rname) {
-    return references.find(rname) != references.end();
-}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
