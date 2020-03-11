@@ -25,7 +25,9 @@ TransformedSeq::TransformedSeq(SupportValues::TransformIdSubsym _transform_ID_su
                                Binarization&& _cabac_binarization)
     : transform_ID_subsym(_transform_ID_subsym),
       support_values(std::move(_support_values)),
-      cabac_binarization(std::move(_cabac_binarization)) {}
+      cabac_binarization(std::move(_cabac_binarization)) {
+    state_vars.populate(transform_ID_subsym, support_values, cabac_binarization);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

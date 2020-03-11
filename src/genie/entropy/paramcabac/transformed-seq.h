@@ -14,6 +14,7 @@
 #include <memory>
 #include "binarization.h"
 #include "support_values.h"
+#include "state_vars.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -47,6 +48,7 @@ class TransformedSeq {
     SupportValues::TransformIdSubsym transform_ID_subsym;  //!< : 3; Line 9
     SupportValues support_values;                          //!< Line 10
     Binarization cabac_binarization;                       //!< Line 11
+    StateVars state_vars;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
