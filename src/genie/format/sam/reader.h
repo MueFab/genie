@@ -46,6 +46,8 @@ class Reader {
    private:
     std::istream& stream;
     header::Header header;
+    std::map<std::string, uint16_t> ref_sequences;
+
     bool rec_saved;
 
     Constraint constraint;
@@ -58,7 +60,11 @@ class Reader {
    public:
     explicit Reader(std::istream& _stream, Constraint _constraint = Constraint::NONE, uint64_t _constraint_val = UINT64_MAX);
 
-    void addCacheEntry(std::string& qname, size_t& pos);
+    void addCacheEntry(std::string& qname, size_t &pos);
+
+    bool isReferenceExists(const std::string &rname);
+
+    bool getSeqID(const std::string& rname, uint16_t &seqID) const;
 
     const header::Header& getHeader() const;
 

@@ -54,19 +54,19 @@ class Header {
    private:
     std::vector<HeaderLine> lines;
     std::vector<std::string> comments;
-    std::map<std::string, std::vector<std::unique_ptr<TagBase>>> references;
 
     void globalChecks() const;
 
    public:
+
+
     explicit Header(std::istream& stream);
     Header() = default;
     Header(Header&& header) noexcept;
     void print(std::ostream& stream) const;
 
     const std::vector<HeaderLine>& getLines() const;
-    void addReference(HeaderLine&& line);
-    bool isReferenceExists(const std::string& _rname);
+
     void addComment(std::string&& _str);
     void addLine(HeaderLine&& line);
 
