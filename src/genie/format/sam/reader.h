@@ -52,21 +52,23 @@ class Reader {
     uint64_t constraint_val;
     uint64_t num_records;
 
-    std::map<std::string, std::vector<int>> cache;
+    std::map<std::string, std::vector<size_t>> cache;
     std::map<std::string, std::vector<std::vector<Record>>> data;
 
    public:
     explicit Reader(std::istream& _stream, Constraint _constraint = Constraint::NONE, uint64_t _constraint_val = UINT64_MAX);
 
+    void addCacheEntry(std::string& qname, size_t& pos);
+
     const header::Header& getHeader() const;
 
     bool isConstrainReached() const; //
 
-    void addRecord(std::string& str);
+    void addRecord(Record& record);
 
     void read(int num);
 
-    bool getSortedRecord(std::list<Record>& unmappedRead, std::list<Record>& read1, std::list<Record>& read2);
+    bool getSortedTemplate(std::list<Record>& unmappedRead, std::list<Record>& read1, std::list<Record>& read2);
 
     bool isEnd();
 

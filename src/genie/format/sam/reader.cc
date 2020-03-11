@@ -19,27 +19,40 @@ namespace sam {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void Reader::addCacheEntry(std::string &qname, size_t &pos) {
+    auto search = cache.find(qname);
+    if (!(search == cache.end())) {
+        search->second.push_back(pos);
+    } else {
+        cache.emplace(std::move(qname), std::vector<size_t>({pos}));
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 Reader::Reader(std::istream& _stream, Constraint _constraint, uint64_t _constraint_val):
     stream(_stream), header(stream), rec_saved(false), constraint(_constraint), constraint_val(_constraint_val), num_records(0){
 
 #if WITH_CACHE
     int init_pos = stream.tellg();
-    std::string str;
 
-    int pos = stream.tellg();
-    while(std::getline(stream, str)){
-        auto qname = str.substr(0, str.find('\t'));
+    while(stream.peek() != EOF){
+        std::string str;
+        std::getline(stream, str, '\t');
 
-        auto search = cache.find(qname);
-        if (search == cache.end()){
-            cache.emplace(std::move(qname), std::move(std::vector<int>({pos})));
-        }
-        else {
-            search->second.push_back(pos);
-        }
+        size_t pos = stream.tellg();
 
-        pos = stream.tellg();
+        addCacheEntry(str, pos);
+
+        std::getline(stream, str);
     }
+
+//    while(std::getline(stream, str)){
+//        auto qname = str.substr(0, str.find('\t'));
+//
+//        pos = stream.tellg();
+//    }
+
     stream.clear();
     stream.seekg(init_pos);
 
@@ -69,8 +82,7 @@ bool Reader::isConstrainReached() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Reader::addRecord(std::string& str) {
-    Record record(str);
+void Reader::addRecord(Record& record) {
     // TODO: Store values for other constraints such as BY_SIZE (Yeremia)
     num_records++;
 
@@ -112,16 +124,19 @@ void Reader::addRecord(std::string& str) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO: Change type of num to size_t, prevent over-/underflow (yeremia)
+// TODO: Prevent over-/underflow (Yeremia)
 void Reader::read(int num) {
     std::string str;
 
 #if WITH_CACHE
     for (auto iter = cache.begin(); iter != cache.end(); iter++){
-        for (auto iter_pos = iter->second.begin(); iter_pos != iter->second.end(); iter_pos++){
-            stream.seekg(*iter_pos);
+        for (auto& pos : iter->second){
+            stream.seekg(pos);
             std::getline(stream, str);
-            addRecord(str);
+
+            Record rec(iter->first, str);
+            addRecord(rec);
+
             num--;
         }
 
@@ -142,7 +157,7 @@ void Reader::read(int num) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Reader::getSortedRecord(std::list<Record>& unmappedRead, std::list<Record>& read1, std::list<Record>& read2) {
+bool Reader::getSortedTemplate(std::list<Record>& unmappedRead, std::list<Record>& read1, std::list<Record>& read2) {
 
     unmappedRead.clear();
     read1.clear();
