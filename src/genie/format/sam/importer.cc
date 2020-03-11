@@ -113,44 +113,95 @@ std::string Importer::convertCigar2ECigar(const std::string &cigar, const std::s
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::record::Record Importer::convert(uint16_t ref, sam::Record &&_r1, sam::Record *_r2) {
-    sam::Record r1 = std::move(_r1);
+//core::record::Record Importer::convert(uint16_t ref, sam::Record &&_r1, sam::Record *_r2) {
+//    sam::Record r1 = std::move(_r1);
+//    auto flag_tuple = convertFlags2Mpeg(r1.getFlags());
+//    core::record::Record ret(_r2 ? 2 : 1, core::record::ClassType::CLASS_I, r1.moveQname(), "Genie",
+//                             std::get<1>(flag_tuple));
+//
+//    core::record::Alignment alignment(convertCigar2ECigar(r1.getCigar(), r1.getSeq()),
+//                                      r1.checkFlag(Record::FlagPos::SEQ_REVERSE));
+//    alignment.addMappingScore(r1.getMapQ());
+//    core::record::AlignmentBox alignmentContainer(r1.getPos(), std::move(alignment));
+//
+//    core::record::Segment segment(r1.moveSeq());
+//    if (r1.getQual() != "*") {
+//        segment.addQualities(r1.moveQual());
+//    }
+//    ret.addSegment(std::move(segment));
+//
+//    if (_r2) {
+//        sam::Record r2 = std::move(*_r2);
+//
+//        core::record::Alignment alignment2(std::move(convertCigar2ECigar(r2.getCigar(), r2.getSeq())), r2.checkFlag(Record::FlagPos::SEQ_REVERSE));
+//        alignment2.addMappingScore(r2.getMapQ());
+//
+//        core::record::Segment segment2(r2.moveSeq());
+//        if (r2.getQual() != "*") {
+//            segment2.addQualities(r2.moveQual());
+//        }
+//        ret.addSegment(std::move(segment2));
+//
+//        auto splitAlign =
+//            util::make_unique<core::record::alignment_split::SameRec>(r2.getPos() - r1.getPos(), std::move(alignment2));
+//        alignmentContainer.addAlignmentSplit(std::move(splitAlign));
+//    } else {
+//    }
+//
+//    ret.addAlignment(ref, std::move(alignmentContainer));  // TODO
+//    return ret;
+//}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+core::record::Record&& Importer::convert(uint16_t ref, std::list<sam::Record>&& recs1, std::list<sam::Record>&& recs2){
+
+    auto r1 = std::move(recs1.front());
+    recs1.pop_front();
+
+    auto r2 = std::move(recs2.front());
+    recs2.pop_front();
+
+    // TODO: read_1_first (yeremia)
+
     auto flag_tuple = convertFlags2Mpeg(r1.getFlags());
-    core::record::Record ret(_r2 ? 2 : 1, core::record::ClassType::CLASS_I, r1.moveQname(), "Genie",
-                             std::get<1>(flag_tuple));
 
-    core::record::Alignment alignment(convertCigar2ECigar(r1.getCigar(), r1.getSeq()),
-                                      r1.checkFlag(Record::FlagPos::SEQ_REVERSE));
-    alignment.addMappingScore(r1.getMapQ());
-    core::record::AlignmentBox alignmentContainer(r1.getPos(), std::move(alignment));
+    core::record::Record mpegRec(1, core::record::ClassType::CLASS_I, r1.moveQname()
+            , "Genie", std::get<1>(flag_tuple));
 
-    core::record::Segment segment(r1.moveSeq());
-    if (r1.getQual() != "*") {
-        segment.addQualities(r1.moveQual());
-    }
-    ret.addSegment(std::move(segment));
+//    core::record::Segment segmentR1(r1.moveSeq());
+//    if (r1.getQual() != "*") {
+//        segmentR1.addQualities(r1.moveQual());
+//    }
+//    mpegRec.addSegment(std::move(segment));
+//
+//    core::record::Segment segmentR2(r2.moveSeq());
+//    if (r2.getQual() != "*") {
+//        segmentR1.addQualities(r2.moveQual());
+//    }
+//
+//    core::record::Alignment alignment(convertCigar2ECigar(primaryRec.getCigar(), primaryRec.getSeq()),
+//                                      primaryRec.checkFlag(Record::FlagPos::SEQ_REVERSE));
+//
+//    alignment.addMappingScore(primaryRec.getMapQ());
+//
+//    core::record::AlignmentBox alignmentContainer(primaryRec.getPos(), std::move(alignment));
+//
+////    for (auto &r : _r1){
+////        auto splitAlign =
+////            util::make_unique<core::record::alignment_split::SameRec>(r2.getPos() - r1.getPos(), std::move(alignment2));
+////
+////
+////    }
 
-    if (_r2) {
-        sam::Record r2 = std::move(*_r2);
-
-        core::record::Alignment alignment2(std::move(convertCigar2ECigar(r2.getCigar(), r2.getSeq())), r2.checkFlag(Record::FlagPos::SEQ_REVERSE));
-        alignment2.addMappingScore(r2.getMapQ());
-
-        core::record::Segment segment2(r2.moveSeq());
-        if (r2.getQual() != "*") {
-            segment2.addQualities(r2.moveQual());
-        }
-        ret.addSegment(std::move(segment2));
-
-        auto splitAlign =
-            util::make_unique<core::record::alignment_split::SameRec>(r2.getPos() - r1.getPos(), std::move(alignment2));
-        alignmentContainer.addAlignmentSplit(std::move(splitAlign));
-    } else {
-    }
-
-    ret.addAlignment(ref, std::move(alignmentContainer));  // TODO
-    return ret;
+    return std::move(mpegRec);
 }
+
+//// ---------------------------------------------------------------------------------------------------------------------
+//
+//core::record::Record&& Importer::convertSingleEnded(uint16_t ref, sam::Record&& _r1) {
+//
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -215,12 +266,12 @@ bool Importer::pump(size_t id) {
 //
 //    // Break if less than blockSize records were read from the SAM file
 //    return !samReader.isEnd();
-    std::list<genie::format::sam::Record> unmappedRead, read1, read2;
-    samReader.read(blockSize);
-    while (samReader.getSortedRecord(unmappedRead, read1, read2)){
-
-    }
-    return !samReader.isEnd();
+//    std::list<genie::format::sam::Record> unmappedRead, read1, read2;
+//    samReader.read(blockSize);
+//    while (samReader.getSortedRecord(unmappedRead, read1, read2)){
+//        auto mpegRec = convert();
+//    }
+//    return !samReader.isEnd();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
