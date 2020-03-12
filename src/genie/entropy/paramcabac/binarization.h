@@ -11,7 +11,6 @@
 
 #include <genie/util/bitwriter.h>
 #include <boost/optional/optional.hpp>
-#include <memory>
 #include "binarization_parameters.h"
 #include "context.h"
 
@@ -26,10 +25,10 @@ namespace paramcabac {
  */
 class Binarization {
    public:
+    Binarization();
+
     Binarization(BinarizationParameters::BinarizationId _binarization_ID,
                  BinarizationParameters&& _cabac_binarization_parameters);
-
-    Binarization();
 
     Binarization(uint8_t coding_subsym_size, uint8_t output_symbol_size, util::BitReader& reader);
 
