@@ -39,6 +39,8 @@ class StateVars {
 
    public:
 
+    static const uint32_t MAX_LUT_SIZE = (1u<<8u);
+
     StateVars();
 
     void populate(const SupportValues::TransformIdSubsym transform_ID_subsym,
