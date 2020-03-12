@@ -16,18 +16,18 @@ namespace paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+Binarization::Binarization()
+    : Binarization(BinarizationParameters::BinarizationId::BINARY_CODING,
+                   BinarizationParameters(BinarizationParameters::BinarizationId::BINARY_CODING, std::vector<uint8_t>(0))) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 Binarization::Binarization(BinarizationParameters::BinarizationId _binarization_ID,
                            BinarizationParameters&& _cabac_binarization_parameters)
     : binarization_ID(_binarization_ID),
       bypass_flag(true),
       cabac_binarization_parameters(std::move(_cabac_binarization_parameters)),
       cabac_context_parameters() {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-Binarization::Binarization()
-    : Binarization(BinarizationParameters::BinarizationId::BINARY_CODING,
-                   BinarizationParameters(BinarizationParameters::BinarizationId::BINARY_CODING, 0)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -70,7 +70,7 @@ void Binarization::setContextParameters(Context&& _cabac_context_parameters) {
 void Binarization::write(util::BitWriter& writer) const {
     writer.write(uint8_t(binarization_ID), 5);
     writer.write(bypass_flag, 1);
-    cabac_binarization_parameters.write(writer);
+    cabac_binarization_parameters.write(binarization_ID, writer);
     if (cabac_context_parameters) {
         cabac_context_parameters->write(writer);
     }
