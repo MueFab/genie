@@ -31,6 +31,7 @@ class StateVars {
     uint32_t numAlphaSubsym;
     uint32_t numSubsyms;
     uint32_t numCtxSubsym;
+    uint32_t cLengthBI;
     uint32_t codingOrderCtxOffset[3];
     uint32_t codingSizeCtxOffset;
     uint32_t numCtxLuts;

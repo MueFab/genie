@@ -4,7 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include "state_vars.h"
+#include "binarization_parameters.h"
 #include <genie/core/constants.h>
+#include <genie/util/exceptions.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -31,15 +33,19 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
     const uint8_t codingSubsymSize = support_values.getCodingSubsymSize();
     const uint8_t outputSymbolSize = support_values.getOutputSymbolSize();
     const uint8_t codingOrder = support_values.getCodingOrder();
-    core::GenDesc descriptor_ID = core::GenDesc::POS;                   // need descriptor_ID TODO
-    core::GenSubIndex subsequence_ID = core::GenSub::POS_MAPPING_FIRST; // need subsequence_ID TODO
-    core::AlphabetID alphabet_ID = core::AlphabetID::ACGTN;             // need alphabet_ID TODO
+    const BinarizationParameters::BinarizationId binarization_ID = cabac_binarization.getBinarizationID();
+    const BinarizationParameters& cabacBinazParams = cabac_binarization.getCabacBinarizationParameters();
+    const Context& cabacContextParams = cabac_binarization.getCabacContextParameters();
+
+    core::GenDesc descriptor_ID = core::GenDesc::POS;                   // need descriptor_ID to be supplied to this function TODO
+    core::GenSubIndex subsequence_ID = core::GenSub::POS_MAPPING_FIRST; // need subsequence_ID to be supplied to this function TODO
+    core::AlphabetID alphabet_ID = core::AlphabetID::ACGTN;             // need alphabet_ID to be supplied to this function TODO
 
     // numSubSymbols
     if(codingSubsymSize > 0) { // TODO: should do assert or return error?
         numSubsyms = outputSymbolSize / codingSubsymSize;
     } else {
-        // TODO deal with error.
+        UTILS_THROW_RUNTIME_EXCEPTION("coding_subsym_size = "+std::to_string(codingSubsymSize)+" not supported");
     }
 
     // numAlphabetSymbols
@@ -66,6 +72,67 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
 
     if(numAlphaSubsym == 0) { // 0 == not special
         numAlphaSubsym = (1<<codingSubsymSize);
+    }
+
+    /* numContextsSymbol */
+    switch(binarization_ID) {
+        case BinarizationParameters::BinarizationId::BINARY_CODING:
+            numCtxSubsym = codingSubsymSize;
+            cLengthBI = numCtxSubsym;
+        break;
+        case BinarizationParameters::BinarizationId::TRUNCATED_UNARY:
+            numCtxSubsym = cabacBinazParams.getCMax(); // cmax
+        break;
+        case BinarizationParameters::BinarizationId::EXPONENTIAL_GOLOMB:
+            numCtxSubsym = std::floor(std::log2(numAlphaSubsym+1))+1;
+        break;
+        case BinarizationParameters::BinarizationId::SIGNED_EXPONENTIAL_GOMB:
+            numCtxSubsym = std::floor(std::log2(numAlphaSubsym+1))+2;
+        break;
+        case BinarizationParameters::BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
+            numCtxSubsym = cabacBinazParams.getCMaxTeg() // cmax_teg
+                         + std::floor(std::log2(numAlphaSubsym+1))+1;
+        break;
+        case BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
+            numCtxSubsym = cabacBinazParams.getCMaxTeg() // cmax_teg
+                         + std::floor(std::log2(numAlphaSubsym+1))+2;
+        break;
+        case BinarizationParameters::BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY:
+        {
+            uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
+            numCtxSubsym = (outputSymbolSize/splitUnitSize)
+                         * ((1<<splitUnitSize)-1)
+                         + ((1<<(outputSymbolSize%splitUnitSize))-1);
+        }
+        break;
+        case BinarizationParameters::BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
+        {
+            uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
+            numCtxSubsym = (outputSymbolSize/splitUnitSize)
+                         * ((1<<splitUnitSize)-1)
+                         + ((1<<(outputSymbolSize%splitUnitSize))-1)
+                         + 1;
+        }
+        break;
+        case BinarizationParameters::BinarizationId::DOUBLE_TRUNCATED_UNARY:
+        {
+            uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
+            numCtxSubsym = cabacBinazParams.getCMaxDtu()
+                         + (outputSymbolSize/splitUnitSize)
+                         * ((1<<splitUnitSize)-1)
+                         + ((1<<(outputSymbolSize%splitUnitSize))-1);
+        }
+        break;
+        case BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
+        {
+            uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
+            numCtxSubsym = cabacBinazParams.getCMaxDtu()
+                         + (outputSymbolSize/splitUnitSize)
+                         * ((1<<splitUnitSize)-1)
+                         + ((1<<(outputSymbolSize%splitUnitSize))-1)
+                         + 1;
+        }
+        break;
     }
 }
 
