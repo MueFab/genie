@@ -49,7 +49,7 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
     if(codingSubsymSize > 0) {
         numSubsyms = outputSymbolSize / codingSubsymSize;
     } else {
-        UTILS_THROW_RUNTIME_EXCEPTION("coding_subsym_size = "+std::to_string(codingSubsymSize)+" not supported");
+        // DISABLE for now UTILS_THROW_RUNTIME_EXCEPTION("coding_subsym_size = "+std::to_string(codingSubsymSize)+" not supported");
     }
 
     // numAlphaSubsym
@@ -162,9 +162,11 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
                 binarization_ID <= BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY) ||
                 codingOrder == 0 ||
                 (1u<<codingSubsymSize) > MAX_LUT_SIZE) {
+            /* DISABLE for now
             UTILS_THROW_RUNTIME_EXCEPTION("LUT_TRANSFORM not supported with given configuration: coding_order = 0\
                                          , binarization_ID = "+std::to_string((uint8_t)binarization_ID)+"\
                                          , coding_subsym_size = "+std::to_string(codingSubsymSize));
+                                         */
         } else {
             numCtxLuts = (codingSubsymSize/2)
                        * ((1<<2)-1)
