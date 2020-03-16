@@ -29,7 +29,7 @@ GabacSeqConfSet::GabacSeqConfSet() {
         "\"diff_coding_enabled\": false,"
         "\"binarization_id\": 0,"
         "\"binarization_parameters\":[32],"
-        "\"context_selection_id\": 0"
+        "\"context_selection_id\": 1"
         "}]"
         "}";
 
@@ -84,7 +84,7 @@ GabacSeqConfSet::CabacBinarization GabacSeqConfSet::storeBinarization(
     using namespace entropy::paramcabac;
 
     auto bin_ID = BinarizationParameters::BinarizationId(tSeqConf.binarizationId);
-    auto bin_params = BinarizationParameters(bin_ID, tSeqConf.binarizationParameters[0]);
+    auto bin_params = BinarizationParameters(bin_ID, std::vector<uint8_t>(tSeqConf.binarizationParameters[0]));
     auto binarization = Binarization(bin_ID, std::move(bin_params));
 
     // Additional parameter for context adaptive modes

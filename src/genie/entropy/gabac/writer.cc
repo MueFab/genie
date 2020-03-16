@@ -81,7 +81,7 @@ void Writer::writeAsBIbypass(uint64_t input, unsigned int cLength) {
 void Writer::writeAsBIcabac(uint64_t input, unsigned int cLength, unsigned int offset) {
     assert(getBinarization(BinarizationId::BI).sbCheck(input, input, cLength));
 
-    unsigned int cm = ContextSelector::getContextForBi(offset, 0);
+    unsigned int cm = 0;//ContextSelector::getContextForBi(offset, 0);
     auto scan = m_contextModels.begin() + cm;
     for (int i = cLength - 1; i >= 0; i--)  // i must be signed
     {
