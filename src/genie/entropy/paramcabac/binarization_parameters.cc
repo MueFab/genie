@@ -95,25 +95,31 @@ void BinarizationParameters::write(BinarizationId binID, util::BitWriter &writer
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint8_t BinarizationParameters::getCMax() const {
-        return cmax;
+    return cmax;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint8_t BinarizationParameters::getCMaxTeg() const {
-        return cmax_teg;
+    return cmax_teg;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint8_t BinarizationParameters::getCMaxDtu() const {
-        return cmax_dtu;
+    return cmax_dtu;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint8_t BinarizationParameters::getSplitUnitSize() const {
-        return split_unit_size;
+    return split_unit_size;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t BinarizationParameters::getNumBinarizationParams(BinarizationParameters::BinarizationId binarzationId) {
+    return numParams[uint8_t(binarzationId)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

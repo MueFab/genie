@@ -10,7 +10,6 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/util/bitwriter.h>
-#include <boost/optional/optional.hpp>
 #include "binarization_parameters.h"
 #include "context.h"
 
@@ -45,6 +44,8 @@ class Binarization {
     const BinarizationParameters& getCabacBinarizationParameters() const;
 
     const Context& getCabacContextParameters() const;
+
+    uint8_t getNumBinarizationParams();
 
    private:
     BinarizationParameters::BinarizationId binarization_ID;

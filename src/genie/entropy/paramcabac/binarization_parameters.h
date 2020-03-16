@@ -25,11 +25,6 @@ namespace paramcabac {
  * ISO 23092-2 Section 8.3.3.1 table 98
  */
 class BinarizationParameters {
-   private:
-    uint8_t cmax;             //!< : 8; Line 3
-    uint8_t cmax_teg;         //!< : 8; Line 5
-    uint8_t cmax_dtu;         //!< : 8; Line 7
-    uint8_t split_unit_size;  //!< : 4; Line 10
    public:
     enum class BinarizationId : uint8_t {
         BINARY_CODING = 0,
@@ -61,6 +56,17 @@ class BinarizationParameters {
     uint8_t getCMaxDtu() const;
 
     uint8_t getSplitUnitSize() const;
+
+    static uint8_t getNumBinarizationParams(BinarizationParameters::BinarizationId binarzationId);
+
+   private:
+    uint8_t cmax;             //!< : 8; Line 3
+    uint8_t cmax_teg;         //!< : 8; Line 5
+    uint8_t cmax_dtu;         //!< : 8; Line 7
+    uint8_t split_unit_size;  //!< : 4; Line 10
+    
+    static constexpr uint8_t numParams[unsigned(BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY) + 1u] =
+    {0, 1, 0, 0, 1, 1, 1, 1, 2, 2};    
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

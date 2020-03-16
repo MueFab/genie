@@ -6,7 +6,6 @@
 
 #include "binarization.h"
 #include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -74,6 +73,12 @@ void Binarization::write(util::BitWriter& writer) const {
     if (!bypass_flag) {
         cabac_context_parameters.write(writer);
     }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t Binarization::getNumBinarizationParams() {
+    return BinarizationParameters::getNumBinarizationParams(binarization_ID);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
