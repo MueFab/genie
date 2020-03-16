@@ -56,7 +56,7 @@ const BinarizationParameters& Binarization::getCabacBinarizationParameters() con
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const Context& Binarization::getCabacContextParameters() const { return cabac_context_parameters.get(); }
+const Context& Binarization::getCabacContextParameters() const { return cabac_context_parameters; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -71,8 +71,8 @@ void Binarization::write(util::BitWriter& writer) const {
     writer.write(uint8_t(binarization_ID), 5);
     writer.write(bypass_flag, 1);
     cabac_binarization_parameters.write(binarization_ID, writer);
-    if (cabac_context_parameters) {
-        cabac_context_parameters->write(writer);
+    if (!bypass_flag) {
+        cabac_context_parameters.write(writer);
     }
 }
 
