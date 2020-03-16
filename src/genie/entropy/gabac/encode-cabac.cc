@@ -23,7 +23,7 @@ void encode_cabac(const BinarizationId& binarizationId, const std::vector<unsign
     util::DataBlock block(0, 1);
     assert(symbols != nullptr);
 #ifndef NDEBUG
-    const unsigned int paramSize[unsigned(BinarizationId::STEG) + 1u] = {1, 1, 0, 0, 1, 1};
+    const unsigned int paramSize[unsigned(BinarizationId::STEG) + 1u] = {1, 1, 0, 0, 1, 1}; // FIXME what is this??? TBC
 #endif
     assert(binarizationParameters.size() >= paramSize[static_cast<int>(binarizationId)]);
 

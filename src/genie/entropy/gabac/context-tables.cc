@@ -5,6 +5,7 @@
  */
 
 #include "context-tables.h"
+#include<iostream>
 
 namespace genie {
 namespace entropy {
@@ -35,6 +36,16 @@ std::vector<ContextModel> buildContextTable() {
         }
     }
 
+    std::cout << "Size of contextModels: " << contextModels.size() << std::endl;
+    return contextModels;
+}
+
+
+std::vector<ContextModel> buildContextTable(unsigned int numContexts) {
+    std::vector<ContextModel> contextModels;
+    
+    // TODO 
+    
     return contextModels;
 }
 
