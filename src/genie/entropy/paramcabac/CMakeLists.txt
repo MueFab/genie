@@ -7,6 +7,7 @@ set(source_files
         decoder.cc
         subsequence.cc
         support_values.cc
+        state_vars.cc
         transformed-seq.cc
         transformed_parameters.cc
         )
