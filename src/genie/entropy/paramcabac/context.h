@@ -13,7 +13,6 @@
 #include <genie/util/bitwriter.h>
 #include <genie/util/make-unique.h>
 #include <boost/optional/optional.hpp>
-#include <memory>
 #include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -74,7 +74,12 @@ uint16_t Context::getNumContexts() const { return num_contexts; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Context::getShareSubsymCtxFlag() const { return *share_subsym_ctx_flag; }
+bool Context::getShareSubsymCtxFlag() const {
+    if (share_subsym_ctx_flag)
+        return *share_subsym_ctx_flag;
+    else
+        return false; // default.
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
