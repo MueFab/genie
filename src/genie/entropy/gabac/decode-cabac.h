@@ -10,6 +10,8 @@
 #include <cstdint>
 #include <vector>
 
+#include <genie/entropy/paramcabac/transformed-seq.h>
+
 namespace genie {
 namespace util {
 class DataBlock;
@@ -23,8 +25,7 @@ namespace gabac {
 enum class BinarizationId;
 enum class ContextSelectionId;
 
-void decode_cabac(const BinarizationId& binarizationId, const std::vector<uint32_t>& binarizationParameters,
-                  const ContextSelectionId& contextSelectionId, uint8_t wordsize, util::DataBlock* bitstream);
+void decode_cabac(const paramcabac::TransformedSeq &conf, util::DataBlock* bitstream);
 
 }  // namespace gabac
 }  // namespace entropy
