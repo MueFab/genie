@@ -160,7 +160,7 @@ const TransformationProperties &getTransformation(const gabac::SequenceTransform
          [](const std::vector<uint64_t> &, std::vector<util::DataBlock> *const transformedSequences) {
              transformedSequences->resize(1);
              gabac::inverseTransformDiffCoding(&(*transformedSequences)[0]);
-         }},
+         }},/*/* RESTRUCT-DISABLE
         {"paramcabac",  // Name
          {"binarization_id", "binarization_parameter", "context_selection_id", "word_size"},
          {"sequence"},  // StreamNames
@@ -175,7 +175,8 @@ const TransformationProperties &getTransformation(const gabac::SequenceTransform
              gabac::decode_cabac(gabac::BinarizationId(param[0]), {static_cast<unsigned>(param[1])},
                                  gabac::ContextSelectionId(param[2]), static_cast<uint8_t>(param[3]),
                                  &(*transformedSequences)[0]);
-         }}};
+         }}*/
+         };
     return transformationInformation[unsigned(id)];
 }
 

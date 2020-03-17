@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 
+#include <genie/entropy/paramcabac/subsequence.h>
+
 namespace genie {
 namespace entropy {
 namespace gabac {
@@ -152,6 +154,10 @@ struct EncodingConfiguration {
      */
     bool operator!=(const EncodingConfiguration& conf) const;
 
+
+    paramcabac::Subsequence subseq;
+
+    // RESTRUCT OBSOLETE To be removed
     unsigned int wordSize;                                    /**< @brief How many bytes are considered one symbol */
     gabac::SequenceTransformationId sequenceTransformationId; /**< @brief Which transformation to apply */
     unsigned int sequenceTransformationParameter;             /**< @brief Parameter for input stream

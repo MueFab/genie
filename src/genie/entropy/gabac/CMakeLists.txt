@@ -1,7 +1,7 @@
 project("genie-gabac")
 
 set(source_files
-        analysis.cc
+        #analysis.cc
         bit-input-stream.cc
         c-interface.cc
         configuration.cc
