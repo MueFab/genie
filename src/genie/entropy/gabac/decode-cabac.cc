@@ -27,6 +27,7 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
     }
 
     util::DataBlock symbols(0, conf.getSupportValues().getMinimalSizeInBytes(conf.getSupportValues().getOutputSymbolSize()));
+
     const paramcabac::SupportValues &supportVals = conf.getSupportValues();
     const paramcabac::Binarization &binarzation = conf.getBinarization();
     const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();

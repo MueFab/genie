@@ -22,9 +22,6 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-enum class BinarizationId;
-enum class ContextSelectionId;
-
 void decode_cabac(const paramcabac::TransformedSeq &conf, util::DataBlock* bitstream);
 
 }  // namespace gabac
