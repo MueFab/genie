@@ -21,8 +21,10 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
+/* RESTRUCT_DISABLE
 static void decodeInverseLUT(unsigned bits0, unsigned order, std::istream *inStream, util::DataBlock *const inverseLut,
                              util::DataBlock *const inverseLut1) {
+    // RESTRUCT_TODO
     size_t streamSize = StreamHandler::readStream(*inStream, inverseLut);
     if (streamSize <= 0) return;
 
@@ -64,14 +66,14 @@ static void decodeInverseLUT(unsigned bits0, unsigned order, std::istream *inStr
     }
 }
 
-static void doDiffCoding(bool enabled, util::DataBlock *const lutTransformedSequence) {
+static void doDiffCoding(bool enabled, util::DataBlock *const lutTransformedSubseq) {
     // Diff genie
     if (enabled) {
         // GABACIFY_LOG_TRACE << "Diff genie *en*abled";
         std::vector<util::DataBlock> vec(1);
-        vec[0].swap(lutTransformedSequence);
+        vec[0].swap(lutTransformedSubseq);
         gabac::getTransformation(gabac::SequenceTransformationId::diff_coding).inverseTransform({}, &vec);
-        vec[0].swap(lutTransformedSequence);
+        vec[0].swap(lutTransformedSubseq);
         return;
     }
 
@@ -89,63 +91,61 @@ static void doLUTCoding(bool enabled, unsigned order, std::vector<util::DataBloc
     }
 
     // GABACIFY_LOG_TRACE << "LUT transform *dis*abled";
-}
+} */
 
-static void doEntropyCoding(const gabac::TransformedSequenceConfiguration &transformedSequenceConfiguration,
-                            uint8_t wordsize, std::istream *inStream,
-                            util::DataBlock *const diffAndLutTransformedSequence) {
-    size_t streamSize = StreamHandler::readStream(*inStream, diffAndLutTransformedSequence);
+static void doEntropyCoding(const paramcabac::TransformedSeq &transformedSubseqCfg,
+                            std::istream *inStream,
+                            util::DataBlock *const diffAndLutTransformedSubseq) {
+    size_t streamSize = StreamHandler::readStream(*inStream, diffAndLutTransformedSubseq);
     if (streamSize <= 0) return;
     // GABACIFY_LOG_TRACE << "Bitstream size: " <<
     // diffAndLutTransformedSequence->size();
 
     // Decoding
-    gabac::decode_cabac(transformedSequenceConfiguration.binarizationId,
-                        transformedSequenceConfiguration.binarizationParameters,
-                        transformedSequenceConfiguration.contextSelectionId, wordsize, diffAndLutTransformedSequence);
+    gabac::decode_cabac(transformedSubseqCfg, diffAndLutTransformedSubseq);
 }
 
 void decode(const IOConfiguration &ioConf, const EncodingConfiguration &enConf) {
     while (ioConf.inputStream->peek() != EOF) {
         // Set up for the inverse sequence transformation
-        size_t numTransformedSequences = gabac::getTransformation(enConf.sequenceTransformationId).wordsizes.size();
+        size_t numTransformedSubSeqCfgs = enConf.subseq.getNumTransformSubseqCfgs();
 
         // Loop through the transformed sequences
-        std::vector<util::DataBlock> transformedSequences;
-        for (size_t i = 0; i < numTransformedSequences; i++) {
+        std::vector<util::DataBlock> transformedSubseqs;
+        for (size_t i = 0; i < numTransformedSubSeqCfgs; i++) {
             // GABACIFY_LOG_TRACE << "Processing transformed sequence: " << i;
-            auto transformedSequenceConfiguration = enConf.transformedSequenceConfigurations.at(i);
+            auto transformedSubseqCfg = enConf.subseq.getTransformSubseqCfg(i);
 
-            std::vector<util::DataBlock> lutTransformedSequences(3);
-            if (transformedSequenceConfiguration.lutTransformationEnabled) {
+            std::vector<util::DataBlock> lutTransformedSubseq(3);
+            const paramcabac::SupportValues::TransformIdSubsym subSymTransform = transformedSubseqCfg.getTransformID();
+            if ( subSymTransform == paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM) {
+                /* RESTRUCT_DISABLE
                 decodeInverseLUT(enConf.transformedSequenceConfigurations[i].lutBits,
                                  enConf.transformedSequenceConfigurations[i].lutOrder, ioConf.inputStream,
                                  &lutTransformedSequences[1], &lutTransformedSequences[2]);
+                                 */
             }
 
-            uint8_t wsize = getTransformation(enConf.sequenceTransformationId).wordsizes[i];
-            if (wsize == 0) {
-                wsize = static_cast<uint8_t>(enConf.wordSize);
-            }
+            doEntropyCoding(transformedSubseqCfg, ioConf.inputStream,
+                            &lutTransformedSubseq[0]);
 
-            doEntropyCoding(enConf.transformedSequenceConfigurations[i], wsize, ioConf.inputStream,
-                            &lutTransformedSequences[0]);
+            /* RESTRUCT_DISABLE
+            doDiffCoding(subSymTransform == paramcabac::SupportValues::TransformIdSubsym::DIFF_CODING, &lutTransformedSubseq[0]);
 
-            doDiffCoding(enConf.transformedSequenceConfigurations[i].diffCodingEnabled, &lutTransformedSequences[0]);
+            doLUTCoding(subSymTransform == paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM,
+                        transformedSubseqCfg.getSupportValues().getCodingOrder(), &lutTransformedSubseq); */
 
-            doLUTCoding(enConf.transformedSequenceConfigurations[i].lutTransformationEnabled,
-                        enConf.transformedSequenceConfigurations[i].lutOrder, &lutTransformedSequences);
-
-            transformedSequences.emplace_back();
-            transformedSequences.back().swap(&(lutTransformedSequences[0]));
+            transformedSubseqs.emplace_back();
+            transformedSubseqs.back().swap(&(lutTransformedSubseq[0]));
         }
 
-        getTransformation(enConf.sequenceTransformationId)
-            .inverseTransform({enConf.sequenceTransformationParameter}, &transformedSequences);
+        /* RESTRUCT_DISABLE
+        getTransformation(enConf.subseq.getTransformParameters().getTransformIdSubseq())
+            .inverseTransform({enConf.subseq.getTransformParameters()}, &transformedSubseqs);*/
         // GABACIFY_LOG_TRACE << "Decoded sequence of length: " <<
         // transformedSequences[0].size();
 
-        gabac::StreamHandler::writeBytes(*ioConf.outputStream, &transformedSequences[0]);
+        gabac::StreamHandler::writeBytes(*ioConf.outputStream, &transformedSubseqs[0]);
     }
 }
 
