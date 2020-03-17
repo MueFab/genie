@@ -22,13 +22,9 @@ namespace entropy {
 namespace paramcabac {
 
 class Subsequence {
-   private:
-    boost::optional<uint16_t> descriptor_subsequence_ID;
-    TransformedParameters transform_subseq_parameters;
-    std::vector<TransformedSeq> transformSubseq_cfgs;
-    Subsequence() = default;
-
    public:
+    Subsequence();
+
     Subsequence(TransformedParameters&& _transform_subseq_parameters, uint16_t descriptor_subsequence_ID,
                 bool tokentype);
 
@@ -49,6 +45,11 @@ class Subsequence {
     size_t getNumTransformSubseqCfgs() const;
 
     const std::vector<TransformedSeq>& getTransformSubseqCfgs() const;
+
+   private:
+    boost::optional<uint16_t> descriptor_subsequence_ID;
+    TransformedParameters transform_subseq_parameters;
+    std::vector<TransformedSeq> transformSubseq_cfgs;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
