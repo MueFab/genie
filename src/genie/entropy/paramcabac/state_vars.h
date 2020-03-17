@@ -28,7 +28,7 @@ namespace paramcabac {
  */
 class StateVars {
    private:
-    uint32_t numAlphaSubsym;
+    uint64_t numAlphaSubsym;
     uint32_t numSubsyms;
     uint32_t numCtxSubsym;
     uint32_t cLengthBI;
@@ -49,9 +49,26 @@ class StateVars {
 
     virtual ~StateVars() = default;
 
-/*
- * TODO get functions
-*/
+    uint32_t getNumSubsymbols() const {
+        return numSubsyms;
+    }
+
+    uint32_t getNumCtxPerSubsymbol() const {
+        return numCtxSubsym;
+    }
+
+    uint32_t getCLengthBI() const {
+        return cLengthBI;
+    }
+
+    uint8_t getNumCtxForLUTs() const {
+        return numCtxLuts;
+    }
+
+    uint8_t getNumCtxTotal() const {
+        return numCtxTotal;
+    }
+
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

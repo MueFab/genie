@@ -25,15 +25,12 @@ namespace paramcabac {
  * ISO 23092-2 Section 8.3.2 table
  */
 class SupportValues {
-   private:
-    uint8_t output_symbol_size;
-    uint8_t coding_subsym_size;
-    uint8_t coding_order;
-    boost::optional<bool> share_subsym_lut_flag;
-    boost::optional<bool> share_subsym_prv_flag;
-
    public:
-    enum class TransformIdSubsym : uint8_t { NO_TRANSFORM = 0, LUT_TRANSFORM = 1, DIFF_CODING = 2 };
+    enum class TransformIdSubsym : uint8_t {
+        NO_TRANSFORM = 0,
+        LUT_TRANSFORM = 1,
+        DIFF_CODING = 2
+    };
 
     SupportValues(uint8_t _output_symbol_size, uint8_t _coding_subsym_size, uint8_t _coding_order,
                   const TransformIdSubsym &_transform_ID_subsym, bool _share_subsym_prv_flag = true,
@@ -56,6 +53,16 @@ class SupportValues {
     bool getShareSubsymLutFlag() const;
 
     bool getShareSubsymPrvFlag() const;
+
+    uint8_t getMinimalSizeInBytes(uint8_t sizeInBit) const;
+
+   private:
+    uint8_t output_symbol_size;
+    uint8_t coding_subsym_size;
+    uint8_t coding_order;
+    boost::optional<bool> share_subsym_lut_flag;
+    boost::optional<bool> share_subsym_prv_flag;
+
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

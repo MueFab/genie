@@ -86,6 +86,12 @@ bool SupportValues::getShareSubsymPrvFlag() const { return *share_subsym_prv_fla
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+uint8_t SupportValues::getMinimalSizeInBytes(uint8_t sizeInBit) const {
+    return (sizeInBit / 8) + (sizeInBit % 8) ? 1 : 0;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace paramcabac
 }  // namespace entropy
 }  // namespace genie

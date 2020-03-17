@@ -52,6 +52,10 @@ const Binarization& TransformedSeq::getBinarization() const { return cabac_binar
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+const StateVars& TransformedSeq::getStateVars() const { return state_vars; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void TransformedSeq::write(util::BitWriter& writer) const {
     writer.write(uint8_t(transform_ID_subsym), 3);
     support_values.write(writer);
