@@ -55,6 +55,7 @@ void code(const std::string &inputFilePath, const std::string &configurationFile
     // input string to the internal GABAC configuration
     genie::entropy::gabac::EncodingConfiguration configuration;
     {
+        /* RESTRUCT-DISABLE
         std::ifstream configurationFile;
         if (!configurationFilePath.empty()) {
             configurationFile = std::ifstream(configurationFilePath, std::ios::binary);
@@ -65,6 +66,7 @@ void code(const std::string &inputFilePath, const std::string &configurationFile
         }
         std::string jsonInput = std::string(std::istreambuf_iterator<char>(*confstream), {});
         configuration = genie::entropy::gabac::EncodingConfiguration(jsonInput);
+        */
     }
 
     genie::entropy::gabac::run(ioconf, configuration, decode);
