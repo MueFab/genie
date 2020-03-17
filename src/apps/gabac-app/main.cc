@@ -22,8 +22,10 @@ int main(int argc, char* argv[]) {
             gabacify::code(programOptions.inputFilePath, programOptions.configurationFilePath,
                            programOptions.outputFilePath, programOptions.blocksize, true);
         } else if (programOptions.task == "analyze") {
+            /* RESTRUCT-DISABLE
             gabacify::analyze(programOptions.inputFilePath, programOptions.outputFilePath, programOptions.blocksize,
                               programOptions.maxVal, programOptions.wordSize);
+                              */
         } else {
             GABAC_DIE("Invalid task: " + std::string(programOptions.task));
         }
