@@ -118,22 +118,25 @@ void decode(const IOConfiguration &ioConf, const EncodingConfiguration &enConf) 
 
             std::vector<util::DataBlock> lutTransformedSubseq(3);
             const paramcabac::SupportValues::TransformIdSubsym subSymTransform = transformedSubseqCfg.getTransformID();
-            if ( subSymTransform == paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM) {
+            if (subSymTransform == paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM) {
                 /* RESTRUCT_DISABLE
                 decodeInverseLUT(enConf.transformedSequenceConfigurations[i].lutBits,
                                  enConf.transformedSequenceConfigurations[i].lutOrder, ioConf.inputStream,
                                  &lutTransformedSequences[1], &lutTransformedSequences[2]);
-                                 */
+                */
             }
 
             doEntropyCoding(transformedSubseqCfg, ioConf.inputStream,
                             &lutTransformedSubseq[0]);
 
             /* RESTRUCT_DISABLE
-            doDiffCoding(subSymTransform == paramcabac::SupportValues::TransformIdSubsym::DIFF_CODING, &lutTransformedSubseq[0]);
-
-            doLUTCoding(subSymTransform == paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM,
-                        transformedSubseqCfg.getSupportValues().getCodingOrder(), &lutTransformedSubseq); */
+            if (subSymTransform == paramcabac::SupportValues::TransformIdSubsym::DIFF_CODING) {
+                doDiffCoding(subSymTransform == paramcabac::SupportValues::TransformIdSubsym::DIFF_CODING, &lutTransformedSubseq[0]);
+            } else if (subSymTransform == paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM) {
+                doLUTCoding(subSymTransform == paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM,
+                            transformedSubseqCfg.getSupportValues().getCodingOrder(),
+                            &lutTransformedSubseq);
+            } */
 
             transformedSubseqs.emplace_back();
             transformedSubseqs.back().swap(&(lutTransformedSubseq[0]));
