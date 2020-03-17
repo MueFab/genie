@@ -12,6 +12,8 @@
 #include <limits>
 #include <vector>
 
+#include <genie/entropy/paramcabac/transformed-seq.h>
+
 namespace genie {
 namespace util {
 class DataBlock;
@@ -22,11 +24,8 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-enum class BinarizationId;
-enum class ContextSelectionId;
-
-void encode_cabac(const BinarizationId& binarizationId, const std::vector<uint32_t>& binarizationParameters,
-                  const ContextSelectionId& contextSelectionId, util::DataBlock* symbols,
+void encode_cabac(const paramcabac::TransformedSeq &conf,
+                  util::DataBlock* symbols,
                   size_t maxsize = std::numeric_limits<size_t>::max());
 
 }  // namespace gabac
