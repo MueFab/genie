@@ -118,8 +118,10 @@ uint8_t BinarizationParameters::getSplitUnitSize() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+uint8_t BinarizationParameters::numParams[unsigned(BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY) + 1u] = {0, 1, 0, 0, 1, 1, 1, 1, 2, 2};
+
 uint8_t BinarizationParameters::getNumBinarizationParams(BinarizationParameters::BinarizationId binarzationId) {
-    return numParams[uint8_t(binarzationId)];
+    return BinarizationParameters::numParams[uint8_t(binarzationId)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

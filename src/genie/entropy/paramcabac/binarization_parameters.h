@@ -65,8 +65,8 @@ class BinarizationParameters {
     uint8_t cmax_dtu;         //!< : 8; Line 7
     uint8_t split_unit_size;  //!< : 4; Line 10
     
-    static constexpr uint8_t numParams[unsigned(BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY) + 1u] =
-    {0, 1, 0, 0, 1, 1, 1, 1, 2, 2};    
+    static uint8_t numParams[unsigned(BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY) + 1u];
+
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
