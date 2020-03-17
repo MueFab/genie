@@ -44,6 +44,8 @@ class TransformedSeq {
 
     const Binarization& getBinarization() const;
 
+    const StateVars& getStateVars() const;
+
    private:
     SupportValues::TransformIdSubsym transform_ID_subsym;  //!< : 3; Line 9
     SupportValues support_values;                          //!< Line 10
