@@ -24,7 +24,6 @@ void code(const std::string &inputFilePath, const std::string &configurationFile
     genie::entropy::gabac::NullStream nullstream;
 
     std::istream *istream = &std::cin;
-    std::istream *confstream = &std::cin;
     std::ostream *ostream = &std::cout;
     std::ostream *logstream = &std::cout;
 
@@ -56,6 +55,7 @@ void code(const std::string &inputFilePath, const std::string &configurationFile
     genie::entropy::gabac::EncodingConfiguration configuration;
     {
         /* RESTRUCT-DISABLE
+        std::istream *confstream = &std::cin;
         std::ifstream configurationFile;
         if (!configurationFilePath.empty()) {
             configurationFile = std::ifstream(configurationFilePath, std::ios::binary);
@@ -65,8 +65,7 @@ void code(const std::string &inputFilePath, const std::string &configurationFile
             confstream = &configurationFile;
         }
         std::string jsonInput = std::string(std::istreambuf_iterator<char>(*confstream), {});
-        configuration = genie::entropy::gabac::EncodingConfiguration(jsonInput);
-        */
+        configuration = genie::entropy::gabac::EncodingConfiguration(jsonInput);*/
     }
 
     genie::entropy::gabac::run(ioconf, configuration, decode);
