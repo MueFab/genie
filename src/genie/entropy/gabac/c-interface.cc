@@ -295,12 +295,14 @@ int gabac_run(gabac_operation operation, gabac_io_config *io_config, const char 
             ioconf_cpp.inputStream = input.get();
 
             genie::entropy::gabac::EncodingConfiguration enConf;
-            genie::entropy::gabac::AnalysisConfiguration analyseConfig;
+            //RESTRUCT_DISABLE genie::entropy::gabac::AnalysisConfiguration analyseConfig;
             switch (operation) {
+                /*RESTRUCT_DISABLE
                 case gabac_operation_ANALYZE:
                     // analyseConfig = ...
                     genie::entropy::gabac::analyze(ioconf_cpp, analyseConfig);
                     break;
+                    */
                 case gabac_operation_ENCODE:
                     enConf = genie::entropy::gabac::EncodingConfiguration(config);
                     genie::entropy::gabac::run(ioconf_cpp, enConf, false);
@@ -339,6 +341,7 @@ int gabac_run(gabac_operation operation, gabac_io_config *io_config, const char 
     }
 }
 
+/*RESTRUCT_DISABLE
 int gabac_config_is_general(const char *inconf, size_t inconf_size, uint64_t max, uint8_t wsize) {
     genie::entropy::gabac::EncodingConfiguration conf(std::string(inconf, inconf_size));
     return conf.isGeneral(max, wsize);
@@ -369,7 +372,7 @@ int gabac_config_optimize_create(const char *inconf, size_t inconf_size, uint64_
     *outconf_size = str.size();
     memcpy(*outconf, str.c_str(), *outconf_size + 1);
     return gabac_return_SUCCESS;
-}
+}*/
 
 int gabac_config_free(char **outconf) {
     free(*outconf);
