@@ -34,7 +34,7 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
 
     explicit DecoderTokenType(util::BitReader &reader);
 
-    void setSubsequenceCfg(uint8_t index, TransformedParameters &&cfg);
+    void setSubsequenceCfg(uint8_t index, Subsequence &&cfg);
 
     const Subsequence &getSubsequenceCfg(uint8_t index) const;
 
@@ -67,7 +67,7 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
 
     explicit DecoderRegular(util::BitReader &reader);
 
-    void setSubsequenceCfg(uint8_t index, TransformedParameters &&cfg);
+    void setSubsequenceCfg(uint8_t index, Subsequence &&cfg);
 
     const Subsequence &getSubsequenceCfg(uint8_t index) const;
 
