@@ -44,7 +44,7 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
     util::BlockStepper r = symbols.getReader();
 
     if (binarzation.getBypassFlag()) { // bypass mode
-        uint64_t (Reader::*func)(unsigned int);
+        uint64_t (Reader::*func)(unsigned int) = nullptr;
         switch (binarzation.getBinarizationID()) {
             case paramcabac::BinarizationParameters::BinarizationId::BINARY_CODING:
                 func = &Reader::readAsBIbypass;
@@ -102,7 +102,7 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
         return;
     }
 
-    uint64_t (Reader::*func)(unsigned int, unsigned int);
+    uint64_t (Reader::*func)(unsigned int, unsigned int) = nullptr;
     switch (binarzation.getBinarizationID()) {
         case paramcabac::BinarizationParameters::BinarizationId::BINARY_CODING:
             func = &Reader::readAsBIcabac;
