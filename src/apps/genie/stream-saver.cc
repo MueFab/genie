@@ -32,6 +32,7 @@ void StreamSaver::run_gabac(const std::string &name, util::DataBlock *data, bool
               << std::endl;
 }
 
+/* RESTRUCT_DISBALE
 void StreamSaver::analyze(const std::string &name, util::DataBlock *data) {
     std::string configname = getConfigName(name);
     uint64_t insize = data->getRawSize();
@@ -51,8 +52,9 @@ void StreamSaver::analyze(const std::string &name, util::DataBlock *data) {
     aconf.wordSize = params.at(configname).wordsize;
 
     std::cout << "ANALYZING: " + this->configPath + configname + ".json" << std::endl;
+
     entropy::gabac::analyze(ioconf, aconf);
-}
+}*/
 
 void StreamSaver::compress(const std::string &name, util::DataBlock *data) {
     util::DataBlock original;
