@@ -46,7 +46,7 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
     util::BlockStepper r = symbols->getReader();
 
     if (binarzation.getBypassFlag()) { // bypass mode
-        void (Writer::*func)(uint64_t, unsigned int);
+        void (Writer::*func)(uint64_t, unsigned int) = nullptr;
         switch (binarzation.getBinarizationID()) {
             case paramcabac::BinarizationParameters::BinarizationId::BINARY_CODING:
                 func = &Writer::writeAsBIbypass;
@@ -106,7 +106,7 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
         return;
     }
 
-    void (Writer::*func)(uint64_t, unsigned int, unsigned int);
+    void (Writer::*func)(uint64_t, unsigned int, unsigned int) = nullptr;
     switch (binarzation.getBinarizationID()) {
         case paramcabac::BinarizationParameters::BinarizationId::BINARY_CODING:
             func = &Writer::writeAsBIcabac;
