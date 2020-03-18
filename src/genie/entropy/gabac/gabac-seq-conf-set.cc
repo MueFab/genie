@@ -18,26 +18,11 @@ namespace gabac {
 // ---------------------------------------------------------------------------------------------------------------------
 
 GabacSeqConfSet::GabacSeqConfSet() {
-    const std::string DEFAULT_GABAC_CONF_JSON =
-        "{"
-        "\"word_size\": 4,"
-        "\"sequence_transformation_id\": 0,"
-        "\"sequence_transformation_parameter\": 0,"
-        "\"transformed_sequences\":"
-        "[{"
-        "\"lut_transformation_enabled\": false,"
-        "\"diff_coding_enabled\": false,"
-        "\"binarization_id\": 0,"
-        "\"binarization_parameters\":[32],"
-        "\"context_selection_id\": 1"
-        "}]"
-        "}";
-
     // One configuration per subsequence
     for (const auto &desc : core::getDescriptors()) {
         conf.emplace_back();
         for (size_t i = 0; i < getDescriptor(desc.id).subseqs.size(); ++i) {
-            conf.back().emplace_back(DEFAULT_GABAC_CONF_JSON);
+            conf.back().emplace_back();
         }
     }
 }
@@ -48,6 +33,11 @@ const gabac::EncodingConfiguration &GabacSeqConfSet::getConfAsGabac(core::GenSub
     return conf[uint8_t(sub.first)][uint8_t(sub.second)];
 }
 
+void GabacSeqConfSet::setConfAsGabac(core::GenSubIndex sub, DescriptorSubsequenceCfg &subseqCfg) const {
+    // FIXME conf[uint8_t(sub.first)][uint8_t(sub.second)].subseq = subseqCfg;
+}
+
+#if 0 //RESTRUCT_DISABLE
 // ---------------------------------------------------------------------------------------------------------------------
 
 GabacSeqConfSet::TransformSubseqParameters GabacSeqConfSet::storeTransParams(
@@ -116,6 +106,7 @@ void GabacSeqConfSet::storeSubseq(const gabac::EncodingConfiguration &gabac_conf
     }
 }
 
+#endif
 // ---------------------------------------------------------------------------------------------------------------------
 
 void GabacSeqConfSet::storeParameters(core::parameter::ParameterSet &parameterSet) const {
@@ -159,6 +150,7 @@ const GabacSeqConfSet::DecoderConfigurationCabac &GabacSeqConfSet::loadDescripto
     return reinterpret_cast<const DecoderRegular &>(decoder_conf);
 }
 
+#if 0 //RESTRUCT_DISABLE
 // ---------------------------------------------------------------------------------------------------------------------
 
 gabac::TransformedSequenceConfiguration GabacSeqConfSet::loadTransformedSequence(
@@ -193,6 +185,7 @@ gabac::TransformedSequenceConfiguration GabacSeqConfSet::loadTransformedSequence
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+#endif
 
 void GabacSeqConfSet::loadParameters(const core::parameter::ParameterSet &parameterSet) {
     using namespace entropy::paramcabac;
@@ -201,24 +194,13 @@ void GabacSeqConfSet::loadParameters(const core::parameter::ParameterSet &parame
         auto &descConfig = loadDescriptorDecoderCfg(parameterSet, desc.id);
         for (const auto &subdesc : getDescriptor(desc.id).subseqs) {
             auto sub_desc = descConfig.getSubsequenceCfg(subdesc.id.second);
-            auto sub_desc_id = desc.tokentype ? 0 : sub_desc.getDescriptorSubsequenceID();
 
-            auto &gabac_conf = conf[uint8_t(desc.id)][sub_desc_id];
+            //FIXME setConfAsGabac(subdesc.id.second, sub_desc);
 
-            gabac_conf.wordSize = 4;  // TODO Remove hardcoded value
-
-            const auto TRANS_ID = sub_desc.getTransformParameters().getTransformIdSubseq();
-            gabac_conf.sequenceTransformationId = gabac::SequenceTransformationId(TRANS_ID);
-
-            for (const auto &transformedDesc : sub_desc.getTransformSubseqCfgs()) {
-                gabac_conf.transformedSequenceConfigurations.emplace_back();
-                auto &gabacTransCfg = gabac_conf.transformedSequenceConfigurations.back();
-
-                gabacTransCfg = loadTransformedSequence(transformedDesc);
-            }
         }
     }
 }
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 

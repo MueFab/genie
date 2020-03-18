@@ -132,7 +132,6 @@ static void encodeSingleSequence(const paramcabac::TransformedSeq &cfg,
 void encode(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
     conf.validate();
     util::DataBlock sequence(0, 1);
-    // sequence.setWordSize(static_cast<uint8_t>(enConf.wordSize)); TODO how many bytes for each token of DESCRIPTOR subseq
     size_t size = 0;
     if (!conf.blocksize) {
         size = gabac::StreamHandler::readFull(*conf.inputStream, &sequence);
@@ -159,7 +158,7 @@ void encode(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
                                  conf.outputStream);
         }
         if (conf.blocksize) {
-            sequence.setWordSize(static_cast<uint8_t>(enConf.wordSize));
+            // RESTRUCT_DISABLE sequence.setWordSize(static_cast<uint8_t>(enConf.wordSize));
             size = gabac::StreamHandler::readBlock(*conf.inputStream, conf.blocksize, &sequence);
         } else {
             size = 0;

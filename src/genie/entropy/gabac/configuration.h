@@ -18,6 +18,7 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
+#if 0
 enum class BinarizationId;
 enum class ContextSelectionId;
 enum class SequenceTransformationId;
@@ -55,6 +56,8 @@ struct TransformedSequenceConfiguration {
     bool operator!=(const TransformedSequenceConfiguration& conf) const;
 };
 
+#endif
+
 /**
  * @brief Specifies which gabac transformations to execute
  */
@@ -77,70 +80,6 @@ struct EncodingConfiguration {
     ~EncodingConfiguration();
 
     /**
-     * @brief Encode as json
-     * @return JSON string
-     */
-    std::string toJsonString() const;
-
-    /**
-     * @brief Generate human readable text
-     * @return Text
-     */
-    std::string toPrintableString() const;
-
-    /**
-     * Will modify this configuration so that it is guaranteed to work with the
-     * parameter passed. It is also gueranteed that it will work with all
-     * streams it was working before, even outside of the stream specification
-     * passed.
-     * @param max Maximum value in the stream
-     * @param wordsize Maximum word size in the stream
-     * @warning You can still break gabac if there is a sequence of more than
-     * 4GBs of the same symbol while being in match core or run length core.
-     * Moreover the modified config is probably not optimal, but it will work.
-     * @return Adapted configuration
-     */
-    gabac::EncodingConfiguration generalize(uint64_t max, unsigned wordsize) const;
-
-    /**
-     * Applies generalize() and checks if it changed the configuration, i.a. if
-     * it was generally applicable before.
-     * @param max Maximum symbol
-     * @param wordsize Maximum word size
-     * @return True if working with all streams in specification
-     */
-    bool isGeneral(uint64_t max, unsigned wordsize) const;
-
-    /**
-     * Checks if a subsequence is general
-     * @param max Maximum symbol
-     * @param sub Subsequence id
-     * @return true if general
-     */
-    bool isSubGeneral(uint64_t max, unsigned sub) const;
-
-    /**
-     * Will apply some small parameter tweaks that are guaranteed to improve
-     * performance / speed regardless of the data in the stream. Other than
-     * generalize() some streams might stop working if they are outside of the
-     * specification. Streams inside the specifications are guaranteed to work
-     * the same way they did before or better.
-     * @param max Maximum symbol allowed in the stream
-     * @param wordsize Maximum allowed word size
-     * @return An improved configuration
-     */
-    gabac::EncodingConfiguration optimize(uint64_t max, unsigned wordsize) const;
-
-    /**
-     * Applies optimize() and checks if it changed the configuration, i.a. if it
-     * was optimal before.
-     * @param max Maximum symbol
-     * @param wordsize Maximum word size
-     * @return True if optimal
-     */
-    bool isOptimal(uint64_t max, unsigned wordsize) const;
-
-    /**
      * Compare
      * @param conf
      * @return
@@ -158,11 +97,10 @@ struct EncodingConfiguration {
     paramcabac::Subsequence subseq;
 
     // RESTRUCT OBSOLETE To be removed
-    unsigned int wordSize;                                    /**< @brief How many bytes are considered one symbol */
-    gabac::SequenceTransformationId sequenceTransformationId; /**< @brief Which transformation to apply */
-    unsigned int sequenceTransformationParameter;             /**< @brief Parameter for input stream
-                                                                 transformation */
-    std::vector<TransformedSequenceConfiguration> transformedSequenceConfigurations; /**< @brief Stream configs */
+    //unsigned int wordSize;                                    /**< @brief How many bytes are considered one symbol */
+    //gabac::SequenceTransformationId sequenceTransformationId; /**< @brief Which transformation to apply */
+    //unsigned int sequenceTransformationParameter;             /**< @brief Parameter for input stream transformation */
+    //std::vector<TransformedSequenceConfiguration> transformedSequenceConfigurations; /**< @brief Stream configs */
 };
 
 /**
@@ -205,6 +143,7 @@ struct IOConfiguration {
     void validate() const;
 };
 
+#if 0
 /**
  * @brief Candidates for analysis
  * TODO: Add json serialization
@@ -231,6 +170,7 @@ struct AnalysisConfiguration {
     uint64_t maxValue;
     uint8_t wordSize;
 };
+#endif
 
 }  // namespace gabac
 }  // namespace entropy
