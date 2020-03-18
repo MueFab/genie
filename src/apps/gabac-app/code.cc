@@ -17,8 +17,13 @@ namespace gabacify {
 
 //------------------------------------------------------------------------------
 
-void code(const std::string &inputFilePath, const std::string &configurationFilePath, const std::string &outputFilePath,
-          size_t blocksize, bool decode) {
+void code(const std::string &inputFilePath,
+          //RESTRUCT_DISABLE const std::string &configurationFilePath,
+          const std::string &outputFilePath,
+          size_t blocksize,
+          uint8_t descID,
+          uint8_t subseqID,
+          bool decode) {
     std::ifstream inputFile;
     std::ofstream outputFile;
     genie::entropy::gabac::NullStream nullstream;
@@ -52,7 +57,7 @@ void code(const std::string &inputFilePath, const std::string &configurationFile
 
     // Read the entire configuration file as a string and convert the JSON
     // input string to the internal GABAC configuration
-    genie::entropy::gabac::EncodingConfiguration configuration;
+    genie::entropy::gabac::EncodingConfiguration configuration; // TODO load config based on descID, subseqID
     {
         /* RESTRUCT-DISABLE
         std::istream *confstream = &std::cin;

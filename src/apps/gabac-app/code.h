@@ -6,8 +6,13 @@
 
 namespace gabacify {
 
-void code(const std::string& inputFilePath, const std::string& configurationFilePath, const std::string& outputFilePath,
-          size_t blocksize, bool decode);
+void code(const std::string& inputFilePath,
+          // RESTRUCT_DISABLE const std::string& configurationFilePath,
+          const std::string& outputFilePath,
+          size_t blocksize,
+          uint8_t descID,
+          uint8_t subseqID,
+          bool decode);
 
 }  // namespace gabacify
 
