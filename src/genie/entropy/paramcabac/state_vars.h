@@ -9,11 +9,6 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//#include <genie/util/bitreader.h>
-//#include <genie/util/bitwriter.h>
-//#include <genie/util/make-unique.h>
-//#include <boost/optional/optional.hpp>
-//#include <memory>
 #include "binarization.h"
 #include "support_values.h"
 
