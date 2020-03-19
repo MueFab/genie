@@ -54,10 +54,13 @@ static unsigned int bitLength(uint64_t value) {
     return numBits;
 }
 
-Writer::Writer(OBufferStream *const bitstream)
+Writer::Writer(OBufferStream *const bitstream, bool bypassFlag, unsigned int numContexts)
     : m_bitOutputStream(bitstream),
-      m_binaryArithmeticEncoder(m_bitOutputStream),
-      m_contextModels(contexttables::buildContextTable()) {}
+      m_binaryArithmeticEncoder(m_bitOutputStream) {
+    if(!bypassFlag && numContexts > 0) {
+        m_contextModels = contexttables::buildContextTable(numContexts);
+    }
+}
 
 Writer::~Writer() = default;
 
@@ -66,6 +69,10 @@ void Writer::start(size_t numSymbols) {
     assert(numSymbols <= std::numeric_limits<unsigned>::max());
     writeNumSymbols(static_cast<unsigned>(numSymbols));
     m_binaryArithmeticEncoder.start();
+}
+
+void Writer::flush() {
+    m_binaryArithmeticEncoder.flush();
 }
 
 void Writer::reset() {

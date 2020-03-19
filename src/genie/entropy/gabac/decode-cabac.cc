@@ -33,7 +33,9 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
     const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
     const paramcabac::StateVars &stateVars = conf.getStateVars();
 
-    Reader reader(bitstream);
+    Reader reader(bitstream,
+                  binarzation.getBypassFlag(),
+                  stateVars.getNumCtxTotal());
     size_t numSymbols = reader.start();
     if (numSymbols <= 0) return;
 

@@ -27,11 +27,13 @@ namespace gabac {
 
 class Writer {
    public:
-    explicit Writer(OBufferStream *bitstream);
+    explicit Writer(OBufferStream *bitstream, bool bypassFlag = true, unsigned int numContexts = 0);
 
     ~Writer();
 
     void start(size_t numSymbols);
+
+    void flush();
 
     void reset();
 

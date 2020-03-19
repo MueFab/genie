@@ -22,11 +22,14 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-Reader::Reader(util::DataBlock *const bitstream)
+Reader::Reader(util::DataBlock *const bitstream, bool bypassFlag, unsigned int numContexts)
     : m_bitInputStream(bitstream),
       // m_contextSelector(),
-      m_decBinCabac(m_bitInputStream),
-      m_contextModels(contexttables::buildContextTable()) {}
+      m_decBinCabac(m_bitInputStream) {
+    if(!bypassFlag && numContexts > 0) {
+        m_contextModels = contexttables::buildContextTable(numContexts);
+    }
+}
 
 Reader::~Reader() = default;
 
