@@ -24,10 +24,11 @@ namespace gabac {
 
 Reader::Reader(util::DataBlock *const bitstream, bool bypassFlag, unsigned int numContexts)
     : m_bitInputStream(bitstream),
-      // m_contextSelector(),
-      m_decBinCabac(m_bitInputStream) {
+      m_decBinCabac(m_bitInputStream),
+      m_bypassFlag(bypassFlag),
+      m_numContexts(numContexts) {
     if(!bypassFlag && numContexts > 0) {
-        m_contextModels = contexttables::buildContextTable(numContexts);
+        m_contextModels = contexttables::buildContextTable(m_numContexts);
     }
 }
 
@@ -37,7 +38,7 @@ uint64_t Reader::readAsBIbypass(unsigned int cLength) { return m_decBinCabac.dec
 
 uint64_t Reader::readAsBIcabac(unsigned int cLength, unsigned int offset) {
     unsigned int bins = 0;
-    unsigned int cm = ContextSelector::getContextForBi(offset, 0);
+    unsigned int cm = offset;
     auto scan = m_contextModels.begin() + cm;
     for (size_t i = cLength; i > 0; i--) {
         bins = (bins << 1u) | m_decBinCabac.decodeBin(&*(scan++));
@@ -58,7 +59,7 @@ uint64_t Reader::readAsTUbypass(unsigned int cMax) {
 
 uint64_t Reader::readAsTUcabac(unsigned int cMax, unsigned int offset) {
     unsigned int i = 0;
-    unsigned int cm = ContextSelector::getContextForTu(offset, i);
+    unsigned int cm = offset;
     auto scan = m_contextModels.begin() + cm;
     while (m_decBinCabac.decodeBin(&*scan) == 1) {
         i++;
@@ -86,7 +87,7 @@ uint64_t Reader::readAsEGbypass(unsigned int) {
 }
 
 uint64_t Reader::readAsEGcabac(unsigned int, unsigned int offset) {
-    unsigned int cm = ContextSelector::getContextForEg(offset, 0);
+    unsigned int cm = offset;
     auto scan = m_contextModels.begin() + cm;
     unsigned int i = 0;
     while (m_decBinCabac.decodeBin(&*scan) == 0) {
@@ -180,10 +181,16 @@ size_t Reader::start() {
     return numSymbols;
 }
 
-void Reader::reset() {
-    m_contextModels = contexttables::buildContextTable();
+void Reader::close() {
     m_decBinCabac.reset();
 }
+
+void Reader::reset() {
+    m_decBinCabac.reset();
+    m_contextModels.clear();
+    m_contextModels = contexttables::buildContextTable(m_numContexts);
+}
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
