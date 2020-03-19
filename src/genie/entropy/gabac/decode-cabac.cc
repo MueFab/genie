@@ -97,7 +97,7 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
             r.inc();
         }
 
-        reader.reset();
+        reader.close();
 
         symbols.swap(bitstream);
 
@@ -196,7 +196,7 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
         GABAC_DIE("Invalid context selection");
     }
 
-    reader.reset();
+    reader.close();
 
     symbols.swap(bitstream);
 }

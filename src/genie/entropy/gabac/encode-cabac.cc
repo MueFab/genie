@@ -101,7 +101,7 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
             r.inc();
         }
 
-        writer.reset();
+        writer.close();
 
         bitstream.flush(symbols);
 
@@ -207,7 +207,7 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
         GABAC_DIE("Invalid context selection");
     }
 
-    writer.reset();
+    writer.close();
 
     bitstream.flush(symbols);
 }
