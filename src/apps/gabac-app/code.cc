@@ -55,22 +55,10 @@ void code(const std::string &inputFilePath,
     genie::entropy::gabac::IOConfiguration ioconf = {istream, ostream, blocksize, logstream,
                                                      genie::entropy::gabac::IOConfiguration::LogLevel::INFO};
 
-    // Read the entire configuration file as a string and convert the JSON
     // input string to the internal GABAC configuration
-    genie::entropy::gabac::EncodingConfiguration configuration; // TODO load config based on descID, subseqID
+    genie::entropy::gabac::EncodingConfiguration configuration;
     {
-        /* RESTRUCT-DISABLE
-        std::istream *confstream = &std::cin;
-        std::ifstream configurationFile;
-        if (!configurationFilePath.empty()) {
-            configurationFile = std::ifstream(configurationFilePath, std::ios::binary);
-            if (!configurationFile) {
-                GABAC_DIE("Could not open configuration file");
-            }
-            confstream = &configurationFile;
-        }
-        std::string jsonInput = std::string(std::istreambuf_iterator<char>(*confstream), {});
-        configuration = genie::entropy::gabac::EncodingConfiguration(jsonInput);*/
+        // TODO populate config based on descID, subseqID
     }
 
     genie::entropy::gabac::run(ioconf, configuration, decode);
