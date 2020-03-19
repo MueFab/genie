@@ -57,6 +57,8 @@ class Reader {
 
     size_t start();
 
+    void close();
+
     void reset();
 
    private:
@@ -65,6 +67,9 @@ class Reader {
     // ContextSelector m_contextSelector;
 
     BinaryArithmeticDecoder m_decBinCabac;
+
+    bool m_bypassFlag;
+    unsigned int m_numContexts;
 
     std::vector<ContextModel> m_contextModels;
 };

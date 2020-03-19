@@ -56,9 +56,11 @@ static unsigned int bitLength(uint64_t value) {
 
 Writer::Writer(OBufferStream *const bitstream, bool bypassFlag, unsigned int numContexts)
     : m_bitOutputStream(bitstream),
-      m_binaryArithmeticEncoder(m_bitOutputStream) {
+      m_binaryArithmeticEncoder(m_bitOutputStream),
+      m_bypassFlag(bypassFlag),
+      m_numContexts(numContexts) {
     if(!bypassFlag && numContexts > 0) {
-        m_contextModels = contexttables::buildContextTable(numContexts);
+        m_contextModels = contexttables::buildContextTable(m_numContexts);
     }
 }
 
@@ -71,13 +73,14 @@ void Writer::start(size_t numSymbols) {
     m_binaryArithmeticEncoder.start();
 }
 
-void Writer::flush() {
+void Writer::close() {
     m_binaryArithmeticEncoder.flush();
 }
 
 void Writer::reset() {
     m_binaryArithmeticEncoder.flush();
-    m_contextModels = contexttables::buildContextTable();
+    m_contextModels.clear();
+    m_contextModels = contexttables::buildContextTable(m_numContexts);
 }
 
 void Writer::writeAsBIbypass(uint64_t input, unsigned int cLength) {
@@ -88,7 +91,7 @@ void Writer::writeAsBIbypass(uint64_t input, unsigned int cLength) {
 void Writer::writeAsBIcabac(uint64_t input, unsigned int cLength, unsigned int offset) {
     assert(getBinarization(BinarizationId::BI).sbCheck(input, input, cLength));
 
-    unsigned int cm = 0;//ContextSelector::getContextForBi(offset, 0);
+    unsigned int cm = offset;
     auto scan = m_contextModels.begin() + cm;
     for (int i = cLength - 1; i >= 0; i--)  // i must be signed
     {
@@ -111,7 +114,7 @@ void Writer::writeAsTUbypass(uint64_t input, unsigned int cMax) {
 void Writer::writeAsTUcabac(uint64_t input, unsigned int cMax, unsigned int offset) {
     assert(getBinarization(BinarizationId::TU).sbCheck(input, input, cMax));
 
-    unsigned int cm = ContextSelector::getContextForTu(offset, 0);
+    unsigned int cm = offset;
 
     auto scan = m_contextModels.begin() + cm;
 
@@ -142,7 +145,7 @@ void Writer::writeAsEGcabac(uint64_t input, unsigned int, unsigned int offset) {
     input++;
     unsigned int i = 0;
 
-    unsigned int cm = ContextSelector::getContextForEg(offset, i);
+    unsigned int cm = offset;
     auto scan = m_contextModels.begin() + cm;
     unsigned int length = ((bitLength(static_cast<uint64_t>(input)) - 1) << 1u) + 1;
 

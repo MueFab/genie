@@ -33,7 +33,7 @@ class Writer {
 
     void start(size_t numSymbols);
 
-    void flush();
+    void close();
 
     void reset();
 
@@ -69,6 +69,9 @@ class Writer {
     // ContextSelector m_contextSelector;
 
     BinaryArithmeticEncoder m_binaryArithmeticEncoder;
+
+    bool m_bypassFlag;
+    unsigned int m_numContexts;
 
     std::vector<ContextModel> m_contextModels;
 };
