@@ -38,7 +38,9 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
     const paramcabac::StateVars &stateVars = conf.getStateVars();
 
     OBufferStream bitstream(&block);
-    Writer writer(&bitstream);
+    Writer writer(&bitstream,
+                  binarzation.getBypassFlag(),
+                  stateVars.getNumCtxTotal());
     writer.start(numSymbols);
 
     unsigned int binarizationParameter = 0;

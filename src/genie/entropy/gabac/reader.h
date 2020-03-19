@@ -25,7 +25,7 @@ namespace gabac {
 
 class Reader {
    public:
-    explicit Reader(util::DataBlock *bitstream);
+    explicit Reader(util::DataBlock *bitstream, bool bypassFlag = true, unsigned int numContexts = 0);
 
     ~Reader();
 
