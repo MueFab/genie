@@ -56,7 +56,15 @@ class StateVars {
         return cLengthBI;
     }
 
-    uint32_t getNumCtxForLUTs() const {
+    uint32_t getCodingOrderCtxOffset(uint8_t index) const {
+        return codingOrderCtxOffset[index];
+    }
+
+    uint32_t getCodingSizeCtxOffset() const {
+        return codingSizeCtxOffset;
+    }
+
+    uint32_t getNumCtxLUTs() const {
         return numCtxLuts;
     }
 
