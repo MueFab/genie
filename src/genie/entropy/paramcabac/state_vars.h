@@ -56,11 +56,11 @@ class StateVars {
         return cLengthBI;
     }
 
-    uint8_t getNumCtxForLUTs() const {
+    uint32_t getNumCtxForLUTs() const {
         return numCtxLuts;
     }
 
-    uint8_t getNumCtxTotal() const {
+    uint32_t getNumCtxTotal() const {
         return numCtxTotal;
     }
 
