@@ -84,12 +84,12 @@ void Writer::reset() {
 }
 
 void Writer::writeAsBIbypass(uint64_t input, unsigned int cLength) {
-    assert(getBinarization(BinarizationId::BI).sbCheck(input, input, cLength));
+    //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::BI).sbCheck(input, input, cLength));
     m_binaryArithmeticEncoder.encodeBinsEP(static_cast<unsigned int>(input), cLength);
 }
 
 void Writer::writeAsBIcabac(uint64_t input, unsigned int cLength, unsigned int offset) {
-    assert(getBinarization(BinarizationId::BI).sbCheck(input, input, cLength));
+    //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::BI).sbCheck(input, input, cLength));
 
     unsigned int cm = offset;
     auto scan = m_contextModels.begin() + cm;
@@ -101,7 +101,7 @@ void Writer::writeAsBIcabac(uint64_t input, unsigned int cLength, unsigned int o
 }
 
 void Writer::writeAsTUbypass(uint64_t input, unsigned int cMax) {
-    assert(getBinarization(BinarizationId::TU).sbCheck(input, input, cMax));
+    //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::TU).sbCheck(input, input, cMax));
 
     for (uint64_t i = 0; i < input; i++) {
         m_binaryArithmeticEncoder.encodeBinEP(1);
@@ -112,7 +112,7 @@ void Writer::writeAsTUbypass(uint64_t input, unsigned int cMax) {
 }
 
 void Writer::writeAsTUcabac(uint64_t input, unsigned int cMax, unsigned int offset) {
-    assert(getBinarization(BinarizationId::TU).sbCheck(input, input, cMax));
+    //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::TU).sbCheck(input, input, cMax));
 
     unsigned int cm = offset;
 
@@ -131,7 +131,7 @@ void Writer::writeAsTUcabac(uint64_t input, unsigned int cMax, unsigned int offs
 }
 
 void Writer::writeAsEGbypass(uint64_t input, unsigned int) {
-    assert(getBinarization(BinarizationId::EG).sbCheck(input, input, 0));
+    //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::EG).sbCheck(input, input, 0));
 
     input++;
     unsigned int length = ((bitLength(static_cast<uint64_t>(input)) - 1) << 1u) + 1;
@@ -140,7 +140,7 @@ void Writer::writeAsEGbypass(uint64_t input, unsigned int) {
 }
 
 void Writer::writeAsEGcabac(uint64_t input, unsigned int, unsigned int offset) {
-    assert(getBinarization(BinarizationId::EG).sbCheck(input, input, 0));
+    //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::EG).sbCheck(input, input, 0));
 
     input++;
     unsigned int i = 0;
@@ -163,7 +163,7 @@ void Writer::writeAsEGcabac(uint64_t input, unsigned int, unsigned int offset) {
 }
 
 void Writer::writeAsSEGbypass(uint64_t input, unsigned int) {
-    assert(getBinarization(BinarizationId::SEG).sbCheck(input, input, 0));
+    //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::SEG).sbCheck(input, input, 0));
     if (int64_t(input) <= 0) {
         writeAsEGbypass(static_cast<unsigned int>(-int64_t(input)) << 1u, 0);
     } else {
@@ -172,7 +172,7 @@ void Writer::writeAsSEGbypass(uint64_t input, unsigned int) {
 }
 
 void Writer::writeAsSEGcabac(uint64_t input, unsigned int, unsigned int offset) {
-    assert(getBinarization(BinarizationId::SEG).sbCheck(uint64_t(input), uint64_t(input), 0));
+    //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::SEG).sbCheck(uint64_t(input), uint64_t(input), 0));
 
     if (int64_t(input) <= 0) {
         writeAsEGcabac(static_cast<unsigned int>(-int64_t(input)) << 1u, 0, offset);
@@ -182,7 +182,7 @@ void Writer::writeAsSEGcabac(uint64_t input, unsigned int, unsigned int offset) 
 }
 
 void Writer::writeAsTEGbypass(uint64_t input, unsigned int cTruncExpGolParam) {
-    assert(getBinarization(BinarizationId::TEG).sbCheck(input, input, cTruncExpGolParam));
+    //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::TEG).sbCheck(input, input, cTruncExpGolParam));
 
     if (input < cTruncExpGolParam) {
         writeAsTUbypass(input, cTruncExpGolParam);
@@ -193,7 +193,7 @@ void Writer::writeAsTEGbypass(uint64_t input, unsigned int cTruncExpGolParam) {
 }
 
 void Writer::writeAsTEGcabac(uint64_t input, unsigned int cTruncExpGolParam, unsigned int offset) {
-    assert(getBinarization(BinarizationId::TEG).sbCheck(input, input, cTruncExpGolParam));
+    //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::TEG).sbCheck(input, input, cTruncExpGolParam));
 
     if (input < cTruncExpGolParam) {
         writeAsTUcabac(input, cTruncExpGolParam, offset);
@@ -204,7 +204,7 @@ void Writer::writeAsTEGcabac(uint64_t input, unsigned int cTruncExpGolParam, uns
 }
 
 void Writer::writeAsSTEGbypass(uint64_t input, unsigned int cSignedTruncExpGolParam) {
-    assert(getBinarization(BinarizationId::STEG).sbCheck(uint64_t(input), uint64_t(input), cSignedTruncExpGolParam));
+    //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::STEG).sbCheck(uint64_t(input), uint64_t(input), cSignedTruncExpGolParam));
 
     if (int64_t(input) < 0) {
         writeAsTEGbypass(uint64_t(-int64_t(input)), cSignedTruncExpGolParam);
@@ -218,7 +218,7 @@ void Writer::writeAsSTEGbypass(uint64_t input, unsigned int cSignedTruncExpGolPa
 }
 
 void Writer::writeAsSTEGcabac(uint64_t input, unsigned int cSignedTruncExpGolParam, unsigned int offset) {
-    assert(getBinarization(BinarizationId::STEG).sbCheck(uint64_t(input), uint64_t(input), cSignedTruncExpGolParam));
+    //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::STEG).sbCheck(uint64_t(input), uint64_t(input), cSignedTruncExpGolParam));
 
     if (int64_t(input) < 0) {
         writeAsTEGcabac(uint64_t(-int64_t(input)), cSignedTruncExpGolParam, offset);
