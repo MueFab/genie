@@ -44,7 +44,6 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
     const bool shareSubSymCtxFlag = cabacContextParams.getShareSubsymCtxFlag();
     const uint16_t numContexts = cabacContextParams.getNumContexts();
 
-
     // numSubsyms
     if(codingSubsymSize > 0) {
         numSubsyms = outputSymbolSize / codingSubsymSize;
@@ -78,113 +77,118 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
         numAlphaSubsym = (1<<codingSubsymSize);
     }
 
-    // numCtxSubsym
-    switch(binarization_ID) {
-        case BinarizationParameters::BinarizationId::BINARY_CODING:
-            numCtxSubsym = codingSubsymSize;
-            cLengthBI = numCtxSubsym;
-        break;
-        case BinarizationParameters::BinarizationId::TRUNCATED_UNARY:
-            numCtxSubsym = cabacBinazParams.getCMax(); // cmax
-        break;
-        case BinarizationParameters::BinarizationId::EXPONENTIAL_GOLOMB:
-            numCtxSubsym = std::floor(std::log2(numAlphaSubsym+1))+1;
-        break;
-        case BinarizationParameters::BinarizationId::SIGNED_EXPONENTIAL_GOMB:
-            numCtxSubsym = std::floor(std::log2(numAlphaSubsym+1))+2;
-        break;
-        case BinarizationParameters::BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
-            numCtxSubsym = cabacBinazParams.getCMaxTeg() // cmax_teg
-                         + std::floor(std::log2(numAlphaSubsym+1))+1;
-        break;
-        case BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
-            numCtxSubsym = cabacBinazParams.getCMaxTeg() // cmax_teg
-                         + std::floor(std::log2(numAlphaSubsym+1))+2;
-        break;
-        case BinarizationParameters::BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY:
-        {
-            uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
-            numCtxSubsym = (outputSymbolSize/splitUnitSize)
-                         * ((1<<splitUnitSize)-1)
-                         + ((1<<(outputSymbolSize%splitUnitSize))-1);
-        }
-        break;
-        case BinarizationParameters::BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
-        {
-            uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
-            numCtxSubsym = (outputSymbolSize/splitUnitSize)
-                         * ((1<<splitUnitSize)-1)
-                         + ((1<<(outputSymbolSize%splitUnitSize))-1)
-                         + 1;
-        }
-        break;
-        case BinarizationParameters::BinarizationId::DOUBLE_TRUNCATED_UNARY:
-        {
-            uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
-            numCtxSubsym = cabacBinazParams.getCMaxDtu()
-                         + (outputSymbolSize/splitUnitSize)
-                         * ((1<<splitUnitSize)-1)
-                         + ((1<<(outputSymbolSize%splitUnitSize))-1);
-        }
-        break;
-        case BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
-        {
-            uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
-            numCtxSubsym = cabacBinazParams.getCMaxDtu()
-                         + (outputSymbolSize/splitUnitSize)
-                         * ((1<<splitUnitSize)-1)
-                         + ((1<<(outputSymbolSize%splitUnitSize))-1)
-                         + 1;
-        }
-        break;
-    }
+    //cLengthBI
+    cLengthBI = codingSubsymSize;
 
-    // codingOrderCtxOffset[]
-    codingOrderCtxOffset[0] = 0;
-    if(codingOrder >= 1)
-        codingOrderCtxOffset[1] = numCtxSubsym;
-    if(codingOrder == 2)
-        codingOrderCtxOffset[2] = numCtxSubsym * numAlphaSubsym;
+    if (!cabac_binarization.getBypassFlag()) {
+        // numCtxSubsym
+        switch(binarization_ID) {
+            case BinarizationParameters::BinarizationId::BINARY_CODING:
+                numCtxSubsym = codingSubsymSize;
 
-    // codingSizeCtxOffset
-    if(shareSubSymCtxFlag) {
-        codingSizeCtxOffset = 0;
-    } else if(codingOrder == 0) {
-        codingSizeCtxOffset = numCtxSubsym;
-    } else {
-        codingSizeCtxOffset = codingOrderCtxOffset[codingOrder] *  numAlphaSubsym;
-    }
+            break;
+            case BinarizationParameters::BinarizationId::TRUNCATED_UNARY:
+                numCtxSubsym = cabacBinazParams.getCMax(); // cmax
+            break;
+            case BinarizationParameters::BinarizationId::EXPONENTIAL_GOLOMB:
+                numCtxSubsym = std::floor(std::log2(numAlphaSubsym+1))+1;
+            break;
+            case BinarizationParameters::BinarizationId::SIGNED_EXPONENTIAL_GOMB:
+                numCtxSubsym = std::floor(std::log2(numAlphaSubsym+1))+2;
+            break;
+            case BinarizationParameters::BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
+                numCtxSubsym = cabacBinazParams.getCMaxTeg() // cmax_teg
+                             + std::floor(std::log2(numAlphaSubsym+1))+1;
+            break;
+            case BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
+                numCtxSubsym = cabacBinazParams.getCMaxTeg() // cmax_teg
+                             + std::floor(std::log2(numAlphaSubsym+1))+2;
+            break;
+            case BinarizationParameters::BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY:
+            {
+                uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
+                numCtxSubsym = (outputSymbolSize/splitUnitSize)
+                             * ((1<<splitUnitSize)-1)
+                             + ((1<<(outputSymbolSize%splitUnitSize))-1);
+            }
+            break;
+            case BinarizationParameters::BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
+            {
+                uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
+                numCtxSubsym = (outputSymbolSize/splitUnitSize)
+                             * ((1<<splitUnitSize)-1)
+                             + ((1<<(outputSymbolSize%splitUnitSize))-1)
+                             + 1;
+            }
+            break;
+            case BinarizationParameters::BinarizationId::DOUBLE_TRUNCATED_UNARY:
+            {
+                uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
+                numCtxSubsym = cabacBinazParams.getCMaxDtu()
+                             + (outputSymbolSize/splitUnitSize)
+                             * ((1<<splitUnitSize)-1)
+                             + ((1<<(outputSymbolSize%splitUnitSize))-1);
+            }
+            break;
+            case BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
+            {
+                uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
+                numCtxSubsym = cabacBinazParams.getCMaxDtu()
+                             + (outputSymbolSize/splitUnitSize)
+                             * ((1<<splitUnitSize)-1)
+                             + ((1<<(outputSymbolSize%splitUnitSize))-1)
+                             + 1;
+            }
+            break;
+        }
 
-    // numCtxLuts
-    numCtxLuts = 0;
-    if(transform_ID_subsym == SupportValues::TransformIdSubsym::LUT_TRANSFORM) {
-        if((binarization_ID >= BinarizationParameters::BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY &&
-                binarization_ID <= BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY) ||
-                codingOrder == 0 ||
-                (1u<<codingSubsymSize) > MAX_LUT_SIZE) {
-            UTILS_THROW_RUNTIME_EXCEPTION("LUT_TRANSFORM not supported with given configuration: coding_order = 0\
-                                         , binarization_ID = "+std::to_string((uint8_t)binarization_ID)+"\
-                                         , coding_subsym_size = "+std::to_string(codingSubsymSize));
+        // codingOrderCtxOffset[]
+        codingOrderCtxOffset[0] = 0;
+        if(codingOrder >= 1)
+            codingOrderCtxOffset[1] = numCtxSubsym;
+        if(codingOrder == 2)
+            codingOrderCtxOffset[2] = numCtxSubsym * numAlphaSubsym;
+
+        // codingSizeCtxOffset
+        if(shareSubSymCtxFlag) {
+            codingSizeCtxOffset = 0;
+        } else if(codingOrder == 0) {
+            codingSizeCtxOffset = numCtxSubsym;
         } else {
-            numCtxLuts = (codingSubsymSize/2)
-                       * ((1<<2)-1)
-                       + ((1<<(codingSubsymSize%2))-1);
+            codingSizeCtxOffset = codingOrderCtxOffset[codingOrder] *  numAlphaSubsym;
         }
-    }
 
-   // numCtxTotal
-    if(numContexts != 0) {
-        numCtxTotal = numContexts;
-    } else {
-        numCtxTotal = numCtxLuts;
-        numCtxTotal += (shareSubSymCtxFlag) ?
-                        1 :
-                        numSubsyms *
-                        ((codingOrder == 0) ?
-                                numCtxSubsym :
-                                codingOrderCtxOffset[codingOrder] *
-                                numAlphaSubsym);
-    }
+        // numCtxLuts
+        numCtxLuts = 0;
+        if(transform_ID_subsym == SupportValues::TransformIdSubsym::LUT_TRANSFORM) {
+            if((binarization_ID >= BinarizationParameters::BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY &&
+                    binarization_ID <= BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY) ||
+                    codingOrder == 0 ||
+                    (1u<<codingSubsymSize) > MAX_LUT_SIZE) {
+                UTILS_THROW_RUNTIME_EXCEPTION("LUT_TRANSFORM not supported with given configuration: coding_order = 0\
+                                             , binarization_ID = "+std::to_string((uint8_t)binarization_ID)+"\
+                                             , coding_subsym_size = "+std::to_string(codingSubsymSize));
+            } else {
+                numCtxLuts = (codingSubsymSize/2)
+                           * ((1<<2)-1)
+                           + ((1<<(codingSubsymSize%2))-1);
+            }
+        }
+
+       // numCtxTotal
+        if(numContexts != 0) {
+            numCtxTotal = numContexts;
+        } else {
+            numCtxTotal = numCtxLuts;
+            numCtxTotal += (shareSubSymCtxFlag) ?
+                            1 :
+                            numSubsyms *
+                            ((codingOrder == 0) ?
+                                    numCtxSubsym :
+                                    codingOrderCtxOffset[codingOrder] *
+                                    numAlphaSubsym);
+        }
+    } // if (!cabac_binarization.getBypassFlag())
 }
 
 }  // namespace paramcabac
