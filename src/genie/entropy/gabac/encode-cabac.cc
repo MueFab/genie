@@ -34,13 +34,15 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
     const paramcabac::Binarization &binarzation = conf.getBinarization();
     const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
     const paramcabac::StateVars &stateVars = conf.getStateVars();
+
     const uint8_t outputSymbolSize = supportVals.getOutputSymbolSize();
     const uint8_t codingSubsymSize = supportVals.getCodingSubsymSize();
     const uint64_t subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize)-1;
+    const bool bypassFlag = binarzation.getBypassFlag();
 
     OBufferStream bitstream(&block);
     Writer writer(&bitstream,
-                  binarzation.getBypassFlag(),
+                  bypassFlag,
                   stateVars.getNumCtxTotal());
     writer.start(numSymbols);
 
@@ -49,7 +51,7 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
     util::BlockStepper r = symbols->getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
-    if (binarzation.getBypassFlag()) { // bypass mode
+    if (bypassFlag) { // bypass mode
         void (Writer::*func)(uint64_t, unsigned int) = nullptr;
         switch (binarzation.getBinarizationID()) {
             case paramcabac::BinarizationParameters::BinarizationId::BINARY_CODING:
@@ -180,7 +182,7 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
                 subsymValue = (symbolValue>>(oss-=codingSubsymSize)) & subsymMask;
                 subsymbols[s].subsymIdx = s;
                 uint32_t ctxIdx = ContextSelector::getContextIdx(stateVars,
-                                                                 binarzation.getBypassFlag(),
+                                                                 bypassFlag,
                                                                  codingOrder,
                                                                  subsymbols[s]);
                 (writer.*func)(subsymValue, binarizationParameter, ctxIdx);
@@ -189,22 +191,26 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
             r.inc();
         }
     } else if (codingOrder == 1) {
-        unsigned int previousSymbol = 0;
         while (r.isValid()) {
             if (maxSize <= bitstream.size()) {
                 break;
             }
-            uint64_t symbol = r.get();
-            (writer.*func)(r.get(), binarizationParameter, previousSymbol << 2u);
-            if (int64_t(symbol) < 0) {
-                symbol = uint64_t(-int64_t(symbol));
+
+            // Split symbol into subsymbols and loop over subsymbols
+            uint64_t symbolValue = r.get();
+            uint64_t subsymValue = 0;
+            uint32_t oss = outputSymbolSize;
+            for (uint8_t s=0; s<stateVars.getNumSubsymbols(); s++) {
+                subsymValue = (symbolValue>>(oss-=codingSubsymSize)) & subsymMask;
+                subsymbols[s].subsymIdx = s;
+                uint32_t ctxIdx = ContextSelector::getContextIdx(stateVars,
+                                                                 bypassFlag,
+                                                                 codingOrder,
+                                                                 subsymbols[s]);
+                (writer.*func)(subsymValue, binarizationParameter, ctxIdx);
+                subsymbols[s].prvValues[0] = subsymValue;
             }
-            if (symbol > 3) {
-                previousSymbol = 3;
-            } else {
-                assert(symbol <= std::numeric_limits<unsigned int>::max());
-                previousSymbol = static_cast<unsigned int>(symbol);
-            }
+
             r.inc();
         }
     } else if (codingOrder == 2) {

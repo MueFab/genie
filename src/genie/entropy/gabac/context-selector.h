@@ -18,8 +18,8 @@ namespace entropy {
 namespace gabac {
 
 struct Subsymbol {
-    uint8_t subsymIdx;
-    uint32_t prvValues[2];
+    uint8_t subsymIdx = 0;
+    uint32_t prvValues[2] = {0, 0};
 };
 
 class ContextSelector {
