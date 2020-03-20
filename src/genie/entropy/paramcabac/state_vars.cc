@@ -79,7 +79,9 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
     }
 
     //cLengthBI
-    cLengthBI = codingSubsymSize;
+    if(binarization_ID == BinarizationParameters::BinarizationId::BINARY_CODING) {
+        cLengthBI = codingSubsymSize;
+    }
 
     if (!cabac_binarization.getBypassFlag()) {
         // numCtxSubsym
@@ -188,6 +190,7 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
                                     numCtxSubsym :
                                     codingOrderCtxOffset[codingOrder] *
                                     numAlphaSubsym);
+            //std::cout<<"NumContexts: "<< std::to_string(numCtxTotal);
         }
     } // if (!cabac_binarization.getBypassFlag())
 }

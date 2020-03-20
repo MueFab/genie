@@ -16,8 +16,8 @@ namespace paramcabac {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Binarization::Binarization()
-    : Binarization(BinarizationParameters::BinarizationId::BINARY_CODING,
-                   BinarizationParameters(BinarizationParameters::BinarizationId::BINARY_CODING, std::vector<uint8_t>(0)),
+    : Binarization(BinarizationParameters::BinarizationId::TRUNCATED_UNARY,
+                   BinarizationParameters(BinarizationParameters::BinarizationId::TRUNCATED_UNARY, std::vector<uint8_t>({7})),
                    false) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
