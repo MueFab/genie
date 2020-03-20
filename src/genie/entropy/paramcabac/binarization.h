@@ -27,7 +27,8 @@ class Binarization {
     Binarization();
 
     Binarization(BinarizationParameters::BinarizationId _binarization_ID,
-                 BinarizationParameters&& _cabac_binarization_parameters);
+                 BinarizationParameters&& _cabac_binarization_parameters,
+                 bool _bypass_flag);
 
     Binarization(uint8_t coding_subsym_size, uint8_t output_symbol_size, util::BitReader& reader);
 

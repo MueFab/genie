@@ -17,14 +17,16 @@ namespace paramcabac {
 
 Binarization::Binarization()
     : Binarization(BinarizationParameters::BinarizationId::BINARY_CODING,
-                   BinarizationParameters(BinarizationParameters::BinarizationId::BINARY_CODING, std::vector<uint8_t>(0))) {}
+                   BinarizationParameters(BinarizationParameters::BinarizationId::BINARY_CODING, std::vector<uint8_t>(0)),
+                   false) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 Binarization::Binarization(BinarizationParameters::BinarizationId _binarization_ID,
-                           BinarizationParameters&& _cabac_binarization_parameters)
+                           BinarizationParameters&& _cabac_binarization_parameters,
+                           bool _bypass_flag)
     : binarization_ID(_binarization_ID),
-      bypass_flag(true),
+      bypass_flag(_bypass_flag),
       cabac_binarization_parameters(std::move(_cabac_binarization_parameters)),
       cabac_context_parameters() {}
 
