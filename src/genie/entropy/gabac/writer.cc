@@ -9,16 +9,13 @@
 #include <cassert>
 #include <limits>
 
-#include "constants.h"
-#include "context-selector.h"
-
+#include "context-tables.h"
 //
 // #include binary-arithmetic-decoder.cc from here instead of compiling it
 // separately, so that we may call inlined member functions of class
 // BinaryArithmeticDecoder in this file.
 //
 #include "binary-arithmetic-encoder.cc"
-#include "gabac.h"
 
 namespace genie {
 namespace entropy {

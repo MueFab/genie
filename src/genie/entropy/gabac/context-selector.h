@@ -28,6 +28,7 @@ class ContextSelector {
 
     ~ContextSelector() = default;
 
+    static
     unsigned int getContextIdx(const paramcabac::StateVars &stateVars,
                                bool bypassFlag,
                                uint8_t codingOrder,

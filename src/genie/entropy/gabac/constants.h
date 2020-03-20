@@ -10,6 +10,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <stdint.h>
 
 namespace genie {
 namespace util {

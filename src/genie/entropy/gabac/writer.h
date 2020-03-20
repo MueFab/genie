@@ -66,8 +66,6 @@ class Writer {
    private:
     util::BitWriter m_bitOutputStream;
 
-    // ContextSelector m_contextSelector;
-
     BinaryArithmeticEncoder m_binaryArithmeticEncoder;
 
     bool m_bypassFlag;
