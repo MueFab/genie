@@ -26,6 +26,8 @@ class DatasetParameterSet {
 
     void setDatasetGroupId(uint8_t datasetGroupId) { dataset_group_ID = datasetGroupId; }
 
+    const uint64_t getLength() const;
+
    private:
     /**
      * ISO 23092-1 Section 6.5.2 table 23

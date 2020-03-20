@@ -15,7 +15,16 @@ DatasetGroup::DatasetGroup(std::vector<genie::format::mpegg_p1::Dataset>* x_data
     }
 }
 
-void DatasetGroup::writeToFile(genie::util::BitWriter&) const {
+void DatasetGroup::writeToFile(genie::util::BitWriter& bitWriter) const {
+    bitWriter.write("dgcn");
+
+    uint64_t length = 12;                                           //"dgcn" dataset_group
+    length += 12 + 2 + 2 * dataset_group_header.getNumDatasets();   //"dghd" dataset_group_header
+    for (auto const& it: datasets) {
+        length += it.getLength();
+    }
+
+    bitWriter.write(length, 64);
     // TODO
 }
 

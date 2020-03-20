@@ -15,6 +15,7 @@ class DatasetGroupHeader {
 
     uint8_t getDatasetGroupId() const { return dataset_group_ID; }
     uint8_t getVersionNumber() const { return version_number; }
+    uint64_t getNumDatasets() const { return dataset_ID.size(); };
     const std::vector<uint16_t>& getDatasetId() const { return dataset_ID; }
 
    private:

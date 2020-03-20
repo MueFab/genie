@@ -59,6 +59,8 @@ class Dataset {
     const DatasetHeader& getDatasetHeader() const { return dataset_header; }
     const std::vector<DatasetParameterSet>& getDatasetParameterSets() const { return dataset_parameter_sets; }
 
+    const uint64_t getLength() const;
+
     void setDatasetHeaderGroupId(uint8_t GroupId) { dataset_header.setDatasetGroupId(GroupId); }
     void setDatasetParameterSetsGroupId(uint8_t GroupId);
 

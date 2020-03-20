@@ -33,6 +33,8 @@ class DatasetHeader {
     uint16_t getDatasetId() const { return dataset_ID; }
     uint8_t getDatasetGroupId() const { return dataset_group_ID; }
 
+    const uint64_t getLength() const;
+
    private:
     /**
      * ISO 23092-1 Section 6.5.2 table 19

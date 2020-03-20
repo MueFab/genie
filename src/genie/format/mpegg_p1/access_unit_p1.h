@@ -42,6 +42,8 @@ class AccessUnit {
    public:
     explicit AccessUnit(genie::format::mgb::AccessUnit&& au_p2);
 
+    const uint64_t getLength() const;
+
    private:
     /**
      * ISO 23092-1 Section 6.5.3 table 24

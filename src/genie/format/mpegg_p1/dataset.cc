@@ -34,6 +34,22 @@ void Dataset::setDatasetParameterSetsGroupId(uint8_t GroupId) {
     }
 }
 
+const uint64_t Dataset::getLength() const
+{
+    uint64_t length = 12; //gen_info
+    length += dataset_header.getLength();
+
+    for (auto const& it: dataset_parameter_sets) {
+        length += it.getSize();
+    }
+
+    for (auto const& it: access_units) {
+        length += it.getSize();
+    }
+
+    return length;
+}
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie
