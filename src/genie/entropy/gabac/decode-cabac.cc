@@ -14,7 +14,7 @@
 #include "exceptions.h"
 #include "reader.h"
 
-#include <genie/entropy/paramcabac/transformed-seq.h>
+#include "context-selector.h"
 
 namespace genie {
 namespace entropy {
@@ -32,6 +32,7 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
     const paramcabac::Binarization &binarzation = conf.getBinarization();
     const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
     const paramcabac::StateVars &stateVars = conf.getStateVars();
+    const uint8_t codingSubsymSize = supportVals.getCodingSubsymSize();
 
     Reader reader(bitstream,
                   binarzation.getBypassFlag(),
@@ -44,6 +45,7 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
 
     unsigned int binarizationParameter = 0;
     util::BlockStepper r = symbols.getReader();
+    std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
     if (binarzation.getBypassFlag()) { // bypass mode
         uint64_t (Reader::*func)(unsigned int) = nullptr;
@@ -92,8 +94,14 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
                 GABAC_DIE("Invalid binarization");
         }
         while (r.isValid()) {
-            uint64_t symbol = (reader.*func)(binarizationParameter);
-            r.set(symbol);
+            // Decode subsymbols and merge them to construct symbols
+            uint64_t symbolValue = 0;
+            uint64_t subsymValue = 0;
+            for (uint8_t s=0; s<stateVars.getNumSubsymbols(); s++) {
+                subsymValue = (reader.*func)(binarizationParameter);
+                symbolValue = (symbolValue<<codingSubsymSize) | subsymValue;
+            }
+            r.set(symbolValue);
             r.inc();
         }
 
@@ -153,8 +161,20 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
     uint8_t codingOrder = supportVals.getCodingOrder();
     if (codingOrder == 0) {
         while (r.isValid()) {
-            uint64_t symbol = (reader.*func)(binarizationParameter, 0);
-            r.set(symbol);
+            // Decode subsymbols and merge them to construct symbols
+            uint64_t symbolValue = 0;
+            uint64_t subsymValue = 0;
+            for (uint8_t s=0; s<stateVars.getNumSubsymbols(); s++) {
+                subsymbols[s].subsymIdx = s;
+                uint32_t ctxIdx = ContextSelector::getContextIdx(stateVars,
+                                                                 binarzation.getBypassFlag(),
+                                                                 codingOrder,
+                                                                 subsymbols[s]);
+                subsymValue = (reader.*func)(binarizationParameter, ctxIdx);
+                symbolValue = (symbolValue<<codingSubsymSize) | subsymValue;
+            }
+
+            r.set(symbolValue);
             r.inc();
         }
     } else if (codingOrder == 1) {
