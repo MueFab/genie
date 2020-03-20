@@ -20,6 +20,7 @@ StateVars::StateVars()
     : numAlphaSubsym(0),
       numSubsyms(0),
       numCtxSubsym(0),
+      cLengthBI(0),
       codingOrderCtxOffset{0,0,0},
       codingSizeCtxOffset(0),
       numCtxLuts(0),
@@ -74,7 +75,7 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
     }
 
     if(numAlphaSubsym == 0) { // 0 == not special
-        numAlphaSubsym = (1<<codingSubsymSize);
+        numAlphaSubsym = StateVars::get2PowN(codingSubsymSize);
     }
 
     //cLengthBI
