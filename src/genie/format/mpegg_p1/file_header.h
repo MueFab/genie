@@ -12,9 +12,9 @@ namespace mpegg_p1 {
 class FileHeader {
    public:
     explicit FileHeader() = default;
-    explicit FileHeader(std::vector<std::string>*);
+    explicit FileHeader(std::vector<std::string>*); //FIXME:strings needs to be checked for size!
 
-    void addCompatibleBrand(const std::string& brand) { compatible_brand.push_back(brand); }
+    void addCompatibleBrand(const std::string& brand) { compatible_brand.push_back(brand); } //FIXME:string needs to be checked for size!
 
     const char* getMajorBrand() const { return major_brand; }
     const char* getMinorBrand() const { return minor_brand; }
