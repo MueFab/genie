@@ -22,7 +22,7 @@ DatasetParameterSet::DatasetParameterSet(const core::parameter::ParameterSet&& p
                                          const uint16_t x_dataset_ID)
     : dataset_ID(x_dataset_ID), parameterSet_p2(std::move(parameterSet)) {}
 
-const uint64_t DatasetParameterSet::getLength() const {
+uint64_t DatasetParameterSet::getLength() const {
     uint64_t length = 12; //gen_info
     length += 3;
     //TODO

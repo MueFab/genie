@@ -51,7 +51,7 @@ DatasetHeader::DatasetHeader(uint8_t datasetGroupId, uint16_t datasetId/*, char 
       tflag(0),
       thres(0) {}
 
-const uint64_t DatasetHeader::getLength() const
+uint64_t DatasetHeader::getLength() const
 {
     uint64_t length = 12; //gen_info
     //TODO

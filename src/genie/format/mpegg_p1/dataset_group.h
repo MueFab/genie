@@ -37,7 +37,7 @@ class DG_protection {
 
 class DatasetGroup {
    public:
-    explicit DatasetGroup(std::vector<genie::format::mpegg_p1::Dataset>*);
+    explicit DatasetGroup(std::vector<genie::format::mpegg_p1::Dataset>*, const uint8_t x_datasetGroupID);
 
     const DatasetGroupHeader& getDatasetGroupHeader() const { return dataset_group_header; }
     const std::vector<Dataset>& getDatasets() const { return datasets; }

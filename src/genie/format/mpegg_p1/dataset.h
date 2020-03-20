@@ -59,12 +59,19 @@ class Dataset {
     const DatasetHeader& getDatasetHeader() const { return dataset_header; }
     const std::vector<DatasetParameterSet>& getDatasetParameterSets() const { return dataset_parameter_sets; }
 
-    const uint64_t getLength() const;
+    uint64_t getLength() const;
 
-    void setDatasetHeaderGroupId(uint8_t GroupId) { dataset_header.setDatasetGroupId(GroupId); }
-    void setDatasetParameterSetsGroupId(uint8_t GroupId);
+
+    void setDatasetGroupId(uint8_t groupId) {
+        this->setDatasetHeaderGroupId(groupId);
+        this->setDatasetParameterSetsGroupId(groupId);
+    };
+
+    void writeToFile(genie::util::BitWriter& bitWriter) const;
 
    private:
+    void setDatasetHeaderGroupId(uint8_t groupId) { dataset_header.setDatasetGroupId(groupId); }
+    void setDatasetParameterSetsGroupId(uint8_t groupId);
     /**
      * ISO 23092-1 Section 6.5.2 table 18
      *
