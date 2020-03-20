@@ -199,22 +199,23 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
             r.inc();
         }
     } else if (codingOrder == 2) {
-        unsigned int previousSymbol = 0;
-        unsigned int previousPreviousSymbol = 0;
-
         while (r.isValid()) {
-            uint64_t symbol = (reader.*func)(binarizationParameter, (previousSymbol << 2u) + previousPreviousSymbol);
-            r.set(symbol);
-            previousPreviousSymbol = previousSymbol;
-            if (int64_t(symbol) < 0) {
-                symbol = uint64_t(-int64_t(symbol));
+            // Decode subsymbols and merge them to construct symbols
+            uint64_t symbolValue = 0;
+            uint64_t subsymValue = 0;
+            for (uint8_t s=0; s<stateVars.getNumSubsymbols(); s++) {
+                subsymbols[s].subsymIdx = s;
+                uint32_t ctxIdx = ContextSelector::getContextIdx(stateVars,
+                                                                 bypassFlag,
+                                                                 codingOrder,
+                                                                 subsymbols[s]);
+                subsymValue = (reader.*func)(binarizationParameter, ctxIdx);
+                symbolValue = (symbolValue<<codingSubsymSize) | subsymValue;
+                subsymbols[s].prvValues[1] = subsymbols[s].prvValues[0];
+                subsymbols[s].prvValues[0] = subsymValue;
             }
-            if (symbol > 3) {
-                previousSymbol = 3;
-            } else {
-                assert(symbol <= std::numeric_limits<unsigned int>::max());
-                previousSymbol = static_cast<unsigned int>(symbol);
-            }
+
+            r.set(symbolValue);
             r.inc();
         }
     } else {

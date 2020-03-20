@@ -214,24 +214,27 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
             r.inc();
         }
     } else if (codingOrder == 2) {
-        unsigned int previousSymbol = 0;
-        unsigned int previousPreviousSymbol = 0;
         while (r.isValid()) {
             if (maxSize <= bitstream.size()) {
                 break;
             }
-            uint64_t symbol = r.get();
-            (writer.*func)(symbol, binarizationParameter, (previousSymbol << 2u) + previousPreviousSymbol);
-            previousPreviousSymbol = previousSymbol;
-            if (int64_t(symbol) < 0) {
-                symbol = uint64_t(-int64_t(symbol));
+
+            // Split symbol into subsymbols and loop over subsymbols
+            uint64_t symbolValue = r.get();
+            uint64_t subsymValue = 0;
+            uint32_t oss = outputSymbolSize;
+            for (uint8_t s=0; s<stateVars.getNumSubsymbols(); s++) {
+                subsymValue = (symbolValue>>(oss-=codingSubsymSize)) & subsymMask;
+                subsymbols[s].subsymIdx = s;
+                uint32_t ctxIdx = ContextSelector::getContextIdx(stateVars,
+                                                                 bypassFlag,
+                                                                 codingOrder,
+                                                                 subsymbols[s]);
+                (writer.*func)(subsymValue, binarizationParameter, ctxIdx);
+                subsymbols[s].prvValues[1] = subsymbols[s].prvValues[0];
+                subsymbols[s].prvValues[0] = subsymValue;
             }
-            if (symbol > 3) {
-                previousSymbol = 3;
-            } else {
-                assert(symbol <= std::numeric_limits<unsigned int>::max());
-                previousSymbol = static_cast<unsigned int>(symbol);
-            }
+
             r.inc();
         }
     } else {
