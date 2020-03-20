@@ -8,7 +8,6 @@
 #include <cassert>
 #include "bit-input-stream.h"
 #include "cabac-tables.h"
-#include "context-model.h"
 
 namespace genie {
 namespace entropy {
