@@ -72,6 +72,15 @@ class StateVars {
         return numCtxTotal;
     }
 
+    /* some extra functions (for now put in statevars)
+     * FIXME move else where
+     */
+    static
+    uint64_t get2PowN(uint8_t N) {
+        assert(N<=32);
+        uint64_t one = 1u;
+        return one<<N;
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
