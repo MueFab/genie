@@ -14,6 +14,8 @@
 #include "exceptions.h"
 #include "writer.h"
 
+#include "context-selector.h"
+
 namespace genie {
 namespace entropy {
 namespace gabac {
@@ -24,10 +26,6 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
     util::DataBlock block(0, 1);
 
     assert(symbols != nullptr);
-#ifndef NDEBUG
-    //const unsigned int paramSize[unsigned(BinarizationId::STEG) + 1u] = {1, 1, 0, 0, 1, 1}; // FIXME what is this??? TBC
-#endif
-    //assert(binarzation.getCabacBinarizationParameters().size() >= paramSize[static_cast<int>(binarzation.binarization_ID)]);
 
     size_t numSymbols = symbols->size();
     if (numSymbols <= 0) return;
@@ -36,6 +34,9 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
     const paramcabac::Binarization &binarzation = conf.getBinarization();
     const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
     const paramcabac::StateVars &stateVars = conf.getStateVars();
+    const uint8_t outputSymbolSize = supportVals.getOutputSymbolSize();
+    const uint8_t codingSubsymSize = supportVals.getCodingSubsymSize();
+    const uint64_t subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize)-1;
 
     OBufferStream bitstream(&block);
     Writer writer(&bitstream,
@@ -46,6 +47,7 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
     unsigned int binarizationParameter = 0;
 
     util::BlockStepper r = symbols->getReader();
+    std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
     if (binarzation.getBypassFlag()) { // bypass mode
         void (Writer::*func)(uint64_t, unsigned int) = nullptr;
@@ -97,7 +99,16 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
             if (maxSize <= bitstream.size()) {
                 break;
             }
-            (writer.*func)(r.get(), binarizationParameter);
+
+            // Split symbol into subsymbols and then encode subsymbols
+            uint64_t symbolValue = r.get();
+            uint64_t subsymValue = 0;
+            uint32_t oss = outputSymbolSize;
+            for (uint8_t s=0; s<stateVars.getNumSubsymbols(); s++) {
+                subsymValue = (symbolValue>>(oss-=codingSubsymSize)) & subsymMask;
+                (writer.*func)(subsymValue, binarizationParameter);
+            }
+
             r.inc();
         }
 
@@ -160,7 +171,21 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
             if (maxSize <= bitstream.size()) {
                 break;
             }
-            (writer.*func)(r.get(), binarizationParameter, 0);
+
+            // Split symbol into subsymbols and loop over subsymbols
+            uint64_t symbolValue = r.get();
+            uint64_t subsymValue = 0;
+            uint32_t oss = outputSymbolSize;
+            for (uint8_t s=0; s<stateVars.getNumSubsymbols(); s++) {
+                subsymValue = (symbolValue>>(oss-=codingSubsymSize)) & subsymMask;
+                subsymbols[s].subsymIdx = s;
+                uint32_t ctxIdx = ContextSelector::getContextIdx(stateVars,
+                                                                 binarzation.getBypassFlag(),
+                                                                 codingOrder,
+                                                                 subsymbols[s]);
+                (writer.*func)(subsymValue, binarizationParameter, ctxIdx);
+            }
+            
             r.inc();
         }
     } else if (codingOrder == 1) {
