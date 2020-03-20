@@ -42,7 +42,7 @@ class AccessUnit {
    public:
     explicit AccessUnit(genie::format::mgb::AccessUnit&& au_p2);
 
-    const uint64_t getLength() const;
+    uint64_t getLength() const;
 
    private:
     /**
