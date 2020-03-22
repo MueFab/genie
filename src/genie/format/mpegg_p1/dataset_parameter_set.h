@@ -28,6 +28,8 @@ class DatasetParameterSet {
 
     uint64_t getLength() const;
 
+    void writeToFile(genie::util::BitWriter& bitWriter) const;
+
    private:
     /**
      * ISO 23092-1 Section 6.5.2 table 23

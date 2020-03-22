@@ -7,6 +7,8 @@
 #ifndef GENIE_DATASET_HEADER_H
 #define GENIE_DATASET_HEADER_H
 
+#include "genie/util/bitwriter.h"
+
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -34,6 +36,8 @@ class DatasetHeader {
     uint8_t getDatasetGroupId() const { return dataset_group_ID; }
 
     uint64_t getLength() const;
+
+    void writeToFile(genie::util::BitWriter& bitWriter) const;
 
    private:
     /**

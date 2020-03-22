@@ -54,8 +54,18 @@ DatasetHeader::DatasetHeader(uint8_t datasetGroupId, uint16_t datasetId/*, char 
 uint64_t DatasetHeader::getLength() const
 {
     uint64_t length = 12; //gen_info
+    length += 1 + 2 + 4; //dataset_group_ID, dataset_ID, version
     //TODO
     return length;
+}
+
+void DatasetHeader::writeToFile(genie::util::BitWriter& bitWriter) const
+{
+    bitWriter.write("dthd");
+
+    bitWriter.write(this->getLength(), 64);
+
+    //TODO
 }
 
 }  // namespace mpegg_p1

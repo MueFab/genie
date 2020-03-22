@@ -52,7 +52,19 @@ uint64_t Dataset::getLength() const
 
 void Dataset::writeToFile(genie::util::BitWriter& bitWriter) const
 {
-    //TODO
+    bitWriter.write("dtcn");
+
+    bitWriter.write(this->getLength(), 64);
+
+    dataset_header.writeToFile(bitWriter);
+
+    for (auto const& it: dataset_parameter_sets) {
+        it.writeToFile(bitWriter);
+    }
+
+    for (auto const& it: access_units) {
+        it.writeToFile(bitWriter);
+    }
 }
 
 }  // namespace mpegg_p1
