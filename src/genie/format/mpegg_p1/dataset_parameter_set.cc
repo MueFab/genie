@@ -29,6 +29,14 @@ uint64_t DatasetParameterSet::getLength() const {
     return length;
 }
 
+void DatasetParameterSet::writeToFile(genie::util::BitWriter& bitWriter) const
+{
+    bitWriter.write("pars");
+
+    bitWriter.write(this->getLength(), 64);
+    //TODO
+}
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie

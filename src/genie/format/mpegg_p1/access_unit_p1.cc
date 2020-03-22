@@ -16,6 +16,15 @@ uint64_t AccessUnit::getLength() const {
     //TODO
     return length;
 }
+
+void AccessUnit::writeToFile(genie::util::BitWriter& bitWriter) const
+{
+    bitWriter.write("aucn");
+
+    bitWriter.write(this->getLength(), 64);
+    //TODO
+}
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie
