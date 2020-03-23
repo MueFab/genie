@@ -26,7 +26,9 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
         GABAC_DIE("Bitstream is null");
     }
 
-    util::DataBlock symbols(0, conf.getSupportValues().getMinimalSizeInBytes(conf.getSupportValues().getOutputSymbolSize()));
+    util::DataBlock symbols(0,
+                            4);
+                            //conf.getSupportValues().getMinimalSizeInBytes(conf.getSupportValues().getOutputSymbolSize()));
 
     const paramcabac::SupportValues &supportVals = conf.getSupportValues();
     const paramcabac::Binarization &binarzation = conf.getBinarization();

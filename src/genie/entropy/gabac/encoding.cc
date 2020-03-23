@@ -131,7 +131,7 @@ static void encodeSingleSequence(const paramcabac::TransformedSeq &cfg,
 
 void encode(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
     conf.validate();
-    util::DataBlock sequence(0, 1);
+    util::DataBlock sequence(0, 4);
     size_t size = 0;
     if (!conf.blocksize) {
         size = gabac::StreamHandler::readFull(*conf.inputStream, &sequence);
