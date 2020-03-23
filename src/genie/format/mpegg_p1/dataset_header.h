@@ -18,7 +18,7 @@ namespace format {
 namespace mpegg_p1 {
 class DatasetHeader {
    public:
-    explicit DatasetHeader(const uint16_t datasetID);
+    explicit DatasetHeader(const uint16_t x_datasetID);
 
     DatasetHeader(uint8_t datasetGroupId, uint16_t datasetId/*, char *version, uint8_t byteOffsetSizeFlag,
                   uint8_t nonOverlappingAuRangeFlag, uint8_t pos40BitsFlag, uint8_t blockHeaderFlag, uint8_t mitFlag,
