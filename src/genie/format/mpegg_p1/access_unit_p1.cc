@@ -23,6 +23,8 @@ void AccessUnit::writeToFile(genie::util::BitWriter& bitWriter) const
 
     bitWriter.write(this->getLength(), 64);
     //TODO
+
+    bitWriter.flush();
 }
 
 }  // namespace mpegg_p1
