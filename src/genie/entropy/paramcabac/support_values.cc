@@ -16,7 +16,7 @@ namespace paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SupportValues::SupportValues() : SupportValues(8, 8, 1, TransformIdSubsym::NO_TRANSFORM) {}
+SupportValues::SupportValues() : SupportValues(3, 3, 1, TransformIdSubsym::NO_TRANSFORM) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
