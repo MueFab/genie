@@ -10,87 +10,8 @@
 #include "genie/format/mpegg_p1/dataset.h"
 #include "genie/format/mpegg_p1/mpegg_file.h"
 
-// DatasetHeader *
-// initDatasetHeaderNoMIT(DatasetGroupId datasetGroupId, DatasetId datasetId, char *version, bool multipleAlignmentFlag,
-//                       bool byteOffsetSizeFlag, bool posOffsetIsUint40, bool nonOverlappingAURange,
-//                       bool blockHeaderFlag, uint16_t sequencesCount, ReferenceId referenceId, uint8_t datasetType,
-//                       uint8_t numClasses, uint8_t alphabetId, uint32_t numUClusters, uint8_t uSignatureSize,
-//                       uint8_t uSignatureLength, bool uSignatureConstantLength, uint32_t numberUAccessUnits,
-//                       uint32_t multipleSignatureBase) {
-//    DatasetHeader* datasetHeader = (DatasetHeader*)malloc(sizeof(DatasetHeader));
-//
-//    datasetHeader->datasetGroupId = datasetGroupId;
-//    datasetHeader->datasetId = datasetId;
-//    memcpy(datasetHeader->version, version, 4);
-//    datasetHeader->multipleAlignmentFlag = multipleAlignmentFlag;
-//    datasetHeader->byteOffsetSizeFlag = byteOffsetSizeFlag;
-//    datasetHeader->posOffsetIsUint40 = posOffsetIsUint40;
-//    datasetHeader->nonOverlappingAURange_flag = nonOverlappingAURange;
-//    datasetHeader->blockHeaderFlag = blockHeaderFlag;
-//
-//    datasetHeader->mitFlag = false;
-//    datasetHeader->classContiguosModeFlag = false;
-//    datasetHeader->orderedBlocksFlag = false;
-//
-//    datasetHeader->sequencesCount = sequencesCount;
-//    datasetHeader->referenceId = referenceId;
-//    datasetHeader->seqIds = (SequenceID*)calloc(datasetHeader->sequencesCount, sizeof(SequenceID));
-//    datasetHeader->seqBlocks = (uint32_t*)calloc(datasetHeader->sequencesCount, sizeof(uint32_t));
-//    datasetHeader->datasetType=datasetType;
-//    datasetHeader->numClasses=numClasses;
-//    datasetHeader->classId = (ClassType*)calloc(numClasses, sizeof(ClassType*));
-//    datasetHeader->numDescriptors = (uint8_t*)calloc(numClasses, sizeof(uint8_t));
-//    datasetHeader->descriptorId = (uint8_t**)calloc(numClasses, sizeof(uint8_t*));
-//
-//    datasetHeader->alphabetId = alphabetId;
-//    datasetHeader->numUClusters = numUClusters;
-//    datasetHeader->uSignatureConstantLength = uSignatureConstantLength;
-//    datasetHeader->uSignatureSize = uSignatureSize;
-//    datasetHeader->uSignatureLength = uSignatureLength;
-//    datasetHeader->numberUAccessUnits = numberUAccessUnits;
-//    datasetHeader->multipleSignatureBase = multipleSignatureBase;
-//    datasetHeader->thresholds = (uint32_t*)calloc(datasetHeader->sequencesCount, sizeof(uint32_t));
-//    datasetHeader->hasSeek = false;
-//    datasetHeader->seekPosition = 0;
-//    return datasetHeader;
-//}
-
-// Ref_information readRefInformation(char* refInfoFilePath){
-//    FILE* refInfoInputFile = fopen(refInfoFilePath, "r");
-//    Ref_information ref_information;
-//    void* returnedValue = fgets(ref_information.refUri, 1024, refInfoInputFile);
-//    if(returnedValue){
-//        char *c = strchr(ref_information.refUri, '\n');
-//        if (c)
-//            *c = 0;
-//    }else{
-//        printf("> errno:%d feof:%d ferror:%d retval:%p s[0]:%d\n\n",
-//               errno, feof(refInfoInputFile), ferror(refInfoInputFile), returnedValue, ref_information.refUri[0]);
-//    }
-//    fscanf(refInfoInputFile, "%i\n", &(ref_information.numberSequences));
-//    ref_information.sequenceName = (char**)calloc(ref_information.numberSequences, sizeof(char*));
-//    for(int i=0; i<ref_information.numberSequences; i++){
-//        ref_information.sequenceName[i] = (char*)calloc(1024, sizeof(char));
-//        if (fgets(ref_information.sequenceName[i], 1024, refInfoInputFile))
-//        {
-//            char *c = strchr(ref_information.sequenceName[i], '\n');
-//            if (c)
-//                *c = 0;
-//        }
-//    }
-//    if (fgets(ref_information.refName, 1024, refInfoInputFile))
-//    {
-//        char *c = strchr(ref_information.refName, '\n');
-//        if (c)
-//            *c = 0;
-//    }
-//    return ref_information;
-//}
-
 int createMPEGGFileNoMITFromByteStream(const std::string& fileName, const std::string& outputFileName) {
     fprintf(stdout, "Bytestream file: %s\n", fileName.c_str());
-
-    // Ref_information ref_information = readRefInformation(refInfoPath);
 
     std::ifstream inputFilestream;
     inputFilestream.open(fileName, std::ios::binary);
@@ -100,25 +21,6 @@ int createMPEGGFileNoMITFromByteStream(const std::string& fileName, const std::s
     }
 
     genie::util::BitReader inputFileBitReader(inputFilestream);
-
-    /*uint32_t value;
-    char buffer[256];
-    fprintf(stdout, "%s\n", buffer);
-    inputFileBitReader.readNBits(32, buffer);
-    fprintf(stdout, "%s\n", buffer);
-
-    inputFileBitReader.readNBits(8, &value);
-    fprintf(stdout, "%u\n", value);*/
-
-    /*    uint32_t value;
-        for (int j = 0; j < 6; ++j) {
-            fprintf(stdout, "Byte %i:", j);
-
-            for (int i = 0; i < 1; i++) {
-                inputFileBitReader.readNBits(8, &value);
-                fprintf(stdout, "%u \n", value);
-            }
-        }*/
 
     std::vector<genie::format::mgb::AccessUnit> accessUnits;
 
