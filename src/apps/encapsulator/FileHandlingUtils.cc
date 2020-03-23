@@ -55,6 +55,7 @@ int createMPEGGFileNoMITFromByteStream(const std::string& fileName, const std::s
     std::vector<genie::format::mpegg_p1::DatasetGroup> datasetGroups;
     datasetGroups.emplace_back(&datasets, 1);
 
+    //test output
     fprintf(stdout, "%u\n", datasetGroups.front().getDatasets().front().getDatasetHeader().getDatasetId());
     fprintf(stdout, "%u\n", datasetGroups.front().getDatasets().front().getDatasetHeader().getDatasetGroupId());
     fprintf(stdout, "%u\n", datasetGroups.front().getDatasets().front().getDatasetParameterSetDatasetID());
@@ -65,6 +66,8 @@ int createMPEGGFileNoMITFromByteStream(const std::string& fileName, const std::s
     // - DatasetGroup[]
 
     genie::format::mpegg_p1::MpeggFile mpeggFile(&datasetGroups);
+
+    //test output
     fprintf(stdout, "%u\n",
             mpeggFile.getDatasetGroups().front().getDatasets().front().getDatasetHeader().getDatasetGroupId());
 
