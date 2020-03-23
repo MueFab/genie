@@ -46,7 +46,7 @@ class DatasetHeader {
      * ------------------------------------------------------------------------------------------------------------- */
     uint8_t dataset_group_ID : 8;
     uint16_t dataset_ID : 16;
-    char version[4];
+    std::string version;
     uint8_t byte_offset_size_flag : 1;
     uint8_t non_overlapping_AU_range_flag : 1;
     uint8_t pos_40_bits_flag : 1;
