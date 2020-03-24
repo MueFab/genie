@@ -69,6 +69,11 @@ struct EncodingConfiguration {
     EncodingConfiguration();
 
     /**
+     * @brief Create config from subseq
+     */
+    EncodingConfiguration(paramcabac::Subsequence&& _subseq);
+
+    /**
      * @brief Create config from JSON
      * @param jsonstring JSON encoded configuration
      */
