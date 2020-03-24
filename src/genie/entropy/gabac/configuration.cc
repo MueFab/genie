@@ -23,6 +23,10 @@ namespace gabac {
 EncodingConfiguration::EncodingConfiguration()
     : subseq() {}
 
+EncodingConfiguration::EncodingConfiguration(paramcabac::Subsequence&& _subseq) {
+    subseq = std::move(_subseq);
+}
+
 EncodingConfiguration::~EncodingConfiguration() = default;
 
 bool EncodingConfiguration::operator==(const EncodingConfiguration& conf) const { return (conf == *this); }
