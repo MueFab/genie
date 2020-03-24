@@ -29,10 +29,17 @@ class TransformedSeq {
    public:
     TransformedSeq();
 
-    TransformedSeq(SupportValues::TransformIdSubsym _transform_ID_subsym, SupportValues&& _support_values,
-                   Binarization&& _cabac_binarization);
+    TransformedSeq(SupportValues::TransformIdSubsym _transform_ID_subsym,
+                   SupportValues&& _support_values,
+                   Binarization&& _cabac_binarization,
+                   const core::GenDesc _descriptor_ID = core::GenDesc::POS,
+                   const core::GenSubIndex _subsequence_ID = core::GenSub::POS_MAPPING_FIRST,
+                   const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
 
-    TransformedSeq(util::BitReader& reader);
+    TransformedSeq(util::BitReader& reader,
+                   const core::GenDesc _descriptor_ID = core::GenDesc::POS,
+                   const core::GenSubIndex _subsequence_ID = core::GenSub::POS_MAPPING_FIRST,
+                   const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
 
     virtual ~TransformedSeq() = default;
 
@@ -46,11 +53,28 @@ class TransformedSeq {
 
     const StateVars& getStateVars() const;
 
+    void setDescriptorID(const core::GenDesc _descriptor_ID) {
+        descriptor_ID = _descriptor_ID;
+    }
+
+    void setSubsequenceID(const core::GenSubIndex _subsequence_ID) {
+        subsequence_ID = _subsequence_ID;
+    }
+
+    void setAlphabetID(core::AlphabetID _alphabet_ID) {
+        alphabet_ID = _alphabet_ID;
+    }
+
    private:
     SupportValues::TransformIdSubsym transform_ID_subsym;  //!< : 3; Line 9
     SupportValues support_values;                          //!< Line 10
     Binarization cabac_binarization;                       //!< Line 11
     StateVars state_vars;
+
+    // declaration with default value.
+    core::GenDesc descriptor_ID = core::GenDesc::POS;
+    core::GenSubIndex subsequence_ID = core::GenSub::POS_MAPPING_FIRST;
+    core::AlphabetID alphabet_ID = core::AlphabetID::ACGTN;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
