@@ -51,7 +51,7 @@ static unsigned int bitLength(uint64_t value) {
     return numBits;
 }
 
-Writer::Writer(OBufferStream *const bitstream, bool bypassFlag, unsigned int numContexts)
+Writer::Writer(OBufferStream *const bitstream, bool bypassFlag, unsigned long numContexts)
     : m_bitOutputStream(bitstream),
       m_binaryArithmeticEncoder(m_bitOutputStream),
       m_bypassFlag(bypassFlag),

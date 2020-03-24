@@ -25,7 +25,7 @@ namespace gabac {
 
 class Reader {
    public:
-    explicit Reader(util::DataBlock *bitstream, bool bypassFlag = true, unsigned int numContexts = 0);
+    explicit Reader(util::DataBlock *bitstream, bool bypassFlag = true, unsigned long numContexts = 0);
 
     ~Reader();
 
@@ -69,7 +69,7 @@ class Reader {
     BinaryArithmeticDecoder m_decBinCabac;
 
     bool m_bypassFlag;
-    unsigned int m_numContexts;
+    unsigned long m_numContexts;
 
     std::vector<ContextModel> m_contextModels;
 };

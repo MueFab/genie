@@ -12,7 +12,7 @@ namespace entropy {
 namespace gabac {
 namespace contexttables {
 
-std::vector<ContextModel> buildContextTable(unsigned int numContexts) {
+std::vector<ContextModel> buildContextTable(unsigned long numContexts) {
     return std::vector<ContextModel>(numContexts);
 }
 
