@@ -107,10 +107,7 @@ struct GenSub {
 
     static constexpr GenSubIndex RFTP = {GenDesc::RFTP, 0};
 
-    static constexpr GenSubIndex RFTT_TYPE = {GenDesc::RFTT, 0};
-    static constexpr GenSubIndex RFTT_SUBSTITUTION = {GenDesc::RFTT, 1};
-    static constexpr GenSubIndex RFTT_INSERTION = {GenDesc::RFTT, 2};
-
+    static constexpr GenSubIndex RFTT = {GenDesc::RFTT, 0};
 };
 
 struct GenConst {

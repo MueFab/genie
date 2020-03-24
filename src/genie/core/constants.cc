@@ -78,9 +78,7 @@ constexpr GenSubIndex GenSub::RNAME_CABAC_1;
 
 constexpr GenSubIndex GenSub::RFTP;
 
-constexpr GenSubIndex GenSub::RFTT_TYPE;
-constexpr GenSubIndex GenSub::RFTT_SUBSTITUTION;
-constexpr GenSubIndex GenSub::RFTT_INSERTION;
+constexpr GenSubIndex GenSub::RFTT;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -170,12 +168,7 @@ const std::vector<GenomicDescriptorProperties> &getDescriptors() {
 
         {GenDesc::RFTP, "rftp", false, {{GenSub::RFTP, "rftp"}}},
 
-        {GenDesc::RFTT,
-         "rftt",
-         false,
-         {{GenSub::RFTT_TYPE, "type"},
-          {GenSub::RFTT_SUBSTITUTION, "substitution"},
-          {GenSub::RFTT_INSERTION, "insertion"}}},
+        {GenDesc::RFTT, "rftt", false, {{GenSub::RFTP, "rftt"}}},
     };
 
     return prop;
