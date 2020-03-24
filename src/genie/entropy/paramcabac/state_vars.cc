@@ -5,7 +5,6 @@
  */
 #include "state_vars.h"
 #include "binarization_parameters.h"
-#include <genie/core/constants.h>
 #include <genie/util/exceptions.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -24,20 +23,49 @@ StateVars::StateVars()
       codingOrderCtxOffset{0,0,0},
       codingSizeCtxOffset(0),
       numCtxLuts(0),
-      numCtxTotal(0){}
+      numCtxTotal(0) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+uint64_t StateVars::getNumAlphaSpecial(const core::GenDesc descriptor_ID,
+                                       const core::GenSubIndex subsequence_ID,
+                                       const core::AlphabetID alphabet_ID) {
+    unsigned long numAlphaSpecial = 0;
+    if(descriptor_ID == core::GenDesc::MMTYPE) {
+        if(subsequence_ID == core::GenSub::MMTYPE_TYPE) { // subseq 0
+            numAlphaSpecial = 3;
+        } else if((subsequence_ID == core::GenSub::MMTYPE_SUBSTITUTION) // subseq 1
+                ||(subsequence_ID == core::GenSub::MMTYPE_INSERTION) // subseq 2
+        ) {
+            numAlphaSpecial = (alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16;
+        }
+    } else if(descriptor_ID == core::GenDesc::CLIPS) {
+        if(subsequence_ID == core::GenSub::CLIPS_TYPE) { // subseq 1
+            numAlphaSpecial = 9;
+        } else if(subsequence_ID == core::GenSub::CLIPS_SOFT_STRING) { // subseq 2
+            numAlphaSpecial = ((alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16) + 1;
+        }
+    } else if(descriptor_ID == core::GenDesc::UREADS && subsequence_ID == core::GenSub::UREADS) { // subseq 0
+        numAlphaSpecial = (alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16;
+    } else if(descriptor_ID == core::GenDesc::RTYPE && subsequence_ID ==  core::GenSub::RTYPE) {
+        numAlphaSpecial = 6;
+    } else if(descriptor_ID == core::GenDesc::RFTT && subsequence_ID == core::GenSub::RFTT) { // subseq 0
+        numAlphaSpecial = (alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16;
+    }
+
+    return numAlphaSpecial;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_subsym,
                          const SupportValues support_values,
-                         const Binarization cabac_binarization) {
+                         const Binarization cabac_binarization,
+                         const core::GenDesc descriptor_ID,
+                         const core::GenSubIndex subsequence_ID,
+                         const core::AlphabetID alphabet_ID) {
 
     const BinarizationParameters::BinarizationId binarization_ID = cabac_binarization.getBinarizationID();
     const BinarizationParameters& cabacBinazParams = cabac_binarization.getCabacBinarizationParameters();
     const Context& cabacContextParams = cabac_binarization.getCabacContextParameters();
-
-    core::GenDesc descriptor_ID = core::GenDesc::POS;                   // need descriptor_ID to be supplied to this function TODO
-    core::GenSubIndex subsequence_ID = core::GenSub::POS_MAPPING_FIRST; // need subsequence_ID to be supplied to this function TODO
-    core::AlphabetID alphabet_ID = core::AlphabetID::ACGTN;             // need alphabet_ID to be supplied to this function TODO
 
     const uint8_t codingSubsymSize = support_values.getCodingSubsymSize();
     const uint8_t outputSymbolSize = support_values.getOutputSymbolSize();
@@ -53,26 +81,8 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
     }
 
     // numAlphaSubsym
-    // Check for special cases for numAlphabetSymbols
-    if(descriptor_ID == core::GenDesc::MMTYPE || descriptor_ID == core::GenDesc::RFTT) {
-        if(subsequence_ID == core::GenSub::MMTYPE_TYPE || subsequence_ID == core::GenSub::RFTT_TYPE) { // subseq 0
-            numAlphaSubsym = 3;
-        } else if((subsequence_ID == core::GenSub::MMTYPE_SUBSTITUTION || subsequence_ID == core::GenSub::RFTT_SUBSTITUTION) // subseq 1
-                ||(subsequence_ID == core::GenSub::MMTYPE_INSERTION || subsequence_ID == core::GenSub::RFTT_INSERTION) // subseq 2
-                  ) {
-            numAlphaSubsym = (alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16;
-        }
-    } else if(descriptor_ID == core::GenDesc::CLIPS) {
-        if(subsequence_ID == core::GenSub::CLIPS_TYPE) { // subseq 1
-            numAlphaSubsym = 9;
-        } else if(subsequence_ID == core::GenSub::CLIPS_SOFT_STRING) { // subseq 2
-            numAlphaSubsym = ((alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16) + 1;
-        }
-    } else if(descriptor_ID == core::GenDesc::UREADS && subsequence_ID == core::GenSub::UREADS) { // subseq 0
-        numAlphaSubsym = (alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16;
-    } else if(descriptor_ID == core::GenDesc::RTYPE && subsequence_ID ==  core::GenSub::RTYPE) {
-        numAlphaSubsym = 6;
-    }
+    // Check for special cases for numAlphaSubsym
+    numAlphaSubsym = StateVars::getNumAlphaSpecial(descriptor_ID, subsequence_ID, alphabet_ID);
 
     if(numAlphaSubsym == 0) { // 0 == not special
         numAlphaSubsym = StateVars::get2PowN(codingSubsymSize);

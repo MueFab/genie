@@ -12,6 +12,8 @@
 #include "binarization.h"
 #include "support_values.h"
 
+#include <genie/core/constants.h>
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -27,10 +29,10 @@ class StateVars {
     uint32_t numSubsyms;
     uint32_t numCtxSubsym;
     uint32_t cLengthBI;
-    uint32_t codingOrderCtxOffset[3];
-    uint32_t codingSizeCtxOffset;
+    uint64_t codingOrderCtxOffset[3];
+    uint64_t codingSizeCtxOffset;
     uint32_t numCtxLuts;
-    uint32_t numCtxTotal;
+    uint64_t numCtxTotal;
 
    public:
 
@@ -40,7 +42,10 @@ class StateVars {
 
     void populate(const SupportValues::TransformIdSubsym transform_ID_subsym,
                   const SupportValues support_values,
-                  const Binarization cabac_binarization);
+                  const Binarization cabac_binarization,
+                  const core::GenDesc descriptor_ID,
+                  const core::GenSubIndex subsequence_ID,
+                  const core::AlphabetID alphabet_ID);
 
     virtual ~StateVars() = default;
 
@@ -56,11 +61,11 @@ class StateVars {
         return cLengthBI;
     }
 
-    uint32_t getCodingOrderCtxOffset(uint8_t index) const {
+    uint64_t getCodingOrderCtxOffset(uint8_t index) const {
         return codingOrderCtxOffset[index];
     }
 
-    uint32_t getCodingSizeCtxOffset() const {
+    uint64_t getCodingSizeCtxOffset() const {
         return codingSizeCtxOffset;
     }
 
@@ -68,13 +73,18 @@ class StateVars {
         return numCtxLuts;
     }
 
-    uint32_t getNumCtxTotal() const {
+    uint64_t getNumCtxTotal() const {
         return numCtxTotal;
     }
 
     /* some extra functions (for now put in statevars)
      * FIXME move else where
      */
+    static
+    uint64_t getNumAlphaSpecial(const core::GenDesc descriptor_ID,
+                                const core::GenSubIndex subsequence_ID,
+                                const core::AlphabetID alphabet_ID);
+
     static
     uint64_t get2PowN(uint8_t N) {
         assert(N<=32);
