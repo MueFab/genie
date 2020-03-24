@@ -22,34 +22,39 @@ namespace entropy {
 namespace paramcabac {
 
 /**
- * ISO 23092-2 Section 8.3.3.2 table 99
+ * ISO 23092-2 Section 8.3.3.2 table 99  // FIXME update all of these clause numbers and tables.
  */
 class Context {
-   private:
-    uint8_t adaptive_mode_flag : 1;                     //!< Line 2
-    uint16_t num_contexts : 16;                         //!< Line 3
-    std::vector<uint8_t> context_initialization_value;  //!< : 7; Lines 4-6
-    boost::optional<bool> share_subsym_ctx_flag;        //!< : 1; Line 8
    public:
-    Context(bool adaptive_mode_flag, uint8_t coding_subsym_size, uint8_t output_symbol_size,
-            bool _share_subsym_ctx_flag);
-
     Context();
 
-    Context(uint8_t coding_subsym_size, uint8_t output_symbol_size, util::BitReader& reader);
+    Context(bool adaptive_mode_flag,
+            uint8_t output_symbol_size,
+            uint8_t coding_subsym_size,
+            bool _share_subsym_ctx_flag);
+
+    Context(uint8_t output_symbol_size,
+            uint8_t coding_subsym_size,
+            util::BitReader& reader);
     virtual ~Context() = default;
 
     void addContextInitializationValue(uint8_t _context_initialization_value);
 
     virtual void write(util::BitWriter& writer) const;
 
-    uint8_t getAdaptiveModeFlag() const;
+    bool getAdaptiveModeFlag() const;
 
     uint16_t getNumContexts() const;
 
     bool getShareSubsymCtxFlag() const;
 
     const std::vector<uint8_t>& getContextInitializationValue() const;
+
+   private:
+    bool adaptive_mode_flag : true;                     //!< Line 2
+    uint16_t num_contexts : 16;                         //!< Line 3
+    std::vector<uint8_t> context_initialization_value;  //!< : 7; Lines 4-6
+    boost::optional<bool> share_subsym_ctx_flag;        //!< : 1; Line 8
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
