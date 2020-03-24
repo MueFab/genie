@@ -1,4 +1,5 @@
 #include "code.h"
+#include "config.h"
 
 #include <algorithm>
 #include <cassert>
@@ -56,10 +57,8 @@ void code(const std::string &inputFilePath,
                                                      genie::entropy::gabac::IOConfiguration::LogLevel::INFO};
 
     // input string to the internal GABAC configuration
-    genie::entropy::gabac::EncodingConfiguration configuration;
-    {
-        // TODO populate config based on descID, subseqID
-    }
+    genie::entropy::gabac::EncodingConfiguration configuration =
+            getEncoderConfig(descID, subseqID);
 
     genie::entropy::gabac::run(ioconf, configuration, decode);
 
