@@ -25,7 +25,8 @@ class Subsequence {
    public:
     Subsequence();
 
-    Subsequence(TransformedParameters&& _transform_subseq_parameters, uint16_t descriptor_subsequence_ID,
+    Subsequence(TransformedParameters&& _transform_subseq_parameters,
+                uint16_t descriptor_subsequence_ID,
                 bool tokentype);
 
     Subsequence(bool tokentype, util::BitReader& reader);

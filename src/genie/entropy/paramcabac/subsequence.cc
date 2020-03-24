@@ -20,7 +20,8 @@ namespace paramcabac {
 Subsequence::Subsequence()
     : Subsequence(TransformedParameters(), 0, false) {}
 
-Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters, uint16_t _descriptor_subsequence_ID,
+Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters,
+                         uint16_t _descriptor_subsequence_ID,
                          bool tokentype)
     : descriptor_subsequence_ID(),
       transform_subseq_parameters(std::move(_transform_subseq_parameters)),
