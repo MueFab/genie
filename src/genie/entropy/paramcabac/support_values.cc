@@ -16,22 +16,19 @@ namespace paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SupportValues::SupportValues() : SupportValues(3, 3, 1, TransformIdSubsym::NO_TRANSFORM) {}
+SupportValues::SupportValues() : SupportValues(3, 3, 1) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 SupportValues::SupportValues(uint8_t _output_symbol_size, uint8_t _coding_subsym_size, uint8_t _coding_order,
-                             const TransformIdSubsym &transform_ID_subsym, bool _share_subsym_prv_flag,
-                             bool _share_subsym_lut_flag)
+                             bool _share_subsym_prv_flag, bool _share_subsym_lut_flag)
     : output_symbol_size(_output_symbol_size),
       coding_subsym_size(_coding_subsym_size),
       coding_order(_coding_order),
       share_subsym_lut_flag(),
       share_subsym_prv_flag() {
     if (coding_subsym_size < output_symbol_size && coding_order > 0) {
-        if (transform_ID_subsym == TransformIdSubsym::LUT_TRANSFORM) {
-            share_subsym_lut_flag = _share_subsym_lut_flag;
-        }
+        share_subsym_lut_flag = _share_subsym_lut_flag;
         share_subsym_prv_flag = _share_subsym_prv_flag;
     }
 }
