@@ -22,7 +22,7 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-Reader::Reader(util::DataBlock *const bitstream, bool bypassFlag, unsigned int numContexts)
+Reader::Reader(util::DataBlock *const bitstream, bool bypassFlag, unsigned long numContexts)
     : m_bitInputStream(bitstream),
       m_decBinCabac(m_bitInputStream),
       m_bypassFlag(bypassFlag),

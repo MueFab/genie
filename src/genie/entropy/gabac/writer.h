@@ -27,7 +27,7 @@ namespace gabac {
 
 class Writer {
    public:
-    explicit Writer(OBufferStream *bitstream, bool bypassFlag = true, unsigned int numContexts = 0);
+    explicit Writer(OBufferStream *bitstream, bool bypassFlag = true, unsigned long numContexts = 0);
 
     ~Writer();
 
@@ -69,7 +69,7 @@ class Writer {
     BinaryArithmeticEncoder m_binaryArithmeticEncoder;
 
     bool m_bypassFlag;
-    unsigned int m_numContexts;
+    unsigned long m_numContexts;
 
     std::vector<ContextModel> m_contextModels;
 };
