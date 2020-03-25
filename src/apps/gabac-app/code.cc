@@ -56,11 +56,7 @@ void code(const std::string &inputFilePath,
     genie::entropy::gabac::IOConfiguration ioconf = {istream, ostream, blocksize, logstream,
                                                      genie::entropy::gabac::IOConfiguration::LogLevel::INFO};
 
-    // input string to the internal GABAC configuration
-    genie::entropy::gabac::EncodingConfiguration configuration =
-            getEncoderConfig(descID, subseqID);
-
-    genie::entropy::gabac::run(ioconf, configuration, decode);
+    genie::entropy::gabac::run(ioconf, getEncoderConfig(descID, subseqID), decode);
 
     /* GABACIFY_LOG_INFO << "Wrote buffer of size "
                       << outStream.bytesWritten()
