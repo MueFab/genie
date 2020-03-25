@@ -27,7 +27,8 @@ class Subsequence {
 
     Subsequence(TransformedParameters&& _transform_subseq_parameters,
                 uint16_t descriptor_subsequence_ID,
-                bool tokentype);
+                bool tokentype,
+                std::vector<TransformedSeq>&& transformSubseq_cfgs);
 
     Subsequence(bool tokentype, util::BitReader& reader);
 
