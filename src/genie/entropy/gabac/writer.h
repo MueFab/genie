@@ -69,6 +69,14 @@ class Writer {
 
     void writeAsSSUTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
+    void writeAsDTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
+
+    void writeAsDTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+
+    void writeAsSDTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
+
+    void writeAsSDTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+
     void writeNumSymbols(unsigned int numSymbols);
 
    private:

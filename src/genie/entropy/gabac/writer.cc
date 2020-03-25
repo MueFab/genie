@@ -291,6 +291,57 @@ void Writer::writeAsSSUTUcabac(uint64_t input, const std::vector<unsigned int> b
     }
 }
 
+void Writer::writeAsDTUbypass(uint64_t input, const std::vector<unsigned int> binParams) {
+
+    const unsigned int cMaxDtu = binParams[2];
+
+    writeAsTUbypass((input<cMaxDtu) ? input : cMaxDtu, std::vector<unsigned int>({cMaxDtu}));
+
+    if(input >= cMaxDtu) {
+        input -= cMaxDtu;
+
+        writeAsSUTUbypass(input, binParams);
+    }
+}
+
+void Writer::writeAsDTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+
+    const unsigned int cMaxDtu = binParams[2];
+
+    writeAsTUcabac((input<cMaxDtu) ? input : cMaxDtu, std::vector<unsigned int>({cMaxDtu}), ctxIdx);
+
+    if(input >= cMaxDtu) {
+        input -= cMaxDtu;
+
+        writeAsSUTUcabac(input, binParams, ctxIdx + cMaxDtu);
+    }
+}
+
+void Writer::writeAsSDTUbypass(uint64_t input, const std::vector<unsigned int> binParams) {
+
+    if (int64_t(input) < 0) {
+        writeAsDTUbypass(uint64_t(-int64_t(input)), binParams);
+        writeAsBIbypass(1, std::vector<unsigned int>({1}));
+    } else if (input > 0) {
+        writeAsDTUbypass(uint64_t(input), binParams);
+        writeAsBIbypass(0, std::vector<unsigned int>({1}));
+    } else {
+        writeAsDTUbypass(0, binParams);
+    }
+}
+
+void Writer::writeAsSDTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    if (int64_t(input) < 0) {
+        writeAsDTUcabac(uint64_t(-int64_t(input)), binParams, ctxIdx);
+        writeAsBIcabac(1, std::vector<unsigned int>({1}), ctxIdx);  // FIXME fix ctxIdx for sign bit
+    } else if (input > 0) {
+        writeAsDTUcabac(uint64_t(input), binParams, ctxIdx);
+        writeAsBIcabac(0, std::vector<unsigned int>({1}), ctxIdx);  // FIXME fix ctxIdx for sign bit
+    } else {
+        writeAsDTUcabac(0, binParams, ctxIdx);
+    }
+}
+
 void Writer::writeNumSymbols(unsigned int numSymbols) { m_bitOutputStream.write(numSymbols, 32); }
 }  // namespace gabac
 }  // namespace entropy
