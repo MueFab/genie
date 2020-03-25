@@ -43,7 +43,6 @@ class StateVars {
     void populate(const SupportValues::TransformIdSubsym transform_ID_subsym,
                   const SupportValues support_values,
                   const Binarization cabac_binarization,
-                  const core::GenDesc descriptor_ID,
                   const core::GenSubIndex subsequence_ID,
                   const core::AlphabetID alphabet_ID);
 
@@ -81,8 +80,7 @@ class StateVars {
      * FIXME move else where
      */
     static
-    uint64_t getNumAlphaSpecial(const core::GenDesc descriptor_ID,
-                                const core::GenSubIndex subsequence_ID,
+    uint64_t getNumAlphaSpecial(const core::GenSubIndex subsequence_ID,
                                 const core::AlphabetID alphabet_ID);
 
     static

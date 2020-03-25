@@ -26,29 +26,24 @@ StateVars::StateVars()
       numCtxTotal(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
-uint64_t StateVars::getNumAlphaSpecial(const core::GenDesc descriptor_ID,
-                                       const core::GenSubIndex subsequence_ID,
+uint64_t StateVars::getNumAlphaSpecial(const core::GenSubIndex subsequence_ID,
                                        const core::AlphabetID alphabet_ID) {
     unsigned long numAlphaSpecial = 0;
-    if(descriptor_ID == core::GenDesc::MMTYPE) {
-        if(subsequence_ID == core::GenSub::MMTYPE_TYPE) { // subseq 0
+    if(subsequence_ID == core::GenSub::MMTYPE_TYPE) { // mmtype subseq 0
             numAlphaSpecial = 3;
-        } else if((subsequence_ID == core::GenSub::MMTYPE_SUBSTITUTION) // subseq 1
-                ||(subsequence_ID == core::GenSub::MMTYPE_INSERTION) // subseq 2
-        ) {
-            numAlphaSpecial = (alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16;
-        }
-    } else if(descriptor_ID == core::GenDesc::CLIPS) {
-        if(subsequence_ID == core::GenSub::CLIPS_TYPE) { // subseq 1
-            numAlphaSpecial = 9;
-        } else if(subsequence_ID == core::GenSub::CLIPS_SOFT_STRING) { // subseq 2
-            numAlphaSpecial = ((alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16) + 1;
-        }
-    } else if(descriptor_ID == core::GenDesc::UREADS && subsequence_ID == core::GenSub::UREADS) { // subseq 0
+    } else if((subsequence_ID == core::GenSub::MMTYPE_SUBSTITUTION) // mmtype subseq 1
+            ||(subsequence_ID == core::GenSub::MMTYPE_INSERTION) // mmtype subseq 2
+    ) {
         numAlphaSpecial = (alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16;
-    } else if(descriptor_ID == core::GenDesc::RTYPE && subsequence_ID ==  core::GenSub::RTYPE) {
+    } if(subsequence_ID == core::GenSub::CLIPS_TYPE) { // mmtype subseq 1
+            numAlphaSpecial = 9;
+    } else if(subsequence_ID == core::GenSub::CLIPS_SOFT_STRING) { // subseq 2
+        numAlphaSpecial = ((alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16) + 1;
+    } else if(subsequence_ID == core::GenSub::UREADS) { // ureads subseq 0
+        numAlphaSpecial = (alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16;
+    } else if(subsequence_ID ==  core::GenSub::RTYPE) { // rtype subseq 0
         numAlphaSpecial = 6;
-    } else if(descriptor_ID == core::GenDesc::RFTT && subsequence_ID == core::GenSub::RFTT) { // subseq 0
+    } else if(subsequence_ID == core::GenSub::RFTT) { // rftt subseq 0
         numAlphaSpecial = (alphabet_ID == core::AlphabetID::ACGTN) ? 5 : 16;
     }
 
@@ -59,7 +54,6 @@ uint64_t StateVars::getNumAlphaSpecial(const core::GenDesc descriptor_ID,
 void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_subsym,
                          const SupportValues support_values,
                          const Binarization cabac_binarization,
-                         const core::GenDesc descriptor_ID,
                          const core::GenSubIndex subsequence_ID,
                          const core::AlphabetID alphabet_ID) {
 
@@ -82,7 +76,7 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
 
     // numAlphaSubsym
     // Check for special cases for numAlphaSubsym
-    numAlphaSubsym = StateVars::getNumAlphaSpecial(descriptor_ID, subsequence_ID, alphabet_ID);
+    numAlphaSubsym = StateVars::getNumAlphaSpecial(subsequence_ID, alphabet_ID);
 
     if(numAlphaSubsym == 0) { // 0 == not special
         numAlphaSubsym = StateVars::get2PowN(codingSubsymSize);
@@ -200,7 +194,7 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
                                     numCtxSubsym :
                                     codingOrderCtxOffset[codingOrder] *
                                     numAlphaSubsym);
-            std::cout<<"NumContexts: "<< std::to_string(numCtxTotal) << std::endl;
+            //std::cout<<"NumContexts: "<< std::to_string(numCtxTotal) << std::endl;
         }
     } // if (!cabac_binarization.getBypassFlag())
 }
