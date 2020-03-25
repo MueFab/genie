@@ -34,12 +34,11 @@ EncodingConfiguration getEncoderConfig(
 
     uint8_t symSize;
     GenDesc genieDescID = (GenDesc) descID;
-    GenSubIndex geniesubseqID = (GenSubIndex) std::pair<GenDesc, uint8_t>(genieDescID, subseqID);
+    GenSubIndex genieSubseqID = (GenSubIndex) std::pair<GenDesc, uint8_t>(genieDescID, subseqID);
 
     // default values
     AlphabetID alphaID = AlphabetID::ACGTN;
-    uint64_t numAlphaSpecial = StateVars::getNumAlphaSpecial(genieDescID,
-                                                             geniesubseqID,
+    uint64_t numAlphaSpecial = StateVars::getNumAlphaSpecial(genieSubseqID,
                                                              alphaID);
 
     TransformedParameters::TransformIdSubseq trnsfSubseqID =
@@ -68,20 +67,21 @@ EncodingConfiguration getEncoderConfig(
         GABAC_DIE("Unsupported subseqID "+std::to_string(subseqID)+" for descID value "+std::to_string(subseqID));
     }
 
-    Subsequence subseqCfg(
-            TransformedParameters(trnsfSubseqID, 0),
-            subseqID,
-            tokenTypeFlag);
     TransformedSeq trnsfSubseqCfg(
             trnsfSubsymID,
-            SupportValues(outputSymbolSize, codingSubSymSize, codingOrder, shareSubsymPrvFlag, shareSubsymLutFlag),
+            SupportValues(outputSymbolSize, codingSubSymSize, codingOrder, shareSubsymLutFlag, shareSubsymPrvFlag),
             Binarization(binID,
                          bypassFlag,
                          BinarizationParameters(binID, binParams),
-                         Context(adaptiveModeFlag, outputSymbolSize, codingSubSymSize, shareSubsymCtxFlag))
+                         Context(adaptiveModeFlag, outputSymbolSize, codingSubSymSize, shareSubsymCtxFlag)),
+            genieSubseqID,
+            alphaID
             );
-
-    subseqCfg.setTransformSubseqCfg(0, std::move(trnsfSubseqCfg));
+    Subsequence subseqCfg(
+            TransformedParameters(trnsfSubseqID, 0),
+            subseqID,
+            tokenTypeFlag,
+            std::vector<TransformedSeq>({trnsfSubseqCfg}));
 
     return EncodingConfiguration(std::move(subseqCfg));
 }
