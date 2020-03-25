@@ -85,10 +85,10 @@ void Writer::writeAsBIbypass(uint64_t input, unsigned int cLength) {
     m_binaryArithmeticEncoder.encodeBinsEP(static_cast<unsigned int>(input), cLength);
 }
 
-void Writer::writeAsBIcabac(uint64_t input, unsigned int cLength, unsigned int offset) {
+void Writer::writeAsBIcabac(uint64_t input, unsigned int cLength, unsigned int ctxIdx) {
     //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::BI).sbCheck(input, input, cLength));
 
-    unsigned int cm = offset;
+    unsigned int cm = ctxIdx;
     auto scan = m_contextModels.begin() + cm;
     for (int i = cLength - 1; i >= 0; i--)  // i must be signed
     {
@@ -108,10 +108,10 @@ void Writer::writeAsTUbypass(uint64_t input, unsigned int cMax) {
     }
 }
 
-void Writer::writeAsTUcabac(uint64_t input, unsigned int cMax, unsigned int offset) {
+void Writer::writeAsTUcabac(uint64_t input, unsigned int cMax, unsigned int ctxIdx) {
     //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::TU).sbCheck(input, input, cMax));
 
-    unsigned int cm = offset;
+    unsigned int cm = ctxIdx;
 
     auto scan = m_contextModels.begin() + cm;
 
@@ -136,13 +136,13 @@ void Writer::writeAsEGbypass(uint64_t input, unsigned int) {
     m_binaryArithmeticEncoder.encodeBinsEP(static_cast<unsigned>(input), length);
 }
 
-void Writer::writeAsEGcabac(uint64_t input, unsigned int, unsigned int offset) {
+void Writer::writeAsEGcabac(uint64_t input, unsigned int, unsigned int ctxIdx) {
     //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::EG).sbCheck(input, input, 0));
 
     input++;
     unsigned int i = 0;
 
-    unsigned int cm = offset;
+    unsigned int cm = ctxIdx;
     auto scan = m_contextModels.begin() + cm;
     unsigned int length = ((bitLength(static_cast<uint64_t>(input)) - 1) << 1u) + 1;
 
@@ -168,13 +168,13 @@ void Writer::writeAsSEGbypass(uint64_t input, unsigned int) {
     }
 }
 
-void Writer::writeAsSEGcabac(uint64_t input, unsigned int, unsigned int offset) {
+void Writer::writeAsSEGcabac(uint64_t input, unsigned int, unsigned int ctxIdx) {
     //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::SEG).sbCheck(uint64_t(input), uint64_t(input), 0));
 
     if (int64_t(input) <= 0) {
-        writeAsEGcabac(static_cast<unsigned int>(-int64_t(input)) << 1u, 0, offset);
+        writeAsEGcabac(static_cast<unsigned int>(-int64_t(input)) << 1u, 0, ctxIdx);
     } else {
-        writeAsEGcabac(static_cast<unsigned int>(static_cast<uint64_t>(input) << 1u) - 1, 0, offset);
+        writeAsEGcabac(static_cast<unsigned int>(static_cast<uint64_t>(input) << 1u) - 1, 0, ctxIdx);
     }
 }
 
@@ -189,14 +189,14 @@ void Writer::writeAsTEGbypass(uint64_t input, unsigned int cTruncExpGolParam) {
     }
 }
 
-void Writer::writeAsTEGcabac(uint64_t input, unsigned int cTruncExpGolParam, unsigned int offset) {
+void Writer::writeAsTEGcabac(uint64_t input, unsigned int cTruncExpGolParam, unsigned int ctxIdx) {
     //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::TEG).sbCheck(input, input, cTruncExpGolParam));
 
     if (input < cTruncExpGolParam) {
-        writeAsTUcabac(input, cTruncExpGolParam, offset);
+        writeAsTUcabac(input, cTruncExpGolParam, ctxIdx);
     } else {
-        writeAsTUcabac(cTruncExpGolParam, cTruncExpGolParam, offset);
-        writeAsEGcabac(input - cTruncExpGolParam, 0, offset);
+        writeAsTUcabac(cTruncExpGolParam, cTruncExpGolParam, ctxIdx);
+        writeAsEGcabac(input - cTruncExpGolParam, 0, ctxIdx);
     }
 }
 
@@ -214,17 +214,77 @@ void Writer::writeAsSTEGbypass(uint64_t input, unsigned int cSignedTruncExpGolPa
     }
 }
 
-void Writer::writeAsSTEGcabac(uint64_t input, unsigned int cSignedTruncExpGolParam, unsigned int offset) {
+void Writer::writeAsSTEGcabac(uint64_t input, unsigned int cSignedTruncExpGolParam, unsigned int ctxIdx) {
     //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::STEG).sbCheck(uint64_t(input), uint64_t(input), cSignedTruncExpGolParam));
 
     if (int64_t(input) < 0) {
-        writeAsTEGcabac(uint64_t(-int64_t(input)), cSignedTruncExpGolParam, offset);
-        writeAsBIcabac(1, 1, offset);
+        writeAsTEGcabac(uint64_t(-int64_t(input)), cSignedTruncExpGolParam, ctxIdx);
+        writeAsBIcabac(1, 1, ctxIdx);
     } else if (input > 0) {
-        writeAsTEGcabac(uint64_t(input), cSignedTruncExpGolParam, offset);
-        writeAsBIcabac(0, 1, offset);
+        writeAsTEGcabac(uint64_t(input), cSignedTruncExpGolParam, ctxIdx);
+        writeAsBIcabac(0, 1, ctxIdx);
     } else {
-        writeAsTEGcabac(0, cSignedTruncExpGolParam, offset);
+        writeAsTEGcabac(0, cSignedTruncExpGolParam, ctxIdx);
+    }
+}
+
+void Writer::writeAsSUTUbypass(uint64_t input,
+                              unsigned int outputSymSize,
+                              unsigned int splitUnitSize) {
+    unsigned int i, j;
+    for(i=0, j=outputSymSize; i<outputSymSize; i+=splitUnitSize) {
+        unsigned int unitSize = (i == 0 && outputSymSize % splitUnitSize)
+                                ? outputSymSize % splitUnitSize
+                                : splitUnitSize;
+        unsigned int cMax = (1u<<unitSize)-1;
+        unsigned int val = (input>>(j-=unitSize)) & cMax;
+        writeAsTUbypass(val, cMax);
+    }
+}
+
+void Writer::writeAsSUTUcabac(uint64_t input,
+                              unsigned int outputSymSize,
+                              unsigned int splitUnitSize,
+                              unsigned int ctxIdx) {
+    unsigned int cm = ctxIdx;
+    unsigned int i, j;
+    for(i=0, j=outputSymSize; i<outputSymSize; i+=splitUnitSize) {
+        unsigned int unitSize = (i == 0 && outputSymSize % splitUnitSize)
+                                ? outputSymSize % splitUnitSize
+                                : splitUnitSize;
+        unsigned int cMax = (1u<<unitSize)-1;
+        unsigned int val = (input>>(j-=unitSize)) & cMax;
+        writeAsTUcabac(val, cMax, cm);
+        cm += cMax;
+    }
+}
+
+void Writer::writeAsSSUTUbypass(uint64_t input,
+                                unsigned int outputSymSize,
+                                unsigned int splitUnitSize) {
+    if (int64_t(input) < 0) {
+        writeAsSUTUbypass(uint64_t(-int64_t(input)), outputSymSize, splitUnitSize);
+        writeAsBIbypass(1, 1);
+    } else if (input > 0) {
+        writeAsSUTUbypass(uint64_t(input), outputSymSize, splitUnitSize);
+        writeAsBIbypass(0, 1);
+    } else {
+        writeAsSUTUbypass(0, outputSymSize, splitUnitSize);
+    }
+}
+
+void Writer::writeAsSSUTUcabac(uint64_t input,
+                               unsigned int outputSymSize,
+                               unsigned int splitUnitSize,
+                               unsigned int ctxIdx) {
+    if (int64_t(input) < 0) {
+        writeAsSUTUcabac(uint64_t(-int64_t(input)), outputSymSize, splitUnitSize, ctxIdx);
+        writeAsBIbypass(1, 1);
+    } else if (input > 0) {
+        writeAsSUTUcabac(uint64_t(input), outputSymSize, splitUnitSize, ctxIdx);
+        writeAsBIbypass(0, 1);
+    } else {
+        writeAsSUTUcabac(0, outputSymSize, splitUnitSize, ctxIdx);
     }
 }
 

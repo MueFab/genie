@@ -39,27 +39,45 @@ class Writer {
 
     void writeAsBIbypass(uint64_t input, unsigned int cLength);
 
-    void writeAsBIcabac(uint64_t input, unsigned int cLength, unsigned int offset);
+    void writeAsBIcabac(uint64_t input, unsigned int cLength, unsigned int ctxIdx);
 
     void writeAsTUbypass(uint64_t input, unsigned int cMax);
 
-    void writeAsTUcabac(uint64_t input, unsigned int cMax, unsigned int offset);
+    void writeAsTUcabac(uint64_t input, unsigned int cMax, unsigned int ctxIdx);
 
     void writeAsEGbypass(uint64_t input, unsigned int dummy);
 
-    void writeAsEGcabac(uint64_t input, unsigned int dummy, unsigned int offset);
+    void writeAsEGcabac(uint64_t input, unsigned int dummy, unsigned int ctxIdx);
 
     void writeAsSEGbypass(uint64_t input, unsigned int dummy);
 
-    void writeAsSEGcabac(uint64_t input, unsigned int dummy, unsigned int offset);
+    void writeAsSEGcabac(uint64_t input, unsigned int dummy, unsigned int ctxIdx);
 
     void writeAsTEGbypass(uint64_t input, unsigned int cTruncExpGolParam);
 
-    void writeAsTEGcabac(uint64_t input, unsigned int cTruncExpGolParam, unsigned int offset);
+    void writeAsTEGcabac(uint64_t input, unsigned int cTruncExpGolParam, unsigned int ctxIdx);
 
     void writeAsSTEGbypass(uint64_t input, unsigned int cSignedTruncExpGolParam);
 
-    void writeAsSTEGcabac(uint64_t input, unsigned int cSignedTruncExpGolParam, unsigned int offset);
+    void writeAsSTEGcabac(uint64_t input, unsigned int cSignedTruncExpGolParam, unsigned int ctxIdx);
+
+    void writeAsSUTUbypass(uint64_t input,
+                           unsigned int outputSymSize,
+                           unsigned int splitUnitSize);
+
+    void writeAsSUTUcabac(uint64_t input,
+                          unsigned int outputSymSize,
+                          unsigned int splitUnitSize,
+                          unsigned int ctxIdx);
+
+    void writeAsSSUTUbypass(uint64_t input,
+                            unsigned int outputSymSize,
+                            unsigned int splitUnitSize);
+
+    void writeAsSSUTUcabac(uint64_t input,
+                           unsigned int outputSymSize,
+                           unsigned int splitUnitSize,
+                           unsigned int ctxIdx);
 
     void writeNumSymbols(unsigned int numSymbols);
 
