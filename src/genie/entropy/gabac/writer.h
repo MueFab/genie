@@ -27,57 +27,47 @@ namespace gabac {
 
 class Writer {
    public:
-    explicit Writer(OBufferStream *bitstream, bool bypassFlag = true, unsigned long numContexts = 0);
+    explicit Writer(OBufferStream *bitstream, const bool bypassFlag = true, const unsigned long numContexts = 0);
 
     ~Writer();
 
-    void start(size_t numSymbols);
+    void start(const size_t numSymbols);
 
     void close();
 
     void reset();
 
-    void writeAsBIbypass(uint64_t input, unsigned int cLength);
+    void writeAsBIbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsBIcabac(uint64_t input, unsigned int cLength, unsigned int ctxIdx);
+    void writeAsBIcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
-    void writeAsTUbypass(uint64_t input, unsigned int cMax);
+    void writeAsTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsTUcabac(uint64_t input, unsigned int cMax, unsigned int ctxIdx);
+    void writeAsTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
-    void writeAsEGbypass(uint64_t input, unsigned int dummy);
+    void writeAsEGbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsEGcabac(uint64_t input, unsigned int dummy, unsigned int ctxIdx);
+    void writeAsEGcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
-    void writeAsSEGbypass(uint64_t input, unsigned int dummy);
+    void writeAsSEGbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsSEGcabac(uint64_t input, unsigned int dummy, unsigned int ctxIdx);
+    void writeAsSEGcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
-    void writeAsTEGbypass(uint64_t input, unsigned int cTruncExpGolParam);
+    void writeAsTEGbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsTEGcabac(uint64_t input, unsigned int cTruncExpGolParam, unsigned int ctxIdx);
+    void writeAsTEGcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
-    void writeAsSTEGbypass(uint64_t input, unsigned int cSignedTruncExpGolParam);
+    void writeAsSTEGbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsSTEGcabac(uint64_t input, unsigned int cSignedTruncExpGolParam, unsigned int ctxIdx);
+    void writeAsSTEGcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
-    void writeAsSUTUbypass(uint64_t input,
-                           unsigned int outputSymSize,
-                           unsigned int splitUnitSize);
+    void writeAsSUTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsSUTUcabac(uint64_t input,
-                          unsigned int outputSymSize,
-                          unsigned int splitUnitSize,
-                          unsigned int ctxIdx);
+    void writeAsSUTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
-    void writeAsSSUTUbypass(uint64_t input,
-                            unsigned int outputSymSize,
-                            unsigned int splitUnitSize);
+    void writeAsSSUTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsSSUTUcabac(uint64_t input,
-                           unsigned int outputSymSize,
-                           unsigned int splitUnitSize,
-                           unsigned int ctxIdx);
+    void writeAsSSUTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
     void writeNumSymbols(unsigned int numSymbols);
 
