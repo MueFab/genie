@@ -15,7 +15,7 @@ namespace gabac {
 
 class ContextModel {
    public:
-    explicit ContextModel(unsigned char state = 64);
+    explicit ContextModel(unsigned char initState = 64);
 
     ~ContextModel();
 
