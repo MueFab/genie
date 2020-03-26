@@ -22,7 +22,7 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-Reader::Reader(util::DataBlock *const bitstream, bool bypassFlag, unsigned long numContexts)
+Reader::Reader(util::DataBlock *const bitstream, const bool bypassFlag, const unsigned long numContexts)
     : m_bitInputStream(bitstream),
       m_decBinCabac(m_bitInputStream),
       m_bypassFlag(bypassFlag),
@@ -34,11 +34,12 @@ Reader::Reader(util::DataBlock *const bitstream, bool bypassFlag, unsigned long 
 
 Reader::~Reader() = default;
 
-uint64_t Reader::readAsBIbypass(unsigned int cLength) { return m_decBinCabac.decodeBinsEP(cLength); }
+uint64_t Reader::readAsBIbypass(const std::vector<unsigned int> binParams) { return m_decBinCabac.decodeBinsEP(binParams[0]); }
 
-uint64_t Reader::readAsBIcabac(unsigned int cLength, unsigned int offset) {
+uint64_t Reader::readAsBIcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
     unsigned int bins = 0;
-    unsigned int cm = offset;
+    unsigned int cm = ctxIdx;
+    const unsigned int cLength = binParams[0];
     auto scan = m_contextModels.begin() + cm;
     for (size_t i = cLength; i > 0; i--) {
         bins = (bins << 1u) | m_decBinCabac.decodeBin(&*(scan++));
@@ -46,9 +47,10 @@ uint64_t Reader::readAsBIcabac(unsigned int cLength, unsigned int offset) {
     return static_cast<uint64_t>(bins);
 }
 
-uint64_t Reader::readAsTUbypass(unsigned int cMax) {
+uint64_t Reader::readAsTUbypass(const std::vector<unsigned int> binParams) {
     unsigned int i = 0;
-    while (readAsBIbypass(1) == 1) {
+    const unsigned int cMax = binParams[0];
+    while (readAsBIbypass(std::vector<unsigned int>({1})) == 1) {
         i++;
         if (i == cMax) {
             break;
@@ -57,9 +59,10 @@ uint64_t Reader::readAsTUbypass(unsigned int cMax) {
     return static_cast<uint64_t>(i);
 }
 
-uint64_t Reader::readAsTUcabac(unsigned int cMax, unsigned int offset) {
+uint64_t Reader::readAsTUcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
     unsigned int i = 0;
-    unsigned int cm = offset;
+    unsigned int cm = ctxIdx;
+    const unsigned int cMax = binParams[0];
     auto scan = m_contextModels.begin() + cm;
     while (m_decBinCabac.decodeBin(&*scan) == 1) {
         i++;
@@ -72,10 +75,10 @@ uint64_t Reader::readAsTUcabac(unsigned int cMax, unsigned int offset) {
     return static_cast<uint64_t>(i);
 }
 
-uint64_t Reader::readAsEGbypass(unsigned int) {
+uint64_t Reader::readAsEGbypass(const std::vector<unsigned int>) {
     unsigned int bins = 0;
     unsigned int i = 0;
-    while (readAsBIbypass(1) == 0) {
+    while (readAsBIbypass(std::vector<unsigned int>({1})) == 0) {
         i++;
     }
     if (i != 0) {
@@ -86,8 +89,8 @@ uint64_t Reader::readAsEGbypass(unsigned int) {
     return static_cast<uint64_t>(bins - 1);
 }
 
-uint64_t Reader::readAsEGcabac(unsigned int, unsigned int offset) {
-    unsigned int cm = offset;
+uint64_t Reader::readAsEGcabac(const std::vector<unsigned int>, const unsigned int ctxIdx) {
+    unsigned int cm = ctxIdx;
     auto scan = m_contextModels.begin() + cm;
     unsigned int i = 0;
     while (m_decBinCabac.decodeBin(&*scan) == 0) {
@@ -103,8 +106,8 @@ uint64_t Reader::readAsEGcabac(unsigned int, unsigned int offset) {
     return static_cast<uint64_t>(bins - 1);
 }
 
-uint64_t Reader::readAsSEGbypass(unsigned int) {
-    uint64_t tmp = readAsEGbypass(0);
+uint64_t Reader::readAsSEGbypass(const std::vector<unsigned int> binParams) {
+    uint64_t tmp = readAsEGbypass(binParams);
     // Save, only last bit
     if ((static_cast<uint64_t>(tmp) & 0x1u) == 0) {
         if (tmp == 0) {
@@ -117,8 +120,8 @@ uint64_t Reader::readAsSEGbypass(unsigned int) {
     }
 }
 
-uint64_t Reader::readAsSEGcabac(unsigned int, unsigned int offset) {
-    uint64_t tmp = readAsEGcabac(0, offset);
+uint64_t Reader::readAsSEGcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    uint64_t tmp = readAsEGcabac(binParams, ctxIdx);
     if ((static_cast<uint64_t>(tmp) & 0x1u) == 0) {
         if (tmp == 0) {
             return 0;
@@ -130,26 +133,26 @@ uint64_t Reader::readAsSEGcabac(unsigned int, unsigned int offset) {
     }
 }
 
-uint64_t Reader::readAsTEGbypass(unsigned int treshold) {
-    uint64_t value = readAsTUbypass(treshold);
-    if (static_cast<unsigned int>(value) == treshold) {
-        value += readAsEGbypass(0);
+uint64_t Reader::readAsTEGbypass(const std::vector<unsigned int> binParams) {
+    uint64_t value = readAsTUbypass(binParams);
+    if (static_cast<unsigned int>(value) == binParams[0]) {
+        value += readAsEGbypass(std::vector<unsigned int>({0}));
     }
     return value;
 }
 
-uint64_t Reader::readAsTEGcabac(unsigned int treshold, unsigned int offset) {
-    uint64_t value = readAsTUcabac(treshold, offset);
-    if (static_cast<unsigned int>(value) == treshold) {
-        value += readAsEGcabac(0, offset);
+uint64_t Reader::readAsTEGcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    uint64_t value = readAsTUcabac(binParams, ctxIdx);
+    if (static_cast<unsigned int>(value) == binParams[0]) {
+        value += readAsEGcabac(std::vector<unsigned int>({0}), ctxIdx); //FIXME should not this be ctxIdx+binParams[0]?
     }
     return value;
 }
 
-uint64_t Reader::readAsSTEGbypass(unsigned int treshold) {
-    uint64_t value = readAsTEGbypass(treshold);
+uint64_t Reader::readAsSTEGbypass(const std::vector<unsigned int> binParams) {
+    uint64_t value = readAsTEGbypass(binParams);
     if (value != 0) {
-        if (readAsBIbypass(1) == 1) {
+        if (readAsBIbypass(std::vector<unsigned int>({1})) == 1) {
             return uint64_t(-1 * int64_t(value));
         } else {
             return value;
@@ -158,10 +161,10 @@ uint64_t Reader::readAsSTEGbypass(unsigned int treshold) {
     return value;
 }
 
-uint64_t Reader::readAsSTEGcabac(unsigned int treshold, unsigned int offset) {
-    uint64_t value = readAsTEGcabac(treshold, offset);
+uint64_t Reader::readAsSTEGcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    uint64_t value = readAsTEGcabac(binParams, ctxIdx);
     if (value != 0) {
-        if (readAsBIcabac(1, offset) == 1) {
+        if (readAsBIcabac(std::vector<unsigned int>({1}), ctxIdx) == 1) {  // FIXME fix ctxIdx for sign bit
             return uint64_t(-1 * int64_t(value));
         } else {
             return value;
