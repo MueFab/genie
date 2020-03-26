@@ -35,6 +35,7 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
     const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
     const paramcabac::StateVars &stateVars = conf.getStateVars();
 
+    const uint8_t outputSymbolSize = supportVals.getOutputSymbolSize();
     const uint8_t codingSubsymSize = supportVals.getCodingSubsymSize();
     const bool bypassFlag = binarzation.getBypassFlag();
 
@@ -77,22 +78,25 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
                 binParams[0] = binarzationParams.getCMaxTeg();
                 break;
             case paramcabac::BinarizationParameters::BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY:
-                //func = &Reader::readAsSUTUbypass; TODO
-                binParams[0] = binarzationParams.getSplitUnitSize();
+                func = &Reader::readAsSUTUbypass;
+                binParams[0] = outputSymbolSize;
+                binParams[1] = binarzationParams.getSplitUnitSize();
                 break;
             case paramcabac::BinarizationParameters::BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
-                //func = &Reader::readAsSSUTUbypass; TODO
-                binParams[0] = binarzationParams.getSplitUnitSize();
+                func = &Reader::readAsSSUTUbypass;
+                binParams[0] = outputSymbolSize;
+                binParams[1] = binarzationParams.getSplitUnitSize();
                 break;
             case paramcabac::BinarizationParameters::BinarizationId::DOUBLE_TRUNCATED_UNARY:
-                //func = &Reader::readAsDTUbypass; TODO
-                //binarizationParameter = binarzationParams.getCMaxDtu(); // TODO make binarizationParameter a vector
-                binParams[0] = binarzationParams.getSplitUnitSize();
+                func = &Reader::readAsDTUbypass;
+                binParams[0] = outputSymbolSize;
+                binParams[1] = binarzationParams.getSplitUnitSize();
+                binParams[2] = binarzationParams.getCMaxDtu();
                 break;
             case paramcabac::BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
-                //func = &Reader::readAsSDTUbypass; TODO
-                //binarizationParameter = binarzationParams.getCMaxDtu(); // TODO make binarizationParameter a vector
-                binParams[0] = binarzationParams.getSplitUnitSize();
+                binParams[0] = outputSymbolSize;
+                binParams[1] = binarzationParams.getSplitUnitSize();
+                binParams[2] = binarzationParams.getCMaxDtu();
                 break;
             default:
                 GABAC_DIE("Invalid binarization");
@@ -141,22 +145,26 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
             binParams[0] = binarzationParams.getCMaxTeg();
             break;
         case paramcabac::BinarizationParameters::BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY:
-            //func = &Reader::readAsSUTUcabac; TODO
-            binParams[0] = binarzationParams.getSplitUnitSize();
+            func = &Reader::readAsSUTUcabac;
+            binParams[0] = outputSymbolSize;
+            binParams[1] = binarzationParams.getSplitUnitSize();
             break;
         case paramcabac::BinarizationParameters::BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
-            //func = &Reader::readAsSSUTUcabac; TODO
-            binParams[0] = binarzationParams.getSplitUnitSize();
+            func = &Reader::readAsSSUTUcabac;
+            binParams[0] = outputSymbolSize;
+            binParams[1] = binarzationParams.getSplitUnitSize();
             break;
         case paramcabac::BinarizationParameters::BinarizationId::DOUBLE_TRUNCATED_UNARY:
-            //func = &Reader::readAsDTUcabac; TODO
-            //binarizationParameter = binarzationParams.getCMaxDtu(); // TODO make binarizationParameter a vector
-            binParams[0] = binarzationParams.getSplitUnitSize();
+            func = &Reader::readAsDTUcabac;
+            binParams[0] = outputSymbolSize;
+            binParams[1] = binarzationParams.getSplitUnitSize();
+            binParams[2] = binarzationParams.getCMaxDtu();
             break;
         case paramcabac::BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
-            //func = &Reader::readAsSDTUcabac; TODO
-            //binarizationParameter = binarzationParams.getCMaxDtu(); // TODO make binarizationParameter a vector
-            binParams[0] = binarzationParams.getSplitUnitSize();
+            func = &Reader::readAsSDTUcabac;
+            binParams[0] = outputSymbolSize;
+            binParams[1] = binarzationParams.getSplitUnitSize();
+            binParams[2] = binarzationParams.getCMaxDtu();
             break;
         default:
             GABAC_DIE("Invalid binarization");
