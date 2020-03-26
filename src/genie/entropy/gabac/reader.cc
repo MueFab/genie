@@ -173,6 +173,72 @@ uint64_t Reader::readAsSTEGcabac(const std::vector<unsigned int> binParams, cons
     return value;
 }
 
+uint64_t Reader::readAsSUTUbypass(const std::vector<unsigned int> binParams) {
+    const uint32_t outputSymSize = binParams[0];
+    const uint32_t splitUnitSize = binParams[1];
+
+    uint32_t i;
+    uint64_t value = 0;
+
+    for(i=0; i<outputSymSize; i+=splitUnitSize) {
+        uint64_t val = 0;
+        uint32_t cMax = (i == 0 && outputSymSize % splitUnitSize)
+                      ? (1u<<(outputSymSize % splitUnitSize))-1
+                      : (1u<<splitUnitSize)-1;
+        val = readAsTUbypass(std::vector<unsigned int>({cMax}));
+
+        value = (value<<splitUnitSize) | val;
+    }
+
+    return value;
+}
+
+uint64_t Reader::readAsSUTUcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    const uint32_t outputSymSize = binParams[0];
+    const uint32_t splitUnitSize = binParams[1];
+
+    uint32_t cm = ctxIdx;
+    uint32_t i;
+    uint64_t value = 0;
+
+    for(i=0; i<outputSymSize; i+=splitUnitSize) {
+        uint64_t val = 0;
+        uint32_t cMax = (i == 0 && outputSymSize % splitUnitSize)
+                      ? (1u<<(outputSymSize % splitUnitSize))-1
+                      : (1u<<splitUnitSize)-1;
+        val = readAsTUcabac(std::vector<unsigned int>({cMax}), cm);
+        cm += cMax;
+
+        value = (value<<splitUnitSize) | val;
+    }
+
+    return value;
+}
+
+uint64_t Reader::readAsSSUTUbypass(const std::vector<unsigned int> binParams) {
+    uint64_t value = readAsSUTUbypass(binParams);
+    if (value != 0) {
+        if (readAsBIbypass(std::vector<unsigned int>({1})) == 1) {
+            return uint64_t(-1 * int64_t(value));
+        } else {
+            return value;
+        }
+    }
+    return value;
+}
+
+uint64_t Reader::readAsSSUTUcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    uint64_t value = readAsSUTUcabac(binParams, ctxIdx);
+    if (value != 0) {
+        if (readAsBIcabac(std::vector<unsigned int>({1}), ctxIdx) == 1) {  // FIXME fix ctxIdx for sign bit
+            return uint64_t(-1 * int64_t(value));
+        } else {
+            return value;
+        }
+    }
+    return value;
+}
+
 size_t Reader::readNumSymbols() {
     auto result = m_bitInputStream.read(32);
     return static_cast<size_t>(result);
