@@ -55,6 +55,14 @@ class Reader {
 
     uint64_t readAsSTEGcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
+    uint64_t readAsSUTUbypass(const std::vector<unsigned int> binParams);
+
+    uint64_t readAsSUTUcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+
+    uint64_t readAsSSUTUbypass(const std::vector<unsigned int> binParams);
+
+    uint64_t readAsSSUTUcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+
     size_t start();
 
     void close();
