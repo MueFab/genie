@@ -25,35 +25,35 @@ namespace gabac {
 
 class Reader {
    public:
-    explicit Reader(util::DataBlock *bitstream, bool bypassFlag = true, unsigned long numContexts = 0);
+    explicit Reader(util::DataBlock *bitstream, const bool bypassFlag = true, const unsigned long numContexts = 0);
 
     ~Reader();
 
     size_t readNumSymbols();
 
-    uint64_t readAsBIbypass(unsigned int cLength);
+    uint64_t readAsBIbypass(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsBIcabac(unsigned int cLength, unsigned int offset);
+    uint64_t readAsBIcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
-    uint64_t readAsTUbypass(unsigned int cMax);
+    uint64_t readAsTUbypass(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsTUcabac(unsigned int cMax, unsigned int offset);
+    uint64_t readAsTUcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
-    uint64_t readAsEGbypass(unsigned int dummy);
+    uint64_t readAsEGbypass(const std::vector<unsigned int> dummy);
 
-    uint64_t readAsEGcabac(unsigned int dummy, unsigned int offset);
+    uint64_t readAsEGcabac(const std::vector<unsigned int> dummy, const unsigned int ctxIdx);
 
-    uint64_t readAsSEGbypass(unsigned int dummy);
+    uint64_t readAsSEGbypass(const std::vector<unsigned int> dummy);
 
-    uint64_t readAsSEGcabac(unsigned int dummy, unsigned int offset);
+    uint64_t readAsSEGcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
-    uint64_t readAsTEGbypass(unsigned int treshold);
+    uint64_t readAsTEGbypass(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsTEGcabac(unsigned int treshold, unsigned int offset);
+    uint64_t readAsTEGcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
-    uint64_t readAsSTEGbypass(unsigned int treshold);
+    uint64_t readAsSTEGbypass(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsSTEGcabac(unsigned int treshold, unsigned int offset);
+    uint64_t readAsSTEGcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
     size_t start();
 

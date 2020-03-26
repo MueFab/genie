@@ -200,7 +200,7 @@ void Writer::writeAsTEGcabac(uint64_t input, const std::vector<unsigned int> bin
         writeAsTUcabac(input, binParams, ctxIdx);
     } else {
         writeAsTUcabac(cTruncExpGolParam, binParams, ctxIdx);
-        writeAsEGcabac(input - cTruncExpGolParam, std::vector<unsigned int>({0}), ctxIdx);
+        writeAsEGcabac(input - cTruncExpGolParam, std::vector<unsigned int>({0}), ctxIdx); //FIXME should not this be ctxIdx+binParams[0]?
     }
 }
 
