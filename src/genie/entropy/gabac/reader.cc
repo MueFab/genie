@@ -239,6 +239,54 @@ uint64_t Reader::readAsSSUTUcabac(const std::vector<unsigned int> binParams, con
     return value;
 }
 
+uint64_t Reader::readAsDTUbypass(const std::vector<unsigned int> binParams) {
+    const uint32_t cMaxDTU = binParams[2];
+
+    uint64_t value = readAsTUbypass(std::vector<unsigned int>({cMaxDTU}));
+
+    if(value >= cMaxDTU) {
+        value += readAsSUTUbypass(binParams);
+    }
+
+    return value;
+}
+
+uint64_t Reader::readAsDTUcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    const uint32_t cMaxDTU = binParams[2];
+
+    uint64_t value = readAsTUcabac(std::vector<unsigned int>({cMaxDTU}), ctxIdx);
+
+    if(value >= cMaxDTU) {
+        value += readAsSUTUcabac(binParams, ctxIdx + cMaxDTU);
+    }
+
+    return value;
+}
+
+uint64_t Reader::readAsSDTUbypass(const std::vector<unsigned int> binParams) {
+    uint64_t value = readAsDTUbypass(binParams);
+    if (value != 0) {
+        if (readAsBIbypass(std::vector<unsigned int>({1})) == 1) {
+            return uint64_t(-1 * int64_t(value));
+        } else {
+            return value;
+        }
+    }
+    return value;
+}
+
+uint64_t Reader::readAsSDTUcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    uint64_t value = readAsDTUcabac(binParams, ctxIdx);
+    if (value != 0) {
+        if (readAsBIcabac(std::vector<unsigned int>({1}), ctxIdx) == 1) {  // FIXME fix ctxIdx for sign bit
+            return uint64_t(-1 * int64_t(value));
+        } else {
+            return value;
+        }
+    }
+    return value;
+}
+
 size_t Reader::readNumSymbols() {
     auto result = m_bitInputStream.read(32);
     return static_cast<size_t>(result);

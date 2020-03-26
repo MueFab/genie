@@ -63,6 +63,14 @@ class Reader {
 
     uint64_t readAsSSUTUcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
+    uint64_t readAsDTUbypass(const std::vector<unsigned int> binParams);
+
+    uint64_t readAsDTUcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+
+    uint64_t readAsSDTUbypass(const std::vector<unsigned int> binParams);
+
+    uint64_t readAsSDTUcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+
     size_t start();
 
     void close();
