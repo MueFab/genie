@@ -162,6 +162,17 @@ std::vector<SingleToken>&& TokenState::run() {
     return std::move(curRec);
 }
 
+uint32_t flipEndianness(uint32_t val) {
+    uint32_t ret = 0;
+    uint8_t *ptr_out = (uint8_t* )&ret;
+    uint8_t *ptr_in = (uint8_t* )&val;
+    ptr_out[0] = ptr_in[3];
+    ptr_out[1] = ptr_in[2];
+    ptr_out[2] = ptr_in[1];
+    ptr_out[3] = ptr_in[0];
+    return ret;
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 void TokenState::encode(const std::vector<SingleToken>& tokens, core::AccessUnitRaw::Descriptor& streams) {
@@ -180,7 +191,11 @@ void TokenState::encode(const std::vector<SingleToken>& tokens, core::AccessUnit
             }
             streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push('\0');
         } else {
-            streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push(tokens[i].param);
+            uint32_t value = tokens[i].param;
+            if(tokens[i].token == Tokens::DIGITS || tokens[i].token == Tokens::DELTA || tokens[i].token == Tokens::DIGITS0 || tokens[i].token == Tokens::DELTA0) {
+                value = flipEndianness(value);
+            }
+            streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push(value);
         }
     }
 }

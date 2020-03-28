@@ -13,7 +13,30 @@ namespace gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void writeVInt(uint64_t val, util::DataBlock &out) {
+    std::vector<uint8_t> tmp;
+    do {
+        tmp.push_back(val & 0x7f);
+        val >>= 7;
+    } while (val != 0);
+    for (int i = tmp.size() - 1; i > 0; i--) out.push_back(tmp[i] | 0x80);
+    out.push_back(tmp[0]);
+}
+
+util::DataBlock convertTokenType(const util::DataBlock &in) {
+    util::DataBlock out(0, 1);
+    uint32_t num_output_symbols = in.empty() ? 0 : 256 * (256 * (256 * in.get(0) + in.get(1)) + in.get(2)) + in.get(3);
+    writeVInt(num_output_symbols, out);
+    if (!in.empty()) {
+        for (size_t i = 4; i < in.size(); ++i) {
+            out.push_back(in.get(i));
+        }
+    }
+    return out;
+}
+
 core::AccessUnitPayload::SubsequencePayload GabacCompressor::compress(const gabac::EncodingConfiguration &conf,
+                                                                      bool vSize,
                                                                       core::AccessUnitRaw::Subsequence &&in) {
     // Interface to GABAC library
     core::AccessUnitRaw::Subsequence data = std::move(in);
@@ -38,6 +61,9 @@ core::AccessUnitPayload::SubsequencePayload GabacCompressor::compress(const gaba
     size_t index = 0;
     core::AccessUnitPayload::SubsequencePayload out(data.getID());
     for (auto &o : outbuffer) {
+        if(vSize) {
+            o = convertTokenType(o);
+        }
         out.add(core::AccessUnitPayload::TransformedPayload(std::move(o), index++));
     }
     return out;
@@ -54,11 +80,12 @@ void GabacCompressor::flowIn(core::AccessUnitRaw &&t, size_t id) {
         for (const auto &subdesc : desc) {
             auto &input = raw_aus.get(subdesc.getID());
             auto s_id = subdesc.getID();
-            if(desc.getID() == core::GenDesc::RNAME || desc.getID() == core::GenDesc::MSAR) {
+            if (desc.getID() == core::GenDesc::RNAME || desc.getID() == core::GenDesc::MSAR) {
                 s_id.second = 0;
             }
             const auto &conf = configSet.getConfAsGabac(s_id);
-            descriptor_payload.add(compress(conf, std::move(input)));
+            descriptor_payload.add(compress(
+                conf, desc.getID() == core::GenDesc::RNAME || desc.getID() == core::GenDesc::MSAR, std::move(input)));
         }
         if (!descriptor_payload.isEmpty()) {
             payload.setPayload(desc.getID(), std::move(descriptor_payload));

@@ -114,7 +114,7 @@ void AccessUnitPayload::DescriptorPayload::write(util::BitWriter& writer) const 
                 num_streams++;
             }
         }
-        writer.write(2000, 32);  // TODO: get # of records here
+        writer.write(1000, 32);  // TODO: get # of records here
         writer.write(num_streams, 16);
         for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
             if(!subsequencePayloads[i].isEmpty()) {
