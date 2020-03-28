@@ -163,6 +163,9 @@ bool Importer::pump(size_t id) {
     {
         util::OrderedSection section(&lock, id);
         samReader.read(blockSize, s);
+        if (s.size() == 0) {
+            return false;
+        }
         auto it = refs.find(s.front().getRname());
         if (it == refs.end()) {
             local_ref_num = ref_counter;
