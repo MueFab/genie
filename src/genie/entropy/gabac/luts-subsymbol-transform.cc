@@ -87,6 +87,43 @@ void LUTsSubSymbolTransformation::decodeLUTs(const paramcabac::SupportValues& su
     }
 }
 
+void LUTsSubSymbolTransformation::sortLutRow(LutRow& lutRow) {
+    // sort entries in descending order and populate numMaxElems;
+}
+
+void LUTsSubSymbolTransformation::encodeLutOrder1(Writer &writer, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut) {
+    uint32_t i, j;
+    for(i=0; i<numAlphaSubsym; i++) {
+        sortLutRow(lut[i]);
+        writer.writeLutSymbol(lut[i].numMaxElems, codingSubsymSize);
+        for(j=0; j<=lut[i].numMaxElems; j++) {
+            writer.writeLutSymbol(lut[i].entries[j].value, codingSubsymSize);
+        }
+    }
+}
+
+void LUTsSubSymbolTransformation::encodeLUTs(const paramcabac::SupportValues& supportVals, const paramcabac::StateVars& stateVars, Writer &writer) {
+
+    uint8_t const codingSubsymSize = supportVals.getCodingSubsymSize();
+    uint8_t const codingOrder = supportVals.getCodingOrder();
+    uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
+                                                 supportVals.getShareSubsymLutFlag());
+    uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
+
+    if(numLuts == 0 || codingOrder < 1)
+        return;
+
+    for(uint32_t s=0; s<numLuts; s++) {
+        if(codingOrder == 2) {
+            for(uint32_t k=0; k<numAlphaSubsym; k++) {
+                encodeLutOrder1(writer, numAlphaSubsym, codingSubsymSize, lutsO2[s][k]);
+            }
+        } else if(codingOrder == 1) {
+            encodeLutOrder1(writer, numAlphaSubsym, codingSubsymSize, lutsO1[s]);
+        }
+    }
+}
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
