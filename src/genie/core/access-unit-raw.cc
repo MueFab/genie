@@ -57,7 +57,7 @@ uint64_t AccessUnitRaw::Subsequence::pull() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnitRaw::Subsequence &AccessUnitRaw::Descriptor::get(uint16_t sub) { return subdesc[uint8_t(sub)]; }
+AccessUnitRaw::Subsequence &AccessUnitRaw::Descriptor::get(uint16_t sub) { return subdesc[sub]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -69,7 +69,7 @@ void AccessUnitRaw::Descriptor::add(Subsequence &&sub) { subdesc.push_back(std::
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnitRaw::Descriptor::set(uint8_t _id, Subsequence &&sub) { subdesc[uint8_t(_id)] = std::move(sub); }
+void AccessUnitRaw::Descriptor::set(uint16_t _id, Subsequence &&sub) { subdesc[uint8_t(_id)] = std::move(sub); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

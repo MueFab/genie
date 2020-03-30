@@ -100,15 +100,14 @@ class AccessUnitRaw {
          */
         Subsequence& get(uint16_t sub);
 
-        static constexpr size_t NUM_TOKEN_STREAMS = 10;
 
         const Subsequence& get(uint16_t sub) const { return subdesc[sub]; }
 
         Subsequence& getTokenType(uint16_t pos, uint8_t type) {
-            while(subdesc.size() <= pos * NUM_TOKEN_STREAMS + type) {
+            while(subdesc.size() <= pos * 16 + type) {
                 subdesc.emplace_back(4, GenSubIndex (GenDesc::RNAME, subdesc.size()));
             }
-            return get(pos * NUM_TOKEN_STREAMS + type);
+            return get(pos * 16 + type);
         }
 
         /**
@@ -128,7 +127,7 @@ class AccessUnitRaw {
          * @param _id
          * @param sub
          */
-        void set(uint8_t _id, Subsequence&& sub);
+        void set(uint16_t _id, Subsequence&& sub);
 
         /**
          * @brief

@@ -118,7 +118,7 @@ void AccessUnitPayload::DescriptorPayload::write(util::BitWriter& writer) const 
         writer.write(num_streams, 16);
         for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
             if(!subsequencePayloads[i].isEmpty()) {
-                subsequencePayloads[i].writeTokentype(writer, i % 10);
+                subsequencePayloads[i].writeTokentype(writer, i % 16);
             }
         }
         return;
