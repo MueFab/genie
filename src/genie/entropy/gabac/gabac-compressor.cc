@@ -23,7 +23,7 @@ void writeVInt(uint64_t val, util::DataBlock &out) {
     out.push_back(tmp[0]);
 }
 
-util::DataBlock convertTokenType(const util::DataBlock &in) {
+static util::DataBlock convertTokenType(const util::DataBlock &in) {
     util::DataBlock out(0, 1);
     uint32_t num_output_symbols = in.empty() ? 0 : 256 * (256 * (256 * in.get(0) + in.get(1)) + in.get(2)) + in.get(3);
     writeVInt(num_output_symbols, out);
