@@ -25,6 +25,16 @@ struct LutEntry {
     uint64_t value;
     uint64_t index;
     uint64_t freq; // used only in encoder
+
+    bool operator < (const LutEntry& entry) const
+    {
+        return (freq < entry.freq);
+    }
+
+    bool operator > (const LutEntry& entry) const
+    {
+        return (freq > entry.freq);
+    }
 };
 
 struct LutRow {
