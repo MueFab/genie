@@ -12,6 +12,7 @@
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 #include <genie/util/data-block.h>
+#include <numeric>
 #include "constants.h"
 #include "parameter/parameter_set.h"
 
@@ -72,7 +73,7 @@ class AccessUnitPayload {
        private:
         std::vector<TransformedPayload> transformedPayloads;  //!< @brief
         GenSubIndex id;                                       //!< @brief
-
+        size_t numSymbols;
        public:
         /**
          * @brief
@@ -81,6 +82,14 @@ class AccessUnitPayload {
         explicit SubsequencePayload(GenSubIndex _id);
 
         explicit SubsequencePayload(GenSubIndex _id, size_t remainingSize, size_t subseq_ctr, util::BitReader& reader);
+
+        void annotateNumSymbols (size_t num) {
+            numSymbols = num;
+        }
+
+        size_t getNumSymbols() const {
+            return numSymbols;
+        }
 
         /**
          * @brief
@@ -93,13 +102,6 @@ class AccessUnitPayload {
          * @param writer
          */
         void write(util::BitWriter& writer) const;
-
-        void writeTokentype(util::BitWriter& writer, uint8_t type) const {
-            writer.write(type, 4);
-            writer.write(3, 4);
-
-            transformedPayloads[0].write(writer);
-        }
 
         /**
          * @brief
@@ -122,18 +124,12 @@ class AccessUnitPayload {
         const TransformedPayload* end() const { return &transformedPayloads.back() + 1; }
 
         size_t getWrittenSize() const {
-            size_t size = 0;
-            for (size_t i = 0; i < transformedPayloads.size(); ++i) {
-                if (getID().first == core::GenDesc::RNAME || getID().first == core::GenDesc::MSAR) {
-                    size += 1;
-                } else {
-                    if (i != transformedPayloads.size() - 1) {
-                        size += 4;
-                    }
-                }
-                size += transformedPayloads[i].getWrittenSize();
-            }
-            return size;
+            size_t overhead = getDescriptor(getID().first).tokentype
+                                  ? transformedPayloads.size() * sizeof(uint8_t)
+                                  : (transformedPayloads.size() - 1) * sizeof(uint32_t);
+            return std::accumulate(
+                transformedPayloads.begin(), transformedPayloads.end(), overhead,
+                [](size_t sum, const TransformedPayload& payload) { return sum + payload.getWrittenSize(); });
         }
     };
 
@@ -189,19 +185,12 @@ class AccessUnitPayload {
         const SubsequencePayload* end() const { return &subsequencePayloads.back() + 1; }
 
         size_t getWrittenSize() const {
-            size_t size = 0;
-            if (getID() == core::GenDesc::RNAME || getID() == core::GenDesc::MSAR) {
-                size += 6;
-            }
-            for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
-                if (getID() != core::GenDesc::RNAME && getID() != core::GenDesc::MSAR) {
-                    if (i != subsequencePayloads.size() - 1) {
-                        size += 4;
-                    }
-                }
-                size += subsequencePayloads[i].getWrittenSize();
-            }
-            return size;
+            size_t overhead = getDescriptor(getID()).tokentype ? sizeof(uint16_t) + sizeof(uint32_t)
+                                                               : (subsequencePayloads.size() - 1) * sizeof(uint32_t);
+            return std::accumulate(subsequencePayloads.begin(), subsequencePayloads.end(), overhead,
+                                   [](size_t sum, const SubsequencePayload& payload) {
+                                       return payload.isEmpty() ? sum : sum + payload.getWrittenSize();
+                                   });
         }
     };
 

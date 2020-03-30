@@ -40,6 +40,7 @@ core::AccessUnitPayload::SubsequencePayload GabacCompressor::compress(const gaba
                                                                       core::AccessUnitRaw::Subsequence &&in) {
     // Interface to GABAC library
     core::AccessUnitRaw::Subsequence data = std::move(in);
+    size_t num_symbols = data.getNumSymbols();
     util::DataBlock buffer = data.move();
     gabac::IBufferStream bufferInputStream(&buffer);
 
@@ -60,6 +61,7 @@ core::AccessUnitPayload::SubsequencePayload GabacCompressor::compress(const gaba
     bufferOutputStream.flush_blocks(&outbuffer);
     size_t index = 0;
     core::AccessUnitPayload::SubsequencePayload out(data.getID());
+    out.annotateNumSymbols(num_symbols);
     for (auto &o : outbuffer) {
         if(vSize) {
             o = convertTokenType(o);

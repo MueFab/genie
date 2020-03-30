@@ -82,6 +82,10 @@ class AccessUnitRaw {
         GenSubIndex getID() const;
 
         uint64_t pull();
+
+        size_t getNumSymbols() {
+            return data.size();
+        }
     };
 
     /**
@@ -104,10 +108,11 @@ class AccessUnitRaw {
         const Subsequence& get(uint16_t sub) const { return subdesc[sub]; }
 
         Subsequence& getTokenType(uint16_t pos, uint8_t type) {
-            while(subdesc.size() <= pos * 16 + type) {
+            uint16_t s_id = ((pos << 4u) | (type & 0xfu));
+            while(subdesc.size() <= s_id) {
                 subdesc.emplace_back(4, GenSubIndex (GenDesc::RNAME, subdesc.size()));
             }
-            return get(pos * 16 + type);
+            return get(s_id);
         }
 
         /**
