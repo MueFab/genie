@@ -27,6 +27,13 @@ LutOrder1 getInitLutsOrder1(uint64_t numAlphaSubsym) {
                               );
 }
 
+LUTsSubSymbolTransformation::LUTsSubSymbolTransformation(const paramcabac::SupportValues& _supportVals,
+                                                         const paramcabac::StateVars& _stateVars,
+                                                         const bool _modeFlag)
+    : supportVals(_supportVals),
+      stateVars(_stateVars),
+      encodingModeFlag(_modeFlag) {}
+
 void LUTsSubSymbolTransformation::setupLutsO1(uint8_t numSubsyms, uint64_t numAlphaSubsym) {
 
     if(numAlphaSubsym > paramcabac::StateVars::MAX_LUT_SIZE)
@@ -61,7 +68,10 @@ void LUTsSubSymbolTransformation::decodeLutOrder1(Reader &reader, uint64_t numAl
     }
 }
 
-void LUTsSubSymbolTransformation::decodeLUTs(const paramcabac::SupportValues& supportVals, const paramcabac::StateVars& stateVars, Reader &reader) {
+void LUTsSubSymbolTransformation::decodeLUTs(Reader &reader) {
+
+    if(encodingModeFlag)
+        return;
 
     uint8_t const codingSubsymSize = supportVals.getCodingSubsymSize();
     uint8_t const codingOrder = supportVals.getCodingOrder();
@@ -72,17 +82,17 @@ void LUTsSubSymbolTransformation::decodeLUTs(const paramcabac::SupportValues& su
     if(numLuts == 0 || codingOrder < 1)
         return;
 
-    if(codingOrder == 2)
+    if(codingOrder == 2) {
         setupLutsO2(stateVars.getNumSubsymbols(), numAlphaSubsym);
-    else if(codingOrder == 1)
-        setupLutsO1(stateVars.getNumSubsymbols(), numAlphaSubsym);
-
-    for(uint32_t s=0; s<numLuts; s++) {
-        if(codingOrder == 2) {
+        for(uint32_t s=0; s<numLuts; s++) {
             for(uint32_t k=0; k<numAlphaSubsym; k++) {
                 decodeLutOrder1(reader, numAlphaSubsym, codingSubsymSize, lutsO2[s][k]);
             }
-        } else if(codingOrder == 1) {
+        }
+    }
+    else if(codingOrder == 1) {
+        setupLutsO1(stateVars.getNumSubsymbols(), numAlphaSubsym);
+        for(uint32_t s=0; s<numLuts; s++) {
             decodeLutOrder1(reader, numAlphaSubsym, codingSubsymSize, lutsO1[s]);
         }
     }
@@ -105,7 +115,10 @@ void LUTsSubSymbolTransformation::encodeLutOrder1(Writer &writer, uint64_t numAl
     }
 }
 
-void LUTsSubSymbolTransformation::encodeLUTs(const paramcabac::SupportValues& supportVals, const paramcabac::StateVars& stateVars, Writer &writer) {
+void LUTsSubSymbolTransformation::encodeLUTs(Writer &writer) {
+
+    if(!encodingModeFlag)
+        return;
 
     uint8_t const codingSubsymSize = supportVals.getCodingSubsymSize();
     uint8_t const codingOrder = supportVals.getCodingOrder();
@@ -116,12 +129,14 @@ void LUTsSubSymbolTransformation::encodeLUTs(const paramcabac::SupportValues& su
     if(numLuts == 0 || codingOrder < 1)
         return;
 
-    for(uint32_t s=0; s<numLuts; s++) {
-        if(codingOrder == 2) {
+    if(codingOrder == 2) {
+        for(uint32_t s=0; s<numLuts; s++) {
             for(uint32_t k=0; k<numAlphaSubsym; k++) {
                 encodeLutOrder1(writer, numAlphaSubsym, codingSubsymSize, lutsO2[s][k]);
             }
-        } else if(codingOrder == 1) {
+        }
+    } else if(codingOrder == 1) {
+        for(uint32_t s=0; s<numLuts; s++) {
             encodeLutOrder1(writer, numAlphaSubsym, codingSubsymSize, lutsO1[s]);
         }
     }
