@@ -76,6 +76,13 @@ GenSubIndex AccessUnitPayload::SubsequencePayload::getID() const { return id; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnitPayload::SubsequencePayload::write(util::BitWriter& writer) const {
+    if(getDescriptor(getID().first).tokentype) {
+        writer.write(getID().second & 0xfu, 4);
+        writer.write(3, 4);
+
+        transformedPayloads[0].write(writer);
+        return;
+    }
     for (size_t i = 0; i < transformedPayloads.size(); ++i) {
         transformedPayloads[i].write(writer);
         if (i != transformedPayloads.size() - 1) {
@@ -109,23 +116,23 @@ bool AccessUnitPayload::SubsequencePayload::isEmpty() const {
 void AccessUnitPayload::DescriptorPayload::write(util::BitWriter& writer) const {
     if(this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
         size_t num_streams = 0;
-        for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
-            if(!subsequencePayloads[i].isEmpty()) {
+        for (const auto & subsequencePayload : subsequencePayloads) {
+            if(!subsequencePayload.isEmpty()) {
                 num_streams++;
             }
         }
-        writer.write(1000, 32);  // TODO: get # of records here
+        writer.write(subsequencePayloads.front().getNumSymbols(), 32);  // TODO: get # of records here
         writer.write(num_streams, 16);
-        for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
-            if(!subsequencePayloads[i].isEmpty()) {
-                subsequencePayloads[i].writeTokentype(writer, i % 16);
+        for (const auto & subsequencePayload : subsequencePayloads) {
+            if(!subsequencePayload.isEmpty()) {
+                subsequencePayload.write(writer);
             }
         }
         return;
     }
     for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
         if (i != subsequencePayloads.size() - 1) {
-            writer.write(subsequencePayloads[i].getWrittenSize(), 32);
+            writer.write(subsequencePayloads[i].isEmpty() ? 0 : subsequencePayloads[i].getWrittenSize(), 32);
         }
         subsequencePayloads[i].write(writer);
     }
