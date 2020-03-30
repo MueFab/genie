@@ -110,7 +110,7 @@ class AccessUnitRaw {
         Subsequence& getTokenType(uint16_t pos, uint8_t type) {
             uint16_t s_id = ((pos << 4u) | (type & 0xfu));
             while(subdesc.size() <= s_id) {
-                subdesc.emplace_back(4, GenSubIndex (GenDesc::RNAME, subdesc.size()));
+                subdesc.emplace_back(4, GenSubIndex (getID(), subdesc.size()));
             }
             return get(s_id);
         }

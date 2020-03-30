@@ -27,7 +27,7 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, size_t id) {
     auto qvdecoder = core::GlobalCfg::getSingleton().getIndustrialPark().construct<core::QVDecoder>(
         data.getParameters().getQVConfig(core::record::ClassType::CLASS_U).getMode(), reader);
     auto namedecoder = core::GlobalCfg::getSingleton().getIndustrialPark().construct<core::NameDecoder>(0, reader);
-    auto names = namedecoder->decode(t.get(core::GenDesc::RNAME));
+    auto names = namedecoder->decode(data.get(core::GenDesc::RNAME));
     for (size_t i = 0; i < data.getNumRecords() / data.getParameters().getNumberTemplateSegments(); ++i) {
         core::record::Record rec(data.getParameters().getNumberTemplateSegments(), core::record::ClassType::CLASS_U,
                                  std::move(names[i]), "", 0);

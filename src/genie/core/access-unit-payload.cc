@@ -55,6 +55,11 @@ AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id) : id(
 AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id, size_t remainingSize, size_t subseq_ctr,
                                                           util::BitReader& reader)
     : id(std::move(_id)) {
+    if(getDescriptor(getID().first).tokentype) {
+        // TODO: The size is UNKNOWN?
+        transformedPayloads.emplace_back(0, reader);
+        return;
+    }
     for (size_t i = 0; i < subseq_ctr; ++i) {
         size_t s = 0;
         if (i != subseq_ctr - 1) {
@@ -234,6 +239,31 @@ AccessUnitPayload::DescriptorPayload::DescriptorPayload() : id(GenDesc(0)) {}
 AccessUnitPayload::DescriptorPayload::DescriptorPayload(GenDesc _id, size_t count, size_t remainingSize,
                                                         util::BitReader& reader)
     : id(_id) {
+    if(this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
+        size_t numSymbols = reader.read<uint32_t>();
+        auto num_streams = reader.read<uint16_t>();
+        int32_t typenum = -1;
+        for (size_t i = 0; i < num_streams; ++i) {
+            uint8_t type = reader.read(4);
+
+            if(!type) {
+                typenum ++;
+            }
+
+            while(subsequencePayloads.size() < ((typenum << 4u) | type)) {
+                subsequencePayloads.emplace_back(GenSubIndex {id, subsequencePayloads.size()});
+                subsequencePayloads.back().annotateNumSymbols(numSymbols);
+            }
+
+            uint8_t method = reader.read(4);
+
+            UTILS_DIE_IF(method != 3, "Only CABAC method supported");
+
+            subsequencePayloads.emplace_back(GenSubIndex{_id, subsequencePayloads.size()}, 0, 1, reader);
+            subsequencePayloads.back().annotateNumSymbols(numSymbols);
+        }
+        return;
+    }
     for (size_t i = 0; i < count; ++i) {
         size_t s = 0;
         if (i != count - 1) {
