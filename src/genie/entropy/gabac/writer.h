@@ -77,6 +77,8 @@ class Writer {
 
     void writeAsSDTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
+    void writeLutSymbol(uint64_t input, const uint8_t codingSubsymSize);
+
     void writeNumSymbols(unsigned int numSymbols);
 
    private:
