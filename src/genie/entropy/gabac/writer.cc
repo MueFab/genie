@@ -342,6 +342,14 @@ void Writer::writeAsSDTUcabac(uint64_t input, const std::vector<unsigned int> bi
     }
 }
 
+void Writer::writeLutSymbol(uint64_t input, const uint8_t codingSubsymSize) {
+    std::vector<unsigned int> binParams({codingSubsymSize, 2});
+    if(m_bypassFlag)
+        writeAsSUTUbypass(input, binParams);
+    else
+        writeAsSUTUcabac(input, binParams, 0); // ctxIdx = 0
+}
+
 void Writer::writeNumSymbols(unsigned int numSymbols) { m_bitOutputStream.write(numSymbols, 32); }
 }  // namespace gabac
 }  // namespace entropy
