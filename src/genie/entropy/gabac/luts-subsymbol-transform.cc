@@ -43,29 +43,46 @@ void LUTsSubSymbolTransformation::setupLutsO2(uint8_t numSubsyms, uint64_t numAl
         return;
 
     lutsO2.clear();
-    // Create a lutsO1 initialized with default values.
-    //std::vector<LutOrder1> initLutsO1 = getInitLutsO1(numSubsyms, numAlphaSubsym);
     lutsO2 = std::vector<LutOrder2>(numSubsyms,
                                     std::vector<LutOrder1>(numAlphaSubsym,
                                                            getInitLutsOrder1(numAlphaSubsym))
                                    );
 }
 
+void LUTsSubSymbolTransformation::decodeLutOrder1(Reader &reader, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut) {
+    uint32_t i, j;
+    for(i=0; i<numAlphaSubsym; i++) {
+        lut[i].numMaxElems = reader.readLutSymbol(codingSubsymSize);
+        for(j=0; j<=lut[i].numMaxElems; j++) {
+            lut[i].entries[j].value = reader.readLutSymbol(codingSubsymSize);
+            lut[i].entries[j].index = j;
+        }
+    }
+}
+
 void LUTsSubSymbolTransformation::decodeLUTs(const paramcabac::SupportValues& supportVals, const paramcabac::StateVars& stateVars, Reader &reader) {
 
+    uint8_t const codingSubsymSize = supportVals.getCodingSubsymSize();
     uint8_t const codingOrder = supportVals.getCodingOrder();
     uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
                                                  supportVals.getShareSubsymLutFlag());
+    uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
 
-    uint32_t s;
-    setupLutsO1(stateVars.getNumSubsymbols(), stateVars.getNumAlphaSubsymbol());
-    setupLutsO2(stateVars.getNumSubsymbols(), stateVars.getNumAlphaSubsymbol());
+    if(numLuts == 0 || codingOrder < 1)
+        return;
 
-    for(s=0; s<numLuts; s++) {
+    if(codingOrder == 2)
+        setupLutsO2(stateVars.getNumSubsymbols(), numAlphaSubsym);
+    else if(codingOrder == 1)
+        setupLutsO1(stateVars.getNumSubsymbols(), numAlphaSubsym);
+
+    for(uint32_t s=0; s<numLuts; s++) {
         if(codingOrder == 2) {
-
+            for(uint32_t k=0; k<numAlphaSubsym; k++) {
+                decodeLutOrder1(reader, numAlphaSubsym, codingSubsymSize, lutsO2[s][k]);
+            }
         } else if(codingOrder == 1) {
-
+            decodeLutOrder1(reader, numAlphaSubsym, codingSubsymSize, lutsO1[s]);
         }
     }
 }
