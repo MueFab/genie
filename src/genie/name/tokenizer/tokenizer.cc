@@ -162,15 +162,11 @@ std::vector<SingleToken>&& TokenState::run() {
     return std::move(curRec);
 }
 
-uint32_t flipEndianness(uint32_t val) {
-    uint32_t ret = 0;
-    uint8_t *ptr_out = (uint8_t* )&ret;
-    uint8_t *ptr_in = (uint8_t* )&val;
-    ptr_out[0] = ptr_in[3];
-    ptr_out[1] = ptr_in[2];
-    ptr_out[2] = ptr_in[1];
-    ptr_out[3] = ptr_in[0];
-    return ret;
+void push32bigEndian(core::AccessUnitRaw::Subsequence& seq, uint32_t value) {
+    seq.push((value >> 24) & 0xff);
+    seq.push((value >> 16) & 0xff);
+    seq.push((value >> 8) & 0xff);
+    seq.push((value)&0xff);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -181,31 +177,19 @@ void TokenState::encode(const std::vector<SingleToken>& tokens, core::AccessUnit
         //       streams.emplace_back(getTokenInfo(Tokens::DZLEN).paramSeq + 1, util::DataBlock(0, 4));
         //   }
         streams.getTokenType(i, TYPE_SEQ).push((uint8_t)tokens[i].token);
-        if (getTokenInfo(tokens[i].token).paramSeq < 0) {
+        if (getTokenInfo(tokens[i].token).paramSeq == 0) {
             continue;
         }
 
         if (tokens[i].token == Tokens::STRING) {
             for (const auto& c : tokens[i].paramString) {
-                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push(c);
+                streams.getTokenType(i, (uint8_t) tokens[i].token).push(c);
             }
-            streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push('\0');
+            streams.getTokenType(i, (uint8_t)tokens[i].token).push('\0');
+        } else if(getTokenInfo(tokens[i].token).paramSeq == sizeof(uint32_t)){
+            push32bigEndian(streams.getTokenType(i, (uint8_t)tokens[i].token), tokens[i].param);
         } else {
-            uint32_t value = tokens[i].param;
-            if(tokens[i].token == Tokens::DIFF) {
-                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push(0);
-                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push(0);
-                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push(0);
-                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push(value);
-            } else if(tokens[i].token == Tokens::DIGITS){
-                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push((value >> 24) & 0xff);
-                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push((value >> 16) & 0xff);
-                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push((value >> 8) & 0xff);
-                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push((value) & 0xff);
-            }
-            else {
-                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push(value);
-            }
+            streams.getTokenType(i, (uint8_t)tokens[i].token).push(tokens[i].param);
         }
     }
 }
