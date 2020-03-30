@@ -192,10 +192,20 @@ void TokenState::encode(const std::vector<SingleToken>& tokens, core::AccessUnit
             streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push('\0');
         } else {
             uint32_t value = tokens[i].param;
-            if(tokens[i].token == Tokens::DIGITS || tokens[i].token == Tokens::DELTA || tokens[i].token == Tokens::DIGITS0 || tokens[i].token == Tokens::DELTA0) {
-                value = flipEndianness(value);
+            if(tokens[i].token == Tokens::DIFF) {
+                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push(0);
+                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push(0);
+                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push(0);
+                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push(value);
+            } else if(tokens[i].token == Tokens::DIGITS){
+                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push((value >> 24) & 0xff);
+                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push((value >> 16) & 0xff);
+                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push((value >> 8) & 0xff);
+                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push((value) & 0xff);
             }
-            streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push(value);
+            else {
+                streams.getTokenType(i, getTokenInfo(tokens[i].token).paramSeq).push(value);
+            }
         }
     }
 }
