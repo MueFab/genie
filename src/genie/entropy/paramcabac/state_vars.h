@@ -52,6 +52,10 @@ class StateVars {
         return numSubsyms;
     }
 
+    uint64_t getNumAlphaSubsymbol() const {
+        return numAlphaSubsym;
+    }
+
     uint32_t getNumCtxPerSubsymbol() const {
         return numCtxSubsym;
     }
@@ -75,6 +79,12 @@ class StateVars {
     uint64_t getNumCtxTotal() const {
         return numCtxTotal;
     }
+
+    uint8_t getNumLuts(uint8_t const codingOrder,
+                       bool const shareSubsymLutFlag) const;
+
+    uint8_t getNumPrvs(uint8_t const codingOrder,
+                       bool const shareSubsymPrvFlag) const;
 
     /* some extra functions (for now put in statevars)
      * FIXME move else where
