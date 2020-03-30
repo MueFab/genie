@@ -48,20 +48,32 @@ typedef std::vector<LutOrder1> LutOrder2;
 class LUTsSubSymbolTransformation {
 
     public:
-    void decodeLUTs(const paramcabac::SupportValues& supportVals, const paramcabac::StateVars& stateVars, Reader &reader);
-    void encodeLUTs(const paramcabac::SupportValues& supportVals, const paramcabac::StateVars& stateVars, Writer &writer);
+    LUTsSubSymbolTransformation(const paramcabac::SupportValues& _supportVals,
+                                const paramcabac::StateVars& _stateVars,
+                                const bool _modeFlag);
+
+    void decodeLUTs(Reader &reader);
+    void encodeLUTs(Writer &writer);
+
+    void invTransform(util::DataBlock& symbolsIn, util::DataBlock& symbolsOut);
+    void transform(util::DataBlock& symbolsIn, util::DataBlock& symbolsOut);
 
     private:
     void setupLutsO1(uint8_t numSubsyms, uint64_t numAlphaSubsym);
     void setupLutsO2(uint8_t numSubsyms, uint64_t numAlphaSubsym);
 
     void sortLutRow(LutRow& lutRow);
+    void buildLuts(util::DataBlock& symbols);
 
     void decodeLutOrder1(Reader &reader, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut);
     void encodeLutOrder1(Writer &writer, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut);
 
     std::vector<LutOrder1> lutsO1;  // max size numSubsyms
     std::vector<LutOrder2> lutsO2;  // max size numSubsyms
+
+    const paramcabac::SupportValues& supportVals;
+    const paramcabac::StateVars& stateVars;
+    bool encodingModeFlag;
 };
 
 }  // namespace gabac
