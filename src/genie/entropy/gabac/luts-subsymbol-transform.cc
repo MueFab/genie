@@ -13,6 +13,7 @@
 #include <genie/util/block-stepper.h>
 #include <genie/util/data-block.h>
 #include "exceptions.h"
+#include "context-selector.h"
 
 namespace genie {
 namespace entropy {
@@ -55,6 +56,63 @@ void LUTsSubSymbolTransformation::setupLutsO2(uint8_t numSubsyms, uint64_t numAl
                                     std::vector<LutOrder1>(numAlphaSubsym,
                                                            getInitLutsOrder1(numAlphaSubsym))
                                    );
+}
+
+void LUTsSubSymbolTransformation::buildLuts(util::DataBlock* const symbols) {
+    assert(symbols != nullptr);
+
+    size_t numSymbols = symbols->size();
+    if (numSymbols <= 0) return;
+
+    uint8_t const outputSymbolSize = supportVals.getOutputSymbolSize();
+    uint8_t const codingSubsymSize = supportVals.getCodingSubsymSize();
+    uint8_t const codingOrder = supportVals.getCodingOrder();
+    uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
+                                                 supportVals.getShareSubsymLutFlag());
+    uint8_t const numPrvs = stateVars.getNumPrvs(codingOrder,
+                                                 supportVals.getShareSubsymPrvFlag());
+    uint8_t const numSubsymbols = stateVars.getNumSubsymbols();
+    uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
+    uint64_t const subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize)-1;
+
+
+    if(numLuts == 0 || codingOrder < 1)
+        return;
+
+    util::BlockStepper r = symbols->getReader();
+    std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
+
+    if(codingOrder == 2)
+        setupLutsO2(numSubsymbols, numAlphaSubsym);
+    else
+        setupLutsO1(numSubsymbols, numAlphaSubsym);
+
+    while (r.isValid()) {
+        // Split symbol into subsymbols and then build subsymbols
+        uint64_t symbolValue = r.get();
+        uint64_t subsymValue = 0;
+        uint32_t oss = outputSymbolSize;
+
+        uint64_t symValue = abs((int64_t) symbolValue);
+        for (uint8_t s=0; s<numSubsymbols; s++) {
+            uint8_t lutIdx = (numLuts > 1) ? s : 0; // either private or shared LUT
+            uint8_t prvIdx = (numPrvs > 1) ? s : 0; // either private or shared PRV
+
+            subsymValue = (symValue>>(oss-=codingSubsymSize)) & subsymMask;
+
+            if(codingOrder == 2) {
+                LutOrder2 lut = lutsO2[lutIdx];
+                lut[subsymbols[prvIdx].prvValues[1]][subsymbols[prvIdx].prvValues[0]].entries[subsymValue].freq++;
+                lut[subsymbols[prvIdx].prvValues[1]][subsymbols[prvIdx].prvValues[0]].entries[subsymValue].value = subsymValue;
+            } else if(codingOrder == 1) {
+                LutOrder1 lut = lutsO1[lutIdx];
+                lut[subsymbols[prvIdx].prvValues[0]].entries[subsymValue].freq++;
+                lut[subsymbols[prvIdx].prvValues[0]].entries[subsymValue].value = subsymValue;
+            }
+        }
+
+        r.inc();
+    }
 }
 
 void LUTsSubSymbolTransformation::decodeLutOrder1(Reader &reader, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut) {
