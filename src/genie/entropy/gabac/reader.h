@@ -71,6 +71,8 @@ class Reader {
 
     uint64_t readAsSDTUcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
+    uint64_t readLutSymbol(const uint8_t codingSubsymSize);
+
     size_t start();
 
     void close();

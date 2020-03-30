@@ -287,6 +287,14 @@ uint64_t Reader::readAsSDTUcabac(const std::vector<unsigned int> binParams, cons
     return value;
 }
 
+uint64_t Reader::readLutSymbol(const uint8_t codingSubsymSize) {
+    std::vector<unsigned int> binParams({codingSubsymSize, 2});
+    if(m_bypassFlag)
+        return readAsSUTUbypass(binParams);
+    else
+        return readAsSUTUcabac(binParams, 0); // ctxIdx = 0
+}
+
 size_t Reader::readNumSymbols() {
     auto result = m_bitInputStream.read(32);
     return static_cast<size_t>(result);
