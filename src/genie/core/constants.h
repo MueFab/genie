@@ -41,7 +41,7 @@ enum class GenDesc : uint8_t {
     RFTT = 17
 };
 
-using GenSubIndex = std::pair<GenDesc, uint8_t>;
+using GenSubIndex = std::pair<GenDesc, uint16_t>;
 struct GenSub {
     static constexpr GenSubIndex POS_MAPPING_FIRST = {GenDesc::POS, 0};
     static constexpr GenSubIndex POS_MAPPING_ADDITIONAL = {GenDesc::POS, 1};
