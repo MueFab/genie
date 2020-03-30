@@ -43,6 +43,7 @@ class LUTsSubSymbolTransformation {
 
     void setupLutsO1(uint8_t numSubsyms, uint64_t numAlphaSubsym);
     void setupLutsO2(uint8_t numSubsyms, uint64_t numAlphaSubsym);
+    void decodeLutOrder1(Reader &reader, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut);
 
     std::vector<LutOrder1> lutsO1;  // max size numSubsyms
     std::vector<LutOrder2> lutsO2;  // max size numSubsyms
