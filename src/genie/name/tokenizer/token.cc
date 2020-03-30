@@ -30,9 +30,9 @@ bool SingleToken::operator!=(const SingleToken& t) const { return !((*this) == t
 
 const TokenInfo& getTokenInfo(Tokens t) {
     static auto info = []() -> std::vector<TokenInfo> {
-        std::vector<TokenInfo> ret = {{"DUP", 1},    {"DIFF", 2},  {"STRING", 3},  {"CHAR", 4},
-                                      {"DIGITS", 5}, {"DELTA", 6}, {"DIGITS0", 7}, {"DELTA0", 8},
-                                      {"MATCH", -1}, {"DZLEN", 9}, {"END", -1},    {"NONE", -1}};
+        std::vector<TokenInfo> ret = {{"DUP", 1},    {"DIFF", 1},  {"STRING", 2},  {"CHAR", 3},
+                                      {"DIGITS", 4}, {"DELTA", 5}, {"DIGITS0", 6}, {"DELTA0", 7},
+                                      {"MATCH", -1}, {"DZLEN", 8}, {"END", -1},    {"NONE", -1}};
         return ret;
     }();
     return info[uint8_t(t)];
