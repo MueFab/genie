@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <functional>
 
 #include <genie/util/block-stepper.h>
 #include <genie/util/data-block.h>
@@ -89,6 +90,8 @@ void LUTsSubSymbolTransformation::decodeLUTs(const paramcabac::SupportValues& su
 
 void LUTsSubSymbolTransformation::sortLutRow(LutRow& lutRow) {
     // sort entries in descending order and populate numMaxElems;
+    sort(lutRow.entries.begin(), lutRow.entries.end(), std::greater<LutEntry>());
+    lutRow.numMaxElems = std::count_if(lutRow.entries.begin(), lutRow.entries.end(), [](LutEntry e){return e.freq != 0;});
 }
 
 void LUTsSubSymbolTransformation::encodeLutOrder1(Writer &writer, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut) {
