@@ -35,17 +35,19 @@ class ContextSelector {
     unsigned int getContextIdx(const paramcabac::StateVars &stateVars,
                                bool bypassFlag,
                                uint8_t codingOrder,
-                               const Subsymbol &subsym) {
+                               uint8_t subsymIdx,
+                               std::vector<Subsymbol>& subsymbols,
+                               uint8_t prvIdx) {
         unsigned int ctxIdx = 0;
         if (!bypassFlag) {
             if (codingOrder > 0) {
                 ctxIdx += stateVars.getNumCtxLUTs();
-                ctxIdx += subsym.subsymIdx * stateVars.getCodingSizeCtxOffset();
+                ctxIdx += subsymIdx * stateVars.getCodingSizeCtxOffset();
                 for (unsigned int i = 1; i <= codingOrder; i++) {
-                    ctxIdx += subsym.prvValues[i - 1] * stateVars.getCodingOrderCtxOffset(i);
+                    ctxIdx += subsymbols[prvIdx].prvValues[i - 1] * stateVars.getCodingOrderCtxOffset(i);
                 }
             } else {
-                ctxIdx += subsym.subsymIdx * stateVars.getCodingSizeCtxOffset();
+                ctxIdx += subsymIdx * stateVars.getCodingSizeCtxOffset();
             }
         }
 
