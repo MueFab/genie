@@ -24,17 +24,11 @@ namespace gabac {
 
 struct LutEntry {
     uint64_t value;
-    uint64_t index;
     uint64_t freq; // used only in encoder
 
-    bool operator < (const LutEntry& entry) const
+    bool operator >= (const LutEntry& entry) const
     {
-        return (freq < entry.freq);
-    }
-
-    bool operator > (const LutEntry& entry) const
-    {
-        return (freq > entry.freq);
+        return (freq >= entry.freq);
     }
 };
 
@@ -56,11 +50,18 @@ class LUTsSubSymbolTransformation {
     void decodeLUTs(Reader &reader);
     void encodeLUTs(Writer &writer, util::DataBlock* const symbols);
 
-    void invTransform(util::DataBlock* const symbolsIn, util::DataBlock* const symbolsOut);
-    void transform(util::DataBlock* const symbolsIn, util::DataBlock* const symbolsOut);
+    uint64_t getNumMaxElems(std::vector<Subsymbol>& subsymbols,
+                            const uint8_t lutIdx,
+                            const uint8_t prvIdx);
 
-    void invTransform(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx, uint8_t prvIdx);
-    void transform(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx, uint8_t prvIdx);
+    void invTransform(std::vector<Subsymbol>& subsymbols,
+                      const uint8_t subsymIdx,
+                      const uint8_t lutIdx,
+                      const uint8_t prvIdx);
+    void transform(std::vector<Subsymbol>& subsymbols,
+                   const uint8_t subsymIdx,
+                   const uint8_t lutIdx,
+                   const uint8_t prvIdx);
 
     private:
     void setupLutsO1(uint8_t numSubsyms, uint64_t numAlphaSubsym);
