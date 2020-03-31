@@ -74,7 +74,7 @@ void LUTsSubSymbolTransformation::buildLuts(util::DataBlock* const symbols) {
     uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
     uint64_t const subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize)-1;
 
-    if(numLuts == 0 || codingOrder < 1)
+    if(numLuts == 0)
         return;
 
     util::BlockStepper r = symbols->getReader();
@@ -135,7 +135,7 @@ void LUTsSubSymbolTransformation::decodeLUTs(Reader &reader) {
                                                  supportVals.getShareSubsymLutFlag());
     uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
 
-    if(numLuts == 0 || codingOrder < 1)
+    if(numLuts == 0)
         return;
 
     if(codingOrder == 2) {
@@ -182,7 +182,7 @@ void LUTsSubSymbolTransformation::encodeLUTs(Writer &writer, util::DataBlock* co
                                                  supportVals.getShareSubsymLutFlag());
     uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
 
-    if(numLuts == 0 || codingOrder < 1)
+    if(numLuts == 0)
         return;
 
     // build LUTs from symbols
@@ -252,7 +252,7 @@ void LUTsSubSymbolTransformation::transform(util::DataBlock* const symbolsIn, ut
     uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
     uint64_t const subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize)-1;
 
-    if(numLuts == 0 || codingOrder < 1)
+    if(numLuts == 0)
         return;
 
     util::BlockStepper r = symbolsIn->getReader();
