@@ -71,7 +71,21 @@ class Reader {
 
     uint64_t readAsSDTUcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
 
+    uint64_t readBI(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+
+    uint64_t readTU(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+
+    uint64_t readEG(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+
+    uint64_t readTEG(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+
+    uint64_t readSUTU(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+
+    uint64_t readDTU(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+
     uint64_t readLutSymbol(const uint8_t codingSubsymSize);
+
+    bool readSignFlag();
 
     size_t start();
 

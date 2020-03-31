@@ -287,12 +287,62 @@ uint64_t Reader::readAsSDTUcabac(const std::vector<unsigned int> binParams, cons
     return value;
 }
 
+uint64_t Reader::readBI(const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    if(m_bypassFlag)
+        return readAsBIbypass(binParams);
+    else
+        return readAsBIcabac(binParams, ctxIdx);
+}
+
+uint64_t Reader::readTU(const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    if(m_bypassFlag)
+        return readAsTUbypass(binParams);
+    else
+        return readAsTUcabac(binParams, ctxIdx);
+}
+
+uint64_t Reader::readEG(const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    if(m_bypassFlag)
+        return readAsEGbypass(binParams);
+    else
+        return readAsEGcabac(binParams, ctxIdx);
+}
+
+uint64_t Reader::readTEG(const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    if(m_bypassFlag)
+        return readAsTEGbypass(binParams);
+    else
+        return readAsTEGcabac(binParams, ctxIdx);
+}
+
+uint64_t Reader::readSUTU(const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    if(m_bypassFlag)
+        return readAsSUTUbypass(binParams);
+    else
+        return readAsSUTUcabac(binParams, ctxIdx);
+}
+
+uint64_t Reader::readDTU(const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    if(m_bypassFlag)
+        return readAsDTUbypass(binParams);
+    else
+        return readAsDTUcabac(binParams, ctxIdx);
+}
+
 uint64_t Reader::readLutSymbol(const uint8_t codingSubsymSize) {
     std::vector<unsigned int> binParams({codingSubsymSize, 2});
     if(m_bypassFlag)
         return readAsSUTUbypass(binParams);
     else
         return readAsSUTUcabac(binParams, 0); // ctxIdx = 0
+}
+
+bool Reader::readSignFlag() {
+    std::vector<unsigned int> binParams({1});
+    if(m_bypassFlag)
+        return (bool) readAsBIbypass(std::vector<unsigned int>({1}));
+    else
+        return (bool) readAsBIcabac(std::vector<unsigned int>({1}), m_numContexts-1);
 }
 
 size_t Reader::readNumSymbols() {
