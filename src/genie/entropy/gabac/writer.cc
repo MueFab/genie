@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <limits>
+#include <cmath>
 
 #include "context-tables.h"
 //
@@ -132,32 +133,30 @@ void Writer::writeAsTUcabac(uint64_t input, const std::vector<unsigned int> binP
 void Writer::writeAsEGbypass(uint64_t input, const std::vector<unsigned int>) {
     //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::EG).sbCheck(input, input, 0));
 
-    input++;
-    unsigned int length = ((getBitLength(static_cast<uint64_t>(input)) - 1) << 1u) + 1;
-    assert(input <= std::numeric_limits<unsigned>::max());
-    m_binaryArithmeticEncoder.encodeBinsEP(static_cast<unsigned>(input), length);
+    unsigned int valuePlus1 = input + 1;
+    unsigned int numLeadZeros = floor(log2(valuePlus1));
+
+    /* prefix */
+    writeAsBIbypass(1, std::vector<unsigned int>({numLeadZeros + 1}));
+    if(numLeadZeros) {
+        /* suffix */
+        writeAsBIbypass(valuePlus1 & ((1u<<numLeadZeros)-1),
+                       std::vector<unsigned int>({numLeadZeros}));
+    }
 }
 
 void Writer::writeAsEGcabac(uint64_t input, const std::vector<unsigned int>, const unsigned int ctxIdx) {
     //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::EG).sbCheck(input, input, 0));
 
-    input++;
-    unsigned int i = 0;
+    unsigned int valuePlus1 = input + 1;
+    unsigned int numLeadZeros = floor(log2(valuePlus1));
 
-    unsigned int cm = ctxIdx;
-    auto scan = m_contextModels.begin() + cm;
-    unsigned int length = ((getBitLength(static_cast<uint64_t>(input)) - 1) << 1u) + 1;
-
-    for (i = static_cast<uint8_t>(length) >> 1u; i > 0; i--) {
-        m_binaryArithmeticEncoder.encodeBin(0, &*(scan++));
-    }
-    m_binaryArithmeticEncoder.encodeBin(1, &*scan);
-
-    length -= ((static_cast<uint8_t>(length) >> 1u) + 1);
-    if (length != 0) {
-        input -= (1u << length);
-        assert(input <= std::numeric_limits<unsigned>::max());
-        m_binaryArithmeticEncoder.encodeBinsEP(static_cast<unsigned>(input), length);
+    /* prefix */
+    writeAsBIcabac(1, std::vector<unsigned int>({numLeadZeros + 1}), ctxIdx);
+    if(numLeadZeros) {
+        /* suffix */
+        writeAsBIbypass(valuePlus1 & ((1u<<numLeadZeros)-1),
+                       std::vector<unsigned int>({numLeadZeros}));
     }
 }
 
