@@ -22,8 +22,8 @@ static inline
 LutOrder1 getInitLutsOrder1(uint64_t numAlphaSubsym) {
     return std::vector<LutRow>(numAlphaSubsym,
                                {std::vector<LutEntry>(numAlphaSubsym,
-                                                      {0,0,0}), // value, index, freq
-                                0} // maxVaue
+                                                      {0,0}), // value, freq
+                                0} // numMaxElems
                               );
 }
 
@@ -99,18 +99,26 @@ void LUTsSubSymbolTransformation::buildLuts(util::DataBlock* const symbols) {
             subsymValue = (symValue>>(oss-=codingSubsymSize)) & subsymMask;
 
             if(codingOrder == 2) {
-                LutOrder2 lut = lutsO2[lutIdx];
+                LutOrder2& lut = lutsO2[lutIdx];
                 lut[subsymbols[prvIdx].prvValues[1]][subsymbols[prvIdx].prvValues[0]].entries[subsymValue].freq++;
                 lut[subsymbols[prvIdx].prvValues[1]][subsymbols[prvIdx].prvValues[0]].entries[subsymValue].value = subsymValue;
+
+                subsymbols[prvIdx].prvValues[1] = subsymbols[prvIdx].prvValues[0];
+                subsymbols[prvIdx].prvValues[0] = subsymValue;
+
             } else if(codingOrder == 1) {
-                LutOrder1 lut = lutsO1[lutIdx];
+                LutOrder1& lut = lutsO1[lutIdx];
                 lut[subsymbols[prvIdx].prvValues[0]].entries[subsymValue].freq++;
                 lut[subsymbols[prvIdx].prvValues[0]].entries[subsymValue].value = subsymValue;
+
+                subsymbols[prvIdx].prvValues[0] = subsymValue;
             }
         }
 
         r.inc();
     }
+
+    return;
 }
 
 void LUTsSubSymbolTransformation::decodeLutOrder1(Reader &reader, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut) {
@@ -119,7 +127,6 @@ void LUTsSubSymbolTransformation::decodeLutOrder1(Reader &reader, uint64_t numAl
         lut[i].numMaxElems = reader.readLutSymbol(codingSubsymSize);
         for(j=0; j<=lut[i].numMaxElems; j++) {
             lut[i].entries[j].value = reader.readLutSymbol(codingSubsymSize);
-            lut[i].entries[j].index = j;
         }
     }
 }
@@ -156,8 +163,10 @@ void LUTsSubSymbolTransformation::decodeLUTs(Reader &reader) {
 
 void LUTsSubSymbolTransformation::sortLutRow(LutRow& lutRow) {
     // sort entries in descending order and populate numMaxElems;
-    sort(lutRow.entries.begin(), lutRow.entries.end(), std::greater<LutEntry>());
+    sort(lutRow.entries.begin(), lutRow.entries.end(), std::greater_equal<LutEntry>());
     lutRow.numMaxElems = std::count_if(lutRow.entries.begin(), lutRow.entries.end(), [](LutEntry e){return e.freq != 0;});
+    if(lutRow.numMaxElems > 0)
+        lutRow.numMaxElems--;
 }
 
 void LUTsSubSymbolTransformation::encodeLutOrder1(Writer &writer, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut) {
@@ -209,7 +218,7 @@ void LUTsSubSymbolTransformation::transform(std::vector<Subsymbol>& subsymbols,
     uint8_t const codingOrder = supportVals.getCodingOrder();
     uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
 
-    Subsymbol subsymbol = subsymbols[subsymIdx];
+    Subsymbol& subsymbol = subsymbols[subsymIdx];
     if(codingOrder == 2) {
         LutOrder2 lut = lutsO2[lutIdx];
         /* Search the index for subsymValue */
@@ -235,69 +244,20 @@ void LUTsSubSymbolTransformation::transform(std::vector<Subsymbol>& subsymbols,
     }
 }
 
-void LUTsSubSymbolTransformation::transform(util::DataBlock* const symbolsIn, util::DataBlock* const symbolsOut) {
-    assert(symbolsIn != nullptr);
-
-    size_t numSymbols = symbolsIn->size();
-    if (numSymbols <= 0) return;
-
-    uint8_t const outputSymbolSize = supportVals.getOutputSymbolSize();
-    uint8_t const codingSubsymSize = supportVals.getCodingSubsymSize();
+uint64_t LUTsSubSymbolTransformation::getNumMaxElems(std::vector<Subsymbol>& subsymbols,
+                                                     const uint8_t lutIdx,
+                                                     const uint8_t prvIdx) {
     uint8_t const codingOrder = supportVals.getCodingOrder();
-    uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
-                                                 supportVals.getShareSubsymLutFlag());
-    uint8_t const numPrvs = stateVars.getNumPrvs(codingOrder,
-                                                 supportVals.getShareSubsymPrvFlag());
-    uint8_t const numSubsymbols = stateVars.getNumSubsymbols();
-    uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
-    uint64_t const subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize)-1;
 
-    if(numLuts == 0)
-        return;
-
-    util::BlockStepper r = symbolsIn->getReader();
-    std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
-
-    while (r.isValid()) {
-        // Split symbol into subsymbols and then build subsymbols
-        uint64_t symbolValue = r.get();
-        uint64_t subsymValue = 0;
-        uint32_t oss = outputSymbolSize;
-
-        uint64_t symValue = abs((int64_t) symbolValue);
-        for (uint8_t s=0; s<numSubsymbols; s++) {
-            uint8_t lutIdx = (numLuts > 1) ? s : 0; // either private or shared LUT
-            uint8_t prvIdx = (numPrvs > 1) ? s : 0; // either private or shared PRV
-
-            subsymValue = (symValue>>(oss-=codingSubsymSize)) & subsymMask;
-
-            if(codingOrder == 2) {
-                LutOrder2 lut = lutsO2[lutIdx];
-                /* Search the index for subsymValue */
-                for(uint64_t j=0; j<numAlphaSubsym; j++) {
-                    if(lut[subsymbols[prvIdx].prvValues[1]][subsymbols[prvIdx].prvValues[0]].entries[j].value == subsymValue &&
-                       lut[subsymbols[prvIdx].prvValues[1]][subsymbols[prvIdx].prvValues[0]].entries[j].freq > 0) {
-                        subsymbols[s].lutNumMaxElems = lut[subsymbols[prvIdx].prvValues[1]][subsymbols[prvIdx].prvValues[0]].numMaxElems;
-                        subsymbols[s].lutEntryIdx = j;
-                        break;
-                    }
-                }
-            } else if(codingOrder == 1) {
-                LutOrder1 lut = lutsO1[lutIdx];
-                /* Search the index for subsymValue */
-                for(uint64_t j=0; j<numAlphaSubsym; j++) {
-                    if(lut[subsymbols[prvIdx].prvValues[0]].entries[j].value == subsymValue &&
-                       lut[subsymbols[prvIdx].prvValues[0]].entries[j].freq > 0) {
-                        subsymbols[s].lutNumMaxElems = lut[subsymbols[prvIdx].prvValues[0]].numMaxElems;
-                        subsymbols[s].lutEntryIdx = j;
-                        break;
-                    }
-                }
-            }
-        }
-
-        r.inc();
+    if(codingOrder == 2) {
+        LutOrder2 lut = lutsO2[lutIdx];
+        return lut[subsymbols[prvIdx].prvValues[1]][subsymbols[prvIdx].prvValues[0]].numMaxElems;
+    } else if(codingOrder == 1) {
+        LutOrder1 lut = lutsO1[lutIdx];
+        return lut[subsymbols[prvIdx].prvValues[0]].numMaxElems;
     }
+
+    return 0;
 }
 
 void LUTsSubSymbolTransformation::invTransform(std::vector<Subsymbol>& subsymbols,
@@ -306,7 +266,7 @@ void LUTsSubSymbolTransformation::invTransform(std::vector<Subsymbol>& subsymbol
                                                const uint8_t prvIdx) {
     uint8_t const codingOrder = supportVals.getCodingOrder();
 
-    Subsymbol subsymbol = subsymbols[subsymIdx];
+    Subsymbol& subsymbol = subsymbols[subsymIdx];
     if(codingOrder == 2) {
         LutOrder2 lut = lutsO2[lutIdx];
         subsymbol.subsymValue = lut[subsymbols[prvIdx].prvValues[1]][subsymbols[prvIdx].prvValues[0]].entries[subsymbol.lutEntryIdx].value;

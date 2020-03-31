@@ -21,7 +21,8 @@ set(source_files
         gabac-decompressor.cc
         gabac-seq-conf-set.cc
         genie-gabac-output-stream.cc
-        lut-transform.cc
+        lut-transform.cc # To be removed
+        luts-subsymbol-transform.cc
         match-coding.cc
         reader.cc
         rle-coding.cc
