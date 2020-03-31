@@ -22,36 +22,6 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-static unsigned int getBitLength(uint64_t value) {
-    unsigned int numBits = 0;
-
-    if (value > 0x7FFF) {
-        value >>= 16;
-        numBits += 16;
-    }
-
-    if (value > 0x7F) {
-        value >>= 8;
-        numBits += 8;
-    }
-
-    if (value > 0x7) {
-        value >>= 4;
-        numBits += 4;
-    }
-
-    if (value > 0x1) {
-        value >>= 2;
-        numBits += 2;
-    }
-
-    if (value > 0x0) {
-        numBits += 1;
-    }
-
-    return numBits;
-}
-
 Writer::Writer(OBufferStream *const bitstream, const bool bypassFlag, const unsigned long numContexts)
     : m_bitOutputStream(bitstream),
       m_binaryArithmeticEncoder(m_bitOutputStream),
@@ -106,7 +76,7 @@ void Writer::writeAsTUbypass(uint64_t input, const std::vector<unsigned int> bin
     for (uint64_t i = 0; i < input; i++) {
         m_binaryArithmeticEncoder.encodeBinEP(1);
     }
-    if (input != cMax) {
+    if (cMax > input) {
         m_binaryArithmeticEncoder.encodeBinEP(0);
     }
 }
@@ -117,17 +87,14 @@ void Writer::writeAsTUcabac(uint64_t input, const std::vector<unsigned int> binP
     const unsigned int cMax = binParams[0];
     unsigned int cm = ctxIdx;
     auto scan = m_contextModels.begin() + cm;
-
-    if (input == cMax) {
-        for (; input > 0; input--) {
-            m_binaryArithmeticEncoder.encodeBin(1, &*(scan++));
-        }
-    } else {
-        for (; input > 0; input--) {
-            m_binaryArithmeticEncoder.encodeBin(1, &*(scan++));
-        }
+    for (uint64_t i = 0; i < input; i++) {
+        m_binaryArithmeticEncoder.encodeBin(1, &*(scan++));
+    }
+    if (cMax > input) {
         m_binaryArithmeticEncoder.encodeBin(0, &*scan);
     }
+
+    printf("\n");
 }
 
 void Writer::writeAsEGbypass(uint64_t input, const std::vector<unsigned int>) {
