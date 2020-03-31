@@ -10,6 +10,7 @@
 #include "reader.h"
 #include "writer.h"
 #include <genie/entropy/paramcabac/state_vars.h>
+#include "context-selector.h"
 
 namespace genie {
 namespace util {
@@ -53,10 +54,11 @@ class LUTsSubSymbolTransformation {
                                 const bool _modeFlag);
 
     void decodeLUTs(Reader &reader);
-    void encodeLUTs(Writer &writer);
+    void encodeLUTs(Writer &writer, util::DataBlock* const symbols);
 
     void invTransform(util::DataBlock* const symbolsIn, util::DataBlock* const symbolsOut);
     void transform(util::DataBlock* const symbolsIn, util::DataBlock* const symbolsOut);
+    void transform(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx, uint8_t prvIdx);
 
     private:
     void setupLutsO1(uint8_t numSubsyms, uint64_t numAlphaSubsym);

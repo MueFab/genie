@@ -13,7 +13,6 @@
 #include <genie/util/block-stepper.h>
 #include <genie/util/data-block.h>
 #include "exceptions.h"
-#include "context-selector.h"
 
 namespace genie {
 namespace entropy {
@@ -74,7 +73,6 @@ void LUTsSubSymbolTransformation::buildLuts(util::DataBlock* const symbols) {
     uint8_t const numSubsymbols = stateVars.getNumSubsymbols();
     uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
     uint64_t const subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize)-1;
-
 
     if(numLuts == 0 || codingOrder < 1)
         return;
@@ -173,7 +171,7 @@ void LUTsSubSymbolTransformation::encodeLutOrder1(Writer &writer, uint64_t numAl
     }
 }
 
-void LUTsSubSymbolTransformation::encodeLUTs(Writer &writer) {
+void LUTsSubSymbolTransformation::encodeLUTs(Writer &writer, util::DataBlock* const symbols) {
 
     if(!encodingModeFlag)
         return;
@@ -187,6 +185,10 @@ void LUTsSubSymbolTransformation::encodeLUTs(Writer &writer) {
     if(numLuts == 0 || codingOrder < 1)
         return;
 
+    // build LUTs from symbols
+    buildLuts(symbols);
+
+    // encode LUTs
     if(codingOrder == 2) {
         for(uint32_t s=0; s<numLuts; s++) {
             for(uint32_t k=0; k<numAlphaSubsym; k++) {
@@ -197,6 +199,104 @@ void LUTsSubSymbolTransformation::encodeLUTs(Writer &writer) {
         for(uint32_t s=0; s<numLuts; s++) {
             encodeLutOrder1(writer, numAlphaSubsym, codingSubsymSize, lutsO1[s]);
         }
+    }
+}
+
+void LUTsSubSymbolTransformation::transform(std::vector<Subsymbol>& subsymbols,
+                                            const uint8_t subsymIdx,
+                                            const uint8_t lutIdx,
+                                            const uint8_t prvIdx) {
+    uint8_t const codingOrder = supportVals.getCodingOrder();
+    uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
+
+    Subsymbol subsymbol = subsymbols[subsymIdx];
+    if(codingOrder == 2) {
+        LutOrder2 lut = lutsO2[lutIdx];
+        /* Search the index for subsymValue */
+        for(uint64_t j=0; j<numAlphaSubsym; j++) {
+            if(lut[subsymbols[prvIdx].prvValues[1]][subsymbols[prvIdx].prvValues[0]].entries[j].value == subsymbol.subsymValue &&
+               lut[subsymbols[prvIdx].prvValues[1]][subsymbols[prvIdx].prvValues[0]].entries[j].freq > 0) {
+                subsymbol.lutNumMaxElems = lut[subsymbols[prvIdx].prvValues[1]][subsymbols[prvIdx].prvValues[0]].numMaxElems;
+                subsymbol.lutEntryIdx = j;
+                break;
+            }
+        }
+    } else if(codingOrder == 1) {
+        /* Search the index for subsymValue */
+        for(uint64_t j=0; j<numAlphaSubsym; j++) {
+            LutOrder1 lut = lutsO1[lutIdx];
+            if(lut[subsymbols[prvIdx].prvValues[0]].entries[j].value == subsymbol.subsymValue &&
+               lut[subsymbols[prvIdx].prvValues[0]].entries[j].freq > 0) {
+                subsymbol.lutNumMaxElems = lut[subsymbols[prvIdx].prvValues[0]].numMaxElems;
+                subsymbol.lutEntryIdx = j;
+                break;
+            }
+        }
+    }
+}
+
+void LUTsSubSymbolTransformation::transform(util::DataBlock* const symbolsIn, util::DataBlock* const symbolsOut) {
+    assert(symbolsIn != nullptr);
+
+    size_t numSymbols = symbolsIn->size();
+    if (numSymbols <= 0) return;
+
+    uint8_t const outputSymbolSize = supportVals.getOutputSymbolSize();
+    uint8_t const codingSubsymSize = supportVals.getCodingSubsymSize();
+    uint8_t const codingOrder = supportVals.getCodingOrder();
+    uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
+                                                 supportVals.getShareSubsymLutFlag());
+    uint8_t const numPrvs = stateVars.getNumPrvs(codingOrder,
+                                                 supportVals.getShareSubsymPrvFlag());
+    uint8_t const numSubsymbols = stateVars.getNumSubsymbols();
+    uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
+    uint64_t const subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize)-1;
+
+    if(numLuts == 0 || codingOrder < 1)
+        return;
+
+    util::BlockStepper r = symbolsIn->getReader();
+    std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
+
+    while (r.isValid()) {
+        // Split symbol into subsymbols and then build subsymbols
+        uint64_t symbolValue = r.get();
+        uint64_t subsymValue = 0;
+        uint32_t oss = outputSymbolSize;
+
+        uint64_t symValue = abs((int64_t) symbolValue);
+        for (uint8_t s=0; s<numSubsymbols; s++) {
+            uint8_t lutIdx = (numLuts > 1) ? s : 0; // either private or shared LUT
+            uint8_t prvIdx = (numPrvs > 1) ? s : 0; // either private or shared PRV
+
+            subsymValue = (symValue>>(oss-=codingSubsymSize)) & subsymMask;
+
+            if(codingOrder == 2) {
+                LutOrder2 lut = lutsO2[lutIdx];
+                /* Search the index for subsymValue */
+                for(uint64_t j=0; j<numAlphaSubsym; j++) {
+                    if(lut[subsymbols[prvIdx].prvValues[1]][subsymbols[prvIdx].prvValues[0]].entries[j].value == subsymValue &&
+                       lut[subsymbols[prvIdx].prvValues[1]][subsymbols[prvIdx].prvValues[0]].entries[j].freq > 0) {
+                        subsymbols[s].lutNumMaxElems = lut[subsymbols[prvIdx].prvValues[1]][subsymbols[prvIdx].prvValues[0]].numMaxElems;
+                        subsymbols[s].lutEntryIdx = j;
+                        break;
+                    }
+                }
+            } else if(codingOrder == 1) {
+                /* Search the index for subsymValue */
+                for(uint64_t j=0; j<numAlphaSubsym; j++) {
+                    LutOrder1 lut = lutsO1[lutIdx];
+                    if(lut[subsymbols[prvIdx].prvValues[0]].entries[j].value == subsymValue &&
+                       lut[subsymbols[prvIdx].prvValues[0]].entries[j].freq > 0) {
+                        subsymbols[s].lutNumMaxElems = lut[subsymbols[prvIdx].prvValues[0]].numMaxElems;
+                        subsymbols[s].lutEntryIdx = j;
+                        break;
+                    }
+                }
+            }
+        }
+
+        r.inc();
     }
 }
 
