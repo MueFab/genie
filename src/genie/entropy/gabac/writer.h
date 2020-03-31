@@ -79,6 +79,8 @@ class Writer {
 
     void writeLutSymbol(uint64_t input, const uint8_t codingSubsymSize);
 
+    void writeSignFlag(uint64_t input);
+
     void writeNumSymbols(unsigned int numSymbols);
 
    private:
