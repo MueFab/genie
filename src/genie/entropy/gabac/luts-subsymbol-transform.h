@@ -58,6 +58,8 @@ class LUTsSubSymbolTransformation {
 
     void invTransform(util::DataBlock* const symbolsIn, util::DataBlock* const symbolsOut);
     void transform(util::DataBlock* const symbolsIn, util::DataBlock* const symbolsOut);
+
+    void invTransform(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx, uint8_t prvIdx);
     void transform(std::vector<Subsymbol>& subsymbols, uint8_t subsymIdx, uint8_t lutIdx, uint8_t prvIdx);
 
     private:

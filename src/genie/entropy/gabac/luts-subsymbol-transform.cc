@@ -222,9 +222,9 @@ void LUTsSubSymbolTransformation::transform(std::vector<Subsymbol>& subsymbols,
             }
         }
     } else if(codingOrder == 1) {
+        LutOrder1 lut = lutsO1[lutIdx];
         /* Search the index for subsymValue */
         for(uint64_t j=0; j<numAlphaSubsym; j++) {
-            LutOrder1 lut = lutsO1[lutIdx];
             if(lut[subsymbols[prvIdx].prvValues[0]].entries[j].value == subsymbol.subsymValue &&
                lut[subsymbols[prvIdx].prvValues[0]].entries[j].freq > 0) {
                 subsymbol.lutNumMaxElems = lut[subsymbols[prvIdx].prvValues[0]].numMaxElems;
@@ -283,9 +283,9 @@ void LUTsSubSymbolTransformation::transform(util::DataBlock* const symbolsIn, ut
                     }
                 }
             } else if(codingOrder == 1) {
+                LutOrder1 lut = lutsO1[lutIdx];
                 /* Search the index for subsymValue */
                 for(uint64_t j=0; j<numAlphaSubsym; j++) {
-                    LutOrder1 lut = lutsO1[lutIdx];
                     if(lut[subsymbols[prvIdx].prvValues[0]].entries[j].value == subsymValue &&
                        lut[subsymbols[prvIdx].prvValues[0]].entries[j].freq > 0) {
                         subsymbols[s].lutNumMaxElems = lut[subsymbols[prvIdx].prvValues[0]].numMaxElems;
@@ -299,6 +299,24 @@ void LUTsSubSymbolTransformation::transform(util::DataBlock* const symbolsIn, ut
         r.inc();
     }
 }
+
+void LUTsSubSymbolTransformation::invTransform(std::vector<Subsymbol>& subsymbols,
+                                               const uint8_t subsymIdx,
+                                               const uint8_t lutIdx,
+                                               const uint8_t prvIdx) {
+    uint8_t const codingOrder = supportVals.getCodingOrder();
+
+    Subsymbol subsymbol = subsymbols[subsymIdx];
+    if(codingOrder == 2) {
+        LutOrder2 lut = lutsO2[lutIdx];
+        subsymbol.subsymValue = lut[subsymbols[prvIdx].prvValues[1]][subsymbols[prvIdx].prvValues[0]].entries[subsymbol.lutEntryIdx].value;
+    } else if(codingOrder == 1) {
+        LutOrder1 lut = lutsO1[lutIdx];
+        subsymbol.subsymValue = lut[subsymbols[prvIdx].prvValues[0]].entries[subsymbol.lutEntryIdx].value;
+    }
+}
+
+
 
 }  // namespace gabac
 }  // namespace entropy
