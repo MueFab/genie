@@ -161,25 +161,6 @@ void Writer::writeAsEGcabac(uint64_t input, const std::vector<unsigned int>, con
     }
 }
 
-void Writer::writeAsSEGbypass(uint64_t input, const std::vector<unsigned int> binParams) {
-    //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::SEG).sbCheck(input, input, 0));
-    if (int64_t(input) <= 0) {
-        writeAsEGbypass(static_cast<unsigned int>(-int64_t(input)) << 1u, binParams);
-    } else {
-        writeAsEGbypass(static_cast<unsigned int>(static_cast<uint64_t>(input) << 1u) - 1, binParams);
-    }
-}
-
-void Writer::writeAsSEGcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
-    //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::SEG).sbCheck(uint64_t(input), uint64_t(input), 0));
-
-    if (int64_t(input) <= 0) {
-        writeAsEGcabac(static_cast<unsigned int>(-int64_t(input)) << 1u, binParams, ctxIdx);
-    } else {
-        writeAsEGcabac(static_cast<unsigned int>(static_cast<uint64_t>(input) << 1u) - 1, binParams, ctxIdx);
-    }
-}
-
 void Writer::writeAsTEGbypass(uint64_t input, const std::vector<unsigned int> binParams) {
     //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::TEG).sbCheck(input, input, cTruncExpGolParam));
 
@@ -201,34 +182,6 @@ void Writer::writeAsTEGcabac(uint64_t input, const std::vector<unsigned int> bin
     } else {
         writeAsTUcabac(cTruncExpGolParam, binParams, ctxIdx);
         writeAsEGcabac(input - cTruncExpGolParam, std::vector<unsigned int>({0}), ctxIdx); //FIXME should not this be ctxIdx+binParams[0]?
-    }
-}
-
-void Writer::writeAsSTEGbypass(uint64_t input, const std::vector<unsigned int> binParams) {
-    //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::STEG).sbCheck(uint64_t(input), uint64_t(input), cSignedTruncExpGolParam));
-
-    if (int64_t(input) < 0) {
-        writeAsTEGbypass(uint64_t(-int64_t(input)), binParams);
-        writeAsBIbypass(1, std::vector<unsigned int>({1}));
-    } else if (input > 0) {
-        writeAsTEGbypass(uint64_t(input), binParams);
-        writeAsBIbypass(0, std::vector<unsigned int>({1}));
-    } else {
-        writeAsTEGbypass(0, binParams);
-    }
-}
-
-void Writer::writeAsSTEGcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
-    //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::STEG).sbCheck(uint64_t(input), uint64_t(input), cSignedTruncExpGolParam));
-
-    if (int64_t(input) < 0) {
-        writeAsTEGcabac(uint64_t(-int64_t(input)), binParams, ctxIdx);
-        writeAsBIcabac(1, std::vector<unsigned int>({1}), ctxIdx); // FIXME fix ctxIdx for sign bit
-    } else if (input > 0) {
-        writeAsTEGcabac(uint64_t(input), binParams, ctxIdx);
-        writeAsBIcabac(0, std::vector<unsigned int>({1}), ctxIdx); // FIXME fix ctxIdx for sign bit
-    } else {
-        writeAsTEGcabac(0, binParams, ctxIdx);
     }
 }
 
@@ -266,31 +219,6 @@ void Writer::writeAsSUTUcabac(uint64_t input, const std::vector<unsigned int> bi
     }
 }
 
-void Writer::writeAsSSUTUbypass(uint64_t input, const std::vector<unsigned int> binParams) {
-
-    if (int64_t(input) < 0) {
-        writeAsSUTUbypass(uint64_t(-int64_t(input)), binParams);
-        writeAsBIbypass(1, std::vector<unsigned int>({1}));
-    } else if (input > 0) {
-        writeAsSUTUbypass(uint64_t(input), binParams);
-        writeAsBIbypass(0, std::vector<unsigned int>({1}));
-    } else {
-        writeAsSUTUbypass(0, binParams);
-    }
-}
-
-void Writer::writeAsSSUTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
-    if (int64_t(input) < 0) {
-        writeAsSUTUcabac(uint64_t(-int64_t(input)), binParams, ctxIdx);
-        writeAsBIcabac(1, std::vector<unsigned int>({1}), ctxIdx);  // FIXME fix ctxIdx for sign bit
-    } else if (input > 0) {
-        writeAsSUTUcabac(uint64_t(input), binParams, ctxIdx);
-        writeAsBIcabac(0, std::vector<unsigned int>({1}), ctxIdx);  // FIXME fix ctxIdx for sign bit
-    } else {
-        writeAsSUTUcabac(0, binParams, ctxIdx);
-    }
-}
-
 void Writer::writeAsDTUbypass(uint64_t input, const std::vector<unsigned int> binParams) {
 
     const unsigned int cMaxDtu = binParams[2];
@@ -317,29 +245,46 @@ void Writer::writeAsDTUcabac(uint64_t input, const std::vector<unsigned int> bin
     }
 }
 
-void Writer::writeAsSDTUbypass(uint64_t input, const std::vector<unsigned int> binParams) {
-
-    if (int64_t(input) < 0) {
-        writeAsDTUbypass(uint64_t(-int64_t(input)), binParams);
-        writeAsBIbypass(1, std::vector<unsigned int>({1}));
-    } else if (input > 0) {
-        writeAsDTUbypass(uint64_t(input), binParams);
-        writeAsBIbypass(0, std::vector<unsigned int>({1}));
-    } else {
-        writeAsDTUbypass(0, binParams);
-    }
+void Writer::writeBI(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    if(m_bypassFlag)
+        writeAsBIbypass(input, binParams);
+    else
+        writeAsBIcabac(input, binParams, ctxIdx);
 }
 
-void Writer::writeAsSDTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
-    if (int64_t(input) < 0) {
-        writeAsDTUcabac(uint64_t(-int64_t(input)), binParams, ctxIdx);
-        writeAsBIcabac(1, std::vector<unsigned int>({1}), ctxIdx);  // FIXME fix ctxIdx for sign bit
-    } else if (input > 0) {
-        writeAsDTUcabac(uint64_t(input), binParams, ctxIdx);
-        writeAsBIcabac(0, std::vector<unsigned int>({1}), ctxIdx);  // FIXME fix ctxIdx for sign bit
-    } else {
-        writeAsDTUcabac(0, binParams, ctxIdx);
-    }
+void Writer::writeTU(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    if(m_bypassFlag)
+        writeAsTUbypass(input, binParams);
+    else
+        writeAsTUcabac(input, binParams, ctxIdx);
+}
+
+void Writer::writeEG(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    if(m_bypassFlag)
+        writeAsEGbypass(input, binParams);
+    else
+        writeAsEGcabac(input, binParams, ctxIdx);
+}
+
+void Writer::writeTEG(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    if(m_bypassFlag)
+        writeAsTEGbypass(input, binParams);
+    else
+        writeAsTEGcabac(input, binParams, ctxIdx);
+}
+
+void Writer::writeSUTU(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    if(m_bypassFlag)
+        writeAsSUTUbypass(input, binParams);
+    else
+        writeAsSUTUcabac(input, binParams, ctxIdx);
+}
+
+void Writer::writeDTU(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+    if(m_bypassFlag)
+        writeAsDTUbypass(input, binParams);
+    else
+        writeAsDTUcabac(input, binParams, ctxIdx);
 }
 
 void Writer::writeLutSymbol(uint64_t input, const uint8_t codingSubsymSize) {
