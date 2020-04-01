@@ -56,7 +56,7 @@ void LUTsSubSymbolTransform::setupLutsO2(uint8_t numSubsyms, uint64_t numAlphaSu
                                    );
 }
 
-void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols) {
+void LUTsSubSymbolTransform::buildLuts(const core::Alphabet alphaProps, util::DataBlock* const symbols, util::DataBlock* const depSymbols) {
     assert(symbols != nullptr);
 
     size_t numSymbols = symbols->size();
@@ -79,6 +79,11 @@ void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols) {
     util::BlockStepper r = symbols->getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
+    util::BlockStepper d;
+    if(depSymbols) {
+        d = depSymbols->getReader();
+    }
+
     if(codingOrder == 2)
         setupLutsO2(numSubsymbols, numAlphaSubsym);
     else
@@ -90,10 +95,21 @@ void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols) {
         uint64_t subsymValue = 0;
         uint32_t oss = outputSymbolSize;
 
+        uint64_t depSymbolValue = 0, depSubsymValue = 0;
+        if(d.isValid()) {
+            depSymbolValue = alphaProps.inverseLut[d.get()];
+            d.inc();
+        }
+
         uint64_t symValue = abs((int64_t) symbolValue);
         for (uint8_t s=0; s<numSubsymbols; s++) {
             uint8_t lutIdx = (numLuts > 1) ? s : 0; // either private or shared LUT
             uint8_t prvIdx = (numPrvs > 1) ? s : 0; // either private or shared PRV
+
+            if(depSymbols) {
+                depSubsymValue = (depSymbolValue>>(oss-codingSubsymSize)) & subsymMask;
+                subsymbols[prvIdx].prvValues[0] = depSubsymValue;
+            }
 
             subsymValue = (symValue>>(oss-=codingSubsymSize)) & subsymMask;
 
@@ -179,7 +195,7 @@ void LUTsSubSymbolTransform::encodeLutOrder1(Writer &writer, uint64_t numAlphaSu
     }
 }
 
-void LUTsSubSymbolTransform::encodeLUTs(Writer &writer, util::DataBlock* const symbols) {
+void LUTsSubSymbolTransform::encodeLUTs(Writer &writer, const core::Alphabet alphaProps, util::DataBlock* const symbols, util::DataBlock* const depSymbols) {
 
     if(!encodingModeFlag)
         return;
@@ -194,7 +210,7 @@ void LUTsSubSymbolTransform::encodeLUTs(Writer &writer, util::DataBlock* const s
         return;
 
     // build LUTs from symbols
-    buildLuts(symbols);
+    buildLuts(alphaProps, symbols, depSymbols);
 
     // encode LUTs
     if(codingOrder == 2) {
