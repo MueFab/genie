@@ -10,7 +10,7 @@
 #include "reader.h"
 #include "writer.h"
 #include <genie/entropy/paramcabac/state_vars.h>
-#include "context-selector.h"
+#include "subsymbol.h"
 
 namespace genie {
 namespace util {
@@ -40,12 +40,12 @@ struct LutRow {
 typedef std::vector<LutRow>    LutOrder1;
 typedef std::vector<LutOrder1> LutOrder2;
 
-class LUTsSubSymbolTransformation {
+class LUTsSubSymbolTransform {
 
     public:
-    LUTsSubSymbolTransformation(const paramcabac::SupportValues& _supportVals,
-                                const paramcabac::StateVars& _stateVars,
-                                const bool _modeFlag);
+    LUTsSubSymbolTransform(const paramcabac::SupportValues& _supportVals,
+                           const paramcabac::StateVars& _stateVars,
+                           const bool _modeFlag);
 
     void decodeLUTs(Reader &reader);
     void encodeLUTs(Writer &writer, util::DataBlock* const symbols);
@@ -64,6 +64,7 @@ class LUTsSubSymbolTransformation {
                    const uint8_t prvIdx);
 
     private:
+    inline LutOrder1 getInitLutsOrder1(uint64_t numAlphaSubsym);
     void setupLutsO1(uint8_t numSubsyms, uint64_t numAlphaSubsym);
     void setupLutsO2(uint8_t numSubsyms, uint64_t numAlphaSubsym);
     void buildLuts(util::DataBlock* const symbols);
