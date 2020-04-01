@@ -18,8 +18,7 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-static inline
-LutOrder1 getInitLutsOrder1(uint64_t numAlphaSubsym) {
+LutOrder1 LUTsSubSymbolTransform::getInitLutsOrder1(uint64_t numAlphaSubsym) {
     return std::vector<LutRow>(numAlphaSubsym,
                                {std::vector<LutEntry>(numAlphaSubsym,
                                                       {0,0}), // value, freq
@@ -27,14 +26,14 @@ LutOrder1 getInitLutsOrder1(uint64_t numAlphaSubsym) {
                               );
 }
 
-LUTsSubSymbolTransformation::LUTsSubSymbolTransformation(const paramcabac::SupportValues& _supportVals,
-                                                         const paramcabac::StateVars& _stateVars,
-                                                         const bool _modeFlag)
+LUTsSubSymbolTransform::LUTsSubSymbolTransform(const paramcabac::SupportValues& _supportVals,
+                                               const paramcabac::StateVars& _stateVars,
+                                               const bool _modeFlag)
     : supportVals(_supportVals),
       stateVars(_stateVars),
       encodingModeFlag(_modeFlag) {}
 
-void LUTsSubSymbolTransformation::setupLutsO1(uint8_t numSubsyms, uint64_t numAlphaSubsym) {
+void LUTsSubSymbolTransform::setupLutsO1(uint8_t numSubsyms, uint64_t numAlphaSubsym) {
 
     if(numAlphaSubsym > paramcabac::StateVars::MAX_LUT_SIZE)
         return;
@@ -42,10 +41,10 @@ void LUTsSubSymbolTransformation::setupLutsO1(uint8_t numSubsyms, uint64_t numAl
     lutsO1.clear();
     lutsO1 = std::vector<LutOrder1>(numSubsyms,
                                     getInitLutsOrder1(numAlphaSubsym)
-                                   );
+    );
 }
 
-void LUTsSubSymbolTransformation::setupLutsO2(uint8_t numSubsyms, uint64_t numAlphaSubsym) {
+void LUTsSubSymbolTransform::setupLutsO2(uint8_t numSubsyms, uint64_t numAlphaSubsym) {
 
     if(numAlphaSubsym > paramcabac::StateVars::MAX_LUT_SIZE)
         return;
@@ -57,7 +56,7 @@ void LUTsSubSymbolTransformation::setupLutsO2(uint8_t numSubsyms, uint64_t numAl
                                    );
 }
 
-void LUTsSubSymbolTransformation::buildLuts(util::DataBlock* const symbols) {
+void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols) {
     assert(symbols != nullptr);
 
     size_t numSymbols = symbols->size();
@@ -121,7 +120,7 @@ void LUTsSubSymbolTransformation::buildLuts(util::DataBlock* const symbols) {
     return;
 }
 
-void LUTsSubSymbolTransformation::decodeLutOrder1(Reader &reader, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut) {
+void LUTsSubSymbolTransform::decodeLutOrder1(Reader &reader, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut) {
     uint32_t i, j;
     for(i=0; i<numAlphaSubsym; i++) {
         lut[i].numMaxElems = reader.readLutSymbol(codingSubsymSize);
@@ -131,7 +130,7 @@ void LUTsSubSymbolTransformation::decodeLutOrder1(Reader &reader, uint64_t numAl
     }
 }
 
-void LUTsSubSymbolTransformation::decodeLUTs(Reader &reader) {
+void LUTsSubSymbolTransform::decodeLUTs(Reader &reader) {
 
     if(encodingModeFlag)
         return;
@@ -161,7 +160,7 @@ void LUTsSubSymbolTransformation::decodeLUTs(Reader &reader) {
     }
 }
 
-void LUTsSubSymbolTransformation::sortLutRow(LutRow& lutRow) {
+void LUTsSubSymbolTransform::sortLutRow(LutRow& lutRow) {
     // sort entries in descending order and populate numMaxElems;
     sort(lutRow.entries.begin(), lutRow.entries.end(), std::greater_equal<LutEntry>());
     lutRow.numMaxElems = std::count_if(lutRow.entries.begin(), lutRow.entries.end(), [](LutEntry e){return e.freq != 0;});
@@ -169,7 +168,7 @@ void LUTsSubSymbolTransformation::sortLutRow(LutRow& lutRow) {
         lutRow.numMaxElems--;
 }
 
-void LUTsSubSymbolTransformation::encodeLutOrder1(Writer &writer, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut) {
+void LUTsSubSymbolTransform::encodeLutOrder1(Writer &writer, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut) {
     uint32_t i, j;
     for(i=0; i<numAlphaSubsym; i++) {
         sortLutRow(lut[i]);
@@ -180,7 +179,7 @@ void LUTsSubSymbolTransformation::encodeLutOrder1(Writer &writer, uint64_t numAl
     }
 }
 
-void LUTsSubSymbolTransformation::encodeLUTs(Writer &writer, util::DataBlock* const symbols) {
+void LUTsSubSymbolTransform::encodeLUTs(Writer &writer, util::DataBlock* const symbols) {
 
     if(!encodingModeFlag)
         return;
@@ -211,10 +210,10 @@ void LUTsSubSymbolTransformation::encodeLUTs(Writer &writer, util::DataBlock* co
     }
 }
 
-void LUTsSubSymbolTransformation::transform(std::vector<Subsymbol>& subsymbols,
-                                            const uint8_t subsymIdx,
-                                            const uint8_t lutIdx,
-                                            const uint8_t prvIdx) {
+void LUTsSubSymbolTransform::transform(std::vector<Subsymbol>& subsymbols,
+                                       const uint8_t subsymIdx,
+                                       const uint8_t lutIdx,
+                                       const uint8_t prvIdx) {
     uint8_t const codingOrder = supportVals.getCodingOrder();
     uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
 
@@ -244,9 +243,9 @@ void LUTsSubSymbolTransformation::transform(std::vector<Subsymbol>& subsymbols,
     }
 }
 
-uint64_t LUTsSubSymbolTransformation::getNumMaxElems(std::vector<Subsymbol>& subsymbols,
-                                                     const uint8_t lutIdx,
-                                                     const uint8_t prvIdx) {
+uint64_t LUTsSubSymbolTransform::getNumMaxElems(std::vector<Subsymbol>& subsymbols,
+                                                const uint8_t lutIdx,
+                                                const uint8_t prvIdx) {
     uint8_t const codingOrder = supportVals.getCodingOrder();
 
     if(codingOrder == 2) {
@@ -260,10 +259,10 @@ uint64_t LUTsSubSymbolTransformation::getNumMaxElems(std::vector<Subsymbol>& sub
     return 0;
 }
 
-void LUTsSubSymbolTransformation::invTransform(std::vector<Subsymbol>& subsymbols,
-                                               const uint8_t subsymIdx,
-                                               const uint8_t lutIdx,
-                                               const uint8_t prvIdx) {
+void LUTsSubSymbolTransform::invTransform(std::vector<Subsymbol>& subsymbols,
+                                          const uint8_t subsymIdx,
+                                          const uint8_t lutIdx,
+                                          const uint8_t prvIdx) {
     uint8_t const codingOrder = supportVals.getCodingOrder();
 
     Subsymbol& subsymbol = subsymbols[subsymIdx];
@@ -275,8 +274,6 @@ void LUTsSubSymbolTransformation::invTransform(std::vector<Subsymbol>& subsymbol
         subsymbol.subsymValue = lut[subsymbols[prvIdx].prvValues[0]].entries[subsymbol.lutEntryIdx].value;
     }
 }
-
-
 
 }  // namespace gabac
 }  // namespace entropy
