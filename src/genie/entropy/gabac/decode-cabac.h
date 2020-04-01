@@ -22,7 +22,9 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-void decode_cabac(const paramcabac::TransformedSeq &conf, util::DataBlock* bitstream);
+void decode_cabac(const paramcabac::TransformedSeq &conf,
+                  util::DataBlock* bitstream,
+                  util::DataBlock* const depSymbols = nullptr);
 
 }  // namespace gabac
 }  // namespace entropy

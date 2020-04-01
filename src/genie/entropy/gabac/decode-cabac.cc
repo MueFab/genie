@@ -43,7 +43,8 @@ void decode_sign_flag(Reader &reader,
 }
 
 void decode_cabac(const paramcabac::TransformedSeq &conf,
-                  util::DataBlock* const bitstream) {
+                  util::DataBlock* bitstream,
+                  util::DataBlock* const depSymbols) {
     if (bitstream == nullptr) {
         GABAC_DIE("Bitstream is null");
     }
@@ -57,10 +58,12 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
     const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
     const paramcabac::StateVars &stateVars = conf.getStateVars();
     const paramcabac::BinarizationParameters::BinarizationId binID = binarzation.getBinarizationID();
+    const core::Alphabet alphaProps = getAlphabetProperties(conf.getAlphabetID());
 
     const uint8_t outputSymbolSize = supportVals.getOutputSymbolSize();
     const uint8_t codingSubsymSize = supportVals.getCodingSubsymSize();
     const uint8_t codingOrder = supportVals.getCodingOrder();
+    const uint64_t subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize)-1;
     const bool bypassFlag = binarzation.getBypassFlag();
 
     uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
@@ -80,9 +83,15 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
     std::vector<unsigned int> binParams(3, 0);
     util::BlockStepper r = symbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
+
     LUTsSubSymbolTransform invLutsSubsymTrnsfm(supportVals, stateVars, false);
     if(numLuts > 0) {
         invLutsSubsymTrnsfm.decodeLUTs(reader);
+    }
+
+    util::BlockStepper rDep;
+    if(depSymbols) {
+        rDep = depSymbols->getReader();
     }
 
     uint64_t (Reader::*func)(const std::vector<unsigned int>, const unsigned int) = nullptr;
@@ -125,9 +134,22 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
         // Decode subsymbols and merge them to construct symbols
         uint64_t symbolValue = 0;
         uint64_t decodedSubsym = 0;
+
+        uint64_t depSymbolValue = 0, depSubsymValue = 0;
+        if(rDep.isValid()) {
+            depSymbolValue = alphaProps.inverseLut[rDep.get()];
+            rDep.inc();
+        }
+
+        uint32_t oss = outputSymbolSize;
         for (uint8_t s=0; s<stateVars.getNumSubsymbols(); s++) {
             const uint8_t lutIdx = (numLuts > 1) ? s : 0; // either private or shared LUT
             const uint8_t prvIdx = (numPrvs > 1) ? s : 0; // either private or shared PRV
+
+            if(depSymbols) {
+                depSubsymValue = (depSymbolValue>>(oss-=codingSubsymSize)) & subsymMask;
+                subsymbols[prvIdx].prvValues[0] = depSubsymValue;
+            }
 
             subsymbols[s].subsymIdx = s;
             uint32_t ctxIdx = ContextSelector::getContextIdx(stateVars,
