@@ -22,7 +22,8 @@ int main(int argc, char* argv[]) {
                            programOptions.blocksize,
                            programOptions.descID,
                            programOptions.subseqID,
-                           false);
+                           false,
+                           programOptions.dependencyFilePath);
         } else if (programOptions.task == "decode") {
             gabacify::code(programOptions.inputFilePath,
                            // RESTRUCT_DISABLE programOptions.configurationFilePath,
@@ -30,7 +31,8 @@ int main(int argc, char* argv[]) {
                            programOptions.blocksize,
                            programOptions.descID,
                            programOptions.subseqID,
-                           true);
+                           true,
+                           programOptions.dependencyFilePath);
         } /* RESTRUCT-DISABLE
           else if (programOptions.task == "analyze") {
 

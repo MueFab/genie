@@ -34,6 +34,7 @@ void ProgramOptions::processCommandLine(int argc, char *argv[]) {
                    "'error', or 'fatal'");
 
     app.add_option("-i,--input_file", this->inputFilePath, "Input file");
+    app.add_option("-r,--dependency_file", this->dependencyFilePath, "Reference/Dependency file");
     app.add_option("-o,--output_file", this->outputFilePath, "Output file");
     app.add_option("task,-t,--task", this->task, "Task ('encode' or 'decode')")->required(true);
 

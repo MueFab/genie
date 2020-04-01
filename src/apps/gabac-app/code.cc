@@ -24,12 +24,15 @@ void code(const std::string &inputFilePath,
           size_t blocksize,
           uint8_t descID,
           uint8_t subseqID,
-          bool decode) {
+          bool decode,
+          const std::string& dependencyFilePath) {
     std::ifstream inputFile;
+    std::ifstream dependencyFile;
     std::ofstream outputFile;
     genie::entropy::gabac::NullStream nullstream;
 
     std::istream *istream = &std::cin;
+    std::istream *dstream = nullptr;
     std::ostream *ostream = &std::cout;
     std::ostream *logstream = &std::cout;
 
@@ -40,6 +43,15 @@ void code(const std::string &inputFilePath,
             GABAC_DIE("Could not open input file");
         }
         istream = &inputFile;
+    }
+
+    if (!dependencyFilePath.empty()) {
+        // Read in the entire dependency file
+        dependencyFile = std::ifstream(dependencyFilePath, std::ios::binary);
+        if (!inputFile) {
+            GABAC_DIE("Could not open dependency file");
+        }
+        dstream = &dependencyFile;
     }
 
     if (!outputFilePath.empty()) {
@@ -53,7 +65,7 @@ void code(const std::string &inputFilePath,
         logstream = &nullstream;
     }
 
-    genie::entropy::gabac::IOConfiguration ioconf = {istream, ostream, blocksize, logstream,
+    genie::entropy::gabac::IOConfiguration ioconf = {istream, dstream, ostream, blocksize, logstream,
                                                      genie::entropy::gabac::IOConfiguration::LogLevel::INFO};
 
     genie::entropy::gabac::run(ioconf, getEncoderConfig(descID, subseqID), decode);
