@@ -48,7 +48,7 @@ class LUTsSubSymbolTransform {
                            const bool _modeFlag);
 
     void decodeLUTs(Reader &reader);
-    void encodeLUTs(Writer &writer, util::DataBlock* const symbols);
+    void encodeLUTs(Writer &writer, const core::Alphabet alphaProps, util::DataBlock* const symbols, util::DataBlock* const depSymbols = nullptr);
 
     uint64_t getNumMaxElems(std::vector<Subsymbol>& subsymbols,
                             const uint8_t lutIdx,
@@ -67,7 +67,7 @@ class LUTsSubSymbolTransform {
     inline LutOrder1 getInitLutsOrder1(uint64_t numAlphaSubsym);
     void setupLutsO1(uint8_t numSubsyms, uint64_t numAlphaSubsym);
     void setupLutsO2(uint8_t numSubsyms, uint64_t numAlphaSubsym);
-    void buildLuts(util::DataBlock* const symbols);
+    void buildLuts(const core::Alphabet alphaProps, util::DataBlock* const symbols, util::DataBlock* const depSymbols = nullptr);
 
     void sortLutRow(LutRow& lutRow);
 
