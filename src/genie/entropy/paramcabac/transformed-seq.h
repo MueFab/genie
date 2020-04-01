@@ -55,6 +55,10 @@ class TransformedSeq {
         subsequence_ID = _subsequence_ID;
     }
 
+    core::AlphabetID getAlphabetID() const {
+        return alphabet_ID;
+    }
+
     void setAlphabetID(core::AlphabetID _alphabet_ID) {
         alphabet_ID = _alphabet_ID;
     }
