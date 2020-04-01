@@ -12,7 +12,7 @@ set(source_files
         context-tables.cc
         decode-cabac.cc
         decoding.cc
-        diff-coding.cc
+        diff-subsymbol-transform.cc
         encode-cabac.cc
         encoding.cc
         equality-coding.cc
@@ -21,7 +21,6 @@ set(source_files
         gabac-decompressor.cc
         gabac-seq-conf-set.cc
         genie-gabac-output-stream.cc
-        lut-transform.cc # To be removed
         luts-subsymbol-transform.cc
         match-coding.cc
         reader.cc
