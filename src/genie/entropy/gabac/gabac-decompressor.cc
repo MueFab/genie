@@ -31,7 +31,7 @@ core::AccessUnitRaw::Subsequence GabacDecompressor::decompress(const gabac::Enco
     // Setup
     const size_t GABAC_BLOCK_SIZE = 0;  // 0 means single block (block size is equal to input size)
     std::ostream* const GABC_LOG_OUTPUT_STREAM = &std::cout;
-    const gabac::IOConfiguration GABAC_IO_SETUP = {&in_stream, &outbuffer, GABAC_BLOCK_SIZE, GABC_LOG_OUTPUT_STREAM,
+    const gabac::IOConfiguration GABAC_IO_SETUP = {&in_stream, nullptr, &outbuffer, GABAC_BLOCK_SIZE, GABC_LOG_OUTPUT_STREAM,
                                                    gabac::IOConfiguration::LogLevel::TRACE};
     const bool GABAC_DECODING_MODE = true;
 

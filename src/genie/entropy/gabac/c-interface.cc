@@ -254,7 +254,7 @@ int gabac_execute_transform(uint8_t transformationID, const uint64_t *param, int
 
 int gabac_run(gabac_operation operation, gabac_io_config *io_config, const char *config_json, size_t json_length) {
     try {
-        genie::entropy::gabac::IOConfiguration ioconf_cpp = {nullptr, nullptr, 0, nullptr,
+        genie::entropy::gabac::IOConfiguration ioconf_cpp = {nullptr, nullptr, nullptr, 0, nullptr,
                                                              genie::entropy::gabac::IOConfiguration::LogLevel::TRACE};
         ioconf_cpp.blocksize = io_config->blocksize;
         ioconf_cpp.level = static_cast<genie::entropy::gabac::IOConfiguration::LogLevel>(io_config->log_level);

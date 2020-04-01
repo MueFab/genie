@@ -25,7 +25,7 @@ core::AccessUnitPayload::SubsequencePayload GabacCompressor::compress(const gaba
     // Setup
     const size_t GABAC_BLOCK_SIZE = 0;  // 0 means single block (block size is equal to input size)
     std::ostream *const GABAC_LOG_OUTPUT_STREAM = &std::cout;
-    const gabac::IOConfiguration GABAC_IO_SETUP = {&bufferInputStream, &bufferOutputStream, GABAC_BLOCK_SIZE,
+    const gabac::IOConfiguration GABAC_IO_SETUP = {&bufferInputStream, nullptr, &bufferOutputStream, GABAC_BLOCK_SIZE,
                                                    GABAC_LOG_OUTPUT_STREAM, gabac::IOConfiguration::LogLevel::TRACE};
     const bool GABAC_DECODING_MODE = false;
 
