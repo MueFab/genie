@@ -113,6 +113,7 @@ struct EncodingConfiguration {
  */
 struct IOConfiguration {
     std::istream* inputStream;  /**< @brief Where to read from */
+    std::istream* dependencyStream;  /**< @brief Where to read from */
     std::ostream* outputStream; /**< @brief Where to write to */
     size_t blocksize;           /**< @brief How many bytes to read at once. Put 0 to read
                                    all in one go */
