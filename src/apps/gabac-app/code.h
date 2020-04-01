@@ -12,7 +12,8 @@ void code(const std::string& inputFilePath,
           size_t blocksize,
           uint8_t descID,
           uint8_t subseqID,
-          bool decode);
+          bool decode,
+          const std::string& dependencyFilePath = "");
 
 }  // namespace gabacify
 

@@ -15,6 +15,7 @@ class ProgramOptions {
     //std::string configurationFilePath;
     std::string logLevel;
     std::string inputFilePath;
+    std::string dependencyFilePath;
     std::string outputFilePath;
     std::string task;
     size_t blocksize;
