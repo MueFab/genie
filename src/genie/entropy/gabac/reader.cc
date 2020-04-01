@@ -16,8 +16,6 @@
 //
 #include "binary-arithmetic-decoder.cc"
 
-#include "context-selector.h"
-
 namespace genie {
 namespace entropy {
 namespace gabac {

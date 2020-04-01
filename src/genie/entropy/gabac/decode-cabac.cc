@@ -80,7 +80,7 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
     std::vector<unsigned int> binParams(3, 0);
     util::BlockStepper r = symbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
-    LUTsSubSymbolTransformation invLutsSubsymTrnsfm(supportVals, stateVars, false);
+    LUTsSubSymbolTransform invLutsSubsymTrnsfm(supportVals, stateVars, false);
     if(numLuts > 0) {
         invLutsSubsymTrnsfm.decodeLUTs(reader);
     }
