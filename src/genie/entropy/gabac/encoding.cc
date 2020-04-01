@@ -17,66 +17,13 @@
 #include "encode-cabac.h"
 #include "stream-handler.h"
 #include "writer.h"
+#include "gabac.h"
 #include <genie/entropy/paramcabac/transformed-seq.h>
 
 namespace genie {
 namespace entropy {
 namespace gabac {
 
-/* RESTRUCT_DISABLE
-static uint64_t getMax(const util::DataBlock &b) {
-    uint64_t max = 0;
-    util::BlockStepper r = b.getReader();
-    while (r.isValid()) {
-        max = std::max(max, r.get());
-    }
-    return max;
-}
-
-void doLutTransform(unsigned int order, std::vector<util::DataBlock> *const lutSequences, unsigned *bits0,
-                    std::ostream *out) {
-    // RESTRUCT_TODO
-    // GABACIFY_LOG_TRACE << "LUT transform *en*abled";
-
-    // Put raw sequence in, get transformed sequence and lut tables
-    getTransformation(SequenceTransformationId::lut_transform).transform({order}, lutSequences);
-
-    // GABACIFY_LOG_DEBUG << "Got uncompressed stream after LUT: " <<
-    // (*lutSequences)[0].size() << " bytes"; GABACIFY_LOG_DEBUG << "Got table0
-    // after LUT: " << (*lutSequences)[1].size() << " bytes"; GABACIFY_LOG_DEBUG
-    // << "Got table1 after LUT: " << (*lutSequences)[2].size() << " bytes";
-
-    // Calculate bit size for order 0 table
-    if (*bits0 == 0) {
-        uint64_t max = getMax(lutSequences->at(1));
-        *bits0 = unsigned(std::ceil(std::log2(max + 1)));
-        if (max <= 1) {
-            *bits0 = 1;
-        }
-    }
-
-    auto bits1 = unsigned((*lutSequences)[1].size());
-    encodeStream({false, 0, 0, false, gabac::BinarizationId::BI, {*bits0}, gabac::ContextSelectionId::bypass},
-                 &(*lutSequences)[1], out);
-
-    if (order > 0) {
-        bits1 = unsigned(std::ceil(std::log2(bits1)));
-        encodeStream({false, 0, 0, false, gabac::BinarizationId::BI, {bits1}, gabac::ContextSelectionId::bypass},
-                     &(*lutSequences)[2], out);
-    }
-}
-
-void doDiffTransform(std::vector<util::DataBlock> *const sequence) {
-    // GABACIFY_LOG_TRACE << "LUT transform *en*abled";
-
-    // Put raw sequence in, get transformed sequence and lut tables
-    getTransformation(SequenceTransformationId::diff_coding).transform({0}, sequence);
-
-    // GABACIFY_LOG_TRACE << "Diff genie *dis*abled";
-    // GABACIFY_LOG_DEBUG << "Got uncompressed stream after diff: "
-    // << diffAndLutTransformedSequence->size() << " bytes";
-}
-*/
 
 /* RESTRUCT_DISABLE
 void doSequenceTransform(const gabac::SequenceTransformationId &transID, uint64_t param,
@@ -98,45 +45,35 @@ void doSequenceTransform(const gabac::SequenceTransformationId &transID, uint64_
 }
 */
 
-static void encodeStream(const paramcabac::TransformedSeq &conf,
-                         util::DataBlock *const diffAndLutTransformedSequence, std::ostream *out) {
-    // Encoding
-    gabac::encode_cabac(conf, diffAndLutTransformedSequence);
-
-    gabac::StreamHandler::writeStream(*out, diffAndLutTransformedSequence);
-}
-
 static void encodeSingleSequence(const paramcabac::TransformedSeq &cfg,
                                  util::DataBlock *const seq,
-                                 std::ostream *out) {
-    std::vector<util::DataBlock> lutTransformedSubseqs;
+                                 std::ostream *out,
+                                 util::DataBlock *const dep = nullptr) {
+    // Encoding
+    gabac::encode_cabac(cfg, seq, dep);
 
-    // Symbol/transformed symbols, lut0 bytestream, lut1 bytestream
-    lutTransformedSubseqs.resize(1);
-    lutTransformedSubseqs[0].swap(seq);
-
-    // Put sequence in, get lut sequence and lut bytestreams
-    /* RESTRUCT-DISABLE
-    const paramcabac::SupportValues::TransformIdSubsym subSymTransform = cfg.getTransformID();
-    if (subSymTransform == paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM) {
-        //unsigned bits = cfg.lutBits; // TODO
-        doLutTransform(cfg.getSupportValues().getCodingOrder(),
-                       &lutTransformedSubseqs, &bits, out);
-    } else if (subSymTransform == paramcabac::SupportValues::TransformIdSubsym::DIFF_CODING) {
-        doDiffTransform(&lutTransformedSubseqs);
-    }*/
-
-    encodeStream(cfg, &lutTransformedSubseqs[0], out);
+    gabac::StreamHandler::writeStream(*out, seq);
 }
 
 void encode(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
     conf.validate();
     util::DataBlock sequence(0, 4);
+    util::DataBlock dependency(0, 4);
     size_t size = 0;
     if (!conf.blocksize) {
         size = gabac::StreamHandler::readFull(*conf.inputStream, &sequence);
+        if(conf.dependencyStream != nullptr) {
+            if(size != gabac::StreamHandler::readFull(*conf.dependencyStream, &dependency)) {
+                GABAC_DIE("Size mismatch between dependency and descriptor subsequence");
+            }
+        }
     } else {
         size = gabac::StreamHandler::readBlock(*conf.inputStream, conf.blocksize, &sequence);
+        if(conf.dependencyStream != nullptr) {
+            if(size != gabac::StreamHandler::readBlock(*conf.dependencyStream, conf.blocksize, &dependency)) {
+                GABAC_DIE("Size mismatch between dependency and descriptor subsequence");
+            }
+        }
     }
     while (size) {
         // Insert sequence into vector
@@ -155,11 +92,17 @@ void encode(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
             // Put transformed sequence in, get partial bytestream back
             encodeSingleSequence(enConf.subseq.getTransformSubseqCfg(i),
                                  &(transformedSubseqs[i]),
-                                 conf.outputStream);
+                                 conf.outputStream,
+                                 (dependency.size()) ? &dependency : nullptr);
         }
         if (conf.blocksize) {
             // RESTRUCT_DISABLE sequence.setWordSize(static_cast<uint8_t>(enConf.wordSize));
             size = gabac::StreamHandler::readBlock(*conf.inputStream, conf.blocksize, &sequence);
+            if(conf.dependencyStream != nullptr) {
+                if(size != gabac::StreamHandler::readBlock(*conf.dependencyStream, conf.blocksize, &dependency)) {
+                    GABAC_DIE("Size mismatch between dependency and descriptor subsequence");
+                }
+            }
         } else {
             size = 0;
         }
