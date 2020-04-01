@@ -93,8 +93,6 @@ void Writer::writeAsTUcabac(uint64_t input, const std::vector<unsigned int> binP
     if (cMax > input) {
         m_binaryArithmeticEncoder.encodeBin(0, &*scan);
     }
-
-    printf("\n");
 }
 
 void Writer::writeAsEGbypass(uint64_t input, const std::vector<unsigned int>) {
