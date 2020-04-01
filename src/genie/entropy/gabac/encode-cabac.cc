@@ -76,7 +76,7 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
 
     util::BlockStepper r = symbols->getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
-    LUTsSubSymbolTransformation lutsSubsymTrnsfm(supportVals, stateVars, true);
+    LUTsSubSymbolTransform lutsSubsymTrnsfm(supportVals, stateVars, true);
     if(numLuts > 0) {
         lutsSubsymTrnsfm.encodeLUTs(writer, symbols);
     }

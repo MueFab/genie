@@ -12,69 +12,14 @@
 #include <limits>
 
 #include "decode-cabac.h"
-#include "diff-coding.h"
 #include "encode-cabac.h"
 #include "equality-coding.h"
-#include "lut-transform.h"
 #include "match-coding.h"
 #include "rle-coding.h"
 
 namespace genie {
 namespace entropy {
 namespace gabac {
-
-const BinarizationProperties &getBinarization(const gabac::BinarizationId &id) {
-    static const std::vector<BinarizationProperties> binarizationInformation = {
-        {
-            "BI",
-            1,
-            32,
-            false,
-            [](uint64_t) -> int64_t { return 0; },
-            [](uint64_t parameter) -> int64_t { return uint64_t((1ull << (parameter)) - 1u); },
-        },
-        {
-            "TU",
-            1,
-            32,
-            false,
-            [](uint64_t) -> int64_t { return 0; },
-            [](uint64_t parameter) -> int64_t { return parameter; },
-        },
-        {
-            "EG",
-            0,
-            0,
-            false,
-            [](uint64_t) -> int64_t { return 0; },
-            [](uint64_t) -> int64_t { return std::numeric_limits<int32_t>::max(); },
-        },
-        {
-            "SEG",
-            0,
-            0,
-            true,
-            [](uint64_t) -> int64_t { return std::numeric_limits<int32_t>::min() / 2; },
-            [](uint64_t) -> int64_t { return std::numeric_limits<int32_t>::max() / 2; },
-        },
-        {
-            "TEG",
-            0,
-            255,
-            false,
-            [](uint64_t) -> int64_t { return 0; },
-            [](uint64_t param) -> int64_t { return std::numeric_limits<int32_t>::max() + param; },
-        },
-        {
-            "STEG",
-            0,
-            255,
-            true,
-            [](uint64_t param) -> int64_t { return std::numeric_limits<int32_t>::min() / 2ll - param; },
-            [](uint64_t param) -> int64_t { return std::numeric_limits<int32_t>::max() / 2ll + param; },
-        }};
-    return binarizationInformation[unsigned(id)];
-}
 
 // ------------------------------------------------------------------------------
 
@@ -133,34 +78,7 @@ const TransformationProperties &getTransformation(const gabac::SequenceTransform
              gabac::inverseTransformRleCoding(param[0], &(*transformedSequences)[0], &(*transformedSequences)[1]);
              transformedSequences->resize(1);
          }},
-        {"lut_coding",  // Name
-         {"context_order"},
-         {"sequence", "lut0", "lut1"},  // StreamNames
-         {0, 0, 0},                     // WordSizes (0: non fixed current stream wordsize)
-         [](const std::vector<uint64_t> &order, std::vector<util::DataBlock> *const transformedSequences) {
-             transformedSequences->resize(3);
-             (*transformedSequences)[1] = util::DataBlock(0, (*transformedSequences)[0].getWordSize());
-             (*transformedSequences)[2] = util::DataBlock(0, (*transformedSequences)[0].getWordSize());
-             gabac::transformLutTransform(static_cast<unsigned int>(order[0]), &(*transformedSequences)[0],
-                                          &(*transformedSequences)[1], &(*transformedSequences)[2]);
-         },
-         [](const std::vector<uint64_t> &order, std::vector<util::DataBlock> *const transformedSequences) {
-             gabac::inverseTransformLutTransform(static_cast<unsigned int>(order[0]), &(*transformedSequences)[0],
-                                                 &(*transformedSequences)[1], &(*transformedSequences)[2]);
-             transformedSequences->resize(1);
-         }},
-        {"diff_coding",  // Name
-         {},
-         {"sequence"},  // StreamNames
-         {0},           // WordSizes (0: non fixed current stream wordsize)
-         [](const std::vector<uint64_t> &, std::vector<util::DataBlock> *const transformedSequences) {
-             transformedSequences->resize(1);
-             gabac::transformDiffCoding(&(*transformedSequences)[0]);
-         },
-         [](const std::vector<uint64_t> &, std::vector<util::DataBlock> *const transformedSequences) {
-             transformedSequences->resize(1);
-             gabac::inverseTransformDiffCoding(&(*transformedSequences)[0]);
-         }},/*/* RESTRUCT-DISABLE
+         /*/* RESTRUCT-DISABLE
         {"paramcabac",  // Name
          {"binarization_id", "binarization_parameter", "context_selection_id", "word_size"},
          {"sequence"},  // StreamNames
