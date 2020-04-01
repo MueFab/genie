@@ -26,6 +26,7 @@ namespace gabac {
 
 void encode_cabac(const paramcabac::TransformedSeq &conf,
                   util::DataBlock* symbols,
+                  util::DataBlock* const depSymbols = nullptr,
                   size_t maxsize = std::numeric_limits<size_t>::max());
 
 }  // namespace gabac
