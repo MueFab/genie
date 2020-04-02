@@ -108,7 +108,7 @@ core::AccessUnitRaw Encoder::pack(size_t id, uint16_t ref, uint8_t qv_depth,
     core::parameter::DataUnit::DatasetType dataType = core::parameter::DataUnit::DatasetType::ALIGNED;
     core::parameter::ParameterSet ret(id, id, dataType, core::AlphabetID::ACGTN, state.readLength, state.pairedEnd,
                                       false, qv_depth, 0, false, false);
-    ret.addClass(core::record::ClassType::CLASS_U, std::move(qvparam));
+    ret.addClass(core::record::ClassType::CLASS_I, std::move(qvparam));
     auto crps = core::parameter::ComputedRef(core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY);
     crps.setExtension(core::parameter::ComputedRefExtended(0, cr_buf_max_size));
     ret.setComputedRef(std::move(crps));
@@ -161,6 +161,7 @@ void Encoder::flowIn(core::record::Chunk&& t, size_t id) {
     auto rawAU = pack(id, ref, qvdepth, std::move(qv.first), state);
     rawAU.get(core::GenDesc::QV) = std::move(qv.second);
     rawAU.get(core::GenDesc::RNAME) = std::move(rname);
+    rawAU.get(core::GenDesc::FLAGS) = core::AccessUnitRaw::Descriptor(core::GenDesc::FLAGS);
     data.clear();
     flowOut(std::move(rawAU), id);
 }

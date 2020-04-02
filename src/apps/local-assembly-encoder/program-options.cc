@@ -21,6 +21,10 @@ void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     num_threads = 1;
     app.add_option("-t,--threads", num_threads, "Number of threads");
     app.add_flag("-f,--force-override", forceOverride, "Override output file if already existing");
+    discardQualities = false;
+    app.add_flag("--no-qvs", discardQualities, "Discards quality values");
+    discardNames = false;
+    app.add_flag("--no-names", discardNames, "Discard read names");
 
     try {
         app.parse(argc, argv);

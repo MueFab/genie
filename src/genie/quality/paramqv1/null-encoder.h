@@ -20,13 +20,6 @@ class NullEncoder : public core::QVEncoder {
         desc.add(core::AccessUnitRaw::Subsequence(1, core::GenSub::QV_PRESENT));
         desc.add(core::AccessUnitRaw::Subsequence(1, core::GenSub::QV_CODEBOOK));
         desc.add(core::AccessUnitRaw::Subsequence(1, core::GenSub::QV_STEPS_0));
-        if (rec.front().getClassID() == core::record::ClassType::CLASS_I ||
-            rec.front().getClassID() == core::record::ClassType::CLASS_HM) {
-            desc.add(core::AccessUnitRaw::Subsequence(1, core::GenSub::QV_STEPS_1));
-
-            codebook = paramqv1::QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);
-            set.addCodeBook(std::move(codebook));
-        }
         param->setQvps(std::move(set));
         return std::make_pair(std::move(param), std::move(desc));
     }
