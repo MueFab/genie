@@ -41,6 +41,10 @@ class ParameterSet : public DataUnit {
 
     const ComputedRef &getComputedRef() const;
 
+    bool isComputedReference() const {
+        return this->parameter_set_crps.has_value();
+    }
+
     size_t getNumberTemplateSegments() const;
 
     void setComputedRef(ComputedRef &&parameter_set_crps);
