@@ -145,7 +145,7 @@ void DatasetHeader::writeToFile(genie::util::BitWriter& bitWriter) const {
 
     bitWriter.write(dataset_group_ID, 8);
     bitWriter.write(dataset_ID, 16);
-    bitWriter.write(version);//FIXME
+    bitWriter.write(version);//FIXME check for too short strings
 
     std::string toWrite;
 
