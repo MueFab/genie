@@ -55,10 +55,10 @@ BinarizationParameters::BinarizationParameters(const BinarizationId &_binarizati
             break;
         case BinarizationId::DOUBLE_TRUNCATED_UNARY:
         case BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
-            cmax_dtu = params[0];  // Fall-through
+            cmax_dtu = params[1];  // Fall-through
         case BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY:
         case BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
-            split_unit_size = params[1];
+            split_unit_size = params[0];
             break;
         case BinarizationId::BINARY_CODING:
         case BinarizationId::EXPONENTIAL_GOLOMB:
