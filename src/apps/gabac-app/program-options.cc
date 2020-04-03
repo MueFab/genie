@@ -36,7 +36,7 @@ void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     app.add_option("-i,--input_file", this->inputFilePath, "Input file");
     app.add_option("-r,--dependency_file", this->dependencyFilePath, "Reference/Dependency file");
     app.add_option("-o,--output_file", this->outputFilePath, "Output file");
-    app.add_option("task,-t,--task", this->task, "Task ('encode' or 'decode')")->required(true);
+    app.add_option("-t,--task", this->task, "Task ('encode' or 'decode')")->required(true);
 
     this->blocksize = 0;
     app.add_option("-b,--block_size", this->blocksize, "Block size - 0 means infinite");
