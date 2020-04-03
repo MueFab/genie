@@ -11,6 +11,7 @@
 #include <genie/quality/qvwriteout/encoder.h>
 #include <genie/read/lowlatency/decoder.h>
 #include <genie/read/lowlatency/encoder.h>
+#include <genie/read/spring/spring-encoder.h>
 #include <genie/util/thread-manager.h>
 #include <fstream>
 #include <string>
@@ -21,11 +22,12 @@ void encode(const ProgramOptions& programOptions) {
     genie::module::detect();
     if (!programOptions.decompression) {
         std::ifstream infile(programOptions.inputFilePath);
+        UTILS_DIE_IF(!infile, "Could not open input file");
         const size_t RECORDS_PER_BLOCK = 10000;
 
         genie::quality::qvwriteout::Encoder qvencoder;
         genie::name::tokenizer::Encoder nameencoder;
-        genie::read::lowlatency::Encoder encoder(&qvencoder, &nameencoder);
+        genie::read::spring::SpringEncoder encoder(&qvencoder, &nameencoder, "./");
 
         genie::entropy::gabac::GabacCompressor compressor;
 
@@ -35,6 +37,7 @@ void encode(const ProgramOptions& programOptions) {
         if (programOptions.pairedPath.empty()) {
             importer = genie::util::make_unique<genie::format::fastq::Importer>(RECORDS_PER_BLOCK, infile);
         } else {
+            UTILS_DIE_IF(!pairedfile, "Could not open paired input file");
             importer = genie::util::make_unique<genie::format::fastq::Importer>(RECORDS_PER_BLOCK, infile, pairedfile);
         }
         genie::format::mgb::Exporter exporter(&outfile);

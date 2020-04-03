@@ -29,15 +29,17 @@
 #include "spring-gabac.h"
 #include "util.h"
 
+
 namespace genie {
 namespace read {
 namespace spring {
-
-/*void generate_streams_SPRING(format::fastq::FastqFileReader *fastqFileReader1, format::fastq::FastqFileReader
+#if 0
+void generate_streams_SPRING(format::fastq::FastqFileReader *fastqFileReader1, format::fastq::FastqFileReader
 *fastqFileReader2, int num_thr, bool paired_end, const std::string &working_dir, bool, const std::string
-&outputFilePath, bool ureads_flag, bool preserve_quality, bool preserve_id, util::FastqStats *stats) { #ifdef
-GENIE_USE_OPENMP std::cout << "SPRING: built with OpenMP" << std::endl; #else std::cout << "SPRING: *not* built with
-OpenMP" << std::endl; #endif
+&outputFilePath, bool ureads_flag, bool preserve_quality, bool preserve_id, util::FastqStats *stats) {
+#ifdef GENIE_USE_OPENMP
+    std::cout << "SPRING: built with OpenMP" << std::endl; #else std::cout << "SPRING: *not* built with OpenMP" << std::endl;
+#endif
 
     // generate random temp directory in the working directory
     std::string temp_dir;
@@ -206,7 +208,9 @@ OpenMP" << std::endl; #endif
 #endif
 
     return;
-}*/
+}
+
+#endif
 
 std::string random_string(size_t length) {
     auto randchar = []() -> char {
@@ -224,3 +228,4 @@ std::string random_string(size_t length) {
 }  // namespace spring
 }  // namespace read
 }  // namespace genie
+

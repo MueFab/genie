@@ -15,6 +15,7 @@ set(source_files
         reorder-compress-quality-id.cc
         return-structures.cc
         spring.cc
+        spring-encoder.cc
         util.cc
         )
 
