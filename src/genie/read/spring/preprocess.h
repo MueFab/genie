@@ -32,13 +32,15 @@ struct Preprocessor {
     std::ofstream fout_id;
     std::ofstream fout_quality[2];
 
+    std::string temp_dir;
+
     bool init = false;
 
     void setup(bool preserveID, bool preserveQV, const std::string& working_dir) {
         cp.preserve_id = preserveID;
         cp.preserve_quality = preserveQV;
         // generate random temp directory in the working directory
-        std::string temp_dir;
+
         while (true) {
             std::string random_str = "tmp." + spring::random_string(10);
             temp_dir = working_dir + "/" + random_str + '/';
