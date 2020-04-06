@@ -39,55 +39,55 @@ class Writer {
 
     void writeAsBIbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsBIcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    void writeAsBIcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
     void writeAsTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    void writeAsTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
     void writeAsEGbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsEGcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    void writeAsEGcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
     void writeAsSEGbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsSEGcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    void writeAsSEGcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
     void writeAsTEGbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsTEGcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    void writeAsTEGcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
     void writeAsSTEGbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsSTEGcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    void writeAsSTEGcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
     void writeAsSUTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsSUTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    void writeAsSUTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
     void writeAsSSUTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsSSUTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    void writeAsSSUTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
     void writeAsDTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsDTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    void writeAsDTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
     void writeAsSDTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsSDTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    void writeAsSDTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeBI(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    void writeBI(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeTU(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    void writeTU(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeEG(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    void writeEG(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeTEG(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    void writeTEG(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeSUTU(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    void writeSUTU(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeDTU(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    void writeDTU(uint64_t input, const std::vector<unsigned int> binParams);
 
     void writeLutSymbol(uint64_t input, const uint8_t codingSubsymSize);
 

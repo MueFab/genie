@@ -56,11 +56,11 @@ void Writer::writeAsBIbypass(uint64_t input, const std::vector<unsigned int> bin
     m_binaryArithmeticEncoder.encodeBinsEP(static_cast<unsigned int>(input), binParams[0]);
 }
 
-void Writer::writeAsBIcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+void Writer::writeAsBIcabac(uint64_t input, const std::vector<unsigned int> binParams) {
     //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::BI).sbCheck(input, input, cLength));
 
     const unsigned int cLength = binParams[0];
-    unsigned int cm = ctxIdx;
+    unsigned int cm = binParams[3];
     auto scan = m_contextModels.begin() + cm;
     for (int i = cLength - 1; i >= 0; i--)  // i must be signed
     {
@@ -81,11 +81,11 @@ void Writer::writeAsTUbypass(uint64_t input, const std::vector<unsigned int> bin
     }
 }
 
-void Writer::writeAsTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+void Writer::writeAsTUcabac(uint64_t input, const std::vector<unsigned int> binParams) {
     //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::TU).sbCheck(input, input, cMax));
 
     const unsigned int cMax = binParams[0];
-    unsigned int cm = ctxIdx;
+    unsigned int cm = binParams[3];
     auto scan = m_contextModels.begin() + cm;
     for (uint64_t i = 0; i < input; i++) {
         m_binaryArithmeticEncoder.encodeBin(1, &*(scan++));
@@ -110,14 +110,14 @@ void Writer::writeAsEGbypass(uint64_t input, const std::vector<unsigned int>) {
     }
 }
 
-void Writer::writeAsEGcabac(uint64_t input, const std::vector<unsigned int>, const unsigned int ctxIdx) {
+void Writer::writeAsEGcabac(uint64_t input, const std::vector<unsigned int> binParams) {
     //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::EG).sbCheck(input, input, 0));
 
     unsigned int valuePlus1 = input + 1;
     unsigned int numLeadZeros = floor(log2(valuePlus1));
 
     /* prefix */
-    writeAsBIcabac(1, std::vector<unsigned int>({numLeadZeros + 1}), ctxIdx);
+    writeAsBIcabac(1, std::vector<unsigned int>({numLeadZeros + 1, 0, 0, binParams[3]}));
     if(numLeadZeros) {
         /* suffix */
         writeAsBIbypass(valuePlus1 & ((1u<<numLeadZeros)-1),
@@ -137,15 +137,14 @@ void Writer::writeAsTEGbypass(uint64_t input, const std::vector<unsigned int> bi
     }
 }
 
-void Writer::writeAsTEGcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+void Writer::writeAsTEGcabac(uint64_t input, const std::vector<unsigned int> binParams) {
     //RESTRUCT_DISABLE assert(getBinarization(BinarizationId::TEG).sbCheck(input, input, cTruncExpGolParam));
 
     const unsigned int cTruncExpGolParam = binParams[0];
-    if (input < cTruncExpGolParam) {
-        writeAsTUcabac(input, binParams, ctxIdx);
-    } else {
-        writeAsTUcabac(cTruncExpGolParam, binParams, ctxIdx);
-        writeAsEGcabac(input - cTruncExpGolParam, std::vector<unsigned int>({0}), ctxIdx); //FIXME should not this be ctxIdx+binParams[0]?
+
+    writeAsTUcabac(input, std::vector<unsigned int>({cTruncExpGolParam, 0, 0, binParams[3]}));
+    if (input >= cTruncExpGolParam) {
+        writeAsEGcabac(input - cTruncExpGolParam, std::vector<unsigned int>({0, 0, 0, binParams[3]+cTruncExpGolParam}));
     }
 }
 
@@ -165,12 +164,12 @@ void Writer::writeAsSUTUbypass(uint64_t input, const std::vector<unsigned int> b
     }
 }
 
-void Writer::writeAsSUTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+void Writer::writeAsSUTUcabac(uint64_t input, const std::vector<unsigned int> binParams) {
 
     const unsigned int outputSymSize = binParams[0];
     const unsigned int splitUnitSize = binParams[1];
 
-    unsigned int cm = ctxIdx;
+    unsigned int cm = binParams[3];
     unsigned int i, j;
     for(i=0, j=outputSymSize; i<outputSymSize; i+=splitUnitSize) {
         unsigned int unitSize = (i == 0 && outputSymSize % splitUnitSize)
@@ -178,7 +177,7 @@ void Writer::writeAsSUTUcabac(uint64_t input, const std::vector<unsigned int> bi
                                 : splitUnitSize;
         unsigned int cMax = (1u<<unitSize)-1;
         unsigned int val = (input>>(j-=unitSize)) & cMax;
-        writeAsTUcabac(val, std::vector<unsigned int>({cMax}), cm);
+        writeAsTUcabac(val, std::vector<unsigned int>({cMax, 0, 0, cm}));
         cm += cMax;
     }
 }
@@ -196,67 +195,67 @@ void Writer::writeAsDTUbypass(uint64_t input, const std::vector<unsigned int> bi
     }
 }
 
-void Writer::writeAsDTUcabac(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+void Writer::writeAsDTUcabac(uint64_t input, const std::vector<unsigned int> binParams) {
 
     const unsigned int cMaxDtu = binParams[2];
 
-    writeAsTUcabac((input<cMaxDtu) ? input : cMaxDtu, std::vector<unsigned int>({cMaxDtu}), ctxIdx);
+    writeAsTUcabac((input<cMaxDtu) ? input : cMaxDtu, std::vector<unsigned int>({cMaxDtu, 0, 0, binParams[3]}));
 
     if(input >= cMaxDtu) {
         input -= cMaxDtu;
 
-        writeAsSUTUcabac(input, binParams, ctxIdx + cMaxDtu);
+        writeAsSUTUcabac(input, std::vector<unsigned int>({binParams[0], binParams[1], 0, binParams[3] + cMaxDtu}));
     }
 }
 
-void Writer::writeBI(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+void Writer::writeBI(uint64_t input, const std::vector<unsigned int> binParams) {
     if(m_bypassFlag)
         writeAsBIbypass(input, binParams);
     else
-        writeAsBIcabac(input, binParams, ctxIdx);
+        writeAsBIcabac(input, binParams);
 }
 
-void Writer::writeTU(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+void Writer::writeTU(uint64_t input, const std::vector<unsigned int> binParams) {
     if(m_bypassFlag)
         writeAsTUbypass(input, binParams);
     else
-        writeAsTUcabac(input, binParams, ctxIdx);
+        writeAsTUcabac(input, binParams);
 }
 
-void Writer::writeEG(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+void Writer::writeEG(uint64_t input, const std::vector<unsigned int> binParams) {
     if(m_bypassFlag)
         writeAsEGbypass(input, binParams);
     else
-        writeAsEGcabac(input, binParams, ctxIdx);
+        writeAsEGcabac(input, binParams);
 }
 
-void Writer::writeTEG(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+void Writer::writeTEG(uint64_t input, const std::vector<unsigned int> binParams) {
     if(m_bypassFlag)
         writeAsTEGbypass(input, binParams);
     else
-        writeAsTEGcabac(input, binParams, ctxIdx);
+        writeAsTEGcabac(input, binParams);
 }
 
-void Writer::writeSUTU(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+void Writer::writeSUTU(uint64_t input, const std::vector<unsigned int> binParams) {
     if(m_bypassFlag)
         writeAsSUTUbypass(input, binParams);
     else
-        writeAsSUTUcabac(input, binParams, ctxIdx);
+        writeAsSUTUcabac(input, binParams);
 }
 
-void Writer::writeDTU(uint64_t input, const std::vector<unsigned int> binParams, const unsigned int ctxIdx) {
+void Writer::writeDTU(uint64_t input, const std::vector<unsigned int> binParams) {
     if(m_bypassFlag)
         writeAsDTUbypass(input, binParams);
     else
-        writeAsDTUcabac(input, binParams, ctxIdx);
+        writeAsDTUcabac(input, binParams);
 }
 
 void Writer::writeLutSymbol(uint64_t input, const uint8_t codingSubsymSize) {
-    std::vector<unsigned int> binParams({codingSubsymSize, 2});
+    std::vector<unsigned int> binParams({codingSubsymSize, 2, 0, 0}); // ctxIdx = 0
     if(m_bypassFlag)
         writeAsSUTUbypass(input, binParams);
     else
-        writeAsSUTUcabac(input, binParams, 0); // ctxIdx = 0
+        writeAsSUTUcabac(input, binParams);
 }
 
 void Writer::writeSignFlag(uint64_t input) {
@@ -265,7 +264,7 @@ void Writer::writeSignFlag(uint64_t input) {
     if(m_bypassFlag)
         writeAsBIbypass(symbolValueSigned < 0, std::vector<unsigned int>({1}));
     else
-        writeAsBIcabac(symbolValueSigned < 0, std::vector<unsigned int>({1}), m_numContexts-1);
+        writeAsBIcabac(symbolValueSigned < 0, std::vector<unsigned int>({1, 0, 0, static_cast<unsigned int>(m_numContexts-1)}));
 }
 
 void Writer::writeNumSymbols(unsigned int numSymbols) { m_bitOutputStream.write(numSymbols, 32); }
