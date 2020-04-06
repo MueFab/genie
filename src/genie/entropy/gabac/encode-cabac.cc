@@ -21,6 +21,8 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
+typedef void (Writer::*binFunc)(uint64_t, const std::vector<unsigned int>);
+
 static inline
 void encode_sign_flag(Writer &writer,
                       const paramcabac::BinarizationParameters::BinarizationId binID,
@@ -37,6 +39,89 @@ void encode_sign_flag(Writer &writer,
                 break;
         }
     }
+}
+
+static inline
+binFunc get_binarizor(const uint8_t outputSymbolSize,
+                      const bool bypassFlag,
+                      const paramcabac::BinarizationParameters::BinarizationId binID,
+                      const paramcabac::BinarizationParameters &binarzationParams,
+                      const paramcabac::StateVars &stateVars,
+                      std::vector<unsigned int> binParams) {
+    binFunc func = nullptr;
+    if(bypassFlag) {
+        switch (binID) {
+            case paramcabac::BinarizationParameters::BinarizationId::BINARY_CODING:
+                func = &Writer::writeAsBIbypass;
+                binParams[0] = stateVars.getCLengthBI();
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY:
+                func = &Writer::writeAsTUbypass;
+                binParams[0] = binarzationParams.getCMax();
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::EXPONENTIAL_GOLOMB:
+            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_EXPONENTIAL_GOMB:
+                func = &Writer::writeEG;
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
+            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
+                func = &Writer::writeAsTEGbypass;
+                binParams[0] = binarzationParams.getCMaxTeg();
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY:
+            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
+                func = &Writer::writeAsSUTUbypass;
+                binParams[0] = outputSymbolSize;
+                binParams[1] = binarzationParams.getSplitUnitSize();
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::DOUBLE_TRUNCATED_UNARY:
+            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
+                func = &Writer::writeAsDTUbypass;
+                binParams[0] = outputSymbolSize;
+                binParams[1] = binarzationParams.getSplitUnitSize();
+                binParams[2] = binarzationParams.getCMaxDtu();
+                break;
+            default:
+                GABAC_DIE("Unknown Binarization");
+        }
+    } else {
+        switch (binID) {
+            case paramcabac::BinarizationParameters::BinarizationId::BINARY_CODING:
+                func = &Writer::writeAsBIcabac;
+                binParams[0] = stateVars.getCLengthBI();
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY:
+                func = &Writer::writeAsTUcabac;
+                binParams[0] = binarzationParams.getCMax();
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::EXPONENTIAL_GOLOMB:
+            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_EXPONENTIAL_GOMB:
+                func = &Writer::writeEG;
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
+            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
+                func = &Writer::writeAsTEGcabac;
+                binParams[0] = binarzationParams.getCMaxTeg();
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY:
+            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
+                func = &Writer::writeAsSUTUcabac;
+                binParams[0] = outputSymbolSize;
+                binParams[1] = binarzationParams.getSplitUnitSize();
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::DOUBLE_TRUNCATED_UNARY:
+            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
+                func = &Writer::writeAsDTUcabac;
+                binParams[0] = outputSymbolSize;
+                binParams[1] = binarzationParams.getSplitUnitSize();
+                binParams[2] = binarzationParams.getCMaxDtu();
+                break;
+            default:
+                GABAC_DIE("Unknown Binarization");
+        }
+    }
+
+    return func;
 }
 
 void encode_cabac(const paramcabac::TransformedSeq &conf,
@@ -74,7 +159,7 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
                   stateVars.getNumCtxTotal());
     writer.start(numSymbols);
 
-    std::vector<unsigned int> binParams(3, 0);
+    std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
 
     util::BlockStepper r = symbols->getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
@@ -89,41 +174,12 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
         rDep = depSymbols->getReader();
     }
 
-    void (Writer::*func)(uint64_t, const std::vector<unsigned int>, const unsigned int) = nullptr;
-    switch (binID) {
-        case paramcabac::BinarizationParameters::BinarizationId::BINARY_CODING:
-            func = &Writer::writeBI;
-            binParams[0] = stateVars.getCLengthBI();
-            break;
-        case paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY:
-            func = &Writer::writeTU;
-            binParams[0] = binarzationParams.getCMax();
-            break;
-        case paramcabac::BinarizationParameters::BinarizationId::EXPONENTIAL_GOLOMB:
-        case paramcabac::BinarizationParameters::BinarizationId::SIGNED_EXPONENTIAL_GOMB:
-            func = &Writer::writeEG;
-            break;
-        case paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
-        case paramcabac::BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
-            func = &Writer::writeTEG;
-            binParams[0] = binarzationParams.getCMaxTeg();
-            break;
-        case paramcabac::BinarizationParameters::BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY:
-        case paramcabac::BinarizationParameters::BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
-            func = &Writer::writeSUTU;
-            binParams[0] = outputSymbolSize;
-            binParams[1] = binarzationParams.getSplitUnitSize();
-            break;
-        case paramcabac::BinarizationParameters::BinarizationId::DOUBLE_TRUNCATED_UNARY:
-        case paramcabac::BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
-            func = &Writer::writeDTU;
-            binParams[0] = outputSymbolSize;
-            binParams[1] = binarzationParams.getSplitUnitSize();
-            binParams[2] = binarzationParams.getCMaxDtu();
-            break;
-        default:
-            GABAC_DIE("Unknown Binarization");
-    }
+    binFunc func = get_binarizor(outputSymbolSize,
+                                 bypassFlag,
+                                 binID,
+                                 binarzationParams,
+                                 stateVars,
+                                 binParams);
 
     while (r.isValid()) {
         if (maxSize <= bitstream.size()) {
@@ -154,12 +210,12 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
             subsymValToCode = subsymbols[s].subsymValue = (symbolValue>>(oss-=codingSubsymSize)) & subsymMask;
             subsymbols[s].subsymIdx = s;
 
-            uint32_t ctxIdx = ContextSelector::getContextIdx(stateVars,
-                                                             bypassFlag,
-                                                             codingOrder,
-                                                             s,
-                                                             subsymbols,
-                                                             prvIdx);
+            binParams[3] = ContextSelector::getContextIdx(stateVars,
+                                                          bypassFlag,
+                                                          codingOrder,
+                                                          s,
+                                                          subsymbols,
+                                                          prvIdx);
 
             if(numLuts > 0) {
                 subsymbols[s].lutEntryIdx = 0;
@@ -179,7 +235,7 @@ void encode_cabac(const paramcabac::TransformedSeq &conf,
                 }
             }
 
-            (writer.*func)(subsymValToCode, binParams, ctxIdx);
+            (writer.*func)(subsymValToCode, binParams);
         }
 
         encode_sign_flag(writer, binID, origSymbol);
