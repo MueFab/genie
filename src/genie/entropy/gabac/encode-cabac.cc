@@ -124,6 +124,82 @@ binFunc get_binarizor(const uint8_t outputSymbolSize,
     return func;
 }
 
+void encode_cabac_0(const paramcabac::TransformedSeq &conf,
+                    util::DataBlock* symbols,
+                    size_t maxSize) {
+    util::DataBlock block(0, 1);
+
+    assert(symbols != nullptr);
+
+    size_t numSymbols = symbols->size();
+    if (numSymbols <= 0) return;
+
+    const paramcabac::SupportValues &supportVals = conf.getSupportValues();
+    const paramcabac::Binarization &binarzation = conf.getBinarization();
+    const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
+    const paramcabac::StateVars &stateVars = conf.getStateVars();
+    const paramcabac::BinarizationParameters::BinarizationId binID = binarzation.getBinarizationID();
+    const core::Alphabet alphaProps = getAlphabetProperties(conf.getAlphabetID());
+
+    const uint8_t outputSymbolSize = supportVals.getOutputSymbolSize();
+    const uint8_t codingSubsymSize = supportVals.getCodingSubsymSize();
+    const uint64_t subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize)-1;
+    const bool bypassFlag = binarzation.getBypassFlag();
+
+    OBufferStream bitstream(&block);
+    Writer writer(&bitstream,
+                  bypassFlag,
+                  stateVars.getNumCtxTotal());
+    writer.start(numSymbols);
+
+    std::vector<unsigned int> binParams(4, 0);  // first three elements are for binarization params, last one is for ctxIdx
+
+    util::BlockStepper r = symbols->getReader();
+    std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
+
+    binFunc func = get_binarizor(outputSymbolSize,
+                                 bypassFlag,
+                                 binID,
+                                 binarzationParams,
+                                 stateVars,
+                                 binParams);
+
+    while (r.isValid()) {
+        if (maxSize <= bitstream.size()) {
+            break;
+        }
+
+        // Split symbol into subsymbols and then encode subsymbols
+        const uint64_t origSymbol = r.get();
+        const uint64_t symbolValue = abs((int64_t) origSymbol);
+        uint64_t subsymValToCode = 0;
+
+        uint32_t oss = outputSymbolSize;
+        for (uint8_t s=0; s<stateVars.getNumSubsymbols(); s++) {
+
+            subsymValToCode = subsymbols[s].subsymValue = (symbolValue>>(oss-=codingSubsymSize)) & subsymMask;
+            subsymbols[s].subsymIdx = s;
+
+            binParams[3] = ContextSelector::getContextIdx(stateVars,
+                                                          bypassFlag,
+                                                          0, // codingOrder
+                                                          s,
+                                                          subsymbols,
+                                                          0); // prvIdx - N/A
+
+            (writer.*func)(subsymValToCode, binParams);
+        }
+
+        encode_sign_flag(writer, binID, origSymbol);
+
+        r.inc();
+    }
+
+    writer.close();
+
+    bitstream.flush(symbols);
+}
+
 void encode_cabac(const paramcabac::TransformedSeq &conf,
                   util::DataBlock* symbols,
                   util::DataBlock* const depSymbols,
