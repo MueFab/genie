@@ -52,9 +52,10 @@ uint64_t StateVars::getNumAlphaSpecial(const core::GenSubIndex subsequence_ID,
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-uint8_t StateVars::getNumLuts(uint8_t const codingOrder,
-                              bool const shareSubsymLutFlag) const {
-    return (codingOrder > 0 && numCtxLuts)
+uint8_t StateVars::getNumLuts(const uint8_t codingOrder,
+                              const bool shareSubsymLutFlag,
+                              const SupportValues::TransformIdSubsym trnsfSubsymID) const {
+    return (codingOrder > 0 && trnsfSubsymID == SupportValues::TransformIdSubsym::LUT_TRANSFORM)
             ? ((shareSubsymLutFlag)
                     ? 1
                     : numSubsyms)
@@ -62,8 +63,8 @@ uint8_t StateVars::getNumLuts(uint8_t const codingOrder,
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-uint8_t StateVars::getNumPrvs(uint8_t const codingOrder,
-                              bool const shareSubsymPrvFlag) const {
+uint8_t StateVars::getNumPrvs(const uint8_t codingOrder,
+                              const bool shareSubsymPrvFlag) const {
     return (codingOrder > 0)
             ? ((shareSubsymPrvFlag)
                     ? 1
