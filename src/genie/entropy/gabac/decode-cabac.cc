@@ -223,7 +223,8 @@ void decode_cabac_order1(const paramcabac::TransformedSeq &conf,
     const bool bypassFlag = binarzation.getBypassFlag();
 
     uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
-                                                 supportVals.getShareSubsymLutFlag());
+                                                 supportVals.getShareSubsymLutFlag(),
+                                                 conf.getTransformIDSubsym());
     uint8_t const numPrvs = stateVars.getNumPrvs(codingOrder,
                                                  supportVals.getShareSubsymPrvFlag());
 
@@ -240,7 +241,7 @@ void decode_cabac_order1(const paramcabac::TransformedSeq &conf,
     util::BlockStepper r = symbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
-    LUTsSubSymbolTransform invLutsSubsymTrnsfm(supportVals, stateVars, false);
+    LUTsSubSymbolTransform invLutsSubsymTrnsfm(supportVals, stateVars, numLuts, numPrvs, false);
     if(numLuts > 0) {
         invLutsSubsymTrnsfm.decodeLUTs(reader);
     }
@@ -338,7 +339,8 @@ void decode_cabac_order2(const paramcabac::TransformedSeq &conf,
     const bool bypassFlag = binarzation.getBypassFlag();
 
     uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
-                                                 supportVals.getShareSubsymLutFlag());
+                                                 supportVals.getShareSubsymLutFlag(),
+                                                 conf.getTransformIDSubsym());
     uint8_t const numPrvs = stateVars.getNumPrvs(codingOrder,
                                                  supportVals.getShareSubsymPrvFlag());
 
@@ -355,7 +357,7 @@ void decode_cabac_order2(const paramcabac::TransformedSeq &conf,
     util::BlockStepper r = symbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
-    LUTsSubSymbolTransform invLutsSubsymTrnsfm(supportVals, stateVars, false);
+    LUTsSubSymbolTransform invLutsSubsymTrnsfm(supportVals, stateVars, numLuts, numPrvs, false);
     if(numLuts > 0) {
         invLutsSubsymTrnsfm.decodeLUTs(reader);
     }

@@ -222,7 +222,8 @@ void encode_cabac_order1(const paramcabac::TransformedSeq &conf,
     const bool bypassFlag = binarzation.getBypassFlag();
 
     uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
-                                                 supportVals.getShareSubsymLutFlag());
+                                                 supportVals.getShareSubsymLutFlag(),
+                                                 conf.getTransformIDSubsym());
     uint8_t const numPrvs = stateVars.getNumPrvs(codingOrder,
                                                  supportVals.getShareSubsymPrvFlag());
 
@@ -238,7 +239,7 @@ void encode_cabac_order1(const paramcabac::TransformedSeq &conf,
     util::BlockStepper r = symbols->getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
-    LUTsSubSymbolTransform lutsSubsymTrnsfm(supportVals, stateVars, true);
+    LUTsSubSymbolTransform lutsSubsymTrnsfm(supportVals, stateVars, numLuts, numPrvs, true);
     if(numLuts > 0) {
         lutsSubsymTrnsfm.encodeLUTs(writer, alphaProps, symbols, depSymbols);
     }
@@ -337,7 +338,8 @@ void encode_cabac_order2(const paramcabac::TransformedSeq &conf,
     const bool bypassFlag = binarzation.getBypassFlag();
 
     uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
-                                                 supportVals.getShareSubsymLutFlag());
+                                                 supportVals.getShareSubsymLutFlag(),
+                                                 conf.getTransformIDSubsym());
     uint8_t const numPrvs = stateVars.getNumPrvs(codingOrder,
                                                  supportVals.getShareSubsymPrvFlag());
 
@@ -353,7 +355,7 @@ void encode_cabac_order2(const paramcabac::TransformedSeq &conf,
     util::BlockStepper r = symbols->getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
-    LUTsSubSymbolTransform lutsSubsymTrnsfm(supportVals, stateVars, true);
+    LUTsSubSymbolTransform lutsSubsymTrnsfm(supportVals, stateVars, numLuts, numPrvs, true);
     if(numLuts > 0) {
         lutsSubsymTrnsfm.encodeLUTs(writer, alphaProps, symbols, nullptr);
     }
