@@ -53,7 +53,7 @@ TransformedSeq::TransformedSeq(util::BitReader& reader,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SupportValues::TransformIdSubsym TransformedSeq::getTransformID() const { return transform_ID_subsym; }
+SupportValues::TransformIdSubsym TransformedSeq::getTransformIDSubsym() const { return transform_ID_subsym; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

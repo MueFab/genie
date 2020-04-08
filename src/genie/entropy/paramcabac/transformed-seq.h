@@ -43,7 +43,7 @@ class TransformedSeq {
 
     virtual void write(util::BitWriter& writer) const;
 
-    SupportValues::TransformIdSubsym getTransformID() const;
+    SupportValues::TransformIdSubsym getTransformIDSubsym() const;
 
     const SupportValues& getSupportValues() const;
 
