@@ -80,11 +80,12 @@ class StateVars {
         return numCtxTotal;
     }
 
-    uint8_t getNumLuts(uint8_t const codingOrder,
-                       bool const shareSubsymLutFlag) const;
+    uint8_t getNumLuts(const uint8_t codingOrder,
+                       const bool shareSubsymLutFlag,
+                       const SupportValues::TransformIdSubsym trnsfSubsymID) const;
 
-    uint8_t getNumPrvs(uint8_t const codingOrder,
-                       bool const shareSubsymPrvFlag) const;
+    uint8_t getNumPrvs(const uint8_t codingOrder,
+                       const bool shareSubsymPrvFlag) const;
 
     /* some extra functions (for now put in statevars)
      * FIXME move else where
