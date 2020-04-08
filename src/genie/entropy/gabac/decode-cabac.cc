@@ -242,8 +242,12 @@ void decode_cabac_order1(const paramcabac::TransformedSeq &conf,
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
     LUTsSubSymbolTransform invLutsSubsymTrnsfm(supportVals, stateVars, numLuts, numPrvs, false);
+    bool customCmaxTU = false;
     if(numLuts > 0) {
         invLutsSubsymTrnsfm.decodeLUTs(reader);
+        if(binID == paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY) {
+            customCmaxTU = true;
+        }
     }
 
     util::BlockStepper rDep;
@@ -285,19 +289,17 @@ void decode_cabac_order1(const paramcabac::TransformedSeq &conf,
                                                           s,
                                                           subsymbols,
                                                           prvIdx);
-            if(numLuts > 0) {
-                if(binID == paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY) {
-                    subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElems(subsymbols,
-                                                                                      lutIdx,
-                                                                                      prvIdx);
-                    binParams[0] = std::min((uint64_t) binarzationParams.getCMax(),subsymbols[s].lutNumMaxElems); // update cMax
-                }
+            if(customCmaxTU) {
+                subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder1(subsymbols,
+                                                                                        lutIdx,
+                                                                                        prvIdx);
+                binParams[0] = std::min((uint64_t) binarzationParams.getCMax(),subsymbols[s].lutNumMaxElems); // update cMax
             }
             subsymbols[s].subsymValue = (reader.*func)(binParams);
 
             if(numLuts > 0) {
                 subsymbols[s].lutEntryIdx = subsymbols[s].subsymValue;
-                invLutsSubsymTrnsfm.invTransform(subsymbols, s, lutIdx, prvIdx);
+                invLutsSubsymTrnsfm.invTransformOrder1(subsymbols, s, lutIdx, prvIdx);
             }
 
             subsymbols[prvIdx].prvValues[0] = subsymbols[s].subsymValue;
@@ -358,8 +360,12 @@ void decode_cabac_order2(const paramcabac::TransformedSeq &conf,
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
     LUTsSubSymbolTransform invLutsSubsymTrnsfm(supportVals, stateVars, numLuts, numPrvs, false);
+    bool customCmaxTU = false;
     if(numLuts > 0) {
         invLutsSubsymTrnsfm.decodeLUTs(reader);
+        if(binID == paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY) {
+            customCmaxTU = true;
+        }
     }
 
     binFunc func = get_binarizor(outputSymbolSize,
@@ -384,19 +390,17 @@ void decode_cabac_order2(const paramcabac::TransformedSeq &conf,
                                                           s,
                                                           subsymbols,
                                                           prvIdx);
-            if(numLuts > 0) {
-                if(binID == paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY) {
-                    subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElems(subsymbols,
-                                                                                      lutIdx,
-                                                                                      prvIdx);
-                    binParams[0] = std::min((uint64_t) binarzationParams.getCMax(),subsymbols[s].lutNumMaxElems); // update cMax
-                }
+            if(customCmaxTU) {
+                subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder2(subsymbols,
+                                                                                        lutIdx,
+                                                                                        prvIdx);
+                binParams[0] = std::min((uint64_t) binarzationParams.getCMax(),subsymbols[s].lutNumMaxElems); // update cMax
             }
             subsymbols[s].subsymValue = (reader.*func)(binParams);
 
             if(numLuts > 0) {
                 subsymbols[s].lutEntryIdx = subsymbols[s].subsymValue;
-                invLutsSubsymTrnsfm.invTransform(subsymbols, s, lutIdx, prvIdx);
+                invLutsSubsymTrnsfm.invTransformOrder2(subsymbols, s, lutIdx, prvIdx);
             }
 
             subsymbols[prvIdx].prvValues[1] = subsymbols[prvIdx].prvValues[0];

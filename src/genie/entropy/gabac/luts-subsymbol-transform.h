@@ -52,23 +52,35 @@ class LUTsSubSymbolTransform {
     void decodeLUTs(Reader &reader);
     void encodeLUTs(Writer &writer, const core::Alphabet alphaProps, util::DataBlock* const symbols, util::DataBlock* const depSymbols = nullptr);
 
-    uint64_t getNumMaxElems(std::vector<Subsymbol>& subsymbols,
+    uint64_t getNumMaxElemsOrder2(std::vector<Subsymbol>& subsymbols,
+                                  const uint8_t lutIdx,
+                                  const uint8_t prvIdx);
+    uint64_t getNumMaxElemsOrder1(std::vector<Subsymbol>& subsymbols,
+                                  const uint8_t lutIdx,
+                                  const uint8_t prvIdx);
+
+    void invTransformOrder2(std::vector<Subsymbol>& subsymbols,
+                            const uint8_t subsymIdx,
+                            const uint8_t lutIdx,
+                            const uint8_t prvIdx);
+    void invTransformOrder1(std::vector<Subsymbol>& subsymbols,
+                            const uint8_t subsymIdx,
                             const uint8_t lutIdx,
                             const uint8_t prvIdx);
 
-    void invTransform(std::vector<Subsymbol>& subsymbols,
-                      const uint8_t subsymIdx,
-                      const uint8_t lutIdx,
-                      const uint8_t prvIdx);
-    void transform(std::vector<Subsymbol>& subsymbols,
-                   const uint8_t subsymIdx,
-                   const uint8_t lutIdx,
-                   const uint8_t prvIdx);
+    void transformOrder2(std::vector<Subsymbol>& subsymbols,
+                         const uint8_t subsymIdx,
+                         const uint8_t lutIdx,
+                         const uint8_t prvIdx);
+    void transformOrder1(std::vector<Subsymbol>& subsymbols,
+                         const uint8_t subsymIdx,
+                         const uint8_t lutIdx,
+                         const uint8_t prvIdx);
 
     private:
     inline LutOrder1 getInitLutsOrder1(uint64_t numAlphaSubsym);
-    void setupLutsO1(uint8_t numSubsyms, uint64_t numAlphaSubsym);
-    void setupLutsO2(uint8_t numSubsyms, uint64_t numAlphaSubsym);
+    void setupLutsOrder1(uint8_t numSubsyms, uint64_t numAlphaSubsym);
+    void setupLutsOrder2(uint8_t numSubsyms, uint64_t numAlphaSubsym);
     void buildLuts(const core::Alphabet alphaProps, util::DataBlock* const symbols, util::DataBlock* const depSymbols = nullptr);
 
     void sortLutRow(LutRow& lutRow);
