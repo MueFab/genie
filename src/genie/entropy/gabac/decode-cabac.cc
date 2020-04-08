@@ -161,6 +161,8 @@ void decode_cabac_order0(const paramcabac::TransformedSeq &conf,
     util::BlockStepper r = symbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
+    ContextSelector ctxSelector(stateVars);
+
     binFunc func = get_binarizor(outputSymbolSize,
                                  bypassFlag,
                                  binID,
@@ -175,12 +177,8 @@ void decode_cabac_order0(const paramcabac::TransformedSeq &conf,
         for (uint8_t s=0; s<stateVars.getNumSubsymbols(); s++) {
 
             subsymbols[s].subsymIdx = s;
-            binParams[3] = ContextSelector::getContextIdx(stateVars,
-                                                          bypassFlag,
-                                                          0,  //codingOrder
-                                                          s,
-                                                          subsymbols,
-                                                          0); // prvIdx - N/A
+            binParams[3] = ctxSelector.getContextIdxOrder0(s);
+
 
             subsymbols[s].subsymValue = (reader.*func)(binParams);
 
@@ -255,6 +253,8 @@ void decode_cabac_order1(const paramcabac::TransformedSeq &conf,
         rDep = depSymbols->getReader();
     }
 
+    ContextSelector ctxSelector(stateVars);
+
     binFunc func = get_binarizor(outputSymbolSize,
                                  bypassFlag,
                                  binID,
@@ -283,12 +283,11 @@ void decode_cabac_order1(const paramcabac::TransformedSeq &conf,
             }
 
             subsymbols[s].subsymIdx = s;
-            binParams[3] = ContextSelector::getContextIdx(stateVars,
-                                                          bypassFlag,
-                                                          codingOrder,
-                                                          s,
-                                                          subsymbols,
-                                                          prvIdx);
+            binParams[3] = ctxSelector.getContextIdxOrderGT0(s,
+                                                             prvIdx,
+                                                             subsymbols,
+                                                             codingOrder);
+
             if(customCmaxTU) {
                 subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder1(subsymbols,
                                                                                         lutIdx,
@@ -368,6 +367,8 @@ void decode_cabac_order2(const paramcabac::TransformedSeq &conf,
         }
     }
 
+    ContextSelector ctxSelector(stateVars);
+
     binFunc func = get_binarizor(outputSymbolSize,
                                  bypassFlag,
                                  binID,
@@ -384,12 +385,11 @@ void decode_cabac_order2(const paramcabac::TransformedSeq &conf,
             const uint8_t prvIdx = (numPrvs > 1) ? s : 0; // either private or shared PRV
 
             subsymbols[s].subsymIdx = s;
-            binParams[3] = ContextSelector::getContextIdx(stateVars,
-                                                          bypassFlag,
-                                                          codingOrder,
-                                                          s,
-                                                          subsymbols,
-                                                          prvIdx);
+            binParams[3] = ctxSelector.getContextIdxOrderGT0(s,
+                                                             prvIdx,
+                                                             subsymbols,
+                                                             codingOrder);
+
             if(customCmaxTU) {
                 subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder2(subsymbols,
                                                                                         lutIdx,
