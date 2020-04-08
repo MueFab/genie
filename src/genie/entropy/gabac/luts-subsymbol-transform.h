@@ -45,6 +45,8 @@ class LUTsSubSymbolTransform {
     public:
     LUTsSubSymbolTransform(const paramcabac::SupportValues& _supportVals,
                            const paramcabac::StateVars& _stateVars,
+                           const uint8_t _numLuts,
+                           const uint8_t _numPrvs,
                            const bool _modeFlag);
 
     void decodeLUTs(Reader &reader);
@@ -79,6 +81,8 @@ class LUTsSubSymbolTransform {
 
     const paramcabac::SupportValues& supportVals;
     const paramcabac::StateVars& stateVars;
+    uint8_t numLuts;
+    uint8_t numPrvs;
     bool encodingModeFlag;
 };
 
