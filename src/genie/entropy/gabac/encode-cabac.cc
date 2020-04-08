@@ -47,7 +47,7 @@ binFunc get_binarizor(const uint8_t outputSymbolSize,
                       const paramcabac::BinarizationParameters::BinarizationId binID,
                       const paramcabac::BinarizationParameters &binarzationParams,
                       const paramcabac::StateVars &stateVars,
-                      std::vector<unsigned int> binParams) {
+                      std::vector<unsigned int>& binParams) {
     binFunc func = nullptr;
     if(bypassFlag) {
         switch (binID) {
@@ -61,7 +61,7 @@ binFunc get_binarizor(const uint8_t outputSymbolSize,
                 break;
             case paramcabac::BinarizationParameters::BinarizationId::EXPONENTIAL_GOLOMB:
             case paramcabac::BinarizationParameters::BinarizationId::SIGNED_EXPONENTIAL_GOMB:
-                func = &Writer::writeEG;
+                func = &Writer::writeAsEGbypass;
                 break;
             case paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
             case paramcabac::BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
@@ -96,7 +96,7 @@ binFunc get_binarizor(const uint8_t outputSymbolSize,
                 break;
             case paramcabac::BinarizationParameters::BinarizationId::EXPONENTIAL_GOLOMB:
             case paramcabac::BinarizationParameters::BinarizationId::SIGNED_EXPONENTIAL_GOMB:
-                func = &Writer::writeEG;
+                func = &Writer::writeAsEGcabac;
                 break;
             case paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
             case paramcabac::BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:

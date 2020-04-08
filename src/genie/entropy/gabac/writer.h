@@ -49,33 +49,17 @@ class Writer {
 
     void writeAsEGcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsSEGbypass(uint64_t input, const std::vector<unsigned int> binParams);
-
-    void writeAsSEGcabac(uint64_t input, const std::vector<unsigned int> binParams);
-
     void writeAsTEGbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
     void writeAsTEGcabac(uint64_t input, const std::vector<unsigned int> binParams);
-
-    void writeAsSTEGbypass(uint64_t input, const std::vector<unsigned int> binParams);
-
-    void writeAsSTEGcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
     void writeAsSUTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
     void writeAsSUTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsSSUTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
-
-    void writeAsSSUTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
-
     void writeAsDTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
     void writeAsDTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
-
-    void writeAsSDTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
-
-    void writeAsSDTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
     void writeBI(uint64_t input, const std::vector<unsigned int> binParams);
 
