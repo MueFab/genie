@@ -18,33 +18,32 @@ namespace entropy {
 namespace gabac {
 
 class ContextSelector {
-   public:
-    ContextSelector() = default;
+    public:
+    ContextSelector(const paramcabac::StateVars& _stateVars)
+        : stateVars (_stateVars){};
 
     ~ContextSelector() = default;
 
-    static
-    unsigned int getContextIdx(const paramcabac::StateVars &stateVars,
-                               bool bypassFlag,
-                               uint8_t codingOrder,
-                               uint8_t subsymIdx,
-                               std::vector<Subsymbol>& subsymbols,
-                               uint8_t prvIdx) {
+    unsigned int getContextIdxOrder0(const uint8_t subsymIdx) {
+        return subsymIdx * stateVars.getCodingSizeCtxOffset();
+    }
+
+    unsigned int getContextIdxOrderGT0(const uint8_t subsymIdx,
+                                       const uint8_t prvIdx,
+                                       const std::vector<Subsymbol>& subsymbols,
+                                       const uint8_t codingOrder) {
         unsigned int ctxIdx = 0;
-        if (!bypassFlag) {
-            if (codingOrder > 0) {
-                ctxIdx += stateVars.getNumCtxLUTs();
-                ctxIdx += subsymIdx * stateVars.getCodingSizeCtxOffset();
-                for (unsigned int i = 1; i <= codingOrder; i++) {
-                    ctxIdx += subsymbols[prvIdx].prvValues[i - 1] * stateVars.getCodingOrderCtxOffset(i);
-                }
-            } else {
-                ctxIdx += subsymIdx * stateVars.getCodingSizeCtxOffset();
-            }
+        ctxIdx += stateVars.getNumCtxLUTs();
+        ctxIdx += subsymIdx * stateVars.getCodingSizeCtxOffset();
+        for (unsigned int i = 1; i <= codingOrder; i++) {
+            ctxIdx += subsymbols[prvIdx].prvValues[i - 1] * stateVars.getCodingOrderCtxOffset(i);
         }
 
         return ctxIdx;
     }
+
+    private:
+    const paramcabac::StateVars& stateVars;
 };
 
 }  // namespace gabac
