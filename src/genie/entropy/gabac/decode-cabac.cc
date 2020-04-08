@@ -21,6 +21,8 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
+typedef uint64_t (Reader::*binFunc)(const std::vector<unsigned int>);
+
 static inline
 void decode_sign_flag(Reader &reader,
                       const paramcabac::BinarizationParameters::BinarizationId binID,
@@ -42,9 +44,163 @@ void decode_sign_flag(Reader &reader,
     }
 }
 
-void decode_cabac(const paramcabac::TransformedSeq &conf,
-                  util::DataBlock* bitstream,
-                  util::DataBlock* const depSymbols) {
+static inline
+binFunc get_binarizor(const uint8_t outputSymbolSize,
+                      const bool bypassFlag,
+                      const paramcabac::BinarizationParameters::BinarizationId binID,
+                      const paramcabac::BinarizationParameters &binarzationParams,
+                      const paramcabac::StateVars &stateVars,
+                      std::vector<unsigned int>& binParams) {
+    binFunc func = nullptr;
+    if(bypassFlag) {
+        switch (binID) {
+            case paramcabac::BinarizationParameters::BinarizationId::BINARY_CODING:
+                func = &Reader::readAsBIbypass;
+                binParams[0] = stateVars.getCLengthBI();
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY:
+                func = &Reader::readAsTUbypass;
+                binParams[0] = binarzationParams.getCMax();
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::EXPONENTIAL_GOLOMB:
+            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_EXPONENTIAL_GOMB:
+                func = &Reader::readAsEGbypass;
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
+            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
+                func = &Reader::readAsTEGbypass;
+                binParams[0] = binarzationParams.getCMaxTeg();
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY:
+            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
+                func = &Reader::readAsSUTUbypass;
+                binParams[0] = outputSymbolSize;
+                binParams[1] = binarzationParams.getSplitUnitSize();
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::DOUBLE_TRUNCATED_UNARY:
+            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
+                func = &Reader::readAsDTUbypass;
+                binParams[0] = outputSymbolSize;
+                binParams[1] = binarzationParams.getSplitUnitSize();
+                binParams[2] = binarzationParams.getCMaxDtu();
+                break;
+            default:
+                GABAC_DIE("Unknown Binarization");
+        }
+    } else {
+        switch (binID) {
+            case paramcabac::BinarizationParameters::BinarizationId::BINARY_CODING:
+                func = &Reader::readAsBIcabac;
+                binParams[0] = stateVars.getCLengthBI();
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY:
+                func = &Reader::readAsTUcabac;
+                binParams[0] = binarzationParams.getCMax();
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::EXPONENTIAL_GOLOMB:
+            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_EXPONENTIAL_GOMB:
+                func = &Reader::readAsEGcabac;
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
+            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
+                func = &Reader::readAsTEGcabac;
+                binParams[0] = binarzationParams.getCMaxTeg();
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY:
+            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
+                func = &Reader::readAsSUTUcabac;
+                binParams[0] = outputSymbolSize;
+                binParams[1] = binarzationParams.getSplitUnitSize();
+                break;
+            case paramcabac::BinarizationParameters::BinarizationId::DOUBLE_TRUNCATED_UNARY:
+            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
+                func = &Reader::readAsDTUcabac;
+                binParams[0] = outputSymbolSize;
+                binParams[1] = binarzationParams.getSplitUnitSize();
+                binParams[2] = binarzationParams.getCMaxDtu();
+                break;
+            default:
+                GABAC_DIE("Unknown Binarization");
+        }
+    }
+
+    return func;
+}
+
+void decode_cabac_order0(const paramcabac::TransformedSeq &conf,
+                         util::DataBlock* bitstream) {
+    if (bitstream == nullptr) {
+        GABAC_DIE("Bitstream is null");
+    }
+
+    util::DataBlock symbols(0,
+                            4);
+                            //conf.getSupportValues().getMinimalSizeInBytes(conf.getSupportValues().getOutputSymbolSize()));
+
+    const paramcabac::SupportValues &supportVals = conf.getSupportValues();
+    const paramcabac::Binarization &binarzation = conf.getBinarization();
+    const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
+    const paramcabac::StateVars &stateVars = conf.getStateVars();
+    const paramcabac::BinarizationParameters::BinarizationId binID = binarzation.getBinarizationID();
+    const core::Alphabet alphaProps = getAlphabetProperties(conf.getAlphabetID());
+
+    const uint8_t outputSymbolSize = supportVals.getOutputSymbolSize();
+    const uint8_t codingSubsymSize = supportVals.getCodingSubsymSize();
+    const bool bypassFlag = binarzation.getBypassFlag();
+
+    Reader reader(bitstream,
+                  bypassFlag,
+                  stateVars.getNumCtxTotal());
+    size_t numSymbols = reader.start();
+    if (numSymbols <= 0) return;
+
+    symbols.resize(numSymbols);
+
+    std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
+
+    util::BlockStepper r = symbols.getReader();
+    std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
+
+    binFunc func = get_binarizor(outputSymbolSize,
+                                 bypassFlag,
+                                 binID,
+                                 binarzationParams,
+                                 stateVars,
+                                 binParams);
+
+    while (r.isValid()) {
+        // Decode subsymbols and merge them to construct symbols
+        uint64_t symbolValue = 0;
+
+        for (uint8_t s=0; s<stateVars.getNumSubsymbols(); s++) {
+
+            subsymbols[s].subsymIdx = s;
+            binParams[3] = ContextSelector::getContextIdx(stateVars,
+                                                          bypassFlag,
+                                                          0,  //codingOrder
+                                                          s,
+                                                          subsymbols,
+                                                          0); // prvIdx - N/A
+
+            subsymbols[s].subsymValue = (reader.*func)(binParams);
+
+            symbolValue = (symbolValue<<codingSubsymSize) | subsymbols[s].subsymValue;
+        }
+
+        decode_sign_flag(reader, binID, symbolValue);
+
+        r.set(symbolValue);
+        r.inc();
+    }
+
+    reader.close();
+
+    symbols.swap(bitstream);
+}
+
+void decode_cabac_order1(const paramcabac::TransformedSeq &conf,
+                         util::DataBlock* bitstream,
+                         util::DataBlock* const depSymbols) {
     if (bitstream == nullptr) {
         GABAC_DIE("Bitstream is null");
     }
@@ -77,10 +233,10 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
     size_t numSymbols = reader.start();
     if (numSymbols <= 0) return;
 
-    // symbols->clear();
     symbols.resize(numSymbols);
 
-    std::vector<unsigned int> binParams(3, 0);
+    std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
+
     util::BlockStepper r = symbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
@@ -94,46 +250,16 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
         rDep = depSymbols->getReader();
     }
 
-    uint64_t (Reader::*func)(const std::vector<unsigned int>, const unsigned int) = nullptr;
-    switch (binID) {
-        case paramcabac::BinarizationParameters::BinarizationId::BINARY_CODING:
-            func = &Reader::readBI;
-            binParams[0] = stateVars.getCLengthBI();
-            break;
-        case paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY:
-            func = &Reader::readTU;
-            binParams[0] = binarzationParams.getCMax();
-            break;
-        case paramcabac::BinarizationParameters::BinarizationId::EXPONENTIAL_GOLOMB:
-        case paramcabac::BinarizationParameters::BinarizationId::SIGNED_EXPONENTIAL_GOMB:
-            func = &Reader::readEG;
-            break;
-        case paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
-        case paramcabac::BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
-            func = &Reader::readTEG;
-            binParams[0] = binarzationParams.getCMaxTeg();
-            break;
-        case paramcabac::BinarizationParameters::BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY:
-        case paramcabac::BinarizationParameters::BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
-            func = &Reader::readSUTU;
-            binParams[0] = outputSymbolSize;
-            binParams[1] = binarzationParams.getSplitUnitSize();
-            break;
-        case paramcabac::BinarizationParameters::BinarizationId::DOUBLE_TRUNCATED_UNARY:
-        case paramcabac::BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
-            func = &Reader::readDTU;
-            binParams[0] = outputSymbolSize;
-            binParams[1] = binarzationParams.getSplitUnitSize();
-            binParams[2] = binarzationParams.getCMaxDtu();
-            break;
-        default:
-            GABAC_DIE("Invalid binarization");
-    }
+    binFunc func = get_binarizor(outputSymbolSize,
+                                 bypassFlag,
+                                 binID,
+                                 binarzationParams,
+                                 stateVars,
+                                 binParams);
 
     while (r.isValid()) {
         // Decode subsymbols and merge them to construct symbols
         uint64_t symbolValue = 0;
-        uint64_t decodedSubsym = 0;
 
         uint64_t depSymbolValue = 0, depSubsymValue = 0;
         if(rDep.isValid()) {
@@ -152,12 +278,12 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
             }
 
             subsymbols[s].subsymIdx = s;
-            uint32_t ctxIdx = ContextSelector::getContextIdx(stateVars,
-                                                             bypassFlag,
-                                                             codingOrder,
-                                                             s,
-                                                             subsymbols,
-                                                             prvIdx);
+            binParams[3] = ContextSelector::getContextIdx(stateVars,
+                                                          bypassFlag,
+                                                          codingOrder,
+                                                          s,
+                                                          subsymbols,
+                                                          prvIdx);
             if(numLuts > 0) {
                 if(binID == paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY) {
                     subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElems(subsymbols,
@@ -166,21 +292,14 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
                     binParams[0] = std::min((uint64_t) binarzationParams.getCMax(),subsymbols[s].lutNumMaxElems); // update cMax
                 }
             }
-            subsymbols[s].subsymValue = decodedSubsym = (reader.*func)(binParams, ctxIdx);
+            subsymbols[s].subsymValue = (reader.*func)(binParams);
 
             if(numLuts > 0) {
-                subsymbols[s].lutEntryIdx = decodedSubsym;
+                subsymbols[s].lutEntryIdx = subsymbols[s].subsymValue;
                 invLutsSubsymTrnsfm.invTransform(subsymbols, s, lutIdx, prvIdx);
             }
 
-            if(numPrvs > 0) {
-                if(codingOrder == 2) {
-                    subsymbols[prvIdx].prvValues[1] = subsymbols[prvIdx].prvValues[0];
-                    subsymbols[prvIdx].prvValues[0] = subsymbols[s].subsymValue;
-                } else if(codingOrder == 1) {
-                    subsymbols[prvIdx].prvValues[0] = subsymbols[s].subsymValue;
-                }
-            }
+            subsymbols[prvIdx].prvValues[0] = subsymbols[s].subsymValue;
 
             symbolValue = (symbolValue<<codingSubsymSize) | subsymbols[s].subsymValue;
         }
@@ -194,6 +313,123 @@ void decode_cabac(const paramcabac::TransformedSeq &conf,
     reader.close();
 
     symbols.swap(bitstream);
+}
+
+void decode_cabac_order2(const paramcabac::TransformedSeq &conf,
+                         util::DataBlock* bitstream) {
+    if (bitstream == nullptr) {
+        GABAC_DIE("Bitstream is null");
+    }
+
+    util::DataBlock symbols(0,
+                            4);
+                            //conf.getSupportValues().getMinimalSizeInBytes(conf.getSupportValues().getOutputSymbolSize()));
+
+    const paramcabac::SupportValues &supportVals = conf.getSupportValues();
+    const paramcabac::Binarization &binarzation = conf.getBinarization();
+    const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
+    const paramcabac::StateVars &stateVars = conf.getStateVars();
+    const paramcabac::BinarizationParameters::BinarizationId binID = binarzation.getBinarizationID();
+    const core::Alphabet alphaProps = getAlphabetProperties(conf.getAlphabetID());
+
+    const uint8_t outputSymbolSize = supportVals.getOutputSymbolSize();
+    const uint8_t codingSubsymSize = supportVals.getCodingSubsymSize();
+    const uint8_t codingOrder = supportVals.getCodingOrder();
+    const bool bypassFlag = binarzation.getBypassFlag();
+
+    uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
+                                                 supportVals.getShareSubsymLutFlag());
+    uint8_t const numPrvs = stateVars.getNumPrvs(codingOrder,
+                                                 supportVals.getShareSubsymPrvFlag());
+
+    Reader reader(bitstream,
+                  bypassFlag,
+                  stateVars.getNumCtxTotal());
+    size_t numSymbols = reader.start();
+    if (numSymbols <= 0) return;
+
+    symbols.resize(numSymbols);
+
+    std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
+
+    util::BlockStepper r = symbols.getReader();
+    std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
+
+    LUTsSubSymbolTransform invLutsSubsymTrnsfm(supportVals, stateVars, false);
+    if(numLuts > 0) {
+        invLutsSubsymTrnsfm.decodeLUTs(reader);
+    }
+
+    binFunc func = get_binarizor(outputSymbolSize,
+                                 bypassFlag,
+                                 binID,
+                                 binarzationParams,
+                                 stateVars,
+                                 binParams);
+
+    while (r.isValid()) {
+        // Decode subsymbols and merge them to construct symbols
+        uint64_t symbolValue = 0;
+
+        for (uint8_t s=0; s<stateVars.getNumSubsymbols(); s++) {
+            const uint8_t lutIdx = (numLuts > 1) ? s : 0; // either private or shared LUT
+            const uint8_t prvIdx = (numPrvs > 1) ? s : 0; // either private or shared PRV
+
+            subsymbols[s].subsymIdx = s;
+            binParams[3] = ContextSelector::getContextIdx(stateVars,
+                                                          bypassFlag,
+                                                          codingOrder,
+                                                          s,
+                                                          subsymbols,
+                                                          prvIdx);
+            if(numLuts > 0) {
+                if(binID == paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY) {
+                    subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElems(subsymbols,
+                                                                                      lutIdx,
+                                                                                      prvIdx);
+                    binParams[0] = std::min((uint64_t) binarzationParams.getCMax(),subsymbols[s].lutNumMaxElems); // update cMax
+                }
+            }
+            subsymbols[s].subsymValue = (reader.*func)(binParams);
+
+            if(numLuts > 0) {
+                subsymbols[s].lutEntryIdx = subsymbols[s].subsymValue;
+                invLutsSubsymTrnsfm.invTransform(subsymbols, s, lutIdx, prvIdx);
+            }
+
+            subsymbols[prvIdx].prvValues[1] = subsymbols[prvIdx].prvValues[0];
+            subsymbols[prvIdx].prvValues[0] = subsymbols[s].subsymValue;
+
+            symbolValue = (symbolValue<<codingSubsymSize) | subsymbols[s].subsymValue;
+        }
+
+        decode_sign_flag(reader, binID, symbolValue);
+
+        r.set(symbolValue);
+        r.inc();
+    }
+
+    reader.close();
+
+    symbols.swap(bitstream);
+}
+
+void decode_cabac(const paramcabac::TransformedSeq &conf,
+                  util::DataBlock* bitstream,
+                  util::DataBlock* const depSymbols) {
+    switch(conf.getSupportValues().getCodingOrder()) {
+        case 0:
+            decode_cabac_order0(conf, bitstream);
+        break;
+        case 1:
+            decode_cabac_order1(conf, bitstream, depSymbols);
+        break;
+        case 2:
+            decode_cabac_order2(conf, bitstream);
+        break;
+        default:
+            GABAC_DIE("Unknown coding order");
+    }
 }
 }  // namespace gabac
 }  // namespace entropy
