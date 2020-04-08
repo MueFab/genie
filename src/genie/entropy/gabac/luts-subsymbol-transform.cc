@@ -28,9 +28,13 @@ LutOrder1 LUTsSubSymbolTransform::getInitLutsOrder1(uint64_t numAlphaSubsym) {
 
 LUTsSubSymbolTransform::LUTsSubSymbolTransform(const paramcabac::SupportValues& _supportVals,
                                                const paramcabac::StateVars& _stateVars,
+                                               uint8_t _numLuts,
+                                               uint8_t _numPrvs,
                                                const bool _modeFlag)
     : supportVals(_supportVals),
       stateVars(_stateVars),
+      numLuts(_numLuts),
+      numPrvs(_numPrvs),
       encodingModeFlag(_modeFlag) {}
 
 void LUTsSubSymbolTransform::setupLutsO1(uint8_t numSubsyms, uint64_t numAlphaSubsym) {
@@ -57,6 +61,9 @@ void LUTsSubSymbolTransform::setupLutsO2(uint8_t numSubsyms, uint64_t numAlphaSu
 }
 
 void LUTsSubSymbolTransform::buildLuts(const core::Alphabet alphaProps, util::DataBlock* const symbols, util::DataBlock* const depSymbols) {
+    if(numLuts == 0 || !encodingModeFlag)
+        return;
+
     assert(symbols != nullptr);
 
     size_t numSymbols = symbols->size();
@@ -65,16 +72,9 @@ void LUTsSubSymbolTransform::buildLuts(const core::Alphabet alphaProps, util::Da
     uint8_t const outputSymbolSize = supportVals.getOutputSymbolSize();
     uint8_t const codingSubsymSize = supportVals.getCodingSubsymSize();
     uint8_t const codingOrder = supportVals.getCodingOrder();
-    uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
-                                                 supportVals.getShareSubsymLutFlag());
-    uint8_t const numPrvs = stateVars.getNumPrvs(codingOrder,
-                                                 supportVals.getShareSubsymPrvFlag());
     uint8_t const numSubsymbols = stateVars.getNumSubsymbols();
     uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
     uint64_t const subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize)-1;
-
-    if(numLuts == 0)
-        return;
 
     util::BlockStepper r = symbols->getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
@@ -148,17 +148,12 @@ void LUTsSubSymbolTransform::decodeLutOrder1(Reader &reader, uint64_t numAlphaSu
 
 void LUTsSubSymbolTransform::decodeLUTs(Reader &reader) {
 
-    if(encodingModeFlag)
+    if(numLuts == 0 || encodingModeFlag)
         return;
 
     uint8_t const codingSubsymSize = supportVals.getCodingSubsymSize();
     uint8_t const codingOrder = supportVals.getCodingOrder();
-    uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
-                                                 supportVals.getShareSubsymLutFlag());
     uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
-
-    if(numLuts == 0)
-        return;
 
     if(codingOrder == 2) {
         setupLutsO2(stateVars.getNumSubsymbols(), numAlphaSubsym);
@@ -197,17 +192,12 @@ void LUTsSubSymbolTransform::encodeLutOrder1(Writer &writer, uint64_t numAlphaSu
 
 void LUTsSubSymbolTransform::encodeLUTs(Writer &writer, const core::Alphabet alphaProps, util::DataBlock* const symbols, util::DataBlock* const depSymbols) {
 
-    if(!encodingModeFlag)
+    if(numLuts == 0 || !encodingModeFlag)
         return;
 
     uint8_t const codingSubsymSize = supportVals.getCodingSubsymSize();
     uint8_t const codingOrder = supportVals.getCodingOrder();
-    uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
-                                                 supportVals.getShareSubsymLutFlag());
     uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
-
-    if(numLuts == 0)
-        return;
 
     // build LUTs from symbols
     buildLuts(alphaProps, symbols, depSymbols);
