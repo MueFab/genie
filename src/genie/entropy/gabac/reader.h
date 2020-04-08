@@ -33,55 +33,43 @@ class Reader {
 
     uint64_t readAsBIbypass(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsBIcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    uint64_t readAsBIcabac(const std::vector<unsigned int> binParams);
 
     uint64_t readAsTUbypass(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsTUcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    uint64_t readAsTUcabac(const std::vector<unsigned int> binParams);
 
     uint64_t readAsEGbypass(const std::vector<unsigned int> dummy);
 
-    uint64_t readAsEGcabac(const std::vector<unsigned int> dummy, const unsigned int ctxIdx);
+    uint64_t readAsEGcabac(const std::vector<unsigned int> dummy);
 
     uint64_t readAsSEGbypass(const std::vector<unsigned int> dummy);
 
-    uint64_t readAsSEGcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    uint64_t readAsSEGcabac(const std::vector<unsigned int> binParams);
 
     uint64_t readAsTEGbypass(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsTEGcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
-
-    uint64_t readAsSTEGbypass(const std::vector<unsigned int> binParams);
-
-    uint64_t readAsSTEGcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    uint64_t readAsTEGcabac(const std::vector<unsigned int> binParams);
 
     uint64_t readAsSUTUbypass(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsSUTUcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
-
-    uint64_t readAsSSUTUbypass(const std::vector<unsigned int> binParams);
-
-    uint64_t readAsSSUTUcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    uint64_t readAsSUTUcabac(const std::vector<unsigned int> binParams);
 
     uint64_t readAsDTUbypass(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsDTUcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    uint64_t readAsDTUcabac(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsSDTUbypass(const std::vector<unsigned int> binParams);
+    uint64_t readBI(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsSDTUcabac(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    uint64_t readTU(const std::vector<unsigned int> binParams);
 
-    uint64_t readBI(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    uint64_t readEG(const std::vector<unsigned int> binParams);
 
-    uint64_t readTU(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    uint64_t readTEG(const std::vector<unsigned int> binParams);
 
-    uint64_t readEG(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    uint64_t readSUTU(const std::vector<unsigned int> binParams);
 
-    uint64_t readTEG(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
-
-    uint64_t readSUTU(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
-
-    uint64_t readDTU(const std::vector<unsigned int> binParams, const unsigned int ctxIdx);
+    uint64_t readDTU(const std::vector<unsigned int> binParams);
 
     uint64_t readLutSymbol(const uint8_t codingSubsymSize);
 
