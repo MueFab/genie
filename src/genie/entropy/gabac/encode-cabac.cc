@@ -294,7 +294,7 @@ void encode_cabac_order1(const paramcabac::TransformedSeq &conf,
 
             if(numLuts > 0) {
                 subsymbols[s].lutEntryIdx = 0;
-                lutsSubsymTrnsfm.transform(subsymbols, s, lutIdx, prvIdx);
+                lutsSubsymTrnsfm.transformOrder1(subsymbols, s, lutIdx, prvIdx);
                 subsymValToCode = subsymbols[s].lutEntryIdx;
                 if(binID == paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY) {
                     binParams[0] = std::min((uint64_t) binarzationParams.getCMax(),subsymbols[s].lutNumMaxElems); // update cMax
@@ -394,7 +394,7 @@ void encode_cabac_order2(const paramcabac::TransformedSeq &conf,
 
             if(numLuts > 0) {
                 subsymbols[s].lutEntryIdx = 0;
-                lutsSubsymTrnsfm.transform(subsymbols, s, lutIdx, prvIdx);
+                lutsSubsymTrnsfm.transformOrder2(subsymbols, s, lutIdx, prvIdx);
                 subsymValToCode = subsymbols[s].lutEntryIdx;
                 if(binID == paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY) {
                     binParams[0] = std::min((uint64_t) binarzationParams.getCMax(),subsymbols[s].lutNumMaxElems); // update cMax
