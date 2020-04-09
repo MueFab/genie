@@ -27,7 +27,9 @@ void encode(const ProgramOptions& programOptions) {
 
         genie::quality::qvwriteout::Encoder qvencoder;
         genie::name::tokenizer::Encoder nameencoder;
-        genie::read::spring::SpringEncoder encoder(&qvencoder, &nameencoder, "./");
+
+        genie::util::FastqStats stats;
+        genie::read::spring::SpringEncoder encoder(&qvencoder, &nameencoder, "./", &stats);
 
         genie::entropy::gabac::GabacCompressor compressor;
 

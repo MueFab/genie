@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "generate-read-streams.h"
 #include "id-tokenization.h"
 #include "params.h"
 #include "reorder-compress-quality-id.h"
@@ -91,6 +92,16 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
         std::string file_blocks_quality = basedir + "/blocks_quality.bin";
         std::string file_blocks_id = basedir + "/blocks_id.bin";
         std::vector<uint32_t> block_start, block_end;
+        {
+            se_data data;
+            loadPE_Data(cp, temp_dir, false,  &data);
+
+            pe_block_data bdata;
+            generateBlocksPE(data, &bdata);
+            data.order_arr.clear();
+
+            generate_qual_id_pe(temp_dir, bdata, cp.num_reads);
+        }
         if (preserve_quality) {
             // read block start and end into vector
             read_block_start_end(file_blocks_quality, block_start, block_end);
@@ -219,11 +230,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
             std::string file_to_save_streams = quality_desc_prefix + std::to_string(block_num);
             std::ofstream out(file_to_save_streams);
             for (uint32_t i = block_start[block_num]; i < block_end[block_num]; i++)
-                for (size_t pos_in_read = 0; pos_in_read < quality_array[i - block_start[start_block_num]].size();
-                     pos_in_read++) {
                     out << quality_array[i - block_start[start_block_num]] << "\n";
-                }
-
         }
         start_block_num = end_block_num;
 

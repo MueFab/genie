@@ -65,18 +65,18 @@ void compress_subseqs(subseq_data *data,
 core::AccessUnitRaw generate_read_streams(const std::string &temp_dir, const compression_params &cp,
                                           util::FastqStats *stats);
 
-core::AccessUnitRaw generate_read_streams_se(const std::string &temp_dir, const compression_params &cp,
-                                             util::FastqStats *stats);
+core::AccessUnitRaw generate_read_streams_se(const se_data &data, uint64_t block_num, size_t num_recs);
 
-core::AccessUnitRaw generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp,
-                                             util::FastqStats *stats);
+core::AccessUnitRaw generate_read_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num, size_t num_recs);
 
 void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data);
-void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data);
+void loadPE_Data(const compression_params &cp, const std::string &temp_dir, bool del, se_data *data);
 core::AccessUnitRaw generate_subseqs(const se_data &data, uint64_t block_num);
 core::AccessUnitRaw generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num,
                                         pe_statistics *pest);
 void generateBlocksPE(const se_data &data, pe_block_data *bdata);
+
+void generate_qual_id_pe(const std::string &temp_dir, const pe_block_data &bdata, uint32_t num_reads);
 
 }  // namespace spring
 }  // namespace read
