@@ -10,6 +10,7 @@
 
 #endif
 
+#include <genie/core/read-encoder.h>
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
@@ -31,7 +32,6 @@ namespace read {
 namespace spring {
 
 void reorder_compress_quality_id(const std::string &temp_dir, const compression_params &cp,
-                                 const std::vector<std::vector<entropy::gabac::EncodingConfiguration>> &configs,
                                  util::FastqStats *stats) {
     // Read some parameter
     uint32_t numreads = cp.num_reads;
@@ -70,14 +70,14 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
             std::cout << "Compressing qualities\n";
             uint32_t num_reads_per_file = numreads;
             reorder_compress(file_quality[0], temp_dir, num_reads_per_file, num_thr, num_reads_per_block, str_array,
-                             str_array_size, order_array, "quality", configs, stats);
+                             str_array_size, order_array, "quality", stats);
             remove(file_quality[0].c_str());
         }
         if (preserve_id) {
             std::cout << "Compressing ids\n";
             uint32_t num_reads_per_file = numreads;
             reorder_compress(file_id, temp_dir, num_reads_per_file, num_thr, num_reads_per_block, str_array,
-                             str_array_size, order_array, "id", configs, stats);
+                             str_array_size, order_array, "id", stats);
             remove(file_id.c_str());
         }
 
@@ -104,7 +104,7 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
             // (needed because block sizes are not exactly equal to
             // num_reads_per_block
             reorder_compress_quality_pe(file_quality, temp_dir, quality_array, quality_array_size, order_array,
-                                        block_start, block_end, cp, configs, stats);
+                                        block_start, block_end, cp, stats);
             delete[] quality_array;
             delete[] order_array;
             remove(file_quality[0].c_str());
@@ -117,7 +117,7 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
             std::string *id_array = new std::string[numreads / 2];
             std::ifstream f_id(file_id);
             for (uint32_t i = 0; i < numreads / 2; i++) std::getline(f_id, id_array[i]);
-            reorder_compress_id_pe(id_array, temp_dir, file_order_id, block_start, block_end, cp, configs, stats);
+            reorder_compress_id_pe(id_array, temp_dir, file_order_id, block_start, block_end, cp, stats);
             delete[] id_array;
             for (uint32_t i = 0; i < block_start.size(); i++) remove((file_order_id + "." + std::to_string(i)).c_str());
             remove(file_id.c_str());
@@ -155,17 +155,12 @@ void generate_order(const std::string &file_order, uint32_t *order_array, const 
 }
 
 void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, const std::string &file_order_id,
-                            const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
-                            const compression_params &cp,
-                            const std::vector<std::vector<entropy::gabac::EncodingConfiguration>> &configs,
-                            util::FastqStats *stats) {
+                            const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end, const compression_params &cp, util::FastqStats *stats) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
-    (void)cp;
-
-    uint64_t size = 0;
+    (void) cp;
 
 #ifdef GENIE_USE_OPENMP
-#pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic) reduction(+ : size)
+#pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic)
 #endif
     for (uint64_t block_num = 0; block_num < block_start.size(); block_num++) {
         std::ifstream f_order_id(file_order_id + "." + std::to_string(block_num), std::ios::binary);
@@ -175,32 +170,22 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
             f_order_id.read((char *)&index, sizeof(uint32_t));
             id_array_block[j - block_start[block_num]] = id_array[index];
         }
-        auto raw_data = generate_empty_raw_data();
-        std::vector<std::vector<std::vector<util::DataBlock>>> generated_streams = create_default_streams();
-        generate_read_id_tokens(id_array_block, block_end[block_num] - block_start[block_num], raw_data[15]);
-        for (int i = 0; i < 128; i++) {
-            for (int j = 0; j < 6; j++) {
-                gabac_compress(configs[15][0], &raw_data[15][6 * i + j], &generated_streams[15][6 * i + j]);
-            }
-        }
         std::string file_to_save_streams = id_desc_prefix + std::to_string(block_num);
-        size += write_streams_to_file(generated_streams, file_to_save_streams, id_descriptors);
+        std::ofstream out(file_to_save_streams);
+        for(size_t i = 0; i < block_end[block_num] - block_start[block_num]; ++i) {
+            out << id_array_block[i] << "\n";
+        }
 
         f_order_id.close();
         delete[] id_array_block;
     }
-
-    if (stats->enabled) {
-        stats->cmprs_id_sz += size;
-        stats->cmprs_total_sz += size;
-    }
 }
+
 
 void reorder_compress_quality_pe(std::string file_quality[2], const std::string &temp_dir, std::string *quality_array,
                                  const uint64_t &quality_array_size, uint32_t *order_array,
                                  const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
                                  const compression_params &cp,
-                                 const std::vector<std::vector<entropy::gabac::EncodingConfiguration>> &configs,
                                  util::FastqStats *stats) {
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
     uint32_t start_block_num = 0;
@@ -231,18 +216,14 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
 #pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic) reduction(+ : size)
 #endif
         for (uint64_t block_num = start_block_num; block_num < end_block_num; block_num++) {
-            auto raw_data = generate_empty_raw_data();
-            std::vector<std::vector<std::vector<util::DataBlock>>> generated_streams = create_default_streams();
+            std::string file_to_save_streams = quality_desc_prefix + std::to_string(block_num);
+            std::ofstream out(file_to_save_streams);
             for (uint32_t i = block_start[block_num]; i < block_end[block_num]; i++)
                 for (size_t pos_in_read = 0; pos_in_read < quality_array[i - block_start[start_block_num]].size();
-                     pos_in_read++)
-                    raw_data[14][2].push_back((uint8_t)quality_array[i - block_start[start_block_num]][pos_in_read] -
-                                              33);  // quality
+                     pos_in_read++) {
+                    out << quality_array[i - block_start[start_block_num]] << "\n";
+                }
 
-            for (size_t subseq = 0; subseq < 3; subseq++)
-                gabac_compress(configs[14][subseq], &raw_data[14][subseq], &generated_streams[14][subseq]);
-            std::string file_to_save_streams = quality_desc_prefix + std::to_string(block_num);
-            write_streams_to_file(generated_streams, file_to_save_streams, quality_descriptors);
         }
         start_block_num = end_block_num;
 
@@ -256,7 +237,6 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
 void reorder_compress(const std::string &file_name, const std::string &temp_dir, const uint32_t &num_reads_per_file,
                       const int &num_thr, const uint32_t &num_reads_per_block, std::string *str_array,
                       const uint32_t &str_array_size, uint32_t *order_array, const std::string &mode,
-                      const std::vector<std::vector<entropy::gabac::EncodingConfiguration>> &configs,
                       util::FastqStats *stats) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
@@ -310,25 +290,11 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
             }
             uint32_t num_reads_block = (uint32_t)(end_read_num - start_read_num);
 
-            auto raw_data = generate_empty_raw_data();
-            std::vector<std::vector<std::vector<util::DataBlock>>> generated_streams = create_default_streams();
-            if (mode == "id") {
-                generate_read_id_tokens(str_array + start_read_num, num_reads_block, raw_data[15]);
-                for (int i = 0; i < 128; i++) {
-                    for (int j = 0; j < 6; j++) {
-                        gabac_compress(configs[15][0], &raw_data[15][6 * i + j], &generated_streams[15][6 * i + j]);
-                    }
-                }
-                std::string file_to_save_streams = id_desc_prefix + std::to_string(block_num_offset + block_num);
-                id_size += write_streams_to_file(generated_streams, file_to_save_streams, id_descriptors);
-            } else {
-                for (uint32_t i = start_read_num; i < start_read_num + num_reads_block; i++)
-                    for (size_t pos_in_read = 0; pos_in_read < str_array[i].size(); pos_in_read++)
-                        raw_data[14][2].push_back((uint8_t)str_array[i][pos_in_read] - 33);  // quality
-                for (size_t subseq = 0; subseq < 3; subseq++)
-                    gabac_compress(configs[14][subseq], &raw_data[14][subseq], &generated_streams[14][subseq]);
-                std::string file_to_save_streams = quality_desc_prefix + std::to_string(block_num_offset + block_num);
-                qual_size += write_streams_to_file(generated_streams, file_to_save_streams, quality_descriptors);
+
+            std::string file_to_save_streams = (mode == "id" ? id_desc_prefix : quality_desc_prefix) + std::to_string(block_num_offset + block_num);
+            std::ofstream out(file_to_save_streams);
+            for(auto i = str_array + start_read_num; i < str_array + start_read_num + start_read_num + num_reads_block; ++i) {
+                out << *i << "\n";
             }
         }  // omp parallel
 
@@ -340,32 +306,6 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
     }
 }
 
-void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std::vector<int64_t> tokens[128][6]) {
-    char prev_ID[MAX_NUM_TOKENS_ID] = {0};
-    uint32_t prev_tokens_ptr[MAX_NUM_TOKENS_ID] = {0};
-    for (uint32_t id_num = 0; id_num < num_ids; id_num++) {
-        tokens[0][0].push_back(1);  // DIFF
-        if (id_num == 0)
-            tokens[0][1].push_back(0);  // DIFF 0 for first id
-        else
-            tokens[0][1].push_back(1);  // DIFF 1 for rest of ids
-        generate_id_tokens(prev_ID, prev_tokens_ptr, id_array[id_num], tokens);
-    }
-}
-
-void generate_read_id_tokens(std::string *id_array, const uint32_t &num_ids, std::vector<util::DataBlock> &tokens) {
-    char prev_ID[MAX_NUM_TOKENS_ID] = {0};
-    uint32_t prev_tokens_ptr[MAX_NUM_TOKENS_ID] = {0};
-    for (uint32_t id_num = 0; id_num < num_ids; id_num++) {
-        tokens[0 * 6 + 0].push_back(1);  // DIFF
-        if (id_num == 0) {
-            big_endian_push_uint32(0, &tokens[0 * 6 + 1]);  // DIFF 0 for first id
-        } else {
-            big_endian_push_uint32(1, &tokens[0 * 6 + 1]);  // DIFF 1 for rest of ids
-        }
-        generate_id_tokens(prev_ID, prev_tokens_ptr, id_array[id_num], tokens);
-    }
-}
 }  // namespace spring
 }  // namespace read
 }  // namespace genie

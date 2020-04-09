@@ -39,7 +39,7 @@ void Preprocessor::preprocess(core::record::Chunk &&t, size_t id) {
         cp.num_reads_clean[0] = 0;
         cp.num_reads_clean[1] = 0;
         cp.max_readlen = 0;
-        cp.num_reads_per_block = 0;
+        cp.num_reads_per_block = NUM_READS_PER_BLOCK;
         cp.num_thr = 1;
         cp.num_blocks = 0;
         for (int j = 0; j < 2; j++) {
