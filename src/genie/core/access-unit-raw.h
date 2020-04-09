@@ -232,6 +232,10 @@ class AccessUnitRaw {
      */
     size_t getNumRecords() const;
 
+    void setNumRecords(size_t recs)  {
+        numRecords = recs;
+    }
+
     void clear();
 
     void addRecord();

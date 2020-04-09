@@ -33,7 +33,7 @@ uint64_t getNumBlocks(const compression_params &data) {
     return uint64_t(std::ceil(float(data.num_reads) / data.num_reads_per_block));
 }
 
-core::AccessUnitRaw generate_read_streams_se(const se_data &data, uint64_t block_num, size_t num_recs) {  // char_to_int
+core::AccessUnitRaw generate_read_streams_se(const se_data &data, uint64_t block_num) {  // char_to_int
 
     core::parameter::ParameterSet ps(block_num, block_num, core::parameter::DataUnit::DatasetType::NON_ALIGNED,
                                      core::AlphabetID::ACGTN, 0, data.cp.paired_end, false, data.cp.preserve_quality, 0,
@@ -41,7 +41,7 @@ core::AccessUnitRaw generate_read_streams_se(const se_data &data, uint64_t block
     core::parameter::ComputedRef cr(core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY);
     ps.setComputedRef(std::move(cr));
 
-    core::AccessUnitRaw raw_data(std::move(ps), num_recs);
+    core::AccessUnitRaw raw_data(std::move(ps), 0);
 
     int64_t char_to_int[128];
     char_to_int[(uint8_t)'A'] = 0;
@@ -129,6 +129,8 @@ core::AccessUnitRaw generate_read_streams_se(const se_data &data, uint64_t block
             seq_end = prevpos + data.read_length_arr[i];
         }
     }
+
+    raw_data.setNumRecords(raw_data.get(core::GenSub::RCOMP).getNumSymbols());
 
     return raw_data;
 }
@@ -513,7 +515,7 @@ void generate_qual_id_pe(const std::string &temp_dir, const pe_block_data &bdata
     f_blocks_id.close();
 }
 
-core::AccessUnitRaw generate_read_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num, size_t num_recs) {
+core::AccessUnitRaw generate_read_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num) {
 
     core::parameter::ParameterSet ps(cur_block_num, cur_block_num, core::parameter::DataUnit::DatasetType::NON_ALIGNED,
                                      core::AlphabetID::ACGTN, 0, data.cp.paired_end, false, data.cp.preserve_quality, 0,
@@ -521,7 +523,7 @@ core::AccessUnitRaw generate_read_streams_pe(const se_data &data, const pe_block
     core::parameter::ComputedRef cr(core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY);
     ps.setComputedRef(std::move(cr));
 
-    core::AccessUnitRaw raw_au(std::move(ps), num_recs);
+    core::AccessUnitRaw raw_au(std::move(ps), 0);
     // char_to_int
     int64_t char_to_int[128];
     char_to_int[(uint8_t)'A'] = 0;
@@ -686,6 +688,9 @@ core::AccessUnitRaw generate_read_streams_pe(const se_data &data, const pe_block
             }
         }
     }
+
+    raw_au.setNumRecords(raw_au.get(core::GenSub::RCOMP).getNumSymbols() / 2);
+
     return raw_au;
 }
 

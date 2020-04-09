@@ -6,8 +6,6 @@
 #include <genie/format/sam/importer.h>
 #include <genie/module/manager.h>
 #include <genie/name/tokenizer/encoder.h>
-#include <genie/name/tokenizer/null-encoder.h>
-#include <genie/quality/paramqv1/null-encoder.h>
 #include <genie/quality/qvwriteout/encoder.h>
 #include <genie/read/localassembly/decoder.h>
 #include <genie/read/localassembly/encoder.h>
@@ -25,17 +23,15 @@ void encode(const ProgramOptions &programOptions) {
 
         const size_t LOCAL_ASSEMBLY_BUFFER_SIZE = 2000;
         std::unique_ptr<genie::core::QVEncoder> qvencoder;
-        if (programOptions.discardQualities) {
-            qvencoder = genie::util::make_unique<genie::quality::paramqv1::NullEncoder>();
-        } else {
+
+        if (!programOptions.discardQualities) {
             qvencoder = genie::util::make_unique<genie::quality::qvwriteout::Encoder>();
         }
         std::unique_ptr<genie::core::NameEncoder> namecoder;
-        if (programOptions.discardNames) {
-            namecoder = genie::util::make_unique<genie::name::tokenizer::NullEncoder>();
-        } else {
+        if (!programOptions.discardNames) {
             namecoder = genie::util::make_unique<genie::name::tokenizer::Encoder>();
         }
+
         genie::read::localassembly::Encoder encoder(LOCAL_ASSEMBLY_BUFFER_SIZE, false, qvencoder.get(), namecoder.get());
 
         genie::entropy::gabac::GabacCompressor compressor;
