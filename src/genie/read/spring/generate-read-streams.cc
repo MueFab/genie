@@ -3,7 +3,7 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-#if 0
+
 #ifdef GENIE_USE_OPENMP
 
 #include <omp.h>
@@ -33,10 +33,16 @@ uint64_t getNumBlocks(const compression_params &data) {
     return uint64_t(std::ceil(float(data.num_reads) / data.num_reads_per_block));
 }
 
-core::AccessUnitRaw generate_subseqs(const se_data &data, uint64_t block_num) {
-    core::AccessUnitRaw rdata(core::parameter::ParameterSet(), 0);
+core::AccessUnitRaw generate_read_streams_se(const se_data &data, uint64_t block_num, size_t num_recs) {  // char_to_int
 
-    // char_to_int
+    core::parameter::ParameterSet ps(block_num, block_num, core::parameter::DataUnit::DatasetType::NON_ALIGNED,
+                                     core::AlphabetID::ACGTN, 0, data.cp.paired_end, false, data.cp.preserve_quality, 0,
+                                     false, false);
+    core::parameter::ComputedRef cr(core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY);
+    ps.setComputedRef(std::move(cr));
+
+    core::AccessUnitRaw raw_data(std::move(ps), num_recs);
+
     int64_t char_to_int[128];
     char_to_int[(uint8_t)'A'] = 0;
     char_to_int[(uint8_t)'C'] = 1;
@@ -70,60 +76,61 @@ core::AccessUnitRaw generate_subseqs(const se_data &data, uint64_t block_num) {
     }
     if (seq_start != seq_end) {
         // not all unaligned
-        rdata.push(core::GenSub::RLEN, seq_end - seq_start - 1);  // rlen
-        rdata.push(core::GenSub::RTYPE, 5);                       // rtype
+        raw_data.push(core::GenSub::RLEN, seq_end - seq_start - 1);  // rlen
+        raw_data.push(core::GenSub::RTYPE, 5);                       // rtype
         for (uint64_t i = seq_start; i < seq_end; i++)
-            rdata.push(core::GenSub::UREADS, char_to_int[(uint8_t)data.seq[i]]);  // ureads
+            raw_data.push(core::GenSub::UREADS, char_to_int[(uint8_t)data.seq[i]]);  // ureads
     }
     uint64_t prevpos = 0, diffpos;
     // Write streams
     for (uint64_t i = start_read_num; i < end_read_num; i++) {
         if (data.flag_arr[i] == true) {
-            rdata.push(core::GenSub::RLEN, data.read_length_arr[i] - 1);          // rlen
-            rdata.push(core::GenSub::RCOMP, rc_to_int[(uint8_t)data.RC_arr[i]]);  // rcomp
+            raw_data.push(core::GenSub::RLEN, data.read_length_arr[i] - 1);          // rlen
+            raw_data.push(core::GenSub::RCOMP, rc_to_int[(uint8_t)data.RC_arr[i]]);  // rcomp
             if (i == start_read_num) {
                 // Note: In order non-preserving mode, if the first read of
                 // the block is a singleton, then the rest are too.
-                rdata.get(core::GenDesc::POS, 0).push(0);  // pos
+                raw_data.push(core::GenSub::POS_MAPPING_FIRST, 0);  // pos
                 prevpos = data.pos_arr[i];
             } else {
                 diffpos = data.pos_arr[i] - prevpos;
-                rdata.get(core::GenDesc::POS, 0).push(diffpos);  // pos
+                raw_data.push(core::GenSub::POS_MAPPING_FIRST, diffpos);  // pos
                 prevpos = data.pos_arr[i];
             }
             if (data.noise_len_arr[i] == 0)
-                rdata.get(core::GenDesc::RTYPE, 0).push(1);  // rtype = P
+                raw_data.push(core::GenSub::RTYPE, 1);  // rtype = P
             else {
-                rdata.get(core::GenDesc::RTYPE, 0).push(3);  // rtype = M
+                raw_data.push(core::GenSub::RTYPE, 3);  // rtype = M
                 for (uint16_t j = 0; j < data.noise_len_arr[i]; j++) {
-                    rdata.get(core::GenDesc::MMPOS, 0).push(0);  // mmpos
+                    raw_data.push(core::GenSub::MMPOS_TERMINATOR, 0);  // mmpos
                     if (j == 0)
-                        rdata.get(core::GenDesc::MMPOS, 1).push(data.noisepos_arr[data.pos_in_noise_arr[i] + j]);
+                        raw_data.push(core::GenSub::MMPOS_POSITION, data.noisepos_arr[data.pos_in_noise_arr[i] + j]);
                     else
-                        rdata.get(core::GenDesc::MMPOS, 1)
-                            .push(data.noisepos_arr[data.pos_in_noise_arr[i] + j] - 1);  // decoder adds +1
-                    rdata.get(core::GenDesc::MMTYPE, 0).push(0);                         // mmtype = Substitution
-                    rdata.get(core::GenDesc::MMTYPE, 1)
-                        .push(char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[i] + j]]);
+                        raw_data.push(core::GenSub::MMPOS_POSITION,
+                                      data.noisepos_arr[data.pos_in_noise_arr[i] + j] - 1);  // decoder adds +1
+                    raw_data.push(core::GenSub::MMTYPE_TYPE, 0);                             // mmtype = Substitution
+                    raw_data.push(core::GenSub::MMTYPE_SUBSTITUTION,
+                                  char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[i] + j]]);
                 }
-                rdata.get(core::GenDesc::MMPOS, 0).push(1);
+                raw_data.push(core::GenSub::MMPOS_TERMINATOR, 1);
             }
         } else {
-            rdata.get(core::GenDesc::RTYPE, 0).push(5);                           // rtype
-            rdata.get(core::GenDesc::RLEN, 0).push(data.read_length_arr[i] - 1);  // rlen
+            raw_data.push(core::GenSub::RTYPE, 5);                           // rtype
+            raw_data.push(core::GenSub::RLEN, data.read_length_arr[i] - 1);  // rlen
             for (uint64_t j = 0; j < data.read_length_arr[i]; j++) {
-                rdata.get(core::GenDesc::UREADS, 0)
-                    .push(char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[i] + j]]);  // ureads
+                raw_data.push(core::GenSub::UREADS,
+                              char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[i] + j]]);  // ureads
             }
-            rdata.get(core::GenDesc::POS, 0).push(seq_end - prevpos);             // pos
-            rdata.get(core::GenDesc::RCOMP, 0).push(0);                           // rcomp
-            rdata.get(core::GenDesc::RLEN, 0).push(data.read_length_arr[i] - 1);  // rlen
-            rdata.get(core::GenDesc::RTYPE, 0).push(1);                           // rtype = P
+            raw_data.push(core::GenSub::POS_MAPPING_FIRST, seq_end - prevpos);  // pos
+            raw_data.push(core::GenSub::RCOMP, 0);                              // rcomp
+            raw_data.push(core::GenSub::RLEN, data.read_length_arr[i] - 1);     // rlen
+            raw_data.push(core::GenSub::RTYPE, 1);                              // rtype = P
             prevpos = seq_end;
             seq_end = prevpos + data.read_length_arr[i];
         }
     }
-    return rdata;
+
+    return raw_data;
 }
 
 void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data) {
@@ -233,7 +240,7 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     remove(file_seq.c_str());
 }
 
-void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data) {
+void loadPE_Data(const compression_params &cp, const std::string &temp_dir, bool del, se_data *data) {
     std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> descriptorFilesPerAU;
 
     const std::string file_seq = temp_dir + "/read_seq.txt";
@@ -341,14 +348,16 @@ void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     f_order.close();
     f_readlength.close();
 
-    // delete old streams
-    remove(file_noise.c_str());
-    remove(file_noisepos.c_str());
-    remove(file_RC.c_str());
-    remove(file_readlength.c_str());
-    remove(file_unaligned.c_str());
-    remove(file_pos.c_str());
-    remove(file_seq.c_str());
+    if (del) {
+        // delete old streams
+        remove(file_noise.c_str());
+        remove(file_noisepos.c_str());
+        remove(file_RC.c_str());
+        remove(file_readlength.c_str());
+        remove(file_unaligned.c_str());
+        remove(file_pos.c_str());
+        remove(file_seq.c_str());
+    }
 }
 
 void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
@@ -446,16 +455,73 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
     already_seen.clear();
 }
 
-core::AccessUnitRaw generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num,
-                                        pe_statistics *pest) {
-#ifdef GENIE_USE_OPENMP
-    const unsigned cur_thread_num = omp_get_thread_num();
-#else
-    const unsigned cur_thread_num = 0;
-#endif
+void generate_qual_id_pe(const std::string &temp_dir, const pe_block_data &bdata, uint32_t num_reads) {
+    // PE step 3: generate index for ids and quality
 
-    core::AccessUnitRaw rdata(core::parameter::ParameterSet(), 0);
+    const std::string file_order_quality = temp_dir + "/order_quality.bin";
+    const std::string file_blocks_quality = temp_dir + "/blocks_quality.bin";
+    const std::string file_order_id = temp_dir + "/order_id.bin";
+    const std::string file_blocks_id = temp_dir + "/blocks_id.bin";
 
+    // quality:
+    std::ofstream f_order_quality(file_order_quality, std::ios::binary);
+    // store order (as usual in uint32_t)
+    std::ofstream f_blocks_quality(file_blocks_quality, std::ios::binary);
+    // store block start and end positions (differs from the block_start and end
+    // because here we measure in terms of quality values rather than records
+    uint32_t quality_block_pos = 0;
+    for (uint32_t i = 0; i < bdata.block_start.size(); i++) {
+        f_blocks_quality.write((char *)&quality_block_pos, sizeof(uint32_t));
+        for (uint32_t j = bdata.block_start[i]; j < bdata.block_end[i]; j++) {
+            uint32_t current = bdata.read_index_genomic_record[j];
+            uint32_t pair = (current < num_reads / 2) ? (current + num_reads / 2) : (current - num_reads / 2);
+            if ((bdata.block_num[current] == bdata.block_num[pair]) &&
+                (bdata.genomic_record_index[pair] == bdata.genomic_record_index[current])) {
+                // pair in genomic record
+                f_order_quality.write((char *)&current, sizeof(uint32_t));
+                quality_block_pos++;
+                f_order_quality.write((char *)&pair, sizeof(uint32_t));
+                quality_block_pos++;
+            } else {
+                // only single read in genomic record
+                f_order_quality.write((char *)&current, sizeof(uint32_t));
+                quality_block_pos++;
+            }
+        }
+        f_blocks_quality.write((char *)&quality_block_pos, sizeof(uint32_t));
+    }
+    f_order_quality.close();
+    f_blocks_quality.close();
+    // id:
+    std::ofstream f_blocks_id(file_blocks_id, std::ios::binary);
+    // store block start and end positions (measured in terms of records since 1
+    // record = 1 id)
+    for (uint32_t i = 0; i < bdata.block_start.size(); i++) {
+        f_blocks_id.write((char *)&bdata.block_start[i], sizeof(uint32_t));
+        f_blocks_id.write((char *)&bdata.block_end[i], sizeof(uint32_t));
+        std::ofstream f_order_id(file_order_id + "." + std::to_string(i), std::ios::binary);
+        // store order
+        for (uint32_t j = bdata.block_start[i]; j < bdata.block_end[i]; j++) {
+            uint32_t current = bdata.read_index_genomic_record[j];
+            uint32_t pair = (current < num_reads / 2) ? (current + num_reads / 2) : (current - num_reads / 2);
+            // just write the min of current and pair
+            uint32_t min_index = (current > pair) ? pair : current;
+            f_order_id.write((char *)&min_index, sizeof(uint32_t));
+        }
+        f_order_id.close();
+    }
+    f_blocks_id.close();
+}
+
+core::AccessUnitRaw generate_read_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num, size_t num_recs) {
+
+    core::parameter::ParameterSet ps(cur_block_num, cur_block_num, core::parameter::DataUnit::DatasetType::NON_ALIGNED,
+                                     core::AlphabetID::ACGTN, 0, data.cp.paired_end, false, data.cp.preserve_quality, 0,
+                                     false, false);
+    core::parameter::ComputedRef cr(core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY);
+    ps.setComputedRef(std::move(cr));
+
+    core::AccessUnitRaw raw_au(std::move(ps), num_recs);
     // char_to_int
     int64_t char_to_int[128];
     char_to_int[(uint8_t)'A'] = 0;
@@ -472,10 +538,10 @@ core::AccessUnitRaw generate_streams_pe(const se_data &data, const pe_block_data
     uint64_t seq_start = bdata.block_seq_start[cur_block_num], seq_end = bdata.block_seq_end[cur_block_num];
     if (seq_start != seq_end) {
         // not all unaligned
-        rdata.get(core::GenDesc::RLEN, 0).push(seq_end - seq_start - 1);  // rlen
-        rdata.get(core::GenDesc::RTYPE, 0).push(5);                       // rtype
+        raw_au.push(core::GenSub::RLEN, seq_end - seq_start - 1);
+        raw_au.push(core::GenSub::RTYPE, 5);
         for (uint64_t i = seq_start; i < seq_end; i++)
-            rdata.get(core::GenDesc::UREADS, 0).push(char_to_int[(uint8_t)data.seq[i]]);  // ureads
+            raw_au.push(core::GenSub::UREADS, char_to_int[(uint8_t)data.seq[i]]);
     }
     uint64_t prevpos = 0, diffpos;
     // Write streams
@@ -488,11 +554,11 @@ core::AccessUnitRaw generate_streams_pe(const se_data &data, const pe_block_data
             if (i == bdata.block_start[cur_block_num]) {
                 // Note: In order non-preserving mode, if the first read of
                 // the block is a singleton, then the rest are too.
-                rdata.get(core::GenDesc::POS, 0).push(0);  // pos
+                raw_au.push(core::GenSub::POS_MAPPING_FIRST, 0);
                 prevpos = data.pos_arr[current];
             } else {
                 diffpos = data.pos_arr[current] - prevpos;
-                rdata.get(core::GenDesc::POS, 0).push(diffpos);  // pos
+                raw_au.push(core::GenSub::POS_MAPPING_FIRST, diffpos);
                 prevpos = data.pos_arr[current];
             }
         }
@@ -501,131 +567,128 @@ core::AccessUnitRaw generate_streams_pe(const se_data &data, const pe_block_data
             // both reads in same record
             if (data.flag_arr[current] == false) {
                 // Case 1: both unaligned
-                rdata.get(core::GenDesc::RTYPE, 0).push(5);  // rtype
-                rdata.get(core::GenDesc::RLEN, 0)
-                    .push(data.read_length_arr[current] + data.read_length_arr[pair] - 1);  // rlen
+                raw_au.push(core::GenSub::RTYPE, 5);  // rtype
+                raw_au.push(core::GenSub::RLEN,
+                            data.read_length_arr[current] + data.read_length_arr[pair] - 1);  // rlen
                 for (uint64_t j = 0; j < data.read_length_arr[current]; j++) {
-                    rdata.get(core::GenDesc::UREADS, 0)
-                        .push(char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
+                    raw_au.push(core::GenSub::UREADS,
+                                char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
                 }
                 for (uint64_t j = 0; j < data.read_length_arr[pair]; j++) {
-                    rdata.get(core::GenDesc::UREADS, 0)
-                        .push(char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[pair] + j]]);  // ureads
+                    raw_au.push(core::GenSub::UREADS,
+                                char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[pair] + j]]);  // ureads
                 }
-                rdata.get(core::GenDesc::POS, 0).push(seq_end - prevpos);                   // pos
-                rdata.get(core::GenDesc::RCOMP, 0).push(0);                                 // rcomp
-                rdata.get(core::GenDesc::RCOMP, 0).push(0);                                 // rcomp
-                rdata.get(core::GenDesc::RLEN, 0).push(data.read_length_arr[current] - 1);  // rlen
-                rdata.get(core::GenDesc::RLEN, 0).push(data.read_length_arr[pair] - 1);     // rlen
-                rdata.get(core::GenDesc::RTYPE, 0).push(1);                                 // rtype = P
-                rdata.get(core::GenDesc::PAIR, 0).push(0);  // pair decoding case same_rec
+                raw_au.push(core::GenSub::POS_MAPPING_FIRST, seq_end - prevpos);     // pos
+                raw_au.push(core::GenSub::RCOMP, 0);                                 // rcomp
+                raw_au.push(core::GenSub::RCOMP, 0);                                 // rcomp
+                raw_au.push(core::GenSub::RLEN, data.read_length_arr[current] - 1);  // rlen
+                raw_au.push(core::GenSub::RLEN, data.read_length_arr[pair] - 1);     // rlen
+                raw_au.push(core::GenSub::RTYPE, 1);                                 // rtype = P
+                raw_au.push(core::GenSub::PAIR_DECODING_CASE, 0);                    // pair decoding case same_rec
                 bool read_1_first = true;
                 uint16_t delta = data.read_length_arr[current];
-                rdata.get(core::GenDesc::PAIR, 1).push(!(read_1_first) + 2 * delta);  // pair
+                raw_au.push(core::GenSub::PAIR_SAME_REC, !(read_1_first) + 2 * delta);  // pair
                 prevpos = seq_end;
                 seq_end = prevpos + data.read_length_arr[current] + data.read_length_arr[pair];
             } else {
                 // Case 2: both aligned
-                rdata.get(core::GenDesc::RLEN, 0).push(data.read_length_arr[current] - 1);          // rlen
-                rdata.get(core::GenDesc::RLEN, 0).push(data.read_length_arr[pair] - 1);             // rlen
-                rdata.get(core::GenDesc::RCOMP, 0).push(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
-                rdata.get(core::GenDesc::RCOMP, 0).push(rc_to_int[(uint8_t)data.RC_arr[pair]]);     // rcomp
+                raw_au.push(core::GenSub::RLEN, data.read_length_arr[current] - 1);          // rlen
+                raw_au.push(core::GenSub::RLEN, data.read_length_arr[pair] - 1);             // rlen
+                raw_au.push(core::GenSub::RCOMP, rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
+                raw_au.push(core::GenSub::RCOMP, rc_to_int[(uint8_t)data.RC_arr[pair]]);     // rcomp
                 if (data.noise_len_arr[current] == 0 && data.noise_len_arr[pair] == 0)
-                    rdata.get(core::GenDesc::RTYPE, 0).push(1);  // rtype = P
+                    raw_au.push(core::GenSub::RTYPE, 1);  // rtype = P
                 else {
-                    rdata.get(core::GenDesc::RTYPE, 0).push(3);  // rtype = M
+                    raw_au.push(core::GenSub::RTYPE, 3);  // rtype = M
                     for (int k = 0; k < 2; k++) {
                         uint32_t index = k ? pair : current;
                         for (uint16_t j = 0; j < data.noise_len_arr[index]; j++) {
-                            rdata.get(core::GenDesc::MMPOS, 0).push(0);  // mmpos
+                            raw_au.push(core::GenSub::MMPOS_TERMINATOR, 0);  // mmpos
                             if (j == 0)
-                                rdata.get(core::GenDesc::MMPOS, 1)
-                                    .push(data.noisepos_arr[data.pos_in_noise_arr[index] + j]);  // mmpos
+                                raw_au.push(core::GenSub::MMPOS_POSITION,
+                                            data.noisepos_arr[data.pos_in_noise_arr[index] + j]);  // mmpos
                             else
-                                rdata.get(core::GenDesc::MMPOS, 1)
-                                    .push(data.noisepos_arr[data.pos_in_noise_arr[index] + j] - 1);  // mmpos
-                            rdata.get(core::GenDesc::MMTYPE, 0).push(0);  // mmtype = Substitution
-                            rdata.get(core::GenDesc::MMTYPE, 1)
-                                .push(char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[index] + j]]);
+                                raw_au.push(core::GenSub::MMPOS_POSITION,
+                                            data.noisepos_arr[data.pos_in_noise_arr[index] + j] - 1);  // mmpos
+                            raw_au.push(core::GenSub::MMTYPE_TYPE, 0);  // mmtype = Substitution
+                            raw_au.push(core::GenSub::MMTYPE_SUBSTITUTION,
+                                        char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[index] + j]]);
                         }
-                        rdata.get(core::GenDesc::MMPOS, 0).push(1);  // mmpos
+                        raw_au.push(core::GenSub::MMPOS_TERMINATOR, 1);  // mmpos
                     }
                 }
                 bool read_1_first = (current < pair);
                 uint16_t delta = data.pos_arr[pair] - data.pos_arr[current];
-                rdata.get(core::GenDesc::PAIR, 0).push(0);                            // pair decoding case same_rec
-                rdata.get(core::GenDesc::PAIR, 1).push(!(read_1_first) + 2 * delta);  // pair
-                pest->count_same_rec[cur_thread_num]++;
+                raw_au.push(core::GenSub::PAIR_DECODING_CASE, 0);                       // pair decoding case same_rec
+                raw_au.push(core::GenSub::PAIR_SAME_REC, !(read_1_first) + 2 * delta);  // pair
+                //  pest->count_same_rec[cur_thread_num]++;
             }
         } else {
             // only one read in genomic record
             if (data.flag_arr[current] == true) {
-                rdata.get(core::GenDesc::RLEN, 0).push(data.read_length_arr[current] - 1);          // rlen
-                rdata.get(core::GenDesc::RCOMP, 0).push(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
+                raw_au.push(core::GenSub::RLEN, data.read_length_arr[current] - 1);          // rlen
+                raw_au.push(core::GenSub::RCOMP, rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
                 if (data.noise_len_arr[current] == 0)
-                    rdata.get(core::GenDesc::RTYPE, 0).push(1);  // rtype = P
+                    raw_au.push(core::GenSub::RTYPE, 1);  // rtype = P
                 else {
-                    rdata.get(core::GenDesc::RTYPE, 0).push(3);  // rtype = M
+                    raw_au.push(core::GenSub::RTYPE, 3);  // rtype = M
                     for (uint16_t j = 0; j < data.noise_len_arr[current]; j++) {
-                        rdata.get(core::GenDesc::MMPOS, 0).push(0);  // mmpos
+                        raw_au.push(core::GenSub::MMPOS_TERMINATOR, 0);  // mmpos
                         if (j == 0)
-                            rdata.get(core::GenDesc::MMPOS, 1)
-                                .push(data.noisepos_arr[data.pos_in_noise_arr[current] + j]);  // mmpos
+                            raw_au.push(core::GenSub::MMPOS_POSITION,
+                                        data.noisepos_arr[data.pos_in_noise_arr[current] + j]);  // mmpos
                         else
-                            rdata.get(core::GenDesc::MMPOS, 1)
-                                .push(data.noisepos_arr[data.pos_in_noise_arr[current] + j] - 1);  // mmpos
-                        rdata.get(core::GenDesc::MMTYPE, 0).push(0);  // mmtype = Substitution
-                        rdata.get(core::GenDesc::MMTYPE, 1)
-                            .push(char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[current] + j]]);
+                            raw_au.push(core::GenSub::MMPOS_POSITION,
+                                        data.noisepos_arr[data.pos_in_noise_arr[current] + j] - 1);  // mmpos
+                        raw_au.push(core::GenSub::MMTYPE_TYPE, 0);  // mmtype = Substitution
+                        raw_au.push(core::GenSub::MMTYPE_SUBSTITUTION,
+                                    char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[current] + j]]);
                     }
-                    rdata.get(core::GenDesc::MMPOS, 0).push(1);
+                    raw_au.push(core::GenSub::MMPOS_TERMINATOR, 1);
                 }
             } else {
-                rdata.get(core::GenDesc::RTYPE, 0).push(5);                                 // rtype
-                rdata.get(core::GenDesc::RLEN, 0).push(data.read_length_arr[current] - 1);  // rlen
+                raw_au.push(core::GenSub::RTYPE, 5);                                 // rtype
+                raw_au.push(core::GenSub::RLEN, data.read_length_arr[current] - 1);  // rlen
                 for (uint64_t j = 0; j < data.read_length_arr[current]; j++) {
-                    rdata.get(core::GenDesc::UREADS, 0)
-                        .push(char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
+                    raw_au.push(core::GenSub::UREADS,
+                                char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
                 }
-                rdata.get(core::GenDesc::POS, 0).push(seq_end - prevpos);                   // pos
-                rdata.get(core::GenDesc::RCOMP, 0).push(0);                                 // rcomp
-                rdata.get(core::GenDesc::RLEN, 0).push(data.read_length_arr[current] - 1);  // rlen
-                rdata.get(core::GenDesc::RTYPE, 0).push(1);                                 // rtype = P
+                raw_au.push(core::GenSub::POS_MAPPING_FIRST, seq_end - prevpos);     // pos
+                raw_au.push(core::GenSub::RCOMP, 0);                                 // rcomp
+                raw_au.push(core::GenSub::RLEN, data.read_length_arr[current] - 1);  // rlen
+                raw_au.push(core::GenSub::RTYPE, 1);                                 // rtype = P
                 prevpos = seq_end;
                 seq_end = prevpos + data.read_length_arr[current];
             }
 
             // pair subsequences
             bool same_block = (bdata.block_num[current] == bdata.block_num[pair]);
-            if (same_block)
-                pest->count_split_same_AU[cur_thread_num]++;
-            else
-                pest->count_split_diff_AU[cur_thread_num]++;
+            /*      if (same_block)
+                      pest->count_split_same_AU[cur_thread_num]++;
+                  else
+                      pest->count_split_diff_AU[cur_thread_num]++; */
 
             bool read_1_first = (current < pair);
             if (same_block && !read_1_first) {
-                rdata.get(core::GenDesc::PAIR, 0).push(1);  // R1_split
-                rdata.get(core::GenDesc::PAIR, 2).push(bdata.genomic_record_index[pair]);
+                raw_au.push(core::GenSub::PAIR_DECODING_CASE, 1);  // R1_split
+                raw_au.push(core::GenSub::PAIR_R1_SPLIT, bdata.genomic_record_index[pair]);
             } else if (same_block && read_1_first) {
-                rdata.get(core::GenDesc::PAIR, 0).push(2);  // R2_split
-                rdata.get(core::GenDesc::PAIR, 3).push(bdata.genomic_record_index[pair]);
+                raw_au.push(core::GenSub::PAIR_DECODING_CASE, 2);  // R2_split
+                raw_au.push(core::GenSub::PAIR_R2_SPLIT, bdata.genomic_record_index[pair]);
             } else if (!same_block && !read_1_first) {
-                rdata.get(core::GenDesc::PAIR, 0).push(3);  // R1_diff_ref_seq
-                rdata.get(core::GenDesc::PAIR, 4).push(bdata.block_num[pair]);
-                rdata.get(core::GenDesc::PAIR, 6).push(bdata.genomic_record_index[pair]);
+                raw_au.push(core::GenSub::PAIR_DECODING_CASE, 3);  // R1_diff_ref_seq
+                raw_au.push(core::GenSub::PAIR_R1_DIFF_SEQ, bdata.block_num[pair]);
+                raw_au.push(core::GenSub::PAIR_R1_DIFF_POS, bdata.genomic_record_index[pair]);
             } else {
-                rdata.get(core::GenDesc::PAIR, 0).push(4);  // R2_diff_ref_seq
-                rdata.get(core::GenDesc::PAIR, 5).push(bdata.block_num[pair]);
-                rdata.get(core::GenDesc::PAIR, 7).push(bdata.genomic_record_index[pair]);
+                raw_au.push(core::GenSub::PAIR_DECODING_CASE, 4);  // R2_diff_ref_seq
+                raw_au.push(core::GenSub::PAIR_R2_DIFF_SEQ, bdata.block_num[pair]);
+                raw_au.push(core::GenSub::PAIR_R2_DIFF_POS, bdata.genomic_record_index[pair]);
             }
         }
     }
-
-    return rdata;
+    return raw_au;
 }
 
 }  // namespace spring
 }  // namespace read
 }  // namespace genie
-
-#endif

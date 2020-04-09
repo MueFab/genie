@@ -18,9 +18,9 @@ namespace spring {
 class SpringEncoder : public genie::core::ReadEncoder {
    private:
     Preprocessor preprocessor;
-
+    util::FastqStats* stats;
    public:
-    SpringEncoder(genie::core::QVEncoder* coder, genie::core::NameEncoder* ncoder, const std::string& working_dir) : genie::core::ReadEncoder(coder, ncoder) {
+    SpringEncoder(genie::core::QVEncoder* coder, genie::core::NameEncoder* ncoder, const std::string& working_dir, util::FastqStats* _stats) : genie::core::ReadEncoder(coder, ncoder), stats(_stats) {
         preprocessor.setup(ncoder, coder, working_dir);
 
     }
