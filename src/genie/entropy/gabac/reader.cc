@@ -245,15 +245,8 @@ bool Reader::readSignFlag() {
         return (bool) readAsBIcabac(std::vector<unsigned int>({1, 0, 0, static_cast<unsigned int>(m_numContexts-1)}));
 }
 
-size_t Reader::readNumSymbols() {
-    auto result = m_bitInputStream.read(32);
-    return static_cast<size_t>(result);
-}
-
-size_t Reader::start() {
-    size_t numSymbols = readNumSymbols();
-    if (numSymbols > 0) m_decBinCabac.start();
-    return numSymbols;
+void Reader::start() {
+    m_decBinCabac.start();
 }
 
 void Reader::close() {

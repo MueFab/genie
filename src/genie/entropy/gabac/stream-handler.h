@@ -21,11 +21,16 @@ namespace gabac {
 
 class StreamHandler {
    public:
-    static size_t readStream(std::istream& input, util::DataBlock* buffer);
+    static uint64_t readUInt(std::istream &input, size_t numBytes);
+    static uint64_t readU7(std::istream &input);
+    static size_t readStream(std::istream& input, util::DataBlock* buffer, size_t& numSymbols);
     static size_t readBytes(std::istream& input, size_t bytes, util::DataBlock* buffer);
     static size_t readFull(std::istream& input, util::DataBlock* buffer);
     static size_t readBlock(std::istream& input, size_t bytes, util::DataBlock* buffer);
-    static size_t writeStream(std::ostream& output, util::DataBlock* buffer);
+
+    static void writeUInt(std::ostream &output, uint64_t value, size_t numBytes);
+    static void writeU7(std::ostream &output, uint64_t value);
+    static size_t writeStream(std::ostream& output, util::DataBlock* buffer, size_t numSymbols);
     static size_t writeBytes(std::ostream& output, util::DataBlock* buffer);
 };
 }  // namespace gabac

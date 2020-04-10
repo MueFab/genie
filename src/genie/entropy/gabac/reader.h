@@ -29,8 +29,6 @@ class Reader {
 
     ~Reader();
 
-    size_t readNumSymbols();
-
     uint64_t readAsBIbypass(const std::vector<unsigned int> binParams);
 
     uint64_t readAsBIcabac(const std::vector<unsigned int> binParams);
@@ -75,7 +73,7 @@ class Reader {
 
     bool readSignFlag();
 
-    size_t start();
+    void start();
 
     void close();
 
