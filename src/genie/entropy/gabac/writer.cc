@@ -34,10 +34,7 @@ Writer::Writer(OBufferStream *const bitstream, const bool bypassFlag, const unsi
 
 Writer::~Writer() = default;
 
-void Writer::start(const size_t numSymbols) {
-    assert(numSymbols > 0);
-    assert(numSymbols <= std::numeric_limits<unsigned>::max());
-    writeNumSymbols(static_cast<unsigned>(numSymbols));
+void Writer::start() {
     m_binaryArithmeticEncoder.start();
 }
 
@@ -267,7 +264,6 @@ void Writer::writeSignFlag(uint64_t input) {
         writeAsBIcabac(symbolValueSigned < 0, std::vector<unsigned int>({1, 0, 0, static_cast<unsigned int>(m_numContexts-1)}));
 }
 
-void Writer::writeNumSymbols(unsigned int numSymbols) { m_bitOutputStream.write(numSymbols, 32); }
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie

@@ -110,7 +110,6 @@ void BinaryArithmeticDecoder::reset() { decodeBinTrm(); }
 
 void BinaryArithmeticDecoder::start() {
     assert(m_bitInputStream.getNumBitsUntilByteAligned() == 0);
-    m_bitInputStream.skipBytes(4);  // Corresponding the numSymbols already reader::start()
 
     m_numBitsNeeded = -8;
     m_range = 510;

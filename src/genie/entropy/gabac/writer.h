@@ -31,7 +31,7 @@ class Writer {
 
     ~Writer();
 
-    void start(const size_t numSymbols);
+    void start();
 
     void close();
 
@@ -76,8 +76,6 @@ class Writer {
     void writeLutSymbol(uint64_t input, const uint8_t codingSubsymSize);
 
     void writeSignFlag(uint64_t input);
-
-    void writeNumSymbols(unsigned int numSymbols);
 
    private:
     util::BitWriter m_bitOutputStream;
