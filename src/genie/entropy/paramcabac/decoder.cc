@@ -20,7 +20,7 @@ DecoderRegular::DecoderRegular(core::GenDesc desc)
         descriptor_subsequence_cfgs.push_back(Subsequence(TransformedParameters(),
                                                           i,
                                                           false,
-                                                          std::vector<TransformedSeq>({TransformedSeq()})));
+                                                          std::vector<TransformedSubSeq>({TransformedSubSeq()})));
     }
 }
 
@@ -69,7 +69,7 @@ DecoderTokenType::DecoderTokenType()
         descriptor_subsequence_cfgs.emplace_back(TransformedParameters(),
                                                  i,
                                                  true,
-                                                 std::vector<TransformedSeq>({TransformedSeq()}));
+                                                 std::vector<TransformedSubSeq>({TransformedSubSeq()}));
     }
 }
 

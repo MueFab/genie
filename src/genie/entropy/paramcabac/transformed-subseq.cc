@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "transformed-seq.h"
+#include "transformed-subseq.h"
+
 #include <genie/util/bitwriter.h>
 #include <genie/util/make-unique.h>
 
@@ -16,16 +17,16 @@ namespace paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TransformedSeq::TransformedSeq()
-    : TransformedSeq(SupportValues::TransformIdSubsym::NO_TRANSFORM, SupportValues(), Binarization()) {}
+TransformedSubSeq::TransformedSubSeq()
+    : TransformedSubSeq(SupportValues::TransformIdSubsym::NO_TRANSFORM, SupportValues(), Binarization()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TransformedSeq::TransformedSeq(SupportValues::TransformIdSubsym _transform_ID_subsym,
-                               SupportValues&& _support_values,
-                               Binarization&& _cabac_binarization,
-                               const core::GenSubIndex _subsequence_ID,
-                               const core::AlphabetID _alphabet_ID)
+TransformedSubSeq::TransformedSubSeq(SupportValues::TransformIdSubsym _transform_ID_subsym,
+                                     SupportValues&& _support_values,
+                                     Binarization&& _cabac_binarization,
+                                     const core::GenSubIndex _subsequence_ID,
+                                     const core::AlphabetID _alphabet_ID)
     : transform_ID_subsym(_transform_ID_subsym),
       support_values(std::move(_support_values)),
       cabac_binarization(std::move(_cabac_binarization)),
@@ -40,9 +41,9 @@ TransformedSeq::TransformedSeq(SupportValues::TransformIdSubsym _transform_ID_su
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TransformedSeq::TransformedSeq(util::BitReader& reader,
-                               const core::GenSubIndex _subsequence_ID,
-                               const core::AlphabetID _alphabet_ID)
+TransformedSubSeq::TransformedSubSeq(util::BitReader& reader,
+                                     const core::GenSubIndex _subsequence_ID,
+                                     const core::AlphabetID _alphabet_ID)
       : subsequence_ID(_subsequence_ID),
         alphabet_ID(_alphabet_ID) {
     transform_ID_subsym = reader.read<SupportValues::TransformIdSubsym>(3);
@@ -53,23 +54,23 @@ TransformedSeq::TransformedSeq(util::BitReader& reader,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SupportValues::TransformIdSubsym TransformedSeq::getTransformIDSubsym() const { return transform_ID_subsym; }
+SupportValues::TransformIdSubsym TransformedSubSeq::getTransformIDSubsym() const { return transform_ID_subsym; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const SupportValues& TransformedSeq::getSupportValues() const { return support_values; }
+const SupportValues& TransformedSubSeq::getSupportValues() const { return support_values; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const Binarization& TransformedSeq::getBinarization() const { return cabac_binarization; }
+const Binarization& TransformedSubSeq::getBinarization() const { return cabac_binarization; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const StateVars& TransformedSeq::getStateVars() const { return state_vars; }
+const StateVars& TransformedSubSeq::getStateVars() const { return state_vars; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void TransformedSeq::write(util::BitWriter& writer) const {
+void TransformedSubSeq::write(util::BitWriter& writer) const {
     writer.write(uint8_t(transform_ID_subsym), 3);
     support_values.write(transform_ID_subsym, writer);
     cabac_binarization.write(writer);

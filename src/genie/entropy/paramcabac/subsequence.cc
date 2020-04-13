@@ -18,12 +18,12 @@ namespace paramcabac {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Subsequence::Subsequence()
-    : Subsequence(TransformedParameters(), 0, false, std::vector<TransformedSeq>({TransformedSeq()})) {}
+    : Subsequence(TransformedParameters(), 0, false, std::vector<TransformedSubSeq>({TransformedSubSeq()})) {}
 
 Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters,
                          uint16_t _descriptor_subsequence_ID,
                          bool tokentype,
-                         std::vector<TransformedSeq>&& _transformSubseq_cfgs)
+                         std::vector<TransformedSubSeq>&& _transformSubseq_cfgs)
     : descriptor_subsequence_ID(),
       transform_subseq_parameters(std::move(_transform_subseq_parameters)) {
     if (!tokentype) {
@@ -61,13 +61,13 @@ Subsequence::Subsequence(bool tokentype, util::BitReader& reader) {
             break;
     }
     for (size_t i = 0; i < numSubseq; ++i) {
-        transformSubseq_cfgs.emplace_back(TransformedSeq(reader));
+        transformSubseq_cfgs.emplace_back(TransformedSubSeq(reader));
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Subsequence::setTransformSubseqCfg(size_t index, TransformedSeq&& _transformSubseq_cfg) {
+void Subsequence::setTransformSubseqCfg(size_t index, TransformedSubSeq&& _transformSubseq_cfg) {
     transformSubseq_cfgs[index] = std::move(_transformSubseq_cfg);
 }
 
@@ -96,7 +96,7 @@ const TransformedParameters& Subsequence::getTransformParameters() const { retur
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const TransformedSeq& Subsequence::getTransformSubseqCfg(uint8_t index) const { return transformSubseq_cfgs[index]; }
+const TransformedSubSeq& Subsequence::getTransformSubseqCfg(uint8_t index) const { return transformSubseq_cfgs[index]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -104,7 +104,7 @@ size_t Subsequence::getNumTransformSubseqCfgs() const { return transformSubseq_c
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<TransformedSeq>& Subsequence::getTransformSubseqCfgs() const { return transformSubseq_cfgs; }
+const std::vector<TransformedSubSeq>& Subsequence::getTransformSubseqCfgs() const { return transformSubseq_cfgs; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

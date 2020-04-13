@@ -124,7 +124,7 @@ binFunc get_binarizor(const uint8_t outputSymbolSize,
     return func;
 }
 
-void encode_cabac_order0(const paramcabac::TransformedSeq &conf,
+void encode_cabac_order0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
                          util::DataBlock* symbols,
                          size_t maxSize) {
     assert(symbols != nullptr);
@@ -132,12 +132,12 @@ void encode_cabac_order0(const paramcabac::TransformedSeq &conf,
     size_t numSymbols = symbols->size();
     if (numSymbols <= 0) return;
 
-    const paramcabac::SupportValues &supportVals = conf.getSupportValues();
-    const paramcabac::Binarization &binarzation = conf.getBinarization();
+    const paramcabac::SupportValues &supportVals = trnsfSubseqConf.getSupportValues();
+    const paramcabac::Binarization &binarzation = trnsfSubseqConf.getBinarization();
     const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
-    const paramcabac::StateVars &stateVars = conf.getStateVars();
+    const paramcabac::StateVars &stateVars = trnsfSubseqConf.getStateVars();
     const paramcabac::BinarizationParameters::BinarizationId binID = binarzation.getBinarizationID();
-    const core::Alphabet alphaProps = getAlphabetProperties(conf.getAlphabetID());
+    const core::Alphabet alphaProps = getAlphabetProperties(trnsfSubseqConf.getAlphabetID());
 
     const uint8_t outputSymbolSize = supportVals.getOutputSymbolSize();
     const uint8_t codingSubsymSize = supportVals.getCodingSubsymSize();
@@ -196,7 +196,7 @@ void encode_cabac_order0(const paramcabac::TransformedSeq &conf,
     bitstream.flush(symbols);
 }
 
-void encode_cabac_order1(const paramcabac::TransformedSeq &conf,
+void encode_cabac_order1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
                          util::DataBlock* symbols,
                          util::DataBlock* const depSymbols,
                          size_t maxSize) {
@@ -205,12 +205,12 @@ void encode_cabac_order1(const paramcabac::TransformedSeq &conf,
     size_t numSymbols = symbols->size();
     if (numSymbols <= 0) return;
 
-    const paramcabac::SupportValues &supportVals = conf.getSupportValues();
-    const paramcabac::Binarization &binarzation = conf.getBinarization();
+    const paramcabac::SupportValues &supportVals = trnsfSubseqConf.getSupportValues();
+    const paramcabac::Binarization &binarzation = trnsfSubseqConf.getBinarization();
     const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
-    const paramcabac::StateVars &stateVars = conf.getStateVars();
+    const paramcabac::StateVars &stateVars = trnsfSubseqConf.getStateVars();
     const paramcabac::BinarizationParameters::BinarizationId binID = binarzation.getBinarizationID();
-    const core::Alphabet alphaProps = getAlphabetProperties(conf.getAlphabetID());
+    const core::Alphabet alphaProps = getAlphabetProperties(trnsfSubseqConf.getAlphabetID());
 
     const uint8_t outputSymbolSize = supportVals.getOutputSymbolSize();
     const uint8_t codingSubsymSize = supportVals.getCodingSubsymSize();
@@ -220,7 +220,7 @@ void encode_cabac_order1(const paramcabac::TransformedSeq &conf,
 
     uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
                                                  supportVals.getShareSubsymLutFlag(),
-                                                 conf.getTransformIDSubsym());
+                                                 trnsfSubseqConf.getTransformIDSubsym());
     uint8_t const numPrvs = stateVars.getNumPrvs(codingOrder,
                                                  supportVals.getShareSubsymPrvFlag());
 
@@ -313,7 +313,7 @@ void encode_cabac_order1(const paramcabac::TransformedSeq &conf,
     bitstream.flush(symbols);
 }
 
-void encode_cabac_order2(const paramcabac::TransformedSeq &conf,
+void encode_cabac_order2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
                          util::DataBlock* symbols,
                          size_t maxSize) {
     assert(symbols != nullptr);
@@ -321,12 +321,12 @@ void encode_cabac_order2(const paramcabac::TransformedSeq &conf,
     size_t numSymbols = symbols->size();
     if (numSymbols <= 0) return;
 
-    const paramcabac::SupportValues &supportVals = conf.getSupportValues();
-    const paramcabac::Binarization &binarzation = conf.getBinarization();
+    const paramcabac::SupportValues &supportVals = trnsfSubseqConf.getSupportValues();
+    const paramcabac::Binarization &binarzation = trnsfSubseqConf.getBinarization();
     const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
-    const paramcabac::StateVars &stateVars = conf.getStateVars();
+    const paramcabac::StateVars &stateVars = trnsfSubseqConf.getStateVars();
     const paramcabac::BinarizationParameters::BinarizationId binID = binarzation.getBinarizationID();
-    const core::Alphabet alphaProps = getAlphabetProperties(conf.getAlphabetID());
+    const core::Alphabet alphaProps = getAlphabetProperties(trnsfSubseqConf.getAlphabetID());
 
     const uint8_t outputSymbolSize = supportVals.getOutputSymbolSize();
     const uint8_t codingSubsymSize = supportVals.getCodingSubsymSize();
@@ -336,7 +336,7 @@ void encode_cabac_order2(const paramcabac::TransformedSeq &conf,
 
     uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
                                                  supportVals.getShareSubsymLutFlag(),
-                                                 conf.getTransformIDSubsym());
+                                                 trnsfSubseqConf.getTransformIDSubsym());
     uint8_t const numPrvs = stateVars.getNumPrvs(codingOrder,
                                                  supportVals.getShareSubsymPrvFlag());
 
@@ -414,20 +414,20 @@ void encode_cabac_order2(const paramcabac::TransformedSeq &conf,
     bitstream.flush(symbols);
 }
 
-void encode_cabac(const paramcabac::TransformedSeq &conf,
+void encode_cabac(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
                   util::DataBlock* symbols,
                   util::DataBlock* const depSymbols,
                   size_t maxSize) {
 
-    switch(conf.getSupportValues().getCodingOrder()) {
+    switch(trnsfSubseqConf.getSupportValues().getCodingOrder()) {
         case 0:
-            encode_cabac_order0(conf, symbols, maxSize);
+            encode_cabac_order0(trnsfSubseqConf, symbols, maxSize);
         break;
         case 1:
-            encode_cabac_order1(conf, symbols, depSymbols, maxSize);
+            encode_cabac_order1(trnsfSubseqConf, symbols, depSymbols, maxSize);
         break;
         case 2:
-            encode_cabac_order2(conf, symbols, maxSize);
+            encode_cabac_order2(trnsfSubseqConf, symbols, maxSize);
         break;
         default:
             GABAC_DIE("Unknown coding order");
