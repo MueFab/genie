@@ -37,11 +37,11 @@ class Reader {
 
     uint64_t readAsTUcabac(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsEGbypass(const std::vector<unsigned int> dummy);
+    uint64_t readAsEGbypass(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsEGcabac(const std::vector<unsigned int> dummy);
+    uint64_t readAsEGcabac(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsSEGbypass(const std::vector<unsigned int> dummy);
+    uint64_t readAsSEGbypass(const std::vector<unsigned int> binParams);
 
     uint64_t readAsSEGcabac(const std::vector<unsigned int> binParams);
 

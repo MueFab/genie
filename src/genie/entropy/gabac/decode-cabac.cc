@@ -128,14 +128,16 @@ binFunc get_binarizor(const uint8_t outputSymbolSize,
 }
 
 void decode_cabac_order0(const paramcabac::TransformedSeq &conf,
+                         const unsigned int numEncodedSymbols,
                          util::DataBlock* bitstream) {
     if (bitstream == nullptr) {
         GABAC_DIE("Bitstream is null");
     }
 
-    util::DataBlock symbols(0,
-                            4);
-                            //conf.getSupportValues().getMinimalSizeInBytes(conf.getSupportValues().getOutputSymbolSize()));
+    if (numEncodedSymbols <= 0) return;
+
+    util::DataBlock symbols(numEncodedSymbols,
+                            4); //conf.getSupportValues().getMinimalSizeInBytes(conf.getSupportValues().getOutputSymbolSize()));
 
     const paramcabac::SupportValues &supportVals = conf.getSupportValues();
     const paramcabac::Binarization &binarzation = conf.getBinarization();
@@ -151,10 +153,7 @@ void decode_cabac_order0(const paramcabac::TransformedSeq &conf,
     Reader reader(bitstream,
                   bypassFlag,
                   stateVars.getNumCtxTotal());
-    size_t numSymbols = reader.start();
-    if (numSymbols <= 0) return;
-
-    symbols.resize(numSymbols);
+    reader.start();
 
     std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
 
@@ -197,15 +196,17 @@ void decode_cabac_order0(const paramcabac::TransformedSeq &conf,
 }
 
 void decode_cabac_order1(const paramcabac::TransformedSeq &conf,
+                         const unsigned int numEncodedSymbols,
                          util::DataBlock* bitstream,
                          util::DataBlock* const depSymbols) {
     if (bitstream == nullptr) {
         GABAC_DIE("Bitstream is null");
     }
 
-    util::DataBlock symbols(0,
-                            4);
-                            //conf.getSupportValues().getMinimalSizeInBytes(conf.getSupportValues().getOutputSymbolSize()));
+    if (numEncodedSymbols <= 0) return;
+
+    util::DataBlock symbols(numEncodedSymbols,
+                            4); //conf.getSupportValues().getMinimalSizeInBytes(conf.getSupportValues().getOutputSymbolSize()));
 
     const paramcabac::SupportValues &supportVals = conf.getSupportValues();
     const paramcabac::Binarization &binarzation = conf.getBinarization();
@@ -229,10 +230,7 @@ void decode_cabac_order1(const paramcabac::TransformedSeq &conf,
     Reader reader(bitstream,
                   bypassFlag,
                   stateVars.getNumCtxTotal());
-    size_t numSymbols = reader.start();
-    if (numSymbols <= 0) return;
-
-    symbols.resize(numSymbols);
+    reader.start();
 
     std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
 
@@ -318,14 +316,16 @@ void decode_cabac_order1(const paramcabac::TransformedSeq &conf,
 }
 
 void decode_cabac_order2(const paramcabac::TransformedSeq &conf,
+                         const unsigned int numEncodedSymbols,
                          util::DataBlock* bitstream) {
     if (bitstream == nullptr) {
         GABAC_DIE("Bitstream is null");
     }
 
-    util::DataBlock symbols(0,
-                            4);
-                            //conf.getSupportValues().getMinimalSizeInBytes(conf.getSupportValues().getOutputSymbolSize()));
+    if (numEncodedSymbols <= 0) return;
+
+    util::DataBlock symbols(numEncodedSymbols,
+                            4); //conf.getSupportValues().getMinimalSizeInBytes(conf.getSupportValues().getOutputSymbolSize()));
 
     const paramcabac::SupportValues &supportVals = conf.getSupportValues();
     const paramcabac::Binarization &binarzation = conf.getBinarization();
@@ -348,10 +348,7 @@ void decode_cabac_order2(const paramcabac::TransformedSeq &conf,
     Reader reader(bitstream,
                   bypassFlag,
                   stateVars.getNumCtxTotal());
-    size_t numSymbols = reader.start();
-    if (numSymbols <= 0) return;
-
-    symbols.resize(numSymbols);
+    reader.start();
 
     std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
 
@@ -421,17 +418,18 @@ void decode_cabac_order2(const paramcabac::TransformedSeq &conf,
 }
 
 void decode_cabac(const paramcabac::TransformedSeq &conf,
+                  const unsigned int numEncodedSymbols,
                   util::DataBlock* bitstream,
                   util::DataBlock* const depSymbols) {
     switch(conf.getSupportValues().getCodingOrder()) {
         case 0:
-            decode_cabac_order0(conf, bitstream);
+            decode_cabac_order0(conf, numEncodedSymbols, bitstream);
         break;
         case 1:
-            decode_cabac_order1(conf, bitstream, depSymbols);
+            decode_cabac_order1(conf, numEncodedSymbols, bitstream, depSymbols);
         break;
         case 2:
-            decode_cabac_order2(conf, bitstream);
+            decode_cabac_order2(conf, numEncodedSymbols, bitstream);
         break;
         default:
             GABAC_DIE("Unknown coding order");
