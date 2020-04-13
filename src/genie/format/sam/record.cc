@@ -6,6 +6,7 @@
 
 #include "record.h"
 #include <constants.h>
+#include <genie/core/stats/perf-stats.h>
 #include <genie/util/exceptions.h>
 #include <genie/util/tokenize.h>
 #include <regex>
@@ -74,7 +75,7 @@ Record::Record() : Record("", 0, "", 0, 0, "", "", 0, 0, "", "") {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Record::Record(const std::string& string) {
+Record::Record(const std::string& string, genie::core::stats::SamStats *stats) {
     auto tokens = util::tokenize(string, '\t');
     UTILS_DIE_IF(tokens.size() < 11, "Invalid SAM record");
     qname = tokens[0];
@@ -89,6 +90,22 @@ Record::Record(const std::string& string) {
     seq = tokens[9];
     qual = tokens[10];
     //    check();
+
+    if (stats != nullptr) {
+        stats->num_recs++;
+        stats->orig_total_sz += string.size() + 1; // +1 for newline
+        stats->orig_qname_sz += qname.size();
+        stats->orig_flag_sz += tokens[1].size();
+        stats->orig_rname_sz += rname.size();
+        stats->orig_pos_sz += tokens[3].size();
+        stats->orig_mapq_sz += tokens[4].size();
+        stats->orig_cigar_sz += cigar.size();
+        stats->orig_rnext_sz += rnext.size();
+        stats->orig_pnext_sz += tokens[7].size();
+        stats->orig_tlen_sz += tokens[8].size();
+        stats->orig_seq_sz += seq.size();
+        stats->orig_qual_sz += qual.size();
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

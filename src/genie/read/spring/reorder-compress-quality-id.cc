@@ -32,7 +32,7 @@ namespace spring {
 
 void reorder_compress_quality_id(const std::string &temp_dir, const compression_params &cp,
                                  const std::vector<std::vector<entropy::gabac::EncodingConfiguration>> &configs,
-                                 util::FastqStats *stats) {
+                                 genie::core::stats::FastqStats *stats) {
     // Read some parameter
     uint32_t numreads = cp.num_reads;
     int num_thr = cp.num_thr;
@@ -158,7 +158,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
                             const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
                             const compression_params &cp,
                             const std::vector<std::vector<entropy::gabac::EncodingConfiguration>> &configs,
-                            util::FastqStats *stats) {
+                            genie::core::stats::FastqStats *stats) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
     (void)cp;
 
@@ -189,11 +189,6 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
         f_order_id.close();
         delete[] id_array_block;
     }
-
-    if (stats->enabled) {
-        stats->cmprs_id_sz += size;
-        stats->cmprs_total_sz += size;
-    }
 }
 
 void reorder_compress_quality_pe(std::string file_quality[2], const std::string &temp_dir, std::string *quality_array,
@@ -201,7 +196,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
                                  const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
                                  const compression_params &cp,
                                  const std::vector<std::vector<entropy::gabac::EncodingConfiguration>> &configs,
-                                 util::FastqStats *stats) {
+                                 genie::core::stats::FastqStats *stats) {
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
     uint32_t start_block_num = 0;
     uint32_t end_block_num = 0;
@@ -245,11 +240,6 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
             write_streams_to_file(generated_streams, file_to_save_streams, quality_descriptors);
         }
         start_block_num = end_block_num;
-
-        if (stats->enabled) {
-            stats->cmprs_qual_sz += size;
-            stats->cmprs_total_sz += size;
-        }
     }
 }
 
@@ -257,7 +247,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                       const int &num_thr, const uint32_t &num_reads_per_block, std::string *str_array,
                       const uint32_t &str_array_size, uint32_t *order_array, const std::string &mode,
                       const std::vector<std::vector<entropy::gabac::EncodingConfiguration>> &configs,
-                      util::FastqStats *stats) {
+                      genie::core::stats::FastqStats *stats) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
     for (uint32_t ndex = 0; ndex <= num_reads_per_file / str_array_size; ndex++) {
@@ -331,12 +321,6 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 qual_size += write_streams_to_file(generated_streams, file_to_save_streams, quality_descriptors);
             }
         }  // omp parallel
-
-        if (stats->enabled) {
-            stats->cmprs_id_sz += id_size;
-            stats->cmprs_qual_sz += qual_size;
-            stats->cmprs_total_sz += id_size + qual_size;
-        }
     }
 }
 

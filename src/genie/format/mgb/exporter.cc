@@ -14,7 +14,7 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Exporter::Exporter(std::ostream* _file) : writer(_file) {}
+Exporter::Exporter(std::ostream* _file, genie::core::stats::PerfStats *_stats) : writer(_file), stats(_stats) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ void Exporter::flowIn(core::AccessUnitPayload&& t, size_t id) {
         }
         au.addBlock(Block(descriptor, data.movePayload(descriptor)));
     }
-    au.write(writer);
+    au.write(writer, stats);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

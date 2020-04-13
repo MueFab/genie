@@ -18,6 +18,7 @@ class ProgramOptions {
     bool decompression;
     uint8_t num_threads;
     bool forceOverride;
+    bool stats;
 
    private:
     void processCommandLine(int argc, char *argv[]);

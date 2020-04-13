@@ -13,7 +13,7 @@
 
 #include <genie/generation.h>
 #include <genie/stream-saver.h>
-#include <genie/util/perf-stats.h>
+#include <genie/core/stats/perf-stats.h>
 
 #include "return-structures.h"
 #include "util.h"

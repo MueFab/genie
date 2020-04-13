@@ -7,7 +7,7 @@
 #ifndef GENIE_SPRING_ENCODER_H
 #define GENIE_SPRING_ENCODER_H
 
-#include <genie/util/perf-stats.h>
+#include <genie/core/stats/perf-stats.h>
 #include <read_coding/spring/util.h>
 #include "mpegg-encoder.h"
 namespace genie {
@@ -20,7 +20,7 @@ class SpringEncoder : public MpeggEncoder {
     bool preserve_quality;
     bool preserve_id;
     spring::compression_params cp;
-    util::FastqStats *stats;
+    genie::core::stats::FastqStats *stats;
     std::string temp_dir;
     std::chrono::time_point<std::chrono::steady_clock> compression_start;
 
@@ -49,7 +49,7 @@ class SpringEncoder : public MpeggEncoder {
     void preprocessIteration(backbone::mpegg_rec::MpeggChunk &&t);
     void preprocessClean();
     SpringEncoder(int _num_thr, std::string _working_dir, bool _ureads_flag, bool _preserve_quality, bool _preserve_id,
-                  util::FastqStats &_stats);
+                  genie::core::stats::FastqStats &_stats);
     void flowIn(backbone::mpegg_rec::MpeggChunk &&t, size_t id) override;
     void dryIn() override;
 };
