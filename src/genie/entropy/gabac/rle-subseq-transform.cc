@@ -4,11 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "rle-coding.h"
-
 #include <cassert>
 
 #include <genie/util/block-stepper.h>
+#include "rle-subseq-transform.h"
 namespace genie {
 namespace entropy {
 namespace gabac {
