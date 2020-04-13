@@ -6,7 +6,6 @@
 
 #include "reader.h"
 
-#include "constants.h"
 #include "context-tables.h"
 
 //
