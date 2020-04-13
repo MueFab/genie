@@ -7,7 +7,7 @@
 namespace lae {
 
 ProgramOptions::ProgramOptions(int argc, char *argv[])
-    : inputFilePath(), outputFilePath(), decompression(false), num_threads(1), forceOverride(false) {
+    : inputFilePath(), outputFilePath(), decompression(false), num_threads(1), forceOverride(false), stats(false) {
     processCommandLine(argc, argv);
 }
 
@@ -21,6 +21,7 @@ void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     num_threads = 1;
     app.add_option("-t,--threads", num_threads, "Number of threads");
     app.add_flag("-f,--force-override", forceOverride, "Override output file if already existing");
+    app.add_flag("-v,--verbose,--stats", stats, "Print compression ratios & speed");
 
     try {
         app.parse(argc, argv);

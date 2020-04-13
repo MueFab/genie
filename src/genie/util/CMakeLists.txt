@@ -9,7 +9,6 @@ set(source_files
         log.cc
         ordered-lock.cc
         ordered-section.cc
-        perf-stats.cc
         string-helpers.cc
         stringview.cc
         thread-manager.cc

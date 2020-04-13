@@ -19,6 +19,7 @@
 
 namespace genie {
 namespace core {
+namespace stats { class PerfStats; }
 namespace parameter {
 
 class DataUnit {
@@ -35,7 +36,7 @@ class DataUnit {
 
     virtual ~DataUnit() = default;
 
-    virtual void write(util::BitWriter &write) const;
+    virtual void write(util::BitWriter &write, genie::core::stats::PerfStats *stats = nullptr) const;
 
     DataUnitType getDataUnitType() const;
 };

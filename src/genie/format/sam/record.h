@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/core/cigar-tokenizer.h>
+#include <genie/core/stats/perf-stats.h>
 #include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -59,7 +60,7 @@ class Record {
 
     Record();
 
-    explicit Record(const std::string& string);
+    explicit Record(const std::string& string, genie::core::stats::SamStats *stats = nullptr);
 
     void check() const;
 

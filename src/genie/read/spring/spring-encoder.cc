@@ -162,7 +162,7 @@ void SpringEncoder::preprocessClean() {
 }
 
 SpringEncoder::SpringEncoder(int _num_thr, std::string _working_dir, bool _ureads_flag, bool _preserve_quality,
-                             bool _preserve_id, util::FastqStats &_stats)
+                             bool _preserve_id, genie::core::stats::FastqStats &_stats)
     : num_thr(_num_thr),
       working_dir(std::move(_working_dir)),
       preserve_quality(_preserve_quality),
@@ -207,7 +207,7 @@ void SpringEncoder::dryIn() {
     std::cout << "Preprocessing done!\n";
     std::cout << "Time for this step: "
               << std::chrono::duration_cast<std::chrono::seconds>(preprocess_end - preprocess_start).count() << " s\n";
-    if (stats->enabled) {
+    if (stats != NULL) {
         stats->preprocess_t = preprocess_end - preprocess_start;
     }
 
@@ -218,7 +218,7 @@ void SpringEncoder::dryIn() {
     std::cout << "Reordering done!\n";
     std::cout << "Time for this step: "
               << std::chrono::duration_cast<std::chrono::seconds>(reorder_end - reorder_start).count() << " s\n";
-    if (stats->enabled) {
+    if (stats != NULL) {
         stats->reorder_t = reorder_end - reorder_start;
     }
 
@@ -229,7 +229,7 @@ void SpringEncoder::dryIn() {
     std::cout << "Encoding done!\n";
     std::cout << "Time for this step: "
               << std::chrono::duration_cast<std::chrono::seconds>(encoder_end - encoder_start).count() << " s\n";
-    if (stats->enabled) {
+    if (stats != NULL) {
         stats->encode_t = encoder_end - encoder_start;
     }
 
@@ -259,7 +259,7 @@ void SpringEncoder::dryIn() {
     std::cout << "Generating read streams done!\n";
     std::cout << "Time for this step: " << std::chrono::duration_cast<std::chrono::seconds>(grs_end - grs_start).count()
               << " s\n";
-    if (stats->enabled) {
+    if (stats != NULL) {
         stats->generation_t = grs_end - grs_start;
     }
 

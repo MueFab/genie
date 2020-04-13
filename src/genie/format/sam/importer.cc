@@ -17,8 +17,8 @@ namespace sam {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Importer::Importer(size_t _blockSize, std::istream &_file)
-    : blockSize(_blockSize), samReader(_file), lock(), ref_counter(0) {}
+Importer::Importer(size_t _blockSize, std::istream &_file, genie::core::stats::SamStats *_stats)
+    : blockSize(_blockSize), samReader(_file), lock(), stats(_stats), ref_counter(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -162,7 +162,7 @@ bool Importer::pump(size_t id) {
     uint16_t local_ref_num = 0;
     {
         util::OrderedSection section(&lock, id);
-        samReader.read(blockSize, s);
+        samReader.read(blockSize, s, stats);
         if (s.size() == 0) {
             return false;
         }

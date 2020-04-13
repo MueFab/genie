@@ -16,6 +16,7 @@
 #include <vector>
 
 #include <genie/core/access-unit-payload.h>
+#include <genie/core/stats/perf-stats.h>
 #include <genie/util/ordered-lock.h>
 #include <genie/util/ordered-section.h>
 #include "access_unit.h"
@@ -32,9 +33,10 @@ class Exporter : public util::Drain<core::AccessUnitPayload> {
    private:
     util::BitWriter writer;
     util::OrderedLock lock;
+    genie::core::stats::PerfStats *stats;
 
    public:
-    explicit Exporter(std::ostream* _file);
+    explicit Exporter(std::ostream* _file,  genie::core::stats::PerfStats *_stats = nullptr);
     void flowIn(core::AccessUnitPayload&& t, size_t id) override;
     void dryIn() override;
 };

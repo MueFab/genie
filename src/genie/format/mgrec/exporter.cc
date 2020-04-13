@@ -15,7 +15,7 @@ namespace mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MgrecsExporter::MgrecsExporter(std::ostream &_file_1) : writer(&_file_1) {}
+MgrecsExporter::MgrecsExporter(std::ostream &_file_1, genie::core::stats::PerfStats *_stats) : writer(&_file_1), stats(_stats) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

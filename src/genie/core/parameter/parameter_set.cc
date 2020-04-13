@@ -124,7 +124,7 @@ ParameterSet::ParameterSet()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::write(util::BitWriter &writer) const {
+void ParameterSet::write(util::BitWriter &writer, genie::core::stats::PerfStats *) const {
     DataUnit::write(writer);
     writer.write(0, 10);  // reserved
 
