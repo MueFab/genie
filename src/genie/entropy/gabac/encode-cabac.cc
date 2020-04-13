@@ -149,7 +149,7 @@ void encode_cabac_order0(const paramcabac::TransformedSeq &conf,
     Writer writer(&bitstream,
                   bypassFlag,
                   stateVars.getNumCtxTotal());
-    writer.start(numSymbols);
+    writer.start();
 
     std::vector<unsigned int> binParams(4, 0);  // first three elements are for binarization params, last one is for ctxIdx
 
@@ -229,7 +229,7 @@ void encode_cabac_order1(const paramcabac::TransformedSeq &conf,
     Writer writer(&bitstream,
                   bypassFlag,
                   stateVars.getNumCtxTotal());
-    writer.start(numSymbols);
+    writer.start();
 
     std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
 
@@ -345,7 +345,7 @@ void encode_cabac_order2(const paramcabac::TransformedSeq &conf,
     Writer writer(&bitstream,
                   bypassFlag,
                   stateVars.getNumCtxTotal());
-    writer.start(numSymbols);
+    writer.start();
 
     std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
 

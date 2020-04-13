@@ -23,6 +23,7 @@ namespace entropy {
 namespace gabac {
 
 void decode_cabac(const paramcabac::TransformedSeq &conf,
+                  const unsigned int numEncodedSymbols,
                   util::DataBlock* bitstream,
                   util::DataBlock* const depSymbols = nullptr);
 

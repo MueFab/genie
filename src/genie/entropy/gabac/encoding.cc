@@ -43,17 +43,21 @@ void doSequenceTransform(const gabac::SequenceTransformationId &transID, uint64_
         // << " bytes";
     }
 }
-*/
+
 
 static void encodeSingleSequence(const paramcabac::TransformedSeq &cfg,
                                  util::DataBlock *const seq,
                                  std::ostream *out,
                                  util::DataBlock *const dep = nullptr) {
+    size_t numSymbols = seq->size();
+    if(numSymbols <= 0) return;
+
     // Encoding
     gabac::encode_cabac(cfg, seq, dep);
 
+    printf("compressed size: %lu\n", seq->getRawSize());
     gabac::StreamHandler::writeStream(*out, seq);
-}
+}*/
 
 void encode(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
     conf.validate();
@@ -89,11 +93,16 @@ void encode(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
 
         // Loop through the transformed sequences
         for (size_t i = 0; i < transformedSubseqs.size(); i++) {
-            // Put transformed sequence in, get partial bytestream back
-            encodeSingleSequence(enConf.subseq.getTransformSubseqCfg(i),
-                                 &(transformedSubseqs[i]),
-                                 conf.outputStream,
-                                 (dependency.size()) ? &dependency : nullptr);
+            size_t numSymbols = transformedSubseqs[i].size();
+            if(numSymbols <= 0) return;
+
+            // Encoding
+            gabac::encode_cabac(enConf.subseq.getTransformSubseqCfg(i),
+                                &(transformedSubseqs[i]),
+                                (dependency.size()) ? &dependency : nullptr);
+
+            printf("compressed size: %lu\n", transformedSubseqs[i].getRawSize());
+            gabac::StreamHandler::writeStream(*conf.outputStream, &transformedSubseqs[i], numSymbols);
         }
         if (conf.blocksize) {
             // RESTRUCT_DISABLE sequence.setWordSize(static_cast<uint8_t>(enConf.wordSize));

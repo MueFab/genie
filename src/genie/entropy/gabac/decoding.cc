@@ -26,11 +26,12 @@ static void decodeSingleSequence(const paramcabac::TransformedSeq &transformedSu
                                  std::istream *inStream,
                                  util::DataBlock *const decodedTransformedSubseq,
                                  util::DataBlock *const dependencySubseq = nullptr) {
-    size_t streamSize = StreamHandler::readStream(*inStream, decodedTransformedSubseq);
-    if (streamSize <= 0) return;
+    size_t numEncodedSymbols = 0;
+    size_t streamSize = StreamHandler::readStream(*inStream, decodedTransformedSubseq, numEncodedSymbols);
+    if (streamSize <= 0 || numEncodedSymbols <= 0) return;
 
     // Decoding
-    gabac::decode_cabac(transformedSubseqCfg, decodedTransformedSubseq, dependencySubseq);
+    gabac::decode_cabac(transformedSubseqCfg, numEncodedSymbols, decodedTransformedSubseq, dependencySubseq);
 }
 
 void decode(const IOConfiguration &ioConf, const EncodingConfiguration &enConf) {
