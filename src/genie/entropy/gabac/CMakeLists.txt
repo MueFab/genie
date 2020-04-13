@@ -10,24 +10,24 @@ set(source_files
         constants.cc
         context-model.cc
         context-tables.cc
+        exceptions.cc
+        luts-subsymbol-transform.cc
+        diff-subsymbol-transform.cc
+        equality-subseq-transform.cc
+        match-subseq-transform.cc
+        rle-subseq-transform.cc
         decode-cabac.cc
         decoding.cc
-        diff-subsymbol-transform.cc
         encode-cabac.cc
         encoding.cc
-        equality-coding.cc
-        exceptions.cc
         gabac-compressor.cc
         gabac-decompressor.cc
         gabac-seq-conf-set.cc
         genie-gabac-output-stream.cc
-        luts-subsymbol-transform.cc
-        match-coding.cc
-        reader.cc
-        rle-coding.cc
         run.cc
         stream-handler.cc
         streams.cc
+        reader.cc
         writer.cc
         )
 

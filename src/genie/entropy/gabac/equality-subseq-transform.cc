@@ -12,7 +12,7 @@
 // util::DataBlocks swap meaning. For wordsizes greater 1 this optimization is not possible, as the raw values do not
 // fit into the same data block where input values are still inside (different word sizes)
 
-#include "equality-coding.h"
+#include "equality-subseq-transform.h"
 
 #include <algorithm>
 #include <cassert>

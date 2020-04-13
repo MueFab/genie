@@ -25,7 +25,7 @@ namespace gabac {
 /**
  * @brief Supported transformations
  */
-enum class SequenceTransformationId {
+enum class DescSubseqTransformationId {
     no_transform = 0,    /**< @brief Do nothing */
     equality_coding = 1, /**< @brief Find equal values sequentially */
     match_coding = 2,    /**< @brief Find larger sequence matches */
@@ -37,7 +37,7 @@ enum class SequenceTransformationId {
 /**
  * @brief Transformation signature
  */
-using SequenceTransform = std::function<void(const std::vector<uint64_t>& param, std::vector<util::DataBlock>* const)>;
+using DescSubseqTransform = std::function<void(const std::vector<uint64_t>& param, std::vector<util::DataBlock>* const)>;
 
 /**
  * @brief Transformation meta data available to applications using gabac
@@ -48,8 +48,8 @@ struct TransformationProperties {
     std::vector<std::string> streamNames; /**< @brief Name of every stream */
     std::vector<uint8_t> wordsizes;       /**< @brief Wordsizes of every stream. Zero
                                              means word size of input data */
-    SequenceTransform transform;          /**< @brief Function pointer to transformation */
-    SequenceTransform inverseTransform;   /**< @brief Function pointer to inverse
+    DescSubseqTransform transform;          /**< @brief Function pointer to transformation */
+    DescSubseqTransform inverseTransform;   /**< @brief Function pointer to inverse
                                              transformation */
 };
 
@@ -58,7 +58,7 @@ struct TransformationProperties {
  * @param id Transformation ID
  * @return Properties object
  */
-const TransformationProperties& getTransformation(const gabac::SequenceTransformationId& id);
+const TransformationProperties& getTransformation(const gabac::DescSubseqTransformationId& id);
 
 }  // namespace gabac
 }  // namespace entropy

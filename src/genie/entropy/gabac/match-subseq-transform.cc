@@ -4,14 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "match-coding.h"
-
 #include <algorithm>
 #include <cassert>
 #include <iostream>
 
 #include <genie/util/block-stepper.h>
 #include <genie/util/data-block.h>
+#include "match-subseq-transform.h"
 
 namespace genie {
 namespace entropy {
