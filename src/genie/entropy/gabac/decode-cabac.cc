@@ -10,7 +10,6 @@
 #include <limits>
 
 #include <genie/util/data-block.h>
-#include "constants.h"
 #include "exceptions.h"
 #include "reader.h"
 

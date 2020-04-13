@@ -10,7 +10,6 @@
 
 #include <genie/util/block-stepper.h>
 #include <genie/util/data-block.h>
-#include "constants.h"
 #include "exceptions.h"
 #include "writer.h"
 

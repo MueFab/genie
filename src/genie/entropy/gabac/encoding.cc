@@ -18,7 +18,7 @@
 #include "encode-cabac.h"
 #include "stream-handler.h"
 #include "writer.h"
-#include "gabac.h"
+#include "exceptions.h"
 
 namespace genie {
 namespace entropy {
