@@ -37,76 +37,6 @@ void GabacSeqConfSet::setConfAsGabac(core::GenSubIndex sub, DescriptorSubsequenc
     // FIXME conf[uint8_t(sub.first)][uint8_t(sub.second)].subseq = subseqCfg;
 }
 
-#if 0 //RESTRUCT_DISABLE
-// ---------------------------------------------------------------------------------------------------------------------
-
-GabacSeqConfSet::TransformSubseqParameters GabacSeqConfSet::storeTransParams(
-    const gabac::EncodingConfiguration &gabac_configuration) {
-    using namespace entropy::paramcabac;
-
-    // Build parameter
-    auto mpeg_transform_id = TransformedParameters::TransformIdSubseq(gabac_configuration.sequenceTransformationId);
-    auto trans_param = gabac_configuration.sequenceTransformationParameter;
-    return TransformedParameters(mpeg_transform_id, trans_param);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-GabacSeqConfSet::TransformIdSubsym GabacSeqConfSet::storeTransform(
-    const gabac::TransformedSequenceConfiguration &tSeqConf) {
-    using namespace entropy::paramcabac;
-
-    SupportValues::TransformIdSubsym transform = SupportValues::TransformIdSubsym::NO_TRANSFORM;
-    if (tSeqConf.lutTransformationEnabled && tSeqConf.diffCodingEnabled) {
-        UTILS_THROW_RUNTIME_EXCEPTION("LUT and Diff core at the same time not supported");
-    } else if (tSeqConf.lutTransformationEnabled) {
-        transform = SupportValues::TransformIdSubsym::LUT_TRANSFORM;
-    } else if (tSeqConf.diffCodingEnabled) {
-        transform = SupportValues::TransformIdSubsym::DIFF_CODING;
-    }
-    return transform;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-GabacSeqConfSet::CabacBinarization GabacSeqConfSet::storeBinarization(
-    const gabac::TransformedSequenceConfiguration &tSeqConf) {
-    using namespace entropy::paramcabac;
-
-    auto bin_ID = BinarizationParameters::BinarizationId(tSeqConf.binarizationId);
-    auto bin_params = BinarizationParameters(bin_ID, std::vector<uint8_t>(tSeqConf.binarizationParameters[0]));
-    auto binarization = Binarization(bin_ID, std::move(bin_params));
-
-    // Additional parameter for context adaptive modes
-    if (tSeqConf.contextSelectionId != gabac::ContextSelectionId::bypass) {
-        // TODO insert actual values when adaptive core ready
-        auto context_params = Context(false, 3, 3, false);
-        binarization.setContextParameters(std::move(context_params));
-    }
-    return binarization;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void GabacSeqConfSet::storeSubseq(const gabac::EncodingConfiguration &gabac_configuration,
-                                  DescriptorSubsequenceCfg &sub_conf) {
-    using namespace entropy::paramcabac;
-
-    size_t trans_seq_id = 0;
-    for (const auto &tSeqConf : gabac_configuration.transformedSequenceConfigurations) {
-        auto size = gabac::getTransformation(gabac_configuration.sequenceTransformationId).wordsizes[trans_seq_id] * 8;
-        size = size ? size : gabac_configuration.wordSize * 8;
-
-        auto transform = storeTransform(tSeqConf);
-        auto binarization = storeBinarization(tSeqConf);
-        auto supp_vals = SupportValues(size, size, 0, transform);
-        auto subcfg = TransformedSeq(transform, std::move(supp_vals), std::move(binarization));
-        sub_conf.setTransformSubseqCfg(trans_seq_id, std::move(subcfg));
-        ++trans_seq_id;
-    }
-}
-
-#endif
 // ---------------------------------------------------------------------------------------------------------------------
 
 void GabacSeqConfSet::storeParameters(core::parameter::ParameterSet &parameterSet) const {
@@ -150,42 +80,7 @@ const GabacSeqConfSet::DecoderConfigurationCabac &GabacSeqConfSet::loadDescripto
     return reinterpret_cast<const DecoderRegular &>(decoder_conf);
 }
 
-#if 0 //RESTRUCT_DISABLE
 // ---------------------------------------------------------------------------------------------------------------------
-
-gabac::TransformedSequenceConfiguration GabacSeqConfSet::loadTransformedSequence(
-    const TransformSubseqCfg &transformedDesc) {
-    using namespace entropy::paramcabac;
-    gabac::TransformedSequenceConfiguration gabacTransCfg;
-
-    const auto DIFF = SupportValues::TransformIdSubsym::DIFF_CODING;
-    gabacTransCfg.diffCodingEnabled = transformedDesc.getTransformID() == DIFF;
-
-    const auto LUT = SupportValues::TransformIdSubsym::LUT_TRANSFORM;
-    gabacTransCfg.lutTransformationEnabled = transformedDesc.getTransformID() == LUT;
-
-    const auto MAX_BIN = BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB;
-    UTILS_DIE_IF(transformedDesc.getBinarization().getBinarizationID() > MAX_BIN, "Binarization unsupported");
-
-    const auto CUR_BIN = transformedDesc.getBinarization().getBinarizationID();
-    gabacTransCfg.binarizationId = gabac::BinarizationId(CUR_BIN);
-
-    gabacTransCfg.binarizationParameters.push_back(32);  // TODO Remove hardcoded value
-    if (transformedDesc.getBinarization().getBypassFlag()) {
-        gabacTransCfg.contextSelectionId = gabac::ContextSelectionId::bypass;
-    } else {
-        const auto CODING_ORDER = transformedDesc.getSupportValues().getCodingOrder();
-        gabacTransCfg.contextSelectionId = gabac::ContextSelectionId(CODING_ORDER + 1);
-    }
-
-    gabacTransCfg.lutOrder = 0;  // TODO Remove hardcoded value
-    gabacTransCfg.lutBits = 0;   // TODO Remove hardcoded value
-
-    return gabacTransCfg;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-#endif
 
 void GabacSeqConfSet::loadParameters(const core::parameter::ParameterSet &parameterSet) {
     using namespace entropy::paramcabac;

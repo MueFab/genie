@@ -77,32 +77,9 @@ const TransformationProperties &getTransformation(const gabac::SequenceTransform
          [](const std::vector<uint64_t> &param, std::vector<util::DataBlock> *const transformedSequences) {
              gabac::inverseTransformRleCoding(param[0], &(*transformedSequences)[0], &(*transformedSequences)[1]);
              transformedSequences->resize(1);
-         }},
-         /*/* RESTRUCT-DISABLE
-        {"paramcabac",  // Name
-         {"binarization_id", "binarization_parameter", "context_selection_id", "word_size"},
-         {"sequence"},  // StreamNames
-         {0},           // WordSizes (0: non fixed current stream wordsize)
-         [](const std::vector<uint64_t> &param, std::vector<util::DataBlock> *const transformedSequences) {
-             transformedSequences->resize(1);
-             gabac::encode_cabac(gabac::BinarizationId(param[0]), {static_cast<unsigned>(param[1])},
-                                 gabac::ContextSelectionId(param[2]), &(*transformedSequences)[0]);
-         },
-         [](const std::vector<uint64_t> &param, std::vector<util::DataBlock> *const transformedSequences) {
-             transformedSequences->resize(1);
-             gabac::decode_cabac(gabac::BinarizationId(param[0]), {static_cast<unsigned>(param[1])},
-                                 gabac::ContextSelectionId(param[2]), static_cast<uint8_t>(param[3]),
-                                 &(*transformedSequences)[0]);
-         }}*/
+         }}
          };
     return transformationInformation[unsigned(id)];
-}
-
-bool BinarizationProperties::sbCheck(uint64_t minv, uint64_t maxv, uint64_t parameter) const {
-    if (isSigned) {
-        return int64_t(minv) >= int64_t(this->min(parameter)) && int64_t(maxv) <= int64_t(this->max(parameter));
-    }
-    return minv >= this->min(parameter) && maxv <= this->max(parameter);
 }
 
 }  // namespace gabac

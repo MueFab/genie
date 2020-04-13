@@ -5,7 +5,7 @@ set(source_files
         binary-arithmetic-encoder.cc
         binary-arithmetic-decoder.cc
         bit-input-stream.cc
-        c-interface.cc
+        #c-interface.cc
         configuration.cc
         constants.cc
         context-model.cc

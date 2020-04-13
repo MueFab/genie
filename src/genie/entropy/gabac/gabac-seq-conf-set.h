@@ -37,48 +37,6 @@ class GabacSeqConfSet {
     using ParameterSet = core::parameter::ParameterSet;
     using TransformSubseqCfg = entropy::paramcabac::TransformedSubSeq;
 
-#if 0 //RESTRUCT_DISABLE
-    /**
-     * @brief Convert gabac::EncodingConfiguration to mgb::desc_conf_pres::paramcabac::TransformSubseqParameters
-     * @param gabac_configuration Input gabac config
-     * @return Newly created transform parameter object
-     */
-    static TransformSubseqParameters storeTransParams(const gabac::EncodingConfiguration& gabac_configuration);
-
-    /**
-     * @brief Convert gabac::TransformedSequenceConfiguration to
-     * mgb::desc_conf_pres::paramcabac::SupportValues::TransformIdSubsym
-     * @param tSeqConf Input gabac config
-     * @return Newly created MPEG-G Transformation ID
-     */
-    static TransformIdSubsym storeTransform(const gabac::TransformedSequenceConfiguration& tSeqConf);
-
-    /**
-     * @brief Convert gabac::TransformedSequenceConfiguration to
-     * mgb::desc_conf_pres::paramcabac::CabacBinarization
-     * @param tSeqConf Input gabac config
-     * @return Newly created MPEG-G Binarization object
-     */
-    static CabacBinarization storeBinarization(const gabac::TransformedSequenceConfiguration& tSeqConf);
-
-    /**
-     * @brief Convert gabac::EncodingConfiguration to mgb::desc_conf_pres::paramcabac::DescriptorSubsequenceCfg.
-     * The complete subdescriptor sequence configuration will be processed including binarization, transformation,
-     * paramcabac
-     * @param gabac_configuration Input gabac config
-     * @param sub_conf Output where to put the converted data
-     */
-    static void storeSubseq(const gabac::EncodingConfiguration& gabac_configuration,
-                            DescriptorSubsequenceCfg& sub_conf);
-
-    /**
-     * @brief Convert mgb::desc_conf_pres::paramcabac::TransformSubseqCfg to
-     * gabac::TransformedSequenceConfiguration.
-     * @param transformedDesc Input subsequence configuration
-     * @param gabacTransCfg Where to write the output data.
-     */
-    static gabac::TransformedSequenceConfiguration loadTransformedSequence(const TransformSubseqCfg& transformedDesc);
-#endif
     /**
      * @brief Extract the mgb::desc_conf_pres::paramcabac::DecoderConfigurationCabac from a
      * mgb::ParameterSet. An exception will be thrown if none is available.
