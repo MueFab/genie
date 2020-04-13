@@ -12,13 +12,13 @@
 
 #include <genie/util/block-stepper.h>
 #include <genie/util/data-block.h>
+#include <genie/entropy/paramcabac/transformed-subseq.h>
 #include "configuration.h"
 #include "constants.h"
 #include "encode-cabac.h"
 #include "stream-handler.h"
 #include "writer.h"
 #include "gabac.h"
-#include <genie/entropy/paramcabac/transformed-seq.h>
 
 namespace genie {
 namespace entropy {
@@ -101,7 +101,7 @@ void encode(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
                                 &(transformedSubseqs[i]),
                                 (dependency.size()) ? &dependency : nullptr);
 
-            printf("compressed size: %lu\n", transformedSubseqs[i].getRawSize());
+            printf("compressed size: %lu\n", transformedSubseqs[i].getRawSize()+4);
             gabac::StreamHandler::writeStream(*conf.outputStream, &transformedSubseqs[i], numSymbols);
         }
         if (conf.blocksize) {

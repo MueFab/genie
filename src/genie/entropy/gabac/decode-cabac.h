@@ -10,7 +10,7 @@
 #include <cstdint>
 #include <vector>
 
-#include <genie/entropy/paramcabac/transformed-seq.h>
+#include <genie/entropy/paramcabac/transformed-subseq.h>
 
 namespace genie {
 namespace util {
@@ -22,7 +22,7 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-void decode_cabac(const paramcabac::TransformedSeq &conf,
+void decode_cabac(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
                   const unsigned int numEncodedSymbols,
                   util::DataBlock* bitstream,
                   util::DataBlock* const depSymbols = nullptr);

@@ -22,7 +22,7 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-static void decodeSingleSequence(const paramcabac::TransformedSeq &transformedSubseqCfg,
+static void decodeSingleSequence(const paramcabac::TransformedSubSeq &transformedSubseqCfg,
                                  std::istream *inStream,
                                  util::DataBlock *const decodedTransformedSubseq,
                                  util::DataBlock *const dependencySubseq = nullptr) {

@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_TRANSFORMED_SEQ_H
-#define GENIE_TRANSFORMED_SEQ_H
+#ifndef GENIE_TRANSFORMED_SUBSEQ_H
+#define GENIE_TRANSFORMED_SUBSEQ_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,21 +25,21 @@ namespace paramcabac {
 /**
  * ISO 23092-2 Section 8.3.1 table lines 9 to 11
  */
-class TransformedSeq {
+class TransformedSubSeq {
    public:
-    TransformedSeq();
+    TransformedSubSeq();
 
-    TransformedSeq(SupportValues::TransformIdSubsym _transform_ID_subsym,
-                   SupportValues&& _support_values,
-                   Binarization&& _cabac_binarization,
-                   const core::GenSubIndex _subsequence_ID = core::GenSub::POS_MAPPING_FIRST,
-                   const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
+    TransformedSubSeq(SupportValues::TransformIdSubsym _transform_ID_subsym,
+                      SupportValues&& _support_values,
+                      Binarization&& _cabac_binarization,
+                      const core::GenSubIndex _subsequence_ID = core::GenSub::POS_MAPPING_FIRST,
+                      const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
 
-    TransformedSeq(util::BitReader& reader,
-                   const core::GenSubIndex _subsequence_ID = core::GenSub::POS_MAPPING_FIRST,
-                   const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
+    TransformedSubSeq(util::BitReader& reader,
+                      const core::GenSubIndex _subsequence_ID = core::GenSub::POS_MAPPING_FIRST,
+                      const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
 
-    virtual ~TransformedSeq() = default;
+    virtual ~TransformedSubSeq() = default;
 
     virtual void write(util::BitWriter& writer) const;
 
@@ -82,7 +82,7 @@ class TransformedSeq {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_TRANSFORMED_SEQ_H
+#endif  // GENIE_TRANSFORMED_SUBSEQ_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

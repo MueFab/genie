@@ -13,7 +13,7 @@
 #include <genie/entropy/gabac/gabac.h>
 #include <genie/entropy/paramcabac/decoder.h>
 #include <genie/entropy/paramcabac/subsequence.h>
-#include <genie/entropy/paramcabac/transformed-seq.h>
+#include <genie/entropy/paramcabac/transformed-subseq.h>
 #include <vector>
 
 namespace genie {
@@ -35,7 +35,7 @@ class GabacSeqConfSet {
     using DescriptorSubsequenceCfg = entropy::paramcabac::Subsequence;
     using DecoderConfigurationCabac = entropy::paramcabac::DecoderRegular;
     using ParameterSet = core::parameter::ParameterSet;
-    using TransformSubseqCfg = entropy::paramcabac::TransformedSeq;
+    using TransformSubseqCfg = entropy::paramcabac::TransformedSubSeq;
 
 #if 0 //RESTRUCT_DISABLE
     /**

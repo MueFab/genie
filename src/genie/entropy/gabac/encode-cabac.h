@@ -12,7 +12,7 @@
 #include <limits>
 #include <vector>
 
-#include <genie/entropy/paramcabac/transformed-seq.h>
+#include <genie/entropy/paramcabac/transformed-subseq.h>
 
 namespace genie {
 namespace util {
@@ -24,7 +24,7 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-void encode_cabac(const paramcabac::TransformedSeq &conf,
+void encode_cabac(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
                   util::DataBlock* symbols,
                   util::DataBlock* const depSymbols = nullptr,
                   size_t maxsize = std::numeric_limits<size_t>::max());
