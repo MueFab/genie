@@ -95,6 +95,16 @@ class StateVars {
                                 const core::AlphabetID alphabet_ID);
 
     static
+    uint8_t getMinimalSizeInBytes(uint8_t sizeInBits) {
+        return (sizeInBits / 8) + ((sizeInBits % 8) ? 1 : 0);
+    }
+
+    static
+    uint8_t getLgWordSize(uint8_t sizeInBits) {
+        return StateVars::getMinimalSizeInBytes(sizeInBits) >> 3;
+    }
+
+    static
     uint64_t get2PowN(uint8_t N) {
         assert(N<=32);
         uint64_t one = 1u;

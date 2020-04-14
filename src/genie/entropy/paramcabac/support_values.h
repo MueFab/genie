@@ -50,8 +50,6 @@ class SupportValues {
 
     bool getShareSubsymPrvFlag() const;
 
-    uint8_t getMinimalSizeInBytes(uint8_t sizeInBit) const;
-
    private:
     uint8_t output_symbol_size;
     uint8_t coding_subsym_size;
