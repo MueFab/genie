@@ -51,7 +51,7 @@ class TransformedParameters {
 
     uint16_t getParam() const;
 
-    const std::vector<uint8_t> *getMergeCodingShiftSize() const;
+    const std::vector<uint8_t> getMergeCodingShiftSize() const;
 
    private:
     TransformIdSubseq transform_ID_subseq;               //!< : 8; Line 2
