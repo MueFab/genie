@@ -7,6 +7,8 @@
 #ifndef GENIE_DATASET_HEADER_H
 #define GENIE_DATASET_HEADER_H
 
+#include "genie/util/bitwriter.h"
+
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -16,7 +18,7 @@ namespace format {
 namespace mpegg_p1 {
 class DatasetHeader {
    public:
-    explicit DatasetHeader(const uint16_t datasetID);
+    explicit DatasetHeader(const uint16_t x_datasetID);
 
     DatasetHeader(uint8_t datasetGroupId, uint16_t datasetId/*, char *version, uint8_t byteOffsetSizeFlag,
                   uint8_t nonOverlappingAuRangeFlag, uint8_t pos40BitsFlag, uint8_t blockHeaderFlag, uint8_t mitFlag,
@@ -33,6 +35,10 @@ class DatasetHeader {
     uint16_t getDatasetId() const { return dataset_ID; }
     uint8_t getDatasetGroupId() const { return dataset_group_ID; }
 
+    uint64_t getLength() const;
+
+    void writeToFile(genie::util::BitWriter& bitWriter) const;
+
    private:
     /**
      * ISO 23092-1 Section 6.5.2 table 19
@@ -40,7 +46,7 @@ class DatasetHeader {
      * ------------------------------------------------------------------------------------------------------------- */
     uint8_t dataset_group_ID : 8;
     uint16_t dataset_ID : 16;
-    char version[4];
+    std::string version;
     uint8_t byte_offset_size_flag : 1;
     uint8_t non_overlapping_AU_range_flag : 1;
     uint8_t pos_40_bits_flag : 1;

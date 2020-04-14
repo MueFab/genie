@@ -28,9 +28,42 @@ Dataset::Dataset(const genie::format::mgb::DataUnitFactory& dataUnitFactory,
     }
 }
 
-void Dataset::setDatasetParameterSetsGroupId(uint8_t GroupId) {
+void Dataset::setDatasetParameterSetsGroupId(uint8_t groupId) {
     for (auto& ps : dataset_parameter_sets) {
-        ps.setDatasetGroupId(GroupId);
+        ps.setDatasetGroupId(groupId);
+    }
+}
+
+uint64_t Dataset::getLength() const
+{
+    uint64_t length = 12; //gen_info
+    length += dataset_header.getLength();
+
+    for (auto const& it: dataset_parameter_sets) {
+        length += it.getLength();
+    }
+
+    for (auto const& it: access_units) {
+        length += it.getLength();
+    }
+
+    return length;
+}
+
+void Dataset::writeToFile(genie::util::BitWriter& bitWriter) const
+{
+    bitWriter.write("dtcn");
+
+    bitWriter.write(this->getLength(), 64);
+
+    dataset_header.writeToFile(bitWriter);
+
+    for (auto const& it: dataset_parameter_sets) {
+        it.writeToFile(bitWriter);
+    }
+
+    for (auto const& it: access_units) {
+        it.writeToFile(bitWriter);
     }
 }
 

@@ -42,13 +42,17 @@ class AccessUnit {
    public:
     explicit AccessUnit(genie::format::mgb::AccessUnit&& au_p2);
 
+    uint64_t getLength() const;
+
+    void writeToFile(genie::util::BitWriter& bitWriter) const;
+
    private:
     /**
      * ISO 23092-1 Section 6.5.3 table 24
      *
      * ------------------------------------------------------------------------------------------------------------- */
 
-    genie::format::mgb::AccessUnit au_p1;
+    genie::format::mgb::AccessUnit au_p1; // if MIT_flag is set to 0 -> au_p1 header equates to au_p2 header
 
     // std::unique_ptr<AU_information> au_information;   //optional
     // std::unique_ptr<AU_protection> au_protection;     //optional
