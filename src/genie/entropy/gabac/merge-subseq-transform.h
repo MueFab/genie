@@ -20,9 +20,9 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-void transformMergeCoding(const paramcabac::Subsequence& subseqCfg, util::DataBlock *symbols, std::vector<util::DataBlock *> transformedSubseqs);
+void transformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs);
 
-void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg, util::DataBlock *symbols, std::vector<util::DataBlock *> transformedSubseqs);
+void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs);
 
 }  // namespace gabac
 }  // namespace entropy
