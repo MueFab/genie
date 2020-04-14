@@ -13,6 +13,7 @@
 #include <genie/read/lowlatency/encoder.h>
 #include <genie/read/spring/spring-encoder.h>
 #include <genie/util/thread-manager.h>
+#include <genie/core/stats/perf-stats.h>
 #include <fstream>
 #include <string>
 
@@ -28,7 +29,7 @@ void encode(const ProgramOptions& programOptions) {
         genie::quality::qvwriteout::Encoder qvencoder;
         genie::name::tokenizer::Encoder nameencoder;
 
-        genie::util::FastqStats stats;
+        genie::core::stats::FastqStats stats(false);
         genie::read::spring::SpringEncoder encoder(&qvencoder, &nameencoder, "./", &stats);
 
         genie::entropy::gabac::GabacCompressor compressor;

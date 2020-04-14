@@ -24,13 +24,13 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
     pe_block_data bdata;
     compression_params cp;
     std::string temp_dir;
-    util::FastqStats* stats;
+    core::stats::FastqStats* stats;
     uint32_t num_AUs;
     genie::core::QVEncoder* coder;
     genie::core::NameEncoder* ncoder;
 
    public:
-    SpringSource(genie::core::QVEncoder* _coder, genie::core::NameEncoder* _ncoder, const compression_params& _cp, std::string  _temp_dir, util::FastqStats* _stats)
+    SpringSource(genie::core::QVEncoder* _coder, genie::core::NameEncoder* _ncoder, const compression_params& _cp, std::string  _temp_dir, core::stats::FastqStats* _stats)
         : cp(_cp), temp_dir(std::move(_temp_dir)), stats(_stats), coder(_coder), ncoder(_ncoder) {
         if (cp.paired_end) {
             loadPE_Data(cp, temp_dir, true, &data);

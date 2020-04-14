@@ -19,7 +19,7 @@
 #if 0
 namespace dsg {
 
-static void generationFromFastq_SPRING(const ProgramOptions &programOptions, util::FastqStats *stats, const std::string &filename) {
+static void generationFromFastq_SPRING(const ProgramOptions &programOptions, core::stats::FastqStats *stats, const std::string &filename) {
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Descriptor stream generation from FASTQ file" << std::endl;
     std::cout << "Output filename = " << filename << std::endl;
@@ -44,7 +44,7 @@ static void generationFromFastq_SPRING(const ProgramOptions &programOptions, uti
     }
 }
 
-static void generationFromFastq(const ProgramOptions &programOptions, util::FastqStats *stats) {
+static void generationFromFastq(const ProgramOptions &programOptions, core::stats::FastqStats *stats) {
     std::string filename = programOptions.outputFilePath;
 
     if (filename.empty()) {
@@ -86,7 +86,7 @@ static void generationFromFastq(const ProgramOptions &programOptions, util::Fast
     generationFromFastq_SPRING(programOptions, stats, filename);
 }
 
-void decompression_fastq(const ProgramOptions &programOptions, util::FastqStats *stats) {
+void decompression_fastq(const ProgramOptions &programOptions, core::stats::FastqStats *stats) {
     // Open file and create tmp directory with random name
     std::ifstream in(programOptions.inputFilePath);
     if (!in) {
@@ -131,7 +131,7 @@ void decompression_fastq(const ProgramOptions &programOptions, util::FastqStats 
 
 void decompression(const ProgramOptions &programOptions) {
     if (programOptions.inputFileType == "GENIE") {
-        util::FastqStats stats;
+        core::stats::FastqStats stats;
         std::chrono::steady_clock::time_point start_t;
         if (programOptions.verbose) {
             stats.enabled = true;
@@ -153,7 +153,7 @@ void decompression(const ProgramOptions &programOptions) {
 
 void generation(const ProgramOptions &programOptions) {
     if (programOptions.inputFileType == "FASTQ") {
-        util::FastqStats stats;
+        core::stats::FastqStats stats;
         std::chrono::steady_clock::time_point start_t;
         if (programOptions.verbose) {
             stats.enabled = true;
