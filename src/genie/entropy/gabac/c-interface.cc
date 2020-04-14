@@ -219,7 +219,7 @@ int gabac_stream_release(gabac_stream *stream) {
 
 int gabac_execute_transform(uint8_t transformationID, const uint64_t *param, int inverse, gabac_data_block *input) {
     try {
-        auto transID = genie::entropy::gabac::SequenceTransformationId(transformationID);
+        auto transID = genie::entropy::gabac::DescSubseqTransformationId(transformationID);
         std::vector<genie::util::DataBlock> blocks(genie::entropy::gabac::getTransformation(transID).wordsizes.size());
         std::vector<uint64_t> params_vec(gabac_sequence_transform_params[transformationID]);
         for (size_t i = 0; i < blocks.size(); ++i) {

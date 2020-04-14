@@ -14,7 +14,6 @@
 #include <genie/util/data-block.h>
 #include <genie/entropy/paramcabac/transformed-subseq.h>
 #include "configuration.h"
-#include "constants.h"
 #include "encode-cabac.h"
 #include "stream-handler.h"
 #include "writer.h"

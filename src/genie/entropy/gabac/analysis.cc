@@ -57,8 +57,8 @@ const AnalysisConfiguration& getCandidateConfig() {
         {// Wordsizes
          1, 2, 4, 8},
         {// Sequence Transformations
-         gabac::SequenceTransformationId::no_transform, gabac::SequenceTransformationId::equality_coding,
-         gabac::SequenceTransformationId::match_coding, gabac::SequenceTransformationId::rle_coding},
+         gabac::DescSubseqTransformationId::no_transform, gabac::DescSubseqTransformationId::equality_coding,
+         gabac::DescSubseqTransformationId::match_coding, gabac::DescSubseqTransformationId::rle_coding},
         {// Match genie window sizes
          32, 256},
         {// RLE Guard
@@ -126,11 +126,11 @@ static void getMinMax(const util::DataBlock& b, uint64_t* umin, uint64_t* umax, 
     }
 }
 
-static uint64_t getMaxOfStream(SequenceTransformationId trans, uint8_t stream, uint64_t max) {
-    if ((trans == SequenceTransformationId::rle_coding || trans == SequenceTransformationId::match_coding) &&
+static uint64_t getMaxOfStream(DescSubseqTransformationId trans, uint8_t stream, uint64_t max) {
+    if ((trans == DescSubseqTransformationId::rle_coding || trans == DescSubseqTransformationId::match_coding) &&
         stream > 0)
         return std::numeric_limits<uint32_t>::max();
-    if (trans == SequenceTransformationId::equality_coding && stream == 1) return 1;
+    if (trans == DescSubseqTransformationId::equality_coding && stream == 1) return 1;
     return max;
 }
 
@@ -190,7 +190,7 @@ void getOptimumOfLutTransformedStream(const AnalysisConfiguration& aconf, Traver
         info->currConfig.transformedSequenceConfigurations[info->currStreamIndex].diffCodingEnabled = transID;
         if (transID) {
             info->stack.push(info->stack.top());
-            gabac::getTransformation(gabac::SequenceTransformationId::diff_coding)
+            gabac::getTransformation(gabac::DescSubseqTransformationId::diff_coding)
                 .transform({0}, &info->stack.top().streams);
         }
         getOptimumOfDiffTransformedStream(aconf, info);
@@ -207,7 +207,7 @@ void getOptimumOfLutEnabled(const AnalysisConfiguration& aconf, TraversalInfo* i
         info->stack.push(info->stack.top());
 
         try {
-            getTransformation(SequenceTransformationId::lut_transform)
+            getTransformation(DescSubseqTransformationId::lut_transform)
                 .transform({info->currConfig.transformedSequenceConfigurations[info->currStreamIndex].lutOrder},
                            &info->stack.top().streams);
         } catch (...) {

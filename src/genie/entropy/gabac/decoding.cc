@@ -12,7 +12,6 @@
 
 #include <genie/util/data-block.h>
 #include "configuration.h"
-#include "constants.h"
 #include "decode-cabac.h"
 #include "reader.h"
 #include "stream-handler.h"

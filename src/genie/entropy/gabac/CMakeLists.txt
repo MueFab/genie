@@ -7,7 +7,7 @@ set(source_files
         bit-input-stream.cc
         #c-interface.cc
         configuration.cc
-        constants.cc
+        #constants.cc
         context-model.cc
         context-tables.cc
         exceptions.cc
