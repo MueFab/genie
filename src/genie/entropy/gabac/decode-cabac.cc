@@ -135,9 +135,6 @@ void decode_cabac_order0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
 
     if (numEncodedSymbols <= 0) return;
 
-    util::DataBlock symbols(numEncodedSymbols,
-                            4); //conf.getSupportValues().getMinimalSizeInBytes(conf.getSupportValues().getOutputSymbolSize()));
-
     const paramcabac::SupportValues &supportVals = trnsfSubseqConf.getSupportValues();
     const paramcabac::Binarization &binarzation = trnsfSubseqConf.getBinarization();
     const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
@@ -156,6 +153,8 @@ void decode_cabac_order0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
 
     std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
 
+    util::DataBlock symbols(numEncodedSymbols,
+                            4); //paramcabac::StateVars::getMinimalSizeInBytes(outputSymbolSize);
     util::BlockStepper r = symbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
@@ -204,9 +203,6 @@ void decode_cabac_order1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
 
     if (numEncodedSymbols <= 0) return;
 
-    util::DataBlock symbols(numEncodedSymbols,
-                            4); //conf.getSupportValues().getMinimalSizeInBytes(conf.getSupportValues().getOutputSymbolSize()));
-
     const paramcabac::SupportValues &supportVals = trnsfSubseqConf.getSupportValues();
     const paramcabac::Binarization &binarzation = trnsfSubseqConf.getBinarization();
     const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
@@ -233,6 +229,8 @@ void decode_cabac_order1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
 
     std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
 
+    util::DataBlock symbols(numEncodedSymbols,
+                            4); //paramcabac::StateVars::getMinimalSizeInBytes(outputSymbolSize);
     util::BlockStepper r = symbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
@@ -323,9 +321,6 @@ void decode_cabac_order2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
 
     if (numEncodedSymbols <= 0) return;
 
-    util::DataBlock symbols(numEncodedSymbols,
-                            4); //conf.getSupportValues().getMinimalSizeInBytes(conf.getSupportValues().getOutputSymbolSize()));
-
     const paramcabac::SupportValues &supportVals = trnsfSubseqConf.getSupportValues();
     const paramcabac::Binarization &binarzation = trnsfSubseqConf.getBinarization();
     const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
@@ -351,6 +346,8 @@ void decode_cabac_order2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
 
     std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
 
+    util::DataBlock symbols(numEncodedSymbols,
+                            4); //paramcabac::StateVars::getMinimalSizeInBytes(outputSymbolSize);
     util::BlockStepper r = symbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
