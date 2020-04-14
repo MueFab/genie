@@ -59,6 +59,10 @@ struct EncodingConfiguration {
     bool operator!=(const EncodingConfiguration& conf) const;
 
 
+    const paramcabac::Subsequence& getSubseqConfig() const {
+        return subseq;
+    }
+
     paramcabac::Subsequence subseq;
 };
 
