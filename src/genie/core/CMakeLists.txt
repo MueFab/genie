@@ -25,6 +25,8 @@ set(source_files
         record/alignment-box.cc
         record/alignment.cc
 
+        stats/perf-stats.cc
+
         access-unit-payload.cc
         access-unit-raw.cc
         constants.cc

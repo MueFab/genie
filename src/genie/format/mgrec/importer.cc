@@ -15,8 +15,8 @@ namespace mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MgrecsImporter::MgrecsImporter(size_t _blockSize, std::istream &_file_1)
-    : blockSize(_blockSize), reader(_file_1), record_counter(0) {}
+MgrecsImporter::MgrecsImporter(size_t _blockSize, std::istream &_file_1, genie::core::stats::PerfStats *_stats)
+    : blockSize(_blockSize), reader(_file_1), record_counter(0), stats(_stats) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

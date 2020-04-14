@@ -27,6 +27,7 @@
 
 namespace genie {
 namespace core {
+namespace stats { class PerfStats; }
 namespace parameter {
 
 class ParameterSet : public DataUnit {
@@ -59,7 +60,7 @@ class ParameterSet : public DataUnit {
 
     void setMultipleSignatureBase(uint32_t _multiple_signature_base, uint8_t _U_signature_size);
 
-    void write(util::BitWriter &writer) const override;
+    void write(util::BitWriter &writer, genie::core::stats::PerfStats *stats = nullptr) const override;
 
     DatasetType getDatasetType() const;
 

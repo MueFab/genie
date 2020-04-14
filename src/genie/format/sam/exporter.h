@@ -11,6 +11,7 @@
 
 #include <genie/core/format-exporter.h>
 #include <genie/core/record/alignment_split/same-rec.h>
+#include <genie/core/stats/perf-stats.h>
 #include <genie/util/ordered-lock.h>
 #include "header/header.h"
 #include "writer.h"
@@ -24,7 +25,8 @@ namespace sam {
 // ---------------------------------------------------------------------------------------------------------------------
 
 class Exporter : public core::FormatExporter {
-    util::OrderedLock lock;  //!< @brief Lock to ensure in order execution
+    util::OrderedLock lock;              //!< @brief Lock to ensure in order execution
+    genie::core::stats::SamStats *stats; //!< @brief Stats collector (null => don't collect)
     Writer writer;
 
    public:
@@ -38,7 +40,7 @@ class Exporter : public core::FormatExporter {
      * @brief Unpaired mode
      * @param _file_1 Output file
      */
-    explicit Exporter(header::Header&& header, std::ostream& _file_1);
+    explicit Exporter(header::Header&& header, std::ostream& _file_1,  genie::core::stats::SamStats *_stats = nullptr);
 
     struct Stash {
         uint16_t flags;

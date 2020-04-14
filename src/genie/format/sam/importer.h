@@ -11,6 +11,7 @@
 
 #include <genie/core/format-importer.h>
 #include <genie/core/record/record.h>
+#include <genie/core/stats/perf-stats.h>
 #include <genie/util/ordered-lock.h>
 #include <map>
 #include "reader.h"
@@ -27,10 +28,11 @@ class Importer : public core::FormatImporter {
    private:
     size_t blockSize;
     Reader samReader;
-    util::OrderedLock lock;  //!< @brief Lock to ensure in order execution
+    util::OrderedLock lock;               //!< @brief Lock to ensure in order execution
+    genie::core::stats::SamStats *stats;  //!< @brief Stats collector (null => don't collect)
 
    public:
-    Importer(size_t _blockSize, std::istream &_file);
+    Importer(size_t _blockSize, std::istream &_file, genie::core::stats::SamStats *_stats = nullptr);
 
     static std::tuple<bool, uint8_t> convertFlags2Mpeg(uint16_t flags);
 

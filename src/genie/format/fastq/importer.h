@@ -11,6 +11,7 @@
 
 #include <format-importer.h>
 #include <genie/core/record/record.h>
+#include <genie/core/stats/perf-stats.h>
 #include <genie/util/exceptions.h>
 #include <genie/util/make-unique.h>
 #include <genie/util/ordered-lock.h>
@@ -33,6 +34,7 @@ class Importer : public core::FormatImporter {
     std::vector<std::istream *> file_list;         //!< @brief Input streams (paired files supported)
     size_t record_counter;                         //!< @brief ID of next data chunk
     util::OrderedLock lock;                        //!< @brief Lock to ensure in order execution
+    genie::core::stats::FastqStats *stats;         //!< @brief Stats collector (null => don't collect)
 
     enum Lines { ID = 0, SEQUENCE = 1, RESERVED = 2, QUALITY = 3 };  //!< @brief FASTQ format lines
     enum Files { FIRST = 0, SECOND = 1 };                            //!< @brief File shortcuts
@@ -64,7 +66,7 @@ class Importer : public core::FormatImporter {
      * @param _blockSize How many records to extract per pump()
      * @param _file_1 Input file
      */
-    Importer(size_t _blockSize, std::istream &_file_1);
+    Importer(size_t _blockSize, std::istream &_file_1, genie::core::stats::FastqStats *_stats = nullptr);
 
     /**
      * @brief Paired input
@@ -72,7 +74,7 @@ class Importer : public core::FormatImporter {
      * @param _file_1 Input file #1
      * @param _file_2 Input file #2
      */
-    Importer(size_t _blockSize, std::istream &_file_1, std::istream &_file_2);
+    Importer(size_t _blockSize, std::istream &_file_1, std::istream &_file_2, genie::core::stats::FastqStats *_stats = nullptr);
 
     /**
      * @brief Process one block of data and propagate it to the next module in the chain
