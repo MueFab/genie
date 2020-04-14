@@ -67,7 +67,7 @@ void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::
     const uint64_t symbolsCount = (*transformedSubseqs)[0].size();
     symbols.resize(symbolsCount);
     symbols.setWordSize(paramcabac::StateVars::getLgWordSize(subseqShiftSizes[subseqCount-1] +
-                                                              subseqCfg.getTransformSubseqCfg(subseqCount-1).getSupportValues().getOutputSymbolSize()));
+                                                             subseqCfg.getTransformSubseqCfg(subseqCount-1).getSupportValues().getOutputSymbolSize()));
 
     for (uint64_t i = 0; i < symbolsCount; i++) {
         uint64_t symbolValue = 0;
