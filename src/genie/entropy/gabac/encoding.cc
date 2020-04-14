@@ -20,31 +20,66 @@
 #include "writer.h"
 #include "exceptions.h"
 
+#include "equality-subseq-transform.h"
+#include "match-subseq-transform.h"
+#include "rle-subseq-transform.h"
+#include "merge-subseq-transform.h"
+
 namespace genie {
 namespace entropy {
 namespace gabac {
 
-
-/* RESTRUCT_DISABLE
-void doSequenceTransform(const gabac::SequenceTransformationId &transID, uint64_t param,
-                         std::vector<util::DataBlock> *const transformedSubSeqs) {
+static inline
+void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
+                         std::vector<util::DataBlock> *const transformedSubseqs) {
     // GABACIFY_LOG_TRACE << "Encoding sequence of length: " <<
     // (*transformedSequences)[0].size();
 
     // GABACIFY_LOG_DEBUG << "Performing sequence transformation " <<
     // gabac::transformationInformation[id].name;
 
-    getTransformation(transID).transform({param}, transformedSubSeqs);
+    const paramcabac::TransformedParameters& trnsfSubseqParams = subseqCfg.getTransformParameters();
+    const uint16_t param = trnsfSubseqParams.getParam(); // get first param
+
+    switch(trnsfSubseqParams.getTransformIdSubseq()) {
+        case paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM:
+            transformedSubseqs->resize(1);
+        break;
+        case paramcabac::TransformedParameters::TransformIdSubseq::EQUALITY_CODING:
+            transformedSubseqs->resize(2);
+            (*transformedSubseqs)[1] = util::DataBlock(0, 1); // FIXME shouldn't this wsize=1 be based on outputSymbolSize?
+            transformEqualityCoding(&(*transformedSubseqs)[0], &(*transformedSubseqs)[1]);
+        break;
+        case paramcabac::TransformedParameters::TransformIdSubseq::MATCH_CODING:
+            transformedSubseqs->resize(3);
+            assert(param <= std::numeric_limits<uint32_t>::max());
+            (*transformedSubseqs)[1] = util::DataBlock(0, 4); // FIXME shouldn't this wsize=4 be based on outputSymbolSize?
+            (*transformedSubseqs)[2] = util::DataBlock(0, 4); // FIXME shouldn't this wsize=4 be based on outputSymbolSize?
+            transformMatchCoding(static_cast<uint32_t>(param), &(*transformedSubseqs)[0],
+                                 &(*transformedSubseqs)[1], &(*transformedSubseqs)[2]);
+        break;
+        case paramcabac::TransformedParameters::TransformIdSubseq::RLE_CODING:
+            transformedSubseqs->resize(2);
+            (*transformedSubseqs)[1] = util::DataBlock(0, 1); // FIXME shouldn't this wsize=1 be based on outputSymbolSize?
+            transformRleCoding(param, &(*transformedSubseqs)[0], &(*transformedSubseqs)[1]);
+        break;
+        case paramcabac::TransformedParameters::TransformIdSubseq::MERGE_CODING:
+            transformMergeCoding(subseqCfg, transformedSubseqs);
+        break;
+        default:
+            GABAC_DIE("Invalid subseq transforamtion");
+        break;
+    }
 
     // GABACIFY_LOG_TRACE << "Got " << transformedSequences->size() << "
     // sequences";
-    for (unsigned i = 0; i < transformedSubSeqs->size(); ++i) {
+    for (unsigned i = 0; i < transformedSubseqs->size(); ++i) {
         // GABACIFY_LOG_TRACE << i << ": " << (*transformedSequences)[i].size()
         // << " bytes";
     }
 }
 
-
+/*
 static void encodeSingleSequence(const paramcabac::TransformedSeq &cfg,
                                  util::DataBlock *const seq,
                                  std::ostream *out,
@@ -85,11 +120,8 @@ void encode(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
         transformedSubseqs.resize(1);
         transformedSubseqs[0].swap(&sequence);
 
-        /* RESTRUCT_DISABLE
         // Put symbol stream in, get transformed streams out
-        doSequenceTransform(enConf.subseq.getTransformParameters().getTransformIdSubseq(),
-                            enConf.subseq.getTransformParameters().getParam(),
-                            &transformedSubseqs);*/
+        doSubsequenceTransform(enConf.getSubseqConfig(), &transformedSubseqs);
 
         // Loop through the transformed sequences
         for (size_t i = 0; i < transformedSubseqs.size(); i++) {
