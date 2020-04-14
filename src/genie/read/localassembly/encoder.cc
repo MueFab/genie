@@ -135,16 +135,18 @@ void Encoder::flowIn(core::record::Chunk&& t, size_t id) {
     auto ref = data.front().getAlignmentSharedData().getSeqID();
     uint64_t lastPos = 0;
     core::QVEncoder::QVCoded qv(nullptr, core::AccessUnitRaw::Descriptor(core::GenDesc::QV));
-    uint8_t qvdepth = data.front().getSegments().front().getQualities().size();
+    uint8_t qvdepth = qvcoder ? data.front().getSegments().front().getQualities().size() : 0;
     if (qvcoder) {
         qv = qvcoder->encode(data);
+    } else {
+        qv.first = quality::paramqv1::QualityValues1::getDefaultSet(core::record::ClassType::CLASS_I);
     }
     core::AccessUnitRaw::Descriptor rname(core::GenDesc::RNAME);
     if (namecoder) {
         rname = namecoder->encode(data);
     }
     for (auto& r : data) {
-        UTILS_DIE_IF(r.getSegments().front().getQualities().size() != qvdepth, "QV_depth not compatible");
+        UTILS_DIE_IF(r.getSegments().front().getQualities().size() != qvdepth && qvcoder, "QV_depth not compatible");
         UTILS_DIE_IF(r.getAlignments().front().getPosition() < lastPos,
                      "Data seems to be unsorted. Local assembly encoding needs sorted input data.");
 

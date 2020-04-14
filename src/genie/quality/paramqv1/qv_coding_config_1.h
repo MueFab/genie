@@ -70,6 +70,21 @@ class QualityValues1 : public core::parameter::QualityValues {
         return pSet[uint8_t(id)];
     }
 
+    static std::unique_ptr<core::parameter::QualityValues> getDefaultSet(core::record::ClassType type) {
+        auto ret = util::make_unique<paramqv1::QualityValues1>(QvpsPresetId::ASCII, false);
+        ParameterSet set;
+
+        auto codebook = QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);
+        set.addCodeBook(std::move(codebook));
+
+        if(type == core::record::ClassType::CLASS_I || type == core::record::ClassType::CLASS_HM) {
+            codebook = paramqv1::QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);
+            set.addCodeBook(std::move(codebook));
+        }
+        ret->setQvps(std::move(set));
+        return ret;
+    }
+
     size_t getNumberCodeBooks() const {
         if (qvps_preset_ID.is_initialized()) {
             return 1;
