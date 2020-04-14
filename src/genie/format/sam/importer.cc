@@ -185,7 +185,7 @@ bool Importer::pump(size_t id) {
         const std::string &rnameSearchString =
             samRecord.getRnext() == "=" ? samRecord.getRname() : samRecord.getRnext();
         auto mate = samRecords.begin();
-        mate = samRecords.end();  // Disable pairs for now TODO: implement
+     //   mate = samRecords.end();  // Disable pairs for now TODO: implement
         if (samRecord.getPnext() == samRecord.getPos() && samRecord.getRname() == rnameSearchString) {
             mate = samRecords.end();
         }
