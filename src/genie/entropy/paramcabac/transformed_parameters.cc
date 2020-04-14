@@ -96,7 +96,7 @@ uint16_t TransformedParameters::getParam() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<uint8_t> *TransformedParameters::getMergeCodingShiftSize() const { return &merge_coding_shift_size; }
+const std::vector<uint8_t> TransformedParameters::getMergeCodingShiftSize() const { return merge_coding_shift_size; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
