@@ -233,11 +233,6 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
                     out << quality_array[i - block_start[start_block_num]] << "\n";
         }
         start_block_num = end_block_num;
-
-        if (stats->enabled) {
-            stats->cmprs_qual_sz += size;
-            stats->cmprs_total_sz += size;
-        }
     }
 }
 
@@ -304,12 +299,6 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 out << *i << "\n";
             }
         }  // omp parallel
-
-        if (stats->enabled) {
-            stats->cmprs_id_sz += id_size;
-            stats->cmprs_qual_sz += qual_size;
-            stats->cmprs_total_sz += id_size + qual_size;
-        }
     }
 }
 

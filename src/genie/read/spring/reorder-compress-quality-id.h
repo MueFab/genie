@@ -9,7 +9,7 @@
 
 #include <string>
 
-#include <genie/util/perf-stats.h>
+#include <genie/core/stats/perf-stats.h>
 #include "util.h"
 
 namespace genie {

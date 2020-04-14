@@ -11,8 +11,8 @@
 #include <string>
 
 #include <genie/core/access-unit-raw.h>
+#include <genie/core/stats/perf-stats.h>
 #include <genie/stream-saver.h>
-#include <genie/util/perf-stats.h>
 #include "util.h"
 
 namespace genie {
@@ -63,7 +63,7 @@ void compress_subseqs(subseq_data *data,
                       const std::vector<std::vector<entropy::gabac::EncodingConfiguration>> &configs);
 
 core::AccessUnitRaw generate_read_streams(const std::string &temp_dir, const compression_params &cp,
-                                          util::FastqStats *stats);
+                                          genie::core::stats::FastqStats *stats);
 
 core::AccessUnitRaw generate_read_streams_se(const se_data &data, uint64_t block_num);
 

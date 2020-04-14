@@ -5,7 +5,7 @@
  */
 
 #include <genie/util/bitwriter.h>
-#include <genie/util/perf-stats.h>
+#include <genie/core/stats/perf-stats.h>
 #include <fstream>
 #include <stdexcept>
 #include <string>
@@ -17,7 +17,7 @@ namespace read {
 namespace spring {
 
 /*void combine_aus(const std::string &temp_dir, compression_params &cp, const
-std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::string &outputFilePath, util::FastqStats
+std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::string &outputFilePath, genie::core::stats::FastqStats
 *stats) { using namespace format; std::ofstream ofstr(outputFilePath); util::BitWriter bw(&ofstr);
 
   // write parameter set
@@ -29,7 +29,6 @@ std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::stri
                                             .core::mgrec::ClassType::CLASS_U, configs, true);
   auto crps = util::make_unique<ParameterSetCrps>(ParameterSetCrps::CrAlgId::GLOBAL_ASSEMBLY);
   ps.setCrps(std::move(crps));
-  // FIXME add in size written to stats->cmprs_total_sz
   ps.write(&bw);
 
   // read info about number of blocks (AUs) and the number of reads and records in those
@@ -70,7 +69,6 @@ std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::stri
     AccessUnit au = createQuickAccessUnit(
         auId, PARAMETER_SET_ID, num_reads_per_AU[auId], .core::mgrec::ClassType::CLASS_U,
         DataUnit::DatasetType::NON_ALIGNED, &generated_streams, num_records_per_AU[auId]);
-    // FIXME add in size written to stats
     au.write(&bw);
   }
 }*/

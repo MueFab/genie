@@ -7,7 +7,7 @@
 namespace lae {
 
 ProgramOptions::ProgramOptions(int argc, char *argv[])
-    : inputFilePath(), outputFilePath(), decompression(false), num_threads(1), forceOverride(false) {
+    : inputFilePath(), outputFilePath(), decompression(false), num_threads(1), forceOverride(false), stats(false) {
     processCommandLine(argc, argv);
 }
 

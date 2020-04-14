@@ -16,13 +16,13 @@ namespace fastq {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Importer::Importer(size_t _blockSize, std::istream &_file_1)
-    : blockSize(_blockSize), file_list{&_file_1}, record_counter(0) {}
+Importer::Importer(size_t _blockSize, std::istream &_file_1, genie::core::stats::FastqStats *_stats)
+    : blockSize(_blockSize), file_list{&_file_1}, record_counter(0), stats(_stats) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Importer::Importer(size_t _blockSize, std::istream &_file_1, std::istream &_file_2)
-    : blockSize(_blockSize), file_list{&_file_1, &_file_2}, record_counter(0) {}
+Importer::Importer(size_t _blockSize, std::istream &_file_1, std::istream &_file_2, genie::core::stats::FastqStats *_stats)
+    : blockSize(_blockSize), file_list{&_file_1, &_file_2}, record_counter(0), stats(_stats) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

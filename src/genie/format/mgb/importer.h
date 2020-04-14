@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/core/stats/perf-stats.h>
 #include <genie/util/bitreader.h>
 #include <genie/util/ordered-section.h>
 #include <genie/util/original-source.h>
@@ -29,10 +30,11 @@ class Importer : public util::Source<core::AccessUnitPayload>, public util::Orig
     util::BitReader reader;
     std::map<size_t, core::parameter::ParameterSet> parameterSets;
     util::OrderedLock lock;
+    genie::core::stats::PerfStats *stats;
     mgb::DataUnitFactory factory;
 
    public:
-    explicit Importer(std::istream& _file);
+    explicit Importer(std::istream& _file, genie::core::stats::PerfStats *_stats = nullptr);
 
     bool pump(size_t id) override;
 

@@ -22,7 +22,7 @@ const header::Header& Reader::getHeader() const { return header; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Reader::read(size_t num, std::vector<Record>& vec) {
+void Reader::read(size_t num, std::vector<Record>& vec, genie::core::stats::SamStats *stats) {
     std::string string;
     vec.clear();
     if (rec_saved) {
@@ -30,7 +30,8 @@ void Reader::read(size_t num, std::vector<Record>& vec) {
         vec.emplace_back(std::move(save));
     }
     while (num && std::getline(stream, string)) {
-        vec.emplace_back(string);
+        Record rec(string, stats);
+        vec.emplace_back(rec);
         if (vec.front().getRname() != vec.back().getRname()) {
             save = std::move(vec.back());
             vec.pop_back();
