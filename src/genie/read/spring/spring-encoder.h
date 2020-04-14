@@ -8,7 +8,7 @@
 #define GENIE_SPRING_ENCODER_H
 
 #include <genie/core/read-encoder.h>
-#include <genie/util/perf-stats.h>
+#include <genie/core/stats/perf-stats.h>
 #include "preprocess.h"
 
 namespace genie {
@@ -18,9 +18,9 @@ namespace spring {
 class SpringEncoder : public genie::core::ReadEncoder {
    private:
     Preprocessor preprocessor;
-    util::FastqStats* stats;
+    core::stats::FastqStats* stats;
    public:
-    SpringEncoder(genie::core::QVEncoder* coder, genie::core::NameEncoder* ncoder, const std::string& working_dir, util::FastqStats* _stats) : genie::core::ReadEncoder(coder, ncoder), stats(_stats) {
+    SpringEncoder(genie::core::QVEncoder* coder, genie::core::NameEncoder* ncoder, const std::string& working_dir, core::stats::FastqStats* _stats) : genie::core::ReadEncoder(coder, ncoder), stats(_stats) {
         preprocessor.setup(ncoder, coder, working_dir);
 
     }
