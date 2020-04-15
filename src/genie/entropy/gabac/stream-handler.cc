@@ -14,40 +14,49 @@ namespace gabac {
 #define UINT_MAX_LENGTH (sizeof(uint64_t))
 #define U7_MAX_LENGTH   (((sizeof(uint64_t) + 6) / 7) * 8)
 
-uint64_t StreamHandler::readUInt(std::istream &input, size_t numBytes) {
+size_t StreamHandler::readUInt(std::istream &input, uint64_t& retVal, size_t numBytes) {
     uint8_t bytes[UINT_MAX_LENGTH] = {0};
 
     input.read(reinterpret_cast<char *>(bytes), numBytes);
 
-    uint64_t retVal = 0;
-    size_t b = 0;
+    retVal = 0;
+    size_t c = 0; // counter
     while(numBytes-- > 0)
     {
-        retVal = (retVal << 8) | bytes[b++];
+        retVal = (retVal << 8) | bytes[c++];
     }
-    return retVal;
+
+    return c;
 }
 
-size_t StreamHandler::readU7(std::istream &input) {
-    uint64_t retVal = 0;
-    size_t retValSize = 0;
+size_t StreamHandler::readU7(std::istream &input, uint64_t& retVal) {
+    size_t c = 0; // counter
     uint8_t byte;
+    retVal = 0;
 
     do {
-        if (retValSize == U7_MAX_LENGTH) GABAC_DIE("readU7: out of range");
-        retValSize++;
+        if (c == U7_MAX_LENGTH) GABAC_DIE("readU7: out of range");
+        c++;
 
         input.read(reinterpret_cast<char *>(&byte), 1);
         retVal = (retVal << 7) | (byte & 0x7F);
     } while ((byte & 0x80) != 0);
 
-    return retVal;
+    return c;
 }
 
-size_t StreamHandler::readStream(std::istream &input, util::DataBlock *buffer, size_t& numSymbols) {
-    size_t streamSize = readUInt(input, 4);
-    numSymbols = readUInt(input, 4);
-    return readBytes(input, streamSize-4, buffer);
+size_t StreamHandler::readStream(std::istream &input, util::DataBlock *buffer, uint64_t& numSymbols) {
+    size_t streamSize = 0;
+    uint64_t payloadSize = 0 ;
+    streamSize += readUInt(input, payloadSize, 4);
+
+    numSymbols = 0;
+    if(payloadSize >= 4) {
+        streamSize += readUInt(input, numSymbols, 4);
+        streamSize += readBytes(input, payloadSize-4, buffer);
+    }
+
+    return streamSize;
 }
 
 size_t StreamHandler::readBytes(std::istream &input, size_t bytes, util::DataBlock *buffer) {
@@ -104,6 +113,14 @@ size_t StreamHandler::readBlock(std::istream &input, size_t bytes, util::DataBlo
     return buffer->size();
 }
 
+size_t StreamHandler::readStreamSize(std::istream& input) {
+    input.seekg (0, input.end);
+    size_t length = input.tellg();
+    input.seekg (0, input.beg);
+
+    return length;
+}
+
 size_t StreamHandler::writeUInt(std::ostream &output, uint64_t value, size_t numBytes) {
     uint8_t bytes[UINT_MAX_LENGTH] = {0};
     size_t c = 0; // counter
@@ -137,11 +154,15 @@ size_t StreamHandler::writeU7(std::ostream &output, uint64_t value) {
     return c;
 }
 
-size_t StreamHandler::writeStream(std::ostream &output, util::DataBlock *buffer, size_t numSymbols) {
-    uint32_t streamSize = buffer->getRawSize() + 4;
-    writeUInt(output, streamSize, 4);
-    writeUInt(output, numSymbols, 4);
-    return writeBytes(output, buffer);
+size_t StreamHandler::writeStream(std::ostream &output, util::DataBlock *buffer, uint64_t numSymbols) {
+    size_t streamSize = 0;
+    uint64_t payloadSize = buffer->getRawSize()+((numSymbols)?4:0);
+    streamSize += writeUInt(output, payloadSize, 4);
+    if(payloadSize >= 4) {
+        streamSize += writeUInt(output, numSymbols, 4);
+        streamSize += writeBytes(output, buffer);
+    }
+    return streamSize;
 }
 
 size_t StreamHandler::writeBytes(std::ostream &output, util::DataBlock *buffer) {
