@@ -104,18 +104,20 @@ size_t StreamHandler::readBlock(std::istream &input, size_t bytes, util::DataBlo
     return buffer->size();
 }
 
-void StreamHandler::writeUInt(std::ostream &output, uint64_t value, size_t numBytes) {
+size_t StreamHandler::writeUInt(std::ostream &output, uint64_t value, size_t numBytes) {
     uint8_t bytes[UINT_MAX_LENGTH] = {0};
-    size_t b = 0;
+    size_t c = 0; // counter
     while(numBytes-- > 0) {
-        bytes[b++] = (value >> (numBytes * 8)) & 0xFF;
+        bytes[c++] = (value >> (numBytes * 8)) & 0xFF;
     }
-    output.write(reinterpret_cast<char *>(bytes), b);
+    output.write(reinterpret_cast<char *>(bytes), c);
+
+    return c;
 }
 
-void StreamHandler::writeU7(std::ostream &output, uint64_t value) {
+size_t StreamHandler::writeU7(std::ostream &output, uint64_t value) {
     uint8_t bytes[U7_MAX_LENGTH] = {0};
-    size_t b = 0;
+    size_t c = 0; // counter
     int shift;
     const int inputMaxSize = sizeof(value) * 8;
     for (shift = 0; (shift < inputMaxSize) && ((value >> shift) != 0);
@@ -127,10 +129,12 @@ void StreamHandler::writeU7(std::ostream &output, uint64_t value) {
                 ((value >> shift) & 0x7F)
                 |
                 (shift > 0 ? 0x80 : 0x00));
-        bytes[b++] = code;
+        bytes[c++] = code;
     }
 
-    output.write(reinterpret_cast<char *>(bytes), b);
+    output.write(reinterpret_cast<char *>(bytes), c);
+
+    return c;
 }
 
 size_t StreamHandler::writeStream(std::ostream &output, util::DataBlock *buffer, size_t numSymbols) {
