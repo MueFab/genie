@@ -95,25 +95,18 @@ static void encodeSingleSequence(const paramcabac::TransformedSeq &cfg,
 
 void encode(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
     conf.validate();
-    util::DataBlock sequence(0, 4);
-    util::DataBlock dependency(0, 4);
-    size_t size = 0;
-    if (!conf.blocksize) {
-        size = gabac::StreamHandler::readFull(*conf.inputStream, &sequence);
-        if(conf.dependencyStream != nullptr) {
-            if(size != gabac::StreamHandler::readFull(*conf.dependencyStream, &dependency)) {
-                GABAC_DIE("Size mismatch between dependency and descriptor subsequence");
-            }
-        }
-    } else {
-        size = gabac::StreamHandler::readBlock(*conf.inputStream, conf.blocksize, &sequence);
-        if(conf.dependencyStream != nullptr) {
-            if(size != gabac::StreamHandler::readBlock(*conf.dependencyStream, conf.blocksize, &dependency)) {
-                GABAC_DIE("Size mismatch between dependency and descriptor subsequence");
-            }
+    util::DataBlock sequence(0, 4);  //FIXME
+    util::DataBlock dependency(0, 4);//FIXME
+    size_t numDescSubseqSymbols = 0;
+
+    numDescSubseqSymbols = gabac::StreamHandler::readFull(*conf.inputStream, &sequence);
+    if(conf.dependencyStream != nullptr) {
+        if(numDescSubseqSymbols != gabac::StreamHandler::readFull(*conf.dependencyStream, &dependency)) {
+            GABAC_DIE("Size mismatch between dependency and descriptor subsequence");
         }
     }
-    while (size) {
+
+    if(numDescSubseqSymbols > 0) {
         // Insert sequence into vector
         std::vector<util::DataBlock> transformedSubseqs;
         transformedSubseqs.resize(1);
@@ -121,31 +114,23 @@ void encode(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
 
         // Put symbol stream in, get transformed streams out
         doSubsequenceTransform(enConf.getSubseqConfig(), &transformedSubseqs);
+        const size_t numTrnsfSubseqs = transformedSubseqs.size();
 
         // Loop through the transformed sequences
-        for (size_t i = 0; i < transformedSubseqs.size(); i++) {
+        for (size_t i = 0; i < numTrnsfSubseqs; i++) {
             size_t numSymbols = transformedSubseqs[i].size();
-            if(numSymbols <= 0) return;
+            if(numSymbols > 0) {
+                // Encoding
+                gabac::encode_cabac(enConf.subseq.getTransformSubseqCfg(i),
+                                    &(transformedSubseqs[i]),
+                                    (dependency.size()) ? &dependency : nullptr);
 
-            // Encoding
-            gabac::encode_cabac(enConf.subseq.getTransformSubseqCfg(i),
-                                &(transformedSubseqs[i]),
-                                (dependency.size()) ? &dependency : nullptr);
-
-            printf("compressed size: %lu\n", transformedSubseqs[i].getRawSize()+4);
-            gabac::StreamHandler::writeStream(*conf.outputStream, &transformedSubseqs[i], numSymbols);
-        }
-        if (conf.blocksize) {
-            // RESTRUCT_DISABLE sequence.setWordSize(static_cast<uint8_t>(enConf.wordSize));
-            size = gabac::StreamHandler::readBlock(*conf.inputStream, conf.blocksize, &sequence);
-            if(conf.dependencyStream != nullptr) {
-                if(size != gabac::StreamHandler::readBlock(*conf.dependencyStream, conf.blocksize, &dependency)) {
-                    GABAC_DIE("Size mismatch between dependency and descriptor subsequence");
-                }
+                printf("compressed size: %lu\n", transformedSubseqs[i].getRawSize()+4);
+                gabac::StreamHandler::writeStream(*conf.outputStream, &transformedSubseqs[i], numSymbols);
             }
-        } else {
-            size = 0;
         }
+
+        numDescSubseqSymbols = 0;
     }
 }
 }  // namespace gabac
