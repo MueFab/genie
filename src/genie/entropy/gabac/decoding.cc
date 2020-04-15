@@ -71,60 +71,81 @@ void doInverseSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
     }
 }
 
-static inline
-void decodeSingleSequence(const paramcabac::TransformedSubSeq &transformedSubseqCfg,
-                          std::istream *inStream,
-                          util::DataBlock *const decodedTransformedSubseq,
-                          util::DataBlock *const dependencySubseq = nullptr) {
-    size_t numEncodedSymbols = 0;
-    size_t streamSize = StreamHandler::readStream(*inStream, decodedTransformedSubseq, numEncodedSymbols);
-    if (streamSize <= 0 || numEncodedSymbols <= 0) return;
-
-    // Decoding
-    gabac::decode_cabac(transformedSubseqCfg, numEncodedSymbols, decodedTransformedSubseq, dependencySubseq);
-}
-
-void decode(const IOConfiguration &ioConf, const EncodingConfiguration &enConf) {
+unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const EncodingConfiguration &enConf) {
     util::DataBlock dependency(0, 4);
-    size_t size = 0;
-    if(ioConf.dependencyStream != nullptr) {
-        if (!ioConf.blocksize) {
-            if(size == gabac::StreamHandler::readFull(*ioConf.dependencyStream, &dependency)) {
-                GABAC_DIE("Dependency file is empty");
-            }
-        } else {
-            if(size == gabac::StreamHandler::readBlock(*ioConf.dependencyStream, ioConf.blocksize, &dependency)) {
-                GABAC_DIE("Dependency file is empty");
-            }
-        } // FIXME the support for blockSize might need to be removed. TBD. For the moment read whole file.
+
+    uint64_t subseqPayloadSizeUsed = 0;
+    uint64_t numDescSubseqSymbols = 0;
+    const uint64_t subseqPayloadSize = gabac::StreamHandler::readStreamSize(*ioConf.inputStream);
+
+    if (subseqPayloadSize <= 0) return 0;
+
+    // read number of symbols in descriptor subsequence
+    if(enConf.getSubseqConfig().getTokentypeFlag()) {
+        subseqPayloadSizeUsed += gabac::StreamHandler::readU7(*ioConf.inputStream, numDescSubseqSymbols);
+    } else {
+        subseqPayloadSizeUsed += gabac::StreamHandler::readUInt(*ioConf.inputStream, numDescSubseqSymbols, 4);
     }
 
-    while (ioConf.inputStream->peek() != EOF) {
-        // Set up for the inverse sequence transformation
-        size_t numTransformedSubSeqCfgs = enConf.subseq.getNumTransformSubseqCfgs();
-
-        // Loop through the transformed sequences
-        std::vector<util::DataBlock> transformedSubseqs;
-        for (size_t i = 0; i < numTransformedSubSeqCfgs; i++) {
-            // GABACIFY_LOG_TRACE << "Processing transformed sequence: " << i;
-            auto transformedSubseqCfg = enConf.subseq.getTransformSubseqCfg(i);
-
-            util::DataBlock decodedTransformedSubseq;
-
-            decodeSingleSequence(transformedSubseqCfg,
-                                 ioConf.inputStream,
-                                 &decodedTransformedSubseq,
-                                 (dependency.size()) ? &dependency : nullptr);
-
-            transformedSubseqs.emplace_back();
-            transformedSubseqs.back().swap(&(decodedTransformedSubseq));
+    if(numDescSubseqSymbols > 0) {
+        if(ioConf.dependencyStream != nullptr) {
+            if(numDescSubseqSymbols == gabac::StreamHandler::readFull(*ioConf.dependencyStream, &dependency)) {
+                GABAC_DIE("Dependency stream is empty");
+            }
         }
 
-        doInverseSubsequenceTransform(enConf.getSubseqConfig(), &transformedSubseqs);
-        // GABACIFY_LOG_TRACE << "Decoded sequence of length: " << transformedSubseqs[0].size();
+        if (ioConf.inputStream->peek() != EOF) {
+            // Set up for the inverse sequence transformation
+            size_t numTrnsfSubseqsCfgs = enConf.subseq.getNumTransformSubseqCfgs();
 
-        gabac::StreamHandler::writeBytes(*ioConf.outputStream, &transformedSubseqs[0]);
+            // Loop through the transformed sequences
+            std::vector<util::DataBlock> transformedSubseqs;
+            for (size_t i = 0; i < numTrnsfSubseqsCfgs; i++) {
+                // GABACIFY_LOG_TRACE << "Processing transformed sequence: " << i;
+                auto transformedSubseqCfg = enConf.subseq.getTransformSubseqCfg(i);
+
+                util::DataBlock decodedTransformedSubseq;
+                uint64_t numtrnsfSymbols = 0;
+                uint64_t trnsfSubseqPayloadSizeRemain = 0;
+
+                if(i < (numTrnsfSubseqsCfgs-1)) {
+                    subseqPayloadSizeUsed += gabac::StreamHandler::readUInt(*ioConf.inputStream, trnsfSubseqPayloadSizeRemain, 4);
+                } else {
+                    trnsfSubseqPayloadSizeRemain = subseqPayloadSize - subseqPayloadSizeUsed;
+                }
+
+                if(trnsfSubseqPayloadSizeRemain > 0) {
+                    if(numTrnsfSubseqsCfgs > 1) {
+                        subseqPayloadSizeUsed += gabac::StreamHandler::readUInt(*ioConf.inputStream, numtrnsfSymbols, 4);
+                        trnsfSubseqPayloadSizeRemain -= 4;
+                    } else {
+                        numtrnsfSymbols = numDescSubseqSymbols;
+                    }
+
+                    if (numtrnsfSymbols <= 0) continue;
+
+                    subseqPayloadSizeUsed += gabac::StreamHandler::readBytes(*ioConf.inputStream,
+                                                                             trnsfSubseqPayloadSizeRemain,
+                                                                             &decodedTransformedSubseq);
+
+                    // Decoding
+                    gabac::decode_cabac(transformedSubseqCfg,
+                                        numtrnsfSymbols,
+                                        &decodedTransformedSubseq,
+                                        (dependency.size()) ? &dependency : nullptr);
+                    transformedSubseqs.emplace_back();
+                    transformedSubseqs.back().swap(&(decodedTransformedSubseq));
+                }
+            }
+
+            doInverseSubsequenceTransform(enConf.getSubseqConfig(), &transformedSubseqs);
+            // GABACIFY_LOG_TRACE << "Decoded sequence of length: " << transformedSubseqs[0].size();
+
+            gabac::StreamHandler::writeBytes(*ioConf.outputStream, &transformedSubseqs[0]);
+        }
     }
+
+    return subseqPayloadSizeUsed;
 }
 
 }  // namespace gabac
