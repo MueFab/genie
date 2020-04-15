@@ -14,7 +14,7 @@ namespace gabac {
 struct IOConfiguration;
 struct EncodingConfiguration;
 
-void encode(const IOConfiguration& conf, const EncodingConfiguration& enConf);
+unsigned long encodeDescSubsequence(const IOConfiguration& conf, const EncodingConfiguration& enConf);
 
 }  // namespace gabac
 }  // namespace entropy
