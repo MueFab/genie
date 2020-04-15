@@ -22,11 +22,12 @@ Subsequence::Subsequence()
 
 Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters,
                          uint16_t _descriptor_subsequence_ID,
-                         bool tokentype,
+                         bool _tokentypeFlag,
                          std::vector<TransformedSubSeq>&& _transformSubseq_cfgs)
     : descriptor_subsequence_ID(),
+      tokentypeFlag(_tokentypeFlag),
       transform_subseq_parameters(std::move(_transform_subseq_parameters)) {
-    if (!tokentype) {
+    if (!tokentypeFlag) {
         descriptor_subsequence_ID = _descriptor_subsequence_ID;
     }
 
@@ -38,7 +39,8 @@ Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters,
 // ---------------------------------------------------------------------------------------------------------------------
 
 Subsequence::Subsequence(bool tokentype, util::BitReader& reader) {
-    if (!tokentype) {
+    tokentypeFlag = tokentype;
+    if (!tokentypeFlag) {
         descriptor_subsequence_ID = reader.read<uint16_t>(10);
     }
     transform_subseq_parameters = TransformedParameters(reader);
@@ -105,6 +107,10 @@ size_t Subsequence::getNumTransformSubseqCfgs() const { return transformSubseq_c
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::vector<TransformedSubSeq>& Subsequence::getTransformSubseqCfgs() const { return transformSubseq_cfgs; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Subsequence::getTokentypeFlag() const { return tokentypeFlag; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
