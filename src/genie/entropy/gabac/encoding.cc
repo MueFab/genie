@@ -78,28 +78,14 @@ void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
     }
 }
 
-/*
-static void encodeSingleSequence(const paramcabac::TransformedSeq &cfg,
-                                 util::DataBlock *const seq,
-                                 std::ostream *out,
-                                 util::DataBlock *const dep = nullptr) {
-    size_t numSymbols = seq->size();
-    if(numSymbols <= 0) return;
-
-    // Encoding
-    gabac::encode_cabac(cfg, seq, dep);
-
-    printf("compressed size: %lu\n", seq->getRawSize());
-    gabac::StreamHandler::writeStream(*out, seq);
-}*/
-
-void encode(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
+unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
     conf.validate();
-    util::DataBlock sequence(0, 4);  //FIXME
-    util::DataBlock dependency(0, 4);//FIXME
+    util::DataBlock subsequence(0, 4);  //FIXME
+    util::DataBlock dependency(0, 4);   //FIXME
     size_t numDescSubseqSymbols = 0;
+    size_t subseqPayloadSize = 0;
 
-    numDescSubseqSymbols = gabac::StreamHandler::readFull(*conf.inputStream, &sequence);
+    numDescSubseqSymbols = gabac::StreamHandler::readFull(*conf.inputStream, &subsequence);
     if(conf.dependencyStream != nullptr) {
         if(numDescSubseqSymbols != gabac::StreamHandler::readFull(*conf.dependencyStream, &dependency)) {
             GABAC_DIE("Size mismatch between dependency and descriptor subsequence");
@@ -107,31 +93,50 @@ void encode(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
     }
 
     if(numDescSubseqSymbols > 0) {
-        // Insert sequence into vector
+        // write number of symbols in descriptor subsequence
+        if(enConf.getSubseqConfig().getTokentypeFlag()) {
+            subseqPayloadSize += gabac::StreamHandler::writeU7(*conf.outputStream, numDescSubseqSymbols);
+        } else {
+            subseqPayloadSize += gabac::StreamHandler::writeUInt(*conf.outputStream, numDescSubseqSymbols, 4);
+        }
+
+        // Insert subsequence into vector
         std::vector<util::DataBlock> transformedSubseqs;
         transformedSubseqs.resize(1);
-        transformedSubseqs[0].swap(&sequence);
+        transformedSubseqs[0].swap(&subsequence);
 
-        // Put symbol stream in, get transformed streams out
+        // Put descriptor subsequence, get transformed subsequences out
         doSubsequenceTransform(enConf.getSubseqConfig(), &transformedSubseqs);
         const size_t numTrnsfSubseqs = transformedSubseqs.size();
 
         // Loop through the transformed sequences
         for (size_t i = 0; i < numTrnsfSubseqs; i++) {
-            size_t numSymbols = transformedSubseqs[i].size();
-            if(numSymbols > 0) {
+            uint64_t numtrnsfSymbols = transformedSubseqs[i].size();
+            uint64_t trnsfSubseqPayloadSize = 0;
+            if(numtrnsfSymbols > 0) {
                 // Encoding
                 gabac::encode_cabac(enConf.subseq.getTransformSubseqCfg(i),
                                     &(transformedSubseqs[i]),
                                     (dependency.size()) ? &dependency : nullptr);
 
-                printf("compressed size: %lu\n", transformedSubseqs[i].getRawSize()+4);
-                gabac::StreamHandler::writeStream(*conf.outputStream, &transformedSubseqs[i], numSymbols);
+                trnsfSubseqPayloadSize = transformedSubseqs[i].getRawSize();
+            }
+
+            if(i < (numTrnsfSubseqs-1)) {
+                subseqPayloadSize += gabac::StreamHandler::writeUInt(*conf.outputStream, trnsfSubseqPayloadSize, 4);
+            }
+
+            if(numTrnsfSubseqs > 1) {
+                subseqPayloadSize += gabac::StreamHandler::writeUInt(*conf.outputStream, numtrnsfSymbols, 4);
+            }
+
+            if(trnsfSubseqPayloadSize > 0) {
+                subseqPayloadSize += gabac::StreamHandler::writeBytes(*conf.outputStream, &transformedSubseqs[i]);
             }
         }
-
-        numDescSubseqSymbols = 0;
     }
+
+    return subseqPayloadSize;
 }
 }  // namespace gabac
 }  // namespace entropy
