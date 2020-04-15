@@ -21,7 +21,7 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::vector<
     assert(transformedSubseqs != nullptr);
     const paramcabac::TransformedParameters& trnsfSubseqParams = subseqCfg.getTransformParameters();
     const uint16_t subseqCount = trnsfSubseqParams.getParam();
-    const std::vector<uint8_t> subseqShiftSizes = trnsfSubseqParams.getMergeCodingShiftSize();
+    const std::vector<uint8_t> subseqShiftSizes = trnsfSubseqParams.getMergeCodingShiftSizes();
     const std::vector<paramcabac::TransformedSubSeq>& trnsfCfgs = subseqCfg.getTransformSubseqCfgs();
 
     if (subseqCount <= 0) {
@@ -34,11 +34,11 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::vector<
     transformedSubseqs->resize(subseqCount);
 
     const uint64_t symbolsCount = symbols.size();
-    std::vector<uint64_t> trnsSubseqMasks(0, subseqCount);
+    std::vector<uint64_t> trnsSubseqMasks(subseqCount, 0);
     for (uint64_t ts = 0; ts < subseqCount; ts++) {
         const uint8_t codingSubsymSize = trnsfCfgs[ts].getSupportValues().getCodingSubsymSize();
         trnsSubseqMasks[ts] = (1u<<codingSubsymSize)-1;
-        (*transformedSubseqs)[ts].setWordSize(paramcabac::StateVars::getLgWordSize(trnsfCfgs[ts].getSupportValues().getOutputSymbolSize()));
+        (*transformedSubseqs)[ts].setWordSize(paramcabac::StateVars::getMinimalSizeInBytes(trnsfCfgs[ts].getSupportValues().getOutputSymbolSize()));
         (*transformedSubseqs)[ts].resize(symbolsCount);
     }
 
@@ -56,18 +56,16 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::vector<
 void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs) {
     const paramcabac::TransformedParameters& trnsfSubseqParams = subseqCfg.getTransformParameters();
     const uint16_t subseqCount = trnsfSubseqParams.getParam();
-    const std::vector<uint8_t> subseqShiftSizes = trnsfSubseqParams.getMergeCodingShiftSize();
+    const std::vector<uint8_t> subseqShiftSizes = trnsfSubseqParams.getMergeCodingShiftSizes();
 
     if (subseqCount <= 0 || subseqCount != (*transformedSubseqs).size()) {
         GABAC_DIE("invalid subseq_count for merge coding");
     }
 
     // Prepare the output data structure
-    util::DataBlock symbols(0, 1);
     const uint64_t symbolsCount = (*transformedSubseqs)[0].size();
-    symbols.resize(symbolsCount);
-    symbols.setWordSize(paramcabac::StateVars::getLgWordSize(subseqShiftSizes[subseqCount-1] +
-                                                             subseqCfg.getTransformSubseqCfg(subseqCount-1).getSupportValues().getOutputSymbolSize()));
+    util::DataBlock symbols(symbolsCount, 4);
+    // FIXME TODO paramcabac::StateVars::getMinimalSizeInBytes(subseqShiftSizes[0] + subseqCfg.getTransformSubseqCfg(0).getSupportValues().getOutputSymbolSize())
 
     for (uint64_t i = 0; i < symbolsCount; i++) {
         uint64_t symbolValue = 0;

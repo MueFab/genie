@@ -123,7 +123,7 @@ unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingC
             }
 
             if(i < (numTrnsfSubseqs-1)) {
-                subseqPayloadSize += gabac::StreamHandler::writeUInt(*conf.outputStream, trnsfSubseqPayloadSize, 4);
+                subseqPayloadSize += gabac::StreamHandler::writeUInt(*conf.outputStream, trnsfSubseqPayloadSize+4, 4);
             }
 
             if(numTrnsfSubseqs > 1) {
