@@ -12,11 +12,11 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-void run(const IOConfiguration& conf, const EncodingConfiguration& enConf, bool decode) {
+unsigned long run(const IOConfiguration& conf, const EncodingConfiguration& enConf, bool decode) {
     if (decode) {
-        gabac::decode(conf, enConf);
+        return gabac::decodeDescSubsequence(conf, enConf);
     } else {
-        gabac::encode(conf, enConf);
+        return gabac::encodeDescSubsequence(conf, enConf);
     }
 }
 }  // namespace gabac
