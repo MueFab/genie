@@ -26,39 +26,52 @@ void transformRleCoding(const uint64_t guard, util::DataBlock *const rawValues, 
     // input for rawValues is guaranteed to grow slower than reading process
     // -> in place possible
 
+    util::DataBlock trnsfRawValues(0, rawValues->getWordSize());
     util::BlockStepper r = rawValues->getReader();
-    util::BlockStepper w = rawValues->getReader();
 
-    uint64_t cur = r.get();
-    r.inc();
-    uint64_t lengthValue = 1;
+    uint64_t lastSym = 0;
+    uint64_t runValue = 0;
     while (r.isValid()) {
-        uint64_t tmp = r.get();
+        uint64_t curSym = r.get();
         r.inc();
-        if (tmp == cur) {
-            ++lengthValue;
-        } else {
-            w.set(cur);
-            w.inc();
-            cur = tmp;
-            while (lengthValue > guard) {
+        if (lastSym != curSym && runValue > 0) {
+            trnsfRawValues.push_back(lastSym);
+
+            while (runValue >= guard) {
                 lengths->push_back(guard);
-                lengthValue -= guard;
+                runValue -= guard;
             }
-            lengths->push_back(lengthValue - 1);
-            lengthValue = 1;
+
+            if (runValue > 0) {
+                lengths->push_back(runValue - 1);
+            }
+
+            runValue = 0;
         }
+
+        lastSym = curSym;
+        runValue++;
     }
 
-    w.set(cur);
-    w.inc();
-    while (lengthValue > guard) {
-        lengths->push_back(guard);
-        lengthValue -= guard;
-    }
-    lengths->push_back(lengthValue - 1);
+    if (runValue > 0) {
+        trnsfRawValues.push_back(lastSym);
 
-    rawValues->resize(rawValues->size() - (w.end - w.curr) / w.wordSize);
+        while (runValue >= guard) {
+            lengths->push_back(guard);
+            runValue -= guard;
+        }
+
+        if (runValue > 0) {
+            lengths->push_back(runValue - 1); // non-guard run-value is coded as lengthValue-1
+        }
+
+        runValue = 0;
+    }
+
+    rawValues->clear();
+    rawValues->swap(&trnsfRawValues);
+
+    rawValues->swap(lengths); // transformSubseq[0] = lengths, transformSubseq[1] = values
 }
 
 void inverseTransformRleCoding(const uint64_t guard, util::DataBlock *const rawValues, util::DataBlock *const lengths) {
@@ -75,26 +88,31 @@ void inverseTransformRleCoding(const uint64_t guard, util::DataBlock *const rawV
     util::BlockStepper rLen = lengths->getReader();
     // Re-compute the symbol sequence
     while (rVal.isValid()) {
+        uint64_t totalLengthValue = 0;
         uint64_t rawValue = rVal.get();
-        uint64_t lengthValue = rLen.get();
-        rLen.inc();
-        uint64_t totalLengthValue = lengthValue;
-        while (lengthValue == guard) {
-            lengthValue = rLen.get();
+        rVal.inc();
+
+        while (rLen.isValid()) {
+            uint64_t runValue = rLen.get();
             rLen.inc();
-            totalLengthValue += lengthValue;
+
+            if (runValue == guard) {
+                totalLengthValue += runValue;
+            } else {
+                totalLengthValue += runValue + 1; // non-guard run-value is coded as lengthValue-1
+                break;
+            }
         }
-        totalLengthValue++;
+
         while (totalLengthValue > 0) {
             totalLengthValue--;
             symbols.push_back(rawValue);
         }
-        rVal.inc();
     }
 
-    symbols.swap(rawValues);
+    rawValues->clear();
     lengths->clear();
-    lengths->shrink_to_fit();
+    symbols.swap(lengths);
 }
 }  // namespace gabac
 }  // namespace entropy
