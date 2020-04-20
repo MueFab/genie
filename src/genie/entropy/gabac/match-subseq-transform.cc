@@ -63,6 +63,9 @@ void transformMatchCoding(const uint32_t windowSize, util::DataBlock *const symb
     }
 
     rawValues.swap(symbols);
+
+    symbols->swap(pointers);  // transformSubseq[0] = pointer
+    pointers->swap(lengths);  // transformSubseq[1] = lengths, transformSubseq[2] = values
 }
 
 void inverseTransformMatchCoding(util::DataBlock *const rawValues, util::DataBlock *const pointers,
@@ -94,11 +97,14 @@ void inverseTransformMatchCoding(util::DataBlock *const rawValues, util::DataBlo
         }
     }
 
-    symbols.swap(rawValues);
     pointers->clear();
     pointers->shrink_to_fit();
     lengths->clear();
     lengths->shrink_to_fit();
+    rawValues->clear();
+    rawValues->shrink_to_fit();
+
+    symbols.swap(pointers);
 }
 }  // namespace gabac
 }  // namespace entropy
