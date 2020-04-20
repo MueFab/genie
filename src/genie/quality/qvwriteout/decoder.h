@@ -11,7 +11,7 @@ namespace qvwriteout {
 
 class Decoder : public core::QVDecoder {
    public:
-    std::string decode(const core::parameter::QualityValues& param, const std::string& ecigar,
+    std::string process(const core::parameter::QualityValues& param, const std::string& ecigar,
                        core::AccessUnitRaw::Descriptor& desc) override {
         std::string qv;
         const auto& param_casted = dynamic_cast<const quality::paramqv1::QualityValues1&>(param);

@@ -7,6 +7,10 @@
 #ifndef GENIE_MANAGER_H
 #define GENIE_MANAGER_H
 
+#include <memory>
+#include <string>
+#include <vector>
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

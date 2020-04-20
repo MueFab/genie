@@ -47,11 +47,11 @@ void Encoder::flowIn(core::record::Chunk&& t, size_t id)  {
 
     core::QVEncoder::QVCoded qv(nullptr, core::AccessUnitRaw::Descriptor(core::GenDesc::QV));
     if (qvcoder) {
-        qv = qvcoder->encode(data);
+        qv = qvcoder->process(data);
     }
 
     if(namecoder) {
-        auto rname = namecoder->encode(data);
+        auto rname = namecoder->process(data);
         state.streams.get(core::GenDesc::RNAME) = std::move(rname);
     }
 

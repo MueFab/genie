@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/core/access-unit-payload.h>
 #include <genie/core/record/record.h>
 #include <genie/util/drain.h>
 
@@ -21,6 +22,8 @@ namespace core {
  * @brief Interface for exporters of various file formats. Note that each importer has to convert from mpegg-records
  */
 class FormatExporter : public util::Drain<record::Chunk> {};
+
+class FormatExporterCompressed : public util::Drain<core::AccessUnitPayload> {};
 
 // ---------------------------------------------------------------------------------------------------------------------
 

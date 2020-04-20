@@ -32,7 +32,7 @@ class Decoder : public core::NameDecoder {
 
    public:
 
-    std::vector<std::string> decode(core::AccessUnitRaw::Descriptor& desc) override;
+    std::vector<std::string> process(core::AccessUnitRaw::Descriptor& desc) override;
 
     static std::unique_ptr<core::NameDecoder> create(util::BitReader& reader) {
         (void)reader;

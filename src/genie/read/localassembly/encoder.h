@@ -109,7 +109,7 @@ class Encoder : public core::ReadEncoder {
      * @param _cr_buf_max_size Buffer size for local assembly reference memory. Will end up in parameter set
      * @param _debug If additional debugging information shall be printed
      */
-    Encoder(uint32_t _cr_buf_max_size, bool _debug, core::QVEncoder* coder, core::NameEncoder* ncoder);
+    Encoder(uint32_t _cr_buf_max_size, bool _debug);
 
     static uint64_t getLengthOfCigar(const std::string& cigar);
 

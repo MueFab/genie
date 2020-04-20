@@ -51,7 +51,7 @@ std::string Decoder::inflate(const std::vector<SingleToken>& rec) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<std::string> Decoder::decode(core::AccessUnitRaw::Descriptor& desc)  {
+std::vector<std::string> Decoder::process(core::AccessUnitRaw::Descriptor& desc)  {
     std::vector<std::string> ret;
     std::vector<SingleToken> oldRec;
     while(!desc.getTokenType(0, TYPE_SEQ).end()) {

@@ -25,7 +25,7 @@ namespace core {
 class QVEncoder {
    public:
     using QVCoded = std::pair<std::unique_ptr<core::parameter::QualityValues>, core::AccessUnitRaw::Descriptor>;
-    virtual QVCoded encode(const record::Chunk& rec) = 0;
+    virtual QVCoded process(const record::Chunk& rec) = 0;
 
     /**
      * @Brief For polymorphic destruction

@@ -24,7 +24,7 @@ namespace core {
  */
 class NameEncoder {
    public:
-    virtual core::AccessUnitRaw::Descriptor encode(const record::Chunk& rec) = 0;
+    virtual core::AccessUnitRaw::Descriptor process(const record::Chunk& rec) = 0;
 
     /**
      * @Brief For polymorphic destruction

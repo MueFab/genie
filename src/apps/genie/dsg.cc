@@ -14,7 +14,7 @@
 
 #include <genie/util/exceptions.h>
 #include "generation.h"
-#include "program-options.h"
+#include "genie/run/program-options.h"
 
 static void printProgramInformation();
 

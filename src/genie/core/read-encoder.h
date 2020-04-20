@@ -10,10 +10,11 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/util/drain.h>
+#include <genie/util/selector.h>
 #include <genie/util/source.h>
 #include "access-unit-raw.h"
-#include "qv-encoder.h"
 #include "name-encoder.h"
+#include "qv-encoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,15 +26,21 @@ namespace core {
  */
 class ReadEncoder : public util::Drain<record::Chunk>, public util::Source<AccessUnitRaw> {
    protected:
-    QVEncoder* qvcoder;
-    NameEncoder* namecoder;
+    util::SideSelector<genie::core::QVEncoder, genie::core::QVEncoder::QVCoded, const genie::core::record::Chunk&>*
+        qvcoder;
+    util::SideSelector<genie::core::NameEncoder, genie::core::AccessUnitRaw::Descriptor,
+                       const genie::core::record::Chunk&>* namecoder;
 
    public:
-    explicit ReadEncoder(QVEncoder* coder, NameEncoder* ncoder) : qvcoder(coder), namecoder(ncoder) {}
+    virtual void setQVCoder(util::SideSelector<genie::core::QVEncoder, genie::core::QVEncoder::QVCoded,
+                                               const genie::core::record::Chunk&>* coder) {
+        qvcoder = coder;
+    }
 
-    virtual void setQVCoder(QVEncoder* coder) { qvcoder = coder; }
-
-    virtual void setNameCoder(NameEncoder* coder) { namecoder = coder; }
+    virtual void setNameCoder(util::SideSelector<genie::core::NameEncoder, genie::core::AccessUnitRaw::Descriptor,
+                                                 const genie::core::record::Chunk&>* coder) {
+        namecoder = coder;
+    }
 
     /**
      * @Brief For polymorphic destruction

@@ -12,7 +12,7 @@
 
 #include <map>
 #include <vector>
-#include "program-options.h"
+#include "genie/run/program-options.h"
 
 namespace dsg {
 

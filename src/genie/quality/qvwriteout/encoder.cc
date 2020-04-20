@@ -51,7 +51,7 @@ void Encoder::encodeUnalignedSegment(const core::record::Segment& s, core::Acces
     }
 }
 
-core::QVEncoder::QVCoded Encoder::encode(const core::record::Chunk& rec) {
+core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
     auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
     core::AccessUnitRaw::Descriptor desc(core::GenDesc::QV);
 

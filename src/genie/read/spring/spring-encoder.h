@@ -20,8 +20,8 @@ class SpringEncoder : public genie::core::ReadEncoder {
     Preprocessor preprocessor;
     core::stats::FastqStats* stats;
    public:
-    SpringEncoder(genie::core::QVEncoder* coder, genie::core::NameEncoder* ncoder, const std::string& working_dir, core::stats::FastqStats* _stats) : genie::core::ReadEncoder(coder, ncoder), stats(_stats) {
-        preprocessor.setup(ncoder, coder, working_dir);
+    SpringEncoder(const std::string& working_dir, core::stats::FastqStats* _stats) : stats(_stats) {
+      //  preprocessor.setup(ncoder, coder, working_dir);
 
     }
     void flowIn(genie::core::record::Chunk &&t, size_t id) override;
