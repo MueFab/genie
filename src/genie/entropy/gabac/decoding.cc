@@ -43,16 +43,16 @@ void doInverseSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
             transformedSubseqs->resize(1);
         break;
         case paramcabac::TransformedParameters::TransformIdSubseq::EQUALITY_CODING:
-            inverseTransformEqualityCoding(&(*transformedSubseqs)[0], &(*transformedSubseqs)[1]);
+            inverseTransformEqualityCoding(&(*transformedSubseqs)[1], &(*transformedSubseqs)[0]);
             transformedSubseqs->resize(1);
         break;
         case paramcabac::TransformedParameters::TransformIdSubseq::MATCH_CODING:
-            inverseTransformMatchCoding(&(*transformedSubseqs)[0], &(*transformedSubseqs)[1],
-                                               &(*transformedSubseqs)[2]);
+            inverseTransformMatchCoding(&(*transformedSubseqs)[2], &(*transformedSubseqs)[0],
+                                               &(*transformedSubseqs)[1]);
             transformedSubseqs->resize(1);
         break;
         case paramcabac::TransformedParameters::TransformIdSubseq::RLE_CODING:
-            inverseTransformRleCoding(param, &(*transformedSubseqs)[0], &(*transformedSubseqs)[1]);
+            inverseTransformRleCoding(param, &(*transformedSubseqs)[1], &(*transformedSubseqs)[0]);
             transformedSubseqs->resize(1);
         break;
         case paramcabac::TransformedParameters::TransformIdSubseq::MERGE_CODING:
@@ -89,8 +89,8 @@ unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const Encodin
 
     if(numDescSubseqSymbols > 0) {
         if(ioConf.dependencyStream != nullptr) {
-            if(numDescSubseqSymbols == gabac::StreamHandler::readFull(*ioConf.dependencyStream, &dependency)) {
-                GABAC_DIE("Dependency stream is empty");
+            if(numDescSubseqSymbols != gabac::StreamHandler::readFull(*ioConf.dependencyStream, &dependency)) {
+                GABAC_DIE("Size mismatch between dependency and descriptor subsequence");
             }
         }
 
@@ -99,7 +99,7 @@ unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const Encodin
             size_t numTrnsfSubseqsCfgs = enConf.subseq.getNumTransformSubseqCfgs();
 
             // Loop through the transformed sequences
-            std::vector<util::DataBlock> transformedSubseqs;
+            std::vector<util::DataBlock> transformedSubseqs(numTrnsfSubseqsCfgs);
             for (size_t i = 0; i < numTrnsfSubseqsCfgs; i++) {
                 // GABACIFY_LOG_TRACE << "Processing transformed sequence: " << i;
                 auto transformedSubseqCfg = enConf.subseq.getTransformSubseqCfg(i);
@@ -133,8 +133,7 @@ unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const Encodin
                                         numtrnsfSymbols,
                                         &decodedTransformedSubseq,
                                         (dependency.size()) ? &dependency : nullptr);
-                    transformedSubseqs.emplace_back();
-                    transformedSubseqs.back().swap(&(decodedTransformedSubseq));
+                    transformedSubseqs[i].swap(&(decodedTransformedSubseq));
                 }
             }
 
