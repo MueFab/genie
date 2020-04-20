@@ -75,7 +75,7 @@ class Writer {
 
     void writeLutSymbol(uint64_t input, const uint8_t codingSubsymSize);
 
-    void writeSignFlag(uint64_t input);
+    void writeSignFlag(int64_t input);
 
    private:
     util::BitWriter m_bitOutputStream;
