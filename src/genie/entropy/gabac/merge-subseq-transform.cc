@@ -31,6 +31,7 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::vector<
     // Prepare internal and output data structures
     util::DataBlock symbols(0, 1);
     symbols.swap(&(*transformedSubseqs)[0]);
+    (*transformedSubseqs)[0].clear();
     transformedSubseqs->resize(subseqCount);
 
     const uint64_t symbolsCount = symbols.size();
@@ -45,8 +46,22 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::vector<
     // split
     for (uint64_t i = 0; i < symbolsCount; i++) {
         uint64_t symbolValue = symbols.get(i);
+        int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(symbolValue, symbols.getWordSize());
+
+        bool isNegative = false;
+        if (signedSymbolValue < 0) {
+            isNegative = true;
+            symbolValue = abs(signedSymbolValue);
+        }
+
         for (uint64_t ts = 0; ts < subseqCount; ts++) {
-            (*transformedSubseqs)[ts].set(i, (symbolValue>>subseqShiftSizes[ts]) & trnsSubseqMasks[ts]);
+            uint64_t trnsfSymbol = (symbolValue>>subseqShiftSizes[ts]) & trnsSubseqMasks[ts];
+            if (isNegative) {
+                int64_t trnsfSymbolSigned = -(trnsfSymbol);
+                trnsfSymbol = static_cast<uint64_t>(trnsfSymbolSigned);
+            }
+
+            (*transformedSubseqs)[ts].set(i, trnsfSymbol);
         }
     }
 
@@ -69,9 +84,22 @@ void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::
 
     for (uint64_t i = 0; i < symbolsCount; i++) {
         uint64_t symbolValue = 0;
+        bool isNegative = false;
         for (uint64_t ts = 0; ts < subseqCount; ts++) {
-            symbolValue = (symbolValue << subseqShiftSizes[ts]) | (*transformedSubseqs)[ts].get(i);
+            uint64_t decodedTrnsfSymbol = (*transformedSubseqs)[ts].get(i);
+            if (static_cast<int64_t>(decodedTrnsfSymbol) < 0) {
+                decodedTrnsfSymbol = -(static_cast<int64_t>(decodedTrnsfSymbol));
+                isNegative = true;
+            }
+
+            symbolValue = (symbolValue << subseqShiftSizes[ts]) | decodedTrnsfSymbol;
         }
+
+        if (isNegative) {
+            int64_t symbolValueSigned = -(symbolValue);
+            symbolValue = static_cast<uint64_t>(symbolValueSigned);
+        }
+
         symbols.set(i, symbolValue);
     }
 
