@@ -34,7 +34,7 @@ void decode_sign_flag(Reader &reader,
             case paramcabac::BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
                 if(reader.readSignFlag()) {
                     int64_t symbolValueSigned = -(symbolValue);
-                    symbolValue = (uint64_t) symbolValueSigned;
+                    symbolValue = static_cast<uint64_t>(symbolValueSigned);
                 }
                 break;
             default:
