@@ -25,14 +25,14 @@ typedef void (Writer::*binFunc)(uint64_t, const std::vector<unsigned int>);
 static inline
 void encode_sign_flag(Writer &writer,
                       const paramcabac::BinarizationParameters::BinarizationId binID,
-                      const uint64_t symbolValue) {
-    if(symbolValue != 0) {
+                      const int64_t signedSymbolValue) {
+    if(signedSymbolValue != 0) {
         switch(binID) {
             case paramcabac::BinarizationParameters::BinarizationId::SIGNED_EXPONENTIAL_GOMB:
             case paramcabac::BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
             case paramcabac::BinarizationParameters::BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
             case paramcabac::BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
-                writer.writeSignFlag(symbolValue);
+                writer.writeSignFlag(signedSymbolValue);
                 break;
             default:
                 break;
@@ -171,7 +171,8 @@ void encode_cabac_order0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
 
         // Split symbol into subsymbols and then encode subsymbols
         const uint64_t origSymbol = r.get();
-        const uint64_t symbolValue = abs((int64_t) origSymbol);
+        const int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(origSymbol, symbols->getWordSize());
+        const uint64_t symbolValue = abs(signedSymbolValue);
         uint64_t subsymValToCode = 0;
 
         uint32_t oss = outputSymbolSize;
@@ -185,7 +186,7 @@ void encode_cabac_order0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
             (writer.*func)(subsymValToCode, binParams);
         }
 
-        encode_sign_flag(writer, binID, origSymbol);
+        encode_sign_flag(writer, binID, signedSymbolValue);
 
         r.inc();
     }
@@ -261,7 +262,8 @@ void encode_cabac_order1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
 
         // Split symbol into subsymbols and then encode subsymbols
         const uint64_t origSymbol = r.get();
-        const uint64_t symbolValue = abs((int64_t) origSymbol);
+        const int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(origSymbol, symbols->getWordSize());
+        const uint64_t symbolValue = abs(signedSymbolValue);
         uint64_t subsymValToCode = 0;
 
         uint64_t depSymbolValue = 0, depSubsymValue = 0;
@@ -302,7 +304,7 @@ void encode_cabac_order1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
             subsymbols[prvIdx].prvValues[0] = subsymbols[s].subsymValue;
         }
 
-        encode_sign_flag(writer, binID, origSymbol);
+        encode_sign_flag(writer, binID, signedSymbolValue);
 
         r.inc();
     }
@@ -372,7 +374,8 @@ void encode_cabac_order2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
 
         // Split symbol into subsymbols and then encode subsymbols
         const uint64_t origSymbol = r.get();
-        const uint64_t symbolValue = abs((int64_t) origSymbol);
+        const int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(origSymbol, symbols->getWordSize());
+        const uint64_t symbolValue = abs(signedSymbolValue);
         uint64_t subsymValToCode = 0;
 
         uint32_t oss = outputSymbolSize;
@@ -403,7 +406,7 @@ void encode_cabac_order2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
             subsymbols[prvIdx].prvValues[0] = subsymbols[s].subsymValue;
         }
 
-        encode_sign_flag(writer, binID, origSymbol);
+        encode_sign_flag(writer, binID, signedSymbolValue);
 
         r.inc();
     }
