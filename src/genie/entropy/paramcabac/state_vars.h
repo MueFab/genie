@@ -105,6 +105,30 @@ class StateVars {
     }
 
     static
+    int64_t getSignedValue(uint64_t input, uint8_t sizeInBytes) {
+        int64_t signedValue = 0;
+
+        switch(sizeInBytes) {
+            case 1:
+                signedValue = static_cast<int64_t>(static_cast<int8_t>(input));
+                break;
+            case 2:
+                signedValue = static_cast<int64_t>(static_cast<int16_t>(input));
+                break;
+            case 4:
+                signedValue = static_cast<int64_t>(static_cast<int32_t>(input));
+                break;
+            case 8:
+                signedValue = static_cast<int64_t>(input);
+                break;
+            default:
+                UTILS_THROW_RUNTIME_EXCEPTION("Invalid size");
+        }
+
+        return signedValue;
+    }
+
+    static
     uint64_t get2PowN(uint8_t N) {
         assert(N<=32);
         uint64_t one = 1u;
