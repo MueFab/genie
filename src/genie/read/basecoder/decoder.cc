@@ -89,9 +89,9 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(siz
                                             std::to_string(RGROUP), FLAGS);
 
     core::record::Segment segment(std::move(sequence));
-    segment.addQualities(qvdecoder.decode(container.getParameters().getQVConfig(core::record::ClassType::CLASS_U),
-                                          std::get<0>(ret).getAlignment().getECigar(),
-                                          container.get(core::GenDesc::QV)));
+    segment.addQualities(qvdecoder.process(container.getParameters().getQVConfig(core::record::ClassType::CLASS_U),
+                                           std::get<0>(ret).getAlignment().getECigar(),
+                                           container.get(core::GenDesc::QV)));
     std::get<1>(ret).addSegment(std::move(segment));
     return ret;
 }
@@ -166,8 +166,8 @@ void Decoder::decodeAdditional(size_t softclip_offset, core::QVDecoder &qvdecode
     auto srec = util::make_unique<core::record::alignment_split::SameRec>(DELTA, std::move(alignment));
 
     core::record::Segment segment(std::move(sequence));
-    segment.addQualities(qvdecoder.decode(container.getParameters().getQVConfig(core::record::ClassType::CLASS_I),
-                                          srec->getAlignment().getECigar(), container.get(core::GenDesc::QV)));
+    segment.addQualities(qvdecoder.process(container.getParameters().getQVConfig(core::record::ClassType::CLASS_I),
+                                           srec->getAlignment().getECigar(), container.get(core::GenDesc::QV)));
 
     std::get<0>(state).addAlignmentSplit(std::move(srec));
     std::get<1>(state).addSegment(std::move(segment));

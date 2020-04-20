@@ -11,8 +11,6 @@
 #include <string>
 #include <vector>
 
-#include <genie/generation.h>
-#include <genie/stream-saver.h>
 #include <genie/core/stats/perf-stats.h>
 
 #include "return-structures.h"

@@ -33,7 +33,7 @@ namespace tokenizer {
 
 class Encoder : public core::NameEncoder {
    public:
-    core::AccessUnitRaw::Descriptor encode(const core::record::Chunk& recs) override {
+    core::AccessUnitRaw::Descriptor process(const core::record::Chunk& recs) override {
         core::AccessUnitRaw::Descriptor ret(core::GenDesc::RNAME);
         std::vector<SingleToken> old;
 

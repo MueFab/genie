@@ -1,17 +1,20 @@
 project("genie")
 
 set(source_files
-        dsg.cc
-        generation.cc
-        program-options.cc
-        stream-saver.cc
-        utilities.cc
+        main.cc
+        run/main.cc
+        run/program-options.cc
         )
 
 add_executable(genie ${source_files})
 
 target_link_libraries(genie PRIVATE genie-gabac)
+target_link_libraries(genie PRIVATE genie-module)
 target_link_libraries(genie PRIVATE genie-spring)
+target_link_libraries(genie PRIVATE genie-sam)
+target_link_libraries(genie PRIVATE genie-mgb)
+target_link_libraries(genie PRIVATE genie-localassembly)
+target_link_libraries(genie PRIVATE genie-qvwriteout)
 target_link_libraries(genie PRIVATE genie-util)
 target_link_libraries(genie PRIVATE pthread)
 

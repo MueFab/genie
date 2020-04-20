@@ -12,11 +12,18 @@
 namespace genie {
 namespace util {
 
+thread_local size_t ThreadManager::threadID;
+thread_local size_t ThreadManager::threadNum;
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ThreadManager::action() {
+void ThreadManager::action(size_t id) {
+    ThreadManager::threadID = id;
+    ThreadManager::threadNum = threads.size();
     try {
-        while (!stopFlag && source->pump(counter++)) {
+        for(const auto& s : source) {
+            while (!stopFlag && s->pump(counter++)) {
+            }
         }
     } catch (std::exception& e) {
         std::cerr << e.what() << std::endl;
@@ -26,20 +33,21 @@ void ThreadManager::action() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ThreadManager::ThreadManager(size_t thread_num, OriginalSource* src)
-    : counter(0), threads(thread_num), stopFlag(false), abortFlag(false), source(src) {}
+ThreadManager::ThreadManager(size_t thread_num)
+    : counter(0), threads(thread_num), stopFlag(false), abortFlag(false) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint32_t ThreadManager::run() {
+    size_t ctr = 0;
     for (auto& t : threads) {
-        t = std::thread(&ThreadManager::action, this);
+        t = std::thread(&ThreadManager::action, this, ctr++);
     }
     for (auto& t : threads) {
         t.join();
     }
     if (!abortFlag) {
-        source->dryIn();
+        source.front()->dryIn();
     }
     return counter;
 }

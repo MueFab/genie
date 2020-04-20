@@ -11,6 +11,7 @@
 
 #include <genie/util/original-source.h>
 #include <genie/util/source.h>
+#include <genie/core/access-unit-payload.h>
 #include "record/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -22,6 +23,8 @@ namespace core {
  * @brief Interface for importers of various file formats. Note that each importer has to convert to mpegg-records
  */
 class FormatImporter : public util::Source<record::Chunk>, public util::OriginalSource {};
+
+class FormatImporterCompressed : public util::Source<core::AccessUnitPayload>, public util::OriginalSource {};
 
 // ---------------------------------------------------------------------------------------------------------------------
 

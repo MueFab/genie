@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ENCODER_H
-#define GENIE_ENCODER_H
+#ifndef GENIE_REF_ENCODER_H
+#define GENIE_REF_ENCODER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -19,7 +19,20 @@ namespace refcoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-class Encoder : public core::ReadEncoder {};
+class Encoder : public core::ReadEncoder {
+   public:
+    Encoder() : core::ReadEncoder() {
+
+    }
+
+    void flowIn(core::record::Chunk&& t, size_t id) override {
+
+    }
+
+    void dryIn() override {
+        dryOut();
+    }
+};
 
 // ---------------------------------------------------------------------------------------------------------------------
 

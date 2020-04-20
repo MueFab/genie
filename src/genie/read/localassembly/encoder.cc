@@ -137,13 +137,13 @@ void Encoder::flowIn(core::record::Chunk&& t, size_t id) {
     core::QVEncoder::QVCoded qv(nullptr, core::AccessUnitRaw::Descriptor(core::GenDesc::QV));
     uint8_t qvdepth = qvcoder ? data.front().getSegments().front().getQualities().size() : 0;
     if (qvcoder) {
-        qv = qvcoder->encode(data);
+        qv = qvcoder->process(data);
     } else {
         qv.first = quality::paramqv1::QualityValues1::getDefaultSet(core::record::ClassType::CLASS_I);
     }
     core::AccessUnitRaw::Descriptor rname(core::GenDesc::RNAME);
     if (namecoder) {
-        rname = namecoder->encode(data);
+        rname = namecoder->process(data);
     }
     for (auto& r : data) {
         UTILS_DIE_IF(r.getSegments().front().getQualities().size() != qvdepth && qvcoder, "QV_depth not compatible");
@@ -177,8 +177,8 @@ void Encoder::dryIn() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder(uint32_t _cr_buf_max_size, bool _debug, core::QVEncoder* coder, core::NameEncoder* ncoder)
-    : ReadEncoder(coder, ncoder), debug(_debug), cr_buf_max_size(_cr_buf_max_size) {}
+Encoder::Encoder(uint32_t _cr_buf_max_size, bool _debug)
+    : debug(_debug), cr_buf_max_size(_cr_buf_max_size) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

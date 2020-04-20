@@ -28,20 +28,28 @@ class ThreadManager {
     std::vector<std::thread> threads;  //!< @brief Storage for all the threads
     std::atomic<bool> stopFlag;        //!< @brief Threads will stop after current block when set
     bool abortFlag;                    //!< @brief The dryIn() signal will be skipped after stop(). Used with stopFlag
-    OriginalSource* source;            //!< @brief Where to enter the pipeline
+    std::vector<OriginalSource*> source;            //!< @brief Where to enter the pipeline
 
     /**
      * @brief Threading code
      */
-    void action();
+    void action(size_t id);
 
    public:
+
+    static thread_local size_t threadID;
+    static thread_local size_t threadNum;
+
     /**
      * @brief Constructs a new ThreadManager
      * @param thread_num How many threads ro start
      * @param src Where to enter the pipeline
      */
-    ThreadManager(size_t thread_num, OriginalSource* src);
+    ThreadManager(size_t thread_num);
+
+    void setSource(std::vector<OriginalSource*> src) {
+        source = src;
+    }
 
     /**
      * @brief Executes the complete genie pipeline until no input data left

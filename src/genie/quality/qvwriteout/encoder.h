@@ -21,7 +21,7 @@ class Encoder : public core::QVEncoder {
     static void encodeUnalignedSegment(const core::record::Segment& s, core::AccessUnitRaw::Descriptor& desc);
 
    public:
-    core::QVEncoder::QVCoded encode(const core::record::Chunk& rec) override;
+    core::QVEncoder::QVCoded process(const core::record::Chunk& rec) override;
 };
 
 }  // namespace qvwriteout

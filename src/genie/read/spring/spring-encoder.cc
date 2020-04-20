@@ -26,11 +26,13 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
     std::string temp_dir;
     core::stats::FastqStats* stats;
     uint32_t num_AUs;
-    genie::core::QVEncoder* coder;
-    genie::core::NameEncoder* ncoder;
+    util::SideSelector<genie::core::QVEncoder, genie::core::QVEncoder::QVCoded, const genie::core::record::Chunk&>* coder;
+    util::SideSelector<genie::core::NameEncoder, genie::core::AccessUnitRaw::Descriptor,
+        const genie::core::record::Chunk&>* ncoder;
 
    public:
-    SpringSource(genie::core::QVEncoder* _coder, genie::core::NameEncoder* _ncoder, const compression_params& _cp, std::string  _temp_dir, core::stats::FastqStats* _stats)
+    SpringSource(util::SideSelector<genie::core::QVEncoder, genie::core::QVEncoder::QVCoded, const genie::core::record::Chunk&>* _coder, util::SideSelector<genie::core::NameEncoder, genie::core::AccessUnitRaw::Descriptor,
+        const genie::core::record::Chunk&>* _ncoder, const compression_params& _cp, std::string  _temp_dir, core::stats::FastqStats* _stats)
         : cp(_cp), temp_dir(std::move(_temp_dir)), stats(_stats), coder(_coder), ncoder(_ncoder) {
         if (cp.paired_end) {
             loadPE_Data(cp, temp_dir, true, &data);
@@ -75,11 +77,11 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
         }
 
         if(ncoder) {
-            au.get(core::GenDesc::RNAME) = this->ncoder->encode(chunk);
+            au.get(core::GenDesc::RNAME) = this->ncoder->process(chunk);
         }
 
         if(coder) {
-            auto qv_coded = this->coder->encode(chunk);
+            auto qv_coded = this->coder->process(chunk);
             au.get(core::GenDesc::QV) = qv_coded.second;
             au.getParameters().addClass(genie::core::record::ClassType::CLASS_U, std::move(qv_coded.first));
         } else {
@@ -130,8 +132,9 @@ void SpringEncoder::dryIn() {
 
     SpringSource src(this->qvcoder, this->namecoder,this->preprocessor.cp, this->preprocessor.temp_dir, this->stats);
     src.setDrain(this->drain);
-
-    util::ThreadManager mgr(preprocessor.cp.num_thr, &src);
+    std::vector<util::OriginalSource*> srcVec = {&src};
+    util::ThreadManager mgr(preprocessor.cp.num_thr);
+    mgr.setSource(srcVec);
     mgr.run();
 }
 }  // namespace spring
