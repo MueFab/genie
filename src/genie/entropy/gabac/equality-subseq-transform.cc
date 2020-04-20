@@ -89,6 +89,8 @@ void transformEqualityCoding(util::DataBlock *const values, util::DataBlock *con
     } else {
         transformEqualityCoding1(values, equalityFlags);
     }
+
+    values->swap(equalityFlags); // transformSubseq[0] = flags, transformSubseq[1] = values,
 }
 
 void inverseTransformEqualityCoding(util::DataBlock *const values, util::DataBlock *const equalityFlags) {
