@@ -159,6 +159,7 @@ void decode_cabac_order0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
     ContextSelector ctxSelector(stateVars);
+    const bool diffEnabled = (trnsfSubseqConf.getTransformIDSubsym() == paramcabac::SupportValues::TransformIdSubsym::DIFF_CODING);
 
     binFunc func = get_binarizor(outputSymbolSize,
                                  bypassFlag,
@@ -176,8 +177,12 @@ void decode_cabac_order0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
             subsymbols[s].subsymIdx = s;
             binParams[3] = ctxSelector.getContextIdxOrder0(s);
 
-
             subsymbols[s].subsymValue = (reader.*func)(binParams);
+
+            if(diffEnabled) {
+                subsymbols[s].subsymValue += subsymbols[s].prvValues[0];
+                subsymbols[s].prvValues[0] = subsymbols[s].subsymValue;
+            }
 
             symbolValue = (symbolValue<<codingSubsymSize) | subsymbols[s].subsymValue;
         }
@@ -219,8 +224,7 @@ void decode_cabac_order1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
     uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
                                                  supportVals.getShareSubsymLutFlag(),
                                                  trnsfSubseqConf.getTransformIDSubsym());
-    uint8_t const numPrvs = stateVars.getNumPrvs(codingOrder,
-                                                 supportVals.getShareSubsymPrvFlag());
+    uint8_t const numPrvs = stateVars.getNumPrvs(supportVals.getShareSubsymPrvFlag());
 
     Reader reader(bitstream,
                   bypassFlag,
@@ -336,8 +340,7 @@ void decode_cabac_order2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
     uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
                                                  supportVals.getShareSubsymLutFlag(),
                                                  trnsfSubseqConf.getTransformIDSubsym());
-    uint8_t const numPrvs = stateVars.getNumPrvs(codingOrder,
-                                                 supportVals.getShareSubsymPrvFlag());
+    uint8_t const numPrvs = stateVars.getNumPrvs(supportVals.getShareSubsymPrvFlag());
 
     Reader reader(bitstream,
                   bypassFlag,

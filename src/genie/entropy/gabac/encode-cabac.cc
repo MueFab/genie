@@ -136,7 +136,6 @@ void encode_cabac_order0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
     const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
     const paramcabac::StateVars &stateVars = trnsfSubseqConf.getStateVars();
     const paramcabac::BinarizationParameters::BinarizationId binID = binarzation.getBinarizationID();
-    const core::Alphabet alphaProps = getAlphabetProperties(trnsfSubseqConf.getAlphabetID());
 
     const uint8_t outputSymbolSize = supportVals.getOutputSymbolSize();
     const uint8_t codingSubsymSize = supportVals.getCodingSubsymSize();
@@ -156,6 +155,7 @@ void encode_cabac_order0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
     ContextSelector ctxSelector(stateVars);
+    const bool diffEnabled = (trnsfSubseqConf.getTransformIDSubsym() == paramcabac::SupportValues::TransformIdSubsym::DIFF_CODING);
 
     binFunc func = get_binarizor(outputSymbolSize,
                                  bypassFlag,
@@ -180,6 +180,12 @@ void encode_cabac_order0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
 
             subsymValToCode = subsymbols[s].subsymValue = (symbolValue>>(oss-=codingSubsymSize)) & subsymMask;
             subsymbols[s].subsymIdx = s;
+
+            if(diffEnabled) {
+                assert(subsymbols[s].prvValues[0] <= subsymValToCode);
+                subsymValToCode -= subsymbols[s].prvValues[0];
+                subsymbols[s].prvValues[0] = subsymbols[s].subsymValue;
+            }
 
             binParams[3] = ctxSelector.getContextIdxOrder0(s);
 
@@ -221,8 +227,7 @@ void encode_cabac_order1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
     uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
                                                  supportVals.getShareSubsymLutFlag(),
                                                  trnsfSubseqConf.getTransformIDSubsym());
-    uint8_t const numPrvs = stateVars.getNumPrvs(codingOrder,
-                                                 supportVals.getShareSubsymPrvFlag());
+    uint8_t const numPrvs = stateVars.getNumPrvs(supportVals.getShareSubsymPrvFlag());
 
     util::DataBlock block(0, 1);
     OBufferStream bitstream(&block);
@@ -338,8 +343,7 @@ void encode_cabac_order2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
     uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
                                                  supportVals.getShareSubsymLutFlag(),
                                                  trnsfSubseqConf.getTransformIDSubsym());
-    uint8_t const numPrvs = stateVars.getNumPrvs(codingOrder,
-                                                 supportVals.getShareSubsymPrvFlag());
+    uint8_t const numPrvs = stateVars.getNumPrvs(supportVals.getShareSubsymPrvFlag());
 
     util::DataBlock block(0, 1);
     OBufferStream bitstream(&block);

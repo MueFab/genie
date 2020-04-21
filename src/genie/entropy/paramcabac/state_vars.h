@@ -84,8 +84,7 @@ class StateVars {
                        const bool shareSubsymLutFlag,
                        const SupportValues::TransformIdSubsym trnsfSubsymID) const;
 
-    uint8_t getNumPrvs(const uint8_t codingOrder,
-                       const bool shareSubsymPrvFlag) const;
+    uint8_t getNumPrvs(const bool shareSubsymPrvFlag) const;
 
     /* some extra functions (for now put in statevars)
      * FIXME move else where
