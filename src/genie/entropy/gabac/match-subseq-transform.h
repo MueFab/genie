@@ -9,12 +9,7 @@
 
 #include <cstdint>
 #include <genie/entropy/paramcabac/subsequence.h>
-
-namespace genie {
-namespace util {
-class DataBlock;
-}
-}  // namespace genie
+#include <genie/util/data-block.h>
 
 namespace genie {
 namespace entropy {
