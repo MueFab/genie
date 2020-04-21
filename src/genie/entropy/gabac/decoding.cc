@@ -40,8 +40,7 @@ void doInverseSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
             transformedSubseqs->resize(1);
         break;
         case paramcabac::TransformedParameters::TransformIdSubseq::EQUALITY_CODING:
-            inverseTransformEqualityCoding(&(*transformedSubseqs)[1], &(*transformedSubseqs)[0]);
-            transformedSubseqs->resize(1);
+            inverseTransformEqualityCoding(transformedSubseqs);
         break;
         case paramcabac::TransformedParameters::TransformIdSubseq::MATCH_CODING:
             inverseTransformMatchCoding(transformedSubseqs);
@@ -59,10 +58,10 @@ void doInverseSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
 
     // GABACIFY_LOG_TRACE << "Got " << transformedSequences->size() << "
     // sequences";
-    for (unsigned i = 0; i < transformedSubseqs->size(); ++i) {
+    // for (unsigned i = 0; i < transformedSubseqs->size(); ++i) {
         // GABACIFY_LOG_TRACE << i << ": " << (*transformedSequences)[i].size()
         // << " bytes";
-    }
+    // }
 }
 
 unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const EncodingConfiguration &enConf) {

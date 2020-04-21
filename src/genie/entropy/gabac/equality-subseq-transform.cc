@@ -12,14 +12,14 @@
 // util::DataBlocks swap meaning. For wordsizes greater 1 this optimization is not possible, as the raw values do not
 // fit into the same data block where input values are still inside (different word sizes)
 
-#include "equality-subseq-transform.h"
-
 #include <algorithm>
 #include <cassert>
 #include <iostream>
 
 #include <genie/util/block-stepper.h>
 #include <genie/util/data-block.h>
+#include "exceptions.h"
+#include "equality-subseq-transform.h"
 
 namespace genie {
 namespace entropy {
@@ -28,7 +28,6 @@ namespace gabac {
 // Optimized for wordsize 1. In place for equality flags
 static void transformEqualityCoding0(util::DataBlock *const values, util::DataBlock *const equalityFlags) {
     uint64_t previousSymbol = 0;
-    *equalityFlags = util::DataBlock(0, values->getWordSize());
 
     util::BlockStepper r = values->getReader();
     // Treat value as equalityFlags and vice versa
@@ -56,7 +55,6 @@ static void transformEqualityCoding0(util::DataBlock *const values, util::DataBl
 static void transformEqualityCoding1(util::DataBlock *const values, util::DataBlock *const equalityFlags) {
     uint64_t previousSymbol = 0;
 
-    *equalityFlags = util::DataBlock(0, 1);
     util::BlockStepper r = values->getReader();
     util::BlockStepper w = values->getReader();
     // Treat value as equalityFlags and vice versa
@@ -80,41 +78,42 @@ static void transformEqualityCoding1(util::DataBlock *const values, util::DataBl
     values->resize(values->size() - (w.end - w.curr) / w.wordSize);
 }
 
-void transformEqualityCoding(util::DataBlock *const values, util::DataBlock *const equalityFlags) {
-    assert(equalityFlags != nullptr);
-    assert(values != nullptr);
+void transformEqualityCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs) {
+    const std::vector<paramcabac::TransformedSubSeq>& trnsfCfgs = subseqCfg.getTransformSubseqCfgs();
 
-    if (values->getWordSize() == 1) {
-        transformEqualityCoding0(values, equalityFlags);
+    // Prepare internal and the output data structures
+    transformedSubseqs->resize(2);
+    (*transformedSubseqs)[0].swap(&(*transformedSubseqs)[1]); // transformSubseq[0] = flags, transformSubseq[1] = values
+    util::DataBlock *const flags     = &((*transformedSubseqs)[0]);
+    util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
+
+    flags->setWordSize(paramcabac::StateVars::getMinimalSizeInBytes(trnsfCfgs[0].getSupportValues().getOutputSymbolSize()));
+    rawValues->setWordSize(paramcabac::StateVars::getMinimalSizeInBytes(trnsfCfgs[1].getSupportValues().getOutputSymbolSize()));
+
+    if (rawValues->getWordSize() == 1) {
+        transformEqualityCoding0(rawValues, flags); // FIXME this might not be needed TBC
     } else {
-        transformEqualityCoding1(values, equalityFlags);
+        transformEqualityCoding1(rawValues, flags);
     }
-
-    values->swap(equalityFlags); // transformSubseq[0] = flags, transformSubseq[1] = values,
 }
 
-void inverseTransformEqualityCoding(util::DataBlock *const values, util::DataBlock *const equalityFlags) {
-    assert(values != nullptr);
-    assert(equalityFlags != nullptr);
-    util::DataBlock output(0, values->getWordSize());
-    util::DataBlock *outputptr;
+void inverseTransformEqualityCoding(std::vector<util::DataBlock> *const transformedSubseqs) {
+    assert(transformedSubseqs != nullptr);
 
-    // Wordsize 1 allows in place operation in equality flag buffer
-    if (values->getWordSize() == 1) {
-        outputptr = equalityFlags;
-    } else {
-        // Other wordsizes have to use a distinct buffer
-        outputptr = &output;
-        output.resize(equalityFlags->size());
+    if ((*transformedSubseqs).size() != 2) {
+        GABAC_DIE("invalid subseq count for equality inverse transform");
     }
+
+    // Prepare internal and the output data structures
+    util::DataBlock *const flags     = &((*transformedSubseqs)[0]);
+    util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
+    util::DataBlock symbols(0, rawValues->getWordSize());
+
+    util::BlockStepper rflag = flags->getReader();
+    util::BlockStepper rval = rawValues->getReader();
 
     // Re-compute the symbols from the equality flags and values
     uint64_t previousSymbol = 0;
-
-    util::BlockStepper rflag = equalityFlags->getReader();
-    util::BlockStepper rval = values->getReader();
-    util::BlockStepper rwrite = outputptr->getReader();
-
     while (rflag.isValid()) {
         if (rflag.get() == 0) {
             uint64_t val = rval.get();
@@ -126,22 +125,14 @@ void inverseTransformEqualityCoding(util::DataBlock *const values, util::DataBlo
             }
         }
 
-        rwrite.set(previousSymbol);
-        rwrite.inc();
+        symbols.push_back(previousSymbol);
         rflag.inc();
     }
-    outputptr->resize(outputptr->size() - (rwrite.end - rwrite.curr) / rwrite.wordSize);
 
-    // Swap memory to value buffer to meet conventions
-    if (values->getWordSize() == 1) {
-        values->swap(equalityFlags);
-    } else {
-        values->swap(&output);
-    }
+    (*transformedSubseqs).resize(1);
+    (*transformedSubseqs)[0].clear();
 
-    // Clear equality buffer
-    equalityFlags->clear();
-    equalityFlags->shrink_to_fit();
+    symbols.swap(&(*transformedSubseqs)[0]);
 }
 }  // namespace gabac
 }  // namespace entropy

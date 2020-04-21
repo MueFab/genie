@@ -7,18 +7,16 @@
 #ifndef GABAC_EQUALITY_CODING_H_
 #define GABAC_EQUALITY_CODING_H_
 
-namespace genie {
-namespace util {
-class DataBlock;
-}
-}  // namespace genie
+#include <genie/entropy/paramcabac/subsequence.h>
+#include <genie/util/data-block.h>
+
 namespace genie {
 namespace entropy {
 namespace gabac {
 
-void transformEqualityCoding(util::DataBlock *values, util::DataBlock *equalityFlags);
+void transformEqualityCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs);
 
-void inverseTransformEqualityCoding(util::DataBlock *values, util::DataBlock *equalityFlags);
+void inverseTransformEqualityCoding(std::vector<util::DataBlock> *const transformedSubseqs);
 
 }  // namespace gabac
 }  // namespace entropy

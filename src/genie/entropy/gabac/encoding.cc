@@ -42,9 +42,7 @@ void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
             transformedSubseqs->resize(1);
         break;
         case paramcabac::TransformedParameters::TransformIdSubseq::EQUALITY_CODING:
-            transformedSubseqs->resize(2);
-            (*transformedSubseqs)[1] = util::DataBlock(0, 1); // FIXME shouldn't this wsize=1 be based on outputSymbolSize?
-            transformEqualityCoding(&(*transformedSubseqs)[0], &(*transformedSubseqs)[1]);
+            transformEqualityCoding(subseqCfg, transformedSubseqs);
         break;
         case paramcabac::TransformedParameters::TransformIdSubseq::MATCH_CODING:
             transformMatchCoding(subseqCfg, transformedSubseqs);
@@ -62,10 +60,10 @@ void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
 
     // GABACIFY_LOG_TRACE << "Got " << transformedSequences->size() << "
     // sequences";
-    for (unsigned i = 0; i < transformedSubseqs->size(); ++i) {
+    // for (unsigned i = 0; i < transformedSubseqs->size(); ++i) {
         // GABACIFY_LOG_TRACE << i << ": " << (*transformedSequences)[i].size()
         // << " bytes";
-    }
+    // }
 }
 
 unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
