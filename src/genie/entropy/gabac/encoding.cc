@@ -50,12 +50,7 @@ void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
             transformEqualityCoding(&(*transformedSubseqs)[0], &(*transformedSubseqs)[1]);
         break;
         case paramcabac::TransformedParameters::TransformIdSubseq::MATCH_CODING:
-            transformedSubseqs->resize(3);
-            assert(param <= std::numeric_limits<uint32_t>::max());
-            (*transformedSubseqs)[1] = util::DataBlock(0, 4); // FIXME shouldn't this wsize=4 be based on outputSymbolSize?
-            (*transformedSubseqs)[2] = util::DataBlock(0, 4); // FIXME shouldn't this wsize=4 be based on outputSymbolSize?
-            transformMatchCoding(static_cast<uint32_t>(param), &(*transformedSubseqs)[0],
-                                 &(*transformedSubseqs)[1], &(*transformedSubseqs)[2]);
+            transformMatchCoding(subseqCfg, transformedSubseqs);
         break;
         case paramcabac::TransformedParameters::TransformIdSubseq::RLE_CODING:
             transformedSubseqs->resize(2);

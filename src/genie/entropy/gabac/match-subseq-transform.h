@@ -8,6 +8,7 @@
 #define GABAC_MATCH_CODING_H_
 
 #include <cstdint>
+#include <genie/entropy/paramcabac/subsequence.h>
 
 namespace genie {
 namespace util {
@@ -19,10 +20,9 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-void transformMatchCoding(uint32_t windowSize, util::DataBlock *rawValues, util::DataBlock *pointers,
-                          util::DataBlock *lengths);
+void transformMatchCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs);
 
-void inverseTransformMatchCoding(util::DataBlock *rawValues, util::DataBlock *pointers, util::DataBlock *lengths);
+void inverseTransformMatchCoding(std::vector<util::DataBlock> *const transformedSubseqs);
 
 }  // namespace gabac
 }  // namespace entropy
