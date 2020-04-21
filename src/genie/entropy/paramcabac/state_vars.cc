@@ -63,13 +63,8 @@ uint8_t StateVars::getNumLuts(const uint8_t codingOrder,
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-uint8_t StateVars::getNumPrvs(const uint8_t codingOrder,
-                              const bool shareSubsymPrvFlag) const {
-    return (codingOrder > 0)
-            ? ((shareSubsymPrvFlag)
-                    ? 1
-                    : numSubsyms)
-            : 0;
+uint8_t StateVars::getNumPrvs(const bool shareSubsymPrvFlag) const {
+    return (shareSubsymPrvFlag) ? 1 : numSubsyms;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

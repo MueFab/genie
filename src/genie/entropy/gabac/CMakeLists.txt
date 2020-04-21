@@ -12,7 +12,6 @@ set(source_files
         context-tables.cc
         exceptions.cc
         luts-subsymbol-transform.cc
-        diff-subsymbol-transform.cc
         equality-subseq-transform.cc
         match-subseq-transform.cc
         merge-subseq-transform.cc

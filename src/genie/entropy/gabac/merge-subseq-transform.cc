@@ -56,9 +56,10 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::vector<
 
         for (uint64_t ts = 0; ts < subseqCount; ts++) {
             uint64_t trnsfSymbol = (symbolValue>>subseqShiftSizes[ts]) & trnsSubseqMasks[ts];
-            if (isNegative) {
+            if (isNegative && trnsfSymbol != 0) {
                 int64_t trnsfSymbolSigned = -(trnsfSymbol);
                 trnsfSymbol = static_cast<uint64_t>(trnsfSymbolSigned);
+                isNegative = false;
             }
 
             (*transformedSubseqs)[ts].set(i, trnsfSymbol);
