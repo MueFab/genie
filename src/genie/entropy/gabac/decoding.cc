@@ -35,10 +35,7 @@ void doInverseSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
     // GABACIFY_LOG_DEBUG << "Performing sequence transformation " <<
     // gabac::transformationInformation[id].name;
 
-    const paramcabac::TransformedParameters& trnsfSubseqParams = subseqCfg.getTransformParameters();
-    const uint16_t param = trnsfSubseqParams.getParam(); // get first param
-
-    switch(trnsfSubseqParams.getTransformIdSubseq()) {
+    switch(subseqCfg.getTransformParameters().getTransformIdSubseq()) {
         case paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM:
             transformedSubseqs->resize(1);
         break;
@@ -50,8 +47,7 @@ void doInverseSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
             inverseTransformMatchCoding(transformedSubseqs);
         break;
         case paramcabac::TransformedParameters::TransformIdSubseq::RLE_CODING:
-            inverseTransformRleCoding(param, &(*transformedSubseqs)[1], &(*transformedSubseqs)[0]);
-            transformedSubseqs->resize(1);
+            inverseTransformRleCoding(subseqCfg, transformedSubseqs);
         break;
         case paramcabac::TransformedParameters::TransformIdSubseq::MERGE_CODING:
             inverseTransformMergeCoding(subseqCfg, transformedSubseqs);

@@ -37,10 +37,7 @@ void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
     // GABACIFY_LOG_DEBUG << "Performing sequence transformation " <<
     // gabac::transformationInformation[id].name;
 
-    const paramcabac::TransformedParameters& trnsfSubseqParams = subseqCfg.getTransformParameters();
-    const uint16_t param = trnsfSubseqParams.getParam(); // get first param
-
-    switch(trnsfSubseqParams.getTransformIdSubseq()) {
+    switch(subseqCfg.getTransformParameters().getTransformIdSubseq()) {
         case paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM:
             transformedSubseqs->resize(1);
         break;
@@ -53,9 +50,7 @@ void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
             transformMatchCoding(subseqCfg, transformedSubseqs);
         break;
         case paramcabac::TransformedParameters::TransformIdSubseq::RLE_CODING:
-            transformedSubseqs->resize(2);
-            (*transformedSubseqs)[1] = util::DataBlock(0, 1); // FIXME shouldn't this wsize=1 be based on outputSymbolSize?
-            transformRleCoding(param, &(*transformedSubseqs)[0], &(*transformedSubseqs)[1]);
+            transformRleCoding(subseqCfg, transformedSubseqs);
         break;
         case paramcabac::TransformedParameters::TransformIdSubseq::MERGE_CODING:
             transformMergeCoding(subseqCfg, transformedSubseqs);

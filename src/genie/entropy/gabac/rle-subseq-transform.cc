@@ -7,35 +7,38 @@
 #include <cassert>
 
 #include <genie/util/block-stepper.h>
+#include "exceptions.h"
 #include "rle-subseq-transform.h"
+
 namespace genie {
 namespace entropy {
 namespace gabac {
 
-void transformRleCoding(const uint64_t guard, util::DataBlock *const rawValues, util::DataBlock *const lengths) {
+void transformRleCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs) {
+    assert(transformedSubseqs != nullptr);
+    const uint8_t guard = subseqCfg.getTransformParameters().getParam();
+    const std::vector<paramcabac::TransformedSubSeq>& trnsfCfgs = subseqCfg.getTransformSubseqCfgs();
     assert(guard > 0);
-    assert(rawValues != nullptr);
-    assert(lengths != nullptr);
 
-    lengths->clear();
+    // Prepare internal and the output data structures
+    util::DataBlock symbols(0, 1);
+    symbols.swap(&(*transformedSubseqs)[0]);
+    (*transformedSubseqs)[0].clear();
+    transformedSubseqs->resize(2);
 
-    if (rawValues->empty()) {
-        return;
-    }
+    util::DataBlock *const lengths   = &((*transformedSubseqs)[0]);
+    util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
+    lengths->setWordSize(paramcabac::StateVars::getMinimalSizeInBytes(trnsfCfgs[0].getSupportValues().getOutputSymbolSize()));
+    rawValues->setWordSize(paramcabac::StateVars::getMinimalSizeInBytes(trnsfCfgs[1].getSupportValues().getOutputSymbolSize()));
 
-    // input for rawValues is guaranteed to grow slower than reading process
-    // -> in place possible
-
-    util::DataBlock trnsfRawValues(0, rawValues->getWordSize());
-    util::BlockStepper r = rawValues->getReader();
-
+    util::BlockStepper r = symbols.getReader();
     uint64_t lastSym = 0;
     uint64_t runValue = 0;
     while (r.isValid()) {
         uint64_t curSym = r.get();
         r.inc();
         if (lastSym != curSym && runValue > 0) {
-            trnsfRawValues.push_back(lastSym);
+            rawValues->push_back(lastSym);
 
             while (runValue >= guard) {
                 lengths->push_back(guard);
@@ -54,7 +57,7 @@ void transformRleCoding(const uint64_t guard, util::DataBlock *const rawValues, 
     }
 
     if (runValue > 0) {
-        trnsfRawValues.push_back(lastSym);
+        rawValues->push_back(lastSym);
 
         while (runValue >= guard) {
             lengths->push_back(guard);
@@ -68,25 +71,28 @@ void transformRleCoding(const uint64_t guard, util::DataBlock *const rawValues, 
         runValue = 0;
     }
 
-    rawValues->clear();
-    rawValues->swap(&trnsfRawValues);
-
-    rawValues->swap(lengths); // transformSubseq[0] = lengths, transformSubseq[1] = values
+    symbols.clear();
 }
 
-void inverseTransformRleCoding(const uint64_t guard, util::DataBlock *const rawValues, util::DataBlock *const lengths) {
-    assert(rawValues != nullptr);
-    assert(!rawValues->empty());
+void inverseTransformRleCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs) {
+    assert(transformedSubseqs != nullptr);
+
+    if ((*transformedSubseqs).size() != 2) {
+        GABAC_DIE("invalid subseq count for rle inverse transform");
+    }
+
+    const uint8_t guard = subseqCfg.getTransformParameters().getParam();
     assert(guard > 0);
 
-    // input for rawValues is not guaranteed to grow slower than reading process
-    // -> in place not possible
-
+    // Prepare internal and the output data structures
+    util::DataBlock *const lengths   = &((*transformedSubseqs)[0]);
+    util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
     util::DataBlock symbols(0, rawValues->getWordSize());
 
     util::BlockStepper rVal = rawValues->getReader();
     util::BlockStepper rLen = lengths->getReader();
-    // Re-compute the symbol sequence
+
+    // Re-compute the symbols from the lengths and raw values
     while (rVal.isValid()) {
         uint64_t totalLengthValue = 0;
         uint64_t rawValue = rVal.get();
@@ -110,9 +116,10 @@ void inverseTransformRleCoding(const uint64_t guard, util::DataBlock *const rawV
         }
     }
 
-    rawValues->clear();
-    lengths->clear();
-    symbols.swap(lengths);
+    (*transformedSubseqs).resize(1);
+    (*transformedSubseqs)[0].clear();
+
+    symbols.swap(&(*transformedSubseqs)[0]);
 }
 }  // namespace gabac
 }  // namespace entropy
