@@ -47,9 +47,7 @@ void doInverseSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
             transformedSubseqs->resize(1);
         break;
         case paramcabac::TransformedParameters::TransformIdSubseq::MATCH_CODING:
-            inverseTransformMatchCoding(&(*transformedSubseqs)[2], &(*transformedSubseqs)[0],
-                                               &(*transformedSubseqs)[1]);
-            transformedSubseqs->resize(1);
+            inverseTransformMatchCoding(transformedSubseqs);
         break;
         case paramcabac::TransformedParameters::TransformIdSubseq::RLE_CODING:
             inverseTransformRleCoding(param, &(*transformedSubseqs)[1], &(*transformedSubseqs)[0]);

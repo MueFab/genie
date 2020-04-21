@@ -75,7 +75,7 @@ void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::
     const std::vector<uint8_t> subseqShiftSizes = trnsfSubseqParams.getMergeCodingShiftSizes();
 
     if (subseqCount <= 0 || subseqCount != (*transformedSubseqs).size()) {
-        GABAC_DIE("invalid subseq_count for merge coding");
+        GABAC_DIE("invalid subseq_count for merge inverse transform");
     }
 
     // Prepare the output data structure
