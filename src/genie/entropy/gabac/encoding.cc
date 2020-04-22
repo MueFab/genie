@@ -68,8 +68,14 @@ void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
 
 unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
     conf.validate();
-    util::DataBlock subsequence(0, 4);  //FIXME
-    util::DataBlock dependency(0, 4);   //FIXME
+    const paramcabac::Subsequence &subseqCfg = enConf.getSubseqConfig();
+    const uint8_t wordSize = enConf.getSubseqWordSize();
+    util::DataBlock subsequence(0, wordSize);
+    util::DataBlock dependency(0, wordSize);
+    if(GABAC_APP_TEST) {
+        subsequence.setWordSize(4);
+        dependency.setWordSize(4);
+    }
     size_t numDescSubseqSymbols = 0;
     size_t subseqPayloadSize = 0;
 
@@ -82,7 +88,7 @@ unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingC
 
     if(numDescSubseqSymbols > 0) {
         // write number of symbols in descriptor subsequence
-        if(enConf.getSubseqConfig().getTokentypeFlag()) {
+        if(subseqCfg.getTokentypeFlag()) {
             subseqPayloadSize += gabac::StreamHandler::writeU7(*conf.outputStream, numDescSubseqSymbols);
         } else {
             subseqPayloadSize += gabac::StreamHandler::writeUInt(*conf.outputStream, numDescSubseqSymbols, 4);
@@ -94,7 +100,7 @@ unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingC
         transformedSubseqs[0].swap(&subsequence);
 
         // Put descriptor subsequence, get transformed subsequences out
-        doSubsequenceTransform(enConf.getSubseqConfig(), &transformedSubseqs);
+        doSubsequenceTransform(subseqCfg, &transformedSubseqs);
         const size_t numTrnsfSubseqs = transformedSubseqs.size();
 
         // Loop through the transformed sequences
@@ -103,7 +109,7 @@ unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingC
             uint64_t trnsfSubseqPayloadSize = 0;
             if(numtrnsfSymbols > 0) {
                 // Encoding
-                gabac::encode_cabac(enConf.subseq.getTransformSubseqCfg(i),
+                gabac::encode_cabac(subseqCfg.getTransformSubseqCfg(i),
                                     &(transformedSubseqs[i]),
                                     (dependency.size()) ? &dependency : nullptr);
 
