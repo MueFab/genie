@@ -2,7 +2,7 @@ project("gabac-app")
 
 set(source_files
         #analyze.cc
-        config.cc
+        config-manual.cc
         code.cc
         main.cc
         program-options.cc
