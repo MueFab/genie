@@ -123,13 +123,13 @@ binFunc get_binarizor(const uint8_t outputSymbolSize,
     return func;
 }
 
-void encodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                                 util::DataBlock* symbols,
-                                 size_t maxSize) {
+size_t encodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                                   util::DataBlock* symbols,
+                                   size_t maxSize) {
     assert(symbols != nullptr);
 
     size_t numSymbols = symbols->size();
-    if (numSymbols <= 0) return;
+    if (numSymbols <= 0) return 0;
 
     const paramcabac::SupportValues &supportVals = trnsfSubseqConf.getSupportValues();
     const paramcabac::Binarization &binarzation = trnsfSubseqConf.getBinarization();
@@ -200,16 +200,18 @@ void encodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSubse
     writer.close();
 
     bitstream.flush(symbols);
+
+    return symbols->size(); // size of bitstream
 }
 
-void encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                                 util::DataBlock* symbols,
-                                 util::DataBlock* const depSymbols,
-                                 size_t maxSize) {
+size_t encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                                   util::DataBlock* symbols,
+                                   util::DataBlock* const depSymbols,
+                                   size_t maxSize) {
     assert(symbols != nullptr);
 
     size_t numSymbols = symbols->size();
-    if (numSymbols <= 0) return;
+    if (numSymbols <= 0) return 0;
 
     const paramcabac::SupportValues &supportVals = trnsfSubseqConf.getSupportValues();
     const paramcabac::Binarization &binarzation = trnsfSubseqConf.getBinarization();
@@ -317,15 +319,17 @@ void encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSubse
     writer.close();
 
     bitstream.flush(symbols);
+
+    return symbols->size(); // size of bitstream
 }
 
-void encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                                 util::DataBlock* symbols,
-                                 size_t maxSize) {
+size_t encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                                   util::DataBlock* symbols,
+                                   size_t maxSize) {
     assert(symbols != nullptr);
 
     size_t numSymbols = symbols->size();
-    if (numSymbols <= 0) return;
+    if (numSymbols <= 0) return 0;
 
     const paramcabac::SupportValues &supportVals = trnsfSubseqConf.getSupportValues();
     const paramcabac::Binarization &binarzation = trnsfSubseqConf.getBinarization();
@@ -418,26 +422,30 @@ void encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSubse
     writer.close();
 
     bitstream.flush(symbols);
+
+    return symbols->size(); // size of bitstream
 }
 
-void encodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                           util::DataBlock* symbols,
-                           util::DataBlock* const depSymbols,
-                           size_t maxSize) {
+size_t encodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                             util::DataBlock* symbols,
+                             util::DataBlock* const depSymbols,
+                             size_t maxSize) {
 
     switch(trnsfSubseqConf.getSupportValues().getCodingOrder()) {
         case 0:
-            encodeTransformSubseqOrder0(trnsfSubseqConf, symbols, maxSize);
+            return encodeTransformSubseqOrder0(trnsfSubseqConf, symbols, maxSize);
         break;
         case 1:
-            encodeTransformSubseqOrder1(trnsfSubseqConf, symbols, depSymbols, maxSize);
+            return encodeTransformSubseqOrder1(trnsfSubseqConf, symbols, depSymbols, maxSize);
         break;
         case 2:
-            encodeTransformSubseqOrder2(trnsfSubseqConf, symbols, maxSize);
+            return encodeTransformSubseqOrder2(trnsfSubseqConf, symbols, maxSize);
         break;
         default:
             GABAC_DIE("Unknown coding order");
     }
+
+    return 0;
 }
 }  // namespace gabac
 }  // namespace entropy
