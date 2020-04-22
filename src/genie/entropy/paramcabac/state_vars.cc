@@ -211,7 +211,6 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
                                     numCtxSubsym :
                                     codingOrderCtxOffset[codingOrder] *
                                     numAlphaSubsym);
-            //std::cout<<"NumContexts: "<< std::to_string(numCtxTotal) << std::endl;
         }
     } // if (!cabac_binarization.getBypassFlag())
 }
