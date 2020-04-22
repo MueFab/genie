@@ -24,9 +24,9 @@ namespace gabac {
 typedef uint64_t (Reader::*binFunc)(const std::vector<unsigned int>);
 
 static inline
-void decode_sign_flag(Reader &reader,
-                      const paramcabac::BinarizationParameters::BinarizationId binID,
-                      uint64_t &symbolValue) {
+void decodeSignFlag(Reader &reader,
+                    const paramcabac::BinarizationParameters::BinarizationId binID,
+                    uint64_t &symbolValue) {
     if(symbolValue != 0) {
         switch(binID) {
             case paramcabac::BinarizationParameters::BinarizationId::SIGNED_EXPONENTIAL_GOMB:
@@ -45,12 +45,12 @@ void decode_sign_flag(Reader &reader,
 }
 
 static inline
-binFunc get_binarizor(const uint8_t outputSymbolSize,
-                      const bool bypassFlag,
-                      const paramcabac::BinarizationParameters::BinarizationId binID,
-                      const paramcabac::BinarizationParameters &binarzationParams,
-                      const paramcabac::StateVars &stateVars,
-                      std::vector<unsigned int>& binParams) {
+binFunc getBinarizor(const uint8_t outputSymbolSize,
+                     const bool bypassFlag,
+                     const paramcabac::BinarizationParameters::BinarizationId binID,
+                     const paramcabac::BinarizationParameters &binarzationParams,
+                     const paramcabac::StateVars &stateVars,
+                     std::vector<unsigned int>& binParams) {
     binFunc func = nullptr;
     if(bypassFlag) {
         switch (binID) {
@@ -162,12 +162,12 @@ size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
     ContextSelector ctxSelector(stateVars);
     const bool diffEnabled = (trnsfSubseqConf.getTransformIDSubsym() == paramcabac::SupportValues::TransformIdSubsym::DIFF_CODING);
 
-    binFunc func = get_binarizor(outputSymbolSize,
-                                 bypassFlag,
-                                 binID,
-                                 binarzationParams,
-                                 stateVars,
-                                 binParams);
+    binFunc func = getBinarizor(outputSymbolSize,
+                                bypassFlag,
+                                binID,
+                                binarzationParams,
+                                stateVars,
+                                binParams);
 
     while (r.isValid()) {
         // Decode subsymbols and merge them to construct symbols
@@ -188,7 +188,7 @@ size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
             symbolValue = (symbolValue<<codingSubsymSize) | subsymbols[s].subsymValue;
         }
 
-        decode_sign_flag(reader, binID, symbolValue);
+        decodeSignFlag(reader, binID, symbolValue);
 
         r.set(symbolValue);
         r.inc();
@@ -258,12 +258,12 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
     ContextSelector ctxSelector(stateVars);
 
-    binFunc func = get_binarizor(outputSymbolSize,
-                                 bypassFlag,
-                                 binID,
-                                 binarzationParams,
-                                 stateVars,
-                                 binParams);
+    binFunc func = getBinarizor(outputSymbolSize,
+                                bypassFlag,
+                                binID,
+                                binarzationParams,
+                                stateVars,
+                                binParams);
 
     while (r.isValid()) {
         // Decode subsymbols and merge them to construct symbols
@@ -309,7 +309,7 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
             symbolValue = (symbolValue<<codingSubsymSize) | subsymbols[s].subsymValue;
         }
 
-        decode_sign_flag(reader, binID, symbolValue);
+        decodeSignFlag(reader, binID, symbolValue);
 
         r.set(symbolValue);
         r.inc();
@@ -371,12 +371,12 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
 
     ContextSelector ctxSelector(stateVars);
 
-    binFunc func = get_binarizor(outputSymbolSize,
-                                 bypassFlag,
-                                 binID,
-                                 binarzationParams,
-                                 stateVars,
-                                 binParams);
+    binFunc func = getBinarizor(outputSymbolSize,
+                                bypassFlag,
+                                binID,
+                                binarzationParams,
+                                stateVars,
+                                binParams);
 
     while (r.isValid()) {
         // Decode subsymbols and merge them to construct symbols
@@ -411,7 +411,7 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
             symbolValue = (symbolValue<<codingSubsymSize) | subsymbols[s].subsymValue;
         }
 
-        decode_sign_flag(reader, binID, symbolValue);
+        decodeSignFlag(reader, binID, symbolValue);
 
         r.set(symbolValue);
         r.inc();
