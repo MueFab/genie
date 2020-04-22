@@ -65,7 +65,12 @@ void doInverseSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
 }
 
 unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const EncodingConfiguration &enConf) {
-    util::DataBlock dependency(0, 4);
+    const paramcabac::Subsequence &subseqCfg = enConf.getSubseqConfig();
+    const uint8_t wordSize = enConf.getSubseqWordSize();
+    util::DataBlock dependency(0, wordSize);
+    if(GABAC_APP_TEST) {
+        dependency.setWordSize(4);
+    }
 
     uint64_t subseqPayloadSizeUsed = 0;
     uint64_t numDescSubseqSymbols = 0;
@@ -74,7 +79,7 @@ unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const Encodin
     if (subseqPayloadSize <= 0) return 0;
 
     // read number of symbols in descriptor subsequence
-    if(enConf.getSubseqConfig().getTokentypeFlag()) {
+    if(subseqCfg.getTokentypeFlag()) {
         subseqPayloadSizeUsed += gabac::StreamHandler::readU7(*ioConf.inputStream, numDescSubseqSymbols);
     } else {
         subseqPayloadSizeUsed += gabac::StreamHandler::readUInt(*ioConf.inputStream, numDescSubseqSymbols, 4);
@@ -89,13 +94,12 @@ unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const Encodin
 
         if (ioConf.inputStream->peek() != EOF) {
             // Set up for the inverse sequence transformation
-            size_t numTrnsfSubseqsCfgs = enConf.subseq.getNumTransformSubseqCfgs();
+            size_t numTrnsfSubseqsCfgs = subseqCfg.getNumTransformSubseqCfgs();
 
             // Loop through the transformed sequences
             std::vector<util::DataBlock> transformedSubseqs(numTrnsfSubseqsCfgs);
             for (size_t i = 0; i < numTrnsfSubseqsCfgs; i++) {
                 // GABACIFY_LOG_TRACE << "Processing transformed sequence: " << i;
-                auto transformedSubseqCfg = enConf.subseq.getTransformSubseqCfg(i);
 
                 util::DataBlock decodedTransformedSubseq;
                 uint64_t numtrnsfSymbols = 0;
@@ -122,7 +126,7 @@ unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const Encodin
                                                                              &decodedTransformedSubseq);
 
                     // Decoding
-                    gabac::decode_cabac(transformedSubseqCfg,
+                    gabac::decode_cabac(subseqCfg.getTransformSubseqCfg(i),
                                         numtrnsfSymbols,
                                         &decodedTransformedSubseq,
                                         (dependency.size()) ? &dependency : nullptr);
@@ -130,7 +134,7 @@ unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const Encodin
                 }
             }
 
-            doInverseSubsequenceTransform(enConf.getSubseqConfig(), &transformedSubseqs);
+            doInverseSubsequenceTransform(subseqCfg, &transformedSubseqs);
             // GABACIFY_LOG_TRACE << "Decoded sequence of length: " << transformedSubseqs[0].size();
 
             gabac::StreamHandler::writeBytes(*ioConf.outputStream, &transformedSubseqs[0]);

@@ -17,6 +17,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#define GABAC_APP_TEST 1
+
 namespace genie {
 namespace entropy {
 namespace paramcabac {

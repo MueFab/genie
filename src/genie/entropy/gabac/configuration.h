@@ -22,7 +22,7 @@ namespace gabac {
  * @brief Specifies which gabac transformations to execute
  */
 struct EncodingConfiguration {
-   public:
+    public:
     /**
      * @brief Create default config
      */
@@ -58,12 +58,14 @@ struct EncodingConfiguration {
      */
     bool operator!=(const EncodingConfiguration& conf) const;
 
+    uint8_t getSubseqWordSize() const;
 
     const paramcabac::Subsequence& getSubseqConfig() const {
-        return subseq;
+        return subseqCfg;
     }
 
-    paramcabac::Subsequence subseq;
+    private:
+    paramcabac::Subsequence subseqCfg;
 };
 
 /**

@@ -80,8 +80,12 @@ void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::
 
     // Prepare the output data structure
     const uint64_t symbolsCount = (*transformedSubseqs)[0].size();
-    util::DataBlock symbols(symbolsCount, 4);
-    // FIXME TODO paramcabac::StateVars::getMinimalSizeInBytes(subseqShiftSizes[0] + subseqCfg.getTransformSubseqCfg(0).getSupportValues().getOutputSymbolSize())
+    util::DataBlock symbols(symbolsCount,
+                            paramcabac::StateVars::getMinimalSizeInBytes(subseqShiftSizes[0] +
+                                                                         subseqCfg.getTransformSubseqCfg(0).getSupportValues().getOutputSymbolSize()));
+    if(GABAC_APP_TEST) {
+        symbols.setWordSize(4);
+    }
 
     for (uint64_t i = 0; i < symbolsCount; i++) {
         uint64_t symbolValue = 0;

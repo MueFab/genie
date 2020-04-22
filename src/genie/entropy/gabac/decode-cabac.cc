@@ -10,6 +10,7 @@
 #include <limits>
 
 #include <genie/util/data-block.h>
+#include <genie/entropy/paramcabac/subsequence.h>
 #include "exceptions.h"
 #include "reader.h"
 
@@ -153,9 +154,9 @@ void decode_cabac_order0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
 
     std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
 
-    util::DataBlock symbols(numEncodedSymbols,
-                            4); //paramcabac::StateVars::getMinimalSizeInBytes(outputSymbolSize);
-    util::BlockStepper r = symbols.getReader();
+    util::DataBlock decodedSymbols(numEncodedSymbols,
+                                   (GABAC_APP_TEST) ? 4 : paramcabac::StateVars::getMinimalSizeInBytes(outputSymbolSize));
+    util::BlockStepper r = decodedSymbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
     ContextSelector ctxSelector(stateVars);
@@ -195,7 +196,7 @@ void decode_cabac_order0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
 
     reader.close();
 
-    symbols.swap(bitstream);
+    decodedSymbols.swap(bitstream);
 }
 
 void decode_cabac_order1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
@@ -233,9 +234,9 @@ void decode_cabac_order1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
 
     std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
 
-    util::DataBlock symbols(numEncodedSymbols,
-                            4); //paramcabac::StateVars::getMinimalSizeInBytes(outputSymbolSize);
-    util::BlockStepper r = symbols.getReader();
+    util::DataBlock decodedSymbols(numEncodedSymbols,
+                                   (GABAC_APP_TEST) ? 4 : paramcabac::StateVars::getMinimalSizeInBytes(outputSymbolSize));
+    util::BlockStepper r = decodedSymbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
     LUTsSubSymbolTransform invLutsSubsymTrnsfm(supportVals, stateVars, numLuts, numPrvs, false);
@@ -313,7 +314,7 @@ void decode_cabac_order1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
 
     reader.close();
 
-    symbols.swap(bitstream);
+    decodedSymbols.swap(bitstream);
 }
 
 void decode_cabac_order2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
@@ -349,9 +350,9 @@ void decode_cabac_order2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
 
     std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
 
-    util::DataBlock symbols(numEncodedSymbols,
-                            4); //paramcabac::StateVars::getMinimalSizeInBytes(outputSymbolSize);
-    util::BlockStepper r = symbols.getReader();
+    util::DataBlock decodedSymbols(numEncodedSymbols,
+                                   (GABAC_APP_TEST) ? 4 : paramcabac::StateVars::getMinimalSizeInBytes(outputSymbolSize));
+    util::BlockStepper r = decodedSymbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
     LUTsSubSymbolTransform invLutsSubsymTrnsfm(supportVals, stateVars, numLuts, numPrvs, false);
@@ -413,7 +414,7 @@ void decode_cabac_order2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
 
     reader.close();
 
-    symbols.swap(bitstream);
+    decodedSymbols.swap(bitstream);
 }
 
 void decode_cabac(const paramcabac::TransformedSubSeq &trnsfSubseqConf,

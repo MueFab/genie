@@ -10,11 +10,9 @@
 #ifdef __cplusplus
 
 /* General */
-//#include "constants.h"
 #include "exceptions.h"
 
 /* Encode / Decode */
-//#include "analysis.h"
 #include "configuration.h"
 #include "run.h"
 
