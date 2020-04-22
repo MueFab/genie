@@ -127,9 +127,9 @@ binFunc get_binarizor(const uint8_t outputSymbolSize,
     return func;
 }
 
-void decode_cabac_order0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                         const unsigned int numEncodedSymbols,
-                         util::DataBlock* bitstream) {
+void decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                                 const unsigned int numEncodedSymbols,
+                                 util::DataBlock* bitstream) {
     if (bitstream == nullptr) {
         GABAC_DIE("Bitstream is null");
     }
@@ -199,10 +199,10 @@ void decode_cabac_order0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
     decodedSymbols.swap(bitstream);
 }
 
-void decode_cabac_order1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                         const unsigned int numEncodedSymbols,
-                         util::DataBlock* bitstream,
-                         util::DataBlock* const depSymbols) {
+void decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                                 const unsigned int numEncodedSymbols,
+                                 util::DataBlock* bitstream,
+                                 util::DataBlock* const depSymbols) {
     if (bitstream == nullptr) {
         GABAC_DIE("Bitstream is null");
     }
@@ -317,9 +317,9 @@ void decode_cabac_order1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
     decodedSymbols.swap(bitstream);
 }
 
-void decode_cabac_order2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                         const unsigned int numEncodedSymbols,
-                         util::DataBlock* bitstream) {
+void decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                                 const unsigned int numEncodedSymbols,
+                                 util::DataBlock* bitstream) {
     if (bitstream == nullptr) {
         GABAC_DIE("Bitstream is null");
     }
@@ -417,19 +417,19 @@ void decode_cabac_order2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
     decodedSymbols.swap(bitstream);
 }
 
-void decode_cabac(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                  const unsigned int numEncodedSymbols,
-                  util::DataBlock* bitstream,
-                  util::DataBlock* const depSymbols) {
+void decodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                           const unsigned int numEncodedSymbols,
+                           util::DataBlock* bitstream,
+                           util::DataBlock* const depSymbols) {
     switch(trnsfSubseqConf.getSupportValues().getCodingOrder()) {
         case 0:
-            decode_cabac_order0(trnsfSubseqConf, numEncodedSymbols, bitstream);
+            decodeTransformSubseqOrder0(trnsfSubseqConf, numEncodedSymbols, bitstream);
         break;
         case 1:
-            decode_cabac_order1(trnsfSubseqConf, numEncodedSymbols, bitstream, depSymbols);
+            decodeTransformSubseqOrder1(trnsfSubseqConf, numEncodedSymbols, bitstream, depSymbols);
         break;
         case 2:
-            decode_cabac_order2(trnsfSubseqConf, numEncodedSymbols, bitstream);
+            decodeTransformSubseqOrder2(trnsfSubseqConf, numEncodedSymbols, bitstream);
         break;
         default:
             GABAC_DIE("Unknown coding order");

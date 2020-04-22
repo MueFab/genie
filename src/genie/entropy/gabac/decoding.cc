@@ -126,10 +126,10 @@ unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const Encodin
                                                                              &decodedTransformedSubseq);
 
                     // Decoding
-                    gabac::decode_cabac(subseqCfg.getTransformSubseqCfg(i),
-                                        numtrnsfSymbols,
-                                        &decodedTransformedSubseq,
-                                        (dependency.size()) ? &dependency : nullptr);
+                    gabac::decodeTransformSubseq(subseqCfg.getTransformSubseqCfg(i),
+                                                 numtrnsfSymbols,
+                                                 &decodedTransformedSubseq,
+                                                 (dependency.size()) ? &dependency : nullptr);
                     transformedSubseqs[i].swap(&(decodedTransformedSubseq));
                 }
             }
