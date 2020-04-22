@@ -127,25 +127,25 @@ binFunc get_binarizor(const uint8_t outputSymbolSize,
     return func;
 }
 
-void decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                                 const unsigned int numEncodedSymbols,
-                                 util::DataBlock* bitstream) {
+size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                                   const unsigned int numEncodedSymbols,
+                                   util::DataBlock* bitstream) {
     if (bitstream == nullptr) {
         GABAC_DIE("Bitstream is null");
     }
 
-    if (numEncodedSymbols <= 0) return;
+    if (numEncodedSymbols <= 0) return 0;
 
     const paramcabac::SupportValues &supportVals = trnsfSubseqConf.getSupportValues();
     const paramcabac::Binarization &binarzation = trnsfSubseqConf.getBinarization();
     const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
     const paramcabac::StateVars &stateVars = trnsfSubseqConf.getStateVars();
     const paramcabac::BinarizationParameters::BinarizationId binID = binarzation.getBinarizationID();
-    const core::Alphabet alphaProps = getAlphabetProperties(trnsfSubseqConf.getAlphabetID());
 
     const uint8_t outputSymbolSize = supportVals.getOutputSymbolSize();
     const uint8_t codingSubsymSize = supportVals.getCodingSubsymSize();
     const bool bypassFlag = binarzation.getBypassFlag();
+    size_t payloadSizeUsed = 0;
 
     Reader reader(bitstream,
                   bypassFlag,
@@ -194,20 +194,22 @@ void decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSubse
         r.inc();
     }
 
-    reader.close();
+    payloadSizeUsed = reader.close();
 
     decodedSymbols.swap(bitstream);
+
+    return payloadSizeUsed;
 }
 
-void decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                                 const unsigned int numEncodedSymbols,
-                                 util::DataBlock* bitstream,
-                                 util::DataBlock* const depSymbols) {
+size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                                   const unsigned int numEncodedSymbols,
+                                   util::DataBlock* bitstream,
+                                   util::DataBlock* const depSymbols) {
     if (bitstream == nullptr) {
         GABAC_DIE("Bitstream is null");
     }
 
-    if (numEncodedSymbols <= 0) return;
+    if (numEncodedSymbols <= 0) return 0;
 
     const paramcabac::SupportValues &supportVals = trnsfSubseqConf.getSupportValues();
     const paramcabac::Binarization &binarzation = trnsfSubseqConf.getBinarization();
@@ -221,6 +223,7 @@ void decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSubse
     const uint8_t codingOrder = supportVals.getCodingOrder();
     const uint64_t subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize)-1;
     const bool bypassFlag = binarzation.getBypassFlag();
+    size_t payloadSizeUsed = 0;
 
     uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
                                                  supportVals.getShareSubsymLutFlag(),
@@ -312,26 +315,27 @@ void decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSubse
         r.inc();
     }
 
-    reader.close();
+    payloadSizeUsed = reader.close();
 
     decodedSymbols.swap(bitstream);
+
+    return payloadSizeUsed;
 }
 
-void decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                                 const unsigned int numEncodedSymbols,
-                                 util::DataBlock* bitstream) {
+size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                                   const unsigned int numEncodedSymbols,
+                                   util::DataBlock* bitstream) {
     if (bitstream == nullptr) {
         GABAC_DIE("Bitstream is null");
     }
 
-    if (numEncodedSymbols <= 0) return;
+    if (numEncodedSymbols <= 0) return 0;
 
     const paramcabac::SupportValues &supportVals = trnsfSubseqConf.getSupportValues();
     const paramcabac::Binarization &binarzation = trnsfSubseqConf.getBinarization();
     const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
     const paramcabac::StateVars &stateVars = trnsfSubseqConf.getStateVars();
     const paramcabac::BinarizationParameters::BinarizationId binID = binarzation.getBinarizationID();
-    const core::Alphabet alphaProps = getAlphabetProperties(trnsfSubseqConf.getAlphabetID());
 
     const uint8_t outputSymbolSize = supportVals.getOutputSymbolSize();
     const uint8_t codingSubsymSize = supportVals.getCodingSubsymSize();
@@ -342,6 +346,7 @@ void decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSubse
                                                  supportVals.getShareSubsymLutFlag(),
                                                  trnsfSubseqConf.getTransformIDSubsym());
     uint8_t const numPrvs = stateVars.getNumPrvs(supportVals.getShareSubsymPrvFlag());
+    size_t payloadSizeUsed = 0;
 
     Reader reader(bitstream,
                   bypassFlag,
@@ -412,28 +417,32 @@ void decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSubse
         r.inc();
     }
 
-    reader.close();
+    payloadSizeUsed = reader.close();
 
     decodedSymbols.swap(bitstream);
+
+    return payloadSizeUsed;
 }
 
-void decodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                           const unsigned int numEncodedSymbols,
-                           util::DataBlock* bitstream,
-                           util::DataBlock* const depSymbols) {
+size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                             const unsigned int numEncodedSymbols,
+                             util::DataBlock* bitstream,
+                             util::DataBlock* const depSymbols) {
     switch(trnsfSubseqConf.getSupportValues().getCodingOrder()) {
         case 0:
-            decodeTransformSubseqOrder0(trnsfSubseqConf, numEncodedSymbols, bitstream);
+            return decodeTransformSubseqOrder0(trnsfSubseqConf, numEncodedSymbols, bitstream);
         break;
         case 1:
-            decodeTransformSubseqOrder1(trnsfSubseqConf, numEncodedSymbols, bitstream, depSymbols);
+            return decodeTransformSubseqOrder1(trnsfSubseqConf, numEncodedSymbols, bitstream, depSymbols);
         break;
         case 2:
-            decodeTransformSubseqOrder2(trnsfSubseqConf, numEncodedSymbols, bitstream);
+            return decodeTransformSubseqOrder2(trnsfSubseqConf, numEncodedSymbols, bitstream);
         break;
         default:
             GABAC_DIE("Unknown coding order");
     }
+
+    return 0;
 }
 }  // namespace gabac
 }  // namespace entropy
