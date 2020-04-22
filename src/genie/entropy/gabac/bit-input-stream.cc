@@ -35,6 +35,10 @@ BitInputStream::~BitInputStream() = default;
 
 unsigned int BitInputStream::getNumBitsUntilByteAligned() const { return m_numHeldBits & 0x7u; }
 
+size_t BitInputStream::getNumBytesRead() const {
+    return m_reader.curr - static_cast<uint8_t *>(m_bitstream->getData());
+}
+
 unsigned char BitInputStream::readByte() {
     unsigned int result = read(8);
     assert(result <= std::numeric_limits<unsigned char>::max());

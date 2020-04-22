@@ -22,6 +22,7 @@ class BinaryArithmeticDecoder {
     void decodeBinTrm();
     void reset();
     void start();
+    size_t close();
 
    private:
     BitInputStream m_bitInputStream;

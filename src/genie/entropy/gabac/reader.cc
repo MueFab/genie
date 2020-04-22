@@ -248,8 +248,8 @@ void Reader::start() {
     m_decBinCabac.start();
 }
 
-void Reader::close() {
-    m_decBinCabac.reset();
+size_t Reader::close() {
+    return m_decBinCabac.close();
 }
 
 void Reader::reset() {

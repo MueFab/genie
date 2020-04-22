@@ -116,6 +116,11 @@ void BinaryArithmeticDecoder::start() {
     m_value = (m_bitInputStream.readByte() << 8u);
     m_value |= m_bitInputStream.readByte();
 }
+
+size_t BinaryArithmeticDecoder::close() {
+    decodeBinTrm();
+    return m_bitInputStream.getNumBytesRead();
+}
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
