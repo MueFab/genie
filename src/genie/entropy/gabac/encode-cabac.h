@@ -24,10 +24,10 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-void encode_cabac(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                  util::DataBlock* symbols,
-                  util::DataBlock* const depSymbols = nullptr,
-                  size_t maxsize = std::numeric_limits<size_t>::max());
+void encodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                           util::DataBlock* symbols,
+                           util::DataBlock* const depSymbols = nullptr,
+                           size_t maxsize = std::numeric_limits<size_t>::max());
 
 }  // namespace gabac
 }  // namespace entropy

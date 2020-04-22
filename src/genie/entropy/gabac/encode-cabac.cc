@@ -123,9 +123,9 @@ binFunc get_binarizor(const uint8_t outputSymbolSize,
     return func;
 }
 
-void encode_cabac_order0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                         util::DataBlock* symbols,
-                         size_t maxSize) {
+void encodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                                 util::DataBlock* symbols,
+                                 size_t maxSize) {
     assert(symbols != nullptr);
 
     size_t numSymbols = symbols->size();
@@ -202,10 +202,10 @@ void encode_cabac_order0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
     bitstream.flush(symbols);
 }
 
-void encode_cabac_order1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                         util::DataBlock* symbols,
-                         util::DataBlock* const depSymbols,
-                         size_t maxSize) {
+void encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                                 util::DataBlock* symbols,
+                                 util::DataBlock* const depSymbols,
+                                 size_t maxSize) {
     assert(symbols != nullptr);
 
     size_t numSymbols = symbols->size();
@@ -319,9 +319,9 @@ void encode_cabac_order1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
     bitstream.flush(symbols);
 }
 
-void encode_cabac_order2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                         util::DataBlock* symbols,
-                         size_t maxSize) {
+void encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                                 util::DataBlock* symbols,
+                                 size_t maxSize) {
     assert(symbols != nullptr);
 
     size_t numSymbols = symbols->size();
@@ -420,20 +420,20 @@ void encode_cabac_order2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
     bitstream.flush(symbols);
 }
 
-void encode_cabac(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                  util::DataBlock* symbols,
-                  util::DataBlock* const depSymbols,
-                  size_t maxSize) {
+void encodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                           util::DataBlock* symbols,
+                           util::DataBlock* const depSymbols,
+                           size_t maxSize) {
 
     switch(trnsfSubseqConf.getSupportValues().getCodingOrder()) {
         case 0:
-            encode_cabac_order0(trnsfSubseqConf, symbols, maxSize);
+            encodeTransformSubseqOrder0(trnsfSubseqConf, symbols, maxSize);
         break;
         case 1:
-            encode_cabac_order1(trnsfSubseqConf, symbols, depSymbols, maxSize);
+            encodeTransformSubseqOrder1(trnsfSubseqConf, symbols, depSymbols, maxSize);
         break;
         case 2:
-            encode_cabac_order2(trnsfSubseqConf, symbols, maxSize);
+            encodeTransformSubseqOrder2(trnsfSubseqConf, symbols, maxSize);
         break;
         default:
             GABAC_DIE("Unknown coding order");

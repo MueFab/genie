@@ -109,9 +109,9 @@ unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingC
             uint64_t trnsfSubseqPayloadSize = 0;
             if(numtrnsfSymbols > 0) {
                 // Encoding
-                gabac::encode_cabac(subseqCfg.getTransformSubseqCfg(i),
-                                    &(transformedSubseqs[i]),
-                                    (dependency.size()) ? &dependency : nullptr);
+                gabac::encodeTransformSubseq(subseqCfg.getTransformSubseqCfg(i),
+                                             &(transformedSubseqs[i]),
+                                             (dependency.size()) ? &dependency : nullptr);
 
                 trnsfSubseqPayloadSize = transformedSubseqs[i].getRawSize();
             }
