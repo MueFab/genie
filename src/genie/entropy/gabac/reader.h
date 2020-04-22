@@ -75,15 +75,12 @@ class Reader {
 
     void start();
 
-    void close();
+    size_t close();
 
     void reset();
 
    private:
     BitInputStream m_bitInputStream;
-
-    // ContextSelector m_contextSelector;
-
     BinaryArithmeticDecoder m_decBinCabac;
 
     bool m_bypassFlag;
