@@ -17,10 +17,7 @@ namespace paramcabac {
 DecoderRegular::DecoderRegular(core::GenDesc desc)
     : core::parameter::desc_pres::DecoderRegular(MODE_CABAC), descriptor_subsequence_cfgs() {
     for (size_t i = 0; i < core::getDescriptors()[uint8_t(desc)].subseqs.size(); ++i) {
-        descriptor_subsequence_cfgs.push_back(Subsequence(TransformedParameters(),
-                                                          i,
-                                                          false,
-                                                          std::vector<TransformedSubSeq>({TransformedSubSeq()})));
+        descriptor_subsequence_cfgs.emplace_back(i, false);
     }
 }
 
@@ -29,7 +26,7 @@ DecoderRegular::DecoderRegular(core::GenDesc desc)
 DecoderRegular::DecoderRegular(util::BitReader &reader) : core::parameter::desc_pres::DecoderRegular(MODE_CABAC) {
     uint8_t num_descriptor_subsequence_cfgs = reader.read<uint8_t>() + 1;
     for (size_t i = 0; i < num_descriptor_subsequence_cfgs; ++i) {
-        descriptor_subsequence_cfgs.emplace_back(Subsequence(false, reader));
+        descriptor_subsequence_cfgs.emplace_back(false, reader);
     }
 }
 
@@ -66,10 +63,7 @@ void DecoderRegular::write(util::BitWriter &writer) const {
 DecoderTokenType::DecoderTokenType()
     : core::parameter::desc_pres::DecoderTokentype(MODE_CABAC), rle_guard_tokentype(0), descriptor_subsequence_cfgs() {
     for (size_t i = 0; i < 2; ++i) {
-        descriptor_subsequence_cfgs.emplace_back(TransformedParameters(),
-                                                 i,
-                                                 true,
-                                                 std::vector<TransformedSubSeq>({TransformedSubSeq()}));
+        descriptor_subsequence_cfgs.emplace_back(i, true);
     }
 }
 
@@ -79,7 +73,7 @@ DecoderTokenType::DecoderTokenType(util::BitReader &reader) : core::parameter::d
     uint8_t num_descriptor_subsequence_cfgs = 2;
     rle_guard_tokentype = reader.read<uint8_t>();
     for (size_t i = 0; i < num_descriptor_subsequence_cfgs; ++i) {
-        descriptor_subsequence_cfgs.emplace_back(Subsequence(true, reader));
+        descriptor_subsequence_cfgs.emplace_back(true, reader);
     }
 }
 

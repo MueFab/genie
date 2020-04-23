@@ -27,8 +27,10 @@ class Subsequence {
    public:
     Subsequence();
 
+    Subsequence(uint16_t _descriptor_subsequence_ID, bool _tokentypeFlag);
+
     Subsequence(TransformedParameters&& _transform_subseq_parameters,
-                uint16_t descriptor_subsequence_ID,
+                uint16_t _descriptor_subsequence_ID,
                 bool _tokentypeFlag,
                 std::vector<TransformedSubSeq>&& transformSubseq_cfgs);
 
