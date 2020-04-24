@@ -68,7 +68,7 @@ void code(const std::string &inputFilePath,
     genie::entropy::gabac::IOConfiguration ioconf = {istream, dstream, ostream, blocksize, logstream,
                                                      genie::entropy::gabac::IOConfiguration::LogLevel::INFO};
 
-    unsigned long descSubseqPayloadSize = genie::entropy::gabac::run(ioconf, getEncoderConfigManual(descID, subseqID), decode);
+    genie::entropy::gabac::run(ioconf, getEncoderConfigManual(descID, subseqID), decode);
 
     /* GABACIFY_LOG_INFO << "Wrote buffer of size "
                       << outStream.bytesWritten()
