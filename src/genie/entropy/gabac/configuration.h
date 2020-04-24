@@ -64,6 +64,10 @@ struct EncodingConfiguration {
         return subseqCfg;
     }
 
+    void setSubseqConfig(paramcabac::Subsequence _subseqCfg) {
+        subseqCfg = _subseqCfg;
+    }
+
     private:
     paramcabac::Subsequence subseqCfg;
 };

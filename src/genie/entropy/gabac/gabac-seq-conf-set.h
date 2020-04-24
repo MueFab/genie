@@ -29,13 +29,9 @@ class GabacSeqConfSet {
     std::vector<SeqConf> conf;                                  //!< @brief Configuration for all genomic descriptors
 
     // Shortcuts
-    using TransformSubseqParameters = entropy::paramcabac::TransformedParameters;
-    using TransformIdSubsym = entropy::paramcabac::SupportValues::TransformIdSubsym;
-    using CabacBinarization = entropy::paramcabac::Binarization;
     using DescriptorSubsequenceCfg = entropy::paramcabac::Subsequence;
     using DecoderConfigurationCabac = entropy::paramcabac::DecoderRegular;
     using ParameterSet = core::parameter::ParameterSet;
-    using TransformSubseqCfg = entropy::paramcabac::TransformedSubSeq;
 
     /**
      * @brief Extract the mgb::desc_conf_pres::paramcabac::DecoderConfigurationCabac from a
@@ -51,19 +47,22 @@ class GabacSeqConfSet {
    public:
     /**
      * @brief Retrieve a configuration from the current set, fitting for the specified subsequence
-     * @param desc Which descriptor
-     * @param sub Which subsequence
+     * @param sub - identifies descriptor subseuqence
      * @return Gabac configuration
      */
     const gabac::EncodingConfiguration& getConfAsGabac(core::GenSubIndex sub) const;
 
+    gabac::EncodingConfiguration& getConfAsGabac(core::GenSubIndex sub) {
+        return conf[uint8_t(sub.first)][uint8_t(sub.second)];
+    };
+
     /**
      * @brief Set a configuration for the specified subsequence
-     * @param desc Which descriptor
-     * @param sub Which subsequence
-     * @return Gabac configuration
+     * @param sub - identifies descriptor subsequence
+     * @param subseqCfg - the descritpor subsequence configuration
+     * @return none
      */
-    void setConfAsGabac(core::GenSubIndex sub, DescriptorSubsequenceCfg &subseqCfg) const;
+    void setConfAsGabac(core::GenSubIndex sub, DescriptorSubsequenceCfg &subseqCfg);
 
     /**
      *  @brief Create a default config guaranteed to work (bypass, no transformation, binary binarization)
@@ -84,17 +83,15 @@ class GabacSeqConfSet {
 
     template <typename T>
     void fillDecoder(const core::GenomicDescriptorProperties& desc, T& decoder_config) const {
-    /* TODO
         for (const auto& subdesc : desc.subseqs) {
-            auto subseqCfg = getConfAsGabac(subdesc.id);
-            // FIXME decoder_config.setSubsequenceCfg(subdesc.id.second, std::move(subseqCfg));
+            auto enCfg = getConfAsGabac(subdesc.id);
+            //FIXME decoder_config.setSubsequenceCfg(uint8_t(subdesc.id.second), enCfg.getSubseqConfig());
 
-            // RESTRUCT_DISABLE
+            // RESTRUCT_DISABLE - probably do not need it anymore
             // This is where actual translation of one gabac config to MPEGG takes place
             //auto& subseq_cfg = decoder_config.getSubsequenceCfg(subdesc.id.second);
-            //storeSubseq(getConfAsGabac(subdesc.id), subseq_cfg);
+            //storeSubseq(getConfAsGabac(subdesc.id), subseq_cfg);*/
         }
-        */
     }
 };
 }  // namespace gabac

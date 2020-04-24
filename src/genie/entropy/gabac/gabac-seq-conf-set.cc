@@ -33,8 +33,10 @@ const gabac::EncodingConfiguration &GabacSeqConfSet::getConfAsGabac(core::GenSub
     return conf[uint8_t(sub.first)][uint8_t(sub.second)];
 }
 
-void GabacSeqConfSet::setConfAsGabac(core::GenSubIndex sub, DescriptorSubsequenceCfg &subseqCfg) const {
-    // FIXME conf[uint8_t(sub.first)][uint8_t(sub.second)].subseq = subseqCfg;
+// ---------------------------------------------------------------------------------------------------------------------
+
+void GabacSeqConfSet::setConfAsGabac(core::GenSubIndex sub, DescriptorSubsequenceCfg &subseqCfg) {
+    conf[uint8_t(sub.first)][uint8_t(sub.second)].setSubseqConfig(subseqCfg);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -88,10 +90,9 @@ void GabacSeqConfSet::loadParameters(const core::parameter::ParameterSet &parame
     for (const auto &desc : core::getDescriptors()) {
         auto &descConfig = loadDescriptorDecoderCfg(parameterSet, desc.id);
         for (const auto &subdesc : getDescriptor(desc.id).subseqs) {
-            auto sub_desc = descConfig.getSubsequenceCfg(subdesc.id.second);
+            auto subseqCfg = descConfig.getSubsequenceCfg(subdesc.id.second);
 
-            //FIXME setConfAsGabac(subdesc.id.second, sub_desc);
-
+            //FIXME setConfAsGabac(subdesc.id.second, subseqCfg);
         }
     }
 }
