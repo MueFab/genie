@@ -111,7 +111,7 @@ bool AccessUnitPayload::SubsequencePayload::isEmpty() const {
 
 void AccessUnitPayload::DescriptorPayload::write(util::BitWriter& writer) const {
     for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
-        if (i != subsequencePayloads.size() - 1) {
+        if (i < (subsequencePayloads.size() - 1)) {
             writer.write(subsequencePayloads[i].getWrittenSize(), 32);
         }
         subsequencePayloads[i].write(writer);
