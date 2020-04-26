@@ -57,7 +57,7 @@ void GabacSeqConfSet::storeParameters(core::parameter::ParameterSet &parameterSe
             descriptor_configuration->setDecoder(std::move(decoder_config));
         }
 
-        auto descriptor_container = core::parameter::DescriptorBox();
+        auto descriptor_container = core::parameter::DescriptorSubseqCfg();
         descriptor_container.set(std::move(descriptor_configuration));
 
         parameterSet.setDescriptor(desc.id, std::move(descriptor_container));
