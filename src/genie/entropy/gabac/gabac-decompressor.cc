@@ -17,13 +17,7 @@ core::AccessUnitRaw::Subsequence GabacDecompressor::decompress(const gabac::Enco
     core::AccessUnitPayload::SubsequencePayload in = std::move(data);
     // Interface to GABAC library
     std::stringstream in_stream;
-    for (auto& payload : in) {
-        util::DataBlock buffer = payload.move();
-
-        uint32_t size = buffer.getRawSize();
-        in_stream.write(reinterpret_cast<char*>(&size), sizeof(uint32_t));
-        in_stream.write(reinterpret_cast<char*>(buffer.getData()), buffer.getRawSize());
-    }
+    util::DataBlock buffer = in.move();
 
     util::DataBlock tmp(0, 4);
     gabac::OBufferStream outbuffer(&tmp);

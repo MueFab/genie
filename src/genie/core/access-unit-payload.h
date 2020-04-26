@@ -28,49 +28,9 @@ class AccessUnitPayload {
     /**
      * @brief
      */
-    class TransformedPayload {
-       private:
-        util::DataBlock payloadData;  //!< @brief
-        size_t position{};
-
-       public:
-        /**
-         * @brief
-         * @param writer
-         */
-        void write(util::BitWriter& writer) const;
-
-        /**
-         * @brief
-         * @param _data
-         */
-        explicit TransformedPayload(util::DataBlock _data, size_t pos);
-
-        TransformedPayload(size_t size, util::BitReader& reader);
-
-        /**
-         * @brief
-         * @return
-         */
-        bool isEmpty() const;
-
-        /**
-         * @brief
-         * @param _data
-         */
-        util::DataBlock&& move();
-
-        size_t getIndex() const;
-
-        size_t getWrittenSize() const { return payloadData.getRawSize(); }
-    };
-
-    /**
-     * @brief
-     */
     class SubsequencePayload {
        private:
-        std::vector<TransformedPayload> transformedPayloads;  //!< @brief
+        util::DataBlock transformedPayloads;  //!< @brief
         GenSubIndex id;                                       //!< @brief
 
        public:
@@ -80,7 +40,7 @@ class AccessUnitPayload {
          */
         explicit SubsequencePayload(GenSubIndex _id);
 
-        explicit SubsequencePayload(GenSubIndex _id, size_t remainingSize, size_t subseq_ctr, util::BitReader& reader);
+        explicit SubsequencePayload(GenSubIndex _id, size_t remainingSize, util::BitReader& reader);
 
         /**
          * @brief
@@ -98,7 +58,21 @@ class AccessUnitPayload {
          * @brief
          * @param p
          */
-        void add(TransformedPayload p);
+        void set(util::DataBlock&& p) {
+            transformedPayloads = std::move(p);
+        }
+
+        const util::DataBlock& get() const {
+            return transformedPayloads;
+        }
+
+        util::DataBlock& get()  {
+            return transformedPayloads;
+        }
+
+        util::DataBlock&& move()  {
+            return std::move(transformedPayloads);
+        }
 
         /**
          * @brief
@@ -106,23 +80,8 @@ class AccessUnitPayload {
          */
         bool isEmpty() const;
 
-        TransformedPayload* begin() { return &transformedPayloads.front(); }
-
-        TransformedPayload* end() { return &transformedPayloads.back() + 1; }
-
-        const TransformedPayload* begin() const { return &transformedPayloads.front(); }
-
-        const TransformedPayload* end() const { return &transformedPayloads.back() + 1; }
-
         size_t getWrittenSize() const {
-            size_t size = 0;
-            for (size_t i = 0; i < transformedPayloads.size(); ++i) {
-                size += transformedPayloads[i].getWrittenSize();
-                if (i != transformedPayloads.size() - 1) {
-                    size += 4;
-                }
-            }
-            return size;
+            return transformedPayloads.getRawSize();
         }
     };
 

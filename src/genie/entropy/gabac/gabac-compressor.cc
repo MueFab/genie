@@ -20,7 +20,8 @@ core::AccessUnitPayload::SubsequencePayload GabacCompressor::compress(const gaba
     util::DataBlock buffer = data.move();
     gabac::IBufferStream bufferInputStream(&buffer);
 
-    GenieGabacOutputStream bufferOutputStream;
+    util::DataBlock outblock(0, 1);
+    gabac::OBufferStream bufferOutputStream(&outblock);
 
     // Setup
     const size_t GABAC_BLOCK_SIZE = 0;  // 0 means single block (block size is equal to input size)
@@ -32,14 +33,9 @@ core::AccessUnitPayload::SubsequencePayload GabacCompressor::compress(const gaba
     // Run
     gabac::run(GABAC_IO_SETUP, conf, GABAC_DECODING_MODE);
 
-    // Translate to GENIE-Payload TODO: change gabac to directly output the right format
-    std::vector<util::DataBlock> outbuffer;
-    bufferOutputStream.flush_blocks(&outbuffer);
-    size_t index = 0;
+    bufferOutputStream.flush(&outblock);
     core::AccessUnitPayload::SubsequencePayload out(data.getID());
-    for (auto &o : outbuffer) {
-        out.add(core::AccessUnitPayload::TransformedPayload(std::move(o), index++));
-    }
+    out.set(std::move(outblock));
     return out;
 }
 
