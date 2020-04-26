@@ -23,7 +23,6 @@ set(source_files
         gabac-compressor.cc
         gabac-decompressor.cc
         gabac-seq-conf-set.cc
-        genie-gabac-output-stream.cc
         run.cc
         stream-handler.cc
         streams.cc
