@@ -8,7 +8,7 @@ set(source_files
         parameter/computed_ref_extended.cc
         parameter/data_unit.cc
         parameter/descriptor.cc
-        parameter/descriptor_box.cc
+        parameter/descriptor_subseq_cfg.cc
         parameter/parameter_set.cc
         parameter/quality-values.cc
 
