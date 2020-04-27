@@ -30,8 +30,8 @@ class AccessUnitPayload {
      */
     class SubsequencePayload {
        private:
-        util::DataBlock transformedPayloads;  //!< @brief
-        GenSubIndex id;                                       //!< @brief
+        GenSubIndex id;           //!< @brief
+        util::DataBlock payload;  //!< @brief
 
        public:
         /**
@@ -59,19 +59,31 @@ class AccessUnitPayload {
          * @param p
          */
         void set(util::DataBlock&& p) {
-            transformedPayloads = std::move(p);
+            payload = std::move(p);
         }
 
+        /**
+         * @brief return subsequence payload
+         * @return payload
+         */
         const util::DataBlock& get() const {
-            return transformedPayloads;
+            return payload;
         }
 
+        /**
+         * @brief return subsequence payload
+         * @return payload
+         */
         util::DataBlock& get()  {
-            return transformedPayloads;
+            return payload;
         }
 
+        /**
+         * @brief move subsequence payload
+         * @return payload
+         */
         util::DataBlock&& move()  {
-            return std::move(transformedPayloads);
+            return std::move(payload);
         }
 
         /**
@@ -80,8 +92,12 @@ class AccessUnitPayload {
          */
         bool isEmpty() const;
 
+        /**
+         * @brief return subsequence payload size
+         * @return payload size
+         */
         size_t getWrittenSize() const {
-            return transformedPayloads.getRawSize();
+            return payload.getRawSize();
         }
     };
 
