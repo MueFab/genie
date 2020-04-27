@@ -64,8 +64,8 @@ struct EncodingConfiguration {
         return subseqCfg;
     }
 
-    void setSubseqConfig(paramcabac::Subsequence _subseqCfg) {
-        subseqCfg = _subseqCfg;
+    void setSubseqConfig(paramcabac::Subsequence &&_subseqCfg) {
+        subseqCfg = std::move(_subseqCfg);
     }
 
     private:

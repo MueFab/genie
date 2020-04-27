@@ -35,8 +35,8 @@ const gabac::EncodingConfiguration &GabacSeqConfSet::getConfAsGabac(core::GenSub
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void GabacSeqConfSet::setConfAsGabac(core::GenSubIndex sub, DescriptorSubsequenceCfg &subseqCfg) {
-    conf[uint8_t(sub.first)][uint8_t(sub.second)].setSubseqConfig(subseqCfg);
+void GabacSeqConfSet::setConfAsGabac(core::GenSubIndex sub, DescriptorSubsequenceCfg &&subseqCfg) {
+    conf[uint8_t(sub.first)][uint8_t(sub.second)].setSubseqConfig(std::move(subseqCfg));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ void GabacSeqConfSet::loadParameters(const core::parameter::ParameterSet &parame
         for (const auto &subdesc : getDescriptor(desc.id).subseqs) {
             auto subseqCfg = descConfig.getSubsequenceCfg(subdesc.id.second);
 
-            //FIXME setConfAsGabac(subdesc.id.second, subseqCfg);
+            setConfAsGabac(subdesc.id, std::move(subseqCfg));
         }
     }
 }

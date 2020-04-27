@@ -62,7 +62,7 @@ class GabacSeqConfSet {
      * @param subseqCfg - the descritpor subsequence configuration
      * @return none
      */
-    void setConfAsGabac(core::GenSubIndex sub, DescriptorSubsequenceCfg &subseqCfg);
+    void setConfAsGabac(core::GenSubIndex sub, DescriptorSubsequenceCfg &&subseqCfg);
 
     /**
      *  @brief Create a default config guaranteed to work (bypass, no transformation, binary binarization)
