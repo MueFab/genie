@@ -22,7 +22,7 @@ GabacSeqConfSet::GabacSeqConfSet() {
     for (const auto &desc : core::getDescriptors()) {
         conf.emplace_back();
         for (size_t i = 0; i < getDescriptor(desc.id).subseqs.size(); ++i) {
-            conf.back().emplace_back();
+            conf.back().emplace_back(paramcabac::Subsequence(i, desc.tokentype));
         }
     }
 }
