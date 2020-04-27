@@ -19,11 +19,11 @@ AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id) : id(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id, size_t size,util::BitReader& reader)
-    : id(std::move(_id)), transformedPayloads(0, 1) {
-    transformedPayloads.reserve(size);
+AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id, size_t size, util::BitReader& reader)
+    : id(std::move(_id)), payload(0, 1) {
+    payload.reserve(size);
     for (size_t i = 0; i < size; ++i) {
-        transformedPayloads.push_back(reader.read(8));
+        payload.push_back(reader.read(8));
     }
 }
 
@@ -34,13 +34,13 @@ GenSubIndex AccessUnitPayload::SubsequencePayload::getID() const { return id; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnitPayload::SubsequencePayload::write(util::BitWriter& writer) const {
-    writer.writeBypass(transformedPayloads.getData(), transformedPayloads.getRawSize());
+    writer.writeBypass(payload.getData(), payload.getRawSize());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool AccessUnitPayload::SubsequencePayload::isEmpty() const {
-    return transformedPayloads.empty();
+    return payload.empty();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -152,7 +152,7 @@ AccessUnitPayload::DescriptorPayload::DescriptorPayload(GenDesc _id, size_t coun
     : id(_id) {
     for (size_t i = 0; i < count; ++i) {
         size_t s = 0;
-        if (i != count - 1) {
+        if (i < (count - 1)) {
             s = reader.read(32);
             remainingSize -= (s + 4);
         } else {
