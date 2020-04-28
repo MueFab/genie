@@ -17,7 +17,6 @@ namespace gabac {
 void transformRleCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs) {
     assert(transformedSubseqs != nullptr);
     const uint8_t guard = subseqCfg.getTransformParameters().getParam();
-    const std::vector<paramcabac::TransformedSubSeq>& trnsfCfgs = subseqCfg.getTransformSubseqCfgs();
     assert(guard > 0);
 
     // Prepare internal and the output data structures
@@ -28,8 +27,8 @@ void transformRleCoding(const paramcabac::Subsequence& subseqCfg, std::vector<ut
 
     util::DataBlock *const lengths   = &((*transformedSubseqs)[0]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
-    lengths->setWordSize(paramcabac::StateVars::getMinimalSizeInBytes(trnsfCfgs[0].getSupportValues().getOutputSymbolSize()));
-    rawValues->setWordSize(paramcabac::StateVars::getMinimalSizeInBytes(trnsfCfgs[1].getSupportValues().getOutputSymbolSize()));
+    lengths->setWordSize(4);
+    rawValues->setWordSize(4);
 
     util::BlockStepper r = symbols.getReader();
     uint64_t lastSym = 0;
