@@ -154,8 +154,7 @@ size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
 
     std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
 
-    util::DataBlock decodedSymbols(numEncodedSymbols,
-                                   (GABAC_APP_TEST) ? 4 : paramcabac::StateVars::getMinimalSizeInBytes(outputSymbolSize));
+    util::DataBlock decodedSymbols(numEncodedSymbols, 4);
     util::BlockStepper r = decodedSymbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
@@ -237,8 +236,7 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
     std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
 
-    util::DataBlock decodedSymbols(numEncodedSymbols,
-                                   (GABAC_APP_TEST) ? 4 : paramcabac::StateVars::getMinimalSizeInBytes(outputSymbolSize));
+    util::DataBlock decodedSymbols(numEncodedSymbols, 4);
     util::BlockStepper r = decodedSymbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
@@ -355,8 +353,7 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
 
     std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
 
-    util::DataBlock decodedSymbols(numEncodedSymbols,
-                                   (GABAC_APP_TEST) ? 4 : paramcabac::StateVars::getMinimalSizeInBytes(outputSymbolSize));
+    util::DataBlock decodedSymbols(numEncodedSymbols, 4);
     util::BlockStepper r = decodedSymbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 

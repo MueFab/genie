@@ -66,11 +66,7 @@ void doInverseSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
 
 unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const EncodingConfiguration &enConf) {
     const paramcabac::Subsequence &subseqCfg = enConf.getSubseqConfig();
-    const uint8_t wordSize = enConf.getSubseqWordSize();
-    util::DataBlock dependency(0, wordSize);
-    if(GABAC_APP_TEST) {
-        dependency.setWordSize(4);
-    }
+    util::DataBlock dependency(0, 4);
 
     uint64_t subseqPayloadSizeUsed = 0;
     uint64_t numDescSubseqSymbols = 0;
