@@ -6,6 +6,7 @@ set(source_files
         binary-arithmetic-decoder.cc
         bit-input-stream.cc
         #c-interface.cc
+        config-manual.cc
         configuration.cc
         #constants.cc
         context-model.cc
