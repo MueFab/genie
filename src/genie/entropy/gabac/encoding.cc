@@ -42,7 +42,7 @@ void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
             transformedSubseqs->resize(1);
         break;
         case paramcabac::TransformedParameters::TransformIdSubseq::EQUALITY_CODING:
-            transformEqualityCoding(subseqCfg, transformedSubseqs);
+            transformEqualityCoding(transformedSubseqs);
         break;
         case paramcabac::TransformedParameters::TransformIdSubseq::MATCH_CODING:
             transformMatchCoding(subseqCfg, transformedSubseqs);
@@ -69,13 +69,9 @@ void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
 unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
     conf.validate();
     const paramcabac::Subsequence &subseqCfg = enConf.getSubseqConfig();
-    const uint8_t wordSize = enConf.getSubseqWordSize();
-    util::DataBlock subsequence(0, wordSize);
-    util::DataBlock dependency(0, wordSize);
-    if(GABAC_APP_TEST) {
-        subsequence.setWordSize(4);
-        dependency.setWordSize(4);
-    }
+    util::DataBlock subsequence(0, 4);
+    util::DataBlock dependency(0, 4);
+
     size_t numDescSubseqSymbols = 0;
     size_t subseqPayloadSize = 0;
 
