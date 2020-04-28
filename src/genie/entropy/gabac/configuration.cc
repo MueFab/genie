@@ -5,6 +5,7 @@
  */
 
 #include "configuration.h"
+#include "config-manual.h"
 
 #include "exceptions.h"
 #include "stream-handler.h"
@@ -18,6 +19,10 @@ namespace gabac {
 
 EncodingConfiguration::EncodingConfiguration()
     : subseqCfg() {}
+
+EncodingConfiguration::EncodingConfiguration(const core::GenSubIndex sub) {
+    subseqCfg = getEncoderConfigManual(sub);
+}
 
 EncodingConfiguration::EncodingConfiguration(paramcabac::Subsequence&& _subseq) {
     subseqCfg = std::move(_subseq);

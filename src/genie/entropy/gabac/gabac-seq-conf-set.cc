@@ -5,6 +5,7 @@
  */
 
 #include "gabac-seq-conf-set.h"
+#include "config-manual.h"
 #include <genie/core/parameter/descriptor_present/decoder.h>
 #include <genie/core/parameter/descriptor_present/descriptor_present.h>
 #include <genie/util/make-unique.h>
@@ -21,8 +22,9 @@ GabacSeqConfSet::GabacSeqConfSet() {
     // One configuration per subsequence
     for (const auto &desc : core::getDescriptors()) {
         conf.emplace_back();
-        for (size_t i = 0; i < getDescriptor(desc.id).subseqs.size(); ++i) {
-            conf.back().emplace_back(paramcabac::Subsequence(i, desc.tokentype));
+        const GenomicDescriptorProperties& descProp = getDescriptor(desc.id);
+        for (size_t i = 0; i < descProp.subseqs.size(); ++i) {
+            conf.back().emplace_back(getEncoderConfigManual(descProp.subseqs[i].id));
         }
     }
 }
