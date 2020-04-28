@@ -40,6 +40,19 @@ class AccessUnitPayload {
          */
         explicit SubsequencePayload(GenSubIndex _id);
 
+        /**
+         * @brief
+         * @param _id
+         * @param _payload
+         */
+        explicit SubsequencePayload(GenSubIndex _id, util::DataBlock&& _payload);
+
+        /**
+         * @brief
+         * @param _id
+         * @param remainingSize
+         * @param reader
+         */
         explicit SubsequencePayload(GenSubIndex _id, size_t remainingSize, util::BitReader& reader);
 
         /**
