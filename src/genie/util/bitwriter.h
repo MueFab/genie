@@ -76,7 +76,7 @@ class BitWriter {
 
     bool isAligned() const { return m_numHeldBits == 0; }
 
-    void writeBypass(std::istream *in) {
+    void writeBuffer(std::istream *in) {
         if (!isAligned()) {
             UTILS_DIE("Writer not aligned when it should be");
         }
@@ -89,7 +89,7 @@ class BitWriter {
         } while (in->gcount() == BUFFERSIZE);
     }
 
-    void writeBypass(const void *in, size_t size) {
+    void writeBuffer(const void *in, size_t size) {
         this->m_bitsWritten += size * 8;
         if (!isAligned()) {
             UTILS_DIE("Writer not aligned when it should be");
