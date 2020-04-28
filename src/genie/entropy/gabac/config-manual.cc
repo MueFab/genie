@@ -40,7 +40,7 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
     // default values
     const AlphabetID alphaID = AlphabetID::ACGTN;
     //const uint64_t numAlphaSpecial = StateVars::getNumAlphaSpecial(genieSubseqID, alphaID);
-    //uint8_t symSize;
+    const uint8_t symSize = (alphaID == AlphabetID::ACGTN) ? 3 : 5;
 
     TransformedParameters::TransformIdSubseq trnsfSubseqID =
             TransformedParameters::TransformIdSubseq::NO_TRANSFORM;
@@ -62,16 +62,18 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
     bool shareSubsymCtxFlag[MAX_NUM_TRANSPORT_SEQS] = {false};
 
     bool found = true;
-/*
+
     // populate config below
     switch(genieDescID) {
         case GenDesc::POS:
             switch(subseqID) {
                 case 0: // POS for first alignment
-                    // TODO
+                    outputSymbolSize[0] = 32;
+                    codingSubSymSize[0] = 32;
                 break;
                 case 1: // POS for other alignments
-                    // TODO
+                    outputSymbolSize[0] = 32;
+                    codingSubSymSize[0] = 32;
                 break;
                 default:
                     found = false;
@@ -80,7 +82,8 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case GenDesc::RCOMP:
             switch(subseqID) {
                 case 0:
-                    // TODO
+                    outputSymbolSize[0] = 2;
+                    codingSubSymSize[0] = 2;
                 break;
                 default:
                     found = false;
@@ -91,7 +94,8 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
                 case 0:
                 case 1:
                 case 2:
-                    // TODO
+                    outputSymbolSize[0] = 1;
+                    codingSubSymSize[0] = 1;
                 break;
                 default:
                     found = false;
@@ -100,10 +104,12 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case GenDesc::MMPOS:
             switch(subseqID) {
                 case 0: // mmposFlag
-                    // TODO
+                    outputSymbolSize[0] = 1;
+                    codingSubSymSize[0] = 1;
                 break;
                 case 1: // mmposPos
-                    // TODO
+                    outputSymbolSize[0] = 16;
+                    codingSubSymSize[0] = 16;
                 break;
                 default:
                     found = false;
@@ -112,11 +118,13 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case GenDesc::MMTYPE:
             switch(subseqID) {
                 case 0: // mmtype
-                    // TODO
+                    outputSymbolSize[0] = 2;
+                    codingSubSymSize[0] = 2;
                 break;
                 case 1: // mmtypeSbs
                 case 2: // mmtypeIndels
-                    // TODO
+                    outputSymbolSize[0] = symSize;
+                    codingSubSymSize[0] = symSize;
                 break;
                 default:
                     found = false;
@@ -126,13 +134,16 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
             switch(subseqID) {
                 case 0: // clipsRecordID
                 case 3: // clipsHardClipsLength
-                    // TODO
+                    outputSymbolSize[0] = 32;
+                    codingSubSymSize[0] = 32;
                 break;
                 case 1: // clipsType
-                    // TODO
+                    outputSymbolSize[0] = 4;
+                    codingSubSymSize[0] = 4;
                 break;
                 case 2: // clipsSoftClips
-                    // TODO
+                    outputSymbolSize[0] = symSize;
+                    codingSubSymSize[0] = symSize;
                 break;
                 default:
                     found = false;
@@ -141,7 +152,8 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case GenDesc::UREADS:
             switch(subseqID) {
                 case 0:
-                    // TODO
+                    outputSymbolSize[0] = symSize;
+                    codingSubSymSize[0] = symSize;
                 break;
                 default:
                     found = false;
@@ -150,7 +162,8 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case GenDesc::RLEN:
             switch(subseqID) {
                 case 0:
-                    // TODO
+                    outputSymbolSize[0] = 32;
+                    codingSubSymSize[0] = 32;
                 break;
                 default:
                     found = false;
@@ -159,16 +172,20 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case GenDesc::PAIR:
             switch(subseqID) {
                 case 0: // pairType
-                    // TODO
+                    outputSymbolSize[0] = 3;
+                    codingSubSymSize[0] = 3;
                 break;
                 case 1: // pairReadDistance
-                    // TODO
+                    outputSymbolSize[0] = 16;
+                    codingSubSymSize[0] = 16;
                 break;
                 case 2: case 3: case 6: case 7: // pairAbsPos
-                    // TODO
+                    outputSymbolSize[0] = 32;
+                    codingSubSymSize[0] = 32;
                 break;
                 case 4: case 5: // pairSeqID
-                    // TODO
+                    outputSymbolSize[0] = 16;
+                    codingSubSymSize[0] = 16;
                 break;
                 default:
                     found = false;
@@ -177,7 +194,8 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case GenDesc::MSCORE:
             switch(subseqID) {
                 case 0:
-                    // TODO
+                    outputSymbolSize[0] = 32;
+                    codingSubSymSize[0] = 32;
                 break;
                 default:
                     found = false;
@@ -187,16 +205,20 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
             switch(subseqID) {
                 case 0: // number of alignments
                 case 1: // index of right alignments
-                    // TODO
+                    outputSymbolSize[0] = 16;
+                    codingSubSymSize[0] = 16;
                 break;
                 case 2: // more alignments flag
-                    // TODO
+                    outputSymbolSize[0] = 1;
+                    codingSubSymSize[0] = 1;
                 break;
                 case 3: // next alignment SeqID
-                    // TODO
+                    outputSymbolSize[0] = 16;
+                    codingSubSymSize[0] = 16;
                 break;
                 case 4: // next alignment abs mapping pos
-                    // TODO
+                    outputSymbolSize[0] = 32;
+                    codingSubSymSize[0] = 32;
                 break;
                 default:
                     found = false;
@@ -207,10 +229,12 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
             tokenTypeFlag = true;
             switch(subseqID) {
                 case 0: // CABAC_METHOD_0
-                    // TODO
+                    outputSymbolSize[0] = 8;
+                    codingSubSymSize[0] = 8;
                 break;
                 case 1: // CABAC_METHOD_1
-                    // TODO
+                    outputSymbolSize[0] = 8;
+                    codingSubSymSize[0] = 8;
                 break;
                 default:
                     found = false;
@@ -219,7 +243,8 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case GenDesc::RTYPE:
             switch(subseqID) {
                 case 0:
-                    // TODO
+                    outputSymbolSize[0] = 3;
+                    codingSubSymSize[0] = 3;
                 break;
                 default:
                     found = false;
@@ -228,7 +253,8 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case GenDesc::RGROUP:
             switch(subseqID) {
                 case 0:
-                    // TODO
+                    outputSymbolSize[0] = 16;
+                    codingSubSymSize[0] = 16;
                 break;
                 default:
                     found = false;
@@ -237,7 +263,8 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case GenDesc::QV:
             switch(subseqID) {
                 case 0: // qvPresenceFlag
-                    // TODO
+                    outputSymbolSize[0] = 1;
+                    codingSubSymSize[0] = 1;
                 break;
                 default:// subSequenceID >= 2
                     // TODO
@@ -247,7 +274,8 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case GenDesc::RFTP:
             switch(subseqID) {
                 case 0: // POS for first alignment
-                    // TODO
+                    outputSymbolSize[0] = 32;
+                    codingSubSymSize[0] = 32;
                 break;
                 default:
                     found = false;
@@ -256,13 +284,14 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
         case GenDesc::RFTT:
             switch(subseqID) {
                 case 0:
-                    // TODO
+                    outputSymbolSize[0] = symSize;
+                    codingSubSymSize[0] = symSize;
                 break;
                 default:
                     found = false;
             }
         break;
-    }*/
+    }
 
     if(!found) {
         //GABAC_DIE("Unsupported subseqID "+std::to_string(subseqID)+" for descID value "+std::to_string(descID));
