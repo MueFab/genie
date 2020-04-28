@@ -39,7 +39,7 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::vector<
     for (uint64_t ts = 0; ts < subseqCount; ts++) {
         const uint8_t codingSubsymSize = trnsfCfgs[ts].getSupportValues().getCodingSubsymSize();
         trnsSubseqMasks[ts] = (1u<<codingSubsymSize)-1;
-        (*transformedSubseqs)[ts].setWordSize(paramcabac::StateVars::getMinimalSizeInBytes(trnsfCfgs[ts].getSupportValues().getOutputSymbolSize()));
+        (*transformedSubseqs)[ts].setWordSize(4);
         (*transformedSubseqs)[ts].resize(symbolsCount);
     }
 
@@ -80,12 +80,7 @@ void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::
 
     // Prepare the output data structure
     const uint64_t symbolsCount = (*transformedSubseqs)[0].size();
-    util::DataBlock symbols(symbolsCount,
-                            paramcabac::StateVars::getMinimalSizeInBytes(subseqShiftSizes[0] +
-                                                                         subseqCfg.getTransformSubseqCfg(0).getSupportValues().getOutputSymbolSize()));
-    if(GABAC_APP_TEST) {
-        symbols.setWordSize(4);
-    }
+    util::DataBlock symbols(symbolsCount, 4);
 
     for (uint64_t i = 0; i < symbolsCount; i++) {
         uint64_t symbolValue = 0;

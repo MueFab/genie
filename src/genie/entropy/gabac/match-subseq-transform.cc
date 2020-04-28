@@ -20,7 +20,6 @@ namespace gabac {
 void transformMatchCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs) {
     assert(transformedSubseqs != nullptr);
     const uint16_t matchBufferSize = subseqCfg.getTransformParameters().getParam();
-    const std::vector<paramcabac::TransformedSubSeq>& trnsfCfgs = subseqCfg.getTransformSubseqCfgs();
 
     // Prepare internal and the output data structures
     util::DataBlock symbols(0, 1);
@@ -31,9 +30,9 @@ void transformMatchCoding(const paramcabac::Subsequence& subseqCfg, std::vector<
     util::DataBlock *const pointers  = &((*transformedSubseqs)[0]);
     util::DataBlock *const lengths   = &((*transformedSubseqs)[1]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[2]);
-    pointers->setWordSize(paramcabac::StateVars::getMinimalSizeInBytes(trnsfCfgs[0].getSupportValues().getOutputSymbolSize()));
-    lengths->setWordSize(paramcabac::StateVars::getMinimalSizeInBytes(trnsfCfgs[1].getSupportValues().getOutputSymbolSize()));
-    rawValues->setWordSize(paramcabac::StateVars::getMinimalSizeInBytes(trnsfCfgs[2].getSupportValues().getOutputSymbolSize()));
+    pointers->setWordSize(4);
+    lengths->setWordSize(4);
+    rawValues->setWordSize(4);
 
     const uint64_t symbolsSize = symbols.size();
 

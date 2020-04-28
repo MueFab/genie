@@ -78,8 +78,7 @@ static void transformEqualityCoding1(util::DataBlock *const values, util::DataBl
     values->resize(values->size() - (w.end - w.curr) / w.wordSize);
 }
 
-void transformEqualityCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs) {
-    const std::vector<paramcabac::TransformedSubSeq>& trnsfCfgs = subseqCfg.getTransformSubseqCfgs();
+void transformEqualityCoding(std::vector<util::DataBlock> *const transformedSubseqs) {
 
     // Prepare internal and the output data structures
     transformedSubseqs->resize(2);
@@ -87,8 +86,8 @@ void transformEqualityCoding(const paramcabac::Subsequence& subseqCfg, std::vect
     util::DataBlock *const flags     = &((*transformedSubseqs)[0]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
 
-    flags->setWordSize(paramcabac::StateVars::getMinimalSizeInBytes(trnsfCfgs[0].getSupportValues().getOutputSymbolSize()));
-    rawValues->setWordSize(paramcabac::StateVars::getMinimalSizeInBytes(trnsfCfgs[1].getSupportValues().getOutputSymbolSize()));
+    flags->setWordSize(4);
+    rawValues->setWordSize(4);
 
     if (rawValues->getWordSize() == 1) {
         transformEqualityCoding0(rawValues, flags); // FIXME this might not be needed TBC
