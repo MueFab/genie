@@ -82,6 +82,8 @@ class AccessUnitRaw {
         GenSubIndex getID() const;
 
         uint64_t pull();
+
+        size_t getRawSize() const { return data.size(); }
     };
 
     /**

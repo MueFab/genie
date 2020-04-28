@@ -19,6 +19,11 @@ AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id) : id(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id, util::DataBlock&& _payload)
+    : id(std::move(_id)), payload(std::move(_payload)) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id, size_t size, util::BitReader& reader)
     : id(std::move(_id)), payload(0, 1) {
     payload.reserve(size);
