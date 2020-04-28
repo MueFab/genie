@@ -29,15 +29,15 @@ struct EncodingConfiguration {
     EncodingConfiguration();
 
     /**
+     * @brief Create default config for a given descriptor subsequence
+     * @param sub descriptor subsequence index.
+     */
+    explicit EncodingConfiguration(const core::GenSubIndex sub);
+
+    /**
      * @brief Create config from subseq
      */
     EncodingConfiguration(paramcabac::Subsequence&& _subseq);
-
-    /**
-     * @brief Create config from JSON
-     * @param jsonstring JSON encoded configuration
-     */
-    explicit EncodingConfiguration(const std::string& jsonstring);
 
     /**
      * @brief Destroy config
