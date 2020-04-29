@@ -68,33 +68,24 @@ void GabacSeqConfSet::storeParameters(core::parameter::ParameterSet &parameterSe
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const GabacSeqConfSet::DecoderConfigurationCabac &GabacSeqConfSet::loadDescriptorDecoderCfg(
-    const GabacSeqConfSet::ParameterSet &parameterSet, core::GenDesc descriptor_id) {
-    using namespace entropy::paramcabac;
-
-    auto &curDesc = parameterSet.getDescriptor(descriptor_id);
-    UTILS_DIE_IF(curDesc.isClassSpecific(), "Class specific config not supported");
-    auto PRESENT = core::parameter::desc_pres::DescriptorPresent::PRESENT;
-    auto &base_conf = curDesc.get();
-    UTILS_DIE_IF(base_conf.getPreset() != PRESENT, "Config not present");
-    auto &decoder_conf =
-        reinterpret_cast<const core::parameter::desc_pres::DescriptorPresent &>(base_conf).getDecoder();
-    UTILS_DIE_IF(decoder_conf.getMode() != paramcabac::DecoderRegular::MODE_CABAC, "Config is not paramcabac");
-
-    return reinterpret_cast<const DecoderRegular &>(decoder_conf);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void GabacSeqConfSet::loadParameters(const core::parameter::ParameterSet &parameterSet) {
     using namespace entropy::paramcabac;
 
     for (const auto &desc : core::getDescriptors()) {
-        auto &descConfig = loadDescriptorDecoderCfg(parameterSet, desc.id);
-        for (const auto &subdesc : getDescriptor(desc.id).subseqs) {
-            auto subseqCfg = descConfig.getSubsequenceCfg(subdesc.id.second);
+        if(core::getDescriptor(desc.id).tokentype) {
+            auto &descConfig = loadDescriptorDecoderCfg<entropy::paramcabac::DecoderTokenType>(parameterSet, desc.id);
+            for (const auto &subdesc : getDescriptor(desc.id).subseqs) {
+                auto subseqCfg = descConfig.getSubsequenceCfg(subdesc.id.second);
 
-            setConfAsGabac(subdesc.id, std::move(subseqCfg));
+                setConfAsGabac(subdesc.id, std::move(subseqCfg));
+            }
+        } else {
+            auto &descConfig = loadDescriptorDecoderCfg<entropy::paramcabac::DecoderRegular>(parameterSet, desc.id);
+            for (const auto &subdesc : getDescriptor(desc.id).subseqs) {
+                auto subseqCfg = descConfig.getSubsequenceCfg(subdesc.id.second);
+
+                setConfAsGabac(subdesc.id, std::move(subseqCfg));
+            }
         }
     }
 }

@@ -50,6 +50,11 @@ TransformedSubSeq::TransformedSubSeq(util::BitReader& reader,
     support_values = SupportValues(transform_ID_subsym, reader);
     cabac_binarization =
         Binarization(support_values.getCodingSubsymSize(), support_values.getOutputSymbolSize(), reader);
+    state_vars.populate(transform_ID_subsym,
+                        support_values,
+                        cabac_binarization,
+                        subsequence_ID,
+                        alphabet_ID);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
