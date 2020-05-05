@@ -54,8 +54,8 @@ class SupportValues {
     uint8_t output_symbol_size;
     uint8_t coding_subsym_size;
     uint8_t coding_order;
-    bool share_subsym_lut_flag;
-    bool share_subsym_prv_flag;
+    bool share_subsym_lut_flag : true;
+    bool share_subsym_prv_flag : true;
 
 };
 
