@@ -1,14 +1,11 @@
 project("genie-gabac")
 
 set(source_files
-        #analysis.cc
         binary-arithmetic-encoder.cc
         binary-arithmetic-decoder.cc
         bit-input-stream.cc
-        #c-interface.cc
         config-manual.cc
         configuration.cc
-        #constants.cc
         context-model.cc
         context-tables.cc
         exceptions.cc
