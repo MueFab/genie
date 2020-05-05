@@ -22,4 +22,3 @@ for build in $BUILDS; do
     run /bin/rm -fR "$self_rel_dir/build-$build"
 done
 
-#run /bin/rm -fr "$self_rel_dir/Testing"
