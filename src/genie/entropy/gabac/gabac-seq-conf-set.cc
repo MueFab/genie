@@ -5,7 +5,6 @@
  */
 
 #include "gabac-seq-conf-set.h"
-#include "config-manual.h"
 #include <genie/core/parameter/descriptor_present/decoder.h>
 #include <genie/core/parameter/descriptor_present/descriptor_present.h>
 #include <genie/util/make-unique.h>

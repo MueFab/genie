@@ -1,5 +1,4 @@
 #include "code.h"
-#include "config-manual.h"
 
 #include <algorithm>
 #include <cassert>
@@ -13,6 +12,7 @@
 #include <vector>
 
 #include <genie/entropy/gabac/gabac.h>
+#include <genie/core/constants.h>
 
 namespace gabacify {
 
@@ -68,7 +68,10 @@ void code(const std::string &inputFilePath,
     genie::entropy::gabac::IOConfiguration ioconf = {istream, dstream, ostream, blocksize, logstream,
                                                      genie::entropy::gabac::IOConfiguration::LogLevel::INFO};
 
-    genie::entropy::gabac::run(ioconf, getEncoderConfigManual(descID, subseqID), decode);
+    genie::core::GenSubIndex genieSubseqID = (genie::core::GenSubIndex)
+            std::pair<genie::core::GenDesc, uint8_t>((genie::core::GenDesc) descID, subseqID);
+
+    genie::entropy::gabac::run(ioconf, genie::entropy::gabac::getEncoderConfigManual(genieSubseqID), decode);
 
     /* GABACIFY_LOG_INFO << "Wrote buffer of size "
                       << outStream.bytesWritten()
