@@ -66,7 +66,7 @@ Subsequence::Subsequence(bool tokentype, util::BitReader& reader) {
             break;
     }
     for (size_t i = 0; i < numSubseq; ++i) {
-        transformSubseq_cfgs.emplace_back(TransformedSubSeq(reader));
+        transformSubseq_cfgs.emplace_back(reader);
     }
 }
 
