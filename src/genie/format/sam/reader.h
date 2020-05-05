@@ -10,10 +10,12 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <istream>
-#include <map>
-#include <list>
 #include "header/header.h"
 #include "record.h"
+
+#include <map>
+#include <list>
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,71 +26,50 @@ namespace sam {
 // ---------------------------------------------------------------------------------------------------------------------
 
 class Reader {
-   public:
-
-    enum class Index : uint8_t {
-        SINGLE_MAPPED = 0,
-        SINGLE_UNMAPPED = 1,
-        PAIR_FIRST_PRIMARY = 2,
-        PAIR_LAST_PRIMARY = 3,
-        PAIR_FIRST_NONPRIMARY = 4,
-        PAIR_LAST_NONPRIMARY = 5,
-        UNKNOWN = 6,
-        TOTAL_TYPES = 7,
-    };
-
-    enum class Constraint : uint8_t {
-        NONE = 0,
-        BY_NUM_RECORDS = 1,
-        BY_SIZE = 2
-    };
-
    private:
     std::istream& stream;
     header::Header header;
-    std::map<std::string, uint16_t> ref_sequences;
-
+    Record save;
     bool rec_saved;
 
-    Constraint constraint;
-    uint64_t constraint_val;
-    uint64_t num_records;
-
-    std::map<std::string, std::vector<size_t>> cache;
-    std::map<std::string, std::vector<std::vector<Record>>> data;
-
    public:
-    explicit Reader(std::istream& _stream, Constraint _constraint = Constraint::NONE, uint64_t _constraint_val = UINT64_MAX);
-
-    void addCacheEntry(std::string& qname, size_t &pos);
-
-    bool isReferenceExists(const std::string &rname);
-
-    bool getSeqID(const std::string& rname, uint16_t &seqID) const;
+    explicit Reader(std::istream& _stream);
 
     const header::Header& getHeader() const;
 
-    bool isConstrainReached() const; //
-
-    void addRecord(Record& record);
-
-    void read(int num);
-
-    bool getSortedTemplate(std::list<Record>& unmappedRead, std::list<Record>& read1, std::list<Record>& read2);
+    bool read(Record& rec);
+    void readRecords(size_t num, std::vector<Record>& vec);
 
     bool isEnd();
-
-    const std::map<std::string, std::vector<std::vector<Record>>> & getData() const;
-
-    // TODO: Discusssion - Implement isConstrainReached as pointer to avoid if-case / switch evaluation
-//    bool (&isConstrainReached)();
-//    bool noConstrain() const;
-//    bool isLimitNumRecordReached() const;
-//    bool isLimitSizeReached() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+class ReadTemplateGroup{
+   private:
+    std::list<std::pair<std::string, size_t>> window;
+    std::map<std::string, ReadTemplate> data;
+    size_t counter;
+
+    void addEntry(const std::string& qname);
+    void updateEntry(const std::string& qname);
+    void removeEntry(std::string& qname);
+
+   public:
+    explicit ReadTemplateGroup();
+
+    void addRecord(Record&& rec);
+    void addRecords(std::list<Record>& recs);
+    void addRecords(std::vector<Record>& recs);
+
+    void resetCounter();
+
+    bool getTemplate(ReadTemplate& t);
+    bool getTemplate(ReadTemplate& t, const size_t& threshold);
+    void getTemplates(std::list<ReadTemplate>& ts, const size_t& threshold);
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
 }  // namespace sam
 }  // namespace format
 }  // namespace genie

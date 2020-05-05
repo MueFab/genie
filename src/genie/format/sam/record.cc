@@ -131,7 +131,7 @@ void Record::checkValuesUsingRegex() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Record::checkValuesUsingCondition(){
+void Record::checkValuesUsingCondition() const{
 
     // TODO: Check all conditions in SAM specification (Yeremia)
     // Value of certain field may not be set to certain value because:
@@ -326,6 +326,91 @@ bool Record::isPairOf(Record &other) const {
 
 
 // ---------------------------------------------------------------------------------------------------------------------
+
+ReadTemplate::ReadTemplate() : is_empty(true) {
+    initializeData();
+}
+
+ReadTemplate::ReadTemplate(Record &&rec) : qname(rec.getQname()), is_empty(false){
+    initializeData();
+    addRecord(std::move(rec));
+}
+
+void ReadTemplate::initializeData() {
+    data.resize(size_t(Index::TOTAL_TYPES));
+}
+
+void ReadTemplate::addRecord(Record&& rec) {
+
+    if (is_empty){
+        qname = rec.getQname();
+    } else {
+        UTILS_DIE_IF(qname != rec.getQname(), "Invalid QNAME");
+    }
+
+    auto idx = Index::UNKNOWN;
+
+    // Handles paired-end read / multi segments
+    if (rec.checkFlag(Record::FlagPos::MULTI_SEGMENT_TEMPLATE)) {
+        UTILS_DIE_IF(rec.checkFlag(Record::FlagPos::SEGMENT_UNMAPPED),
+                     "Unmapped multi segment found for QNAME " + qname + " !");
+
+        if (rec.checkFlag(Record::FlagPos::FIRST_SEGMENT)) {
+            idx = rec.isPrimaryLine() ? Index::PAIR_FIRST_PRIMARY : Index::PAIR_FIRST_NONPRIMARY;
+        } else if (rec.checkFlag(Record::FlagPos::LAST_SEGMENT)) {
+            idx = rec.isPrimaryLine() ? Index::PAIR_LAST_PRIMARY : Index::PAIR_LAST_NONPRIMARY;
+        } else {
+            UTILS_DIE("Neither first nor last segment for QNAME " + qname + " !");
+        }
+
+    // Handles single-end read / single segment
+    } else if (!rec.checkFlag(Record::FlagPos::FIRST_SEGMENT) && !rec.checkFlag(Record::FlagPos::LAST_SEGMENT)) {
+        idx = rec.checkFlag(Record::FlagPos::SEGMENT_UNMAPPED) ? Index::SINGLE_UNMAPPED : Index::SINGLE_MAPPED;
+
+    // Should never be reached
+    } else {
+        UTILS_DIE("Not handled case found for QNAME " + qname + " !");
+    }
+
+    data[uint8_t(idx)].push_back(std::move(rec));
+}
+
+bool ReadTemplate::isUnmapped() {
+    return data[uint8_t(Index::SINGLE_UNMAPPED)].size() == 1;
+}
+
+bool ReadTemplate::isSingle() {
+    return data[uint8_t(Index::SINGLE_MAPPED)].size() == 1;
+}
+
+bool ReadTemplate::isPair() {
+    return data[uint8_t(Index::PAIR_FIRST_PRIMARY)].size() == 1 &&
+           data[uint8_t(Index::PAIR_LAST_PRIMARY)].size() == 1 &&
+           data[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].size() >= 0 &&
+           data[uint8_t(Index::PAIR_LAST_NONPRIMARY)].size() >= 0;
+}
+
+bool ReadTemplate::isUnknown() {
+    return data[uint8_t(Index::UNKNOWN)].size() >= 1;
+}
+
+bool ReadTemplate::isValid() {
+    if (isUnknown() || data[uint8_t(Index::SINGLE_UNMAPPED)].size() > 1 ||
+        data[uint8_t(Index::SINGLE_MAPPED)].size() > 1){
+        return false;
+    }
+    if (isUnmapped() && !isSingle() && !isPair()){
+        return true;
+    } else if (!isUnmapped() && isSingle() && !isPair()){
+        return true;
+    } else if (!isUnmapped() && !isSingle() && isPair()){
+        return true;
+    }
+    return false;
+}
+bool ReadTemplate::getSamRecords(std::list<std::list<Record>>& sam_recs) {
+    return false;
+}
 
 }  // namespace sam
 }  // namespace format

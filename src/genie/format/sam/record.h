@@ -11,6 +11,10 @@
 
 #include <string>
 #include <genie/core/cigar-tokenizer.h>
+
+#include <map>
+#include <list>
+#include <vector>
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -102,7 +106,7 @@ public:
 
     void checkValuesUsingRegex() const;
 
-    void checkValuesUsingCondition();
+    void checkValuesUsingCondition() const;
 
     bool isPrimaryLine() const;
 
@@ -114,6 +118,41 @@ public:
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
+
+class ReadTemplate{
+   public:
+    enum class Index : uint8_t {
+        SINGLE_UNMAPPED = 0,
+        SINGLE_MAPPED = 1,
+        PAIR_FIRST_PRIMARY = 2,
+        PAIR_LAST_PRIMARY = 3,
+        PAIR_FIRST_NONPRIMARY = 4,
+        PAIR_LAST_NONPRIMARY = 5,
+        UNKNOWN = 6,
+        TOTAL_TYPES = 7,
+    };
+
+   private:
+    std::vector<std::list<Record>> data;
+    bool is_empty = false;
+
+   public:
+    std::string qname;
+
+    ReadTemplate();
+    explicit ReadTemplate(Record&& rec);
+
+    void initializeData();
+    void addRecord(Record&& rec);
+
+    bool isUnmapped();
+    bool isSingle();
+    bool isPair();
+    bool isUnknown();
+
+    bool isValid();
+    bool getSamRecords(std::list<std::list<Record>> & sam_recs);
+};
 
 }  // namespace sam
 }  // namespace format
