@@ -4,19 +4,19 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_DECODING_H_
-#define GABAC_DECODING_H_
+#ifndef GABAC_ENCODE_DESC_SUBSEQ_H_
+#define GABAC_ENCODE_DESC_SUBSEQ_H_
 
 namespace genie {
 namespace entropy {
 namespace gabac {
 
-struct EncodingConfiguration;
 struct IOConfiguration;
+struct EncodingConfiguration;
 
-unsigned long decodeDescSubsequence(const IOConfiguration& ioConf, const EncodingConfiguration& enConf);
+unsigned long encodeDescSubsequence(const IOConfiguration& conf, const EncodingConfiguration& enConf);
 
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
-#endif  // GABAC_DECODING_H_
+#endif  // GABAC_ENCODE_DESC_SUBSEQ_H_

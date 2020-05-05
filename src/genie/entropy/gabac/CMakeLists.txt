@@ -14,10 +14,10 @@ set(source_files
         match-subseq-transform.cc
         merge-subseq-transform.cc
         rle-subseq-transform.cc
-        decode-cabac.cc
-        decoding.cc
-        encode-cabac.cc
-        encoding.cc
+        decode-transformed-subseq.cc
+        decode-desc-subseq.cc
+        encode-transformed-subseq.cc
+        encode-desc-subseq.cc
         gabac-compressor.cc
         gabac-decompressor.cc
         gabac-seq-conf-set.cc

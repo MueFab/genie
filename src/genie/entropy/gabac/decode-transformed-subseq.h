@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_DECODE_CABAC_H_
-#define GABAC_DECODE_CABAC_H_
+#ifndef GABAC_DECODE_TRANSFORMED_SUBSEQ_H_
+#define GABAC_DECODE_TRANSFORMED_SUBSEQ_H_
 
 #include <cstdint>
 #include <vector>
@@ -30,4 +30,4 @@ size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqCon
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
-#endif  // GABAC_DECODE_CABAC_H_
+#endif  // GABAC_DECODE_TRANSFORMED_SUBSEQ_H_
