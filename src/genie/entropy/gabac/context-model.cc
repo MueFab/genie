@@ -10,7 +10,10 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-ContextModel::ContextModel(unsigned char state) : m_state(state) {}
+ContextModel::ContextModel(unsigned char initState) {
+    unsigned char valMps = (initState >= 64);
+    m_state = ((valMps ? (initState - 64) : (63 - initState))<<1) + valMps;
+}
 
 ContextModel::~ContextModel() = default;
 

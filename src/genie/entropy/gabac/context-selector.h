@@ -8,6 +8,8 @@
 #define GABAC_CONTEXT_SELECTOR_H_
 
 #include "context-tables.h"
+#include "subsymbol.h"
+#include <genie/entropy/paramcabac/state_vars.h>
 
 #include <cassert>
 
@@ -16,50 +18,33 @@ namespace entropy {
 namespace gabac {
 
 class ContextSelector {
-   public:
-    ContextSelector() = default;
+    public:
+    ContextSelector(const paramcabac::StateVars& _stateVars)
+        : stateVars (_stateVars){};
 
     ~ContextSelector() = default;
 
-    /**
-     * @note Inline definition for performance as suggested by NCSA
-     */
-    static unsigned int getContextForBi(unsigned int contextSetIdx, unsigned int binIdx);
+    unsigned int getContextIdxOrder0(const uint8_t subsymIdx) {
+        return subsymIdx * stateVars.getCodingSizeCtxOffset();
+    }
 
-    /**
-     * @note Inline definition for performance as suggested by NCSA
-     */
-    static unsigned int getContextForTu(unsigned int contextSetIdx, unsigned int binIdx);
+    unsigned int getContextIdxOrderGT0(const uint8_t subsymIdx,
+                                       const uint8_t prvIdx,
+                                       const std::vector<Subsymbol>& subsymbols,
+                                       const uint8_t codingOrder) {
+        unsigned int ctxIdx = 0;
+        ctxIdx += stateVars.getNumCtxLUTs();
+        ctxIdx += subsymIdx * stateVars.getCodingSizeCtxOffset();
+        for (unsigned int i = 1; i <= codingOrder; i++) {
+            ctxIdx += subsymbols[prvIdx].prvValues[i - 1] * stateVars.getCodingOrderCtxOffset(i);
+        }
 
-    /**
-     * @note Inline definition for performance as suggested by NCSA
-     */
-    static unsigned int getContextForEg(unsigned int contextSetIdx, unsigned int binIdx);
+        return ctxIdx;
+    }
+
+    private:
+    const paramcabac::StateVars& stateVars;
 };
-
-inline unsigned int ContextSelector::getContextForBi(unsigned int contextSetIdx, unsigned int binIdx) {
-    assert(binIdx < contexttables::CONTEXT_SET_LENGTH);
-    // TODO(Tom): add explanation for this assertion
-    assert(contextSetIdx < 16);
-
-    return (contexttables::OFFSET_BINARY_0 + (contextSetIdx * contexttables::CONTEXT_SET_LENGTH) + binIdx);
-}
-
-inline unsigned int ContextSelector::getContextForTu(unsigned int contextSetIdx, unsigned int binIdx) {
-    assert(binIdx < contexttables::CONTEXT_SET_LENGTH);
-    // TODO(Tom): add explanation for this assertion
-    assert(contextSetIdx < 16);
-
-    return (contexttables::OFFSET_TRUNCATED_UNARY_0 + (contextSetIdx * contexttables::CONTEXT_SET_LENGTH) + binIdx);
-}
-
-inline unsigned int ContextSelector::getContextForEg(unsigned int contextSetIdx, unsigned int binIdx) {
-    assert(binIdx < contexttables::CONTEXT_SET_LENGTH);
-    // TODO(Tom): add explanation for this assertion
-    assert(contextSetIdx < 16);
-
-    return (contexttables::OFFSET_EXPONENTIAL_GOLOMB_0 + (contextSetIdx * contexttables::CONTEXT_SET_LENGTH) + binIdx);
-}
 
 }  // namespace gabac
 }  // namespace entropy

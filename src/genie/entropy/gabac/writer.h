@@ -27,46 +27,63 @@ namespace gabac {
 
 class Writer {
    public:
-    explicit Writer(OBufferStream *bitstream);
+    explicit Writer(OBufferStream *bitstream, const bool bypassFlag = true, const unsigned long numContexts = 0);
 
     ~Writer();
 
-    void start(size_t numSymbols);
+    void start();
+
+    void close();
 
     void reset();
 
-    void writeAsBIbypass(uint64_t input, unsigned int cLength);
+    void writeAsBIbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsBIcabac(uint64_t input, unsigned int cLength, unsigned int offset);
+    void writeAsBIcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsTUbypass(uint64_t input, unsigned int cMax);
+    void writeAsTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsTUcabac(uint64_t input, unsigned int cMax, unsigned int offset);
+    void writeAsTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsEGbypass(uint64_t input, unsigned int dummy);
+    void writeAsEGbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsEGcabac(uint64_t input, unsigned int dummy, unsigned int offset);
+    void writeAsEGcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsSEGbypass(uint64_t input, unsigned int dummy);
+    void writeAsTEGbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsSEGcabac(uint64_t input, unsigned int dummy, unsigned int offset);
+    void writeAsTEGcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsTEGbypass(uint64_t input, unsigned int cTruncExpGolParam);
+    void writeAsSUTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsTEGcabac(uint64_t input, unsigned int cTruncExpGolParam, unsigned int offset);
+    void writeAsSUTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsSTEGbypass(uint64_t input, unsigned int cSignedTruncExpGolParam);
+    void writeAsDTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeAsSTEGcabac(uint64_t input, unsigned int cSignedTruncExpGolParam, unsigned int offset);
+    void writeAsDTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeNumSymbols(unsigned int numSymbols);
+    void writeBI(uint64_t input, const std::vector<unsigned int> binParams);
+
+    void writeTU(uint64_t input, const std::vector<unsigned int> binParams);
+
+    void writeEG(uint64_t input, const std::vector<unsigned int> binParams);
+
+    void writeTEG(uint64_t input, const std::vector<unsigned int> binParams);
+
+    void writeSUTU(uint64_t input, const std::vector<unsigned int> binParams);
+
+    void writeDTU(uint64_t input, const std::vector<unsigned int> binParams);
+
+    void writeLutSymbol(uint64_t input, const uint8_t codingSubsymSize);
+
+    void writeSignFlag(int64_t input);
 
    private:
     util::BitWriter m_bitOutputStream;
 
-    // ContextSelector m_contextSelector;
-
     BinaryArithmeticEncoder m_binaryArithmeticEncoder;
+
+    bool m_bypassFlag;
+    unsigned long m_numContexts;
 
     std::vector<ContextModel> m_contextModels;
 };

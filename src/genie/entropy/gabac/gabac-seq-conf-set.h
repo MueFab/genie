@@ -10,10 +10,11 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/core/access-unit-raw.h>
+#include <genie/core/parameter/descriptor_present/descriptor_present.h>
 #include <genie/entropy/gabac/gabac.h>
 #include <genie/entropy/paramcabac/decoder.h>
 #include <genie/entropy/paramcabac/subsequence.h>
-#include <genie/entropy/paramcabac/transformed-seq.h>
+#include <genie/entropy/paramcabac/transformed-subseq.h>
 #include <vector>
 
 namespace genie {
@@ -29,46 +30,9 @@ class GabacSeqConfSet {
     std::vector<SeqConf> conf;                                  //!< @brief Configuration for all genomic descriptors
 
     // Shortcuts
-    using TransformSubseqParameters = entropy::paramcabac::TransformedParameters;
-    using TransformIdSubsym = entropy::paramcabac::SupportValues::TransformIdSubsym;
-    using CabacBinarization = entropy::paramcabac::Binarization;
     using DescriptorSubsequenceCfg = entropy::paramcabac::Subsequence;
     using DecoderConfigurationCabac = entropy::paramcabac::DecoderRegular;
     using ParameterSet = core::parameter::ParameterSet;
-    using TransformSubseqCfg = entropy::paramcabac::TransformedSeq;
-
-    /**
-     * @brief Convert gabac::EncodingConfiguration to mgb::desc_conf_pres::paramcabac::TransformSubseqParameters
-     * @param gabac_configuration Input gabac config
-     * @return Newly created transform parameter object
-     */
-    static TransformSubseqParameters storeTransParams(const gabac::EncodingConfiguration& gabac_configuration);
-
-    /**
-     * @brief Convert gabac::TransformedSequenceConfiguration to
-     * mgb::desc_conf_pres::paramcabac::SupportValues::TransformIdSubsym
-     * @param tSeqConf Input gabac config
-     * @return Newly created MPEG-G Transformation ID
-     */
-    static TransformIdSubsym storeTransform(const gabac::TransformedSequenceConfiguration& tSeqConf);
-
-    /**
-     * @brief Convert gabac::TransformedSequenceConfiguration to
-     * mgb::desc_conf_pres::paramcabac::CabacBinarization
-     * @param tSeqConf Input gabac config
-     * @return Newly created MPEG-G Binarization object
-     */
-    static CabacBinarization storeBinarization(const gabac::TransformedSequenceConfiguration& tSeqConf);
-
-    /**
-     * @brief Convert gabac::EncodingConfiguration to mgb::desc_conf_pres::paramcabac::DescriptorSubsequenceCfg.
-     * The complete subdescriptor sequence configuration will be processed including binarization, transformation,
-     * paramcabac
-     * @param gabac_configuration Input gabac config
-     * @param sub_conf Output where to put the converted data
-     */
-    static void storeSubseq(const gabac::EncodingConfiguration& gabac_configuration,
-                            DescriptorSubsequenceCfg& sub_conf);
 
     /**
      * @brief Extract the mgb::desc_conf_pres::paramcabac::DecoderConfigurationCabac from a
@@ -78,25 +42,42 @@ class GabacSeqConfSet {
      * @return A properly casted DecoderConfigurationCabac. No new object is created, the object was already inside the
      * input parameter set
      */
-    static const DecoderConfigurationCabac& loadDescriptorDecoderCfg(const ParameterSet& parameterSet,
-                                                                     core::GenDesc descriptor_id);
+    template <typename T>
+    static const T &loadDescriptorDecoderCfg(
+        const GabacSeqConfSet::ParameterSet &parameterSet, core::GenDesc descriptor_id) {
+        using namespace entropy::paramcabac;
 
-    /**
-     * @brief Convert mgb::desc_conf_pres::paramcabac::TransformSubseqCfg to
-     * gabac::TransformedSequenceConfiguration.
-     * @param transformedDesc Input subsequence configuration
-     * @param gabacTransCfg Where to write the output data.
-     */
-    static gabac::TransformedSequenceConfiguration loadTransformedSequence(const TransformSubseqCfg& transformedDesc);
+        auto &curDesc = parameterSet.getDescriptor(descriptor_id);
+        UTILS_DIE_IF(curDesc.isClassSpecific(), "Class specific config not supported");
+        auto PRESENT = core::parameter::desc_pres::DescriptorPresent::PRESENT;
+        auto &base_conf = curDesc.get();
+        UTILS_DIE_IF(base_conf.getPreset() != PRESENT, "Config not present");
+        auto &decoder_conf =
+            dynamic_cast<const core::parameter::desc_pres::DescriptorPresent &>(base_conf).getDecoder();
+        UTILS_DIE_IF(decoder_conf.getMode() != paramcabac::DecoderRegular::MODE_CABAC, "Config is not paramcabac");
+
+        return dynamic_cast<const T &>(decoder_conf);
+    }
 
    public:
     /**
      * @brief Retrieve a configuration from the current set, fitting for the specified subsequence
-     * @param desc Which descriptor
-     * @param sub Which subsequence
+     * @param sub - identifies descriptor subseuqence
      * @return Gabac configuration
      */
     const gabac::EncodingConfiguration& getConfAsGabac(core::GenSubIndex sub) const;
+
+    gabac::EncodingConfiguration& getConfAsGabac(core::GenSubIndex sub) {
+        return conf[uint8_t(sub.first)][uint8_t(sub.second)];
+    };
+
+    /**
+     * @brief Set a configuration for the specified subsequence
+     * @param sub - identifies descriptor subsequence
+     * @param subseqCfg - the descritpor subsequence configuration
+     * @return none
+     */
+    void setConfAsGabac(core::GenSubIndex sub, DescriptorSubsequenceCfg &&subseqCfg);
 
     /**
      *  @brief Create a default config guaranteed to work (bypass, no transformation, binary binarization)
@@ -118,12 +99,8 @@ class GabacSeqConfSet {
     template <typename T>
     void fillDecoder(const core::GenomicDescriptorProperties& desc, T& decoder_config) const {
         for (const auto& subdesc : desc.subseqs) {
-            auto transform_params = storeTransParams(getConfAsGabac(subdesc.id));
-            decoder_config.setSubsequenceCfg(subdesc.id.second, std::move(transform_params));
-
-            // This is where actual translation of one gabac config to MPEGG takes place
-            auto& subseq_cfg = decoder_config.getSubsequenceCfg(subdesc.id.second);
-            storeSubseq(getConfAsGabac(subdesc.id), subseq_cfg);
+            auto subseqCfg = getConfAsGabac(subdesc.id).getSubseqConfig();
+            decoder_config.setSubsequenceCfg(subdesc.id.second, std::move(subseqCfg));
         }
     }
 };
