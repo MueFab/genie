@@ -7,7 +7,6 @@
 
 #include <genie/entropy/gabac/gabac.h>
 
-#include "analyze.h"
 #include "code.h"
 #include "program-options.h"
 
@@ -17,7 +16,6 @@ int main(int argc, char* argv[]) {
 
         if (programOptions.task == "encode") {
             gabacify::code(programOptions.inputFilePath,
-                           // RESTRUCT_DISABLE programOptions.configurationFilePath,
                            programOptions.outputFilePath,
                            programOptions.blocksize,
                            programOptions.descID,
@@ -26,20 +24,13 @@ int main(int argc, char* argv[]) {
                            programOptions.dependencyFilePath);
         } else if (programOptions.task == "decode") {
             gabacify::code(programOptions.inputFilePath,
-                           // RESTRUCT_DISABLE programOptions.configurationFilePath,
                            programOptions.outputFilePath,
                            programOptions.blocksize,
                            programOptions.descID,
                            programOptions.subseqID,
                            true,
                            programOptions.dependencyFilePath);
-        } /* RESTRUCT-DISABLE
-          else if (programOptions.task == "analyze") {
-
-            gabacify::analyze(programOptions.inputFilePath, programOptions.outputFilePath, programOptions.blocksize,
-                              programOptions.maxVal, programOptions.wordSize);
-
-        } */ else {
+        } else {
             GABAC_DIE("Invalid task: " + std::string(programOptions.task));
         }
     } catch (const genie::entropy::gabac::RuntimeException& e) {
