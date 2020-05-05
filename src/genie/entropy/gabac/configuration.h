@@ -13,6 +13,7 @@
 #include <vector>
 
 #include <genie/entropy/paramcabac/subsequence.h>
+#include "config-manual.h"
 
 namespace genie {
 namespace entropy {
