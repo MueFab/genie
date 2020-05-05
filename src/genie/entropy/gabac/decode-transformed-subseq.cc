@@ -29,10 +29,10 @@ void decodeSignFlag(Reader &reader,
                     uint64_t &symbolValue) {
     if(symbolValue != 0) {
         switch(binID) {
-            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_EXPONENTIAL_GOMB:
-            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
-            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
-            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
+            case paramcabac::BinarizationParameters::BinarizationId::SEG:
+            case paramcabac::BinarizationParameters::BinarizationId::STEG:
+            case paramcabac::BinarizationParameters::BinarizationId::SSUTU:
+            case paramcabac::BinarizationParameters::BinarizationId::SDTU:
                 if(reader.readSignFlag()) {
                     int64_t symbolValueSigned = -(symbolValue);
                     symbolValue = static_cast<uint64_t>(symbolValueSigned);
@@ -54,31 +54,31 @@ binFunc getBinarizor(const uint8_t outputSymbolSize,
     binFunc func = nullptr;
     if(bypassFlag) {
         switch (binID) {
-            case paramcabac::BinarizationParameters::BinarizationId::BINARY_CODING:
+            case paramcabac::BinarizationParameters::BinarizationId::BI:
                 func = &Reader::readAsBIbypass;
                 binParams[0] = stateVars.getCLengthBI();
                 break;
-            case paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY:
+            case paramcabac::BinarizationParameters::BinarizationId::TU:
                 func = &Reader::readAsTUbypass;
                 binParams[0] = binarzationParams.getCMax();
                 break;
-            case paramcabac::BinarizationParameters::BinarizationId::EXPONENTIAL_GOLOMB:
-            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_EXPONENTIAL_GOMB:
+            case paramcabac::BinarizationParameters::BinarizationId::EG:
+            case paramcabac::BinarizationParameters::BinarizationId::SEG:
                 func = &Reader::readAsEGbypass;
                 break;
-            case paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
-            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
+            case paramcabac::BinarizationParameters::BinarizationId::TEG:
+            case paramcabac::BinarizationParameters::BinarizationId::STEG:
                 func = &Reader::readAsTEGbypass;
                 binParams[0] = binarzationParams.getCMaxTeg();
                 break;
-            case paramcabac::BinarizationParameters::BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY:
-            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
+            case paramcabac::BinarizationParameters::BinarizationId::SUTU:
+            case paramcabac::BinarizationParameters::BinarizationId::SSUTU:
                 func = &Reader::readAsSUTUbypass;
                 binParams[0] = outputSymbolSize;
                 binParams[1] = binarzationParams.getSplitUnitSize();
                 break;
-            case paramcabac::BinarizationParameters::BinarizationId::DOUBLE_TRUNCATED_UNARY:
-            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
+            case paramcabac::BinarizationParameters::BinarizationId::DTU:
+            case paramcabac::BinarizationParameters::BinarizationId::SDTU:
                 func = &Reader::readAsDTUbypass;
                 binParams[0] = outputSymbolSize;
                 binParams[1] = binarzationParams.getSplitUnitSize();
@@ -89,31 +89,31 @@ binFunc getBinarizor(const uint8_t outputSymbolSize,
         }
     } else {
         switch (binID) {
-            case paramcabac::BinarizationParameters::BinarizationId::BINARY_CODING:
+            case paramcabac::BinarizationParameters::BinarizationId::BI:
                 func = &Reader::readAsBIcabac;
                 binParams[0] = stateVars.getCLengthBI();
                 break;
-            case paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY:
+            case paramcabac::BinarizationParameters::BinarizationId::TU:
                 func = &Reader::readAsTUcabac;
                 binParams[0] = binarzationParams.getCMax();
                 break;
-            case paramcabac::BinarizationParameters::BinarizationId::EXPONENTIAL_GOLOMB:
-            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_EXPONENTIAL_GOMB:
+            case paramcabac::BinarizationParameters::BinarizationId::EG:
+            case paramcabac::BinarizationParameters::BinarizationId::SEG:
                 func = &Reader::readAsEGcabac;
                 break;
-            case paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
-            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
+            case paramcabac::BinarizationParameters::BinarizationId::TEG:
+            case paramcabac::BinarizationParameters::BinarizationId::STEG:
                 func = &Reader::readAsTEGcabac;
                 binParams[0] = binarzationParams.getCMaxTeg();
                 break;
-            case paramcabac::BinarizationParameters::BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY:
-            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
+            case paramcabac::BinarizationParameters::BinarizationId::SUTU:
+            case paramcabac::BinarizationParameters::BinarizationId::SSUTU:
                 func = &Reader::readAsSUTUcabac;
                 binParams[0] = outputSymbolSize;
                 binParams[1] = binarzationParams.getSplitUnitSize();
                 break;
-            case paramcabac::BinarizationParameters::BinarizationId::DOUBLE_TRUNCATED_UNARY:
-            case paramcabac::BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
+            case paramcabac::BinarizationParameters::BinarizationId::DTU:
+            case paramcabac::BinarizationParameters::BinarizationId::SDTU:
                 func = &Reader::readAsDTUcabac;
                 binParams[0] = outputSymbolSize;
                 binParams[1] = binarzationParams.getSplitUnitSize();
@@ -245,7 +245,7 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
     bool customCmaxTU = false;
     if(numLuts > 0) {
         invLutsSubsymTrnsfm.decodeLUTs(reader);
-        if(binID == paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY) {
+        if(binID == paramcabac::BinarizationParameters::BinarizationId::TU) {
             customCmaxTU = true;
         }
     }
@@ -363,7 +363,7 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
     bool customCmaxTU = false;
     if(numLuts > 0) {
         invLutsSubsymTrnsfm.decodeLUTs(reader);
-        if(binID == paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY) {
+        if(binID == paramcabac::BinarizationParameters::BinarizationId::TU) {
             customCmaxTU = true;
         }
     }
