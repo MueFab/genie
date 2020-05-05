@@ -61,18 +61,6 @@ class Writer {
 
     void writeAsDTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
-    void writeBI(uint64_t input, const std::vector<unsigned int> binParams);
-
-    void writeTU(uint64_t input, const std::vector<unsigned int> binParams);
-
-    void writeEG(uint64_t input, const std::vector<unsigned int> binParams);
-
-    void writeTEG(uint64_t input, const std::vector<unsigned int> binParams);
-
-    void writeSUTU(uint64_t input, const std::vector<unsigned int> binParams);
-
-    void writeDTU(uint64_t input, const std::vector<unsigned int> binParams);
-
     void writeLutSymbol(uint64_t input, const uint8_t codingSubsymSize);
 
     void writeSignFlag(int64_t input);
