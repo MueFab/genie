@@ -10,6 +10,8 @@
 #include <cstdint>
 #include <vector>
 
+#include <genie/entropy/paramcabac/transformed-subseq.h>
+
 namespace genie {
 namespace util {
 class DataBlock;
@@ -20,11 +22,10 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-enum class BinarizationId;
-enum class ContextSelectionId;
-
-void decode_cabac(const BinarizationId& binarizationId, const std::vector<uint32_t>& binarizationParameters,
-                  const ContextSelectionId& contextSelectionId, uint8_t wordsize, util::DataBlock* bitstream);
+size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                             const unsigned int numEncodedSymbols,
+                             util::DataBlock* bitstream,
+                             util::DataBlock* const depSymbols = nullptr);
 
 }  // namespace gabac
 }  // namespace entropy

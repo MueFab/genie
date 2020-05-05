@@ -1,4 +1,4 @@
-#include <genie/entropy/gabac/match-coding.h>
+#include <genie/entropy/gabac/match-subseq-transform.h>
 #include <genie/util/data-block.h>
 #include <gtest/gtest.h>
 #include <algorithm>

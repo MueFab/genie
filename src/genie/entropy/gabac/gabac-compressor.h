@@ -14,7 +14,6 @@
 #include <genie/entropy/gabac/gabac.h>
 #include <genie/util/make-unique.h>
 #include "gabac-seq-conf-set.h"
-#include "genie-gabac-output-stream.h"
 
 namespace genie {
 namespace entropy {

@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DESCRIPTOR_BOX_H
-#define GENIE_DESCRIPTOR_BOX_H
+#ifndef GENIE_DESCRIPTOR_SUBSEQ_CFG_H
+#define GENIE_DESCRIPTOR_SUBSEQ_CFG_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,21 +21,21 @@ namespace genie {
 namespace core {
 namespace parameter {
 
-class DescriptorBox {
+class DescriptorSubseqCfg {
    public:
-    DescriptorBox();
+    DescriptorSubseqCfg();
 
-    DescriptorBox(const DescriptorBox& box);
+    DescriptorSubseqCfg(const DescriptorSubseqCfg& cfg);
 
-    DescriptorBox(DescriptorBox&& box) noexcept;
+    DescriptorSubseqCfg(DescriptorSubseqCfg&& cfg) noexcept;
 
-    DescriptorBox& operator=(const DescriptorBox& box);
+    DescriptorSubseqCfg& operator=(const DescriptorSubseqCfg& cfg);
 
-    DescriptorBox& operator=(DescriptorBox&& box) noexcept;
+    DescriptorSubseqCfg& operator=(DescriptorSubseqCfg&& cfg) noexcept;
 
-    DescriptorBox(size_t num_classes, GenDesc desc, util::BitReader& reader);
+    DescriptorSubseqCfg(size_t num_classes, GenDesc desc, util::BitReader& reader);
 
-    virtual ~DescriptorBox() = default;
+    virtual ~DescriptorSubseqCfg() = default;
 
     void setClassSpecific(uint8_t index, std::unique_ptr<Descriptor> conf);  //!< For class specific config
     void set(std::unique_ptr<Descriptor> conf);                              //!< For non-class-specific config
@@ -59,7 +59,7 @@ class DescriptorBox {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DESCRIPTOR_BOX_H
+#endif  // GENIE_DESCRIPTOR_SUBSEQ_CFG_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

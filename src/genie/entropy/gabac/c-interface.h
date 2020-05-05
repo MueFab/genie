@@ -173,7 +173,7 @@ extern const uint8_t gabac_transform_WORD_SIZES[][3];
 typedef enum gabac_operation {
     gabac_operation_ENCODE = 0, /**< @brief Use configuration to compress */
     gabac_operation_DECODE = 1, /**< @brief Use configuration to decompress */
-    gabac_operation_ANALYZE = 2 /**< @brief Find best configuration for input data */
+    //RESTRUCT_DISABLE gabac_operation_ANALYZE = 2 /**< @brief Find best configuration for input data */
 } gabac_operation;
 
 /**

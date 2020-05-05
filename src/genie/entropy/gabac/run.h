@@ -19,7 +19,7 @@ struct IOConfiguration;
  * @param enConf gabac configuration
  * @param decode If you want to decode (true) or encode (false).
  */
-void run(const IOConfiguration& conf, const EncodingConfiguration& enConf, bool decode);
+unsigned long run(const IOConfiguration& conf, const EncodingConfiguration& enConf, bool decode);
 
 }  // namespace gabac
 }  // namespace entropy

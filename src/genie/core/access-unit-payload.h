@@ -28,50 +28,10 @@ class AccessUnitPayload {
     /**
      * @brief
      */
-    class TransformedPayload {
-       private:
-        util::DataBlock payloadData;  //!< @brief
-        size_t position{};
-
-       public:
-        /**
-         * @brief
-         * @param writer
-         */
-        void write(util::BitWriter& writer) const;
-
-        /**
-         * @brief
-         * @param _data
-         */
-        explicit TransformedPayload(util::DataBlock _data, size_t pos);
-
-        TransformedPayload(size_t size, util::BitReader& reader);
-
-        /**
-         * @brief
-         * @return
-         */
-        bool isEmpty() const;
-
-        /**
-         * @brief
-         * @param _data
-         */
-        util::DataBlock&& move();
-
-        size_t getIndex() const;
-
-        size_t getWrittenSize() const { return payloadData.getRawSize(); }
-    };
-
-    /**
-     * @brief
-     */
     class SubsequencePayload {
        private:
-        std::vector<TransformedPayload> transformedPayloads;  //!< @brief
-        GenSubIndex id;                                       //!< @brief
+        GenSubIndex id;           //!< @brief
+        util::DataBlock payload;  //!< @brief
 
        public:
         /**
@@ -80,7 +40,20 @@ class AccessUnitPayload {
          */
         explicit SubsequencePayload(GenSubIndex _id);
 
-        explicit SubsequencePayload(GenSubIndex _id, size_t remainingSize, size_t subseq_ctr, util::BitReader& reader);
+        /**
+         * @brief
+         * @param _id
+         * @param _payload
+         */
+        explicit SubsequencePayload(GenSubIndex _id, util::DataBlock&& _payload);
+
+        /**
+         * @brief
+         * @param _id
+         * @param remainingSize
+         * @param reader
+         */
+        explicit SubsequencePayload(GenSubIndex _id, size_t remainingSize, util::BitReader& reader);
 
         /**
          * @brief
@@ -98,7 +71,33 @@ class AccessUnitPayload {
          * @brief
          * @param p
          */
-        void add(TransformedPayload p);
+        void set(util::DataBlock&& p) {
+            payload = std::move(p);
+        }
+
+        /**
+         * @brief return subsequence payload
+         * @return payload
+         */
+        const util::DataBlock& get() const {
+            return payload;
+        }
+
+        /**
+         * @brief return subsequence payload
+         * @return payload
+         */
+        util::DataBlock& get()  {
+            return payload;
+        }
+
+        /**
+         * @brief move subsequence payload
+         * @return payload
+         */
+        util::DataBlock&& move()  {
+            return std::move(payload);
+        }
 
         /**
          * @brief
@@ -106,23 +105,12 @@ class AccessUnitPayload {
          */
         bool isEmpty() const;
 
-        TransformedPayload* begin() { return &transformedPayloads.front(); }
-
-        TransformedPayload* end() { return &transformedPayloads.back() + 1; }
-
-        const TransformedPayload* begin() const { return &transformedPayloads.front(); }
-
-        const TransformedPayload* end() const { return &transformedPayloads.back() + 1; }
-
+        /**
+         * @brief return subsequence payload size
+         * @return payload size
+         */
         size_t getWrittenSize() const {
-            size_t size = 0;
-            for (size_t i = 0; i < transformedPayloads.size(); ++i) {
-                size += transformedPayloads[i].getWrittenSize();
-                if (i != transformedPayloads.size() - 1) {
-                    size += 4;
-                }
-            }
-            return size;
+            return payload.getRawSize();
         }
     };
 

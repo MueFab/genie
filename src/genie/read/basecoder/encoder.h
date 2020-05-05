@@ -36,7 +36,7 @@ class Encoder {
 
     struct ClipInformation {
         std::array<std::string, 2> softClips;
-        std::array<size_t, 2> hardClips = {0, 0};
+        std::array<size_t, 2> hardClips = {{0, 0}};
     };
 
     ClipInformation encodeCigar(const std::string &read, const std::string &cigar, const std::string &ref,

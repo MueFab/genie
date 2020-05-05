@@ -1,31 +1,33 @@
 project("genie-gabac")
 
 set(source_files
-        analysis.cc
+        #analysis.cc
+        binary-arithmetic-encoder.cc
+        binary-arithmetic-decoder.cc
         bit-input-stream.cc
-        c-interface.cc
+        #c-interface.cc
+        config-manual.cc
         configuration.cc
-        constants.cc
+        #constants.cc
         context-model.cc
         context-tables.cc
+        exceptions.cc
+        luts-subsymbol-transform.cc
+        equality-subseq-transform.cc
+        match-subseq-transform.cc
+        merge-subseq-transform.cc
+        rle-subseq-transform.cc
         decode-cabac.cc
         decoding.cc
-        diff-coding.cc
         encode-cabac.cc
         encoding.cc
-        equality-coding.cc
-        exceptions.cc
         gabac-compressor.cc
         gabac-decompressor.cc
         gabac-seq-conf-set.cc
-        genie-gabac-output-stream.cc
-        lut-transform.cc
-        match-coding.cc
-        reader.cc
-        rle-coding.cc
         run.cc
         stream-handler.cc
         streams.cc
+        reader.cc
         writer.cc
         )
 

@@ -16,7 +16,13 @@ namespace paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Context::Context(bool _adaptive_mode_flag, uint8_t _coding_subsym_size, uint8_t _output_symbol_size,
+Context::Context() : Context(true, 8, 8, false) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Context::Context(bool _adaptive_mode_flag,
+                 uint8_t _output_symbol_size,
+                 uint8_t _coding_subsym_size,
                  bool _share_subsym_ctx_flag)
     : adaptive_mode_flag(_adaptive_mode_flag),
       num_contexts(0),
@@ -29,11 +35,9 @@ Context::Context(bool _adaptive_mode_flag, uint8_t _coding_subsym_size, uint8_t 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Context::Context() : Context(false, 8, 8, false) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-Context::Context(uint8_t coding_subsym_size, uint8_t output_symbol_size, util::BitReader& reader) {
+Context::Context(uint8_t output_symbol_size,
+                 uint8_t coding_subsym_size,
+                 util::BitReader& reader) {
     adaptive_mode_flag = reader.read<bool>(1);
     num_contexts = reader.read<uint16_t>();
     for (size_t i = 0; i < num_contexts; ++i) {
@@ -66,7 +70,7 @@ void Context::write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t Context::getAdaptiveModeFlag() const { return adaptive_mode_flag; }
+bool Context::getAdaptiveModeFlag() const { return adaptive_mode_flag; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -74,7 +78,12 @@ uint16_t Context::getNumContexts() const { return num_contexts; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Context::getShareSubsymCtxFlag() const { return *share_subsym_ctx_flag; }
+bool Context::getShareSubsymCtxFlag() const {
+    if (share_subsym_ctx_flag)
+        return *share_subsym_ctx_flag;
+    else
+        return false; // default.
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

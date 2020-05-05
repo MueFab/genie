@@ -10,8 +10,6 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/util/bitwriter.h>
-#include <boost/optional/optional.hpp>
-#include <memory>
 #include "binarization_parameters.h"
 #include "context.h"
 
@@ -26,12 +24,16 @@ namespace paramcabac {
  */
 class Binarization {
    public:
-    Binarization(BinarizationParameters::BinarizationId _binarization_ID,
-                 BinarizationParameters&& _cabac_binarization_parameters);
-
     Binarization();
 
-    Binarization(uint8_t coding_subsym_size, uint8_t output_symbol_size, util::BitReader& reader);
+    Binarization(BinarizationParameters::BinarizationId _binarization_ID,
+                 bool _bypass_flag,
+                 BinarizationParameters&& _cabac_binarization_parameters,
+                 Context&& _cabac_context_parameters);
+
+    Binarization(uint8_t output_symbol_size,
+                 uint8_t coding_subsym_size,
+                 util::BitReader& reader);
 
     virtual ~Binarization() = default;
 
@@ -47,11 +49,13 @@ class Binarization {
 
     const Context& getCabacContextParameters() const;
 
+    uint8_t getNumBinarizationParams();
+
    private:
     BinarizationParameters::BinarizationId binarization_ID;
     uint8_t bypass_flag;
     BinarizationParameters cabac_binarization_parameters;
-    boost::optional<Context> cabac_context_parameters;
+    Context cabac_context_parameters;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

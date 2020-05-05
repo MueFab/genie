@@ -14,7 +14,7 @@ void StreamSaver::run_gabac(const std::string &name, util::DataBlock *data, bool
     entropy::gabac::OBufferStream ostream(&out);
 
     // Configure gabac streams
-    entropy::gabac::IOConfiguration ioconf = {&istream, &ostream, insize, &std::cout,
+    entropy::gabac::IOConfiguration ioconf = {&istream, nullptr, &ostream, insize, &std::cout,
                                               entropy::gabac::IOConfiguration::LogLevel::TRACE};
 
     entropy::gabac::run(ioconf, enConf, decompression);
@@ -32,6 +32,7 @@ void StreamSaver::run_gabac(const std::string &name, util::DataBlock *data, bool
               << std::endl;
 }
 
+/* RESTRUCT_DISBALE
 void StreamSaver::analyze(const std::string &name, util::DataBlock *data) {
     std::string configname = getConfigName(name);
     uint64_t insize = data->getRawSize();
@@ -51,8 +52,9 @@ void StreamSaver::analyze(const std::string &name, util::DataBlock *data) {
     aconf.wordSize = params.at(configname).wordsize;
 
     std::cout << "ANALYZING: " + this->configPath + configname + ".json" << std::endl;
+
     entropy::gabac::analyze(ioconf, aconf);
-}
+}*/
 
 void StreamSaver::compress(const std::string &name, util::DataBlock *data) {
     util::DataBlock original;
@@ -224,16 +226,18 @@ void StreamSaver::loadConfig(const std::string &name) {
             configstring = getDefaultConf();
         }
 
+        /* RESTRUCT_DISABLE
         entropy::gabac::EncodingConfiguration enconf(configstring);
 
-        configs.emplace(name, enconf);
+        configs.emplace(name, enconf); */
     } else {
         util::DataBlock block(0, 1);
         unpack("conf_" + name + ".json", &block);
         std::string json(block.getRawSize(), ' ');
         std::memcpy(&json[0], block.getData(), block.getRawSize());
+        /* RESTRUCT_DISABLE
         entropy::gabac::EncodingConfiguration enconf(json);
-        configs.emplace(name, enconf);
+        configs.emplace(name, enconf);*/
     }
 }
 
@@ -246,11 +250,12 @@ void StreamSaver::reloadConfigSet() {
 
 uint64_t StreamSaver::finish() {
     off_t size = 0;
+    /* RESTRUCT_DISABLE
     for (const auto &e : getParams()) {
         std::string params = configs.at(e.first).toJsonString();
         util::DataBlock block(&params);
         size += pack(block, "conf_" + e.first + ".json");
-    }
+    }*/
     return size;
 }
 

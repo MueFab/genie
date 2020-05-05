@@ -7,11 +7,15 @@ set(source_files
         decoder.cc
         subsequence.cc
         support_values.cc
-        transformed-seq.cc
+        state_vars.cc
+        transformed-subseq.cc
         transformed_parameters.cc
         )
 
 add_library(genie-paramcabac ${source_files})
+
+target_link_libraries(genie-paramcabac PUBLIC genie-core)
+target_link_libraries(genie-paramcabac PUBLIC genie-util)
 
 get_filename_component(THIS_DIR ./ ABSOLUTE)
 get_filename_component(TOP_DIR ../../../ ABSOLUTE)

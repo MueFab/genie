@@ -10,11 +10,9 @@
 #ifdef __cplusplus
 
 /* General */
-#include "constants.h"
 #include "exceptions.h"
 
 /* Encode / Decode */
-#include "analysis.h"
 #include "configuration.h"
 #include "run.h"
 
@@ -23,6 +21,6 @@
 
 #endif /* __cplusplus */
 
-#include "c-interface.h"
+//#include "c-interface.h"
 
 #endif /* GABAC_GABAC_H_ */

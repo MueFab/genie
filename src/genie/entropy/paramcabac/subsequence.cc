@@ -17,20 +17,33 @@ namespace paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters, uint16_t _descriptor_subsequence_ID,
-                         bool tokentype)
+Subsequence::Subsequence()
+    : Subsequence(TransformedParameters(), 0, false, std::vector<TransformedSubSeq>({TransformedSubSeq()})) {}
+
+Subsequence::Subsequence(uint16_t _descriptor_subsequence_ID, bool _tokentypeFlag)
+    : Subsequence(TransformedParameters(), _descriptor_subsequence_ID, _tokentypeFlag, std::vector<TransformedSubSeq>({TransformedSubSeq()})) {}
+
+Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters,
+                         uint16_t _descriptor_subsequence_ID,
+                         bool _tokentypeFlag,
+                         std::vector<TransformedSubSeq>&& _transformSubseq_cfgs)
     : descriptor_subsequence_ID(),
-      transform_subseq_parameters(std::move(_transform_subseq_parameters)),
-      transformSubseq_cfgs(transform_subseq_parameters.getNumStreams()) {
-    if (!tokentype) {
+      tokentypeFlag(_tokentypeFlag),
+      transform_subseq_parameters(std::move(_transform_subseq_parameters)) {
+    if (!tokentypeFlag) {
         descriptor_subsequence_ID = _descriptor_subsequence_ID;
+    }
+
+    if(_transformSubseq_cfgs.size() == transform_subseq_parameters.getNumStreams()) {
+        transformSubseq_cfgs = std::move(_transformSubseq_cfgs);
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 Subsequence::Subsequence(bool tokentype, util::BitReader& reader) {
-    if (!tokentype) {
+    tokentypeFlag = tokentype;
+    if (!tokentypeFlag) {
         descriptor_subsequence_ID = reader.read<uint16_t>(10);
     }
     transform_subseq_parameters = TransformedParameters(reader);
@@ -53,13 +66,13 @@ Subsequence::Subsequence(bool tokentype, util::BitReader& reader) {
             break;
     }
     for (size_t i = 0; i < numSubseq; ++i) {
-        transformSubseq_cfgs.emplace_back(TransformedSeq(reader));
+        transformSubseq_cfgs.emplace_back(reader);
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Subsequence::setTransformSubseqCfg(size_t index, TransformedSeq&& _transformSubseq_cfg) {
+void Subsequence::setTransformSubseqCfg(size_t index, TransformedSubSeq&& _transformSubseq_cfg) {
     transformSubseq_cfgs[index] = std::move(_transformSubseq_cfg);
 }
 
@@ -88,7 +101,7 @@ const TransformedParameters& Subsequence::getTransformParameters() const { retur
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const TransformedSeq& Subsequence::getTransformSubseqCfg(uint8_t index) const { return transformSubseq_cfgs[index]; }
+const TransformedSubSeq& Subsequence::getTransformSubseqCfg(uint8_t index) const { return transformSubseq_cfgs[index]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -96,7 +109,11 @@ size_t Subsequence::getNumTransformSubseqCfgs() const { return transformSubseq_c
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<TransformedSeq>& Subsequence::getTransformSubseqCfgs() const { return transformSubseq_cfgs; }
+const std::vector<TransformedSubSeq>& Subsequence::getTransformSubseqCfgs() const { return transformSubseq_cfgs; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Subsequence::getTokentypeFlag() const { return tokentypeFlag; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
