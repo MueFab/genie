@@ -24,23 +24,23 @@ DescriptorSubseqCfg::DescriptorSubseqCfg() : class_specific_dec_cfg_flag(false),
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorSubseqCfg::DescriptorSubseqCfg(const DescriptorSubseqCfg& box) : class_specific_dec_cfg_flag(false) { *this = box; }
+DescriptorSubseqCfg::DescriptorSubseqCfg(const DescriptorSubseqCfg& cfg) : class_specific_dec_cfg_flag(false) { *this = cfg; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorSubseqCfg::DescriptorSubseqCfg(DescriptorSubseqCfg&& box) noexcept : class_specific_dec_cfg_flag(false) {
-    *this = std::move(box);
+DescriptorSubseqCfg::DescriptorSubseqCfg(DescriptorSubseqCfg&& cfg) noexcept : class_specific_dec_cfg_flag(false) {
+    *this = std::move(cfg);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorSubseqCfg& DescriptorSubseqCfg::operator=(const DescriptorSubseqCfg& box) {
-    if (this == &box) {
+DescriptorSubseqCfg& DescriptorSubseqCfg::operator=(const DescriptorSubseqCfg& cfg) {
+    if (this == &cfg) {
         return *this;
     }
-    class_specific_dec_cfg_flag = box.class_specific_dec_cfg_flag;
+    class_specific_dec_cfg_flag = cfg.class_specific_dec_cfg_flag;
     descriptor_configurations.clear();
-    for (const auto& b : box.descriptor_configurations) {
+    for (const auto& b : cfg.descriptor_configurations) {
         descriptor_configurations.emplace_back(b->clone());
     }
     return *this;
@@ -48,9 +48,9 @@ DescriptorSubseqCfg& DescriptorSubseqCfg::operator=(const DescriptorSubseqCfg& b
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorSubseqCfg& DescriptorSubseqCfg::operator=(DescriptorSubseqCfg&& box) noexcept {
-    class_specific_dec_cfg_flag = box.class_specific_dec_cfg_flag;
-    descriptor_configurations = std::move(box.descriptor_configurations);
+DescriptorSubseqCfg& DescriptorSubseqCfg::operator=(DescriptorSubseqCfg&& cfg) noexcept {
+    class_specific_dec_cfg_flag = cfg.class_specific_dec_cfg_flag;
+    descriptor_configurations = std::move(cfg.descriptor_configurations);
     return *this;
 }
 

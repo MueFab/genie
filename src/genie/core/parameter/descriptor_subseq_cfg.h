@@ -25,13 +25,13 @@ class DescriptorSubseqCfg {
    public:
     DescriptorSubseqCfg();
 
-    DescriptorSubseqCfg(const DescriptorSubseqCfg& box);
+    DescriptorSubseqCfg(const DescriptorSubseqCfg& cfg);
 
-    DescriptorSubseqCfg(DescriptorSubseqCfg&& box) noexcept;
+    DescriptorSubseqCfg(DescriptorSubseqCfg&& cfg) noexcept;
 
-    DescriptorSubseqCfg& operator=(const DescriptorSubseqCfg& box);
+    DescriptorSubseqCfg& operator=(const DescriptorSubseqCfg& cfg);
 
-    DescriptorSubseqCfg& operator=(DescriptorSubseqCfg&& box) noexcept;
+    DescriptorSubseqCfg& operator=(DescriptorSubseqCfg&& cfg) noexcept;
 
     DescriptorSubseqCfg(size_t num_classes, GenDesc desc, util::BitReader& reader);
 
