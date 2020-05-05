@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "encoding.h"
+#include "encode-desc-subseq.h"
 
 #include <algorithm>
 #include <cmath>
@@ -14,7 +14,7 @@
 #include <genie/util/data-block.h>
 #include <genie/entropy/paramcabac/transformed-subseq.h>
 #include "configuration.h"
-#include "encode-cabac.h"
+#include "encode-transformed-subseq.h"
 #include "stream-handler.h"
 #include "writer.h"
 #include "exceptions.h"
