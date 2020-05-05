@@ -356,14 +356,17 @@ void ReadTemplate::addRecord(Record&& rec) {
                      "Unmapped multi segment found for QNAME " + qname + " !");
 
         if (rec.checkFlag(Record::FlagPos::FIRST_SEGMENT)) {
-            idx = rec.isPrimaryLine() ? Index::PAIR_FIRST_PRIMARY : Index::PAIR_FIRST_NONPRIMARY;
+            //idx = rec.isPrimaryLine() ? Index::PAIR_FIRST_PRIMARY : Index::PAIR_FIRST_NONPRIMARY;
+            idx = Index::PAIR_FIRST;
         } else if (rec.checkFlag(Record::FlagPos::LAST_SEGMENT)) {
-            idx = rec.isPrimaryLine() ? Index::PAIR_LAST_PRIMARY : Index::PAIR_LAST_NONPRIMARY;
+            //idx = rec.isPrimaryLine() ? Index::PAIR_LAST_PRIMARY : Index::PAIR_LAST_NONPRIMARY;
+            idx = Index::PAIR_LAST;
         } else {
             UTILS_DIE("Neither first nor last segment for QNAME " + qname + " !");
         }
 
     // Handles single-end read / single segment
+    // TODO (Yeremia): for linear template both are set,
     } else if (!rec.checkFlag(Record::FlagPos::FIRST_SEGMENT) && !rec.checkFlag(Record::FlagPos::LAST_SEGMENT)) {
         idx = rec.checkFlag(Record::FlagPos::SEGMENT_UNMAPPED) ? Index::SINGLE_UNMAPPED : Index::SINGLE_MAPPED;
 
@@ -380,23 +383,25 @@ bool ReadTemplate::isUnmapped() {
 }
 
 bool ReadTemplate::isSingle() {
-    return data[uint8_t(Index::SINGLE_MAPPED)].size() == 1;
+    // Single non- and multiplie alignements
+    return !data[uint8_t(Index::SINGLE_MAPPED)].empty() &&
+        data[uint8_t(Index::SINGLE_MAPPED)].front().isPrimaryLine();
 }
 
 bool ReadTemplate::isPair() {
-    return data[uint8_t(Index::PAIR_FIRST_PRIMARY)].size() == 1 &&
-           data[uint8_t(Index::PAIR_LAST_PRIMARY)].size() == 1 &&
-           data[uint8_t(Index::PAIR_FIRST_NONPRIMARY)].size() >= 0 &&
-           data[uint8_t(Index::PAIR_LAST_NONPRIMARY)].size() >= 0;
+    // Pair non- and multiplie alignements
+    return !data[uint8_t(Index::PAIR_FIRST)].empty() &&
+           !data[uint8_t(Index::PAIR_LAST)].empty() &&
+           data[uint8_t(Index::PAIR_FIRST)].front().isPrimaryLine() &&
+           data[uint8_t(Index::PAIR_LAST)].front().isPrimaryLine();
 }
 
 bool ReadTemplate::isUnknown() {
-    return data[uint8_t(Index::UNKNOWN)].size() >= 1;
+    return !data[uint8_t(Index::UNKNOWN)].empty();
 }
 
 bool ReadTemplate::isValid() {
-    if (isUnknown() || data[uint8_t(Index::SINGLE_UNMAPPED)].size() > 1 ||
-        data[uint8_t(Index::SINGLE_MAPPED)].size() > 1){
+    if (isUnknown() || data[uint8_t(Index::SINGLE_UNMAPPED)].size() > 1){
         return false;
     }
     if (isUnmapped() && !isSingle() && !isPair()){
@@ -409,7 +414,21 @@ bool ReadTemplate::isValid() {
     return false;
 }
 bool ReadTemplate::getSamRecords(std::list<std::list<Record>>& sam_recs) {
-    return false;
+    sam_recs.clear();
+    if (isValid()) {
+        if (isUnmapped()){
+            sam_recs.push_back(std::move(data[uint8_t(Index::SINGLE_UNMAPPED)]));
+        } else if (isSingle()) {
+            sam_recs.push_back(std::move(data[uint8_t(Index::SINGLE_MAPPED)]));
+        } else if (isPair()){
+            //TODO (Yeremia):
+            UTILS_DIE("NOT_IMPLEMENTED");
+        }
+        return true;
+    } else {
+        return false;
+    }
+
 }
 
 }  // namespace sam

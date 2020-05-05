@@ -124,12 +124,10 @@ class ReadTemplate{
     enum class Index : uint8_t {
         SINGLE_UNMAPPED = 0,
         SINGLE_MAPPED = 1,
-        PAIR_FIRST_PRIMARY = 2,
-        PAIR_LAST_PRIMARY = 3,
-        PAIR_FIRST_NONPRIMARY = 4,
-        PAIR_LAST_NONPRIMARY = 5,
-        UNKNOWN = 6,
-        TOTAL_TYPES = 7,
+        PAIR_FIRST= 2,
+        PAIR_LAST = 3,
+        UNKNOWN = 4,
+        TOTAL_TYPES = 5,
     };
 
    private:
