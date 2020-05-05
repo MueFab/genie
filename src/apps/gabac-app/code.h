@@ -7,7 +7,6 @@
 namespace gabacify {
 
 void code(const std::string& inputFilePath,
-          // RESTRUCT_DISABLE const std::string& configurationFilePath,
           const std::string& outputFilePath,
           size_t blocksize,
           uint8_t descID,
