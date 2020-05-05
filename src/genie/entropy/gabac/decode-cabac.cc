@@ -222,12 +222,13 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
     const uint8_t codingOrder = supportVals.getCodingOrder();
     const uint64_t subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize)-1;
     const bool bypassFlag = binarzation.getBypassFlag();
-    size_t payloadSizeUsed = 0;
+    assert(bypassFlag == false);
 
     uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
                                                  supportVals.getShareSubsymLutFlag(),
                                                  trnsfSubseqConf.getTransformIDSubsym());
     uint8_t const numPrvs = stateVars.getNumPrvs(supportVals.getShareSubsymPrvFlag());
+    size_t payloadSizeUsed = 0;
 
     Reader reader(bitstream,
                   bypassFlag,
@@ -339,6 +340,7 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
     const uint8_t codingSubsymSize = supportVals.getCodingSubsymSize();
     const uint8_t codingOrder = supportVals.getCodingOrder();
     const bool bypassFlag = binarzation.getBypassFlag();
+    assert(bypassFlag == false);
 
     uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
                                                  supportVals.getShareSubsymLutFlag(),

@@ -225,6 +225,7 @@ size_t encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
     const uint8_t codingOrder = supportVals.getCodingOrder();
     const uint64_t subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize)-1;
     const bool bypassFlag = binarzation.getBypassFlag();
+    assert(bypassFlag == false);
 
     uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
                                                  supportVals.getShareSubsymLutFlag(),
@@ -343,6 +344,7 @@ size_t encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
     const uint8_t codingOrder = supportVals.getCodingOrder();
     const uint64_t subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize)-1;
     const bool bypassFlag = binarzation.getBypassFlag();
+    assert(bypassFlag == false);
 
     uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
                                                  supportVals.getShareSubsymLutFlag(),
