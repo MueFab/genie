@@ -14,11 +14,17 @@ namespace gabac {
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::AccessUnitPayload::SubsequencePayload GabacCompressor::compress(const gabac::EncodingConfiguration &conf,
-                                                                      core::AccessUnitRaw::Subsequence &&in) {
+                                                                      core::AccessUnitRaw::Subsequence &&in,
+                                                                      util::DataBlock* const dependency) {
     // Interface to GABAC library
     core::AccessUnitRaw::Subsequence data = std::move(in);
     util::DataBlock buffer = data.move();
     gabac::IBufferStream bufferInputStream(&buffer);
+
+    gabac::IBufferStream *bufferDependencyStream = nullptr;
+    if(dependency != nullptr) {
+        bufferDependencyStream = new gabac::IBufferStream(dependency);
+    }
 
     util::DataBlock outblock(0, 1);
     gabac::OBufferStream bufferOutputStream(&outblock);
@@ -26,7 +32,7 @@ core::AccessUnitPayload::SubsequencePayload GabacCompressor::compress(const gaba
     // Setup
     const size_t GABAC_BLOCK_SIZE = 0;  // 0 means single block (block size is equal to input size)
     std::ostream *const GABAC_LOG_OUTPUT_STREAM = &std::cout;
-    const gabac::IOConfiguration GABAC_IO_SETUP = {&bufferInputStream, nullptr, &bufferOutputStream, GABAC_BLOCK_SIZE,
+    const gabac::IOConfiguration GABAC_IO_SETUP = {&bufferInputStream, bufferDependencyStream, &bufferOutputStream, GABAC_BLOCK_SIZE,
                                                    GABAC_LOG_OUTPUT_STREAM, gabac::IOConfiguration::LogLevel::TRACE};
     const bool GABAC_DECODING_MODE = false;
 
@@ -36,6 +42,11 @@ core::AccessUnitPayload::SubsequencePayload GabacCompressor::compress(const gaba
     bufferOutputStream.flush(&outblock);
     core::AccessUnitPayload::SubsequencePayload out(data.getID());
     out.set(std::move(outblock));
+
+    if(bufferDependencyStream != nullptr) {
+        delete bufferDependencyStream;
+    }
+
     return out;
 }
 
@@ -52,7 +63,7 @@ void GabacCompressor::flowIn(core::AccessUnitRaw &&t, size_t id) {
             if(input.getRawSize() > 0) {
                 const auto &conf = configSet.getConfAsGabac(subdesc.getID());
                 // add compressed payload
-                descriptor_payload.add(compress(conf, std::move(input)));
+                descriptor_payload.add(compress(conf, std::move(input), raw_aus.getSubsequenceDependency(subdesc.getID())));
             } else {
                 // add empty payload
                 descriptor_payload.add(core::AccessUnitPayload::SubsequencePayload(subdesc.getID(), util::DataBlock(0,1)));
