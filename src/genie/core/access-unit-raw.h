@@ -245,9 +245,19 @@ class AccessUnitRaw {
 
     const Descriptor* end() const { return &descriptors.back() + 1; }
 
+    void pushMmtypeDependency(uint8_t symbolCode) {mmtypeDependency.push_back(symbolCode); }
+
+    void pushRfttDependency(uint8_t symbolCode) {rfttDependency.push_back(symbolCode); }
+
+    util::DataBlock* getSubsequenceDependency(GenSubIndex sub);
+    const util::DataBlock* getSubsequenceDependency(GenSubIndex sub) const;
+
    private:
     std::vector<Descriptor> descriptors;  //!< @brief
     parameter::ParameterSet parameters;   //!< @brief
+
+    util::DataBlock mmtypeDependency;     //!< @brief
+    util::DataBlock rfttDependency;       //!< @brief
 
     size_t numRecords;  //!< @brief
 
