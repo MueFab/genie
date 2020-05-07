@@ -112,7 +112,7 @@ uint64_t AccessUnitRaw::pull(GenSubIndex sub) { return get(sub).pull(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnitRaw::AccessUnitRaw(parameter::ParameterSet &&set, size_t _numRecords)
-    : descriptors(), parameters(std::move(set)), numRecords(_numRecords), minPos(0), maxPos(0), referenceSequence(0) {
+    : descriptors(), parameters(std::move(set)), mmtypeDependency(0,4), rfttDependency(0,4), numRecords(_numRecords), minPos(0), maxPos(0), referenceSequence(0) {
     const size_t WORDSIZE = 4;
     for (const auto &desc : getDescriptors()) {
         Descriptor desc_data(desc.id);
@@ -176,6 +176,26 @@ uint64_t AccessUnitRaw::getMaxPos() const { return maxPos; }
 uint64_t AccessUnitRaw::getMinPos() const { return minPos; }
 
 // ---------------------------------------------------------------------------------------------------------------------
+
+util::DataBlock* AccessUnitRaw::getSubsequenceDependency(GenSubIndex sub) {
+    if(sub == GenSub::MMTYPE_SUBSTITUTION)
+        return &mmtypeDependency;
+    else if(sub == GenSub::RFTT)
+        return &rfttDependency;
+    else
+        return nullptr;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const util::DataBlock* AccessUnitRaw::getSubsequenceDependency(GenSubIndex sub) const {
+    if(sub == GenSub::MMTYPE_SUBSTITUTION)
+        return &mmtypeDependency;
+    else if(sub == GenSub::RFTT)
+        return &rfttDependency;
+    else
+        return nullptr;
+}
 
 }  // namespace core
 }  // namespace genie
