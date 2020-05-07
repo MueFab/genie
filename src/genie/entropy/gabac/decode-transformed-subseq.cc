@@ -215,7 +215,6 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
     const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
     const paramcabac::StateVars &stateVars = trnsfSubseqConf.getStateVars();
     const paramcabac::BinarizationParameters::BinarizationId binID = binarzation.getBinarizationID();
-    const core::Alphabet alphaProps = getAlphabetProperties(trnsfSubseqConf.getAlphabetID());
 
     const uint8_t outputSymbolSize = supportVals.getOutputSymbolSize();
     const uint8_t codingSubsymSize = supportVals.getCodingSubsymSize();
@@ -270,7 +269,7 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
         uint64_t depSymbolValue = 0, depSubsymValue = 0;
         if(rDep.isValid()) {
-            depSymbolValue = alphaProps.inverseLut[rDep.get()];
+            depSymbolValue = rDep.get();
             rDep.inc();
         }
 
