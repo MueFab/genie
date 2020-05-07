@@ -26,11 +26,12 @@ class GabacDecompressor : public core::EntropyDecoder {
     /**
      * @brief Execute gabac library
      * @param conf Gabac configuration to use
-     * @param in Compressed set of transformed sequences
-     * @param out Where to put uncompressed sequence
+     * @param in subsequence payload
+     * @param dependency subsequence containing dependency symbols
      */
     static core::AccessUnitRaw::Subsequence decompress(const gabac::EncodingConfiguration& conf,
-                                                       core::AccessUnitPayload::SubsequencePayload&& in);
+                                                       core::AccessUnitPayload::SubsequencePayload&& in,
+                                                       util::DataBlock* const dependency = nullptr);
 
    public:
     /**
