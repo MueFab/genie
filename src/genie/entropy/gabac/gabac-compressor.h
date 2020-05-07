@@ -31,7 +31,8 @@ class GabacCompressor : public core::EntropyEncoder {
      * @param out Where to put compressed data. A set of transformed subsequences is generated
      */
     static core::AccessUnitPayload::SubsequencePayload compress(const gabac::EncodingConfiguration& conf,
-                                                                core::AccessUnitRaw::Subsequence&& in);
+                                                                core::AccessUnitRaw::Subsequence&& in,
+                                                                util::DataBlock* const dependency = nullptr);
 
    public:
     GabacSeqConfSet configSet;  //!< @brief Config set to use. In contrast to decompression it's static over time
