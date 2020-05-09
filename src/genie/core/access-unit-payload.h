@@ -29,51 +29,11 @@ class AccessUnitPayload {
     /**
      * @brief
      */
-    class TransformedPayload {
-       private:
-        util::DataBlock payloadData;  //!< @brief
-        size_t position{};
-
-       public:
-        /**
-         * @brief
-         * @param writer
-         */
-        void write(util::BitWriter& writer) const;
-
-        /**
-         * @brief
-         * @param _data
-         */
-        explicit TransformedPayload(util::DataBlock _data, size_t pos);
-
-        TransformedPayload(size_t size, util::BitReader& reader);
-
-        /**
-         * @brief
-         * @return
-         */
-        bool isEmpty() const;
-
-        /**
-         * @brief
-         * @param _data
-         */
-        util::DataBlock&& move();
-
-        size_t getIndex() const;
-
-        size_t getWrittenSize() const { return payloadData.getRawSize(); }
-    };
-
-    /**
-     * @brief
-     */
     class SubsequencePayload {
        private:
-        std::vector<TransformedPayload> transformedPayloads;  //!< @brief
-        GenSubIndex id;                                       //!< @brief
-        size_t numSymbols;
+        GenSubIndex id;           //!< @brief
+        util::DataBlock payload;  //!< @brief
+
        public:
         /**
          * @brief
@@ -81,15 +41,20 @@ class AccessUnitPayload {
          */
         explicit SubsequencePayload(GenSubIndex _id);
 
-        explicit SubsequencePayload(GenSubIndex _id, size_t remainingSize, size_t subseq_ctr, util::BitReader& reader);
+        /**
+         * @brief
+         * @param _id
+         * @param _payload
+         */
+        explicit SubsequencePayload(GenSubIndex _id, util::DataBlock&& _payload);
 
-        void annotateNumSymbols (size_t num) {
-            numSymbols = num;
-        }
-
-        size_t getNumSymbols() const {
-            return numSymbols;
-        }
+        /**
+         * @brief
+         * @param _id
+         * @param remainingSize
+         * @param reader
+         */
+        explicit SubsequencePayload(GenSubIndex _id, size_t remainingSize, util::BitReader& reader);
 
         /**
          * @brief
@@ -107,7 +72,33 @@ class AccessUnitPayload {
          * @brief
          * @param p
          */
-        void add(TransformedPayload p);
+        void set(util::DataBlock&& p) {
+            payload = std::move(p);
+        }
+
+        /**
+         * @brief return subsequence payload
+         * @return payload
+         */
+        const util::DataBlock& get() const {
+            return payload;
+        }
+
+        /**
+         * @brief return subsequence payload
+         * @return payload
+         */
+        util::DataBlock& get()  {
+            return payload;
+        }
+
+        /**
+         * @brief move subsequence payload
+         * @return payload
+         */
+        util::DataBlock&& move()  {
+            return std::move(payload);
+        }
 
         /**
          * @brief
@@ -115,21 +106,12 @@ class AccessUnitPayload {
          */
         bool isEmpty() const;
 
-        TransformedPayload* begin() { return &transformedPayloads.front(); }
-
-        TransformedPayload* end() { return &transformedPayloads.back() + 1; }
-
-        const TransformedPayload* begin() const { return &transformedPayloads.front(); }
-
-        const TransformedPayload* end() const { return &transformedPayloads.back() + 1; }
-
+        /**
+         * @brief return subsequence payload size
+         * @return payload size
+         */
         size_t getWrittenSize() const {
-            size_t overhead = getDescriptor(getID().first).tokentype
-                                  ? transformedPayloads.size() * sizeof(uint8_t)
-                                  : (transformedPayloads.size() - 1) * sizeof(uint32_t);
-            return std::accumulate(
-                transformedPayloads.begin(), transformedPayloads.end(), overhead,
-                [](size_t sum, const TransformedPayload& payload) { return sum + payload.getWrittenSize(); });
+            return payload.getRawSize();
         }
     };
 

@@ -6,7 +6,6 @@
 
 #include "binarization.h"
 #include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -16,27 +15,36 @@ namespace paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Binarization::Binarization(BinarizationParameters::BinarizationId _binarization_ID,
-                           BinarizationParameters&& _cabac_binarization_parameters)
-    : binarization_ID(_binarization_ID),
-      bypass_flag(true),
-      cabac_binarization_parameters(std::move(_cabac_binarization_parameters)),
-      cabac_context_parameters() {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 Binarization::Binarization()
     : Binarization(BinarizationParameters::BinarizationId::BINARY_CODING,
-                   BinarizationParameters(BinarizationParameters::BinarizationId::BINARY_CODING, 0)) {}
+                   false,
+                   BinarizationParameters(),
+                   Context()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Binarization::Binarization(uint8_t coding_subsym_size, uint8_t output_symbol_size, util::BitReader& reader) {
+Binarization::Binarization(BinarizationParameters::BinarizationId _binarization_ID,
+                           bool _bypass_flag,
+                           BinarizationParameters&& _cabac_binarization_parameters,
+                           Context&& _cabac_Context_parameters)
+    : binarization_ID(_binarization_ID),
+      bypass_flag(_bypass_flag),
+      cabac_binarization_parameters(std::move(_cabac_binarization_parameters)){
+    if (!bypass_flag) {
+        cabac_context_parameters = std::move(_cabac_Context_parameters);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Binarization::Binarization(uint8_t output_symbol_size,
+                           uint8_t coding_subsym_size,
+                           util::BitReader& reader) {
     binarization_ID = reader.read<BinarizationParameters::BinarizationId>(5);
     bypass_flag = reader.read<bool>(1);
     cabac_binarization_parameters = BinarizationParameters(binarization_ID, reader);
     if (!bypass_flag) {
-        cabac_context_parameters = Context(coding_subsym_size, output_symbol_size, reader);
+        cabac_context_parameters = Context(output_symbol_size, coding_subsym_size, reader);
     }
 }
 
@@ -56,7 +64,7 @@ const BinarizationParameters& Binarization::getCabacBinarizationParameters() con
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const Context& Binarization::getCabacContextParameters() const { return cabac_context_parameters.get(); }
+const Context& Binarization::getCabacContextParameters() const { return cabac_context_parameters; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -70,10 +78,16 @@ void Binarization::setContextParameters(Context&& _cabac_context_parameters) {
 void Binarization::write(util::BitWriter& writer) const {
     writer.write(uint8_t(binarization_ID), 5);
     writer.write(bypass_flag, 1);
-    cabac_binarization_parameters.write(writer);
-    if (cabac_context_parameters) {
-        cabac_context_parameters->write(writer);
+    cabac_binarization_parameters.write(binarization_ID, writer);
+    if (!bypass_flag) {
+        cabac_context_parameters.write(writer);
     }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t Binarization::getNumBinarizationParams() {
+    return BinarizationParameters::getNumBinarizationParams(binarization_ID);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

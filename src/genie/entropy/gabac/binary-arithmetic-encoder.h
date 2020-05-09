@@ -8,12 +8,11 @@
 #define GABAC_BINARY_ARITHMETIC_ENCODER_H_
 
 #include <genie/util/bitwriter.h>
+#include "context-model.h"
 
 namespace genie {
 namespace entropy {
 namespace gabac {
-
-class ContextModel;
 
 class BinaryArithmeticEncoder {
    public:

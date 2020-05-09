@@ -12,15 +12,16 @@ class ProgramOptions {
     ~ProgramOptions();
 
    public:
-    std::string configurationFilePath;
+    //std::string configurationFilePath;
     std::string logLevel;
     std::string inputFilePath;
+    std::string dependencyFilePath;
     std::string outputFilePath;
     std::string task;
     size_t blocksize;
 
-    uint64_t maxVal;
-    uint8_t wordSize;
+    uint8_t descID;
+    uint8_t subseqID;
 
    private:
     void processCommandLine(int argc, char *argv[]);

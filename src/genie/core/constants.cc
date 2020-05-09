@@ -168,7 +168,9 @@ const std::vector<GenomicDescriptorProperties> &getDescriptors() {
 
         {GenDesc::RFTP, "rftp", false, {{GenSub::RFTP, "rftp"}}},
 
-        {GenDesc ::RFTT, "rftt", false, {{GenSub::RFTT, "rftt"}}}};
+        {GenDesc::RFTT, "rftt", false, {{GenSub::RFTP, "rftt"}}},
+    };
+
     return prop;
 }
 

@@ -44,30 +44,22 @@ core::AccessUnitPayload::SubsequencePayload GabacCompressor::compress(const gaba
     util::DataBlock buffer = data.move();
     gabac::IBufferStream bufferInputStream(&buffer);
 
-    GenieGabacOutputStream bufferOutputStream;
+    util::DataBlock outblock(0, 1);
+    gabac::OBufferStream bufferOutputStream(&outblock);
 
     // Setup
     const size_t GABAC_BLOCK_SIZE = 0;  // 0 means single block (block size is equal to input size)
-    std::ostream *const GABC_LOG_OUTPUT_STREAM = &std::cout;
-    const gabac::IOConfiguration GABAC_IO_SETUP = {&bufferInputStream, &bufferOutputStream, GABAC_BLOCK_SIZE,
-                                                   GABC_LOG_OUTPUT_STREAM, gabac::IOConfiguration::LogLevel::TRACE};
+    std::ostream *const GABAC_LOG_OUTPUT_STREAM = &std::cout;
+    const gabac::IOConfiguration GABAC_IO_SETUP = {&bufferInputStream, nullptr, &bufferOutputStream, GABAC_BLOCK_SIZE,
+                                                   GABAC_LOG_OUTPUT_STREAM, gabac::IOConfiguration::LogLevel::TRACE};
     const bool GABAC_DECODING_MODE = false;
 
     // Run
     gabac::run(GABAC_IO_SETUP, conf, GABAC_DECODING_MODE);
 
-    // Translate to GENIE-Payload TODO: change gabac to directly output the right format
-    std::vector<util::DataBlock> outbuffer;
-    bufferOutputStream.flush_blocks(&outbuffer);
-    size_t index = 0;
+    bufferOutputStream.flush(&outblock);
     core::AccessUnitPayload::SubsequencePayload out(data.getID());
-    out.annotateNumSymbols(num_symbols);
-    for (auto &o : outbuffer) {
-        if(vSize) {
-            o = convertTokenType(o);
-        }
-        out.add(core::AccessUnitPayload::TransformedPayload(std::move(o), index++));
-    }
+    out.set(std::move(outblock));
     return out;
 }
 
@@ -81,13 +73,14 @@ void GabacCompressor::flowIn(core::AccessUnitRaw &&t, size_t id) {
         core::AccessUnitPayload::DescriptorPayload descriptor_payload(desc.getID());
         for (const auto &subdesc : desc) {
             auto &input = raw_aus.get(subdesc.getID());
-            auto s_id = subdesc.getID();
-            if (desc.getID() == core::GenDesc::RNAME || desc.getID() == core::GenDesc::MSAR) {
-                s_id.second = 0;
+            if(input.getRawSize() > 0) {
+                const auto &conf = configSet.getConfAsGabac(subdesc.getID());
+                // add compressed payload
+                descriptor_payload.add(compress(conf, std::move(input)));
+            } else {
+                // add empty payload
+                descriptor_payload.add(core::AccessUnitPayload::SubsequencePayload(subdesc.getID(), util::DataBlock(0,1)));
             }
-            const auto &conf = configSet.getConfAsGabac(s_id);
-            descriptor_payload.add(compress(
-                conf, desc.getID() == core::GenDesc::RNAME || desc.getID() == core::GenDesc::MSAR, std::move(input)));
         }
         if (!descriptor_payload.isEmpty()) {
             payload.setPayload(desc.getID(), std::move(descriptor_payload));

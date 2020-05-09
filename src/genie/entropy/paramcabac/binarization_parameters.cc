@@ -7,7 +7,6 @@
 #include "binarization_parameters.h"
 #include <genie/util/bitwriter.h>
 #include <genie/util/exceptions.h>
-#include <genie/util/make-unique.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -17,42 +16,7 @@ namespace paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t BinarizationParameters::getParameter() const {
-    if (cmax) {
-        return *cmax;
-    }
-    if (cmax_teg) {
-        return *cmax_teg;
-    }
-    if (cmax_dtu) {
-        return *cmax_dtu;
-    }
-    if (split_unit_size) {
-        return *split_unit_size;
-    }
-    return 0;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void BinarizationParameters::write(util::BitWriter &writer) const {
-    if (cmax) {
-        writer.write(*cmax, 8);
-    }
-    if (cmax_teg) {
-        writer.write(*cmax_teg, 8);
-    }
-    if (cmax_dtu) {
-        writer.write(*cmax_dtu, 8);
-    }
-    if (split_unit_size) {
-        writer.write(*split_unit_size, 4);
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-BinarizationParameters::BinarizationParameters() : BinarizationParameters(BinarizationId::BINARY_CODING, 0) {}
+BinarizationParameters::BinarizationParameters() : BinarizationParameters(BinarizationId::BINARY_CODING, std::vector<uint8_t>()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -68,8 +32,8 @@ BinarizationParameters::BinarizationParameters(BinarizationId binID, util::BitRe
         case BinarizationId::DOUBLE_TRUNCATED_UNARY:
         case BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
             cmax_dtu = reader.read<uint8_t>();  // Fall-through
-        case BinarizationId::SPLIT_UNIT_WISE_TRUNCATED_UNARY:
-        case BinarizationId::SIGNED_SPLIT_UNIT_WISE_TRUNCATED_UNARY:
+        case BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY:
+        case BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
             split_unit_size = reader.read<uint8_t>(4);
             break;
         default:
@@ -79,15 +43,22 @@ BinarizationParameters::BinarizationParameters(BinarizationId binID, util::BitRe
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BinarizationParameters::BinarizationParameters(const BinarizationId &_binarization_id, uint8_t param)
+BinarizationParameters::BinarizationParameters(const BinarizationId &_binarization_id, std::vector<uint8_t> params)
     : cmax(), cmax_teg(), cmax_dtu(), split_unit_size() {
     switch (_binarization_id) {
         case BinarizationId::TRUNCATED_UNARY:
-            cmax = param;
+            cmax = params[0];
             break;
         case BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
         case BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
-            cmax_teg = param;
+            cmax_teg = params[0];
+            break;
+        case BinarizationId::DOUBLE_TRUNCATED_UNARY:
+        case BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
+            cmax_dtu = params[1];  // Fall-through
+        case BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY:
+        case BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
+            split_unit_size = params[0];
             break;
         case BinarizationId::BINARY_CODING:
         case BinarizationId::EXPONENTIAL_GOLOMB:
@@ -96,6 +67,61 @@ BinarizationParameters::BinarizationParameters(const BinarizationId &_binarizati
         default:
             UTILS_THROW_RUNTIME_EXCEPTION("Binarization not supported");
     }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void BinarizationParameters::write(BinarizationId binID, util::BitWriter &writer) const {
+    switch (binID) {
+        case BinarizationId::TRUNCATED_UNARY:
+            writer.write(cmax, 8);
+            break;
+        case BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
+        case BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
+            writer.write(cmax_teg, 8);
+            break;
+        case BinarizationId::DOUBLE_TRUNCATED_UNARY:
+        case BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
+            writer.write(cmax_dtu, 8);  // Fall-through
+        case BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY:
+        case BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
+            writer.write(split_unit_size, 4);
+            break;
+        default:
+            break;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t BinarizationParameters::getCMax() const {
+    return cmax;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t BinarizationParameters::getCMaxTeg() const {
+    return cmax_teg;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t BinarizationParameters::getCMaxDtu() const {
+    return cmax_dtu;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t BinarizationParameters::getSplitUnitSize() const {
+    return split_unit_size;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t BinarizationParameters::numParams[unsigned(BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY) + 1u] = {0, 1, 0, 0, 1, 1, 1, 1, 2, 2};
+
+uint8_t BinarizationParameters::getNumBinarizationParams(BinarizationParameters::BinarizationId binarzationId) {
+    return BinarizationParameters::numParams[uint8_t(binarzationId)];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

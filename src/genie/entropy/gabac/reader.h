@@ -25,46 +25,66 @@ namespace gabac {
 
 class Reader {
    public:
-    explicit Reader(util::DataBlock *bitstream);
+    explicit Reader(util::DataBlock *bitstream, const bool bypassFlag = true, const unsigned long numContexts = 0);
 
     ~Reader();
 
-    size_t readNumSymbols();
+    uint64_t readAsBIbypass(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsBIbypass(unsigned int cLength);
+    uint64_t readAsBIcabac(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsBIcabac(unsigned int cLength, unsigned int offset);
+    uint64_t readAsTUbypass(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsTUbypass(unsigned int cMax);
+    uint64_t readAsTUcabac(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsTUcabac(unsigned int cMax, unsigned int offset);
+    uint64_t readAsEGbypass(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsEGbypass(unsigned int dummy);
+    uint64_t readAsEGcabac(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsEGcabac(unsigned int dummy, unsigned int offset);
+    uint64_t readAsSEGbypass(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsSEGbypass(unsigned int dummy);
+    uint64_t readAsSEGcabac(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsSEGcabac(unsigned int dummy, unsigned int offset);
+    uint64_t readAsTEGbypass(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsTEGbypass(unsigned int treshold);
+    uint64_t readAsTEGcabac(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsTEGcabac(unsigned int treshold, unsigned int offset);
+    uint64_t readAsSUTUbypass(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsSTEGbypass(unsigned int treshold);
+    uint64_t readAsSUTUcabac(const std::vector<unsigned int> binParams);
 
-    uint64_t readAsSTEGcabac(unsigned int treshold, unsigned int offset);
+    uint64_t readAsDTUbypass(const std::vector<unsigned int> binParams);
 
-    size_t start();
+    uint64_t readAsDTUcabac(const std::vector<unsigned int> binParams);
+
+    uint64_t readBI(const std::vector<unsigned int> binParams);
+
+    uint64_t readTU(const std::vector<unsigned int> binParams);
+
+    uint64_t readEG(const std::vector<unsigned int> binParams);
+
+    uint64_t readTEG(const std::vector<unsigned int> binParams);
+
+    uint64_t readSUTU(const std::vector<unsigned int> binParams);
+
+    uint64_t readDTU(const std::vector<unsigned int> binParams);
+
+    uint64_t readLutSymbol(const uint8_t codingSubsymSize);
+
+    bool readSignFlag();
+
+    void start();
+
+    size_t close();
 
     void reset();
 
    private:
     BitInputStream m_bitInputStream;
-
-    // ContextSelector m_contextSelector;
-
     BinaryArithmeticDecoder m_decBinCabac;
+
+    bool m_bypassFlag;
+    unsigned long m_numContexts;
 
     std::vector<ContextModel> m_contextModels;
 };
