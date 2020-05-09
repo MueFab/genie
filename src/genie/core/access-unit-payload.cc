@@ -15,62 +15,20 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnitPayload::TransformedPayload::write(util::BitWriter& writer) const {
-    writer.writeBypass(payloadData.getData(), payloadData.getRawSize());
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-AccessUnitPayload::TransformedPayload::TransformedPayload(util::DataBlock _data, size_t pos)
-    : payloadData(std::move(_data)), position(pos) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-AccessUnitPayload::TransformedPayload::TransformedPayload(size_t size, util::BitReader& reader) {
-    payloadData = util::DataBlock(0, 1);
-    payloadData.reserve(size);
-    for (size_t i = 0; i < size; ++i) {
-        payloadData.push_back(reader.read(8));
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool AccessUnitPayload::TransformedPayload::isEmpty() const { return payloadData.empty(); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-util::DataBlock&& AccessUnitPayload::TransformedPayload::move() { return std::move(payloadData); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-size_t AccessUnitPayload::TransformedPayload::getIndex() const { return position; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id) : id(std::move(_id)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id, size_t remainingSize, size_t subseq_ctr,
-                                                          util::BitReader& reader)
-    : id(std::move(_id)) {
-    if(getDescriptor(getID().first).tokentype) {
-        // TODO: The size is UNKNOWN?
-        transformedPayloads.emplace_back(0, reader);
-        return;
-    }
-    for (size_t i = 0; i < subseq_ctr; ++i) {
-        size_t s = 0;
-        if (i != subseq_ctr - 1) {
-            s = reader.read(32);
-            remainingSize -= (s + 4);
-        } else {
-            s = remainingSize;
-        }
-        if (s) {
-            transformedPayloads.emplace_back(s, reader);
-        }
+AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id, util::DataBlock&& _payload)
+    : id(std::move(_id)), payload(std::move(_payload)) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id, size_t size, util::BitReader& reader)
+    : id(std::move(_id)), payload(0, 1) {
+    payload.reserve(size);
+    for (size_t i = 0; i < size; ++i) {
+        payload.push_back(reader.read(8));
     }
 }
 
@@ -81,39 +39,13 @@ GenSubIndex AccessUnitPayload::SubsequencePayload::getID() const { return id; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnitPayload::SubsequencePayload::write(util::BitWriter& writer) const {
-    if(getDescriptor(getID().first).tokentype) {
-        writer.write(getID().second & 0xfu, 4);
-        writer.write(3, 4);
-
-        transformedPayloads[0].write(writer);
-        return;
-    }
-    for (size_t i = 0; i < transformedPayloads.size(); ++i) {
-        transformedPayloads[i].write(writer);
-        if (i != transformedPayloads.size() - 1) {
-            writer.write(transformedPayloads[i].getWrittenSize(), 32);
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void AccessUnitPayload::SubsequencePayload::add(TransformedPayload p) {
-    transformedPayloads.emplace_back(std::move(p));
+    writer.writeBuffer(payload.getData(), payload.getRawSize());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool AccessUnitPayload::SubsequencePayload::isEmpty() const {
-    if (transformedPayloads.empty()) {
-        return true;
-    }
-    for (const auto& p : transformedPayloads) {
-        if (!p.isEmpty()) {
-            return false;
-        }
-    }
-    return true;
+    return payload.empty();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -136,8 +68,8 @@ void AccessUnitPayload::DescriptorPayload::write(util::BitWriter& writer) const 
         return;
     }
     for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
-        if (i != subsequencePayloads.size() - 1) {
-            writer.write(subsequencePayloads[i].isEmpty() ? 0 : subsequencePayloads[i].getWrittenSize(), 32);
+        if (i < (subsequencePayloads.size() - 1)) {
+            writer.write(subsequencePayloads[i].getWrittenSize(), 32);
         }
         subsequencePayloads[i].write(writer);
     }
@@ -266,14 +198,14 @@ AccessUnitPayload::DescriptorPayload::DescriptorPayload(GenDesc _id, size_t coun
     }
     for (size_t i = 0; i < count; ++i) {
         size_t s = 0;
-        if (i != count - 1) {
+        if (i < (count - 1)) {
             s = reader.read(32);
             remainingSize -= (s + 4);
         } else {
             s = remainingSize;
         }
         if (s) {
-            subsequencePayloads.emplace_back(GenSubIndex{_id, i}, s, 1, reader);
+            subsequencePayloads.emplace_back(GenSubIndex{_id, i}, s, reader);
         }
     }
 }

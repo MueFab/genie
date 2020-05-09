@@ -8,7 +8,6 @@
 #include <cassert>
 #include "bit-input-stream.h"
 #include "cabac-tables.h"
-#include "context-model.h"
 
 namespace genie {
 namespace entropy {
@@ -111,12 +110,16 @@ void BinaryArithmeticDecoder::reset() { decodeBinTrm(); }
 
 void BinaryArithmeticDecoder::start() {
     assert(m_bitInputStream.getNumBitsUntilByteAligned() == 0);
-    m_bitInputStream.skipBytes(4);  // Corresponding the numSymbols already reader::start()
 
     m_numBitsNeeded = -8;
     m_range = 510;
     m_value = (m_bitInputStream.readByte() << 8u);
     m_value |= m_bitInputStream.readByte();
+}
+
+size_t BinaryArithmeticDecoder::close() {
+    decodeBinTrm();
+    return m_bitInputStream.getNumBytesRead();
 }
 }  // namespace gabac
 }  // namespace entropy

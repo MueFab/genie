@@ -20,7 +20,7 @@
 #include <vector>
 #include "computed_ref.h"
 #include "data_unit.h"
-#include "descriptor_box.h"
+#include "descriptor_subseq_cfg.h"
 #include "quality-values.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -52,9 +52,9 @@ class ParameterSet : public DataUnit {
 
     void addClass(record::ClassType class_id, std::unique_ptr<QualityValues> conf);
 
-    void setDescriptor(GenDesc index, DescriptorBox &&descriptor);
+    void setDescriptor(GenDesc index, DescriptorSubseqCfg &&descriptor);
 
-    const DescriptorBox &getDescriptor(GenDesc index) const;
+    const DescriptorSubseqCfg &getDescriptor(GenDesc index) const;
 
     void addGroup(std::string &&rgroup_id);
 
@@ -101,7 +101,7 @@ class ParameterSet : public DataUnit {
     uint8_t qv_depth;
     uint8_t as_depth;
     std::vector<record::ClassType> class_IDs;
-    std::vector<DescriptorBox> descriptors;
+    std::vector<DescriptorSubseqCfg> descriptors;
     std::vector<std::string> rgroup_IDs;
     bool multiple_alignments_flag;
     bool spliced_reads_flag;

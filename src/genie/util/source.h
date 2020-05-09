@@ -18,7 +18,7 @@ namespace genie {
 namespace util {
 
 /**
- * @brief Implementing this interface signals the ability to putput data chunks of type TYPE
+ * @brief Implementing this interface signals the ability to output data chunks of type TYPE
  * @tparam TYPE Data chunk type
  */
 template <typename TYPE>

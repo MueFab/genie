@@ -230,7 +230,7 @@ void Decoder::decodeMismatches(size_t clip_offset, std::string &sequence, std::s
 std::tuple<size_t, size_t> Decoder::decodeClips(std::vector<std::string> &sequences,
                                                 std::vector<std::string> &cigar_extended) {
     size_t num = recordCounter++;
-    std::tuple<size_t, size_t> softclip_offset = {0, 0};
+    std::tuple<size_t, size_t> softclip_offset{0, 0};
     if (container.isEnd(core::GenSub::CLIPS_RECORD_ID) || num != container.peek(core::GenSub::CLIPS_RECORD_ID)) {
         return softclip_offset;
     }

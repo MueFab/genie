@@ -4,47 +4,54 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "match-coding.h"
-
 #include <algorithm>
 #include <cassert>
 #include <iostream>
 
 #include <genie/util/block-stepper.h>
 #include <genie/util/data-block.h>
+#include "exceptions.h"
+#include "match-subseq-transform.h"
 
 namespace genie {
 namespace entropy {
 namespace gabac {
 
-void transformMatchCoding(const uint32_t windowSize, util::DataBlock *const symbols, util::DataBlock *const pointers,
-                          util::DataBlock *const lengths) {
-    assert(pointers != nullptr);
-    assert(lengths != nullptr);
-    assert(symbols != nullptr);
-    util::DataBlock rawValues(0, symbols->getWordSize());
+void transformMatchCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs) {
+    assert(transformedSubseqs != nullptr);
+    const uint16_t matchBufferSize = subseqCfg.getTransformParameters().getParam();
 
-    // Prepare the output vectors
-    pointers->clear();
-    lengths->clear();
+    // Prepare internal and the output data structures
+    util::DataBlock symbols(0, 1);
+    symbols.swap(&(*transformedSubseqs)[0]);
+    (*transformedSubseqs)[0].clear();
+    transformedSubseqs->resize(3);
 
-    if (windowSize == 0) {
-        lengths->resize(symbols->size());
+    util::DataBlock *const pointers  = &((*transformedSubseqs)[0]);
+    util::DataBlock *const lengths   = &((*transformedSubseqs)[1]);
+    util::DataBlock *const rawValues = &((*transformedSubseqs)[2]);
+    pointers->setWordSize(4);
+    lengths->setWordSize(4);
+    rawValues->setWordSize(4);
+
+    const uint64_t symbolsSize = symbols.size();
+
+    if (matchBufferSize == 0) {
+        lengths->resize(symbolsSize);
         std::fill(lengths->begin(), lengths->end(), 0);
         return;
     }
 
-    // Do the match genie
-    const uint64_t symbolsSize = symbols->size();
+    // Perform the match transformation
     for (uint64_t i = 0; i < symbolsSize; i++) {
         uint64_t pointer = 0;
         uint64_t length = 0;
-        uint64_t windowStartIdx = i - windowSize;
+        uint64_t windowStartIdx = i - matchBufferSize;
         uint64_t windowEndIdx = i;
 
         for (uint64_t w = windowStartIdx; w < windowEndIdx; w++) {
             uint64_t offset = i;
-            while ((offset < symbolsSize) && (symbols->get(offset) == (symbols->get(w + offset - i)))) {
+            while ((offset < symbolsSize) && (symbols.get(offset) == (symbols.get(w + offset - i)))) {
                 offset++;
             }
             offset -= i;
@@ -55,7 +62,7 @@ void transformMatchCoding(const uint32_t windowSize, util::DataBlock *const symb
         }
         if (length < 2) {
             lengths->push_back(0);
-            rawValues.push_back(symbols->get(i));
+            rawValues->push_back(symbols.get(i));
         } else {
             pointers->push_back(i - pointer);
             lengths->push_back(length);
@@ -63,15 +70,23 @@ void transformMatchCoding(const uint32_t windowSize, util::DataBlock *const symb
         }
     }
 
-    rawValues.swap(symbols);
+    symbols.clear();
 }
 
-void inverseTransformMatchCoding(util::DataBlock *const rawValues, util::DataBlock *const pointers,
-                                 util::DataBlock *const lengths) {
+void inverseTransformMatchCoding(std::vector<util::DataBlock> *const transformedSubseqs) {
+    assert(transformedSubseqs != nullptr);
+
+    if ((*transformedSubseqs).size() != 3) {
+        GABAC_DIE("invalid subseq count for match inverse transform");
+    }
+
+    // Prepare internal and the output data structures
+    util::DataBlock *const pointers  = &((*transformedSubseqs)[0]);
+    util::DataBlock *const lengths   = &((*transformedSubseqs)[1]);
+    util::DataBlock *const rawValues = &((*transformedSubseqs)[2]);
+
     util::DataBlock symbols(0, rawValues->getWordSize());
     assert(lengths->size() == pointers->size() + rawValues->size());
-
-    // In-place probably not possible
 
     // Re-compute the symbols from the pointer, lengths and raw values
     size_t n = 0;
@@ -95,11 +110,10 @@ void inverseTransformMatchCoding(util::DataBlock *const rawValues, util::DataBlo
         }
     }
 
-    symbols.swap(rawValues);
-    pointers->clear();
-    pointers->shrink_to_fit();
-    lengths->clear();
-    lengths->shrink_to_fit();
+    (*transformedSubseqs).resize(1);
+    (*transformedSubseqs)[0].clear();
+
+    symbols.swap(&(*transformedSubseqs)[0]);
 }
 }  // namespace gabac
 }  // namespace entropy

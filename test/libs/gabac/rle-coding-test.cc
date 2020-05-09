@@ -1,4 +1,4 @@
-#include <genie/entropy/gabac/rle-coding.h>
+#include <genie/entropy/gabac/rle-subseq-transform.h>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <vector>

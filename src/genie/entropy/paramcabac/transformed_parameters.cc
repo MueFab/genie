@@ -35,7 +35,9 @@ TransformedParameters::TransformedParameters(util::BitReader &reader) {
             rle_coding_guard = reader.read<uint8_t>();
             break;
         case TransformIdSubseq::MERGE_CODING:
-            UTILS_DIE("Merge core not supported");
+            break;
+        default:
+            UTILS_THROW_RUNTIME_EXCEPTION("Invalid subseq transformation");
             break;
     }
 }
@@ -59,7 +61,10 @@ TransformedParameters::TransformedParameters(const TransformIdSubseq &_transform
             match_coding_buffer_size = param;
             break;
         case TransformIdSubseq::MERGE_CODING:
-            UTILS_THROW_RUNTIME_EXCEPTION("Merge core not supported");
+            merge_coding_subseq_count = param;
+            break;
+        default:
+            UTILS_THROW_RUNTIME_EXCEPTION("Invalid subseq transformation");
             break;
     }
 }
@@ -67,8 +72,12 @@ TransformedParameters::TransformedParameters(const TransformIdSubseq &_transform
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t TransformedParameters::getNumStreams() const {
-    static const std::vector<size_t> lut = {1, 2, 3, 2, 1};
-    return lut[uint8_t(transform_ID_subseq)];
+    if (transform_ID_subseq == TransformedParameters::TransformIdSubseq::MERGE_CODING)
+        return *merge_coding_subseq_count;
+    else {
+        static const std::vector<size_t> lut = {1, 2, 3, 2, 1};
+        return lut[uint8_t(transform_ID_subseq)];
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -96,7 +105,13 @@ uint16_t TransformedParameters::getParam() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<uint8_t> *TransformedParameters::getMergeCodingShiftSize() const { return &merge_coding_shift_size; }
+const std::vector<uint8_t> TransformedParameters::getMergeCodingShiftSizes() const { return merge_coding_shift_size; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void TransformedParameters::setMergeCodingShiftSizes(std::vector<uint8_t> mergeCodingshiftSizes) {
+    merge_coding_shift_size = mergeCodingshiftSizes;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

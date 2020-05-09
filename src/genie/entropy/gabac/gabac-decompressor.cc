@@ -43,18 +43,8 @@ core::AccessUnitRaw::Subsequence GabacDecompressor::decompress(const gabac::Enco
                                                                core::AccessUnitPayload::SubsequencePayload&& data) {
     core::AccessUnitPayload::SubsequencePayload in = std::move(data);
     // Interface to GABAC library
-    std::stringstream in_stream;
-    for (auto& payload : in) {
-        util::DataBlock buffer = payload.move();
-
-        if(getDescriptor(in.getID().first).tokentype) {
-            buffer = convertTokenType(buffer);
-        }
-
-        uint32_t size = buffer.getRawSize();
-        in_stream.write(reinterpret_cast<char*>(&size), sizeof(uint32_t));
-        in_stream.write(reinterpret_cast<char*>(buffer.getData()), buffer.getRawSize());
-    }
+    util::DataBlock buffer = in.move();
+    gabac::IBufferStream in_stream(&buffer, 0);
 
     util::DataBlock tmp(0, 4);
     gabac::OBufferStream outbuffer(&tmp);
@@ -62,7 +52,7 @@ core::AccessUnitRaw::Subsequence GabacDecompressor::decompress(const gabac::Enco
     // Setup
     const size_t GABAC_BLOCK_SIZE = 0;  // 0 means single block (block size is equal to input size)
     std::ostream* const GABC_LOG_OUTPUT_STREAM = &std::cout;
-    const gabac::IOConfiguration GABAC_IO_SETUP = {&in_stream, &outbuffer, GABAC_BLOCK_SIZE, GABC_LOG_OUTPUT_STREAM,
+    const gabac::IOConfiguration GABAC_IO_SETUP = {&in_stream, nullptr, &outbuffer, GABAC_BLOCK_SIZE, GABC_LOG_OUTPUT_STREAM,
                                                    gabac::IOConfiguration::LogLevel::TRACE};
     const bool GABAC_DECODING_MODE = true;
 

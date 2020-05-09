@@ -12,7 +12,7 @@
 #include <global-cfg.h>
 #include <sstream>
 #include "descriptor.h"
-#include "descriptor_box.h"
+#include "descriptor_subseq_cfg.h"
 #include "quality-values.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::
         class_IDs.push_back(bitReader.read<record::ClassType>(4));
     }
     for (size_t i = 0; i < getDescriptors().size(); ++i) {
-        descriptors.emplace_back(DescriptorBox(num_classes, GenDesc(i), bitReader));
+        descriptors.emplace_back(DescriptorSubseqCfg(num_classes, GenDesc(i), bitReader));
     }
     auto num_groups = bitReader.read<uint16_t>();
     for (size_t i = 0; i < num_groups; ++i) {
@@ -140,7 +140,7 @@ void ParameterSet::write(util::BitWriter &writer, genie::core::stats::PerfStats 
 
     // Now size is known, write to final destination
     writer.write(bytes, 22);
-    writer.writeBypass(&ss);
+    writer.writeBuffer(&ss);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -219,13 +219,13 @@ void ParameterSet::addClass(record::ClassType class_id, std::unique_ptr<QualityV
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::setDescriptor(GenDesc index, DescriptorBox &&descriptor) {
+void ParameterSet::setDescriptor(GenDesc index, DescriptorSubseqCfg &&descriptor) {
     descriptors[uint8_t(index)] = std::move(descriptor);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const DescriptorBox &ParameterSet::getDescriptor(GenDesc index) const { return descriptors[uint8_t(index)]; }
+const DescriptorSubseqCfg &ParameterSet::getDescriptor(GenDesc index) const { return descriptors[uint8_t(index)]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

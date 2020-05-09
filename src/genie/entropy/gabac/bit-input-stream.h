@@ -28,6 +28,8 @@ class BitInputStream {
 
     unsigned int getNumBitsUntilByteAligned() const;
 
+    size_t getNumBytesRead() const;
+
     unsigned char readByte();
 
     unsigned int read(unsigned int numBits);
