@@ -154,8 +154,117 @@ core::record::Record Importer::convert(uint16_t ref, sam::Record &&_r1, sam::Rec
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+void Importer::convertUnmapped(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d) {
+    auto& sam_rec = sam_recs_2d.front().front();
+
+    auto flag_tuple = convertFlags2Mpeg(sam_rec.getFlags());
+    core::record::Record rec(1, core::record::ClassType::CLASS_I, sam_rec.moveQname(), "Genie",
+                             std::get<1>(flag_tuple));
+
+    // No alignmnent
+    // core::record::Alignment alignment(convertCigar2ECigar(sam_rec.getCigar(), sam_rec.getSeq()),
+    //                                   sam_rec.checkFlag(Record::FlagPos::SEQ_REVERSE));
+
+    //alignment.addMappingScore(sam_rec.getMapQ());
+    //core::record::AlignmentBox alignmentContainer(sam_rec.getPos(), std::move(alignment));
+
+    core::record::Segment segment(sam_rec.moveSeq());
+    if (sam_rec.getQual() != "*") {
+        segment.addQualities(sam_rec.moveQual());
+    }
+    rec.addSegment(std::move(segment));
+
+    // No alignment
+    //    ret.addAlignment(ref, std::move(alignmentContainer));  // TODO
+
+    chunk.push_back(std::move(rec));
+}
+// ---------------------------------------------------------------------------------------------------------------------
+void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d) {
+    auto& sam_rec = sam_recs_2d.front().front();
+    sam_recs_2d.front().pop_front();
+
+    auto flag_tuple = convertFlags2Mpeg(sam_rec.getFlags());
+    core::record::Record rec(1, core::record::ClassType::CLASS_I, sam_rec.moveQname(), "Genie",
+                             std::get<1>(flag_tuple));
+
+    core::record::Alignment alignment(convertCigar2ECigar(sam_rec.getCigar(), sam_rec.getSeq()),
+                                      sam_rec.checkFlag(Record::FlagPos::SEQ_REVERSE));
+    alignment.addMappingScore(sam_rec.getMapQ());
+
+    core::record::AlignmentBox alignmentContainer(sam_rec.getPos(), std::move(alignment));
+    rec.addAlignment(refs[sam_rec.getRname()], std::move(alignmentContainer));
+
+    core::record::Segment segment(sam_rec.moveSeq());
+    if (sam_rec.getQual() != "*") {
+        segment.addQualities(sam_rec.moveQual());
+    }
+    rec.addSegment(std::move(segment));
+
+    for (auto& sam_rec: sam_recs_2d.front()){
+        core::record::Alignment alignment(convertCigar2ECigar(sam_rec.getCigar(), sam_rec.getSeq()),
+                                          sam_rec.checkFlag(Record::FlagPos::SEQ_REVERSE));
+        alignment.addMappingScore(sam_rec.getMapQ());
+
+        core::record::AlignmentBox alignmentContainer(sam_rec.getPos(), std::move(alignment));
+        rec.addAlignment(refs[sam_rec.getRname()], std::move(alignmentContainer));
+    }
+
+    chunk.push_back(std::move(rec));
+}
+// ---------------------------------------------------------------------------------------------------------------------
+void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d) {
+
+}
+// ---------------------------------------------------------------------------------------------------------------------
+void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt) {
+    SamRecords2D sam_recs_2d;
+    rt.getRecords(sam_recs_2d);
+
+    for (auto& sam_recs:sam_recs_2d){
+        for (auto& sam_rc:sam_recs){
+            auto& rname = sam_rc.getRname();
+
+            if (rname != "=" || rname != "*"){
+                auto it = refs.find(rname);
+                if (it == refs.end()) {
+                    refs.insert(std::make_pair(sam_rc.getRname(), ref_counter++));
+                }
+            }
+        }
+    }
+
+    if (rt.isValid()){
+        if (rt.isUnmapped()){
+            convertUnmapped(chunk, sam_recs_2d);
+        } else if (rt.isSingle()){
+            convertSingleEnd(chunk, sam_recs_2d);
+        } else if (rt.isPair()){
+            convertPairedEnd(chunk, sam_recs_2d);
+        } else {
+            UTILS_DIE("Unhandled case found !");
+        }
+    } else{
+        UTILS_DIE("Invalid Read Template");
+    }
+
+}
+// ---------------------------------------------------------------------------------------------------------------------
 
 bool Importer::pump(size_t id) {
+    auto counter = blockSize;
+    std::string line;
+    std::list<std::string> lines;
+    core::record::Chunk chunk;
+    {
+        util::OrderedSection section(&lock, id);
+        while (stream.good() && counter--){
+            std::getline(stream, line);
+            lines.push_back(std::move(line));
+        }
+    }
+
+
 //    core::record::Chunk chunk;
 //    std::vector<sam::Record> s;
 //    std::list<sam::Record> samRecords;

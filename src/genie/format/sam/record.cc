@@ -308,7 +308,7 @@ bool Record::isPairOf(Record &other) const {
 
         // If self is mapped or data for assumption if complete, check fields
         //if (!other.isNextUnmapped()){
-        if (!(other.isNextUnmapped() || isUnmapped())){
+        if (!(isUnmapped() || other.isNextUnmapped())){
             if (!((other.rnext == "=" ? other.rname : other.rnext) == rname && other.pnext == pos &&
                   other.checkFlag(FlagPos::NEXT_SEQ_REVERSE) == checkFlag(FlagPos::SEQ_REVERSE))) {
                 return false;
