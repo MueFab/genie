@@ -288,26 +288,31 @@ bool Record::isNextUnmapped() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Record::isPairOf(Record &other) const {
-    // If any read is non-multi segments
+    // If any read is not multi segments
     if (!(checkFlag(FlagPos::MULTI_SEGMENT_TEMPLATE) && other.checkFlag(FlagPos::MULTI_SEGMENT_TEMPLATE))) {
         return false;
     }
 
-    // If next segment is mapped or data of other is complete, check others fields
-    //if (!isNextUnmapped()){
-    if (!(isNextUnmapped() || other.isUnmapped())){
-        if (!((rnext == "=" ? rname : rnext) == other.rname && pnext == other.pos &&
-              checkFlag(FlagPos::NEXT_SEQ_REVERSE) == other.checkFlag(FlagPos::SEQ_REVERSE))) {
-            return false;
+    // Check RNEXT and PNEXT can only be done if both are primary line
+    // because for secondary alignment, RNEXT and PNEXT point to RNAME and POS of
+    // primary line of the next template
+    if (isPrimaryLine() && other.isPrimaryLine()){
+        // If next segment is mapped or data of other is complete, check others fields
+        //if (!isNextUnmapped()){
+        if (!(isNextUnmapped() || other.isUnmapped())){
+            if (!((rnext == "=" ? rname : rnext) == other.rname && pnext == other.pos &&
+                  checkFlag(FlagPos::NEXT_SEQ_REVERSE) == other.checkFlag(FlagPos::SEQ_REVERSE))) {
+                return false;
+            }
         }
-    }
 
-    // If self is mapped or data for assumption if complete, check fields
-    //if (!other.isNextUnmapped()){
-    if (!(other.isNextUnmapped() || isUnmapped())){
-        if (!((other.rnext == "=" ? other.rname : other.rnext) == rname && other.pnext == pos &&
-              other.checkFlag(FlagPos::NEXT_SEQ_REVERSE) == checkFlag(FlagPos::SEQ_REVERSE))) {
-            return false;
+        // If self is mapped or data for assumption if complete, check fields
+        //if (!other.isNextUnmapped()){
+        if (!(other.isNextUnmapped() || isUnmapped())){
+            if (!((other.rnext == "=" ? other.rname : other.rnext) == rname && other.pnext == pos &&
+                  other.checkFlag(FlagPos::NEXT_SEQ_REVERSE) == checkFlag(FlagPos::SEQ_REVERSE))) {
+                return false;
+            }
         }
     }
 
