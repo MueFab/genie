@@ -327,9 +327,9 @@ bool Record::isPairOf(Record &other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReadTemplate::ReadTemplate() : is_empty(true) {
-    initializeData();
-}
+//ReadTemplate::ReadTemplate() : is_empty(true) {
+//    initializeData();
+//}
 
 ReadTemplate::ReadTemplate(Record &&rec) : qname(rec.getQname()), is_empty(false){
     initializeData();
@@ -342,27 +342,26 @@ void ReadTemplate::initializeData() {
 
 void ReadTemplate::addRecord(Record&& rec) {
 
-    if (is_empty){
-        qname = rec.getQname();
-    } else {
-        UTILS_DIE_IF(qname != rec.getQname(), "Invalid QNAME");
-    }
-
+//    if (is_empty){
+//        qname = rec.getQname();
+//    } else {
+//        UTILS_DIE_IF(qname != rec.getQname(), "Invalid QNAME");
+//    }
+    UTILS_DIE_IF(qname != rec.getQname(), "Invalid QNAME");
+    
     auto idx = Index::UNKNOWN;
 
     // Handles paired-end read / multi segments
     if (rec.checkFlag(Record::FlagPos::MULTI_SEGMENT_TEMPLATE)) {
-        UTILS_DIE_IF(rec.checkFlag(Record::FlagPos::SEGMENT_UNMAPPED),
-                     "Unmapped multi segment found for QNAME " + qname + " !");
+//        UTILS_DIE_IF(rec.checkFlag(Record::FlagPos::SEGMENT_UNMAPPED),
+//                     "Unmapped multi segment found for QNAME " + qname + " !");
 
         if (rec.checkFlag(Record::FlagPos::FIRST_SEGMENT)) {
-            //idx = rec.isPrimaryLine() ? Index::PAIR_FIRST_PRIMARY : Index::PAIR_FIRST_NONPRIMARY;
             idx = Index::PAIR_FIRST;
         } else if (rec.checkFlag(Record::FlagPos::LAST_SEGMENT)) {
-            //idx = rec.isPrimaryLine() ? Index::PAIR_LAST_PRIMARY : Index::PAIR_LAST_NONPRIMARY;
             idx = Index::PAIR_LAST;
         } else {
-            UTILS_DIE("Neither first nor last segment for QNAME " + qname + " !");
+            UTILS_DIE("Neither first nor last segment for Template " + qname + " !");
         }
 
     // Handles single-end read / single segment
@@ -375,7 +374,11 @@ void ReadTemplate::addRecord(Record&& rec) {
         UTILS_DIE("Not handled case found for QNAME " + qname + " !");
     }
 
-    data[uint8_t(idx)].push_back(std::move(rec));
+    if (rec.isPrimaryLine()){
+        data[uint8_t(idx)].push_front(std::move(rec));
+    } else {
+        data[uint8_t(idx)].push_back(std::move(rec));
+    }
 }
 
 bool ReadTemplate::isUnmapped() {
@@ -403,15 +406,14 @@ bool ReadTemplate::isUnknown() {
 bool ReadTemplate::isValid() {
     if (isUnknown() || data[uint8_t(Index::SINGLE_UNMAPPED)].size() > 1){
         return false;
+    } else {
+        auto is_unmapped = isUnmapped();
+        auto is_single = isSingle();
+        auto is_pair = isPair();
+        return ( is_unmapped && !is_single && !is_pair) ||
+               (!is_unmapped &&  is_single && !is_pair) ||
+               (!is_unmapped && !is_single &&  is_pair);
     }
-    if (isUnmapped() && !isSingle() && !isPair()){
-        return true;
-    } else if (!isUnmapped() && isSingle() && !isPair()){
-        return true;
-    } else if (!isUnmapped() && !isSingle() && isPair()){
-        return true;
-    }
-    return false;
 }
 bool ReadTemplate::getSamRecords(std::list<std::list<Record>>& sam_recs) {
     sam_recs.clear();
@@ -421,8 +423,8 @@ bool ReadTemplate::getSamRecords(std::list<std::list<Record>>& sam_recs) {
         } else if (isSingle()) {
             sam_recs.push_back(std::move(data[uint8_t(Index::SINGLE_MAPPED)]));
         } else if (isPair()){
-            //TODO (Yeremia):
-            UTILS_DIE("NOT_IMPLEMENTED");
+            sam_recs.push_back(std::move(data[uint8_t(Index::PAIR_FIRST)]));
+            sam_recs.push_back(std::move(data[uint8_t(Index::PAIR_LAST)]));
         }
         return true;
     } else {
