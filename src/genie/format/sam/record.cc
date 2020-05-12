@@ -327,11 +327,11 @@ bool Record::isPairOf(Record &other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//ReadTemplate::ReadTemplate() : is_empty(true) {
-//    initializeData();
-//}
+ReadTemplate::ReadTemplate() : {
+    initializeData();
+}
 
-ReadTemplate::ReadTemplate(Record &&rec) : qname(rec.getQname()), is_empty(false){
+ReadTemplate::ReadTemplate(Record &&rec) : qname(rec.getQname()){
     initializeData();
     addRecord(std::move(rec));
 }
@@ -342,12 +342,14 @@ void ReadTemplate::initializeData() {
 
 void ReadTemplate::addRecord(Record&& rec) {
 
-//    if (is_empty){
-//        qname = rec.getQname();
-//    } else {
-//        UTILS_DIE_IF(qname != rec.getQname(), "Invalid QNAME");
-//    }
-    UTILS_DIE_IF(qname != rec.getQname(), "Invalid QNAME");
+    if (qname != rec.getQname()){
+        if (qname.empty()){
+            qname = rec.getQname();
+        } else {
+            UTILS_DIE("Record with QNAME " + rec.getQname() + " was added to ReadTemplate with "
+                      + "QNAME " + qname);
+        }
+    }
     
     auto idx = Index::UNKNOWN;
 
@@ -365,7 +367,7 @@ void ReadTemplate::addRecord(Record&& rec) {
         }
 
     // Handles single-end read / single segment
-    // TODO (Yeremia): for linear template both are set,
+    // TODO (Yeremia): for linear template FIRST_SEGMENT and LAST_SEGMENT are set,
     } else if (!rec.checkFlag(Record::FlagPos::FIRST_SEGMENT) && !rec.checkFlag(Record::FlagPos::LAST_SEGMENT)) {
         idx = rec.checkFlag(Record::FlagPos::SEGMENT_UNMAPPED) ? Index::SINGLE_UNMAPPED : Index::SINGLE_MAPPED;
 
@@ -415,7 +417,7 @@ bool ReadTemplate::isValid() {
                (!is_unmapped && !is_single &&  is_pair);
     }
 }
-bool ReadTemplate::getSamRecords(std::list<std::list<Record>>& sam_recs) {
+bool ReadTemplate::getRecords(std::list<std::list<Record>>& sam_recs) {
     sam_recs.clear();
     if (isValid()) {
         if (isUnmapped()){
