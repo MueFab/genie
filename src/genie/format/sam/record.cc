@@ -67,7 +67,11 @@ Record::Record(std::string _qname, uint16_t _flag, std::string _rname, uint32_t 
       pnext(_pnext),
       tlen(_tlen),
       seq(std::move(_seq)),
-      qual(std::move(_qual)) {}
+      qual(std::move(_qual)) {
+
+    checkValuesUsingRegex();
+    checkValuesUsingCondition();
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -276,13 +280,17 @@ bool Record::isPrimaryLine() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Record::isUnmapped() const {
-    return checkFlag(FlagPos::SEGMENT_UNMAPPED) || rname == "*" || pos == 0;
+    // FlagPos::SEGMENT_UNMAPPED is the only reliable way to tell whether a read is unmapped
+    // Unmapped segment without coordinate has RNAME of '*'
+    // Unmapped coordinate may have ordinary coordinate != 0
+    return checkFlag(FlagPos::SEGMENT_UNMAPPED) || rname == "*";
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Record::isNextUnmapped() const {
-    return checkFlag(FlagPos::NEXT_SEGMENT_UNMAPPED) || rnext == "*" || pnext == 0;
+    // See isUnmapped()
+    return checkFlag(FlagPos::NEXT_SEGMENT_UNMAPPED) || rnext == "*";
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -399,7 +407,7 @@ bool ReadTemplate::isSingle() {
 }
 
 bool ReadTemplate::isPair() {
-    // Pair non- and multiplie alignements
+    // Pair non- and multiple alignments
 //    return !data[uint8_t(Index::PAIR_FIRST)].empty() &&
 //           !data[uint8_t(Index::PAIR_LAST)].empty() &&
 //           data[uint8_t(Index::PAIR_FIRST)].front().isPrimaryLine() &&
