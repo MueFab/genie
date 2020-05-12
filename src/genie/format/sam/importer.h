@@ -34,6 +34,9 @@ class Importer : public core::FormatImporter {
     ReadTemplateGroup rtg;
     util::OrderedLock lock;  //!< @brief Lock to ensure in order execution
 
+    void convertPairedEndNoSplit(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d);
+    void convertPairedEndSplitPair(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d);
+
    public:
     Importer(size_t _blockSize, std::istream &_file);
 
@@ -49,8 +52,9 @@ class Importer : public core::FormatImporter {
     size_t ref_counter;
 
     static core::record::Record convert(uint16_t ref, sam::Record &&_r1, sam::Record *_r2);
-    void convertUnmapped(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d);
-    void convertSingleEnd(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d);
+    void convertUnmapped(core::record::Chunk& chunk, SamRecords& sam_recs);
+    void convertSingleEnd(core::record::Chunk& chunk, SamRecords& sam_recs, bool unmapped_pair=false);
+
     void convertPairedEnd(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d);
     void convert(core::record::Chunk& chunk, ReadTemplate& rt);
 
