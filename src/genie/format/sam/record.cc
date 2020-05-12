@@ -398,7 +398,9 @@ bool ReadTemplate::isPair() {
     return !data[uint8_t(Index::PAIR_FIRST)].empty() &&
            !data[uint8_t(Index::PAIR_LAST)].empty() &&
            data[uint8_t(Index::PAIR_FIRST)].front().isPrimaryLine() &&
-           data[uint8_t(Index::PAIR_LAST)].front().isPrimaryLine();
+           data[uint8_t(Index::PAIR_LAST)].front().isPrimaryLine() &&
+           data[uint8_t(Index::PAIR_FIRST)].front().isPairOf(data[uint8_t(Index::PAIR_LAST)].front()) &&
+           data[uint8_t(Index::PAIR_LAST)].front().isPairOf(data[uint8_t(Index::PAIR_FIRST)].front());
 }
 
 bool ReadTemplate::isUnknown() {
