@@ -289,8 +289,12 @@ void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_re
         read_2_ok = true;
     }
 
+    UTILS_DIE_IF(!sam_recs_2d.front().front().isPairOf(sam_recs_2d.back().front()),
+                 "read_1 is not pair of read_2 or vice versa");
+
     // If-case is reached when both read_1 and read_2 have primary line and at least 1 record
     if (read_1_ok && read_2_ok){
+        // TODO (Yeremia): insert convertPairedEndNoSplit and convertPairedEndSplitPair here
         UTILS_DIE("TODO");
         if (false){
 
