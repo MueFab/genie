@@ -132,12 +132,11 @@ class ReadTemplate{
 
    private:
     std::vector<std::list<Record>> data;
-//    bool is_empty = false;
 
    public:
     std::string qname;
 
-    //ReadTemplate();
+    ReadTemplate();
     explicit ReadTemplate(Record&& rec);
 
     void initializeData();
@@ -149,7 +148,7 @@ class ReadTemplate{
     bool isUnknown();
 
     bool isValid();
-    bool getSamRecords(std::list<std::list<Record>> & sam_recs);
+    bool getRecords(std::list<std::list<Record>> & sam_recs);
 };
 
 }  // namespace sam
