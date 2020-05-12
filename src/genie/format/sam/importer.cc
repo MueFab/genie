@@ -6,6 +6,7 @@
 
 #include "importer.h"
 #include <genie/core/record/alignment_split/same-rec.h>
+#include <genie/core/record/alignment_split/unpaired.h>
 #include <genie/util/ordered-section.h>
 #include <list>
 
@@ -154,12 +155,12 @@ core::record::Record Importer::convert(uint16_t ref, sam::Record &&_r1, sam::Rec
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertUnmapped(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d) {
-    auto& sam_rec = sam_recs_2d.front().front();
+void Importer::convertUnmapped(core::record::Chunk &chunk, SamRecords &sam_recs) {
+    auto& sam_rec = sam_recs.front();
 
     auto flag_tuple = convertFlags2Mpeg(sam_rec.getFlags());
-    core::record::Record rec(1, core::record::ClassType::CLASS_I, sam_rec.moveQname(), "Genie",
-                             std::get<1>(flag_tuple));
+    core::record::Record rec(1, core::record::ClassType::CLASS_I, sam_rec.moveQname(),
+                             "Genie",std::get<1>(flag_tuple));
 
     // No alignmnent
     // core::record::Alignment alignment(convertCigar2ECigar(sam_rec.getCigar(), sam_rec.getSeq()),
@@ -175,25 +176,29 @@ void Importer::convertUnmapped(core::record::Chunk &chunk, SamRecords2D &sam_rec
     rec.addSegment(std::move(segment));
 
     // No alignment
-    //    ret.addAlignment(ref, std::move(alignmentContainer));  // TODO
+    //    ret.addAlignment(ref, std::move(alignmentContainer));
 
     chunk.push_back(std::move(rec));
+
+    sam_recs.clear();
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d) {
-    auto& sam_rec = sam_recs_2d.front().front();
-    sam_recs_2d.front().pop_front();
+void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords &sam_recs, bool unmapped_pair) {
+    // TODO (Yeremia): Change to by reference
+    UTILS_DIE("TODO (Yeremia): Change to by reference")
+    auto&& sam_rec = std::move(sam_recs.front());
+    sam_recs.pop_front();
 
     auto flag_tuple = convertFlags2Mpeg(sam_rec.getFlags());
-    core::record::Record rec(1, core::record::ClassType::CLASS_I, sam_rec.moveQname(), "Genie",
-                             std::get<1>(flag_tuple));
+    core::record::Record rec(1, core::record::ClassType::CLASS_I, sam_rec.moveQname(),
+                             "Genie",std::get<1>(flag_tuple));
 
     core::record::Alignment alignment(convertCigar2ECigar(sam_rec.getCigar(), sam_rec.getSeq()),
                                       sam_rec.checkFlag(Record::FlagPos::SEQ_REVERSE));
     alignment.addMappingScore(sam_rec.getMapQ());
 
     core::record::AlignmentBox alignmentContainer(sam_rec.getPos(), std::move(alignment));
-    rec.addAlignment(refs[sam_rec.getRname()], std::move(alignmentContainer));
+    rec.addAlignment(refs.at(sam_rec.getRname()), std::move(alignmentContainer));
 
     core::record::Segment segment(sam_rec.moveSeq());
     if (sam_rec.getQual() != "*") {
@@ -201,20 +206,121 @@ void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords2D &sam_re
     }
     rec.addSegment(std::move(segment));
 
-    for (auto& sam_rec: sam_recs_2d.front()){
+    for (auto& sam_rec: sam_recs){
+
+        UTILS_DIE_IF(sam_rec.isUnmapped(),
+                     "Unaligned sam record found for qname " + sam_rec.getQname());
+
         core::record::Alignment alignment(convertCigar2ECigar(sam_rec.getCigar(), sam_rec.getSeq()),
                                           sam_rec.checkFlag(Record::FlagPos::SEQ_REVERSE));
         alignment.addMappingScore(sam_rec.getMapQ());
 
         core::record::AlignmentBox alignmentContainer(sam_rec.getPos(), std::move(alignment));
-        rec.addAlignment(refs[sam_rec.getRname()], std::move(alignmentContainer));
+
+        if (unmapped_pair){
+            auto splitAlign = util::make_unique<core::record::alignment_split::Unpaired>();
+            alignmentContainer.addAlignmentSplit(std::move(splitAlign));
+        }
+
+        rec.addAlignment(refs.at(sam_rec.getRname()), std::move(alignmentContainer));
     }
 
     chunk.push_back(std::move(rec));
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d) {
+void Importer::convertPairedEndNoSplit(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d) {
 
+}
+// ---------------------------------------------------------------------------------------------------------------------
+void Importer::convertPairedEndSplitPair(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d) {
+
+    UTILS_DIE("TODO");
+    if (!sam_recs_2d.front().empty() && sam_recs_2d.front().front().isPrimaryLine()){
+        auto is_read_1_avail = true;
+        auto& sam_read_1 = sam_recs_2d.front().front();
+        sam_recs_2d.front().pop_front();
+
+        auto flag_tuple = convertFlags2Mpeg(sam_read_1.getFlags());
+        core::record::Record rec_read_1(1, core::record::ClassType::CLASS_I, sam_read_1.moveQname(),
+                                   "Genie",std::get<1>(flag_tuple));
+
+        core::record::Segment segment(sam_read_1.moveSeq());
+        if (sam_read_1.getQual() != "*") {
+            segment.addQualities(sam_read_1.moveQual());
+        }
+        rec_read_1.addSegment(std::move(segment));
+
+        if (!sam_read_1.isUnmapped()){
+            core::record::Alignment alignment(convertCigar2ECigar(sam_read_1.getCigar(), sam_read_1.getSeq()),
+                                              sam_read_1.checkFlag(Record::FlagPos::SEQ_REVERSE));
+            alignment.addMappingScore(sam_read_1.getMapQ());
+
+            core::record::AlignmentBox abox_read_1(sam_read_1.getPos(), std::move(alignment));
+        } else{
+
+        }
+    }
+
+}
+// ---------------------------------------------------------------------------------------------------------------------
+void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d){
+
+    auto read_1_ok = false;
+    if (sam_recs_2d.back().empty()) {
+        convertSingleEnd(chunk, sam_recs_2d.front(), true);
+    } else if (!sam_recs_2d.back().front().isPrimaryLine()){
+        UTILS_DIE("Primary line of read_2 is not found!");
+    } else if (sam_recs_2d.back().front().isUnmapped()){
+        convertSingleEnd(chunk, sam_recs_2d.front(), true);
+        convertUnmapped(chunk, sam_recs_2d.back());
+    } else {
+        read_1_ok = true;
+    }
+
+    auto read_2_ok = false;
+    if (sam_recs_2d.front().empty()) {
+        convertSingleEnd(chunk, sam_recs_2d.back(), true);
+    } else if (!sam_recs_2d.front().front().isPrimaryLine()){
+        UTILS_DIE("Primary line of read_1 is not found!");
+    } else if (sam_recs_2d.front().front().isUnmapped()){
+        convertSingleEnd(chunk, sam_recs_2d.back(), true);
+        convertUnmapped(chunk, sam_recs_2d.front());
+    } else {
+        read_2_ok = true;
+    }
+
+    // If-case is reached when both read_1 and read_2 have primary line and at least 1 record
+    if (read_1_ok && read_2_ok){
+        UTILS_DIE("TODO");
+        if (false){
+
+        } else {
+
+        }
+    }
+
+//    auto& sam_rec_1 = sam_recs_2d.front().front();
+//    sam_recs_2d.front().pop_front();
+//
+//    auto& sam_rec_2 = sam_recs_2d.back().front();
+//    sam_recs_2d.back().pop_front();
+//
+//    auto flag_tuple = convertFlags2Mpeg(sam_rec_1.getFlags());
+//    core::record::Record rec(2, core::record::ClassType::CLASS_I, sam_rec_1.moveQname(),
+//                             "Genie",std::get<1>(flag_tuple), sam_rec_1.getPos() < sam_rec_2.getPos());
+//
+//    core::record::Alignment alignment(convertCigar2ECigar(sam_rec_1.getCigar(), sam_rec_1.getSeq()),
+//                                      sam_rec_1.checkFlag(Record::FlagPos::SEQ_REVERSE));
+//    alignment.addMappingScore(sam_rec_1.getMapQ());
+//
+//    core::record::AlignmentBox alignmentContainer(sam_rec_1.getPos(), std::move(alignment));
+//    rec.addAlignment(refs.at(sam_rec_1.getRname()), std::move(alignmentContainer));
+//
+//    core::record::Segment segment(sam_rec_1.moveSeq());
+//    if (sam_rec_1.getQual() != "*") {
+//        segment.addQualities(sam_rec_1.moveQual());
+//    }
+//    rec.addSegment(std::move(segment));
 }
 // ---------------------------------------------------------------------------------------------------------------------
 void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt) {
