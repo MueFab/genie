@@ -132,12 +132,12 @@ class ReadTemplate{
 
    private:
     std::vector<std::list<Record>> data;
-    bool is_empty = false;
+//    bool is_empty = false;
 
    public:
     std::string qname;
 
-    ReadTemplate();
+    //ReadTemplate();
     explicit ReadTemplate(Record&& rec);
 
     void initializeData();
