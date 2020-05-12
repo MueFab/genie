@@ -23,9 +23,13 @@ namespace sam {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+typedef std::list<Record> SamRecords;
+typedef std::list<std::list<Record>> SamRecords2D;
+
 class Importer : public core::FormatImporter {
    private:
     size_t blockSize;
+    std::istream& stream;
     Reader samReader;
     ReadTemplateGroup rtg;
     util::OrderedLock lock;  //!< @brief Lock to ensure in order execution
@@ -45,6 +49,10 @@ class Importer : public core::FormatImporter {
     size_t ref_counter;
 
     static core::record::Record convert(uint16_t ref, sam::Record &&_r1, sam::Record *_r2);
+    void convertUnmapped(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d);
+    void convertSingleEnd(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d);
+    void convertPairedEnd(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d);
+    void convert(core::record::Chunk& chunk, ReadTemplate& rt);
 
     bool pump(size_t id) override;
 
