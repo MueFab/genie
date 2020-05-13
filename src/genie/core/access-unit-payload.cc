@@ -15,17 +15,17 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id) : id(std::move(_id)) {}
+AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id) : id(std::move(_id)), numSymbols(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id, util::DataBlock&& _payload)
-    : id(std::move(_id)), payload(std::move(_payload)) {}
+    : id(std::move(_id)), payload(std::move(_payload)), numSymbols(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id, size_t size, util::BitReader& reader)
-    : id(std::move(_id)), payload(0, 1) {
+    : id(std::move(_id)), payload(0, 1), numSymbols(0) {
     payload.reserve(size);
     for (size_t i = 0; i < size; ++i) {
         payload.push_back(reader.read(8));
@@ -182,7 +182,7 @@ AccessUnitPayload::DescriptorPayload::DescriptorPayload(GenDesc _id, size_t coun
                 typenum ++;
             }
 
-            while(subsequencePayloads.size() < ((typenum << 4u) | type)) {
+            while(subsequencePayloads.size() < ((uint32_t(typenum) << 4u) | type)) {
                 subsequencePayloads.emplace_back(GenSubIndex {id, subsequencePayloads.size()});
                 subsequencePayloads.back().annotateNumSymbols(numSymbols);
             }
@@ -191,7 +191,7 @@ AccessUnitPayload::DescriptorPayload::DescriptorPayload(GenDesc _id, size_t coun
 
             UTILS_DIE_IF(method != 3, "Only CABAC method supported");
 
-            subsequencePayloads.emplace_back(GenSubIndex{_id, subsequencePayloads.size()}, 0, 1, reader);
+            subsequencePayloads.emplace_back(GenSubIndex{_id, subsequencePayloads.size()}, 0, reader);
             subsequencePayloads.back().annotateNumSymbols(numSymbols);
         }
         return;

@@ -38,7 +38,7 @@ namespace mgb {
 
    public:
     explicit Exporter(std::ostream* _file,  genie::core::stats::PerfStats *_stats = nullptr);
-    void flowIn(core::AccessUnitPayload&& t, size_t id) override;
+    void flowIn(core::AccessUnitPayload&& t, const genie::util::Section& id) override;
     void dryIn() override;
 };
 

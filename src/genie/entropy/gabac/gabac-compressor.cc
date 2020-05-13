@@ -36,7 +36,6 @@ static util::DataBlock convertTokenType(const util::DataBlock &in) {
 }
 
 core::AccessUnitPayload::SubsequencePayload GabacCompressor::compress(const gabac::EncodingConfiguration &conf,
-                                                                      bool vSize,
                                                                       core::AccessUnitRaw::Subsequence &&in) {
     // Interface to GABAC library
     core::AccessUnitRaw::Subsequence data = std::move(in);
@@ -59,13 +58,14 @@ core::AccessUnitPayload::SubsequencePayload GabacCompressor::compress(const gaba
 
     bufferOutputStream.flush(&outblock);
     core::AccessUnitPayload::SubsequencePayload out(data.getID());
+    out.annotateNumSymbols(num_symbols);
     out.set(std::move(outblock));
     return out;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void GabacCompressor::flowIn(core::AccessUnitRaw &&t, size_t id) {
+void GabacCompressor::flowIn(core::AccessUnitRaw &&t, const util::Section& id) {
     core::AccessUnitRaw raw_aus = std::move(t);
     auto payload = core::AccessUnitPayload(raw_aus.moveParameters(), raw_aus.getNumRecords());
 
@@ -73,7 +73,7 @@ void GabacCompressor::flowIn(core::AccessUnitRaw &&t, size_t id) {
         core::AccessUnitPayload::DescriptorPayload descriptor_payload(desc.getID());
         for (const auto &subdesc : desc) {
             auto &input = raw_aus.get(subdesc.getID());
-            if(input.getRawSize() > 0) {
+            if(input.getNumSymbols() > 0) {
                 const auto &conf = configSet.getConfAsGabac(subdesc.getID());
                 // add compressed payload
                 descriptor_payload.add(compress(conf, std::move(input)));

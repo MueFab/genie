@@ -16,6 +16,12 @@
 namespace genie {
 namespace util {
 
+struct Section {
+    size_t start;
+    size_t length;
+    bool strongSkip;
+};
+
 /**
  * @brief By implementing this interface, a genie module signals the ability to process data of type TYPE.
  * @tparam TYPE Input data type which is accepted
@@ -28,7 +34,7 @@ class Drain {
      * @param t Input data chunk
      * @param id Current block identifier (for multithreading)
      */
-    virtual void flowIn(TYPE&& t, size_t id) = 0;
+    virtual void flowIn(TYPE&& t, const Section& id) = 0;
 
     /**
      * @brief Signals that no further data (and calls to flowIn) will be available
@@ -39,6 +45,8 @@ class Drain {
      * @brief For inheritance
      */
     virtual ~Drain() = default;
+
+    virtual void skipIn(const Section& id) = 0;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

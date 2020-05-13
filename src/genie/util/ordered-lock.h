@@ -23,7 +23,7 @@ namespace util {
  */
 class OrderedLock {
    private:
-    uint32_t counter;                  //!< @brief Which thread is currently allowed to execute the protected section
+    size_t counter;                  //!< @brief Which thread is currently allowed to execute the protected section
     std::mutex m;                      //!< @brief Waiting mutex
     std::condition_variable cond_var;  //!< @brief Checks if the current thread is allowed to continue
 
@@ -41,7 +41,7 @@ class OrderedLock {
     /**
      * @brief Marks current block / thread as finished and triggers waiting threads to continue if allowed to.
      */
-    void finished();
+    void finished(size_t length);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

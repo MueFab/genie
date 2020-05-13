@@ -166,7 +166,7 @@ void generate_order(const std::string &file_order, uint32_t *order_array, const 
 }
 
 void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, const std::string &file_order_id,
-                            const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end, const compression_params &cp, core::stats::FastqStats *stats) {
+                            const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end, const compression_params &cp, core::stats::FastqStats *) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
     (void) cp;
 
@@ -197,7 +197,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
                                  const uint64_t &quality_array_size, uint32_t *order_array,
                                  const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
                                  const compression_params &cp,
-                                 core::stats::FastqStats *stats) {
+                                 core::stats::FastqStats *) {
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
     uint32_t start_block_num = 0;
     uint32_t end_block_num = 0;
@@ -221,7 +221,6 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
             }
         }
 
-        uint64_t size = 0;
 
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic) reduction(+ : size)
@@ -239,7 +238,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
 void reorder_compress(const std::string &file_name, const std::string &temp_dir, const uint32_t &num_reads_per_file,
                       const int &num_thr, const uint32_t &num_reads_per_block, std::string *str_array,
                       const uint32_t &str_array_size, uint32_t *order_array, const std::string &mode,
-                      core::stats::FastqStats *stats) {
+                      core::stats::FastqStats *) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
     for (uint32_t ndex = 0; ndex <= num_reads_per_file / str_array_size; ndex++) {
@@ -275,8 +274,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
         //
         // There might be a better way to parallelize the loop.
         //
-        uint64_t id_size = 0;
-        uint64_t qual_size = 0;
+
 
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel for num_threads(num_thr) schedule(dynamic) reduction(+ : id_size) reduction(+ : qual_size)

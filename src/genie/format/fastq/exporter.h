@@ -48,7 +48,7 @@ class Exporter : public util::Drain<core::record::Chunk> {
      * @param records Input records
      * @param id Block identifier (for multithreading)
      */
-    void flowIn(core::record::Chunk &&records, size_t id) override;
+    void flowIn(core::record::Chunk &&records, const util::Section& id) override;
 
     /**
      * @brief Accepts end of file marker

@@ -46,6 +46,8 @@ class ReadEncoder : public util::Drain<record::Chunk>, public util::Source<Acces
      * @Brief For polymorphic destruction
      */
     ~ReadEncoder() override = default;
+
+    void skipIn(const genie::util::Section&) override {}
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -18,7 +18,7 @@ namespace localassembly {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::flowIn(core::AccessUnitRaw&& t, size_t id) {
+void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
     size_t numRecords = t.getNumRecords();
     size_t bufSize = t.getParameters().getComputedRef().getExtension().getBufMaxSize();
     size_t segments = t.getParameters().getNumberTemplateSegments();

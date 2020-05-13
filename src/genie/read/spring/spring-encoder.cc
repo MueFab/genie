@@ -16,7 +16,7 @@ namespace genie {
 namespace read {
 namespace spring {
 
-void SpringEncoder::flowIn(core::record::Chunk&& t, size_t id) { preprocessor.preprocess(std::move(t), id); }
+void SpringEncoder::flowIn(core::record::Chunk&& t, const util::Section& id) { preprocessor.preprocess(std::move(t), id.start); }
 
 class SpringSource : public util::OriginalSource, public util::Source<core::AccessUnitRaw> {
    private:
@@ -45,7 +45,7 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
         num_AUs = std::ceil(float(cp.num_reads) / cp.num_reads_per_block);
     }
 
-    bool pump(size_t id) override {
+    bool pump(size_t& id) override {
         core::AccessUnitRaw au(core::parameter::ParameterSet(), 0);
         if (cp.paired_end) {
             au = generate_read_streams_pe(data, bdata, id);
@@ -91,7 +91,7 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
         }
 
 
-        flowOut(std::move(au), id);
+        flowOut(std::move(au), util::Section{id, 0, false});
         return id != num_AUs - 1 ;
     }
 
@@ -102,6 +102,7 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
 };
 
 void SpringEncoder::dryIn() {
+    return;
     preprocessor.finish();
 
     std::cout << "Reordering ...\n";

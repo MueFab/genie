@@ -33,8 +33,17 @@ class AccessUnitPayload {
        private:
         GenSubIndex id;           //!< @brief
         util::DataBlock payload;  //!< @brief
-
+        size_t numSymbols;
        public:
+
+        size_t getNumSymbols() const {
+            return numSymbols;
+        }
+
+        void annotateNumSymbols(size_t num) {
+            numSymbols = num;
+        }
+
         /**
          * @brief
          * @param _id

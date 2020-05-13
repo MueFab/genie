@@ -36,7 +36,7 @@ class Importer : public util::Source<core::AccessUnitPayload>, public util::Orig
    public:
     explicit Importer(std::istream& _file, genie::core::stats::PerfStats *_stats = nullptr);
 
-    bool pump(size_t id) override;
+    bool pump(size_t& id) override;
 
     /**
      * @brief Signal end of data.

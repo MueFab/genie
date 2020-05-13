@@ -65,7 +65,7 @@ core::AccessUnitRaw::Subsequence GabacDecompressor::decompress(const gabac::Enco
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void GabacDecompressor::flowIn(core::AccessUnitPayload&& t, size_t id) {
+void GabacDecompressor::flowIn(core::AccessUnitPayload&& t, const util::Section& id) {
     core::AccessUnitPayload payloadSet = std::move(t);
     GabacSeqConfSet configSet;
     auto raw_aus = core::AccessUnitRaw(payloadSet.moveParameters(), payloadSet.getRecordNum());

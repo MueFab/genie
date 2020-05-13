@@ -11,6 +11,7 @@
 #include <genie/read/refcoder/encoder.h>
 #include <genie/read/spring/spring-encoder.h>
 #include <genie/util/exceptions.h>
+#include <genie/util/selector.h>
 #include <genie/util/thread-manager.h>
 #include <atomic>
 #include <fstream>
@@ -19,7 +20,6 @@
 #include <thread>
 #include <utility>
 #include "program-options.h"
-#include <genie/util/selector.h>
 namespace genieapp {
 namespace run {
 
@@ -36,32 +36,29 @@ enum class EncodingCase { UNALIGNED = 0, ALIGNED_WITH_REF = 1, ALIGNED_NO_REF = 
 
 enum class OperationCase { ENCODE = 0, DECODE = 1, CONVERT = 2, CAPSULATE = 3 };
 
-
 class FlowGraph {
    public:
     virtual void run() {}
-};
-
-class Preprocessor : public genie::util::Drain<genie::core::record::Chunk>,
-                     public genie::util::Source<genie::core::record::Chunk> {
-   private:
-   public:
+    virtual void stop(bool) {}
 };
 
 class FlowGraphEncode : public FlowGraph {
     genie::util::ThreadManager mgr;
-    std::vector<std::unique_ptr<genie::core::FormatImporter>> importers;
+    std::unique_ptr<genie::core::Classifier> classifier;
 
-    std::vector<std::unique_ptr<Preprocessor>> preprocessors;
+    std::vector<std::unique_ptr<genie::core::FormatImporter>> importers;
 
     std::vector<std::unique_ptr<genie::core::ReadEncoder>> readCoders;
     genie::util::Selector<genie::core::record::Chunk, genie::core::AccessUnitRaw> readSelector;
 
     std::vector<std::unique_ptr<genie::core::QVEncoder>> qvCoders;
-    genie::util::SideSelector<genie::core::QVEncoder, genie::core::QVEncoder::QVCoded, const genie::core::record::Chunk&> qvSelector;
+    genie::util::SideSelector<genie::core::QVEncoder, genie::core::QVEncoder::QVCoded,
+                              const genie::core::record::Chunk&>
+        qvSelector;
 
     std::vector<std::unique_ptr<genie::core::NameEncoder>> nameCoders;
-    genie::util::SideSelector<genie::core::NameEncoder, genie::core::AccessUnitRaw::Descriptor, const genie::core::record::Chunk&>
+    genie::util::SideSelector<genie::core::NameEncoder, genie::core::AccessUnitRaw::Descriptor,
+                              const genie::core::record::Chunk&>
         nameSelector;
 
     std::vector<std::unique_ptr<genie::core::EntropyEncoder>> entropyCoders;
@@ -77,49 +74,36 @@ class FlowGraphEncode : public FlowGraph {
     }
 
     void addImporter(std::unique_ptr<genie::core::FormatImporter> dat) {
-        importers.emplace_back(std::move(dat));
-        if(!preprocessors.empty()) {
-            importers.back()->setDrain(preprocessors.front().get());
-        } else {
-            importers.back()->setDrain(&readSelector);
+        importers.emplace_back();
+        setImporter(std::move(dat), importers.size() - 1);
+    }
+
+    void setClassifier(std::unique_ptr<genie::core::Classifier> _classifier) {
+        classifier = std::move(_classifier);
+
+        for(auto& i : importers) {
+            i->setClassifier(classifier.get());
         }
     }
 
-    void addPreprocessor(std::unique_ptr<Preprocessor> dat) {
-        if (!preprocessors.empty()) {
-            preprocessors.back()->setDrain(dat.get());
-        } else {
-            for(const auto& imp : importers) {
-                imp->setDrain(dat.get());
-            }
-        }
-        preprocessors.emplace_back(std::move(dat));
-        preprocessors.back()->setDrain(&readSelector);
+    void setImporter(std::unique_ptr<genie::core::FormatImporter> dat, size_t index) {
+        importers[index] = std::move(dat);
+        importers[index]->setDrain(&readSelector);
+        importers[index]->setClassifier(classifier.get());
     }
 
     void addReadCoder(std::unique_ptr<genie::core::ReadEncoder> dat) {
         readCoders.emplace_back(std::move(dat));
         readSelector.addBranch(readCoders.back().get(), readCoders.back().get());
+        readCoders.back()->setQVCoder(&qvSelector);
+        readCoders.back()->setNameCoder(&nameSelector);
     }
 
-    void setReadCoderSelector(const std::function<size_t(const genie::core::record::Chunk&)>& fun) {
-        readSelector.setOperation(fun);
-    }
-
-    void addQVCoder(std::unique_ptr<genie::core::QVEncoder> dat) {
-        qvCoders.emplace_back(std::move(dat));
-        qvSelector.addMod(qvCoders.back().get());
-    }
-    void setQVSelector(std::function<size_t(const genie::core::record::Chunk&)> fun) {
-        qvSelector.setSelection(std::move(fun));
-    }
-
-    void addNameCoder(std::unique_ptr<genie::core::NameEncoder> dat) {
-        nameCoders.emplace_back(std::move(dat));
-        nameSelector.addMod(nameCoders.back().get());
-    }
-    void setNameSelector(std::function<size_t(const genie::core::record::Chunk&)> fun) {
-        nameSelector.setSelection(std::move(fun));
+    void setReadCoder(std::unique_ptr<genie::core::ReadEncoder> dat, size_t index) {
+        readCoders[index] = std::move(dat);
+        readSelector.setBranch(readCoders[index].get(), readCoders[index].get(), index);
+        readCoders[index]->setQVCoder(&qvSelector);
+        readCoders[index]->setNameCoder(&nameSelector);
     }
 
     void addEntropyCoder(std::unique_ptr<genie::core::EntropyEncoder> dat) {
@@ -127,8 +111,9 @@ class FlowGraphEncode : public FlowGraph {
         entropySelector.addBranch(entropyCoders.back().get(), entropyCoders.back().get());
     }
 
-    void setEntropyCoderSelector(const std::function<size_t(const genie::core::AccessUnitRaw&)>& fun) {
-        entropySelector.setOperation(fun);
+    void setEntropyCoder(std::unique_ptr<genie::core::EntropyEncoder> dat, size_t index) {
+        entropyCoders[index] = std::move(dat);
+        entropySelector.setBranch(entropyCoders[index].get(), entropyCoders[index].get(), index);
     }
 
     void addExporter(std::unique_ptr<genie::core::FormatExporterCompressed> dat) {
@@ -136,42 +121,109 @@ class FlowGraphEncode : public FlowGraph {
         exporterSelector.add(exporters.back().get());
     }
 
-    void setExporterSelector(const std::function<size_t(const genie::core::AccessUnitRaw&)>& fun) {
+    void setExporter(std::unique_ptr<genie::core::FormatExporterCompressed> dat, size_t index) {
+        exporters[index] = std::move(dat);
+        exporterSelector.set(exporters[index].get(), index);
+    }
+
+    void addNameCoder(std::unique_ptr<genie::core::NameEncoder> dat) {
+        nameCoders.emplace_back(std::move(dat));
+        nameSelector.addMod(nameCoders.back().get());
+    }
+
+    void setNameCoder(std::unique_ptr<genie::core::NameEncoder> dat, size_t index) {
+        nameCoders[index] = std::move(dat);
+        nameSelector.setMod(nameCoders[index].get(), index);
+    }
+
+    void addQVCoder(std::unique_ptr<genie::core::QVEncoder> dat) {
+        qvCoders.emplace_back(std::move(dat));
+        qvSelector.addMod(qvCoders.back().get());
+    }
+
+    void setQVCoder(std::unique_ptr<genie::core::QVEncoder> dat, size_t index) {
+        qvCoders[index] = std::move(dat);
+        qvSelector.setMod(qvCoders[index].get(), index);
+    }
+
+    void setReadCoderSelector(const std::function<size_t(const genie::core::record::Chunk&)>& fun) {
+        readSelector.setOperation(fun);
+    }
+
+    void setQVSelector(std::function<size_t(const genie::core::record::Chunk&)> fun) {
+        qvSelector.setSelection(std::move(fun));
+
+        for(auto& r : readCoders) {
+            r->setQVCoder(&qvSelector);
+        }
+    }
+
+    void setNameSelector(std::function<size_t(const genie::core::record::Chunk&)> fun) {
+        nameSelector.setSelection(std::move(fun));
+
+        for(auto& r : readCoders) {
+            r->setNameCoder(&nameSelector);
+        }
+    }
+
+    void setEntropyCoderSelector(const std::function<size_t(const genie::core::AccessUnitRaw&)>& fun) {
         entropySelector.setOperation(fun);
     }
+
+    void setExporterSelector(const std::function<size_t(const genie::core::AccessUnitPayload&)>& fun) {
+        exporterSelector.setOperation(fun);
+    }
+
+    void run() override {
+        std::vector<genie::util::OriginalSource*> imps;
+        for (auto& i : importers) {
+            imps.emplace_back(i.get());
+        }
+        mgr.setSource(std::move(imps));
+        mgr.run();
+    }
+
+    void stop(bool abort) override { mgr.stop(abort); }
 };
+
+std::unique_ptr<FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::string& working_dir, size_t au_size) {
+    std::unique_ptr<FlowGraphEncode> ret = genie::util::make_unique<FlowGraphEncode>(threads);
+
+    ret->setClassifier(genie::util::make_unique<genie::core::ClassifierBypass>());
+
+    ret->addReadCoder(genie::util::make_unique<genie::read::spring::SpringEncoder>(working_dir, nullptr));
+    ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Encoder>(2048, false));
+    ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Encoder>());
+    ret->setReadCoderSelector([](const genie::core::record::Chunk& ) -> size_t { return 1; });
+
+    ret->addQVCoder(genie::util::make_unique<genie::quality::qvwriteout::Encoder>());
+    ret->setQVSelector([](const genie::core::record::Chunk& ) -> size_t { return 0; });
+
+    ret->addNameCoder(genie::util::make_unique<genie::name::tokenizer::Encoder>());
+    ret->setNameSelector([](const genie::core::record::Chunk& ) -> size_t { return 0; });
+
+    ret->addEntropyCoder(genie::util::make_unique<genie::entropy::gabac::GabacCompressor>());
+    ret->setEntropyCoderSelector([](const genie::core::AccessUnitRaw& ) -> size_t { return 0; });
+
+    ret->setExporterSelector([](const genie::core::AccessUnitPayload& ) -> size_t { return 0; });
+
+    return ret;
+}
 
 int main(int argc, char* argv[]) {
     ProgramOptions pOpts(argc, argv);
 
     constexpr size_t BLOCKSIZE = 10000;
-    FlowGraphEncode enc(pOpts.numberOfThreads);
+    auto flow = buildDefaultEncoder(pOpts.numberOfThreads, pOpts.workingDirectory, BLOCKSIZE);
 
     std::ifstream input_file(pOpts.inputFile);
-    enc.addImporter(genie::util::make_unique<genie::format::sam::Importer>(BLOCKSIZE, input_file));
-
-    enc.addReadCoder(genie::util::make_unique<genie::read::spring::SpringEncoder>(pOpts.workingDirectory, nullptr));
-    enc.addReadCoder(genie::util::make_unique<genie::read::localassembly::Encoder>(2048, false));
-    enc.addReadCoder(genie::util::make_unique<genie::read::refcoder::Encoder>());
-    enc.setReadCoderSelector([](const genie::core::record::Chunk& ch)->size_t {
-        if(ch.front().getClassID() == genie::core::record::ClassType::CLASS_U) {
-            return 0;
-        }
-        return 1;
-    });
-
-    enc.addQVCoder(genie::util::make_unique<genie::quality::qvwriteout::Encoder>());
-
-    enc.addNameCoder(genie::util::make_unique<genie::name::tokenizer::Encoder>());
-
-    enc.addEntropyCoder(genie::util::make_unique<genie::entropy::gabac::GabacCompressor>());
+    flow->addImporter(genie::util::make_unique<genie::format::sam::Importer>(BLOCKSIZE, input_file));
 
     std::ofstream output_file(pOpts.outputFile);
-    enc.addExporter(genie::util::make_unique<genie::format::mgb::Exporter>(&output_file));
+    flow->addExporter(genie::util::make_unique<genie::format::mgb::Exporter>(&output_file));
 
-    enc.run();
+    flow->run();
 
-    UTILS_DIE("Run");
     return 0;
 }
 

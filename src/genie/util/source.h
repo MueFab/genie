@@ -32,12 +32,16 @@ class Source {
      * @param t Current chunk of data
      * @param id Block identifier (for multithreading)
      */
-    void flowOut(TYPE&& t, size_t id) { drain->flowIn(std::move(t), id); }
+    void flowOut(TYPE&& t, const Section& id) { drain->flowIn(std::move(t), id); }
 
     /**
      * @brief Propagates end-of-data signal to drain set before
      */
     void dryOut() { drain->dryIn(); }
+
+    void skipOut(const Section& id) {
+        drain->skipIn(id);
+    }
 
    public:
     /**

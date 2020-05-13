@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include "ordered-lock.h"
+#include "drain.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,14 +23,18 @@ namespace util {
 class OrderedSection {
    private:
     OrderedLock* lock;  //!< @brief Underlying lock
-
+    size_t length;
    public:
     /**
      * @brief Try to aquire the lock
      * @param _lock Underlying lock
      * @param id Block identifier to wait for
      */
-    OrderedSection(OrderedLock* _lock, size_t id);
+    OrderedSection(OrderedLock* _lock, const Section& id);
+
+    void setLength(size_t l) {
+        length = l;
+    }
 
     /**
      * @brief Release the lock

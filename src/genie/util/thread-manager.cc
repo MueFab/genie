@@ -22,7 +22,7 @@ void ThreadManager::action(size_t id) {
     ThreadManager::threadNum = threads.size();
     try {
         for(const auto& s : source) {
-            while (!stopFlag && s->pump(counter++)) {
+            while (!stopFlag && s->pump(counter)) {
             }
         }
     } catch (std::exception& e) {

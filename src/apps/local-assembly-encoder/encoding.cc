@@ -40,7 +40,7 @@ void encode(const ProgramOptions &programOptions) {
             namecoder = genie::util::make_unique<genie::name::tokenizer::Encoder>();
         }
 
-        genie::read::localassembly::Encoder encoder(LOCAL_ASSEMBLY_BUFFER_SIZE, false, qvencoder.get(), namecoder.get());
+        genie::read::localassembly::Encoder encoder(LOCAL_ASSEMBLY_BUFFER_SIZE, false);
 
         genie::entropy::gabac::GabacCompressor compressor;
 

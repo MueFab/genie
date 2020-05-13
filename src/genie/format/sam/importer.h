@@ -14,6 +14,7 @@
 #include <genie/core/stats/perf-stats.h>
 #include <genie/util/ordered-lock.h>
 #include <map>
+#include <list>
 #include "reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -28,7 +29,6 @@ class Importer : public core::FormatImporter {
    private:
     size_t blockSize;
     Reader samReader;
-    util::OrderedLock lock;               //!< @brief Lock to ensure in order execution
     genie::core::stats::SamStats *stats;  //!< @brief Stats collector (null => don't collect)
 
    public:
@@ -46,8 +46,70 @@ class Importer : public core::FormatImporter {
     size_t ref_counter;
 
     static core::record::Record convert(uint16_t ref, sam::Record &&_r1, sam::Record *_r2);
+    bool pumpRetrieve(genie::core::Classifier* _classifier) override {
+        core::record::Chunk chunk;
+        std::vector<sam::Record> s;
+        std::list<sam::Record> samRecords;
+        uint16_t local_ref_num = 0;
+        {
+            //TODO: util::OrderedSection section(&lock, id);
+            samReader.read(blockSize, s, stats);
+            if (s.size() == 0) {
+                return false;
+            }
+            auto it = refs.find(s.front().getRname());
+            if (it == refs.end()) {
+                local_ref_num = ref_counter;
+                refs.insert(std::make_pair(s.front().getRname(), ref_counter++));
+            } else {
+                local_ref_num = it->second;
+            }
+        }
+        std::copy(s.begin(), s.end(), std::back_inserter(samRecords));
 
-    bool pump(size_t id) override;
+        std::cout << "Read " << samRecords.size() << " SAM record(s) " << std::endl;
+        size_t skipped = 0;
+        while (!samRecords.empty()) {
+            sam::Record samRecord = std::move(samRecords.front());
+            samRecords.erase(samRecords.begin());
+            // Search for mate
+            const std::string &rnameSearchString =
+                samRecord.getRnext() == "=" ? samRecord.getRname() : samRecord.getRnext();
+            auto mate = samRecords.begin();
+            //   mate = samRecords.end();  // Disable pairs for now TODO: implement
+            if (samRecord.getPnext() == samRecord.getPos() && samRecord.getRname() == rnameSearchString) {
+                mate = samRecords.end();
+            }
+            for (; mate != samRecords.end(); ++mate) {
+                if (mate->getRname() == rnameSearchString && mate->getPos() == samRecord.getPnext()) {
+                    // LOG_TRACE << "Found mate";
+                    break;
+                }
+            }
+            if (mate == samRecords.end()) {
+                // LOG_TRACE << "Did not find mate";
+                if ((samRecord.getFlags() & (1u << uint16_t(Record::FlagPos::SEGMENT_UNMAPPED))) ||
+                    samRecord.getCigar() == "*" || samRecord.getPos() == 0 || samRecord.getRname() == "*") {
+                    skipped++;
+                } else {
+                    chunk.emplace_back(convert(local_ref_num, std::move(samRecord), nullptr));
+                }
+            } else {
+                // TODO: note the filtering of unaligned reads above. Move this to the encoder
+                chunk.emplace_back(convert(local_ref_num, std::move(samRecord), &*mate));
+                samRecords.erase(mate);
+            }
+        }
+        if (skipped) {
+            std::cerr << "Skipped " << skipped << " unmapped reads! Those are currently not supported." << std::endl;
+        }
+        if (!chunk.empty()) {
+            _classifier->add(std::move(chunk));
+        }
+
+        // Break if less than blockSize records were read from the SAM file
+        return !samReader.isEnd();
+    }
 
     void dryIn() override;
 };

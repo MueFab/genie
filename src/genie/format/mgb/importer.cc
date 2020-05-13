@@ -19,10 +19,10 @@ Importer::Importer(std::istream& _file, genie::core::stats::PerfStats *_stats) :
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Importer::pump(size_t id) {
+bool Importer::pump(size_t& id) {
     boost::optional<mgb::AccessUnit> unit;
     {
-        util::OrderedSection section(&lock, id);
+       //TODO: util::OrderedSection section(&lock, id);
         unit = factory.read(reader);
     }
     if (!unit) {
@@ -44,7 +44,7 @@ bool Importer::pump(size_t id) {
     }
     set.setRecordNum(unit->getReadCount());
     unit.reset();
-    flowOut(std::move(set), id);
+    flowOut(std::move(set), util::Section{id, 100, false});
     return true;
 }
 

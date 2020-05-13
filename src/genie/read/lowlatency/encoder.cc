@@ -15,7 +15,7 @@ namespace lowlatency {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder(core::QVEncoder* coder, core::NameEncoder* ncoder) : core::ReadEncoder(coder, ncoder) {}
+Encoder::Encoder(core::QVEncoder* coder, core::NameEncoder* ncoder) : core::ReadEncoder() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
