@@ -227,7 +227,28 @@ void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords &sam_recs
 }
 // ---------------------------------------------------------------------------------------------------------------------
 void Importer::convertPairedEndNoSplit(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d) {
+    auto& sam_rec_1 = sam_recs_2d.front().front();
+    sam_recs_2d.front().pop_front();
 
+    auto& sam_rec_2 = sam_recs_2d.back().front();
+    sam_recs_2d.back().pop_front();
+
+    auto flag_tuple = convertFlags2Mpeg(sam_rec_1.getFlags());
+    core::record::Record rec(2, core::record::ClassType::CLASS_I, sam_rec_1.moveQname(),
+                             "Genie",std::get<1>(flag_tuple), sam_rec_1.getPos() < sam_rec_2.getPos());
+
+    core::record::Alignment alignment(convertCigar2ECigar(sam_rec_1.getCigar(), sam_rec_1.getSeq()),
+                                      sam_rec_1.checkFlag(Record::FlagPos::SEQ_REVERSE));
+    alignment.addMappingScore(sam_rec_1.getMapQ());
+
+    core::record::AlignmentBox alignmentContainer(sam_rec_1.getPos(), std::move(alignment));
+    rec.addAlignment(refs.at(sam_rec_1.getRname()), std::move(alignmentContainer));
+
+    core::record::Segment segment(sam_rec_1.moveSeq());
+    if (sam_rec_1.getQual() != "*") {
+        segment.addQualities(sam_rec_1.moveQual());
+    }
+    rec.addSegment(std::move(segment));
 }
 // ---------------------------------------------------------------------------------------------------------------------
 void Importer::convertPairedEndSplitPair(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d) {
@@ -276,8 +297,31 @@ void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_re
         UTILS_DIE_IF(!read_1.front().isPairOf(read_2.front()),
                      "read_1 is not pair of read_2 or vice versa");
 
-        // TODO (Yeremia): insert convertPairedEndNoSplit and convertPairedEndSplitPair here
-        UTILS_DIE("TODO");
+        auto create_split_records = false;
+        if (read_1.size() == read_2.size()){
+            auto read_1_it = read_1.begin();
+            auto read_2_it = read_2.begin();
+            auto any_different_ref = false;
+            while(read_1_it != read_1.end() && read_2_it != read_2.end()){
+                if (read_1_it->getRname() != read_2_it->getRname()){
+                    any_different_ref = true;
+                    break;
+                }
+
+                read_1_it++;
+                read_2_it++;
+            }
+
+            create_split_records = any_different_ref;
+        }
+
+        if (create_split_records){
+            convertPairedEndSplitPair(chunk, sam_recs_2d);
+        } else {
+            convertPairedEndNoSplit(chunk, sam_recs_2d);
+        }
+
+    // One of reads is not ok
     } else {
         if (read_1_unmapped) {
             convertUnmapped(chunk, read_1);
@@ -295,29 +339,7 @@ void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_re
             convertSingleEnd(chunk, read_2, true);
         }
     }
-
-//    auto& sam_rec_1 = sam_recs_2d.front().front();
-//    sam_recs_2d.front().pop_front();
-//
-//    auto& sam_rec_2 = sam_recs_2d.back().front();
-//    sam_recs_2d.back().pop_front();
-//
-//    auto flag_tuple = convertFlags2Mpeg(sam_rec_1.getFlags());
-//    core::record::Record rec(2, core::record::ClassType::CLASS_I, sam_rec_1.moveQname(),
-//                             "Genie",std::get<1>(flag_tuple), sam_rec_1.getPos() < sam_rec_2.getPos());
-//
-//    core::record::Alignment alignment(convertCigar2ECigar(sam_rec_1.getCigar(), sam_rec_1.getSeq()),
-//                                      sam_rec_1.checkFlag(Record::FlagPos::SEQ_REVERSE));
-//    alignment.addMappingScore(sam_rec_1.getMapQ());
-//
-//    core::record::AlignmentBox alignmentContainer(sam_rec_1.getPos(), std::move(alignment));
-//    rec.addAlignment(refs.at(sam_rec_1.getRname()), std::move(alignmentContainer));
-//
-//    core::record::Segment segment(sam_rec_1.moveSeq());
-//    if (sam_rec_1.getQual() != "*") {
-//        segment.addQualities(sam_rec_1.moveQual());
-//    }
-//    rec.addSegment(std::move(segment));
+    sam_recs_2d.clear();
 }
 // ---------------------------------------------------------------------------------------------------------------------
 void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt) {
@@ -339,16 +361,16 @@ void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt) {
 
     if (rt.isValid()){
         if (rt.isUnmapped()){
-            convertUnmapped(chunk, sam_recs_2d);
+            convertUnmapped(chunk, sam_recs_2d.front());
         } else if (rt.isSingle()){
-            convertSingleEnd(chunk, sam_recs_2d);
+            convertSingleEnd(chunk, sam_recs_2d.front());
         } else if (rt.isPair()){
             convertPairedEnd(chunk, sam_recs_2d);
         } else {
-            UTILS_DIE("Unhandled case found !");
+            UTILS_DIE("Unhandled case found!");
         }
     } else{
-        UTILS_DIE("Invalid Read Template");
+        UTILS_DIE("Invalid Read Template. Neither unmapped, single-end nor paired-end");
     }
 
 }
