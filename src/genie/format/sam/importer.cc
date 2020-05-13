@@ -184,8 +184,6 @@ void Importer::convertUnmapped(core::record::Chunk &chunk, SamRecords &sam_recs)
 }
 // ---------------------------------------------------------------------------------------------------------------------
 void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords &sam_recs, bool unmapped_pair) {
-    // TODO (Yeremia): Change to by reference
-    UTILS_DIE("TODO (Yeremia): Change to by reference")
     auto&& sam_rec = std::move(sam_recs.front());
     sam_recs.pop_front();
 
@@ -206,12 +204,12 @@ void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords &sam_recs
     }
     rec.addSegment(std::move(segment));
 
-    for (auto& sam_rec: sam_recs){
+    for (auto sam_rec_it = ++sam_recs.begin(); sam_rec_it != sam_recs.end(); sam_rec_it++){
 
-        UTILS_DIE_IF(sam_rec.isUnmapped(),
+        UTILS_DIE_IF(sam_rec_it->isUnmapped(),
                      "Unaligned sam record found for qname " + sam_rec.getQname());
 
-        core::record::Alignment alignment(convertCigar2ECigar(sam_rec.getCigar(), sam_rec.getSeq()),
+        core::record::Alignment alignment(convertCigar2ECigar(sam_rec_it->getCigar(), sam_rec_it->getSeq()),
                                           sam_rec.checkFlag(Record::FlagPos::SEQ_REVERSE));
         alignment.addMappingScore(sam_rec.getMapQ());
 
@@ -235,71 +233,66 @@ void Importer::convertPairedEndNoSplit(core::record::Chunk &chunk, SamRecords2D 
 void Importer::convertPairedEndSplitPair(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d) {
 
     UTILS_DIE("TODO");
-    if (!sam_recs_2d.front().empty() && sam_recs_2d.front().front().isPrimaryLine()){
-        auto is_read_1_avail = true;
-        auto& sam_read_1 = sam_recs_2d.front().front();
-        sam_recs_2d.front().pop_front();
+    auto is_read_1_avail = true;
+    auto& sam_read_1 = sam_recs_2d.front().front();
+    sam_recs_2d.front().pop_front();
 
-        auto flag_tuple = convertFlags2Mpeg(sam_read_1.getFlags());
-        core::record::Record rec_read_1(1, core::record::ClassType::CLASS_I, sam_read_1.moveQname(),
-                                   "Genie",std::get<1>(flag_tuple));
+    auto flag_tuple = convertFlags2Mpeg(sam_read_1.getFlags());
+    core::record::Record rec_read_1(1, core::record::ClassType::CLASS_I, sam_read_1.moveQname(),
+                               "Genie",std::get<1>(flag_tuple));
 
-        core::record::Segment segment(sam_read_1.moveSeq());
-        if (sam_read_1.getQual() != "*") {
-            segment.addQualities(sam_read_1.moveQual());
-        }
-        rec_read_1.addSegment(std::move(segment));
-
-        if (!sam_read_1.isUnmapped()){
-            core::record::Alignment alignment(convertCigar2ECigar(sam_read_1.getCigar(), sam_read_1.getSeq()),
-                                              sam_read_1.checkFlag(Record::FlagPos::SEQ_REVERSE));
-            alignment.addMappingScore(sam_read_1.getMapQ());
-
-            core::record::AlignmentBox abox_read_1(sam_read_1.getPos(), std::move(alignment));
-        } else{
-
-        }
+    core::record::Segment segment(sam_read_1.moveSeq());
+    if (sam_read_1.getQual() != "*") {
+        segment.addQualities(sam_read_1.moveQual());
     }
+    rec_read_1.addSegment(std::move(segment));
 
+    if (!sam_read_1.isUnmapped()){
+        core::record::Alignment alignment(convertCigar2ECigar(sam_read_1.getCigar(), sam_read_1.getSeq()),
+                                          sam_read_1.checkFlag(Record::FlagPos::SEQ_REVERSE));
+        alignment.addMappingScore(sam_read_1.getMapQ());
+
+        core::record::AlignmentBox abox_read_1(sam_read_1.getPos(), std::move(alignment));
+    } else{
+
+    }
 }
 // ---------------------------------------------------------------------------------------------------------------------
 void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d){
 
-    auto read_1_ok = false;
-    if (sam_recs_2d.back().empty()) {
-        convertSingleEnd(chunk, sam_recs_2d.front(), true);
-    } else if (!sam_recs_2d.back().front().isPrimaryLine()){
-        UTILS_DIE("Primary line of read_2 is not found!");
-    } else if (sam_recs_2d.back().front().isUnmapped()){
-        convertSingleEnd(chunk, sam_recs_2d.front(), true);
-        convertUnmapped(chunk, sam_recs_2d.back());
-    } else {
-        read_1_ok = true;
-    }
+    auto& read_1 = sam_recs_2d.front();
+    auto read_1_empty = read_1.empty();
+    auto read_1_unmapped = read_1.front().isUnmapped();
+    auto read_1_primary = read_1.front().isPrimaryLine();
+    auto read_1_ok = !read_1_empty && read_1_primary && !read_1_unmapped;
 
-    auto read_2_ok = false;
-    if (sam_recs_2d.front().empty()) {
-        convertSingleEnd(chunk, sam_recs_2d.back(), true);
-    } else if (!sam_recs_2d.front().front().isPrimaryLine()){
-        UTILS_DIE("Primary line of read_1 is not found!");
-    } else if (sam_recs_2d.front().front().isUnmapped()){
-        convertSingleEnd(chunk, sam_recs_2d.back(), true);
-        convertUnmapped(chunk, sam_recs_2d.front());
-    } else {
-        read_2_ok = true;
-    }
+    auto& read_2 = sam_recs_2d.back();
+    auto read_2_empty = read_2.empty();
+    auto read_2_unmapped = read_2.front().isUnmapped();
+    auto read_2_primary = read_2.front().isPrimaryLine();
+    auto read_2_ok = !read_2_empty && read_2_primary && !read_2_unmapped;
 
-    UTILS_DIE_IF(!sam_recs_2d.front().front().isPairOf(sam_recs_2d.back().front()),
-                 "read_1 is not pair of read_2 or vice versa");
-
-    // If-case is reached when both read_1 and read_2 have primary line and at least 1 record
     if (read_1_ok && read_2_ok){
+        UTILS_DIE_IF(!read_1.front().isPairOf(read_2.front()),
+                     "read_1 is not pair of read_2 or vice versa");
+
         // TODO (Yeremia): insert convertPairedEndNoSplit and convertPairedEndSplitPair here
         UTILS_DIE("TODO");
-        if (false){
+    } else {
+        if (read_1_unmapped) {
+            convertUnmapped(chunk, read_1);
+        } else if (!read_1_primary){
+            UTILS_DIE("Primary line of read_1 is not found!");
+        } else if (read_1_ok){
+            convertSingleEnd(chunk, read_1, true);
+        }
 
-        } else {
-
+        if (read_2_unmapped){
+            convertUnmapped(chunk, read_2);
+        } else if (!read_2_primary){
+            UTILS_DIE("Primary line of read_2 is not found!");
+        } else if (read_2_ok) {
+            convertSingleEnd(chunk, read_2, true);
         }
     }
 
