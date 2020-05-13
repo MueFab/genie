@@ -38,7 +38,7 @@ class GabacDecompressor : public core::EntropyDecoder {
      * @param payloadSet Input payload
      * @param id Block identification (for multithreading)
      */
-    void flowIn(core::AccessUnitPayload&& payloadSet, size_t id) override;
+    void flowIn(core::AccessUnitPayload&& payloadSet, const util::Section& id) override;
 
     /**
      * @brief Propagate end of data signal

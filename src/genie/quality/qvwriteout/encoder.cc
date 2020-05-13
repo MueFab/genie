@@ -5,7 +5,7 @@ namespace genie {
 namespace quality {
 namespace qvwriteout {
 
-void Encoder::setUpParameters(const core::record::Chunk&, paramqv1::QualityValues1& param,
+void Encoder::setUpParameters(const core::record::Chunk& rec, paramqv1::QualityValues1& param,
                               core::AccessUnitRaw::Descriptor& desc) {
     paramqv1::ParameterSet set;
 

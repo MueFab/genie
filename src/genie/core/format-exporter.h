@@ -23,7 +23,10 @@ namespace core {
  */
 class FormatExporter : public util::Drain<record::Chunk> {};
 
-class FormatExporterCompressed : public util::Drain<core::AccessUnitPayload> {};
+class FormatExporterCompressed : public util::Drain<core::AccessUnitPayload> {
+   public:
+    void skipIn(const genie::util::Section&) override {}
+};
 
 // ---------------------------------------------------------------------------------------------------------------------
 

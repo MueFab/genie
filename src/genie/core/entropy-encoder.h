@@ -25,6 +25,7 @@ namespace core {
 class EntropyEncoder : public util::Source<AccessUnitPayload>, public util::Drain<AccessUnitRaw> {
    public:
     ~EntropyEncoder() override = default;
+    void skipIn(const genie::util::Section&) override {}
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -25,7 +25,7 @@ class Encoder : public core::ReadEncoder {
 
     }
 
-    void flowIn(core::record::Chunk&& t, size_t id) override {
+    void flowIn(core::record::Chunk&& , const util::Section& ) override {
 
     }
 

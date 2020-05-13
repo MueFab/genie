@@ -68,7 +68,11 @@ class GabacSeqConfSet {
     const gabac::EncodingConfiguration& getConfAsGabac(core::GenSubIndex sub) const;
 
     gabac::EncodingConfiguration& getConfAsGabac(core::GenSubIndex sub) {
-        return conf[uint8_t(sub.first)][uint8_t(sub.second)];
+        if(getDescriptor(sub.first).tokentype) {
+            return conf[uint8_t(sub.first)][0];
+        } else {
+            return conf[uint8_t(sub.first)][uint8_t(sub.second)];
+        }
     };
 
     /**

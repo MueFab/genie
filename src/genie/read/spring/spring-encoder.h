@@ -20,12 +20,13 @@ class SpringEncoder : public genie::core::ReadEncoder {
     Preprocessor preprocessor;
     core::stats::FastqStats* stats;
    public:
-    SpringEncoder(const std::string& working_dir, core::stats::FastqStats* _stats) : stats(_stats) {
+    SpringEncoder(const std::string& , core::stats::FastqStats* _stats) : stats(_stats) {
       //  preprocessor.setup(ncoder, coder, working_dir);
 
     }
-    void flowIn(genie::core::record::Chunk &&t, size_t id) override;
+    void flowIn(genie::core::record::Chunk &&t, const util::Section& id) override;
     void dryIn() override;
+    void skipIn(const genie::util::Section&) override {}
 };
 }  // namespace spring
 }  // namespace read

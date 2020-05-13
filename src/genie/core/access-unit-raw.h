@@ -83,7 +83,7 @@ class AccessUnitRaw {
 
         uint64_t pull();
 
-        size_t getRawSize() const { return data.size(); }
+        size_t getNumSymbols() const { return data.size(); }
     };
 
     /**

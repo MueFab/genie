@@ -125,7 +125,7 @@ core::AccessUnitRaw Encoder::pack(size_t id, uint16_t ref, uint8_t qv_depth,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Encoder::flowIn(core::record::Chunk&& t, size_t id) {
+void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     core::record::Chunk data = std::move(t);
     LaeState state(cr_buf_max_size, data.front().getAlignments().front().getPosition());
 
@@ -160,7 +160,7 @@ void Encoder::flowIn(core::record::Chunk&& t, size_t id) {
         updateAssembly(r, state);
     }
 
-    auto rawAU = pack(id, ref, qvdepth, std::move(qv.first), state);
+    auto rawAU = pack(id.start, ref, qvdepth, std::move(qv.first), state);
     rawAU.get(core::GenDesc::QV) = std::move(qv.second);
     rawAU.get(core::GenDesc::RNAME) = std::move(rname);
     rawAU.get(core::GenDesc::FLAGS) = core::AccessUnitRaw::Descriptor(core::GenDesc::FLAGS);

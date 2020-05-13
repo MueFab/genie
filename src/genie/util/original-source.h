@@ -26,7 +26,7 @@ class OriginalSource {
      * @param current block id
      * @return True if more data is available, false otherwise
      */
-    virtual bool pump(size_t id) = 0;
+    virtual bool pump(size_t& id) = 0;
 
     /**
      * @brief Signal end of data.

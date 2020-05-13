@@ -236,7 +236,7 @@ std::vector<sam::Record> Exporter::convert(core::record::Record&& rec) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Exporter::flowIn(core::record::Chunk&& records, size_t id) {
+void Exporter::flowIn(core::record::Chunk&& records, const util::Section& id) {
     core::record::Chunk recs = std::move(records);
     util::OrderedSection section(&lock, id);
     for (auto& rec : recs) {

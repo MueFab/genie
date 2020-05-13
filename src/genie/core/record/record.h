@@ -170,6 +170,10 @@ class Record {
     const AlignmentSharedData& getAlignmentSharedData() const;
 
     const AlignmentExternal& getAlignmentExternal() const;
+
+    void setClassType(ClassType type) {
+        this->class_ID = type;
+    }
 };
 
 /**
