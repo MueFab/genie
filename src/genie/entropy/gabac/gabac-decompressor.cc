@@ -12,33 +12,6 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-std::pair<uint32_t, uint8_t> readVInt(const util::DataBlock &in) {
-    std::pair<uint32_t, uint8_t> ret = {0,0};
-    const auto* ptr = (uint8_t *)in.getData();
-    uint8_t c = 0;
-    do {
-        c = *(ptr++);
-        ret.first = (ret.first << 7u) | (c & 0x7fu);
-        ret.second++;
-    } while (c & 0x80u);
-    return ret;
-}
-
-static util::DataBlock convertTokenType(const util::DataBlock &in) {
-    util::DataBlock out(0, 1);
-    auto num_sym = readVInt(in);
-    out.push_back((num_sym.first >> 24u) && 0xffu);
-    out.push_back((num_sym.first >> 16u) && 0xffu);
-    out.push_back((num_sym.first >> 8u) && 0xffu);
-    out.push_back(num_sym.first && 0xffu);
-
-    for(size_t pos = num_sym.second; pos < in.size(); ++pos) {
-        out.push_back(in.get(pos));
-    }
-
-    return out;
-}
-
 core::AccessUnitRaw::Subsequence GabacDecompressor::decompress(const gabac::EncodingConfiguration& conf,
                                                                core::AccessUnitPayload::SubsequencePayload&& data) {
     core::AccessUnitPayload::SubsequencePayload in = std::move(data);

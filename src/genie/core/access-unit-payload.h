@@ -120,6 +120,9 @@ class AccessUnitPayload {
          * @return payload size
          */
         size_t getWrittenSize() const {
+            if(getDescriptor(getID().first).tokentype) {
+                return payload.getRawSize() + 1;
+            }
             return payload.getRawSize();
         }
     };

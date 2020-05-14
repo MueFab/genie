@@ -27,7 +27,7 @@ namespace read {
 namespace spring {
 
 
-void Preprocessor::preprocess(core::record::Chunk &&t, size_t id) {
+void Preprocessor::preprocess(core::record::Chunk &&t, size_t) {
     core::record::Chunk data = std::move(t);
 
     if(!init) {

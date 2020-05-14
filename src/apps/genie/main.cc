@@ -6,11 +6,11 @@
 #include <string>
 #include <vector>
 
-int stat (int argc, char* argv[]) {
+int stat (int , char* []) {
     UTILS_DIE("Stat not implemented");
 }
 
-int help (int argc, char* argv[]) {
+int help (int , char* []) {
     UTILS_DIE("Help text not helpfull enough");
 }
 

@@ -39,6 +39,10 @@ GenSubIndex AccessUnitPayload::SubsequencePayload::getID() const { return id; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnitPayload::SubsequencePayload::write(util::BitWriter& writer) const {
+    if(getDescriptor(getID().first).tokentype) {
+        writer.write(getID().second & 0xfu, 4);
+        writer.write(3, 4);
+    }
     writer.writeBuffer(payload.getData(), payload.getRawSize());
 }
 
