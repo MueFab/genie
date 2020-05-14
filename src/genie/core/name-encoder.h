@@ -34,7 +34,7 @@ class NameEncoder {
 
 class NameEncoderNone : public NameEncoder{
    public:
-    core::AccessUnitRaw::Descriptor process(const record::Chunk& rec) override {
+    core::AccessUnitRaw::Descriptor process(const record::Chunk&) override {
         return core::AccessUnitRaw::Descriptor(GenDesc::RNAME);
     }
 

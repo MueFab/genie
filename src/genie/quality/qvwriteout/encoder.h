@@ -27,7 +27,7 @@ class Encoder : public core::QVEncoder {
 class NoneEncoder : public core::QVEncoder {
    public:
     using QVCoded = std::pair<std::unique_ptr<core::parameter::QualityValues>, core::AccessUnitRaw::Descriptor>;
-    QVCoded process(const core::record::Chunk& rec) override {
+    QVCoded process(const core::record::Chunk&) override {
         auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
         core::AccessUnitRaw::Descriptor desc(core::GenDesc::QV);
 
