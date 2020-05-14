@@ -65,7 +65,7 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
 
         size_t ctr = 0;
         for (const auto& s : r.getSegments()) {
-            bool aligned = ctr < num_aligned_segs && false;
+            bool aligned = ctr < num_aligned_segs;
             if (aligned) {
                 const std::string& cigar = ctr ? reinterpret_cast<const core::record::alignment_split::SameRec&>(
                                                      *r.getAlignments().front().getAlignmentSplits().at(ctr - 1))
