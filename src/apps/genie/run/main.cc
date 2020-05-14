@@ -199,7 +199,7 @@ std::unique_ptr<FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::
     ret->addQVCoder(genie::util::make_unique<genie::quality::qvwriteout::Encoder>());
     ret->setQVSelector([](const genie::core::record::Chunk& ) -> size_t { return 0; });
 
-    ret->addNameCoder(genie::util::make_unique<genie::name::tokenizer::Encoder>());
+    ret->addNameCoder(genie::util::make_unique<genie::core::NameEncoderNone>());
     ret->setNameSelector([](const genie::core::record::Chunk& ) -> size_t { return 0; });
 
     ret->addEntropyCoder(genie::util::make_unique<genie::entropy::gabac::GabacCompressor>());
