@@ -264,9 +264,18 @@ class AccessUnitPayload {
 
     const DescriptorPayload* end() const { return &desc_pay.back() + 1; }
 
+    core::record::ClassType getClassType() const {
+        return type;
+    }
+
+    void setClassType(core::record::ClassType _type) {
+        type = _type;
+    }
+
    private:
     std::vector<DescriptorPayload> desc_pay;  //!< @brief
 
+    core::record::ClassType type{};
     size_t record_num;                   //!< @brief
     parameter::ParameterSet parameters;  //!< @brief
 

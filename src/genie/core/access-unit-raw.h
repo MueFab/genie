@@ -234,6 +234,14 @@ class AccessUnitRaw {
         numRecords = recs;
     }
 
+    core::record::ClassType getClassType() const {
+        return type;
+    }
+
+    void setClassType(core::record::ClassType _type) {
+        type = _type;
+    }
+
     void clear();
 
     void addRecord();
@@ -264,6 +272,7 @@ class AccessUnitRaw {
 
     size_t numRecords;  //!< @brief
 
+    core::record::ClassType type{};
     uint64_t minPos;
     uint64_t maxPos;
 

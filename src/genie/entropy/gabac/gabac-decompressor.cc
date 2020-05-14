@@ -61,6 +61,7 @@ void GabacDecompressor::flowIn(core::AccessUnitPayload&& t, const util::Section&
     }
 
     raw_aus.setReference(payloadSet.getReference());
+    raw_aus.setClassType(payloadSet.getClassType());
     payloadSet.clear();
     flowOut(std::move(raw_aus), id);
 }

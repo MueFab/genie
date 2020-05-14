@@ -176,7 +176,8 @@ AccessUnitPayload::DescriptorPayload::DescriptorPayload(GenDesc _id, size_t coun
                                                         util::BitReader& reader)
     : id(_id) {
     if(this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
-        size_t numSymbols = reader.read<uint32_t>();
+        subsequencePayloads.emplace_back(GenSubIndex{_id, 0}, remainingSize, reader);
+     /*   size_t numSymbols = reader.read<uint32_t>();
         auto num_streams = reader.read<uint16_t>();
         int32_t typenum = -1;
         for (size_t i = 0; i < num_streams; ++i) {
@@ -198,7 +199,7 @@ AccessUnitPayload::DescriptorPayload::DescriptorPayload(GenDesc _id, size_t coun
             subsequencePayloads.emplace_back(GenSubIndex{_id, subsequencePayloads.size()}, 0, reader);
             subsequencePayloads.back().annotateNumSymbols(numSymbols);
         }
-        return;
+        return; */
     }
     for (size_t i = 0; i < count; ++i) {
         size_t s = 0;

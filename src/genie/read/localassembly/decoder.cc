@@ -27,7 +27,7 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
     std::stringstream str;
     util::BitReader reader(str);
     auto qvdecoder = core::GlobalCfg::getSingleton().getIndustrialPark().construct<core::QVDecoder>(
-        t.getParameters().getQVConfig(core::record::ClassType::CLASS_U).getMode(), reader);
+        t.getParameters().getQVConfig(t.getClassType()).getMode(), reader);
     auto namedecoder = core::GlobalCfg::getSingleton().getIndustrialPark().construct<core::NameDecoder>(0, reader);
     auto names = namedecoder->process(t.get(core::GenDesc::RNAME));
     core::record::Chunk chunk;
@@ -39,7 +39,8 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
         for (const auto& m : meta) {
             refs.emplace_back(refEncoder.getReference(m.position, m.length));
         }
-        auto rec = decoder.pull(ref, *qvdecoder, std::move(names[recID]), std::move(refs));
+        std::string name = names.size() > recID ? std::move(names[recID]) : "";
+        auto rec = decoder.pull(ref, *qvdecoder, std::move(name), std::move(refs));
         refEncoder.addRead(rec);
         chunk.emplace_back(std::move(rec));
     }

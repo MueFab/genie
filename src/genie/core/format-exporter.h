@@ -21,7 +21,10 @@ namespace core {
 /**
  * @brief Interface for exporters of various file formats. Note that each importer has to convert from mpegg-records
  */
-class FormatExporter : public util::Drain<record::Chunk> {};
+class FormatExporter : public util::Drain<record::Chunk> {
+   public:
+    void skipIn(const genie::util::Section&) override {}
+};
 
 class FormatExporterCompressed : public util::Drain<core::AccessUnitPayload> {
    public:

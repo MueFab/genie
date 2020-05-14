@@ -25,6 +25,10 @@ namespace core {
 class EntropyDecoder : public util::Drain<AccessUnitPayload>, public util::Source<AccessUnitRaw> {
    public:
     ~EntropyDecoder() override = default;
+
+    void skipIn(const util::Section& s) override{
+        skipOut(s);
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
