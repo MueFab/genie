@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DECODER_H
-#define GENIE_DECODER_H
+#ifndef GENIE_LAE_DECODER_H
+#define GENIE_LAE_DECODER_H
 
 #include <genie/core/read-decoder.h>
 #include "local-reference.h"

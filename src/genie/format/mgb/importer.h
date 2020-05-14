@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_IMPORTER_H
-#define GENIE_IMPORTER_H
+#ifndef GENIE_MGB_IMPORTER_H
+#define GENIE_MGB_IMPORTER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -16,6 +16,7 @@
 #include <genie/util/source.h>
 #include <map>
 #include "data-unit-factory.h"
+#include "format-importer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,11 +26,12 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-class Importer : public util::Source<core::AccessUnitPayload>, public util::OriginalSource {
+class Importer : public core::FormatImporterCompressed {
    private:
     util::BitReader reader;
     std::map<size_t, core::parameter::ParameterSet> parameterSets;
-    util::OrderedLock lock;
+    std::mutex lock;
+    uint64_t pos_counter = 0;
     genie::core::stats::PerfStats *stats;
     mgb::DataUnitFactory factory;
 
