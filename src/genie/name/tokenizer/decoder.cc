@@ -51,6 +51,15 @@ std::string Decoder::inflate(const std::vector<SingleToken>& rec) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+uint32_t pull32bigEndian(core::AccessUnitRaw::Subsequence& seq) {
+    uint32_t ret = 0;
+    ret |= seq.pull() << 24;
+    ret |= seq.pull() << 16;
+    ret |= seq.pull() << 8;
+    ret |= seq.pull();
+    return ret;
+}
+
 std::vector<std::string> Decoder::process(core::AccessUnitRaw::Descriptor& desc)  {
     std::vector<std::string> ret;
     std::vector<SingleToken> oldRec;
@@ -61,7 +70,7 @@ std::vector<std::string> Decoder::process(core::AccessUnitRaw::Descriptor& desc)
 
         if (ret.empty()) {
             UTILS_DIE_IF(Tokens(desc.getTokenType(0, TYPE_SEQ).get()) != Tokens::DIFF, "First token in AU must be DIFF");
-            UTILS_DIE_IF(desc.getTokenType(0, getTokenInfo(Tokens::DIFF).paramSeq).get() != 0, "First DIFF in AU must be 0");
+            UTILS_DIE_IF(desc.getTokenType(0, (uint8_t)Tokens::DIFF).get() != 0, "First DIFF in AU must be 0");
         }
 
         auto type = Tokens(desc.getTokenType(cur_pos, TYPE_SEQ).pull());
@@ -70,13 +79,16 @@ std::vector<std::string> Decoder::process(core::AccessUnitRaw::Descriptor& desc)
             SingleToken t(type, 0, "");
 
             if (type == Tokens::STRING) {
-                char c = desc.getTokenType(cur_pos, getTokenInfo(Tokens::STRING).paramSeq).pull();
+                char c = desc.getTokenType(cur_pos, (uint8_t)Tokens::STRING).pull();
                 while (c != '\0') {
                     t.paramString += c;
-                    c = desc.getTokenType(cur_pos, getTokenInfo(Tokens::STRING).paramSeq).pull();
+                    c = desc.getTokenType(cur_pos, (uint8_t)Tokens::STRING).pull();
                 }
-            } else if (getTokenInfo(type).paramSeq > 0) {
-                t.param = desc.getTokenType(cur_pos, getTokenInfo(type).paramSeq).pull();
+            } else if (type == Tokens::DIGITS || type == Tokens::DIGITS0) {
+                t.param = pull32bigEndian(desc.getTokenType(cur_pos, (uint8_t)type));
+            }
+            else if ((uint8_t)type < uint8_t(Tokens::MATCH)) {
+                t.param = desc.getTokenType(cur_pos, (uint8_t)type).pull();
             }
 
             rec.push_back(t);
