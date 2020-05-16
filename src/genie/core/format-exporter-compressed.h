@@ -31,6 +31,11 @@ class FormatExporterCompressed : public util::Drain<AccessUnitPayload> {
     /**
      *
      */
+    void flushIn() override;
+
+    /**
+     *
+     */
     ~FormatExporterCompressed() override = default;
 };
 

@@ -25,8 +25,8 @@ class SpringEncoder : public genie::core::ReadEncoder {
         //  preprocessor.setup(ncoder, coder, working_dir);
     }
     void flowIn(genie::core::record::Chunk&& t, const util::Section& id) override;
-    void dryIn() override;
-    void skipIn(const genie::util::Section&) override {}
+
+    void flushIn() override;
 };
 }  // namespace spring
 }  // namespace read

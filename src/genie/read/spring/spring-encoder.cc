@@ -100,13 +100,10 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
         return id != num_AUs - 1;
     }
 
-    /**
-     * @brief Signal end of data.
-     */
-    virtual void dryIn() override { dryOut(); }
+    void flushIn() override { flushOut(); }
 };
 
-void SpringEncoder::dryIn() {
+void SpringEncoder::flushIn() {
     return;
     preprocessor.finish();
 

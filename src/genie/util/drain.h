@@ -39,7 +39,7 @@ class Drain {
     /**
      * @brief Signals that no further data (and calls to flowIn) will be available
      */
-    virtual void dryIn() = 0;
+    virtual void flushIn() = 0;
 
     /**
      * @brief For inheritance

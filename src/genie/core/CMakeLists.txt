@@ -36,6 +36,7 @@ set(source_files
         constants.cc
         format-importer.cc
         format-exporter.cc
+        format-importer-compressed.cc
         format-exporter-compressed.cc
         global-cfg.cc
         locus.cc

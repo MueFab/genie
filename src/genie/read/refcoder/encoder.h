@@ -24,8 +24,6 @@ class Encoder : public core::ReadEncoder {
     Encoder() : core::ReadEncoder() {}
 
     void flowIn(core::record::Chunk&&, const util::Section&) override {}
-
-    void dryIn() override { dryOut(); }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

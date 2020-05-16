@@ -139,7 +139,6 @@ void GabacDecompressor::flowIn(core::AccessUnitPayload&& t, const util::Section&
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void GabacDecompressor::dryIn() { dryOut(); }
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie

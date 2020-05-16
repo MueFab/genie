@@ -25,12 +25,12 @@ class SelectorTail : public genie::util::Source<Tout>, public genie::util::Drain
 
     void flowIn(Tout&& t, const Section& id) override { genie::util::Source<Tout>::flowOut(std::move(t), id); }
 
-    void dryIn() override {
+    void flushIn() override {
         size_t num = ++dryCtr;
         if (num == modNum) {
             // Output signal once every module contained finished
             dryCtr = 0;
-            genie::util::Source<Tout>::dryOut();
+            genie::util::Source<Tout>::flushOut();
         }
     }
 
@@ -75,9 +75,9 @@ class SelectorHead : public genie::util::Drain<Tin> {
         route(std::move(in), dest, id);
     }
 
-    void dryIn() override {
+    void flushIn() override {
         for (const auto& m : mods) {
-            m->dryIn();
+            m->flushIn();
         }
     }
 
@@ -112,7 +112,7 @@ class Selector : public genie::util::Drain<Tin>, public genie::util::Source<Tout
 
     void flowIn(Tin&& t, const util::Section& id) override { head.flowIn(std::move(t), id); }
 
-    void dryIn() override { head.dryIn(); }
+    void flushIn() override { head.flushIn(); }
 
     void skipIn(const Section& id) override { head.skipIn(id); }
 

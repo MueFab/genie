@@ -39,11 +39,6 @@ class GabacDecompressor : public core::EntropyDecoder {
      * @param id Block identification (for multithreading)
      */
     void flowIn(core::AccessUnitPayload&& payloadSet, const util::Section& id) override;
-
-    /**
-     * @brief Propagate end of data signal
-     */
-    void dryIn() override;
 };
 
 }  // namespace gabac

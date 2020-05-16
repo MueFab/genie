@@ -32,6 +32,11 @@ class FormatExporter : public util::Drain<record::Chunk> {
     /**
      *
      */
+    void flushIn() override;
+
+    /**
+     *
+     */
     ~FormatExporter() override = default;
 };
 

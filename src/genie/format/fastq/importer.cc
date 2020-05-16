@@ -93,10 +93,6 @@ void Importer::sanityCheck(const std::array<std::string, LINES_PER_RECORD> &data
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Importer::dryIn() { dryOut(); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 }  // namespace fastq
 }  // namespace format
 }  // namespace genie

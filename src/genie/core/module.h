@@ -33,6 +33,11 @@ class Module : public util::Source<Tout>, public util::Drain<Tin> {
     /**
      *
      */
+    void flushIn() override;
+
+    /**
+     *
+     */
     ~Module() override = default;
 };
 

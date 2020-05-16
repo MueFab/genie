@@ -12,8 +12,6 @@ class Decoder : public core::ReadDecoder {
     Decoder() : core::ReadDecoder() {}
 
     void flowIn(core::AccessUnitRaw&&, const util::Section&) override {}
-
-    void dryIn() override { dryOut(); }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

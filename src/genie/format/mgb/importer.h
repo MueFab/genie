@@ -40,11 +40,6 @@ class Importer : public core::FormatImporterCompressed {
     explicit Importer(std::istream& _file, genie::core::stats::PerfStats* _stats = nullptr);
 
     bool pump(size_t& id) override;
-
-    /**
-     * @brief Signal end of data.
-     */
-    void dryIn() override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
