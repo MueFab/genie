@@ -120,9 +120,6 @@ class AccessUnitPayload {
          * @return payload size
          */
         size_t getWrittenSize() const {
-            if(getDescriptor(getID().first).tokentype) {
-                return payload.getRawSize() + 1;
-            }
             return payload.getRawSize();
         }
     };
@@ -179,11 +176,11 @@ class AccessUnitPayload {
         const SubsequencePayload* end() const { return &subsequencePayloads.back() + 1; }
 
         size_t getWrittenSize() const {
-            size_t overhead = getDescriptor(getID()).tokentype ? sizeof(uint16_t) + sizeof(uint32_t)
+            size_t overhead = getDescriptor(getID()).tokentype ? 0
                                                                : (subsequencePayloads.size() - 1) * sizeof(uint32_t);
             return std::accumulate(subsequencePayloads.begin(), subsequencePayloads.end(), overhead,
                                    [](size_t sum, const SubsequencePayload& payload) {
-                                       return payload.isEmpty() ? sum : sum + payload.getWrittenSize();
+                                     return payload.isEmpty() ? sum : sum + payload.getWrittenSize();
                                    });
         }
     };

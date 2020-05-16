@@ -39,10 +39,6 @@ GenSubIndex AccessUnitPayload::SubsequencePayload::getID() const { return id; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnitPayload::SubsequencePayload::write(util::BitWriter& writer) const {
-    if(getDescriptor(getID().first).tokentype) {
-        writer.write(getID().second & 0xfu, 4);
-        writer.write(3, 4);
-    }
     writer.writeBuffer(payload.getData(), payload.getRawSize());
 }
 
@@ -56,19 +52,7 @@ bool AccessUnitPayload::SubsequencePayload::isEmpty() const {
 
 void AccessUnitPayload::DescriptorPayload::write(util::BitWriter& writer) const {
     if(this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
-        size_t num_streams = 0;
-        for (const auto & subsequencePayload : subsequencePayloads) {
-            if(!subsequencePayload.isEmpty()) {
-                num_streams++;
-            }
-        }
-        writer.write(subsequencePayloads.front().getNumSymbols(), 32);  // TODO: get # of records here
-        writer.write(num_streams, 16);
-        for (const auto & subsequencePayload : subsequencePayloads) {
-            if(!subsequencePayload.isEmpty()) {
-                subsequencePayload.write(writer);
-            }
-        }
+        subsequencePayloads.front().write(writer);
         return;
     }
     for (size_t i = 0; i < subsequencePayloads.size(); ++i) {
