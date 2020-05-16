@@ -119,26 +119,6 @@ class Selector : public genie::util::Drain<Tin>, public genie::util::Source<Tout
     void setDrain(genie::util::Drain<Tout>* d) override { tail.setDrain(d); }
 };
 
-template <typename Coder, typename Ret, typename... Args>
-class SideSelector {
-   private:
-    std::vector<Coder*> mods;
-    std::function<size_t(Args...)> select;
-
-    static size_t defaultSelect(Args...) { return 0; }
-
-   public:
-    SideSelector() : select(&defaultSelect) {}
-    void setMod(Coder* mod, size_t index) { mods[index] = mod; }
-    void addMod(Coder* mod) { mods.emplace_back(mod); }
-    void setSelection(std::function<size_t(Args...)> _select) { select = _select; }
-    Ret process(Args... param) {
-        size_t index = select(param...);
-        UTILS_DIE_IF(index >= mods.size(), "Invalid index in SideSelector");
-        return mods[index]->process(param...);
-    }
-};
-
 }  // namespace util
 }  // namespace genie
 
