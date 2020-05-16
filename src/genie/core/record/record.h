@@ -116,6 +116,8 @@ class Record {
      * @param index
      * @return
      */
+    std::vector<Segment>& getSegments() ;
+
     const std::vector<Segment>& getSegments() const;
 
     /**
@@ -160,6 +162,10 @@ class Record {
      * @return
      */
     const std::string& getName() const;
+
+    void setName(const std::string& _name) {
+        read_name = _name;
+    }
 
     /**
      *
