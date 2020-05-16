@@ -110,8 +110,6 @@ class Importer : public core::FormatImporter {
         // Break if less than blockSize records were read from the SAM file
         return !samReader.isEnd();
     }
-
-    void dryIn() override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

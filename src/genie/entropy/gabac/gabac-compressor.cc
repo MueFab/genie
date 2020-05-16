@@ -116,8 +116,6 @@ void GabacCompressor::flowIn(core::AccessUnitRaw &&t, const util::Section &id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void GabacCompressor::dryIn() { dryOut(); }
-
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie

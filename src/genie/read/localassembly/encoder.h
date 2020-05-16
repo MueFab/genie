@@ -44,8 +44,8 @@ class Encoder : public core::ReadEncoder {
         bool pairedEnd;                     //!< @brief Current guess regarding pairing
         size_t readLength;                  //!< @brief Current guess regarding read length
         core::record::ClassType classType;  //!< @brief Current guess regarding class type
-        uint64_t minPos;
-        uint64_t maxPos;
+        uint64_t minPos;                    //!<
+        uint64_t maxPos;                    //!<
     };
 
     /**
@@ -100,19 +100,25 @@ class Encoder : public core::ReadEncoder {
     void flowIn(core::record::Chunk&& t, const util::Section& id) override;
 
     /**
-     * @brief Propagate end-of-data signal.
-     */
-    void dryIn() override;
-
-    /**
      * @brief Initialize the module
      * @param _cr_buf_max_size Buffer size for local assembly reference memory. Will end up in parameter set
      * @param _debug If additional debugging information shall be printed
      */
     Encoder(uint32_t _cr_buf_max_size, bool _debug);
 
+    /**
+     *
+     * @param cigar
+     * @return
+     */
     static uint64_t getLengthOfCigar(const std::string& cigar);
 
+    /**
+     *
+     * @param position
+     * @param cigar
+     * @param state
+     */
     void updateAUBoundaries(uint64_t position, const std::string& cigar, LaeState& state) const;
 };
 

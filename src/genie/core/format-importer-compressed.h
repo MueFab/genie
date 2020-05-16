@@ -27,6 +27,11 @@ class FormatImporterCompressed : public util::Source<AccessUnitPayload>, public 
      *
      */
     ~FormatImporterCompressed() override = default;
+
+    /**
+     *
+     */
+    void flushIn() override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

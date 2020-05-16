@@ -31,7 +31,7 @@ class OriginalSource {
     /**
      * @brief Signal end of data.
      */
-    virtual void dryIn() = 0;
+    virtual void flushIn() = 0;
 
     /**
      * @brief For inheritance

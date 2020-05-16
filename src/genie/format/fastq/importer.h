@@ -83,11 +83,6 @@ class Importer : public core::FormatImporter {
      * @return True if more data is available, false otherwise
      */
     bool pump(size_t &id) override;
-
-    /**
-     * @brief Cleanup, end of data
-     */
-    void dryIn() override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

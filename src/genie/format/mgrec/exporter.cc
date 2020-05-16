@@ -30,10 +30,6 @@ void MgrecsExporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MgrecsExporter::dryIn() {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 }  // namespace mgrec
 }  // namespace format
 }  // namespace genie

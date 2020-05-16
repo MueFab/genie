@@ -36,8 +36,6 @@ class MgrecsImporter : public util::Source<core::record::Chunk>, public util::Or
     MgrecsImporter(size_t _blockSize, std::istream &_file_1, genie::core::stats::PerfStats *_stats = nullptr);
 
     bool pump(size_t &id) override;
-
-    void dryIn() override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -45,11 +45,6 @@ class GabacCompressor : public core::EntropyEncoder {
      * @param id Block identifier (for multithreading).
      */
     void flowIn(core::AccessUnitRaw&& raw_aus, const util::Section& id) override;
-
-    /**
-     * @brief Propagate end of data signal
-     */
-    void dryIn() override;
 };
 }  // namespace gabac
 }  // namespace entropy

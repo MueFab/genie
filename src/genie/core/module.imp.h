@@ -21,6 +21,13 @@ void Module<Tin, Tout>::skipIn(const util::Section& id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+template <typename Tin, typename Tout>
+void Module<Tin, Tout>::flushIn() {
+    util::Source<Tout>::flushOut();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace core
 }  // namespace genie
 

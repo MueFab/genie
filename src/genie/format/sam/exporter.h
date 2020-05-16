@@ -67,11 +67,6 @@ class Exporter : public core::FormatExporter {
     std::vector<sam::Record> convert(core::record::Record&& rec);
 
     void flowIn(core::record::Chunk&& records, const util::Section& id) override;
-
-    /**
-     * @brief Accepts end of file marker
-     */
-    void dryIn() override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

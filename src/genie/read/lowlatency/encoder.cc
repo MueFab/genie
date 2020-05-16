@@ -60,8 +60,6 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     flowOut(pack(id, data.front().getSegments().front().getQualities().size(), std::move(qv.first), state), id);
 }
 
-void Encoder::dryIn() { dryOut(); }
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::AccessUnitRaw Encoder::pack(const util::Section& id, uint8_t qv_depth,

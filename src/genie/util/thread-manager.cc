@@ -46,7 +46,7 @@ uint32_t ThreadManager::run() {
         t.join();
     }
     if (!abortFlag) {
-        source.front()->dryIn();
+        source.front()->flushIn();
     }
     return counter;
 }
