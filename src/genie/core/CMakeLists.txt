@@ -34,6 +34,8 @@ set(source_files
         classifier-bypass.cc
         classifier-regroup.cc
         constants.cc
+        flowgraph-decode.cc
+        flowgraph-encode.cc
         format-importer.cc
         format-exporter.cc
         format-importer-compressed.cc

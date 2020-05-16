@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/util/selector.h>
+#include <genie/util/sideSelector.h>
 #include <genie/util/source.h>
 #include "access-unit-raw.h"
 #include "module.h"
