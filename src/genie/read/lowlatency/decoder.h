@@ -20,7 +20,7 @@ namespace lowlatency {
 class Decoder : public core::ReadDecoder {
    private:
    public:
-    void flowIn(core::AccessUnitRaw&& t, size_t id) override;
+    void flowIn(core::AccessUnitRaw&& t, const util::Section& id) override;
     void dryIn() override;
 };
 

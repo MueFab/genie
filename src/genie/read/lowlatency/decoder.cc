@@ -18,7 +18,7 @@ namespace lowlatency {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::flowIn(core::AccessUnitRaw&& t, size_t id) {
+void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
     core::record::Chunk ret;
     core::AccessUnitRaw data = std::move(t);
 
@@ -49,8 +49,8 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, size_t id) {
             }
 
             core::record::Segment seg(std::move(seq));
-            seg.addQualities(qvdecoder->process(data.getParameters().getQVConfig(core::record::ClassType::CLASS_U),
-                                                std::to_string(length) + "+", data.get(core::GenDesc::QV)));
+            //     seg.addQualities(qvdecoder->process(data.getParameters().getQVConfig(core::record::ClassType::CLASS_U),
+            //                                        std::to_string(length) + "+", data.get(core::GenDesc::QV)));
             rec.addSegment(std::move(seg));
         }
 

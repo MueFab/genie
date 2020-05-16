@@ -4,12 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_QV_DECODER_H
-#define GENIE_QV_DECODER_H
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#include "access-unit-raw.h"
+#include "classifier-bypass.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -18,32 +13,33 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-class QVDecoder {
-   public:
-    /**
-     *
-     * @param param
-     * @param ecigar
-     * @param desc
-     * @return
-     */
-    virtual std::vector<std::string> process(const parameter::QualityValues& param,
-                                             const std::vector<std::string>& ecigar,
-                                             AccessUnitRaw::Descriptor& desc) = 0;
-    /**
-     * @Brief For polymorphic destruction
-     */
-    ~QVDecoder() = default;
-};
+record::Chunk ClassifierBypass::getChunk() {
+    flushing = false;
+    record::Chunk ret;
+    if (vec.empty()) {
+        return ret;
+    }
+    ret = std::move(vec.front());
+    vec.erase(vec.begin());
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ClassifierBypass::add(record::Chunk&& c) { vec.emplace_back(std::move(c)); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ClassifierBypass::flush() { flushing = true; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool ClassifierBypass::isFlushing() const { return flushing; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace core
 }  // namespace genie
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#endif  // GENIE_QV_DECODER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

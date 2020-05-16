@@ -2,6 +2,8 @@ project("genie-core")
 
 set(source_files
         parameter/descriptor_present/decoder.cc
+        parameter/descriptor_present/decoder-regular.cc
+        parameter/descriptor_present/decoder-tokentype.cc
         parameter/descriptor_present/descriptor_present.cc
 
         parameter/computed_ref.cc
@@ -29,9 +31,17 @@ set(source_files
 
         access-unit-payload.cc
         access-unit-raw.cc
+        classifier-bypass.cc
+        classifier-regroup.cc
         constants.cc
+        format-importer.cc
+        format-exporter.cc
+        format-exporter-compressed.cc
         global-cfg.cc
         locus.cc
+        name-encoder-none.cc
+        read-encoder.cc
+        read-decoder.cc
         )
 
 add_library(genie-core ${source_files})

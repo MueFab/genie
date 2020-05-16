@@ -16,6 +16,8 @@
 
 #include <utility>
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace core {
 
@@ -24,7 +26,13 @@ namespace core {
  */
 class QVEncoder {
    public:
-    using QVCoded = std::pair<std::unique_ptr<core::parameter::QualityValues>, core::AccessUnitRaw::Descriptor>;
+    using QVCoded = std::pair<std::unique_ptr<parameter::QualityValues>, AccessUnitRaw::Descriptor>;  //!<
+
+    /**
+     *
+     * @param rec
+     * @return
+     */
     virtual QVCoded process(const record::Chunk& rec) = 0;
 
     /**

@@ -118,6 +118,10 @@ class Record {
      */
     std::vector<Segment>& getSegments();
 
+    /**
+     *
+     * @return
+     */
     const std::vector<Segment>& getSegments() const;
 
     /**
@@ -143,12 +147,6 @@ class Record {
      *
      * @return
      */
-    std::unique_ptr<Record> clone() const;
-
-    /**
-     *
-     * @return
-     */
     uint8_t getFlags() const;
 
     /**
@@ -163,7 +161,17 @@ class Record {
      */
     const std::string& getName() const;
 
-    void setName(const std::string& _name) { read_name = _name; }
+    /**
+     *
+     * @param _name
+     */
+    void setName(const std::string& _name);
+
+    /**
+     *
+     * @param type
+     */
+    void setClassType(ClassType type);
 
     /**
      *
@@ -171,11 +179,17 @@ class Record {
      */
     const std::string& getGroup() const;
 
+    /**
+     *
+     * @return
+     */
     const AlignmentSharedData& getAlignmentSharedData() const;
 
+    /**
+     *
+     * @return
+     */
     const AlignmentExternal& getAlignmentExternal() const;
-
-    void setClassType(ClassType type) { this->class_ID = type; }
 };
 
 /**

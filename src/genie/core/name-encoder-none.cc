@@ -4,39 +4,23 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ENTROPY_ENCODER_H
-#define GENIE_ENTROPY_ENCODER_H
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#include "access-unit-payload.h"
-#include "access-unit-raw.h"
-#include "module.h"
+#include "name-encoder-none.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 
-/**
- * @brief Interface for entropy coders. They convert raw access units to access unit payloads
- */
-class EntropyEncoder : public Module<AccessUnitRaw, AccessUnitPayload> {
-   public:
-    /**
-     *
-     */
-    ~EntropyEncoder() override = default;
-};
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnitRaw::Descriptor NameEncoderNone::process(const record::Chunk&) {
+    return AccessUnitRaw::Descriptor(GenDesc::RNAME);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace core
 }  // namespace genie
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#endif  // GENIE_ENTROPY_ENCODER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

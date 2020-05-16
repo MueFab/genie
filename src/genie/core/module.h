@@ -4,49 +4,50 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_LL_ENCODER_H
-#define GENIE_LL_ENCODER_H
+#ifndef GENIE_MODULE_H
+#define GENIE_MODULE_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/read-encoder.h>
+#include <genie/util/source.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
-namespace read {
-namespace lowlatency {
+namespace core {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-class Encoder : public core::ReadEncoder {
-   private:
-    struct LLState {
-        size_t readLength;
-        bool pairedEnd;
-        core::AccessUnitRaw streams;
-    };
-
+/**
+ *
+ * @tparam Tin
+ * @tparam Tout
+ */
+template <typename Tin, typename Tout>
+class Module : public util::Source<Tout>, public util::Drain<Tin> {
    public:
-    explicit Encoder(core::QVEncoder* coder, core::NameEncoder* ncoder);
+    /**
+     *
+     * @param id
+     */
+    void skipIn(const util::Section& id) override;
 
-    void flowIn(core::record::Chunk&& t, const util::Section& id) override;
-
-    void dryIn() override;
-
-    core::AccessUnitRaw pack(const util::Section& id, uint8_t qv_depth,
-                             std::unique_ptr<core::parameter::QualityValues> qvparam, LLState& state) const;
+    /**
+     *
+     */
+    ~Module() override = default;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace lowlatency
-}  // namespace read
+}  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ENCODER_H
+#include "module.imp.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#endif  // GENIE_MODULE_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

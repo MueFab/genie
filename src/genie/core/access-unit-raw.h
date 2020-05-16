@@ -81,9 +81,17 @@ class AccessUnitRaw {
          */
         GenSubIndex getID() const;
 
+        /**
+         *
+         * @return
+         */
         uint64_t pull();
 
-        size_t getNumSymbols() const { return data.size(); }
+        /**
+         *
+         * @return
+         */
+        size_t getNumSymbols() const;
     };
 
     /**
@@ -102,15 +110,20 @@ class AccessUnitRaw {
          */
         Subsequence& get(uint16_t sub);
 
-        const Subsequence& get(uint16_t sub) const { return subdesc[sub]; }
+        /**
+         *
+         * @param sub
+         * @return
+         */
+        const Subsequence& get(uint16_t sub) const;
 
-        Subsequence& getTokenType(uint16_t pos, uint8_t type) {
-            uint16_t s_id = ((pos << 4u) | (type & 0xfu));
-            while (subdesc.size() <= s_id) {
-                subdesc.emplace_back(4, GenSubIndex(getID(), subdesc.size()));
-            }
-            return get(s_id);
-        }
+        /**
+         *
+         * @param pos
+         * @param type
+         * @return
+         */
+        Subsequence& getTokenType(uint16_t pos, uint8_t type);
 
         /**
          * @brief
@@ -137,15 +150,35 @@ class AccessUnitRaw {
          */
         explicit Descriptor(GenDesc _id);
 
-        Subsequence* begin() { return &subdesc.front(); }
+        /**
+         *
+         * @return
+         */
+        Subsequence* begin();
 
-        Subsequence* end() { return &subdesc.back() + 1; }
+        /**
+         *
+         * @return
+         */
+        Subsequence* end();
 
-        const Subsequence* begin() const { return &subdesc.front(); }
+        /**
+         *
+         * @return
+         */
+        const Subsequence* begin() const;
 
-        const Subsequence* end() const { return &subdesc.back() + 1; }
+        /**
+         *
+         * @return
+         */
+        const Subsequence* end() const;
 
-        size_t getSize() const { return subdesc.size(); }
+        /**
+         *
+         * @return
+         */
+        size_t getSize() const;
     };
 
     /**
@@ -164,8 +197,19 @@ class AccessUnitRaw {
      */
     Subsequence& get(GenSubIndex sub);
 
-    Descriptor& get(GenDesc desc) { return descriptors[uint8_t(desc)]; }
-    const Descriptor& get(GenDesc desc) const { return descriptors[uint8_t(desc)]; }
+    /**
+     *
+     * @param desc
+     * @return
+     */
+    Descriptor& get(GenDesc desc);
+
+    /**
+     *
+     * @param desc
+     * @return
+     */
+    const Descriptor& get(GenDesc desc) const;
 
     /**
      * @brief
@@ -182,8 +226,19 @@ class AccessUnitRaw {
      */
     void push(GenSubIndex sub, uint64_t value);
 
+    /**
+     *
+     * @param sub
+     * @return
+     */
     bool isEnd(GenSubIndex sub);
 
+    /**
+     *
+     * @param sub
+     * @param lookahead
+     * @return
+     */
     uint64_t peek(GenSubIndex sub, size_t lookahead = 0);
 
     /**
@@ -229,35 +284,93 @@ class AccessUnitRaw {
      */
     size_t getNumRecords() const;
 
-    void setNumRecords(size_t recs) { numRecords = recs; }
+    /**
+     *
+     * @param recs
+     */
+    void setNumRecords(size_t recs);
 
-    core::record::ClassType getClassType() const { return type; }
+    /**
+     *
+     * @return
+     */
+    record::ClassType getClassType() const;
 
-    void setClassType(core::record::ClassType _type) { type = _type; }
+    /**
+     *
+     * @param _type
+     */
+    void setClassType(record::ClassType _type);
 
+    /**
+     *
+     */
     void clear();
 
+    /**
+     *
+     */
     void addRecord();
 
+    /**
+     *
+     * @param ref
+     */
     void setReference(uint16_t ref);
 
+    /**
+     *
+     * @return
+     */
     uint16_t getReference();
 
+    /**
+     *
+     * @param pos
+     */
     void setMaxPos(uint64_t pos);
 
+    /**
+     *
+     * @param pos
+     */
     void setMinPos(uint64_t pos);
 
+    /**
+     *
+     * @return
+     */
     uint64_t getMaxPos() const;
 
+    /**
+     *
+     * @return
+     */
     uint64_t getMinPos() const;
 
-    Descriptor* begin() { return &descriptors.front(); }
+    /**
+     *
+     * @return
+     */
+    Descriptor* begin();
 
-    Descriptor* end() { return &descriptors.back() + 1; }
+    /**
+     *
+     * @return
+     */
+    Descriptor* end();
 
-    const Descriptor* begin() const { return &descriptors.front(); }
+    /**
+     *
+     * @return
+     */
+    const Descriptor* begin() const;
 
-    const Descriptor* end() const { return &descriptors.back() + 1; }
+    /**
+     *
+     * @return
+     */
+    const Descriptor* end() const;
 
    private:
     std::vector<Descriptor> descriptors;  //!< @brief
@@ -265,11 +378,11 @@ class AccessUnitRaw {
 
     size_t numRecords;  //!< @brief
 
-    core::record::ClassType type{};
-    uint64_t minPos;
-    uint64_t maxPos;
+    record::ClassType type{};  //!<
+    uint64_t minPos;           //!<
+    uint64_t maxPos;           //!<
 
-    uint16_t referenceSequence;
+    uint16_t referenceSequence;  //!<
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

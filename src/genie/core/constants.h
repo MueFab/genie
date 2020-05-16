@@ -18,8 +18,14 @@
 namespace genie {
 namespace core {
 
+/**
+ *
+ */
 enum class AlphabetID : uint8_t { ACGTN = 0, ACGTRYSWKMBDHVN_ = 1 };
 
+/**
+ *
+ */
 enum class GenDesc : uint8_t {
     POS = 0,
     RCOMP = 1,
@@ -41,7 +47,14 @@ enum class GenDesc : uint8_t {
     RFTT = 17
 };
 
+/**
+ *
+ */
 using GenSubIndex = std::pair<GenDesc, uint16_t>;
+
+/**
+ *
+ */
 struct GenSub {
     static constexpr GenSubIndex POS_MAPPING_FIRST = {GenDesc::POS, 0};
     static constexpr GenSubIndex POS_MAPPING_ADDITIONAL = {GenDesc::POS, 1};
@@ -110,6 +123,9 @@ struct GenSub {
     static constexpr GenSubIndex RFTT = {GenDesc::RFTT, 0};
 };
 
+/**
+ *
+ */
 struct GenConst {
     static constexpr uint8_t MMPOS_PERSIST = 0;
     static constexpr uint8_t MMPOS_TERMINATE = 1;
@@ -137,40 +153,87 @@ struct GenConst {
     static constexpr uint8_t RTYPE_CLASS_HM = 6;
 };
 
+/**
+ *
+ */
 struct GenomicSubDescriptorProperties {
-    GenSubIndex id;
-    std::string name;
+    GenSubIndex id;    //!<
+    std::string name;  //!<
 };
 
+/**
+ *
+ */
 struct GenomicDescriptorProperties {
-    GenDesc id;
-    std::string name;
-    bool tokentype;
-    std::vector<GenomicSubDescriptorProperties> subseqs;
+    GenDesc id;                                           //!<
+    std::string name;                                     //!<
+    bool tokentype;                                       //!<
+    std::vector<GenomicSubDescriptorProperties> subseqs;  //!<
+
+    /**
+     *
+     * @param sub
+     * @return
+     */
     const GenomicSubDescriptorProperties& getSubSeq(uint8_t sub) const;
 };
 
+/**
+ *
+ */
 struct Alphabet {
-    std::vector<char> lut;
-    std::vector<char> inverseLut;
+    std::vector<char> lut;         //!<
+    std::vector<char> inverseLut;  //!<
 
+    /**
+     *
+     * @param c
+     * @return
+     */
     bool isIncluded(char c) const;
 };
 
+/**
+ *
+ * @return
+ */
 const std::vector<GenomicDescriptorProperties>& getDescriptors();
 
+/**
+ *
+ * @param desc
+ * @return
+ */
 const GenomicDescriptorProperties& getDescriptor(GenDesc desc);
+
+/**
+ *
+ * @param idx
+ * @return
+ */
 const GenomicSubDescriptorProperties& getSubsequence(GenSubIndex idx);
 
+/**
+ *
+ * @param id
+ * @return
+ */
 const Alphabet& getAlphabetProperties(AlphabetID id);
 
+/**
+ *
+ */
 struct CigarFormatInfo {
-    std::vector<uint8_t> lut_step_ref;
-    std::vector<uint8_t> lut_step_bases;
-    std::vector<uint8_t> lut_ignore;
-    bool explicitSubstitution;
+    std::vector<uint8_t> lut_step_ref;    //!<
+    std::vector<uint8_t> lut_step_bases;  //!<
+    std::vector<uint8_t> lut_ignore;      //!<
+    bool explicitSubstitution;            //!<
 };
 
+/**
+ *
+ * @return
+ */
 const CigarFormatInfo& getECigarInfo();
 
 // ---------------------------------------------------------------------------------------------------------------------

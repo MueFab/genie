@@ -20,20 +20,20 @@ MgrecsImporter::MgrecsImporter(size_t _blockSize, std::istream &_file_1, genie::
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool MgrecsImporter::pump(size_t id) {
+bool MgrecsImporter::pump(size_t &) {
     core::record::Chunk chunk;
     {
-        util::OrderedSection section(&lock, id);
+        //  util::OrderedSection section(&lock, id);
         for (size_t i = 0; i < blockSize; ++i) {
             core::record::Record rec(reader);
             if (!reader.isGood()) {
-                flowOut(std::move(chunk), record_counter++);
+                //          flowOut(std::move(chunk), record_counter++);
                 return false;
             }
             chunk.emplace_back(std::move(rec));
         }
     }
-    flowOut(std::move(chunk), record_counter++);
+    //  flowOut(std::move(chunk), record_counter++);
 
     return true;
 }

@@ -16,6 +16,7 @@
 #include <vector>
 
 #include <genie/core/access-unit-payload.h>
+#include <genie/core/format-exporter-compressed.h>
 #include <genie/core/format-exporter.h>
 #include <genie/core/stats/perf-stats.h>
 #include <genie/util/ordered-lock.h>

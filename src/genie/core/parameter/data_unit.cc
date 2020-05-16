@@ -18,9 +18,7 @@ DataUnit::DataUnit(const DataUnitType &t) : data_unit_type(t) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DataUnit::write(util::BitWriter &writer, genie::core::stats::PerfStats *) const {
-    writer.write(uint64_t(data_unit_type), 8);
-}
+void DataUnit::write(util::BitWriter &writer, stats::PerfStats *) const { writer.write(uint64_t(data_unit_type), 8); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -20,22 +20,50 @@ namespace genie {
 namespace core {
 namespace parameter {
 
+/**
+ *
+ */
 class Descriptor {
    public:
+    /**
+     *
+     * @param _dec_cfg_preset
+     */
     explicit Descriptor(uint8_t _dec_cfg_preset);
 
+    /**
+     *
+     * @return
+     */
     virtual std::unique_ptr<Descriptor> clone() const = 0;
 
+    /**
+     *
+     * @param writer
+     */
     virtual void write(util::BitWriter &writer) const;
 
+    /**
+     *
+     * @param desc
+     * @param reader
+     * @return
+     */
     static std::unique_ptr<Descriptor> factory(GenDesc desc, util::BitReader &reader);
 
+    /**
+     *
+     */
     virtual ~Descriptor() = default;
 
+    /**
+     *
+     * @return
+     */
     uint8_t getPreset() const;
 
    protected:
-    uint8_t dec_cfg_preset;
+    uint8_t dec_cfg_preset;  //!<
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,36 +4,48 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_QV_DECODER_H
-#define GENIE_QV_DECODER_H
+#ifndef GENIE_CLASSIFIER_BYPASS_H
+#define GENIE_CLASSIFIER_BYPASS_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "access-unit-raw.h"
+#include "classifier.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 
-// ---------------------------------------------------------------------------------------------------------------------
+/**
+ *
+ */
+class ClassifierBypass : public Classifier {
+    std::vector<record::Chunk> vec;  //!<
+    bool flushing = false;           //!<
 
-class QVDecoder {
    public:
     /**
      *
-     * @param param
-     * @param ecigar
-     * @param desc
      * @return
      */
-    virtual std::vector<std::string> process(const parameter::QualityValues& param,
-                                             const std::vector<std::string>& ecigar,
-                                             AccessUnitRaw::Descriptor& desc) = 0;
+    record::Chunk getChunk() override;
+
     /**
-     * @Brief For polymorphic destruction
+     *
+     * @param c
      */
-    ~QVDecoder() = default;
+    void add(record::Chunk&& c) override;
+
+    /**
+     *
+     */
+    void flush() override;
+
+    /**
+     *
+     * @return
+     */
+    bool isFlushing() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -43,7 +55,7 @@ class QVDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_QV_DECODER_H
+#endif  // GENIE_CLASSIFIER_BYPASS_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

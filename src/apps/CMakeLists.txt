@@ -1,5 +1,5 @@
 add_subdirectory(encapsulator)
 add_subdirectory(gabac-app)
 add_subdirectory(genie)
-add_subdirectory(local-assembly-encoder)
-add_subdirectory(lowlatency-encoder)
+#add_subdirectory(local-assembly-encoder)
+#add_subdirectory(lowlatency-encoder)

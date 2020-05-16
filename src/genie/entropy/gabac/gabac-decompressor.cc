@@ -16,14 +16,13 @@ namespace entropy {
 namespace gabac {
 
 core::AccessUnitRaw::Descriptor decompressTokens(const gabac::EncodingConfiguration& conf0,
-                                                 const gabac::EncodingConfiguration& conf1,
+                                                 const gabac::EncodingConfiguration&,
                                                  core::AccessUnitPayload::SubsequencePayload&& data) {
     core::AccessUnitPayload::SubsequencePayload in = std::move(data);
     util::DataBlock remainingData = std::move(in.move());
     core::AccessUnitRaw::Descriptor ret(core::GenDesc::RNAME);
     size_t offset = 6;
     UTILS_DIE_IF(offset >= remainingData.getRawSize(), "Tokentype stream smaller than expected");
-    uint32_t num_output_descriptors = 0;
     uint16_t num_tokentype_descriptors = 0;
     {
         const size_t READAHEAD = 6;
@@ -32,7 +31,7 @@ core::AccessUnitRaw::Descriptor decompressTokens(const gabac::EncodingConfigurat
         gabac::IBufferStream stream(&tmp);
         util::BitReader reader(stream);
 
-        num_output_descriptors = reader.read<uint32_t>();
+        reader.read<uint32_t>();
         num_tokentype_descriptors = reader.read<uint16_t>();
     }
     int32_t typeNum = -1;

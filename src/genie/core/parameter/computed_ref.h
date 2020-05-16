@@ -23,8 +23,14 @@ namespace genie {
 namespace core {
 namespace parameter {
 
+/**
+ *
+ */
 class ComputedRef {
    public:
+    /**
+     *
+     */
     enum class Algorithm : uint8_t {
         RESERVED = 0,
         REF_TRANSFORM = 1,
@@ -34,22 +40,49 @@ class ComputedRef {
     };
 
    private:
-    Algorithm cr_alg_ID;
-    boost::optional<ComputedRefExtended> extension;  // TODO: std::optional
+    Algorithm cr_alg_ID;                             //!<
+    boost::optional<ComputedRefExtended> extension;  //!<
 
    public:
+    /**
+     *
+     * @param _cr_alg_ID
+     */
     explicit ComputedRef(Algorithm _cr_alg_ID);
 
+    /**
+     *
+     * @param reader
+     */
     explicit ComputedRef(util::BitReader &reader);
 
+    /**
+     *
+     */
     virtual ~ComputedRef() = default;
 
+    /**
+     *
+     * @param _crps_info
+     */
     void setExtension(ComputedRefExtended &&_crps_info);
 
+    /**
+     *
+     * @return
+     */
     const ComputedRefExtended &getExtension() const;
 
-    Algorithm getAlgorithm() const { return cr_alg_ID; }
+    /**
+     *
+     * @return
+     */
+    Algorithm getAlgorithm() const;
 
+    /**
+     *
+     * @param bw
+     */
     virtual void write(util::BitWriter &bw) const;
 };
 

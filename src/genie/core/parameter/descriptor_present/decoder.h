@@ -21,20 +21,42 @@ namespace core {
 namespace parameter {
 namespace desc_pres {
 
+/**
+ *
+ */
 class Decoder {
    public:
+    /**
+     *
+     * @param writer
+     */
     virtual void write(util::BitWriter& writer) const;
 
+    /**
+     *
+     * @return
+     */
     virtual std::unique_ptr<Decoder> clone() const = 0;
 
+    /**
+     *
+     * @param _encoding_mode_id
+     */
     explicit Decoder(uint8_t _encoding_mode_id);
 
+    /**
+     *
+     */
     virtual ~Decoder() = default;
 
+    /**
+     *
+     * @return
+     */
     uint8_t getMode() const;
 
    protected:
-    uint8_t encoding_mode_ID;
+    uint8_t encoding_mode_ID;  //!<
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

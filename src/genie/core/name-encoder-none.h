@@ -4,36 +4,28 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_QV_DECODER_H
-#define GENIE_QV_DECODER_H
+#ifndef GENIE_NAME_ENCODER_NONE_H
+#define GENIE_NAME_ENCODER_NONE_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "access-unit-raw.h"
+#include "name-encoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-class QVDecoder {
+/**
+ *
+ */
+class NameEncoderNone : public NameEncoder {
    public:
     /**
      *
-     * @param param
-     * @param ecigar
-     * @param desc
      * @return
      */
-    virtual std::vector<std::string> process(const parameter::QualityValues& param,
-                                             const std::vector<std::string>& ecigar,
-                                             AccessUnitRaw::Descriptor& desc) = 0;
-    /**
-     * @Brief For polymorphic destruction
-     */
-    ~QVDecoder() = default;
+    AccessUnitRaw::Descriptor process(const record::Chunk&) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -43,7 +35,7 @@ class QVDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_QV_DECODER_H
+#endif  // GENIE_NAME_ENCODER_NONE_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

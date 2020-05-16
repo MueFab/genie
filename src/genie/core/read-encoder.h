@@ -13,6 +13,7 @@
 #include <genie/util/selector.h>
 #include <genie/util/source.h>
 #include "access-unit-raw.h"
+#include "module.h"
 #include "name-encoder.h"
 #include "qv-encoder.h"
 
@@ -24,30 +25,32 @@ namespace core {
 /**
  * @brief The basic interface for modules encoding the plain read data
  */
-class ReadEncoder : public util::Drain<record::Chunk>, public util::Source<AccessUnitRaw> {
+class ReadEncoder : public Module<record::Chunk, AccessUnitRaw> {
+   public:
+    using QvSelector = util::SideSelector<QVEncoder, QVEncoder::QVCoded, const record::Chunk&>;             //!<
+    using NameSelector = util::SideSelector<NameEncoder, AccessUnitRaw::Descriptor, const record::Chunk&>;  //!<
+
    protected:
-    util::SideSelector<genie::core::QVEncoder, genie::core::QVEncoder::QVCoded, const genie::core::record::Chunk&>*
-        qvcoder;
-    util::SideSelector<genie::core::NameEncoder, genie::core::AccessUnitRaw::Descriptor,
-                       const genie::core::record::Chunk&>* namecoder;
+    QvSelector* qvcoder{};      //!<
+    NameSelector* namecoder{};  //!<
 
    public:
-    virtual void setQVCoder(util::SideSelector<genie::core::QVEncoder, genie::core::QVEncoder::QVCoded,
-                                               const genie::core::record::Chunk&>* coder) {
-        qvcoder = coder;
-    }
+    /**
+     *
+     * @param coder
+     */
+    virtual void setQVCoder(QvSelector* coder);
 
-    virtual void setNameCoder(util::SideSelector<genie::core::NameEncoder, genie::core::AccessUnitRaw::Descriptor,
-                                                 const genie::core::record::Chunk&>* coder) {
-        namecoder = coder;
-    }
+    /**
+     *
+     * @param coder
+     */
+    virtual void setNameCoder(NameSelector* coder);
 
     /**
      * @Brief For polymorphic destruction
      */
     ~ReadEncoder() override = default;
-
-    void skipIn(const genie::util::Section&) override {}
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

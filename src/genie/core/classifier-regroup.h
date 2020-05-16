@@ -4,78 +4,91 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_QUALITY_VALUES_H
-#define GENIE_QUALITY_VALUES_H
+#ifndef GENIE_CLASSIFIERREGROUP_H
+#define GENIE_CLASSIFIERREGROUP_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
-#include <cstdint>
-#include <memory>
+#include "classifier.h"
+#include "record/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
-namespace parameter {
 
 /**
  *
  */
-class QualityValues {
+class ClassifierRegroup : public Classifier {
+   private:
+    using ClassBlock = std::vector<record::Chunk>;  //!<
+    using SequenceBlock = std::vector<ClassBlock>;  //!<
+    SequenceBlock classes;                          //!<
+    uint16_t currentSeq;                            //!<
+    size_t auSize;                                  //!<
+    bool flushing;                                  //!<
+
    public:
     /**
      *
-     * @param writer
+     * @param _auSize
      */
-    virtual void write(util::BitWriter &writer) const = 0;
-
-    /**
-     *
-     */
-    virtual ~QualityValues() = default;
-
-    /**
-     *
-     * @param _qv_coding_mode
-     * @param _qv_reverse_flag
-     */
-    QualityValues(uint8_t _qv_coding_mode, bool _qv_reverse_flag);
+    explicit ClassifierRegroup(size_t _auSize);
 
     /**
      *
      * @return
      */
-    virtual std::unique_ptr<QualityValues> clone() const = 0;
+    record::Chunk getChunk() override;
+
+    /**
+     *
+     * @param c
+     */
+    void add(record::Chunk&& c) override;
+
+    /**
+     *
+     */
+    void flush() override;
 
     /**
      *
      * @return
      */
-    uint8_t getMode() const;
+    bool isFlushing() const override;
 
     /**
      *
+     * @param cigar
      * @return
      */
-    virtual size_t getNumSubsequences() const = 0;
+    static record::ClassType classifyECigar(const std::string& cigar);
 
-   protected:
-    uint8_t qv_coding_mode;  //!<
-    bool qv_reverse_flag;    //!<
+    /**
+     *
+     * @param seq
+     * @return
+     */
+    static record::ClassType classifySeq(const std::string& seq);
+
+    /**
+     *
+     * @param r
+     * @return
+     */
+    static record::ClassType classify(const record::Record& r);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace parameter
 }  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_QUALITY_VALUES_H
+#endif  // GENIE_CLASSIFIERREGROUP_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,36 +4,29 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_QV_DECODER_H
-#define GENIE_QV_DECODER_H
+#ifndef GENIE_FORMAT_IMPORTER_COMPRESSED_H
+#define GENIE_FORMAT_IMPORTER_COMPRESSED_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "access-unit-raw.h"
+#include <genie/core/access-unit-payload.h>
+#include <genie/util/original-source.h>
+#include <genie/util/source.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-class QVDecoder {
+/**
+ *
+ */
+class FormatImporterCompressed : public util::Source<AccessUnitPayload>, public util::OriginalSource {
    public:
     /**
      *
-     * @param param
-     * @param ecigar
-     * @param desc
-     * @return
      */
-    virtual std::vector<std::string> process(const parameter::QualityValues& param,
-                                             const std::vector<std::string>& ecigar,
-                                             AccessUnitRaw::Descriptor& desc) = 0;
-    /**
-     * @Brief For polymorphic destruction
-     */
-    ~QVDecoder() = default;
+    ~FormatImporterCompressed() override = default;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -43,7 +36,7 @@ class QVDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_QV_DECODER_H
+#endif  // GENIE_FORMAT_IMPORTER_COMPRESSED_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
