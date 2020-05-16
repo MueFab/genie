@@ -20,7 +20,7 @@ MgrecsExporter::MgrecsExporter(std::ostream &_file_1, genie::core::stats::PerfSt
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MgrecsExporter::flowIn(core::record::Chunk &&t, size_t id) {
+void MgrecsExporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
     core::record::Chunk data = std::move(t);
     util::OrderedSection section(&lock, id);
     for (auto &i : data) {

@@ -1,16 +1,37 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #ifndef GENIE_DECODER_REGULAR_H
 #define GENIE_DECODER_REGULAR_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include "decoder.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 namespace parameter {
 namespace desc_pres {
 
+/**
+ *
+ */
 class DecoderRegular : public Decoder {
    public:
-    explicit DecoderRegular(uint8_t _encoding_mode_id) : Decoder(_encoding_mode_id) {}
+    /**
+     *
+     * @param _encoding_mode_id
+     */
+    explicit DecoderRegular(uint8_t _encoding_mode_id);
+
+    /**
+     *
+     */
     ~DecoderRegular() override = default;
 };
 
@@ -21,4 +42,9 @@ class DecoderRegular : public Decoder {
 }  // namespace core
 }  // namespace genie
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #endif  // GENIE_DECODER_REGULAR_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

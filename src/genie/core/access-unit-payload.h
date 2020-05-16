@@ -33,12 +33,20 @@ class AccessUnitPayload {
        private:
         GenSubIndex id;           //!< @brief
         util::DataBlock payload;  //!< @brief
-        size_t numSymbols;
+        size_t numSymbols;        //!<
 
        public:
-        size_t getNumSymbols() const { return numSymbols; }
+        /**
+         *
+         * @return
+         */
+        size_t getNumSymbols() const;
 
-        void annotateNumSymbols(size_t num) { numSymbols = num; }
+        /**
+         *
+         * @param num
+         */
+        void annotateNumSymbols(size_t num);
 
         /**
          * @brief
@@ -77,25 +85,25 @@ class AccessUnitPayload {
          * @brief
          * @param p
          */
-        void set(util::DataBlock&& p) { payload = std::move(p); }
+        void set(util::DataBlock&& p);
 
         /**
          * @brief return subsequence payload
          * @return payload
          */
-        const util::DataBlock& get() const { return payload; }
+        const util::DataBlock& get() const;
 
         /**
          * @brief return subsequence payload
          * @return payload
          */
-        util::DataBlock& get() { return payload; }
+        util::DataBlock& get();
 
         /**
          * @brief move subsequence payload
          * @return payload
          */
-        util::DataBlock&& move() { return std::move(payload); }
+        util::DataBlock&& move();
 
         /**
          * @brief
@@ -107,7 +115,7 @@ class AccessUnitPayload {
          * @brief return subsequence payload size
          * @return payload size
          */
-        size_t getWrittenSize() const { return payload.getRawSize(); }
+        size_t getWrittenSize() const;
     };
 
     /**
@@ -125,8 +133,18 @@ class AccessUnitPayload {
          */
         explicit DescriptorPayload(GenDesc _id);
 
+        /**
+         *
+         */
         explicit DescriptorPayload();
 
+        /**
+         *
+         * @param _id
+         * @param count
+         * @param remainingSize
+         * @param reader
+         */
         explicit DescriptorPayload(GenDesc _id, size_t count, size_t remainingSize, util::BitReader& reader);
 
         /**
@@ -153,22 +171,35 @@ class AccessUnitPayload {
          */
         bool isEmpty() const;
 
-        SubsequencePayload* begin() { return &subsequencePayloads.front(); }
+        /**
+         *
+         * @return
+         */
+        SubsequencePayload* begin();
 
-        SubsequencePayload* end() { return &subsequencePayloads.back() + 1; }
+        /**
+         *
+         * @return
+         */
+        SubsequencePayload* end();
 
-        const SubsequencePayload* begin() const { return &subsequencePayloads.front(); }
+        /**
+         *
+         * @return
+         */
+        const SubsequencePayload* begin() const;
 
-        const SubsequencePayload* end() const { return &subsequencePayloads.back() + 1; }
+        /**
+         *
+         * @return
+         */
+        const SubsequencePayload* end() const;
 
-        size_t getWrittenSize() const {
-            size_t overhead =
-                getDescriptor(getID()).tokentype ? 0 : (subsequencePayloads.size() - 1) * sizeof(uint32_t);
-            return std::accumulate(subsequencePayloads.begin(), subsequencePayloads.end(), overhead,
-                                   [](size_t sum, const SubsequencePayload& payload) {
-                                       return payload.isEmpty() ? sum : sum + payload.getWrittenSize();
-                                   });
-        }
+        /**
+         *
+         * @return
+         */
+        size_t getWrittenSize() const;
     };
 
     /**
@@ -223,44 +254,99 @@ class AccessUnitPayload {
      */
     parameter::ParameterSet&& moveParameters();
 
+    /**
+     *
+     */
     void clear();
 
+    /**
+     *
+     * @return
+     */
     uint16_t getReference() const;
 
+    /**
+     *
+     * @param ref
+     */
     void setReference(uint16_t ref);
 
+    /**
+     *
+     * @param pos
+     */
     void setMaxPos(uint64_t pos);
 
+    /**
+     *
+     * @param pos
+     */
     void setMinPos(uint64_t pos);
 
+    /**
+     *
+     * @return
+     */
     uint64_t getMaxPos() const;
 
+    /**
+     *
+     * @return
+     */
     uint64_t getMinPos() const;
 
+    /**
+     *
+     * @param num
+     */
     void setRecordNum(size_t num);
 
-    DescriptorPayload* begin() { return &desc_pay.front(); }
+    /**
+     *
+     * @return
+     */
+    DescriptorPayload* begin();
 
-    DescriptorPayload* end() { return &desc_pay.back() + 1; }
+    /**
+     *
+     * @return
+     */
+    DescriptorPayload* end();
 
-    const DescriptorPayload* begin() const { return &desc_pay.front(); }
+    /**
+     *
+     * @return
+     */
+    const DescriptorPayload* begin() const;
 
-    const DescriptorPayload* end() const { return &desc_pay.back() + 1; }
+    /**
+     *
+     * @return
+     */
+    const DescriptorPayload* end() const;
 
-    core::record::ClassType getClassType() const { return type; }
+    /**
+     *
+     * @return
+     */
+    record::ClassType getClassType() const;
 
-    void setClassType(core::record::ClassType _type) { type = _type; }
+    /**
+     *
+     * @param _type
+     */
+    void setClassType(record::ClassType _type);
 
    private:
     std::vector<DescriptorPayload> desc_pay;  //!< @brief
 
-    core::record::ClassType type{};
+    record::ClassType type{};
     size_t record_num;                   //!< @brief
     parameter::ParameterSet parameters;  //!< @brief
 
-    uint16_t reference{};
-    uint64_t minPos{};
-    uint64_t maxPos{};
+    uint16_t reference{};  //!<
+    uint64_t minPos{};     //!<
+    uint64_t maxPos{};     //!<
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

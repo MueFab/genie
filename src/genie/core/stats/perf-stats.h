@@ -57,7 +57,7 @@ class PerfStats {
     PerfStats(bool _decompression);
     virtual ~PerfStats(void) = 0;
 
-    virtual void recordMgbStreams(const std::vector<genie::format::mgb::Block> &blocks) = 0;
+    virtual void recordMgbStreams(const std::vector<format::mgb::Block> &blocks) = 0;
     virtual void printStats(void) = 0;
 };
 

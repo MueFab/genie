@@ -41,7 +41,7 @@ class MgrecsExporter : public util::Drain<core::record::Chunk> {
      * @param t
      * @param id
      */
-    void flowIn(core::record::Chunk&& t, size_t id) override;
+    void flowIn(core::record::Chunk&& t, const util::Section& id) override;
 
     /**
      *

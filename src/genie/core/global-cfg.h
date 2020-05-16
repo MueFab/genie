@@ -21,7 +21,15 @@ namespace core {
  */
 class GlobalCfg {
    private:
+    /**
+     *
+     */
     GlobalCfg() = default;
+
+    /**
+     *
+     * @param cfg
+     */
     GlobalCfg(GlobalCfg& cfg) = default;
 
     util::IndustrialPark fpark;  //! @brief Our factories

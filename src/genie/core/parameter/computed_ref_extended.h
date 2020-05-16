@@ -20,18 +20,37 @@ namespace genie {
 namespace core {
 namespace parameter {
 
+/**
+ *
+ */
 class ComputedRefExtended {
    private:
-    uint8_t cr_pad_size;
-    uint32_t cr_buf_max_size;
+    uint8_t cr_pad_size;       //!<
+    uint32_t cr_buf_max_size;  //!<
 
    public:
+    /**
+     *
+     * @param cr_pad_size
+     * @param cr_buf_max_size
+     */
     ComputedRefExtended(uint8_t cr_pad_size, uint32_t cr_buf_max_size);
 
+    /**
+     *
+     */
     virtual ~ComputedRefExtended() = default;
 
+    /**
+     *
+     * @return
+     */
     uint32_t getBufMaxSize() const;
 
+    /**
+     *
+     * @param writer
+     */
     virtual void write(util::BitWriter &writer) const;
 };
 

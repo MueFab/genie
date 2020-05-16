@@ -12,6 +12,7 @@
 #include <genie/util/selector.h>
 #include <genie/util/source.h>
 #include "access-unit-raw.h"
+#include "module.h"
 #include "name-decoder.h"
 #include "qv-decoder.h"
 #include "record/record.h"
@@ -24,32 +25,33 @@ namespace core {
 /**
  * @brief The basic interface for modules decoding the plain read data
  */
-class ReadDecoder : public util::Source<record::Chunk>, public util::Drain<AccessUnitRaw> {
+class ReadDecoder : public Module<AccessUnitRaw, record::Chunk> {
+   public:
+    using QvSelector = util::SideSelector<QVDecoder, std::vector<std::string>, const parameter::QualityValues&,
+                                          const std::vector<std::string>&, AccessUnitRaw::Descriptor&>;          //!<
+    using NameSelector = util::SideSelector<NameDecoder, std::vector<std::string>, AccessUnitRaw::Descriptor&>;  //!<
+
    protected:
-    genie::util::SideSelector<genie::core::QVDecoder, std::vector<std::string>,
-                              const genie::core::parameter::QualityValues&, const std::vector<std::string>&,
-                              genie::core::AccessUnitRaw::Descriptor&>* qvcoder;
-    genie::util::SideSelector<genie::core::NameDecoder, std::vector<std::string>,
-                              genie::core::AccessUnitRaw::Descriptor&>* namecoder;
+    QvSelector* qvcoder{};      //!<
+    NameSelector* namecoder{};  //!<
 
    public:
-    virtual void setQVCoder(
-        genie::util::SideSelector<genie::core::QVDecoder, std::vector<std::string>,
-                                  const genie::core::parameter::QualityValues&, const std::vector<std::string>&,
-                                  genie::core::AccessUnitRaw::Descriptor&>* coder) {
-        qvcoder = coder;
-    }
+    /**
+     *
+     * @param coder
+     */
+    virtual void setQVCoder(QvSelector* coder);
 
-    virtual void setNameCoder(genie::util::SideSelector<genie::core::NameDecoder, std::vector<std::string>,
-                                                        genie::core::AccessUnitRaw::Descriptor&>* coder) {
-        namecoder = coder;
-    }
+    /**
+     *
+     * @param coder
+     */
+    virtual void setNameCoder(NameSelector* coder);
+
     /**
      * @Brief For polymorphic destruction
      */
     ~ReadDecoder() override = default;
-
-    void skipIn(const util::Section& sec) override { skipOut(sec); }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

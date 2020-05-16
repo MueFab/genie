@@ -4,12 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_QV_DECODER_H
-#define GENIE_QV_DECODER_H
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#include "access-unit-raw.h"
+#include "read-decoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -18,32 +13,22 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-class QVDecoder {
-   public:
-    /**
-     *
-     * @param param
-     * @param ecigar
-     * @param desc
-     * @return
-     */
-    virtual std::vector<std::string> process(const parameter::QualityValues& param,
-                                             const std::vector<std::string>& ecigar,
-                                             AccessUnitRaw::Descriptor& desc) = 0;
-    /**
-     * @Brief For polymorphic destruction
-     */
-    ~QVDecoder() = default;
-};
+void ReadDecoder::setQVCoder(util::SideSelector<QVDecoder, std::vector<std::string>, const parameter::QualityValues&,
+                                                const std::vector<std::string>&, AccessUnitRaw::Descriptor&>* coder) {
+    qvcoder = coder;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ReadDecoder::setNameCoder(
+    util::SideSelector<NameDecoder, std::vector<std::string>, AccessUnitRaw::Descriptor&>* coder) {
+    namecoder = coder;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace core
 }  // namespace genie
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#endif  // GENIE_QV_DECODER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

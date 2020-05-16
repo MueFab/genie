@@ -53,7 +53,7 @@ FastqStats::FastqStats(bool _decompression) : PerfStats(_decompression) {
 
 FastqStats::~FastqStats(void) {}
 
-void FastqStats::recordMgbStreams(const std::vector<genie::format::mgb::Block> &blocks) {
+void FastqStats::recordMgbStreams(const std::vector<format::mgb::Block> &blocks) {
     size_t id_sz = 0;
     size_t seq_sz = 0;
     size_t qual_sz = 0;
@@ -155,7 +155,7 @@ SamStats::SamStats(bool _decompression) : PerfStats(_decompression) {
 
 SamStats::~SamStats(void) {}
 
-void SamStats::recordMgbStreams(const std::vector<genie::format::mgb::Block> &blocks) {
+void SamStats::recordMgbStreams(const std::vector<format::mgb::Block> &blocks) {
     size_t qname_sz = 0;
     size_t flag_sz = 0;
     size_t rname_sz = 0;

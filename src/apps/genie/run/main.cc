@@ -1,5 +1,6 @@
 #include <gabac-compressor.h>
 #include <gabac-decompressor.h>
+#include <genie/core/classifier-bypass.h>
 #include <genie/core/entropy-decoder.h>
 #include <genie/core/entropy-encoder.h>
 #include <genie/core/format-exporter.h>
@@ -363,7 +364,7 @@ class FlowGraphDecode : public FlowGraph {
     }
 };
 
-std::unique_ptr<FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::string& working_dir, size_t au_size) {
+std::unique_ptr<FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::string& working_dir, size_t) {
     std::unique_ptr<FlowGraphEncode> ret = genie::util::make_unique<FlowGraphEncode>(threads);
 
     ret->setClassifier(genie::util::make_unique<genie::core::ClassifierBypass>());
@@ -387,7 +388,7 @@ std::unique_ptr<FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::
     return ret;
 }
 
-std::unique_ptr<FlowGraphDecode> buildDefaultDecoder(size_t threads, const std::string& working_dir, size_t au_size) {
+std::unique_ptr<FlowGraphDecode> buildDefaultDecoder(size_t threads, const std::string&, size_t) {
     std::unique_ptr<FlowGraphDecode> ret = genie::util::make_unique<FlowGraphDecode>(threads);
 
     // ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, nullptr));
@@ -397,8 +398,8 @@ std::unique_ptr<FlowGraphDecode> buildDefaultDecoder(size_t threads, const std::
     ret->setReadCoderSelector([](const genie::core::AccessUnitRaw&) -> size_t { return 1; });
 
     ret->addQVCoder(genie::util::make_unique<genie::quality::qvwriteout::Decoder>());
-    ret->setQVSelector([](const genie::core::parameter::QualityValues& param, const std::vector<std::string>& ecigar,
-                          genie::core::AccessUnitRaw::Descriptor& desc) -> size_t { return 0; });
+    ret->setQVSelector([](const genie::core::parameter::QualityValues&, const std::vector<std::string>&,
+                          genie::core::AccessUnitRaw::Descriptor&) -> size_t { return 0; });
 
     ret->addNameCoder(genie::util::make_unique<genie::name::tokenizer::Decoder>());
     ret->setNameSelector([](const genie::core::AccessUnitRaw::Descriptor&) -> size_t { return 0; });

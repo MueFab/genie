@@ -15,11 +15,11 @@ namespace lowlatency {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder(core::QVEncoder* coder, core::NameEncoder* ncoder) : core::ReadEncoder() {}
+Encoder::Encoder(core::QVEncoder*, core::NameEncoder*) : core::ReadEncoder() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Encoder::flowIn(core::record::Chunk&& t, size_t id) {
+void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     core::record::Chunk data = std::move(t);
 
     core::parameter::ParameterSet set;
@@ -64,11 +64,11 @@ void Encoder::dryIn() { dryOut(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AccessUnitRaw Encoder::pack(size_t id, uint8_t qv_depth, std::unique_ptr<core::parameter::QualityValues> qvparam,
-                                  LLState& state) const {
+core::AccessUnitRaw Encoder::pack(const util::Section& id, uint8_t qv_depth,
+                                  std::unique_ptr<core::parameter::QualityValues> qvparam, LLState& state) const {
     core::parameter::DataUnit::DatasetType dataType = core::parameter::DataUnit::DatasetType::ALIGNED;
-    core::parameter::ParameterSet ret(id, id, dataType, core::AlphabetID::ACGTN, state.readLength, state.pairedEnd,
-                                      false, qv_depth, 0, false, false);
+    core::parameter::ParameterSet ret(id.start, id.start, dataType, core::AlphabetID::ACGTN, state.readLength,
+                                      state.pairedEnd, false, qv_depth, 0, false, false);
     ret.addClass(core::record::ClassType::CLASS_U, std::move(qvparam));
 
     auto rawAU = std::move(state.streams);

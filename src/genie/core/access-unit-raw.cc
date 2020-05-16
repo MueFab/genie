@@ -50,6 +50,10 @@ GenSubIndex AccessUnitRaw::Subsequence::getID() const { return id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+size_t AccessUnitRaw::Subsequence::getNumSymbols() const { return data.size(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint64_t AccessUnitRaw::Subsequence::pull() {
     UTILS_DIE_IF(end(), "Tried to read descriptor that has already ended");
     return data.get(position++);
@@ -58,6 +62,20 @@ uint64_t AccessUnitRaw::Subsequence::pull() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnitRaw::Subsequence &AccessUnitRaw::Descriptor::get(uint16_t sub) { return subdesc[sub]; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const AccessUnitRaw::Subsequence &AccessUnitRaw::Descriptor::get(uint16_t sub) const { return subdesc[sub]; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnitRaw::Subsequence &AccessUnitRaw::Descriptor::getTokenType(uint16_t pos, uint8_t type) {
+    uint16_t s_id = ((pos << 4u) | (type & 0xfu));
+    while (subdesc.size() <= s_id) {
+        subdesc.emplace_back(4, GenSubIndex(getID(), subdesc.size()));
+    }
+    return get(s_id);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -77,9 +95,37 @@ AccessUnitRaw::Descriptor::Descriptor(GenDesc _id) : id(_id) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+AccessUnitRaw::Subsequence *AccessUnitRaw::Descriptor::begin() { return &subdesc.front(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnitRaw::Subsequence *AccessUnitRaw::Descriptor::end() { return &subdesc.back() + 1; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const AccessUnitRaw::Subsequence *AccessUnitRaw::Descriptor::begin() const { return &subdesc.front(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const AccessUnitRaw::Subsequence *AccessUnitRaw::Descriptor::end() const { return &subdesc.back() + 1; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+size_t AccessUnitRaw::Descriptor::getSize() const { return subdesc.size(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 AccessUnitRaw::Subsequence &AccessUnitRaw::get(GenSubIndex sub) {
     return descriptors[uint8_t(sub.first)].get(sub.second);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnitRaw::Descriptor &AccessUnitRaw::get(GenDesc desc) { return descriptors[uint8_t(desc)]; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const AccessUnitRaw::Descriptor &AccessUnitRaw::get(GenDesc desc) const { return descriptors[uint8_t(desc)]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -174,6 +220,34 @@ uint64_t AccessUnitRaw::getMaxPos() const { return maxPos; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t AccessUnitRaw::getMinPos() const { return minPos; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void AccessUnitRaw::setNumRecords(size_t recs) { numRecords = recs; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+record::ClassType AccessUnitRaw::getClassType() const { return type; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void AccessUnitRaw::setClassType(record::ClassType _type) { type = _type; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnitRaw::Descriptor *AccessUnitRaw::begin() { return &descriptors.front(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnitRaw::Descriptor *AccessUnitRaw::end() { return &descriptors.back() + 1; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const AccessUnitRaw::Descriptor *AccessUnitRaw::begin() const { return &descriptors.front(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const AccessUnitRaw::Descriptor *AccessUnitRaw::end() const { return &descriptors.back() + 1; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

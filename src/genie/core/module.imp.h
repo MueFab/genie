@@ -4,12 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_QV_DECODER_H
-#define GENIE_QV_DECODER_H
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#include "access-unit-raw.h"
+#ifndef GENIE_MODULE_IMP_H
+#define GENIE_MODULE_IMP_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -18,23 +14,10 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-class QVDecoder {
-   public:
-    /**
-     *
-     * @param param
-     * @param ecigar
-     * @param desc
-     * @return
-     */
-    virtual std::vector<std::string> process(const parameter::QualityValues& param,
-                                             const std::vector<std::string>& ecigar,
-                                             AccessUnitRaw::Descriptor& desc) = 0;
-    /**
-     * @Brief For polymorphic destruction
-     */
-    ~QVDecoder() = default;
-};
+template <typename Tin, typename Tout>
+void Module<Tin, Tout>::skipIn(const util::Section& id) {
+    util::Source<Tout>::skipOut(id);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -43,7 +26,7 @@ class QVDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_QV_DECODER_H
+#endif  // GENIE_MODULE_IMP_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

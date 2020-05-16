@@ -16,6 +16,8 @@
 
 #include <utility>
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace core {
 
@@ -24,19 +26,17 @@ namespace core {
  */
 class NameEncoder {
    public:
-    virtual core::AccessUnitRaw::Descriptor process(const record::Chunk& rec) = 0;
+    /**
+     *
+     * @param rec
+     * @return
+     */
+    virtual AccessUnitRaw::Descriptor process(const record::Chunk& rec) = 0;
 
     /**
      * @Brief For polymorphic destruction
      */
     ~NameEncoder() = default;
-};
-
-class NameEncoderNone : public NameEncoder {
-   public:
-    core::AccessUnitRaw::Descriptor process(const record::Chunk&) override {
-        return core::AccessUnitRaw::Descriptor(GenDesc::RNAME);
-    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

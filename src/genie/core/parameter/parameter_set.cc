@@ -124,7 +124,7 @@ ParameterSet::ParameterSet()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::write(util::BitWriter &writer, genie::core::stats::PerfStats *) const {
+void ParameterSet::write(util::BitWriter &writer, stats::PerfStats *) const {
     DataUnit::write(writer);
     writer.write(0, 10);  // reserved
 
@@ -193,6 +193,10 @@ const ComputedRef &ParameterSet::getComputedRef() const { return *parameter_set_
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t ParameterSet::getNumberTemplateSegments() const { return number_of_template_segments_minus1 + 1; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool ParameterSet::isComputedReference() const { return this->parameter_set_crps.has_value(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

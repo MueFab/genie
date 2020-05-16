@@ -32,6 +32,12 @@ AccessUnitPayload::SubsequencePayload::SubsequencePayload(GenSubIndex _id, size_
     }
 }
 
+size_t AccessUnitPayload::SubsequencePayload::getNumSymbols() const { return numSymbols; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void AccessUnitPayload::SubsequencePayload::annotateNumSymbols(size_t num) { numSymbols = num; }
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 GenSubIndex AccessUnitPayload::SubsequencePayload::getID() const { return id; }
@@ -45,6 +51,26 @@ void AccessUnitPayload::SubsequencePayload::write(util::BitWriter& writer) const
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool AccessUnitPayload::SubsequencePayload::isEmpty() const { return payload.empty(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void AccessUnitPayload::SubsequencePayload::set(util::DataBlock&& p) { payload = std::move(p); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const util::DataBlock& AccessUnitPayload::SubsequencePayload::get() const { return payload; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+util::DataBlock& AccessUnitPayload::SubsequencePayload::get() { return payload; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+util::DataBlock&& AccessUnitPayload::SubsequencePayload::move() { return std::move(payload); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+size_t AccessUnitPayload::SubsequencePayload::getWrittenSize() const { return payload.getRawSize(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -159,29 +185,6 @@ AccessUnitPayload::DescriptorPayload::DescriptorPayload(GenDesc _id, size_t coun
     : id(_id) {
     if (this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
         subsequencePayloads.emplace_back(GenSubIndex{_id, 0}, remainingSize, reader);
-        /*   size_t numSymbols = reader.read<uint32_t>();
-           auto num_streams = reader.read<uint16_t>();
-           int32_t typenum = -1;
-           for (size_t i = 0; i < num_streams; ++i) {
-               uint8_t type = reader.read(4);
-
-               if(!type) {
-                   typenum ++;
-               }
-
-               while(subsequencePayloads.size() < ((uint32_t(typenum) << 4u) | type)) {
-                   subsequencePayloads.emplace_back(GenSubIndex {id, subsequencePayloads.size()});
-                   subsequencePayloads.back().annotateNumSymbols(numSymbols);
-               }
-
-               uint8_t method = reader.read(4);
-
-               UTILS_DIE_IF(method != 3, "Only CABAC method supported");
-
-               subsequencePayloads.emplace_back(GenSubIndex{_id, subsequencePayloads.size()}, 0, reader);
-               subsequencePayloads.back().annotateNumSymbols(numSymbols);
-           }
-           return; */
     }
     for (size_t i = 0; i < count; ++i) {
         size_t s = 0;
@@ -196,6 +199,64 @@ AccessUnitPayload::DescriptorPayload::DescriptorPayload(GenDesc _id, size_t coun
         }
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnitPayload::SubsequencePayload* AccessUnitPayload::DescriptorPayload::begin() {
+    return &subsequencePayloads.front();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnitPayload::SubsequencePayload* AccessUnitPayload::DescriptorPayload::end() {
+    return &subsequencePayloads.back() + 1;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const AccessUnitPayload::SubsequencePayload* AccessUnitPayload::DescriptorPayload::begin() const {
+    return &subsequencePayloads.front();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const AccessUnitPayload::SubsequencePayload* AccessUnitPayload::DescriptorPayload::end() const {
+    return &subsequencePayloads.back() + 1;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+size_t AccessUnitPayload::DescriptorPayload::getWrittenSize() const {
+    size_t overhead = getDescriptor(getID()).tokentype ? 0 : (subsequencePayloads.size() - 1) * sizeof(uint32_t);
+    return std::accumulate(subsequencePayloads.begin(), subsequencePayloads.end(), overhead,
+                           [](size_t sum, const SubsequencePayload& payload) {
+                               return payload.isEmpty() ? sum : sum + payload.getWrittenSize();
+                           });
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnitPayload::DescriptorPayload* AccessUnitPayload::begin() { return &desc_pay.front(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnitPayload::DescriptorPayload* AccessUnitPayload::end() { return &desc_pay.back() + 1; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const AccessUnitPayload::DescriptorPayload* AccessUnitPayload::begin() const { return &desc_pay.front(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const AccessUnitPayload::DescriptorPayload* AccessUnitPayload::end() const { return &desc_pay.back() + 1; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+record::ClassType AccessUnitPayload::getClassType() const { return type; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void AccessUnitPayload::setClassType(record::ClassType _type) { type = _type; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

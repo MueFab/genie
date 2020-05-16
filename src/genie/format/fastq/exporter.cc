@@ -24,7 +24,7 @@ Exporter::Exporter(std::ostream &_file_1, std::ostream &_file_2, genie::core::st
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Exporter::flowIn(core::record::Chunk &&t, size_t id) {
+void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
     core::record::Chunk data = std::move(t);
     util::OrderedSection section(&lock, id);
     for (const auto &i : data) {

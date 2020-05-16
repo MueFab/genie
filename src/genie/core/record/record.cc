@@ -163,6 +163,8 @@ void Record::addAlignment(uint16_t _seq_id, AlignmentBox &&rec) {
 
 const std::vector<Segment> &Record::getSegments() const { return reads; }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::vector<Segment> &Record::getSegments() { return reads; }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -225,6 +227,14 @@ const AlignmentSharedData &Record::getAlignmentSharedData() const { return share
 // ---------------------------------------------------------------------------------------------------------------------
 
 const AlignmentExternal &Record::getAlignmentExternal() const { return *moreAlignmentInfo; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Record::setName(const std::string &_name) { read_name = _name; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Record::setClassType(ClassType type) { this->class_ID = type; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
