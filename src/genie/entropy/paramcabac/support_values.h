@@ -23,11 +23,7 @@ namespace paramcabac {
  */
 class SupportValues {
    public:
-    enum class TransformIdSubsym : uint8_t {
-        NO_TRANSFORM = 0,
-        LUT_TRANSFORM = 1,
-        DIFF_CODING = 2
-    };
+    enum class TransformIdSubsym : uint8_t { NO_TRANSFORM = 0, LUT_TRANSFORM = 1, DIFF_CODING = 2 };
 
     SupportValues();
 
@@ -56,7 +52,6 @@ class SupportValues {
     uint8_t coding_order;
     bool share_subsym_lut_flag;
     bool share_subsym_prv_flag;
-
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

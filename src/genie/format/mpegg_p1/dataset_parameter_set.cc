@@ -23,18 +23,17 @@ DatasetParameterSet::DatasetParameterSet(const core::parameter::ParameterSet&& p
     : dataset_ID(x_dataset_ID), parameterSet_p2(std::move(parameterSet)) {}
 
 uint64_t DatasetParameterSet::getLength() const {
-    uint64_t length = 12; //gen_info
+    uint64_t length = 12;  // gen_info
     length += 3;
-    //TODO
+    // TODO
     return length;
 }
 
-void DatasetParameterSet::writeToFile(genie::util::BitWriter& bitWriter) const
-{
+void DatasetParameterSet::writeToFile(genie::util::BitWriter& bitWriter) const {
     bitWriter.write("pars");
 
     bitWriter.write(this->getLength(), 64);
-    //TODO
+    // TODO
 
     bitWriter.flush();
 }

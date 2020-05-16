@@ -16,7 +16,7 @@ void FileHeader::writeToFile(genie::util::BitWriter& bitWriter) const {
 
     bitWriter.write(major_brand);
     bitWriter.write(minor_brand);
-    for (auto const& it: compatible_brand) {
+    for (auto const& it : compatible_brand) {
         bitWriter.write(it);
     }
     bitWriter.flush();

@@ -19,19 +19,20 @@ namespace localassembly {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void addECigar (const core::record::Record& rec, std::vector<std::string>& cig_vec) {
+void addECigar(const core::record::Record& rec, std::vector<std::string>& cig_vec) {
     size_t num = 0;
-    for(const auto& seg : rec.getSegments()) {
-        if(rec.getAlignments().empty()) {
+    for (const auto& seg : rec.getSegments()) {
+        if (rec.getAlignments().empty()) {
             cig_vec.emplace_back(std::to_string(seg.getSequence().length()) + '+');
             num++;
             continue;
         }
-        if(!num) {
+        if (!num) {
             cig_vec.emplace_back(rec.getAlignments().front().getAlignment().getECigar());
         } else {
-            if(rec.getAlignments().front().getAlignmentSplits().size() <= num - 1) {
-                auto* split = dynamic_cast<const core::record::alignment_split::SameRec*>(rec.getAlignments().front().getAlignmentSplits()[num - 1].get());
+            if (rec.getAlignments().front().getAlignmentSplits().size() <= num - 1) {
+                auto* split = dynamic_cast<const core::record::alignment_split::SameRec*>(
+                    rec.getAlignments().front().getAlignmentSplits()[num - 1].get());
                 cig_vec.emplace_back(split->getAlignment().getECigar());
             } else {
                 cig_vec.emplace_back(std::to_string(seg.getSequence().length()) + '+');
@@ -63,7 +64,7 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
             refs.emplace_back(refEncoder.getReference(m.position, m.length));
         }
         auto rec = decoder.pull(ref, std::move(refs));
-        if(!names.empty()) {
+        if (!names.empty()) {
             rec.setName(names[recID]);
         }
         addECigar(rec, ecigars);
@@ -72,9 +73,9 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
     }
     auto qvs = this->qvcoder->process(qvparam, ecigars, qvStream);
     size_t qvCounter = 0;
-    for(auto& r : chunk) {
-        for(auto& s : r.getSegments()) {
-            if(!qvs[qvCounter].empty()) {
+    for (auto& r : chunk) {
+        for (auto& s : r.getSegments()) {
+            if (!qvs[qvCounter].empty()) {
                 s.addQualities(std::move(qvs[qvCounter]));
             }
             qvCounter++;

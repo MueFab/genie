@@ -19,7 +19,9 @@
 
 namespace genie {
 namespace core {
-namespace stats { class PerfStats; }
+namespace stats {
+class PerfStats;
+}
 namespace parameter {
 
 class DataUnit {

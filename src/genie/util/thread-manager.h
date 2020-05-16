@@ -19,17 +19,16 @@
 namespace genie {
 namespace util {
 
-
 /**
  * @brief Allows to run the genie pipeline with multiple threads
  */
 class ThreadManager {
    private:
-    size_t counter;     //!< @brief Identifier for next block
+    size_t counter;                    //!< @brief Identifier for next block
     std::vector<std::thread> threads;  //!< @brief Storage for all the threads
     std::atomic<bool> stopFlag;        //!< @brief Threads will stop after current block when set
     bool abortFlag;                    //!< @brief The dryIn() signal will be skipped after stop(). Used with stopFlag
-    std::vector<OriginalSource*> source;            //!< @brief Where to enter the pipeline
+    std::vector<OriginalSource*> source;  //!< @brief Where to enter the pipeline
 
     /**
      * @brief Threading code
@@ -37,7 +36,6 @@ class ThreadManager {
     void action(size_t id);
 
    public:
-
     static thread_local size_t threadID;
     static thread_local size_t threadNum;
 
@@ -48,9 +46,7 @@ class ThreadManager {
      */
     ThreadManager(size_t thread_num);
 
-    void setSource(std::vector<OriginalSource*> src) {
-        source = src;
-    }
+    void setSource(std::vector<OriginalSource*> src) { source = src; }
 
     /**
      * @brief Executes the complete genie pipeline until no input data left

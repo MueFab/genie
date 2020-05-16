@@ -32,11 +32,11 @@ class Importer : public core::FormatImporterCompressed {
     std::map<size_t, core::parameter::ParameterSet> parameterSets;
     std::mutex lock;
     uint64_t pos_counter = 0;
-    genie::core::stats::PerfStats *stats;
+    genie::core::stats::PerfStats* stats;
     mgb::DataUnitFactory factory;
 
    public:
-    explicit Importer(std::istream& _file, genie::core::stats::PerfStats *_stats = nullptr);
+    explicit Importer(std::istream& _file, genie::core::stats::PerfStats* _stats = nullptr);
 
     bool pump(size_t& id) override;
 

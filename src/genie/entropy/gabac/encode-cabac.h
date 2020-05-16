@@ -24,8 +24,7 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-size_t encodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                             util::DataBlock* symbols,
+size_t encodeTransformSubseq(const paramcabac::TransformedSubSeq& trnsfSubseqConf, util::DataBlock* symbols,
                              util::DataBlock* const depSymbols = nullptr,
                              size_t maxsize = std::numeric_limits<size_t>::max());
 

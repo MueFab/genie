@@ -19,7 +19,8 @@ Exporter::Exporter(std::ostream &_file_1, genie::core::stats::FastqStats *_stats
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Exporter::Exporter(std::ostream &_file_1, std::ostream &_file_2, genie::core::stats::FastqStats *_stats) : file{&_file_1, &_file_2}, stats(_stats) {}
+Exporter::Exporter(std::ostream &_file_1, std::ostream &_file_2, genie::core::stats::FastqStats *_stats)
+    : file{&_file_1, &_file_2}, stats(_stats) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -16,20 +16,15 @@ namespace paramcabac {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Binarization::Binarization()
-    : Binarization(BinarizationParameters::BinarizationId::BINARY_CODING,
-                   false,
-                   BinarizationParameters(),
-                   Context()) {}
+    : Binarization(BinarizationParameters::BinarizationId::BINARY_CODING, false, BinarizationParameters(), Context()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Binarization::Binarization(BinarizationParameters::BinarizationId _binarization_ID,
-                           bool _bypass_flag,
-                           BinarizationParameters&& _cabac_binarization_parameters,
-                           Context&& _cabac_Context_parameters)
+Binarization::Binarization(BinarizationParameters::BinarizationId _binarization_ID, bool _bypass_flag,
+                           BinarizationParameters&& _cabac_binarization_parameters, Context&& _cabac_Context_parameters)
     : binarization_ID(_binarization_ID),
       bypass_flag(_bypass_flag),
-      cabac_binarization_parameters(std::move(_cabac_binarization_parameters)){
+      cabac_binarization_parameters(std::move(_cabac_binarization_parameters)) {
     if (!bypass_flag) {
         cabac_context_parameters = std::move(_cabac_Context_parameters);
     }
@@ -37,9 +32,7 @@ Binarization::Binarization(BinarizationParameters::BinarizationId _binarization_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Binarization::Binarization(uint8_t output_symbol_size,
-                           uint8_t coding_subsym_size,
-                           util::BitReader& reader) {
+Binarization::Binarization(uint8_t output_symbol_size, uint8_t coding_subsym_size, util::BitReader& reader) {
     binarization_ID = reader.read<BinarizationParameters::BinarizationId>(5);
     bypass_flag = reader.read<bool>(1);
     cabac_binarization_parameters = BinarizationParameters(binarization_ID, reader);

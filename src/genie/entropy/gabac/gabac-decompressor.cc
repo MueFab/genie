@@ -27,8 +27,8 @@ core::AccessUnitRaw::Descriptor decompressTokens(const gabac::EncodingConfigurat
     uint16_t num_tokentype_descriptors = 0;
     {
         const size_t READAHEAD = 6;
-        util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()), READAHEAD,
-                                              remainingData.getWordSize());
+        util::DataBlock tmp =
+            util::DataBlock(static_cast<uint8_t*>(remainingData.getData()), READAHEAD, remainingData.getWordSize());
         gabac::IBufferStream stream(&tmp);
         util::BitReader reader(stream);
 
@@ -47,9 +47,8 @@ core::AccessUnitRaw::Descriptor decompressTokens(const gabac::EncodingConfigurat
         uint8_t type_id = reader.read(4);
         uint8_t method = reader.read(4);
 
-        if(type_id == 0)
-            typeNum++;
-        size_t mappedTypeId = (typeNum<<4u) | (type_id & 0xfu);
+        if (type_id == 0) typeNum++;
+        size_t mappedTypeId = (typeNum << 4u) | (type_id & 0xfu);
 
         UTILS_DIE_IF(method != 3, "Only CABAC0 supported");
         offset++;
@@ -112,9 +111,11 @@ void GabacDecompressor::flowIn(core::AccessUnitPayload&& t, const util::Section&
             auto decomp = decompressTokens(configSet.getConfAsGabac(core::GenSubIndex{desc.getID(), 0}),
                                            configSet.getConfAsGabac(core::GenSubIndex{desc.getID(), 1}),
                                            std::move(*desc.begin()));
-            for(auto& subseq : decomp) {
+            for (auto& subseq : decomp) {
                 while (raw_aus.get(desc.getID()).getSize() <= subseq.getID().second) {
-                    raw_aus.get(desc.getID()).add(core::AccessUnitRaw::Subsequence(4, core::GenSubIndex{desc.getID(), raw_aus.get(desc.getID()).getSize()}));
+                    raw_aus.get(desc.getID())
+                        .add(core::AccessUnitRaw::Subsequence(
+                            4, core::GenSubIndex{desc.getID(), raw_aus.get(desc.getID()).getSize()}));
                 }
                 raw_aus.set(subseq.getID(), std::move(subseq));
             }

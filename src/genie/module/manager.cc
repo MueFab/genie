@@ -31,8 +31,7 @@ void detect() {
         entropy::paramcabac::DecoderRegular::MODE_CABAC, &entropy::paramcabac::DecoderTokenType::create);
     indPark.registerConstructor<core::parameter::QualityValues>(quality::paramqv1::QualityValues1::MODE_QV1,
                                                                 &quality::paramqv1::QualityValues1::create);
-    indPark.registerConstructor<core::NameDecoder>(0,
-                                                                &name::tokenizer::Decoder::create);
+    indPark.registerConstructor<core::NameDecoder>(0, &name::tokenizer::Decoder::create);
 
     indPark.registerConstructor<core::QVDecoder>(quality::paramqv1::QualityValues1::MODE_QV1,
                                                  &quality::qvwriteout::Decoder::create);

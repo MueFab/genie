@@ -4,8 +4,8 @@
 #include <cstddef>
 #include <string>
 
-#include <genie/entropy/gabac/gabac.h>
 #include <genie/core/constants.h>
+#include <genie/entropy/gabac/gabac.h>
 
 namespace genie {
 namespace entropy {

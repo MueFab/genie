@@ -77,8 +77,7 @@ const TransformationProperties &getTransformation(const gabac::DescSubseqTransfo
          [](const std::vector<uint64_t> &param, std::vector<util::DataBlock> *const transformedSubseqs) {
              gabac::inverseTransformRleCoding(param[0], &(*transformedSubseqs)[0], &(*transformedSubseqs)[1]);
              transformedSubseqs->resize(1);
-         }}
-         };
+         }}};
     return trnsfInfo[unsigned(id)];
 }
 

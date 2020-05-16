@@ -13,7 +13,9 @@ namespace util {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-OrderedSection::OrderedSection(OrderedLock* _lock, const Section& id) : lock(_lock), length(id.length) { lock->wait(id.start); }
+OrderedSection::OrderedSection(OrderedLock* _lock, const Section& id) : lock(_lock), length(id.length) {
+    lock->wait(id.start);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

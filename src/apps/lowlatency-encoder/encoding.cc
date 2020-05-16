@@ -1,5 +1,6 @@
 #include "encoding.h"
 
+#include <genie/core/stats/perf-stats.h>
 #include <genie/entropy/gabac/gabac-compressor.h>
 #include <genie/entropy/gabac/gabac-decompressor.h>
 #include <genie/format/fastq/exporter.h>
@@ -13,7 +14,6 @@
 #include <genie/read/lowlatency/encoder.h>
 #include <genie/read/spring/spring-encoder.h>
 #include <genie/util/thread-manager.h>
-#include <genie/core/stats/perf-stats.h>
 #include <fstream>
 #include <string>
 

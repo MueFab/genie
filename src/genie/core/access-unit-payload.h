@@ -34,15 +34,11 @@ class AccessUnitPayload {
         GenSubIndex id;           //!< @brief
         util::DataBlock payload;  //!< @brief
         size_t numSymbols;
+
        public:
+        size_t getNumSymbols() const { return numSymbols; }
 
-        size_t getNumSymbols() const {
-            return numSymbols;
-        }
-
-        void annotateNumSymbols(size_t num) {
-            numSymbols = num;
-        }
+        void annotateNumSymbols(size_t num) { numSymbols = num; }
 
         /**
          * @brief
@@ -81,33 +77,25 @@ class AccessUnitPayload {
          * @brief
          * @param p
          */
-        void set(util::DataBlock&& p) {
-            payload = std::move(p);
-        }
+        void set(util::DataBlock&& p) { payload = std::move(p); }
 
         /**
          * @brief return subsequence payload
          * @return payload
          */
-        const util::DataBlock& get() const {
-            return payload;
-        }
+        const util::DataBlock& get() const { return payload; }
 
         /**
          * @brief return subsequence payload
          * @return payload
          */
-        util::DataBlock& get()  {
-            return payload;
-        }
+        util::DataBlock& get() { return payload; }
 
         /**
          * @brief move subsequence payload
          * @return payload
          */
-        util::DataBlock&& move()  {
-            return std::move(payload);
-        }
+        util::DataBlock&& move() { return std::move(payload); }
 
         /**
          * @brief
@@ -119,9 +107,7 @@ class AccessUnitPayload {
          * @brief return subsequence payload size
          * @return payload size
          */
-        size_t getWrittenSize() const {
-            return payload.getRawSize();
-        }
+        size_t getWrittenSize() const { return payload.getRawSize(); }
     };
 
     /**
@@ -176,11 +162,11 @@ class AccessUnitPayload {
         const SubsequencePayload* end() const { return &subsequencePayloads.back() + 1; }
 
         size_t getWrittenSize() const {
-            size_t overhead = getDescriptor(getID()).tokentype ? 0
-                                                               : (subsequencePayloads.size() - 1) * sizeof(uint32_t);
+            size_t overhead =
+                getDescriptor(getID()).tokentype ? 0 : (subsequencePayloads.size() - 1) * sizeof(uint32_t);
             return std::accumulate(subsequencePayloads.begin(), subsequencePayloads.end(), overhead,
                                    [](size_t sum, const SubsequencePayload& payload) {
-                                     return payload.isEmpty() ? sum : sum + payload.getWrittenSize();
+                                       return payload.isEmpty() ? sum : sum + payload.getWrittenSize();
                                    });
         }
     };
@@ -261,13 +247,9 @@ class AccessUnitPayload {
 
     const DescriptorPayload* end() const { return &desc_pay.back() + 1; }
 
-    core::record::ClassType getClassType() const {
-        return type;
-    }
+    core::record::ClassType getClassType() const { return type; }
 
-    void setClassType(core::record::ClassType _type) {
-        type = _type;
-    }
+    void setClassType(core::record::ClassType _type) { type = _type; }
 
    private:
     std::vector<DescriptorPayload> desc_pay;  //!< @brief

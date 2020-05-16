@@ -55,17 +55,26 @@ std::vector<Decoder::SegmentMeta> Decoder::readSegmentMeta() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(size_t clip_offset,
-                                                                             std::string &&seq, std::string &&cigar) {
+std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(size_t clip_offset, std::string &&seq,
+                                                                             std::string &&cigar) {
     auto sequence = std::move(seq);
 
     const auto RTYPE = container.pull(core::GenSub::RTYPE);
 
     const auto RCOMP = container.pull(core::GenSub::RCOMP);
 
-    const auto FLAG_PCR = container.isEnd(core::GenSub::FLAGS_PCR_DUPLICATE) ? 0 : container.pull(core::GenSub::FLAGS_PCR_DUPLICATE) << core::GenConst::FLAGS_PCR_DUPLICATE_POS;
-    const auto FLAG_QUAL = container.isEnd(core::GenSub::FLAGS_QUALITY_FAIL) ? 0 : container.pull(core::GenSub::FLAGS_QUALITY_FAIL) << core::GenConst::FLAGS_QUALITY_FAIL_POS;
-    const auto FLAG_PAIR = container.isEnd(core::GenSub::FLAGS_PROPER_PAIR) ? 0 : container.pull(core::GenSub::FLAGS_PROPER_PAIR) << core::GenConst::FLAGS_PROPER_PAIR_POS;
+    const auto FLAG_PCR = container.isEnd(core::GenSub::FLAGS_PCR_DUPLICATE)
+                              ? 0
+                              : container.pull(core::GenSub::FLAGS_PCR_DUPLICATE)
+                                    << core::GenConst::FLAGS_PCR_DUPLICATE_POS;
+    const auto FLAG_QUAL = container.isEnd(core::GenSub::FLAGS_QUALITY_FAIL)
+                               ? 0
+                               : container.pull(core::GenSub::FLAGS_QUALITY_FAIL)
+                                     << core::GenConst::FLAGS_QUALITY_FAIL_POS;
+    const auto FLAG_PAIR = container.isEnd(core::GenSub::FLAGS_PROPER_PAIR)
+                               ? 0
+                               : container.pull(core::GenSub::FLAGS_PROPER_PAIR)
+                                     << core::GenConst::FLAGS_PROPER_PAIR_POS;
     const auto FLAGS = FLAG_PCR | FLAG_QUAL | FLAG_PAIR;
 
     const auto MSCORE = container.pull(core::GenSub::MSCORE);
@@ -138,8 +147,7 @@ std::string Decoder::contractECigar(const std::string &cigar_long) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::decodeAdditional(size_t softclip_offset, std::string &&seq,
-                               std::string &&cigar,
+void Decoder::decodeAdditional(size_t softclip_offset, std::string &&seq, std::string &&cigar,
                                std::tuple<core::record::AlignmentBox, core::record::Record> &state) {
     auto sequence = std::move(seq);
 

@@ -9,8 +9,8 @@
 #include <cassert>
 #include <limits>
 
-#include <genie/util/data-block.h>
 #include <genie/entropy/paramcabac/subsequence.h>
+#include <genie/util/data-block.h>
 #include "exceptions.h"
 #include "reader.h"
 
@@ -23,17 +23,15 @@ namespace gabac {
 
 typedef uint64_t (Reader::*binFunc)(const std::vector<unsigned int>);
 
-static inline
-void decodeSignFlag(Reader &reader,
-                    const paramcabac::BinarizationParameters::BinarizationId binID,
-                    uint64_t &symbolValue) {
-    if(symbolValue != 0) {
-        switch(binID) {
+static inline void decodeSignFlag(Reader &reader, const paramcabac::BinarizationParameters::BinarizationId binID,
+                                  uint64_t &symbolValue) {
+    if (symbolValue != 0) {
+        switch (binID) {
             case paramcabac::BinarizationParameters::BinarizationId::SIGNED_EXPONENTIAL_GOMB:
             case paramcabac::BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
             case paramcabac::BinarizationParameters::BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY:
             case paramcabac::BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY:
-                if(reader.readSignFlag()) {
+                if (reader.readSignFlag()) {
                     int64_t symbolValueSigned = -(symbolValue);
                     symbolValue = static_cast<uint64_t>(symbolValueSigned);
                 }
@@ -44,15 +42,12 @@ void decodeSignFlag(Reader &reader,
     }
 }
 
-static inline
-binFunc getBinarizor(const uint8_t outputSymbolSize,
-                     const bool bypassFlag,
-                     const paramcabac::BinarizationParameters::BinarizationId binID,
-                     const paramcabac::BinarizationParameters &binarzationParams,
-                     const paramcabac::StateVars &stateVars,
-                     std::vector<unsigned int>& binParams) {
+static inline binFunc getBinarizor(const uint8_t outputSymbolSize, const bool bypassFlag,
+                                   const paramcabac::BinarizationParameters::BinarizationId binID,
+                                   const paramcabac::BinarizationParameters &binarzationParams,
+                                   const paramcabac::StateVars &stateVars, std::vector<unsigned int> &binParams) {
     binFunc func = nullptr;
-    if(bypassFlag) {
+    if (bypassFlag) {
         switch (binID) {
             case paramcabac::BinarizationParameters::BinarizationId::BINARY_CODING:
                 func = &Reader::readAsBIbypass;
@@ -128,8 +123,7 @@ binFunc getBinarizor(const uint8_t outputSymbolSize,
 }
 
 size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                                   const unsigned int numEncodedSymbols,
-                                   util::DataBlock* bitstream) {
+                                   const unsigned int numEncodedSymbols, util::DataBlock *bitstream) {
     if (bitstream == nullptr) {
         GABAC_DIE("Bitstream is null");
     }
@@ -147,44 +141,38 @@ size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
     const bool bypassFlag = binarzation.getBypassFlag();
     size_t payloadSizeUsed = 0;
 
-    Reader reader(bitstream,
-                  bypassFlag,
-                  stateVars.getNumCtxTotal());
+    Reader reader(bitstream, bypassFlag, stateVars.getNumCtxTotal());
     reader.start();
 
-    std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
+    std::vector<unsigned int> binParams(4,
+                                        0);  // first three elements are for binarization params, last one is for ctxIdx
 
     util::DataBlock decodedSymbols(numEncodedSymbols, 4);
     util::BlockStepper r = decodedSymbols.getReader();
     std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
 
     ContextSelector ctxSelector(stateVars);
-    const bool diffEnabled = (trnsfSubseqConf.getTransformIDSubsym() == paramcabac::SupportValues::TransformIdSubsym::DIFF_CODING);
+    const bool diffEnabled =
+        (trnsfSubseqConf.getTransformIDSubsym() == paramcabac::SupportValues::TransformIdSubsym::DIFF_CODING);
 
-    binFunc func = getBinarizor(outputSymbolSize,
-                                bypassFlag,
-                                binID,
-                                binarzationParams,
-                                stateVars,
-                                binParams);
+    binFunc func = getBinarizor(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
 
     while (r.isValid()) {
         // Decode subsymbols and merge them to construct symbols
         uint64_t symbolValue = 0;
 
-        for (uint8_t s=0; s<stateVars.getNumSubsymbols(); s++) {
-
+        for (uint8_t s = 0; s < stateVars.getNumSubsymbols(); s++) {
             subsymbols[s].subsymIdx = s;
             binParams[3] = ctxSelector.getContextIdxOrder0(s);
 
             subsymbols[s].subsymValue = (reader.*func)(binParams);
 
-            if(diffEnabled) {
+            if (diffEnabled) {
                 subsymbols[s].subsymValue += subsymbols[s].prvValues[0];
                 subsymbols[s].prvValues[0] = subsymbols[s].subsymValue;
             }
 
-            symbolValue = (symbolValue<<codingSubsymSize) | subsymbols[s].subsymValue;
+            symbolValue = (symbolValue << codingSubsymSize) | subsymbols[s].subsymValue;
         }
 
         decodeSignFlag(reader, binID, symbolValue);
@@ -201,9 +189,8 @@ size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
 }
 
 size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                                   const unsigned int numEncodedSymbols,
-                                   util::DataBlock* bitstream,
-                                   util::DataBlock* const depSymbols) {
+                                   const unsigned int numEncodedSymbols, util::DataBlock *bitstream,
+                                   util::DataBlock *const depSymbols) {
     if (bitstream == nullptr) {
         GABAC_DIE("Bitstream is null");
     }
@@ -220,21 +207,19 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
     const uint8_t outputSymbolSize = supportVals.getOutputSymbolSize();
     const uint8_t codingSubsymSize = supportVals.getCodingSubsymSize();
     const uint8_t codingOrder = supportVals.getCodingOrder();
-    const uint64_t subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize)-1;
+    const uint64_t subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize) - 1;
     const bool bypassFlag = binarzation.getBypassFlag();
     size_t payloadSizeUsed = 0;
 
-    uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
-                                                 supportVals.getShareSubsymLutFlag(),
-                                                 trnsfSubseqConf.getTransformIDSubsym());
+    uint8_t const numLuts =
+        stateVars.getNumLuts(codingOrder, supportVals.getShareSubsymLutFlag(), trnsfSubseqConf.getTransformIDSubsym());
     uint8_t const numPrvs = stateVars.getNumPrvs(supportVals.getShareSubsymPrvFlag());
 
-    Reader reader(bitstream,
-                  bypassFlag,
-                  stateVars.getNumCtxTotal());
+    Reader reader(bitstream, bypassFlag, stateVars.getNumCtxTotal());
     reader.start();
 
-    std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
+    std::vector<unsigned int> binParams(4,
+                                        0);  // first three elements are for binarization params, last one is for ctxIdx
 
     util::DataBlock decodedSymbols(numEncodedSymbols, 4);
     util::BlockStepper r = decodedSymbols.getReader();
@@ -242,69 +227,60 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
     LUTsSubSymbolTransform invLutsSubsymTrnsfm(supportVals, stateVars, numLuts, numPrvs, false);
     bool customCmaxTU = false;
-    if(numLuts > 0) {
+    if (numLuts > 0) {
         invLutsSubsymTrnsfm.decodeLUTs(reader);
-        if(binID == paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY) {
+        if (binID == paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY) {
             customCmaxTU = true;
         }
     }
 
     util::BlockStepper rDep;
-    if(depSymbols) {
+    if (depSymbols) {
         rDep = depSymbols->getReader();
     }
 
     ContextSelector ctxSelector(stateVars);
 
-    binFunc func = getBinarizor(outputSymbolSize,
-                                bypassFlag,
-                                binID,
-                                binarzationParams,
-                                stateVars,
-                                binParams);
+    binFunc func = getBinarizor(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
 
     while (r.isValid()) {
         // Decode subsymbols and merge them to construct symbols
         uint64_t symbolValue = 0;
 
         uint64_t depSymbolValue = 0, depSubsymValue = 0;
-        if(rDep.isValid()) {
+        if (rDep.isValid()) {
             depSymbolValue = alphaProps.inverseLut[rDep.get()];
             rDep.inc();
         }
 
         uint32_t oss = outputSymbolSize;
-        for (uint8_t s=0; s<stateVars.getNumSubsymbols(); s++) {
-            const uint8_t lutIdx = (numLuts > 1) ? s : 0; // either private or shared LUT
-            const uint8_t prvIdx = (numPrvs > 1) ? s : 0; // either private or shared PRV
+        for (uint8_t s = 0; s < stateVars.getNumSubsymbols(); s++) {
+            const uint8_t lutIdx = (numLuts > 1) ? s : 0;  // either private or shared LUT
+            const uint8_t prvIdx = (numPrvs > 1) ? s : 0;  // either private or shared PRV
 
-            if(depSymbols) {
-                depSubsymValue = (depSymbolValue>>(oss-=codingSubsymSize)) & subsymMask;
+            if (depSymbols) {
+                depSubsymValue = (depSymbolValue >> (oss -= codingSubsymSize)) & subsymMask;
                 subsymbols[prvIdx].prvValues[0] = depSubsymValue;
             }
 
             subsymbols[s].subsymIdx = s;
-            binParams[3] = ctxSelector.getContextIdxOrderGT0(s,
-                                                             prvIdx,
-                                                             subsymbols,
-                                                             codingOrder);
+            binParams[3] = ctxSelector.getContextIdxOrderGT0(s, prvIdx, subsymbols, codingOrder);
 
-            if(customCmaxTU) {
-                subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder1(subsymbols,
-                                                                                        lutIdx,
-                                                                                        prvIdx);
-                binParams[0] = std::min((uint64_t) binarzationParams.getCMax(),subsymbols[s].lutNumMaxElems); // update cMax
+            if (customCmaxTU) {
+                subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder1(subsymbols, lutIdx, prvIdx);
+                binParams[0] =
+                    std::min((uint64_t)binarzationParams.getCMax(), subsymbols[s].lutNumMaxElems);  // update cMax
             }
             subsymbols[s].subsymValue = (reader.*func)(binParams);
 
-            if(numLuts > 0) {
+            if (numLuts > 0) {
                 subsymbols[s].lutEntryIdx = subsymbols[s].subsymValue;
                 invLutsSubsymTrnsfm.invTransformOrder1(subsymbols, s, lutIdx, prvIdx);
             }
 
             subsymbols[prvIdx].prvValues[0] = subsymbols[s].subsymValue;
 
-            symbolValue = (symbolValue<<codingSubsymSize) | subsymbols[s].subsymValue;
+            symbolValue = (symbolValue << codingSubsymSize) | subsymbols[s].subsymValue;
         }
 
         decodeSignFlag(reader, binID, symbolValue);
@@ -321,8 +297,7 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 }
 
 size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                                   const unsigned int numEncodedSymbols,
-                                   util::DataBlock* bitstream) {
+                                   const unsigned int numEncodedSymbols, util::DataBlock *bitstream) {
     if (bitstream == nullptr) {
         GABAC_DIE("Bitstream is null");
     }
@@ -340,18 +315,16 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
     const uint8_t codingOrder = supportVals.getCodingOrder();
     const bool bypassFlag = binarzation.getBypassFlag();
 
-    uint8_t const numLuts = stateVars.getNumLuts(codingOrder,
-                                                 supportVals.getShareSubsymLutFlag(),
-                                                 trnsfSubseqConf.getTransformIDSubsym());
+    uint8_t const numLuts =
+        stateVars.getNumLuts(codingOrder, supportVals.getShareSubsymLutFlag(), trnsfSubseqConf.getTransformIDSubsym());
     uint8_t const numPrvs = stateVars.getNumPrvs(supportVals.getShareSubsymPrvFlag());
     size_t payloadSizeUsed = 0;
 
-    Reader reader(bitstream,
-                  bypassFlag,
-                  stateVars.getNumCtxTotal());
+    Reader reader(bitstream, bypassFlag, stateVars.getNumCtxTotal());
     reader.start();
 
-    std::vector<unsigned int> binParams(4, 0); // first three elements are for binarization params, last one is for ctxIdx
+    std::vector<unsigned int> binParams(4,
+                                        0);  // first three elements are for binarization params, last one is for ctxIdx
 
     util::DataBlock decodedSymbols(numEncodedSymbols, 4);
     util::BlockStepper r = decodedSymbols.getReader();
@@ -359,45 +332,36 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
 
     LUTsSubSymbolTransform invLutsSubsymTrnsfm(supportVals, stateVars, numLuts, numPrvs, false);
     bool customCmaxTU = false;
-    if(numLuts > 0) {
+    if (numLuts > 0) {
         invLutsSubsymTrnsfm.decodeLUTs(reader);
-        if(binID == paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY) {
+        if (binID == paramcabac::BinarizationParameters::BinarizationId::TRUNCATED_UNARY) {
             customCmaxTU = true;
         }
     }
 
     ContextSelector ctxSelector(stateVars);
 
-    binFunc func = getBinarizor(outputSymbolSize,
-                                bypassFlag,
-                                binID,
-                                binarzationParams,
-                                stateVars,
-                                binParams);
+    binFunc func = getBinarizor(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
 
     while (r.isValid()) {
         // Decode subsymbols and merge them to construct symbols
         uint64_t symbolValue = 0;
 
-        for (uint8_t s=0; s<stateVars.getNumSubsymbols(); s++) {
-            const uint8_t lutIdx = (numLuts > 1) ? s : 0; // either private or shared LUT
-            const uint8_t prvIdx = (numPrvs > 1) ? s : 0; // either private or shared PRV
+        for (uint8_t s = 0; s < stateVars.getNumSubsymbols(); s++) {
+            const uint8_t lutIdx = (numLuts > 1) ? s : 0;  // either private or shared LUT
+            const uint8_t prvIdx = (numPrvs > 1) ? s : 0;  // either private or shared PRV
 
             subsymbols[s].subsymIdx = s;
-            binParams[3] = ctxSelector.getContextIdxOrderGT0(s,
-                                                             prvIdx,
-                                                             subsymbols,
-                                                             codingOrder);
+            binParams[3] = ctxSelector.getContextIdxOrderGT0(s, prvIdx, subsymbols, codingOrder);
 
-            if(customCmaxTU) {
-                subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder2(subsymbols,
-                                                                                        lutIdx,
-                                                                                        prvIdx);
-                binParams[0] = std::min((uint64_t) binarzationParams.getCMax(),subsymbols[s].lutNumMaxElems); // update cMax
+            if (customCmaxTU) {
+                subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder2(subsymbols, lutIdx, prvIdx);
+                binParams[0] =
+                    std::min((uint64_t)binarzationParams.getCMax(), subsymbols[s].lutNumMaxElems);  // update cMax
             }
             subsymbols[s].subsymValue = (reader.*func)(binParams);
 
-            if(numLuts > 0) {
+            if (numLuts > 0) {
                 subsymbols[s].lutEntryIdx = subsymbols[s].subsymValue;
                 invLutsSubsymTrnsfm.invTransformOrder2(subsymbols, s, lutIdx, prvIdx);
             }
@@ -405,7 +369,7 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
             subsymbols[prvIdx].prvValues[1] = subsymbols[prvIdx].prvValues[0];
             subsymbols[prvIdx].prvValues[0] = subsymbols[s].subsymValue;
 
-            symbolValue = (symbolValue<<codingSubsymSize) | subsymbols[s].subsymValue;
+            symbolValue = (symbolValue << codingSubsymSize) | subsymbols[s].subsymValue;
         }
 
         decodeSignFlag(reader, binID, symbolValue);
@@ -421,20 +385,18 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
     return payloadSizeUsed;
 }
 
-size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                             const unsigned int numEncodedSymbols,
-                             util::DataBlock* bitstream,
-                             util::DataBlock* const depSymbols) {
-    switch(trnsfSubseqConf.getSupportValues().getCodingOrder()) {
+size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf, const unsigned int numEncodedSymbols,
+                             util::DataBlock *bitstream, util::DataBlock *const depSymbols) {
+    switch (trnsfSubseqConf.getSupportValues().getCodingOrder()) {
         case 0:
             return decodeTransformSubseqOrder0(trnsfSubseqConf, numEncodedSymbols, bitstream);
-        break;
+            break;
         case 1:
             return decodeTransformSubseqOrder1(trnsfSubseqConf, numEncodedSymbols, bitstream, depSymbols);
-        break;
+            break;
         case 2:
             return decodeTransformSubseqOrder2(trnsfSubseqConf, numEncodedSymbols, bitstream);
-        break;
+            break;
         default:
             GABAC_DIE("Unknown coding order");
     }

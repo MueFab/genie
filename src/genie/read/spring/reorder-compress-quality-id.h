@@ -16,7 +16,8 @@ namespace genie {
 namespace read {
 namespace spring {
 
-void reorder_compress_quality_id(const std::string &temp_dir, const compression_params &cp, core::stats::FastqStats *stats);
+void reorder_compress_quality_id(const std::string &temp_dir, const compression_params &cp,
+                                 core::stats::FastqStats *stats);
 
 void generate_order(const std::string &file_order, uint32_t *order_array, const uint32_t &numreads);
 

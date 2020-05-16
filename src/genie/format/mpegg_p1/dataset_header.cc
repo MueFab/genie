@@ -5,8 +5,8 @@
  */
 
 #include "dataset_header.h"
-#include <bitset>
 #include <math.h>
+#include <bitset>
 
 namespace genie {
 namespace format {
@@ -40,10 +40,12 @@ DatasetHeader::DatasetHeader(const uint16_t x_datasetID)
       U_signature_constant_length(0),
       U_signature_length(0),
       tflag(0),
-      thres(0) {    version[0] = 'a';
+      thres(0) {
+    version[0] = 'a';
     version[1] = 'b';
     version[2] = 'c';
-    version[3] = 'd';}
+    version[3] = 'd';
+}
 
 DatasetHeader::DatasetHeader(uint8_t datasetGroupId, uint16_t datasetId/*, char *version, uint8_t byteOffsetSizeFlag,
                              uint8_t nonOverlappingAuRangeFlag, uint8_t pos40BitsFlag, uint8_t blockHeaderFlag,
@@ -145,21 +147,21 @@ void DatasetHeader::writeToFile(genie::util::BitWriter& bitWriter) const {
 
     bitWriter.write(dataset_group_ID, 8);
     bitWriter.write(dataset_ID, 16);
-    bitWriter.write(version);//FIXME check for too short strings
+    bitWriter.write(version);  // FIXME check for too short strings
 
     std::string toWrite;
 
     toWrite += std::bitset<1>(byte_offset_size_flag).to_string();
-    //bitWriter.write(byte_offset_size_flag, 1);
+    // bitWriter.write(byte_offset_size_flag, 1);
 
     toWrite += std::bitset<1>(non_overlapping_AU_range_flag).to_string();
-    //bitWriter.write(non_overlapping_AU_range_flag, 1);
+    // bitWriter.write(non_overlapping_AU_range_flag, 1);
 
     toWrite += std::bitset<1>(pos_40_bits_flag).to_string();
-    //bitWriter.write(pos_40_bits_flag, 1);
+    // bitWriter.write(pos_40_bits_flag, 1);
 
     toWrite += std::bitset<1>(block_header_flag).to_string();
-    //bitWriter.write(block_header_flag, 1);
+    // bitWriter.write(block_header_flag, 1);
 
     if (block_header_flag) {
         toWrite += std::bitset<1>(MIT_flag).to_string();
@@ -168,7 +170,7 @@ void DatasetHeader::writeToFile(genie::util::BitWriter& bitWriter) const {
         toWrite += std::bitset<1>(ordered_blocks_flag).to_string();
     }
     toWrite += std::bitset<16>(seq_count).to_string();
-    if (seq_count > 0) {//TODO
+    if (seq_count > 0) {  // TODO
         bitWriter.write(reference_ID, 8);
         for (int seq = 0; seq < seq_count; seq++) {
             bitWriter.write(seq_ID[seq], 16);
@@ -178,7 +180,7 @@ void DatasetHeader::writeToFile(genie::util::BitWriter& bitWriter) const {
         }
     }
     toWrite += std::bitset<4>(dataset_type).to_string();
-    if (MIT_flag == 1) {//TODO
+    if (MIT_flag == 1) {  // TODO
         bitWriter.write(num_classes, 4);
         for (int ci = 0; ci < num_classes; ci++) {
             bitWriter.write(clid[ci], 4);
@@ -192,7 +194,7 @@ void DatasetHeader::writeToFile(genie::util::BitWriter& bitWriter) const {
     }
     toWrite += std::bitset<8>(alphabet_ID).to_string();
     toWrite += std::bitset<32>(num_U_access_units).to_string();
-    if (num_U_access_units > 0) {//TODO
+    if (num_U_access_units > 0) {  // TODO
         bitWriter.write(num_U_clusters, 32);
         bitWriter.write(multiple_signature_base, 31);
         if (multiple_signature_base > 0) {
@@ -213,76 +215,74 @@ void DatasetHeader::writeToFile(genie::util::BitWriter& bitWriter) const {
             }
         }
     }
-/*
-    if (block_header_flag) {
-        bitWriter.write(MIT_flag, 1);
-        bitWriter.write(CC_mode_flag, 1);
-    } else {
-        bitWriter.write(ordered_blocks_flag, 1);
-    }
-    bitWriter.write(seq_count, 16);
-    if (seq_count > 0) {
-        bitWriter.write(reference_ID, 8);
-        for (int seq = 0; seq < seq_count; seq++) {
-            bitWriter.write(seq_ID[seq], 16);
+    /*
+        if (block_header_flag) {
+            bitWriter.write(MIT_flag, 1);
+            bitWriter.write(CC_mode_flag, 1);
+        } else {
+            bitWriter.write(ordered_blocks_flag, 1);
         }
-        for (int seq = 0; seq < seq_count; seq++) {
-            bitWriter.write(seq_blocks[seq], 32);
+        bitWriter.write(seq_count, 16);
+        if (seq_count > 0) {
+            bitWriter.write(reference_ID, 8);
+            for (int seq = 0; seq < seq_count; seq++) {
+                bitWriter.write(seq_ID[seq], 16);
+            }
+            for (int seq = 0; seq < seq_count; seq++) {
+                bitWriter.write(seq_blocks[seq], 32);
+            }
         }
-    }
-    bitWriter.write(dataset_type, 4);
-    if (MIT_flag == 1) {
-        bitWriter.write(num_classes, 4);
-        for (int ci = 0; ci < num_classes; ci++) {
-            bitWriter.write(clid[ci], 4);
-            if (!block_header_flag) {
-                bitWriter.write(num_descriptors[ci], 5);
-                for (int di = 0; di < num_descriptors[ci]; di++) {
-                    bitWriter.write(descriptor_ID[ci][di], 7);
+        bitWriter.write(dataset_type, 4);
+        if (MIT_flag == 1) {
+            bitWriter.write(num_classes, 4);
+            for (int ci = 0; ci < num_classes; ci++) {
+                bitWriter.write(clid[ci], 4);
+                if (!block_header_flag) {
+                    bitWriter.write(num_descriptors[ci], 5);
+                    for (int di = 0; di < num_descriptors[ci]; di++) {
+                        bitWriter.write(descriptor_ID[ci][di], 7);
+                    }
                 }
             }
         }
-    }
-    bitWriter.write(alphabet_ID, 8);
-    bitWriter.write(num_U_access_units, 32);
-    if (num_U_access_units > 0) {
-        bitWriter.write(num_U_clusters, 32);
-        bitWriter.write(multiple_signature_base, 31);
-        if (multiple_signature_base > 0) {
-            bitWriter.write(U_signature_size, 6);
-        }
-        bitWriter.write(U_signature_constant_length, 1);
-        if (U_signature_constant_length) {
-            bitWriter.write(U_signature_length, 8);
-        }
-    }
-    if (seq_count > 0) {
-        bitWriter.write(1, 1);  // tflag[0]
-        bitWriter.write(thres[0], 31);
-        for (int i = 1; i < seq_count; i++) {
-            bitWriter.write(tflag[i], 1);
-            if (tflag[i] == 1) {
-                bitWriter.write(thres[i], 31);
+        bitWriter.write(alphabet_ID, 8);
+        bitWriter.write(num_U_access_units, 32);
+        if (num_U_access_units > 0) {
+            bitWriter.write(num_U_clusters, 32);
+            bitWriter.write(multiple_signature_base, 31);
+            if (multiple_signature_base > 0) {
+                bitWriter.write(U_signature_size, 6);
+            }
+            bitWriter.write(U_signature_constant_length, 1);
+            if (U_signature_constant_length) {
+                bitWriter.write(U_signature_length, 8);
             }
         }
-    }
-    */
+        if (seq_count > 0) {
+            bitWriter.write(1, 1);  // tflag[0]
+            bitWriter.write(thres[0], 31);
+            for (int i = 1; i < seq_count; i++) {
+                bitWriter.write(tflag[i], 1);
+                if (tflag[i] == 1) {
+                    bitWriter.write(thres[i], 31);
+                }
+            }
+        }
+        */
     while (toWrite.size() % 8) {
         toWrite += "0";
     }
 
-//    fprintf(stdout, "toWrite: %s %lu\n", toWrite.c_str(), toWrite.size());
+    //    fprintf(stdout, "toWrite: %s %lu\n", toWrite.c_str(), toWrite.size());
     uint8_t bytes = toWrite.size() / 8;
     for (uint8_t i = 0; i < bytes; i++) {
         uint8_t out = 0;
         for (uint8_t j = 0; j < 8; j++) {
-            if(toWrite[7-j] == '1')
-                out += pow(2, j);
+            if (toWrite[7 - j] == '1') out += pow(2, j);
 
-//            fprintf(stdout, "%u %u: %u\n", i, j, out);
-//            fprintf(stdout, "char: %c\n", toWrite[7-j]);
-//            fprintf(stdout, "toWrite: %s %lu\n", toWrite.c_str(), toWrite.size());
-
+            //            fprintf(stdout, "%u %u: %u\n", i, j, out);
+            //            fprintf(stdout, "char: %c\n", toWrite[7-j]);
+            //            fprintf(stdout, "toWrite: %s %lu\n", toWrite.c_str(), toWrite.size());
         }
         bitWriter.write(out, 8);
         toWrite = toWrite.substr(8, toWrite.size());

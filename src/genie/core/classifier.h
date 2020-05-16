@@ -17,7 +17,7 @@ class Classifier {
     virtual bool isFlushing() const = 0;
 };
 
-class ClassifierRegroup : public Classifier{
+class ClassifierRegroup : public Classifier {
    private:
     using ClassBlock = std::vector<genie::core::record::Chunk>;
     using SequenceBlock = std::vector<ClassBlock>;
@@ -33,7 +33,7 @@ class ClassifierRegroup : public Classifier{
             c.emplace_back();
         }
     }
-    genie::core::record::Chunk getChunk() override{
+    genie::core::record::Chunk getChunk() override {
         for (auto& c : classes) {
             if (c.size() > 1 || (!c.front().empty() && flushing)) {
                 genie::core::record::Chunk chunk = std::move(c.front());
@@ -50,7 +50,7 @@ class ClassifierRegroup : public Classifier{
         return genie::core::record::Chunk();
     }
 
-    void add(genie::core::record::Chunk&& c) override{
+    void add(genie::core::record::Chunk&& c) override {
         genie::core::record::Chunk chunk = std::move(c);
         for (auto& r : chunk) {
             auto classtype = classify(r);
@@ -129,14 +129,15 @@ class ClassifierRegroup : public Classifier{
     }
 };
 
-class ClassifierBypass : public Classifier{
+class ClassifierBypass : public Classifier {
     std::vector<genie::core::record::Chunk> vec;
     bool flushing = false;
+
    public:
     genie::core::record::Chunk getChunk() override {
         flushing = false;
         genie::core::record::Chunk ret;
-        if(vec.empty()) {
+        if (vec.empty()) {
             return ret;
         }
         ret = std::move(vec.front());
@@ -144,17 +145,11 @@ class ClassifierBypass : public Classifier{
         return ret;
     }
 
-    void add(genie::core::record::Chunk&& c) override {
-        vec.emplace_back(std::move(c));
-    }
+    void add(genie::core::record::Chunk&& c) override { vec.emplace_back(std::move(c)); }
 
-    void flush() override {
-        flushing = true;
-    }
+    void flush() override { flushing = true; }
 
-    virtual bool isFlushing() const override {
-        return flushing;
-    }
+    virtual bool isFlushing() const override { return flushing; }
 };
 
 }  // namespace core

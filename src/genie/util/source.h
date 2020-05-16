@@ -39,9 +39,7 @@ class Source {
      */
     void dryOut() { drain->dryIn(); }
 
-    void skipOut(const Section& id) {
-        drain->skipIn(id);
-    }
+    void skipOut(const Section& id) { drain->skipIn(id); }
 
    public:
     /**

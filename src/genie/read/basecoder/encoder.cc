@@ -66,8 +66,8 @@ void Encoder::encodeFirstSegment(const core::record::Record &rec) {
     const auto MSCORE = ALIGNMENT.getAlignment().getMappingScores().front();  // TODO: Multiple mapping scores
     container.push(core::GenSub::MSCORE, MSCORE);
 
-   // const auto RGROUP = 0;  // TODO
-  //  container.push(core::GenSub::RGROUP, RGROUP);
+    // const auto RGROUP = 0;  // TODO
+    //  container.push(core::GenSub::RGROUP, RGROUP);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

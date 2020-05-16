@@ -27,10 +27,8 @@ class Subsequence {
 
     Subsequence(uint16_t _descriptor_subsequence_ID, bool _tokentypeFlag);
 
-    Subsequence(TransformedParameters&& _transform_subseq_parameters,
-                uint16_t _descriptor_subsequence_ID,
-                bool _tokentypeFlag,
-                std::vector<TransformedSubSeq>&& transformSubseq_cfgs);
+    Subsequence(TransformedParameters&& _transform_subseq_parameters, uint16_t _descriptor_subsequence_ID,
+                bool _tokentypeFlag, std::vector<TransformedSubSeq>&& transformSubseq_cfgs);
 
     Subsequence(bool tokentype, util::BitReader& reader);
 
@@ -49,12 +47,12 @@ class Subsequence {
     size_t getNumTransformSubseqCfgs() const;
 
     const std::vector<TransformedSubSeq>& getTransformSubseqCfgs() const;
-    
+
     bool getTokentypeFlag() const;
 
    private:
     boost::optional<uint16_t> descriptor_subsequence_ID;
-    bool tokentypeFlag; // helper field - not written to bitstream
+    bool tokentypeFlag;  // helper field - not written to bitstream
     TransformedParameters transform_subseq_parameters;
     std::vector<TransformedSubSeq> transformSubseq_cfgs;
 };

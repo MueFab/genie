@@ -17,16 +17,11 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-EncodingConfiguration::EncodingConfiguration()
-    : subseqCfg() {}
+EncodingConfiguration::EncodingConfiguration() : subseqCfg() {}
 
-EncodingConfiguration::EncodingConfiguration(const core::GenSubIndex sub) {
-    subseqCfg = getEncoderConfigManual(sub);
-}
+EncodingConfiguration::EncodingConfiguration(const core::GenSubIndex sub) { subseqCfg = getEncoderConfigManual(sub); }
 
-EncodingConfiguration::EncodingConfiguration(paramcabac::Subsequence&& _subseq) {
-    subseqCfg = std::move(_subseq);
-}
+EncodingConfiguration::EncodingConfiguration(paramcabac::Subsequence&& _subseq) { subseqCfg = std::move(_subseq); }
 
 EncodingConfiguration::~EncodingConfiguration() = default;
 
@@ -36,27 +31,27 @@ bool EncodingConfiguration::operator!=(const EncodingConfiguration& conf) const 
 uint8_t EncodingConfiguration::getSubseqWordSize() const {
     const std::vector<paramcabac::TransformedSubSeq>& trnsfCfgs = subseqCfg.getTransformSubseqCfgs();
 
-    switch(subseqCfg.getTransformParameters().getTransformIdSubseq()) {
+    switch (subseqCfg.getTransformParameters().getTransformIdSubseq()) {
         case paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM:
             return paramcabac::StateVars::getMinimalSizeInBytes(trnsfCfgs[0].getSupportValues().getOutputSymbolSize());
-        break;
+            break;
         case paramcabac::TransformedParameters::TransformIdSubseq::EQUALITY_CODING:
             return paramcabac::StateVars::getMinimalSizeInBytes(trnsfCfgs[1].getSupportValues().getOutputSymbolSize());
-        break;
+            break;
         case paramcabac::TransformedParameters::TransformIdSubseq::MATCH_CODING:
             return paramcabac::StateVars::getMinimalSizeInBytes(trnsfCfgs[2].getSupportValues().getOutputSymbolSize());
-        break;
+            break;
         case paramcabac::TransformedParameters::TransformIdSubseq::RLE_CODING:
             return paramcabac::StateVars::getMinimalSizeInBytes(trnsfCfgs[1].getSupportValues().getOutputSymbolSize());
-        break;
+            break;
         case paramcabac::TransformedParameters::TransformIdSubseq::MERGE_CODING: {
             const std::vector<uint8_t> subseqShiftSizes = subseqCfg.getTransformParameters().getMergeCodingShiftSizes();
-            return paramcabac::StateVars::getMinimalSizeInBytes(subseqShiftSizes[0] + trnsfCfgs[0].getSupportValues().getOutputSymbolSize());
-        }
-        break;
+            return paramcabac::StateVars::getMinimalSizeInBytes(subseqShiftSizes[0] +
+                                                                trnsfCfgs[0].getSupportValues().getOutputSymbolSize());
+        } break;
         default:
             GABAC_DIE("Invalid subseq transforamtion");
-        break;
+            break;
     }
 
     return 1;

@@ -61,7 +61,6 @@ class Dataset {
 
     uint64_t getLength() const;
 
-
     void setDatasetGroupId(uint8_t groupId) {
         this->setDatasetHeaderGroupId(groupId);
         this->setDatasetParameterSetsGroupId(groupId);

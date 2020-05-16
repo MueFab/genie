@@ -19,7 +19,7 @@ Encoder::Encoder(core::QVEncoder* coder, core::NameEncoder* ncoder) : core::Read
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Encoder::flowIn(core::record::Chunk&& t, size_t id)  {
+void Encoder::flowIn(core::record::Chunk&& t, size_t id) {
     core::record::Chunk data = std::move(t);
 
     core::parameter::ParameterSet set;
@@ -50,7 +50,7 @@ void Encoder::flowIn(core::record::Chunk&& t, size_t id)  {
         qv = qvcoder->process(data);
     }
 
-    if(namecoder) {
+    if (namecoder) {
         auto rname = namecoder->process(data);
         state.streams.get(core::GenDesc::RNAME) = std::move(rname);
     }
@@ -60,7 +60,7 @@ void Encoder::flowIn(core::record::Chunk&& t, size_t id)  {
     flowOut(pack(id, data.front().getSegments().front().getQualities().size(), std::move(qv.first), state), id);
 }
 
-void Encoder::dryIn()  { dryOut(); }
+void Encoder::dryIn() { dryOut(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

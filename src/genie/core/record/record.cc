@@ -163,7 +163,7 @@ void Record::addAlignment(uint16_t _seq_id, AlignmentBox &&rec) {
 
 const std::vector<Segment> &Record::getSegments() const { return reads; }
 
-std::vector<Segment> &Record::getSegments()  { return reads; }
+std::vector<Segment> &Record::getSegments() { return reads; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

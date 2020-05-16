@@ -44,14 +44,12 @@ void AccessUnitPayload::SubsequencePayload::write(util::BitWriter& writer) const
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool AccessUnitPayload::SubsequencePayload::isEmpty() const {
-    return payload.empty();
-}
+bool AccessUnitPayload::SubsequencePayload::isEmpty() const { return payload.empty(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnitPayload::DescriptorPayload::write(util::BitWriter& writer) const {
-    if(this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
+    if (this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
         subsequencePayloads.front().write(writer);
         return;
     }
@@ -159,31 +157,31 @@ AccessUnitPayload::DescriptorPayload::DescriptorPayload() : id(GenDesc(0)) {}
 AccessUnitPayload::DescriptorPayload::DescriptorPayload(GenDesc _id, size_t count, size_t remainingSize,
                                                         util::BitReader& reader)
     : id(_id) {
-    if(this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
+    if (this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
         subsequencePayloads.emplace_back(GenSubIndex{_id, 0}, remainingSize, reader);
-     /*   size_t numSymbols = reader.read<uint32_t>();
-        auto num_streams = reader.read<uint16_t>();
-        int32_t typenum = -1;
-        for (size_t i = 0; i < num_streams; ++i) {
-            uint8_t type = reader.read(4);
+        /*   size_t numSymbols = reader.read<uint32_t>();
+           auto num_streams = reader.read<uint16_t>();
+           int32_t typenum = -1;
+           for (size_t i = 0; i < num_streams; ++i) {
+               uint8_t type = reader.read(4);
 
-            if(!type) {
-                typenum ++;
-            }
+               if(!type) {
+                   typenum ++;
+               }
 
-            while(subsequencePayloads.size() < ((uint32_t(typenum) << 4u) | type)) {
-                subsequencePayloads.emplace_back(GenSubIndex {id, subsequencePayloads.size()});
-                subsequencePayloads.back().annotateNumSymbols(numSymbols);
-            }
+               while(subsequencePayloads.size() < ((uint32_t(typenum) << 4u) | type)) {
+                   subsequencePayloads.emplace_back(GenSubIndex {id, subsequencePayloads.size()});
+                   subsequencePayloads.back().annotateNumSymbols(numSymbols);
+               }
 
-            uint8_t method = reader.read(4);
+               uint8_t method = reader.read(4);
 
-            UTILS_DIE_IF(method != 3, "Only CABAC method supported");
+               UTILS_DIE_IF(method != 3, "Only CABAC method supported");
 
-            subsequencePayloads.emplace_back(GenSubIndex{_id, subsequencePayloads.size()}, 0, reader);
-            subsequencePayloads.back().annotateNumSymbols(numSymbols);
-        }
-        return; */
+               subsequencePayloads.emplace_back(GenSubIndex{_id, subsequencePayloads.size()}, 0, reader);
+               subsequencePayloads.back().annotateNumSymbols(numSymbols);
+           }
+           return; */
     }
     for (size_t i = 0; i < count; ++i) {
         size_t s = 0;

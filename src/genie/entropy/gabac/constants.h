@@ -7,10 +7,10 @@
 #ifndef GABAC_CONSTANTS_H_
 #define GABAC_CONSTANTS_H_
 
+#include <stdint.h>
 #include <functional>
 #include <string>
 #include <vector>
-#include <stdint.h>
 
 namespace genie {
 namespace util {
@@ -30,14 +30,14 @@ enum class DescSubseqTransformationId {
     equality_coding = 1, /**< @brief Find equal values sequentially */
     match_coding = 2,    /**< @brief Find larger sequence matches */
     rle_coding = 3,      /**< @brief Find run lengths */
-    merge_coding = 4,      /**< @brief Find run lengths */
+    merge_coding = 4,    /**< @brief Find run lengths */
 };
-
 
 /**
  * @brief Transformation signature
  */
-using DescSubseqTransform = std::function<void(const std::vector<uint64_t>& param, std::vector<util::DataBlock>* const)>;
+using DescSubseqTransform =
+    std::function<void(const std::vector<uint64_t>& param, std::vector<util::DataBlock>* const)>;
 
 /**
  * @brief Transformation meta data available to applications using gabac
@@ -48,9 +48,9 @@ struct TransformationProperties {
     std::vector<std::string> streamNames; /**< @brief Name of every stream */
     std::vector<uint8_t> wordsizes;       /**< @brief Wordsizes of every stream. Zero
                                              means word size of input data */
-    DescSubseqTransform transform;          /**< @brief Function pointer to transformation */
-    DescSubseqTransform inverseTransform;   /**< @brief Function pointer to inverse
-                                             transformation */
+    DescSubseqTransform transform;        /**< @brief Function pointer to transformation */
+    DescSubseqTransform inverseTransform; /**< @brief Function pointer to inverse
+                                           transformation */
 };
 
 /**

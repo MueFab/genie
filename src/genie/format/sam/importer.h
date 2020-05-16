@@ -13,8 +13,8 @@
 #include <genie/core/record/record.h>
 #include <genie/core/stats/perf-stats.h>
 #include <genie/util/ordered-lock.h>
-#include <map>
 #include <list>
+#include <map>
 #include "reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -46,13 +46,13 @@ class Importer : public core::FormatImporter {
     size_t ref_counter;
 
     static core::record::Record convert(uint16_t ref, sam::Record &&_r1, sam::Record *_r2);
-    bool pumpRetrieve(genie::core::Classifier* _classifier) override {
+    bool pumpRetrieve(genie::core::Classifier *_classifier) override {
         core::record::Chunk chunk;
         std::vector<sam::Record> s;
         std::list<sam::Record> samRecords;
         uint16_t local_ref_num = 0;
         {
-            //TODO: util::OrderedSection section(&lock, id);
+            // TODO: util::OrderedSection section(&lock, id);
             samReader.read(blockSize, s, stats);
             if (s.size() == 0) {
                 return false;

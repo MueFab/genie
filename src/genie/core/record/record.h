@@ -116,7 +116,7 @@ class Record {
      * @param index
      * @return
      */
-    std::vector<Segment>& getSegments() ;
+    std::vector<Segment>& getSegments();
 
     const std::vector<Segment>& getSegments() const;
 
@@ -163,9 +163,7 @@ class Record {
      */
     const std::string& getName() const;
 
-    void setName(const std::string& _name) {
-        read_name = _name;
-    }
+    void setName(const std::string& _name) { read_name = _name; }
 
     /**
      *
@@ -177,9 +175,7 @@ class Record {
 
     const AlignmentExternal& getAlignmentExternal() const;
 
-    void setClassType(ClassType type) {
-        this->class_ID = type;
-    }
+    void setClassType(ClassType type) { this->class_ID = type; }
 };
 
 /**

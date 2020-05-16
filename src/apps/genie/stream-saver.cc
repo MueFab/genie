@@ -14,8 +14,8 @@ void StreamSaver::run_gabac(const std::string &name, util::DataBlock *data, bool
     entropy::gabac::OBufferStream ostream(&out);
 
     // Configure gabac streams
-    entropy::gabac::IOConfiguration ioconf = {&istream, nullptr, &ostream, insize, &std::cout,
-                                              entropy::gabac::IOConfiguration::LogLevel::TRACE};
+    entropy::gabac::IOConfiguration ioconf = {&istream, nullptr,    &ostream,
+                                              insize,   &std::cout, entropy::gabac::IOConfiguration::LogLevel::TRACE};
 
     entropy::gabac::run(ioconf, enConf, decompression);
 

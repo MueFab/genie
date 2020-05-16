@@ -13,54 +13,53 @@
 #include <genie/util/data-block.h>
 #include "configuration.h"
 #include "decode-cabac.h"
+#include "exceptions.h"
 #include "reader.h"
 #include "stream-handler.h"
-#include "exceptions.h"
 
 #include "equality-subseq-transform.h"
 #include "match-subseq-transform.h"
-#include "rle-subseq-transform.h"
 #include "merge-subseq-transform.h"
+#include "rle-subseq-transform.h"
 
 namespace genie {
 namespace entropy {
 namespace gabac {
 
-static inline
-void doInverseSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
-                                   std::vector<util::DataBlock> *const transformedSubseqs) {
+static inline void doInverseSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
+                                                 std::vector<util::DataBlock> *const transformedSubseqs) {
     // GABACIFY_LOG_TRACE << "Encoding sequence of length: " <<
     // (*transformedSequences)[0].size();
 
     // GABACIFY_LOG_DEBUG << "Performing sequence transformation " <<
     // gabac::transformationInformation[id].name;
 
-    switch(subseqCfg.getTransformParameters().getTransformIdSubseq()) {
+    switch (subseqCfg.getTransformParameters().getTransformIdSubseq()) {
         case paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM:
             transformedSubseqs->resize(1);
-        break;
+            break;
         case paramcabac::TransformedParameters::TransformIdSubseq::EQUALITY_CODING:
             inverseTransformEqualityCoding(transformedSubseqs);
-        break;
+            break;
         case paramcabac::TransformedParameters::TransformIdSubseq::MATCH_CODING:
             inverseTransformMatchCoding(transformedSubseqs);
-        break;
+            break;
         case paramcabac::TransformedParameters::TransformIdSubseq::RLE_CODING:
             inverseTransformRleCoding(subseqCfg, transformedSubseqs);
-        break;
+            break;
         case paramcabac::TransformedParameters::TransformIdSubseq::MERGE_CODING:
             inverseTransformMergeCoding(subseqCfg, transformedSubseqs);
-        break;
+            break;
         default:
             GABAC_DIE("Invalid subseq transforamtion");
-        break;
+            break;
     }
 
     // GABACIFY_LOG_TRACE << "Got " << transformedSequences->size() << "
     // sequences";
     // for (unsigned i = 0; i < transformedSubseqs->size(); ++i) {
-        // GABACIFY_LOG_TRACE << i << ": " << (*transformedSequences)[i].size()
-        // << " bytes";
+    // GABACIFY_LOG_TRACE << i << ": " << (*transformedSequences)[i].size()
+    // << " bytes";
     // }
 }
 
@@ -75,15 +74,15 @@ unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const Encodin
     if (subseqPayloadSize <= 0) return 0;
 
     // read number of symbols in descriptor subsequence
-    if(subseqCfg.getTokentypeFlag()) {
+    if (subseqCfg.getTokentypeFlag()) {
         subseqPayloadSizeUsed += gabac::StreamHandler::readU7(*ioConf.inputStream, numDescSubseqSymbols);
     } else {
         subseqPayloadSizeUsed += gabac::StreamHandler::readUInt(*ioConf.inputStream, numDescSubseqSymbols, 4);
     }
 
-    if(numDescSubseqSymbols > 0) {
-        if(ioConf.dependencyStream != nullptr) {
-            if(numDescSubseqSymbols != gabac::StreamHandler::readFull(*ioConf.dependencyStream, &dependency)) {
+    if (numDescSubseqSymbols > 0) {
+        if (ioConf.dependencyStream != nullptr) {
+            if (numDescSubseqSymbols != gabac::StreamHandler::readFull(*ioConf.dependencyStream, &dependency)) {
                 GABAC_DIE("Size mismatch between dependency and descriptor subsequence");
             }
         }
@@ -101,15 +100,17 @@ unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const Encodin
                 uint64_t numtrnsfSymbols = 0;
                 uint64_t trnsfSubseqPayloadSizeRemain = 0;
 
-                if(i < (numTrnsfSubseqsCfgs-1)) {
-                    subseqPayloadSizeUsed += gabac::StreamHandler::readUInt(*ioConf.inputStream, trnsfSubseqPayloadSizeRemain, 4);
+                if (i < (numTrnsfSubseqsCfgs - 1)) {
+                    subseqPayloadSizeUsed +=
+                        gabac::StreamHandler::readUInt(*ioConf.inputStream, trnsfSubseqPayloadSizeRemain, 4);
                 } else {
                     trnsfSubseqPayloadSizeRemain = subseqPayloadSize - subseqPayloadSizeUsed;
                 }
 
-                if(trnsfSubseqPayloadSizeRemain > 0) {
-                    if(numTrnsfSubseqsCfgs > 1) {
-                        subseqPayloadSizeUsed += gabac::StreamHandler::readUInt(*ioConf.inputStream, numtrnsfSymbols, 4);
+                if (trnsfSubseqPayloadSizeRemain > 0) {
+                    if (numTrnsfSubseqsCfgs > 1) {
+                        subseqPayloadSizeUsed +=
+                            gabac::StreamHandler::readUInt(*ioConf.inputStream, numtrnsfSymbols, 4);
                         trnsfSubseqPayloadSizeRemain -= 4;
                     } else {
                         numtrnsfSymbols = numDescSubseqSymbols;
@@ -117,14 +118,12 @@ unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const Encodin
 
                     if (numtrnsfSymbols <= 0) continue;
 
-                    gabac::StreamHandler::readBytes(*ioConf.inputStream,
-                                                    trnsfSubseqPayloadSizeRemain,
+                    gabac::StreamHandler::readBytes(*ioConf.inputStream, trnsfSubseqPayloadSizeRemain,
                                                     &decodedTransformedSubseq);
 
                     // Decoding
                     subseqPayloadSizeUsed += gabac::decodeTransformSubseq(subseqCfg.getTransformSubseqCfg(i),
-                                                                          numtrnsfSymbols,
-                                                                          &decodedTransformedSubseq,
+                                                                          numtrnsfSymbols, &decodedTransformedSubseq,
                                                                           (dependency.size()) ? &dependency : nullptr);
                     transformedSubseqs[i].swap(&(decodedTransformedSubseq));
                 }

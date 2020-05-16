@@ -10,7 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #ifdef ATOMIC_SZ_CTRS
-# include <atomic>
+#include <atomic>
 #endif
 #include <chrono>
 #include <cstdio>
@@ -33,9 +33,9 @@ namespace stats {
 // use an atomic type to increment the count to avoid data races.
 //
 #ifdef ATOMIC_SZ_CTRS
-    typedef std::atomic<off_t> stream_sz_t;
+typedef std::atomic<off_t> stream_sz_t;
 #else
-    typedef off_t stream_sz_t;
+typedef off_t stream_sz_t;
 #endif
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -115,8 +115,8 @@ class SamStats : virtual public PerfStats {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
 }  // namespace stats
+}  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------

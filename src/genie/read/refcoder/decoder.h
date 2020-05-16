@@ -9,17 +9,11 @@ namespace refcoder {
 
 class Decoder : public core::ReadDecoder {
    public:
-    Decoder() : core::ReadDecoder() {
+    Decoder() : core::ReadDecoder() {}
 
-    }
+    void flowIn(core::AccessUnitRaw&&, const util::Section&) override {}
 
-    void flowIn(core::AccessUnitRaw&& , const util::Section& ) override {
-
-    }
-
-    void dryIn() override {
-        dryOut();
-    }
+    void dryIn() override { dryOut(); }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -60,16 +60,17 @@ uint32_t pull32bigEndian(core::AccessUnitRaw::Subsequence& seq) {
     return ret;
 }
 
-std::vector<std::string> Decoder::process(core::AccessUnitRaw::Descriptor& desc)  {
+std::vector<std::string> Decoder::process(core::AccessUnitRaw::Descriptor& desc) {
     std::vector<std::string> ret;
     std::vector<SingleToken> oldRec;
-    while(!desc.getTokenType(0, TYPE_SEQ).end()) {
+    while (!desc.getTokenType(0, TYPE_SEQ).end()) {
         size_t cur_pos = 0;
 
         std::vector<SingleToken> rec;
 
         if (ret.empty()) {
-            UTILS_DIE_IF(Tokens(desc.getTokenType(0, TYPE_SEQ).get()) != Tokens::DIFF, "First token in AU must be DIFF");
+            UTILS_DIE_IF(Tokens(desc.getTokenType(0, TYPE_SEQ).get()) != Tokens::DIFF,
+                         "First token in AU must be DIFF");
             UTILS_DIE_IF(desc.getTokenType(0, (uint8_t)Tokens::DIFF).get() != 0, "First DIFF in AU must be 0");
         }
 
@@ -86,8 +87,7 @@ std::vector<std::string> Decoder::process(core::AccessUnitRaw::Descriptor& desc)
                 }
             } else if (type == Tokens::DIGITS || type == Tokens::DIGITS0) {
                 t.param = pull32bigEndian(desc.getTokenType(cur_pos, (uint8_t)type));
-            }
-            else if ((uint8_t)type < uint8_t(Tokens::MATCH)) {
+            } else if ((uint8_t)type < uint8_t(Tokens::MATCH)) {
                 t.param = desc.getTokenType(cur_pos, (uint8_t)type).pull();
             }
 

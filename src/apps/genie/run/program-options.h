@@ -41,11 +41,12 @@ class ProgramOptions {
     bool externalRef;
 
     size_t numberOfThreads;
-private:
+
+   private:
     void validate();
 };
 
-}
-}  // namespace dsg
+}  // namespace run
+}  // namespace genieapp
 
 #endif  // DSG_PROGRAMOPTIONS_H_

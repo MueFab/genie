@@ -32,7 +32,7 @@ class RawReference : public core::parameter::DataUnit {
 
     void addSequence(RawReferenceSequence&& ref);
 
-    void write(util::BitWriter& writer, genie::core::stats::PerfStats *stats = nullptr) const override;
+    void write(util::BitWriter& writer, genie::core::stats::PerfStats* stats = nullptr) const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

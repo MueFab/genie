@@ -17,7 +17,8 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-void transformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs) {
+void transformMergeCoding(const paramcabac::Subsequence& subseqCfg,
+                          std::vector<util::DataBlock>* const transformedSubseqs) {
     assert(transformedSubseqs != nullptr);
     const paramcabac::TransformedParameters& trnsfSubseqParams = subseqCfg.getTransformParameters();
     const uint16_t subseqCount = trnsfSubseqParams.getParam();
@@ -38,7 +39,7 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::vector<
     std::vector<uint64_t> trnsSubseqMasks(subseqCount, 0);
     for (uint64_t ts = 0; ts < subseqCount; ts++) {
         const uint8_t codingSubsymSize = trnsfCfgs[ts].getSupportValues().getCodingSubsymSize();
-        trnsSubseqMasks[ts] = (1u<<codingSubsymSize)-1;
+        trnsSubseqMasks[ts] = (1u << codingSubsymSize) - 1;
         (*transformedSubseqs)[ts].setWordSize(4);
         (*transformedSubseqs)[ts].resize(symbolsCount);
     }
@@ -55,7 +56,7 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::vector<
         }
 
         for (uint64_t ts = 0; ts < subseqCount; ts++) {
-            uint64_t trnsfSymbol = (symbolValue>>subseqShiftSizes[ts]) & trnsSubseqMasks[ts];
+            uint64_t trnsfSymbol = (symbolValue >> subseqShiftSizes[ts]) & trnsSubseqMasks[ts];
             if (isNegative && trnsfSymbol != 0) {
                 int64_t trnsfSymbolSigned = -(trnsfSymbol);
                 trnsfSymbol = static_cast<uint64_t>(trnsfSymbolSigned);
@@ -69,7 +70,8 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::vector<
     symbols.clear();
 }
 
-void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs) {
+void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg,
+                                 std::vector<util::DataBlock>* const transformedSubseqs) {
     const paramcabac::TransformedParameters& trnsfSubseqParams = subseqCfg.getTransformParameters();
     const uint16_t subseqCount = trnsfSubseqParams.getParam();
     const std::vector<uint8_t> subseqShiftSizes = trnsfSubseqParams.getMergeCodingShiftSizes();

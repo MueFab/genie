@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <iostream>
 #include <genie/core/stats/perf-stats.h>
+#include <iostream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -16,9 +16,8 @@ namespace stats {
 // ---------------------------------------------------------------------------------------------------------------------
 
 // For debugging (but always enabled)
-__attribute__((noinline))
-void descNotHandled(int id, size_t size) {
-    std::cerr << "Block desc #" << id << " of size " << size << " unaccounted for."  << std::endl;
+__attribute__((noinline)) void descNotHandled(int id, size_t size) {
+    std::cerr << "Block desc #" << id << " of size " << size << " unaccounted for." << std::endl;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -52,7 +51,7 @@ FastqStats::FastqStats(bool _decompression) : PerfStats(_decompression) {
     cmprs_qual_sz = 0;
 }
 
-FastqStats::~FastqStats(void) { }
+FastqStats::~FastqStats(void) {}
 
 void FastqStats::recordMgbStreams(const std::vector<genie::format::mgb::Block> &blocks) {
     size_t id_sz = 0;
@@ -66,9 +65,15 @@ void FastqStats::recordMgbStreams(const std::vector<genie::format::mgb::Block> &
             continue;
         }
         switch (block.getDescriptorID()) {
-            case (int)GenDesc::RNAME:  id_sz += size; break;
-            case (int)GenDesc::UREADS: seq_sz += size; break;
-            case (int)GenDesc::QV:     qual_sz += size; break;
+            case (int)GenDesc::RNAME:
+                id_sz += size;
+                break;
+            case (int)GenDesc::UREADS:
+                seq_sz += size;
+                break;
+            case (int)GenDesc::QV:
+                qual_sz += size;
+                break;
             default:
                 descNotHandled(block.getDescriptorID(), size);
                 break;
@@ -83,7 +88,7 @@ void FastqStats::recordMgbStreams(const std::vector<genie::format::mgb::Block> &
 }
 
 void FastqStats::printStats(void) {
-    if (! decompression) {
+    if (!decompression) {
         std::cerr << "#FASTQ records: " << num_recs << std::endl;
 
         std::cerr.precision(3);
@@ -114,10 +119,9 @@ void FastqStats::printStats(void) {
         std::cerr << "Combine AUs:    " << std::chrono::duration_cast<std::chrono::milliseconds>(combine_t).count()
                   << " msec" << std::endl;
 
-        std::cerr << "Total time:     " << std::chrono::duration_cast<std::chrono::milliseconds>(total_t).count() << " msec"
-                  << std::endl;
-    }
-    else {
+        std::cerr << "Total time:     " << std::chrono::duration_cast<std::chrono::milliseconds>(total_t).count()
+                  << " msec" << std::endl;
+    } else {
         std::cerr << "<Decompression stats not written yet>" << std::endl;
     }
 }
@@ -172,18 +176,34 @@ void SamStats::recordMgbStreams(const std::vector<genie::format::mgb::Block> &bl
             continue;
         }
         switch (block.getDescriptorID()) {
-            //case (int)GenDesc::qname:  qname_sz += size; break;
-            case (int)GenDesc::FLAGS:  flag_sz += size; break;
-            case (int)GenDesc::RNAME:  rname_sz += size; break;
-            case (int)GenDesc::POS:    pos_sz += size; break;
-            case (int)GenDesc::MSCORE: mapq_sz += size; break;
-            case (int)GenDesc::CLIPS:  cigar_sz += size; break;
-            //case (int)GenDesc::rnext:  rnext_sz += size; break;
-            //case (int)GenDesc::pnext:  pnext_sz += size; break;
-            //case (int)GenDesc::tlen:   tlen_sz += size; break;
-            case (int)GenDesc::UREADS: seq_sz += size; break;
-            case (int)GenDesc::QV:     qual_sz += size; break;
-            case (int)GenDesc::RLEN:   rlen_sz += size; break;
+            // case (int)GenDesc::qname:  qname_sz += size; break;
+            case (int)GenDesc::FLAGS:
+                flag_sz += size;
+                break;
+            case (int)GenDesc::RNAME:
+                rname_sz += size;
+                break;
+            case (int)GenDesc::POS:
+                pos_sz += size;
+                break;
+            case (int)GenDesc::MSCORE:
+                mapq_sz += size;
+                break;
+            case (int)GenDesc::CLIPS:
+                cigar_sz += size;
+                break;
+            // case (int)GenDesc::rnext:  rnext_sz += size; break;
+            // case (int)GenDesc::pnext:  pnext_sz += size; break;
+            // case (int)GenDesc::tlen:   tlen_sz += size; break;
+            case (int)GenDesc::UREADS:
+                seq_sz += size;
+                break;
+            case (int)GenDesc::QV:
+                qual_sz += size;
+                break;
+            case (int)GenDesc::RLEN:
+                rlen_sz += size;
+                break;
             default:
                 descNotHandled(block.getDescriptorID(), size);
                 break;
@@ -211,7 +231,7 @@ void SamStats::recordMgbStreams(const std::vector<genie::format::mgb::Block> &bl
 }
 
 void SamStats::printStats(void) {
-    if (! decompression) {
+    if (!decompression) {
         std::cerr << "#SAM records: " << num_recs << std::endl;
 
         std::cerr.precision(3);
@@ -239,12 +259,11 @@ void SamStats::printStats(void) {
         std::cerr << "qv:       compressed " << orig_qual_sz << " bytes to " << cmprs_qual_sz << " bytes ("
                   << ((double)orig_qual_sz) / cmprs_qual_sz << "x)" << std::endl;
 
-        off_t orig_ovhd_sz = orig_total_sz - orig_qname_sz - orig_flag_sz - orig_rname_sz
-                           - orig_pos_sz - orig_mapq_sz - orig_cigar_sz - orig_rnext_sz
-                           - orig_pnext_sz - orig_tlen_sz - orig_seq_sz - orig_qual_sz;
-        off_t cmprs_ovhd_sz = cmprs_total_sz - cmprs_qname_sz - cmprs_flag_sz - cmprs_rname_sz
-                           - cmprs_pos_sz - cmprs_mapq_sz - cmprs_cigar_sz - cmprs_rnext_sz
-                           - cmprs_pnext_sz - cmprs_tlen_sz - cmprs_seq_sz - cmprs_qual_sz;
+        off_t orig_ovhd_sz = orig_total_sz - orig_qname_sz - orig_flag_sz - orig_rname_sz - orig_pos_sz - orig_mapq_sz -
+                             orig_cigar_sz - orig_rnext_sz - orig_pnext_sz - orig_tlen_sz - orig_seq_sz - orig_qual_sz;
+        off_t cmprs_ovhd_sz = cmprs_total_sz - cmprs_qname_sz - cmprs_flag_sz - cmprs_rname_sz - cmprs_pos_sz -
+                              cmprs_mapq_sz - cmprs_cigar_sz - cmprs_rnext_sz - cmprs_pnext_sz - cmprs_tlen_sz -
+                              cmprs_seq_sz - cmprs_qual_sz;
         std::cerr << "Overhead: " << orig_ovhd_sz << " bytes (" << 100.0 * orig_ovhd_sz / orig_total_sz << "%) / "
                   << cmprs_ovhd_sz << " bytes (" << 100.0 * cmprs_ovhd_sz / cmprs_total_sz << "%)" << std::endl;
         std::cerr << "Total:    compressed " << orig_total_sz << " bytes to " << cmprs_total_sz << " bytes ("
@@ -263,10 +282,9 @@ void SamStats::printStats(void) {
         std::cerr << "Combine AUs:    " << std::chrono::duration_cast<std::chrono::milliseconds>(combine_t).count()
                   << " msec" << std::endl;
 
-        std::cerr << "Total time:     " << std::chrono::duration_cast<std::chrono::milliseconds>(total_t).count() << " msec"
-                  << std::endl;
-    }
-    else {
+        std::cerr << "Total time:     " << std::chrono::duration_cast<std::chrono::milliseconds>(total_t).count()
+                  << " msec" << std::endl;
+    } else {
         std::cerr << "<Decompression stats not written yet>" << std::endl;
     }
 }

@@ -77,7 +77,7 @@ class QualityValues1 : public core::parameter::QualityValues {
         auto codebook = QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);
         set.addCodeBook(std::move(codebook));
 
-        if(type == core::record::ClassType::CLASS_I || type == core::record::ClassType::CLASS_HM) {
+        if (type == core::record::ClassType::CLASS_I || type == core::record::ClassType::CLASS_HM) {
             codebook = paramqv1::QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);
             set.addCodeBook(std::move(codebook));
         }
