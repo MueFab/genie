@@ -21,7 +21,7 @@ GabacSeqConfSet::GabacSeqConfSet() {
     // One configuration per subsequence
     for (const auto &desc : core::getDescriptors()) {
         conf.emplace_back();
-        const GenomicDescriptorProperties& descProp = getDescriptor(desc.id);
+        const GenomicDescriptorProperties &descProp = getDescriptor(desc.id);
         for (size_t i = 0; i < descProp.subseqs.size(); ++i) {
             conf.back().emplace_back(getEncoderConfigManual(descProp.subseqs[i].id));
         }
@@ -71,7 +71,7 @@ void GabacSeqConfSet::loadParameters(const core::parameter::ParameterSet &parame
     using namespace entropy::paramcabac;
 
     for (const auto &desc : core::getDescriptors()) {
-        if(core::getDescriptor(desc.id).tokentype) {
+        if (core::getDescriptor(desc.id).tokentype) {
             auto &descConfig = loadDescriptorDecoderCfg<entropy::paramcabac::DecoderTokenType>(parameterSet, desc.id);
             for (const auto &subdesc : getDescriptor(desc.id).subseqs) {
                 auto subseqCfg = descConfig.getSubsequenceCfg(subdesc.id.second);
@@ -88,7 +88,6 @@ void GabacSeqConfSet::loadParameters(const core::parameter::ParameterSet &parame
         }
     }
 }
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 

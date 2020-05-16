@@ -516,7 +516,6 @@ void generate_qual_id_pe(const std::string &temp_dir, const pe_block_data &bdata
 }
 
 core::AccessUnitRaw generate_read_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num) {
-
     core::parameter::ParameterSet ps(cur_block_num, cur_block_num, core::parameter::DataUnit::DatasetType::NON_ALIGNED,
                                      core::AlphabetID::ACGTN, 0, data.cp.paired_end, false, data.cp.preserve_quality, 0,
                                      false, false);

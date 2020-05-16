@@ -12,10 +12,9 @@
 #include <genie/util/selector.h>
 #include <genie/util/source.h>
 #include "access-unit-raw.h"
-#include "qv-decoder.h"
-#include "record/record.h"
 #include "name-decoder.h"
 #include "qv-decoder.h"
+#include "record/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,19 +26,22 @@ namespace core {
  */
 class ReadDecoder : public util::Source<record::Chunk>, public util::Drain<AccessUnitRaw> {
    protected:
-    genie::util::SideSelector<genie::core::QVDecoder, std::vector<std::string>, const genie::core::parameter::QualityValues&,
-        const std::vector<std::string>&, genie::core::AccessUnitRaw::Descriptor&>*
-        qvcoder;
+    genie::util::SideSelector<genie::core::QVDecoder, std::vector<std::string>,
+                              const genie::core::parameter::QualityValues&, const std::vector<std::string>&,
+                              genie::core::AccessUnitRaw::Descriptor&>* qvcoder;
     genie::util::SideSelector<genie::core::NameDecoder, std::vector<std::string>,
-        genie::core::AccessUnitRaw::Descriptor&>* namecoder;
+                              genie::core::AccessUnitRaw::Descriptor&>* namecoder;
+
    public:
-    virtual void setQVCoder(genie::util::SideSelector<genie::core::QVDecoder, std::vector<std::string>, const genie::core::parameter::QualityValues&,
-        const std::vector<std::string>&, genie::core::AccessUnitRaw::Descriptor&>* coder) {
+    virtual void setQVCoder(
+        genie::util::SideSelector<genie::core::QVDecoder, std::vector<std::string>,
+                                  const genie::core::parameter::QualityValues&, const std::vector<std::string>&,
+                                  genie::core::AccessUnitRaw::Descriptor&>* coder) {
         qvcoder = coder;
     }
 
     virtual void setNameCoder(genie::util::SideSelector<genie::core::NameDecoder, std::vector<std::string>,
-        genie::core::AccessUnitRaw::Descriptor&>* coder) {
+                                                        genie::core::AccessUnitRaw::Descriptor&>* coder) {
         namecoder = coder;
     }
     /**
@@ -47,9 +49,7 @@ class ReadDecoder : public util::Source<record::Chunk>, public util::Drain<Acces
      */
     ~ReadDecoder() override = default;
 
-    void skipIn(const util::Section& sec) override {
-        skipOut(sec);
-    }
+    void skipIn(const util::Section& sec) override { skipOut(sec); }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

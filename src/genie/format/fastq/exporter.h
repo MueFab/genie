@@ -25,30 +25,30 @@ namespace fastq {
  * @brief Module to export MPEG-G record to fastq files
  */
 class Exporter : public util::Drain<core::record::Chunk> {
-    std::vector<std::ostream *> file;      //!< @brief Support for paired output files
-    util::OrderedLock lock;                //!< @brief Lock to ensure in order execution
-    genie::core::stats::FastqStats *stats; //!< @brief Stats collector (null => don't collect)
+    std::vector<std::ostream *> file;       //!< @brief Support for paired output files
+    util::OrderedLock lock;                 //!< @brief Lock to ensure in order execution
+    genie::core::stats::FastqStats *stats;  //!< @brief Stats collector (null => don't collect)
 
    public:
     /**
      * @brief Unpaired mode
      * @param _file_1 Output file
      */
-    explicit Exporter(std::ostream &_file_1,  genie::core::stats::FastqStats *_stats = nullptr);
+    explicit Exporter(std::ostream &_file_1, genie::core::stats::FastqStats *_stats = nullptr);
 
     /**
      * @brief Paired mode
      * @param _file_1 Output file #1
      * @param _file_2 Output file #2
      */
-    Exporter(std::ostream &_file_1, std::ostream &_file_2,  genie::core::stats::FastqStats *_stats = nullptr);
+    Exporter(std::ostream &_file_1, std::ostream &_file_2, genie::core::stats::FastqStats *_stats = nullptr);
 
     /**
      * @brief Process one chunk of MPEGG records
      * @param records Input records
      * @param id Block identifier (for multithreading)
      */
-    void flowIn(core::record::Chunk &&records, const util::Section& id) override;
+    void flowIn(core::record::Chunk &&records, const util::Section &id) override;
 
     /**
      * @brief Accepts end of file marker

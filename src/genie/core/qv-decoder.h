@@ -8,8 +8,9 @@ namespace core {
 
 class QVDecoder {
    public:
-    virtual std::vector<std::string> process(const parameter::QualityValues& param, const std::vector<std::string>& ecigar,
-                               AccessUnitRaw::Descriptor& desc) = 0;
+    virtual std::vector<std::string> process(const parameter::QualityValues& param,
+                                             const std::vector<std::string>& ecigar,
+                                             AccessUnitRaw::Descriptor& desc) = 0;
     /**
      * @Brief For polymorphic destruction
      */

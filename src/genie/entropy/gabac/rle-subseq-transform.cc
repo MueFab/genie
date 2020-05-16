@@ -14,7 +14,8 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-void transformRleCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs) {
+void transformRleCoding(const paramcabac::Subsequence &subseqCfg,
+                        std::vector<util::DataBlock> *const transformedSubseqs) {
     assert(transformedSubseqs != nullptr);
     const uint8_t guard = subseqCfg.getTransformParameters().getParam();
     assert(guard > 0);
@@ -25,7 +26,7 @@ void transformRleCoding(const paramcabac::Subsequence& subseqCfg, std::vector<ut
     (*transformedSubseqs)[0].clear();
     transformedSubseqs->resize(2);
 
-    util::DataBlock *const lengths   = &((*transformedSubseqs)[0]);
+    util::DataBlock *const lengths = &((*transformedSubseqs)[0]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
     lengths->setWordSize(4);
     rawValues->setWordSize(4);
@@ -64,7 +65,7 @@ void transformRleCoding(const paramcabac::Subsequence& subseqCfg, std::vector<ut
         }
 
         if (runValue > 0) {
-            lengths->push_back(runValue - 1); // non-guard run-value is coded as lengthValue-1
+            lengths->push_back(runValue - 1);  // non-guard run-value is coded as lengthValue-1
         }
 
         runValue = 0;
@@ -73,7 +74,8 @@ void transformRleCoding(const paramcabac::Subsequence& subseqCfg, std::vector<ut
     symbols.clear();
 }
 
-void inverseTransformRleCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs) {
+void inverseTransformRleCoding(const paramcabac::Subsequence &subseqCfg,
+                               std::vector<util::DataBlock> *const transformedSubseqs) {
     assert(transformedSubseqs != nullptr);
 
     if ((*transformedSubseqs).size() != 2) {
@@ -84,7 +86,7 @@ void inverseTransformRleCoding(const paramcabac::Subsequence& subseqCfg, std::ve
     assert(guard > 0);
 
     // Prepare internal and the output data structures
-    util::DataBlock *const lengths   = &((*transformedSubseqs)[0]);
+    util::DataBlock *const lengths = &((*transformedSubseqs)[0]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
     util::DataBlock symbols(0, rawValues->getWordSize());
 
@@ -104,7 +106,7 @@ void inverseTransformRleCoding(const paramcabac::Subsequence& subseqCfg, std::ve
             if (runValue == guard) {
                 totalLengthValue += runValue;
             } else {
-                totalLengthValue += runValue + 1; // non-guard run-value is coded as lengthValue-1
+                totalLengthValue += runValue + 1;  // non-guard run-value is coded as lengthValue-1
                 break;
             }
         }

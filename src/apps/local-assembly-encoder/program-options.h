@@ -21,6 +21,7 @@ class ProgramOptions {
     bool discardQualities;
     bool discardNames;
     bool stats = false;
+
    private:
     void processCommandLine(int argc, char *argv[]);
 };

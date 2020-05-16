@@ -24,7 +24,9 @@ DescriptorSubseqCfg::DescriptorSubseqCfg() : class_specific_dec_cfg_flag(false),
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorSubseqCfg::DescriptorSubseqCfg(const DescriptorSubseqCfg& cfg) : class_specific_dec_cfg_flag(false) { *this = cfg; }
+DescriptorSubseqCfg::DescriptorSubseqCfg(const DescriptorSubseqCfg& cfg) : class_specific_dec_cfg_flag(false) {
+    *this = cfg;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -91,7 +93,9 @@ const Descriptor& DescriptorSubseqCfg::get() const { return *descriptor_configur
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const Descriptor& DescriptorSubseqCfg::getClassSpecific(uint8_t index) const { return *descriptor_configurations[index]; }
+const Descriptor& DescriptorSubseqCfg::getClassSpecific(uint8_t index) const {
+    return *descriptor_configurations[index];
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

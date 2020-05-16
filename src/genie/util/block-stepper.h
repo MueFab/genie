@@ -23,8 +23,8 @@ struct BlockStepper {
     uint8_t *end;
     uint8_t wordSize;
 
-    explicit BlockStepper(uint8_t *_cur = nullptr, uint8_t *_end = nullptr, uint8_t _wordSize = 1) :
-            curr(_cur), end(_end), wordSize(_wordSize) {}
+    explicit BlockStepper(uint8_t *_cur = nullptr, uint8_t *_end = nullptr, uint8_t _wordSize = 1)
+        : curr(_cur), end(_end), wordSize(_wordSize) {}
 
     bool isValid() const;
 

@@ -14,7 +14,7 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Exporter::Exporter(std::ostream* _file, genie::core::stats::PerfStats *_stats) : writer(_file), stats(_stats) {}
+Exporter::Exporter(std::ostream* _file, genie::core::stats::PerfStats* _stats) : writer(_file), stats(_stats) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +27,8 @@ void Exporter::flowIn(core::AccessUnitPayload&& t, const util::Section& id) {
                                                           core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY) {
         type = core::record::ClassType::CLASS_I;
     }
-    mgb::AccessUnit au(id.start, id.start, type, data.getRecordNum() * data.getParameters().getNumberTemplateSegments(), core::parameter::DataUnit::DatasetType::ALIGNED, 32, 32, 0);
+    mgb::AccessUnit au(id.start, id.start, type, data.getRecordNum() * data.getParameters().getNumberTemplateSegments(),
+                       core::parameter::DataUnit::DatasetType::ALIGNED, 32, 32, 0);
     /*au.setAuTypeCfg(
         AuTypeCfg(data.getReference(), data.getMinPos(), data.getMaxPos(), data.getParameters().getPosSize()));*/
     for (size_t descriptor = 0; descriptor < core::getDescriptors().size(); ++descriptor) {

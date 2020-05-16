@@ -24,7 +24,7 @@ core::AccessUnitPayload::DescriptorPayload GabacCompressor::compressTokens(const
         }
     }
 
-    if(num_streams == 0) {
+    if (num_streams == 0) {
         return core::AccessUnitPayload::DescriptorPayload(desc.getID());
     }
 
@@ -41,7 +41,7 @@ core::AccessUnitPayload::DescriptorPayload GabacCompressor::compressTokens(const
 
     stream.flush(&block);
     core::AccessUnitPayload::DescriptorPayload ret(desc.getID());
-    ret.add(core::AccessUnitPayload::SubsequencePayload({desc.getID(),0}, std::move(block)));
+    ret.add(core::AccessUnitPayload::SubsequencePayload({desc.getID(), 0}, std::move(block)));
     return ret;
 }
 

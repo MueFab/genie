@@ -13,8 +13,8 @@
 #include <genie/util/make-unique.h>
 #include <memory>
 #include "binarization.h"
-#include "support_values.h"
 #include "state_vars.h"
+#include "support_values.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,8 +29,7 @@ class TransformedSubSeq {
    public:
     TransformedSubSeq();
 
-    TransformedSubSeq(SupportValues::TransformIdSubsym _transform_ID_subsym,
-                      SupportValues&& _support_values,
+    TransformedSubSeq(SupportValues::TransformIdSubsym _transform_ID_subsym, SupportValues&& _support_values,
                       Binarization&& _cabac_binarization,
                       const core::GenSubIndex _subsequence_ID = core::GenSub::POS_MAPPING_FIRST,
                       const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
@@ -51,17 +50,11 @@ class TransformedSubSeq {
 
     const StateVars& getStateVars() const;
 
-    void setSubsequenceID(const core::GenSubIndex _subsequence_ID) {
-        subsequence_ID = _subsequence_ID;
-    }
+    void setSubsequenceID(const core::GenSubIndex _subsequence_ID) { subsequence_ID = _subsequence_ID; }
 
-    core::AlphabetID getAlphabetID() const {
-        return alphabet_ID;
-    }
+    core::AlphabetID getAlphabetID() const { return alphabet_ID; }
 
-    void setAlphabetID(core::AlphabetID _alphabet_ID) {
-        alphabet_ID = _alphabet_ID;
-    }
+    void setAlphabetID(core::AlphabetID _alphabet_ID) { alphabet_ID = _alphabet_ID; }
 
    private:
     SupportValues::TransformIdSubsym transform_ID_subsym;  //!< : 3; Line 9

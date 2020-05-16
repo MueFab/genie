@@ -12,7 +12,7 @@ namespace gabac {
 
 ContextModel::ContextModel(unsigned char initState) {
     unsigned char valMps = (initState >= 64);
-    m_state = ((valMps ? (initState - 64) : (63 - initState))<<1) + valMps;
+    m_state = ((valMps ? (initState - 64) : (63 - initState)) << 1) + valMps;
 }
 
 ContextModel::~ContextModel() = default;

@@ -11,21 +11,17 @@
 #include <utility>
 #include <vector>
 
-#include <genie/entropy/gabac/gabac.h>
 #include <genie/core/constants.h>
+#include <genie/entropy/gabac/gabac.h>
 
 namespace gabacify {
 
 //------------------------------------------------------------------------------
 
 void code(const std::string &inputFilePath,
-          //RESTRUCT_DISABLE const std::string &configurationFilePath,
-          const std::string &outputFilePath,
-          size_t blocksize,
-          uint8_t descID,
-          uint8_t subseqID,
-          bool decode,
-          const std::string& dependencyFilePath) {
+          // RESTRUCT_DISABLE const std::string &configurationFilePath,
+          const std::string &outputFilePath, size_t blocksize, uint8_t descID, uint8_t subseqID, bool decode,
+          const std::string &dependencyFilePath) {
     std::ifstream inputFile;
     std::ifstream dependencyFile;
     std::ofstream outputFile;
@@ -65,11 +61,11 @@ void code(const std::string &inputFilePath,
         logstream = &nullstream;
     }
 
-    genie::entropy::gabac::IOConfiguration ioconf = {istream, dstream, ostream, blocksize, logstream,
-                                                     genie::entropy::gabac::IOConfiguration::LogLevel::INFO};
+    genie::entropy::gabac::IOConfiguration ioconf = {
+        istream, dstream, ostream, blocksize, logstream, genie::entropy::gabac::IOConfiguration::LogLevel::INFO};
 
-    genie::core::GenSubIndex genieSubseqID = (genie::core::GenSubIndex)
-            std::pair<genie::core::GenDesc, uint8_t>((genie::core::GenDesc) descID, subseqID);
+    genie::core::GenSubIndex genieSubseqID =
+        (genie::core::GenSubIndex)std::pair<genie::core::GenDesc, uint8_t>((genie::core::GenDesc)descID, subseqID);
 
     genie::entropy::gabac::run(ioconf, genie::entropy::gabac::getEncoderConfigManual(genieSubseqID), decode);
 

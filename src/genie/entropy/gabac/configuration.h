@@ -23,7 +23,7 @@ namespace gabac {
  * @brief Specifies which gabac transformations to execute
  */
 struct EncodingConfiguration {
-    public:
+   public:
     /**
      * @brief Create default config
      */
@@ -61,15 +61,11 @@ struct EncodingConfiguration {
 
     uint8_t getSubseqWordSize() const;
 
-    const paramcabac::Subsequence& getSubseqConfig() const {
-        return subseqCfg;
-    }
+    const paramcabac::Subsequence& getSubseqConfig() const { return subseqCfg; }
 
-    void setSubseqConfig(paramcabac::Subsequence &&_subseqCfg) {
-        subseqCfg = std::move(_subseqCfg);
-    }
+    void setSubseqConfig(paramcabac::Subsequence&& _subseqCfg) { subseqCfg = std::move(_subseqCfg); }
 
-    private:
+   private:
     paramcabac::Subsequence subseqCfg;
 };
 
@@ -77,11 +73,11 @@ struct EncodingConfiguration {
  * @brief Specifies where to read and write.
  */
 struct IOConfiguration {
-    std::istream* inputStream;  /**< @brief Where to read from */
-    std::istream* dependencyStream;  /**< @brief Where to read from */
-    std::ostream* outputStream; /**< @brief Where to write to */
-    size_t blocksize;           /**< @brief How many bytes to read at once. Put 0 to read
-                                   all in one go */
+    std::istream* inputStream;      /**< @brief Where to read from */
+    std::istream* dependencyStream; /**< @brief Where to read from */
+    std::ostream* outputStream;     /**< @brief Where to write to */
+    size_t blocksize;               /**< @brief How many bytes to read at once. Put 0 to read
+                                       all in one go */
 
     std::ostream* logStream; /**< @brief Where to write logging information*/
 

@@ -21,12 +21,11 @@ Subsequence::Subsequence()
     : Subsequence(TransformedParameters(), 0, false, std::vector<TransformedSubSeq>({TransformedSubSeq()})) {}
 
 Subsequence::Subsequence(uint16_t _descriptor_subsequence_ID, bool _tokentypeFlag)
-    : Subsequence(TransformedParameters(), _descriptor_subsequence_ID, _tokentypeFlag, std::vector<TransformedSubSeq>({TransformedSubSeq()})) {}
+    : Subsequence(TransformedParameters(), _descriptor_subsequence_ID, _tokentypeFlag,
+                  std::vector<TransformedSubSeq>({TransformedSubSeq()})) {}
 
-Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters,
-                         uint16_t _descriptor_subsequence_ID,
-                         bool _tokentypeFlag,
-                         std::vector<TransformedSubSeq>&& _transformSubseq_cfgs)
+Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters, uint16_t _descriptor_subsequence_ID,
+                         bool _tokentypeFlag, std::vector<TransformedSubSeq>&& _transformSubseq_cfgs)
     : descriptor_subsequence_ID(),
       tokentypeFlag(_tokentypeFlag),
       transform_subseq_parameters(std::move(_transform_subseq_parameters)) {
@@ -34,7 +33,7 @@ Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters,
         descriptor_subsequence_ID = _descriptor_subsequence_ID;
     }
 
-    if(_transformSubseq_cfgs.size() == transform_subseq_parameters.getNumStreams()) {
+    if (_transformSubseq_cfgs.size() == transform_subseq_parameters.getNumStreams()) {
         transformSubseq_cfgs = std::move(_transformSubseq_cfgs);
     }
 }

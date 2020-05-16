@@ -43,8 +43,8 @@ class GabacSeqConfSet {
      * input parameter set
      */
     template <typename T>
-    static const T &loadDescriptorDecoderCfg(
-        const GabacSeqConfSet::ParameterSet &parameterSet, core::GenDesc descriptor_id) {
+    static const T &loadDescriptorDecoderCfg(const GabacSeqConfSet::ParameterSet &parameterSet,
+                                             core::GenDesc descriptor_id) {
         using namespace entropy::paramcabac;
 
         auto &curDesc = parameterSet.getDescriptor(descriptor_id);
@@ -65,10 +65,10 @@ class GabacSeqConfSet {
      * @param sub - identifies descriptor subseuqence
      * @return Gabac configuration
      */
-    const gabac::EncodingConfiguration& getConfAsGabac(core::GenSubIndex sub) const;
+    const gabac::EncodingConfiguration &getConfAsGabac(core::GenSubIndex sub) const;
 
-    gabac::EncodingConfiguration& getConfAsGabac(core::GenSubIndex sub) {
-        if(getDescriptor(sub.first).tokentype) {
+    gabac::EncodingConfiguration &getConfAsGabac(core::GenSubIndex sub) {
+        if (getDescriptor(sub.first).tokentype) {
             return conf[uint8_t(sub.first)][0];
         } else {
             return conf[uint8_t(sub.first)][uint8_t(sub.second)];
@@ -92,17 +92,17 @@ class GabacSeqConfSet {
      * @brief Store the complete set of gabac configurations in an MPEG-G parameter set
      * @param parameterSet Output object
      */
-    void storeParameters(ParameterSet& parameterSet) const;
+    void storeParameters(ParameterSet &parameterSet) const;
 
     /**
      * @brief Load a complete set of gabac configurations to the internal memory of gabac configurations
      * @param parameterSet Input object
      */
-    void loadParameters(const ParameterSet& parameterSet);
+    void loadParameters(const ParameterSet &parameterSet);
 
     template <typename T>
-    void fillDecoder(const core::GenomicDescriptorProperties& desc, T& decoder_config) const {
-        for (const auto& subdesc : desc.subseqs) {
+    void fillDecoder(const core::GenomicDescriptorProperties &desc, T &decoder_config) const {
+        for (const auto &subdesc : desc.subseqs) {
             auto subseqCfg = getConfAsGabac(subdesc.id).getSubseqConfig();
             decoder_config.setSubsequenceCfg(subdesc.id.second, std::move(subseqCfg));
         }

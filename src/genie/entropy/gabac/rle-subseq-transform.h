@@ -7,17 +7,19 @@
 #ifndef GABAC_RLE_CODING_H_
 #define GABAC_RLE_CODING_H_
 
-#include <cstdint>
 #include <genie/entropy/paramcabac/subsequence.h>
 #include <genie/util/data-block.h>
+#include <cstdint>
 
 namespace genie {
 namespace entropy {
 namespace gabac {
 
-void transformRleCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs);
+void transformRleCoding(const paramcabac::Subsequence& subseqCfg,
+                        std::vector<util::DataBlock>* const transformedSubseqs);
 
-void inverseTransformRleCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs);
+void inverseTransformRleCoding(const paramcabac::Subsequence& subseqCfg,
+                               std::vector<util::DataBlock>* const transformedSubseqs);
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie

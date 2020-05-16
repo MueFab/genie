@@ -75,7 +75,7 @@ Record::Record() : Record("", 0, "", 0, 0, "", "", 0, 0, "", "") {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Record::Record(const std::string& string, genie::core::stats::SamStats *stats) {
+Record::Record(const std::string& string, genie::core::stats::SamStats* stats) {
     auto tokens = util::tokenize(string, '\t');
     UTILS_DIE_IF(tokens.size() < 11, "Invalid SAM record");
     qname = tokens[0];
@@ -93,7 +93,7 @@ Record::Record(const std::string& string, genie::core::stats::SamStats *stats) {
 
     if (stats != nullptr) {
         stats->num_recs++;
-        stats->orig_total_sz += string.size() + 1; // +1 for newline
+        stats->orig_total_sz += string.size() + 1;  // +1 for newline
         stats->orig_qname_sz += qname.size();
         stats->orig_flag_sz += tokens[1].size();
         stats->orig_rname_sz += rname.size();

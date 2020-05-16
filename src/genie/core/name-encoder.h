@@ -32,12 +32,11 @@ class NameEncoder {
     ~NameEncoder() = default;
 };
 
-class NameEncoderNone : public NameEncoder{
+class NameEncoderNone : public NameEncoder {
    public:
     core::AccessUnitRaw::Descriptor process(const record::Chunk&) override {
         return core::AccessUnitRaw::Descriptor(GenDesc::RNAME);
     }
-
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

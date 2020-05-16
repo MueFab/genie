@@ -15,7 +15,7 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Importer::Importer(std::istream& _file, genie::core::stats::PerfStats *_stats) : reader(_file), stats(_stats) {}
+Importer::Importer(std::istream& _file, genie::core::stats::PerfStats* _stats) : reader(_file), stats(_stats) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

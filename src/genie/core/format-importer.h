@@ -25,16 +25,16 @@ namespace core {
 /**
  * @brief Interface for importers of various file formats. Note that each importer has to convert to mpegg-records
  */
-class FormatImporter : public util::OriginalSource, public util::Source<record::Chunk>{
+class FormatImporter : public util::OriginalSource, public util::Source<record::Chunk> {
    private:
     std::mutex lock;
     genie::core::Classifier* classifier;
+
    protected:
     virtual bool pumpRetrieve(genie::core::Classifier* _classifier) = 0;
+
    public:
-    void setClassifier(genie::core::Classifier* _classifier) {
-        classifier = _classifier;
-    }
+    void setClassifier(genie::core::Classifier* _classifier) { classifier = _classifier; }
     bool pump(size_t& id) override {
         genie::core::record::Chunk chunk;
         util::Section sec{};
@@ -47,11 +47,11 @@ class FormatImporter : public util::OriginalSource, public util::Source<record::
                 id += chunk.size();
             } else {
                 bool dataLeft = pumpRetrieve(classifier);
-                if(!dataLeft && !flushing) {
+                if (!dataLeft && !flushing) {
                     classifier->flush();
                     return true;
                 }
-                if(!dataLeft && flushing) {
+                if (!dataLeft && flushing) {
                     return false;
                 }
             }

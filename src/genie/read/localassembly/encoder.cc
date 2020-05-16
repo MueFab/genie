@@ -177,8 +177,7 @@ void Encoder::dryIn() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder(uint32_t _cr_buf_max_size, bool _debug)
-    : debug(_debug), cr_buf_max_size(_cr_buf_max_size) {}
+Encoder::Encoder(uint32_t _cr_buf_max_size, bool _debug) : debug(_debug), cr_buf_max_size(_cr_buf_max_size) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

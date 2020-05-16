@@ -94,7 +94,7 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
         std::vector<uint32_t> block_start, block_end;
         {
             se_data data;
-            loadPE_Data(cp, temp_dir, false,  &data);
+            loadPE_Data(cp, temp_dir, false, &data);
 
             pe_block_data bdata;
             generateBlocksPE(data, &bdata);
@@ -166,9 +166,10 @@ void generate_order(const std::string &file_order, uint32_t *order_array, const 
 }
 
 void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, const std::string &file_order_id,
-                            const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end, const compression_params &cp, core::stats::FastqStats *) {
+                            const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
+                            const compression_params &cp, core::stats::FastqStats *) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
-    (void) cp;
+    (void)cp;
 
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic)
@@ -183,7 +184,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
         }
         std::string file_to_save_streams = id_desc_prefix + std::to_string(block_num);
         std::ofstream out(file_to_save_streams);
-        for(size_t i = 0; i < block_end[block_num] - block_start[block_num]; ++i) {
+        for (size_t i = 0; i < block_end[block_num] - block_start[block_num]; ++i) {
             out << id_array_block[i] << "\n";
         }
 
@@ -192,12 +193,10 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
     }
 }
 
-
 void reorder_compress_quality_pe(std::string file_quality[2], const std::string &temp_dir, std::string *quality_array,
                                  const uint64_t &quality_array_size, uint32_t *order_array,
                                  const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
-                                 const compression_params &cp,
-                                 core::stats::FastqStats *) {
+                                 const compression_params &cp, core::stats::FastqStats *) {
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
     uint32_t start_block_num = 0;
     uint32_t end_block_num = 0;
@@ -221,7 +220,6 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
             }
         }
 
-
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic) reduction(+ : size)
 #endif
@@ -229,7 +227,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
             std::string file_to_save_streams = quality_desc_prefix + std::to_string(block_num);
             std::ofstream out(file_to_save_streams);
             for (uint32_t i = block_start[block_num]; i < block_end[block_num]; i++)
-                    out << quality_array[i - block_start[start_block_num]] << "\n";
+                out << quality_array[i - block_start[start_block_num]] << "\n";
         }
         start_block_num = end_block_num;
     }
@@ -275,7 +273,6 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
         // There might be a better way to parallelize the loop.
         //
 
-
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel for num_threads(num_thr) schedule(dynamic) reduction(+ : id_size) reduction(+ : qual_size)
 #else
@@ -290,10 +287,11 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
             }
             uint32_t num_reads_block = (uint32_t)(end_read_num - start_read_num);
 
-
-            std::string file_to_save_streams = (mode == "id" ? id_desc_prefix : quality_desc_prefix) + std::to_string(block_num_offset + block_num);
+            std::string file_to_save_streams =
+                (mode == "id" ? id_desc_prefix : quality_desc_prefix) + std::to_string(block_num_offset + block_num);
             std::ofstream out(file_to_save_streams);
-            for(auto i = str_array + start_read_num; i < str_array + start_read_num + start_read_num + num_reads_block; ++i) {
+            for (auto i = str_array + start_read_num; i < str_array + start_read_num + start_read_num + num_reads_block;
+                 ++i) {
                 out << *i << "\n";
             }
         }  // omp parallel

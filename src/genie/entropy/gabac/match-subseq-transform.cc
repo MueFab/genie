@@ -17,7 +17,8 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-void transformMatchCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs) {
+void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
+                          std::vector<util::DataBlock> *const transformedSubseqs) {
     assert(transformedSubseqs != nullptr);
     const uint16_t matchBufferSize = subseqCfg.getTransformParameters().getParam();
 
@@ -27,8 +28,8 @@ void transformMatchCoding(const paramcabac::Subsequence& subseqCfg, std::vector<
     (*transformedSubseqs)[0].clear();
     transformedSubseqs->resize(3);
 
-    util::DataBlock *const pointers  = &((*transformedSubseqs)[0]);
-    util::DataBlock *const lengths   = &((*transformedSubseqs)[1]);
+    util::DataBlock *const pointers = &((*transformedSubseqs)[0]);
+    util::DataBlock *const lengths = &((*transformedSubseqs)[1]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[2]);
     pointers->setWordSize(4);
     lengths->setWordSize(4);
@@ -81,8 +82,8 @@ void inverseTransformMatchCoding(std::vector<util::DataBlock> *const transformed
     }
 
     // Prepare internal and the output data structures
-    util::DataBlock *const pointers  = &((*transformedSubseqs)[0]);
-    util::DataBlock *const lengths   = &((*transformedSubseqs)[1]);
+    util::DataBlock *const pointers = &((*transformedSubseqs)[0]);
+    util::DataBlock *const lengths = &((*transformedSubseqs)[1]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[2]);
 
     util::DataBlock symbols(0, rawValues->getWordSize());

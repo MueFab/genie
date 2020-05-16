@@ -60,7 +60,7 @@ class Record {
 
     Record();
 
-    explicit Record(const std::string& string, genie::core::stats::SamStats *stats = nullptr);
+    explicit Record(const std::string& string, genie::core::stats::SamStats* stats = nullptr);
 
     void check() const;
 

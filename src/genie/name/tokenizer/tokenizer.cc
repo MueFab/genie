@@ -183,10 +183,10 @@ void TokenState::encode(const std::vector<SingleToken>& tokens, core::AccessUnit
 
         if (tokens[i].token == Tokens::STRING) {
             for (const auto& c : tokens[i].paramString) {
-                streams.getTokenType(i, (uint8_t) tokens[i].token).push(c);
+                streams.getTokenType(i, (uint8_t)tokens[i].token).push(c);
             }
             streams.getTokenType(i, (uint8_t)tokens[i].token).push('\0');
-        } else if(getTokenInfo(tokens[i].token).paramSeq == sizeof(uint32_t)){
+        } else if (getTokenInfo(tokens[i].token).paramSeq == sizeof(uint32_t)) {
             push32bigEndian(streams.getTokenType(i, (uint8_t)tokens[i].token), tokens[i].param);
         } else {
             streams.getTokenType(i, (uint8_t)tokens[i].token).push(tokens[i].param);

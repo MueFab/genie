@@ -22,7 +22,7 @@ const header::Header& Reader::getHeader() const { return header; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Reader::read(size_t num, std::vector<Record>& vec, genie::core::stats::SamStats *stats) {
+void Reader::read(size_t num, std::vector<Record>& vec, genie::core::stats::SamStats* stats) {
     std::string string;
     vec.clear();
     if (rec_saved) {

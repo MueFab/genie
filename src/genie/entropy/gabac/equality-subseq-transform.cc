@@ -18,8 +18,8 @@
 
 #include <genie/util/block-stepper.h>
 #include <genie/util/data-block.h>
-#include "exceptions.h"
 #include "equality-subseq-transform.h"
+#include "exceptions.h"
 
 namespace genie {
 namespace entropy {
@@ -79,18 +79,18 @@ static void transformEqualityCoding1(util::DataBlock *const values, util::DataBl
 }
 
 void transformEqualityCoding(std::vector<util::DataBlock> *const transformedSubseqs) {
-
     // Prepare internal and the output data structures
     transformedSubseqs->resize(2);
-    (*transformedSubseqs)[0].swap(&(*transformedSubseqs)[1]); // transformSubseq[0] = flags, transformSubseq[1] = values
-    util::DataBlock *const flags     = &((*transformedSubseqs)[0]);
+    (*transformedSubseqs)[0].swap(
+        &(*transformedSubseqs)[1]);  // transformSubseq[0] = flags, transformSubseq[1] = values
+    util::DataBlock *const flags = &((*transformedSubseqs)[0]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
 
     flags->setWordSize(4);
     rawValues->setWordSize(4);
 
     if (rawValues->getWordSize() == 1) {
-        transformEqualityCoding0(rawValues, flags); // FIXME this might not be needed TBC
+        transformEqualityCoding0(rawValues, flags);  // FIXME this might not be needed TBC
     } else {
         transformEqualityCoding1(rawValues, flags);
     }
@@ -104,7 +104,7 @@ void inverseTransformEqualityCoding(std::vector<util::DataBlock> *const transfor
     }
 
     // Prepare internal and the output data structures
-    util::DataBlock *const flags     = &((*transformedSubseqs)[0]);
+    util::DataBlock *const flags = &((*transformedSubseqs)[0]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
     util::DataBlock symbols(0, rawValues->getWordSize());
 

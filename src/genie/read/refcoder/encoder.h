@@ -21,17 +21,11 @@ namespace refcoder {
 
 class Encoder : public core::ReadEncoder {
    public:
-    Encoder() : core::ReadEncoder() {
+    Encoder() : core::ReadEncoder() {}
 
-    }
+    void flowIn(core::record::Chunk&&, const util::Section&) override {}
 
-    void flowIn(core::record::Chunk&& , const util::Section& ) override {
-
-    }
-
-    void dryIn() override {
-        dryOut();
-    }
+    void dryIn() override { dryOut(); }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

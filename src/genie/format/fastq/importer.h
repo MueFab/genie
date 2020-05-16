@@ -74,7 +74,8 @@ class Importer : public core::FormatImporter {
      * @param _file_1 Input file #1
      * @param _file_2 Input file #2
      */
-    Importer(size_t _blockSize, std::istream &_file_1, std::istream &_file_2, genie::core::stats::FastqStats *_stats = nullptr);
+    Importer(size_t _blockSize, std::istream &_file_1, std::istream &_file_2,
+             genie::core::stats::FastqStats *_stats = nullptr);
 
     /**
      * @brief Process one block of data and propagate it to the next module in the chain

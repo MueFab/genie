@@ -10,59 +10,58 @@
 #include <cmath>
 #include <vector>
 
+#include <genie/entropy/paramcabac/transformed-subseq.h>
 #include <genie/util/block-stepper.h>
 #include <genie/util/data-block.h>
-#include <genie/entropy/paramcabac/transformed-subseq.h>
 #include "configuration.h"
 #include "encode-cabac.h"
+#include "exceptions.h"
 #include "stream-handler.h"
 #include "writer.h"
-#include "exceptions.h"
 
 #include "equality-subseq-transform.h"
 #include "match-subseq-transform.h"
-#include "rle-subseq-transform.h"
 #include "merge-subseq-transform.h"
+#include "rle-subseq-transform.h"
 
 namespace genie {
 namespace entropy {
 namespace gabac {
 
-static inline
-void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
-                         std::vector<util::DataBlock> *const transformedSubseqs) {
+static inline void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
+                                          std::vector<util::DataBlock> *const transformedSubseqs) {
     // GABACIFY_LOG_TRACE << "Encoding sequence of length: " <<
     // (*transformedSequences)[0].size();
 
     // GABACIFY_LOG_DEBUG << "Performing sequence transformation " <<
     // gabac::transformationInformation[id].name;
 
-    switch(subseqCfg.getTransformParameters().getTransformIdSubseq()) {
+    switch (subseqCfg.getTransformParameters().getTransformIdSubseq()) {
         case paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM:
             transformedSubseqs->resize(1);
-        break;
+            break;
         case paramcabac::TransformedParameters::TransformIdSubseq::EQUALITY_CODING:
             transformEqualityCoding(transformedSubseqs);
-        break;
+            break;
         case paramcabac::TransformedParameters::TransformIdSubseq::MATCH_CODING:
             transformMatchCoding(subseqCfg, transformedSubseqs);
-        break;
+            break;
         case paramcabac::TransformedParameters::TransformIdSubseq::RLE_CODING:
             transformRleCoding(subseqCfg, transformedSubseqs);
-        break;
+            break;
         case paramcabac::TransformedParameters::TransformIdSubseq::MERGE_CODING:
             transformMergeCoding(subseqCfg, transformedSubseqs);
-        break;
+            break;
         default:
             GABAC_DIE("Invalid subseq transforamtion");
-        break;
+            break;
     }
 
     // GABACIFY_LOG_TRACE << "Got " << transformedSequences->size() << "
     // sequences";
     // for (unsigned i = 0; i < transformedSubseqs->size(); ++i) {
-        // GABACIFY_LOG_TRACE << i << ": " << (*transformedSequences)[i].size()
-        // << " bytes";
+    // GABACIFY_LOG_TRACE << i << ": " << (*transformedSequences)[i].size()
+    // << " bytes";
     // }
 }
 
@@ -76,15 +75,15 @@ unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingC
     size_t subseqPayloadSize = 0;
 
     numDescSubseqSymbols = gabac::StreamHandler::readFull(*conf.inputStream, &subsequence);
-    if(conf.dependencyStream != nullptr) {
-        if(numDescSubseqSymbols != gabac::StreamHandler::readFull(*conf.dependencyStream, &dependency)) {
+    if (conf.dependencyStream != nullptr) {
+        if (numDescSubseqSymbols != gabac::StreamHandler::readFull(*conf.dependencyStream, &dependency)) {
             GABAC_DIE("Size mismatch between dependency and descriptor subsequence");
         }
     }
 
-    if(numDescSubseqSymbols > 0) {
+    if (numDescSubseqSymbols > 0) {
         // write number of symbols in descriptor subsequence
-        if(subseqCfg.getTokentypeFlag()) {
+        if (subseqCfg.getTokentypeFlag()) {
             subseqPayloadSize += gabac::StreamHandler::writeU7(*conf.outputStream, numDescSubseqSymbols);
         } else {
             subseqPayloadSize += gabac::StreamHandler::writeUInt(*conf.outputStream, numDescSubseqSymbols, 4);
@@ -103,22 +102,22 @@ unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingC
         for (size_t i = 0; i < numTrnsfSubseqs; i++) {
             uint64_t numtrnsfSymbols = transformedSubseqs[i].size();
             uint64_t trnsfSubseqPayloadSize = 0;
-            if(numtrnsfSymbols > 0) {
+            if (numtrnsfSymbols > 0) {
                 // Encoding
-                trnsfSubseqPayloadSize = gabac::encodeTransformSubseq(subseqCfg.getTransformSubseqCfg(i),
-                                                                      &(transformedSubseqs[i]),
-                                                                      (dependency.size()) ? &dependency : nullptr);
+                trnsfSubseqPayloadSize =
+                    gabac::encodeTransformSubseq(subseqCfg.getTransformSubseqCfg(i), &(transformedSubseqs[i]),
+                                                 (dependency.size()) ? &dependency : nullptr);
             }
 
-            if(i < (numTrnsfSubseqs-1)) {
-                subseqPayloadSize += gabac::StreamHandler::writeUInt(*conf.outputStream, trnsfSubseqPayloadSize+4, 4);
+            if (i < (numTrnsfSubseqs - 1)) {
+                subseqPayloadSize += gabac::StreamHandler::writeUInt(*conf.outputStream, trnsfSubseqPayloadSize + 4, 4);
             }
 
-            if(numTrnsfSubseqs > 1) {
+            if (numTrnsfSubseqs > 1) {
                 subseqPayloadSize += gabac::StreamHandler::writeUInt(*conf.outputStream, numtrnsfSymbols, 4);
             }
 
-            if(trnsfSubseqPayloadSize > 0) {
+            if (trnsfSubseqPayloadSize > 0) {
                 subseqPayloadSize += gabac::StreamHandler::writeBytes(*conf.outputStream, &transformedSubseqs[i]);
             }
         }

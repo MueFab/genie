@@ -26,7 +26,7 @@ void OrderedLock::wait(size_t id) {
 void OrderedLock::finished(size_t length) {
     {
         std::unique_lock<std::mutex> lock(m);
-        counter+= length;
+        counter += length;
     }
     cond_var.notify_all();
 }

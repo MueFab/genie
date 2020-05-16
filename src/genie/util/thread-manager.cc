@@ -21,7 +21,7 @@ void ThreadManager::action(size_t id) {
     ThreadManager::threadID = id;
     ThreadManager::threadNum = threads.size();
     try {
-        for(const auto& s : source) {
+        for (const auto& s : source) {
             while (!stopFlag && s->pump(counter)) {
             }
         }
@@ -33,8 +33,7 @@ void ThreadManager::action(size_t id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ThreadManager::ThreadManager(size_t thread_num)
-    : counter(0), threads(thread_num), stopFlag(false), abortFlag(false) {}
+ThreadManager::ThreadManager(size_t thread_num) : counter(0), threads(thread_num), stopFlag(false), abortFlag(false) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

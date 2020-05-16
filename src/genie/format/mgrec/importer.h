@@ -29,7 +29,7 @@ class MgrecsImporter : public util::Source<core::record::Chunk>, public util::Or
     size_t blockSize;
     util::BitReader reader;
     size_t record_counter;
-    util::OrderedLock lock;  //!< @brief Lock to ensure in order execution
+    util::OrderedLock lock;                //!< @brief Lock to ensure in order execution
     genie::core::stats::PerfStats *stats;  //!< @brief Stats collector (null => don't collect)
 
    public:

@@ -23,7 +23,7 @@ class SideSelector {
     }
 };
 
-}
-}
+}  // namespace util
+}  // namespace genie
 
 #endif  // GENIE_SIDESELECTOR_H

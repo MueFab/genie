@@ -31,7 +31,6 @@ class Decoder : public core::NameDecoder {
     static std::string inflate(const std::vector<SingleToken>& rec);
 
    public:
-
     std::vector<std::string> process(core::AccessUnitRaw::Descriptor& desc) override;
 
     static std::unique_ptr<core::NameDecoder> create(util::BitReader& reader) {

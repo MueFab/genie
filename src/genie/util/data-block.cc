@@ -18,10 +18,9 @@ namespace util {
 // ---------------------------------------------------------------------------------------------------------------------
 
 BlockStepper util::DataBlock::getReader() const {
-    return BlockStepper(const_cast<uint8_t *>(data.data()),
-                        const_cast<uint8_t *>(data.end().base()),
+    return BlockStepper(const_cast<uint8_t *>(data.data()), const_cast<uint8_t *>(data.end().base()),
                         static_cast<uint8_t>(getWordSize()));
-                        // TODO(Fabian): Add BlockStepper for const
+    // TODO(Fabian): Add BlockStepper for const
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -29,7 +29,6 @@
 #include "spring-gabac.h"
 #include "util.h"
 
-
 namespace genie {
 namespace read {
 namespace spring {
@@ -228,4 +227,3 @@ std::string random_string(size_t length) {
 }  // namespace spring
 }  // namespace read
 }  // namespace genie
-

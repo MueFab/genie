@@ -11,7 +11,8 @@ namespace mpegg_p1 {
 
 class DatasetGroupHeader {
    public:
-    explicit DatasetGroupHeader(const std::vector<genie::format::mpegg_p1::Dataset>* datasetId, const uint8_t x_datasetGroupID);
+    explicit DatasetGroupHeader(const std::vector<genie::format::mpegg_p1::Dataset>* datasetId,
+                                const uint8_t x_datasetGroupID);
 
     uint8_t getDatasetGroupId() const { return dataset_group_ID; }
     uint8_t getVersionNumber() const { return version_number; }

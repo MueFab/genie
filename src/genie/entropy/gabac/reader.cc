@@ -24,14 +24,16 @@ Reader::Reader(util::DataBlock *const bitstream, const bool bypassFlag, const un
       m_decBinCabac(m_bitInputStream),
       m_bypassFlag(bypassFlag),
       m_numContexts(numContexts) {
-    if(!bypassFlag && numContexts > 0) {
+    if (!bypassFlag && numContexts > 0) {
         m_contextModels = contexttables::buildContextTable(m_numContexts);
     }
 }
 
 Reader::~Reader() = default;
 
-uint64_t Reader::readAsBIbypass(const std::vector<unsigned int> binParams) { return m_decBinCabac.decodeBinsEP(binParams[0]); }
+uint64_t Reader::readAsBIbypass(const std::vector<unsigned int> binParams) {
+    return m_decBinCabac.decodeBinsEP(binParams[0]);
+}
 
 uint64_t Reader::readAsBIcabac(const std::vector<unsigned int> binParams) {
     unsigned int bins = 0;
@@ -50,8 +52,7 @@ uint64_t Reader::readAsTUbypass(const std::vector<unsigned int> binParams) {
     uint8_t b = 0;
     while (i < cMax) {
         b = m_decBinCabac.decodeBinsEP(1);
-        if(b == 0)
-            break;
+        if (b == 0) break;
         i++;
     }
     return static_cast<uint64_t>(i);
@@ -65,8 +66,7 @@ uint64_t Reader::readAsTUcabac(const std::vector<unsigned int> binParams) {
     uint8_t b = 0;
     while (i < cMax) {
         b = m_decBinCabac.decodeBin(&*scan);
-        if(b == 0)
-            break;
+        if (b == 0) break;
         i++;
         scan++;
     }
@@ -115,7 +115,7 @@ uint64_t Reader::readAsTEGbypass(const std::vector<unsigned int> binParams) {
 uint64_t Reader::readAsTEGcabac(const std::vector<unsigned int> binParams) {
     uint64_t value = readAsTUcabac(binParams);
     if (static_cast<unsigned int>(value) == binParams[0]) {
-        value += readAsEGcabac(std::vector<unsigned int>({0, 0, 0, binParams[3]+binParams[0]}));
+        value += readAsEGcabac(std::vector<unsigned int>({0, 0, 0, binParams[3] + binParams[0]}));
     }
     return value;
 }
@@ -127,14 +127,13 @@ uint64_t Reader::readAsSUTUbypass(const std::vector<unsigned int> binParams) {
     uint32_t i;
     uint64_t value = 0;
 
-    for(i=0; i<outputSymSize; i+=splitUnitSize) {
+    for (i = 0; i < outputSymSize; i += splitUnitSize) {
         uint64_t val = 0;
-        uint32_t cMax = (i == 0 && outputSymSize % splitUnitSize)
-                      ? (1u<<(outputSymSize % splitUnitSize))-1
-                      : (1u<<splitUnitSize)-1;
+        uint32_t cMax = (i == 0 && outputSymSize % splitUnitSize) ? (1u << (outputSymSize % splitUnitSize)) - 1
+                                                                  : (1u << splitUnitSize) - 1;
         val = readAsTUbypass(std::vector<unsigned int>({cMax}));
 
-        value = (value<<splitUnitSize) | val;
+        value = (value << splitUnitSize) | val;
     }
 
     return value;
@@ -148,15 +147,14 @@ uint64_t Reader::readAsSUTUcabac(const std::vector<unsigned int> binParams) {
     uint32_t i;
     uint64_t value = 0;
 
-    for(i=0; i<outputSymSize; i+=splitUnitSize) {
+    for (i = 0; i < outputSymSize; i += splitUnitSize) {
         uint64_t val = 0;
-        uint32_t cMax = (i == 0 && outputSymSize % splitUnitSize)
-                      ? (1u<<(outputSymSize % splitUnitSize))-1
-                      : (1u<<splitUnitSize)-1;
+        uint32_t cMax = (i == 0 && outputSymSize % splitUnitSize) ? (1u << (outputSymSize % splitUnitSize)) - 1
+                                                                  : (1u << splitUnitSize) - 1;
         val = readAsTUcabac(std::vector<unsigned int>({cMax, 0, 0, cm}));
         cm += cMax;
 
-        value = (value<<splitUnitSize) | val;
+        value = (value << splitUnitSize) | val;
     }
 
     return value;
@@ -167,7 +165,7 @@ uint64_t Reader::readAsDTUbypass(const std::vector<unsigned int> binParams) {
 
     uint64_t value = readAsTUbypass(std::vector<unsigned int>({cMaxDTU}));
 
-    if(value >= cMaxDTU) {
+    if (value >= cMaxDTU) {
         value += readAsSUTUbypass(binParams);
     }
 
@@ -179,58 +177,58 @@ uint64_t Reader::readAsDTUcabac(const std::vector<unsigned int> binParams) {
 
     uint64_t value = readAsTUcabac(std::vector<unsigned int>({cMaxDTU, 0, 0, binParams[3]}));
 
-    if(value >= cMaxDTU) {
-        value += readAsSUTUcabac(std::vector<unsigned int>({binParams[0], binParams[1], 0, binParams[3]+cMaxDTU}));
+    if (value >= cMaxDTU) {
+        value += readAsSUTUcabac(std::vector<unsigned int>({binParams[0], binParams[1], 0, binParams[3] + cMaxDTU}));
     }
 
     return value;
 }
 
 uint64_t Reader::readBI(const std::vector<unsigned int> binParams) {
-    if(m_bypassFlag)
+    if (m_bypassFlag)
         return readAsBIbypass(binParams);
     else
         return readAsBIcabac(binParams);
 }
 
 uint64_t Reader::readTU(const std::vector<unsigned int> binParams) {
-    if(m_bypassFlag)
+    if (m_bypassFlag)
         return readAsTUbypass(binParams);
     else
         return readAsTUcabac(binParams);
 }
 
 uint64_t Reader::readEG(const std::vector<unsigned int> binParams) {
-    if(m_bypassFlag)
+    if (m_bypassFlag)
         return readAsEGbypass(binParams);
     else
         return readAsEGcabac(binParams);
 }
 
 uint64_t Reader::readTEG(const std::vector<unsigned int> binParams) {
-    if(m_bypassFlag)
+    if (m_bypassFlag)
         return readAsTEGbypass(binParams);
     else
         return readAsTEGcabac(binParams);
 }
 
 uint64_t Reader::readSUTU(const std::vector<unsigned int> binParams) {
-    if(m_bypassFlag)
+    if (m_bypassFlag)
         return readAsSUTUbypass(binParams);
     else
         return readAsSUTUcabac(binParams);
 }
 
 uint64_t Reader::readDTU(const std::vector<unsigned int> binParams) {
-    if(m_bypassFlag)
+    if (m_bypassFlag)
         return readAsDTUbypass(binParams);
     else
         return readAsDTUcabac(binParams);
 }
 
 uint64_t Reader::readLutSymbol(const uint8_t codingSubsymSize) {
-    std::vector<unsigned int> binParams({codingSubsymSize, 2, 0, 0}); // ctxIdx = 0
-    if(m_bypassFlag)
+    std::vector<unsigned int> binParams({codingSubsymSize, 2, 0, 0});  // ctxIdx = 0
+    if (m_bypassFlag)
         return readAsSUTUbypass(binParams);
     else
         return readAsSUTUcabac(binParams);
@@ -238,19 +236,15 @@ uint64_t Reader::readLutSymbol(const uint8_t codingSubsymSize) {
 
 bool Reader::readSignFlag() {
     std::vector<unsigned int> binParams({1});
-    if(m_bypassFlag)
-        return (bool) readAsBIbypass(std::vector<unsigned int>({1}));
+    if (m_bypassFlag)
+        return (bool)readAsBIbypass(std::vector<unsigned int>({1}));
     else
-        return (bool) readAsBIcabac(std::vector<unsigned int>({1, 0, 0, static_cast<unsigned int>(m_numContexts-1)}));
+        return (bool)readAsBIcabac(std::vector<unsigned int>({1, 0, 0, static_cast<unsigned int>(m_numContexts - 1)}));
 }
 
-void Reader::start() {
-    m_decBinCabac.start();
-}
+void Reader::start() { m_decBinCabac.start(); }
 
-size_t Reader::close() {
-    return m_decBinCabac.close();
-}
+size_t Reader::close() { return m_decBinCabac.close(); }
 
 void Reader::reset() {
     m_decBinCabac.reset();

@@ -431,7 +431,8 @@ int main(int argc, char* argv[]) {
         case OperationCase::DECODE: {
             auto flow = buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory, BLOCKSIZE);
             flow->addImporter(genie::util::make_unique<genie::format::mgb::Importer>(input_file));
-            flow->addExporter(genie::util::make_unique<genie::format::sam::Exporter>(genie::format::sam::header::Header::createDefaultHeader(), output_file));
+            flow->addExporter(genie::util::make_unique<genie::format::sam::Exporter>(
+                genie::format::sam::header::Header::createDefaultHeader(), output_file));
             flowGraph = std::move(flow);
         } break;
             break;

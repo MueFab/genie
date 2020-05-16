@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <genie/util/bitwriter.h>
 #include <genie/core/stats/perf-stats.h>
+#include <genie/util/bitwriter.h>
 #include <fstream>
 #include <stdexcept>
 #include <string>
@@ -17,8 +17,9 @@ namespace read {
 namespace spring {
 
 /*void combine_aus(const std::string &temp_dir, compression_params &cp, const
-std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::string &outputFilePath, genie::core::stats::FastqStats
-*stats) { using namespace format; std::ofstream ofstr(outputFilePath); util::BitWriter bw(&ofstr);
+std::vector<std::vector<gabac::EncodingConfiguration>>& configs, const std::string &outputFilePath,
+genie::core::stats::FastqStats *stats) { using namespace format; std::ofstream ofstr(outputFilePath); util::BitWriter
+bw(&ofstr);
 
   // write parameter set
   const uint8_t PARAMETER_SET_ID = 0;

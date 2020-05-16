@@ -28,14 +28,10 @@ class Context {
    public:
     Context();
 
-    Context(bool adaptive_mode_flag,
-            uint8_t output_symbol_size,
-            uint8_t coding_subsym_size,
+    Context(bool adaptive_mode_flag, uint8_t output_symbol_size, uint8_t coding_subsym_size,
             bool _share_subsym_ctx_flag);
 
-    Context(uint8_t output_symbol_size,
-            uint8_t coding_subsym_size,
-            util::BitReader& reader);
+    Context(uint8_t output_symbol_size, uint8_t coding_subsym_size, util::BitReader& reader);
     virtual ~Context() = default;
 
     void addContextInitializationValue(uint8_t _context_initialization_value);

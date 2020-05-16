@@ -49,7 +49,6 @@ struct Preprocessor {
         UTILS_DIE_IF(!ghc::filesystem::create_directory(temp_dir), "Cannot create temporary directory.");
         std::cout << "Temporary directory: " << temp_dir << "\n";
 
-
         outfileclean[0] = temp_dir + "/input_clean_1.dna";
         outfileclean[1] = temp_dir + "/input_clean_2.dna";
         outfileN[0] = temp_dir + "/input_N.dna";
@@ -61,7 +60,7 @@ struct Preprocessor {
         outfilequality[1] = temp_dir + "/quality_2";
     }
 
-    void preprocess(core::record::Chunk &&t, size_t id);
+    void preprocess(core::record::Chunk&& t, size_t id);
 
     void finish();
 };

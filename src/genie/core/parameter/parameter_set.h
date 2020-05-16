@@ -27,7 +27,9 @@
 
 namespace genie {
 namespace core {
-namespace stats { class PerfStats; }
+namespace stats {
+class PerfStats;
+}
 namespace parameter {
 
 class ParameterSet : public DataUnit {
@@ -42,9 +44,7 @@ class ParameterSet : public DataUnit {
 
     const ComputedRef &getComputedRef() const;
 
-    bool isComputedReference() const {
-        return this->parameter_set_crps.has_value();
-    }
+    bool isComputedReference() const { return this->parameter_set_crps.has_value(); }
 
     size_t getNumberTemplateSegments() const;
 

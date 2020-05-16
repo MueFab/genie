@@ -48,9 +48,7 @@ class ComputedRef {
 
     const ComputedRefExtended &getExtension() const;
 
-    Algorithm getAlgorithm() const{
-        return cr_alg_ID;
-    }
+    Algorithm getAlgorithm() const { return cr_alg_ID; }
 
     virtual void write(util::BitWriter &bw) const;
 };

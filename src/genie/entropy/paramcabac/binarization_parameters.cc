@@ -16,7 +16,8 @@ namespace paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BinarizationParameters::BinarizationParameters() : BinarizationParameters(BinarizationId::BINARY_CODING, std::vector<uint8_t>()) {}
+BinarizationParameters::BinarizationParameters()
+    : BinarizationParameters(BinarizationId::BINARY_CODING, std::vector<uint8_t>()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -94,31 +95,24 @@ void BinarizationParameters::write(BinarizationId binID, util::BitWriter &writer
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t BinarizationParameters::getCMax() const {
-    return cmax;
-}
+uint8_t BinarizationParameters::getCMax() const { return cmax; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t BinarizationParameters::getCMaxTeg() const {
-    return cmax_teg;
-}
+uint8_t BinarizationParameters::getCMaxTeg() const { return cmax_teg; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t BinarizationParameters::getCMaxDtu() const {
-    return cmax_dtu;
-}
+uint8_t BinarizationParameters::getCMaxDtu() const { return cmax_dtu; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t BinarizationParameters::getSplitUnitSize() const {
-    return split_unit_size;
-}
+uint8_t BinarizationParameters::getSplitUnitSize() const { return split_unit_size; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t BinarizationParameters::numParams[unsigned(BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY) + 1u] = {0, 1, 0, 0, 1, 1, 1, 1, 2, 2};
+uint8_t BinarizationParameters::numParams[unsigned(BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY) + 1u] = {
+    0, 1, 0, 0, 1, 1, 1, 1, 2, 2};
 
 uint8_t BinarizationParameters::getNumBinarizationParams(BinarizationParameters::BinarizationId binarzationId) {
     return BinarizationParameters::numParams[uint8_t(binarzationId)];

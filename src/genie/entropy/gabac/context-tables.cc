@@ -5,7 +5,7 @@
  */
 
 #include "context-tables.h"
-#include<iostream>
+#include <iostream>
 
 namespace genie {
 namespace entropy {

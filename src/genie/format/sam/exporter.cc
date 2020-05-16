@@ -73,7 +73,8 @@ uint64_t Exporter::mappedLength(const std::string& cigar) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Exporter::Exporter(header::Header&& header, std::ostream& _file_1, genie::core::stats::SamStats *_stats) : stats(_stats), writer(std::move(header), _file_1) {}
+Exporter::Exporter(header::Header&& header, std::ostream& _file_1, genie::core::stats::SamStats* _stats)
+    : stats(_stats), writer(std::move(header), _file_1) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

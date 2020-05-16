@@ -16,7 +16,9 @@ namespace genie {
 namespace read {
 namespace spring {
 
-void SpringEncoder::flowIn(core::record::Chunk&& t, const util::Section& id) { preprocessor.preprocess(std::move(t), id.start); }
+void SpringEncoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
+    preprocessor.preprocess(std::move(t), id.start);
+}
 
 class SpringSource : public util::OriginalSource, public util::Source<core::AccessUnitRaw> {
    private:
@@ -26,13 +28,17 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
     std::string temp_dir;
     core::stats::FastqStats* stats;
     uint32_t num_AUs;
-    util::SideSelector<genie::core::QVEncoder, genie::core::QVEncoder::QVCoded, const genie::core::record::Chunk&>* coder;
+    util::SideSelector<genie::core::QVEncoder, genie::core::QVEncoder::QVCoded, const genie::core::record::Chunk&>*
+        coder;
     util::SideSelector<genie::core::NameEncoder, genie::core::AccessUnitRaw::Descriptor,
-        const genie::core::record::Chunk&>* ncoder;
+                       const genie::core::record::Chunk&>* ncoder;
 
    public:
-    SpringSource(util::SideSelector<genie::core::QVEncoder, genie::core::QVEncoder::QVCoded, const genie::core::record::Chunk&>* _coder, util::SideSelector<genie::core::NameEncoder, genie::core::AccessUnitRaw::Descriptor,
-        const genie::core::record::Chunk&>* _ncoder, const compression_params& _cp, std::string  _temp_dir, core::stats::FastqStats* _stats)
+    SpringSource(util::SideSelector<genie::core::QVEncoder, genie::core::QVEncoder::QVCoded,
+                                    const genie::core::record::Chunk&>* _coder,
+                 util::SideSelector<genie::core::NameEncoder, genie::core::AccessUnitRaw::Descriptor,
+                                    const genie::core::record::Chunk&>* _ncoder,
+                 const compression_params& _cp, std::string _temp_dir, core::stats::FastqStats* _stats)
         : cp(_cp), temp_dir(std::move(_temp_dir)), stats(_stats), coder(_coder), ncoder(_ncoder) {
         if (cp.paired_end) {
             loadPE_Data(cp, temp_dir, true, &data);
@@ -54,18 +60,18 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
         }
 
         core::record::Chunk chunk;
-        if(coder || ncoder) {
+        if (coder || ncoder) {
             std::ifstream qvfile(temp_dir + "/quality_streams." + std::to_string(id));
             std::ifstream namefile(temp_dir + "/id_streams." + std::to_string(id));
-            for(size_t i = 0; i < au.getNumRecords(); ++i) {
+            for (size_t i = 0; i < au.getNumRecords(); ++i) {
                 std::string name;
-                if(ncoder) {
+                if (ncoder) {
                     UTILS_DIE_IF(!std::getline(namefile, name), "Name file too short");
                 }
-                chunk.emplace_back((uint8_t )cp.paired_end + 1, core::record::ClassType::CLASS_U, std::move(name),
-                    "", 0);
-                if(coder) {
-                    for(size_t j = 0; j < (uint8_t )cp.paired_end + 1u; ++j) {
+                chunk.emplace_back((uint8_t)cp.paired_end + 1, core::record::ClassType::CLASS_U, std::move(name), "",
+                                   0);
+                if (coder) {
+                    for (size_t j = 0; j < (uint8_t)cp.paired_end + 1u; ++j) {
                         std::string qv;
                         UTILS_DIE_IF(!std::getline(qvfile, qv), "Qv file too short");
                         core::record::Segment s(std::string(qv.length(), 'N'));
@@ -76,11 +82,11 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
             }
         }
 
-        if(ncoder) {
+        if (ncoder) {
             au.get(core::GenDesc::RNAME) = this->ncoder->process(chunk);
         }
 
-        if(coder) {
+        if (coder) {
             auto qv_coded = this->coder->process(chunk);
             au.get(core::GenDesc::QV) = qv_coded.second;
             au.getParameters().addClass(genie::core::record::ClassType::CLASS_U, std::move(qv_coded.first));
@@ -90,9 +96,8 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
                                             genie::quality::paramqv1::QualityValues1::QvpsPresetId::ASCII, false));
         }
 
-
         flowOut(std::move(au), util::Section{id, 0, false});
-        return id != num_AUs - 1 ;
+        return id != num_AUs - 1;
     }
 
     /**
@@ -131,7 +136,7 @@ void SpringEncoder::dryIn() {
                   << std::chrono::duration_cast<std::chrono::seconds>(rcqi_end - rcqi_start).count() << " s\n";
     }
 
-    SpringSource src(this->qvcoder, this->namecoder,this->preprocessor.cp, this->preprocessor.temp_dir, this->stats);
+    SpringSource src(this->qvcoder, this->namecoder, this->preprocessor.cp, this->preprocessor.temp_dir, this->stats);
     src.setDrain(this->drain);
     std::vector<util::OriginalSource*> srcVec = {&src};
     util::ThreadManager mgr(preprocessor.cp.num_thr);

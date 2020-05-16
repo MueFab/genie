@@ -6,15 +6,11 @@
 #include <string>
 #include <vector>
 
-int stat (int , char* []) {
-    UTILS_DIE("Stat not implemented");
-}
+int stat(int, char*[]) { UTILS_DIE("Stat not implemented"); }
 
-int help (int , char* []) {
-    UTILS_DIE("Help text not helpfull enough");
-}
+int help(int, char*[]) { UTILS_DIE("Help text not helpfull enough"); }
 
-int main (int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 #ifdef GENIE_USE_OPENMP
     std::cout << "genie: built with OpenMP\n\n" << std::endl;
 #else
@@ -26,7 +22,7 @@ int main (int argc, char* argv[]) {
         UTILS_DIE_IF(argc <= OPERATION_INDEX, "No operation specified, type 'genie help' for more info.");
         std::string operation = argv[OPERATION_INDEX];
         transform(operation.begin(), operation.end(), operation.begin(), ::tolower);
-        if(operation == "run") {
+        if (operation == "run") {
             genieapp::run::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else if (operation == "stat") {
             stat(argc - OPERATION_INDEX, argv + OPERATION_INDEX);

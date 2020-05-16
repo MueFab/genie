@@ -9,8 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "ordered-lock.h"
 #include "drain.h"
+#include "ordered-lock.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,6 +24,7 @@ class OrderedSection {
    private:
     OrderedLock* lock;  //!< @brief Underlying lock
     size_t length;
+
    public:
     /**
      * @brief Try to aquire the lock
@@ -32,9 +33,7 @@ class OrderedSection {
      */
     OrderedSection(OrderedLock* _lock, const Section& id);
 
-    void setLength(size_t l) {
-        length = l;
-    }
+    void setLength(size_t l) { length = l; }
 
     /**
      * @brief Release the lock

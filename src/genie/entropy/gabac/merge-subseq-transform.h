@@ -7,17 +7,19 @@
 #ifndef GABAC_MERGE_CODING_H_
 #define GABAC_MERGE_CODING_H_
 
-#include <cstdint>
 #include <genie/entropy/paramcabac/subsequence.h>
 #include <genie/util/data-block.h>
+#include <cstdint>
 
 namespace genie {
 namespace entropy {
 namespace gabac {
 
-void transformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs);
+void transformMergeCoding(const paramcabac::Subsequence& subseqCfg,
+                          std::vector<util::DataBlock>* const transformedSubseqs);
 
-void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg, std::vector<util::DataBlock> *const transformedSubseqs);
+void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg,
+                                 std::vector<util::DataBlock>* const transformedSubseqs);
 
 }  // namespace gabac
 }  // namespace entropy

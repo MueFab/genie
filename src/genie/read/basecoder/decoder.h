@@ -51,7 +51,8 @@ class Decoder {
 
     std::vector<SegmentMeta> readSegmentMeta();
 
-    std::tuple<core::record::AlignmentBox, core::record::Record> decode(size_t clip_offset, std::string &&seq, std::string &&cigar);
+    std::tuple<core::record::AlignmentBox, core::record::Record> decode(size_t clip_offset, std::string &&seq,
+                                                                        std::string &&cigar);
 
     static std::string contractECigar(const std::string &cigar_long);
 

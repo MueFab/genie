@@ -33,7 +33,8 @@ class GabacCompressor : public core::EntropyEncoder {
     static core::AccessUnitPayload::SubsequencePayload compress(const gabac::EncodingConfiguration& conf,
                                                                 core::AccessUnitRaw::Subsequence&& in);
 
-    static core::AccessUnitPayload::DescriptorPayload compressTokens(const gabac::EncodingConfiguration& conf0, core::AccessUnitRaw::Descriptor &&in);
+    static core::AccessUnitPayload::DescriptorPayload compressTokens(const gabac::EncodingConfiguration& conf0,
+                                                                     core::AccessUnitRaw::Descriptor&& in);
 
    public:
     GabacSeqConfSet configSet;  //!< @brief Config set to use. In contrast to decompression it's static over time

@@ -7,8 +7,8 @@
 #ifndef SPRING_COMPRESS_UREADS_H_
 #define SPRING_COMPRESS_UREADS_H_
 
-#include <genie/stream-saver.h>
 #include <genie/core/stats/perf-stats.h>
+#include <genie/stream-saver.h>
 #include <string>
 #include "util.h"
 

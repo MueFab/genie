@@ -26,11 +26,10 @@ namespace genie {
 namespace read {
 namespace spring {
 
-
 void Preprocessor::preprocess(core::record::Chunk &&t, size_t) {
     core::record::Chunk data = std::move(t);
 
-    if(!init) {
+    if (!init) {
         init = true;
         cp.paired_end = data.front().getSegments().size() == 2;
         UTILS_DIE_IF(data.front().getSegments().size() > 2, "Maximum of two segments per read supported");
@@ -126,6 +125,6 @@ void Preprocessor::finish() {
     std::cout << "Total number of reads without N: " << cp.num_reads_clean[0] + cp.num_reads_clean[1] << "\n";
 }
 
+}  // namespace spring
 }  // namespace read
-}  // namespace genie
 }  // namespace genie

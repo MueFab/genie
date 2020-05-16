@@ -26,9 +26,7 @@ class EntropyDecoder : public util::Drain<AccessUnitPayload>, public util::Sourc
    public:
     ~EntropyDecoder() override = default;
 
-    void skipIn(const util::Section& s) override{
-        skipOut(s);
-    }
+    void skipIn(const util::Section& s) override { skipOut(s); }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

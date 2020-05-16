@@ -7,9 +7,9 @@
 #ifndef GABAC_CONTEXT_SELECTOR_H_
 #define GABAC_CONTEXT_SELECTOR_H_
 
+#include <genie/entropy/paramcabac/state_vars.h>
 #include "context-tables.h"
 #include "subsymbol.h"
-#include <genie/entropy/paramcabac/state_vars.h>
 
 #include <cassert>
 
@@ -18,20 +18,15 @@ namespace entropy {
 namespace gabac {
 
 class ContextSelector {
-    public:
-    ContextSelector(const paramcabac::StateVars& _stateVars)
-        : stateVars (_stateVars){};
+   public:
+    ContextSelector(const paramcabac::StateVars& _stateVars) : stateVars(_stateVars){};
 
     ~ContextSelector() = default;
 
-    unsigned int getContextIdxOrder0(const uint8_t subsymIdx) {
-        return subsymIdx * stateVars.getCodingSizeCtxOffset();
-    }
+    unsigned int getContextIdxOrder0(const uint8_t subsymIdx) { return subsymIdx * stateVars.getCodingSizeCtxOffset(); }
 
-    unsigned int getContextIdxOrderGT0(const uint8_t subsymIdx,
-                                       const uint8_t prvIdx,
-                                       const std::vector<Subsymbol>& subsymbols,
-                                       const uint8_t codingOrder) {
+    unsigned int getContextIdxOrderGT0(const uint8_t subsymIdx, const uint8_t prvIdx,
+                                       const std::vector<Subsymbol>& subsymbols, const uint8_t codingOrder) {
         unsigned int ctxIdx = 0;
         ctxIdx += stateVars.getNumCtxLUTs();
         ctxIdx += subsymIdx * stateVars.getCodingSizeCtxOffset();
@@ -42,7 +37,7 @@ class ContextSelector {
         return ctxIdx;
     }
 
-    private:
+   private:
     const paramcabac::StateVars& stateVars;
 };
 

@@ -19,31 +19,28 @@ namespace gabac {
 
 using namespace genie::entropy::paramcabac;
 
-#define MAX_NUM_TRANSPORT_SEQS 4 // put max 4 for now.
+#define MAX_NUM_TRANSPORT_SEQS 4  // put max 4 for now.
 
 // ---------------------------------------------------------------------------------------------------------------------
-unsigned long getCmaxTU(uint64_t const        numAlphaSpecial,
-                        uint8_t const         codingSubsymSize) {
-    if(numAlphaSpecial > 0) { /* special case */
-        return numAlphaSpecial-1;
+unsigned long getCmaxTU(uint64_t const numAlphaSpecial, uint8_t const codingSubsymSize) {
+    if (numAlphaSpecial > 0) { /* special case */
+        return numAlphaSpecial - 1;
     } else {
-        return StateVars::get2PowN(codingSubsymSize)-1;
+        return StateVars::get2PowN(codingSubsymSize) - 1;
     }
 }
 
 paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
-
-    const GenDesc genieDescID = (GenDesc) sub.first;
+    const GenDesc genieDescID = (GenDesc)sub.first;
     const GenSubIndex genieSubseqID = sub;
-    const uint8_t subseqID = (uint8_t) sub.second;
+    const uint8_t subseqID = (uint8_t)sub.second;
 
     // default values
     const AlphabetID alphaID = AlphabetID::ACGTN;
-    //const uint64_t numAlphaSpecial = StateVars::getNumAlphaSpecial(genieSubseqID, alphaID);
+    // const uint64_t numAlphaSpecial = StateVars::getNumAlphaSpecial(genieSubseqID, alphaID);
     const uint8_t symSize = (alphaID == AlphabetID::ACGTN) ? 3 : 5;
 
-    TransformedParameters::TransformIdSubseq trnsfSubseqID =
-            TransformedParameters::TransformIdSubseq::NO_TRANSFORM;
+    TransformedParameters::TransformIdSubseq trnsfSubseqID = TransformedParameters::TransformIdSubseq::NO_TRANSFORM;
     uint16_t trnsfSubseqParam = 0;
     std::vector<uint8_t> mergeCodingShiftSizes(MAX_NUM_TRANSPORT_SEQS, 0);
     bool tokenTypeFlag = false;
@@ -51,9 +48,10 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
     uint8_t codingSubSymSize[MAX_NUM_TRANSPORT_SEQS] = {8};
     uint8_t outputSymbolSize[MAX_NUM_TRANSPORT_SEQS] = {8};
     uint8_t codingOrder[MAX_NUM_TRANSPORT_SEQS] = {0};
-    SupportValues::TransformIdSubsym trnsfSubsymID[MAX_NUM_TRANSPORT_SEQS] = {SupportValues::TransformIdSubsym::NO_TRANSFORM};
-    BinarizationParameters::BinarizationId binID[MAX_NUM_TRANSPORT_SEQS] =
-            {BinarizationParameters::BinarizationId::BINARY_CODING};
+    SupportValues::TransformIdSubsym trnsfSubsymID[MAX_NUM_TRANSPORT_SEQS] = {
+        SupportValues::TransformIdSubsym::NO_TRANSFORM};
+    BinarizationParameters::BinarizationId binID[MAX_NUM_TRANSPORT_SEQS] = {
+        BinarizationParameters::BinarizationId::BINARY_CODING};
     std::vector<std::vector<uint8_t>> binParams(MAX_NUM_TRANSPORT_SEQS, std::vector<uint8_t>(2, 0));
     bool bypassFlag[MAX_NUM_TRANSPORT_SEQS] = {false};
     bool adaptiveModeFlag[MAX_NUM_TRANSPORT_SEQS] = {true};
@@ -64,267 +62,264 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
     bool found = true;
 
     // populate config below
-    switch(genieDescID) {
+    switch (genieDescID) {
         case GenDesc::POS:
-            switch(subseqID) {
-                case 0: // POS for first alignment
+            switch (subseqID) {
+                case 0:  // POS for first alignment
                     outputSymbolSize[0] = 32;
                     codingSubSymSize[0] = 32;
-                break;
-                case 1: // POS for other alignments
+                    break;
+                case 1:  // POS for other alignments
                     outputSymbolSize[0] = 32;
                     codingSubSymSize[0] = 32;
-                break;
+                    break;
                 default:
                     found = false;
             }
-        break;
+            break;
         case GenDesc::RCOMP:
-            switch(subseqID) {
+            switch (subseqID) {
                 case 0:
                     outputSymbolSize[0] = 2;
                     codingSubSymSize[0] = 2;
-                break;
+                    break;
                 default:
                     found = false;
             }
-        break;
+            break;
         case GenDesc::FLAGS:
-            switch(subseqID) {
+            switch (subseqID) {
                 case 0:
                 case 1:
                 case 2:
                     outputSymbolSize[0] = 1;
                     codingSubSymSize[0] = 1;
-                break;
+                    break;
                 default:
                     found = false;
             }
-        break;
+            break;
         case GenDesc::MMPOS:
-            switch(subseqID) {
-                case 0: // mmposFlag
+            switch (subseqID) {
+                case 0:  // mmposFlag
                     outputSymbolSize[0] = 1;
                     codingSubSymSize[0] = 1;
-                break;
-                case 1: // mmposPos
+                    break;
+                case 1:  // mmposPos
                     outputSymbolSize[0] = 16;
                     codingSubSymSize[0] = 16;
-                break;
+                    break;
                 default:
                     found = false;
             }
-        break;
+            break;
         case GenDesc::MMTYPE:
-            switch(subseqID) {
-                case 0: // mmtype
+            switch (subseqID) {
+                case 0:  // mmtype
                     outputSymbolSize[0] = 2;
                     codingSubSymSize[0] = 2;
-                break;
-                case 1: // mmtypeSbs
-                case 2: // mmtypeIndels
+                    break;
+                case 1:  // mmtypeSbs
+                case 2:  // mmtypeIndels
                     outputSymbolSize[0] = symSize;
                     codingSubSymSize[0] = symSize;
-                break;
+                    break;
                 default:
                     found = false;
             }
-        break;
+            break;
         case GenDesc::CLIPS:
-            switch(subseqID) {
-                case 0: // clipsRecordID
-                case 3: // clipsHardClipsLength
+            switch (subseqID) {
+                case 0:  // clipsRecordID
+                case 3:  // clipsHardClipsLength
                     outputSymbolSize[0] = 32;
                     codingSubSymSize[0] = 32;
-                break;
-                case 1: // clipsType
+                    break;
+                case 1:  // clipsType
                     outputSymbolSize[0] = 4;
                     codingSubSymSize[0] = 4;
-                break;
-                case 2: // clipsSoftClips
+                    break;
+                case 2:  // clipsSoftClips
                     outputSymbolSize[0] = symSize;
                     codingSubSymSize[0] = symSize;
-                break;
+                    break;
                 default:
                     found = false;
             }
-        break;
+            break;
         case GenDesc::UREADS:
-            switch(subseqID) {
+            switch (subseqID) {
                 case 0:
                     outputSymbolSize[0] = symSize;
                     codingSubSymSize[0] = symSize;
-                break;
+                    break;
                 default:
                     found = false;
             }
-        break;
+            break;
         case GenDesc::RLEN:
-            switch(subseqID) {
+            switch (subseqID) {
                 case 0:
                     outputSymbolSize[0] = 32;
                     codingSubSymSize[0] = 32;
-                break;
+                    break;
                 default:
                     found = false;
             }
-        break;
+            break;
         case GenDesc::PAIR:
-            switch(subseqID) {
-                case 0: // pairType
+            switch (subseqID) {
+                case 0:  // pairType
                     outputSymbolSize[0] = 3;
                     codingSubSymSize[0] = 3;
-                break;
-                case 1: // pairReadDistance
+                    break;
+                case 1:  // pairReadDistance
                     outputSymbolSize[0] = 16;
                     codingSubSymSize[0] = 16;
-                break;
-                case 2: case 3: case 6: case 7: // pairAbsPos
+                    break;
+                case 2:
+                case 3:
+                case 6:
+                case 7:  // pairAbsPos
                     outputSymbolSize[0] = 32;
                     codingSubSymSize[0] = 32;
-                break;
-                case 4: case 5: // pairSeqID
+                    break;
+                case 4:
+                case 5:  // pairSeqID
                     outputSymbolSize[0] = 16;
                     codingSubSymSize[0] = 16;
-                break;
+                    break;
                 default:
                     found = false;
             }
-        break;
+            break;
         case GenDesc::MSCORE:
-            switch(subseqID) {
+            switch (subseqID) {
                 case 0:
                     outputSymbolSize[0] = 32;
                     codingSubSymSize[0] = 32;
-                break;
+                    break;
                 default:
                     found = false;
             }
-        break;
+            break;
         case GenDesc::MMAP:
-            switch(subseqID) {
-                case 0: // number of alignments
-                case 1: // index of right alignments
+            switch (subseqID) {
+                case 0:  // number of alignments
+                case 1:  // index of right alignments
                     outputSymbolSize[0] = 16;
                     codingSubSymSize[0] = 16;
-                break;
-                case 2: // more alignments flag
+                    break;
+                case 2:  // more alignments flag
                     outputSymbolSize[0] = 1;
                     codingSubSymSize[0] = 1;
-                break;
-                case 3: // next alignment SeqID
+                    break;
+                case 3:  // next alignment SeqID
                     outputSymbolSize[0] = 16;
                     codingSubSymSize[0] = 16;
-                break;
-                case 4: // next alignment abs mapping pos
+                    break;
+                case 4:  // next alignment abs mapping pos
                     outputSymbolSize[0] = 32;
                     codingSubSymSize[0] = 32;
-                break;
+                    break;
                 default:
                     found = false;
             }
-        break;
+            break;
         case GenDesc::MSAR:
         case GenDesc::RNAME:
             tokenTypeFlag = true;
-            switch(subseqID) {
-                case 0: // CABAC_METHOD_0
+            switch (subseqID) {
+                case 0:  // CABAC_METHOD_0
                     outputSymbolSize[0] = 8;
                     codingSubSymSize[0] = 8;
-                break;
-                case 1: // CABAC_METHOD_1
+                    break;
+                case 1:  // CABAC_METHOD_1
                     outputSymbolSize[0] = 8;
                     codingSubSymSize[0] = 8;
-                break;
+                    break;
                 default:
                     found = false;
             }
-        break;
+            break;
         case GenDesc::RTYPE:
-            switch(subseqID) {
+            switch (subseqID) {
                 case 0:
                     outputSymbolSize[0] = 3;
                     codingSubSymSize[0] = 3;
-                break;
+                    break;
                 default:
                     found = false;
             }
-        break;
+            break;
         case GenDesc::RGROUP:
-            switch(subseqID) {
+            switch (subseqID) {
                 case 0:
                     outputSymbolSize[0] = 16;
                     codingSubSymSize[0] = 16;
-                break;
+                    break;
                 default:
                     found = false;
             }
-        break;
+            break;
         case GenDesc::QV:
-            switch(subseqID) {
-                case 0: // qvPresenceFlag
+            switch (subseqID) {
+                case 0:  // qvPresenceFlag
                     outputSymbolSize[0] = 1;
                     codingSubSymSize[0] = 1;
-                break;
-                default:// subSequenceID >= 2
+                    break;
+                default:  // subSequenceID >= 2
                     // TODO
                     found = false;
             }
-        break;
+            break;
         case GenDesc::RFTP:
-            switch(subseqID) {
-                case 0: // POS for first alignment
+            switch (subseqID) {
+                case 0:  // POS for first alignment
                     outputSymbolSize[0] = 32;
                     codingSubSymSize[0] = 32;
-                break;
+                    break;
                 default:
                     found = false;
             }
-        break;
+            break;
         case GenDesc::RFTT:
-            switch(subseqID) {
+            switch (subseqID) {
                 case 0:
                     outputSymbolSize[0] = symSize;
                     codingSubSymSize[0] = symSize;
-                break;
+                    break;
                 default:
                     found = false;
             }
-        break;
+            break;
     }
 
-    if(!found) {
-        //GABAC_DIE("Unsupported subseqID "+std::to_string(subseqID)+" for descID value "+std::to_string(descID));
+    if (!found) {
+        // GABAC_DIE("Unsupported subseqID "+std::to_string(subseqID)+" for descID value "+std::to_string(descID));
     }
 
     TransformedParameters trnsfSubseqParams(trnsfSubseqID, trnsfSubseqParam);
     size_t numTrnsfSubseqs = trnsfSubseqParams.getNumStreams();
 
-    if(trnsfSubseqID == TransformedParameters::TransformIdSubseq::MERGE_CODING) {
+    if (trnsfSubseqID == TransformedParameters::TransformIdSubseq::MERGE_CODING) {
         trnsfSubseqParams.setMergeCodingShiftSizes(mergeCodingShiftSizes);
         numTrnsfSubseqs = trnsfSubseqParam;
     }
 
     std::vector<TransformedSubSeq> trnsfSubseqCfgs;
 
-    for(size_t t=0; t<numTrnsfSubseqs; t++) {
-        trnsfSubseqCfgs.push_back(
-                TransformedSubSeq(trnsfSubsymID[t],
-                                  SupportValues(outputSymbolSize[t], codingSubSymSize[t], codingOrder[t], shareSubsymLutFlag[t], shareSubsymPrvFlag[t]),
-                                  Binarization(binID[t],
-                                               bypassFlag[t],
-                                               BinarizationParameters(binID[t], binParams[t]),
-                                               Context(adaptiveModeFlag[t], outputSymbolSize[t], codingSubSymSize[t], shareSubsymCtxFlag[t])),
-                                  genieSubseqID,
-                                  alphaID)
-                                  );
+    for (size_t t = 0; t < numTrnsfSubseqs; t++) {
+        trnsfSubseqCfgs.push_back(TransformedSubSeq(
+            trnsfSubsymID[t],
+            SupportValues(outputSymbolSize[t], codingSubSymSize[t], codingOrder[t], shareSubsymLutFlag[t],
+                          shareSubsymPrvFlag[t]),
+            Binarization(binID[t], bypassFlag[t], BinarizationParameters(binID[t], binParams[t]),
+                         Context(adaptiveModeFlag[t], outputSymbolSize[t], codingSubSymSize[t], shareSubsymCtxFlag[t])),
+            genieSubseqID, alphaID));
     }
 
-    Subsequence subseqCfg(
-            std::move(trnsfSubseqParams),
-            subseqID,
-            tokenTypeFlag,
-            std::move(trnsfSubseqCfgs));
+    Subsequence subseqCfg(std::move(trnsfSubseqParams), subseqID, tokenTypeFlag, std::move(trnsfSubseqCfgs));
 
     return subseqCfg;
 }
