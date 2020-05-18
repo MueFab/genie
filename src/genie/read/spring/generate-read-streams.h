@@ -62,8 +62,7 @@ uint64_t getNumBlocks(const compression_params &data);
 void compress_subseqs(subseq_data *data,
                       const std::vector<std::vector<entropy::gabac::EncodingConfiguration>> &configs);
 
-core::AccessUnitRaw generate_read_streams(const std::string &temp_dir, const compression_params &cp,
-                                          genie::core::stats::FastqStats *stats);
+core::AccessUnitRaw generate_read_streams(const std::string &temp_dir, const compression_params &cp);
 
 core::AccessUnitRaw generate_read_streams_se(const se_data &data, uint64_t block_num);
 

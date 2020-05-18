@@ -6,6 +6,7 @@
 
 #include "gabac-compressor.h"
 #include <genie/util/make-unique.h>
+#include <genie/util/watch.h>
 
 namespace genie {
 namespace entropy {
@@ -77,19 +78,36 @@ core::AccessUnitPayload::SubsequencePayload GabacCompressor::compress(const gaba
 // ---------------------------------------------------------------------------------------------------------------------
 
 void GabacCompressor::flowIn(core::AccessUnitRaw &&t, const util::Section &id) {
+    util::Watch watch;
     core::AccessUnitRaw raw_aus = std::move(t);
     auto payload = core::AccessUnitPayload(raw_aus.moveParameters(), raw_aus.getNumRecords());
+    payload.setStats(std::move(raw_aus.getStats()));
 
+    size_t totalSizeCompressed = 0;
+    size_t totalSizeUncompressed = 0;
     for (auto &desc : raw_aus) {
         core::AccessUnitPayload::DescriptorPayload descriptor_payload(desc.getID());
         auto ID = desc.getID();
         if (!getDescriptor(desc.getID()).tokentype) {
             for (const auto &subdesc : desc) {
+                totalSizeUncompressed += raw_aus.get(subdesc.getID()).getNumSymbols() * sizeof(uint32_t);
+                if (raw_aus.get(subdesc.getID()).getNumSymbols()) {
+                    payload.getStats().addInteger(
+                        "size-" + getDescriptor(desc.getID()).name + std::to_string(subdesc.getID().second) + "-raw",
+                        raw_aus.get(subdesc.getID()).getNumSymbols() * sizeof(uint32_t));
+                }
                 auto &input = raw_aus.get(subdesc.getID());
                 if (input.getNumSymbols() > 0) {
                     const auto &conf = configSet.getConfAsGabac(subdesc.getID());
                     // add compressed payload
-                    descriptor_payload.add(compress(conf, std::move(input)));
+                    auto compressed = compress(conf, std::move(input));
+                    if (compressed.getNumSymbols()) {
+                        payload.getStats().addInteger("size-" + getDescriptor(desc.getID()).name +
+                                                          std::to_string(subdesc.getID().second) + "-comp",
+                                                      compressed.get().getRawSize());
+                    }
+                    totalSizeCompressed += compressed.get().getRawSize();
+                    descriptor_payload.add(std::move(compressed));
                 } else {
                     // add empty payload
                     descriptor_payload.add(
@@ -105,12 +123,16 @@ void GabacCompressor::flowIn(core::AccessUnitRaw &&t, const util::Section &id) {
         }
     }
 
+    payload.getStats().addInteger("size-total-comp", totalSizeCompressed);
+    payload.getStats().addInteger("size-total-raw", totalSizeUncompressed);
+
     configSet.storeParameters(payload.getParameters());
 
     payload.setReference(raw_aus.getReference());
     payload.setMinPos(raw_aus.getMinPos());
     payload.setMaxPos(raw_aus.getMaxPos());
     raw_aus.clear();
+    payload.getStats().addDouble("time-gabac", watch.check());
     flowOut(std::move(payload), id);
 }
 

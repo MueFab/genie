@@ -39,7 +39,7 @@ class Importer : public core::FormatImporterCompressed {
    public:
     explicit Importer(std::istream& _file, genie::core::stats::PerfStats* _stats = nullptr);
 
-    bool pump(size_t& id) override;
+    bool pump(size_t& id, std::mutex& lock) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

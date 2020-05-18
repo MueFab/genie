@@ -17,16 +17,16 @@ void FormatImporter::setClassifier(Classifier* _classifier) { classifier = _clas
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool FormatImporter::pump(size_t& id) {
+bool FormatImporter::pump(size_t& id, std::mutex& lock) {
     record::Chunk chunk;
     util::Section sec{};
     {
         std::unique_lock<std::mutex> guard(lock);
         bool flushing = classifier->isFlushing();
         chunk = classifier->getChunk();
-        if (!chunk.empty()) {
-            sec = {id, chunk.size(), false};
-            id += chunk.size();
+        if (!chunk.getData().empty()) {
+            sec = {id, chunk.getData().size(), false};
+            id += chunk.getData().size();
         } else {
             bool dataLeft = pumpRetrieve(classifier);
             if (!dataLeft && !flushing) {
@@ -38,7 +38,7 @@ bool FormatImporter::pump(size_t& id) {
             }
         }
     }
-    if (!chunk.empty()) {
+    if (!chunk.getData().empty()) {
         Source<record::Chunk>::flowOut(std::move(chunk), sec);
     }
     return true;

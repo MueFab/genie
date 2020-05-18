@@ -73,8 +73,7 @@ uint64_t Exporter::mappedLength(const std::string& cigar) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Exporter::Exporter(header::Header&& header, std::ostream& _file_1, genie::core::stats::SamStats* _stats)
-    : stats(_stats), writer(std::move(header), _file_1) {}
+Exporter::Exporter(header::Header&& header, std::ostream& _file_1) : writer(std::move(header), _file_1) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -240,7 +239,7 @@ std::vector<sam::Record> Exporter::convert(core::record::Record&& rec) {
 void Exporter::flowIn(core::record::Chunk&& records, const util::Section& id) {
     core::record::Chunk recs = std::move(records);
     util::OrderedSection section(&lock, id);
-    for (auto& rec : recs) {
+    for (auto& rec : recs.getData()) {
         auto sam_recs = convert(std::move(rec));
         for (auto& srec : sam_recs) {
             writer.write(std::move(srec));

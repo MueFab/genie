@@ -35,10 +35,9 @@ class Exporter : public core::FormatExporterCompressed {
    private:
     util::BitWriter writer;
     util::OrderedLock lock;
-    genie::core::stats::PerfStats* stats;
 
    public:
-    explicit Exporter(std::ostream* _file, genie::core::stats::PerfStats* _stats = nullptr);
+    explicit Exporter(std::ostream* _file);
     void flowIn(core::AccessUnitPayload&& t, const genie::util::Section& id) override;
 };
 

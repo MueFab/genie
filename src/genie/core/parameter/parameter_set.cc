@@ -124,7 +124,7 @@ ParameterSet::ParameterSet()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::write(util::BitWriter &writer, stats::PerfStats *) const {
+void ParameterSet::write(util::BitWriter &writer) const {
     DataUnit::write(writer);
     writer.write(0, 10);  // reserved
 

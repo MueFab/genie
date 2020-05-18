@@ -75,9 +75,26 @@ Record::Record() : Record("", 0, "", 0, 0, "", "", 0, 0, "", "") {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Record::Record(const std::string& string, genie::core::stats::SamStats* stats) {
+Record::Record(const std::string& string, Stats& s) {
     auto tokens = util::tokenize(string, '\t');
     UTILS_DIE_IF(tokens.size() < 11, "Invalid SAM record");
+    if (s.active) {
+        s.qname = tokens[0].size();
+        s.flag = tokens[1].size();
+        s.rname = tokens[2].size();
+        s.pos = tokens[3].size();
+        s.mapq = tokens[4].size();
+        s.cigar = tokens[5].size();
+        s.rnext = tokens[6].size();
+        s.pnext = tokens[7].size();
+        s.tlen = tokens[8].size();
+        s.seq = tokens[9].size();
+        s.qual = tokens[10].size();
+
+        for (size_t i = 11; i < tokens.size(); ++i) {
+            s.opt += tokens[i].size();
+        }
+    }
     qname = tokens[0];
     flag = std::stoi(tokens[1]);
     rname = tokens[2];
@@ -90,22 +107,6 @@ Record::Record(const std::string& string, genie::core::stats::SamStats* stats) {
     seq = tokens[9];
     qual = tokens[10];
     //    check();
-
-    if (stats != nullptr) {
-        stats->num_recs++;
-        stats->orig_total_sz += string.size() + 1;  // +1 for newline
-        stats->orig_qname_sz += qname.size();
-        stats->orig_flag_sz += tokens[1].size();
-        stats->orig_rname_sz += rname.size();
-        stats->orig_pos_sz += tokens[3].size();
-        stats->orig_mapq_sz += tokens[4].size();
-        stats->orig_cigar_sz += cigar.size();
-        stats->orig_rnext_sz += rnext.size();
-        stats->orig_pnext_sz += tokens[7].size();
-        stats->orig_tlen_sz += tokens[8].size();
-        stats->orig_seq_sz += seq.size();
-        stats->orig_qual_sz += qual.size();
-    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

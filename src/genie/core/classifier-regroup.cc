@@ -25,7 +25,7 @@ ClassifierRegroup::ClassifierRegroup(size_t _auSize) : auSize(_auSize), flushing
 
 record::Chunk ClassifierRegroup::getChunk() {
     for (auto& c : classes) {
-        if (c.size() > 1 || (!c.front().empty() && flushing)) {
+        if (c.size() > 1 || (!c.front().getData().empty() && flushing)) {
             record::Chunk chunk = std::move(c.front());
             c.erase(c.begin());
             if (c.empty()) {
@@ -44,7 +44,7 @@ record::Chunk ClassifierRegroup::getChunk() {
 
 void ClassifierRegroup::add(record::Chunk&& c) {
     record::Chunk chunk = std::move(c);
-    for (auto& r : chunk) {
+    for (auto& r : chunk.getData()) {
         auto classtype = classify(r);
         r.setClassType(classtype);
         if (r.getClassID() < record::ClassType::CLASS_HM && r.getAlignmentSharedData().getSeqID() != currentSeq) {
@@ -53,10 +53,10 @@ void ClassifierRegroup::add(record::Chunk&& c) {
                 classes[i].emplace_back();
             }
         }
-        if (classes[uint8_t(classtype)].back().size() >= auSize) {
+        if (classes[uint8_t(classtype)].back().getData().size() >= auSize) {
             classes[uint8_t(classtype)].emplace_back();
         }
-        classes[uint8_t(classtype)].back().emplace_back(std::move(r));
+        classes[uint8_t(classtype)].back().getData().emplace_back(std::move(r));
     }
 }
 

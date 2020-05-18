@@ -12,17 +12,21 @@
 namespace genie {
 namespace util {
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 thread_local size_t ThreadManager::threadID;
 thread_local size_t ThreadManager::threadNum;
+thread_local ThreadManager* ThreadManager::localManager;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ThreadManager::action(size_t id) {
     ThreadManager::threadID = id;
     ThreadManager::threadNum = threads.size();
+    ThreadManager::localManager = this;
     try {
         for (const auto& s : source) {
-            while (!stopFlag && s->pump(counter)) {
+            while (!stopFlag && s->pump(counter, lock)) {
             }
         }
     } catch (std::exception& e) {

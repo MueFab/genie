@@ -177,6 +177,12 @@ class FlowGraphEncode : public FlowGraph {
      * @param abort
      */
     void stop(bool abort) override;
+
+    /**
+     *
+     * @return
+     */
+    core::stats::PerfStats getStats() override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/record/record.h>
+#include <genie/core/record/chunk.h>
 #include <genie/core/stats/perf-stats.h>
 #include <genie/util/bitwriter.h>
 #include <genie/util/drain.h>
@@ -25,16 +25,15 @@ namespace mgrec {
  *
  */
 class MgrecsExporter : public util::Drain<core::record::Chunk> {
-    util::BitWriter writer;                //!<
-    util::OrderedLock lock;                //!<
-    genie::core::stats::PerfStats* stats;  //!< @brief Stats collector (null => don't collect)
+    util::BitWriter writer;  //!<
+    util::OrderedLock lock;  //!<
 
    public:
     /**
      *
      * @param _file_1
      */
-    explicit MgrecsExporter(std::ostream& _file_1, genie::core::stats::PerfStats* _stats = nullptr);
+    explicit MgrecsExporter(std::ostream& _file_1);
 
     /**
      *

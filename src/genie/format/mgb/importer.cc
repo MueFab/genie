@@ -19,7 +19,7 @@ Importer::Importer(std::istream& _file, genie::core::stats::PerfStats* _stats) :
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Importer::pump(size_t& id) {
+bool Importer::pump(size_t& id, std::mutex&) {
     boost::optional<mgb::AccessUnit> unit;
     util::Section sec{};
     {

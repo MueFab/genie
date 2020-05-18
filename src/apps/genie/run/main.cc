@@ -61,8 +61,8 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 
 int main(int argc, char* argv[]) {
     ProgramOptions pOpts(argc, argv);
-
-    constexpr size_t BLOCKSIZE = 10000;
+    genie::util::Watch watch;
+    constexpr size_t BLOCKSIZE = 1000;
     std::unique_ptr<genie::core::FlowGraph> flowGraph;
     std::ifstream input_file(pOpts.inputFile);
     std::ofstream output_file(pOpts.outputFile);
@@ -93,6 +93,11 @@ int main(int argc, char* argv[]) {
     }
 
     flowGraph->run();
+
+    auto stats = flowGraph->getStats();
+    stats.addDouble("time-total", watch.check());
+    std::cout << stats << std::endl;
+
 
     return 0;
 }

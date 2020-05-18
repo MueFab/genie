@@ -4,59 +4,35 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_FORMAT_EXPORTER_H
-#define GENIE_FORMAT_EXPORTER_H
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#include <genie/core/access-unit-payload.h>
-#include <genie/core/record/chunk.h>
-#include <genie/util/drain.h>
+#include "chunk.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
-
-/**
- * @brief Interface for exporters of various file formats. Note that each importer has to convert from mpegg-records
- */
-class FormatExporter : public util::Drain<record::Chunk> {
-   private:
-    stats::PerfStats stats; //!<
-
-   public:
-    /**
-     *
-     * @return
-     */
-    stats::PerfStats& getStats();
-
-    /**
-     *
-     * @param id
-     */
-    void skipIn(const util::Section& id) override;
-
-    /**
-     *
-     */
-    void flushIn() override;
-
-    /**
-     *
-     */
-    ~FormatExporter() override = default;
-};
+namespace record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+std::vector<Record>& Chunk::getData() { return data; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::vector<Record>& Chunk::getData() const { return data; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+stats::PerfStats& Chunk::getStats() { return stats; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Chunk::setStats(stats::PerfStats&& s) { stats = std::move(s); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace record
 }  // namespace core
 }  // namespace genie
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#endif  // GENIE_FORMAT_EXPORTER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

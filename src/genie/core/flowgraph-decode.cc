@@ -160,6 +160,16 @@ void FlowGraphDecode::run() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+core::stats::PerfStats FlowGraphDecode::getStats() {
+    core::stats::PerfStats ret;
+    for (auto& e : exporters) {
+        ret.add(e->getStats());
+    }
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace core
 }  // namespace genie
 

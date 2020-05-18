@@ -21,7 +21,16 @@ namespace core {
  *
  */
 class FormatExporterCompressed : public util::Drain<AccessUnitPayload> {
+   private:
+    stats::PerfStats stats; //!<
+
    public:
+    /**
+     *
+     * @return
+     */
+    stats::PerfStats& getStats();
+
     /**
      *
      * @param id

@@ -21,6 +21,7 @@ set(source_files
         record/alignment_split/unpaired.cc
         record/segment.cc
         record/record.cc
+        record/chunk.cc
         record/alignment-split.cc
         record/alignment-shared-data.cc
         record/alignment-external.cc

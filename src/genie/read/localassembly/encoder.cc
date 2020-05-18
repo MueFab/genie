@@ -6,6 +6,7 @@
 
 #include "encoder.h"
 #include <genie/quality/paramqv1/qv_coding_config_1.h>
+#include <genie/util/watch.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -126,16 +127,17 @@ core::AccessUnitRaw Encoder::pack(size_t id, uint16_t ref, uint8_t qv_depth,
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
+    util::Watch watch;
     core::record::Chunk data = std::move(t);
-    LaeState state(cr_buf_max_size, data.front().getAlignments().front().getPosition());
+    LaeState state(cr_buf_max_size, data.getData().front().getAlignments().front().getPosition());
 
-    state.pairedEnd = data.front().getNumberOfTemplateSegments() > 1;
-    state.readLength = data.front().getSegments().front().getSequence().length();
+    state.pairedEnd = data.getData().front().getNumberOfTemplateSegments() > 1;
+    state.readLength = data.getData().front().getSegments().front().getSequence().length();
 
-    auto ref = data.front().getAlignmentSharedData().getSeqID();
+    auto ref = data.getData().front().getAlignmentSharedData().getSeqID();
     uint64_t lastPos = 0;
     core::QVEncoder::QVCoded qv(nullptr, core::AccessUnitRaw::Descriptor(core::GenDesc::QV));
-    uint8_t qvdepth = qvcoder ? data.front().getSegments().front().getQualities().size() : 0;
+    uint8_t qvdepth = qvcoder ? data.getData().front().getSegments().front().getQualities().size() : 0;
     if (qvcoder) {
         qv = qvcoder->process(data);
     } else {
@@ -145,7 +147,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     if (namecoder) {
         rname = namecoder->process(data);
     }
-    for (auto& r : data) {
+    for (auto& r : data.getData()) {
         UTILS_DIE_IF(r.getSegments().front().getQualities().size() != qvdepth && qvcoder, "QV_depth not compatible");
         UTILS_DIE_IF(r.getAlignments().front().getPosition() < lastPos,
                      "Data seems to be unsorted. Local assembly encoding needs sorted input data.");
@@ -164,7 +166,9 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     rawAU.get(core::GenDesc::QV) = std::move(qv.second);
     rawAU.get(core::GenDesc::RNAME) = std::move(rname);
     rawAU.get(core::GenDesc::FLAGS) = core::AccessUnitRaw::Descriptor(core::GenDesc::FLAGS);
-    data.clear();
+    rawAU.setStats(std::move(data.getStats()));
+    data.getData().clear();
+    rawAU.getStats().addDouble("time-localassembly", watch.check());
     flowOut(std::move(rawAU), id);
 }
 

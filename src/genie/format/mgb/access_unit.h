@@ -36,7 +36,7 @@ class AccessUnit : public core::parameter::DataUnit {
     explicit AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &parameterSets,
                         util::BitReader &bitReader);
 
-    void write(util::BitWriter &writer, genie::core::stats::PerfStats *stats = nullptr) const override;
+    void write(util::BitWriter &writer) const override;
 
     AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
                uint32_t _reads_count, DatasetType dataset_type, uint8_t posSize, uint8_t signatureSize,

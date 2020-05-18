@@ -71,11 +71,11 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
         }
         addECigar(rec, ecigars);
         refEncoder.addRead(rec);
-        chunk.emplace_back(std::move(rec));
+        chunk.getData().emplace_back(std::move(rec));
     }
     auto qvs = this->qvcoder->process(qvparam, ecigars, qvStream);
     size_t qvCounter = 0;
-    for (auto& r : chunk) {
+    for (auto& r : chunk.getData()) {
         for (auto& s : r.getSegments()) {
             if (!qvs[qvCounter].empty()) {
                 s.addQualities(std::move(qvs[qvCounter]));

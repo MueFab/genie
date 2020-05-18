@@ -33,7 +33,7 @@ class Reader {
 
     const header::Header& getHeader() const;
 
-    void read(size_t num, std::vector<Record>& vec, genie::core::stats::SamStats* stats);
+    void read(size_t num, std::vector<Record>& vec, core::stats::PerfStats& stats);
 
     bool isEnd();
 };
