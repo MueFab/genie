@@ -27,7 +27,6 @@ namespace core {
  */
 class FormatImporter : public util::OriginalSource, public util::Source<record::Chunk> {
    private:
-    std::mutex lock;         //!<
     Classifier* classifier;  //!<
 
    protected:
@@ -50,7 +49,7 @@ class FormatImporter : public util::OriginalSource, public util::Source<record::
      * @param id
      * @return
      */
-    bool pump(size_t& id) override;
+    bool pump(size_t& id, std::mutex& lock) override;
 
     /**
      *

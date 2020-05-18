@@ -32,8 +32,7 @@ namespace genie {
 namespace read {
 namespace spring {
 
-void reorder_compress_quality_id(const std::string &temp_dir, const compression_params &cp,
-                                 core::stats::FastqStats *stats) {
+void reorder_compress_quality_id(const std::string &temp_dir, const compression_params &cp) {
     // Read some parameter
     uint32_t numreads = cp.num_reads;
     int num_thr = cp.num_thr;
@@ -71,14 +70,14 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
             std::cout << "Compressing qualities\n";
             uint32_t num_reads_per_file = numreads;
             reorder_compress(file_quality[0], temp_dir, num_reads_per_file, num_thr, num_reads_per_block, str_array,
-                             str_array_size, order_array, "quality", stats);
+                             str_array_size, order_array, "quality");
             remove(file_quality[0].c_str());
         }
         if (preserve_id) {
             std::cout << "Compressing ids\n";
             uint32_t num_reads_per_file = numreads;
             reorder_compress(file_id, temp_dir, num_reads_per_file, num_thr, num_reads_per_block, str_array,
-                             str_array_size, order_array, "id", stats);
+                             str_array_size, order_array, "id");
             remove(file_id.c_str());
         }
 
@@ -115,7 +114,7 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
             // (needed because block sizes are not exactly equal to
             // num_reads_per_block
             reorder_compress_quality_pe(file_quality, temp_dir, quality_array, quality_array_size, order_array,
-                                        block_start, block_end, cp, stats);
+                                        block_start, block_end, cp);
             delete[] quality_array;
             delete[] order_array;
             remove(file_quality[0].c_str());
@@ -128,7 +127,7 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
             std::string *id_array = new std::string[numreads / 2];
             std::ifstream f_id(file_id);
             for (uint32_t i = 0; i < numreads / 2; i++) std::getline(f_id, id_array[i]);
-            reorder_compress_id_pe(id_array, temp_dir, file_order_id, block_start, block_end, cp, stats);
+            reorder_compress_id_pe(id_array, temp_dir, file_order_id, block_start, block_end, cp);
             delete[] id_array;
             for (uint32_t i = 0; i < block_start.size(); i++) remove((file_order_id + "." + std::to_string(i)).c_str());
             remove(file_id.c_str());
@@ -167,7 +166,7 @@ void generate_order(const std::string &file_order, uint32_t *order_array, const 
 
 void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, const std::string &file_order_id,
                             const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
-                            const compression_params &cp, core::stats::FastqStats *) {
+                            const compression_params &cp) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
     (void)cp;
 
@@ -196,7 +195,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
 void reorder_compress_quality_pe(std::string file_quality[2], const std::string &temp_dir, std::string *quality_array,
                                  const uint64_t &quality_array_size, uint32_t *order_array,
                                  const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
-                                 const compression_params &cp, core::stats::FastqStats *) {
+                                 const compression_params &cp) {
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
     uint32_t start_block_num = 0;
     uint32_t end_block_num = 0;
@@ -235,8 +234,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
 
 void reorder_compress(const std::string &file_name, const std::string &temp_dir, const uint32_t &num_reads_per_file,
                       const int &num_thr, const uint32_t &num_reads_per_block, std::string *str_array,
-                      const uint32_t &str_array_size, uint32_t *order_array, const std::string &mode,
-                      core::stats::FastqStats *) {
+                      const uint32_t &str_array_size, uint32_t *order_array, const std::string &mode) {
     const std::string id_desc_prefix = temp_dir + "/id_streams.";
     const std::string quality_desc_prefix = temp_dir + "/quality_streams.";
     for (uint32_t ndex = 0; ndex <= num_reads_per_file / str_array_size; ndex++) {

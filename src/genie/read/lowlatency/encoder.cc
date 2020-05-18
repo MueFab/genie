@@ -23,10 +23,11 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     core::record::Chunk data = std::move(t);
 
     core::parameter::ParameterSet set;
-    LLState state{data.front().getSegments().front().getSequence().length(),
-                  data.front().getNumberOfTemplateSegments() > 1,
-                  core::AccessUnitRaw(std::move(set), data.size() * data.front().getNumberOfTemplateSegments())};
-    for (auto& r : data) {
+    LLState state{data.getData().front().getSegments().front().getSequence().length(),
+                  data.getData().front().getNumberOfTemplateSegments() > 1,
+                  core::AccessUnitRaw(std::move(set),
+                                      data.getData().size() * data.getData().front().getNumberOfTemplateSegments())};
+    for (auto& r : data.getData()) {
         for (auto& s : r.getSegments()) {
             state.streams.push(core::GenSub::RLEN, s.getSequence().length() - 1);
             if (state.readLength != s.getSequence().length()) {
@@ -57,7 +58,8 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
 
     state.streams.get(core::GenDesc::QV) = std::move(qv.second);
 
-    flowOut(pack(id, data.front().getSegments().front().getQualities().size(), std::move(qv.first), state), id);
+    flowOut(pack(id, data.getData().front().getSegments().front().getQualities().size(), std::move(qv.first), state),
+            id);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

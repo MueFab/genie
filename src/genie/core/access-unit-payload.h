@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/core/stats/perf-stats.h>
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 #include <genie/util/data-block.h>
@@ -337,8 +338,22 @@ class AccessUnitPayload {
      */
     void setClassType(record::ClassType _type);
 
+    /**
+     *
+     * @return
+     */
+    stats::PerfStats& getStats();
+
+    /**
+     *
+     * @param s
+     */
+    void setStats(stats::PerfStats&& s);
+
    private:
     std::vector<DescriptorPayload> desc_pay;  //!< @brief
+
+    stats::PerfStats stats;
 
     record::ClassType type{};
     size_t record_num;                   //!< @brief

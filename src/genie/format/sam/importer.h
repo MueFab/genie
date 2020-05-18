@@ -13,6 +13,7 @@
 #include <genie/core/record/record.h>
 #include <genie/core/stats/perf-stats.h>
 #include <genie/util/ordered-lock.h>
+#include <genie/util/watch.h>
 #include <list>
 #include <map>
 #include "reader.h"
@@ -29,10 +30,9 @@ class Importer : public core::FormatImporter {
    private:
     size_t blockSize;
     Reader samReader;
-    genie::core::stats::SamStats *stats;  //!< @brief Stats collector (null => don't collect)
 
    public:
-    Importer(size_t _blockSize, std::istream &_file, genie::core::stats::SamStats *_stats = nullptr);
+    Importer(size_t _blockSize, std::istream &_file);
 
     static std::tuple<bool, uint8_t> convertFlags2Mpeg(uint16_t flags);
 
@@ -47,12 +47,13 @@ class Importer : public core::FormatImporter {
 
     static core::record::Record convert(uint16_t ref, sam::Record &&_r1, sam::Record *_r2);
     bool pumpRetrieve(genie::core::Classifier *_classifier) override {
+        util::Watch watch;
+        core::stats::PerfStats stats;
         core::record::Chunk chunk;
         std::vector<sam::Record> s;
         std::list<sam::Record> samRecords;
         uint16_t local_ref_num = 0;
         {
-            // TODO: util::OrderedSection section(&lock, id);
             samReader.read(blockSize, s, stats);
             if (s.size() == 0) {
                 return false;
@@ -76,7 +77,7 @@ class Importer : public core::FormatImporter {
             const std::string &rnameSearchString =
                 samRecord.getRnext() == "=" ? samRecord.getRname() : samRecord.getRnext();
             auto mate = samRecords.begin();
-            //   mate = samRecords.end();  // Disable pairs for now TODO: implement
+            mate = samRecords.end();  // Disable pairs for now TODO: implement
             if (samRecord.getPnext() == samRecord.getPos() && samRecord.getRname() == rnameSearchString) {
                 mate = samRecords.end();
             }
@@ -92,18 +93,20 @@ class Importer : public core::FormatImporter {
                     samRecord.getCigar() == "*" || samRecord.getPos() == 0 || samRecord.getRname() == "*") {
                     skipped++;
                 } else {
-                    chunk.emplace_back(convert(local_ref_num, std::move(samRecord), nullptr));
+                    chunk.getData().emplace_back(convert(local_ref_num, std::move(samRecord), nullptr));
                 }
             } else {
                 // TODO: note the filtering of unaligned reads above. Move this to the encoder
-                chunk.emplace_back(convert(local_ref_num, std::move(samRecord), &*mate));
+                chunk.getData().emplace_back(convert(local_ref_num, std::move(samRecord), &*mate));
                 samRecords.erase(mate);
             }
         }
         if (skipped) {
             std::cerr << "Skipped " << skipped << " unmapped reads! Those are currently not supported." << std::endl;
         }
-        if (!chunk.empty()) {
+        if (!chunk.getData().empty()) {
+            stats.addDouble("time-sam-import", watch.check());
+            chunk.setStats(std::move(stats));
             _classifier->add(std::move(chunk));
         }
 

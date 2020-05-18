@@ -5,6 +5,7 @@
  */
 
 #include "exporter.h"
+#include <genie/util/watch.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -14,13 +15,15 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Exporter::Exporter(std::ostream* _file, genie::core::stats::PerfStats* _stats) : writer(_file), stats(_stats) {}
+Exporter::Exporter(std::ostream* _file) : writer(_file) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Exporter::flowIn(core::AccessUnitPayload&& t, const util::Section& id) {
+    util::Watch watch;
     core::AccessUnitPayload data = std::move(t);
     util::OrderedSection section(&lock, id);
+    getStats().add(data.getStats());
     data.getParameters().write(writer);
     auto type = core::record::ClassType::CLASS_U;
     if (data.getParameters().isComputedReference() && data.getParameters().getComputedRef().getAlgorithm() ==
@@ -37,7 +40,8 @@ void Exporter::flowIn(core::AccessUnitPayload&& t, const util::Section& id) {
         }
         au.addBlock(Block(descriptor, data.movePayload(descriptor)));
     }
-    au.write(writer, stats);
+    au.write(writer);
+    getStats().addDouble("time-mgb-export", watch.check());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

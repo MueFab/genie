@@ -12,7 +12,6 @@
 #include <genie/core/read-encoder.h>
 #include <genie/core/record/alignment_split/same-rec.h>
 #include <genie/read/basecoder/encoder.h>
-#include <mutex>
 #include "local-reference.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

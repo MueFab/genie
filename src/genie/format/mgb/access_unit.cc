@@ -142,7 +142,7 @@ uint32_t AccessUnit::getReadCount() const { return reads_count; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::write(util::BitWriter &writer, genie::core::stats::PerfStats *stats) const {
+void AccessUnit::write(util::BitWriter &writer) const {
     DataUnit::write(writer);
     writer.write(0, 3);
 
@@ -165,10 +165,6 @@ void AccessUnit::write(util::BitWriter &writer, genie::core::stats::PerfStats *s
     writer.writeBuffer(&ss);
     for (auto &i : blocks) {
         i.write(writer);
-    }
-
-    if (stats != nullptr) {
-        stats->recordMgbStreams(getBlocks());
     }
 }
 

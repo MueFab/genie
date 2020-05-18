@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/core/stats/perf-stats.h>
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 #include <cstdint>
@@ -191,11 +192,6 @@ class Record {
      */
     const AlignmentExternal& getAlignmentExternal() const;
 };
-
-/**
- *
- */
-typedef std::vector<Record> Chunk;
 
 // ---------------------------------------------------------------------------------------------------------------------
 

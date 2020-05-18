@@ -31,8 +31,8 @@ void Preprocessor::preprocess(core::record::Chunk &&t, size_t) {
 
     if (!init) {
         init = true;
-        cp.paired_end = data.front().getSegments().size() == 2;
-        UTILS_DIE_IF(data.front().getSegments().size() > 2, "Maximum of two segments per read supported");
+        cp.paired_end = data.getData().front().getSegments().size() == 2;
+        UTILS_DIE_IF(data.getData().front().getSegments().size() > 2, "Maximum of two segments per read supported");
         cp.ureads_flag = false;
         cp.num_reads = 0;
         cp.num_reads_clean[0] = 0;
@@ -51,11 +51,12 @@ void Preprocessor::preprocess(core::record::Chunk &&t, size_t) {
         if (cp.preserve_id) fout_id.open(outfileid);
     }
 
-    UTILS_DIE_IF(data.front().getNumberOfTemplateSegments() * data.size() + cp.num_reads > MAX_NUM_READS,
-                 "Too many reads");
+    UTILS_DIE_IF(
+        data.getData().front().getNumberOfTemplateSegments() * data.getData().size() + cp.num_reads > MAX_NUM_READS,
+        "Too many reads");
 
     size_t rec_index = 0;
-    for (auto &rec : data) {
+    for (auto &rec : data.getData()) {
         UTILS_DIE_IF(rec.getSegments().size() != ((size_t)cp.paired_end + 1), "Number of segments differs");
         size_t seg_index = 0;
         for (auto &seq : rec.getSegments()) {

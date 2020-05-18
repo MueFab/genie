@@ -19,7 +19,7 @@
 #if 0
 namespace dsg {
 
-static void generationFromFastq_SPRING(const ProgramOptions &programOptions, core::stats::FastqStats *stats, const std::string &filename) {
+static void generationFromFastq_SPRING(const ProgramOptions &programOptions, const std::string &filename) {
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Descriptor stream generation from FASTQ file" << std::endl;
     std::cout << "Output filename = " << filename << std::endl;
@@ -44,7 +44,7 @@ static void generationFromFastq_SPRING(const ProgramOptions &programOptions, cor
     }
 }
 
-static void generationFromFastq(const ProgramOptions &programOptions, core::stats::FastqStats *stats) {
+static void generationFromFastq(const ProgramOptions &programOptions) {
     std::string filename = programOptions.outputFilePath;
 
     if (filename.empty()) {
@@ -86,7 +86,7 @@ static void generationFromFastq(const ProgramOptions &programOptions, core::stat
     generationFromFastq_SPRING(programOptions, stats, filename);
 }
 
-void decompression_fastq(const ProgramOptions &programOptions, core::stats::FastqStats *stats) {
+void decompression_fastq(const ProgramOptions &programOptions) {
     // Open file and create tmp directory with random name
     std::ifstream in(programOptions.inputFilePath);
     if (!in) {

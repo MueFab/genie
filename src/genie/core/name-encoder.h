@@ -9,10 +9,10 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/core/record/chunk.h>
 #include <genie/util/drain.h>
 #include <genie/util/source.h>
 #include "access-unit-raw.h"
-#include "record/record.h"
 
 #include <utility>
 

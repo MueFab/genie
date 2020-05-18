@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/record/record.h>
+#include <genie/core/record/chunk.h>
 #include <genie/core/stats/perf-stats.h>
 #include <genie/util/bitreader.h>
 #include <genie/util/ordered-lock.h>
@@ -29,13 +29,12 @@ class MgrecsImporter : public util::Source<core::record::Chunk>, public util::Or
     size_t blockSize;
     util::BitReader reader;
     size_t record_counter;
-    util::OrderedLock lock;                //!< @brief Lock to ensure in order execution
-    genie::core::stats::PerfStats *stats;  //!< @brief Stats collector (null => don't collect)
+    util::OrderedLock lock;  //!< @brief Lock to ensure in order execution
 
    public:
-    MgrecsImporter(size_t _blockSize, std::istream &_file_1, genie::core::stats::PerfStats *_stats = nullptr);
+    MgrecsImporter(size_t _blockSize, std::istream& _file_1);
 
-    bool pump(size_t &id) override;
+    bool pump(size_t& id, std::mutex& lock) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

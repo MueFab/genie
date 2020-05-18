@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/core/record/chunk.h>
 #include <genie/util/selector.h>
 #include <genie/util/sideSelector.h>
 #include <genie/util/source.h>
@@ -16,7 +17,6 @@
 #include "module.h"
 #include "name-decoder.h"
 #include "qv-decoder.h"
-#include "record/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

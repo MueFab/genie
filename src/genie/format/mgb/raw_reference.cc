@@ -33,7 +33,7 @@ void RawReference::addSequence(RawReferenceSequence &&ref) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void RawReference::write(util::BitWriter &writer, genie::core::stats::PerfStats *) const {
+void RawReference::write(util::BitWriter &writer) const {
     DataUnit::write(writer);
 
     uint64_t size = 0;

@@ -54,7 +54,7 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
             rec.addSegment(std::move(seg));
         }
 
-        ret.push_back(std::move(rec));
+        ret.getData().push_back(std::move(rec));
     }
 
     flowOut(std::move(ret), id);

@@ -37,7 +37,7 @@ class Encoder : public core::NameEncoder {
         core::AccessUnitRaw::Descriptor ret(core::GenDesc::RNAME);
         std::vector<SingleToken> old;
 
-        for (const auto& r : recs) {
+        for (const auto& r : recs.getData()) {
             TokenState state(old, r.getName());
             auto newTok = state.run();
             TokenState::encode(newTok, ret);

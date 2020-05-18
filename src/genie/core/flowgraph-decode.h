@@ -171,6 +171,12 @@ class FlowGraphDecode : public FlowGraph {
      *
      */
     void run() override;
+
+    /**
+     *
+     * @return
+     */
+    core::stats::PerfStats getStats() override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

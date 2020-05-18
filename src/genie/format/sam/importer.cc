@@ -17,8 +17,7 @@ namespace sam {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Importer::Importer(size_t _blockSize, std::istream &_file, genie::core::stats::SamStats *_stats)
-    : blockSize(_blockSize), samReader(_file), stats(_stats), ref_counter(0) {}
+Importer::Importer(size_t _blockSize, std::istream &_file) : blockSize(_blockSize), samReader(_file), ref_counter(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -50,9 +49,9 @@ char Importer::convertCigar2ECigarChar(char token) {
         lut['P'] = ']';
         return lut;
     }();
-    UTILS_DIE_IF(token < 0, "Invalid cigar token " + std::to_string(token));
+    UTILS_DIE_IF(token < 0, "Invalid cigar token " + std::to_string((char)token));
     char ret = lut_loc[token];
-    UTILS_DIE_IF(ret == 0, "Invalid cigar token" + std::to_string(token));
+    UTILS_DIE_IF(ret == 0, "Invalid cigar token " + std::string(1, token));
     return ret;
 }
 
@@ -72,7 +71,7 @@ int Importer::stepSequence(char token) {
         lut['P'] = 0;
         return lut;
     }();
-    UTILS_DIE_IF(token < 0, "Invalid cigar token " + std::to_string(token));
+    UTILS_DIE_IF(token < 0, "Invalid cigar token " + std::to_string((char)token));
     return lut_loc[token];
 }
 

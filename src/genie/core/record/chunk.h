@@ -4,28 +4,40 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_FORMAT_EXPORTER_H
-#define GENIE_FORMAT_EXPORTER_H
+#ifndef GENIE_CHUNK_H
+#define GENIE_CHUNK_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/access-unit-payload.h>
-#include <genie/core/record/chunk.h>
-#include <genie/util/drain.h>
+#include "record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
+namespace record {
 
 /**
- * @brief Interface for exporters of various file formats. Note that each importer has to convert from mpegg-records
+ *
  */
-class FormatExporter : public util::Drain<record::Chunk> {
+class Chunk {
    private:
-    stats::PerfStats stats; //!<
+    std::vector<Record> data;  //!<
+    stats::PerfStats stats;    //!<
 
    public:
+    /**
+     *
+     * @return
+     */
+    std::vector<Record>& getData();
+
+    /**
+     *
+     * @return
+     */
+    const std::vector<Record>& getData() const;
+
     /**
      *
      * @return
@@ -34,29 +46,20 @@ class FormatExporter : public util::Drain<record::Chunk> {
 
     /**
      *
-     * @param id
+     * @param s
      */
-    void skipIn(const util::Section& id) override;
-
-    /**
-     *
-     */
-    void flushIn() override;
-
-    /**
-     *
-     */
-    ~FormatExporter() override = default;
+    void setStats(stats::PerfStats&& s);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+}  // namespace record
 }  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_FORMAT_EXPORTER_H
+#endif  // GENIE_CHUNK_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

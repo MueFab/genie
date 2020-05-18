@@ -15,12 +15,12 @@ namespace mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MgrecsImporter::MgrecsImporter(size_t _blockSize, std::istream &_file_1, genie::core::stats::PerfStats *_stats)
-    : blockSize(_blockSize), reader(_file_1), record_counter(0), stats(_stats) {}
+MgrecsImporter::MgrecsImporter(size_t _blockSize, std::istream& _file_1)
+    : blockSize(_blockSize), reader(_file_1), record_counter(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool MgrecsImporter::pump(size_t &) {
+bool MgrecsImporter::pump(size_t&, std::mutex&) {
     core::record::Chunk chunk;
     {
         //  util::OrderedSection section(&lock, id);
@@ -30,7 +30,7 @@ bool MgrecsImporter::pump(size_t &) {
                 //          flowOut(std::move(chunk), record_counter++);
                 return false;
             }
-            chunk.emplace_back(std::move(rec));
+            chunk.getData().emplace_back(std::move(rec));
         }
     }
     //  flowOut(std::move(chunk), record_counter++);

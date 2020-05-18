@@ -172,6 +172,16 @@ void FlowGraphEncode::stop(bool abort) { mgr.stop(abort); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+core::stats::PerfStats FlowGraphEncode::getStats() {
+    core::stats::PerfStats ret;
+    for (auto& e : exporters) {
+        ret.add(e->getStats());
+    }
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace core
 }  // namespace genie
 

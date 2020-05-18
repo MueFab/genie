@@ -134,7 +134,7 @@ class ParameterSet : public DataUnit {
      * @param writer
      * @param stats
      */
-    void write(util::BitWriter &writer, stats::PerfStats *stats = nullptr) const override;
+    void write(util::BitWriter &writer) const override;
 
     /**
      *

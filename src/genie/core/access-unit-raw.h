@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/core/stats/perf-stats.h>
 #include <genie/util/data-block.h>
 #include "constants.h"
 #include "parameter/parameter_set.h"
@@ -372,9 +373,14 @@ class AccessUnitRaw {
      */
     const Descriptor* end() const;
 
+    stats::PerfStats& getStats() { return stats; }
+
+    void setStats(stats::PerfStats&& _stats) { stats = std::move(_stats); }
+
    private:
     std::vector<Descriptor> descriptors;  //!< @brief
     parameter::ParameterSet parameters;   //!< @brief
+    stats::PerfStats stats;
 
     size_t numRecords;  //!< @brief
 

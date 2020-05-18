@@ -12,6 +12,8 @@
 #include "spring.h"
 #include "util.h"
 
+#include <genie/core/record/chunk.h>
+
 namespace genie {
 namespace read {
 namespace spring {

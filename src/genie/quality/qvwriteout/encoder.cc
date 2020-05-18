@@ -15,8 +15,8 @@ void Encoder::setUpParameters(const core::record::Chunk& rec, paramqv1::QualityV
     desc.add(core::AccessUnitRaw::Subsequence(4, core::GenSub::QV_PRESENT));
     desc.add(core::AccessUnitRaw::Subsequence(4, core::GenSub::QV_CODEBOOK));
     desc.add(core::AccessUnitRaw::Subsequence(4, core::GenSub::QV_STEPS_0));
-    if (rec.front().getClassID() == core::record::ClassType::CLASS_I ||
-        rec.front().getClassID() == core::record::ClassType::CLASS_HM) {
+    if (rec.getData().front().getClassID() == core::record::ClassType::CLASS_I ||
+        rec.getData().front().getClassID() == core::record::ClassType::CLASS_HM) {
         desc.add(core::AccessUnitRaw::Subsequence(4, core::GenSub::QV_STEPS_1));
 
         codebook = paramqv1::QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);
@@ -57,7 +57,7 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
 
     setUpParameters(rec, *param, desc);
 
-    for (const auto& r : rec) {
+    for (const auto& r : rec.getData()) {
         size_t num_aligned_segs = r.getAlignments().empty() ? 0 : 1;
         if (num_aligned_segs) {
             num_aligned_segs += r.getAlignments().front().getAlignmentSplits().size();
