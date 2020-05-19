@@ -87,7 +87,7 @@ void AccessUnitRaw::Descriptor::add(Subsequence &&sub) { subdesc.push_back(std::
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnitRaw::Descriptor::set(uint16_t _id, Subsequence &&sub) { subdesc[uint8_t(_id)] = std::move(sub); }
+void AccessUnitRaw::Descriptor::set(uint16_t _id, Subsequence &&sub) { subdesc[uint16_t(_id)] = std::move(sub); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -185,6 +185,7 @@ AccessUnitPayload::DescriptorPayload::DescriptorPayload(GenDesc _id, size_t coun
     : id(_id) {
     if (this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
         subsequencePayloads.emplace_back(GenSubIndex{_id, 0}, remainingSize, reader);
+        return;
     }
     for (size_t i = 0; i < count; ++i) {
         size_t s = 0;

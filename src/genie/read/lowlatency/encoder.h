@@ -28,7 +28,6 @@ class Encoder : public core::ReadEncoder {
     };
 
    public:
-    explicit Encoder(core::QVEncoder* coder, core::NameEncoder* ncoder);
 
     void flowIn(core::record::Chunk&& t, const util::Section& id) override;
 

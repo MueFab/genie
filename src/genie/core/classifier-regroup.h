@@ -28,6 +28,7 @@ class ClassifierRegroup : public Classifier {
     uint16_t currentSeq;                            //!<
     size_t auSize;                                  //!<
     bool flushing;                                  //!<
+    bool init{true};                                //!<
 
    public:
     /**

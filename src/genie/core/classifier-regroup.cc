@@ -44,6 +44,10 @@ record::Chunk ClassifierRegroup::getChunk() {
 
 void ClassifierRegroup::add(record::Chunk&& c) {
     record::Chunk chunk = std::move(c);
+    if(init) {
+        init = false;
+        currentSeq = chunk.getData().front().getAlignmentSharedData().getSeqID();
+    }
     for (auto& r : chunk.getData()) {
         auto classtype = classify(r);
         r.setClassType(classtype);
@@ -53,10 +57,10 @@ void ClassifierRegroup::add(record::Chunk&& c) {
                 classes[i].emplace_back();
             }
         }
-        if (classes[uint8_t(classtype)].back().getData().size() >= auSize) {
-            classes[uint8_t(classtype)].emplace_back();
+        if (classes[uint8_t(classtype) - 1].back().getData().size() >= auSize) {
+            classes[uint8_t(classtype) - 1].emplace_back();
         }
-        classes[uint8_t(classtype)].back().getData().emplace_back(std::move(r));
+        classes[uint8_t(classtype) - 1].back().getData().emplace_back(std::move(r));
     }
 }
 
@@ -103,7 +107,11 @@ record::ClassType ClassifierRegroup::classify(const record::Record& r) {
         return record::ClassType::CLASS_HM;
     }
 
-    record::ClassType highestClass = record::ClassType::CLASS_P;
+    record::ClassType highestClass = record::ClassType::CLASS_M;
+    highestClass = std::max(highestClass, classifyECigar(r.getAlignments().front().getAlignment().getECigar()));
+    if (highestClass == record::ClassType::CLASS_I) {
+        return highestClass;
+    }
     for (const auto& a : r.getAlignments().front().getAlignmentSplits()) {
         if (a->getType() != record::AlignmentSplit::Type::SAME_REC) {
             continue;

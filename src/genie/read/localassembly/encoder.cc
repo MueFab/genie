@@ -104,12 +104,12 @@ void Encoder::updateGuesses(const core::record::Record& r, Encoder::LaeState& st
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::AccessUnitRaw Encoder::pack(size_t id, uint16_t ref, uint8_t qv_depth,
-                                  std::unique_ptr<core::parameter::QualityValues> qvparam,
+                                  std::unique_ptr<core::parameter::QualityValues> qvparam, core::record::ClassType type,
                                   Encoder::LaeState& state) const {
     core::parameter::DataUnit::DatasetType dataType = core::parameter::DataUnit::DatasetType::ALIGNED;
     core::parameter::ParameterSet ret(id, id, dataType, core::AlphabetID::ACGTN, state.readLength, state.pairedEnd,
                                       false, qv_depth, 0, false, false);
-    ret.addClass(core::record::ClassType::CLASS_I, std::move(qvparam));
+    ret.addClass(type, std::move(qvparam));
     auto crps = core::parameter::ComputedRef(core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY);
     crps.setExtension(core::parameter::ComputedRefExtended(0, cr_buf_max_size));
     ret.setComputedRef(std::move(crps));
@@ -120,7 +120,7 @@ core::AccessUnitRaw Encoder::pack(size_t id, uint16_t ref, uint8_t qv_depth,
     rawAU.setReference(ref);
     rawAU.setMinPos(state.minPos);
     rawAU.setMaxPos(state.maxPos);
-
+    rawAU.setClassType(type);
     return rawAU;
 }
 
@@ -138,15 +138,9 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     uint64_t lastPos = 0;
     core::QVEncoder::QVCoded qv(nullptr, core::AccessUnitRaw::Descriptor(core::GenDesc::QV));
     uint8_t qvdepth = qvcoder ? data.getData().front().getSegments().front().getQualities().size() : 0;
-    if (qvcoder) {
-        qv = qvcoder->process(data);
-    } else {
-        qv.first = quality::paramqv1::QualityValues1::getDefaultSet(core::record::ClassType::CLASS_I);
-    }
+    qv = qvcoder->process(data);
     core::AccessUnitRaw::Descriptor rname(core::GenDesc::RNAME);
-    if (namecoder) {
-        rname = namecoder->process(data);
-    }
+    rname = namecoder->process(data);
     for (auto& r : data.getData()) {
         UTILS_DIE_IF(r.getSegments().front().getQualities().size() != qvdepth && qvcoder, "QV_depth not compatible");
         UTILS_DIE_IF(r.getAlignments().front().getPosition() < lastPos,
@@ -162,7 +156,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
         updateAssembly(r, state);
     }
 
-    auto rawAU = pack(id.start, ref, qvdepth, std::move(qv.first), state);
+    auto rawAU = pack(id.start, ref, qvdepth, std::move(qv.first), data.getData().front().getClassID(), state);
     rawAU.get(core::GenDesc::QV) = std::move(qv.second);
     rawAU.get(core::GenDesc::RNAME) = std::move(rname);
     rawAU.get(core::GenDesc::FLAGS) = core::AccessUnitRaw::Descriptor(core::GenDesc::FLAGS);

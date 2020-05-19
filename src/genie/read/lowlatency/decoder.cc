@@ -24,10 +24,10 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
 
     std::stringstream str;
     util::BitReader reader(str);
-    auto qvdecoder = core::GlobalCfg::getSingleton().getIndustrialPark().construct<core::QVDecoder>(
-        data.getParameters().getQVConfig(core::record::ClassType::CLASS_U).getMode(), reader);
-    auto namedecoder = core::GlobalCfg::getSingleton().getIndustrialPark().construct<core::NameDecoder>(0, reader);
-    auto names = namedecoder->process(data.get(core::GenDesc::RNAME));
+    const auto& qvparam = data.getParameters().getQVConfig(data.getClassType());
+    auto qvStream = std::move(data.get(core::GenDesc::QV));
+    auto names = namecoder->process(data.get(core::GenDesc::RNAME));
+    std::vector<std::string> ecigars;
     for (size_t i = 0; i < data.getNumRecords() / data.getParameters().getNumberTemplateSegments(); ++i) {
         core::record::Record rec(data.getParameters().getNumberTemplateSegments(), core::record::ClassType::CLASS_U,
                                  std::move(names[i]), "", 0);
@@ -40,6 +40,7 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
 
         for (size_t j = 0; j < data.getParameters().getNumberTemplateSegments(); ++j) {
             size_t length = data.getParameters().getReadLength();
+            ecigars.emplace_back(length, '+');
             if (!length) {
                 length = data.pull(core::GenSub::RLEN) + 1;
             }
@@ -55,6 +56,17 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
         }
 
         ret.getData().push_back(std::move(rec));
+    }
+
+    auto qvs = this->qvcoder->process(qvparam, ecigars, qvStream);
+    size_t qvCounter = 0;
+    for (auto& r : ret.getData()) {
+        for (auto& s : r.getSegments()) {
+            if (!qvs[qvCounter].empty()) {
+                s.addQualities(std::move(qvs[qvCounter]));
+            }
+            qvCounter++;
+        }
     }
 
     flowOut(std::move(ret), id);
