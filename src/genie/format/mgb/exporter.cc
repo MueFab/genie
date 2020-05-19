@@ -25,13 +25,9 @@ void Exporter::flowIn(core::AccessUnitPayload&& t, const util::Section& id) {
     util::OrderedSection section(&lock, id);
     getStats().add(data.getStats());
     data.getParameters().write(writer);
-    auto type = core::record::ClassType::CLASS_U;
-    if (data.getParameters().isComputedReference() && data.getParameters().getComputedRef().getAlgorithm() ==
-                                                          core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY) {
-        type = core::record::ClassType::CLASS_I;
-    }
-    mgb::AccessUnit au(id.start, id.start, type, data.getRecordNum() * data.getParameters().getNumberTemplateSegments(),
-                       core::parameter::DataUnit::DatasetType::ALIGNED, 32, 32, 0);
+
+    mgb::AccessUnit au(id.start, id.start, data.getClassType(), data.getRecordNum() * data.getParameters().getNumberTemplateSegments(),
+                       data.getClassType() == core::record::ClassType::CLASS_U ? core::parameter::DataUnit::DatasetType::NON_ALIGNED : core::parameter::DataUnit::DatasetType::ALIGNED, 32, 32, 0);
     /*au.setAuTypeCfg(
         AuTypeCfg(data.getReference(), data.getMinPos(), data.getMaxPos(), data.getParameters().getPosSize()));*/
     for (size_t descriptor = 0; descriptor < core::getDescriptors().size(); ++descriptor) {

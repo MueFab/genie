@@ -15,10 +15,6 @@ namespace lowlatency {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder(core::QVEncoder*, core::NameEncoder*) : core::ReadEncoder() {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     core::record::Chunk data = std::move(t);
 
@@ -47,26 +43,22 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     }
 
     core::QVEncoder::QVCoded qv(nullptr, core::AccessUnitRaw::Descriptor(core::GenDesc::QV));
-    if (qvcoder) {
-        qv = qvcoder->process(data);
-    }
+    qv = qvcoder->process(data);
+    core::AccessUnitRaw::Descriptor rname(core::GenDesc::RNAME);
+    rname = namecoder->process(data);
+    auto rawAU = pack(id, data.getData().front().getSegments().front().getQualities().size(), std::move(qv.first), state);
 
-    if (namecoder) {
-        auto rname = namecoder->process(data);
-        state.streams.get(core::GenDesc::RNAME) = std::move(rname);
-    }
+    rawAU.get(core::GenDesc::QV) = std::move(qv.second);
+    rawAU.get(core::GenDesc::RNAME) = std::move(rname);
 
-    state.streams.get(core::GenDesc::QV) = std::move(qv.second);
-
-    flowOut(pack(id, data.getData().front().getSegments().front().getQualities().size(), std::move(qv.first), state),
-            id);
+    flowOut(std::move(rawAU), id);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::AccessUnitRaw Encoder::pack(const util::Section& id, uint8_t qv_depth,
                                   std::unique_ptr<core::parameter::QualityValues> qvparam, LLState& state) const {
-    core::parameter::DataUnit::DatasetType dataType = core::parameter::DataUnit::DatasetType::ALIGNED;
+    core::parameter::DataUnit::DatasetType dataType = core::parameter::DataUnit::DatasetType::NON_ALIGNED;
     core::parameter::ParameterSet ret(id.start, id.start, dataType, core::AlphabetID::ACGTN, state.readLength,
                                       state.pairedEnd, false, qv_depth, 0, false, false);
     ret.addClass(core::record::ClassType::CLASS_U, std::move(qvparam));
@@ -77,6 +69,7 @@ core::AccessUnitRaw Encoder::pack(const util::Section& id, uint8_t qv_depth,
     rawAU.setReference(0);
     rawAU.setMinPos(0);
     rawAU.setMaxPos(0);
+    rawAU.setClassType(core::record::ClassType::CLASS_U);
 
     return rawAU;
 }

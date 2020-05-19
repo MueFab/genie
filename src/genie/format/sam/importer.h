@@ -69,7 +69,6 @@ class Importer : public core::FormatImporter {
         std::copy(s.begin(), s.end(), std::back_inserter(samRecords));
 
         std::cout << "Read " << samRecords.size() << " SAM record(s) " << std::endl;
-        size_t skipped = 0;
         while (!samRecords.empty()) {
             sam::Record samRecord = std::move(samRecords.front());
             samRecords.erase(samRecords.begin());
@@ -91,7 +90,13 @@ class Importer : public core::FormatImporter {
                 // LOG_TRACE << "Did not find mate";
                 if ((samRecord.getFlags() & (1u << uint16_t(Record::FlagPos::SEGMENT_UNMAPPED))) ||
                     samRecord.getCigar() == "*" || samRecord.getPos() == 0 || samRecord.getRname() == "*") {
-                    skipped++;
+                    core::record::Record r(1, core::record::ClassType::CLASS_U, samRecord.moveQname(), "", 0);
+                    core::record::Segment seg(samRecord.moveSeq());
+                    if(!samRecord.getQual().empty()) {
+                        seg.addQualities(samRecord.moveQual());
+                    }
+                    r.addSegment(std::move(seg));
+                    chunk.getData().emplace_back(std::move(r));
                 } else {
                     chunk.getData().emplace_back(convert(local_ref_num, std::move(samRecord), nullptr));
                 }
@@ -100,9 +105,6 @@ class Importer : public core::FormatImporter {
                 chunk.getData().emplace_back(convert(local_ref_num, std::move(samRecord), &*mate));
                 samRecords.erase(mate);
             }
-        }
-        if (skipped) {
-            std::cerr << "Skipped " << skipped << " unmapped reads! Those are currently not supported." << std::endl;
         }
         if (!chunk.getData().empty()) {
             stats.addDouble("time-sam-import", watch.check());

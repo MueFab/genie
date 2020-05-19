@@ -131,6 +131,7 @@ void GabacCompressor::flowIn(core::AccessUnitRaw &&t, const util::Section &id) {
     payload.setReference(raw_aus.getReference());
     payload.setMinPos(raw_aus.getMinPos());
     payload.setMaxPos(raw_aus.getMaxPos());
+    payload.setClassType(raw_aus.getClassType());
     raw_aus.clear();
     payload.getStats().addDouble("time-gabac", watch.check());
     flowOut(std::move(payload), id);

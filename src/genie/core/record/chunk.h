@@ -24,7 +24,6 @@ class Chunk {
    private:
     std::vector<Record> data;  //!<
     stats::PerfStats stats;    //!<
-
    public:
     /**
      *
