@@ -27,7 +27,7 @@ ClassifierRegroup::ClassifierRegroup(size_t _auSize) : auSize(_auSize), flushing
 record::Chunk ClassifierRegroup::getChunk() {
     util::Watch watch;
     for (auto& c : classes) {
-        if (c.size() > 1 || (!c.front().getData().empty() && flushing)) {
+        while (c.size() > 1 || (!c.front().getData().empty() && flushing)) {
             record::Chunk chunk = std::move(c.front());
             c.erase(c.begin());
             if (c.empty()) {
@@ -36,7 +36,9 @@ record::Chunk ClassifierRegroup::getChunk() {
             chunk.setStats(std::move(stats));
             stats = core::stats::PerfStats();
             stats.addDouble("time-classifier", watch.check());
-            return chunk;
+            if(!chunk.getData().empty()) {
+                return chunk;
+            }
         }
     }
     if (flushing) {
@@ -60,7 +62,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
         r.setClassType(classtype);
         if (r.getClassID() < record::ClassType::CLASS_HM && r.getAlignmentSharedData().getSeqID() != currentSeq) {
             currentSeq = r.getAlignmentSharedData().getSeqID();
-            for (size_t i = 0; i < uint8_t(record::ClassType::CLASS_HM); ++i) {
+            for (size_t i = 0; i < uint8_t(record::ClassType::CLASS_HM) - 1; ++i) {
                 classes[i].emplace_back();
             }
         }
@@ -83,15 +85,16 @@ bool ClassifierRegroup::isFlushing() const { return flushing; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 record::ClassType ClassifierRegroup::classifyECigar(const std::string& cigar) {
+    auto highest = record::ClassType::CLASS_P;
     for (const auto& c : cigar) {
         if (c == '+' || c == '-') {
             return record::ClassType::CLASS_I;
         }
         if (getAlphabetProperties(AlphabetID::ACGTN).isIncluded(c)) {
-            return record::ClassType::CLASS_M;
+            highest = record::ClassType::CLASS_M;
         }
     }
-    return record::ClassType::CLASS_P;
+    return highest;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
