@@ -26,24 +26,22 @@ Importer::Importer(size_t _blockSize, std::istream &_file_1, std::istream &_file
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-/*bool Importer::pump(size_t &) {
+bool Importer::pumpRetrieve(core::Classifier* _classifier)  {
     core::record::Chunk chunk;
     bool eof = false;
     {
-        //  util::OrderedSection section(&lock, id);
         for (size_t cur_record = 0; cur_record < blockSize; ++cur_record) {
             auto data = readData(file_list);
             if (data.empty()) {
                 eof = true;
                 break;
             }
-            chunk.push_back(buildRecord(data));
+            chunk.getData().push_back(buildRecord(data));
         }
     }
-    //   flowOut(std::move(chunk), record_counter++);
-
+    _classifier->add(std::move(chunk));
     return !eof;
-}*/
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

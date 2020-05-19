@@ -1,4 +1,6 @@
 
+#include <genie/format/fastq/exporter.h>
+#include <genie/format/fastq/importer.h>
 #include <genie/format/mgb/exporter.h>
 #include <genie/format/mgb/importer.h>
 #include <genie/format/sam/exporter.h>
@@ -22,8 +24,6 @@ std::string file_extension(const std::string& path) {
     }
     return ext;
 }
-
-enum class EncodingCase { UNALIGNED = 0, ALIGNED_WITH_REF = 1, ALIGNED_NO_REF = 2 };
 
 enum class OperationCase { UNKNOWN = 0, ENCODE = 1, DECODE = 2, CONVERT = 3, CAPSULATE = 4 };
 
@@ -66,21 +66,41 @@ int main(int argc, char* argv[]) {
     std::unique_ptr<genie::core::FlowGraph> flowGraph;
     std::ifstream input_file(pOpts.inputFile);
     std::ofstream output_file(pOpts.outputFile);
+    std::ofstream output_sup_file;
+    std::ifstream input_sup_file;
     switch (getOperation(pOpts.inputFile, pOpts.outputFile)) {
         case OperationCase::UNKNOWN:
             UTILS_DIE("Unknown constellation of file name extensions - doesn't know which operation to perform.");
             break;
         case OperationCase::ENCODE: {
             auto flow = genie::module::buildDefaultEncoder(pOpts.numberOfThreads, pOpts.workingDirectory, BLOCKSIZE);
-            flow->addImporter(genie::util::make_unique<genie::format::sam::Importer>(BLOCKSIZE, input_file));
+            if(file_extension(pOpts.inputFile) == "sam") {
+                flow->addImporter(genie::util::make_unique<genie::format::sam::Importer>(BLOCKSIZE, input_file));
+            } else if (file_extension(pOpts.inputFile) == "fastq") {
+                if (file_extension(pOpts.inputSupFile) == "fastq") {
+                    input_sup_file.open(pOpts.inputSupFile);
+                    flow->addImporter(genie::util::make_unique<genie::format::fastq::Importer>(BLOCKSIZE, input_file, input_sup_file));
+                } else {
+                    flow->addImporter(genie::util::make_unique<genie::format::fastq::Importer>(BLOCKSIZE, input_file));
+                }
+            }
             flow->addExporter(genie::util::make_unique<genie::format::mgb::Exporter>(&output_file));
             flowGraph = std::move(flow);
         } break;
         case OperationCase::DECODE: {
             auto flow = genie::module::buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory, BLOCKSIZE);
             flow->addImporter(genie::util::make_unique<genie::format::mgb::Importer>(input_file));
-            flow->addExporter(genie::util::make_unique<genie::format::sam::Exporter>(
-                genie::format::sam::header::Header::createDefaultHeader(), output_file));
+            if(file_extension(pOpts.outputFile) == "sam") {
+                flow->addExporter(genie::util::make_unique<genie::format::sam::Exporter>(
+                    genie::format::sam::header::Header::createDefaultHeader(), output_file));
+            } else if (file_extension(pOpts.outputFile) == "fastq"){
+                if(file_extension(pOpts.outputSupFile) == "fastq") {
+                    output_sup_file.open(pOpts.outputSupFile);
+                    flow->addExporter(genie::util::make_unique<genie::format::fastq::Exporter>(output_file, output_sup_file));
+                } else {
+                    flow->addExporter(genie::util::make_unique<genie::format::fastq::Exporter>(output_file));
+                }
+            }
             flowGraph = std::move(flow);
         } break;
             break;
