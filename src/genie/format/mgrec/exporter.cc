@@ -15,11 +15,11 @@ namespace mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MgrecsExporter::MgrecsExporter(std::ostream &_file_1) : writer(&_file_1) {}
+Exporter::Exporter(std::ostream &_file_1) : writer(&_file_1) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MgrecsExporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
+void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
     core::record::Chunk data = std::move(t);
     util::OrderedSection section(&lock, id);
     for (auto &i : data.getData()) {

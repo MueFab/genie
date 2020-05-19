@@ -6,6 +6,7 @@
 
 #include "importer.h"
 #include <genie/util/ordered-section.h>
+#include <genie/util/watch.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -15,27 +16,27 @@ namespace mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MgrecsImporter::MgrecsImporter(size_t _blockSize, std::istream& _file_1)
+Importer::Importer(size_t _blockSize, std::istream& _file_1)
     : blockSize(_blockSize), reader(_file_1), record_counter(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool MgrecsImporter::pump(size_t&, std::mutex&) {
+bool Importer::pumpRetrieve(core::Classifier* _classifier)  {
+    util::Watch watch;
     core::record::Chunk chunk;
     {
-        //  util::OrderedSection section(&lock, id);
         for (size_t i = 0; i < blockSize; ++i) {
             core::record::Record rec(reader);
             if (!reader.isGood()) {
-                //          flowOut(std::move(chunk), record_counter++);
-                return false;
+                break;
             }
             chunk.getData().emplace_back(std::move(rec));
         }
     }
-    //  flowOut(std::move(chunk), record_counter++);
 
-    return true;
+    chunk.getStats().addDouble("time-mgrec-import", watch.check());
+    _classifier->add(std::move(chunk));
+    return reader.isGood();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

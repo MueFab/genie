@@ -9,6 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <classifier.h>
+#include <format-importer.h>
 #include <genie/core/record/chunk.h>
 #include <genie/core/stats/perf-stats.h>
 #include <genie/util/bitreader.h>
@@ -24,17 +26,16 @@ namespace mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-class MgrecsImporter : public util::Source<core::record::Chunk>, public util::OriginalSource {
+class Importer : public core::FormatImporter {
    private:
     size_t blockSize;
     util::BitReader reader;
     size_t record_counter;
-    util::OrderedLock lock;  //!< @brief Lock to ensure in order execution
 
    public:
-    MgrecsImporter(size_t _blockSize, std::istream& _file_1);
+    Importer(size_t _blockSize, std::istream& _file_1);
 
-    bool pump(size_t& id, std::mutex& lock) override;
+    bool pumpRetrieve(core::Classifier* _classifier) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

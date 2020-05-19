@@ -63,7 +63,7 @@ void Encoder::encodeFirstSegment(const core::record::Record &rec) {
         (rec.getFlags() & core::GenConst::FLAGS_PROPER_PAIR_MASK) >> core::GenConst::FLAGS_PROPER_PAIR_POS;
     container.push(core::GenSub::FLAGS_PROPER_PAIR, FLAG_PAIR);
 
-    const auto MSCORE = ALIGNMENT.getAlignment().getMappingScores().front();  // TODO: Multiple mapping scores
+    const auto MSCORE = ALIGNMENT.getAlignment().getMappingScores().empty() ? 255 :ALIGNMENT.getAlignment().getMappingScores().front();  // TODO: Multiple mapping scores
     container.push(core::GenSub::MSCORE, MSCORE);
 
     // const auto RGROUP = 0;  // TODO

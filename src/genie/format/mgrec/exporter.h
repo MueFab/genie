@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_EXPORTER_H
-#define GENIE_EXPORTER_H
+#ifndef GENIE_MGREC_EXPORTER_H
+#define GENIE_MGREC_EXPORTER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -14,6 +14,7 @@
 #include <genie/util/bitwriter.h>
 #include <genie/util/drain.h>
 #include <genie/util/ordered-lock.h>
+#include <genie/core/format-exporter.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +25,7 @@ namespace mgrec {
 /**
  *
  */
-class MgrecsExporter : public util::Drain<core::record::Chunk> {
+class Exporter : public core::FormatExporter {
     util::BitWriter writer;  //!<
     util::OrderedLock lock;  //!<
 
@@ -33,7 +34,7 @@ class MgrecsExporter : public util::Drain<core::record::Chunk> {
      *
      * @param _file_1
      */
-    explicit MgrecsExporter(std::ostream& _file_1);
+    explicit Exporter(std::ostream& _file_1);
 
     /**
      *

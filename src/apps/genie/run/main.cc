@@ -3,6 +3,8 @@
 #include <genie/format/fastq/importer.h>
 #include <genie/format/mgb/exporter.h>
 #include <genie/format/mgb/importer.h>
+#include <genie/format/mgrec/exporter.h>
+#include <genie/format/mgrec/importer.h>
 #include <genie/format/sam/exporter.h>
 #include <genie/format/sam/importer.h>
 #include <genie/module/default-setup.h>
@@ -33,6 +35,8 @@ FileType getType(const std::string& ext) {
     if (ext == "sam") {
         return FileType::THIRD_PARTY;
     } else if (ext == "fastq") {
+        return FileType::THIRD_PARTY;
+    } else if (ext == "mgrec") {
         return FileType::THIRD_PARTY;
     } else if (ext == "mgb") {
         return FileType::MPEG;
@@ -83,6 +87,8 @@ int main(int argc, char* argv[]) {
                 } else {
                     flow->addImporter(genie::util::make_unique<genie::format::fastq::Importer>(BLOCKSIZE, input_file));
                 }
+            } else if (file_extension(pOpts.inputFile) == "mgrec") {
+                flow->addImporter(genie::util::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, input_file));
             }
             flow->addExporter(genie::util::make_unique<genie::format::mgb::Exporter>(&output_file));
             flowGraph = std::move(flow);
@@ -100,6 +106,8 @@ int main(int argc, char* argv[]) {
                 } else {
                     flow->addExporter(genie::util::make_unique<genie::format::fastq::Exporter>(output_file));
                 }
+            } else if (file_extension(pOpts.outputFile) == "mgrec") {
+                flow->addExporter(genie::util::make_unique<genie::format::mgrec::Exporter>(output_file));
             }
             flowGraph = std::move(flow);
         } break;
