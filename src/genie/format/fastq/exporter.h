@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/core/format-exporter.h>
 #include <genie/core/record/chunk.h>
 #include <genie/core/stats/perf-stats.h>
 #include <genie/util/drain.h>
@@ -24,7 +25,7 @@ namespace fastq {
 /**
  * @brief Module to export MPEG-G record to fastq files
  */
-class Exporter : public util::Drain<core::record::Chunk> {
+class Exporter : public core::FormatExporter {
     std::vector<std::ostream *> file;  //!< @brief Support for paired output files
     util::OrderedLock lock;            //!< @brief Lock to ensure in order execution
 

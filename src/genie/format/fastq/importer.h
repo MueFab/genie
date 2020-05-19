@@ -76,11 +76,11 @@ class Importer : public core::FormatImporter {
     Importer(size_t _blockSize, std::istream &_file_1, std::istream &_file_2);
 
     /**
-     * @brief Process one block of data and propagate it to the next module in the chain
-     * @param id Current block identifier
-     * @return True if more data is available, false otherwise
+     *
+     * @param _classifier
+     * @return
      */
-    // bool pump(size_t &id) override;
+    bool pumpRetrieve(core::Classifier* _classifier) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

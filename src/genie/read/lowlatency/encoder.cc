@@ -22,7 +22,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     LLState state{data.getData().front().getSegments().front().getSequence().length(),
                   data.getData().front().getNumberOfTemplateSegments() > 1,
                   core::AccessUnitRaw(std::move(set),
-                                      data.getData().size() * data.getData().front().getNumberOfTemplateSegments())};
+                                      data.getData().size())};
     for (auto& r : data.getData()) {
         for (auto& s : r.getSegments()) {
             state.streams.push(core::GenSub::RLEN, s.getSequence().length() - 1);
