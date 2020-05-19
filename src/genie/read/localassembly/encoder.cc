@@ -118,8 +118,8 @@ core::AccessUnitRaw Encoder::pack(size_t id, uint16_t ref, uint8_t qv_depth,
 
     rawAU.setParameters(std::move(ret));
     rawAU.setReference(ref);
-    rawAU.setMinPos(state.minPos);
-    rawAU.setMaxPos(state.maxPos);
+    rawAU.setMinPos(1);
+    rawAU.setMaxPos(state.maxPos - state.minPos + 1);
     rawAU.setClassType(type);
     return rawAU;
 }

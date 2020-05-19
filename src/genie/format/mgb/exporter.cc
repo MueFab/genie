@@ -30,8 +30,10 @@ void Exporter::flowIn(core::AccessUnitPayload&& t, const util::Section& id) {
 
     mgb::AccessUnit au(id_ctr, id_ctr, data.getClassType(), data.getRecordNum() * data.getParameters().getNumberTemplateSegments(),
                        data.getClassType() == core::record::ClassType::CLASS_U ? core::parameter::DataUnit::DatasetType::NON_ALIGNED : core::parameter::DataUnit::DatasetType::ALIGNED, 32, 32, 0);
-    /*au.setAuTypeCfg(
-        AuTypeCfg(data.getReference(), data.getMinPos(), data.getMaxPos(), data.getParameters().getPosSize()));*/
+    if(au.getClass() != core::record::ClassType::CLASS_U) {
+        au.setAuTypeCfg(
+            AuTypeCfg(id_ctr, data.getMinPos(), data.getMaxPos(), data.getParameters().getPosSize()));
+    }
     for (size_t descriptor = 0; descriptor < core::getDescriptors().size(); ++descriptor) {
         if (data.getPayload(core::GenDesc(descriptor)).isEmpty()) {
             continue;

@@ -90,7 +90,7 @@ std::string Importer::convertCigar2ECigar(const std::string &cigar, const std::s
         }
         if (a == 'X') {
             size_t end = std::stoi(digits) + seq_pos;
-            UTILS_DIE_IF(end >= seq.length(), "CIGAR not valid for seq");
+            UTILS_DIE_IF(end > seq.length(), "CIGAR not valid for seq");
             for (; seq_pos < end; ++seq_pos) {
                 ecigar += std::toupper(seq[seq_pos]);
             }
