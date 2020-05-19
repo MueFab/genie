@@ -211,6 +211,18 @@ class ParameterSet : public DataUnit {
      */
     const QualityValues &getQVConfig(record::ClassType type) const;
 
+    /**
+     *
+     * @param id
+     */
+    void setID(uint8_t id);
+
+    /**
+     *
+     * @param id
+     */
+    void setParentID(uint8_t id);
+
    private:
     /**
      *

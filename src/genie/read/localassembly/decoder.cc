@@ -9,6 +9,7 @@
 #include <genie/core/name-decoder.h>
 #include <genie/core/record/alignment_split/same-rec.h>
 #include <genie/read/basecoder/decoder.h>
+#include <genie/util/watch.h>
 #include <sstream>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -45,6 +46,7 @@ void addECigar(const core::record::Record& rec, std::vector<std::string>& cig_ve
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
+    util::Watch watch;
     size_t numRecords = t.getNumRecords();
     size_t bufSize = t.getParameters().getComputedRef().getExtension().getBufMaxSize();
     size_t segments = t.getParameters().getNumberTemplateSegments();
@@ -55,7 +57,12 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
     core::record::Chunk chunk;
     const auto& qvparam = t.getParameters().getQVConfig(t.getClassType());
     auto qvStream = std::move(t.get(core::GenDesc::QV));
+    t.getStats().addDouble("time-localassembly", watch.check());
+    watch.reset();
     auto names = namecoder->process(t.get(core::GenDesc::RNAME));
+    t.getStats().addDouble("time-name", watch.check());
+    watch.reset();
+    chunk.setStats(std::move(t.getStats()));
     basecoder::Decoder decoder(std::move(t), segments);
     std::vector<std::string> ecigars;
     for (size_t recID = 0; recID < numRecords; ++recID) {
@@ -73,6 +80,8 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
         refEncoder.addRead(rec);
         chunk.getData().emplace_back(std::move(rec));
     }
+    chunk.getStats().addDouble("time-localassembly", watch.check());
+    watch.reset();
     auto qvs = this->qvcoder->process(qvparam, ecigars, qvStream);
     size_t qvCounter = 0;
     for (auto& r : chunk.getData()) {
@@ -83,7 +92,7 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
             qvCounter++;
         }
     }
-
+    chunk.getStats().addDouble("time-qv", watch.check());
     flowOut(std::move(chunk), id);
 }
 

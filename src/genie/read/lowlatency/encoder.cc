@@ -6,6 +6,7 @@
 
 #include "encoder.h"
 #include <genie/name/tokenizer/decoder.h>
+#include <genie/util/watch.h>
 #include "genie/name/tokenizer/encoder.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -16,6 +17,7 @@ namespace lowlatency {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
+    util::Watch watch;
     core::record::Chunk data = std::move(t);
 
     core::parameter::ParameterSet set;
@@ -42,15 +44,25 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
         }
     }
 
+    data.getStats().addDouble("time-lowlatency", watch.check());
+    watch.reset();
     core::QVEncoder::QVCoded qv(nullptr, core::AccessUnitRaw::Descriptor(core::GenDesc::QV));
     qv = qvcoder->process(data);
+    data.getStats().addDouble("time-qv", watch.check());
+    watch.reset();
     core::AccessUnitRaw::Descriptor rname(core::GenDesc::RNAME);
     rname = namecoder->process(data);
+    data.getStats().addDouble("time-name", watch.check());
+    watch.reset();
     auto rawAU = pack(id, data.getData().front().getSegments().front().getQualities().size(), std::move(qv.first), state);
 
     rawAU.get(core::GenDesc::QV) = std::move(qv.second);
     rawAU.get(core::GenDesc::RNAME) = std::move(rname);
 
+    data.getStats().addDouble("time-lowlatency", watch.check());
+    watch.reset();
+
+    rawAU.setStats(std::move(data.getStats()));
     flowOut(std::move(rawAU), id);
 }
 

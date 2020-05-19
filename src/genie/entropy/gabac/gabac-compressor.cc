@@ -115,8 +115,19 @@ void GabacCompressor::flowIn(core::AccessUnitRaw &&t, const util::Section &id) {
                 }
             }
         } else {
+            size_t size = 0;
+            for(const auto& s : desc) {
+                size += s.getNumSymbols() * sizeof(uint32_t);
+            }
+            std::string name = getDescriptor(desc.getID()).name;
+            if(size) {
+                payload.getStats().addInteger("size-" + name + "-raw", size);
+            }
             const auto &conf = configSet.getConfAsGabac({desc.getID(), 0});
             descriptor_payload = compressTokens(conf, std::move(desc));
+            if(size) {
+                payload.getStats().addInteger("size-" + name + "-comp", descriptor_payload.begin()->get().getRawSize());
+            }
         }
         if (!descriptor_payload.isEmpty()) {
             payload.setPayload(ID, std::move(descriptor_payload));

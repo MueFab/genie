@@ -5,6 +5,7 @@
  */
 
 #include "importer.h"
+#include <genie/util/watch.h>
 #include "access_unit.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -20,6 +21,7 @@ Importer::Importer(std::istream& _file, genie::core::stats::PerfStats* _stats) :
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Importer::pump(size_t& id, std::mutex&) {
+    util::Watch watch;
     boost::optional<mgb::AccessUnit> unit;
     util::Section sec{};
     {
@@ -49,6 +51,7 @@ bool Importer::pump(size_t& id, std::mutex&) {
     set.setRecordNum(unit->getReadCount());
     set.setClassType(unit->getClass());
     unit.reset();
+    set.getStats().addDouble("time-mgb-import", watch.check());
     flowOut(std::move(set), sec);
     return true;
 }

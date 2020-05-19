@@ -138,9 +138,15 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     uint64_t lastPos = 0;
     core::QVEncoder::QVCoded qv(nullptr, core::AccessUnitRaw::Descriptor(core::GenDesc::QV));
     uint8_t qvdepth = qvcoder ? data.getData().front().getSegments().front().getQualities().size() : 0;
+    data.getStats().addDouble("time-localassembly", watch.check());
+    watch.reset();
     qv = qvcoder->process(data);
+    data.getStats().addDouble("time-quality", watch.check());
+    watch.reset();
     core::AccessUnitRaw::Descriptor rname(core::GenDesc::RNAME);
     rname = namecoder->process(data);
+    data.getStats().addDouble("time-name", watch.check());
+    watch.reset();
     for (auto& r : data.getData()) {
         UTILS_DIE_IF(r.getSegments().front().getQualities().size() != qvdepth && qvcoder, "QV_depth not compatible");
         UTILS_DIE_IF(r.getAlignments().front().getPosition() < lastPos,

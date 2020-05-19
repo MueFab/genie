@@ -7,6 +7,7 @@
 #include "decoder.h"
 #include <genie/core/global-cfg.h>
 #include <genie/read/basecoder/decoder.h>
+#include <genie/util/watch.h>
 #include <name-decoder.h>
 #include <sstream>
 
@@ -19,14 +20,15 @@ namespace lowlatency {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
+    util::Watch watch;
     core::record::Chunk ret;
     core::AccessUnitRaw data = std::move(t);
 
-    std::stringstream str;
-    util::BitReader reader(str);
     const auto& qvparam = data.getParameters().getQVConfig(data.getClassType());
     auto qvStream = std::move(data.get(core::GenDesc::QV));
     auto names = namecoder->process(data.get(core::GenDesc::RNAME));
+    data.getStats().addDouble("time-name", watch.check());
+    watch.reset();
     std::vector<std::string> ecigars;
     for (size_t i = 0; i < data.getNumRecords() / data.getParameters().getNumberTemplateSegments(); ++i) {
         core::record::Record rec(data.getParameters().getNumberTemplateSegments(), core::record::ClassType::CLASS_U,
@@ -58,6 +60,8 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
         ret.getData().push_back(std::move(rec));
     }
 
+    data.getStats().addDouble("time-lowlatency", watch.check());
+    watch.reset();
     auto qvs = this->qvcoder->process(qvparam, ecigars, qvStream);
     size_t qvCounter = 0;
     for (auto& r : ret.getData()) {
@@ -69,6 +73,10 @@ void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
         }
     }
 
+    data.getStats().addDouble("time-qv", watch.check());
+    watch.reset();
+
+    ret.setStats(std::move(data.getStats()));
     flowOut(std::move(ret), id);
 }
 
