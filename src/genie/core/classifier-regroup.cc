@@ -5,6 +5,7 @@
  */
 
 #include "classifier-regroup.h"
+#include <genie/util/watch.h>
 #include "constants.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -24,6 +25,7 @@ ClassifierRegroup::ClassifierRegroup(size_t _auSize) : auSize(_auSize), flushing
 // ---------------------------------------------------------------------------------------------------------------------
 
 record::Chunk ClassifierRegroup::getChunk() {
+    util::Watch watch;
     for (auto& c : classes) {
         if (c.size() > 1 || (!c.front().getData().empty() && flushing)) {
             record::Chunk chunk = std::move(c.front());
@@ -31,6 +33,9 @@ record::Chunk ClassifierRegroup::getChunk() {
             if (c.empty()) {
                 c.emplace_back();
             }
+            chunk.setStats(std::move(stats));
+            stats = core::stats::PerfStats();
+            stats.addDouble("time-classifier", watch.check());
             return chunk;
         }
     }
@@ -44,6 +49,8 @@ record::Chunk ClassifierRegroup::getChunk() {
 
 void ClassifierRegroup::add(record::Chunk&& c) {
     record::Chunk chunk = std::move(c);
+    stats.add(chunk.getStats());
+    util::Watch watch;
     if(init) {
         init = false;
         currentSeq = chunk.getData().front().getAlignmentSharedData().getSeqID();
@@ -62,6 +69,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
         }
         classes[uint8_t(classtype) - 1].back().getData().emplace_back(std::move(r));
     }
+    stats.addDouble("time-classifier", watch.check());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -7,6 +7,7 @@
 #include "importer.h"
 #include <genie/core/record/class-type.h>
 #include <genie/util/ordered-section.h>
+#include <genie/util/watch.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +28,11 @@ Importer::Importer(size_t _blockSize, std::istream &_file_1, std::istream &_file
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Importer::pumpRetrieve(core::Classifier* _classifier)  {
+    util::Watch watch;
     core::record::Chunk chunk;
+    size_t size_seq= 0;
+    size_t size_qual = 0;
+    size_t size_name = 0;
     bool eof = false;
     {
         for (size_t cur_record = 0; cur_record < blockSize; ++cur_record) {
@@ -36,9 +41,23 @@ bool Importer::pumpRetrieve(core::Classifier* _classifier)  {
                 eof = true;
                 break;
             }
-            chunk.getData().push_back(buildRecord(data));
+            auto record = buildRecord(data);
+            for(const auto& seg : record.getSegments()) {
+                size_seq += seg.getSequence().size();
+                for(const auto &q : seg.getQualities()) {
+                    size_qual += q.size();
+                }
+            }
+            size_name += record.getName().size() * 2;
+            chunk.getData().push_back(std::move(record));
         }
     }
+
+    chunk.getStats().addInteger("size-fastq-seq", size_seq);
+    chunk.getStats().addInteger("size-fastq-qual", size_qual);
+    chunk.getStats().addInteger("size-fastq-name", size_name);
+    chunk.getStats().addInteger("size-fastq-total", size_name + size_qual + size_seq);
+    chunk.getStats().addDouble("time-fastq-import", watch.check());
     _classifier->add(std::move(chunk));
     return !eof;
 }

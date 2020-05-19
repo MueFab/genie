@@ -15,7 +15,7 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Exporter::Exporter(std::ostream* _file) : writer(_file) {}
+Exporter::Exporter(std::ostream* _file) : writer(_file), id_ctr(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,9 +24,11 @@ void Exporter::flowIn(core::AccessUnitPayload&& t, const util::Section& id) {
     core::AccessUnitPayload data = std::move(t);
     util::OrderedSection section(&lock, id);
     getStats().add(data.getStats());
+    data.getParameters().setID(id_ctr);
+    data.getParameters().setParentID(id_ctr);
     data.getParameters().write(writer);
 
-    mgb::AccessUnit au(id.start, id.start, data.getClassType(), data.getRecordNum() * data.getParameters().getNumberTemplateSegments(),
+    mgb::AccessUnit au(id_ctr, id_ctr, data.getClassType(), data.getRecordNum() * data.getParameters().getNumberTemplateSegments(),
                        data.getClassType() == core::record::ClassType::CLASS_U ? core::parameter::DataUnit::DatasetType::NON_ALIGNED : core::parameter::DataUnit::DatasetType::ALIGNED, 32, 32, 0);
     /*au.setAuTypeCfg(
         AuTypeCfg(data.getReference(), data.getMinPos(), data.getMaxPos(), data.getParameters().getPosSize()));*/
@@ -37,6 +39,7 @@ void Exporter::flowIn(core::AccessUnitPayload&& t, const util::Section& id) {
         au.addBlock(Block(descriptor, data.movePayload(descriptor)));
     }
     au.write(writer);
+    id_ctr++;
     getStats().addDouble("time-mgb-export", watch.check());
 }
 

@@ -393,6 +393,18 @@ const QualityValues &ParameterSet::getQVConfig(record::ClassType type) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void ParameterSet::setID(uint8_t id) {
+    parameter_set_ID = id;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ParameterSet::setParentID(uint8_t id) {
+    parent_parameter_set_ID = id;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace parameter
 }  // namespace core
 }  // namespace genie

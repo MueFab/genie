@@ -8,6 +8,7 @@
 #include <genie/core/constants.h>
 #include <genie/core/record/alignment_split/same-rec.h>
 #include <genie/util/ordered-section.h>
+#include <genie/util/watch.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -243,14 +244,44 @@ std::vector<sam::Record> Exporter::convert(core::record::Record&& rec) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Exporter::flowIn(core::record::Chunk&& records, const util::Section& id) {
+    util::Watch watch;
     core::record::Chunk recs = std::move(records);
+    Record::Stats sam_stats;
+    getStats().add(recs.getStats());
     util::OrderedSection section(&lock, id);
     for (auto& rec : recs.getData()) {
         auto sam_recs = convert(std::move(rec));
         for (auto& srec : sam_recs) {
+            if(recs.getStats().isActive()) {
+                sam_stats.qname += srec.getQname().size();
+                sam_stats.flag += std::to_string(srec.getFlags()).size();
+                sam_stats.rname += srec.getRname().size();
+                sam_stats.pos += std::to_string(srec.getPos()).size();
+                sam_stats.mapq += std::to_string(srec.getMapQ()).size();
+                sam_stats.cigar += srec.getRname().size();
+                sam_stats.rnext += srec.getRname().size();
+                sam_stats.pnext += std::to_string(srec.getPnext()).size();
+                sam_stats.tlen += std::to_string(srec.getTlen()).size();
+                sam_stats.seq += srec.getSeq().size();
+                sam_stats.qual += srec.getQual().size();
+            }
             writer.write(std::move(srec));
         }
     }
+
+    getStats().addInteger("size-sam-qname", sam_stats.qname);
+    getStats().addInteger("size-sam-flag", sam_stats.flag);
+    getStats().addInteger("size-sam-rname", sam_stats.rname);
+    getStats().addInteger("size-sam-pos", sam_stats.pos);
+    getStats().addInteger("size-sam-mapq", sam_stats.mapq );
+    getStats().addInteger("size-sam-cigar", sam_stats.cigar);
+    getStats().addInteger("size-sam-rnext", sam_stats.rnext);
+    getStats().addInteger("size-sam-pnext", sam_stats.pnext);
+    getStats().addInteger("size-sam-tlen", sam_stats.tlen );
+    getStats().addInteger("size-sam-seq", sam_stats.seq);
+    getStats().addInteger("size-sam-qual", sam_stats.qual );
+    getStats().addInteger("size-sam-total", sam_stats.total());
+    getStats().addDouble("time-sam-export", watch.check());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

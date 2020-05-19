@@ -6,6 +6,7 @@
 
 #include "gabac-decompressor.h"
 #include <genie/util/exceptions.h>
+#include <genie/util/watch.h>
 #include <sstream>
 #include "decode-cabac.h"
 #include "stream-handler.h"
@@ -96,28 +97,38 @@ core::AccessUnitRaw::Subsequence GabacDecompressor::decompress(const gabac::Enco
 // ---------------------------------------------------------------------------------------------------------------------
 
 void GabacDecompressor::flowIn(core::AccessUnitPayload&& t, const util::Section& id) {
+    util::Watch watch;
     core::AccessUnitPayload payloadSet = std::move(t);
     GabacSeqConfSet configSet;
     auto raw_aus = core::AccessUnitRaw(payloadSet.moveParameters(), payloadSet.getRecordNum());
 
     configSet.loadParameters(raw_aus.getParameters());
 
+    size_t totalSizeCompressed = 0;
+    size_t totalSizeUncompressed = 0;
     for (auto& desc : payloadSet) {
         if (desc.isEmpty()) {
             continue;
         }
         if (getDescriptor(desc.getID()).tokentype) {
+            payloadSet.getStats().addInteger(
+                "size-" + getDescriptor(desc.getID()).name + "-comp",
+                desc.begin()->get().getRawSize());
             auto decomp = decompressTokens(configSet.getConfAsGabac(core::GenSubIndex{desc.getID(), 0}),
                                            configSet.getConfAsGabac(core::GenSubIndex{desc.getID(), 1}),
                                            std::move(*desc.begin()));
+            size_t size = 0;
             for (auto& subseq : decomp) {
+                size += subseq.getNumSymbols() * sizeof(uint32_t);
                 while (raw_aus.get(desc.getID()).getSize() <= subseq.getID().second) {
                     raw_aus.get(desc.getID())
                         .add(core::AccessUnitRaw::Subsequence(
                             4, core::GenSubIndex{desc.getID(), raw_aus.get(desc.getID()).getSize()}));
                 }
+
                 raw_aus.set(subseq.getID(), std::move(subseq));
             }
+            payloadSet.getStats().addInteger("size-" + getDescriptor(desc.getID()).name + "-raw", size);
             continue;
         }
         for (auto& subseq : desc) {
@@ -125,15 +136,35 @@ void GabacDecompressor::flowIn(core::AccessUnitPayload&& t, const util::Section&
                 continue;
             }
             auto d_id = subseq.getID();
+
+            if(subseq.get().getRawSize()) {
+                payloadSet.getStats().addInteger(
+                    "size-" + getDescriptor(desc.getID()).name + std::to_string(subseq.getID().second) + "-comp",
+                    subseq.get().getRawSize());
+            }
+            totalSizeCompressed += subseq.get().getRawSize();
+
             core::AccessUnitRaw::Subsequence subseqData =
                 decompress(configSet.getConfAsGabac(subseq.getID()), std::move(subseq));
+
+            if(subseqData.getNumSymbols()) {
+                payloadSet.getStats().addInteger(
+                    "size-" + getDescriptor(desc.getID()).name + std::to_string(subseqData.getID().second) + "-raw",
+                    subseqData.getNumSymbols() * sizeof(uint32_t));
+                totalSizeUncompressed += subseqData.getNumSymbols() * sizeof(uint32_t);
+            }
+
             raw_aus.set(d_id, std::move(subseqData));
         }
     }
 
     raw_aus.setReference(payloadSet.getReference());
     raw_aus.setClassType(payloadSet.getClassType());
+    raw_aus.setStats(std::move(payloadSet.getStats()));
     payloadSet.clear();
+    raw_aus.getStats().addDouble("time-gabac", watch.check());
+    raw_aus.getStats().addInteger("size-total-comp", totalSizeCompressed);
+    raw_aus.getStats().addInteger("size-total-raw", totalSizeUncompressed);
     flowOut(std::move(raw_aus), id);
 }
 

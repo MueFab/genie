@@ -29,6 +29,7 @@ class ClassifierRegroup : public Classifier {
     size_t auSize;                                  //!<
     bool flushing;                                  //!<
     bool init{true};                                //!<
+    core::stats::PerfStats stats;
 
    public:
     /**
