@@ -340,7 +340,7 @@ bool Record::isPairOf(Record &other) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReadTemplate::ReadTemplate() : {
+ReadTemplate::ReadTemplate(){
     initializeData();
 }
 

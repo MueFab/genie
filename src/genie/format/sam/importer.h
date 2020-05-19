@@ -53,7 +53,8 @@ class Importer : public core::FormatImporter {
 
     static core::record::Record convert(uint16_t ref, sam::Record &&_r1, sam::Record *_r2);
     void convertUnmapped(core::record::Chunk& chunk, SamRecords& sam_recs);
-    void convertSingleEnd(core::record::Chunk& chunk, SamRecords& sam_recs, bool unmapped_pair=false);
+    void convertSingleEnd(core::record::Chunk& chunk, SamRecords& sam_recs,
+                          bool unmapped_pair=false, bool is_read_1_first=true);
 
     void convertPairedEnd(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d);
     void convert(core::record::Chunk& chunk, ReadTemplate& rt);
