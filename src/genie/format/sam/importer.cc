@@ -430,6 +430,7 @@ void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_re
 
         auto create_split_records = false;
 
+        // Check whether read_1 has the same number of alignments as read_2 and the references are the same
         if (read_1.size() == read_2.size()){
             auto read_1_it = read_1.begin();
             auto read_2_it = read_2.begin();
@@ -453,12 +454,12 @@ void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_re
             convertPairedEndNoSplit(chunk, sam_recs_2d);
         }
 
-    // One of reads is not ok
+    // Handle alignments where one of the reads is not complete (unpaired etc)
     } else {
         if (read_1_unmapped) {
             convertUnmapped(chunk, read_1);
         } else if (!read_1_primary){
-            UTILS_DIE("Primary line of read_1 is not found!");
+            UTILS_DIE("Cannot find the primary line of read_1!");
         } else if (read_1_ok){
             convertSingleEnd(chunk, read_1, true, true);
         }
@@ -466,7 +467,7 @@ void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_re
         if (read_2_unmapped){
             convertUnmapped(chunk, read_2);
         } else if (!read_2_primary){
-            UTILS_DIE("Primary line of read_2 is not found!");
+            UTILS_DIE("Cannot find the primary line of read_2!");
         } else if (read_2_ok) {
             convertSingleEnd(chunk, read_2, true, false);
         }
@@ -478,6 +479,7 @@ void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt) {
     SamRecords2D sam_recs_2d;
     rt.getRecords(sam_recs_2d);
 
+    // Register Reference Sequence Name RNAME
     for (auto& sam_recs:sam_recs_2d){
         for (auto& sam_rc:sam_recs){
             const auto& rname = sam_rc.getRname();
@@ -491,6 +493,7 @@ void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt) {
         }
     }
 
+    // Convert SAM records to MPEG-G record(s)
     if (rt.isValid()){
         if (rt.isUnmapped()){
             convertUnmapped(chunk, sam_recs_2d.front());
@@ -509,15 +512,15 @@ void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Importer::pump(size_t id) {
-    auto counter = blockSize;
     std::string line;
     std::list<std::string> lines;
     core::record::Chunk chunk;
     {
         util::OrderedSection section(&lock, id);
-        while (stream.good() && counter--){
-            std::getline(stream, line);
-            lines.push_back(std::move(line));
+        while (samReader.good() && blockSize > lines.size()){
+//            std::getline(stream, line);
+//            lines.push_back(std::move(line));
+            samReader.read(lines);
         }
     }
 
