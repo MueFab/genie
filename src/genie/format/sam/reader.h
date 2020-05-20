@@ -29,18 +29,20 @@ class Reader {
    private:
     std::istream& stream;
     header::Header header;
-    Record save;
-    bool rec_saved;
+    bool with_cache;
+
+    std::map<std::string, std::vector<size_t>> cache;
 
    public:
-    explicit Reader(std::istream& _stream);
+    explicit Reader(std::istream& _stream, bool with_cache);
 
     const header::Header& getHeader() const;
 
-    bool read(Record& rec);
-    void readRecords(size_t num, std::vector<Record>& vec);
+    void addCacheEntry(std::string& qname, size_t &pos);
 
-    bool isEnd();
+    bool read(std::list<std::string> lines);
+
+    bool good();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
