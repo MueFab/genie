@@ -71,7 +71,7 @@ void HeaderLine::parseTags(const std::vector<std::string>& _tags, const HeaderLi
                 parseSingleTag(tagvalue, taginfo);
             }
         }
-        UTILS_DIE_IF(!found, "Tag unknown in sam header");
+        UTILS_DIE_IF(!found, "Unknown tag in SAM header");
     }
 }
 
@@ -89,7 +89,7 @@ HeaderLine::HeaderLine(const std::string& line) {
             break;
         }
     }
-    UTILS_DIE_IF(!found, "Unknown Sam header line");
+    UTILS_DIE_IF(!found, "Unknown SAM header line");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
