@@ -344,10 +344,18 @@ ReadTemplate::ReadTemplate(){
     initializeData();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 ReadTemplate::ReadTemplate(Record &&rec) : qname(rec.getQname()){
     initializeData();
     addRecord(std::move(rec));
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::string& ReadTemplate::getQname() { return qname;}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void ReadTemplate::initializeData() {
     data.resize(size_t(Index::TOTAL_TYPES));
