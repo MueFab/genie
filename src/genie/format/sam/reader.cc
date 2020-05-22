@@ -17,20 +17,42 @@ namespace sam {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Reader::Reader(std::istream& _stream, bool _with_cache) : stream(_stream), header(stream), with_cache(_with_cache) {
-    if (with_cache){
+Reader::Reader(std::istream& _stream, bool _with_index) : stream(_stream), header(stream), with_index(_with_index) {
+
+    uint16_t seqID = 0;
+    for (auto &headerLine : header.getLines()){
+        if (headerLine.getName() == "SQ") {
+            for (auto &tag : headerLine.getTags()) {
+                auto tagName = tag->getName();
+
+                if (tagName == "SN"){
+                    refs.emplace(tag->toString(), seqID);
+                } else if(tagName == "AN"){
+                    // TODO : value of tag AN is comma-separated list (yeremia)
+                    refs.emplace(tag->toString(), seqID);
+                }
+            }
+            seqID++;
+        }
+    }
+
+    if (with_index){
         int init_pos = stream.tellg();
 
-        // Add entry to cache
+        // Add entry to index
         while(stream.good()){
             std::string str;
             size_t pos = stream.tellg();
 
             std::getline(stream, str, '\t');
 
-            // If not a header, add to cache
+            // If not a header, add to index
             UTILS_DIE_IF(str[0] == '@', "Found header in the middle of SAM file");
-            addCacheEntry(str, pos);
+
+            // Handle case where there is empty line before EOF
+            if (str.length()){
+                addCacheEntry(str, pos);
+            }
 
             // Move to next line, skip the rest of fields
             stream.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -50,13 +72,15 @@ Reader::Reader(std::istream& _stream, bool _with_cache) : stream(_stream), heade
 const header::Header& Reader::getHeader() const { return header; }
 
 // ---------------------------------------------------------------------------------------------------------------------
+std::map<std::string, size_t>& Reader::getRefs() { return refs; }
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Reader::addCacheEntry(std::string &qname, size_t &pos) {
-    auto search = cache.find(qname);
-    if (!(search == cache.end())) {
+    auto search = index.find(qname);
+    if (!(search == index.end())) {
         search->second.push_back(pos);
     } else {
-        cache.emplace(std::move(qname), std::vector<size_t>({pos}));
+        index.emplace(std::move(qname), std::vector<size_t>({pos}));
     }
 }
 
@@ -69,8 +93,8 @@ bool Reader::read(std::list<std::string> lines) {
         return false;
     }
 
-    if (with_cache){
-        auto entry = cache.begin();
+    if (with_index){
+        auto entry = index.begin();
 
         while (!entry->second.empty()){
             stream.seekg(entry->second.front());
@@ -80,7 +104,7 @@ bool Reader::read(std::list<std::string> lines) {
             stream.clear();
         }
 
-        cache.erase(entry);
+        index.erase(entry);
         return true;
     } else {
         std::getline(stream, line);
@@ -94,7 +118,7 @@ bool Reader::read(std::list<std::string> lines) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Reader::good() {
-    return (stream.good() && !(with_cache && cache.empty()));
+    return (stream.good() && !(with_index && index.empty()));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
