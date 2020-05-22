@@ -20,7 +20,7 @@ namespace sam {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Importer::Importer(size_t _blockSize, std::istream &_file)
-    : blockSize(_blockSize), stream(_file), samReader(_file), lock(), ref_counter(0) {}
+    : blockSize(_blockSize), samReader(_file), lock(), ref_counter(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -156,76 +156,100 @@ core::record::Record Importer::convert(uint16_t ref, sam::Record &&_r1, sam::Rec
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertUnmapped(core::record::Chunk &chunk, SamRecords &sam_recs) {
-    auto& sam_rec = sam_recs.front();
 
-    auto flag_tuple = convertFlags2Mpeg(sam_rec.getFlags());
-    core::record::Record rec(1, core::record::ClassType::CLASS_I, sam_rec.moveQname(),
-                             "Genie",std::get<1>(flag_tuple));
-
-    // No alignmnent
-    // core::record::Alignment alignment(convertCigar2ECigar(sam_rec.getCigar(), sam_rec.getSeq()),
-    //                                   sam_rec.checkFlag(Record::FlagPos::SEQ_REVERSE));
-
-    //alignment.addMappingScore(sam_rec.getMapQ());
-    //core::record::AlignmentBox alignmentContainer(sam_rec.getPos(), std::move(alignment));
-
-    core::record::Segment segment(sam_rec.moveSeq());
-    if (sam_rec.getQual() != "*") {
-        segment.addQualities(sam_rec.moveQual());
-    }
-    rec.addSegment(std::move(segment));
-
-    // No alignment
-    //    ret.addAlignment(ref, std::move(alignmentContainer));
-
-    chunk.push_back(std::move(rec));
-
-    sam_recs.clear();
-}
-// ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords &sam_recs, bool unmapped_pair, bool is_read_1_first) {
-    auto&& sam_rec = std::move(sam_recs.front());
-    sam_recs.pop_front();
-
-    auto flag_tuple = convertFlags2Mpeg(sam_rec.getFlags());
-    core::record::Record rec(1, core::record::ClassType::CLASS_I, sam_rec.moveQname(),
-                             "Genie",std::get<1>(flag_tuple), is_read_1_first);
-
-    core::record::Alignment alignment(convertCigar2ECigar(sam_rec.getCigar(), sam_rec.getSeq()),
-                                      sam_rec.checkFlag(Record::FlagPos::SEQ_REVERSE));
-    alignment.addMappingScore(sam_rec.getMapQ());
-
-    core::record::AlignmentBox alignmentContainer(sam_rec.getPos(), std::move(alignment));
-    rec.addAlignment(refs.at(sam_rec.getRname()), std::move(alignmentContainer));
-
-    core::record::Segment segment(sam_rec.moveSeq());
-    if (sam_rec.getQual() != "*") {
-        segment.addQualities(sam_rec.moveQual());
-    }
-    rec.addSegment(std::move(segment));
-
-    for (auto sam_rec_it = ++sam_recs.begin(); sam_rec_it != sam_recs.end(); sam_rec_it++){
-
-        UTILS_DIE_IF(sam_rec_it->isUnmapped(),
-                     "Unaligned sam record found for qname " + sam_rec.getQname());
-
-        core::record::Alignment alignment(convertCigar2ECigar(sam_rec_it->getCigar(), sam_rec_it->getSeq()),
-                                          sam_rec.checkFlag(Record::FlagPos::SEQ_REVERSE));
-        alignment.addMappingScore(sam_rec.getMapQ());
-
-        core::record::AlignmentBox alignmentContainer(sam_rec.getPos(), std::move(alignment));
-
-        if (unmapped_pair){
-            auto splitAlign = util::make_unique<core::record::alignment_split::Unpaired>();
-            alignmentContainer.addAlignmentSplit(std::move(splitAlign));
+bool Importer::pump(size_t id) {
+    std::string line;
+    std::list<std::string> lines;
+    std::list<ReadTemplate> read_templates;
+    core::record::Chunk chunk;
+    {
+        util::OrderedSection section(&lock, id);
+        while (samReader.good() && blockSize > lines.size()){
+//            std::getline(stream, line);
+//            lines.push_back(std::move(line));
+            samReader.read(lines);
         }
-
-        rec.addAlignment(refs.at(sam_rec.getRname()), std::move(alignmentContainer));
     }
 
-    chunk.push_back(std::move(rec));
+    rtg.addRecords(lines);
+    rtg.getTemplates(read_templates);
+
+    for (auto & read_template:read_templates){
+        convert(chunk, read_template);
+    }
+
+    if (!chunk.empty()) {
+        flowOut(std::move(chunk), id);
+    }
+
+    // Break if less than blockSize records were read from the SAM file
+    return samReader.good();
+
+//    core::record::Chunk chunk;
+//    std::vector<sam::Record> s;
+//    std::list<sam::Record> samRecords;
+//    uint16_t local_ref_num = 0;
+//    {
+//        util::OrderedSection section(&lock, id);
+//        samReader.read(blockSize, s);
+//        auto it = refs.find(s.front().getRname());
+//        if (it == refs.end()) {
+//            local_ref_num = ref_counter;
+//            refs.insert(std::make_pair(s.front().getRname(), ref_counter++));
+//        } else {
+//            local_ref_num = it->second;
+//        }
+//    }
+//    std::copy(s.begin(), s.end(), std::back_inserter(samRecords));
+//
+//    std::cout << "Read " << samRecords.size() << " SAM record(s) for access unit " << id << std::endl;
+//    size_t skipped = 0;
+//    while (!samRecords.empty()) {
+//        sam::Record samRecord = std::move(samRecords.front());
+//        samRecords.erase(samRecords.begin());
+//        // Search for mate
+//        const std::string &rnameSearchString =
+//            samRecord.getRnext() == "=" ? samRecord.getRname() : samRecord.getRnext();
+//        auto mate = samRecords.begin();
+//        mate = samRecords.end();  // Disable pairs for now TODO: implement
+//        if (samRecord.getPnext() == samRecord.getPos() && samRecord.getRname() == rnameSearchString) {
+//            mate = samRecords.end();
+//        }
+//        for (; mate != samRecords.end(); ++mate) {
+//            if (mate->getRname() == rnameSearchString && mate->getPos() == samRecord.getPnext()) {
+//                // LOG_TRACE << "Found mate";
+//                break;
+//            }
+//        }
+//        if (mate == samRecords.end()) {
+//            // LOG_TRACE << "Did not find mate";
+//            if ((samRecord.getFlags() & (1u << uint16_t(Record::FlagPos::SEGMENT_UNMAPPED))) ||
+//                samRecord.getCigar() == "*" || samRecord.getPos() == 0 || samRecord.getRname() == "*") {
+//                skipped++;
+//            } else {
+//                chunk.emplace_back(convert(local_ref_num, std::move(samRecord), nullptr));
+//            }
+//        } else {
+//            // TODO: note the filtering of unaligned reads above. Move this to the encoder
+//            chunk.emplace_back(convert(local_ref_num, std::move(samRecord), &*mate));
+//            samRecords.erase(mate);
+//        }
+//    }
+//    if (skipped) {
+//        std::cerr << "Skipped " << skipped << " unmapped reads! Those are currently not supported." << std::endl;
+//    }
+//    if (!chunk.empty()) {
+//        flowOut(std::move(chunk), id);
+//    }
+//
+//    // Break if less than blockSize records were read from the SAM file
+//    return !samReader.isEnd();
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Importer::dryIn() { dryOut(); }
+
 // ---------------------------------------------------------------------------------------------------------------------
 void Importer::convertPairedEndNoSplit(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d) {
 
@@ -307,8 +331,8 @@ void Importer::convertPairedEndSplitPair(core::record::Chunk &chunk, SamRecords2
     // Process primary line of read 1
     auto flag_tuple = convertFlags2Mpeg(sam_r1_ptr->getFlags());
     core::record::Record rec_1(2, core::record::ClassType::CLASS_I, sam_r1_ptr->moveQname(),
-                             "Genie",std::get<1>(flag_tuple),
-                             sam_r1_ptr->getPos() < sam_r2_ptr->getPos());
+                               "Genie",std::get<1>(flag_tuple),
+                               sam_r1_ptr->getPos() < sam_r2_ptr->getPos());
 
     // Process primary line of read 1
     {
@@ -333,8 +357,8 @@ void Importer::convertPairedEndSplitPair(core::record::Chunk &chunk, SamRecords2
     }
 
     core::record::Record rec_2(2, core::record::ClassType::CLASS_I, sam_r2_ptr->moveQname(),
-                             "Genie",std::get<1>(flag_tuple),
-                             sam_r1_ptr->getPos() > sam_r2_ptr->getPos());
+                               "Genie",std::get<1>(flag_tuple),
+                               sam_r1_ptr->getPos() > sam_r2_ptr->getPos());
 
     // Process primary line of read 2
     {
@@ -410,6 +434,77 @@ void Importer::convertPairedEndSplitPair(core::record::Chunk &chunk, SamRecords2
     sam_recs_2d.back().clear();
 }
 // ---------------------------------------------------------------------------------------------------------------------
+void Importer::convertUnmapped(core::record::Chunk &chunk, SamRecords &sam_recs) {
+    auto& sam_rec = sam_recs.front();
+
+    auto flag_tuple = convertFlags2Mpeg(sam_rec.getFlags());
+    core::record::Record rec(1, core::record::ClassType::CLASS_I, sam_rec.moveQname(),
+                             "Genie",std::get<1>(flag_tuple));
+
+    // No alignmnent
+    // core::record::Alignment alignment(convertCigar2ECigar(sam_rec.getCigar(), sam_rec.getSeq()),
+    //                                   sam_rec.checkFlag(Record::FlagPos::SEQ_REVERSE));
+
+    //alignment.addMappingScore(sam_rec.getMapQ());
+    //core::record::AlignmentBox alignmentContainer(sam_rec.getPos(), std::move(alignment));
+
+    core::record::Segment segment(sam_rec.moveSeq());
+    if (sam_rec.getQual() != "*") {
+        segment.addQualities(sam_rec.moveQual());
+    }
+    rec.addSegment(std::move(segment));
+
+    // No alignment
+    //    ret.addAlignment(ref, std::move(alignmentContainer));
+
+    chunk.push_back(std::move(rec));
+
+    sam_recs.clear();
+}
+// ---------------------------------------------------------------------------------------------------------------------
+void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords &sam_recs, bool unmapped_pair, bool is_read_1_first) {
+    auto&& sam_rec = std::move(sam_recs.front());
+    sam_recs.pop_front();
+
+    auto flag_tuple = convertFlags2Mpeg(sam_rec.getFlags());
+    core::record::Record rec(1, core::record::ClassType::CLASS_I, sam_rec.moveQname(),
+                             "Genie",std::get<1>(flag_tuple), is_read_1_first);
+
+    core::record::Alignment alignment(convertCigar2ECigar(sam_rec.getCigar(), sam_rec.getSeq()),
+                                      sam_rec.checkFlag(Record::FlagPos::SEQ_REVERSE));
+    alignment.addMappingScore(sam_rec.getMapQ());
+
+    core::record::AlignmentBox alignmentContainer(sam_rec.getPos(), std::move(alignment));
+    rec.addAlignment(refs.at(sam_rec.getRname()), std::move(alignmentContainer));
+
+    core::record::Segment segment(sam_rec.moveSeq());
+    if (sam_rec.getQual() != "*") {
+        segment.addQualities(sam_rec.moveQual());
+    }
+    rec.addSegment(std::move(segment));
+
+    for (auto sam_rec_it = ++sam_recs.begin(); sam_rec_it != sam_recs.end(); sam_rec_it++){
+
+        UTILS_DIE_IF(sam_rec_it->isUnmapped(),
+                     "Unaligned sam record found for qname " + sam_rec.getQname());
+
+        core::record::Alignment alignment(convertCigar2ECigar(sam_rec_it->getCigar(), sam_rec_it->getSeq()),
+                                          sam_rec.checkFlag(Record::FlagPos::SEQ_REVERSE));
+        alignment.addMappingScore(sam_rec.getMapQ());
+
+        core::record::AlignmentBox alignmentContainer(sam_rec.getPos(), std::move(alignment));
+
+        if (unmapped_pair){
+            auto splitAlign = util::make_unique<core::record::alignment_split::Unpaired>();
+            alignmentContainer.addAlignmentSplit(std::move(splitAlign));
+        }
+
+        rec.addAlignment(refs.at(sam_rec.getRname()), std::move(alignmentContainer));
+    }
+
+    chunk.push_back(std::move(rec));
+}
+// ---------------------------------------------------------------------------------------------------------------------
 void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d){
 
     auto& read_1 = sam_recs_2d.front();
@@ -454,7 +549,7 @@ void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_re
             convertPairedEndNoSplit(chunk, sam_recs_2d);
         }
 
-    // Handle alignments where one of the reads is not complete (unpaired etc)
+        // Handle alignments where one of the reads is not complete (unpaired etc)
     } else {
         if (read_1_unmapped) {
             convertUnmapped(chunk, read_1);
@@ -509,87 +604,6 @@ void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt) {
     }
 
 }
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool Importer::pump(size_t id) {
-    std::string line;
-    std::list<std::string> lines;
-    core::record::Chunk chunk;
-    {
-        util::OrderedSection section(&lock, id);
-        while (samReader.good() && blockSize > lines.size()){
-//            std::getline(stream, line);
-//            lines.push_back(std::move(line));
-            samReader.read(lines);
-        }
-    }
-
-
-//    core::record::Chunk chunk;
-//    std::vector<sam::Record> s;
-//    std::list<sam::Record> samRecords;
-//    uint16_t local_ref_num = 0;
-//    {
-//        util::OrderedSection section(&lock, id);
-//        samReader.read(blockSize, s);
-//        auto it = refs.find(s.front().getRname());
-//        if (it == refs.end()) {
-//            local_ref_num = ref_counter;
-//            refs.insert(std::make_pair(s.front().getRname(), ref_counter++));
-//        } else {
-//            local_ref_num = it->second;
-//        }
-//    }
-//    std::copy(s.begin(), s.end(), std::back_inserter(samRecords));
-//
-//    std::cout << "Read " << samRecords.size() << " SAM record(s) for access unit " << id << std::endl;
-//    size_t skipped = 0;
-//    while (!samRecords.empty()) {
-//        sam::Record samRecord = std::move(samRecords.front());
-//        samRecords.erase(samRecords.begin());
-//        // Search for mate
-//        const std::string &rnameSearchString =
-//            samRecord.getRnext() == "=" ? samRecord.getRname() : samRecord.getRnext();
-//        auto mate = samRecords.begin();
-//        mate = samRecords.end();  // Disable pairs for now TODO: implement
-//        if (samRecord.getPnext() == samRecord.getPos() && samRecord.getRname() == rnameSearchString) {
-//            mate = samRecords.end();
-//        }
-//        for (; mate != samRecords.end(); ++mate) {
-//            if (mate->getRname() == rnameSearchString && mate->getPos() == samRecord.getPnext()) {
-//                // LOG_TRACE << "Found mate";
-//                break;
-//            }
-//        }
-//        if (mate == samRecords.end()) {
-//            // LOG_TRACE << "Did not find mate";
-//            if ((samRecord.getFlags() & (1u << uint16_t(Record::FlagPos::SEGMENT_UNMAPPED))) ||
-//                samRecord.getCigar() == "*" || samRecord.getPos() == 0 || samRecord.getRname() == "*") {
-//                skipped++;
-//            } else {
-//                chunk.emplace_back(convert(local_ref_num, std::move(samRecord), nullptr));
-//            }
-//        } else {
-//            // TODO: note the filtering of unaligned reads above. Move this to the encoder
-//            chunk.emplace_back(convert(local_ref_num, std::move(samRecord), &*mate));
-//            samRecords.erase(mate);
-//        }
-//    }
-//    if (skipped) {
-//        std::cerr << "Skipped " << skipped << " unmapped reads! Those are currently not supported." << std::endl;
-//    }
-//    if (!chunk.empty()) {
-//        flowOut(std::move(chunk), id);
-//    }
-//
-//    // Break if less than blockSize records were read from the SAM file
-//    return !samReader.isEnd();
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Importer::dryIn() { dryOut(); }
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace sam
