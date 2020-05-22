@@ -20,7 +20,7 @@ namespace sam {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Importer::Importer(size_t _blockSize, std::istream &_file)
-    : blockSize(_blockSize), samReader(_file), lock(), refs(samReader.getRefs()){
+    : blockSize(_blockSize), samReader(_file), lock(){
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -166,17 +166,16 @@ bool Importer::pump(size_t id) {
     {
         util::OrderedSection section(&lock, id);
         while (samReader.good() && blockSize > lines.size()){
-//            std::getline(stream, line);
-//            lines.push_back(std::move(line));
             samReader.read(lines);
         }
     }
 
     rtg.addRecords(lines);
+    lines.clear();
     rtg.getTemplates(read_templates);
 
     for (auto & read_template:read_templates){
-        convert(chunk, read_template);
+        convert(chunk, read_template, samReader.getRefs());
     }
 
     if (!chunk.empty()) {
@@ -252,7 +251,7 @@ bool Importer::pump(size_t id) {
 void Importer::dryIn() { dryOut(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertPairedEndNoSplit(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d) {
+void Importer::convertPairedEndNoSplit(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d, std::map<std::string, size_t>& refs) {
 
     auto sam_r1_ptr = sam_recs_2d.front().begin();
     auto sam_r2_ptr = sam_recs_2d.back().begin();
@@ -324,7 +323,7 @@ void Importer::convertPairedEndNoSplit(core::record::Chunk &chunk, SamRecords2D 
     sam_recs_2d.back().clear();
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertPairedEndSplitPair(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d) {
+void Importer::convertPairedEndSplitPair(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d, std::map<std::string, size_t>& refs) {
 
     auto sam_r1_ptr = sam_recs_2d.front().begin();
     auto sam_r2_ptr = sam_recs_2d.back().begin();
@@ -435,7 +434,7 @@ void Importer::convertPairedEndSplitPair(core::record::Chunk &chunk, SamRecords2
     sam_recs_2d.back().clear();
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertUnmapped(core::record::Chunk &chunk, SamRecords &sam_recs) {
+void Importer::convertUnmapped(core::record::Chunk &chunk, SamRecords &sam_recs, std::map<std::string, size_t>& refs) {
     auto& sam_rec = sam_recs.front();
 
     auto flag_tuple = convertFlags2Mpeg(sam_rec.getFlags());
@@ -463,7 +462,7 @@ void Importer::convertUnmapped(core::record::Chunk &chunk, SamRecords &sam_recs)
     sam_recs.clear();
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords &sam_recs, bool unmapped_pair, bool is_read_1_first) {
+void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords &sam_recs, std::map<std::string, size_t>& refs, bool unmapped_pair, bool is_read_1_first) {
     auto&& sam_rec = std::move(sam_recs.front());
     sam_recs.pop_front();
 
@@ -506,7 +505,7 @@ void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords &sam_recs
     chunk.push_back(std::move(rec));
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d){
+void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d, std::map<std::string, size_t>& refs){
 
     auto& read_1 = sam_recs_2d.front();
     auto read_1_empty = read_1.empty();
@@ -545,36 +544,33 @@ void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_re
         }
 
         if (create_split_records){
-            convertPairedEndSplitPair(chunk, sam_recs_2d);
+            convertPairedEndSplitPair(chunk, sam_recs_2d, refs);
         } else {
-            convertPairedEndNoSplit(chunk, sam_recs_2d);
+            convertPairedEndNoSplit(chunk, sam_recs_2d, refs);
         }
 
         // Handle alignments where one of the reads is not complete (unpaired etc)
     } else {
         if (read_1_unmapped) {
-            convertUnmapped(chunk, read_1);
+            convertUnmapped(chunk, read_1, refs);
         } else if (!read_1_primary){
             UTILS_DIE("Cannot find the primary line of read_1!");
         } else if (read_1_ok){
-            convertSingleEnd(chunk, read_1, true, true);
+            convertSingleEnd(chunk, read_1, refs, true, true);
         }
 
         if (read_2_unmapped){
-            convertUnmapped(chunk, read_2);
+            convertUnmapped(chunk, read_2, refs);
         } else if (!read_2_primary){
             UTILS_DIE("Cannot find the primary line of read_2!");
         } else if (read_2_ok) {
-            convertSingleEnd(chunk, read_2, true, false);
+            convertSingleEnd(chunk, read_2, refs, true, false);
         }
     }
     sam_recs_2d.clear();
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt) {
-    SamRecords2D sam_recs_2d;
-    rt.getRecords(sam_recs_2d);
-
+void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt, std::map<std::string, size_t>& refs) {
 //    // Register Reference Sequence Name RNAME
 //    for (auto& sam_recs:sam_recs_2d){
 //        for (auto& sam_rc:sam_recs){
@@ -589,19 +585,24 @@ void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt) {
 //        }
 //    }
 
+    UTILS_DIE_IF(!rt.isValid(), "Invalid Read Template. Neither unmapped, single-end nor paired-end");
+
+    auto is_unmapped = rt.isUnmapped();
+    auto is_single = rt.isSingle();
+    auto is_pair = rt.isPair();
+
+    SamRecords2D sam_recs_2d;
+    rt.getRecords(sam_recs_2d);
+
     // Convert SAM records to MPEG-G record(s)
-    if (rt.isValid()){
-        if (rt.isUnmapped()){
-            convertUnmapped(chunk, sam_recs_2d.front());
-        } else if (rt.isSingle()){
-            convertSingleEnd(chunk, sam_recs_2d.front());
-        } else if (rt.isPair()){
-            convertPairedEnd(chunk, sam_recs_2d);
-        } else {
-            UTILS_DIE("Unhandled read type found. Should never be reached!");
-        }
-    } else{
-        UTILS_DIE("Invalid Read Template. Neither unmapped, single-end nor paired-end");
+    if (is_unmapped){
+        convertUnmapped(chunk, sam_recs_2d.front(), refs);
+    } else if (is_single){
+        convertSingleEnd(chunk, sam_recs_2d.front(), refs);
+    } else if (is_pair){
+        convertPairedEnd(chunk, sam_recs_2d, refs);
+    } else {
+        UTILS_DIE("Unhandled read type found. Should never be reached!");
     }
 
 }

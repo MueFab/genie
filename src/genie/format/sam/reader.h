@@ -43,7 +43,7 @@ class Reader {
 
     void addCacheEntry(std::string& qname, size_t &pos);
 
-    bool read(std::list<std::string> lines);
+    bool read(std::list<std::string>& lines);
 
     bool good();
 };

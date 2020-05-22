@@ -33,11 +33,8 @@ class Importer : public core::FormatImporter {
     ReadTemplateGroup rtg;
     util::OrderedLock lock;  //!< @brief Lock to ensure in order execution
 
-    std::map<std::string, size_t>& refs;
-    //size_t ref_counter;
-
-    void convertPairedEndNoSplit(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d);
-    void convertPairedEndSplitPair(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d);
+    static void convertPairedEndNoSplit(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d, std::map<std::string, size_t>& refs);
+    static void convertPairedEndSplitPair(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d, std::map<std::string, size_t>& refs);
 
    public:
     Importer(size_t _blockSize, std::istream &_file);
@@ -56,12 +53,12 @@ class Importer : public core::FormatImporter {
 
     void dryIn() override;
 
-    void convertUnmapped(core::record::Chunk& chunk, SamRecords& sam_recs);
-    void convertSingleEnd(core::record::Chunk& chunk, SamRecords& sam_recs,
+    static void convertUnmapped(core::record::Chunk& chunk, SamRecords& sam_recs, std::map<std::string, size_t>& refs);
+    static void convertSingleEnd(core::record::Chunk& chunk, SamRecords& sam_recs, std::map<std::string, size_t>& refs,
                           bool unmapped_pair=false, bool is_read_1_first=true);
 
-    void convertPairedEnd(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d);
-    void convert(core::record::Chunk& chunk, ReadTemplate& rt);
+    static void convertPairedEnd(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d, std::map<std::string, size_t>& refs);
+    static void convert(core::record::Chunk& chunk, ReadTemplate& rt, std::map<std::string, size_t>& refs);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

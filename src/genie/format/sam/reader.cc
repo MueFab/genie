@@ -28,8 +28,8 @@ Reader::Reader(std::istream& _stream, bool _with_index) : stream(_stream), heade
                 if (tagName == "SN"){
                     refs.emplace(tag->toString(), seqID);
                 } else if(tagName == "AN"){
-                    // TODO : value of tag AN is comma-separated list (yeremia)
-                    refs.emplace(tag->toString(), seqID);
+                    // Exclude Tag AN
+                    //refs.emplace(tag->toString(), seqID);
                 }
             }
             seqID++;
@@ -86,18 +86,17 @@ void Reader::addCacheEntry(std::string &qname, size_t &pos) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Reader::read(std::list<std::string> lines) {
+bool Reader::read(std::list<std::string>& lines) {
     std::string line;
-
-    if (!good()){
-        return false;
-    }
 
     if (with_index){
         auto entry = index.begin();
 
-        while (!entry->second.empty()){
-            stream.seekg(entry->second.front());
+        //while (!entry->second.empty()){
+        for (auto& pos: entry->second){
+            stream.clear();
+
+            stream.seekg(pos);
             std::getline(stream, line);
             lines.push_back(std::move(line));
 
@@ -107,6 +106,7 @@ bool Reader::read(std::list<std::string> lines) {
         index.erase(entry);
         return true;
     } else {
+        UTILS_DIE_IF(!stream.good(), "Cannot read stream");
         std::getline(stream, line);
 
         lines.push_back(std::move(line));
