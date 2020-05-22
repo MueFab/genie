@@ -33,6 +33,9 @@ class Importer : public core::FormatImporter {
     ReadTemplateGroup rtg;
     util::OrderedLock lock;  //!< @brief Lock to ensure in order execution
 
+    std::map<std::string, size_t>& refs;
+    //size_t ref_counter;
+
     void convertPairedEndNoSplit(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d);
     void convertPairedEndSplitPair(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d);
 
@@ -46,9 +49,6 @@ class Importer : public core::FormatImporter {
     static int stepSequence(char token);
 
     static std::string convertCigar2ECigar(const std::string &cigar, const std::string &seq);
-
-    std::map<std::string, size_t> refs;
-    size_t ref_counter;
 
     static core::record::Record convert(uint16_t ref, sam::Record &&_r1, sam::Record *_r2);
 

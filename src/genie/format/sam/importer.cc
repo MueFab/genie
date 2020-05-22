@@ -20,7 +20,8 @@ namespace sam {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Importer::Importer(size_t _blockSize, std::istream &_file)
-    : blockSize(_blockSize), samReader(_file), lock(), ref_counter(0) {}
+    : blockSize(_blockSize), samReader(_file), lock(), refs(samReader.getRefs()){
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -574,19 +575,19 @@ void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt) {
     SamRecords2D sam_recs_2d;
     rt.getRecords(sam_recs_2d);
 
-    // Register Reference Sequence Name RNAME
-    for (auto& sam_recs:sam_recs_2d){
-        for (auto& sam_rc:sam_recs){
-            const auto& rname = sam_rc.getRname();
-
-            if (rname != "=" || rname != "*"){
-                auto it = refs.find(rname);
-                if (it == refs.end()) {
-                    refs.insert(std::make_pair(sam_rc.getRname(), ref_counter++));
-                }
-            }
-        }
-    }
+//    // Register Reference Sequence Name RNAME
+//    for (auto& sam_recs:sam_recs_2d){
+//        for (auto& sam_rc:sam_recs){
+//            const auto& rname = sam_rc.getRname();
+//
+//            if (rname != "=" || rname != "*"){
+//                auto it = refs.find(rname);
+//                if (it == refs.end()) {
+//                    refs.insert(std::make_pair(sam_rc.getRname(), ref_counter++));
+//                }
+//            }
+//        }
+//    }
 
     // Convert SAM records to MPEG-G record(s)
     if (rt.isValid()){

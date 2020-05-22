@@ -29,14 +29,17 @@ class Reader {
    private:
     std::istream& stream;
     header::Header header;
-    bool with_cache;
+    std::map<std::string, size_t> refs;
+    bool with_index;
 
-    std::map<std::string, std::vector<size_t>> cache;
+    std::map<std::string, std::vector<size_t>> index;
 
    public:
-    explicit Reader(std::istream& _stream, bool with_cache=true);
+    explicit Reader(std::istream& _stream, bool _with_index=true);
 
     const header::Header& getHeader() const;
+
+    std::map<std::string, size_t>& getRefs();
 
     void addCacheEntry(std::string& qname, size_t &pos);
 
