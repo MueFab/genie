@@ -13,11 +13,13 @@
 #include <genie/format/sam/reader.h>
 #include <genie/format/sam/record.h>
 
-TEST(SamRecord, Simple) {  // NOLINT(cert-err-cpp)
+TEST(SamRecord, ParseString) {  // NOLINT(cert-err-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
     std::ifstream f(gitRootDir + "/data/sam/four-reads-with-header.sam");
-    genie::format::sam::Reader reader(f);
+
+    // Disable index to preserve the order of sam records
+    genie::format::sam::Reader reader(f, false);
 
 //    EXPECT_EQ(reader.header,
 //              "@HD\tVN:1.3\tSO:coordinate\n@PG\tID:Illumina.SecondaryAnalysis.SortedToBamConverter\n@SQ\tSN:EcoliDH10B."
@@ -100,44 +102,79 @@ TEST(SamRecord, Simple) {  // NOLINT(cert-err-cpp)
 }
 #endif
 
-// TODO (Yeremia): Remove or fix this example. SAM does not allow record to use alternative alias of reference.
-#if false
-TEST(SamFileReader, PairReferenceWithAlternativeAlias) {  // NOLINT(cert-err-cpp)
-    // Test Reference with alternative alias
-
+#if true
+TEST(SAM, SamReaderReference) {  // NOLINT(cert-err-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-    std::ifstream f(gitRootDir + "/data/sam/sample01.sam");
-    genie::format::sam::Reader reader(f);
 
-    std::vector<genie::format::sam::Record> recs;
-    reader.read(1, recs);
-//    std::list<genie::format::sam::Record> unmappedRead, read1, read2;
-//    EXPECT_NO_THROW(EXPECT_EQ(reader.getSortedTemplate(unmappedRead, read1, read2), true));
+    // Valid RName
+    {
+        std::ifstream f(gitRootDir + "/data/sam/pair_reads.sam");
+        UTILS_DIE_IF(!f.good(), "Cannot read file");
+
+        genie::format::sam::Reader reader(f);
+
+        auto& refs = reader.getRefs();
+
+        std::list<std::string> lines;
+        reader.read(lines);
+        for (auto &line : lines){
+            genie::format::sam::Record rec(line);
+            EXPECT_NO_THROW(refs.at(rec.getRname()));
+        }
+    }
+    // Invalid RName
+    {
+        std::ifstream f(gitRootDir + "/data/sam/invalid_rname.sam");
+        UTILS_DIE_IF(!f.good(), "Cannot read file");
+
+        genie::format::sam::Reader reader(f);
+        auto& refs = reader.getRefs();
+
+        std::list<std::string> lines;
+        reader.read(lines);
+        for (auto &line : lines){
+            genie::format::sam::Record rec(line);
+            EXPECT_ANY_THROW(refs.at(rec.getRname()));
+        }
+    }
 }
 #endif
 
-//TEST(SamReader, SingleEndUnmapped) {  // NOLINT(cert-err-cpp)
-//    // Test sam file containing alignments with invalid flags
-//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-//    std::ifstream f(gitRootDir + "/data/sam/sample06.sam");
-//    genie::format::sam::Reader reader(f);
-//
-////    genie::format::sam::Record rec;
-////    reader.read(rec);
-////
-////    genie::format::sam::Template t(std::move(rec));
-////
-////    EXPECT_EQ(7, 7);
-//
-//    std::vector<genie::format::sam::Record> recs;
-//    genie::format::sam::TemplateGroup tg;
-//
-//    reader.readRecords(10, recs);
-//
-//    tg.addRecords(recs);
-//
-//    EXPECT_EQ(7, 7);
-//}
+TEST(SAM, ImporterUnmappedReads) {  // NOLINT(cert-err-cpp)
+    // Test sam file containing alignments with invalid flags
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::ifstream f(gitRootDir + "/data/sam/unmapped_reads.sam");
+    UTILS_DIE_IF(!f.good(), "Cannot read file");
+
+    genie::format::sam::Reader reader(f);
+
+    std::list<std::string> lines;
+    std::list<genie::format::sam::ReadTemplate> rts;
+    genie::format::sam::ReadTemplateGroup rtg;
+
+    genie::core::record::Chunk chunk;
+    {
+        while (reader.good()){
+            reader.read(lines);
+        }
+    }
+
+    rtg.addRecords(lines);
+    lines.clear();
+    rtg.getTemplates(rts);
+
+    ASSERT_EQ(rts.size(), 5);
+
+    for (auto & rt: rts){
+        EXPECT_TRUE(rt.isValid() && rt.isUnmapped());
+        genie::format::sam::Importer::convert(chunk, rt, reader.getRefs());
+
+        EXPECT_EQ(chunk.back().getNumberOfTemplateSegments(), 1);
+        EXPECT_EQ(chunk.back().getClassID(), genie::core::record::ClassType::CLASS_I);
+        EXPECT_EQ(chunk.back().getFlags(), 0);
+    }
+
+}
 //
 //TEST(SamReader, PairedEndHeaderInvalid) {  // NOLINT(cert-err-cpp)
 //    // Test sam file with invalid SAM header tag
@@ -213,6 +250,7 @@ TEST(SamFileReader, PairReferenceWithAlternativeAlias) {  // NOLINT(cert-err-cpp
 //
 //}
 
+# if false
 TEST(SamFileReader, main) {  // NOLINT(cert-err-cpp)
     std::vector<std::string> fnames = {
             "9799_7#3.sam",  // 0 - TODO: As an example for header
@@ -309,7 +347,7 @@ TEST(SamFileReader, main) {  // NOLINT(cert-err-cpp)
 //
 //    std::string x("AAA");
 }
-
+#endif
 
 
 
