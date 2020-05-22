@@ -34,7 +34,7 @@ class Reader {
     std::map<std::string, std::vector<size_t>> cache;
 
    public:
-    explicit Reader(std::istream& _stream, bool with_cache);
+    explicit Reader(std::istream& _stream, bool with_cache=true);
 
     const header::Header& getHeader() const;
 
@@ -52,23 +52,24 @@ class ReadTemplateGroup{
     std::list<std::pair<std::string, size_t>> window;
     std::map<std::string, ReadTemplate> data;
     size_t counter;
+    bool enable_window;
 
     void addEntry(const std::string& qname);
     void updateEntry(const std::string& qname);
-    void removeEntry(std::string& qname);
+    void removeEntry(const std::string& qname);
 
    public:
-    explicit ReadTemplateGroup();
+    explicit ReadTemplateGroup(bool _enable_window=false);
 
     void addRecord(Record&& rec);
     void addRecords(std::list<Record>& recs);
     void addRecords(std::vector<Record>& recs);
+    void addRecords(std::list<std::string>& lines);
 
     void resetCounter();
 
-    bool getTemplate(ReadTemplate& t);
-    bool getTemplate(ReadTemplate& t, const size_t& threshold);
-    void getTemplates(std::list<ReadTemplate>& ts, const size_t& threshold);
+    bool getTemplate(ReadTemplate& t, const size_t& threshold=0);
+    void getTemplates(std::list<ReadTemplate>& ts, const size_t& threshold=0);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

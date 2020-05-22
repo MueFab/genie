@@ -28,10 +28,9 @@ Reader::Reader(std::istream& _stream, bool _with_cache) : stream(_stream), heade
 
             std::getline(stream, str, '\t');
 
-            // If not a header, add to tache
-            if (str[0] != '@'){
-                addCacheEntry(str, pos);
-            }
+            // If not a header, add to cache
+            UTILS_DIE_IF(str[0] == '@', "Found header in the middle of SAM file");
+            addCacheEntry(str, pos);
 
             // Move to next line, skip the rest of fields
             stream.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -100,48 +99,54 @@ bool Reader::good() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReadTemplateGroup::ReadTemplateGroup() : counter(0) {}
+ReadTemplateGroup::ReadTemplateGroup(bool _enable_window) : counter(0), enable_window(_enable_window) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReadTemplateGroup::addEntry(const std::string& qname) {
-    window.emplace_front(qname, counter);
-    counter++;
+    if (enable_window){
+        window.emplace_front(qname, counter);
+        counter++;
+    }
 }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReadTemplateGroup::updateEntry(const std::string& qname) {
-    bool found = false;
-    for (auto iter = window.begin(); iter != window.end(); iter++){
-        if (iter->first == qname){
-            found = true;
-            iter->second = counter;
-            counter ++;
+    if (enable_window){
+        bool found = false;
+        for (auto iter = window.begin(); iter != window.end(); iter++){
+            if (iter->first == qname){
+                found = true;
+                iter->second = counter;
+                counter ++;
 
-            window.push_front(std::move(*iter));
-            window.erase(iter);
+                window.push_front(std::move(*iter));
+                window.erase(iter);
 
-            //window.splice(window.begin(), window, iter, std::next(iter));
-            break;
+                //window.splice(window.begin(), window, iter, std::next(iter));
+                break;
+            }
         }
-    }
 
-    UTILS_DIE_IF(!found, "No read template with QNAME " + qname);
+        UTILS_DIE_IF(!found, "No read template with QNAME " + qname);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReadTemplateGroup::removeEntry(std::string& qname) {
-    bool found = false;
-    for (auto iter = window.begin(); iter != window.end(); iter++){
-        if (iter->first == qname){
-            found = true;
-            window.erase(iter);
-            break;
+void ReadTemplateGroup::removeEntry(const std::string& qname) {
+    if (enable_window) {
+        bool found = false;
+        for (auto iter = window.begin(); iter != window.end(); iter++) {
+            if (iter->first == qname) {
+                found = true;
+                window.erase(iter);
+                break;
+            }
         }
-    }
 
-    UTILS_DIE_IF(!found, "No read template with QNAME " + qname);
+        UTILS_DIE_IF(!found, "No read template with QNAME " + qname);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -178,6 +183,16 @@ void ReadTemplateGroup::addRecords(std::vector<Record>& recs) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void ReadTemplateGroup::addRecords(std::list<std::string>& lines) {
+    for (auto &line: lines){
+        Record sam_rec(line);
+
+        addRecord(std::move(sam_rec));
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void ReadTemplateGroup::resetCounter() {
     auto lowest_counter = window.back().second;
     counter -= lowest_counter;
@@ -188,25 +203,32 @@ void ReadTemplateGroup::resetCounter() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool ReadTemplateGroup::getTemplate(ReadTemplate& t) {
-    if (!window.empty() && data[window.back().first].isValid()){
-        t = std::move(data[window.back().first]);
-        data.erase(window.back().first);
-        window.erase(std::prev(window.end()));
-        return true;
-    } else {
-        return false;
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 bool ReadTemplateGroup::getTemplate(ReadTemplate& t, const size_t& threshold) {
-    if (counter - window.back().second > threshold) {
-        return getTemplate(t);
+    if (enable_window) {
+        if (counter - window.back().second > threshold) {
+            if (!window.empty() && data[window.back().first].isValid()){
+                t = std::move(data[window.back().first]);
+                data.erase(window.back().first);
+                window.erase(std::prev(window.end()));
+
+                removeEntry(t.getQname());
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     } else {
-        return false;
+        if (!data.empty()){
+            t = std::move(data.at(data.begin()->first));
+            data.erase(t.getQname());
+            return true;
+        } else {
+            return false;
+        }
     }
+
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
