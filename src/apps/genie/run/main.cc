@@ -1,4 +1,5 @@
 
+#include <genie/format/fasta/reader.h>
 #include <genie/format/fastq/exporter.h>
 #include <genie/format/fastq/importer.h>
 #include <genie/format/mgb/exporter.h>
@@ -64,6 +65,11 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 }
 
 int main(int argc, char* argv[]) {
+ /*   std::ifstream in("GCF_000001405.39_GRCh38.p13_genomic.fasta");
+    std::ifstream inFai("GCF_000001405.39_GRCh38.p13_genomic.fasta.fai");
+    genie::format::fasta::FastaFile file(in, inFai);
+    std::cout << file.loadSection("NC_012920.1", 16509, 16569) << std::endl;
+    return 0; */
     ProgramOptions pOpts(argc, argv);
     genie::util::Watch watch;
     constexpr size_t BLOCKSIZE = 1000;

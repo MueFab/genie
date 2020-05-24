@@ -1,8 +1,11 @@
 project("genie-fasta")
 
 set(source_files
+        fai-file.cc
+        manager.cc
         reader.cc
-        record.cc)
+        reference.cc
+        )
 
 add_library(genie-fasta ${source_files})
 
