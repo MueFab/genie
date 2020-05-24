@@ -4,41 +4,59 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef UTIL_FASTA_RECORD_H_
-#define UTIL_FASTA_RECORD_H_
+#ifndef GENIE_REFERENCE_MANAGER_H
+#define GENIE_REFERENCE_MANAGER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <string>
+#include <map>
+#include <memory>
+#include <vector>
+#include "reference.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
-namespace format {
-namespace fasta {
+namespace core {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-struct FastaRecord {
-   public:
-    FastaRecord(std::string header, std::string sequence);
-
-    ~FastaRecord();
+/**
+ *
+ */
+class ReferenceManager {
+   private:
+    std::map<std::string, std::vector<std::unique_ptr<Reference>>> refs;  //!<
 
    public:
-    std::string header;
-    std::string sequence;
+    /**
+     *
+     * @param name
+     * @param _start
+     * @param _end
+     * @return
+     */
+    std::string getSequence(const std::string& name, uint64_t _start, uint64_t _end) const;
+
+    /**
+     *
+     * @param ref
+     */
+    void registerRef(std::unique_ptr<Reference> ref);
+
+    /**
+     *
+     * @param ref
+     */
+    void registerRef(std::vector<std::unique_ptr<Reference>>&& ref);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace fasta
-}  // namespace format
+}  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // UTIL_FASTA_RECORD_H_
+#endif  // GENIE_REFERENCE_MANAGER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

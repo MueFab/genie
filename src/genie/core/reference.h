@@ -4,81 +4,76 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef UTIL_FASTA_FILE_READER_H_
-#define UTIL_FASTA_FILE_READER_H_
+#ifndef GENIE_CORE_REFERENCE_H
+#define GENIE_CORE_REFERENCE_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/exceptions.h>
-#include <map>
-#include <set>
 #include <string>
-#include <utility>
-#include <vector>
-
-#include "fai-file.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
-namespace format {
-namespace fasta {
+namespace core {
 
 /**
  *
  */
-class FastaReader {
+class Reference {
    private:
-    FaiFile fai;          //!<
-    std::istream* fasta;  //!<
+    std::string name; //!<
+    uint64_t start; //!<
+    uint64_t end; //!<
 
    public:
     /**
      *
-     * @param fastaFile
-     * @param faiFile
+     * @return
      */
-    FastaReader(std::istream& fastaFile, std::istream& faiFile);
+    const std::string& getName() const;
 
     /**
      *
      * @return
      */
-    std::set<std::string> getSequences() const;
+    uint64_t getStart() const;
 
     /**
      *
-     * @param name
      * @return
      */
-    uint64_t getLength(const std::string& name) const;
+    uint64_t getEnd() const;
 
     /**
      *
-     * @param sequence
-     * @param start
-     * @param end
+     * @param _start
+     * @param _end
      * @return
      */
-    std::string loadSection(const std::string& sequence, uint64_t start, uint64_t end);
+    virtual std::string getSequence(uint64_t _start, uint64_t _end) = 0;
 
     /**
      *
-     * @param fasta
-     * @param fai
      */
-    static void index(std::istream& fasta, std::ostream& fai);
+    virtual ~Reference() = default;
+
+    /**
+     *
+     * @param _name
+     * @param _start
+     * @param _end
+     */
+    Reference(std::string _name, uint64_t _start, uint64_t _end);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace fasta
-}  // namespace format
+}  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // UTIL_FASTA_FILE_READER_H_
+#endif  // GENIE_REFERENCE_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

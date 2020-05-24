@@ -46,6 +46,8 @@ set(source_files
         name-encoder-none.cc
         read-encoder.cc
         read-decoder.cc
+        reference.cc
+        reference-manager.cc
         )
 
 add_library(genie-core ${source_files})

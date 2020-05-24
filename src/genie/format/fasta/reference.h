@@ -4,19 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef UTIL_FASTA_FILE_READER_H_
-#define UTIL_FASTA_FILE_READER_H_
+// ---------------------------------------------------------------------------------------------------------------------
+
+#ifndef GENIE_FASTA_REFERENCE_H
+#define GENIE_FASTA_REFERENCE_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/exceptions.h>
-#include <map>
-#include <set>
+#include <genie/core/reference.h>
 #include <string>
-#include <utility>
-#include <vector>
-
-#include "fai-file.h"
+#include "manager.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,47 +24,26 @@ namespace fasta {
 /**
  *
  */
-class FastaReader {
+class Reference : public core::Reference {
    private:
-    FaiFile fai;          //!<
-    std::istream* fasta;  //!<
+    Manager* mgr;  //!<
 
    public:
     /**
      *
-     * @param fastaFile
-     * @param faiFile
-     */
-    FastaReader(std::istream& fastaFile, std::istream& faiFile);
-
-    /**
-     *
-     * @return
-     */
-    std::set<std::string> getSequences() const;
-
-    /**
-     *
      * @param name
-     * @return
+     * @param length
+     * @param m
      */
-    uint64_t getLength(const std::string& name) const;
+    Reference(std::string name, size_t length, Manager* m);
 
     /**
      *
-     * @param sequence
-     * @param start
-     * @param end
+     * @param _start
+     * @param _end
      * @return
      */
-    std::string loadSection(const std::string& sequence, uint64_t start, uint64_t end);
-
-    /**
-     *
-     * @param fasta
-     * @param fai
-     */
-    static void index(std::istream& fasta, std::ostream& fai);
+    std::string getSequence(uint64_t _start, uint64_t _end) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -78,7 +54,7 @@ class FastaReader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // UTIL_FASTA_FILE_READER_H_
+#endif  // GENIE_FASTA_REFERENCE_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

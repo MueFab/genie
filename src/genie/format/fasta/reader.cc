@@ -4,60 +4,92 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "reader.h"
+#include <algorithm>
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
-/*namespace format {
-    namespace fasta {
+namespace format {
+namespace fasta {
 
-        FastaFileReader::FastaFileReader(const std::string &path) : FileReader(path) {}
+// ---------------------------------------------------------------------------------------------------------------------
 
-        FastaFileReader::~FastaFileReader() = default;
+FastaReader::FastaReader(std::istream& fastaFile, std::istream& faiFile) : fai(faiFile), fasta(&fastaFile) {}
 
-        void FastaFileReader::parse(std::vector<FastaRecord> *const fastaRecords) {
-            // Reset file pointer to the beginning of the file
-            size_t fpos = tell();
-            seekFromSet(0);
+// ---------------------------------------------------------------------------------------------------------------------
 
-            std::string currentHeader;
-            std::string currentSequence;
+std::set<std::string> FastaReader::getSequences() const { return fai.getSequences(); }
 
-            while (true) {
-                // Read a line
-                std::string line;
-                readLine(&line);
-                if (line.empty()) {
-                    break;
-                }
+// ---------------------------------------------------------------------------------------------------------------------
 
-                // Process line
-                if (line[0] == '>') {
-                    // Store the previous FASTA record, if there is one
-                    if (!currentSequence.empty()) {
-                        // We have a sequence, check if we have a header
-                        if (currentHeader.empty()) {
-                            throw std::runtime_error{"Found FASTA sequence, but no header"};
-                        }
+uint64_t FastaReader::getLength(const std::string& name) const { return fai.getLength(name); }
 
-                        FastaRecord currentFastaRecord(currentHeader, currentSequence);
-                        fastaRecords->push_back(currentFastaRecord);
+// ---------------------------------------------------------------------------------------------------------------------
 
-                        currentHeader = "";
-                        currentSequence = "";
-                    }
-
-                    // Store the header and trim it: remove everything after the first space
-                    currentHeader = line;
-                    currentHeader = currentHeader.substr(0, currentHeader.find_first_of(" "));
-                } else {
-                    currentSequence += line;
-                }
-            }
-
-            FastaRecord currentFastaRecord(currentHeader, currentSequence);
-            fastaRecords->push_back(currentFastaRecord);
-
-            seekFromSet(fpos);
+std::string FastaReader::loadSection(const std::string& sequence, uint64_t start, uint64_t end) {
+    auto startPos = fai.getFilePosition(sequence, start);
+    std::string ret;
+    ret.reserve(end - start);
+    fasta->seekg(startPos);
+    std::string buffer;
+    while (getline(*fasta, buffer)) {
+        start += buffer.size();
+        if (start < end) {
+            ret += buffer;
+        } else if (start >= end) {
+            ret += buffer.substr(0, buffer.size() - (start - end));
+            break;
         }
-
     }
-}  // namespace util */
+    std::transform(ret.begin(), ret.end(), ret.begin(), ::toupper);
+    return ret;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void FastaReader::index(std::istream& fasta, std::ostream& fai) {
+    std::string buffer;
+    FaiFile faiFile;
+    FaiFile::FaiSequence seq;
+    bool lastline = false;
+    uint64_t nextoffset = 0;
+    while (getline(fasta, buffer)) {
+        UTILS_DIE_IF(buffer.empty(), "Empty line in fasta");
+        if (buffer.front() == '>') {
+            lastline = false;
+            if (seq.offset != 0) {
+                uint64_t tmp = seq.offset;
+                seq.offset = nextoffset;
+                faiFile.addSequence(seq);
+                seq.offset = tmp;
+            }
+            seq.name = buffer.substr(1, buffer.find_first_of(' ') - 1);
+            seq.offset += buffer.size() + 1;
+            nextoffset = seq.offset;
+            UTILS_DIE_IF(!getline(fasta, buffer), "Missing line in fasta");
+            seq.length = 0;
+            seq.linebases = buffer.size();
+            seq.linewidth = buffer.size() + 1;
+        } else {
+            UTILS_DIE_IF(lastline, "Invalid fasta line length");
+        }
+        seq.length += buffer.size();
+        seq.offset += buffer.size() + 1;
+        if (buffer.size() != seq.linebases) {
+            lastline = true;
+        }
+    }
+    seq.offset = nextoffset;
+    faiFile.addSequence(seq);
+    fai << faiFile;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace fasta
+}  // namespace format
+}  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
