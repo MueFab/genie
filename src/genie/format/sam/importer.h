@@ -33,8 +33,23 @@ class Importer : public core::FormatImporter {
     ReadTemplateGroup rtg;
     util::OrderedLock lock;  //!< @brief Lock to ensure in order execution
 
-    static void convertPairedEndNoSplit(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d, std::map<std::string, size_t>& refs);
-    static void convertPairedEndSplitPair(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d, std::map<std::string, size_t>& refs);
+    static std::unique_ptr<core::record::Record> convertSam2SameRec(Record& sam_r1, Record& sam_r2,
+                                            std::map<std::string, size_t>& refs);
+
+    static void addAlignmentToSameRec(std::unique_ptr<core::record::Record>& rec, Record& sam_r1, Record& sam_r2,
+                                      std::map<std::string, size_t>& refs);
+
+    static void convertPairedEndNoSplit(core::record::Chunk& template_chunk, SamRecords2D& sam_recs_2d, std::map<std::string, size_t>& refs);
+
+    static std::unique_ptr<core::record::Record> convertSam2SplitRec(Record& sam_r1, Record* sam_r2_ptr,
+                                              std::map<std::string, size_t>& refs);
+
+    static void addAlignmentToSplitRec(std::unique_ptr<core::record::Record>& rec, Record& sam_r1, Record* sam_r2_ptr,
+                                       std::map<std::string, size_t>& refs);
+
+
+    static void convertPairedEndSplitPair(core::record::Chunk& template_chunk, SamRecords2D& sam_recs_2d, std::map<std::string, size_t>& refs);
+    void _convertPairedEnd(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d, std::map<std::string, size_t>& refs);
 
    public:
     Importer(size_t _blockSize, std::istream &_file);

@@ -107,13 +107,15 @@ public:
 
     void checkValuesUsingCondition() const;
 
+    bool isFirstRead() const;
+    bool isLastRead() const;
+    bool isPairedEnd() const;
     bool isPrimaryLine() const;
-
     bool isUnmapped() const;
-
     bool isNextUnmapped() const;
-
     bool isPairOf(Record &other) const;
+
+    void setSeq(const std::string& _seq);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

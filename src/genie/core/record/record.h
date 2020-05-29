@@ -170,6 +170,19 @@ class Record {
     const AlignmentSharedData& getAlignmentSharedData() const;
 
     const AlignmentExternal& getAlignmentExternal() const;
+
+    /**
+     *
+     * @return
+     */
+    bool getRead1First() const;
+
+    /**
+     *
+     * @return
+     */
+    void setMoreAlignmentInfo(std::unique_ptr<AlignmentExternal> _more_alignment_info);
+
 };
 
 /**
