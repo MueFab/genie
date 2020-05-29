@@ -214,6 +214,10 @@ const std::string &Record::getName() const { return read_name; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool Record::getRead1First() const { return read_1_first; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 const std::string &Record::getGroup() const { return read_group; }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -223,6 +227,12 @@ const AlignmentSharedData &Record::getAlignmentSharedData() const { return share
 // ---------------------------------------------------------------------------------------------------------------------
 
 const AlignmentExternal &Record::getAlignmentExternal() const { return *moreAlignmentInfo; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Record::setMoreAlignmentInfo(std::unique_ptr<AlignmentExternal> _more_alignment_info) {
+        moreAlignmentInfo = std::move(_more_alignment_info);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

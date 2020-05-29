@@ -270,9 +270,13 @@ std::string Record::toString() const {
     ret += std::to_string(tlen) + '\t' + seq + '\t' + qual;
     return ret;
 }
-
 // ---------------------------------------------------------------------------------------------------------------------
-
+bool Record::isFirstRead() const { return checkFlag(FlagPos::FIRST_SEGMENT) ; }
+// ---------------------------------------------------------------------------------------------------------------------
+bool Record::isLastRead() const { return checkFlag(FlagPos::LAST_SEGMENT) ; }
+// ---------------------------------------------------------------------------------------------------------------------
+bool Record::isPairedEnd() const { return checkFlag(FlagPos::MULTI_SEGMENT_TEMPLATE) ; }
+// ---------------------------------------------------------------------------------------------------------------------
 bool Record::isPrimaryLine() const {
     return !(checkFlag(FlagPos::SECONDARY_ALIGNMENT) || checkFlag(FlagPos::SUPPLEMENTARY_ALIGNMENT));
 }
@@ -302,12 +306,11 @@ bool Record::isPairOf(Record &other) const {
     }
 
     // Check RNEXT and PNEXT can only be done if both are primary line
-    // because for secondary alignment, RNEXT and PNEXT point to RNAME and POS of
-    // primary line of the next template
-    if (isPrimaryLine() && other.isPrimaryLine()){
+    // For secondary alignment, RNEXT and PNEXT point to RNAME and POS of primary line of the next template
+    // See "Recommended Practice for SAM Format" in SAM Format documentation for more information
+    if (isPrimaryLine() && other.isPrimaryLine()) {
         // If next segment is mapped or data of other is complete, check others fields
-        //if (!isNextUnmapped()){
-        if (!(isNextUnmapped() || other.isUnmapped())){
+        if (!(isNextUnmapped() || other.isUnmapped())) {
             if (!((rnext == "=" ? rname : rnext) == other.rname && pnext == other.pos &&
                   checkFlag(FlagPos::NEXT_SEQ_REVERSE) == other.checkFlag(FlagPos::SEQ_REVERSE))) {
                 return false;
@@ -315,8 +318,7 @@ bool Record::isPairOf(Record &other) const {
         }
 
         // If self is mapped or data for assumption if complete, check fields
-        //if (!other.isNextUnmapped()){
-        if (!(isUnmapped() || other.isNextUnmapped())){
+        if (!(isUnmapped() || other.isNextUnmapped())) {
             if (!((other.rnext == "=" ? other.rname : other.rnext) == rname && other.pnext == pos &&
                   other.checkFlag(FlagPos::NEXT_SEQ_REVERSE) == checkFlag(FlagPos::SEQ_REVERSE))) {
                 return false;
@@ -336,7 +338,9 @@ bool Record::isPairOf(Record &other) const {
 //    return &revSeq;
 //}
 
-
+void Record::setSeq(const std::string& _seq) {
+    seq = _seq;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -444,6 +448,7 @@ bool ReadTemplate::isValid() {
                (!is_unmapped && !is_single &&  is_pair);
     }
 }
+
 bool ReadTemplate::getRecords(std::list<std::list<Record>>& sam_recs) {
     sam_recs.clear();
     if (isValid()) {
