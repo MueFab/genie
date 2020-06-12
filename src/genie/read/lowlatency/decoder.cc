@@ -19,10 +19,10 @@ namespace lowlatency {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
+void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     util::Watch watch;
     core::record::Chunk ret;
-    core::AccessUnitRaw data = std::move(t);
+    core::AccessUnit data = std::move(t);
 
     const auto& qvparam = data.getParameters().getQVConfig(data.getClassType());
     auto qvStream = std::move(data.get(core::GenDesc::QV));

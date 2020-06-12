@@ -12,7 +12,7 @@
 #include <genie/core/record/chunk.h>
 #include <genie/util/drain.h>
 #include <genie/util/source.h>
-#include "access-unit-raw.h"
+#include "access-unit.h"
 
 #include <utility>
 
@@ -31,7 +31,7 @@ class NameEncoder {
      * @param rec
      * @return
      */
-    virtual AccessUnitRaw::Descriptor process(const record::Chunk& rec) = 0;
+    virtual AccessUnit::Descriptor process(const record::Chunk& rec) = 0;
 
     /**
      * @Brief For polymorphic destruction

@@ -145,13 +145,13 @@ void FlowGraphEncode::setNameSelector(std::function<size_t(const genie::core::re
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FlowGraphEncode::setEntropyCoderSelector(const std::function<size_t(const genie::core::AccessUnitRaw&)>& fun) {
+void FlowGraphEncode::setEntropyCoderSelector(const std::function<size_t(const genie::core::AccessUnit&)>& fun) {
     entropySelector.setOperation(fun);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FlowGraphEncode::setExporterSelector(const std::function<size_t(const genie::core::AccessUnitPayload&)>& fun) {
+void FlowGraphEncode::setExporterSelector(const std::function<size_t(const genie::core::AccessUnit&)>& fun) {
     exporterSelector.setOperation(fun);
 }
 

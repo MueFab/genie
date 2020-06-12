@@ -20,7 +20,7 @@ void SpringEncoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     preprocessor.preprocess(std::move(t), id.start);
 }
 
-class SpringSource : public util::OriginalSource, public util::Source<core::AccessUnitRaw> {
+class SpringSource : public util::OriginalSource, public util::Source<core::AccessUnit> {
    private:
     se_data data;
     pe_block_data bdata;
@@ -29,13 +29,13 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
     uint32_t num_AUs;
     util::SideSelector<genie::core::QVEncoder, genie::core::QVEncoder::QVCoded, const genie::core::record::Chunk&>*
         coder;
-    util::SideSelector<genie::core::NameEncoder, genie::core::AccessUnitRaw::Descriptor,
+    util::SideSelector<genie::core::NameEncoder, genie::core::AccessUnit::Descriptor,
                        const genie::core::record::Chunk&>* ncoder;
 
    public:
     SpringSource(util::SideSelector<genie::core::QVEncoder, genie::core::QVEncoder::QVCoded,
                                     const genie::core::record::Chunk&>* _coder,
-                 util::SideSelector<genie::core::NameEncoder, genie::core::AccessUnitRaw::Descriptor,
+                 util::SideSelector<genie::core::NameEncoder, genie::core::AccessUnit::Descriptor,
                                     const genie::core::record::Chunk&>* _ncoder,
                  const compression_params& _cp, std::string _temp_dir)
         : cp(_cp), temp_dir(std::move(_temp_dir)), coder(_coder), ncoder(_ncoder) {
@@ -51,7 +51,7 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
     }
 
     bool pump(size_t& id, std::mutex&) override {
-        core::AccessUnitRaw au(core::parameter::ParameterSet(), 0);
+        core::AccessUnit au(core::parameter::ParameterSet(), 0);
         if (cp.paired_end) {
             au = generate_read_streams_pe(data, bdata, id);
         } else {

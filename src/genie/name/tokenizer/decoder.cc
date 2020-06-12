@@ -51,7 +51,7 @@ std::string Decoder::inflate(const std::vector<SingleToken>& rec) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t pull32bigEndian(core::AccessUnitRaw::Subsequence& seq) {
+uint32_t pull32bigEndian(core::AccessUnit::Subsequence& seq) {
     uint32_t ret = 0;
     ret |= seq.pull() << 24;
     ret |= seq.pull() << 16;
@@ -60,7 +60,7 @@ uint32_t pull32bigEndian(core::AccessUnitRaw::Subsequence& seq) {
     return ret;
 }
 
-std::vector<std::string> Decoder::process(core::AccessUnitRaw::Descriptor& desc) {
+std::vector<std::string> Decoder::process(core::AccessUnit::Descriptor& desc) {
     std::vector<std::string> ret;
     std::vector<SingleToken> oldRec;
     while (!desc.getTokenType(0, TYPE_SEQ).end()) {

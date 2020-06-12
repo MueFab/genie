@@ -80,7 +80,7 @@ void FlowGraphDecode::setExporter(std::unique_ptr<genie::core::FormatExporter> d
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FlowGraphDecode::setReadCoderSelector(const std::function<size_t(const genie::core::AccessUnitRaw&)>& fun) {
+void FlowGraphDecode::setReadCoderSelector(const std::function<size_t(const genie::core::AccessUnit&)>& fun) {
     readSelector.setOperation(fun);
 }
 
@@ -88,7 +88,7 @@ void FlowGraphDecode::setReadCoderSelector(const std::function<size_t(const geni
 
 void FlowGraphDecode::setQVSelector(
     std::function<size_t(const genie::core::parameter::QualityValues& param, const std::vector<std::string>& ecigar,
-                         genie::core::AccessUnitRaw::Descriptor& desc)>
+                         genie::core::AccessUnit::Descriptor& desc)>
         fun) {
     qvSelector.setSelection(std::move(fun));
 
@@ -99,7 +99,7 @@ void FlowGraphDecode::setQVSelector(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FlowGraphDecode::setNameSelector(std::function<size_t(genie::core::AccessUnitRaw::Descriptor& desc)> fun) {
+void FlowGraphDecode::setNameSelector(std::function<size_t(genie::core::AccessUnit::Descriptor& desc)> fun) {
     nameSelector.setSelection(std::move(fun));
 
     for (auto& r : readCoders) {
@@ -109,7 +109,7 @@ void FlowGraphDecode::setNameSelector(std::function<size_t(genie::core::AccessUn
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FlowGraphDecode::setEntropyCoderSelector(const std::function<size_t(const genie::core::AccessUnitPayload&)>& fun) {
+void FlowGraphDecode::setEntropyCoderSelector(const std::function<size_t(const genie::core::AccessUnit&)>& fun) {
     entropySelector.setOperation(fun);
 }
 

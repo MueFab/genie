@@ -10,7 +10,7 @@
 #include <map>
 #include <string>
 
-#include <genie/core/access-unit-raw.h>
+#include <genie/core/access-unit.h>
 #include <genie/core/stats/perf-stats.h>
 #include <genie/stream-saver.h>
 #include "util.h"
@@ -62,16 +62,16 @@ uint64_t getNumBlocks(const compression_params &data);
 void compress_subseqs(subseq_data *data,
                       const std::vector<std::vector<entropy::gabac::EncodingConfiguration>> &configs);
 
-core::AccessUnitRaw generate_read_streams(const std::string &temp_dir, const compression_params &cp);
+core::AccessUnit generate_read_streams(const std::string &temp_dir, const compression_params &cp);
 
-core::AccessUnitRaw generate_read_streams_se(const se_data &data, uint64_t block_num);
+core::AccessUnit generate_read_streams_se(const se_data &data, uint64_t block_num);
 
-core::AccessUnitRaw generate_read_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num);
+core::AccessUnit generate_read_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num);
 
 void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data);
 void loadPE_Data(const compression_params &cp, const std::string &temp_dir, bool del, se_data *data);
-core::AccessUnitRaw generate_subseqs(const se_data &data, uint64_t block_num);
-core::AccessUnitRaw generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num,
+core::AccessUnit generate_subseqs(const se_data &data, uint64_t block_num);
+core::AccessUnit generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num,
                                         pe_statistics *pest);
 void generateBlocksPE(const se_data &data, pe_block_data *bdata);
 

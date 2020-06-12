@@ -30,8 +30,7 @@ set(source_files
 
         stats/perf-stats.cc
 
-        access-unit-payload.cc
-        access-unit-raw.cc
+        access-unit.cc
         classifier-bypass.cc
         classifier-regroup.cc
         constants.cc

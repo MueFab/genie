@@ -16,7 +16,7 @@ namespace basecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Decoder::Decoder(core::AccessUnitRaw &&au, size_t segments)
+Decoder::Decoder(core::AccessUnit &&au, size_t segments)
     : container(std::move(au)), position(0), length(0), recordCounter(0), number_template_segments(segments) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

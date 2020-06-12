@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "access-unit-raw.h"
+#include "access-unit.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ class NameDecoder {
      * @param desc
      * @return
      */
-    virtual std::vector<std::string> process(AccessUnitRaw::Descriptor& desc) = 0;
+    virtual std::vector<std::string> process(AccessUnit::Descriptor& desc) = 0;
 
     /**
      * @Brief For polymorphic destruction

@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/access-unit-payload.h>
+#include <genie/core/access-unit.h>
 #include <genie/util/original-source.h>
 #include <genie/util/source.h>
 
@@ -21,7 +21,7 @@ namespace core {
 /**
  *
  */
-class FormatImporterCompressed : public util::Source<AccessUnitPayload>, public util::OriginalSource {
+class FormatImporterCompressed : public util::Source<AccessUnit>, public util::OriginalSource {
    public:
     /**
      *

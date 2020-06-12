@@ -13,7 +13,7 @@ class Decoder : public core::QVDecoder {
    public:
     std::vector<std::string> process(const core::parameter::QualityValues& param,
                                      const std::vector<std::string>& ecigar_vec,
-                                     core::AccessUnitRaw::Descriptor& desc) override {
+                                     core::AccessUnit::Descriptor& desc) override {
         std::vector<std::string> qv;
         const auto& param_casted = dynamic_cast<const quality::paramqv1::QualityValues1&>(param);
         for (const auto& ecigar : ecigar_vec) {

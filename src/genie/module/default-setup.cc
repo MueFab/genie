@@ -51,9 +51,9 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
     ret->setNameSelector([](const genie::core::record::Chunk&) -> size_t { return 0; });
 
     ret->addEntropyCoder(genie::util::make_unique<genie::entropy::gabac::GabacCompressor>());
-    ret->setEntropyCoderSelector([](const genie::core::AccessUnitRaw&) -> size_t { return 0; });
+    ret->setEntropyCoderSelector([](const genie::core::AccessUnit&) -> size_t { return 0; });
 
-    ret->setExporterSelector([](const genie::core::AccessUnitPayload&) -> size_t { return 0; });
+    ret->setExporterSelector([](const genie::core::AccessUnit&) -> size_t { return 0; });
 
     return ret;
 }
@@ -66,7 +66,7 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
     ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Decoder>());
     ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Decoder>());
     ret->addReadCoder(genie::util::make_unique<genie::read::lowlatency::Decoder>());
-    ret->setReadCoderSelector([](const genie::core::AccessUnitRaw& au) -> size_t {
+    ret->setReadCoderSelector([](const genie::core::AccessUnit& au) -> size_t {
         if (au.getParameters().isComputedReference()) {
             switch (au.getParameters().getComputedRef().getAlgorithm()) {
                 case core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY:
@@ -95,16 +95,16 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
 
     ret->addQVCoder(genie::util::make_unique<genie::quality::qvwriteout::Decoder>());
     ret->setQVSelector([](const genie::core::parameter::QualityValues& param, const std::vector<std::string>&,
-                          genie::core::AccessUnitRaw::Descriptor&) -> size_t {
+                          genie::core::AccessUnit::Descriptor&) -> size_t {
         UTILS_DIE_IF(param.getMode() != 1, "Unsupported QV decoding mode");
         return 0;
     });
 
     ret->addNameCoder(genie::util::make_unique<genie::name::tokenizer::Decoder>());
-    ret->setNameSelector([](const genie::core::AccessUnitRaw::Descriptor&) -> size_t { return 0; });
+    ret->setNameSelector([](const genie::core::AccessUnit::Descriptor&) -> size_t { return 0; });
 
     ret->addEntropyCoder(genie::util::make_unique<genie::entropy::gabac::GabacDecompressor>());
-    ret->setEntropyCoderSelector([](const genie::core::AccessUnitPayload&) -> size_t { return 0; });
+    ret->setEntropyCoderSelector([](const genie::core::AccessUnit&) -> size_t { return 0; });
 
     ret->setExporterSelector([](const genie::core::record::Chunk&) -> size_t { return 0; });
 

@@ -19,9 +19,9 @@ Exporter::Exporter(std::ostream* _file) : writer(_file), id_ctr(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Exporter::flowIn(core::AccessUnitPayload&& t, const util::Section& id) {
+void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
     util::Watch watch;
-    core::AccessUnitPayload data = std::move(t);
+    core::AccessUnit data = std::move(t);
     util::OrderedSection section(&lock, id);
     getStats().add(data.getStats());
     data.getParameters().setID(id_ctr);
@@ -35,10 +35,10 @@ void Exporter::flowIn(core::AccessUnitPayload&& t, const util::Section& id) {
             AuTypeCfg(id_ctr, data.getMinPos(), data.getMaxPos(), data.getParameters().getPosSize()));
     }
     for (size_t descriptor = 0; descriptor < core::getDescriptors().size(); ++descriptor) {
-        if (data.getPayload(core::GenDesc(descriptor)).isEmpty()) {
+        if (data.get(core::GenDesc(descriptor)).isEmpty()) {
             continue;
         }
-        au.addBlock(Block(descriptor, data.movePayload(descriptor)));
+        au.addBlock(Block(descriptor, data.move(core::GenDesc(descriptor))));
     }
     au.write(writer);
     id_ctr++;

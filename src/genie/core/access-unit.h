@@ -4,13 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ACCESS_UNIT_RAW_H
-#define GENIE_ACCESS_UNIT_RAW_H
+#ifndef GENIE_CORE_ACCESS_UNIT_H
+#define GENIE_CORE_ACCESS_UNIT_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/core/stats/perf-stats.h>
 #include <genie/util/data-block.h>
+#include <numeric>
 #include "constants.h"
 #include "parameter/parameter_set.h"
 
@@ -22,7 +23,7 @@ namespace core {
 /**
  * @brief
  */
-class AccessUnitRaw {
+class AccessUnit {
    public:
     /**
      * @brief
@@ -33,6 +34,7 @@ class AccessUnitRaw {
         size_t position;       //!< @brief
 
         GenSubIndex id;  //!< @brief
+        size_t numSymbols;
 
        public:
         /**
@@ -93,6 +95,43 @@ class AccessUnitRaw {
          * @return
          */
         size_t getNumSymbols() const;
+
+        void annotateNumSymbols(size_t num) {
+            numSymbols = num;
+        }
+
+        bool isEmpty() const {
+            return !getNumSymbols();
+        }
+
+        size_t getRawSize() const {
+            return data.getRawSize();
+        }
+
+        void write(util::BitWriter& writer) const {
+            writer.writeBuffer(data.getData(), data.getRawSize());
+        }
+
+        Subsequence(GenSubIndex _id, size_t size, util::BitReader& reader)
+            : data(0, 1), id(std::move(_id)), numSymbols(0) {
+            data.reserve(size);
+            for (size_t i = 0; i < size; ++i) {
+                data.push_back(reader.read(8));
+            }
+        }
+
+        Subsequence(GenSubIndex _id)
+            : data(0, 1), id(_id), numSymbols(0) {
+        }
+
+        Subsequence(GenSubIndex _id, util::DataBlock&& dat)
+            : data(std::move(dat)), id(std::move(_id)), numSymbols(0) {
+        }
+
+        void set(util::DataBlock&& dat) {
+            data = std::move(dat);
+        }
+
     };
 
     /**
@@ -180,6 +219,59 @@ class AccessUnitRaw {
          * @return
          */
         size_t getSize() const;
+
+        size_t getWrittenSize() const {
+            size_t overhead = getDescriptor(getID()).tokentype ? 0 : (subdesc.size() - 1) * sizeof(uint32_t);
+            return std::accumulate(subdesc.begin(), subdesc.end(), overhead,
+                                   [](size_t sum, const Subsequence& payload) {
+                                     return payload.isEmpty() ? sum : sum + payload.getRawSize();
+                                   });
+        }
+
+        void write(util::BitWriter& writer) const {
+            if (this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
+                subdesc.front().write(writer);
+                return;
+            }
+            for (size_t i = 0; i < subdesc.size(); ++i) {
+                if (i < (subdesc.size() - 1)) {
+                    writer.write(subdesc[i].getRawSize(), 32);
+                }
+                subdesc[i].write(writer);
+            }
+        }
+
+        Descriptor(GenDesc _id, size_t count, size_t remainingSize,
+                                                                util::BitReader& reader)
+            : id(_id) {
+            if (this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
+                subdesc.emplace_back(GenSubIndex{_id, 0}, remainingSize, reader);
+                return;
+            }
+            for (size_t i = 0; i < count; ++i) {
+                size_t s = 0;
+                if (i < (count - 1)) {
+                    s = reader.read(32);
+                    remainingSize -= (s + 4);
+                } else {
+                    s = remainingSize;
+                }
+                if (s) {
+                    subdesc.emplace_back(GenSubIndex{_id, i}, s, reader);
+                }
+            }
+        }
+
+        bool isEmpty() const{
+            for(const auto& d : subdesc) {
+                if(!d.isEmpty()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        Descriptor() : id(GenDesc(0)) {}
     };
 
     /**
@@ -205,6 +297,11 @@ class AccessUnitRaw {
      */
     Descriptor& get(GenDesc desc);
 
+
+    Descriptor&& move(GenDesc desc) {
+        return std::move(get(desc));
+    }
+
     /**
      *
      * @param desc
@@ -219,6 +316,10 @@ class AccessUnitRaw {
      * @param data
      */
     void set(GenSubIndex sub, Subsequence&& data);
+
+    void set(GenDesc sub, Descriptor&& data) {
+        descriptors[uint8_t(sub)] = std::move(data);
+    }
 
     /**
      *
@@ -253,7 +354,7 @@ class AccessUnitRaw {
      * @brief
      * @param set
      */
-    AccessUnitRaw(parameter::ParameterSet&& set, size_t _numRecords);
+    AccessUnit(parameter::ParameterSet&& set, size_t _numRecords);
 
     /**
      * @brief
@@ -377,6 +478,10 @@ class AccessUnitRaw {
 
     void setStats(stats::PerfStats&& _stats) { stats = std::move(_stats); }
 
+    size_t getRecordNum() const { return numRecords; }
+
+    void setRecordNum(size_t rec) { numRecords = rec; }
+
    private:
     std::vector<Descriptor> descriptors;  //!< @brief
     parameter::ParameterSet parameters;   //!< @brief
@@ -398,7 +503,7 @@ class AccessUnitRaw {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ACCESS_UNIT_RAW_H
+#endif  // GENIE_ACCESS_UNIT_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

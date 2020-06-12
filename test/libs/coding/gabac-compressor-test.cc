@@ -6,9 +6,9 @@
 
 TEST(GabacCompressor, NonEmpty) {  // NOLINT(cert-err58-cpp)
 
-    class DummyModule : public genie::util::Drain<genie::core::AccessUnitPayload> {
+    class DummyModule : public genie::util::Drain<genie::core::AccessUnit> {
        public:
-        void flowIn(genie::core::AccessUnitPayload&& t, size_t id) override {
+        void flowIn(genie::core::AccessUnit&& t, size_t id) override {
             auto data = std::move(t);  // Needed to "consume" the data and move it into local scope
             /* This is where we catch the result of GabacCompressor. Collect any information about results here */
 
@@ -48,7 +48,7 @@ TEST(GabacCompressor, NonEmpty) {  // NOLINT(cert-err58-cpp)
     compressor.setDrain(&dummy);
 
     size_t numRecs = 50;  // Number of records. Not important, as we are not working with records at the level of gabac
-    genie::core::AccessUnitRaw raw_aus(genie::core::parameter::ParameterSet(), numRecs);
+    genie::core::AccessUnit raw_aus(genie::core::parameter::ParameterSet(), numRecs);
 
     for (size_t i = 0; i < 50; ++i) {
         raw_aus.get(genie::core::GenSub::RLEN).push(i);  // Append some data for one selected subsequence

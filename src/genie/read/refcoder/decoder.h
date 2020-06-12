@@ -11,7 +11,7 @@ class Decoder : public core::ReadDecoder {
    public:
     Decoder() : core::ReadDecoder() {}
 
-    void flowIn(core::AccessUnitRaw&&, const util::Section&) override {}
+    void flowIn(core::AccessUnit&&, const util::Section&) override {}
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

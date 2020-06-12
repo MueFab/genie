@@ -23,7 +23,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     core::parameter::ParameterSet set;
     LLState state{data.getData().front().getSegments().front().getSequence().length(),
                   data.getData().front().getNumberOfTemplateSegments() > 1,
-                  core::AccessUnitRaw(std::move(set),
+                  core::AccessUnit(std::move(set),
                                       data.getData().size())};
     for (auto& r : data.getData()) {
         for (auto& s : r.getSegments()) {
@@ -46,11 +46,11 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
 
     data.getStats().addDouble("time-lowlatency", watch.check());
     watch.reset();
-    core::QVEncoder::QVCoded qv(nullptr, core::AccessUnitRaw::Descriptor(core::GenDesc::QV));
+    core::QVEncoder::QVCoded qv(nullptr, core::AccessUnit::Descriptor(core::GenDesc::QV));
     qv = qvcoder->process(data);
     data.getStats().addDouble("time-qv", watch.check());
     watch.reset();
-    core::AccessUnitRaw::Descriptor rname(core::GenDesc::RNAME);
+    core::AccessUnit::Descriptor rname(core::GenDesc::RNAME);
     rname = namecoder->process(data);
     data.getStats().addDouble("time-name", watch.check());
     watch.reset();
@@ -68,7 +68,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AccessUnitRaw Encoder::pack(const util::Section& id, uint8_t qv_depth,
+core::AccessUnit Encoder::pack(const util::Section& id, uint8_t qv_depth,
                                   std::unique_ptr<core::parameter::QualityValues> qvparam, LLState& state) const {
     core::parameter::DataUnit::DatasetType dataType = core::parameter::DataUnit::DatasetType::NON_ALIGNED;
     core::parameter::ParameterSet ret(id.start, id.start, dataType, core::AlphabetID::ACGTN, state.readLength,

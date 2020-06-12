@@ -34,10 +34,11 @@ bool Importer::pump(size_t& id, std::mutex&) {
         sec.length = unit->getReadCount();
         pos_counter += unit->getReadCount();
     }
-    core::AccessUnitPayload set(factory.getParams(unit->getParameterID()), id);
+    auto paramset = factory.getParams(unit->getParameterID());
+    core::AccessUnit set(std::move(paramset), id);
 
     for (auto& b : unit->getBlocks()) {
-        set.setPayload(core::GenDesc(b.getDescriptorID()), b.movePayload());
+        set.set(core::GenDesc(b.getDescriptorID()), b.movePayload());
     }
     if (unit->getClass() != core::record::ClassType::CLASS_U) {
         set.setReference(unit->getAlignmentInfo().getRefID());

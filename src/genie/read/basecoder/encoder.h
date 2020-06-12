@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include <genie/core/access-unit-raw.h>
+#include <genie/core/access-unit.h>
 #include <genie/core/record/alignment_split/same-rec.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -26,7 +26,7 @@ namespace basecoder {
  */
 class Encoder {
    private:
-    core::AccessUnitRaw container;
+    core::AccessUnit container;
     int32_t pos;
     uint32_t readCounter;
 
@@ -85,7 +85,7 @@ class Encoder {
 
     void add(const core::record::Record &rec, const std::string &ref1, const std::string &ref2);
 
-    core::AccessUnitRaw &&moveStreams();
+    core::AccessUnit &&moveStreams();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

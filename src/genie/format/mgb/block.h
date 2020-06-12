@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/access-unit-payload.h>
+#include <genie/core/access-unit.h>
 #include <genie/util/bitwriter.h>
 #include <cstdint>
 #include <vector>
@@ -25,16 +25,16 @@ class Block {
     uint8_t descriptor_ID;
     uint32_t block_payload_size;
 
-    core::AccessUnitPayload::DescriptorPayload payload;
+    core::AccessUnit::Descriptor payload;
 
    public:
     Block();
-    Block(uint8_t _descriptor_ID, core::AccessUnitPayload::DescriptorPayload _payload);
+    Block(uint8_t _descriptor_ID, core::AccessUnit::Descriptor _payload);
     explicit Block(size_t qv_count, util::BitReader &reader);
     virtual ~Block() = default;
     virtual void write(util::BitWriter &writer) const;
 
-    core::AccessUnitPayload::DescriptorPayload &&movePayload();
+    core::AccessUnit::Descriptor &&movePayload();
 
     uint8_t getDescriptorID() const;
 
