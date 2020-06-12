@@ -25,7 +25,7 @@ class NameEncoderNone : public NameEncoder {
      *
      * @return
      */
-    AccessUnitRaw::Descriptor process(const record::Chunk&) override;
+    AccessUnit::Descriptor process(const record::Chunk&) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

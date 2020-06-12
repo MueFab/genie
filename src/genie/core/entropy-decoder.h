@@ -9,8 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "access-unit-payload.h"
-#include "access-unit-raw.h"
+#include "access-unit.h"
+#include "access-unit.h"
 #include "module.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ namespace core {
 /**
  * @brief Interface for entropy decoders. They convert access unit payloads to raw access units
  */
-class EntropyDecoder : public Module<AccessUnitPayload, AccessUnitRaw> {
+class EntropyDecoder : public Module<AccessUnit, AccessUnit> {
    public:
     /**
      *

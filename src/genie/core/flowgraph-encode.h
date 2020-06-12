@@ -28,7 +28,7 @@ class FlowGraphEncode : public FlowGraph {
     std::vector<std::unique_ptr<genie::core::FormatImporter>> importers;  //!<
 
     std::vector<std::unique_ptr<genie::core::ReadEncoder>> readCoders;                           //!<
-    genie::util::Selector<genie::core::record::Chunk, genie::core::AccessUnitRaw> readSelector;  //!<
+    genie::util::Selector<genie::core::record::Chunk, genie::core::AccessUnit> readSelector;  //!<
 
     std::vector<std::unique_ptr<genie::core::QVEncoder>> qvCoders;  //!<
     genie::util::SideSelector<genie::core::QVEncoder, genie::core::QVEncoder::QVCoded,
@@ -36,15 +36,15 @@ class FlowGraphEncode : public FlowGraph {
         qvSelector;  //!<
 
     std::vector<std::unique_ptr<genie::core::NameEncoder>> nameCoders;  //!<
-    genie::util::SideSelector<genie::core::NameEncoder, genie::core::AccessUnitRaw::Descriptor,
+    genie::util::SideSelector<genie::core::NameEncoder, genie::core::AccessUnit::Descriptor,
                               const genie::core::record::Chunk&>
         nameSelector;  //!<
 
     std::vector<std::unique_ptr<genie::core::EntropyEncoder>> entropyCoders;                            //!<
-    genie::util::Selector<genie::core::AccessUnitRaw, genie::core::AccessUnitPayload> entropySelector;  //!<
+    genie::util::Selector<genie::core::AccessUnit, genie::core::AccessUnit> entropySelector;  //!<
 
     std::vector<std::unique_ptr<genie::core::FormatExporterCompressed>> exporters;  //!<
-    genie::util::SelectorHead<genie::core::AccessUnitPayload> exporterSelector;     //!<
+    genie::util::SelectorHead<genie::core::AccessUnit> exporterSelector;     //!<
 
    public:
     /**
@@ -159,13 +159,13 @@ class FlowGraphEncode : public FlowGraph {
      *
      * @param fun
      */
-    void setEntropyCoderSelector(const std::function<size_t(const genie::core::AccessUnitRaw&)>& fun);
+    void setEntropyCoderSelector(const std::function<size_t(const genie::core::AccessUnit&)>& fun);
 
     /**
      *
      * @param fun
      */
-    void setExporterSelector(const std::function<size_t(const genie::core::AccessUnitPayload&)>& fun);
+    void setExporterSelector(const std::function<size_t(const genie::core::AccessUnit&)>& fun);
 
     /**
      *

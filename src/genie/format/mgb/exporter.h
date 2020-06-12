@@ -11,11 +11,11 @@
 
 #include <genie/util/drain.h>
 
-#include <genie/core/access-unit-raw.h>
+#include <genie/core/access-unit.h>
 #include <memory>
 #include <vector>
 
-#include <genie/core/access-unit-payload.h>
+#include <genie/core/access-unit.h>
 #include <genie/core/format-exporter-compressed.h>
 #include <genie/core/format-exporter.h>
 #include <genie/core/stats/perf-stats.h>
@@ -38,7 +38,7 @@ class Exporter : public core::FormatExporterCompressed {
     size_t id_ctr;
    public:
     explicit Exporter(std::ostream* _file);
-    void flowIn(core::AccessUnitPayload&& t, const genie::util::Section& id) override;
+    void flowIn(core::AccessUnit&& t, const genie::util::Section& id) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

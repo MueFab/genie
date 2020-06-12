@@ -87,7 +87,7 @@ class Encoder : public core::ReadEncoder {
      * @param state The state used throughout the current encoding
      * @return RawAccessUnit ready for entropy core
      */
-    core::AccessUnitRaw pack(size_t id, uint16_t ref, uint8_t qv_depth,
+    core::AccessUnit pack(size_t id, uint16_t ref, uint8_t qv_depth,
                              std::unique_ptr<core::parameter::QualityValues> qvparam, core::record::ClassType type,
                              Encoder::LaeState& state) const;
 

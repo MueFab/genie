@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <access-unit-raw.h>
+#include <access-unit.h>
 #include <cstdint>
 #include <limits>
 #include <string>
@@ -123,7 +123,7 @@ struct TokenState {
      * @param tokens
      * @param streams
      */
-    static void encode(const std::vector<SingleToken>& tokens, core::AccessUnitRaw::Descriptor& streams);
+    static void encode(const std::vector<SingleToken>& tokens, core::AccessUnit::Descriptor& streams);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

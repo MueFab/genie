@@ -30,20 +30,20 @@ class FlowGraphDecode : public FlowGraph {
     std::vector<std::unique_ptr<genie::core::FormatImporterCompressed>> importers;  //!<
 
     std::vector<std::unique_ptr<genie::core::EntropyDecoder>> entropyCoders;                            //!<
-    genie::util::Selector<genie::core::AccessUnitPayload, genie::core::AccessUnitRaw> entropySelector;  //!<
+    genie::util::Selector<genie::core::AccessUnit, genie::core::AccessUnit> entropySelector;  //!<
 
     std::vector<std::unique_ptr<genie::core::ReadDecoder>> readCoders;                           //!<
-    genie::util::Selector<genie::core::AccessUnitRaw, genie::core::record::Chunk> readSelector;  //!<
+    genie::util::Selector<genie::core::AccessUnit, genie::core::record::Chunk> readSelector;  //!<
 
     std::vector<std::unique_ptr<genie::core::QVDecoder>> qvCoders;  //!<
     genie::util::SideSelector<genie::core::QVDecoder, std::vector<std::string>,
                               const genie::core::parameter::QualityValues&, const std::vector<std::string>&,
-                              genie::core::AccessUnitRaw::Descriptor&>
+                              genie::core::AccessUnit::Descriptor&>
         qvSelector;  //!<
 
     std::vector<std::unique_ptr<genie::core::NameDecoder>> nameCoders;  //!<
     genie::util::SideSelector<genie::core::NameDecoder, std::vector<std::string>,
-                              genie::core::AccessUnitRaw::Descriptor&>
+                              genie::core::AccessUnit::Descriptor&>
         nameSelector;  //!<
 
     std::vector<std::unique_ptr<genie::core::FormatExporter>> exporters;     //!<
@@ -112,7 +112,7 @@ class FlowGraphDecode : public FlowGraph {
      *
      * @param fun
      */
-    void setReadCoderSelector(const std::function<size_t(const genie::core::AccessUnitRaw&)>& fun);
+    void setReadCoderSelector(const std::function<size_t(const genie::core::AccessUnit&)>& fun);
 
     /**
      *
@@ -120,20 +120,20 @@ class FlowGraphDecode : public FlowGraph {
      */
     void setQVSelector(
         std::function<size_t(const genie::core::parameter::QualityValues& param, const std::vector<std::string>& ecigar,
-                             genie::core::AccessUnitRaw::Descriptor& desc)>
+                             genie::core::AccessUnit::Descriptor& desc)>
             fun);
 
     /**
      *
      * @param fun
      */
-    void setNameSelector(std::function<size_t(genie::core::AccessUnitRaw::Descriptor& desc)> fun);
+    void setNameSelector(std::function<size_t(genie::core::AccessUnit::Descriptor& desc)> fun);
 
     /**
      *
      * @param fun
      */
-    void setEntropyCoderSelector(const std::function<size_t(const genie::core::AccessUnitPayload&)>& fun);
+    void setEntropyCoderSelector(const std::function<size_t(const genie::core::AccessUnit&)>& fun);
 
     /**
      *

@@ -12,7 +12,7 @@
 #include <genie/core/record/chunk.h>
 #include <genie/util/drain.h>
 #include <genie/util/source.h>
-#include "access-unit-raw.h"
+#include "access-unit.h"
 
 #include <utility>
 
@@ -26,7 +26,7 @@ namespace core {
  */
 class QVEncoder {
    public:
-    using QVCoded = std::pair<std::unique_ptr<parameter::QualityValues>, AccessUnitRaw::Descriptor>;  //!<
+    using QVCoded = std::pair<std::unique_ptr<parameter::QualityValues>, AccessUnit::Descriptor>;  //!<
 
     /**
      *

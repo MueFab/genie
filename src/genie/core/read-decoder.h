@@ -13,7 +13,7 @@
 #include <genie/util/selector.h>
 #include <genie/util/sideSelector.h>
 #include <genie/util/source.h>
-#include "access-unit-raw.h"
+#include "access-unit.h"
 #include "module.h"
 #include "name-decoder.h"
 #include "qv-decoder.h"
@@ -26,11 +26,11 @@ namespace core {
 /**
  * @brief The basic interface for modules decoding the plain read data
  */
-class ReadDecoder : public Module<AccessUnitRaw, record::Chunk> {
+class ReadDecoder : public Module<AccessUnit, record::Chunk> {
    public:
     using QvSelector = util::SideSelector<QVDecoder, std::vector<std::string>, const parameter::QualityValues&,
-                                          const std::vector<std::string>&, AccessUnitRaw::Descriptor&>;          //!<
-    using NameSelector = util::SideSelector<NameDecoder, std::vector<std::string>, AccessUnitRaw::Descriptor&>;  //!<
+                                          const std::vector<std::string>&, AccessUnit::Descriptor&>;          //!<
+    using NameSelector = util::SideSelector<NameDecoder, std::vector<std::string>, AccessUnit::Descriptor&>;  //!<
 
    protected:
     QvSelector* qvcoder{};      //!<

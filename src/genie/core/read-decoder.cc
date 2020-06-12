@@ -14,14 +14,14 @@ namespace core {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReadDecoder::setQVCoder(util::SideSelector<QVDecoder, std::vector<std::string>, const parameter::QualityValues&,
-                                                const std::vector<std::string>&, AccessUnitRaw::Descriptor&>* coder) {
+                                                const std::vector<std::string>&, AccessUnit::Descriptor&>* coder) {
     qvcoder = coder;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReadDecoder::setNameCoder(
-    util::SideSelector<NameDecoder, std::vector<std::string>, AccessUnitRaw::Descriptor&>* coder) {
+    util::SideSelector<NameDecoder, std::vector<std::string>, AccessUnit::Descriptor&>* coder) {
     namecoder = coder;
 }
 

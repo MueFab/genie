@@ -45,7 +45,7 @@ void addECigar(const core::record::Record& rec, std::vector<std::string>& cig_ve
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::flowIn(core::AccessUnitRaw&& t, const util::Section& id) {
+void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     util::Watch watch;
     size_t numRecords = t.getNumRecords();
     size_t bufSize = t.getParameters().getComputedRef().getExtension().getBufMaxSize();

@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/access-unit-payload.h>
+#include <genie/core/access-unit.h>
 #include <genie/core/entropy-encoder.h>
 #include <genie/entropy/gabac/gabac.h>
 #include <genie/util/make-unique.h>
@@ -30,11 +30,11 @@ class GabacCompressor : public core::EntropyEncoder {
      * @param in Uncompressed data
      * @param out Where to put compressed data. A set of transformed subsequences is generated
      */
-    static core::AccessUnitPayload::SubsequencePayload compress(const gabac::EncodingConfiguration& conf,
-                                                                core::AccessUnitRaw::Subsequence&& in);
+    static core::AccessUnit::Subsequence compress(const gabac::EncodingConfiguration& conf,
+                                                                core::AccessUnit::Subsequence&& in);
 
-    static core::AccessUnitPayload::DescriptorPayload compressTokens(const gabac::EncodingConfiguration& conf0,
-                                                                     core::AccessUnitRaw::Descriptor&& in);
+    static core::AccessUnit::Descriptor compressTokens(const gabac::EncodingConfiguration& conf0,
+                                                                     core::AccessUnit::Descriptor&& in);
 
    public:
     GabacSeqConfSet configSet;  //!< @brief Config set to use. In contrast to decompression it's static over time
@@ -44,7 +44,7 @@ class GabacCompressor : public core::EntropyEncoder {
      * @param raw_aus Input data
      * @param id Block identifier (for multithreading).
      */
-    void flowIn(core::AccessUnitRaw&& raw_aus, const util::Section& id) override;
+    void flowIn(core::AccessUnit&& raw_aus, const util::Section& id) override;
 };
 }  // namespace gabac
 }  // namespace entropy

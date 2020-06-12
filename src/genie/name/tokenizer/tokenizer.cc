@@ -5,7 +5,7 @@
  */
 
 #include "tokenizer.h"
-#include <access-unit-raw.h>
+#include <access-unit.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -162,7 +162,7 @@ std::vector<SingleToken>&& TokenState::run() {
     return std::move(curRec);
 }
 
-void push32bigEndian(core::AccessUnitRaw::Subsequence& seq, uint32_t value) {
+void push32bigEndian(core::AccessUnit::Subsequence& seq, uint32_t value) {
     seq.push((value >> 24) & 0xff);
     seq.push((value >> 16) & 0xff);
     seq.push((value >> 8) & 0xff);
@@ -171,7 +171,7 @@ void push32bigEndian(core::AccessUnitRaw::Subsequence& seq, uint32_t value) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void TokenState::encode(const std::vector<SingleToken>& tokens, core::AccessUnitRaw::Descriptor& streams) {
+void TokenState::encode(const std::vector<SingleToken>& tokens, core::AccessUnit::Descriptor& streams) {
     for (size_t i = 0; i < tokens.size(); ++i) {
         //   while (streams.size() <= i) {
         //       streams.emplace_back(getTokenInfo(Tokens::DZLEN).paramSeq + 1, util::DataBlock(0, 4));

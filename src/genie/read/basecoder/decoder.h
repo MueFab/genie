@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-#include <genie/core/access-unit-raw.h>
+#include <genie/core/access-unit.h>
 #include <genie/core/record/record.h>
 #include <qv-decoder.h>
 #include <memory>
@@ -27,7 +27,7 @@ namespace basecoder {
 
 class Decoder {
    private:
-    core::AccessUnitRaw container;
+    core::AccessUnit container;
     uint64_t position;
     uint64_t length;
 
@@ -36,7 +36,7 @@ class Decoder {
     size_t number_template_segments;
 
    public:
-    Decoder(core::AccessUnitRaw &&au, size_t segments);
+    Decoder(core::AccessUnit &&au, size_t segments);
     core::record::Record pull(uint16_t ref, std::vector<std::string> &&vec);
 
     struct SegmentMeta {

@@ -103,7 +103,7 @@ void Encoder::updateGuesses(const core::record::Record& r, Encoder::LaeState& st
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AccessUnitRaw Encoder::pack(size_t id, uint16_t ref, uint8_t qv_depth,
+core::AccessUnit Encoder::pack(size_t id, uint16_t ref, uint8_t qv_depth,
                                   std::unique_ptr<core::parameter::QualityValues> qvparam, core::record::ClassType type,
                                   Encoder::LaeState& state) const {
     core::parameter::DataUnit::DatasetType dataType = core::parameter::DataUnit::DatasetType::ALIGNED;
@@ -136,14 +136,14 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
 
     auto ref = data.getData().front().getAlignmentSharedData().getSeqID();
     uint64_t lastPos = 0;
-    core::QVEncoder::QVCoded qv(nullptr, core::AccessUnitRaw::Descriptor(core::GenDesc::QV));
+    core::QVEncoder::QVCoded qv(nullptr, core::AccessUnit::Descriptor(core::GenDesc::QV));
     uint8_t qvdepth = qvcoder ? data.getData().front().getSegments().front().getQualities().size() : 0;
     data.getStats().addDouble("time-localassembly", watch.check());
     watch.reset();
     qv = qvcoder->process(data);
     data.getStats().addDouble("time-quality", watch.check());
     watch.reset();
-    core::AccessUnitRaw::Descriptor rname(core::GenDesc::RNAME);
+    core::AccessUnit::Descriptor rname(core::GenDesc::RNAME);
     rname = namecoder->process(data);
     data.getStats().addDouble("time-name", watch.check());
     watch.reset();
@@ -165,7 +165,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     auto rawAU = pack(id.start, ref, qvdepth, std::move(qv.first), data.getData().front().getClassID(), state);
     rawAU.get(core::GenDesc::QV) = std::move(qv.second);
     rawAU.get(core::GenDesc::RNAME) = std::move(rname);
-    rawAU.get(core::GenDesc::FLAGS) = core::AccessUnitRaw::Descriptor(core::GenDesc::FLAGS);
+    rawAU.get(core::GenDesc::FLAGS) = core::AccessUnit::Descriptor(core::GenDesc::FLAGS);
     rawAU.setStats(std::move(data.getStats()));
     data.getData().clear();
     rawAU.getStats().addDouble("time-localassembly", watch.check());

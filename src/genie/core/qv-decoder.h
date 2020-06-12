@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "access-unit-raw.h"
+#include "access-unit.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ class QVDecoder {
      */
     virtual std::vector<std::string> process(const parameter::QualityValues& param,
                                              const std::vector<std::string>& ecigar,
-                                             AccessUnitRaw::Descriptor& desc) = 0;
+                                             AccessUnit::Descriptor& desc) = 0;
     /**
      * @Brief For polymorphic destruction
      */

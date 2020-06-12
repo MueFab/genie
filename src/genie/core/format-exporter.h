@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/access-unit-payload.h>
+#include <genie/core/access-unit.h>
 #include <genie/core/record/chunk.h>
 #include <genie/util/drain.h>
 

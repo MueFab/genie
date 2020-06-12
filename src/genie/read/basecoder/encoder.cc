@@ -294,7 +294,7 @@ Encoder::ClipInformation Encoder::encodeCigar(const std::string &read, const std
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::AccessUnitRaw &&Encoder::moveStreams() { return std::move(container); }
+core::AccessUnit &&Encoder::moveStreams() { return std::move(container); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

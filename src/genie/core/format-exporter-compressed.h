@@ -10,7 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/util/drain.h>
-#include "access-unit-payload.h"
+#include "access-unit.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,7 +20,7 @@ namespace core {
 /**
  *
  */
-class FormatExporterCompressed : public util::Drain<AccessUnitPayload> {
+class FormatExporterCompressed : public util::Drain<AccessUnit> {
    private:
     stats::PerfStats stats; //!<
 
