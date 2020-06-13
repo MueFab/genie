@@ -17,6 +17,7 @@
 #include "module.h"
 #include "name-decoder.h"
 #include "qv-decoder.h"
+#include "entropy-decoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -31,10 +32,12 @@ class ReadDecoder : public Module<AccessUnit, record::Chunk> {
     using QvSelector = util::SideSelector<QVDecoder, std::vector<std::string>, const parameter::QualityValues&,
                                           const std::vector<std::string>&, AccessUnit::Descriptor&>;          //!<
     using NameSelector = util::SideSelector<NameDecoder, std::vector<std::string>, AccessUnit::Descriptor&>;  //!<
+    using EntropySelector = util::SideSelector<EntropyDecoder, AccessUnit::Descriptor, const parameter::DescriptorSubseqCfg&, AccessUnit::Descriptor&>;  //!<
 
    protected:
     QvSelector* qvcoder{};      //!<
     NameSelector* namecoder{};  //!<
+    EntropySelector* entropycoder{};  //!<
 
    public:
     /**
@@ -48,6 +51,18 @@ class ReadDecoder : public Module<AccessUnit, record::Chunk> {
      * @param coder
      */
     virtual void setNameCoder(NameSelector* coder);
+
+    virtual void setEntropyCoder(EntropySelector* coder) {
+        entropycoder = coder;
+    }
+
+    AccessUnit entropyCodeAU(AccessUnit&& a) {
+        AccessUnit au = std::move(a);
+        for(auto &d : au) {
+            d = entropycoder->process(au.getParameters().getDescriptor(d.getID()), d);
+        }
+        return au;
+    }
 
     /**
      * @Brief For polymorphic destruction

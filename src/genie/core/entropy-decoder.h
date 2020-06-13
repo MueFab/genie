@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "access-unit.h"
+#include <genie/core/parameter/descriptor_present/decoder.h>
 #include "access-unit.h"
 #include "module.h"
 
@@ -21,12 +21,15 @@ namespace core {
 /**
  * @brief Interface for entropy decoders. They convert access unit payloads to raw access units
  */
-class EntropyDecoder : public Module<AccessUnit, AccessUnit> {
+class EntropyDecoder {
    public:
     /**
      *
      */
-    ~EntropyDecoder() override = default;
+    ~EntropyDecoder() = default;
+
+    virtual core::AccessUnit::Descriptor process(const parameter::DescriptorSubseqCfg& param,
+                                                 core::AccessUnit::Descriptor& desc) = 0;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

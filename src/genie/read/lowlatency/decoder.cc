@@ -23,7 +23,7 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     util::Watch watch;
     core::record::Chunk ret;
     core::AccessUnit data = std::move(t);
-
+    data = entropyCodeAU(std::move(data));
     const auto& qvparam = data.getParameters().getQVConfig(data.getClassType());
     auto qvStream = std::move(data.get(core::GenDesc::QV));
     auto names = namecoder->process(data.get(core::GenDesc::RNAME));

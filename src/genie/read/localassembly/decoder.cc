@@ -47,23 +47,25 @@ void addECigar(const core::record::Record& rec, std::vector<std::string>& cig_ve
 
 void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     util::Watch watch;
-    size_t numRecords = t.getNumRecords();
-    size_t bufSize = t.getParameters().getComputedRef().getExtension().getBufMaxSize();
-    size_t segments = t.getParameters().getNumberTemplateSegments();
-    uint16_t ref = t.getReference();
+    auto t_data = std::move(t);
+    t_data = entropyCodeAU(std::move(t_data));
+    size_t numRecords = t_data.getNumRecords();
+    size_t bufSize = t_data.getParameters().getComputedRef().getExtension().getBufMaxSize();
+    size_t segments = t_data.getParameters().getNumberTemplateSegments();
+    uint16_t ref = t_data.getReference();
     LocalReference refEncoder(bufSize);
     std::stringstream str;
     util::BitReader reader(str);
     core::record::Chunk chunk;
-    const auto& qvparam = t.getParameters().getQVConfig(t.getClassType());
-    auto qvStream = std::move(t.get(core::GenDesc::QV));
-    t.getStats().addDouble("time-localassembly", watch.check());
+    const auto& qvparam = t_data.getParameters().getQVConfig(t_data.getClassType());
+    auto qvStream = std::move(t_data.get(core::GenDesc::QV));
+    t_data.getStats().addDouble("time-localassembly", watch.check());
     watch.reset();
-    auto names = namecoder->process(t.get(core::GenDesc::RNAME));
-    t.getStats().addDouble("time-name", watch.check());
+    auto names = namecoder->process(t_data.get(core::GenDesc::RNAME));
+    t_data.getStats().addDouble("time-name", watch.check());
     watch.reset();
-    chunk.setStats(std::move(t.getStats()));
-    basecoder::Decoder decoder(std::move(t), segments);
+    chunk.setStats(std::move(t_data.getStats()));
+    basecoder::Decoder decoder(std::move(t_data), segments);
     std::vector<std::string> ecigars;
     for (size_t recID = 0; recID < numRecords; ++recID) {
         auto meta = decoder.readSegmentMeta();

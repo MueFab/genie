@@ -41,7 +41,7 @@ class FlowGraphEncode : public FlowGraph {
         nameSelector;  //!<
 
     std::vector<std::unique_ptr<genie::core::EntropyEncoder>> entropyCoders;                            //!<
-    genie::util::Selector<genie::core::AccessUnit, genie::core::AccessUnit> entropySelector;  //!<
+    genie::util::SideSelector<genie::core::EntropyEncoder, genie::core::EntropyEncoder::EntropyCoded , genie::core::AccessUnit::Descriptor&> entropySelector;  //!<
 
     std::vector<std::unique_ptr<genie::core::FormatExporterCompressed>> exporters;  //!<
     genie::util::SelectorHead<genie::core::AccessUnit> exporterSelector;     //!<
@@ -159,7 +159,7 @@ class FlowGraphEncode : public FlowGraph {
      *
      * @param fun
      */
-    void setEntropyCoderSelector(const std::function<size_t(const genie::core::AccessUnit&)>& fun);
+    void setEntropyCoderSelector(const std::function<size_t(const genie::core::AccessUnit::Descriptor&)>& fun);
 
     /**
      *

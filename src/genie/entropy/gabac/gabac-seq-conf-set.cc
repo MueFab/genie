@@ -67,6 +67,26 @@ void GabacSeqConfSet::storeParameters(core::parameter::ParameterSet &parameterSe
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void GabacSeqConfSet::storeParameters(core::GenDesc desc, core::parameter::DescriptorSubseqCfg &parameterSet) const {
+    auto descriptor_configuration = util::make_unique<core::parameter::desc_pres::DescriptorPresent>();
+    using namespace entropy::paramcabac;
+
+    if (desc == core::GenDesc::RNAME || desc == core::GenDesc::MSAR) {
+        auto decoder_config = util::make_unique<DecoderTokenType>();
+        fillDecoder(core::getDescriptor(desc), *decoder_config);
+        descriptor_configuration->setDecoder(std::move(decoder_config));
+    } else {
+        auto decoder_config = util::make_unique<DecoderRegular>(desc);
+        fillDecoder(core::getDescriptor(desc), *decoder_config);
+        descriptor_configuration->setDecoder(std::move(decoder_config));
+    }
+
+    parameterSet = core::parameter::DescriptorSubseqCfg();
+    parameterSet.set(std::move(descriptor_configuration));
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void GabacSeqConfSet::loadParameters(const core::parameter::ParameterSet &parameterSet) {
     using namespace entropy::paramcabac;
 

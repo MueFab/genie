@@ -29,10 +29,7 @@ class FlowGraphDecode : public FlowGraph {
     genie::util::ThreadManager mgr;                                                 //!<
     std::vector<std::unique_ptr<genie::core::FormatImporterCompressed>> importers;  //!<
 
-    std::vector<std::unique_ptr<genie::core::EntropyDecoder>> entropyCoders;                            //!<
-    genie::util::Selector<genie::core::AccessUnit, genie::core::AccessUnit> entropySelector;  //!<
-
-    std::vector<std::unique_ptr<genie::core::ReadDecoder>> readCoders;                           //!<
+    std::vector<std::unique_ptr<genie::core::ReadDecoder>> readCoders;                        //!<
     genie::util::Selector<genie::core::AccessUnit, genie::core::record::Chunk> readSelector;  //!<
 
     std::vector<std::unique_ptr<genie::core::QVDecoder>> qvCoders;  //!<
@@ -45,6 +42,10 @@ class FlowGraphDecode : public FlowGraph {
     genie::util::SideSelector<genie::core::NameDecoder, std::vector<std::string>,
                               genie::core::AccessUnit::Descriptor&>
         nameSelector;  //!<
+
+    std::vector<std::unique_ptr<genie::core::EntropyDecoder>> entropyCoders;  //!<
+    genie::util::SideSelector<genie::core::EntropyDecoder, genie::core::AccessUnit::Descriptor, const parameter::DescriptorSubseqCfg&, genie::core::AccessUnit::Descriptor&>
+        entropySelector;  //!<
 
     std::vector<std::unique_ptr<genie::core::FormatExporter>> exporters;     //!<
     genie::util::SelectorHead<genie::core::record::Chunk> exporterSelector;  //!<
@@ -133,7 +134,7 @@ class FlowGraphDecode : public FlowGraph {
      *
      * @param fun
      */
-    void setEntropyCoderSelector(const std::function<size_t(const genie::core::AccessUnit&)>& fun);
+    void setEntropyCoderSelector(const std::function<size_t(const parameter::DescriptorSubseqCfg&, genie::core::AccessUnit::Descriptor&)>& fun);
 
     /**
      *

@@ -17,11 +17,14 @@ namespace entropy {
 namespace gabac {
 
 core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration& conf0,
-                                                 const gabac::EncodingConfiguration&,
-                                                 core::AccessUnit::Subsequence&& data) {
+                                              const gabac::EncodingConfiguration&,
+                                              core::AccessUnit::Subsequence&& data) {
     core::AccessUnit::Subsequence in = std::move(data);
     util::DataBlock remainingData = std::move(in.move());
-    core::AccessUnit::Descriptor ret(core::GenDesc::RNAME);
+    core::AccessUnit::Descriptor ret(in.getID().first);
+    if(remainingData.empty()) {
+        return ret;
+    }
     size_t offset = 6;
     UTILS_DIE_IF(offset >= remainingData.getRawSize(), "Tokentype stream smaller than expected");
     uint16_t num_tokentype_descriptors = 0;
@@ -67,7 +70,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
 }
 
 core::AccessUnit::Subsequence GabacDecompressor::decompress(const gabac::EncodingConfiguration& conf,
-                                                               core::AccessUnit::Subsequence&& data) {
+                                                            core::AccessUnit::Subsequence&& data) {
     core::AccessUnit::Subsequence in = std::move(data);
     // Interface to GABAC library
     util::DataBlock buffer = in.move();
@@ -94,78 +97,30 @@ core::AccessUnit::Subsequence GabacDecompressor::decompress(const gabac::Encodin
     return core::AccessUnit::Subsequence(std::move(tmp), in.getID());
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void GabacDecompressor::flowIn(core::AccessUnit&& t, const util::Section& id) {
-    util::Watch watch;
-    core::AccessUnit payloadSet = std::move(t);
-    GabacSeqConfSet configSet;
-    auto raw_aus = core::AccessUnit(payloadSet.moveParameters(), payloadSet.getRecordNum());
-
-    configSet.loadParameters(raw_aus.getParameters());
-
-    size_t totalSizeCompressed = 0;
-    size_t totalSizeUncompressed = 0;
-    for (auto& desc : payloadSet) {
-        if (desc.isEmpty()) {
-            continue;
-        }
-        if (getDescriptor(desc.getID()).tokentype) {
-            payloadSet.getStats().addInteger(
-                "size-" + getDescriptor(desc.getID()).name + "-comp",
-                desc.begin()->getRawSize());
-            auto decomp = decompressTokens(configSet.getConfAsGabac(core::GenSubIndex{desc.getID(), 0}),
-                                           configSet.getConfAsGabac(core::GenSubIndex{desc.getID(), 1}),
-                                           std::move(*desc.begin()));
-            size_t size = 0;
-            for (auto& subseq : decomp) {
-                size += subseq.getNumSymbols() * sizeof(uint32_t);
-                while (raw_aus.get(desc.getID()).getSize() <= subseq.getID().second) {
-                    raw_aus.get(desc.getID())
-                        .add(core::AccessUnit::Subsequence(
-                            4, core::GenSubIndex{desc.getID(), raw_aus.get(desc.getID()).getSize()}));
-                }
-
-                raw_aus.set(subseq.getID(), std::move(subseq));
-            }
-            payloadSet.getStats().addInteger("size-" + getDescriptor(desc.getID()).name + "-raw", size);
-            continue;
-        }
+core::AccessUnit::Descriptor GabacDecompressor::process(const parameter::DescriptorSubseqCfg& param,
+                                                        core::AccessUnit::Descriptor& d) {
+    core::AccessUnit::Descriptor desc = std::move(d);
+    const auto& param_desc = dynamic_cast<const core::parameter::desc_pres::DescriptorPresent&>(param.get());
+    if (getDescriptor(desc.getID()).tokentype) {
+        const auto& token_param = dynamic_cast<const paramcabac::DecoderTokenType&>(param_desc.getDecoder());
+        auto conf0 = token_param.getSubsequenceCfg(0);
+        auto conf1 = token_param.getSubsequenceCfg(1);
+        desc = decompressTokens(gabac::EncodingConfiguration(std::move(conf0)),
+                                gabac::EncodingConfiguration(std::move(conf1)), std::move(*desc.begin()));
+    } else {
         for (auto& subseq : desc) {
             if (subseq.isEmpty()) {
                 continue;
             }
             auto d_id = subseq.getID();
 
-            if(subseq.getRawSize()) {
-                payloadSet.getStats().addInteger(
-                    "size-" + getDescriptor(desc.getID()).name + std::to_string(subseq.getID().second) + "-comp",
-                    subseq.getRawSize());
-            }
-            totalSizeCompressed += subseq.getRawSize();
+            const auto& token_param = dynamic_cast<const paramcabac::DecoderRegular&>(param_desc.getDecoder());
+            auto conf0 = token_param.getSubsequenceCfg(d_id.second);
 
-            core::AccessUnit::Subsequence subseqData =
-                decompress(configSet.getConfAsGabac(subseq.getID()), std::move(subseq));
-
-            if(subseqData.getNumSymbols()) {
-                payloadSet.getStats().addInteger(
-                    "size-" + getDescriptor(desc.getID()).name + std::to_string(subseqData.getID().second) + "-raw",
-                    subseqData.getNumSymbols() * sizeof(uint32_t));
-                totalSizeUncompressed += subseqData.getNumSymbols() * sizeof(uint32_t);
-            }
-
-            raw_aus.set(d_id, std::move(subseqData));
+            desc.set(d_id.second, decompress(gabac::EncodingConfiguration(std::move(conf0)), std::move(subseq)));
         }
     }
-
-    raw_aus.setReference(payloadSet.getReference());
-    raw_aus.setClassType(payloadSet.getClassType());
-    raw_aus.setStats(std::move(payloadSet.getStats()));
-    payloadSet.clear();
-    raw_aus.getStats().addDouble("time-gabac", watch.check());
-    raw_aus.getStats().addInteger("size-total-comp", totalSizeCompressed);
-    raw_aus.getStats().addInteger("size-total-raw", totalSizeUncompressed);
-    flowOut(std::move(raw_aus), id);
+    return desc;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

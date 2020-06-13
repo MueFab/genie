@@ -33,12 +33,9 @@ class GabacDecompressor : public core::EntropyDecoder {
                                                        core::AccessUnit::Subsequence&& in);
 
    public:
-    /**
-     * @brief Process BlockPayload and execute gabac decompression
-     * @param payloadSet Input payload
-     * @param id Block identification (for multithreading)
-     */
-    void flowIn(core::AccessUnit&& payloadSet, const util::Section& id) override;
+
+    core::AccessUnit::Descriptor process(const parameter::DescriptorSubseqCfg& param,
+                                         core::AccessUnit::Descriptor& d) override;
 };
 
 }  // namespace gabac

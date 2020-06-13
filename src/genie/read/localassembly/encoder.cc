@@ -169,6 +169,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     rawAU.setStats(std::move(data.getStats()));
     data.getData().clear();
     rawAU.getStats().addDouble("time-localassembly", watch.check());
+    rawAU = entropyCodeAU(std::move(rawAU));
     flowOut(std::move(rawAU), id);
 }
 

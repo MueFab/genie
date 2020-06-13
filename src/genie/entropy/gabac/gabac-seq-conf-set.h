@@ -94,6 +94,8 @@ class GabacSeqConfSet {
      */
     void storeParameters(ParameterSet &parameterSet) const;
 
+    void storeParameters(core::GenDesc desc, core::parameter::DescriptorSubseqCfg &parameterSet) const;
+
     /**
      * @brief Load a complete set of gabac configurations to the internal memory of gabac configurations
      * @param parameterSet Input object
