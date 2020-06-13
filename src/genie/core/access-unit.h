@@ -258,6 +258,8 @@ class AccessUnit {
                 }
                 if (s) {
                     subdesc.emplace_back(GenSubIndex{_id, i}, s, reader);
+                } else {
+                    subdesc.emplace_back(GenSubIndex{_id, i}, util::DataBlock(0, 4));
                 }
             }
         }

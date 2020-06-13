@@ -63,6 +63,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     watch.reset();
 
     rawAU.setStats(std::move(data.getStats()));
+    rawAU = entropyCodeAU(std::move(rawAU));
     flowOut(std::move(rawAU), id);
 }
 

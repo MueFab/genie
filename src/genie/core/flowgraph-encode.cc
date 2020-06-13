@@ -14,8 +14,7 @@ namespace core {
 // ---------------------------------------------------------------------------------------------------------------------
 
 FlowGraphEncode::FlowGraphEncode(size_t threads) : mgr(threads) {
-    entropySelector.setDrain(&exporterSelector);
-    readSelector.setDrain(&entropySelector);
+    readSelector.setDrain(&exporterSelector);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -50,6 +49,7 @@ void FlowGraphEncode::addReadCoder(std::unique_ptr<genie::core::ReadEncoder> dat
     readSelector.addBranch(readCoders.back().get(), readCoders.back().get());
     readCoders.back()->setQVCoder(&qvSelector);
     readCoders.back()->setNameCoder(&nameSelector);
+    readCoders.back()->setEntropyCoder(&entropySelector);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -65,14 +65,14 @@ void FlowGraphEncode::setReadCoder(std::unique_ptr<genie::core::ReadEncoder> dat
 
 void FlowGraphEncode::addEntropyCoder(std::unique_ptr<genie::core::EntropyEncoder> dat) {
     entropyCoders.emplace_back(std::move(dat));
-    entropySelector.addBranch(entropyCoders.back().get(), entropyCoders.back().get());
+    entropySelector.addMod(entropyCoders.back().get());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FlowGraphEncode::setEntropyCoder(std::unique_ptr<genie::core::EntropyEncoder> dat, size_t index) {
     entropyCoders[index] = std::move(dat);
-    entropySelector.setBranch(entropyCoders[index].get(), entropyCoders[index].get(), index);
+    entropySelector.setMod(entropyCoders[index].get(), index);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -145,8 +145,8 @@ void FlowGraphEncode::setNameSelector(std::function<size_t(const genie::core::re
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FlowGraphEncode::setEntropyCoderSelector(const std::function<size_t(const genie::core::AccessUnit&)>& fun) {
-    entropySelector.setOperation(fun);
+void FlowGraphEncode::setEntropyCoderSelector(const std::function<size_t(const genie::core::AccessUnit::Descriptor&)>& fun) {
+    entropySelector.setSelection(fun);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

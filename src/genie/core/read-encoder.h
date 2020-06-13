@@ -15,6 +15,7 @@
 #include <genie/util/source.h>
 #include "access-unit.h"
 #include "module.h"
+#include "entropy-encoder.h"
 #include "name-encoder.h"
 #include "qv-encoder.h"
 
@@ -30,10 +31,12 @@ class ReadEncoder : public Module<record::Chunk, AccessUnit> {
    public:
     using QvSelector = util::SideSelector<QVEncoder, QVEncoder::QVCoded, const record::Chunk&>;             //!<
     using NameSelector = util::SideSelector<NameEncoder, AccessUnit::Descriptor, const record::Chunk&>;  //!<
+    using EntropySelector = util::SideSelector<EntropyEncoder, EntropyEncoder::EntropyCoded, AccessUnit::Descriptor&>;  //!<
 
    protected:
     QvSelector* qvcoder{};      //!<
     NameSelector* namecoder{};  //!<
+    EntropySelector* entropycoder{};  //!<
 
    public:
     /**
@@ -47,6 +50,24 @@ class ReadEncoder : public Module<record::Chunk, AccessUnit> {
      * @param coder
      */
     virtual void setNameCoder(NameSelector* coder);
+
+    /**
+     *
+     * @param coder
+     */
+    virtual void setEntropyCoder(EntropySelector* coder) {
+        entropycoder = coder;
+    }
+
+    AccessUnit entropyCodeAU(AccessUnit&& a) {
+        AccessUnit au = std::move(a);
+        for(auto &d : au) {
+            auto encoded = entropycoder->process(d);
+            au.getParameters().setDescriptor(d.getID(), std::move(encoded.first));
+            au.set(d.getID(), std::move(encoded.second));
+        }
+        return au;
+    }
 
     /**
      * @Brief For polymorphic destruction

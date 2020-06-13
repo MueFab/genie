@@ -51,7 +51,7 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
     ret->setNameSelector([](const genie::core::record::Chunk&) -> size_t { return 0; });
 
     ret->addEntropyCoder(genie::util::make_unique<genie::entropy::gabac::GabacCompressor>());
-    ret->setEntropyCoderSelector([](const genie::core::AccessUnit&) -> size_t { return 0; });
+    ret->setEntropyCoderSelector([](const genie::core::AccessUnit::Descriptor&) -> size_t { return 0; });
 
     ret->setExporterSelector([](const genie::core::AccessUnit&) -> size_t { return 0; });
 
@@ -104,7 +104,7 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
     ret->setNameSelector([](const genie::core::AccessUnit::Descriptor&) -> size_t { return 0; });
 
     ret->addEntropyCoder(genie::util::make_unique<genie::entropy::gabac::GabacDecompressor>());
-    ret->setEntropyCoderSelector([](const genie::core::AccessUnit&) -> size_t { return 0; });
+    ret->setEntropyCoderSelector([](const genie::core::parameter::DescriptorSubseqCfg&, genie::core::AccessUnit::Descriptor&) -> size_t { return 0; });
 
     ret->setExporterSelector([](const genie::core::record::Chunk&) -> size_t { return 0; });
 
