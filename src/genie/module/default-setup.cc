@@ -28,14 +28,14 @@ namespace module {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::string&, size_t blocksize) {
+std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::string& working_dir, size_t blocksize) {
     std::unique_ptr<core::FlowGraphEncode> ret = genie::util::make_unique<core::FlowGraphEncode>(threads);
 
     ret->setClassifier(genie::util::make_unique<genie::core::ClassifierRegroup>(blocksize));
 
     ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Encoder>());
     ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Encoder>(2048, false));
-    ret->addReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>());
+    ret->addReadCoder(genie::util::make_unique<genie::read::spring::SpringEncoder>(working_dir));
     ret->setReadCoderSelector([](const genie::core::record::Chunk& chunk) -> size_t {
         if (chunk.getData().front().getClassID() == genie::core::record::ClassType::CLASS_U) {
             return 2;

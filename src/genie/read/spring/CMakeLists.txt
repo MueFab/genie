@@ -9,8 +9,6 @@ set(source_files
         encoder.cc
         generate-new-fastq.cc
         generate-read-streams.cc
-        spring-gabac.cc
-        id-tokenization.cc
         preprocess.cc
         reorder-compress-quality-id.cc
         return-structures.cc

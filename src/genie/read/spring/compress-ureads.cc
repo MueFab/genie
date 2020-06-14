@@ -23,7 +23,6 @@
 #include "generate-read-streams.h"
 #include "params.h"
 #include "reorder-compress-quality-id.h"
-#include "spring-gabac.h"
 #include "util.h"
 
 #include <genie/util/bitwriter.h>

@@ -40,7 +40,7 @@ class FormatExporterCompressed : public util::Drain<AccessUnit> {
     /**
      *
      */
-    void flushIn() override;
+    void flushIn(size_t& pos) override;
 
     /**
      *

@@ -26,7 +26,6 @@
 #include "preprocess.h"
 #include "reorder-compress-quality-id.h"
 #include "reorder.h"
-#include "spring-gabac.h"
 #include "util.h"
 
 namespace genie {

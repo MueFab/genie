@@ -17,7 +17,8 @@ namespace read {
 namespace spring {
 
 void SpringEncoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
-    preprocessor.preprocess(std::move(t), id.start);
+    preprocessor.preprocess(std::move(t), id);
+    skipOut(id);
 }
 
 class SpringSource : public util::OriginalSource, public util::Source<core::AccessUnit> {
@@ -33,10 +34,8 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
                        const genie::core::record::Chunk&>* ncoder;
 
    public:
-    SpringSource(util::SideSelector<genie::core::QVEncoder, genie::core::QVEncoder::QVCoded,
-                                    const genie::core::record::Chunk&>* _coder,
-                 util::SideSelector<genie::core::NameEncoder, genie::core::AccessUnit::Descriptor,
-                                    const genie::core::record::Chunk&>* _ncoder,
+    SpringSource(core::ReadEncoder::QvSelector* _coder,
+                 core::ReadEncoder::NameSelector* _ncoder,
                  const compression_params& _cp, std::string _temp_dir)
         : cp(_cp), temp_dir(std::move(_temp_dir)), coder(_coder), ncoder(_ncoder) {
         if (cp.paired_end) {
@@ -99,12 +98,11 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
         return id != num_AUs - 1;
     }
 
-    void flushIn() override { flushOut(); }
+    void flushIn(size_t& pos) override { flushOut(pos); }
 };
 
-void SpringEncoder::flushIn() {
-    return;
-    preprocessor.finish();
+void SpringEncoder::flushIn(size_t& pos) {
+    preprocessor.finish(pos);
 
     std::cout << "Reordering ...\n";
     auto reorder_start = std::chrono::steady_clock::now();
@@ -125,7 +123,7 @@ void SpringEncoder::flushIn() {
     if (preprocessor.cp.preserve_quality || preprocessor.cp.preserve_id) {
         std::cout << "Reordering and compressing quality and/or ids ...\n";
         auto rcqi_start = std::chrono::steady_clock::now();
-        reorder_compress_quality_id(preprocessor.temp_dir, preprocessor.cp);
+        reorder_compress_quality_id(preprocessor.temp_dir, preprocessor.cp, qvcoder, namecoder, entropycoder);
         auto rcqi_end = std::chrono::steady_clock::now();
         std::cout << "Reordering and compressing quality and/or ids done!\n";
         std::cout << "Time for this step: "

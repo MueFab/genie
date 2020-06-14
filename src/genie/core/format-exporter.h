@@ -41,7 +41,7 @@ class FormatExporter : public util::Drain<record::Chunk> {
     /**
      *
      */
-    void flushIn() override;
+    void flushIn(size_t& pos) override;
 
     /**
      *

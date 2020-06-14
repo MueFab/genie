@@ -50,7 +50,7 @@ uint32_t ThreadManager::run() {
         t.join();
     }
     if (!abortFlag) {
-        source.front()->flushIn();
+        source.front()->flushIn(ctr);
     }
     return counter;
 }
