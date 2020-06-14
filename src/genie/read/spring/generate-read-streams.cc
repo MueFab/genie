@@ -1,15 +1,12 @@
-/**
- * @file
- * @copyright This file is part of GENIE. See LICENSE and/or
- * https://github.com/mitogen/genie for more details.
- */
-
 #ifdef GENIE_USE_OPENMP
 
 #include <omp.h>
 
 #endif
 
+#include <genie/core/access-unit.h>
+#include <genie/core/parameter/parameter_set.h>
+#include <genie/core/read-encoder.h>
 #include <array>
 #include <cmath>  // abs
 #include <cstdio>
@@ -28,20 +25,126 @@ namespace genie {
 namespace read {
 namespace spring {
 
-uint64_t getNumBlocks(const compression_params &data) {
-    return uint64_t(std::ceil(float(data.num_reads) / data.num_reads_per_block));
+void generate_read_streams(const std::string &temp_dir, const compression_params &cp, core::ReadEncoder::EntropySelector* entropycoder) {
+    if (!cp.paired_end)
+        generate_read_streams_se(temp_dir, cp, entropycoder);
+    else
+        generate_read_streams_pe(temp_dir, cp, entropycoder);
 }
 
-core::AccessUnit generate_read_streams_se(const se_data &data, uint64_t block_num) {  // char_to_int
+struct se_data {
+    compression_params cp;
+    std::vector<bool> flag_arr;
+    std::vector<uint64_t> pos_arr;
+    std::vector<uint16_t> read_length_arr;
+    std::vector<char> noise_arr;
+    std::vector<uint16_t> noisepos_arr;
+    std::vector<uint64_t> pos_in_noise_arr;
+    std::vector<uint16_t> noise_len_arr;
+    std::vector<char> unaligned_arr;
+    std::string seq;
+    std::vector<char> RC_arr;
+    std::vector<uint32_t> order_arr;
+};
 
-    core::parameter::ParameterSet ps(block_num, block_num, core::parameter::DataUnit::DatasetType::NON_ALIGNED,
-                                     core::AlphabetID::ACGTN, 0, data.cp.paired_end, false, data.cp.preserve_quality, 0,
-                                     false, false);
-    core::parameter::ComputedRef cr(core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY);
-    ps.setComputedRef(std::move(cr));
+void generate_subseqs(const se_data &data, uint64_t block_num, subseq_data *subseqData) {
+    subseqData->block_num = block_num;
+    for (auto arr : subseq_indices) subseqData->subseq_vector[arr[0]][arr[1]] = std::vector<int64_t>();
 
-    core::AccessUnit raw_data(std::move(ps), 0);
+    // char_to_int
+    int64_t char_to_int[128];
+    char_to_int[(uint8_t)'A'] = 0;
+    char_to_int[(uint8_t)'C'] = 1;
+    char_to_int[(uint8_t)'G'] = 2;
+    char_to_int[(uint8_t)'T'] = 3;
+    char_to_int[(uint8_t)'N'] = 4;
 
+    int64_t rc_to_int[128];
+    rc_to_int[(uint8_t)'d'] = 0;
+    rc_to_int[(uint8_t)'r'] = 1;
+
+    // clear vectors
+    for (auto arr : subseq_indices) subseqData->subseq_vector[arr[0]][arr[1]].clear();
+
+    uint64_t start_read_num = block_num * data.cp.num_reads_per_block;
+    uint64_t end_read_num = (block_num + 1) * data.cp.num_reads_per_block;
+
+    if (end_read_num >= data.cp.num_reads) {
+        end_read_num = data.cp.num_reads;
+    }
+
+    // first find the seq
+    uint64_t seq_start, seq_end;
+    if (data.flag_arr[start_read_num] == false)
+        seq_start = seq_end = 0;  // all reads unaligned
+    else {
+        seq_end = seq_start = data.pos_arr[start_read_num];
+        // find last read in AU that's aligned
+        uint64_t i = start_read_num;
+        for (; i < end_read_num; i++) {
+            if (data.flag_arr[i] == false) break;
+            seq_end = std::max(seq_end, data.pos_arr[i] + data.read_length_arr[i]);
+        }
+    }
+    if (seq_start != seq_end) {
+        // not all unaligned
+        subseqData->subseq_vector[7][0].push_back(seq_end - seq_start - 1);  // rlen
+        subseqData->subseq_vector[12][0].push_back(5);                       // rtype
+        for (uint64_t i = seq_start; i < seq_end; i++)
+            subseqData->subseq_vector[6][0].push_back(char_to_int[(uint8_t)data.seq[i]]);  // ureads
+    }
+    uint64_t prevpos = 0, diffpos;
+    // Write streams
+    for (uint64_t i = start_read_num; i < end_read_num; i++) {
+        if (data.flag_arr[i] == true) {
+            subseqData->subseq_vector[7][0].push_back(data.read_length_arr[i] - 1);         // rlen
+            subseqData->subseq_vector[1][0].push_back(rc_to_int[(uint8_t)data.RC_arr[i]]);  // rcomp
+            if (i == start_read_num) {
+                // Note: In order non-preserving mode, if the first read of
+                // the block is a singleton, then the rest are too.
+                subseqData->subseq_vector[0][0].push_back(0);  // pos
+                prevpos = data.pos_arr[i];
+            } else {
+                diffpos = data.pos_arr[i] - prevpos;
+                subseqData->subseq_vector[0][0].push_back(diffpos);  // pos
+                prevpos = data.pos_arr[i];
+            }
+            if (data.noise_len_arr[i] == 0)
+                subseqData->subseq_vector[12][0].push_back(1);  // rtype = P
+            else {
+                subseqData->subseq_vector[12][0].push_back(3);  // rtype = M
+                for (uint16_t j = 0; j < data.noise_len_arr[i]; j++) {
+                    subseqData->subseq_vector[3][0].push_back(0);  // mmpos
+                    if (j == 0)
+                        subseqData->subseq_vector[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[i] + j]);
+                    else
+                        subseqData->subseq_vector[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[i] + j] -
+                                                                  1);  // decoder adds +1
+                    subseqData->subseq_vector[4][0].push_back(0);      // mmtype = Substitution
+                    subseqData->subseq_vector[4][1].push_back(
+                        char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[i] + j]]);
+                }
+                subseqData->subseq_vector[3][0].push_back(1);
+            }
+        } else {
+            subseqData->subseq_vector[12][0].push_back(5);                           // rtype
+            subseqData->subseq_vector[7][0].push_back(data.read_length_arr[i] - 1);  // rlen
+            for (uint64_t j = 0; j < data.read_length_arr[i]; j++) {
+                subseqData->subseq_vector[6][0].push_back(
+                    char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[i] + j]]);  // ureads
+            }
+            subseqData->subseq_vector[0][0].push_back(seq_end - prevpos);            // pos
+            subseqData->subseq_vector[1][0].push_back(0);                            // rcomp
+            subseqData->subseq_vector[7][0].push_back(data.read_length_arr[i] - 1);  // rlen
+            subseqData->subseq_vector[12][0].push_back(1);                           // rtype = P
+            prevpos = seq_end;
+            seq_end = prevpos + data.read_length_arr[i];
+        }
+    }
+}
+
+void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit& raw_au) {
+    // char_to_int
     int64_t char_to_int[128];
     char_to_int[(uint8_t)'A'] = 0;
     char_to_int[(uint8_t)'C'] = 1;
@@ -75,63 +178,93 @@ core::AccessUnit generate_read_streams_se(const se_data &data, uint64_t block_nu
     }
     if (seq_start != seq_end) {
         // not all unaligned
-        raw_data.push(core::GenSub::RLEN, seq_end - seq_start - 1);  // rlen
-        raw_data.push(core::GenSub::RTYPE, 5);                       // rtype
+        raw_au.get(core::GenSub::RLEN).push(seq_end - seq_start - 1);  // rlen
+        raw_au.get(core::GenSub::RTYPE).push(5);                       // rtype
         for (uint64_t i = seq_start; i < seq_end; i++)
-            raw_data.push(core::GenSub::UREADS, char_to_int[(uint8_t)data.seq[i]]);  // ureads
+            raw_au.get(core::GenSub::UREADS).push(char_to_int[(uint8_t)data.seq[i]]);  // ureads
     }
     uint64_t prevpos = 0, diffpos;
     // Write streams
     for (uint64_t i = start_read_num; i < end_read_num; i++) {
         if (data.flag_arr[i] == true) {
-            raw_data.push(core::GenSub::RLEN, data.read_length_arr[i] - 1);          // rlen
-            raw_data.push(core::GenSub::RCOMP, rc_to_int[(uint8_t)data.RC_arr[i]]);  // rcomp
+            raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[i] - 1);         // rlen
+            raw_au.get(core::GenSub::RCOMP).push(rc_to_int[(uint8_t)data.RC_arr[i]]);  // rcomp
             if (i == start_read_num) {
                 // Note: In order non-preserving mode, if the first read of
                 // the block is a singleton, then the rest are too.
-                raw_data.push(core::GenSub::POS_MAPPING_FIRST, 0);  // pos
+                raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(0);  // pos
                 prevpos = data.pos_arr[i];
             } else {
                 diffpos = data.pos_arr[i] - prevpos;
-                raw_data.push(core::GenSub::POS_MAPPING_FIRST, diffpos);  // pos
+                raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(diffpos);  // pos
                 prevpos = data.pos_arr[i];
             }
             if (data.noise_len_arr[i] == 0)
-                raw_data.push(core::GenSub::RTYPE, 1);  // rtype = P
+                raw_au.get(core::GenSub::RTYPE).push(1);  // rtype = P
             else {
-                raw_data.push(core::GenSub::RTYPE, 3);  // rtype = M
+                raw_au.get(core::GenSub::RTYPE).push(3);  // rtype = M
                 for (uint16_t j = 0; j < data.noise_len_arr[i]; j++) {
-                    raw_data.push(core::GenSub::MMPOS_TERMINATOR, 0);  // mmpos
+                    raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(0);  // mmpos
                     if (j == 0)
-                        raw_data.push(core::GenSub::MMPOS_POSITION, data.noisepos_arr[data.pos_in_noise_arr[i] + j]);
+                        raw_au.get(core::GenSub::MMPOS_POSITION).push(data.noisepos_arr[data.pos_in_noise_arr[i] + j]);
                     else
-                        raw_data.push(core::GenSub::MMPOS_POSITION,
-                                      data.noisepos_arr[data.pos_in_noise_arr[i] + j] - 1);  // decoder adds +1
-                    raw_data.push(core::GenSub::MMTYPE_TYPE, 0);                             // mmtype = Substitution
-                    raw_data.push(core::GenSub::MMTYPE_SUBSTITUTION,
-                                  char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[i] + j]]);
+                        raw_au.get(core::GenSub::MMPOS_POSITION).push(data.noisepos_arr[data.pos_in_noise_arr[i] + j] -
+                                                 1);  // decoder adds +1
+                    raw_au.get(core::GenSub::MMTYPE_TYPE).push(0);      // mmtype = Substitution
+                    raw_au.get(core::GenSub::MMTYPE_SUBSTITUTION).push(char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[i] + j]]);
                 }
-                raw_data.push(core::GenSub::MMPOS_TERMINATOR, 1);
+                raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(1);
             }
         } else {
-            raw_data.push(core::GenSub::RTYPE, 5);                           // rtype
-            raw_data.push(core::GenSub::RLEN, data.read_length_arr[i] - 1);  // rlen
+            raw_au.get(core::GenSub::RTYPE).push(5);                           // rtype
+            raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[i] - 1);  // rlen
             for (uint64_t j = 0; j < data.read_length_arr[i]; j++) {
-                raw_data.push(core::GenSub::UREADS,
-                              char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[i] + j]]);  // ureads
+                raw_au.get(core::GenSub::UREADS).push(char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[i] + j]]);  // ureads
             }
-            raw_data.push(core::GenSub::POS_MAPPING_FIRST, seq_end - prevpos);  // pos
-            raw_data.push(core::GenSub::RCOMP, 0);                              // rcomp
-            raw_data.push(core::GenSub::RLEN, data.read_length_arr[i] - 1);     // rlen
-            raw_data.push(core::GenSub::RTYPE, 1);                              // rtype = P
+            raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(seq_end - prevpos);            // pos
+            raw_au.get(core::GenSub::RCOMP).push(0);                            // rcomp
+            raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[i] - 1);  // rlen
+            raw_au.get(core::GenSub::RTYPE).push(1);                           // rtype = P
             prevpos = seq_end;
             seq_end = prevpos + data.read_length_arr[i];
         }
     }
+}
 
-    raw_data.setNumRecords(raw_data.get(core::GenSub::RCOMP).getNumSymbols());
+void generate_and_compress_se(const std::string &temp_dir, const se_data &data, core::ReadEncoder::EntropySelector* entropycoder) {
+    // Now generate new streams and compress blocks in parallel
+    // this is actually number of read pairs per block for PE
+    uint64_t blocks = uint64_t(std::ceil(float(data.cp.num_reads) / data.cp.num_reads_per_block));
 
-    return raw_data;
+    std::vector<uint32_t> num_reads_per_block(blocks);
+#ifdef GENIE_USE_OPENMP
+#pragma omp parallel for num_threads(data.cp.num_thr) schedule(dynamic)
+#endif
+    for (uint64_t block_num = 0; block_num < blocks; block_num++) {
+        core::AccessUnit au(core::parameter::ParameterSet(), 0);
+
+        generate_subseqs(data, block_num, au);
+        num_reads_per_block[block_num] = au.get(core::GenSub::RCOMP).getNumSymbols();  // rcomp
+
+        au = core::ReadEncoder::entropyCodeAU(entropycoder, std::move(au));
+
+        std::string file_to_save_streams = temp_dir + "/read_streams." + std::to_string(block_num);
+        for(const auto&d : au) {
+            if(d.isEmpty()) {
+                continue;
+            }
+            std::ofstream out(file_to_save_streams + "." + std::to_string(uint8_t(d.getID())));
+            util::BitWriter bw(&out);
+            d.write(bw);
+        }
+    }  // end omp parallel for
+
+    // write num blocks, reads per block to a file
+    const std::string block_info_file = temp_dir + "/block_info.bin";
+    std::ofstream f_block_info(block_info_file, std::ios::binary);
+    uint32_t num_blocks = (uint32_t)blocks;
+    f_block_info.write((char *)&num_blocks, sizeof(uint32_t));
+    f_block_info.write((char *)&num_reads_per_block[0], num_blocks * sizeof(uint32_t));
 }
 
 void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data) {
@@ -241,7 +374,14 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     remove(file_seq.c_str());
 }
 
-void loadPE_Data(const compression_params &cp, const std::string &temp_dir, bool del, se_data *data) {
+void generate_read_streams_se(const std::string &temp_dir, const compression_params &cp, core::ReadEncoder::EntropySelector* entropycoder) {
+    se_data data;
+    loadSE_Data(cp, temp_dir, &data);
+
+    generate_and_compress_se(temp_dir, data, entropycoder);
+}
+
+void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data) {
     std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> descriptorFilesPerAU;
 
     const std::string file_seq = temp_dir + "/read_seq.txt";
@@ -349,17 +489,25 @@ void loadPE_Data(const compression_params &cp, const std::string &temp_dir, bool
     f_order.close();
     f_readlength.close();
 
-    if (del) {
-        // delete old streams
-        remove(file_noise.c_str());
-        remove(file_noisepos.c_str());
-        remove(file_RC.c_str());
-        remove(file_readlength.c_str());
-        remove(file_unaligned.c_str());
-        remove(file_pos.c_str());
-        remove(file_seq.c_str());
-    }
+    // delete old streams
+    remove(file_noise.c_str());
+    remove(file_noisepos.c_str());
+    remove(file_RC.c_str());
+    remove(file_readlength.c_str());
+    remove(file_unaligned.c_str());
+    remove(file_pos.c_str());
+    remove(file_seq.c_str());
 }
+
+struct pe_block_data {
+    std::vector<uint32_t> block_start;
+    std::vector<uint32_t> block_end;  // block start and end positions wrt
+    std::vector<uint32_t> block_num;
+    std::vector<uint32_t> genomic_record_index;
+    std::vector<uint32_t> read_index_genomic_record;
+    std::vector<uint32_t> block_seq_start;
+    std::vector<uint32_t> block_seq_end;
+};
 
 void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
     bdata->block_num = std::vector<uint32_t>(data.cp.num_reads);
@@ -514,14 +662,19 @@ void generate_qual_id_pe(const std::string &temp_dir, const pe_block_data &bdata
     f_blocks_id.close();
 }
 
-core::AccessUnit generate_read_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num) {
-    core::parameter::ParameterSet ps(cur_block_num, cur_block_num, core::parameter::DataUnit::DatasetType::NON_ALIGNED,
-                                     core::AlphabetID::ACGTN, 0, data.cp.paired_end, false, data.cp.preserve_quality, 0,
-                                     false, false);
-    core::parameter::ComputedRef cr(core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY);
-    ps.setComputedRef(std::move(cr));
+struct pe_statistics {
+    std::vector<uint32_t> count_same_rec;
+    std::vector<uint32_t> count_split_same_AU;
+    std::vector<uint32_t> count_split_diff_AU;
+};
 
-    core::AccessUnit raw_au(std::move(ps), 0);
+void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num, pe_statistics *pest, core::AccessUnit& raw_au) {
+#ifdef GENIE_USE_OPENMP
+    const unsigned cur_thread_num = omp_get_thread_num();
+#else
+    const unsigned cur_thread_num = 0;
+#endif
+
     // char_to_int
     int64_t char_to_int[128];
     char_to_int[(uint8_t)'A'] = 0;
@@ -538,10 +691,10 @@ core::AccessUnit generate_read_streams_pe(const se_data &data, const pe_block_da
     uint64_t seq_start = bdata.block_seq_start[cur_block_num], seq_end = bdata.block_seq_end[cur_block_num];
     if (seq_start != seq_end) {
         // not all unaligned
-        raw_au.push(core::GenSub::RLEN, seq_end - seq_start - 1);
-        raw_au.push(core::GenSub::RTYPE, 5);
+        raw_au.get(core::GenSub::RLEN).push(seq_end - seq_start - 1);  // rlen
+        raw_au.get(core::GenSub::RTYPE).push(5);                       // rtype
         for (uint64_t i = seq_start; i < seq_end; i++)
-            raw_au.push(core::GenSub::UREADS, char_to_int[(uint8_t)data.seq[i]]);
+            raw_au.get(core::GenSub::UREADS).push(char_to_int[(uint8_t)data.seq[i]]);  // ureads
     }
     uint64_t prevpos = 0, diffpos;
     // Write streams
@@ -554,11 +707,11 @@ core::AccessUnit generate_read_streams_pe(const se_data &data, const pe_block_da
             if (i == bdata.block_start[cur_block_num]) {
                 // Note: In order non-preserving mode, if the first read of
                 // the block is a singleton, then the rest are too.
-                raw_au.push(core::GenSub::POS_MAPPING_FIRST, 0);
+                raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(0);  // pos
                 prevpos = data.pos_arr[current];
             } else {
                 diffpos = data.pos_arr[current] - prevpos;
-                raw_au.push(core::GenSub::POS_MAPPING_FIRST, diffpos);
+                raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(diffpos);  // pos
                 prevpos = data.pos_arr[current];
             }
         }
@@ -567,129 +720,191 @@ core::AccessUnit generate_read_streams_pe(const se_data &data, const pe_block_da
             // both reads in same record
             if (data.flag_arr[current] == false) {
                 // Case 1: both unaligned
-                raw_au.push(core::GenSub::RTYPE, 5);  // rtype
-                raw_au.push(core::GenSub::RLEN,
-                            data.read_length_arr[current] + data.read_length_arr[pair] - 1);  // rlen
+                raw_au.get(core::GenSub::RTYPE).push(5);                                                              // rtype
+                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] + data.read_length_arr[pair] - 1);  // rlen
                 for (uint64_t j = 0; j < data.read_length_arr[current]; j++) {
-                    raw_au.push(core::GenSub::UREADS,
-                                char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
+                    raw_au.get(core::GenSub::UREADS).push(
+                        char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
                 }
                 for (uint64_t j = 0; j < data.read_length_arr[pair]; j++) {
-                    raw_au.push(core::GenSub::UREADS,
-                                char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[pair] + j]]);  // ureads
+                    raw_au.get(core::GenSub::UREADS).push(
+                        char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[pair] + j]]);  // ureads
                 }
-                raw_au.push(core::GenSub::POS_MAPPING_FIRST, seq_end - prevpos);     // pos
-                raw_au.push(core::GenSub::RCOMP, 0);                                 // rcomp
-                raw_au.push(core::GenSub::RCOMP, 0);                                 // rcomp
-                raw_au.push(core::GenSub::RLEN, data.read_length_arr[current] - 1);  // rlen
-                raw_au.push(core::GenSub::RLEN, data.read_length_arr[pair] - 1);     // rlen
-                raw_au.push(core::GenSub::RTYPE, 1);                                 // rtype = P
-                raw_au.push(core::GenSub::PAIR_DECODING_CASE, 0);                    // pair decoding case same_rec
+                raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(seq_end - prevpos);                  // pos
+                raw_au.get(core::GenSub::RCOMP).push(0);                                  // rcomp
+                raw_au.get(core::GenSub::RCOMP).push(0);                                  // rcomp
+                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] - 1);  // rlen
+                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[pair] - 1);     // rlen
+                raw_au.get(core::GenSub::RTYPE).push(1);                                 // rtype = P
+                raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(0);                                  // pair decoding case same_rec
                 bool read_1_first = true;
                 uint16_t delta = data.read_length_arr[current];
-                raw_au.push(core::GenSub::PAIR_SAME_REC, !(read_1_first) + 2 * delta);  // pair
+                raw_au.get(core::GenSub::PAIR_SAME_REC).push(!(read_1_first) + 2 * delta);  // pair
                 prevpos = seq_end;
                 seq_end = prevpos + data.read_length_arr[current] + data.read_length_arr[pair];
             } else {
                 // Case 2: both aligned
-                raw_au.push(core::GenSub::RLEN, data.read_length_arr[current] - 1);          // rlen
-                raw_au.push(core::GenSub::RLEN, data.read_length_arr[pair] - 1);             // rlen
-                raw_au.push(core::GenSub::RCOMP, rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
-                raw_au.push(core::GenSub::RCOMP, rc_to_int[(uint8_t)data.RC_arr[pair]]);     // rcomp
+                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] - 1);         // rlen
+                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[pair] - 1);            // rlen
+                raw_au.get(core::GenSub::RCOMP).push(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
+                raw_au.get(core::GenSub::RCOMP).push(rc_to_int[(uint8_t)data.RC_arr[pair]]);     // rcomp
                 if (data.noise_len_arr[current] == 0 && data.noise_len_arr[pair] == 0)
-                    raw_au.push(core::GenSub::RTYPE, 1);  // rtype = P
+                    raw_au.get(core::GenSub::RTYPE).push(1);  // rtype = P
                 else {
-                    raw_au.push(core::GenSub::RTYPE, 3);  // rtype = M
+                    raw_au.get(core::GenSub::RTYPE).push(3);  // rtype = M
                     for (int k = 0; k < 2; k++) {
                         uint32_t index = k ? pair : current;
                         for (uint16_t j = 0; j < data.noise_len_arr[index]; j++) {
-                            raw_au.push(core::GenSub::MMPOS_TERMINATOR, 0);  // mmpos
+                            raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(0);  // mmpos
                             if (j == 0)
-                                raw_au.push(core::GenSub::MMPOS_POSITION,
-                                            data.noisepos_arr[data.pos_in_noise_arr[index] + j]);  // mmpos
+                                raw_au.get(core::GenSub::MMPOS_POSITION).push(data.noisepos_arr[data.pos_in_noise_arr[index] + j]);  // mmpos
                             else
-                                raw_au.push(core::GenSub::MMPOS_POSITION,
-                                            data.noisepos_arr[data.pos_in_noise_arr[index] + j] - 1);  // mmpos
-                            raw_au.push(core::GenSub::MMTYPE_TYPE, 0);  // mmtype = Substitution
-                            raw_au.push(core::GenSub::MMTYPE_SUBSTITUTION,
-                                        char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[index] + j]]);
+                                raw_au.get(core::GenSub::MMPOS_POSITION).push(data.noisepos_arr[data.pos_in_noise_arr[index] + j] -
+                                                         1);  // mmpos
+                            raw_au.get(core::GenSub::MMTYPE_TYPE).push(0);      // mmtype = Substitution
+                            raw_au.get(core::GenSub::MMTYPE_SUBSTITUTION).push(
+                                char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[index] + j]]);
                         }
-                        raw_au.push(core::GenSub::MMPOS_TERMINATOR, 1);  // mmpos
+                        raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(1);  // mmpos
                     }
                 }
                 bool read_1_first = (current < pair);
                 uint16_t delta = data.pos_arr[pair] - data.pos_arr[current];
-                raw_au.push(core::GenSub::PAIR_DECODING_CASE, 0);                       // pair decoding case same_rec
-                raw_au.push(core::GenSub::PAIR_SAME_REC, !(read_1_first) + 2 * delta);  // pair
-                //  pest->count_same_rec[cur_thread_num]++;
+                raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(0);                            // pair decoding case same_rec
+                raw_au.get(core::GenSub::PAIR_SAME_REC).push(!(read_1_first) + 2 * delta);  // pair
+                pest->count_same_rec[cur_thread_num]++;
             }
         } else {
             // only one read in genomic record
             if (data.flag_arr[current] == true) {
-                raw_au.push(core::GenSub::RLEN, data.read_length_arr[current] - 1);          // rlen
-                raw_au.push(core::GenSub::RCOMP, rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
+                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] - 1);         // rlen
+                raw_au.get(core::GenSub::RCOMP).push(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
                 if (data.noise_len_arr[current] == 0)
-                    raw_au.push(core::GenSub::RTYPE, 1);  // rtype = P
+                    raw_au.get(core::GenSub::RTYPE).push(1);  // rtype = P
                 else {
-                    raw_au.push(core::GenSub::RTYPE, 3);  // rtype = M
+                    raw_au.get(core::GenSub::RTYPE).push(3);  // rtype = M
                     for (uint16_t j = 0; j < data.noise_len_arr[current]; j++) {
-                        raw_au.push(core::GenSub::MMPOS_TERMINATOR, 0);  // mmpos
+                        raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(0);  // mmpos
                         if (j == 0)
-                            raw_au.push(core::GenSub::MMPOS_POSITION,
-                                        data.noisepos_arr[data.pos_in_noise_arr[current] + j]);  // mmpos
+                            raw_au.get(core::GenSub::MMPOS_POSITION).push(data.noisepos_arr[data.pos_in_noise_arr[current] + j]);  // mmpos
                         else
-                            raw_au.push(core::GenSub::MMPOS_POSITION,
-                                        data.noisepos_arr[data.pos_in_noise_arr[current] + j] - 1);  // mmpos
-                        raw_au.push(core::GenSub::MMTYPE_TYPE, 0);  // mmtype = Substitution
-                        raw_au.push(core::GenSub::MMTYPE_SUBSTITUTION,
-                                    char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[current] + j]]);
+                            raw_au.get(core::GenSub::MMPOS_POSITION).push(data.noisepos_arr[data.pos_in_noise_arr[current] + j] -
+                                                     1);  // mmpos
+                        raw_au.get(core::GenSub::MMTYPE_TYPE).push(0);      // mmtype = Substitution
+                        raw_au.get(core::GenSub::MMTYPE_SUBSTITUTION).push(
+                            char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[current] + j]]);
                     }
-                    raw_au.push(core::GenSub::MMPOS_TERMINATOR, 1);
+                    raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(1);
                 }
             } else {
-                raw_au.push(core::GenSub::RTYPE, 5);                                 // rtype
-                raw_au.push(core::GenSub::RLEN, data.read_length_arr[current] - 1);  // rlen
+                raw_au.get(core::GenSub::RTYPE).push(5);                                 // rtype
+                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] - 1);  // rlen
                 for (uint64_t j = 0; j < data.read_length_arr[current]; j++) {
-                    raw_au.push(core::GenSub::UREADS,
-                                char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
+                    raw_au.get(core::GenSub::UREADS).push(
+                        char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
                 }
-                raw_au.push(core::GenSub::POS_MAPPING_FIRST, seq_end - prevpos);     // pos
-                raw_au.push(core::GenSub::RCOMP, 0);                                 // rcomp
-                raw_au.push(core::GenSub::RLEN, data.read_length_arr[current] - 1);  // rlen
-                raw_au.push(core::GenSub::RTYPE, 1);                                 // rtype = P
+                raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(seq_end - prevpos);                  // pos
+                raw_au.get(core::GenSub::RCOMP).push(0);                                  // rcomp
+                raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] - 1);  // rlen
+                raw_au.get(core::GenSub::RTYPE).push(1);                                 // rtype = P
                 prevpos = seq_end;
                 seq_end = prevpos + data.read_length_arr[current];
             }
 
             // pair subsequences
             bool same_block = (bdata.block_num[current] == bdata.block_num[pair]);
-            /*      if (same_block)
-                      pest->count_split_same_AU[cur_thread_num]++;
-                  else
-                      pest->count_split_diff_AU[cur_thread_num]++; */
+            if (same_block)
+                pest->count_split_same_AU[cur_thread_num]++;
+            else
+                pest->count_split_diff_AU[cur_thread_num]++;
 
             bool read_1_first = (current < pair);
             if (same_block && !read_1_first) {
-                raw_au.push(core::GenSub::PAIR_DECODING_CASE, 1);  // R1_split
-                raw_au.push(core::GenSub::PAIR_R1_SPLIT, bdata.genomic_record_index[pair]);
+                raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(1);  // R1_split
+                raw_au.get(core::GenSub::PAIR_R1_SPLIT).push(bdata.genomic_record_index[pair]);
             } else if (same_block && read_1_first) {
-                raw_au.push(core::GenSub::PAIR_DECODING_CASE, 2);  // R2_split
-                raw_au.push(core::GenSub::PAIR_R2_SPLIT, bdata.genomic_record_index[pair]);
+                raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(2);  // R2_split
+                raw_au.get(core::GenSub::PAIR_R2_SPLIT).push(bdata.genomic_record_index[pair]);
             } else if (!same_block && !read_1_first) {
-                raw_au.push(core::GenSub::PAIR_DECODING_CASE, 3);  // R1_diff_ref_seq
-                raw_au.push(core::GenSub::PAIR_R1_DIFF_SEQ, bdata.block_num[pair]);
-                raw_au.push(core::GenSub::PAIR_R1_DIFF_POS, bdata.genomic_record_index[pair]);
+                raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(3);  // R1_diff_ref_seq
+                raw_au.get(core::GenSub::PAIR_R1_DIFF_SEQ).push(bdata.block_num[pair]);
+                raw_au.get(core::GenSub::PAIR_R1_DIFF_POS).push(bdata.genomic_record_index[pair]);
             } else {
-                raw_au.push(core::GenSub::PAIR_DECODING_CASE, 4);  // R2_diff_ref_seq
-                raw_au.push(core::GenSub::PAIR_R2_DIFF_SEQ, bdata.block_num[pair]);
-                raw_au.push(core::GenSub::PAIR_R2_DIFF_POS, bdata.genomic_record_index[pair]);
+                raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(4);  // R2_diff_ref_seq
+                raw_au.get(core::GenSub::PAIR_R2_DIFF_SEQ).push(bdata.block_num[pair]);
+                raw_au.get(core::GenSub::PAIR_R2_DIFF_POS).push(bdata.genomic_record_index[pair]);
             }
         }
     }
+}
 
-    raw_au.setNumRecords(raw_au.get(core::GenSub::RCOMP).getNumSymbols() / 2);
+void generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp, core::ReadEncoder::EntropySelector* entropycoder) {
+    // basic approach: start looking at reads from left to right. If current is
+    // aligned but pair is unaligned, pair is kept at the end current AU and
+    // stored in different record. We try to keep number of records in AU =
+    // num_reads_per_block (without counting the the unaligned pairs above. As we
+    // scan to right, if we come across a read whose pair has already been seen in
+    // the same AU and the gap is < 32768 (and non-ovelapping since delta >= 0),
+    // then we add this to the paired read's genomic record. Finally when we come
+    // to unaligned reads whose pair is also unaligned, we store them in same
+    // genomic record.
 
-    return raw_au;
+    se_data data;
+    loadPE_Data(cp, temp_dir, &data);
+
+    pe_block_data bdata;
+    generateBlocksPE(data, &bdata);
+    data.order_arr.clear();
+
+    generate_qual_id_pe(temp_dir, bdata, cp.num_reads);
+
+    pe_statistics pest;
+    pest.count_same_rec = std::vector<uint32_t>(cp.num_thr, 0);
+    pest.count_split_same_AU = std::vector<uint32_t>(cp.num_thr, 0);
+    pest.count_split_diff_AU = std::vector<uint32_t>(cp.num_thr, 0);
+
+    std::vector<uint32_t> num_reads_per_block(bdata.block_start.size());
+    std::vector<uint32_t> num_records_per_block(bdata.block_start.size());
+
+    // PE step 4: Now generate read streams and compress blocks in parallel
+// this is actually number of read pairs per block for PE
+#ifdef GENIE_USE_OPENMP
+#pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic)
+#endif
+    for (uint64_t cur_block_num = 0; cur_block_num < bdata.block_start.size(); cur_block_num++) {
+        core::AccessUnit au(core::parameter::ParameterSet(), 0);
+
+        generate_streams_pe(data, bdata, cur_block_num, &pest, au);
+        num_reads_per_block[cur_block_num] = au.get(core::GenSub::RCOMP).getNumSymbols();  // rcomp
+        num_records_per_block[cur_block_num] =
+            bdata.block_end[cur_block_num] - bdata.block_start[cur_block_num];  // used later for ids
+        au = core::ReadEncoder::entropyCodeAU(entropycoder, std::move(au));
+
+        std::string file_to_save_streams = temp_dir + "/read_streams." + std::to_string(cur_block_num);
+        for(const auto&d : au) {
+            if(d.isEmpty()) {
+                continue;
+            }
+            std::ofstream out(file_to_save_streams + "." + std::to_string(uint8_t(d.getID())));
+            util::BitWriter bw(&out);
+            d.write(bw);
+        }
+    }  // end omp parallel
+
+    std::cout << "count_same_rec: " << std::accumulate(pest.count_same_rec.begin(), pest.count_same_rec.end(), 0)
+              << "\n";
+    std::cout << "count_split_same_AU: "
+              << std::accumulate(pest.count_split_same_AU.begin(), pest.count_split_same_AU.end(), 0) << "\n";
+    std::cout << "count_split_diff_AU: "
+              << std::accumulate(pest.count_split_diff_AU.begin(), pest.count_split_diff_AU.end(), 0) << "\n";
+
+    // write num blocks, reads per block and records per block to a file
+    const std::string block_info_file = temp_dir + "/block_info.bin";
+    std::ofstream f_block_info(block_info_file, std::ios::binary);
+    uint32_t num_blocks = bdata.block_start.size();
+    f_block_info.write((char *)&num_blocks, sizeof(uint32_t));
+    f_block_info.write((char *)&num_reads_per_block[0], num_blocks * sizeof(uint32_t));
+    f_block_info.write((char *)&num_records_per_block[0], num_blocks * sizeof(uint32_t));
 }
 
 }  // namespace spring
