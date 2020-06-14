@@ -6,8 +6,8 @@
 
 #include <stdexcept>
 #include <string>
-#include "null-encoder.h"
 #include "reorder.h"
+#include "spring-encoding.h"
 #include "util.h"
 
 namespace genie {

@@ -46,7 +46,7 @@ class ThreadManager {
      * @param thread_num How many threads ro start
      * @param src Where to enter the pipeline
      */
-    ThreadManager(size_t thread_num);
+    ThreadManager(size_t thread_num, size_t counter = 0);
 
     void setSource(std::vector<OriginalSource*> src) { source = src; }
 

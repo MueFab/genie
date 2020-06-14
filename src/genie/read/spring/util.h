@@ -64,32 +64,13 @@ struct compression_params {
     uint32_t num_blocks;
 };
 
-uint32_t read_fastq_block(std::ifstream &fin, std::string *id_array, std::string *read_array,
-                          std::string *quality_array, const uint32_t &num_reads);
-
-void write_fastq_block(std::ofstream &fout, std::string *id_array, std::string *read_array, std::string *quality_array,
-                       const uint32_t &num_reads, const bool preserve_quality);
-
-void write_vector_to_file(const std::vector<int64_t> &subseq, const std::string &file_name);
-
 std::vector<int64_t> read_vector_from_file(const std::string &file_name);
-
-void quantize_quality(std::string *quality_array, const uint32_t &num_lines, char *quantization_table);
-
-void generate_illumina_binning_table(char *illumina_binning_table);
-
-void generate_binary_binning_table(char *binary_binning_table, const unsigned int thr, const unsigned int high,
-                                   const unsigned int low);
 
 void reverse_complement(char *s, char *s1, const int readlen);
 
 std::string reverse_complement(const std::string &s, const int readlen);
 
-std::string read_file_as_string(const std::string &file_seq);
-
-void generate_order_array(const std::string &file_order, uint32_t *order_array, const uint32_t &numreads);
-
-bool is_permutation(uint32_t *order_array, const uint32_t &numreads);
+std::string random_string(size_t length);
 
 }  // namespace spring
 }  // namespace read

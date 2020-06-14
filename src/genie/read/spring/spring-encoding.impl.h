@@ -4,95 +4,25 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SPRING_ENCODER_H_
-#define SPRING_ENCODER_H_
-
-#ifdef GENIE_USE_OPENMP
-
-#include <omp.h>
-
-#endif
-
-#include <algorithm>
-#include <bitset>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <list>
-#include <string>
-
-#include "bitset-util.h"
-#include "params.h"
-#include "util.h"
+#ifndef GENIE_SPRING_ENCODING_IMPL_H
+#define GENIE_SPRING_ENCODING_IMPL_H
 
 namespace genie {
 namespace read {
 namespace spring {
 
 template <size_t bitset_size>
-struct encoder_global_b {
-    std::bitset<bitset_size> **basemask;
-    int max_readlen;
-    // bitset for A,G,C,T,N at each position
-    // used in stringtobitset, and bitsettostring
-    std::bitset<bitset_size> mask63;  // bitset with 63 bits set to 1 (used in
-    // bitsettostring for conversion to ullong)
-    encoder_global_b(int max_readlen_param) {
-        max_readlen = max_readlen_param;
-        basemask = new std::bitset<bitset_size> *[max_readlen_param];
-        for (int i = 0; i < max_readlen_param; i++) basemask[i] = new std::bitset<bitset_size>[128];
-    }
+encoder_global_b<bitset_size>::encoder_global_b(int max_readlen_param) {
+    max_readlen = max_readlen_param;
+    basemask = new std::bitset<bitset_size> *[max_readlen_param];
+    for (int i = 0; i < max_readlen_param; i++) basemask[i] = new std::bitset<bitset_size>[128];
+}
 
-    ~encoder_global_b() {
-        for (int i = 0; i < max_readlen; i++) delete[] basemask[i];
-        delete[] basemask;
-    }
-};
-
-struct encoder_global {
-    uint32_t numreads, numreads_s, numreads_N;
-    int numdict_s = NUM_DICT_ENCODER;
-
-    int max_readlen, num_thr;
-
-    std::string basedir;
-    std::string infile;
-    std::string infile_flag;
-    std::string infile_pos;
-    std::string infile_seq;
-    std::string infile_RC;
-    std::string infile_readlength;
-    std::string infile_N;
-    std::string outfile_unaligned;
-    std::string outfile_seq;
-    std::string outfile_pos;
-    std::string outfile_noise;
-    std::string outfile_noisepos;
-    std::string infile_order;
-    std::string infile_order_N;
-
-    char enc_noise[128][128];
-};
-
-struct contig_reads {
-    std::string read;
-    int64_t pos;
-    char RC;
-    uint32_t order;
-    uint16_t read_length;
-};
-
-std::string buildcontig(std::list<contig_reads> &current_contig, const uint32_t &list_size);
-
-void writecontig(const std::string &ref, std::list<contig_reads> &current_contig, std::ofstream &f_seq,
-                 std::ofstream &f_pos, std::ofstream &f_noise, std::ofstream &f_noisepos, std::ofstream &f_order,
-                 std::ofstream &f_RC, std::ofstream &f_readlength, uint64_t &abs_pos);
-
-void getDataParams(encoder_global &eg, const compression_params &cp);
-
-void correct_order(uint32_t *order_s, const encoder_global &eg);
+template <size_t bitset_size>
+encoder_global_b<bitset_size>::~encoder_global_b() {
+    for (int i = 0; i < max_readlen; i++) delete[] basemask[i];
+    delete[] basemask;
+}
 
 template <size_t bitset_size>
 std::string bitsettostring(std::bitset<bitset_size> b, const uint16_t readlen,
@@ -188,8 +118,8 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                 in_readlength.read((char *)&rl, sizeof(uint16_t));
             }
             if (c == '0' || done || list_size > 10000000)  // limit on list size so
-                                                           // that memory doesn't get
-                                                           // too large
+                // that memory doesn't get
+                // too large
             {
                 if (list_size != 0) {
                     // sort contig according to pos
@@ -221,13 +151,13 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                     startposidx = dict[l].bphf->lookup(ull);
                                     if (startposidx >= dict[l].numkeys)  // not found
                                         continue;
-                                        // check if any other thread is modifying same dictpos
+                                    // check if any other thread is modifying same dictpos
 #ifdef GENIE_USE_OPENMP
                                     if (!dict_lock[startposidx].test()) continue;
 #else
-                                        // if we are single-threaded we do not need to continue
-                                        // because nobody else could possibly try to modify the same
-                                        // dictpos
+                                    // if we are single-threaded we do not need to continue
+                                    // because nobody else could possibly try to modify the same
+                                    // dictpos
 #endif
                                     dict[l].findpos(dictidx, startposidx);
                                     if (dict[l].empty_bin[startposidx])  // bin is empty
@@ -249,11 +179,11 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                             if (!rev)
                                                 hamming = ((forward_bitset ^ read[rid]) &
                                                            mask[0][eg.max_readlen - read_lengths_s[rid]])
-                                                              .count();
+                                                    .count();
                                             else
                                                 hamming = ((reverse_bitset ^ read[rid]) &
                                                            mask[0][eg.max_readlen - read_lengths_s[rid]])
-                                                              .count();
+                                                    .count();
                                             if (hamming <= thresh_s) {
 #ifdef GENIE_USE_OPENMP
                                                 read_lock[rid].set();
@@ -274,7 +204,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                                 long pos = rev ? (j + eg.max_readlen - read_lengths_s[rid]) : j;
                                                 std::string read_string =
                                                     rev ? reverse_complement(bitsettostring<bitset_size>(
-                                                                                 read[rid], read_lengths_s[rid], egb),
+                                                        read[rid], read_lengths_s[rid], egb),
                                                                              read_lengths_s[rid])
                                                         : bitsettostring<bitset_size>(read[rid], read_lengths_s[rid],
                                                                                       egb);
@@ -607,4 +537,4 @@ void encoder_main(const std::string &temp_dir, const compression_params &cp) {
 }  // namespace read
 }  // namespace genie
 
-#endif  // SPRING_ENCODER_H_
+#endif  // GENIE_SPRING_ENCODING_IMPL_H
