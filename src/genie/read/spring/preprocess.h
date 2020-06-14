@@ -9,11 +9,11 @@
 
 #include <filesystem@e980ed0/filesystem.hpp>
 #include <string>
-#include "spring.h"
 #include "util.h"
 
 #include <genie/core/record/chunk.h>
 #include <genie/util/ordered-lock.h>
+#include <genie/util/ordered-section.h>
 #include <genie/util/drain.h>
 
 namespace genie {
@@ -42,31 +42,13 @@ struct Preprocessor {
 
     bool init = false;
 
-    void setup(const std::string& working_dir) {
-        cp.preserve_id = true;
-        cp.preserve_quality = true;
-        // generate random temp directory in the working directory
-
-        while (true) {
-            std::string random_str = "tmp." + spring::random_string(10);
-            temp_dir = working_dir + "/" + random_str + '/';
-            if (!ghc::filesystem::exists(temp_dir)) break;
-        }
-        UTILS_DIE_IF(!ghc::filesystem::create_directory(temp_dir), "Cannot create temporary directory.");
-        std::cout << "Temporary directory: " << temp_dir << "\n";
-
-        outfileclean[0] = temp_dir + "/input_clean_1.dna";
-        outfileclean[1] = temp_dir + "/input_clean_2.dna";
-        outfileN[0] = temp_dir + "/input_N.dna";
-        outfileN[1] = temp_dir + "/input_N.dna.2";
-        outfileorderN[0] = temp_dir + "/read_order_N.bin";
-        outfileorderN[1] = temp_dir + "/read_order_N.bin.2";
-        outfileid = temp_dir + "/id_1";
-        outfilequality[0] = temp_dir + "/quality_1";
-        outfilequality[1] = temp_dir + "/quality_2";
-    }
+    void setup(const std::string& working_dir);
 
     void preprocess(core::record::Chunk&& t, const util::Section& id);
+
+    void skip(const util::Section& id) {
+        util::OrderedSection sec(&lock, id);
+    }
 
     void finish(size_t pos);
 };

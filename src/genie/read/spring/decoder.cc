@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "decompress.h"
+#include "decoder.h"
 #include <algorithm>
 #include <array>
 #include <fstream>

@@ -19,7 +19,7 @@
 #include <genie/quality/qvwriteout/encoder.h>
 #include <genie/read/lowlatency/decoder.h>
 #include <genie/read/lowlatency/encoder.h>
-#include <genie/read/spring/spring-encoder.h>
+#include <genie/read/spring/encoder.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

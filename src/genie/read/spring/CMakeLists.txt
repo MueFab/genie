@@ -3,17 +3,12 @@ project("genie-spring")
 set(source_files
         bitset-util.cc
         call-template-functions.cc
-        combine-aus.cc
-        compress-ureads.cc
-        decompress.cc
-        encoder.cc
-        generate-new-fastq.cc
+        decoder.cc
+        spring-encoding.cc
         generate-read-streams.cc
         preprocess.cc
         reorder-compress-quality-id.cc
-        return-structures.cc
-        spring.cc
-        spring-encoder.cc
+        encoder.cc
         util.cc
         )
 

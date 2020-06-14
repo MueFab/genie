@@ -37,7 +37,7 @@ void ThreadManager::action(size_t id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ThreadManager::ThreadManager(size_t thread_num) : counter(0), threads(thread_num), stopFlag(false), abortFlag(false) {}
+ThreadManager::ThreadManager(size_t thread_num,  size_t ctr) : counter(ctr), threads(thread_num), stopFlag(false), abortFlag(false) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ uint32_t ThreadManager::run() {
         t.join();
     }
     if (!abortFlag) {
-        source.front()->flushIn(ctr);
+        source.front()->flushIn(counter);
     }
     return counter;
 }
