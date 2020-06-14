@@ -22,7 +22,6 @@
 #include <vector>
 
 #include "generate-read-streams.h"
-#include "spring-gabac.h"
 #include "util.h"
 
 namespace genie {

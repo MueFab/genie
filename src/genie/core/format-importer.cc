@@ -25,7 +25,7 @@ bool FormatImporter::pump(size_t& id, std::mutex& lock) {
         bool flushing = classifier->isFlushing();
         chunk = classifier->getChunk();
         if (!chunk.getData().empty()) {
-            sec = {id, chunk.getData().size(), false};
+            sec = {id, chunk.getData().size(), true};
             id += chunk.getData().size();
         } else {
             bool dataLeft = pumpRetrieve(classifier);
@@ -46,7 +46,7 @@ bool FormatImporter::pump(size_t& id, std::mutex& lock) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FormatImporter::flushIn() {}
+void FormatImporter::flushIn(size_t& pos) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

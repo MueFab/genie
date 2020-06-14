@@ -10,6 +10,8 @@
 
 #include <genie/core/parameter/parameter_set.h>
 #include <genie/core/record/record.h>
+#include <genie/util/drain.h>
+#include <genie/util/ordered-section.h>
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
@@ -26,9 +28,10 @@ namespace genie {
 namespace read {
 namespace spring {
 
-void Preprocessor::preprocess(core::record::Chunk &&t, size_t) {
+void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section& id) {
     core::record::Chunk data = std::move(t);
 
+    util::OrderedSection lsec(&lock, id);
     if (!init) {
         init = true;
         cp.paired_end = data.getData().front().getSegments().size() == 2;
@@ -86,7 +89,9 @@ void Preprocessor::preprocess(core::record::Chunk &&t, size_t) {
     UTILS_DIE_IF(cp.num_reads == 0, "No reads found.");
 }
 
-void Preprocessor::finish() {
+void Preprocessor::finish(size_t id) {
+    util::Section sec{id, 0, true};
+    util::OrderedSection lsec(&lock, sec);
     for (int j = 0; j < 2; j++) {
         if (j == 1 && !cp.paired_end) continue;
         fout_clean[j].close();

@@ -37,7 +37,7 @@ class Source {
     /**
      * @brief Propagates end-of-data signal to drain set before
      */
-    void flushOut() { drain->flushIn(); }
+    void flushOut(size_t& pos) { drain->flushIn(pos); }
 
     void skipOut(const Section& id) { drain->skipIn(id); }
 

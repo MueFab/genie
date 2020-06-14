@@ -9,7 +9,6 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
-#include "spring-gabac.h"
 #include "util.h"
 
 namespace genie {

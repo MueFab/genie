@@ -32,7 +32,7 @@ class OriginalSource {
     /**
      * @brief Signal end of data.
      */
-    virtual void flushIn() = 0;
+    virtual void flushIn(size_t& pos) = 0;
 
     /**
      * @brief For inheritance

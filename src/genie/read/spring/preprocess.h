@@ -13,6 +13,8 @@
 #include "util.h"
 
 #include <genie/core/record/chunk.h>
+#include <genie/util/ordered-lock.h>
+#include <genie/util/drain.h>
 
 namespace genie {
 namespace read {
@@ -36,11 +38,13 @@ struct Preprocessor {
 
     std::string temp_dir;
 
+    util::OrderedLock lock;
+
     bool init = false;
 
-    void setup(bool preserveID, bool preserveQV, const std::string& working_dir) {
-        cp.preserve_id = preserveID;
-        cp.preserve_quality = preserveQV;
+    void setup(const std::string& working_dir) {
+        cp.preserve_id = true;
+        cp.preserve_quality = true;
         // generate random temp directory in the working directory
 
         while (true) {
@@ -62,9 +66,9 @@ struct Preprocessor {
         outfilequality[1] = temp_dir + "/quality_2";
     }
 
-    void preprocess(core::record::Chunk&& t, size_t id);
+    void preprocess(core::record::Chunk&& t, const util::Section& id);
 
-    void finish();
+    void finish(size_t pos);
 };
 
 }  // namespace spring

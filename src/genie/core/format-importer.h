@@ -54,7 +54,7 @@ class FormatImporter : public util::OriginalSource, public util::Source<record::
     /**
      *
      */
-    void flushIn() override;
+    void flushIn(size_t& pos) override;
 
     /**
      *
