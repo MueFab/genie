@@ -59,7 +59,7 @@ class ReadEncoder : public Module<record::Chunk, AccessUnit> {
         entropycoder = coder;
     }
 
-    AccessUnit entropyCodeAU(AccessUnit&& a) {
+    static AccessUnit entropyCodeAU(EntropySelector* entropycoder, AccessUnit&& a) {
         AccessUnit au = std::move(a);
         for(auto &d : au) {
             auto encoded = entropycoder->process(d);
@@ -67,6 +67,10 @@ class ReadEncoder : public Module<record::Chunk, AccessUnit> {
             au.set(d.getID(), std::move(encoded.second));
         }
         return au;
+    }
+
+    AccessUnit entropyCodeAU(AccessUnit&& a) {
+        return entropyCodeAU(entropycoder, std::move(a));
     }
 
     /**

@@ -23,8 +23,6 @@ void SpringEncoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
 
 class SpringSource : public util::OriginalSource, public util::Source<core::AccessUnit> {
    private:
-    se_data data;
-    pe_block_data bdata;
     compression_params cp;
     std::string temp_dir;
     uint32_t num_AUs;
@@ -38,64 +36,10 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
                  core::ReadEncoder::NameSelector* _ncoder,
                  const compression_params& _cp, std::string _temp_dir)
         : cp(_cp), temp_dir(std::move(_temp_dir)), coder(_coder), ncoder(_ncoder) {
-        if (cp.paired_end) {
-            loadPE_Data(cp, temp_dir, true, &data);
-            generateBlocksPE(data, &bdata);
-            data.order_arr.clear();
-        } else {
-            loadSE_Data(cp, temp_dir, &data);
-        }
-
-        num_AUs = std::ceil(float(cp.num_reads) / cp.num_reads_per_block);
     }
 
     bool pump(size_t& id, std::mutex&) override {
-        core::AccessUnit au(core::parameter::ParameterSet(), 0);
-        if (cp.paired_end) {
-            au = generate_read_streams_pe(data, bdata, id);
-        } else {
-            au = generate_read_streams_se(data, id);
-        }
 
-        core::record::Chunk chunk;
-        if (coder || ncoder) {
-            std::ifstream qvfile(temp_dir + "/quality_streams." + std::to_string(id));
-            std::ifstream namefile(temp_dir + "/id_streams." + std::to_string(id));
-            for (size_t i = 0; i < au.getNumRecords(); ++i) {
-                std::string name;
-                if (ncoder) {
-                    UTILS_DIE_IF(!std::getline(namefile, name), "Name file too short");
-                }
-                chunk.getData().emplace_back((uint8_t)cp.paired_end + 1, core::record::ClassType::CLASS_U,
-                                             std::move(name), "", 0);
-                if (coder) {
-                    for (size_t j = 0; j < (uint8_t)cp.paired_end + 1u; ++j) {
-                        std::string qv;
-                        UTILS_DIE_IF(!std::getline(qvfile, qv), "Qv file too short");
-                        core::record::Segment s(std::string(qv.length(), 'N'));
-                        s.addQualities(std::move(qv));
-                        chunk.getData().back().addSegment(std::move(s));
-                    }
-                }
-            }
-        }
-
-        if (ncoder) {
-            au.get(core::GenDesc::RNAME) = this->ncoder->process(chunk);
-        }
-
-        if (coder) {
-            auto qv_coded = this->coder->process(chunk);
-            au.get(core::GenDesc::QV) = qv_coded.second;
-            au.getParameters().addClass(genie::core::record::ClassType::CLASS_U, std::move(qv_coded.first));
-        } else {
-            au.getParameters().addClass(genie::core::record::ClassType::CLASS_U,
-                                        util::make_unique<genie::quality::paramqv1::QualityValues1>(
-                                            genie::quality::paramqv1::QualityValues1::QvpsPresetId::ASCII, false));
-        }
-
-        flowOut(std::move(au), util::Section{id, 0, false});
-        return id != num_AUs - 1;
     }
 
     void flushIn(size_t& pos) override { flushOut(pos); }
@@ -120,6 +64,14 @@ void SpringEncoder::flushIn(size_t& pos) {
     std::cout << "Time for this step: "
               << std::chrono::duration_cast<std::chrono::seconds>(encoder_end - encoder_start).count() << " s\n";
 
+    std::cout << "Generating read streams ...\n";
+    auto grs_start = std::chrono::steady_clock::now();
+    generate_read_streams(preprocessor.temp_dir, preprocessor.cp, entropycoder);
+    auto grs_end = std::chrono::steady_clock::now();
+    std::cout << "Generating read streams done!\n";
+    std::cout << "Time for this step: "
+              << std::chrono::duration_cast<std::chrono::seconds>(grs_end - grs_start).count() << " s\n";
+
     if (preprocessor.cp.preserve_quality || preprocessor.cp.preserve_id) {
         std::cout << "Reordering and compressing quality and/or ids ...\n";
         auto rcqi_start = std::chrono::steady_clock::now();
@@ -127,15 +79,17 @@ void SpringEncoder::flushIn(size_t& pos) {
         auto rcqi_end = std::chrono::steady_clock::now();
         std::cout << "Reordering and compressing quality and/or ids done!\n";
         std::cout << "Time for this step: "
-                  << std::chrono::duration_cast<std::chrono::seconds>(rcqi_end - rcqi_start).count() << " s\n";
+                  <<
+                  std::chrono::duration_cast<std::chrono::seconds>(rcqi_end -
+                                                                   rcqi_start).count() << " s\n";
     }
 
-    SpringSource src(this->qvcoder, this->namecoder, this->preprocessor.cp, this->preprocessor.temp_dir);
+   /* SpringSource src(this->qvcoder, this->namecoder, this->preprocessor.cp, this->preprocessor.temp_dir);
     src.setDrain(this->drain);
     std::vector<util::OriginalSource*> srcVec = {&src};
     util::ThreadManager mgr(preprocessor.cp.num_thr);
     mgr.setSource(srcVec);
-    mgr.run();
+    mgr.run();*/
 }
 }  // namespace spring
 }  // namespace read
