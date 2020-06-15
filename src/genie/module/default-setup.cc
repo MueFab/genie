@@ -20,6 +20,7 @@
 #include <genie/read/lowlatency/decoder.h>
 #include <genie/read/lowlatency/encoder.h>
 #include <genie/read/spring/encoder.h>
+#include <genie/read/spring/decoder.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -35,7 +36,7 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
 
     ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Encoder>());
     ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Encoder>(2048, false));
-    ret->addReadCoder(genie::util::make_unique<genie::read::spring::SpringEncoder>(working_dir));
+    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads));
     ret->setReadCoderSelector([](const genie::core::record::Chunk& chunk) -> size_t {
         if (chunk.getData().front().getClassID() == genie::core::record::ClassType::CLASS_U) {
             return 2;
@@ -60,17 +61,18 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const std::string&, size_t) {
+std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const std::string& working_dir, size_t) {
     std::unique_ptr<core::FlowGraphDecode> ret = genie::util::make_unique<core::FlowGraphDecode>(threads);
 
     ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Decoder>());
     ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Decoder>());
     ret->addReadCoder(genie::util::make_unique<genie::read::lowlatency::Decoder>());
+    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, true, threads));
     ret->setReadCoderSelector([](const genie::core::AccessUnit& au) -> size_t {
         if (au.getParameters().isComputedReference()) {
             switch (au.getParameters().getComputedRef().getAlgorithm()) {
                 case core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY:
-                    UTILS_DIE("Global assembly decoding not supported");
+                    return 3;
                     break;
                 case core::parameter::ComputedRef::Algorithm::REF_TRANSFORM:
                     UTILS_DIE("Ref Transform decoding not supported");

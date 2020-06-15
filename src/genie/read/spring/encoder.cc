@@ -17,7 +17,7 @@ namespace genie {
 namespace read {
 namespace spring {
 
-void SpringEncoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
+void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     preprocessor.preprocess(std::move(t), id);
     skipOut(id);
 }
@@ -29,6 +29,7 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
     std::string id_desc_prefix;
     std::string quality_desc_prefix;
     std::vector<uint32_t> num_records_per_AU;
+    std::vector<uint32_t> num_reads_per_AU;
     uint32_t auId;
     std::vector<core::parameter::ParameterSet>& params;
 
@@ -39,7 +40,7 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
         const std::string block_info_file = temp_dir + "/block_info.bin";
         std::ifstream f_block_info(block_info_file, std::ios::binary);
         f_block_info.read((char*)&num_AUs, sizeof(uint32_t));
-        std::vector<uint32_t> num_reads_per_AU(num_AUs);
+        num_reads_per_AU = std::vector<uint32_t>(num_AUs);
         num_records_per_AU = std::vector<uint32_t>(num_AUs);
         f_block_info.read((char*)&num_reads_per_AU[0], num_AUs * sizeof(uint32_t));
         if (!cp.paired_end)  // num reads same as num records per AU
@@ -65,8 +66,7 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
             if (auId >= num_AUs) {
                 return false;
             }
-
-            au = core::AccessUnit(std::move(params[auId]), num_records_per_AU[auId]);
+            au = core::AccessUnit(std::move(params[auId]), num_reads_per_AU[auId]);
             au.setClassType(core::record::ClassType::CLASS_U);
 
             for (auto& d : au) {
@@ -80,7 +80,7 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
                 } else {
                     filename = read_desc_prefix + std::to_string(auId) + "." + std::to_string(uint8_t(d.getID()));
                 }
-                if (!ghc::filesystem::exists(filename)) {
+                if (!ghc::filesystem::exists(filename) || !ghc::filesystem::file_size(filename)) {
                     continue;
                 }
                 std::ifstream input(filename);
@@ -90,7 +90,7 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
                 ghc::filesystem::remove(filename);
             }
             auId++;
-            sec = {id, au.getNumRecords(), true};
+            sec = {id, au.getNumReads(), true};
             id += sec.length;
         }
         flowOut(std::move(au), sec);
@@ -100,7 +100,7 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
     void flushIn(size_t& pos) override { flushOut(pos); }
 };
 
-void SpringEncoder::flushIn(size_t& pos) {
+void Encoder::flushIn(size_t& pos) {
     preprocessor.finish(pos);
 
     std::vector<core::parameter::ParameterSet> params;

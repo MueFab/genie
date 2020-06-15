@@ -49,7 +49,7 @@ bool Importer::pump(size_t& id, std::mutex&) {
         set.setMinPos(0);
         set.setMaxPos(0);
     }
-    set.setRecordNum(unit->getReadCount());
+    set.setNumReads(unit->getReadCount());
     set.setClassType(unit->getClass());
     unit.reset();
     set.getStats().addDouble("time-mgb-import", watch.check());

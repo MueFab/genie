@@ -56,12 +56,16 @@ class ReadDecoder : public Module<AccessUnit, record::Chunk> {
         entropycoder = coder;
     }
 
-    AccessUnit entropyCodeAU(AccessUnit&& a) {
+    static AccessUnit entropyCodeAU(EntropySelector* select, AccessUnit&& a) {
         AccessUnit au = std::move(a);
         for(auto &d : au) {
-            d = entropycoder->process(au.getParameters().getDescriptor(d.getID()), d);
+            d = select->process(au.getParameters().getDescriptor(d.getID()), d);
         }
         return au;
+    }
+
+    AccessUnit entropyCodeAU(AccessUnit&& a) {
+        return entropyCodeAU(entropycoder, std::move(a));
     }
 
     /**

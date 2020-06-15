@@ -158,7 +158,7 @@ uint64_t AccessUnit::pull(GenSubIndex sub) { return get(sub).pull(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::AccessUnit(parameter::ParameterSet &&set, size_t _numRecords)
-    : descriptors(), parameters(std::move(set)), numRecords(_numRecords), minPos(0), maxPos(0), referenceSequence(0) {
+    : descriptors(), parameters(std::move(set)), numReads(_numRecords), minPos(0), maxPos(0), referenceSequence(0) {
     const size_t WORDSIZE = 4;
     for (const auto &desc : getDescriptors()) {
         Descriptor desc_data(desc.id);
@@ -187,7 +187,7 @@ parameter::ParameterSet &&AccessUnit::moveParameters() { return std::move(parame
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t AccessUnit::getNumRecords() const { return numRecords; }
+size_t AccessUnit::getNumReads() const { return numReads; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -195,7 +195,7 @@ void AccessUnit::clear() { *this = AccessUnit(parameter::ParameterSet(), 0); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::addRecord() { numRecords++; }
+void AccessUnit::addRecord() { numReads++; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -223,7 +223,7 @@ uint64_t AccessUnit::getMinPos() const { return minPos; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setNumRecords(size_t recs) { numRecords = recs; }
+void AccessUnit::setNumReads(size_t recs) { numReads = recs; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

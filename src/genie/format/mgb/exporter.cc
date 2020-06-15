@@ -28,7 +28,7 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
     data.getParameters().setParentID(id_ctr);
     data.getParameters().write(writer);
 
-    mgb::AccessUnit au(id_ctr, id_ctr, data.getClassType(), data.getRecordNum() * data.getParameters().getNumberTemplateSegments(),
+    mgb::AccessUnit au(id_ctr, id_ctr, data.getClassType(), data.getNumReads(),
                        data.getClassType() == core::record::ClassType::CLASS_U ? core::parameter::DataUnit::DatasetType::NON_ALIGNED : core::parameter::DataUnit::DatasetType::ALIGNED, 32, 32, 0);
     if(au.getClass() != core::record::ClassType::CLASS_U) {
         au.setAuTypeCfg(

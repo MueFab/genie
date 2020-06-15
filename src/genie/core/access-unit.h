@@ -386,13 +386,13 @@ class AccessUnit {
      * @brief
      * @return
      */
-    size_t getNumRecords() const;
+    size_t getNumReads() const;
 
     /**
      *
      * @param recs
      */
-    void setNumRecords(size_t recs);
+    void setNumReads(size_t recs);
 
     /**
      *
@@ -480,16 +480,12 @@ class AccessUnit {
 
     void setStats(stats::PerfStats&& _stats) { stats = std::move(_stats); }
 
-    size_t getRecordNum() const { return numRecords; }
-
-    void setRecordNum(size_t rec) { numRecords = rec; }
-
    private:
     std::vector<Descriptor> descriptors;  //!< @brief
     parameter::ParameterSet parameters;   //!< @brief
     stats::PerfStats stats;
 
-    size_t numRecords;  //!< @brief
+    size_t numReads;  //!< @brief
 
     record::ClassType type{};  //!<
     uint64_t minPos;           //!<

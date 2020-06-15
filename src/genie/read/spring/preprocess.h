@@ -42,7 +42,7 @@ struct Preprocessor {
 
     bool init = false;
 
-    void setup(const std::string& working_dir);
+    void setup(const std::string& working_dir, size_t num_thr);
 
     void preprocess(core::record::Chunk&& t, const util::Section& id);
 
