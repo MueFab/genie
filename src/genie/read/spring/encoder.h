@@ -15,13 +15,13 @@ namespace genie {
 namespace read {
 namespace spring {
 
-class SpringEncoder : public genie::core::ReadEncoder {
+class Encoder : public genie::core::ReadEncoder {
    private:
     Preprocessor preprocessor;
 
    public:
-    explicit SpringEncoder(const std::string& working_dir) {
-        preprocessor.setup(working_dir);
+    explicit Encoder(const std::string& working_dir, size_t num_thr) {
+        preprocessor.setup(working_dir, num_thr);
     }
     void flowIn(genie::core::record::Chunk&& t, const util::Section& id) override;
 

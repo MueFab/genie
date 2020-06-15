@@ -30,7 +30,7 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     data.getStats().addDouble("time-name", watch.check());
     watch.reset();
     std::vector<std::string> ecigars;
-    for (size_t i = 0; i < data.getNumRecords() / data.getParameters().getNumberTemplateSegments(); ++i) {
+    for (size_t i = 0; i < data.getNumReads() / data.getParameters().getNumberTemplateSegments(); ++i) {
         core::record::Record rec(data.getParameters().getNumberTemplateSegments(), core::record::ClassType::CLASS_U,
                                  std::move(names[i]), "", 0);
 

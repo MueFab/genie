@@ -49,7 +49,7 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     util::Watch watch;
     auto t_data = std::move(t);
     t_data = entropyCodeAU(std::move(t_data));
-    size_t numRecords = t_data.getNumRecords();
+    size_t numRecords = t_data.getNumReads();
     size_t bufSize = t_data.getParameters().getComputedRef().getExtension().getBufMaxSize();
     size_t segments = t_data.getParameters().getNumberTemplateSegments();
     uint16_t ref = t_data.getReference();

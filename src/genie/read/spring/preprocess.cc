@@ -27,9 +27,10 @@ namespace genie {
 namespace read {
 namespace spring {
 
-void Preprocessor::setup(const std::string& working_dir) {
+void Preprocessor::setup(const std::string& working_dir, size_t num_thr) {
     cp.preserve_id = true;
     cp.preserve_quality = true;
+    cp.num_thr = num_thr;
     // generate random temp directory in the working directory
 
     while (true) {
@@ -65,7 +66,6 @@ void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section& id) 
         cp.num_reads_clean[1] = 0;
         cp.max_readlen = 0;
         cp.num_reads_per_block = NUM_READS_PER_BLOCK;
-        cp.num_thr = 1;
         cp.num_blocks = 0;
         for (int j = 0; j < 2; j++) {
             if (j == 1 && !cp.paired_end) continue;

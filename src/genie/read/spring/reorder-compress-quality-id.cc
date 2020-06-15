@@ -230,14 +230,11 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
 
         for (uint64_t block_num = start_block_num; block_num < end_block_num; block_num++) {
             genie::core::record::Chunk chunk;
-            for (size_t i = block_start[block_num]; i < block_end[block_num]; i += 2) {
+            for (size_t i = block_start[block_num]; i < block_end[block_num]; i++) {
                 chunk.getData().emplace_back(2, core::record::ClassType::CLASS_U, "", "", 0);
                 core::record::Segment s(std::string(quality_array[i - block_start[start_block_num]].size(), 'N'));
-                core::record::Segment s2(std::string(quality_array[i + 1 - block_start[start_block_num]].size(), 'N'));
                 s.addQualities(std::move(quality_array[i - block_start[start_block_num]]));
-                s2.addQualities(std::move(quality_array[i + 1 - block_start[start_block_num]]));
                 chunk.getData().back().addSegment(std::move(s));
-                chunk.getData().back().addSegment(std::move(s2));
             }
 
             std::string name = outfile_quality + "." + std::to_string(block_num);
