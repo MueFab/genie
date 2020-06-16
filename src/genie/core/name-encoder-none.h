@@ -25,7 +25,7 @@ class NameEncoderNone : public NameEncoder {
      *
      * @return
      */
-    AccessUnit::Descriptor process(const record::Chunk&) override;
+    std::tuple<AccessUnit::Descriptor, core::stats::PerfStats> process(const record::Chunk&) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

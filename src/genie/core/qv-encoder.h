@@ -26,7 +26,7 @@ namespace core {
  */
 class QVEncoder {
    public:
-    using QVCoded = std::pair<std::unique_ptr<parameter::QualityValues>, AccessUnit::Descriptor>;  //!<
+    using QVCoded = std::tuple<std::unique_ptr<parameter::QualityValues>, AccessUnit::Descriptor, core::stats::PerfStats>;  //!<
 
     /**
      *

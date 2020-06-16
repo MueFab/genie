@@ -33,19 +33,13 @@ class FlowGraphDecode : public FlowGraph {
     genie::util::Selector<genie::core::AccessUnit, genie::core::record::Chunk> readSelector;  //!<
 
     std::vector<std::unique_ptr<genie::core::QVDecoder>> qvCoders;  //!<
-    genie::util::SideSelector<genie::core::QVDecoder, std::vector<std::string>,
-                              const genie::core::parameter::QualityValues&, const std::vector<std::string>&,
-                              genie::core::AccessUnit::Descriptor&>
-        qvSelector;  //!<
+    genie::core::ReadDecoder::QvSelector qvSelector;  //!<
 
     std::vector<std::unique_ptr<genie::core::NameDecoder>> nameCoders;  //!<
-    genie::util::SideSelector<genie::core::NameDecoder, std::vector<std::string>,
-                              genie::core::AccessUnit::Descriptor&>
-        nameSelector;  //!<
+    core::ReadDecoder::NameSelector nameSelector;                       //!<
 
     std::vector<std::unique_ptr<genie::core::EntropyDecoder>> entropyCoders;  //!<
-    genie::util::SideSelector<genie::core::EntropyDecoder, genie::core::AccessUnit::Descriptor, const parameter::DescriptorSubseqCfg&, genie::core::AccessUnit::Descriptor&>
-        entropySelector;  //!<
+    genie::core::ReadDecoder::EntropySelector entropySelector;                //!<
 
     std::vector<std::unique_ptr<genie::core::FormatExporter>> exporters;     //!<
     genie::util::SelectorHead<genie::core::record::Chunk> exporterSelector;  //!<
@@ -134,7 +128,8 @@ class FlowGraphDecode : public FlowGraph {
      *
      * @param fun
      */
-    void setEntropyCoderSelector(const std::function<size_t(const parameter::DescriptorSubseqCfg&, genie::core::AccessUnit::Descriptor&)>& fun);
+    void setEntropyCoderSelector(
+        const std::function<size_t(const parameter::DescriptorSubseqCfg&, genie::core::AccessUnit::Descriptor&)>& fun);
 
     /**
      *

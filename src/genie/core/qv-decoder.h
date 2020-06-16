@@ -27,7 +27,7 @@ class QVDecoder {
      * @param desc
      * @return
      */
-    virtual std::vector<std::string> process(const parameter::QualityValues& param,
+    virtual std::tuple<std::vector<std::string>, core::stats::PerfStats> process(const parameter::QualityValues& param,
                                              const std::vector<std::string>& ecigar,
                                              AccessUnit::Descriptor& desc) = 0;
     /**

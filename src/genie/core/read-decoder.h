@@ -29,10 +29,10 @@ namespace core {
  */
 class ReadDecoder : public Module<AccessUnit, record::Chunk> {
    public:
-    using QvSelector = util::SideSelector<QVDecoder, std::vector<std::string>, const parameter::QualityValues&,
+    using QvSelector = util::SideSelector<QVDecoder, std::tuple<std::vector<std::string>, core::stats::PerfStats>, const parameter::QualityValues&,
                                           const std::vector<std::string>&, AccessUnit::Descriptor&>;          //!<
-    using NameSelector = util::SideSelector<NameDecoder, std::vector<std::string>, AccessUnit::Descriptor&>;  //!<
-    using EntropySelector = util::SideSelector<EntropyDecoder, AccessUnit::Descriptor, const parameter::DescriptorSubseqCfg&, AccessUnit::Descriptor&>;  //!<
+    using NameSelector = util::SideSelector<NameDecoder, std::tuple<std::vector<std::string>, core::stats::PerfStats>, AccessUnit::Descriptor&>;  //!<
+    using EntropySelector = util::SideSelector<EntropyDecoder, std::tuple<AccessUnit::Descriptor, core::stats::PerfStats>, const parameter::DescriptorSubseqCfg&, AccessUnit::Descriptor&>;  //!<
 
    protected:
     QvSelector* qvcoder{};      //!<
@@ -59,7 +59,9 @@ class ReadDecoder : public Module<AccessUnit, record::Chunk> {
     static AccessUnit entropyCodeAU(EntropySelector* select, AccessUnit&& a) {
         AccessUnit au = std::move(a);
         for(auto &d : au) {
-            d = select->process(au.getParameters().getDescriptor(d.getID()), d);
+            auto enc = select->process(au.getParameters().getDescriptor(d.getID()), d);
+            d = std::get<0>(enc);
+            au.getStats().add(std::get<1>(enc));
         }
         return au;
     }

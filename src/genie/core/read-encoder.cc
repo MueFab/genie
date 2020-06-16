@@ -20,7 +20,7 @@ void ReadEncoder::setQVCoder(util::SideSelector<QVEncoder, QVEncoder::QVCoded, c
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReadEncoder::setNameCoder(
-    util::SideSelector<NameEncoder, AccessUnit::Descriptor, const record::Chunk&>* coder) {
+    NameSelector* coder) {
     namecoder = coder;
 }
 

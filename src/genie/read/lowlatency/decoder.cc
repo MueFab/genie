@@ -32,7 +32,7 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     std::vector<std::string> ecigars;
     for (size_t i = 0; i < data.getNumReads() / data.getParameters().getNumberTemplateSegments(); ++i) {
         core::record::Record rec(data.getParameters().getNumberTemplateSegments(), core::record::ClassType::CLASS_U,
-                                 std::move(names[i]), "", 0);
+                                 std::move(std::get<0>(names)[i]), "", 0);
 
         if (data.getParameters().getNumberTemplateSegments() > 1) {
             UTILS_DIE_IF(data.pull(core::GenSub::PAIR_DECODING_CASE) != core::GenConst::PAIR_SAME_RECORD,
@@ -66,8 +66,8 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     size_t qvCounter = 0;
     for (auto& r : ret.getData()) {
         for (auto& s : r.getSegments()) {
-            if (!qvs[qvCounter].empty()) {
-                s.addQualities(std::move(qvs[qvCounter]));
+            if (!std::get<0>(qvs)[qvCounter].empty()) {
+                s.addQualities(std::move(std::get<0>(qvs)[qvCounter]));
             }
             qvCounter++;
         }

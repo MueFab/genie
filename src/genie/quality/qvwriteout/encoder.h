@@ -26,12 +26,11 @@ class Encoder : public core::QVEncoder {
 
 class NoneEncoder : public core::QVEncoder {
    public:
-    using QVCoded = std::pair<std::unique_ptr<core::parameter::QualityValues>, core::AccessUnit::Descriptor>;
     QVCoded process(const core::record::Chunk&) override {
         auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
         core::AccessUnit::Descriptor desc(core::GenDesc::QV);
 
-        return std::make_pair(std::move(param), std::move(desc));
+        return {std::move(param), std::move(desc), core::stats::PerfStats()};
     }
 };
 

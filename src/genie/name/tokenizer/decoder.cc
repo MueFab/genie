@@ -5,6 +5,7 @@
  */
 
 #include "decoder.h"
+#include <genie/util/watch.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -60,15 +61,16 @@ uint32_t pull32bigEndian(core::AccessUnit::Subsequence& seq) {
     return ret;
 }
 
-std::vector<std::string> Decoder::process(core::AccessUnit::Descriptor& desc) {
-    std::vector<std::string> ret;
+std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(core::AccessUnit::Descriptor& desc) {
+    std::tuple<std::vector<std::string>, core::stats::PerfStats> ret;
     std::vector<SingleToken> oldRec;
+    util::Watch watch;
     while (!desc.getTokenType(0, TYPE_SEQ).end()) {
         size_t cur_pos = 0;
 
         std::vector<SingleToken> rec;
 
-        if (ret.empty()) {
+        if (std::get<0>(ret).empty()) {
             UTILS_DIE_IF(Tokens(desc.getTokenType(0, TYPE_SEQ).get()) != Tokens::DIFF,
                          "First token in AU must be DIFF");
             UTILS_DIE_IF(desc.getTokenType(0, (uint8_t)Tokens::DIFF).get() != 0, "First DIFF in AU must be 0");
@@ -100,8 +102,9 @@ std::vector<std::string> Decoder::process(core::AccessUnit::Descriptor& desc) {
         rec = patch(oldRec, rec);
         oldRec = rec;
 
-        ret.emplace_back(inflate(rec));
+        std::get<0>(ret).emplace_back(inflate(rec));
     }
+    std::get<1>(ret).addDouble("time-nametokenize", watch.check());
     return ret;
 }
 

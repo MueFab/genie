@@ -25,14 +25,6 @@ namespace genie {
 namespace read {
 namespace spring {
 
-void generate_read_streams(const std::string &temp_dir, const compression_params &cp,
-                           core::ReadEncoder::EntropySelector *entropycoder,
-                           std::vector<core::parameter::ParameterSet> &params) {
-    if (!cp.paired_end)
-        generate_read_streams_se(temp_dir, cp, entropycoder, params);
-    else
-        generate_read_streams_pe(temp_dir, cp, entropycoder, params);
-}
 
 struct se_data {
     compression_params cp{};
@@ -48,102 +40,6 @@ struct se_data {
     std::vector<char> RC_arr;
     std::vector<uint32_t> order_arr;
 };
-
-void generate_subseqs(const se_data &data, uint64_t block_num, subseq_data *subseqData) {
-    subseqData->block_num = block_num;
-    for (auto arr : subseq_indices) subseqData->subseq_vector[arr[0]][arr[1]] = std::vector<int64_t>();
-
-    // char_to_int
-    int64_t char_to_int[128];
-    char_to_int[(uint8_t)'A'] = 0;
-    char_to_int[(uint8_t)'C'] = 1;
-    char_to_int[(uint8_t)'G'] = 2;
-    char_to_int[(uint8_t)'T'] = 3;
-    char_to_int[(uint8_t)'N'] = 4;
-
-    int64_t rc_to_int[128];
-    rc_to_int[(uint8_t)'d'] = 0;
-    rc_to_int[(uint8_t)'r'] = 1;
-
-    // clear vectors
-    for (auto arr : subseq_indices) subseqData->subseq_vector[arr[0]][arr[1]].clear();
-
-    uint64_t start_read_num = block_num * data.cp.num_reads_per_block;
-    uint64_t end_read_num = (block_num + 1) * data.cp.num_reads_per_block;
-
-    if (end_read_num >= data.cp.num_reads) {
-        end_read_num = data.cp.num_reads;
-    }
-
-    // first find the seq
-    uint64_t seq_start, seq_end;
-    if (data.flag_arr[start_read_num] == false)
-        seq_start = seq_end = 0;  // all reads unaligned
-    else {
-        seq_end = seq_start = data.pos_arr[start_read_num];
-        // find last read in AU that's aligned
-        uint64_t i = start_read_num;
-        for (; i < end_read_num; i++) {
-            if (data.flag_arr[i] == false) break;
-            seq_end = std::max(seq_end, data.pos_arr[i] + data.read_length_arr[i]);
-        }
-    }
-    if (seq_start != seq_end) {
-        // not all unaligned
-        subseqData->subseq_vector[7][0].push_back(seq_end - seq_start - 1);  // rlen
-        subseqData->subseq_vector[12][0].push_back(5);                       // rtype
-        for (uint64_t i = seq_start; i < seq_end; i++)
-            subseqData->subseq_vector[6][0].push_back(char_to_int[(uint8_t)data.seq[i]]);  // ureads
-    }
-    uint64_t prevpos = 0, diffpos;
-    // Write streams
-    for (uint64_t i = start_read_num; i < end_read_num; i++) {
-        if (data.flag_arr[i] == true) {
-            subseqData->subseq_vector[7][0].push_back(data.read_length_arr[i] - 1);         // rlen
-            subseqData->subseq_vector[1][0].push_back(rc_to_int[(uint8_t)data.RC_arr[i]]);  // rcomp
-            if (i == start_read_num) {
-                // Note: In order non-preserving mode, if the first read of
-                // the block is a singleton, then the rest are too.
-                subseqData->subseq_vector[0][0].push_back(0);  // pos
-                prevpos = data.pos_arr[i];
-            } else {
-                diffpos = data.pos_arr[i] - prevpos;
-                subseqData->subseq_vector[0][0].push_back(diffpos);  // pos
-                prevpos = data.pos_arr[i];
-            }
-            if (data.noise_len_arr[i] == 0)
-                subseqData->subseq_vector[12][0].push_back(1);  // rtype = P
-            else {
-                subseqData->subseq_vector[12][0].push_back(3);  // rtype = M
-                for (uint16_t j = 0; j < data.noise_len_arr[i]; j++) {
-                    subseqData->subseq_vector[3][0].push_back(0);  // mmpos
-                    if (j == 0)
-                        subseqData->subseq_vector[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[i] + j]);
-                    else
-                        subseqData->subseq_vector[3][1].push_back(data.noisepos_arr[data.pos_in_noise_arr[i] + j] -
-                                                                  1);  // decoder adds +1
-                    subseqData->subseq_vector[4][0].push_back(0);      // mmtype = Substitution
-                    subseqData->subseq_vector[4][1].push_back(
-                        char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[i] + j]]);
-                }
-                subseqData->subseq_vector[3][0].push_back(1);
-            }
-        } else {
-            subseqData->subseq_vector[12][0].push_back(5);                           // rtype
-            subseqData->subseq_vector[7][0].push_back(data.read_length_arr[i] - 1);  // rlen
-            for (uint64_t j = 0; j < data.read_length_arr[i]; j++) {
-                subseqData->subseq_vector[6][0].push_back(
-                    char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[i] + j]]);  // ureads
-            }
-            subseqData->subseq_vector[0][0].push_back(seq_end - prevpos);            // pos
-            subseqData->subseq_vector[1][0].push_back(0);                            // rcomp
-            subseqData->subseq_vector[7][0].push_back(data.read_length_arr[i] - 1);  // rlen
-            subseqData->subseq_vector[12][0].push_back(1);                           // rtype = P
-            prevpos = seq_end;
-            seq_end = prevpos + data.read_length_arr[i];
-        }
-    }
-}
 
 void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit &raw_au) {
     // char_to_int
@@ -237,7 +133,7 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
 
 void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
                               core::ReadEncoder::EntropySelector *entropycoder,
-                              std::vector<core::parameter::ParameterSet> &params) {
+                              std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats& stats) {
     // Now generate new streams and compress blocks in parallel
     // this is actually number of read pairs per block for PE
     uint64_t blocks = uint64_t(std::ceil(float(data.cp.num_reads) / data.cp.num_reads_per_block));
@@ -245,6 +141,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
     params.resize(blocks);
 
     std::vector<uint32_t> num_reads_per_block(blocks);
+    std::vector<core::stats::PerfStats> stat_vec(blocks);
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel for num_threads(data.cp.num_thr) schedule(dynamic)
 #endif
@@ -258,6 +155,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
         num_reads_per_block[block_num] = au.get(core::GenSub::RCOMP).getNumSymbols();  // rcomp
 
         au = core::ReadEncoder::entropyCodeAU(entropycoder, std::move(au));
+        stat_vec[block_num].add(au.getStats());
 
         params[block_num] = std::move(au.moveParameters());
 
@@ -271,6 +169,10 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
             d.write(bw);
         }
     }  // end omp parallel for
+
+    for(const auto& s : stat_vec) {
+        stats.add(s);
+    }
 
     // write num blocks, reads per block to a file
     const std::string block_info_file = temp_dir + "/block_info.bin";
@@ -389,11 +291,11 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
 
 void generate_read_streams_se(const std::string &temp_dir, const compression_params &cp,
                               core::ReadEncoder::EntropySelector *entropycoder,
-                              std::vector<core::parameter::ParameterSet> &params) {
+                              std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats& stats) {
     se_data data;
     loadSE_Data(cp, temp_dir, &data);
 
-    generate_and_compress_se(temp_dir, data, entropycoder, params);
+    generate_and_compress_se(temp_dir, data, entropycoder, params, stats);
 }
 
 void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data) {
@@ -858,7 +760,7 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
 }
 
 void generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp,
-                              core::ReadEncoder::EntropySelector *entropycoder, std::vector<core::parameter::ParameterSet> &params) {
+                              core::ReadEncoder::EntropySelector *entropycoder, std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
     // basic approach: start looking at reads from left to right. If current is
     // aligned but pair is unaligned, pair is kept at the end current AU and
     // stored in different record. We try to keep number of records in AU =
@@ -888,6 +790,8 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
 
     params.resize(bdata.block_start.size());
 
+    std::vector<core::stats::PerfStats> stat_vec(bdata.block_start.size());
+
     // PE step 4: Now generate read streams and compress blocks in parallel
 // this is actually number of read pairs per block for PE
 #ifdef GENIE_USE_OPENMP
@@ -905,6 +809,8 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
             bdata.block_end[cur_block_num] - bdata.block_start[cur_block_num];  // used later for ids
         au = core::ReadEncoder::entropyCodeAU(entropycoder, std::move(au));
 
+        stat_vec[cur_block_num].add(au.getStats());
+
         params[cur_block_num] = std::move(au.moveParameters());
 
         std::string file_to_save_streams = temp_dir + "/read_streams." + std::to_string(cur_block_num);
@@ -917,6 +823,10 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
             d.write(bw);
         }
     }  // end omp parallel
+
+    for(const auto & s : stat_vec) {
+        stats.add(s);
+    }
 
     std::cout << "count_same_rec: " << std::accumulate(pest.count_same_rec.begin(), pest.count_same_rec.end(), 0)
               << "\n";
@@ -932,6 +842,15 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
     f_block_info.write((char *)&num_blocks, sizeof(uint32_t));
     f_block_info.write((char *)&num_reads_per_block[0], num_blocks * sizeof(uint32_t));
     f_block_info.write((char *)&num_records_per_block[0], num_blocks * sizeof(uint32_t));
+}
+
+void generate_read_streams(const std::string &temp_dir, const compression_params &cp,
+                           core::ReadEncoder::EntropySelector *entropycoder,
+                           std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats& stats) {
+    if (!cp.paired_end)
+        generate_read_streams_se(temp_dir, cp, entropycoder, params, stats);
+    else
+        generate_read_streams_pe(temp_dir, cp, entropycoder, params, stats);
 }
 
 }  // namespace spring

@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/util/watch.h>
 #include <limits>
 #include <string>
 #include <vector>
@@ -33,16 +34,18 @@ namespace tokenizer {
 
 class Encoder : public core::NameEncoder {
    public:
-    core::AccessUnit::Descriptor process(const core::record::Chunk& recs) override {
-        core::AccessUnit::Descriptor ret(core::GenDesc::RNAME);
+    std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(const core::record::Chunk& recs) override {
+        util::Watch watch;
+        std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> ret = {core::AccessUnit::Descriptor(core::GenDesc::RNAME), core::stats::PerfStats()};
         std::vector<SingleToken> old;
 
         for (const auto& r : recs.getData()) {
             TokenState state(old, r.getName());
             auto newTok = state.run();
-            TokenState::encode(newTok, ret);
+            TokenState::encode(newTok, std::get<0>(ret));
             old = patch(old, newTok);
         }
+        std::get<1>(ret).addDouble("time-nametokenizer", watch.check());
         return ret;
     }
 };
