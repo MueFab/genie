@@ -49,7 +49,6 @@ class Importer : public core::FormatImporter {
 
 
     static void convertPairedEndSplitPair(core::record::Chunk& template_chunk, SamRecords2D& sam_recs_2d, std::map<std::string, size_t>& refs);
-    void _convertPairedEnd(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d, std::map<std::string, size_t>& refs);
 
    public:
     Importer(size_t _blockSize, std::istream &_file);

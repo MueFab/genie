@@ -175,45 +175,55 @@ TEST(SAM, ImporterUnmappedReads) {  // NOLINT(cert-err-cpp)
     }
 
 }
-//
-//TEST(SamReader, PairedEndHeaderInvalid) {  // NOLINT(cert-err-cpp)
-//    // Test sam file with invalid SAM header tag
-//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-//    std::ifstream f(gitRootDir + "/data/sam/sample02.sam");
-//    ASSERT_THROW(genie::format::sam::Reader reader(f);, genie::util::RuntimeException);
-//}
-//
-//TEST(SamReader, PairedEndReferenceNotExists) {  // NOLINT(cert-err-cpp)
-//    // Test sam file with record, which reference does not exist in header
-//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-//    std::ifstream f(gitRootDir + "/data/sam/sample03.sam");
-//    genie::format::sam::Reader reader(f);
-//    ASSERT_THROW(reader.read(10), genie::util::RuntimeException);
-//}
-//
-//TEST(SamReader, PairedEndInvalidFlags) {  // NOLINT(cert-err-cpp)
-//    // Test sam file containing alignments with invalid flags
-//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-//    {
-//        // Paired-end but no MultiSeg flag
-//        std::ifstream f(gitRootDir + "/data/sam/sample04.sam");
-//        genie::format::sam::Reader reader(f);
-//        ASSERT_THROW(reader.read(10), genie::util::RuntimeException);
-//    }
-//    {
-//        // FirstSegment & LastSegment
-//        std::ifstream f(gitRootDir + "/data/sam/sample05.sam");
-//        genie::format::sam::Reader reader(f);
-//        ASSERT_THROW(reader.read(10), genie::util::RuntimeException);
-//    }
-//}
+
+
+TEST(SAM, ImporterPairReadsMultipleAlignments) {  // NOLINT(cert-err-cpp)
+    /* Possible sources for toy example:
+        "K562_cytosol_LID8465_GEM_v3.sam",      // 0
+        "K562_cytosol_LID8465_TopHat_v2.sam",   // 1
+        "simulation.1.homoINDELs.homoCEUsnps.reads2.fq.sam.samelength.sam", // 2
+        "SRR327342.sam" // 3
+    */
+
+    // Test sam file containing alignments with invalid flags
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::ifstream f(gitRootDir + "/data/sam/pair_reads_multi_alignments.sam");
+    UTILS_DIE_IF(!f.good(), "Cannot read file");
+
+    genie::format::sam::Reader reader(f);
+
+    std::list<std::string> lines;
+    std::list<genie::format::sam::ReadTemplate> rts;
+    genie::format::sam::ReadTemplateGroup rtg;
+
+    genie::core::record::Chunk chunk;
+    {
+        while (reader.good()){
+            reader.read(lines);
+        }
+    }
+
+    rtg.addRecords(lines);
+    lines.clear();
+    rtg.getTemplates(rts);
+
+    ASSERT_EQ(rts.size(), 20);
+
+    for (auto & rt: rts){
+        EXPECT_TRUE(rt.isValid() && rt.isPair());
+        genie::format::sam::Importer::convert(chunk, rt, reader.getRefs());
+
+        EXPECT_EQ(chunk.back().getNumberOfTemplateSegments(), 2);
+        EXPECT_EQ(chunk.back().getClassID(), genie::core::record::ClassType::CLASS_I);
+        EXPECT_EQ(chunk.back().getFlags(), 4);
+    }
+
+}
+
 //
 //TEST(SamImporter, PairedEndMultiAlignment) {  // NOLINT(cert-err-cpp)
 //    std::vector<std::string> fnames = {
-//            "K562_cytosol_LID8465_GEM_v3.sam",      // 0
-//            "K562_cytosol_LID8465_TopHat_v2.sam",   // 1
-//            "simulation.1.homoINDELs.homoCEUsnps.reads2.fq.sam.samelength.sam", // 2
-//            "SRR327342.sam" // 3
+
 //    };
 //
 //    std::ifstream f("/phys/ssd/tmp/truncated_sam/" + fnames[0]);
