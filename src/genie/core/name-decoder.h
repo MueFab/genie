@@ -26,7 +26,7 @@ class NameDecoder {
      * @param desc
      * @return
      */
-    virtual std::vector<std::string> process(AccessUnit::Descriptor& desc) = 0;
+    virtual std::tuple<std::vector<std::string>, core::stats::PerfStats> process(AccessUnit::Descriptor& desc) = 0;
 
     /**
      * @Brief For polymorphic destruction

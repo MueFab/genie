@@ -46,17 +46,16 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
 
     data.getStats().addDouble("time-lowlatency", watch.check());
     watch.reset();
-    core::QVEncoder::QVCoded qv(nullptr, core::AccessUnit::Descriptor(core::GenDesc::QV));
-    qv = qvcoder->process(data);
+    auto qv = qvcoder->process(data);
     data.getStats().addDouble("time-qv", watch.check());
     watch.reset();
     core::AccessUnit::Descriptor rname(core::GenDesc::RNAME);
-    rname = namecoder->process(data);
+    rname = std::get<0>(namecoder->process(data));
     data.getStats().addDouble("time-name", watch.check());
     watch.reset();
-    auto rawAU = pack(id, data.getData().front().getSegments().front().getQualities().size(), std::move(qv.first), state);
+    auto rawAU = pack(id, data.getData().front().getSegments().front().getQualities().size(), std::move(std::get<0>(qv)), state);
 
-    rawAU.get(core::GenDesc::QV) = std::move(qv.second);
+    rawAU.get(core::GenDesc::QV) = std::move(std::get<1>(qv));
     rawAU.get(core::GenDesc::RNAME) = std::move(rname);
 
     data.getStats().addDouble("time-lowlatency", watch.check());

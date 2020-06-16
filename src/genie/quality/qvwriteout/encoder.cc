@@ -1,5 +1,6 @@
 #include "encoder.h"
 #include <core/record/alignment_split/same-rec.h>
+#include <util/watch.h>
 
 namespace genie {
 namespace quality {
@@ -52,6 +53,7 @@ void Encoder::encodeUnalignedSegment(const core::record::Segment& s, core::Acces
 }
 
 core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
+    util::Watch watch;
     auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
     core::AccessUnit::Descriptor desc(core::GenDesc::QV);
 
@@ -80,7 +82,9 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
         }
     }
 
-    return std::make_pair(std::move(param), std::move(desc));
+    core::stats::PerfStats stats;
+    stats.addDouble("time-qv1writeout", watch.check());
+    return {std::move(param), std::move(desc), stats};
 }
 }  // namespace qvwriteout
 }  // namespace quality

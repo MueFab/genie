@@ -34,7 +34,7 @@ class GabacDecompressor : public core::EntropyDecoder {
 
    public:
 
-    core::AccessUnit::Descriptor process(const parameter::DescriptorSubseqCfg& param,
+    std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(const parameter::DescriptorSubseqCfg& param,
                                          core::AccessUnit::Descriptor& d) override;
 };
 

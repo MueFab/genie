@@ -30,7 +30,7 @@ namespace core {
 class ReadEncoder : public Module<record::Chunk, AccessUnit> {
    public:
     using QvSelector = util::SideSelector<QVEncoder, QVEncoder::QVCoded, const record::Chunk&>;             //!<
-    using NameSelector = util::SideSelector<NameEncoder, AccessUnit::Descriptor, const record::Chunk&>;  //!<
+    using NameSelector = util::SideSelector<NameEncoder, std::tuple<AccessUnit::Descriptor, core::stats::PerfStats>, const record::Chunk&>;  //!<
     using EntropySelector = util::SideSelector<EntropyEncoder, EntropyEncoder::EntropyCoded, AccessUnit::Descriptor&>;  //!<
 
    protected:
@@ -63,8 +63,9 @@ class ReadEncoder : public Module<record::Chunk, AccessUnit> {
         AccessUnit au = std::move(a);
         for(auto &d : au) {
             auto encoded = entropycoder->process(d);
-            au.getParameters().setDescriptor(d.getID(), std::move(encoded.first));
-            au.set(d.getID(), std::move(encoded.second));
+            au.getParameters().setDescriptor(d.getID(), std::move(std::get<0>(encoded)));
+            au.set(d.getID(), std::move(std::get<1>(encoded)));
+            au.getStats().add(std::get<2>(encoded));
         }
         return au;
     }

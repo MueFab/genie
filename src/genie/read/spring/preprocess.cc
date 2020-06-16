@@ -56,6 +56,7 @@ void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section& id) 
     core::record::Chunk data = std::move(t);
 
     util::OrderedSection lsec(&lock, id);
+    stats.add(data.getStats());
     if (!init) {
         init = true;
         cp.paired_end = data.getData().front().getSegments().size() == 2;

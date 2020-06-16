@@ -97,18 +97,20 @@ core::AccessUnit::Subsequence GabacDecompressor::decompress(const gabac::Encodin
     return core::AccessUnit::Subsequence(std::move(tmp), in.getID());
 }
 
-core::AccessUnit::Descriptor GabacDecompressor::process(const parameter::DescriptorSubseqCfg& param,
+std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> GabacDecompressor::process(const parameter::DescriptorSubseqCfg& param,
                                                         core::AccessUnit::Descriptor& d) {
-    core::AccessUnit::Descriptor desc = std::move(d);
+    util::Watch watch;
+    std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> desc;
+    std::get<0>(desc) = std::move(d);
     const auto& param_desc = dynamic_cast<const core::parameter::desc_pres::DescriptorPresent&>(param.get());
-    if (getDescriptor(desc.getID()).tokentype) {
+    if (getDescriptor(std::get<0>(desc).getID()).tokentype) {
         const auto& token_param = dynamic_cast<const paramcabac::DecoderTokenType&>(param_desc.getDecoder());
         auto conf0 = token_param.getSubsequenceCfg(0);
         auto conf1 = token_param.getSubsequenceCfg(1);
-        desc = decompressTokens(gabac::EncodingConfiguration(std::move(conf0)),
-                                gabac::EncodingConfiguration(std::move(conf1)), std::move(*desc.begin()));
+        std::get<0>(desc) = decompressTokens(gabac::EncodingConfiguration(std::move(conf0)),
+                                gabac::EncodingConfiguration(std::move(conf1)), std::move(*std::get<0>(desc).begin()));
     } else {
-        for (auto& subseq : desc) {
+        for (auto& subseq : std::get<0>(desc)) {
             if (subseq.isEmpty()) {
                 continue;
             }
@@ -117,9 +119,10 @@ core::AccessUnit::Descriptor GabacDecompressor::process(const parameter::Descrip
             const auto& token_param = dynamic_cast<const paramcabac::DecoderRegular&>(param_desc.getDecoder());
             auto conf0 = token_param.getSubsequenceCfg(d_id.second);
 
-            desc.set(d_id.second, decompress(gabac::EncodingConfiguration(std::move(conf0)), std::move(subseq)));
+            std::get<0>(desc).set(d_id.second, decompress(gabac::EncodingConfiguration(std::move(conf0)), std::move(subseq)));
         }
     }
+    std::get<1>(desc).addDouble("time-gabac", watch.check());
     return desc;
 }
 

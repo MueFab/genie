@@ -75,8 +75,8 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
             refs.emplace_back(refEncoder.getReference(m.position, m.length));
         }
         auto rec = decoder.pull(ref, std::move(refs));
-        if (!names.empty()) {
-            rec.setName(names[recID]);
+        if (!std::get<0>(names).empty()) {
+            rec.setName(std::get<0>(names)[recID]);
         }
         addECigar(rec, ecigars);
         refEncoder.addRead(rec);
@@ -88,8 +88,8 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     size_t qvCounter = 0;
     for (auto& r : chunk.getData()) {
         for (auto& s : r.getSegments()) {
-            if (!qvs[qvCounter].empty()) {
-                s.addQualities(std::move(qvs[qvCounter]));
+            if (!std::get<0>(qvs)[qvCounter].empty()) {
+                s.addQualities(std::move(std::get<0>(qvs)[qvCounter]));
             }
             qvCounter++;
         }

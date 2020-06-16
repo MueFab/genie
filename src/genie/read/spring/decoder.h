@@ -63,7 +63,7 @@ class Decoder : public genie::core::ReadDecoder {
         std::string file_quality = "quality_1";
         std::string file_id = "id_1";
 
-        cp.paired_end = true;
+        cp.paired_end = false;
         cp.ureads_flag = false;
         // temporary files for combine pairs case
         std::string file_unmatched_fastq1 = basedir + "/unmatched_1.fastq";
@@ -88,8 +88,10 @@ class Decoder : public genie::core::ReadDecoder {
         while (!au.get(core::GenSub::RTYPE).end()) {
             if(au.get(core::GenSub::RTYPE).pull() != 5) {
                 ecigars.emplace_back(std::to_string(au.get(core::GenSub::RLEN).pull() + 1) + "+");
-                if(au.get(core::GenSub::PAIR_DECODING_CASE).pull() == 0) {
-                    ecigars.emplace_back(std::to_string(au.get(core::GenSub::RLEN).pull() + 1) + "+");
+                if(cp.paired_end) {
+                    if (au.get(core::GenSub::PAIR_DECODING_CASE).pull() == 0) {
+                        ecigars.emplace_back(std::to_string(au.get(core::GenSub::RLEN).pull() + 1) + "+");
+                    }
                 }
             } else {
                 au.get(core::GenSub::RLEN).pull();
@@ -100,13 +102,15 @@ class Decoder : public genie::core::ReadDecoder {
         au.get(core::GenSub::RLEN).setPosition(0);
 
         watch.pause();
-        std::vector<std::string> names = namecoder->process(au.get(core::GenDesc::RNAME));
-        std::vector<std::string> qvs = qvcoder->process(
+        auto names = namecoder->process(au.get(core::GenDesc::RNAME));
+        au.getStats().add(std::get<1>(names));
+        auto qvs = qvcoder->process(
             au.getParameters().getQVConfig(core::record::ClassType::CLASS_U), ecigars, au.get(core::GenDesc::QV));
+        au.getStats().add(std::get<1>(qvs));
         watch.resume();
 
         decode_streams(au, cp.paired_end, combine_pairs, matched_records, unmatched_records, mate_au_id,
-                       mate_record_index, names, qvs);
+                       mate_record_index, std::get<0>(names), std::get<0>(qvs));
 
         for (size_t i = 0; i < matched_records[0].size(); ++i) {
             chunk.getData().emplace_back(cp.paired_end ? 2 : 1, core::record::ClassType::CLASS_U,

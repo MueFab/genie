@@ -31,7 +31,7 @@ class NameEncoder {
      * @param rec
      * @return
      */
-    virtual AccessUnit::Descriptor process(const record::Chunk& rec) = 0;
+    virtual std::tuple<AccessUnit::Descriptor, core::stats::PerfStats> process(const record::Chunk& rec) = 0;
 
     /**
      * @Brief For polymorphic destruction

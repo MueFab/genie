@@ -13,8 +13,8 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Descriptor NameEncoderNone::process(const record::Chunk&) {
-    return AccessUnit::Descriptor(GenDesc::RNAME);
+std::tuple<AccessUnit::Descriptor, core::stats::PerfStats> NameEncoderNone::process(const record::Chunk&) {
+    return {AccessUnit::Descriptor(GenDesc::RNAME), core::stats::PerfStats()};
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

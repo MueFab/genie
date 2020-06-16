@@ -40,6 +40,12 @@ struct Preprocessor {
 
     util::OrderedLock lock;
 
+    core::stats::PerfStats stats;
+
+    core::stats::PerfStats& gteStats() {
+        return stats;
+    }
+
     bool init = false;
 
     void setup(const std::string& working_dir, size_t num_thr);
@@ -51,6 +57,8 @@ struct Preprocessor {
     }
 
     void finish(size_t pos);
+
+
 };
 
 }  // namespace spring
