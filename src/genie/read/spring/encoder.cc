@@ -105,6 +105,10 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
 };
 
 void Encoder::flushIn(size_t& pos) {
+    if(!preprocessor.used) {
+        flushOut(pos);
+        return;
+    }
     preprocessor.finish(pos);
 
 
@@ -149,6 +153,12 @@ void Encoder::flushIn(size_t& pos) {
     util::ThreadManager mgr(preprocessor.cp.num_thr, pos);
     mgr.setSource(srcVec);
     mgr.run();
+
+    ghc::filesystem::remove(preprocessor.temp_dir + "/blocks_id.bin");
+    ghc::filesystem::remove(preprocessor.temp_dir + "/read_order.bin");
+    ghc::filesystem::remove(preprocessor.temp_dir);
+
+    preprocessor.setup(preprocessor.working_dir, preprocessor.cp.num_thr, preprocessor.cp.paired_end);
 
     flushOut(pos);
 }

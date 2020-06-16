@@ -38,10 +38,15 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
 
     ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Encoder>());
     ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Encoder>(2048, false));
-    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads));
+    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, false));
+    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, true));
     ret->setReadCoderSelector([](const genie::core::record::Chunk& chunk) -> size_t {
         if (chunk.getData().front().getClassID() == genie::core::record::ClassType::CLASS_U) {
-            return 2;
+            if(chunk.getData().front().getNumberOfTemplateSegments() > 1) {
+                return 3;
+            } else {
+                return 2;
+            }
         } else {
             return 1;
         }
@@ -69,12 +74,17 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
     ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Decoder>());
     ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Decoder>());
     ret->addReadCoder(genie::util::make_unique<genie::read::lowlatency::Decoder>());
-    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, true, threads));
+    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, true, false, threads));
+    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, true, true, threads));
     ret->setReadCoderSelector([](const genie::core::AccessUnit& au) -> size_t {
         if (au.getParameters().isComputedReference()) {
             switch (au.getParameters().getComputedRef().getAlgorithm()) {
                 case core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY:
-                    return 3;
+                    if(au.getParameters().getNumberTemplateSegments() >= 2) {
+                        return 4;
+                    } else {
+                        return 3;
+                    }
                     break;
                 case core::parameter::ComputedRef::Algorithm::REF_TRANSFORM:
                     UTILS_DIE("Ref Transform decoding not supported");

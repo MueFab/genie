@@ -37,6 +37,7 @@ struct Preprocessor {
     std::ofstream fout_quality[2];
 
     std::string temp_dir;
+    std::string working_dir;
 
     util::OrderedLock lock;
 
@@ -46,9 +47,33 @@ struct Preprocessor {
         return stats;
     }
 
-    bool init = false;
+    bool used = false;
 
-    void setup(const std::string& working_dir, size_t num_thr);
+    void setup(const std::string& working_dir, size_t num_thr, bool paired_end);
+
+    ~Preprocessor(){
+        if(!used) {
+            for (int j = 0; j < 2; j++) {
+                if (j == 1 && !cp.paired_end) continue;
+                fout_clean[j].close();
+                fout_N[j].close();
+                fout_order_N[j].close();
+                if (cp.preserve_quality) fout_quality[j].close();
+            }
+            if (cp.preserve_id) fout_id.close();
+
+            for (int j = 0; j < 2; j++) {
+                if (j == 1 && !cp.paired_end) continue;
+                ghc::filesystem::remove(outfileclean[j]);
+                ghc::filesystem::remove(outfileN[j]);
+                ghc::filesystem::remove(outfileorderN[j]);
+                if (cp.preserve_quality) ghc::filesystem::remove(outfilequality[j]);
+            }
+            if (cp.preserve_id) ghc::filesystem::remove(outfileid);
+
+            ghc::filesystem::remove(temp_dir);
+        }
+    }
 
     void preprocess(core::record::Chunk&& t, const util::Section& id);
 

@@ -20,8 +20,8 @@ class Encoder : public genie::core::ReadEncoder {
     Preprocessor preprocessor;
 
    public:
-    explicit Encoder(const std::string& working_dir, size_t num_thr) {
-        preprocessor.setup(working_dir, num_thr);
+    explicit Encoder(const std::string& working_dir, size_t num_thr, bool paired_end) {
+        preprocessor.setup(working_dir, num_thr, paired_end);
     }
     void flowIn(genie::core::record::Chunk&& t, const util::Section& id) override;
 

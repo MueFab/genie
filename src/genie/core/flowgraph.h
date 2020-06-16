@@ -34,6 +34,8 @@ class FlowGraph {
      * @return
      */
     virtual core::stats::PerfStats getStats() = 0;
+
+    virtual ~FlowGraph() = default;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

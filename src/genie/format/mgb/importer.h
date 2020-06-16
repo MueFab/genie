@@ -32,7 +32,6 @@ class Importer : public core::FormatImporterCompressed {
     util::BitReader reader;
     std::map<size_t, core::parameter::ParameterSet> parameterSets;
     std::mutex lock;
-    uint64_t pos_counter = 0;
     genie::core::stats::PerfStats* stats;
     mgb::DataUnitFactory factory;
 
