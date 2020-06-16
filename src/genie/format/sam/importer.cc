@@ -304,24 +304,29 @@ void Importer::addAlignmentToSameRec(std::unique_ptr<core::record::Record>& rec,
 // ---------------------------------------------------------------------------------------------------------------------
 void Importer::convertPairedEndNoSplit(core::record::Chunk &template_chunk, SamRecords2D &sam_recs_2d, std::map<std::string, size_t>& refs) {
 
-    // Chunk has to contain only records from one template
-    template_chunk.clear();
+    auto sam_r1_iter = sam_recs_2d.front().begin();
+    auto sam_r2_iter = sam_recs_2d.back().begin();
 
-    auto sam_r1_ptr = sam_recs_2d.front().begin();
-    auto sam_r2_ptr = sam_recs_2d.back().begin();
+    auto sam_r1_end = sam_recs_2d.front().end();
+    auto sam_r2_end = sam_recs_2d.back().end();
 
-    auto rec = convertSam2SameRec(*sam_r1_ptr, *sam_r2_ptr, refs);
+    // Cache SEQ of read 1 & 2 to replace SEQ of other alignment if the value is '*'
+    // See "Recommended Practice for SAM Format" in SAM Format documentation for more information
+    auto sam_r1_seq = sam_r1_iter != sam_r1_end ? sam_r1_iter->getSeq() : "*";
+    auto sam_r2_seq = sam_r2_iter != sam_r2_end ? sam_r2_iter->getSeq() : "*";
 
-    sam_r1_ptr++;
-    sam_r2_ptr++;
+    auto rec = convertSam2SameRec(*sam_r1_iter, *sam_r2_iter, refs);
 
-    while (sam_r1_ptr != sam_recs_2d.front().end() && sam_r2_ptr != sam_recs_2d.back().end()){
-        UTILS_DIE_IF(sam_r1_ptr->getRname() != sam_r2_ptr->getRname(), "Read1 and Read2 have different RNAME");
-        UTILS_DIE_IF(!sam_r1_ptr->isPairOf(*sam_r2_ptr), "Not read 1 is not pair of read 2");
+    sam_r1_iter++;
+    sam_r2_iter++;
 
-        if (rec->getAlignmentSharedData().getSeqID() != refs.at(sam_r1_ptr->getRname())){
+    while (sam_r1_iter != sam_recs_2d.front().end() && sam_r2_iter != sam_recs_2d.back().end()){
+        UTILS_DIE_IF(sam_r1_iter->getRname() != sam_r2_iter->getRname(), "Read1 and Read2 have different RNAME");
+        UTILS_DIE_IF(!sam_r1_iter->isPairOf(*sam_r2_iter), "Not read 1 is not pair of read 2");
+
+        if (rec->getAlignmentSharedData().getSeqID() != refs.at(sam_r1_iter->getRname())){
             // Add more_alignment_info
-            auto leftmost_read = sam_r1_ptr->getPos() < sam_r1_ptr->getPos() ? sam_r1_ptr : sam_r2_ptr;
+            auto leftmost_read = sam_r1_iter->getPos() < sam_r1_iter->getPos() ? sam_r1_iter : sam_r2_iter;
 //            auto more_alignment_info = util::make_unique<core::record::alignment_external::OtherRec>(
 //                leftmost_read->getPos(), refs.at(leftmost_read->getRname()));
 //            rec->setMoreAlignmentInfo(std::move(more_alignment_info));
@@ -330,21 +335,19 @@ void Importer::convertPairedEndNoSplit(core::record::Chunk &template_chunk, SamR
 
             // Retrieve back Sequence from the primary line due to SEQ and QUAL are set to "*"
             // See "Recommended Practice for SAM Format" in SAM Format documentation for more information
-            if (sam_r1_ptr->getSeq() == "*"){
-                auto r1_seq = template_chunk.front().getSegments().front().getSequence();
-                sam_r1_ptr->setSeq(r1_seq);
+            if (sam_r1_iter->getSeq() == "*"){
+                sam_r1_iter->setSeq(sam_r1_seq);
             }
-            if (sam_r2_ptr->getSeq() == "*"){
-                auto r2_seq = template_chunk.front().getSegments().back().getSequence();
-                sam_r2_ptr->setSeq(r2_seq);
+            if (sam_r2_iter->getSeq() == "*"){
+                sam_r2_iter->setSeq(sam_r2_seq);
             }
 
-            rec = convertSam2SameRec(*sam_r1_ptr, *sam_r2_ptr, refs);
+            rec = convertSam2SameRec(*sam_r1_iter, *sam_r2_iter, refs);
         } else {
-            addAlignmentToSameRec(rec, *sam_r1_ptr, *sam_r2_ptr, refs);
+            addAlignmentToSameRec(rec, *sam_r1_iter, *sam_r2_iter, refs);
         }
-        sam_r1_ptr++;
-        sam_r2_ptr++;
+        sam_r1_iter++;
+        sam_r2_iter++;
     }
 
     UTILS_DIE_IF(rec == nullptr, "Empty MPEG-G record");
@@ -474,73 +477,16 @@ void Importer::convertPairedEndSplitPair(core::record::Chunk &template_chunk, Sa
         sam_r2_iter++;
     }
 
+    if (rec_1 != nullptr){
+        template_chunk.push_back(std::move(*rec_1));
+    }
+
+    if (rec_2 != nullptr){
+        template_chunk.push_back(std::move(*rec_2));
+    }
+
     sam_recs_2d.front().clear();
     sam_recs_2d.back().clear();
-}
-// ---------------------------------------------------------------------------------------------------------------------
-void Importer::_convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d,
-                                 std::map<std::string, size_t> &refs) {
-//
-//    auto sam_r1_iter = sam_recs_2d.front().begin();
-//    auto sam_r2_iter = sam_recs_2d.back().begin();
-//
-//    std::unique_ptr<core::record::Record> mpeg_r1_ptr = nullptr;
-//    std::unique_ptr<core::record::Record> mpeg_r2_ptr = nullptr;
-//
-//    while (sam_r1_iter != sam_recs_2d.front().end() || sam_r2_iter != sam_recs_2d.back().end()){
-//
-//        if (sam_r2_iter == sam_recs_2d.back().end()){
-//            if (sam_r1_iter != nullptr){
-//
-//            }
-//
-//        } else if (sam_r1_iter == sam_recs_2d.front().end() ){
-//
-//        // Start from here, both sam_r1_iter and sam_r2_iter are valid
-//        } else{
-//
-//            // If mpeg_r1_ptr is SameRec and existing MPEG-G record has the same seqID
-//            if (mpeg_r2_ptr != nullptr && mpeg_r2_ptr == nullptr &&
-//                sam_r1_iter->getRname() == sam_r2_iter->getRname() &&
-//                mpeg_r1_ptr->getAlignmentSharedData().getSeqID() == refs.at(sam_r1_iter->getRname())){
-//
-//                addAlignmentToSameRec(mpeg_r1_ptr, static_cast<Record &>(*sam_r1_iter), static_cast<Record &>(*sam_r1_iter), refs);
-//
-//            // Create new MPEG-G record(s) and let the previously created records to point to the new one.
-//            } else{
-//                // Find the leftmost read
-//                auto leftmost_read = sam_r1_iter->getPos() < sam_r1_iter->getPos() ? sam_r1_iter : sam_r2_iter;
-//
-//                // Points more_alignment_info of mpeg_r1_ptr to the leftmost read
-//                if (mpeg_r1_ptr != nullptr){
-//                    auto more_alignment_info = util::make_unique<genie::core::record::alignment_external::OtherRec>(
-//                        leftmost_read->getPos(), refs.at(leftmost_read->getRname()));
-//                    mpeg_r1_ptr->setMoreAlignmentInfo(std::move(more_alignment_info));
-//                    chunk.push_back(std::move(*mpeg_r1_ptr));
-//                }
-//
-//                // Points more_alignment_info of mpeg_r2_ptr to the leftmost read
-//                if (mpeg_r2_ptr != nullptr) {
-//                    auto more_alignment_info = util::make_unique<genie::core::record::alignment_external::OtherRec>(
-//                        leftmost_read->getPos(), refs.at(leftmost_read->getRname()));
-//                    mpeg_r2_ptr->setMoreAlignmentInfo(std::move(more_alignment_info));
-//                    chunk.push_back(std::move(*mpeg_r2_ptr));
-//                }
-//
-//                if (sam_r1_iter->getRname() != sam_r2_iter->getRname()){
-//                    mpeg_r1_ptr = convertSam2SplitRec(
-//                        static_cast<Record &>(*sam_r1_iter), &(*sam_r2_iter), refs);
-//                    mpeg_r2_ptr = convertSam2SplitRec(
-//                        static_cast<Record &>(*sam_r2_iter), &(*sam_r1_iter), refs);
-//                } else if (sam_r1_iter->getRname() == sam_r2_iter->getRname()) {
-//                    mpeg_r1_ptr = convertSam2SameRec(
-//                        static_cast<Record &>(*sam_r1_iter), static_cast<Record &>(*sam_r2_iter), refs);
-//                }
-//            }
-//        }
-//
-//    }
-
 }
 // ---------------------------------------------------------------------------------------------------------------------
 void Importer::convertUnmapped(core::record::Chunk &chunk, SamRecords &sam_recs, std::map<std::string, size_t>& refs) {
