@@ -254,7 +254,7 @@ class Decoder : public genie::core::ReadDecoder {
         flushOut(pos);
     }
 
-    void skipIn(const util::Section& id) override { skipOut(id); }
+    void skipIn(const util::Section& id) override { {util::OrderedSection sec(&lock, id);} skipOut(id); }
 };
 
 }  // namespace spring
