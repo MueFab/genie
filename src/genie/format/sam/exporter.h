@@ -13,6 +13,7 @@
 #include <genie/core/record/alignment_split/same-rec.h>
 #include <genie/core/stats/perf-stats.h>
 #include <genie/util/ordered-lock.h>
+#include <genie/util/ordered-section.h>
 #include "header/header.h"
 #include "writer.h"
 
@@ -66,6 +67,10 @@ class Exporter : public core::FormatExporter {
     std::vector<sam::Record> convert(core::record::Record&& rec);
 
     void flowIn(core::record::Chunk&& records, const util::Section& id) override;
+
+    void skipIn(const util::Section& id) override {
+        util::OrderedSection (&lock, id);
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
