@@ -132,6 +132,10 @@ class AccessUnit {
             data = std::move(dat);
         }
 
+        void setPosition(size_t pos) {
+            position = pos;
+        }
+
     };
 
     /**

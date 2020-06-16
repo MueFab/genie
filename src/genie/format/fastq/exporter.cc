@@ -27,8 +27,8 @@ Exporter::Exporter(std::ostream &_file_1, std::ostream &_file_2) : file{&_file_1
 void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
     core::record::Chunk data = std::move(t);
     getStats().add(data.getStats());
-    util::OrderedSection section(&lock, id);
     util::Watch watch;
+    util::OrderedSection section(&lock, id);
     size_t size_seq = 0;
     size_t size_qual = 0;
     size_t size_name = 0;
@@ -72,13 +72,13 @@ void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
                 file_ptr--;
             }
         }
-
-        getStats().addInteger("size-fastq-seq", size_seq);
-        getStats().addInteger("size-fastq-name", size_name);
-        getStats().addInteger("size-fastq-qual", size_qual);
-        getStats().addInteger("size-fastq-total", size_qual + size_name + size_seq);
-        getStats().addDouble("time-fastq-export", watch.check());
     }
+
+    getStats().addInteger("size-fastq-seq", size_seq);
+    getStats().addInteger("size-fastq-name", size_name);
+    getStats().addInteger("size-fastq-qual", size_qual);
+    getStats().addInteger("size-fastq-total", size_qual + size_name + size_seq);
+    getStats().addDouble("time-fastq-export", watch.check());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

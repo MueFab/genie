@@ -6,6 +6,7 @@
 
 #include "thread-manager.h"
 #include <iostream>
+#include "exceptions.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,6 +30,9 @@ void ThreadManager::action(size_t id) {
             while (!stopFlag && s->pump(counter, lock)) {
             }
         }
+    } catch (genie::util::Exception& e) {
+        std::cerr << e.msg() << std::endl;
+        throw(e);
     } catch (std::exception& e) {
         std::cerr << e.what() << std::endl;
         throw(e);
