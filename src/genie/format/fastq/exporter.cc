@@ -34,6 +34,9 @@ void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
     size_t size_name = 0;
     for (const auto &i : data.getData()) {
         auto file_ptr = file.data();
+        if(!i.isRead1First()) {
+            file_ptr = &file.back();
+        }
         for (const auto &rec : i.getSegments()) {
             // ID
             size_name += i.getName().size();
@@ -63,7 +66,11 @@ void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
                 (*file_ptr)->write(qual.c_str(), qual.length());
             }
             (*file_ptr)->write("\n", 1);
-            file_ptr++;
+            if(i.isRead1First()) {
+                file_ptr++;
+            } else {
+                file_ptr--;
+            }
         }
 
         getStats().addInteger("size-fastq-seq", size_seq);

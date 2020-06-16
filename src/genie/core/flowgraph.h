@@ -7,6 +7,8 @@
 #ifndef GENIE_FLOWGRAPH_H
 #define GENIE_FLOWGRAPH_H
 
+#include <genie/core/stats/perf-stats.h>
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {

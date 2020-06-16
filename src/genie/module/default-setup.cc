@@ -11,6 +11,8 @@
 #include <genie/read/refcoder/encoder.h>
 //#include <genie/read/spring/encoder.h>
 #include <genie/core/classifier-regroup.h>
+#include <genie/core/flowgraph-convert.h>
+#include <genie/core/classifier-bypass.h>
 #include <genie/entropy/gabac/gabac-compressor.h>
 #include <genie/entropy/gabac/gabac-decompressor.h>
 #include <genie/name/tokenizer/decoder.h>
@@ -19,8 +21,8 @@
 #include <genie/quality/qvwriteout/encoder.h>
 #include <genie/read/lowlatency/decoder.h>
 #include <genie/read/lowlatency/encoder.h>
-#include <genie/read/spring/encoder.h>
 #include <genie/read/spring/decoder.h>
+#include <genie/read/spring/encoder.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -109,6 +111,18 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
     ret->setEntropyCoderSelector([](const genie::core::parameter::DescriptorSubseqCfg&, genie::core::AccessUnit::Descriptor&) -> size_t { return 0; });
 
     ret->setExporterSelector([](const genie::core::record::Chunk&) -> size_t { return 0; });
+
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::unique_ptr<core::FlowGraphConvert> buildDefaultConverter(size_t threads) {
+    std::unique_ptr<core::FlowGraphConvert> ret = genie::util::make_unique<core::FlowGraphConvert>(threads);
+
+    ret->setExporterSelector([](const genie::core::record::Chunk&) -> size_t { return 0; });
+
+    ret->setClassifier(genie::util::make_unique<genie::core::ClassifierBypass>());
 
     return ret;
 }

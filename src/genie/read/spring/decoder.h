@@ -117,6 +117,9 @@ class Decoder : public genie::core::ReadDecoder {
         }
 
         size_t chunk_size = chunk.getData().size();
+        if(cp.paired_end) {
+            chunk_size *= 2;
+        }
         flowOut(std::move(chunk), util::Section{id.start, chunk_size, true});
         if(id.length - chunk_size > 0) {
             skipOut(util::Section{id.start + chunk_size, id.length - chunk_size, true});
