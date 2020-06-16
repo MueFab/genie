@@ -118,9 +118,40 @@ int main(int argc, char* argv[]) {
             flowGraph = std::move(flow);
         } break;
             break;
-        case OperationCase::CONVERT:
-            UTILS_DIE("Conversion between third party formats not yet supported.");
+        case OperationCase::CONVERT: {
+            auto flow = genie::module::buildDefaultConverter(pOpts.numberOfThreads);
+            if (file_extension(pOpts.outputFile) == "sam") {
+                flow->addExporter(genie::util::make_unique<genie::format::sam::Exporter>(
+                    genie::format::sam::header::Header::createDefaultHeader(), output_file));
+            } else if (file_extension(pOpts.outputFile) == "fastq") {
+                if (file_extension(pOpts.outputSupFile) == "fastq") {
+                    output_sup_file.open(pOpts.outputSupFile);
+                    flow->addExporter(
+                        genie::util::make_unique<genie::format::fastq::Exporter>(output_file, output_sup_file));
+                } else {
+                    flow->addExporter(genie::util::make_unique<genie::format::fastq::Exporter>(output_file));
+                }
+            } else if (file_extension(pOpts.outputFile) == "mgrec") {
+                flow->addExporter(genie::util::make_unique<genie::format::mgrec::Exporter>(output_file));
+            }
+
+            if (file_extension(pOpts.inputFile) == "sam") {
+                flow->addImporter(genie::util::make_unique<genie::format::sam::Importer>(BLOCKSIZE, input_file));
+            } else if (file_extension(pOpts.inputFile) == "fastq") {
+                if (file_extension(pOpts.inputSupFile) == "fastq") {
+                    output_sup_file.open(pOpts.inputSupFile);
+                    flow->addImporter(
+                        genie::util::make_unique<genie::format::fastq::Importer>(BLOCKSIZE, input_file, input_sup_file));
+                } else {
+                    flow->addImporter(genie::util::make_unique<genie::format::fastq::Importer>(BLOCKSIZE, input_file));
+                }
+            } else if (file_extension(pOpts.inputFile) == "mgrec") {
+                flow->addImporter(genie::util::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, input_file));
+            }
+
+            flowGraph = std::move(flow);
             break;
+        }
         case OperationCase::CAPSULATE:
             UTILS_DIE("Encapsulation / Decapsulation not yet supported.");
             break;

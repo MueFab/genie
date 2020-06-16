@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/core/flowgraph-convert.h>
 #include <genie/core/flowgraph-decode.h>
 #include <genie/core/flowgraph-encode.h>
 
@@ -31,6 +32,13 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
  * @return
  */
 std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const std::string&, size_t);
+
+/**
+ *
+ * @param threads
+ * @return
+ */
+std::unique_ptr<core::FlowGraphConvert> buildDefaultConverter(size_t threads);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

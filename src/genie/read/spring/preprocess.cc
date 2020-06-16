@@ -101,7 +101,7 @@ void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section& id) 
             }
             ++seg_index;
         }
-        fout_id << "@" << rec.getName() << "\n";
+        fout_id << rec.getName() << "\n";
         ++rec_index;
     }
     cp.num_reads += rec_index;
