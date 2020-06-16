@@ -15,6 +15,7 @@
 #include <genie/util/drain.h>
 #include <genie/util/make-unique.h>
 #include <genie/util/ordered-lock.h>
+#include <genie/util/ordered-section.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -42,6 +43,10 @@ class Exporter : public core::FormatExporter {
      * @param _file_2 Output file #2
      */
     Exporter(std::ostream &_file_1, std::ostream &_file_2);
+
+    void skipIn(const util::Section& id) override {
+        util::OrderedSection sec(&lock, id);
+    }
 
     /**
      * @brief Process one chunk of MPEGG records
