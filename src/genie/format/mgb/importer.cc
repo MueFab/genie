@@ -30,12 +30,12 @@ bool Importer::pump(size_t& id, std::mutex&) {
         if (!unit) {
             return false;
         }
-        sec.start = pos_counter;
+        sec.start = id;
         sec.length = unit->getReadCount();
-        pos_counter += unit->getReadCount();
+        id += unit->getReadCount();
     }
     auto paramset = factory.getParams(unit->getParameterID());
-    core::AccessUnit set(std::move(paramset), id);
+    core::AccessUnit set(std::move(paramset), unit->getReadCount());
 
     for (auto& b : unit->getBlocks()) {
         set.set(core::GenDesc(b.getDescriptorID()), b.movePayload());

@@ -7,7 +7,10 @@
 namespace genie {
 namespace util {
 
-class GenericFactory {};
+class GenericFactory {
+   public:
+    virtual ~GenericFactory() = default;
+};
 
 template <typename T>
 class Factory : public GenericFactory {

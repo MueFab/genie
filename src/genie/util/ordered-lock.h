@@ -42,6 +42,10 @@ class OrderedLock {
      * @brief Marks current block / thread as finished and triggers waiting threads to continue if allowed to.
      */
     void finished(size_t length);
+
+    void reset() {
+        counter = 0;
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

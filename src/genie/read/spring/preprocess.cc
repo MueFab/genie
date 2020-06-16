@@ -27,10 +27,23 @@ namespace genie {
 namespace read {
 namespace spring {
 
-void Preprocessor::setup(const std::string& working_dir, size_t num_thr) {
+void Preprocessor::setup(const std::string &wdir, size_t num_thr, bool paired_end) {
     cp.preserve_id = true;
     cp.preserve_quality = true;
     cp.num_thr = num_thr;
+    working_dir = wdir;
+    used = false;
+
+    lock.reset();
+
+    cp.paired_end = paired_end;
+    cp.ureads_flag = false;
+    cp.num_reads = 0;
+    cp.num_reads_clean[0] = 0;
+    cp.num_reads_clean[1] = 0;
+    cp.max_readlen = 0;
+    cp.num_reads_per_block = NUM_READS_PER_BLOCK;
+    cp.num_blocks = 0;
     // generate random temp directory in the working directory
 
     while (true) {
@@ -50,33 +63,23 @@ void Preprocessor::setup(const std::string& working_dir, size_t num_thr) {
     outfileid = temp_dir + "/id_1";
     outfilequality[0] = temp_dir + "/quality_1";
     outfilequality[1] = temp_dir + "/quality_2";
+
+    for (int j = 0; j < 2; j++) {
+        if (j == 1 && !cp.paired_end) continue;
+        fout_clean[j].open(outfileclean[j]);
+        fout_N[j].open(outfileN[j]);
+        fout_order_N[j].open(outfileorderN[j], std::ios::binary);
+        if (cp.preserve_quality) fout_quality[j].open(outfilequality[j]);
+    }
+    if (cp.preserve_id) fout_id.open(outfileid);
 }
 
-void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section& id) {
+void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section &id) {
     core::record::Chunk data = std::move(t);
 
     util::OrderedSection lsec(&lock, id);
+    used = true;
     stats.add(data.getStats());
-    if (!init) {
-        init = true;
-        cp.paired_end = data.getData().front().getSegments().size() == 2;
-        UTILS_DIE_IF(data.getData().front().getSegments().size() > 2, "Maximum of two segments per read supported");
-        cp.ureads_flag = false;
-        cp.num_reads = 0;
-        cp.num_reads_clean[0] = 0;
-        cp.num_reads_clean[1] = 0;
-        cp.max_readlen = 0;
-        cp.num_reads_per_block = NUM_READS_PER_BLOCK;
-        cp.num_blocks = 0;
-        for (int j = 0; j < 2; j++) {
-            if (j == 1 && !cp.paired_end) continue;
-            fout_clean[j].open(outfileclean[j]);
-            fout_N[j].open(outfileN[j]);
-            fout_order_N[j].open(outfileorderN[j], std::ios::binary);
-            if (cp.preserve_quality) fout_quality[j].open(outfilequality[j]);
-        }
-        if (cp.preserve_id) fout_id.open(outfileid);
-    }
 
     UTILS_DIE_IF(
         data.getData().front().getNumberOfTemplateSegments() * data.getData().size() + cp.num_reads > MAX_NUM_READS,
@@ -114,6 +117,9 @@ void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section& id) 
 }
 
 void Preprocessor::finish(size_t id) {
+    if(!used) {
+        return;
+    }
     util::Section sec{id, 0, true};
     util::OrderedSection lsec(&lock, sec);
     for (int j = 0; j < 2; j++) {

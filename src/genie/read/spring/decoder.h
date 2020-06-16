@@ -30,7 +30,8 @@ struct Record {
 void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                     std::array<std::vector<Record>, 2>& matched_records,
                     std::array<std::vector<Record>, 2>& unmatched_records, std::vector<uint32_t>& mate_au_id,
-                    std::vector<uint32_t>& mate_record_index, std::vector<std::string>& names, std::vector<std::string>& qvs);
+                    std::vector<uint32_t>& mate_record_index, std::vector<std::string>& names,
+                    std::vector<std::string>& qvs);
 
 class Decoder : public genie::core::ReadDecoder {
    private:
@@ -42,13 +43,17 @@ class Decoder : public genie::core::ReadDecoder {
     std::ofstream fout_unmatched1;
     std::ofstream fout_unmatched2;
 
+    std::string file_unmatched_fastq1;
+    std::string file_unmatched_fastq2;
+    std::string basedir;
+
     std::vector<uint32_t> mate_au_id_concat, mate_record_index_concat;
 
    public:
-    explicit Decoder(const std::string& working_dir, bool comb_p, size_t threads)
+    explicit Decoder(const std::string& working_dir, bool comb_p, bool paired_end, size_t threads)
         : combine_pairs(comb_p), num_thr(threads) {
         init = false;
-        std::string basedir = working_dir;
+        basedir = working_dir;
 
         while (true) {
             std::string random_str = "tmp." + spring::random_string(10);
@@ -62,12 +67,11 @@ class Decoder : public genie::core::ReadDecoder {
         std::string compression_params_file = "cp.bin";
         std::string file_quality = "quality_1";
         std::string file_id = "id_1";
-
-        cp.paired_end = false;
         cp.ureads_flag = false;
+        cp.paired_end = paired_end;
         // temporary files for combine pairs case
-        std::string file_unmatched_fastq1 = basedir + "/unmatched_1.fastq";
-        std::string file_unmatched_fastq2 = basedir + "/unmatched_2.fastq";
+        file_unmatched_fastq1 = basedir + "/unmatched_1.fastq";
+        file_unmatched_fastq2 = basedir + "/unmatched_2.fastq";
         if (cp.paired_end) {
             if (combine_pairs && !cp.ureads_flag) {
                 fout_unmatched1.open(file_unmatched_fastq1);
@@ -86,9 +90,9 @@ class Decoder : public genie::core::ReadDecoder {
 
         std::vector<std::string> ecigars;
         while (!au.get(core::GenSub::RTYPE).end()) {
-            if(au.get(core::GenSub::RTYPE).pull() != 5) {
+            if (au.get(core::GenSub::RTYPE).pull() != 5) {
                 ecigars.emplace_back(std::to_string(au.get(core::GenSub::RLEN).pull() + 1) + "+");
-                if(cp.paired_end) {
+                if (cp.paired_end) {
                     if (au.get(core::GenSub::PAIR_DECODING_CASE).pull() == 0) {
                         ecigars.emplace_back(std::to_string(au.get(core::GenSub::RLEN).pull() + 1) + "+");
                     }
@@ -104,8 +108,8 @@ class Decoder : public genie::core::ReadDecoder {
         watch.pause();
         auto names = namecoder->process(au.get(core::GenDesc::RNAME));
         au.getStats().add(std::get<1>(names));
-        auto qvs = qvcoder->process(
-            au.getParameters().getQVConfig(core::record::ClassType::CLASS_U), ecigars, au.get(core::GenDesc::QV));
+        auto qvs = qvcoder->process(au.getParameters().getQVConfig(core::record::ClassType::CLASS_U), ecigars,
+                                    au.get(core::GenDesc::QV));
         au.getStats().add(std::get<1>(qvs));
         watch.resume();
 
@@ -157,18 +161,33 @@ class Decoder : public genie::core::ReadDecoder {
         }
     }
 
+    static void readRec(std::ifstream& i, Record& r) {
+        UTILS_DIE_IF(!std::getline(i, r.name), "Error reading tmp file");
+        UTILS_DIE_IF(!std::getline(i, r.seq), "Error reading tmp file");
+        UTILS_DIE_IF(!std::getline(i, r.qv), "Error reading tmp file");
+    }
+
+    void add(core::record::Chunk& chunk, core::record::Record&& r, size_t& pos) {
+        const size_t CHUNK_SIZE = 100000;
+        chunk.getData().push_back(std::move(r));
+        if(chunk.getData().size() >= CHUNK_SIZE) {
+            size_t size = chunk.getData().size() * 2;
+            flowOut(std::move(chunk), {pos, size, true});
+            pos += size;
+        }
+    }
+
     void flushIn(size_t& pos) override {
-        /*
+        core::record::Chunk chunk;
+
         // now reorder the remaining unmatched reads so that they are paired and then
         // write them to file.
         if (!cp.ureads_flag && cp.paired_end && combine_pairs) {
+            std::cout << "Order unmatched decoded reads..." << std::endl;
             fout_unmatched1.close();
             fout_unmatched2.close();
             // first write the reads in file 1 as it is
             std::ifstream fin_unmatched1(file_unmatched_fastq1);
-            fout << fin_unmatched1.rdbuf();
-            fin_unmatched1.close();
-            fout.clear();  // clear error flags if f_unmatched1 is empty
 
             // now build index and reverse index to reorder reads in file 2
             size_t size_unmatched = mate_au_id_concat.size();
@@ -195,18 +214,43 @@ class Decoder : public genie::core::ReadDecoder {
                     std::ifstream fin_unmatched2(file_unmatched_fastq2);
                     uint32_t bin_start = i * bin_size;
                     for (uint32_t j = 0; j < size_unmatched; j++) {
-                        if (reverse_index[j] >= bin_start && reverse_index[j] < bin_start + num_records_bin)
-                            read_fastq_record_from_ifstream(fin_unmatched2, records_bin[reverse_index[j] - bin_start],
-                                                            cp.preserve_quality);
-                        else
-                            read_fastq_record_from_ifstream(fin_unmatched2, tmpFastqRecord, cp.preserve_quality);
+                        if (reverse_index[j] >= bin_start && reverse_index[j] < bin_start + num_records_bin) {
+                            readRec(fin_unmatched2, records_bin[reverse_index[j] - bin_start]);
+                        } else {
+                            readRec(fin_unmatched2, tmpFastqRecord);
+                        }
                     }
                     fin_unmatched2.close();
-                    for (uint32_t j = 0; j < num_records_bin; j++)
-                        write_fastq_record_to_ostream(fout2, records_bin[j], cp.preserve_quality);
+                    for (uint32_t j = 0; j < num_records_bin; j++) {
+                        readRec(fin_unmatched1, tmpFastqRecord);
+
+                        core::record::Record r(2, core::record::ClassType::CLASS_U, std::move(tmpFastqRecord.name), "",
+                                               0);
+                        core::record::Segment s1(std::move(tmpFastqRecord.seq));
+                        s1.addQualities(std::move(tmpFastqRecord.qv));
+
+                        core::record::Segment s2(std::move(records_bin[j].seq));
+                        s2.addQualities(std::move(records_bin[j].qv));
+
+                        r.addSegment(std::move(s1));
+                        r.addSegment(std::move(s2));
+
+                        add(chunk, std::move(r), pos);
+                    }
                 }
             }
-        }*/
+            ghc::filesystem::remove(file_unmatched_fastq1);
+            ghc::filesystem::remove(file_unmatched_fastq2);
+        }
+
+        size_t size = chunk.getData().size() * 2;
+        if(size) {
+            flowOut(std::move(chunk), {pos, size, true});
+            pos += size;
+        }
+
+        ghc::filesystem::remove(basedir);
+
         flushOut(pos);
     }
 
