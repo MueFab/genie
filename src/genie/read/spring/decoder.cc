@@ -23,7 +23,7 @@ namespace spring {
 void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                     std::array<std::vector<Record>, 2>& matched_records,
                     std::array<std::vector<Record>, 2>& unmatched_records, std::vector<uint32_t> &mate_au_id,
-                    std::vector<uint32_t> &mate_record_index) {
+                    std::vector<uint32_t> &mate_record_index, std::vector<std::string>& names, std::vector<std::string>& qvs) {
     /*
      * return values are matched_records[2] (for pairs that are matched),
      * unmatched_records[2] (for pairs that are unmatched), mate_au_id,
@@ -38,6 +38,8 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
      */
     std::vector<uint32_t> mate_record_index_same_rec;  // for sorting in the combine_pairs case
     std::vector<Record> unmatched_same_au[2];
+    size_t qv_pos = 0;
+    size_t name_pos = 0;
     Record cur_record;
     std::string refBuf;
     // int_to_char
@@ -156,6 +158,8 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                     }
                 }
                 cur_record.seq = cur_read[i];
+                cur_record.name = names[name_pos];
+                cur_record.qv = std::move(qvs[qv_pos++]);
                 if (!paired_end) {
                     matched_records[0].push_back(cur_record);
                 } else {
@@ -173,6 +177,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                     }
                 }
             }
+            name_pos++;
         }
     }
     // if combine_pairs is true, reorder reads in unmatched_same_au so that pairs

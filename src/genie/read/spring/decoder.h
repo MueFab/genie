@@ -10,6 +10,7 @@
 #include <genie/core/read-decoder.h>
 #include <genie/stream-saver.h>
 #include <genie/util/ordered-section.h>
+#include <genie/util/watch.h>
 #include <map>
 #include <string>
 #include <vector>
@@ -29,7 +30,7 @@ struct Record {
 void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                     std::array<std::vector<Record>, 2>& matched_records,
                     std::array<std::vector<Record>, 2>& unmatched_records, std::vector<uint32_t>& mate_au_id,
-                    std::vector<uint32_t>& mate_record_index);
+                    std::vector<uint32_t>& mate_record_index, std::vector<std::string>& names, std::vector<std::string>& qvs);
 
 class Decoder : public genie::core::ReadDecoder {
    private:
@@ -77,23 +78,47 @@ class Decoder : public genie::core::ReadDecoder {
     void flowIn(genie::core::AccessUnit&& t, const util::Section& id) override {
         core::record::Chunk chunk;
         genie::core::AccessUnit au = entropyCodeAU(std::move(t));
+        util::Watch watch;
         std::array<std::vector<Record>, 2> matched_records;
         std::array<std::vector<Record>, 2> unmatched_records;
         std::vector<uint32_t> mate_au_id;
         std::vector<uint32_t> mate_record_index;
+
+        std::vector<std::string> ecigars;
+        while (!au.get(core::GenSub::RTYPE).end()) {
+            if(au.get(core::GenSub::RTYPE).pull() != 5) {
+                ecigars.emplace_back(std::to_string(au.get(core::GenSub::RLEN).pull() + 1) + "+");
+                if(au.get(core::GenSub::PAIR_DECODING_CASE).pull() == 0) {
+                    ecigars.emplace_back(std::to_string(au.get(core::GenSub::RLEN).pull() + 1) + "+");
+                }
+            } else {
+                au.get(core::GenSub::RLEN).pull();
+            }
+        }
+        au.get(core::GenSub::PAIR_DECODING_CASE).setPosition(0);
+        au.get(core::GenSub::RTYPE).setPosition(0);
+        au.get(core::GenSub::RLEN).setPosition(0);
+
+        watch.pause();
+        std::vector<std::string> names = namecoder->process(au.get(core::GenDesc::RNAME));
+        std::vector<std::string> qvs = qvcoder->process(
+            au.getParameters().getQVConfig(core::record::ClassType::CLASS_U), ecigars, au.get(core::GenDesc::QV));
+        watch.resume();
+
         decode_streams(au, cp.paired_end, combine_pairs, matched_records, unmatched_records, mate_au_id,
-                       mate_record_index);
+                       mate_record_index, names, qvs);
 
         for (size_t i = 0; i < matched_records[0].size(); ++i) {
-            chunk.getData().emplace_back(cp.paired_end ? 2 : 1, core::record::ClassType::CLASS_U, std::move(matched_records[0][i].name), "", 0);
+            chunk.getData().emplace_back(cp.paired_end ? 2 : 1, core::record::ClassType::CLASS_U,
+                                         std::move(matched_records[0][i].name), "", 0);
             core::record::Segment seg(std::move(matched_records[0][i].seq));
-            if(!matched_records[0][i].qv.empty()) {
+            if (!matched_records[0][i].qv.empty()) {
                 seg.addQualities(std::move(matched_records[0][i].qv));
             }
             chunk.getData().back().addSegment(std::move(seg));
-            if(cp.paired_end) {
+            if (cp.paired_end) {
                 core::record::Segment seg2(std::move(matched_records[1][i].seq));
-                if(!matched_records[1][i].qv.empty()) {
+                if (!matched_records[1][i].qv.empty()) {
                     seg2.addQualities(std::move(matched_records[1][i].qv));
                 }
                 chunk.getData().back().addSegment(std::move(seg2));
@@ -117,11 +142,13 @@ class Decoder : public genie::core::ReadDecoder {
         }
 
         size_t chunk_size = chunk.getData().size();
-        if(cp.paired_end) {
+        if (cp.paired_end) {
             chunk_size *= 2;
         }
+        chunk.setStats(std::move(au.getStats()));
+        chunk.getStats().addDouble("time-spring-decoder", watch.check());
         flowOut(std::move(chunk), util::Section{id.start, chunk_size, true});
-        if(id.length - chunk_size > 0) {
+        if (id.length - chunk_size > 0) {
             skipOut(util::Section{id.start + chunk_size, id.length - chunk_size, true});
         }
     }
