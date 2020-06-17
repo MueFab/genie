@@ -68,34 +68,33 @@ std::unique_ptr<core::parameter::QualityValues> QualityValues1::clone() const {
     return ret;
 }
 
-
 std::unique_ptr<QualityValues1::QualityValues> QualityValues1::create(util::BitReader& reader) {
     return util::make_unique<QualityValues1>(reader);
 }
 
 const Codebook& QualityValues1::getPresetCodebook(QvpsPresetId id) {
     const static std::vector<Codebook> pSet = []() -> std::vector<Codebook> {
-      std::vector<Codebook> ret;
-      Codebook set(33, 34);
-      for (uint8_t p = 2; p < 94; ++p) {
-          set.addEntry(p + 33);
-      }
-      ret.emplace_back(std::move(set));
+        std::vector<Codebook> ret;
+        Codebook set(33, 34);
+        for (uint8_t p = 2; p < 94; ++p) {
+            set.addEntry(p + 33);
+        }
+        ret.emplace_back(std::move(set));
 
-      set = Codebook(33, 41);
-      for (uint8_t p = 46; p <= 66; p += 5) {
-          set.addEntry(p);
-      }
-      set.addEntry(74);
-      ret.emplace_back(std::move(set));
+        set = Codebook(33, 41);
+        for (uint8_t p = 46; p <= 66; p += 5) {
+            set.addEntry(p);
+        }
+        set.addEntry(74);
+        ret.emplace_back(std::move(set));
 
-      set = Codebook(64, 72);
-      for (uint8_t p = 77; p <= 97; p += 5) {
-          set.addEntry(p);
-      }
-      set.addEntry(104);
-      ret.emplace_back(std::move(set));
-      return ret;
+        set = Codebook(64, 72);
+        for (uint8_t p = 77; p <= 97; p += 5) {
+            set.addEntry(p);
+        }
+        set.addEntry(104);
+        ret.emplace_back(std::move(set));
+        return ret;
     }();
     return pSet[uint8_t(id)];
 }

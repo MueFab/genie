@@ -12,9 +12,9 @@
 #include "util.h"
 
 #include <genie/core/record/chunk.h>
+#include <genie/util/drain.h>
 #include <genie/util/ordered-lock.h>
 #include <genie/util/ordered-section.h>
-#include <genie/util/drain.h>
 
 namespace genie {
 namespace read {
@@ -43,16 +43,14 @@ struct Preprocessor {
 
     core::stats::PerfStats stats;
 
-    core::stats::PerfStats& gteStats() {
-        return stats;
-    }
+    core::stats::PerfStats& gteStats() { return stats; }
 
     bool used = false;
 
     void setup(const std::string& working_dir, size_t num_thr, bool paired_end);
 
-    ~Preprocessor(){
-        if(!used) {
+    ~Preprocessor() {
+        if (!used) {
             for (int j = 0; j < 2; j++) {
                 if (j == 1 && !cp.paired_end) continue;
                 fout_clean[j].close();
@@ -77,13 +75,9 @@ struct Preprocessor {
 
     void preprocess(core::record::Chunk&& t, const util::Section& id);
 
-    void skip(const util::Section& id) {
-        util::OrderedSection sec(&lock, id);
-    }
+    void skip(const util::Section& id) { util::OrderedSection sec(&lock, id); }
 
     void finish(size_t pos);
-
-
 };
 
 }  // namespace spring

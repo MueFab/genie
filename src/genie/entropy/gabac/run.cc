@@ -8,9 +8,14 @@
 
 #include "decoding.h"
 #include "encoding.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace entropy {
 namespace gabac {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 unsigned long run(const IOConfiguration& conf, const EncodingConfiguration& enConf, bool decode) {
     if (decode) {
@@ -19,6 +24,12 @@ unsigned long run(const IOConfiguration& conf, const EncodingConfiguration& enCo
         return gabac::encodeDescSubsequence(conf, enConf);
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

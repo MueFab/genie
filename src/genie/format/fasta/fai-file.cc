@@ -5,8 +5,8 @@
  */
 
 #include "fai-file.h"
-#include <istream>
 #include <genie/util/exceptions.h>
+#include <istream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -27,6 +27,9 @@ namespace paramcabac {
  */
 class TransformedParameters {
    public:
+    /**
+     *
+     */
     enum class TransformIdSubseq : uint8_t {
         NO_TRANSFORM = 0,
         EQUALITY_CODING = 1,
@@ -35,23 +38,63 @@ class TransformedParameters {
         MERGE_CODING = 4
     };
 
+    /**
+     *
+     * @param writer
+     */
     virtual void write(util::BitWriter &writer) const;
 
+    /**
+     *
+     */
     TransformedParameters();
 
+    /**
+     *
+     * @param reader
+     */
     explicit TransformedParameters(util::BitReader &reader);
 
+    /**
+     *
+     * @param _transform_ID_subseq
+     * @param param
+     */
     TransformedParameters(const TransformIdSubseq &_transform_ID_subseq, uint16_t param);
 
+    /**
+     *
+     */
     virtual ~TransformedParameters() = default;
 
+    /**
+     *
+     * @return
+     */
     size_t getNumStreams() const;
 
+    /**
+     *
+     * @return
+     */
     TransformIdSubseq getTransformIdSubseq() const;
 
+    /**
+     *
+     * @return
+     */
     uint16_t getParam() const;
 
+    /**
+     *
+     * @return
+     */
     const std::vector<uint8_t> getMergeCodingShiftSizes() const;
+
+    /**
+     *
+     * @param mergeCodingshiftSizes
+     */
     void setMergeCodingShiftSizes(std::vector<uint8_t> mergeCodingshiftSizes);
 
    private:

@@ -21,17 +21,34 @@ namespace genie {
 namespace format {
 namespace mgb {
 
+/**
+ *
+ */
 class RawReference : public core::parameter::DataUnit {
    private:
-    std::vector<RawReferenceSequence> seqs;
+    std::vector<RawReferenceSequence> seqs;  //!<
 
    public:
+    /**
+     *
+     */
     RawReference();
 
+    /**
+     *
+     */
     ~RawReference() override = default;
 
+    /**
+     *
+     * @param ref
+     */
     void addSequence(RawReferenceSequence&& ref);
 
+    /**
+     *
+     * @param writer
+     */
     void write(util::BitWriter& writer) const override;
 };
 

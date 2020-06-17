@@ -16,7 +16,7 @@ namespace core {
 class FlowGraphConvert : public FlowGraph {
     genie::util::ThreadManager mgr;                                       //!<
     std::vector<std::unique_ptr<genie::core::FormatImporter>> importers;  //!<
-    std::unique_ptr<genie::core::Classifier> classifier;  //!<
+    std::unique_ptr<genie::core::Classifier> classifier;                  //!<
 
     std::vector<std::unique_ptr<genie::core::FormatExporter>> exporters;     //!<
     genie::util::SelectorHead<genie::core::record::Chunk> exporterSelector;  //!<
@@ -60,6 +60,10 @@ class FlowGraphConvert : public FlowGraph {
      */
     void setExporterSelector(const std::function<size_t(const genie::core::record::Chunk&)>& fun);
 
+    /**
+     *
+     * @param _classifier
+     */
     void setClassifier(std::unique_ptr<genie::core::Classifier> _classifier);
 
     /**
@@ -73,9 +77,13 @@ class FlowGraphConvert : public FlowGraph {
      */
     core::stats::PerfStats getStats() override;
 
+    /**
+     *
+     * @param abort
+     */
     void stop(bool abort) override;
 };
-}
-}
+}  // namespace core
+}  // namespace genie
 
 #endif  // GENIE_FLOWGRAPH_CONVERT_H

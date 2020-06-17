@@ -15,6 +15,7 @@ namespace genie {
 namespace core {
 namespace record {
 namespace alignment_external {
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 OtherRec::OtherRec(uint64_t _next_pos, uint16_t _next_seq_ID)

@@ -13,11 +13,11 @@
 
 #endif
 
+#include <bbhash/BooPHF.h>
 #include <algorithm>
 #include <bitset>
 #include <fstream>
 #include <string>
-#include <bbhash/BooPHF.h>
 #include "params.h"
 
 namespace genie {

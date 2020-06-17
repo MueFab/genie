@@ -13,8 +13,7 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FlowGraphConvert::FlowGraphConvert(size_t threads) : mgr(threads) {
-}
+FlowGraphConvert::FlowGraphConvert(size_t threads) : mgr(threads) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

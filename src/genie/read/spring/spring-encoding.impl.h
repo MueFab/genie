@@ -118,8 +118,8 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                 in_readlength.read((char *)&rl, sizeof(uint16_t));
             }
             if (c == '0' || done || list_size > 10000000)  // limit on list size so
-                // that memory doesn't get
-                // too large
+                                                           // that memory doesn't get
+                                                           // too large
             {
                 if (list_size != 0) {
                     // sort contig according to pos
@@ -151,13 +151,13 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                     startposidx = dict[l].bphf->lookup(ull);
                                     if (startposidx >= dict[l].numkeys)  // not found
                                         continue;
-                                    // check if any other thread is modifying same dictpos
+                                        // check if any other thread is modifying same dictpos
 #ifdef GENIE_USE_OPENMP
                                     if (!dict_lock[startposidx].test()) continue;
 #else
-                                    // if we are single-threaded we do not need to continue
-                                    // because nobody else could possibly try to modify the same
-                                    // dictpos
+                                        // if we are single-threaded we do not need to continue
+                                        // because nobody else could possibly try to modify the same
+                                        // dictpos
 #endif
                                     dict[l].findpos(dictidx, startposidx);
                                     if (dict[l].empty_bin[startposidx])  // bin is empty
@@ -179,11 +179,11 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                             if (!rev)
                                                 hamming = ((forward_bitset ^ read[rid]) &
                                                            mask[0][eg.max_readlen - read_lengths_s[rid]])
-                                                    .count();
+                                                              .count();
                                             else
                                                 hamming = ((reverse_bitset ^ read[rid]) &
                                                            mask[0][eg.max_readlen - read_lengths_s[rid]])
-                                                    .count();
+                                                              .count();
                                             if (hamming <= thresh_s) {
 #ifdef GENIE_USE_OPENMP
                                                 read_lock[rid].set();
@@ -204,7 +204,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                                 long pos = rev ? (j + eg.max_readlen - read_lengths_s[rid]) : j;
                                                 std::string read_string =
                                                     rev ? reverse_complement(bitsettostring<bitset_size>(
-                                                        read[rid], read_lengths_s[rid], egb),
+                                                                                 read[rid], read_lengths_s[rid], egb),
                                                                              read_lengths_s[rid])
                                                         : bitsettostring<bitset_size>(read[rid], read_lengths_s[rid],
                                                                                       egb);

@@ -13,15 +13,25 @@
 #include <genie/util/block-stepper.h>
 #include <genie/util/data-block.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace entropy {
 namespace gabac {
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool LutEntry::operator>=(const LutEntry& entry) const { return (freq >= entry.freq); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 LutOrder1 LUTsSubSymbolTransform::getInitLutsOrder1(uint64_t numAlphaSubsym) {
     return std::vector<LutRow>(numAlphaSubsym, {std::vector<LutEntry>(numAlphaSubsym, {0, 0}),  // value, freq
                                                 0}                                              // numMaxElems
     );
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 LUTsSubSymbolTransform::LUTsSubSymbolTransform(const paramcabac::SupportValues& _supportVals,
                                                const paramcabac::StateVars& _stateVars, uint8_t _numLuts,
@@ -32,12 +42,16 @@ LUTsSubSymbolTransform::LUTsSubSymbolTransform(const paramcabac::SupportValues& 
       numPrvs(_numPrvs),
       encodingModeFlag(_modeFlag) {}
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void LUTsSubSymbolTransform::setupLutsOrder1(uint8_t numSubsyms, uint64_t numAlphaSubsym) {
     if (numAlphaSubsym > paramcabac::StateVars::MAX_LUT_SIZE) return;
 
     lutsO1.clear();
     lutsO1 = std::vector<LutOrder1>(numSubsyms, getInitLutsOrder1(numAlphaSubsym));
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void LUTsSubSymbolTransform::setupLutsOrder2(uint8_t numSubsyms, uint64_t numAlphaSubsym) {
     if (numAlphaSubsym > paramcabac::StateVars::MAX_LUT_SIZE) return;
@@ -46,6 +60,8 @@ void LUTsSubSymbolTransform::setupLutsOrder2(uint8_t numSubsyms, uint64_t numAlp
     lutsO2 =
         std::vector<LutOrder2>(numSubsyms, std::vector<LutOrder1>(numAlphaSubsym, getInitLutsOrder1(numAlphaSubsym)));
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void LUTsSubSymbolTransform::buildLuts(const core::Alphabet alphaProps, util::DataBlock* const symbols,
                                        util::DataBlock* const depSymbols) {
@@ -124,6 +140,8 @@ void LUTsSubSymbolTransform::buildLuts(const core::Alphabet alphaProps, util::Da
     return;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void LUTsSubSymbolTransform::decodeLutOrder1(Reader& reader, uint64_t numAlphaSubsym, uint8_t codingSubsymSize,
                                              LutOrder1& lut) {
     uint32_t i, j;
@@ -134,6 +152,8 @@ void LUTsSubSymbolTransform::decodeLutOrder1(Reader& reader, uint64_t numAlphaSu
         }
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void LUTsSubSymbolTransform::decodeLUTs(Reader& reader) {
     if (numLuts == 0 || encodingModeFlag) return;
@@ -157,6 +177,8 @@ void LUTsSubSymbolTransform::decodeLUTs(Reader& reader) {
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void LUTsSubSymbolTransform::sortLutRow(LutRow& lutRow) {
     // sort entries in descending order and populate numMaxElems;
     sort(lutRow.entries.begin(), lutRow.entries.end(), std::greater_equal<LutEntry>());
@@ -164,6 +186,8 @@ void LUTsSubSymbolTransform::sortLutRow(LutRow& lutRow) {
         std::count_if(lutRow.entries.begin(), lutRow.entries.end(), [](LutEntry e) { return e.freq != 0; });
     if (lutRow.numMaxElems > 0) lutRow.numMaxElems--;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void LUTsSubSymbolTransform::encodeLutOrder1(Writer& writer, uint64_t numAlphaSubsym, uint8_t codingSubsymSize,
                                              LutOrder1& lut) {
@@ -176,6 +200,8 @@ void LUTsSubSymbolTransform::encodeLutOrder1(Writer& writer, uint64_t numAlphaSu
         }
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void LUTsSubSymbolTransform::encodeLUTs(Writer& writer, const core::Alphabet alphaProps, util::DataBlock* const symbols,
                                         util::DataBlock* const depSymbols) {
@@ -202,6 +228,8 @@ void LUTsSubSymbolTransform::encodeLUTs(Writer& writer, const core::Alphabet alp
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void LUTsSubSymbolTransform::transformOrder2(std::vector<Subsymbol>& subsymbols, const uint8_t subsymIdx,
                                              const uint8_t lutIdx, const uint8_t prvIdx) {
     Subsymbol& subsymbol = subsymbols[subsymIdx];
@@ -214,6 +242,8 @@ void LUTsSubSymbolTransform::transformOrder2(std::vector<Subsymbol>& subsymbols,
         subsymbol.lutEntryIdx = distance(lutRow.entries.begin(), entry);
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void LUTsSubSymbolTransform::transformOrder1(std::vector<Subsymbol>& subsymbols, const uint8_t subsymIdx,
                                              const uint8_t lutIdx, const uint8_t prvIdx) {
@@ -229,15 +259,21 @@ void LUTsSubSymbolTransform::transformOrder1(std::vector<Subsymbol>& subsymbols,
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint64_t LUTsSubSymbolTransform::getNumMaxElemsOrder2(std::vector<Subsymbol>& subsymbols, const uint8_t lutIdx,
                                                       const uint8_t prvIdx) {
     return lutsO2[lutIdx][subsymbols[prvIdx].prvValues[1]][subsymbols[prvIdx].prvValues[0]].numMaxElems;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint64_t LUTsSubSymbolTransform::getNumMaxElemsOrder1(std::vector<Subsymbol>& subsymbols, const uint8_t lutIdx,
                                                       const uint8_t prvIdx) {
     return lutsO1[lutIdx][subsymbols[prvIdx].prvValues[0]].numMaxElems;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void LUTsSubSymbolTransform::invTransformOrder2(std::vector<Subsymbol>& subsymbols, const uint8_t subsymIdx,
                                                 const uint8_t lutIdx, const uint8_t prvIdx) {
@@ -246,12 +282,19 @@ void LUTsSubSymbolTransform::invTransformOrder2(std::vector<Subsymbol>& subsymbo
                                             .value;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void LUTsSubSymbolTransform::invTransformOrder1(std::vector<Subsymbol>& subsymbols, const uint8_t subsymIdx,
                                                 const uint8_t lutIdx, const uint8_t prvIdx) {
     subsymbols[subsymIdx].subsymValue =
         lutsO1[lutIdx][subsymbols[prvIdx].prvValues[0]].entries[subsymbols[subsymIdx].lutEntryIdx].value;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

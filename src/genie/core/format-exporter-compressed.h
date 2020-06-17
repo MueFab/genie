@@ -22,7 +22,7 @@ namespace core {
  */
 class FormatExporterCompressed : public util::Drain<AccessUnit> {
    private:
-    stats::PerfStats stats; //!<
+    stats::PerfStats stats;  //!<
 
    public:
     /**

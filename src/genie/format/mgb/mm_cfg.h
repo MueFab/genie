@@ -28,11 +28,33 @@ class MmCfg {
     uint32_t mm_count;      //!< Line 9
 
    public:
+    /**
+     *
+     * @param _mm_threshold
+     * @param _mm_count
+     */
     MmCfg(uint16_t _mm_threshold, uint32_t _mm_count);
+
+    /**
+     *
+     */
     MmCfg();
+
+    /**
+     *
+     * @param reader
+     */
     explicit MmCfg(util::BitReader &reader);
+
+    /**
+     *
+     */
     virtual ~MmCfg() = default;
 
+    /**
+     *
+     * @param writer
+     */
     virtual void write(util::BitWriter &writer) const;
 };
 

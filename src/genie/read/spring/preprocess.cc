@@ -117,7 +117,7 @@ void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section &id) 
 }
 
 void Preprocessor::finish(size_t id) {
-    if(!used) {
+    if (!used) {
         return;
     }
     util::Section sec{id, 0, true};

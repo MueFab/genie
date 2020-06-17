@@ -29,16 +29,32 @@ namespace genie {
 namespace format {
 namespace mgb {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+/**
+ *
+ */
 class Exporter : public core::FormatExporterCompressed {
    private:
-    util::BitWriter writer;
-    util::OrderedLock lock;
-    size_t id_ctr;
+    util::BitWriter writer;  //!<
+    util::OrderedLock lock;  //!<
+    size_t id_ctr;           //!<
    public:
+    /**
+     *
+     * @param _file
+     */
     explicit Exporter(std::ostream* _file);
+
+    /**
+     *
+     * @param t
+     * @param id
+     */
     void flowIn(core::AccessUnit&& t, const genie::util::Section& id) override;
+
+    /**
+     *
+     * @param id
+     */
     void skipIn(const genie::util::Section& id) override;
 };
 

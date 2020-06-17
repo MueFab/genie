@@ -25,7 +25,7 @@ bool FormatImporter::pump(size_t& id, std::mutex& lock) {
         bool flushing = classifier->isFlushing();
         chunk = classifier->getChunk();
         uint32_t segment_count = 0;
-        for(const auto& r : chunk.getData()) {
+        for (const auto& r : chunk.getData()) {
             segment_count += r.getSegments().size();
         }
         if (!chunk.getData().empty()) {
@@ -50,7 +50,7 @@ bool FormatImporter::pump(size_t& id, std::mutex& lock) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FormatImporter::flushIn(size_t& pos) {flushOut(pos);}
+void FormatImporter::flushIn(size_t& pos) { flushOut(pos); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

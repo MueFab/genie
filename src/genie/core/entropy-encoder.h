@@ -23,7 +23,8 @@ namespace core {
  */
 class EntropyEncoder {
    public:
-    using EntropyCoded = std::tuple<parameter::DescriptorSubseqCfg, AccessUnit::Descriptor, core::stats::PerfStats>;  //!<
+    using EntropyCoded =
+        std::tuple<parameter::DescriptorSubseqCfg, AccessUnit::Descriptor, core::stats::PerfStats>;  //!<
 
     /**
      *

@@ -22,8 +22,9 @@ namespace read {
 namespace spring {
 void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                     std::array<std::vector<Record>, 2>& matched_records,
-                    std::array<std::vector<Record>, 2>& unmatched_records, std::vector<uint32_t> &mate_au_id,
-                    std::vector<uint32_t> &mate_record_index, std::vector<std::string>& names, std::vector<std::string>& qvs) {
+                    std::array<std::vector<Record>, 2>& unmatched_records, std::vector<uint32_t>& mate_au_id,
+                    std::vector<uint32_t>& mate_record_index, std::vector<std::string>& names,
+                    std::vector<std::string>& qvs) {
     /*
      * return values are matched_records[2] (for pairs that are matched),
      * unmatched_records[2] (for pairs that are unmatched), mate_au_id,
@@ -48,7 +49,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
     // some state variables
     uint64_t abs_pos = 0;
 
-    while(!au.get(core::GenSub::RTYPE).end()) {
+    while (!au.get(core::GenSub::RTYPE).end()) {
         auto rtype = au.get(core::GenSub::RTYPE).pull();
         if (rtype == 5) {
             // put in refBuf
@@ -86,7 +87,8 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                         read_1_first = false;
                         if (combine_pairs) {
                             if (pairing_decoding_case == 1) {
-                                mate_record_index_same_rec.push_back((uint32_t)(au.get(core::GenSub::PAIR_R1_SPLIT).pull()));
+                                mate_record_index_same_rec.push_back(
+                                    (uint32_t)(au.get(core::GenSub::PAIR_R1_SPLIT).pull()));
                                 same_au_flag = true;
                             } else if (pairing_decoding_case == 3) {
                                 mate_au_id.push_back((uint32_t)(au.get(core::GenSub::PAIR_R1_DIFF_SEQ).pull()));
@@ -114,8 +116,9 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                 number_of_record_segments = 1;
             }
             uint32_t rlen[2];
-            for (int i = 0; i < number_of_record_segments; i++) rlen[i] = (uint32_t)(au.get(core::GenSub::RLEN).pull()) + 1;  // rlen
-            uint32_t pos = au.get(core::GenSub::POS_MAPPING_FIRST).pull();                                                                 // pos
+            for (int i = 0; i < number_of_record_segments; i++)
+                rlen[i] = (uint32_t)(au.get(core::GenSub::RLEN).pull()) + 1;  // rlen
+            uint32_t pos = au.get(core::GenSub::POS_MAPPING_FIRST).pull();    // pos
 
             abs_pos += pos;
             std::string cur_read[2];
@@ -125,7 +128,8 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                 cur_read[1] = refBuf.substr(pair_abs_pos, rlen[1]);
             }
             bool reverseComp[2];
-            for (int i = 0; i < number_of_record_segments; i++) reverseComp[i] = au.get(core::GenSub::RCOMP).pull();  // rcomp
+            for (int i = 0; i < number_of_record_segments; i++)
+                reverseComp[i] = au.get(core::GenSub::RCOMP).pull();  // rcomp
             if (rtype == 3) {
                 // type M
                 for (int i = 0; i < number_of_record_segments; i++) {

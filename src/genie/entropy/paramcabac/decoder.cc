@@ -8,9 +8,14 @@
 #include <genie/util/bitwriter.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace entropy {
 namespace paramcabac {
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+DecoderRegular::DecoderRegular() : core::parameter::desc_pres::DecoderRegular(MODE_CABAC) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -48,8 +53,11 @@ std::unique_ptr<core::parameter::desc_pres::Decoder> DecoderRegular::clone() con
     return util::make_unique<DecoderRegular>(*this);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 Subsequence &DecoderRegular::getSubsequenceCfg(uint8_t index) { return descriptor_subsequence_cfgs[index]; }
 
+// ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<core::parameter::desc_pres::DecoderRegular> DecoderRegular::create(util::BitReader &reader) {
     return util::make_unique<DecoderRegular>(reader);
@@ -102,7 +110,11 @@ std::unique_ptr<core::parameter::desc_pres::Decoder> DecoderTokenType::clone() c
     return util::make_unique<DecoderTokenType>(*this);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 Subsequence &DecoderTokenType::getSubsequenceCfg(uint8_t index) { return descriptor_subsequence_cfgs[index]; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<core::parameter::desc_pres::DecoderTokentype> DecoderTokenType::create(util::BitReader &reader) {
     return util::make_unique<DecoderTokenType>(reader);

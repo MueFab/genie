@@ -8,9 +8,13 @@
 #include <cassert>
 #include "cabac-tables.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace entropy {
 namespace gabac {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 BinaryArithmeticEncoder::BinaryArithmeticEncoder(const util::BitWriter& bitOutputStream)
     : m_bitOutputStream(bitOutputStream),
@@ -20,7 +24,11 @@ BinaryArithmeticEncoder::BinaryArithmeticEncoder(const util::BitWriter& bitOutpu
       m_numBufferedBytes(0),
       m_range(0) {}
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 BinaryArithmeticEncoder::~BinaryArithmeticEncoder() = default;
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 inline void BinaryArithmeticEncoder::encodeBin(unsigned int bin, ContextModel* const contextModel) {
     assert((bin == 0) || (bin == 1));
@@ -48,6 +56,8 @@ inline void BinaryArithmeticEncoder::encodeBin(unsigned int bin, ContextModel* c
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void BinaryArithmeticEncoder::encodeBinEP(unsigned int bin) {
     assert((bin == 0) || (bin == 1));
 
@@ -60,6 +70,8 @@ void BinaryArithmeticEncoder::encodeBinEP(unsigned int bin) {
         writeOut();
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void BinaryArithmeticEncoder::encodeBinsEP(unsigned int bins, unsigned int numBins) {
     while (numBins > 8) {
@@ -81,6 +93,8 @@ void BinaryArithmeticEncoder::encodeBinsEP(unsigned int bins, unsigned int numBi
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void BinaryArithmeticEncoder::encodeBinTrm(unsigned int bin) {
     // Encode the least-significant bit of bin as a terminating bin
     m_range -= 2;
@@ -101,6 +115,8 @@ void BinaryArithmeticEncoder::encodeBinTrm(unsigned int bin) {
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void BinaryArithmeticEncoder::flush() {
     encodeBinTrm(1);
     finish();
@@ -109,6 +125,8 @@ void BinaryArithmeticEncoder::flush() {
     start();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void BinaryArithmeticEncoder::start() {
     m_bufferedByte = 0xff;
     m_low = 0;
@@ -116,6 +134,8 @@ void BinaryArithmeticEncoder::start() {
     m_numBufferedBytes = 0;
     m_range = 510;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void BinaryArithmeticEncoder::finish() {
     if ((m_low >> (32u - m_numBitsLeft)) > 0) {
@@ -136,6 +156,8 @@ void BinaryArithmeticEncoder::finish() {
     }
     m_bitOutputStream.write(m_low >> 8u, (24u - m_numBitsLeft));
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void BinaryArithmeticEncoder::writeOut() {
     unsigned int leadByte = m_low >> (24u - m_numBitsLeft);
@@ -162,6 +184,12 @@ void BinaryArithmeticEncoder::writeOut() {
         }
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

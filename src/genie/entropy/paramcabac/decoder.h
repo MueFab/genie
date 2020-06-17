@@ -21,60 +21,138 @@ namespace entropy {
 namespace paramcabac {
 
 /**
- * Base for ISO 23092-2 Section 8.3.1 and ISO 23092-2 Section 8.3.5
+ *
  */
 class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
    protected:
-    uint8_t rle_guard_tokentype : 8;                       //!< line 4
-    std::vector<Subsequence> descriptor_subsequence_cfgs;  //!< Line 4 to 13
+    uint8_t rle_guard_tokentype : 8;                       //!<
+    std::vector<Subsequence> descriptor_subsequence_cfgs;  //!<
    public:
-    static const uint8_t MODE_CABAC = 0;
+    static const uint8_t MODE_CABAC = 0;  //!<
 
+    /**
+     *
+     */
     explicit DecoderTokenType();
 
+    /**
+     *
+     * @param reader
+     */
     explicit DecoderTokenType(util::BitReader &reader);
 
+    /**
+     *
+     * @param index
+     * @param cfg
+     */
     void setSubsequenceCfg(uint8_t index, Subsequence &&cfg);
 
+    /**
+     *
+     * @param index
+     * @return
+     */
     const Subsequence &getSubsequenceCfg(uint8_t index) const;
 
+    /**
+     *
+     * @param index
+     * @return
+     */
     Subsequence &getSubsequenceCfg(uint8_t index);
 
+    /**
+     *
+     * @return
+     */
     std::unique_ptr<core::parameter::desc_pres::Decoder> clone() const override;
 
+    /**
+     *
+     * @param reader
+     * @return
+     */
     static std::unique_ptr<core::parameter::desc_pres::DecoderTokentype> create(util::BitReader &reader);
 
+    /**
+     *
+     * @param writer
+     */
     void write(util::BitWriter &writer) const override;
 
+    /**
+     *
+     * @return
+     */
     uint8_t getRleGuardTokentype() const;
 };
 
 /**
- * Base for ISO 23092-2 Section 8.3.1 and ISO 23092-2 Section 8.3.5
+ *
  */
 class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
    protected:
-    std::vector<Subsequence> descriptor_subsequence_cfgs;  //!< Line 4 to 13
+    std::vector<Subsequence> descriptor_subsequence_cfgs;  //!<
 
    public:
-    static const uint8_t MODE_CABAC = 0;
+    static const uint8_t MODE_CABAC = 0;  //!<
 
-    DecoderRegular() : core::parameter::desc_pres::DecoderRegular(MODE_CABAC) {}
+    /**
+     *
+     */
+    DecoderRegular();
 
+    /**
+     *
+     * @param desc
+     */
     explicit DecoderRegular(core::GenDesc desc);
 
+    /**
+     *
+     * @param reader
+     */
     explicit DecoderRegular(util::BitReader &reader);
 
+    /**
+     *
+     * @param index
+     * @param cfg
+     */
     void setSubsequenceCfg(uint8_t index, Subsequence &&cfg);
 
+    /**
+     *
+     * @param index
+     * @return
+     */
     const Subsequence &getSubsequenceCfg(uint8_t index) const;
 
+    /**
+     *
+     * @param index
+     * @return
+     */
     Subsequence &getSubsequenceCfg(uint8_t index);
 
+    /**
+     *
+     * @return
+     */
     std::unique_ptr<core::parameter::desc_pres::Decoder> clone() const override;
 
+    /**
+     *
+     * @param reader
+     * @return
+     */
     static std::unique_ptr<core::parameter::desc_pres::DecoderRegular> create(util::BitReader &reader);
 
+    /**
+     *
+     * @param writer
+     */
     void write(util::BitWriter &writer) const override;
 };
 

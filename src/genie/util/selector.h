@@ -1,3 +1,9 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #ifndef GENIE_SELECTOR_H
 #define GENIE_SELECTOR_H
 
@@ -84,7 +90,7 @@ class SelectorHead : public genie::util::Drain<Tin> {
     void skipIn(const Section& id) override {
         bool first = true;
         for (const auto& m : mods) {
-            if(first) {
+            if (first) {
                 m->skipIn(id);
                 first = false;
             } else {

@@ -18,7 +18,8 @@ struct subseq_data {
 };
 
 void generate_read_streams(const std::string &temp_dir, const compression_params &cp,
-                           core::ReadEncoder::EntropySelector *entropycoder, std::vector<core::parameter::ParameterSet>&, core::stats::PerfStats& stats);
+                           core::ReadEncoder::EntropySelector *entropycoder,
+                           std::vector<core::parameter::ParameterSet> &, core::stats::PerfStats &stats);
 
 }  // namespace spring
 }  // namespace read

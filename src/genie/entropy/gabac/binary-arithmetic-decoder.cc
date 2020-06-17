@@ -9,12 +9,18 @@
 #include "bit-input-stream.h"
 #include "cabac-tables.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace entropy {
 namespace gabac {
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 BinaryArithmeticDecoder::BinaryArithmeticDecoder(const BitInputStream& bitInputStream)
     : m_bitInputStream(bitInputStream), m_numBitsNeeded(0), m_range(0), m_value(0) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 inline unsigned int BinaryArithmeticDecoder::decodeBin(ContextModel* const contextModel) {
     assert(contextModel != nullptr);
@@ -52,6 +58,8 @@ inline unsigned int BinaryArithmeticDecoder::decodeBin(ContextModel* const conte
     return decodedByte;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 unsigned int BinaryArithmeticDecoder::decodeBinsEP(unsigned int numBins) {
     unsigned int bins = 0;
     unsigned int scaledRange;
@@ -87,6 +95,8 @@ unsigned int BinaryArithmeticDecoder::decodeBinsEP(unsigned int numBins) {
     return bins;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void BinaryArithmeticDecoder::decodeBinTrm() {
     m_range -= 2;
     unsigned int scaledRange = m_range << 7u;
@@ -106,7 +116,11 @@ void BinaryArithmeticDecoder::decodeBinTrm() {
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void BinaryArithmeticDecoder::reset() { decodeBinTrm(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void BinaryArithmeticDecoder::start() {
     assert(m_bitInputStream.getNumBitsUntilByteAligned() == 0);
@@ -117,10 +131,18 @@ void BinaryArithmeticDecoder::start() {
     m_value |= m_bitInputStream.readByte();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 size_t BinaryArithmeticDecoder::close() {
     decodeBinTrm();
     return m_bitInputStream.getNumBytesRead();
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

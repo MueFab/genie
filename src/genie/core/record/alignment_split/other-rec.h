@@ -25,6 +25,7 @@ namespace alignment_split {
  *
  */
 class OtherRec : public AlignmentSplit {
+   private:
     uint64_t split_pos;     //!<
     uint16_t split_seq_ID;  //!<
 

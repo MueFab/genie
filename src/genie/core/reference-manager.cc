@@ -44,7 +44,7 @@ void ReferenceManager::registerRef(std::unique_ptr<Reference> ref) {
 
 void ReferenceManager::registerRef(std::vector<std::unique_ptr<Reference>>&& ref) {
     auto vec = std::move(ref);
-    for(auto &v : vec) {
+    for (auto& v : vec) {
         registerRef(std::move(v));
     }
 }

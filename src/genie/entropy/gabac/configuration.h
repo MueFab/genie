@@ -7,6 +7,8 @@
 #ifndef GABAC_CONFIGURATION_H_
 #define GABAC_CONFIGURATION_H_
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include <istream>
 #include <ostream>
 #include <string>
@@ -14,6 +16,8 @@
 
 #include <genie/entropy/paramcabac/subsequence.h>
 #include "config-manual.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace entropy {
@@ -59,14 +63,26 @@ struct EncodingConfiguration {
      */
     bool operator!=(const EncodingConfiguration& conf) const;
 
+    /**
+     *
+     * @return
+     */
     uint8_t getSubseqWordSize() const;
 
+    /**
+     *
+     * @return
+     */
     const paramcabac::Subsequence& getSubseqConfig() const;
 
+    /**
+     *
+     * @param _subseqCfg
+     */
     void setSubseqConfig(paramcabac::Subsequence&& _subseqCfg);
 
    private:
-    paramcabac::Subsequence subseqCfg;
+    paramcabac::Subsequence subseqCfg;  //!<
 };
 
 /**
@@ -110,8 +126,15 @@ struct IOConfiguration {
     void validate() const;
 };
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #endif  // GABAC_CONFIGURATION_H_
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

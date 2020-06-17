@@ -19,18 +19,17 @@ void ReadEncoder::setQVCoder(util::SideSelector<QVEncoder, QVEncoder::QVCoded, c
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReadEncoder::setNameCoder(
-    NameSelector* coder) {
-    namecoder = coder;
-}
+void ReadEncoder::setNameCoder(NameSelector* coder) { namecoder = coder; }
 
-void ReadEncoder::setEntropyCoder(EntropySelector* coder) {
-    entropycoder = coder;
-}
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ReadEncoder::setEntropyCoder(EntropySelector* coder) { entropycoder = coder; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit ReadEncoder::entropyCodeAU(EntropySelector* entropycoder, AccessUnit&& a) {
     AccessUnit au = std::move(a);
-    for(auto &d : au) {
+    for (auto& d : au) {
         auto encoded = entropycoder->process(d);
         au.getParameters().setDescriptor(d.getID(), std::move(std::get<0>(encoded)));
         au.set(d.getID(), std::move(std::get<1>(encoded)));
@@ -39,9 +38,9 @@ AccessUnit ReadEncoder::entropyCodeAU(EntropySelector* entropycoder, AccessUnit&
     return au;
 }
 
-AccessUnit ReadEncoder::entropyCodeAU(AccessUnit&& a) {
-    return entropyCodeAU(entropycoder, std::move(a));
-}
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnit ReadEncoder::entropyCodeAU(AccessUnit&& a) { return entropyCodeAU(entropycoder, std::move(a)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

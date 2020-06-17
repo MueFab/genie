@@ -27,6 +27,7 @@ StateVars::StateVars()
       numCtxTotal(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
+
 uint64_t StateVars::getNumAlphaSpecial(const core::GenSubIndex subsequence_ID, const core::AlphabetID alphabet_ID) {
     unsigned long numAlphaSpecial = 0;
     if (subsequence_ID == core::GenSub::MMTYPE_TYPE) {  // mmtype subseq 0
@@ -52,6 +53,7 @@ uint64_t StateVars::getNumAlphaSpecial(const core::GenSubIndex subsequence_ID, c
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+
 uint8_t StateVars::getNumLuts(const uint8_t codingOrder, const bool shareSubsymLutFlag,
                               const SupportValues::TransformIdSubsym trnsfSubsymID) const {
     return (codingOrder > 0 && trnsfSubsymID == SupportValues::TransformIdSubsym::LUT_TRANSFORM)
@@ -60,9 +62,11 @@ uint8_t StateVars::getNumLuts(const uint8_t codingOrder, const bool shareSubsymL
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+
 uint8_t StateVars::getNumPrvs(const bool shareSubsymPrvFlag) const { return (shareSubsymPrvFlag) ? 1 : numSubsyms; }
 
 // ---------------------------------------------------------------------------------------------------------------------
+
 void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_subsym, const SupportValues support_values,
                          const Binarization cabac_binarization, const core::GenSubIndex subsequence_ID,
                          const core::AlphabetID alphabet_ID) {
@@ -189,25 +193,47 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
     }  // if (!cabac_binarization.getBypassFlag())
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint32_t StateVars::getNumSubsymbols() const { return numSubsyms; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t StateVars::getNumAlphaSubsymbol() const { return numAlphaSubsym; }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint32_t StateVars::getNumCtxPerSubsymbol() const { return numCtxSubsym; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 uint32_t StateVars::getCLengthBI() const { return cLengthBI; }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint64_t StateVars::getCodingOrderCtxOffset(uint8_t index) const { return codingOrderCtxOffset[index]; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t StateVars::getCodingSizeCtxOffset() const { return codingSizeCtxOffset; }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint32_t StateVars::getNumCtxLUTs() const { return numCtxLuts; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t StateVars::getNumCtxTotal() const { return numCtxTotal; }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint8_t StateVars::getMinimalSizeInBytes(uint8_t sizeInBits) { return (sizeInBits / 8) + ((sizeInBits % 8) ? 1 : 0); }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint8_t StateVars::getLgWordSize(uint8_t sizeInBits) { return StateVars::getMinimalSizeInBytes(sizeInBits) >> 3; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 int64_t StateVars::getSignedValue(uint64_t input, uint8_t sizeInBytes) {
     int64_t signedValue = 0;
@@ -232,11 +258,15 @@ int64_t StateVars::getSignedValue(uint64_t input, uint8_t sizeInBytes) {
     return signedValue;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint64_t StateVars::get2PowN(uint8_t N) {
     assert(N <= 32);
     uint64_t one = 1u;
     return one << N;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace paramcabac
 }  // namespace entropy

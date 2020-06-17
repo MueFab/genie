@@ -19,8 +19,14 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
+/**
+ *
+ */
 class DT_metadata {
    public:
+    /**
+     *
+     */
     DT_metadata() : DT_metadata_value() {
         DT_metadata_value = {0x37, 0xfd, 0x58, 0x7a, 0x00, 0x5a, 0x04, 0x00, 0xd6, 0xe6, 0x46,
                              0xb4, 0x00, 0x00, 0x00, 0x00, 0xdf, 0x1c, 0x21, 0x44, 0xb6, 0x1f,
@@ -28,11 +34,17 @@ class DT_metadata {
     }
 
    private:
-    std::vector<uint8_t> DT_metadata_value;
+    std::vector<uint8_t> DT_metadata_value;  //!<
 };
 
+/**
+ *
+ */
 class DT_protection {
    public:
+    /**
+     *
+     */
     DT_protection() : DT_protection_value() {
         DT_protection_value = {0x37, 0xfd, 0x58, 0x7a, 0x00, 0x5a, 0x04, 0x00, 0xd6, 0xe6, 0x46,
                                0xb4, 0x00, 0x00, 0x00, 0x00, 0xdf, 0x1c, 0x21, 0x44, 0xb6, 0x1f,
@@ -40,47 +52,93 @@ class DT_protection {
     }
 
    private:
-    std::vector<uint8_t> DT_protection_value;
+    std::vector<uint8_t> DT_protection_value;  //!<
 };
 
+/**
+ *
+ */
 class Dataset {
    public:
+    /**
+     *
+     * @param dataUnitFactory
+     * @param accessUnits_p2
+     * @param dataset_ID
+     */
     Dataset(const genie::format::mgb::DataUnitFactory& dataUnitFactory,
             std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2, const uint16_t dataset_ID);
 
+    /**
+     *
+     * @return
+     */
     uint16_t getDatasetParameterSetDatasetID() const {
         return dataset_parameter_sets.front().getDatasetID();
     }  // only returns ID of first ps in vector
 
+    /**
+     *
+     * @return
+     */
     uint8_t getDatasetParameterSetDatasetGroupID() const {
         return dataset_parameter_sets.front().getDatasetGroupID();
     }  // only returns ID of first ps in vector
 
+    /**
+     *
+     * @return
+     */
     const DatasetHeader& getDatasetHeader() const { return dataset_header; }
+
+    /**
+     *
+     * @return
+     */
     const std::vector<DatasetParameterSet>& getDatasetParameterSets() const { return dataset_parameter_sets; }
 
+    /**
+     *
+     * @return
+     */
     uint64_t getLength() const;
 
+    /**
+     *
+     * @param groupId
+     */
     void setDatasetGroupId(uint8_t groupId) {
         this->setDatasetHeaderGroupId(groupId);
         this->setDatasetParameterSetsGroupId(groupId);
     };
 
+    /**
+     *
+     * @param bitWriter
+     */
     void writeToFile(genie::util::BitWriter& bitWriter) const;
 
    private:
+    /**
+     *
+     */
     void setDatasetHeaderGroupId(uint8_t groupId) { dataset_header.setDatasetGroupId(groupId); }
+
+    /**
+     *
+     * @param groupId
+     */
     void setDatasetParameterSetsGroupId(uint8_t groupId);
     /**
      * ISO 23092-1 Section 6.5.2 table 18
      *
      * ------------------------------------------------------------------------------------------------------------- */
-    mpegg_p1::DatasetHeader dataset_header;
+    mpegg_p1::DatasetHeader dataset_header;  //!<
     // std::unique_ptr<DT_metadata> dt_metadata;     //optional
     // std::unique_ptr<DT_protection> dt_protection; //optional
-    std::vector<DatasetParameterSet> dataset_parameter_sets;
+    std::vector<DatasetParameterSet> dataset_parameter_sets;  //!<
     /** master_index_table is optional and not yet implemented */
-    std::vector<mpegg_p1::AccessUnit> access_units;
+    std::vector<mpegg_p1::AccessUnit> access_units;  //!<
     /** descriptor_stream[] is optional and not yet implemented */
 };
 

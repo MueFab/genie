@@ -23,8 +23,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     core::parameter::ParameterSet set;
     LLState state{data.getData().front().getSegments().front().getSequence().length(),
                   data.getData().front().getNumberOfTemplateSegments() > 1,
-                  core::AccessUnit(std::move(set),
-                                      data.getData().size())};
+                  core::AccessUnit(std::move(set), data.getData().size())};
     for (auto& r : data.getData()) {
         for (auto& s : r.getSegments()) {
             state.streams.push(core::GenSub::RLEN, s.getSequence().length() - 1);
@@ -53,7 +52,8 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     rname = std::get<0>(namecoder->process(data));
     data.getStats().addDouble("time-name", watch.check());
     watch.reset();
-    auto rawAU = pack(id, data.getData().front().getSegments().front().getQualities().size(), std::move(std::get<0>(qv)), state);
+    auto rawAU =
+        pack(id, data.getData().front().getSegments().front().getQualities().size(), std::move(std::get<0>(qv)), state);
 
     rawAU.get(core::GenDesc::QV) = std::move(std::get<1>(qv));
     rawAU.get(core::GenDesc::RNAME) = std::move(rname);
@@ -69,7 +69,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::AccessUnit Encoder::pack(const util::Section& id, uint8_t qv_depth,
-                                  std::unique_ptr<core::parameter::QualityValues> qvparam, LLState& state) const {
+                               std::unique_ptr<core::parameter::QualityValues> qvparam, LLState& state) const {
     core::parameter::DataUnit::DatasetType dataType = core::parameter::DataUnit::DatasetType::NON_ALIGNED;
     core::parameter::ParameterSet ret(id.start, id.start, dataType, core::AlphabetID::ACGTN, state.readLength,
                                       state.pairedEnd, false, qv_depth, 0, false, false);

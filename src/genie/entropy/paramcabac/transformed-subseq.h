@@ -27,44 +27,95 @@ namespace paramcabac {
  */
 class TransformedSubSeq {
    public:
+    /**
+     *
+     */
     TransformedSubSeq();
 
+    /**
+     *
+     * @param _transform_ID_subsym
+     * @param _support_values
+     * @param _cabac_binarization
+     * @param _subsequence_ID
+     * @param _alphabet_ID
+     */
     TransformedSubSeq(SupportValues::TransformIdSubsym _transform_ID_subsym, SupportValues&& _support_values,
                       Binarization&& _cabac_binarization,
                       const core::GenSubIndex _subsequence_ID = core::GenSub::POS_MAPPING_FIRST,
                       const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
-
+    /**
+     *
+     * @param reader
+     * @param _subsequence_ID
+     * @param _alphabet_ID
+     */
     TransformedSubSeq(util::BitReader& reader,
                       const core::GenSubIndex _subsequence_ID = core::GenSub::POS_MAPPING_FIRST,
                       const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
 
+    /**
+     *
+     */
     virtual ~TransformedSubSeq() = default;
 
+    /**
+     *
+     * @param writer
+     */
     virtual void write(util::BitWriter& writer) const;
 
+    /**
+     *
+     * @return
+     */
     SupportValues::TransformIdSubsym getTransformIDSubsym() const;
 
+    /**
+     *
+     * @return
+     */
     const SupportValues& getSupportValues() const;
 
+    /**
+     *
+     * @return
+     */
     const Binarization& getBinarization() const;
 
+    /**
+     *
+     * @return
+     */
     const StateVars& getStateVars() const;
 
-    void setSubsequenceID(const core::GenSubIndex _subsequence_ID) { subsequence_ID = _subsequence_ID; }
+    /**
+     *
+     * @param _subsequence_ID
+     */
+    void setSubsequenceID(const core::GenSubIndex _subsequence_ID);
 
-    core::AlphabetID getAlphabetID() const { return alphabet_ID; }
+    /**
+     *
+     * @return
+     */
+    core::AlphabetID getAlphabetID() const;
 
-    void setAlphabetID(core::AlphabetID _alphabet_ID) { alphabet_ID = _alphabet_ID; }
+    /**
+     *
+     * @param _alphabet_ID
+     */
+    void setAlphabetID(core::AlphabetID _alphabet_ID);
 
    private:
     SupportValues::TransformIdSubsym transform_ID_subsym;  //!< : 3; Line 9
     SupportValues support_values;                          //!< Line 10
     Binarization cabac_binarization;                       //!< Line 11
-    StateVars state_vars;
+    StateVars state_vars;                                  //!<
 
     // declaration with default value.
-    core::GenSubIndex subsequence_ID = core::GenSub::POS_MAPPING_FIRST;
-    core::AlphabetID alphabet_ID = core::AlphabetID::ACGTN;
+    core::GenSubIndex subsequence_ID = core::GenSub::POS_MAPPING_FIRST;  //!<
+    core::AlphabetID alphabet_ID = core::AlphabetID::ACGTN;              //!<
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -28,8 +28,14 @@ class EntropyDecoder {
      */
     ~EntropyDecoder() = default;
 
-    virtual std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(const parameter::DescriptorSubseqCfg& param,
-                                                 core::AccessUnit::Descriptor& desc) = 0;
+    /**
+     *
+     * @param param
+     * @param desc
+     * @return
+     */
+    virtual std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(
+        const parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& desc) = 0;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

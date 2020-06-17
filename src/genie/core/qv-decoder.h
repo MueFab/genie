@@ -28,8 +28,8 @@ class QVDecoder {
      * @return
      */
     virtual std::tuple<std::vector<std::string>, core::stats::PerfStats> process(const parameter::QualityValues& param,
-                                             const std::vector<std::string>& ecigar,
-                                             AccessUnit::Descriptor& desc) = 0;
+                                                                                 const std::vector<std::string>& ecigar,
+                                                                                 AccessUnit::Descriptor& desc) = 0;
     /**
      * @Brief For polymorphic destruction
      */

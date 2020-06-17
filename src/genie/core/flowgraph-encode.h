@@ -7,6 +7,8 @@
 #ifndef GENIE_FLOWGRAPH_ENCODE_H
 #define GENIE_FLOWGRAPH_ENCODE_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include "entropy-encoder.h"
 #include "flowgraph.h"
 #include "format-exporter-compressed.h"
@@ -27,7 +29,7 @@ class FlowGraphEncode : public FlowGraph {
 
     std::vector<std::unique_ptr<genie::core::FormatImporter>> importers;  //!<
 
-    std::vector<std::unique_ptr<genie::core::ReadEncoder>> readCoders;                           //!<
+    std::vector<std::unique_ptr<genie::core::ReadEncoder>> readCoders;                        //!<
     genie::util::Selector<genie::core::record::Chunk, genie::core::AccessUnit> readSelector;  //!<
 
     std::vector<std::unique_ptr<genie::core::QVEncoder>> qvCoders;  //!<
@@ -36,14 +38,15 @@ class FlowGraphEncode : public FlowGraph {
         qvSelector;  //!<
 
     std::vector<std::unique_ptr<genie::core::NameEncoder>> nameCoders;  //!<
-    genie::core::ReadEncoder::NameSelector
-        nameSelector;  //!<
+    genie::core::ReadEncoder::NameSelector nameSelector;                //!<
 
-    std::vector<std::unique_ptr<genie::core::EntropyEncoder>> entropyCoders;                            //!<
-    genie::util::SideSelector<genie::core::EntropyEncoder, genie::core::EntropyEncoder::EntropyCoded , genie::core::AccessUnit::Descriptor&> entropySelector;  //!<
+    std::vector<std::unique_ptr<genie::core::EntropyEncoder>> entropyCoders;  //!<
+    genie::util::SideSelector<genie::core::EntropyEncoder, genie::core::EntropyEncoder::EntropyCoded,
+                              genie::core::AccessUnit::Descriptor&>
+        entropySelector;  //!<
 
     std::vector<std::unique_ptr<genie::core::FormatExporterCompressed>> exporters;  //!<
-    genie::util::SelectorHead<genie::core::AccessUnit> exporterSelector;     //!<
+    genie::util::SelectorHead<genie::core::AccessUnit> exporterSelector;            //!<
 
    public:
     /**

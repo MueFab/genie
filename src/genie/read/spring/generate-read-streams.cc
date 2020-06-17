@@ -25,7 +25,6 @@ namespace genie {
 namespace read {
 namespace spring {
 
-
 struct se_data {
     compression_params cp{};
     std::vector<bool> flag_arr;
@@ -133,7 +132,7 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
 
 void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
                               core::ReadEncoder::EntropySelector *entropycoder,
-                              std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats& stats) {
+                              std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
     // Now generate new streams and compress blocks in parallel
     // this is actually number of read pairs per block for PE
     uint64_t blocks = uint64_t(std::ceil(float(data.cp.num_reads) / data.cp.num_reads_per_block));
@@ -148,7 +147,8 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
     for (uint64_t block_num = 0; block_num < blocks; block_num++) {
         params[block_num] = core::parameter::ParameterSet(0, 0, core::parameter::ParameterSet::DatasetType::NON_ALIGNED,
                                                           core::AlphabetID::ACGTN, 0, false, false, 1, 0, false, false);
-        params[block_num].setComputedRef(core::parameter::ComputedRef(core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY));
+        params[block_num].setComputedRef(
+            core::parameter::ComputedRef(core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY));
         core::AccessUnit au(std::move(params[block_num]), 0);
 
         generate_subseqs(data, block_num, au);
@@ -170,7 +170,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
         }
     }  // end omp parallel for
 
-    for(const auto& s : stat_vec) {
+    for (const auto &s : stat_vec) {
         stats.add(s);
     }
 
@@ -291,7 +291,7 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
 
 void generate_read_streams_se(const std::string &temp_dir, const compression_params &cp,
                               core::ReadEncoder::EntropySelector *entropycoder,
-                              std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats& stats) {
+                              std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
     se_data data;
     loadSE_Data(cp, temp_dir, &data);
 
@@ -760,7 +760,8 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
 }
 
 void generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp,
-                              core::ReadEncoder::EntropySelector *entropycoder, std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
+                              core::ReadEncoder::EntropySelector *entropycoder,
+                              std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
     // basic approach: start looking at reads from left to right. If current is
     // aligned but pair is unaligned, pair is kept at the end current AU and
     // stored in different record. We try to keep number of records in AU =
@@ -798,9 +799,11 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
 #pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic)
 #endif
     for (uint64_t cur_block_num = 0; cur_block_num < bdata.block_start.size(); cur_block_num++) {
-        params[cur_block_num] = core::parameter::ParameterSet(0, 0, core::parameter::ParameterSet::DatasetType::NON_ALIGNED,
-                                                          core::AlphabetID::ACGTN, 0, true, false, 1, 0, false, false);
-        params[cur_block_num].setComputedRef(core::parameter::ComputedRef(core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY));
+        params[cur_block_num] =
+            core::parameter::ParameterSet(0, 0, core::parameter::ParameterSet::DatasetType::NON_ALIGNED,
+                                          core::AlphabetID::ACGTN, 0, true, false, 1, 0, false, false);
+        params[cur_block_num].setComputedRef(
+            core::parameter::ComputedRef(core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY));
         core::AccessUnit au(std::move(params[cur_block_num]), 0);
 
         generate_streams_pe(data, bdata, cur_block_num, &pest, au);
@@ -824,7 +827,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
         }
     }  // end omp parallel
 
-    for(const auto & s : stat_vec) {
+    for (const auto &s : stat_vec) {
         stats.add(s);
     }
 
@@ -846,7 +849,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
 
 void generate_read_streams(const std::string &temp_dir, const compression_params &cp,
                            core::ReadEncoder::EntropySelector *entropycoder,
-                           std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats& stats) {
+                           std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
     if (!cp.paired_end)
         generate_read_streams_se(temp_dir, cp, entropycoder, params, stats);
     else

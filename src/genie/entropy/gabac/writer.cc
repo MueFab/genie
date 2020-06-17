@@ -18,9 +18,13 @@
 //
 #include "binary-arithmetic-encoder.cc"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace entropy {
 namespace gabac {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 Writer::Writer(OBufferStream *const bitstream, const bool bypassFlag, const unsigned long numContexts)
     : m_bitOutputStream(bitstream),
@@ -32,11 +36,19 @@ Writer::Writer(OBufferStream *const bitstream, const bool bypassFlag, const unsi
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 Writer::~Writer() = default;
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Writer::start() { m_binaryArithmeticEncoder.start(); }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Writer::close() { m_binaryArithmeticEncoder.flush(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Writer::reset() {
     m_binaryArithmeticEncoder.flush();
@@ -44,9 +56,13 @@ void Writer::reset() {
     m_contextModels = contexttables::buildContextTable(m_numContexts);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Writer::writeAsBIbypass(uint64_t input, const std::vector<unsigned int> binParams) {
     m_binaryArithmeticEncoder.encodeBinsEP(static_cast<unsigned int>(input), binParams[0]);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Writer::writeAsBIcabac(uint64_t input, const std::vector<unsigned int> binParams) {
     const unsigned int cLength = binParams[0];
@@ -59,6 +75,8 @@ void Writer::writeAsBIcabac(uint64_t input, const std::vector<unsigned int> binP
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Writer::writeAsTUbypass(uint64_t input, const std::vector<unsigned int> binParams) {
     const unsigned int cMax = binParams[0];
     for (uint64_t i = 0; i < input; i++) {
@@ -68,6 +86,8 @@ void Writer::writeAsTUbypass(uint64_t input, const std::vector<unsigned int> bin
         m_binaryArithmeticEncoder.encodeBinEP(0);
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Writer::writeAsTUcabac(uint64_t input, const std::vector<unsigned int> binParams) {
     const unsigned int cMax = binParams[0];
@@ -81,6 +101,8 @@ void Writer::writeAsTUcabac(uint64_t input, const std::vector<unsigned int> binP
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Writer::writeAsEGbypass(uint64_t input, const std::vector<unsigned int>) {
     unsigned int valuePlus1 = input + 1;
     unsigned int numLeadZeros = floor(log2(valuePlus1));
@@ -92,6 +114,8 @@ void Writer::writeAsEGbypass(uint64_t input, const std::vector<unsigned int>) {
         writeAsBIbypass(valuePlus1 & ((1u << numLeadZeros) - 1), std::vector<unsigned int>({numLeadZeros}));
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Writer::writeAsEGcabac(uint64_t input, const std::vector<unsigned int> binParams) {
     unsigned int valuePlus1 = input + 1;
@@ -105,6 +129,8 @@ void Writer::writeAsEGcabac(uint64_t input, const std::vector<unsigned int> binP
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Writer::writeAsTEGbypass(uint64_t input, const std::vector<unsigned int> binParams) {
     const unsigned int cTruncExpGolParam = binParams[0];
     if (input < cTruncExpGolParam) {
@@ -115,6 +141,8 @@ void Writer::writeAsTEGbypass(uint64_t input, const std::vector<unsigned int> bi
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Writer::writeAsTEGcabac(uint64_t input, const std::vector<unsigned int> binParams) {
     const unsigned int cTruncExpGolParam = binParams[0];
 
@@ -124,6 +152,8 @@ void Writer::writeAsTEGcabac(uint64_t input, const std::vector<unsigned int> bin
                        std::vector<unsigned int>({0, 0, 0, binParams[3] + cTruncExpGolParam}));
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Writer::writeAsSUTUbypass(uint64_t input, const std::vector<unsigned int> binParams) {
     const unsigned int outputSymSize = binParams[0];
@@ -138,6 +168,8 @@ void Writer::writeAsSUTUbypass(uint64_t input, const std::vector<unsigned int> b
         writeAsTUbypass(val, std::vector<unsigned int>({cMax}));
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Writer::writeAsSUTUcabac(uint64_t input, const std::vector<unsigned int> binParams) {
     const unsigned int outputSymSize = binParams[0];
@@ -155,6 +187,8 @@ void Writer::writeAsSUTUcabac(uint64_t input, const std::vector<unsigned int> bi
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Writer::writeAsDTUbypass(uint64_t input, const std::vector<unsigned int> binParams) {
     const unsigned int cMaxDtu = binParams[2];
 
@@ -166,6 +200,8 @@ void Writer::writeAsDTUbypass(uint64_t input, const std::vector<unsigned int> bi
         writeAsSUTUbypass(input, binParams);
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Writer::writeAsDTUcabac(uint64_t input, const std::vector<unsigned int> binParams) {
     const unsigned int cMaxDtu = binParams[2];
@@ -179,12 +215,16 @@ void Writer::writeAsDTUcabac(uint64_t input, const std::vector<unsigned int> bin
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Writer::writeBI(uint64_t input, const std::vector<unsigned int> binParams) {
     if (m_bypassFlag)
         writeAsBIbypass(input, binParams);
     else
         writeAsBIcabac(input, binParams);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Writer::writeTU(uint64_t input, const std::vector<unsigned int> binParams) {
     if (m_bypassFlag)
@@ -193,12 +233,16 @@ void Writer::writeTU(uint64_t input, const std::vector<unsigned int> binParams) 
         writeAsTUcabac(input, binParams);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Writer::writeEG(uint64_t input, const std::vector<unsigned int> binParams) {
     if (m_bypassFlag)
         writeAsEGbypass(input, binParams);
     else
         writeAsEGcabac(input, binParams);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Writer::writeTEG(uint64_t input, const std::vector<unsigned int> binParams) {
     if (m_bypassFlag)
@@ -207,6 +251,8 @@ void Writer::writeTEG(uint64_t input, const std::vector<unsigned int> binParams)
         writeAsTEGcabac(input, binParams);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Writer::writeSUTU(uint64_t input, const std::vector<unsigned int> binParams) {
     if (m_bypassFlag)
         writeAsSUTUbypass(input, binParams);
@@ -214,12 +260,16 @@ void Writer::writeSUTU(uint64_t input, const std::vector<unsigned int> binParams
         writeAsSUTUcabac(input, binParams);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Writer::writeDTU(uint64_t input, const std::vector<unsigned int> binParams) {
     if (m_bypassFlag)
         writeAsDTUbypass(input, binParams);
     else
         writeAsDTUcabac(input, binParams);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Writer::writeLutSymbol(uint64_t input, const uint8_t codingSubsymSize) {
     std::vector<unsigned int> binParams({codingSubsymSize, 2, 0, 0});  // ctxIdx = 0
@@ -229,6 +279,8 @@ void Writer::writeLutSymbol(uint64_t input, const uint8_t codingSubsymSize) {
         writeAsSUTUcabac(input, binParams);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Writer::writeSignFlag(int64_t input) {
     std::vector<unsigned int> binParams({1});
     if (m_bypassFlag)
@@ -237,6 +289,11 @@ void Writer::writeSignFlag(int64_t input) {
         writeAsBIcabac(input < 0, std::vector<unsigned int>({1, 0, 0, static_cast<unsigned int>(m_numContexts - 1)}));
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

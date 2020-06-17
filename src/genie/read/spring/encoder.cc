@@ -35,8 +35,11 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
     std::vector<core::parameter::ParameterSet>& params;
 
     core::stats::PerfStats stats;
+
    public:
-    SpringSource(const std::string& temp_dir, const compression_params& cp, std::vector<core::parameter::ParameterSet>& p, core::stats::PerfStats s) : params(p), stats(std::move(s)) {
+    SpringSource(const std::string& temp_dir, const compression_params& cp,
+                 std::vector<core::parameter::ParameterSet>& p, core::stats::PerfStats s)
+        : params(p), stats(std::move(s)) {
         auId = 0;
         // read info about number of blocks (AUs) and the number of reads and records in those
         const std::string block_info_file = temp_dir + "/block_info.bin";
@@ -105,12 +108,11 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
 };
 
 void Encoder::flushIn(size_t& pos) {
-    if(!preprocessor.used) {
+    if (!preprocessor.used) {
         flushOut(pos);
         return;
     }
     preprocessor.finish(pos);
-
 
     std::vector<core::parameter::ParameterSet> params;
     auto loc_cp = preprocessor.cp;
@@ -137,7 +139,6 @@ void Encoder::flushIn(size_t& pos) {
     generate_read_streams(preprocessor.temp_dir, loc_cp, entropycoder, params, stats);
     std::cout << "Generating read streams done!\n";
     stats.addDouble("time-spring-gen-reads", watch.check());
-
 
     if (preprocessor.cp.preserve_quality || preprocessor.cp.preserve_id) {
         watch.reset();

@@ -63,8 +63,7 @@ struct reorder_global {
 };
 
 template <size_t bitset_size>
-void bitsettostring(std::bitset<bitset_size> b, char *s, const uint16_t readlen,
-                    const reorder_global<bitset_size> &rg);
+void bitsettostring(std::bitset<bitset_size> b, char *s, const uint16_t readlen, const reorder_global<bitset_size> &rg);
 
 template <size_t bitset_size>
 void setglobalarrays(reorder_global<bitset_size> &rg);

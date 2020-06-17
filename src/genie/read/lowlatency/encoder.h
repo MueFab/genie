@@ -28,11 +28,10 @@ class Encoder : public core::ReadEncoder {
     };
 
    public:
-
     void flowIn(core::record::Chunk&& t, const util::Section& id) override;
 
     core::AccessUnit pack(const util::Section& id, uint8_t qv_depth,
-                             std::unique_ptr<core::parameter::QualityValues> qvparam, LLState& state) const;
+                          std::unique_ptr<core::parameter::QualityValues> qvparam, LLState& state) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

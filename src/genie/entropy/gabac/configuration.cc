@@ -12,20 +12,37 @@
 
 #include <genie/entropy/paramcabac/transformed-subseq.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace entropy {
 namespace gabac {
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 EncodingConfiguration::EncodingConfiguration() : subseqCfg() {}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 EncodingConfiguration::EncodingConfiguration(const core::GenSubIndex sub) { subseqCfg = getEncoderConfigManual(sub); }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 EncodingConfiguration::EncodingConfiguration(paramcabac::Subsequence&& _subseq) { subseqCfg = std::move(_subseq); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 EncodingConfiguration::~EncodingConfiguration() = default;
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool EncodingConfiguration::operator==(const EncodingConfiguration& conf) const { return (conf == *this); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool EncodingConfiguration::operator!=(const EncodingConfiguration& conf) const { return !(conf == *this); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 uint8_t EncodingConfiguration::getSubseqWordSize() const {
     const std::vector<paramcabac::TransformedSubSeq>& trnsfCfgs = subseqCfg.getTransformSubseqCfgs();
@@ -56,9 +73,15 @@ uint8_t EncodingConfiguration::getSubseqWordSize() const {
     return 1;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 const paramcabac::Subsequence& EncodingConfiguration::getSubseqConfig() const { return subseqCfg; }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void EncodingConfiguration::setSubseqConfig(paramcabac::Subsequence&& _subseqCfg) { subseqCfg = std::move(_subseqCfg); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void IOConfiguration::validate() const {
     if (!inputStream) {
@@ -75,6 +98,8 @@ void IOConfiguration::validate() const {
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::ostream& IOConfiguration::log(const LogLevel& l) const {
     static NullStream nullstr;
     if (static_cast<int>(l) >= static_cast<int>(level)) {
@@ -83,6 +108,11 @@ std::ostream& IOConfiguration::log(const LogLevel& l) const {
     return nullstr;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

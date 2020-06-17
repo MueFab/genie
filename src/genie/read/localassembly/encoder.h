@@ -88,8 +88,8 @@ class Encoder : public core::ReadEncoder {
      * @return RawAccessUnit ready for entropy core
      */
     core::AccessUnit pack(size_t id, uint16_t ref, uint8_t qv_depth,
-                             std::unique_ptr<core::parameter::QualityValues> qvparam, core::record::ClassType type,
-                             Encoder::LaeState& state) const;
+                          std::unique_ptr<core::parameter::QualityValues> qvparam, core::record::ClassType type,
+                          Encoder::LaeState& state) const;
 
    public:
     /**

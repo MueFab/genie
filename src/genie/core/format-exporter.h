@@ -23,7 +23,7 @@ namespace core {
  */
 class FormatExporter : public util::Drain<record::Chunk> {
    private:
-    stats::PerfStats stats; //!<
+    stats::PerfStats stats;  //!<
 
    public:
     /**

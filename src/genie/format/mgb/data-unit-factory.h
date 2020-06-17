@@ -19,14 +19,26 @@ namespace genie {
 namespace format {
 namespace mgb {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+/**
+ *
+ */
 class DataUnitFactory {
    private:
-    std::map<size_t, core::parameter::ParameterSet> parameters;
+    std::map<size_t, core::parameter::ParameterSet> parameters;  //!<
 
    public:
+    /**
+     *
+     * @param id
+     * @return
+     */
     const core::parameter::ParameterSet& getParams(size_t id) const;
+
+    /**
+     *
+     * @param bitReader
+     * @return
+     */
     boost::optional<AccessUnit> read(util::BitReader& bitReader);
 };
 

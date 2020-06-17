@@ -104,8 +104,8 @@ void Encoder::updateGuesses(const core::record::Record& r, Encoder::LaeState& st
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::AccessUnit Encoder::pack(size_t id, uint16_t ref, uint8_t qv_depth,
-                                  std::unique_ptr<core::parameter::QualityValues> qvparam, core::record::ClassType type,
-                                  Encoder::LaeState& state) const {
+                               std::unique_ptr<core::parameter::QualityValues> qvparam, core::record::ClassType type,
+                               Encoder::LaeState& state) const {
     core::parameter::DataUnit::DatasetType dataType = core::parameter::DataUnit::DatasetType::ALIGNED;
     core::parameter::ParameterSet ret(id, id, dataType, core::AlphabetID::ACGTN, state.readLength, state.pairedEnd,
                                       false, qv_depth, 0, false, false);

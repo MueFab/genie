@@ -36,6 +36,16 @@ const gabac::EncodingConfiguration &GabacSeqConfSet::getConfAsGabac(core::GenSub
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+gabac::EncodingConfiguration &GabacSeqConfSet::getConfAsGabac(core::GenSubIndex sub) {
+    if (getDescriptor(sub.first).tokentype) {
+        return conf[uint8_t(sub.first)][0];
+    } else {
+        return conf[uint8_t(sub.first)][uint8_t(sub.second)];
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void GabacSeqConfSet::setConfAsGabac(core::GenSubIndex sub, DescriptorSubsequenceCfg &&subseqCfg) {
     conf[uint8_t(sub.first)][uint8_t(sub.second)].setSubseqConfig(std::move(subseqCfg));
 }

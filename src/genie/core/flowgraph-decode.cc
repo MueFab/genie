@@ -13,9 +13,7 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FlowGraphDecode::FlowGraphDecode(size_t threads) : mgr(threads) {
-    readSelector.setDrain(&exporterSelector);
-}
+FlowGraphDecode::FlowGraphDecode(size_t threads) : mgr(threads) { readSelector.setDrain(&exporterSelector); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -110,7 +108,8 @@ void FlowGraphDecode::setNameSelector(std::function<size_t(genie::core::AccessUn
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FlowGraphDecode::setEntropyCoderSelector(const std::function<size_t(const parameter::DescriptorSubseqCfg&, genie::core::AccessUnit::Descriptor&)>& fun) {
+void FlowGraphDecode::setEntropyCoderSelector(
+    const std::function<size_t(const parameter::DescriptorSubseqCfg&, genie::core::AccessUnit::Descriptor&)>& fun) {
     entropySelector.setSelection(fun);
 }
 
