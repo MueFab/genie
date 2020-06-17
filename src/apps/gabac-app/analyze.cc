@@ -19,14 +19,14 @@ void analyze(const std::string &inputFilePath, const std::string &configurationF
     if (!inputFilePath.empty()) {
         inputFile = std::ifstream(inputFilePath, std::ios::binary);
         if (!inputFile) {
-            GABAC_DIE("Could not open input file");
+            UTILS_DIE("Could not open input file");
         }
         istream = &inputFile;
     }
     if (!configurationFilePath.empty()) {
         configurationFile = std::ofstream(configurationFilePath, std::ios::binary);
         if (!configurationFile) {
-            GABAC_DIE("Could not open output file");
+            UTILS_DIE("Could not open output file");
         }
         ostream = &configurationFile;
     } else {

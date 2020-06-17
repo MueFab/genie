@@ -30,16 +30,19 @@ void Encoder::setUpParameters(const core::record::Chunk& rec, paramqv1::QualityV
 void Encoder::encodeAlignedSegment(const core::record::Segment& s, const std::string& ecigar,
                                    core::AccessUnit::Descriptor& desc) {
     for (const auto& q : s.getQualities()) {
-        core::CigarTokenizer::tokenize(ecigar, core::getECigarInfo(),
-                                       [&desc, &q](uint8_t cigar, const util::StringView& bs, const util::StringView&) {
-                                           auto qvs = bs.deploy(q.data());
-                                           uint8_t codebook =
-                                               core::getECigarInfo().lut_step_ref[cigar] || core::getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar) ? 2 : desc.getSize() - 1;
-                                           for (const auto& c : qvs) {
-                                               UTILS_DIE_IF(c < 33 || c > 126, "Invalid quality score");
-                                               desc.get(codebook).push(c - 33);
-                                           }
-                                       });
+        core::CigarTokenizer::tokenize(
+            ecigar, core::getECigarInfo(),
+            [&desc, &q](uint8_t cigar, const util::StringView& bs, const util::StringView&) {
+                auto qvs = bs.deploy(q.data());
+                uint8_t codebook = core::getECigarInfo().lut_step_ref[cigar] ||
+                                           core::getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar)
+                                       ? 2
+                                       : desc.getSize() - 1;
+                for (const auto& c : qvs) {
+                    UTILS_DIE_IF(c < 33 || c > 126, "Invalid quality score");
+                    desc.get(codebook).push(c - 33);
+                }
+            });
     }
 }
 
@@ -86,6 +89,14 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
     stats.addDouble("time-qv1writeout", watch.check());
     return {std::move(param), std::move(desc), stats};
 }
+
+core::QVEncoder::QVCoded NoneEncoder::process(const core::record::Chunk&) {
+    auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
+    core::AccessUnit::Descriptor desc(core::GenDesc::QV);
+
+    return {std::move(param), std::move(desc), core::stats::PerfStats()};
+}
+
 }  // namespace qvwriteout
 }  // namespace quality
 }  // namespace genie

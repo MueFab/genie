@@ -189,6 +189,55 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
     }  // if (!cabac_binarization.getBypassFlag())
 }
 
+uint32_t StateVars::getNumSubsymbols() const { return numSubsyms; }
+
+uint64_t StateVars::getNumAlphaSubsymbol() const { return numAlphaSubsym; }
+
+uint32_t StateVars::getNumCtxPerSubsymbol() const { return numCtxSubsym; }
+
+uint32_t StateVars::getCLengthBI() const { return cLengthBI; }
+
+uint64_t StateVars::getCodingOrderCtxOffset(uint8_t index) const { return codingOrderCtxOffset[index]; }
+
+uint64_t StateVars::getCodingSizeCtxOffset() const { return codingSizeCtxOffset; }
+
+uint32_t StateVars::getNumCtxLUTs() const { return numCtxLuts; }
+
+uint64_t StateVars::getNumCtxTotal() const { return numCtxTotal; }
+
+uint8_t StateVars::getMinimalSizeInBytes(uint8_t sizeInBits) { return (sizeInBits / 8) + ((sizeInBits % 8) ? 1 : 0); }
+
+uint8_t StateVars::getLgWordSize(uint8_t sizeInBits) { return StateVars::getMinimalSizeInBytes(sizeInBits) >> 3; }
+
+int64_t StateVars::getSignedValue(uint64_t input, uint8_t sizeInBytes) {
+    int64_t signedValue = 0;
+
+    switch (sizeInBytes) {
+        case 1:
+            signedValue = static_cast<int64_t>(static_cast<int8_t>(input));
+            break;
+        case 2:
+            signedValue = static_cast<int64_t>(static_cast<int16_t>(input));
+            break;
+        case 4:
+            signedValue = static_cast<int64_t>(static_cast<int32_t>(input));
+            break;
+        case 8:
+            signedValue = static_cast<int64_t>(input);
+            break;
+        default:
+            UTILS_THROW_RUNTIME_EXCEPTION("Invalid size");
+    }
+
+    return signedValue;
+}
+
+uint64_t StateVars::get2PowN(uint8_t N) {
+    assert(N <= 32);
+    uint64_t one = 1u;
+    return one << N;
+}
+
 }  // namespace paramcabac
 }  // namespace entropy
 }  // namespace genie

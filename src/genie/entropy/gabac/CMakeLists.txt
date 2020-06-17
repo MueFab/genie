@@ -10,8 +10,8 @@ set(source_files
         configuration.cc
         #constants.cc
         context-model.cc
+        context-selector.cc
         context-tables.cc
-        exceptions.cc
         luts-subsymbol-transform.cc
         equality-subseq-transform.cc
         match-subseq-transform.cc
@@ -21,8 +21,8 @@ set(source_files
         decoding.cc
         encode-cabac.cc
         encoding.cc
-        gabac-compressor.cc
-        gabac-decompressor.cc
+        encoder.cc
+        decoder.cc
         gabac-seq-conf-set.cc
         run.cc
         stream-handler.cc

@@ -33,12 +33,9 @@ int main(int argc, char* argv[]) {
 
         } */
         else {
-            GABAC_DIE("Invalid task: " + std::string(programOptions.task));
+            UTILS_DIE("Invalid task: " + std::string(programOptions.task));
         }
-    } catch (const genie::entropy::gabac::RuntimeException& e) {
-        std::cerr << e.message() << std::endl;
-        return EXIT_FAILURE;
-    } catch (const std::exception& e) {
+    }  catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;
     } catch (...) {

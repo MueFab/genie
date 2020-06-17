@@ -232,10 +232,10 @@ std::vector<sam::Record> Exporter::convert(core::record::Record&& rec) {
         stash.clear();
         primaryAlignment = false;
     }
-    if(rec.getAlignments().empty()) {
-        for(auto& s : rec.getSegments()) {
-            ret.emplace_back(rec.getName(), 0, "*", 0, 255, "*",
-                "*", 0, 0, s.getSequence(), s.getQualities().empty() ? "*" : s.getQualities().front() );
+    if (rec.getAlignments().empty()) {
+        for (auto& s : rec.getSegments()) {
+            ret.emplace_back(rec.getName(), 0, "*", 0, 255, "*", "*", 0, 0, s.getSequence(),
+                             s.getQualities().empty() ? "*" : s.getQualities().front());
         }
     }
     return ret;
@@ -252,7 +252,7 @@ void Exporter::flowIn(core::record::Chunk&& records, const util::Section& id) {
     for (auto& rec : recs.getData()) {
         auto sam_recs = convert(std::move(rec));
         for (auto& srec : sam_recs) {
-            if(recs.getStats().isActive()) {
+            if (recs.getStats().isActive()) {
                 sam_stats.qname += srec.getQname().size();
                 sam_stats.flag += std::to_string(srec.getFlags()).size();
                 sam_stats.rname += srec.getRname().size();
@@ -273,16 +273,18 @@ void Exporter::flowIn(core::record::Chunk&& records, const util::Section& id) {
     getStats().addInteger("size-sam-flag", sam_stats.flag);
     getStats().addInteger("size-sam-rname", sam_stats.rname);
     getStats().addInteger("size-sam-pos", sam_stats.pos);
-    getStats().addInteger("size-sam-mapq", sam_stats.mapq );
+    getStats().addInteger("size-sam-mapq", sam_stats.mapq);
     getStats().addInteger("size-sam-cigar", sam_stats.cigar);
     getStats().addInteger("size-sam-rnext", sam_stats.rnext);
     getStats().addInteger("size-sam-pnext", sam_stats.pnext);
-    getStats().addInteger("size-sam-tlen", sam_stats.tlen );
+    getStats().addInteger("size-sam-tlen", sam_stats.tlen);
     getStats().addInteger("size-sam-seq", sam_stats.seq);
-    getStats().addInteger("size-sam-qual", sam_stats.qual );
+    getStats().addInteger("size-sam-qual", sam_stats.qual);
     getStats().addInteger("size-sam-total", sam_stats.total());
     getStats().addDouble("time-sam-export", watch.check());
 }
+
+void Exporter::skipIn(const util::Section& id) { util::OrderedSection(&lock, id); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

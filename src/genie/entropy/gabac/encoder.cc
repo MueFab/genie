@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "gabac-compressor.h"
+#include "encoder.h"
 #include <genie/util/make-unique.h>
 #include <genie/util/watch.h>
 
@@ -12,7 +12,7 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-core::AccessUnit::Descriptor GabacCompressor::compressTokens(const gabac::EncodingConfiguration &conf0,
+core::AccessUnit::Descriptor Encoder::compressTokens(const gabac::EncodingConfiguration &conf0,
                                                                            core::AccessUnit::Descriptor &&in) {
     auto desc = std::move(in);
     util::DataBlock block(0, 1);
@@ -46,7 +46,7 @@ core::AccessUnit::Descriptor GabacCompressor::compressTokens(const gabac::Encodi
     return ret;
 }
 
-core::AccessUnit::Subsequence GabacCompressor::compress(const gabac::EncodingConfiguration &conf,
+core::AccessUnit::Subsequence Encoder::compress(const gabac::EncodingConfiguration &conf,
                                                                       core::AccessUnit::Subsequence &&in) {
     // Interface to GABAC library
     core::AccessUnit::Subsequence data = std::move(in);

@@ -6,7 +6,6 @@
 
 #include "stream-handler.h"
 #include <genie/util/data-block.h>
-#include "exceptions.h"
 namespace genie {
 namespace entropy {
 namespace gabac {
@@ -34,7 +33,7 @@ size_t StreamHandler::readU7(std::istream &input, uint64_t &retVal) {
     retVal = 0;
 
     do {
-        if (c == U7_MAX_LENGTH) GABAC_DIE("readU7: out of range");
+        if (c == U7_MAX_LENGTH) UTILS_DIE("readU7: out of range");
         c++;
 
         input.read(reinterpret_cast<char *>(&byte), 1);
@@ -61,7 +60,7 @@ size_t StreamHandler::readStream(std::istream &input, util::DataBlock *buffer, u
 size_t StreamHandler::readBytes(std::istream &input, size_t bytes, util::DataBlock *buffer) {
     if (bytes > 0) {
         if (bytes % buffer->getWordSize()) {
-            GABAC_DIE("Input stream length not a multiple of word size");
+            UTILS_DIE("Input stream length not a multiple of word size");
         }
         buffer->resize(bytes / buffer->getWordSize());
         input.read(static_cast<char *>(buffer->getData()), bytes);
@@ -82,10 +81,10 @@ size_t StreamHandler::readFull(std::istream &input, util::DataBlock *buffer) {
                    BUFFER_SIZE * buffer->getWordSize());
     }
     if (!input.eof()) {
-        GABAC_DIE("Error while reading input stream");
+        UTILS_DIE("Error while reading input stream");
     }
     if (input.gcount() % buffer->getWordSize()) {
-        GABAC_DIE("Input stream length not a multiple of word size");
+        UTILS_DIE("Input stream length not a multiple of word size");
     }
     buffer->resize(buffer->size() - (BUFFER_SIZE - input.gcount() / buffer->getWordSize()));
     input.exceptions(safe);
@@ -97,14 +96,14 @@ size_t StreamHandler::readBlock(std::istream &input, size_t bytes, util::DataBlo
     input.exceptions(std::ios::badbit);
 
     if (bytes % buffer->getWordSize()) {
-        GABAC_DIE("Input stream length not a multiple of word size");
+        UTILS_DIE("Input stream length not a multiple of word size");
     }
     const size_t BUFFER_SIZE = bytes / buffer->getWordSize();
     buffer->resize(BUFFER_SIZE);
     input.read(static_cast<char *>(buffer->getData()), BUFFER_SIZE * buffer->getWordSize());
     if (!input.good()) {
         if (!input.eof()) {
-            GABAC_DIE("Error while reading input stream");
+            UTILS_DIE("Error while reading input stream");
         }
         buffer->resize(buffer->size() - (BUFFER_SIZE - input.gcount() / buffer->getWordSize()));
     }

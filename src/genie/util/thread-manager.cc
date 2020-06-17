@@ -43,6 +43,8 @@ void ThreadManager::action(size_t id) {
 
 ThreadManager::ThreadManager(size_t thread_num,  size_t ctr) : counter(ctr), threads(thread_num), stopFlag(false), abortFlag(false) {}
 
+void ThreadManager::setSource(std::vector<OriginalSource*> src) { source = std::move(src); }
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint32_t ThreadManager::run() {

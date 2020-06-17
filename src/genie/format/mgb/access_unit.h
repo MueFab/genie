@@ -62,7 +62,7 @@ class AccessUnit : public core::parameter::DataUnit {
 
     uint32_t getReadCount() const;
 
-    core::record::ClassType getClass() const { return au_type; }
+    core::record::ClassType getClass() const;
 
    private:
     void preWrite(util::BitWriter &writer) const;

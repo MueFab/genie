@@ -36,7 +36,7 @@ void code(const std::string &inputFilePath,
         // Read in the entire input file
         inputFile = std::ifstream(inputFilePath, std::ios::binary);
         if (!inputFile) {
-            GABAC_DIE("Could not open input file");
+            UTILS_DIE("Could not open input file");
         }
         istream = &inputFile;
     }
@@ -45,7 +45,7 @@ void code(const std::string &inputFilePath,
         // Read in the entire dependency file
         dependencyFile = std::ifstream(dependencyFilePath, std::ios::binary);
         if (!inputFile) {
-            GABAC_DIE("Could not open dependency file");
+            UTILS_DIE("Could not open dependency file");
         }
         dstream = &dependencyFile;
     }
@@ -54,7 +54,7 @@ void code(const std::string &inputFilePath,
         // Write the bytestream
         outputFile = std::ofstream(outputFilePath, std::ios::binary);
         if (!outputFile) {
-            GABAC_DIE("Could not open output file");
+            UTILS_DIE("Could not open output file");
         }
         ostream = &outputFile;
     } else {

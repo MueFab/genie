@@ -26,12 +26,7 @@ class Encoder : public core::QVEncoder {
 
 class NoneEncoder : public core::QVEncoder {
    public:
-    QVCoded process(const core::record::Chunk&) override {
-        auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
-        core::AccessUnit::Descriptor desc(core::GenDesc::QV);
-
-        return {std::move(param), std::move(desc), core::stats::PerfStats()};
-    }
+    QVCoded process(const core::record::Chunk&) override;
 };
 
 }  // namespace qvwriteout

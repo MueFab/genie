@@ -55,24 +55,11 @@ class ReadEncoder : public Module<record::Chunk, AccessUnit> {
      *
      * @param coder
      */
-    virtual void setEntropyCoder(EntropySelector* coder) {
-        entropycoder = coder;
-    }
+    virtual void setEntropyCoder(EntropySelector* coder);
 
-    static AccessUnit entropyCodeAU(EntropySelector* entropycoder, AccessUnit&& a) {
-        AccessUnit au = std::move(a);
-        for(auto &d : au) {
-            auto encoded = entropycoder->process(d);
-            au.getParameters().setDescriptor(d.getID(), std::move(std::get<0>(encoded)));
-            au.set(d.getID(), std::move(std::get<1>(encoded)));
-            au.getStats().add(std::get<2>(encoded));
-        }
-        return au;
-    }
+    static AccessUnit entropyCodeAU(EntropySelector* entropycoder, AccessUnit&& a);
 
-    AccessUnit entropyCodeAU(AccessUnit&& a) {
-        return entropyCodeAU(entropycoder, std::move(a));
-    }
+    AccessUnit entropyCodeAU(AccessUnit&& a);
 
     /**
      * @Brief For polymorphic destruction

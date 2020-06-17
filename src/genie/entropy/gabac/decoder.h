@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_GABAC_DECOMPRESSOR_H
-#define GENIE_GABAC_DECOMPRESSOR_H
+#ifndef GENIE_GABAC_DECODER_H
+#define GENIE_GABAC_DECODER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ namespace gabac {
 /**
  * @brief Module to decompress a BlockPayload back into a raw access unit using Gabac
  */
-class GabacDecompressor : public core::EntropyDecoder {
+class Decoder : public core::EntropyDecoder {
    private:
     /**
      * @brief Execute gabac library
@@ -43,7 +43,7 @@ class GabacDecompressor : public core::EntropyDecoder {
 }  // namespace genie
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_GABAC_DECOMPRESSOR_H
+#endif  // GENIE_DECODER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

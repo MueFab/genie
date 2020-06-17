@@ -10,7 +10,6 @@
 
 #include <genie/util/block-stepper.h>
 #include <genie/util/data-block.h>
-#include "exceptions.h"
 #include "match-subseq-transform.h"
 
 namespace genie {
@@ -78,7 +77,7 @@ void inverseTransformMatchCoding(std::vector<util::DataBlock> *const transformed
     assert(transformedSubseqs != nullptr);
 
     if ((*transformedSubseqs).size() != 3) {
-        GABAC_DIE("invalid subseq count for match inverse transform");
+        UTILS_DIE("invalid subseq count for match inverse transform");
     }
 
     // Prepare internal and the output data structures

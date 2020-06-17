@@ -11,6 +11,7 @@
 
 #include <atomic>
 #include <thread>
+#include <utility>
 #include <vector>
 #include "original-source.h"
 
@@ -48,7 +49,7 @@ class ThreadManager {
      */
     ThreadManager(size_t thread_num, size_t counter = 0);
 
-    void setSource(std::vector<OriginalSource*> src) { source = src; }
+    void setSource(std::vector<OriginalSource*> src);
 
     /**
      * @brief Executes the complete genie pipeline until no input data left

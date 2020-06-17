@@ -39,9 +39,7 @@ class Exporter : public core::FormatExporterCompressed {
    public:
     explicit Exporter(std::ostream* _file);
     void flowIn(core::AccessUnit&& t, const genie::util::Section& id) override;
-    void skipIn(const genie::util::Section& id) override {
-        util::OrderedSection sec(&lock, id);
-    }
+    void skipIn(const genie::util::Section& id) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

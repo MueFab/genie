@@ -55,24 +55,9 @@ class Record {
         size_t qual{};
         size_t opt{};
 
-        void add(const Stats& s) {
-            qname += s.qname;
-            flag += s.flag;
-            rname += s.rname;
-            pos += s.pos;
-            mapq += s.mapq;
-            cigar += s.cigar;
-            rnext += s.rnext;
-            pnext += s.pnext;
-            tlen += s.tlen;
-            seq += s.seq;
-            qual += s.qual;
-            opt += s.opt;
-        }
+        void add(const Stats& s);
 
-        size_t total() const {
-            return qname + flag + rname + pos + mapq + cigar + rnext + pnext + tlen + seq + qual + opt;
-        }
+        size_t total() const;
     };
     enum class FlagPos : uint16_t {
         MULTI_SEGMENT_TEMPLATE = 0,

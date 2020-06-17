@@ -17,7 +17,7 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Block::Block(uint8_t _descriptor_ID, core::AccessUnit::Descriptor _payload)
+Block::Block(uint8_t _descriptor_ID, core::AccessUnit::Descriptor&& _payload)
     : descriptor_ID(_descriptor_ID), payload(std::move(_payload)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -64,6 +64,9 @@ core::AccessUnit::Descriptor &&Block::movePayload() { return std::move(payload);
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint8_t Block::getDescriptorID() const { return descriptor_ID; }
+
+
+size_t Block::getWrittenSize() const { return payload.getWrittenSize() + sizeof(uint32_t) + sizeof(uint8_t); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -10,7 +10,6 @@
 
 #include <genie/util/block-stepper.h>
 #include <genie/util/data-block.h>
-#include "exceptions.h"
 #include "merge-subseq-transform.h"
 
 namespace genie {
@@ -26,7 +25,7 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg,
     const std::vector<paramcabac::TransformedSubSeq>& trnsfCfgs = subseqCfg.getTransformSubseqCfgs();
 
     if (subseqCount <= 0) {
-        GABAC_DIE("invalid subseq_count for merge coding");
+        UTILS_DIE("invalid subseq_count for merge coding");
     }
 
     // Prepare internal and output data structures
@@ -77,7 +76,7 @@ void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg,
     const std::vector<uint8_t> subseqShiftSizes = trnsfSubseqParams.getMergeCodingShiftSizes();
 
     if (subseqCount <= 0 || subseqCount != (*transformedSubseqs).size()) {
-        GABAC_DIE("invalid subseq_count for merge inverse transform");
+        UTILS_DIE("invalid subseq_count for merge inverse transform");
     }
 
     // Prepare the output data structure

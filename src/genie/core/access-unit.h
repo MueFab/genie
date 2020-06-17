@@ -96,46 +96,23 @@ class AccessUnit {
          */
         size_t getNumSymbols() const;
 
-        void annotateNumSymbols(size_t num) {
-            numSymbols = num;
-        }
+        void annotateNumSymbols(size_t num);
 
-        bool isEmpty() const {
-            return !getNumSymbols();
-        }
+        bool isEmpty() const;
 
-        size_t getRawSize() const {
-            return data.getRawSize();
-        }
+        size_t getRawSize() const;
 
-        void write(util::BitWriter& writer) const {
-            writer.writeBuffer(data.getData(), data.getRawSize());
-        }
+        void write(util::BitWriter& writer) const;
 
-        Subsequence(GenSubIndex _id, size_t size, util::BitReader& reader)
-            : data(0, 1), id(std::move(_id)), numSymbols(0) {
-            data.reserve(size);
-            for (size_t i = 0; i < size; ++i) {
-                data.push_back(reader.read(8));
-            }
-        }
+        Subsequence(GenSubIndex _id, size_t size, util::BitReader& reader);
 
-        Subsequence(GenSubIndex _id)
-            : data(0, 1), id(_id), numSymbols(0) {
-        }
+        explicit Subsequence(GenSubIndex _id);
 
-        Subsequence(GenSubIndex _id, util::DataBlock&& dat)
-            : data(std::move(dat)), id(std::move(_id)), numSymbols(0) {
-        }
+        Subsequence(GenSubIndex _id, util::DataBlock&& dat);
 
-        void set(util::DataBlock&& dat) {
-            data = std::move(dat);
-        }
+        void set(util::DataBlock&& dat);
 
-        void setPosition(size_t pos) {
-            position = pos;
-        }
-
+        void setPosition(size_t pos);
     };
 
     /**
@@ -224,60 +201,15 @@ class AccessUnit {
          */
         size_t getSize() const;
 
-        size_t getWrittenSize() const {
-            size_t overhead = getDescriptor(getID()).tokentype ? 0 : (subdesc.size() - 1) * sizeof(uint32_t);
-            return std::accumulate(subdesc.begin(), subdesc.end(), overhead,
-                                   [](size_t sum, const Subsequence& payload) {
-                                     return payload.isEmpty() ? sum : sum + payload.getRawSize();
-                                   });
-        }
+        size_t getWrittenSize() const;
 
-        void write(util::BitWriter& writer) const {
-            if (this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
-                subdesc.front().write(writer);
-                return;
-            }
-            for (size_t i = 0; i < subdesc.size(); ++i) {
-                if (i < (subdesc.size() - 1)) {
-                    writer.write(subdesc[i].getRawSize(), 32);
-                }
-                subdesc[i].write(writer);
-            }
-        }
+        void write(util::BitWriter& writer) const;
 
-        Descriptor(GenDesc _id, size_t count, size_t remainingSize,
-                                                                util::BitReader& reader)
-            : id(_id) {
-            if (this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
-                subdesc.emplace_back(GenSubIndex{_id, 0}, remainingSize, reader);
-                return;
-            }
-            for (size_t i = 0; i < count; ++i) {
-                size_t s = 0;
-                if (i < (count - 1)) {
-                    s = reader.read(32);
-                    remainingSize -= (s + 4);
-                } else {
-                    s = remainingSize;
-                }
-                if (s) {
-                    subdesc.emplace_back(GenSubIndex{_id, i}, s, reader);
-                } else {
-                    subdesc.emplace_back(GenSubIndex{_id, i}, util::DataBlock(0, 4));
-                }
-            }
-        }
+        Descriptor(GenDesc _id, size_t count, size_t remainingSize, util::BitReader& reader);
 
-        bool isEmpty() const{
-            for(const auto& d : subdesc) {
-                if(!d.isEmpty()) {
-                    return false;
-                }
-            }
-            return true;
-        }
+        bool isEmpty() const;
 
-        Descriptor() : id(GenDesc(0)) {}
+        Descriptor();
     };
 
     /**
@@ -303,11 +235,6 @@ class AccessUnit {
      */
     Descriptor& get(GenDesc desc);
 
-
-    Descriptor&& move(GenDesc desc) {
-        return std::move(get(desc));
-    }
-
     /**
      *
      * @param desc
@@ -323,9 +250,7 @@ class AccessUnit {
      */
     void set(GenSubIndex sub, Subsequence&& data);
 
-    void set(GenDesc sub, Descriptor&& data) {
-        descriptors[uint8_t(sub)] = std::move(data);
-    }
+    void set(GenDesc sub, Descriptor&& data);
 
     /**
      *
@@ -480,9 +405,9 @@ class AccessUnit {
      */
     const Descriptor* end() const;
 
-    stats::PerfStats& getStats() { return stats; }
+    stats::PerfStats& getStats();
 
-    void setStats(stats::PerfStats&& _stats) { stats = std::move(_stats); }
+    void setStats(stats::PerfStats&& _stats);
 
    private:
     std::vector<Descriptor> descriptors;  //!< @brief

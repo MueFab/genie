@@ -15,7 +15,6 @@
 #include <genie/util/data-block.h>
 #include "configuration.h"
 #include "encode-cabac.h"
-#include "exceptions.h"
 #include "stream-handler.h"
 #include "writer.h"
 
@@ -53,7 +52,7 @@ static inline void doSubsequenceTransform(const paramcabac::Subsequence &subseqC
             transformMergeCoding(subseqCfg, transformedSubseqs);
             break;
         default:
-            GABAC_DIE("Invalid subseq transforamtion");
+            UTILS_DIE("Invalid subseq transforamtion");
             break;
     }
 
@@ -77,7 +76,7 @@ unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingC
     numDescSubseqSymbols = gabac::StreamHandler::readFull(*conf.inputStream, &subsequence);
     if (conf.dependencyStream != nullptr) {
         if (numDescSubseqSymbols != gabac::StreamHandler::readFull(*conf.dependencyStream, &dependency)) {
-            GABAC_DIE("Size mismatch between dependency and descriptor subsequence");
+            UTILS_DIE("Size mismatch between dependency and descriptor subsequence");
         }
     }
 

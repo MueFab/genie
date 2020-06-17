@@ -238,6 +238,10 @@ void Record::setClassType(ClassType type) { this->class_ID = type; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool Record::isRead1First() const {
+    return read_1_first;
+}
+
 }  // namespace record
 }  // namespace core
 }  // namespace genie

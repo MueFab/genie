@@ -44,9 +44,7 @@ class Exporter : public core::FormatExporter {
      */
     Exporter(std::ostream &_file_1, std::ostream &_file_2);
 
-    void skipIn(const util::Section& id) override {
-        util::OrderedSection sec(&lock, id);
-    }
+    void skipIn(const util::Section& id) override;
 
     /**
      * @brief Process one chunk of MPEGG records

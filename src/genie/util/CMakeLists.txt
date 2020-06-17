@@ -13,6 +13,7 @@ set(source_files
         stringview.cc
         thread-manager.cc
         tokenize.cc
+        watch.cc
         )
 
 add_library(genie-util ${source_files})

@@ -140,6 +140,8 @@ const AuTypeCfg &AccessUnit::getAlignmentInfo() const { return *au_Type_U_Cfg; }
 
 uint32_t AccessUnit::getReadCount() const { return reads_count; }
 
+core::record::ClassType AccessUnit::getClass() const { return au_type; }
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnit::write(util::BitWriter &writer) const {

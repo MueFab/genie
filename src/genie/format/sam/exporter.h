@@ -68,9 +68,7 @@ class Exporter : public core::FormatExporter {
 
     void flowIn(core::record::Chunk&& records, const util::Section& id) override;
 
-    void skipIn(const util::Section& id) override {
-        util::OrderedSection (&lock, id);
-    }
+    void skipIn(const util::Section& id) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

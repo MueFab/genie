@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_GABAC_COMPRESSOR_H
-#define GENIE_GABAC_COMPRESSOR_H
+#ifndef GENIE_GABAC_ENCODER_H
+#define GENIE_GABAC_ENCODER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ namespace gabac {
 /**
  * @brief Module to compress raw access units into blockpayloads using GABAC
  */
-class GabacCompressor : public core::EntropyEncoder {
+class Encoder : public core::EntropyEncoder {
    private:
     /**
      * @brief Run the actual gabac compression
@@ -103,7 +103,7 @@ class GabacCompressor : public core::EntropyEncoder {
 }  // namespace genie
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_GABAC_COMPRESSOR_H
+#endif  // GENIE_ENCODER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
