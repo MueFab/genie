@@ -1,6 +1,6 @@
 #include "program-options.h"
 
-#include <cli11@13becad/CLI11.hpp>
+#include <cli11/CLI11.hpp>
 
 #include <genie/util/exceptions.h>
 #include <cassert>
