@@ -30,31 +30,63 @@
 namespace genie {
 namespace util {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+/**
+ *
+ */
 class Exception : public std::exception {
    public:
+
+    /**
+     *
+     * @param msg
+     */
     explicit Exception(std::string msg);
 
+    /**
+     *
+     */
     ~Exception() noexcept override;
 
+    /**
+     *
+     * @return
+     */
     virtual std::string msg() const;
 
+    /**
+     *
+     * @return
+     */
     const char *what() const noexcept override;
 
    protected:
-    std::string msg_;
+    std::string msg_; //!<
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+/**
+ *
+ */
 class RuntimeException : public Exception {
    public:
+    /**
+     *
+     * @param file
+     * @param function
+     * @param line
+     * @param msg
+     */
     explicit RuntimeException(const std::string &file, const std::string &function, int line,
                               const std::string &msg) noexcept;
 
+    /**
+     *
+     * @param e
+     */
     RuntimeException(const RuntimeException &e) noexcept;
 
+    /**
+     *
+     */
     ~RuntimeException() noexcept override;
 };
 

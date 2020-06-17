@@ -7,15 +7,20 @@
 #ifndef GENIE_DATASET_HEADER_H
 #define GENIE_DATASET_HEADER_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include "genie/util/bitwriter.h"
 
 #include <cstdint>
 #include <iostream>
 #include <vector>
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
+
 /**
  *
  */
@@ -46,19 +51,19 @@ class DatasetHeader {
      *
      * @param datasetGroupId
      */
-    void setDatasetGroupId(uint8_t datasetGroupId) { dataset_group_ID = datasetGroupId; }
+    void setDatasetGroupId(uint8_t datasetGroupId);
 
     /**
      *
      * @return
      */
-    uint16_t getDatasetId() const { return dataset_ID; }
+    uint16_t getDatasetId() const;
 
     /**
      *
      * @return
      */
-    uint8_t getDatasetGroupId() const { return dataset_group_ID; }
+    uint8_t getDatasetGroupId() const;
 
     /**
      *
@@ -73,10 +78,6 @@ class DatasetHeader {
     void writeToFile(genie::util::BitWriter& bitWriter) const;
 
    private:
-    /**
-     * ISO 23092-1 Section 6.5.2 table 19
-     *
-     * ------------------------------------------------------------------------------------------------------------- */
     uint8_t dataset_group_ID : 8;                     //!<
     uint16_t dataset_ID : 16;                         //!<
     std::string version;                              //!<
@@ -111,8 +112,15 @@ class DatasetHeader {
     // }
 };
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #endif  // GENIE_DATASET_HEADER_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

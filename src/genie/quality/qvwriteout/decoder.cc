@@ -6,9 +6,13 @@
 
 #include "decoder.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace quality {
 namespace qvwriteout {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(
     const core::parameter::QualityValues& param, const std::vector<std::string>& ecigar_vec,
@@ -40,10 +44,11 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(
     return qv;
 }
 
-std::unique_ptr<core::QVDecoder> Decoder::create(util::BitReader& reader) {
-    (void)reader;
-    return util::make_unique<Decoder>();
-}
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace qvwriteout
 }  // namespace quality
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

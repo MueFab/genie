@@ -13,9 +13,6 @@
 #include <limits>
 #include <string>
 #include <vector>
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 #include "genie/core/name-encoder.h"
 #include "genie/core/record/record.h"
 #include "genie/util/data-block.h"

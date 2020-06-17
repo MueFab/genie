@@ -7,9 +7,13 @@
 #ifndef GENIE_SPRING_ENCODING_IMPL_H
 #define GENIE_SPRING_ENCODING_IMPL_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace read {
 namespace spring {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>
 encoder_global_b<bitset_size>::encoder_global_b(int max_readlen_param) {
@@ -18,11 +22,15 @@ encoder_global_b<bitset_size>::encoder_global_b(int max_readlen_param) {
     for (int i = 0; i < max_readlen_param; i++) basemask[i] = new std::bitset<bitset_size>[128];
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 template <size_t bitset_size>
 encoder_global_b<bitset_size>::~encoder_global_b() {
     for (int i = 0; i < max_readlen; i++) delete[] basemask[i];
     delete[] basemask;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>
 std::string bitsettostring(std::bitset<bitset_size> b, const uint16_t readlen,
@@ -42,6 +50,8 @@ std::string bitsettostring(std::bitset<bitset_size> b, const uint16_t readlen,
     }
     return s;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>
 void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s, uint16_t *read_lengths_s,
@@ -400,6 +410,8 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     return;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 template <size_t bitset_size>
 void setglobalarrays(encoder_global &eg, encoder_global_b<bitset_size> &egb) {
     for (int i = 0; i < 63; i++) egb.mask63[i] = 1;
@@ -445,6 +457,8 @@ void setglobalarrays(encoder_global &eg, encoder_global_b<bitset_size> &egb) {
     return;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 template <size_t bitset_size>
 void readsingletons(std::bitset<bitset_size> *read, uint32_t *order_s, uint16_t *read_lengths_s,
                     const encoder_global &eg, const encoder_global_b<bitset_size> &egb) {
@@ -473,6 +487,8 @@ void readsingletons(std::bitset<bitset_size> *read, uint32_t *order_s, uint16_t 
         f_order_N.read((char *)&order_s[i], sizeof(uint32_t));
     f_order_N.close();
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>
 void encoder_main(const std::string &temp_dir, const compression_params &cp) {
@@ -533,8 +549,16 @@ void encoder_main(const std::string &temp_dir, const compression_params &cp) {
     delete eg_ptr;
     delete egb_ptr;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace spring
 }  // namespace read
 }  // namespace genie
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #endif  // GENIE_SPRING_ENCODING_IMPL_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

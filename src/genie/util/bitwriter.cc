@@ -136,6 +136,8 @@ uint64_t BitWriter::getBitsWritten() { return m_bitsWritten + m_numHeldBits; }
 
 bool BitWriter::isAligned() const { return m_numHeldBits == 0; }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void BitWriter::writeBuffer(std::istream *in) {
     if (!isAligned()) {
         UTILS_DIE("Writer not aligned when it should be");

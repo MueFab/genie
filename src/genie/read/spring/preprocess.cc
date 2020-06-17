@@ -4,28 +4,24 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifdef GENIE_USE_OPENMP
-#include <omp.h>
-#endif
-
-#include <genie/core/parameter/parameter_set.h>
 #include <genie/core/record/record.h>
 #include <genie/util/drain.h>
 #include <genie/util/ordered-section.h>
 #include <algorithm>
-#include <cmath>
 #include <cstdio>
-#include <fstream>
 #include <iostream>
-#include <stdexcept>
 #include <string>
 #include "params.h"
 #include "preprocess.h"
 #include "util.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace read {
 namespace spring {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Preprocessor::setup(const std::string &wdir, size_t num_thr, bool paired_end) {
     cp.preserve_id = true;
@@ -74,6 +70,8 @@ void Preprocessor::setup(const std::string &wdir, size_t num_thr, bool paired_en
     if (cp.preserve_id) fout_id.open(outfileid);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section &id) {
     core::record::Chunk data = std::move(t);
 
@@ -111,10 +109,10 @@ void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section &id) 
     cp.num_reads += rec_index;
     cp.num_blocks++;
 
-    // ---------------------------------------------------------------------------------------------
-
     UTILS_DIE_IF(cp.num_reads == 0, "No reads found.");
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Preprocessor::finish(size_t id) {
     if (!used) {
@@ -161,6 +159,45 @@ void Preprocessor::finish(size_t id) {
     std::cout << "Total number of reads without N: " << cp.num_reads_clean[0] + cp.num_reads_clean[1] << "\n";
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+core::stats::PerfStats& Preprocessor::getStats() { return stats; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Preprocessor::~Preprocessor() {
+    if (!used) {
+        for (int j = 0; j < 2; j++) {
+            if (j == 1 && !cp.paired_end) continue;
+            fout_clean[j].close();
+            fout_N[j].close();
+            fout_order_N[j].close();
+            if (cp.preserve_quality) fout_quality[j].close();
+        }
+        if (cp.preserve_id) fout_id.close();
+
+        for (int j = 0; j < 2; j++) {
+            if (j == 1 && !cp.paired_end) continue;
+            ghc::filesystem::remove(outfileclean[j]);
+            ghc::filesystem::remove(outfileN[j]);
+            ghc::filesystem::remove(outfileorderN[j]);
+            if (cp.preserve_quality) ghc::filesystem::remove(outfilequality[j]);
+        }
+        if (cp.preserve_id) ghc::filesystem::remove(outfileid);
+
+        ghc::filesystem::remove(temp_dir);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Preprocessor::skip(const util::Section& id) { util::OrderedSection sec(&lock, id); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace spring
 }  // namespace read
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

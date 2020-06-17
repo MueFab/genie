@@ -23,19 +23,46 @@ namespace genie {
 namespace quality {
 namespace paramqv1 {
 
+/**
+ *
+ */
 class ParameterSet {
    private:
-    std::vector<Codebook> qv_codebooks;
+    std::vector<Codebook> qv_codebooks; //!<
 
    public:
+    /**
+     *
+     * @param reader
+     */
     explicit ParameterSet(util::BitReader &reader);
+
+    /**
+     *
+     */
     explicit ParameterSet() = default;
+
+    /**
+     *
+     * @return
+     */
     const std::vector<Codebook> &getCodebooks() const;
 
+    /**
+     *
+     */
     virtual ~ParameterSet() = default;
 
+    /**
+     *
+     * @param book
+     */
     void addCodeBook(Codebook &&book);
 
+    /**
+     *
+     * @param writer
+     */
     virtual void write(util::BitWriter &writer) const;
 };
 

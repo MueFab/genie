@@ -16,22 +16,44 @@
 namespace genie {
 namespace util {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+/**
+ *
+ */
 struct BlockStepper {
-    uint8_t *curr;
-    uint8_t *end;
-    uint8_t wordSize;
+    uint8_t *curr; //!<
+    uint8_t *end; //!<
+    uint8_t wordSize; //!<
 
+    /**
+     *
+     * @param _cur
+     * @param _end
+     * @param _wordSize
+     */
     explicit BlockStepper(uint8_t *_cur = nullptr, uint8_t *_end = nullptr, uint8_t _wordSize = 1)
         : curr(_cur), end(_end), wordSize(_wordSize) {}
 
+    /**
+     *
+     * @return
+     */
     bool isValid() const;
 
+    /**
+     *
+     */
     void inc();
 
+    /**
+     *
+     * @return
+     */
     uint64_t get() const;
 
+    /**
+     *
+     * @param val
+     */
     void set(uint64_t val) const;
 };
 

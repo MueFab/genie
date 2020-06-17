@@ -7,15 +7,21 @@
 #ifndef GENIE_BITSET_UTIL_IMPL_H
 #define GENIE_BITSET_UTIL_IMPL_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace read {
 namespace spring {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>
 void stringtobitset(const std::string &s, const uint16_t readlen, std::bitset<bitset_size> &b,
                     std::bitset<bitset_size> **basemask) {
     for (int i = 0; i < readlen; i++) b |= basemask[i][(uint8_t)s[i]];
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>
 void generateindexmasks(std::bitset<bitset_size> *mask1, bbhashdict *dict, int numdict, int bpb) {
@@ -24,6 +30,8 @@ void generateindexmasks(std::bitset<bitset_size> *mask1, bbhashdict *dict, int n
         for (int i = bpb * dict[j].start; i < bpb * (dict[j].end + 1); i++) mask1[j][i] = 1;
     return;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>
 void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_lengths, const int numdict,
@@ -220,6 +228,8 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint1
     return;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 template <size_t bitset_size>
 void generatemasks(std::bitset<bitset_size> **mask, const int max_readlen, const int bpb) {
     // mask for zeroing the end bits (needed while reordering to compute Hamming
@@ -233,6 +243,8 @@ void generatemasks(std::bitset<bitset_size> **mask, const int max_readlen, const
     return;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 template <size_t bitset_size>
 void chartobitset(char *s, const int readlen, std::bitset<bitset_size> &b, std::bitset<bitset_size> **basemask) {
     b.reset();
@@ -240,8 +252,15 @@ void chartobitset(char *s, const int readlen, std::bitset<bitset_size> &b, std::
     return;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace spring
 }  // namespace read
 }  // namespace genie
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #endif  // GENIE_BITSET_UTIL_IMPL_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

@@ -152,6 +152,8 @@ core::record::Record Importer::convert(uint16_t ref, sam::Record &&_r1, sam::Rec
     return ret;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool Importer::pumpRetrieve(genie::core::Classifier *_classifier) {
     util::Watch watch;
     core::stats::PerfStats stats;

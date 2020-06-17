@@ -8,9 +8,13 @@
 #include <core/record/alignment_split/same-rec.h>
 #include <util/watch.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace quality {
 namespace qvwriteout {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Encoder::setUpParameters(const core::record::Chunk& rec, paramqv1::QualityValues1& param,
                               core::AccessUnit::Descriptor& desc) {
@@ -33,6 +37,8 @@ void Encoder::setUpParameters(const core::record::Chunk& rec, paramqv1::QualityV
     param.setQvps(std::move(set));
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Encoder::encodeAlignedSegment(const core::record::Segment& s, const std::string& ecigar,
                                    core::AccessUnit::Descriptor& desc) {
     for (const auto& q : s.getQualities()) {
@@ -52,6 +58,8 @@ void Encoder::encodeAlignedSegment(const core::record::Segment& s, const std::st
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Encoder::encodeUnalignedSegment(const core::record::Segment& s, core::AccessUnit::Descriptor& desc) {
     for (const auto& q : s.getQualities()) {
         for (const auto& c : q) {
@@ -60,6 +68,8 @@ void Encoder::encodeUnalignedSegment(const core::record::Segment& s, core::Acces
         }
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
     util::Watch watch;
@@ -96,6 +106,8 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
     return {std::move(param), std::move(desc), stats};
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 core::QVEncoder::QVCoded NoneEncoder::process(const core::record::Chunk&) {
     auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
     core::AccessUnit::Descriptor desc(core::GenDesc::QV);
@@ -103,6 +115,11 @@ core::QVEncoder::QVCoded NoneEncoder::process(const core::record::Chunk&) {
     return {std::move(param), std::move(desc), core::stats::PerfStats()};
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace qvwriteout
 }  // namespace quality
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
