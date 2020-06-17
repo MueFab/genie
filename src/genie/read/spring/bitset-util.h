@@ -17,7 +17,7 @@
 #include <bitset>
 #include <fstream>
 #include <string>
-#include <bbhash@48a854a/BooPHF.h>
+#include <bbhash/BooPHF.h>
 #include "params.h"
 
 namespace genie {

@@ -8,9 +8,9 @@
 #define SPRING_DECOMPRESS_H_
 
 #include <genie/core/read-decoder.h>
-#include <genie/stream-saver.h>
 #include <genie/util/ordered-section.h>
 #include <genie/util/watch.h>
+#include <filesystem/filesystem.hpp>
 #include <map>
 #include <string>
 #include <vector>
