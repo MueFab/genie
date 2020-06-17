@@ -21,7 +21,7 @@ namespace quality {
 namespace paramqv1 {
 
 /**
- * ISO 23092-2 Section 3.3.2.2 table 9 Lines 4 to 7
+ *
  */
 class Codebook {
    private:
@@ -29,15 +29,40 @@ class Codebook {
     std::vector<uint8_t> qv_recon;  //!< Lines 5 to 7
 
    public:
+    /**
+     *
+     * @param reader
+     */
     explicit Codebook(util::BitReader &reader);
+
+    /**
+     *
+     * @param v1
+     * @param v2
+     */
     Codebook(uint8_t v1, uint8_t v2);
 
+    /**
+     *
+     */
     virtual ~Codebook() = default;
 
+    /**
+     *
+     * @param entry
+     */
     void addEntry(uint8_t entry);
 
+    /**
+     *
+     * @return
+     */
     const std::vector<uint8_t> &getEntries() const;
 
+    /**
+     *
+     * @param writer
+     */
     virtual void write(util::BitWriter &writer) const;
 };
 

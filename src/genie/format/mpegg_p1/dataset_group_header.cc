@@ -6,9 +6,13 @@
 
 #include "dataset_group_header.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 DatasetGroupHeader::DatasetGroupHeader(const std::vector<genie::format::mpegg_p1::Dataset>* datasets,
                                        const uint8_t x_datasetGroupID)
@@ -17,6 +21,8 @@ DatasetGroupHeader::DatasetGroupHeader(const std::vector<genie::format::mpegg_p1
         dataset_ID.push_back(dataset.getDatasetHeader().getDatasetId());
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetGroupHeader::writeToFile(genie::util::BitWriter& bitWriter) const {
     bitWriter.write("dghd");
@@ -34,6 +40,27 @@ void DatasetGroupHeader::writeToFile(genie::util::BitWriter& bitWriter) const {
     bitWriter.flush();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t DatasetGroupHeader::getDatasetGroupId() const { return dataset_group_ID; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t DatasetGroupHeader::getVersionNumber() const { return version_number; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t DatasetGroupHeader::getNumDatasets() const { return dataset_ID.size(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::vector<uint16_t>& DatasetGroupHeader::getDatasetId() const { return dataset_ID; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

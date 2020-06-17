@@ -5,33 +5,31 @@
  */
 
 #ifdef GENIE_USE_OPENMP
-
 #include <omp.h>
-
 #endif
 
-#include <algorithm>
-#include <cmath>
-#include <cstdio>
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <iterator>
-#include <string>
-#include <vector>
-
-#include "params.h"
-#include "reorder-compress-quality-id.h"
-#include "util.h"
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/core/access-unit.h>
 #include <genie/core/read-encoder.h>
 #include <genie/core/record/chunk.h>
 #include <genie/core/record/segment.h>
+#include <cmath>
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+#include <string>
+#include <vector>
+#include "reorder-compress-quality-id.h"
+#include "util.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace read {
 namespace spring {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void reorder_compress_quality_id(const std::string &temp_dir, const compression_params &cp,
                                  genie::core::ReadEncoder::QvSelector *qv_coder,
@@ -136,6 +134,8 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void read_block_start_end(const std::string &file_blocks, std::vector<uint32_t> &block_start,
                           std::vector<uint32_t> &block_end) {
     std::ifstream f_blocks(file_blocks, std::ios::binary);
@@ -150,6 +150,8 @@ void read_block_start_end(const std::string &file_blocks, std::vector<uint32_t> 
     f_blocks.close();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void generate_order(const std::string &file_order, uint32_t *order_array, const uint32_t &numreads) {
     std::ifstream fin_order(file_order, std::ios::binary);
     uint32_t order;
@@ -159,6 +161,8 @@ void generate_order(const std::string &file_order, uint32_t *order_array, const 
     }
     fin_order.close();
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, const std::string &file_order_id,
                             const std::vector<uint32_t> &block_start, const std::vector<uint32_t> &block_end,
@@ -207,6 +211,8 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
         stats.add(s);
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void reorder_compress_quality_pe(std::string file_quality[2], const std::string &outfile_quality,
                                  const std::string &temp_dir, std::string *quality_array,
@@ -273,6 +279,8 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
         }
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void reorder_compress(const std::string &file_name, const std::string &temp_dir, const uint32_t &num_reads_per_file,
                       const int &num_thr, const uint32_t &num_reads_per_block, std::string *str_array,
@@ -381,6 +389,11 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace spring
 }  // namespace read
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

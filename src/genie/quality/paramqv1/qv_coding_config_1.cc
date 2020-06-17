@@ -68,9 +68,13 @@ std::unique_ptr<core::parameter::QualityValues> QualityValues1::clone() const {
     return ret;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::unique_ptr<QualityValues1::QualityValues> QualityValues1::create(util::BitReader& reader) {
     return util::make_unique<QualityValues1>(reader);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 const Codebook& QualityValues1::getPresetCodebook(QvpsPresetId id) {
     const static std::vector<Codebook> pSet = []() -> std::vector<Codebook> {
@@ -99,6 +103,8 @@ const Codebook& QualityValues1::getPresetCodebook(QvpsPresetId id) {
     return pSet[uint8_t(id)];
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::unique_ptr<core::parameter::QualityValues> QualityValues1::getDefaultSet(core::record::ClassType type) {
     auto ret = util::make_unique<paramqv1::QualityValues1>(QvpsPresetId::ASCII, false);
     ParameterSet set;
@@ -114,12 +120,16 @@ std::unique_ptr<core::parameter::QualityValues> QualityValues1::getDefaultSet(co
     return ret;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 size_t QualityValues1::getNumberCodeBooks() const {
     if (qvps_preset_ID.is_initialized()) {
         return 1;
     }
     return parameter_set_qvps->getCodebooks().size();
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 const Codebook& QualityValues1::getCodebook(size_t id) const {
     if (qvps_preset_ID.is_initialized()) {
@@ -128,6 +138,8 @@ const Codebook& QualityValues1::getCodebook(size_t id) const {
     }
     return parameter_set_qvps->getCodebooks()[id];
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 size_t QualityValues1::getNumSubsequences() const { return getNumberCodeBooks() + 2; }
 

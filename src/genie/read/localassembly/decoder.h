@@ -7,6 +7,8 @@
 #ifndef GENIE_LAE_DECODER_H
 #define GENIE_LAE_DECODER_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include <genie/core/read-decoder.h>
 #include "local-reference.h"
 
@@ -16,11 +18,18 @@ namespace genie {
 namespace read {
 namespace localassembly {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+/**
+ *
+ */
 class Decoder : public core::ReadDecoder {
    private:
    public:
+
+    /**
+     *
+     * @param t
+     * @param id
+     */
     void flowIn(core::AccessUnit&& t, const util::Section& id) override;
 };
 

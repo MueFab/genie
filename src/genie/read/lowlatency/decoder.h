@@ -7,6 +7,8 @@
 #ifndef GENIE_LL_DECODER_H
 #define GENIE_LL_DECODER_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include <genie/core/read-decoder.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -15,11 +17,17 @@ namespace genie {
 namespace read {
 namespace lowlatency {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+/**
+ *
+ */
 class Decoder : public core::ReadDecoder {
    private:
    public:
+    /**
+     *
+     * @param t
+     * @param id
+     */
     void flowIn(core::AccessUnit&& t, const util::Section& id) override;
 };
 

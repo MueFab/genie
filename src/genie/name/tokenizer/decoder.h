@@ -31,6 +31,11 @@ class Decoder : public core::NameDecoder {
     static std::string inflate(const std::vector<SingleToken>& rec);
 
    public:
+    /**
+     *
+     * @param desc
+     * @return
+     */
     std::tuple<std::vector<std::string>, core::stats::PerfStats> process(core::AccessUnit::Descriptor& desc) override;
 };
 

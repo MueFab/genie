@@ -32,6 +32,7 @@ class OrderedLock {
      * @brief initialize
      */
     OrderedLock();
+
     /**
      * @brief Waits until the current thread / data block is allowed to execute
      * @param id Block / thread identifier of this thread
@@ -43,6 +44,9 @@ class OrderedLock {
      */
     void finished(size_t length);
 
+    /**
+     *
+     */
     void reset();
 };
 

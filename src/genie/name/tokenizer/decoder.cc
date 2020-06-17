@@ -61,6 +61,8 @@ uint32_t pull32bigEndian(core::AccessUnit::Subsequence& seq) {
     return ret;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(core::AccessUnit::Descriptor& desc) {
     std::tuple<std::vector<std::string>, core::stats::PerfStats> ret;
     std::vector<SingleToken> oldRec;

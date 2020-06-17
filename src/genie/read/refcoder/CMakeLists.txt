@@ -1,6 +1,7 @@
 project("genie-refcoder")
 
 set(source_files
+        decoder.cc
         encoder.cc)
 
 add_library(genie-refcoder ${source_files})

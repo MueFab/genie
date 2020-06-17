@@ -10,9 +10,13 @@
 #include "spring-encoding.h"
 #include "util.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace read {
 namespace spring {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void call_reorder(const std::string &temp_dir, compression_params &cp) {
     size_t bitset_size_reorder = (2 * cp.max_readlen - 1) / 64 * 64 + 64;
@@ -69,6 +73,8 @@ void call_reorder(const std::string &temp_dir, compression_params &cp) {
             throw std::runtime_error("Wrong bitset size.");
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void call_encoder(const std::string &temp_dir, compression_params &cp) {
     size_t bitset_size_encoder = (3 * cp.max_readlen - 1) / 64 * 64 + 64;
@@ -149,6 +155,12 @@ void call_encoder(const std::string &temp_dir, compression_params &cp) {
             throw std::runtime_error("Wrong bitset size.");
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace spring
 }  // namespace read
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

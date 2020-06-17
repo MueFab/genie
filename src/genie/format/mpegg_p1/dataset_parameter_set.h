@@ -7,7 +7,11 @@
 #ifndef GENIE_DATASET_PARAMETER_SET_H
 #define GENIE_DATASET_PARAMETER_SET_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include <genie/core/parameter/parameter_set.h>
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace format {
@@ -41,19 +45,19 @@ class DatasetParameterSet {
      *
      * @return
      */
-    uint16_t getDatasetID() const { return dataset_ID; }
+    uint16_t getDatasetID() const;
 
     /**
      *
      * @return
      */
-    uint8_t getDatasetGroupID() const { return dataset_group_ID; }
+    uint8_t getDatasetGroupID() const;
 
     /**
      *
      * @param datasetGroupId
      */
-    void setDatasetGroupId(uint8_t datasetGroupId) { dataset_group_ID = datasetGroupId; }
+    void setDatasetGroupId(uint8_t datasetGroupId);
 
     /**
      *
@@ -68,17 +72,21 @@ class DatasetParameterSet {
     void writeToFile(genie::util::BitWriter& bitWriter) const;
 
    private:
-    /**
-     * ISO 23092-1 Section 6.5.2 table 23
-     *
-     * ------------------------------------------------------------------------------------------------------------- */
     uint8_t dataset_group_ID : 8;  //!<
     uint16_t dataset_ID : 16;      //!<
 
     core::parameter::ParameterSet parameterSet_p2;  //!<
 };
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #endif  // GENIE_PARAMETER_SET_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

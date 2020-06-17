@@ -6,9 +6,13 @@
 
 #include "dataset.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 Dataset::Dataset(const genie::format::mgb::DataUnitFactory& dataUnitFactory,
                  std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2, const uint16_t dataset_ID)
@@ -28,11 +32,15 @@ Dataset::Dataset(const genie::format::mgb::DataUnitFactory& dataUnitFactory,
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Dataset::setDatasetParameterSetsGroupId(uint8_t groupId) {
     for (auto& ps : dataset_parameter_sets) {
         ps.setDatasetGroupId(groupId);
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t Dataset::getLength() const {
     uint64_t length = 12;  // gen_info
@@ -48,6 +56,8 @@ uint64_t Dataset::getLength() const {
 
     return length;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Dataset::writeToFile(genie::util::BitWriter& bitWriter) const {
     bitWriter.write("dtcn");
@@ -65,6 +75,58 @@ void Dataset::writeToFile(genie::util::BitWriter& bitWriter) const {
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+DT_metadata::DT_metadata() : DT_metadata_value() {
+    DT_metadata_value = {0x37, 0xfd, 0x58, 0x7a, 0x00, 0x5a, 0x04, 0x00, 0xd6, 0xe6, 0x46,
+                         0xb4, 0x00, 0x00, 0x00, 0x00, 0xdf, 0x1c, 0x21, 0x44, 0xb6, 0x1f,
+                         0x7d, 0xf3, 0x00, 0x01, 0x00, 0x00, 0x04, 0x00, 0x5a, 0x59};
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+DT_protection::DT_protection() : DT_protection_value() {
+    DT_protection_value = {0x37, 0xfd, 0x58, 0x7a, 0x00, 0x5a, 0x04, 0x00, 0xd6, 0xe6, 0x46,
+                           0xb4, 0x00, 0x00, 0x00, 0x00, 0xdf, 0x1c, 0x21, 0x44, 0xb6, 0x1f,
+                           0x7d, 0xf3, 0x00, 0x01, 0x00, 0x00, 0x04, 0x00, 0x5a, 0x59};
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint16_t Dataset::getDatasetParameterSetDatasetID() const {
+    return dataset_parameter_sets.front().getDatasetID();
+}  // only returns ID of first ps in vector
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t Dataset::getDatasetParameterSetDatasetGroupID() const {
+    return dataset_parameter_sets.front().getDatasetGroupID();
+}  // only returns ID of first ps in vector
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const DatasetHeader& Dataset::getDatasetHeader() const { return dataset_header; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::vector<DatasetParameterSet>& Dataset::getDatasetParameterSets() const { return dataset_parameter_sets; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Dataset::setDatasetGroupId(uint8_t groupId) {
+    this->setDatasetHeaderGroupId(groupId);
+    this->setDatasetParameterSetsGroupId(groupId);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Dataset::setDatasetHeaderGroupId(uint8_t groupId) { dataset_header.setDatasetGroupId(groupId); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

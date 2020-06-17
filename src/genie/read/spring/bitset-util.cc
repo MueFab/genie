@@ -7,9 +7,13 @@
 #include "bitset-util.h"
 #include "params.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace read {
 namespace spring {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void bbhashdict::findpos(int64_t *dictidx, const uint64_t &startposidx) {
     dictidx[0] = startpos[startposidx];
@@ -25,6 +29,8 @@ void bbhashdict::findpos(int64_t *dictidx, const uint64_t &startposidx) {
         dictidx[1] = endidx;  // no read deleted
     return;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void bbhashdict::remove(int64_t *dictidx, const uint64_t &startposidx, const int64_t current) {
     auto size = dictidx[1] - dictidx[0];
@@ -49,6 +55,11 @@ void bbhashdict::remove(int64_t *dictidx, const uint64_t &startposidx, const int
     return;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace spring
 }  // namespace read
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

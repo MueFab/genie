@@ -9,6 +9,7 @@ set(source_files
         preprocess.cc
         reorder-compress-quality-id.cc
         encoder.cc
+        encoder-source.cc
         util.cc
         )
 

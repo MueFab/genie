@@ -4,54 +4,27 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef UTIL_STRING_HELPERS_H_
-#define UTIL_STRING_HELPERS_H_
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#include <string>
+#include "decoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
-namespace util {
+namespace read {
+namespace refcoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-static const char *ws = " \t\n\r\f\v"; //!<
-
-/**
- *
- * @param s
- * @param t
- * @return
- */
-std::string &rtrim(std::string &s, const char *t = ws);
-
-/**
- *
- * @param s
- * @param t
- * @return
- */
-std::string &ltrim(std::string &s, const char *t = ws);
-
-/**
- *
- * @param s
- * @param t
- * @return
- */
-std::string &trim(std::string &s, const char *t = ws);
+Decoder::Decoder() : core::ReadDecoder() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace util
+void Decoder::flowIn(core::AccessUnit&&, const util::Section&)  {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace refcoder
+}  // namespace read
 }  // namespace genie
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#endif  // UTIL_STRING_HELPERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

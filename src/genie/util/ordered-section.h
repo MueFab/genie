@@ -23,7 +23,7 @@ namespace util {
 class OrderedSection {
    private:
     OrderedLock* lock;  //!< @brief Underlying lock
-    size_t length;
+    size_t length; //!<
 
    public:
     /**
@@ -33,6 +33,10 @@ class OrderedSection {
      */
     OrderedSection(OrderedLock* _lock, const Section& id);
 
+    /**
+     *
+     * @param l
+     */
     void setLength(size_t l);
 
     /**

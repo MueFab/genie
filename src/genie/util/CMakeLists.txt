@@ -6,7 +6,6 @@ set(source_files
         data-block.cc
         date.cc
         exceptions.cc
-        log.cc
         ordered-lock.cc
         ordered-section.cc
         string-helpers.cc

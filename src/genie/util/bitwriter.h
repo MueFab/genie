@@ -55,6 +55,10 @@ class BitWriter {
      */
     void write(uint64_t value, uint8_t bits);
 
+    /**
+     *
+     * @param string
+     */
     void write(const std::string &string);
 
     /**
@@ -75,10 +79,23 @@ class BitWriter {
      */
     uint64_t getBitsWritten();
 
+    /**
+     *
+     * @return
+     */
     bool isAligned() const;
 
+    /**
+     *
+     * @param in
+     */
     void writeBuffer(std::istream *in);
 
+    /**
+     *
+     * @param in
+     * @param size
+     */
     void writeBuffer(const void *in, size_t size);
 };
 

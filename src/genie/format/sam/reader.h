@@ -19,22 +19,41 @@ namespace genie {
 namespace format {
 namespace sam {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+/**
+ *
+ */
 class Reader {
    private:
-    std::istream& stream;
-    header::Header header;
-    Record save;
-    bool rec_saved;
+    std::istream& stream;//!<
+    header::Header header;//!<
+    Record save;//!<
+    bool rec_saved;//!<
 
    public:
+    /**
+     *
+     * @param _stream
+     */
     explicit Reader(std::istream& _stream);
 
+    /**
+     *
+     * @return
+     */
     const header::Header& getHeader() const;
 
+    /**
+     *
+     * @param num
+     * @param vec
+     * @param stats
+     */
     void read(size_t num, std::vector<Record>& vec, core::stats::PerfStats& stats);
 
+    /**
+     *
+     * @return
+     */
     bool isEnd();
 };
 

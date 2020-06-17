@@ -7,20 +7,30 @@
 #ifndef GENIE_REORDER_IMPL_H
 #define GENIE_REORDER_IMPL_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace read {
 namespace spring {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>
 reorder_global<bitset_size>::reorder_global(int max_readlen_param) {
     basemask = new std::bitset<bitset_size> *[max_readlen_param];
     for (int i = 0; i < max_readlen_param; i++) basemask[i] = new std::bitset<bitset_size>[128];
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 template <size_t bitset_size>
 reorder_global<bitset_size>::~reorder_global() {
     for (int i = 0; i < max_readlen; i++) delete[] basemask[i];
     delete[] basemask;
 }
+
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>
 void bitsettostring(std::bitset<bitset_size> b, char *s, const uint16_t readlen,
@@ -40,6 +50,8 @@ void bitsettostring(std::bitset<bitset_size> b, char *s, const uint16_t readlen,
     return;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 template <size_t bitset_size>
 void setglobalarrays(reorder_global<bitset_size> &rg) {
     for (int i = 0; i < 64; i++) rg.mask64[i] = 1;
@@ -55,6 +67,8 @@ void setglobalarrays(reorder_global<bitset_size> &rg) {
     }
     return;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>
 void updaterefcount(std::bitset<bitset_size> &cur, std::bitset<bitset_size> &ref, std::bitset<bitset_size> &revref,
@@ -155,6 +169,8 @@ void updaterefcount(std::bitset<bitset_size> &cur, std::bitset<bitset_size> &ref
     return;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 template <size_t bitset_size>
 void readDnaFile(std::bitset<bitset_size> *read, uint16_t *read_lengths, const reorder_global<bitset_size> &rg) {
     //
@@ -226,10 +242,8 @@ void readDnaFile(std::bitset<bitset_size> *read, uint16_t *read_lengths, const r
     return;
 }
 
-//
-// Note: the search_match() function is invoked from within the OpenMP
-// parallel region in reorder().
-//
+// ---------------------------------------------------------------------------------------------------------------------
+
 template <size_t bitset_size>
 bool search_match(const std::bitset<bitset_size> &ref, std::bitset<bitset_size> *mask1,
 #ifdef GENIE_USE_OPENMP
@@ -307,6 +321,8 @@ bool search_match(const std::bitset<bitset_size> &ref, std::bitset<bitset_size> 
     }
     return flag;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>
 void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_lengths,
@@ -610,9 +626,8 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
     return;
 }
 
-//
-// convert bitset to string for all num_thr files in parallel
-//
+// ---------------------------------------------------------------------------------------------------------------------
+
 template <size_t bitset_size>
 void writetofile(std::bitset<bitset_size> *read, uint16_t *read_lengths, reorder_global<bitset_size> &rg) {
     //
@@ -693,6 +708,8 @@ void writetofile(std::bitset<bitset_size> *read, uint16_t *read_lengths, reorder
     return;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 template <size_t bitset_size>
 void reorder_main(const std::string &temp_dir, const compression_params &cp) {
     reorder_global<bitset_size> *rg_pointer = new reorder_global<bitset_size>(cp.max_readlen);
@@ -742,8 +759,15 @@ void reorder_main(const std::string &temp_dir, const compression_params &cp) {
     std::cout << "Done!\n";
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace spring
 }  // namespace read
 }  // namespace genie
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #endif  // GENIE_REORDER_IMPL_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

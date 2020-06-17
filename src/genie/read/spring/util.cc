@@ -13,9 +13,13 @@
 #include <string>
 #include <vector>
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace read {
 namespace spring {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 std::vector<int64_t> read_vector_from_file(const std::string &file_name) {
     std::ifstream f_in(file_name, std::ios::binary);
@@ -30,11 +34,15 @@ std::vector<int64_t> read_vector_from_file(const std::string &file_name) {
     return vec;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void reverse_complement(char *s, char *s1, const int readlen) {
     for (int j = 0; j < readlen; j++) s1[j] = chartorevchar[(uint8_t)s[readlen - j - 1]];
     s1[readlen] = '\0';
     return;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 std::string reverse_complement(const std::string &s, const int readlen) {
     std::string s1;
@@ -42,6 +50,8 @@ std::string reverse_complement(const std::string &s, const int readlen) {
     for (int j = 0; j < readlen; j++) s1[j] = chartorevchar[(uint8_t)s[readlen - j - 1]];
     return s1;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 std::string random_string(size_t length) {
     auto randchar = []() -> char {
@@ -57,6 +67,11 @@ std::string random_string(size_t length) {
     return str;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace spring
 }  // namespace read
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

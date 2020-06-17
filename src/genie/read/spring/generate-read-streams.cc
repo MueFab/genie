@@ -1,8 +1,14 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #ifdef GENIE_USE_OPENMP
-
 #include <omp.h>
-
 #endif
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/core/access-unit.h>
 #include <genie/core/parameter/parameter_set.h>
@@ -21,9 +27,13 @@
 #include "generate-read-streams.h"
 #include "util.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace read {
 namespace spring {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 struct se_data {
     compression_params cp{};
@@ -39,6 +49,8 @@ struct se_data {
     std::vector<char> RC_arr;
     std::vector<uint32_t> order_arr;
 };
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit &raw_au) {
     // char_to_int
@@ -130,6 +142,8 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
                               core::ReadEncoder::EntropySelector *entropycoder,
                               std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
@@ -181,6 +195,8 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
     f_block_info.write((char *)&num_blocks, sizeof(uint32_t));
     f_block_info.write((char *)&num_reads_per_block[0], num_blocks * sizeof(uint32_t));
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data) {
     const std::string file_seq = temp_dir + "/read_seq.txt";
@@ -289,6 +305,8 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     remove(file_seq.c_str());
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void generate_read_streams_se(const std::string &temp_dir, const compression_params &cp,
                               core::ReadEncoder::EntropySelector *entropycoder,
                               std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
@@ -297,6 +315,8 @@ void generate_read_streams_se(const std::string &temp_dir, const compression_par
 
     generate_and_compress_se(temp_dir, data, entropycoder, params, stats);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_data *data) {
     std::vector<std::map<uint8_t, std::map<uint8_t, std::string>>> descriptorFilesPerAU;
@@ -416,6 +436,8 @@ void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     remove(file_seq.c_str());
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 struct pe_block_data {
     std::vector<uint32_t> block_start;
     std::vector<uint32_t> block_end;  // block start and end positions wrt
@@ -425,6 +447,8 @@ struct pe_block_data {
     std::vector<uint32_t> block_seq_start;
     std::vector<uint32_t> block_seq_end;
 };
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
     bdata->block_num = std::vector<uint32_t>(data.cp.num_reads);
@@ -521,6 +545,8 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
     already_seen.clear();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void generate_qual_id_pe(const std::string &temp_dir, const pe_block_data &bdata, uint32_t num_reads) {
     // PE step 3: generate index for ids and quality
 
@@ -579,11 +605,15 @@ void generate_qual_id_pe(const std::string &temp_dir, const pe_block_data &bdata
     f_blocks_id.close();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 struct pe_statistics {
     std::vector<uint32_t> count_same_rec;
     std::vector<uint32_t> count_split_same_AU;
     std::vector<uint32_t> count_split_diff_AU;
 };
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64_t cur_block_num, pe_statistics *pest,
                          core::AccessUnit &raw_au) {
@@ -759,6 +789,8 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void generate_read_streams_pe(const std::string &temp_dir, const compression_params &cp,
                               core::ReadEncoder::EntropySelector *entropycoder,
                               std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
@@ -847,6 +879,8 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
     f_block_info.write((char *)&num_records_per_block[0], num_blocks * sizeof(uint32_t));
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void generate_read_streams(const std::string &temp_dir, const compression_params &cp,
                            core::ReadEncoder::EntropySelector *entropycoder,
                            std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
@@ -856,6 +890,11 @@ void generate_read_streams(const std::string &temp_dir, const compression_params
         generate_read_streams_pe(temp_dir, cp, entropycoder, params, stats);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace spring
 }  // namespace read
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

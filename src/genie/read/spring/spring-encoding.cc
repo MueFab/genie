@@ -5,7 +5,6 @@
  */
 
 #include "spring-encoding.h"
-// #include <omp.h>
 #include <algorithm>
 #include <array>
 #include <bitset>
@@ -19,9 +18,13 @@
 #include <string>
 #include <vector>
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace read {
 namespace spring {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 std::string buildcontig(std::list<contig_reads> &current_contig, const uint32_t &list_size) {
     static const char longtochar[5] = {'A', 'C', 'G', 'T', 'N'};
@@ -63,6 +66,8 @@ std::string buildcontig(std::list<contig_reads> &current_contig, const uint32_t 
     return ref;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void writecontig(const std::string &ref, std::list<contig_reads> &current_contig, std::ofstream &f_seq,
                  std::ofstream &f_pos, std::ofstream &f_noise, std::ofstream &f_noisepos, std::ofstream &f_order,
                  std::ofstream &f_RC, std::ofstream &f_readlength, uint64_t &abs_pos) {
@@ -93,6 +98,8 @@ void writecontig(const std::string &ref, std::list<contig_reads> &current_contig
     return;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void getDataParams(encoder_global &eg, const compression_params &cp) {
     uint32_t numreads_clean, numreads_total;
     numreads_clean = cp.num_reads_clean[0] + cp.num_reads_clean[1];
@@ -111,6 +118,8 @@ void getDataParams(encoder_global &eg, const compression_params &cp) {
     std::cout << "Number of singleton reads: " << eg.numreads_s << std::endl;
     std::cout << "Number of reads with N: " << eg.numreads_N << std::endl;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void correct_order(uint32_t *order_s, const encoder_global &eg) {
     uint32_t numreads_total = eg.numreads + eg.numreads_s + eg.numreads_N;
@@ -155,6 +164,12 @@ void correct_order(uint32_t *order_s, const encoder_global &eg) {
     delete[] cumulative_N_reads;
     return;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace spring
 }  // namespace read
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

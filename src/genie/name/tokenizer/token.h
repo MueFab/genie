@@ -22,6 +22,8 @@ namespace genie {
 namespace name {
 namespace tokenizer {
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 constexpr uint8_t TYPE_SEQ = 0;  //!<
 
 /**

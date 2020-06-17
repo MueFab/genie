@@ -17,13 +17,20 @@ namespace genie {
 namespace read {
 namespace refcoder {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+/**
+ *
+ */
 class Encoder : public core::ReadEncoder {
    public:
-    Encoder() : core::ReadEncoder() {}
+    /**
+     *
+     */
+    Encoder();
 
-    void flowIn(core::record::Chunk&&, const util::Section&) override {}
+    /**
+     *
+     */
+    void flowIn(core::record::Chunk&&, const util::Section&) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

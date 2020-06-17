@@ -28,9 +28,9 @@ struct BlockStepper;
  */
 class DataBlock {
    private:
-    uint8_t lgWordSize;
+    uint8_t lgWordSize; //!<
 
-    std::vector<uint8_t> data;
+    std::vector<uint8_t> data; //!<
 
    public:
     /**

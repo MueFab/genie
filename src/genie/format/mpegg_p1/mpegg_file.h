@@ -7,11 +7,15 @@
 #ifndef GENIE_MPEGG_FILE_H
 #define GENIE_MPEGG_FILE_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include <string>
 #include <vector>
 #include "genie/format/mpegg_p1/dataset_group.h"
 #include "genie/format/mpegg_p1/file_header.h"
 #include "genie/util/bitwriter.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace format {
@@ -34,12 +38,12 @@ class MpeggFile {
     /**
      *
      */
-    const FileHeader& getFileHeader() const { return fileHeader; }
+    const FileHeader& getFileHeader() const;
 
     /*
      *
      */
-    const std::vector<DatasetGroup>& getDatasetGroups() const { return datasetGroups; }
+    const std::vector<DatasetGroup>& getDatasetGroups() const;
 
     /**
      *
@@ -52,7 +56,15 @@ class MpeggFile {
     std::vector<DatasetGroup> datasetGroups;  //!<
 };
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 #endif  // GENIE_MPEGG_FILE_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

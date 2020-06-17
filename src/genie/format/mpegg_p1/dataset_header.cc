@@ -8,9 +8,13 @@
 #include <math.h>
 #include <bitset>
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 DatasetHeader::DatasetHeader(const uint16_t x_datasetID)
     : dataset_group_ID(0),
@@ -46,6 +50,8 @@ DatasetHeader::DatasetHeader(const uint16_t x_datasetID)
     version[2] = 'c';
     version[3] = 'd';
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 DatasetHeader::DatasetHeader(uint8_t datasetGroupId, uint16_t datasetId/*, char *version, uint8_t byteOffsetSizeFlag,
                              uint8_t nonOverlappingAuRangeFlag, uint8_t pos40BitsFlag, uint8_t blockHeaderFlag,
@@ -85,6 +91,8 @@ DatasetHeader::DatasetHeader(uint8_t datasetGroupId, uint16_t datasetId/*, char 
       U_signature_length(0),
       tflag(0),
       thres(0) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t DatasetHeader::getLength() const {
     // length is first calculated in bits
@@ -139,6 +147,8 @@ uint64_t DatasetHeader::getLength() const {
     length /= 8;  // byte conversion
     return length;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetHeader::writeToFile(genie::util::BitWriter& bitWriter) const {
     bitWriter.write("dthd");
@@ -292,6 +302,23 @@ void DatasetHeader::writeToFile(genie::util::BitWriter& bitWriter) const {
     bitWriter.flush();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetHeader::setDatasetGroupId(uint8_t datasetGroupId) { dataset_group_ID = datasetGroupId; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint16_t DatasetHeader::getDatasetId() const { return dataset_ID; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t DatasetHeader::getDatasetGroupId() const { return dataset_group_ID; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

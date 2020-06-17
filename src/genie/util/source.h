@@ -39,6 +39,10 @@ class Source {
      */
     void flushOut(size_t& pos) { drain->flushIn(pos); }
 
+    /**
+     *
+     * @param id
+     */
     void skipOut(const Section& id) { drain->skipIn(id); }
 
    public:

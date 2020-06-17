@@ -19,34 +19,72 @@
 namespace genie {
 namespace util {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+/**
+ *
+ */
 class BitReader {
    private:
-    std::istream &istream;
-    uint8_t m_heldBits;
-    uint8_t m_numHeldBits;
+    std::istream &istream; //!<
+    uint8_t m_heldBits; //!<
+    uint8_t m_numHeldBits; //!<
 
    public:
+    /**
+     *
+     * @param _istream
+     */
     explicit BitReader(std::istream &_istream);
 
+    /**
+     *
+     * @return
+     */
     uint64_t getByte();
 
+    /**
+     *
+     * @return
+     */
     uint64_t flush();
 
+    /**
+     *
+     * @param numBits
+     * @return
+     */
     uint64_t read(uint8_t numBits);
+
+    /**
+     *
+     * @tparam T
+     * @return
+     */
     template <typename T, typename = std::enable_if<std::is_integral<T>::value>>
     T read() {
         return static_cast<T>(read(sizeof(T) * 8));
     }
 
+    /**
+     *
+     * @tparam T
+     * @param s
+     * @return
+     */
     template <typename T, typename = std::enable_if<std::is_integral<T>::value>>
     T read(size_t s) {
         return static_cast<T>(read(s));
     }
 
+    /**
+     *
+     * @param str
+     */
     void read(std::string &str);
 
+    /**
+     *
+     * @return
+     */
     bool isGood() const;
 };
 

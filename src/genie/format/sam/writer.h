@@ -19,17 +19,32 @@ namespace genie {
 namespace format {
 namespace sam {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+/**
+ *
+ */
 class Writer {
    private:
-    header::Header header;
-    std::ostream& file;
+    header::Header header; //!<
+    std::ostream& file;//!<
 
    public:
+    /**
+     *
+     * @param fileHeader
+     * @param stream
+     */
     Writer(header::Header&& fileHeader, std::ostream& stream);
+
+    /**
+     *
+     * @return
+     */
     const header::Header& getHeader() const;
 
+    /**
+     *
+     * @param rec
+     */
     void write(sam::Record&& rec);
 };
 

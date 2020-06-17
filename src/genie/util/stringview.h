@@ -16,20 +16,54 @@
 namespace genie {
 namespace util {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+/**
+ *
+ */
 struct StringView {
    private:
-    size_t start;
-    size_t stop;
-    const char* memory;
+    size_t start; //!<
+    size_t stop; //!<
+    const char* memory; //!<
 
    public:
+    /**
+     *
+     * @param start_p
+     * @param stop_p
+     */
     StringView(size_t start_p, size_t stop_p);
+
+    /**
+     *
+     * @param start_p
+     * @param stop_p
+     * @param mem
+     */
     StringView(size_t start_p, size_t stop_p, const char* mem);
+
+    /**
+     *
+     * @param mem
+     * @return
+     */
     StringView deploy(const char* mem) const;
+
+    /**
+     *
+     * @return
+     */
     const char* begin() const;
+
+    /**
+     *
+     * @return
+     */
     const char* end() const;
+
+    /**
+     *
+     * @return
+     */
     size_t length() const;
 };
 
