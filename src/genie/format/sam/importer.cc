@@ -8,6 +8,7 @@
 #include <genie/core/record/alignment_split/same-rec.h>
 #include <genie/core/record/alignment_split/other-rec.h>
 #include <genie/core/record/alignment_split/unpaired.h>
+#include <genie/core/record/alignment-external.h>
 #include <genie/core/record/alignment_external/other-rec.h>
 
 #include <genie/util/ordered-section.h>
@@ -327,9 +328,9 @@ void Importer::convertPairedEndNoSplit(core::record::Chunk &template_chunk, SamR
         if (rec->getAlignmentSharedData().getSeqID() != refs.at(sam_r1_iter->getRname())){
             // Add more_alignment_info
             auto leftmost_read = sam_r1_iter->getPos() < sam_r1_iter->getPos() ? sam_r1_iter : sam_r2_iter;
-//            auto more_alignment_info = util::make_unique<core::record::alignment_external::OtherRec>(
-//                leftmost_read->getPos(), refs.at(leftmost_read->getRname()));
-//            rec->setMoreAlignmentInfo(std::move(more_alignment_info));
+            auto more_alignment_info = util::make_unique<core::record::alignment_external::OtherRec>(
+                leftmost_read->getPos(), refs.at(leftmost_read->getRname()));
+            rec->setMoreAlignmentInfo(std::move(more_alignment_info));
 
             template_chunk.push_back(std::move(*rec));
 
