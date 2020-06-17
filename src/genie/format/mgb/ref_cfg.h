@@ -30,11 +30,37 @@ class RefCfg {
 
     uint8_t posSize;  //!< internal
    public:
+    /**
+     *
+     * @param _ref_sequence_ID
+     * @param _ref_start_position
+     * @param _ref_end_position
+     * @param _posSize
+     */
     RefCfg(uint16_t _ref_sequence_ID, uint64_t _ref_start_position, uint64_t _ref_end_position, uint8_t _posSize);
+
+    /**
+     *
+     * @param _posSize
+     */
     explicit RefCfg(uint8_t _posSize);
+
+    /**
+     *
+     * @param _posSize
+     * @param reader
+     */
     RefCfg(uint8_t _posSize, util::BitReader &reader);
+
+    /**
+     *
+     */
     virtual ~RefCfg() = default;
 
+    /**
+     *
+     * @param writer
+     */
     virtual void write(util::BitWriter &writer) const;
 };
 

@@ -71,6 +71,18 @@ void TransformedSubSeq::write(util::BitWriter& writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void TransformedSubSeq::setSubsequenceID(const core::GenSubIndex _subsequence_ID) { subsequence_ID = _subsequence_ID; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+core::AlphabetID TransformedSubSeq::getAlphabetID() const { return alphabet_ID; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void TransformedSubSeq::setAlphabetID(core::AlphabetID _alphabet_ID) { alphabet_ID = _alphabet_ID; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace paramcabac
 }  // namespace entropy
 }  // namespace genie

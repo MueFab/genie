@@ -10,11 +10,14 @@
 #include <sstream>
 #include "decode-cabac.h"
 #include "stream-handler.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace entropy {
 namespace gabac {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration& conf0,
                                               const gabac::EncodingConfiguration&,
@@ -22,7 +25,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
     core::AccessUnit::Subsequence in = std::move(data);
     util::DataBlock remainingData = std::move(in.move());
     core::AccessUnit::Descriptor ret(in.getID().first);
-    if(remainingData.empty()) {
+    if (remainingData.empty()) {
         return ret;
     }
     size_t offset = 6;
@@ -69,8 +72,10 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
     return ret;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfiguration& conf,
-                                                            core::AccessUnit::Subsequence&& data) {
+                                                  core::AccessUnit::Subsequence&& data) {
     core::AccessUnit::Subsequence in = std::move(data);
     // Interface to GABAC library
     util::DataBlock buffer = in.move();
@@ -97,14 +102,15 @@ core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfigura
     return core::AccessUnit::Subsequence(std::move(tmp), in.getID());
 }
 
-std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::process(const parameter::DescriptorSubseqCfg& param,
-                                                        core::AccessUnit::Descriptor& d) {
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::process(
+    const parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d) {
     util::Watch watch;
     std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> desc;
     std::get<0>(desc) = std::move(d);
     const auto& param_desc = dynamic_cast<const core::parameter::desc_pres::DescriptorPresent&>(param.get());
     if (getDescriptor(std::get<0>(desc).getID()).tokentype) {
-
         size_t size = 0;
         for (const auto& s : std::get<0>(desc)) {
             size += s.getNumSymbols() * sizeof(uint32_t);
@@ -112,22 +118,21 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::proces
 
         if (size) {
             std::get<1>(desc).addInteger("size-gabac-total-comp", size);
-            std::get<1>(desc).addInteger(
-                "size-gabac-" + core::getDescriptor(std::get<0>(desc).getID()).name +  "-comp",
-                size);
+            std::get<1>(desc).addInteger("size-gabac-" + core::getDescriptor(std::get<0>(desc).getID()).name + "-comp",
+                                         size);
         }
 
         const auto& token_param = dynamic_cast<const paramcabac::DecoderTokenType&>(param_desc.getDecoder());
         auto conf0 = token_param.getSubsequenceCfg(0);
         auto conf1 = token_param.getSubsequenceCfg(1);
-        std::get<0>(desc) = decompressTokens(gabac::EncodingConfiguration(std::move(conf0)),
-                                gabac::EncodingConfiguration(std::move(conf1)), std::move(*std::get<0>(desc).begin()));
+        std::get<0>(desc) =
+            decompressTokens(gabac::EncodingConfiguration(std::move(conf0)),
+                             gabac::EncodingConfiguration(std::move(conf1)), std::move(*std::get<0>(desc).begin()));
 
         if (size) {
             std::get<1>(desc).addInteger("size-gabac-total-raw", std::get<0>(desc).begin()->getRawSize());
-            std::get<1>(desc).addInteger(
-                "size-gabac-" + core::getDescriptor(std::get<0>(desc).getID()).name +  "-raw",
-                std::get<0>(desc).begin()->getRawSize());
+            std::get<1>(desc).addInteger("size-gabac-" + core::getDescriptor(std::get<0>(desc).getID()).name + "-raw",
+                                         std::get<0>(desc).begin()->getRawSize());
         }
     } else {
         for (auto& subseq : std::get<0>(desc)) {
@@ -142,16 +147,19 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::proces
             if (!subseq.isEmpty()) {
                 std::get<1>(desc).addInteger("size-gabac-total-comp", subseq.getRawSize());
                 std::get<1>(desc).addInteger(
-                    "size-gabac-" + core::getDescriptor(std::get<0>(desc).getID()).name + "-" + core::getDescriptor(std::get<0>(desc).getID()).subseqs[d_id.second].name + "-comp",
+                    "size-gabac-" + core::getDescriptor(std::get<0>(desc).getID()).name + "-" +
+                        core::getDescriptor(std::get<0>(desc).getID()).subseqs[d_id.second].name + "-comp",
                     subseq.getRawSize());
             }
 
-            std::get<0>(desc).set(d_id.second, decompress(gabac::EncodingConfiguration(std::move(conf0)), std::move(subseq)));
+            std::get<0>(desc).set(d_id.second,
+                                  decompress(gabac::EncodingConfiguration(std::move(conf0)), std::move(subseq)));
 
             if (!std::get<0>(desc).get(d_id.second).isEmpty()) {
                 std::get<1>(desc).addInteger("size-gabac-total-raw", std::get<0>(desc).get(d_id.second).getRawSize());
                 std::get<1>(desc).addInteger(
-                    "size-gabac-" + core::getDescriptor(std::get<0>(desc).getID()).name + "-" + core::getDescriptor(std::get<0>(desc).getID()).subseqs[d_id.second].name + "-raw",
+                    "size-gabac-" + core::getDescriptor(std::get<0>(desc).getID()).name + "-" +
+                        core::getDescriptor(std::get<0>(desc).getID()).subseqs[d_id.second].name + "-raw",
                     std::get<0>(desc).get(d_id.second).getRawSize());
             }
         }
@@ -165,5 +173,6 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::proces
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
+
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

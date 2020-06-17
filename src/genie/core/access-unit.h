@@ -33,8 +33,8 @@ class AccessUnit {
         util::DataBlock data;  //!< @brief
         size_t position;       //!< @brief
 
-        GenSubIndex id;  //!< @brief
-        size_t numSymbols;
+        GenSubIndex id;     //!< @brief
+        size_t numSymbols;  //!<
 
        public:
         /**
@@ -96,22 +96,61 @@ class AccessUnit {
          */
         size_t getNumSymbols() const;
 
+        /**
+         *
+         * @param num
+         */
         void annotateNumSymbols(size_t num);
 
+        /**
+         *
+         * @return
+         */
         bool isEmpty() const;
 
+        /**
+         *
+         * @return
+         */
         size_t getRawSize() const;
 
+        /**
+         *
+         * @param writer
+         */
         void write(util::BitWriter& writer) const;
 
+        /**
+         *
+         * @param _id
+         * @param size
+         * @param reader
+         */
         Subsequence(GenSubIndex _id, size_t size, util::BitReader& reader);
 
+        /**
+         *
+         * @param _id
+         */
         explicit Subsequence(GenSubIndex _id);
 
+        /**
+         *
+         * @param _id
+         * @param dat
+         */
         Subsequence(GenSubIndex _id, util::DataBlock&& dat);
 
+        /**
+         *
+         * @param dat
+         */
         void set(util::DataBlock&& dat);
 
+        /**
+         *
+         * @param pos
+         */
         void setPosition(size_t pos);
     };
 
@@ -201,14 +240,36 @@ class AccessUnit {
          */
         size_t getSize() const;
 
+        /**
+         *
+         * @return
+         */
         size_t getWrittenSize() const;
 
+        /**
+         *
+         * @param writer
+         */
         void write(util::BitWriter& writer) const;
 
+        /**
+         *
+         * @param _id
+         * @param count
+         * @param remainingSize
+         * @param reader
+         */
         Descriptor(GenDesc _id, size_t count, size_t remainingSize, util::BitReader& reader);
 
+        /**
+         *
+         * @return
+         */
         bool isEmpty() const;
 
+        /**
+         *
+         */
         Descriptor();
     };
 
@@ -250,6 +311,11 @@ class AccessUnit {
      */
     void set(GenSubIndex sub, Subsequence&& data);
 
+    /**
+     *
+     * @param sub
+     * @param data
+     */
     void set(GenDesc sub, Descriptor&& data);
 
     /**
@@ -405,14 +471,22 @@ class AccessUnit {
      */
     const Descriptor* end() const;
 
+    /**
+     *
+     * @return
+     */
     stats::PerfStats& getStats();
 
+    /**
+     *
+     * @param _stats
+     */
     void setStats(stats::PerfStats&& _stats);
 
    private:
     std::vector<Descriptor> descriptors;  //!< @brief
     parameter::ParameterSet parameters;   //!< @brief
-    stats::PerfStats stats;
+    stats::PerfStats stats;               //!<
 
     size_t numReads;  //!< @brief
 

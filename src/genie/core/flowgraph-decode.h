@@ -33,7 +33,7 @@ class FlowGraphDecode : public FlowGraph {
     genie::util::Selector<genie::core::AccessUnit, genie::core::record::Chunk> readSelector;  //!<
 
     std::vector<std::unique_ptr<genie::core::QVDecoder>> qvCoders;  //!<
-    genie::core::ReadDecoder::QvSelector qvSelector;  //!<
+    genie::core::ReadDecoder::QvSelector qvSelector;                //!<
 
     std::vector<std::unique_ptr<genie::core::NameDecoder>> nameCoders;  //!<
     core::ReadDecoder::NameSelector nameSelector;                       //!<

@@ -198,7 +198,7 @@ std::vector<int32_t> Decoder::numberDeletions(size_t number) {
 void Decoder::decodeMismatches(size_t clip_offset, std::string &sequence, std::string &cigar_extended) {
     uint64_t mismatchPosition = 0;
     uint64_t cigarOffset = cigar_extended.find_first_not_of(']');
-    if(container.isEnd(core::GenSub::MMPOS_TERMINATOR)) {
+    if (container.isEnd(core::GenSub::MMPOS_TERMINATOR)) {
         return;
     }
     while (!container.pull(core::GenSub::MMPOS_TERMINATOR)) {

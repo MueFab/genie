@@ -27,10 +27,10 @@ Importer::Importer(size_t _blockSize, std::istream &_file_1, std::istream &_file
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Importer::pumpRetrieve(core::Classifier* _classifier)  {
+bool Importer::pumpRetrieve(core::Classifier *_classifier) {
     util::Watch watch;
     core::record::Chunk chunk;
-    size_t size_seq= 0;
+    size_t size_seq = 0;
     size_t size_qual = 0;
     size_t size_name = 0;
     bool eof = false;
@@ -42,9 +42,9 @@ bool Importer::pumpRetrieve(core::Classifier* _classifier)  {
                 break;
             }
             auto record = buildRecord(data);
-            for(const auto& seg : record.getSegments()) {
+            for (const auto &seg : record.getSegments()) {
                 size_seq += seg.getSequence().size();
-                for(const auto &q : seg.getQualities()) {
+                for (const auto &q : seg.getQualities()) {
                     size_qual += q.size();
                 }
             }

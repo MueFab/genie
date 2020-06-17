@@ -17,7 +17,7 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Block::Block(uint8_t _descriptor_ID, core::AccessUnit::Descriptor&& _payload)
+Block::Block(uint8_t _descriptor_ID, core::AccessUnit::Descriptor &&_payload)
     : descriptor_ID(_descriptor_ID), payload(std::move(_payload)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -39,8 +39,7 @@ Block::Block(size_t qv_count, util::BitReader &reader) {
     auto count = core::GenDesc(descriptor_ID) == core::GenDesc::QV
                      ? qv_count
                      : core::getDescriptor(core::GenDesc(descriptor_ID)).subseqs.size();
-    payload =
-        core::AccessUnit::Descriptor(core::GenDesc(descriptor_ID), count, block_payload_size, reader);
+    payload = core::AccessUnit::Descriptor(core::GenDesc(descriptor_ID), count, block_payload_size, reader);
 
     reader.flush();
 }
@@ -64,7 +63,6 @@ core::AccessUnit::Descriptor &&Block::movePayload() { return std::move(payload);
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint8_t Block::getDescriptorID() const { return descriptor_ID; }
-
 
 size_t Block::getWrittenSize() const { return payload.getWrittenSize() + sizeof(uint32_t) + sizeof(uint8_t); }
 

@@ -9,9 +9,13 @@
 #include <genie/util/block-stepper.h>
 #include "rle-subseq-transform.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace entropy {
 namespace gabac {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void transformRleCoding(const paramcabac::Subsequence &subseqCfg,
                         std::vector<util::DataBlock> *const transformedSubseqs) {
@@ -73,6 +77,8 @@ void transformRleCoding(const paramcabac::Subsequence &subseqCfg,
     symbols.clear();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void inverseTransformRleCoding(const paramcabac::Subsequence &subseqCfg,
                                std::vector<util::DataBlock> *const transformedSubseqs) {
     assert(transformedSubseqs != nullptr);
@@ -121,6 +127,12 @@ void inverseTransformRleCoding(const paramcabac::Subsequence &subseqCfg,
 
     symbols.swap(&(*transformedSubseqs)[0]);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

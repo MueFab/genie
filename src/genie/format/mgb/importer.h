@@ -25,19 +25,31 @@ namespace genie {
 namespace format {
 namespace mgb {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+/**
+ *
+ */
 class Importer : public core::FormatImporterCompressed {
    private:
-    util::BitReader reader;
-    std::map<size_t, core::parameter::ParameterSet> parameterSets;
-    std::mutex lock;
-    genie::core::stats::PerfStats* stats;
-    mgb::DataUnitFactory factory;
+    util::BitReader reader;                                         //!<
+    std::map<size_t, core::parameter::ParameterSet> parameterSets;  //!<
+    std::mutex lock;                                                //!<
+    genie::core::stats::PerfStats* stats;                           //!<
+    mgb::DataUnitFactory factory;                                   //!<
 
    public:
+    /**
+     *
+     * @param _file
+     * @param _stats
+     */
     explicit Importer(std::istream& _file, genie::core::stats::PerfStats* _stats = nullptr);
 
+    /**
+     *
+     * @param id
+     * @param lock
+     * @return
+     */
     bool pump(size_t& id, std::mutex& lock) override;
 };
 

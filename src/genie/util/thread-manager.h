@@ -28,7 +28,7 @@ class ThreadManager {
     size_t counter;                    //!< @brief Identifier for next block
     std::vector<std::thread> threads;  //!< @brief Storage for all the threads
     std::atomic<bool> stopFlag;        //!< @brief Threads will stop after current block when set
-    bool abortFlag;                    //!< @brief The flushIn(size_t& pos) signal will be skipped after stop(). Used with stopFlag
+    bool abortFlag;  //!< @brief The flushIn(size_t& pos) signal will be skipped after stop(). Used with stopFlag
     std::vector<OriginalSource*> source;  //!< @brief Where to enter the pipeline
     std::mutex lock;
 

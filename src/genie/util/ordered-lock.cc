@@ -35,10 +35,7 @@ void OrderedLock::finished(size_t length) {
 
 OrderedLock::OrderedLock() : counter(0) {}
 
-
-void OrderedLock::reset() {
-    counter = 0;
-}
+void OrderedLock::reset() { counter = 0; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

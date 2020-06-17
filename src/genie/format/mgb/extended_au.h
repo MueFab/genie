@@ -29,10 +29,30 @@ class ExtendedAu {
 
     uint8_t posSize;  //!< Internal
    public:
+    /**
+     *
+     * @param _extended_AU_start_position
+     * @param _extended_AU_end_position
+     * @param _posSize
+     */
     ExtendedAu(uint64_t _extended_AU_start_position, uint64_t _extended_AU_end_position, uint8_t _posSize);
+
+    /**
+     *
+     * @param _posSize
+     * @param reader
+     */
     ExtendedAu(uint8_t _posSize, util::BitReader& reader);
+
+    /**
+     *
+     */
     virtual ~ExtendedAu() = default;
 
+    /**
+     *
+     * @param writer
+     */
     virtual void write(util::BitWriter& writer) const;
 };
 

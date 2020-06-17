@@ -14,8 +14,8 @@
 #include <genie/util/sideSelector.h>
 #include <genie/util/source.h>
 #include "access-unit.h"
-#include "module.h"
 #include "entropy-encoder.h"
+#include "module.h"
 #include "name-encoder.h"
 #include "qv-encoder.h"
 
@@ -29,13 +29,15 @@ namespace core {
  */
 class ReadEncoder : public Module<record::Chunk, AccessUnit> {
    public:
-    using QvSelector = util::SideSelector<QVEncoder, QVEncoder::QVCoded, const record::Chunk&>;             //!<
-    using NameSelector = util::SideSelector<NameEncoder, std::tuple<AccessUnit::Descriptor, core::stats::PerfStats>, const record::Chunk&>;  //!<
-    using EntropySelector = util::SideSelector<EntropyEncoder, EntropyEncoder::EntropyCoded, AccessUnit::Descriptor&>;  //!<
+    using QvSelector = util::SideSelector<QVEncoder, QVEncoder::QVCoded, const record::Chunk&>;  //!<
+    using NameSelector = util::SideSelector<NameEncoder, std::tuple<AccessUnit::Descriptor, core::stats::PerfStats>,
+                                            const record::Chunk&>;  //!<
+    using EntropySelector =
+        util::SideSelector<EntropyEncoder, EntropyEncoder::EntropyCoded, AccessUnit::Descriptor&>;  //!<
 
    protected:
-    QvSelector* qvcoder{};      //!<
-    NameSelector* namecoder{};  //!<
+    QvSelector* qvcoder{};            //!<
+    NameSelector* namecoder{};        //!<
     EntropySelector* entropycoder{};  //!<
 
    public:
@@ -57,8 +59,19 @@ class ReadEncoder : public Module<record::Chunk, AccessUnit> {
      */
     virtual void setEntropyCoder(EntropySelector* coder);
 
+    /**
+     *
+     * @param entropycoder
+     * @param a
+     * @return
+     */
     static AccessUnit entropyCodeAU(EntropySelector* entropycoder, AccessUnit&& a);
 
+    /**
+     *
+     * @param a
+     * @return
+     */
     AccessUnit entropyCodeAU(AccessUnit&& a);
 
     /**

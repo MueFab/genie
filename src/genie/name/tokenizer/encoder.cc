@@ -26,6 +26,6 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Encoder::proces
     return ret;
 }
 
-}
-}
-}
+}  // namespace tokenizer
+}  // namespace name
+}  // namespace genie

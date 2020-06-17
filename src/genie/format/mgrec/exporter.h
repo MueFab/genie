@@ -9,12 +9,12 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/core/format-exporter.h>
 #include <genie/core/record/chunk.h>
 #include <genie/core/stats/perf-stats.h>
 #include <genie/util/bitwriter.h>
 #include <genie/util/drain.h>
 #include <genie/util/ordered-lock.h>
-#include <genie/core/format-exporter.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

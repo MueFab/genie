@@ -40,12 +40,11 @@ void Codebook::write(util::BitWriter& writer) const {
 }
 
 Codebook::Codebook(uint8_t v1, uint8_t v2) {
-qv_recon.push_back(v1);
-qv_recon.push_back(v2);
+    qv_recon.push_back(v1);
+    qv_recon.push_back(v2);
 }
 
-
-const std::vector<uint8_t> &Codebook::getEntries() const { return qv_recon; }
+const std::vector<uint8_t>& Codebook::getEntries() const { return qv_recon; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

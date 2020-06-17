@@ -27,6 +27,7 @@ namespace alignment_split {
  *
  */
 class SameRec : public AlignmentSplit {
+   private:
     int64_t delta;        //!<
     Alignment alignment;  //!<
 

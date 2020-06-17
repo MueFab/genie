@@ -21,9 +21,9 @@ namespace core {
  */
 class Reference {
    private:
-    std::string name; //!<
-    uint64_t start; //!<
-    uint64_t end; //!<
+    std::string name;  //!<
+    uint64_t start;    //!<
+    uint64_t end;      //!<
 
    public:
     /**

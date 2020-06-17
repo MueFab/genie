@@ -20,9 +20,13 @@
 #include <genie/util/data-block.h>
 #include "equality-subseq-transform.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace entropy {
 namespace gabac {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 // Optimized for wordsize 1. In place for equality flags
 static void transformEqualityCoding0(util::DataBlock *const values, util::DataBlock *const equalityFlags) {
@@ -49,6 +53,8 @@ static void transformEqualityCoding0(util::DataBlock *const values, util::DataBl
     // Swap back before returning
     equalityFlags->swap(values);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 // Optimized for wordsize 1 > 0. In place for values
 static void transformEqualityCoding1(util::DataBlock *const values, util::DataBlock *const equalityFlags) {
@@ -77,6 +83,8 @@ static void transformEqualityCoding1(util::DataBlock *const values, util::DataBl
     values->resize(values->size() - (w.end - w.curr) / w.wordSize);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void transformEqualityCoding(std::vector<util::DataBlock> *const transformedSubseqs) {
     // Prepare internal and the output data structures
     transformedSubseqs->resize(2);
@@ -94,6 +102,8 @@ void transformEqualityCoding(std::vector<util::DataBlock> *const transformedSubs
         transformEqualityCoding1(rawValues, flags);
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void inverseTransformEqualityCoding(std::vector<util::DataBlock> *const transformedSubseqs) {
     assert(transformedSubseqs != nullptr);
@@ -132,6 +142,12 @@ void inverseTransformEqualityCoding(std::vector<util::DataBlock> *const transfor
 
     symbols.swap(&(*transformedSubseqs)[0]);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

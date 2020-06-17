@@ -23,9 +23,13 @@
 #include "merge-subseq-transform.h"
 #include "rle-subseq-transform.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace entropy {
 namespace gabac {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 static inline void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
                                           std::vector<util::DataBlock> *const transformedSubseqs) {
@@ -63,6 +67,8 @@ static inline void doSubsequenceTransform(const paramcabac::Subsequence &subseqC
     // << " bytes";
     // }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
     conf.validate();
@@ -124,6 +130,12 @@ unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingC
 
     return subseqPayloadSize;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

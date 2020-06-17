@@ -14,10 +14,10 @@
 #include <genie/util/sideSelector.h>
 #include <genie/util/source.h>
 #include "access-unit.h"
+#include "entropy-decoder.h"
 #include "module.h"
 #include "name-decoder.h"
 #include "qv-decoder.h"
-#include "entropy-decoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,14 +29,18 @@ namespace core {
  */
 class ReadDecoder : public Module<AccessUnit, record::Chunk> {
    public:
-    using QvSelector = util::SideSelector<QVDecoder, std::tuple<std::vector<std::string>, core::stats::PerfStats>, const parameter::QualityValues&,
-                                          const std::vector<std::string>&, AccessUnit::Descriptor&>;          //!<
-    using NameSelector = util::SideSelector<NameDecoder, std::tuple<std::vector<std::string>, core::stats::PerfStats>, AccessUnit::Descriptor&>;  //!<
-    using EntropySelector = util::SideSelector<EntropyDecoder, std::tuple<AccessUnit::Descriptor, core::stats::PerfStats>, const parameter::DescriptorSubseqCfg&, AccessUnit::Descriptor&>;  //!<
+    using QvSelector = util::SideSelector<QVDecoder, std::tuple<std::vector<std::string>, core::stats::PerfStats>,
+                                          const parameter::QualityValues&, const std::vector<std::string>&,
+                                          AccessUnit::Descriptor&>;  //!<
+    using NameSelector = util::SideSelector<NameDecoder, std::tuple<std::vector<std::string>, core::stats::PerfStats>,
+                                            AccessUnit::Descriptor&>;  //!<
+    using EntropySelector =
+        util::SideSelector<EntropyDecoder, std::tuple<AccessUnit::Descriptor, core::stats::PerfStats>,
+                           const parameter::DescriptorSubseqCfg&, AccessUnit::Descriptor&>;  //!<
 
    protected:
-    QvSelector* qvcoder{};      //!<
-    NameSelector* namecoder{};  //!<
+    QvSelector* qvcoder{};            //!<
+    NameSelector* namecoder{};        //!<
     EntropySelector* entropycoder{};  //!<
 
    public:
@@ -52,10 +56,25 @@ class ReadDecoder : public Module<AccessUnit, record::Chunk> {
      */
     virtual void setNameCoder(NameSelector* coder);
 
+    /**
+     *
+     * @param coder
+     */
     virtual void setEntropyCoder(EntropySelector* coder);
 
+    /**
+     *
+     * @param select
+     * @param a
+     * @return
+     */
     static AccessUnit entropyCodeAU(EntropySelector* select, AccessUnit&& a);
 
+    /**
+     *
+     * @param a
+     * @return
+     */
     AccessUnit entropyCodeAU(AccessUnit&& a);
 
     /**

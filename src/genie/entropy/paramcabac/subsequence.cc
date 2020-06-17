@@ -20,9 +20,13 @@ namespace paramcabac {
 Subsequence::Subsequence()
     : Subsequence(TransformedParameters(), 0, false, std::vector<TransformedSubSeq>({TransformedSubSeq()})) {}
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 Subsequence::Subsequence(uint16_t _descriptor_subsequence_ID, bool _tokentypeFlag)
     : Subsequence(TransformedParameters(), _descriptor_subsequence_ID, _tokentypeFlag,
                   std::vector<TransformedSubSeq>({TransformedSubSeq()})) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters, uint16_t _descriptor_subsequence_ID,
                          bool _tokentypeFlag, std::vector<TransformedSubSeq>&& _transformSubseq_cfgs)

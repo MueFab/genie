@@ -7,6 +7,8 @@
 #ifndef GENIE_FLOWGRAPH_H
 #define GENIE_FLOWGRAPH_H
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include <genie/core/stats/perf-stats.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -35,6 +37,9 @@ class FlowGraph {
      */
     virtual core::stats::PerfStats getStats() = 0;
 
+    /**
+     *
+     */
     virtual ~FlowGraph() = default;
 };
 

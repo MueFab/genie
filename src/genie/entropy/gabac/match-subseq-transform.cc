@@ -12,9 +12,13 @@
 #include <genie/util/data-block.h>
 #include "match-subseq-transform.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace entropy {
 namespace gabac {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
                           std::vector<util::DataBlock> *const transformedSubseqs) {
@@ -73,6 +77,8 @@ void transformMatchCoding(const paramcabac::Subsequence &subseqCfg,
     symbols.clear();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void inverseTransformMatchCoding(std::vector<util::DataBlock> *const transformedSubseqs) {
     assert(transformedSubseqs != nullptr);
 
@@ -115,6 +121,12 @@ void inverseTransformMatchCoding(std::vector<util::DataBlock> *const transformed
 
     symbols.swap(&(*transformedSubseqs)[0]);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

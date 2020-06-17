@@ -14,6 +14,8 @@
 #include <genie/util/make-unique.h>
 #include "gabac-seq-conf-set.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace entropy {
 namespace gabac {
@@ -30,17 +32,25 @@ class Decoder : public core::EntropyDecoder {
      * @param out Where to put uncompressed sequence
      */
     static core::AccessUnit::Subsequence decompress(const gabac::EncodingConfiguration& conf,
-                                                       core::AccessUnit::Subsequence&& in);
+                                                    core::AccessUnit::Subsequence&& in);
 
    public:
-
-    std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(const parameter::DescriptorSubseqCfg& param,
-                                         core::AccessUnit::Descriptor& d) override;
+    /**
+     *
+     * @param param
+     * @param d
+     * @return
+     */
+    std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(
+        const parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d) override;
 };
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 #endif  // GENIE_DECODER_H

@@ -1,3 +1,9 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #ifndef GENIE_DECODER_H
 #define GENIE_DECODER_H
 
@@ -13,8 +19,8 @@ namespace qvwriteout {
 class Decoder : public core::QVDecoder {
    public:
     std::tuple<std::vector<std::string>, core::stats::PerfStats> process(const core::parameter::QualityValues& param,
-                                     const std::vector<std::string>& ecigar_vec,
-                                     core::AccessUnit::Descriptor& desc) override;
+                                                                         const std::vector<std::string>& ecigar_vec,
+                                                                         core::AccessUnit::Descriptor& desc) override;
 
     static std::unique_ptr<core::QVDecoder> create(util::BitReader& reader);
 };

@@ -17,6 +17,8 @@
 #include <genie/entropy/paramcabac/transformed-subseq.h>
 #include <vector>
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace entropy {
 namespace gabac {
@@ -67,13 +69,12 @@ class GabacSeqConfSet {
      */
     const gabac::EncodingConfiguration &getConfAsGabac(core::GenSubIndex sub) const;
 
-    gabac::EncodingConfiguration &getConfAsGabac(core::GenSubIndex sub) {
-        if (getDescriptor(sub.first).tokentype) {
-            return conf[uint8_t(sub.first)][0];
-        } else {
-            return conf[uint8_t(sub.first)][uint8_t(sub.second)];
-        }
-    };
+    /**
+     *
+     * @param sub
+     * @return
+     */
+    gabac::EncodingConfiguration &getConfAsGabac(core::GenSubIndex sub);
 
     /**
      * @brief Set a configuration for the specified subsequence
@@ -94,6 +95,11 @@ class GabacSeqConfSet {
      */
     void storeParameters(ParameterSet &parameterSet) const;
 
+    /**
+     *
+     * @param desc
+     * @param parameterSet
+     */
     void storeParameters(core::GenDesc desc, core::parameter::DescriptorSubseqCfg &parameterSet) const;
 
     /**
@@ -102,6 +108,12 @@ class GabacSeqConfSet {
      */
     void loadParameters(const ParameterSet &parameterSet);
 
+    /**
+     *
+     * @tparam T
+     * @param desc
+     * @param decoder_config
+     */
     template <typename T>
     void fillDecoder(const core::GenomicDescriptorProperties &desc, T &decoder_config) const {
         for (const auto &subdesc : desc.subseqs) {
@@ -110,9 +122,13 @@ class GabacSeqConfSet {
         }
     }
 };
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 #endif  // GENIE_GABAC_SEQ_CONF_SET_H

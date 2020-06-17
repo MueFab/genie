@@ -170,7 +170,7 @@ class Decoder : public genie::core::ReadDecoder {
     void add(core::record::Chunk& chunk, core::record::Record&& r, size_t& pos) {
         const size_t CHUNK_SIZE = 100000;
         chunk.getData().push_back(std::move(r));
-        if(chunk.getData().size() >= CHUNK_SIZE) {
+        if (chunk.getData().size() >= CHUNK_SIZE) {
             size_t size = chunk.getData().size() * 2;
             flowOut(std::move(chunk), {pos, size, true});
             pos += size;
@@ -244,7 +244,7 @@ class Decoder : public genie::core::ReadDecoder {
         }
 
         size_t size = chunk.getData().size() * 2;
-        if(size) {
+        if (size) {
             flowOut(std::move(chunk), {pos, size, true});
             pos += size;
         }
@@ -254,7 +254,10 @@ class Decoder : public genie::core::ReadDecoder {
         flushOut(pos);
     }
 
-    void skipIn(const util::Section& id) override { {util::OrderedSection sec(&lock, id);} skipOut(id); }
+    void skipIn(const util::Section& id) override {
+        { util::OrderedSection sec(&lock, id); }
+        skipOut(id);
+    }
 };
 
 }  // namespace spring

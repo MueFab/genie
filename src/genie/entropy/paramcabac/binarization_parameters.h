@@ -22,10 +22,13 @@ namespace paramcabac {
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
- * ISO 23092-2 Section 8.3.3.1 table 98
+ *
  */
 class BinarizationParameters {
    public:
+    /**
+     *
+     */
     enum class BinarizationId : uint8_t {
         BINARY_CODING = 0,
         TRUNCATED_UNARY = 1,
@@ -39,33 +42,75 @@ class BinarizationParameters {
         SIGNED_DOUBLE_TRUNCATED_UNARY = 9,
     };
 
+    /**
+     *
+     */
     BinarizationParameters();
 
+    /**
+     *
+     * @param binID
+     * @param reader
+     */
     BinarizationParameters(BinarizationId binID, util::BitReader &reader);
 
+    /**
+     *
+     * @param _binarization_id
+     * @param params
+     */
     BinarizationParameters(const BinarizationId &_binarization_id, std::vector<uint8_t> params);
 
+    /**
+     *
+     */
     virtual ~BinarizationParameters() = default;
 
+    /**
+     *
+     * @param binID
+     * @param writer
+     */
     virtual void write(BinarizationId binID, util::BitWriter &writer) const;
 
+    /**
+     *
+     * @return
+     */
     uint8_t getCMax() const;
 
+    /**
+     *
+     * @return
+     */
     uint8_t getCMaxTeg() const;
 
+    /**
+     *
+     * @return
+     */
     uint8_t getCMaxDtu() const;
 
+    /**
+     *
+     * @return
+     */
     uint8_t getSplitUnitSize() const;
 
+    /**
+     *
+     * @param binarzationId
+     * @return
+     */
     static uint8_t getNumBinarizationParams(BinarizationParameters::BinarizationId binarzationId);
 
    private:
-    uint8_t cmax;             //!< : 8; Line 3
-    uint8_t cmax_teg;         //!< : 8; Line 5
-    uint8_t cmax_dtu;         //!< : 8; Line 7
-    uint8_t split_unit_size;  //!< : 4; Line 10
+    uint8_t cmax;             //!<
+    uint8_t cmax_teg;         //!<
+    uint8_t cmax_dtu;         //!<
+    uint8_t split_unit_size;  //!<
 
-    static uint8_t numParams[unsigned(BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY) + 1u];
+    static uint8_t numParams[unsigned(BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY) + 1u];  //!<
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

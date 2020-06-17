@@ -12,22 +12,59 @@
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
+
+/**
+ *
+ */
 class DatasetParameterSet {
    public:
+    /**
+     *
+     */
     explicit DatasetParameterSet(const core::parameter::ParameterSet&&);
 
+    /**
+     *
+     * @param x_dataset_group_ID
+     * @param x_dataset_ID
+     */
     explicit DatasetParameterSet(const core::parameter::ParameterSet&&, const uint8_t x_dataset_group_ID,
                                  const uint16_t x_dataset_ID);
 
+    /**
+     *
+     * @param x_dataset_ID
+     */
     explicit DatasetParameterSet(const core::parameter::ParameterSet&&, const uint16_t x_dataset_ID);
 
+    /**
+     *
+     * @return
+     */
     uint16_t getDatasetID() const { return dataset_ID; }
+
+    /**
+     *
+     * @return
+     */
     uint8_t getDatasetGroupID() const { return dataset_group_ID; }
 
+    /**
+     *
+     * @param datasetGroupId
+     */
     void setDatasetGroupId(uint8_t datasetGroupId) { dataset_group_ID = datasetGroupId; }
 
+    /**
+     *
+     * @return
+     */
     uint64_t getLength() const;
 
+    /**
+     *
+     * @param bitWriter
+     */
     void writeToFile(genie::util::BitWriter& bitWriter) const;
 
    private:
@@ -35,10 +72,10 @@ class DatasetParameterSet {
      * ISO 23092-1 Section 6.5.2 table 23
      *
      * ------------------------------------------------------------------------------------------------------------- */
-    uint8_t dataset_group_ID : 8;
-    uint16_t dataset_ID : 16;
+    uint8_t dataset_group_ID : 8;  //!<
+    uint16_t dataset_ID : 16;      //!<
 
-    core::parameter::ParameterSet parameterSet_p2;
+    core::parameter::ParameterSet parameterSet_p2;  //!<
 };
 }  // namespace mpegg_p1
 }  // namespace format

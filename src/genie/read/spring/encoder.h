@@ -27,7 +27,7 @@ class Encoder : public genie::core::ReadEncoder {
 
     void flushIn(size_t& pos) override;
 
-    void skipIn(const util::Section& id) override{
+    void skipIn(const util::Section& id) override {
         preprocessor.skip(id);
         skipOut(id);
     }

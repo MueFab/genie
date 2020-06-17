@@ -30,14 +30,36 @@ class RawReferenceSequence {
     std::string ref_sequence;  //!< Line 7
 
    public:
+    /**
+     *
+     * @param _sequence_ID
+     * @param _seq_start
+     * @param _ref_sequence
+     */
     RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_start, std::string &&_ref_sequence);
 
+    /**
+     *
+     */
     virtual ~RawReferenceSequence() = default;
 
+    /**
+     *
+     * @param s
+     * @return
+     */
     bool isIdUnique(const RawReferenceSequence &s) const;
 
+    /**
+     *
+     * @param writer
+     */
     void write(util::BitWriter &writer) const;
 
+    /**
+     *
+     * @return
+     */
     uint64_t getTotalSize() const;
 };
 

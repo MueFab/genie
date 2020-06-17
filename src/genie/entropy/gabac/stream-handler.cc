@@ -6,12 +6,19 @@
 
 #include "stream-handler.h"
 #include <genie/util/data-block.h>
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace entropy {
 namespace gabac {
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #define UINT_MAX_LENGTH (sizeof(uint64_t))
 #define U7_MAX_LENGTH (((sizeof(uint64_t) + 6) / 7) * 8)
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 size_t StreamHandler::readUInt(std::istream &input, uint64_t &retVal, size_t numBytes) {
     uint8_t bytes[UINT_MAX_LENGTH] = {0};
@@ -26,6 +33,8 @@ size_t StreamHandler::readUInt(std::istream &input, uint64_t &retVal, size_t num
 
     return c;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 size_t StreamHandler::readU7(std::istream &input, uint64_t &retVal) {
     size_t c = 0;  // counter
@@ -43,6 +52,8 @@ size_t StreamHandler::readU7(std::istream &input, uint64_t &retVal) {
     return c;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 size_t StreamHandler::readStream(std::istream &input, util::DataBlock *buffer, uint64_t &numSymbols) {
     size_t streamSize = 0;
     uint64_t payloadSize = 0;
@@ -57,6 +68,8 @@ size_t StreamHandler::readStream(std::istream &input, util::DataBlock *buffer, u
     return streamSize;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 size_t StreamHandler::readBytes(std::istream &input, size_t bytes, util::DataBlock *buffer) {
     if (bytes > 0) {
         if (bytes % buffer->getWordSize()) {
@@ -67,6 +80,8 @@ size_t StreamHandler::readBytes(std::istream &input, size_t bytes, util::DataBlo
     }
     return bytes;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 size_t StreamHandler::readFull(std::istream &input, util::DataBlock *buffer) {
     auto safe = input.exceptions();
@@ -91,6 +106,8 @@ size_t StreamHandler::readFull(std::istream &input, util::DataBlock *buffer) {
     return buffer->size();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 size_t StreamHandler::readBlock(std::istream &input, size_t bytes, util::DataBlock *buffer) {
     auto safe = input.exceptions();
     input.exceptions(std::ios::badbit);
@@ -111,6 +128,8 @@ size_t StreamHandler::readBlock(std::istream &input, size_t bytes, util::DataBlo
     return buffer->size();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 size_t StreamHandler::readStreamSize(std::istream &input) {
     input.seekg(0, input.end);
     size_t length = input.tellg();
@@ -118,6 +137,8 @@ size_t StreamHandler::readStreamSize(std::istream &input) {
 
     return length;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 size_t StreamHandler::writeUInt(std::ostream &output, uint64_t value, size_t numBytes) {
     uint8_t bytes[UINT_MAX_LENGTH] = {0};
@@ -129,6 +150,8 @@ size_t StreamHandler::writeUInt(std::ostream &output, uint64_t value, size_t num
 
     return c;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 size_t StreamHandler::writeU7(std::ostream &output, uint64_t value) {
     uint8_t bytes[U7_MAX_LENGTH] = {0};
@@ -149,6 +172,8 @@ size_t StreamHandler::writeU7(std::ostream &output, uint64_t value) {
     return c;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 size_t StreamHandler::writeStream(std::ostream &output, util::DataBlock *buffer, uint64_t numSymbols) {
     size_t streamSize = 0;
     uint64_t payloadSize = buffer->getRawSize() + ((numSymbols) ? 4 : 0);
@@ -160,6 +185,8 @@ size_t StreamHandler::writeStream(std::ostream &output, util::DataBlock *buffer,
     return streamSize;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 size_t StreamHandler::writeBytes(std::ostream &output, util::DataBlock *buffer) {
     size_t ret = buffer->getRawSize();
     if (ret > 0) {
@@ -168,6 +195,12 @@ size_t StreamHandler::writeBytes(std::ostream &output, util::DataBlock *buffer) 
     }
     return ret;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

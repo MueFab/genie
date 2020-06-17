@@ -24,17 +24,28 @@ namespace genie {
 namespace format {
 namespace mgrec {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
+/**
+ *
+ */
 class Importer : public core::FormatImporter {
    private:
-    size_t blockSize;
-    util::BitReader reader;
-    size_t record_counter;
+    size_t blockSize;        //!<
+    util::BitReader reader;  //!<
+    size_t record_counter;   //!<
 
    public:
+    /**
+     *
+     * @param _blockSize
+     * @param _file_1
+     */
     Importer(size_t _blockSize, std::istream& _file_1);
 
+    /**
+     *
+     * @param _classifier
+     * @return
+     */
     bool pumpRetrieve(core::Classifier* _classifier) override;
 };
 

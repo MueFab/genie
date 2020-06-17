@@ -15,11 +15,17 @@
 #include "context-selector.h"
 #include "luts-subsymbol-transform.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace entropy {
 namespace gabac {
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 typedef void (Writer::*binFunc)(uint64_t, const std::vector<unsigned int>);
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 static inline void encodeSignflag(Writer &writer, const paramcabac::BinarizationParameters::BinarizationId binID,
                                   const int64_t signedSymbolValue) {
@@ -36,6 +42,8 @@ static inline void encodeSignflag(Writer &writer, const paramcabac::Binarization
         }
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 static inline binFunc getBinarizor(const uint8_t outputSymbolSize, const bool bypassFlag,
                                    const paramcabac::BinarizationParameters::BinarizationId binID,
@@ -117,6 +125,8 @@ static inline binFunc getBinarizor(const uint8_t outputSymbolSize, const bool by
     return func;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 size_t encodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSubseqConf, util::DataBlock *symbols,
                                    size_t maxSize) {
     assert(symbols != nullptr);
@@ -190,6 +200,8 @@ size_t encodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
 
     return symbols->size();  // size of bitstream
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 size_t encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSubseqConf, util::DataBlock *symbols,
                                    util::DataBlock *const depSymbols, size_t maxSize) {
@@ -299,6 +311,8 @@ size_t encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
     return symbols->size();  // size of bitstream
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 size_t encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSubseqConf, util::DataBlock *symbols,
                                    size_t maxSize) {
     assert(symbols != nullptr);
@@ -392,6 +406,8 @@ size_t encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
     return symbols->size();  // size of bitstream
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 size_t encodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf, util::DataBlock *symbols,
                              util::DataBlock *const depSymbols, size_t maxSize) {
     switch (trnsfSubseqConf.getSupportValues().getCodingOrder()) {
@@ -410,6 +426,12 @@ size_t encodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqCon
 
     return 0;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

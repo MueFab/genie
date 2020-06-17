@@ -9,9 +9,13 @@
 #include <cassert>
 #include <limits>
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace entropy {
 namespace gabac {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 inline static unsigned char readIn(util::BlockStepper *reader) {
     if (!reader->isValid()) {
@@ -24,19 +28,29 @@ inline static unsigned char readIn(util::BlockStepper *reader) {
     return byte;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 BitInputStream::BitInputStream(util::DataBlock *const bitstream)
     : m_bitstream(bitstream), m_heldBits(0), m_numHeldBits(0) {
     m_reader = m_bitstream->getReader();  // TODO(Jan): This line is redundant.
     reset();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 BitInputStream::~BitInputStream() = default;
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 unsigned int BitInputStream::getNumBitsUntilByteAligned() const { return m_numHeldBits & 0x7u; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 size_t BitInputStream::getNumBytesRead() const {
     return m_reader.curr - static_cast<uint8_t *>(m_bitstream->getData());
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 unsigned char BitInputStream::readByte() {
     unsigned int result = read(8);
@@ -44,11 +58,15 @@ unsigned char BitInputStream::readByte() {
     return static_cast<unsigned char>(result);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void BitInputStream::reset() {
     m_heldBits = 0;
     m_numHeldBits = 0;
     m_reader = m_bitstream->getReader();
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 unsigned int BitInputStream::read(unsigned int numBits) {
     // uint64_t BitInputStream::read(const unsigned int numBits) {
@@ -114,11 +132,19 @@ L0:
     return bits;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void BitInputStream::skipBytes(unsigned int numBytes) {
     for (unsigned int i = 0; i < numBytes; i++) {
         readIn(&m_reader);
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

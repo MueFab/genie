@@ -31,7 +31,8 @@ namespace module {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::string& working_dir, size_t blocksize) {
+std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::string& working_dir,
+                                                           size_t blocksize) {
     std::unique_ptr<core::FlowGraphEncode> ret = genie::util::make_unique<core::FlowGraphEncode>(threads);
 
     ret->setClassifier(genie::util::make_unique<genie::core::ClassifierRegroup>(blocksize));
@@ -42,7 +43,7 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
     ret->addReadCoder(genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, true));
     ret->setReadCoderSelector([](const genie::core::record::Chunk& chunk) -> size_t {
         if (chunk.getData().front().getClassID() == genie::core::record::ClassType::CLASS_U) {
-            if(chunk.getData().front().getNumberOfTemplateSegments() > 1) {
+            if (chunk.getData().front().getNumberOfTemplateSegments() > 1) {
                 return 3;
             } else {
                 return 2;
@@ -80,7 +81,7 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
         if (au.getParameters().isComputedReference()) {
             switch (au.getParameters().getComputedRef().getAlgorithm()) {
                 case core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY:
-                    if(au.getParameters().getNumberTemplateSegments() >= 2) {
+                    if (au.getParameters().getNumberTemplateSegments() >= 2) {
                         return 4;
                     } else {
                         return 3;
@@ -118,7 +119,8 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
     ret->setNameSelector([](const genie::core::AccessUnit::Descriptor&) -> size_t { return 0; });
 
     ret->addEntropyCoder(genie::util::make_unique<genie::entropy::gabac::Decoder>());
-    ret->setEntropyCoderSelector([](const genie::core::parameter::DescriptorSubseqCfg&, genie::core::AccessUnit::Descriptor&) -> size_t { return 0; });
+    ret->setEntropyCoderSelector([](const genie::core::parameter::DescriptorSubseqCfg&,
+                                    genie::core::AccessUnit::Descriptor&) -> size_t { return 0; });
 
     ret->setExporterSelector([](const genie::core::record::Chunk&) -> size_t { return 0; });
 

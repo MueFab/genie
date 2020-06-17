@@ -12,9 +12,13 @@
 #include <genie/util/data-block.h>
 #include "merge-subseq-transform.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace entropy {
 namespace gabac {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void transformMergeCoding(const paramcabac::Subsequence& subseqCfg,
                           std::vector<util::DataBlock>* const transformedSubseqs) {
@@ -69,6 +73,8 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg,
     symbols.clear();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg,
                                  std::vector<util::DataBlock>* const transformedSubseqs) {
     const paramcabac::TransformedParameters& trnsfSubseqParams = subseqCfg.getTransformParameters();
@@ -109,6 +115,12 @@ void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg,
 
     symbols.swap(&(*transformedSubseqs)[0]);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

@@ -1,3 +1,9 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #ifndef GENIE_DATASET_GROUP_H
 #define GENIE_DATASET_GROUP_H
 
@@ -11,8 +17,14 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
+/**
+ *
+ */
 class DG_metadata {
    public:
+    /**
+     *
+     */
     DG_metadata() : DG_metadata_value() {
         DG_metadata_value = {0x37, 0xfd, 0x58, 0x7a, 0x00, 0x5a, 0x04, 0x00, 0xd6, 0xe6, 0x46,
                              0xb4, 0x00, 0x00, 0x00, 0x00, 0xdf, 0x1c, 0x21, 0x44, 0xb6, 0x1f,
@@ -20,11 +32,17 @@ class DG_metadata {
     }
 
    private:
-    std::vector<uint8_t> DG_metadata_value;
+    std::vector<uint8_t> DG_metadata_value;  //!<
 };
 
+/**
+ *
+ */
 class DG_protection {
    public:
+    /**
+     *
+     */
     DG_protection() : DG_protection_value() {
         DG_protection_value = {0x37, 0xfd, 0x58, 0x7a, 0x00, 0x5a, 0x04, 0x00, 0xd6, 0xe6, 0x46,
                                0xb4, 0x00, 0x00, 0x00, 0x00, 0xdf, 0x1c, 0x21, 0x44, 0xb6, 0x1f,
@@ -32,16 +50,36 @@ class DG_protection {
     }
 
    private:
-    std::vector<uint8_t> DG_protection_value;
+    std::vector<uint8_t> DG_protection_value;  //!<
 };
 
+/**
+ *
+ */
 class DatasetGroup {
    public:
+    /**
+     *
+     * @param x_datasetGroupID
+     */
     explicit DatasetGroup(std::vector<genie::format::mpegg_p1::Dataset>*, const uint8_t x_datasetGroupID);
 
+    /**
+     *
+     * @return
+     */
     const DatasetGroupHeader& getDatasetGroupHeader() const { return dataset_group_header; }
+
+    /**
+     *
+     * @return
+     */
     const std::vector<Dataset>& getDatasets() const { return datasets; }
 
+    /**
+     *
+     * @param bitWriter
+     */
     void writeToFile(genie::util::BitWriter& bitWriter) const;
 
    private:
@@ -49,11 +87,11 @@ class DatasetGroup {
      * ISO 23092-1 Section 6.5.1 table 8
      *
      * ------------------------------------------------------------------------------------------------------------- */
-    mpegg_p1::DatasetGroupHeader dataset_group_header;
+    mpegg_p1::DatasetGroupHeader dataset_group_header;  //!<
     // DG_metadata dg_metadata;      // optional
     // DG_protection dg_protection;  // optional
     /** reference[] and reference_metadata[] and label_list is optional and not yet implemented */
-    std::vector<Dataset> datasets;
+    std::vector<Dataset> datasets;  //!<
 };
 
 }  // namespace mpegg_p1

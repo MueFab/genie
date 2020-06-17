@@ -1,3 +1,9 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #include "config-manual.h"
 
 #include <algorithm>
@@ -13,6 +19,8 @@
 
 #include <genie/entropy/paramcabac/subsequence.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace entropy {
 namespace gabac {
@@ -22,6 +30,7 @@ using namespace genie::entropy::paramcabac;
 #define MAX_NUM_TRANSPORT_SEQS 4  // put max 4 for now.
 
 // ---------------------------------------------------------------------------------------------------------------------
+
 unsigned long getCmaxTU(uint64_t const numAlphaSpecial, uint8_t const codingSubsymSize) {
     if (numAlphaSpecial > 0) { /* special case */
         return numAlphaSpecial - 1;
@@ -29,6 +38,8 @@ unsigned long getCmaxTU(uint64_t const numAlphaSpecial, uint8_t const codingSubs
         return StateVars::get2PowN(codingSubsymSize) - 1;
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
     const GenDesc genieDescID = (GenDesc)sub.first;
@@ -324,11 +335,11 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
     return subseqCfg;
 }
 
-//------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
 
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

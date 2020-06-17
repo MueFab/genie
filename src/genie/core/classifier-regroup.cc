@@ -36,7 +36,7 @@ record::Chunk ClassifierRegroup::getChunk() {
             chunk.setStats(std::move(stats));
             stats = core::stats::PerfStats();
             stats.addDouble("time-classifier", watch.check());
-            if(!chunk.getData().empty()) {
+            if (!chunk.getData().empty()) {
                 return chunk;
             }
         }
@@ -53,7 +53,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
     record::Chunk chunk = std::move(c);
     stats.add(chunk.getStats());
     util::Watch watch;
-    if(init) {
+    if (init) {
         init = false;
         currentSeq = chunk.getData().front().getAlignmentSharedData().getSeqID();
     }

@@ -1,3 +1,9 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #include "encoder.h"
 #include <core/record/alignment_split/same-rec.h>
 #include <util/watch.h>
