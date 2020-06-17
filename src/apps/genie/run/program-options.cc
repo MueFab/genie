@@ -1,3 +1,9 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #include "program-options.h"
 #include <genie/util/exceptions.h>
 #include <cli11/CLI11.hpp>
@@ -7,8 +13,12 @@
 #include <string>
 #include <thread>
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genieapp {
 namespace run {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 std::string parent_dir(const std::string &path) {
     std::string ret;
@@ -25,6 +35,8 @@ std::string parent_dir(const std::string &path) {
     }
     return ret;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 ProgramOptions::ProgramOptions(int argc, char *argv[]) {
     CLI::App app("Genie MPEG-G reference encoder\n");
@@ -83,6 +95,8 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) {
     validate();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::string size_string(std::uintmax_t f_size) {
     size_t exponent = 0;
     auto size = static_cast<double>(f_size);
@@ -100,11 +114,15 @@ std::string size_string(std::uintmax_t f_size) {
     return number + UNITS[exponent];
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void validateInputFile(const std::string &file) {
     UTILS_DIE_IF(!ghc::filesystem::exists(file), "Input file does not exist: " + file);
     std::ifstream stream(file);
     UTILS_DIE_IF(!stream, "Input file does exist, but is not accessible. Insufficient permissions? " + file);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 std::string random_string(size_t length) {
     auto randchar = []() -> char {
@@ -119,6 +137,8 @@ std::string random_string(size_t length) {
     std::generate_n(str.begin(), length, randchar);
     return str;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void validateWorkingDir(const std::string &dir) {
     UTILS_DIE_IF(!ghc::filesystem::exists(dir), "Directory does not exist: " + dir);
@@ -140,6 +160,8 @@ void validateWorkingDir(const std::string &dir) {
     ghc::filesystem::remove(test_name);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void validateOutputFile(const std::string &file, bool forced) {
     UTILS_DIE_IF(ghc::filesystem::exists(file) && !forced,
                  "Output file already existing and no force flag set: " + file);
@@ -155,6 +177,8 @@ void validateOutputFile(const std::string &file, bool forced) {
     }
     ghc::filesystem::remove(file);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void ProgramOptions::validate() {
     validateInputFile(inputFile);
@@ -218,5 +242,10 @@ void ProgramOptions::validate() {
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace run
 }  // namespace genieapp
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

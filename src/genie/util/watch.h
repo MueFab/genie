@@ -12,44 +12,15 @@ class Watch {
     bool paused;
 
    public:
-    Watch() { reset(); }
+    Watch();
 
-    void reset() {
-        start = std::chrono::high_resolution_clock::now();
-        offset = 0;
-        paused = false;
-    }
+    void reset();
 
-    double check() const {
-        if (paused) {
-            return offset;
-        } else {
-            return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() -
-                                                                         start)
-                           .count() /
-                       1e6 +
-                   offset;
-        }
-    }
+    double check() const;
 
-    void pause() {
-        if (paused) {
-            return;
-        }
-        paused = true;
-        offset +=
-            std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start)
-                .count() /
-            1e6;
-    }
+    void pause();
 
-    void resume() {
-        if (!paused) {
-            return;
-        }
-        paused = false;
-        start = std::chrono::high_resolution_clock::now();
-    }
+    void resume();
 };
 }  // namespace util
 }  // namespace genie

@@ -8,7 +8,6 @@
 #include <genie/util/data-block.h>
 #include <cassert>
 #include <limits>
-#include "exceptions.h"
 
 namespace genie {
 namespace entropy {
@@ -16,7 +15,7 @@ namespace gabac {
 
 inline static unsigned char readIn(util::BlockStepper *reader) {
     if (!reader->isValid()) {
-        GABAC_DIE("Index out of bounds");
+        UTILS_DIE("Index out of bounds");
     }
     // TODO(Jan): We here rely on that get() returns exactly 1 byte. However, it might happen that it returns multiple
     // bytes. Fix that.

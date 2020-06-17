@@ -7,7 +7,6 @@
 #include "configuration.h"
 #include "config-manual.h"
 
-#include "exceptions.h"
 #include "stream-handler.h"
 #include "streams.h"
 
@@ -50,25 +49,29 @@ uint8_t EncodingConfiguration::getSubseqWordSize() const {
                                                                 trnsfCfgs[0].getSupportValues().getOutputSymbolSize());
         } break;
         default:
-            GABAC_DIE("Invalid subseq transforamtion");
+            UTILS_DIE("Invalid subseq transforamtion");
             break;
     }
 
     return 1;
 }
 
+const paramcabac::Subsequence& EncodingConfiguration::getSubseqConfig() const { return subseqCfg; }
+
+void EncodingConfiguration::setSubseqConfig(paramcabac::Subsequence&& _subseqCfg) { subseqCfg = std::move(_subseqCfg); }
+
 void IOConfiguration::validate() const {
     if (!inputStream) {
-        GABAC_DIE("Invalid input stream");
+        UTILS_DIE("Invalid input stream");
     }
     if (!outputStream) {
-        GABAC_DIE("Invalid output stream");
+        UTILS_DIE("Invalid output stream");
     }
     if (!logStream) {
-        GABAC_DIE("Invalid logging output stream");
+        UTILS_DIE("Invalid logging output stream");
     }
     if (unsigned(this->level) > unsigned(IOConfiguration::LogLevel::FATAL)) {
-        GABAC_DIE("Invalid logging level");
+        UTILS_DIE("Invalid logging level");
     }
 }
 

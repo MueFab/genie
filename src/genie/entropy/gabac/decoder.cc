@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "gabac-decompressor.h"
+#include "decoder.h"
 #include <genie/util/exceptions.h>
 #include <genie/util/watch.h>
 #include <sstream>
@@ -69,7 +69,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
     return ret;
 }
 
-core::AccessUnit::Subsequence GabacDecompressor::decompress(const gabac::EncodingConfiguration& conf,
+core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfiguration& conf,
                                                             core::AccessUnit::Subsequence&& data) {
     core::AccessUnit::Subsequence in = std::move(data);
     // Interface to GABAC library
@@ -97,7 +97,7 @@ core::AccessUnit::Subsequence GabacDecompressor::decompress(const gabac::Encodin
     return core::AccessUnit::Subsequence(std::move(tmp), in.getID());
 }
 
-std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> GabacDecompressor::process(const parameter::DescriptorSubseqCfg& param,
+std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::process(const parameter::DescriptorSubseqCfg& param,
                                                         core::AccessUnit::Descriptor& d) {
     util::Watch watch;
     std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> desc;

@@ -29,7 +29,7 @@ class Block {
 
    public:
     Block();
-    Block(uint8_t _descriptor_ID, core::AccessUnit::Descriptor _payload);
+    Block(uint8_t _descriptor_ID, core::AccessUnit::Descriptor&& _payload);
     explicit Block(size_t qv_count, util::BitReader &reader);
     virtual ~Block() = default;
     virtual void write(util::BitWriter &writer) const;
@@ -38,7 +38,7 @@ class Block {
 
     uint8_t getDescriptorID() const;
 
-    size_t getWrittenSize() const { return payload.getWrittenSize() + 5; }
+    size_t getWrittenSize() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -30,16 +30,13 @@ class Codebook {
 
    public:
     explicit Codebook(util::BitReader &reader);
-    Codebook(uint8_t v1, uint8_t v2) {
-        qv_recon.push_back(v1);
-        qv_recon.push_back(v2);
-    }
+    Codebook(uint8_t v1, uint8_t v2);
 
     virtual ~Codebook() = default;
 
     void addEntry(uint8_t entry);
 
-    const std::vector<uint8_t> &getEntries() const { return qv_recon; }
+    const std::vector<uint8_t> &getEntries() const;
 
     virtual void write(util::BitWriter &writer) const;
 };

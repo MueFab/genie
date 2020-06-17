@@ -55,6 +55,25 @@ const core::CigarFormatInfo& getSAMCigarInfo() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void Record::Stats::add(const Stats& s) {
+    qname += s.qname;
+    flag += s.flag;
+    rname += s.rname;
+    pos += s.pos;
+    mapq += s.mapq;
+    cigar += s.cigar;
+    rnext += s.rnext;
+    pnext += s.pnext;
+    tlen += s.tlen;
+    seq += s.seq;
+    qual += s.qual;
+    opt += s.opt;
+}
+
+size_t Record::Stats::total() const {
+    return qname + flag + rname + pos + mapq + cigar + rnext + pnext + tlen + seq + qual + opt;
+}
+
 Record::Record(std::string _qname, uint16_t _flag, std::string _rname, uint32_t _pos, uint8_t _mapq, std::string _cigar,
                std::string _rnext, uint32_t _pnext, int32_t _tlen, std::string _seq, std::string _qual)
     : qname(std::move(_qname)),

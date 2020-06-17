@@ -7,7 +7,6 @@
 #include <cassert>
 
 #include <genie/util/block-stepper.h>
-#include "exceptions.h"
 #include "rle-subseq-transform.h"
 
 namespace genie {
@@ -79,7 +78,7 @@ void inverseTransformRleCoding(const paramcabac::Subsequence &subseqCfg,
     assert(transformedSubseqs != nullptr);
 
     if ((*transformedSubseqs).size() != 2) {
-        GABAC_DIE("invalid subseq count for rle inverse transform");
+        UTILS_DIE("invalid subseq count for rle inverse transform");
     }
 
     const uint8_t guard = subseqCfg.getTransformParameters().getParam();

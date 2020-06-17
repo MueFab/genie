@@ -8,8 +8,6 @@
 
 #include <algorithm>
 
-#include "exceptions.h"
-
 namespace genie {
 namespace entropy {
 namespace gabac {
@@ -39,7 +37,7 @@ int DataBlockBuffer::overflow(int c) {
 
 std::streamsize DataBlockBuffer::xsputn(const char *s, std::streamsize n) {
     if (block.modByWordSize(n)) {
-        GABAC_DIE("Invalid Data length");
+        UTILS_DIE("Invalid Data length");
     }
     size_t oldSize = block.size();
     block.resize(block.size() + block.divByWordSize(n));
@@ -49,7 +47,7 @@ std::streamsize DataBlockBuffer::xsputn(const char *s, std::streamsize n) {
 
 std::streamsize DataBlockBuffer::xsgetn(char *s, std::streamsize n) {
     if (block.modByWordSize(n)) {
-        GABAC_DIE("Invalid Data length");
+        UTILS_DIE("Invalid Data length");
     }
     size_t bytesRead = std::min(block.getRawSize() - block.mulByWordSize(pos), size_t(n));
     memcpy(s, static_cast<uint8_t *>(block.getData()) + block.mulByWordSize(pos), bytesRead);
@@ -73,6 +71,20 @@ int DataBlockBuffer::uflow() {
 
 void DataBlockBuffer::flush_block(util::DataBlock *blk) { block.swap(blk); }
 
+std::streambuf::pos_type DataBlockBuffer::seekpos(pos_type sp, std::ios_base::openmode) { return pos = sp; }
+
+std::streambuf::pos_type DataBlockBuffer::seekoff(off_type off, std::ios_base::seekdir dir,
+                                  std::ios_base::openmode which) {
+    (void)which;
+    if (dir == std::ios_base::cur)
+        pos = (off < 0 && size_t(std::abs(off)) > pos) ? 0 : std::min(pos + off, block.size());
+    else if (dir == std::ios_base::end)
+        pos = (off < 0 && size_t(std::abs(off)) > block.size()) ? 0 : std::min(block.size() + off, block.size());
+    else if (dir == std::ios_base::beg)
+        pos = (off < 0 && std::abs(off) > 0) ? 0 : std::min(size_t(0) + off, block.size());
+    return pos;
+}
+
 IFileStream::IFileStream(FILE *f) : FileBuffer(f), std::istream(this) {}
 
 OFileStream::OFileStream(FILE *f) : FileBuffer(f), std::ostream(this) {}
@@ -80,6 +92,8 @@ OFileStream::OFileStream(FILE *f) : FileBuffer(f), std::ostream(this) {}
 IBufferStream::IBufferStream(util::DataBlock *d, size_t pos_i) : DataBlockBuffer(d, pos_i), std::istream(this) {}
 
 OBufferStream::OBufferStream(util::DataBlock *d) : DataBlockBuffer(d, 0), std::ostream(this) {}
+
+void OBufferStream::flush(util::DataBlock *blk) { flush_block(blk); }
 
 NullStream::NullStream() : std::ostream(&m_sb) {}
 }  // namespace gabac

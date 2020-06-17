@@ -12,7 +12,6 @@
 
 #include <genie/util/block-stepper.h>
 #include <genie/util/data-block.h>
-#include "exceptions.h"
 
 namespace genie {
 namespace entropy {

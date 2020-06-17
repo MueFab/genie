@@ -33,7 +33,7 @@ class OrderedSection {
      */
     OrderedSection(OrderedLock* _lock, const Section& id);
 
-    void setLength(size_t l) { length = l; }
+    void setLength(size_t l);
 
     /**
      * @brief Release the lock

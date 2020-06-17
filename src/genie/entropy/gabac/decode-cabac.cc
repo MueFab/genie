@@ -11,7 +11,6 @@
 
 #include <genie/entropy/paramcabac/subsequence.h>
 #include <genie/util/data-block.h>
-#include "exceptions.h"
 #include "reader.h"
 
 #include "context-selector.h"
@@ -80,7 +79,7 @@ static inline binFunc getBinarizor(const uint8_t outputSymbolSize, const bool by
                 binParams[2] = binarzationParams.getCMaxDtu();
                 break;
             default:
-                GABAC_DIE("Unknown Binarization");
+                UTILS_DIE("Unknown Binarization");
         }
     } else {
         switch (binID) {
@@ -115,7 +114,7 @@ static inline binFunc getBinarizor(const uint8_t outputSymbolSize, const bool by
                 binParams[2] = binarzationParams.getCMaxDtu();
                 break;
             default:
-                GABAC_DIE("Unknown Binarization");
+                UTILS_DIE("Unknown Binarization");
         }
     }
 
@@ -125,7 +124,7 @@ static inline binFunc getBinarizor(const uint8_t outputSymbolSize, const bool by
 size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
                                    const unsigned int numEncodedSymbols, util::DataBlock *bitstream) {
     if (bitstream == nullptr) {
-        GABAC_DIE("Bitstream is null");
+        UTILS_DIE("Bitstream is null");
     }
 
     if (numEncodedSymbols <= 0) return 0;
@@ -192,7 +191,7 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
                                    const unsigned int numEncodedSymbols, util::DataBlock *bitstream,
                                    util::DataBlock *const depSymbols) {
     if (bitstream == nullptr) {
-        GABAC_DIE("Bitstream is null");
+        UTILS_DIE("Bitstream is null");
     }
 
     if (numEncodedSymbols <= 0) return 0;
@@ -299,7 +298,7 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
                                    const unsigned int numEncodedSymbols, util::DataBlock *bitstream) {
     if (bitstream == nullptr) {
-        GABAC_DIE("Bitstream is null");
+        UTILS_DIE("Bitstream is null");
     }
 
     if (numEncodedSymbols <= 0) return 0;
@@ -398,7 +397,7 @@ size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqCon
             return decodeTransformSubseqOrder2(trnsfSubseqConf, numEncodedSymbols, bitstream);
             break;
         default:
-            GABAC_DIE("Unknown coding order");
+            UTILS_DIE("Unknown coding order");
     }
 
     return 0;

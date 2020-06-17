@@ -1,14 +1,30 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #include <genie/module/manager.h>
 #include <genie/run/main.h>
 #include <genie/util/exceptions.h>
 #include <cli11/CLI11.hpp>
 #include <iostream>
 #include <string>
-#include <vector>
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 int stat(int, char*[]) { UTILS_DIE("Stat not implemented"); }
 
-int help(int, char*[]) { UTILS_DIE("Help text not helpfull enough"); }
+// ---------------------------------------------------------------------------------------------------------------------
+
+int help(int, char*[]) {
+    std::cout << "Usage: \ngenie run -i [input-file] -o [output-file]\nUse -f to overwrite existing output files.\nUse "
+                 "-t to specify the number of threads.\nIn case of paired fastq files, use --input-suppl-file or "
+                 "--output-suppl-file to specify the second file." << std::endl;
+    return 0;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 int main(int argc, char* argv[]) {
 #ifdef GENIE_USE_OPENMP
@@ -38,3 +54,6 @@ int main(int argc, char* argv[]) {
     }
     return 0;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

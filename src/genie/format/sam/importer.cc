@@ -152,6 +152,76 @@ core::record::Record Importer::convert(uint16_t ref, sam::Record &&_r1, sam::Rec
     return ret;
 }
 
+bool Importer::pumpRetrieve(genie::core::Classifier *_classifier) {
+    util::Watch watch;
+    core::stats::PerfStats stats;
+    core::record::Chunk chunk;
+    std::vector<sam::Record> s;
+    std::list<sam::Record> samRecords;
+    uint16_t local_ref_num = 0;
+    {
+        samReader.read(blockSize, s, stats);
+        if (s.size() == 0) {
+            return false;
+        }
+        auto it = refs.find(s.front().getRname());
+        if (it == refs.end()) {
+            local_ref_num = ref_counter;
+            refs.insert(std::make_pair(s.front().getRname(), ref_counter++));
+        } else {
+            local_ref_num = it->second;
+        }
+    }
+    std::copy(s.begin(), s.end(), std::back_inserter(samRecords));
+
+    std::cout << "Read " << samRecords.size() << " SAM record(s) " << std::endl;
+    while (!samRecords.empty()) {
+        sam::Record samRecord = std::move(samRecords.front());
+        samRecords.erase(samRecords.begin());
+        // Search for mate
+        const std::string &rnameSearchString =
+            samRecord.getRnext() == "=" ? samRecord.getRname() : samRecord.getRnext();
+        auto mate = samRecords.begin();
+        mate = samRecords.end();  // Disable pairs for now TODO: implement
+        if (samRecord.getPnext() == samRecord.getPos() && samRecord.getRname() == rnameSearchString) {
+            mate = samRecords.end();
+        }
+        for (; mate != samRecords.end(); ++mate) {
+            if (mate->getRname() == rnameSearchString && mate->getPos() == samRecord.getPnext()) {
+                // LOG_TRACE << "Found mate";
+                break;
+            }
+        }
+        if (mate == samRecords.end()) {
+            // LOG_TRACE << "Did not find mate";
+            if ((samRecord.getFlags() & (1u << uint16_t(Record::FlagPos::SEGMENT_UNMAPPED))) ||
+                samRecord.getCigar() == "*" || samRecord.getPos() == 0 || samRecord.getRname() == "*") {
+                core::record::Record r(1, core::record::ClassType::CLASS_U, samRecord.moveQname(), "", 0);
+                core::record::Segment seg(samRecord.moveSeq());
+                if (!samRecord.getQual().empty()) {
+                    seg.addQualities(samRecord.moveQual());
+                }
+                r.addSegment(std::move(seg));
+                chunk.getData().emplace_back(std::move(r));
+            } else {
+                chunk.getData().emplace_back(convert(local_ref_num, std::move(samRecord), nullptr));
+            }
+        } else {
+            // TODO: note the filtering of unaligned reads above. Move this to the encoder
+            chunk.getData().emplace_back(convert(local_ref_num, std::move(samRecord), &*mate));
+            samRecords.erase(mate);
+        }
+    }
+    if (!chunk.getData().empty()) {
+        stats.addDouble("time-sam-import", watch.check());
+        chunk.setStats(std::move(stats));
+        _classifier->add(std::move(chunk));
+    }
+
+    // Break if less than blockSize records were read from the SAM file
+    return !samReader.isEnd();
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace sam

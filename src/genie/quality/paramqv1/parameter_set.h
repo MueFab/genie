@@ -28,14 +28,9 @@ class ParameterSet {
     std::vector<Codebook> qv_codebooks;
 
    public:
-    explicit ParameterSet(util::BitReader &reader) {
-        const size_t num_codebooks = reader.read<int>(4);
-        for (auto c = num_codebooks; c > 0; --c) {
-            qv_codebooks.emplace_back(Codebook(reader));
-        }
-    }
+    explicit ParameterSet(util::BitReader &reader);
     explicit ParameterSet() = default;
-    const std::vector<Codebook> &getCodebooks() const { return qv_codebooks; }
+    const std::vector<Codebook> &getCodebooks() const;
 
     virtual ~ParameterSet() = default;
 

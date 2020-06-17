@@ -10,7 +10,6 @@
 
 #include <genie/util/block-stepper.h>
 #include <genie/util/data-block.h>
-#include "exceptions.h"
 #include "writer.h"
 
 #include "context-selector.h"
@@ -76,7 +75,7 @@ static inline binFunc getBinarizor(const uint8_t outputSymbolSize, const bool by
                 binParams[2] = binarzationParams.getCMaxDtu();
                 break;
             default:
-                GABAC_DIE("Unknown Binarization");
+                UTILS_DIE("Unknown Binarization");
         }
     } else {
         switch (binID) {
@@ -111,7 +110,7 @@ static inline binFunc getBinarizor(const uint8_t outputSymbolSize, const bool by
                 binParams[2] = binarzationParams.getCMaxDtu();
                 break;
             default:
-                GABAC_DIE("Unknown Binarization");
+                UTILS_DIE("Unknown Binarization");
         }
     }
 
@@ -406,7 +405,7 @@ size_t encodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqCon
             return encodeTransformSubseqOrder2(trnsfSubseqConf, symbols, maxSize);
             break;
         default:
-            GABAC_DIE("Unknown coding order");
+            UTILS_DIE("Unknown coding order");
     }
 
     return 0;

@@ -1,4 +1,4 @@
-#include <genie/entropy/gabac/gabac-compressor.h>
+#include <genie/entropy/gabac/encoder.h>
 #include <genie/util/drain.h>
 #include <gtest/gtest.h>
 #include <iostream>

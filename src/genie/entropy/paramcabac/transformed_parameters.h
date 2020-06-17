@@ -39,7 +39,7 @@ class TransformedParameters {
 
     TransformedParameters();
 
-    TransformedParameters(util::BitReader &reader);
+    explicit TransformedParameters(util::BitReader &reader);
 
     TransformedParameters(const TransformIdSubseq &_transform_ID_subseq, uint16_t param);
 

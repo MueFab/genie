@@ -192,9 +192,7 @@ class Record {
      */
     const AlignmentExternal& getAlignmentExternal() const;
 
-    bool isRead1First() const {
-        return read_1_first;
-    }
+    bool isRead1First() const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

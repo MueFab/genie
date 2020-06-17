@@ -19,7 +19,6 @@
 #include <genie/util/block-stepper.h>
 #include <genie/util/data-block.h>
 #include "equality-subseq-transform.h"
-#include "exceptions.h"
 
 namespace genie {
 namespace entropy {
@@ -100,7 +99,7 @@ void inverseTransformEqualityCoding(std::vector<util::DataBlock> *const transfor
     assert(transformedSubseqs != nullptr);
 
     if ((*transformedSubseqs).size() != 2) {
-        GABAC_DIE("invalid subseq count for equality inverse transform");
+        UTILS_DIE("invalid subseq count for equality inverse transform");
     }
 
     // Prepare internal and the output data structures

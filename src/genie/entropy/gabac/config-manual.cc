@@ -296,7 +296,7 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
     }
 
     if (!found) {
-        // GABAC_DIE("Unsupported subseqID "+std::to_string(subseqID)+" for descID value "+std::to_string(descID));
+        // UTILS_DIE("Unsupported subseqID "+std::to_string(subseqID)+" for descID value "+std::to_string(descID));
     }
 
     TransformedParameters trnsfSubseqParams(trnsfSubseqID, trnsfSubseqParam);

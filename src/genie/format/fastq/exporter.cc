@@ -24,6 +24,8 @@ Exporter::Exporter(std::ostream &_file_1, std::ostream &_file_2) : file{&_file_1
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void Exporter::skipIn(const util::Section &id) { util::OrderedSection sec(&lock, id); }
+
 void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
     core::record::Chunk data = std::move(t);
     getStats().add(data.getStats());
@@ -34,7 +36,7 @@ void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
     size_t size_name = 0;
     for (const auto &i : data.getData()) {
         auto file_ptr = file.data();
-        if(!i.isRead1First()) {
+        if (!i.isRead1First()) {
             file_ptr = &file.back();
         }
         for (const auto &rec : i.getSegments()) {
@@ -66,7 +68,7 @@ void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
                 (*file_ptr)->write(qual.c_str(), qual.length());
             }
             (*file_ptr)->write("\n", 1);
-            if(i.isRead1First()) {
+            if (i.isRead1First()) {
                 file_ptr++;
             } else {
                 file_ptr--;

@@ -61,9 +61,9 @@ struct EncodingConfiguration {
 
     uint8_t getSubseqWordSize() const;
 
-    const paramcabac::Subsequence& getSubseqConfig() const { return subseqCfg; }
+    const paramcabac::Subsequence& getSubseqConfig() const;
 
-    void setSubseqConfig(paramcabac::Subsequence&& _subseqCfg) { subseqCfg = std::move(_subseqCfg); }
+    void setSubseqConfig(paramcabac::Subsequence&& _subseqCfg);
 
    private:
     paramcabac::Subsequence subseqCfg;

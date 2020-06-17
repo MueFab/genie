@@ -61,19 +61,10 @@ class DataBlockBuffer : public std::streambuf {
     int uflow() override;
     virtual void flush_block(util::DataBlock *blk);
 
-    pos_type seekpos(pos_type sp, std::ios_base::openmode) override { return pos = sp; }
+    pos_type seekpos(pos_type sp, std::ios_base::openmode) override;
 
     pos_type seekoff(off_type off, std::ios_base::seekdir dir,
-                     std::ios_base::openmode which = std::ios_base::in) override {
-        (void)which;
-        if (dir == std::ios_base::cur)
-            pos = (off < 0 && size_t(std::abs(off)) > pos) ? 0 : std::min(pos + off, block.size());
-        else if (dir == std::ios_base::end)
-            pos = (off < 0 && size_t(std::abs(off)) > block.size()) ? 0 : std::min(block.size() + off, block.size());
-        else if (dir == std::ios_base::beg)
-            pos = (off < 0 && std::abs(off) > 0) ? 0 : std::min(size_t(0) + off, block.size());
-        return pos;
-    }
+                     std::ios_base::openmode which = std::ios_base::in) override;
 
    private:
     util::DataBlock block;
@@ -133,7 +124,7 @@ class OBufferStream : public DataBlockBuffer, public std::ostream {
      * @brief Swap internal block with external one
      * @param blk Block to fill with data
      */
-    virtual void flush(util::DataBlock *blk) { flush_block(blk); }
+    virtual void flush(util::DataBlock *blk);
 };
 
 /**

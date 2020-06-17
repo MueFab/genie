@@ -48,6 +48,13 @@ std::unique_ptr<core::parameter::desc_pres::Decoder> DecoderRegular::clone() con
     return util::make_unique<DecoderRegular>(*this);
 }
 
+Subsequence &DecoderRegular::getSubsequenceCfg(uint8_t index) { return descriptor_subsequence_cfgs[index]; }
+
+
+std::unique_ptr<core::parameter::desc_pres::DecoderRegular> DecoderRegular::create(util::BitReader &reader) {
+    return util::make_unique<DecoderRegular>(reader);
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DecoderRegular::write(util::BitWriter &writer) const {
@@ -93,6 +100,12 @@ const Subsequence &DecoderTokenType::getSubsequenceCfg(uint8_t index) const {
 
 std::unique_ptr<core::parameter::desc_pres::Decoder> DecoderTokenType::clone() const {
     return util::make_unique<DecoderTokenType>(*this);
+}
+
+Subsequence &DecoderTokenType::getSubsequenceCfg(uint8_t index) { return descriptor_subsequence_cfgs[index]; }
+
+std::unique_ptr<core::parameter::desc_pres::DecoderTokentype> DecoderTokenType::create(util::BitReader &reader) {
+    return util::make_unique<DecoderTokenType>(reader);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

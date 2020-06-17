@@ -39,68 +39,17 @@ class QualityValues1 : public core::parameter::QualityValues {
 
     std::unique_ptr<QualityValues> clone() const override;
 
-    static std::unique_ptr<QualityValues> create(util::BitReader& reader) {
-        return util::make_unique<QualityValues1>(reader);
-    }
+    static std::unique_ptr<QualityValues> create(util::BitReader& reader);
 
-    static const Codebook& getPresetCodebook(QvpsPresetId id) {
-        const static std::vector<Codebook> pSet = []() -> std::vector<Codebook> {
-            std::vector<Codebook> ret;
-            Codebook set(33, 34);
-            for (uint8_t p = 2; p < 94; ++p) {
-                set.addEntry(p + 33);
-            }
-            ret.emplace_back(std::move(set));
+    static const Codebook& getPresetCodebook(QvpsPresetId id);
 
-            set = Codebook(33, 41);
-            for (uint8_t p = 46; p <= 66; p += 5) {
-                set.addEntry(p);
-            }
-            set.addEntry(74);
-            ret.emplace_back(std::move(set));
+    static std::unique_ptr<core::parameter::QualityValues> getDefaultSet(core::record::ClassType type);
 
-            set = Codebook(64, 72);
-            for (uint8_t p = 77; p <= 97; p += 5) {
-                set.addEntry(p);
-            }
-            set.addEntry(104);
-            ret.emplace_back(std::move(set));
-            return ret;
-        }();
-        return pSet[uint8_t(id)];
-    }
+    size_t getNumberCodeBooks() const;
 
-    static std::unique_ptr<core::parameter::QualityValues> getDefaultSet(core::record::ClassType type) {
-        auto ret = util::make_unique<paramqv1::QualityValues1>(QvpsPresetId::ASCII, false);
-        ParameterSet set;
+    const Codebook& getCodebook(size_t id) const;
 
-        auto codebook = QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);
-        set.addCodeBook(std::move(codebook));
-
-        if (type == core::record::ClassType::CLASS_I || type == core::record::ClassType::CLASS_HM) {
-            codebook = paramqv1::QualityValues1::getPresetCodebook(paramqv1::QualityValues1::QvpsPresetId::ASCII);
-            set.addCodeBook(std::move(codebook));
-        }
-        ret->setQvps(std::move(set));
-        return ret;
-    }
-
-    size_t getNumberCodeBooks() const {
-        if (qvps_preset_ID.is_initialized()) {
-            return 1;
-        }
-        return parameter_set_qvps->getCodebooks().size();
-    }
-
-    const Codebook& getCodebook(size_t id) const {
-        if (qvps_preset_ID.is_initialized()) {
-            UTILS_DIE_IF(id > 0, "Codebook out of bounds");
-            return getPresetCodebook(qvps_preset_ID.get());
-        }
-        return parameter_set_qvps->getCodebooks()[id];
-    }
-
-    size_t getNumSubsequences() const override { return getNumberCodeBooks() + 2; }
+    size_t getNumSubsequences() const override;
 
    private:
     boost::optional<ParameterSet> parameter_set_qvps;
