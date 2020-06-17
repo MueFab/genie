@@ -101,7 +101,7 @@ bool PerfStats::isActive() const { return active; }
 
 std::ostream& operator<<(std::ostream& stream, const PerfStats& stats) {
     for (const auto& s : stats) {
-        stream << std::setw(32) << std::left << s.first;
+        stream << std::setw(40) << std::left << s.first;
         if (s.second.isInteger) {
             //   stream << "min: " << std::setw(16) << std::left << std::fixed << s.second.min.iData;
             //  stream << "avg: " << std::setw(16) << std::setfill(' ') << std::setprecision(2) <<  std::left <<

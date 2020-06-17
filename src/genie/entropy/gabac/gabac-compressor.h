@@ -50,14 +50,30 @@ class GabacCompressor : public core::EntropyEncoder {
                     const auto& conf = configSet.getConfAsGabac(subdesc.getID());
                     // add compressed payload
                     auto id = subdesc.getID();
+
+                    if (!subdesc.isEmpty()) {
+                        std::get<2>(ret).addInteger("size-gabac-total-raw", subdesc.getRawSize());
+                        std::get<2>(ret).addInteger(
+                            "size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-" + core::getDescriptor(std::get<1>(ret).getID()).subseqs[id.second].name + "-raw",
+                            subdesc.getRawSize());
+                    }
+
                     std::get<1>(ret).set(id.second, compress(conf, std::move(subdesc)));
+
+                    if (!std::get<1>(ret).get(id.second).isEmpty()) {
+                        std::get<2>(ret).addInteger("size-gabac-total-comp",
+                                                    std::get<1>(ret).get(id.second).getRawSize());
+                        std::get<2>(ret).addInteger(
+                            "size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-" + core::getDescriptor(std::get<1>(ret).getID()).subseqs[id.second].name + "-comp",
+                            std::get<1>(ret).get(id.second).getRawSize());
+                    }
                 } else {
                     // add empty payload
                     std::get<1>(ret).set(subdesc.getID().second,
-                                   core::AccessUnit::Subsequence(subdesc.getID(), util::DataBlock(0, 1)));
+                                         core::AccessUnit::Subsequence(subdesc.getID(), util::DataBlock(0, 1)));
                 }
             }
-            configSet.storeParameters(std::get<1>(ret).getID(),std::get<0>(ret));
+            configSet.storeParameters(std::get<1>(ret).getID(), std::get<0>(ret));
         } else {
             size_t size = 0;
             for (const auto& s : std::get<1>(ret)) {
@@ -66,7 +82,17 @@ class GabacCompressor : public core::EntropyEncoder {
             std::string name = getDescriptor(std::get<1>(ret).getID()).name;
             const auto& conf = configSet.getConfAsGabac({std::get<1>(ret).getID(), 0});
             std::get<1>(ret) = compressTokens(conf, std::move(std::get<1>(ret)));
-            configSet.storeParameters(std::get<1>(ret).getID(),std::get<0>(ret));
+            configSet.storeParameters(std::get<1>(ret).getID(), std::get<0>(ret));
+
+            if (size) {
+                std::get<2>(ret).addInteger("size-gabac-total-raw", size);
+                std::get<2>(ret).addInteger("size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-raw",
+                                            size);
+                std::get<2>(ret).addInteger("size-gabac-total-comp", std::get<1>(ret).begin()->getRawSize());
+                std::get<2>(ret).addInteger(
+                    "size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-comp",
+                    std::get<1>(ret).begin()->getRawSize());
+            }
         }
         std::get<2>(ret).addDouble("time-gabac", watch.check());
         return ret;
