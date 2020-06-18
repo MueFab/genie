@@ -1,5 +1,5 @@
-#include <gabac/data-block.h>
-#include <gabac/match-coding.h>
+#include <genie/entropy/gabac/match-subseq-transform.h>
+#include <genie/util/data-block.h>
 #include <gtest/gtest.h>
 #include <algorithm>
 #include <functional>
@@ -17,17 +17,17 @@ class MatchCodingTest : public ::testing::Test {
 };
 
 TEST_F(MatchCodingTest, transformMatchCoding) {
-    gabac::DataBlock symbols(0, 8);
-    gabac::DataBlock pointers(0, 4);
-    gabac::DataBlock expectedPointers(0, 4);
-    gabac::DataBlock lengths(0, 4);
-    gabac::DataBlock expectedLengths(0, 4);
-    gabac::DataBlock rawValues(0, 8);
-    gabac::DataBlock expectedRawValues(0, 8);
+    genie::util::DataBlock symbols(0, 8);
+    genie::util::DataBlock pointers(0, 4);
+    genie::util::DataBlock expectedPointers(0, 4);
+    genie::util::DataBlock lengths(0, 4);
+    genie::util::DataBlock expectedLengths(0, 4);
+    genie::util::DataBlock rawValues(0, 8);
+    genie::util::DataBlock expectedRawValues(0, 8);
     int windowSize;
 
     for (auto& windowSizeIt : windowSizes) {
-        EXPECT_NO_THROW(gabac::transformMatchCoding(windowSizeIt, &rawValues, &pointers, &lengths));
+        EXPECT_NO_THROW(genie::entropy::gabac::transformMatchCoding(windowSizeIt, &rawValues, &pointers, &lengths));
         EXPECT_EQ(pointers.size(), 0);
         EXPECT_EQ(lengths.size(), 0);
         EXPECT_EQ(rawValues.size(), 0);
@@ -41,7 +41,7 @@ TEST_F(MatchCodingTest, transformMatchCoding) {
     lengths = {};
     expectedRawValues = {uint64_t(-1), 2, uint64_t(-3), 4, 4, uint64_t(-3), 2, uint64_t(-1)};
     windowSize = 0;
-    EXPECT_NO_THROW(gabac::transformMatchCoding(windowSize, &rawValues, &pointers, &lengths));
+    EXPECT_NO_THROW(genie::entropy::gabac::transformMatchCoding(windowSize, &rawValues, &pointers, &lengths));
     EXPECT_EQ(pointers.size(), 0);
     EXPECT_EQ(lengths.size(), 8);
     EXPECT_EQ(rawValues.size(), 8);
@@ -55,7 +55,7 @@ TEST_F(MatchCodingTest, transformMatchCoding) {
     expectedLengths = {0, 0, 0, 0, 3, 0};
     expectedRawValues = {uint64_t(-1), 2, uint64_t(-3), 4, uint64_t(-1)};
     windowSize = 4;
-    EXPECT_NO_THROW(gabac::transformMatchCoding(windowSize, &rawValues, &pointers, &lengths));
+    EXPECT_NO_THROW(genie::entropy::gabac::transformMatchCoding(windowSize, &rawValues, &pointers, &lengths));
     EXPECT_EQ(pointers.size(), 1);
     EXPECT_EQ(pointers, expectedPointers);
     EXPECT_EQ(lengths.size(), 6);
@@ -65,16 +65,16 @@ TEST_F(MatchCodingTest, transformMatchCoding) {
 }
 
 TEST_F(MatchCodingTest, inverseTransformMatchCoding) {
-    gabac::DataBlock expectedSymbols(0, 8);
-    gabac::DataBlock pointers(0, 4);
-    gabac::DataBlock lengths(0, 4);
-    gabac::DataBlock rawValues(0, 8);
+    genie::util::DataBlock expectedSymbols(0, 8);
+    genie::util::DataBlock pointers(0, 4);
+    genie::util::DataBlock lengths(0, 4);
+    genie::util::DataBlock rawValues(0, 8);
 
     // Void input shall lead to void output
     pointers = {};
     lengths = {};
     rawValues = {};
-    EXPECT_NO_THROW(gabac::inverseTransformMatchCoding(&rawValues, &pointers, &lengths));
+    EXPECT_NO_THROW(genie::entropy::gabac::inverseTransformMatchCoding(&rawValues, &pointers, &lengths));
     EXPECT_EQ(rawValues.size(), 0);
 
     // void rawValues (is not allowed) and lengths is not
@@ -83,28 +83,28 @@ TEST_F(MatchCodingTest, inverseTransformMatchCoding) {
     rawValues = {};
 
     // void rawValues (is not allowed) and lengths is not
-    EXPECT_DEATH(gabac::inverseTransformMatchCoding(&rawValues, &pointers, &lengths), "");
+    EXPECT_DEATH(genie::entropy::gabac::inverseTransformMatchCoding(&rawValues, &pointers, &lengths), "");
     pointers = {0, 0, 0, 0};
     lengths = {};
     rawValues = {};
-    EXPECT_DEATH(gabac::inverseTransformMatchCoding(&rawValues, &pointers, &lengths), "");
+    EXPECT_DEATH(genie::entropy::gabac::inverseTransformMatchCoding(&rawValues, &pointers, &lengths), "");
 
     // windowSize == 4
     expectedSymbols = {uint64_t(-1), 2, uint64_t(-3), 4, 2, uint64_t(-3), 4, uint64_t(-1)};
     pointers = {3};
     lengths = {0, 0, 0, 0, 3, 0};
     rawValues = {uint64_t(-1), 2, uint64_t(-3), 4, uint64_t(-1)};
-    EXPECT_NO_THROW(gabac::inverseTransformMatchCoding(&rawValues, &pointers, &lengths));
+    EXPECT_NO_THROW(genie::entropy::gabac::inverseTransformMatchCoding(&rawValues, &pointers, &lengths));
     EXPECT_EQ(rawValues.size(), expectedSymbols.size());
     EXPECT_EQ(rawValues, expectedSymbols);
 }
 
 TEST_F(MatchCodingTest, roundTripCoding) {
-    gabac::DataBlock symbols(0, 8);
-    gabac::DataBlock decodedSymbols(0, 8);
-    gabac::DataBlock pointers(0, 4);
-    gabac::DataBlock lengths(0, 4);
-    gabac::DataBlock rawValues(0, 8);
+    genie::util::DataBlock symbols(0, 8);
+    genie::util::DataBlock decodedSymbols(0, 8);
+    genie::util::DataBlock pointers(0, 4);
+    genie::util::DataBlock lengths(0, 4);
+    genie::util::DataBlock rawValues(0, 8);
 
     // test large file size word size 1
     symbols.resize(largeTestSize);
@@ -114,8 +114,8 @@ TEST_F(MatchCodingTest, roundTripCoding) {
     rawValues = symbols;
 
     for (auto& windowSize : windowSizes) {
-        EXPECT_NO_THROW(gabac::transformMatchCoding(windowSize, &rawValues, &pointers, &lengths));
-        EXPECT_NO_THROW(gabac::inverseTransformMatchCoding(&rawValues, &pointers, &lengths));
+        EXPECT_NO_THROW(genie::entropy::gabac::transformMatchCoding(windowSize, &rawValues, &pointers, &lengths));
+        EXPECT_NO_THROW(genie::entropy::gabac::inverseTransformMatchCoding(&rawValues, &pointers, &lengths));
         EXPECT_EQ(symbols.size(), rawValues.size());
         EXPECT_EQ(symbols, rawValues);
     }
@@ -126,8 +126,8 @@ TEST_F(MatchCodingTest, roundTripCoding) {
                                          &symbols);
     rawValues = symbols;
     for (auto& windowSize : windowSizes) {
-        EXPECT_NO_THROW(gabac::transformMatchCoding(windowSize, &rawValues, &pointers, &lengths));
-        EXPECT_NO_THROW(gabac::inverseTransformMatchCoding(&rawValues, &pointers, &lengths));
+        EXPECT_NO_THROW(genie::entropy::gabac::transformMatchCoding(windowSize, &rawValues, &pointers, &lengths));
+        EXPECT_NO_THROW(genie::entropy::gabac::inverseTransformMatchCoding(&rawValues, &pointers, &lengths));
         EXPECT_EQ(symbols.size(), rawValues.size());
         EXPECT_EQ(symbols, rawValues);
     }
@@ -137,8 +137,8 @@ TEST_F(MatchCodingTest, roundTripCoding) {
                                          &symbols);
     rawValues = symbols;
     for (auto& windowSize : windowSizes) {
-        EXPECT_NO_THROW(gabac::transformMatchCoding(windowSize, &rawValues, &pointers, &lengths));
-        EXPECT_NO_THROW(gabac::inverseTransformMatchCoding(&rawValues, &pointers, &lengths));
+        EXPECT_NO_THROW(genie::entropy::gabac::transformMatchCoding(windowSize, &rawValues, &pointers, &lengths));
+        EXPECT_NO_THROW(genie::entropy::gabac::inverseTransformMatchCoding(&rawValues, &pointers, &lengths));
         EXPECT_EQ(symbols.size(), rawValues.size());
         EXPECT_EQ(symbols, rawValues);
     }

@@ -8,6 +8,7 @@ class GABAC_RETURN:
     SUCCESS = 0
     FAILURE = 1
 
+
 class GABAC_LOG_LEVEL:
     r"""
     Different logging urgency
@@ -27,6 +28,7 @@ class GABAC_LOG_LEVEL:
     ERROR = 4
     FATAL = 5
 
+
 class GABAC_TRANSFORM:
     r"""
     Gabac available transformations
@@ -38,7 +40,7 @@ class GABAC_TRANSFORM:
         gabac_transform_RLE         : Find run lengths
         gabac_transform_LUT         : Remap symbols based on probability
         gabac_transform_DIFF        : Use differences between symbol values instead of symbols
-        gabac_transform_CABAC       : coding based on cabac
+        gabac_transform_CABAC       : core based on paramcabac
     """
     NONE = 0
     EQUALITY = 1
@@ -48,9 +50,10 @@ class GABAC_TRANSFORM:
     DIFF = 5
     CABAC = 6
 
+
 class GABAC_BINARIZATION:
     r"""
-    Binarizations for cabac transformation
+    Binarizations for paramcabac transformation
 
     Values:
         BI : Binary
@@ -66,13 +69,14 @@ class GABAC_BINARIZATION:
     SEG = 3
     TEG = 4
     STEG = 5
-    
+
+
 class GABAC_CONTEXT_SELECT:
     r"""
-    Context selection modes for cabac transformation
+    Context selection modes for paramcabac transformation
 
     Values:
-        BYPASS           : Do not use arithmetic coding
+        BYPASS           : Do not use arithmetic core
         ADAPTIVE_ORDER_0 : Current symbol only
         ADAPTIVE_ORDER_1 : Use current + previous symbol
         ADAPTIVE_ORDER_2 : Use current + previous + before previous symbol
@@ -80,7 +84,8 @@ class GABAC_CONTEXT_SELECT:
     BYPASS = 0
     ADAPTIVE_ORDER_0 = 1
     ADAPTIVE_ORDER_1 = 2
-    ADAPTIVE_ORDER_2 = 3 
+    ADAPTIVE_ORDER_2 = 3
+
 
 class GABAC_OPERATION:
     r"""
@@ -94,6 +99,7 @@ class GABAC_OPERATION:
     ENCODE = 0
     DECODE = 1
     ANALYZE = 2
+
 
 class GABAC_STREAM_MODE:
     r"""
