@@ -136,10 +136,10 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
 
     auto ref = data.getData().front().getAlignmentSharedData().getSeqID();
     uint64_t lastPos = 0;
-    uint8_t qvdepth = qvcoder ? data.getData().front().getSegments().front().getQualities().size() : 0;
     data.getStats().addDouble("time-localassembly", watch.check());
     watch.reset();
     auto qv = qvcoder->process(data);
+    uint8_t qvdepth = std::get<1>(qv).isEmpty() ? 0 : 1;
     data.getStats().addDouble("time-quality", watch.check());
     watch.reset();
     core::AccessUnit::Descriptor rname(core::GenDesc::RNAME);
@@ -147,7 +147,6 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     data.getStats().addDouble("time-name", watch.check());
     watch.reset();
     for (auto& r : data.getData()) {
-        UTILS_DIE_IF(r.getSegments().front().getQualities().size() != qvdepth && qvcoder, "QV_depth not compatible");
         UTILS_DIE_IF(r.getAlignments().front().getPosition() < lastPos,
                      "Data seems to be unsorted. Local assembly encoding needs sorted input data.");
 

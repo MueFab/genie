@@ -30,7 +30,10 @@ core::AccessUnit::Descriptor Encoder::compressTokens(const gabac::EncodingConfig
     }
 
     if (num_streams == 0) {
-        return core::AccessUnit::Descriptor(desc.getID());
+        auto ret_empty = core::AccessUnit::Descriptor(desc.getID());
+        // add empty payload
+        ret_empty.add(core::AccessUnit::Subsequence({desc.getID(), 0}, util::DataBlock(0, 1)));
+        return ret_empty;
     }
 
     writer.write(desc.begin()->getNumSymbols(), 32);

@@ -65,7 +65,11 @@ bool SpringSource::pump(size_t& id, std::mutex& lock) {
             } else {
                 filename = read_desc_prefix + std::to_string(auId) + "." + std::to_string(uint8_t(d.getID()));
             }
-            if (!ghc::filesystem::exists(filename) || !ghc::filesystem::file_size(filename)) {
+            if (!ghc::filesystem::exists(filename)) {
+                continue;
+            }
+            if(!ghc::filesystem::file_size(filename)) {
+                ghc::filesystem::remove(filename);
                 continue;
             }
             std::ifstream input(filename);
