@@ -20,7 +20,8 @@ int stat(int, char*[]) { UTILS_DIE("Stat not implemented"); }
 int help(int, char*[]) {
     std::cout << "Usage: \ngenie run -i [input-file] -o [output-file]\nUse -f to overwrite existing output files.\nUse "
                  "-t to specify the number of threads.\nIn case of paired fastq files, use --input-suppl-file or "
-                 "--output-suppl-file to specify the second file." << std::endl;
+                 "--output-suppl-file to specify the second file."
+              << std::endl;
     return 0;
 }
 

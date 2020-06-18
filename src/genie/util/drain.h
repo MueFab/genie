@@ -20,9 +20,9 @@ namespace util {
  *
  */
 struct Section {
-    size_t start; //!<
-    size_t length; //!<
-    bool strongSkip; //!<
+    size_t start;     //!<
+    size_t length;    //!<
+    bool strongSkip;  //!<
 };
 
 /**

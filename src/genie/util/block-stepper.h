@@ -20,9 +20,9 @@ namespace util {
  *
  */
 struct BlockStepper {
-    uint8_t *curr; //!<
-    uint8_t *end; //!<
-    uint8_t wordSize; //!<
+    uint8_t *curr;     //!<
+    uint8_t *end;      //!<
+    uint8_t wordSize;  //!<
 
     /**
      *

@@ -22,13 +22,13 @@ namespace util {
  */
 class Date {
    private:
-    uint16_t year; //!<
-    uint8_t month; //!<
-    uint8_t day; //!<
-    bool timePresent; //!<
-    uint8_t hour; //!<
-    uint8_t minute; //!<
-    uint8_t second; //!<
+    uint16_t year;     //!<
+    uint8_t month;     //!<
+    uint8_t day;       //!<
+    bool timePresent;  //!<
+    uint8_t hour;      //!<
+    uint8_t minute;    //!<
+    uint8_t second;    //!<
 
     /**
      *
@@ -37,7 +37,6 @@ class Date {
     bool checkValidity() const;
 
    public:
-
     /**
      *
      * @return

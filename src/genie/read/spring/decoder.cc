@@ -167,10 +167,10 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                     }
                 }
                 cur_record.seq = cur_read[i];
-                if(!names.empty()) {
+                if (!names.empty()) {
                     cur_record.name = names[name_pos];
                 }
-                if(!qvs.empty()) {
+                if (!qvs.empty()) {
                     cur_record.qv = std::move(qvs[qv_pos++]);
                 }
                 if (!paired_end) {
@@ -402,12 +402,12 @@ void Decoder::flushIn(size_t& pos) {
 
                     core::record::Record r(2, core::record::ClassType::CLASS_U, std::move(tmpFastqRecord.name), "", 0);
                     core::record::Segment s1(std::move(tmpFastqRecord.seq));
-                    if(!tmpFastqRecord.qv.empty()) {
+                    if (!tmpFastqRecord.qv.empty()) {
                         s1.addQualities(std::move(tmpFastqRecord.qv));
                     }
 
                     core::record::Segment s2(std::move(records_bin[j].seq));
-                    if(!records_bin[j].qv.empty()) {
+                    if (!records_bin[j].qv.empty()) {
                         s2.addQualities(std::move(records_bin[j].qv));
                     }
 

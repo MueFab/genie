@@ -21,9 +21,9 @@ namespace util {
  */
 class Watch {
    private:
-    std::chrono::high_resolution_clock::time_point start; //!<
-    double offset{}; //!<
-    bool paused; //!<
+    std::chrono::high_resolution_clock::time_point start;  //!<
+    double offset{};                                       //!<
+    bool paused;                                           //!<
 
    public:
     /**

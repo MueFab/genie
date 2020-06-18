@@ -17,8 +17,8 @@ namespace util {
 template <typename Coder, typename Ret, typename... Args>
 class SideSelector {
    private:
-    std::vector<Coder*> mods; //!<
-    std::function<size_t(Args...)> select; //!<
+    std::vector<Coder*> mods;               //!<
+    std::function<size_t(Args...)> select;  //!<
 
     /**
      *

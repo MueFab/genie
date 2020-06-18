@@ -4,6 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "preprocess.h"
 #include <genie/core/record/record.h>
 #include <genie/util/drain.h>
 #include <genie/util/ordered-section.h>
@@ -12,7 +13,6 @@
 #include <iostream>
 #include <string>
 #include "params.h"
-#include "preprocess.h"
 #include "util.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -161,7 +161,7 @@ void Preprocessor::finish(size_t id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::stats::PerfStats& Preprocessor::getStats() { return stats; }
+core::stats::PerfStats &Preprocessor::getStats() { return stats; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -191,7 +191,7 @@ Preprocessor::~Preprocessor() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Preprocessor::skip(const util::Section& id) { util::OrderedSection sec(&lock, id); }
+void Preprocessor::skip(const util::Section &id) { util::OrderedSection sec(&lock, id); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

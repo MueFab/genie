@@ -49,8 +49,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     auto qv = qvcoder->process(data);
     auto rname = namecoder->process(data);
     watch.resume();
-    auto rawAU =
-        pack(id, std::get<1>(qv).isEmpty() ? 0 : 1, std::move(std::get<0>(qv)), state);
+    auto rawAU = pack(id, std::get<1>(qv).isEmpty() ? 0 : 1, std::move(std::get<0>(qv)), state);
 
     rawAU.get(core::GenDesc::QV) = std::move(std::get<1>(qv));
     rawAU.get(core::GenDesc::RNAME) = std::move(std::get<0>(rname));

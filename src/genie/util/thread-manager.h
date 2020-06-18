@@ -30,7 +30,7 @@ class ThreadManager {
     std::atomic<bool> stopFlag;        //!< @brief Threads will stop after current block when set
     bool abortFlag;  //!< @brief The flushIn(size_t& pos) signal will be skipped after stop(). Used with stopFlag
     std::vector<OriginalSource*> source;  //!< @brief Where to enter the pipeline
-    std::mutex lock; //!<
+    std::mutex lock;                      //!<
 
     /**
      * @brief Threading code
@@ -38,9 +38,9 @@ class ThreadManager {
     void action(size_t id);
 
    public:
-    static thread_local size_t threadID; //!<
-    static thread_local size_t threadNum; //!<
-    static thread_local ThreadManager* localManager; //!<
+    static thread_local size_t threadID;              //!<
+    static thread_local size_t threadNum;             //!<
+    static thread_local ThreadManager* localManager;  //!<
 
     /**
      * @brief Constructs a new ThreadManager

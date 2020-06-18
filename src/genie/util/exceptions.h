@@ -35,7 +35,6 @@ namespace util {
  */
 class Exception : public std::exception {
    public:
-
     /**
      *
      * @param msg
@@ -60,7 +59,7 @@ class Exception : public std::exception {
     const char *what() const noexcept override;
 
    protected:
-    std::string msg_; //!<
+    std::string msg_;  //!<
 };
 
 /**

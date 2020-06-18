@@ -27,8 +27,8 @@ namespace header {
 template <typename Type>
 class TagEnum : public TagBase {
    private:
-    Type data; //!<
-    const std::vector<std::string>& lookup; //!<
+    Type data;                               //!<
+    const std::vector<std::string>& lookup;  //!<
 
    public:
     /**

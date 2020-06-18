@@ -36,9 +36,7 @@ void FileHeader::writeToFile(genie::util::BitWriter& bitWriter) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FileHeader::addCompatibleBrand(const std::string& brand) {
-    compatible_brand.push_back(brand);
-}
+void FileHeader::addCompatibleBrand(const std::string& brand) { compatible_brand.push_back(brand); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

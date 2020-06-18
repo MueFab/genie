@@ -22,14 +22,13 @@ namespace lowlatency {
  */
 class Encoder : public core::ReadEncoder {
    private:
-
     /**
      *
      */
     struct LLState {
-        size_t readLength; //!<
-        bool pairedEnd; //!<
-        core::AccessUnit streams; //!<
+        size_t readLength;         //!<
+        bool pairedEnd;            //!<
+        core::AccessUnit streams;  //!<
     };
 
    public:

@@ -68,7 +68,7 @@ bool SpringSource::pump(size_t& id, std::mutex& lock) {
             if (!ghc::filesystem::exists(filename)) {
                 continue;
             }
-            if(!ghc::filesystem::file_size(filename)) {
+            if (!ghc::filesystem::file_size(filename)) {
                 ghc::filesystem::remove(filename);
                 continue;
             }

@@ -70,7 +70,6 @@ class AccessUnit {
     void writeToFile(genie::util::BitWriter& bitWriter) const;
 
    private:
-
     genie::format::mgb::AccessUnit au_p1;  //!< if MIT_flag is set to 0 -> au_p1 header equates to au_p2 header
 
     // std::unique_ptr<AU_information> au_information;   //optional

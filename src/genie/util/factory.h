@@ -7,12 +7,10 @@
 #ifndef GENIE_FACTORY_H
 #define GENIE_FACTORY_H
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
 #include "exceptions.h"
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,7 +32,7 @@ class GenericFactory {
 template <typename T>
 class Factory : public GenericFactory {
    private:
-    std::map<uint8_t, std::function<std::unique_ptr<T>(util::BitReader&)>> factories; //!<
+    std::map<uint8_t, std::function<std::unique_ptr<T>(util::BitReader&)>> factories;  //!<
 
    public:
     /**
@@ -85,7 +83,6 @@ class Factory : public GenericFactory {
 
 }  // namespace util
 }  // namespace genie
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 

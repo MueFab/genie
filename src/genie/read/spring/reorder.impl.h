@@ -29,7 +29,6 @@ reorder_global<bitset_size>::~reorder_global() {
     delete[] basemask;
 }
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <size_t bitset_size>

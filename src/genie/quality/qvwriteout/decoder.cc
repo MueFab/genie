@@ -18,7 +18,7 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(
     const core::parameter::QualityValues& param, const std::vector<std::string>& ecigar_vec,
     core::AccessUnit::Descriptor& desc) {
     std::tuple<std::vector<std::string>, core::stats::PerfStats> qv;
-    if(desc.isEmpty()) {
+    if (desc.isEmpty()) {
         return qv;
     }
     util::Watch watch;

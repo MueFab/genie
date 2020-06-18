@@ -24,8 +24,8 @@ namespace sam {
  */
 class Writer {
    private:
-    header::Header header; //!<
-    std::ostream& file;//!<
+    header::Header header;  //!<
+    std::ostream& file;     //!<
 
    public:
     /**

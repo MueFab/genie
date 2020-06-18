@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
         else {
             UTILS_DIE("Invalid task: " + std::string(programOptions.task));
         }
-    }  catch (const std::exception& e) {
+    } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;
     } catch (...) {

@@ -21,9 +21,9 @@ namespace util {
  */
 struct StringView {
    private:
-    size_t start; //!<
-    size_t stop; //!<
-    const char* memory; //!<
+    size_t start;        //!<
+    size_t stop;         //!<
+    const char* memory;  //!<
 
    public:
     /**

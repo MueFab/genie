@@ -27,9 +27,9 @@ namespace basecoder {
  */
 class Encoder {
    private:
-    core::AccessUnit container; //!<
-    int32_t pos; //!<
-    uint32_t readCounter; //!<
+    core::AccessUnit container;  //!<
+    int32_t pos;                 //!<
+    uint32_t readCounter;        //!<
 
     /**
      *
@@ -48,8 +48,8 @@ class Encoder {
      *
      */
     struct ClipInformation {
-        std::array<std::string, 2> softClips; //!<
-        std::array<size_t, 2> hardClips = {{0, 0}}; //!<
+        std::array<std::string, 2> softClips;        //!<
+        std::array<size_t, 2> hardClips = {{0, 0}};  //!<
     };
 
     /**
@@ -88,16 +88,16 @@ class Encoder {
          * @param _type
          */
         CodingState(const std::string &_read, const std::string &_ref, core::record::ClassType _type);
-        size_t count; //!<
-        size_t read_pos; //!<
-        size_t ref_offset; //!<
-        size_t lastMisMatch; //!<
-        bool isRightClip; //!<
+        size_t count;         //!<
+        size_t read_pos;      //!<
+        size_t ref_offset;    //!<
+        size_t lastMisMatch;  //!<
+        bool isRightClip;     //!<
 
-        const std::string &read; //!<
-        const std::string &ref; //!<
-        const core::record::ClassType type; //!<
-        ClipInformation clips; //!<
+        const std::string &read;             //!<
+        const std::string &ref;              //!<
+        const core::record::ClassType type;  //!<
+        ClipInformation clips;               //!<
     };
 
     /**

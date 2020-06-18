@@ -24,7 +24,6 @@ namespace localassembly {
 class Decoder : public core::ReadDecoder {
    private:
    public:
-
     /**
      *
      * @param t

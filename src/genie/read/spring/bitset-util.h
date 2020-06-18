@@ -38,14 +38,14 @@ typedef boomphf::mphf<u_int64_t, hasher_t> boophf_t;
  */
 class bbhashdict {
    public:
-    boophf_t *bphf; //!<
-    int start;//!<
-    int end;//!<
-    uint32_t numkeys;//!<
+    boophf_t *bphf;          //!<
+    int start;               //!<
+    int end;                 //!<
+    uint32_t numkeys;        //!<
     uint32_t dict_numreads;  //!< number of reads in this dict (for variable length)
-    uint32_t *startpos;//!<
-    uint32_t *read_id;//!<
-    bool *empty_bin = NULL;//!<
+    uint32_t *startpos;      //!<
+    uint32_t *read_id;       //!<
+    bool *empty_bin = NULL;  //!<
 
     /**
      *
