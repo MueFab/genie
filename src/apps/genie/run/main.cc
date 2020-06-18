@@ -14,6 +14,7 @@
 #include <genie/format/sam/exporter.h>
 #include <genie/format/sam/importer.h>
 #include <genie/module/default-setup.h>
+#include <genie/read/lowlatency/encoder.h>
 #include <genie/quality/qvwriteout/encoder.h>
 #include <fstream>
 #include "program-options.h"
@@ -124,7 +125,7 @@ void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
 std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts,
                                                      std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    constexpr size_t BLOCKSIZE = 10000;
+    constexpr size_t BLOCKSIZE = 256000;
     auto flow = genie::module::buildDefaultEncoder(pOpts.numberOfThreads, pOpts.workingDirectory, BLOCKSIZE);
     outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile));
     flow->addExporter(genie::util::make_unique<genie::format::mgb::Exporter>(outputFiles.back().get()));
@@ -134,6 +135,10 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
     }
     if(pOpts.readNameMode == "none") {
         flow->setNameCoder(genie::util::make_unique<genie::core::NameEncoderNone>(), 0);
+    }
+    if(pOpts.lowLatency) {
+        flow->setReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(), 2);
+        flow->setReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(), 3);
     }
     return flow;
 }

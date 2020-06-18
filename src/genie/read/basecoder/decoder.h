@@ -124,6 +124,11 @@ class Decoder {
      */
     std::tuple<size_t, size_t> decodeClips(std::vector<std::string> &sequences,
                                            std::vector<std::string> &cigar_extended);
+
+    /**
+     *
+     */
+    void clear();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -146,7 +146,9 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     rname = std::get<0>(namecoder->process(data));
     data.getStats().addDouble("time-name", watch.check());
     watch.reset();
+    size_t read_num = 0;
     for (auto& r : data.getData()) {
+        read_num += r.getSegments().size();
         UTILS_DIE_IF(r.getAlignments().front().getPosition() < lastPos,
                      "Data seems to be unsorted. Local assembly encoding needs sorted input data.");
 
@@ -168,6 +170,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     data.getData().clear();
     rawAU.getStats().addDouble("time-localassembly", watch.check());
     rawAU = entropyCodeAU(std::move(rawAU));
+    rawAU.setNumReads(read_num);
     flowOut(std::move(rawAU), id);
 }
 

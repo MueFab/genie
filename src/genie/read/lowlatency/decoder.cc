@@ -30,9 +30,10 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     data.getStats().addDouble("time-name", watch.check());
     watch.reset();
     std::vector<std::string> ecigars;
+    // FIXME: loop condition is only correct if all records have the full number of reads
     for (size_t i = 0; i < data.getNumReads() / data.getParameters().getNumberTemplateSegments(); ++i) {
         core::record::Record rec(data.getParameters().getNumberTemplateSegments(), core::record::ClassType::CLASS_U,
-                                 std::move(std::get<0>(names)[i]), "", 0);
+                                 std::move(std::get<0>(names).empty() ? "" : std::move(std::get<0>(names)[i])), "", 0);
 
         if (data.getParameters().getNumberTemplateSegments() > 1) {
             UTILS_DIE_IF(data.pull(core::GenSub::PAIR_DECODING_CASE) != core::GenConst::PAIR_SAME_RECORD,
@@ -64,12 +65,14 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     watch.reset();
     auto qvs = this->qvcoder->process(qvparam, ecigars, qvStream);
     size_t qvCounter = 0;
-    for (auto& r : ret.getData()) {
-        for (auto& s : r.getSegments()) {
-            if (!std::get<0>(qvs)[qvCounter].empty()) {
-                s.addQualities(std::move(std::get<0>(qvs)[qvCounter]));
+    if(!std::get<0>(qvs).empty()) {
+        for (auto& r : ret.getData()) {
+            for (auto& s : r.getSegments()) {
+                if (!std::get<0>(qvs)[qvCounter].empty()) {
+                    s.addQualities(std::move(std::get<0>(qvs)[qvCounter]));
+                }
+                qvCounter++;
             }
-            qvCounter++;
         }
     }
 
@@ -77,6 +80,7 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     watch.reset();
 
     ret.setStats(std::move(data.getStats()));
+    data.clear();
     flowOut(std::move(ret), id);
 }
 

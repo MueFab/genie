@@ -25,8 +25,10 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     LLState state{data.getData().front().getSegments().front().getSequence().length(),
                   data.getData().front().getNumberOfTemplateSegments() > 1,
                   core::AccessUnit(std::move(set), data.getData().size())};
+    size_t num_reads = 0;
     for (auto& r : data.getData()) {
         for (auto& s : r.getSegments()) {
+            num_reads++;
             state.streams.push(core::GenSub::RLEN, s.getSequence().length() - 1);
             if (state.readLength != s.getSequence().length()) {
                 state.readLength = 0;
@@ -43,27 +45,23 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
             state.streams.push(core::GenSub::PAIR_SAME_REC, DUMMY_POS);
         }
     }
-
-    data.getStats().addDouble("time-lowlatency", watch.check());
-    watch.reset();
+    watch.pause();
     auto qv = qvcoder->process(data);
-    data.getStats().addDouble("time-qv", watch.check());
-    watch.reset();
-    core::AccessUnit::Descriptor rname(core::GenDesc::RNAME);
-    rname = std::get<0>(namecoder->process(data));
-    data.getStats().addDouble("time-name", watch.check());
-    watch.reset();
+    auto rname = namecoder->process(data);
+    watch.resume();
     auto rawAU =
-        pack(id, data.getData().front().getSegments().front().getQualities().size(), std::move(std::get<0>(qv)), state);
+        pack(id, std::get<1>(qv).isEmpty() ? 0 : 1, std::move(std::get<0>(qv)), state);
 
     rawAU.get(core::GenDesc::QV) = std::move(std::get<1>(qv));
-    rawAU.get(core::GenDesc::RNAME) = std::move(rname);
-
-    data.getStats().addDouble("time-lowlatency", watch.check());
-    watch.reset();
+    rawAU.get(core::GenDesc::RNAME) = std::move(std::get<0>(rname));
 
     rawAU.setStats(std::move(data.getStats()));
+    rawAU.getStats().addDouble("time-lowlatency", watch.check());
+    rawAU.getStats().add(std::get<2>(qv));
+    rawAU.getStats().add(std::get<1>(rname));
     rawAU = entropyCodeAU(std::move(rawAU));
+    rawAU.setNumReads(num_reads);
+    data.getData().clear();
     flowOut(std::move(rawAU), id);
 }
 
