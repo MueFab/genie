@@ -13,19 +13,9 @@
 #include <cstdlib>
 #include <vector>
 
+#include <genie/util/bitreader.h>
 #include <fstream>
-#include "format/part2/data_unit.h"
-#include "util/bitreader.h"
 
-// typedef struct {
-//    char refUri[1024];
-//    uint8_t numberSequences;
-//    char** sequenceName;
-//    char refName[1024];
-//} Ref_information;
-//
-// Ref_information readRefInformation(char* refInfoFilePath);
-
-int createMPEGGFileNoMITFromByteStream(const char* fileName, char* outputFileName);
+int createMPEGGFileNoMITFromByteStream(const std::string& fileName, const std::string& outputFileName);
 
 #endif  // GENIE_FILEHANDLINGUTILS_H

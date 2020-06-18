@@ -144,7 +144,7 @@ Using the function pointers transform or inverseTransform and providing the righ
 you can execute the transformations.
 
 ```
-using SequenceTransform = std::function<void(const std::vector<uint64_t>& param, std::vector<gabac::DataBlock> *const)>;
+using SequenceTransform = std::function<void(const std::vector<uint64_t>& param, std::vector<util::DataBlock> *const)>;
 ```
 
 Note that all transformation work in place, so your input data streams will get discarded and replaced by the transformed streams.
@@ -182,7 +182,7 @@ enum class ContextSelectionId;
 
 ## Data block
 
-gabac::DataBlock is the central data structure of the gabac interface. A DataBlock manages a chunk of memory (currently utilizing a std::vector internally) while being aware of the word size of the data inside. The advantage over a traditional std::vector is, that you can adapt the word size dynamically in runtime without having to waste memory. A std::vector<uint64\_t> can only contain 64 bit values, a std::vector<uint32\_t> only 32 bit values. Notice that these are also different types, so a function having std::vector<uint64\_t> as parameters can not be called with std::vector<uint32\_t>. A DataBlock avoids all these problems by encapsulating the memory and retrieving a symbol of the right word size on the fly when accessing it. The DataBlock main constructor takes a size in elements and the requested word size, the remaining interface is very similar to std::vector. There are also constructors available to create a data block directly from a vector or string.
+util::DataBlock is the central data structure of the gabac interface. A util::DataBlock manages a chunk of memory (currently utilizing a std::vector internally) while being aware of the word size of the data inside. The advantage over a traditional std::vector is, that you can adapt the word size dynamically in runtime without having to waste memory. A std::vector<uint64\_t> can only contain 64 bit values, a std::vector<uint32\_t> only 32 bit values. Notice that these are also different types, so a function having std::vector<uint64\_t> as parameters can not be called with std::vector<uint32\_t>. A util::DataBlock avoids all these problems by encapsulating the memory and retrieving a symbol of the right word size on the fly when accessing it. The util::DataBlock main constructor takes a size in elements and the requested word size, the remaining interface is very similar to std::vector. There are also constructors available to create a data block directly from a vector or string.
 
 ```
 DataBlock b(100, 4);  // 100 Values with 4 bytes per value
@@ -194,10 +194,10 @@ b.push_back(42);  // Append new value
 
 ## Block stepper
 
-gabac::BlockStepper is basically a simple structure that allows you to traverse a data block as fast as possible. While you could also just use a range based loop or iterators, the block stepper is the fastest possibility.
+util::BlockStepper is basically a simple structure that allows you to traverse a data block as fast as possible. While you could also just use a range based loop or iterators, the block stepper is the fastest possibility.
 
 ```
-BlockStepper s = dataBlock.getReader();
+BlockStepper s = util::DataBlock.getReader();
 while (s.isValid()){
     uint64_t val = s.get();
     // Do something....
@@ -221,7 +221,7 @@ try {
 
 ## Streams
 
-gabac::IFileStream, gabac::OFileStream, gabac::IBufferStream, gabac::OBufferStream are custom streams implementing the std::istream and std::ostream interfaces to have GABAC interacting directly with gabac::DataBlock and c-style FILE* pointers. Hence you can read from / spill data to various different types of memory.
+gabac::IFileStream, gabac::OFileStream, gabac::IBufferStream, gabac::OBufferStream are custom streams implementing the std::istream and std::ostream interfaces to have GABAC interacting directly with util::DataBlock and c-style FILE* pointers. Hence you can read from / spill data to various different types of memory.
 ```
 gabac::OBufferStream o(&datablock):
 gabac::IFileStream i(fileptr);
