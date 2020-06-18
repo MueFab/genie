@@ -35,7 +35,6 @@ class Decoder : public core::QVDecoder {
     std::tuple<std::vector<std::string>, core::stats::PerfStats> process(const core::parameter::QualityValues& param,
                                                                          const std::vector<std::string>& ecigar_vec,
                                                                          core::AccessUnit::Descriptor& desc) override;
-
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

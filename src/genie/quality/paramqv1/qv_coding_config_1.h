@@ -28,7 +28,7 @@ namespace paramqv1 {
  */
 class QualityValues1 : public core::parameter::QualityValues {
    public:
-    static const uint8_t MODE_QV1 = 1; //!<
+    static const uint8_t MODE_QV1 = 1;  //!<
 
     /**
      *
@@ -107,8 +107,8 @@ class QualityValues1 : public core::parameter::QualityValues {
     size_t getNumSubsequences() const override;
 
    private:
-    boost::optional<ParameterSet> parameter_set_qvps; //!<
-    boost::optional<QvpsPresetId> qvps_preset_ID; //!<
+    boost::optional<ParameterSet> parameter_set_qvps;  //!<
+    boost::optional<QvpsPresetId> qvps_preset_ID;      //!<
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

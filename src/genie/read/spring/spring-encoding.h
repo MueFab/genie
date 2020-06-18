@@ -94,11 +94,11 @@ struct encoder_global {
  *
  */
 struct contig_reads {
-    std::string read;//!<
-    int64_t pos;//!<
-    char RC;//!<
-    uint32_t order;//!<
-    uint16_t read_length;//!<
+    std::string read;      //!<
+    int64_t pos;           //!<
+    char RC;               //!<
+    uint32_t order;        //!<
+    uint16_t read_length;  //!<
 };
 
 /**

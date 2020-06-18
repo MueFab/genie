@@ -54,7 +54,7 @@ enum class Platform : uint8_t {
  */
 class TagBase {
    private:
-    std::string name; //!<
+    std::string name;  //!<
 
    public:
     /**

@@ -26,7 +26,7 @@ namespace util {
  */
 class IndustrialPark {
    private:
-    std::map<std::type_index, std::unique_ptr<GenericFactory>> factories; //!<
+    std::map<std::type_index, std::unique_ptr<GenericFactory>> factories;  //!<
 
     /**
      *
@@ -58,7 +58,6 @@ class IndustrialPark {
     }
 
    public:
-
     /**
      *
      * @tparam T

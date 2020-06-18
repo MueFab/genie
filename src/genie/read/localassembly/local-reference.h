@@ -25,11 +25,11 @@ namespace localassembly {
  */
 class LocalReference {
    public:
-    uint32_t cr_buf_max_size; //!<
+    uint32_t cr_buf_max_size;  //!<
 
-    std::vector<std::string> sequences; //!<
-    std::vector<uint64_t> sequence_positions; //!<
-    uint32_t crBufSize; //!<
+    std::vector<std::string> sequences;        //!<
+    std::vector<uint64_t> sequence_positions;  //!<
+    uint32_t crBufSize;                        //!<
 
     /**
      *

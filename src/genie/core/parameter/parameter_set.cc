@@ -401,9 +401,7 @@ void ParameterSet::setParentID(uint8_t id) { parent_parameter_set_ID = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ParameterSet::setQVDepth(uint8_t qv) {
-    qv_depth = qv;
-}
+void ParameterSet::setQVDepth(uint8_t qv) { qv_depth = qv; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

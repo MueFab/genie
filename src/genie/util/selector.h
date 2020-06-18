@@ -27,9 +27,9 @@ namespace util {
 template <typename Tout>
 class SelectorTail : public genie::util::Source<Tout>, public genie::util::Drain<Tout> {
    private:
-    size_t dryCtr{}; //!<
-    size_t modNum{};//!<
-    size_t position{};//!<
+    size_t dryCtr{};    //!<
+    size_t modNum{};    //!<
+    size_t position{};  //!<
 
    public:
     /**
@@ -86,8 +86,8 @@ class SelectorTail : public genie::util::Source<Tout>, public genie::util::Drain
 template <typename Tin>
 class SelectorHead : public genie::util::Drain<Tin> {
    private:
-    std::vector<genie::util::Drain<Tin>*> mods; //!<
-    std::function<size_t(const Tin& t)> select; //!<
+    std::vector<genie::util::Drain<Tin>*> mods;  //!<
+    std::function<size_t(const Tin& t)> select;  //!<
 
    protected:
     /**
@@ -189,8 +189,8 @@ class SelectorHead : public genie::util::Drain<Tin> {
 template <typename Tin, typename Tout>
 class Selector : public genie::util::Drain<Tin>, public genie::util::Source<Tout> {
    private:
-    SelectorHead<Tin> head; //!<
-    SelectorTail<Tout> tail; //!<
+    SelectorHead<Tin> head;   //!<
+    SelectorTail<Tout> tail;  //!<
 
    public:
     /**

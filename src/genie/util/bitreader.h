@@ -24,9 +24,9 @@ namespace util {
  */
 class BitReader {
    private:
-    std::istream &istream; //!<
-    uint8_t m_heldBits; //!<
-    uint8_t m_numHeldBits; //!<
+    std::istream &istream;  //!<
+    uint8_t m_heldBits;     //!<
+    uint8_t m_numHeldBits;  //!<
 
    public:
     /**

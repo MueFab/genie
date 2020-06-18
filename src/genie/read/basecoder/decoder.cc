@@ -283,9 +283,7 @@ std::tuple<size_t, size_t> Decoder::decodeClips(std::vector<std::string> &sequen
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::clear() {
-    this->container.clear();
-}
+void Decoder::clear() { this->container.clear(); }
 
 }  // namespace basecoder
 }  // namespace read

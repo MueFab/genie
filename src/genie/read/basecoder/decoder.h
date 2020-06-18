@@ -28,13 +28,13 @@ namespace basecoder {
  */
 class Decoder {
    private:
-    core::AccessUnit container; //!<
-    uint64_t position; //!<
-    uint64_t length; //!<
+    core::AccessUnit container;  //!<
+    uint64_t position;           //!<
+    uint64_t length;             //!<
 
-    uint64_t recordCounter; //!<
+    uint64_t recordCounter;  //!<
 
-    size_t number_template_segments; //!<
+    size_t number_template_segments;  //!<
 
    public:
     /**
@@ -56,16 +56,16 @@ class Decoder {
      *
      */
     struct SegmentMeta {
-        uint64_t position; //!<
-        uint64_t length; //!<
+        uint64_t position;  //!<
+        uint64_t length;    //!<
     };
 
     /**
      *
      */
     struct SegmentDecoded {
-        core::record::Record record; //!<
-        uint64_t length; //!<
+        core::record::Record record;  //!<
+        uint64_t length;              //!<
     };
 
     /**

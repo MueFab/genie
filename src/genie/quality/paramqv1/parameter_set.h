@@ -28,7 +28,7 @@ namespace paramqv1 {
  */
 class ParameterSet {
    private:
-    std::vector<Codebook> qv_codebooks; //!<
+    std::vector<Codebook> qv_codebooks;  //!<
 
    public:
     /**

@@ -29,8 +29,8 @@ namespace sam {
  */
 class Importer : public core::FormatImporter {
    private:
-    size_t blockSize;//!<
-    Reader samReader;//!<
+    size_t blockSize;  //!<
+    Reader samReader;  //!<
 
    public:
     /**
@@ -69,8 +69,8 @@ class Importer : public core::FormatImporter {
      */
     static std::string convertCigar2ECigar(const std::string &cigar, const std::string &seq);
 
-    std::map<std::string, size_t> refs; //!<
-    size_t ref_counter; //!<
+    std::map<std::string, size_t> refs;  //!<
+    size_t ref_counter;                  //!<
 
     /**
      *

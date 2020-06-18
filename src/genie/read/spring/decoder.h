@@ -57,18 +57,18 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
  */
 class Decoder : public genie::core::ReadDecoder {
    private:
-    compression_params cp{}; //!<
-    bool combine_pairs;//!<
-    size_t num_thr;//!<
-    util::OrderedLock lock;//!<
-    std::ofstream fout_unmatched1;//!<
-    std::ofstream fout_unmatched2;//!<
+    compression_params cp{};        //!<
+    bool combine_pairs;             //!<
+    size_t num_thr;                 //!<
+    util::OrderedLock lock;         //!<
+    std::ofstream fout_unmatched1;  //!<
+    std::ofstream fout_unmatched2;  //!<
 
-    std::string file_unmatched_fastq1;//!<
-    std::string file_unmatched_fastq2;//!<
-    std::string basedir;//!<
+    std::string file_unmatched_fastq1;  //!<
+    std::string file_unmatched_fastq2;  //!<
+    std::string basedir;                //!<
 
-    std::vector<uint32_t> mate_au_id_concat, mate_record_index_concat;//!<
+    std::vector<uint32_t> mate_au_id_concat, mate_record_index_concat;  //!<
 
    public:
     /**

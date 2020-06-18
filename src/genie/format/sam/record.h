@@ -30,33 +30,33 @@ const core::CigarFormatInfo& getSAMCigarInfo();
  */
 class Record {
    private:
-    std::string qname; //!<
-    uint16_t flag;//!<
-    std::string rname;//!<
-    uint32_t pos;//!<
-    uint8_t mapq;//!<
-    std::string cigar;//!<
-    std::string rnext;//!<
-    uint32_t pnext;//!<
-    int32_t tlen;//!<
-    std::string seq;//!<
-    std::string qual;//!<
-    // TODO: Tags
+    std::string qname;  //!<
+    uint16_t flag;      //!<
+    std::string rname;  //!<
+    uint32_t pos;       //!<
+    uint8_t mapq;       //!<
+    std::string cigar;  //!<
+    std::string rnext;  //!<
+    uint32_t pnext;     //!<
+    int32_t tlen;       //!<
+    std::string seq;    //!<
+    std::string qual;   //!<
+                        // TODO: Tags
    public:
     struct Stats {
-        bool active{true}; //!<
-        size_t qname{};//!<
-        size_t flag{};//!<
-        size_t rname{};//!<
-        size_t pos{};//!<
-        size_t mapq{};//!<
-        size_t cigar{};//!<
-        size_t rnext{};//!<
-        size_t pnext{};//!<
-        size_t tlen{};//!<
-        size_t seq{};//!<
-        size_t qual{};//!<
-        size_t opt{};//!<
+        bool active{true};  //!<
+        size_t qname{};     //!<
+        size_t flag{};      //!<
+        size_t rname{};     //!<
+        size_t pos{};       //!<
+        size_t mapq{};      //!<
+        size_t cigar{};     //!<
+        size_t rnext{};     //!<
+        size_t pnext{};     //!<
+        size_t tlen{};      //!<
+        size_t seq{};       //!<
+        size_t qual{};      //!<
+        size_t opt{};       //!<
 
         /**
          *

@@ -119,7 +119,6 @@ class Dataset {
      */
     void setDatasetParameterSetsGroupId(uint8_t groupId);
 
-
     mpegg_p1::DatasetHeader dataset_header;  //!<
     // std::unique_ptr<DT_metadata> dt_metadata;     //optional
     // std::unique_ptr<DT_protection> dt_protection; //optional

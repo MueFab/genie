@@ -51,7 +51,6 @@ class Encoder : public core::QVEncoder {
     static void encodeUnalignedSegment(const core::record::Segment& s, core::AccessUnit::Descriptor& desc);
 
    public:
-
     /**
      *
      * @param rec

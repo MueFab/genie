@@ -7,8 +7,6 @@
 #ifndef SPRING_REORDER_H_
 #define SPRING_REORDER_H_
 
-
-
 #ifdef GENIE_USE_OPENMP
 
 #include <omp.h>

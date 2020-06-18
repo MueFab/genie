@@ -24,7 +24,7 @@ namespace header {
  */
 class TagNumber : public TagBase {
    private:
-    uint64_t data; //!<
+    uint64_t data;  //!<
 
    public:
     /**

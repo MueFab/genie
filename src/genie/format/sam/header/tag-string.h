@@ -24,7 +24,7 @@ namespace header {
  */
 class TagString : public TagBase {
    private:
-    std::string data; //!<
+    std::string data;  //!<
 
    public:
     /**

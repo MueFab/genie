@@ -24,10 +24,10 @@ namespace sam {
  */
 class Reader {
    private:
-    std::istream& stream;//!<
-    header::Header header;//!<
-    Record save;//!<
-    bool rec_saved;//!<
+    std::istream& stream;   //!<
+    header::Header header;  //!<
+    Record save;            //!<
+    bool rec_saved;         //!<
 
    public:
     /**

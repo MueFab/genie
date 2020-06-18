@@ -25,7 +25,7 @@ namespace header {
 template <typename Type>
 class TagObject : public TagBase {
    private:
-    Type data; //!<
+    Type data;  //!<
 
    public:
     /**

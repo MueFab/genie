@@ -27,9 +27,9 @@ namespace header {
  */
 class HeaderLine {
    private:
-    std::string name; //!<
-    std::string comment; //!<
-    std::vector<std::unique_ptr<TagBase>> tags; //!<
+    std::string name;                            //!<
+    std::string comment;                         //!<
+    std::vector<std::unique_ptr<TagBase>> tags;  //!<
 
     /**
      *
@@ -101,7 +101,7 @@ class HeaderLine {
  */
 class Header {
    private:
-    std::vector<HeaderLine> lines; //!<
+    std::vector<HeaderLine> lines;  //!<
 
     /**
      *

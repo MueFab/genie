@@ -65,7 +65,7 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     watch.reset();
     auto qvs = this->qvcoder->process(qvparam, ecigars, qvStream);
     size_t qvCounter = 0;
-    if(!std::get<0>(qvs).empty()) {
+    if (!std::get<0>(qvs).empty()) {
         for (auto& r : ret.getData()) {
             for (auto& s : r.getSegments()) {
                 if (!std::get<0>(qvs)[qvCounter].empty()) {
