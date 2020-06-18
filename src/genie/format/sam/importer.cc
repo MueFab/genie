@@ -198,9 +198,9 @@ bool Importer::pumpRetrieve(genie::core::Classifier *_classifier) {
             // LOG_TRACE << "Did not find mate";
             if ((samRecord.getFlags() & (1u << uint16_t(Record::FlagPos::SEGMENT_UNMAPPED))) ||
                 samRecord.getCigar() == "*" || samRecord.getPos() == 0 || samRecord.getRname() == "*") {
-                core::record::Record r(1, core::record::ClassType::CLASS_U, samRecord.moveQname(), "", 0);
+                core::record::Record r(1, core::record::ClassType::CLASS_U, samRecord.getQname() == "*" ? "" : samRecord.moveQname(), "", 0);
                 core::record::Segment seg(samRecord.moveSeq());
-                if (!samRecord.getQual().empty()) {
+                if (!samRecord.getQual().empty() && samRecord.getQual() != "*") {
                     seg.addQualities(samRecord.moveQual());
                 }
                 r.addSegment(std::move(seg));

@@ -234,8 +234,8 @@ std::vector<sam::Record> Exporter::convert(core::record::Record&& rec) {
     }
     if (rec.getAlignments().empty()) {
         for (auto& s : rec.getSegments()) {
-            ret.emplace_back(rec.getName(), 0, "*", 0, 255, "*", "*", 0, 0, s.getSequence(),
-                             s.getQualities().empty() ? "*" : s.getQualities().front());
+            ret.emplace_back(rec.getName().empty() ? "*" : rec.getName(), 0, "*", 0, 255, "*", "*", 0, 0,
+                             s.getSequence(), s.getQualities().empty() ? "*" : s.getQualities().front());
         }
     }
     return ret;

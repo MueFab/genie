@@ -17,8 +17,11 @@ namespace qvwriteout {
 std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(
     const core::parameter::QualityValues& param, const std::vector<std::string>& ecigar_vec,
     core::AccessUnit::Descriptor& desc) {
-    util::Watch watch;
     std::tuple<std::vector<std::string>, core::stats::PerfStats> qv;
+    if(desc.isEmpty()) {
+        return qv;
+    }
+    util::Watch watch;
     const auto& param_casted = dynamic_cast<const quality::paramqv1::QualityValues1&>(param);
     for (const auto& ecigar : ecigar_vec) {
         std::get<0>(qv).emplace_back();

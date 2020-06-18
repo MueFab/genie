@@ -57,6 +57,7 @@ void FlowGraphEncode::setReadCoder(std::unique_ptr<genie::core::ReadEncoder> dat
     readSelector.setBranch(readCoders[index].get(), readCoders[index].get(), index);
     readCoders[index]->setQVCoder(&qvSelector);
     readCoders[index]->setNameCoder(&nameSelector);
+    readCoders[index]->setEntropyCoder(&entropySelector);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

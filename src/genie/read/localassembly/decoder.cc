@@ -86,15 +86,18 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     watch.reset();
     auto qvs = this->qvcoder->process(qvparam, ecigars, qvStream);
     size_t qvCounter = 0;
-    for (auto& r : chunk.getData()) {
-        for (auto& s : r.getSegments()) {
-            if (!std::get<0>(qvs)[qvCounter].empty()) {
-                s.addQualities(std::move(std::get<0>(qvs)[qvCounter]));
+    if(!std::get<0>(qvs).empty()) {
+        for (auto& r : chunk.getData()) {
+            for (auto& s : r.getSegments()) {
+                if (!std::get<0>(qvs)[qvCounter].empty()) {
+                    s.addQualities(std::move(std::get<0>(qvs)[qvCounter]));
+                }
+                qvCounter++;
             }
-            qvCounter++;
         }
     }
     chunk.getStats().addDouble("time-qv", watch.check());
+    decoder.clear();
     flowOut(std::move(chunk), id);
 }
 

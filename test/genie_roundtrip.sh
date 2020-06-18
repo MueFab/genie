@@ -21,7 +21,7 @@ then
     echo "GENIE_PATH environment variable not set or invalid"
     exit -1
 else
-    COMMAND_ENCODE="${TIME_CMD} ${GENIE_PATH} run"
+    COMMAND_ENCODE="${TIME_CMD} ${GENIE_PATH} run --low-latency"
     COMMAND_DECODE="${TIME_CMD} ${GENIE_PATH} run"
     COMMAND_ENCODE2="${TIME_CMD} ${GENIE_PATH} run"
     COMMAND_DECODE2="${TIME_CMD} ${GENIE_PATH} run"

@@ -16,7 +16,7 @@ then
     echo "GENIE_PATH environment variable not set or invalid"
     exit -1
 else
-    COMMAND_ENCODE="${TIME_CMD} ${GENIE_PATH} run --read-ids none --qv none"
+    COMMAND_ENCODE="${TIME_CMD} ${GENIE_PATH} run"
     COMMAND_CONVERT="${TIME_CMD} ${GENIE_PATH} run"
 fi
 
