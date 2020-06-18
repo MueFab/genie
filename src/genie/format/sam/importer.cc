@@ -297,7 +297,8 @@ void Importer::addAlignmentToSameRec(std::unique_ptr<core::record::Record>& rec,
                                        sam_r2.checkFlag(Record::FlagPos::SEQ_REVERSE));
     alignment2.addMappingScore(sam_r2.getMapQ());
 
-    auto splitAlign = util::make_unique<core::record::alignment_split::SameRec>(sam_r2.getPos() - sam_r1.getPos(), std::move(alignment2));
+    auto delta = sam_r2.getPos() > sam_r1.getPos() ? sam_r2.getPos() - sam_r1.getPos() : sam_r1.getPos() - sam_r2.getPos();
+    auto splitAlign = util::make_unique<core::record::alignment_split::SameRec>(delta, std::move(alignment2));
     alignmentContainer.addAlignmentSplit(std::move(splitAlign));
 
     rec->addAlignment(refs.at(sam_r1.getRname()), std::move(alignmentContainer));
@@ -327,7 +328,7 @@ void Importer::convertPairedEndNoSplit(core::record::Chunk &template_chunk, SamR
 
         if (rec->getAlignmentSharedData().getSeqID() != refs.at(sam_r1_iter->getRname())){
             // Add more_alignment_info
-            auto leftmost_read = sam_r1_iter->getPos() < sam_r1_iter->getPos() ? sam_r1_iter : sam_r2_iter;
+            auto leftmost_read = sam_r1_iter->getPos() < sam_r2_iter->getPos() ? sam_r1_iter : sam_r2_iter;
             auto more_alignment_info = util::make_unique<core::record::alignment_external::OtherRec>(
                 leftmost_read->getPos(), refs.at(leftmost_read->getRname()));
             rec->setMoreAlignmentInfo(std::move(more_alignment_info));
@@ -605,7 +606,7 @@ void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_re
             convertPairedEndNoSplit(chunk, sam_recs_2d, refs);
         }
 
-        // Handle alignments where one of the reads is not complete (unpaired etc)
+    // Handle alignments where one of the reads is not complete (unpaired etc)
     } else {
         if (read_1_unmapped) {
             convertUnmapped(chunk, read_1, refs);

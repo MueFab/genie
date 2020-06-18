@@ -207,16 +207,40 @@ TEST(SAM, ImporterPairReadsMultipleAlignments) {  // NOLINT(cert-err-cpp)
     lines.clear();
     rtg.getTemplates(rts);
 
-    ASSERT_EQ(rts.size(), 20);
+    ASSERT_EQ(rts.size(), 1);
 
-    for (auto & rt: rts){
-        EXPECT_TRUE(rt.isValid() && rt.isPair());
-        genie::format::sam::Importer::convert(chunk, rt, reader.getRefs());
+    genie::format::sam::Importer::convert(chunk, rts.front(), reader.getRefs());
 
-        EXPECT_EQ(chunk.back().getNumberOfTemplateSegments(), 2);
-        EXPECT_EQ(chunk.back().getClassID(), genie::core::record::ClassType::CLASS_I);
-        EXPECT_EQ(chunk.back().getFlags(), 4);
-    }
+    auto rec_1 = chunk.front();
+    EXPECT_EQ(rec_1.getNumberOfTemplateSegments(), 2);
+    EXPECT_EQ(rec_1.getClassID(), genie::core::record::ClassType::CLASS_I);
+    EXPECT_EQ(rec_1.getFlags(), 4);
+    EXPECT_EQ(rec_1.getAlignments().size(), 3);
+
+    auto rec_1_alignment_1 = rec_1.getAlignments().front();
+    EXPECT_EQ(rec_1_alignment_1.getPosition(), 181879);
+    EXPECT_EQ(rec_1_alignment_1.getAlignment().getECigar(), "76=");
+    EXPECT_EQ(rec_1_alignment_1.getAlignment().getMappingScores().front(), 118);
+    EXPECT_EQ(rec_1_alignment_1.getAlignmentSplits().front(), 118);
+
+//    auto first_rec_last_alignment = rec_1.getAlignments().front();
+//    EXPECT_EQ(first_rec_last_alignment.getPosition(), 181879);
+//    EXPECT_EQ(first_rec_last_alignment.getAlignment().getECigar(), "76=");
+//    EXPECT_EQ(first_rec_last_alignment.getAlignment().getMappingScores(), 118);
+
+    EXPECT_EQ(chunk.back().getNumberOfTemplateSegments(), 2);
+    EXPECT_EQ(chunk.back().getClassID(), genie::core::record::ClassType::CLASS_I);
+    EXPECT_EQ(chunk.front().getFlags(), 4);
+    EXPECT_EQ(chunk.back().getAlignments().size(), 1);
+
+//    for (auto & rt: rts){
+//        EXPECT_TRUE(rt.isValid() && rt.isPair());
+//        genie::format::sam::Importer::convert(chunk, rt, reader.getRefs());
+//
+//        EXPECT_EQ(chunk.back().getNumberOfTemplateSegments(), 2);
+//        EXPECT_EQ(chunk.back().getClassID(), genie::core::record::ClassType::CLASS_I);
+//        EXPECT_EQ(chunk.back().getFlags(), 4);
+//    }
 
 }
 
