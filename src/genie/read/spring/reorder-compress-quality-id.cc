@@ -261,6 +261,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
 
             std::string name = outfile_quality + "." + std::to_string(block_num);
             auto raw_desc = qv_coder->process(chunk);
+            params[block_num].setQVDepth(std::get<1>(raw_desc).isEmpty() ? 0 : 1);
             stat_vec[block_num - start_block_num].add(std::get<2>(raw_desc));
             chunk.getData().clear();
             auto encoded = entropy->process(std::get<1>(raw_desc));
@@ -371,6 +372,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 }
                 auto qv_str = qv_coder->process(chunk);
                 stat_vec[block_num].add(std::get<2>(qv_str));
+                params[block_num_offset + block_num].setQVDepth(std::get<1>(qv_str).isEmpty() ? 0 : 1);
                 auto encoded = entropy->process(std::get<1>(qv_str));
                 stat_vec[block_num].add(std::get<2>(encoded));
                 params[block_num_offset + block_num].addClass(core::record::ClassType::CLASS_U,

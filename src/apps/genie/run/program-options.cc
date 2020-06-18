@@ -227,6 +227,9 @@ void ProgramOptions::validate() {
 
     std::cout << std::endl;
 
+    UTILS_DIE_IF(qvMode != "none" && qvMode != "lossless", "QVMode " + qvMode + " unknown");
+    UTILS_DIE_IF(readNameMode != "none" && readNameMode != "lossless", "Read name mode " + readNameMode + " unknown");
+
     if (std::thread::hardware_concurrency()) {
         UTILS_DIE_IF(numberOfThreads < 1 || numberOfThreads > std::thread::hardware_concurrency(),
                      "Invalid number of threads: " + std::to_string(numberOfThreads) +

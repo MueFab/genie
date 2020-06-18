@@ -223,6 +223,12 @@ class ParameterSet : public DataUnit {
      */
     void setParentID(uint8_t id);
 
+    /**
+     *
+     * @param qv
+     */
+    void setQVDepth(uint8_t qv);
+
    private:
     /**
      *

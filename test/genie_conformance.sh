@@ -7,7 +7,6 @@ INPUT_FILE_FIRST=$1
 INPUT_FILE_SECOND=$2
 TIME_PATH="/bin/time"
 
-
 TIME_CMD="${TIME_PATH} -f \"time result\ncmd:%C\nreal %es\nuser %Us \nsys  %Ss \nmemory:%MKB \ncpu %P\""
 
 # Check parameters and environment
@@ -17,7 +16,7 @@ then
     echo "GENIE_PATH environment variable not set or invalid"
     exit -1
 else
-    COMMAND_ENCODE="${TIME_CMD} ${GENIE_PATH} run"
+    COMMAND_ENCODE="${TIME_CMD} ${GENIE_PATH} run --read-ids none --qv none"
     COMMAND_CONVERT="${TIME_CMD} ${GENIE_PATH} run"
 fi
 
