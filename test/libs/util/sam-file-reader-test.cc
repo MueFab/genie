@@ -13,6 +13,11 @@
 #include <genie/format/sam/reader.h>
 #include <genie/format/sam/record.h>
 
+#include <genie/core/record/alignment_split/same-rec.h>
+#include <genie/core/record/alignment_split/other-rec.h>
+#include <genie/core/record/alignment_split/unpaired.h>
+#include <genie/core/record/alignment_external/other-rec.h>
+
 TEST(SamRecord, ParseString) {  // NOLINT(cert-err-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
@@ -62,7 +67,6 @@ TEST(SamRecord, ParseString) {  // NOLINT(cert-err-cpp)
     EXPECT_EQ(lastRec.getSeq(),
               "CTTTTGATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGCTTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAAT"
               "TTTATTGACTTAGGTCACTAAATACTTTAACCAATATAGGCATACG");
-    // TODO: Use string literal? (Yeremia)
     EXPECT_EQ(lastRec.getQual(),
               ":23>>:::CDCDC>@:@>?<59C>4:>4:4(3CACA@@CAA@@CCBDDDDCA:CA??>A>CCCCADFFECDC:FEEAEEA@GC="
               "GIIFJJJJJJIJIJJJJJJJJJJIIGIGHGJJJJJJJJGJJJJHGIJJJJIHJHHHHGFFFFF@@C");
@@ -176,14 +180,7 @@ TEST(SAM, ImporterUnmappedReads) {  // NOLINT(cert-err-cpp)
 
 }
 
-
-TEST(SAM, ImporterPairReadsMultipleAlignments) {  // NOLINT(cert-err-cpp)
-    /* Possible sources for toy example:
-        "K562_cytosol_LID8465_GEM_v3.sam",      // 0
-        "K562_cytosol_LID8465_TopHat_v2.sam",   // 1
-        "simulation.1.homoINDELs.homoCEUsnps.reads2.fq.sam.samelength.sam", // 2
-        "SRR327342.sam" // 3
-    */
+TEST(SAM, ImporterPairReadsMultipleAlignmentsSameRec) {  // NOLINT(cert-err-cpp)
 
     // Test sam file containing alignments with invalid flags
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
@@ -211,78 +208,177 @@ TEST(SAM, ImporterPairReadsMultipleAlignments) {  // NOLINT(cert-err-cpp)
 
     genie::format::sam::Importer::convert(chunk, rts.front(), reader.getRefs());
 
-    auto rec_1 = chunk.front();
-    EXPECT_EQ(rec_1.getNumberOfTemplateSegments(), 2);
-    EXPECT_EQ(rec_1.getClassID(), genie::core::record::ClassType::CLASS_I);
-    EXPECT_EQ(rec_1.getFlags(), 4);
-    EXPECT_EQ(rec_1.getAlignments().size(), 3);
+    EXPECT_EQ(chunk.size(), 4);
 
-    auto rec_1_alignment_1 = rec_1.getAlignments().front();
-    EXPECT_EQ(rec_1_alignment_1.getPosition(), 181879);
-    EXPECT_EQ(rec_1_alignment_1.getAlignment().getECigar(), "76=");
-    EXPECT_EQ(rec_1_alignment_1.getAlignment().getMappingScores().front(), 118);
-    EXPECT_EQ(rec_1_alignment_1.getAlignmentSplits().front(), 118);
+    /// First MPEG-G Record with reference sequence chr1
+    auto rec = chunk.begin();
+    EXPECT_EQ(rec->getNumberOfTemplateSegments(), 2);
+    EXPECT_EQ(rec->getSegments().size(), 2);
+    EXPECT_EQ(rec->getAlignments().size(), 3);
+    EXPECT_EQ(rec->getClassID(), genie::core::record::ClassType::CLASS_I);
+    EXPECT_EQ(rec->getFlags(), 4);
 
-//    auto first_rec_last_alignment = rec_1.getAlignments().front();
-//    EXPECT_EQ(first_rec_last_alignment.getPosition(), 181879);
-//    EXPECT_EQ(first_rec_last_alignment.getAlignment().getECigar(), "76=");
-//    EXPECT_EQ(first_rec_last_alignment.getAlignment().getMappingScores(), 118);
+    auto rec_alignment = rec->getAlignments().begin();
+    EXPECT_EQ(rec_alignment->getPosition(), 181879-1);
+    EXPECT_EQ(rec_alignment->getAlignment().getECigar(), "76=");
+    EXPECT_EQ(rec_alignment->getAlignment().getMappingScores().front(), 118);
 
-    EXPECT_EQ(chunk.back().getNumberOfTemplateSegments(), 2);
-    EXPECT_EQ(chunk.back().getClassID(), genie::core::record::ClassType::CLASS_I);
-    EXPECT_EQ(chunk.front().getFlags(), 4);
-    EXPECT_EQ(chunk.back().getAlignments().size(), 1);
+    ASSERT_EQ(rec_alignment->getAlignmentSplits().front().get()->getType(),
+              genie::core::record::AlignmentSplit::Type::SAME_REC);
 
-//    for (auto & rt: rts){
-//        EXPECT_TRUE(rt.isValid() && rt.isPair());
-//        genie::format::sam::Importer::convert(chunk, rt, reader.getRefs());
-//
-//        EXPECT_EQ(chunk.back().getNumberOfTemplateSegments(), 2);
-//        EXPECT_EQ(chunk.back().getClassID(), genie::core::record::ClassType::CLASS_I);
-//        EXPECT_EQ(chunk.back().getFlags(), 4);
-//    }
+    auto rec_alignment_split = dynamic_cast<genie::core::record::alignment_split::SameRec *>(
+        rec_alignment->getAlignmentSplits().front().get());
+    EXPECT_EQ(rec_alignment_split->getDelta(), -171338);
+    EXPECT_EQ(rec_alignment_split->getAlignment().getECigar(), "76=");
+    EXPECT_EQ(rec_alignment_split->getAlignment().getMappingScores().front(), 118);
+
+    /// Third MPEG-G Record with reference sequence GL877875.1
+    rec += 3;
+    EXPECT_EQ(rec->getNumberOfTemplateSegments(), 2);
+    EXPECT_EQ(rec->getSegments().size(), 2);
+    EXPECT_EQ(rec->getAlignments().size(), 1);
+    EXPECT_EQ(rec->getClassID(), genie::core::record::ClassType::CLASS_I);
+    EXPECT_EQ(rec->getFlags(), 4);
+
+    rec_alignment = rec->getAlignments().begin();
+    EXPECT_EQ(rec_alignment->getPosition(), 1491-1);
+    EXPECT_EQ(rec_alignment->getAlignment().getECigar(), "76=");
+    EXPECT_EQ(rec_alignment->getAlignment().getMappingScores().front(), 100);
+
+    ASSERT_EQ(rec_alignment->getAlignmentSplits().front().get()->getType(),
+              genie::core::record::AlignmentSplit::Type::SAME_REC);
+
+    rec_alignment_split = dynamic_cast<genie::core::record::alignment_split::SameRec *>(
+        rec_alignment->getAlignmentSplits().front().get());
+    EXPECT_EQ(rec_alignment_split->getDelta(), -833);
+    EXPECT_EQ(rec_alignment_split->getAlignment().getECigar(), "76=");
+    EXPECT_EQ(rec_alignment_split->getAlignment().getMappingScores().front(), 100);
 
 }
 
-//
-//TEST(SamImporter, PairedEndMultiAlignment) {  // NOLINT(cert-err-cpp)
-//    std::vector<std::string> fnames = {
+TEST(SAM, ImporterPairReadsMultipleAlignmentsSplitRec) {  // NOLINT(cert-err-cpp)
 
-//    };
-//
-//    std::ifstream f("/phys/ssd/tmp/truncated_sam/" + fnames[0]);
-//
-//    std::list<genie::format::sam::Record> unmappedRead, read1, read2;
-//    genie::format::sam::Reader reader(f);
-//
-//    reader.read(1);
-//
-//    if (reader.getSortedTemplate(unmappedRead, read1, read2)){
-//        EXPECT_EQ(unmappedRead.size(), 0);
-//        EXPECT_EQ(read1.size(), 7);
-//        EXPECT_EQ(read2.size(), 7);
-////        auto mpegRec = genie::format::sam::Importer::convert(0, std::move(read1), &read2);
-//    }
-//
-//    EXPECT_EQ(reader.getSortedTemplate(unmappedRead, read1, read2), false);
-//    EXPECT_EQ(unmappedRead.size(), 0);
-//    EXPECT_EQ(read1.size(), 0);
-//    EXPECT_EQ(read2.size(), 0);
-//}
+    // Test sam file containing alignments with invalid flags
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+    std::ifstream f(gitRootDir + "/data/sam/pair_reads_multi_alignments.sam");
+    UTILS_DIE_IF(!f.good(), "Cannot read file");
 
-//TEST(SamImporter, TruncatedSAM) {  // NOLINT(cert-err-cpp)
-//    std::vector<std::string> fnames = {
-//            "K562_cytosol_LID8465_GEM_v3.sam",      // 0
-//            "K562_cytosol_LID8465_TopHat_v2.sam",   // 1
-//            "simulation.1.homoINDELs.homoCEUsnps.reads2.fq.sam.samelength.sam", // 2
-//            "SRR327342.sam" // 3
-//    };
-//
-//    std::ifstream f("/phys/ssd/tmp/truncated_sam/" + fnames[0]);
-//
-//    genie::format::sam::Importer samImporter(512, f);
-//
-//}
+    genie::format::sam::Reader reader(f);
+
+    std::list<std::string> lines;
+    std::list<genie::format::sam::ReadTemplate> rts;
+    genie::format::sam::ReadTemplateGroup rtg;
+
+    genie::core::record::Chunk chunk;
+    {
+        while (reader.good()){
+            reader.read(lines);
+        }
+    }
+
+    rtg.addRecords(lines);
+    lines.clear();
+    rtg.getTemplates(rts);
+
+    ASSERT_EQ(rts.size(), 1);
+
+    genie::format::sam::Importer::convert(chunk, rts.front(), reader.getRefs(), true);
+
+    EXPECT_EQ(chunk.size(), 8);
+
+    /// First read template reference sequence chr1
+    /// Read 1
+    auto rec = chunk.begin();
+    {
+        EXPECT_EQ(rec->getNumberOfTemplateSegments(), 2);
+        EXPECT_EQ(rec->getSegments().size(), 1);
+        EXPECT_EQ(rec->getAlignments().size(), 3);
+        EXPECT_EQ(rec->getClassID(), genie::core::record::ClassType::CLASS_I);
+        EXPECT_EQ(rec->getFlags(), 4);
+
+        auto rec_alignment = rec->getAlignments().begin();
+        EXPECT_EQ(rec_alignment->getPosition(), 181879-1);
+        EXPECT_EQ(rec_alignment->getAlignment().getECigar(), "76=");
+        EXPECT_EQ(rec_alignment->getAlignment().getMappingScores().front(), 118);
+
+        auto rec_alignment_split = dynamic_cast<genie::core::record::alignment_split::OtherRec *>(
+            rec_alignment->getAlignmentSplits().front().get());
+        EXPECT_EQ(rec_alignment_split->getNextPos(), 10541-1);
+        EXPECT_EQ(rec_alignment_split->getNextSeq(), 0);
+
+        auto rec_more_alignment_info = dynamic_cast<const genie::core::record::alignment_external::OtherRec *>(
+            &(rec->getAlignmentExternal()));
+        EXPECT_EQ(rec_more_alignment_info->getNextPos(), 113602003-1);
+        EXPECT_EQ(rec_more_alignment_info->getNextSeq(), 1);
+    }
+
+    /// Read 2
+    rec += 1;
+    {
+        EXPECT_EQ(rec->getNumberOfTemplateSegments(), 2);
+        EXPECT_EQ(rec->getSegments().size(), 1);
+        EXPECT_EQ(rec->getAlignments().size(), 3);
+        EXPECT_EQ(rec->getClassID(), genie::core::record::ClassType::CLASS_I);
+        EXPECT_EQ(rec->getFlags(), 4);
+
+        auto rec_alignment = rec->getAlignments().begin();
+        EXPECT_EQ(rec_alignment->getPosition(), 10541-1);
+        EXPECT_EQ(rec_alignment->getAlignment().getECigar(), "76=");
+        EXPECT_EQ(rec_alignment->getAlignment().getMappingScores().front(), 118);
+
+        auto rec_alignment_split = dynamic_cast<genie::core::record::alignment_split::OtherRec *>(
+            rec_alignment->getAlignmentSplits().front().get());
+        EXPECT_EQ(rec_alignment_split->getNextPos(), 181879-1);
+        EXPECT_EQ(rec_alignment_split->getNextSeq(), 0);
+
+        auto rec_more_alignment_info = dynamic_cast<const genie::core::record::alignment_external::OtherRec *>(
+            &(rec->getAlignmentExternal()));
+        EXPECT_EQ(rec_more_alignment_info->getNextPos(), 113602258-1);
+        EXPECT_EQ(rec_more_alignment_info->getNextSeq(), 1);
+    }
+
+    /// Third MPEG-G Record with reference sequence GL877875.1
+    /// Read 1
+    rec += 5;
+    {
+        EXPECT_EQ(rec->getNumberOfTemplateSegments(), 2);
+        EXPECT_EQ(rec->getSegments().size(), 1);
+        EXPECT_EQ(rec->getAlignments().size(), 1);
+        EXPECT_EQ(rec->getClassID(), genie::core::record::ClassType::CLASS_I);
+        EXPECT_EQ(rec->getFlags(), 4);
+
+        auto rec_alignment = rec->getAlignments().begin();
+        EXPECT_EQ(rec_alignment->getPosition(), 1491-1);
+        EXPECT_EQ(rec_alignment->getAlignment().getECigar(), "76=");
+        EXPECT_EQ(rec_alignment->getAlignment().getMappingScores().front(), 100);
+
+        auto rec_alignment_split = dynamic_cast<genie::core::record::alignment_split::OtherRec *>(
+            rec_alignment->getAlignmentSplits().front().get());
+        EXPECT_EQ(rec_alignment_split->getNextPos(), 658-1);
+        EXPECT_EQ(rec_alignment_split->getNextSeq(), 3);
+    }
+
+    /// Read 2
+    rec += 1;
+    {
+        EXPECT_EQ(rec->getNumberOfTemplateSegments(), 2);
+        EXPECT_EQ(rec->getSegments().size(), 1);
+        EXPECT_EQ(rec->getAlignments().size(), 1);
+        EXPECT_EQ(rec->getClassID(), genie::core::record::ClassType::CLASS_I);
+        EXPECT_EQ(rec->getFlags(), 4);
+
+        auto rec_alignment = rec->getAlignments().begin();
+        EXPECT_EQ(rec_alignment->getPosition(), 658-1);
+        EXPECT_EQ(rec_alignment->getAlignment().getECigar(), "76=");
+        EXPECT_EQ(rec_alignment->getAlignment().getMappingScores().front(), 100);
+
+        auto rec_alignment_split = dynamic_cast<genie::core::record::alignment_split::OtherRec *>(
+            rec_alignment->getAlignmentSplits().front().get());
+        EXPECT_EQ(rec_alignment_split->getNextPos(), 1491-1);
+        EXPECT_EQ(rec_alignment_split->getNextSeq(), 3);
+    }
+
+}
 
 # if false
 TEST(SamFileReader, main) {  // NOLINT(cert-err-cpp)

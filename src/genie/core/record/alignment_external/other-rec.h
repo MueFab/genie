@@ -36,6 +36,8 @@ class OtherRec : public AlignmentExternal {
      */
     OtherRec(uint64_t _next_pos, uint16_t _next_seq_ID);
 
+
+
     /**
      *
      * @return
