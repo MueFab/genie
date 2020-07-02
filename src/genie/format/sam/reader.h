@@ -35,16 +35,44 @@ class Reader {
     std::map<std::string, std::vector<size_t>> index;
 
    public:
+    /**
+     *
+     * @param _stream
+     * @param _with_index
+     */
     explicit Reader(std::istream& _stream, bool _with_index=true);
 
+    /**
+     *
+     * @return
+     */
     const header::Header& getHeader() const;
 
+    /**
+     *
+     * @return
+     */
     std::map<std::string, size_t>& getRefs();
 
+    /**
+     * @brief Add entry to cache
+     *
+     * @param qname: QNAME of sam record
+     * @param pos: Position of sam record in the sam file
+     */
     void addCacheEntry(std::string& qname, size_t &pos);
 
+    /**
+     *
+     * @param lines
+     * @return
+     */
     bool read(std::list<std::string>& lines);
 
+    /**
+     *
+     * @return
+     */
     bool good();
 };
 
@@ -57,21 +85,73 @@ class ReadTemplateGroup{
     size_t counter;
     bool enable_window;
 
+    /**
+     *
+     * @param qname
+     */
     void addEntry(const std::string& qname);
+
+    /**
+     *
+     * @param qname
+     */
     void updateEntry(const std::string& qname);
+
+    /**
+     *
+     * @param qname
+     */
     void removeEntry(const std::string& qname);
 
    public:
+    /**
+     *
+     * @param _enable_window
+     */
     explicit ReadTemplateGroup(bool _enable_window=false);
 
+    /**
+     *
+     * @param rec
+     */
     void addRecord(Record&& rec);
+
+    /**
+     *
+     * @param recs
+     */
     void addRecords(std::list<Record>& recs);
+
+    /**
+     *
+     * @param recs
+     */
     void addRecords(std::vector<Record>& recs);
+
+    /**
+     *
+     * @param lines
+     */
     void addRecords(std::list<std::string>& lines);
 
+    /**
+     *
+     */
     void resetCounter();
 
+    /**
+     *
+     * @param t
+     * @param threshold
+     * @return
+     */
     bool getTemplate(ReadTemplate& t, const size_t& threshold=0);
+
+    /**
+     *
+     * @param ts
+     * @param threshold
+     */
     void getTemplates(std::list<ReadTemplate>& ts, const size_t& threshold=0);
 };
 
