@@ -40,12 +40,6 @@ class ClassifierBypass : public Classifier {
      *
      */
     void flush() override;
-
-    /**
-     *
-     * @return
-     */
-    bool isFlushing() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

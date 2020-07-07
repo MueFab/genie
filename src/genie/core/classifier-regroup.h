@@ -22,14 +22,46 @@ namespace core {
  */
 class ClassifierRegroup : public Classifier {
    private:
+
+    std::vector<record::Chunk> finishedChunks;
+
     using ClassBlock = std::vector<record::Chunk>;  //!<
-    using SequenceBlock = std::vector<ClassBlock>;  //!<
-    SequenceBlock classes;                          //!<
-    uint16_t currentSeq;                            //!<
+    using PairedBlock = std::vector<ClassBlock>;
+    using RefNoRefBlock = std::vector<PairedBlock>;
+    RefNoRefBlock currentChunks;                      //!<
+    ReferenceManager* refMgr;
+    std::string currentSeq;                            //!<
+    std::vector<std::pair<size_t, size_t>> currentSeqCoverage; //!<
+
     size_t auSize;                                  //!<
-    bool flushing;                                  //!<
-    bool init{true};                                //!<
     core::stats::PerfStats stats;
+
+    bool isCovered(size_t start, size_t end) const{
+        size_t position = start;
+
+        for(auto it = currentSeqCoverage.begin(); it != currentSeqCoverage.end(); ++it) {
+            if(position >= (end - 1)) {
+                return true;
+            }
+            if(position >= it->first && position < it->second) {
+                position = it->second - 1;
+                it = currentSeqCoverage.begin();
+            }
+        }
+        return false;
+    }
+
+    bool isCovered(const core::record::Record& r) const{
+        for(size_t i = 0; i <= r.getAlignments().front().getAlignmentSplits().size(); ++i) {
+            auto pos = r.getPosition(0, i);
+            if(!isCovered(pos, pos + r.getMappedLength(0, i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 
    public:
     /**
@@ -57,12 +89,6 @@ class ClassifierRegroup : public Classifier {
 
     /**
      *
-     * @return
-     */
-    bool isFlushing() const override;
-
-    /**
-     *
      * @param cigar
      * @return
      */
@@ -80,7 +106,7 @@ class ClassifierRegroup : public Classifier {
      * @param r
      * @return
      */
-    static record::ClassType classify(const record::Record& r);
+    static record::ClassType coarseClassify(const record::Record& r);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

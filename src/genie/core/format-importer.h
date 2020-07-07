@@ -28,7 +28,7 @@ namespace core {
 class FormatImporter : public util::OriginalSource, public util::Source<record::Chunk> {
    private:
     Classifier* classifier;  //!<
-
+    bool flushing{false};
    protected:
     /**
      *

@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/core/reference-manager.h>
 #include "record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -23,6 +24,7 @@ namespace record {
 class Chunk {
    private:
     std::vector<Record> data;  //!<
+    ReferenceManager::ReferenceExcerpt reference;
     stats::PerfStats stats;    //!<
    public:
     /**
@@ -30,6 +32,10 @@ class Chunk {
      * @return
      */
     std::vector<Record>& getData();
+
+    ReferenceManager::ReferenceExcerpt& getRef() {
+        return reference;
+    }
 
     /**
      *

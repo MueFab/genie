@@ -11,9 +11,11 @@
 namespace genie {
 namespace core {
 
+const uint64_t ReferenceManager::CHUNK_SIZE = 1 * 1024 * 1024;  //!
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string ReferenceManager::getSequence(const std::string& name, uint64_t _start, uint64_t _end) const {
+std::string ReferenceCollection::getSequence(const std::string& name, uint64_t _start, uint64_t _end) const {
     auto it = refs.find(name);
     if (it == refs.end()) {
         return "";
@@ -31,18 +33,21 @@ std::string ReferenceManager::getSequence(const std::string& name, uint64_t _sta
             it2 = it->second.begin();
         }
     }
+    if (position >= _end) {
+        return ret;
+    }
     return "";
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReferenceManager::registerRef(std::unique_ptr<Reference> ref) {
+void ReferenceCollection::registerRef(std::unique_ptr<Reference> ref) {
     refs[ref->getName()].emplace_back(std::move(ref));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReferenceManager::registerRef(std::vector<std::unique_ptr<Reference>>&& ref) {
+void ReferenceCollection::registerRef(std::vector<std::unique_ptr<Reference>>&& ref) {
     auto vec = std::move(ref);
     for (auto& v : vec) {
         registerRef(std::move(v));

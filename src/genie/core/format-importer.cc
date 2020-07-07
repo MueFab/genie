@@ -22,7 +22,6 @@ bool FormatImporter::pump(size_t& id, std::mutex& lock) {
     util::Section sec{};
     {
         std::unique_lock<std::mutex> guard(lock);
-        bool flushing = classifier->isFlushing();
         chunk = classifier->getChunk();
         uint32_t segment_count = 0;
         for (const auto& r : chunk.getData()) {
@@ -35,9 +34,11 @@ bool FormatImporter::pump(size_t& id, std::mutex& lock) {
             bool dataLeft = pumpRetrieve(classifier);
             if (!dataLeft && !flushing) {
                 classifier->flush();
+                flushing = true;
                 return true;
             }
             if (!dataLeft && flushing) {
+                flushing = false;
                 return false;
             }
         }

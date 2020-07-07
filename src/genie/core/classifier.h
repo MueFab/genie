@@ -41,12 +41,6 @@ class Classifier {
 
     /**
      *
-     * @return
-     */
-    virtual bool isFlushing() const = 0;
-
-    /**
-     *
      */
     virtual ~Classifier() = default;
 };
