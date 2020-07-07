@@ -11,8 +11,10 @@
 
 #include <genie/core/reference.h>
 #include <reference-source.h>
+#include <condition_variable>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <vector>
 #include "reader.h"
 
@@ -26,17 +28,8 @@ namespace fasta {
  *
  */
 class Manager : public core::ReferenceSource {
-    /**
-     *
-     */
-    struct FastaChunk {
-        std::shared_ptr<const std::string> chunk;  //!<
-    };
-    FastaReader reader;                                       //!<
-    std::map<std::string, std::vector<FastaChunk>> data;      //!<
-    std::vector<std::pair<std::string, uint64_t>> cacheList;  //!<
-    static const uint64_t CHUNK_SIZE = 1 * 1024 * 1024;       //!<
-    static const uint64_t CACHE_SIZE = 16;                    //!<
+    FastaReader reader;
+    std::mutex readerMutex;
 
     /**
      *
@@ -45,23 +38,8 @@ class Manager : public core::ReferenceSource {
      */
     Manager(std::istream& fasta, std::istream& fai);
 
-    /**
-     *
-     * @param seq
-     * @param id
-     * @return
-     */
-    std::pair<std::string, uint64_t> updateCacheList(const std::string& seq, size_t id);
-
-    /**
-     *
-     * @param sequence
-     * @param chunk
-     * @return
-     */
-    std::shared_ptr<const std::string> getChunk(const std::string& sequence, size_t chunk);
-
    public:
+
     /**
      *
      * @return

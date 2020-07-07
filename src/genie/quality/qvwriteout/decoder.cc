@@ -30,7 +30,7 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(
         }
         core::CigarTokenizer::tokenize(
             ecigar, core::getECigarInfo(),
-            [&qv, &desc, &param_casted](uint8_t cigar, const util::StringView& bs, const util::StringView&) {
+            [&qv, &desc, &param_casted](uint8_t cigar, const util::StringView& bs, const util::StringView&) -> bool{
                 uint8_t codebook = param_casted.getNumberCodeBooks() - 1;
                 if (core::getECigarInfo().lut_step_ref[cigar] ||
                     core::getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar)) {
@@ -41,6 +41,7 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(
                     uint8_t index = desc.get(codebook + 2).pull();
                     std::get<0>(qv).back().push_back(param_casted.getCodebook(codebook).getEntries()[index]);
                 }
+                return true;
             });
     }
     std::get<1>(qv).addDouble("time-qv1writeout", watch.check());

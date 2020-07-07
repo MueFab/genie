@@ -174,6 +174,9 @@ bool Importer::pumpRetrieve(genie::core::Classifier *_classifier) {
             local_ref_num = it->second;
         }
     }
+    std::string referenceName = s.front().getRname();
+    size_t auMin = s.front().getPos();
+    size_t auMax = auMin;
     std::copy(s.begin(), s.end(), std::back_inserter(samRecords));
 
     std::cout << "Read " << samRecords.size() << " SAM record(s) " << std::endl;
@@ -214,10 +217,17 @@ bool Importer::pumpRetrieve(genie::core::Classifier *_classifier) {
             chunk.getData().emplace_back(convert(local_ref_num, std::move(samRecord), &*mate));
             samRecords.erase(mate);
         }
+
+        if (!chunk.getData().back().getAlignments().empty()) {
+            auto cov = chunk.getData().back().getTemplatePosition();
+            auMin = std::min(auMin, cov.first);
+            auMax = std::max(auMax, cov.second);
+        }
     }
     if (!chunk.getData().empty()) {
         stats.addDouble("time-sam-import", watch.check());
         chunk.setStats(std::move(stats));
+        chunk.getRef() = core::ReferenceManager::ReferenceExcerpt(referenceName, auMin, auMax);
         _classifier->add(std::move(chunk));
     }
 

@@ -44,7 +44,7 @@ void Encoder::encodeAlignedSegment(const core::record::Segment& s, const std::st
     for (const auto& q : s.getQualities()) {
         core::CigarTokenizer::tokenize(
             ecigar, core::getECigarInfo(),
-            [&desc, &q](uint8_t cigar, const util::StringView& bs, const util::StringView&) {
+            [&desc, &q](uint8_t cigar, const util::StringView& bs, const util::StringView&) -> bool {
                 auto qvs = bs.deploy(q.data());
                 uint8_t codebook = core::getECigarInfo().lut_step_ref[cigar] ||
                                            core::getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar)
@@ -54,6 +54,7 @@ void Encoder::encodeAlignedSegment(const core::record::Segment& s, const std::st
                     UTILS_DIE_IF(c < 33 || c > 126, "Invalid quality score");
                     desc.get(codebook).push(c - 33);
                 }
+                return true;
             });
     }
 }

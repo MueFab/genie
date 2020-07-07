@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/core/read-encoder.h>
+#include <genie/read/basecoder/encoder.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,6 +22,24 @@ namespace refcoder {
  *
  */
 class Encoder : public core::ReadEncoder {
+   private:
+
+    struct State {
+        size_t readLength{};
+        bool pairedEnd{};
+        size_t minPos{};
+        size_t maxPos{};
+        basecoder::Encoder readCoder;
+        explicit State(size_t start) : readCoder(start){
+
+        }
+    };
+
+    void updateAssembly(const core::record::Record& r, State& state,
+                                 const core::ReferenceManager::ReferenceExcerpt& excerpt) const;
+    static const core::record::alignment_split::SameRec& getPairedAlignment(const core::record::Record& r);
+    core::AccessUnit pack(size_t id, uint16_t ref, uint8_t qv_depth,
+                                   std::unique_ptr<core::parameter::QualityValues> qvparam, core::record::ClassType type, State& state) const;
    public:
     /**
      *

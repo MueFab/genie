@@ -9,6 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/core/constants.h>
+#include <genie/core/record/alignment_split/same-rec.h>
 #include <genie/core/stats/perf-stats.h>
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
@@ -197,6 +199,57 @@ class Record {
      * @return
      */
     bool isRead1First() const;
+
+    static uint64_t getLengthOfCigar(const std::string& cigar) {
+        std::string digits;
+        size_t length = 0;
+        for (const auto& c : cigar) {
+            if (isdigit(c)) {
+                digits += c;
+                continue;
+            }
+            if (getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(c)) {
+                length++;
+                digits.clear();
+                continue;
+            }
+            if (c == '=' || c == '-' || c == '*' || c == '/' || c == '%') {
+                length += std::stoi(digits);
+                digits.clear();
+            } else {
+                digits.clear();
+            }
+        }
+        return length;
+    }
+
+    size_t getMappedLength(size_t alignment, size_t split) const {
+        if (split == 0) {
+            return getLengthOfCigar(getAlignments()[alignment].getAlignment().getECigar());
+        }
+        auto& s2 = dynamic_cast<record::alignment_split::SameRec&>(
+            *getAlignments()[alignment].getAlignmentSplits()[split - 1]);
+        return getLengthOfCigar(s2.getAlignment().getECigar());
+    }
+
+    std::pair<size_t, size_t> getTemplatePosition() const {
+        std::pair<size_t, size_t> ret = {getPosition(0, 0), getPosition(0, 0) + getMappedLength(0, 0)};
+        for (size_t i = 0; i < getAlignments().front().getAlignmentSplits().size(); ++i) {
+            auto pos = getPosition(0, i);
+            ret.first = std::min(ret.first, pos);
+            ret.second = std::max(ret.second, pos + getMappedLength(0, i));
+        }
+        return ret;
+    }
+
+    size_t getPosition(size_t alignment, size_t split) const {
+        if (split == 0) {
+            return getAlignments()[alignment].getPosition();
+        }
+        auto& s2 = dynamic_cast<record::alignment_split::SameRec&>(
+            *getAlignments()[alignment].getAlignmentSplits()[split - 1]);
+        return getAlignments()[alignment].getPosition() + s2.getDelta();
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
