@@ -14,6 +14,7 @@
 #include "format-exporter-compressed.h"
 #include "format-importer.h"
 #include "read-encoder.h"
+#include "reference-source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,6 +26,8 @@ namespace core {
  */
 class FlowGraphEncode : public FlowGraph {
     genie::util::ThreadManager mgr;                       //!<
+    std::unique_ptr<genie::core::ReferenceManager> refMgr;
+    std::vector<std::unique_ptr<genie::core::ReferenceSource>> refSources;
     std::unique_ptr<genie::core::Classifier> classifier;  //!<
 
     std::vector<std::unique_ptr<genie::core::FormatImporter>> importers;  //!<
@@ -60,6 +63,15 @@ class FlowGraphEncode : public FlowGraph {
      * @param dat
      */
     void addImporter(std::unique_ptr<genie::core::FormatImporter> dat);
+
+    void addReferenceSource(std::unique_ptr<genie::core::ReferenceSource> dat) {
+        refSources.push_back(std::move(dat));
+        refMgr->addReferenceSource(*refSources.back());
+    }
+
+    ReferenceManager& getRefMgr() {
+        return *refMgr;
+    }
 
     /**
      *

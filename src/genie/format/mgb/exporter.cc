@@ -6,6 +6,7 @@
 
 #include "exporter.h"
 #include <genie/util/watch.h>
+#include "raw_reference.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,6 +28,16 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
     data.getParameters().setID(id_ctr);
     data.getParameters().setParentID(id_ctr);
     data.getParameters().write(writer);
+    mgb::RawReference ref;
+    for(const auto& p : data.getRefToWrite()) {
+        auto string = *data.getReferenceExcerpt().getChunkAt(p.first);
+        mgb::RawReferenceSequence refseq(data.getReference(), p.first, std::move(string));
+        ref.addSequence(std::move(refseq));
+    }
+    if(!ref.isEmpty()) {
+        ref.write(writer);
+        ref = mgb::RawReference();
+    }
 
     mgb::AccessUnit au(id_ctr, id_ctr, data.getClassType(), data.getNumReads(),
                        data.getClassType() == core::record::ClassType::CLASS_U
@@ -34,7 +45,7 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
                            : core::parameter::DataUnit::DatasetType::ALIGNED,
                        32, 32, 0);
     if (au.getClass() != core::record::ClassType::CLASS_U) {
-        au.setAuTypeCfg(AuTypeCfg(id_ctr, data.getMinPos(), data.getMaxPos(), data.getParameters().getPosSize()));
+        au.setAuTypeCfg(AuTypeCfg(data.getReference(), data.getMinPos(), data.getMaxPos(), data.getParameters().getPosSize()));
     }
     for (size_t descriptor = 0; descriptor < core::getDescriptors().size(); ++descriptor) {
         if (data.get(core::GenDesc(descriptor)).isEmpty()) {

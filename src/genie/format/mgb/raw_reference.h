@@ -50,6 +50,10 @@ class RawReference : public core::parameter::DataUnit {
      * @param writer
      */
     void write(util::BitWriter& writer) const override;
+
+    bool isEmpty() const {
+        return seqs.empty();
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

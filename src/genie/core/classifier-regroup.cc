@@ -16,10 +16,13 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ClassifierRegroup::ClassifierRegroup(size_t _auSize) : auSize(_auSize) {
+ClassifierRegroup::ClassifierRegroup(size_t _auSize, ReferenceManager* rfmgr) : refMgr(rfmgr), auSize(_auSize) {
     currentChunks.resize(2);
     for (auto& c : currentChunks) {
-        c.resize((uint8_t)record::ClassType::CLASS_U);
+        c.resize(2);
+        for(auto& c2 : c) {
+            c2.resize((uint8_t)record::ClassType::CLASS_U);
+        }
     }
 }
 
@@ -36,12 +39,14 @@ record::Chunk ClassifierRegroup::getChunk() {
     return ret;
 }
 
-record::ClassType fineClassifierECigar(const std::string& ref, const std::string& seq,
+record::ClassType ClassifierRegroup::fineClassifierECigar(const std::string& ref, const std::string& seq,
                                        const std::string& ecigar) {
     record::ClassType classtype = record::ClassType::CLASS_P;
 
-    auto classChecker = [&classtype, &ref, &seq](uint8_t cigar, const util::StringView& bs,
-                                                     const util::StringView& rs) -> bool {
+    auto classChecker = [&classtype, &ref, &seq](uint8_t cigar, const util::StringView& _bs,
+                                                     const util::StringView& _rs) -> bool {
+        auto bs = _bs.deploy(seq.data());
+        auto rs = _rs.deploy(ref.data());
         // Possible mismatches not encoded in ecigar
         if (cigar == '=') {
             for (size_t i = 0; i < bs.length(); ++i) {
@@ -72,16 +77,29 @@ record::ClassType fineClassifierECigar(const std::string& ref, const std::string
     return classtype;
 }
 
-record::ClassType fineClassifierRecord(const ReferenceManager::ReferenceExcerpt& record_reference,
-                                       const core::record::Record& rec) {
+record::ClassType ClassifierRegroup::fineClassifierRecord(ReferenceManager::ReferenceExcerpt& record_reference,
+                                       const core::record::Record& rec, bool loadonly) {
     record::ClassType ret = record::ClassType::CLASS_P;
     auto segment_it = rec.getSegments().begin();
 
-    std::string ref =
-        record_reference.getString(rec.getPosition(0, 0), rec.getPosition(0, 0) + rec.getMappedLength(0, 0));
+    auto pos_s = rec.getPosition(0, 0);
+    auto pos_e = pos_s + rec.getMappedLength(0, 0);
 
-    ret = std::max(ret, fineClassifierECigar(ref, segment_it->getSequence(),
-                                             rec.getAlignments().front().getAlignment().getECigar()));
+    if(record_reference.getRefName().empty()) {
+        record_reference = ReferenceManager::ReferenceExcerpt(currentSeq, pos_s, pos_e);
+    } else {
+        record_reference.extend(pos_e);
+    }
+
+    record_reference.mapSection(pos_s, pos_e, refMgr);
+
+    std::string ref =
+        record_reference.getString(pos_s, pos_e);
+
+    if(!loadonly) {
+        ret = std::max(ret, fineClassifierECigar(ref, segment_it->getSequence(),
+                                                 rec.getAlignments().front().getAlignment().getECigar()));
+    }
 
     for (size_t i = 0; i < rec.getAlignments().front().getAlignmentSplits().size(); ++i) {
         if (ret == core::record::ClassType::CLASS_M) {
@@ -89,12 +107,22 @@ record::ClassType fineClassifierRecord(const ReferenceManager::ReferenceExcerpt&
         }
         segment_it++;
 
-        auto pos = rec.getPosition(0, i + 1);
+        pos_s = rec.getPosition(0, i + 1);
+        pos_e = pos_s + rec.getMappedLength(0, i + 1);
 
-        ref = record_reference.getString(pos, pos + rec.getMappedLength(0, i + 1));
+        record_reference.extend(pos_e);
 
-        ret = std::max(ret,
-                       fineClassifierECigar(ref, segment_it->getSequence(), dynamic_cast<core::record::alignment_split::SameRec&>(*rec.getAlignments().front().getAlignmentSplits()[i]).getAlignment().getECigar()));
+        record_reference.mapSection(pos_s, pos_e, refMgr);
+
+        ref = record_reference.getString(pos_s, pos_e);
+
+        if(!loadonly) {
+            ret = std::max(ret, fineClassifierECigar(ref, segment_it->getSequence(),
+                                                     dynamic_cast<core::record::alignment_split::SameRec&>(
+                                                         *rec.getAlignments().front().getAlignmentSplits()[i])
+                                                         .getAlignment()
+                                                         .getECigar()));
+        }
     }
 
     return ret;
@@ -104,11 +132,11 @@ record::ClassType fineClassifierRecord(const ReferenceManager::ReferenceExcerpt&
 
 void ClassifierRegroup::add(record::Chunk&& c) {
     record::Chunk chunk = std::move(c);
-    auto chunk_reference =
-        refMgr->load(chunk.getRef().getRefName(), chunk.getRef().getGlobalStart(), chunk.getRef().getGlobalEnd());
 
+    // New reference
     if (chunk.getRef().getRefName() != currentSeq) {
         currentSeq = chunk.getRef().getRefName();
+        currentSeqCoverage = refMgr->getCoverage(currentSeq);
         for (auto& refblock : currentChunks) {
             for (auto& pairblock : refblock) {
                 for (auto& classblock : pairblock) {
@@ -116,6 +144,14 @@ void ClassifierRegroup::add(record::Chunk&& c) {
                         classblock.getData().front().getClassID() == record::ClassType::CLASS_U) {
                         continue;
                     }
+                    for(size_t i = classblock.getRef().getGlobalStart() / refMgr->getChunkSize(); i <= (classblock.getRef().getGlobalEnd() - 1) / refMgr->getChunkSize(); ++i) {
+                        if(isWritten(classblock.getRef().getRefName(), i)) {
+                            continue;
+                        }
+                        refState.at(classblock.getRef().getRefName()).at(i) = 1;
+                        classblock.addRefToWrite(i * refMgr->getChunkSize(), (i + 1) * refMgr->getChunkSize());
+                    }
+                    classblock.setRefID(refMgr->ref2ID(classblock.getRef().getRefName()));
                     finishedChunks.push_back(std::move(classblock));
                 }
             }
@@ -127,18 +163,35 @@ void ClassifierRegroup::add(record::Chunk&& c) {
         bool paired = r.getNumberOfTemplateSegments() > 1;
         bool refBased = false;
 
+        ReferenceManager::ReferenceExcerpt record_reference;
+
         // Unaligned reads can't be ref based, otherwise check if reference available
         if (classtype != core::record::ClassType::CLASS_U) {
             refBased = isCovered(r);
         }
-        if (refBased && classtype == record::ClassType::CLASS_M) {
-            classtype = fineClassifierRecord(chunk_reference, r);
+        if(refBased) {
+            // Load reference and do detailed classification
+            if (classtype == record::ClassType::CLASS_M) {
+                classtype = fineClassifierRecord(record_reference, r, false);
+            } else {
+                fineClassifierRecord(record_reference, r, true);
+            }
         }
         r.setClassType(classtype);
 
-        currentChunks[refBased][paired][(uint8_t)classtype].getData().push_back(r);
-        if (currentChunks[refBased][paired][(uint8_t)classtype].getData().size() == auSize) {
-            finishedChunks.push_back(std::move(currentChunks[refBased][paired][(uint8_t)classtype]));
+        currentChunks[refBased][paired][(uint8_t)classtype - 1].getData().push_back(r);
+        currentChunks[refBased][paired][(uint8_t)classtype - 1].getRef().merge(record_reference);
+        if (currentChunks[refBased][paired][(uint8_t)classtype -1 ].getData().size() == auSize) {
+            auto& classblock = currentChunks[refBased][paired][(uint8_t)classtype - 1];
+            for(size_t i = classblock.getRef().getGlobalStart() / refMgr->getChunkSize(); i <= (classblock.getRef().getGlobalEnd() - 1) / refMgr->getChunkSize(); ++i) {
+                if(isWritten(classblock.getRef().getRefName(), i)) {
+                    continue;
+                }
+                refState.at(classblock.getRef().getRefName()).at(i) = 1;
+                classblock.addRefToWrite(i * refMgr->getChunkSize(), (i + 1) * refMgr->getChunkSize());
+            }
+            classblock.setRefID(refMgr->ref2ID(classblock.getRef().getRefName()));
+            finishedChunks.push_back(std::move(classblock));
         }
     }
 }
@@ -149,9 +202,18 @@ void ClassifierRegroup::flush() {
     for (auto& refblock : currentChunks) {
         for (auto& pairblock : refblock) {
             for (auto& classblock : pairblock) {
-                if (classblock.getData().empty()) {
+                if (classblock.getData().empty() ||
+                    classblock.getData().front().getClassID() == record::ClassType::CLASS_U) {
                     continue;
                 }
+                for(size_t i = classblock.getRef().getGlobalStart() / refMgr->getChunkSize(); i <= (classblock.getRef().getGlobalEnd() - 1) / refMgr->getChunkSize(); ++i) {
+                    if(isWritten(classblock.getRef().getRefName(), i)) {
+                        continue;
+                    }
+                    refState.at(classblock.getRef().getRefName()).at(i) = 1;
+                    classblock.addRefToWrite(i * refMgr->getChunkSize(), (i + 1) * refMgr->getChunkSize());
+                }
+                classblock.setRefID(refMgr->ref2ID(classblock.getRef().getRefName()));
                 finishedChunks.push_back(std::move(classblock));
             }
         }

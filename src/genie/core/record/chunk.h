@@ -25,6 +25,8 @@ class Chunk {
    private:
     std::vector<Record> data;  //!<
     ReferenceManager::ReferenceExcerpt reference;
+    std::vector<std::pair<size_t, size_t>> refToWrite;
+    size_t refID;
     stats::PerfStats stats;    //!<
    public:
     /**
@@ -33,8 +35,28 @@ class Chunk {
      */
     std::vector<Record>& getData();
 
-    ReferenceManager::ReferenceExcerpt& getRef() {
+    ReferenceManager::ReferenceExcerpt& getRef(){
         return reference;
+    }
+
+    void addRefToWrite(size_t start, size_t end) {
+        refToWrite.emplace_back(start, end);
+    }
+
+    const std::vector<std::pair<size_t, size_t>>& getRefToWrite() const {
+        return refToWrite;
+    }
+
+    const ReferenceManager::ReferenceExcerpt& getRef() const{
+        return reference;
+    }
+
+    void setRefID(size_t id) {
+        refID = id;
+    }
+
+    size_t getRefID() const {
+        return refID;
     }
 
     /**
