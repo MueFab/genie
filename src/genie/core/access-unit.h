@@ -14,6 +14,7 @@
 #include <numeric>
 #include "constants.h"
 #include "parameter/parameter_set.h"
+#include "reference-manager.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -483,10 +484,25 @@ class AccessUnit {
      */
     void setStats(stats::PerfStats&& _stats);
 
+    void setReference(const ReferenceManager::ReferenceExcerpt& ex, const std::vector<std::pair<size_t, size_t>>& ref2Write) {
+        reference = ex;
+        refToWrite = ref2Write;
+    }
+
+    const ReferenceManager::ReferenceExcerpt& getReferenceExcerpt() const {
+        return reference;
+    }
+
+    const std::vector<std::pair<size_t, size_t>>& getRefToWrite() const{
+        return refToWrite;
+    }
+
    private:
     std::vector<Descriptor> descriptors;  //!< @brief
     parameter::ParameterSet parameters;   //!< @brief
     stats::PerfStats stats;               //!<
+    ReferenceManager::ReferenceExcerpt reference;
+    std::vector<std::pair<size_t, size_t>> refToWrite;
 
     size_t numReads;  //!< @brief
 

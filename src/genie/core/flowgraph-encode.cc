@@ -13,7 +13,7 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FlowGraphEncode::FlowGraphEncode(size_t threads) : mgr(threads) { readSelector.setDrain(&exporterSelector); }
+FlowGraphEncode::FlowGraphEncode(size_t threads) : mgr(threads) { readSelector.setDrain(&exporterSelector); refMgr = genie::util::make_unique<ReferenceManager>(16); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -158,6 +158,7 @@ void FlowGraphEncode::setExporterSelector(const std::function<size_t(const genie
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FlowGraphEncode::run() {
+    refMgr->buildCache();
     std::vector<genie::util::OriginalSource*> imps;
     for (auto& i : importers) {
         imps.emplace_back(i.get());

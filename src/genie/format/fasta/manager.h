@@ -31,14 +31,14 @@ class Manager : public core::ReferenceSource {
     FastaReader reader;
     std::mutex readerMutex;
 
+   public:
+
     /**
      *
      * @param fasta
      * @param fai
      */
     Manager(std::istream& fasta, std::istream& fai);
-
-   public:
 
     /**
      *

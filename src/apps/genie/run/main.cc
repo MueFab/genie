@@ -5,6 +5,7 @@
  */
 
 #include <genie/core/name-encoder-none.h>
+#include <genie/format/fasta/manager.h>
 #include <genie/format/fastq/exporter.h>
 #include <genie/format/fastq/importer.h>
 #include <genie/format/mgb/exporter.h>
@@ -16,6 +17,7 @@
 #include <genie/module/default-setup.h>
 #include <genie/quality/qvwriteout/encoder.h>
 #include <genie/read/lowlatency/encoder.h>
+#include <filesystem/filesystem.hpp>
 #include <fstream>
 #include "program-options.h"
 
@@ -127,6 +129,23 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
     constexpr size_t BLOCKSIZE = 256000;
     auto flow = genie::module::buildDefaultEncoder(pOpts.numberOfThreads, pOpts.workingDirectory, BLOCKSIZE);
+    if(!pOpts.inputRefFile.empty()) {
+        if(file_extension(pOpts.inputRefFile) == "fasta") {
+            std::string fai = pOpts.inputRefFile.substr(0, pOpts.inputRefFile.size() - 5) + "fai";
+            auto fasta_file = genie::util::make_unique<std::ifstream> (pOpts.inputRefFile);
+            if(!ghc::filesystem::exists(fai)) {
+                std::cout << "Indexing " << pOpts.inputRefFile  << " ..." << std::endl;
+                std::ofstream fai_file(fai);
+                genie::format::fasta::FastaReader::index(*fasta_file, fai_file);
+            }
+            auto fai_file = genie::util::make_unique<std::ifstream>(fai);
+            inputFiles.push_back(std::move(fasta_file));
+            inputFiles.push_back(std::move(fai_file));
+            flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(**(inputFiles.rbegin() + 1), **inputFiles.rbegin()));
+        } else {
+            UTILS_DIE("Unknown reference format");
+        }
+    }
     outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile));
     flow->addExporter(genie::util::make_unique<genie::format::mgb::Exporter>(outputFiles.back().get()));
     attachImporter(*flow, pOpts, inputFiles);

@@ -35,7 +35,7 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
                                                            size_t blocksize) {
     std::unique_ptr<core::FlowGraphEncode> ret = genie::util::make_unique<core::FlowGraphEncode>(threads);
 
-    ret->setClassifier(genie::util::make_unique<genie::core::ClassifierRegroup>(blocksize));
+    ret->setClassifier(genie::util::make_unique<genie::core::ClassifierRegroup>(blocksize, &ret->getRefMgr()));
 
     ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Encoder>());
     ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Encoder>(2048, false));
@@ -49,7 +49,11 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
                 return 2;
             }
         } else {
-            return 1;
+            if(chunk.getRef().isEmpty()) {
+                return 1;
+            } else {
+                return 0;
+            }
         }
     });
 

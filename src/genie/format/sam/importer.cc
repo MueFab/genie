@@ -121,7 +121,7 @@ core::record::Record Importer::convert(uint16_t ref, sam::Record &&_r1, sam::Rec
     core::record::Alignment alignment(convertCigar2ECigar(r1.getCigar(), r1.getSeq()),
                                       r1.checkFlag(Record::FlagPos::SEQ_REVERSE));
     alignment.addMappingScore(r1.getMapQ());
-    core::record::AlignmentBox alignmentContainer(r1.getPos(), std::move(alignment));
+    core::record::AlignmentBox alignmentContainer(r1.getPos() - 1, std::move(alignment));
 
     core::record::Segment segment(r1.moveSeq());
     if (r1.getQual() != "*") {

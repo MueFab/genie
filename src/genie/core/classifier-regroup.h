@@ -32,6 +32,7 @@ class ClassifierRegroup : public Classifier {
     ReferenceManager* refMgr;
     std::string currentSeq;                            //!<
     std::vector<std::pair<size_t, size_t>> currentSeqCoverage; //!<
+    std::map<std::string, std::vector<uint8_t>> refState;
 
     size_t auSize;                                  //!<
     core::stats::PerfStats stats;
@@ -40,12 +41,12 @@ class ClassifierRegroup : public Classifier {
         size_t position = start;
 
         for(auto it = currentSeqCoverage.begin(); it != currentSeqCoverage.end(); ++it) {
-            if(position >= (end - 1)) {
-                return true;
-            }
             if(position >= it->first && position < it->second) {
                 position = it->second - 1;
                 it = currentSeqCoverage.begin();
+            }
+            if(position >= (end - 1)) {
+                return true;
             }
         }
         return false;
@@ -61,14 +62,40 @@ class ClassifierRegroup : public Classifier {
         return true;
     }
 
-
+   void push(bool refBased, bool paired, core::record::ClassType classtype, core::record::Record& r){
+       auto& chunk = currentChunks[refBased][paired][(uint8_t)classtype - 1];
+       if(chunk.getRef().getRefName().empty()) {
+           auto pos = r.getPosition(0,0);
+           chunk.getRef() = ReferenceManager::ReferenceExcerpt(currentSeq, pos, pos + r.getMappedLength(0, 0));
+           for(size_t i = 0; i < r.getAlignments().front().getAlignmentSplits().size(); ++i) {
+               pos = r.getPosition(0, 1);
+           }
+       }
+   }
 
    public:
+
+    bool isWritten(const std::string& ref, size_t index) {
+        if(refState.find(ref) == refState.end()) {
+            refState.insert(std::make_pair(ref, std::vector<uint8_t>(1, 0)));
+        }
+        if(refState.at(ref).size() <= index) {
+            refState.at(ref).resize(index + 1, 0);
+        }
+        return refState.at(ref).at(index);
+    }
+
+    record::ClassType fineClassifierECigar(const std::string& ref, const std::string& seq,
+                                                              const std::string& ecigar);
+
+    record::ClassType fineClassifierRecord(ReferenceManager::ReferenceExcerpt& record_reference,
+                                                              const core::record::Record& rec, bool loadonly);
+
     /**
      *
      * @param _auSize
      */
-    explicit ClassifierRegroup(size_t _auSize);
+    ClassifierRegroup(size_t _auSize, ReferenceManager* rfmgr);
 
     /**
      *

@@ -30,16 +30,15 @@ const core::record::alignment_split::SameRec& Encoder::getPairedAlignment(const 
 
 void Encoder::updateAssembly(const core::record::Record& r, State& state,
                              const core::ReferenceManager::ReferenceExcerpt& excerpt) const {
-    auto offset = excerpt.getGlobalStart() - r.getAlignments().front().getPosition();
     std::string ref1 = excerpt.getString(
-        offset, offset + core::record::Record::getLengthOfCigar(r.getAlignments().front().getAlignment().getECigar()));
+        r.getAlignments().front().getPosition(), r.getAlignments().front().getPosition() + core::record::Record::getLengthOfCigar(r.getAlignments().front().getAlignment().getECigar()));
     std::string ref2;
 
     if (r.getNumberOfTemplateSegments() > 1) {
         const auto& srec = getPairedAlignment(r);
         ref2 = excerpt.getString(
-            offset + srec.getDelta(),
-            offset + srec.getDelta() + core::record::Record::getLengthOfCigar(srec.getAlignment().getECigar()));
+            r.getAlignments().front().getPosition() + srec.getDelta(),
+            r.getAlignments().front().getPosition() + srec.getDelta() + core::record::Record::getLengthOfCigar(srec.getAlignment().getECigar()));
     }
 
     state.readCoder.add(r, ref1, ref2);
@@ -110,6 +109,8 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     data.getData().clear();
     rawAU = entropyCodeAU(std::move(rawAU));
     rawAU.setNumReads(read_num);
+    rawAU.setReference(data.getRef(), data.getRefToWrite());
+    rawAU.setReference(data.getRefID());
     flowOut(std::move(rawAU), id);
 }
 
