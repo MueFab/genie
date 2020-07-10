@@ -28,6 +28,7 @@ class Chunk {
     std::vector<std::pair<size_t, size_t>> refToWrite;
     size_t refID;
     stats::PerfStats stats;    //!<
+    bool referenceOnly{false};
    public:
     /**
      *
@@ -76,6 +77,22 @@ class Chunk {
      * @param s
      */
     void setStats(stats::PerfStats&& s);
+
+    /**
+     *
+     * @return
+     */
+    bool isReferenceOnly() const {
+        return referenceOnly;
+    }
+
+    /**
+     *
+     * @param ref
+     */
+    void setReferenceOnly(bool ref) {
+        referenceOnly = ref;
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

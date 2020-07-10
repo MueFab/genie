@@ -127,7 +127,7 @@ void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
 std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts,
                                                      std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    constexpr size_t BLOCKSIZE = 256000;
+    constexpr size_t BLOCKSIZE = 10000;
     auto flow = genie::module::buildDefaultEncoder(pOpts.numberOfThreads, pOpts.workingDirectory, BLOCKSIZE);
     if(!pOpts.inputRefFile.empty()) {
         if(file_extension(pOpts.inputRefFile) == "fasta") {

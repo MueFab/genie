@@ -144,15 +144,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
                         classblock.getData().front().getClassID() == record::ClassType::CLASS_U) {
                         continue;
                     }
-                    for(size_t i = classblock.getRef().getGlobalStart() / refMgr->getChunkSize(); i <= (classblock.getRef().getGlobalEnd() - 1) / refMgr->getChunkSize(); ++i) {
-                        if(isWritten(classblock.getRef().getRefName(), i)) {
-                            continue;
-                        }
-                        refState.at(classblock.getRef().getRefName()).at(i) = 1;
-                        classblock.addRefToWrite(i * refMgr->getChunkSize(), (i + 1) * refMgr->getChunkSize());
-                    }
-                    classblock.setRefID(refMgr->ref2ID(classblock.getRef().getRefName()));
-                    finishedChunks.push_back(std::move(classblock));
+                    queueFinishedChunk(classblock);
                 }
             }
         }
@@ -183,15 +175,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
         currentChunks[refBased][paired][(uint8_t)classtype - 1].getRef().merge(record_reference);
         if (currentChunks[refBased][paired][(uint8_t)classtype -1 ].getData().size() == auSize) {
             auto& classblock = currentChunks[refBased][paired][(uint8_t)classtype - 1];
-            for(size_t i = classblock.getRef().getGlobalStart() / refMgr->getChunkSize(); i <= (classblock.getRef().getGlobalEnd() - 1) / refMgr->getChunkSize(); ++i) {
-                if(isWritten(classblock.getRef().getRefName(), i)) {
-                    continue;
-                }
-                refState.at(classblock.getRef().getRefName()).at(i) = 1;
-                classblock.addRefToWrite(i * refMgr->getChunkSize(), (i + 1) * refMgr->getChunkSize());
-            }
-            classblock.setRefID(refMgr->ref2ID(classblock.getRef().getRefName()));
-            finishedChunks.push_back(std::move(classblock));
+            queueFinishedChunk(classblock);
         }
     }
 }
@@ -206,15 +190,7 @@ void ClassifierRegroup::flush() {
                     classblock.getData().front().getClassID() == record::ClassType::CLASS_U) {
                     continue;
                 }
-                for(size_t i = classblock.getRef().getGlobalStart() / refMgr->getChunkSize(); i <= (classblock.getRef().getGlobalEnd() - 1) / refMgr->getChunkSize(); ++i) {
-                    if(isWritten(classblock.getRef().getRefName(), i)) {
-                        continue;
-                    }
-                    refState.at(classblock.getRef().getRefName()).at(i) = 1;
-                    classblock.addRefToWrite(i * refMgr->getChunkSize(), (i + 1) * refMgr->getChunkSize());
-                }
-                classblock.setRefID(refMgr->ref2ID(classblock.getRef().getRefName()));
-                finishedChunks.push_back(std::move(classblock));
+                queueFinishedChunk(classblock);
             }
         }
     }

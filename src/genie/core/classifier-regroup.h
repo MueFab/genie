@@ -73,6 +73,38 @@ class ClassifierRegroup : public Classifier {
        }
    }
 
+    void queueFinishedChunk(core::record::Chunk& data) {
+        const bool RAW_REFERENCE = true;
+
+        if(!data.getRef().isEmpty()) {
+            for (size_t i = data.getRef().getGlobalStart() / refMgr->getChunkSize();
+                 i <= (data.getRef().getGlobalEnd() - 1) / refMgr->getChunkSize(); ++i) {
+                if (isWritten(data.getRef().getRefName(), i)) {
+                    continue;
+                }
+                refState.at(data.getRef().getRefName()).at(i) = 1;
+
+                if (RAW_REFERENCE) {
+                    data.addRefToWrite(i * refMgr->getChunkSize(), (i + 1) * refMgr->getChunkSize());
+                } else {
+                    core::record::Chunk refChunk;
+                    refChunk.setReferenceOnly(true);
+                    refChunk.setRefID(refMgr->ref2ID(data.getRef().getRefName()));
+                    refChunk.getRef() = data.getRef();
+                    core::record::Record rec(1, core::record::ClassType::CLASS_U, "", "", 0);
+                    std::string seq = *data.getRef().getChunkAt(i * refMgr->getChunkSize());
+                    core::record::Segment segment(std::move(seq));
+                    rec.addSegment(std::move(segment));
+                    refChunk.getData().push_back(std::move(rec));
+                    finishedChunks.push_back(std::move(refChunk));
+                }
+            }
+
+            data.setRefID(refMgr->ref2ID(data.getRef().getRefName()));
+        }
+        finishedChunks.push_back(std::move(data));
+    }
+
    public:
 
     bool isWritten(const std::string& ref, size_t index) {

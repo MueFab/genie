@@ -43,7 +43,11 @@ class ReferenceCollection {
 
     std::vector<std::pair<size_t, size_t>> getCoverage(const std::string& name) const {
         std::vector<std::pair<size_t, size_t>> ret;
-        for (const auto& s : refs.at(name)) {
+        auto it = refs.find(name);
+        if(it == refs.end()) {
+            return ret;
+        }
+        for (const auto& s : it->second) {
             ret.emplace_back(s->getStart(), s->getEnd());
         }
         return ret;
@@ -164,6 +168,14 @@ class ReferenceManager {
                     mapChunkAt(i, e.getChunkAt(i));
                 }
             }
+        }
+
+        size_t getDataStart() const {
+            return global_start - global_start % CHUNK_SIZE;
+        }
+
+        size_t getDataEnd() const {
+            return global_end - global_end % CHUNK_SIZE + CHUNK_SIZE;
         }
 
         size_t getGlobalStart() const { return global_start; }

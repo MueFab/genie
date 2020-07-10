@@ -29,6 +29,7 @@ class Encoder : public core::ReadEncoder {
         size_t readLength;         //!<
         bool pairedEnd;            //!<
         core::AccessUnit streams;  //!<
+        bool refOnly;
     };
 
    public:

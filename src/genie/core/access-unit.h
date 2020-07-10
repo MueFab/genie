@@ -497,12 +497,29 @@ class AccessUnit {
         return refToWrite;
     }
 
+    /**
+     *
+     * @return
+     */
+    bool isReferenceOnly() const {
+        return referenceOnly;
+    }
+
+    /**
+     *
+     * @param ref
+     */
+    void setReferenceOnly(bool ref) {
+        referenceOnly = ref;
+    }
+
    private:
     std::vector<Descriptor> descriptors;  //!< @brief
     parameter::ParameterSet parameters;   //!< @brief
     stats::PerfStats stats;               //!<
     ReferenceManager::ReferenceExcerpt reference;
     std::vector<std::pair<size_t, size_t>> refToWrite;
+    bool referenceOnly{false};
 
     size_t numReads;  //!< @brief
 
