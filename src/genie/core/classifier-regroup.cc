@@ -201,7 +201,7 @@ void ClassifierRegroup::flush() {
 record::ClassType ClassifierRegroup::classifyECigar(const std::string& cigar) {
     auto highest = record::ClassType::CLASS_P;
     for (const auto& c : cigar) {
-        if (c == '+' || c == '-') {
+        if (c == '+' || c == '-' || c == ')') {
             return record::ClassType::CLASS_I;
         }
         if (getAlphabetProperties(AlphabetID::ACGTN).isIncluded(c)) {
