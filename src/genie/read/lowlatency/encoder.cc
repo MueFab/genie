@@ -22,9 +22,10 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     core::record::Chunk data = std::move(t);
 
     core::parameter::ParameterSet set;
+
     LLState state{data.getData().front().getSegments().front().getSequence().length(),
                   data.getData().front().getNumberOfTemplateSegments() > 1,
-                  core::AccessUnit(std::move(set), data.getData().size())};
+                  core::AccessUnit(std::move(set), data.getData().size()), data.isReferenceOnly()};
     size_t num_reads = 0;
     for (auto& r : data.getData()) {
         for (auto& s : r.getSegments()) {
@@ -60,6 +61,8 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     rawAU.getStats().add(std::get<1>(rname));
     rawAU = entropyCodeAU(std::move(rawAU));
     rawAU.setNumReads(num_reads);
+    rawAU.setReferenceOnly(data.isReferenceOnly());
+    rawAU.setReference(data.getRefID());
     data.getData().clear();
     flowOut(std::move(rawAU), id);
 }
@@ -68,7 +71,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
 
 core::AccessUnit Encoder::pack(const util::Section& id, uint8_t qv_depth,
                                std::unique_ptr<core::parameter::QualityValues> qvparam, LLState& state) const {
-    core::parameter::DataUnit::DatasetType dataType = core::parameter::DataUnit::DatasetType::NON_ALIGNED;
+    core::parameter::DataUnit::DatasetType dataType = state.refOnly ? core::parameter::DataUnit::DatasetType::REFERENCE : core::parameter::DataUnit::DatasetType::NON_ALIGNED;
     core::parameter::ParameterSet ret(id.start, id.start, dataType, core::AlphabetID::ACGTN, state.readLength,
                                       state.pairedEnd, false, qv_depth, 0, false, false);
     ret.addClass(core::record::ClassType::CLASS_U, std::move(qvparam));

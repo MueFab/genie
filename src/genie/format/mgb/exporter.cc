@@ -39,11 +39,15 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
         ref = mgb::RawReference();
     }
 
+    auto datasetType = data.getClassType() != core::record::ClassType::CLASS_U
+              ? core::parameter::DataUnit::DatasetType::ALIGNED : (data.isReferenceOnly() ? core::parameter::DataUnit::DatasetType::REFERENCE : core::parameter::DataUnit::DatasetType::NON_ALIGNED);
+
     mgb::AccessUnit au(id_ctr, id_ctr, data.getClassType(), data.getNumReads(),
-                       data.getClassType() == core::record::ClassType::CLASS_U
-                           ? core::parameter::DataUnit::DatasetType::NON_ALIGNED
-                           : core::parameter::DataUnit::DatasetType::ALIGNED,
+                       datasetType,
                        32, 32, 0);
+    if(data.isReferenceOnly()) {
+        au.setRefCfg(RefCfg(data.getReference(), data.getReferenceExcerpt().getDataStart(), data.getReferenceExcerpt().getDataEnd() - 1, 32));
+    }
     if (au.getClass() != core::record::ClassType::CLASS_U) {
         au.setAuTypeCfg(AuTypeCfg(data.getReference(), data.getMinPos(), data.getMaxPos(), data.getParameters().getPosSize()));
     }
