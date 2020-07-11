@@ -25,9 +25,7 @@ void RawReferenceSequence::write(util::BitWriter &writer) const {
     writer.write(sequence_ID, 16);
     writer.write(seq_start, 40);
     writer.write(seq_start + ref_sequence.length(), 40);
-    for (const auto &a : ref_sequence) {
-        writer.write(a, 8);
-    }
+    writer.writeBuffer(ref_sequence.data(), ref_sequence.length());
     writer.write('\0', 8);
 }
 

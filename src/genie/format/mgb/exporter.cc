@@ -27,7 +27,6 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
     getStats().add(data.getStats());
     data.getParameters().setID(id_ctr);
     data.getParameters().setParentID(id_ctr);
-    data.getParameters().write(writer);
     mgb::RawReference ref;
     for(const auto& p : data.getRefToWrite()) {
         auto string = *data.getReferenceExcerpt().getChunkAt(p.first);
@@ -38,6 +37,12 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
         ref.write(writer);
         ref = mgb::RawReference();
     }
+
+    if(data.getNumReads() == 0) {
+        return;
+    }
+
+    data.getParameters().write(writer);
 
     auto datasetType = data.getClassType() != core::record::ClassType::CLASS_U
               ? core::parameter::DataUnit::DatasetType::ALIGNED : (data.isReferenceOnly() ? core::parameter::DataUnit::DatasetType::REFERENCE : core::parameter::DataUnit::DatasetType::NON_ALIGNED);

@@ -57,9 +57,6 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) {
     workingDirectory = "";
     app.add_option("-w,--working-dir", workingDirectory, "");
 
-    paramsetPath = "";
-    app.add_option("--param-set", paramsetPath, "");
-
     qvMode = "lossless";
     app.add_option("--qv", qvMode, "");
 
@@ -72,8 +69,8 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) {
     lowLatency = false;
     app.add_flag("--low-latency", lowLatency, "");
 
-    externalRef = false;
-    app.add_flag("--external-ref", externalRef, "");
+    refMode = "relevant";
+    app.add_option("--embedded-ref", refMode, "");
 
     numberOfThreads = std::thread::hardware_concurrency();
     app.add_option("-t,--threads", numberOfThreads, "");
@@ -228,6 +225,7 @@ void ProgramOptions::validate() {
     std::cout << std::endl;
 
     UTILS_DIE_IF(qvMode != "none" && qvMode != "lossless", "QVMode " + qvMode + " unknown");
+    UTILS_DIE_IF(refMode != "none" && refMode != "relevant" && refMode != "full", "RefMode " + refMode + " unknown");
     UTILS_DIE_IF(readNameMode != "none" && readNameMode != "lossless", "Read name mode " + readNameMode + " unknown");
 
     if (std::thread::hardware_concurrency()) {
