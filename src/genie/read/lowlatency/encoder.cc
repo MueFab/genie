@@ -21,6 +21,15 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     util::Watch watch;
     core::record::Chunk data = std::move(t);
 
+    if(data.getData().empty()) {
+        core::parameter::ParameterSet set;
+        core::AccessUnit au(std::move(set), 0);
+        au.setReference(data.getRef(), data.getRefToWrite());
+        au.setReference(data.getRefID());
+        flowOut(std::move(au), id);
+        return;
+    }
+
     core::parameter::ParameterSet set;
 
     LLState state{data.getData().front().getSegments().front().getSequence().length(),
@@ -47,13 +56,19 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
         }
     }
     watch.pause();
+
     auto qv = qvcoder->process(data);
     auto rname = namecoder->process(data);
     watch.resume();
     auto rawAU = pack(id, std::get<1>(qv).isEmpty() ? 0 : 1, std::move(std::get<0>(qv)), state);
 
-    rawAU.get(core::GenDesc::QV) = std::move(std::get<1>(qv));
-    rawAU.get(core::GenDesc::RNAME) = std::move(std::get<0>(rname));
+    if(!data.isReferenceOnly()) {
+        rawAU.get(core::GenDesc::QV) = std::move(std::get<1>(qv));
+        rawAU.get(core::GenDesc::RNAME) = std::move(std::get<0>(rname));
+    }
+    if(state.readLength != 0) {
+        rawAU.set(core::GenSub::RLEN, core::AccessUnit::Subsequence(core::GenSub::RLEN));
+    }
 
     rawAU.setStats(std::move(data.getStats()));
     rawAU.getStats().addDouble("time-lowlatency", watch.check());

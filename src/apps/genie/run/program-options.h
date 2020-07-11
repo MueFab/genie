@@ -47,7 +47,7 @@ class ProgramOptions {
     bool forceOverwrite;  //!<
 
     bool lowLatency;   //!<
-    bool externalRef;  //!<
+    std::string refMode;  //!<
 
     size_t numberOfThreads;  //!<
 

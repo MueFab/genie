@@ -32,10 +32,10 @@ namespace module {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::string& working_dir,
-                                                           size_t blocksize) {
+                                                           size_t blocksize, core::ClassifierRegroup::RefMode externalref) {
     std::unique_ptr<core::FlowGraphEncode> ret = genie::util::make_unique<core::FlowGraphEncode>(threads);
 
-    ret->setClassifier(genie::util::make_unique<genie::core::ClassifierRegroup>(blocksize, &ret->getRefMgr()));
+    ret->setClassifier(genie::util::make_unique<genie::core::ClassifierRegroup>(blocksize, &ret->getRefMgr(), externalref));
 
     ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Encoder>());
     ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Encoder>(2048, false));
@@ -43,6 +43,9 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
     ret->addReadCoder(genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, false));
     ret->addReadCoder(genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, true));
     ret->setReadCoderSelector([](const genie::core::record::Chunk& chunk) -> size_t {
+        if(chunk.getData().empty()) {
+            return 2;
+        }
         if (chunk.getData().front().getClassID() == genie::core::record::ClassType::CLASS_U) {
             if(chunk.isReferenceOnly()) {
                 return 2;

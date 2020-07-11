@@ -16,11 +16,12 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ClassifierRegroup::ClassifierRegroup(size_t _auSize, ReferenceManager* rfmgr) : refMgr(rfmgr), auSize(_auSize) {
+ClassifierRegroup::ClassifierRegroup(size_t _auSize, ReferenceManager* rfmgr, RefMode mode)
+    : refMgr(rfmgr), auSize(_auSize), refMode(mode) {
     currentChunks.resize(2);
     for (auto& c : currentChunks) {
         c.resize(2);
-        for(auto& c2 : c) {
+        for (auto& c2 : c) {
             c2.resize((uint8_t)record::ClassType::CLASS_U);
         }
     }
@@ -29,6 +30,69 @@ ClassifierRegroup::ClassifierRegroup(size_t _auSize, ReferenceManager* rfmgr) : 
 // ---------------------------------------------------------------------------------------------------------------------
 
 record::Chunk ClassifierRegroup::getChunk() {
+    if (refMode == RefMode::FULL) {
+        auto seqvec = refMgr->getSequences();
+        while (true) {
+            if (refModeFullSeqID != seqvec.size()) {
+                auto seq = seqvec.at(refModeFullSeqID);
+                auto cov_vec = refMgr->getCoverage(seq);
+                auto cov = cov_vec.at(refModeFullCovID);
+                size_t chunkOffset = cov.first / refMgr->getChunkSize();
+
+                if (!isWritten(seq, chunkOffset + refModeFullChunkID)) {
+                    core::record::Chunk refChunk;
+
+                    if (RAW_REFERENCE) {
+                        refChunk.addRefToWrite((chunkOffset + refModeFullChunkID) * refMgr->getChunkSize(),
+                                               (chunkOffset + refModeFullChunkID + 1) * refMgr->getChunkSize());
+                        refChunk.getRef() =
+                            refMgr->load(seq, (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize(),
+                                         (chunkOffset + refModeFullChunkID + 1) * refMgr->getChunkSize());
+                        refChunk.setRefID(refMgr->ref2ID(seq));
+                    } else {
+                        refChunk.setReferenceOnly(true);
+                        refChunk.setRefID(refMgr->ref2ID(seq));
+                        refChunk.getRef() =
+                            refMgr->load(seq, (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize(),
+                                         (chunkOffset + refModeFullChunkID + 1) * refMgr->getChunkSize());
+                        core::record::Record rec(1, core::record::ClassType::CLASS_U, "", "", 0);
+                        std::string ref_seq =  *refChunk.getRef().getChunkAt((chunkOffset + refModeFullChunkID) * refMgr->getChunkSize());
+                        if(ref_seq.empty()) {
+                            std::cerr << "empty" << std::endl;
+                        }
+                        core::record::Segment segment(std::move(ref_seq));
+                        rec.addSegment(std::move(segment));
+                        refChunk.getData().push_back(std::move(rec));
+                    }
+
+                    refModeFullChunkID++;
+                    if (refModeFullChunkID > ((cov.second - 1)  / refMgr->getChunkSize())) {
+                        refModeFullCovID++;
+                        refModeFullChunkID = 0;
+                    }
+                    if (refModeFullCovID == cov_vec.size()) {
+                        refModeFullCovID = 0;
+                        refModeFullSeqID++;
+                    }
+
+                    return refChunk;
+                } else {
+                    refModeFullChunkID++;
+                    if (refModeFullChunkID > ((cov.second - 1) / refMgr->getChunkSize())) {
+                        refModeFullCovID++;
+                        refModeFullChunkID = 0;
+                    }
+                    if (refModeFullCovID == cov_vec.size()) {
+                        refModeFullCovID = 0;
+                        refModeFullSeqID++;
+                    }
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
     auto ret = record::Chunk();
     if (finishedChunks.empty()) {
         return ret;
@@ -40,11 +104,11 @@ record::Chunk ClassifierRegroup::getChunk() {
 }
 
 record::ClassType ClassifierRegroup::fineClassifierECigar(const std::string& ref, const std::string& seq,
-                                       const std::string& ecigar) {
+                                                          const std::string& ecigar) {
     record::ClassType classtype = record::ClassType::CLASS_P;
 
     auto classChecker = [&classtype, &ref, &seq](uint8_t cigar, const util::StringView& _bs,
-                                                     const util::StringView& _rs) -> bool {
+                                                 const util::StringView& _rs) -> bool {
         auto bs = _bs.deploy(seq.data());
         auto rs = _rs.deploy(ref.data());
         // Possible mismatches not encoded in ecigar
@@ -78,14 +142,14 @@ record::ClassType ClassifierRegroup::fineClassifierECigar(const std::string& ref
 }
 
 record::ClassType ClassifierRegroup::fineClassifierRecord(ReferenceManager::ReferenceExcerpt& record_reference,
-                                       const core::record::Record& rec, bool loadonly) {
+                                                          const core::record::Record& rec, bool loadonly) {
     record::ClassType ret = record::ClassType::CLASS_P;
     auto segment_it = rec.getSegments().begin();
 
     auto pos_s = rec.getPosition(0, 0);
     auto pos_e = pos_s + rec.getMappedLength(0, 0);
 
-    if(record_reference.getRefName().empty()) {
+    if (record_reference.getRefName().empty()) {
         record_reference = ReferenceManager::ReferenceExcerpt(currentSeq, pos_s, pos_e);
     } else {
         record_reference.extend(pos_e);
@@ -93,10 +157,9 @@ record::ClassType ClassifierRegroup::fineClassifierRecord(ReferenceManager::Refe
 
     record_reference.mapSection(pos_s, pos_e, refMgr);
 
-    std::string ref =
-        record_reference.getString(pos_s, pos_e);
+    std::string ref = record_reference.getString(pos_s, pos_e);
 
-    if(!loadonly) {
+    if (!loadonly) {
         ret = std::max(ret, fineClassifierECigar(ref, segment_it->getSequence(),
                                                  rec.getAlignments().front().getAlignment().getECigar()));
     }
@@ -116,7 +179,7 @@ record::ClassType ClassifierRegroup::fineClassifierRecord(ReferenceManager::Refe
 
         ref = record_reference.getString(pos_s, pos_e);
 
-        if(!loadonly) {
+        if (!loadonly) {
             ret = std::max(ret, fineClassifierECigar(ref, segment_it->getSequence(),
                                                      dynamic_cast<core::record::alignment_split::SameRec&>(
                                                          *rec.getAlignments().front().getAlignmentSplits()[i])
@@ -161,7 +224,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
         if (classtype != core::record::ClassType::CLASS_U) {
             refBased = isCovered(r);
         }
-        if(refBased) {
+        if (refBased) {
             // Load reference and do detailed classification
             if (classtype == record::ClassType::CLASS_M) {
                 classtype = fineClassifierRecord(record_reference, r, false);
@@ -173,7 +236,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
 
         currentChunks[refBased][paired][(uint8_t)classtype - 1].getData().push_back(r);
         currentChunks[refBased][paired][(uint8_t)classtype - 1].getRef().merge(record_reference);
-        if (currentChunks[refBased][paired][(uint8_t)classtype -1 ].getData().size() == auSize) {
+        if (currentChunks[refBased][paired][(uint8_t)classtype - 1].getData().size() == auSize) {
             auto& classblock = currentChunks[refBased][paired][(uint8_t)classtype - 1];
             queueFinishedChunk(classblock);
         }
@@ -201,7 +264,7 @@ void ClassifierRegroup::flush() {
 record::ClassType ClassifierRegroup::classifyECigar(const std::string& cigar) {
     auto highest = record::ClassType::CLASS_P;
     for (const auto& c : cigar) {
-        if (c == '+' || c == '-' || c == ')') {
+        if (c == '+' || c == '-' || c == ')' || c == ']') {
             return record::ClassType::CLASS_I;
         }
         if (getAlphabetProperties(AlphabetID::ACGTN).isIncluded(c)) {

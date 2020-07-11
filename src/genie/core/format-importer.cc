@@ -27,7 +27,10 @@ bool FormatImporter::pump(size_t& id, std::mutex& lock) {
         for (const auto& r : chunk.getData()) {
             segment_count += r.getSegments().size();
         }
-        if (!chunk.getData().empty()) {
+        if(chunk.getData().empty()) {
+            segment_count = 1;
+        }
+        if (!chunk.getData().empty() || !chunk.getRefToWrite().empty()) {
             sec = {id, segment_count, true};
             id += segment_count;
         } else {
@@ -43,7 +46,7 @@ bool FormatImporter::pump(size_t& id, std::mutex& lock) {
             }
         }
     }
-    if (!chunk.getData().empty()) {
+    if (!chunk.getData().empty() || !chunk.getRefToWrite().empty()) {
         Source<record::Chunk>::flowOut(std::move(chunk), sec);
     }
     return true;

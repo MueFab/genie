@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/core/classifier-regroup.h>
 #include <genie/core/flowgraph-convert.h>
 #include <genie/core/flowgraph-decode.h>
 #include <genie/core/flowgraph-encode.h>
@@ -24,7 +25,7 @@ namespace module {
  * @param working_dir
  * @return
  */
-std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::string& working_dir, size_t);
+std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::string& working_dir, size_t, core::ClassifierRegroup::RefMode externalref);
 
 /**
  *

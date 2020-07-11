@@ -128,7 +128,15 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
                                                      std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
     constexpr size_t BLOCKSIZE = 10000;
-    auto flow = genie::module::buildDefaultEncoder(pOpts.numberOfThreads, pOpts.workingDirectory, BLOCKSIZE);
+    genie::core::ClassifierRegroup::RefMode mode;
+    if(pOpts.refMode == "none") {
+        mode = genie::core::ClassifierRegroup::RefMode::NONE;
+    } else if(pOpts.refMode == "full") {
+        mode = genie::core::ClassifierRegroup::RefMode::FULL;
+    } else {
+        mode = genie::core::ClassifierRegroup::RefMode::RELEVANT;
+    }
+    auto flow = genie::module::buildDefaultEncoder(pOpts.numberOfThreads, pOpts.workingDirectory, BLOCKSIZE, mode);
     if(!pOpts.inputRefFile.empty()) {
         if(file_extension(pOpts.inputRefFile) == "fasta") {
             std::string fai = pOpts.inputRefFile.substr(0, pOpts.inputRefFile.size() - 5) + "fai";

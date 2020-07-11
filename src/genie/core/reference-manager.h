@@ -211,7 +211,7 @@ class ReferenceManager {
             : ref_name(std::move(name)),
               global_start(start),
               global_end(end),
-              data(((global_end - global_end % CHUNK_SIZE + CHUNK_SIZE) - (global_start - global_start % CHUNK_SIZE) -
+              data((((global_end - 1) - (global_end - 1) % CHUNK_SIZE + CHUNK_SIZE) - (global_start - global_start % CHUNK_SIZE) -
                     1) / CHUNK_SIZE +
                        1,
                    undef_page()) {}
