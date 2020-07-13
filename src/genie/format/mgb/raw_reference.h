@@ -34,6 +34,14 @@ class RawReference : public core::parameter::DataUnit {
      */
     RawReference();
 
+    RawReference(util::BitReader& reader) : DataUnit(DataUnitType::RAW_REFERENCE), seqs() {
+        reader.read<uint64_t>();
+        auto count = reader.read<uint16_t>();
+        for(size_t i = 0; i < count; ++i) {
+            seqs.emplace_back(reader);
+        }
+    }
+
     /**
      *
      */

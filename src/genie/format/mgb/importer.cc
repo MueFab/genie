@@ -16,7 +16,7 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Importer::Importer(std::istream& _file, genie::core::stats::PerfStats* _stats) : reader(_file), stats(_stats) {}
+Importer::Importer(std::istream& _file, core::ReferenceManager* manager, genie::core::stats::PerfStats* _stats) : reader(_file), stats(_stats), ref_manager(manager) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -51,8 +51,17 @@ bool Importer::pump(size_t& id, std::mutex&) {
     }
     set.setNumReads(unit->getReadCount());
     set.setClassType(unit->getClass());
-    unit.reset();
     set.getStats().addDouble("time-mgb-import", watch.check());
+    if(unit->getClass() != core::record::ClassType::CLASS_U) {
+        auto seqs = ref_manager->getSequences();
+        auto cur_seq = ref_manager->ID2Ref(unit->getAlignmentInfo().getRefID());
+        if (std::find(seqs.begin(), seqs.end(), cur_seq) != seqs.end()) {
+            set.setReference(ref_manager->load(cur_seq, unit->getAlignmentInfo().getStartPos(),
+                                               unit->getAlignmentInfo().getEndPos() + 1),
+                             {});
+        }
+    }
+    unit.reset();
     flowOut(std::move(set), sec);
     return true;
 }
