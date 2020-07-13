@@ -55,7 +55,9 @@ size_t AccessUnit::Subsequence::getNumSymbols() const { return data.size(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t AccessUnit::Subsequence::pull() {
-    UTILS_DIE_IF(end(), "Tried to read descriptor that has already ended");
+    if(end()) {
+        UTILS_DIE( "Tried to read descriptor that has already ended");
+    }
     return data.get(position++);
 }
 
@@ -179,10 +181,8 @@ void AccessUnit::Subsequence::write(util::BitWriter &writer) const {
 
 AccessUnit::Subsequence::Subsequence(GenSubIndex _id, size_t size, util::BitReader &reader)
     : data(0, 1), id(std::move(_id)), numSymbols(0) {
-    data.reserve(size);
-    for (size_t i = 0; i < size; ++i) {
-        data.push_back(reader.read(8));
-    }
+    data.resize(size);
+    reader.readBuffer((char*)data.getData(), size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

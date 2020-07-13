@@ -35,6 +35,7 @@ class Importer : public core::FormatImporterCompressed {
     std::mutex lock;                                                //!<
     genie::core::stats::PerfStats* stats;                           //!<
     mgb::DataUnitFactory factory;                                   //!<
+    core::ReferenceManager* ref_manager;
 
    public:
     /**
@@ -42,7 +43,7 @@ class Importer : public core::FormatImporterCompressed {
      * @param _file
      * @param _stats
      */
-    explicit Importer(std::istream& _file, genie::core::stats::PerfStats* _stats = nullptr);
+    explicit Importer(std::istream& _file, core::ReferenceManager* manager, genie::core::stats::PerfStats* _stats = nullptr);
 
     /**
      *

@@ -29,6 +29,9 @@ class FlowGraphDecode : public FlowGraph {
     genie::util::ThreadManager mgr;                                                 //!<
     std::vector<std::unique_ptr<genie::core::FormatImporterCompressed>> importers;  //!<
 
+    std::unique_ptr<genie::core::ReferenceManager> refMgr;
+    std::vector<std::unique_ptr<genie::core::ReferenceSource>> refSources;
+
     std::vector<std::unique_ptr<genie::core::ReadDecoder>> readCoders;                        //!<
     genie::util::Selector<genie::core::AccessUnit, genie::core::record::Chunk> readSelector;  //!<
 
@@ -45,6 +48,16 @@ class FlowGraphDecode : public FlowGraph {
     genie::util::SelectorHead<genie::core::record::Chunk> exporterSelector;  //!<
 
    public:
+
+    void addReferenceSource(std::unique_ptr<genie::core::ReferenceSource> dat) {
+        refSources.push_back(std::move(dat));
+        refMgr->addReferenceSource(*refSources.back());
+    }
+
+    ReferenceManager& getRefMgr() {
+        return *refMgr;
+    }
+
     /**
      *
      * @param threads

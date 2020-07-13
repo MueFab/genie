@@ -292,7 +292,9 @@ class ReferenceManager {
         }
 
         std::string getString(size_t start, size_t end) const {
-            UTILS_DIE_IF(start < global_start || end > global_end, "String can't be bigger than reference excerpt");
+            if(start < global_start || end > global_end) {
+                UTILS_DIE("String can't be bigger than reference excerpt");
+            }
             auto stepper = getStepper();
             std::string ret;
             stepper.inc(start - global_start);

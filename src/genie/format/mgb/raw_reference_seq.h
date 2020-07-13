@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 #include <memory>
 #include <string>
@@ -37,6 +38,15 @@ class RawReferenceSequence {
      * @param _ref_sequence
      */
     RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_start, std::string &&_ref_sequence);
+
+
+    explicit RawReferenceSequence(util::BitReader& reader) {
+        sequence_ID = reader.read<uint16_t>();
+        seq_start = reader.read(40);
+        size_t seq_end = reader.read(40);
+        ref_sequence.resize(seq_end - seq_start + 1);
+        reader.readBuffer(&ref_sequence[0], seq_end - seq_start + 1);
+    }
 
     /**
      *

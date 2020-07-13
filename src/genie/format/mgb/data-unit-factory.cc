@@ -6,6 +6,7 @@
 
 #include "data-unit-factory.h"
 #include "access_unit.h"
+#include "raw_reference.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,7 +29,8 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
         }
         switch (type) {
             case core::parameter::DataUnit::DataUnitType::RAW_REFERENCE: {
-                UTILS_DIE("DataUnitFactory RAW_REFERENCE not yet supported!");
+                auto r = RawReference(bitReader);
+                break;
             }
             case core::parameter::DataUnit::DataUnitType::PARAMETER_SET: {
                 auto p = core::parameter::ParameterSet(bitReader);

@@ -42,7 +42,7 @@ class Decoder {
      * @param au
      * @param segments
      */
-    Decoder(core::AccessUnit &&au, size_t segments);
+    Decoder(core::AccessUnit &&au, size_t segments,  size_t pos = 0);
 
     /**
      *

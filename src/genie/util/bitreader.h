@@ -86,6 +86,10 @@ class BitReader {
      * @return
      */
     bool isGood() const;
+
+    void readBuffer(void *in, size_t size) {
+        istream.read((char*)in, size);
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
