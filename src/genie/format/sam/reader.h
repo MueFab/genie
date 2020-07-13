@@ -36,9 +36,10 @@ class Reader {
 
    public:
     /**
+     * @brief Initialize Reader given istream, allows index to group reads that belongs to the same template
      *
-     * @param _stream
-     * @param _with_index
+     * @param _stream: Input stream of sam records
+     * @param _with_index: 
      */
     explicit Reader(std::istream& _stream, bool _with_index=true);
 

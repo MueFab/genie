@@ -166,12 +166,16 @@ std::unique_ptr<core::record::Record> Importer::convertSam2SameRec(Record &sam_r
     core::record::Segment segment(sam_r1.moveSeq());
     if (sam_r1.getQual() != "*") {
         segment.addQualities(sam_r1.moveQual());
+    } else {
+        segment.addQualities(std::move(std::string("\0", 1)));
     }
     rec->addSegment(std::move(segment));
 
     core::record::Segment segment2(sam_r2.moveSeq());
     if (sam_r2.getQual() != "*") {
         segment2.addQualities(sam_r2.moveQual());
+    } else {
+        segment2.addQualities(std::move(std::string("\0", 1)));
     }
     rec->addSegment(std::move(segment2));
 
@@ -235,6 +239,7 @@ void Importer::convertPairedEndNoSplit(core::record::Chunk &template_chunk, SamR
             rec->setMoreAlignmentInfo(std::move(more_alignment_info));
 
             template_chunk.push_back(std::move(*rec));
+            rec.release();
 
             // Retrieve back Sequence from the primary line due to SEQ and QUAL are set to "*"
             // See "Recommended Practice for SAM Format" in SAM Format documentation for more information
@@ -255,6 +260,7 @@ void Importer::convertPairedEndNoSplit(core::record::Chunk &template_chunk, SamR
 
     UTILS_DIE_IF(rec == nullptr, "Empty MPEG-G record");
     template_chunk.push_back(std::move(*rec));
+    rec.release();
 
     sam_recs_2d.front().clear();
     sam_recs_2d.back().clear();
@@ -271,6 +277,8 @@ std::unique_ptr<core::record::Record> Importer::convertSam2SplitRec(Record &sam_
     core::record::Segment segment(sam_r1.moveSeq());
     if (sam_r1.getQual() != "*") {
         segment.addQualities(sam_r1.moveQual());
+    } else {
+        segment.addQualities(std::move(std::string("\0", 1)));
     }
     rec->addSegment(std::move(segment));
 
@@ -338,6 +346,7 @@ void Importer::convertPairedEndSplitPair(core::record::Chunk &template_chunk, Sa
                     rec_1->setMoreAlignmentInfo(std::move(more_alignment_info));
 
                     template_chunk.push_back(std::move(*rec_1));
+                    rec_1.release();
 
                     // Retrieve back Sequence from the primary line due to SEQ and QUAL are set to "*"
                     // See "Recommended Practice for SAM Format" in SAM Format documentation for more information
@@ -369,6 +378,7 @@ void Importer::convertPairedEndSplitPair(core::record::Chunk &template_chunk, Sa
                     rec_2->setMoreAlignmentInfo(std::move(more_alignment_info));
 
                     template_chunk.push_back(std::move(*rec_2));
+                    rec_2.release();
 
                     // Retrieve back Sequence from the primary line due to SEQ and QUAL are set to "*"
                     // See "Recommended Practice for SAM Format" in SAM Format documentation for more information
@@ -390,10 +400,12 @@ void Importer::convertPairedEndSplitPair(core::record::Chunk &template_chunk, Sa
 
     if (rec_1 != nullptr){
         template_chunk.push_back(std::move(*rec_1));
+        rec_1.release();
     }
 
     if (rec_2 != nullptr){
         template_chunk.push_back(std::move(*rec_2));
+        rec_2.release();
     }
 
     sam_recs_2d.front().clear();
@@ -416,7 +428,10 @@ void Importer::convertUnmapped(core::record::Chunk &chunk, SamRecords &sam_recs,
 
     core::record::Segment segment(sam_rec.moveSeq());
     if (sam_rec.getQual() != "*") {
+//        UTILS_DIE("Unmapped read has quality value!");
         segment.addQualities(sam_rec.moveQual());
+    } else {
+        segment.addQualities("\0");
     }
     rec.addSegment(std::move(segment));
 
@@ -451,6 +466,8 @@ void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords &sam_recs
     core::record::Segment segment(sam_rec.moveSeq());
     if (sam_rec.getQual() != "*") {
         segment.addQualities(sam_rec.moveQual());
+    } else {
+        segment.addQualities("\0");
     }
     rec.addSegment(std::move(segment));
 
