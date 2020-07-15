@@ -66,7 +66,6 @@ class FlowGraphEncode : public FlowGraph {
 
     void addReferenceSource(std::unique_ptr<genie::core::ReferenceSource> dat) {
         refSources.push_back(std::move(dat));
-        refMgr->addReferenceSource(*refSources.back());
     }
 
     ReferenceManager& getRefMgr() {

@@ -27,8 +27,23 @@ class BitReader {
     std::istream &istream;  //!<
     uint8_t m_heldBits;     //!<
     uint8_t m_numHeldBits;  //!<
+    uint64_t bitsRead;
 
    public:
+    uint64_t getBitsRead() const { return bitsRead; }
+
+    bool isAligned() const {
+        return !m_numHeldBits;
+    }
+
+    size_t getPos() const {
+        return istream.tellg();
+    }
+
+    void setPos(size_t pos) const {
+        istream.seekg(pos, std::ios_base::beg);
+    }
+
     /**
      *
      * @param _istream
@@ -87,8 +102,11 @@ class BitReader {
      */
     bool isGood() const;
 
+    void skip(size_t bytes) { istream.seekg(bytes, std::ios_base::cur); }
+
     void readBuffer(void *in, size_t size) {
-        istream.read((char*)in, size);
+        bitsRead += size * 8;
+        istream.read((char *)in, size);
     }
 };
 

@@ -19,7 +19,7 @@ namespace lowlatency {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
+core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
     util::Watch watch;
     core::record::Chunk ret;
     core::AccessUnit data = std::move(t);
@@ -81,7 +81,16 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
 
     ret.setStats(std::move(data.getStats()));
     data.clear();
-    flowOut(std::move(ret), id);
+    return ret;
+}
+
+
+void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
+    flowOut(decode_common(std::move(t)), id);
+}
+
+std::string Decoder::decode(core::AccessUnit&& t) {
+    return decode_common(std::move(t)).getData().front().getSegments().front().getSequence();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

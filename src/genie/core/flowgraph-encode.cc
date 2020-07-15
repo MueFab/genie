@@ -158,7 +158,6 @@ void FlowGraphEncode::setExporterSelector(const std::function<size_t(const genie
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FlowGraphEncode::run() {
-    refMgr->buildCache();
     std::vector<genie::util::OriginalSource*> imps;
     for (auto& i : importers) {
         imps.emplace_back(i.get());

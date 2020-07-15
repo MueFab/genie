@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/core/read-decoder.h>
+#include <ref-decoder.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,9 +21,13 @@ namespace lowlatency {
 /**
  *
  */
-class Decoder : public core::ReadDecoder {
+class Decoder : public core::ReadDecoder, public core::RefDecoder {
    private:
    public:
+
+    std::string decode(core::AccessUnit&& t) override;
+    core::record::Chunk decode_common(core::AccessUnit&& t);
+
     /**
      *
      * @param t
