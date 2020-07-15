@@ -10,13 +10,13 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/util/make-unique.h>
+#include <algorithm>
 #include <deque>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <utility>
 #include <vector>
-#include "reference-source.h"
 #include "reference.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ class ReferenceCollection {
     std::vector<std::pair<size_t, size_t>> getCoverage(const std::string& name) const {
         std::vector<std::pair<size_t, size_t>> ret;
         auto it = refs.find(name);
-        if(it == refs.end()) {
+        if (it == refs.end()) {
             return ret;
         }
         for (const auto& s : it->second) {
@@ -114,10 +114,18 @@ class ReferenceManager {
 
    public:
 
-    size_t ref2ID(const std::string& ref) const {
+    void validateRefID(size_t id) {
+        std::unique_lock<std::mutex> lock2(cacheInfoLock);
+        for(size_t i = 0; i < id; ++i) {
+            data[std::to_string(i)];
+        }
+    }
+
+    size_t ref2ID(const std::string& ref) {
+        std::unique_lock<std::mutex> lock2(cacheInfoLock);
         size_t ctr = 0;
-        for(const auto& r : data) {
-            if(r.first == ref) {
+        for (const auto& r : data) {
+            if (r.first == ref) {
                 return ctr;
             }
             ctr++;
@@ -125,18 +133,17 @@ class ReferenceManager {
         UTILS_DIE("Unknown reference");
     }
 
-    std::string ID2Ref(size_t id) const {
+    std::string ID2Ref(size_t id) {
+        std::unique_lock<std::mutex> lock2(cacheInfoLock);
         size_t ctr = 0;
-        for(const auto& r : data) {
-            if(id == ctr) {
+        for (const auto& r : data) {
+            if (id == ctr) {
                 return r.first;
             }
             ctr++;
         }
         UTILS_DIE("Unknown reference");
     }
-
-    void addReferenceSource(ReferenceSource& source) { mgr.registerRef(source.generateRefHandles()); }
 
     static size_t getChunkSize() { return CHUNK_SIZE; }
 
@@ -170,13 +177,9 @@ class ReferenceManager {
             }
         }
 
-        size_t getDataStart() const {
-            return global_start - global_start % CHUNK_SIZE;
-        }
+        size_t getDataStart() const { return global_start - global_start % CHUNK_SIZE; }
 
-        size_t getDataEnd() const {
-            return global_end - global_end % CHUNK_SIZE + CHUNK_SIZE;
-        }
+        size_t getDataEnd() const { return global_end - global_end % CHUNK_SIZE + CHUNK_SIZE; }
 
         size_t getGlobalStart() const { return global_start; }
 
@@ -211,8 +214,9 @@ class ReferenceManager {
             : ref_name(std::move(name)),
               global_start(start),
               global_end(end),
-              data((((global_end - 1) - (global_end - 1) % CHUNK_SIZE + CHUNK_SIZE) - (global_start - global_start % CHUNK_SIZE) -
-                    1) / CHUNK_SIZE +
+              data((((global_end - 1) - (global_end - 1) % CHUNK_SIZE + CHUNK_SIZE) -
+                    (global_start - global_start % CHUNK_SIZE) - 1) /
+                           CHUNK_SIZE +
                        1,
                    undef_page()) {}
 
@@ -292,7 +296,7 @@ class ReferenceManager {
         }
 
         std::string getString(size_t start, size_t end) const {
-            if(start < global_start || end > global_end) {
+            if (start < global_start || end > global_end) {
                 UTILS_DIE("String can't be bigger than reference excerpt");
             }
             auto stepper = getStepper();
@@ -308,27 +312,19 @@ class ReferenceManager {
 
     explicit ReferenceManager(size_t csize) : cacheSize(csize) {}
 
-    void buildCache() {
-        std::map<std::string, size_t> lengths;
-        data.clear();
 
-        for (const auto& s : mgr.getSequences()) {
-            size_t max = 0;
-            auto cov = mgr.getCoverage(s);
-            for (const auto& p : cov) {
-                max = std::max(max, p.second);
-            }
-            lengths.insert(std::make_pair(s, max));
+    void addRef(std::unique_ptr<Reference> ref) {
+        std::unique_lock<std::mutex> lock2(cacheInfoLock);
+        auto sequence = data.find(ref->getName());
+        size_t curChunks = sequence == data.end() ? 0 : sequence->second.size();
+        for (size_t i = curChunks; i < (ref->getEnd() - 1) / CHUNK_SIZE + 1; i++) {
+            data[ref->getName()].push_back(genie::util::make_unique<CacheLine>());
         }
-
-        for (const auto& s : lengths) {
-            for (size_t i = 0; i < (s.second - 1) / CHUNK_SIZE + 1; i++) {
-                data[s.first].push_back(genie::util::make_unique<CacheLine>());
-            }
-        }
+        mgr.registerRef(std::move(ref));
     }
 
     std::shared_ptr<const std::string> loadAt(const std::string& name, size_t pos) {
+        std::unique_lock<std::mutex> lock2(cacheInfoLock);
         size_t id = pos / CHUNK_SIZE;
         auto it = data.find(name);
 
@@ -337,11 +333,15 @@ class ReferenceManager {
             return ReferenceExcerpt::undef_page();
         }
 
-        std::lock_guard<std::mutex> lock1(it->second[id]->loadMutex);
-        std::unique_lock<std::mutex> lock2(cacheInfoLock);
+        auto& cacheline = *it->second[id];
+        lock2.unlock();
+
+        // Very important that lock2 is released and we lock again in that specific order, to avoid deadlocks.
+        std::lock_guard<std::mutex> lock1(cacheline.loadMutex);
+        lock2.lock();
 
         // Chunk already loaded
-        auto ret = it->second[id]->chunk;
+        auto ret = cacheline.chunk;
         if (ret) {
             touch(name, id);
             return ret;
@@ -349,10 +349,10 @@ class ReferenceManager {
 
         // Try quick load. Maybe another thread unloaded this reference but it is still in memory, reachable via weak
         // ptr.
-        ret = it->second[id]->memory.lock();
+        ret = cacheline.memory.lock();
         if (ret) {
-            it->second[id]->chunk = ret;
-            it->second[id]->memory = ret;
+            cacheline.chunk = ret;
+            cacheline.memory = ret;
             touch(name, id);
             return ret;
         }
@@ -363,8 +363,8 @@ class ReferenceManager {
         ret = std::make_shared<const std::string>(mgr.getSequence(name, id * CHUNK_SIZE, (id + 1) * CHUNK_SIZE));
         lock2.lock();
 
-        it->second[id]->chunk = ret;
-        it->second[id]->memory = ret;
+        cacheline.chunk = ret;
+        cacheline.memory = ret;
         touch(name, id);
         return ret;
     }

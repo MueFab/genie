@@ -11,11 +11,13 @@
 
 #include <genie/util/selector.h>
 #include <genie/util/sideSelector.h>
+#include "reference-source.h"
 #include "entropy-decoder.h"
 #include "flowgraph.h"
 #include "format-exporter.h"
 #include "format-importer-compressed.h"
 #include "read-decoder.h"
+#include <genie/core/ref-decoder.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -31,6 +33,7 @@ class FlowGraphDecode : public FlowGraph {
 
     std::unique_ptr<genie::core::ReferenceManager> refMgr;
     std::vector<std::unique_ptr<genie::core::ReferenceSource>> refSources;
+    genie::core::RefDecoder* refDecoder{nullptr};
 
     std::vector<std::unique_ptr<genie::core::ReadDecoder>> readCoders;                        //!<
     genie::util::Selector<genie::core::AccessUnit, genie::core::record::Chunk> readSelector;  //!<
@@ -51,11 +54,18 @@ class FlowGraphDecode : public FlowGraph {
 
     void addReferenceSource(std::unique_ptr<genie::core::ReferenceSource> dat) {
         refSources.push_back(std::move(dat));
-        refMgr->addReferenceSource(*refSources.back());
     }
 
     ReferenceManager& getRefMgr() {
         return *refMgr;
+    }
+
+    void setRefDecoder(genie::core::RefDecoder* _refDecoder) {
+        refDecoder = _refDecoder;
+    }
+
+    genie::core::RefDecoder* getRefDecoder() {
+        return refDecoder;
     }
 
     /**

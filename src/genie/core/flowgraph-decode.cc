@@ -150,7 +150,6 @@ void FlowGraphDecode::setQVCoder(std::unique_ptr<genie::core::QVDecoder> dat, si
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FlowGraphDecode::run() {
-    refMgr->buildCache();
     std::vector<genie::util::OriginalSource*> imps;
     for (auto& i : importers) {
         imps.emplace_back(i.get());

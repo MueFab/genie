@@ -149,7 +149,7 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
             auto fai_file = genie::util::make_unique<std::ifstream>(fai);
             inputFiles.push_back(std::move(fasta_file));
             inputFiles.push_back(std::move(fai_file));
-            flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(**(inputFiles.rbegin() + 1), **inputFiles.rbegin()));
+            flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(**(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr()));
         } else {
             UTILS_DIE("Unknown reference format");
         }
@@ -189,13 +189,13 @@ std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts
             auto fai_file = genie::util::make_unique<std::ifstream>(fai);
             inputFiles.push_back(std::move(fasta_file));
             inputFiles.push_back(std::move(fai_file));
-            flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(**(inputFiles.rbegin() + 1), **inputFiles.rbegin()));
+            flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(**(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr()));
         } else {
             UTILS_DIE("Unknown reference format");
         }
     }
     inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile));
-    flow->addImporter(genie::util::make_unique<genie::format::mgb::Importer>(*inputFiles.back(), &flow->getRefMgr()));
+    flow->addImporter(genie::util::make_unique<genie::format::mgb::Importer>(*inputFiles.back(), &flow->getRefMgr(), flow->getRefDecoder()));
     attachExporter(*flow, pOpts, outputFiles);
     return flow;
 }

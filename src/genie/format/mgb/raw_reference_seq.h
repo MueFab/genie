@@ -27,25 +27,39 @@ class RawReferenceSequence {
    private:
     uint16_t sequence_ID : 16;  //!< Line 4
     uint64_t seq_start : 40;    //!< Line 5
-    //!< uint64_t seq_end : 40; //!< Line 6 currently computed by length of string
-    std::string ref_sequence;  //!< Line 7
+    uint64_t seq_end : 40;      //!< Line 6
+    std::string ref_sequence;   //!< Line 7
 
    public:
+    uint16_t getSeqID() const { return sequence_ID; }
+
+    uint64_t getStart() const { return seq_start; }
+
+    uint64_t getEnd() const { return seq_end; }
+
+    std::string& getSequence() { return ref_sequence; }
+
+    const std::string& getSequence() const { return ref_sequence; }
+
     /**
      *
      * @param _sequence_ID
      * @param _seq_start
      * @param _ref_sequence
      */
-    RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_start, std::string &&_ref_sequence);
+    RawReferenceSequence(uint16_t _sequence_ID, uint64_t _seq_start, std::string&& _ref_sequence);
 
-
-    explicit RawReferenceSequence(util::BitReader& reader) {
+    explicit RawReferenceSequence(util::BitReader& reader, bool headerOnly) {
         sequence_ID = reader.read<uint16_t>();
         seq_start = reader.read(40);
-        size_t seq_end = reader.read(40);
-        ref_sequence.resize(seq_end - seq_start + 1);
-        reader.readBuffer(&ref_sequence[0], seq_end - seq_start + 1);
+        seq_end = reader.read(40);
+        if (!headerOnly) {
+            ref_sequence.resize(seq_end - seq_start + 1);
+            reader.readBuffer(&ref_sequence[0], seq_end - seq_start + 1);
+        } else {
+            UTILS_DIE_IF(!reader.isAligned(), "Bitreader not aligned");
+            reader.skip(seq_end - seq_start + 1);
+        }
     }
 
     /**
@@ -58,13 +72,13 @@ class RawReferenceSequence {
      * @param s
      * @return
      */
-    bool isIdUnique(const RawReferenceSequence &s) const;
+    bool isIdUnique(const RawReferenceSequence& s) const;
 
     /**
      *
      * @param writer
      */
-    void write(util::BitWriter &writer) const;
+    void write(util::BitWriter& writer) const;
 
     /**
      *

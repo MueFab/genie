@@ -16,7 +16,7 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Importer::Importer(std::istream& _file, core::ReferenceManager* manager, genie::core::stats::PerfStats* _stats) : reader(_file), stats(_stats), ref_manager(manager) {}
+Importer::Importer(std::istream& _file, core::ReferenceManager* manager, core::RefDecoder* refd,  genie::core::stats::PerfStats* _stats) : core::ReferenceSource(manager), reader(_file), stats(_stats), factory(manager, this), ref_manager(manager), decoder(refd) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,35 +34,8 @@ bool Importer::pump(size_t& id, std::mutex&) {
         sec.length = unit->getReadCount();
         id += unit->getReadCount();
     }
-    auto paramset = factory.getParams(unit->getParameterID());
-    core::AccessUnit set(std::move(paramset), unit->getReadCount());
 
-    for (auto& b : unit->getBlocks()) {
-        set.set(core::GenDesc(b.getDescriptorID()), b.movePayload());
-    }
-    if (unit->getClass() != core::record::ClassType::CLASS_U) {
-        set.setReference(unit->getAlignmentInfo().getRefID());
-        set.setMinPos(unit->getAlignmentInfo().getStartPos());
-        set.setMaxPos(unit->getAlignmentInfo().getEndPos());
-    } else {
-        set.setReference(0);
-        set.setMinPos(0);
-        set.setMaxPos(0);
-    }
-    set.setNumReads(unit->getReadCount());
-    set.setClassType(unit->getClass());
-    set.getStats().addDouble("time-mgb-import", watch.check());
-    if(unit->getClass() != core::record::ClassType::CLASS_U) {
-        auto seqs = ref_manager->getSequences();
-        auto cur_seq = ref_manager->ID2Ref(unit->getAlignmentInfo().getRefID());
-        if (std::find(seqs.begin(), seqs.end(), cur_seq) != seqs.end()) {
-            set.setReference(ref_manager->load(cur_seq, unit->getAlignmentInfo().getStartPos(),
-                                               unit->getAlignmentInfo().getEndPos() + 1),
-                             {});
-        }
-    }
-    unit.reset();
-    flowOut(std::move(set), sec);
+    flowOut(convertAU(std::move(unit.get())), sec);
     return true;
 }
 

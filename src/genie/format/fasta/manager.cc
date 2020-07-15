@@ -17,8 +17,12 @@ namespace fasta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Manager::Manager(std::istream& fasta, std::istream& fai)
-    : reader(fasta, fai) {
+Manager::Manager(std::istream& fasta, std::istream& fai, core::ReferenceManager* mgr)
+    : core::ReferenceSource(mgr), reader(fasta, fai) {
+    auto ref = generateRefHandles();
+    for(auto& r : ref) {
+        mgr->addRef(std::move(r));
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

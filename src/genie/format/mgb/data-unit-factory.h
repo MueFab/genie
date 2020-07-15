@@ -12,6 +12,7 @@
 #include <genie/core/parameter/parameter_set.h>
 #include <map>
 #include "access_unit.h"
+#include "raw_reference.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -19,20 +20,35 @@ namespace genie {
 namespace format {
 namespace mgb {
 
+class Importer;
+
 /**
  *
  */
 class DataUnitFactory {
+   public:
+
    private:
     std::map<size_t, core::parameter::ParameterSet> parameters;  //!<
+    core::ReferenceManager* refmgr;
+    Importer* importer;
 
    public:
+
+    explicit DataUnitFactory(core::ReferenceManager* mgr, mgb::Importer* _importer) : refmgr(mgr), importer(_importer) {
+
+    }
+
     /**
      *
      * @param id
      * @return
      */
     const core::parameter::ParameterSet& getParams(size_t id) const;
+
+    const std::map<size_t, core::parameter::ParameterSet>& getParams() const {
+        return parameters;
+    }
 
     /**
      *

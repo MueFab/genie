@@ -20,10 +20,12 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &parameterSets, util::BitReader &bitReader)
+AccessUnit::AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &parameterSets, util::BitReader &bitReader, bool lazyPayload)
     : DataUnit(DataUnitType::ACCESS_UNIT) {
+    UTILS_DIE_IF(!bitReader.isAligned(), "Bitreader not aligned");
+    uint64_t bitreader_pos = bitReader.getBitsRead() / 8 - 1;
     bitReader.read(3);
-    bitReader.read(29);
+    uint32_t du_size = bitReader.read(29);
 
     access_unit_ID = bitReader.read<uint32_t>();
     num_blocks = bitReader.read<uint8_t>();
@@ -48,8 +50,14 @@ AccessUnit::AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &pa
 
     bitReader.flush();
 
-    for (size_t i = 0; i < num_blocks; ++i) {
-        blocks.emplace_back(parameterSets.at(parameter_set_ID).getQVConfig(au_type).getNumSubsequences(), bitReader);
+    uint64_t bytesRead = (bitReader.getBitsRead() / 8 - bitreader_pos);
+    payloadbytes = du_size - bytesRead;
+    qv_payloads = parameterSets.at(parameter_set_ID).getQVConfig(au_type).getNumSubsequences();
+
+    UTILS_DIE_IF(!bitReader.isAligned(), "Bitreader not aligned");
+
+    if(!lazyPayload) {
+        loadPayload(bitReader);
     }
 }
 

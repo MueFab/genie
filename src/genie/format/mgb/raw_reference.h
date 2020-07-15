@@ -34,11 +34,11 @@ class RawReference : public core::parameter::DataUnit {
      */
     RawReference();
 
-    RawReference(util::BitReader& reader) : DataUnit(DataUnitType::RAW_REFERENCE), seqs() {
+    RawReference(util::BitReader& reader, bool headerOnly = false) : DataUnit(DataUnitType::RAW_REFERENCE), seqs() {
         reader.read<uint64_t>();
         auto count = reader.read<uint16_t>();
         for(size_t i = 0; i < count; ++i) {
-            seqs.emplace_back(reader);
+            seqs.emplace_back(reader, headerOnly);
         }
     }
 
@@ -61,6 +61,18 @@ class RawReference : public core::parameter::DataUnit {
 
     bool isEmpty() const {
         return seqs.empty();
+    }
+
+    RawReferenceSequence& getSequence(size_t index) {
+        return seqs[index];
+    }
+
+    std::vector<RawReferenceSequence>::iterator begin() {
+        return seqs.begin();
+    }
+
+    std::vector<RawReferenceSequence>::iterator end() {
+        return seqs.end();
     }
 };
 

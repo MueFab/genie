@@ -13,7 +13,7 @@ namespace util {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BitReader::BitReader(std::istream &_istream) : istream(_istream), m_heldBits(0), m_numHeldBits(0) {}
+BitReader::BitReader(std::istream &_istream) : istream(_istream), m_heldBits(0), m_numHeldBits(0), bitsRead(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,6 +28,7 @@ uint64_t BitReader::getByte() {
 uint64_t BitReader::flush() {
     auto ret = m_heldBits;
     m_heldBits = 0;
+    bitsRead += m_numHeldBits;
     m_numHeldBits = 0;
     return ret;
 }
@@ -35,6 +36,7 @@ uint64_t BitReader::flush() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t BitReader::read(uint8_t numBits) {
+    bitsRead += numBits;
     uint64_t bits = 0;
     // uint64_t bits = 0;
     if (numBits <= m_numHeldBits) {
@@ -110,9 +112,8 @@ L0:
 // ---------------------------------------------------------------------------------------------------------------------
 
 void BitReader::read(std::string &str) {
-    for (auto &c : str) {
-        c = char(read(8));
-    }
+    bitsRead += str.length() * 8;
+    istream.read(&str[0], str.length());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

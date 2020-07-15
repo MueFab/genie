@@ -16,6 +16,8 @@ set(source_files
 
         exporter.cc
         importer.cc
+
+        reference.cc
         )
 
 add_library(genie-mgb ${source_files})

@@ -30,6 +30,19 @@ class RefCfg {
 
     uint8_t posSize;  //!< internal
    public:
+
+    uint16_t getSeqID() const {
+        return ref_sequence_ID;
+    }
+
+    uint64_t getStart() const {
+        return ref_start_position;
+    }
+
+    uint64_t getEnd() const {
+        return ref_end_position;
+    }
+
     /**
      *
      * @param _ref_sequence_ID

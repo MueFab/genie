@@ -11,6 +11,7 @@
 
 #include <memory>
 #include <vector>
+#include "reference-manager.h"
 #include "reference.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -22,17 +23,12 @@ namespace core {
  *
  */
 class ReferenceSource {
+   protected:
+    ReferenceManager* refMgr;
    public:
-    /**
-     *
-     * @return
-     */
-    virtual std::vector<std::unique_ptr<core::Reference>> generateRefHandles() = 0;
+    explicit ReferenceSource(ReferenceManager* mgr) : refMgr(mgr) {
 
-    /**
-     *
-     */
-    virtual ~ReferenceSource() = default;
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

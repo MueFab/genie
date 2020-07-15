@@ -31,6 +31,9 @@ class Manager : public core::ReferenceSource {
     FastaReader reader;
     std::mutex readerMutex;
 
+   private:
+    std::vector<std::unique_ptr<core::Reference>> generateRefHandles();
+
    public:
 
     /**
@@ -38,7 +41,7 @@ class Manager : public core::ReferenceSource {
      * @param fasta
      * @param fai
      */
-    Manager(std::istream& fasta, std::istream& fai);
+    Manager(std::istream& fasta, std::istream& fai, core::ReferenceManager* mgr);
 
     /**
      *
@@ -62,11 +65,6 @@ class Manager : public core::ReferenceSource {
      */
     std::string getRef(const std::string& sequence, uint64_t start, uint64_t end);
 
-    /**
-     *
-     * @return
-     */
-    std::vector<std::unique_ptr<core::Reference>> generateRefHandles() override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
