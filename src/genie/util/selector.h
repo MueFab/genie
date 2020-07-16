@@ -209,6 +209,7 @@ class Selector : public genie::util::Drain<Tin>, public genie::util::Source<Tout
      */
     void addBranch(genie::util::Drain<Tin>* entry, genie::util::Source<Tout>* out) {
         head.add(entry);
+        tail.addMod();
         out->setDrain(&tail);
     }
 

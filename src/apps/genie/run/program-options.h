@@ -35,7 +35,6 @@ class ProgramOptions {
 
     std::string outputFile;     //!<
     std::string outputSupFile;  //!<
-    std::string outputRefFile;  //!<
 
     std::string workingDirectory;  //!<
 
@@ -50,6 +49,7 @@ class ProgramOptions {
     std::string refMode;  //!<
 
     size_t numberOfThreads;  //!<
+    bool rawReference;
 
    private:
     /**

@@ -51,8 +51,6 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) {
 
     outputSupFile = "";
     app.add_option("--output-suppl-file", outputSupFile, "");
-    outputRefFile = "";
-    app.add_option("--output-ref-file", outputRefFile, "");
 
     workingDirectory = "";
     app.add_option("-w,--working-dir", workingDirectory, "");
@@ -74,6 +72,9 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) {
 
     numberOfThreads = std::thread::hardware_concurrency();
     app.add_option("-t,--threads", numberOfThreads, "");
+
+    rawReference = false;
+    app.add_flag("--raw-ref", rawReference, "");
 
     try {
         app.parse(argc, argv);
@@ -213,12 +214,6 @@ void ProgramOptions::validate() {
         validateOutputFile(outputSupFile, forceOverwrite);
         std::cout << "Output supplementary file: " << outputSupFile << " with "
                   << size_string(ghc::filesystem::space(parent_dir(outputSupFile)).available) << " available"
-                  << std::endl;
-    }
-    if (!outputRefFile.empty()) {
-        validateOutputFile(outputRefFile, forceOverwrite);
-        std::cout << "Output reference file: " << outputRefFile << " with "
-                  << size_string(ghc::filesystem::space(parent_dir(outputRefFile)).available) << " available"
                   << std::endl;
     }
 

@@ -27,6 +27,7 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
         type = bitReader.read<core::parameter::DataUnit::DataUnitType>();
         size_t pos = bitReader.getPos();
         if (!bitReader.isGood()) {
+            bitReader.clear();
             return boost::none;
         }
         switch (type) {
@@ -37,7 +38,7 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                     pos += 12;
                     std::cout << "Found ref(raw) " << ref.getSeqID() << ":[" << ref.getStart() << ", " << ref.getEnd() << "] ..." << std::endl;
                     refmgr->validateRefID(ref.getSeqID());
-                    refmgr->addRef(util::make_unique<mgb::Reference>(std::to_string(ref.getSeqID()), ref.getStart(), ref.getEnd() + 1, importer, pos, true));
+                    refmgr->addRef(util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(), ref.getEnd() + 1, importer, pos, true));
                     pos += (ref.getEnd() - ref.getStart() + 1);
                 }
                 break;
@@ -54,12 +55,16 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                     const auto& ref = ret.getRefCfg();
                     refmgr->validateRefID(ref.getSeqID());
                     std::cout << "Found ref(compressed) " << ref.getSeqID() << ":[" << ref.getStart() << ", " << ref.getEnd() << "] ..." << std::endl;
-                    refmgr->addRef(util::make_unique<mgb::Reference>(std::to_string(ref.getSeqID()), ref.getStart(), ref.getEnd() + 1, importer, pos, false));
+                    refmgr->addRef(util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(), ref.getEnd() + 1, importer, pos, false));
                     bitReader.skip(ret.getPayloadSize());
                 } else {
-                    ret.loadPayload(bitReader);
-                    std::cout << "Decompressing AU " << ret.getID() << "..." << std::endl;
-                    return ret;
+                    if(!referenceOnly) {
+                        ret.loadPayload(bitReader);
+                        std::cout << "Decompressing AU " << ret.getID() << "..." << std::endl;
+                        return ret;
+                    } else {
+                        bitReader.skip(ret.getPayloadSize());
+                    }
                 }
                 break;
             }

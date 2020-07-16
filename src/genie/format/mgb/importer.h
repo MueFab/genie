@@ -76,7 +76,7 @@ class Importer : public core::FormatImporterCompressed, public core::ReferenceSo
      * @param _file
      * @param _stats
      */
-    explicit Importer(std::istream& _file, core::ReferenceManager* manager, core::RefDecoder* refd,
+    explicit Importer(std::istream& _file, core::ReferenceManager* manager, core::RefDecoder* refd, bool refOnly,
                       genie::core::stats::PerfStats* _stats = nullptr);
 
     /**
@@ -88,20 +88,29 @@ class Importer : public core::FormatImporterCompressed, public core::ReferenceSo
     bool pump(size_t& id, std::mutex& lock) override;
 
     std::string getRef(bool raw, size_t f_pos, size_t start, size_t end) {
-        std::lock_guard<std::mutex> f_lock(this->lock);
-        size_t oldPos = reader.getPos();
+        AccessUnit au(0, 0, core::record::ClassType::NONE, 0, core::parameter::DataUnit::DatasetType::REFERENCE, 0, 0,
+                      0);
         std::string ret;
+        {
+            std::lock_guard<std::mutex> f_lock(this->lock);
+            size_t oldPos = reader.getPos();
 
-        reader.setPos(f_pos + start);
-        if (raw) {
-            ret.resize(end - start);
-            reader.readBuffer(&ret[0], ret.length());
-        } else {
+            if (raw) {
+                reader.setPos(f_pos + start);
+                ret.resize(end - start);
+                reader.readBuffer(&ret[0], ret.length());
+            } else {
+                reader.setPos(f_pos);
+                au = AccessUnit(factory.getParams(), reader, false);
+            }
 
-            ret = decoder->decode(convertAU(AccessUnit(factory.getParams(), reader, false)));
+            reader.setPos(oldPos);
         }
 
-        reader.setPos(oldPos);
+        if (!raw) {
+            ret = decoder->decode(convertAU(std::move(au)));
+        }
+
         return ret;
     }
 };
