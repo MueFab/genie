@@ -11,6 +11,8 @@
 
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
+#include <genie/util/runtime-exception.h>
+
 #include <memory>
 #include <string>
 

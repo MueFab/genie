@@ -9,13 +9,14 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <cstdint>
+
+#include "computed_ref_extended.h"
+
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
-#include <boost/optional/optional.hpp>
-#include <cstdint>
-#include <memory>
-#include "computed_ref_extended.h"
+
+#include <boost/optional.hpp>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -45,9 +46,12 @@ class ComputedRef {
 
    public:
 
-    bool operator==(const ComputedRef& cr) const{
-        return cr_alg_ID == cr.cr_alg_ID && extension == cr.extension;
-    }
+    /**
+     *
+     * @param cr
+     * @return
+     */
+    bool operator==(const ComputedRef& cr) const;
 
     /**
      *

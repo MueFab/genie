@@ -13,6 +13,7 @@
 #include "encoder-source.h"
 #include "generate-read-streams.h"
 #include "reorder-compress-quality-id.h"
+#include <iostream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

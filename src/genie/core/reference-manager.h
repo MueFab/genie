@@ -17,7 +17,8 @@
 #include <mutex>
 #include <utility>
 #include <vector>
-#include "reference.h"
+
+#include "reference-collection.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,369 +28,290 @@ namespace core {
 /**
  *
  */
-class ReferenceCollection {
-   private:
-    std::map<std::string, std::vector<std::unique_ptr<Reference>>> refs;  //!<
-
-   public:
-    /**
-     *
-     * @param name
-     * @param _start
-     * @param _end
-     * @return
-     */
-    std::string getSequence(const std::string& name, uint64_t _start, uint64_t _end) const;
-
-    std::vector<std::pair<size_t, size_t>> getCoverage(const std::string& name) const {
-        std::vector<std::pair<size_t, size_t>> ret;
-        auto it = refs.find(name);
-        if (it == refs.end()) {
-            return ret;
-        }
-        for (const auto& s : it->second) {
-            ret.emplace_back(s->getStart(), s->getEnd());
-        }
-        return ret;
-    }
-
-    std::vector<std::string> getSequences() const {
-        std::vector<std::string> ret;
-        for (const auto& s : refs) {
-            ret.emplace_back(s.first);
-        }
-        return ret;
-    }
-
-    /**
-     *
-     * @param ref
-     */
-    void registerRef(std::unique_ptr<Reference> ref);
-
-    /**
-     *
-     * @param ref
-     */
-    void registerRef(std::vector<std::unique_ptr<Reference>>&& ref);
-};
-
 class ReferenceManager {
    private:
-    ReferenceCollection mgr;
+    ReferenceCollection mgr;  //!<
 
     struct CacheLine {
         std::shared_ptr<const std::string> chunk;  //!<
         std::weak_ptr<const std::string> memory;   //!<
-        std::mutex loadMutex;
+        std::mutex loadMutex;                      //!<
     };
 
-    std::map<std::string, std::vector<std::unique_ptr<CacheLine>>> data;
-    std::deque<std::pair<std::string, size_t>> cacheInfo;
-    std::mutex cacheInfoLock;
-    uint64_t cacheSize;  //!<
-    static const uint64_t CHUNK_SIZE;
+    std::map<std::string, std::vector<std::unique_ptr<CacheLine>>> data;  //!<
+    std::deque<std::pair<std::string, size_t>> cacheInfo;                 //!<
+    std::mutex cacheInfoLock;                                             //!<
+    uint64_t cacheSize;                                                   //!<
+    static const uint64_t CHUNK_SIZE;                                     //!<
 
-    void touch(const std::string& name, size_t num) {
-        if (cacheInfo.size() < cacheSize) {
-            cacheInfo.push_front(std::make_pair(name, num));
-            return;
-        }
-
-        for (auto it = cacheInfo.begin(); it != cacheInfo.end(); ++it) {
-            if (it->first == name && it->second == num) {
-                cacheInfo.erase(it);
-                cacheInfo.push_front(std::make_pair(name, num));
-                return;
-            }
-        }
-
-        cacheInfo.push_front(std::make_pair(name, num));
-        auto& line = data[cacheInfo.back().first][cacheInfo.back().second];
-        cacheInfo.pop_back();
-
-        line->chunk.reset();
-        line->memory.reset();
-    }
+    /**
+     *
+     * @param name
+     * @param num
+     */
+    void touch(const std::string& name, size_t num);
 
    public:
+    /**
+     *
+     * @param id
+     */
+    void validateRefID(size_t id);
 
-    void validateRefID(size_t id) {
-        std::unique_lock<std::mutex> lock2(cacheInfoLock);
-        for(size_t i = 0; i <= id; ++i) {
-            auto s = std::to_string(i);
-            data[std::string(s.size() < 3 ? (3 - s.size()) : 0, '0') + s];
-        }
-    }
+    /**
+     *
+     * @param ref
+     * @return
+     */
+    size_t ref2ID(const std::string& ref);
 
-    size_t ref2ID(const std::string& ref) {
-        std::unique_lock<std::mutex> lock2(cacheInfoLock);
-        size_t ctr = 0;
-        for (const auto& r : data) {
-            if (r.first == ref) {
-                return ctr;
-            }
-            ctr++;
-        }
-        UTILS_DIE("Unknown reference");
-    }
+    /**
+     *
+     * @param id
+     * @return
+     */
+    std::string ID2Ref(size_t id);
 
-    std::string ID2Ref(size_t id) {
-        std::unique_lock<std::mutex> lock2(cacheInfoLock);
-        size_t ctr = 0;
-        for (const auto& r : data) {
-            if (id == ctr) {
-                return r.first;
-            }
-            ctr++;
-        }
-        UTILS_DIE("Unknown reference");
-    }
+    /**
+     *
+     * @return
+     */
+    static size_t getChunkSize();
 
-    static size_t getChunkSize() { return CHUNK_SIZE; }
-
+    /**
+     *
+     */
     struct ReferenceExcerpt {
        private:
-        std::string ref_name;
-        size_t global_start;
-        size_t global_end;
-        std::vector<std::shared_ptr<const std::string>> data;
+        std::string ref_name;                                  //!<
+        size_t global_start;                                   //!<
+        size_t global_end;                                     //!<
+        std::vector<std::shared_ptr<const std::string>> data;  //!<
 
        public:
-        bool isEmpty() const {
-            for (const auto& p : data) {
-                if (isMapped(p)) {
-                    return false;
-                }
-            }
-            return true;
-        }
+        /**
+         *
+         * @return
+         */
+        bool isEmpty() const;
 
-        void merge(ReferenceExcerpt& e) {
-            if (this->ref_name.empty()) {
-                *this = std::move(e);
-                return;
-            }
-            extend(e.global_end);
-            for (size_t i = e.global_start; i < e.global_end; i += CHUNK_SIZE) {
-                if (e.isMapped(i)) {
-                    mapChunkAt(i, e.getChunkAt(i));
-                }
-            }
-        }
+        /**
+         *
+         * @param e
+         */
+        void merge(ReferenceExcerpt& e);
 
-        size_t getDataStart() const { return global_start - (global_start % CHUNK_SIZE); }
+        /**
+         *
+         * @return
+         */
+        size_t getDataStart() const;
 
-        size_t getDataEnd() const { return global_end - (global_end % CHUNK_SIZE) + CHUNK_SIZE; }
+        /**
+         *
+         * @return
+         */
+        size_t getDataEnd() const;
 
-        size_t getGlobalStart() const { return global_start; }
+        /**
+         *
+         * @return
+         */
+        size_t getGlobalStart() const;
 
-        size_t getGlobalEnd() const { return global_end; }
+        /**
+         *
+         * @return
+         */
+        size_t getGlobalEnd() const;
 
-        const std::string& getRefName() const { return ref_name; }
+        /**
+         *
+         * @return
+         */
+        const std::string& getRefName() const;
 
-        std::shared_ptr<const std::string> getChunkAt(size_t pos) const {
-            int id = (pos - (global_start - global_start % CHUNK_SIZE)) / CHUNK_SIZE;
-            UTILS_DIE_IF(id < 0 || id >= (int)data.size(), "Invalid index");
-            return data[id];
-        }
+        /**
+         *
+         * @param pos
+         * @return
+         */
+        std::shared_ptr<const std::string> getChunkAt(size_t pos) const;
 
-        void mapChunkAt(size_t pos, std::shared_ptr<const std::string> dat) {
-            int id = (pos - (global_start - global_start % CHUNK_SIZE)) / CHUNK_SIZE;
-            UTILS_DIE_IF(id < 0 || id >= (int)data.size(), "Invalid index");
-            data[id] = std::move(dat);
-        }
+        /**
+         *
+         * @param pos
+         * @param dat
+         */
+        void mapChunkAt(size_t pos, std::shared_ptr<const std::string> dat);
 
-        void mapSection(size_t start, size_t end, ReferenceManager* mgr) {
-            for (size_t i = start; i < end; i += CHUNK_SIZE) {
-                if (isMapped(i)) {
-                    continue;
-                }
-                mapChunkAt(i, mgr->loadAt(ref_name, i));
-            }
-        }
+        /**
+         *
+         * @param start
+         * @param end
+         * @param mgr
+         */
+        void mapSection(size_t start, size_t end, ReferenceManager* mgr);
 
-        ReferenceExcerpt() : ReferenceExcerpt("", 0, 1) {}
+        /**
+         *
+         */
+        ReferenceExcerpt();
 
-        ReferenceExcerpt(std::string name, size_t start, size_t end)
-            : ref_name(std::move(name)),
-              global_start(start),
-              global_end(end),
-              data((((global_end - 1) - (global_end - 1) % CHUNK_SIZE + CHUNK_SIZE) -
-                    (global_start - global_start % CHUNK_SIZE) - 1) /
-                           CHUNK_SIZE +
-                       1,
-                   undef_page()) {}
+        /**
+         *
+         * @param name
+         * @param start
+         * @param end
+         */
+        ReferenceExcerpt(std::string name, size_t start, size_t end);
 
-        static const std::shared_ptr<const std::string>& undef_page() {
-            static std::shared_ptr<const std::string> ret = std::make_shared<const std::string>(CHUNK_SIZE, 'N');
-            return ret;
-        }
+        /**
+         *
+         * @return
+         */
+        static const std::shared_ptr<const std::string>& undef_page();
 
-        void extend(size_t newEnd) {
-            if (newEnd < global_end) {
-                return;
-            }
-            size_t id = (newEnd - (global_start - global_start % CHUNK_SIZE)) / CHUNK_SIZE;
-            for (size_t i = data.size() - 1; i < id; ++i) {
-                data.push_back(undef_page());
-            }
-            global_end = newEnd;
-        }
+        /**
+         *
+         * @param newEnd
+         */
+        void extend(size_t newEnd);
 
-        static bool isMapped(const std::shared_ptr<const std::string>& page) {
-            return page.get() != undef_page().get();
-        }
+        /**
+         *
+         * @param page
+         * @return
+         */
+        static bool isMapped(const std::shared_ptr<const std::string>& page);
 
-        bool isMapped(size_t pos) const {
-            return isMapped(data[(pos - (global_start - global_start % CHUNK_SIZE)) / CHUNK_SIZE]);
-        }
+        /**
+         *
+         * @param pos
+         * @return
+         */
+        bool isMapped(size_t pos) const;
 
-        void unMapAt(size_t pos) {
-            data[(pos - (global_start - global_start % CHUNK_SIZE)) / CHUNK_SIZE] = undef_page();
-        }
+        /**
+         *
+         * @param pos
+         */
+        void unMapAt(size_t pos);
 
+        /**
+         *
+         */
         struct Stepper {
            private:
-            std::vector<std::shared_ptr<const std::string>>::const_iterator startVecIt;
-            std::vector<std::shared_ptr<const std::string>>::const_iterator vecIt;
-            std::vector<std::shared_ptr<const std::string>>::const_iterator endVecIt;
-            size_t stringPos;
-            const char* curString;
+            std::vector<std::shared_ptr<const std::string>>::const_iterator startVecIt;  //!<
+            std::vector<std::shared_ptr<const std::string>>::const_iterator vecIt;       //!<
+            std::vector<std::shared_ptr<const std::string>>::const_iterator endVecIt;    //!<
+            size_t stringPos;                                                            //!<
+            const char* curString;                                                       //!<
 
            public:
-            explicit Stepper(const ReferenceExcerpt& e) {
-                startVecIt = e.data.begin();
-                vecIt = e.data.begin();
-                endVecIt = e.data.end();
-                stringPos = e.global_start % CHUNK_SIZE;
-                curString = (**vecIt).data();
-            }
-            void inc(size_t off = 1) {
-                stringPos += off;
-                while (stringPos >= CHUNK_SIZE) {
-                    stringPos -= CHUNK_SIZE;
-                    vecIt++;
-                }
-                curString = vecIt->get()->data();
-            }
+            /**
+             *
+             * @param e
+             */
+            explicit Stepper(const ReferenceExcerpt& e);
 
-            void setPos(size_t pos) {
-                stringPos = pos % CHUNK_SIZE;
-                vecIt = startVecIt + pos / CHUNK_SIZE;
-                curString = vecIt->get()->data();
-            }
+            /**
+             *
+             * @param off
+             */
+            void inc(size_t off = 1);
 
-            bool end() const { return vecIt >= endVecIt; }
+            /**
+             *
+             * @param pos
+             */
+            void setPos(size_t pos);
 
-            char get() const { return curString[stringPos]; }
+            /**
+             *
+             * @return
+             */
+            bool end() const;
+
+            /**
+             *
+             * @return
+             */
+            char get() const;
         };
 
-        Stepper getStepper() const { return Stepper(*this); }
+        /**
+         *
+         * @return
+         */
+        Stepper getStepper() const;
 
-        ReferenceExcerpt getSubExcerpt(size_t start, size_t end) const {
-            UTILS_DIE_IF(start < global_start || end > global_end, "SubExcerpt can't be bigger than parent");
-            ReferenceExcerpt ret(ref_name, start, end);
-            for (size_t i = start; i < end; i += CHUNK_SIZE) {
-                ret.mapChunkAt(i, getChunkAt(i));
-            }
-            return ret;
-        }
+        /**
+         *
+         * @param start
+         * @param end
+         * @return
+         */
+        ReferenceExcerpt getSubExcerpt(size_t start, size_t end) const;
 
-        std::string getString(size_t start, size_t end) const {
-            if (start < global_start || end > global_end) {
-                UTILS_DIE("String can't be bigger than reference excerpt");
-            }
-            auto stepper = getStepper();
-            std::string ret;
-            stepper.inc(start - global_start);
-            for (size_t i = start; i < end; ++i) {
-                ret += stepper.get();
-                stepper.inc();
-            }
-            return ret;
-        }
+        /**
+         *
+         * @param start
+         * @param end
+         * @return
+         */
+        std::string getString(size_t start, size_t end) const;
     };
 
-    explicit ReferenceManager(size_t csize) : cacheSize(csize) {}
+    /**
+     *
+     * @param csize
+     */
+    explicit ReferenceManager(size_t csize);
 
+    /**
+     *
+     * @param ref
+     */
+    void addRef(std::unique_ptr<Reference> ref);
 
-    void addRef(std::unique_ptr<Reference> ref) {
-        std::unique_lock<std::mutex> lock2(cacheInfoLock);
-        auto sequence = data.find(ref->getName());
-        size_t curChunks = sequence == data.end() ? 0 : sequence->second.size();
-        for (size_t i = curChunks; i < (ref->getEnd() - 1) / CHUNK_SIZE + 1; i++) {
-            data[ref->getName()].push_back(genie::util::make_unique<CacheLine>());
-        }
-        mgr.registerRef(std::move(ref));
-    }
+    /**
+     *
+     * @param name
+     * @param pos
+     * @return
+     */
+    std::shared_ptr<const std::string> loadAt(const std::string& name, size_t pos);
 
-    std::shared_ptr<const std::string> loadAt(const std::string& name, size_t pos) {
-        std::unique_lock<std::mutex> lock2(cacheInfoLock);
-        size_t id = pos / CHUNK_SIZE;
-        auto it = data.find(name);
+    /**
+     *
+     * @param name
+     * @param start
+     * @param end
+     * @return
+     */
+    ReferenceExcerpt load(const std::string& name, size_t start, size_t end);
 
-        // Invalid chunk
-        if (it == data.end()) {
-            return ReferenceExcerpt::undef_page();
-        }
+    /**
+     *
+     * @param name
+     * @return
+     */
+    std::vector<std::pair<size_t, size_t>> getCoverage(const std::string& name) const;
 
-        auto& cacheline = *it->second[id];
-        lock2.unlock();
+    /**
+     *
+     * @return
+     */
+    std::vector<std::string> getSequences() const;
 
-        // Very important that lock2 is released and we lock again in that specific order, to avoid deadlocks.
-        std::lock_guard<std::mutex> lock1(cacheline.loadMutex);
-        lock2.lock();
-
-        // Chunk already loaded
-        auto ret = cacheline.chunk;
-        if (ret) {
-            touch(name, id);
-            return ret;
-        }
-
-        // Try quick load. Maybe another thread unloaded this reference but it is still in memory, reachable via weak
-        // ptr.
-        ret = cacheline.memory.lock();
-        if (ret) {
-            cacheline.chunk = ret;
-            cacheline.memory = ret;
-            touch(name, id);
-            return ret;
-        }
-
-        // Reference is not in memory. We have to do a slow read from disc...
-        // Loading mutex keeps locked for this chunk, but other chunks can be accessed, main lock is opened.
-        lock2.unlock();
-        ret = std::make_shared<const std::string>(mgr.getSequence(name, id * CHUNK_SIZE, (id + 1) * CHUNK_SIZE));
-        lock2.lock();
-
-        cacheline.chunk = ret;
-        cacheline.memory = ret;
-        touch(name, id);
-        return ret;
-    }
-
-    ReferenceExcerpt load(const std::string& name, size_t start, size_t end) {
-        ReferenceExcerpt ret(name, start, end);
-        for (size_t i = start; i < end; i += CHUNK_SIZE) {
-            ret.mapChunkAt(i, loadAt(name, i));
-        }
-        return ret;
-    }
-
-    std::vector<std::pair<size_t, size_t>> getCoverage(const std::string& name) const { return mgr.getCoverage(name); }
-
-    std::vector<std::string> getSequences() const { return mgr.getSequences(); }
-
-    size_t getLength(const std::string& name) {
-        auto cov = getCoverage(name);
-        size_t ret = 0;
-        for(const auto& c : cov) {
-            ret = std::max(c.second, ret);
-        }
-        return ret;
-    }
+    /**
+     *
+     * @param name
+     * @return
+     */
+    size_t getLength(const std::string& name);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

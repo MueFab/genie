@@ -2,7 +2,7 @@
 
 #include <cli11/CLI11.hpp>
 
-#include <genie/util/exceptions.h>
+#include <genie/util/runtime-exception.h>
 #include <cassert>
 #include <fstream>
 

@@ -5,17 +5,22 @@
  */
 
 #include "descriptor.h"
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-#include <genie/util/exceptions.h>
+
+#include <genie/core/parameter/descriptor_present/descriptor_present.h>
+#include <genie/util/runtime-exception.h>
 #include <genie/util/make-unique.h>
-#include <parameter/descriptor_present/descriptor_present.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 namespace parameter {
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Descriptor::equals(const Descriptor* desc) const {
+    return dec_cfg_preset == desc->dec_cfg_preset;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

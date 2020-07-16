@@ -5,8 +5,11 @@
  */
 
 #include "encoder.h"
+
 #include <genie/quality/paramqv1/qv_coding_config_1.h>
 #include <genie/util/watch.h>
+
+#include <iostream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -7,6 +7,7 @@
 #include "header.h"
 #include <genie/util/tokenize.h>
 #include <regex>
+#include <iostream>
 #include "tag-enum.h"
 #include "tag-number.h"
 #include "tag-string.h"

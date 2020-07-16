@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/exceptions.h>
+#include <genie/util/runtime-exception.h>
 #include <map>
 #include <set>
 #include <string>

@@ -9,7 +9,6 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <memory>
 #include "drain.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -32,25 +31,25 @@ class Source {
      * @param t Current chunk of data
      * @param id Block identifier (for multithreading)
      */
-    void flowOut(TYPE&& t, const Section& id) { drain->flowIn(std::move(t), id); }
+    void flowOut(TYPE&& t, const Section& id);
 
     /**
      * @brief Propagates end-of-data signal to drain set before
      */
-    void flushOut(size_t& pos) { drain->flushIn(pos); }
+    void flushOut(size_t& pos);
 
     /**
      *
      * @param id
      */
-    void skipOut(const Section& id) { drain->skipIn(id); }
+    void skipOut(const Section& id);
 
    public:
     /**
      * @brief Current data output will be propagated to a new destination
      * @param d New destination for output data
      */
-    virtual void setDrain(Drain<TYPE>* d) { drain = d; }
+    virtual void setDrain(Drain<TYPE>* d);
 
     /**
      * @brief For inheritance
@@ -62,6 +61,10 @@ class Source {
 
 }  // namespace util
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include "source.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

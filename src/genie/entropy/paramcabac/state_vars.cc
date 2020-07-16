@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 #include "state_vars.h"
-#include <genie/util/exceptions.h>
+#include <genie/util/runtime-exception.h>
 #include <cmath>
 #include "binarization_parameters.h"
 

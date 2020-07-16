@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/exceptions.h>
+#include <genie/util/runtime-exception.h>
 #include <genie/util/make-unique.h>
 #include "tag.h"
 

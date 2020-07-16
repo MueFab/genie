@@ -9,10 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
 #include <istream>
-#include <string>
-#include <type_traits>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,26 +24,37 @@ class BitReader {
     std::istream &istream;  //!<
     uint8_t m_heldBits;     //!<
     uint8_t m_numHeldBits;  //!<
-    uint64_t bitsRead;
+    uint64_t bitsRead; //!<
 
    public:
-    uint64_t getBitsRead() const { return bitsRead; }
+    /**
+     *
+     * @return
+     */
+    uint64_t getBitsRead() const;
 
-    bool isAligned() const {
-        return !m_numHeldBits;
-    }
+    /**
+     *
+     * @return
+     */
+    bool isAligned() const;
 
-    size_t getPos() const {
-        return istream.tellg();
-    }
+    /**
+     *
+     * @return
+     */
+    size_t getPos() const;
 
-    void setPos(size_t pos) const {
-        istream.seekg(pos, std::ios_base::beg);
-    }
+    /**
+     *
+     * @param pos
+     */
+    void setPos(size_t pos) const;
 
-    void clear() {
-        istream.clear();
-    }
+    /**
+     *
+     */
+    void clear();
 
     /**
      *
@@ -79,9 +87,7 @@ class BitReader {
      * @return
      */
     template <typename T, typename = std::enable_if<std::is_integral<T>::value>>
-    T read() {
-        return static_cast<T>(read(sizeof(T) * 8));
-    }
+    T read();
 
     /**
      *
@@ -90,9 +96,7 @@ class BitReader {
      * @return
      */
     template <typename T, typename = std::enable_if<std::is_integral<T>::value>>
-    T read(size_t s) {
-        return static_cast<T>(read(s));
-    }
+    T read(size_t s);
 
     /**
      *
@@ -106,18 +110,28 @@ class BitReader {
      */
     bool isGood() const;
 
-    void skip(size_t bytes) { istream.seekg(bytes, std::ios_base::cur); }
+    /**
+     *
+     * @param bytes
+     */
+    void skip(size_t bytes);
 
-    void readBuffer(void *in, size_t size) {
-        bitsRead += size * 8;
-        istream.read((char *)in, size);
-    }
+    /**
+     *
+     * @param in
+     * @param size
+     */
+    void readBuffer(void *in, size_t size);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace util
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include "bitreader.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -6,7 +6,7 @@
 
 #include "raw_reference.h"
 #include <genie/util/bitwriter.h>
-#include <genie/util/exceptions.h>
+#include <genie/util/runtime-exception.h>
 #include <genie/util/make-unique.h>
 #include <sstream>
 

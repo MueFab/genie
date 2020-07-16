@@ -11,7 +11,7 @@
 
 #include <genie/core/record/chunk.h>
 #include <genie/util/selector.h>
-#include <genie/util/sideSelector.h>
+#include <genie/util/side-selector.h>
 #include <genie/util/source.h>
 #include "access-unit.h"
 #include "entropy-decoder.h"

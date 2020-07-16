@@ -4,12 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "descriptor_present.h"
-#include <genie/util/bitwriter.h>
 #include <genie/util/make-unique.h>
+
 #include <global-cfg.h>
 #include "decoder-regular.h"
 #include "decoder-tokentype.h"
+#include "descriptor_present.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -33,6 +33,13 @@ DescriptorPresent::DescriptorPresent(GenDesc desc, util::BitReader &reader) : De
     } else {
         decoder_configuration = GlobalCfg::getSingleton().getIndustrialPark().construct<DecoderRegular>(mode, reader);
     }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool DescriptorPresent::equals(const Descriptor *desc) const {
+    return Descriptor::equals(desc) &&
+           decoder_configuration->equals(dynamic_cast<const DescriptorPresent *>(desc)->decoder_configuration.get());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

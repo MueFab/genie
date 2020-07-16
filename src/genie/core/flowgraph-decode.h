@@ -9,15 +9,17 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/core/ref-decoder.h>
 #include <genie/util/selector.h>
-#include <genie/util/sideSelector.h>
-#include "reference-source.h"
+#include <genie/util/side-selector.h>
+#include <genie/util/thread-manager.h>
+
 #include "entropy-decoder.h"
 #include "flowgraph.h"
 #include "format-exporter.h"
 #include "format-importer-compressed.h"
 #include "read-decoder.h"
-#include <genie/core/ref-decoder.h>
+#include "reference-source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -31,9 +33,9 @@ class FlowGraphDecode : public FlowGraph {
     genie::util::ThreadManager mgr;                                                 //!<
     std::vector<std::unique_ptr<genie::core::FormatImporterCompressed>> importers;  //!<
 
-    std::unique_ptr<genie::core::ReferenceManager> refMgr;
-    std::vector<std::unique_ptr<genie::core::ReferenceSource>> refSources;
-    genie::core::RefDecoder* refDecoder{nullptr};
+    std::unique_ptr<genie::core::ReferenceManager> refMgr; //!<
+    std::vector<std::unique_ptr<genie::core::ReferenceSource>> refSources; //!<
+    genie::core::RefDecoder* refDecoder{nullptr}; //!<
 
     std::vector<std::unique_ptr<genie::core::ReadDecoder>> readCoders;                        //!<
     genie::util::Selector<genie::core::AccessUnit, genie::core::record::Chunk> readSelector;  //!<
@@ -52,21 +54,29 @@ class FlowGraphDecode : public FlowGraph {
 
    public:
 
-    void addReferenceSource(std::unique_ptr<genie::core::ReferenceSource> dat) {
-        refSources.push_back(std::move(dat));
-    }
+    /**
+     *
+     * @param dat
+     */
+    void addReferenceSource(std::unique_ptr<genie::core::ReferenceSource> dat);
 
-    ReferenceManager& getRefMgr() {
-        return *refMgr;
-    }
+    /**
+     *
+     * @return
+     */
+    ReferenceManager& getRefMgr();
 
-    void setRefDecoder(genie::core::RefDecoder* _refDecoder) {
-        refDecoder = _refDecoder;
-    }
+    /**
+     *
+     * @param _refDecoder
+     */
+    void setRefDecoder(genie::core::RefDecoder* _refDecoder);
 
-    genie::core::RefDecoder* getRefDecoder() {
-        return refDecoder;
-    }
+    /**
+     *
+     * @return
+     */
+    genie::core::RefDecoder* getRefDecoder();
 
     /**
      *

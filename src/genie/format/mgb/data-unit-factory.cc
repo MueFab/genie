@@ -8,6 +8,7 @@
 #include "access_unit.h"
 #include "raw_reference.h"
 #include "reference.h"
+#include <iostream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

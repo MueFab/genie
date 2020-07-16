@@ -10,9 +10,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
+
 #include <cstdint>
-#include <memory>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,10 +28,12 @@ class ComputedRefExtended {
     uint32_t cr_buf_max_size;  //!<
 
    public:
-
-    bool operator==(const ComputedRefExtended& ext) const {
-       return cr_pad_size == ext.cr_pad_size && cr_buf_max_size == ext.cr_buf_max_size;
-    }
+    /**
+     *
+     * @param ext
+     * @return
+     */
+    bool operator==(const ComputedRefExtended& ext) const;
 
     /**
      *
@@ -56,7 +57,7 @@ class ComputedRefExtended {
      *
      * @param writer
      */
-    virtual void write(util::BitWriter &writer) const;
+    virtual void write(util::BitWriter& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

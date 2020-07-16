@@ -9,10 +9,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/constants.h>
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
 #include <memory>
+
+#include <genie/util/bitwriter.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -55,9 +54,12 @@ class Decoder {
      */
     uint8_t getMode() const;
 
-    virtual bool equals(const Decoder* dec) const {
-        return encoding_mode_ID == dec->encoding_mode_ID;
-    }
+    /**
+     *
+     * @param dec
+     * @return
+     */
+    virtual bool equals(const Decoder* dec) const;
 
    protected:
     uint8_t encoding_mode_ID;  //!<

@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "exceptions.h"
+#ifndef GENIE_SOURCE_IMPL_H
+#define GENIE_SOURCE_IMPL_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -13,43 +14,40 @@ namespace util {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Exception::Exception(std::string msg) : msg_(std::move(msg)) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-Exception::~Exception() noexcept = default;
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::string Exception::msg() const { return msg_; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const char *Exception::what() const noexcept { return msg_.c_str(); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-RuntimeException::RuntimeException(const std::string &file, const std::string &function, int line,
-                                   const std::string &msg) noexcept
-    : Exception(file + ":" + function + ":" + std::to_string(line) + ": " + msg) {
-    // These dummy casts just avoid compiler warnings due to unused variables
-    static_cast<void>(file);
-    static_cast<void>(function);
-    static_cast<void>(line);
+template <typename TYPE>
+void Source<TYPE>::flowOut(TYPE&& t, const Section& id) {
+    drain->flowIn(std::move(t), id);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-RuntimeException::RuntimeException(const RuntimeException &e) noexcept : Exception(e.what()) {}
+template <typename TYPE>
+void Source<TYPE>::flushOut(size_t& pos) {
+    drain->flushIn(pos);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-RuntimeException::~RuntimeException() noexcept = default;
+template <typename TYPE>
+void Source<TYPE>::skipOut(const Section& id) {
+    drain->skipIn(id);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+template <typename TYPE>
+void Source<TYPE>::setDrain(Drain<TYPE>* d) {
+    drain = d;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace util
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#endif  // GENIE_SOURCE_IMPL_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

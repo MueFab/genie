@@ -4,12 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef UTIL_EXCEPTIONS_H_
-#define UTIL_EXCEPTIONS_H_
+#ifndef GENIE_RUNTIME_EXCEPTION_H
+#define GENIE_RUNTIME_EXCEPTION_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#define DIE(msg) UTILS_DIE(msg)
 #define UTILS_DIE(msg) UTILS_THROW_RUNTIME_EXCEPTION(msg)
 #define UTILS_DIE_IF(cond, msg)                 \
     do {                                        \
@@ -21,46 +20,12 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <exception>
-#include <iostream>
-#include <string>
+#include "exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace util {
-
-/**
- *
- */
-class Exception : public std::exception {
-   public:
-    /**
-     *
-     * @param msg
-     */
-    explicit Exception(std::string msg);
-
-    /**
-     *
-     */
-    ~Exception() noexcept override;
-
-    /**
-     *
-     * @return
-     */
-    virtual std::string msg() const;
-
-    /**
-     *
-     * @return
-     */
-    const char *what() const noexcept override;
-
-   protected:
-    std::string msg_;  //!<
-};
 
 /**
  *
@@ -96,7 +61,7 @@ class RuntimeException : public Exception {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // UTIL_EXCEPTIONS_H_
+#endif  // GENIE_RUNTIME_EXCEPTION_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

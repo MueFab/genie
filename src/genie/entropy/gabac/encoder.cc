@@ -5,8 +5,11 @@
  */
 
 #include "encoder.h"
+
 #include <genie/util/make-unique.h>
 #include <genie/util/watch.h>
+
+#include <iostream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -6,7 +6,7 @@
 
 #include "qv_coding_config_1.h"
 #include <genie/util/bitwriter.h>
-#include <genie/util/exceptions.h>
+#include <genie/util/runtime-exception.h>
 #include <genie/util/make-unique.h>
 
 // ---------------------------------------------------------------------------------------------------------------------

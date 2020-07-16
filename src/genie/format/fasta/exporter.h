@@ -7,6 +7,8 @@
 #include <genie/util/original-source.h>
 #include <genie/util/thread-manager.h>
 
+#include <iostream>
+
 namespace genie {
 namespace format {
 namespace fasta {
