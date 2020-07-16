@@ -33,6 +33,10 @@ class DescriptorPresent : public Descriptor {
    public:
     static constexpr int8_t PRESENT = 0;  //!<
 
+    bool equals(const Descriptor* desc) const override {
+        return Descriptor::equals(desc) && decoder_configuration->equals(dynamic_cast<const DescriptorPresent*>(desc)->decoder_configuration.get());
+    }
+
     /**
      *
      */

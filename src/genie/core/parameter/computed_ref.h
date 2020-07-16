@@ -44,6 +44,11 @@ class ComputedRef {
     boost::optional<ComputedRefExtended> extension;  //!<
 
    public:
+
+    bool operator==(const ComputedRef& cr) const{
+        return cr_alg_ID == cr.cr_alg_ID && extension == cr.extension;
+    }
+
     /**
      *
      * @param _cr_alg_ID

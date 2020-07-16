@@ -97,6 +97,13 @@ class TransformedParameters {
      */
     void setMergeCodingShiftSizes(std::vector<uint8_t> mergeCodingshiftSizes);
 
+    bool operator==(const TransformedParameters &val) const {
+        return transform_ID_subseq == val.transform_ID_subseq &&
+               match_coding_buffer_size == val.match_coding_buffer_size && rle_coding_guard == val.rle_coding_guard &&
+               merge_coding_subseq_count == val.merge_coding_subseq_count &&
+               merge_coding_shift_size == val.merge_coding_shift_size;
+    }
+
    private:
     TransformIdSubseq transform_ID_subseq;               //!< : 8; Line 2
     boost::optional<uint16_t> match_coding_buffer_size;  //!< : 16; Line 6

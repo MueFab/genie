@@ -62,6 +62,10 @@ class QualityValues {
      */
     virtual size_t getNumSubsequences() const = 0;
 
+    virtual bool equals(const QualityValues* qv) const {
+        return qv_coding_mode == qv->qv_coding_mode && qv_reverse_flag == qv->qv_reverse_flag;
+    }
+
    protected:
     uint8_t qv_coding_mode;  //!<
     bool qv_reverse_flag;    //!<

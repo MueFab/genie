@@ -104,6 +104,10 @@ class BinarizationParameters {
      */
     static uint8_t getNumBinarizationParams(BinarizationParameters::BinarizationId binarzationId);
 
+    bool operator==(const BinarizationParameters& bin) const {
+        return cmax == bin.cmax && cmax_teg == bin.cmax_teg && cmax_dtu == bin.cmax_dtu && split_unit_size == bin.split_unit_size;
+    }
+
    private:
     uint8_t cmax;             //!<
     uint8_t cmax_teg;         //!<
