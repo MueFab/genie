@@ -37,6 +37,7 @@ class Exporter : public core::FormatExporterCompressed {
     util::BitWriter writer;  //!<
     util::OrderedLock lock;  //!<
     size_t id_ctr;           //!<
+    std::vector<core::parameter::ParameterSet> parameter_stash;
    public:
     /**
      *

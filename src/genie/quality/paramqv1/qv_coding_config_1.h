@@ -106,6 +106,10 @@ class QualityValues1 : public core::parameter::QualityValues {
      */
     size_t getNumSubsequences() const override;
 
+    bool equals(const QualityValues* qv) const override{
+        return core::parameter::QualityValues::equals(qv) && parameter_set_qvps == dynamic_cast<const QualityValues1*>(qv)->parameter_set_qvps && qvps_preset_ID == dynamic_cast<const QualityValues1*>(qv)->qvps_preset_ID;
+    }
+
    private:
     boost::optional<ParameterSet> parameter_set_qvps;  //!<
     boost::optional<QvpsPresetId> qvps_preset_ID;      //!<

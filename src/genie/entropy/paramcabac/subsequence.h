@@ -110,6 +110,12 @@ class Subsequence {
      */
     bool getTokentypeFlag() const;
 
+    bool operator==(const Subsequence& seq) const {
+        return descriptor_subsequence_ID == seq.descriptor_subsequence_ID && tokentypeFlag == seq.tokentypeFlag &&
+               transform_subseq_parameters == seq.transform_subseq_parameters &&
+               transformSubseq_cfgs == seq.transformSubseq_cfgs;
+    }
+
    private:
     boost::optional<uint16_t> descriptor_subsequence_ID;  //!<
     bool tokentypeFlag;                                   //!< helper field - not written to bitstream

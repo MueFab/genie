@@ -25,8 +25,9 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
     core::AccessUnit data = std::move(t);
     util::OrderedSection section(&lock, id);
     getStats().add(data.getStats());
-    data.getParameters().setID(id_ctr);
-    data.getParameters().setParentID(id_ctr);
+    size_t parameter_id = parameter_stash.size();
+    data.getParameters().setID(parameter_id);
+    data.getParameters().setParentID(parameter_id);
     mgb::RawReference ref;
     for(const auto& p : data.getRefToWrite()) {
         auto string = *data.getReferenceExcerpt().getChunkAt(p.first);
@@ -44,12 +45,23 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
         return;
     }
 
-    data.getParameters().write(writer);
+    bool found = false;
+    for(const auto& p : parameter_stash) {
+        if(data.getParameters() == p) {
+            found = true;
+            parameter_id = p.getID();
+        }
+    }
+
+    if(!found) {
+        data.getParameters().write(writer);
+        parameter_stash.push_back(data.getParameters());
+    }
 
     auto datasetType = data.getClassType() != core::record::ClassType::CLASS_U
               ? core::parameter::DataUnit::DatasetType::ALIGNED : (data.isReferenceOnly() ? core::parameter::DataUnit::DatasetType::REFERENCE : core::parameter::DataUnit::DatasetType::NON_ALIGNED);
 
-    mgb::AccessUnit au(id_ctr, id_ctr, data.getClassType(), data.getNumReads(),
+    mgb::AccessUnit au(id_ctr, parameter_id, data.getClassType(), data.getNumReads(),
                        datasetType,
                        32, 32, 0);
     if(data.isReferenceOnly()) {

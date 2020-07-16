@@ -29,6 +29,11 @@ class ComputedRefExtended {
     uint32_t cr_buf_max_size;  //!<
 
    public:
+
+    bool operator==(const ComputedRefExtended& ext) const {
+       return cr_pad_size == ext.cr_pad_size && cr_buf_max_size == ext.cr_buf_max_size;
+    }
+
     /**
      *
      * @param cr_pad_size

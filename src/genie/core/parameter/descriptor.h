@@ -56,6 +56,10 @@ class Descriptor {
      */
     virtual ~Descriptor() = default;
 
+    virtual bool equals(const Descriptor* desc) const {
+        return dec_cfg_preset == desc->dec_cfg_preset;
+    }
+
     /**
      *
      * @return

@@ -29,6 +29,9 @@ class Codebook {
     std::vector<uint8_t> qv_recon;  //!< Lines 5 to 7
 
    public:
+
+    bool operator==(const Codebook &ps) const { return qv_recon == ps.qv_recon; }
+
     /**
      *
      * @param reader

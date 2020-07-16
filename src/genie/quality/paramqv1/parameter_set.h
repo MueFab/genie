@@ -31,6 +31,7 @@ class ParameterSet {
     std::vector<Codebook> qv_codebooks;  //!<
 
    public:
+    bool operator==(const ParameterSet &ps) const { return qv_codebooks == ps.qv_codebooks; }
     /**
      *
      * @param reader

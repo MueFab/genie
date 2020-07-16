@@ -93,6 +93,10 @@ class SupportValues {
      */
     bool getShareSubsymPrvFlag() const;
 
+    bool operator==(const SupportValues& val) const {
+        return output_symbol_size == val.output_symbol_size && coding_subsym_size == val.coding_subsym_size && coding_order == val.coding_order && share_subsym_lut_flag == val.share_subsym_lut_flag && share_subsym_prv_flag == val.share_subsym_prv_flag;
+    }
+
    private:
     uint8_t output_symbol_size;  //!<
     uint8_t coding_subsym_size;  //!<

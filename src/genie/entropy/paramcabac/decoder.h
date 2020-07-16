@@ -27,8 +27,16 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
    protected:
     uint8_t rle_guard_tokentype : 8;                       //!<
     std::vector<Subsequence> descriptor_subsequence_cfgs;  //!<
+
    public:
     static const uint8_t MODE_CABAC = 0;  //!<
+
+    bool equals(const Decoder *dec) const override {
+        return core::parameter::desc_pres::Decoder::equals(dec) &&
+               dynamic_cast<const DecoderTokenType *>(dec)->rle_guard_tokentype == rle_guard_tokentype &&
+               dynamic_cast<const DecoderTokenType *>(dec)->rle_guard_tokentype == rle_guard_tokentype &&
+               dynamic_cast<const DecoderTokenType *>(dec)->descriptor_subsequence_cfgs == descriptor_subsequence_cfgs;
+    }
 
     /**
      *
@@ -97,6 +105,11 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
 
    public:
     static const uint8_t MODE_CABAC = 0;  //!<
+
+    bool equals(const Decoder *dec) const override {
+        return core::parameter::desc_pres::Decoder::equals(dec) &&
+               dynamic_cast<const DecoderRegular *>(dec)->descriptor_subsequence_cfgs == descriptor_subsequence_cfgs;
+    }
 
     /**
      *

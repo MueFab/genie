@@ -37,6 +37,16 @@ class StateVars {
    public:
     static const uint32_t MAX_LUT_SIZE = (1u << 8u);  //!<
 
+    bool operator==(const StateVars& bin) const {
+        return numAlphaSubsym == bin.numAlphaSubsym && numSubsyms == bin.numSubsyms &&
+               numCtxSubsym == bin.numCtxSubsym && cLengthBI == bin.cLengthBI &&
+               codingOrderCtxOffset[0] == bin.codingOrderCtxOffset[0] &&
+               codingOrderCtxOffset[1] == bin.codingOrderCtxOffset[1] &&
+               codingOrderCtxOffset[2] == bin.codingOrderCtxOffset[2] &&
+               codingSizeCtxOffset == bin.codingSizeCtxOffset && numCtxLuts == bin.numCtxLuts &&
+               numCtxTotal == bin.numCtxTotal;
+    }
+
     /**
      *
      */

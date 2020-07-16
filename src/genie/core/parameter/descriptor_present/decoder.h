@@ -55,6 +55,10 @@ class Decoder {
      */
     uint8_t getMode() const;
 
+    virtual bool equals(const Decoder* dec) const {
+        return encoding_mode_ID == dec->encoding_mode_ID;
+    }
+
    protected:
     uint8_t encoding_mode_ID;  //!<
 };
