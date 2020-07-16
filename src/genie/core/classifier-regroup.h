@@ -47,7 +47,7 @@ class ClassifierRegroup : public Classifier {
     size_t refModeFullCovID{0};
     size_t refModeFullChunkID{0};
 
-    static const bool RAW_REFERENCE = true;
+    bool rawRefMode = true;
 
     bool isCovered(size_t start, size_t end) const{
         size_t position = start;
@@ -95,15 +95,20 @@ class ClassifierRegroup : public Classifier {
                     }
                     refState.at(data.getRef().getRefName()).at(i) = 1;
 
-                    if (RAW_REFERENCE) {
-                        data.addRefToWrite(i * refMgr->getChunkSize(), (i + 1) * refMgr->getChunkSize());
+                    if (rawRefMode) {
+                        size_t length = refMgr->getLength(data.getRef().getRefName());
+                        data.addRefToWrite(i * refMgr->getChunkSize(), std::min((i + 1) * refMgr->getChunkSize(), length));
                     } else {
+                        size_t length = refMgr->getLength(data.getRef().getRefName());
                         core::record::Chunk refChunk;
                         refChunk.setReferenceOnly(true);
                         refChunk.setRefID(refMgr->ref2ID(data.getRef().getRefName()));
                         refChunk.getRef() = data.getRef();
                         core::record::Record rec(1, core::record::ClassType::CLASS_U, "", "", 0);
                         std::string seq = *data.getRef().getChunkAt(i * refMgr->getChunkSize());
+                        if((i+1) * refMgr->getChunkSize() > length) {
+                            seq = seq.substr(0, length - i * refMgr->getChunkSize());
+                        }
                         core::record::Segment segment(std::move(seq));
                         rec.addSegment(std::move(segment));
                         refChunk.getData().push_back(std::move(rec));
@@ -139,7 +144,7 @@ class ClassifierRegroup : public Classifier {
      *
      * @param _auSize
      */
-    ClassifierRegroup(size_t _auSize, ReferenceManager* rfmgr, RefMode mode);
+    ClassifierRegroup(size_t _auSize, ReferenceManager* rfmgr, RefMode mode, bool raw_ref);
 
     /**
      *

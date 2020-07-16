@@ -44,6 +44,10 @@ class BitReader {
         istream.seekg(pos, std::ios_base::beg);
     }
 
+    void clear() {
+        istream.clear();
+    }
+
     /**
      *
      * @param _istream

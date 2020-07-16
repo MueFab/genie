@@ -16,8 +16,8 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ClassifierRegroup::ClassifierRegroup(size_t _auSize, ReferenceManager* rfmgr, RefMode mode)
-    : refMgr(rfmgr), auSize(_auSize), refMode(mode) {
+ClassifierRegroup::ClassifierRegroup(size_t _auSize, ReferenceManager* rfmgr, RefMode mode, bool raw_ref)
+    : refMgr(rfmgr), auSize(_auSize), refMode(mode), rawRefMode(raw_ref) {
     currentChunks.resize(2);
     for (auto& c : currentChunks) {
         c.resize(2);
@@ -42,23 +42,39 @@ record::Chunk ClassifierRegroup::getChunk() {
                 if (!isWritten(seq, chunkOffset + refModeFullChunkID)) {
                     core::record::Chunk refChunk;
 
-                    if (RAW_REFERENCE) {
-                        refChunk.addRefToWrite((chunkOffset + refModeFullChunkID) * refMgr->getChunkSize(),
-                                               (chunkOffset + refModeFullChunkID + 1) * refMgr->getChunkSize());
-                        refChunk.getRef() =
-                            refMgr->load(seq, (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize(),
-                                         (chunkOffset + refModeFullChunkID + 1) * refMgr->getChunkSize());
+                    std::cout << "Writing ref " << seq << " ["
+                              << std::max(cov.first, (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize())
+                              << ", "
+                              << std::min(cov.second, (chunkOffset + refModeFullChunkID + 1) * refMgr->getChunkSize())
+                              << "]" << std::endl;
+
+                    if (rawRefMode) {
+                        refChunk.addRefToWrite(
+                            std::max(cov.first, (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize()),
+                            std::min(cov.second, (chunkOffset + refModeFullChunkID + 1) * refMgr->getChunkSize()));
+                        refChunk.getRef() = refMgr->load(
+                            seq, std::max(cov.first, (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize()),
+                            std::min(cov.second, (chunkOffset + refModeFullChunkID + 1) * refMgr->getChunkSize()));
                         refChunk.setRefID(refMgr->ref2ID(seq));
                     } else {
                         refChunk.setReferenceOnly(true);
                         refChunk.setRefID(refMgr->ref2ID(seq));
-                        refChunk.getRef() =
-                            refMgr->load(seq, (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize(),
-                                         (chunkOffset + refModeFullChunkID + 1) * refMgr->getChunkSize());
+                        refChunk.getRef() = refMgr->load(
+                            seq, std::max(cov.first, (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize()),
+                            std::min(cov.second, (chunkOffset + refModeFullChunkID + 1) * refMgr->getChunkSize()));
                         core::record::Record rec(1, core::record::ClassType::CLASS_U, "", "", 0);
-                        std::string ref_seq =  *refChunk.getRef().getChunkAt((chunkOffset + refModeFullChunkID) * refMgr->getChunkSize());
-                        if(ref_seq.empty()) {
+                        std::string ref_seq =
+                            *refChunk.getRef().getChunkAt((chunkOffset + refModeFullChunkID) * refMgr->getChunkSize());
+                        if (ref_seq.empty()) {
                             std::cerr << "empty" << std::endl;
+                        }
+                        if (cov.first > (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize()) {
+                            ref_seq =
+                                ref_seq.substr(cov.first - (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize());
+                        }
+                        if (cov.second < (chunkOffset + refModeFullChunkID + 1) * refMgr->getChunkSize()) {
+                            ref_seq = ref_seq.substr(
+                                0, (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize() - cov.second);
                         }
                         core::record::Segment segment(std::move(ref_seq));
                         rec.addSegment(std::move(segment));
@@ -66,7 +82,7 @@ record::Chunk ClassifierRegroup::getChunk() {
                     }
 
                     refModeFullChunkID++;
-                    if (refModeFullChunkID > ((cov.second - 1)  / refMgr->getChunkSize())) {
+                    if (refModeFullChunkID > ((cov.second - 1) / refMgr->getChunkSize())) {
                         refModeFullCovID++;
                         refModeFullChunkID = 0;
                     }

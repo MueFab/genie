@@ -16,7 +16,7 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Importer::Importer(std::istream& _file, core::ReferenceManager* manager, core::RefDecoder* refd,  genie::core::stats::PerfStats* _stats) : core::ReferenceSource(manager), reader(_file), stats(_stats), factory(manager, this), ref_manager(manager), decoder(refd) {}
+Importer::Importer(std::istream& _file, core::ReferenceManager* manager, core::RefDecoder* refd, bool refOnly, genie::core::stats::PerfStats* _stats) : core::ReferenceSource(manager), reader(_file), stats(_stats), factory(manager, this, refOnly), ref_manager(manager), decoder(refd) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

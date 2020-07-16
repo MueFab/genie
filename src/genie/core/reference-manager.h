@@ -116,8 +116,9 @@ class ReferenceManager {
 
     void validateRefID(size_t id) {
         std::unique_lock<std::mutex> lock2(cacheInfoLock);
-        for(size_t i = 0; i < id; ++i) {
-            data[std::to_string(i)];
+        for(size_t i = 0; i <= id; ++i) {
+            auto s = std::to_string(i);
+            data[std::string(s.size() < 3 ? (3 - s.size()) : 0, '0') + s];
         }
     }
 
@@ -177,9 +178,9 @@ class ReferenceManager {
             }
         }
 
-        size_t getDataStart() const { return global_start - global_start % CHUNK_SIZE; }
+        size_t getDataStart() const { return global_start - (global_start % CHUNK_SIZE); }
 
-        size_t getDataEnd() const { return global_end - global_end % CHUNK_SIZE + CHUNK_SIZE; }
+        size_t getDataEnd() const { return global_end - (global_end % CHUNK_SIZE) + CHUNK_SIZE; }
 
         size_t getGlobalStart() const { return global_start; }
 
@@ -380,6 +381,15 @@ class ReferenceManager {
     std::vector<std::pair<size_t, size_t>> getCoverage(const std::string& name) const { return mgr.getCoverage(name); }
 
     std::vector<std::string> getSequences() const { return mgr.getSequences(); }
+
+    size_t getLength(const std::string& name) {
+        auto cov = getCoverage(name);
+        size_t ret = 0;
+        for(const auto& c : cov) {
+            ret = std::max(c.second, ret);
+        }
+        return ret;
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

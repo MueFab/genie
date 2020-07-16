@@ -32,10 +32,10 @@ namespace module {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::string& working_dir,
-                                                           size_t blocksize, core::ClassifierRegroup::RefMode externalref) {
+                                                           size_t blocksize, core::ClassifierRegroup::RefMode externalref, bool rawref) {
     std::unique_ptr<core::FlowGraphEncode> ret = genie::util::make_unique<core::FlowGraphEncode>(threads);
 
-    ret->setClassifier(genie::util::make_unique<genie::core::ClassifierRegroup>(blocksize, &ret->getRefMgr(), externalref));
+    ret->setClassifier(genie::util::make_unique<genie::core::ClassifierRegroup>(blocksize, &ret->getRefMgr(), externalref, rawref));
 
     ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Encoder>());
     ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Encoder>(2048, false));

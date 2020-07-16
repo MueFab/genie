@@ -78,6 +78,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     rawAU.setNumReads(num_reads);
     rawAU.setReferenceOnly(data.isReferenceOnly());
     rawAU.setReference(data.getRefID());
+    rawAU.setReference(data.getRef(), {});
     data.getData().clear();
     flowOut(std::move(rawAU), id);
 }

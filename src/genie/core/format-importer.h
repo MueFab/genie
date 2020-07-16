@@ -62,6 +62,18 @@ class FormatImporter : public util::OriginalSource, public util::Source<record::
     ~FormatImporter() override = default;
 };
 
+class NullImporter : public FormatImporter {
+   protected:
+    /**
+     *
+     * @param _classifier
+     * @return
+     */
+    bool pumpRetrieve(Classifier*) override {
+        return false;
+    }
+};
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace core

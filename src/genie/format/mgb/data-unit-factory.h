@@ -32,10 +32,11 @@ class DataUnitFactory {
     std::map<size_t, core::parameter::ParameterSet> parameters;  //!<
     core::ReferenceManager* refmgr;
     Importer* importer;
+    bool referenceOnly;
 
    public:
 
-    explicit DataUnitFactory(core::ReferenceManager* mgr, mgb::Importer* _importer) : refmgr(mgr), importer(_importer) {
+    explicit DataUnitFactory(core::ReferenceManager* mgr, mgb::Importer* _importer, bool ref) : refmgr(mgr), importer(_importer), referenceOnly(ref) {
 
     }
 

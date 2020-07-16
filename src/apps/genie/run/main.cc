@@ -6,6 +6,7 @@
 
 #include <genie/core/name-encoder-none.h>
 #include <genie/format/fasta/manager.h>
+#include <genie/format/fasta/exporter.h>
 #include <genie/format/fastq/exporter.h>
 #include <genie/format/fastq/importer.h>
 #include <genie/format/mgb/exporter.h>
@@ -48,7 +49,7 @@ enum class FileType { UNKNOWN = 0, MPEG = 1, THIRD_PARTY = 2 };
 // ---------------------------------------------------------------------------------------------------------------------
 
 FileType getType(const std::string& ext) {
-    if (ext == "sam" || ext == "fastq" || ext == "mgrec") {
+    if (ext == "sam" || ext == "fastq" || ext == "mgrec" || ext == "fasta") {
         return FileType::THIRD_PARTY;
     } else if (ext == "mgb") {
         return FileType::MPEG;
@@ -97,10 +98,28 @@ void attachExporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
         }
     } else if (file_extension(pOpts.outputFile) == "mgrec") {
         flow.addExporter(genie::util::make_unique<genie::format::mgrec::Exporter>(*outputFiles.back()));
+    } else if (file_extension(pOpts.outputFile) == "fasta") {
+        flow.addExporter(genie::util::make_unique<genie::format::fasta::Exporter>(&flow.getRefMgr(), outputFiles.back().get(), pOpts.numberOfThreads));
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+
+void addFasta(const std::string& fastaFile, genie::core::FlowGraphEncode* flow,
+              std::vector<std::unique_ptr<std::ifstream>>& inputFiles) {
+    std::string fai = fastaFile.substr(0, fastaFile.size() - 5) + "fai";
+    auto fasta_file = genie::util::make_unique<std::ifstream>(fastaFile);
+    if (!ghc::filesystem::exists(fai)) {
+        std::cout << "Indexing " << fastaFile << " ..." << std::endl;
+        std::ofstream fai_file(fai);
+        genie::format::fasta::FastaReader::index(*fasta_file, fai_file);
+    }
+    auto fai_file = genie::util::make_unique<std::ifstream>(fai);
+    inputFiles.push_back(std::move(fasta_file));
+    inputFiles.push_back(std::move(fai_file));
+    flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(
+        **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr()));
+}
 
 template <class T>
 void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ifstream>>& inputFiles) {
@@ -119,6 +138,8 @@ void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
         }
     } else if (file_extension(pOpts.inputFile) == "mgrec") {
         flow.addImporter(genie::util::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, *inputFiles.back()));
+    } else if (file_extension(pOpts.inputFile) == "fasta") {
+        flow.addImporter(genie::util::make_unique<genie::core::NullImporter>());
     }
 }
 
@@ -129,27 +150,23 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
     constexpr size_t BLOCKSIZE = 10000;
     genie::core::ClassifierRegroup::RefMode mode;
-    if(pOpts.refMode == "none") {
+    if (pOpts.refMode == "none") {
         mode = genie::core::ClassifierRegroup::RefMode::NONE;
-    } else if(pOpts.refMode == "full") {
+    } else if (pOpts.refMode == "full") {
         mode = genie::core::ClassifierRegroup::RefMode::FULL;
     } else {
         mode = genie::core::ClassifierRegroup::RefMode::RELEVANT;
     }
-    auto flow = genie::module::buildDefaultEncoder(pOpts.numberOfThreads, pOpts.workingDirectory, BLOCKSIZE, mode);
-    if(!pOpts.inputRefFile.empty()) {
-        if(file_extension(pOpts.inputRefFile) == "fasta") {
-            std::string fai = pOpts.inputRefFile.substr(0, pOpts.inputRefFile.size() - 5) + "fai";
-            auto fasta_file = genie::util::make_unique<std::ifstream> (pOpts.inputRefFile);
-            if(!ghc::filesystem::exists(fai)) {
-                std::cout << "Indexing " << pOpts.inputRefFile  << " ..." << std::endl;
-                std::ofstream fai_file(fai);
-                genie::format::fasta::FastaReader::index(*fasta_file, fai_file);
-            }
-            auto fai_file = genie::util::make_unique<std::ifstream>(fai);
-            inputFiles.push_back(std::move(fasta_file));
-            inputFiles.push_back(std::move(fai_file));
-            flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(**(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr()));
+    if (file_extension(pOpts.inputFile) == "fasta") {
+        mode = genie::core::ClassifierRegroup::RefMode::FULL;
+    }
+    auto flow = genie::module::buildDefaultEncoder(pOpts.numberOfThreads, pOpts.workingDirectory, BLOCKSIZE, mode,
+                                                   pOpts.rawReference);
+    if (file_extension(pOpts.inputFile) == "fasta") {
+        addFasta(pOpts.inputFile, flow.get(), inputFiles);
+    } else if (!pOpts.inputRefFile.empty()) {
+        if (file_extension(pOpts.inputRefFile) == "fasta") {
+            addFasta(pOpts.inputRefFile, flow.get(), inputFiles);
         } else {
             UTILS_DIE("Unknown reference format");
         }
@@ -177,25 +194,29 @@ std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
     constexpr size_t BLOCKSIZE = 10000;
     auto flow = genie::module::buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory, BLOCKSIZE);
-    if(!pOpts.inputRefFile.empty()) {
-        if(file_extension(pOpts.inputRefFile) == "fasta") {
+    if (!pOpts.inputRefFile.empty()) {
+        if (file_extension(pOpts.inputRefFile) == "fasta") {
             std::string fai = pOpts.inputRefFile.substr(0, pOpts.inputRefFile.size() - 5) + "fai";
-            auto fasta_file = genie::util::make_unique<std::ifstream> (pOpts.inputRefFile);
-            if(!ghc::filesystem::exists(fai)) {
-                std::cout << "Indexing " << pOpts.inputRefFile  << " ..." << std::endl;
+            auto fasta_file = genie::util::make_unique<std::ifstream>(pOpts.inputRefFile);
+            if (!ghc::filesystem::exists(fai)) {
+                std::cout << "Indexing " << pOpts.inputRefFile << " ..." << std::endl;
                 std::ofstream fai_file(fai);
                 genie::format::fasta::FastaReader::index(*fasta_file, fai_file);
             }
             auto fai_file = genie::util::make_unique<std::ifstream>(fai);
             inputFiles.push_back(std::move(fasta_file));
             inputFiles.push_back(std::move(fai_file));
-            flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(**(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr()));
-        } else {
-            UTILS_DIE("Unknown reference format");
+            flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(
+                **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr()));
+        } else if (file_extension(pOpts.inputRefFile) == "mgb") {
+                inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputRefFile));
+                flow->addImporter(genie::util::make_unique<genie::format::mgb::Importer>(*inputFiles.back(), &flow->getRefMgr(),
+                                                                                         flow->getRefDecoder(), true));
         }
     }
     inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile));
-    flow->addImporter(genie::util::make_unique<genie::format::mgb::Importer>(*inputFiles.back(), &flow->getRefMgr(), flow->getRefDecoder()));
+    flow->addImporter(genie::util::make_unique<genie::format::mgb::Importer>(*inputFiles.back(), &flow->getRefMgr(),
+                                                                             flow->getRefDecoder(), file_extension(pOpts.outputFile) == "fasta"));
     attachExporter(*flow, pOpts, outputFiles);
     return flow;
 }
@@ -206,7 +227,6 @@ std::unique_ptr<genie::core::FlowGraph> buildConverter(const ProgramOptions& pOp
                                                        std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                                                        std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
     auto flow = genie::module::buildDefaultConverter(pOpts.numberOfThreads);
-    ;
     attachExporter(*flow, pOpts, outputFiles);
     attachImporter(*flow, pOpts, inputFiles);
     return flow;
