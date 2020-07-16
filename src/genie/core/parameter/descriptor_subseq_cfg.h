@@ -9,10 +9,11 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
+#include <genie/core/constants.h>
+#include <genie/util/bitreader.h>
+
 #include <memory>
-#include <vector>
+
 #include "descriptor.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -114,23 +115,21 @@ class DescriptorSubseqCfg {
      */
     virtual void write(util::BitWriter& writer) const;
 
-    bool operator==(const DescriptorSubseqCfg& cfg) const {
-        return class_specific_dec_cfg_flag == cfg.class_specific_dec_cfg_flag && desc_comp(cfg);
-    }
-
-    bool desc_comp(const DescriptorSubseqCfg& cfg) const {
-        if (cfg.descriptor_configurations.size() != descriptor_configurations.size()) {
-            return false;
-        }
-        for (size_t i = 0; i < cfg.descriptor_configurations.size(); ++i) {
-            if (!(descriptor_configurations[i]->equals(cfg.descriptor_configurations[i].get()))) {
-                return false;
-            }
-        }
-        return true;
-    }
+    /**
+     *
+     * @param cfg
+     * @return
+     */
+    bool operator==(const DescriptorSubseqCfg& cfg) const;
 
    private:
+    /**
+     *
+     * @param cfg
+     * @return
+     */
+    bool desc_comp(const DescriptorSubseqCfg& cfg) const;
+
     bool class_specific_dec_cfg_flag;                                    //!<
     std::vector<std::unique_ptr<Descriptor>> descriptor_configurations;  //!<
 };

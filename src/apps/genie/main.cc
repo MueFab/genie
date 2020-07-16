@@ -6,7 +6,7 @@
 
 #include <genie/module/manager.h>
 #include <genie/run/main.h>
-#include <genie/util/exceptions.h>
+#include <genie/util/runtime-exception.h>
 #include <cli11/CLI11.hpp>
 #include <iostream>
 #include <string>

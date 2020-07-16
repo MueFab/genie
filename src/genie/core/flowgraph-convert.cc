@@ -17,6 +17,12 @@ FlowGraphConvert::FlowGraphConvert(size_t threads) : mgr(threads) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+ReferenceManager& FlowGraphConvert::getRefMgr() {
+    return *refMgr;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void FlowGraphConvert::addImporter(std::unique_ptr<genie::core::FormatImporter> dat) {
     importers.emplace_back();
     setImporter(std::move(dat), importers.size() - 1);

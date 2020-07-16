@@ -7,7 +7,7 @@
 #include "codebook.h"
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
-#include <genie/util/exceptions.h>
+#include <genie/util/runtime-exception.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

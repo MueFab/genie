@@ -22,123 +22,86 @@ namespace core {
  */
 class ClassifierRegroup : public Classifier {
    public:
-    enum class RefMode {
-        NONE = 0,
-        RELEVANT = 1,
-        FULL = 2
-    };
-   private:
+    enum class RefMode { NONE = 0, RELEVANT = 1, FULL = 2 };
 
-    std::vector<record::Chunk> finishedChunks;
+   private:
+    std::vector<record::Chunk> finishedChunks;  //!<
 
     using ClassBlock = std::vector<record::Chunk>;  //!<
-    using PairedBlock = std::vector<ClassBlock>;
+    using PairedBlock = std::vector<ClassBlock>;    //!<
     using RefNoRefBlock = std::vector<PairedBlock>;
-    RefNoRefBlock currentChunks;                      //!<
-    ReferenceManager* refMgr;
-    std::string currentSeq;                            //!<
-    std::vector<std::pair<size_t, size_t>> currentSeqCoverage; //!<
-    std::map<std::string, std::vector<uint8_t>> refState;
+    RefNoRefBlock currentChunks;                                //!<
+    ReferenceManager* refMgr;                                   //!<
+    std::string currentSeq;                                     //!<
+    std::vector<std::pair<size_t, size_t>> currentSeqCoverage;  //!<
+    std::map<std::string, std::vector<uint8_t>> refState;       //!<
 
-    size_t auSize;                                  //!<
-    core::stats::PerfStats stats;
-    RefMode refMode;
-    size_t refModeFullSeqID{0};
-    size_t refModeFullCovID{0};
-    size_t refModeFullChunkID{0};
+    size_t auSize;                 //!<
+    core::stats::PerfStats stats;  //!<
+    RefMode refMode;               //!<
+    size_t refModeFullSeqID{0};    //!<
+    size_t refModeFullCovID{0};    //!<
+    size_t refModeFullChunkID{0};  //!<
 
-    bool rawRefMode = true;
+    bool rawRefMode = true;  //!<
 
-    bool isCovered(size_t start, size_t end) const{
-        size_t position = start;
+    /**
+     *
+     * @param start
+     * @param end
+     * @return
+     */
+    bool isCovered(size_t start, size_t end) const;
 
-        for(auto it = currentSeqCoverage.begin(); it != currentSeqCoverage.end(); ++it) {
-            if(position >= it->first && position < it->second) {
-                position = it->second - 1;
-                it = currentSeqCoverage.begin();
-            }
-            if(position >= (end - 1)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    /**
+     *
+     * @param r
+     * @return
+     */
+    bool isCovered(const core::record::Record& r) const;
 
-    bool isCovered(const core::record::Record& r) const{
-        for(size_t i = 0; i <= r.getAlignments().front().getAlignmentSplits().size(); ++i) {
-            auto pos = r.getPosition(0, i);
-            if(!isCovered(pos, pos + r.getMappedLength(0, i))) {
-                return false;
-            }
-        }
-        return true;
-    }
+    /**
+     *
+     * @param refBased
+     * @param paired
+     * @param classtype
+     * @param r
+     */
+    void push(bool refBased, bool paired, core::record::ClassType classtype, core::record::Record& r);
 
-   void push(bool refBased, bool paired, core::record::ClassType classtype, core::record::Record& r){
-       auto& chunk = currentChunks[refBased][paired][(uint8_t)classtype - 1];
-       if(chunk.getRef().getRefName().empty()) {
-           auto pos = r.getPosition(0,0);
-           chunk.getRef() = ReferenceManager::ReferenceExcerpt(currentSeq, pos, pos + r.getMappedLength(0, 0));
-           for(size_t i = 0; i < r.getAlignments().front().getAlignmentSplits().size(); ++i) {
-               pos = r.getPosition(0, 1);
-           }
-       }
-   }
-
-    void queueFinishedChunk(core::record::Chunk& data) {
-        if(!data.getRef().isEmpty()) {
-            if(refMode == RefMode::RELEVANT) {
-                for (size_t i = data.getRef().getGlobalStart() / refMgr->getChunkSize();
-                     i <= (data.getRef().getGlobalEnd() - 1) / refMgr->getChunkSize(); ++i) {
-                    if (isWritten(data.getRef().getRefName(), i)) {
-                        continue;
-                    }
-                    refState.at(data.getRef().getRefName()).at(i) = 1;
-
-                    if (rawRefMode) {
-                        size_t length = refMgr->getLength(data.getRef().getRefName());
-                        data.addRefToWrite(i * refMgr->getChunkSize(), std::min((i + 1) * refMgr->getChunkSize(), length));
-                    } else {
-                        size_t length = refMgr->getLength(data.getRef().getRefName());
-                        core::record::Chunk refChunk;
-                        refChunk.setReferenceOnly(true);
-                        refChunk.setRefID(refMgr->ref2ID(data.getRef().getRefName()));
-                        refChunk.getRef() = data.getRef();
-                        core::record::Record rec(1, core::record::ClassType::CLASS_U, "", "", 0);
-                        std::string seq = *data.getRef().getChunkAt(i * refMgr->getChunkSize());
-                        if((i+1) * refMgr->getChunkSize() > length) {
-                            seq = seq.substr(0, length - i * refMgr->getChunkSize());
-                        }
-                        core::record::Segment segment(std::move(seq));
-                        rec.addSegment(std::move(segment));
-                        refChunk.getData().push_back(std::move(rec));
-                        finishedChunks.push_back(std::move(refChunk));
-                    }
-                }
-            }
-
-            data.setRefID(refMgr->ref2ID(data.getRef().getRefName()));
-        }
-        finishedChunks.push_back(std::move(data));
-    }
+    /**
+     *
+     * @param data
+     */
+    void queueFinishedChunk(core::record::Chunk& data);
 
    public:
+    /**
+     *
+     * @param ref
+     * @param index
+     * @return
+     */
+    bool isWritten(const std::string& ref, size_t index);
 
-    bool isWritten(const std::string& ref, size_t index) {
-        if(refState.find(ref) == refState.end()) {
-            refState.insert(std::make_pair(ref, std::vector<uint8_t>(1, 0)));
-        }
-        if(refState.at(ref).size() <= index) {
-            refState.at(ref).resize(index + 1, 0);
-        }
-        return refState.at(ref).at(index);
-    }
+    /**
+     *
+     * @param ref
+     * @param seq
+     * @param ecigar
+     * @return
+     */
+    record::ClassType fineClassifierECigar(const std::string& ref, const std::string& seq, const std::string& ecigar);
 
-    record::ClassType fineClassifierECigar(const std::string& ref, const std::string& seq,
-                                                              const std::string& ecigar);
-
+    /**
+     *
+     * @param record_reference
+     * @param rec
+     * @param loadonly
+     * @return
+     */
     record::ClassType fineClassifierRecord(ReferenceManager::ReferenceExcerpt& record_reference,
-                                                              const core::record::Record& rec, bool loadonly);
+                                           const core::record::Record& rec, bool loadonly);
 
     /**
      *

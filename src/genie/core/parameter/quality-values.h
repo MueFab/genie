@@ -9,10 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
-#include <cstdint>
+
 #include <memory>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -62,9 +60,12 @@ class QualityValues {
      */
     virtual size_t getNumSubsequences() const = 0;
 
-    virtual bool equals(const QualityValues* qv) const {
-        return qv_coding_mode == qv->qv_coding_mode && qv_reverse_flag == qv->qv_reverse_flag;
-    }
+    /**
+     *
+     * @param qv
+     * @return
+     */
+    virtual bool equals(const QualityValues* qv) const;
 
    protected:
     uint8_t qv_coding_mode;  //!<

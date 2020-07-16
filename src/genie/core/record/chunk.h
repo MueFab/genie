@@ -24,11 +24,11 @@ namespace record {
 class Chunk {
    private:
     std::vector<Record> data;  //!<
-    ReferenceManager::ReferenceExcerpt reference;
-    std::vector<std::pair<size_t, size_t>> refToWrite;
-    size_t refID;
+    ReferenceManager::ReferenceExcerpt reference; //!<
+    std::vector<std::pair<size_t, size_t>> refToWrite; //!y
+    size_t refID; //!<
     stats::PerfStats stats;    //!<
-    bool referenceOnly{false};
+    bool referenceOnly{false}; //!<
    public:
     /**
      *
@@ -36,29 +36,42 @@ class Chunk {
      */
     std::vector<Record>& getData();
 
-    ReferenceManager::ReferenceExcerpt& getRef(){
-        return reference;
-    }
+    /**
+     *
+     * @return
+     */
+    ReferenceManager::ReferenceExcerpt& getRef();
 
-    void addRefToWrite(size_t start, size_t end) {
-        refToWrite.emplace_back(start, end);
-    }
+    /**
+     *
+     * @param start
+     * @param end
+     */
+    void addRefToWrite(size_t start, size_t end);
 
-    const std::vector<std::pair<size_t, size_t>>& getRefToWrite() const {
-        return refToWrite;
-    }
+    /**
+     *
+     * @return
+     */
+    const std::vector<std::pair<size_t, size_t>>& getRefToWrite() const;
 
-    const ReferenceManager::ReferenceExcerpt& getRef() const{
-        return reference;
-    }
+    /**
+     *
+     * @return
+     */
+    const ReferenceManager::ReferenceExcerpt& getRef() const;
 
-    void setRefID(size_t id) {
-        refID = id;
-    }
+    /**
+     *
+     * @param id
+     */
+    void setRefID(size_t id);
 
-    size_t getRefID() const {
-        return refID;
-    }
+    /**
+     *
+     * @return
+     */
+    size_t getRefID() const;
 
     /**
      *
@@ -82,17 +95,13 @@ class Chunk {
      *
      * @return
      */
-    bool isReferenceOnly() const {
-        return referenceOnly;
-    }
+    bool isReferenceOnly() const;
 
     /**
      *
      * @param ref
      */
-    void setReferenceOnly(bool ref) {
-        referenceOnly = ref;
-    }
+    void setReferenceOnly(bool ref);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

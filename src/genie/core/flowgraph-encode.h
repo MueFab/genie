@@ -9,6 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <genie/util/thread-manager.h>
+
 #include "entropy-encoder.h"
 #include "flowgraph.h"
 #include "format-exporter-compressed.h"
@@ -26,8 +28,8 @@ namespace core {
  */
 class FlowGraphEncode : public FlowGraph {
     genie::util::ThreadManager mgr;                       //!<
-    std::unique_ptr<genie::core::ReferenceManager> refMgr;
-    std::vector<std::unique_ptr<genie::core::ReferenceSource>> refSources;
+    std::unique_ptr<genie::core::ReferenceManager> refMgr; //!<
+    std::vector<std::unique_ptr<genie::core::ReferenceSource>> refSources; //!<
     std::unique_ptr<genie::core::Classifier> classifier;  //!<
 
     std::vector<std::unique_ptr<genie::core::FormatImporter>> importers;  //!<
@@ -64,13 +66,17 @@ class FlowGraphEncode : public FlowGraph {
      */
     void addImporter(std::unique_ptr<genie::core::FormatImporter> dat);
 
-    void addReferenceSource(std::unique_ptr<genie::core::ReferenceSource> dat) {
-        refSources.push_back(std::move(dat));
-    }
+    /**
+     *
+     * @param dat
+     */
+    void addReferenceSource(std::unique_ptr<genie::core::ReferenceSource> dat);
 
-    ReferenceManager& getRefMgr() {
-        return *refMgr;
-    }
+    /**
+     *
+     * @return
+     */
+    ReferenceManager& getRefMgr();
 
     /**
      *

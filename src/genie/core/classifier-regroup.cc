@@ -5,14 +5,111 @@
  */
 
 #include "classifier-regroup.h"
+
 #include <genie/util/watch.h>
+
 #include "cigar-tokenizer.h"
 #include "constants.h"
+
+#include <iostream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool ClassifierRegroup::isCovered(size_t start, size_t end) const {
+    size_t position = start;
+
+    for (auto it = currentSeqCoverage.begin(); it != currentSeqCoverage.end(); ++it) {
+        if (position >= it->first && position < it->second) {
+            position = it->second - 1;
+            it = currentSeqCoverage.begin();
+        }
+        if (position >= (end - 1)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool ClassifierRegroup::isCovered(const core::record::Record& r) const {
+    for (size_t i = 0; i <= r.getAlignments().front().getAlignmentSplits().size(); ++i) {
+        auto pos = r.getPosition(0, i);
+        if (!isCovered(pos, pos + r.getMappedLength(0, i))) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ClassifierRegroup::push(bool refBased, bool paired, core::record::ClassType classtype, core::record::Record& r) {
+    auto& chunk = currentChunks[refBased][paired][(uint8_t)classtype - 1];
+    if (chunk.getRef().getRefName().empty()) {
+        auto pos = r.getPosition(0, 0);
+        chunk.getRef() = ReferenceManager::ReferenceExcerpt(currentSeq, pos, pos + r.getMappedLength(0, 0));
+        for (size_t i = 0; i < r.getAlignments().front().getAlignmentSplits().size(); ++i) {
+            pos = r.getPosition(0, 1);
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ClassifierRegroup::queueFinishedChunk(core::record::Chunk& data) {
+    if (!data.getRef().isEmpty()) {
+        if (refMode == RefMode::RELEVANT) {
+            for (size_t i = data.getRef().getGlobalStart() / refMgr->getChunkSize();
+                 i <= (data.getRef().getGlobalEnd() - 1) / refMgr->getChunkSize(); ++i) {
+                if (isWritten(data.getRef().getRefName(), i)) {
+                    continue;
+                }
+                refState.at(data.getRef().getRefName()).at(i) = 1;
+
+                if (rawRefMode) {
+                    size_t length = refMgr->getLength(data.getRef().getRefName());
+                    data.addRefToWrite(i * refMgr->getChunkSize(), std::min((i + 1) * refMgr->getChunkSize(), length));
+                } else {
+                    size_t length = refMgr->getLength(data.getRef().getRefName());
+                    core::record::Chunk refChunk;
+                    refChunk.setReferenceOnly(true);
+                    refChunk.setRefID(refMgr->ref2ID(data.getRef().getRefName()));
+                    refChunk.getRef() = data.getRef();
+                    core::record::Record rec(1, core::record::ClassType::CLASS_U, "", "", 0);
+                    std::string seq = *data.getRef().getChunkAt(i * refMgr->getChunkSize());
+                    if ((i + 1) * refMgr->getChunkSize() > length) {
+                        seq = seq.substr(0, length - i * refMgr->getChunkSize());
+                    }
+                    core::record::Segment segment(std::move(seq));
+                    rec.addSegment(std::move(segment));
+                    refChunk.getData().push_back(std::move(rec));
+                    finishedChunks.push_back(std::move(refChunk));
+                }
+            }
+        }
+
+        data.setRefID(refMgr->ref2ID(data.getRef().getRefName()));
+    }
+    finishedChunks.push_back(std::move(data));
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool ClassifierRegroup::isWritten(const std::string& ref, size_t index) {
+    if (refState.find(ref) == refState.end()) {
+        refState.insert(std::make_pair(ref, std::vector<uint8_t>(1, 0)));
+    }
+    if (refState.at(ref).size() <= index) {
+        refState.at(ref).resize(index + 1, 0);
+    }
+    return refState.at(ref).at(index);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -119,6 +216,8 @@ record::Chunk ClassifierRegroup::getChunk() {
     return ret;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 record::ClassType ClassifierRegroup::fineClassifierECigar(const std::string& ref, const std::string& seq,
                                                           const std::string& ecigar) {
     record::ClassType classtype = record::ClassType::CLASS_P;
@@ -156,6 +255,8 @@ record::ClassType ClassifierRegroup::fineClassifierECigar(const std::string& ref
     core::CigarTokenizer::tokenize(ecigar, core::getECigarInfo(), classChecker);
     return classtype;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 record::ClassType ClassifierRegroup::fineClassifierRecord(ReferenceManager::ReferenceExcerpt& record_reference,
                                                           const core::record::Record& rec, bool loadonly) {

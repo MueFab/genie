@@ -10,20 +10,12 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
-#include "exceptions.h"
+#include "generic-factory.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace util {
-
-/**
- *
- */
-class GenericFactory {
-   public:
-    virtual ~GenericFactory() = default;
-};
 
 /**
  *
@@ -40,31 +32,20 @@ class Factory : public GenericFactory {
      * @param id
      * @param factory
      */
-    void registerType(uint8_t id, const std::function<std::unique_ptr<T>(util::BitReader&)>& factory) {
-        factories.insert(std::make_pair(id, factory));
-    }
+    void registerType(uint8_t id, const std::function<std::unique_ptr<T>(util::BitReader&)>& factory);
 
     /**
      *
      * @param factory
      * @return
      */
-    uint8_t registerType(const std::function<std::unique_ptr<T>(util::BitReader&)>& factory) {
-        uint8_t id = 0;
-        auto it = factories.find(id);
-        while (it != factories.end()) {
-            id++;
-            it = factories.find(id);
-        }
-        factories.insert(std::make_pair(id, factory));
-        return id;
-    }
+    uint8_t registerType(const std::function<std::unique_ptr<T>(util::BitReader&)>& factory);
 
     /**
      *
      * @param id
      */
-    void unregisterType(uint8_t id) { factories.erase(id); }
+    void unregisterType(uint8_t id);
 
     /**
      *
@@ -72,17 +53,17 @@ class Factory : public GenericFactory {
      * @param reader
      * @return
      */
-    std::unique_ptr<T> create(uint8_t id, util::BitReader& reader) {
-        auto it = factories.find(id);
-        UTILS_DIE_IF(it == factories.end(), "Unknown implementation in factory");
-        return it->second(reader);
-    }
+    std::unique_ptr<T> create(uint8_t id, util::BitReader& reader);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace util
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include "factory.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

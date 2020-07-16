@@ -5,15 +5,10 @@
  */
 
 #include "parameter_set.h"
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-#include <genie/util/exceptions.h>
-#include <genie/util/make-unique.h>
-#include <global-cfg.h>
+
+#include <genie/core/global-cfg.h>
+
 #include <sstream>
-#include "descriptor.h"
-#include "descriptor_subseq_cfg.h"
-#include "quality-values.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -402,6 +397,34 @@ void ParameterSet::setParentID(uint8_t id) { parent_parameter_set_ID = id; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ParameterSet::setQVDepth(uint8_t qv) { qv_depth = qv; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool ParameterSet::operator==(const ParameterSet &ps) const {
+    return dataset_type == ps.dataset_type &&
+           alphabet_ID == ps.alphabet_ID && read_length == ps.read_length &&
+           number_of_template_segments_minus1 == ps.number_of_template_segments_minus1 &&
+           max_au_data_unit_size == ps.max_au_data_unit_size && pos_40_bits_flag == ps.pos_40_bits_flag &&
+           qv_depth == ps.qv_depth && as_depth == ps.as_depth && class_IDs == ps.class_IDs &&
+           descriptors == ps.descriptors && rgroup_IDs == ps.rgroup_IDs &&
+           multiple_alignments_flag == ps.multiple_alignments_flag && spliced_reads_flag == ps.spliced_reads_flag &&
+           multiple_signature_base == ps.multiple_signature_base && u_signature_size == ps.u_signature_size &&
+           qual_cmp(ps) && parameter_set_crps == ps.parameter_set_crps;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool ParameterSet::qual_cmp(const ParameterSet &ps) const {
+    if (ps.qv_coding_configs.size() != qv_coding_configs.size()) {
+        return false;
+    }
+    for (size_t i = 0; i < ps.qv_coding_configs.size(); ++i) {
+        if (!(qv_coding_configs[i]->equals(ps.qv_coding_configs[i].get()))) {
+            return false;
+        }
+    }
+    return true;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

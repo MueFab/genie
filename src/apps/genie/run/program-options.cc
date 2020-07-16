@@ -5,7 +5,7 @@
  */
 
 #include "program-options.h"
-#include <genie/util/exceptions.h>
+#include <genie/util/runtime-exception.h>
 #include <cli11/CLI11.hpp>
 #include <filesystem/filesystem.hpp>
 #include <iostream>

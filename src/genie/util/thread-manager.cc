@@ -5,8 +5,9 @@
  */
 
 #include "thread-manager.h"
+#include "runtime-exception.h"
+
 #include <iostream>
-#include "exceptions.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

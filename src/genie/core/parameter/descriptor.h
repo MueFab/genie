@@ -12,6 +12,7 @@
 #include <genie/core/constants.h>
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
+
 #include <memory>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -56,9 +57,12 @@ class Descriptor {
      */
     virtual ~Descriptor() = default;
 
-    virtual bool equals(const Descriptor* desc) const {
-        return dec_cfg_preset == desc->dec_cfg_preset;
-    }
+    /**
+     *
+     * @param desc
+     * @return
+     */
+    virtual bool equals(const Descriptor *desc) const;
 
     /**
      *

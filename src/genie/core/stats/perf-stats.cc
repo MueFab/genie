@@ -5,8 +5,11 @@
  */
 
 #include "perf-stats.h"
-#include <genie/util/exceptions.h>
+
+#include <genie/util/runtime-exception.h>
+
 #include <iomanip>
+#include <ostream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

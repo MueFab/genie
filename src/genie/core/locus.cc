@@ -5,7 +5,7 @@
  */
 
 #include "locus.h"
-#include <genie/util/exceptions.h>
+#include <genie/util/runtime-exception.h>
 #include <genie/util/tokenize.h>
 
 // ---------------------------------------------------------------------------------------------------------------------

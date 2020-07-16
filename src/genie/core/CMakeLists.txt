@@ -38,6 +38,7 @@ set(source_files
         flowgraph-decode.cc
         flowgraph-encode.cc
         format-importer.cc
+        format-importer-null.cc
         format-exporter.cc
         format-importer-compressed.cc
         format-exporter-compressed.cc
@@ -47,7 +48,9 @@ set(source_files
         read-encoder.cc
         read-decoder.cc
         reference.cc
+        reference-collection.cc
         reference-manager.cc
+        reference-source.cc
         )
 
 add_library(genie-core ${source_files})

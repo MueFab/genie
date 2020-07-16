@@ -5,10 +5,10 @@
  */
 
 #include "descriptor_subseq_cfg.h"
-#include <genie/util/bitwriter.h>
-#include <genie/util/exceptions.h>
+
+#include <genie/core/parameter/descriptor_present/descriptor_present.h>
+#include <genie/util/runtime-exception.h>
 #include <genie/util/make-unique.h>
-#include "parameter/descriptor_present/descriptor_present.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -121,6 +121,26 @@ void DescriptorSubseqCfg::write(util::BitWriter& writer) const {
     for (auto& i : descriptor_configurations) {
         i->write(writer);
     }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool DescriptorSubseqCfg::operator==(const DescriptorSubseqCfg& cfg) const {
+    return class_specific_dec_cfg_flag == cfg.class_specific_dec_cfg_flag && desc_comp(cfg);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool DescriptorSubseqCfg::desc_comp(const DescriptorSubseqCfg& cfg) const {
+    if (cfg.descriptor_configurations.size() != descriptor_configurations.size()) {
+        return false;
+    }
+    for (size_t i = 0; i < cfg.descriptor_configurations.size(); ++i) {
+        if (!(descriptor_configurations[i]->equals(cfg.descriptor_configurations[i].get()))) {
+            return false;
+        }
+    }
+    return true;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

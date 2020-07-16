@@ -1,11 +1,21 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #ifndef GENIE_FLOWGRAPH_CONVERT_H
 #define GENIE_FLOWGRAPH_CONVERT_H
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include <genie/util/selector.h>
 #include <genie/util/thread-manager.h>
 #include "flowgraph.h"
 #include "format-exporter.h"
 #include "format-importer.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
@@ -17,7 +27,7 @@ class FlowGraphConvert : public FlowGraph {
     genie::util::ThreadManager mgr;                                       //!<
     std::vector<std::unique_ptr<genie::core::FormatImporter>> importers;  //!<
     std::unique_ptr<genie::core::Classifier> classifier;                  //!<
-    std::unique_ptr<genie::core::ReferenceManager> refMgr;
+    std::unique_ptr<genie::core::ReferenceManager> refMgr; //!<
 
     std::vector<std::unique_ptr<genie::core::FormatExporter>> exporters;     //!<
     genie::util::SelectorHead<genie::core::record::Chunk> exporterSelector;  //!<
@@ -29,9 +39,11 @@ class FlowGraphConvert : public FlowGraph {
      */
     explicit FlowGraphConvert(size_t threads);
 
-    ReferenceManager& getRefMgr() {
-        return *refMgr;
-    }
+    /**
+     *
+     * @return
+     */
+    ReferenceManager& getRefMgr();
 
     /**
      *
@@ -88,7 +100,15 @@ class FlowGraphConvert : public FlowGraph {
      */
     void stop(bool abort) override;
 };
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace core
 }  // namespace genie
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #endif  // GENIE_FLOWGRAPH_CONVERT_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

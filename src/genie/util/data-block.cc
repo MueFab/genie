@@ -4,11 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "data-block.h"
-
 #include <limits>
 
-#include "block-stepper.h"
+#include "data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -5,10 +5,13 @@
  */
 
 #include "local-reference.h"
+
 #include <genie/core/constants.h>
 #include <genie/core/record/alignment_split/same-rec.h>
+
 #include <limits>
 #include <map>
+#include <iostream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

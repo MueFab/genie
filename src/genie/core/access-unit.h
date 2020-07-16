@@ -484,42 +484,44 @@ class AccessUnit {
      */
     void setStats(stats::PerfStats&& _stats);
 
-    void setReference(const ReferenceManager::ReferenceExcerpt& ex, const std::vector<std::pair<size_t, size_t>>& ref2Write) {
-        reference = ex;
-        refToWrite = ref2Write;
-    }
-
-    const ReferenceManager::ReferenceExcerpt& getReferenceExcerpt() const {
-        return reference;
-    }
-
-    const std::vector<std::pair<size_t, size_t>>& getRefToWrite() const{
-        return refToWrite;
-    }
+    /**
+     *
+     * @param ex
+     * @param ref2Write
+     */
+    void setReference(const ReferenceManager::ReferenceExcerpt& ex, const std::vector<std::pair<size_t, size_t>>& ref2Write);
 
     /**
      *
      * @return
      */
-    bool isReferenceOnly() const {
-        return referenceOnly;
-    }
+    const ReferenceManager::ReferenceExcerpt& getReferenceExcerpt() const;
+
+    /**
+     *
+     * @return
+     */
+    const std::vector<std::pair<size_t, size_t>>& getRefToWrite() const;
+
+    /**
+     *
+     * @return
+     */
+    bool isReferenceOnly() const;
 
     /**
      *
      * @param ref
      */
-    void setReferenceOnly(bool ref) {
-        referenceOnly = ref;
-    }
+    void setReferenceOnly(bool ref);
 
    private:
     std::vector<Descriptor> descriptors;  //!< @brief
     parameter::ParameterSet parameters;   //!< @brief
     stats::PerfStats stats;               //!<
-    ReferenceManager::ReferenceExcerpt reference;
-    std::vector<std::pair<size_t, size_t>> refToWrite;
-    bool referenceOnly{false};
+    ReferenceManager::ReferenceExcerpt reference; //!<
+    std::vector<std::pair<size_t, size_t>> refToWrite; //!<
+    bool referenceOnly{false}; //!<
 
     size_t numReads;  //!< @brief
 

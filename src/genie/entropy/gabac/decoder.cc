@@ -5,11 +5,13 @@
  */
 
 #include "decoder.h"
-#include <genie/util/exceptions.h>
-#include <genie/util/watch.h>
-#include <sstream>
 #include "decode-cabac.h"
 #include "stream-handler.h"
+
+#include <genie/util/runtime-exception.h>
+#include <genie/util/watch.h>
+
+#include <iostream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

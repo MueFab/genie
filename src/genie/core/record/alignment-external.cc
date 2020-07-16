@@ -7,7 +7,7 @@
 #include "alignment-external.h"
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
-#include <genie/util/exceptions.h>
+#include <genie/util/runtime-exception.h>
 #include <genie/util/make-unique.h>
 #include "alignment_external/none.h"
 #include "alignment_external/other-rec.h"

@@ -368,6 +368,37 @@ void AccessUnit::setStats(stats::PerfStats &&_stats) { stats = std::move(_stats)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void AccessUnit::setReference(const ReferenceManager::ReferenceExcerpt& ex, const std::vector<std::pair<size_t, size_t>>& ref2Write) {
+    reference = ex;
+    refToWrite = ref2Write;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const ReferenceManager::ReferenceExcerpt& AccessUnit::getReferenceExcerpt() const {
+    return reference;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::vector<std::pair<size_t, size_t>>& AccessUnit::getRefToWrite() const{
+    return refToWrite;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool AccessUnit::isReferenceOnly() const {
+    return referenceOnly;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void AccessUnit::setReferenceOnly(bool ref) {
+    referenceOnly = ref;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace core
 }  // namespace genie
 

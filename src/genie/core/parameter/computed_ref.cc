@@ -5,15 +5,20 @@
  */
 
 #include "computed_ref.h"
-#include <genie/util/bitwriter.h>
-#include <genie/util/exceptions.h>
-#include <genie/util/make-unique.h>
+
+#include <genie/util/runtime-exception.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 namespace parameter {
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool ComputedRef::operator==(const ComputedRef& cr) const{
+    return cr_alg_ID == cr.cr_alg_ID && extension == cr.extension;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -37,9 +42,7 @@ ComputedRef::ComputedRef(util::BitReader &reader) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ComputedRef::setExtension(ComputedRefExtended &&_crps_info) {
-    if (!extension) {
-        UTILS_THROW_RUNTIME_EXCEPTION("Invalid crps mode for crps info");
-    }
+    UTILS_DIE_IF(!extension, "Invalid crps mode for crps info");
     extension = std::move(_crps_info);
 }
 

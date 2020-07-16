@@ -12,9 +12,12 @@
 #include <functional>
 #include <map>
 #include <typeindex>
+
 #include "bitreader.h"
 #include "factory.h"
+#include "generic-factory.h"
 #include "make-unique.h"
+#include "runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,15 +37,7 @@ class IndustrialPark {
      * @return
      */
     template <typename T>
-    Factory<T>* findAndCreate() {
-        auto type = std::type_index(typeid(T));
-        auto it = factories.find(type);
-        if (it == factories.end()) {
-            factories.insert(std::make_pair(type, util::make_unique<Factory<T>>()));
-            it = factories.find(type);
-        }
-        return reinterpret_cast<Factory<T>*>(it->second.get());
-    }
+    Factory<T>* findAndCreate();
 
     /**
      *
@@ -50,12 +45,7 @@ class IndustrialPark {
      * @return
      */
     template <typename T>
-    Factory<T>* findAndFail() const {
-        auto type = std::type_index(typeid(T));
-        auto it = factories.find(type);
-        UTILS_DIE_IF(it == factories.end(), "Unknown factory type");
-        return reinterpret_cast<Factory<T>*>(it->second.get());
-    }
+    Factory<T>* findAndFail() const;
 
    public:
     /**
@@ -65,9 +55,7 @@ class IndustrialPark {
      * @param constructor
      */
     template <typename T>
-    void registerConstructor(uint8_t id, const std::function<std::unique_ptr<T>(util::BitReader&)>& constructor) {
-        findAndCreate<T>()->registerType(id, constructor);
-    }
+    void registerConstructor(uint8_t id, const std::function<std::unique_ptr<T>(util::BitReader&)>& constructor);
 
     /**
      *
@@ -76,9 +64,7 @@ class IndustrialPark {
      * @return
      */
     template <typename T>
-    uint8_t registerConstructor(const std::function<std::unique_ptr<T>(util::BitReader&)>& constructor) {
-        return findAndCreate<T>()->registerType(constructor);
-    }
+    uint8_t registerConstructor(const std::function<std::unique_ptr<T>(util::BitReader&)>& constructor);
 
     /**
      *
@@ -86,9 +72,7 @@ class IndustrialPark {
      * @param id
      */
     template <typename T>
-    void unregisterConstructor(uint8_t id) {
-        findAndFail<T>()->unregisterType(id);
-    }
+    void unregisterConstructor(uint8_t id);
 
     /**
      *
@@ -98,15 +82,17 @@ class IndustrialPark {
      * @return
      */
     template <typename T>
-    std::unique_ptr<T> construct(uint8_t id, util::BitReader& reader) const {
-        return findAndFail<T>()->create(id, reader);
-    }
+    std::unique_ptr<T> construct(uint8_t id, util::BitReader& reader) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace util
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include "industrial-park.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -24,11 +24,13 @@ namespace core {
  */
 class ReferenceSource {
    protected:
-    ReferenceManager* refMgr;
+    ReferenceManager* refMgr; //!<
    public:
-    explicit ReferenceSource(ReferenceManager* mgr) : refMgr(mgr) {
-
-    }
+    /**
+     *
+     * @param mgr
+     */
+    explicit ReferenceSource(ReferenceManager* mgr);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

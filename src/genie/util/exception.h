@@ -4,64 +4,48 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SIDESELECTOR_H
-#define GENIE_SIDESELECTOR_H
+#ifndef UTIL_EXCEPTIONS_H_
+#define UTIL_EXCEPTIONS_H_
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace util {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename Coder, typename Ret, typename... Args>
-class SideSelector {
-   private:
-    std::vector<Coder*> mods;               //!<
-    std::function<size_t(Args...)> select;  //!<
-
-    /**
-     *
-     * @param ...
-     * @return
-     */
-    static size_t defaultSelect(Args...) { return 0; }
-
+/**
+ *
+ */
+class Exception : public std::exception {
    public:
     /**
      *
+     * @param msg
      */
-    SideSelector() : select(&defaultSelect) {}
+    explicit Exception(std::string msg);
 
     /**
      *
-     * @param mod
-     * @param index
      */
-    void setMod(Coder* mod, size_t index) { mods[index] = mod; }
+    ~Exception() noexcept override;
 
     /**
      *
-     * @param mod
-     */
-    void addMod(Coder* mod) { mods.emplace_back(mod); }
-
-    /**
-     *
-     * @param _select
-     */
-    void setSelection(std::function<size_t(Args...)> _select) { select = _select; }
-
-    /**
-     *
-     * @param param
      * @return
      */
-    Ret process(Args... param) {
-        size_t index = select(param...);
-        UTILS_DIE_IF(index >= mods.size(), "Invalid index in SideSelector");
-        return mods[index]->process(param...);
-    }
+    virtual std::string msg() const;
+
+    /**
+     *
+     * @return
+     */
+    const char *what() const noexcept override;
+
+   protected:
+    std::string msg_;  //!<
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -71,7 +55,7 @@ class SideSelector {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_SIDESELECTOR_H
+#endif  // UTIL_EXCEPTIONS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

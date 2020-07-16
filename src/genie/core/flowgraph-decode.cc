@@ -13,6 +13,30 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void FlowGraphDecode::addReferenceSource(std::unique_ptr<genie::core::ReferenceSource> dat) {
+    refSources.push_back(std::move(dat));
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+ReferenceManager& FlowGraphDecode::getRefMgr() {
+    return *refMgr;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void FlowGraphDecode::setRefDecoder(genie::core::RefDecoder* _refDecoder) {
+    refDecoder = _refDecoder;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+genie::core::RefDecoder* FlowGraphDecode::getRefDecoder() {
+    return refDecoder;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 FlowGraphDecode::FlowGraphDecode(size_t threads) : mgr(threads) { readSelector.setDrain(&exporterSelector);  refMgr = genie::util::make_unique<ReferenceManager>(16); }
 
 // ---------------------------------------------------------------------------------------------------------------------

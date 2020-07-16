@@ -6,7 +6,7 @@
 
 #include "binarization_parameters.h"
 #include <genie/util/bitwriter.h>
-#include <genie/util/exceptions.h>
+#include <genie/util/runtime-exception.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

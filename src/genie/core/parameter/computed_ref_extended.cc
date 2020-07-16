@@ -5,13 +5,18 @@
  */
 
 #include "computed_ref_extended.h"
-#include <genie/util/bitwriter.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 namespace parameter {
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool ComputedRefExtended::operator==(const ComputedRefExtended& ext) const {
+    return cr_pad_size == ext.cr_pad_size && cr_buf_max_size == ext.cr_buf_max_size;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
