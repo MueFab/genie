@@ -31,14 +31,16 @@ const core::record::alignment_split::SameRec& Encoder::getPairedAlignment(const 
 void Encoder::updateAssembly(const core::record::Record& r, State& state,
                              const core::ReferenceManager::ReferenceExcerpt& excerpt) const {
     std::string ref1 = excerpt.getString(
-        r.getAlignments().front().getPosition(), r.getAlignments().front().getPosition() + core::record::Record::getLengthOfCigar(r.getAlignments().front().getAlignment().getECigar()));
+        r.getAlignments().front().getPosition(),
+        r.getAlignments().front().getPosition() +
+            core::record::Record::getLengthOfCigar(r.getAlignments().front().getAlignment().getECigar()));
     std::string ref2;
 
     if (r.getNumberOfTemplateSegments() > 1) {
         const auto& srec = getPairedAlignment(r);
-        ref2 = excerpt.getString(
-            r.getAlignments().front().getPosition() + srec.getDelta(),
-            r.getAlignments().front().getPosition() + srec.getDelta() + core::record::Record::getLengthOfCigar(srec.getAlignment().getECigar()));
+        ref2 = excerpt.getString(r.getAlignments().front().getPosition() + srec.getDelta(),
+                                 r.getAlignments().front().getPosition() + srec.getDelta() +
+                                     core::record::Record::getLengthOfCigar(srec.getAlignment().getECigar()));
     }
 
     state.readCoder.add(r, ref1, ref2);

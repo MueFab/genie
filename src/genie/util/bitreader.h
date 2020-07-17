@@ -24,7 +24,7 @@ class BitReader {
     std::istream &istream;  //!<
     uint8_t m_heldBits;     //!<
     uint8_t m_numHeldBits;  //!<
-    uint64_t bitsRead; //!<
+    uint64_t bitsRead;      //!<
 
    public:
     /**

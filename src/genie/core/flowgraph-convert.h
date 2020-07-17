@@ -27,7 +27,7 @@ class FlowGraphConvert : public FlowGraph {
     genie::util::ThreadManager mgr;                                       //!<
     std::vector<std::unique_ptr<genie::core::FormatImporter>> importers;  //!<
     std::unique_ptr<genie::core::Classifier> classifier;                  //!<
-    std::unique_ptr<genie::core::ReferenceManager> refMgr; //!<
+    std::unique_ptr<genie::core::ReferenceManager> refMgr;                //!<
 
     std::vector<std::unique_ptr<genie::core::FormatExporter>> exporters;     //!<
     genie::util::SelectorHead<genie::core::record::Chunk> exporterSelector;  //!<

@@ -95,7 +95,9 @@ class Binarization {
     uint8_t getNumBinarizationParams();
 
     bool operator==(const Binarization& bin) const {
-        return binarization_ID == bin.binarization_ID && bypass_flag == bin.bypass_flag && cabac_binarization_parameters == bin.cabac_binarization_parameters && cabac_context_parameters == bin.cabac_context_parameters;
+        return binarization_ID == bin.binarization_ID && bypass_flag == bin.bypass_flag &&
+               cabac_binarization_parameters == bin.cabac_binarization_parameters &&
+               cabac_context_parameters == bin.cabac_context_parameters;
     }
 
    private:

@@ -23,12 +23,12 @@ namespace record {
  */
 class Chunk {
    private:
-    std::vector<Record> data;  //!<
-    ReferenceManager::ReferenceExcerpt reference; //!<
-    std::vector<std::pair<size_t, size_t>> refToWrite; //!y
-    size_t refID; //!<
-    stats::PerfStats stats;    //!<
-    bool referenceOnly{false}; //!<
+    std::vector<Record> data;                           //!<
+    ReferenceManager::ReferenceExcerpt reference;       //!<
+    std::vector<std::pair<size_t, size_t>> refToWrite;  //! y
+    size_t refID;                                       //!<
+    stats::PerfStats stats;                             //!<
+    bool referenceOnly{false};                          //!<
    public:
     /**
      *

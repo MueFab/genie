@@ -14,39 +14,27 @@ namespace record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceManager::ReferenceExcerpt& Chunk::getRef(){
-    return reference;
-}
+ReferenceManager::ReferenceExcerpt& Chunk::getRef() { return reference; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Chunk::addRefToWrite(size_t start, size_t end) {
-    refToWrite.emplace_back(start, end);
-}
+void Chunk::addRefToWrite(size_t start, size_t end) { refToWrite.emplace_back(start, end); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<std::pair<size_t, size_t>>& Chunk::getRefToWrite() const {
-    return refToWrite;
-}
+const std::vector<std::pair<size_t, size_t>>& Chunk::getRefToWrite() const { return refToWrite; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const ReferenceManager::ReferenceExcerpt& Chunk::getRef() const{
-    return reference;
-}
+const ReferenceManager::ReferenceExcerpt& Chunk::getRef() const { return reference; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Chunk::setRefID(size_t id) {
-    refID = id;
-}
+void Chunk::setRefID(size_t id) { refID = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t Chunk::getRefID() const {
-    return refID;
-}
+size_t Chunk::getRefID() const { return refID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -66,15 +54,11 @@ void Chunk::setStats(stats::PerfStats&& s) { stats = std::move(s); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Chunk::isReferenceOnly() const {
-    return referenceOnly;
-}
+bool Chunk::isReferenceOnly() const { return referenceOnly; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Chunk::setReferenceOnly(bool ref) {
-    referenceOnly = ref;
-}
+void Chunk::setReferenceOnly(bool ref) { referenceOnly = ref; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

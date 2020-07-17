@@ -24,7 +24,7 @@ namespace core {
  */
 class ReferenceSource {
    protected:
-    ReferenceManager* refMgr; //!<
+    ReferenceManager* refMgr;  //!<
    public:
     /**
      *

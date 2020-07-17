@@ -45,13 +45,12 @@ class ComputedRef {
     boost::optional<ComputedRefExtended> extension;  //!<
 
    public:
-
     /**
      *
      * @param cr
      * @return
      */
-    bool operator==(const ComputedRef& cr) const;
+    bool operator==(const ComputedRef &cr) const;
 
     /**
      *

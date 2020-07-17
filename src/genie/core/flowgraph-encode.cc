@@ -19,13 +19,14 @@ void FlowGraphEncode::addReferenceSource(std::unique_ptr<genie::core::ReferenceS
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceManager& FlowGraphEncode::getRefMgr() {
-    return *refMgr;
-}
+ReferenceManager& FlowGraphEncode::getRefMgr() { return *refMgr; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FlowGraphEncode::FlowGraphEncode(size_t threads) : mgr(threads) { readSelector.setDrain(&exporterSelector); refMgr = genie::util::make_unique<ReferenceManager>(16); }
+FlowGraphEncode::FlowGraphEncode(size_t threads) : mgr(threads) {
+    readSelector.setDrain(&exporterSelector);
+    refMgr = genie::util::make_unique<ReferenceManager>(16);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

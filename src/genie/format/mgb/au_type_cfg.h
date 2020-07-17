@@ -23,14 +23,14 @@ namespace format {
 namespace mgb {
 
 /**
- * ISO 23092-2 Section 3.4.1.1 table 19 lines 16 to 25
+ *
  */
 class AuTypeCfg {
    private:
-    uint16_t sequence_ID;                     //!< Line 18
-    uint64_t AU_start_position;               //!< Line 19
-    uint64_t AU_end_position;                 //!< Line 20
-    boost::optional<ExtendedAu> extended_AU;  //!< Lines 21 to 24
+    uint16_t sequence_ID;                     //!<
+    uint64_t AU_start_position;               //!<
+    uint64_t AU_end_position;                 //!<
+    boost::optional<ExtendedAu> extended_AU;  //!<
 
     uint8_t posSize;  //!< internal
 

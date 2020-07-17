@@ -9,13 +9,10 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/reference.h>
-#include <reference-source.h>
-#include <condition_variable>
-#include <map>
-#include <memory>
-#include <mutex>
-#include <vector>
+#include <genie/core/reference-source.h>
+
+#include <set>
+
 #include "reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -35,7 +32,6 @@ class Manager : public core::ReferenceSource {
     std::vector<std::unique_ptr<core::Reference>> generateRefHandles();
 
    public:
-
     /**
      *
      * @param fasta
@@ -64,7 +60,6 @@ class Manager : public core::ReferenceSource {
      * @return
      */
     std::string getRef(const std::string& sequence, uint64_t start, uint64_t end);
-
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

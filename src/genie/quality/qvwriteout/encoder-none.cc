@@ -4,23 +4,29 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "reference.h"
-#include "importer.h"
+#include "encoder-none.h"
+
+#include <quality/paramqv1/qv_coding_config_1.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
-namespace format {
-namespace mgb {
+namespace quality {
+namespace qvwriteout {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string Reference::getSequence(uint64_t _start, uint64_t _end) { return mgr->getRef(raw, f_pos, _start, _end); }
+core::QVEncoder::QVCoded NoneEncoder::process(const core::record::Chunk&) {
+    auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
+    core::AccessUnit::Descriptor desc(core::GenDesc::QV);
+
+    return {std::move(param), std::move(desc), core::stats::PerfStats()};
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace mgb
-}  // namespace format
+}  // namespace qvwriteout
+}  // namespace quality
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------

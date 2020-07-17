@@ -12,8 +12,8 @@
 #include <memory>
 
 #include <genie/core/constants.h>
-#include <genie/util/bitreader.h>
 #include <genie/core/record/class-type.h>
+#include <genie/util/bitreader.h>
 
 #include "computed_ref.h"
 #include "data_unit.h"

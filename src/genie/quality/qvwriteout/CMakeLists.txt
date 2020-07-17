@@ -2,6 +2,7 @@ project("genie-qvwriteout")
 
 set(source_files
         encoder.cc
+        encoder-none.cc
         decoder.cc
         )
 

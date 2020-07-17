@@ -20,7 +20,20 @@ namespace mgb {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &parameterSets, util::BitReader &bitReader, bool lazyPayload)
+void AccessUnit::loadPayload(util::BitReader &bitReader) {
+    for (size_t i = 0; i < num_blocks; ++i) {
+        blocks.emplace_back(qv_payloads, bitReader);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+size_t AccessUnit::getPayloadSize() const { return payloadbytes; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnit::AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &parameterSets, util::BitReader &bitReader,
+                       bool lazyPayload)
     : DataUnit(DataUnitType::ACCESS_UNIT) {
     UTILS_DIE_IF(!bitReader.isAligned(), "Bitreader not aligned");
     uint64_t bitreader_pos = bitReader.getBitsRead() / 8 - 1;
@@ -56,7 +69,7 @@ AccessUnit::AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &pa
 
     UTILS_DIE_IF(!bitReader.isAligned(), "Bitreader not aligned");
 
-    if(!lazyPayload) {
+    if (!lazyPayload) {
         loadPayload(bitReader);
     }
 }
@@ -112,6 +125,10 @@ void AccessUnit::setRefCfg(RefCfg &&cfg) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+const RefCfg &AccessUnit::getRefCfg() { return ref_cfg.get(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void AccessUnit::setAuTypeCfg(AuTypeCfg &&cfg) {
     if (!au_Type_U_Cfg) {
         UTILS_THROW_RUNTIME_EXCEPTION("au_type_u_cfg not valid for this access unit");
@@ -147,6 +164,8 @@ const AuTypeCfg &AccessUnit::getAlignmentInfo() const { return *au_Type_U_Cfg; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint32_t AccessUnit::getReadCount() const { return reads_count; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 core::record::ClassType AccessUnit::getClass() const { return au_type; }
 

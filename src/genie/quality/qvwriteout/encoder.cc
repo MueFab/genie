@@ -109,15 +109,6 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::QVEncoder::QVCoded NoneEncoder::process(const core::record::Chunk&) {
-    auto param = util::make_unique<paramqv1::QualityValues1>(paramqv1::QualityValues1::QvpsPresetId::ASCII, false);
-    core::AccessUnit::Descriptor desc(core::GenDesc::QV);
-
-    return {std::move(param), std::move(desc), core::stats::PerfStats()};
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 }  // namespace qvwriteout
 }  // namespace quality
 }  // namespace genie

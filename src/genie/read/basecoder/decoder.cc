@@ -179,7 +179,7 @@ void Decoder::decodeAdditional(size_t softclip_offset, std::string &&seq, std::s
 
 std::vector<int32_t> Decoder::numberDeletions(size_t number) {
     std::vector<int32_t> counters(number, 0);
-    if(container.get(core::GenSub::MMPOS_TERMINATOR).isEmpty()) {
+    if (container.get(core::GenSub::MMPOS_TERMINATOR).isEmpty()) {
         return counters;
     }
     size_t lookahead = 0;
@@ -209,7 +209,9 @@ void Decoder::decodeMismatches(size_t clip_offset, std::string &sequence, std::s
         const auto POSITION = mismatchPosition - 1 + clip_offset;
         const auto TYPE = container.pull((core::GenSub::MMTYPE_TYPE));
         if (TYPE == core::GenConst::MMTYPE_SUBSTITUTION) {
-            const auto SUBSTITUTION = container.get(core::GenSub::MMTYPE_SUBSTITUTION).isEmpty() ? getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N'] : container.pull((core::GenSub::MMTYPE_SUBSTITUTION));
+            const auto SUBSTITUTION = container.get(core::GenSub::MMTYPE_SUBSTITUTION).isEmpty()
+                                          ? getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N']
+                                          : container.pull((core::GenSub::MMTYPE_SUBSTITUTION));
             const auto SUBSTITUTION_CHAR = getAlphabetProperties(core::AlphabetID::ACGTN).lut[SUBSTITUTION];
             sequence[POSITION] = SUBSTITUTION_CHAR;
             cigar_extended[POSITION + cigarOffset] = SUBSTITUTION_CHAR;
@@ -287,6 +289,8 @@ std::tuple<size_t, size_t> Decoder::decodeClips(std::vector<std::string> &sequen
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Decoder::clear() { this->container.clear(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace basecoder
 }  // namespace read

@@ -55,8 +55,8 @@ size_t AccessUnit::Subsequence::getNumSymbols() const { return data.size(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t AccessUnit::Subsequence::pull() {
-    if(end()) {
-        UTILS_DIE( "Tried to read descriptor that has already ended");
+    if (end()) {
+        UTILS_DIE("Tried to read descriptor that has already ended");
     }
     return data.get(position++);
 }
@@ -182,7 +182,7 @@ void AccessUnit::Subsequence::write(util::BitWriter &writer) const {
 AccessUnit::Subsequence::Subsequence(GenSubIndex _id, size_t size, util::BitReader &reader)
     : data(0, 1), id(std::move(_id)), numSymbols(0) {
     data.resize(size);
-    reader.readBuffer((char*)data.getData(), size);
+    reader.readBuffer((char *)data.getData(), size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -368,34 +368,27 @@ void AccessUnit::setStats(stats::PerfStats &&_stats) { stats = std::move(_stats)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setReference(const ReferenceManager::ReferenceExcerpt& ex, const std::vector<std::pair<size_t, size_t>>& ref2Write) {
+void AccessUnit::setReference(const ReferenceManager::ReferenceExcerpt &ex,
+                              const std::vector<std::pair<size_t, size_t>> &ref2Write) {
     reference = ex;
     refToWrite = ref2Write;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const ReferenceManager::ReferenceExcerpt& AccessUnit::getReferenceExcerpt() const {
-    return reference;
-}
+const ReferenceManager::ReferenceExcerpt &AccessUnit::getReferenceExcerpt() const { return reference; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<std::pair<size_t, size_t>>& AccessUnit::getRefToWrite() const{
-    return refToWrite;
-}
+const std::vector<std::pair<size_t, size_t>> &AccessUnit::getRefToWrite() const { return refToWrite; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool AccessUnit::isReferenceOnly() const {
-    return referenceOnly;
-}
+bool AccessUnit::isReferenceOnly() const { return referenceOnly; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::setReferenceOnly(bool ref) {
-    referenceOnly = ref;
-}
+void AccessUnit::setReferenceOnly(bool ref) { referenceOnly = ref; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

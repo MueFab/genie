@@ -34,10 +34,10 @@ namespace mgb {
  */
 class Exporter : public core::FormatExporterCompressed {
    private:
-    util::BitWriter writer;  //!<
-    util::OrderedLock lock;  //!<
-    size_t id_ctr;           //!<
-    std::vector<core::parameter::ParameterSet> parameter_stash;
+    util::BitWriter writer;                                      //!<
+    util::OrderedLock lock;                                      //!<
+    size_t id_ctr;                                               //!<
+    std::vector<core::parameter::ParameterSet> parameter_stash;  //!<
    public:
     /**
      *

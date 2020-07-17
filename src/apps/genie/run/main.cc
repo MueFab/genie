@@ -4,10 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <genie/core/name-encoder-none.h>
 #include <genie/core/format-importer-null.h>
-#include <genie/format/fasta/manager.h>
+#include <genie/core/name-encoder-none.h>
 #include <genie/format/fasta/exporter.h>
+#include <genie/format/fasta/manager.h>
 #include <genie/format/fastq/exporter.h>
 #include <genie/format/fastq/importer.h>
 #include <genie/format/mgb/exporter.h>
@@ -17,11 +17,12 @@
 #include <genie/format/sam/exporter.h>
 #include <genie/format/sam/importer.h>
 #include <genie/module/default-setup.h>
-#include <genie/quality/qvwriteout/encoder.h>
 #include <genie/read/lowlatency/encoder.h>
 #include <filesystem/filesystem.hpp>
-#include <fstream>
 #include "program-options.h"
+
+#include <genie/quality/qvwriteout/encoder-none.h>
+#include <iostream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -100,7 +101,8 @@ void attachExporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
     } else if (file_extension(pOpts.outputFile) == "mgrec") {
         flow.addExporter(genie::util::make_unique<genie::format::mgrec::Exporter>(*outputFiles.back()));
     } else if (file_extension(pOpts.outputFile) == "fasta") {
-        flow.addExporter(genie::util::make_unique<genie::format::fasta::Exporter>(&flow.getRefMgr(), outputFiles.back().get(), pOpts.numberOfThreads));
+        flow.addExporter(genie::util::make_unique<genie::format::fasta::Exporter>(
+            &flow.getRefMgr(), outputFiles.back().get(), pOpts.numberOfThreads));
     }
 }
 
@@ -121,6 +123,8 @@ void addFasta(const std::string& fastaFile, genie::core::FlowGraphEncode* flow,
     flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(
         **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr()));
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 template <class T>
 void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ifstream>>& inputFiles) {
@@ -210,14 +214,14 @@ std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts
             flow->addReferenceSource(genie::util::make_unique<genie::format::fasta::Manager>(
                 **(inputFiles.rbegin() + 1), **inputFiles.rbegin(), &flow->getRefMgr()));
         } else if (file_extension(pOpts.inputRefFile) == "mgb") {
-                inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputRefFile));
-                flow->addImporter(genie::util::make_unique<genie::format::mgb::Importer>(*inputFiles.back(), &flow->getRefMgr(),
-                                                                                         flow->getRefDecoder(), true));
+            inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputRefFile));
+            flow->addImporter(genie::util::make_unique<genie::format::mgb::Importer>(
+                *inputFiles.back(), &flow->getRefMgr(), flow->getRefDecoder(), true));
         }
     }
     inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile));
-    flow->addImporter(genie::util::make_unique<genie::format::mgb::Importer>(*inputFiles.back(), &flow->getRefMgr(),
-                                                                             flow->getRefDecoder(), file_extension(pOpts.outputFile) == "fasta"));
+    flow->addImporter(genie::util::make_unique<genie::format::mgb::Importer>(
+        *inputFiles.back(), &flow->getRefMgr(), flow->getRefDecoder(), file_extension(pOpts.outputFile) == "fasta"));
     attachExporter(*flow, pOpts, outputFiles);
     return flow;
 }

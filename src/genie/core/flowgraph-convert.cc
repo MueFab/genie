@@ -17,9 +17,7 @@ FlowGraphConvert::FlowGraphConvert(size_t threads) : mgr(threads) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceManager& FlowGraphConvert::getRefMgr() {
-    return *refMgr;
-}
+ReferenceManager& FlowGraphConvert::getRefMgr() { return *refMgr; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,74 +4,67 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_REFERENCE_COLLECTION_H
-#define GENIE_REFERENCE_COLLECTION_H
+#ifndef GENIE_FASTA_SOURCE_H
+#define GENIE_FASTA_SOURCE_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
+#include <genie/core/reference-manager.h>
+#include <genie/util/ordered-lock.h>
+#include <genie/util/original-source.h>
+#include <genie/util/source.h>
 
-#include "reference.h"
+#include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
-namespace core {
+namespace format {
+namespace fasta {
 
 /**
  *
  */
-class ReferenceCollection {
+class FastaSource : public util::OriginalSource, public util::Source<std::string> {
    private:
-    std::map<std::string, std::vector<std::unique_ptr<Reference>>> refs;  //!<
+    std::ostream* outfile;                       //!<
+    util::OrderedLock outlock;                   //!<
+    core::ReferenceManager* refMgr;              //!<
+    std::map<std::string, size_t> accu_lengths;  //!<
+    size_t line_length;                          //!<
 
    public:
     /**
      *
-     * @param name
-     * @param _start
-     * @param _end
+     * @param _outfile
+     * @param _refMgr
+     */
+    FastaSource(std::ostream* _outfile, core::ReferenceManager* _refMgr);
+
+    /**
+     *
+     * @param id
+     * @param lock
      * @return
      */
-    std::string getSequence(const std::string& name, uint64_t _start, uint64_t _end) const;
+    bool pump(size_t& id, std::mutex& lock) override;
 
     /**
      *
-     * @param name
-     * @return
+     * @param id
      */
-    std::vector<std::pair<size_t, size_t>> getCoverage(const std::string& name) const;
-
-    /**
-     *
-     * @return
-     */
-    std::vector<std::string> getSequences() const;
-
-    /**
-     *
-     * @param ref
-     */
-    void registerRef(std::unique_ptr<Reference> ref);
-
-    /**
-     *
-     * @param ref
-     */
-    void registerRef(std::vector<std::unique_ptr<Reference>>&& ref);
+    void flushIn(size_t& id) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
+}  // namespace fasta
+}  // namespace format
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_REFERENCE_COLLECTION_H
+#endif  // GENIE_FASTA_SOURCE_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -30,7 +30,7 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(
         }
         core::CigarTokenizer::tokenize(
             ecigar, core::getECigarInfo(),
-            [&qv, &desc, &param_casted](uint8_t cigar, const util::StringView& bs, const util::StringView&) -> bool{
+            [&qv, &desc, &param_casted](uint8_t cigar, const util::StringView& bs, const util::StringView&) -> bool {
                 uint8_t codebook = param_casted.getNumberCodeBooks() - 1;
                 if (core::getECigarInfo().lut_step_ref[cigar] ||
                     core::getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar)) {

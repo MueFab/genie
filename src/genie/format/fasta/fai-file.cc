@@ -5,8 +5,11 @@
  */
 
 #include "fai-file.h"
+
 #include <genie/util/runtime-exception.h>
+
 #include <istream>
+#include <ostream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

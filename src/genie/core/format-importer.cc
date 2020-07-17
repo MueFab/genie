@@ -27,7 +27,7 @@ bool FormatImporter::pump(size_t& id, std::mutex& lock) {
         for (const auto& r : chunk.getData()) {
             segment_count += r.getSegments().size();
         }
-        if(chunk.getData().empty()) {
+        if (chunk.getData().empty()) {
             segment_count = 1;
         }
         if (!chunk.getData().empty() || !chunk.getRefToWrite().empty()) {

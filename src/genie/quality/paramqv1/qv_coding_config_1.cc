@@ -6,8 +6,8 @@
 
 #include "qv_coding_config_1.h"
 #include <genie/util/bitwriter.h>
-#include <genie/util/runtime-exception.h>
 #include <genie/util/make-unique.h>
+#include <genie/util/runtime-exception.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -142,6 +142,14 @@ const Codebook& QualityValues1::getCodebook(size_t id) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t QualityValues1::getNumSubsequences() const { return getNumberCodeBooks() + 2; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool QualityValues1::equals(const QualityValues* qv) const {
+    return core::parameter::QualityValues::equals(qv) &&
+           parameter_set_qvps == dynamic_cast<const QualityValues1*>(qv)->parameter_set_qvps &&
+           qvps_preset_ID == dynamic_cast<const QualityValues1*>(qv)->qvps_preset_ID;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

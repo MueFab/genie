@@ -401,8 +401,7 @@ void ParameterSet::setQVDepth(uint8_t qv) { qv_depth = qv; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool ParameterSet::operator==(const ParameterSet &ps) const {
-    return dataset_type == ps.dataset_type &&
-           alphabet_ID == ps.alphabet_ID && read_length == ps.read_length &&
+    return dataset_type == ps.dataset_type && alphabet_ID == ps.alphabet_ID && read_length == ps.read_length &&
            number_of_template_segments_minus1 == ps.number_of_template_segments_minus1 &&
            max_au_data_unit_size == ps.max_au_data_unit_size && pos_40_bits_flag == ps.pos_40_bits_flag &&
            qv_depth == ps.qv_depth && as_depth == ps.as_depth && class_IDs == ps.class_IDs &&

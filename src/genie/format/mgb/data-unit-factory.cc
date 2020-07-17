@@ -5,16 +5,21 @@
  */
 
 #include "data-unit-factory.h"
+#include <iostream>
 #include "access_unit.h"
 #include "raw_reference.h"
 #include "reference.h"
-#include <iostream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace format {
 namespace mgb {
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+DataUnitFactory::DataUnitFactory(core::ReferenceManager* mgr, mgb::Importer* _importer, bool ref)
+    : refmgr(mgr), importer(_importer), referenceOnly(ref) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -35,31 +40,35 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
             case core::parameter::DataUnit::DataUnitType::RAW_REFERENCE: {
                 pos += 10;
                 auto r = RawReference(bitReader, true);
-                for(auto& ref : r) {
+                for (auto& ref : r) {
                     pos += 12;
-                    std::cout << "Found ref(raw) " << ref.getSeqID() << ":[" << ref.getStart() << ", " << ref.getEnd() << "] ..." << std::endl;
+                    std::cout << "Found ref(raw) " << ref.getSeqID() << ":[" << ref.getStart() << ", " << ref.getEnd()
+                              << "] ..." << std::endl;
                     refmgr->validateRefID(ref.getSeqID());
-                    refmgr->addRef(util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(), ref.getEnd() + 1, importer, pos, true));
+                    refmgr->addRef(util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
+                                                                     ref.getEnd() + 1, importer, pos, true));
                     pos += (ref.getEnd() - ref.getStart() + 1);
                 }
                 break;
             }
             case core::parameter::DataUnit::DataUnitType::PARAMETER_SET: {
                 auto p = core::parameter::ParameterSet(bitReader);
-                std::cout << "Found PS " << (uint32_t )p.getID() << "..." << std::endl;
+                std::cout << "Found PS " << (uint32_t)p.getID() << "..." << std::endl;
                 parameters.insert(std::make_pair(p.getID(), std::move(p)));
                 break;
             }
             case core::parameter::DataUnit::DataUnitType::ACCESS_UNIT: {
                 auto ret = AccessUnit(parameters, bitReader, true);
-                if(getParams(ret.getParameterID()).getDatasetType() == mgb::AccessUnit::DatasetType::REFERENCE) {
+                if (getParams(ret.getParameterID()).getDatasetType() == mgb::AccessUnit::DatasetType::REFERENCE) {
                     const auto& ref = ret.getRefCfg();
                     refmgr->validateRefID(ref.getSeqID());
-                    std::cout << "Found ref(compressed) " << ref.getSeqID() << ":[" << ref.getStart() << ", " << ref.getEnd() << "] ..." << std::endl;
-                    refmgr->addRef(util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(), ref.getEnd() + 1, importer, pos, false));
+                    std::cout << "Found ref(compressed) " << ref.getSeqID() << ":[" << ref.getStart() << ", "
+                              << ref.getEnd() << "] ..." << std::endl;
+                    refmgr->addRef(util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
+                                                                     ref.getEnd() + 1, importer, pos, false));
                     bitReader.skip(ret.getPayloadSize());
                 } else {
-                    if(!referenceOnly) {
+                    if (!referenceOnly) {
                         ret.loadPayload(bitReader);
                         std::cout << "Decompressing AU " << ret.getID() << "..." << std::endl;
                         return ret;
@@ -75,6 +84,10 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
         }
     } while (true);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::map<size_t, core::parameter::ParameterSet>& DataUnitFactory::getParams() const { return parameters; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

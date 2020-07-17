@@ -91,7 +91,9 @@ class Context {
     const std::vector<uint8_t>& getContextInitializationValue() const;
 
     bool operator==(const Context& ctx) const {
-        return adaptive_mode_flag == ctx.adaptive_mode_flag && num_contexts == ctx.num_contexts && context_initialization_value == ctx.context_initialization_value && share_subsym_ctx_flag == ctx.share_subsym_ctx_flag;
+        return adaptive_mode_flag == ctx.adaptive_mode_flag && num_contexts == ctx.num_contexts &&
+               context_initialization_value == ctx.context_initialization_value &&
+               share_subsym_ctx_flag == ctx.share_subsym_ctx_flag;
     }
 
    private:

@@ -24,8 +24,18 @@ namespace lowlatency {
 class Decoder : public core::ReadDecoder, public core::RefDecoder {
    private:
    public:
-
+    /**
+     *
+     * @param t
+     * @return
+     */
     std::string decode(core::AccessUnit&& t) override;
+
+    /**
+     *
+     * @param t
+     * @return
+     */
     core::record::Chunk decode_common(core::AccessUnit&& t);
 
     /**

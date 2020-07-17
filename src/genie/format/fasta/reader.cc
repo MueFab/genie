@@ -6,6 +6,8 @@
 
 #include "reader.h"
 
+#include <genie/util/runtime-exception.h>
+
 #include <algorithm>
 #include <istream>
 

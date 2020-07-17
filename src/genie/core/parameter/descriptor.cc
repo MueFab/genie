@@ -7,8 +7,8 @@
 #include "descriptor.h"
 
 #include <genie/core/parameter/descriptor_present/descriptor_present.h>
-#include <genie/util/runtime-exception.h>
 #include <genie/util/make-unique.h>
+#include <genie/util/runtime-exception.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -18,9 +18,7 @@ namespace parameter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Descriptor::equals(const Descriptor* desc) const {
-    return dec_cfg_preset == desc->dec_cfg_preset;
-}
+bool Descriptor::equals(const Descriptor *desc) const { return dec_cfg_preset == desc->dec_cfg_preset; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

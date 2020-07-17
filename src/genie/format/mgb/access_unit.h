@@ -44,15 +44,17 @@ class AccessUnit : public core::parameter::DataUnit {
     explicit AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &parameterSets,
                         util::BitReader &bitReader, bool lazyPayload = false);
 
-    void loadPayload(util::BitReader &bitReader) {
-        for (size_t i = 0; i < num_blocks; ++i) {
-            blocks.emplace_back(qv_payloads, bitReader);
-        }
-    }
+    /**
+     *
+     * @param bitReader
+     */
+    void loadPayload(util::BitReader &bitReader);
 
-    size_t getPayloadSize() const {
-        return payloadbytes;
-    }
+    /**
+     *
+     * @return
+     */
+    size_t getPayloadSize() const;
 
     /**
      *
@@ -93,9 +95,11 @@ class AccessUnit : public core::parameter::DataUnit {
      */
     void setRefCfg(RefCfg &&cfg);
 
-    const RefCfg& getRefCfg() {
-        return ref_cfg.get();
-    }
+    /**
+     *
+     * @return
+     */
+    const RefCfg &getRefCfg();
 
     /**
      *
@@ -164,8 +168,8 @@ class AccessUnit : public core::parameter::DataUnit {
 
     std::vector<Block> blocks;  //!<
 
-    size_t payloadbytes;
-    size_t qv_payloads;
+    size_t payloadbytes;  //!<
+    size_t qv_payloads;   //!<
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

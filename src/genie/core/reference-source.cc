@@ -13,8 +13,7 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceSource::ReferenceSource(ReferenceManager* mgr) : refMgr(mgr) {
-}
+ReferenceSource::ReferenceSource(ReferenceManager* mgr) : refMgr(mgr) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

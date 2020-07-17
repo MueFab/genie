@@ -4,46 +4,42 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "alignment-external.h"
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
-#include <genie/util/runtime-exception.h>
-#include "alignment_external/none.h"
-#include "alignment_external/other-rec.h"
+#include "exporter.h"
+
+#include <genie/util/thread-manager.h>
+
+#include "fasta-source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
-namespace core {
-namespace record {
+namespace format {
+namespace fasta {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AlignmentExternal::AlignmentExternal(Type _moreAlignmentInfoType) : moreAlignmentInfoType(_moreAlignmentInfoType) {}
+Exporter::Exporter(core::ReferenceManager* _refMgr, std::ostream* out, size_t _num_threads)
+    : refMgr(_refMgr), outfile(out), num_threads(_num_threads) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AlignmentExternal::write(util::BitWriter &writer) const { writer.write(uint8_t(moreAlignmentInfoType), 8); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::unique_ptr<AlignmentExternal> AlignmentExternal::factory(util::BitReader &reader) {
-    auto type = reader.read<Type>();
-    switch (type) {
-        case Type::NONE:
-            return util::make_unique<alignment_external::None>();
-        case Type::OTHER_REC:
-            return util::make_unique<alignment_external::OtherRec>(reader);
-        default:
-            UTILS_DIE("Unknown MoreAlignmentInfoType");
-    }
+void Exporter::flushIn(size_t&) {
+    util::ThreadManager mgr(num_threads);
+    FastaSource source(outfile, refMgr);
+    std::vector<util::OriginalSource*> vec;
+    vec.push_back(&source);
+    mgr.setSource(vec);
+    mgr.run();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace record
-}  // namespace core
+void Exporter::flowIn(core::record::Chunk&&, const util::Section&) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace fasta
+}  // namespace format
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
