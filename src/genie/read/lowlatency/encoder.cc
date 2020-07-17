@@ -21,7 +21,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     util::Watch watch;
     core::record::Chunk data = std::move(t);
 
-    if(data.getData().empty()) {
+    if (data.getData().empty()) {
         core::parameter::ParameterSet set;
         core::AccessUnit au(std::move(set), 0);
         au.setReference(data.getRef(), data.getRefToWrite());
@@ -62,11 +62,11 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     watch.resume();
     auto rawAU = pack(id, std::get<1>(qv).isEmpty() ? 0 : 1, std::move(std::get<0>(qv)), state);
 
-    if(!data.isReferenceOnly()) {
+    if (!data.isReferenceOnly()) {
         rawAU.get(core::GenDesc::QV) = std::move(std::get<1>(qv));
         rawAU.get(core::GenDesc::RNAME) = std::move(std::get<0>(rname));
     }
-    if(state.readLength != 0) {
+    if (state.readLength != 0) {
         rawAU.set(core::GenSub::RLEN, core::AccessUnit::Subsequence(core::GenSub::RLEN));
     }
 
@@ -87,7 +87,9 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
 
 core::AccessUnit Encoder::pack(const util::Section& id, uint8_t qv_depth,
                                std::unique_ptr<core::parameter::QualityValues> qvparam, LLState& state) const {
-    core::parameter::DataUnit::DatasetType dataType = state.refOnly ? core::parameter::DataUnit::DatasetType::REFERENCE : core::parameter::DataUnit::DatasetType::NON_ALIGNED;
+    core::parameter::DataUnit::DatasetType dataType = state.refOnly
+                                                          ? core::parameter::DataUnit::DatasetType::REFERENCE
+                                                          : core::parameter::DataUnit::DatasetType::NON_ALIGNED;
     core::parameter::ParameterSet ret(id.start, id.start, dataType, core::AlphabetID::ACGTN, state.readLength,
                                       state.pairedEnd, false, qv_depth, 0, false, false);
     ret.addClass(core::record::ClassType::CLASS_U, std::move(qvparam));

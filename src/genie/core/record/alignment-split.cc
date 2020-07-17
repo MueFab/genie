@@ -7,8 +7,8 @@
 #include "alignment-split.h"
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
-#include <genie/util/runtime-exception.h>
 #include <genie/util/make-unique.h>
+#include <genie/util/runtime-exception.h>
 #include "alignment_split/other-rec.h"
 #include "alignment_split/same-rec.h"
 #include "alignment_split/unpaired.h"

@@ -35,7 +35,7 @@ class DescriptorPresent : public Descriptor {
      * @param desc
      * @return
      */
-    bool equals(const Descriptor* desc) const override;
+    bool equals(const Descriptor *desc) const override;
 
     /**
      *

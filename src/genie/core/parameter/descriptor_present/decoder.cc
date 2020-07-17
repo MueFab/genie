@@ -27,9 +27,7 @@ Decoder::Decoder(uint8_t _encoding_mode_id) : encoding_mode_ID(_encoding_mode_id
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Decoder::equals(const Decoder* dec) const {
-    return encoding_mode_ID == dec->encoding_mode_ID;
-}
+bool Decoder::equals(const Decoder* dec) const { return encoding_mode_ID == dec->encoding_mode_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

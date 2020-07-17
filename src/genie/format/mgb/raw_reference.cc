@@ -6,8 +6,8 @@
 
 #include "raw_reference.h"
 #include <genie/util/bitwriter.h>
-#include <genie/util/runtime-exception.h>
 #include <genie/util/make-unique.h>
+#include <genie/util/runtime-exception.h>
 #include <sstream>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -19,6 +19,16 @@ namespace mgb {
 // ---------------------------------------------------------------------------------------------------------------------
 
 RawReference::RawReference() : DataUnit(DataUnitType::RAW_REFERENCE), seqs() {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+RawReference::RawReference(util::BitReader &reader, bool headerOnly) : DataUnit(DataUnitType::RAW_REFERENCE), seqs() {
+    reader.read<uint64_t>();
+    auto count = reader.read<uint16_t>();
+    for (size_t i = 0; i < count; ++i) {
+        seqs.emplace_back(reader, headerOnly);
+    }
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -48,6 +58,22 @@ void RawReference::write(util::BitWriter &writer) const {
         i.write(writer);
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool RawReference::isEmpty() const { return seqs.empty(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+RawReferenceSequence &RawReference::getSequence(size_t index) { return seqs[index]; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::vector<RawReferenceSequence>::iterator RawReference::begin() { return seqs.begin(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::vector<RawReferenceSequence>::iterator RawReference::end() { return seqs.end(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

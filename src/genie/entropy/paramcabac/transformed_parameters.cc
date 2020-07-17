@@ -6,8 +6,8 @@
 
 #include "transformed_parameters.h"
 #include <genie/util/bitwriter.h>
-#include <genie/util/runtime-exception.h>
 #include <genie/util/make-unique.h>
+#include <genie/util/runtime-exception.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

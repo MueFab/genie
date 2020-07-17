@@ -71,7 +71,8 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
         std::vector<std::string> refs;
         refs.reserve(meta.size());
         for (const auto& m : meta) {
-            refs.emplace_back(ref_excerpt.getString(m.position, std::min(ref_excerpt.getGlobalEnd(), m.position + m.length)));
+            refs.emplace_back(
+                ref_excerpt.getString(m.position, std::min(ref_excerpt.getGlobalEnd(), m.position + m.length)));
             refs.back().resize(m.length);
         }
         auto rec = decoder.pull(ref, std::move(refs));

@@ -25,12 +25,15 @@ namespace paramqv1 {
  */
 class Codebook {
    private:
-    // uint8_t qv_num_codebook_entries : 8;  //!< Line 4
-    std::vector<uint8_t> qv_recon;  //!< Lines 5 to 7
+    std::vector<uint8_t> qv_recon;  //!<
 
    public:
-
-    bool operator==(const Codebook &ps) const { return qv_recon == ps.qv_recon; }
+    /**
+     *
+     * @param ps
+     * @return
+     */
+    bool operator==(const Codebook &ps) const;
 
     /**
      *

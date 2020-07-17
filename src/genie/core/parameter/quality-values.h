@@ -28,7 +28,7 @@ class QualityValues {
      *
      * @param writer
      */
-    virtual void write(util::BitWriter &writer) const = 0;
+    virtual void write(util::BitWriter& writer) const = 0;
 
     /**
      *

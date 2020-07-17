@@ -7,8 +7,8 @@
 #include "record.h"
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
-#include <genie/util/runtime-exception.h>
 #include <genie/util/make-unique.h>
+#include <genie/util/runtime-exception.h>
 #include "alignment-box.h"
 #include "alignment-shared-data.h"
 #include "alignment_external/none.h"
@@ -242,10 +242,10 @@ bool Record::isRead1First() const { return read_1_first; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t Record::getLengthOfCigar(const std::string& cigar) {
+uint64_t Record::getLengthOfCigar(const std::string &cigar) {
     std::string digits;
     size_t length = 0;
-    for (const auto& c : cigar) {
+    for (const auto &c : cigar) {
         if (isdigit(c)) {
             digits += c;
             continue;
@@ -271,8 +271,8 @@ size_t Record::getMappedLength(size_t alignment, size_t split) const {
     if (split == 0) {
         return getLengthOfCigar(getAlignments()[alignment].getAlignment().getECigar());
     }
-    auto& s2 = dynamic_cast<record::alignment_split::SameRec&>(
-        *getAlignments()[alignment].getAlignmentSplits()[split - 1]);
+    auto &s2 =
+        dynamic_cast<record::alignment_split::SameRec &>(*getAlignments()[alignment].getAlignmentSplits()[split - 1]);
     return getLengthOfCigar(s2.getAlignment().getECigar());
 }
 
@@ -294,8 +294,8 @@ size_t Record::getPosition(size_t alignment, size_t split) const {
     if (split == 0) {
         return getAlignments()[alignment].getPosition();
     }
-    auto& s2 = dynamic_cast<record::alignment_split::SameRec&>(
-        *getAlignments()[alignment].getAlignmentSplits()[split - 1]);
+    auto &s2 =
+        dynamic_cast<record::alignment_split::SameRec &>(*getAlignments()[alignment].getAlignmentSplits()[split - 1]);
     return getAlignments()[alignment].getPosition() + s2.getDelta();
 }
 

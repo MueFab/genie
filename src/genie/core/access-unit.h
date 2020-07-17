@@ -489,7 +489,8 @@ class AccessUnit {
      * @param ex
      * @param ref2Write
      */
-    void setReference(const ReferenceManager::ReferenceExcerpt& ex, const std::vector<std::pair<size_t, size_t>>& ref2Write);
+    void setReference(const ReferenceManager::ReferenceExcerpt& ex,
+                      const std::vector<std::pair<size_t, size_t>>& ref2Write);
 
     /**
      *
@@ -516,12 +517,12 @@ class AccessUnit {
     void setReferenceOnly(bool ref);
 
    private:
-    std::vector<Descriptor> descriptors;  //!< @brief
-    parameter::ParameterSet parameters;   //!< @brief
-    stats::PerfStats stats;               //!<
-    ReferenceManager::ReferenceExcerpt reference; //!<
-    std::vector<std::pair<size_t, size_t>> refToWrite; //!<
-    bool referenceOnly{false}; //!<
+    std::vector<Descriptor> descriptors;                //!< @brief
+    parameter::ParameterSet parameters;                 //!< @brief
+    stats::PerfStats stats;                             //!<
+    ReferenceManager::ReferenceExcerpt reference;       //!<
+    std::vector<std::pair<size_t, size_t>> refToWrite;  //!<
+    bool referenceOnly{false};                          //!<
 
     size_t numReads;  //!< @brief
 

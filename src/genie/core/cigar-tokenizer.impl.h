@@ -39,7 +39,7 @@ void CigarTokenizer::tokenize(const std::string& cigar, const CigarFormatInfo& f
             pos_ref += size * format.lut_step_ref[c];
         }
 
-        if(!lambda(c, util::StringView(old_pos_bases, pos_bases), util::StringView(old_pos_ref, pos_ref))) {
+        if (!lambda(c, util::StringView(old_pos_bases, pos_bases), util::StringView(old_pos_ref, pos_ref))) {
             return;
         }
 

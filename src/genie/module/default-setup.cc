@@ -5,11 +5,7 @@
  */
 
 #include "default-setup.h"
-#include <genie/read/localassembly/decoder.h>
-#include <genie/read/localassembly/encoder.h>
-#include <genie/read/refcoder/decoder.h>
-#include <genie/read/refcoder/encoder.h>
-//#include <genie/read/spring/encoder.h>
+
 #include <genie/core/classifier-bypass.h>
 #include <genie/core/classifier-regroup.h>
 #include <genie/core/flowgraph-convert.h>
@@ -19,8 +15,12 @@
 #include <genie/name/tokenizer/encoder.h>
 #include <genie/quality/qvwriteout/decoder.h>
 #include <genie/quality/qvwriteout/encoder.h>
+#include <genie/read/localassembly/decoder.h>
+#include <genie/read/localassembly/encoder.h>
 #include <genie/read/lowlatency/decoder.h>
 #include <genie/read/lowlatency/encoder.h>
+#include <genie/read/refcoder/decoder.h>
+#include <genie/read/refcoder/encoder.h>
 #include <genie/read/spring/decoder.h>
 #include <genie/read/spring/encoder.h>
 
@@ -32,10 +32,12 @@ namespace module {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const std::string& working_dir,
-                                                           size_t blocksize, core::ClassifierRegroup::RefMode externalref, bool rawref) {
+                                                           size_t blocksize,
+                                                           core::ClassifierRegroup::RefMode externalref, bool rawref) {
     std::unique_ptr<core::FlowGraphEncode> ret = genie::util::make_unique<core::FlowGraphEncode>(threads);
 
-    ret->setClassifier(genie::util::make_unique<genie::core::ClassifierRegroup>(blocksize, &ret->getRefMgr(), externalref, rawref));
+    ret->setClassifier(
+        genie::util::make_unique<genie::core::ClassifierRegroup>(blocksize, &ret->getRefMgr(), externalref, rawref));
 
     ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Encoder>());
     ret->addReadCoder(genie::util::make_unique<genie::read::localassembly::Encoder>(2048, false));
@@ -43,11 +45,11 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
     ret->addReadCoder(genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, false));
     ret->addReadCoder(genie::util::make_unique<genie::read::spring::Encoder>(working_dir, threads, true));
     ret->setReadCoderSelector([](const genie::core::record::Chunk& chunk) -> size_t {
-        if(chunk.getData().empty()) {
+        if (chunk.getData().empty()) {
             return 2;
         }
         if (chunk.getData().front().getClassID() == genie::core::record::ClassType::CLASS_U) {
-            if(chunk.isReferenceOnly()) {
+            if (chunk.isReferenceOnly()) {
                 return 2;
             }
             if (chunk.getData().front().getNumberOfTemplateSegments() > 1) {
@@ -56,7 +58,7 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
                 return 3;
             }
         } else {
-            if(chunk.getRef().isEmpty()) {
+            if (chunk.getRef().isEmpty()) {
                 return 1;
             } else {
                 return 0;

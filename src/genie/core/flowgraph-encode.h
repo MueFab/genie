@@ -27,10 +27,10 @@ namespace core {
  *
  */
 class FlowGraphEncode : public FlowGraph {
-    genie::util::ThreadManager mgr;                       //!<
-    std::unique_ptr<genie::core::ReferenceManager> refMgr; //!<
-    std::vector<std::unique_ptr<genie::core::ReferenceSource>> refSources; //!<
-    std::unique_ptr<genie::core::Classifier> classifier;  //!<
+    genie::util::ThreadManager mgr;                                         //!<
+    std::unique_ptr<genie::core::ReferenceManager> refMgr;                  //!<
+    std::vector<std::unique_ptr<genie::core::ReferenceSource>> refSources;  //!<
+    std::unique_ptr<genie::core::Classifier> classifier;                    //!<
 
     std::vector<std::unique_ptr<genie::core::FormatImporter>> importers;  //!<
 

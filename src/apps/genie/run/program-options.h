@@ -45,11 +45,11 @@ class ProgramOptions {
 
     bool forceOverwrite;  //!<
 
-    bool lowLatency;   //!<
+    bool lowLatency;      //!<
     std::string refMode;  //!<
 
     size_t numberOfThreads;  //!<
-    bool rawReference;
+    bool rawReference;       //!<
 
    private:
     /**

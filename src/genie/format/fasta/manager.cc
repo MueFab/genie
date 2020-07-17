@@ -5,8 +5,6 @@
  */
 
 #include "manager.h"
-#include <genie/util/make-unique.h>
-#include <algorithm>
 #include "reference.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -20,7 +18,7 @@ namespace fasta {
 Manager::Manager(std::istream& fasta, std::istream& fai, core::ReferenceManager* mgr)
     : core::ReferenceSource(mgr), reader(fasta, fai) {
     auto ref = generateRefHandles();
-    for(auto& r : ref) {
+    for (auto& r : ref) {
         mgr->addRef(std::move(r));
     }
 }

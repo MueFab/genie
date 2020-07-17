@@ -59,18 +59,6 @@ class Encoder : public core::QVEncoder {
     core::QVEncoder::QVCoded process(const core::record::Chunk& rec) override;
 };
 
-/**
- *
- */
-class NoneEncoder : public core::QVEncoder {
-   public:
-    /**
-     *
-     * @return
-     */
-    QVCoded process(const core::record::Chunk&) override;
-};
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace qvwriteout

@@ -11,6 +11,7 @@
 
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
+
 #include <cstdint>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -30,18 +31,23 @@ class RefCfg {
 
     uint8_t posSize;  //!< internal
    public:
+    /**
+     *
+     * @return
+     */
+    uint16_t getSeqID() const;
 
-    uint16_t getSeqID() const {
-        return ref_sequence_ID;
-    }
+    /**
+     *
+     * @return
+     */
+    uint64_t getStart() const;
 
-    uint64_t getStart() const {
-        return ref_start_position;
-    }
-
-    uint64_t getEnd() const {
-        return ref_end_position;
-    }
+    /**
+     *
+     * @return
+     */
+    uint64_t getEnd() const;
 
     /**
      *

@@ -4,74 +4,40 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_REFERENCE_COLLECTION_H
-#define GENIE_REFERENCE_COLLECTION_H
+#ifndef GENIE_ENCODER_NONE_H
+#define GENIE_ENCODER_NONE_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
-
-#include "reference.h"
+#include <genie/core/qv-encoder.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
-namespace core {
+namespace quality {
+namespace qvwriteout {
 
 /**
  *
  */
-class ReferenceCollection {
-   private:
-    std::map<std::string, std::vector<std::unique_ptr<Reference>>> refs;  //!<
-
+class NoneEncoder : public core::QVEncoder {
    public:
     /**
      *
-     * @param name
-     * @param _start
-     * @param _end
      * @return
      */
-    std::string getSequence(const std::string& name, uint64_t _start, uint64_t _end) const;
-
-    /**
-     *
-     * @param name
-     * @return
-     */
-    std::vector<std::pair<size_t, size_t>> getCoverage(const std::string& name) const;
-
-    /**
-     *
-     * @return
-     */
-    std::vector<std::string> getSequences() const;
-
-    /**
-     *
-     * @param ref
-     */
-    void registerRef(std::unique_ptr<Reference> ref);
-
-    /**
-     *
-     * @param ref
-     */
-    void registerRef(std::vector<std::unique_ptr<Reference>>&& ref);
+    QVCoded process(const core::record::Chunk&) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
+}  // namespace qvwriteout
+}  // namespace quality
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_REFERENCE_COLLECTION_H
+#endif  // GENIE_ENCODER_NONE_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

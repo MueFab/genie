@@ -14,8 +14,8 @@
 #include <vector>
 
 #include <genie/core/access-unit.h>
-#include <genie/core/record/record.h>
 #include <genie/core/record/alignment_split/same-rec.h>
+#include <genie/core/record/record.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

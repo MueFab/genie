@@ -17,6 +17,10 @@ namespace paramqv1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool Codebook::operator==(const Codebook& ps) const { return qv_recon == ps.qv_recon; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 Codebook::Codebook(util::BitReader& reader) {
     qv_recon.resize(reader.read<uint8_t>());
     for (auto& v : qv_recon) {

@@ -29,7 +29,6 @@ class Reference {
     uint64_t end;      //!<
 
    public:
-
     /**
      *
      * @return

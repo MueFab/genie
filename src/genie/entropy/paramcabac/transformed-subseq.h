@@ -108,9 +108,10 @@ class TransformedSubSeq {
     void setAlphabetID(core::AlphabetID _alphabet_ID);
 
     bool operator==(const TransformedSubSeq& val) const {
-        return transform_ID_subsym == val.transform_ID_subsym && support_values == val.support_values && cabac_binarization == cabac_binarization && state_vars == val.state_vars && subsequence_ID == val.subsequence_ID && alphabet_ID == val.alphabet_ID;
+        return transform_ID_subsym == val.transform_ID_subsym && support_values == val.support_values &&
+               cabac_binarization == cabac_binarization && state_vars == val.state_vars &&
+               subsequence_ID == val.subsequence_ID && alphabet_ID == val.alphabet_ID;
     }
-
 
    private:
     SupportValues::TransformIdSubsym transform_ID_subsym;  //!< : 3; Line 9
