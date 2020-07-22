@@ -16,7 +16,7 @@
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 
-#include <boost/optional.hpp>
+#include <boost/optional/optional.hpp>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

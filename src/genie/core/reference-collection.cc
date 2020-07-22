@@ -31,12 +31,12 @@ std::string ReferenceCollection::getSequence(const std::string& name, uint64_t _
             }
 
             if (it2->get()->getStart() > position) {
-                nearest = std::min(nearest, it2->get()->getStart());
+                nearest = std::min<size_t>(nearest, it2->get()->getStart());
             }
 
             if (it2->get()->getStart() <= position && it2->get()->getEnd() > position) {
                 nearest = std::numeric_limits<size_t>::max();
-                ret += it2->get()->getSequence(position, std::min(it2->get()->getEnd(), _end));
+                ret += it2->get()->getSequence(position, std::min<size_t>(it2->get()->getEnd(), _end));
                 position = it2->get()->getEnd();
                 it2 = it->second.begin();
             }
