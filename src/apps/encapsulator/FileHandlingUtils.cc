@@ -4,7 +4,9 @@
  */
 
 #include "FileHandlingUtils.h"
+#include <genie/format/mgb/importer.h>
 #include "genie/core/parameter/parameter_set.h"
+#include "genie/read/lowlatency/decoder.h"
 #include "genie/format//mpegg_p1/dataset_group.h"
 #include "genie/format/mgb/data-unit-factory.h"
 #include "genie/format/mpegg_p1/dataset.h"
@@ -24,7 +26,11 @@ int createMPEGGFileNoMITFromByteStream(const std::string& fileName, const std::s
 
     std::vector<genie::format::mgb::AccessUnit> accessUnits;
 
-    auto dataUnitFactory = genie::format::mgb::DataUnitFactory();
+    genie::core::ReferenceManager refmgr(16);
+    genie::read::lowlatency::Decoder decoder;
+    genie::format::mgb::Importer importer(inputFilestream, &refmgr, &decoder, false );
+
+    auto dataUnitFactory = genie::format::mgb::DataUnitFactory(&refmgr, &importer, false);
     while (true) {
         auto au = dataUnitFactory.read(inputFileBitReader);
         if (!au) {
