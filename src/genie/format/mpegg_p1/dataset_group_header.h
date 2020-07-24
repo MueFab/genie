@@ -4,14 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DATASET_GROUP_HEADER_H
-#define GENIE_DATASET_GROUP_HEADER_H
+#ifndef GENIE_PART1_DATASET_GROUP_HEADER_H
+#define GENIE_PART1_DATASET_GROUP_HEADER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
 #include <vector>
-#include "dataset.h"
+
+#include "dataset/dataset.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +31,7 @@ class DatasetGroupHeader {
      * @param x_datasetGroupID
      */
     explicit DatasetGroupHeader(const std::vector<genie::format::mpegg_p1::Dataset>* datasetId,
-                                const uint8_t x_datasetGroupID);
+                                uint8_t x_datasetGroupID);
 
     /**
      *
@@ -58,14 +59,14 @@ class DatasetGroupHeader {
 
     /**
      *
-     * @param bitWriter
+     * @param bit_writer
      */
-    void writeToFile(genie::util::BitWriter& bitWriter) const;
+    void writeToFile(genie::util::BitWriter& bit_writer) const;
 
    private:
-    uint8_t dataset_group_ID : 8;      //!<
-    uint8_t version_number : 8;        //!<
-    std::vector<uint16_t> dataset_ID;  //!<
+    uint8_t dataset_group_ID;
+    uint8_t version_number;
+    std::vector<uint16_t> dataset_IDs;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -76,7 +77,7 @@ class DatasetGroupHeader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DATASET_GROUP_HEADER_H
+#endif  // GENIE_PART1_DATASET_GROUP_HEADER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

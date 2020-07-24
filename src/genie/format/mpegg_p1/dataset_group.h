@@ -4,16 +4,19 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DATASET_GROUP_H
-#define GENIE_DATASET_GROUP_H
+#ifndef GENIE_PART1_DATASET_GROUP_H
+#define GENIE_PART1_DATASET_GROUP_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
 #include <vector>
 
-#include "dataset.h"
 #include "dataset_group_header.h"
+#include "reference/reference.h"
+#include "dataset/dataset.h"
+#include "reference_metadata/reference_metadata.h"
+#include "label_list/label_list.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,41 +27,84 @@ namespace mpegg_p1 {
 /**
  *
  */
-class DG_metadata {
+class DGMetadata {
    public:
     /**
      *
      */
-    DG_metadata();
+    DGMetadata();
+
+    /**
+     *
+     * @param bit_writer
+     */
+    void write(genie::util::BitWriter& bit_writer) const;
 
    private:
     std::vector<uint8_t> DG_metadata_value;  //!<
+
 };
 
 /**
  *
  */
-class DG_protection {
+class DGProtection {
    public:
     /**
      *
      */
-    DG_protection();
+    DGProtection();
+
+    /**
+     *
+     * @param bit_writer
+     */
+    void write(genie::util::BitWriter& bit_writer) const;
 
    private:
     std::vector<uint8_t> DG_protection_value;  //!<
+
 };
 
 /**
  *
  */
 class DatasetGroup {
+   private:
+    /** ------------------------------------------------------------------------------------------------------------
+     * ISO 23092-1 Section 6.5.1 table 8
+     * ------------------------------------------------------------------------------------------------------------- */
+
+    // ISO 23092-1 Section 6.5.1.3
+    DatasetGroupHeader dataset_group_header;
+
+    // ISO 23092-1 Section 6.5.1.3
+    // optional
+    std::vector<Reference> references;
+
+    // ISO 23092-1 Section 6.5.1.4
+    std::vector<ReferenceMetadata> reference_metadatas;
+
+    // ISO 23092-1 Section 6.5.1.5
+    // optional
+    std::unique_ptr<LabelList> label_list;
+
+    // ISO 23092-1 Section 6.5.1.6 specification 23092-3
+    // optional
+    std::unique_ptr<DGMetadata> DG_metadata;
+
+    // ISO 23092-1 Section 6.5.1.7 specification 23092-3
+    // optional
+    std::unique_ptr<DGProtection> DG_protection;
+
+    std::vector<Dataset> datasets;
+
    public:
     /**
      *
      * @param x_datasetGroupID
      */
-    explicit DatasetGroup(std::vector<genie::format::mpegg_p1::Dataset>*, const uint8_t x_datasetGroupID);
+    explicit DatasetGroup(std::vector<genie::format::mpegg_p1::Dataset>*, uint8_t x_datasetGroupID);
 
     /**
      *
@@ -74,16 +120,10 @@ class DatasetGroup {
 
     /**
      *
-     * @param bitWriter
+     * @param bit_writer
      */
-    void writeToFile(genie::util::BitWriter& bitWriter) const;
+    void writeToFile(genie::util::BitWriter& bit_writer) const;
 
-   private:
-    mpegg_p1::DatasetGroupHeader dataset_group_header;  //!<
-    // DG_metadata dg_metadata;      // optional
-    // DG_protection dg_protection;  // optional
-    /** reference[] and reference_metadata[] and label_list is optional and not yet implemented */
-    std::vector<Dataset> datasets;  //!<
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -94,7 +134,7 @@ class DatasetGroup {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DATASET_GROUP_H
+#endif  // GENIE_PART1_DATASET_GROUP_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

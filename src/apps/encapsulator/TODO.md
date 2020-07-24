@@ -10,7 +10,7 @@
     
 ##write outs
 
-- start from src/genie/format/mpegg_p1/dataset.cc::writeToFile
+- start from src/genie/format/mpegg_p1/dataset.cc::write
   - calculation for length of Datasets needs to be done
     - calculation for length of Dataset Headers needs to be done
     - calculation for length of Dataset Parameter Sets needs to be done
