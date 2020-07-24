@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ACCESS_UNIT_P1_H
-#define GENIE_ACCESS_UNIT_P1_H
+#ifndef GENIE_PART1_ACCESS_UNIT_P1_H
+#define GENIE_PART1_ACCESS_UNIT_P1_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -50,6 +50,13 @@ class AU_protection {
  *
  */
 class AccessUnit {
+   private:
+    genie::format::mgb::AccessUnit au_p1;  //!< if MIT_flag is set to 0 -> au_p1 header equates to au_p2 header
+
+    // std::unique_ptr<AU_information> au_information;   //optional
+    // std::unique_ptr<AU_protection> au_protection;     //optional
+
+
    public:
     /**
      *
@@ -65,15 +72,10 @@ class AccessUnit {
 
     /**
      *
-     * @param bitWriter
+     * @param bit_writer
      */
-    void writeToFile(genie::util::BitWriter& bitWriter) const;
+    void writeToFile(genie::util::BitWriter& bit_writer) const;
 
-   private:
-    genie::format::mgb::AccessUnit au_p1;  //!< if MIT_flag is set to 0 -> au_p1 header equates to au_p2 header
-
-    // std::unique_ptr<AU_information> au_information;   //optional
-    // std::unique_ptr<AU_protection> au_protection;     //optional
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -84,7 +86,7 @@ class AccessUnit {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ACCESS_UNIT_P1_H
+#endif  // GENIE_PART1_ACCESS_UNIT_P1_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
