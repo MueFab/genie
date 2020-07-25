@@ -366,8 +366,7 @@ void ClassifierRegroup::flush() {
     for (auto& refblock : currentChunks) {
         for (auto& pairblock : refblock) {
             for (auto& classblock : pairblock) {
-                if (classblock.getData().empty() ||
-                    classblock.getData().front().getClassID() == record::ClassType::CLASS_U) {
+                if (classblock.getData().empty()) {
                     continue;
                 }
                 queueFinishedChunk(classblock);
