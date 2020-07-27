@@ -39,6 +39,8 @@ class BlockHeader {
 
     void setClassInfos(std::vector<ClassInfo>&& _cls_infos);
 
+    virtual uint64_t getLength() const;
+
     virtual void write(genie::util::BitWriter& bit_writer) const;
 
     void writeClassInfos(genie::util::BitWriter& bit_writer) const;

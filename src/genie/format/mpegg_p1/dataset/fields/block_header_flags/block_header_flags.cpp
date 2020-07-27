@@ -37,6 +37,10 @@ void BlockHeader::setClassInfos(std::vector<ClassInfo>&& _cls_infos) {
     class_infos = _cls_infos;
 }
 
+uint64_t BlockHeader::getLength() const {
+    return 1;
+}
+
 void BlockHeader::write(util::BitWriter& bit_writer) const {
 
     // block_header_flag u(1)

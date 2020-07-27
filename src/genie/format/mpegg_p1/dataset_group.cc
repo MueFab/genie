@@ -4,6 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include
 #include "dataset_group.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -46,15 +47,36 @@ void DGProtection::write(util::BitWriter& bit_writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// only for single vector of Datasets -> dataset_group_ID(0)
-DatasetGroup::DatasetGroup(std::vector<genie::format::mpegg_p1::Dataset>* x_datasets, const uint8_t x_datasetGroupID)
-    : dataset_group_header(x_datasets, x_datasetGroupID) {
-    datasets = std::move(*x_datasets);
+// TODO (Yeremia): Version number
+DatasetGroup::DatasetGroup(std::vector<Dataset> &&_datasets)
+    : dataset_group_header(_datasets, 0),
+      datasets(std::move(_datasets)){}
 
-    for (auto& dataset : datasets) {  // setting GroupIDs of Datasets
-        dataset.setDatasetGroupId(x_datasetGroupID);
-    }
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroup::addReferences(std::vector<Reference>&& _references) {references = std::move(_references);}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::vector<Reference> &DatasetGroup::getReferences() const {return references;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroup::addLabelList(std::vector<Label> && _labels) {
+    label_list = util::make_unique<LabelList>(getDatasetGroupHeader().getDatasetGroupId(), std::move(_labels));
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const LabelList& DatasetGroup::getLabelList() const { return *label_list;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroup::addDGMetadata(std::unique_ptr<DGMetadata> _dg_metadata) { DG_metadata = std::move(_dg_metadata);}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroup::addDGProtection(std::unique_ptr<DGProtection> _dg_protection) {DG_protection = std::move(_dg_protection);}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

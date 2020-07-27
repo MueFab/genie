@@ -11,15 +11,19 @@ LabelList::LabelList()
 LabelList::LabelList(uint8_t _ds_group_ID)
     : dataset_group_ID(_ds_group_ID) {}
 
-void LabelList::addLabel(Label&& _label) {
-    labels.push_back(std::move(_label));
-}
+LabelList::LabelList(uint8_t _ds_group_ID, std::vector<Label> &&_labels)
+    : dataset_group_ID(_ds_group_ID),
+      labels(std::move(_labels)){}
 
-void LabelList::addLabels(std::vector<Label>& _labels) {
-    UTILS_DIE_IF(_labels.empty(), "_label is empty!");
-
-    std::move(_labels.begin(), _labels.end(), std::back_inserter(labels));
-}
+//void LabelList::addLabel(Label&& _label) {
+//    labels.push_back(std::move(_label));
+//}
+//
+//void LabelList::addLabels(std::vector<Label>& _labels) {
+//    UTILS_DIE_IF(_labels.empty(), "_label is empty!");
+//
+//    std::move(_labels.begin(), _labels.end(), std::back_inserter(labels));
+//}
 
 void LabelList::setLabels(std::vector<Label>&& _labels) {
     labels = _labels;

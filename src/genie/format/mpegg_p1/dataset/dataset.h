@@ -96,8 +96,8 @@ class Dataset {
 
     const std::vector<DatasetParameterSet>& getDatasetParameterSets() const;
 
-    void setDatasetGroupId(uint8_t GroupId);
-    void setDatasetParameterSetsGroupId(uint8_t GroupId);
+    void setDatasetGroupId(uint8_t group_id);
+    void setDatasetParameterSetsGroupId(uint8_t ps_group_id);
 
     void write(genie::util::BitWriter& bit_writer) const;
 

@@ -100,17 +100,41 @@ class DatasetGroup {
     std::vector<Dataset> datasets;
 
    public:
-    /**
-     *
-     * @param x_datasetGroupID
-     */
-    explicit DatasetGroup(std::vector<genie::format::mpegg_p1::Dataset>*, uint8_t x_datasetGroupID);
+
+    explicit DatasetGroup(std::vector<Dataset>&& _datasets);
 
     /**
      *
      * @return
      */
     const DatasetGroupHeader& getDatasetGroupHeader() const;
+
+    /**
+     *
+     * @param _references
+     */
+    void addReferences(std::vector<Reference>&& _references);
+
+    /**
+     *
+     * @return
+     */
+    const std::vector<Reference>& getReferences() const;
+
+    /**
+     *
+     * @param _label_list
+     */
+    void addLabelList(std::vector<Label>&& _label_list);
+
+    /**
+     *
+     * @return
+     */
+    const LabelList& getLabelList() const;
+
+    void addDGMetadata(std::unique_ptr<DGMetadata> _dg_metadata);
+    void addDGProtection(std::unique_ptr<DGProtection>_dg_protection);
 
     /**
      *

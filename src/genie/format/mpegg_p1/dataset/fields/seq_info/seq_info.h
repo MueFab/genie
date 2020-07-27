@@ -24,6 +24,8 @@ class SequenceInfo {
 
     explicit SequenceInfo(uint8_t _ref_ID);
 
+    uint64_t getLength() const;
+
     bool anySeq() const;
     bool isValid() const;
 

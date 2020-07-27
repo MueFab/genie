@@ -24,18 +24,26 @@ class LabelList{
     LabelList();
     explicit LabelList(uint8_t _ds_group_ID);
 
-    /*
+    /**
      *
-     */
-    void addLabel(Label&& _label);
+     * @param _ds_group_ID
+     * @param labels
+    **/
+    LabelList(uint8_t _ds_group_ID, std::vector<Label>&& _labels);
 
-    /*
-     *
-     */
-    void addLabels(std::vector<Label>& _labels);
+//    /*
+//     *
+//     */
+//    void addLabel(Label&& _label);
+//
+//    /*
+//     *
+//     */
+//    void addLabels(std::vector<Label>& _labels);
 
-    /*
+    /**
      *
+     * @param _labels
      */
     void setLabels(std::vector<Label>&& _labels);
 
