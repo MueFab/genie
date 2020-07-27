@@ -57,11 +57,10 @@ class DatasetHeader {
 
     uint64_t getLength() const;
 
-    uint16_t getDatasetId() const { return dataset_ID; }
-    uint8_t getDatasetGroupId() const { return dataset_group_ID; }
+    uint16_t getDatasetId() const;
+    uint8_t getDatasetGroupId() const;
 
-    void setDatasetGroupId(uint8_t datasetGroupId) { dataset_group_ID = datasetGroupId; }
-
+    void setDatasetGroupId(uint8_t group_ID);
 
     void write(genie::util::BitWriter& bit_writer) const;
 };

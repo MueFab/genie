@@ -14,11 +14,23 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetGroupHeader::DatasetGroupHeader(const std::vector<genie::format::mpegg_p1::Dataset>* datasets,
-                                       const uint8_t x_datasetGroupID)
-    : dataset_group_ID(x_datasetGroupID), version_number(0) {
-    for (const auto& ds : *datasets) {
-        dataset_IDs.push_back(ds.getDatasetHeader().getDatasetId());
+DatasetGroupHeader::DatasetGroupHeader(std::vector<Dataset> &datasets, uint8_t ver)
+    : version_number(ver) {
+
+    auto iter = datasets.begin();
+
+    dataset_group_ID = iter->getDatasetHeader().getDatasetGroupId();
+    dataset_IDs.push_back(iter->getDatasetParameterSetDatasetID());
+
+    iter++;
+
+    while (iter != datasets.end()){
+        UTILS_DIE_IF(iter->getDatasetHeader().getDatasetGroupId() != dataset_group_ID,
+                     "dataset_group_ID is inconsistent");
+
+        dataset_IDs.push_back(iter->getDatasetParameterSetDatasetID());
+
+        iter++;
     }
 }
 

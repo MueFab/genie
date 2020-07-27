@@ -17,6 +17,8 @@ class WithHeader : public BlockHeader {
 
     WithHeader(bool _mit_flag, bool _cc_mode_flag);
 
+    uint64_t getLength() const override;
+
     void write(genie::util::BitWriter& bit_writer) const override;
 
    protected:

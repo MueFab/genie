@@ -64,9 +64,9 @@ uint8_t Dataset::getDatasetParameterSetDatasetGroupID() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Dataset::setDatasetParameterSetsGroupId(uint8_t GroupId) {
+void Dataset::setDatasetParameterSetsGroupId(uint8_t ps_group_id) {
     for (auto& ps : dataset_parameter_sets) {
-        ps.setDatasetGroupId(GroupId);
+        ps.setDatasetGroupId(ps_group_id);
     }
 }
 

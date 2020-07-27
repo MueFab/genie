@@ -25,19 +25,21 @@ DatasetHeader::DatasetHeader(uint8_t group_ID, uint16_t ID, bool _byte_offset_si
       pos_40_bits_flag(_pos_40_bits_flag),
       dataset_type(_dataset_type),
       alphabet_ID(_alphabet_ID),
-      num_U_access_units(_num_U_access_units){}
+      num_U_access_units(_num_U_access_units){
+
+    UTILS_DIE_IF(4 != version.size(), "Version string must consists of 4 characters");
+}
 
 uint64_t DatasetHeader::getLength() const {
+    uint64_t bitlength = 12 * 8;   // gen_info
+    bitlength += (1 + 2 + 4) * 8;  // dataset_group_ID, dataset_ID, version
+    bitlength += 4; // byte_offset_size_flag, non_overlapping_AU_range_flag, pos_40_bits_flag
+
+    bitlength += block_header.getLength();
+
     // TODO (Yeremia): Fix getLength()
-//    // length is first calculated in bits
-//    uint64_t length = 12 * 8;   // gen_info
-//    length += (1 + 2 + 4) * 8;  // dataset_group_ID, dataset_ID, version
-//    length += 4;
-//    if (block_header_flag) {
-//        length += 2;
-//    } else {
-//        length += 1;
-//    }
+
+
 //    length += 16;
 //    if (seq_count > 0) {
 //        length += 8;                      // reference_ID
@@ -82,6 +84,12 @@ uint64_t DatasetHeader::getLength() const {
 //    return length;
 }
 
+uint16_t DatasetHeader::getDatasetId() const {return dataset_ID;}
+
+uint8_t DatasetHeader::getDatasetGroupId() const {return dataset_group_ID;}
+
+void DatasetHeader::setDatasetGroupId(uint8_t group_ID) { dataset_group_ID = group_ID;}
+
 void DatasetHeader::write(util::BitWriter& bit_writer) const {
     UTILS_DIE_IF(version.size() != 4, "Invalid version");
 
@@ -123,7 +131,7 @@ void DatasetHeader::write(util::BitWriter& bit_writer) const {
     bit_writer.write(num_U_access_units, 32);
 
     if (num_U_access_units){
-        UTILS_DIE_IF(u_access_unit_info == nullptr, "No u_access_unit_info");
+        UTILS_DIE_IF(u_access_unit_info == nullptr, "No u_access_unit_info stored!");
 
         //num_U_clusters, multiple_signature_base, U_signature_size, U_signature_constant_length, U_signature_length
         u_access_unit_info->write(bit_writer);

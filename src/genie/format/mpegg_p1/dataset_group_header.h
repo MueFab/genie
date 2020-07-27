@@ -25,13 +25,13 @@ namespace mpegg_p1 {
  */
 class DatasetGroupHeader {
    public:
+
     /**
      *
-     * @param datasetId
-     * @param x_datasetGroupID
+     * @param datasets
+     * @param ver
      */
-    explicit DatasetGroupHeader(const std::vector<genie::format::mpegg_p1::Dataset>* datasetId,
-                                uint8_t x_datasetGroupID);
+    explicit DatasetGroupHeader(std::vector<Dataset>& datasets, uint8_t ver);
 
     /**
      *

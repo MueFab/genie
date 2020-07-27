@@ -15,6 +15,46 @@ SequenceInfo::SequenceInfo(uint8_t _ref_ID)
       seq_IDs(),
       seq_blocks(){}
 
+uint64_t SequenceInfo::getLength() const {
+    uint64_t bitlength = 16;
+
+    if (anySeq()){
+        // reference_ID u(8)
+        bitlength += 8;
+
+        // seq_ID u(16)
+        bitlength += 16 * getSeqCount();
+
+        // seq_blocks u(32)
+        bitlength += 32 * getSeqCount();
+
+        // tflag[0] u(1)
+        bitlength += 1;
+
+        // thres[0] u(31)
+        bitlength += 31;
+
+        auto thres = thress.begin();
+
+        while (thres != thress.end()){
+            auto next_thres = thres +1;
+
+            auto tflag = *thres != *next_thres;
+
+            bitlength += 1;
+
+            if (tflag){
+                // thres[i] u(31)
+                bitlength += 131;
+            }
+
+            thres = next_thres;
+        }
+    }
+
+    return  bitlength;
+}
+
 void SequenceInfo::setRefID(uint8_t _ref_ID) {
     reference_ID = _ref_ID;
 }
