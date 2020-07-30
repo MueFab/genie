@@ -45,7 +45,7 @@ set(source_files
         dataset/fields/block_header_flags/class_info/class_info.cpp
         dataset/fields/u_access_unit_info/u_access_unit_info.cpp
         dataset/fields/seq_additinal_info/seq_additional_info.cpp
-        )
+        access_unit/access_unit_header.h access_unit/block.h access_unit/block_header.h access_unit/block_header.cpp access_unit/block.cpp)
 
 add_library(genie-mpegg_p1 ${source_files})
 

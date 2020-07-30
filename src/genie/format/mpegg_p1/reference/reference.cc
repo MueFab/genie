@@ -18,16 +18,17 @@ Reference::Reference()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Reference::Reference(uint8_t _dataset_grp_ID, uint8_t _ref_ID, std::string _ref_name, uint16_t _ref_major_ver,
-                     uint16_t _ref_minor_ver, uint16_t _ref_patch_ver)
-    : dataset_group_ID(_dataset_grp_ID),
+Reference::Reference(uint8_t _ds_group_ID, uint8_t _ref_ID, std::string _ref_name, uint16_t _ref_major_ver,
+                     uint16_t _ref_minor_ver, uint16_t _ref_patch_ver, std::vector<std::string>&& _seq_names,
+                     ReferenceLocation&& _ref_loc)
+    : dataset_group_ID(_ds_group_ID),
       reference_ID(_ref_ID),
       reference_name(std::move(_ref_name)),
       reference_major_version(_ref_major_ver),
       reference_minor_version(_ref_minor_ver),
       reference_patch_version(_ref_patch_ver),
-      sequence_names(),
-      reference_location()
+      sequence_names(std::move(_seq_names)),
+      reference_location(std::move(_ref_loc))
     {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -36,11 +37,23 @@ void Reference::setDatasetGroupId(uint8_t _dataset_group_ID) {dataset_group_ID =
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Reference::setSequenceNames(std::vector<std::string>&& _seq_names) {sequence_names = _seq_names;}
+uint8_t Reference::getDatasetGroupId() const {return dataset_group_ID;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Reference::addReferenceLocation(ReferenceLocation&& _ref_loc) {reference_location = _ref_loc;}
+void Reference::addSequenceNames(std::vector<std::string>&& _seq_names) { sequence_names = std::move(_seq_names);}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::vector<std::string>& Reference::getSequenceNames() const {return sequence_names;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Reference::addReferenceLocation(ReferenceLocation&& _ref_loc) {reference_location = std::move(_ref_loc);}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const ReferenceLocation &Reference::getReferenceLocation() const {return reference_location;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -49,52 +62,58 @@ uint16_t Reference::getSeqCount() const { return sequence_names.size(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t Reference::getLength() const {
+    // key (4), Length (8)
+    uint64_t len = 12;
+
+    // TODO (Yeremia): len of Value[]?
+
     // dataset_group_ID u(8)
-    uint64_t length = 1;
+    len += 1;
 
     // reference_ID u(8)
-    length += 1;
+    len += 1;
 
     // reference_name st(v)
-    // bit length of string - page 11
-    length += (reference_name.size() + 1) * 1;
+    // bit len of string - page 11
+    len += (reference_name.size() + 1) * 1;
 
     // reference_major_version u(16)
-    length += 2;
+    len += 2;
 
     // reference_minor_version u(16)
-    length += 2;
+    len += 2;
 
     // reference_patch_version u(16)
-    length += 2;
+    len += 2;
 
     // writeToFile seq_count u(16)
-    length += 2;
+    len += 2;
 
     // writeToFile sequence_name[]
     for (auto& sequence_name: sequence_names){
-        // bit length of string - page 11
-        length += (sequence_name.size() + 1) * 1;
+        // bit len of string - page 11
+        len += (sequence_name.size() + 1) * 1;
     }
 
     // reserved 7 bits u(7) and external_ref_flag u(1)
-    length += 1;
+    len += 1;
 
     // if (external_ref_flag)
-    length += reference_location.getLength();
+    len += reference_location.getLength();
 
-    return length;
+    return len;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Reference::writeToFile(util::BitWriter& bit_writer) const {
+    // KLV (Key Length Value) format
 
-    //TODO (Yeremia): is it required?
+    // Key of KVL format
     bit_writer.write("rfgn");
 
-    //TODO (Yeremia): is it required?
-    // length = ...
+    // Length of KVL format
+    bit_writer.write(getLength(), 64);
 
     // dataset_group_ID u(8)
     bit_writer.write(dataset_group_ID, 8);

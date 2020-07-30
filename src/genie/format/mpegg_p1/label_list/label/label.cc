@@ -40,9 +40,13 @@ uint16_t Label::getNumDatasets() const { return (uint16_t) dataset_infos.size();
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t Label::getLength() const {
+    // key (4), Length (8)
+    uint64_t len = 12;
+
+    // TODO (Yeremia): length of Value[]?
 
     // label_ID st(v)
-    uint64_t len = (label_ID.size() + 1);
+    len += (label_ID.size() + 1);
 
     // num_datasets u(16)
     len += 2;
@@ -58,6 +62,13 @@ uint64_t Label::getLength() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Label::write(util::BitWriter& bit_writer) const {
+    // KLV (Key Length Value) format
+
+    // Key of KVL format
+    bit_writer.write("lbll");
+
+    // Length of KVL format
+    bit_writer.write(getLength(), 64);
 
     // label_ID st(v)
     bit_writer.write(label_ID);

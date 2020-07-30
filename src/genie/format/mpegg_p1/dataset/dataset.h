@@ -29,6 +29,10 @@ class DTMetadata {
      */
     DTMetadata();
 
+    uint64_t getLength() const;
+
+    void writeToFile(genie::util::BitWriter& bit_writer) const;
+
    private:
     std::vector<uint8_t> DT_metadata_value;  //!<
 };
@@ -42,6 +46,10 @@ class DTProtection {
      *
      */
     DTProtection();
+
+    uint64_t getLength() const;
+
+    void writeToFile(genie::util::BitWriter& bit_writer) const;
 
    private:
     std::vector<uint8_t> DT_protection_value;  //!<

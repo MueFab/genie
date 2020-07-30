@@ -34,6 +34,11 @@ class DGMetadata {
      */
     DGMetadata();
 
+    /**
+     * Get length of DG metadata in bytes
+     *
+     * @return
+     */
     uint64_t getLength() const;
 
     /**
@@ -57,6 +62,11 @@ class DGProtection {
      */
     DGProtection();
 
+    /**
+     * Get length of DG protection in bytes
+     *
+     * @return
+     */
     uint64_t getLength() const;
 
     /**
@@ -70,9 +80,6 @@ class DGProtection {
 
 };
 
-/**
- *
- */
 class DatasetGroup {
    private:
     /** ------------------------------------------------------------------------------------------------------------
@@ -101,19 +108,16 @@ class DatasetGroup {
     // optional
     std::unique_ptr<DGProtection> DG_protection;
 
+    // ISO 23092-1 Section 6.5.2.1
     std::vector<Dataset> datasets;
 
    public:
 
-    explicit DatasetGroup(std::vector<Dataset>&& _datasets);
-
     /**
-     * Get length of Dataset Header in bits.
-     * @return
+     *
+     * @param _datasets
      */
-    uint64_t getLength() const;
-
-    void setDatasetGroupId(uint8_t _dataset_group_ID);
+    explicit DatasetGroup(std::vector<Dataset>&& _datasets);
 
     /**
      *
@@ -172,6 +176,12 @@ class DatasetGroup {
 
     /**
      *
+     * @return
+     */
+    const DGMetadata& getDgMetadata() const;
+
+    /**
+     *
      * @param _dg_protection
      */
     void addDGProtection(std::unique_ptr<DGProtection>_dg_protection);
@@ -180,7 +190,25 @@ class DatasetGroup {
      *
      * @return
      */
+    const DGProtection& getDgProtection() const;
+
+    /**
+     *
+     * @return
+     */
     const std::vector<Dataset>& getDatasets() const;
+
+    /**
+     *
+     * @param _dataset_group_ID
+     */
+    void setDatasetGroupId(uint8_t _dataset_group_ID);
+
+    /**
+     * Get length of Dataset Header in bytes.
+     * @return
+     */
+    uint64_t getLength() const;
 
     /**
      *

@@ -25,21 +25,34 @@ void ReferenceMetadata::setDatasetGroupId(uint8_t _dataset_group_ID) {dataset_gr
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t ReferenceMetadata::getLength() const {
+    // key (4), Length (8)
+    uint64_t len = 12;
+
+    // TODO (Yeremia): len of Value[]?
+
     // dataset_group_ID u(8)
-    uint64_t length = 1;
+    len += 1;
 
     // reference_ID u(8)
-    length += 1;
+    len += 1;
 
     // reference_metadata_value()
-    length += reference_metadata_value.size();
+    len += reference_metadata_value.size();
 
-    return length;
+    return len;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReferenceMetadata::writeToFile(genie::util::BitWriter& bit_writer) const {
+
+    // KLV (Key Length Value) format
+
+    // Key of KVL format
+    bit_writer.write("rfmd");
+
+    // Length of KVL format
+    bit_writer.write(getLength(), 64);
 
     // dataset_group_ID u(8)
     bit_writer.write(dataset_group_ID, 8);
