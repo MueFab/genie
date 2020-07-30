@@ -16,6 +16,7 @@ class DatasetInfo{
     *
     **/
     uint16_t dataset_ID;
+
     std::vector<DatasetRegion> dataset_regions;
 
    public:
@@ -50,9 +51,11 @@ class DatasetInfo{
     /*
      *
      */
-    const std::vector<DatasetRegion>& getDatasetRegions() const ;
+    const std::vector<DatasetRegion>& getDatasetRegions() const;
 
-    void write(genie::util::BitWriter& bit_writer) const;
+    uint64_t getLength() const;
+
+    void writeToFile(genie::util::BitWriter& bit_writer) const;
 };
 
 }  // namespace mpegg_p1

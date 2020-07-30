@@ -34,13 +34,33 @@ DatasetGroupHeader::DatasetGroupHeader(std::vector<Dataset> &datasets, uint8_t v
     }
 }
 
+uint64_t DatasetGroupHeader::getLength() const {
+    // dataset_group_ID u(8)
+    uint64_t length = 8;
+
+    // version_number u(8)
+    length += 1;
+
+    // dataset_IDs[] u(16)
+    length += 2 * dataset_IDs.size();
+
+    return length;
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetGroupHeader::writeToFile(genie::util::BitWriter& bit_writer) const {
+    // KLV (Key Length Value) format
+
     bit_writer.write("dghd");
 
-    uint64_t length = 12;  // key + length
-    length += 2 + 2 * this->getNumDatasets();
+    // Key + Length
+    uint64_t length = 12;
+
+    // TODO (Yeremia): Value of KVL?
+
+    length += getLength();
+
     bit_writer.write(length, 64);
 
     // dataset_group_ID u(8)
@@ -59,7 +79,15 @@ void DatasetGroupHeader::writeToFile(genie::util::BitWriter& bit_writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void DatasetGroupHeader::setDatasetGroupId(uint8_t _dataset_group_ID) {dataset_group_ID = _dataset_group_ID;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint8_t DatasetGroupHeader::getDatasetGroupId() const { return dataset_group_ID; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroupHeader::setVersionNumber(uint8_t _version_number) {version_number = _version_number;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

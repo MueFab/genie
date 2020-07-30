@@ -86,7 +86,6 @@ class Dataset {
     Dataset(const genie::format::mgb::DataUnitFactory& dataUnitFactory,
             std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2, const uint16_t dataset_ID);
 
-    uint64_t getLength() const;
 
     uint16_t getDatasetParameterSetDatasetID() const;
 
@@ -96,10 +95,11 @@ class Dataset {
 
     const std::vector<DatasetParameterSet>& getDatasetParameterSets() const;
 
-    void setDatasetGroupId(uint8_t group_id);
-    void setDatasetParameterSetsGroupId(uint8_t ps_group_id);
+    void setDatasetGroupId(uint8_t _dataset_group_ID);
 
-    void write(genie::util::BitWriter& bit_writer) const;
+    uint64_t getLength() const;
+
+    void writeToFile(genie::util::BitWriter& bit_writer) const;
 
 };
 

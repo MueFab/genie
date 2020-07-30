@@ -21,6 +21,13 @@ namespace mpegg_p1 {
  *
  */
 class DatasetParameterSet {
+
+   private:
+    uint8_t dataset_group_ID : 8;  //!<
+    uint16_t dataset_ID : 16;      //!<
+
+    core::parameter::ParameterSet parameterSet_p2;  //!<
+
    public:
     /**
      *
@@ -70,12 +77,6 @@ class DatasetParameterSet {
      * @param bitWriter
      */
     void writeToFile(genie::util::BitWriter& bitWriter) const;
-
-   private:
-    uint8_t dataset_group_ID : 8;  //!<
-    uint16_t dataset_ID : 16;      //!<
-
-    core::parameter::ParameterSet parameterSet_p2;  //!<
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

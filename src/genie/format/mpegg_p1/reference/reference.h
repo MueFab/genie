@@ -25,8 +25,8 @@ class Reference{
 
    private:
     /** ------------------------------------------------------------------------------------------------------------
-    * ISO 23092-1 Section 6.5.1.3 table 10
-    * ISO 23092-1 Section 6.5.1.4 table 13 - metadata specified in ISO/IEC 23092-3
+    * Reference - ISO 23092-1 Section 6.5.1.3 table 10
+    * Reference Metadata - ISO 23092-1 Section 6.5.1.4 table 13 - metadata specified in ISO/IEC 23092-3
     * ------------------------------------------------------------------------------------------------------------- */
     uint8_t dataset_group_ID;
     uint8_t reference_ID;
@@ -47,13 +47,22 @@ class Reference{
     Reference(uint8_t _dataset_grp_ID, uint8_t _ref_ID, std::string _ref_name, uint16_t _ref_major_ver,
               uint16_t _ref_minor_ver, uint16_t _ref_patch_ver);
 
+    void setDatasetGroupId(uint8_t _dataset_group_ID);
+
     void setSequenceNames(std::vector<std::string>&& _seq_names);
 
     void addReferenceLocation(ReferenceLocation&& _ref_loc);
 
     uint16_t getSeqCount() const;
 
-    void write(genie::util::BitWriter& bit_writer) const;
+    /**
+     * Get length of reference in bits.
+     *
+     * @return
+     */
+    uint64_t getLength() const;
+
+    void writeToFile(genie::util::BitWriter& bit_writer) const;
 };
 
 }  // namespace mpegg_p1

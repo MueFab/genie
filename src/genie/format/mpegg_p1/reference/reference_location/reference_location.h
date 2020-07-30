@@ -22,6 +22,8 @@ class ReferenceLocation{
 
     bool isExternal() const;
 
+    virtual uint64_t getLength() const;
+
     virtual void write(genie::util::BitWriter& bit_writer) const;
 
    protected:

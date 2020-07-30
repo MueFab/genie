@@ -40,7 +40,7 @@ void AccessUnit::writeToFile(genie::util::BitWriter& bit_writer) const {
 
     bit_writer.flush();
 
-    // TODO (Yeremia): implement write of AccessUnit
+    // TODO (Yeremia): implement writeToFile of AccessUnit
     UTILS_DIE("Not implemented yet");
 }
 
