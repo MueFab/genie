@@ -10,6 +10,62 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t DTMetadata::getLength() const {
+    uint64_t len = 12;  // gen_info
+    // TODO (Yeremia): length of Value[]?
+
+    len += DT_metadata_value.size();
+
+    return len;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DTMetadata::writeToFile(genie::util::BitWriter &bit_writer) const {
+    // KLV (Key Length Value) format
+
+    // Key of KVL format
+    bit_writer.write("dtmd");
+
+    // Length of KVL format
+    bit_writer.write(getLength(), 64);
+
+    for (auto val : DT_metadata_value){
+        bit_writer.write(val, 8);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t DTProtection::getLength() const {
+    uint64_t len = 12;  // gen_info
+    // TODO (Yeremia): length of Value[]?
+
+    len += DT_protection_value.size();
+
+    return len;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DTProtection::writeToFile(genie::util::BitWriter &bit_writer) const {
+    // KLV (Key Length Value) format
+
+    // Key of KVL format
+    bit_writer.write("dtpr");
+
+    // Length of KVL format
+    bit_writer.write(getLength(), 64);
+
+    for (auto val : DT_protection_value){
+        bit_writer.write(val, 8);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 Dataset::Dataset(uint16_t dataset_ID)
     : dataset_header(dataset_ID){}  // TODO: dataset_header constructor
 
@@ -67,38 +123,55 @@ const DatasetHeader& Dataset::getDatasetHeader() const { return dataset_header; 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t Dataset::getLength() const {
-    uint64_t length = 12;  // gen_info
-    length += dataset_header.getLength();
+    uint64_t len = 12;  // gen_info
+    // TODO (Yeremia): length of Value[]?
+
+    len += dataset_header.getLength();
+
+    // DT_metadata
+    if (DT_metadata != nullptr){
+        DT_metadata->getLength();
+    }
+
+    // DT_protection
+    if (DT_protection != nullptr){
+        DT_protection->getLength();
+    }
 
     for (auto const& it : dataset_parameter_sets) {
-        length += it.getLength();
+        len += it.getLength();
     }
 
     for (auto const& it : access_units) {
-        length += it.getLength();
+        len += it.getLength();
     }
 
-    return length;
+    return len;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Dataset::writeToFile(util::BitWriter& bit_writer) const {
+    // KLV (Key Length Value) format
 
-    //TODO (Yeremia): is it required?
+    // Key of KVL format
     bit_writer.write("dtcn");
 
-    //TODO (Yeremia): is it required?
-    bit_writer.write(this->getLength(), 64);
+    // Length of KVL format
+    bit_writer.write(getLength(), 64);
 
     // dataset_header DatasetHeader
     dataset_header.write(bit_writer);
 
-    // TODO (Yeremia): Write DG_metadata
-    //DG_metadata.writeToFile(bit_writer);
+    // DT_metadata
+    if (DT_metadata != nullptr){
+        DT_metadata->writeToFile(bit_writer);
+    }
 
-    // TODO (Yeremia): Write DG_protection
-    //DG_protection.writeToFile(bit_writer);
+    // DT_protection
+    if (DT_protection != nullptr){
+        DT_protection->writeToFile(bit_writer);
+    }
 
     // TODO (Yeremia): writeToFile master_index_table depending on MIT_FLAG
 //    if (MIT_FLAG){

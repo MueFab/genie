@@ -43,13 +43,6 @@ class DatasetGroupHeader {
     explicit DatasetGroupHeader(std::vector<Dataset>& datasets, uint8_t ver);
 
     /**
-     * Get length of dataset group header in bits.
-     *
-     * @return
-     */
-    uint64_t getLength() const;
-
-    /**
      * Set dataset_group_ID
      *
      * @param _dataset_group_ID
@@ -67,7 +60,7 @@ class DatasetGroupHeader {
      * @param version_number
      */
     void setVersionNumber(uint8_t _version_number);
-    
+
     /**
      *
      * @return
@@ -85,6 +78,13 @@ class DatasetGroupHeader {
      * @return
      */
     const std::vector<uint16_t>& getDatasetId() const;
+
+    /**
+     * Get length of dataset group header in bytes.
+     *
+     * @return
+     */
+    uint64_t getLength() const;
 
     /**
      *

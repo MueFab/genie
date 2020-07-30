@@ -61,33 +61,6 @@ DatasetGroup::DatasetGroup(std::vector<Dataset> &&_datasets)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroup::setDatasetGroupId(uint8_t _dataset_group_ID) {
-
-    dataset_group_header.setDatasetGroupId(_dataset_group_ID);
-
-    for (auto& ref: references){
-        ref.setDatasetGroupId(_dataset_group_ID);
-    }
-
-    for (auto& ref_meta: reference_metadata){
-        ref_meta.setDatasetGroupId(_dataset_group_ID);
-    }
-
-    if (label_list != nullptr){
-        label_list->setDatasetGroupId(_dataset_group_ID);
-    }
-
-    // DG_metadata has no dataset_group_ID
-
-    // DG_protection has no dataset_group_ID
-
-    for (auto& ds: datasets){
-        ds.setDatasetGroupId(_dataset_group_ID);
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void DatasetGroup::addReferences(std::vector<Reference>&& _references) {references = std::move(_references);}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -130,8 +103,15 @@ void DatasetGroup::addDGMetadata(std::unique_ptr<DGMetadata> _dg_metadata) { DG_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+const DGMetadata &DatasetGroup::getDgMetadata() const {return *DG_metadata;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void DatasetGroup::addDGProtection(std::unique_ptr<DGProtection> _dg_protection) {DG_protection = std::move(_dg_protection);}
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+const DGProtection &DatasetGroup::getDgProtection() const {return *DG_protection;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -143,9 +123,41 @@ const std::vector<Dataset>& DatasetGroup::getDatasets() const { return datasets;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void DatasetGroup::setDatasetGroupId(uint8_t _dataset_group_ID) {
+
+    dataset_group_header.setDatasetGroupId(_dataset_group_ID);
+
+    for (auto& ref: references){
+        ref.setDatasetGroupId(_dataset_group_ID);
+    }
+
+    for (auto& ref_meta: reference_metadata){
+        ref_meta.setDatasetGroupId(_dataset_group_ID);
+    }
+
+    if (label_list != nullptr){
+        label_list->setDatasetGroupId(_dataset_group_ID);
+    }
+
+    // DG_metadata has no dataset_group_ID
+
+    // DG_protection has no dataset_group_ID
+
+    for (auto& ds: datasets){
+        ds.setDatasetGroupId(_dataset_group_ID);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint64_t DatasetGroup::getLength() const {
 
-    uint64_t length = dataset_group_header.getLength();
+    // key (4), Length (8)
+    uint64_t length = 12;
+
+    // TODO (Yeremia): length of Value[]?
+
+    length += dataset_group_header.getLength();
 
     for (auto& ref: references){
         length += ref.getLength();
@@ -179,21 +191,13 @@ uint64_t DatasetGroup::getLength() const {
 void DatasetGroup::writeToFile(genie::util::BitWriter& bit_writer) const {
     // KLV (Key Length Value) format
 
+    // Key of KVL format
     bit_writer.write("dgcn");
 
-    // key (4), Length (8)
-    uint64_t length = 12;
+    // Length of KVL format
+    bit_writer.write(getLength(), 64);
 
-    // TODO (Yeremia): Value?
-
-    length += getLength();
-
-    bit_writer.write(length, 64);
-
-    dataset_group_header.writeToFile(bit_writer);
-    for (auto const& it : datasets) {
-        it.writeToFile(bit_writer);
-    }
+    // Value of KVL format
 
     // dataset_group_header
     dataset_group_header.writeToFile(bit_writer);

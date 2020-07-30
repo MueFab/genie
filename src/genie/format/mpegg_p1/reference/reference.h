@@ -1,4 +1,8 @@
-
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 #ifndef GENIE_PART1_REFERENCE_H
 #define GENIE_PART1_REFERENCE_H
 
@@ -43,25 +47,78 @@ class Reference{
 
    public:
 
+    /**
+     *
+     */
     Reference();
-    Reference(uint8_t _dataset_grp_ID, uint8_t _ref_ID, std::string _ref_name, uint16_t _ref_major_ver,
-              uint16_t _ref_minor_ver, uint16_t _ref_patch_ver);
 
+    /**
+     *
+     * @param _ds_group_ID
+     * @param _ref_ID
+     * @param _ref_name
+     * @param _ref_major_ver
+     * @param _ref_minor_ver
+     * @param _ref_patch_ver
+     * @param _seq_names
+     * @param _ref_loc
+     */
+    Reference(uint8_t _ds_group_ID, uint8_t _ref_ID, std::string _ref_name, uint16_t _ref_major_ver,
+              uint16_t _ref_minor_ver, uint16_t _ref_patch_ver, std::vector<std::string>&& _seq_names, ReferenceLocation&& _ref_loc);
+
+    /**
+     *
+     * @param _dataset_group_ID
+     */
     void setDatasetGroupId(uint8_t _dataset_group_ID);
 
-    void setSequenceNames(std::vector<std::string>&& _seq_names);
+    /**
+     *
+     * @return
+     */
+    uint8_t getDatasetGroupId() const;
 
+    /**
+     *
+     * @param _seq_names
+     */
+    void addSequenceNames(std::vector<std::string>&& _seq_names);
+
+    /**
+     *
+     * @return
+     */
+    const std::vector<std::string>& getSequenceNames() const;
+
+    /**
+     *
+     * @param _ref_loc
+     */
     void addReferenceLocation(ReferenceLocation&& _ref_loc);
 
+    /**
+     *
+     * @return
+     */
+    const ReferenceLocation& getReferenceLocation() const;
+
+    /**
+     *
+     * @return
+     */
     uint16_t getSeqCount() const;
 
     /**
-     * Get length of reference in bits.
+     * Get length of reference in bytes
      *
      * @return
      */
     uint64_t getLength() const;
 
+    /**
+     *
+     * @param bit_writer
+     */
     void writeToFile(genie::util::BitWriter& bit_writer) const;
 };
 

@@ -35,8 +35,13 @@ DatasetGroupHeader::DatasetGroupHeader(std::vector<Dataset> &datasets, uint8_t v
 }
 
 uint64_t DatasetGroupHeader::getLength() const {
+    // key (4), Length (8)
+    uint64_t length = 12;
+
+    // TODO (Yeremia): length of Value[]?
+
     // dataset_group_ID u(8)
-    uint64_t length = 8;
+    length += 8;
 
     // version_number u(8)
     length += 1;
@@ -52,16 +57,11 @@ uint64_t DatasetGroupHeader::getLength() const {
 void DatasetGroupHeader::writeToFile(genie::util::BitWriter& bit_writer) const {
     // KLV (Key Length Value) format
 
+    // Key of KVL format
     bit_writer.write("dghd");
 
-    // Key + Length
-    uint64_t length = 12;
-
-    // TODO (Yeremia): Value of KVL?
-
-    length += getLength();
-
-    bit_writer.write(length, 64);
+    // Length of KVL format
+    bit_writer.write(getLength(), 64);
 
     // dataset_group_ID u(8)
     bit_writer.write(dataset_group_ID, 8);
