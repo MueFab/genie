@@ -17,6 +17,7 @@ class Label{
     * ISO 23092-1 Section 6.5.1.5.4 table 15
     **/
     std::string label_ID;
+
     std::vector<DatasetInfo> dataset_infos;
 
    public:
@@ -48,6 +49,8 @@ class Label{
      * Implements num_datasets
      */
     uint16_t getNumDatasets() const;
+
+    uint64_t getLength() const;
 
     void write(genie::util::BitWriter& bit_writer) const;
 };

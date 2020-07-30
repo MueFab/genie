@@ -34,11 +34,13 @@ class DGMetadata {
      */
     DGMetadata();
 
+    uint64_t getLength() const;
+
     /**
      *
      * @param bit_writer
      */
-    void write(genie::util::BitWriter& bit_writer) const;
+    void writeToFile(genie::util::BitWriter& bit_writer) const;
 
    private:
     std::vector<uint8_t> DG_metadata_value;  //!<
@@ -55,11 +57,13 @@ class DGProtection {
      */
     DGProtection();
 
+    uint64_t getLength() const;
+
     /**
      *
      * @param bit_writer
      */
-    void write(genie::util::BitWriter& bit_writer) const;
+    void writeToFile(genie::util::BitWriter& bit_writer) const;
 
    private:
     std::vector<uint8_t> DG_protection_value;  //!<
@@ -83,7 +87,7 @@ class DatasetGroup {
     std::vector<Reference> references;
 
     // ISO 23092-1 Section 6.5.1.4
-    std::vector<ReferenceMetadata> reference_metadatas;
+    std::vector<ReferenceMetadata> reference_metadata;
 
     // ISO 23092-1 Section 6.5.1.5
     // optional
@@ -102,6 +106,14 @@ class DatasetGroup {
    public:
 
     explicit DatasetGroup(std::vector<Dataset>&& _datasets);
+
+    /**
+     * Get length of Dataset Header in bits.
+     * @return
+     */
+    uint64_t getLength() const;
+
+    void setDatasetGroupId(uint8_t _dataset_group_ID);
 
     /**
      *
@@ -123,9 +135,28 @@ class DatasetGroup {
 
     /**
      *
+     * @param _ref_metadata
+     */
+    void addReferenceMetadata(std::vector<ReferenceMetadata>&& _ref_metadata);
+
+    /**
+     * Get an array of reference metadata
+     *
+     * @return
+     */
+    const std::vector<ReferenceMetadata>& getReferenceMetadata() const;
+
+    /**
+     *
+     * @param _labels
+     */
+    void addLabels(std::vector<Label>&& _labels);
+
+    /**
+     *
      * @param _label_list
      */
-    void addLabelList(std::vector<Label>&& _label_list);
+    void addLabelList(std::unique_ptr<LabelList> _label_list);
 
     /**
      *
@@ -133,7 +164,16 @@ class DatasetGroup {
      */
     const LabelList& getLabelList() const;
 
+    /**
+     *
+     * @param _dg_metadata
+     */
     void addDGMetadata(std::unique_ptr<DGMetadata> _dg_metadata);
+
+    /**
+     *
+     * @param _dg_protection
+     */
     void addDGProtection(std::unique_ptr<DGProtection>_dg_protection);
 
     /**

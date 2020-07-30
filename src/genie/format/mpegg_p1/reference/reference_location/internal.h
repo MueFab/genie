@@ -19,6 +19,8 @@ class Internal : public ReferenceLocation {
 //    Internal();
     Internal(uint8_t _dataset_group_ID, uint16_t _dataset_ID);
 
+    uint64_t getLength() const override;
+
     void write(genie::util::BitWriter& bit_writer) const;
 };
 

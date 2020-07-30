@@ -26,7 +26,21 @@ uint8_t DatasetInfo::getNumRegions() const { return (uint8_t) dataset_regions.si
 
 const std::vector<DatasetRegion>& DatasetInfo::getDatasetRegions() const { return dataset_regions; }
 
-void DatasetInfo::write(util::BitWriter& bit_writer) const {
+uint64_t DatasetInfo::getLength() const {
+
+    // dataset_IDs u(16)
+    uint64_t len = 2;
+
+    // num_regions u(8)
+    len += 1;
+
+    // for dataset_regions
+    for (auto& ds_reg: dataset_regions){
+        len += ds_reg.getLength();
+    }
+}
+
+void DatasetInfo::writeToFile(util::BitWriter& bit_writer) const {
 
     // dataset_IDs u(16)
     bit_writer.write(dataset_ID, 16);
@@ -39,6 +53,8 @@ void DatasetInfo::write(util::BitWriter& bit_writer) const {
         dataset_region.write(bit_writer);
     }
 }
+
+
 
 }  // namespace mpegg_p1
 }  // namespace format

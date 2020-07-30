@@ -31,15 +31,17 @@ class LabelList{
     **/
     LabelList(uint8_t _ds_group_ID, std::vector<Label>&& _labels);
 
-//    /*
-//     *
-//     */
-//    void addLabel(Label&& _label);
-//
-//    /*
-//     *
-//     */
-//    void addLabels(std::vector<Label>& _labels);
+    /**
+     *
+     * @param _dataset_group_ID
+     */
+    void setDatasetGroupId(uint8_t _dataset_group_ID);
+
+    /**
+     *
+     * @return
+     */
+    uint8_t getDatasetGroupID() const;
 
     /**
      *
@@ -48,21 +50,23 @@ class LabelList{
     void setLabels(std::vector<Label>&& _labels);
 
     /*
-     *
-     */
-    uint8_t getDatasetGroupID() const;
-
-    /*
      * Implements num_labels
      */
     uint16_t getNumLabels() const;
 
-    /*
+    /**
      *
+     * @return
      */
     const std::vector<Label>& getLabels() const;
 
-    void write(genie::util::BitWriter& bit_writer) const;
+    /**
+     *
+     * @return
+     */
+    uint64_t getLength() const;
+
+    void writeToFile(genie::util::BitWriter& bit_writer) const;
 };
 
 }  // namespace mpegg_p1

@@ -22,7 +22,7 @@ void WithoutHeader::write(genie::util::BitWriter& bit_writer) const {
     BlockHeader::write(bit_writer);
 
 //    // block_header_flag u(1)
-//    bit_writer.write(getBlockHeaderFlag(), 1);
+//    bit_writer.writeToFile(getBlockHeaderFlag(), 1);
 
     // ordered_blocks_flag u(1)
     bit_writer.write(ordered_blocks_flag, 1);

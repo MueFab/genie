@@ -19,7 +19,11 @@ class ReferenceMetadata {
    public:
     ReferenceMetadata();
 
-    void write(genie::util::BitWriter& bit_writer) const;
+    void setDatasetGroupId(uint8_t _dataset_group_ID);
+
+    uint64_t getLength() const;
+
+    void writeToFile(genie::util::BitWriter& bit_writer) const;
 };
 
 }  // namespace mpegg_p1

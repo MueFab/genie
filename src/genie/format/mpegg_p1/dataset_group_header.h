@@ -24,6 +24,15 @@ namespace mpegg_p1 {
  *
  */
 class DatasetGroupHeader {
+    /** ------------------------------------------------------------------------------------------------------------
+     * ISO 23092-1 Section 6.5.1.2 table 9
+     * ------------------------------------------------------------------------------------------------------------- */
+
+   private:
+    uint8_t dataset_group_ID;
+    uint8_t version_number;
+    std::vector<uint16_t> dataset_IDs;
+
    public:
 
     /**
@@ -34,11 +43,31 @@ class DatasetGroupHeader {
     explicit DatasetGroupHeader(std::vector<Dataset>& datasets, uint8_t ver);
 
     /**
+     * Get length of dataset group header in bits.
+     *
+     * @return
+     */
+    uint64_t getLength() const;
+
+    /**
+     * Set dataset_group_ID
+     *
+     * @param _dataset_group_ID
+     */
+    void setDatasetGroupId(uint8_t _dataset_group_ID);
+
+    /**
      *
      * @return
      */
     uint8_t getDatasetGroupId() const;
 
+    /**
+     *
+     * @param version_number
+     */
+    void setVersionNumber(uint8_t _version_number);
+    
     /**
      *
      * @return
@@ -62,11 +91,6 @@ class DatasetGroupHeader {
      * @param bit_writer
      */
     void writeToFile(genie::util::BitWriter& bit_writer) const;
-
-   private:
-    uint8_t dataset_group_ID;
-    uint8_t version_number;
-    std::vector<uint16_t> dataset_IDs;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -16,6 +16,8 @@ Reference::Reference()
       sequence_names(),
       reference_location() {}
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 Reference::Reference(uint8_t _dataset_grp_ID, uint8_t _ref_ID, std::string _ref_name, uint16_t _ref_major_ver,
                      uint16_t _ref_minor_ver, uint16_t _ref_patch_ver)
     : dataset_group_ID(_dataset_grp_ID),
@@ -28,13 +30,71 @@ Reference::Reference(uint8_t _dataset_grp_ID, uint8_t _ref_ID, std::string _ref_
       reference_location()
     {}
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Reference::setDatasetGroupId(uint8_t _dataset_group_ID) {dataset_group_ID = _dataset_group_ID;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Reference::setSequenceNames(std::vector<std::string>&& _seq_names) {sequence_names = _seq_names;}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Reference::addReferenceLocation(ReferenceLocation&& _ref_loc) {reference_location = _ref_loc;}
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint16_t Reference::getSeqCount() const { return sequence_names.size(); }
 
-void Reference::write(util::BitWriter& bit_writer) const {
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t Reference::getLength() const {
+    // dataset_group_ID u(8)
+    uint64_t length = 1;
+
+    // reference_ID u(8)
+    length += 1;
+
+    // reference_name st(v)
+    // bit length of string - page 11
+    length += (reference_name.size() + 1) * 1;
+
+    // reference_major_version u(16)
+    length += 2;
+
+    // reference_minor_version u(16)
+    length += 2;
+
+    // reference_patch_version u(16)
+    length += 2;
+
+    // writeToFile seq_count u(16)
+    length += 2;
+
+    // writeToFile sequence_name[]
+    for (auto& sequence_name: sequence_names){
+        // bit length of string - page 11
+        length += (sequence_name.size() + 1) * 1;
+    }
+
+    // reserved 7 bits u(7) and external_ref_flag u(1)
+    length += 1;
+
+    // if (external_ref_flag)
+    length += reference_location.getLength();
+
+    return length;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Reference::writeToFile(util::BitWriter& bit_writer) const {
+
+    //TODO (Yeremia): is it required?
+    bit_writer.write("rfgn");
+
+    //TODO (Yeremia): is it required?
+    // length = ...
 
     // dataset_group_ID u(8)
     bit_writer.write(dataset_group_ID, 8);
@@ -54,23 +114,25 @@ void Reference::write(util::BitWriter& bit_writer) const {
     // reference_patch_version u(16)
     bit_writer.write(reference_patch_version, 16);
 
-    // write seq_count
+    // writeToFile seq_count u(16)
     bit_writer.write(getSeqCount(), 16);
 
-    // write sequence_name[]
+    // writeToFile sequence_name[]
     for (auto& sequence_name: sequence_names){
         bit_writer.write(sequence_name);
     }
 
-    // reserve 7 bits
+    // reserve 7 bits u(7)
     bit_writer.write(0, 7);
 
-    // write external_ref_flag
+    // writeToFile external_ref_flag u(1)
     bit_writer.write(reference_location.isExternal(), 1);
 
     // if (external_ref_flag)
     reference_location.write(bit_writer);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace mpegg_p1
 }  // namespace format

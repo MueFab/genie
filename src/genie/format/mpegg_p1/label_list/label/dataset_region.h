@@ -51,9 +51,15 @@ class DatasetRegion{
     uint64_t getEndPos() const;
 
     /**
-    * ISO 23092-1 Section 6.5.1.5.4 table 15
-    *   (for num_regions)
-    **/
+     *
+     * @return
+     */
+    u_int64_t getLength() const;
+
+    /**
+     *
+     * @param bit_writer
+     */
     void write(genie::util::BitWriter& bit_writer) const;
 };
 
