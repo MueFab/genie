@@ -135,8 +135,8 @@ void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
     } else if (file_extension(pOpts.inputFile) == "fastq") {
         if (file_extension(pOpts.inputSupFile) == "fastq") {
             if (pOpts.readNameMode == "none") {
-                std::cout << "WARNING: paired fastq provided with read name mode set to none"
-                          << " - the pairing information of some reads will be lost when using SPRING encoding.";
+                std::cerr << "WARNING: paired fastq provided with read name mode set to none"
+                          << " - the pairing information of some reads will be lost when using SPRING encoding.\n";
             }
             auto& file1 = *inputFiles.back();
             inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputSupFile));

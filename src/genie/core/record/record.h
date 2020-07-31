@@ -60,9 +60,10 @@ class Record {
      * @param _read_name
      * @param _read_group
      * @param _flags
+     * @param _read_1_first
      */
     Record(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::string&& _read_name,
-           std::string&& _read_group, uint8_t _flags);
+           std::string&& _read_group, uint8_t _flags, bool _read_1_first = true);
 
     /**
      *
