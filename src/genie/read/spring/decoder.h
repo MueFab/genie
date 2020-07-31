@@ -48,9 +48,8 @@ struct Record {
  */
 void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                     std::array<std::vector<Record>, 2>& matched_records,
-                    std::array<std::vector<Record>, 2>& unmatched_records, std::vector<uint32_t>& mate_au_id,
-                    std::vector<uint32_t>& mate_record_index, std::vector<std::string>& names,
-                    std::vector<std::string>& qvs);
+                    std::array<std::vector<Record>, 2>& unmatched_records,
+                    std::vector<std::string>& names, std::vector<std::string>& qvs);
 
 /**
  *
@@ -63,12 +62,15 @@ class Decoder : public genie::core::ReadDecoder {
     util::OrderedLock lock;         //!<
     std::ofstream fout_unmatched1;  //!<
     std::ofstream fout_unmatched2;  //!<
+    std::ofstream fout_unmatched_readnames_1;  //!<
+    std::ofstream fout_unmatched_readnames_2;  //!<
 
     std::string file_unmatched_fastq1;  //!<
     std::string file_unmatched_fastq2;  //!<
+    std::string file_unmatched_readnames_1; //!<
+    std::string file_unmatched_readnames_2; //!<
+    uint32_t unmatched_record_index[2];   //!<
     std::string basedir;                //!<
-
-    std::vector<uint32_t> mate_au_id_concat, mate_record_index_concat;  //!<
 
    public:
     /**
