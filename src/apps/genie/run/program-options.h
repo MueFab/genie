@@ -45,6 +45,8 @@ class ProgramOptions {
 
     bool forceOverwrite;  //!<
 
+    bool combinePairsFlag;  //!<
+
     bool lowLatency;      //!<
     std::string refMode;  //!<
 
