@@ -175,20 +175,16 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                 if (!paired_end) {
                     matched_records[0].push_back(cur_record);
                 } else {
-                    if (!combine_pairs) {
+                    if (number_of_record_segments == 2) {
                         matched_records[first_read_flag ? 0 : 1].push_back(cur_record);
                     } else {
-                        if (number_of_record_segments == 2) {
-                            matched_records[first_read_flag ? 0 : 1].push_back(cur_record);
-                        } else {
-                            if (same_au_flag) {
-                                unmatched_same_au[first_read_flag ? 0 : 1].push_back(cur_record);
-                                if (first_read_flag)
-                                    pos_in_unmatched_same_au_0[cur_record.name] = unmatched_same_au[0].size()-1;
-                            }
-                            else {
-                                unmatched_records[first_read_flag ? 0 : 1].push_back(cur_record);
-                            }
+                        if (same_au_flag) {
+                            unmatched_same_au[first_read_flag ? 0 : 1].push_back(cur_record);
+                            if (first_read_flag)
+                                pos_in_unmatched_same_au_0[cur_record.name] = unmatched_same_au[0].size()-1;
+                        }
+                        else {
+                            unmatched_records[first_read_flag ? 0 : 1].push_back(cur_record);
                         }
                     }
                 }
@@ -241,7 +237,7 @@ Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end, s
     file_unmatched_fastq1 = basedir + "/unmatched_1.fastq";
     file_unmatched_fastq2 = basedir + "/unmatched_2.fastq";
     file_unmatched_readnames_1 = basedir + "/unmatched_readnames_1.txt";
-    file_unmatched_readnames_1 = basedir + "/unmatched_readnames_2.txt";
+    file_unmatched_readnames_2 = basedir + "/unmatched_readnames_2.txt";
     if (cp.paired_end) {
         if (combine_pairs && !cp.ureads_flag) {
             fout_unmatched1.open(file_unmatched_fastq1);
@@ -397,7 +393,10 @@ void Decoder::flushIn(size_t& pos) {
     // First step will be to sort the read names for unmatched_1 and unmatched_2
     // - that will provide us with a mapping between the records in
     // unmatched_1 and unmatched_2. Then we write the unmatched_1 in their original
-    // order, and unmatched_2 in the corresponding sorted order.
+    // order, and unmatched_2 in the corresponding sorted order. This last part is
+    // done in chunks whose size is determined by BIN_SIZE_COMBINE_PAIRS, to
+    // put a limit on the memory usage for this step. Higher BIN_SIZE_COMBINE_PAIRS
+    // can lead to speed up due to fewer disk accesses.
 
 
     if (!cp.ureads_flag && cp.paired_end && combine_pairs) {
@@ -418,11 +417,11 @@ void Decoder::flushIn(size_t& pos) {
         if (size_unmatched > 0) {
             // first sort fout_unmatched_readnames_* using disk-based merge sort
             // from https://github.com/arq5x/kway-mergesort
-            size_t maxBufferSize = 1000000000; // roughly 1 GB
+            size_t maxBufferSize = 100000; // roughly 1 GB
             std::ofstream fout_unmatched_readnames_1_sorted(file_unmatched_readnames_1_sorted);
             std::ofstream fout_unmatched_readnames_2_sorted(file_unmatched_readnames_2_sorted);
-            kwaymergesort::KwayMergeSort<std::string> *sorter =
-                            new kwaymergesort::KwayMergeSort<std::string> (
+            kwaymergesort::KwayMergeSort *sorter =
+                            new kwaymergesort::KwayMergeSort (
                                                 file_unmatched_readnames_1,
                                                 &fout_unmatched_readnames_1_sorted,
                                                 maxBufferSize,
@@ -431,7 +430,7 @@ void Decoder::flushIn(size_t& pos) {
             sorter->Sort();
             delete sorter;
             fout_unmatched_readnames_1_sorted.close();
-            sorter = new kwaymergesort::KwayMergeSort<std::string> (
+            sorter = new kwaymergesort::KwayMergeSort (
                                     file_unmatched_readnames_2,
                                     &fout_unmatched_readnames_2_sorted,
                                     maxBufferSize,
@@ -452,7 +451,6 @@ void Decoder::flushIn(size_t& pos) {
             std::string line;
             uint32_t num_lines = 0;
             while (std::getline(fin_unmatched_readnames_1_sorted, line)) {
-                num_lines++;
                 auto pos_tab = line.find_last_of('\t'); // find last tab
                 index_file_1[num_lines++] = std::stoull(line.substr(pos_tab+1));
             }
@@ -463,12 +461,11 @@ void Decoder::flushIn(size_t& pos) {
             std::ifstream fin_unmatched_readnames_2_sorted(file_unmatched_readnames_2_sorted);
             num_lines = 0;
             while (std::getline(fin_unmatched_readnames_2_sorted, line)) {
-                num_lines++;
                 auto pos_tab = line.find_last_of('\t'); // find last tab
                 reverse_index_file_2[std::stoull(line.substr(pos_tab+1))] = num_lines++;
             }
             if (num_lines != size_unmatched)
-                UTILS_DIE("Sizes of unmatched reads across AUs don't match (readnames_1_sorted).");
+                UTILS_DIE("Sizes of unmatched reads across AUs don't match (readnames_2_sorted).");
             fin_unmatched_readnames_2_sorted.close();
 
             // now build index from file 2 to file 1
