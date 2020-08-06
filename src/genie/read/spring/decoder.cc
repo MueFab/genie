@@ -410,14 +410,15 @@ void Decoder::flushIn(size_t& pos) {
         if (unmatched_record_index[0] != unmatched_record_index[1])
             UTILS_DIE("Sizes of unmatched reads across AUs don't match.");
         uint32_t size_unmatched = unmatched_record_index[0];
+        std::cout << "Pairs to match: " << size_unmatched << "\n";
 
         std::string file_unmatched_readnames_1_sorted = file_unmatched_readnames_1 + ".sorted";
         std::string file_unmatched_readnames_2_sorted = file_unmatched_readnames_2 + ".sorted";
 
         if (size_unmatched > 0) {
             // first sort fout_unmatched_readnames_* using disk-based merge sort
-            // from https://github.com/arq5x/kway-mergesort
-            size_t maxBufferSize = 100000; // roughly 1 GB
+            // from fork of https://github.com/arq5x/kway-mergesort
+            size_t maxBufferSize = 1000000000; // roughly 1 GB
             std::ofstream fout_unmatched_readnames_1_sorted(file_unmatched_readnames_1_sorted);
             std::ofstream fout_unmatched_readnames_2_sorted(file_unmatched_readnames_2_sorted);
             kwaymergesort::KwayMergeSort *sorter =
