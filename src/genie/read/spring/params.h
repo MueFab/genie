@@ -40,7 +40,7 @@ const int NUM_READS_PER_BLOCK_UREADS =
     256000;  //!< might want NUM_READS_PER_BLOCK_UREADS to be a bit smaller since it can have longer reads
 const uint32_t MAX_NUM_TOKENS_ID = 1024;  //!<
 const uint32_t BIN_SIZE_COMBINE_PAIRS =
-    10000000;  //!< number of records put in memory at a time when decompressing with combine_pairs on. Higher value
+    30000000;  //!< number of records put in memory at a time when decompressing with combine_pairs on. Higher value
                //!< uses more memory but is slightly faster.
 
 // ---------------------------------------------------------------------------------------------------------------------
