@@ -405,7 +405,7 @@ void Decoder::flushIn(size_t& pos) {
         fout_unmatched2.close();
         fout_unmatched_readnames_1.close();
         fout_unmatched_readnames_2.close();
-
+        
         // verify that the two unmatched reads have same number of reads
         if (unmatched_record_index[0] != unmatched_record_index[1])
             UTILS_DIE("Sizes of unmatched reads across AUs don't match.");
@@ -418,7 +418,8 @@ void Decoder::flushIn(size_t& pos) {
         if (size_unmatched > 0) {
             // first sort fout_unmatched_readnames_* using disk-based merge sort
             // from fork of https://github.com/arq5x/kway-mergesort
-            size_t maxBufferSize = 1000000000; // roughly 1 GB
+            auto sort_readnames_start = std::chrono::steady_clock::now();
+            size_t maxBufferSize = 2000000000; // roughly 2 GB
             std::ofstream fout_unmatched_readnames_1_sorted(file_unmatched_readnames_1_sorted);
             std::ofstream fout_unmatched_readnames_2_sorted(file_unmatched_readnames_2_sorted);
             kwaymergesort::KwayMergeSort *sorter =
@@ -440,6 +441,9 @@ void Decoder::flushIn(size_t& pos) {
             sorter->Sort();
             delete sorter;
             fout_unmatched_readnames_2_sorted.close();
+            auto sort_readnames_end = std::chrono::steady_clock::now();
+            
+            std::cout << "Time for sorting read names: " << std::chrono::duration_cast<std::chrono::seconds>(sort_readnames_end-sort_readnames_start).count() << " s\n";
 
             // now build an index that tells for read i in file_2, where it's pair in
             // file_1 lies.
@@ -476,6 +480,7 @@ void Decoder::flushIn(size_t& pos) {
 
             index_file_1.clear();
 
+            auto reorder_unmatched_start = std::chrono::steady_clock::now();
             // we will write the reads in file 1 in the same order as in file_unmatched_fastq1
             std::ifstream fin_unmatched1(file_unmatched_fastq1);
 
@@ -517,13 +522,17 @@ void Decoder::flushIn(size_t& pos) {
                     add(chunk, std::move(r), pos);
                 }
             }
+            ghc::filesystem::remove(file_unmatched_readnames_1_sorted);
+            ghc::filesystem::remove(file_unmatched_readnames_2_sorted);
+            auto reorder_unmatched_end = std::chrono::steady_clock::now();
+            std::cout << "Time for reordering unmatched reads: " << std::chrono::duration_cast<std::chrono::seconds>(reorder_unmatched_end - reorder_unmatched_start).count() << " s\n";
         }
         ghc::filesystem::remove(file_unmatched_fastq1);
         ghc::filesystem::remove(file_unmatched_fastq2);
         ghc::filesystem::remove(file_unmatched_readnames_1);
         ghc::filesystem::remove(file_unmatched_readnames_2);
-        ghc::filesystem::remove(file_unmatched_readnames_1_sorted);
-        ghc::filesystem::remove(file_unmatched_readnames_2_sorted);
+
+
     }
 
     size_t size = chunk.getData().size() * 2;
