@@ -28,10 +28,6 @@ RuntimeException::RuntimeException(const RuntimeException &e) noexcept : Excepti
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-RuntimeException::~RuntimeException() noexcept = default;
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 }  // namespace util
 }  // namespace genie
 

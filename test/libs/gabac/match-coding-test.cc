@@ -1,4 +1,4 @@
-#include <genie/entropy/gabac/match-subseq-transform.h>
+/*#include <genie/entropy/gabac/match-subseq-transform.h>
 #include <genie/util/data-block.h>
 #include <gtest/gtest.h>
 #include <algorithm>
@@ -143,4 +143,4 @@ TEST_F(MatchCodingTest, roundTripCoding) {
         EXPECT_EQ(symbols, rawValues);
     }
     symbols.clear();
-}
+}*/

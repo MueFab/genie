@@ -1,4 +1,4 @@
-#include <genie/entropy/gabac/diff-coding.h>
+/*#include <genie/entropy/gabac/diff-coding.h>
 #include <genie/util/data-block.h>
 #include <gtest/gtest.h>
 #include <algorithm>
@@ -142,4 +142,4 @@ TEST(DiffCodingTest, roundTripCoding) {
     EXPECT_EQ(transformedSymbols.size(), symbols.size());
     EXPECT_EQ(transformedSymbols, symbols);
     symbols.clear();
-}
+}*/

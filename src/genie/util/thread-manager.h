@@ -22,37 +22,37 @@ namespace genie {
 namespace util {
 
 /**
- * @brief Allows to run the genie pipeline with multiple threads
+ * @brief Allows to run the genie pipeline with multiple threads.
  */
 class ThreadManager {
    private:
-    size_t counter;                    //!< @brief Identifier for next block
-    std::vector<std::thread> threads;  //!< @brief Storage for all the threads
-    std::atomic<bool> stopFlag;        //!< @brief Threads will stop after current block when set
-    bool abortFlag;  //!< @brief The flushIn(size_t& pos) signal will be skipped after stop(). Used with stopFlag
-    std::vector<OriginalSource*> source;  //!< @brief Where to enter the pipeline
-    std::mutex lock;                      //!<
+    size_t counter;                    //!< @brief Identifier for next block.
+    std::vector<std::thread> threads;  //!< @brief Storage for all the threads.
+    std::atomic<bool> stopFlag;        //!< @brief Threads will stop after current block when set.
+    bool abortFlag;  //!< @brief The flushIn signal will be skipped after stop(). Used with stopFlag.
+    std::vector<OriginalSource*> source;  //!< @brief Entry points for the pipeline.
+    std::mutex lock;                      //!< @brief Mutex protecting the counter variable.
 
     /**
-     * @brief Threading code
+     * @brief Threading code.
      */
     void action(size_t id);
 
    public:
-    static thread_local size_t threadID;              //!<
-    static thread_local size_t threadNum;             //!<
-    static thread_local ThreadManager* localManager;  //!<
+    static thread_local size_t threadID;              //!< @brief Each thread will see its own ID here
+    static thread_local size_t threadNum;             //!< @brief Each thread will see the number of threads here.
+    static thread_local ThreadManager* localManager;  //!< @brief Each thread see its manager here.
 
     /**
-     * @brief Constructs a new ThreadManager
-     * @param thread_num How many threads ro start
-     * @param src Where to enter the pipeline
+     *
+     * @param thread_num
+     * @param counter
      */
     explicit ThreadManager(size_t thread_num, size_t counter = 0);
 
     /**
-     *
-     * @param src
+     * @brief Set the entry points to the pipeline.
+     * @param src Vector of entry points.
      */
     void setSource(std::vector<OriginalSource*> src);
 

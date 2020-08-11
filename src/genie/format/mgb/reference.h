@@ -34,9 +34,12 @@ class Reference : public core::Reference {
    public:
     /**
      *
-     * @param name
-     * @param length
-     * @param m
+     * @param _name
+     * @param _start
+     * @param _end
+     * @param _mgr
+     * @param filepos
+     * @param _raw
      */
     Reference(const std::string& _name, size_t _start, size_t _end, Importer* _mgr, size_t filepos, bool _raw)
         : core::Reference(_name, _start, _end), mgr(_mgr), f_pos(filepos), raw(_raw) {}

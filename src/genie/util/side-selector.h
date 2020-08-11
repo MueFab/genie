@@ -17,46 +17,47 @@ namespace genie {
 namespace util {
 
 /**
- *
- * @tparam Coder
- * @tparam Ret
- * @tparam Args
+ * @brief Redirects input data to a module which is selected by a provided function.
+ * @tparam Coder Interface for the modules.
+ * @tparam Ret Return type for the module process function.
+ * @tparam Args Parameter types for the module process function.
  */
 template <typename Coder, typename Ret, typename... Args>
 class SideSelector {
    private:
-    std::vector<Coder*> mods;               //!<
-    std::function<size_t(Args...)> select;  //!<
+    std::vector<Coder*> mods;               //!< @brief List of possible modules to select.
+    std::function<size_t(Args...)> select;  //!< @brief select function. It returns the index of the selected module.
 
     /**
-     *
-     * @param ...
-     * @return
+     * @brief A default selection function.
+     * @param ... Parameters required by the module interface.
+     * @return For this default selector always 0.
      */
     static size_t defaultSelect(Args...);
 
    public:
     /**
-     *
+     * @brief Default initialization.
      */
     SideSelector();
 
     /**
-     *
-     * @param mod
-     * @param index
+     * @brief Set the module at a specified index.
+     * @param mod The new module.
+     * @param index Index where to insert the module.
+     * @attention The index has to be added by addMod() before.
      */
     void setMod(Coder* mod, size_t index);
 
     /**
-     *
-     * @param mod
+     * @brief Add a new module to the end of the module list.
+     * @param mod The new module.
      */
     void addMod(Coder* mod);
 
     /**
-     *
-     * @param _select
+     * @brief Set the selection function which will determine to which module data is passed.
+     * @param _select A selection function returning an index.
      */
     void setSelection(std::function<size_t(Args...)> _select);
 

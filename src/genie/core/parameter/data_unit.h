@@ -61,7 +61,6 @@ class DataUnit {
     /**
      *
      * @param write
-     * @param stats
      */
     virtual void write(util::BitWriter &write) const;
 

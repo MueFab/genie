@@ -17,41 +17,39 @@ namespace genie {
 namespace util {
 
 /**
- *
+ * @brief A handle to quickly iterate over a DataBlock.
  */
 struct BlockStepper {
-    uint8_t *curr;     //!<
-    uint8_t *end;      //!<
-    uint8_t wordSize;  //!<
+    uint8_t *curr;     //!< @brief Pointer to current position.
+    uint8_t *end;      //!< @brief Pointer to the first invalid position.
+    uint8_t wordSize;  //!< @brief Size of each element.
 
     /**
-     *
-     * @param _cur
-     * @param _end
-     * @param _wordSize
+     * @brief Construct a new blockstepper from the raw data.
+     * @param _cur Current position.
+     * @param _end End position.
+     * @param _wordSize Size in bytes of one element.
      */
     explicit BlockStepper(uint8_t *_cur = nullptr, uint8_t *_end = nullptr, uint8_t _wordSize = 1);
 
     /**
-     *
-     * @return
+     * @return True, if the current position is not yet the end position.
      */
     bool isValid() const;
 
     /**
-     *
+     * @brief Increment by one element.
      */
     void inc();
 
     /**
-     *
-     * @return
+     * @return The current element.
      */
     uint64_t get() const;
 
     /**
-     *
-     * @param val
+     * @brief Set the current element to a new value.
+     * @param val New value.
      */
     void set(uint64_t val) const;
 };

@@ -17,17 +17,18 @@ namespace genie {
 namespace util {
 
 /**
- *
+ * @brief A section of genomic record read from the input data sources.
  */
 struct Section {
-    size_t start;     //!<
-    size_t length;    //!<
-    bool strongSkip;  //!<
+    size_t start;     //!< @brief ID of first record
+    size_t length;    //!< @brief Number of records
+    bool strongSkip;  //!< @brief If hte pipeline branches and branches are merged again, anly skipIn() with strongSkip
+                      //!< == true will pass through the merging point.
 };
 
 /**
  * @brief By implementing this interface, a genie module signals the ability to process data of type TYPE.
- * @tparam TYPE Input data type which is accepted
+ * @tparam TYPE Input data type which is accepted.
  */
 template <typename TYPE>
 class Drain {
@@ -40,18 +41,18 @@ class Drain {
     virtual void flowIn(TYPE&& t, const Section& id) = 0;
 
     /**
-     * @brief Signals that no further data (and calls to flowIn) will be available
+     * @brief Signals that no further data (and calls to flowIn) will be available.
      */
     virtual void flushIn(size_t& pos) = 0;
 
     /**
-     * @brief For inheritance
+     * @brief For inheritance.
      */
     virtual ~Drain() = default;
 
     /**
-     *
-     * @param id
+     * @brief Signals that a chunk of data won't be delivered using flowIn()
+     * @param id Block position of skipped data.
      */
     virtual void skipIn(const Section& id) = 0;
 };

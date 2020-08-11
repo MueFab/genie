@@ -29,17 +29,19 @@ class DatasetParameterSet {
 
     /**
      *
+     * @param set
      * @param x_dataset_group_ID
      * @param x_dataset_ID
      */
-    explicit DatasetParameterSet(const core::parameter::ParameterSet&&, const uint8_t x_dataset_group_ID,
+    explicit DatasetParameterSet(const core::parameter::ParameterSet&& set, const uint8_t x_dataset_group_ID,
                                  const uint16_t x_dataset_ID);
 
     /**
      *
+     * @param set
      * @param x_dataset_ID
      */
-    explicit DatasetParameterSet(const core::parameter::ParameterSet&&, const uint16_t x_dataset_ID);
+    explicit DatasetParameterSet(const core::parameter::ParameterSet&& set, const uint16_t x_dataset_ID);
 
     /**
      *
