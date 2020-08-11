@@ -27,6 +27,8 @@ void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
     }
 }
 
+void Exporter::skipIn(const util::Section &id) { util::OrderedSection sec(&lock, id); }
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace mgrec
