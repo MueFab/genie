@@ -131,7 +131,7 @@ void BitWriter::flush() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t BitWriter::getBitsWritten() { return m_bitsWritten + m_numHeldBits; }
+uint64_t BitWriter::getBitsWritten() const { return m_bitsWritten + m_numHeldBits; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -139,7 +139,7 @@ bool BitWriter::isAligned() const { return m_numHeldBits == 0; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitWriter::writeBuffer(std::istream *in) {
+void BitWriter::writeBypass(std::istream *in) {
     if (!isAligned()) {
         UTILS_DIE("Writer not aligned when it should be");
     }
@@ -154,7 +154,7 @@ void BitWriter::writeBuffer(std::istream *in) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitWriter::writeBuffer(const void *in, size_t size) {
+void BitWriter::writeBypass(const void *in, size_t size) {
     this->m_bitsWritten += size * 8;
     if (!isAligned()) {
         UTILS_DIE("Writer not aligned when it should be");

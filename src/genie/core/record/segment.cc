@@ -27,11 +27,11 @@ Segment::Segment(std::string&& _sequence) : sequence(std::move(_sequence)), qual
 
 Segment::Segment(uint32_t length, uint8_t qv_depth, util::BitReader& reader) {
     this->sequence = std::string(length, 0);
-    reader.read(this->sequence);
+    reader.readBypass(this->sequence);
     this->quality_values.resize(qv_depth);
     for (auto& q : quality_values) {
         q.resize(length, 0);
-        reader.read(q);
+        reader.readBypass(q);
     }
 }
 

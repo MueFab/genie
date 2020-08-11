@@ -37,7 +37,7 @@ void BitReader::skip(size_t bytes) { istream.seekg(bytes, std::ios_base::cur); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitReader::readBuffer(void *in, size_t size) {
+void BitReader::readBypass(void *in, size_t size) {
     bitsRead += size * 8;
     istream.read((char *)in, size);
 }
@@ -69,7 +69,6 @@ uint64_t BitReader::flush() {
 uint64_t BitReader::read(uint8_t numBits) {
     bitsRead += numBits;
     uint64_t bits = 0;
-    // uint64_t bits = 0;
     if (numBits <= m_numHeldBits) {
         // Get numBits most significant bits from heldBits as bits
         bits = m_heldBits >> (m_numHeldBits - numBits);
@@ -142,7 +141,7 @@ L0:
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitReader::read(std::string &str) {
+void BitReader::readBypass(std::string &str) {
     bitsRead += str.length() * 8;
     istream.read(&str[0], str.length());
 }

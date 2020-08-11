@@ -102,7 +102,7 @@ class BitReader {
      * @attention This bypasses the bit wise reading mechanism.
      * @param str The string to fill with data. Has to have the correct size already.
      */
-    void read(std::string &str);
+    void readBypass(std::string &str);
 
     /**
      * @return True if there are no problems so far reading data.
@@ -122,7 +122,7 @@ class BitReader {
      * @param size
      * @attention This bypasses the bit wise reading mechanism.
      */
-    void readBuffer(void *in, size_t size);
+    void readBypass(void *in, size_t size);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
