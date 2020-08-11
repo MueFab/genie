@@ -53,8 +53,9 @@ class Exporter : public core::FormatExporter {
     static uint64_t mappedLength(const std::string& cigar);
 
     /**
-     * @brief Unpaired mode
-     * @param _file_1 Output file
+     *
+     * @param header
+     * @param _file_1
      */
     explicit Exporter(header::Header&& header, std::ostream& _file_1);
 

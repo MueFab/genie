@@ -31,7 +31,7 @@ class QVDecoder {
                                                                                  const std::vector<std::string>& ecigar,
                                                                                  AccessUnit::Descriptor& desc) = 0;
     /**
-     * @Brief For polymorphic destruction
+     * @brief For polymorphic destruction
      */
     ~QVDecoder() = default;
 };

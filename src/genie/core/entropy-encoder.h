@@ -33,7 +33,7 @@ class EntropyEncoder {
 
     /**
      *
-     * @param rec
+     * @param desc
      * @return
      */
     virtual EntropyCoded process(core::AccessUnit::Descriptor& desc) = 0;

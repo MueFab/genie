@@ -36,6 +36,7 @@ class Manager : public core::ReferenceSource {
      *
      * @param fasta
      * @param fai
+     * @param mgr
      */
     Manager(std::istream& fasta, std::istream& fai, core::ReferenceManager* mgr);
 
