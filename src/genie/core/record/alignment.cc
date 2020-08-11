@@ -23,7 +23,7 @@ Alignment::Alignment(std::string &&_ecigar_string, uint8_t _reverse_comp)
 
 Alignment::Alignment(uint8_t as_depth, util::BitReader &reader) {
     ecigar_string.resize(reader.read<uint32_t>(24));
-    reader.read(ecigar_string);
+    reader.readBypass(ecigar_string);
 
     reverse_comp = reader.read<uint8_t>();
     for (size_t a = 0; a < as_depth; ++a) {

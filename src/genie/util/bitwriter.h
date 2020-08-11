@@ -74,7 +74,7 @@ class BitWriter {
      * @brief Reveals the already written number of bits.
      * @return m_bitsWritten is returned.
      */
-    uint64_t getBitsWritten();
+    uint64_t getBitsWritten() const;
 
     /**
      * @return True if the stream position is aligned to a full byte.
@@ -85,7 +85,7 @@ class BitWriter {
      * @brief Write a full input stream to this output stream.
      * @param in Data source.
      */
-    void writeBuffer(std::istream *in);
+    void writeBypass(std::istream *in);
 
     /**
      * @brief Write a complete buffer
@@ -93,7 +93,7 @@ class BitWriter {
      * @param size Size of buffer.
      * @attention This bypasses the bit by bit writing method.
      */
-    void writeBuffer(const void *in, size_t size);
+    void writeBypass(const void *in, size_t size);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

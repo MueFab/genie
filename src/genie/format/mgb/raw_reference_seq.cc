@@ -42,7 +42,7 @@ RawReferenceSequence::RawReferenceSequence(util::BitReader& reader, bool headerO
     seq_end = reader.read(40);
     if (!headerOnly) {
         ref_sequence.resize(seq_end - seq_start + 1);
-        reader.readBuffer(&ref_sequence[0], seq_end - seq_start + 1);
+        reader.readBypass(&ref_sequence[0], seq_end - seq_start + 1);
     } else {
         UTILS_DIE_IF(!reader.isAligned(), "Bitreader not aligned");
         reader.skip(seq_end - seq_start + 1);
@@ -60,7 +60,7 @@ void RawReferenceSequence::write(util::BitWriter& writer) const {
     writer.write(sequence_ID, 16);
     writer.write(seq_start, 40);
     writer.write(seq_start + ref_sequence.length(), 40);
-    writer.writeBuffer(ref_sequence.data(), ref_sequence.length());
+    writer.writeBypass(ref_sequence.data(), ref_sequence.length());
     writer.write('\0', 8);
 }
 

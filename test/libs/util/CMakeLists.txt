@@ -4,6 +4,7 @@ set(source_files
         date.cc
         watch.cc
         bitwriter.cc
+        bitroundtrip.cc
         stringview.cc
         string-helpers.cc
         thread-manager.cc

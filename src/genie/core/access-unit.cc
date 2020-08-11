@@ -174,7 +174,7 @@ size_t AccessUnit::Subsequence::getRawSize() const { return data.getRawSize(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnit::Subsequence::write(util::BitWriter &writer) const {
-    writer.writeBuffer(data.getData(), data.getRawSize());
+    writer.writeBypass(data.getData(), data.getRawSize());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -182,7 +182,7 @@ void AccessUnit::Subsequence::write(util::BitWriter &writer) const {
 AccessUnit::Subsequence::Subsequence(GenSubIndex _id, size_t size, util::BitReader &reader)
     : data(0, 1), id(std::move(_id)), numSymbols(0) {
     data.resize(size);
-    reader.readBuffer((char *)data.getData(), size);
+    reader.readBypass((char *)data.getData(), size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
