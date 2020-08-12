@@ -4,13 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_PART1_ACCESS_UNIT_P1_H
-#define GENIE_PART1_ACCESS_UNIT_P1_H
+#ifndef GENIE_DATASET_PARAMETER_SET_H
+#define GENIE_DATASET_PARAMETER_SET_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "genie/format/mgb/access_unit.h"
-#include "genie/format/mgb/data-unit-factory.h"
+#include <genie/core/parameter/parameter_set.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,51 +20,52 @@ namespace mpegg_p1 {
 /**
  *
  */
-class AU_information {
+class DatasetParameterSet {
+
+   private:
+    uint8_t dataset_group_ID : 8;  //!<
+    uint16_t dataset_ID : 16;      //!<
+
+    // parameter_set_ID and parent_parameter_set_ID also encoded_parameters()
+    core::parameter::ParameterSet parameterSet_p2;  //!<
+
    public:
     /**
      *
      */
-    AU_information();
+    explicit DatasetParameterSet(const core::parameter::ParameterSet&&);
 
-   private:
-    std::vector<uint8_t> AU_information_value;  //!<
-};
-
-/**
- *
- */
-class AU_protection {
-   public:
     /**
      *
+     * @param ID
      */
-    AU_protection();
+    explicit DatasetParameterSet(uint16_t ID, const core::parameter::ParameterSet&&);
 
-   private:
-    std::vector<uint8_t> AU_protection_value;  //!<
-};
-
-/**
- *
- */
-class AccessUnit {
-   private:
-    genie::format::mgb::AccessUnit au_p1;  //!< if MIT_flag is set to 0 -> au_p1 header equates to au_p2 header
-
-    //optional
-     std::unique_ptr<AU_information> au_information;
-
-    //optional
-     std::unique_ptr<AU_protection> au_protection;
-
-
-   public:
     /**
      *
-     * @param au_p2
+     * @param group_ID
+     * @param ID
      */
-    explicit AccessUnit(genie::format::mgb::AccessUnit&& au_p2);
+    explicit DatasetParameterSet(uint8_t group_ID, uint16_t ID,
+                                 const core::parameter::ParameterSet&& parameterSet);
+
+    /**
+     *
+     * @return
+     */
+    uint16_t getDatasetID() const;
+
+    /**
+     *
+     * @return
+     */
+    uint8_t getDatasetGroupID() const;
+
+    /**
+     *
+     * @param datasetGroupId
+     */
+    void setDatasetGroupId(uint8_t datasetGroupId);
 
     /**
      *
@@ -77,8 +77,7 @@ class AccessUnit {
      *
      * @param bit_writer
      */
-    void writeToFile(genie::util::BitWriter& bit_writer) const;
-
+    void write(genie::util::BitWriter& bit_writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -89,7 +88,7 @@ class AccessUnit {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_PART1_ACCESS_UNIT_P1_H
+#endif  // GENIE_PARAMETER_SET_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

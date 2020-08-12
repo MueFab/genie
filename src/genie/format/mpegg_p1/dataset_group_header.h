@@ -12,6 +12,9 @@
 #include <cstdint>
 #include <vector>
 
+#include <genie/util/bitreader.h>
+#include <genie/util/bitwriter.h>
+
 #include "dataset/dataset.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -35,12 +38,16 @@ class DatasetGroupHeader {
 
    public:
 
+    DatasetGroupHeader();
+
     /**
      *
      * @param datasets
      * @param ver
      */
     explicit DatasetGroupHeader(std::vector<Dataset>& datasets, uint8_t ver);
+
+    explicit DatasetGroupHeader(util::BitReader& bit_reader);
 
     /**
      * Set dataset_group_ID
@@ -90,7 +97,7 @@ class DatasetGroupHeader {
      *
      * @param bit_writer
      */
-    void writeToFile(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& bit_writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

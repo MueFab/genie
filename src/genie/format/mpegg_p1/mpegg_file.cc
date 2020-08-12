@@ -38,7 +38,7 @@ const std::vector<DatasetGroup>& MpeggFile::getDatasetGroups() const { return da
 void MpeggFile::writeToFile(genie::util::BitWriter& bitWriter) const {
     fileHeader.writeToFile(bitWriter);
     for (auto& datasetGroup : datasetGroups) {
-        datasetGroup.writeToFile(bitWriter);
+        datasetGroup.write(bitWriter);
     }
 }
 

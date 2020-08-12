@@ -26,7 +26,7 @@ uint64_t DGMetadata::getLength() const {return DG_metadata_value.size();}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DGMetadata::writeToFile(util::BitWriter& bit_writer) const {
+void DGMetadata::write(util::BitWriter& bit_writer) const {
     for (auto val: DG_metadata_value){
         bit_writer.write(val, 8);
     }
@@ -46,7 +46,7 @@ uint64_t DGProtection::getLength() const {return DG_protection_value.size();}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DGProtection::writeToFile(util::BitWriter& bit_writer) const {
+void DGProtection::write(util::BitWriter& bit_writer) const {
     for (auto val: DG_protection_value){
         bit_writer.write(val, 8);
     }
@@ -58,6 +58,21 @@ void DGProtection::writeToFile(util::BitWriter& bit_writer) const {
 DatasetGroup::DatasetGroup(std::vector<Dataset> &&_datasets)
     : dataset_group_header(_datasets, 0),
       datasets(std::move(_datasets)){}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+DatasetGroup::DatasetGroup(util::BitReader& bit_reader) {
+
+//    auto current_pos = bit_reader.getPos();
+//
+//    auto key = bit_reader.read<std::string>(4*8);
+//    auto length = bit_reader.read<uint64_t>(64);
+//
+//
+//    bit_reader.flush();
+//    auto pos_after_read = bit_reader.getPos();
+//    UTILS_DIE_IF(pos_after_read-current_pos != length, "Invalid length");
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -153,42 +168,40 @@ void DatasetGroup::setDatasetGroupId(uint8_t _dataset_group_ID) {
 uint64_t DatasetGroup::getLength() const {
 
     // key (4), Length (8)
-    uint64_t length = 12;
+    uint64_t len = 12;
 
-    // TODO (Yeremia): length of Value[]?
-
-    length += dataset_group_header.getLength();
+    len += dataset_group_header.getLength();
 
     for (auto& ref: references){
-        length += ref.getLength();
+        len += ref.getLength();
     }
 
     for (auto& ref_meta: reference_metadata){
-        length += ref_meta.getLength();
+        len += ref_meta.getLength();
     }
 
     if (label_list != nullptr){
-        length += label_list->getLength();
+        len += label_list->getLength();
     }
 
     if (DG_metadata != nullptr){
-        length += DG_metadata->getLength();
+        len += DG_metadata->getLength();
     }
 
     if (DG_metadata != nullptr){
-        length += DG_metadata->getLength();
+        len += DG_metadata->getLength();
     }
 
     for (auto& ds: datasets){
-        length += ds.getLength();
+        len += ds.getLength();
     }
 
-    return length;
+    return len;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroup::writeToFile(genie::util::BitWriter& bit_writer) const {
+void DatasetGroup::write(genie::util::BitWriter& bit_writer) const {
     // KLV (Key Length Value) format
 
     // Key of KVL format
@@ -197,10 +210,10 @@ void DatasetGroup::writeToFile(genie::util::BitWriter& bit_writer) const {
     // Length of KVL format
     bit_writer.write(getLength(), 64);
 
-    // Value of KVL format
+    // Value
 
     // dataset_group_header
-    dataset_group_header.writeToFile(bit_writer);
+    dataset_group_header.write(bit_writer);
 
     // reference (optional)
     for (auto &reference: references){
@@ -219,17 +232,17 @@ void DatasetGroup::writeToFile(genie::util::BitWriter& bit_writer) const {
 
     // DG_metadata (optional)
     if (DG_metadata != nullptr){
-        DG_metadata->writeToFile(bit_writer);
+        DG_metadata->write(bit_writer);
     }
 
     // DG_protection (optional)
     if (DG_protection != nullptr){
-        DG_protection->writeToFile(bit_writer);
+        DG_protection->write(bit_writer);
     }
 
     // dataset[]
     for (auto& ds: datasets){
-        ds.writeToFile(bit_writer);
+        ds.write(bit_writer);
     }
 
     bit_writer.flush();

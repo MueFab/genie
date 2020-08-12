@@ -66,18 +66,13 @@ void DTProtection::writeToFile(genie::util::BitWriter &bit_writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Dataset::Dataset(uint16_t dataset_ID)
-    : dataset_header(dataset_ID){}  // TODO: dataset_header constructor
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-Dataset::Dataset(const genie::format::mgb::DataUnitFactory& dataUnitFactory,
-                 std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2, const uint16_t dataset_ID)
+Dataset::Dataset(uint16_t dataset_ID, const genie::format::mgb::DataUnitFactory& dataUnitFactory,
+                 std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2)
     : dataset_header(dataset_ID) {  // TODO: dataset_header constructor
 
     for (unsigned int i = 0;; ++i) {
         try {  // to iterate over dataUnitFactory.getParams(i)
-            dataset_parameter_sets.emplace_back(std::move(dataUnitFactory.getParams(i)), dataset_ID);
+            dataset_parameter_sets.emplace_back(dataset_ID, std::move(dataUnitFactory.getParams(i)));
         } catch (const std::out_of_range&) {
             // std::cout << "Got " << i << " ParameterSet/s from DataUnitFactory" << std::endl; //debuginfo
             break;
@@ -151,7 +146,7 @@ uint64_t Dataset::getLength() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Dataset::writeToFile(util::BitWriter& bit_writer) const {
+void Dataset::write(util::BitWriter& bit_writer) const {
     // KLV (Key Length Value) format
 
     // Key of KVL format
@@ -159,6 +154,8 @@ void Dataset::writeToFile(util::BitWriter& bit_writer) const {
 
     // Length of KVL format
     bit_writer.write(getLength(), 64);
+
+    // Value of KVL format:
 
     // dataset_header DatasetHeader
     dataset_header.write(bit_writer);
@@ -173,23 +170,23 @@ void Dataset::writeToFile(util::BitWriter& bit_writer) const {
         DT_protection->writeToFile(bit_writer);
     }
 
-    // TODO (Yeremia): writeToFile master_index_table depending on MIT_FLAG
+    // TODO (Yeremia): write master_index_table depending on MIT_FLAG
 //    if (MIT_FLAG){
-//        master_index_table.writeToFile(bit_writer);
+//        master_index_table.write(bit_writer);
 //    }
 
     for (auto &ac: access_units){
-        ac.writeToFile(bit_writer);
+        ac.write(bit_writer);
     }
 
-    // TODO (Yeremia): writeToFile descriptor_stream depending on block_header_flag
+    // TODO (Yeremia): write descriptor_stream depending on block_header_flag
 //    if (block_header_flag == 0){
 //        for (auto &ds: descriptor_streams){
-//            dc.writeToFile(bit_writer);
+//            dc.write(bit_writer);
 //        }
 //    }
 
-    // TODO (Yeremia): implement writeToFile of Dataset
+    // TODO (Yeremia): implement write of Dataset
     UTILS_DIE("Not implemented yet");
 }
 
