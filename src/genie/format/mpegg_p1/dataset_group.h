@@ -15,7 +15,6 @@
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 
-#include "dataset_group_header.h"
 #include "reference/reference.h"
 #include "dataset/dataset.h"
 #include "reference_metadata/reference_metadata.h"
@@ -86,11 +85,15 @@ class DGProtection {
 class DatasetGroup {
    private:
     /** ------------------------------------------------------------------------------------------------------------
+     * ISO 23092-1 Section 6.5.1.2 table 9 - dataset_group_header
+     * ------------------------------------------------------------------------------------------------------------- */
+    uint8_t dataset_group_ID;
+    uint8_t version_number;
+
+    // dataset_IDs[] u(16) from datasets
+    /** ------------------------------------------------------------------------------------------------------------
      * ISO 23092-1 Section 6.5.1 table 8
      * ------------------------------------------------------------------------------------------------------------- */
-
-    // ISO 23092-1 Section 6.5.1.3
-    DatasetGroupHeader dataset_group_header;
 
     // ISO 23092-1 Section 6.5.1.3
     // optional
@@ -122,13 +125,18 @@ class DatasetGroup {
      */
     explicit DatasetGroup(std::vector<Dataset>&& _datasets);
 
+    /**
+     *
+     * @param bit_reader
+     */
     explicit DatasetGroup(util::BitReader& bit_reader);
 
     /**
      *
+     * @param sort_ids
      * @return
      */
-    const DatasetGroupHeader& getDatasetGroupHeader() const;
+    std::vector<uint16_t>&& getDatasetIDs(bool sort_ids=false) const;
 
     /**
      *
@@ -209,9 +217,21 @@ class DatasetGroup {
 
     /**
      *
-     * @param _dataset_group_ID
+     * @param ID
      */
-    void setDatasetGroupId(uint8_t _dataset_group_ID);
+    void setID(uint8_t ID);
+
+    /**
+     *
+     * @return
+     */
+    uint64_t getHeaderLength() const;
+
+    /**
+     *
+     * @param bit_writer
+     */
+    void writeHeader(util::BitWriter& bit_writer) const;
 
     /**
      * Get length of Dataset Header in bytes.
