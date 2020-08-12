@@ -11,6 +11,7 @@
 #include <vector>
 
 #include <genie/core/parameter/data_unit.h>
+#include <genie/core/parameter/parameter_set.h>
 
 #include "dataset_header.h"
 #include "genie/format/mgb/data-unit-factory.h"
@@ -58,12 +59,49 @@ class DTProtection {
 };
 
 class Dataset {
+   public:
+    enum class ByteOffsetSizeFlag: uint8_t {
+        ON = 64,
+        OFF = 32,
+    };
+
+    enum class Pos40SizeFlag: uint8_t {
+        ON = 40,
+        OFF = 32,
+    };
    private:
     /** ------------------------------------------------------------------------------------------------------------
-     *  ISO 23092-1 Section 6.5.2 table 18
+     *  ISO 23092-1 Section 6.5.2 table 19
      *  ------------------------------------------------------------------------------------------------------------ */
 
-    DatasetHeader dataset_header;
+    uint8_t dataset_group_ID;
+    uint16_t dataset_ID;
+    std::string version;
+    ByteOffsetSizeFlag byte_offset_size_flag;
+    bool non_overlapping_AU_range_flag;
+    Pos40SizeFlag pos_40_bits_flag;
+
+    // block_header_flag, MIT_flag, CC_mode_flag, ordered_blocks_flag, num_classes, clid[],
+    // num_descriptors[], descriptor_ID[][]
+    BlockHeader block_header;
+
+    // seq_count, reference_ID, seq_ID[], seq_blocks[], tflag[], thres[]
+    SequenceInfo seq_info;
+
+    core::parameter::DataUnit::DatasetType dataset_type;
+
+    uint8_t alphabet_ID;
+    uint32_t num_U_access_units;
+
+    //num_U_clusters, multiple_signature_base, U_signature_size, U_signature_constant_length, U_signature_length
+    std::unique_ptr<UAccessUnitInfo> u_access_unit_info;
+
+    /** ------------------------------------------------------------------------------------------------------------
+     *  ISO 23092-1 Section 6.5.2.2 table 18
+     *  ------------------------------------------------------------------------------------------------------------ */
+
+//    DatasetHeader dataset_header;
+
     // ISO 23092-1 Section 6.5.2.3 - specification 23092-3
     // optional
     std::unique_ptr<DTMetadata> DT_metadata;
@@ -72,7 +110,7 @@ class Dataset {
     // optional
     std::unique_ptr<DTProtection> DT_protection;
 
-    std::vector<DatasetParameterSet> dataset_parameter_sets;
+    std::vector<core::parameter::ParameterSet> dataset_parameter_sets;
 
     // TODO(Yeremia): Master Index Table
     //MasterIndexTable master_index_table;
@@ -90,9 +128,9 @@ class Dataset {
      *
      * @param dataUnitFactory
      * @param accessUnits_p2
-     * @param dataset_ID
+     * @param ID
      */
-    Dataset(uint16_t dataset_ID, const genie::format::mgb::DataUnitFactory& dataUnitFactory,
+    Dataset(uint16_t ID, const genie::format::mgb::DataUnitFactory& dataUnitFactory,
             std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2);
 
     uint16_t getID() const;
@@ -101,11 +139,29 @@ class Dataset {
 
     uint8_t getDatasetParameterSetDatasetGroupID() const;
 
-    const DatasetHeader& getDatasetHeader() const;
-
     const std::vector<DatasetParameterSet>& getDatasetParameterSets() const;
 
     void setDatasetGroupId(uint8_t _dataset_group_ID);
+
+    /**
+     *
+     * @return length of dataset_header in bytes
+     */
+    uint64_t getHeaderLength() const;
+
+    /**
+     *
+     * @param bit_writer
+     */
+    void writeHeader(util::BitWriter& bit_writer) const;
+
+    uint64_t getParameterSetLength() const;
+
+    /**
+     *
+     * @param bit_writer
+     */
+    void writeParameterSets(util::BitWriter& bit_writer) const;
 
     uint64_t getLength() const;
 

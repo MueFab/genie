@@ -193,13 +193,13 @@ uint64_t DatasetGroup::getHeaderLength() const {
     // VALUE
 
     // dataset_group_ID u(8)
-    len += 1;
+    len += sizeof(uint8_t);
 
     // version_number u(8)
-    len += 1;
+    len += sizeof(uint8_t);
 
     // dataset_IDs[] u(16)
-    len += 2 * datasets.size();
+    len += sizeof(uint16_t) * datasets.size();
 
     return len;
 }
