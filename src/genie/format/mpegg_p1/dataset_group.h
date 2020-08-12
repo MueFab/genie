@@ -56,9 +56,10 @@ class DatasetGroup {
    public:
     /**
      *
+     * @param sets
      * @param x_datasetGroupID
      */
-    explicit DatasetGroup(std::vector<genie::format::mpegg_p1::Dataset>*, const uint8_t x_datasetGroupID);
+    explicit DatasetGroup(std::vector<genie::format::mpegg_p1::Dataset>* sets, const uint8_t x_datasetGroupID);
 
     /**
      *

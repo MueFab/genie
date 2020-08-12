@@ -135,7 +135,7 @@ void ParameterSet::write(util::BitWriter &writer) const {
 
     // Now size is known, write to final destination
     writer.write(bytes, 22);
-    writer.writeBuffer(&ss);
+    writer.writeBypass(&ss);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -40,6 +40,7 @@ class AccessUnit : public core::parameter::DataUnit {
      *
      * @param parameterSets
      * @param bitReader
+     * @param lazyPayload
      */
     explicit AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &parameterSets,
                         util::BitReader &bitReader, bool lazyPayload = false);

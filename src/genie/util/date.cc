@@ -5,8 +5,9 @@
  */
 
 #include "date.h"
+#include <regex>
 #include "runtime-exception.h"
-#include "tokenize.h"
+#include "string-helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -17,7 +18,7 @@ namespace util {
 
 bool Date::checkValidity() const {
     size_t days_per_month[] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    if (year < 1900 || year > 2100) {
+    if (year < 1900 || year >= 2100) {
         return false;
     }
     if (month < 1 || month > 12) {
@@ -42,7 +43,7 @@ bool Date::checkValidity() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string Date::getRegex() {
-    return "^(1|2)(9|0)[0-9]{2}-(0|1)[0-9]-[1-3][0-9](T[0-2][0-9]:[0-5][0-9]:[0-5][0-9])*$";
+    return "^(1|2)(9|0)[0-9]{2}-(0|1)[0-9]-[0-3][0-9](T[0-2][0-9]:[0-5][0-9]:[0-5][0-9])*$";
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -88,14 +89,15 @@ bool Date::leapYear() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Date Date::fromString(const std::string& string) {
+
+    UTILS_DIE_IF(!std::regex_match(string, std::regex(getRegex())), "Invalid date");
+
     auto date_time = tokenize(string, 'T');
     auto date = tokenize(date_time.front(), '-');
-    UTILS_DIE_IF(date.size() != 3, "Invalid date");
     if (date_time.size() == 1) {
         return Date(std::stoi(date[0]), std::stoi(date[1]), std::stoi(date[2]));
     } else if (date_time.size() == 2) {
         auto time = tokenize(date_time.back(), ':');
-        UTILS_DIE_IF(time.size() != 3, "Invalid time");
         return Date(std::stoi(date[0]), std::stoi(date[1]), std::stoi(date[2]), std::stoi(time[0]), std::stoi(time[1]),
                     std::stoi(time[2]));
     } else {
@@ -123,18 +125,33 @@ std::string Date::toString() const {
     std::string ret;
     ret += std::to_string(year);
     ret += '-';
+    if(month < 10) {
+        ret += '0';
+    }
     ret += std::to_string(month);
     ret += '-';
+    if(day < 10) {
+        ret += '0';
+    }
     ret += std::to_string(day);
     if (!timePresent) {
         return ret;
     }
     ret += 'T';
-    ret + std::to_string(hour);
+    if(hour < 10) {
+        ret += '0';
+    }
+    ret += std::to_string(hour);
     ret += ':';
-    ret + std::to_string(minute);
+    if(minute < 10) {
+        ret += '0';
+    }
+    ret += std::to_string(minute);
     ret += ':';
-    ret + std::to_string(second);
+    if(second < 10) {
+        ret += '0';
+    }
+    ret += std::to_string(second);
     return ret;
 }
 

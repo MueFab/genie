@@ -25,7 +25,7 @@ class NullImporter : public FormatImporter {
      * @param _classifier
      * @return
      */
-    bool pumpRetrieve(Classifier*) override;
+    bool pumpRetrieve(Classifier* _classifier) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

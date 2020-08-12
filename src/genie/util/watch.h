@@ -17,38 +17,37 @@ namespace genie {
 namespace util {
 
 /**
- *
+ * @brief Utility class to measure time.
  */
 class Watch {
    private:
-    std::chrono::high_resolution_clock::time_point start;  //!<
-    double offset{};                                       //!<
-    bool paused;                                           //!<
+    std::chrono::high_resolution_clock::time_point start;  //!< @brief When the current period of time started.
+    double offset{};                                       //!< @brief Elapsed time from previous time periods.
+    bool paused;                                           //!< @brief If the time is currently measured.
 
    public:
     /**
-     *
+     *  @brief Default initialize.
      */
     Watch();
 
     /**
-     *
+     *  @brief Reset the watch to the default state, measurements are stopped and time set to zero.
      */
     void reset();
 
     /**
-     *
-     * @return
+     * @return Elapsed time in all periods where the watch was active.
      */
     double check() const;
 
     /**
-     *
+     * @brief Pause the current measurement, time elapsed until resume() is called won't be counted.
      */
     void pause();
 
     /**
-     *
+     * @brief Active watch again after a previous call to pause().
      */
     void resume();
 };

@@ -30,9 +30,8 @@ struct BlockStepper;
  */
 class DataBlock {
    private:
-    uint8_t lgWordSize;  //!<
-
-    std::vector<uint8_t> data;  //!<
+    uint8_t lgWordSize;  //!< @brief log2 of the wordsize. Wordsize = 1 << lgWordsize
+    std::vector<uint8_t> data;  //!< @brief The actual raw data.
 
    public:
     /**
@@ -143,8 +142,8 @@ class DataBlock {
     template <typename T>
     class ProxyCore {
        private:
-        T stream;         //!<
-        size_t position;  //!<
+        T stream;         //!< @brief The DataBlock we are referring to.
+        size_t position;  //!< @brief The position inside the datablock.
 
        public:
         /**
@@ -169,8 +168,8 @@ class DataBlock {
         ProxyCore &operator=(uint64_t val);
     };
 
-    using Proxy = ProxyCore<DataBlock *>;            /**< Standard proxy */
-    using ConstProxy = ProxyCore<const DataBlock *>; /**< Standard proxy for const */
+    using Proxy = ProxyCore<DataBlock *>;            //!< @brief Standard proxy
+    using ConstProxy = ProxyCore<const DataBlock *>; //!< @brief Standard proxy for const
 
     /**
      * @brief Iterator for data blocks. Like for proxy object: only use if
@@ -180,8 +179,8 @@ class DataBlock {
     template <typename T>
     class IteratorCore {
        private:
-        T stream;         //!<
-        size_t position;  //!<
+        T stream;         //!< @brief The DataBlock we are referring to.
+        size_t position;  //!< @brief The position inside the datablock.
 
        public:
         /**

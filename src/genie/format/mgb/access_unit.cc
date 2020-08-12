@@ -191,7 +191,7 @@ void AccessUnit::write(util::BitWriter &writer) const {
 
     // Now size is known, write to final destination
     writer.write(bytes, 29);
-    writer.writeBuffer(&ss);
+    writer.writeBypass(&ss);
     for (auto &i : blocks) {
         i.write(writer);
     }

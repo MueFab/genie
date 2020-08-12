@@ -17,35 +17,33 @@ namespace genie {
 namespace util {
 
 /**
- *
+ * @brief A general exception.
  */
 class Exception : public std::exception {
    public:
     /**
-     *
-     * @param msg
+     * @brief Initialize with a message.
+     * @param msg The message.
      */
     explicit Exception(std::string msg);
 
     /**
-     *
+     * @brief Needed for inheritance.
      */
-    ~Exception() noexcept override;
+    ~Exception() noexcept override = default;
 
     /**
-     *
-     * @return
+     * @return The internal message.
      */
     virtual std::string msg() const;
 
     /**
-     *
-     * @return
+     * @return The internal message as a c string.
      */
     const char *what() const noexcept override;
 
    protected:
-    std::string msg_;  //!<
+    std::string msg_;  //!< @brief The exception message.
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

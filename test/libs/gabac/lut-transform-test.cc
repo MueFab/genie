@@ -1,4 +1,4 @@
-#include <genie/entropy/gabac/lut-transform.h>
+/*#include <genie/entropy/gabac/lut-transform.h>
 #include <genie/util/data-block.h>
 #include <gtest/gtest.h>
 #include <iostream>
@@ -32,3 +32,4 @@ TEST(LutTransformTest, roundTripCoding0) {
     EXPECT_EQ(decodedSymbols.size(), symbols.size());
     EXPECT_EQ(decodedSymbols, symbols);
 }
+*/

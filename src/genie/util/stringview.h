@@ -17,52 +17,49 @@ namespace genie {
 namespace util {
 
 /**
- *
+ * @brief Represents a read-only section of a string.
  */
 struct StringView {
    private:
-    size_t start;        //!<
-    size_t stop;         //!<
-    const char* memory;  //!<
+    size_t start;        //!< @brief First character's offset in the string.
+    size_t stop;         //!< @brief Last character's offset plus 1.
+    const char* memory;  //!< @brief String pointer.
 
    public:
     /**
-     *
-     * @param start_p
-     * @param stop_p
+     * @brief Create a string view without deploying to an actual string. Just save the offsets.
+     * @param start_p String begin.
+     * @param stop_p String end.
      */
     StringView(size_t start_p, size_t stop_p);
 
     /**
-     *
-     * @param start_p
-     * @param stop_p
-     * @param mem
+     * @brief Create a string view and deploys it to an actual string.
+     * @param start_p String begin.
+     * @param stop_p String end.
+     * @param mem Pointer to string memory.
      */
     StringView(size_t start_p, size_t stop_p, const char* mem);
 
     /**
-     *
-     * @param mem
-     * @return
+     * @brief Use the offsets and view at a string.
+     * @param mem Pointer to the memory.
+     * @return A new StringView with the string applied.
      */
     StringView deploy(const char* mem) const;
 
     /**
-     *
-     * @return
+     * @return Pointer to the first character.
      */
     const char* begin() const;
 
     /**
-     *
-     * @return
+     * @return Pointer to the position after the last character.
      */
     const char* end() const;
 
     /**
-     *
-     * @return
+     * @return Length of the string view.
      */
     size_t length() const;
 };

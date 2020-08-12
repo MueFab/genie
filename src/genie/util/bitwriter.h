@@ -22,10 +22,10 @@ namespace util {
  */
 class BitWriter {
    private:
-    std::ostream *stream;    //!< @brief Where to direct output. A file for example
-    uint64_t m_heldBits;     //!< @brief Contains bits which cannot be written yet, as no byte is full
-    uint8_t m_numHeldBits;   //!< @brief How many bits there are in m_heldBits;
-    uint64_t m_bitsWritten;  //!< @brief Counts number of written bits for statistical usages
+    std::ostream *stream;    //!< @brief Where to direct output. A file for example.
+    uint64_t m_heldBits;     //!< @brief Contains bits which cannot be written yet, as no byte is full.
+    uint8_t m_numHeldBits;   //!< @brief How many bits there are in m_heldBits.
+    uint64_t m_bitsWritten;  //!< @brief Counts number of written bits for statistical usages.
 
     /**
      * @brief Redirect assembled byte to the output stream
@@ -36,7 +36,7 @@ class BitWriter {
    public:
     /**
      * @brief Create a bitwriter from an existing output stream.
-     * @param str Some output stream. Must be valid to write to,
+     * @param str Some output stream. Must be valid to write to.
      */
     explicit BitWriter(std::ostream *str);
 
@@ -53,47 +53,47 @@ class BitWriter {
     void write(uint64_t value, uint8_t bits);
 
     /**
-     *
-     * @param string
+     * @brief Write all characters of string to the stream.
+     * @param string String to write.
      */
     void write(const std::string &string);
 
     /**
-     * @brief Write the whole data from an other stream. Basically appending the data to this stream.
+     * @brief Write the whole data from another stream. Basically appending the data to this stream.
      * @param in Data source
      */
     void write(std::istream *in);
 
     /**
      * @brief Writes all buffered bits to the output stream. If there is no full byte available, the missing bits for
-     * one full byte are filled with zeros. If no bits are currently buffered, nothing is written (not even zeros)
+     * one full byte are filled with zeros. If no bits are currently buffered, nothing is written (not even zeros).
      */
     void flush();
 
     /**
-     * @brief Reveals the already written number of bits
-     * @return m_bitsWritten is returned
+     * @brief Reveals the already written number of bits.
+     * @return m_bitsWritten is returned.
      */
-    uint64_t getBitsWritten();
+    uint64_t getBitsWritten() const;
 
     /**
-     *
-     * @return
+     * @return True if the stream position is aligned to a full byte.
      */
     bool isAligned() const;
 
     /**
-     *
-     * @param in
+     * @brief Write a full input stream to this output stream.
+     * @param in Data source.
      */
-    void writeBuffer(std::istream *in);
+    void writeBypass(std::istream *in);
 
     /**
-     *
-     * @param in
-     * @param size
+     * @brief Write a complete buffer
+     * @param in Buffer.
+     * @param size Size of buffer.
+     * @attention This bypasses the bit by bit writing method.
      */
-    void writeBuffer(const void *in, size_t size);
+    void writeBypass(const void *in, size_t size);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -106,6 +106,9 @@ class ClassifierRegroup : public Classifier {
     /**
      *
      * @param _auSize
+     * @param rfmgr
+     * @param mode
+     * @param raw_ref
      */
     ClassifierRegroup(size_t _auSize, ReferenceManager* rfmgr, RefMode mode, bool raw_ref);
 
