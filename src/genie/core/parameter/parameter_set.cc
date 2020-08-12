@@ -140,6 +140,19 @@ void ParameterSet::write(util::BitWriter &writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+uint64_t ParameterSet::getLength() const {
+    std::stringstream ss;
+    util::BitWriter tmp_writer(&ss);
+    preWrite(tmp_writer);
+    tmp_writer.flush();
+
+    uint64_t len = tmp_writer.getBitsWritten() / 8;
+
+    return len;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void ParameterSet::preWrite(util::BitWriter &writer) const {
     writer.write(parameter_set_ID, 8);
     writer.write(parent_parameter_set_ID, 8);
@@ -393,6 +406,10 @@ void ParameterSet::setID(uint8_t id) { parameter_set_ID = id; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ParameterSet::setParentID(uint8_t id) { parent_parameter_set_ID = id; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t ParameterSet::getParentID() const {return parent_parameter_set_ID;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
