@@ -5,7 +5,6 @@ set(source_files
 #        dataset.cc
 #        dataset_header.cc
         dataset_group.cc
-        dataset_group_header.cc
         dataset/dataset_parameter_set.cc
         file_header.cc
         mpegg_file.cc

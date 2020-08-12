@@ -23,7 +23,7 @@ uint64_t DTMetadata::getLength() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DTMetadata::writeToFile(genie::util::BitWriter &bit_writer) const {
+void DTMetadata::write(genie::util::BitWriter &bit_writer) const {
     // KLV (Key Length Value) format
 
     // Key of KVL format
@@ -50,7 +50,7 @@ uint64_t DTProtection::getLength() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DTProtection::writeToFile(genie::util::BitWriter &bit_writer) const {
+void DTProtection::write(genie::util::BitWriter &bit_writer) const {
     // KLV (Key Length Value) format
 
     // Key of KVL format
@@ -83,6 +83,10 @@ Dataset::Dataset(uint16_t dataset_ID, const genie::format::mgb::DataUnitFactory&
         access_units.emplace_back(std::move(au));
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint16_t Dataset::getID() const { return dataset_header.getID(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -162,12 +166,12 @@ void Dataset::write(util::BitWriter& bit_writer) const {
 
     // DT_metadata
     if (DT_metadata != nullptr){
-        DT_metadata->writeToFile(bit_writer);
+        DT_metadata->write(bit_writer);
     }
 
     // DT_protection
     if (DT_protection != nullptr){
-        DT_protection->writeToFile(bit_writer);
+        DT_protection->write(bit_writer);
     }
 
     // TODO (Yeremia): write master_index_table depending on MIT_FLAG

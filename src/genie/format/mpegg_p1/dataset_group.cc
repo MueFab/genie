@@ -54,14 +54,22 @@ void DGProtection::write(util::BitWriter& bit_writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// TODO (Yeremia): Fix version number
 DatasetGroup::DatasetGroup(std::vector<Dataset> &&_datasets)
-    : dataset_group_header(_datasets, 0),
-      datasets(std::move(_datasets)){}
+    : dataset_group_ID(0),
+      version_number(0), // TODO (Yeremia): Fix version number
+      datasets(std::move(_datasets)){
+
+    std::vector<uint16_t> dataset_IDs(getDatasetIDs(true));
+
+    auto it = std::unique( dataset_IDs.begin(), dataset_IDs.end() );
+
+    UTILS_DIE_IF(!(it == dataset_IDs.end() ), "dataset_ID is not unique!");
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetGroup::DatasetGroup(util::BitReader& bit_reader) {
+    // TODO (Yeremia)
 
 //    auto current_pos = bit_reader.getPos();
 //
@@ -72,6 +80,22 @@ DatasetGroup::DatasetGroup(util::BitReader& bit_reader) {
 //    bit_reader.flush();
 //    auto pos_after_read = bit_reader.getPos();
 //    UTILS_DIE_IF(pos_after_read-current_pos != length, "Invalid length");
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::vector<uint16_t>&& DatasetGroup::getDatasetIDs(bool sort_ids) const {
+    std::vector<uint16_t> dataset_IDs;
+
+    for (auto &ds : datasets){
+        dataset_IDs.push_back(ds.getID());
+    }
+
+    if (sort_ids){
+        sort(dataset_IDs.begin(), dataset_IDs.end());
+    }
+
+    return std::move(dataset_IDs);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -97,7 +121,7 @@ const std::vector<ReferenceMetadata> &DatasetGroup::getReferenceMetadata() const
 void DatasetGroup::addLabels(std::vector<Label> && _labels) {
     UTILS_DIE_IF(label_list != nullptr, "Label list is already added");
 
-    label_list = util::make_unique<LabelList>(getDatasetGroupHeader().getDatasetGroupId(), std::move(_labels));
+    label_list = util::make_unique<LabelList>(dataset_group_ID, std::move(_labels));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -128,9 +152,6 @@ void DatasetGroup::addDGProtection(std::unique_ptr<DGProtection> _dg_protection)
 
 const DGProtection &DatasetGroup::getDgProtection() const {return *DG_protection;}
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-const DatasetGroupHeader& DatasetGroup::getDatasetGroupHeader() const { return dataset_group_header; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -138,20 +159,20 @@ const std::vector<Dataset>& DatasetGroup::getDatasets() const { return datasets;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroup::setDatasetGroupId(uint8_t _dataset_group_ID) {
+void DatasetGroup::setID(uint8_t ID) {
 
-    dataset_group_header.setDatasetGroupId(_dataset_group_ID);
+    dataset_group_ID = ID;
 
     for (auto& ref: references){
-        ref.setDatasetGroupId(_dataset_group_ID);
+        ref.setDatasetGroupId(ID);
     }
 
     for (auto& ref_meta: reference_metadata){
-        ref_meta.setDatasetGroupId(_dataset_group_ID);
+        ref_meta.setDatasetGroupId(ID);
     }
 
     if (label_list != nullptr){
-        label_list->setDatasetGroupId(_dataset_group_ID);
+        label_list->setDatasetGroupId(ID);
     }
 
     // DG_metadata has no dataset_group_ID
@@ -159,8 +180,53 @@ void DatasetGroup::setDatasetGroupId(uint8_t _dataset_group_ID) {
     // DG_protection has no dataset_group_ID
 
     for (auto& ds: datasets){
-        ds.setDatasetGroupId(_dataset_group_ID);
+        ds.setDatasetGroupId(ID);
     }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t DatasetGroup::getHeaderLength() const {
+    // key (4), Length (8)
+    uint64_t len = 12;
+
+    // VALUE
+
+    // dataset_group_ID u(8)
+    len += 1;
+
+    // version_number u(8)
+    len += 1;
+
+    // dataset_IDs[] u(16)
+    len += 2 * datasets.size();
+
+    return len;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroup::writeHeader(util::BitWriter& bit_writer) const {
+    // KLV (Key Length Value) format
+
+    // Key of KVL format
+    bit_writer.write("dghd");
+
+    // Length of KVL format
+    bit_writer.write(getLength(), 64);
+
+    // dataset_group_ID u(8)
+    bit_writer.write(dataset_group_ID, 8);
+
+    // version_number u(8)
+    bit_writer.write(version_number, 8);
+
+    // dataset_IDs[] u(16)
+    for (auto &d_ID: getDatasetIDs()){
+        bit_writer.write(d_ID, 16);
+    }
+
+    bit_writer.flush();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -170,7 +236,7 @@ uint64_t DatasetGroup::getLength() const {
     // key (4), Length (8)
     uint64_t len = 12;
 
-    len += dataset_group_header.getLength();
+    len += getHeaderLength();
 
     for (auto& ref: references){
         len += ref.getLength();
@@ -210,10 +276,8 @@ void DatasetGroup::write(genie::util::BitWriter& bit_writer) const {
     // Length of KVL format
     bit_writer.write(getLength(), 64);
 
-    // Value
-
     // dataset_group_header
-    dataset_group_header.write(bit_writer);
+    writeHeader(bit_writer);
 
     // reference (optional)
     for (auto &reference: references){

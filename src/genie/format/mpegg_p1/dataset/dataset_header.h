@@ -71,8 +71,9 @@ class DatasetHeader {
 
     uint64_t getLength() const;
 
-    uint16_t getDatasetId() const;
-    uint8_t getDatasetGroupId() const;
+    uint16_t getID() const;
+
+    uint8_t getGroupID() const;
 
     void setDatasetGroupId(uint8_t group_ID);
 

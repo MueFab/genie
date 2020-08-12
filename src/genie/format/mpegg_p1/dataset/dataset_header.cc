@@ -86,9 +86,9 @@ uint64_t DatasetHeader::getLength() const {
 //    return length;
 }
 
-uint16_t DatasetHeader::getDatasetId() const {return dataset_ID;}
+uint16_t DatasetHeader::getID() const {return dataset_ID;}
 
-uint8_t DatasetHeader::getDatasetGroupId() const {return dataset_group_ID;}
+uint8_t DatasetHeader::getGroupID() const {return dataset_group_ID;}
 
 void DatasetHeader::setDatasetGroupId(uint8_t group_ID) { dataset_group_ID = group_ID;}
 
