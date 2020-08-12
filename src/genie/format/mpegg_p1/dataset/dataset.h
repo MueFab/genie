@@ -10,10 +10,12 @@
 #include <memory>
 #include <vector>
 
+#include <genie/core/parameter/data_unit.h>
+
 #include "dataset_header.h"
 #include "genie/format/mgb/data-unit-factory.h"
-#include "genie/format/mpegg_p1/access_unit_p1.h"
-#include "genie/format/mpegg_p1/dataset_parameter_set.h"
+#include "genie/format/mpegg_p1/access_unit/access_unit.h"
+#include "dataset_parameter_set.h"
 
 namespace genie {
 namespace format {
@@ -57,12 +59,11 @@ class DTProtection {
 
 class Dataset {
    private:
-    /**
-     * ISO 23092-1 Section 6.5.2 table 18
-     *
-     * ------------------------------------------------------------------------------------------------------------- */
-    DatasetHeader dataset_header;
+    /** ------------------------------------------------------------------------------------------------------------
+     *  ISO 23092-1 Section 6.5.2 table 18
+     *  ------------------------------------------------------------------------------------------------------------ */
 
+    DatasetHeader dataset_header;
     // ISO 23092-1 Section 6.5.2.3 - specification 23092-3
     // optional
     std::unique_ptr<DTMetadata> DT_metadata;
@@ -83,7 +84,7 @@ class Dataset {
 
    public:
 
-    Dataset(const uint16_t dataset_ID);
+    Dataset(uint16_t _dataset_ID);
 
     /**
      *
@@ -91,9 +92,8 @@ class Dataset {
      * @param accessUnits_p2
      * @param dataset_ID
      */
-    Dataset(const genie::format::mgb::DataUnitFactory& dataUnitFactory,
-            std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2, const uint16_t dataset_ID);
-
+    Dataset(uint16_t dataset_ID, const genie::format::mgb::DataUnitFactory& dataUnitFactory,
+            std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2);
 
     uint16_t getDatasetParameterSetDatasetID() const;
 
@@ -107,7 +107,7 @@ class Dataset {
 
     uint64_t getLength() const;
 
-    void writeToFile(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& bit_writer) const;
 
 };
 

@@ -4,8 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/util/runtime-exception.h"
 #include "dataset_header.h"
+#include <parameter/data_unit.h>
+#include "genie/util/runtime-exception.h"
 
 namespace genie {
 namespace format {
@@ -14,9 +15,10 @@ namespace mpegg_p1 {
 // TODO (Yeremia): Fix DatasetHeader constructor
 DatasetHeader::DatasetHeader(const uint16_t datasetID) : dataset_ID(datasetID) {}
 
-DatasetHeader::DatasetHeader(uint8_t group_ID, uint16_t ID, bool _byte_offset_size_flag,
-                             bool _non_overlapping_AU_range_flag, bool _pos_40_bits_flag,
-                             uint8_t _dataset_type, uint8_t _alphabet_ID, uint32_t _num_U_access_units)
+DatasetHeader::DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSizeFlag _byte_offset_size_flag,
+                             bool _non_overlapping_AU_range_flag, Pos40SizeFlag _pos_40_bits_flag,
+                             core::parameter::DataUnit::DatasetType _dataset_type, uint8_t _alphabet_ID,
+                             uint32_t _num_U_access_units)
     : dataset_group_ID(group_ID),
       dataset_ID(ID),
       version("XXXX"), // TODO (Yeremia): Version
@@ -103,13 +105,21 @@ void DatasetHeader::write(util::BitWriter& bit_writer) const {
     bit_writer.write(version);
 
     // byte_offset_size_flag u(1)
-    bit_writer.write(byte_offset_size_flag, 1);
+    if (byte_offset_size_flag == ByteOffsetSizeFlag::ON){
+        bit_writer.write(1, 1);
+    } else {
+        bit_writer.write(0, 1);
+    }
 
     // non_overlapping_AU_range_flag u(1)
     bit_writer.write(non_overlapping_AU_range_flag, 1);
 
     // pos_40_bits_flag u(1)
-    bit_writer.write(pos_40_bits_flag, 1);
+    if (pos_40_bits_flag == Pos40SizeFlag::ON) {
+        bit_writer.write(1, 1);
+    } else {
+        bit_writer.write(0, 1);
+    }
 
     // block_header_flag, MIT_flag, CC_mode_flag, ordered_blocks_flag
     block_header.write(bit_writer);
@@ -119,7 +129,17 @@ void DatasetHeader::write(util::BitWriter& bit_writer) const {
     seq_info.write(bit_writer);
 
     // dataset_type u(4)
-    bit_writer.write(dataset_type, 4);
+    switch(dataset_type) {
+        case core::parameter::DataUnit::DatasetType::NON_ALIGNED:
+            bit_writer.write(0, 4);
+            break;
+        case core::parameter::DataUnit::DatasetType::ALIGNED:
+            bit_writer.write(1, 4);
+            break;
+        case core::parameter::DataUnit::DatasetType::REFERENCE:
+            bit_writer.write(2, 4);
+            break;
+    }
 
     // num_classes, clid[ci], num_descriptors[ci], descriptor_ID[ci][di]
     block_header.writeClassInfos(bit_writer);

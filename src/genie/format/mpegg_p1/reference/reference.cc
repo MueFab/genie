@@ -86,10 +86,10 @@ uint64_t Reference::getLength() const {
     // reference_patch_version u(16)
     len += 2;
 
-    // writeToFile seq_count u(16)
+    // write seq_count u(16)
     len += 2;
 
-    // writeToFile sequence_name[]
+    // write sequence_name[]
     for (auto& sequence_name: sequence_names){
         // bit len of string - page 11
         len += (sequence_name.size() + 1) * 1;
@@ -133,10 +133,10 @@ void Reference::writeToFile(util::BitWriter& bit_writer) const {
     // reference_patch_version u(16)
     bit_writer.write(reference_patch_version, 16);
 
-    // writeToFile seq_count u(16)
+    // write seq_count u(16)
     bit_writer.write(getSeqCount(), 16);
 
-    // writeToFile sequence_name[]
+    // write sequence_name[]
     for (auto& sequence_name: sequence_names){
         bit_writer.write(sequence_name);
     }
@@ -144,7 +144,7 @@ void Reference::writeToFile(util::BitWriter& bit_writer) const {
     // reserve 7 bits u(7)
     bit_writer.write(0, 7);
 
-    // writeToFile external_ref_flag u(1)
+    // write external_ref_flag u(1)
     bit_writer.write(reference_location.isExternal(), 1);
 
     // if (external_ref_flag)

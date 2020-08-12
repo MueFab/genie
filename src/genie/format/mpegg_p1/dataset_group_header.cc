@@ -14,6 +14,12 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+DatasetGroupHeader::DatasetGroupHeader()
+    : dataset_group_ID(),
+      version_number(){}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 DatasetGroupHeader::DatasetGroupHeader(std::vector<Dataset> &datasets, uint8_t ver)
     : version_number(ver) {
 
@@ -32,49 +38,6 @@ DatasetGroupHeader::DatasetGroupHeader(std::vector<Dataset> &datasets, uint8_t v
 
         iter++;
     }
-}
-
-uint64_t DatasetGroupHeader::getLength() const {
-    // key (4), Length (8)
-    uint64_t length = 12;
-
-    // TODO (Yeremia): length of Value[]?
-
-    // dataset_group_ID u(8)
-    length += 8;
-
-    // version_number u(8)
-    length += 1;
-
-    // dataset_IDs[] u(16)
-    length += 2 * dataset_IDs.size();
-
-    return length;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetGroupHeader::writeToFile(genie::util::BitWriter& bit_writer) const {
-    // KLV (Key Length Value) format
-
-    // Key of KVL format
-    bit_writer.write("dghd");
-
-    // Length of KVL format
-    bit_writer.write(getLength(), 64);
-
-    // dataset_group_ID u(8)
-    bit_writer.write(dataset_group_ID, 8);
-
-    // version_number u(8)
-    bit_writer.write(version_number, 8);
-
-    // dataset_IDs[] u(16)
-    for (auto &d_ID: dataset_IDs){
-        bit_writer.write(d_ID, 16);
-    }
-
-    bit_writer.flush();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -100,6 +63,51 @@ uint64_t DatasetGroupHeader::getNumDatasets() const { return dataset_IDs.size();
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::vector<uint16_t>& DatasetGroupHeader::getDatasetId() const { return dataset_IDs; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t DatasetGroupHeader::getLength() const {
+    // key (4), Length (8)
+    uint64_t len = 12;
+
+    // VALUE
+
+    // dataset_group_ID u(8)
+    len += 1;
+
+    // version_number u(8)
+    len += 1;
+
+    // dataset_IDs[] u(16)
+    len += 2 * dataset_IDs.size();
+
+    return len;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroupHeader::write(genie::util::BitWriter& bit_writer) const {
+    // KLV (Key Length Value) format
+
+    // Key of KVL format
+    bit_writer.write("dghd");
+
+    // Length of KVL format
+    bit_writer.write(getLength(), 64);
+
+    // dataset_group_ID u(8)
+    bit_writer.write(dataset_group_ID, 8);
+
+    // version_number u(8)
+    bit_writer.write(version_number, 8);
+
+    // dataset_IDs[] u(16)
+    for (auto &d_ID: dataset_IDs){
+        bit_writer.write(d_ID, 16);
+    }
+
+    bit_writer.flush();
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

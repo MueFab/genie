@@ -12,6 +12,9 @@
 #include <memory>
 #include <vector>
 
+#include <genie/util/bitreader.h>
+#include <genie/util/bitwriter.h>
+
 #include "dataset_group_header.h"
 #include "reference/reference.h"
 #include "dataset/dataset.h"
@@ -45,7 +48,7 @@ class DGMetadata {
      *
      * @param bit_writer
      */
-    void writeToFile(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& bit_writer) const;
 
    private:
     std::vector<uint8_t> DG_metadata_value;  //!<
@@ -73,7 +76,7 @@ class DGProtection {
      *
      * @param bit_writer
      */
-    void writeToFile(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& bit_writer) const;
 
    private:
     std::vector<uint8_t> DG_protection_value;  //!<
@@ -118,6 +121,8 @@ class DatasetGroup {
      * @param _datasets
      */
     explicit DatasetGroup(std::vector<Dataset>&& _datasets);
+
+    explicit DatasetGroup(util::BitReader& bit_reader);
 
     /**
      *
@@ -169,24 +174,28 @@ class DatasetGroup {
     const LabelList& getLabelList() const;
 
     /**
+     * Add DG_metadata
      *
      * @param _dg_metadata
      */
     void addDGMetadata(std::unique_ptr<DGMetadata> _dg_metadata);
 
     /**
+     * Get DG_metadata
      *
      * @return
      */
     const DGMetadata& getDgMetadata() const;
 
     /**
+     * Add DG_protection
      *
      * @param _dg_protection
      */
     void addDGProtection(std::unique_ptr<DGProtection>_dg_protection);
 
     /**
+     * Get DG_protection
      *
      * @return
      */
@@ -214,7 +223,7 @@ class DatasetGroup {
      *
      * @param bit_writer
      */
-    void writeToFile(genie::util::BitWriter& bit_writer) const;
+    void write(util::BitWriter& bit_writer) const;
 
 };
 

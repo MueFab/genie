@@ -6,26 +6,23 @@
 #ifndef GENIE_PART1_BLOCK_H
 #define GENIE_PART1_BLOCK_H
 
+#include <vector>
+#include <genie/format/mgb/block.h>
 #include "genie/util/bitwriter.h"
 #include "genie/util/exception.h"
-#include "block_header.h"
 
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-class Block{
-   private:
-    BlockHeader block_header;
-    std::vector<uint8_t> block_payload;
-
+class Block: mgb::Block{
    public:
     /**
      *
      * @param _desc_ID
      * @param payload
      */
-    explicit Block(uint8_t _desc_ID, std::vector<uint8_t>&& payload);
+    explicit Block(uint8_t _desc_ID, core::AccessUnit::Descriptor && payload);
 
     /**
      *
@@ -37,13 +34,13 @@ class Block{
      *
      * @return
      */
-    uint8_t getDescriptorID() const;
+    uint8_t getID() const;
 
     /**
      *
      * @return
      */
-    uint32_t getBlockPayloadSize() const;
+    uint32_t getPayloadSize() const;
 
     /**
      *
@@ -55,7 +52,7 @@ class Block{
      *
      * @param bit_writer
      */
-    void writeToFile(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& bit_writer) const;
 };
 
 }  // namespace mpegg_p1
