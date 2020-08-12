@@ -37,7 +37,7 @@ class QVEncoder {
     virtual QVCoded process(const record::Chunk& rec) = 0;
 
     /**
-     * @Brief For polymorphic destruction
+     * @brief For polymorphic destruction
      */
     ~QVEncoder() = default;
 };

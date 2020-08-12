@@ -13,7 +13,6 @@ set(source_files
         string-helpers.cc
         stringview.cc
         thread-manager.cc
-        tokenize.cc
         watch.cc
         )
 

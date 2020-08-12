@@ -39,14 +39,16 @@ class AccessUnit {
 
        public:
         /**
-         * @brief
+         *
          * @param wordsize
+         * @param _id
          */
         Subsequence(size_t wordsize, GenSubIndex _id);
 
         /**
-         * @brief
+         *
          * @param d
+         * @param _id
          */
         Subsequence(util::DataBlock d, GenSubIndex _id);
 
@@ -276,7 +278,6 @@ class AccessUnit {
 
     /**
      * @brief
-     * @param desc
      * @param sub
      * @return
      */
@@ -284,7 +285,6 @@ class AccessUnit {
 
     /**
      * @brief
-     * @param desc
      * @param sub
      * @return
      */
@@ -306,7 +306,6 @@ class AccessUnit {
 
     /**
      * @brief
-     * @param desc
      * @param sub
      * @param data
      */
@@ -349,8 +348,9 @@ class AccessUnit {
     uint64_t pull(GenSubIndex sub);
 
     /**
-     * @brief
+     *
      * @param set
+     * @param _numRecords
      */
     AccessUnit(parameter::ParameterSet&& set, size_t _numRecords);
 

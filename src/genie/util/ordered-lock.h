@@ -44,7 +44,7 @@ class OrderedLock {
     void finished(size_t length);
 
     /**
-     *
+     * @brief Reset the internal counter
      */
     void reset();
 };

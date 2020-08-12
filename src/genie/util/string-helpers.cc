@@ -31,6 +31,19 @@ std::string &trim(std::string &s, const char *t) { return ltrim(rtrim(s, t), t);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+std::vector<std::string> tokenize(const std::string& str, const char delim) {
+    size_t start;
+    size_t end = 0;
+    std::vector<std::string> out;
+    while ((start = str.find_first_not_of(delim, end)) != std::string::npos) {
+        end = str.find(delim, start);
+        out.push_back(str.substr(start, end - start));
+    }
+    return out;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace util
 }  // namespace genie
 

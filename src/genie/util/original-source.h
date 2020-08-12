@@ -22,11 +22,12 @@ namespace util {
  */
 class OriginalSource {
    public:
-    /**
-     * @brief Spawn some data
-     * @param current block id
-     * @return True if more data is available, false otherwise
-     */
+   /**
+    *
+    * @param id
+    * @param lock
+    * @return
+    */
     virtual bool pump(size_t& id, std::mutex& lock) = 0;
 
     /**

@@ -47,6 +47,7 @@ class FormatImporter : public util::OriginalSource, public util::Source<record::
     /**
      *
      * @param id
+     * @param lock
      * @return
      */
     bool pump(size_t& id, std::mutex& lock) override;

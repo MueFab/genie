@@ -8,7 +8,7 @@
 #include <constants.h>
 #include <genie/core/stats/perf-stats.h>
 #include <genie/util/runtime-exception.h>
-#include <genie/util/tokenize.h>
+#include <genie/util/string-helpers.h>
 #include <regex>
 #include "header/tag.h"
 

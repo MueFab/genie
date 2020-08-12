@@ -50,6 +50,9 @@ class Importer : public core::FormatImporterCompressed, public core::ReferenceSo
     /**
      *
      * @param _file
+     * @param manager
+     * @param refd
+     * @param refOnly
      * @param _stats
      */
     explicit Importer(std::istream& _file, core::ReferenceManager* manager, core::RefDecoder* refd, bool refOnly,

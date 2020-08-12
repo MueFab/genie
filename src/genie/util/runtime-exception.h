@@ -28,7 +28,7 @@ namespace genie {
 namespace util {
 
 /**
- *
+ * @brief Genie runtime exception for all the bad stuff that can happen.
  */
 class RuntimeException : public Exception {
    public:
@@ -43,15 +43,15 @@ class RuntimeException : public Exception {
                               const std::string &msg) noexcept;
 
     /**
-     *
+     * @brief
      * @param e
      */
     RuntimeException(const RuntimeException &e) noexcept;
 
     /**
-     *
+     * @brief Needed for inheritance.
      */
-    ~RuntimeException() noexcept override;
+    ~RuntimeException() noexcept override = default;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

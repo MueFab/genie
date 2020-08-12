@@ -29,7 +29,7 @@ class NameDecoder {
     virtual std::tuple<std::vector<std::string>, core::stats::PerfStats> process(AccessUnit::Descriptor& desc) = 0;
 
     /**
-     * @Brief For polymorphic destruction
+     * @brief For polymorphic destruction
      */
     ~NameDecoder() = default;
 };

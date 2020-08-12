@@ -75,7 +75,7 @@ class ReadEncoder : public Module<record::Chunk, AccessUnit> {
     AccessUnit entropyCodeAU(AccessUnit&& a);
 
     /**
-     * @Brief For polymorphic destruction
+     * @brief For polymorphic destruction
      */
     ~ReadEncoder() override = default;
 };

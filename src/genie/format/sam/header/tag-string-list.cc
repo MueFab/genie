@@ -6,7 +6,7 @@
 
 #include "tag-string-list.h"
 #include <genie/util/make-unique.h>
-#include <genie/util/tokenize.h>
+#include <genie/util/string-helpers.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
