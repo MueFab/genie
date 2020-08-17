@@ -4,9 +4,11 @@ trigger:
 strategy:
   matrix:
     linux:
-      imageName: 'ubuntu-latest'
+      imageName: 'ubuntu-20.04'
     mac:
-      imageName: 'macos-latest'
+      imageName: 'macos-10.15'
+    windows:
+      imageName: 'vs2017-win2016'
 
 pool:
   vmImage: $(imageName)
