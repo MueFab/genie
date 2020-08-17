@@ -7,14 +7,9 @@ strategy:
       imageName: 'ubuntu-latest'
     mac:
       imageName: 'macos-latest'
-    windows:
-      imageName: 'vs2017-win2016'
 
 pool:
   vmImage: $(imageName)
-
-#pool:
-#  vmImage: 'ubuntu-latest'
 
 steps:
 - script: |
