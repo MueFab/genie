@@ -22,6 +22,6 @@ steps:
 # Build with the CMake cross-platform build system
 - task: CMake@1
   inputs:
-    workingDirectory: 'build' # Optional
-    #cmakeArgs: # Optional
+    workingDirectory: 'cmake-build'
+    cmakeArgs: .. -DCMAKE_BUILD_TYPE=Release
 
