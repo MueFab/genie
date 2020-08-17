@@ -4,17 +4,22 @@
  */
 
 #include "program-options.h"
-#include <cli11@13becad/CLI11.hpp>
+#include <cli11/CLI11.hpp>
 #include <sstream>
 
 namespace encapsulator {
 
-ProgramOptions::ProgramOptions(int argc, char *argv[]) : force(false), help(false) { processCommandLine(argc, argv); }
+ProgramOptions::ProgramOptions(int argc, char *argv[])
+    : force(false), help(false), inputFilePath(""), outputFilePath("") {
+    processCommandLine(argc, argv);
+}
 
 void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     CLI::App app("encapsulator");
 
     app.add_flag("-f,--force", force, "Force overwriting of output file(s)");
+    app.add_option("-i,--input-file", inputFilePath, "Input file")->mandatory(true);
+    app.add_option("-o,--output-file", outputFilePath, "Output file")->mandatory(false);
 
     try {
         app.parse(argc, argv);

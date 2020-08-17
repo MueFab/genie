@@ -11,20 +11,24 @@
 #include <utility>
 #include <vector>
 
-#include "gabac/gabac.h"
+#include <genie/core/constants.h>
+#include <genie/entropy/gabac/gabac.h>
 
 namespace gabacify {
 
 //------------------------------------------------------------------------------
 
-void code(const std::string &inputFilePath, const std::string &configurationFilePath, const std::string &outputFilePath,
-          size_t blocksize, bool decode) {
+void code(const std::string &inputFilePath,
+          // RESTRUCT_DISABLE const std::string &configurationFilePath,
+          const std::string &outputFilePath, size_t blocksize, uint8_t descID, uint8_t subseqID, bool decode,
+          const std::string &dependencyFilePath) {
     std::ifstream inputFile;
+    std::ifstream dependencyFile;
     std::ofstream outputFile;
-    gabac::NullStream nullstream;
+    genie::entropy::gabac::NullStream nullstream;
 
     std::istream *istream = &std::cin;
-    std::istream *confstream = &std::cin;
+    std::istream *dstream = nullptr;
     std::ostream *ostream = &std::cout;
     std::ostream *logstream = &std::cout;
 
@@ -32,41 +36,38 @@ void code(const std::string &inputFilePath, const std::string &configurationFile
         // Read in the entire input file
         inputFile = std::ifstream(inputFilePath, std::ios::binary);
         if (!inputFile) {
-            GABAC_DIE("Could not open input file");
+            UTILS_DIE("Could not open input file");
         }
         istream = &inputFile;
+    }
+
+    if (!dependencyFilePath.empty()) {
+        // Read in the entire dependency file
+        dependencyFile = std::ifstream(dependencyFilePath, std::ios::binary);
+        if (!inputFile) {
+            UTILS_DIE("Could not open dependency file");
+        }
+        dstream = &dependencyFile;
     }
 
     if (!outputFilePath.empty()) {
         // Write the bytestream
         outputFile = std::ofstream(outputFilePath, std::ios::binary);
         if (!outputFile) {
-            GABAC_DIE("Could not open output file");
+            UTILS_DIE("Could not open output file");
         }
         ostream = &outputFile;
     } else {
         logstream = &nullstream;
     }
 
-    gabac::IOConfiguration ioconf = {istream, ostream, blocksize, logstream, gabac::IOConfiguration::LogLevel::INFO};
+    genie::entropy::gabac::IOConfiguration ioconf = {
+        istream, dstream, ostream, blocksize, logstream, genie::entropy::gabac::IOConfiguration::LogLevel::INFO};
 
-    // Read the entire configuration file as a string and convert the JSON
-    // input string to the internal GABAC configuration
-    gabac::EncodingConfiguration configuration;
-    {
-        std::ifstream configurationFile;
-        if (!configurationFilePath.empty()) {
-            configurationFile = std::ifstream(configurationFilePath, std::ios::binary);
-            if (!configurationFile) {
-                GABAC_DIE("Could not open configuration file");
-            }
-            confstream = &configurationFile;
-        }
-        std::string jsonInput = std::string(std::istreambuf_iterator<char>(*confstream), {});
-        configuration = gabac::EncodingConfiguration(jsonInput);
-    }
+    genie::core::GenSubIndex genieSubseqID =
+        (genie::core::GenSubIndex)std::pair<genie::core::GenDesc, uint8_t>((genie::core::GenDesc)descID, subseqID);
 
-    gabac::run(ioconf, configuration, decode);
+    genie::entropy::gabac::run(ioconf, genie::entropy::gabac::getEncoderConfigManual(genieSubseqID), decode);
 
     /* GABACIFY_LOG_INFO << "Wrote buffer of size "
                       << outStream.bytesWritten()

@@ -1,15 +1,10 @@
 ### Python built-in modules
-import os
-import sys
-import time
 import ctypes as ct
+
 ### External modules (requires pip install)
-import numpy as np
 ### Own modules
 from . import (
-    repo_path,
     libgabac_fpath,
-    GABAC_RETURN,
 )
 
 libgabac = ct.cdll.LoadLibrary(libgabac_fpath)
@@ -24,6 +19,7 @@ libgabac = ct.cdll.LoadLibrary(libgabac_fpath)
 
 STRONG_TYPE = True
 
+
 ###-------Data Block-------###
 
 class gabac_data_block(ct.Structure):
@@ -37,6 +33,7 @@ class gabac_data_block(ct.Structure):
         ("values_size", ct.c_size_t),
         ("word_size", ct.c_uint8),
     ]
+
 
 # Arguments
 #   gabac_data_block *block,
@@ -129,6 +126,7 @@ libgabac.gabac_data_block_set.argtypes = [
 ]
 libgabac.gabac_data_block_set.restype = None
 
+
 class gabac_stream(ct.Structure):
     r"""
     void *data;
@@ -138,6 +136,7 @@ class gabac_stream(ct.Structure):
         ("data", ct.c_void_p),
         ("input_mode", ct.c_uint)
     ]
+
 
 # Arguments
 #   gabac_stream *stream,
@@ -218,6 +217,7 @@ class gabac_io_config(ct.Structure):
         ("blocksize", ct.c_size_t),
     ]
 
+
 # gabac_execute_transform
 # -----------------------------------------------------------------------------
 
@@ -234,7 +234,6 @@ libgabac.gabac_execute_transform.argtypes = [
     ct.c_int,
     ct.POINTER(gabac_data_block) if STRONG_TYPE else ct.c_void_p,
 ]
-
 
 libgabac.gabac_execute_transform.restype = ct.c_int
 
@@ -285,4 +284,3 @@ libgabac.gabac_config_is_general.argtypes = [
     ct.c_uint64,
     ct.c_uint8
 ]
-

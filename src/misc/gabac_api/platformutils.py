@@ -8,7 +8,7 @@ def libc_path():
     elif platform.startswith('darwin'):
         return "/usr/lib/system/libsystem_c.dylib"
     else:
-        return "/usr/lib64/lic.so" # This is our best guess
+        return "/usr/lib64/lic.so"  # This is our best guess
 
 
 def dynamic_lib_extension():
@@ -17,4 +17,4 @@ def dynamic_lib_extension():
     elif platform.startswith('darwin'):
         return ".dylib"
     else:
-        return ".so" # This is our best guess
+        return ".so"  # This is our best guess

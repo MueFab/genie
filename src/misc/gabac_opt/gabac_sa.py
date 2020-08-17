@@ -1,25 +1,16 @@
-import os
 # import copy
 import json
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import random
+from gabac_conf_gen import GabacConfiguration
+
+
 # import math
 # import ctypes as ct
 # from collections import OrderedDict
 
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-
-from gabac_api import libgabac
-from gabac_api import gabac_stream
-from gabac_api import gabac_io_config
-from gabac_api import gabac_data_block
-from gabac_api import GABAC_BINARIZATION, GABAC_CONTEXT_SELECT, GABAC_LOG_LEVEL, GABAC_LOG_LEVEL
-from gabac_api import GABAC_OPERATION, GABAC_RETURN, GABAC_STREAM_MODE, GABAC_TRANSFORM
-from gabac_api import root_path
-from test_python_api import array, libc
-
-from gabac_conf_gen import GabacConfiguration
 
 class SimulatedAnnealingForGabac(object):
     r"""
@@ -47,15 +38,15 @@ class SimulatedAnnealingForGabac(object):
     """
 
     def __init__(
-        self,
-        data,
-        seq_transform_id:int,
-        kmax:int    = 50,
-        kt:float    = 1,
-        mutation_nparam:int = 1,
-        ena_roundtrip:bool  = True,
-        verbose:bool    = True,
-        debug:bool      = False,
+            self,
+            data,
+            seq_transform_id: int,
+            kmax: int = 50,
+            kt: float = 1,
+            mutation_nparam: int = 1,
+            ena_roundtrip: bool = True,
+            verbose: bool = True,
+            debug: bool = False,
     ):
         self.verbose = verbose
         self.debug = debug
@@ -71,7 +62,7 @@ class SimulatedAnnealingForGabac(object):
 
         # Init
         self.gc = GabacConfiguration(
-            self.seq_transform_id, 
+            self.seq_transform_id,
             data,
             ena_roundtrip=ena_roundtrip
         )
@@ -92,23 +83,23 @@ class SimulatedAnnealingForGabac(object):
         self.E0 = enc_length / len(self.data)
 
         self.result[0, :] = [
-            enc_length, 
-            enc_length, 
-            enc_length, 
+            enc_length,
+            enc_length,
+            enc_length,
             self.E0,
             self.E0,
             self.E0,
             enc_time,
             enc_time]
-        
+
         if self.verbose:
             print('E{:03d}: {:.3f}'.format(0, self.E0))
 
     def _temperature(
-        self,
-        k,
+            self,
+            k,
     ):
-        return (1 - k/self.kmax) * self.kt
+        return (1 - k / self.kmax) * self.kt
 
     def start(self):
         s = self.s0
@@ -124,7 +115,7 @@ class SimulatedAnnealingForGabac(object):
 
             while True:
                 new_s = self.gc.mutate_nparams(s, nparams=self.mutation_nparam)
-                #new_s = self.gc.generate_random_neighbor(s)
+                # new_s = self.gc.generate_random_neighbor(s)
 
                 if self.debug:
                     with open('prev_config.json', 'w') as f:
@@ -142,14 +133,14 @@ class SimulatedAnnealingForGabac(object):
                 if True:
                     break
 
-            new_E = enc_length/len(self.data)
+            new_E = enc_length / len(self.data)
 
             dE = new_E - E
 
-            self.result[k+1, 0] = enc_length
-            self.result[k+1, 3] = new_E
-            self.result[k+1, 6] = enc_time
-            self.result[k+1, 7] = enc_time + self.result[k, 7]
+            self.result[k + 1, 0] = enc_length
+            self.result[k + 1, 3] = new_E
+            self.result[k + 1, 6] = enc_time
+            self.result[k + 1, 7] = enc_time + self.result[k, 7]
 
             if dE > 0.0:
                 if self.verbose:
@@ -158,10 +149,10 @@ class SimulatedAnnealingForGabac(object):
                     ), end='')
 
                 if np.exp(-dE / T) > random.random():
-                #if np.exp(dE/T) - 1 < random.random():
+                    # if np.exp(dE/T) - 1 < random.random():
                     if self.verbose:
                         print('{:.2f} accept'.format(np.exp(-dE / T)), end='')
-                    
+
                     s = new_s
                     el = enc_length
                     E = new_E
@@ -184,23 +175,23 @@ class SimulatedAnnealingForGabac(object):
                 el = enc_length
                 E = new_E
 
-            self.result[k+1, 1] = el
-            self.result[k+1, 4] = E
+            self.result[k + 1, 1] = el
+            self.result[k + 1, 4] = E
 
             if E < best_E:
                 best_s = s
                 best_el = el
                 best_E = E
-                
-            self.result[k+1, 2] = best_el
-            self.result[k+1, 5] = best_E
+
+            self.result[k + 1, 2] = best_el
+            self.result[k + 1, 5] = best_E
 
         return best_s, best_E
 
     def show_plot(self):
-        plt.plot(np.arange(self.kmax + 1), self.result[:,3], 'b')
-        plt.plot(np.arange(self.kmax + 1), self.result[:,4], 'r')
-        plt.plot(np.arange(self.kmax + 1), self.result[:,5], 'k')
+        plt.plot(np.arange(self.kmax + 1), self.result[:, 3], 'b')
+        plt.plot(np.arange(self.kmax + 1), self.result[:, 4], 'r')
+        plt.plot(np.arange(self.kmax + 1), self.result[:, 5], 'k')
         plt.show()
 
     def result_as_csv(self, path, filename):
@@ -216,14 +207,13 @@ class SimulatedAnnealingForGabac(object):
                 'best_encoded_ratio',
                 'encoding_time',
                 'total_encoding_time']
-            )
+        )
 
-        df['filename'] = pd.Series([ filename for _ in range(self.kmax + 1) ], index=df.index)
+        df['filename'] = pd.Series([filename for _ in range(self.kmax + 1)], index=df.index)
         df['iter'] = pd.Series([curr_iter for curr_iter in range(self.kmax + 1)], index=df.index)
 
         df.to_csv(
             path,
             index=False,
-            #header=None, 
+            # header=None,
         )
-
