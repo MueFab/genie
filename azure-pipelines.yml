@@ -1,34 +1,26 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - master
 
+strategy:
+  matrix:
+    linux:
+      imageName: 'ubuntu-latest'
+    mac:
+      imageName: 'macos-latest'
+    windows:
+      imageName: 'vs2017-win2016'
+
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: $(imageName)
+
+#pool:
+#  vmImage: 'ubuntu-latest'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
-
 - script: |
     mkdir cmake-build-release
     cd cmake-build-release
     cmake .. -DCMAKE_BUILD_TYPE=Release
     make --jobs
   displayName: 'Run CMake & Make'
-
-# CMake
-# Build with the CMake cross-platform build system
-#- task: CMake@1
-#  inputs:
-#    workingDirectory: 'cmake-build'
-#    cmakeArgs: .. -DCMAKE_BUILD_TYPE=Release
 
