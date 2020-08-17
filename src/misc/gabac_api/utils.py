@@ -1,11 +1,13 @@
 ### Python built-in modules
-import json
 import ctypes as ct
+import json
+
 ### Own modules
 from .c_api import libgabac
 from .platformutils import libc_path
 
 libc = ct.CDLL(libc_path())
+
 
 def array(dtype, data):
     if isinstance(data, int):
@@ -22,6 +24,7 @@ def array(dtype, data):
     else:
         raise TypeError("Incorrect datatype of data")
 
+
 def print_array(arr):
     for val in arr:
         if isinstance(val, bytes):
@@ -30,6 +33,7 @@ def print_array(arr):
             print("{}".format(val), end='')
     print()
 
+
 def print_block(block):
     for i in range(block.values_size):
         # print("{: 2d}".format(libgabac.gabac_data_block_get(ct.byref(block), i)), end='')
@@ -37,11 +41,13 @@ def print_block(block):
     # print()
     libc.printf(b"\n")
 
+
 def get_block_values(block):
     values = ""
     for i in range(block.values_size):
         values += "{:02d}".format(libgabac.gabac_data_block_get(ct.byref(block), i))
     return values
+
 
 def are_blocks_equal(block1, block2):
     if block1.values_size == block2.values_size:
@@ -52,6 +58,7 @@ def are_blocks_equal(block1, block2):
         return True
     else:
         return False
+
 
 def json_to_array(config):
     return array(ct.c_char, json.dumps(config, indent=4).encode('utf-8'))

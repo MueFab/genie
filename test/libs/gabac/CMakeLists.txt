@@ -15,4 +15,5 @@ set(source_files
 add_executable(gabac-tests ${source_files})
 
 target_link_libraries(gabac-tests PRIVATE gtest_main)
-target_link_libraries(gabac-tests PRIVATE gabac)
+target_link_libraries(gabac-tests PRIVATE genie-core)
+target_link_libraries(gabac-tests PRIVATE genie-gabac)
