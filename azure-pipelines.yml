@@ -18,13 +18,17 @@ steps:
     echo See https://aka.ms/yaml
   displayName: 'Run a multi-line script'
 
-- script: make --jobs
-  displayName: 'Run Make'
+- script: |
+    mkdir cmake-build-release
+    cd cmake-build-release
+    cmake .. -DCMAKE_BUILD_TYPE=Release
+    make --jobs
+  displayName: 'Run CMake & Make'
 
 # CMake
 # Build with the CMake cross-platform build system
-- task: CMake@1
-  inputs:
-    workingDirectory: 'cmake-build'
-    cmakeArgs: .. -DCMAKE_BUILD_TYPE=Release
+#- task: CMake@1
+#  inputs:
+#    workingDirectory: 'cmake-build'
+#    cmakeArgs: .. -DCMAKE_BUILD_TYPE=Release
 
