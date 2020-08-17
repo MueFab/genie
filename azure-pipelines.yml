@@ -19,3 +19,8 @@ steps:
     make --jobs
   displayName: 'Run CMake & Make'
 
+- script: |
+    echo 'Run GABAC Roundtrips'
+    ./ci/gabac-roundtrips.sh
+  displayName: 'Run GABAC Roundtrips'
+
