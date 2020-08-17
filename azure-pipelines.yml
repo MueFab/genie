@@ -18,6 +18,9 @@ steps:
     echo See https://aka.ms/yaml
   displayName: 'Run a multi-line script'
 
+- script: make --jobs
+  displayName: 'Run Make'
+
 # CMake
 # Build with the CMake cross-platform build system
 - task: CMake@1
