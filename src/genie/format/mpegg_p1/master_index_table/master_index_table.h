@@ -8,7 +8,6 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-}
 class MasterIndexTable {
    private:
     std::vector<mpegg_p1::MITAccessUnitInfo> ac_info;

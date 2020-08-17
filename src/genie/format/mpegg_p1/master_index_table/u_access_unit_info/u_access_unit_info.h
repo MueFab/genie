@@ -5,9 +5,6 @@
 #include <cstdint>
 #include <memory>
 
-#include <genie/format/mpegg_p1/dataset/enums.h>
-
-
 namespace genie {
 namespace format {
 namespace mpegg_p1 {

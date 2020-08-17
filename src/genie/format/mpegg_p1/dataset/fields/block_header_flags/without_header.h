@@ -8,7 +8,7 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-class WithoutHeader: public BlockHeader {
+class WithoutHeader: public BlockConfig {
    private:
     bool ordered_blocks_flag;
 

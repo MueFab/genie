@@ -180,7 +180,7 @@ void DatasetGroup::setID(uint8_t ID) {
     // DG_protection has no dataset_group_ID
 
     for (auto& ds: datasets){
-        ds.setDatasetGroupId(ID);
+        ds.setGroupId(ID);
     }
 }
 

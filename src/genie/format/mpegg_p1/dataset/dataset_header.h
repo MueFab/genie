@@ -48,10 +48,10 @@ class DatasetHeader {
 
     // block_header_flag, MIT_flag, CC_mode_flag, ordered_blocks_flag, num_classes, clid[],
     // num_descriptors[], descriptor_ID[][]
-    BlockHeader block_header;
+    BlockConfig block_header;
 
     // seq_count, reference_ID, seq_ID[], seq_blocks[], tflag[], thres[]
-    SequenceInfo seq_info;
+    SequenceConfig seq_info;
 
     core::parameter::DataUnit::DatasetType dataset_type;
 

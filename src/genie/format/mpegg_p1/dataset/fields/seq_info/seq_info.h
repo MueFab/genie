@@ -10,7 +10,7 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-class SequenceInfo {
+class SequenceConfig {
    private:
     uint8_t reference_ID;
     std::vector<uint16_t> seq_IDs;
@@ -20,9 +20,9 @@ class SequenceInfo {
     std::vector<uint32_t> thress;
 
    public:
-    SequenceInfo();
+    SequenceConfig();
 
-    explicit SequenceInfo(uint8_t _ref_ID);
+    explicit SequenceConfig(uint8_t _ref_ID);
 
     uint64_t getLength() const;
 

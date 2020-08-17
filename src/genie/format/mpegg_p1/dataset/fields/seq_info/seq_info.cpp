@@ -5,17 +5,17 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-SequenceInfo::SequenceInfo()
+SequenceConfig::SequenceConfig()
     : reference_ID(0),
       seq_IDs(),
       seq_blocks(){}
 
-SequenceInfo::SequenceInfo(uint8_t _ref_ID)
+SequenceConfig::SequenceConfig(uint8_t _ref_ID)
     : reference_ID(_ref_ID),
       seq_IDs(),
       seq_blocks(){}
 
-uint64_t SequenceInfo::getLength() const {
+uint64_t SequenceConfig::getLength() const {
     uint64_t bitlength = 16;
 
     if (anySeq()){
@@ -55,16 +55,16 @@ uint64_t SequenceInfo::getLength() const {
     return  bitlength;
 }
 
-void SequenceInfo::setRefID(uint8_t _ref_ID) {
+void SequenceConfig::setRefID(uint8_t _ref_ID) {
     reference_ID = _ref_ID;
 }
 
-void SequenceInfo::addEntry(uint16_t seq_ID, uint32_t seq_block) {
+void SequenceConfig::addEntry(uint16_t seq_ID, uint32_t seq_block) {
     seq_IDs.push_back(seq_ID);
     seq_blocks.push_back(seq_block);
 }
 
-void SequenceInfo::addEntries(std::vector<uint16_t>& _seq_IDs, std::vector<uint32_t>& _seq_blocks) {
+void SequenceConfig::addEntries(std::vector<uint16_t>& _seq_IDs, std::vector<uint32_t>& _seq_blocks) {
 
     UTILS_DIE_IF(_seq_IDs.empty() || _seq_blocks.empty(),
                  "Either _seq_IDs or _seq_blocks is empty");
@@ -76,11 +76,11 @@ void SequenceInfo::addEntries(std::vector<uint16_t>& _seq_IDs, std::vector<uint3
     std::move(_seq_blocks.begin(), _seq_blocks.end(), std::back_inserter(seq_blocks));
 }
 
-uint16_t SequenceInfo::getSeqCount() const { return seq_IDs.size(); }
+uint16_t SequenceConfig::getSeqCount() const { return seq_IDs.size(); }
 
-bool SequenceInfo::anySeq() const { return !seq_IDs.empty(); }
+bool SequenceConfig::anySeq() const { return !seq_IDs.empty(); }
 
-void SequenceInfo::write(util::BitWriter& bit_writer) const {
+void SequenceConfig::write(util::BitWriter& bit_writer) const {
 
     UTILS_DIE_IF(!isValid(),
                  "seq_count and size of thres[] are different!");
@@ -104,7 +104,7 @@ void SequenceInfo::write(util::BitWriter& bit_writer) const {
     }
 }
 
-void SequenceInfo::writeThres(util::BitWriter& bit_writer) const {
+void SequenceConfig::writeThres(util::BitWriter& bit_writer) const {
 
     UTILS_DIE_IF(!isValid(),
                  "seq_count and size of thres[] are different!");
@@ -138,7 +138,7 @@ void SequenceInfo::writeThres(util::BitWriter& bit_writer) const {
     }
 }
 
-bool SequenceInfo::isValid() const { return seq_IDs.size() == thress.size(); }
+bool SequenceConfig::isValid() const { return seq_IDs.size() == thress.size(); }
 
 }  // namespace mpegg_p1
 }  // namespace format

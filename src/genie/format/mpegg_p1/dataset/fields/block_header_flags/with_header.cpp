@@ -5,22 +5,22 @@ namespace format {
 namespace mpegg_p1 {
 
 WithHeader::WithHeader()
-    : BlockHeader(true, false),
+    : BlockConfig(true, false),
       CC_mode_flag(false){}
 
 WithHeader::WithHeader(bool _mit_flag, bool _cc_mode_flag)
-    : BlockHeader(true, _mit_flag),
+    : BlockConfig(true, _mit_flag),
       CC_mode_flag(_cc_mode_flag){}
 
 
 uint64_t WithHeader::getLength() const {
-    return BlockHeader::getLength() + 2; // block_header_flag, MIT_flag, CC_mode_flag
+    return BlockConfig::getLength() + 2; // block_header_flag, MIT_flag, CC_mode_flag
 }
 
 void WithHeader::write(genie::util::BitWriter& bit_writer) const {
 
     // block_header_flag u(1)
-    BlockHeader::write(bit_writer);
+    BlockConfig::write(bit_writer);
 
     // MIT_flag u(1)
     bit_writer.write(MIT_flag, 1);
