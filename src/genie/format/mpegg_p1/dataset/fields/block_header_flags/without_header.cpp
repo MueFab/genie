@@ -5,21 +5,21 @@ namespace format {
 namespace mpegg_p1 {
 
 WithoutHeader::WithoutHeader()
-    : BlockHeader(false, true),
+    : BlockConfig(false, true),
       ordered_blocks_flag(false){}
 
 WithoutHeader::WithoutHeader(bool _cc_mode_flag)
-    : BlockHeader(false, true),
+    : BlockConfig(false, true),
       ordered_blocks_flag(_cc_mode_flag){}
 
 uint64_t WithoutHeader::getLength() const {
-    return BlockHeader::getLength() + 1; // block_header_flag, ordered_blocks_flag
+    return BlockConfig::getLength() + 1; // block_header_flag, ordered_blocks_flag
 }
 
 void WithoutHeader::write(genie::util::BitWriter& bit_writer) const {
 
     // block_header_flag u(1)
-    BlockHeader::write(bit_writer);
+    BlockConfig::write(bit_writer);
 
 //    // block_header_flag u(1)
 //    bit_writer.write(getBlockHeaderFlag(), 1);

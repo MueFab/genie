@@ -8,7 +8,7 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-class WithHeader : public BlockHeader {
+class WithHeader : public BlockConfig {
    private:
     bool CC_mode_flag;
 

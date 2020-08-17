@@ -10,13 +10,13 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-class BlockHeader {
+class BlockConfig {
    private:
 
    public:
-    BlockHeader();
+    BlockConfig();
 
-    BlockHeader(bool _block_header_flag, bool _mit_flag);
+    BlockConfig(bool _block_header_flag, bool _mit_flag);
 
     /*
      *

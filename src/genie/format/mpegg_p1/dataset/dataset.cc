@@ -94,34 +94,23 @@ void DTProtection::write(genie::util::BitWriter &bit_writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint16_t Dataset::getID() const { return dataset_header.getID(); }
+void Dataset::setGroupId(uint8_t group_ID) {dataset_group_ID = group_ID;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Dataset::setDatasetGroupId(uint8_t _dataset_group_ID) {
-
-    dataset_header.setDatasetGroupId(_dataset_group_ID);
-
-    for (auto& ps : dataset_parameter_sets) {
-        ps.setDatasetGroupId(_dataset_group_ID);
-    }
-}
+uint8_t Dataset::getGroupID() const { return dataset_group_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint16_t Dataset::getDatasetParameterSetDatasetID() const {
-    return dataset_parameter_sets.front().getDatasetID();
-}  // only returns ID of first ps in vector
+void Dataset::setID(uint16_t ID) {dataset_ID = ID;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t Dataset::getDatasetParameterSetDatasetGroupID() const {
-    return dataset_parameter_sets.front().getDatasetGroupID();
-}  // only returns ID of first ps in vector
+uint16_t Dataset::getID() const { return dataset_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<DatasetParameterSet>& Dataset::getDatasetParameterSets() const { return dataset_parameter_sets; }
+const std::vector<core::parameter::ParameterSet>& Dataset::getParameterSets() const { return dataset_parameter_sets; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -130,7 +119,7 @@ uint64_t Dataset::getHeaderLength() const {
     bitlength += (1 + 2 + 4) * 8;  // dataset_group_ID, dataset_ID, version
     bitlength += 4; // byte_offset_size_flag, non_overlapping_AU_range_flag, pos_40_bits_flag
 
-    bitlength += block_header.getLength();
+    bitlength += block_config.getLength();
 
     // TODO (Yeremia): Fix getHeaderLength()
 }
@@ -167,7 +156,7 @@ void Dataset::writeHeader(util::BitWriter& bit_writer) const {
     }
 
     // block_header_flag, MIT_flag, CC_mode_flag, ordered_blocks_flag
-    block_header.write(bit_writer);
+    block_config.write(bit_writer);
 
     // seq_count u(16)
     // reference_ID, seq_ID[seq] and seq_blocks[seq]
@@ -187,7 +176,7 @@ void Dataset::writeHeader(util::BitWriter& bit_writer) const {
     }
 
     // num_classes, clid[ci], num_descriptors[ci], descriptor_ID[ci][di]
-    block_header.writeClassInfos(bit_writer);
+    block_config.writeClassInfos(bit_writer);
 
     // alphabet_ID u(8)
     bit_writer.write(alphabet_ID, 8);
@@ -211,8 +200,19 @@ void Dataset::writeHeader(util::BitWriter& bit_writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+uint64_t Dataset::getParameterSetLength() const { return 0; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Dataset::writeParameterSets(util::BitWriter& bit_writer) const {
     for (auto const& ps : dataset_parameter_sets) {
+        // Key of KVL format
+        bit_writer.write("pars");
+
+        // Length of KVL format
+        // KV, dataset_group_ID u(8), dataset_ID u(16), the rest
+        bit_writer.write(12 + sizeof(uint8_t) + sizeof(uint16_t) + ps.getLength(), 64);
+
         // dataset_group_ID u(8)
         bit_writer.write(dataset_group_ID, 8);
         // dataset_ID u(16)
@@ -280,9 +280,9 @@ void Dataset::write(util::BitWriter& bit_writer) const {
     }
 
     // TODO (Yeremia): write master_index_table depending on MIT_FLAG
-//    if (MIT_FLAG){
-//        master_index_table.write(bit_writer);
-//    }
+    if (block_config.getMITFlag()){
+//        master_index_table->write(bit_writer);
+    }
 
     // dataset_parameter_set[]
     writeParameterSets(bit_writer);

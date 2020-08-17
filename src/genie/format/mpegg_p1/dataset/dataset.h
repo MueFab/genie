@@ -12,6 +12,7 @@
 
 #include <genie/core/parameter/data_unit.h>
 #include <genie/core/parameter/parameter_set.h>
+#include <genie/format/mpegg_p1/master_index_table/master_index_table.h>
 
 #include "dataset_header.h"
 #include "genie/format/mgb/data-unit-factory.h"
@@ -83,10 +84,10 @@ class Dataset {
 
     // block_header_flag, MIT_flag, CC_mode_flag, ordered_blocks_flag, num_classes, clid[],
     // num_descriptors[], descriptor_ID[][]
-    BlockHeader block_header;
+    BlockConfig block_config;
 
     // seq_count, reference_ID, seq_ID[], seq_blocks[], tflag[], thres[]
-    SequenceInfo seq_info;
+    SequenceConfig seq_info;
 
     core::parameter::DataUnit::DatasetType dataset_type;
 
@@ -110,10 +111,13 @@ class Dataset {
     // optional
     std::unique_ptr<DTProtection> DT_protection;
 
+    // TODO (Yeremia) : comment
+    // optional
     std::vector<core::parameter::ParameterSet> dataset_parameter_sets;
 
-    // TODO(Yeremia): Master Index Table
-    //MasterIndexTable master_index_table;
+    // TODO (Yeremia) : comment
+    // optional
+    std::unique_ptr<MasterIndexTable> master_index_table;
 
     std::vector<AccessUnit> access_units;
 
@@ -133,15 +137,35 @@ class Dataset {
     Dataset(uint16_t ID, const genie::format::mgb::DataUnitFactory& dataUnitFactory,
             std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2);
 
+    /**
+     *
+     * @param _dataset_group_ID
+     */
+    void setGroupId(uint8_t group_ID);
+
+    /**
+     *
+     * @return
+     */
+    uint8_t getGroupID() const;
+
+    /**
+     *
+     * @param ID
+     */
+    void setID(uint16_t ID);
+
+    /**
+     *
+     * @return
+     */
     uint16_t getID() const;
 
-    uint16_t getDatasetParameterSetDatasetID() const;
-
-    uint8_t getDatasetParameterSetDatasetGroupID() const;
-
-    const std::vector<DatasetParameterSet>& getDatasetParameterSets() const;
-
-    void setDatasetGroupId(uint8_t _dataset_group_ID);
+    /**
+     *
+     * @return
+     */
+    const std::vector<core::parameter::ParameterSet>& getParameterSets() const;
 
     /**
      *
@@ -155,6 +179,10 @@ class Dataset {
      */
     void writeHeader(util::BitWriter& bit_writer) const;
 
+    /**
+     *
+     * @return
+     */
     uint64_t getParameterSetLength() const;
 
     /**
@@ -163,8 +191,16 @@ class Dataset {
      */
     void writeParameterSets(util::BitWriter& bit_writer) const;
 
+    /**
+     *
+     * @return
+     */
     uint64_t getLength() const;
 
+    /**
+     *
+     * @param bit_writer
+     */
     void write(genie::util::BitWriter& bit_writer) const;
 
 };
