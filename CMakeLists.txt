@@ -57,6 +57,11 @@ elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel") # Intel Compiler
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
     #
+elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC") # Microsoft Compiler
+    #
+    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
+    #
 else()
     message(WARNING "C++ compiler not supported: ${CMAKE_CXX_COMPILER_ID}")
 endif()
@@ -99,7 +104,13 @@ endif()
 
 if(${GENIE_USE_OPENMP})
     find_package(OpenMP REQUIRED)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+    elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC") # Microsoft Compiler
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
+    else()
+        message(WARNING "Don't know how to enable openmp for: ${CMAKE_CXX_COMPILER_ID}")
+    endif()
 endif()
 
 

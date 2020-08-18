@@ -59,7 +59,6 @@ class Decoder : public genie::core::ReadDecoder {
    private:
     compression_params cp{};        //!<
     bool combine_pairs;             //!<
-    size_t num_thr;                 //!<
     util::OrderedLock lock;         //!<
     std::ofstream fout_unmatched1;  //!<
     std::ofstream fout_unmatched2;  //!<
@@ -78,7 +77,7 @@ class Decoder : public genie::core::ReadDecoder {
      * @param paired_end
      * @param threads
      */
-    explicit Decoder(const std::string& working_dir, bool comb_p, bool paired_end, size_t threads);
+    explicit Decoder(const std::string& working_dir, bool comb_p, bool paired_end);
 
     /**
      *

@@ -183,10 +183,10 @@ class AccessUnit {
         /**
          *
          * @param pos
-         * @param type
+         * @param _type
          * @return
          */
-        Subsequence& getTokenType(uint16_t pos, uint8_t type);
+        Subsequence& getTokenType(uint16_t pos, uint8_t _type);
 
         /**
          * @brief

@@ -8,6 +8,7 @@
 
 #include <genie/util/runtime-exception.h>
 
+#include <algorithm>
 #include <iomanip>
 #include <ostream>
 

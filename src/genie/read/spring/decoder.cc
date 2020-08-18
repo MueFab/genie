@@ -4,11 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#define NOMINMAX
+
 #include "decoder.h"
 #include <algorithm>
 #include <array>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <stdexcept>
 #include <string>
@@ -217,8 +220,8 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end, size_t threads)
-    : combine_pairs(comb_p), num_thr(threads) {
+Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end)
+    : combine_pairs(comb_p) {
     basedir = working_dir;
 
     while (true) {

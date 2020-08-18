@@ -9,6 +9,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <array>
+
 #include <format-importer.h>
 #include <genie/core/record/record.h>
 #include <genie/core/stats/perf-stats.h>
@@ -32,7 +34,6 @@ class Importer : public core::FormatImporter {
     static constexpr size_t LINES_PER_RECORD = 4;  //!< @brief How many lines in a fastq file belong to one record
     size_t blockSize;                              //!< @brief How many records to read in one pump() run
     std::vector<std::istream *> file_list;         //!< @brief Input streams (paired files supported)
-    size_t record_counter;                         //!< @brief ID of next data chunk
     util::OrderedLock lock;                        //!< @brief Lock to ensure in order execution
 
     enum Lines { ID = 0, SEQUENCE = 1, RESERVED = 2, QUALITY = 3 };  //!< @brief FASTQ format lines

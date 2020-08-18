@@ -4,6 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include <algorithm>
 #include <limits>
 
 #include "data-block.h"
@@ -16,7 +17,7 @@ namespace util {
 // ---------------------------------------------------------------------------------------------------------------------
 
 BlockStepper util::DataBlock::getReader() const {
-    return BlockStepper(const_cast<uint8_t *>(data.data()), const_cast<uint8_t *>(data.end().base()),
+    return BlockStepper(const_cast<uint8_t *>(data.data()), const_cast<uint8_t *>(data.data() + data.size()),
                         static_cast<uint8_t>(getWordSize()));
     // TODO(Fabian): Add BlockStepper for const
 }

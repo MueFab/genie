@@ -39,7 +39,7 @@ class AlignmentBox {
      *
      * @param writer
      */
-    virtual void write(util::BitWriter& writer) const;
+    void write(util::BitWriter& writer) const;
 
     /**
      *

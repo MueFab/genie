@@ -228,12 +228,12 @@ void ReferenceManager::ReferenceExcerpt::mapChunkAt(size_t pos, std::shared_ptr<
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReferenceManager::ReferenceExcerpt::mapSection(size_t start, size_t end, ReferenceManager* mgr) {
+void ReferenceManager::ReferenceExcerpt::mapSection(size_t start, size_t end, ReferenceManager* _mgr) {
     for (size_t i = start; i < end; i += CHUNK_SIZE) {
         if (isMapped(i)) {
             continue;
         }
-        mapChunkAt(i, mgr->loadAt(ref_name, i));
+        mapChunkAt(i, _mgr->loadAt(ref_name, i));
     }
 }
 

@@ -39,7 +39,7 @@ class QVEncoder {
     /**
      * @brief For polymorphic destruction
      */
-    ~QVEncoder() = default;
+    virtual ~QVEncoder() = default;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

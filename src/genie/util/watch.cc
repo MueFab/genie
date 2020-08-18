@@ -18,7 +18,7 @@ Watch::Watch() { reset(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Watch::reset() {
-    start = std::chrono::high_resolution_clock::now();
+    start = std::chrono::steady_clock::now();
     offset = 0;
     paused = false;
 }
@@ -29,9 +29,9 @@ double Watch::check() const {
     if (paused) {
         return offset;
     } else {
-        return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start)
+        return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start)
                        .count() /
-                   1e6 +
+                   1e3 +
                offset;
     }
 }
@@ -43,9 +43,9 @@ void Watch::pause() {
         return;
     }
     paused = true;
-    offset += std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start)
+    offset += std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start)
                   .count() /
-              1e6;
+              1e3;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ void Watch::resume() {
         return;
     }
     paused = false;
-    start = std::chrono::high_resolution_clock::now();
+    start = std::chrono::steady_clock::now();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

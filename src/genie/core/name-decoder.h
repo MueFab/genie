@@ -31,7 +31,7 @@ class NameDecoder {
     /**
      * @brief For polymorphic destruction
      */
-    ~NameDecoder() = default;
+    virtual ~NameDecoder() = default;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
