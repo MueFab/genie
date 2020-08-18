@@ -5,7 +5,6 @@
  */
 
 #include <algorithm>
-#include <limits>
 
 #include "data-block.h"
 
@@ -75,18 +74,18 @@ void util::DataBlock::swap(util::DataBlock *const d) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DataBlock::DataBlock(size_t size, size_t wsize) {
+DataBlock::DataBlock(size_t size, uint8_t wsize) : lgWordSize(0) {
     setWordSize(wsize);
     data.resize(size * wsize);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DataBlock::DataBlock(std::vector<uint8_t> *vec) : lgWordSize(1) { this->data.swap(*vec); }
+DataBlock::DataBlock(std::vector<uint8_t> *vec) : lgWordSize(0) { this->data.swap(*vec); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DataBlock::DataBlock(std::string *vec) : lgWordSize(1) {
+DataBlock::DataBlock(std::string *vec) : lgWordSize(0) {
     size_t size = vec->size() * sizeof(char);
     this->data.resize(size);
     this->data.shrink_to_fit();
@@ -96,25 +95,12 @@ DataBlock::DataBlock(std::string *vec) : lgWordSize(1) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DataBlock::DataBlock(const uint8_t *d, size_t size, uint8_t word_size) {
+DataBlock::DataBlock(const uint8_t *d, size_t size, uint8_t word_size) : lgWordSize(0) {
     setWordSize(word_size);
     size_t s = size * word_size;
     this->data.resize(s);
     this->data.shrink_to_fit();
     std::memcpy(this->data.data(), d, s);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t util::DataBlock::getMaximum() const {
-    BlockStepper r = getReader();
-    uint64_t max = std::numeric_limits<uint64_t>::min();
-    while (r.isValid()) {
-        uint64_t symbol = r.get();
-        max = std::max(max, symbol);
-        r.inc();
-    }
-    return max;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

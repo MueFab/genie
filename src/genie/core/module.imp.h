@@ -22,7 +22,7 @@ void Module<Tin, Tout>::skipIn(const util::Section& id) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Tin, typename Tout>
-void Module<Tin, Tout>::flushIn(size_t& pos) {
+void Module<Tin, Tout>::flushIn(uint64_t& pos) {
     util::Source<Tout>::flushOut(pos);
 }
 

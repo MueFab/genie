@@ -27,7 +27,7 @@ ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::
     alphabet_ID = bitReader.read<AlphabetID>();
     read_length = bitReader.read<uint32_t>(24);
     number_of_template_segments_minus1 = bitReader.read<uint8_t>(2);
-    bitReader.read(6);
+    bitReader.read_b(6);
     max_au_data_unit_size = bitReader.read<uint32_t>(29);
     pos_40_bits_flag = bitReader.read<bool>(1);
     qv_depth = bitReader.read<uint8_t>(3);

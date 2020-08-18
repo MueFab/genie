@@ -31,7 +31,7 @@ std::string &trim(std::string &s, const char *t) { return ltrim(rtrim(s, t), t);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<std::string> tokenize(const std::string& str, const char delim) {
+std::vector<std::string> tokenize(const std::string &str, const char delim) {
     size_t start;
     size_t end = 0;
     std::vector<std::string> out;

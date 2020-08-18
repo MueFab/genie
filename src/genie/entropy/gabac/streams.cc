@@ -113,7 +113,8 @@ std::streambuf::pos_type DataBlockBuffer::seekoff(off_type off, std::ios_base::s
     if (dir == std::ios_base::cur)
         pos = (off < 0 && size_t(std::abs(off)) > pos) ? 0 : std::min<size_t>(pos + off, block.size());
     else if (dir == std::ios_base::end)
-        pos = (off < 0 && size_t(std::abs(off)) > block.size()) ? 0 : std::min<size_t>(block.size() + off, block.size());
+        pos =
+            (off < 0 && size_t(std::abs(off)) > block.size()) ? 0 : std::min<size_t>(block.size() + off, block.size());
     else if (dir == std::ios_base::beg)
         pos = (off < 0 && std::abs(off) > 0) ? 0 : std::min<size_t>(size_t(0) + off, block.size());
     return pos;

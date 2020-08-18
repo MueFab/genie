@@ -38,7 +38,7 @@ class Exporter : public core::FormatExporter {
      *
      * @param id
      */
-    void flushIn(size_t& id) override;
+    void flushIn(uint64_t& id) override;
 
     /**
      *

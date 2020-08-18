@@ -25,7 +25,7 @@ OtherRec::OtherRec(uint64_t _next_pos, uint16_t _next_seq_ID)
 
 OtherRec::OtherRec(util::BitReader &reader)
     : AlignmentExternal(AlignmentExternal::Type::OTHER_REC),
-      next_pos(reader.read(40)),
+      next_pos(reader.read<uint64_t>(40)),
       next_seq_ID(reader.read<uint16_t>()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

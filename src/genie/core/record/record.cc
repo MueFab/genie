@@ -6,7 +6,6 @@
 
 #include <algorithm>
 
-#include "record.h"
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 #include <genie/util/make-unique.h>
@@ -14,6 +13,7 @@
 #include "alignment-box.h"
 #include "alignment-shared-data.h"
 #include "alignment_external/none.h"
+#include "record.h"
 #include "segment.h"
 
 // ---------------------------------------------------------------------------------------------------------------------

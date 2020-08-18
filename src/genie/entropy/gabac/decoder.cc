@@ -52,8 +52,8 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
         gabac::IBufferStream stream(&tmp);
         util::BitReader reader(stream);
 
-        uint16_t type_id = reader.read(4);
-        uint16_t method = reader.read(4);
+        uint16_t type_id = reader.read<uint16_t>(4);
+        uint16_t method = reader.read<uint16_t>(4);
 
         if (type_id == 0) typeNum++;
         size_t mappedTypeId = (typeNum << 4u) | (type_id & 0xfu);

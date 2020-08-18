@@ -37,8 +37,8 @@ AccessUnit::AccessUnit(const std::map<size_t, core::parameter::ParameterSet> &pa
     : DataUnit(DataUnitType::ACCESS_UNIT) {
     UTILS_DIE_IF(!bitReader.isAligned(), "Bitreader not aligned");
     uint64_t bitreader_pos = bitReader.getBitsRead() / 8 - 1;
-    bitReader.read(3);
-    uint32_t du_size = bitReader.read(29);
+    bitReader.read_b(3);
+    uint32_t du_size = bitReader.read<uint32_t>(29);
 
     access_unit_ID = bitReader.read<uint32_t>();
     num_blocks = bitReader.read<uint8_t>();

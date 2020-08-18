@@ -89,17 +89,16 @@ bool Date::leapYear() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Date Date::fromString(const std::string& string) {
-
     UTILS_DIE_IF(!std::regex_match(string, std::regex(getRegex())), "Invalid date");
 
     auto date_time = tokenize(string, 'T');
     auto date = tokenize(date_time.front(), '-');
     if (date_time.size() == 1) {
-        return Date(std::stoi(date[0]), std::stoi(date[1]), std::stoi(date[2]));
+        return {uint16_t(std::stoi(date[0])), uint8_t(std::stoi(date[1])), uint8_t(std::stoi(date[2]))};
     } else if (date_time.size() == 2) {
         auto time = tokenize(date_time.back(), ':');
-        return Date(std::stoi(date[0]), std::stoi(date[1]), std::stoi(date[2]), std::stoi(time[0]), std::stoi(time[1]),
-                    std::stoi(time[2]));
+        return {uint16_t(std::stoi(date[0])), uint8_t(std::stoi(date[1])), uint8_t(std::stoi(date[2])),
+                uint8_t(std::stoi(time[0])),  uint8_t(std::stoi(time[1])), uint8_t(std::stoi(time[2]))};
     } else {
         UTILS_DIE("Invalid date");
     }
@@ -125,12 +124,12 @@ std::string Date::toString() const {
     std::string ret;
     ret += std::to_string(year);
     ret += '-';
-    if(month < 10) {
+    if (month < 10) {
         ret += '0';
     }
     ret += std::to_string(month);
     ret += '-';
-    if(day < 10) {
+    if (day < 10) {
         ret += '0';
     }
     ret += std::to_string(day);
@@ -138,17 +137,17 @@ std::string Date::toString() const {
         return ret;
     }
     ret += 'T';
-    if(hour < 10) {
+    if (hour < 10) {
         ret += '0';
     }
     ret += std::to_string(hour);
     ret += ':';
-    if(minute < 10) {
+    if (minute < 10) {
         ret += '0';
     }
     ret += std::to_string(minute);
     ret += ':';
-    if(second < 10) {
+    if (second < 10) {
         ret += '0';
     }
     ret += std::to_string(second);

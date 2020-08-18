@@ -16,14 +16,14 @@ namespace util {
 
 template <typename T, typename>
 T BitReader::read() {
-    return static_cast<T>(read(sizeof(T) * 8));
+    return static_cast<T>(read_b(sizeof(T) * 8));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T, typename>
-T BitReader::read(size_t s) {
-    return static_cast<T>(read(s));
+T BitReader::read(uint8_t s) {
+    return static_cast<T>(read_b(s));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -16,8 +16,7 @@ namespace mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Importer::Importer(size_t _blockSize, std::istream& _file_1)
-    : blockSize(_blockSize), reader(_file_1) {}
+Importer::Importer(size_t _blockSize, std::istream& _file_1) : blockSize(_blockSize), reader(_file_1) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

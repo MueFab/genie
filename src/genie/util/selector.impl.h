@@ -15,13 +15,6 @@ namespace util {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Tin, typename Tout>
-Selector<Tin, Tout>::Selector(std::function<size_t(const Tin& t)> select) : head(select) {
-    head.setTail(&tail);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename Tin, typename Tout>
 void Selector<Tin, Tout>::addBranch(genie::util::Drain<Tin>* entry, genie::util::Source<Tout>* out) {
     head.add(entry);
     tail.addMod();
@@ -53,7 +46,7 @@ void Selector<Tin, Tout>::flowIn(Tin&& t, const util::Section& id) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Tin, typename Tout>
-void Selector<Tin, Tout>::flushIn(size_t& pos) {
+void Selector<Tin, Tout>::flushIn(uint64_t& pos) {
     head.flushIn(pos);
 }
 

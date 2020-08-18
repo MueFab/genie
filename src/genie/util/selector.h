@@ -37,12 +37,6 @@ class Selector : public genie::util::Drain<Tin>, public genie::util::Source<Tout
    public:
     /**
      *
-     * @param select
-     */
-    explicit Selector(std::function<size_t(const Tin& t)> select);
-
-    /**
-     *
      */
     Selector() = default;
 
@@ -73,7 +67,7 @@ class Selector : public genie::util::Drain<Tin>, public genie::util::Source<Tout
      *
      * @param pos
      */
-    void flushIn(size_t& pos) override;
+    void flushIn(uint64_t& pos) override;
 
     /**
      *

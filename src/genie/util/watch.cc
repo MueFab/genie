@@ -13,7 +13,7 @@ namespace util {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Watch::Watch() { reset(); }
+Watch::Watch() : paused(false) { reset(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,8 +29,7 @@ double Watch::check() const {
     if (paused) {
         return offset;
     } else {
-        return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start)
-                       .count() /
+        return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count() /
                    1e3 +
                offset;
     }
@@ -43,9 +42,8 @@ void Watch::pause() {
         return;
     }
     paused = true;
-    offset += std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start)
-                  .count() /
-              1e3;
+    offset +=
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count() / 1e3;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

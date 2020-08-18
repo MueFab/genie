@@ -18,14 +18,12 @@ namespace util {
 
 thread_local size_t ThreadManager::threadID;
 thread_local size_t ThreadManager::threadNum;
-thread_local ThreadManager* ThreadManager::localManager;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ThreadManager::action(size_t id) {
     ThreadManager::threadID = id;
     ThreadManager::threadNum = threads.size();
-    ThreadManager::localManager = this;
     try {
         for (const auto& s : source) {
             while (!stopFlag && s->pump(counter, lock)) {
@@ -51,7 +49,7 @@ void ThreadManager::setSource(std::vector<OriginalSource*> src) { source = std::
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t ThreadManager::run() {
+uint64_t ThreadManager::run() {
     size_t ctr = 0;
     for (auto& t : threads) {
         t = std::thread(&ThreadManager::action, this, ctr++);

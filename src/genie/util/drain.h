@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstddef>
+#include <cstdint>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,7 +23,7 @@ namespace util {
 struct Section {
     size_t start;     //!< @brief ID of first record
     size_t length;    //!< @brief Number of records
-    bool strongSkip;  //!< @brief If hte pipeline branches and branches are merged again, anly skipIn() with strongSkip
+    bool strongSkip;  //!< @brief If hte pipeline branches and branches are merged again, only skipIn() with strongSkip
                       //!< == true will pass through the merging point.
 };
 
@@ -43,7 +44,7 @@ class Drain {
     /**
      * @brief Signals that no further data (and calls to flowIn) will be available.
      */
-    virtual void flushIn(size_t& pos) = 0;
+    virtual void flushIn(uint64_t& pos) = 0;
 
     /**
      * @brief For inheritance.

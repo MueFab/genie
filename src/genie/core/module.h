@@ -33,7 +33,7 @@ class Module : public util::Source<Tout>, public util::Drain<Tin> {
     /**
      *
      */
-    void flushIn(size_t& pos) override;
+    void flushIn(uint64_t& pos) override;
 
     /**
      *

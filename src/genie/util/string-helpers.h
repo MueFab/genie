@@ -48,10 +48,10 @@ std::string &trim(std::string &s, const char *t = ws);
 /**
  * @brief Splits a string at a delimiting character.
  * @param str String to tokenize.
- * @param delim Delimiting charakter, e.g. ' '.
- * @return Vector of tokens. The delimiting charakter will not be included.
+ * @param delim Delimiting character, e.g. ' '.
+ * @return Vector of tokens. The delimiting character will not be included.
  */
-std::vector<std::string> tokenize(const std::string& str, char delim);
+std::vector<std::string> tokenize(const std::string &str, char delim);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

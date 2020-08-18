@@ -99,13 +99,13 @@ class Decoder : public genie::core::ReadDecoder {
      * @param r
      * @param pos
      */
-    void add(core::record::Chunk& chunk, core::record::Record&& r, size_t& pos);
+    void add(core::record::Chunk& chunk, core::record::Record&& r, uint64_t& pos);
 
     /**
      *
      * @param pos
      */
-    void flushIn(size_t& pos) override;
+    void flushIn(uint64_t& pos) override;
 
     /**
      *

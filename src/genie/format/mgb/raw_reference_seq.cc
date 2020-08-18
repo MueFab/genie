@@ -38,8 +38,8 @@ const std::string& RawReferenceSequence::getSequence() const { return ref_sequen
 
 RawReferenceSequence::RawReferenceSequence(util::BitReader& reader, bool headerOnly) {
     sequence_ID = reader.read<uint16_t>();
-    seq_start = reader.read(40);
-    seq_end = reader.read(40);
+    seq_start = reader.read<uint64_t>(40);
+    seq_end = reader.read<uint64_t>(40);
     if (!headerOnly) {
         ref_sequence.resize(seq_end - seq_start + 1);
         reader.readBypass(&ref_sequence[0], seq_end - seq_start + 1);

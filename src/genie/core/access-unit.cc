@@ -236,7 +236,7 @@ AccessUnit::Descriptor::Descriptor(GenDesc _id, size_t count, size_t remainingSi
     for (size_t i = 0; i < count; ++i) {
         size_t s = 0;
         if (i < (count - 1)) {
-            s = reader.read(32);
+            s = reader.read<size_t>(32);
             remainingSize -= (s + 4);
         } else {
             s = remainingSize;

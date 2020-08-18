@@ -9,6 +9,10 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <functional>
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace util {
 
@@ -45,12 +49,6 @@ class SelectorHead : public genie::util::Drain<Tin> {
 
     /**
      *
-     * @param _selector
-     */
-    explicit SelectorHead(std::function<size_t(const Tin& t)> _selector);
-
-    /**
-     *
      * @param mod
      */
     void add(genie::util::Drain<Tin>* mod);
@@ -77,7 +75,7 @@ class SelectorHead : public genie::util::Drain<Tin> {
      *
      * @param pos
      */
-    void flushIn(size_t& pos) override;
+    void flushIn(uint64_t& pos) override;
 
     /**
      *

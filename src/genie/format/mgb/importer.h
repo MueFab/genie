@@ -32,11 +32,11 @@ namespace mgb {
  */
 class Importer : public core::FormatImporterCompressed, public core::ReferenceSource {
    private:
-    util::BitReader reader;                //!<
-    std::mutex lock;                       //!<
-    mgb::DataUnitFactory factory;          //!<
-    core::ReferenceManager* ref_manager;   //!<
-    core::RefDecoder* decoder;             //!<
+    util::BitReader reader;               //!<
+    std::mutex lock;                      //!<
+    mgb::DataUnitFactory factory;         //!<
+    core::ReferenceManager* ref_manager;  //!<
+    core::RefDecoder* decoder;            //!<
 
     /**
      *
@@ -62,7 +62,7 @@ class Importer : public core::FormatImporterCompressed, public core::ReferenceSo
      * @param lock
      * @return
      */
-    bool pump(size_t& id, std::mutex& lock) override;
+    bool pump(uint64_t& id, std::mutex& lock) override;
 
     /**
      *

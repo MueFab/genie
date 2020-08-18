@@ -25,7 +25,7 @@ Importer::Importer(std::istream& _file, core::ReferenceManager* manager, core::R
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Importer::pump(size_t& id, std::mutex&) {
+bool Importer::pump(uint64_t& id, std::mutex&) {
     util::Watch watch;
     boost::optional<mgb::AccessUnit> unit;
     util::Section sec{};

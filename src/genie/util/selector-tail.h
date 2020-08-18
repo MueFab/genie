@@ -55,7 +55,7 @@ class SelectorTail : public genie::util::Source<Tout>, public genie::util::Drain
      *
      * @param pos
      */
-    void flushIn(size_t& pos) override;
+    void flushIn(uint64_t& pos) override;
 
     /**
      *
