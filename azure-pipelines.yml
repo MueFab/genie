@@ -1,5 +1,6 @@
 trigger:
 - master
+- develop
 
 strategy:
   matrix:
@@ -15,14 +16,19 @@ pool:
 
 steps:
 - script: |
-    mkdir cmake-build-release
-    cd cmake-build-release
-    cmake .. -DCMAKE_BUILD_TYPE=Release
+    mkdir cmake-build-debug
+    cd cmake-build-debug
+    cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=ON
     make --jobs
   displayName: 'Run CMake & Make'
 
 - script: |
+    echo 'Run genie unit tests'
+    ./cmake-build-debug/bin/util-tests
+  displayName: 'Run genie unit tests'
+
+- script: |
     echo 'Run GABAC Roundtrips'
-    ./ci/gabac-roundtrips.sh
+    ./ci/gabac-roundtrip.sh
   displayName: 'Run GABAC Roundtrips'
 
