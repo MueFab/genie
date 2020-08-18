@@ -72,7 +72,7 @@ class Segment {
      *
      * @param write
      */
-    virtual void write(util::BitWriter& write) const;
+    void write(util::BitWriter& write) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

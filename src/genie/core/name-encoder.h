@@ -36,7 +36,7 @@ class NameEncoder {
     /**
      * @brief For polymorphic destruction
      */
-    ~NameEncoder() = default;
+    virtual ~NameEncoder() = default;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -103,16 +103,16 @@ inline void DataBlock::push_back(uint64_t val) {
     data.resize(data.size() + getWordSize());
     switch (lgWordSize) {
         case 0:
-            *reinterpret_cast<uint8_t *>(data.end().base() - 1) = static_cast<uint8_t>(val);
+            *reinterpret_cast<uint8_t *>(&*(data.end() - 1)) = static_cast<uint8_t>(val);
             return;
         case 1:
-            *reinterpret_cast<uint16_t *>(data.end().base() - 2) = static_cast<uint16_t>(val);
+            *reinterpret_cast<uint16_t *>(&*(data.end() - 2)) = static_cast<uint16_t>(val);
             return;
         case 2:
-            *reinterpret_cast<uint32_t *>(data.end().base() - 4) = static_cast<uint32_t>(val);
+            *reinterpret_cast<uint32_t *>(&*(data.end() - 4)) = static_cast<uint32_t>(val);
             return;
         case 3:
-            *reinterpret_cast<uint64_t *>(data.end().base() - 8) = static_cast<uint64_t>(val);
+            *reinterpret_cast<uint64_t *>(&*(data.end() - 8)) = static_cast<uint64_t>(val);
             return;
         default:
             break;

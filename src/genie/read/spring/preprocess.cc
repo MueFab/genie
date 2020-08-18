@@ -4,14 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#define NOMINMAX
+
 #include "preprocess.h"
 #include <genie/core/record/record.h>
 #include <genie/util/drain.h>
 #include <genie/util/ordered-section.h>
 #include <algorithm>
+#include <limits>
 #include <cstdio>
 #include <iostream>
 #include <string>
+#include <cstdint>
 #include "params.h"
 #include "util.h"
 

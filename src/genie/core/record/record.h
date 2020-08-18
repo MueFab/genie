@@ -144,7 +144,7 @@ class Record {
      *
      * @param writer
      */
-    virtual void write(util::BitWriter& writer) const;
+    void write(util::BitWriter& writer) const;
 
     /**
      *

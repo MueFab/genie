@@ -31,7 +31,6 @@ class Importer : public core::FormatImporter {
    private:
     size_t blockSize;        //!<
     util::BitReader reader;  //!<
-    size_t record_counter;   //!<
 
    public:
     /**

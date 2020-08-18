@@ -9,6 +9,7 @@
 #include <genie/core/constants.h>
 #include <genie/core/record/alignment_split/same-rec.h>
 
+#include <algorithm>
 #include <iostream>
 #include <limits>
 #include <map>

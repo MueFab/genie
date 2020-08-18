@@ -56,71 +56,71 @@ using GenSubIndex = std::pair<GenDesc, uint16_t>;
  *
  */
 struct GenSub {
-    static constexpr GenSubIndex POS_MAPPING_FIRST = {GenDesc::POS, 0};
-    static constexpr GenSubIndex POS_MAPPING_ADDITIONAL = {GenDesc::POS, 1};
+    static const GenSubIndex POS_MAPPING_FIRST;
+    static const GenSubIndex POS_MAPPING_ADDITIONAL;
 
-    static constexpr GenSubIndex RCOMP = {GenDesc::RCOMP, 0};
+    static const GenSubIndex RCOMP;
 
-    static constexpr GenSubIndex FLAGS_PCR_DUPLICATE = {GenDesc::FLAGS, 0};
-    static constexpr GenSubIndex FLAGS_QUALITY_FAIL = {GenDesc::FLAGS, 1};
-    static constexpr GenSubIndex FLAGS_PROPER_PAIR = {GenDesc::FLAGS, 2};
+    static const GenSubIndex FLAGS_PCR_DUPLICATE;
+    static const GenSubIndex FLAGS_QUALITY_FAIL;
+    static const GenSubIndex FLAGS_PROPER_PAIR;
 
-    static constexpr GenSubIndex MMPOS_TERMINATOR = {GenDesc::MMPOS, 0};
-    static constexpr GenSubIndex MMPOS_POSITION = {GenDesc::MMPOS, 1};
+    static const GenSubIndex MMPOS_TERMINATOR;
+    static const GenSubIndex MMPOS_POSITION;
 
-    static constexpr GenSubIndex MMTYPE_TYPE = {GenDesc::MMTYPE, 0};
-    static constexpr GenSubIndex MMTYPE_SUBSTITUTION = {GenDesc::MMTYPE, 1};
-    static constexpr GenSubIndex MMTYPE_INSERTION = {GenDesc::MMTYPE, 2};
+    static const GenSubIndex MMTYPE_TYPE;
+    static const GenSubIndex MMTYPE_SUBSTITUTION;
+    static const GenSubIndex MMTYPE_INSERTION;
 
-    static constexpr GenSubIndex CLIPS_RECORD_ID = {GenDesc::CLIPS, 0};
-    static constexpr GenSubIndex CLIPS_TYPE = {GenDesc::CLIPS, 1};
-    static constexpr GenSubIndex CLIPS_SOFT_STRING = {GenDesc::CLIPS, 2};
-    static constexpr GenSubIndex CLIPS_HARD_LENGTH = {GenDesc::CLIPS, 3};
+    static const GenSubIndex CLIPS_RECORD_ID;
+    static const GenSubIndex CLIPS_TYPE;
+    static const GenSubIndex CLIPS_SOFT_STRING;
+    static const GenSubIndex CLIPS_HARD_LENGTH;
 
-    static constexpr GenSubIndex UREADS = {GenDesc::UREADS, 0};
+    static const GenSubIndex UREADS;
 
-    static constexpr GenSubIndex RLEN = {GenDesc::RLEN, 0};
+    static const GenSubIndex RLEN;
 
-    static constexpr GenSubIndex PAIR_DECODING_CASE = {GenDesc::PAIR, 0};
-    static constexpr GenSubIndex PAIR_SAME_REC = {GenDesc::PAIR, 1};
-    static constexpr GenSubIndex PAIR_R1_SPLIT = {GenDesc::PAIR, 2};
-    static constexpr GenSubIndex PAIR_R2_SPLIT = {GenDesc::PAIR, 3};
-    static constexpr GenSubIndex PAIR_R1_DIFF_SEQ = {GenDesc::PAIR, 4};
-    static constexpr GenSubIndex PAIR_R2_DIFF_SEQ = {GenDesc::PAIR, 5};
-    static constexpr GenSubIndex PAIR_R1_DIFF_POS = {GenDesc::PAIR, 6};
-    static constexpr GenSubIndex PAIR_R2_DIFF_POS = {GenDesc::PAIR, 7};
+    static const GenSubIndex PAIR_DECODING_CASE;
+    static const GenSubIndex PAIR_SAME_REC;
+    static const GenSubIndex PAIR_R1_SPLIT;
+    static const GenSubIndex PAIR_R2_SPLIT;
+    static const GenSubIndex PAIR_R1_DIFF_SEQ;
+    static const GenSubIndex PAIR_R2_DIFF_SEQ;
+    static const GenSubIndex PAIR_R1_DIFF_POS;
+    static const GenSubIndex PAIR_R2_DIFF_POS;
 
-    static constexpr GenSubIndex MSCORE = {GenDesc::MSCORE, 0};
+    static const GenSubIndex MSCORE;
 
-    static constexpr GenSubIndex MMAP_NUMBER_ALIGN = {GenDesc::MMAP, 0};
-    static constexpr GenSubIndex MMAP_RIGHT_ALIGN_ID = {GenDesc::MMAP, 1};
-    static constexpr GenSubIndex MMAP_OTHER_REC_FLAG = {GenDesc::MMAP, 2};
-    static constexpr GenSubIndex MMAP_REF_SEQ = {GenDesc::MMAP, 3};
-    static constexpr GenSubIndex MMAP_REF_POS = {GenDesc::MMAP, 4};
+    static const GenSubIndex MMAP_NUMBER_ALIGN;
+    static const GenSubIndex MMAP_RIGHT_ALIGN_ID;
+    static const GenSubIndex MMAP_OTHER_REC_FLAG;
+    static const GenSubIndex MMAP_REF_SEQ;
+    static const GenSubIndex MMAP_REF_POS;
 
-    static constexpr GenSubIndex MSAR_CABAC_0 = {GenDesc::MSAR, 0};
-    static constexpr GenSubIndex MSAR_CABAC_1 = {GenDesc::MSAR, 1};
+    static const GenSubIndex MSAR_CABAC_0;
+    static const GenSubIndex MSAR_CABAC_1;
 
-    static constexpr GenSubIndex RTYPE = {GenDesc::RTYPE, 0};
+    static const GenSubIndex RTYPE;
 
-    static constexpr GenSubIndex RGROUP = {GenDesc::RGROUP, 0};
+    static const GenSubIndex RGROUP;
 
-    static constexpr GenSubIndex QV_PRESENT = {GenDesc::QV, 0};
-    static constexpr GenSubIndex QV_CODEBOOK = {GenDesc::QV, 1};
-    static constexpr GenSubIndex QV_STEPS_0 = {GenDesc::QV, 2};
-    static constexpr GenSubIndex QV_STEPS_1 = {GenDesc::QV, 3};
-    static constexpr GenSubIndex QV_STEPS_2 = {GenDesc::QV, 4};
-    static constexpr GenSubIndex QV_STEPS_3 = {GenDesc::QV, 5};
-    static constexpr GenSubIndex QV_STEPS_4 = {GenDesc::QV, 6};
-    static constexpr GenSubIndex QV_STEPS_5 = {GenDesc::QV, 7};
-    static constexpr GenSubIndex QV_STEPS_6 = {GenDesc::QV, 8};
+    static const GenSubIndex QV_PRESENT;
+    static const GenSubIndex QV_CODEBOOK;
+    static const GenSubIndex QV_STEPS_0;
+    static const GenSubIndex QV_STEPS_1;
+    static const GenSubIndex QV_STEPS_2;
+    static const GenSubIndex QV_STEPS_3;
+    static const GenSubIndex QV_STEPS_4;
+    static const GenSubIndex QV_STEPS_5;
+    static const GenSubIndex QV_STEPS_6;
 
-    static constexpr GenSubIndex RNAME_CABAC_0 = {GenDesc::RNAME, 0};
-    static constexpr GenSubIndex RNAME_CABAC_1 = {GenDesc::RNAME, 1};
+    static const GenSubIndex RNAME_CABAC_0;
+    static const GenSubIndex RNAME_CABAC_1;
 
-    static constexpr GenSubIndex RFTP = {GenDesc::RFTP, 0};
+    static const GenSubIndex RFTP;
 
-    static constexpr GenSubIndex RFTT = {GenDesc::RFTT, 0};
+    static const GenSubIndex RFTT;
 };
 
 /**

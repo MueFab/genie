@@ -149,9 +149,9 @@ class ReferenceManager {
          *
          * @param start
          * @param end
-         * @param mgr
+         * @param _mgr
          */
-        void mapSection(size_t start, size_t end, ReferenceManager* mgr);
+        void mapSection(size_t start, size_t end, ReferenceManager* _mgr);
 
         /**
          *

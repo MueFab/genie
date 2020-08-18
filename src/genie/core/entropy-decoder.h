@@ -26,7 +26,7 @@ class EntropyDecoder {
     /**
      *
      */
-    ~EntropyDecoder() = default;
+    virtual ~EntropyDecoder() = default;
 
     /**
      *

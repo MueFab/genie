@@ -10,20 +10,31 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void active_sleep(int64_t milliseconds) {
+    auto start = std::chrono::steady_clock::now();
+    while(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count() < milliseconds) {
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(WatchTest, Watch) {
     genie::util::Watch watch;
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    active_sleep(500);
     watch.pause();
-    EXPECT_TRUE(watch.check() > 0.49 && watch.check() < 0.51);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    EXPECT_TRUE(watch.check() > 0.49 && watch.check() < 0.51);
+    EXPECT_GT(watch.check(), 0.49);
+    EXPECT_LT(watch.check(), 0.51);
+    active_sleep(500);
+    EXPECT_GT(watch.check(), 0.49);
+    EXPECT_LT(watch.check(), 0.51);
     watch.resume();
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    active_sleep(500);
     watch.pause();
-    EXPECT_TRUE(watch.check() > 0.99 && watch.check() < 1.01);
+    EXPECT_GT(watch.check(), 0.99);
+    EXPECT_LT(watch.check(), 1.01);
     watch.reset();
     watch.pause();
-    EXPECT_TRUE(watch.check() < 0.01);
+    EXPECT_LT(watch.check() ,0.01);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

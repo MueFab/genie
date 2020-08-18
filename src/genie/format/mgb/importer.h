@@ -34,7 +34,6 @@ class Importer : public core::FormatImporterCompressed, public core::ReferenceSo
    private:
     util::BitReader reader;                //!<
     std::mutex lock;                       //!<
-    genie::core::stats::PerfStats* stats;  //!<
     mgb::DataUnitFactory factory;          //!<
     core::ReferenceManager* ref_manager;   //!<
     core::RefDecoder* decoder;             //!<
@@ -55,8 +54,7 @@ class Importer : public core::FormatImporterCompressed, public core::ReferenceSo
      * @param refOnly
      * @param _stats
      */
-    explicit Importer(std::istream& _file, core::ReferenceManager* manager, core::RefDecoder* refd, bool refOnly,
-                      genie::core::stats::PerfStats* _stats = nullptr);
+    explicit Importer(std::istream& _file, core::ReferenceManager* manager, core::RefDecoder* refd, bool refOnly);
 
     /**
      *

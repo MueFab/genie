@@ -90,8 +90,8 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
     auto lld = genie::util::make_unique<genie::read::lowlatency::Decoder>();
     ret->setRefDecoder(lld.get());
     ret->addReadCoder(std::move(lld));
-    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, true, false, threads));
-    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, true, true, threads));
+    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, true, false));
+    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, true, true));
     ret->setReadCoderSelector([](const genie::core::AccessUnit& au) -> size_t {
         if (au.getParameters().isComputedReference()) {
             switch (au.getParameters().getComputedRef().getAlgorithm()) {

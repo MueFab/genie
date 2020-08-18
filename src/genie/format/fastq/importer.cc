@@ -18,12 +18,12 @@ namespace fastq {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Importer::Importer(size_t _blockSize, std::istream &_file_1)
-    : blockSize(_blockSize), file_list{&_file_1}, record_counter(0) {}
+    : blockSize(_blockSize), file_list{&_file_1} {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 Importer::Importer(size_t _blockSize, std::istream &_file_1, std::istream &_file_2)
-    : blockSize(_blockSize), file_list{&_file_1, &_file_2}, record_counter(0) {}
+    : blockSize(_blockSize), file_list{&_file_1, &_file_2} {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

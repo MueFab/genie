@@ -71,8 +71,8 @@ const AccessUnit::Subsequence &AccessUnit::Descriptor::get(uint16_t sub) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Subsequence &AccessUnit::Descriptor::getTokenType(uint16_t pos, uint8_t type) {
-    uint16_t s_id = ((pos << 4u) | (type & 0xfu));
+AccessUnit::Subsequence &AccessUnit::Descriptor::getTokenType(uint16_t pos, uint8_t _type) {
+    uint16_t s_id = ((pos << 4u) | (_type & 0xfu));
     while (subdesc.size() <= s_id) {
         subdesc.emplace_back(4, GenSubIndex(getID(), subdesc.size()));
     }

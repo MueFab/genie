@@ -33,7 +33,7 @@ class QVDecoder {
     /**
      * @brief For polymorphic destruction
      */
-    ~QVDecoder() = default;
+    virtual ~QVDecoder() = default;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

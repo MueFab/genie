@@ -14,71 +14,71 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-constexpr GenSubIndex GenSub::POS_MAPPING_FIRST;
-constexpr GenSubIndex GenSub::POS_MAPPING_ADDITIONAL;
+const GenSubIndex GenSub::POS_MAPPING_FIRST = std::make_pair(GenDesc::POS, 0);
+const GenSubIndex GenSub::POS_MAPPING_ADDITIONAL = std::make_pair(GenDesc::POS, 1);
 
-constexpr GenSubIndex GenSub::RCOMP;
+const GenSubIndex GenSub::RCOMP = std::make_pair(GenDesc::RCOMP, 0);
 
-constexpr GenSubIndex GenSub::FLAGS_PCR_DUPLICATE;
-constexpr GenSubIndex GenSub::FLAGS_QUALITY_FAIL;
-constexpr GenSubIndex GenSub::FLAGS_PROPER_PAIR;
+const GenSubIndex GenSub::FLAGS_PCR_DUPLICATE = std::make_pair(GenDesc::FLAGS, 0);
+const GenSubIndex GenSub::FLAGS_QUALITY_FAIL = std::make_pair(GenDesc::FLAGS, 1);
+const GenSubIndex GenSub::FLAGS_PROPER_PAIR = std::make_pair(GenDesc::FLAGS, 2);
 
-constexpr GenSubIndex GenSub::MMPOS_TERMINATOR;
-constexpr GenSubIndex GenSub::MMPOS_POSITION;
+const GenSubIndex GenSub::MMPOS_TERMINATOR = std::make_pair(GenDesc::MMPOS, 0);
+const GenSubIndex GenSub::MMPOS_POSITION = std::make_pair(GenDesc::MMPOS, 1);
 
-constexpr GenSubIndex GenSub::MMTYPE_TYPE;
-constexpr GenSubIndex GenSub::MMTYPE_SUBSTITUTION;
-constexpr GenSubIndex GenSub::MMTYPE_INSERTION;
+const GenSubIndex GenSub::MMTYPE_TYPE = std::make_pair(GenDesc::MMTYPE, 0);
+const GenSubIndex GenSub::MMTYPE_SUBSTITUTION = std::make_pair(GenDesc::MMTYPE, 1);
+const GenSubIndex GenSub::MMTYPE_INSERTION = std::make_pair(GenDesc::MMTYPE, 2);
 
-constexpr GenSubIndex GenSub::CLIPS_RECORD_ID;
-constexpr GenSubIndex GenSub::CLIPS_TYPE;
-constexpr GenSubIndex GenSub::CLIPS_SOFT_STRING;
-constexpr GenSubIndex GenSub::CLIPS_HARD_LENGTH;
+const GenSubIndex GenSub::CLIPS_RECORD_ID = std::make_pair(GenDesc::CLIPS, 0);
+const GenSubIndex GenSub::CLIPS_TYPE = std::make_pair(GenDesc::CLIPS, 1);
+const GenSubIndex GenSub::CLIPS_SOFT_STRING = std::make_pair(GenDesc::CLIPS, 2);
+const GenSubIndex GenSub::CLIPS_HARD_LENGTH = std::make_pair(GenDesc::CLIPS, 3);
 
-constexpr GenSubIndex GenSub::UREADS;
+const GenSubIndex GenSub::UREADS = std::make_pair(GenDesc::UREADS, 0);
 
-constexpr GenSubIndex GenSub::RLEN;
+const GenSubIndex GenSub::RLEN = std::make_pair(GenDesc::RLEN, 0);
 
-constexpr GenSubIndex GenSub::PAIR_DECODING_CASE;
-constexpr GenSubIndex GenSub::PAIR_SAME_REC;
-constexpr GenSubIndex GenSub::PAIR_R1_SPLIT;
-constexpr GenSubIndex GenSub::PAIR_R2_SPLIT;
-constexpr GenSubIndex GenSub::PAIR_R1_DIFF_SEQ;
-constexpr GenSubIndex GenSub::PAIR_R2_DIFF_SEQ;
-constexpr GenSubIndex GenSub::PAIR_R1_DIFF_POS;
-constexpr GenSubIndex GenSub::PAIR_R2_DIFF_POS;
+const GenSubIndex GenSub::PAIR_DECODING_CASE = std::make_pair(GenDesc::PAIR, 0);
+const GenSubIndex GenSub::PAIR_SAME_REC = std::make_pair(GenDesc::PAIR, 1);
+const GenSubIndex GenSub::PAIR_R1_SPLIT = std::make_pair(GenDesc::PAIR, 2);
+const GenSubIndex GenSub::PAIR_R2_SPLIT = std::make_pair(GenDesc::PAIR, 3);
+const GenSubIndex GenSub::PAIR_R1_DIFF_SEQ = std::make_pair(GenDesc::PAIR, 4);
+const GenSubIndex GenSub::PAIR_R2_DIFF_SEQ = std::make_pair(GenDesc::PAIR, 5);
+const GenSubIndex GenSub::PAIR_R1_DIFF_POS = std::make_pair(GenDesc::PAIR, 6);
+const GenSubIndex GenSub::PAIR_R2_DIFF_POS = std::make_pair(GenDesc::PAIR, 7);
 
-constexpr GenSubIndex GenSub::MSCORE;
+const GenSubIndex GenSub::MSCORE = std::make_pair(GenDesc::MSCORE, 0);
 
-constexpr GenSubIndex GenSub::MMAP_NUMBER_ALIGN;
-constexpr GenSubIndex GenSub::MMAP_RIGHT_ALIGN_ID;
-constexpr GenSubIndex GenSub::MMAP_OTHER_REC_FLAG;
-constexpr GenSubIndex GenSub::MMAP_REF_SEQ;
-constexpr GenSubIndex GenSub::MMAP_REF_POS;
+const GenSubIndex GenSub::MMAP_NUMBER_ALIGN = std::make_pair(GenDesc::MMAP, 0);
+const GenSubIndex GenSub::MMAP_RIGHT_ALIGN_ID = std::make_pair(GenDesc::MMAP, 1);
+const GenSubIndex GenSub::MMAP_OTHER_REC_FLAG = std::make_pair(GenDesc::MMAP, 2);
+const GenSubIndex GenSub::MMAP_REF_SEQ = std::make_pair(GenDesc::MMAP, 3);
+const GenSubIndex GenSub::MMAP_REF_POS = std::make_pair(GenDesc::MMAP, 4);
 
-constexpr GenSubIndex GenSub::MSAR_CABAC_0;
-constexpr GenSubIndex GenSub::MSAR_CABAC_1;
+const GenSubIndex GenSub::MSAR_CABAC_0 = std::make_pair(GenDesc::MSAR, 0);
+const GenSubIndex GenSub::MSAR_CABAC_1 = std::make_pair(GenDesc::MSAR, 1);
 
-constexpr GenSubIndex GenSub::RTYPE;
+const GenSubIndex GenSub::RTYPE = std::make_pair(GenDesc::RTYPE, 0);
 
-constexpr GenSubIndex GenSub::RGROUP;
+const GenSubIndex GenSub::RGROUP = std::make_pair(GenDesc::RGROUP, 0);
 
-constexpr GenSubIndex GenSub::QV_PRESENT;
-constexpr GenSubIndex GenSub::QV_CODEBOOK;
-constexpr GenSubIndex GenSub::QV_STEPS_0;
-constexpr GenSubIndex GenSub::QV_STEPS_1;
-constexpr GenSubIndex GenSub::QV_STEPS_2;
-constexpr GenSubIndex GenSub::QV_STEPS_3;
-constexpr GenSubIndex GenSub::QV_STEPS_4;
-constexpr GenSubIndex GenSub::QV_STEPS_5;
-constexpr GenSubIndex GenSub::QV_STEPS_6;
+const GenSubIndex GenSub::QV_PRESENT = std::make_pair(GenDesc::QV, 0);
+const GenSubIndex GenSub::QV_CODEBOOK = std::make_pair(GenDesc::QV, 1);
+const GenSubIndex GenSub::QV_STEPS_0 = std::make_pair(GenDesc::QV, 2);
+const GenSubIndex GenSub::QV_STEPS_1 = std::make_pair(GenDesc::QV, 3);
+const GenSubIndex GenSub::QV_STEPS_2 = std::make_pair(GenDesc::QV, 4);
+const GenSubIndex GenSub::QV_STEPS_3 = std::make_pair(GenDesc::QV, 5);
+const GenSubIndex GenSub::QV_STEPS_4 = std::make_pair(GenDesc::QV, 6);
+const GenSubIndex GenSub::QV_STEPS_5 = std::make_pair(GenDesc::QV, 7);
+const GenSubIndex GenSub::QV_STEPS_6 = std::make_pair(GenDesc::QV, 8);
 
-constexpr GenSubIndex GenSub::RNAME_CABAC_0;
-constexpr GenSubIndex GenSub::RNAME_CABAC_1;
+const GenSubIndex GenSub::RNAME_CABAC_0 = std::make_pair(GenDesc::RNAME, 0);
+const GenSubIndex GenSub::RNAME_CABAC_1 = std::make_pair(GenDesc::RNAME, 1);
 
-constexpr GenSubIndex GenSub::RFTP;
+const GenSubIndex GenSub::RFTP = std::make_pair(GenDesc::RFTP, 0);
 
-constexpr GenSubIndex GenSub::RFTT;
+const GenSubIndex GenSub::RFTT = std::make_pair(GenDesc::RFTT, 0);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

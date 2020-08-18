@@ -4,6 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include <algorithm>
+
 #include "record.h"
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
