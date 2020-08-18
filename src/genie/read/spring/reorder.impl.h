@@ -361,7 +361,7 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
 #ifdef GENIE_USE_OPENMP
         int tid = omp_get_thread_num();
 #else
-        int tid = 0;       // set thread ID to zero if not using OpenMP
+        int tid = 0;  // set thread ID to zero if not using OpenMP
 #endif
         std::string tid_str = std::to_string(tid);
         std::ofstream foutRC(rg.outfileRC + '.' + tid_str, std::ofstream::out);

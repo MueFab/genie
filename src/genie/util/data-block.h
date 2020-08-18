@@ -30,7 +30,7 @@ struct BlockStepper;
  */
 class DataBlock {
    private:
-    uint8_t lgWordSize;  //!< @brief log2 of the wordsize. Wordsize = 1 << lgWordsize
+    uint8_t lgWordSize;         //!< @brief log2 of the wordsize. Wordsize = 1 << lgWordsize
     std::vector<uint8_t> data;  //!< @brief The actual raw data.
 
    public:
@@ -111,12 +111,6 @@ class DataBlock {
     uint64_t get(size_t index) const;
 
     /**
-     * Calculates the biggest symbol in this block
-     * @return Maximum
-     */
-    uint64_t getMaximum() const;
-
-    /**
      * Calculates the biggest possible word size for this block
      * @return Maximum
      */
@@ -167,9 +161,6 @@ class DataBlock {
          */
         ProxyCore &operator=(uint64_t val);
     };
-
-    using Proxy = ProxyCore<DataBlock *>;            //!< @brief Standard proxy
-    using ConstProxy = ProxyCore<const DataBlock *>; //!< @brief Standard proxy for const
 
     /**
      * @brief Iterator for data blocks. Like for proxy object: only use if
@@ -240,12 +231,6 @@ class DataBlock {
          * @return Saved index
          */
         size_t getOffset() const;
-
-        /**
-         * @brief Return DataBlock
-         * @return Saved block
-         */
-        T getStream() const;
 
         /**
          * @brief Dereference to Proxy object
@@ -392,7 +377,7 @@ class DataBlock {
      * @param size initial size in elements
      * @param wsize size of one element in bytes
      */
-    explicit DataBlock(size_t size = 0, size_t wsize = 1);
+    explicit DataBlock(size_t size = 0, uint8_t wsize = 1);
 
     /**
      * @brief Create Data block from vector

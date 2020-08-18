@@ -21,7 +21,7 @@ void FormatExporterCompressed::skipIn(const util::Section&) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FormatExporterCompressed::flushIn(size_t&) {}
+void FormatExporterCompressed::flushIn(uint64_t&) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

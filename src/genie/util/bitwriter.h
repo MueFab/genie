@@ -41,7 +41,7 @@ class BitWriter {
     explicit BitWriter(std::ostream *str);
 
     /**
-     * @brief Controlled destruction. Flush is calles, but stream not closed.
+     * @brief Controlled destruction. Flush is called, but stream not closed.
      */
     ~BitWriter();
 

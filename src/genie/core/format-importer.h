@@ -50,12 +50,12 @@ class FormatImporter : public util::OriginalSource, public util::Source<record::
      * @param lock
      * @return
      */
-    bool pump(size_t& id, std::mutex& lock) override;
+    bool pump(uint64_t& id, std::mutex& lock) override;
 
     /**
      *
      */
-    void flushIn(size_t& pos) override;
+    void flushIn(uint64_t& pos) override;
 
     /**
      *

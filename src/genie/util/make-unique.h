@@ -21,8 +21,8 @@ namespace util {
  * @tparam T
  */
 template <class T>
-struct _Unique_if {
-    typedef std::unique_ptr<T> _Single_object;
+struct Unique_if {
+    typedef std::unique_ptr<T> Single_object;
 };
 
 /**
@@ -30,8 +30,8 @@ struct _Unique_if {
  * @tparam T
  */
 template <class T>
-struct _Unique_if<T[]> {
-    typedef std::unique_ptr<T[]> _Unknown_bound;
+struct Unique_if<T[]> {
+    typedef std::unique_ptr<T[]> Unknown_bound;
 };
 
 /**
@@ -40,8 +40,8 @@ struct _Unique_if<T[]> {
  * @tparam N
  */
 template <class T, size_t N>
-struct _Unique_if<T[N]> {
-    typedef void _Known_bound;
+struct Unique_if<T[N]> {
+    typedef void Known_bound;  // NOLINT
 };
 
 /**
@@ -52,7 +52,7 @@ struct _Unique_if<T[N]> {
  * @return
  */
 template <class T, class... Args>
-typename _Unique_if<T>::_Single_object make_unique(Args &&... args);
+typename Unique_if<T>::Single_object make_unique(Args &&... args);
 
 /**
  *
@@ -61,7 +61,7 @@ typename _Unique_if<T>::_Single_object make_unique(Args &&... args);
  * @return
  */
 template <class T>
-typename _Unique_if<T>::_Unknown_bound make_unique(size_t n);
+typename Unique_if<T>::Unknown_bound make_unique(size_t n);
 
 /**
  *
@@ -69,8 +69,8 @@ typename _Unique_if<T>::_Unknown_bound make_unique(size_t n);
  * @tparam Args
  * @return
  */
-template <class T, class... Args>
-typename _Unique_if<T>::_Known_bound make_unique(Args &&...) = delete;
+template <class T, class... Args>                                     // NOLINT
+typename Unique_if<T>::Known_bound make_unique(Args &&...) = delete;  // NOLINT
 
 // ---------------------------------------------------------------------------------------------------------------------
 

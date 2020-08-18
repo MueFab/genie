@@ -21,9 +21,9 @@ namespace util {
  */
 class Watch {
    private:
-    std::chrono::steady_clock::time_point start;           //!< @brief When the current period of time started.
-    double offset{};                                       //!< @brief Elapsed time from previous time periods.
-    bool paused;                                           //!< @brief If the time is currently measured.
+    std::chrono::steady_clock::time_point start;  //!< @brief When the current period of time started.
+    double offset{};                              //!< @brief Elapsed time from previous time periods.
+    bool paused;                                  //!< @brief If the time is currently measured.
 
    public:
     /**

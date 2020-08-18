@@ -36,7 +36,9 @@ EncodingConfiguration::~EncodingConfiguration() = default;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool EncodingConfiguration::operator==(const EncodingConfiguration& conf) const { return (conf.subseqCfg == this->subseqCfg); }
+bool EncodingConfiguration::operator==(const EncodingConfiguration& conf) const {
+    return (conf.subseqCfg == this->subseqCfg);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

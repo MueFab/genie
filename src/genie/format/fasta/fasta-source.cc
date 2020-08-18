@@ -30,7 +30,7 @@ FastaSource::FastaSource(std::ostream* _outfile, core::ReferenceManager* _refMgr
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool FastaSource::pump(size_t& id, std::mutex& lock) {
+bool FastaSource::pump(uint64_t& id, std::mutex& lock) {
     util::Section loc_id = {0, 1, false};
     {
         std::lock_guard<std::mutex> guard(lock);
@@ -88,7 +88,7 @@ bool FastaSource::pump(size_t& id, std::mutex& lock) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FastaSource::flushIn(size_t&) {}
+void FastaSource::flushIn(uint64_t&) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -17,8 +17,7 @@ namespace fastq {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Importer::Importer(size_t _blockSize, std::istream &_file_1)
-    : blockSize(_blockSize), file_list{&_file_1} {}
+Importer::Importer(size_t _blockSize, std::istream &_file_1) : blockSize(_blockSize), file_list{&_file_1} {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

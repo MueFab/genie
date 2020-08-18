@@ -25,7 +25,7 @@ OtherRec::OtherRec(uint64_t _split_pos, uint16_t _split_seq_ID)
 
 OtherRec::OtherRec(util::BitReader &reader)
     : AlignmentSplit(AlignmentSplit::Type::OTHER_REC),
-      split_pos(reader.read(40)),
+      split_pos(reader.read<uint64_t>(40)),
       split_seq_ID(reader.read<uint16_t>()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------

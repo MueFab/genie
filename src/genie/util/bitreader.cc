@@ -21,11 +21,11 @@ bool BitReader::isAligned() const { return !m_numHeldBits; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t BitReader::getPos() const { return istream.tellg(); }
+int64_t BitReader::getPos() const { return istream.tellg(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void BitReader::setPos(size_t pos) const { istream.seekg(pos, std::ios_base::beg); }
+void BitReader::setPos(int64_t pos) const { istream.seekg(pos, std::ios_base::beg); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -66,12 +66,12 @@ uint64_t BitReader::flush() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t BitReader::read(uint8_t numBits) {
+uint64_t BitReader::read_b(uint8_t numBits) {
     bitsRead += numBits;
-    uint64_t bits = 0;
+    uint64_t bits;
     if (numBits <= m_numHeldBits) {
         // Get numBits most significant bits from heldBits as bits
-        bits = m_heldBits >> (m_numHeldBits - numBits);
+        bits = m_heldBits >> uint8_t(m_numHeldBits - numBits);
         bits &= ~(0xffu << numBits);
         m_numHeldBits -= numBits;
         return bits;
@@ -84,7 +84,7 @@ uint64_t BitReader::read(uint8_t numBits) {
     bits <<= numBits;  // make room for the bits to come
 
     // Read in more bytes to satisfy the request
-    uint8_t numBytesToLoad = ((numBits - 1u) >> 3u) + 1;
+    auto numBytesToLoad = uint8_t(((numBits - 1u) >> 3u) + 1);
     uint64_t alignedWord = 0;
     // uint64_t alignedWord = 0;
     if (numBytesToLoad == 1) {
@@ -123,7 +123,7 @@ L1:
 L0:
 
     // Resolve remainder bits
-    uint8_t numNextHeldBits = (64 - numBits) % 8;
+    auto numNextHeldBits = uint8_t((64 - numBits) % 8);
 
     // Copy required part of alignedWord into bits
     bits |= alignedWord >> numNextHeldBits;

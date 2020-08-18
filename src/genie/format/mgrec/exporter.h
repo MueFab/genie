@@ -47,7 +47,7 @@ class Exporter : public core::FormatExporter {
      *
      * @param id
      */
-    void skipIn(const util::Section &id) override;
+    void skipIn(const util::Section& id) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -33,7 +33,7 @@ void BitWriter::write(uint64_t bits, uint8_t numBits) {
     // Any modulo-8 remainder of numTotalBits cannot be written this time,
     // and will be held until next time
     uint8_t numTotalBits = numBits + m_numHeldBits;
-    uint8_t numNextHeldBits = numTotalBits % 8;
+    auto numNextHeldBits = uint8_t(numTotalBits % 8);
 
     // Next steps: form a byte-ALIGNED word by concatenating any held bits
     // with the new bits, discarding the bits that will form the nextheldBits
@@ -50,7 +50,7 @@ void BitWriter::write(uint64_t bits, uint8_t numBits) {
     }
 
     // topword serves to justify heldBits to align with the MSB of bits
-    uint64_t topword = (numBits - numNextHeldBits) & ~((1u << 3u) - 1u);
+    uint64_t topword = uint64_t(numBits - numNextHeldBits) & uint64_t(~((1u << 3u) - 1u));
     uint64_t writeBits = (m_heldBits << topword);
     writeBits |= (bits >> numNextHeldBits);
 
@@ -76,19 +76,19 @@ void BitWriter::write(uint64_t bits, uint8_t numBits) {
 
     writeOut(static_cast<uint8_t>((writeBits >> 56u) & 0xffu));
 L7:
-    writeOut(static_cast<char>((writeBits >> 48u) & 0xffu));
+    writeOut(static_cast<uint8_t>((writeBits >> 48u) & 0xffu));
 L6:
-    writeOut(static_cast<char>((writeBits >> 40u) & 0xffu));
+    writeOut(static_cast<uint8_t>((writeBits >> 40u) & 0xffu));
 L5:
-    writeOut(static_cast<char>((writeBits >> 32u) & 0xffu));
+    writeOut(static_cast<uint8_t>((writeBits >> 32u) & 0xffu));
 L4:
-    writeOut(static_cast<char>((writeBits >> 24u) & 0xffu));
+    writeOut(static_cast<uint8_t>((writeBits >> 24u) & 0xffu));
 L3:
-    writeOut(static_cast<char>((writeBits >> 16u) & 0xffu));
+    writeOut(static_cast<uint8_t>((writeBits >> 16u) & 0xffu));
 L2:
-    writeOut(static_cast<char>((writeBits >> 8u) & 0xffu));
+    writeOut(static_cast<uint8_t>((writeBits >> 8u) & 0xffu));
 L1:
-    writeOut(static_cast<char>(writeBits & 0xffu));
+    writeOut(static_cast<uint8_t>(writeBits & 0xffu));
 L0:
 
     // Update output bitstream state
@@ -113,7 +113,7 @@ void BitWriter::write(std::istream *in) {
         if (!*in) {
             break;
         }
-        write(byte, 8);
+        write(uint8_t(byte), 8);
     }
 }
 
@@ -124,7 +124,7 @@ void BitWriter::flush() {
         return;
     }
 
-    write(m_heldBits, (8 - m_numHeldBits));
+    write(m_heldBits, uint8_t(8 - m_numHeldBits));
     m_heldBits = 0x00;
     m_numHeldBits = 0;
 }

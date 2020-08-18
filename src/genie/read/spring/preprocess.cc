@@ -11,11 +11,11 @@
 #include <genie/util/drain.h>
 #include <genie/util/ordered-section.h>
 #include <algorithm>
-#include <limits>
+#include <cstdint>
 #include <cstdio>
 #include <iostream>
+#include <limits>
 #include <string>
-#include <cstdint>
 #include "params.h"
 #include "util.h"
 

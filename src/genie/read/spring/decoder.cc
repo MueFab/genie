@@ -220,8 +220,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end)
-    : combine_pairs(comb_p) {
+Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end) : combine_pairs(comb_p) {
     basedir = working_dir;
 
     while (true) {
@@ -344,7 +343,7 @@ void Decoder::readRec(std::ifstream& i, Record& r) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::add(core::record::Chunk& chunk, core::record::Record&& r, size_t& pos) {
+void Decoder::add(core::record::Chunk& chunk, core::record::Record&& r, uint64_t& pos) {
     const size_t CHUNK_SIZE = 100000;
     chunk.getData().push_back(std::move(r));
     if (chunk.getData().size() >= CHUNK_SIZE) {
@@ -356,7 +355,7 @@ void Decoder::add(core::record::Chunk& chunk, core::record::Record&& r, size_t& 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Decoder::flushIn(size_t& pos) {
+void Decoder::flushIn(uint64_t& pos) {
     core::record::Chunk chunk;
 
     // now reorder the remaining unmatched reads so that they are paired and then

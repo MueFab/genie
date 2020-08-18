@@ -40,11 +40,6 @@ SelectorHead<Tin>::SelectorHead() : select(&defaultSelect) {}
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Tin>
-SelectorHead<Tin>::SelectorHead(std::function<size_t(const Tin& t)> _selector) : select(_selector) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename Tin>
 void SelectorHead<Tin>::add(genie::util::Drain<Tin>* mod) {
     mods.push_back(mod);
 }
@@ -75,7 +70,7 @@ void SelectorHead<Tin>::flowIn(Tin&& t, const Section& id) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Tin>
-void SelectorHead<Tin>::flushIn(size_t& pos) {
+void SelectorHead<Tin>::flushIn(uint64_t& pos) {
     for (const auto& m : mods) {
         m->flushIn(pos);
     }

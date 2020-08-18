@@ -30,7 +30,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Encoder::flushIn(size_t& pos) {
+void Encoder::flushIn(uint64_t& pos) {
     if (!preprocessor.used) {
         flushOut(pos);
         return;
@@ -99,7 +99,7 @@ void flowIn(genie::core::record::Chunk&& t, const util::Section& id);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void flushIn(size_t& pos);
+void flushIn(uint64_t& pos);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

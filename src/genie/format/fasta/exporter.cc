@@ -23,7 +23,7 @@ Exporter::Exporter(core::ReferenceManager* _refMgr, std::ostream* out, size_t _n
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Exporter::flushIn(size_t&) {
+void Exporter::flushIn(uint64_t&) {
     util::ThreadManager mgr(num_threads);
     FastaSource source(outfile, refMgr);
     std::vector<util::OriginalSource*> vec;

@@ -25,14 +25,14 @@ TEST(BitRoundtrip, numbers) {
 
     genie::util::BitReader reader(str);
 
-    EXPECT_EQ(reader.read(64), 0x2345234523452345);
-    EXPECT_EQ(reader.read(32), 0x23452345);
-    EXPECT_EQ(reader.read(16), 0x2345);
-    EXPECT_EQ(reader.read(8), 0x45);
-    EXPECT_EQ(reader.read(4), 0x5);
-    EXPECT_EQ(reader.read(2), 0x1);
-    EXPECT_EQ(reader.read(1), 0x1);
-    EXPECT_EQ(reader.read(37), 0x23452345);
+    EXPECT_EQ(reader.read<uint64_t>(64), 0x2345234523452345);
+    EXPECT_EQ(reader.read<uint64_t>(32), 0x23452345);
+    EXPECT_EQ(reader.read<uint64_t>(16), 0x2345);
+    EXPECT_EQ(reader.read<uint64_t>(8), 0x45);
+    EXPECT_EQ(reader.read<uint64_t>(4), 0x5);
+    EXPECT_EQ(reader.read<uint64_t>(2), 0x1);
+    EXPECT_EQ(reader.read<uint64_t>(1), 0x1);
+    EXPECT_EQ(reader.read<uint64_t>(37), 0x23452345);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

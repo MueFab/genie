@@ -40,14 +40,14 @@ class BitReader {
     /**
      * @return Returns the position in the input stream.
      */
-    size_t getPos() const;
+    int64_t getPos() const;
 
     /**
      * @brief Sets the input stream position.
      * @param pos New position.
      * @attention This bypasses the bit wise reading mechanism.
      */
-    void setPos(size_t pos) const;
+    void setPos(int64_t pos) const;
 
     /**
      * @brief Clears the error state of the underlying input stream.
@@ -78,7 +78,7 @@ class BitReader {
      * @param numBits Number of bits to read.
      * @return Integer containing the bits.
      */
-    uint64_t read(uint8_t numBits);
+    uint64_t read_b(uint8_t numBits);
 
     /**
      * @brief Reads a full integer with the required number of bits.
@@ -95,7 +95,7 @@ class BitReader {
      * @return Custom integer.
      */
     template <typename T, typename = std::enable_if<std::is_integral<T>::value>>
-    T read(size_t s);
+    T read(uint8_t s);
 
     /**
      * @brief Read a string from the input.

@@ -22,18 +22,18 @@ namespace util {
  */
 class OriginalSource {
    public:
-   /**
-    *
-    * @param id
-    * @param lock
-    * @return
-    */
-    virtual bool pump(size_t& id, std::mutex& lock) = 0;
+    /**
+     *
+     * @param id
+     * @param lock
+     * @return
+     */
+    virtual bool pump(uint64_t& id, std::mutex& lock) = 0;
 
     /**
      * @brief Signal end of data.
      */
-    virtual void flushIn(size_t& pos) = 0;
+    virtual void flushIn(uint64_t& pos) = 0;
 
     /**
      * @brief For inheritance

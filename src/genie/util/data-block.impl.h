@@ -103,7 +103,7 @@ inline void DataBlock::push_back(uint64_t val) {
     data.resize(data.size() + getWordSize());
     switch (lgWordSize) {
         case 0:
-            *reinterpret_cast<uint8_t *>(&*(data.end() - 1)) = static_cast<uint8_t>(val);
+            *(data.end() - 1) = static_cast<uint8_t>(val);
             return;
         case 1:
             *reinterpret_cast<uint16_t *>(&*(data.end() - 2)) = static_cast<uint16_t>(val);
@@ -238,13 +238,6 @@ inline size_t DataBlock::IteratorCore<T>::getOffset() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-inline T DataBlock::IteratorCore<T>::getStream() const {
-    return stream;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-template <typename T>
 inline DataBlock::ProxyCore<T> DataBlock::IteratorCore<T>::operator*() const {
     return {stream, position};
 }
@@ -260,7 +253,7 @@ inline bool DataBlock::IteratorCore<T>::operator==(const IteratorCore &c) const 
 
 template <typename T>
 inline bool DataBlock::IteratorCore<T>::operator!=(const IteratorCore &c) const {
-    return !(*this == c);
+    return !(*this == c);  // NOLINT
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

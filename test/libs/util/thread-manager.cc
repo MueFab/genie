@@ -16,7 +16,7 @@ class ThreadManager_DummySource : public genie::util::OriginalSource {
     size_t counter;
     int64_t flushpos;
    public:
-    virtual bool pump(size_t& t_id, std::mutex& lock) override {
+    virtual bool pump(uint64_t& t_id, std::mutex& lock) override {
         std::lock_guard<std::mutex> guard(lock);
 
         // Simulate an access and different data sizes
@@ -31,7 +31,7 @@ class ThreadManager_DummySource : public genie::util::OriginalSource {
         counter++;
         return true;
     }
-    virtual void flushIn(size_t& pos) override {
+    virtual void flushIn(uint64_t& pos) override {
         flushpos = pos;
     }
 
@@ -69,7 +69,7 @@ TEST(ThreadManagerTest, stop) {
     ThreadManager_DummySource source1(3);
     std::vector<genie::util::OriginalSource*> srcvec = {&source1};
     manager.setSource(srcvec);
-    std::future<uint32_t> f2 = std::async(std::launch::async, [&]{ return manager.run(); });
+    std::future<uint64_t> f2 = std::async(std::launch::async, [&]{ return manager.run(); });
 
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     manager.stop(false);
@@ -86,7 +86,7 @@ TEST(ThreadManagerTest, abort) {
     ThreadManager_DummySource source1(3);
     std::vector<genie::util::OriginalSource*> srcvec = {&source1};
     manager.setSource(srcvec);
-    std::future<uint32_t> f2 = std::async(std::launch::async, [&]{ return manager.run(); });
+    std::future<uint64_t> f2 = std::async(std::launch::async, [&]{ return manager.run(); });
 
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     manager.stop(true);

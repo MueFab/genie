@@ -41,7 +41,7 @@ void SelectorTail<Tout>::flowIn(Tout&& t, const Section& id) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename Tout>
-void SelectorTail<Tout>::flushIn(size_t& pos) {
+void SelectorTail<Tout>::flushIn(uint64_t& pos) {
     size_t num = ++dryCtr;
     if (num == modNum) {
         // Output signal once every module contained finished

@@ -27,9 +27,9 @@ Block::Block() : descriptor_ID(0), block_payload_size(0), payload(core::GenDesc(
 // ---------------------------------------------------------------------------------------------------------------------
 
 Block::Block(size_t qv_count, util::BitReader &reader) {
-    reader.read(1);
+    reader.read_b(1);
     descriptor_ID = reader.read<uint8_t>(7);
-    reader.read(3);
+    reader.read_b(3);
     block_payload_size = reader.read<uint32_t>(29);
 
     /*   for(size_t i = 0; i < block_payload_size; ++i) {

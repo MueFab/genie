@@ -26,10 +26,10 @@ namespace util {
  */
 class ThreadManager {
    private:
-    size_t counter;                    //!< @brief Identifier for next block.
+    uint64_t counter;                  //!< @brief Identifier for next block.
     std::vector<std::thread> threads;  //!< @brief Storage for all the threads.
     std::atomic<bool> stopFlag;        //!< @brief Threads will stop after current block when set.
-    bool abortFlag;  //!< @brief The flushIn signal will be skipped after stop(). Used with stopFlag.
+    bool abortFlag;                    //!< @brief The flushIn signal will be skipped after stop(). Used with stopFlag.
     std::vector<OriginalSource*> source;  //!< @brief Entry points for the pipeline.
     std::mutex lock;                      //!< @brief Mutex protecting the counter variable.
 
@@ -39,9 +39,8 @@ class ThreadManager {
     void action(size_t id);
 
    public:
-    static thread_local size_t threadID;              //!< @brief Each thread will see its own ID here
-    static thread_local size_t threadNum;             //!< @brief Each thread will see the number of threads here.
-    static thread_local ThreadManager* localManager;  //!< @brief Each thread see its manager here.
+    static thread_local size_t threadID;   //!< @brief Each thread will see its own ID here
+    static thread_local size_t threadNum;  //!< @brief Each thread will see the number of threads here.
 
     /**
      *
@@ -60,7 +59,7 @@ class ThreadManager {
      * @brief Executes the complete genie pipeline until no input data left
      * @return The total number of blocks processed until the end
      */
-    uint32_t run();
+    uint64_t run();
 
     /**
      * @brief The genie pipeline will stop after the blocks currently in the pipeline are processed.

@@ -17,7 +17,7 @@ void FormatImporter::setClassifier(Classifier* _classifier) { classifier = _clas
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool FormatImporter::pump(size_t& id, std::mutex& lock) {
+bool FormatImporter::pump(uint64_t& id, std::mutex& lock) {
     record::Chunk chunk;
     util::Section sec{};
     {
@@ -54,7 +54,7 @@ bool FormatImporter::pump(size_t& id, std::mutex& lock) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FormatImporter::flushIn(size_t& pos) { flushOut(pos); }
+void FormatImporter::flushIn(uint64_t& pos) { flushOut(pos); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

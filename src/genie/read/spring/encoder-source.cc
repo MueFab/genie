@@ -42,7 +42,7 @@ SpringSource::SpringSource(const std::string& temp_dir, const compression_params
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool SpringSource::pump(size_t& id, std::mutex& lock) {
+bool SpringSource::pump(uint64_t& id, std::mutex& lock) {
     core::AccessUnit au(core::parameter::ParameterSet(), 0);
     util::Section sec{};
     {
@@ -90,7 +90,7 @@ bool SpringSource::pump(size_t& id, std::mutex& lock) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SpringSource::flushIn(size_t& pos) { flushOut(pos); }
+void SpringSource::flushIn(uint64_t& pos) { flushOut(pos); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

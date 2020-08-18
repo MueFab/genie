@@ -22,7 +22,7 @@ void Source<TYPE>::flowOut(TYPE&& t, const Section& id) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename TYPE>
-void Source<TYPE>::flushOut(size_t& pos) {
+void Source<TYPE>::flushOut(uint64_t& pos) {
     drain->flushIn(pos);
 }
 

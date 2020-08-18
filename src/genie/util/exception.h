@@ -25,7 +25,13 @@ class Exception : public std::exception {
      * @brief Initialize with a message.
      * @param msg The message.
      */
-    explicit Exception(std::string msg);
+    explicit Exception(std::string msg) noexcept;
+
+    /**
+     * @brief Nothrow copy constructor
+     * @param e Source object
+     */
+    Exception(const Exception& e) noexcept;
 
     /**
      * @brief Needed for inheritance.
@@ -40,7 +46,7 @@ class Exception : public std::exception {
     /**
      * @return The internal message as a c string.
      */
-    const char *what() const noexcept override;
+    const char* what() const noexcept override;
 
    protected:
     std::string msg_;  //!< @brief The exception message.

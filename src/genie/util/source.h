@@ -36,7 +36,7 @@ class Source {
     /**
      * @brief Propagates end-of-data signal to drain set before.
      */
-    void flushOut(size_t& pos);
+    void flushOut(uint64_t& pos);
 
     /**
      * @brief Propagates skip signal to drain set before.

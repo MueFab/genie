@@ -46,7 +46,7 @@ class Encoder : public genie::core::ReadEncoder {
      *
      * @param pos
      */
-    void flushIn(size_t& pos) override;
+    void flushIn(uint64_t& pos) override;
 
     /**
      *
