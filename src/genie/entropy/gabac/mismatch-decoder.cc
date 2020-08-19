@@ -4,44 +4,45 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "read-decoder.h"
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include "mismatch-decoder.h"
+#include <genie/util/make-unique.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
-namespace core {
+namespace entropy {
+namespace gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReadDecoder::setQVCoder(QvSelector* coder) { qvcoder = coder; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void ReadDecoder::setNameCoder(NameSelector* coder) { namecoder = coder; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void ReadDecoder::setEntropyCoder(EntropySelector* coder) { entropycoder = coder; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-AccessUnit ReadDecoder::entropyCodeAU(EntropySelector* select, AccessUnit&& a, bool mmCoderEnabled) {
-    AccessUnit au = std::move(a);
-    for (auto& d : au) {
-        auto enc = select->process(au.getParameters().getDescriptor(d.getID()), d, mmCoderEnabled);
-        d = std::get<0>(enc);
-        au.getStats().add(std::get<1>(enc));
-    }
-    return au;
+MismatchDecoder::MismatchDecoder(util::DataBlock &&d) : data(std::move(d)) {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit ReadDecoder::entropyCodeAU(AccessUnit&& a, bool mmCoderEnabled) { return entropyCodeAU(entropycoder, std::move(a), mmCoderEnabled); }
+uint64_t MismatchDecoder::decodeMismatch(uint64_t ref) { return 0; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace core
+bool MismatchDecoder::dataLeft() const {
+    return position < data.size();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::unique_ptr<core::MismatchDecoder> MismatchDecoder::copy() const {
+    util::DataBlock d = data;
+    auto ret = util::make_unique<MismatchDecoder>(std::move(d));
+    ret->position = position;
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace gabac
+}  // namespace entropy
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------

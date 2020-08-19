@@ -13,6 +13,7 @@
 #include <genie/util/data-block.h>
 #include <numeric>
 #include "constants.h"
+#include "mismatch-decoder.h"
 #include "parameter/parameter_set.h"
 #include "reference-manager.h"
 
@@ -32,12 +33,53 @@ class AccessUnit {
     class Subsequence {
        private:
         util::DataBlock data;  //!< @brief
-        size_t position;       //!< @brief
+        size_t position{};       //!< @brief
 
         GenSubIndex id;     //!< @brief
-        size_t numSymbols;  //!<
+        size_t numSymbols{};  //!< @brief
+
+        std::unique_ptr<MismatchDecoder> mmDecoder;  //!< @brief
 
        public:
+
+        /**
+         *
+         * @param sub
+         * @return
+         */
+        Subsequence& operator=(const Subsequence& sub);
+
+        /**
+         *
+         * @param sub
+         * @return
+         */
+        Subsequence& operator=(Subsequence&& sub) noexcept;
+
+        /**
+         *
+         * @param sub
+         */
+        Subsequence(const Subsequence& sub);
+
+        /**
+         *
+         * @param sub
+         */
+        Subsequence(Subsequence&& sub)  noexcept;
+
+        /**
+         *
+         * @param mm
+         */
+        void attachMismatchDecoder(std::unique_ptr<MismatchDecoder> mm);
+
+        /**
+         *
+         * @return
+         */
+        MismatchDecoder* getMismatchDecoder() const;
+
         /**
          *
          * @param wordsize

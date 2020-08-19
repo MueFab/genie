@@ -4,38 +4,49 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ENTROPY_DECODER_H
-#define GENIE_ENTROPY_DECODER_H
+#ifndef GENIE_MISMATCH_DECODER_H
+#define GENIE_MISMATCH_DECODER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/parameter/descriptor_present/decoder.h>
-#include "access-unit.h"
-#include "module.h"
+#include <cstdint>
+#include <memory>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace core {
 
+class AccessUnitSubsequence;
+
 /**
- * @brief Interface for entropy decoders. They convert access unit payloads to raw access units
+ *
  */
-class EntropyDecoder {
+class MismatchDecoder {
    public:
     /**
      *
      */
-    virtual ~EntropyDecoder() = default;
+    virtual ~MismatchDecoder() = default;
 
     /**
      *
-     * @param param
-     * @param desc
+     * @param ref
      * @return
      */
-    virtual std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(
-        const parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& desc, bool mmCoderEnabled) = 0;
+    virtual uint64_t decodeMismatch(uint64_t ref) = 0;
+
+    /**
+     *
+     * @return
+     */
+    virtual bool dataLeft() const = 0;
+
+    /**
+     *
+     * @return
+     */
+    virtual std::unique_ptr<MismatchDecoder> copy() const = 0;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -45,7 +56,7 @@ class EntropyDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ENTROPY_DECODER_H
+#endif  // GENIE_MISMATCH_DECODER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

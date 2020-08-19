@@ -36,7 +36,7 @@ class ReadDecoder : public Module<AccessUnit, record::Chunk> {
                                             AccessUnit::Descriptor&>;  //!<
     using EntropySelector =
         util::SideSelector<EntropyDecoder, std::tuple<AccessUnit::Descriptor, core::stats::PerfStats>,
-                           const parameter::DescriptorSubseqCfg&, AccessUnit::Descriptor&>;  //!<
+                           const parameter::DescriptorSubseqCfg&, AccessUnit::Descriptor&, bool>;  //!<
 
    protected:
     QvSelector* qvcoder{};            //!<
@@ -68,14 +68,14 @@ class ReadDecoder : public Module<AccessUnit, record::Chunk> {
      * @param a
      * @return
      */
-    static AccessUnit entropyCodeAU(EntropySelector* select, AccessUnit&& a);
+    static AccessUnit entropyCodeAU(EntropySelector* select, AccessUnit&& a, bool mmCoderEnabled);
 
     /**
      *
      * @param a
      * @return
      */
-    AccessUnit entropyCodeAU(AccessUnit&& a);
+    AccessUnit entropyCodeAU(AccessUnit&& a, bool mmCoderEnabled);
 
     /**
      * @brief For polymorphic destruction
