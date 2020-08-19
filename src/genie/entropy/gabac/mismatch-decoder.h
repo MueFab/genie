@@ -4,15 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_GABAC_DECODER_H
-#define GENIE_GABAC_DECODER_H
+#ifndef GENIE_GABAC_MISMATCH_DECODER_H
+#define GENIE_GABAC_MISMATCH_DECODER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/access-unit.h>
-#include <genie/core/entropy-decoder.h>
-#include <genie/util/make-unique.h>
-#include "gabac-seq-conf-set.h"
+#include <genie/core/mismatch-decoder.h>
+#include <genie/util/data-block.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,28 +19,38 @@ namespace entropy {
 namespace gabac {
 
 /**
- * @brief Module to decompress a BlockPayload back into a raw access unit using Gabac
+ *
  */
-class Decoder : public core::EntropyDecoder {
+class MismatchDecoder : public core::MismatchDecoder {
    private:
-    /**
-     * @brief Execute gabac library
-     * @param conf Gabac configuration to use
-     * @param in Compressed set of transformed sequences
-     * @param out Where to put uncompressed sequence
-     */
-    static core::AccessUnit::Subsequence decompress(const gabac::EncodingConfiguration& conf,
-                                                    core::AccessUnit::Subsequence&& in, bool mmCoderEnabled);
-
+    util::DataBlock data;
+    size_t position{};
    public:
+
     /**
      *
-     * @param param
      * @param d
-     * @return
      */
-    std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(
-        const parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d, bool mmCoderEnabled) override;
+    explicit MismatchDecoder(util::DataBlock &&d);
+
+    /**
+     * @brief Decodes one base of a mismatch with the knowledge that ref is _not_ the wanted base.
+     * @param ref Base to exclude
+     * @return One base for a mismatch subsequence
+     */
+    uint64_t decodeMismatch(uint64_t ref) override;
+
+    /**
+     * @brief Tells if there are more mismatches left in the data.
+     * @return True if data left.
+     */
+    bool dataLeft() const override;
+
+    /**
+     * @brief Copies the object.
+     * @return A copy of the full object state.
+     */
+    std::unique_ptr<core::MismatchDecoder> copy() const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -53,7 +61,7 @@ class Decoder : public core::EntropyDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DECODER_H
+#endif  // GENIE_MISMATCH_DECODER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

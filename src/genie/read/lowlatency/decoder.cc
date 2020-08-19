@@ -23,7 +23,7 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
     util::Watch watch;
     core::record::Chunk ret;
     core::AccessUnit data = std::move(t);
-    data = entropyCodeAU(std::move(data));
+    data = entropyCodeAU(std::move(data), true);
     const auto& qvparam = data.getParameters().getQVConfig(data.getClassType());
     auto qvStream = std::move(data.get(core::GenDesc::QV));
     auto names = namecoder->process(data.get(core::GenDesc::RNAME));

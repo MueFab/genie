@@ -161,7 +161,7 @@ class FlowGraphDecode : public FlowGraph {
      * @param fun
      */
     void setEntropyCoderSelector(
-        const std::function<size_t(const parameter::DescriptorSubseqCfg&, genie::core::AccessUnit::Descriptor&)>& fun);
+        const std::function<size_t(const parameter::DescriptorSubseqCfg&, genie::core::AccessUnit::Descriptor&, bool)>& fun);
 
     /**
      *

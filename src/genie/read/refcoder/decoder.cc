@@ -48,7 +48,7 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     util::Watch watch;
     auto t_data = std::move(t);
     auto ref_excerpt = t_data.getReferenceExcerpt();
-    t_data = entropyCodeAU(std::move(t_data));
+    t_data = entropyCodeAU(std::move(t_data), true);
     auto minPos = t_data.getMinPos();
     size_t numRecords = t_data.getNumReads();
     size_t segments = t_data.getParameters().getNumberTemplateSegments();

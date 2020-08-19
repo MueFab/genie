@@ -48,7 +48,7 @@ void addECigar(const core::record::Record& rec, std::vector<std::string>& cig_ve
 void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     util::Watch watch;
     auto t_data = std::move(t);
-    t_data = entropyCodeAU(std::move(t_data));
+    t_data = entropyCodeAU(std::move(t_data), true);
     size_t numRecords = t_data.getNumReads();
     size_t bufSize = t_data.getParameters().getComputedRef().getExtension().getBufMaxSize();
     size_t segments = t_data.getParameters().getNumberTemplateSegments();

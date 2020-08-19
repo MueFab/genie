@@ -252,7 +252,7 @@ Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end) :
 
 void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
     core::record::Chunk chunk;
-    genie::core::AccessUnit au = entropyCodeAU(std::move(t));
+    genie::core::AccessUnit au = entropyCodeAU(std::move(t), true);
     util::Watch watch;
     std::array<std::vector<Record>, 2> matched_records;
     std::array<std::vector<Record>, 2> unmatched_records;

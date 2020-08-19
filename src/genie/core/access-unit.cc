@@ -5,6 +5,7 @@
  */
 
 #include "access-unit.h"
+#include "mismatch-decoder.h"
 #include <genie/util/make-unique.h>
 #include <algorithm>
 #include <utility>
@@ -13,6 +14,44 @@
 
 namespace genie {
 namespace core {
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnit::Subsequence &AccessUnit::Subsequence::operator=(const Subsequence &sub) {
+    data = sub.data;
+    position = sub.position;
+    id = sub.id;
+    numSymbols = sub.numSymbols;
+    mmDecoder = sub.mmDecoder->copy();
+    return *this;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnit::Subsequence &AccessUnit::Subsequence::operator=(AccessUnit::Subsequence &&sub) noexcept {
+    data = std::move(sub.data);
+    position = sub.position;
+    id = sub.id;
+    numSymbols = sub.numSymbols;
+    mmDecoder = std::move(sub.mmDecoder);
+    return *this;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnit::Subsequence::Subsequence(const Subsequence &sub) { *this = sub; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnit::Subsequence::Subsequence(Subsequence &&sub) noexcept { *this = sub; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void AccessUnit::Subsequence::attachMismatchDecoder(std::unique_ptr<MismatchDecoder> mm) { mmDecoder = std::move(mm); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+MismatchDecoder *AccessUnit::Subsequence::getMismatchDecoder() const { return mmDecoder.get(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

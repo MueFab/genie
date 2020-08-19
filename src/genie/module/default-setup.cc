@@ -135,7 +135,7 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
 
     ret->addEntropyCoder(genie::util::make_unique<genie::entropy::gabac::Decoder>());
     ret->setEntropyCoderSelector([](const genie::core::parameter::DescriptorSubseqCfg&,
-                                    genie::core::AccessUnit::Descriptor&) -> size_t { return 0; });
+                                    genie::core::AccessUnit::Descriptor&, bool) -> size_t { return 0; });
 
     ret->setExporterSelector([](const genie::core::record::Chunk&) -> size_t { return 0; });
 

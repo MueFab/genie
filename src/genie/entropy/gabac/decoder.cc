@@ -11,6 +11,8 @@
 #include <genie/util/runtime-exception.h>
 #include <genie/util/watch.h>
 
+#include "mismatch-decoder.h"
+
 #include <iostream>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -77,8 +79,14 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfiguration& conf,
-                                                  core::AccessUnit::Subsequence&& data) {
+                                                  core::AccessUnit::Subsequence&& data, bool mmCoderEnabled) {
     core::AccessUnit::Subsequence in = std::move(data);
+
+    if(getDescriptor(in.getID().first).getSubSeq(in.getID().second).mismatchDecoding && mmCoderEnabled) {
+        in.attachMismatchDecoder(util::make_unique<MismatchDecoder>(in.move()));
+        return in;
+    }
+
     // Interface to GABAC library
     util::DataBlock buffer = in.move();
     gabac::IBufferStream in_stream(&buffer, 0);
@@ -107,7 +115,7 @@ core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfigura
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::process(
-    const parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d) {
+    const parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d, bool mmCoderEnabled) {
     util::Watch watch;
     std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> desc;
     std::get<0>(desc) = std::move(d);
@@ -155,7 +163,7 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::proces
             }
 
             std::get<0>(desc).set(d_id.second,
-                                  decompress(gabac::EncodingConfiguration(std::move(conf0)), std::move(subseq)));
+                                  decompress(gabac::EncodingConfiguration(std::move(conf0)), std::move(subseq), mmCoderEnabled));
 
             if (!std::get<0>(desc).get(d_id.second).isEmpty()) {
                 std::get<1>(desc).addInteger("size-gabac-total-raw", std::get<0>(desc).get(d_id.second).getRawSize());

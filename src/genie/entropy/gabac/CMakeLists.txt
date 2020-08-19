@@ -15,6 +15,7 @@ set(source_files
         luts-subsymbol-transform.cc
         equality-subseq-transform.cc
         match-subseq-transform.cc
+        mismatch-decoder.cc
         merge-subseq-transform.cc
         rle-subseq-transform.cc
         decode-cabac.cc
