@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_OTHER_REC_H
-#define GENIE_OTHER_REC_H
+#ifndef GENIE_ALIGNMENT_EXT_OTHER_REC_H
+#define GENIE_ALIGNMENT_EXT_OTHER_REC_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -35,6 +35,8 @@ class OtherRec : public AlignmentExternal {
      * @param _next_seq_ID
      */
     OtherRec(uint64_t _next_pos, uint16_t _next_seq_ID);
+
+
 
     /**
      *
@@ -81,7 +83,7 @@ class OtherRec : public AlignmentExternal {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_OTHER_REC_H
+#endif  // GENIE_OTHER_REC_H_EXT
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
