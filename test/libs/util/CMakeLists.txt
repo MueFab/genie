@@ -5,6 +5,8 @@ set(source_files
         watch.cc
         bitwriter.cc
         bitroundtrip.cc
+        helpers.cc
+        sam-file-reader-test.cc
         stringview.cc
         string-helpers.cc
         thread-manager.cc
@@ -16,3 +18,4 @@ target_link_libraries(util-tests PRIVATE gtest_main)
 target_link_libraries(util-tests PRIVATE util)
 target_link_libraries(util-tests PRIVATE genie-core)
 target_link_libraries(util-tests PRIVATE genie-util)
+target_link_libraries(util-tests PRIVATE genie-sam)

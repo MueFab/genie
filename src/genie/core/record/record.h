@@ -62,7 +62,7 @@ class Record {
      * @param _flags
      */
     Record(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::string&& _read_name,
-           std::string&& _read_group, uint8_t _flags);
+           std::string&& _read_group, uint8_t _flags, bool _is_read_1_first=true);
 
     /**
      *
@@ -228,6 +228,19 @@ class Record {
      * @return
      */
     size_t getPosition(size_t alignment, size_t split) const;
+
+    /**
+     *
+     * @return
+     */
+    bool getRead1First() const;
+
+    /**
+     *
+     * @return
+     */
+    void setMoreAlignmentInfo(std::unique_ptr<AlignmentExternal> _more_alignment_info);
+
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

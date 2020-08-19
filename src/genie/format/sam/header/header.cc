@@ -6,8 +6,8 @@
 
 #include "header.h"
 #include <genie/util/string-helpers.h>
-#include <iostream>
 #include <regex>
+#include <iostream>
 #include "tag-enum.h"
 #include "tag-number.h"
 #include "tag-string.h"
@@ -26,15 +26,17 @@ const std::string& HeaderLine::getName() const { return name; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::string& HeaderLine::getComment() const { return comment; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 const std::vector<std::unique_ptr<TagBase>>& HeaderLine::getTags() const { return tags; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void HeaderLine::addTag(std::unique_ptr<TagBase> tag) { tags.push_back(std::move(tag)); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::vector<std::unique_ptr<TagBase>> &&HeaderLine::moveTags() {
+    return std::move(tags);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -70,7 +72,7 @@ void HeaderLine::parseTags(const std::vector<std::string>& _tags, const HeaderLi
                 parseSingleTag(tagvalue, taginfo);
             }
         }
-        UTILS_DIE_IF(!found, "Tag unknown in sam header");
+        UTILS_DIE_IF(!found, "Unknown tag in SAM header");
     }
 }
 
@@ -79,30 +81,29 @@ void HeaderLine::parseTags(const std::vector<std::string>& _tags, const HeaderLi
 HeaderLine::HeaderLine(const std::string& line) {
     auto ret = util::tokenize(line, '\t');
     name = ret.front().substr(1);
-    const std::string COMMENT = "CO";
-    if (name == COMMENT) {
-        comment = line.substr(4);
-        return;
-    }
+
     bool found = false;
     for (const auto& header : getHeaderInfo()) {
         if (header.name == name) {
             found = true;
             parseTags(ret, header);
+            break;
         }
     }
-    UTILS_DIE_IF(!found, "Unknown Sam header line");
+    UTILS_DIE_IF(!found, "Unknown SAM header line");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 HeaderLine::HeaderLine(HeaderLine&& line) noexcept
-    : name(std::move(line.name)), comment(std::move(line.comment)), tags(std::move(line.tags)) {}
+//    : name(std::move(line.name)), comment(std::move(line.comment)), tags(std::move(line.tags)) {}
+    : name(std::move(line.name)), tags(std::move(line.tags)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 HeaderLine::HeaderLine(std::string&& _name, std::string&& _comment)
-    : name(std::move(_name)), comment(std::move(_comment)) {}
+//    : name(std::move(_name)), comment(std::move(_comment)) {}
+    : name(std::move(_name)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -117,13 +118,17 @@ void HeaderLine::print(std::ostream& stream) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Header::Header(std::istream& stream) {
-    while (true) {
-        if (stream.peek() != '@') {
-            break;
+    std::string str;
+    while (stream.peek() == '@') {
+        std::getline(stream, str);
+
+        // Handle comment
+        if (str.substr(1, 2) == "CO"){
+            addComment(str.substr(4));
+        } else {
+            lines.emplace_back(str);
         }
-        std::string samline;
-        std::getline(stream, samline);
-        lines.emplace_back(samline);
+
     }
 }
 
@@ -142,6 +147,12 @@ void Header::print(std::ostream& stream) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::vector<HeaderLine>& Header::getLines() const { return lines; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Header::addComment(std::string&& _str) {
+    comments.push_back(std::move(_str.substr(4)));
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

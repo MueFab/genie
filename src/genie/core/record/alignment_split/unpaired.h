@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_UNPAIRED_H
-#define GENIE_UNPAIRED_H
+#ifndef GENIE_ALIGNMENT_SPLIT_UNPAIRED_H
+#define GENIE_ALIGNMENT_SPLIT_UNPAIRED_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
