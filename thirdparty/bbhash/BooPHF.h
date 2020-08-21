@@ -13,10 +13,25 @@
 #include <unordered_map>
 #include <vector>
 #include <assert.h>
-#include <sys/time.h>
 #include <string.h>
 #include <memory> // for make_shared
+
+#ifdef _WIN32
+#include <intrin.h>
+#include <process.h>
+#define INTR_FETCH_AND_OR(x, y) _InterlockedOr64(x,y)
+#define INTR_FETCH_AND_AND(x, y) _InterlockedAnd64(x, y)
+#define INTR_FETCH_AND_ADD(x, y) _InterlockedExchangeAdd64(x, y)
+#define LOCK_FILE(x) (void)(x)  // TODO
+#define UNLOCK_FILE(x) (void)(x) //TODO
+#else
 #include <unistd.h>
+#define INTR_FETCH_AND_OR(x, y) __sync_fetch_and_or(x, y)
+#define INTR_FETCH_AND_AND(x, y) __sync_fetch_and_and(x, y)
+#define INTR_FETCH_AND_ADD(x, y) __sync_fetch_and_add(x, y)
+#define LOCK_FILE(x) flockfile(x)
+#define UNLOCK_FILE(x) funlockfile(x)
+#endif
 
 
 
@@ -191,162 +206,7 @@ namespace boomphf {
     }
 
 
-    ///// progress bar
-    class Progress
-    {
-    public:
-        int timer_mode;
-        struct timeval timestamp;
-        double heure_debut, heure_actuelle ;
-        std::string   message;
-
-        uint64_t done;
-        uint64_t todo;
-        int subdiv ; // progress printed every 1/subdiv of total to do
-        double partial;
-        int _nthreads;
-        std::vector<double > partial_threaded;
-        std::vector<uint64_t > done_threaded;
-
-        double steps ; //steps = todo/subidv
-
-        void init(uint64_t ntasks, const char * msg,int nthreads =1)
-        {
-            _nthreads = nthreads;
-            message = std::string(msg);
-            gettimeofday(&timestamp, NULL);
-            heure_debut = timestamp.tv_sec +(timestamp.tv_usec/1000000.0);
-
-            //fprintf(stderr,"| %-*s |\n",98,msg);
-
-            todo= ntasks;
-            done = 0;
-            partial =0;
-
-            partial_threaded.resize(_nthreads);
-            done_threaded.resize(_nthreads);
-
-            for (int ii=0; ii<_nthreads;ii++) partial_threaded[ii]=0;
-            for (int ii=0; ii<_nthreads;ii++) done_threaded[ii]=0;
-            subdiv= 1000;
-            steps = (double)todo / (double)subdiv;
-
-            if(!timer_mode)
-            {
-                 fprintf(stderr,"[");fflush(stderr);
-            }
-        }
-
-        void finish()
-        {
-            set(todo);
-             if(timer_mode)
-                 fprintf(stderr,"\n");
-             else
-                 fprintf(stderr,"]\n");
-
-            fflush(stderr);
-            todo= 0;
-            done = 0;
-            partial =0;
-
-        }
-        void finish_threaded()// called by only one of the threads
-        {
-            done = 0;
-            double rem = 0;
-            for (int ii=0; ii<_nthreads;ii++) done += (done_threaded[ii] );
-            for (int ii=0; ii<_nthreads;ii++) partial += (partial_threaded[ii] );
-
-            finish();
-
-        }
-        void inc(uint64_t ntasks_done)
-        {
-            done += ntasks_done;
-            partial += ntasks_done;
-
-
-            while(partial >= steps)
-            {
-                if(timer_mode)
-                {
-                    gettimeofday(&timestamp, NULL);
-                    heure_actuelle = timestamp.tv_sec +(timestamp.tv_usec/1000000.0);
-                    double elapsed = heure_actuelle - heure_debut;
-                    double speed = done / elapsed;
-                    double rem = (todo-done) / speed;
-                    if(done>todo) rem=0;
-                    int min_e  = (int)(elapsed / 60) ;
-                    elapsed -= min_e*60;
-                    int min_r  = (int)(rem / 60) ;
-                    rem -= min_r*60;
-
-                 fprintf(stderr,"%c[%s]  %-5.3g%%   elapsed: %3i min %-2.0f sec   remaining: %3i min %-2.0f sec",13,
-                         message.c_str(),
-                         100*(double)done/todo,
-                         min_e,elapsed,min_r,rem);
-
-                }
-                else
-                {
-                     fprintf(stderr,"-");fflush(stderr);
-                }
-                partial -= steps;
-            }
-
-
-        }
-
-        void inc(uint64_t ntasks_done, int tid) //threads collaborate to this same progress bar
-        {
-            partial_threaded[tid] += ntasks_done;
-            done_threaded[tid] += ntasks_done;
-            while(partial_threaded[tid] >= steps)
-            {
-                if(timer_mode)
-                {
-                    struct timeval timet;
-                    double now;
-                    gettimeofday(&timet, NULL);
-                    now = timet.tv_sec +(timet.tv_usec/1000000.0);
-                    uint64_t total_done  = 0;
-                    for (int ii=0; ii<_nthreads;ii++) total_done += (done_threaded[ii] );
-                    double elapsed = now - heure_debut;
-                    double speed = total_done / elapsed;
-                    double rem = (todo-total_done) / speed;
-                    if(total_done > todo) rem =0;
-                    int min_e  =  (int)(elapsed / 60) ;
-                    elapsed -= min_e*60;
-                    int min_r  =  (int)(rem / 60) ;
-                    rem -= min_r*60;
-
-                     fprintf(stderr,"%c[%s]  %-5.3g%%   elapsed: %3i min %-2.0f sec   remaining: %3i min %-2.0f sec",13,
-                             message.c_str(),
-                             100*(double)total_done/todo,
-                             min_e,elapsed,min_r,rem);
-                }
-                else
-                {
-                     fprintf(stderr,"-");fflush(stderr);
-                }
-                partial_threaded[tid] -= steps;
-
-            }
-
-        }
-
-        void set(uint64_t ntasks_done)
-        {
-            if(ntasks_done > done)
-                inc(ntasks_done-done);
-        }
-        Progress () :     timer_mode(0) {}
-        //include timer, to print ETA ?
-    };
-
-
-
+   
 ////////////////////////////////////////////////////////////////
 #pragma mark -
 #pragma mark hasher
@@ -706,7 +566,7 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
         //atomically   return old val and set to 1
         uint64_t atomic_test_and_set(uint64_t pos)
         {
-            uint64_t oldval =     __sync_fetch_and_or (_bitArray + (pos >> 6), (uint64_t) (1ULL << (pos & 63)) );
+            uint64_t oldval = INTR_FETCH_AND_OR((long long*)_bitArray + (pos >> 6), (uint64_t)(1ULL << (pos & 63)));
 
             return  ( oldval >> (pos & 63 ) ) & 1;
         }
@@ -727,14 +587,14 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
         {
             assert(pos<_size);
             //_bitArray [pos >> 6] |=   (1ULL << (pos & 63) ) ;
-            __sync_fetch_and_or (_bitArray + (pos >> 6ULL), (1ULL << (pos & 63)) );
+            INTR_FETCH_AND_OR((long long*)_bitArray + (pos >> 6ULL), (1ULL << (pos & 63)));
         }
 
         //set bit pos to 0
         void reset(uint64_t pos)
         {
             //_bitArray [pos >> 6] &=   ~(1ULL << (pos & 63) ) ;
-            __sync_fetch_and_and (_bitArray + (pos >> 6ULL), ~(1ULL << (pos & 63) ));
+            INTR_FETCH_AND_AND((long long*)_bitArray + (pos >> 6ULL), ~(1ULL << (pos & 63)));
         }
 
         //return value of  last rank
@@ -814,10 +674,18 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
 
 
     static inline uint64_t fastrange64(uint64_t word, uint64_t p) {
-        //return word %  p;
-
+#ifdef __SIZEOF_INT128__  // then we know we have a 128-bit int
         return (uint64_t)(((__uint128_t)word * (__uint128_t)p) >> 64);
-
+#elif defined(_MSC_VER) && defined(_WIN64)
+        // supported in Visual Studio 2005 and better
+        uint64_t highProduct;
+        _umul128(word, p, &highProduct);  // ignore output
+        return highProduct;
+        unsigned __int64 _umul128(unsigned __int64 Multiplier, unsigned __int64 Multiplicand,
+                                  unsigned __int64* HighProduct);
+#else
+        return word % p;  // fallback
+#endif  // __SIZEOF_INT128__
     }
 
     class level{
@@ -914,30 +782,6 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
 
             setup();
 
-            if(_withprogress)
-            {
-                _progressBar.timer_mode=1;
-
-
-                double total_raw = _nb_levels;
-
-                double sum_geom_read =  ( 1.0 / (1.0 - _proba_collision));
-                double total_writeEach = sum_geom_read + 1.0;
-
-                double total_fastmode_ram =  (_fastModeLevel+1) +  ( pow(_proba_collision,_fastModeLevel)) * (_nb_levels-(_fastModeLevel+1))   ;
-
-                printf("for info, total work write each  : %.3f    total work inram from level %i : %.3f  total work raw : %.3f \n",total_writeEach,_fastModeLevel,total_fastmode_ram,total_raw);
-
-                if(writeEach)
-                {
-                    _progressBar.init(_nelem * total_writeEach,"Building BooPHF",num_thread);
-                }
-                else if(_fastmode)
-                    _progressBar.init( _nelem * total_fastmode_ram    ,"Building BooPHF",num_thread);
-                else
-                    _progressBar.init( _nelem * _nb_levels ,"Building BooPHF",num_thread);
-            }
-
             uint64_t offset = 0;
             for(int ii = 0; ii< _nb_levels; ii++)
             {
@@ -951,10 +795,6 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
 
                 delete _tempBitset;
             }
-
-            if(_withprogress)
-            _progressBar.finish_threaded();
-
 
             _lastbitsetrank = offset ;
 
@@ -1039,7 +879,7 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
         void pthread_processLevel( std::vector<elem_t>  & buffer , std::shared_ptr<Iterator> shared_it, std::shared_ptr<Iterator> until_p, int i)
         {
             uint64_t nb_done =0;
-            int tid =  __sync_fetch_and_add (&_nb_living, 1);
+            int tid = INTR_FETCH_AND_ADD((long long*)& _nb_living, 1);
             auto until = *until_p;
             uint64_t inbuff =0;
 
@@ -1095,7 +935,7 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
                         if(_fastmode && i == _fastModeLevel)
                         {
 
-                            uint64_t idxl2 = __sync_fetch_and_add(& _idxLevelsetLevelFastmode,1);
+                            uint64_t idxl2 = INTR_FETCH_AND_ADD((long long*)&_idxLevelsetLevelFastmode, 1);
                             //si depasse taille attendue pour setLevelFastmode, fall back sur slow mode mais devrait pas arriver si hash ok et proba avec nous
                             if(idxl2>= setLevelFastmode.size())
                                 _fastmode = false;
@@ -1107,7 +947,7 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
                         if(i == _nb_levels-1) //stop cascade here, insert into exact hash
                         {
 
-                            uint64_t hashidx =  __sync_fetch_and_add (& _hashidx, 1);
+                            uint64_t hashidx = INTR_FETCH_AND_ADD((long long*)&_hashidx, 1);
 
 #ifdef BOOPHF_USE_PTHREADS
                             pthread_mutex_lock(&_mutex); //see later if possible to avoid this, mais pas bcp item vont la
@@ -1129,9 +969,9 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
                                 if(writebuff>=NBBUFF)
                                 {
                                     //flush buffer
-                                    flockfile(_currlevelFile);
+                                    LOCK_FILE(_currlevelFile);
                                     fwrite(myWriteBuff.data(),sizeof(elem_t),writebuff,_currlevelFile);
-                                    funlockfile(_currlevelFile);
+                                    UNLOCK_FILE(_currlevelFile);
                                     writebuff = 0;
 
                                 }
@@ -1160,7 +1000,6 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
                     }
 
                     nb_done++;
-                    if((nb_done&1023) ==0  && _withprogress) {_progressBar.inc(nb_done,tid);nb_done=0; }
 
                 }
 
@@ -1170,9 +1009,9 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
             if(_writeEachLevel && writebuff>0)
             {
                 //flush buffer
-                flockfile(_currlevelFile);
+                LOCK_FILE(_currlevelFile);
                 fwrite(myWriteBuff.data(),sizeof(elem_t),writebuff,_currlevelFile);
-                funlockfile(_currlevelFile);
+                UNLOCK_FILE(_currlevelFile);
                 writebuff = 0;
             }
 
@@ -1544,7 +1383,6 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
         uint64_t _hash_domain;
         uint64_t _nelem;
         std::unordered_map<elem_t,uint64_t,Hasher_t> _final_hash;
-        Progress _progressBar;
         int _nb_living;
         int _num_thread;
         uint64_t _hashidx;

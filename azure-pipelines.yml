@@ -20,17 +20,28 @@ steps:
     mkdir cmake-build-debug
     cd cmake-build-debug
     cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DGENIE_USE_OPENMP=OFF -DBUILD_DOCUMENTATION=ON
+  displayName: 'Run CMake'
+
+- script: |
+    cd cmake-build-debug
+    cmake --build ./ -- -j
+  condition: ne( variables['Agent.OS'], 'Windows_NT' )
+  displayName: 'Build (Make)'
+
+- script: |
+    cd cmake-build-debug
     cmake --build ./
-  displayName: 'Run CMake & Make'
+  condition: eq( variables['Agent.OS'], 'Windows_NT' )
+  displayName: 'Build (MSVC)'
 
-- script: |
-    echo 'Run genie unit tests'
-    ./cmake-build-debug/bin/util-tests
-  displayName: 'Run genie unit tests'
+- bash: |
+    $(Build.SourcesDirectory)/cmake-build-debug/bin/util-tests
+  condition: ne( variables['Agent.OS'], 'Windows_NT' )
+  displayName: 'Run genie unit tests (bash)'
 
-- script: |
-    echo 'Run GABAC Roundtrips'
-    chmod 777 ./ci/gabac-roundtrip.sh
-    # ./ci/gabac-roundtrip.sh
-  displayName: 'Run GABAC Roundtrips'
+- powershell: |
+    $(Build.SourcesDirectory)\cmake-build-debug\bin\Debug\util-tests.exe
+  condition: eq( variables['Agent.OS'], 'Windows_NT' )
+  displayName: 'Run genie unit tests (windows)'
+
 
