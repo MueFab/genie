@@ -1,3 +1,8 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
 #include "block.h"
 
@@ -28,7 +33,7 @@ uint64_t Block::getLength() const {
     uint64_t len = 1;
 
     // block_payload_size u(32)
-    len += 4;
+    len += sizeof(uint32_t);
 
     // block_payload[]
     len += mgb::Block::getPayload().getWrittenSize();

@@ -37,7 +37,7 @@ void BlockConfig::setClassInfos(std::vector<ClassInfo>&& _cls_infos) {
     class_infos = _cls_infos;
 }
 
-uint64_t BlockConfig::getLength() const {
+uint64_t BlockConfig::getBitLength() const {
     return 1;
 }
 

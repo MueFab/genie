@@ -13,8 +13,8 @@ WithHeader::WithHeader(bool _mit_flag, bool _cc_mode_flag)
       CC_mode_flag(_cc_mode_flag){}
 
 
-uint64_t WithHeader::getLength() const {
-    return BlockConfig::getLength() + 2; // block_header_flag, MIT_flag, CC_mode_flag
+uint64_t WithHeader::getBitLength() const {
+    return BlockConfig::getBitLength() + 2; // block_header_flag, MIT_flag, CC_mode_flag
 }
 
 void WithHeader::write(genie::util::BitWriter& bit_writer) const {
