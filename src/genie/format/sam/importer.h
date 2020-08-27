@@ -32,6 +32,7 @@ class Importer : public core::FormatImporter {
     Reader samReader;
     ReadTemplateGroup rtg;
     util::OrderedLock lock;  //!< @brief Lock to ensure in order execution
+    uint64_t last_position{0};
 
     /**
      *
@@ -209,7 +210,7 @@ class Importer : public core::FormatImporter {
      * @param r2
      * @return true, if mapping pos of r1 is less than of r2
      */
-    static bool compare(core::record::Record& r1, core::record::Record& r2);
+    static bool compare(const core::record::Record& r1, const core::record::Record& r2);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
