@@ -15,6 +15,12 @@ class MasterIndexTable {
 
    public:
 
+    MasterIndexTable();
+
+    uint64_t getLength() const;
+
+    void write(genie::util::BitWriter& bit_writer) const;
+
 };
 
 }  // namespace mpegg_p1

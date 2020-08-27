@@ -12,8 +12,8 @@ WithoutHeader::WithoutHeader(bool _cc_mode_flag)
     : BlockConfig(false, true),
       ordered_blocks_flag(_cc_mode_flag){}
 
-uint64_t WithoutHeader::getLength() const {
-    return BlockConfig::getLength() + 1; // block_header_flag, ordered_blocks_flag
+uint64_t WithoutHeader::getBitLength() const {
+    return BlockConfig::getBitLength() + 1; // block_header_flag, ordered_blocks_flag
 }
 
 void WithoutHeader::write(genie::util::BitWriter& bit_writer) const {
