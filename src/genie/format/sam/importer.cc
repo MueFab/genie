@@ -4,6 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include <list>
+#include <algorithm>
+
 #include "importer.h"
 #include <genie/core/record/alignment_split/same-rec.h>
 #include <genie/core/record/alignment_split/other-rec.h>
@@ -14,7 +17,6 @@
 #include <genie/util/ordered-section.h>
 //#include <record/alignment_split/other-rec.h>
 //#include <record/alignment_external/other-rec.h>
-#include <list>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -166,10 +168,27 @@ bool Importer::pumpRetrieve(core::Classifier* _classifier) {
         convert(chunk, read_template, samReader.getRefs());
     }
 
+    auto& records = chunk.getData();
+    std::sort (records.begin(), records.end(), compare);
+
+    uint64_t last_position = 0;
+    for(size_t i = 0; i < records.size(); ++i) {
+        uint64_t abs_pos = records[i].getAlignments().front().getPosition();
+        // Bezugsposition
+        uint64_t first_pos = abs_pos; // geringste position
+
+        for(size_t j = 0; j < records[i].getAlignments().size(); ++i) {
+            first_pos = std::min(first_pos, records[i].getAlignments()[j].getPosition());
+        }
+
+        UTILS_DIE_IF(first_pos < last_position, "Das darf nicht passieren.");
+            last_position = first_pos;
+
+    }
+
     if (!chunk.getData().empty()) {
         _classifier->add(std::move(chunk));
     }
-
     return samReader.good();
 }
 
@@ -234,11 +253,27 @@ void Importer::addAlignmentToSameRec(std::unique_ptr<core::record::Record>& rec,
 // ---------------------------------------------------------------------------------------------------------------------
 void Importer::convertPairedEndNoSplit(core::record::Chunk &template_chunk, SamRecords2D &sam_recs_2d, std::map<std::string, size_t>& refs) {
 
+    /// Swap template so that the primary alignment of the first segment always has lower mapping position
+    /// compared to primary alignment of the second segment
+    if (sam_recs_2d.front().front().getPos() > sam_recs_2d.back().front().getPos()){
+        std::swap(sam_recs_2d.front(), sam_recs_2d.back());
+    }
+
     auto sam_r1_iter = sam_recs_2d.front().begin();
     auto sam_r2_iter = sam_recs_2d.back().begin();
 
     auto sam_r1_end = sam_recs_2d.front().end();
     auto sam_r2_end = sam_recs_2d.back().end();
+
+//    if (sam_r1_iter->getPos() > sam_r2_iter->getPos()){
+//        auto tmp_iter = sam_r2_iter;
+//        sam_r2_iter = sam_r1_iter;
+//        sam_r1_iter = tmp_iter;
+//
+//        tmp_iter = sam_r2_end;
+//        sam_r2_end = sam_r1_end;
+//        sam_r1_end = tmp_iter;
+//    }
 
     // Cache SEQ of read 1 & 2 to replace SEQ of other alignment if the value is '*'
     // See "Recommended Practice for SAM Format" in SAM Format documentation for more information
@@ -560,6 +595,11 @@ void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_re
             create_split_records = any_different_ref;
         }
 
+        // Swap template so that the first segment has lower mapping position
+//        if (sam_recs_2d.front().front().getPos() > sam_recs_2d.front().back().getPos()){
+//            std::swap(sam_recs_2d.front().front(), sam_recs_2d.front().back());
+//        }
+
         if (create_split_records || force_split){
             convertPairedEndSplitPair(chunk, sam_recs_2d, refs);
         } else {
@@ -626,6 +666,35 @@ void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt, std::map<st
         UTILS_DIE("Unhandled read type found. Should never be reached!");
     }
 
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Importer::compare(core::record::Record &r1, core::record::Record &r2) {
+//    auto &a1 = r1.getAlignments();
+//    auto &a2 = r2.getAlignments();
+//
+//    if (a1.begin() == a1.end()){
+//        return true;
+//    }
+//
+//    if (r1.getAlignments().empty() || r2.getAlignments().empty()){
+//        return true;
+//    } else {
+//        return r1.getAlignments().front().getPosition() < r2.getAlignments().front().getPosition();
+//    }
+
+    if (r1.getAlignments().empty() || r2.getAlignments().empty()){
+        return false;
+    } else {
+        return r1.getAlignments().front().getPosition() < r2.getAlignments().front().getPosition();
+    }
+
+//    try {
+//        return r1.getAlignments().front().getPosition() < r2.getAlignments().front().getPosition();
+//    } catch (...) {
+//        return true;
+//    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

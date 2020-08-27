@@ -344,14 +344,18 @@ void Record::setSeq(const std::string& _seq) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReadTemplate::ReadTemplate(){
-    initializeData();
+ReadTemplate::ReadTemplate()
+    : qname(),
+      data(size_t(Index::TOTAL_TYPES)){
+//    initializeData();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReadTemplate::ReadTemplate(Record &&rec) : qname(rec.getQname()){
-    initializeData();
+ReadTemplate::ReadTemplate(Record &&rec)
+    : qname(rec.getQname()),
+      data(size_t(Index::TOTAL_TYPES)){
+//    initializeData();
     addRecord(std::move(rec));
 }
 
