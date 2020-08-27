@@ -201,6 +201,15 @@ class Importer : public core::FormatImporter {
      */
     static void convert(core::record::Chunk& chunk, ReadTemplate& rt, std::map<std::string, size_t>& refs,
                         bool force_split=false);
+
+    /**
+     * @brief Compare mapping position of primary alignment of r1 and r2
+     *
+     * @param r1
+     * @param r2
+     * @return true, if mapping pos of r1 is less than of r2
+     */
+    static bool compare(core::record::Record& r1, core::record::Record& r2);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
