@@ -458,7 +458,7 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSplitRec) {  // NOLINT(cert-err-cpp
 //        }
 //    }
 
-}
+//}
 
 # if false
 TEST(SamFileReader, main) {  // NOLINT(cert-err-cpp)
