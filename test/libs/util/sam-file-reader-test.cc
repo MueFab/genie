@@ -13,6 +13,8 @@
 #include <genie/format/sam/reader.h>
 #include <genie/format/sam/record.h>
 
+#include <genie/core/classifier-bypass.h>
+
 #include <genie/core/record/alignment_split/same-rec.h>
 #include <genie/core/record/alignment_split/other-rec.h>
 #include <genie/core/record/alignment_split/unpaired.h>
@@ -219,7 +221,7 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSameRec) {  // NOLINT(cert-err-cpp)
     EXPECT_EQ(rec->getFlags(), 4);
 
     auto rec_alignment = rec->getAlignments().begin();
-    EXPECT_EQ(rec_alignment->getPosition(), 181879-1);
+    EXPECT_EQ(rec_alignment->getPosition(), 10541-1);
     EXPECT_EQ(rec_alignment->getAlignment().getECigar(), "76=");
     EXPECT_EQ(rec_alignment->getAlignment().getMappingScores().front(), 118);
 
@@ -228,7 +230,7 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSameRec) {  // NOLINT(cert-err-cpp)
 
     auto rec_alignment_split = dynamic_cast<genie::core::record::alignment_split::SameRec *>(
         rec_alignment->getAlignmentSplits().front().get());
-    EXPECT_EQ(rec_alignment_split->getDelta(), -171338);
+    EXPECT_EQ(rec_alignment_split->getDelta(), 181879-10541);
     EXPECT_EQ(rec_alignment_split->getAlignment().getECigar(), "76=");
     EXPECT_EQ(rec_alignment_split->getAlignment().getMappingScores().front(), 118);
 
@@ -240,8 +242,9 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSameRec) {  // NOLINT(cert-err-cpp)
     EXPECT_EQ(rec->getClassID(), genie::core::record::ClassType::CLASS_I);
     EXPECT_EQ(rec->getFlags(), 4);
 
+    /// Expect first alignment comes from record with FLAG 419 due to swapping
     rec_alignment = rec->getAlignments().begin();
-    EXPECT_EQ(rec_alignment->getPosition(), 1491-1);
+    EXPECT_EQ(rec_alignment->getPosition(), 658-1);
     EXPECT_EQ(rec_alignment->getAlignment().getECigar(), "76=");
     EXPECT_EQ(rec_alignment->getAlignment().getMappingScores().front(), 100);
 
@@ -250,7 +253,7 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSameRec) {  // NOLINT(cert-err-cpp)
 
     rec_alignment_split = dynamic_cast<genie::core::record::alignment_split::SameRec *>(
         rec_alignment->getAlignmentSplits().front().get());
-    EXPECT_EQ(rec_alignment_split->getDelta(), -833);
+    EXPECT_EQ(rec_alignment_split->getDelta(), 1491-658);
     EXPECT_EQ(rec_alignment_split->getAlignment().getECigar(), "76=");
     EXPECT_EQ(rec_alignment_split->getAlignment().getMappingScores().front(), 100);
 
@@ -377,6 +380,83 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSplitRec) {  // NOLINT(cert-err-cpp
         EXPECT_EQ(rec_alignment_split->getNextPos(), 1491-1);
         EXPECT_EQ(rec_alignment_split->getNextSeq(), 3);
     }
+
+}
+
+//TEST(SamFileReader, ImportFromFile2) {  // NOLINT(cert-err-cpp)
+//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+//
+//    std::vector<std::string> fnames = {
+//        "9799_7#3.sam",  // 0 - TODO: As an example for header
+//        "9827_2#49.sam", // 1 - OK
+//        "dm3PacBio.sam", // 2 - OK
+//        "ERR174310.aln.sort.dupmark.rg.recal.sam", // 3 - OK
+//        "ERR174310.mult.sorted.sam",    // 4 - TODO: ERROR due to invalid SAM Record
+//        "G15511.HCC1143.1.sam",         // 5 - TODO: As an example for header
+//        "HCC1954.mix1.n80t20.sam",      // 6 - TODO: As an example for header
+//        "K562_cytosol_LID8465_GEM_v3.sam",      // 7 - pair multi_alignment - TODO: Create smaller data
+//        "K562_cytosol_LID8465_TopHat_v2.sam",   // 8 - OK
+//        "MiSeq_Ecoli_DH10B_110721_PF.sam",      // 9 - OK
+//        "NA12877_S1.sam",   // 10 - TODO: tag ID PP
+//        "NA12878_S1.sam",   // 11
+//        "NA12878-Rep-1_S1_L001_2.aln.sort.dupmark.rg.sam",  // 12 - TODO: tag PL
+//        "NA12878.pacbio.bwa-sw.20140202.sam",               // 13
+//        "NA12879_S1.sam",         // 14 - (incomplete) pair - TODO: test
+//        "NA12882_S1.sam",         // 15 - pair - TODO: tag ID, PP
+//        "NA12890_S1.sam",         // 16 - incomplete pairs - ok
+//        "NA21144.chrom11.ILLUMINA.bwa.GIH.low_coverage.20130415.sam", // 17 - TODO: tag VN
+//        "sample-2-10_sorted.sam", // 18 - single - ok
+//        "sample-2-11_sorted.sam", // 19 - single - ok
+//        "sample-2-12_sorted.sam", // 20 - single - ok
+//        "simulation.1.homoINDELs.homoCEUsnps.reads2.fq.sam.samelength.sam", // 21 - pair - ok
+//        "SRR327342.sam"           // 22 - single unmapped - TODO: Check converter for unmapped
+//    };
+////    std::ifstream f("/home/adhisant/tmp/data/SAM_TEST/" + fnames[22]);
+//
+//    std::ifstream f(gitRootDir + "/data/sam/input.sam");
+//    UTILS_DIE_IF(!f.good(), "Cannot read file");
+//
+//    genie::format::sam::Reader reader(f);
+//
+//    std::list<std::string> lines;
+//    std::list<genie::format::sam::ReadTemplate> rts;
+//    genie::format::sam::ReadTemplateGroup rtg;
+//
+//    genie::core::record::Chunk chunk;
+//    int k = 0;
+//    {
+//        while (reader.good() && k < 1000){
+//            reader.read(lines);
+//            k++;
+//        }
+//    }
+//
+//    rtg.addRecords(lines);
+//    lines.clear();
+//    rtg.getTemplates(rts);
+//
+//    for (auto& rt: rts){
+//        genie::format::sam::Importer::convert(chunk, rt, reader.getRefs(), false);
+//    }
+//
+//    auto& records = chunk.getData();
+//    std::sort (records.begin(), records.end(), genie::format::sam::Importer::compare);
+
+//    uint64_t last_position = 0;
+//    for(size_t i = 0; i < records.size(); ++i) {
+//        if (!records[i].getAlignments().empty()){
+//            uint64_t abs_pos = records[i].getAlignments().front().getPosition();
+//            // Bezugsposition
+//            uint64_t first_pos = abs_pos; // geringste position
+//
+//            for(size_t j = 0; j < records[i].getAlignments().size(); ++i) {
+//                first_pos = std::min(first_pos, records[i].getAlignments()[j].getPosition());
+//            }
+//
+//            UTILS_DIE_IF(first_pos < last_position, "Das darf nicht passieren.");
+//            last_position = first_pos;
+//        }
+//    }
 
 }
 
