@@ -4,13 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <list>
 #include <algorithm>
+#include <list>
 
-#include "importer.h"
-#include <genie/core/record/alignment_split/same-rec.h>
 #include <genie/core/record/alignment_split/other-rec.h>
+#include <genie/core/record/alignment_split/same-rec.h>
 #include <genie/core/record/alignment_split/unpaired.h>
+#include "importer.h"
 //#include <genie/core/record/alignment-external.h>
 #include <genie/core/record/alignment_external/other-rec.h>
 
@@ -24,11 +24,21 @@ namespace genie {
 namespace format {
 namespace sam {
 
+uint64_t getMinPos(const core::record::Record& r) {
+    uint64_t abs_pos = r.getAlignments().front().getPosition();  // pivot
+    uint64_t first_pos = abs_pos;                                     // lowest locus
+
+    for (const auto &split : r.getAlignments().front().getAlignmentSplits()) {
+        UTILS_DIE_IF(split->getType() != core::record::AlignmentSplit::Type::SAME_REC, "Only same rec split alignments supported");
+        first_pos = std::min(
+            first_pos, abs_pos + dynamic_cast<const core::record::alignment_split::SameRec &>(*split).getDelta());
+    }
+    return first_pos;
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-Importer::Importer(size_t _blockSize, std::istream &_file)
-    : blockSize(_blockSize), samReader(_file), lock(){
-}
+Importer::Importer(size_t _blockSize, std::istream &_file) : blockSize(_blockSize), samReader(_file), lock() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -151,12 +161,12 @@ std::string Importer::convertCigar2ECigar(const std::string &cigar, const std::s
     return samReader.good();
 }*/
 
-bool Importer::pumpRetrieve(core::Classifier* _classifier) {
+bool Importer::pumpRetrieve(core::Classifier *_classifier) {
     std::string line;
     std::list<std::string> lines;
     std::list<ReadTemplate> read_templates;
     core::record::Chunk chunk;
-    while (samReader.good() && blockSize > lines.size()){
+    while (samReader.good() && blockSize > lines.size()) {
         samReader.read(lines);
     }
 
@@ -164,26 +174,22 @@ bool Importer::pumpRetrieve(core::Classifier* _classifier) {
     lines.clear();
     rtg.getTemplates(read_templates);
 
-    for (auto & read_template:read_templates){
+    for (auto &read_template : read_templates) {
         convert(chunk, read_template, samReader.getRefs());
     }
 
-    auto& records = chunk.getData();
-    std::sort (records.begin(), records.end(), compare);
+    auto &records = chunk.getData();
+    std::sort(records.begin(), records.end(), compare);
 
-    uint64_t last_position = 0;
-    for(size_t i = 0; i < records.size(); ++i) {
-        uint64_t abs_pos = records[i].getAlignments().front().getPosition();
-        // Bezugsposition
-        uint64_t first_pos = abs_pos; // geringste position
-
-        for(size_t j = 0; j < records[i].getAlignments().size(); ++i) {
-            first_pos = std::min(first_pos, records[i].getAlignments()[j].getPosition());
+    for (const auto &record : records) {
+        if (record.getAlignments().empty()) {
+            continue;
         }
 
-        UTILS_DIE_IF(first_pos < last_position, "Das darf nicht passieren.");
-            last_position = first_pos;
+        auto minPos = getMinPos(record);
 
+        UTILS_DIE_IF(minPos < last_position, "Records not properly ordered");
+        last_position = minPos;
     }
 
     if (!chunk.getData().empty()) {
@@ -194,17 +200,15 @@ bool Importer::pumpRetrieve(core::Classifier* _classifier) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Importer::flushIn(uint64_t& pos) { flushOut(pos); }
+void Importer::flushIn(uint64_t &pos) { flushOut(pos); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 std::unique_ptr<core::record::Record> Importer::convertSam2SameRec(Record &sam_r1, Record &sam_r2,
-                                                  std::map<std::string, size_t> &refs) {
-
+                                                                   std::map<std::string, size_t> &refs) {
     auto flag_tuple = convertFlags2Mpeg(sam_r1.getFlags());
 
-    auto rec = util::make_unique<core::record::Record>(2, core::record::ClassType::CLASS_I, sam_r1.moveQname(),
-                             "Genie",std::get<1>(flag_tuple),
-                             sam_r1.getPos() < sam_r2.getPos());
+    auto rec = util::make_unique<core::record::Record>(2, core::record::ClassType::CLASS_I, sam_r1.moveQname(), "Genie",
+                                                       std::get<1>(flag_tuple), sam_r1.getPos() < sam_r2.getPos());
 
     core::record::Segment segment(sam_r1.moveSeq());
     if (sam_r1.getQual() != "*") {
@@ -227,9 +231,8 @@ std::unique_ptr<core::record::Record> Importer::convertSam2SameRec(Record &sam_r
     return rec;
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::addAlignmentToSameRec(std::unique_ptr<core::record::Record>& rec, Record& sam_r1, Record& sam_r2,
-                                     std::map<std::string, size_t>& refs) {
-
+void Importer::addAlignmentToSameRec(std::unique_ptr<core::record::Record> &rec, Record &sam_r1, Record &sam_r2,
+                                     std::map<std::string, size_t> &refs) {
     UTILS_DIE_IF(sam_r1.getRname() != sam_r2.getRname(), "Different reference sequence");
 
     core::record::Alignment alignment(convertCigar2ECigar(sam_r1.getCigar(), sam_r1.getSeq()),
@@ -237,7 +240,7 @@ void Importer::addAlignmentToSameRec(std::unique_ptr<core::record::Record>& rec,
     alignment.addMappingScore(sam_r1.getMapQ());
 
     // Convert from sam 1-based mapping position to mpeg-g 0-based coordinate
-    auto sam_r1_pos = sam_r1.getPos()-1;
+    auto sam_r1_pos = sam_r1.getPos() - 1;
     core::record::AlignmentBox alignmentContainer(sam_r1_pos, std::move(alignment));
 
     core::record::Alignment alignment2(convertCigar2ECigar(sam_r2.getCigar(), sam_r2.getSeq()),
@@ -251,8 +254,8 @@ void Importer::addAlignmentToSameRec(std::unique_ptr<core::record::Record>& rec,
     rec->addAlignment(refs.at(sam_r1.getRname()), std::move(alignmentContainer));
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertPairedEndNoSplit(core::record::Chunk &template_chunk, SamRecords2D &sam_recs_2d, std::map<std::string, size_t>& refs) {
-
+void Importer::convertPairedEndNoSplit(core::record::Chunk &template_chunk, SamRecords2D &sam_recs_2d,
+                                       std::map<std::string, size_t> &refs) {
     /// Swap template so that the primary alignment of the first segment always has lower mapping position
     /// compared to primary alignment of the second segment
     if (sam_recs_2d.front().front().getPos() > sam_recs_2d.back().front().getPos()){
@@ -265,15 +268,15 @@ void Importer::convertPairedEndNoSplit(core::record::Chunk &template_chunk, SamR
     auto sam_r1_end = sam_recs_2d.front().end();
     auto sam_r2_end = sam_recs_2d.back().end();
 
-//    if (sam_r1_iter->getPos() > sam_r2_iter->getPos()){
-//        auto tmp_iter = sam_r2_iter;
-//        sam_r2_iter = sam_r1_iter;
-//        sam_r1_iter = tmp_iter;
-//
-//        tmp_iter = sam_r2_end;
-//        sam_r2_end = sam_r1_end;
-//        sam_r1_end = tmp_iter;
-//    }
+    //    if (sam_r1_iter->getPos() > sam_r2_iter->getPos()){
+    //        auto tmp_iter = sam_r2_iter;
+    //        sam_r2_iter = sam_r1_iter;
+    //        sam_r1_iter = tmp_iter;
+    //
+    //        tmp_iter = sam_r2_end;
+    //        sam_r2_end = sam_r1_end;
+    //        sam_r1_end = tmp_iter;
+    //    }
 
     // Cache SEQ of read 1 & 2 to replace SEQ of other alignment if the value is '*'
     // See "Recommended Practice for SAM Format" in SAM Format documentation for more information
@@ -285,11 +288,11 @@ void Importer::convertPairedEndNoSplit(core::record::Chunk &template_chunk, SamR
     sam_r1_iter++;
     sam_r2_iter++;
 
-    while (sam_r1_iter != sam_recs_2d.front().end() && sam_r2_iter != sam_recs_2d.back().end()){
+    while (sam_r1_iter != sam_recs_2d.front().end() && sam_r2_iter != sam_recs_2d.back().end()) {
         UTILS_DIE_IF(sam_r1_iter->getRname() != sam_r2_iter->getRname(), "Read1 and Read2 have different RNAME");
         UTILS_DIE_IF(!sam_r1_iter->isPairOf(*sam_r2_iter), "Not read 1 is not pair of read 2");
 
-        if (rec->getAlignmentSharedData().getSeqID() != refs.at(sam_r1_iter->getRname())){
+        if (rec->getAlignmentSharedData().getSeqID() != refs.at(sam_r1_iter->getRname())) {
             // Add more_alignment_info
             auto leftmost_read = sam_r1_iter->getPos() < sam_r2_iter->getPos() ? sam_r1_iter : sam_r2_iter;
             auto leftmost_read_pos = leftmost_read->getPos() - 1;
@@ -301,10 +304,10 @@ void Importer::convertPairedEndNoSplit(core::record::Chunk &template_chunk, SamR
 
             // Copy SEQ from the primary line due to SEQ and QUAL are set to "*"
             // See "Recommended Practice for SAM Format" in SAM Format documentation for more information
-            if (sam_r1_iter->getSeq() == "*"){
+            if (sam_r1_iter->getSeq() == "*") {
                 sam_r1_iter->setSeq(sam_r1_seq);
             }
-            if (sam_r2_iter->getSeq() == "*"){
+            if (sam_r2_iter->getSeq() == "*") {
                 sam_r2_iter->setSeq(sam_r2_seq);
             }
 
@@ -325,11 +328,10 @@ void Importer::convertPairedEndNoSplit(core::record::Chunk &template_chunk, SamR
 // ---------------------------------------------------------------------------------------------------------------------
 std::unique_ptr<core::record::Record> Importer::convertSam2SplitRec(Record &sam_r1, Record *sam_r2_ptr,
                                                                     std::map<std::string, size_t> &refs) {
-
     auto flag_tuple = convertFlags2Mpeg(sam_r1.getFlags());
 
-    auto rec = util::make_unique<core::record::Record>(2, core::record::ClassType::CLASS_I, sam_r1.moveQname(),
-                                                       "Genie",std::get<1>(flag_tuple), sam_r1.isFirstRead());
+    auto rec = util::make_unique<core::record::Record>(2, core::record::ClassType::CLASS_I, sam_r1.moveQname(), "Genie",
+                                                       std::get<1>(flag_tuple), sam_r1.isFirstRead());
 
     core::record::Segment segment(sam_r1.moveSeq());
     if (sam_r1.getQual() != "*") {
@@ -344,26 +346,24 @@ std::unique_ptr<core::record::Record> Importer::convertSam2SplitRec(Record &sam_
     return rec;
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::addAlignmentToSplitRec(std::unique_ptr<core::record::Record> &rec, Record &sam_r1,
-                                      Record *sam_r2_ptr, std::map<std::string, size_t> &refs) {
-
-    if (!sam_r1.isUnmapped()){
+void Importer::addAlignmentToSplitRec(std::unique_ptr<core::record::Record> &rec, Record &sam_r1, Record *sam_r2_ptr,
+                                      std::map<std::string, size_t> &refs) {
+    if (!sam_r1.isUnmapped()) {
         core::record::Alignment alignment(convertCigar2ECigar(sam_r1.getCigar(), sam_r1.getSeq()),
-                                              sam_r1.checkFlag(Record::FlagPos::SEQ_REVERSE));
+                                          sam_r1.checkFlag(Record::FlagPos::SEQ_REVERSE));
         alignment.addMappingScore(sam_r1.getMapQ());
 
         // Convert from sam 1-based mapping position to mpeg-g 0-based coordinate
-        auto sam_r1_pos = sam_r1.getPos()-1;
+        auto sam_r1_pos = sam_r1.getPos() - 1;
         core::record::AlignmentBox alignmentContainer(sam_r1_pos, std::move(alignment));
 
-        if (sam_r2_ptr == nullptr || sam_r2_ptr->isUnmapped()){
+        if (sam_r2_ptr == nullptr || sam_r2_ptr->isUnmapped()) {
             auto splitAlign = util::make_unique<core::record::alignment_split::Unpaired>();
             alignmentContainer.addAlignmentSplit(std::move(splitAlign));
         } else {
-            auto sam_r2_pos = sam_r2_ptr->getPos()-1;
-            auto splitAlign = util::make_unique<core::record::alignment_split::OtherRec>(
-                sam_r2_pos, refs.at(sam_r2_ptr->getRname())
-            );
+            auto sam_r2_pos = sam_r2_ptr->getPos() - 1;
+            auto splitAlign =
+                util::make_unique<core::record::alignment_split::OtherRec>(sam_r2_pos, refs.at(sam_r2_ptr->getRname()));
             alignmentContainer.addAlignmentSplit(std::move(splitAlign));
         }
 
@@ -371,8 +371,8 @@ void Importer::addAlignmentToSplitRec(std::unique_ptr<core::record::Record> &rec
     }
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertPairedEndSplitPair(core::record::Chunk &template_chunk, SamRecords2D &sam_recs_2d, std::map<std::string, size_t>& refs) {
-
+void Importer::convertPairedEndSplitPair(core::record::Chunk &template_chunk, SamRecords2D &sam_recs_2d,
+                                         std::map<std::string, size_t> &refs) {
     auto sam_r1_iter = sam_recs_2d.front().begin();
     auto sam_r2_iter = sam_recs_2d.back().begin();
 
@@ -386,16 +386,16 @@ void Importer::convertPairedEndSplitPair(core::record::Chunk &template_chunk, Sa
     auto sam_r1_seq = sam_r1_iter != sam_r1_end ? sam_r1_iter->getSeq() : "*";
     auto sam_r2_seq = sam_r2_iter != sam_r2_end ? sam_r2_iter->getSeq() : "*";
 
-    while (sam_r1_iter !=  sam_r1_end || sam_r2_iter != sam_r2_end){
-
+    while (sam_r1_iter != sam_r1_end || sam_r2_iter != sam_r2_end) {
         // Handle Read 1
-        if (sam_r1_iter != sam_r1_end){
+        if (sam_r1_iter != sam_r1_end) {
             auto *sam_r2_ptr = sam_r2_iter != sam_r2_end ? &(*sam_r2_iter) : nullptr;
 
-            if (rec_1){
-                if (rec_1->getAlignmentSharedData().getSeqID() != refs.at(sam_r1_iter->getRname())){
+            if (rec_1) {
+                if (rec_1->getAlignmentSharedData().getSeqID() != refs.at(sam_r1_iter->getRname())) {
                     // Add more_alignment_info
-//                    auto leftmost_read = sam_r1_iter->getPos() < sam_r2_iter->getPos() ? sam_r1_iter : sam_r2_iter;
+                    //                    auto leftmost_read = sam_r1_iter->getPos() < sam_r2_iter->getPos() ?
+                    //                    sam_r1_iter : sam_r2_iter;
                     auto leftmost_read = sam_r1_iter;
                     auto leftmost_read_pos = leftmost_read->getPos() - 1;
                     auto more_alignment_info = util::make_unique<core::record::alignment_external::OtherRec>(
@@ -406,7 +406,7 @@ void Importer::convertPairedEndSplitPair(core::record::Chunk &template_chunk, Sa
 
                     // Retrieve back Sequence from the primary line due to SEQ and QUAL are set to "*"
                     // See "Recommended Practice for SAM Format" in SAM Format documentation for more information
-                    if (sam_r1_iter->getSeq() == "*"){
+                    if (sam_r1_iter->getSeq() == "*") {
                         sam_r1_iter->setSeq(sam_r1_seq);
                     }
 
@@ -420,13 +420,14 @@ void Importer::convertPairedEndSplitPair(core::record::Chunk &template_chunk, Sa
         }
 
         // Handle Read 2
-        if (sam_r2_iter != sam_r2_end){
+        if (sam_r2_iter != sam_r2_end) {
             auto *sam_r1_ptr = sam_r1_iter != sam_r1_end ? &(*sam_r1_iter) : nullptr;
 
-            if (rec_2){
-                if (rec_2->getAlignmentSharedData().getSeqID() != refs.at(sam_r2_iter->getRname())){
+            if (rec_2) {
+                if (rec_2->getAlignmentSharedData().getSeqID() != refs.at(sam_r2_iter->getRname())) {
                     // Add more_alignment_info
-//                    auto leftmost_read = sam_r1_iter->getPos() < sam_r2_iter->getPos() ? sam_r1_iter : sam_r2_iter;
+                    //                    auto leftmost_read = sam_r1_iter->getPos() < sam_r2_iter->getPos() ?
+                    //                    sam_r1_iter : sam_r2_iter;
                     auto leftmost_read = sam_r2_iter;
                     auto leftmost_read_pos = leftmost_read->getPos() - 1;
                     auto more_alignment_info = util::make_unique<core::record::alignment_external::OtherRec>(
@@ -437,7 +438,7 @@ void Importer::convertPairedEndSplitPair(core::record::Chunk &template_chunk, Sa
 
                     // Retrieve back Sequence from the primary line due to SEQ and QUAL are set to "*"
                     // See "Recommended Practice for SAM Format" in SAM Format documentation for more information
-                    if (sam_r2_iter->getSeq() == "*"){
+                    if (sam_r2_iter->getSeq() == "*") {
                         sam_r2_iter->setSeq(sam_r2_seq);
                     }
 
@@ -453,11 +454,11 @@ void Importer::convertPairedEndSplitPair(core::record::Chunk &template_chunk, Sa
         sam_r2_iter++;
     }
 
-    if (rec_1 != nullptr){
+    if (rec_1 != nullptr) {
         template_chunk.getData().push_back(std::move(*rec_1));
     }
 
-    if (rec_2 != nullptr){
+    if (rec_2 != nullptr) {
         template_chunk.getData().push_back(std::move(*rec_2));
     }
 
@@ -465,23 +466,23 @@ void Importer::convertPairedEndSplitPair(core::record::Chunk &template_chunk, Sa
     sam_recs_2d.back().clear();
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertUnmapped(core::record::Chunk &chunk, SamRecords &sam_recs, std::map<std::string, size_t>& refs) {
-    auto& sam_rec = sam_recs.front();
+void Importer::convertUnmapped(core::record::Chunk &chunk, SamRecords &sam_recs, std::map<std::string, size_t> &refs) {
+    auto &sam_rec = sam_recs.front();
 
     auto flag_tuple = convertFlags2Mpeg(sam_rec.getFlags());
-    core::record::Record rec(1, core::record::ClassType::CLASS_I, sam_rec.moveQname(),
-                             "Genie",std::get<1>(flag_tuple));
+    core::record::Record rec(1, core::record::ClassType::CLASS_I, sam_rec.moveQname(), "Genie",
+                             std::get<1>(flag_tuple));
 
     // No alignmnent
     // core::record::Alignment alignment(convertCigar2ECigar(sam_rec.getCigar(), sam_rec.getSeq()),
     //                                   sam_rec.checkFlag(Record::FlagPos::SEQ_REVERSE));
 
-    //alignment.addMappingScore(sam_rec.getMapQ());
-    //core::record::AlignmentBox alignmentContainer(sam_rec.getPos(), std::move(alignment));
+    // alignment.addMappingScore(sam_rec.getMapQ());
+    // core::record::AlignmentBox alignmentContainer(sam_rec.getPos(), std::move(alignment));
 
     core::record::Segment segment(sam_rec.moveSeq());
     if (sam_rec.getQual() != "*") {
-//        UTILS_DIE("Unmapped read has quality value!");
+        //        UTILS_DIE("Unmapped read has quality value!");
         segment.addQualities(sam_rec.moveQual());
     } else {
         segment.addQualities("");
@@ -496,22 +497,21 @@ void Importer::convertUnmapped(core::record::Chunk &chunk, SamRecords &sam_recs,
     sam_recs.clear();
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords &sam_recs, std::map<std::string, size_t>& refs,
+void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords &sam_recs, std::map<std::string, size_t> &refs,
                                 bool unmapped_pair, bool is_read_1_first) {
-
     auto sam_rec = std::move(sam_recs.front());
     sam_recs.pop_front();
 
     auto flag_tuple = convertFlags2Mpeg(sam_rec.getFlags());
-    core::record::Record rec(1, core::record::ClassType::CLASS_I, sam_rec.moveQname(),
-                             "Genie",std::get<1>(flag_tuple), is_read_1_first);
+    core::record::Record rec(1, core::record::ClassType::CLASS_I, sam_rec.moveQname(), "Genie", std::get<1>(flag_tuple),
+                             is_read_1_first);
 
     {
         core::record::Alignment alignment(convertCigar2ECigar(sam_rec.getCigar(), sam_rec.getSeq()),
                                           sam_rec.checkFlag(Record::FlagPos::SEQ_REVERSE));
         alignment.addMappingScore(sam_rec.getMapQ());
 
-        auto pos_zero_base = sam_rec.getPos()-1;
+        auto pos_zero_base = sam_rec.getPos() - 1;
         core::record::AlignmentBox alignmentContainer(pos_zero_base, std::move(alignment));
         rec.addAlignment(refs.at(sam_rec.getRname()), std::move(alignmentContainer));
     }
@@ -524,20 +524,19 @@ void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords &sam_recs
     }
     rec.addSegment(std::move(segment));
 
-    for (auto sam_rec_it = ++sam_recs.begin(); sam_rec_it != sam_recs.end(); sam_rec_it++){
-
-//        UTILS_DIE_IF(sam_rec_it->isUnmapped(),
-//                     "Unaligned sam record found for qname " + sam_rec.getQname());
+    for (auto sam_rec_it = ++sam_recs.begin(); sam_rec_it != sam_recs.end(); sam_rec_it++) {
+        //        UTILS_DIE_IF(sam_rec_it->isUnmapped(),
+        //                     "Unaligned sam record found for qname " + sam_rec.getQname());
 
         core::record::Alignment alignment(convertCigar2ECigar(sam_rec_it->getCigar(), sam_rec_it->getSeq()),
                                           sam_rec_it->checkFlag(Record::FlagPos::SEQ_REVERSE));
         alignment.addMappingScore(sam_rec_it->getMapQ());
 
         // Convert from sam 1-based mapping position to mpeg-g 0-based coordinate
-        auto pos_zero_base = sam_rec_it->getPos()-1;
+        auto pos_zero_base = sam_rec_it->getPos() - 1;
         core::record::AlignmentBox alignmentContainer(pos_zero_base, std::move(alignment));
 
-        if (unmapped_pair){
+        if (unmapped_pair) {
             auto splitAlign = util::make_unique<core::record::alignment_split::Unpaired>();
             alignmentContainer.addAlignmentSplit(std::move(splitAlign));
         }
@@ -549,41 +548,39 @@ void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords &sam_recs
 }
 // ---------------------------------------------------------------------------------------------------------------------
 void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d,
-                                std::map<std::string, size_t>& refs, bool force_split){
-
-    auto& read_1 = sam_recs_2d.front();
+                                std::map<std::string, size_t> &refs, bool force_split) {
+    auto &read_1 = sam_recs_2d.front();
     auto read_1_empty = read_1.empty();
     auto read_1_unmapped = false;
     auto read_1_primary = false;
-    if (!read_1_empty){
+    if (!read_1_empty) {
         read_1_primary = read_1.front().isPrimaryLine();
         read_1_unmapped = read_1.front().isUnmapped();
     }
     auto read_1_ok = !read_1_empty && read_1_primary && !read_1_unmapped;
 
-    auto& read_2 = sam_recs_2d.back();
+    auto &read_2 = sam_recs_2d.back();
     auto read_2_empty = read_2.empty();
     auto read_2_unmapped = false;
     auto read_2_primary = false;
-    if (!read_2_empty){
+    if (!read_2_empty) {
         read_2_unmapped = read_2.front().isUnmapped();
         read_2_primary = read_2.front().isPrimaryLine();
     }
     auto read_2_ok = !read_2_empty && read_2_primary && !read_2_unmapped;
 
-    if (read_1_ok && read_2_ok){
-        UTILS_DIE_IF(!read_1.front().isPairOf(read_2.front()),
-                     "read_1 is not pair of read_2");
+    if (read_1_ok && read_2_ok) {
+        UTILS_DIE_IF(!read_1.front().isPairOf(read_2.front()), "read_1 is not pair of read_2");
 
         auto create_split_records = false;
 
         // Check whether read_1 has the same number of alignments as read_2 and the references are the same
-        if (read_1.size() == read_2.size()){
+        if (read_1.size() == read_2.size()) {
             auto read_1_it = read_1.begin();
             auto read_2_it = read_2.begin();
             auto any_different_ref = false;
-            while(read_1_it != read_1.end() && read_2_it != read_2.end()){
-                if (read_1_it->getRname() != read_2_it->getRname()){
+            while (read_1_it != read_1.end() && read_2_it != read_2.end()) {
+                if (read_1_it->getRname() != read_2_it->getRname()) {
                     any_different_ref = true;
                     break;
                 }
@@ -596,17 +593,17 @@ void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_re
         }
 
         // Swap template so that the first segment has lower mapping position
-//        if (sam_recs_2d.front().front().getPos() > sam_recs_2d.front().back().getPos()){
-//            std::swap(sam_recs_2d.front().front(), sam_recs_2d.front().back());
-//        }
+        //        if (sam_recs_2d.front().front().getPos() > sam_recs_2d.front().back().getPos()){
+        //            std::swap(sam_recs_2d.front().front(), sam_recs_2d.front().back());
+        //        }
 
-        if (create_split_records || force_split){
+        if (create_split_records || force_split) {
             convertPairedEndSplitPair(chunk, sam_recs_2d, refs);
         } else {
             convertPairedEndNoSplit(chunk, sam_recs_2d, refs);
         }
 
-    // Handle alignments where one of the reads is not complete (unpaired etc)
+        // Handle alignments where one of the reads is not complete (unpaired etc)
     } else {
         if (!read_1_empty) {
             if (read_1_unmapped) {
@@ -618,10 +615,10 @@ void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_re
             }
         }
 
-        if (!read_2_empty){
-            if (read_2_unmapped){
+        if (!read_2_empty) {
+            if (read_2_unmapped) {
                 convertUnmapped(chunk, read_2, refs);
-            } else if (!read_2_primary){
+            } else if (!read_2_primary) {
                 UTILS_DIE("Cannot find the primary line of read_2!");
             } else if (read_2_ok) {
                 convertSingleEnd(chunk, read_2, refs, true, false);
@@ -631,20 +628,21 @@ void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_re
     sam_recs_2d.clear();
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt, std::map<std::string, size_t>& refs, bool force_split) {
-//    // Register Reference Sequence Name RNAME
-//    for (auto& sam_recs:sam_recs_2d){
-//        for (auto& sam_rc:sam_recs){
-//            const auto& rname = sam_rc.getRname();
-//
-//            if (rname != "=" || rname != "*"){
-//                auto it = refs.find(rname);
-//                if (it == refs.end()) {
-//                    refs.insert(std::make_pair(sam_rc.getRname(), ref_counter++));
-//                }
-//            }
-//        }
-//    }
+void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt, std::map<std::string, size_t> &refs,
+                       bool force_split) {
+    //    // Register Reference Sequence Name RNAME
+    //    for (auto& sam_recs:sam_recs_2d){
+    //        for (auto& sam_rc:sam_recs){
+    //            const auto& rname = sam_rc.getRname();
+    //
+    //            if (rname != "=" || rname != "*"){
+    //                auto it = refs.find(rname);
+    //                if (it == refs.end()) {
+    //                    refs.insert(std::make_pair(sam_rc.getRname(), ref_counter++));
+    //                }
+    //            }
+    //        }
+    //    }
 
     UTILS_DIE_IF(!rt.isValid(), "Invalid Read Template. Neither unmapped, single-end nor paired-end");
 
@@ -656,45 +654,46 @@ void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt, std::map<st
     rt.getRecords(sam_recs_2d);
 
     // Convert SAM records to MPEG-G record(s)
-    if (is_unmapped){
+    if (is_unmapped) {
         convertUnmapped(chunk, sam_recs_2d.front(), refs);
-    } else if (is_single){
+    } else if (is_single) {
         convertSingleEnd(chunk, sam_recs_2d.front(), refs);
-    } else if (is_pair){
+    } else if (is_pair) {
         convertPairedEnd(chunk, sam_recs_2d, refs, force_split);
     } else {
         UTILS_DIE("Unhandled read type found. Should never be reached!");
     }
-
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Importer::compare(core::record::Record &r1, core::record::Record &r2) {
-//    auto &a1 = r1.getAlignments();
-//    auto &a2 = r2.getAlignments();
-//
-//    if (a1.begin() == a1.end()){
-//        return true;
-//    }
-//
-//    if (r1.getAlignments().empty() || r2.getAlignments().empty()){
-//        return true;
-//    } else {
-//        return r1.getAlignments().front().getPosition() < r2.getAlignments().front().getPosition();
-//    }
+bool Importer::compare(const core::record::Record &r1, const core::record::Record &r2) {
+    //    auto &a1 = r1.getAlignments();
+    //    auto &a2 = r2.getAlignments();
+    //
+    //    if (a1.begin() == a1.end()){
+    //        return true;
+    //    }
+    //
+    //    if (r1.getAlignments().empty() || r2.getAlignments().empty()){
+    //        return true;
+    //    } else {
+    //        return r1.getAlignments().front().getPosition() < r2.getAlignments().front().getPosition();
+    //    }
 
-    if (r1.getAlignments().empty() || r2.getAlignments().empty()){
+    if (r1.getAlignments().empty()) {
         return false;
-    } else {
-        return r1.getAlignments().front().getPosition() < r2.getAlignments().front().getPosition();
     }
+    if(r2.getAlignments().empty()) {
+        return true;
+    }
+    return getMinPos(r1) < getMinPos(r2);
 
-//    try {
-//        return r1.getAlignments().front().getPosition() < r2.getAlignments().front().getPosition();
-//    } catch (...) {
-//        return true;
-//    }
+    //    try {
+    //        return r1.getAlignments().front().getPosition() < r2.getAlignments().front().getPosition();
+    //    } catch (...) {
+    //        return true;
+    //    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
