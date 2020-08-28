@@ -24,18 +24,6 @@ namespace genie {
 namespace format {
 namespace sam {
 
-uint64_t getMinPos(const core::record::Record& r) {
-    uint64_t abs_pos = r.getAlignments().front().getPosition();  // pivot
-    uint64_t first_pos = abs_pos;                                     // lowest locus
-
-    for (const auto &split : r.getAlignments().front().getAlignmentSplits()) {
-        UTILS_DIE_IF(split->getType() != core::record::AlignmentSplit::Type::SAME_REC, "Only same rec split alignments supported");
-        first_pos = std::min(
-            first_pos, abs_pos + dynamic_cast<const core::record::alignment_split::SameRec &>(*split).getDelta());
-    }
-    return first_pos;
-}
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 Importer::Importer(size_t _blockSize, std::istream &_file) : blockSize(_blockSize), samReader(_file), lock() {}
@@ -179,7 +167,7 @@ bool Importer::pumpRetrieve(core::Classifier *_classifier) {
     }
 
     auto &records = chunk.getData();
-    std::sort(records.begin(), records.end(), compare);
+//    std::sort(records.begin(), records.end(), compare);
 
     for (const auto &record : records) {
         if (record.getAlignments().empty()) {
@@ -592,14 +580,19 @@ void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_re
             create_split_records = any_different_ref;
         }
 
-        // Swap template so that the first segment has lower mapping position
-        //        if (sam_recs_2d.front().front().getPos() > sam_recs_2d.front().back().getPos()){
-        //            std::swap(sam_recs_2d.front().front(), sam_recs_2d.front().back());
-        //        }
-
         if (create_split_records || force_split) {
+//            // Swap template so that the first segment has lower mapping position
+//            if (sam_recs_2d.front().front().getPos() > sam_recs_2d.front().back().getPos()){
+//                std::swap(sam_recs_2d.front().front(), sam_recs_2d.front().back());
+//            }
+
             convertPairedEndSplitPair(chunk, sam_recs_2d, refs);
         } else {
+//            // Swap template so that the first segment has lower mapping position
+//            if (sam_recs_2d.front().front().getPos() > sam_recs_2d.front().back().getPos()){
+//                std::swap(sam_recs_2d.front().front(), sam_recs_2d.front().back());
+//            }
+
             convertPairedEndNoSplit(chunk, sam_recs_2d, refs);
         }
 
@@ -630,19 +623,6 @@ void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_re
 // ---------------------------------------------------------------------------------------------------------------------
 void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt, std::map<std::string, size_t> &refs,
                        bool force_split) {
-    //    // Register Reference Sequence Name RNAME
-    //    for (auto& sam_recs:sam_recs_2d){
-    //        for (auto& sam_rc:sam_recs){
-    //            const auto& rname = sam_rc.getRname();
-    //
-    //            if (rname != "=" || rname != "*"){
-    //                auto it = refs.find(rname);
-    //                if (it == refs.end()) {
-    //                    refs.insert(std::make_pair(sam_rc.getRname(), ref_counter++));
-    //                }
-    //            }
-    //        }
-    //    }
 
     UTILS_DIE_IF(!rt.isValid(), "Invalid Read Template. Neither unmapped, single-end nor paired-end");
 
@@ -668,11 +648,26 @@ void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt, std::map<st
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Importer::compare(const core::record::Record &r1, const core::record::Record &r2) {
-    if (r1.getAlignments().empty() || r2.getAlignments().empty()){
+
+    if (r1.getAlignments().empty()) {
         return false;
-    } else {
-        return getMinPos(r1) < getMinPos(r2);
     }
+    if(r2.getAlignments().empty()) {
+        return true;
+    }
+    return getMinPos(r1) < getMinPos(r2);
+}
+
+uint64_t Importer::getMinPos(const core::record::Record& r) {
+    uint64_t abs_pos = r.getAlignments().front().getPosition();  // pivot
+    uint64_t first_pos = abs_pos;                                     // lowest locus
+
+    for (const auto &split : r.getAlignments().front().getAlignmentSplits()) {
+        UTILS_DIE_IF(split->getType() != core::record::AlignmentSplit::Type::SAME_REC, "Only same rec split alignments supported");
+        first_pos = std::min(
+            first_pos, abs_pos + dynamic_cast<const core::record::alignment_split::SameRec &>(*split).getDelta());
+    }
+    return first_pos;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

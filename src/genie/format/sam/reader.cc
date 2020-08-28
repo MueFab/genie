@@ -4,10 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include <limits>
+#include <numeric>
+#include <algorithm>
+
 #include "reader.h"
 #include <genie/util/runtime-exception.h>
-
-#include <limits>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -38,20 +40,39 @@ Reader::Reader(std::istream& _stream, bool _with_index) : stream(_stream), heade
 
     if (with_index){
         int init_pos = stream.tellg();
+        std::string str;
+        std::string flag;
+        std::string mapping_pos;
 
         // Add entry to index
         while(stream.good()){
-            std::string str;
+
             size_t pos = stream.tellg();
 
             std::getline(stream, str, '\t');
 
+            // check FLAG
+            // stream.ignore(std::numeric_limits<std::streamsize>::max(), '\t');
+            std::getline(stream, flag, '\t');
+
+            // Ignore RNAME
+            stream.ignore(std::numeric_limits<std::streamsize>::max(), '\t');
+
+            std::getline(stream, mapping_pos, '\t');
+
             // If not a header, add to index
             UTILS_DIE_IF(str[0] == '@', "Found header in the middle of SAM file");
 
+            uint16_t flag_uint = std::stoi(flag);
+            size_t mpos = std::stoi(mapping_pos);
+
             // Handle case where there is empty line before EOF
             if (str.length()){
-                addCacheEntry(str, pos);
+                addCacheEntry(pos, str, mpos,
+//                      !(flag_uint & 900)
+                    !(flag_uint & (1u << uint8_t(Record::FlagPos::SECONDARY_ALIGNMENT))) &&
+                                     !(flag_uint & (1u << uint8_t(Record::FlagPos::SUPPLEMENTARY_ALIGNMENT)))
+                );
             }
 
             // Move to next line, skip the rest of fields
@@ -64,6 +85,30 @@ Reader::Reader(std::istream& _stream, bool _with_index) : stream(_stream), heade
         stream.seekg(init_pos);
 
         UTILS_DIE_IF(stream.tellg() != init_pos, "Unable to move file pointer");
+
+        std::vector<std::size_t> tmp_pos_list;
+        /// Sorting QNAME based on its mapping position
+        for (auto & it : index) {
+            tmp_pos_list.push_back(it.second.second);
+            qname_list.push_back(it.first);
+        }
+
+        // Insert value from 0 to tmp_pos_list.size()
+        ids.resize(tmp_pos_list.size());
+        std::iota(ids.begin(), ids.end(), 0);
+
+        if (ids.size() > 1){
+            std::sort(ids.begin(), ids.end(), [&tmp_pos_list](size_t i1, size_t i2) {
+                if (i1 == 0){
+                    return false;
+                } else if (i2 == 0){
+                    return true;
+                };
+                return tmp_pos_list[i1] < tmp_pos_list[i2];
+            });
+        }
+
+//        std::move(tmp_pos_list.begin(), tmp_pos_list.end(), std::back_inserter(ids));
     }
 }
 
@@ -72,15 +117,23 @@ Reader::Reader(std::istream& _stream, bool _with_index) : stream(_stream), heade
 const header::Header& Reader::getHeader() const { return header; }
 
 // ---------------------------------------------------------------------------------------------------------------------
+
 std::map<std::string, size_t>& Reader::getRefs() { return refs; }
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Reader::addCacheEntry(std::string &qname, size_t &pos) {
+void Reader::addCacheEntry(size_t pos, std::string &qname,  size_t mapping_pos, bool update_mapping_pos) {
     auto search = index.find(qname);
     if (!(search == index.end())) {
-        search->second.push_back(pos);
+        search->second.first.push_back(pos);
+
+        if (update_mapping_pos && search->second.second > mapping_pos){
+            search->second.second = mapping_pos;
+        }
+
     } else {
-        index.emplace(std::move(qname), std::vector<size_t>({pos}));
+        std::pair<std::vector<size_t>, size_t> data({pos}, mapping_pos);
+        index.emplace(std::move(qname), std::move(data));
     }
 }
 
@@ -90,21 +143,33 @@ bool Reader::read(std::list<std::string>& lines) {
     std::string line;
 
     if (with_index){
-        auto entry = index.begin();
 
-        //while (!entry->second.empty()){
-        for (auto& pos: entry->second){
-            stream.clear();
-
-            stream.seekg(pos);
-            std::getline(stream, line);
-            lines.push_back(std::move(line));
-
-            stream.clear();
+        if (ids.empty()) {
+            return false;
         }
 
-        index.erase(entry);
-        return true;
+        auto entry = index.find(qname_list[ids.front()]);
+
+        if (!(entry == index.end())) {
+
+            for (auto& pos : entry->second.first) {
+                stream.clear();
+
+                stream.seekg(pos);
+                std::getline(stream, line);
+                lines.push_back(std::move(line));
+
+                stream.clear();
+            }
+
+            index.erase(entry);
+            ids.erase(ids.begin());
+
+            return true;
+
+        } else {
+            return false;
+        }
     } else {
         UTILS_DIE_IF(!stream.good(), "Cannot read stream");
         std::getline(stream, line);
