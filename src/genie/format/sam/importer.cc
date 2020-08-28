@@ -668,32 +668,11 @@ void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt, std::map<st
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Importer::compare(const core::record::Record &r1, const core::record::Record &r2) {
-    //    auto &a1 = r1.getAlignments();
-    //    auto &a2 = r2.getAlignments();
-    //
-    //    if (a1.begin() == a1.end()){
-    //        return true;
-    //    }
-    //
-    //    if (r1.getAlignments().empty() || r2.getAlignments().empty()){
-    //        return true;
-    //    } else {
-    //        return r1.getAlignments().front().getPosition() < r2.getAlignments().front().getPosition();
-    //    }
-
-    if (r1.getAlignments().empty()) {
+    if (r1.getAlignments().empty() || r2.getAlignments().empty()){
         return false;
+    } else {
+        return getMinPos(r1) < getMinPos(r2);
     }
-    if(r2.getAlignments().empty()) {
-        return true;
-    }
-    return getMinPos(r1) < getMinPos(r2);
-
-    //    try {
-    //        return r1.getAlignments().front().getPosition() < r2.getAlignments().front().getPosition();
-    //    } catch (...) {
-    //        return true;
-    //    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
