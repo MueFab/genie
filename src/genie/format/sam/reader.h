@@ -32,7 +32,11 @@ class Reader {
     std::map<std::string, size_t> refs;
     bool with_index;
 
-    std::map<std::string, std::vector<size_t>> index;
+    std::map<std::string, std::pair<std::vector<size_t>, size_t>> index;
+
+    // QNAME sorted by its mapping position
+    std::vector<std::string> qname_list;
+    std::vector<std::size_t> ids;
 
    public:
     /**
@@ -61,7 +65,7 @@ class Reader {
      * @param qname: QNAME of sam record
      * @param pos: Position of sam record in the sam file
      */
-    void addCacheEntry(std::string& qname, size_t &pos);
+    void addCacheEntry(size_t pos, std::string &qname,  size_t mapping_pos, bool update_mapping_pos);
 
     /**
      *

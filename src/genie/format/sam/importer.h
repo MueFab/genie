@@ -211,6 +211,8 @@ class Importer : public core::FormatImporter {
      * @return true, if mapping pos of r1 is less than of r2
      */
     static bool compare(const core::record::Record& r1, const core::record::Record& r2);
+
+    static uint64_t getMinPos(const core::record::Record& r);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
