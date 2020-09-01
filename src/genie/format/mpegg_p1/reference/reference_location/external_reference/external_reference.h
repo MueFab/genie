@@ -1,14 +1,14 @@
-//
-// Created by sxperfect on 10.07.20.
-//
-
 #ifndef GENIE_PART1_EXTERNAL_REFERENCE_H
 #define GENIE_PART1_EXTERNAL_REFERENCE_H
 
 #include <cstdint>
 
+#include <genie/util/bitreader.h>
+#include <genie/util/bitwriter.h>
+#include <genie/util/exception.h>
+#include <genie/util/runtime-exception.h>
+
 #include "checksum.h"
-#include "genie/util/bitwriter.h"
 
 namespace genie {
 namespace format {
@@ -22,13 +22,19 @@ class ExternalReference{
         FASTA_REF = 2
     };
 
+    ExternalReference();
+
+//    explicit ExternalReference(util::BitReader& reader);
+
     explicit ExternalReference(Type _reference_type);
 
     ~ExternalReference() = default;
 
-    virtual void write(genie::util::BitWriter& bit_writer) const;
+    Type getReferenceType() const;
 
-   protected:
+    virtual void write(genie::util::BitWriter& writer);
+
+   private:
     Type reference_type;
 };
 

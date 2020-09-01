@@ -12,50 +12,85 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Block::Block(uint8_t _desc_ID, core::AccessUnit::Descriptor &&_payload)
-    : mgb::Block(_desc_ID, std::move(_payload)){}
+Block::Block(util::BitReader &reader)
+    : descriptor_ID(),
+      block_payload(0){
+
+    // reserved
+    reader.read(1);
+
+    descriptor_ID = reader.read(7);
+
+    auto block_payload_size = descriptor_ID = reader.read(32);
+
+    for (auto i = 0; i < block_payload_size; i++){
+        block_payload.push_back(reader.read(8));
+    }
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<uint8_t> &Block::getPayload() const {return block_payload;}
+Block::Block(uint8_t _desc_ID, std::list<uint8_t> &_block_payload)
+    : descriptor_ID(_desc_ID),
+      block_payload(std::move(_block_payload)){}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t Block::getID() const {return getDescriptorID();}
+uint8_t Block::getDescID() const {return descriptor_ID;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t Block::getPayloadSize() const {return getPayload().getWrittenSize();}
+uint32_t Block::getPayloadSize() const {return block_payload.size();}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::list<uint8_t> &Block::getPayload() const {return block_payload;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t Block::getHeaderLength() const {
+    // reserved u(1) + descriptor_ID u(7)
+    uint64_t len = sizeof(uint8_t);
+
+    // block_payload_size u(32)
+    len += sizeof(uint32_t);
+    return len; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Block::writeHeader(util::BitWriter &writer) const {
+    // block_header - reserved u(1)
+    writer.write(0, 1);
+
+    // block_header - descriptor_ID(7)
+    writer.write(descriptor_ID, 7);
+
+    // block_payload_size u(32)
+    writer.write(getPayloadSize(), 32);
+
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t Block::getLength() const {
-    // reserved u(1) + descriptor_ID u(7)
-    uint64_t len = 1;
 
-    // block_payload_size u(32)
-    len += sizeof(uint32_t);
+    uint64_t len = getHeaderLength();
 
     // block_payload[]
-    len += mgb::Block::getPayload().getWrittenSize();
+    len += block_payload.size() * sizeof(uint8_t);
 
     return len;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Block::write(genie::util::BitWriter &bit_writer) const {
+void Block::write(genie::util::BitWriter &writer) const {
 
-    // block_header - reserved u(1)
-    bit_writer.write(0, 1);
+    writeHeader(writer);
 
-    // block_header - descriptor_ID(7)
-    bit_writer.write(getDescriptorID(), 7);
-
-    // block_payload_size u(32)
-    bit_writer.write(getLength(), 29);
-
-//    // block_payload
-    mgb::Block::getPayload().write(bit_writer);
+    for (auto data: block_payload){
+        writer.write(data, 8);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -1,8 +1,8 @@
 #ifndef GENIE_PART1_MIT_H
 #define GENIE_PART1_MIT_H
 
-#include "access_unit_info/access_unit_info.h"
-#include "u_access_unit_info//u_access_unit_info.h"
+#include "genie/format/mpegg_p1/dataset/master_index_table/access_unit_info/access_unit_info.h"
+#include "genie/format/mpegg_p1/dataset/master_index_table/u_access_unit_info/u_access_unit_info.h"
 
 namespace genie {
 namespace format {

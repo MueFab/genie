@@ -15,14 +15,36 @@ namespace mpegg_p1 {
 DescriptorStream::DescriptorStream() {}
 
 uint64_t DescriptorStream::getLength() const {
-    // TODO (Yeremia): Implement this!
-    UTILS_DIE("Not yet implemented!");
-    return 0;
+    uint64_t len = 12;  // gen_info
+
+    // descriptor_stream_header
+    len += descriptor_stream_header.getLength();
+
+    // DS_protection
+    len += DS_protection.getLength();
+
+    // block_payload
+    len += block_payload.size();
+
+    return len;
 }
 
 void DescriptorStream::write(util::BitWriter& bit_writer) const {
-    // TODO (Yeremia): Implement this!
-    UTILS_DIE("Not yet implemented!");
+    // Key of KVL format
+    bit_writer.write("dscn");
+
+    // Length of KVL format
+    bit_writer.write(getLength(), 64);
+
+    descriptor_stream_header.write(bit_writer);
+
+    // DS_protection
+    DS_protection.write(bit_writer);
+
+    // block_payload
+    for (auto data: block_payload){
+        bit_writer.write(data, 8);
+    }
 }
 
 }  // namespace mpegg_p1

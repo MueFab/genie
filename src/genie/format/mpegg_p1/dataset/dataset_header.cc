@@ -37,9 +37,9 @@ uint64_t DatasetHeader::getLength() const {
     bitlength += (1 + 2 + 4) * 8;  // dataset_group_ID, dataset_ID, version
     bitlength += 4; // byte_offset_size_flag, non_overlapping_AU_range_flag, pos_40_bits_flag
 
-    bitlength += block_header.getLength();
+    bitlength += block_header.getBitLength();
 
-    // TODO (Yeremia): Fix getLength()
+    // TODO (Yeremia): Fix getBitLength()
 
 
 //    length += 16;

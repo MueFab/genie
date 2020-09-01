@@ -7,7 +7,7 @@
 
 #include <genie/format/mpegg_p1/dataset/dataset_header.h>
 #include "extended_au_info.h"
-#include "genie/format/mpegg_p1/master_index_table/ref_seq_info.h"
+#include "genie/format/mpegg_p1/dataset/master_index_table/ref_seq_info.h"
 
 namespace genie {
 namespace format {

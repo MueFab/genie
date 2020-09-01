@@ -9,8 +9,10 @@
 #include <string>
 #include <vector>
 
-#include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
+#include <genie/util/bitreader.h>
+#include <genie/util/bitwriter.h>
+#include <genie/util/exception.h>
+
 #include "reference_location/reference_location.h"
 #include "reference_location/external.h"
 #include "reference_location/internal.h"
@@ -65,6 +67,13 @@ class Reference{
      */
     Reference(uint8_t _ds_group_ID, uint8_t _ref_ID, std::string _ref_name, uint16_t _ref_major_ver,
               uint16_t _ref_minor_ver, uint16_t _ref_patch_ver, std::vector<std::string>&& _seq_names, ReferenceLocation&& _ref_loc);
+
+    /**
+     *
+     * @param reader
+     * @param length
+     */
+    Reference(util::BitReader& reader, size_t length);
 
     /**
      *

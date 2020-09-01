@@ -1,9 +1,9 @@
 #ifndef GENIE_PART1_REFERENCE_LOCATION_H
 #define GENIE_PART1_REFERENCE_LOCATION_H
 
+#include "genie/util/bitwriter.h"
 #include "genie/util/exception.h"
 #include "genie/util/runtime-exception.h"
-#include "genie/util/bitwriter.h"
 
 namespace genie {
 namespace format {
@@ -24,9 +24,9 @@ class ReferenceLocation{
 
     virtual uint64_t getLength() const;
 
-    virtual void write(genie::util::BitWriter& bit_writer) const;
+    virtual void write(genie::util::BitWriter& writer);
 
-   protected:
+   private:
     Flag external_ref_flag;
 };
 

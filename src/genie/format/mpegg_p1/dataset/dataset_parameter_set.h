@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DATASET_PARAMETER_SET_H
-#define GENIE_DATASET_PARAMETER_SET_H
+#ifndef GENIE_PART1_DATASET_PARAMETER_SET_H
+#define GENIE_PART1_DATASET_PARAMETER_SET_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -88,7 +88,7 @@ class DatasetParameterSet {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_PARAMETER_SET_H
+#endif  // GENIE_PART1_DATASET_PARAMETER_SET_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

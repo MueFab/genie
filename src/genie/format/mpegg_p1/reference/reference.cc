@@ -1,6 +1,8 @@
 #include <utility>
 
 #include "reference.h"
+#include "reference_location/external.h"
+#include "reference_location/internal.h"
 
 namespace genie {
 namespace format {
@@ -30,6 +32,50 @@ Reference::Reference(uint8_t _ds_group_ID, uint8_t _ref_ID, std::string _ref_nam
       sequence_names(std::move(_seq_names)),
       reference_location(std::move(_ref_loc))
     {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Reference::Reference(util::BitReader& reader, size_t length)
+    : dataset_group_ID(0),
+      reference_ID(0),
+      reference_name(),
+      reference_major_version(0),
+      reference_minor_version(0),
+      reference_patch_version(0),
+      sequence_names(0),
+      reference_location() {
+
+    size_t start_pos = reader.getPos();
+
+    dataset_group_ID = reader.read<uint8_t>();
+    reference_ID = reader.read<uint8_t>();
+    reference_name = reader.read<std::string>();
+    reference_major_version = reader.read<uint16_t>();
+    reference_minor_version = reader.read<uint16_t>();
+    reference_patch_version = reader.read<uint16_t>();
+
+    auto seq_count = reader.read<uint16_t>();
+
+    for (auto seqID = 0; seqID < seq_count; seqID++){
+        sequence_names.emplace_back(reader.read<std::string>());
+    }
+
+    // Reserved
+    reader.read(7);
+
+    bool external_ref_flag = reader.read(1);
+
+    if (external_ref_flag){
+        reference_location = External(reader);
+    } else {
+        reference_location = Internal(reader);
+    }
+    
+    UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid DatasetGroup length!");
+
+    // TODO: Implement this
+    UTILS_DIE("Not Implemented yet!");
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

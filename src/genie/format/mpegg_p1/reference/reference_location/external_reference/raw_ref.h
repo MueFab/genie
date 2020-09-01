@@ -1,8 +1,12 @@
 #ifndef GENIE_PART1_EXTERNAL_REFERENCE_RAW_REF_H
 #define GENIE_PART1_EXTERNAL_REFERENCE_RAW_REF_H
 
-#include <genie/format/mpegg_p1/reference/reference_location/external_reference/external_reference.h>
 #include <vector>
+
+#include <genie/util/bitreader.h>
+#include <genie/util/bitwriter.h>
+
+#include <genie/format/mpegg_p1/reference/reference_location/external_reference/external_reference.h>
 #include "checksum.h"
 
 namespace genie {
@@ -15,12 +19,16 @@ class RawReference: public ExternalReference{
 
    public:
     RawReference();
+
+    RawReference(util::BitReader& reader, Checksum::Algo checksum_alg, uint16_t seq_count);
+
     explicit RawReference(std::vector<Checksum>&& _checksums);
 
     void addChecksum(Checksum &&_checksum);
+
     void addChecksums(std::vector<Checksum>& _checksums);
 
-    void write(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& bit_writer) override;
 };
 
 }  // namespace mpegg_p1

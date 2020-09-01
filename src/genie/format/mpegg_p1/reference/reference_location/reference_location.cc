@@ -12,6 +12,10 @@ ReferenceLocation::ReferenceLocation(ReferenceLocation::Flag _flag)
 
 bool ReferenceLocation::isExternal() const { return external_ref_flag == Flag::EXTERNAL; }
 
+uint64_t ReferenceLocation::getLength() const { return 0; }
+
+void ReferenceLocation::write(util::BitWriter& writer) const {}
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie
