@@ -4,19 +4,25 @@
 #include <array>
 #include <vector>
 
+#include <genie/util/bitreader.h>
+#include <genie/util/bitwriter.h>
+#include <genie/util/exception.h>
+#include <genie/util/runtime-exception.h>
+
 #include "checksum.h"
-#include "genie/util/bitwriter.h"
 
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-class Sha256: Checksum {
+class Sha256: public Checksum {
    private:
     std::array<uint64_t, 4> data;
 
    public:
     Sha256();
+
+    explicit Sha256(util::BitReader& reader);
 
     explicit Sha256(std::vector<uint64_t> &_data);
 

@@ -1,3 +1,9 @@
-//
-// Created by adhisant on 8/27/20.
-//
+#include "u_access_unit_info.h"
+
+namespace genie {
+namespace format {
+namespace mpegg_p1 {
+
+}  // namespace mpegg_p1
+}  // namespace format
+}  // namespace genie

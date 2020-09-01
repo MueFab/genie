@@ -14,7 +14,6 @@ namespace mpegg_p1 {
 
 uint64_t DTMetadata::getLength() const {
     uint64_t len = 12;  // gen_info
-    // TODO (Yeremia): length of Value[]?
 
     len += DT_metadata_value.size();
 
@@ -41,7 +40,6 @@ void DTMetadata::write(genie::util::BitWriter &bit_writer) const {
 
 uint64_t DTProtection::getLength() const {
     uint64_t len = 12;  // gen_info
-    // TODO (Yeremia): length of Value[]?
 
     len += DT_protection_value.size();
 
@@ -110,24 +108,53 @@ uint16_t Dataset::getID() const { return dataset_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<core::parameter::ParameterSet>& Dataset::getParameterSets() const { return dataset_parameter_sets; }
+const std::vector<DatasetParameterSet>& Dataset::getParameterSets() const { return dataset_parameter_sets; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t Dataset::getHeaderLength() const {
-    uint64_t bitlength = 12 * 8;   // gen_info
-    bitlength += (1 + 2 + 4) * 8;  // dataset_group_ID, dataset_ID, version
-    bitlength += 4; // byte_offset_size_flag, non_overlapping_AU_range_flag, pos_40_bits_flag
+    /// gen_info
+    uint64_t bitlength = 12 * 8;
 
-    bitlength += block_config.getLength();
+    /// dataset_group_ID, dataset_ID, version
+    bitlength += (1 + 2 + 4) * 8;
 
-    // TODO (Yeremia): Fix getHeaderLength()
+    /// byte_offset_size_flag, non_overlapping_AU_range_flag, pos_40_bits_flag
+    bitlength += 1 + 1 + 1;
+
+    /// block_header_flag, MIT_flag, CC_mode_flag, ordered_blocks_flag
+    /// ClassInfo (num_classes, clid[], um_descriptors[], descriptor_ID[][])
+    bitlength += block_config.getBitLength();
+
+    /// dataset_type u(4), alphabet_ID(8), num_U_access_units u(32)
+    bitlength += 4 + 8 + 32;
+
+    if (num_U_access_units > 0){
+        /// u_access_unit_info
+        bitlength += u_access_unit_info->getBitLength();
+    }
+
+    /// seq_count, reference_ID, seq_ID[], seq_blocks[], tflag[], thres[]
+    bitlength += seq_info.getLength();
+
+    // Byte aligned
+    bitlength += bitlength % 8;
+
+    return bitlength / 8;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Dataset::writeHeader(util::BitWriter& bit_writer) const {
-    UTILS_DIE_IF(version.size() != 4, "Invalid version");
+    // KLV (Key Length Value) format
+
+    // Key of KVL format
+    bit_writer.write("dthd");
+
+    // Length of KVL format
+    bit_writer.write(getHeaderLength(), 64);
+
+    // Value of KVL format:
 
     // dataset_group_ID u(8)
     bit_writer.write(dataset_group_ID, 8);
@@ -136,6 +163,7 @@ void Dataset::writeHeader(util::BitWriter& bit_writer) const {
     bit_writer.write(dataset_ID, 16);
 
     // version c(4)
+    UTILS_DIE_IF(version.size() != 4, "Invalid version");
     bit_writer.write(version);
 
     // byte_offset_size_flag u(1)
@@ -184,7 +212,7 @@ void Dataset::writeHeader(util::BitWriter& bit_writer) const {
     // num_U_access_units u(32)
     bit_writer.write(num_U_access_units, 32);
 
-    if (num_U_access_units){
+    if (num_U_access_units > 0){
         UTILS_DIE_IF(u_access_unit_info == nullptr, "No u_access_unit_info stored!");
 
         //num_U_clusters, multiple_signature_base, U_signature_size, U_signature_constant_length, U_signature_length
@@ -200,33 +228,8 @@ void Dataset::writeHeader(util::BitWriter& bit_writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t Dataset::getParameterSetLength() const { return 0; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Dataset::writeParameterSets(util::BitWriter& bit_writer) const {
-    for (auto const& ps : dataset_parameter_sets) {
-        // Key of KVL format
-        bit_writer.write("pars");
-
-        // Length of KVL format
-        // KV, dataset_group_ID u(8), dataset_ID u(16), the rest
-        bit_writer.write(12 + sizeof(uint8_t) + sizeof(uint16_t) + ps.getLength(), 64);
-
-        // dataset_group_ID u(8)
-        bit_writer.write(dataset_group_ID, 8);
-        // dataset_ID u(16)
-        bit_writer.write(dataset_ID, 16);
-
-        // parameter_set_ID, parent_parameter_set_ID, encoding_parameters()
-        ps.preWrite(bit_writer);
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 uint64_t Dataset::getLength() const {
-    uint64_t len = 12;  // gen_info
+    uint64_t len = 12;  // KVL
 
     len += getHeaderLength();
 
@@ -238,6 +241,11 @@ uint64_t Dataset::getLength() const {
     // DT_protection
     if (DT_protection != nullptr){
         DT_protection->getLength();
+    }
+
+    // write master_index_table depending on MIT_FLAG
+    if (block_config.getMITFlag()){
+        master_index_table->getLength();
     }
 
     for (auto const& it : dataset_parameter_sets) {
@@ -279,13 +287,15 @@ void Dataset::write(util::BitWriter& bit_writer) const {
         DT_protection->write(bit_writer);
     }
 
-    // TODO (Yeremia): write master_index_table depending on MIT_FLAG
+    // write master_index_table depending on MIT_FLAG
     if (block_config.getMITFlag()){
-//        master_index_table->write(bit_writer);
+        master_index_table->write(bit_writer);
     }
 
     // dataset_parameter_set[]
-    writeParameterSets(bit_writer);
+    for (auto const& ps : dataset_parameter_sets) {
+        ps.write(bit_writer);
+    }
 
     for (auto &ac: access_units){
         ac.write(bit_writer);

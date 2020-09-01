@@ -129,7 +129,7 @@ class DatasetGroup {
      *
      * @param bit_reader
      */
-    explicit DatasetGroup(util::BitReader& bit_reader);
+    explicit DatasetGroup(util::BitReader& reader, size_t length);
 
     /**
      *
@@ -229,9 +229,15 @@ class DatasetGroup {
 
     /**
      *
-     * @param bit_writer
+     * @param writer
      */
-    void writeHeader(util::BitWriter& bit_writer) const;
+    void writeHeader(util::BitWriter& writer) const;
+
+    /**
+     *
+     * @param reader
+     */
+    void readHeader(util::BitReader& reader, size_t length);
 
     /**
      * Get length of Dataset Header in bytes.
@@ -241,9 +247,9 @@ class DatasetGroup {
 
     /**
      *
-     * @param bit_writer
+     * @param writer
      */
-    void write(util::BitWriter& bit_writer) const;
+    void write(util::BitWriter& writer) const;
 
 };
 

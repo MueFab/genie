@@ -20,11 +20,23 @@ class UAccessUnitInfo {
 
     UAccessUnitInfo();
 
-    UAccessUnitInfo(uint32_t _num_U_clusters);
+    explicit UAccessUnitInfo(uint32_t _num_U_clusters);
 
     void setMultipleSignature(uint32_t base, uint8_t size);
     void setConstantSignature(uint8_t sign_length);
 
+    /**
+     * Get length in bit
+     *
+     * @return
+     */
+    uint64_t getBitLength() const;
+
+    /**
+     * Write to bit_writer
+     *
+     * @param bit_writer
+     */
     void write(genie::util::BitWriter& bit_writer) const;
 };
 

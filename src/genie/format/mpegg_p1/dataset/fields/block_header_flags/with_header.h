@@ -17,7 +17,7 @@ class WithHeader : public BlockConfig {
 
     WithHeader(bool _mit_flag, bool _cc_mode_flag);
 
-    uint64_t getLength() const override;
+    uint64_t getBitLength() const override;
 
     void write(genie::util::BitWriter& bit_writer) const override;
 

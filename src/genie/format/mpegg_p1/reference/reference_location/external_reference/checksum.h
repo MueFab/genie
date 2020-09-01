@@ -3,7 +3,8 @@
 
 #include <cstdint>
 
-#include "genie/util/bitwriter.h"
+#include <genie/util/bitreader.h>
+#include <genie/util/bitwriter.h>
 
 namespace genie {
 namespace format {
@@ -16,14 +17,20 @@ class Checksum {
         SHA256 = 1
     };
 
+   private:
+    Algo checksum_alg;
+
+   public:
+
+    Checksum();
+
     explicit Checksum(Algo _algo);
 
-    Algo getType();
+    Algo getType() const;
 
     virtual void write(genie::util::BitWriter& bit_writer) const;
 
-   protected:
-    Algo checksum_alg;
+
 };
 
 }  // namespace mpegg_p1

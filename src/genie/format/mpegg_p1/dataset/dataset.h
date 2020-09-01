@@ -12,12 +12,11 @@
 
 #include <genie/core/parameter/data_unit.h>
 #include <genie/core/parameter/parameter_set.h>
-#include <genie/format/mpegg_p1/master_index_table/master_index_table.h>
+#include <genie/format/mgb/data-unit-factory.h>
 
-#include "dataset_header.h"
-#include "genie/format/mgb/data-unit-factory.h"
-#include "genie/format/mpegg_p1/access_unit/access_unit.h"
-#include "dataset_parameter_set.h"
+#include <genie/format/mpegg_p1/dataset/master_index_table/master_index_table.h>
+#include <genie/format/mpegg_p1/dataset/access_unit/access_unit.h>
+#include <genie/format/mpegg_p1/dataset/dataset_parameter_set.h>
 
 namespace genie {
 namespace format {
@@ -86,16 +85,16 @@ class Dataset {
     // num_descriptors[], descriptor_ID[][]
     BlockConfig block_config;
 
-    // seq_count, reference_ID, seq_ID[], seq_blocks[], tflag[], thres[]
-    SequenceConfig seq_info;
-
     core::parameter::DataUnit::DatasetType dataset_type;
 
     uint8_t alphabet_ID;
     uint32_t num_U_access_units;
 
-    //num_U_clusters, multiple_signature_base, U_signature_size, U_signature_constant_length, U_signature_length
+    // num_U_clusters, multiple_signature_base, U_signature_size, U_signature_constant_length, U_signature_length
     std::unique_ptr<UAccessUnitInfo> u_access_unit_info;
+
+    // seq_count, reference_ID, seq_ID[], seq_blocks[], tflag[], thres[]
+    SequenceConfig seq_info;
 
     /** ------------------------------------------------------------------------------------------------------------
      *  ISO 23092-1 Section 6.5.2.2 table 18
@@ -107,22 +106,24 @@ class Dataset {
     // optional
     std::unique_ptr<DTMetadata> DT_metadata;
 
-    // ISO 23092-1 Section 6.5.2.3 - specification 23092-3
+    // ISO 23092-1 Section 6.5.2.4 - specification 23092-3
     // optional
     std::unique_ptr<DTProtection> DT_protection;
 
-    // TODO (Yeremia) : comment
+    // ISO 23092-1 Section 6.5.2.5 - specification 23092-2
     // optional
-    std::vector<core::parameter::ParameterSet> dataset_parameter_sets;
+    std::vector<DatasetParameterSet> dataset_parameter_sets;
 
-    // TODO (Yeremia) : comment
+    // ISO 23092-1 Section 6.5.3.1 - specification 23092-1
     // optional
     std::unique_ptr<MasterIndexTable> master_index_table;
 
+    // ISO 23092-1 Section 6.5.3
     std::vector<AccessUnit> access_units;
 
     // TODO(Yeremia): Descriptor Stream
-    //std::vector<DescriptorStream> descriptor_streams;
+    // ISO 23092-1 Section 6.5.4
+//    std::vector<DescriptorStream> descriptor_streams;
 
    public:
 
@@ -165,7 +166,7 @@ class Dataset {
      *
      * @return
      */
-    const std::vector<core::parameter::ParameterSet>& getParameterSets() const;
+    const std::vector<DatasetParameterSet>& getParameterSets() const;
 
     /**
      *
@@ -178,18 +179,6 @@ class Dataset {
      * @param bit_writer
      */
     void writeHeader(util::BitWriter& bit_writer) const;
-
-    /**
-     *
-     * @return
-     */
-    uint64_t getParameterSetLength() const;
-
-    /**
-     *
-     * @param bit_writer
-     */
-    void writeParameterSets(util::BitWriter& bit_writer) const;
 
     /**
      *

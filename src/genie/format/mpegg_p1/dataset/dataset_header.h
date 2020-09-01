@@ -46,8 +46,8 @@ class DatasetHeader {
     bool non_overlapping_AU_range_flag;
     Pos40SizeFlag pos_40_bits_flag;
 
-    // block_header_flag, MIT_flag, CC_mode_flag, ordered_blocks_flag, num_classes, clid[],
-    // num_descriptors[], descriptor_ID[][]
+    /// block_header_flag, MIT_flag, CC_mode_flag, ordered_blocks_flag
+    /// ClassInfo (num_classes, clid[], um_descriptors[], descriptor_ID[][])
     BlockConfig block_header;
 
     // seq_count, reference_ID, seq_ID[], seq_blocks[], tflag[], thres[]

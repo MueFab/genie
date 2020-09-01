@@ -6,9 +6,17 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Internal::Internal(uint8_t _dataset_group_ID, uint16_t _dataset_ID):
-    ReferenceLocation(ReferenceLocation::Flag::INTERNAL),
-      dataset_group_ID(_dataset_group_ID), dataset_ID(_dataset_ID){}
+Internal::Internal(uint8_t _dataset_group_ID, uint16_t _dataset_ID)
+    : ReferenceLocation(ReferenceLocation::Flag::INTERNAL),
+      dataset_group_ID(_dataset_group_ID),
+      dataset_ID(_dataset_ID){}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Internal::Internal(util::BitReader& reader)
+    : ReferenceLocation(ReferenceLocation::Flag::INTERNAL),
+      dataset_group_ID(reader.read<uint8_t>()),
+      dataset_ID(reader.read<uint16_t>()){}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

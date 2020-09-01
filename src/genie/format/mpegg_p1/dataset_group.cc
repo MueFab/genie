@@ -56,7 +56,7 @@ void DGProtection::write(util::BitWriter& bit_writer) const {
 
 DatasetGroup::DatasetGroup(std::vector<Dataset> &&_datasets)
     : dataset_group_ID(0),
-      version_number(0), // TODO (Yeremia): Fix version number
+      version_number(0), // FIXME: Fix version number
       datasets(std::move(_datasets)){
 
     std::vector<uint16_t> dataset_IDs(getDatasetIDs(true));
@@ -68,18 +68,40 @@ DatasetGroup::DatasetGroup(std::vector<Dataset> &&_datasets)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetGroup::DatasetGroup(util::BitReader& bit_reader) {
-    // TODO (Yeremia)
+DatasetGroup::DatasetGroup(util::BitReader& reader, size_t length)
+    : dataset_group_ID(0),
+      version_number(0) {
 
-//    auto current_pos = bit_reader.getPos();
-//
-//    auto key = bit_reader.read<std::string>(4*8);
-//    auto length = bit_reader.read<uint64_t>(64);
-//
-//
-//    bit_reader.flush();
-//    auto pos_after_read = bit_reader.getPos();
-//    UTILS_DIE_IF(pos_after_read-current_pos != length, "Invalid length");
+    size_t start_pos = reader.getPos();
+
+    std::string key = reader.read<std::string>(4);
+    UTILS_DIE_IF(key != "dghd", "DatasetGroupHeader is not Found");
+
+    auto header_length = reader.read<size_t>();
+
+    readHeader(reader, header_length-12);
+
+    do {
+        key = reader.read<std::string>(4);
+        auto value_length = reader.read<size_t>();
+
+        if (key == "rfgn"){
+            references.emplace_back(reader, value_length);
+        } else if (key == "rfmd"){
+
+        } else if (key == "labl"){
+
+        } else if (key == "dgmd"){
+
+        } else if (key == "dgpr"){
+
+        } else if (key == "dtcn"){
+
+        }
+
+    } while (reader.getPos() - start_pos < length);
+
+    UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid DatasetGroup length!");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -190,8 +212,6 @@ uint64_t DatasetGroup::getHeaderLength() const {
     // key (4), Length (8)
     uint64_t len = 12;
 
-    // VALUE
-
     // dataset_group_ID u(8)
     len += sizeof(uint8_t);
 
@@ -206,27 +226,39 @@ uint64_t DatasetGroup::getHeaderLength() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroup::writeHeader(util::BitWriter& bit_writer) const {
+void DatasetGroup::writeHeader(util::BitWriter& writer) const {
     // KLV (Key Length Value) format
 
     // Key of KVL format
-    bit_writer.write("dghd");
+    writer.write("dghd");
 
     // Length of KVL format
-    bit_writer.write(getLength(), 64);
+    writer.write(getLength(), 64);
 
     // dataset_group_ID u(8)
-    bit_writer.write(dataset_group_ID, 8);
+    writer.write(dataset_group_ID, 8);
 
     // version_number u(8)
-    bit_writer.write(version_number, 8);
+    writer.write(version_number, 8);
 
     // dataset_IDs[] u(16)
     for (auto &d_ID: getDatasetIDs()){
-        bit_writer.write(d_ID, 16);
+        writer.write(d_ID, 16);
     }
 
-    bit_writer.flush();
+    writer.flush();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetGroup::readHeader(util::BitReader& reader, size_t length) {
+
+    size_t start_pos = reader.getPos();
+
+    dataset_group_ID = reader.read<uint8_t>();
+    version_number = reader.read<uint8_t>();
+
+    UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid DatasetGroupHeader length!");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -267,49 +299,49 @@ uint64_t DatasetGroup::getLength() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroup::write(genie::util::BitWriter& bit_writer) const {
+void DatasetGroup::write(genie::util::BitWriter& writer) const {
     // KLV (Key Length Value) format
 
     // Key of KVL format
-    bit_writer.write("dgcn");
+    writer.write("dgcn");
 
     // Length of KVL format
-    bit_writer.write(getLength(), 64);
+    writer.write(getLength(), 64);
 
     // dataset_group_header
-    writeHeader(bit_writer);
+    writeHeader(writer);
 
     // reference (optional)
     for (auto &reference: references){
-        reference.writeToFile(bit_writer);
+        reference.writeToFile(writer);
     }
 
     // reference_metadata (optional)
     for (auto &ref_metadata: reference_metadata){
-        ref_metadata.writeToFile(bit_writer);
+        ref_metadata.writeToFile(writer);
     }
 
     // label_list (optional)
     if (label_list != nullptr){
-        label_list->writeToFile(bit_writer);
+        label_list->writeToFile(writer);
     }
 
     // DG_metadata (optional)
     if (DG_metadata != nullptr){
-        DG_metadata->write(bit_writer);
+        DG_metadata->write(writer);
     }
 
     // DG_protection (optional)
     if (DG_protection != nullptr){
-        DG_protection->write(bit_writer);
+        DG_protection->write(writer);
     }
 
     // dataset[]
     for (auto& ds: datasets){
-        ds.write(bit_writer);
+        ds.write(writer);
     }
 
-    bit_writer.flush();
+    writer.flush();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -3,8 +3,12 @@
 
 #include <string>
 
+#include <genie/util/bitreader.h>
+#include <genie/util/bitwriter.h>
+#include <genie/util/exception.h>
+#include <genie/util/runtime-exception.h>
+
 #include "reference_location.h"
-#include "genie/util/bitwriter.h"
 
 namespace genie {
 namespace format {
@@ -18,6 +22,8 @@ class Internal : public ReferenceLocation {
    public:
 //    Internal();
     Internal(uint8_t _dataset_group_ID, uint16_t _dataset_ID);
+
+    explicit Internal(util::BitReader& reader);
 
     uint64_t getLength() const override;
 

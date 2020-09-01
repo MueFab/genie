@@ -1,9 +1,9 @@
 #ifndef GENIE_PART1_MIT_U_ACCESS_UNIT_INFO_H
 #define GENIE_PART1_MIT_U_ACCESS_UNIT_INFO_H
 
-#include <vector>
 #include <cstdint>
-#include <memory>
+#include <vector>
+#include <genie/util/bitwriter.h>
 
 namespace genie {
 namespace format {
@@ -15,7 +15,7 @@ class MITUAccessUnitInfo {
    public:
 
 
-
+    uint64_t getLength() const;
     void write(genie::util::BitWriter& bit_writer) const;
 };
 
