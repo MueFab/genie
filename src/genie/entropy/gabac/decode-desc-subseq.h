@@ -4,23 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_DECODE_CABAC_H_
-#define GABAC_DECODE_CABAC_H_
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#include <cstdint>
-#include <vector>
-
-#include <genie/entropy/paramcabac/transformed-subseq.h>
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-namespace genie {
-namespace util {
-class DataBlock;
-}
-}  // namespace genie
+#ifndef GABAC_DECODE_DESC_SUBSEQ_H_
+#define GABAC_DECODE_DESC_SUBSEQ_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,16 +13,20 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+struct EncodingConfiguration;
+struct IOConfiguration;
+
 /**
  *
- * @param trnsfSubseqConf
- * @param numEncodedSymbols
- * @param bitstream
- * @param depSymbols
+ * @param ioConf
+ * @param enConf
  * @return
  */
-size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq& trnsfSubseqConf, const unsigned int numEncodedSymbols,
-                             util::DataBlock* bitstream, util::DataBlock* const depSymbols = nullptr);
+unsigned long decodeDescSubsequence(const IOConfiguration& ioConf, const EncodingConfiguration& enConf);
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace gabac
 }  // namespace entropy
@@ -45,7 +34,7 @@ size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq& trnsfSubseqCon
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_DECODE_CABAC_H_
+#endif  // GABAC_DECODE_DESC_SUBSEQ_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

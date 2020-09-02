@@ -151,48 +151,6 @@ class Writer {
     /**
      *
      * @param input
-     * @param binParams
-     */
-    void writeBI(uint64_t input, const std::vector<unsigned int> binParams);
-
-    /**
-     *
-     * @param input
-     * @param binParams
-     */
-    void writeTU(uint64_t input, const std::vector<unsigned int> binParams);
-
-    /**
-     *
-     * @param input
-     * @param binParams
-     */
-    void writeEG(uint64_t input, const std::vector<unsigned int> binParams);
-
-    /**
-     *
-     * @param input
-     * @param binParams
-     */
-    void writeTEG(uint64_t input, const std::vector<unsigned int> binParams);
-
-    /**
-     *
-     * @param input
-     * @param binParams
-     */
-    void writeSUTU(uint64_t input, const std::vector<unsigned int> binParams);
-
-    /**
-     *
-     * @param input
-     * @param binParams
-     */
-    void writeDTU(uint64_t input, const std::vector<unsigned int> binParams);
-
-    /**
-     *
-     * @param input
      * @param codingSubsymSize
      */
     void writeLutSymbol(uint64_t input, const uint8_t codingSubsymSize);

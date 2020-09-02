@@ -11,8 +11,8 @@
 
 #include <genie/entropy/paramcabac/state_vars.h>
 #include "reader.h"
-#include "subsymbol.h"
 #include "writer.h"
+#include "subsymbol.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -79,11 +79,10 @@ class LUTsSubSymbolTransform {
     /**
      *
      * @param writer
-     * @param alphaProps
      * @param symbols
      * @param depSymbols
      */
-    void encodeLUTs(Writer& writer, const core::Alphabet alphaProps, util::DataBlock* const symbols,
+    void encodeLUTs(Writer& writer, util::DataBlock* const symbols,
                     util::DataBlock* const depSymbols = nullptr);
 
     /**
@@ -168,12 +167,10 @@ class LUTsSubSymbolTransform {
 
     /**
      *
-     * @param alphaProps
      * @param symbols
      * @param depSymbols
      */
-    void buildLuts(const core::Alphabet alphaProps, util::DataBlock* const symbols,
-                   util::DataBlock* const depSymbols = nullptr);
+    void buildLuts(util::DataBlock* const symbols, util::DataBlock* const depSymbols = nullptr);
 
     /**
      *

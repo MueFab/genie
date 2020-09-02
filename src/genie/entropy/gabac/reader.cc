@@ -216,66 +216,9 @@ uint64_t Reader::readAsDTUcabac(const std::vector<unsigned int> binParams) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t Reader::readBI(const std::vector<unsigned int> binParams) {
-    if (m_bypassFlag)
-        return readAsBIbypass(binParams);
-    else
-        return readAsBIcabac(binParams);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t Reader::readTU(const std::vector<unsigned int> binParams) {
-    if (m_bypassFlag)
-        return readAsTUbypass(binParams);
-    else
-        return readAsTUcabac(binParams);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t Reader::readEG(const std::vector<unsigned int> binParams) {
-    if (m_bypassFlag)
-        return readAsEGbypass(binParams);
-    else
-        return readAsEGcabac(binParams);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t Reader::readTEG(const std::vector<unsigned int> binParams) {
-    if (m_bypassFlag)
-        return readAsTEGbypass(binParams);
-    else
-        return readAsTEGcabac(binParams);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t Reader::readSUTU(const std::vector<unsigned int> binParams) {
-    if (m_bypassFlag)
-        return readAsSUTUbypass(binParams);
-    else
-        return readAsSUTUcabac(binParams);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t Reader::readDTU(const std::vector<unsigned int> binParams) {
-    if (m_bypassFlag)
-        return readAsDTUbypass(binParams);
-    else
-        return readAsDTUcabac(binParams);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 uint64_t Reader::readLutSymbol(const uint8_t codingSubsymSize) {
-    std::vector<unsigned int> binParams({codingSubsymSize, 2, 0, 0});  // ctxIdx = 0
-    if (m_bypassFlag)
-        return readAsSUTUbypass(binParams);
-    else
-        return readAsSUTUcabac(binParams);
+    std::vector<unsigned int> binParams({codingSubsymSize, 2, 0, 0}); // ctxIdx = 0
+    return readAsSUTUcabac(binParams);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

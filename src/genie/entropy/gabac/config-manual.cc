@@ -62,7 +62,7 @@ paramcabac::Subsequence getEncoderConfigManual(const core::GenSubIndex sub) {
     SupportValues::TransformIdSubsym trnsfSubsymID[MAX_NUM_TRANSPORT_SEQS] = {
         SupportValues::TransformIdSubsym::NO_TRANSFORM};
     BinarizationParameters::BinarizationId binID[MAX_NUM_TRANSPORT_SEQS] = {
-        BinarizationParameters::BinarizationId::BINARY_CODING};
+        BinarizationParameters::BinarizationId::BI};
     std::vector<std::vector<uint8_t>> binParams(MAX_NUM_TRANSPORT_SEQS, std::vector<uint8_t>(2, 0));
     bool bypassFlag[MAX_NUM_TRANSPORT_SEQS] = {false};
     bool adaptiveModeFlag[MAX_NUM_TRANSPORT_SEQS] = {true};

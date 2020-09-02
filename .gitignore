@@ -6,6 +6,7 @@
 
 # CMake build directories
 cmake-build-*/
+build-*/
 
 # CLion project directory
 .idea/
