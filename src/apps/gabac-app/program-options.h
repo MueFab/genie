@@ -12,7 +12,6 @@ class ProgramOptions {
     ~ProgramOptions();
 
    public:
-    // std::string configurationFilePath;
     std::string logLevel;
     std::string inputFilePath;
     std::string dependencyFilePath;

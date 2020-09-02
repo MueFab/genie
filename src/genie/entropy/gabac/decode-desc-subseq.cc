@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "decoding.h"
+#include "decode-desc-subseq.h"
 
 #include <algorithm>
 #include <cmath>
@@ -12,7 +12,7 @@
 
 #include <genie/util/data-block.h>
 #include "configuration.h"
-#include "decode-cabac.h"
+#include "decode-transformed-subseq.h"
 #include "reader.h"
 #include "stream-handler.h"
 

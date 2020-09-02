@@ -63,8 +63,7 @@ void LUTsSubSymbolTransform::setupLutsOrder2(uint8_t numSubsyms, uint64_t numAlp
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LUTsSubSymbolTransform::buildLuts(const core::Alphabet alphaProps, util::DataBlock* const symbols,
-                                       util::DataBlock* const depSymbols) {
+void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols, util::DataBlock* const depSymbols) {
     if (numLuts == 0 || !encodingModeFlag) return;
 
     assert(symbols != nullptr);
@@ -100,7 +99,7 @@ void LUTsSubSymbolTransform::buildLuts(const core::Alphabet alphaProps, util::Da
 
         uint64_t depSymbolValue = 0, depSubsymValue = 0;
         if (d.isValid()) {
-            depSymbolValue = alphaProps.inverseLut[d.get()];
+            depSymbolValue = d.get();
             d.inc();
         }
 
@@ -203,7 +202,7 @@ void LUTsSubSymbolTransform::encodeLutOrder1(Writer& writer, uint64_t numAlphaSu
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LUTsSubSymbolTransform::encodeLUTs(Writer& writer, const core::Alphabet alphaProps, util::DataBlock* const symbols,
+void LUTsSubSymbolTransform::encodeLUTs(Writer& writer, util::DataBlock* const symbols,
                                         util::DataBlock* const depSymbols) {
     if (numLuts == 0 || !encodingModeFlag) return;
 
@@ -212,7 +211,7 @@ void LUTsSubSymbolTransform::encodeLUTs(Writer& writer, const core::Alphabet alp
     uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
 
     // build LUTs from symbols
-    buildLuts(alphaProps, symbols, depSymbols);
+    buildLuts(symbols, depSymbols);
 
     // encode LUTs
     if (codingOrder == 2) {

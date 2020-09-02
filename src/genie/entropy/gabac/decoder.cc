@@ -5,7 +5,7 @@
  */
 
 #include "decoder.h"
-#include "decode-cabac.h"
+#include "decode-transformed-subseq.h"
 #include "stream-handler.h"
 
 #include <genie/util/runtime-exception.h>
@@ -79,7 +79,8 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfiguration& conf,
-                                                  core::AccessUnit::Subsequence&& data, bool mmCoderEnabled) {
+                                                  core::AccessUnit::Subsequence&& data,
+                                                  bool mmCoderEnabled) {
     core::AccessUnit::Subsequence in = std::move(data);
 
     if(getDescriptor(in.getID().first).getSubSeq(in.getID().second).mismatchDecoding && mmCoderEnabled) {

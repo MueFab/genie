@@ -1,14 +1,11 @@
 project("genie-gabac")
 
 set(source_files
-        #analysis.cc
         binary-arithmetic-encoder.cc
         binary-arithmetic-decoder.cc
         bit-input-stream.cc
-        #c-interface.cc
         config-manual.cc
         configuration.cc
-        #constants.cc
         context-model.cc
         context-selector.cc
         context-tables.cc
@@ -18,12 +15,12 @@ set(source_files
         mismatch-decoder.cc
         merge-subseq-transform.cc
         rle-subseq-transform.cc
-        decode-cabac.cc
-        decoding.cc
-        encode-cabac.cc
-        encoding.cc
-        encoder.cc
+        decode-transformed-subseq.cc
+        decode-desc-subseq.cc
         decoder.cc
+        encode-transformed-subseq.cc
+        encode-desc-subseq.cc
+        encoder.cc
         gabac-seq-conf-set.cc
         run.cc
         stream-handler.cc

@@ -217,66 +217,9 @@ void Writer::writeAsDTUcabac(uint64_t input, const std::vector<unsigned int> bin
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Writer::writeBI(uint64_t input, const std::vector<unsigned int> binParams) {
-    if (m_bypassFlag)
-        writeAsBIbypass(input, binParams);
-    else
-        writeAsBIcabac(input, binParams);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Writer::writeTU(uint64_t input, const std::vector<unsigned int> binParams) {
-    if (m_bypassFlag)
-        writeAsTUbypass(input, binParams);
-    else
-        writeAsTUcabac(input, binParams);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Writer::writeEG(uint64_t input, const std::vector<unsigned int> binParams) {
-    if (m_bypassFlag)
-        writeAsEGbypass(input, binParams);
-    else
-        writeAsEGcabac(input, binParams);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Writer::writeTEG(uint64_t input, const std::vector<unsigned int> binParams) {
-    if (m_bypassFlag)
-        writeAsTEGbypass(input, binParams);
-    else
-        writeAsTEGcabac(input, binParams);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Writer::writeSUTU(uint64_t input, const std::vector<unsigned int> binParams) {
-    if (m_bypassFlag)
-        writeAsSUTUbypass(input, binParams);
-    else
-        writeAsSUTUcabac(input, binParams);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void Writer::writeDTU(uint64_t input, const std::vector<unsigned int> binParams) {
-    if (m_bypassFlag)
-        writeAsDTUbypass(input, binParams);
-    else
-        writeAsDTUcabac(input, binParams);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void Writer::writeLutSymbol(uint64_t input, const uint8_t codingSubsymSize) {
-    std::vector<unsigned int> binParams({codingSubsymSize, 2, 0, 0});  // ctxIdx = 0
-    if (m_bypassFlag)
-        writeAsSUTUbypass(input, binParams);
-    else
-        writeAsSUTUcabac(input, binParams);
+    std::vector<unsigned int> binParams({codingSubsymSize, 2, 0, 0}); // ctxIdx = 0
+    writeAsSUTUcabac(input, binParams);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
