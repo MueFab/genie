@@ -10,7 +10,7 @@ namespace gabacify {
 
 ProgramOptions::ProgramOptions(int argc, char *argv[])
     : logLevel(), inputFilePath(), outputFilePath(), task(),
-      descID(0), subseqID(0) {
+      blocksize(0), descID(0), subseqID(0) {
     processCommandLine(argc, argv);
 }
 
@@ -49,7 +49,7 @@ void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     validate();
 }
 
-void ProgramOptions::validate(void) {
+void ProgramOptions::validate() const {
     // Do stuff depending on the task
     if (this->task == "encode" || this->task == "decode") {
         UTILS_DIE_IF(this->inputFilePath.empty(),

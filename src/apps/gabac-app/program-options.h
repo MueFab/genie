@@ -25,7 +25,7 @@ class ProgramOptions {
    private:
     void processCommandLine(int argc, char *argv[]);
 
-    void validate();
+    void validate() const;
 };
 
 }  // namespace gabacify
