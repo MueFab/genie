@@ -58,7 +58,7 @@ void ProgramOptions::validate() const {
         UTILS_DIE_IF(this->outputFilePath.empty(),
                      "Output file path both not provided!");
     } else {
-        UTILS_DIE("Task '" + this->task + "' is invaid");
+        UTILS_DIE("Task '" + this->task + "' is invalid");
     }
 }
 
