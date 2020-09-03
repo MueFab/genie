@@ -22,7 +22,7 @@ AccessUnit::Subsequence &AccessUnit::Subsequence::operator=(const Subsequence &s
     position = sub.position;
     id = sub.id;
     numSymbols = sub.numSymbols;
-    mmDecoder = sub.mmDecoder->copy();
+    // FIXME leads to segfault mmDecoder = sub.mmDecoder->copy();
     return *this;
 }
 
@@ -306,7 +306,8 @@ AccessUnit::Descriptor::Descriptor() : id(GenDesc(0)) {}
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::AccessUnit(parameter::ParameterSet &&set, size_t _numRecords)
-    : descriptors(), parameters(std::move(set)), numReads(_numRecords), minPos(0), maxPos(0), referenceSequence(0) {
+    : descriptors(), parameters(std::move(set)), numReads(_numRecords), minPos(0), maxPos(0),
+      referenceSequence(0), mmtypeDependency(0,4), rfttDependency(0,4) {
     const size_t WORDSIZE = 4;
     for (const auto &desc : getDescriptors()) {
         Descriptor desc_data(desc.id);
@@ -428,6 +429,28 @@ bool AccessUnit::isReferenceOnly() const { return referenceOnly; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnit::setReferenceOnly(bool ref) { referenceOnly = ref; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+util::DataBlock* AccessUnit::getSubsequenceDependency(GenSubIndex sub) {
+    if(sub == GenSub::MMTYPE_SUBSTITUTION)
+        return &mmtypeDependency;
+    else if(sub == GenSub::RFTT)
+        return &rfttDependency;
+    else
+        return nullptr;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const util::DataBlock* AccessUnit::getSubsequenceDependency(GenSubIndex sub) const {
+    if(sub == GenSub::MMTYPE_SUBSTITUTION)
+        return &mmtypeDependency;
+    else if(sub == GenSub::RFTT)
+        return &rfttDependency;
+    else
+        return nullptr;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

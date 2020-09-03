@@ -200,7 +200,7 @@ void Encoder::encodeSubstitution(CodingState &state) {
     if (state.type > core::record::ClassType::CLASS_N) {
         const auto SYMBOL = getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[state.read[state.read_pos]];
         container.push(core::GenSub::MMTYPE_SUBSTITUTION, SYMBOL);
-        //TODO container.pushMmtypeDependency(getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[state.ref[state.ref_offset]]);
+        container.pushMmtypeDependency(getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[state.ref[state.ref_offset]]);
     }
 }
 

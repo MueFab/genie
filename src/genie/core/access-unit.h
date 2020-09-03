@@ -558,6 +558,30 @@ class AccessUnit {
      */
     void setReferenceOnly(bool ref);
 
+    /**
+     *
+     * @param symbolCode
+     */
+    void pushMmtypeDependency(uint8_t symbolCode) {mmtypeDependency.push_back(symbolCode); }
+
+    /**
+     *
+     * @param symbolCode
+     */
+    void pushRfttDependency(uint8_t symbolCode) {rfttDependency.push_back(symbolCode); }
+
+    /**
+     *
+     * @param sub
+     */
+    util::DataBlock* getSubsequenceDependency(GenSubIndex sub);
+
+    /**
+     *
+     * @param sub
+     */
+    const util::DataBlock* getSubsequenceDependency(GenSubIndex sub) const;
+
    private:
     std::vector<Descriptor> descriptors;                //!< @brief
     parameter::ParameterSet parameters;                 //!< @brief
@@ -573,6 +597,9 @@ class AccessUnit {
     uint64_t maxPos;           //!<
 
     uint16_t referenceSequence;  //!<
+
+    util::DataBlock mmtypeDependency;     //!< @brief
+    util::DataBlock rfttDependency;       //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
