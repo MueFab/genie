@@ -76,12 +76,12 @@ MismatchDecoder *AccessUnit::Subsequence::getMismatchDecoder() const { return mm
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence::Subsequence(size_t wordSize, GenSubIndex _id)
-    : data(0, wordSize), position(0), id(std::move(_id)), dependency(0, 4) {}
+    : data(0, wordSize), position(0), id(std::move(_id)), dependency(0, wordSize) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence::Subsequence(util::DataBlock d, GenSubIndex _id)
-    : data(std::move(d)), position(0), id(std::move(_id)), dependency(0,4) {}
+    : data(std::move(d)), position(0), id(std::move(_id)), dependency(0,d.getWordSize()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -259,7 +259,7 @@ void AccessUnit::Subsequence::write(util::BitWriter &writer) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence::Subsequence(GenSubIndex _id, size_t size, util::BitReader &reader)
-    : data(0, 1), id(std::move(_id)), numSymbols(0), dependency(0, 4) {
+    : data(0, 1), id(std::move(_id)), numSymbols(0), dependency(0, 1) {
     data.resize(size);
     // no need to resize 'dependency' as it's not used on decoder side
     reader.readBypass((char *)data.getData(), size);
@@ -267,12 +267,12 @@ AccessUnit::Subsequence::Subsequence(GenSubIndex _id, size_t size, util::BitRead
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Subsequence::Subsequence(GenSubIndex _id) : data(0, 1), id(_id), numSymbols(0), dependency(0, 4) {}
+AccessUnit::Subsequence::Subsequence(GenSubIndex _id) : data(0, 1), id(_id), numSymbols(0), dependency(0, 1) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence::Subsequence(GenSubIndex _id, util::DataBlock &&dat)
-    : data(std::move(dat)), id(std::move(_id)), numSymbols(0), dependency(0, 4) {}
+    : data(std::move(dat)), id(std::move(_id)), numSymbols(0), dependency(0, data.getWordSize()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
