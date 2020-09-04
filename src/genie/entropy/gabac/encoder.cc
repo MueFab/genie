@@ -58,8 +58,7 @@ core::AccessUnit::Descriptor Encoder::compressTokens(const gabac::EncodingConfig
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::AccessUnit::Subsequence Encoder::compress(const gabac::EncodingConfiguration &conf,
-                                                core::AccessUnit::Subsequence &&in,
-                                                util::DataBlock* const dependency) {
+                                                core::AccessUnit::Subsequence &&in) {
     // Interface to GABAC library
     core::AccessUnit::Subsequence data = std::move(in);
     size_t num_symbols = data.getNumSymbols();
@@ -67,8 +66,8 @@ core::AccessUnit::Subsequence Encoder::compress(const gabac::EncodingConfigurati
     gabac::IBufferStream bufferInputStream(&buffer);
 
     gabac::IBufferStream *bufferDependencyStream = nullptr;
-    if(dependency != nullptr) {
-        bufferDependencyStream = new gabac::IBufferStream(dependency);
+    if(data.getDependency() != nullptr) {
+        bufferDependencyStream = new gabac::IBufferStream(data.getDependency());
     }
 
     util::DataBlock outblock(0, 1);
