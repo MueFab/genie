@@ -210,8 +210,8 @@ void Decoder::decodeMismatches(size_t clip_offset, std::string &sequence, std::s
         const auto TYPE = container.pull((core::GenSub::MMTYPE_TYPE));
         if (TYPE == core::GenConst::MMTYPE_SUBSTITUTION) {
             const auto SUBSTITUTION = container.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()->dataLeft()
-                                          ? getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N']
-                                          : container.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()->decodeMismatch(sequence[POSITION]);
+                                          ? container.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()->decodeMismatch(sequence[POSITION])
+                                          : getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N'];
             const auto SUBSTITUTION_CHAR = getAlphabetProperties(core::AlphabetID::ACGTN).lut[SUBSTITUTION];
             sequence[POSITION] = SUBSTITUTION_CHAR;
             cigar_extended[POSITION + cigarOffset] = SUBSTITUTION_CHAR;
