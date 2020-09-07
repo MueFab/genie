@@ -23,7 +23,7 @@ AccessUnit::Subsequence &AccessUnit::Subsequence::operator=(const Subsequence &s
     id = sub.id;
     numSymbols = sub.numSymbols;
     dependency = sub.dependency;
-    // FIXME leads to segfault mmDecoder = sub.mmDecoder->copy();
+    if (sub.mmDecoder != nullptr) mmDecoder = sub.mmDecoder->copy();
     return *this;
 }
 
