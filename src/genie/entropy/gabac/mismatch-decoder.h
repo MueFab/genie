@@ -11,6 +11,7 @@
 
 #include <genie/core/mismatch-decoder.h>
 #include <genie/util/data-block.h>
+#include "gabac.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,13 +26,15 @@ class MismatchDecoder : public core::MismatchDecoder {
    private:
     util::DataBlock data;
     size_t position{};
+    const EncodingConfiguration &enConf;
+
    public:
 
     /**
      *
      * @param d
      */
-    explicit MismatchDecoder(util::DataBlock &&d);
+    explicit MismatchDecoder(util::DataBlock &&d, const EncodingConfiguration &c);
 
     /**
      * @brief Decodes one base of a mismatch with the knowledge that ref is _not_ the wanted base.

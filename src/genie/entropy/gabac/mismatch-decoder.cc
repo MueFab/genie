@@ -17,7 +17,8 @@ namespace gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MismatchDecoder::MismatchDecoder(util::DataBlock &&d) : data(std::move(d)) {
+MismatchDecoder::MismatchDecoder(util::DataBlock &&d, const EncodingConfiguration &c) : data(std::move(d)), enConf(c) {
+
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -34,7 +35,7 @@ bool MismatchDecoder::dataLeft() const {
 
 std::unique_ptr<core::MismatchDecoder> MismatchDecoder::copy() const {
     util::DataBlock d = data;
-    auto ret = util::make_unique<MismatchDecoder>(std::move(d));
+    auto ret = util::make_unique<MismatchDecoder>(std::move(d), enConf); // FIXME it will start cabac decoding process
     ret->position = position;
     return ret;
 }
