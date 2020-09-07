@@ -196,8 +196,8 @@ void Encoder::encodeSubstitution(CodingState &state) {
     state.lastMisMatch = state.read_pos + 1 - state.clips.softClips[0].length();
     container.push(core::GenSub::MMPOS_POSITION, POSITION);
 
-    container.push(core::GenSub::MMTYPE_TYPE, core::GenConst::MMTYPE_SUBSTITUTION);
-    if (state.type > core::record::ClassType::CLASS_N) {
+    if (state.type >= core::record::ClassType::CLASS_M) {
+        container.push(core::GenSub::MMTYPE_TYPE, core::GenConst::MMTYPE_SUBSTITUTION);
         const auto SYMBOL = getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[state.read[state.read_pos]];
         container.push(core::GenSub::MMTYPE_SUBSTITUTION, SYMBOL);
         container.pushDependency(core::GenSub::MMTYPE_SUBSTITUTION,

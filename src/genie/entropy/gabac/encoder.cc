@@ -109,13 +109,11 @@ core::EntropyEncoder::EntropyCoded Encoder::process(core::AccessUnit::Descriptor
                 // add compressed payload
                 auto id = subdesc.getID();
 
-                if (!subdesc.isEmpty()) {
-                    std::get<2>(ret).addInteger("size-gabac-total-raw", subdesc.getRawSize());
-                    std::get<2>(ret).addInteger(
-                        "size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-" +
-                        core::getDescriptor(std::get<1>(ret).getID()).subseqs[id.second].name + "-raw",
-                        subdesc.getRawSize());
-                }
+                std::get<2>(ret).addInteger("size-gabac-total-raw", subdesc.getRawSize());
+                std::get<2>(ret).addInteger(
+                    "size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-" +
+                    core::getDescriptor(std::get<1>(ret).getID()).subseqs[id.second].name + "-raw",
+                    subdesc.getRawSize());
 
                 std::get<1>(ret).set(id.second, compress(conf, std::move(subdesc)));
 
