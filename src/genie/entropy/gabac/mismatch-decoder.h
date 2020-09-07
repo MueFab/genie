@@ -12,6 +12,7 @@
 #include <genie/core/mismatch-decoder.h>
 #include <genie/util/data-block.h>
 #include "gabac.h"
+#include "decode-transformed-symbols.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,8 +26,12 @@ namespace gabac {
 class MismatchDecoder : public core::MismatchDecoder {
    private:
     util::DataBlock data;
-    size_t position{};
     const EncodingConfiguration &enConf;
+    uint64_t numSubseqSymbolsTotal;
+    uint64_t numSubseqSymbolsDecoded;
+
+    std::vector<TransformedSymbolsDecoder> trnsfSubseqDecoder;
+    size_t numTrnsfSubseqs;
 
    public:
 
