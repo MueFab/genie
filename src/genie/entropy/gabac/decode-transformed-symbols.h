@@ -26,8 +26,57 @@ namespace gabac {
  *
  */
 class TransformedSymbolsDecoder {
+   public:
+
+    /**
+     *
+     * @param
+     */
+    explicit TransformedSymbolsDecoder(util::DataBlock *bitstream,
+                                       const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                                       const unsigned int numEncodedSymbols);
+
+    /**
+     *
+     * @param
+     */
+    ~TransformedSymbolsDecoder();
+
+    /**
+     * @brief
+     * @param
+     * @return
+     */
+    uint64_t decodeNextSymbol(uint64_t *depSymbol);
+
+    /**
+     * @brief
+     * @return the number of symbols available.
+     */
+    size_t symbolsAvail() const;
+
    private:
-    const paramcabac::TransformedSubSeq &trnsfSubseqConf;
+    /**
+     * @brief
+     * @param
+     * @return
+     */
+    uint64_t decodeNextSymbolOrder0();
+
+    /**
+     * @brief
+     * @param
+     * @return
+     */
+    uint64_t decodeNextSymbolOrder1(uint64_t *depSymbol);
+
+    /**
+     * @brief
+     * @param
+     * @return
+     */
+    uint64_t decodeNextSymbolOrder2();
+
     const unsigned int numEncodedSymbols;
     unsigned int numDecodedSymbols;
     const paramcabac::BinarizationParameters::BinarizationId binID;
@@ -49,29 +98,6 @@ class TransformedSymbolsDecoder {
     uint64_t subsymMask;
     uint8_t numLuts;
     uint8_t numPrvs;
-
-   public:
-
-    /**
-     *
-     * @param
-     */
-    explicit TransformedSymbolsDecoder(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                                       const unsigned int numEncodedSymbols,
-                                       util::DataBlock *bitstream);
-
-    /**
-     * @brief
-     * @param
-     * @return
-     */
-    uint64_t decodeNextSymbol(uint64_t *depSymbol);
-
-    /**
-     * @brief
-     * @return the number of symbols available.
-     */
-    size_t symbolsAvail() const;
 
 };
 
