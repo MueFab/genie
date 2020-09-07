@@ -23,7 +23,7 @@ AccessUnit::Subsequence &AccessUnit::Subsequence::operator=(const Subsequence &s
     id = sub.id;
     numSymbols = sub.numSymbols;
     dependency = sub.dependency;
-    if (sub.mmDecoder != nullptr) mmDecoder = sub.mmDecoder->copy();
+    if (sub.mmDecoder != nullptr) mmDecoder = sub.mmDecoder->copy(); // FIXME it will start cabac decoding process
     return *this;
 }
 

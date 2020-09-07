@@ -77,7 +77,7 @@ option(BUILD_COVERAGE "Compile and link code instrumented for coverage analysis"
 option(BUILD_DOCUMENTATION "Build Doxygen documentation" OFF)
 option(BUILD_TESTS "Build tests" OFF)
 option(GABAC_BUILD_SHARED_LIB "Build shared GABAC library" OFF)
-option(GENIE_USE_OPENMP "Use OpenMP parallelization in Genie" OFF)
+option(GENIE_USE_OPENMP "Use OpenMP parallelization in Genie" ON)
 
 message(STATUS "")
 message(STATUS "******** Options ********")

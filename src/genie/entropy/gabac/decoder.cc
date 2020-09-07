@@ -84,7 +84,7 @@ core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfigura
     core::AccessUnit::Subsequence in = std::move(data);
 
     if(getDescriptor(in.getID().first).getSubSeq(in.getID().second).mismatchDecoding && mmCoderEnabled) {
-        in.attachMismatchDecoder(util::make_unique<MismatchDecoder>(in.move()));
+        in.attachMismatchDecoder(util::make_unique<MismatchDecoder>(in.move(), conf));
         return in;
     }
 
