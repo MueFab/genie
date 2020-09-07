@@ -18,13 +18,12 @@ namespace gabac {
 TransformedSymbolsDecoder::TransformedSymbolsDecoder(util::DataBlock *bitstream,
                                                      const paramcabac::TransformedSubSeq &trnsfSubseqConf,
                                                      const unsigned int numSymbols)
-    : //trnsfSubseqConf(trnsfSubseqConf),
-      numEncodedSymbols(numSymbols), numDecodedSymbols(0),
+    : numEncodedSymbols(numSymbols), numDecodedSymbols(0),
       binID(trnsfSubseqConf.getBinarization().getBinarizationID()), stateVars(trnsfSubseqConf.getStateVars()),
       reader(nullptr), ctxSelector(nullptr), invLutsSubsymTrnsfm(nullptr), diffEnabled(false), customCmaxTU(false) {
 
-    if (bitstream == nullptr) UTILS_DIE("Bitstream is null"); // FIXME Should die?
-    if (numEncodedSymbols <= 0) UTILS_DIE("numEncodedSymbols is 0"); // FIXME Should die?
+    if (bitstream == nullptr || bitstream->size() <= 0) return; // FIXME Should die?
+    if (numEncodedSymbols <= 0) return; // FIXME Should die?
 
     const paramcabac::SupportValues &supportVals = trnsfSubseqConf.getSupportValues();
     const paramcabac::Binarization &binarzation = trnsfSubseqConf.getBinarization();
