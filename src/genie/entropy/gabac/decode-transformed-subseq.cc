@@ -21,8 +21,8 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-inline void decodeSignFlag(Reader &reader, const paramcabac::BinarizationParameters::BinarizationId binID,
-                           uint64_t &symbolValue) {
+void decodeSignFlag(Reader &reader, const paramcabac::BinarizationParameters::BinarizationId binID,
+                    uint64_t &symbolValue) {
     if (symbolValue != 0) {
         switch (binID) {
             case paramcabac::BinarizationParameters::BinarizationId::SEG:
@@ -42,10 +42,10 @@ inline void decodeSignFlag(Reader &reader, const paramcabac::BinarizationParamet
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline binFunc getBinarizorReader(const uint8_t outputSymbolSize, const bool bypassFlag,
-                                  const paramcabac::BinarizationParameters::BinarizationId binID,
-                                  const paramcabac::BinarizationParameters &binarzationParams,
-                                  const paramcabac::StateVars &stateVars, std::vector<unsigned int> &binParams) {
+binFunc getBinarizorReader(const uint8_t outputSymbolSize, const bool bypassFlag,
+                           const paramcabac::BinarizationParameters::BinarizationId binID,
+                           const paramcabac::BinarizationParameters &binarzationParams,
+                           const paramcabac::StateVars &stateVars, std::vector<unsigned int> &binParams) {
     binFunc func = nullptr;
     if (bypassFlag) {
         switch (binID) {
