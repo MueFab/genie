@@ -15,10 +15,11 @@ namespace gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TransformedSymbolsDecoder::TransformedSymbolsDecoder(const paramcabac::TransformedSubSeq &trnsfSubseqConf,
-                                           const unsigned int numEncodedSymbols,
-                                           util::DataBlock *bitstream)
-    : trnsfSubseqConf(trnsfSubseqConf), numEncodedSymbols(numEncodedSymbols), numDecodedSymbols(0),
+TransformedSymbolsDecoder::TransformedSymbolsDecoder(util::DataBlock *bitstream,
+                                                     const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+                                                     const unsigned int numSymbols)
+    : //trnsfSubseqConf(trnsfSubseqConf),
+      numEncodedSymbols(numSymbols), numDecodedSymbols(0),
       binID(trnsfSubseqConf.getBinarization().getBinarizationID()), stateVars(trnsfSubseqConf.getStateVars()),
       reader(nullptr), ctxSelector(nullptr), invLutsSubsymTrnsfm(nullptr), diffEnabled(false), customCmaxTU(false) {
 
@@ -37,7 +38,6 @@ TransformedSymbolsDecoder::TransformedSymbolsDecoder(const paramcabac::Transform
 
     numLuts = stateVars.getNumLuts(codingOrder, supportVals.getShareSubsymLutFlag(), trnsfSubseqConf.getTransformIDSubsym());
     numPrvs = stateVars.getNumPrvs(supportVals.getShareSubsymPrvFlag());
-    size_t payloadSizeUsed = 0;
 
     reader = new Reader(bitstream, bypassFlag, stateVars.getNumCtxTotal());
     reader->start();
@@ -61,12 +61,69 @@ TransformedSymbolsDecoder::TransformedSymbolsDecoder(const paramcabac::Transform
 
     binParams = std::vector<unsigned int>(4,  // first three elements are for binarization params, last one is for ctxIdx
                                           0);
-    binarizor = getBinarizor(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
+    binarizor = getBinarizorReader(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t TransformedSymbolsDecoder::decodeNextSymbol(uint64_t *depSymbol) {
+TransformedSymbolsDecoder::~TransformedSymbolsDecoder() {
+    if (reader != nullptr) delete reader;
+    if (ctxSelector != nullptr) delete ctxSelector;
+    if (invLutsSubsymTrnsfm != nullptr) delete invLutsSubsymTrnsfm;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+size_t TransformedSymbolsDecoder::decodeNextSymbol(uint64_t *depSymbol) {
+    switch (codingOrder) {
+        case 0:
+            return decodeNextSymbolOrder0();
+            break;
+        case 1:
+            return decodeNextSymbolOrder1(depSymbol);
+            break;
+        case 2:
+            return decodeNextSymbolOrder2();
+            break;
+        default:
+            UTILS_DIE("Unknown coding order");
+    }
+
+    return 0;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder0() {
+    uint64_t symbolValue = 0;
+    if (numDecodedSymbols < numEncodedSymbols) {
+        // Decode subsymbols and merge them to construct the symbol
+        std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
+        for (uint8_t s = 0; s < stateVars.getNumSubsymbols(); s++) {
+            subsymbols[s].subsymIdx = s;
+            binParams[3] = ctxSelector->getContextIdxOrder0(s);
+
+            subsymbols[s].subsymValue = (reader->*binarizor)(binParams);
+
+            if (diffEnabled) {
+                subsymbols[s].subsymValue += subsymbols[s].prvValues[0];
+                subsymbols[s].prvValues[0] = subsymbols[s].subsymValue;
+            }
+
+            symbolValue = (symbolValue << codingSubsymSize) | subsymbols[s].subsymValue;
+        }
+
+        decodeSignFlag(*reader, binID, symbolValue);
+
+        numDecodedSymbols++;
+    }
+
+    return symbolValue;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder1(uint64_t *depSymbol) {
     uint64_t symbolValue = 0;
     if (numDecodedSymbols < numEncodedSymbols) {
         // Decode subsymbols and merge them to construct the symbol
@@ -98,6 +155,46 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbol(uint64_t *depSymbol) {
                 invLutsSubsymTrnsfm->invTransformOrder1(subsymbols, s, lutIdx, prvIdx);
             }
 
+            subsymbols[prvIdx].prvValues[0] = subsymbols[s].subsymValue;
+
+            symbolValue = (symbolValue << codingSubsymSize) | subsymbols[s].subsymValue;
+        }
+
+        decodeSignFlag(*reader, binID, symbolValue);
+
+        numDecodedSymbols++;
+    }
+
+    return symbolValue;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder2() {
+    uint64_t symbolValue = 0;
+    if (numDecodedSymbols < numEncodedSymbols) {
+        // Decode subsymbols and merge them to construct the symbol
+        std::vector<Subsymbol> subsymbols(stateVars.getNumSubsymbols());
+        for (uint8_t s = 0; s < stateVars.getNumSubsymbols(); s++) {
+            const uint8_t lutIdx = (numLuts > 1) ? s : 0;  // either private or shared LUT
+            const uint8_t prvIdx = (numPrvs > 1) ? s : 0;  // either private or shared PRV
+
+            subsymbols[s].subsymIdx = s;
+            binParams[3] = ctxSelector->getContextIdxOrderGT0(s, prvIdx, subsymbols, codingOrder);
+
+            if (customCmaxTU) {
+                subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm->getNumMaxElemsOrder2(subsymbols, lutIdx, prvIdx);
+                binParams[0] =
+                    std::min(defaultCmax, subsymbols[s].lutNumMaxElems);  // update cMax
+            }
+            subsymbols[s].subsymValue = (reader->*binarizor)(binParams);
+
+            if (numLuts > 0) {
+                subsymbols[s].lutEntryIdx = subsymbols[s].subsymValue;
+                invLutsSubsymTrnsfm->invTransformOrder2(subsymbols, s, lutIdx, prvIdx);
+            }
+
+            subsymbols[prvIdx].prvValues[1] = subsymbols[prvIdx].prvValues[0];
             subsymbols[prvIdx].prvValues[0] = subsymbols[s].subsymValue;
 
             symbolValue = (symbolValue << codingSubsymSize) | subsymbols[s].subsymValue;

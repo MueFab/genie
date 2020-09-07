@@ -16,6 +16,7 @@ set(source_files
         merge-subseq-transform.cc
         rle-subseq-transform.cc
         decode-transformed-subseq.cc
+        decode-transformed-symbols.cc
         decode-desc-subseq.cc
         decoder.cc
         encode-transformed-subseq.cc
