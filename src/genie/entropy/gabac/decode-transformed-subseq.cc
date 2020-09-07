@@ -11,7 +11,6 @@
 
 #include <genie/entropy/paramcabac/subsequence.h>
 #include <genie/util/data-block.h>
-#include "reader.h"
 
 #include "context-selector.h"
 #include "luts-subsymbol-transform.h"
@@ -22,14 +21,8 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-typedef uint64_t (Reader::*binFunc)(const std::vector<unsigned int>);
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-static inline void decodeSignFlag(Reader &reader, const paramcabac::BinarizationParameters::BinarizationId binID,
-                                  uint64_t &symbolValue) {
+inline void decodeSignFlag(Reader &reader, const paramcabac::BinarizationParameters::BinarizationId binID,
+                           uint64_t &symbolValue) {
     if (symbolValue != 0) {
         switch (binID) {
             case paramcabac::BinarizationParameters::BinarizationId::SEG:
@@ -49,10 +42,10 @@ static inline void decodeSignFlag(Reader &reader, const paramcabac::Binarization
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline binFunc getBinarizor(const uint8_t outputSymbolSize, const bool bypassFlag,
-                                   const paramcabac::BinarizationParameters::BinarizationId binID,
-                                   const paramcabac::BinarizationParameters &binarzationParams,
-                                   const paramcabac::StateVars &stateVars, std::vector<unsigned int> &binParams) {
+inline binFunc getBinarizor(const uint8_t outputSymbolSize, const bool bypassFlag,
+                            const paramcabac::BinarizationParameters::BinarizationId binID,
+                            const paramcabac::BinarizationParameters &binarzationParams,
+                            const paramcabac::StateVars &stateVars, std::vector<unsigned int> &binParams) {
     binFunc func = nullptr;
     if (bypassFlag) {
         switch (binID) {

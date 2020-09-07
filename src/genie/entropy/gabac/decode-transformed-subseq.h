@@ -13,6 +13,7 @@
 #include <vector>
 
 #include <genie/entropy/paramcabac/transformed-subseq.h>
+#include "reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,6 +28,37 @@ class DataBlock;
 namespace genie {
 namespace entropy {
 namespace gabac {
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ *
+ * @param
+ */
+typedef uint64_t (Reader::*binFunc)(const std::vector<unsigned int>);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ *
+ * @param
+ */
+inline void decodeSignFlag(Reader &reader, const paramcabac::BinarizationParameters::BinarizationId binID,
+                           uint64_t &symbolValue);
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ *
+ * @param
+ */
+inline binFunc getBinarizor(const uint8_t outputSymbolSize, const bool bypassFlag,
+                            const paramcabac::BinarizationParameters::BinarizationId binID,
+                            const paramcabac::BinarizationParameters &binarzationParams,
+                            const paramcabac::StateVars &stateVars, std::vector<unsigned int> &binParams);
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 /**
  *
