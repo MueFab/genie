@@ -45,10 +45,10 @@ static inline void encodeSignflag(Writer &writer, const paramcabac::Binarization
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline binFunc getBinarizor(const uint8_t outputSymbolSize, const bool bypassFlag,
-                                   const paramcabac::BinarizationParameters::BinarizationId binID,
-                                   const paramcabac::BinarizationParameters &binarzationParams,
-                                   const paramcabac::StateVars &stateVars, std::vector<unsigned int> &binParams) {
+static inline binFunc getBinarizorWriter(const uint8_t outputSymbolSize, const bool bypassFlag,
+                                         const paramcabac::BinarizationParameters::BinarizationId binID,
+                                         const paramcabac::BinarizationParameters &binarzationParams,
+                                         const paramcabac::StateVars &stateVars, std::vector<unsigned int> &binParams) {
     binFunc func = nullptr;
     if (bypassFlag) {
         switch (binID) {
@@ -160,7 +160,7 @@ size_t encodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
     const bool diffEnabled =
         (trnsfSubseqConf.getTransformIDSubsym() == paramcabac::SupportValues::TransformIdSubsym::DIFF_CODING);
 
-    binFunc func = getBinarizor(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
+    binFunc func = getBinarizorWriter(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
 
     while (r.isValid()) {
         if (maxSize <= bitstream.size()) {
@@ -250,7 +250,7 @@ size_t encodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
     ContextSelector ctxSelector(stateVars);
 
-    binFunc func = getBinarizor(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
+    binFunc func = getBinarizorWriter(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
 
     while (r.isValid()) {
         if (maxSize <= bitstream.size()) {
@@ -355,7 +355,7 @@ size_t encodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
 
     ContextSelector ctxSelector(stateVars);
 
-    binFunc func = getBinarizor(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
+    binFunc func = getBinarizorWriter(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
 
     while (r.isValid()) {
         if (maxSize <= bitstream.size()) {
