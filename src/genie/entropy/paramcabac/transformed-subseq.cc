@@ -63,6 +63,10 @@ const StateVars& TransformedSubSeq::getStateVars() const { return state_vars; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+StateVars& TransformedSubSeq::getStateVars() { return state_vars; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void TransformedSubSeq::write(util::BitWriter& writer) const {
     writer.write(uint8_t(transform_ID_subsym), 3);
     support_values.write(transform_ID_subsym, writer);

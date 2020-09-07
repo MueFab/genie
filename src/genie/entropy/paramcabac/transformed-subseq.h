@@ -91,6 +91,12 @@ class TransformedSubSeq {
 
     /**
      *
+     * @return
+     */
+    StateVars& getStateVars();
+
+    /**
+     *
      * @param _subsequence_ID
      */
     void setSubsequenceID(const core::GenSubIndex _subsequence_ID);
