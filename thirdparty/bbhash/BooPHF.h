@@ -19,16 +19,10 @@
 #ifdef _WIN32
 #include <intrin.h>
 #include <process.h>
-#define INTR_FETCH_AND_OR(x, y) _InterlockedOr64(x,y)
-#define INTR_FETCH_AND_AND(x, y) _InterlockedAnd64(x, y)
-#define INTR_FETCH_AND_ADD(x, y) _InterlockedExchangeAdd64(x, y)
 #define LOCK_FILE(x) (void)(x)  // TODO
 #define UNLOCK_FILE(x) (void)(x) //TODO
 #else
 #include <unistd.h>
-#define INTR_FETCH_AND_OR(x, y) __sync_fetch_and_or(x, y)
-#define INTR_FETCH_AND_AND(x, y) __sync_fetch_and_and(x, y)
-#define INTR_FETCH_AND_ADD(x, y) __sync_fetch_and_add(x, y)
 #define LOCK_FILE(x) flockfile(x)
 #define UNLOCK_FILE(x) funlockfile(x)
 #endif
@@ -206,7 +200,7 @@ namespace boomphf {
     }
 
 
-   
+
 ////////////////////////////////////////////////////////////////
 #pragma mark -
 #pragma mark hasher
@@ -566,7 +560,8 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
         //atomically   return old val and set to 1
         uint64_t atomic_test_and_set(uint64_t pos)
         {
-            uint64_t oldval = INTR_FETCH_AND_OR((long long*)_bitArray + (pos >> 6), (uint64_t)(1ULL << (pos & 63)));
+            uint64_t oldval = _bitArray[pos >> 6];
+            _bitArray[pos >> 6] |= (1ULL << (pos & 63));
 
             return  ( oldval >> (pos & 63 ) ) & 1;
         }
@@ -586,15 +581,13 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
         void set(uint64_t pos)
         {
             assert(pos<_size);
-            //_bitArray [pos >> 6] |=   (1ULL << (pos & 63) ) ;
-            INTR_FETCH_AND_OR((long long*)_bitArray + (pos >> 6ULL), (1ULL << (pos & 63)));
+            _bitArray [pos >> 6] |=   (1ULL << (pos & 63) ) ;
         }
 
         //set bit pos to 0
         void reset(uint64_t pos)
         {
-            //_bitArray [pos >> 6] &=   ~(1ULL << (pos & 63) ) ;
-            INTR_FETCH_AND_AND((long long*)_bitArray + (pos >> 6ULL), ~(1ULL << (pos & 63)));
+            _bitArray [pos >> 6] &=   ~(1ULL << (pos & 63) ) ;
         }
 
         //return value of  last rank
@@ -879,7 +872,9 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
         void pthread_processLevel( std::vector<elem_t>  & buffer , std::shared_ptr<Iterator> shared_it, std::shared_ptr<Iterator> until_p, int i)
         {
             uint64_t nb_done =0;
-            int tid = INTR_FETCH_AND_ADD((long long*)& _nb_living, 1);
+
+            int tid = _nb_living;
+            _nb_living += 1;
             auto until = *until_p;
             uint64_t inbuff =0;
 
@@ -934,8 +929,8 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
 
                         if(_fastmode && i == _fastModeLevel)
                         {
-
-                            uint64_t idxl2 = INTR_FETCH_AND_ADD((long long*)&_idxLevelsetLevelFastmode, 1);
+                            uint64_t idxl2 = _idxLevelsetLevelFastmode;
+                            _idxLevelsetLevelFastmode += 1;
                             //si depasse taille attendue pour setLevelFastmode, fall back sur slow mode mais devrait pas arriver si hash ok et proba avec nous
                             if(idxl2>= setLevelFastmode.size())
                                 _fastmode = false;
@@ -946,8 +941,8 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
                         //insert to level i+1 : either next level of the cascade or final hash if last level reached
                         if(i == _nb_levels-1) //stop cascade here, insert into exact hash
                         {
-
-                            uint64_t hashidx = INTR_FETCH_AND_ADD((long long*)&_hashidx, 1);
+                            uint64_t hashidx = _hashidx;
+                            _hashidx += 1;
 
 #ifdef BOOPHF_USE_PTHREADS
                             pthread_mutex_lock(&_mutex); //see later if possible to avoid this, mais pas bcp item vont la
@@ -1448,4 +1443,3 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
         return NULL;
     }
 }
-
