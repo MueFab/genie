@@ -16,27 +16,58 @@
 #include <string.h>
 #include <memory> // for make_shared
 
+#ifdef _WIN32
+# include <process.h>
+#else
+# include <unistd.h>
+#endif
+
 //
 // Turn of BooPHF internal threading.
 // Spring is already using loop-level parallelism at an outer level.
 //
 #define BOOPHF_USE_PTHREADS	0
 
-#ifdef _WIN32
-#include <intrin.h>
-#include <process.h>
-#define INTR_FETCH_AND_OR(x, y) _InterlockedOr64(x,y)
-#define INTR_FETCH_AND_AND(x, y) _InterlockedAnd64(x, y)
-#define INTR_FETCH_AND_ADD(x, y) _InterlockedExchangeAdd64(x, y)
-#define LOCK_FILE(x) (void)(x)  // TODO
-#define UNLOCK_FILE(x) (void)(x) //TODO
+#if !BOOPHF_USE_PTHREADS
+
+static inline long long INTR_FETCH_AND_OR(long long *x, long long y) {
+    long long retval = *x;
+    *x = retval | y;
+    return retval;
+}
+
+static inline long long INTR_FETCH_AND_AND(long long *x, long long y) {
+    long long retval = *x;
+    *x = retval & y;
+    return retval;
+}
+
+static inline long long INTR_FETCH_AND_ADD(long long *x, long long y) {
+    long long retval = *x;
+    *x = retval + y;
+    return retval;
+}
+
+# define LOCK_FILE(x) (void)(x)
+# define UNLOCK_FILE(x) (void)(x)
+
+#elif _WIN32
+
+# include <intrin.h>
+# define INTR_FETCH_AND_OR(x, y)  _InterlockedOr64(x,y)
+# define INTR_FETCH_AND_AND(x, y) _InterlockedAnd64(x, y)
+# define INTR_FETCH_AND_ADD(x, y) _InterlockedExchangeAdd64(x, y) // FIXME ??
+# define LOCK_FILE(x) #error
+# define UNLOCK_FILE(x) #error
+
 #else
-#include <unistd.h>
-#define INTR_FETCH_AND_OR(x, y) __sync_fetch_and_or(x, y)
-#define INTR_FETCH_AND_AND(x, y) __sync_fetch_and_and(x, y)
-#define INTR_FETCH_AND_ADD(x, y) __sync_fetch_and_add(x, y)
-#define LOCK_FILE(x) flockfile(x)
-#define UNLOCK_FILE(x) funlockfile(x)
+
+# define INTR_FETCH_AND_OR(x, y)  __sync_fetch_and_or(x, y)
+# define INTR_FETCH_AND_AND(x, y) __sync_fetch_and_and(x, y)
+# define INTR_FETCH_AND_ADD(x, y) __sync_fetch_and_add(x, y)
+# define LOCK_FILE(x) flockfile(x)
+# define UNLOCK_FILE(x) funlockfile(x)
+
 #endif
 
 
