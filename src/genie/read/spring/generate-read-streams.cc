@@ -256,7 +256,7 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
         data->pos_in_noise_arr[order] = current_pos_noise_arr;
         num_noise_in_curr_read = 0;
         f_noise.get(noise_char);
-        while (noise_char != '0') {
+        while (noise_char != '\n') {
             data->noise_arr[current_pos_noise_arr++] = noise_char;
             num_noise_in_curr_read++;
             f_noise.get(noise_char);
@@ -386,7 +386,7 @@ void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_d
         data->pos_in_noise_arr[order] = current_pos_noise_arr;
         num_noise_in_curr_read = 0;
         f_noise.get(noise_char);
-        while (noise_char != '0') {
+        while (noise_char != '\n') {
             data->noise_arr[current_pos_noise_arr++] = noise_char;
             num_noise_in_curr_read++;
             f_noise.get(noise_char);
