@@ -1286,7 +1286,7 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
 
                 if(i< _nb_levels-1 && i > 0 ) //create curr file
                 {
-                    _currlevelFile = fopen(fname_curr,"w");
+                    _currlevelFile = fopen(fname_curr,"wb");
                 }
             }
 
@@ -1485,4 +1485,3 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
         return NULL;
     }
 }
-
