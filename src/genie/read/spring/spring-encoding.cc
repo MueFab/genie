@@ -87,7 +87,7 @@ void writecontig(const std::string &ref, std::list<contig_reads> &current_contig
                 f_noisepos.write((char *)&pos_var, sizeof(uint16_t));
                 prevj = j;
             }
-        f_noise << "0"; // separator
+        f_noise << "\n";
         abs_current_pos = abs_pos + currentpos;
         f_pos.write((char *)&abs_current_pos, sizeof(uint64_t));
         f_order.write((char *)&((*current_contig_it).order), sizeof(uint32_t));
