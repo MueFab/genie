@@ -4,6 +4,8 @@ Open Source MPEG-G Codec
 
 **First off, we refer the reader to our [usage policy](USAGE_POLICY.md).**
 
+[**Genie on Azure DevOps**](https://dev.azure.com/janvoges/genie/)
+
 ---
 
 ## Quick start
