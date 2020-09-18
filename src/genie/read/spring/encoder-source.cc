@@ -72,7 +72,7 @@ bool SpringSource::pump(uint64_t& id, std::mutex& lock) {
                 ghc::filesystem::remove(filename);
                 continue;
             }
-            std::ifstream input(filename);
+            std::ifstream input(filename,std::ios::binary);
             util::BitReader br(input);
             d = core::AccessUnit::Descriptor(d.getID(), count, ghc::filesystem::file_size(filename), br);
             input.close();
