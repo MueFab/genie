@@ -34,6 +34,24 @@ class Importer : public core::FormatImporter {
     util::OrderedLock lock;  //!< @brief Lock to ensure in order execution
     uint64_t last_position{0};
 
+    std::vector<std::list<core::record::Record>> records_by_ref;
+
+    /**
+     * Check if there is any remaining mpeg-g record to be stored.
+     *
+     * @return true, if end of sam file is reached and Check if there is no remaining mpeg-g record to be stored
+     */
+    bool good();
+
+    /**
+     * Check if there is any remaining mpeg-g record to be stored
+     *
+     * @return
+     */
+    bool anyRemainingMpeggRecord();
+
+    bool anyGroupReachBlockSize();
+
     /**
      *
      * @brief Convert 2 SAM records to SameRec MPEG-G record
@@ -66,7 +84,7 @@ class Importer : public core::FormatImporter {
      * @param sam_recs_2d: List of List of sam records (alignments).
      * @param refs: Map, contains Reference ID associated to each Reference Name
      */
-    static void convertPairedEndNoSplit(core::record::Chunk& template_chunk, SamRecords2D& sam_recs_2d, std::map<std::string, size_t>& refs);
+    static void convertPairedEndNoSplit(std::list<core::record::Record> &records, SamRecords2D& sam_recs_2d, std::map<std::string, size_t>& refs);
 
     /**
      *
@@ -101,7 +119,7 @@ class Importer : public core::FormatImporter {
      * @param sam_recs_2d
      * @param refs
      */
-    static void convertPairedEndSplitPair(core::record::Chunk& template_chunk, SamRecords2D& sam_recs_2d, std::map<std::string, size_t>& refs);
+    static void convertPairedEndSplitPair(std::list<core::record::Record> &records, SamRecords2D& sam_recs_2d, std::map<std::string, size_t>& refs);
 
    public:
     /**
@@ -158,49 +176,46 @@ class Importer : public core::FormatImporter {
      */
     void flushIn(uint64_t& pos) override;
 
-    /**
-     *
-     * @brief Convert Unmapped Reads SAM records to MPEG-G records
-     *
-     * @param chunk: List of MPEG-G records
-     * @param sam_recs: SAM record
-     * @param refs: Map containing Reference ID associated to each Reference Name
-     */
-    static void convertUnmapped(core::record::Chunk& chunk, SamRecords& sam_recs, std::map<std::string, size_t>& refs);
+     /**
+      *
+      * @param records: List of MPEG-G records
+      * @param sam_recs: SAM record
+      * @param refs: Map containing Reference ID associated to each Reference Name
+      */
+    static void convertUnmapped(std::list<core::record::Record> &records, SamRecords& sam_recs, std::map<std::string, size_t>& refs);
 
-    /**
-     *
-     * @brief Convert Single-end Reads SAM records to MPEG-G records
-     *
-     * @param chunk: List of MPEG-G records
-     * @param sam_recs: SAM record
-     * @param refs: Map, contains Reference ID associated to each Reference Name
-     * @param unmapped_pair:  SAM record has
-     * @param is_read_1_first
-     */
-    static void convertSingleEnd(core::record::Chunk& chunk, SamRecords& sam_recs, std::map<std::string, size_t>& refs,
-                          bool unmapped_pair=false, bool is_read_1_first=true);
+     /**
+      * @brief Convert Single-end Reads SAM records to MPEG-G records
+      *
+      * @param records: List of MPEG-G records
+      * @param sam_recs: SAM record
+      * @param refs: Map, contains Reference ID associated to each Reference Name
+      * @param unmapped_pair:  SAM record has pair which is unmapped
+      * @param is_read_1_first
+      */
+    static void convertSingleEnd(std::list<core::record::Record> &records, SamRecords& sam_recs, std::map<std::string, size_t>& refs,
+                                 bool unmapped_pair=false, bool is_read_1_first=true);
 
     /**
      * @brief Convert Paired-end Reads SAM records to MPEG-G records
      *
-     * @param chunk: List of MPEG-G records
+     * @param records: List of MPEG-G records
      * @param sam_recs_2d: List of List of sam records (alignments).
      * @param refs: Map, contains Reference ID associated to each Reference Name
      * @param force_split: Force creation of MPEG-G record for each read.
      */
-    static void convertPairedEnd(core::record::Chunk& chunk, SamRecords2D& sam_recs_2d, std::map<std::string,
-                                 size_t>& refs, bool force_split=false);
+    static void convertPairedEnd(std::list<core::record::Record> &records, SamRecords2D& sam_recs_2d, std::map<std::string,
+        size_t>& refs, bool force_split=false);
 
     /**
      * @brief Convert SAM records contained in ReadTemplate data structure to MPEG-G records
      *
-     * @param chunk: List of MPEG-G records
+     * @param records: List of MPEG-G records
      * @param rt: ReadTemplate object, contains SAM reads belongs to one template
      * @param refs: Map, contains Reference ID associated to each Reference Name
      * @param force_split: Force creation of MPEG-G record for each read.
      */
-    static void convert(core::record::Chunk& chunk, ReadTemplate& rt, std::map<std::string, size_t>& refs,
+    static void convert(std::list<core::record::Record> &records, ReadTemplate& rt, std::map<std::string, size_t>& refs,
                         bool force_split=false);
 
     /**

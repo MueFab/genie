@@ -26,7 +26,12 @@ namespace sam {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Importer::Importer(size_t _blockSize, std::istream &_file) : blockSize(_blockSize), samReader(_file), lock() {}
+Importer::Importer(size_t _blockSize, std::istream &_file) : blockSize(_blockSize), samReader(_file), lock() {
+
+    // Allocate number of references groups
+    // 1 for "unmapped"
+    records_by_ref.resize(samReader.getRefs().size() + 1);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -121,6 +126,38 @@ std::string Importer::convertCigar2ECigar(const std::string &cigar, const std::s
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool Importer::good() {
+    if (!samReader.good()){
+        return anyRemainingMpeggRecord();
+    } else{
+        return true;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Importer::anyRemainingMpeggRecord() {
+    for (auto &iter: records_by_ref){
+        if (!iter.empty()){
+            return true;
+        }
+    }
+    return false;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Importer::anyGroupReachBlockSize() {
+    for (auto &iter: records_by_ref){
+        if (iter.size() > blockSize){
+            return true;
+        }
+    }
+    return false;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 /*bool Importer::pump(uint64_t& id, std::mutex& lock) {
     std::string line;
     std::list<std::string> lines;
@@ -154,20 +191,41 @@ bool Importer::pumpRetrieve(core::Classifier *_classifier) {
     std::list<std::string> lines;
     std::list<ReadTemplate> read_templates;
     core::record::Chunk chunk;
-    while (samReader.good() && blockSize > lines.size()) {
-        samReader.read(lines);
+    std::list<core::record::Record> recs;
+
+    // Do until the number of MPEG-G records for certain reference is above blockSize
+    // or end of file is reached
+    while (samReader.good() && anyGroupReachBlockSize()){
+        while (samReader.good() && blockSize > lines.size()) {
+            samReader.read(lines);
+        }
+
+        rtg.addRecords(lines);
+        lines.clear();
+        rtg.getTemplates(read_templates);
+
+        for (auto &read_template : read_templates) {
+            convert(recs, read_template, samReader.getRefs());
+            for (auto& rec: recs){
+
+                //TODO: Create if case for unmapped MPEG-G records
+
+                // Store in its respective list
+                records_by_ref[rec.getAlignmentSharedData().getSeqID()].push_back(std::move(rec));
+            }
+        }
+        read_templates.clear();
     }
 
-    rtg.addRecords(lines);
-    lines.clear();
-    rtg.getTemplates(read_templates);
-
-    for (auto &read_template : read_templates) {
-        convert(chunk, read_template, samReader.getRefs());
+    for (auto& iter: records_by_ref){
+        if (iter.size() > blockSize || !samReader.good()){
+            std::move(iter.begin(), iter.end(), std::back_inserter(chunk.getData()));
+            break;
+        }
     }
 
     auto &records = chunk.getData();
-//    std::sort(records.begin(), records.end(), compare);
+    std::sort(records.begin(), records.end(), compare);
 
     for (const auto &record : records) {
         if (record.getAlignments().empty()) {
@@ -242,7 +300,7 @@ void Importer::addAlignmentToSameRec(std::unique_ptr<core::record::Record> &rec,
     rec->addAlignment(refs.at(sam_r1.getRname()), std::move(alignmentContainer));
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertPairedEndNoSplit(core::record::Chunk &template_chunk, SamRecords2D &sam_recs_2d,
+void Importer::convertPairedEndNoSplit(std::list<core::record::Record> &records, SamRecords2D &sam_recs_2d,
                                        std::map<std::string, size_t> &refs) {
     /// Swap template so that the primary alignment of the first segment always has lower mapping position
     /// compared to primary alignment of the second segment
@@ -288,7 +346,7 @@ void Importer::convertPairedEndNoSplit(core::record::Chunk &template_chunk, SamR
                 leftmost_read_pos, refs.at(leftmost_read->getRname()));
             rec->setMoreAlignmentInfo(std::move(more_alignment_info));
 
-            template_chunk.getData().push_back(std::move(*rec));
+            records.push_back(std::move(*rec));
 
             // Copy SEQ from the primary line due to SEQ and QUAL are set to "*"
             // See "Recommended Practice for SAM Format" in SAM Format documentation for more information
@@ -308,7 +366,7 @@ void Importer::convertPairedEndNoSplit(core::record::Chunk &template_chunk, SamR
     }
 
     UTILS_DIE_IF(rec == nullptr, "Empty MPEG-G record");
-    template_chunk.getData().push_back(std::move(*rec));
+    records.push_back(std::move(*rec));
 
     sam_recs_2d.front().clear();
     sam_recs_2d.back().clear();
@@ -359,8 +417,9 @@ void Importer::addAlignmentToSplitRec(std::unique_ptr<core::record::Record> &rec
     }
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertPairedEndSplitPair(core::record::Chunk &template_chunk, SamRecords2D &sam_recs_2d,
+void Importer::convertPairedEndSplitPair(std::list<core::record::Record> &records, SamRecords2D &sam_recs_2d,
                                          std::map<std::string, size_t> &refs) {
+
     auto sam_r1_iter = sam_recs_2d.front().begin();
     auto sam_r2_iter = sam_recs_2d.back().begin();
 
@@ -375,6 +434,7 @@ void Importer::convertPairedEndSplitPair(core::record::Chunk &template_chunk, Sa
     auto sam_r2_seq = sam_r2_iter != sam_r2_end ? sam_r2_iter->getSeq() : "*";
 
     while (sam_r1_iter != sam_r1_end || sam_r2_iter != sam_r2_end) {
+
         // Handle Read 1
         if (sam_r1_iter != sam_r1_end) {
             auto *sam_r2_ptr = sam_r2_iter != sam_r2_end ? &(*sam_r2_iter) : nullptr;
@@ -390,7 +450,8 @@ void Importer::convertPairedEndSplitPair(core::record::Chunk &template_chunk, Sa
                         leftmost_read_pos, refs.at(leftmost_read->getRname()));
                     rec_1->setMoreAlignmentInfo(std::move(more_alignment_info));
 
-                    template_chunk.getData().push_back(std::move(*rec_1));
+                    //template_chunk.getData().push_back(std::move(*rec_1));
+                    records.push_back(std::move(*rec_1));
 
                     // Retrieve back Sequence from the primary line due to SEQ and QUAL are set to "*"
                     // See "Recommended Practice for SAM Format" in SAM Format documentation for more information
@@ -422,7 +483,8 @@ void Importer::convertPairedEndSplitPair(core::record::Chunk &template_chunk, Sa
                         leftmost_read_pos, refs.at(leftmost_read->getRname()));
                     rec_2->setMoreAlignmentInfo(std::move(more_alignment_info));
 
-                    template_chunk.getData().push_back(std::move(*rec_2));
+                    //template_chunk.getData().push_back(std::move(*rec_2));
+                    records.push_back(std::move(*rec_2));
 
                     // Retrieve back Sequence from the primary line due to SEQ and QUAL are set to "*"
                     // See "Recommended Practice for SAM Format" in SAM Format documentation for more information
@@ -443,18 +505,22 @@ void Importer::convertPairedEndSplitPair(core::record::Chunk &template_chunk, Sa
     }
 
     if (rec_1 != nullptr) {
-        template_chunk.getData().push_back(std::move(*rec_1));
+        //template_chunk.getData().push_back(std::move(*rec_1));
+        records.push_back(std::move(*rec_1));
     }
 
     if (rec_2 != nullptr) {
-        template_chunk.getData().push_back(std::move(*rec_2));
+        //template_chunk.getData().push_back(std::move(*rec_2));
+        records.push_back(std::move(*rec_2));
     }
 
     sam_recs_2d.front().clear();
     sam_recs_2d.back().clear();
 }
+
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertUnmapped(core::record::Chunk &chunk, SamRecords &sam_recs, std::map<std::string, size_t> &refs) {
+
+void Importer::convertUnmapped(std::list<core::record::Record> &records, SamRecords &sam_recs, std::map<std::string, size_t> &refs) {
     auto &sam_rec = sam_recs.front();
 
     auto flag_tuple = convertFlags2Mpeg(sam_rec.getFlags());
@@ -479,13 +545,14 @@ void Importer::convertUnmapped(core::record::Chunk &chunk, SamRecords &sam_recs,
 
     // No alignment
     //    ret.addAlignment(ref, std::move(alignmentContainer));
-
-    chunk.getData().push_back(std::move(rec));
+    records.push_back(std::move(rec));
 
     sam_recs.clear();
 }
+
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords &sam_recs, std::map<std::string, size_t> &refs,
+
+void Importer::convertSingleEnd(std::list<core::record::Record> &records, SamRecords &sam_recs, std::map<std::string, size_t> &refs,
                                 bool unmapped_pair, bool is_read_1_first) {
     auto sam_rec = std::move(sam_recs.front());
     sam_recs.pop_front();
@@ -532,11 +599,12 @@ void Importer::convertSingleEnd(core::record::Chunk &chunk, SamRecords &sam_recs
         rec.addAlignment(refs.at(sam_rec_it->getRname()), std::move(alignmentContainer));
     }
 
-    chunk.getData().push_back(std::move(rec));
+    records.push_back(std::move(rec));
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_recs_2d,
+void Importer::convertPairedEnd(std::list<core::record::Record> &records, SamRecords2D &sam_recs_2d,
                                 std::map<std::string, size_t> &refs, bool force_split) {
+
     auto &read_1 = sam_recs_2d.front();
     auto read_1_empty = read_1.empty();
     auto read_1_unmapped = false;
@@ -586,42 +654,42 @@ void Importer::convertPairedEnd(core::record::Chunk &chunk, SamRecords2D &sam_re
 //                std::swap(sam_recs_2d.front().front(), sam_recs_2d.front().back());
 //            }
 
-            convertPairedEndSplitPair(chunk, sam_recs_2d, refs);
+            convertPairedEndSplitPair(records, sam_recs_2d, refs);
         } else {
 //            // Swap template so that the first segment has lower mapping position
 //            if (sam_recs_2d.front().front().getPos() > sam_recs_2d.front().back().getPos()){
 //                std::swap(sam_recs_2d.front().front(), sam_recs_2d.front().back());
 //            }
 
-            convertPairedEndNoSplit(chunk, sam_recs_2d, refs);
+            convertPairedEndNoSplit(records, sam_recs_2d, refs);
         }
 
         // Handle alignments where one of the reads is not complete (unpaired etc)
     } else {
         if (!read_1_empty) {
             if (read_1_unmapped) {
-                convertUnmapped(chunk, read_1, refs);
+                convertUnmapped(records, read_1, refs);
             } else if (!read_1_primary) {
                 UTILS_DIE("Cannot find the primary line of read_1!");
             } else if (read_1_ok) {
-                convertSingleEnd(chunk, read_1, refs, true, true);
+                convertSingleEnd(records, read_1, refs, true, true);
             }
         }
 
         if (!read_2_empty) {
             if (read_2_unmapped) {
-                convertUnmapped(chunk, read_2, refs);
+                convertUnmapped(records, read_2, refs);
             } else if (!read_2_primary) {
                 UTILS_DIE("Cannot find the primary line of read_2!");
             } else if (read_2_ok) {
-                convertSingleEnd(chunk, read_2, refs, true, false);
+                convertSingleEnd(records, read_2, refs, true, false);
             }
         }
     }
     sam_recs_2d.clear();
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt, std::map<std::string, size_t> &refs,
+void Importer::convert(std::list<core::record::Record> &records, ReadTemplate &rt, std::map<std::string, size_t> &refs,
                        bool force_split) {
 
     UTILS_DIE_IF(!rt.isValid(), "Invalid Read Template. Neither unmapped, single-end nor paired-end");
@@ -635,11 +703,11 @@ void Importer::convert(core::record::Chunk &chunk, ReadTemplate &rt, std::map<st
 
     // Convert SAM records to MPEG-G record(s)
     if (is_unmapped) {
-        convertUnmapped(chunk, sam_recs_2d.front(), refs);
+        convertUnmapped(records, sam_recs_2d.front(), refs);
     } else if (is_single) {
-        convertSingleEnd(chunk, sam_recs_2d.front(), refs);
+        convertSingleEnd(records, sam_recs_2d.front(), refs);
     } else if (is_pair) {
-        convertPairedEnd(chunk, sam_recs_2d, refs, force_split);
+        convertPairedEnd(records, sam_recs_2d, refs, force_split);
     } else {
         UTILS_DIE("Unhandled read type found. Should never be reached!");
     }
