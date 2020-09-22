@@ -9,9 +9,6 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//#include <genie/util/data-block.h>
-//#include "gabac.h"
-//#include "reader.h"
 #include "decode-transformed-subseq.h"
 #include "context-selector.h"
 #include "luts-subsymbol-transform.h"
@@ -40,6 +37,12 @@ class TransformedSymbolsDecoder {
      *
      * @param
      */
+    explicit TransformedSymbolsDecoder(const TransformedSymbolsDecoder &trnsfSubseqDecoder);
+
+    /**
+     *
+     * @param
+     */
     ~TransformedSymbolsDecoder();
 
     /**
@@ -54,6 +57,10 @@ class TransformedSymbolsDecoder {
      * @return the number of symbols available.
      */
     size_t symbolsAvail() const;
+
+    TransformedSymbolsDecoder &operator=(const TransformedSymbolsDecoder &trnsfSubseqDecoder);
+
+    TransformedSymbolsDecoder &operator=(TransformedSymbolsDecoder &&trnsfSubseqDecoder) noexcept;
 
    private:
     /**
@@ -77,10 +84,17 @@ class TransformedSymbolsDecoder {
      */
     uint64_t decodeNextSymbolOrder2();
 
-    const unsigned int numEncodedSymbols;
+    /**
+     * @brief
+     * @param
+     * @return
+     */
+    void deepCopy(const TransformedSymbolsDecoder &trnsfSubseqDecoder);
+
+
+    unsigned int numEncodedSymbols;
     unsigned int numDecodedSymbols;
-    const paramcabac::BinarizationParameters::BinarizationId binID;
-    const paramcabac::StateVars &stateVars;
+    paramcabac::BinarizationParameters::BinarizationId binID;
 
     Reader *reader;
     ContextSelector *ctxSelector;
@@ -96,9 +110,9 @@ class TransformedSymbolsDecoder {
     uint8_t codingSubsymSize;
     uint8_t codingOrder;
     uint64_t subsymMask;
+    uint8_t numSubSyms;
     uint8_t numLuts;
     uint8_t numPrvs;
-
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
