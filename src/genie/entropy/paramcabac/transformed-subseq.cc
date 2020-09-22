@@ -18,7 +18,7 @@ namespace paramcabac {
 // ---------------------------------------------------------------------------------------------------------------------
 
 TransformedSubSeq::TransformedSubSeq()
-    : TransformedSubSeq(SupportValues::TransformIdSubsym::NO_TRANSFORM, SupportValues(), Binarization()) {}
+    : TransformedSubSeq(SupportValues::TransformIdSubsym::NO_TRANSFORM, SupportValues(), Binarization(), core::GenSub::POS_MAPPING_FIRST) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
