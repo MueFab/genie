@@ -32,11 +32,7 @@ class Reader {
     std::map<std::string, size_t> refs;
     bool with_index;
 
-    std::map<std::string, std::pair<std::vector<size_t>, size_t>> index;
-
-    // QNAME sorted by its mapping position
-    std::vector<std::string> qname_list;
-    std::vector<std::size_t> ids;
+    std::map<std::string, std::vector<size_t>> index;
 
    public:
     /**
@@ -54,29 +50,32 @@ class Reader {
     const header::Header& getHeader() const;
 
     /**
+     * Return references found in sam file
      *
-     * @return
+     * @return map contains RNAME and ref_id pair
      */
     std::map<std::string, size_t>& getRefs();
 
     /**
-     * @brief Add entry to cache
+     * Add qname and file position pair to cache for indexing purpose
      *
      * @param qname: QNAME of sam record
      * @param pos: Position of sam record in the sam file
      */
-    void addCacheEntry(size_t pos, std::string &qname,  size_t mapping_pos, bool update_mapping_pos);
+    void addCacheEntry(std::string& qname, size_t &pos);
 
     /**
+     * Read sam records
      *
      * @param lines
-     * @return
+     * @return true, if there is any remaining sam records to be read
      */
     bool read(std::list<std::string>& lines);
 
     /**
+     * Return the current status of Reader
      *
-     * @return
+     * @return true, if istream is good
      */
     bool good();
 };

@@ -50,6 +50,13 @@ class Importer : public core::FormatImporter {
      */
     bool anyRemainingMpeggRecord();
 
+    bool isEnoughRecs(std::list<core::record::Record>& recs);
+
+    /**
+     * Check if the number of mpeg-g records of any group (MPEG-G records grouped by ref) reach blockSize
+     *
+     * @return true, if the number of mpeg-g records of one group exceeds blockSize
+     */
     bool anyGroupReachBlockSize();
 
     /**
@@ -112,8 +119,7 @@ class Importer : public core::FormatImporter {
 
 
     /**
-     *
-     * @brief Convert SAM Records that belongs to the same template to SplitRec MPEG-G records
+     * Convert SAM Records that belongs to the same template to SplitRec MPEG-G records
      *
      * @param template_chunk:
      * @param sam_recs_2d
@@ -130,8 +136,7 @@ class Importer : public core::FormatImporter {
     Importer(size_t _blockSize, std::istream &_file);
 
     /**
-     *
-     * @brief Convert SAM flags to MPEG-G record flags
+     * Convert SAM flags to MPEG-G record flags
      *
      * @param flags: SAM flags
      * @return
@@ -153,8 +158,7 @@ class Importer : public core::FormatImporter {
     static int stepSequence(char token);
 
     /**
-     *
-     * @brief Convert CIGAR string to ECIGAR string
+     * Convert CIGAR string to ECIGAR string
      *
      * @param cigar
      * @param seq
@@ -185,7 +189,7 @@ class Importer : public core::FormatImporter {
     static void convertUnmapped(std::list<core::record::Record> &records, SamRecords& sam_recs, std::map<std::string, size_t>& refs);
 
      /**
-      * @brief Convert Single-end Reads SAM records to MPEG-G records
+      * Convert Single-end Reads SAM records to MPEG-G records
       *
       * @param records: List of MPEG-G records
       * @param sam_recs: SAM record
@@ -197,7 +201,7 @@ class Importer : public core::FormatImporter {
                                  bool unmapped_pair=false, bool is_read_1_first=true);
 
     /**
-     * @brief Convert Paired-end Reads SAM records to MPEG-G records
+     * Convert Paired-end Reads SAM records to MPEG-G records
      *
      * @param records: List of MPEG-G records
      * @param sam_recs_2d: List of List of sam records (alignments).
@@ -208,7 +212,7 @@ class Importer : public core::FormatImporter {
         size_t>& refs, bool force_split=false);
 
     /**
-     * @brief Convert SAM records contained in ReadTemplate data structure to MPEG-G records
+     * Convert SAM records contained in ReadTemplate data structure to MPEG-G records
      *
      * @param records: List of MPEG-G records
      * @param rt: ReadTemplate object, contains SAM reads belongs to one template
@@ -219,7 +223,7 @@ class Importer : public core::FormatImporter {
                         bool force_split=false);
 
     /**
-     * @brief Compare mapping position of primary alignment of r1 and r2
+     * Compare mapping position of primary alignment of r1 and r2
      *
      * @param r1
      * @param r2

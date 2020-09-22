@@ -137,23 +137,32 @@ bool Importer::good() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Importer::anyRemainingMpeggRecord() {
-    for (auto &iter: records_by_ref){
-        if (!iter.empty()){
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(records_by_ref.begin(), records_by_ref.end(),
+                       [](std::list<core::record::Record>& recs){return !recs.empty();});
+//    for (auto &iter: records_by_ref){
+//        if (!iter.empty()){
+//            return true;
+//        }
+//    }
+//    return false;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Importer::isEnoughRecs(std::list<core::record::Record> &recs) {
+    return recs.size() >= blockSize;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Importer::anyGroupReachBlockSize() {
-    for (auto &iter: records_by_ref){
-        if (iter.size() > blockSize){
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(records_by_ref.begin(), records_by_ref.end(), &Importer::isEnoughRecs);
+//    for (auto &iter: records_by_ref){
+//        if (iter.size() > blockSize){
+//            return true;
+//        }
+//    }
+//    return false;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -208,18 +217,30 @@ bool Importer::pumpRetrieve(core::Classifier *_classifier) {
             convert(recs, read_template, samReader.getRefs());
             for (auto& rec: recs){
 
-                //TODO: Create if case for unmapped MPEG-G records
-
-                // Store in its respective list
-                records_by_ref[rec.getAlignmentSharedData().getSeqID()].push_back(std::move(rec));
+                // If unmapped, store in the last list
+                if (rec.getAlignments().empty()){
+                    records_by_ref[records_by_ref.size()-1].push_back(std::move(rec));
+                } else {
+                    // Store in its respective list
+                    records_by_ref[rec.getAlignmentSharedData().getSeqID()].push_back(std::move(rec));
+                }
             }
+
+            // Empty the recs for the next iteration
+            recs.clear();
         }
         read_templates.clear();
     }
 
-    for (auto& iter: records_by_ref){
-        if (iter.size() > blockSize || !samReader.good()){
-            std::move(iter.begin(), iter.end(), std::back_inserter(chunk.getData()));
+    for (auto& rec_group: records_by_ref){
+
+        if ((rec_group.size() > blockSize || !samReader.good()) && !rec_group.empty()){
+
+            // Move records to chunk
+            std::move(rec_group.begin(), rec_group.end(), std::back_inserter(chunk.getData()));
+
+            // Clear the list, otherwise size stays the same
+            rec_group.clear();
             break;
         }
     }
@@ -241,7 +262,9 @@ bool Importer::pumpRetrieve(core::Classifier *_classifier) {
     if (!chunk.getData().empty()) {
         _classifier->add(std::move(chunk));
     }
-    return samReader.good();
+
+    // Do not use samReader.good() as there is any remaining mpeg-g records to be stored
+    return good();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
