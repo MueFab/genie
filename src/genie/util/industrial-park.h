@@ -55,7 +55,7 @@ class IndustrialPark {
      * @param constructor
      */
     template <typename T>
-    void registerConstructor(uint8_t id, const std::function<std::unique_ptr<T>(util::BitReader&)>& constructor);
+    void registerConstructor(uint8_t id, const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor);
 
     /**
      *
@@ -64,7 +64,7 @@ class IndustrialPark {
      * @return
      */
     template <typename T>
-    uint8_t registerConstructor(const std::function<std::unique_ptr<T>(util::BitReader&)>& constructor);
+    uint8_t registerConstructor(const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor);
 
     /**
      *
@@ -82,7 +82,7 @@ class IndustrialPark {
      * @return
      */
     template <typename T>
-    std::unique_ptr<T> construct(uint8_t id, util::BitReader& reader) const;
+    std::unique_ptr<T> construct(uint8_t id, genie::core::GenDesc desc, util::BitReader& reader) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

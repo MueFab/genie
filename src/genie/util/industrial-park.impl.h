@@ -8,9 +8,12 @@
 #define GENIE_INDUSTRIAL_PARK_IMPL_H
 
 // ---------------------------------------------------------------------------------------------------------------------
+#include <genie/core/constants.h>
 
 namespace genie {
 namespace util {
+
+using namespace genie::core;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -39,14 +42,14 @@ Factory<T>* IndustrialPark::findAndFail() const {
 
 template <typename T>
 void IndustrialPark::registerConstructor(uint8_t id,
-                                         const std::function<std::unique_ptr<T>(util::BitReader&)>& constructor) {
+                                         const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor) {
     findAndCreate<T>()->registerType(id, constructor);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-uint8_t IndustrialPark::registerConstructor(const std::function<std::unique_ptr<T>(util::BitReader&)>& constructor) {
+uint8_t IndustrialPark::registerConstructor(const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor) {
     return findAndCreate<T>()->registerType(constructor);
 }
 
@@ -60,8 +63,8 @@ void IndustrialPark::unregisterConstructor(uint8_t id) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-std::unique_ptr<T> IndustrialPark::construct(uint8_t id, util::BitReader& reader) const {
-    return findAndFail<T>()->create(id, reader);
+std::unique_ptr<T> IndustrialPark::construct(uint8_t id, genie::core::GenDesc desc, util::BitReader& reader) const {
+    return findAndFail<T>()->create(id, desc, reader);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
