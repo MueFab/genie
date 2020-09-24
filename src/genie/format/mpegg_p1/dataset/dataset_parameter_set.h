@@ -4,14 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DATASET_GROUP_HEADER_H
-#define GENIE_DATASET_GROUP_HEADER_H
+#ifndef GENIE_PART1_DATASET_PARAMETER_SET_H
+#define GENIE_PART1_DATASET_PARAMETER_SET_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <vector>
-#include "dataset.h"
+#include <genie/core/parameter/parameter_set.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,50 +20,64 @@ namespace mpegg_p1 {
 /**
  *
  */
-class DatasetGroupHeader {
+class DatasetParameterSet {
+
+   private:
+    uint8_t dataset_group_ID : 8;  //!<
+    uint16_t dataset_ID : 16;      //!<
+
+    // parameter_set_ID and parent_parameter_set_ID also encoded_parameters()
+    core::parameter::ParameterSet parameterSet_p2;  //!<
+
    public:
     /**
      *
-     * @param datasetId
-     * @param x_datasetGroupID
      */
-    explicit DatasetGroupHeader(const std::vector<genie::format::mpegg_p1::Dataset>* datasetId,
-                                const uint8_t x_datasetGroupID);
+    explicit DatasetParameterSet(const core::parameter::ParameterSet&&);
+
+    /**
+     *
+     * @param ID
+     */
+    explicit DatasetParameterSet(uint16_t ID, const core::parameter::ParameterSet&&);
+
+    /**
+     *
+     * @param group_ID
+     * @param ID
+     */
+    explicit DatasetParameterSet(uint8_t group_ID, uint16_t ID,
+                                 const core::parameter::ParameterSet&& parameterSet);
 
     /**
      *
      * @return
      */
-    uint8_t getDatasetGroupId() const;
+    uint16_t getDatasetID() const;
 
     /**
      *
      * @return
      */
-    uint8_t getVersionNumber() const;
+    uint8_t getDatasetGroupID() const;
+
+    /**
+     *
+     * @param datasetGroupId
+     */
+    void setDatasetGroupId(uint8_t datasetGroupId);
 
     /**
      *
      * @return
      */
-    uint64_t getNumDatasets() const;
+    uint64_t getLength() const;
 
     /**
      *
-     * @return
+     * @param bit_writer
      */
-    const std::vector<uint16_t>& getDatasetId() const;
-
-    /**
-     *
-     * @param bitWriter
-     */
-    void writeToFile(genie::util::BitWriter& bitWriter) const;
-
-   private:
-    uint8_t dataset_group_ID : 8;      //!<
-    uint8_t version_number : 8;        //!<
-    std::vector<uint16_t> dataset_ID;  //!<
+    void write(genie::util::BitWriter& bit_writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -76,7 +88,7 @@ class DatasetGroupHeader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DATASET_GROUP_HEADER_H
+#endif  // GENIE_PART1_DATASET_PARAMETER_SET_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
