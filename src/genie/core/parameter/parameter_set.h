@@ -219,6 +219,9 @@ class ParameterSet : public DataUnit {
      */
     void setParentID(uint8_t id);
 
+
+    uint8_t getParentID() const;
+
     /**
      *
      * @param qv
@@ -232,6 +235,15 @@ class ParameterSet : public DataUnit {
      */
     bool operator==(const ParameterSet &ps) const;
 
+    uint64_t getLength() const;
+
+    /**
+     *
+     * @param writer
+     */
+    void preWrite(util::BitWriter &writer) const;
+
+
    private:
     /**
      *
@@ -240,11 +252,6 @@ class ParameterSet : public DataUnit {
      */
     bool qual_cmp(const ParameterSet &ps) const;
 
-    /**
-     *
-     * @param writer
-     */
-    void preWrite(util::BitWriter &writer) const;
 
     uint8_t parameter_set_ID;         //!<
     uint8_t parent_parameter_set_ID;  //!<
