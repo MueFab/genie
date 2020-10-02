@@ -2,7 +2,9 @@
 // intended to be a minimal perfect hash function with fast and low memory construction, at the cost of (slightly) higher bits/elem than other state of the art libraries once built.
 // should work with arbitray large number of elements, based on a cascade of  "collision-free" bit arrays
 
-#pragma once
+#ifndef BOOPHF_H
+#define BOOPHF_H
+
 #include <stdio.h>
 #include <climits>
 #include <stdlib.h>
@@ -1485,3 +1487,6 @@ we need this 2-functors scheme because HashFunctors won't work with unordered_ma
         return NULL;
     }
 }
+
+#endif // BOOPHF_H
+
