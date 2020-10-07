@@ -34,6 +34,12 @@ class ContextSelector {
 
     /**
      *
+     * @param src
+     */
+    ContextSelector(const ContextSelector &src);
+
+    /**
+     *
      */
     ~ContextSelector() = default;
 
