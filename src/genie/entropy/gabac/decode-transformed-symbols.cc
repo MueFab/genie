@@ -40,8 +40,8 @@ TransformedSymbolsDecoder::TransformedSymbolsDecoder(util::DataBlock *bitstream,
       binarizor(getBinarizorReader(outputSymbolSize, trnsfSubseqConf.getBinarization().getBypassFlag(), binID,
                                    trnsfSubseqConf.getBinarization().getCabacBinarizationParameters(),
                                    trnsfSubseqConf.getStateVars(), binParams)) {
-    if (bitstream == nullptr || bitstream->size() <= 0) return;  // TODO throw exception
-    if (numEncodedSymbols <= 0) return;                          // TODO throw exception
+    if (bitstream == nullptr || bitstream->size() <= 0) return;  // Simple return as bitstream can be empty
+    if (numEncodedSymbols <= 0) return;                          // Simple return as numEncodedSymbols can be zero
 
     reader.start();
 
@@ -78,6 +78,9 @@ TransformedSymbolsDecoder::TransformedSymbolsDecoder(const TransformedSymbolsDec
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t TransformedSymbolsDecoder::decodeNextSymbol(uint64_t *depSymbol) {
+
+    if (symbolsAvail() <= 0) UTILS_DIE("No more transformed symbols available.");
+
     switch (codingOrder) {
         case 0:
             return decodeNextSymbolOrder0();

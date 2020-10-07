@@ -26,10 +26,9 @@ MismatchDecoder::MismatchDecoder(util::DataBlock &&d, const EncodingConfiguratio
     util::DataBlock data = std::move(d);
     gabac::IBufferStream inputStream(&data, 0);
     const uint64_t subseqPayloadSize = gabac::StreamHandler::readStreamSize(inputStream);
-    if (subseqPayloadSize <= 0) return; // TODO should throw exception?
+    if (subseqPayloadSize <= 0) return; // Simple return as subseqPayloadSize can be zero.
 
-
-    // read number of symbols in descriptor subsequence
+    // Read number of symbols in descriptor subsequence
     if (subseqCfg.getTokentypeFlag()) {
         subseqPayloadSizeUsed += gabac::StreamHandler::readU7(inputStream, numSubseqSymbolsTotal);
     } else {
@@ -40,7 +39,7 @@ MismatchDecoder::MismatchDecoder(util::DataBlock &&d, const EncodingConfiguratio
         if (inputStream.peek() != EOF) {
             // Set up for the inverse sequence transformation
             numTrnsfSubseqs = subseqCfg.getNumTransformSubseqCfgs();
-            if (numTrnsfSubseqs > 1) return; // TODO allow symbols decoding with only 1 transformed subseqs for now.
+            if (numTrnsfSubseqs > 1) return; // Note: Mismatch decoder is only allowed with 1 transformed subseq.
 
             // Loop through the transformed sequences
             std::vector<util::DataBlock> transformedSubseqs(numTrnsfSubseqs);
@@ -72,7 +71,7 @@ MismatchDecoder::MismatchDecoder(util::DataBlock &&d, const EncodingConfiguratio
                                                                                  &currTrnsfSubseqData);
                     }
 
-                    trnsfSubseqDecoder.emplace_back(&currTrnsfSubseqData,
+                    trnsfSymbolsDecoder.emplace_back(&currTrnsfSubseqData,
                                                     subseqCfg.getTransformSubseqCfg(i),
                                                     currNumtrnsfSymbols);
                 }
@@ -85,12 +84,14 @@ MismatchDecoder::MismatchDecoder(util::DataBlock &&d, const EncodingConfiguratio
 
 uint64_t MismatchDecoder::decodeMismatch(uint64_t ref) {
     std::vector<uint64_t> decodedTrnsfSymbols(numTrnsfSubseqs, 0);
+
     for (size_t i = 0; i < numTrnsfSubseqs; i++) {
-        decodedTrnsfSymbols[i] = trnsfSubseqDecoder[i].decodeNextSymbol(&ref);
+        decodedTrnsfSymbols[i] = (trnsfSymbolsDecoder[i].symbolsAvail() > 0) ? trnsfSymbolsDecoder[i].decodeNextSymbol(&ref) : 0;
     }
 
     numSubseqSymbolsDecoded++;
-    return decodedTrnsfSymbols[0]; // TODO implement inverse subseq transformations. For now only support 1 transform subseq
+    // Note: Mismatch decoder is only allowed with 1 transform subseq.
+    return decodedTrnsfSymbols[0];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
