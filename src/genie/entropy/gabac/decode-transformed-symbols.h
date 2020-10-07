@@ -43,7 +43,7 @@ class TransformedSymbolsDecoder {
      *
      * @param
      */
-    ~TransformedSymbolsDecoder();
+    ~TransformedSymbolsDecoder() = default;
 
     /**
      * @brief
@@ -57,10 +57,6 @@ class TransformedSymbolsDecoder {
      * @return the number of symbols available.
      */
     size_t symbolsAvail() const;
-
-    TransformedSymbolsDecoder &operator=(const TransformedSymbolsDecoder &trnsfSubseqDecoder);
-
-    TransformedSymbolsDecoder &operator=(TransformedSymbolsDecoder &&trnsfSubseqDecoder) noexcept;
 
    private:
     /**
@@ -84,27 +80,8 @@ class TransformedSymbolsDecoder {
      */
     uint64_t decodeNextSymbolOrder2();
 
-    /**
-     * @brief
-     * @param
-     * @return
-     */
-    void deepCopy(const TransformedSymbolsDecoder &trnsfSubseqDecoder);
-
-
     unsigned int numEncodedSymbols;
     unsigned int numDecodedSymbols;
-    paramcabac::BinarizationParameters::BinarizationId binID;
-
-    Reader *reader;
-    ContextSelector *ctxSelector;
-    LUTsSubSymbolTransform *invLutsSubsymTrnsfm;
-
-    binFunc binarizor;
-    std::vector<unsigned int> binParams;
-    bool diffEnabled;
-    bool customCmaxTU;
-    uint64_t defaultCmax;
 
     uint8_t outputSymbolSize;
     uint8_t codingSubsymSize;
@@ -113,6 +90,18 @@ class TransformedSymbolsDecoder {
     uint8_t numSubSyms;
     uint8_t numLuts;
     uint8_t numPrvs;
+
+    Reader reader;
+    ContextSelector ctxSelector;
+    LUTsSubSymbolTransform invLutsSubsymTrnsfm;
+
+    bool diffEnabled;
+    bool customCmaxTU;
+    uint64_t defaultCmax;
+
+    paramcabac::BinarizationParameters::BinarizationId binID;
+    std::vector<unsigned int> binParams;
+    binFunc binarizor;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

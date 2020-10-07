@@ -18,66 +18,62 @@ namespace gabac {
 TransformedSymbolsDecoder::TransformedSymbolsDecoder(util::DataBlock *bitstream,
                                                      const paramcabac::TransformedSubSeq &trnsfSubseqConf,
                                                      const unsigned int numSymbols)
-    : numEncodedSymbols(numSymbols), numDecodedSymbols(0),
+    : numEncodedSymbols(numSymbols),
+      numDecodedSymbols(0),
+      outputSymbolSize(trnsfSubseqConf.getSupportValues().getOutputSymbolSize()),
+      codingSubsymSize(trnsfSubseqConf.getSupportValues().getCodingSubsymSize()),
+      codingOrder(trnsfSubseqConf.getSupportValues().getCodingOrder()),
+      subsymMask(paramcabac::StateVars::get2PowN(codingSubsymSize) - 1),
+      numSubSyms(trnsfSubseqConf.getStateVars().getNumSubsymbols()),
+      numLuts(trnsfSubseqConf.getStateVars().getNumLuts(codingOrder,
+                                                        trnsfSubseqConf.getSupportValues().getShareSubsymLutFlag(),
+                                                        trnsfSubseqConf.getTransformIDSubsym())),
+      numPrvs(trnsfSubseqConf.getStateVars().getNumPrvs(trnsfSubseqConf.getSupportValues().getShareSubsymPrvFlag())),
+      reader(bitstream, trnsfSubseqConf.getBinarization().getBypassFlag(), trnsfSubseqConf.getStateVars().getNumCtxTotal()),
+      ctxSelector(trnsfSubseqConf.getStateVars()),
+      invLutsSubsymTrnsfm(trnsfSubseqConf.getSupportValues(), trnsfSubseqConf.getStateVars(), numLuts, numPrvs, false),
+      diffEnabled(trnsfSubseqConf.getTransformIDSubsym() == paramcabac::SupportValues::TransformIdSubsym::DIFF_CODING),
+      customCmaxTU(false),
+      defaultCmax(trnsfSubseqConf.getBinarization().getCabacBinarizationParameters().getCMax()),
       binID(trnsfSubseqConf.getBinarization().getBinarizationID()),
-      reader(nullptr), ctxSelector(nullptr), invLutsSubsymTrnsfm(nullptr), diffEnabled(false), customCmaxTU(false) {
+      binParams(std::vector<unsigned int>(4,0)), // first three elements are for binarization params, last one is for ctxIdx
+      binarizor(getBinarizorReader(outputSymbolSize, trnsfSubseqConf.getBinarization().getBypassFlag(), binID,
+                                   trnsfSubseqConf.getBinarization().getCabacBinarizationParameters(),
+                                   trnsfSubseqConf.getStateVars(), binParams)) {
+    if (bitstream == nullptr || bitstream->size() <= 0) return;  // TODO throw exception
+    if (numEncodedSymbols <= 0) return;                          // TODO throw exception
 
-    if (bitstream == nullptr || bitstream->size() <= 0) return; // FIXME Should die?
-    if (numEncodedSymbols <= 0) return; // FIXME Should die?
+    reader.start();
 
-    const paramcabac::SupportValues &supportVals = trnsfSubseqConf.getSupportValues();
-    const paramcabac::Binarization &binarzation = trnsfSubseqConf.getBinarization();
-    const paramcabac::BinarizationParameters &binarzationParams = binarzation.getCabacBinarizationParameters();
-    const paramcabac::StateVars &stateVars = trnsfSubseqConf.getStateVars();
-
-    outputSymbolSize = supportVals.getOutputSymbolSize();
-    codingSubsymSize = supportVals.getCodingSubsymSize();
-    codingOrder = supportVals.getCodingOrder();
-    subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize) - 1;
-    const bool bypassFlag = binarzation.getBypassFlag();
-
-    numSubSyms = stateVars.getNumSubsymbols();
-    numLuts = stateVars.getNumLuts(codingOrder, supportVals.getShareSubsymLutFlag(), trnsfSubseqConf.getTransformIDSubsym());
-    numPrvs = stateVars.getNumPrvs(supportVals.getShareSubsymPrvFlag());
-
-    reader = new Reader(bitstream, bypassFlag, stateVars.getNumCtxTotal());
-    reader->start();
-
-    defaultCmax = binarzationParams.getCMax();
-    if (trnsfSubseqConf.getTransformIDSubsym() == paramcabac::SupportValues::TransformIdSubsym::LUT_TRANSFORM) {
-        invLutsSubsymTrnsfm = new LUTsSubSymbolTransform(supportVals, stateVars, numLuts, numPrvs, false);
-
-        if (numLuts > 0) {
-            invLutsSubsymTrnsfm->decodeLUTs(*reader);
-            if (binID == paramcabac::BinarizationParameters::BinarizationId::TU) {
-                customCmaxTU = true;
-            }
+    if (numLuts > 0) {
+        invLutsSubsymTrnsfm.decodeLUTs(reader);
+        if (binID == paramcabac::BinarizationParameters::BinarizationId::TU) {
+            customCmaxTU = true;
         }
-    } else {
-        diffEnabled =
-            (trnsfSubseqConf.getTransformIDSubsym() == paramcabac::SupportValues::TransformIdSubsym::DIFF_CODING);
     }
-
-    ctxSelector = new ContextSelector(stateVars);
-
-    binParams = std::vector<unsigned int>(4,  // first three elements are for binarization params, last one is for ctxIdx
-                                          0);
-    binarizor = getBinarizorReader(outputSymbolSize, bypassFlag, binID, binarzationParams, stateVars, binParams);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TransformedSymbolsDecoder::TransformedSymbolsDecoder(const TransformedSymbolsDecoder &trnsfSubseqDecoder) {
-    deepCopy(trnsfSubseqDecoder);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-TransformedSymbolsDecoder::~TransformedSymbolsDecoder() {
-    if (reader != nullptr) delete reader;
-    if (ctxSelector != nullptr) delete ctxSelector;
-    if (invLutsSubsymTrnsfm != nullptr) delete invLutsSubsymTrnsfm;
-}
+TransformedSymbolsDecoder::TransformedSymbolsDecoder(const TransformedSymbolsDecoder &src)
+    : numEncodedSymbols(src.numEncodedSymbols),
+      numDecodedSymbols(src.numDecodedSymbols),
+      outputSymbolSize(src.outputSymbolSize),
+      codingSubsymSize(src.codingSubsymSize),
+      codingOrder(src.codingOrder),
+      subsymMask(src.subsymMask),
+      numSubSyms(src.numSubSyms),
+      numLuts(src.numLuts),
+      numPrvs(src.numPrvs),
+      reader(src.reader),
+      ctxSelector(src.ctxSelector),
+      invLutsSubsymTrnsfm(src.invLutsSubsymTrnsfm),
+      diffEnabled(src.diffEnabled),
+      customCmaxTU(src.customCmaxTU),
+      defaultCmax(src.defaultCmax),
+      binID(src.binID),
+      binParams(src.binParams),
+      binarizor(src.binarizor) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -108,9 +104,9 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder0() {
         std::vector<Subsymbol> subsymbols(numSubSyms);
         for (uint8_t s = 0; s < numSubSyms; s++) {
             subsymbols[s].subsymIdx = s;
-            binParams[3] = ctxSelector->getContextIdxOrder0(s);
+            binParams[3] = ctxSelector.getContextIdxOrder0(s);
 
-            subsymbols[s].subsymValue = (reader->*binarizor)(binParams);
+            subsymbols[s].subsymValue = (reader.*binarizor)(binParams);
 
             if (diffEnabled) {
                 subsymbols[s].subsymValue += subsymbols[s].prvValues[0];
@@ -120,7 +116,7 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder0() {
             symbolValue = (symbolValue << codingSubsymSize) | subsymbols[s].subsymValue;
         }
 
-        decodeSignFlag(*reader, binID, symbolValue);
+        decodeSignFlag(reader, binID, symbolValue);
 
         numDecodedSymbols++;
     }
@@ -148,18 +144,18 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder1(uint64_t *depSymbol) 
             }
 
             subsymbols[s].subsymIdx = s;
-            binParams[3] = ctxSelector->getContextIdxOrderGT0(s, prvIdx, subsymbols, codingOrder);
+            binParams[3] = ctxSelector.getContextIdxOrderGT0(s, prvIdx, subsymbols, codingOrder);
 
             if (customCmaxTU) {
-                subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm->getNumMaxElemsOrder1(subsymbols, lutIdx, prvIdx);
+                subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder1(subsymbols, lutIdx, prvIdx);
                 binParams[0] =
                     std::min(defaultCmax, subsymbols[s].lutNumMaxElems);  // update cMax
             }
-            subsymbols[s].subsymValue = (reader->*binarizor)(binParams);
+            subsymbols[s].subsymValue = (reader.*binarizor)(binParams);
 
             if (numLuts > 0) {
                 subsymbols[s].lutEntryIdx = subsymbols[s].subsymValue;
-                invLutsSubsymTrnsfm->invTransformOrder1(subsymbols, s, lutIdx, prvIdx);
+                invLutsSubsymTrnsfm.invTransformOrder1(subsymbols, s, lutIdx, prvIdx);
             }
 
             subsymbols[prvIdx].prvValues[0] = subsymbols[s].subsymValue;
@@ -167,7 +163,7 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder1(uint64_t *depSymbol) 
             symbolValue = (symbolValue << codingSubsymSize) | subsymbols[s].subsymValue;
         }
 
-        decodeSignFlag(*reader, binID, symbolValue);
+        decodeSignFlag(reader, binID, symbolValue);
 
         numDecodedSymbols++;
     }
@@ -187,18 +183,18 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder2() {
             const uint8_t prvIdx = (numPrvs > 1) ? s : 0;  // either private or shared PRV
 
             subsymbols[s].subsymIdx = s;
-            binParams[3] = ctxSelector->getContextIdxOrderGT0(s, prvIdx, subsymbols, codingOrder);
+            binParams[3] = ctxSelector.getContextIdxOrderGT0(s, prvIdx, subsymbols, codingOrder);
 
             if (customCmaxTU) {
-                subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm->getNumMaxElemsOrder2(subsymbols, lutIdx, prvIdx);
+                subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder2(subsymbols, lutIdx, prvIdx);
                 binParams[0] =
                     std::min(defaultCmax, subsymbols[s].lutNumMaxElems);  // update cMax
             }
-            subsymbols[s].subsymValue = (reader->*binarizor)(binParams);
+            subsymbols[s].subsymValue = (reader.*binarizor)(binParams);
 
             if (numLuts > 0) {
                 subsymbols[s].lutEntryIdx = subsymbols[s].subsymValue;
-                invLutsSubsymTrnsfm->invTransformOrder2(subsymbols, s, lutIdx, prvIdx);
+                invLutsSubsymTrnsfm.invTransformOrder2(subsymbols, s, lutIdx, prvIdx);
             }
 
             subsymbols[prvIdx].prvValues[1] = subsymbols[prvIdx].prvValues[0];
@@ -207,7 +203,7 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder2() {
             symbolValue = (symbolValue << codingSubsymSize) | subsymbols[s].subsymValue;
         }
 
-        decodeSignFlag(*reader, binID, symbolValue);
+        decodeSignFlag(reader, binID, symbolValue);
 
         numDecodedSymbols++;
     }
@@ -219,75 +215,6 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder2() {
 
 size_t TransformedSymbolsDecoder::symbolsAvail() const {
     return numEncodedSymbols - numDecodedSymbols;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-TransformedSymbolsDecoder &TransformedSymbolsDecoder::operator=(const TransformedSymbolsDecoder &trnsfSubseqDecoder) {
-    deepCopy(trnsfSubseqDecoder);
-    return *this;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-TransformedSymbolsDecoder &TransformedSymbolsDecoder::operator=(TransformedSymbolsDecoder &&trnsfSubseqDecoder) noexcept {
-    numEncodedSymbols = trnsfSubseqDecoder.numEncodedSymbols;
-    numDecodedSymbols = trnsfSubseqDecoder.numDecodedSymbols;
-    binID = trnsfSubseqDecoder.binID;
-    binarizor = trnsfSubseqDecoder.binarizor;
-    binParams = trnsfSubseqDecoder.binParams;
-    diffEnabled = trnsfSubseqDecoder.diffEnabled;
-    customCmaxTU = trnsfSubseqDecoder.customCmaxTU;
-    defaultCmax = trnsfSubseqDecoder.defaultCmax;
-    outputSymbolSize = trnsfSubseqDecoder.outputSymbolSize;
-    codingSubsymSize = trnsfSubseqDecoder.codingSubsymSize;
-    codingOrder = trnsfSubseqDecoder.codingOrder;
-    subsymMask = trnsfSubseqDecoder.subsymMask;
-    numSubSyms = trnsfSubseqDecoder.numSubSyms;
-    numLuts = trnsfSubseqDecoder.numLuts;
-    numPrvs = trnsfSubseqDecoder.numPrvs;
-
-    reader = trnsfSubseqDecoder.reader;
-    ctxSelector = trnsfSubseqDecoder.ctxSelector;
-    invLutsSubsymTrnsfm = trnsfSubseqDecoder.invLutsSubsymTrnsfm;
-
-    /* FIXME
-     * cannot set reader/ctxSselector/invLutsSubsysTrnsfm = nullptr of a const object, need to change design. TBD
-     * /
-    reader = nullptr;
-    ctxSelector = nullptr;
-    invLutsSubsymTrnsfm = nullptr;
-    */
-
-    return *this;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void TransformedSymbolsDecoder::deepCopy(const TransformedSymbolsDecoder &trnsfSubseqDecoder){
-    numEncodedSymbols = trnsfSubseqDecoder.numEncodedSymbols;
-    numDecodedSymbols = trnsfSubseqDecoder.numDecodedSymbols;
-    binID = trnsfSubseqDecoder.binID;
-    binarizor = trnsfSubseqDecoder.binarizor;
-    binParams = trnsfSubseqDecoder.binParams;
-    diffEnabled = trnsfSubseqDecoder.diffEnabled;
-    customCmaxTU = trnsfSubseqDecoder.customCmaxTU;
-    defaultCmax = trnsfSubseqDecoder.defaultCmax;
-    outputSymbolSize = trnsfSubseqDecoder.outputSymbolSize;
-    codingSubsymSize = trnsfSubseqDecoder.codingSubsymSize;
-    codingOrder = trnsfSubseqDecoder.codingOrder;
-    subsymMask = trnsfSubseqDecoder.subsymMask;
-    numSubSyms = trnsfSubseqDecoder.numSubSyms;
-    numLuts = trnsfSubseqDecoder.numLuts;
-    numPrvs = trnsfSubseqDecoder.numPrvs;
-
-    reader = trnsfSubseqDecoder.reader;
-    ctxSelector = trnsfSubseqDecoder.ctxSelector;
-    invLutsSubsymTrnsfm = trnsfSubseqDecoder.invLutsSubsymTrnsfm;
-
-    reader = nullptr;
-    ctxSelector = nullptr;
-    invLutsSubsymTrnsfm = nullptr;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
