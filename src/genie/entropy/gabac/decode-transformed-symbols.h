@@ -46,7 +46,7 @@ class TransformedSymbolsDecoder {
     ~TransformedSymbolsDecoder() = default;
 
     /**
-     * @brief
+     * @brief Decodes next symbol. Before invoking this, caller should check availability with symbolsAvail().
      * @param
      * @return
      */

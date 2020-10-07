@@ -24,15 +24,7 @@ namespace gabac {
  *
  */
 class MismatchDecoder : public core::MismatchDecoder {
-   private:
-    uint64_t numSubseqSymbolsTotal;
-    uint64_t numSubseqSymbolsDecoded;
-
-    std::vector<TransformedSymbolsDecoder> trnsfSubseqDecoder;
-    size_t numTrnsfSubseqs;
-
    public:
-
     /**
      *
      * @param d
@@ -57,6 +49,13 @@ class MismatchDecoder : public core::MismatchDecoder {
      * @return A copy of the full object state.
      */
     std::unique_ptr<core::MismatchDecoder> copy() const override;
+
+   private:
+    uint64_t numSubseqSymbolsTotal;
+    uint64_t numSubseqSymbolsDecoded;
+
+    std::vector<TransformedSymbolsDecoder> trnsfSymbolsDecoder;
+    size_t numTrnsfSubseqs;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
