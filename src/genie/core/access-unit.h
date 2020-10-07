@@ -87,7 +87,7 @@ class AccessUnit {
          *
          * @param mm
          */
-        void attachMismatchDecoder(std::unique_ptr<MismatchDecoder> mm);
+        core::AccessUnit::Subsequence attachMismatchDecoder(std::unique_ptr<MismatchDecoder> mm);
 
         /**
          *

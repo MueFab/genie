@@ -23,7 +23,7 @@ AccessUnit::Subsequence &AccessUnit::Subsequence::operator=(const Subsequence &s
     id = sub.id;
     numSymbols = sub.numSymbols;
     dependency = sub.dependency;
-    if (sub.mmDecoder != nullptr) mmDecoder = sub.mmDecoder->copy(); // FIXME it will start cabac decoding process
+    if (sub.mmDecoder != nullptr) mmDecoder = sub.mmDecoder->copy();
     return *this;
 }
 
@@ -67,7 +67,10 @@ util::DataBlock* AccessUnit::Subsequence::getDependency() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::Subsequence::attachMismatchDecoder(std::unique_ptr<MismatchDecoder> mm) { mmDecoder = std::move(mm); }
+core::AccessUnit::Subsequence AccessUnit::Subsequence::attachMismatchDecoder(std::unique_ptr<MismatchDecoder> mm) {
+    mmDecoder = std::move(mm);
+    return *this;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
