@@ -25,8 +25,6 @@ namespace gabac {
  */
 class MismatchDecoder : public core::MismatchDecoder {
    private:
-    util::DataBlock data;
-    const EncodingConfiguration &enConf;
     uint64_t numSubseqSymbolsTotal;
     uint64_t numSubseqSymbolsDecoded;
 

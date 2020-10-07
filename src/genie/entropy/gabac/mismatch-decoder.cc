@@ -19,13 +19,14 @@ namespace gabac {
 // ---------------------------------------------------------------------------------------------------------------------
 
 MismatchDecoder::MismatchDecoder(util::DataBlock &&d, const EncodingConfiguration &c)
-    : data(std::move(d)), enConf(c), numSubseqSymbolsTotal(0), numSubseqSymbolsDecoded(0), numTrnsfSubseqs(0) {
-    const paramcabac::Subsequence &subseqCfg = enConf.getSubseqConfig();
+    : numSubseqSymbolsTotal(0), numSubseqSymbolsDecoded(0), numTrnsfSubseqs(0) {
+    const paramcabac::Subsequence &subseqCfg = c.getSubseqConfig();
     uint64_t subseqPayloadSizeUsed = 0;
 
+    util::DataBlock data = std::move(d);
     gabac::IBufferStream inputStream(&data, 0);
     const uint64_t subseqPayloadSize = gabac::StreamHandler::readStreamSize(inputStream);
-    if (subseqPayloadSize <= 0) return; // TODO throw exception?
+    if (subseqPayloadSize <= 0) return; // TODO should throw exception?
 
 
     // read number of symbols in descriptor subsequence
@@ -83,13 +84,13 @@ MismatchDecoder::MismatchDecoder(util::DataBlock &&d, const EncodingConfiguratio
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t MismatchDecoder::decodeMismatch(uint64_t ref) {
-    std::vector<uint64_t> decodedTrnsfSymbols;
+    std::vector<uint64_t> decodedTrnsfSymbols(numTrnsfSubseqs, 0);
     for (size_t i = 0; i < numTrnsfSubseqs; i++) {
         decodedTrnsfSymbols[i] = trnsfSubseqDecoder[i].decodeNextSymbol(&ref);
     }
 
     numSubseqSymbolsDecoded++;
-    return decodedTrnsfSymbols[0]; // TODO implement inverse subseq transformations (based on buffer etc.)
+    return decodedTrnsfSymbols[0]; // TODO implement inverse subseq transformations. For now only support 1 transform subseq
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -101,9 +102,7 @@ bool MismatchDecoder::dataLeft() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::unique_ptr<core::MismatchDecoder> MismatchDecoder::copy() const {
-    util::DataBlock d = data;
-    auto ret = util::make_unique<MismatchDecoder>(std::move(d), enConf); // FIXME it will start cabac decoding process
-    return ret;
+    return util::make_unique<MismatchDecoder>(*this);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
