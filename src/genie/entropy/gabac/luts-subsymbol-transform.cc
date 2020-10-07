@@ -36,11 +36,13 @@ LutOrder1 LUTsSubSymbolTransform::getInitLutsOrder1(uint64_t numAlphaSubsym) {
 LUTsSubSymbolTransform::LUTsSubSymbolTransform(const paramcabac::SupportValues& _supportVals,
                                                const paramcabac::StateVars& _stateVars, uint8_t _numLuts,
                                                uint8_t _numPrvs, const bool _modeFlag)
-    : supportVals(_supportVals),
-      stateVars(_stateVars),
-      numLuts(_numLuts),
-      numPrvs(_numPrvs),
-      encodingModeFlag(_modeFlag) {}
+    : supportVals(_supportVals), stateVars(_stateVars), numLuts(_numLuts), numPrvs(_numPrvs), encodingModeFlag(_modeFlag) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+LUTsSubSymbolTransform::LUTsSubSymbolTransform(const LUTsSubSymbolTransform& src)
+    : supportVals(src.supportVals), stateVars(src.stateVars), numLuts(src.numLuts), numPrvs(src.numPrvs),
+      encodingModeFlag(src.encodingModeFlag), lutsO1(src.lutsO1), lutsO2(src.lutsO2) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
