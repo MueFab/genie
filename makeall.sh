@@ -23,5 +23,5 @@ for build in $BUILDS; do
     run /bin/mkdir -p "$build_dir"
     run cd "$build_dir"
     run cmake "$@" -D CMAKE_BUILD_TYPE="${build}" -D GENIE_USE_OPENMP=ON ..
-    run make -j8
+    run make -j
 done
