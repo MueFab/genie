@@ -53,14 +53,6 @@ struct se_data {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit &raw_au) {
-    // char_to_int
-    int64_t char_to_int[128];
-    char_to_int[(uint8_t)'A'] = 0;
-    char_to_int[(uint8_t)'C'] = 1;
-    char_to_int[(uint8_t)'G'] = 2;
-    char_to_int[(uint8_t)'T'] = 3;
-    char_to_int[(uint8_t)'N'] = 4;
-
     int64_t rc_to_int[128];
     rc_to_int[(uint8_t)'d'] = 0;
     rc_to_int[(uint8_t)'r'] = 1;
@@ -90,7 +82,7 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
         raw_au.get(core::GenSub::RLEN).push(seq_end - seq_start - 1);  // rlen
         raw_au.get(core::GenSub::RTYPE).push(5);                       // rtype
         for (uint64_t i = seq_start; i < seq_end; i++)
-            raw_au.get(core::GenSub::UREADS).push(char_to_int[(uint8_t)data.seq[i]]);  // ureads
+            raw_au.get(core::GenSub::UREADS).push(getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[data.seq[i]]);  // ureads
     }
     uint64_t prevpos = 0, diffpos;
     // Write streams
@@ -123,9 +115,9 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
                             .push(data.noisepos_arr[data.pos_in_noise_arr[i] + j] - 1);  // decoder adds +1
                     raw_au.get(core::GenSub::MMTYPE_TYPE).push(0);                       // mmtype = Substitution
                     raw_au.get(core::GenSub::MMTYPE_SUBSTITUTION)
-                        .push(char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[i] + j]]);
+                        .push(getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[data.noise_arr[data.pos_in_noise_arr[i] + j]]);
                     raw_au.pushDependency(core::GenSub::MMTYPE_SUBSTITUTION,
-                                          char_to_int[(uint8_t) data.seq[data.pos_arr[i]+curr_noise_pos]]);
+                                          getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[data.seq[data.pos_arr[i]+curr_noise_pos]]);
                 }
                 raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(1);
             }
@@ -134,7 +126,7 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
             raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[i] - 1);  // rlen
             for (uint64_t j = 0; j < data.read_length_arr[i]; j++) {
                 raw_au.get(core::GenSub::UREADS)
-                    .push(char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[i] + j]]);  // ureads
+                    .push(getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[data.unaligned_arr[data.pos_arr[i] + j]]);  // ureads
             }
             raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(seq_end - prevpos);  // pos
             raw_au.get(core::GenSub::RCOMP).push(0);                              // rcomp
