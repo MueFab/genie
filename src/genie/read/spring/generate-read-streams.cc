@@ -112,7 +112,9 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
                 raw_au.get(core::GenSub::RTYPE).push(1);  // rtype = P
             else {
                 raw_au.get(core::GenSub::RTYPE).push(3);  // rtype = M
+                uint16_t curr_noise_pos = 0;
                 for (uint16_t j = 0; j < data.noise_len_arr[i]; j++) {
+                    curr_noise_pos += data.noisepos_arr[data.pos_in_noise_arr[i] + j];
                     raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(0);  // mmpos
                     if (j == 0)
                         raw_au.get(core::GenSub::MMPOS_POSITION).push(data.noisepos_arr[data.pos_in_noise_arr[i] + j]);
@@ -122,6 +124,8 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
                     raw_au.get(core::GenSub::MMTYPE_TYPE).push(0);                       // mmtype = Substitution
                     raw_au.get(core::GenSub::MMTYPE_SUBSTITUTION)
                         .push(char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[i] + j]]);
+                    raw_au.pushDependency(core::GenSub::MMTYPE_SUBSTITUTION,
+                                          char_to_int[(uint8_t) data.seq[data.pos_arr[i]+curr_noise_pos]]);
                 }
                 raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(1);
             }
@@ -703,7 +707,9 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                     raw_au.get(core::GenSub::RTYPE).push(3);  // rtype = M
                     for (int k = 0; k < 2; k++) {
                         uint32_t index = k ? pair : current;
+                        uint16_t curr_noise_pos = 0;
                         for (uint16_t j = 0; j < data.noise_len_arr[index]; j++) {
+                            curr_noise_pos += data.noisepos_arr[data.pos_in_noise_arr[index] + j];
                             raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(0);  // mmpos
                             if (j == 0)
                                 raw_au.get(core::GenSub::MMPOS_POSITION)
@@ -714,6 +720,9 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                             raw_au.get(core::GenSub::MMTYPE_TYPE).push(0);  // mmtype = Substitution
                             raw_au.get(core::GenSub::MMTYPE_SUBSTITUTION)
                                 .push(char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[index] + j]]);
+                            raw_au.pushDependency(core::GenSub::MMTYPE_SUBSTITUTION,
+                                                  char_to_int[(uint8_t) data.seq[data.pos_arr[index]+curr_noise_pos]]);
+
                         }
                         raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(1);  // mmpos
                     }
@@ -733,7 +742,9 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                     raw_au.get(core::GenSub::RTYPE).push(1);  // rtype = P
                 else {
                     raw_au.get(core::GenSub::RTYPE).push(3);  // rtype = M
+                    uint16_t curr_noise_pos = 0;
                     for (uint16_t j = 0; j < data.noise_len_arr[current]; j++) {
+                        curr_noise_pos += data.noisepos_arr[data.pos_in_noise_arr[current] + j];
                         raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(0);  // mmpos
                         if (j == 0)
                             raw_au.get(core::GenSub::MMPOS_POSITION)
@@ -744,6 +755,8 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                         raw_au.get(core::GenSub::MMTYPE_TYPE).push(0);  // mmtype = Substitution
                         raw_au.get(core::GenSub::MMTYPE_SUBSTITUTION)
                             .push(char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[current] + j]]);
+                        raw_au.pushDependency(core::GenSub::MMTYPE_SUBSTITUTION,
+                                              char_to_int[(uint8_t) data.seq[data.pos_arr[current]+curr_noise_pos]]);
                     }
                     raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(1);
                 }
