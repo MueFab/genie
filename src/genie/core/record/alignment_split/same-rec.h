@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SAME_REC_H
-#define GENIE_SAME_REC_H
+#ifndef GENIE_ALIGNMENT_SPLIT_SAME_REC_H
+#define GENIE_ALIGNMENT_SPLIT_SAME_REC_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 
