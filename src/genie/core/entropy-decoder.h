@@ -35,7 +35,7 @@ class EntropyDecoder {
      * @return
      */
     virtual std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(
-        const parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& desc) = 0;
+        const parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& desc, bool mmCoderEnabled) = 0;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

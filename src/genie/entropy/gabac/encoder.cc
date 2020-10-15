@@ -5,7 +5,6 @@
  */
 
 #include "encoder.h"
-
 #include <genie/util/make-unique.h>
 #include <genie/util/watch.h>
 
@@ -66,13 +65,18 @@ core::AccessUnit::Subsequence Encoder::compress(const gabac::EncodingConfigurati
     util::DataBlock buffer = data.move();
     gabac::IBufferStream bufferInputStream(&buffer);
 
+    gabac::IBufferStream *bufferDependencyStream = nullptr;
+    if(data.getDependency() != nullptr) {
+        bufferDependencyStream = new gabac::IBufferStream(data.getDependency());
+    }
+
     util::DataBlock outblock(0, 1);
     gabac::OBufferStream bufferOutputStream(&outblock);
 
     // Setup
     const size_t GABAC_BLOCK_SIZE = 0;  // 0 means single block (block size is equal to input size)
     std::ostream *const GABAC_LOG_OUTPUT_STREAM = &std::cout;
-    const gabac::IOConfiguration GABAC_IO_SETUP = {&bufferInputStream,      nullptr,
+    const gabac::IOConfiguration GABAC_IO_SETUP = {&bufferInputStream,      bufferDependencyStream,
                                                    &bufferOutputStream,     GABAC_BLOCK_SIZE,
                                                    GABAC_LOG_OUTPUT_STREAM, gabac::IOConfiguration::LogLevel::TRACE};
     const bool GABAC_DECODING_MODE = false;
@@ -84,6 +88,11 @@ core::AccessUnit::Subsequence Encoder::compress(const gabac::EncodingConfigurati
     core::AccessUnit::Subsequence out(data.getID());
     out.annotateNumSymbols(num_symbols);
     out.set(std::move(outblock));
+
+    if(bufferDependencyStream != nullptr) {
+        delete bufferDependencyStream;
+    }
+
     return out;
 }
 
@@ -100,13 +109,11 @@ core::EntropyEncoder::EntropyCoded Encoder::process(core::AccessUnit::Descriptor
                 // add compressed payload
                 auto id = subdesc.getID();
 
-                if (!subdesc.isEmpty()) {
-                    std::get<2>(ret).addInteger("size-gabac-total-raw", subdesc.getRawSize());
-                    std::get<2>(ret).addInteger(
-                        "size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-" +
-                            core::getDescriptor(std::get<1>(ret).getID()).subseqs[id.second].name + "-raw",
-                        subdesc.getRawSize());
-                }
+                std::get<2>(ret).addInteger("size-gabac-total-raw", subdesc.getRawSize());
+                std::get<2>(ret).addInteger(
+                    "size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-" +
+                    core::getDescriptor(std::get<1>(ret).getID()).subseqs[id.second].name + "-raw",
+                    subdesc.getRawSize());
 
                 std::get<1>(ret).set(id.second, compress(conf, std::move(subdesc)));
 
@@ -114,7 +121,7 @@ core::EntropyEncoder::EntropyCoded Encoder::process(core::AccessUnit::Descriptor
                     std::get<2>(ret).addInteger("size-gabac-total-comp", std::get<1>(ret).get(id.second).getRawSize());
                     std::get<2>(ret).addInteger(
                         "size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-" +
-                            core::getDescriptor(std::get<1>(ret).getID()).subseqs[id.second].name + "-comp",
+                        core::getDescriptor(std::get<1>(ret).getID()).subseqs[id.second].name + "-comp",
                         std::get<1>(ret).get(id.second).getRawSize());
                 }
             } else {

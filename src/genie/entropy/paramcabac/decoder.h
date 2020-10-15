@@ -47,7 +47,7 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
      *
      * @param reader
      */
-    explicit DecoderTokenType(util::BitReader &reader);
+    explicit DecoderTokenType(core::GenDesc desc, util::BitReader &reader);
 
     /**
      *
@@ -81,7 +81,7 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
      * @param reader
      * @return
      */
-    static std::unique_ptr<core::parameter::desc_pres::DecoderTokentype> create(util::BitReader &reader);
+    static std::unique_ptr<core::parameter::desc_pres::DecoderTokentype> create(genie::core::GenDesc desc, util::BitReader &reader);
 
     /**
      *
@@ -126,7 +126,7 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
      *
      * @param reader
      */
-    explicit DecoderRegular(util::BitReader &reader);
+    explicit DecoderRegular(core::GenDesc desc, util::BitReader &reader);
 
     /**
      *
@@ -160,7 +160,7 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
      * @param reader
      * @return
      */
-    static std::unique_ptr<core::parameter::desc_pres::DecoderRegular> create(util::BitReader &reader);
+    static std::unique_ptr<core::parameter::desc_pres::DecoderRegular> create(genie::core::GenDesc desc, util::BitReader &reader);
 
     /**
      *

@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_NONE_H
-#define GENIE_NONE_H
+#ifndef GENIE_ALIGNMENT_EXT_NONE_H
+#define GENIE_ALIGNMENT_EXT_NONE_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 

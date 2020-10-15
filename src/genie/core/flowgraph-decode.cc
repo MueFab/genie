@@ -130,7 +130,7 @@ void FlowGraphDecode::setNameSelector(std::function<size_t(genie::core::AccessUn
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FlowGraphDecode::setEntropyCoderSelector(
-    const std::function<size_t(const parameter::DescriptorSubseqCfg&, genie::core::AccessUnit::Descriptor&)>& fun) {
+    const std::function<size_t(const parameter::DescriptorSubseqCfg&, genie::core::AccessUnit::Descriptor&, bool)>& fun) {
     entropySelector.setSelection(fun);
 }
 

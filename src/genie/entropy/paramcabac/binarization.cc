@@ -16,7 +16,7 @@ namespace paramcabac {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Binarization::Binarization()
-    : Binarization(BinarizationParameters::BinarizationId::BINARY_CODING, false, BinarizationParameters(), Context()) {}
+    : Binarization(BinarizationParameters::BinarizationId::BI, false, BinarizationParameters(), Context()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

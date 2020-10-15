@@ -24,7 +24,9 @@ QualityValues1::QualityValues1(QvpsPresetId _qvps_preset_ID, bool _reverse_flag)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-QualityValues1::QualityValues1(util::BitReader& reader) : QualityValues(MODE_QV1, false) {
+QualityValues1::QualityValues1(genie::core::GenDesc desc, util::BitReader& reader) : QualityValues(MODE_QV1, false) {
+    assert(desc == genie::core::GenDesc::QV);
+
     auto qvps_flag = reader.read<bool>(1);
     if (qvps_flag) {
         parameter_set_qvps = ParameterSet(reader);
@@ -70,8 +72,8 @@ std::unique_ptr<core::parameter::QualityValues> QualityValues1::clone() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<QualityValues1::QualityValues> QualityValues1::create(util::BitReader& reader) {
-    return util::make_unique<QualityValues1>(reader);
+std::unique_ptr<QualityValues1::QualityValues> QualityValues1::create(genie::core::GenDesc desc, util::BitReader& reader) {
+    return util::make_unique<QualityValues1>(desc, reader);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

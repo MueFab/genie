@@ -53,7 +53,7 @@ class Subsequence {
      * @param tokentype
      * @param reader
      */
-    Subsequence(bool tokentype, util::BitReader& reader);
+    Subsequence(bool tokentype, core::GenDesc desc, util::BitReader& reader);
 
     /**
      *

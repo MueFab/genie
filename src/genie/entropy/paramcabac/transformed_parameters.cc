@@ -22,7 +22,7 @@ TransformedParameters::TransformedParameters() : TransformedParameters(Transform
 // ---------------------------------------------------------------------------------------------------------------------
 
 TransformedParameters::TransformedParameters(util::BitReader &reader) {
-    transform_ID_subseq = reader.read<TransformIdSubseq>();
+    transform_ID_subseq = reader.read<TransformIdSubseq>(8);
     switch (transform_ID_subseq) {
         case TransformIdSubseq::NO_TRANSFORM:
             break;
@@ -35,6 +35,11 @@ TransformedParameters::TransformedParameters(util::BitReader &reader) {
             rle_coding_guard = reader.read<uint8_t>();
             break;
         case TransformIdSubseq::MERGE_CODING:
+            merge_coding_subseq_count = reader.read<uint8_t>(4);
+            merge_coding_shift_size.resize(*merge_coding_subseq_count);
+            for (int i=0; i < *merge_coding_subseq_count; i++) {
+                merge_coding_shift_size[i] = reader.read<uint8_t>(5);
+            }
             break;
         default:
             UTILS_THROW_RUNTIME_EXCEPTION("Invalid subseq transformation");

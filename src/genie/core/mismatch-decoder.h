@@ -4,37 +4,59 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_DECODING_H_
-#define GABAC_DECODING_H_
+#ifndef GENIE_MISMATCH_DECODER_H
+#define GENIE_MISMATCH_DECODER_H
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <cstdint>
+#include <memory>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
-namespace entropy {
-namespace gabac {
+namespace core {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-struct EncodingConfiguration;
-struct IOConfiguration;
+class AccessUnitSubsequence;
 
 /**
  *
- * @param ioConf
- * @param enConf
- * @return
  */
-unsigned long decodeDescSubsequence(const IOConfiguration& ioConf, const EncodingConfiguration& enConf);
+class MismatchDecoder {
+   public:
+    /**
+     *
+     */
+    virtual ~MismatchDecoder() = default;
+
+    /**
+     *
+     * @param ref
+     * @return
+     */
+    virtual uint64_t decodeMismatch(uint64_t ref) = 0;
+
+    /**
+     *
+     * @return
+     */
+    virtual bool dataLeft() const = 0;
+
+    /**
+     *
+     * @return
+     */
+    virtual std::unique_ptr<MismatchDecoder> copy() const = 0;
+};
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabac
-}  // namespace entropy
+}  // namespace core
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_DECODING_H_
+#endif  // GENIE_MISMATCH_DECODER_H
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

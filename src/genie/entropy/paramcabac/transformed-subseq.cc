@@ -18,7 +18,7 @@ namespace paramcabac {
 // ---------------------------------------------------------------------------------------------------------------------
 
 TransformedSubSeq::TransformedSubSeq()
-    : TransformedSubSeq(SupportValues::TransformIdSubsym::NO_TRANSFORM, SupportValues(), Binarization()) {}
+    : TransformedSubSeq(SupportValues::TransformIdSubsym::NO_TRANSFORM, SupportValues(), Binarization(), core::GenSub::POS_MAPPING_FIRST) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ TransformedSubSeq::TransformedSubSeq(util::BitReader& reader, const core::GenSub
     transform_ID_subsym = reader.read<SupportValues::TransformIdSubsym>(3);
     support_values = SupportValues(transform_ID_subsym, reader);
     cabac_binarization =
-        Binarization(support_values.getCodingSubsymSize(), support_values.getOutputSymbolSize(), reader);
+        Binarization(support_values.getOutputSymbolSize(), support_values.getCodingSubsymSize(), reader);
     state_vars.populate(transform_ID_subsym, support_values, cabac_binarization, subsequence_ID, alphabet_ID);
 }
 
@@ -60,6 +60,10 @@ const Binarization& TransformedSubSeq::getBinarization() const { return cabac_bi
 // ---------------------------------------------------------------------------------------------------------------------
 
 const StateVars& TransformedSubSeq::getStateVars() const { return state_vars; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+StateVars& TransformedSubSeq::getStateVars() { return state_vars; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

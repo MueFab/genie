@@ -5,6 +5,7 @@
  */
 
 #include "access-unit.h"
+#include "mismatch-decoder.h"
 #include <genie/util/make-unique.h>
 #include <algorithm>
 #include <utility>
@@ -16,17 +17,82 @@ namespace core {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Subsequence::Subsequence(size_t wordsize, GenSubIndex _id)
-    : data(0, wordsize), position(0), id(std::move(_id)) {}
+AccessUnit::Subsequence &AccessUnit::Subsequence::operator=(const Subsequence &sub) {
+    data = sub.data;
+    position = sub.position;
+    id = sub.id;
+    numSymbols = sub.numSymbols;
+    dependency = sub.dependency;
+    if (sub.mmDecoder != nullptr) mmDecoder = sub.mmDecoder->copy();
+    return *this;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnit::Subsequence &AccessUnit::Subsequence::operator=(AccessUnit::Subsequence &&sub) noexcept {
+    data = std::move(sub.data);
+    position = sub.position;
+    id = sub.id;
+    numSymbols = sub.numSymbols;
+    dependency = sub.dependency;
+    mmDecoder = std::move(sub.mmDecoder);
+    return *this;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnit::Subsequence::Subsequence(const Subsequence &sub) { *this = sub; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnit::Subsequence::Subsequence(Subsequence &&sub) noexcept { *this = sub; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const util::DataBlock* AccessUnit::Subsequence::getDependency() const {
+    if(id == GenSub::MMTYPE_SUBSTITUTION || id == GenSub::RFTT)
+        return &dependency;
+    else
+        return nullptr;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+util::DataBlock* AccessUnit::Subsequence::getDependency() {
+    if(id == GenSub::MMTYPE_SUBSTITUTION || id == GenSub::RFTT)
+        return &dependency;
+    else
+        return nullptr;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+core::AccessUnit::Subsequence AccessUnit::Subsequence::attachMismatchDecoder(std::unique_ptr<MismatchDecoder> mm) {
+    mmDecoder = std::move(mm);
+    return *this;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+MismatchDecoder *AccessUnit::Subsequence::getMismatchDecoder() const { return mmDecoder.get(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+AccessUnit::Subsequence::Subsequence(size_t wordSize, GenSubIndex _id)
+    : data(0, wordSize), position(0), id(std::move(_id)), dependency(0, wordSize) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence::Subsequence(util::DataBlock d, GenSubIndex _id)
-    : data(std::move(d)), position(0), id(std::move(_id)) {}
+    : data(std::move(d)), position(0), id(std::move(_id)), dependency(0,d.getWordSize()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnit::Subsequence::push(uint64_t val) { data.push_back(val); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void AccessUnit::Subsequence::pushDependency(uint64_t val) { dependency.push_back(val); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -68,6 +134,18 @@ AccessUnit::Subsequence &AccessUnit::Descriptor::get(uint16_t sub) { return subd
 // ---------------------------------------------------------------------------------------------------------------------
 
 const AccessUnit::Subsequence &AccessUnit::Descriptor::get(uint16_t sub) const { return subdesc[sub]; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const util::DataBlock* AccessUnit::Descriptor::getDependency(uint16_t sub) const {
+    return subdesc[sub].getDependency();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+util::DataBlock* AccessUnit::Descriptor::getDependency(uint16_t sub) {
+    return subdesc[sub].getDependency();
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -149,6 +227,10 @@ void AccessUnit::push(GenSubIndex sub, uint64_t value) { get(sub).push(value); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void AccessUnit::pushDependency(GenSubIndex sub, uint64_t value) { get(sub).pushDependency(value); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool AccessUnit::isEnd(GenSubIndex sub) { return get(sub).end(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -180,19 +262,20 @@ void AccessUnit::Subsequence::write(util::BitWriter &writer) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence::Subsequence(GenSubIndex _id, size_t size, util::BitReader &reader)
-    : data(0, 1), id(std::move(_id)), numSymbols(0) {
+    : data(0, 1), id(std::move(_id)), numSymbols(0), dependency(0, 1) {
     data.resize(size);
+    // no need to resize 'dependency' as it's not used on decoder side
     reader.readBypass((char *)data.getData(), size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Subsequence::Subsequence(GenSubIndex _id) : data(0, 1), id(_id), numSymbols(0) {}
+AccessUnit::Subsequence::Subsequence(GenSubIndex _id) : data(0, 1), id(_id), numSymbols(0), dependency(0, 1) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence::Subsequence(GenSubIndex _id, util::DataBlock &&dat)
-    : data(std::move(dat)), id(std::move(_id)), numSymbols(0) {}
+    : data(std::move(dat)), id(std::move(_id)), numSymbols(0), dependency(0, data.getWordSize()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -267,7 +350,8 @@ AccessUnit::Descriptor::Descriptor() : id(GenDesc(0)) {}
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::AccessUnit(parameter::ParameterSet &&set, size_t _numRecords)
-    : descriptors(), parameters(std::move(set)), numReads(_numRecords), minPos(0), maxPos(0), referenceSequence(0) {
+    : descriptors(), parameters(std::move(set)), numReads(_numRecords), minPos(0), maxPos(0),
+      referenceSequence(0) {
     const size_t WORDSIZE = 4;
     for (const auto &desc : getDescriptors()) {
         Descriptor desc_data(desc.id);

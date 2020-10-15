@@ -43,7 +43,9 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") # GNU Compiler Collection
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wshadow")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+    if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+    endif()
     #
 elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # Apple Clang or LLVM Clang
     #
@@ -75,7 +77,7 @@ option(BUILD_COVERAGE "Compile and link code instrumented for coverage analysis"
 option(BUILD_DOCUMENTATION "Build Doxygen documentation" OFF)
 option(BUILD_TESTS "Build tests" OFF)
 option(GABAC_BUILD_SHARED_LIB "Build shared GABAC library" OFF)
-option(GENIE_USE_OPENMP "Use OpenMP parallelization in Genie" OFF)
+option(GENIE_USE_OPENMP "Use OpenMP parallelization in Genie" ON)
 
 message(STATUS "")
 message(STATUS "******** Options ********")

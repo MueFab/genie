@@ -6,8 +6,8 @@
 
 #include "run.h"
 
-#include "decoding.h"
-#include "encoding.h"
+#include "decode-desc-subseq.h"
+#include "encode-desc-subseq.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
