@@ -6,6 +6,7 @@
 
 #include <genie/core/format-importer-null.h>
 #include <genie/core/name-encoder-none.h>
+#include <genie/util/watch.h>
 #include <genie/format/fasta/exporter.h>
 #include <genie/format/fasta/manager.h>
 #include <genie/format/fastq/exporter.h>

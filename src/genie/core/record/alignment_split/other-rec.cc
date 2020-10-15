@@ -51,6 +51,8 @@ void OtherRec::write(util::BitWriter &writer) const {
 
 std::unique_ptr<AlignmentSplit> OtherRec::clone() const {
     auto ret = util::make_unique<OtherRec>();
+    ret->split_pos = this->split_pos;
+    ret->split_seq_ID = this->split_seq_ID;
     return ret;
 }
 
