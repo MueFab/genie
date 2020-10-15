@@ -11,8 +11,8 @@
 
 #include <genie/entropy/paramcabac/state_vars.h>
 #include "reader.h"
-#include "subsymbol.h"
 #include "writer.h"
+#include "subsymbol.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -72,6 +72,12 @@ class LUTsSubSymbolTransform {
 
     /**
      *
+     * @param src
+     */
+    LUTsSubSymbolTransform(const LUTsSubSymbolTransform& src);
+
+    /**
+     *
      * @param reader
      */
     void decodeLUTs(Reader& reader);
@@ -79,11 +85,10 @@ class LUTsSubSymbolTransform {
     /**
      *
      * @param writer
-     * @param alphaProps
      * @param symbols
      * @param depSymbols
      */
-    void encodeLUTs(Writer& writer, const core::Alphabet alphaProps, util::DataBlock* const symbols,
+    void encodeLUTs(Writer& writer, util::DataBlock* const symbols,
                     util::DataBlock* const depSymbols = nullptr);
 
     /**
@@ -168,12 +173,10 @@ class LUTsSubSymbolTransform {
 
     /**
      *
-     * @param alphaProps
      * @param symbols
      * @param depSymbols
      */
-    void buildLuts(const core::Alphabet alphaProps, util::DataBlock* const symbols,
-                   util::DataBlock* const depSymbols = nullptr);
+    void buildLuts(util::DataBlock* const symbols, util::DataBlock* const depSymbols = nullptr);
 
     /**
      *
@@ -199,14 +202,14 @@ class LUTsSubSymbolTransform {
      */
     void encodeLutOrder1(Writer& writer, uint64_t numAlphaSubsym, uint8_t codingSubsymSize, LutOrder1& lut);
 
-    std::vector<LutOrder1> lutsO1;  //!< max size numSubsyms
-    std::vector<LutOrder2> lutsO2;  //!< max size numSubsyms
-
     const paramcabac::SupportValues& supportVals;  //!<
     const paramcabac::StateVars& stateVars;        //!<
     uint8_t numLuts;                               //!<
     uint8_t numPrvs;                               //!<
     bool encodingModeFlag;                         //!<
+
+    std::vector<LutOrder1> lutsO1;  //!< max size numSubsyms
+    std::vector<LutOrder2> lutsO2;  //!< max size numSubsyms
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

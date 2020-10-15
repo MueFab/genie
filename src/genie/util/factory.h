@@ -11,11 +11,14 @@
 
 #include <memory>
 #include "generic-factory.h"
+#include <genie/core/constants.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace util {
+
+using namespace genie::core;
 
 /**
  *
@@ -24,7 +27,7 @@ namespace util {
 template <typename T>
 class Factory : public GenericFactory {
    private:
-    std::map<uint8_t, std::function<std::unique_ptr<T>(util::BitReader&)>> factories;  //!<
+    std::map<uint8_t, std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>> factories;  //!<
 
    public:
     /**
@@ -32,14 +35,14 @@ class Factory : public GenericFactory {
      * @param id
      * @param factory
      */
-    void registerType(uint8_t id, const std::function<std::unique_ptr<T>(util::BitReader&)>& factory);
+    void registerType(uint8_t id, const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& factory);
 
     /**
      *
      * @param factory
      * @return
      */
-    uint8_t registerType(const std::function<std::unique_ptr<T>(util::BitReader&)>& factory);
+    uint8_t registerType(const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& factory);
 
     /**
      *
@@ -53,7 +56,7 @@ class Factory : public GenericFactory {
      * @param reader
      * @return
      */
-    std::unique_ptr<T> create(uint8_t id, util::BitReader& reader);
+    std::unique_ptr<T> create(uint8_t id, genie::core::GenDesc desc, util::BitReader& reader);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

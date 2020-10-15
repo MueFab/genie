@@ -148,48 +148,6 @@ class Reader {
 
     /**
      *
-     * @param binParams
-     * @return
-     */
-    uint64_t readBI(const std::vector<unsigned int> binParams);
-
-    /**
-     *
-     * @param binParams
-     * @return
-     */
-    uint64_t readTU(const std::vector<unsigned int> binParams);
-
-    /**
-     *
-     * @param binParams
-     * @return
-     */
-    uint64_t readEG(const std::vector<unsigned int> binParams);
-
-    /**
-     *
-     * @param binParams
-     * @return
-     */
-    uint64_t readTEG(const std::vector<unsigned int> binParams);
-
-    /**
-     *
-     * @param binParams
-     * @return
-     */
-    uint64_t readSUTU(const std::vector<unsigned int> binParams);
-
-    /**
-     *
-     * @param binParams
-     * @return
-     */
-    uint64_t readDTU(const std::vector<unsigned int> binParams);
-
-    /**
-     *
      * @param codingSubsymSize
      * @return
      */

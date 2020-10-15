@@ -12,7 +12,6 @@ class ProgramOptions {
     ~ProgramOptions();
 
    public:
-    // std::string configurationFilePath;
     std::string logLevel;
     std::string inputFilePath;
     std::string dependencyFilePath;
@@ -26,7 +25,7 @@ class ProgramOptions {
    private:
     void processCommandLine(int argc, char *argv[]);
 
-    void validate();
+    void validate() const;
 };
 
 }  // namespace gabacify

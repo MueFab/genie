@@ -51,8 +51,6 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
     size_t name_pos = 0;
     Record cur_record;
     std::string refBuf;
-    // int_to_char
-    char int_to_char[5] = {'A', 'C', 'G', 'T', 'N'};
 
     // some state variables
     uint64_t abs_pos = 0;
@@ -63,7 +61,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
             // put in refBuf
             uint32_t rlen = au.get(core::GenSub::RLEN).pull() + 1;  // rlen
             for (uint32_t i = 0; i < rlen; i++) {
-                refBuf.push_back(int_to_char[au.get(core::GenSub::UREADS).pull()]);  // ureads
+                refBuf.push_back(getAlphabetProperties(core::AlphabetID::ACGTN).lut[au.get(core::GenSub::UREADS).pull()]);  // ureads
             }
         } else {
             // rtype can be 1 (P) or 3 (M)
@@ -150,8 +148,11 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                         uint32_t mmtype_0 = (uint32_t)(au.get(core::GenSub::MMTYPE_TYPE).pull());
                         if (mmtype_0 != 0)  // i.e., not substitution
                             throw std::runtime_error("Non zero mmtype encountered.");
-                        uint32_t mmtype_1 = (uint32_t)(au.get(core::GenSub::MMTYPE_SUBSTITUTION).pull());
-                        cur_read[i][abs_mmpos] = int_to_char[mmtype_1];
+                        const auto mmtype_1 = au.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()->dataLeft()
+                                              ? au.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()
+                                                  ->decodeMismatch(getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[cur_read[i][abs_mmpos]])
+                                              : getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N'];
+                        cur_read[i][abs_mmpos] = getAlphabetProperties(core::AlphabetID::ACGTN).lut[mmtype_1];
                         abs_mmpos++;
                     }
                 }
@@ -252,7 +253,7 @@ Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end) :
 
 void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
     core::record::Chunk chunk;
-    genie::core::AccessUnit au = entropyCodeAU(std::move(t));
+    genie::core::AccessUnit au = entropyCodeAU(std::move(t), true);
     util::Watch watch;
     std::array<std::vector<Record>, 2> matched_records;
     std::array<std::vector<Record>, 2> unmatched_records;

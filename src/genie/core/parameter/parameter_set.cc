@@ -57,7 +57,7 @@ ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::
     for (size_t i = 0; i < num_classes; ++i) {
         auto mode = bitReader.read<uint8_t>(4);
         qv_coding_configs.emplace_back(
-            GlobalCfg::getSingleton().getIndustrialPark().construct<QualityValues>(mode, bitReader));
+            GlobalCfg::getSingleton().getIndustrialPark().construct<QualityValues>(mode, genie::core::GenDesc::QV, bitReader));
     }
     auto crps_flag = bitReader.read<bool>(1);
     if (crps_flag) {

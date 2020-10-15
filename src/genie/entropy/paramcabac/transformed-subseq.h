@@ -42,7 +42,7 @@ class TransformedSubSeq {
      */
     TransformedSubSeq(SupportValues::TransformIdSubsym _transform_ID_subsym, SupportValues&& _support_values,
                       Binarization&& _cabac_binarization,
-                      const core::GenSubIndex _subsequence_ID = core::GenSub::POS_MAPPING_FIRST,
+                      const core::GenSubIndex _subsequence_ID,
                       const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
     /**
      *
@@ -51,7 +51,7 @@ class TransformedSubSeq {
      * @param _alphabet_ID
      */
     TransformedSubSeq(util::BitReader& reader,
-                      const core::GenSubIndex _subsequence_ID = core::GenSub::POS_MAPPING_FIRST,
+                      const core::GenSubIndex _subsequence_ID,
                       const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
 
     /**
@@ -88,6 +88,12 @@ class TransformedSubSeq {
      * @return
      */
     const StateVars& getStateVars() const;
+
+    /**
+     *
+     * @return
+     */
+    StateVars& getStateVars();
 
     /**
      *

@@ -80,6 +80,7 @@ class GabacSeqConfSet {
      * @brief Set a configuration for the specified subsequence
      * @param sub - identifies descriptor subsequence
      * @param subseqCfg - the descritpor subsequence configuration
+     * @return none
      */
     void setConfAsGabac(core::GenSubIndex sub, DescriptorSubsequenceCfg &&subseqCfg);
 

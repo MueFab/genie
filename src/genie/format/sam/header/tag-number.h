@@ -19,33 +19,17 @@ namespace format {
 namespace sam {
 namespace header {
 
-/**
- *
- */
+// ---------------------------------------------------------------------------------------------------------------------
+
 class TagNumber : public TagBase {
    private:
-    uint64_t data;  //!<
+    uint64_t data;
 
    public:
-    /**
-     *
-     * @param _name
-     * @param _data
-     */
     TagNumber(std::string _name, uint64_t _data);
 
-    /**
-     *
-     * @return
-     */
     std::string toString() const override;
 
-    /**
-     *
-     * @param name
-     * @param string
-     * @return
-     */
     static std::unique_ptr<TagBase> fromString(std::string name, const std::string& string);
 };
 

@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_ENCODING_H_
-#define GABAC_ENCODING_H_
+#ifndef GABAC_ENCODE_DESC_SUBSEQ_H_
+#define GABAC_ENCODE_DESC_SUBSEQ_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ unsigned long encodeDescSubsequence(const IOConfiguration& conf, const EncodingC
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_ENCODING_H_
+#endif  // GABAC_ENCODE_DESC_SUBSEQ_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

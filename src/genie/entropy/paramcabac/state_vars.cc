@@ -96,51 +96,51 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
     }
 
     // cLengthBI
-    if (binarization_ID == BinarizationParameters::BinarizationId::BINARY_CODING) {
+    if (binarization_ID == BinarizationParameters::BinarizationId::BI) {
         cLengthBI = codingSubsymSize;
     }
 
     if (!cabac_binarization.getBypassFlag()) {
         // numCtxSubsym
         switch (binarization_ID) {
-            case BinarizationParameters::BinarizationId::BINARY_CODING:
+            case BinarizationParameters::BinarizationId::BI:
                 numCtxSubsym = codingSubsymSize;
 
                 break;
-            case BinarizationParameters::BinarizationId::TRUNCATED_UNARY:
+            case BinarizationParameters::BinarizationId::TU:
                 numCtxSubsym = cabacBinazParams.getCMax();  // cmax
                 break;
-            case BinarizationParameters::BinarizationId::EXPONENTIAL_GOLOMB:
+            case BinarizationParameters::BinarizationId::EG:
                 numCtxSubsym = std::floor(std::log2(numAlphaSubsym + 1)) + 1;
                 break;
-            case BinarizationParameters::BinarizationId::SIGNED_EXPONENTIAL_GOMB:
+            case BinarizationParameters::BinarizationId::SEG:
                 numCtxSubsym = std::floor(std::log2(numAlphaSubsym + 1)) + 2;
                 break;
-            case BinarizationParameters::BinarizationId::TRUNCATED_EXPONENTIAL_GOLOMB:
+            case BinarizationParameters::BinarizationId::TEG:
                 numCtxSubsym = cabacBinazParams.getCMaxTeg()  // cmax_teg
                                + std::floor(std::log2(numAlphaSubsym + 1)) + 1;
                 break;
-            case BinarizationParameters::BinarizationId::SIGNED_TRUNCATED_EXPONENTIAL_GOLOMB:
+            case BinarizationParameters::BinarizationId::STEG:
                 numCtxSubsym = cabacBinazParams.getCMaxTeg()  // cmax_teg
                                + std::floor(std::log2(numAlphaSubsym + 1)) + 2;
                 break;
-            case BinarizationParameters::BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY: {
+            case BinarizationParameters::BinarizationId::SUTU: {
                 uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
                 numCtxSubsym = (outputSymbolSize / splitUnitSize) * ((1 << splitUnitSize) - 1) +
                                ((1 << (outputSymbolSize % splitUnitSize)) - 1);
             } break;
-            case BinarizationParameters::BinarizationId::SIGNED_SPLIT_UNITWISE_TRUNCATED_UNARY: {
+            case BinarizationParameters::BinarizationId::SSUTU: {
                 uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
                 numCtxSubsym = (outputSymbolSize / splitUnitSize) * ((1 << splitUnitSize) - 1) +
                                ((1 << (outputSymbolSize % splitUnitSize)) - 1) + 1;
             } break;
-            case BinarizationParameters::BinarizationId::DOUBLE_TRUNCATED_UNARY: {
+            case BinarizationParameters::BinarizationId::DTU: {
                 uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
                 numCtxSubsym = cabacBinazParams.getCMaxDtu() +
                                (outputSymbolSize / splitUnitSize) * ((1 << splitUnitSize) - 1) +
                                ((1 << (outputSymbolSize % splitUnitSize)) - 1);
             } break;
-            case BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY: {
+            case BinarizationParameters::BinarizationId::SDTU: {
                 uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
                 numCtxSubsym = cabacBinazParams.getCMaxDtu() +
                                (outputSymbolSize / splitUnitSize) * ((1 << splitUnitSize) - 1) +
@@ -165,8 +165,8 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
         // numCtxLuts
         numCtxLuts = 0;
         if (transform_ID_subsym == SupportValues::TransformIdSubsym::LUT_TRANSFORM) {
-            if ((binarization_ID >= BinarizationParameters::BinarizationId::SPLIT_UNITWISE_TRUNCATED_UNARY &&
-                 binarization_ID <= BinarizationParameters::BinarizationId::SIGNED_DOUBLE_TRUNCATED_UNARY) ||
+            if ((binarization_ID >= BinarizationParameters::BinarizationId::SUTU &&
+                 binarization_ID <= BinarizationParameters::BinarizationId::SDTU) ||
                 codingOrder == 0 || (1u << codingSubsymSize) > MAX_LUT_SIZE) {
                 UTILS_THROW_RUNTIME_EXCEPTION(
                     "LUT_TRANSFORM not supported with given configuration: coding_order = 0\

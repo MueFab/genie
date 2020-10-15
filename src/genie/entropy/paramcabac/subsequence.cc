@@ -44,11 +44,16 @@ Subsequence::Subsequence(TransformedParameters&& _transform_subseq_parameters, u
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Subsequence::Subsequence(bool tokentype, util::BitReader& reader) {
+Subsequence::Subsequence(bool tokentype, core::GenDesc desc, util::BitReader& reader) {
     tokentypeFlag = tokentype;
+    core::GenSubIndex subSeq;
     if (!tokentypeFlag) {
         descriptor_subsequence_ID = reader.read<uint16_t>(10);
+        subSeq = std::pair<core::GenDesc, uint16_t>(desc, *descriptor_subsequence_ID);
+    } else {
+        subSeq = std::pair<core::GenDesc, uint16_t>(desc, 0); // FIXME use zero always?
     }
+
     transform_subseq_parameters = TransformedParameters(reader);
     uint8_t numSubseq = 0;
     switch (transform_subseq_parameters.getTransformIdSubseq()) {
@@ -69,7 +74,7 @@ Subsequence::Subsequence(bool tokentype, util::BitReader& reader) {
             break;
     }
     for (size_t i = 0; i < numSubseq; ++i) {
-        transformSubseq_cfgs.emplace_back(reader);
+        transformSubseq_cfgs.emplace_back(reader, subSeq);
     }
 }
 

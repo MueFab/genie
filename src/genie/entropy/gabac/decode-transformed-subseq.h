@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_DECODE_CABAC_H_
-#define GABAC_DECODE_CABAC_H_
+#ifndef GABAC_DECODE_TRANSFORMED_SUBSEQ_H_
+#define GABAC_DECODE_TRANSFORMED_SUBSEQ_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -13,6 +13,7 @@
 #include <vector>
 
 #include <genie/entropy/paramcabac/transformed-subseq.h>
+#include "reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,6 +29,37 @@ namespace genie {
 namespace entropy {
 namespace gabac {
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ *
+ * @param
+ */
+typedef uint64_t (Reader::*binFunc)(const std::vector<unsigned int>);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ *
+ * @param
+ */
+void decodeSignFlag(Reader &reader, const paramcabac::BinarizationParameters::BinarizationId binID,
+                    uint64_t &symbolValue);
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ *
+ * @param
+ */
+binFunc getBinarizorReader(const uint8_t outputSymbolSize, const bool bypassFlag,
+                           const paramcabac::BinarizationParameters::BinarizationId binID,
+                           const paramcabac::BinarizationParameters &binarzationParams,
+                           const paramcabac::StateVars &stateVars, std::vector<unsigned int> &binParams);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 /**
  *
  * @param trnsfSubseqConf
@@ -39,13 +71,15 @@ namespace gabac {
 size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq& trnsfSubseqConf, const unsigned int numEncodedSymbols,
                              util::DataBlock* bitstream, util::DataBlock* const depSymbols = nullptr);
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabac
 }  // namespace entropy
 }  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_DECODE_CABAC_H_
+#endif  // GABAC_DECODE_TRANSFORMED_SUBSEQ_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

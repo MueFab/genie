@@ -39,7 +39,7 @@ class QualityValues1 : public core::parameter::QualityValues {
      *
      * @param reader
      */
-    explicit QualityValues1(util::BitReader& reader);
+    explicit QualityValues1(genie::core::GenDesc desc, util::BitReader& reader);
 
     /**
      *
@@ -71,7 +71,7 @@ class QualityValues1 : public core::parameter::QualityValues {
      * @param reader
      * @return
      */
-    static std::unique_ptr<QualityValues> create(util::BitReader& reader);
+    static std::unique_ptr<QualityValues> create(genie::core::GenDesc desc, util::BitReader& reader);
 
     /**
      *

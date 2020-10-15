@@ -13,6 +13,7 @@
 #include <genie/util/data-block.h>
 #include <numeric>
 #include "constants.h"
+#include "mismatch-decoder.h"
 #include "parameter/parameter_set.h"
 #include "reference-manager.h"
 
@@ -32,18 +33,74 @@ class AccessUnit {
     class Subsequence {
        private:
         util::DataBlock data;  //!< @brief
-        size_t position;       //!< @brief
+        size_t position{};     //!< @brief
 
-        GenSubIndex id;     //!< @brief
-        size_t numSymbols;  //!<
+        GenSubIndex id;        //!< @brief
+        size_t numSymbols{};   //!< @brief
+
+        util::DataBlock dependency;                  //!< @brief
+        std::unique_ptr<MismatchDecoder> mmDecoder;  //!< @brief
 
        public:
+
         /**
          *
-         * @param wordsize
+         * @param sub
+         * @return
+         */
+        Subsequence& operator=(const Subsequence& sub);
+
+        /**
+         *
+         * @param sub
+         * @return
+         */
+        Subsequence& operator=(Subsequence&& sub) noexcept;
+
+        /**
+         *
+         * @param sub
+         */
+        Subsequence(const Subsequence& sub);
+
+        /**
+         *
+         * @param sub
+         */
+        Subsequence(Subsequence&& sub)  noexcept;
+
+        /**
+         * @brief
+         * @param sub
+         * @return
+         */
+        const util::DataBlock* getDependency() const;
+
+        /**
+         * @brief
+         * @param sub
+         * @return
+         */
+        util::DataBlock* getDependency();
+
+        /**
+         *
+         * @param mm
+         */
+        core::AccessUnit::Subsequence attachMismatchDecoder(std::unique_ptr<MismatchDecoder> mm);
+
+        /**
+         *
+         * @return
+         */
+        MismatchDecoder* getMismatchDecoder() const;
+
+        /**
+         *
+         * @param wordSize
          * @param _id
          */
-        Subsequence(size_t wordsize, GenSubIndex _id);
+        Subsequence(size_t wordSize, GenSubIndex _id);
 
         /**
          *
@@ -57,6 +114,12 @@ class AccessUnit {
          * @param val
          */
         void push(uint64_t val);
+
+        /**
+         * @brief
+         * @param val
+         */
+        void pushDependency(uint64_t val);
 
         /**
          * @brief
@@ -179,6 +242,20 @@ class AccessUnit {
          * @return
          */
         const Subsequence& get(uint16_t sub) const;
+
+        /**
+         * @brief
+         * @param sub
+         * @return
+         */
+        const util::DataBlock* getDependency(uint16_t sub) const;
+
+        /**
+         * @brief
+         * @param sub
+         * @return
+         */
+        util::DataBlock* getDependency(uint16_t sub);
 
         /**
          *
@@ -324,6 +401,13 @@ class AccessUnit {
      * @param value
      */
     void push(GenSubIndex sub, uint64_t value);
+
+    /**
+     *
+     * @param sub
+     * @param value
+     */
+    void pushDependency(GenSubIndex sub, uint64_t value);
 
     /**
      *

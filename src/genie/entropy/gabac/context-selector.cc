@@ -18,6 +18,10 @@ ContextSelector::ContextSelector(const paramcabac::StateVars& _stateVars) : stat
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+ContextSelector::ContextSelector(const ContextSelector& src) : stateVars(src.stateVars) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 unsigned int ContextSelector::getContextIdxOrder0(const uint8_t subsymIdx) {
     return subsymIdx * stateVars.getCodingSizeCtxOffset();
 }

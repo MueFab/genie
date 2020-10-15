@@ -28,11 +28,12 @@ class Decoder : public core::EntropyDecoder {
     /**
      * @brief Execute gabac library
      * @param conf Gabac configuration to use
-     * @param in Compressed set of transformed sequences
-     * @param out Where to put uncompressed sequence
+     * @param in subsequence payload
+     * @param mmCoderEnabled if mismatch coder is enabled
      */
     static core::AccessUnit::Subsequence decompress(const gabac::EncodingConfiguration& conf,
-                                                    core::AccessUnit::Subsequence&& in);
+                                                    core::AccessUnit::Subsequence&& in,
+                                                    bool mmCoderEnabled);
 
    public:
     /**
@@ -42,7 +43,7 @@ class Decoder : public core::EntropyDecoder {
      * @return
      */
     std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(
-        const parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d) override;
+        const parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d, bool mmCoderEnabled) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
