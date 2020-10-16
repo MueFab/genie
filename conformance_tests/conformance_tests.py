@@ -38,16 +38,29 @@ def _get_git_root():
     return git_root
 
 
-def _build(num_threads: int):
+def _build(log_file, num_threads: int):
     git_root = _get_git_root()
+
     executables = {}
 
     for build_type in _build_types:
         log.info("building build type '" + build_type + "'")
         curr_build_dir = os.path.join(git_root, _build_dir_prefix + build_type.lower())
         os.mkdir(curr_build_dir)
-        subprocess.run(['cmake', '..'], cwd=curr_build_dir)
-        subprocess.run(['make', '--jobs=' + str(num_threads)], cwd=curr_build_dir)
+        subprocess.run(
+            ['cmake', '..'],
+            check=True,
+            cwd=curr_build_dir,
+            stdout=log_file,
+            stderr=subprocess.STDOUT
+        )
+        subprocess.run(
+            ['make', '--jobs=' + str(num_threads)],
+            check=True,
+            cwd=curr_build_dir,
+            stdout=log_file,
+            stderr=subprocess.STDOUT
+        )
         executables[build_type] = os.path.join(curr_build_dir, 'bin/genie')
 
     return executables
@@ -103,13 +116,32 @@ def _fastq_tests(executables):
 
 def main():
     # Basic log config
-    format_string = '[%(asctime)s] [%(filename)25s:%(funcName)25s] [%(levelname)-8s] --- %(message)s'
+    format_string = '[%(asctime)s] [%(filename)20s:%(funcName)-20s] [%(levelname)-8s] --- %(message)s'
     log.basicConfig(format=format_string, level=log.INFO)
 
     # Argument parser
     parser = argparse.ArgumentParser(description='conformance tests')
-    parser.add_argument('-l', '--log_level', help='log level', choices=_avail_log_levels.keys(), default='info')
-    parser.add_argument('-t', '--num_threads', help='number of threads (all available if not specified)')
+    parser.add_argument(
+        '-d', '--log_dir',
+        help="log directory (default: '.')",
+        default='.'
+    )
+    parser.add_argument(
+        '-p', '--log_file_name_prefix',
+        help="log file name prefix (default: 'conformance_tests_')",
+        default='conformance_tests_'
+    )
+    parser.add_argument(
+        '-l', '--log_level',
+        help='log level (default: info)',
+        choices=_avail_log_levels.keys(),
+        default='info'
+    )
+    parser.add_argument(
+        '-t', '--num_threads',
+        help='number of threads (default: all available [= {}])'.format(multiprocessing.cpu_count()),
+        default=multiprocessing.cpu_count()
+    )
     args = parser.parse_args()
 
     # Log level
@@ -120,10 +152,6 @@ def main():
         log_level = log.INFO
     logger = log.getLogger()
     logger.setLevel(log_level)
-
-    # Number of threads
-    if args.num_threads is None:
-        args.num_threads = multiprocessing.cpu_count()
 
     # Print banner
     log.info('********************************************************************************')
@@ -136,19 +164,35 @@ def main():
     # Log the arguments
     log.debug('arguments: ')
     for arg in vars(args):
-        log.debug('  %-16s: %s', arg, getattr(args, arg))
+        log.debug('  %-25s: %s', arg, getattr(args, arg))
 
     # Build Genie and execute tests
     try:
+        # Clean
         _clean()
-        executables = _build(args.num_threads)
-        _fastq_tests(executables)
+
+        # Build
+        build_log_file_name = os.path.join(args.log_dir, args.log_file_name_prefix + 'build_log.txt')
+        with open(build_log_file_name, 'w') as build_log_file:
+            executables = _build(log_file=build_log_file, num_threads=args.num_threads)
+
+        # Test
+        # _fastq_tests(executables=executables)
+
+        # Clean
         _clean()
-    except InternalError:
+    except InternalError as error:
         log.error('internal error')
         log.error('traceback follows')
-        raise InternalError
+        raise error
+    except subprocess.CalledProcessError as error:
+        log.error('external error')
+        log.error("consult log files at '{}' for details".format(os.path.abspath(args.log_dir)))
+        log.error('traceback follows')
+        raise error
 
 
 if __name__ == "__main__":
     main()
+else:
+    print("error: must be executed as 'main'; use as module not allowed")
