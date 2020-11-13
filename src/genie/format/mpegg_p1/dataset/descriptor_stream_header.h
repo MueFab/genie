@@ -18,10 +18,13 @@ namespace mpegg_p1 {
 class DescriptorStreamHeader{
    private:
 
+     // u(1)
+    uint8_t reserved;
+
     // u(7)
     uint8_t descriptor_ID;
 
-    // u(1)
+    // u(4)
     uint8_t class_ID;
 
     // u(32)
