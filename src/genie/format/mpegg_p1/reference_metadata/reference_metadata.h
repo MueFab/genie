@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "genie/util/bitwriter.h"
+#include <genie/util/bitreader.h>
 
 namespace genie {
 namespace format {
@@ -18,6 +19,21 @@ class ReferenceMetadata {
 
    public:
     ReferenceMetadata();
+
+    /**
+        *
+        * @param _ds_group_ID
+        * @param _ref_ID
+        * @param _ref_metadata_value
+        */
+    ReferenceMetadata(uint8_t _ds_group_ID, uint8_t _ref_ID; std::vector<uint8_t>&& _ref_metadata_value);
+
+    /**
+    *
+    * @param reader
+    * @param length
+    */
+    ReferenceMetadata(util::BitReader& reader, size_t length);
 
     void setDatasetGroupId(uint8_t _dataset_group_ID);
 
