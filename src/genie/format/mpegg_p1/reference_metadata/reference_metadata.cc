@@ -13,19 +13,43 @@ ReferenceMetadata::ReferenceMetadata()
     : dataset_group_ID(0),
       reference_ID(0),
       reference_metadata_value(){
-
     // TODO (Yeremia): default value for reference_metadata_value
-    UTILS_DIE("Not implemented yet");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+ReferenceMetadata::ReferenceMetadata(uint8_t _ds_group_ID, uint8_t _ref_ID; std::vector<uint8_t>&& _ref_metadata_value)
+    : dataset_group_ID(_ds_group_ID),
+      reference_ID(_ref_ID),
+      reference_metadata_value(std::move(_ref_metadata_value)){}
+}
+// ---------------------------------------------------------------------------------------------------------------------
+
+ReferenceMetadata::ReferenceMetadata(util::BitReader& reader, size_t length)
+    : dataset_group_ID(0),
+      reference_ID(0),
+      reference_metadata_value(){
+
+    size_t start_pos = reader.getPos();
+
+    dataset_group_ID = reader.read<uint8_t>();
+    reference_ID = reader.read<uint8_t>();
+
+    for (auto val: reference_metadata_value){
+      reference_metadata_value = reader.read<uint8_t>();
+    }
+
+    UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid DatasetGroup length!");
+
+    {}
+
+// ---------------------------------------------------------------------------------------------------------------------
 void ReferenceMetadata::setDatasetGroupId(uint8_t _dataset_group_ID) {dataset_group_ID = _dataset_group_ID;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t ReferenceMetadata::getLength() const {
-    // key (4), Length (8)
+    // key c(4), Length u(64)
     uint64_t len = 12;
 
     // TODO (Yeremia): len of Value[]?
