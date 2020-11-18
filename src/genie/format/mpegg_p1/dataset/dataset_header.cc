@@ -12,7 +12,17 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-// TODO (Yeremia): Fix DatasetHeader constructor
+DatasetHeader::DatasetHeader():
+    dataset_group_ID(0),
+    dataset_ID(0),
+    version(),
+    byte_offset_size_flag(ByteOffsetSizeFlag::OFF),
+    non_overlapping_AU_range_flag(false),
+    pos_40_bits_flag(Pos40SizeFlag::OFF),
+    dataset_type(0),
+    alphabet_ID(0),
+    num_U_access_units(0) {}
+
 DatasetHeader::DatasetHeader(const uint16_t datasetID) : dataset_ID(datasetID) {}
 
 DatasetHeader::DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSizeFlag _byte_offset_size_flag,
@@ -33,57 +43,66 @@ DatasetHeader::DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSizeFlag _
 }
 
 uint64_t DatasetHeader::getLength() const {
-    uint64_t bitlength = 12 * 8;   // gen_info
-    bitlength += (1 + 2 + 4) * 8;  // dataset_group_ID, dataset_ID, version
-    bitlength += 4; // byte_offset_size_flag, non_overlapping_AU_range_flag, pos_40_bits_flag
 
-    bitlength += block_header.getBitLength();
+//length is first calculated in bits then converted in bytes
 
-    // TODO (Yeremia): Fix getBitLength()
+    // Key c(4) Length u(64)
+    uint64_t bitlen = (4 * sizeof(char) + 8) * 8 ;   // gen_info
 
+    bitlen += (1 + 2 + 4) * 8;  // dataset_group_ID u(8), dataset_ID u(16), version c(4)
+    bitlen += 3; // byte_offset_size_flag u(1), non_overlapping_AU_range_flag u(1) , pos_40_bits_flag u(1)
 
-//    length += 16;
-//    if (seq_count > 0) {
-//        length += 8;                      // reference_ID
-//        length += (16 + 32) * seq_count;  // seq_ID + seq_blocks
-//    }
-//    length += 4;  // dataset_type
-//    if (MIT_flag == 1) {
-//        length += 4;                // num_classes
-//        length += 4 * num_classes;  // clid
-//        if (!block_header_flag) {
-//            length += 5 * num_classes;                           // num_descriptors
-//            length += 7 * num_classes * num_descriptors.size();  // descriptor_ID
-//        }
-//    }
-//    length += 8 + 32;  // alphabet_ID + num_U_access_units
-//    if (num_U_access_units > 0) {
-//        length += 32 + 31;  // num_U_clusters + multiple_signature_base
-//        if (multiple_signature_base > 0) {
-//            length += 6;  // U_signature_size
-//        }
-//        length += 1;  // U_signature_constant_length
-//        if (U_signature_constant_length) {
-//            length += 8;  // U_signature_length
-//        }
-//    }
-//    if (seq_count > 0) {
-//        length += 1 + 31;  // tflag[0] + thres[0]
-//        for (int i = 1; i < seq_count; i++) {
-//            length += 1;  // tflag[i]
-//            if (tflag[i] == 1) {
-//                length += 31;  // thres[i]
-//            }
-//        }
-//    }
-//
-//    while (length % 8)  // byte_aligned
-//    {
-//        length++;
-//    }
-//
-//    length /= 8;  // byte conversion
-//    return length;
+    bitlen += block_header.getBitLength();   //block_header_flag u(1)
+
+    // TODO (Raouf): Fix getBitLength()
+
+    if (block_header.getBlockHeaderFlag()) {
+        bitlen += block_header.getBitLength(); //MIT_flag u(1)
+        bitlen += block_header.getBitLength(); //CC_mode_flag u(1)
+    }
+    else {
+        bitlen += block_header.getBitLength(); //ordered_blocks_flag u(1)
+    }
+
+    bitlen += 16;   //seq_count u(16)
+    if (seq_info.getSeqCount() > 0) {
+        bitlen += 8; //reference_ID u(8)
+        bitlen += (16 + 32) * seq_info.getSeqCount() ; // seq_ID u(16), seq_blocks u(32)
+    }
+
+    bitlen += 4;  // dataset_type u(4)
+    if (block_header.getMITFlag() == true) {
+        bitlen += 4;  // num_classes u(4)
+        for (auto ci = 0; ci < block_header.getNumClasses(); ci++) {
+            bitlen += 4 ;   // clid[ci] u(4)
+            if (!block_header.getBlockHeaderFlag()) {
+                bitlen += 5 ;  // num_descriptors[ci] u(5)
+//                for (auto di = 0; di < block_header.getClassInfos()[ci].getDescriptorIds().size(); di++) {
+//                    bitlen += 7 ;
+//                }
+                bitlen += block_header.getClassInfos()[ci].getDescriptorIDs().size() * 7; // descriptors_ID[ci][di] u(7)
+            }
+        }
+    }
+
+    bitlen += 8 + 32;  // alphabet_ID u(8), num_U_access_units u(32)
+    if (num_U_access_units > 0) {//
+        u_access_unit_info->getBitLength();  //num_U_clusters u(32), multiple_signature_base u(31), U_signature_size u(6), U_signature_constant_length u(1), U_signature_length u(8)
+    }
+
+    if (seq_info.getSeqCount() > 0) {
+        bitlen += 1 + 31;  // tflag[0] f(1), thres[0] u(31)
+        for (int i = 1; i < seq_info.getSeqCount(); i++) {
+            bitlen += 1;  // tflag[i] u(1)
+            if (seq_info.getTFlags()[i] == true) {
+                bitlen += 31;  // thres[i] u(31)
+            }
+        }
+
+    bitlen += bitlen % 8;  // byte_aligned() f(1)
+
+    length /= 8;  // byte conversion
+    return length;
 }
 
 uint16_t DatasetHeader::getID() const {return dataset_ID;}
