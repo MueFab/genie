@@ -80,7 +80,7 @@ uint64_t DatasetHeader::getLength() const {
 //                for (auto di = 0; di < block_header.getClassInfos()[ci].getDescriptorIds().size(); di++) {
 //                    bitlen += 7 ;
 //                }
-                bitlen += block_header.getClassInfos()[ci].getDescriptorIDs().size() * 7; // descriptors_ID[ci][di] u(7)
+                bitlen += block_header.getClassInfos()[ci].getDescriptorIDs() * 7; // descriptors_ID[ci][di] u(7)
             }
         }
     }
@@ -101,8 +101,8 @@ uint64_t DatasetHeader::getLength() const {
 
     bitlen += bitlen % 8;  // byte_aligned() f(1)
 
-    length /= 8;  // byte conversion
-    return length;
+    bitlen /= 8;  // byte conversion
+    return bitlen;
 }
 
 uint16_t DatasetHeader::getID() const {return dataset_ID;}
