@@ -89,7 +89,7 @@ void write(genie::util::BitWriter& bit_writer) const {
     // Key of KLV format
     bit_writer.write("");
 
-    // Length of KVL format
+    // Length of KLV format
     bit_writer.write(getLength(), 64);
 
     // length

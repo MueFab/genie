@@ -13,7 +13,6 @@ ReferenceMetadata::ReferenceMetadata()
     : dataset_group_ID(0),
       reference_ID(0),
       reference_metadata_value(){
-    // TODO (Yeremia): default value for reference_metadata_value
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -68,10 +67,10 @@ void ReferenceMetadata::writeToFile(genie::util::BitWriter& bit_writer) const {
 
     // KLV (Key Length Value) format
 
-    // Key of KVL format
+    // Key of KLV format
     bit_writer.write("rfmd");
 
-    // Length of KVL format
+    // Length of KLV format
     bit_writer.write(getLength(), 64);
 
     // dataset_group_ID u(8)
