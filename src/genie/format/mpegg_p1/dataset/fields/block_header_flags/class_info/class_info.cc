@@ -21,6 +21,8 @@ void ClassInfo::setDescriptorIDs(std::vector<uint8_t>&& _desc_IDs) {
     descriptor_IDs = _desc_IDs;
 }
 
+
+
 void ClassInfo::write(util::BitWriter& bit_writer, bool block_header_flag) const {
 
     // clid[ci] u(4)

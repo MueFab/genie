@@ -18,10 +18,12 @@ namespace mpegg_p1 {
 
 
 class ReferenceMetadataValue{
-    //A.7 part 3 s100
+    /** ------------------------------------------------------------------------------------------------------------
+    *  ISO/IEC 23092-3 Section 6.5.1.4 table 13
+    *  ------------------------------------------------------------------------------------------------------------ */
    private:
 
-    long length;
+    uint32_t length;
     AlternativeLocusType alternative_locus_location;
 //TODO: create class AlternativeLocusType()
     //std::string chromosome_name;
@@ -50,9 +52,10 @@ class ReferenceMetadataValue{
                            std::string _description, std::string _species, anyURI _URI);
 
     /**
-    *
-    * BitReader
-    */
+     *
+     * @param reader
+     * @param length
+     */
     ReferenceMetadataValue(util::BitReader& reader, size_t length);
 
     /**

@@ -78,6 +78,8 @@ void SequenceConfig::addEntries(std::vector<uint16_t>& _seq_IDs, std::vector<uin
 
 uint16_t SequenceConfig::getSeqCount() const { return seq_IDs.size(); }
 
+
+
 bool SequenceConfig::anySeq() const { return !seq_IDs.empty(); }
 
 void SequenceConfig::write(util::BitWriter& bit_writer) const {
