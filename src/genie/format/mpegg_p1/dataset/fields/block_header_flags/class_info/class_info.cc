@@ -21,7 +21,7 @@ void ClassInfo::setDescriptorIDs(std::vector<uint8_t>&& _desc_IDs) {
     descriptor_IDs = _desc_IDs;
 }
 
-
+const std::vector<uint8_t>& ClassInfo::getDescriptorIDs() const { return descriptor_IDs.size(); }
 
 void ClassInfo::write(util::BitWriter& bit_writer, bool block_header_flag) const {
 

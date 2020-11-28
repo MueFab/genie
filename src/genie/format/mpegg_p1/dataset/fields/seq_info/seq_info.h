@@ -36,7 +36,7 @@ class SequenceConfig {
 
     uint16_t getSeqCount() const;
 
-    const std::vector<bool>& getTFlags() const ;
+    const std::vector<bool>& getTFlags() const;
 
     void write(genie::util::BitWriter& bit_writer) const;
 
