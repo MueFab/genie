@@ -78,7 +78,7 @@ void SequenceConfig::addEntries(std::vector<uint16_t>& _seq_IDs, std::vector<uin
 
 uint16_t SequenceConfig::getSeqCount() const { return seq_IDs.size(); }
 
-
+const std::vector<bool>& SequenceConfig::getTFlags() const { return tflag; }
 
 bool SequenceConfig::anySeq() const { return !seq_IDs.empty(); }
 
