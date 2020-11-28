@@ -16,7 +16,7 @@ class ReferenceMetadata {
    private:
     uint8_t dataset_group_ID;
     uint8_t reference_ID;
-    std::vector<ReferenceMetadataValue> reference_metadata_value; // TODO : reference-metadata-value als class;muss erstellt werden
+    std::vector<ReferenceMetadataValue> reference_metadata_value;
 
    public:
     ReferenceMetadata();
