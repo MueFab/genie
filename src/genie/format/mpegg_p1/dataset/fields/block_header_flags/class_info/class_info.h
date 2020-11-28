@@ -23,6 +23,7 @@ class ClassInfo{
     void addDescriptorIDs(std::vector<uint8_t>& _desc_IDs);
     void setDescriptorIDs(std::vector<uint8_t>&& _desc_IDs);
 
+
     void write(genie::util::BitWriter& bit_writer, bool block_header_flag) const;
 };
 

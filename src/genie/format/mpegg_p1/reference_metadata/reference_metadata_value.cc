@@ -1,5 +1,5 @@
-#include "genie/util/exception.h"
-#include "genie/util/runtime-exception.h"
+#include <genie/util/exception.h>
+#include <genie/util/runtime-exception.h>
 
 #include "reference_metadata_value.h"
 
@@ -43,9 +43,10 @@ ReferenceMetadataValue(util::BitReader& reader, size_t length)
       description(),
       species(),
       URI() {
+
     size_t start_pos = reader.getPos();
 
-    length = reader.read<long>();
+    length = reader.read<uint32_t>();
     alternative_locus_location = reader.read<AlternativeLocusType>();
     alternative_sequence_name = reader.read<std::string>();
     genome_assembly_identifier = reader.read<std::string>();
@@ -63,8 +64,8 @@ uint64_t getLength() const {
     //Key c(4) length u(64)
     uint64_t len = (4* sizeof(char) + 8) * 8;   //gen_info
 
-    //length
-    len += sizeof(length);
+    //length u(32)
+    len += 32;
     //alternative_locus_location
     //alternative_sequence_name
     //genome_assembly_identifier
@@ -85,8 +86,8 @@ void write(genie::util::BitWriter& bit_writer) const {
 
     // KLV (Key Length Value) format
 
-    // Key of KVL format
-    bit_writer.write("xml");
+    // Key of KLV format
+    bit_writer.write("");
 
     // Length of KVL format
     bit_writer.write(getLength(), 64);
@@ -95,22 +96,22 @@ void write(genie::util::BitWriter& bit_writer) const {
     bit_writer.write(length, 8);
 
     // alternative_locus_location
-    bit_writer.write(alternative_locus_location, );
+    alternative_locus_location.write(bit_writer);
 
     //alternative_sequence_name
-    bit_writer.write(alternative_sequence_name, );
+    bit_writer.write(alternative_sequence_name);
 
     //genome_assembly_identifier
-    bitwriter.write(genome_assembly_name, );
+    bitwriter.write(genome_assembly_name);
 
     //description
-    bitwriter.write(description, );
+    bitwriter.write(description);
 
     //species
-    bit_writer.write(species, );
+    bit_writer.write(species);
 
     //URI
-    bit_writer.write(URI, );
+    URI.write(bit_writer);
 
     //TODO : not implemented yet
 

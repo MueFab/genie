@@ -17,6 +17,7 @@ class SequenceConfig {
     std::vector<uint16_t> seq_blocks;
 
     // Additional Info tflag, thres
+    std::vector<bool> tflag;
     std::vector<uint32_t> thress;
 
    public:
@@ -35,6 +36,7 @@ class SequenceConfig {
 
     uint16_t getSeqCount() const;
 
+    const std::vector<bool>& getTFlags() const ;
 
     void write(genie::util::BitWriter& bit_writer) const;
 
