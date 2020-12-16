@@ -42,9 +42,8 @@ MismatchDecoder::MismatchDecoder(util::DataBlock &&d, const EncodingConfiguratio
             if (numTrnsfSubseqs > 1) return; // Note: Mismatch decoder is only allowed with 1 transformed subseq.
 
             // Loop through the transformed sequences
-            std::vector<util::DataBlock> transformedSubseqs(numTrnsfSubseqs);
+            trnsfSubseqData.resize(numTrnsfSubseqs);
             for (size_t i = 0; i < numTrnsfSubseqs; i++) {
-                util::DataBlock currTrnsfSubseqData;
                 uint64_t currNumtrnsfSymbols = 0;
                 uint64_t trnsfSubseqPayloadSizeRemain = 0;
 
@@ -68,10 +67,10 @@ MismatchDecoder::MismatchDecoder(util::DataBlock &&d, const EncodingConfiguratio
                     if (currNumtrnsfSymbols > 0) {
                         subseqPayloadSizeUsed += gabac::StreamHandler::readBytes(inputStream,
                                                                                  trnsfSubseqPayloadSizeRemain,
-                                                                                 &currTrnsfSubseqData);
+                                                                                 &trnsfSubseqData[i]);
                     }
 
-                    trnsfSymbolsDecoder.emplace_back(&currTrnsfSubseqData,
+                    trnsfSymbolsDecoder.emplace_back(&trnsfSubseqData[i],
                                                     subseqCfg.getTransformSubseqCfg(i),
                                                     currNumtrnsfSymbols);
                 }
@@ -98,6 +97,12 @@ uint64_t MismatchDecoder::decodeMismatch(uint64_t ref) {
 
 bool MismatchDecoder::dataLeft() const {
     return numSubseqSymbolsDecoded < numSubseqSymbolsTotal;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t MismatchDecoder::getSubseqSymbolsTotal() const {
+    return numSubseqSymbolsTotal;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
