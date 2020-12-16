@@ -67,11 +67,6 @@ void code(const std::string &inputFilePath,
         (genie::core::GenSubIndex)std::pair<genie::core::GenDesc, uint8_t>((genie::core::GenDesc)descID, subseqID);
 
     genie::entropy::gabac::run(ioconf, genie::entropy::gabac::getEncoderConfigManual(genieSubseqID), decode);
-
-    /* GABACIFY_LOG_INFO << "Wrote buffer of size "
-                      << outStream.bytesWritten()
-                      << " to: "
-                      << outputFilePath;*/
 }
 
 //------------------------------------------------------------------------------
