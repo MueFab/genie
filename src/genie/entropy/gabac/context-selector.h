@@ -62,7 +62,7 @@ class ContextSelector {
                                        const std::vector<Subsymbol>& subsymbols, const uint8_t codingOrder);
 
    private:
-    const paramcabac::StateVars& stateVars;  //!<
+    const paramcabac::StateVars stateVars;  //!<
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
