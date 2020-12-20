@@ -66,15 +66,13 @@ Reference::Reference(util::BitReader& reader, size_t length)
     bool external_ref_flag = reader.read(1);
 
     if (external_ref_flag){
-        reference_location = External(reader);
+        reference_location = External(reader);  //TODO(Raouf): check External(reader)
     } else {
         reference_location = Internal(reader);
     }
     
     UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid DatasetGroup length!");
 
-    // TODO: Implement this
-    UTILS_DIE("Not Implemented yet!");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -108,46 +106,56 @@ uint16_t Reference::getSeqCount() const { return sequence_names.size(); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t Reference::getLength() const {
-    // key (4), Length (8)
-    uint64_t len = 12;
 
-    // TODO (Yeremia): len of Value[]?
+// length is first calculated in bits then converted in bytes
+
+    // key c(4), Length u(64)
+    uint64_t len = (4 * sizeof(char) + 8) * 8;  //gen_info
 
     // dataset_group_ID u(8)
-    len += 1;
+    len += 8;
 
     // reference_ID u(8)
-    len += 1;
+    len += 8;
 
     // reference_name st(v)
-    // bit len of string - page 11
-    len += (reference_name.size() + 1) * 1;
+    len += (reference_name.size() + 1) * 8; // // bit_len of string (stringLength + 1)*8 - Section 6.2.3
 
     // reference_major_version u(16)
-    len += 2;
+    len += 16;
 
     // reference_minor_version u(16)
-    len += 2;
+    len += 16;
 
     // reference_patch_version u(16)
-    len += 2;
+    len += 16;
 
-    // write seq_count u(16)
-    len += 2;
+    // seq_count u(16)
+    len += 16;
 
-    // write sequence_name[]
+    // sequence_name[] st(v)
     for (auto& sequence_name: sequence_names){
-        // bit len of string - page 11
-        len += (sequence_name.size() + 1) * 1;
+        // bit_len of string in Section 6.2.3
+        len += (sequence_name.size() + 1) * 8;
     }
 
-    // reserved 7 bits u(7) and external_ref_flag u(1)
+    // reserved u(7)
+    len += 7;
+
+    // external_ref_flag u(1)
     len += 1;
 
-    // if (external_ref_flag)
-    len += reference_location.getLength();
+    if ( reference_location.getExternalRefFlag() == ReferenceLocation::Flag::External) {
+        len += external.getBitLength();
+    }
 
-    return len;
+    else {
+        len += internal.getBitLength();
+    }
+
+    len += len % 8;
+
+    return len /= 8;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
