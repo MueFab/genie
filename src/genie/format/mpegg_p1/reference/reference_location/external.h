@@ -23,11 +23,18 @@ class External : public ReferenceLocation {
 
     ExternalReference external_reference;
 
+
    public:
 
     External(std::string&& _ref_uri, ExternalReference&& _ext_ref);
 
     explicit External(util::BitReader& reader, uint16_t seq_count);
+
+    std::string getRefUri() const;
+
+    const Checksum::Algo getChecksumAlg() const;
+
+    uint64_t getBitLength() const;
 
     void write(genie::util::BitWriter& writer) override;
 };

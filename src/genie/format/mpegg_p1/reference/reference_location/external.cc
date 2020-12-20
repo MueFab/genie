@@ -43,6 +43,49 @@ External::External(util::BitReader& reader, uint16_t seq_count)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+std::string External::getRefUri() const { return ref_uri;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const Checksum::Algo External::getChecksumAlg() const { return checksum_alg; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t External::getBitLength() const {
+
+    uint64_t bitlen = (getRefUri().size() + 1)* 8;  //ref_uri st(v)
+
+    //checksum_alg u(8)
+    bitlen += 8;
+    //reference_type u(8)
+    bitlen += 8;
+
+    if (external_reference.getReferenceType() == ExternalReference::Type::MPEGG_REF) {
+        bitlen += 8;        // external_dataset_group_ID
+        bitlen += 16;       // external_dataset_ID
+        if (getChecksumAlg() == Checksum::Algo::MD5) {
+            bitlen += 128;      // ref_checksum i(checksum_size)
+        }
+        else if (getChecksumAlg() == Checksum::Algo::SHA256) {
+            bitlen += 256;  // ref_checksum i(checksum_size)
+        }
+    }
+    else {
+        for (auto seqID=0; seqID < reference.getSeqCount(); seqID++ {
+            if (getChecksumAlg() == Checksum::Algo::MD5) {
+                bitlen += 128;      // ref_checksum i(checksum_size)
+            }
+            else if (getChecksumAlg() == Checksum::Algo::SHA256) {
+                bitlen += 256;  // ref_checksum i(checksum_size)
+            }
+        }
+    }
+
+    return bitlen;
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void External::write(util::BitWriter& writer) {
     // ref_uri st(v)
     writer.write(ref_uri);
