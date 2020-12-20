@@ -26,6 +26,9 @@ LabelList::LabelList(uint8_t _ds_group_ID, std::vector<Label> &&_labels)
 void LabelList::setLabels(std::vector<Label>&& _labels) {
     labels = _labels;
 }
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::vector<Label>& LabelList::getLabels() const { return labels; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -41,28 +44,23 @@ uint16_t LabelList::getNumLabels() const { return (uint16_t) labels.size(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<Label>& LabelList::getLabels() const { return labels; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 uint64_t LabelList::getLength() const {
-    // key (4), Length (8)
-    uint64_t len = 12;
 
-    // TODO (Yeremia): len of Value[]?
+    // key c(4), Length u(64)
+    uint64_t len = (4 * sizeof(char) + 8) * 8;  //gen_info
 
     // dataset_group_ID u(8)
-    len += 1;
+    len += 8;
 
     // num_labels u(16)
-    len += 2;
+    len += 16;
 
     // for Label
     for (auto& label: labels){
-        len += label.getLength();
+        len += label.getBitLength();   //gen_info
     }
 
-    return len;
+    return len / 8;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

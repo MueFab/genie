@@ -49,16 +49,17 @@ class LabelList{
      */
     void setLabels(std::vector<Label>&& _labels);
 
-    /*
-     * Implements num_labels
-     */
-    uint16_t getNumLabels() const;
+    /**
+    *
+    * @return
+    */
+    const std::vector<Label>& getLabels() const;
 
     /**
      *
      * @return
      */
-    const std::vector<Label>& getLabels() const;
+    uint16_t getNumLabels() const;
 
     /**
      *
