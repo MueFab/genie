@@ -40,23 +40,25 @@ uint16_t Label::getNumDatasets() const { return (uint16_t) dataset_infos.size();
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t Label::getLength() const {
-    // key (4), Length (8)
-    uint64_t len = 12;
 
-    // TODO (Yeremia): length of Value[]?
+    // key c(4), Length u(64)
+    uint64_t bitlen = (4 * sizeof(char) + 8) * 8;   //gen_info
 
     // label_ID st(v)
-    len += (label_ID.size() + 1);
+    bitlen += (label_ID.size() + 1) * 8;
 
     // num_datasets u(16)
-    len += 2;
+    bitlen += 16;
 
     // for num_datasets
     for (auto& ds_info: dataset_infos){
-        len += ds_info.getLength();
+        bitlen += ds_info.getBitLength();
     }
 
-    return len;
+    // aligned to byte
+    bitlen += bitlen % 8;
+
+    return bitlen;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

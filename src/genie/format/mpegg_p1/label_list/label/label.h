@@ -30,33 +30,46 @@ class Label{
     Label();
     explicit Label(std::string& _label_ID);
 
-    /*
+    /**
      *
+     * @param _ds_info
      */
     void addDatasetInfo(DatasetInfo&& _ds_info);
 
-    /*
+    /**
      *
+     * @param _ds_infos
      */
     void addDatasetInfos(std::vector<DatasetInfo>& _ds_infos);
 
-    /*
+    /**
      *
+     * @param _ds_infos
      */
     void setDatasetInfos(std::vector<DatasetInfo>&& _ds_infos);
 
-    /*
+    /**
      *
+     * @return
      */
     const std::string& getLabelID() const;
 
-    /*
-     * Implements num_datasets
+    /**
+     *
+     * @return
      */
     uint16_t getNumDatasets() const;
 
-    uint64_t getLength() const;
+    /**
+     *
+     * @return
+     */
+    uint64_t getBitLength() const;
 
+    /**
+     *
+     * @param bit_writer
+     */
     void write(genie::util::BitWriter& bit_writer) const;
 };
 
