@@ -20,15 +20,15 @@ Internal::Internal(util::BitReader& reader)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t Internal::getLength() const {
+uint64_t Internal::getBitLength() const {
 
     // internal_dataset_group_ID u(8)
-    uint64_t bitlength = 8;
+    uint64_t bitlen = 8;
 
     // internal_dataset_ID u(16)
-    bitlength += 16;
+    bitlen += 16;
 
-    return bitlength;
+    return bitlen;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
