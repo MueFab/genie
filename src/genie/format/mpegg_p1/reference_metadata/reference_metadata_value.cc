@@ -17,7 +17,6 @@ ReferenceMetadataValue::ReferenceMetadataValue()
       description(),
       species(),
       URI()
-// TODO: check default value
 {}
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,12 +24,12 @@ ReferenceMetadataValue::ReferenceMetadataValue(long _length, AlternativeLocusTyp
                                                std::string _alternative_sequence_name, std::string _genome_assembly_identifier,
                                                std::string _description, std::string _species, anyURI _URI)
     : length(_length),
-      alternative_locus_location(_alternative_locus_location),
-      alternative_sequence_name(_alternative_sequence_name),
-      genome_assembly_identifier(_genome_assembly_identifier),
-      description(_description),
-      species(_species),
-      URI(_URI)
+      alternative_locus_location(std::move(_alternative_locus_location)),
+      alternative_sequence_name(std::move(_alternative_sequence_name)),
+      genome_assembly_identifier(std::move(_genome_assembly_identifier)),
+      description(std::move(_description)),
+      species(std::move(_species)),
+      URI(std::move(_URI))
 
 {}
 // ---------------------------------------------------------------------------------------------------------------------
@@ -60,30 +59,22 @@ ReferenceMetadataValue(util::BitReader& reader, size_t length)
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t getLength() const {
-
+/*
     //Key c(4) length u(64)
     uint64_t len = (4* sizeof(char) + 8) * 8;   //gen_info
 
     //length u(32)
     len += 32;
-    //alternative_locus_location
-    //alternative_sequence_name
-    //genome_assembly_identifier
-    //description
-    //species
-    //URI
 
 //TODO : length of Value[]
-    //length, long integer
-    len /= 8;
 
     return len;
-
+*/
 }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void write(genie::util::BitWriter& bit_writer) const {
-
+    /*
     // KLV (Key Length Value) format
 
     // Key of KLV format
@@ -111,10 +102,8 @@ void write(genie::util::BitWriter& bit_writer) const {
     bit_writer.write(species);
 
     //URI
-    URI.write(bit_writer);
-
-    //TODO : not implemented yet
-
+    bit_writer.write(URI);
+*/
 }
 
 

@@ -25,31 +25,33 @@ class ReferenceMetadataValue{
 
     uint32_t length;
     AlternativeLocusType alternative_locus_location;
-//TODO: create class AlternativeLocusType()
-    //std::string chromosome_name;
-    //position;
-    //long start;
-    //long end;
+
     std::string alternative_sequence_name;
     std::string genome_assembly_identifier;
     std::string description;
     std::string species;
-    anyURI URI;
+    std::string URI;
+
 
    public:
     /**
-    *
-    * default constructor
-    */
+     *
+     */
     ReferenceMetadataValue();
 
     /**
-    *
-    * parameter
-    */
-    ReferenceMetadataValue(long _length, AlternativeLocusType _alternative_locus_location,
+     *
+     * @param _length
+     * @param _alternative_locus_location
+     * @param _alternative_sequence_name
+     * @param _genome_assembly_identifier
+     * @param _description
+     * @param _species
+     * @param _URI
+     */
+    ReferenceMetadataValue(uint32_t _length, AlternativeLocusType _alternative_locus_location,
                            std::string _alternative_sequence_name, std::string _genome_assembly_identifier,
-                           std::string _description, std::string _species, anyURI _URI);
+                           std::string _description, std::string _species, std::string _URI);
 
     /**
      *
