@@ -25,8 +25,9 @@ class DatasetRegion{
     void addClassIDs(std::vector<uint8_t>& _class_IDs);
     void setClassIDs(std::vector<uint8_t>&& _class_IDs);
 
-    /*
+    /**
      *
+     * @return
      */
     uint16_t getSeqID() const;
 
@@ -35,18 +36,21 @@ class DatasetRegion{
      */
     uint8_t getNumClasses() const;
 
-    /*
+    /**
      *
+     * @return
      */
     const std::vector<uint8_t>& getClassIDs() const;
 
-    /*
+    /**
      *
+     * @return
      */
     uint64_t getStartPos() const;
 
-    /*
+    /**
      *
+     * @return
      */
     uint64_t getEndPos() const;
 
@@ -54,7 +58,7 @@ class DatasetRegion{
      *
      * @return
      */
-    u_int64_t getLength() const;
+    u_int64_t getBitLength() const;
 
     /**
      *
