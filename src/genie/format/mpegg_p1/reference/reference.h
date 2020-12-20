@@ -47,6 +47,8 @@ class Reference{
     // Contains external_ref_flag and corresponding data
     ReferenceLocation reference_location;
 
+    External external;
+    Internal internal;
    public:
 
     /**
