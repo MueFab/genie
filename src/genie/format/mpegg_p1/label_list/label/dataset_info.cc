@@ -26,18 +26,20 @@ uint8_t DatasetInfo::getNumRegions() const { return (uint8_t) dataset_regions.si
 
 const std::vector<DatasetRegion>& DatasetInfo::getDatasetRegions() const { return dataset_regions; }
 
-uint64_t DatasetInfo::getLength() const {
+uint64_t DatasetInfo::getBitLength() const {
 
     // dataset_IDs u(16)
-    uint64_t len = 2;
+    uint64_t bitlen = 16;
 
     // num_regions u(8)
-    len += 1;
+    bitlen += 8;
 
     // for dataset_regions
     for (auto& ds_reg: dataset_regions){
-        len += ds_reg.getLength();
+        bitlen += ds_reg.getBitLength();
     }
+
+    return bitlen;
 }
 
 void DatasetInfo::writeToFile(util::BitWriter& bit_writer) const {
