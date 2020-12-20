@@ -4,9 +4,9 @@
 #include <cstdint>
 #include <vector>
 
-#include "genie/util/bitwriter.h"
+#include <genie/util/bitwriter.h>
 #include <genie/util/bitreader.h>
-#include <genie/format/mpegg_p1/reference_metadata/reference_metadata_value.h>
+#include "reference_metadata_value.h"
 
 namespace genie {
 namespace format {
