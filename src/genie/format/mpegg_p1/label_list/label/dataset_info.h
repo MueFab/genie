@@ -23,38 +23,52 @@ class DatasetInfo{
 
     explicit DatasetInfo(uint16_t _ds_ID);
 
-    /*
+    /**
      *
+     * @param _ds_region
      */
     void addDatasetRegion(DatasetRegion&& _ds_region);
 
-    /*
+    /**
      *
+     * @param _ds_regions
      */
     void addDatasetRegions(std::vector<DatasetRegion>& _ds_regions);
 
-    /*
+    /**
      *
+     * @param _ds_regions
      */
     void setDatasetRegions(std::vector<DatasetRegion>&& _ds_regions);
 
-    /*
+    /**
      *
+     * @return
      */
     uint16_t getDatasetID() const;
 
-    /*
+    /**
      *
+     * @return
      */
     uint8_t getNumRegions() const;
 
-    /*
+    /**
      *
+     * @return
      */
     const std::vector<DatasetRegion>& getDatasetRegions() const;
 
-    uint64_t getLength() const;
+    /**
+     *
+     * @return
+     */
+    uint64_t getBitLength() const;
 
+    /**
+     *
+     * @param bit_writer
+     */
     void writeToFile(genie::util::BitWriter& bit_writer) const;
 };
 
