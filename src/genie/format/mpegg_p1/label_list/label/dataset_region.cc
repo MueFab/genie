@@ -53,25 +53,23 @@ uint64_t DatasetRegion::getEndPos() const { return end_pos; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 u_int64_t DatasetRegion::getLength() const {
+
     // seq_ID u(16)
-    uint64_t len_in_bits = 16;
+    uint64_t bitlen = 16;
 
     // num_classes u(4)
-    len_in_bits += 4;
+    bitlen += 4;
 
     // for class_IDs[] u(4)
-    len_in_bits += 4 * class_IDs.size();
+    bitlen += 4 * getNumClasses();
 
     // start_pos u(40)
-    len_in_bits += 40;
+    bitlen += 40;
 
     // end_pos u(40)
-    len_in_bits += 40;
+    bitlen += 40;
 
-    // align to byte
-    len_in_bits += len_in_bits % 8;
-
-    return len_in_bits / 8;
+    return bitlen;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
