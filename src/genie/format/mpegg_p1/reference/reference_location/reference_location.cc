@@ -12,7 +12,9 @@ ReferenceLocation::ReferenceLocation(ReferenceLocation::Flag _flag)
 
 bool ReferenceLocation::isExternal() const { return external_ref_flag == Flag::EXTERNAL; }
 
-uint64_t ReferenceLocation::getLength() const { return 0; }
+uint64_t ReferenceLocation::getBitLength() const { return 1; }
+
+Flag ReferenceLocation::getExternalRefFlag() const { return external_ref_flag; }
 
 void ReferenceLocation::write(util::BitWriter& writer) const {}
 
