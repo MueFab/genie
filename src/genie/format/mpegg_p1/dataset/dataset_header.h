@@ -45,6 +45,7 @@ class DatasetHeader {
     ByteOffsetSizeFlag byte_offset_size_flag;
     bool non_overlapping_AU_range_flag;
     Pos40SizeFlag pos_40_bits_flag;
+    bool multiple_alignment_flag;       // TODO: check existence of variable
 
     /// block_header_flag, MIT_flag, CC_mode_flag, ordered_blocks_flag
     /// ClassInfo (num_classes, clid[], num_descriptors[], descriptor_ID[][])
@@ -62,23 +63,50 @@ class DatasetHeader {
     std::unique_ptr<UAccessUnitInfo> u_access_unit_info;
 
    public:
+    /**
+     *
+     */
     DatasetHeader();
+
+    /**
+     *
+     * @param datasetID
+     */
     explicit DatasetHeader(uint16_t datasetID);
 
+    /**
+     *
+     * @param group_ID
+     * @param ID
+     * @param _byte_offset_size_flag
+     * @param _non_overlapping_AU_range_flag
+     * @param _pos_40_bits_flag
+     * @param _dataset_type
+     * @param _alphabet_ID
+     * @param _num_U_access_units
+     */
     DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSizeFlag _byte_offset_size_flag,
                   bool _non_overlapping_AU_range_flag, Pos40SizeFlag _pos_40_bits_flag,
                   core::parameter::DataUnit::DatasetType _dataset_type, uint8_t _alphabet_ID,
                   uint32_t _num_U_access_units);
 
-    uint64_t getLength() const;
+    uint64_t getHeaderLength() const;
 
     uint16_t getID() const;
+
+    void setID(uint16_t ID);
 
     uint8_t getGroupID() const;
 
     void setDatasetGroupId(uint8_t group_ID);
 
-    void write(genie::util::BitWriter& bit_writer) const;
+    uint32_t getNumUAccessUnits() const;
+
+    bool getMultipleAlignmentFlag() const;
+
+
+
+    void writeHeader(genie::util::BitWriter& bit_writer) const;
 };
 
 }  // namespace mpegg_p1
