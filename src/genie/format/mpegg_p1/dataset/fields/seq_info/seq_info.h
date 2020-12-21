@@ -1,5 +1,5 @@
-#ifndef GENIE_PART1_DATASET_HEADER_SEQ_DATA_H
-#define GENIE_PART1_DATASET_HEADER_SEQ_DATA_H
+#ifndef GENIE_PART1_DATASET_HEADER_SEQ_INFO_H
+#define GENIE_PART1_DATASET_HEADER_SEQ_INFO_H
 
 #include <cstdint>
 #include <vector>
@@ -36,6 +36,8 @@ class SequenceConfig {
 
     uint16_t getSeqCount() const;
 
+    const std::vector<uint16_t>& getSeqBlocks() const;
+
     const std::vector<bool>& getTFlags() const;
 
     void write(genie::util::BitWriter& bit_writer) const;
@@ -48,4 +50,4 @@ class SequenceConfig {
 }  // namespace format
 }  // namespace genie
 
-#endif  // GENIE_PART1_DATASET_HEADER_SEQ_DATA_H
+#endif  // GENIE_PART1_DATASET_HEADER_SEQ_INFO_H
