@@ -4,6 +4,7 @@
 #include <vector>
 #include <cstdint>
 
+#include "genue/core/record/class-type.h"
 #include "genie/util/bitwriter.h"
 
 namespace genie {
@@ -12,7 +13,7 @@ namespace mpegg_p1 {
 
 class ClassInfo{
    private:
-    uint8_t clid;
+    core::record::ClassType clid;
     std::vector<uint8_t> descriptor_IDs;
 
    public:
@@ -22,6 +23,8 @@ class ClassInfo{
     void addDescriptorID(uint8_t _desc_ID);
     void addDescriptorIDs(std::vector<uint8_t>& _desc_IDs);
     void setDescriptorIDs(std::vector<uint8_t>&& _desc_IDs);
+
+    const core::record::ClassType getClid() const;
 
     const std::vector<uint8_t>& getDescriptorIDs() const;
 
