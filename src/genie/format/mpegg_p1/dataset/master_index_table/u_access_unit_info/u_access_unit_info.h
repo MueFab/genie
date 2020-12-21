@@ -11,11 +11,44 @@ namespace mpegg_p1 {
 
 class MITUAccessUnitInfo {
    private:
-
+    uint32_t num_U_clusters;
+    uint32_t multiple_signature_base;
+    uint8_t U_signature_size;
+    bool U_signature_constant_length;
+    uint8_t U_signature_length;
    public:
 
+    UAccessUnitInfo();
 
-    uint64_t getLength() const;
+    explicit UAccessUnitInfo(uint32_t _num_U_clusters);
+
+    void setMultipleSignature(uint32_t base, uint8_t size);
+    void setConstantSignature(uint8_t sign_length);
+
+    /**
+     *
+     * @return
+     */
+    uint8_t getMultipleSignatureBase() const;
+
+    /**
+     *
+     * @return
+     */
+    uint32_t getMultipleSignatureBase() const;
+
+    /**
+     * Get length in bit
+     *
+     * @return
+     */
+    uint64_t getBitLength() const;
+
+    /**
+     * Write to bit_writer
+     *
+     * @param bit_writer
+     */
     void write(genie::util::BitWriter& bit_writer) const;
 };
 
