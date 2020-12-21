@@ -29,11 +29,15 @@ class MITAccessUnitInfo {
      *  Internal
      *  ------------------------------------------------------------------------------------------------------------ */
     DatasetHeader::ByteOffsetSizeFlag byte_offset_size_flag;
-    DatasetHeader::ByteOffsetSizeFlag pos_40_size_flag;
+    DatasetHeader::Pos40SizeFlag pos_40_size_flag;
 
    public:
 
     MITAccessUnitInfo();
+
+    const DatasetHeader::ByteOffsetSizeFlag getByteOffsetSizeFlag() const;
+
+    const DatasetHeader::Pos40SizeFlag getPos40SizeFlag() const;
 
     void write(genie::util::BitWriter& bit_writer) const;
 };
