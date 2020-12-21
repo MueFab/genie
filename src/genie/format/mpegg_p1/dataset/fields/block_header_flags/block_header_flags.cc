@@ -19,6 +19,8 @@ bool BlockConfig::getMITFlag() const { return MIT_flag; }
 
 uint8_t BlockConfig::getNumClasses() const { return class_infos.size(); }
 
+const std::vector<ClassInfo>& getClassInfos() const { return class_infos; }
+
 void BlockConfig::addClassInfo(ClassInfo&& _cls_info) {
     UTILS_DIE_IF(!MIT_flag, "Adding class_info but MIT_flag is false");
 
