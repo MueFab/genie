@@ -48,21 +48,25 @@ FastaReference::FastaReference(std::vector<Checksum> &&_checksums)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FastaReference::addChecksum(Checksum &&_checksum) {
-    UTILS_DIE_IF(!checksums.empty() && checksums.front().getType() != _checksum.getType(),
-                 "Different checksum algorithm");
-    checksums.push_back(_checksum);
-}
+//void FastaReference::addChecksum(Checksum &&_checksum) {
+//    UTILS_DIE_IF(!checksums.empty() && checksums.front().getType() != _checksum.getType(),
+//                 "Different checksum algorithm");
+//    checksums.push_back(_checksum);
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FastaReference::addChecksums(std::vector<Checksum> &_checksums) {
-    for (auto& checksum : _checksums){
-        UTILS_DIE_IF(_checksums.front().getType() != checksum.getType(),
-                     "Different checksum algorithm");
-    }
-    checksums = std::move(_checksums);
-}
+//void FastaReference::addChecksums(std::vector<Checksum> &_checksums) {
+//    for (auto& checksum : _checksums){
+//        UTILS_DIE_IF(_checksums.front().getType() != checksum.getType(),
+//                     "Different checksum algorithm");
+//    }
+//    checksums = std::move(_checksums);
+//}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Checksum::Algo FastaReference::getChecksumAlg() const { return checksums.front().getType(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

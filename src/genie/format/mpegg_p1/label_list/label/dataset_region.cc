@@ -52,7 +52,7 @@ uint64_t DatasetRegion::getEndPos() const { return end_pos; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-u_int64_t DatasetRegion::getLength() const {
+u_int64_t DatasetRegion::getBitLength() const {
 
     // seq_ID u(16)
     uint64_t bitlen = 16;

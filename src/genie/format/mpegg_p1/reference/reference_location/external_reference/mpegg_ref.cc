@@ -49,14 +49,19 @@ uint16_t MpegReference::getDatasetID() const { return dataset_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MpegReference::addChecksum(Checksum&& _checksum) {
-    ref_checksum = _checksum;
-}
+//void MpegReference::addChecksum(Checksum&& _checksum) {
+//    ref_checksum = _checksum;
+//}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Checksum::Algo MpegReference::getChecksumAlg() const { return ref_checksum.getType(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t MpegReference::getLength() const {
-
+    uint64_t len = 1 + 2;
+    len += ref_checksum.getLength();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

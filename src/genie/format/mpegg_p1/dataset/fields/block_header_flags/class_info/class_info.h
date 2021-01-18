@@ -4,7 +4,7 @@
 #include <vector>
 #include <cstdint>
 
-#include "genue/core/record/class-type.h"
+#include "genie/core/record/class-type.h"
 #include "genie/util/bitwriter.h"
 
 namespace genie {
@@ -24,7 +24,7 @@ class ClassInfo{
     void addDescriptorIDs(std::vector<uint8_t>& _desc_IDs);
     void setDescriptorIDs(std::vector<uint8_t>&& _desc_IDs);
 
-    const core::record::ClassType getClid() const;
+    core::record::ClassType getClid() const;
 
     const std::vector<uint8_t>& getDescriptorIDs() const;
 

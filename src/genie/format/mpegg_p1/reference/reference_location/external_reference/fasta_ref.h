@@ -24,9 +24,11 @@ class FastaReference: public ExternalReference{
 
     explicit FastaReference(std::vector<Checksum>&& _checksums);
 
-    void addChecksum(Checksum &&_checksum);
+//    void addChecksum(Checksum &&_checksum);
+//
+//    void addChecksums(std::vector<Checksum>& _checksums);
 
-    void addChecksums(std::vector<Checksum>& _checksums);
+    Checksum::Algo getChecksumAlg() const override;
 
     void write(genie::util::BitWriter& bit_writer) override;
 };

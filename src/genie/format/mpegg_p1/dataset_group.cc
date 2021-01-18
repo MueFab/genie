@@ -299,7 +299,7 @@ uint64_t DatasetGroup::getLength() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroup::write(genie::util::BitWriter& writer) const {
+void DatasetGroup::write(util::BitWriter& writer) const {
     // KLV (Key Length Value) format
 
     // Key of KVL format

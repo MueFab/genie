@@ -48,17 +48,24 @@ class MpegReference: public ExternalReference {
      */
     uint16_t getDatasetID() const;
 
-    /**
-     *
-     * @param _checksum
-     */
-    void addChecksum(Checksum &&_checksum);
+    //TODO(Yeremia): Is it needed?
+//    /**
+//     *
+//     * @param _checksum
+//     */
+//    void addChecksum(Checksum &&_checksum);
 
     /**
      *
      * @return
      */
-    virtual uint64_t getLength() const;
+    Checksum::Algo getChecksumAlg() const override;
+
+    /**
+     *
+     * @return
+     */
+    uint64_t getLength() const;
 
     /**
      *

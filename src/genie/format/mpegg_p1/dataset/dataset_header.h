@@ -90,8 +90,6 @@ class DatasetHeader {
                   core::parameter::DataUnit::DatasetType _dataset_type, uint8_t _alphabet_ID,
                   uint32_t _num_U_access_units);
 
-    uint64_t getHeaderLength() const;
-
     uint16_t getID() const;
 
     void setID(uint16_t ID);
@@ -104,9 +102,9 @@ class DatasetHeader {
 
     bool getMultipleAlignmentFlag() const;
 
+    uint64_t getLength() const;
 
-
-    void writeHeader(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& bit_writer) const;
 };
 
 }  // namespace mpegg_p1

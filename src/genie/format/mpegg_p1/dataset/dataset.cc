@@ -99,7 +99,7 @@ const std::vector<DatasetParameterSet>& Dataset::getParameterSets() const { retu
 uint64_t Dataset::getLength() const {
     uint64_t len = 12;  // KVL
 
-    len += getHeaderLength();
+    len += header.getLength();
 
     // DT_metadata
     if (DT_metadata != nullptr){
@@ -111,10 +111,11 @@ uint64_t Dataset::getLength() const {
         DT_protection->getLength();
     }
 
+    // TODO: Master Index Table
     // write master_index_table depending on MIT_FLAG
-    if (block_config.getMITFlag()){
-        master_index_table->getLength();
-    }
+//    if (block_config.getMITFlag()){
+//        master_index_table->getLength();
+//    }
 
     for (auto const& it : dataset_parameter_sets) {
         // dataset_group_ID u(8) + dataset_ID u(16)
@@ -143,7 +144,7 @@ void Dataset::write(util::BitWriter& bit_writer) const {
     // Value of KVL format:
 
     // dataset_header
-    writeHeader(bit_writer);
+    header.write(bit_writer);
 
     // DT_metadata
     if (DT_metadata != nullptr){
@@ -155,10 +156,11 @@ void Dataset::write(util::BitWriter& bit_writer) const {
         DT_protection->write(bit_writer);
     }
 
-    // write master_index_table depending on MIT_FLAG
-    if (block_config.getMITFlag()){
-        master_index_table->write(bit_writer);
-    }
+    // TODO: Master Index Table
+//    // write master_index_table depending on MIT_FLAG
+//    if (block_config.getMITFlag()){
+//        master_index_table->write(bit_writer);
+//    }
 
     // dataset_parameter_set[]
     for (auto const& ps : dataset_parameter_sets) {

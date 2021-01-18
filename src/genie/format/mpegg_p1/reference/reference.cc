@@ -1,4 +1,5 @@
 #include <utility>
+#include <genie/util/make-unique.h>
 
 #include "reference.h"
 #include "reference_location/external.h"
@@ -16,7 +17,8 @@ Reference::Reference()
       reference_minor_version(0),
       reference_patch_version(0),
       sequence_names(),
-      reference_location() {}
+      reference_location()
+{}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,8 +32,9 @@ Reference::Reference(uint8_t _ds_group_ID, uint8_t _ref_ID, std::string _ref_nam
       reference_minor_version(_ref_minor_ver),
       reference_patch_version(_ref_patch_ver),
       sequence_names(std::move(_seq_names)),
+//      reference_location(util::make_unique<ReferenceLocation>(_ref_loc))
       reference_location(std::move(_ref_loc))
-    {}
+{}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -42,35 +45,47 @@ Reference::Reference(util::BitReader& reader, size_t length)
       reference_major_version(0),
       reference_minor_version(0),
       reference_patch_version(0),
-      sequence_names(0),
-      reference_location() {
+      sequence_names(0)
+//      reference_location()
+{
 
     size_t start_pos = reader.getPos();
 
+    // dataset_group_ID u(8)
     dataset_group_ID = reader.read<uint8_t>();
+    // reference_ID u(8)
     reference_ID = reader.read<uint8_t>();
+    // reference_name st(v)
     reference_name = reader.read<std::string>();
+    // reference_major_version u(16)
     reference_major_version = reader.read<uint16_t>();
+    // reference_minor_version u(16)
     reference_minor_version = reader.read<uint16_t>();
+    // reference_patch_version u(16)
     reference_patch_version = reader.read<uint16_t>();
 
+    // seq_count  u(16)
     auto seq_count = reader.read<uint16_t>();
 
     for (auto seqID = 0; seqID < seq_count; seqID++){
+        // sequence_name[seqID] st(v)
         sequence_names.emplace_back(reader.read<std::string>());
     }
 
-    // Reserved
-    reader.read(7);
+    // reserved u(7)
+    reader.read<uint8_t>(7);
 
-    bool external_ref_flag = reader.read(1);
+    // external_ref_flat u(1)
+    bool external_ref_flag = reader.read<bool>();
 
     if (external_ref_flag){
-        reference_location = External(reader);  //TODO(Raouf): check External(reader)
+        reference_location = External(reader, seq_count);
+//        reference_location = util::make_unique<External>(reader, seq_count);
     } else {
         reference_location = Internal(reader);
+//        reference_location = util::make_unique<Internal>(reader);
     }
-    
+
     UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid DatasetGroup length!");
 
 }
@@ -93,11 +108,11 @@ const std::vector<std::string>& Reference::getSequenceNames() const {return sequ
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Reference::addReferenceLocation(ReferenceLocation&& _ref_loc) {reference_location = std::move(_ref_loc);}
+//void Reference::addReferenceLocation(ReferenceLocation&& _ref_loc) {reference_location = std::move(_ref_loc);}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const ReferenceLocation &Reference::getReferenceLocation() const {return reference_location;}
+//const ReferenceLocation &Reference::getReferenceLocation() const {return reference_location;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -110,52 +125,42 @@ uint64_t Reference::getLength() const {
 // length is first calculated in bits then converted in bytes
 
     // key c(4), Length u(64)
-    uint64_t len = (4 * sizeof(char) + 8) * 8;  //gen_info
+    uint64_t len = (4 * sizeof(char) + 8);  //gen_info
 
     // dataset_group_ID u(8)
-    len += 8;
+    len += 1;
 
     // reference_ID u(8)
-    len += 8;
+    len += 1;
 
     // reference_name st(v)
-    len += (reference_name.size() + 1) * 8; // // bit_len of string (stringLength + 1)*8 - Section 6.2.3
+    len += (reference_name.size() + 1); // // bit_len of string (stringLength + 1)*8 - Section 6.2.3
 
     // reference_major_version u(16)
-    len += 16;
+    len += 2;
 
     // reference_minor_version u(16)
-    len += 16;
+    len += 2;
 
     // reference_patch_version u(16)
-    len += 16;
+    len += 2;
 
     // seq_count u(16)
-    len += 16;
+    len += 2;
 
     // sequence_name[] st(v)
     for (auto& sequence_name: sequence_names){
         // bit_len of string in Section 6.2.3
-        len += (sequence_name.size() + 1) * 8;
+        len += sequence_names.size() * (sequence_name.size() + 1);
     }
 
-    // reserved u(7)
-    len += 7;
-
-    // external_ref_flag u(1)
+    // reserved u(7), external_ref_flag u(1)
     len += 1;
 
-    if ( reference_location.getExternalRefFlag() == ReferenceLocation::Flag::External) {
-        len += external.getBitLength();
-    }
+    len += reference_location.getLength();
+//    len += reference_location->getLength();
 
-    else {
-        len += internal.getBitLength();
-    }
-
-    len += len % 8;
-
-    return len /= 8;
+    return len;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

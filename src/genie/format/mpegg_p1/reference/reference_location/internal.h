@@ -25,9 +25,9 @@ class Internal : public ReferenceLocation {
 
     explicit Internal(util::BitReader& reader);
 
-    uint64_t getBitLength() const override;
+    uint64_t getLength() const override;
 
-    void write(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& bit_writer) const override;
 };
 
 }  // namespace mpegg_p1

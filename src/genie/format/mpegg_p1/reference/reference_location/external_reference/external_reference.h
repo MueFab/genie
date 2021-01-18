@@ -30,7 +30,11 @@ class ExternalReference{
 
     ~ExternalReference() = default;
 
+    virtual Checksum::Algo getChecksumAlg() const;
+
     Type getReferenceType() const;
+
+    virtual uint64_t getlength();
 
     virtual void write(genie::util::BitWriter& writer);
 

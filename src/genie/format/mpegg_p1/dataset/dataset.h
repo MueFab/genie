@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_PART1_DATASET_H
-#define GENIE_PART1_DATASET_H
+#ifndef GENIE_FORMAT_MPEGG_P1_DATASET_DATASET
+#define GENIE_FORMAT_MPEGG_P1_DATASET_DATASET
 
 #include <memory>
 #include <vector>
@@ -66,6 +66,8 @@ class Dataset {
      *  ISO 23092-1 Section 6.5.2.2 table 18
      *  ------------------------------------------------------------------------------------------------------------ */
 
+    DatasetHeader header;
+
     // ISO 23092-1 Section 6.5.2.3 - specification 23092-3
     // optional
     std::unique_ptr<DTMetadata> DT_metadata;
@@ -80,7 +82,8 @@ class Dataset {
 
     // ISO 23092-1 Section 6.5.3.1 - specification 23092-1
     // optional
-    std::unique_ptr<MasterIndexTable> master_index_table;
+    // TODO: Master Index Table
+//    std::unique_ptr<MasterIndexTable> master_index_table;
 
     // ISO 23092-1 Section 6.5.3
     std::vector<AccessUnit> access_units;
@@ -130,4 +133,4 @@ class Dataset {
 }  // namespace format
 }  // namespace genie
 
-#endif  // GENIE_PART1_DATASET_H
+#endif  // GENIE_FORMAT_MPEGG_P1_DATASET_DATASET

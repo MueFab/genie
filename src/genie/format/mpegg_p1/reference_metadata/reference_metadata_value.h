@@ -24,7 +24,7 @@ class ReferenceMetadataValue{
    private:
 
     uint32_t length;
-    AlternativeLocusType alternative_locus_location;
+//    AlternativeLocusType alternative_locus_location;
 
     std::string alternative_sequence_name;
     std::string genome_assembly_identifier;

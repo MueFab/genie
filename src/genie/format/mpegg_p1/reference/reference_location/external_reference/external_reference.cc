@@ -27,9 +27,9 @@ ExternalReference::Type ExternalReference::getReferenceType() const { return ref
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ExternalReference::write(util::BitWriter& writer) const {
-    UTILS_DIE("Base class");
-}
+//void ExternalReference::write(util::BitWriter& writer) const {
+//    UTILS_DIE("Base class");
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

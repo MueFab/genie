@@ -14,9 +14,11 @@ Checksum::Checksum(Algo _algo): checksum_alg(_algo) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Checksum::Algo Checksum::getType() { return checksum_alg; }
+Checksum::Algo Checksum::getType() const { return checksum_alg; }
 
-void Checksum::write(util::BitWriter& bit_writer) const {}
+// ---------------------------------------------------------------------------------------------------------------------
+
+//void Checksum::write(util::BitWriter& bit_writer) const {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

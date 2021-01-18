@@ -3,8 +3,8 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-#ifndef GENIE_PART1_REFERENCE_H
-#define GENIE_PART1_REFERENCE_H
+#ifndef GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE
+#define GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE
 
 #include <string>
 #include <vector>
@@ -46,9 +46,8 @@ class Reference{
 
     // Contains external_ref_flag and corresponding data
     ReferenceLocation reference_location;
+//    std::unique_ptr<ReferenceLocation> reference_location;
 
-    External external;
-    Internal internal;
    public:
 
     /**
@@ -68,7 +67,8 @@ class Reference{
      * @param _ref_loc
      */
     Reference(uint8_t _ds_group_ID, uint8_t _ref_ID, std::string _ref_name, uint16_t _ref_major_ver,
-              uint16_t _ref_minor_ver, uint16_t _ref_patch_ver, std::vector<std::string>&& _seq_names, ReferenceLocation&& _ref_loc);
+              uint16_t _ref_minor_ver, uint16_t _ref_patch_ver, std::vector<std::string>&& _seq_names,
+              ReferenceLocation&& _ref_loc);
 
     /**
      *
@@ -105,13 +105,15 @@ class Reference{
      *
      * @param _ref_loc
      */
-    void addReferenceLocation(ReferenceLocation&& _ref_loc);
+     //TODO: FIX ME
+//    void addReferenceLocation(ReferenceLocation&& _ref_loc);
 
     /**
      *
      * @return
      */
-    const ReferenceLocation& getReferenceLocation() const;
+    //TODO: FIX ME
+//    const ReferenceLocation& getReferenceLocation() const;
 
     /**
      *
@@ -137,4 +139,4 @@ class Reference{
 }  // namespace format
 }  // namespace genie
 
-#endif  // GENIE_PART1_REFERENCE_H
+#endif  // GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE

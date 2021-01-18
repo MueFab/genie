@@ -41,6 +41,8 @@ class Md5: public Checksum {
      */
     explicit Md5(std::vector<uint64_t> &_data);
 
+    uint64_t getLength() const override;
+
     /**
      *
      * @param writer
