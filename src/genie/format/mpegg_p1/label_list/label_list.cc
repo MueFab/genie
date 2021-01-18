@@ -57,7 +57,7 @@ uint64_t LabelList::getLength() const {
 
     // for Label
     for (auto& label: labels){
-        len += label.getBitLength();   //gen_info
+        len += label.getLength();   //gen_info
     }
 
     return len / 8;

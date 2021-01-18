@@ -64,7 +64,7 @@ class Label{
      *
      * @return
      */
-    uint64_t getBitLength() const;
+    uint64_t getLength() const;
 
     /**
      *

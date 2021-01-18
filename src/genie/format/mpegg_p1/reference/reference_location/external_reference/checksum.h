@@ -28,9 +28,9 @@ class Checksum {
 
     Algo getType() const;
 
+    virtual uint64_t getLength() const;
+
     virtual void write(genie::util::BitWriter& bit_writer) const;
-
-
 };
 
 }  // namespace mpegg_p1

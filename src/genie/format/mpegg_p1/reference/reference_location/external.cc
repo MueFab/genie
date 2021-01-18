@@ -1,3 +1,5 @@
+#include <genie/util/make-unique.h>
+
 #include "external.h"
 #include "external_reference/checksum.h"
 #include "external_reference/external_reference.h"
@@ -11,34 +13,28 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-External::External(std::string&& _ref_uri, ExternalReference&& _ext_ref)
-    : ReferenceLocation(ReferenceLocation::Flag::EXTERNAL),
-      ref_uri(_ref_uri),
-      external_reference(_ext_ref){}
+//External::External(std::string&& _ref_uri, ExternalReference&& _ext_ref)
+//    : ReferenceLocation(ReferenceLocation::Flag::EXTERNAL),
+//      ref_uri(_ref_uri),
+//      external_reference(_ext_ref){}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 External::External(util::BitReader& reader, uint16_t seq_count)
     : ReferenceLocation(ReferenceLocation::Flag::EXTERNAL),
-      ref_uri(reader.read<std::string>()),
-      checksum_alg(reader.read<Checksum::Algo>()),
-      reference_type(reader.read<ExternalReference::Type>()),
-      external_reference(){
+      ref_uri(reader.read<std::string>()) {
 
-    switch (reference_type) {
-        case ExternalReference::Type::MPEGG_REF: {
-            external_reference = MpegReference(reader, checksum_alg);
-            break;
-        }
-        case ExternalReference::Type::RAW_REF:{
-            external_reference = RawReference(reader, checksum_alg, seq_count);
-            break;
-        }
-        case ExternalReference::Type::FASTA_REF: {
-            external_reference = FastaReference(reader, checksum_alg, seq_count);
-            break;
-        }
+    auto checksum_alg = reader.read<Checksum::Algo>();
+    auto reference_type = reader.read<ExternalReference::Type>();
+
+    if (reference_type == ExternalReference::Type::MPEGG_REF){
+        external_reference = util::make_unique<MpegReference>(reader, checksum_alg);
+    } else if (reference_type == ExternalReference::Type::RAW_REF){
+        external_reference = util::make_unique<RawReference>(reader, checksum_alg, seq_count);
+    } else if (reference_type == ExternalReference::Type::FASTA_REF){
+        external_reference = util::make_unique<FastaReference>(reader, checksum_alg, seq_count);
     }
+
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -47,71 +43,40 @@ std::string External::getRefUri() const { return ref_uri;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const Checksum::Algo External::getChecksumAlg() const { return checksum_alg; }
+Checksum::Algo External::getChecksumAlg() const { return external_reference->getChecksumAlg(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t External::getBitLength() const {
+uint64_t External::getLength() const {
 
-    uint64_t bitlen = (getRefUri().size() + 1)* 8;  //ref_uri st(v)
 
+//    UTILS_DIE("Not yet implemented");
+    //ref_uri st(v)
+    uint64_t len = (getRefUri().size() + 1);
     //checksum_alg u(8)
-    bitlen += 8;
+    len += 1;
     //reference_type u(8)
-    bitlen += 8;
+    len += 1;
 
-    if (external_reference.getReferenceType() == ExternalReference::Type::MPEGG_REF) {
-        bitlen += 8;        // external_dataset_group_ID
-        bitlen += 16;       // external_dataset_ID
-        if (getChecksumAlg() == Checksum::Algo::MD5) {
-            bitlen += 128;      // ref_checksum i(checksum_size)
-        }
-        else if (getChecksumAlg() == Checksum::Algo::SHA256) {
-            bitlen += 256;  // ref_checksum i(checksum_size)
-        }
-    }
-    else {
-        for (auto seqID=0; seqID < reference.getSeqCount(); seqID++ {
-            if (getChecksumAlg() == Checksum::Algo::MD5) {
-                bitlen += 128;      // ref_checksum i(checksum_size)
-            }
-            else if (getChecksumAlg() == Checksum::Algo::SHA256) {
-                bitlen += 256;  // ref_checksum i(checksum_size)
-            }
-        }
-    }
+    len += external_reference->getlength();
 
-    return bitlen;
-};
+    return len;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void External::write(util::BitWriter& writer) {
+void External::write(util::BitWriter& writer) const {
     // ref_uri st(v)
     writer.write(ref_uri);
 
     // checksum_alg u(8)
-    writer.write((uint8_t)checksum_alg, 8);
+    writer.write((uint8_t) getChecksumAlg(), 8);
 
     // reference_type u(8)
-    writer.write((uint8_t)reference_type, 8);
+    writer.write((uint8_t) external_reference->getReferenceType(), 8);
 
-    switch (external_reference.getReferenceType()) {
-        case ExternalReference::Type::MPEGG_REF: {
-            dynamic_cast<MpegReference*>(&external_reference)->write(writer);
-            break;
-        }
-        case ExternalReference::Type::RAW_REF: {
-            dynamic_cast<RawReference*>(&external_reference)->write(writer);
-            break;
-        }
-        case ExternalReference::Type::FASTA_REF: {
-            dynamic_cast<FastaReference*>(&external_reference)->write(writer);
-            break;
-        }
-    }
-//    // the rest
-//    external_reference.write(writer);
+    // external_datset_group_ID, external_dataset_ID, ref_checksum or checksum[seqID]
+    external_reference->write(writer);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -9,33 +9,31 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceMetadata::ReferenceMetadata()
-    : dataset_group_ID(0),
-      reference_ID(0),
-      reference_metadata_value(){
-}
+ReferenceMetadata::ReferenceMetadata() : dataset_group_ID(0), reference_ID(0){}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceMetadata::ReferenceMetadata(uint8_t _ds_group_ID, uint8_t _ref_ID, std::vector<uint8_t>&& _ref_metadata_value)
-    : dataset_group_ID(_ds_group_ID),
-      reference_ID(_ref_ID),
-      reference_metadata_value(std::move(_ref_metadata_value)){}
+ReferenceMetadata::ReferenceMetadata(uint8_t _ds_group_ID, uint8_t _ref_ID)
+    : dataset_group_ID(_ds_group_ID), reference_ID(_ref_ID){
 }
+//      reference_metadata_value(std::move(_ref_metadata_value)){}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 ReferenceMetadata::ReferenceMetadata(util::BitReader& reader, size_t length)
     : dataset_group_ID(0),
       reference_ID(0),
-      reference_metadata_value() {
+    {
+//      reference_metadata_value() reader{
+
     size_t start_pos = reader.getPos();
 
     dataset_group_ID = reader.read<uint8_t>();
     reference_ID = reader.read<uint8_t>();
 
-    for (auto val : reference_metadata_value) {
-        reference_metadata_value = reader.read<uint8_t>();
-    }
+//    for (auto val : reference_metadata_value) {
+//        reference_metadata_value = reader.read<uint8_t>();
+//    }
 
     UTILS_DIE_IF(reader.getPos() - start_pos != length, "Invalid DatasetGroup length!");
 }
@@ -56,14 +54,14 @@ uint64_t ReferenceMetadata::getLength() const {
     len += 1;
 
     // reference_metadata_value()
-    len += reference_metadata_value.size();
+//    len += reference_metadata_value.size();
 
     return len;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ReferenceMetadata::writeToFile(genie::util::BitWriter& bit_writer) const {
+void ReferenceMetadata::write(genie::util::BitWriter& bit_writer) const {
 
     // KLV (Key Length Value) format
 
@@ -79,9 +77,9 @@ void ReferenceMetadata::writeToFile(genie::util::BitWriter& bit_writer) const {
     // reference_ID u(8)
     bit_writer.write(reference_ID, 8);
 
-    for (auto val: reference_metadata_value){
-        bit_writer.write(val, 8);
-    }
+//    for (auto val: reference_metadata_value){
+//        bit_writer.write(val, 8);
+//    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

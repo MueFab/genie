@@ -4,33 +4,34 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-UAccessUnitInfo::UAccessUnitInfo()
+MITUAccessUnitInfo::MITUAccessUnitInfo()
     : num_U_clusters(0),
       multiple_signature_base(0),
       U_signature_size(0),
       U_signature_constant_length(false),
       U_signature_length(0){}
 
-UAccessUnitInfo::UAccessUnitInfo(uint32_t _num_U_clusters)
+MITUAccessUnitInfo::MITUAccessUnitInfo(uint32_t _num_U_clusters)
     : num_U_clusters(_num_U_clusters),
       multiple_signature_base(0),
       U_signature_size(0),
       U_signature_constant_length(false),
       U_signature_length(0){}
 
-void UAccessUnitInfo::setMultipleSignature(uint32_t base, uint8_t size) {
+void MITUAccessUnitInfo::setMultipleSignature(uint32_t base, uint8_t size) {
     multiple_signature_base = base;
     U_signature_size = size;
 }
-void UAccessUnitInfo::setConstantSignature(uint8_t sign_length) {
+void MITUAccessUnitInfo::setConstantSignature(uint8_t sign_length) {
     U_signature_constant_length = true;
     U_signature_length = sign_length;
 }
 
-uint8_t UAccessUnitInfo::getUSignatureSize() const { return U_signature_size;}
-uint32_t UAccessUnitInfo::getMultipleSignatureBase() const { return multiple_signature_base; }
+uint8_t MITUAccessUnitInfo::getUSignatureSize() const { return U_signature_size;}
 
-uint64_t UAccessUnitInfo::getBitLength() const {
+uint32_t MITUAccessUnitInfo::getMultipleSignatureBase() const { return multiple_signature_base; }
+
+uint64_t MITUAccessUnitInfo::getBitLength() const {
     uint64_t bitlen = 32 + 31;
     if (multiple_signature_base > 0) {
         // U_signature_size u(6)
@@ -46,7 +47,7 @@ uint64_t UAccessUnitInfo::getBitLength() const {
     }
 }
 
-void UAccessUnitInfo::write(util::BitWriter& bit_writer) const {
+void MITUAccessUnitInfo::write(util::BitWriter& bit_writer) const {
 
     // num_U_clusters u(32)
     bit_writer.write(num_U_clusters, 32);

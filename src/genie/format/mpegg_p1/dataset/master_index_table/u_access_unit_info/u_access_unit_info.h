@@ -16,20 +16,17 @@ class MITUAccessUnitInfo {
     uint8_t U_signature_size;
     bool U_signature_constant_length;
     uint8_t U_signature_length;
+
    public:
 
-    UAccessUnitInfo();
+    MITUAccessUnitInfo();
 
-    explicit UAccessUnitInfo(uint32_t _num_U_clusters);
+    explicit MITUAccessUnitInfo(uint32_t _num_U_clusters);
 
     void setMultipleSignature(uint32_t base, uint8_t size);
     void setConstantSignature(uint8_t sign_length);
 
-    /**
-     *
-     * @return
-     */
-    uint8_t getMultipleSignatureBase() const;
+    uint8_t getUSignatureSize() const;
 
     /**
      *
@@ -50,6 +47,7 @@ class MITUAccessUnitInfo {
      * @param bit_writer
      */
     void write(genie::util::BitWriter& bit_writer) const;
+
 };
 
 }  // namespace mpegg_p1

@@ -22,11 +22,11 @@ class ReferenceLocation{
 
     bool isExternal() const;
 
-    virtual uint64_t getBitLength() const;
+    ReferenceLocation::Flag getExternalRefFlag() const;
 
-    Flag getExternalRefFlag() const;
+    virtual uint64_t getLength() const;
 
-    virtual void write(genie::util::BitWriter& writer);
+    virtual void write(genie::util::BitWriter& writer) const;
 
    private:
     Flag external_ref_flag;

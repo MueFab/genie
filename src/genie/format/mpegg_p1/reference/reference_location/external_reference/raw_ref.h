@@ -24,9 +24,11 @@ class RawReference: public ExternalReference{
 
     explicit RawReference(std::vector<Checksum>&& _checksums);
 
-    void addChecksum(Checksum &&_checksum);
+    Checksum::Algo getChecksumAlg() const override;
 
-    void addChecksums(std::vector<Checksum>& _checksums);
+//    void addChecksum(Checksum &&_checksum);
+//
+//    void addChecksums(std::vector<Checksum>& _checksums);
 
     void write(genie::util::BitWriter& bit_writer) override;
 };

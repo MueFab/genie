@@ -26,6 +26,8 @@ class Sha256: public Checksum {
 
     explicit Sha256(std::vector<uint64_t> &_data);
 
+    uint64_t getLength() const override;
+
     void write(genie::util::BitWriter& bit_writer) const override;
 };
 

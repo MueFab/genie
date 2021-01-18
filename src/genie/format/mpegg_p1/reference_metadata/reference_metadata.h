@@ -6,7 +6,8 @@
 
 #include <genie/util/bitwriter.h>
 #include <genie/util/bitreader.h>
-#include "reference_metadata_value.h"
+
+//#include "reference_metadata_value.h"
 
 namespace genie {
 namespace format {
@@ -16,7 +17,7 @@ class ReferenceMetadata {
    private:
     uint8_t dataset_group_ID;
     uint8_t reference_ID;
-    std::vector<ReferenceMetadataValue> reference_metadata_value;
+//    std::vector<ReferenceMetadataValue> reference_metadata_value;
 
    public:
     ReferenceMetadata();
@@ -27,7 +28,7 @@ class ReferenceMetadata {
         * @param _ref_ID
         * @param _ref_metadata_value
         */
-    ReferenceMetadata(uint8_t _ds_group_ID, uint8_t _ref_ID; std::vector<uint8_t>&& _ref_metadata_value);
+    ReferenceMetadata(uint8_t _ds_group_ID, uint8_t _ref_ID, std::vector<uint8_t>&& _ref_metadata_value);
 
     /**
     *
@@ -40,7 +41,7 @@ class ReferenceMetadata {
 
     uint64_t getLength() const;
 
-    void writeToFile(genie::util::BitWriter& bit_writer) const;
+    void write(util::BitWriter& bit_writer) const;
 };
 
 }  // namespace mpegg_p1

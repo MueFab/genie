@@ -21,14 +21,14 @@ void ClassInfo::setDescriptorIDs(std::vector<uint8_t>&& _desc_IDs) {
     descriptor_IDs = _desc_IDs;
 }
 
-const core::record::ClassType ClassInfo::getClid() const { return clid; }
+core::record::ClassType ClassInfo::getClid() const { return clid; }
 
 const std::vector<uint8_t>& ClassInfo::getDescriptorIDs() const { return descriptor_IDs; }
 
 void ClassInfo::write(util::BitWriter& bit_writer, bool block_header_flag) const {
 
     // clid[ci] u(4)
-    bit_writer.write(clid, 4);
+    bit_writer.write((uint8_t) clid, 4);
 
     if (!block_header_flag){
 

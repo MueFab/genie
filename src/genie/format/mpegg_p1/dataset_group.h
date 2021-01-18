@@ -15,6 +15,7 @@
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 
+//#include <genie/format/mpegg_p1/reference/reference.h>
 #include "reference/reference.h"
 #include "dataset/dataset.h"
 #include "reference_metadata/reference_metadata.h"
@@ -47,7 +48,7 @@ class DGMetadata {
      *
      * @param bit_writer
      */
-    void write(genie::util::BitWriter& bit_writer) const;
+    void write(util::BitWriter& bit_writer) const;
 
    private:
     std::vector<uint8_t> DG_metadata_value;  //!<
@@ -75,7 +76,7 @@ class DGProtection {
      *
      * @param bit_writer
      */
-    void write(genie::util::BitWriter& bit_writer) const;
+    void write(util::BitWriter& bit_writer) const;
 
    private:
     std::vector<uint8_t> DG_protection_value;  //!<
@@ -84,6 +85,7 @@ class DGProtection {
 
 class DatasetGroup {
    private:
+
     /** ------------------------------------------------------------------------------------------------------------
      * ISO 23092-1 Section 6.5.1.2 table 9 - dataset_group_header
      * ------------------------------------------------------------------------------------------------------------- */

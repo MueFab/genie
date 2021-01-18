@@ -57,6 +57,8 @@ uint64_t Label::getLength() const {
 
     // aligned to byte
     bitlen += bitlen % 8;
+    // Convert to byte
+    bitlen /= 8;
 
     return bitlen;
 }

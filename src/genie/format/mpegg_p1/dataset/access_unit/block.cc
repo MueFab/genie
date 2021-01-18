@@ -17,14 +17,12 @@ Block::Block(util::BitReader &reader)
       block_payload(0){
 
     // reserved
-    reader.read(1);
+    reader.read<uint8_t>(1);
+    descriptor_ID = reader.read<uint8_t>(7);
+    auto block_payload_size = reader.read<uint32_t>();
 
-    descriptor_ID = reader.read(7);
-
-    auto block_payload_size = descriptor_ID = reader.read(32);
-
-    for (auto i = 0; i < block_payload_size; i++){
-        block_payload.push_back(reader.read(8));
+    for (uint32_t i = 0; i < block_payload_size; i++){
+        block_payload.push_back(reader.read<uint8_t>());
     }
 }
 

@@ -49,21 +49,25 @@ RawReference::RawReference(std::vector<Checksum> &&_checksums)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void RawReference::addChecksum(Checksum &&_checksum) {
-    UTILS_DIE_IF(!checksums.empty() && checksums.front().getType() != _checksum.getType(),
-                 "Different checksum algorithm");
-    checksums.push_back(_checksum);
-}
+//void RawReference::addChecksum(Checksum &&_checksum) {
+//    UTILS_DIE_IF(!checksums.empty() && checksums.front().getType() != _checksum.getType(),
+//                 "Different checksum algorithm");
+//    checksums.push_back(_checksum);
+//}
+//
+// ---------------------------------------------------------------------------------------------------------------------
+//
+//void RawReference::addChecksums(std::vector<Checksum> &_checksums) {
+//    for (auto& checksum : _checksums){
+//        UTILS_DIE_IF(_checksums.front().getType() != checksum.getType(),
+//                     "Different checksum algorithm");
+//    }
+//    checksums = std::move(_checksums);
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void RawReference::addChecksums(std::vector<Checksum> &_checksums) {
-    for (auto& checksum : _checksums){
-        UTILS_DIE_IF(_checksums.front().getType() != checksum.getType(),
-                     "Different checksum algorithm");
-    }
-    checksums = std::move(_checksums);
-}
+Checksum::Algo RawReference::getChecksumAlg() const { return checksums.front().getType(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
