@@ -1,10 +1,11 @@
 project("encapsulator")
 
 set(source_files
-        FileHandlingUtils.cc
+        # TODO: Fix FileHandlingUtils
+        #FileHandlingUtils.cc
         main.cc
         program-options.cc
-        )
+)
 
 add_executable(encapsulator ${source_files})
 
