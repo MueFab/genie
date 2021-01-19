@@ -9,7 +9,7 @@
 #include "genie/read/lowlatency/decoder.h"
 #include "genie/format//mpegg_p1/dataset_group.h"
 #include "genie/format/mgb/data-unit-factory.h"
-#include "genie/format/mpegg_p1/dataset.h"
+#include "genie/format/mpegg_p1/dataset/dataset.h"
 #include "genie/format/mpegg_p1/mpegg_file.h"
 
 int createMPEGGFileNoMITFromByteStream(const std::string& fileName, const std::string& outputFileName) {
