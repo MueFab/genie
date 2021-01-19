@@ -59,9 +59,12 @@ Checksum::Algo MpegReference::getChecksumAlg() const { return ref_checksum.getTy
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t MpegReference::getLength() const {
+uint64_t MpegReference::getLength(){
+    // TODO: Check this one
     uint64_t len = 1 + 2;
     len += ref_checksum.getLength();
+
+    return len;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

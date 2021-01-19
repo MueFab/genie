@@ -16,8 +16,6 @@ class SequenceConfig {
     std::vector<uint16_t> seq_IDs;
     std::vector<uint16_t> seq_blocks;
 
-    // Additional Info tflag, thres
-    std::vector<bool> tflag;
     std::vector<uint32_t> thress;
 
    public:
@@ -25,7 +23,7 @@ class SequenceConfig {
 
     explicit SequenceConfig(uint8_t _ref_ID);
 
-    uint64_t getLength() const;
+    uint64_t getBitLength() const;
 
     bool anySeq() const;
     bool isValid() const;
@@ -38,9 +36,7 @@ class SequenceConfig {
 
     const std::vector<uint16_t>& getSeqBlocks() const;
 
-    const std::vector<bool>& getTFlags() const;
-
-    void write(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& writer) const;
 
     void writeThres(genie::util::BitWriter& bit_writer) const;
 

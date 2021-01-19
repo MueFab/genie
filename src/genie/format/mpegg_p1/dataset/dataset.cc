@@ -130,7 +130,7 @@ uint64_t Dataset::getLength() const {
     // TODO: Master Index Table
     // write master_index_table depending on MIT_FLAG
 //    if (block_config.getMITFlag()){
-//        master_index_table->getLength();
+//        master_index_table->getBitLength();
 //    }
 
     for (auto const& it : dataset_parameter_sets) {

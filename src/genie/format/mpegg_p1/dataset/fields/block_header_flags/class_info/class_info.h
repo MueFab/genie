@@ -18,7 +18,7 @@ class ClassInfo{
 
    public:
 
-    explicit ClassInfo(uint8_t _clid);
+    explicit ClassInfo(core::record::ClassType _clid);
 
     void addDescriptorID(uint8_t _desc_ID);
     void addDescriptorIDs(std::vector<uint8_t>& _desc_IDs);

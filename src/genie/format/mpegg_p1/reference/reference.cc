@@ -159,7 +159,7 @@ uint64_t Reference::getLength() const {
     len += 1;
 
     len += reference_location.getLength();
-//    len += reference_location->getLength();
+//    len += reference_location->getBitLength();
 
     return len;
 }
