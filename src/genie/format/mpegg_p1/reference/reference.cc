@@ -56,7 +56,8 @@ Reference::Reference(util::BitReader& reader, size_t length)
     // reference_ID u(8)
     reference_ID = reader.read<uint8_t>();
     // reference_name st(v)
-    reference_name = reader.read<std::string>();
+    reference_name = readNullTerminatedStr(reader);
+
     // reference_major_version u(16)
     reference_major_version = reader.read<uint16_t>();
     // reference_minor_version u(16)
@@ -69,7 +70,7 @@ Reference::Reference(util::BitReader& reader, size_t length)
 
     for (auto seqID = 0; seqID < seq_count; seqID++){
         // sequence_name[seqID] st(v)
-        sequence_names.emplace_back(reader.read<std::string>());
+        sequence_names.emplace_back(readNullTerminatedStr(reader));
     }
 
     // reserved u(7)
@@ -165,49 +166,49 @@ uint64_t Reference::getLength() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Reference::writeToFile(util::BitWriter& bit_writer) const {
+void Reference::write(util::BitWriter& writer) const {
     // KLV (Key Length Value) format
 
     // Key of KVL format
-    bit_writer.write("rfgn");
+    writer.write("rfgn");
 
     // Length of KVL format
-    bit_writer.write(getLength(), 64);
+    writer.write(getLength(), 64);
 
     // dataset_group_ID u(8)
-    bit_writer.write(dataset_group_ID, 8);
+    writer.write(dataset_group_ID, 8);
 
     // reference_ID u(8)
-    bit_writer.write(reference_ID, 8);
+    writer.write(reference_ID, 8);
 
     // reference_name st(v)
-    bit_writer.write(reference_name);
+    writeNullTerminatedStr(writer, reference_name);
 
     // reference_major_version u(16)
-    bit_writer.write(reference_major_version, 16);
+    writer.write(reference_major_version, 16);
 
     // reference_minor_version u(16)
-    bit_writer.write(reference_minor_version, 16);
+    writer.write(reference_minor_version, 16);
 
     // reference_patch_version u(16)
-    bit_writer.write(reference_patch_version, 16);
+    writer.write(reference_patch_version, 16);
 
     // write seq_count u(16)
-    bit_writer.write(getSeqCount(), 16);
+    writer.write(getSeqCount(), 16);
 
     // write sequence_name[]
     for (auto& sequence_name: sequence_names){
-        bit_writer.write(sequence_name);
+        writer.write(sequence_name);
     }
 
     // reserve 7 bits u(7)
-    bit_writer.write(0, 7);
+    writer.write(0, 7);
 
     // write external_ref_flag u(1)
-    bit_writer.write(reference_location.isExternal(), 1);
+    writer.write(reference_location.isExternal(), 1);
 
     // if (external_ref_flag)
-    reference_location.write(bit_writer);
+    reference_location.write(writer);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

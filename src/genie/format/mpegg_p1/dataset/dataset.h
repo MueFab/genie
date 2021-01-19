@@ -14,7 +14,7 @@
 #include <genie/core/parameter/parameter_set.h>
 #include <genie/format/mgb/data-unit-factory.h>
 
-#include <genie/format/mpegg_p1/dataset/master_index_table/master_index_table.h>
+//#include <genie/format/mpegg_p1/dataset/master_index_table/master_index_table.h>
 #include <genie/format/mpegg_p1/dataset/access_unit/access_unit.h>
 #include <genie/format/mpegg_p1/dataset/dataset_parameter_set.h>
 
@@ -108,6 +108,13 @@ class Dataset {
     Dataset(uint16_t ID, const genie::format::mgb::DataUnitFactory& dataUnitFactory,
             std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2);
 
+    uint16_t getID() const;
+
+    void setID(uint16_t ID);
+
+    uint8_t getGroupID() const;
+
+    void setGroupId(uint8_t group_ID);
 
     /**
      *

@@ -4,6 +4,7 @@ set(source_files
 #        dataset/access_unit_p1.cc
 #        dataset.cc
 #        dataset_header.cc
+        util.cc
         dataset_group.cc
         file_header.cc
         mpegg_file.cc
@@ -26,18 +27,24 @@ set(source_files
         dataset/dataset_parameter_set.cc
         dataset/descriptor_stream.cc
         dataset/descriptor_stream_header.cc
+
         dataset/master_index_table/u_access_unit_info/u_access_unit_info.cc
+
         reference/reference.cc
+
         reference/reference_location/reference_location.cc
         reference/reference_location/external.cc
         reference/reference_location/internal.cc
+
         reference/reference_location/external_reference/external_reference.cc
         reference/reference_location/external_reference/mpegg_ref.cc
         reference/reference_location/external_reference/fasta_ref.cc
         reference/reference_location/external_reference/raw_ref.cc
+
         reference/reference_location/external_reference/checksum.cc
         reference/reference_location/external_reference/sha256.cc
         reference/reference_location/external_reference/md5.cc
+
 #        reference_metadata/reference_metadata.cc
         reference/reference_location/internal.cc
         reference/reference_location/external.cc
@@ -49,11 +56,12 @@ set(source_files
         reference/reference_location/external_reference/checksum.cc
         reference/reference_location/external_reference/md5.cc
         reference/reference_location/external_reference/sha256.cc
+
         label_list/label_list.cc
         label_list/label/label.cc
         label_list/label/dataset_info.cc
         label_list/label/dataset_region.cc
-)
+        )
 
 add_library(genie-mpegg_p1 ${source_files})
 

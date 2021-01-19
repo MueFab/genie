@@ -96,7 +96,7 @@ class DatasetHeader {
 
     uint8_t getGroupID() const;
 
-    void setDatasetGroupId(uint8_t group_ID);
+    void setGroupId(uint8_t group_ID);
 
     uint32_t getNumUAccessUnits() const;
 
