@@ -6,6 +6,8 @@
 
 #include "dataset_group.h"
 
+#include <genie/format/mpegg_p1/util.h>
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -74,7 +76,8 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, size_t length)
 
     size_t start_pos = reader.getPos();
 
-    std::string key = reader.read<std::string>(4);
+    std::string key = readKey(reader);
+
     UTILS_DIE_IF(key != "dghd", "DatasetGroupHeader is not Found");
 
     auto header_length = reader.read<size_t>();
@@ -82,7 +85,7 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, size_t length)
     readHeader(reader, header_length-12);
 
     do {
-        key = reader.read<std::string>(4);
+        key = readKey(reader);
         auto value_length = reader.read<size_t>();
 
         if (key == "rfgn"){
@@ -313,12 +316,12 @@ void DatasetGroup::write(util::BitWriter& writer) const {
 
     // reference (optional)
     for (auto &reference: references){
-        reference.writeToFile(writer);
+        reference.write(writer);
     }
 
     // reference_metadata (optional)
     for (auto &ref_metadata: reference_metadata){
-        ref_metadata.writeToFile(writer);
+        ref_metadata.write(writer);
     }
 
     // label_list (optional)

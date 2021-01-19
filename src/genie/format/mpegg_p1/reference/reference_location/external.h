@@ -6,8 +6,6 @@
 
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
-#include <genie/util/exception.h>
-#include <genie/util/runtime-exception.h>
 
 #include "external_reference/external_reference.h"
 #include "reference_location.h"

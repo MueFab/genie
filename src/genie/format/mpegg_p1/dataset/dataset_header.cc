@@ -112,7 +112,7 @@ void DatasetHeader::setID(uint16_t ID) { dataset_ID = ID;}
 
 uint8_t DatasetHeader::getGroupID() const {return dataset_group_ID;}
 
-void DatasetHeader::setDatasetGroupId(uint8_t group_ID) { dataset_group_ID = group_ID;}
+void DatasetHeader::setGroupId(uint8_t group_ID) { dataset_group_ID = group_ID;}
 
 uint32_t DatasetHeader::getNumUAccessUnits() const { return num_U_access_units;}
 

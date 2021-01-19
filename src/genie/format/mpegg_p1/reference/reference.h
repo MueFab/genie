@@ -12,6 +12,7 @@
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 #include <genie/util/exception.h>
+#include <genie/format/mpegg_p1/util.h>
 
 #include "reference_location/reference_location.h"
 #include "reference_location/external.h"
@@ -130,9 +131,9 @@ class Reference{
 
     /**
      *
-     * @param bit_writer
+     * @param writer
      */
-    void writeToFile(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& writer) const;
 };
 
 }  // namespace mpegg_p1

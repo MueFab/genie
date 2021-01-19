@@ -1,4 +1,7 @@
 #include <genie/util/make-unique.h>
+#include <genie/util/exception.h>
+#include <genie/util/runtime-exception.h>
+#include <genie/format/mpegg_p1/util.h>
 
 #include "external.h"
 #include "external_reference/checksum.h"
@@ -22,7 +25,7 @@ namespace mpegg_p1 {
 
 External::External(util::BitReader& reader, uint16_t seq_count)
     : ReferenceLocation(ReferenceLocation::Flag::EXTERNAL),
-      ref_uri(reader.read<std::string>()) {
+      ref_uri() {
 
     auto checksum_alg = reader.read<Checksum::Algo>();
     auto reference_type = reader.read<ExternalReference::Type>();
@@ -68,6 +71,7 @@ uint64_t External::getLength() const {
 void External::write(util::BitWriter& writer) const {
     // ref_uri st(v)
     writer.write(ref_uri);
+    writer.write('\0', 8);
 
     // checksum_alg u(8)
     writer.write((uint8_t) getChecksumAlg(), 8);
