@@ -15,45 +15,9 @@ SequenceConfig::SequenceConfig(uint8_t _ref_ID)
       seq_IDs(),
       seq_blocks(){}
 
-uint64_t SequenceConfig::getLength() const {
-    uint64_t bitlength = 16;
+bool SequenceConfig::isValid() const { return seq_IDs.size() == thress.size(); }
 
-    if (anySeq()){
-        // reference_ID u(8)
-        bitlength += 8;
-
-        // seq_ID u(16)
-        bitlength += 16 * getSeqCount();
-
-        // seq_blocks u(32)
-        bitlength += 32 * getSeqCount();
-
-        // tflag[0] u(1)
-        bitlength += 1;
-
-        // thres[0] u(31)
-        bitlength += 31;
-
-        auto thres = thress.begin();
-
-        while (thres != thress.end()){
-            auto next_thres = thres +1;
-
-            auto tflag = *thres != *next_thres;
-
-            bitlength += 1;
-
-            if (tflag){
-                // thres[i] u(31)
-                bitlength += 131;
-            }
-
-            thres = next_thres;
-        }
-    }
-
-    return  bitlength;
-}
+bool SequenceConfig::anySeq() const { return !seq_IDs.empty(); }
 
 void SequenceConfig::setRefID(uint8_t _ref_ID) {
     reference_ID = _ref_ID;
@@ -80,30 +44,67 @@ uint16_t SequenceConfig::getSeqCount() const { return seq_IDs.size(); }
 
 const std::vector<uint16_t>& SequenceConfig::getSeqBlocks() const { return seq_blocks; }
 
-const std::vector<bool>& SequenceConfig::getTFlags() const { return tflag; }
+uint64_t SequenceConfig::getBitLength() const {
+    // seq_count u(16)
+    uint64_t bitlen = 16;
 
-bool SequenceConfig::anySeq() const { return !seq_IDs.empty(); }
+    if (anySeq()){
+        // reference_ID u(8)
+        bitlen += 8;
 
-void SequenceConfig::write(util::BitWriter& bit_writer) const {
+        // seq_ID[] u(16)
+        bitlen += 16 * getSeqCount();
+
+        // seq_blocks[] u(32)
+        bitlen += 32 * getSeqCount();
+
+        // tflag[0] u(1)
+        bitlen += 1;
+
+        // thres[0] u(31)
+        bitlen += 31;
+
+        auto thres = thress.begin();
+
+        while (thres != thress.end()){
+            auto next_thres = thres +1;
+
+            bool tflag = *thres != *next_thres;
+
+            bitlen += 1;
+
+            if (tflag){
+                // thres[i] u(31)
+                bitlen += 31;
+            }
+
+            thres = next_thres;
+        }
+    }
+
+    return bitlen;
+}
+
+void SequenceConfig::write(util::BitWriter& writer) const {
 
     UTILS_DIE_IF(!isValid(),
                  "seq_count and size of thres[] are different!");
 
     // seq_count u(16)
-    bit_writer.write(getSeqCount(), 16);
+    writer.write(getSeqCount(), 16);
 
     if (anySeq()){
         // reference_ID u(8)
-        bit_writer.write(reference_ID, 8);
+        writer.write(reference_ID, 8);
 
         // seq_ID u(16)
         for (auto seq_ID: seq_IDs){
-            bit_writer.write(seq_ID, 16);
+            writer.write(seq_ID, 16);
         }
 
         // seq_blocks u(32)
         for (auto seq_block: seq_blocks){
-            bit_writer.write(seq_block, 32);
+            writer.write(seq_block, 32);
         }
     }
 }
@@ -126,7 +127,7 @@ void SequenceConfig::writeThres(util::BitWriter& bit_writer) const {
         while (thres != thress.end()){
             auto next_thres = thres +1;
 
-            auto tflag = *thres != *next_thres;
+            bool tflag = *thres != *next_thres;
 
             // tflag[i] u(1)
             bit_writer.write(tflag, 1);
@@ -141,8 +142,6 @@ void SequenceConfig::writeThres(util::BitWriter& bit_writer) const {
 
     }
 }
-
-bool SequenceConfig::isValid() const { return seq_IDs.size() == thress.size(); }
 
 }  // namespace mpegg_p1
 }  // namespace format

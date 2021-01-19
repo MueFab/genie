@@ -64,12 +64,6 @@ uint64_t DatasetHeader::getLength() const {
         bitlen += block_header.getBitLength(); /// ordered_blocks_flag u(1)
     }
 
-    bitlen += 16;   /// seq_count u(16)
-    if (seq_info.getSeqCount() > 0) {
-        bitlen += 8; /// reference_ID u(8)
-        bitlen += (16 + 32) * seq_info.getSeqCount() ; /// seq_ID u(16), seq_blocks u(32)
-    }
-
     bitlen += 4;  /// dataset_type u(4)
     if (block_header.getMITFlag()) {
         bitlen += 4;  /// num_classes u(4)
@@ -87,18 +81,10 @@ uint64_t DatasetHeader::getLength() const {
 
     bitlen += 8 + 32;  /// alphabet_ID u(8), num_U_access_units u(32)
     if (num_U_access_units > 0) {//
-        u_access_unit_info->getBitLength();  /// num_U_clusters u(32), multiple_signature_base u(31), U_signature_size u(6), U_signature_constant_length u(1), U_signature_length u(8)
+        bitlen += u_access_unit_info->getBitLength();  /// num_U_clusters u(32), multiple_signature_base u(31), U_signature_size u(6), U_signature_constant_length u(1), U_signature_length u(8)
     }
 
-    if (seq_info.getSeqCount() > 0) {
-        bitlen += 1 + 31;  /// tflag[0] f(1), thres[0] u(31)
-        for (int i = 1; i < seq_info.getSeqCount(); i++) {
-            bitlen += 1;  /// tflag[i] u(1)
-            if (seq_info.getTFlags()[i]) {
-                bitlen += 31;  /// thres[i] u(31)
-            }
-        }
-    }
+    bitlen += seq_info.getBitLength();
 
     bitlen += bitlen % 8;  /// byte_aligned() f(1)
     bitlen /= 8;  /// byte conversion

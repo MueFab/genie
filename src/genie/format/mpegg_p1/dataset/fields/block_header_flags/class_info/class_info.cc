@@ -5,8 +5,8 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-ClassInfo::ClassInfo(uint8_t _clid)
-    : clid(clid),
+ClassInfo::ClassInfo(core::record::ClassType _clid)
+    : clid(_clid),
       descriptor_IDs(){}
 
 void ClassInfo::addDescriptorID(uint8_t _desc_ID) {

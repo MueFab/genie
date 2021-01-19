@@ -45,6 +45,8 @@ uint64_t MITUAccessUnitInfo::getBitLength() const {
         // U_signature_constant_length u(8)
         bitlen += 8;
     }
+
+    return bitlen;
 }
 
 void MITUAccessUnitInfo::write(util::BitWriter& bit_writer) const {
