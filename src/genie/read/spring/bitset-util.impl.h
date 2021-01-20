@@ -114,9 +114,9 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint1
         dict[j].numkeys = k + 1;
         // construct mphf
         auto data_iterator =
-            boomphf::range(static_cast<const u_int64_t *>(ull), static_cast<const u_int64_t *>(ull + dict[j].numkeys));
+            boomphf::range(static_cast<const uint64_t *>(ull), static_cast<const uint64_t *>(ull + dict[j].numkeys));
         double gammaFactor = 5.0;  // balance between speed and memory
-        dict[j].bphf = new boomphf::mphf<u_int64_t, hasher_t>(dict[j].numkeys, data_iterator, /*num_thr*/ 1,
+        dict[j].bphf = new boomphf::mphf<uint64_t, hasher_t>(dict[j].numkeys, data_iterator, /*num_thr*/ 1,
                                                               gammaFactor, true, false);
 
         delete[] ull;

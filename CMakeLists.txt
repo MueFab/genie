@@ -90,7 +90,7 @@ if(${BUILD_COVERAGE})
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
     else()
-        message(FATAL_ERROR "Coverage analysis not supported for compiler: ${CMAKE_CXX_COMPILER_ID}")
+        message(WARNING "Coverage analysis not supported for compiler: ${CMAKE_CXX_COMPILER_ID}")
     endif()
 endif()
 
