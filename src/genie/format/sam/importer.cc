@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <list>
+#include <iostream>
 
 #include <genie/core/record/alignment_split/other-rec.h>
 #include <genie/core/record/alignment_split/same-rec.h>
@@ -29,8 +30,10 @@ namespace sam {
 Importer::Importer(size_t _blockSize, std::istream &_file) : blockSize(_blockSize), samReader(_file), lock() {
 
     // Allocate number of references groups
+//    records_by_ref.resize(samReader.getRefs().size() + 1);
     // 1 for "unmapped"
-    records_by_ref.resize(samReader.getRefs().size() + 1);
+    // 2 for each reference (single-end and paired-end)
+    records_by_ref.resize(samReader.getRefs().size() * 2 + 1);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -149,20 +152,20 @@ bool Importer::anyRemainingMpeggRecord() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Importer::isEnoughRecs(std::list<core::record::Record> &recs) {
+bool Importer::isEnoughRecs(std::list<core::record::Record> &recs) const {
     return recs.size() >= blockSize;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Importer::anyGroupReachBlockSize() {
-    return std::any_of(records_by_ref.begin(), records_by_ref.end(), &Importer::isEnoughRecs);
-//    for (auto &iter: records_by_ref){
-//        if (iter.size() > blockSize){
-//            return true;
-//        }
-//    }
-//    return false;
+//    return std::any_of(records_by_ref.begin(), records_by_ref.end(), &Importer::isEnoughRecs);
+    for (auto &iter: records_by_ref){
+        if (isEnoughRecs(iter)){
+            return true;
+        }
+    }
+    return false;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -200,11 +203,11 @@ bool Importer::pumpRetrieve(core::Classifier *_classifier) {
     std::list<std::string> lines;
     std::list<ReadTemplate> read_templates;
     core::record::Chunk chunk;
-    std::list<core::record::Record> recs;
+    std::list<core::record::Record> same_qname_recs;
 
-    // Do until the number of MPEG-G records for certain reference is above blockSize
-    // or end of file is reached
-    while (samReader.good() && anyGroupReachBlockSize()){
+    /// Do until the number of MPEG-G records of certain group (grouped by reference) is above blockSize
+    /// or when the End-of-File (EoF) is reached
+    while (samReader.good() && !anyGroupReachBlockSize()){
         while (samReader.good() && blockSize > lines.size()) {
             samReader.read(lines);
         }
@@ -214,40 +217,69 @@ bool Importer::pumpRetrieve(core::Classifier *_classifier) {
         rtg.getTemplates(read_templates);
 
         for (auto &read_template : read_templates) {
-            convert(recs, read_template, samReader.getRefs());
-            for (auto& rec: recs){
+            convert(same_qname_recs, read_template, samReader.getRefs());
+            for (auto& rec: same_qname_recs){
 
-                // If unmapped, store in the last list
+                /// If unmapped, store in the last list
                 if (rec.getAlignments().empty()){
                     records_by_ref[records_by_ref.size()-1].push_back(std::move(rec));
                 } else {
                     // Store in its respective list
-                    records_by_ref[rec.getAlignmentSharedData().getSeqID()].push_back(std::move(rec));
+                    //records_by_ref[rec.getAlignmentSharedData().getSeqID()].push_back(std::move(rec));
+
+                    // Multiplied by NumberOfTemplateSegments to differentiate groups also by single-end or paired-end
+                    // First half is single-end, second half is paired-end and then unmapped
+                    uint64_t idx = rec.getAlignmentSharedData().getSeqID() * rec.getNumberOfTemplateSegments();
+                    // Store in its respective list
+                    records_by_ref[idx].push_back(std::move(rec));
                 }
             }
 
-            // Empty the recs for the next iteration
-            recs.clear();
+            /// Empty the same_qname_recs for the next iteration
+            same_qname_recs.clear();
         }
         read_templates.clear();
     }
 
+    /// Pump any group of records that has more than blockSize records
     for (auto& rec_group: records_by_ref){
+        if (!rec_group.empty()){
+            /// Pump the records of a group with more than blockSize records
+            if (rec_group.size() > blockSize){
 
-        if ((rec_group.size() > blockSize || !samReader.good()) && !rec_group.empty()){
+                auto end_iter = std::next(rec_group.begin(), blockSize);
 
-            // Move records to chunk
-            std::move(rec_group.begin(), rec_group.end(), std::back_inserter(chunk.getData()));
+                /// Move records to chunk
+                std::move(rec_group.begin(), end_iter, std::back_inserter(chunk.getData()));
+//                auto before = rec_group.size();
 
-            // Clear the list, otherwise size stays the same
-            rec_group.clear();
-            break;
+                /// Remove pumped records from list
+                rec_group.erase(rec_group.begin(), end_iter);
+//                auto after = rec_group.size();
+
+                break;
+
+            /// Pump the remaining records because we have reached the EoF
+            } else if (!samReader.good() && !rec_group.empty()){
+                std::move(rec_group.begin(), rec_group.end(), std::back_inserter(chunk.getData()));
+                /// Clear the list, otherwise size stays the same
+                rec_group.clear();
+                break;
+            }
         }
     }
 
+//    auto num_recs = chunk.getData().size();
     auto &records = chunk.getData();
     std::sort(records.begin(), records.end(), compare);
+//    UTILS_DIE_IF(!std::is_sorted(records.begin(), records.end(), compare), "Still not sorted?!");
+//    auto num_recs2 = records.size();
+//    for (auto &rec: records){
+//        std::cout << getMinPos(rec) << std::endl;
+//    }
+//    std::cout << "Complete" << std::endl;
 
+    last_position = 0;
     for (const auto &record : records) {
         if (record.getAlignments().empty()) {
             continue;
@@ -263,7 +295,8 @@ bool Importer::pumpRetrieve(core::Classifier *_classifier) {
         _classifier->add(std::move(chunk));
     }
 
-    // Do not use samReader.good() as there is any remaining mpeg-g records to be stored
+    // Do not use samReader.good()
+    // There might be any remaining mpeg-g records to be stored
     return good();
 }
 
@@ -276,8 +309,12 @@ std::unique_ptr<core::record::Record> Importer::convertSam2SameRec(Record &sam_r
                                                                    std::map<std::string, size_t> &refs) {
     auto flag_tuple = convertFlags2Mpeg(sam_r1.getFlags());
 
-    auto rec = util::make_unique<core::record::Record>(2, core::record::ClassType::CLASS_I, sam_r1.moveQname(), "Genie",
-                                                       std::get<1>(flag_tuple), sam_r1.getPos() < sam_r2.getPos());
+    auto rec = util::make_unique<core::record::Record>(2,
+                                                       core::record::ClassType::CLASS_I,
+                                                       sam_r1.moveQname(),
+                                                       "Genie",
+                                                       std::get<1>(flag_tuple),
+                                                       sam_r1.getPos() < sam_r2.getPos());
 
     core::record::Segment segment(sam_r1.moveSeq());
     if (sam_r1.getQual() != "*") {
@@ -400,7 +437,8 @@ std::unique_ptr<core::record::Record> Importer::convertSam2SplitRec(Record &sam_
     auto flag_tuple = convertFlags2Mpeg(sam_r1.getFlags());
 
     auto rec = util::make_unique<core::record::Record>(2, core::record::ClassType::CLASS_I, sam_r1.moveQname(), "Genie",
-                                                       std::get<1>(flag_tuple), sam_r1.isFirstRead());
+//                                                       std::get<1>(flag_tuple), sam_r1.isFirstRead());
+                                                       std::get<1>(flag_tuple), true); // is_read_1_first is always true
 
     core::record::Segment segment(sam_r1.moveSeq());
     if (sam_r1.getQual() != "*") {
@@ -543,7 +581,7 @@ void Importer::convertPairedEndSplitPair(std::list<core::record::Record> &record
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Importer::convertUnmapped(std::list<core::record::Record> &records, SamRecords &sam_recs, std::map<std::string, size_t> &refs) {
+void Importer::convertUnmapped(std::list<core::record::Record> &records, SamRecords &sam_recs) {
     auto &sam_rec = sam_recs.front();
 
     auto flag_tuple = convertFlags2Mpeg(sam_rec.getFlags());
@@ -691,7 +729,7 @@ void Importer::convertPairedEnd(std::list<core::record::Record> &records, SamRec
     } else {
         if (!read_1_empty) {
             if (read_1_unmapped) {
-                convertUnmapped(records, read_1, refs);
+                convertUnmapped(records, read_1);
             } else if (!read_1_primary) {
                 UTILS_DIE("Cannot find the primary line of read_1!");
             } else if (read_1_ok) {
@@ -701,7 +739,7 @@ void Importer::convertPairedEnd(std::list<core::record::Record> &records, SamRec
 
         if (!read_2_empty) {
             if (read_2_unmapped) {
-                convertUnmapped(records, read_2, refs);
+                convertUnmapped(records, read_2);
             } else if (!read_2_primary) {
                 UTILS_DIE("Cannot find the primary line of read_2!");
             } else if (read_2_ok) {
@@ -726,7 +764,7 @@ void Importer::convert(std::list<core::record::Record> &records, ReadTemplate &r
 
     // Convert SAM records to MPEG-G record(s)
     if (is_unmapped) {
-        convertUnmapped(records, sam_recs_2d.front(), refs);
+        convertUnmapped(records, sam_recs_2d.front());
     } else if (is_single) {
         convertSingleEnd(records, sam_recs_2d.front(), refs);
     } else if (is_pair) {
@@ -747,18 +785,32 @@ bool Importer::compare(const core::record::Record &r1, const core::record::Recor
         return true;
     }
     return getMinPos(r1) < getMinPos(r2);
+//    uint64_t p1 = getMinPos(r1);
+//    uint64_t p2 = getMinPos(r2);
+//    if (p1 < p2){
+//        return true;
+//    }
+//    return false;
 }
 
 uint64_t Importer::getMinPos(const core::record::Record& r) {
-    uint64_t abs_pos = r.getAlignments().front().getPosition();  // pivot
-    uint64_t first_pos = abs_pos;                                     // lowest locus
+//    uint64_t abs_pos = r.getAlignments().front().getPosition();  // pivot
+//    uint64_t first_pos = abs_pos;                                // lowest locus
 
-    for (const auto &split : r.getAlignments().front().getAlignmentSplits()) {
+//    for (const auto &split : r.getAlignments().front().getAlignmentSplits()) {
+//        UTILS_DIE_IF(split->getType() != core::record::AlignmentSplit::Type::SAME_REC, "Only same rec split alignments supported");
+//        first_pos = std::min(
+//            first_pos, abs_pos + dynamic_cast<const core::record::alignment_split::SameRec &>(*split).getDelta());
+//    }
+
+    uint64_t first_pos = r.getAlignments().front().getPosition();
+    if (r.isRead1First()){
+        return first_pos;
+    } else{
+        auto &split = r.getAlignments().front().getAlignmentSplits().front();
         UTILS_DIE_IF(split->getType() != core::record::AlignmentSplit::Type::SAME_REC, "Only same rec split alignments supported");
-        first_pos = std::min(
-            first_pos, abs_pos + dynamic_cast<const core::record::alignment_split::SameRec &>(*split).getDelta());
+        return first_pos + dynamic_cast<const core::record::alignment_split::SameRec &>(*split).getDelta();
     }
-    return first_pos;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
