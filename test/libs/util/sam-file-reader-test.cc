@@ -77,7 +77,7 @@ TEST(SamRecord, ParseString) {  // NOLINT(cert-err-cpp)
 
 //TODO (Yeremia): Ask whether truncated sam record should be supported
 #if false
- TEST(SamFileReader, Truncated) {  // NOLINT(cert-err-cpp)
+TEST(SamFileReader, Truncated) {  // NOLINT(cert-err-cpp)
     std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
 
     std::string line;
@@ -158,7 +158,8 @@ TEST(SAM, ImporterUnmappedReads) {  // NOLINT(cert-err-cpp)
     std::list<genie::format::sam::ReadTemplate> rts;
     genie::format::sam::ReadTemplateGroup rtg;
 
-    genie::core::record::Chunk chunk;
+//    genie::core::record::Chunk chunk;
+    std::list<genie::core::record::Record> chunk;
     {
         while (reader.good()){
             reader.read(lines);
@@ -173,11 +174,15 @@ TEST(SAM, ImporterUnmappedReads) {  // NOLINT(cert-err-cpp)
 
     for (auto & rt: rts){
         EXPECT_TRUE(rt.isValid() && rt.isUnmapped());
-        genie::format::sam::Importer::convert(chunk, rt, reader.getRefs());
+        // genie::format::sam::Importer::convert(chunk.getData(), rt, reader.getRefs());
+//        EXPECT_EQ(chunk.getData().back().getNumberOfTemplateSegments(), 1);
+//        EXPECT_EQ(chunk.getData().back().getClassID(), genie::core::record::ClassType::CLASS_I);
+//        EXPECT_EQ(chunk.getData().back().getFlags(), 0);
 
-        EXPECT_EQ(chunk.getData().back().getNumberOfTemplateSegments(), 1);
-        EXPECT_EQ(chunk.getData().back().getClassID(), genie::core::record::ClassType::CLASS_I);
-        EXPECT_EQ(chunk.getData().back().getFlags(), 0);
+        genie::format::sam::Importer::convert(chunk, rt, reader.getRefs());
+        EXPECT_EQ(chunk.back().getNumberOfTemplateSegments(), 1);
+        EXPECT_EQ(chunk.back().getClassID(), genie::core::record::ClassType::CLASS_I);
+        EXPECT_EQ(chunk.back().getFlags(), 0);
     }
 
 }
@@ -195,7 +200,8 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSameRec) {  // NOLINT(cert-err-cpp)
     std::list<genie::format::sam::ReadTemplate> rts;
     genie::format::sam::ReadTemplateGroup rtg;
 
-    genie::core::record::Chunk chunk;
+//    genie::core::record::Chunk chunk;
+    std::list<genie::core::record::Record> chunk;
     {
         while (reader.good()){
             reader.read(lines);
@@ -210,10 +216,12 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSameRec) {  // NOLINT(cert-err-cpp)
 
     genie::format::sam::Importer::convert(chunk, rts.front(), reader.getRefs());
 
-    EXPECT_EQ(chunk.getData().size(), 4);
+//    EXPECT_EQ(chunk.getData().size(), 4);
+    EXPECT_EQ(chunk.size(), 4);
 
     /// First MPEG-G Record with reference sequence chr1
-    auto rec = chunk.getData().begin();
+//    auto rec = chunk.getData().begin();
+    auto rec = chunk.begin();
     EXPECT_EQ(rec->getNumberOfTemplateSegments(), 2);
     EXPECT_EQ(rec->getSegments().size(), 2);
     EXPECT_EQ(rec->getAlignments().size(), 3);
@@ -235,7 +243,8 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSameRec) {  // NOLINT(cert-err-cpp)
     EXPECT_EQ(rec_alignment_split->getAlignment().getMappingScores().front(), 118);
 
     /// Third MPEG-G Record with reference sequence GL877875.1
-    rec += 3;
+//    rec += 3;
+    rec = std::next(rec, 3);
     EXPECT_EQ(rec->getNumberOfTemplateSegments(), 2);
     EXPECT_EQ(rec->getSegments().size(), 2);
     EXPECT_EQ(rec->getAlignments().size(), 1);
@@ -272,7 +281,8 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSplitRec) {  // NOLINT(cert-err-cpp
     std::list<genie::format::sam::ReadTemplate> rts;
     genie::format::sam::ReadTemplateGroup rtg;
 
-    genie::core::record::Chunk chunk;
+//    genie::core::record::Chunk chunk;
+    std::list<genie::core::record::Record> chunk;
     {
         while (reader.good()){
             reader.read(lines);
@@ -285,13 +295,16 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSplitRec) {  // NOLINT(cert-err-cpp
 
     ASSERT_EQ(rts.size(), 1);
 
+//    genie::format::sam::Importer::convert(chunk.getData(), rts.front(), reader.getRefs(), true);
     genie::format::sam::Importer::convert(chunk, rts.front(), reader.getRefs(), true);
 
-    EXPECT_EQ(chunk.getData().size(), 8);
+//    EXPECT_EQ(chunk.getData().size(), 8);
+    EXPECT_EQ(chunk.size(), 8);
 
     /// First read template reference sequence chr1
     /// Read 1
-    auto rec = chunk.getData().begin();
+//    auto rec = chunk.getData().begin();
+    auto rec = chunk.begin();
     {
         EXPECT_EQ(rec->getNumberOfTemplateSegments(), 2);
         EXPECT_EQ(rec->getSegments().size(), 1);
@@ -316,7 +329,8 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSplitRec) {  // NOLINT(cert-err-cpp
     }
 
     /// Read 2
-    rec += 1;
+//    rec += 1;
+    rec = std::next(rec);
     {
         EXPECT_EQ(rec->getNumberOfTemplateSegments(), 2);
         EXPECT_EQ(rec->getSegments().size(), 1);
@@ -342,7 +356,8 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSplitRec) {  // NOLINT(cert-err-cpp
 
     /// Third MPEG-G Record with reference sequence GL877875.1
     /// Read 1
-    rec += 5;
+//    rec += 5;
+    rec = std::next(rec, 5);
     {
         EXPECT_EQ(rec->getNumberOfTemplateSegments(), 2);
         EXPECT_EQ(rec->getSegments().size(), 1);
@@ -362,7 +377,8 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSplitRec) {  // NOLINT(cert-err-cpp
     }
 
     /// Read 2
-    rec += 1;
+//    rec += 1;
+    rec = std::next(rec);
     {
         EXPECT_EQ(rec->getNumberOfTemplateSegments(), 2);
         EXPECT_EQ(rec->getSegments().size(), 1);
@@ -383,82 +399,83 @@ TEST(SAM, ImporterPairReadsMultipleAlignmentsSplitRec) {  // NOLINT(cert-err-cpp
 
 }
 
-//TEST(SamFileReader, ImportFromFile2) {  // NOLINT(cert-err-cpp)
-//    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
-//
-//    std::vector<std::string> fnames = {
-//        "9799_7#3.sam",  // 0 - TODO: As an example for header
-//        "9827_2#49.sam", // 1 - OK
-//        "dm3PacBio.sam", // 2 - OK
-//        "ERR174310.aln.sort.dupmark.rg.recal.sam", // 3 - OK
-//        "ERR174310.mult.sorted.sam",    // 4 - TODO: ERROR due to invalid SAM Record
-//        "G15511.HCC1143.1.sam",         // 5 - TODO: As an example for header
-//        "HCC1954.mix1.n80t20.sam",      // 6 - TODO: As an example for header
-//        "K562_cytosol_LID8465_GEM_v3.sam",      // 7 - pair multi_alignment - TODO: Create smaller data
-//        "K562_cytosol_LID8465_TopHat_v2.sam",   // 8 - OK
-//        "MiSeq_Ecoli_DH10B_110721_PF.sam",      // 9 - OK
-//        "NA12877_S1.sam",   // 10 - TODO: tag ID PP
-//        "NA12878_S1.sam",   // 11
-//        "NA12878-Rep-1_S1_L001_2.aln.sort.dupmark.rg.sam",  // 12 - TODO: tag PL
-//        "NA12878.pacbio.bwa-sw.20140202.sam",               // 13
-//        "NA12879_S1.sam",         // 14 - (incomplete) pair - TODO: test
-//        "NA12882_S1.sam",         // 15 - pair - TODO: tag ID, PP
-//        "NA12890_S1.sam",         // 16 - incomplete pairs - ok
-//        "NA21144.chrom11.ILLUMINA.bwa.GIH.low_coverage.20130415.sam", // 17 - TODO: tag VN
-//        "sample-2-10_sorted.sam", // 18 - single - ok
-//        "sample-2-11_sorted.sam", // 19 - single - ok
-//        "sample-2-12_sorted.sam", // 20 - single - ok
-//        "simulation.1.homoINDELs.homoCEUsnps.reads2.fq.sam.samelength.sam", // 21 - pair - ok
-//        "SRR327342.sam"           // 22 - single unmapped - TODO: Check converter for unmapped
-//    };
-////    std::ifstream f("/home/adhisant/tmp/data/SAM_TEST/" + fnames[22]);
-//
-//    std::ifstream f(gitRootDir + "/data/sam/input.sam");
-//    UTILS_DIE_IF(!f.good(), "Cannot read file");
-//
-//    genie::format::sam::Reader reader(f);
-//
-//    std::list<std::string> lines;
-//    std::list<genie::format::sam::ReadTemplate> rts;
-//    genie::format::sam::ReadTemplateGroup rtg;
-//
+# if true
+TEST(SamFileReader, ImportFromFile2) {  // NOLINT(cert-err-cpp)
+    std::string gitRootDir = util_tests::exec("git rev-parse --show-toplevel");
+
+    std::vector<std::string> fnames = {
+        "9799_7#3.sam",  // 0 - TODO: As an example for header
+        "9827_2#49.sam", // 1 - OK
+        "dm3PacBio.sam", // 2 - OK
+        "ERR174310.aln.sort.dupmark.rg.recal.sam", // 3 - OK
+        "ERR174310.mult.sorted.sam",    // 4 - TODO: ERROR due to invalid SAM Record
+        "G15511.HCC1143.1.sam",         // 5 - TODO: As an example for header
+        "HCC1954.mix1.n80t20.sam",      // 6 - TODO: As an example for header
+        "K562_cytosol_LID8465_GEM_v3.sam",      // 7 - pair multi_alignment - TODO: Create smaller data
+        "K562_cytosol_LID8465_TopHat_v2.sam",   // 8 - OK
+        "MiSeq_Ecoli_DH10B_110721_PF.sam",      // 9 - OK
+        "NA12877_S1.sam",   // 10 - TODO: tag ID PP
+        "NA12878_S1.sam",   // 11
+        "NA12878-Rep-1_S1_L001_2.aln.sort.dupmark.rg.sam",  // 12 - TODO: tag PL
+        "NA12878.pacbio.bwa-sw.20140202.sam",               // 13
+        "NA12879_S1.sam",         // 14 - (incomplete) pair - TODO: test
+        "NA12882_S1.sam",         // 15 - pair - TODO: tag ID, PP
+        "NA12890_S1.sam",         // 16 - incomplete pairs - ok
+        "NA21144.chrom11.ILLUMINA.bwa.GIH.low_coverage.20130415.sam", // 17 - TODO: tag VN
+        "sample-2-10_sorted.sam", // 18 - single - ok
+        "sample-2-11_sorted.sam", // 19 - single - ok
+        "sample-2-12_sorted.sam", // 20 - single - ok
+        "simulation.1.homoINDELs.homoCEUsnps.reads2.fq.sam.samelength.sam", // 21 - pair - ok
+        "SRR327342.sam"           // 22 - single unmapped - TODO: Check converter for unmapped
+    };
+//    std::ifstream f("/home/adhisant/tmp/data/SAM_TEST/" + fnames[22]);
+
+    std::ifstream f(gitRootDir + "/data/sam/input2.sam");
+    UTILS_DIE_IF(!f.good(), "Cannot read file");
+
+    genie::format::sam::Reader reader(f);
+
+    std::list<std::string> lines;
+    std::list<genie::format::sam::ReadTemplate> rts;
+    genie::format::sam::ReadTemplateGroup rtg;
+
 //    genie::core::record::Chunk chunk;
-//    int k = 0;
-//    {
-//        while (reader.good() && k < 1000){
-//            reader.read(lines);
-//            k++;
-//        }
-//    }
-//
-//    rtg.addRecords(lines);
-//    lines.clear();
-//    rtg.getTemplates(rts);
-//
-//    for (auto& rt: rts){
+    std::list<genie::core::record::Record> records;
+    int k = 0;
+    {
+        while (reader.good() && k < 1000){
+            reader.read(lines);
+            k++;
+        }
+    }
+
+    rtg.addRecords(lines);
+    lines.clear();
+    rtg.getTemplates(rts);
+
+    for (auto& rt: rts){
 //        genie::format::sam::Importer::convert(chunk, rt, reader.getRefs(), false);
-//    }
-//
+        genie::format::sam::Importer::convert(records, rt, reader.getRefs(), false);
+    }
+
 //    auto& records = chunk.getData();
 //    std::sort (records.begin(), records.end(), genie::format::sam::Importer::compare);
+    records.sort(genie::format::sam::Importer::compare);
 
-//    uint64_t last_position = 0;
-//    for(size_t i = 0; i < records.size(); ++i) {
-//        if (!records[i].getAlignments().empty()){
-//            uint64_t abs_pos = records[i].getAlignments().front().getPosition();
-//            // Bezugsposition
-//            uint64_t first_pos = abs_pos; // geringste position
-//
-//            for(size_t j = 0; j < records[i].getAlignments().size(); ++i) {
-//                first_pos = std::min(first_pos, records[i].getAlignments()[j].getPosition());
-//            }
-//
-//            UTILS_DIE_IF(first_pos < last_position, "Das darf nicht passieren.");
-//            last_position = first_pos;
-//        }
-//    }
+    uint64_t last_position = 0;
+    for (const auto &record : records) {
+        if (record.getAlignments().empty()) {
+            continue;
+        }
 
-//}
+        auto minPos = genie::format::sam::Importer::getMinPos(record);
+
+        UTILS_DIE_IF(minPos < last_position, "Records not properly ordered");
+        last_position = minPos;
+    }
+
+}
+#endif
 
 # if false
 TEST(SamFileReader, main) {  // NOLINT(cert-err-cpp)
