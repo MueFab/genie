@@ -154,7 +154,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel for num_threads(data.cp.num_thr) schedule(dynamic)
 #endif
-    for (uint64_t block_num = 0; block_num < blocks; block_num++) {
+    for (int64_t block_num = 0; block_num < static_cast<int64_t>(blocks); block_num++) {
         params[block_num] = core::parameter::ParameterSet(0, 0, core::parameter::ParameterSet::DatasetType::NON_ALIGNED,
                                                           core::AlphabetID::ACGTN, 0, false, false, 1, 0, false, false);
         params[block_num].setComputedRef(
@@ -835,7 +835,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic)
 #endif
-    for (uint64_t cur_block_num = 0; cur_block_num < bdata.block_start.size(); cur_block_num++) {
+    for (int64_t cur_block_num = 0; cur_block_num < static_cast<int64_t>(bdata.block_start.size()); cur_block_num++) {
         params[cur_block_num] =
             core::parameter::ParameterSet(0, 0, core::parameter::ParameterSet::DatasetType::NON_ALIGNED,
                                           core::AlphabetID::ACGTN, 0, true, false, 1, 0, false, false);
