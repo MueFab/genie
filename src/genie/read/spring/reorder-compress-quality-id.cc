@@ -178,7 +178,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic)
 #endif
-    for (uint64_t block_num = 0; block_num < block_start.size(); block_num++) {
+    for (int64_t block_num = 0; block_num < static_cast<int64_t>(block_start.size()); block_num++) {
         std::ifstream f_order_id(file_order_id + "." + std::to_string(block_num), std::ios::binary);
         std::string *id_array_block = new std::string[block_end[block_num] - block_start[block_num]];
         uint32_t index;
@@ -250,7 +250,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
 #pragma omp parallel for num_threads(cp.num_thr) schedule(dynamic)
 #endif
 
-        for (uint64_t block_num = start_block_num; block_num < end_block_num; block_num++) {
+        for (int64_t block_num = start_block_num; block_num < end_block_num; block_num++) {
             genie::core::record::Chunk chunk;
             for (size_t i = block_start[block_num]; i < block_end[block_num]; i++) {
                 chunk.getData().emplace_back(2, core::record::ClassType::CLASS_U, "", "", 0);
@@ -333,7 +333,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
 #else
         (void)num_thr;  // Suppress unused parameter warning
 #endif
-        for (uint64_t block_num = 0; block_num < blocks; ++block_num) {
+        for (int64_t block_num = 0; block_num < static_cast<int64_t>(blocks); ++block_num) {
             uint64_t block_num_offset = start_read_bin / num_reads_per_block;
             uint64_t start_read_num = block_num * num_reads_per_block;
             uint64_t end_read_num = (block_num + 1) * num_reads_per_block;

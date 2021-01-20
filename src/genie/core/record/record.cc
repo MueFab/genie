@@ -40,10 +40,10 @@ Record::Record()
 // ---------------------------------------------------------------------------------------------------------------------
 
 Record::Record(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::string &&_read_name,
-               std::string &&_read_group, uint8_t _flags)
+               std::string &&_read_group, uint8_t _flags, bool _is_read_1_first)
     : number_of_template_segments(_number_of_template_segments),
       class_ID(_auTypeCfg),
-      read_1_first(true),
+      read_1_first(_is_read_1_first),
       sharedAlignmentInfo(),
       qv_depth(0),
       read_name(std::move(_read_name)),
@@ -220,6 +220,10 @@ const std::string &Record::getName() const { return read_name; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool Record::getRead1First() const { return read_1_first; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 const std::string &Record::getGroup() const { return read_group; }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -299,6 +303,12 @@ size_t Record::getPosition(size_t alignment, size_t split) const {
     auto &s2 =
         dynamic_cast<record::alignment_split::SameRec &>(*getAlignments()[alignment].getAlignmentSplits()[split - 1]);
     return getAlignments()[alignment].getPosition() + s2.getDelta();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Record::setMoreAlignmentInfo(std::unique_ptr<AlignmentExternal> _more_alignment_info) {
+        moreAlignmentInfo = std::move(_more_alignment_info);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
