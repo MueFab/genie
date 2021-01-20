@@ -220,8 +220,8 @@ class ReadTemplate{
     };
 
    private:
-    std::vector<std::list<Record>> data;
     std::string qname;
+    std::vector<std::list<Record>> data;
 
     /**
      * @brief initialize length of data
