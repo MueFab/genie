@@ -50,7 +50,7 @@ class Importer : public core::FormatImporter {
      */
     bool anyRemainingMpeggRecord();
 
-    bool isEnoughRecs(std::list<core::record::Record>& recs);
+    bool isEnoughRecs(std::list<core::record::Record>& recs) const;
 
     /**
      * Check if the number of mpeg-g records of any group (MPEG-G records grouped by ref) reach blockSize
@@ -173,6 +173,11 @@ class Importer : public core::FormatImporter {
      */
    // bool pump(uint64_t& id, std::mutex& lock) override;
 
+    /**
+     *
+     * @param _classifier
+     * @return
+     */
     bool pumpRetrieve(core::Classifier* _classifier) override;
 
     /**
@@ -184,9 +189,8 @@ class Importer : public core::FormatImporter {
       *
       * @param records: List of MPEG-G records
       * @param sam_recs: SAM record
-      * @param refs: Map containing Reference ID associated to each Reference Name
       */
-    static void convertUnmapped(std::list<core::record::Record> &records, SamRecords& sam_recs, std::map<std::string, size_t>& refs);
+    static void convertUnmapped(std::list<core::record::Record> &records, SamRecords& sam_recs);
 
      /**
       * Convert Single-end Reads SAM records to MPEG-G records
