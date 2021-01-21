@@ -4,10 +4,6 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-const DatasetHeader::ByteOffsetSizeFlag MITAccessUnitInfo::getByteOffsetSizeFlag() const { return  byte_offset_size_flag; }
-
-const DatasetHeader::Pos40SizeFlag MITAccessUnitInfo::getPos40SizeFlag() const { return pos_40_size_flag; }
-
 void MITAccessUnitInfo::write(util::BitWriter& bit_writer) const {
 
     // AU_byte_offset u(byteOffsetSize)

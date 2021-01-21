@@ -32,6 +32,7 @@ uint8_t MITUAccessUnitInfo::getUSignatureSize() const { return U_signature_size;
 uint32_t MITUAccessUnitInfo::getMultipleSignatureBase() const { return multiple_signature_base; }
 
 uint64_t MITUAccessUnitInfo::getBitLength() const {
+    // num_U_clusters u(32), multiple_signature_base u(31)
     uint64_t bitlen = 32 + 31;
     if (multiple_signature_base > 0) {
         // U_signature_size u(6)
