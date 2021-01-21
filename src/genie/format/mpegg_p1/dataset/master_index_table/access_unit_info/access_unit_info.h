@@ -35,10 +35,6 @@ class MITAccessUnitInfo {
 
     MITAccessUnitInfo();
 
-    const DatasetHeader::ByteOffsetSizeFlag getByteOffsetSizeFlag() const;
-
-    const DatasetHeader::Pos40SizeFlag getPos40SizeFlag() const;
-
     void write(genie::util::BitWriter& bit_writer) const;
 };
 
