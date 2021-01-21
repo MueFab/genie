@@ -90,13 +90,37 @@ class DatasetHeader {
                   core::parameter::DataUnit::DatasetType _dataset_type, uint8_t _alphabet_ID,
                   uint32_t _num_U_access_units);
 
+    /**
+     *
+     * @return
+     */
     uint16_t getID() const;
-
+    /**
+     *
+     * @param ID
+     */
     void setID(uint16_t ID);
-
+    /**
+     *
+     * @return
+     */
     uint8_t getGroupID() const;
-
+    /**
+     *
+     * @param group_ID
+     */
     void setGroupId(uint8_t group_ID);
+
+    /**
+     *
+     * @return
+     */
+    const SequenceConfig& getSeqInfo() const;
+    /**
+     *
+     * @return
+     */
+    const BlockConfig  & getBlockHeader() const;
 
     uint32_t getNumUAccessUnits() const;
 

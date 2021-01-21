@@ -52,36 +52,12 @@ uint64_t DatasetHeader::getLength() const {
     bitlen += (1 + 2 + 4) * 8;  /// dataset_group_ID u(8), dataset_ID u(16), version c(4)
     bitlen += 3; /// byte_offset_size_flag u(1), non_overlapping_AU_range_flag u(1) , pos_40_bits_flag u(1)
 
-    bitlen += block_header.getBitLength();   /// block_header_flag u(1)
-
-    // TODO (Raouf): Fix getBitLength()
-
-    if (block_header.getBlockHeaderFlag()) {
-        bitlen += block_header.getBitLength(); /// MIT_flag u(1)
-        bitlen += block_header.getBitLength(); /// CC_mode_flag u(1)
-    }
-    else {
-        bitlen += block_header.getBitLength(); /// ordered_blocks_flag u(1)
-    }
-
-    bitlen += 4;  /// dataset_type u(4)
-    if (block_header.getMITFlag()) {
-        bitlen += 4;  /// num_classes u(4)
-        for (auto ci = 0; ci < block_header.getNumClasses(); ci++) {
-            bitlen += 4 ;   /// clid[ci] u(4)
-            if (!block_header.getBlockHeaderFlag()) {
-                bitlen += 5 ;  /// num_descriptors[ci] u(5)
-//                for (auto di = 0; di < block_header.getClassInfos()[ci].getDescriptorIds().size(); di++) {
-//                    bitlen += 7 ;
-//                }
-                bitlen += block_header.getClassInfos()[ci].getDescriptorIDs().size() * 7; /// descriptors_ID[ci][di] u(7)
-            }
-        }
-    }
+    bitlen += block_header.getBitLength();
 
     bitlen += 8 + 32;  /// alphabet_ID u(8), num_U_access_units u(32)
-    if (num_U_access_units > 0) {//
-        bitlen += u_access_unit_info->getBitLength();  /// num_U_clusters u(32), multiple_signature_base u(31), U_signature_size u(6), U_signature_constant_length u(1), U_signature_length u(8)
+
+    if (num_U_access_units > 0) {
+        bitlen += u_access_unit_info->getBitLength();
     }
 
     bitlen += seq_info.getBitLength();
@@ -99,6 +75,10 @@ void DatasetHeader::setID(uint16_t ID) { dataset_ID = ID;}
 uint8_t DatasetHeader::getGroupID() const {return dataset_group_ID;}
 
 void DatasetHeader::setGroupId(uint8_t group_ID) { dataset_group_ID = group_ID;}
+
+const SequenceConfig& DatasetHeader::getSeqInfo() const { return seq_info; }
+
+const BlockConfig& DatasetHeader::getBlockHeader() const { return block_header; }
 
 uint32_t DatasetHeader::getNumUAccessUnits() const { return num_U_access_units;}
 
