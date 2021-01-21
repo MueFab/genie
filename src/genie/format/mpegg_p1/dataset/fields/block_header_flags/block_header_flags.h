@@ -81,6 +81,8 @@ class BlockConfig {
    protected:
     bool block_header_flag;
     bool MIT_flag;
+    //bool CC_mode_flag;
+    //bool ordered_blocks_flag;
 
     std::vector<ClassInfo> class_infos;
 };

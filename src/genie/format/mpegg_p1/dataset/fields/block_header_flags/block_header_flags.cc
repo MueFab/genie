@@ -40,7 +40,33 @@ void BlockConfig::setClassInfos(std::vector<ClassInfo>&& _cls_infos) {
 }
 
 uint64_t BlockConfig::getBitLength() const {
-    return 1;
+
+        uint64_t bitlen = 1;   /// block_header_flag u(1)
+
+        if (block_header_flag) {
+            bitlen += 1; /// MIT_flag u(1)
+            bitlen += 1; /// CC_mode_flag u(1)
+        }
+        else {
+            bitlen += 1; /// ordered_blocks_flag u(1)
+        }
+
+        bitlen += 4;  /// dataset_type u(4)
+
+        if (MIT_flag) {
+            bitlen += 4;  /// num_classes u(4)
+            for (auto ci = 0; ci < getNumClasses(); ci++) {
+                bitlen += 4;  /// clid[ci] u(4)
+                if (!block_header_flag) {
+                    bitlen += 5;  /// num_descriptors[ci] u(5)
+                    //                for (auto di = 0; di < block_header.getClassInfos()[ci].getDescriptorIds().size(); di++) {
+                    //                    bitlen += 7 ;
+                    //                }
+                    bitlen += getClassInfos()[ci].getDescriptorIDs().size() * 7;  /// descriptors_ID[ci][di] u(7)
+                }
+            }
+        }
+        return bitlen;
 }
 
 void BlockConfig::write(util::BitWriter& bit_writer) const {
