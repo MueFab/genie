@@ -29,7 +29,10 @@ void UAccessUnitInfo::setConstantSignature(uint8_t sign_length) {
 }
 
 uint64_t UAccessUnitInfo::getBitLength() const {
+
+    // num_U_clusters u(32), multiple_signature_base u(31)
     uint64_t bitlen = 32 + 31;
+
     if (multiple_signature_base > 0) {
         // U_signature_size u(6)
         bitlen += 6;
@@ -39,7 +42,7 @@ uint64_t UAccessUnitInfo::getBitLength() const {
     bitlen += 1;
 
     if (U_signature_constant_length){
-        // U_signature_constant_length u(8)
+        // U_signature_length u(8)
         bitlen += 8;
     }
 
