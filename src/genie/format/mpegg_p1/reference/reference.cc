@@ -152,7 +152,7 @@ uint64_t Reference::getLength() const {
     // sequence_name[] st(v)
     for (auto& sequence_name: sequence_names){
         // bit_len of string in Section 6.2.3
-        len += sequence_names.size() * (sequence_name.size() + 1);
+        len += (sequence_name.size() + 1);
     }
 
     // reserved u(7), external_ref_flag u(1)
