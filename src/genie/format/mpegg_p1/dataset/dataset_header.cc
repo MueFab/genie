@@ -19,22 +19,24 @@ DatasetHeader::DatasetHeader():
     byte_offset_size_flag(ByteOffsetSizeFlag::OFF),
     non_overlapping_AU_range_flag(false),
     pos_40_bits_flag(Pos40SizeFlag::OFF),
+    multiple_alignment_flag(false),
     dataset_type(core::parameter::DataUnit::DatasetType::NON_ALIGNED),
     alphabet_ID(0),
     num_U_access_units(0) {}
 
-DatasetHeader::DatasetHeader(const uint16_t datasetID) : dataset_ID(datasetID) {}
+DatasetHeader::DatasetHeader(const uint16_t datasetID): dataset_ID(datasetID) {}
 
 DatasetHeader::DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSizeFlag _byte_offset_size_flag,
                              bool _non_overlapping_AU_range_flag, Pos40SizeFlag _pos_40_bits_flag,
-                             core::parameter::DataUnit::DatasetType _dataset_type, uint8_t _alphabet_ID,
-                             uint32_t _num_U_access_units)
+                             bool _multiple_alignment_flag, core::parameter::DataUnit::DatasetType _dataset_type,
+                             uint8_t _alphabet_ID, uint32_t _num_U_access_units)
     : dataset_group_ID(group_ID),
       dataset_ID(ID),
       version("XXXX"), // TODO (Yeremia): Version
       byte_offset_size_flag(_byte_offset_size_flag),
       non_overlapping_AU_range_flag(_non_overlapping_AU_range_flag),
       pos_40_bits_flag(_pos_40_bits_flag),
+      multiple_alignment_flag(_multiple_alignment_flag),
       dataset_type(_dataset_type),
       alphabet_ID(_alphabet_ID),
       num_U_access_units(_num_U_access_units){
@@ -42,31 +44,6 @@ DatasetHeader::DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSizeFlag _
     UTILS_DIE_IF(4 != version.size(), "Version string must consists of 4 characters");
 }
 
-uint64_t DatasetHeader::getLength() const {
-
-//length is first calculated in bits then converted in bytes
-
-    /// Key c(4) Length u(64)
-    uint64_t bitlen = (4 * sizeof(char) + 8) * 8 ;   // gen_info
-
-    bitlen += (1 + 2 + 4) * 8;  /// dataset_group_ID u(8), dataset_ID u(16), version c(4)
-    bitlen += 3; /// byte_offset_size_flag u(1), non_overlapping_AU_range_flag u(1) , pos_40_bits_flag u(1)
-
-    bitlen += block_header.getBitLength();
-
-    bitlen += 8 + 32;  /// alphabet_ID u(8), num_U_access_units u(32)
-
-    if (num_U_access_units > 0) {
-        bitlen += u_access_unit_info->getBitLength();
-    }
-
-    bitlen += seq_info.getBitLength();
-
-    bitlen += bitlen % 8;  /// byte_aligned() f(1)
-    bitlen /= 8;  /// byte conversion
-
-    return bitlen;
-}
 
 uint16_t DatasetHeader::getID() const { return dataset_ID; }
 
@@ -76,6 +53,13 @@ uint8_t DatasetHeader::getGroupID() const {return dataset_group_ID;}
 
 void DatasetHeader::setGroupId(uint8_t group_ID) { dataset_group_ID = group_ID;}
 
+
+DatasetHeader::ByteOffsetSizeFlag DatasetHeader::getByteOffsetSizeFlag() const { return byte_offset_size_flag; }
+
+DatasetHeader::Pos40SizeFlag DatasetHeader::getPos40SizeFlag() const { return pos_40_bits_flag; }
+
+//DatasetHeader::Pos40SizeFlag DatasetHeader::getPos40SizeFlag() const { return pos_40_bits_flag; }
+
 const SequenceConfig& DatasetHeader::getSeqInfo() const { return seq_info; }
 
 const BlockConfig& DatasetHeader::getBlockHeader() const { return block_header; }
@@ -84,12 +68,46 @@ uint32_t DatasetHeader::getNumUAccessUnits() const { return num_U_access_units;}
 
 bool DatasetHeader::getMultipleAlignmentFlag() const { return multiple_alignment_flag; }
 
+
+uint64_t DatasetHeader::getLength() const {
+
+//length is first calculated in bits then converted in bytes
+
+    /// Key c(4) Length u(64)
+    uint64_t bitlen = (4 * sizeof(char) + 8) * 8 ;   // gen_info
+
+    bitlen += (1 + 2 + 4) * 8;  // dataset_group_ID u(8), dataset_ID u(16), version c(4)
+    bitlen += 3; // byte_offset_size_flag u(1), non_overlapping_AU_range_flag u(1) , pos_40_bits_flag u(1)
+
+
+    /// block_header_flag, MIT_flag, CC_mode_flag, ordered_blocks_flag,
+    /// dataset_type, num_classes, clid[], num_descriptors[], descriptors_ID[][]
+    bitlen += block_header.getBitLength();
+
+    bitlen += 8 + 32;  // alphabet_ID u(8), num_U_access_units u(32)
+
+    if (num_U_access_units > 0) {
+        /// num_U_clusters, multiple_signature_base, U_signature_size,
+        /// U_signature_constant_length, U_signature_length
+        bitlen += u_access_unit_info->getBitLength();
+    }
+
+    /// seq_count, reference_ID, seq_ID[], seq_blocks[],
+    /// tflag[0], thres[0], thres[]
+    bitlen += seq_info.getBitLength();
+
+    bitlen += bitlen % 8;  // byte_aligned() f(1)
+    bitlen /= 8;  /// byte conversion
+
+    return bitlen;
+}
+
 void DatasetHeader::write(util::BitWriter& bit_writer) const {
 
-    // Key of KVL format
+    // Key of KLV format
     bit_writer.write("dthd");
 
-    // Length of KVL format
+    // Length of KLV format
     bit_writer.write(getLength(), 64);
 
     // dataset_group_ID u(8)

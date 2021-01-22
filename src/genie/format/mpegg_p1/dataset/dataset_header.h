@@ -51,7 +51,7 @@ class DatasetHeader {
     /// ClassInfo (num_classes, clid[], num_descriptors[], descriptor_ID[][])
     BlockConfig block_header;
 
-    // seq_count, reference_ID, seq_ID[], seq_blocks[], tflag[], thres[]
+    /// seq_count, reference_ID, seq_ID[], seq_blocks[], tflag[], thres[]
     SequenceConfig seq_info;
 
     core::parameter::DataUnit::DatasetType dataset_type;
@@ -59,7 +59,7 @@ class DatasetHeader {
     uint8_t alphabet_ID;
     uint32_t num_U_access_units;
 
-    //num_U_clusters, multiple_signature_base, U_signature_size, U_signature_constant_length, U_signature_length
+    ///num_U_clusters, multiple_signature_base, U_signature_size, U_signature_constant_length, U_signature_length
     std::unique_ptr<UAccessUnitInfo> u_access_unit_info;
 
    public:
@@ -72,7 +72,7 @@ class DatasetHeader {
      *
      * @param datasetID
      */
-    explicit DatasetHeader(uint16_t datasetID);
+    explicit DatasetHeader(const uint16_t datasetID);
 
     /**
      *
@@ -87,8 +87,8 @@ class DatasetHeader {
      */
     DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSizeFlag _byte_offset_size_flag,
                   bool _non_overlapping_AU_range_flag, Pos40SizeFlag _pos_40_bits_flag,
-                  core::parameter::DataUnit::DatasetType _dataset_type, uint8_t _alphabet_ID,
-                  uint32_t _num_U_access_units);
+                  bool _multiple_alignment_flag, core::parameter::DataUnit::DatasetType _dataset_type,
+                  uint8_t _alphabet_ID, uint32_t _num_U_access_units);
 
     /**
      *
@@ -111,6 +111,17 @@ class DatasetHeader {
      */
     void setGroupId(uint8_t group_ID);
 
+
+    /**
+     *
+     * @return
+     */
+    ByteOffsetSizeFlag getByteOffsetSizeFlag() const;
+    /**
+     *
+     * @return
+     */
+    Pos40SizeFlag getPos40SizeFlag() const;
     /**
      *
      * @return
@@ -120,14 +131,28 @@ class DatasetHeader {
      *
      * @return
      */
-    const BlockConfig  & getBlockHeader() const;
-
+    const BlockConfig& getBlockHeader() const;
+    /**
+     *
+     * @return
+     */
     uint32_t getNumUAccessUnits() const;
-
+    /**
+     *
+     * @return
+     */
     bool getMultipleAlignmentFlag() const;
 
-    uint64_t getLength() const;
 
+    /**
+     *
+     * @return
+     */
+    uint64_t getLength() const;
+    /**
+     *
+     * @param bit_writer
+     */
     void write(genie::util::BitWriter& bit_writer) const;
 };
 
