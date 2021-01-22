@@ -42,7 +42,6 @@ void BlockConfig::setClassInfos(std::vector<ClassInfo>&& _cls_infos) {
 uint64_t BlockConfig::getBitLength() const {
 
         uint64_t bitlen = 1;   /// block_header_flag u(1)
-
         if (block_header_flag) {
             bitlen += 1; /// MIT_flag u(1)
             bitlen += 1; /// CC_mode_flag u(1)
@@ -52,7 +51,6 @@ uint64_t BlockConfig::getBitLength() const {
         }
 
         bitlen += 4;  /// dataset_type u(4)
-
         if (MIT_flag) {
             bitlen += 4;  /// num_classes u(4)
             for (auto ci = 0; ci < getNumClasses(); ci++) {
