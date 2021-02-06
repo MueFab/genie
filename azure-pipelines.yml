@@ -1,7 +1,3 @@
-trigger:
-- master
-- develop
-
 strategy:
   matrix:
     linux:
@@ -9,39 +5,26 @@ strategy:
     mac:
       imageName: 'macos-10.15'
     windows:
-      imageName: 'windows-latest'
+      imageName: 'vs2017-win2016'
 
 pool:
   vmImage: $(imageName)
 
 steps:
 - script: |
-    echo "$OSTYPE"
     mkdir cmake-build-debug
     cd cmake-build-debug
-    cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DGENIE_USE_OPENMP=OFF -DBUILD_DOCUMENTATION=ON -DBUILD_COVERAGE=ON
-  displayName: 'Run CMake'
+    cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=ON
+    make --jobs
+  displayName: 'Run CMake & Make'
 
 - script: |
-    cd cmake-build-debug
-    cmake --build ./ -- -j
-  condition: ne( variables['Agent.OS'], 'Windows_NT' )
-  displayName: 'Build (Make)'
+    echo 'Run genie unit tests'
+    ./cmake-build-debug/bin/util-tests
+  displayName: 'Run genie unit tests'
 
 - script: |
-    cd cmake-build-debug
-    cmake --build ./
-  condition: eq( variables['Agent.OS'], 'Windows_NT' )
-  displayName: 'Build (MSVC)'
-
-- bash: |
-    $(Build.SourcesDirectory)/cmake-build-debug/bin/util-tests
-  condition: ne( variables['Agent.OS'], 'Windows_NT' )
-  displayName: 'Run genie unit tests (bash)'
-
-- powershell: |
-    $(Build.SourcesDirectory)\cmake-build-debug\bin\Debug\util-tests.exe
-  condition: eq( variables['Agent.OS'], 'Windows_NT' )
-  displayName: 'Run genie unit tests (windows)'
-
+    echo 'Run GABAC Roundtrips'
+    ./ci/gabac-roundtrip.sh
+  displayName: 'Run GABAC Roundtrips'
 
