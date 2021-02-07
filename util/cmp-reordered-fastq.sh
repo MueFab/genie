@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
-
 # Compare two FASTQ files which are assumed to contain the same set of reads,
 # but in different orders
 
 
 # -----------------------------------------------------------------------------
-# Setup
+# Bash script setup
 # -----------------------------------------------------------------------------
 
 self="${0}"
@@ -14,52 +13,34 @@ self_name="${self##*/}"
 
 datetime=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-trace() { echo "[${self_name}] [${datetime}] [trace] ${*}"; }
-debug() { echo "[${self_name}] [${datetime}] [debug] ${*}"; }
-info() { echo "[${self_name}] [${datetime}] [info] ${*}"; }
-warning() { echo "[${self_name}] [${datetime}] [warning] ${*}"; }
-error() { echo "[${self_name}] [${datetime}] [error] ${*}" 1>&2; }
-fatal() { echo "[${self_name}] [${datetime}] [fatal] ${*}" 1>&2; }
+trace () { echo "${self_name}: trace: ${*}"; }
+debug () { echo "${self_name}@${datetime}: debug: ${*}"; }
+info () { echo "${*}"; }
+warning () { echo "${self_name}: warning: ${*}"; }
+error () { echo "${self_name}: error: ${*}" 1>&2; }
+fatal () { echo "${self_name}: fatal: ${*}" 1>&2; }
 
-run() {
+run () {
     local rc
-    info "running: ${*}"
+    info "Running: ${*}"
     "${@}"
     rc="${?}"
     if [[ ${rc} != 0 ]]; then
-        fatal "command failed (RC=${rc}): ${*}"
+        fatal "Command failed (RC=${rc}): ${*}"
         exit ${rc}
     fi
 }
 
 
 # -----------------------------------------------------------------------------
-# Commands
-# -----------------------------------------------------------------------------
-
-cmds=()
-cmds+=("cmp")
-cmds+=("paste")
-cmds+=("rm")
-cmds+=("sort")
-
-for i in "${!cmds[@]}"; do
-    cmd=${cmds[${i}]}
-    if not command -v "${cmd}" &>/dev/null; then
-        error "command does not exist: ${cmd}"
-        exit 1
-    fi
-done
-
-
-# -----------------------------------------------------------------------------
 # Command line
 # -----------------------------------------------------------------------------
 
-print_usage() {
-    info "usage: ${self_name} [options]"
+print_usage () {
+    info "Usage: ${self_name} [options]"
+    info "Compare two FASTQ files"
     info ""
-    info "options:"
+    info "Options:"
     info "  -h,--help              print this help"
     info "  -1,--one FASTQ_FILE_1  1st FASTQ file"
     info "  -2,--two FASTQ_FILE_2  2nd FASTQ file"
@@ -73,45 +54,36 @@ while [[ "${#}" -gt 0 ]]; do
         -h|--help) print_usage; exit 1;;
         -1|--one) fastq_file_1="${2}"; shift;;
         -2|--two) fastq_file_2="${2}"; shift;;
-        *) error "unknown parameter passed: ${1}"; print_usage; exit 1;;
+        *) error "Unknown parameter passed: ${1}"; print_usage; exit 1;;
     esac
     shift
 done
-
-if [[ ! -f "${fastq_file_1}" ]]; then
-    error "1st FASTQ file is not a regular file: ${fastq_file_1}"
-    exit 1
-fi
-
-if [[ ! -f "${fastq_file_2}" ]]; then
-    error "2nd FASTQ file is not a regular file: ${fastq_file_2}"
-    exit 1
-fi
 
 
 # -----------------------------------------------------------------------------
 # Do it
 # -----------------------------------------------------------------------------
 
-info "sorting 1st FASTQ file: ${fastq_file_1}"
+info "Sorting 1st FASTQ file '${fastq_file_1}'"
+if [[ ! -f "${fastq_file_1}" ]]; then error "'${fastq_file_1}' is not a regular file"; exit 1; fi
 run paste -d" " - - - - < "${fastq_file_1}" > "${fastq_file_1}.one_record_per_line"
 run sort < "${fastq_file_1}.one_record_per_line" > "${fastq_file_1}.sorted"
 
-info "sorting 2nd FASTQ file: ${fastq_file_2}"
+info "Sorting 2nd FASTQ file '${fastq_file_2}'"
+if [[ ! -f "${fastq_file_2}" ]]; then error "'${fastq_file_2}' is not a regular file"; exit 1; fi
 run paste -d" " - - - - < "${fastq_file_2}" > "${fastq_file_2}.one_record_per_line"
 run sort < "${fastq_file_2}.one_record_per_line" > "${fastq_file_2}.sorted"
 
-info "comparing FASTQ files"
+info "Comparing FASTQ files '${fastq_file_1}.sorted' and '${fastq_file_2}.sorted'"
 run cmp "${fastq_file_1}.sorted" "${fastq_file_2}.sorted"
 
-info "FASTQ files '${fastq_file_1}.sorted' and '${fastq_file_2}.sorted' contain the same set of reads"
-
+info "FASTQ files '${fastq_file_1}.sorted' and '${fastq_file_2}.sorted' contain the SAME SET OF READS"
 
 # -----------------------------------------------------------------------------
 # Clean up
 # -----------------------------------------------------------------------------
 
-info "cleaning up"
+info "Cleaning up"
 run rm "${fastq_file_1}.one_record_per_line"
 run rm "${fastq_file_1}.sorted"
 run rm "${fastq_file_2}.one_record_per_line"
