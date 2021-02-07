@@ -109,7 +109,7 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, size_t length)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<uint16_t>&& DatasetGroup::getDatasetIDs(bool sort_ids) const {
+std::vector<uint16_t> DatasetGroup::getDatasetIDs(bool sort_ids) const {
     std::vector<uint16_t> dataset_IDs;
 
     for (auto &ds : datasets){
@@ -120,7 +120,7 @@ std::vector<uint16_t>&& DatasetGroup::getDatasetIDs(bool sort_ids) const {
         sort(dataset_IDs.begin(), dataset_IDs.end());
     }
 
-    return std::move(dataset_IDs);
+    return dataset_IDs;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

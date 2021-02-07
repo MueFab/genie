@@ -9,9 +9,9 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-std::string&& readKey(util::BitReader &reader);
+std::string readKey(util::BitReader &reader);
 
-std::string&& readNullTerminatedStr(util::BitReader &reader);
+std::string readNullTerminatedStr(util::BitReader &reader);
 
 void writeNullTerminatedStr(util::BitWriter &writer, const std::string &string);
 
