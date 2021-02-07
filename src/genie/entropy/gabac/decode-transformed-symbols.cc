@@ -77,7 +77,7 @@ TransformedSymbolsDecoder::TransformedSymbolsDecoder(const TransformedSymbolsDec
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t TransformedSymbolsDecoder::decodeNextSymbol(uint64_t *depSymbol) {
+uint64_t TransformedSymbolsDecoder::decodeNextSymbol(uint64_t *depSymbol) {
 
     if (symbolsAvail() <= 0) UTILS_DIE("No more transformed symbols available.");
 
