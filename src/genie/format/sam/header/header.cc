@@ -101,7 +101,7 @@ HeaderLine::HeaderLine(HeaderLine&& line) noexcept
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-HeaderLine::HeaderLine(std::string&& _name, std::string&& _comment)
+HeaderLine::HeaderLine(std::string&& _name, std::string&&)
 //    : name(std::move(_name)), comment(std::move(_comment)) {}
     : name(std::move(_name)) {}
 
