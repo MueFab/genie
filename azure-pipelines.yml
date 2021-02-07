@@ -11,6 +11,12 @@ pool:
   vmImage: $(imageName)
 
 steps:
+
+- script: |
+    brew install libomp
+  displayName: 'Install openmp (OSX)'
+  condition: eq( variables['Agent.OS'], 'Darwin' )
+
 - script: |
     mkdir cmake-build-debug
     cd cmake-build-debug
