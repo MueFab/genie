@@ -106,8 +106,11 @@ endif()
 
 if(${GENIE_USE_OPENMP})
     find_package(OpenMP REQUIRED)
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+    include_directories(${OpenMP_CXX_INCLUDE_DIRS})
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+    elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xpreprocessor -fopenmp")
     elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC") # Microsoft Compiler
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
     else()
