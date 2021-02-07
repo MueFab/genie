@@ -15,16 +15,31 @@ steps:
     mkdir cmake-build-debug
     cd cmake-build-debug
     cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=ON
-    make --jobs
-  displayName: 'Run CMake & Make'
+    ls -l
+  displayName: 'Run CMake'
 
 - script: |
-    echo 'Run genie unit tests'
-    ./cmake-build-debug/bin/util-tests
+    cd cmake-build-debug
+    make --jobs
+  displayName: 'Run Make'
+  condition: ne( variables['Agent.OS'], 'Windows_NT' )
+
+- task: VSBuild@1
+  inputs:
+    solution: 'cmake-build-debug\genie.sln'
+    msbuildArgs: '-m' 
+  displayName: 'Run MSVC'
+  condition: eq( variables['Agent.OS'], 'Windows_NT' )
+
+- bash: |
+    cp cmake-build-debug/bin/Debug/util-tests.exe cmake-build-debug/bin/util-tests
+    cp cmake-build-debug/bin/Debug/gabac-app.exe cmake-build-debug/bin/gabac-app
+  displayName: 'Copy MSVC files'
+  condition: eq( variables['Agent.OS'], 'Windows_NT' )
+
+- bash: cmake-build-debug/bin/util-tests
   displayName: 'Run genie unit tests'
 
-- script: |
-    echo 'Run GABAC Roundtrips'
-    ./ci/gabac-roundtrip.sh
+- bash: ci/gabac-roundtrip.sh
   displayName: 'Run GABAC Roundtrips'
 

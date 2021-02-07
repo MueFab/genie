@@ -79,7 +79,7 @@ bool SpringSource::pump(uint64_t& id, std::mutex& lock) {
             ghc::filesystem::remove(filename);
         }
         auId++;
-        sec = {id, au.getNumReads(), true};
+        sec = {size_t(id), au.getNumReads(), true};
         id += sec.length;
     }
     au.setStats(std::move(stats));

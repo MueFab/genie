@@ -349,7 +349,7 @@ void Decoder::add(core::record::Chunk& chunk, core::record::Record&& r, uint64_t
     chunk.getData().push_back(std::move(r));
     if (chunk.getData().size() >= CHUNK_SIZE) {
         size_t size = chunk.getData().size() * 2;
-        flowOut(std::move(chunk), {pos, size, true});
+        flowOut(std::move(chunk), {size_t(pos), size, true});
         pos += size;
     }
 }
@@ -427,7 +427,7 @@ void Decoder::flushIn(uint64_t& pos) {
 
     size_t size = chunk.getData().size() * 2;
     if (size) {
-        flowOut(std::move(chunk), {pos, size, true});
+        flowOut(std::move(chunk), {size_t(pos), size, true});
         pos += size;
     }
 

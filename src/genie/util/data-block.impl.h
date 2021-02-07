@@ -91,11 +91,11 @@ inline DataBlock::Iterator DataBlock::begin() { return {this, 0}; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline DataBlock::ConstIterator DataBlock::end() const { return {this, divByWordSize(data.size())}; }
+inline DataBlock::ConstIterator DataBlock::end() const { return {this, size_t(divByWordSize(data.size()))}; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline DataBlock::Iterator DataBlock::end() { return {this, divByWordSize(data.size())}; }
+inline DataBlock::Iterator DataBlock::end() { return {this, size_t(divByWordSize(data.size()))}; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

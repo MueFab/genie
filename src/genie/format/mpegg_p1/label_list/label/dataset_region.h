@@ -58,7 +58,7 @@ class DatasetRegion{
      *
      * @return
      */
-    u_int64_t getBitLength() const;
+    uint64_t getBitLength() const;
 
     /**
      *
