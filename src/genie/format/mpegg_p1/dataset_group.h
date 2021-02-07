@@ -138,7 +138,7 @@ class DatasetGroup {
      * @param sort_ids
      * @return
      */
-    std::vector<uint16_t>&& getDatasetIDs(bool sort_ids=false) const;
+    std::vector<uint16_t> getDatasetIDs(bool sort_ids=false) const;
 
     /**
      *
