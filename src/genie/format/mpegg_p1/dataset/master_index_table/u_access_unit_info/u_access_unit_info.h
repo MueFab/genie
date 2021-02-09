@@ -5,6 +5,9 @@
 #include <vector>
 #include <genie/util/bitwriter.h>
 
+#include "genie/format/mpegg_p1/dataset/dataset_header.h"
+#include "genie/format/mpegg_p1/dataset/master_index_table/access_unit_info/access_unit_info.h"
+
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
@@ -17,17 +20,55 @@ class MITUAccessUnitInfo {
     bool U_signature_constant_length;
     uint8_t U_signature_length;
 
-   public:
+    DatasetHeader* datasetHeader;
+    MITAccessUnitInfo ac_info;
 
+    std::vector<uint8_t> U_cluster_signature;
+    uint16_t num_signatures;
+
+    uint16_t U_ref_sequence_id;
+    uint8_t U_ref_start_position;
+    uint8_t U_ref_end_position;
+
+    /** ------------------------------------------------------------------------------------------------------------
+     *  Internal
+     *  ------------------------------------------------------------------------------------------------------------ */
+    DatasetHeader::ByteOffsetSizeFlag byte_offset_size_flag;
+    DatasetHeader::Pos40SizeFlag pos_40_size_flag;
+   public:
+    /**
+     *
+     */
     MITUAccessUnitInfo();
 
+    /**
+     *
+     * @param _num_U_clusters
+     */
     explicit MITUAccessUnitInfo(uint32_t _num_U_clusters);
 
+    /**
+     *
+     * @param reader
+     * @param length
+     */
+    MITUAccessUnitInfo(util::BitReader& reader, size_t length);
+    /**
+     *
+     * @param base
+     * @param size
+     */
     void setMultipleSignature(uint32_t base, uint8_t size);
+    /**
+     *
+     * @param sign_length
+     */
     void setConstantSignature(uint8_t sign_length);
-
+    /**
+     *
+     * @return
+     */
     uint8_t getUSignatureSize() const;
-
     /**
      *
      * @return
@@ -35,19 +76,16 @@ class MITUAccessUnitInfo {
     uint32_t getMultipleSignatureBase() const;
 
     /**
-     * Get length in bit
      *
      * @return
      */
     uint64_t getBitLength() const;
-
     /**
      * Write to bit_writer
      *
      * @param bit_writer
      */
     void write(genie::util::BitWriter& bit_writer) const;
-
 };
 
 }  // namespace mpegg_p1
