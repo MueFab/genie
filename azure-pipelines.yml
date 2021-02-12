@@ -14,38 +14,70 @@ steps:
 
 - script: |
     brew install libomp
-  displayName: 'Install openmp (OSX)'
+  displayName: 'Openmp installation (OSX)'
   condition: eq( variables['Agent.OS'], 'Darwin' )
+
+- bash: |
+    mkdir ref-decoder
+    cd ref-decoder
+    git config --global init.defaultBranch master
+    git config pull.ff only
+    git init
+    git config user.email "mitogen-group@gmail.com"
+    git config user.name "Azure test script"
+    echo $USERNAME
+    git pull https://${USERNAME}:${PASSWORD}@gitlab-scistimm.epfl.ch/MPEG-G/mpegg-reference-sw.git master
+  displayName: 'Reference decoder checkout'
+  env:
+    USERNAME: $(EPFL_SCI-STI-MM_GITLAB_USERNAME)
+    PASSWORD: $(EPFL_SCI-STI-MM_GITLAB_PASSWORD)
+
+- bash: |
+    cd ref-decoder
+    cmake .
+  displayName: 'Reference decoder cmake'
+
+- script: |
+    cd ref-decoder
+    make --jobs 
+  displayName: 'Reference decoder build (make)'
+  condition: ne( variables['Agent.OS'], 'Windows_NT' )
+
+#- task: VSBuild@1
+#  inputs:
+#    solution: 'ref-decoder\mpegg_reference_sw.sln'
+#    msbuildArgs: '-m' 
+#  displayName: 'Reference decoder build (MSVC)'
+#  condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
 - script: |
     mkdir cmake-build-debug
     cd cmake-build-debug
     cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=ON
-    ls -l
-  displayName: 'Run CMake'
+  displayName: 'Genie cmake'
 
 - script: |
     cd cmake-build-debug
     make --jobs
-  displayName: 'Run Make'
+  displayName: 'Genie build (make)'
   condition: ne( variables['Agent.OS'], 'Windows_NT' )
 
 - task: VSBuild@1
   inputs:
     solution: 'cmake-build-debug\genie.sln'
     msbuildArgs: '-m' 
-  displayName: 'Run MSVC'
+  displayName: 'Genie build (MSVC)'
   condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
 - bash: |
     cp cmake-build-debug/bin/Debug/util-tests.exe cmake-build-debug/bin/util-tests
     cp cmake-build-debug/bin/Debug/gabac-app.exe cmake-build-debug/bin/gabac-app
-  displayName: 'Copy MSVC files'
+  displayName: 'Genie copy exe files (MSVC)'
   condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
 - bash: cmake-build-debug/bin/util-tests
-  displayName: 'Run genie unit tests'
+  displayName: 'Genie run unit tests'
 
 - bash: ci/gabac-roundtrip.sh
-  displayName: 'Run GABAC Roundtrips'
+  displayName: 'GABAC run roundtrips'
 
