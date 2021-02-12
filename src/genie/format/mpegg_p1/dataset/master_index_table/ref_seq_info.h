@@ -22,9 +22,28 @@ class MITReferenceSequenceInfo {
     DatasetHeader::Pos40SizeFlag pos_40_flag;
 
    public:
-
+    /**
+     *
+     * @param reader
+     */
+    MITReferenceSequenceInfo(util::BitReader& reader);
+    /**
+     *
+     * @param seq_id
+     * @param start_pos
+     * @param end_pos
+     * @param flag
+     */
     MITReferenceSequenceInfo(uint16_t seq_id, uint64_t start_pos, uint64_t end_pos, DatasetHeader::Pos40SizeFlag flag);
-
+    /**
+     *
+     * @return
+     */
+    uint64_t getBitLength() const;
+    /**
+     *
+     * @param bit_writer
+     */
     void write(genie::util::BitWriter& bit_writer) const;
 };
 

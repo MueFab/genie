@@ -20,15 +20,17 @@ class MITUAccessUnitInfo {
     bool U_signature_constant_length;
     uint8_t U_signature_length;
 
-    DatasetHeader* datasetHeader;
-    MITAccessUnitInfo ac_info;
-
     std::vector<uint8_t> U_cluster_signature;
     uint16_t num_signatures;
 
-    uint16_t U_ref_sequence_id;
-    uint8_t U_ref_start_position;
-    uint8_t U_ref_end_position;
+    DatasetHeader* datasetHeader;
+   // MITAccessUnitInfo ac_info;
+
+
+
+    //uint16_t U_ref_sequence_id;
+    //uint8_t U_ref_start_position;
+    //uint8_t U_ref_end_position;
 
     /** ------------------------------------------------------------------------------------------------------------
      *  Internal
@@ -52,7 +54,7 @@ class MITUAccessUnitInfo {
      * @param reader
      * @param length
      */
-    MITUAccessUnitInfo(util::BitReader& reader, size_t length);
+    MITUAccessUnitInfo(util::BitReader& reader);
     /**
      *
      * @param base
