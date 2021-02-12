@@ -171,7 +171,7 @@ class Encoder {
      *
      * @param startingMappingPos
      */
-    explicit Encoder(uint64_t startingMappingPos);
+    explicit Encoder(int32_t startingMappingPos);
 
     /**
      *

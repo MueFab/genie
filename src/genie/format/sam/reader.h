@@ -29,7 +29,7 @@ class Reader {
    private:
     std::istream& stream;
     header::Header header;
-    std::map<std::string, size_t> refs;
+    std::map<std::string, uint16_t> refs;
     bool with_index;
 
     std::map<std::string, std::vector<size_t>> index;
@@ -54,7 +54,7 @@ class Reader {
      *
      * @return map contains RNAME and ref_id pair
      */
-    std::map<std::string, size_t>& getRefs();
+    std::map<std::string, uint16_t>& getRefs();
 
     /**
      * Add qname and file position pair to cache for indexing purpose

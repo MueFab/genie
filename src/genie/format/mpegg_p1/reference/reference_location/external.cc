@@ -61,7 +61,7 @@ uint64_t External::getLength() const {
     //reference_type u(8)
     len += 1;
 
-    len += external_reference->getlength();
+    len += external_reference->getLength();
 
     return len;
 }

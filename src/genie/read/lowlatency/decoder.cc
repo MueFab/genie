@@ -32,7 +32,7 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
     std::vector<std::string> ecigars;
     // FIXME: loop condition is only correct if all records have the full number of reads
     for (size_t i = 0; i < data.getNumReads() / data.getParameters().getNumberTemplateSegments(); ++i) {
-        core::record::Record rec(data.getParameters().getNumberTemplateSegments(), core::record::ClassType::CLASS_U,
+        core::record::Record rec(uint8_t (data.getParameters().getNumberTemplateSegments()), core::record::ClassType::CLASS_U,
                                  std::get<0>(names).empty() ? "" : std::move(std::get<0>(names)[i]), "", 0);
 
         if (data.getParameters().getNumberTemplateSegments() > 1) {

@@ -110,7 +110,7 @@ unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingC
             if (numtrnsfSymbols > 0) {
                 // Encoding
                 trnsfSubseqPayloadSize =
-                    gabac::encodeTransformSubseq(subseqCfg.getTransformSubseqCfg(i), &(transformedSubseqs[i]),
+                    gabac::encodeTransformSubseq(subseqCfg.getTransformSubseqCfg((uint8_t)i), &(transformedSubseqs[i]),
                                                  (dependency.size()) ? &dependency : nullptr);
             }
 
@@ -128,7 +128,7 @@ unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingC
         }
     }
 
-    return subseqPayloadSize;
+    return (unsigned long)subseqPayloadSize;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

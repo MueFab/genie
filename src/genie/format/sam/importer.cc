@@ -306,7 +306,7 @@ void Importer::flushIn(uint64_t &pos) { flushOut(pos); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 std::unique_ptr<core::record::Record> Importer::convertSam2SameRec(Record &sam_r1, Record &sam_r2,
-                                                                   std::map<std::string, size_t> &refs) {
+                                                                   std::map<std::string, uint16_t> &refs) {
     auto flag_tuple = convertFlags2Mpeg(sam_r1.getFlags());
 
     auto rec = util::make_unique<core::record::Record>(2,
@@ -338,7 +338,7 @@ std::unique_ptr<core::record::Record> Importer::convertSam2SameRec(Record &sam_r
 }
 // ---------------------------------------------------------------------------------------------------------------------
 void Importer::addAlignmentToSameRec(std::unique_ptr<core::record::Record> &rec, Record &sam_r1, Record &sam_r2,
-                                     std::map<std::string, size_t> &refs) {
+                                     std::map<std::string, uint16_t> &refs) {
     UTILS_DIE_IF(sam_r1.getRname() != sam_r2.getRname(), "Different reference sequence");
 
     core::record::Alignment alignment(convertCigar2ECigar(sam_r1.getCigar(), sam_r1.getSeq()),
@@ -361,7 +361,7 @@ void Importer::addAlignmentToSameRec(std::unique_ptr<core::record::Record> &rec,
 }
 // ---------------------------------------------------------------------------------------------------------------------
 void Importer::convertPairedEndNoSplit(std::list<core::record::Record> &records, SamRecords2D &sam_recs_2d,
-                                       std::map<std::string, size_t> &refs) {
+                                       std::map<std::string, uint16_t> &refs) {
     /// Swap template so that the primary alignment of the first segment always has lower mapping position
     /// compared to primary alignment of the second segment
     if (sam_recs_2d.front().front().getPos() > sam_recs_2d.back().front().getPos()){
@@ -433,7 +433,7 @@ void Importer::convertPairedEndNoSplit(std::list<core::record::Record> &records,
 }
 // ---------------------------------------------------------------------------------------------------------------------
 std::unique_ptr<core::record::Record> Importer::convertSam2SplitRec(Record &sam_r1, Record *sam_r2_ptr,
-                                                                    std::map<std::string, size_t> &refs) {
+                                                                    std::map<std::string, uint16_t> &refs) {
     auto flag_tuple = convertFlags2Mpeg(sam_r1.getFlags());
 
     auto rec = util::make_unique<core::record::Record>(2, core::record::ClassType::CLASS_I, sam_r1.moveQname(), "Genie",
@@ -454,7 +454,7 @@ std::unique_ptr<core::record::Record> Importer::convertSam2SplitRec(Record &sam_
 }
 // ---------------------------------------------------------------------------------------------------------------------
 void Importer::addAlignmentToSplitRec(std::unique_ptr<core::record::Record> &rec, Record &sam_r1, Record *sam_r2_ptr,
-                                      std::map<std::string, size_t> &refs) {
+                                      std::map<std::string, uint16_t> &refs) {
     if (!sam_r1.isUnmapped()) {
         core::record::Alignment alignment(convertCigar2ECigar(sam_r1.getCigar(), sam_r1.getSeq()),
                                           sam_r1.checkFlag(Record::FlagPos::SEQ_REVERSE));
@@ -479,7 +479,7 @@ void Importer::addAlignmentToSplitRec(std::unique_ptr<core::record::Record> &rec
 }
 // ---------------------------------------------------------------------------------------------------------------------
 void Importer::convertPairedEndSplitPair(std::list<core::record::Record> &records, SamRecords2D &sam_recs_2d,
-                                         std::map<std::string, size_t> &refs) {
+                                         std::map<std::string, uint16_t> &refs) {
 
     auto sam_r1_iter = sam_recs_2d.front().begin();
     auto sam_r2_iter = sam_recs_2d.back().begin();
@@ -613,7 +613,8 @@ void Importer::convertUnmapped(std::list<core::record::Record> &records, SamReco
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Importer::convertSingleEnd(std::list<core::record::Record> &records, SamRecords &sam_recs, std::map<std::string, size_t> &refs,
+void Importer::convertSingleEnd(std::list<core::record::Record> &records, SamRecords &sam_recs,
+                                std::map<std::string, uint16_t> &refs,
                                 bool unmapped_pair, bool is_read_1_first) {
     auto sam_rec = std::move(sam_recs.front());
     sam_recs.pop_front();
@@ -664,7 +665,7 @@ void Importer::convertSingleEnd(std::list<core::record::Record> &records, SamRec
 }
 // ---------------------------------------------------------------------------------------------------------------------
 void Importer::convertPairedEnd(std::list<core::record::Record> &records, SamRecords2D &sam_recs_2d,
-                                std::map<std::string, size_t> &refs, bool force_split) {
+                                std::map<std::string, uint16_t> &refs, bool force_split) {
 
     auto &read_1 = sam_recs_2d.front();
     auto read_1_empty = read_1.empty();
@@ -750,7 +751,8 @@ void Importer::convertPairedEnd(std::list<core::record::Record> &records, SamRec
     sam_recs_2d.clear();
 }
 // ---------------------------------------------------------------------------------------------------------------------
-void Importer::convert(std::list<core::record::Record> &records, ReadTemplate &rt, std::map<std::string, size_t> &refs,
+void Importer::convert(std::list<core::record::Record> &records, ReadTemplate &rt,
+                       std::map<std::string, uint16_t> &refs,
                        bool force_split) {
 
     UTILS_DIE_IF(!rt.isValid(), "Invalid Read Template. Neither unmapped, single-end nor paired-end");

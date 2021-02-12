@@ -100,7 +100,7 @@ class AccessUnit {
          * @param wordSize
          * @param _id
          */
-        Subsequence(size_t wordSize, GenSubIndex _id);
+        Subsequence(uint8_t wordSize, GenSubIndex _id);
 
         /**
          *
