@@ -30,7 +30,7 @@ namespace spring {
 void Preprocessor::setup(const std::string &wdir, size_t num_thr, bool paired_end) {
     cp.preserve_id = true;
     cp.preserve_quality = true;
-    cp.num_thr = num_thr;
+    cp.num_thr = (int)num_thr;
     working_dir = wdir;
     used = false;
 
@@ -96,7 +96,7 @@ void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section &id) 
             cp.max_readlen = std::max(cp.max_readlen, (uint32_t)seq.getSequence().length());
             if (seq.getSequence().find('N') != std::string::npos) {
                 fout_N[seg_index] << seq.getSequence() << "\n";
-                uint32_t pos_N = cp.num_reads + rec_index;
+                uint32_t pos_N = cp.num_reads + (uint32_t)rec_index;
                 fout_order_N[seg_index].write((char *)&pos_N, sizeof(uint32_t));
             } else {
                 fout_clean[seg_index] << seq.getSequence() << "\n";
@@ -110,7 +110,7 @@ void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section &id) 
         fout_id << rec.getName() << "\n";
         ++rec_index;
     }
-    cp.num_reads += rec_index;
+    cp.num_reads += (uint32_t)rec_index;
     cp.num_blocks++;
 
     UTILS_DIE_IF(cp.num_reads == 0, "No reads found.");

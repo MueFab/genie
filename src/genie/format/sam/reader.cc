@@ -37,7 +37,7 @@ Reader::Reader(std::istream& _stream, bool _with_index) : stream(_stream), heade
     }
 
     if (with_index){
-        int init_pos = stream.tellg();
+        auto init_pos = stream.tellg();
 
         // Add entry to index
         while(stream.good()){
@@ -72,7 +72,7 @@ Reader::Reader(std::istream& _stream, bool _with_index) : stream(_stream), heade
 const header::Header& Reader::getHeader() const { return header; }
 
 // ---------------------------------------------------------------------------------------------------------------------
-std::map<std::string, size_t>& Reader::getRefs() { return refs; }
+std::map<std::string, uint16_t>& Reader::getRefs() { return refs; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Reader::addCacheEntry(std::string &qname, size_t &pos) {

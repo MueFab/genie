@@ -127,8 +127,8 @@ unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const Encodin
                                                     &decodedTransformedSubseq);
 
                     // Decoding
-                    subseqPayloadSizeUsed += gabac::decodeTransformSubseq(subseqCfg.getTransformSubseqCfg(i),
-                                                                          numtrnsfSymbols, &decodedTransformedSubseq,
+                    subseqPayloadSizeUsed += (uint64_t) gabac::decodeTransformSubseq(subseqCfg.getTransformSubseqCfg((uint8_t)i),
+                                                                                     (unsigned int)numtrnsfSymbols, &decodedTransformedSubseq,
                                                                           (dependency.size()) ? &dependency : nullptr);
                     transformedSubseqs[i].swap(&(decodedTransformedSubseq));
                 }
@@ -141,7 +141,7 @@ unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const Encodin
         }
     }
 
-    return subseqPayloadSizeUsed;
+    return (unsigned long)subseqPayloadSizeUsed;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

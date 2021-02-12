@@ -187,13 +187,13 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                             auto rid = dict[l].read_id[i];
                                             int hamming;
                                             if (!rev)
-                                                hamming = ((forward_bitset ^ read[rid]) &
+                                                hamming = int(((forward_bitset ^ read[rid]) &
                                                            mask[0][eg.max_readlen - read_lengths_s[rid]])
-                                                              .count();
+                                                              .count());
                                             else
-                                                hamming = ((reverse_bitset ^ read[rid]) &
+                                                hamming = int(((reverse_bitset ^ read[rid]) &
                                                            mask[0][eg.max_readlen - read_lengths_s[rid]])
-                                                              .count();
+                                                              .count());
                                             if (hamming <= thresh_s) {
 #ifdef GENIE_USE_OPENMP
                                                 read_lock[rid].set();
@@ -467,7 +467,7 @@ void readsingletons(std::bitset<bitset_size> *read, uint32_t *order_s, uint16_t 
     std::string s;
     for (uint32_t i = 0; i < eg.numreads_s; i++) {
         std::getline(f, s);
-        read_lengths_s[i] = s.length();
+        read_lengths_s[i] = uint16_t(s.length());
         stringtobitset<bitset_size>(s, read_lengths_s[i], read[i], egb.basemask);
     }
     f.close();
@@ -475,7 +475,7 @@ void readsingletons(std::bitset<bitset_size> *read, uint32_t *order_s, uint16_t 
     f.open(eg.infile_N);
     for (uint32_t i = eg.numreads_s; i < eg.numreads_s + eg.numreads_N; i++) {
         std::getline(f, s);
-        read_lengths_s[i] = s.length();
+        read_lengths_s[i] = uint16_t (s.length());
         stringtobitset<bitset_size>(s, read_lengths_s[i], read[i], egb.basemask);
     }
     std::ifstream f_order_s(eg.infile_order + ".singleton", std::ios::binary);

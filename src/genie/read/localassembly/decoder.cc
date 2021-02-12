@@ -50,7 +50,7 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     auto t_data = std::move(t);
     t_data = entropyCodeAU(std::move(t_data), true);
     size_t numRecords = t_data.getNumReads();
-    size_t bufSize = t_data.getParameters().getComputedRef().getExtension().getBufMaxSize();
+    uint32_t bufSize = t_data.getParameters().getComputedRef().getExtension().getBufMaxSize();
     size_t segments = t_data.getParameters().getNumberTemplateSegments();
     uint16_t ref = t_data.getReference();
     LocalReference refEncoder(bufSize);
@@ -72,7 +72,7 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
         std::vector<std::string> refs;
         refs.reserve(meta.size());
         for (const auto& m : meta) {
-            refs.emplace_back(refEncoder.getReference(m.position, m.length));
+            refs.emplace_back(refEncoder.getReference((uint32_t)m.position, (uint32_t)m.length));
         }
         auto rec = decoder.pull(ref, std::move(refs));
         if (!std::get<0>(names).empty()) {

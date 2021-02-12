@@ -29,7 +29,7 @@ class External : public ReferenceLocation {
 
     Checksum::Algo getChecksumAlg() const;
 
-    uint64_t getLength() const;
+    uint64_t getLength() const override;
 
     void write(genie::util::BitWriter& writer) const override;
 };

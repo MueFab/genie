@@ -162,7 +162,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
         core::AccessUnit au(std::move(params[block_num]), 0);
 
         generate_subseqs(data, block_num, au);
-        num_reads_per_block[block_num] = au.get(core::GenSub::RCOMP).getNumSymbols();  // rcomp
+        num_reads_per_block[block_num] = (uint32_t)au.get(core::GenSub::RCOMP).getNumSymbols();  // rcomp
 
         au = core::ReadEncoder::entropyCodeAU(entropycoder, std::move(au));
         stat_vec[block_num].add(au.getStats());
@@ -467,7 +467,7 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
             if (!data.flag_arr[current])
                 bdata->block_seq_start.push_back(0);
             else
-                bdata->block_seq_start.push_back(data.pos_arr[current]);
+                bdata->block_seq_start.push_back((uint32_t)data.pos_arr[current]);
         }
         if (!already_seen[current]) {
             // current is already seen when current is unaligned and its pair has
@@ -514,7 +514,7 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
             if (data.flag_arr[current]) {
                 // update current_block_seq_end
                 if (current_block_seq_end < data.pos_arr[current] + data.read_length_arr[current])
-                    current_block_seq_end = data.pos_arr[current] + data.read_length_arr[current];
+                    current_block_seq_end = uint32_t(data.pos_arr[current] + data.read_length_arr[current]);
             }
         }
         if (num_records_current_block == data.cp.num_reads_per_block || i == data.cp.num_reads - 1) {
@@ -534,7 +534,7 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
                 num_records_current_block = 0;
                 current_block_num++;
                 current_block_seq_end = 0;
-                bdata->block_start.push_back(bdata->read_index_genomic_record.size());
+                bdata->block_start.push_back((uint32_t)bdata->read_index_genomic_record.size());
             }
         }
     }
@@ -720,7 +720,7 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                     }
                 }
                 bool read_1_first = (current < pair);
-                uint16_t delta = data.pos_arr[pair] - data.pos_arr[current];
+                auto delta = (uint16_t)(data.pos_arr[pair] - data.pos_arr[current]);
                 raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(0);  // pair decoding case same_rec
                 raw_au.get(core::GenSub::PAIR_SAME_REC).push(!(read_1_first) + 2 * delta);  // pair
                 pest->count_same_rec[cur_thread_num]++;
@@ -844,7 +844,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
         core::AccessUnit au(std::move(params[cur_block_num]), 0);
 
         generate_streams_pe(data, bdata, cur_block_num, &pest, au);
-        num_reads_per_block[cur_block_num] = au.get(core::GenSub::RCOMP).getNumSymbols();  // rcomp
+        num_reads_per_block[cur_block_num] = (uint32_t)au.get(core::GenSub::RCOMP).getNumSymbols();  // rcomp
         num_records_per_block[cur_block_num] =
             bdata.block_end[cur_block_num] - bdata.block_start[cur_block_num];  // used later for ids
         au = core::ReadEncoder::entropyCodeAU(entropycoder, std::move(au));
@@ -878,7 +878,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
     // write num blocks, reads per block and records per block to a file
     const std::string block_info_file = temp_dir + "/block_info.bin";
     std::ofstream f_block_info(block_info_file, std::ios::binary);
-    uint32_t num_blocks = bdata.block_start.size();
+    auto num_blocks = (uint32_t)bdata.block_start.size();
     f_block_info.write((char *)&num_blocks, sizeof(uint32_t));
     f_block_info.write((char *)&num_reads_per_block[0], num_blocks * sizeof(uint32_t));
     f_block_info.write((char *)&num_records_per_block[0], num_blocks * sizeof(uint32_t));

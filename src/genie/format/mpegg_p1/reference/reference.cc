@@ -117,7 +117,7 @@ const std::vector<std::string>& Reference::getSequenceNames() const {return sequ
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint16_t Reference::getSeqCount() const { return sequence_names.size(); }
+uint16_t Reference::getSeqCount() const { return (uint16_t)sequence_names.size(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -65,7 +65,7 @@ class MpegReference: public ExternalReference {
      *
      * @return
      */
-    uint64_t getLength();
+    uint64_t getLength() override;
 
     /**
      *

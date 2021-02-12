@@ -89,14 +89,14 @@ void LocalReference::addSingleRead(const std::string &record, const std::string 
     sequence_positions.push_back(position);
     std::string read = preprocess(record, ecigar);
     sequences.push_back(read);
-    crBufSize += read.length();
+    crBufSize += (uint32_t)read.length();
 
     while (crBufSize > cr_buf_max_size) {
         if (sequences.size() == 1) {
             UTILS_THROW_RUNTIME_EXCEPTION("Read too long for current cr_buf_max_size");
         }
         // Erase oldest read
-        crBufSize -= sequences.front().length();
+        crBufSize -= (uint32_t)sequences.front().length();
         sequences.erase(sequences.begin());
         sequence_positions.erase(sequence_positions.begin());
     }
@@ -131,7 +131,7 @@ void LocalReference::addRead(const core::record::Record &s) {
 
 std::string LocalReference::generateRef(uint32_t offset, uint32_t len) {
     std::string ref;
-    for (size_t i = offset; i < offset + len; ++i) {
+    for (uint32_t i = offset; i < offset + len; ++i) {
         ref += majorityVote(i);
     }
     return ref;

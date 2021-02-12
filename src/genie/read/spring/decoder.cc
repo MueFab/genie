@@ -59,7 +59,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
         auto rtype = au.get(core::GenSub::RTYPE).pull();
         if (rtype == 5) {
             // put in refBuf
-            uint32_t rlen = au.get(core::GenSub::RLEN).pull() + 1;  // rlen
+            auto rlen = (uint32_t)au.get(core::GenSub::RLEN).pull() + 1;  // rlen
             for (uint32_t i = 0; i < rlen; i++) {
                 refBuf.push_back(getAlphabetProperties(core::AlphabetID::ACGTN).lut[au.get(core::GenSub::UREADS).pull()]);  // ureads
             }
@@ -81,7 +81,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                 uint16_t data_pair;
                 switch (pairing_decoding_case) {
                     case 0:
-                        data_pair = au.get(core::GenSub::PAIR_SAME_REC).pull();
+                        data_pair = (uint16_t)au.get(core::GenSub::PAIR_SAME_REC).pull();
                         read_1_first = !(((uint16_t)(data_pair)) & 1);
                         delta = ((uint16_t)(data_pair)) >> 1;
                         number_of_record_segments = 2;
@@ -124,7 +124,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
             uint32_t rlen[2];
             for (int i = 0; i < number_of_record_segments; i++)
                 rlen[i] = (uint32_t)(au.get(core::GenSub::RLEN).pull()) + 1;  // rlen
-            uint32_t pos = au.get(core::GenSub::POS_MAPPING_FIRST).pull();    // pos
+            auto pos = (uint32_t)au.get(core::GenSub::POS_MAPPING_FIRST).pull();    // pos
 
             abs_pos += pos;
             std::string cur_read[2];
@@ -208,7 +208,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                                       unmatched_same_au[0].end());
             std::vector<std::pair<uint32_t, uint32_t>> record_index_for_sorting(size_unmatched);
             for (size_t i = 0; i < size_unmatched; i++)
-                record_index_for_sorting[i] = std::make_pair(mate_record_index_same_rec[i], i);
+                record_index_for_sorting[i] = std::make_pair(mate_record_index_same_rec[i], uint32_t (i));
             std::sort(
                 record_index_for_sorting.begin(), record_index_for_sorting.end(),
                 [](std::pair<uint32_t, uint32_t> a, std::pair<uint32_t, uint32_t> b) { return a.first < b.first; });
@@ -373,17 +373,17 @@ void Decoder::flushIn(uint64_t& pos) {
         if (size_unmatched > 0) {
             std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> au_id_index_for_sorting(size_unmatched);
             for (size_t i = 0; i < size_unmatched; i++)
-                au_id_index_for_sorting[i] = std::make_tuple(mate_au_id_concat[i], mate_record_index_concat[i], i);
+                au_id_index_for_sorting[i] = std::make_tuple(mate_au_id_concat[i], mate_record_index_concat[i], (uint32_t)i);
             std::sort(au_id_index_for_sorting.begin(), au_id_index_for_sorting.end(),
                       [](std::tuple<uint32_t, uint32_t, uint32_t> a, std::tuple<uint32_t, uint32_t, uint32_t> b) {
                           return (std::get<0>(a) == std::get<0>(b)) ? (std::get<1>(a) < std::get<1>(b))
                                                                     : (std::get<0>(a) < std::get<0>(b));
                       });
             std::vector<uint32_t> reverse_index(size_unmatched);
-            for (size_t i = 0; i < size_unmatched; i++) reverse_index[std::get<2>(au_id_index_for_sorting[i])] = i;
+            for (size_t i = 0; i < size_unmatched; i++) reverse_index[std::get<2>(au_id_index_for_sorting[i])] = (uint32_t)i;
 
             // now reorder the unmatched records in file 2, by picking them in chunks
-            uint32_t bin_size = std::min((size_t)BIN_SIZE_COMBINE_PAIRS, size_unmatched);
+            uint32_t bin_size = std::min(BIN_SIZE_COMBINE_PAIRS, (uint32_t)size_unmatched);
             std::vector<Record> records_bin(bin_size);
             Record tmpFastqRecord;
             for (uint32_t i = 0; i <= size_unmatched / bin_size; i++) {

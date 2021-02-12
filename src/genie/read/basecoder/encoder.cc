@@ -31,7 +31,7 @@ Encoder::CodingState::CodingState(const std::string &_read, const std::string &_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Encoder::Encoder(uint64_t startingMappingPos)
+Encoder::Encoder(int32_t startingMappingPos)
     : container(core::parameter::ParameterSet(), 0), pos(startingMappingPos), readCounter(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ void Encoder::encodeFirstSegment(const core::record::Record &rec) {
     container.push(core::GenSub::RTYPE, uint8_t(rec.getClassID()));
 
     const auto POSITION = ALIGNMENT.getPosition() - pos;
-    pos = ALIGNMENT.getPosition();
+    pos = (int32_t)ALIGNMENT.getPosition();
     container.push(core::GenSub::POS_MAPPING_FIRST, POSITION);
 
     const auto LENGTH = RECORD.getSequence().length() - 1;
@@ -99,9 +99,9 @@ void Encoder::encodeAdditionalSegment(size_t length, const core::record::alignme
 
     container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_SAME_RECORD);
 
-    const uint32_t DELTA = srec.getDelta();
+    const auto DELTA = srec.getDelta();
     const bool FIRST1 = srec.getDelta() >= 0;           // Alignment 1 was the first if delta is positive
-    const auto SAME_REC_DATA = (DELTA << 1u) | FIRST1;  // FIRST1 is encoded in least significant bit
+    const auto SAME_REC_DATA = (DELTA << 1u) | uint32_t(FIRST1);  // FIRST1 is encoded in least significant bit
     container.push(core::GenSub::PAIR_SAME_REC, SAME_REC_DATA);
 }
 

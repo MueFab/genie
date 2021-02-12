@@ -111,18 +111,18 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
                 numCtxSubsym = cabacBinazParams.getCMax();  // cmax
                 break;
             case BinarizationParameters::BinarizationId::EG:
-                numCtxSubsym = std::floor(std::log2(numAlphaSubsym + 1)) + 1;
+                numCtxSubsym = uint32_t (std::floor(std::log2(numAlphaSubsym + 1)) + 1);
                 break;
             case BinarizationParameters::BinarizationId::SEG:
-                numCtxSubsym = std::floor(std::log2(numAlphaSubsym + 1)) + 2;
+                numCtxSubsym = uint32_t (std::floor(std::log2(numAlphaSubsym + 1)) + 2);
                 break;
             case BinarizationParameters::BinarizationId::TEG:
                 numCtxSubsym = cabacBinazParams.getCMaxTeg()  // cmax_teg
-                               + std::floor(std::log2(numAlphaSubsym + 1)) + 1;
+                               + uint32_t (std::floor(std::log2(numAlphaSubsym + 1)) + 1);
                 break;
             case BinarizationParameters::BinarizationId::STEG:
                 numCtxSubsym = cabacBinazParams.getCMaxTeg()  // cmax_teg
-                               + std::floor(std::log2(numAlphaSubsym + 1)) + 2;
+                               + uint32_t (std::floor(std::log2(numAlphaSubsym + 1)) + 2);
                 break;
             case BinarizationParameters::BinarizationId::SUTU: {
                 uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();

@@ -151,7 +151,7 @@ const std::vector<HeaderLine>& Header::getLines() const { return lines; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Header::addComment(std::string&& _str) {
-    comments.push_back(std::move(_str.substr(4)));
+    comments.push_back(_str.substr(4));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
