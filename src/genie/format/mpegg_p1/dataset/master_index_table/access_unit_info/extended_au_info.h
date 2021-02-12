@@ -12,8 +12,8 @@ namespace mpegg_p1 {
 
 class MITExtendedAUInfo {
    private:
-    uint64_t extend_AU_start_position;
-    uint64_t extend_AU_end_position;
+    uint64_t extended_AU_start_position;
+    uint64_t extended_AU_end_position;
 
     /** ------------------------------------------------------------------------------------------------------------
      *  Internal
@@ -21,7 +21,11 @@ class MITExtendedAUInfo {
     DatasetHeader::Pos40SizeFlag pos_40_flag;
    public:
 
+    explicit MITExtendedAUInfo(util::BitReader& reader);
+
     MITExtendedAUInfo(uint64_t start_pos, uint64_t end_pos, DatasetHeader::Pos40SizeFlag flag);
+
+    uint64_t getBitLength() const;
 
     void write(genie::util::BitWriter& bit_writer) const;
 };
