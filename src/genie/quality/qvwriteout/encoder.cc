@@ -104,7 +104,7 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
 
     core::stats::PerfStats stats;
     stats.addDouble("time-qv1writeout", watch.check());
-    return {std::move(param), std::move(desc), stats};
+    return std::make_tuple(std::move(param), std::move(desc), stats);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
