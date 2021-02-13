@@ -24,7 +24,7 @@ DatasetHeader::DatasetHeader():
     alphabet_ID(0),
     num_U_access_units(0) {}
 
-DatasetHeader::DatasetHeader(const uint16_t datasetID): dataset_ID(datasetID) {}
+DatasetHeader::DatasetHeader(uint16_t datasetID) : dataset_ID(datasetID) {}
 
 DatasetHeader::DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSizeFlag _byte_offset_size_flag,
                              bool _non_overlapping_AU_range_flag, Pos40SizeFlag _pos_40_bits_flag,
@@ -58,8 +58,6 @@ DatasetHeader::ByteOffsetSizeFlag DatasetHeader::getByteOffsetSizeFlag() const {
 
 DatasetHeader::Pos40SizeFlag DatasetHeader::getPos40SizeFlag() const { return pos_40_bits_flag; }
 
-//DatasetHeader::Pos40SizeFlag DatasetHeader::getPos40SizeFlag() const { return pos_40_bits_flag; }
-
 const SequenceConfig& DatasetHeader::getSeqInfo() const { return seq_info; }
 
 const BlockConfig& DatasetHeader::getBlockHeader() const { return block_header; }
@@ -67,6 +65,8 @@ const BlockConfig& DatasetHeader::getBlockHeader() const { return block_header; 
 uint32_t DatasetHeader::getNumUAccessUnits() const { return num_U_access_units;}
 
 bool DatasetHeader::getMultipleAlignmentFlag() const { return multiple_alignment_flag; }
+
+core::parameter::DataUnit::DatasetType DatasetHeader::getDatasetType() const { return dataset_type; }
 
 
 uint64_t DatasetHeader::getLength() const {
@@ -79,7 +79,7 @@ uint64_t DatasetHeader::getLength() const {
     bitlen += (1 + 2 + 4) * 8;  // dataset_group_ID u(8), dataset_ID u(16), version c(4)
     bitlen += 3; // byte_offset_size_flag u(1), non_overlapping_AU_range_flag u(1) , pos_40_bits_flag u(1)
 
-
+    // data encapsulated in Class: BlockConfig
     /// block_header_flag, MIT_flag, CC_mode_flag, ordered_blocks_flag,
     /// dataset_type, num_classes, clid[], num_descriptors[], descriptors_ID[][]
     bitlen += block_header.getBitLength();
@@ -87,19 +87,20 @@ uint64_t DatasetHeader::getLength() const {
     bitlen += 8 + 32;  // alphabet_ID u(8), num_U_access_units u(32)
 
     if (num_U_access_units > 0) {
+        // data encapsulated in Class: UAccessUnitInfo
         /// num_U_clusters, multiple_signature_base, U_signature_size,
         /// U_signature_constant_length, U_signature_length
         bitlen += u_access_unit_info->getBitLength();
     }
 
+    // data encapsulated in Class: SequenceConfig
     /// seq_count, reference_ID, seq_ID[], seq_blocks[],
     /// tflag[0], thres[0], thres[]
     bitlen += seq_info.getBitLength();
 
     bitlen += bitlen % 8;  // byte_aligned() f(1)
-    bitlen /= 8;  /// byte conversion
 
-    return bitlen;
+    return bitlen / 8;
 }
 
 void DatasetHeader::write(util::BitWriter& bit_writer) const {
@@ -117,7 +118,7 @@ void DatasetHeader::write(util::BitWriter& bit_writer) const {
     bit_writer.write(dataset_ID, 16);
 
     // version c(4)
-    bit_writer.write(version);
+    writeNullTerminatedStr(bit_writer, version);
 
     // byte_offset_size_flag u(1)
     if (byte_offset_size_flag == ByteOffsetSizeFlag::ON){

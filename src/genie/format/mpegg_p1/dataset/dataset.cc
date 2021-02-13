@@ -12,6 +12,11 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+DTMetadata::DTMetadata()
+    : DT_metadata_value() {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint64_t DTMetadata::getLength() const {
     uint64_t len = 12;  // gen_info
 
@@ -25,16 +30,21 @@ uint64_t DTMetadata::getLength() const {
 void DTMetadata::write(genie::util::BitWriter &bit_writer) const {
     // KLV (Key Length Value) format
 
-    // Key of KVL format
+    // Key of KLV format
     bit_writer.write("dtmd");
 
-    // Length of KVL format
+    // Length of KLV format
     bit_writer.write(getLength(), 64);
 
     for (auto val : DT_metadata_value){
         bit_writer.write(val, 8);
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+DTProtection::DTProtection()
+    : DT_protection_value() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -90,14 +100,68 @@ void DTProtection::write(genie::util::BitWriter &bit_writer) const {
 //    }
 //}
 
+
+
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 const std::vector<DatasetParameterSet>& Dataset::getParameterSets() const { return dataset_parameter_sets; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+const DatasetHeader& Dataset::getHeader() const { return header; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint16_t Dataset::getID() const { return getHeader().getID(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Dataset::setID(uint16_t ID) { header.setID(ID); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t Dataset::getGroupID() const { return getHeader().getGroupID(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Dataset::setGroupId(uint8_t group_ID){ header.setGroupId(group_ID);}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+
+DatasetHeader::ByteOffsetSizeFlag Dataset::getByteOffsetSizeFlag() const { getHeader().getByteOffsetSizeFlag();}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+DatasetHeader::Pos40SizeFlag Dataset::getPos40SizeFlag() const { getHeader().getPos40SizeFlag();}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const SequenceConfig& Dataset::getSeqInfo() const { return getHeader().getSeqInfo();}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const BlockConfig& Dataset::getBlockHeader() const { return getHeader().getBlockHeader();}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint32_t Dataset::getNumUAccessUnits() const { return getHeader().getNumUAccessUnits();}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Dataset::getMultipleAlignmentFlag() const { return getHeader().getMultipleAlignmentFlag();}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+core::parameter::DataUnit::DatasetType Dataset::getDatasetType() const { getHeader().getDatasetType();}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint64_t Dataset::getLength() const {
-    uint64_t len = 12;  // KVL
+
+    uint64_t len = 12;  // KLV
 
     len += header.getLength();
 
@@ -112,10 +176,10 @@ uint64_t Dataset::getLength() const {
     }
 
     // TODO: Master Index Table
-    // write master_index_table depending on MIT_FLAG
-//    if (block_config.getMITFlag()){
-//        master_index_table->getBitLength();
-//    }
+    //write master_index_table depending on MIT_FLAG
+    //if (block_config.getMITFlag()){
+    //    master_index_table->getBitLength();
+    //}
 
     for (auto const& it : dataset_parameter_sets) {
         // dataset_group_ID u(8) + dataset_ID u(16)
@@ -127,6 +191,13 @@ uint64_t Dataset::getLength() const {
         len += it.getLength();
     }
 
+    // TODO (Yeremia): write descriptor_stream depending on block_header_flag
+//    if (block_header_flag == 0){
+//        for (auto &ds: descriptor_streams){
+//            len += ds.geLength();
+//        }
+//    }
+
     return len;
 }
 
@@ -135,13 +206,13 @@ uint64_t Dataset::getLength() const {
 void Dataset::write(util::BitWriter& bit_writer) const {
     // KLV (Key Length Value) format
 
-    // Key of KVL format
+    // Key of KLV format
     bit_writer.write("dtcn");
 
-    // Length of KVL format
+    // Length of KLV format
     bit_writer.write(getLength(), 64);
 
-    // Value of KVL format:
+    // Value of KLV format:
 
     // dataset_header
     header.write(bit_writer);
@@ -174,13 +245,14 @@ void Dataset::write(util::BitWriter& bit_writer) const {
     // TODO (Yeremia): write descriptor_stream depending on block_header_flag
 //    if (block_header_flag == 0){
 //        for (auto &ds: descriptor_streams){
-//            dc.write(bit_writer);
+//            ds.write(bit_writer);
 //        }
 //    }
 
     // TODO (Yeremia): implement write of Dataset
     UTILS_DIE("Not implemented yet");
 }
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 

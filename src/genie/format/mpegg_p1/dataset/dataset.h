@@ -17,8 +17,8 @@
 //#include <genie/format/mpegg_p1/dataset/master_index_table/master_index_table.h>
 #include <genie/format/mpegg_p1/dataset/access_unit/access_unit.h>
 #include <genie/format/mpegg_p1/dataset/dataset_parameter_set.h>
-
 #include "dataset_header.h"
+
 
 namespace genie {
 namespace format {
@@ -97,8 +97,7 @@ class Dataset {
      *
      * @param _dataset_ID
      */
-    Dataset(uint16_t _dataset_ID);
-
+    explicit Dataset(uint16_t _dataset_ID);
     /**
      *
      * @param dataUnitFactory
@@ -108,18 +107,83 @@ class Dataset {
     Dataset(uint16_t ID, const genie::format::mgb::DataUnitFactory& dataUnitFactory,
             std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2);
 
+
+
     /**
      *
      * @return
      */
     const std::vector<DatasetParameterSet>& getParameterSets() const;
+    /**
+     *
+     * @return
+     */
+    const DatasetHeader& getHeader() const;
+
+    /**
+    *
+    * @return
+    */
+    uint16_t getID() const;
+    /**
+     *
+     * @param ID
+     */
+    void setID(uint16_t ID);
+    /**
+     *
+     * @return
+     */
+    uint8_t getGroupID() const;
+    /**
+     *
+     * @param group_ID
+     */
+    void setGroupId(uint8_t group_ID);
+
+    /**
+     *
+     * @return
+     */
+    DatasetHeader::ByteOffsetSizeFlag getByteOffsetSizeFlag() const;
+    /**
+     *
+     * @return
+     */
+    DatasetHeader::Pos40SizeFlag getPos40SizeFlag() const;
+    /**
+     *
+     * @return
+     */
+    const SequenceConfig& getSeqInfo() const;
+    /**
+     *
+     * @return
+     */
+    const BlockConfig& getBlockHeader() const;
+    /**
+     *
+     * @return
+     */
+    uint32_t getNumUAccessUnits() const;
+    /**
+     *
+     * @return
+     */
+    bool getMultipleAlignmentFlag() const;
+    /**
+     *
+     * @return
+     */
+    core::parameter::DataUnit::DatasetType getDatasetType() const;
+
+
 
     /**
      *
      * @return
      */
     uint64_t getLength() const;
-
     /**
      *
      * @param bit_writer

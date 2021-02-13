@@ -13,12 +13,15 @@ class DatasetType;
 #include <string>
 #include <vector>
 
-#include <parameter/data_unit.h>
+
+#include "genie/util/bitwriter.h"
+#include <genie/util/exception.h>
+#include <genie/format/mpegg_p1/util.h>
 
 #include "fields/block_header_flags/block_header_flags.h"
 #include "fields/seq_info/seq_info.h"
 #include "fields/u_access_unit_info/u_access_unit_info.h"
-#include "genie/util/bitwriter.h"
+#include <parameter/data_unit.h>
 
 namespace genie {
 namespace format {
@@ -72,7 +75,7 @@ class DatasetHeader {
      *
      * @param datasetID
      */
-    explicit DatasetHeader(const uint16_t datasetID);
+    explicit DatasetHeader(uint16_t datasetID);
 
     /**
      *
@@ -142,6 +145,11 @@ class DatasetHeader {
      * @return
      */
     bool getMultipleAlignmentFlag() const;
+    /**
+     *
+     * @return
+     */
+    core::parameter::DataUnit::DatasetType getDatasetType() const;
 
 
     /**
