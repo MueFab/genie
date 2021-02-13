@@ -10,7 +10,9 @@
 #include <cstdint>
 #include <vector>
 #include <list>
+
 #include <genie/util/bitwriter.h>
+#include <genie/util/bitreader.h>
 
 #include <access-unit.h>
 #include <genie/format/mpegg_p1/dataset/descriptor_stream_header.h>
@@ -25,9 +27,11 @@ class DSProtection {
 
    public:
     /**
-     *
+     * Default
      */
     DSProtection();
+
+    DSProtection(genie::util::BitReader& bit_reader, size_t length);
 
     uint64_t getLength() const;
 
@@ -47,9 +51,15 @@ class DescriptorStream {
 
    public:
     /**
-     *
+     * Default
      */
     DescriptorStream();
+    /**
+     *
+     * @param bit_reader
+     * @param length
+     */
+    DescriptorStream(genie::util::BitReader& bit_reader, size_t length);
 
     /**
      *

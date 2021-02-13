@@ -49,6 +49,8 @@ class DatasetParameterSet {
     explicit DatasetParameterSet(uint8_t group_ID, uint16_t ID,
                                  const core::parameter::ParameterSet&& parameterSet);
 
+    DatasetParameterSet(util::BitReader& bit_reader, size_t length);
+
     /**
      *
      * @return

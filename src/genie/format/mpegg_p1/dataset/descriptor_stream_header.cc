@@ -5,6 +5,7 @@
  */
 
 #include <genie/util/runtime-exception.h>
+#include <genie/format/mpegg_p1/util.h>
 
 #include "descriptor_stream_header.h"
 
@@ -12,32 +13,60 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
+DescriptorStreamHeader::DescriptorStreamHeader()
+    : reserved(),
+      descriptor_ID(),
+      class_ID(),
+      num_blocks() {}
+
+DescriptorStreamHeader::DescriptorStreamHeader(genie::util::BitReader& bit_reader, size_t length)
+    : reserved(),
+      descriptor_ID(),
+      class_ID(),
+      num_blocks() {
+
+    size_t start_pos = bit_reader.getPos();
+
+    std::string key = readKey(bit_reader);
+    UTILS_DIE_IF(key != "dshd", "DescriptorStreamHeader is not Found");
+
+
+    /// reserved u(1)
+    reserved = bit_reader.read<uint8_t>(1);
+    /// descriptor_ID u(7)
+    descriptor_ID = bit_reader.read<uint8_t>(7);
+    /// class_ID u(4)
+    class_ID = bit_reader.read<uint8_t>(4);
+    /// num_blocks u(32)
+    num_blocks = bit_reader.read<uint32_t>();
+
+    UTILS_DIE_IF(bit_reader.getPos() - start_pos != length, "Invalid DescriptorStreamHeader length!");
+}
+
 
 uint64_t DescriptorStreamHeader::getLength() const {
 
-  //length is first calculated in bits then converted in bytes
+    /// length is first calculated in bits then converted in bytes
 
-       // Key c(4) Length u(64)
-       uint64_t bitlength = (4 * sizeof(char) + 8) * 8 ;   // gen_info
+    /// Key c(4) Length u(64)
+    uint64_t bitlen = (4 * sizeof(char) + 8) * 8;  // gen_info
 
-       //reserved u(1)
-        bitlength += 1;
+    // reserved u(1)
+    bitlen += 1;
 
-       //descriptor_ID u(7)
-       bitlength += 7 ;
+    // descriptor_ID u(7)
+    bitlen += 7;
 
-       //class_ID u(4)
-       bitlength += 4 ;
+    // class_ID u(4)
+    bitlen += 4;
 
-       //num_blocks u(32)
-       bitlength += 32 ;
+    // num_blocks u(32)
+    bitlen += 32;
 
-    // !byte_aligned()
-    bitlength += bitlength % 8;
+    /// !byte_aligned()
+    bitlen += bitlen % 8;
 
-    bitlength /= 8;  // byte conversion
-
-    return bitlength;
+    return bitlen / 8;
 }
 
 void DescriptorStreamHeader::write(util::BitWriter& bit_writer) const {
@@ -62,6 +91,7 @@ void DescriptorStreamHeader::write(util::BitWriter& bit_writer) const {
     bit_writer.flush();
 
 }
+
 
 }  // namespace mpegg_p1
 }  // namespace format

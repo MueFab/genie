@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <vector>
 #include <genie/util/bitwriter.h>
+#include <genie/util/bitreader.h>
 
 namespace genie {
 namespace format {
@@ -31,15 +32,22 @@ class DescriptorStreamHeader{
     uint32_t num_blocks;
 
    public:
-
+    /**
+     * Default
+     */
     DescriptorStreamHeader();
+    /**
+     *
+     * @param bit_reader
+     * @param length
+     */
+    DescriptorStreamHeader(genie::util::BitReader& bit_reader, size_t length);
 
     /**
      *
      * @return
      */
     uint64_t getLength() const;
-
     /**
      *
      * @param bit_writer

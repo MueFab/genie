@@ -5,6 +5,8 @@
  */
 
 #include "dataset_parameter_set.h"
+#include <genie/util/runtime-exception.h>
+#include <genie/format/mpegg_p1/util.h>
 #include <sstream>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -39,6 +41,30 @@ DatasetParameterSet::DatasetParameterSet(uint16_t ID,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+DatasetParameterSet::DatasetParameterSet(util::BitReader& bit_reader, size_t length)
+    : dataset_group_ID(),
+      dataset_ID(),
+      parameterSet_p2() {
+
+    size_t start_pos = bit_reader.getPos();
+
+    std::string key = readKey(bit_reader);
+    UTILS_DIE_IF(key != "pars", "DatasetParameterSet is not Found");
+
+    // dataset_group_ID u(8)
+    dataset_group_ID = bit_reader.read<uint8_t>();
+    // dataset_ID u(8)
+    dataset_ID = bit_reader.read<uint16_t>();
+
+    /// parameter_set_ID and parent_parameter_set_ID also encoded_parameters()
+//    parameterSet_p2 = ParameterSet(bit_reader);
+
+    bit_reader.flush();
+
+    UTILS_DIE_IF(bit_reader.getPos()-start_pos != length, "Invalid DatasetParameterSet length!");
+
+}
+// ---------------------------------------------------------------------------------------------------------------------
 
 uint16_t DatasetParameterSet::getDatasetID() const { return dataset_ID; }
 
@@ -53,14 +79,15 @@ void DatasetParameterSet::setDatasetGroupId(uint8_t datasetGroupId) { dataset_gr
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t DatasetParameterSet::getLength() const {
-    // key (4), Length (8)
-    uint64_t length = 12;
+
+    /// Key c(4) Length u(64)
+    uint64_t len = (4 * sizeof(char) + 8);   // gen_info
 
     // dataset_group_ID u(8)
-    length += 1;
+    len += 1;
 
     // dataset_ID u(16)
-    length += 2;
+    len += 2;
 
     // parameter_set_ID u(8), parent_parameter_set_ID u(8), Length of ParameterSet without parameter_set_ID
     // Reference : ParameterSet::write()
@@ -69,17 +96,19 @@ uint64_t DatasetParameterSet::getLength() const {
     parameterSet_p2.preWrite(tmp_writer);
     tmp_writer.flush();
 
-    length += tmp_writer.getBitsWritten() / 8;
+    len += tmp_writer.getBitsWritten() / 8;
 
-    return length;
+    return len;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetParameterSet::write(util::BitWriter& bit_writer) const {
+
+    /// Key of KLV format
     bit_writer.write("pars");
 
-    // Length of KVL format
+    /// Length of KVL format
     bit_writer.write(getLength(), 64);
 
     // dataset_group_ID u(8)
@@ -93,6 +122,7 @@ void DatasetParameterSet::write(util::BitWriter& bit_writer) const {
 
     bit_writer.flush();
 }
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
