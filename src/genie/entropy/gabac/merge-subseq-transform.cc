@@ -50,7 +50,7 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg,
     // split
     for (uint64_t i = 0; i < symbolsCount; i++) {
         uint64_t symbolValue = symbols.get(i);
-        int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(symbolValue, symbols.getWordSize());
+        int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(symbolValue, (uint8_t)symbols.getWordSize());
 
         bool isNegative = false;
         if (signedSymbolValue < 0) {

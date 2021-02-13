@@ -133,7 +133,7 @@ class bfile_iterator : public std::iterator<std::forward_iterator_tag, basetype>
         //printf("bf it %p\n",_is);
         _buffsize = 10000;
         _buffer = (basetype *) malloc(_buffsize*sizeof(basetype));
-        int reso = fseek(_is,0,SEEK_SET);
+        fseek(_is,0,SEEK_SET);
         advance();
     }
 
@@ -1155,7 +1155,7 @@ class mphf {
 
         _proba_collision = 1.0 -  pow(((_gamma*(double)_nelem -1 ) / (_gamma*(double)_nelem)),_nelem-1);
 
-        double sum_geom =_gamma * ( 1.0 +  _proba_collision / (1.0 - _proba_collision));
+        //double sum_geom =_gamma * ( 1.0 +  _proba_collision / (1.0 - _proba_collision));
         //printf("proba collision %f  sum_geom  %f   \n",_proba_collision,sum_geom);
 
         _nb_levels = 25;

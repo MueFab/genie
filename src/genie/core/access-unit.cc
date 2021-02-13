@@ -84,7 +84,7 @@ AccessUnit::Subsequence::Subsequence(uint8_t wordSize, GenSubIndex _id)
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence::Subsequence(util::DataBlock d, GenSubIndex _id)
-    : data(std::move(d)), position(0), id(std::move(_id)), dependency(0,d.getWordSize()) {}
+    : data(std::move(d)), position(0), id(std::move(_id)), dependency(0,(uint8_t)d.getWordSize()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -152,7 +152,7 @@ util::DataBlock* AccessUnit::Descriptor::getDependency(uint16_t sub) {
 AccessUnit::Subsequence &AccessUnit::Descriptor::getTokenType(uint16_t pos, uint8_t _type) {
     uint16_t s_id = ((pos << 4u) | (_type & 0xfu));
     while (subdesc.size() <= s_id) {
-        subdesc.emplace_back(4, GenSubIndex(getID(), uint16_t (subdesc.size())));
+        subdesc.emplace_back((uint8_t)4, GenSubIndex(getID(), uint16_t (subdesc.size())));
     }
     return get(s_id);
 }
@@ -275,7 +275,7 @@ AccessUnit::Subsequence::Subsequence(GenSubIndex _id) : data(0, 1), id(_id), num
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence::Subsequence(GenSubIndex _id, util::DataBlock &&dat)
-    : data(std::move(dat)), id(std::move(_id)), numSymbols(0), dependency(0, data.getWordSize()) {}
+    : data(std::move(dat)), id(std::move(_id)), numSymbols(0), dependency(0, (uint8_t)data.getWordSize()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -313,7 +313,7 @@ void AccessUnit::Descriptor::write(util::BitWriter &writer) const {
 
 AccessUnit::Descriptor::Descriptor(GenDesc _id, size_t count, size_t remainingSize, util::BitReader &reader) : id(_id) {
     if (this->id == GenDesc::RNAME || this->id == GenDesc::MSAR) {
-        subdesc.emplace_back(GenSubIndex{_id, 0}, remainingSize, reader);
+        subdesc.emplace_back(GenSubIndex{_id, (uint16_t)0}, remainingSize, reader);
         return;
     }
     for (size_t i = 0; i < count; ++i) {

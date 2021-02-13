@@ -374,7 +374,7 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
         unmatched[tid] = 0;
         std::bitset<bitset_size> ref, revref, b;
 
-        int64_t first_rid;
+        int64_t first_rid = 0;
         // first_rid represents first read of contig, used for left searching
 
         // variables for early stopping
@@ -395,7 +395,7 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
         int64_t current, prev;
         uint64_t ull;
         int ref_len;
-        int64_t ref_pos, cur_read_pos;
+        int64_t ref_pos = 0, cur_read_pos = 0;
         // starting positions of the ref and the current read in the contig, can be
         // negative during left search or due to RC
         // useful for sorting according to starting position in the encoding stage.

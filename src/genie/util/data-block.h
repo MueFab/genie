@@ -58,7 +58,7 @@ class DataBlock {
      * before promoting it back to int.  Ergo, just leave the return type
      * of the word size as int.
      */
-    int getWordSize() const;
+    uint8_t getWordSize() const;
 
     /**
      * @brief multiply by size of one symbol in bytes

@@ -29,8 +29,8 @@ class SequenceConfig {
     bool isValid() const;
 
     void setRefID(uint8_t _ref_ID);
-    void addEntry(uint16_t seq_ID, uint32_t seq_block);
-    void addEntries(std::vector<uint16_t>& _seq_IDs, std::vector<uint32_t>& _seq_blocks);
+    void addEntry(uint16_t seq_ID, uint16_t seq_block);
+    void addEntries(std::vector<uint16_t>& _seq_IDs, std::vector<uint16_t>& _seq_blocks);
 
     uint16_t getSeqCount() const;
 

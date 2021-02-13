@@ -91,7 +91,7 @@ void inverseTransformMatchCoding(std::vector<util::DataBlock> *const transformed
     util::DataBlock *const lengths = &((*transformedSubseqs)[1]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[2]);
 
-    util::DataBlock symbols(0, rawValues->getWordSize());
+    util::DataBlock symbols(0, (uint8_t)rawValues->getWordSize());
     assert(lengths->size() == pointers->size() + rawValues->size());
 
     // Re-compute the symbols from the pointer, lengths and raw values
