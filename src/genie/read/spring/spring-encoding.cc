@@ -78,12 +78,12 @@ void writecontig(const std::string &ref, std::list<contig_reads> &current_contig
     long currentpos;
     uint64_t abs_current_pos;
     for (; current_contig_it != current_contig.end(); ++current_contig_it) {
-        currentpos = (*current_contig_it).pos;
+        currentpos = (long)(*current_contig_it).pos;
         prevj = 0;
         for (long j = 0; j < (*current_contig_it).read_length; j++)
             if ((*current_contig_it).read[j] != ref[currentpos + j]) {
                 f_noise << (*current_contig_it).read[j];
-                pos_var = j - prevj;
+                pos_var = (uint16_t)(j - prevj);
                 f_noisepos.write((char *)&pos_var, sizeof(uint16_t));
                 prevj = j;
             }

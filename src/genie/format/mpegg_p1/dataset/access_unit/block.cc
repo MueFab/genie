@@ -38,7 +38,7 @@ uint8_t Block::getDescID() const {return descriptor_ID;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t Block::getPayloadSize() const {return block_payload.size();}
+uint32_t Block::getPayloadSize() const {return (uint32_t)block_payload.size();}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

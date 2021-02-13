@@ -78,7 +78,7 @@ MismatchDecoder *AccessUnit::Subsequence::getMismatchDecoder() const { return mm
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Subsequence::Subsequence(size_t wordSize, GenSubIndex _id)
+AccessUnit::Subsequence::Subsequence(uint8_t wordSize, GenSubIndex _id)
     : data(0, wordSize), position(0), id(std::move(_id)), dependency(0, wordSize) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -152,7 +152,7 @@ util::DataBlock* AccessUnit::Descriptor::getDependency(uint16_t sub) {
 AccessUnit::Subsequence &AccessUnit::Descriptor::getTokenType(uint16_t pos, uint8_t _type) {
     uint16_t s_id = ((pos << 4u) | (_type & 0xfu));
     while (subdesc.size() <= s_id) {
-        subdesc.emplace_back(4, GenSubIndex(getID(), subdesc.size()));
+        subdesc.emplace_back(4, GenSubIndex(getID(), uint16_t (subdesc.size())));
     }
     return get(s_id);
 }
@@ -325,9 +325,9 @@ AccessUnit::Descriptor::Descriptor(GenDesc _id, size_t count, size_t remainingSi
             s = remainingSize;
         }
         if (s) {
-            subdesc.emplace_back(GenSubIndex{_id, i}, s, reader);
+            subdesc.emplace_back(GenSubIndex{_id, (uint16_t)i}, s, reader);
         } else {
-            subdesc.emplace_back(GenSubIndex{_id, i}, util::DataBlock(0, 4));
+            subdesc.emplace_back(GenSubIndex{_id, (uint16_t)i}, util::DataBlock(0, 4));
         }
     }
 }

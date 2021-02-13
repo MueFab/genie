@@ -24,13 +24,15 @@ class Checksum {
 
     Checksum();
 
+    virtual ~Checksum() = default;
+
     explicit Checksum(Algo _algo);
 
     Algo getType() const;
 
-    virtual uint64_t getLength() const;
+    virtual uint64_t getLength() const {return 0;};
 
-    virtual void write(genie::util::BitWriter& bit_writer) const;
+    virtual void write(genie::util::BitWriter&) const {};
 };
 
 }  // namespace mpegg_p1

@@ -118,7 +118,7 @@ class GabacSeqConfSet {
     void fillDecoder(const core::GenomicDescriptorProperties &desc, T &decoder_config) const {
         for (const auto &subdesc : desc.subseqs) {
             auto subseqCfg = getConfAsGabac(subdesc.id).getSubseqConfig();
-            decoder_config.setSubsequenceCfg(subdesc.id.second, std::move(subseqCfg));
+            decoder_config.setSubsequenceCfg(uint8_t(subdesc.id.second), std::move(subseqCfg));
         }
     }
 };

@@ -69,7 +69,7 @@ class Importer : public core::FormatImporter {
      * @return SameRec MPEG-G record
      */
     static std::unique_ptr<core::record::Record> convertSam2SameRec(Record& sam_r1, Record& sam_r2,
-                                                                    std::map<std::string, size_t>& refs);
+                                                                    std::map<std::string, uint16_t>& refs);
 
     /**
      *
@@ -81,7 +81,7 @@ class Importer : public core::FormatImporter {
      * @param refs: Map, contains Reference ID associated to each Reference Name
      */
     static void addAlignmentToSameRec(std::unique_ptr<core::record::Record>& rec, Record& sam_r1, Record& sam_r2,
-                                      std::map<std::string, size_t>& refs);
+                                      std::map<std::string, uint16_t>& refs);
 
     /**
      *
@@ -91,7 +91,8 @@ class Importer : public core::FormatImporter {
      * @param sam_recs_2d: List of List of sam records (alignments).
      * @param refs: Map, contains Reference ID associated to each Reference Name
      */
-    static void convertPairedEndNoSplit(std::list<core::record::Record> &records, SamRecords2D& sam_recs_2d, std::map<std::string, size_t>& refs);
+    static void convertPairedEndNoSplit(std::list<core::record::Record> &records, SamRecords2D& sam_recs_2d,
+                                        std::map<std::string, uint16_t>& refs);
 
     /**
      *
@@ -103,7 +104,7 @@ class Importer : public core::FormatImporter {
      * @return SplitRec MPEG-G record
      */
     static std::unique_ptr<core::record::Record> convertSam2SplitRec(Record& sam_r1, Record* sam_r2_ptr,
-                                              std::map<std::string, size_t>& refs);
+                                                                     std::map<std::string, uint16_t>& refs);
 
     /**
      *
@@ -115,7 +116,7 @@ class Importer : public core::FormatImporter {
      * @param refs: Map, contains Reference ID associated to each Reference Name
      */
     static void addAlignmentToSplitRec(std::unique_ptr<core::record::Record>& rec, Record& sam_r1, Record* sam_r2_ptr,
-                                       std::map<std::string, size_t>& refs);
+                                       std::map<std::string, uint16_t>& refs);
 
 
     /**
@@ -125,7 +126,8 @@ class Importer : public core::FormatImporter {
      * @param sam_recs_2d
      * @param refs
      */
-    static void convertPairedEndSplitPair(std::list<core::record::Record> &records, SamRecords2D& sam_recs_2d, std::map<std::string, size_t>& refs);
+    static void convertPairedEndSplitPair(std::list<core::record::Record> &records, SamRecords2D& sam_recs_2d,
+                                          std::map<std::string, uint16_t>& refs);
 
    public:
     /**
@@ -201,7 +203,8 @@ class Importer : public core::FormatImporter {
       * @param unmapped_pair:  SAM record has pair which is unmapped
       * @param is_read_1_first
       */
-    static void convertSingleEnd(std::list<core::record::Record> &records, SamRecords& sam_recs, std::map<std::string, size_t>& refs,
+    static void convertSingleEnd(std::list<core::record::Record> &records, SamRecords& sam_recs,
+                                 std::map<std::string, uint16_t>& refs,
                                  bool unmapped_pair=false, bool is_read_1_first=true);
 
     /**
@@ -212,8 +215,8 @@ class Importer : public core::FormatImporter {
      * @param refs: Map, contains Reference ID associated to each Reference Name
      * @param force_split: Force creation of MPEG-G record for each read.
      */
-    static void convertPairedEnd(std::list<core::record::Record> &records, SamRecords2D& sam_recs_2d, std::map<std::string,
-        size_t>& refs, bool force_split=false);
+    static void convertPairedEnd(std::list<core::record::Record> &records, SamRecords2D& sam_recs_2d,
+                                 std::map<std::string, uint16_t>& refs, bool force_split=false);
 
     /**
      * Convert SAM records contained in ReadTemplate data structure to MPEG-G records
@@ -223,7 +226,8 @@ class Importer : public core::FormatImporter {
      * @param refs: Map, contains Reference ID associated to each Reference Name
      * @param force_split: Force creation of MPEG-G record for each read.
      */
-    static void convert(std::list<core::record::Record> &records, ReadTemplate& rt, std::map<std::string, size_t>& refs,
+    static void convert(std::list<core::record::Record> &records, ReadTemplate& rt,
+                        std::map<std::string, uint16_t>& refs,
                         bool force_split=false);
 
     /**

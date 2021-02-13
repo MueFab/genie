@@ -196,7 +196,7 @@ void Exporter::generateRecords(bool primary, std::vector<Stash>& stash, const co
         }
         std::string name = rec.getName().empty() ? "*" : rec.getName();
         out.emplace_back(name, stash[i].flags, "ref" + std::to_string(rec.getAlignmentSharedData().getSeqID()),
-                         stash[i].position, stash[i].mappingScore, stash[i].cigar, "=", stash[i + 1].position, tlen,
+                         (uint32_t) stash[i].position, stash[i].mappingScore, stash[i].cigar, "=", (uint32_t)stash[i + 1].position, (int32_t)tlen,
                          stash[i].seq, stash[i].qual);
     }
     if (stash.front().rcomp) {
@@ -204,7 +204,7 @@ void Exporter::generateRecords(bool primary, std::vector<Stash>& stash, const co
     }
     std::string name = rec.getName().empty() ? "*" : rec.getName();
     out.emplace_back(name, stash[i].flags, "ref" + std::to_string(rec.getAlignmentSharedData().getSeqID()),
-                     stash[i].position, stash[i].mappingScore, stash[i].cigar, "=", stash.front().position, -tlen,
+                     (uint32_t) stash[i].position, stash[i].mappingScore, stash[i].cigar, "=", (uint32_t)stash.front().position, (int32_t)-tlen,
                      stash[i].seq, stash[i].qual);
 }
 

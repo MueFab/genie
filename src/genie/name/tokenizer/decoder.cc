@@ -68,7 +68,7 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(co
     std::vector<SingleToken> oldRec;
     util::Watch watch;
     while (!desc.getTokenType(0, TYPE_SEQ).end()) {
-        size_t cur_pos = 0;
+        uint16_t cur_pos = 0;
 
         std::vector<SingleToken> rec;
 
@@ -84,15 +84,15 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(co
             SingleToken t(type, 0, "");
 
             if (type == Tokens::STRING) {
-                char c = desc.getTokenType(cur_pos, (uint8_t)Tokens::STRING).pull();
+                auto c = (char)desc.getTokenType(cur_pos, (uint8_t)Tokens::STRING).pull();
                 while (c != '\0') {
                     t.paramString += c;
-                    c = desc.getTokenType(cur_pos, (uint8_t)Tokens::STRING).pull();
+                    c = (char)desc.getTokenType(cur_pos, (uint8_t)Tokens::STRING).pull();
                 }
             } else if (type == Tokens::DIGITS || type == Tokens::DIGITS0) {
                 t.param = pull32bigEndian(desc.getTokenType(cur_pos, (uint8_t)type));
             } else if ((uint8_t)type < uint8_t(Tokens::MATCH)) {
-                t.param = desc.getTokenType(cur_pos, (uint8_t)type).pull();
+                t.param = (uint32_t)desc.getTokenType(cur_pos, (uint8_t)type).pull();
             }
 
             rec.push_back(t);

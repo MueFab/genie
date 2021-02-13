@@ -104,8 +104,8 @@ void Writer::writeAsTUcabac(uint64_t input, const std::vector<unsigned int> binP
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Writer::writeAsEGbypass(uint64_t input, const std::vector<unsigned int>) {
-    unsigned int valuePlus1 = input + 1;
-    unsigned int numLeadZeros = floor(log2(valuePlus1));
+    auto valuePlus1 = (unsigned int)(input + 1);
+    auto numLeadZeros = (unsigned int)floor(log2(valuePlus1));
 
     /* prefix */
     writeAsBIbypass(1, std::vector<unsigned int>({numLeadZeros + 1}));
@@ -118,8 +118,8 @@ void Writer::writeAsEGbypass(uint64_t input, const std::vector<unsigned int>) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Writer::writeAsEGcabac(uint64_t input, const std::vector<unsigned int> binParams) {
-    unsigned int valuePlus1 = input + 1;
-    unsigned int numLeadZeros = floor(log2(valuePlus1));
+    auto valuePlus1 = (unsigned int)(input + 1);
+    auto numLeadZeros = (unsigned int)floor(log2(valuePlus1));
 
     /* prefix */
     writeAsBIcabac(1, std::vector<unsigned int>({numLeadZeros + 1, 0, 0, binParams[3]}));

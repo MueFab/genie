@@ -28,9 +28,23 @@ class FastaReference: public ExternalReference{
 //
 //    void addChecksums(std::vector<Checksum>& _checksums);
 
+    /**
+     *
+     * @return
+     */
     Checksum::Algo getChecksumAlg() const override;
 
-    void write(genie::util::BitWriter& bit_writer) override;
+    /**
+     *
+     * @return
+     */
+    uint64_t getLength() override {return 0;}
+
+    /**
+     *
+     * @param writer
+     */
+    void write(genie::util::BitWriter& writer) override;
 };
 
 }  // namespace mpegg_p1

@@ -14,7 +14,7 @@ set(source_files
         dataset/fields/block_header_flags/block_header_flags.cc
         dataset/fields/block_header_flags/with_header.cc
         dataset/fields/block_header_flags/without_header.cc
-        dataset/fields/seq_additional_info/seq_additional_info.cc
+#        dataset/fields/seq_additional_info/seq_additional_info.cc
         dataset/fields/seq_info/seq_info.cc
         dataset/fields/u_access_unit_info/u_access_unit_info.cc
 #        dataset/master_index_table/access_unit_info/extended_au_info.cc

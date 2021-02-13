@@ -25,7 +25,7 @@ bool FormatImporter::pump(uint64_t& id, std::mutex& lock) {
         chunk = classifier->getChunk();
         uint32_t segment_count = 0;
         for (const auto& r : chunk.getData()) {
-            segment_count += r.getSegments().size();
+            segment_count += uint32_t(r.getSegments().size());
         }
         if (chunk.getData().empty()) {
             segment_count = 1;

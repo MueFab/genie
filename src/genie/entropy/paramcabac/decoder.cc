@@ -22,7 +22,7 @@ DecoderRegular::DecoderRegular() : core::parameter::desc_pres::DecoderRegular(MO
 DecoderRegular::DecoderRegular(core::GenDesc desc)
     : core::parameter::desc_pres::DecoderRegular(MODE_CABAC), descriptor_subsequence_cfgs() {
     for (size_t i = 0; i < core::getDescriptors()[uint8_t(desc)].subseqs.size(); ++i) {
-        descriptor_subsequence_cfgs.emplace_back(i, false);
+        descriptor_subsequence_cfgs.emplace_back((uint16_t )i, false);
     }
 }
 
@@ -77,7 +77,7 @@ void DecoderRegular::write(util::BitWriter &writer) const {
 
 DecoderTokenType::DecoderTokenType()
     : core::parameter::desc_pres::DecoderTokentype(MODE_CABAC), rle_guard_tokentype(0), descriptor_subsequence_cfgs() {
-    for (size_t i = 0; i < 2; ++i) {
+    for (uint16_t i = 0; i < 2; ++i) {
         descriptor_subsequence_cfgs.emplace_back(i, true);
     }
 }
