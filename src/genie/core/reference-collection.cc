@@ -23,7 +23,7 @@ std::string ReferenceCollection::getSequence(const std::string& name, uint64_t _
     }
     uint64_t position = _start;
     std::string ret;
-    ret.reserve(_end - _start);
+    ret.reserve(size_t(_end - _start));
     while (true) {
         size_t nearest = std::numeric_limits<size_t>::max();
         for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
@@ -32,12 +32,12 @@ std::string ReferenceCollection::getSequence(const std::string& name, uint64_t _
             }
 
             if (it2->get()->getStart() > position) {
-                nearest = std::min<size_t>(nearest, it2->get()->getStart());
+                nearest = std::min<size_t>(nearest, (size_t)it2->get()->getStart());
             }
 
             if (it2->get()->getStart() <= position && it2->get()->getEnd() > position) {
                 nearest = std::numeric_limits<size_t>::max();
-                ret += it2->get()->getSequence(position, std::min<size_t>(it2->get()->getEnd(), _end));
+                ret += it2->get()->getSequence(position, std::min<uint64_t>(it2->get()->getEnd(), _end));
                 position = it2->get()->getEnd();
                 it2 = it->second.begin();
             }
@@ -48,10 +48,10 @@ std::string ReferenceCollection::getSequence(const std::string& name, uint64_t _
         }
 
         if (nearest == std::numeric_limits<size_t>::max()) {
-            ret += std::string(_end - position, 'N');
+            ret += std::string(size_t(_end - position), 'N');
             return ret;
         }
-        ret += std::string(nearest - position, 'N');
+        ret += std::string(size_t(nearest - position), 'N');
         position = nearest;
     }
 }
