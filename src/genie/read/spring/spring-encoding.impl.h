@@ -111,9 +111,9 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
         std::bitset<bitset_size> forward_bitset, reverse_bitset, b;
         char c = '0', rc = 'd';
         std::list<contig_reads> current_contig;
-        int64_t p;
-        uint16_t rl;
-        uint32_t ord, list_size = 0;  // list_size variable introduced because
+        int64_t p = 0;
+        uint16_t rl = 0;
+        uint32_t ord = 0, list_size = 0;  // list_size variable introduced because
         // list::size() was running very slowly
         // on UIUC machine
         std::list<uint32_t> *deleted_rids = new std::list<uint32_t>[eg.numdict_s];
@@ -122,7 +122,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
             if (!(in_flag >> c)) done = true;
             if (!done) {
                 std::getline(f, current);
-                rc = in_RC.get();
+                rc = (char)in_RC.get();
                 in_pos.read((char *)&p, sizeof(int64_t));
                 in_order.read((char *)&ord, sizeof(uint32_t));
                 in_readlength.read((char *)&rl, sizeof(uint16_t));
@@ -146,9 +146,9 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                         // first create bitsets from first readlen positions of ref
                         forward_bitset.reset();
                         reverse_bitset.reset();
-                        stringtobitset(ref.substr(0, eg.max_readlen), eg.max_readlen, forward_bitset, egb.basemask);
+                        stringtobitset(ref.substr(0, eg.max_readlen), (uint16_t)eg.max_readlen, forward_bitset, egb.basemask);
                         stringtobitset(reverse_complement(ref.substr(0, eg.max_readlen), eg.max_readlen),
-                                       eg.max_readlen, reverse_bitset, egb.basemask);
+                                       (uint16_t)eg.max_readlen, reverse_bitset, egb.basemask);
                         for (long j = 0; j < (int64_t)ref.size() - eg.max_readlen + 1; j++) {
                             // search for singleton reads
                             for (int rev = 0; rev < 2; rev++) {

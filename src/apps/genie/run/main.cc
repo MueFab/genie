@@ -36,7 +36,7 @@ std::string file_extension(const std::string& path) {
     auto pos = path.find_last_of('.');
     std::string ext = path.substr(pos + 1);
     for (auto& c : ext) {
-        c = std::tolower(c);
+        c = (char)std::tolower(c);
     }
     return ext;
 }

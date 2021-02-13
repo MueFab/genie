@@ -289,8 +289,8 @@ void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
                    std::get<0>(names), std::get<0>(qvs));
 
     for (size_t i = 0; i < matched_records[0].size(); ++i) {
-        chunk.getData().emplace_back(cp.paired_end ? 2 : 1, core::record::ClassType::CLASS_U,
-                                     std::move(matched_records[0][i].name), "", 0);
+        chunk.getData().emplace_back(cp.paired_end ? (uint8_t)2 : (uint8_t)1, core::record::ClassType::CLASS_U,
+                                     std::move(matched_records[0][i].name), "", (uint8_t)0);
         core::record::Segment seg(std::move(matched_records[0][i].seq));
         if (!matched_records[0][i].qv.empty()) {
             seg.addQualities(std::move(matched_records[0][i].qv));

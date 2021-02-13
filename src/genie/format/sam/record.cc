@@ -83,10 +83,10 @@ Record::Record(const std::string& string) {
     auto tokens = util::tokenize(string, '\t');
     UTILS_DIE_IF(tokens.size() < 11, "Invalid SAM record");
     qname = tokens[0];
-    flag = std::stoi(tokens[1]);
+    flag = (uint16_t)std::stoi(tokens[1]);
     rname = tokens[2];
     pos = std::stoi(tokens[3]);
-    mapq = std::stoi(tokens[4]);
+    mapq = (uint8_t)std::stoi(tokens[4]);
     cigar = tokens[5];
     rnext = tokens[6];
     pnext = std::stoi(tokens[7]);
@@ -103,10 +103,10 @@ Record::Record(const std::string &_qname, const std::string &string) {
     UTILS_DIE_IF(tokens.size() < 10, "Invalid SAM record");
 
     qname = _qname;
-    flag = std::stoi(tokens[0]);
+    flag = (uint16_t)std::stoi(tokens[0]);
     rname = tokens[1];
     pos = std::stoi(tokens[2]);
-    mapq = std::stoi(tokens[3]);
+    mapq = (uint8_t)std::stoi(tokens[3]);
     cigar = tokens[4];
     rnext = tokens[5];
     pnext = std::stoi(tokens[6]);

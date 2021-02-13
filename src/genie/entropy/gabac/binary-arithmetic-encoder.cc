@@ -154,7 +154,7 @@ void BinaryArithmeticEncoder::finish() {
             m_numBufferedBytes -= 1;
         }
     }
-    m_bitOutputStream.write(m_low >> 8u, (24u - m_numBitsLeft));
+    m_bitOutputStream.write(m_low >> 8u, uint8_t (24u - m_numBitsLeft));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -423,8 +423,6 @@ size_t encodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqCon
         default:
             UTILS_DIE("Unknown coding order");
     }
-
-    return 0;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

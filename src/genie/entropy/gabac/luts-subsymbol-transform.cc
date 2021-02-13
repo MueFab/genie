@@ -76,7 +76,7 @@ void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols, util::Dat
     uint8_t const outputSymbolSize = supportVals.getOutputSymbolSize();
     uint8_t const codingSubsymSize = supportVals.getCodingSubsymSize();
     uint8_t const codingOrder = supportVals.getCodingOrder();
-    uint8_t const numSubsymbols = stateVars.getNumSubsymbols();
+    auto const numSubsymbols = (uint8_t)stateVars.getNumSubsymbols();
     uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
     uint64_t const subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize) - 1;
 
@@ -164,14 +164,14 @@ void LUTsSubSymbolTransform::decodeLUTs(Reader& reader) {
     uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
 
     if (codingOrder == 2) {
-        setupLutsOrder2(stateVars.getNumSubsymbols(), numAlphaSubsym);
+        setupLutsOrder2((uint8_t)stateVars.getNumSubsymbols(), numAlphaSubsym);
         for (uint32_t s = 0; s < numLuts; s++) {
             for (uint32_t k = 0; k < numAlphaSubsym; k++) {
                 decodeLutOrder1(reader, numAlphaSubsym, codingSubsymSize, lutsO2[s][k]);
             }
         }
     } else if (codingOrder == 1) {
-        setupLutsOrder1(stateVars.getNumSubsymbols(), numAlphaSubsym);
+        setupLutsOrder1((uint8_t)stateVars.getNumSubsymbols(), numAlphaSubsym);
         for (uint32_t s = 0; s < numLuts; s++) {
             decodeLutOrder1(reader, numAlphaSubsym, codingSubsymSize, lutsO1[s]);
         }

@@ -2,18 +2,25 @@ strategy:
   matrix:
     ubuntu20_04:
       imageName: 'ubuntu-20.04'
+      architecture: ''
     ubuntu18_04:
       imageName: 'ubuntu-18.04'
+      architecture: ''
     ubuntu16_04:
       imageName: 'ubuntu-16.04'
+      architecture: ''
     macos10_15:
       imageName: 'macos-10.15'
+      architecture: ''
     macos10_14:
       imageName: 'macos-10.14'
+      architecture: ''
     windows2016:
       imageName: 'vs2017-win2016'
+      architecture: '-A x64'
     windows2019:
       imageName: 'windows-2019'
+      architecture: '-A x64'
 
 pool:
   vmImage: $(imageName)
@@ -25,6 +32,31 @@ steps:
   displayName: 'Openmp installation (OSX)'
   condition: eq( variables['Agent.OS'], 'Darwin' )
 
+- script: |
+    mkdir cmake-build-debug
+    cd cmake-build-debug
+    cmake .. $(architecture) -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=OFF -DGENIE_WERROR=ON
+  displayName: 'Genie cmake'
+
+- script: |
+    cd cmake-build-debug
+    make --jobs
+  displayName: 'Genie build (make)'
+  condition: ne( variables['Agent.OS'], 'Windows_NT' )
+
+- task: VSBuild@1
+  inputs:
+    solution: 'cmake-build-debug\genie.sln'
+    msbuildArgs: '-m' 
+  displayName: 'Genie build (MSVC)'
+  condition: eq( variables['Agent.OS'], 'Windows_NT' )
+
+- bash: |
+    cp cmake-build-debug/bin/Debug/util-tests.exe cmake-build-debug/bin/util-tests
+    cp cmake-build-debug/bin/Debug/gabac-app.exe cmake-build-debug/bin/gabac-app
+  displayName: 'Genie copy exe files (MSVC)'
+  condition: eq( variables['Agent.OS'], 'Windows_NT' )
+
 - bash: |
     mkdir ref-decoder
     cd ref-decoder
@@ -33,7 +65,6 @@ steps:
     git init
     git config user.email "mitogen-group@gmail.com"
     git config user.name "Azure test script"
-    echo $USERNAME
     git pull https://${USERNAME}:${PASSWORD}@gitlab-scistimm.epfl.ch/MPEG-G/mpegg-reference-sw.git master
   displayName: 'Reference decoder checkout'
   env:
@@ -57,31 +88,6 @@ steps:
 #    msbuildArgs: '-m' 
 #  displayName: 'Reference decoder build (MSVC)'
 #  condition: eq( variables['Agent.OS'], 'Windows_NT' )
-
-- script: |
-    mkdir cmake-build-debug
-    cd cmake-build-debug
-    cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=ON
-  displayName: 'Genie cmake'
-
-- script: |
-    cd cmake-build-debug
-    make --jobs
-  displayName: 'Genie build (make)'
-  condition: ne( variables['Agent.OS'], 'Windows_NT' )
-
-- task: VSBuild@1
-  inputs:
-    solution: 'cmake-build-debug\genie.sln'
-    msbuildArgs: '-m' 
-  displayName: 'Genie build (MSVC)'
-  condition: eq( variables['Agent.OS'], 'Windows_NT' )
-
-- bash: |
-    cp cmake-build-debug/bin/Debug/util-tests.exe cmake-build-debug/bin/util-tests
-    cp cmake-build-debug/bin/Debug/gabac-app.exe cmake-build-debug/bin/gabac-app
-  displayName: 'Genie copy exe files (MSVC)'
-  condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
 - bash: cmake-build-debug/bin/util-tests
   displayName: 'Genie run unit tests'

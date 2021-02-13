@@ -24,7 +24,7 @@ TransformedSymbolsDecoder::TransformedSymbolsDecoder(util::DataBlock *bitstream,
       codingSubsymSize(trnsfSubseqConf.getSupportValues().getCodingSubsymSize()),
       codingOrder(trnsfSubseqConf.getSupportValues().getCodingOrder()),
       subsymMask(paramcabac::StateVars::get2PowN(codingSubsymSize) - 1),
-      numSubSyms(trnsfSubseqConf.getStateVars().getNumSubsymbols()),
+      numSubSyms((uint8_t)trnsfSubseqConf.getStateVars().getNumSubsymbols()),
       numLuts(trnsfSubseqConf.getStateVars().getNumLuts(codingOrder,
                                                         trnsfSubseqConf.getSupportValues().getShareSubsymLutFlag(),
                                                         trnsfSubseqConf.getTransformIDSubsym())),
@@ -94,8 +94,6 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbol(uint64_t *depSymbol) {
         default:
             UTILS_DIE("Unknown coding order");
     }
-
-    return 0;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

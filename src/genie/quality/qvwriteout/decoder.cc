@@ -38,7 +38,7 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(
                 }
 
                 for (size_t i = 0; i < bs.length(); ++i) {
-                    auto index = (uint8_t)desc.get(codebook + 2).pull();
+                    auto index = (uint8_t)desc.get((uint16_t)(codebook + 2)).pull();
                     std::get<0>(qv).back().push_back(param_casted.getCodebook(codebook).getEntries()[index]);
                 }
                 return true;

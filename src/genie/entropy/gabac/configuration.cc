@@ -71,8 +71,6 @@ uint8_t EncodingConfiguration::getSubseqWordSize() const {
             UTILS_DIE("Invalid subseq transforamtion");
             break;
     }
-
-    return 1;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

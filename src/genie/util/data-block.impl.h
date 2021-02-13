@@ -18,7 +18,7 @@ inline uint8_t DataBlock::getLgWordSize() const { return lgWordSize; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline int DataBlock::getWordSize() const { return 1 << lgWordSize; }
+inline uint8_t DataBlock::getWordSize() const { return 1 << lgWordSize; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

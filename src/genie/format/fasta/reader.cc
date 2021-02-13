@@ -46,7 +46,7 @@ std::string FastaReader::loadSection(const std::string& sequence, uint64_t start
             break;
         }
     }
-    std::transform(ret.begin(), ret.end(), ret.begin(), ::toupper);
+    std::transform(ret.begin(), ret.end(), ret.begin(), [](char x) -> char {return (char)toupper(x);});
     return ret;
 }
 

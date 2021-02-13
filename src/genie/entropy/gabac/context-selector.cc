@@ -34,7 +34,7 @@ unsigned int ContextSelector::getContextIdxOrderGT0(const uint8_t subsymIdx, con
     unsigned int ctxIdx = 0;
     ctxIdx += stateVars.getNumCtxLUTs();
     ctxIdx += (unsigned int)(subsymIdx * stateVars.getCodingSizeCtxOffset());
-    for (unsigned int i = 1; i <= codingOrder; i++) {
+    for (uint8_t i = 1; i <= codingOrder; i++) {
         ctxIdx += (unsigned int)(subsymbols[prvIdx].prvValues[i - 1] * stateVars.getCodingOrderCtxOffset(i));
     }
 

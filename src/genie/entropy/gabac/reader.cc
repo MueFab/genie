@@ -61,10 +61,8 @@ uint64_t Reader::readAsBIcabac(const std::vector<unsigned int> binParams) {
 uint64_t Reader::readAsTUbypass(const std::vector<unsigned int> binParams) {
     unsigned int i = 0;
     const unsigned int cMax = binParams[0];
-    uint8_t b = 0;
     while (i < cMax) {
-        b = m_decBinCabac.decodeBinsEP(1);
-        if (b == 0) break;
+        if (m_decBinCabac.decodeBinsEP(1) == 0) break;
         i++;
     }
     return static_cast<uint64_t>(i);
@@ -77,10 +75,8 @@ uint64_t Reader::readAsTUcabac(const std::vector<unsigned int> binParams) {
     unsigned int cm = binParams[3];
     const unsigned int cMax = binParams[0];
     auto scan = m_contextModels.begin() + cm;
-    uint8_t b = 0;
     while (i < cMax) {
-        b = m_decBinCabac.decodeBin(&*scan);
-        if (b == 0) break;
+        if (m_decBinCabac.decodeBin(&*scan) == 0) break;
         i++;
         scan++;
     }

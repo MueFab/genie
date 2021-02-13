@@ -115,7 +115,7 @@ void inverseTransformEqualityCoding(std::vector<util::DataBlock> *const transfor
     // Prepare internal and the output data structures
     util::DataBlock *const flags = &((*transformedSubseqs)[0]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
-    util::DataBlock symbols(0, rawValues->getWordSize());
+    util::DataBlock symbols(0, (uint8_t)rawValues->getWordSize());
 
     util::BlockStepper rflag = flags->getReader();
     util::BlockStepper rval = rawValues->getReader();

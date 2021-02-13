@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
     try {
         UTILS_DIE_IF(argc <= OPERATION_INDEX, "No operation specified, type 'genie help' for more info.");
         std::string operation = argv[OPERATION_INDEX];
-        transform(operation.begin(), operation.end(), operation.begin(), ::tolower);
+        transform(operation.begin(), operation.end(), operation.begin(), [](char x) -> char {return (char)tolower(x);});
         if (operation == "run") {
             genieapp::run::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else if (operation == "stat") {

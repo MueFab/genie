@@ -38,7 +38,7 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
     {
         const size_t READAHEAD = 6;
         util::DataBlock tmp =
-            util::DataBlock(static_cast<uint8_t*>(remainingData.getData()), READAHEAD, remainingData.getWordSize());
+            util::DataBlock(static_cast<uint8_t*>(remainingData.getData()), READAHEAD, (uint8_t)remainingData.getWordSize());
         gabac::IBufferStream stream(&tmp);
         util::BitReader reader(stream);
 

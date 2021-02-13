@@ -89,7 +89,7 @@ Exporter::Stash Exporter::stashFromMainAlignment(const core::record::AlignmentBo
     }
     ret.cigar = eCigar2Cigar(alignment.getAlignment().getECigar());
     ret.mappingScore =
-        alignment.getAlignment().getMappingScores().empty() ? 0 : alignment.getAlignment().getMappingScores().front();
+        alignment.getAlignment().getMappingScores().empty() ? 0 : (uint8_t)alignment.getAlignment().getMappingScores().front();
     ret.rcomp = alignment.getAlignment().getRComp();
     ret.flags = mpeggFlagsToSamFlags(rec.getFlags(), ret.rcomp);
 
@@ -163,7 +163,7 @@ Exporter::Stash Exporter::stashFromSplitAlignment(const core::record::alignment_
     ret.seq = rec.getSegments()[rec_count].getSequence();
     ret.qual = rec.getSegments()[rec_count].getQualities().front();
     ret.cigar = eCigar2Cigar(split.getAlignment().getECigar());
-    ret.mappingScore = split.getAlignment().getMappingScores().front();
+    ret.mappingScore = (uint8_t)split.getAlignment().getMappingScores().front();
     ret.rcomp = split.getAlignment().getRComp();
     ret.flags = mpeggFlagsToSamFlags(rec.getFlags(), ret.rcomp);
     return ret;

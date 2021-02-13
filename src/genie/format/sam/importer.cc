@@ -109,7 +109,7 @@ std::string Importer::convertCigar2ECigar(const std::string &cigar, const std::s
             size_t end = std::stoi(digits) + seq_pos;
             UTILS_DIE_IF(end >= seq.length(), "CIGAR not valid for seq");
             for (; seq_pos < end; ++seq_pos) {
-                ecigar += std::toupper(seq[seq_pos]);
+                ecigar += (char)std::toupper(seq[seq_pos]);
             }
         } else {
             if (a == 'S') {
@@ -309,7 +309,7 @@ std::unique_ptr<core::record::Record> Importer::convertSam2SameRec(Record &sam_r
                                                                    std::map<std::string, uint16_t> &refs) {
     auto flag_tuple = convertFlags2Mpeg(sam_r1.getFlags());
 
-    auto rec = util::make_unique<core::record::Record>(2,
+    auto rec = util::make_unique<core::record::Record>((uint8_t)2,
                                                        core::record::ClassType::CLASS_I,
                                                        sam_r1.moveQname(),
                                                        "Genie",
@@ -436,7 +436,7 @@ std::unique_ptr<core::record::Record> Importer::convertSam2SplitRec(Record &sam_
                                                                     std::map<std::string, uint16_t> &refs) {
     auto flag_tuple = convertFlags2Mpeg(sam_r1.getFlags());
 
-    auto rec = util::make_unique<core::record::Record>(2, core::record::ClassType::CLASS_I, sam_r1.moveQname(), "Genie",
+    auto rec = util::make_unique<core::record::Record>((uint8_t)2, core::record::ClassType::CLASS_I, sam_r1.moveQname(), "Genie",
 //                                                       std::get<1>(flag_tuple), sam_r1.isFirstRead());
                                                        std::get<1>(flag_tuple), true); // is_read_1_first is always true
 
