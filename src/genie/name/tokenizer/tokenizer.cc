@@ -174,7 +174,7 @@ void push32bigEndian(core::AccessUnit::Subsequence& seq, uint32_t value) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void TokenState::encode(const std::vector<SingleToken>& tokens, core::AccessUnit::Descriptor& streams) {
-    for (size_t i = 0; i < tokens.size(); ++i) {
+    for (uint16_t i = 0; i < tokens.size(); ++i) {
         //   while (streams.size() <= i) {
         //       streams.emplace_back(getTokenInfo(Tokens::DZLEN).paramSeq + 1, util::DataBlock(0, 4));
         //   }

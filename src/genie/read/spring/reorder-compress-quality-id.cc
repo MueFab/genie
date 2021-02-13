@@ -364,7 +364,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 std::get<1>(encoded).write(bw);
             } else /* mode == "quality" */ {
                 genie::core::record::Chunk chunk;
-                for (uint32_t i = start_read_num; i < start_read_num + num_reads_block; i++) {
+                for (auto i = (uint32_t)start_read_num; i < start_read_num + num_reads_block; i++) {
                     chunk.getData().emplace_back(1, core::record::ClassType::CLASS_U, "", "", 0);
                     core::record::Segment s(std::string(str_array[i].size(), 'N'));
                     s.addQualities(std::move(str_array[i]));

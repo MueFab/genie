@@ -17,7 +17,7 @@ bool BlockConfig::getBlockHeaderFlag() const { return block_header_flag; }
 
 bool BlockConfig::getMITFlag() const { return MIT_flag; }
 
-uint8_t BlockConfig::getNumClasses() const { return class_infos.size(); }
+uint8_t BlockConfig::getNumClasses() const { return (uint8_t)class_infos.size(); }
 
 const std::vector<ClassInfo>& BlockConfig::getClassInfos() const { return class_infos; }
 

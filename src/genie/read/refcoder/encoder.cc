@@ -50,8 +50,8 @@ core::AccessUnit Encoder::pack(size_t id, uint16_t ref, uint8_t qv_depth,
                                std::unique_ptr<core::parameter::QualityValues> qvparam, core::record::ClassType type,
                                State& state) const {
     core::parameter::DataUnit::DatasetType dataType = core::parameter::DataUnit::DatasetType::ALIGNED;
-    core::parameter::ParameterSet ret(id, id, dataType, core::AlphabetID::ACGTN, state.readLength, state.pairedEnd,
-                                      false, qv_depth, 0, false, false);
+    core::parameter::ParameterSet ret((uint8_t)id, (uint8_t)id, dataType, core::AlphabetID::ACGTN,
+                                      uint32_t(state.readLength), state.pairedEnd, false, qv_depth, 0, false, false);
     ret.addClass(type, std::move(qvparam));
 
     auto rawAU = state.readCoder.moveStreams();
@@ -112,7 +112,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     rawAU = entropyCodeAU(std::move(rawAU));
     rawAU.setNumReads(read_num);
     rawAU.setReference(data.getRef(), data.getRefToWrite());
-    rawAU.setReference(data.getRefID());
+    rawAU.setReference(uint16_t(data.getRefID()));
     flowOut(std::move(rawAU), id);
 }
 

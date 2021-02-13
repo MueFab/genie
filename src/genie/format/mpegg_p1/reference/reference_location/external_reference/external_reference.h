@@ -24,19 +24,19 @@ class ExternalReference{
 
     ExternalReference();
 
+    virtual ~ExternalReference() = default;
+
 //    explicit ExternalReference(util::BitReader& reader);
 
     explicit ExternalReference(Type _reference_type);
 
-    ~ExternalReference() = default;
-
-    virtual Checksum::Algo getChecksumAlg() const;
+    virtual Checksum::Algo getChecksumAlg() const = 0;
 
     Type getReferenceType() const;
 
-    virtual uint64_t getlength();
+    virtual uint64_t getLength() = 0;
 
-    virtual void write(genie::util::BitWriter& writer);
+    virtual void write(genie::util::BitWriter& writer) = 0;
 
    private:
     Type reference_type;

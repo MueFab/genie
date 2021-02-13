@@ -31,6 +31,8 @@ class RawReference: public ExternalReference{
 //    void addChecksums(std::vector<Checksum>& _checksums);
 
     void write(genie::util::BitWriter& bit_writer) override;
+
+    uint64_t getLength() override {return 0;}
 };
 
 }  // namespace mpegg_p1

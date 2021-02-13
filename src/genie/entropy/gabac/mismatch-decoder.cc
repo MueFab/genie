@@ -72,8 +72,8 @@ MismatchDecoder::MismatchDecoder(util::DataBlock &&d, const EncodingConfiguratio
                     }
 
                     trnsfSymbolsDecoder.emplace_back(&currTrnsfSubseqData,
-                                                    subseqCfg.getTransformSubseqCfg(i),
-                                                    currNumtrnsfSymbols);
+                                                    subseqCfg.getTransformSubseqCfg((uint8_t)i),
+                                                     (unsigned int)currNumtrnsfSymbols);
                 }
             }
         }

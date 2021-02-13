@@ -72,7 +72,7 @@ uint64_t BitReader::read_b(uint8_t numBits) {
     if (numBits <= m_numHeldBits) {
         // Get numBits most significant bits from heldBits as bits
         bits = m_heldBits >> uint8_t(m_numHeldBits - numBits);
-        bits &= ~(0xffu << numBits);
+        bits &= ~(uint64_t(0xff) << numBits);
         m_numHeldBits -= numBits;
         return bits;
     }

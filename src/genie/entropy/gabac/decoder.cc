@@ -67,11 +67,11 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
 
         tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset,
                               remainingData.getRawSize() - offset, remainingData.getWordSize());
-        offset += gabac::decodeTransformSubseq(conf0.getSubseqConfig().getTransformSubseqCfg(0), numSymbols, &tmp);
+        offset += gabac::decodeTransformSubseq(conf0.getSubseqConfig().getTransformSubseqCfg(0), (unsigned int)numSymbols, &tmp);
         while (ret.getSize() < mappedTypeId) {
-            ret.add(core::AccessUnit::Subsequence(1, GenSubIndex{GenDesc::RNAME, ret.getSize()}));
+            ret.add(core::AccessUnit::Subsequence(1, GenSubIndex{GenDesc::RNAME, (uint16_t)ret.getSize()}));
         }
-        ret.add(core::AccessUnit::Subsequence(std::move(tmp), GenSubIndex{GenDesc::RNAME, mappedTypeId}));
+        ret.add(core::AccessUnit::Subsequence(std::move(tmp), GenSubIndex{GenDesc::RNAME, (uint16_t)mappedTypeId}));
     }
     return ret;
 }
@@ -83,7 +83,7 @@ core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfigura
                                                   bool mmCoderEnabled) {
     core::AccessUnit::Subsequence in = std::move(data);
 
-    if(getDescriptor(in.getID().first).getSubSeq(in.getID().second).mismatchDecoding && mmCoderEnabled) {
+    if(getDescriptor(in.getID().first).getSubSeq((uint8_t)in.getID().second).mismatchDecoding && mmCoderEnabled) {
         in.attachMismatchDecoder(util::make_unique<MismatchDecoder>(in.move(), conf));
         return in;
     }
@@ -153,7 +153,7 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::proces
             auto d_id = subseq.getID();
 
             const auto& token_param = dynamic_cast<const paramcabac::DecoderRegular&>(param_desc.getDecoder());
-            auto conf0 = token_param.getSubsequenceCfg(d_id.second);
+            auto conf0 = token_param.getSubsequenceCfg((uint8_t)d_id.second);
 
             if (!subseq.isEmpty()) {
                 std::get<1>(desc).addInteger("size-gabac-total-comp", subseq.getRawSize());

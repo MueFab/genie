@@ -40,7 +40,7 @@ void SequenceConfig::addEntries(std::vector<uint16_t>& _seq_IDs, std::vector<uin
     std::move(_seq_blocks.begin(), _seq_blocks.end(), std::back_inserter(seq_blocks));
 }
 
-uint16_t SequenceConfig::getSeqCount() const { return seq_IDs.size(); }
+uint16_t SequenceConfig::getSeqCount() const { return (uint16_t)seq_IDs.size(); }
 
 const std::vector<uint16_t>& SequenceConfig::getSeqBlocks() const { return seq_blocks; }
 

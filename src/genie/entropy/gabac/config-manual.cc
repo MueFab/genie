@@ -31,11 +31,11 @@ using namespace genie::entropy::paramcabac;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-unsigned long getCmaxTU(uint64_t const numAlphaSpecial, uint8_t const codingSubsymSize) {
+uint8_t getCmaxTU(uint64_t const numAlphaSpecial, uint8_t const codingSubsymSize) {
     if (numAlphaSpecial > 0) { /* special case */
-        return numAlphaSpecial - 1;
+        return (uint8_t)(numAlphaSpecial - 1);
     } else {
-        return StateVars::get2PowN(codingSubsymSize) - 1;
+        return (uint8_t)(StateVars::get2PowN(codingSubsymSize) - 1);
     }
 }
 

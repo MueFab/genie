@@ -29,7 +29,7 @@ class Encoder : public core::ReadEncoder {
         size_t minPos{};
         size_t maxPos{};
         basecoder::Encoder readCoder;
-        explicit State(size_t start) : readCoder(start) {}
+        explicit State(size_t start) : readCoder((int32_t)start) {}
     };
 
     void updateAssembly(const core::record::Record& r, State& state,

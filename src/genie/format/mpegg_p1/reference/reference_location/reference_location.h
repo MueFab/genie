@@ -18,15 +18,17 @@ class ReferenceLocation{
 
     ReferenceLocation();
 
+    virtual ~ReferenceLocation() = default;
+
     explicit ReferenceLocation(Flag _flag);
 
     bool isExternal() const;
 
     ReferenceLocation::Flag getExternalRefFlag() const;
 
-    virtual uint64_t getLength() const;
+    virtual uint64_t getLength() const {return 0;}
 
-    virtual void write(genie::util::BitWriter& writer) const;
+    virtual void write(genie::util::BitWriter&) const {}
 
    private:
     Flag external_ref_flag;
