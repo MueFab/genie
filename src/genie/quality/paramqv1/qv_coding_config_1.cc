@@ -25,6 +25,7 @@ QualityValues1::QualityValues1(QvpsPresetId _qvps_preset_ID, bool _reverse_flag)
 // ---------------------------------------------------------------------------------------------------------------------
 
 QualityValues1::QualityValues1(genie::core::GenDesc desc, util::BitReader& reader) : QualityValues(MODE_QV1, false) {
+    (void)desc;
     assert(desc == genie::core::GenDesc::QV);
 
     auto qvps_flag = reader.read<bool>(1);
