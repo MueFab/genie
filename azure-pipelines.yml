@@ -61,7 +61,7 @@ steps:
     mkdir ref-decoder
     cd ref-decoder
     git config --global init.defaultBranch master
-    git config pull.ff only
+    git config --global pull.ff only
     git init
     git config user.email "mitogen-group@gmail.com"
     git config user.name "Azure test script"
