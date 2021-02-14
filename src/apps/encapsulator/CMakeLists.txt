@@ -14,3 +14,6 @@ target_link_libraries(encapsulator PRIVATE genie-spring)
 target_link_libraries(encapsulator PRIVATE genie-mpegg_p1)
 target_link_libraries(encapsulator PRIVATE genie-mgb)
 target_link_libraries(encapsulator PRIVATE genie-module)
+
+install(TARGETS encapsulator
+        RUNTIME DESTINATION "usr/bin")

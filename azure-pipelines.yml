@@ -1,97 +1,290 @@
-strategy:
-  matrix:
-    ubuntu20_04:
-      imageName: 'ubuntu-20.04'
-      architecture: ''
-    ubuntu18_04:
-      imageName: 'ubuntu-18.04'
-      architecture: ''
-    ubuntu16_04:
-      imageName: 'ubuntu-16.04'
-      architecture: ''
-    macos10_15:
-      imageName: 'macos-10.15'
-      architecture: ''
-    macos10_14:
-      imageName: 'macos-10.14'
-      architecture: ''
-    windows2016:
-      imageName: 'vs2017-win2016'
-      architecture: '-A x64'
-    windows2019:
-      imageName: 'windows-2019'
-      architecture: '-A x64'
+stages:
+- stage: 'Building'
+  jobs:
+  - job: 'Debug'
+    strategy:
+      matrix:
+        ubuntu2004:
+          imageName: 'ubuntu-20.04'
+          artifactName: 'ubuntu2004'
+          architecture: ''
+          binDir: 'bin'
+        ubuntu1804:
+          imageName: 'ubuntu-18.04'
+          artifactName: 'ubuntu1804'
+          architecture: ''
+          binDir: 'bin'
+        ubuntu1604:
+          imageName: 'ubuntu-16.04'
+          artifactName: 'ubuntu1604'
+          architecture: ''
+          binDir: 'bin'
+        macos1015:
+          imageName: 'macos-10.15'
+          artifactName: 'macos1015'
+          architecture: ''
+          binDir: 'bin'
+        macos1014:
+          imageName: 'macos-10.14'
+          artifactName: 'macos1014'
+          architecture: ''
+          binDir: 'bin'
+        windows2016:
+          imageName: 'vs2017-win2016'
+          artifactName: 'windows2016'
+          architecture: '-A x64'
+          binDir: 'bin/Debug'
+        windows2019:
+          imageName: 'windows-2019'
+          artifactName: 'windows2019'
+          architecture: '-A x64'
+          binDir: 'bin/Debug'
+    pool:
+      vmImage: $(imageName)
+    steps:
+    - script: brew install libomp
+      displayName: 'Openmp installation (OSX)'
+      condition: eq( variables['Agent.OS'], 'Darwin' )
+    - script: |
+        mkdir cmake-build-debug
+        cd cmake-build-debug
+        cmake .. $(architecture) -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=OFF -DGENIE_WERROR=ON
+      displayName: 'Genie cmake'
+    - script: |
+        cd cmake-build-debug
+        make --jobs
+      displayName: 'Genie build (make)'
+      condition: ne( variables['Agent.OS'], 'Windows_NT' )
+    - task: VSBuild@1
+      inputs:
+        solution: 'cmake-build-debug\genie.sln'
+        msbuildArgs: '-m' 
+      displayName: 'Genie build (MSVC)'
+      condition: eq( variables['Agent.OS'], 'Windows_NT' )
+    - publish: cmake-build-debug/$(binDir)
+      artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
+  - job: 'Release'
+    strategy:
+      matrix:
+        ubuntu2004:
+          imageName: 'ubuntu-20.04'
+          artifactName: 'ubuntu2004'
+          architecture: ''
+          binDir: 'bin'
+        ubuntu1804:
+          imageName: 'ubuntu-18.04'
+          artifactName: 'ubuntu1804'
+          architecture: ''
+          binDir: 'bin'
+        ubuntu1604:
+          imageName: 'ubuntu-16.04'
+          artifactName: 'ubuntu1604'
+          architecture: ''
+          binDir: 'bin'
+        macos1015:
+          imageName: 'macos-10.15'
+          artifactName: 'macos1015'
+          architecture: ''
+          binDir: 'bin'
+        macos1014:
+          imageName: 'macos-10.14'
+          artifactName: 'macos1014'
+          architecture: ''
+          binDir: 'bin'
+        windows2016:
+          imageName: 'vs2017-win2016'
+          artifactName: 'windows2016'
+          architecture: '-A x64'
+          binDir: 'bin/Release'
+        windows2019:
+          imageName: 'windows-2019'
+          artifactName: 'windows2019'
+          architecture: '-A x64'
+          binDir: 'bin/Release'
+    pool:
+      vmImage: $(imageName)
+    steps:
+    - script: brew install libomp
+      displayName: 'Openmp installation (OSX)'
+      condition: eq( variables['Agent.OS'], 'Darwin' )
+    - script: |
+        mkdir cmake-build-release
+        cd cmake-build-release
+        cmake .. $(architecture) -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=OFF -DGENIE_WERROR=ON
+      displayName: 'Genie cmake'
+    - script: |
+        cd cmake-build-release
+        make --jobs
+      displayName: 'Genie build (make)'
+      condition: ne( variables['Agent.OS'], 'Windows_NT' )
+    - task: VSBuild@1
+      inputs:
+        solution: 'cmake-build-release\genie.sln'
+        msbuildArgs: '-m' 
+        configuration: 'Release'
+      displayName: 'Genie build (MSVC)'
+      condition: eq( variables['Agent.OS'], 'Windows_NT' )
+    - publish: cmake-build-release/$(binDir)
+      artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
 
-pool:
-  vmImage: $(imageName)
+- stage: 'Testing'
+  jobs:
+  - job: 'Unit'
+    strategy:
+      matrix:
+        ubuntu2004:
+          imageName: 'ubuntu-20.04'
+          artifactName: 'ubuntu2004'
+          fileExt: ''
+        ubuntu1804:
+          imageName: 'ubuntu-18.04'
+          artifactName: 'ubuntu1804'
+          fileExt: ''
+        ubuntu1604:
+          imageName: 'ubuntu-16.04'
+          artifactName: 'ubuntu1604'
+          fileExt: ''
+        macos1015:
+          imageName: 'macos-10.15'
+          artifactName: 'macos1015'
+          fileExt: ''
+        macos1014:
+          imageName: 'macos-10.14'
+          artifactName: 'macos1014'
+          fileExt: ''
+        windows2016:
+          imageName: 'vs2017-win2016'
+          artifactName: 'windows2016'
+          fileExt: '.exe'
+        windows2019:
+          imageName: 'windows-2019'
+          artifactName: 'windows2019'
+          fileExt: '.exe'
+    pool:
+      vmImage: $(imageName)
+    steps:
+    - checkout: none
+    - script: brew install libomp
+      displayName: 'Openmp installation (OSX)'
+      condition: eq( variables['Agent.OS'], 'Darwin' )
+    - download: current
+      artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
+    - bash: |
+        cd ..
+        chmod +x ./genie-debug-$(artifactName)-$(Build.SourceVersion)/*
+        genie-debug-$(artifactName)-$(Build.SourceVersion)/util-tests$(fileExt)
+      displayName: 'Genie run unit tests'
+  - job: 'Conformance'
+    strategy:
+      matrix:
+        ubuntu2004:
+          imageName: 'ubuntu-20.04'
+          artifactName: 'ubuntu2004'
+          fileExt: ''
+        ubuntu1804:
+          imageName: 'ubuntu-18.04'
+          artifactName: 'ubuntu1804'
+          fileExt: ''
+        ubuntu1604:
+          imageName: 'ubuntu-16.04'
+          artifactName: 'ubuntu1604'
+          fileExt: ''
+        macos1015:
+          imageName: 'macos-10.15'
+          artifactName: 'macos1015'
+          fileExt: ''
+        macos1014:
+          imageName: 'macos-10.14'
+          artifactName: 'macos1014'
+          fileExt: ''
+#        windows2016:
+#          imageName: 'vs2017-win2016'
+#          artifactName: 'windows2016'
+#          fileExt: ''
+#        windows2019:
+#          imageName: 'windows-2019'
+#          artifactName: 'windows2019'
+#          fileExt: ''
+    pool:
+      vmImage: $(imageName)
+    steps:
+    - checkout: none
+    - script: brew install libomp
+      displayName: 'Openmp installation (OSX)'
+      condition: eq( variables['Agent.OS'], 'Darwin' )
+    - download: current
+      artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
+    - bash: |
+        mkdir ref-decoder
+        cd ref-decoder
+        git config --global init.defaultBranch master
+        git config --global pull.ff only
+        git init
+        git config user.email "mitogen-group@gmail.com"
+        git config user.name "Azure test script"
+        git pull https://${USERNAME}:${PASSWORD}@gitlab-scistimm.epfl.ch/MPEG-G/mpegg-reference-sw.git master
+      displayName: 'Reference decoder checkout'
+      env:
+        USERNAME: $(EPFL_SCI-STI-MM_GITLAB_USERNAME)
+        PASSWORD: $(EPFL_SCI-STI-MM_GITLAB_PASSWORD)
+    - bash: |
+        cd ref-decoder
+        cmake .
+      displayName: 'Reference decoder cmake'
+    - script: |
+        cd ref-decoder
+        make --jobs 
+      displayName: 'Reference decoder build (make)'
+      condition: ne( variables['Agent.OS'], 'Windows_NT' )
 
-steps:
+#    - task: VSBuild@1
+#      inputs:
+#        solution: 'ref-decoder\mpegg_reference_sw.sln'
+#        msbuildArgs: '-m' 
+#      displayName: 'Reference decoder build (MSVC)'
+#      condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
-- script: |
-    brew install libomp
-  displayName: 'Openmp installation (OSX)'
-  condition: eq( variables['Agent.OS'], 'Darwin' )
-
-- script: |
-    mkdir cmake-build-debug
-    cd cmake-build-debug
-    cmake .. $(architecture) -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=OFF -DGENIE_WERROR=ON
-  displayName: 'Genie cmake'
-
-- script: |
-    cd cmake-build-debug
-    make --jobs
-  displayName: 'Genie build (make)'
-  condition: ne( variables['Agent.OS'], 'Windows_NT' )
-
-- task: VSBuild@1
-  inputs:
-    solution: 'cmake-build-debug\genie.sln'
-    msbuildArgs: '-m' 
-  displayName: 'Genie build (MSVC)'
-  condition: eq( variables['Agent.OS'], 'Windows_NT' )
-
-- bash: |
-    cp cmake-build-debug/bin/Debug/util-tests.exe cmake-build-debug/bin/util-tests
-    cp cmake-build-debug/bin/Debug/gabac-app.exe cmake-build-debug/bin/gabac-app
-  displayName: 'Genie copy exe files (MSVC)'
-  condition: eq( variables['Agent.OS'], 'Windows_NT' )
-
-- bash: |
-    mkdir ref-decoder
-    cd ref-decoder
-    git config --global init.defaultBranch master
-    git config --global pull.ff only
-    git init
-    git config user.email "mitogen-group@gmail.com"
-    git config user.name "Azure test script"
-    git pull https://${USERNAME}:${PASSWORD}@gitlab-scistimm.epfl.ch/MPEG-G/mpegg-reference-sw.git master
-  displayName: 'Reference decoder checkout'
-  env:
-    USERNAME: $(EPFL_SCI-STI-MM_GITLAB_USERNAME)
-    PASSWORD: $(EPFL_SCI-STI-MM_GITLAB_PASSWORD)
-
-- bash: |
-    cd ref-decoder
-    cmake .
-  displayName: 'Reference decoder cmake'
-
-- script: |
-    cd ref-decoder
-    make --jobs 
-  displayName: 'Reference decoder build (make)'
-  condition: ne( variables['Agent.OS'], 'Windows_NT' )
-
-#- task: VSBuild@1
-#  inputs:
-#    solution: 'ref-decoder\mpegg_reference_sw.sln'
-#    msbuildArgs: '-m' 
-#  displayName: 'Reference decoder build (MSVC)'
-#  condition: eq( variables['Agent.OS'], 'Windows_NT' )
-
-- bash: cmake-build-debug/bin/util-tests
-  displayName: 'Genie run unit tests'
-
-- bash: ci/gabac-roundtrip.sh
-  displayName: 'GABAC run roundtrips'
-
+- stage: 'Deployment'
+  jobs:
+  - job: 'Debian'
+    strategy:
+      matrix:
+        ubuntu2004:
+          imageName: 'ubuntu-20.04'
+          artifactName: 'ubuntu2004'
+          fileExt: ''
+        ubuntu1804:
+          imageName: 'ubuntu-18.04'
+          artifactName: 'ubuntu1804'
+          fileExt: ''
+        ubuntu1604:
+          imageName: 'ubuntu-16.04'
+          artifactName: 'ubuntu1604'
+          fileExt: ''
+    pool:
+      vmImage: $(imageName)
+    steps:
+    - checkout: none
+    - download: current
+      artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
+    - script: echo "Not yet implemented"
+      displayName: 'Build debian package'
+  - job: 'OSX'
+    strategy:
+      matrix:
+        macos1015:
+          imageName: 'macos-10.15'
+          artifactName: 'macos1015'
+          fileExt: ''
+        macos1014:
+          imageName: 'macos-10.14'
+          artifactName: 'macos1014'
+          fileExt: ''
+    pool:
+      vmImage: $(imageName)
+    steps:
+    - checkout: none
+    - download: current
+      artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
+    - script: echo "Not yet implemented"
+      displayName: 'Build OSX dmg'
