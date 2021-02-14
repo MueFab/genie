@@ -170,10 +170,15 @@ stages:
     - download: current
       artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
     - bash: |
-        cd ..
-        chmod +x ./genie-debug-$(artifactName)-$(Build.SourceVersion)/*
-        genie-debug-$(artifactName)-$(Build.SourceVersion)/util-tests$(fileExt)
+        chmod +x ../genie-debug-$(artifactName)-$(Build.SourceVersion)/*
+        ../genie-debug-$(artifactName)-$(Build.SourceVersion)/util-tests$(fileExt) --gtest_output=xml
       displayName: 'Genie run unit tests'
+    - task: PublishTestResults@2
+      displayName: Publish Util test Results
+      inputs:
+        testResultsFiles: 'test_detail.xml'
+        testRunTitle: 'util-$(artifactName)-$(Build.SourceVersion)'
+
   - job: 'Conformance'
     strategy:
       matrix:
