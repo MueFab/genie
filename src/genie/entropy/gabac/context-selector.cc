@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "context-selector.h"
+#include "genie/entropy/gabac/context-selector.h"
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

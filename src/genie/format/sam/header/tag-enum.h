@@ -4,14 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_TAG_ENUM_H
-#define GENIE_TAG_ENUM_H
+#ifndef SRC_GENIE_FORMAT_SAM_HEADER_TAG_ENUM_H_
+#define SRC_GENIE_FORMAT_SAM_HEADER_TAG_ENUM_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/runtime-exception.h>
-#include <genie/util/make-unique.h>
-#include "tag.h"
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+#include "genie/format/sam/header/tag.h"
+#include "genie/util/make-unique.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,11 +28,11 @@ namespace header {
 
 template <typename Type>
 class TagEnum : public TagBase {
-   private:
+ private:
     Type data;
     const std::vector<std::string>& lookup;
 
-   public:
+ public:
     TagEnum(std::string _name, Type _data, const std::vector<std::string>& _lookup)
         : TagBase(std::move(_name)), data(_data), lookup(_lookup) {}
 
@@ -56,7 +60,7 @@ class TagEnum : public TagBase {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_TAG_ENUM_H
+#endif  // SRC_GENIE_FORMAT_SAM_HEADER_TAG_ENUM_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

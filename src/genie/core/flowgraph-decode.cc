@@ -4,7 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "flowgraph-decode.h"
+#include "genie/core/flowgraph-decode.h"
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -130,7 +134,8 @@ void FlowGraphDecode::setNameSelector(std::function<size_t(genie::core::AccessUn
 // ---------------------------------------------------------------------------------------------------------------------
 
 void FlowGraphDecode::setEntropyCoderSelector(
-    const std::function<size_t(const parameter::DescriptorSubseqCfg&, genie::core::AccessUnit::Descriptor&, bool)>& fun) {
+    const std::function<size_t(const parameter::DescriptorSubseqCfg&, genie::core::AccessUnit::Descriptor&, bool)>&
+        fun) {
     entropySelector.setSelection(fun);
 }
 

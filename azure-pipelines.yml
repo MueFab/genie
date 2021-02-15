@@ -42,6 +42,23 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
+    - script: |
+        export PATH="$HOME/.local/bin:$PATH"
+        pip3 install --upgrade pip
+        pip3 install cpplint
+        cd src
+        cpplint --recursive --linelength=120 --filter=-runtime/references,-build/c++11 ./  
+      displayName: 'Cpplint (Ubuntu 20.04)'
+      condition: eq( variables['artifactName'], 'ubuntu2004')
+   
+    - script: |
+        sudo apt-get update
+        sudo apt-get install cppcheck
+        cd src
+        cppcheck --error-exitcode=1 -DGENIE_USE_OPENMP ./
+      displayName: 'Cppcheck (Ubuntu 20.04)'
+      condition: eq( variables['artifactName'], 'ubuntu2004')
+
     - script: brew install libomp
       displayName: 'Openmp installation (OSX)'
       condition: eq( variables['Agent.OS'], 'Darwin' )

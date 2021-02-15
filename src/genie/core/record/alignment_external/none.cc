@@ -4,8 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "none.h"
-#include <genie/util/make-unique.h>
+#include "genie/core/record/alignment_external/none.h"
+#include <memory>
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

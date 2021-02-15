@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SPRING_REORDER_H_
-#define SPRING_REORDER_H_
+#ifndef SRC_GENIE_READ_SPRING_REORDER_H_
+#define SRC_GENIE_READ_SPRING_REORDER_H_
 
 #ifdef GENIE_USE_OPENMP
 
@@ -22,10 +22,9 @@
 #include <iostream>
 #include <numeric>
 #include <string>
-
-#include "bitset-util.h"
-#include "params.h"
-#include "util.h"
+#include "genie/read/spring/bitset-util.h"
+#include "genie/read/spring/params.h"
+#include "genie/read/spring/util.h"
 
 namespace genie {
 namespace read {
@@ -57,7 +56,7 @@ struct reorder_global {
     // construtctor)
     std::bitset<bitset_size> mask64;  // bitset with 64 bits set to 1 (used in
     // bitsettostring for conversion to ullong)
-    reorder_global(int max_readlen_param);
+    explicit reorder_global(int max_readlen_param);
 
     ~reorder_global();
 };
@@ -103,6 +102,6 @@ void reorder_main(const std::string &temp_dir, const compression_params &cp);
 }  // namespace read
 }  // namespace genie
 
-#include "reorder.impl.h"
+#include "genie/read/spring/reorder.impl.h"
 
-#endif  // SPRING_REORDER_H_
+#endif  // SRC_GENIE_READ_SPRING_REORDER_H_

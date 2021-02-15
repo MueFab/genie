@@ -4,16 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_FLOWGRAPH_CONVERT_H
-#define GENIE_FLOWGRAPH_CONVERT_H
+#ifndef SRC_GENIE_CORE_FLOWGRAPH_CONVERT_H_
+#define SRC_GENIE_CORE_FLOWGRAPH_CONVERT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/selector.h>
-#include <genie/util/thread-manager.h>
-#include "flowgraph.h"
-#include "format-exporter.h"
-#include "format-importer.h"
+#include <memory>
+#include <vector>
+#include "genie/core/flowgraph.h"
+#include "genie/core/format-exporter.h"
+#include "genie/core/format-importer.h"
+#include "genie/util/selector.h"
+#include "genie/util/thread-manager.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +34,7 @@ class FlowGraphConvert : public FlowGraph {
     std::vector<std::unique_ptr<genie::core::FormatExporter>> exporters;     //!<
     genie::util::SelectorHead<genie::core::record::Chunk> exporterSelector;  //!<
 
-   public:
+ public:
     /**
      *
      * @param threads
@@ -108,7 +110,7 @@ class FlowGraphConvert : public FlowGraph {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_FLOWGRAPH_CONVERT_H
+#endif  // SRC_GENIE_CORE_FLOWGRAPH_CONVERT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SPRING_PARAMS_H_
-#define SPRING_PARAMS_H_
+#ifndef SRC_GENIE_READ_SPRING_PARAMS_H_
+#define SRC_GENIE_READ_SPRING_PARAMS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -64,10 +64,10 @@ inline uint64_t reorder_lock_idx(uint64_t hval) { return hval & LOCKS_REORDER_MA
  * In the future, we will extend the interface with debugging aids.
  */
 class omp_lock {
-   private:
+ private:
     omp_lock_t lck;  //!<
 
-   public:
+ public:
     /**
      *
      */
@@ -107,7 +107,7 @@ class omp_lock {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SPRING_PARAMS_H_
+#endif  // SRC_GENIE_READ_SPRING_PARAMS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

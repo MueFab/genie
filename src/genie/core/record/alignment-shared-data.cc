@@ -4,9 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "alignment-shared-data.h"
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
+#include "genie/core/record/alignment-shared-data.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

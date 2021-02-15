@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef DSG_PROGRAMOPTIONS_H_
-#define DSG_PROGRAMOPTIONS_H_
+#ifndef SRC_APPS_GENIE_RUN_PROGRAM_OPTIONS_H_
+#define SRC_APPS_GENIE_RUN_PROGRAM_OPTIONS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -17,43 +17,43 @@ namespace genieapp {
 namespace run {
 
 /**
- *
+ * @brief
  */
 class ProgramOptions {
-   public:
+ public:
     /**
-     *
+     * @brief
      * @param argc
      * @param argv
      */
     ProgramOptions(int argc, char *argv[]);
 
-   public:
-    std::string inputFile;     //!<
-    std::string inputSupFile;  //!<
-    std::string inputRefFile;  //!<
+ public:
+    std::string inputFile;     //!< @brief
+    std::string inputSupFile;  //!< @brief
+    std::string inputRefFile;  //!< @brief
 
-    std::string outputFile;     //!<
-    std::string outputSupFile;  //!<
+    std::string outputFile;     //!< @brief
+    std::string outputSupFile;  //!< @brief
 
-    std::string workingDirectory;  //!<
+    std::string workingDirectory;  //!< @brief
 
-    std::string paramsetPath;  //!<
+    std::string paramsetPath;  //!< @brief
 
-    std::string qvMode;        //!<
-    std::string readNameMode;  //!<
+    std::string qvMode;        //!< @brief
+    std::string readNameMode;  //!< @brief
 
-    bool forceOverwrite;  //!<
+    bool forceOverwrite;  //!< @brief
 
-    bool lowLatency;      //!<
-    std::string refMode;  //!<
+    bool lowLatency;      //!< @brief
+    std::string refMode;  //!< @brief
 
-    size_t numberOfThreads;  //!<
-    bool rawReference;       //!<
+    size_t numberOfThreads;  //!< @brief
+    bool rawReference;       //!< @brief
 
-   private:
+ private:
     /**
-     *
+     * @brief
      */
     void validate();
 };
@@ -65,7 +65,7 @@ class ProgramOptions {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // DSG_PROGRAMOPTIONS_H_
+#endif  // SRC_APPS_GENIE_RUN_PROGRAM_OPTIONS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

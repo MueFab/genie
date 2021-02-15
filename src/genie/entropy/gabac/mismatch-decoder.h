@@ -4,15 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_GABAC_MISMATCH_DECODER_H
-#define GENIE_GABAC_MISMATCH_DECODER_H
+#ifndef SRC_GENIE_ENTROPY_GABAC_MISMATCH_DECODER_H_
+#define SRC_GENIE_ENTROPY_GABAC_MISMATCH_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/mismatch-decoder.h>
-#include <genie/util/data-block.h>
-#include "gabac.h"
-#include "decode-transformed-symbols.h"
+#include <memory>
+#include <vector>
+#include "genie/core/mismatch-decoder.h"
+#include "genie/entropy/gabac/decode-transformed-symbols.h"
+#include "genie/entropy/gabac/gabac.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +26,7 @@ namespace gabac {
  *
  */
 class MismatchDecoder : public core::MismatchDecoder {
-   public:
+ public:
     /**
      *
      * @param d
@@ -50,7 +52,7 @@ class MismatchDecoder : public core::MismatchDecoder {
      */
     std::unique_ptr<core::MismatchDecoder> copy() const override;
 
-   private:
+ private:
     uint64_t numSubseqSymbolsTotal;
     uint64_t numSubseqSymbolsDecoded;
 
@@ -66,7 +68,7 @@ class MismatchDecoder : public core::MismatchDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_MISMATCH_DECODER_H
+#endif  // SRC_GENIE_ENTROPY_GABAC_MISMATCH_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

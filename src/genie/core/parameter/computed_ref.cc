@@ -4,9 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "computed_ref.h"
-
-#include <genie/util/runtime-exception.h>
+#include "genie/core/parameter/computed_ref.h"
+#include <utility>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

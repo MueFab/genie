@@ -4,13 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_TAG_STRING_H
-#define GENIE_TAG_STRING_H
+#ifndef SRC_GENIE_FORMAT_SAM_HEADER_TAG_STRING_H_
+#define SRC_GENIE_FORMAT_SAM_HEADER_TAG_STRING_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
-#include "tag.h"
+#include <string>
+#include "genie/format/sam/header/tag.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,10 +23,10 @@ namespace header {
 // ---------------------------------------------------------------------------------------------------------------------
 
 class TagString : public TagBase {
-   private:
+ private:
     std::string data;
 
-   public:
+ public:
     TagString(std::string _name, std::string _data);
 
     std::string toString() const override;
@@ -42,7 +43,7 @@ class TagString : public TagBase {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_TAG_STRING_H
+#endif  // SRC_GENIE_FORMAT_SAM_HEADER_TAG_STRING_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

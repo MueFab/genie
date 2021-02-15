@@ -4,14 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_BINARIZATION_PARAMETERS_H
-#define GENIE_BINARIZATION_PARAMETERS_H
+#ifndef SRC_GENIE_ENTROPY_PARAMCABAC_BINARIZATION_PARAMETERS_H_
+#define SRC_GENIE_ENTROPY_PARAMCABAC_BINARIZATION_PARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
 #include <vector>
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ namespace paramcabac {
  *
  */
 class BinarizationParameters {
-   public:
+ public:
     /**
      *
      */
@@ -109,7 +109,7 @@ class BinarizationParameters {
                split_unit_size == bin.split_unit_size;
     }
 
-   private:
+ private:
     uint8_t cmax;             //!<
     uint8_t cmax_teg;         //!<
     uint8_t cmax_dtu;         //!<
@@ -126,7 +126,7 @@ class BinarizationParameters {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_BINARIZATION_PARAMETERS_H
+#endif  // SRC_GENIE_ENTROPY_PARAMCABAC_BINARIZATION_PARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

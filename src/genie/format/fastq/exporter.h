@@ -4,18 +4,19 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_EXPORTER_H
-#define GENIE_EXPORTER_H
+#ifndef SRC_GENIE_FORMAT_FASTQ_EXPORTER_H_
+#define SRC_GENIE_FORMAT_FASTQ_EXPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/format-exporter.h>
-#include <genie/core/record/chunk.h>
-#include <genie/core/stats/perf-stats.h>
-#include <genie/util/drain.h>
-#include <genie/util/make-unique.h>
-#include <genie/util/ordered-lock.h>
-#include <genie/util/ordered-section.h>
+#include <vector>
+#include "genie/core/format-exporter.h"
+#include "genie/core/record/chunk.h"
+#include "genie/core/stats/perf-stats.h"
+#include "genie/util/drain.h"
+#include "genie/util/make-unique.h"
+#include "genie/util/ordered-lock.h"
+#include "genie/util/ordered-section.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +31,7 @@ class Exporter : public core::FormatExporter {
     std::vector<std::ostream *> file;  //!< @brief Support for paired output files
     util::OrderedLock lock;            //!< @brief Lock to ensure in order execution
 
-   public:
+ public:
     /**
      * @brief Unpaired mode
      * @param _file_1 Output file
@@ -66,7 +67,7 @@ class Exporter : public core::FormatExporter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_EXPORTER_H
+#endif  // SRC_GENIE_FORMAT_FASTQ_EXPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

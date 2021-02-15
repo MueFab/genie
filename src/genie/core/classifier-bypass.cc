@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "classifier-bypass.h"
+#include "genie/core/classifier-bypass.h"
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

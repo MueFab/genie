@@ -4,8 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "decoder.h"
-#include <genie/util/watch.h>
+#include "genie/name/tokenizer/decoder.h"
+#include <string>
+#include <tuple>
+#include <vector>
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +35,7 @@ std::string Decoder::inflate(const std::vector<SingleToken>& rec) {
                 ret += st.paramString;
                 break;
             case Tokens::CHAR:
-                ret += (char)st.param;
+                ret += static_cast<char>(st.param);
                 break;
             case Tokens::DIGITS:
                 ret += std::to_string(st.param);
@@ -84,10 +87,10 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(co
             SingleToken t(type, 0, "");
 
             if (type == Tokens::STRING) {
-                auto c = (char)desc.getTokenType(cur_pos, (uint8_t)Tokens::STRING).pull();
+                auto c = static_cast<char>(desc.getTokenType(cur_pos, (uint8_t)Tokens::STRING).pull());
                 while (c != '\0') {
                     t.paramString += c;
-                    c = (char)desc.getTokenType(cur_pos, (uint8_t)Tokens::STRING).pull();
+                    c = static_cast<char>(desc.getTokenType(cur_pos, (uint8_t)Tokens::STRING).pull());
                 }
             } else if (type == Tokens::DIGITS || type == Tokens::DIGITS0) {
                 t.param = pull32bigEndian(desc.getTokenType(cur_pos, (uint8_t)type));

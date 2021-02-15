@@ -4,12 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_REF_DECODER_H
-#define GENIE_REF_DECODER_H
+#ifndef SRC_GENIE_READ_REFCODER_DECODER_H_
+#define SRC_GENIE_READ_REFCODER_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <read-decoder.h>
+#include "genie/core/read-decoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ namespace refcoder {
  *
  */
 class Decoder : public core::ReadDecoder {
-   public:
+ public:
     /**
      *
      */
@@ -41,7 +41,7 @@ class Decoder : public core::ReadDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DECODER_H
+#endif  // SRC_GENIE_READ_REFCODER_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

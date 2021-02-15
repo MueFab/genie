@@ -4,10 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "reference-collection.h"
-
+#include "genie/core/reference-collection.h"
 #include <algorithm>
 #include <limits>
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,8 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_RUN_H_
-#define GABAC_RUN_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_RUN_H_
+#define SRC_GENIE_ENTROPY_GABAC_RUN_H_
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <cstdint>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +28,7 @@ struct IOConfiguration;
  * @param enConf gabac configuration
  * @param decode If you want to decode (true) or encode (false).
  */
-unsigned long run(const IOConfiguration& conf, const EncodingConfiguration& enConf, bool decode);
+uint64_t run(const IOConfiguration& conf, const EncodingConfiguration& enConf, bool decode);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,7 +38,7 @@ unsigned long run(const IOConfiguration& conf, const EncodingConfiguration& enCo
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_RUN_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_RUN_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

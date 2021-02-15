@@ -4,15 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_EXTENDED_AU_H
-#define GENIE_EXTENDED_AU_H
+#ifndef SRC_GENIE_FORMAT_MGB_EXTENDED_AU_H_
+#define SRC_GENIE_FORMAT_MGB_EXTENDED_AU_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-
 #include <cstdint>
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,12 +23,13 @@ namespace mgb {
  * ISO 23092-2 Section 3.4.1.1 table 19 lines 21 to 24
  */
 class ExtendedAu {
-   private:
+ private:
     uint64_t extended_AU_start_position;  //!< Line 22
     uint64_t extended_AU_end_position;    //!< Line 23
 
     uint8_t posSize;  //!< Internal
-   public:
+
+ public:
     /**
      *
      * @param _extended_AU_start_position
@@ -65,7 +65,7 @@ class ExtendedAu {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_EXTENDED_AU_H
+#endif  // SRC_GENIE_FORMAT_MGB_EXTENDED_AU_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

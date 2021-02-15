@@ -4,21 +4,20 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_FACTORY_H
-#define GENIE_FACTORY_H
+#ifndef SRC_GENIE_UTIL_FACTORY_H_
+#define SRC_GENIE_UTIL_FACTORY_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <map>
 #include <memory>
-#include "generic-factory.h"
-#include <genie/core/constants.h>
+#include "genie/core/constants.h"
+#include "genie/util/generic-factory.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace util {
-
-using namespace genie::core;
 
 /**
  *
@@ -26,16 +25,17 @@ using namespace genie::core;
  */
 template <typename T>
 class Factory : public GenericFactory {
-   private:
+ private:
     std::map<uint8_t, std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>> factories;  //!<
 
-   public:
+ public:
     /**
      *
      * @param id
      * @param factory
      */
-    void registerType(uint8_t id, const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& factory);
+    void registerType(uint8_t id,
+                      const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& factory);
 
     /**
      *
@@ -66,11 +66,11 @@ class Factory : public GenericFactory {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "factory.impl.h"
+#include "genie/util/factory.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_FACTORY_H
+#endif  // SRC_GENIE_UTIL_FACTORY_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

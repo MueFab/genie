@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SPRING_ENCODING_H_
-#define SPRING_ENCODING_H_
+#ifndef SRC_GENIE_READ_SPRING_SPRING_ENCODING_H_
+#define SRC_GENIE_READ_SPRING_SPRING_ENCODING_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,10 +24,9 @@
 #include <iostream>
 #include <list>
 #include <string>
-
-#include "bitset-util.h"
-#include "params.h"
-#include "util.h"
+#include "genie/read/spring/bitset-util.h"
+#include "genie/read/spring/params.h"
+#include "genie/read/spring/util.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -52,7 +51,7 @@ struct encoder_global_b {
      *
      * @param max_readlen_param
      */
-    encoder_global_b(int max_readlen_param);
+    explicit encoder_global_b(int max_readlen_param);
 
     /**
      *
@@ -64,12 +63,12 @@ struct encoder_global_b {
  *
  */
 struct encoder_global {
-    uint32_t numreads;                 //!<
-    uint32_t numreads_s;               //!<
-    uint32_t numreads_N;               //!<
+    uint32_t numreads{};               //!<
+    uint32_t numreads_s{};             //!<
+    uint32_t numreads_N{};             //!<
     int numdict_s = NUM_DICT_ENCODER;  //!<
 
-    int max_readlen, num_thr;  //!<
+    int max_readlen{}, num_thr{};  //!<
 
     std::string basedir;            //!<
     std::string infile;             //!<
@@ -87,7 +86,9 @@ struct encoder_global {
     std::string infile_order;       //!<
     std::string infile_order_N;     //!<
 
-    char enc_noise[128][128];  //!<
+    char enc_noise[128][128]{};  //!<
+
+    encoder_global() = default;
 };
 
 /**
@@ -205,11 +206,11 @@ void encoder_main(const std::string &temp_dir, const compression_params &cp);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "spring-encoding.impl.h"
+#include "genie/read/spring/spring-encoding.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SPRING_ENCODER_H_
+#endif  // SRC_GENIE_READ_SPRING_SPRING_ENCODING_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

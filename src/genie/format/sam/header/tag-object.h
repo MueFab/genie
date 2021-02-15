@@ -4,12 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_TAG_OBJECT_H
-#define GENIE_TAG_OBJECT_H
+#ifndef SRC_GENIE_FORMAT_SAM_HEADER_TAG_OBJECT_H_
+#define SRC_GENIE_FORMAT_SAM_HEADER_TAG_OBJECT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "tag.h"
+#include <memory>
+#include <string>
+#include <utility>
+#include "genie/format/sam/header/tag.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,10 +25,10 @@ namespace header {
 
 template <typename Type>
 class TagObject : public TagBase {
-   private:
+ private:
     Type data;
 
-   public:
+ public:
     const Type& getData() const { return data; }
 
     TagObject(std::string _name, Type _data) : TagBase(std::move(_name)), data(_data) {}
@@ -46,7 +49,7 @@ class TagObject : public TagBase {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_TAG_OBJECT_H
+#endif  // SRC_GENIE_FORMAT_SAM_HEADER_TAG_OBJECT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

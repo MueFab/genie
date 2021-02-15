@@ -4,12 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef UTIL_FASTA_FILE_READER_H_
-#define UTIL_FASTA_FILE_READER_H_
+#ifndef SRC_GENIE_FORMAT_FASTA_READER_H_
+#define SRC_GENIE_FORMAT_FASTA_READER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "fai-file.h"
+#include <set>
+#include <string>
+#include "genie/format/fasta/fai-file.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,11 +23,11 @@ namespace fasta {
  *
  */
 class FastaReader {
-   private:
+ private:
     FaiFile fai;          //!<
     std::istream* fasta;  //!<
 
-   public:
+ public:
     /**
      *
      * @param fastaFile
@@ -71,7 +73,7 @@ class FastaReader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // UTIL_FASTA_FILE_READER_H_
+#endif  // SRC_GENIE_FORMAT_FASTA_READER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

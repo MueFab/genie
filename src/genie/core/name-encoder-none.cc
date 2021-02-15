@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "name-encoder-none.h"
+#include "genie/core/name-encoder-none.h"
+#include <tuple>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

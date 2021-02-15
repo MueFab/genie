@@ -4,13 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "configuration.h"
-#include "config-manual.h"
-
-#include "stream-handler.h"
-#include "streams.h"
-
-#include <genie/entropy/paramcabac/transformed-subseq.h>
+#include "genie/entropy/gabac/configuration.h"
+#include <utility>
+#include "genie/entropy/gabac/config-manual.h"
+#include "genie/entropy/gabac/stream-handler.h"
+#include "genie/entropy/gabac/streams.h"
+#include "genie/entropy/paramcabac/transformed-subseq.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

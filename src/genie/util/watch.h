@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_WATCH_H
-#define GENIE_WATCH_H
+#ifndef SRC_GENIE_UTIL_WATCH_H_
+#define SRC_GENIE_UTIL_WATCH_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,12 +20,12 @@ namespace util {
  * @brief Utility class to measure time.
  */
 class Watch {
-   private:
+ private:
     std::chrono::steady_clock::time_point start;  //!< @brief When the current period of time started.
     double offset{};                              //!< @brief Elapsed time from previous time periods.
     bool paused;                                  //!< @brief If the time is currently measured.
 
-   public:
+ public:
     /**
      *  @brief Default initialize.
      */
@@ -59,7 +59,7 @@ class Watch {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_WATCH_H
+#endif  // SRC_GENIE_UTIL_WATCH_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

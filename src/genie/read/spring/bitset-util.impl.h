@@ -4,8 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_BITSET_UTIL_IMPL_H
-#define GENIE_BITSET_UTIL_IMPL_H
+#ifndef SRC_GENIE_READ_SPRING_BITSET_UTIL_IMPL_H_
+#define SRC_GENIE_READ_SPRING_BITSET_UTIL_IMPL_H_
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <algorithm>
+#include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -102,7 +107,7 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint1
             i = uint64_t(tid) * dict[j].dict_numreads / num_thr;
             stop = uint64_t(tid + 1) * dict[j].dict_numreads / num_thr;
             if (tid == num_thr - 1) stop = dict[j].dict_numreads;
-            for (; i < stop; i++) foutkey.write((char *)&ull[i], sizeof(uint64_t));
+            for (; i < stop; i++) foutkey.write(reinterpret_cast<char *>(&ull[i]), sizeof(uint64_t));
             foutkey.close();
         }  // parallel end
 
@@ -116,8 +121,8 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint1
         auto data_iterator =
             boomphf::range(static_cast<const uint64_t *>(ull), static_cast<const uint64_t *>(ull + dict[j].numkeys));
         double gammaFactor = 5.0;  // balance between speed and memory
-        dict[j].bphf = new boomphf::mphf<uint64_t, hasher_t>(dict[j].numkeys, data_iterator, /*num_thr*/ 1,
-                                                              gammaFactor, true, false);
+        dict[j].bphf = new boomphf::mphf<uint64_t, hasher_t>(dict[j].numkeys, data_iterator, /*num_thr*/ 1, gammaFactor,
+                                                             true, false);
 
         delete[] ull;
 
@@ -154,12 +159,12 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint1
             stop = uint64_t(tid + 1) * dict[j].dict_numreads / num_thr;
             if (tid == num_thr - 1) stop = dict[j].dict_numreads;
             for (; i < stop; i++) {
-                finkey.read((char *)&currentkey, sizeof(uint64_t));
+                finkey.read(reinterpret_cast<char *>(&currentkey), sizeof(uint64_t));
                 //
                 // the following line shows up on the execution profile
                 //
                 currenthash = (dict[j].bphf)->lookup(currentkey);
-                fouthash.write((char *)&currenthash, sizeof(uint64_t));
+                fouthash.write(reinterpret_cast<char *>(&currenthash), sizeof(uint64_t));
             }
             finkey.close();
             remove((basedir + std::string("/keys.bin.") + std::to_string(tid)).c_str());
@@ -188,10 +193,10 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint1
                 std::ifstream finhash(
                     basedir + std::string("/hash.bin.") + std::to_string(tid) + '.' + std::to_string(j),
                     std::ios::binary);
-                finhash.read((char *)&currenthash, sizeof(uint64_t));
+                finhash.read(reinterpret_cast<char *>(&currenthash), sizeof(uint64_t));
                 while (!finhash.eof()) {
                     dict[j].startpos[currenthash + 1]++;
-                    finhash.read((char *)&currenthash, sizeof(uint64_t));
+                    finhash.read(reinterpret_cast<char *>(&currenthash), sizeof(uint64_t));
                 }
                 finhash.close();
             }
@@ -207,12 +212,12 @@ void constructdictionary(std::bitset<bitset_size> *read, bbhashdict *dict, uint1
                 std::ifstream finhash(
                     basedir + std::string("/hash.bin.") + std::to_string(tid) + '.' + std::to_string(j),
                     std::ios::binary);
-                finhash.read((char *)&currenthash, sizeof(uint64_t));
+                finhash.read(reinterpret_cast<char *>(&currenthash), sizeof(uint64_t));
                 while (!finhash.eof()) {
                     while (read_lengths[i] <= dict[j].end) i++;
                     dict[j].read_id[dict[j].startpos[currenthash]++] = i;
                     i++;
-                    finhash.read((char *)&currenthash, sizeof(uint64_t));
+                    finhash.read(reinterpret_cast<char *>(&currenthash), sizeof(uint64_t));
                 }
                 finhash.close();
                 remove((basedir + std::string("/hash.bin.") + std::to_string(tid) + '.' + std::to_string(j)).c_str());
@@ -260,7 +265,7 @@ void chartobitset(char *s, const int readlen, std::bitset<bitset_size> &b, std::
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_BITSET_UTIL_IMPL_H
+#endif  // SRC_GENIE_READ_SPRING_BITSET_UTIL_IMPL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,11 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "genie/read/spring/call-template-functions.h"
 #include <stdexcept>
 #include <string>
-#include "reorder.h"
-#include "spring-encoding.h"
-#include "util.h"
+#include "genie/read/spring/reorder.h"
+#include "genie/read/spring/spring-encoding.h"
+#include "genie/read/spring/util.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

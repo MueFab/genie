@@ -4,9 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "raw_reference_seq.h"
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
+#include "genie/format/mgb/raw_reference_seq.h"
+#include <utility>
+#include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

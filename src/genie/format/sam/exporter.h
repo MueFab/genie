@@ -4,16 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SAM_EXPORTER_H
-#define GENIE_SAM_EXPORTER_H
+#ifndef SRC_GENIE_FORMAT_SAM_EXPORTER_H_
+#define SRC_GENIE_FORMAT_SAM_EXPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/format-exporter.h>
-#include <genie/core/record/alignment_split/same-rec.h>
-#include <genie/util/ordered-lock.h>
-#include "header/header.h"
-#include "writer.h"
+#include <string>
+#include <vector>
+#include "genie/core/format-exporter.h"
+#include "genie/core/record/alignment_split/same-rec.h"
+#include "genie/format/sam/header/header.h"
+#include "genie/format/sam/writer.h"
+#include "genie/util/ordered-lock.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +29,7 @@ class Exporter : public core::FormatExporter {
     util::OrderedLock lock;  //!< @brief Lock to ensure in order execution
     Writer writer;
 
-   public:
+ public:
     static int stepRef(char token);
 
     static char convertECigar2CigarChar(char token);
@@ -80,7 +82,7 @@ class Exporter : public core::FormatExporter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_EXPORTER_H
+#endif  // SRC_GENIE_FORMAT_SAM_EXPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

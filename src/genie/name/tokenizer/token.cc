@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "token.h"
+#include "genie/name/tokenizer/token.h"
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

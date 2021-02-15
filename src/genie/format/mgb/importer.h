@@ -4,22 +4,23 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_MGB_IMPORTER_H
-#define GENIE_MGB_IMPORTER_H
+#ifndef SRC_GENIE_FORMAT_MGB_IMPORTER_H_
+#define SRC_GENIE_FORMAT_MGB_IMPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/format-importer-compressed.h>
-#include <genie/core/ref-decoder.h>
-#include <genie/core/reference-source.h>
-#include <genie/core/stats/perf-stats.h>
-#include <genie/util/bitreader.h>
-#include <genie/util/ordered-section.h>
-#include <genie/util/original-source.h>
-#include <genie/util/source.h>
 #include <map>
-#include "data-unit-factory.h"
-#include "format-importer.h"
+#include <string>
+#include "genie/core/format-importer-compressed.h"
+#include "genie/core/format-importer.h"
+#include "genie/core/ref-decoder.h"
+#include "genie/core/reference-source.h"
+#include "genie/core/stats/perf-stats.h"
+#include "genie/format/mgb/data-unit-factory.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/ordered-section.h"
+#include "genie/util/original-source.h"
+#include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -31,7 +32,7 @@ namespace mgb {
  *
  */
 class Importer : public core::FormatImporterCompressed, public core::ReferenceSource {
-   private:
+ private:
     util::BitReader reader;               //!<
     std::mutex lock;                      //!<
     mgb::DataUnitFactory factory;         //!<
@@ -45,7 +46,7 @@ class Importer : public core::FormatImporterCompressed, public core::ReferenceSo
      */
     core::AccessUnit convertAU(mgb::AccessUnit&& au);
 
-   public:
+ public:
     /**
      *
      * @param _file
@@ -83,7 +84,7 @@ class Importer : public core::FormatImporterCompressed, public core::ReferenceSo
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_IMPORTER_H
+#endif  // SRC_GENIE_FORMAT_MGB_IMPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

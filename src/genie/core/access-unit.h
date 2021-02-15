@@ -4,18 +4,21 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CORE_ACCESS_UNIT_H
-#define GENIE_CORE_ACCESS_UNIT_H
+#ifndef SRC_GENIE_CORE_ACCESS_UNIT_H_
+#define SRC_GENIE_CORE_ACCESS_UNIT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/stats/perf-stats.h>
-#include <genie/util/data-block.h>
+#include <memory>
 #include <numeric>
-#include "constants.h"
-#include "mismatch-decoder.h"
-#include "parameter/parameter_set.h"
-#include "reference-manager.h"
+#include <utility>
+#include <vector>
+#include "genie/core/constants.h"
+#include "genie/core/mismatch-decoder.h"
+#include "genie/core/parameter/parameter_set.h"
+#include "genie/core/reference-manager.h"
+#include "genie/core/stats/perf-stats.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,23 +29,22 @@ namespace core {
  * @brief
  */
 class AccessUnit {
-   public:
+ public:
     /**
      * @brief
      */
     class Subsequence {
-       private:
+     private:
         util::DataBlock data;  //!< @brief
         size_t position{};     //!< @brief
 
-        GenSubIndex id;        //!< @brief
-        size_t numSymbols{};   //!< @brief
+        GenSubIndex id;       //!< @brief
+        size_t numSymbols{};  //!< @brief
 
         util::DataBlock dependency;                  //!< @brief
         std::unique_ptr<MismatchDecoder> mmDecoder;  //!< @brief
 
-       public:
-
+     public:
         /**
          *
          * @param sub
@@ -67,7 +69,7 @@ class AccessUnit {
          *
          * @param sub
          */
-        Subsequence(Subsequence&& sub)  noexcept;
+        Subsequence(Subsequence&& sub) noexcept;
 
         /**
          * @brief
@@ -224,11 +226,11 @@ class AccessUnit {
      * @brief
      */
     class Descriptor {
-       private:
+     private:
         std::vector<Subsequence> subdesc;  //!< @brief
         GenDesc id;                        //!< @brief
 
-       public:
+     public:
         /**
          * @brief
          * @param sub
@@ -600,7 +602,7 @@ class AccessUnit {
      */
     void setReferenceOnly(bool ref);
 
-   private:
+ private:
     std::vector<Descriptor> descriptors;                //!< @brief
     parameter::ParameterSet parameters;                 //!< @brief
     stats::PerfStats stats;                             //!<
@@ -624,7 +626,7 @@ class AccessUnit {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ACCESS_UNIT_H
+#endif  // SRC_GENIE_CORE_ACCESS_UNIT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

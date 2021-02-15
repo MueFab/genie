@@ -5,7 +5,10 @@
  */
 
 // ---------------------------------------------------------------------------------------------------------------------
-#include "decode-transformed-symbols.h"
+
+#include "genie/entropy/gabac/decode-transformed-symbols.h"
+#include <algorithm>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,14 +32,16 @@ TransformedSymbolsDecoder::TransformedSymbolsDecoder(util::DataBlock *bitstream,
                                                         trnsfSubseqConf.getSupportValues().getShareSubsymLutFlag(),
                                                         trnsfSubseqConf.getTransformIDSubsym())),
       numPrvs(trnsfSubseqConf.getStateVars().getNumPrvs(trnsfSubseqConf.getSupportValues().getShareSubsymPrvFlag())),
-      reader(bitstream, trnsfSubseqConf.getBinarization().getBypassFlag(), (unsigned int)trnsfSubseqConf.getStateVars().getNumCtxTotal()),
+      reader(bitstream, trnsfSubseqConf.getBinarization().getBypassFlag(),
+             (unsigned int)trnsfSubseqConf.getStateVars().getNumCtxTotal()),
       ctxSelector(trnsfSubseqConf.getStateVars()),
       invLutsSubsymTrnsfm(trnsfSubseqConf.getSupportValues(), trnsfSubseqConf.getStateVars(), numLuts, numPrvs, false),
       diffEnabled(trnsfSubseqConf.getTransformIDSubsym() == paramcabac::SupportValues::TransformIdSubsym::DIFF_CODING),
       customCmaxTU(false),
       defaultCmax(trnsfSubseqConf.getBinarization().getCabacBinarizationParameters().getCMax()),
       binID(trnsfSubseqConf.getBinarization().getBinarizationID()),
-      binParams(std::vector<unsigned int>(4,0)), // first three elements are for binarization params, last one is for ctxIdx
+      binParams(
+          std::vector<unsigned int>(4, 0)),  // first three elements are for binarization params, last one is for ctxIdx
       binarizor(getBinarizorReader(outputSymbolSize, trnsfSubseqConf.getBinarization().getBypassFlag(), binID,
                                    trnsfSubseqConf.getBinarization().getCabacBinarizationParameters(),
                                    trnsfSubseqConf.getStateVars(), binParams)) {
@@ -78,7 +83,6 @@ TransformedSymbolsDecoder::TransformedSymbolsDecoder(const TransformedSymbolsDec
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t TransformedSymbolsDecoder::decodeNextSymbol(uint64_t *depSymbol) {
-
     if (symbolsAvail() <= 0) UTILS_DIE("No more transformed symbols available.");
 
     switch (codingOrder) {
@@ -149,8 +153,7 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder1(uint64_t *depSymbol) 
 
             if (customCmaxTU) {
                 subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder1(subsymbols, lutIdx, prvIdx);
-                binParams[0] = (unsigned int)
-                    std::min(defaultCmax, subsymbols[s].lutNumMaxElems);  // update cMax
+                binParams[0] = (unsigned int)std::min(defaultCmax, subsymbols[s].lutNumMaxElems);  // update cMax
             }
             subsymbols[s].subsymValue = (reader.*binarizor)(binParams);
 
@@ -188,8 +191,7 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder2() {
 
             if (customCmaxTU) {
                 subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder2(subsymbols, lutIdx, prvIdx);
-                binParams[0] = (unsigned int)
-                    std::min(defaultCmax, subsymbols[s].lutNumMaxElems);  // update cMax
+                binParams[0] = (unsigned int)std::min(defaultCmax, subsymbols[s].lutNumMaxElems);  // update cMax
             }
             subsymbols[s].subsymValue = (reader.*binarizor)(binParams);
 
@@ -214,9 +216,7 @@ uint64_t TransformedSymbolsDecoder::decodeNextSymbolOrder2() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t TransformedSymbolsDecoder::symbolsAvail() const {
-    return numEncodedSymbols - numDecodedSymbols;
-}
+size_t TransformedSymbolsDecoder::symbolsAvail() const { return numEncodedSymbols - numDecodedSymbols; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

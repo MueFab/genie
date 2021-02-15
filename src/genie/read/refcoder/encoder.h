@@ -4,13 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_REF_ENCODER_H
-#define GENIE_REF_ENCODER_H
+#ifndef SRC_GENIE_READ_REFCODER_ENCODER_H_
+#define SRC_GENIE_READ_REFCODER_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/read-encoder.h>
-#include <genie/read/basecoder/encoder.h>
+#include <memory>
+#include "genie/core/read-encoder.h"
+#include "genie/read/basecoder/encoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,7 +23,7 @@ namespace refcoder {
  *
  */
 class Encoder : public core::ReadEncoder {
-   private:
+ private:
     struct State {
         size_t readLength{};
         bool pairedEnd{};
@@ -39,7 +40,7 @@ class Encoder : public core::ReadEncoder {
                           std::unique_ptr<core::parameter::QualityValues> qvparam, core::record::ClassType type,
                           State& state) const;
 
-   public:
+ public:
     /**
      *
      */
@@ -59,7 +60,7 @@ class Encoder : public core::ReadEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ENCODER_H
+#endif  // SRC_GENIE_READ_REFCODER_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

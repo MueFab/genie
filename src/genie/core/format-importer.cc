@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "format-importer.h"
+#include "genie/core/format-importer.h"
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

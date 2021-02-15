@@ -4,16 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_SUBSYMBOL_H_
-#define GABAC_SUBSYMBOL_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_SUBSYMBOL_H_
+#define SRC_GENIE_ENTROPY_GABAC_SUBSYMBOL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "context-tables.h"
-
-#include <genie/entropy/paramcabac/state_vars.h>
-
 #include <cassert>
+#include "genie/entropy/gabac/context-tables.h"
+#include "genie/entropy/paramcabac/state_vars.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -40,7 +38,7 @@ struct Subsymbol {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_SUBSYMBOL_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_SUBSYMBOL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

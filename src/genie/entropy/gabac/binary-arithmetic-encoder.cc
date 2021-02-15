@@ -4,9 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "binary-arithmetic-encoder.h"
+#include "genie/entropy/gabac/binary-arithmetic-encoder.h"
 #include <cassert>
-#include "cabac-tables.h"
+#include "genie/entropy/gabac/cabac-tables.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -154,7 +154,7 @@ void BinaryArithmeticEncoder::finish() {
             m_numBufferedBytes -= 1;
         }
     }
-    m_bitOutputStream.write(m_low >> 8u, uint8_t (24u - m_numBitsLeft));
+    m_bitOutputStream.write(m_low >> 8u, uint8_t(24u - m_numBitsLeft));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

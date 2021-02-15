@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_GENERIC_FACTORY_H
-#define GENIE_GENERIC_FACTORY_H
+#ifndef SRC_GENIE_UTIL_GENERIC_FACTORY_H_
+#define SRC_GENIE_UTIL_GENERIC_FACTORY_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -16,7 +16,7 @@ namespace util {
  *
  */
 class GenericFactory {
-   public:
+ public:
     /**
      *
      */
@@ -30,7 +30,7 @@ class GenericFactory {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_GENERIC_FACTORY_H
+#endif  // SRC_GENIE_UTIL_GENERIC_FACTORY_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

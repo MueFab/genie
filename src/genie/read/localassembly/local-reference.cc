@@ -4,16 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "local-reference.h"
-
-#include <genie/core/constants.h>
-#include <genie/core/record/alignment_split/same-rec.h>
-
+#include "genie/read/localassembly/local-reference.h"
 #include <algorithm>
+#include <cctype>
 #include <iostream>
 #include <limits>
 #include <map>
-#include <cctype>
+#include "genie/core/constants.h"
+#include "genie/core/record/alignment_split/same-rec.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

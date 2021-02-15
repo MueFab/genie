@@ -4,22 +4,19 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "decode-desc-subseq.h"
-
+#include "genie/entropy/gabac/decode-desc-subseq.h"
 #include <algorithm>
 #include <cmath>
 #include <vector>
-
-#include <genie/util/data-block.h>
-#include "configuration.h"
-#include "decode-transformed-subseq.h"
-#include "reader.h"
-#include "stream-handler.h"
-
-#include "equality-subseq-transform.h"
-#include "match-subseq-transform.h"
-#include "merge-subseq-transform.h"
-#include "rle-subseq-transform.h"
+#include "genie/entropy/gabac/configuration.h"
+#include "genie/entropy/gabac/decode-transformed-subseq.h"
+#include "genie/entropy/gabac/equality-subseq-transform.h"
+#include "genie/entropy/gabac/match-subseq-transform.h"
+#include "genie/entropy/gabac/merge-subseq-transform.h"
+#include "genie/entropy/gabac/reader.h"
+#include "genie/entropy/gabac/rle-subseq-transform.h"
+#include "genie/entropy/gabac/stream-handler.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -68,7 +65,7 @@ static inline void doInverseSubsequenceTransform(const paramcabac::Subsequence &
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const EncodingConfiguration &enConf) {
+uint64_t decodeDescSubsequence(const IOConfiguration &ioConf, const EncodingConfiguration &enConf) {
     const paramcabac::Subsequence &subseqCfg = enConf.getSubseqConfig();
     util::DataBlock dependency(0, 4);
 
@@ -127,9 +124,9 @@ unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const Encodin
                                                     &decodedTransformedSubseq);
 
                     // Decoding
-                    subseqPayloadSizeUsed += (uint64_t) gabac::decodeTransformSubseq(subseqCfg.getTransformSubseqCfg((uint8_t)i),
-                                                                                     (unsigned int)numtrnsfSymbols, &decodedTransformedSubseq,
-                                                                          (dependency.size()) ? &dependency : nullptr);
+                    subseqPayloadSizeUsed += (uint64_t)gabac::decodeTransformSubseq(
+                        subseqCfg.getTransformSubseqCfg((uint8_t)i), (unsigned int)numtrnsfSymbols,
+                        &decodedTransformedSubseq, (dependency.size()) ? &dependency : nullptr);
                     transformedSubseqs[i].swap(&(decodedTransformedSubseq));
                 }
             }
@@ -141,7 +138,7 @@ unsigned long decodeDescSubsequence(const IOConfiguration &ioConf, const Encodin
         }
     }
 
-    return (unsigned long)subseqPayloadSizeUsed;
+    return (uint64_t)subseqPayloadSizeUsed;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

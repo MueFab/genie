@@ -4,8 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_REORDER_IMPL_H
-#define GENIE_REORDER_IMPL_H
+#ifndef SRC_GENIE_READ_SPRING_REORDER_IMPL_H_
+#define SRC_GENIE_READ_SPRING_REORDER_IMPL_H_
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <algorithm>
+#include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -36,7 +41,7 @@ void bitsettostring(std::bitset<bitset_size> b, char *s, const uint16_t readlen,
                     const reorder_global<bitset_size> &rg) {
     // destroys bitset b
     static const char revinttochar[4] = {'A', 'G', 'C', 'T'};
-    unsigned long long ull;
+    uint64_t ull;
     for (int i = 0; i < 2 * readlen / 64 + 1; i++) {
         ull = (b & rg.mask64).to_ullong();
         b >>= 64;
@@ -72,23 +77,21 @@ void setglobalarrays(reorder_global<bitset_size> &rg) {
 template <size_t bitset_size>
 void updaterefcount(std::bitset<bitset_size> &cur, std::bitset<bitset_size> &ref, std::bitset<bitset_size> &revref,
                     int **count, const bool resetcount, const bool rev, const int shift, const uint16_t cur_readlen,
-                    int &ref_len, const reorder_global<bitset_size> &rg)
-// for var length, shift represents shift of start positions, if read length is
-// small, may not need to shift actually
-{
+                    int &ref_len, const reorder_global<bitset_size> &rg) {
+    // for var length, shift represents shift of start positions, if read length is
+    // small, may not need to shift actually
     static const char inttochar[4] = {'A', 'C', 'T', 'G'};
     auto chartoint = [](uint8_t a) { return (a & 0x06) >> 1; };  // inverse of above
     char s[MAX_READ_LEN + 1], s1[MAX_READ_LEN + 1], *current;
     bitsettostring<bitset_size>(cur, s, cur_readlen, rg);
-    if (rev == false)
+    if (rev == false) {
         current = s;
-    else {
+    } else {
         reverse_complement(s, s1, cur_readlen);
         current = s1;
     }
 
-    if (resetcount == true)  // resetcount - unmatched read so start over
-    {
+    if (resetcount == true) {  // resetcount - unmatched read so start over
         std::fill(count[0], count[0] + rg.max_readlen, 0);
         std::fill(count[1], count[1] + rg.max_readlen, 0);
         std::fill(count[2], count[2] + rg.max_readlen, 0);
@@ -111,8 +114,7 @@ void updaterefcount(std::bitset<bitset_size> &cur, std::bitset<bitset_size> &ref
                 count[chartoint((uint8_t)current[i])][i] = 1;
             }
             ref_len = std::max<int>(ref_len - shift, cur_readlen);
-        } else  // reverse case is quite complicated in the variable length case
-        {
+        } else {  // reverse case is quite complicated in the variable length case
             if (cur_readlen - shift >= ref_len) {
                 for (int i = cur_readlen - shift - ref_len; i < cur_readlen - shift; i++) {
                     for (int j = 0; j < 4; j++) count[j][i] = count[j][i - (cur_readlen - shift - ref_len)];
@@ -139,8 +141,9 @@ void updaterefcount(std::bitset<bitset_size> &cur, std::bitset<bitset_size> &ref
                 for (int i = 0; i < rg.max_readlen - shift; i++) {
                     for (int j = 0; j < 4; j++) count[j][i] = count[j][i + (ref_len + shift - rg.max_readlen)];
                 }
-                for (int i = rg.max_readlen - cur_readlen; i < rg.max_readlen - shift; i++)
+                for (int i = rg.max_readlen - cur_readlen; i < rg.max_readlen - shift; i++) {
                     count[chartoint((uint8_t)current[i - (rg.max_readlen - cur_readlen)])][i] += 1;
+                }
                 for (int i = rg.max_readlen - shift; i < rg.max_readlen; i++) {
                     for (int j = 0; j < 4; j++) count[j][i] = 0;
                     count[chartoint((uint8_t)current[i - (rg.max_readlen - cur_readlen)])][i] = 1;
@@ -276,27 +279,26 @@ bool search_match(const std::bitset<bitset_size> &ref, std::bitset<bitset_size> 
         dict_lock[reorder_lock_idx(startposidx)].set();
 #endif
         dict[l].findpos(dictidx, startposidx);
-        if (dict[l].empty_bin[startposidx])  // bin is empty
-        {
+        if (dict[l].empty_bin[startposidx]) {  // bin is empty
 #ifdef GENIE_USE_OPENMP
             dict_lock[reorder_lock_idx(startposidx)].unset();
 #endif
             continue;
         }
         uint64_t ull1 = ((read[dict[l].read_id[dictidx[0]]] & mask1[l]) >> 2 * dict[l].start).to_ullong();
-        if (ull == ull1)  // checking if ull is actually the key for this bin
-        {
+        if (ull == ull1) {  // checking if ull is actually the key for this bin
             for (int64_t i = dictidx[1] - 1; i >= dictidx[0] && i >= dictidx[1] - maxsearch; i--) {
                 auto rid = dict[l].read_id[i];
                 size_t hamming;
-                if (!rev)
+                if (!rev) {
                     hamming = ((ref ^ read[rid]) &
                                mask[0][rg.max_readlen - std::min<int>(ref_len - shift, read_lengths[rid])])
                                   .count();
-                else
+                } else {
                     hamming = ((ref ^ read[rid]) &
                                mask[shift][rg.max_readlen - std::min<int>(ref_len + shift, read_lengths[rid])])
                                   .count();
+                }
                 if (hamming <= thresh) {
 #ifdef GENIE_USE_OPENMP
                     read_lock[reorder_lock_idx(rid)].set();
@@ -462,7 +464,7 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
             }
             flag = 0;
             uint32_t k;
-            if (!stop_searching)
+            if (!stop_searching) {
                 for (int shift = 0; shift < rg.maxshift; shift++) {
                     // find forward match
                     flag = search_match<bitset_size>(ref, mask1,
@@ -483,20 +485,19 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
                             cur_read_pos = ref_pos + ref_len_old - shift - read_lengths[current];
                             ref_pos = ref_pos + ref_len_old - shift - ref_len;
                         }
-                        if (prev_unmatched == true)  // prev read not singleton, write it now
-                        {
+                        if (prev_unmatched == true) {  // prev read not singleton, write it now
                             foutRC << 'd';
-                            foutorder.write((char *)&prev, sizeof(uint32_t));
+                            foutorder.write(reinterpret_cast<char *>(&prev), sizeof(uint32_t));
                             foutflag << 0;  // for unmatched
                             int64_t zero = 0;
-                            foutpos.write((char *)&zero, sizeof(int64_t));
-                            foutlength.write((char *)&read_lengths[prev], sizeof(uint16_t));
+                            foutpos.write(reinterpret_cast<char *>(&zero), sizeof(int64_t));
+                            foutlength.write(reinterpret_cast<char *>(&read_lengths[prev]), sizeof(uint16_t));
                         }
                         foutRC << (left_search ? 'r' : 'd');
-                        foutorder.write((char *)&current, sizeof(uint32_t));
+                        foutorder.write(reinterpret_cast<char *>(&current), sizeof(uint32_t));
                         foutflag << 1;  // for matched
-                        foutpos.write((char *)&cur_read_pos, sizeof(int64_t));
-                        foutlength.write((char *)&read_lengths[current], sizeof(uint16_t));
+                        foutpos.write(reinterpret_cast<char *>(&cur_read_pos), sizeof(int64_t));
+                        foutlength.write(reinterpret_cast<char *>(&read_lengths[current]), sizeof(uint16_t));
 
                         prev_unmatched = false;
                         break;
@@ -522,20 +523,19 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
                             cur_read_pos = ref_pos - shift;
                             ref_pos = cur_read_pos;
                         }
-                        if (prev_unmatched == true)  // prev read not singleton, write it now
-                        {
+                        if (prev_unmatched == true) {  // prev read not singleton, write it now
                             foutRC << 'd';
-                            foutorder.write((char *)&prev, sizeof(uint32_t));
+                            foutorder.write(reinterpret_cast<char *>(&prev), sizeof(uint32_t));
                             foutflag << 0;  // for unmatched
                             int64_t zero = 0;
-                            foutpos.write((char *)&zero, sizeof(int64_t));
-                            foutlength.write((char *)&read_lengths[prev], sizeof(uint16_t));
+                            foutpos.write(reinterpret_cast<char *>(&zero), sizeof(int64_t));
+                            foutlength.write(reinterpret_cast<char *>(&read_lengths[prev]), sizeof(uint16_t));
                         }
                         foutRC << (left_search ? 'd' : 'r');
-                        foutorder.write((char *)&current, sizeof(uint32_t));
+                        foutorder.write(reinterpret_cast<char *>(&current), sizeof(uint32_t));
                         foutflag << 1;  // for matched
-                        foutpos.write((char *)&cur_read_pos, sizeof(int64_t));
-                        foutlength.write((char *)&read_lengths[current], sizeof(uint16_t));
+                        foutpos.write(reinterpret_cast<char *>(&cur_read_pos), sizeof(int64_t));
+                        foutlength.write(reinterpret_cast<char *>(&read_lengths[current]), sizeof(uint16_t));
 
                         prev_unmatched = false;
                         break;
@@ -544,11 +544,11 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
                     revref <<= 2;
                     ref >>= 2;
                 }
-            if (flag == 0)  // no match found
-            {
+            }
+            if (flag == 0) {
+                // no match found
                 num_unmatched_past_1M_thr++;
-                if (!left_search)  // start left search
-                {
+                if (!left_search) {  // start left search
                     left_search = true;
                     left_search_start = true;
                     // update ref and count with RC of first_read
@@ -556,17 +556,15 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
                                                 read_lengths[first_rid], ref_len, rg);
                     ref_pos = 0;
                     cur_read_pos = 0;
-                } else  // left search done, now pick arbitrary read and start new
-                        // contig
-                {
+                } else {  // left search done, now pick arbitrary read and start new
+                          // contig
                     left_search = false;
                     for (int64_t j = remainingpos; j >= 0; j--) {
                         if (remainingreads[j] == 1) {
 #ifdef GENIE_USE_OPENMP
                             read_lock[reorder_lock_idx(j)].set();
 #endif
-                            if (remainingreads[j])  // checking again inside critical block
-                            {
+                            if (remainingreads[j]) {  // checking again inside critical block
                                 current = j;
                                 remainingpos = j - 1;
                                 remainingreads[j] = 0;
@@ -580,9 +578,8 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
                         }
                     }
                     if (flag == 0) {
-                        if (prev_unmatched == true)  // last read was singleton, write it now
-                        {
-                            foutorder_s.write((char *)&prev, sizeof(uint32_t));
+                        if (prev_unmatched == true) {  // last read was singleton, write it now
+                            foutorder_s.write(reinterpret_cast<char *>(&prev), sizeof(uint32_t));
                         }
                         done = 1;  // no reads left
                     } else {
@@ -590,9 +587,8 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
                                                     read_lengths[current], ref_len, rg);
                         ref_pos = 0;
                         cur_read_pos = 0;
-                        if (prev_unmatched == true)  // prev read singleton, write it now
-                        {
-                            foutorder_s.write((char *)&prev, sizeof(uint32_t));
+                        if (prev_unmatched == true) {  // prev read singleton, write it now
+                            foutorder_s.write(reinterpret_cast<char *>(&prev), sizeof(uint32_t));
                         }
                         prev_unmatched = true;
                         first_rid = current;
@@ -656,9 +652,8 @@ void writetofile(std::bitset<bitset_size> *read, uint16_t *read_lengths, reorder
         char s[MAX_READ_LEN + 1], s1[MAX_READ_LEN + 1];
         uint32_t current;
         char c;
-        while (finRC >> std::noskipws >> c)  // read character by character
-        {
-            finorder.read((char *)&current, sizeof(uint32_t));
+        while (finRC >> std::noskipws >> c) {  // read character by character
+            finorder.read(reinterpret_cast<char *>(&current), sizeof(uint32_t));
             bitsettostring<bitset_size>(read[current], s, read_lengths[current], rg);
             if (c == 'd') {
                 fout << s << "\n";
@@ -667,11 +662,11 @@ void writetofile(std::bitset<bitset_size> *read, uint16_t *read_lengths, reorder
                 fout << s1 << "\n";
             }
         }
-        finorder_s.read((char *)&current, sizeof(uint32_t));
+        finorder_s.read(reinterpret_cast<char *>(&current), sizeof(uint32_t));
         while (!finorder_s.eof()) {
             bitsettostring<bitset_size>(read[current], s, read_lengths[current], rg);
             fout_s << s << "\n";
-            finorder_s.read((char *)&current, sizeof(uint32_t));
+            finorder_s.read(reinterpret_cast<char *>(&current), sizeof(uint32_t));
         }
 
         fout.close();
@@ -766,7 +761,7 @@ void reorder_main(const std::string &temp_dir, const compression_params &cp) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_REORDER_IMPL_H
+#endif  // SRC_GENIE_READ_SPRING_REORDER_IMPL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

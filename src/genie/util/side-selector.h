@@ -4,14 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SIDE_SELECTOR_H
-#define GENIE_SIDE_SELECTOR_H
+#ifndef SRC_GENIE_UTIL_SIDE_SELECTOR_H_
+#define SRC_GENIE_UTIL_SIDE_SELECTOR_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "runtime-exception.h"
-
 #include <functional>
+#include <vector>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ namespace util {
  */
 template <typename Coder, typename Ret, typename... Args>
 class SideSelector {
-   private:
+ private:
     std::vector<Coder*> mods;               //!< @brief List of possible modules to select.
     std::function<size_t(Args...)> select;  //!< @brief select function. It returns the index of the selected module.
 
@@ -37,7 +37,7 @@ class SideSelector {
      */
     static size_t defaultSelect(Args...);
 
-   public:
+ public:
     /**
      * @brief Default initialization.
      */
@@ -78,11 +78,11 @@ class SideSelector {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "side-selector.impl.h"
+#include "genie/util/side-selector.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_SIDE_SELECTOR_H
+#endif  // SRC_GENIE_UTIL_SIDE_SELECTOR_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

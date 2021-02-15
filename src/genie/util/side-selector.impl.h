@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SIDE_SELECTOR_IMPL_H
-#define GENIE_SIDE_SELECTOR_IMPL_H
+#ifndef SRC_GENIE_UTIL_SIDE_SELECTOR_IMPL_H_
+#define SRC_GENIE_UTIL_SIDE_SELECTOR_IMPL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -61,7 +61,7 @@ Ret SideSelector<Coder, Ret, Args...>::process(Args... param) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_SIDE_SELECTOR_IMPL_H
+#endif  // SRC_GENIE_UTIL_SIDE_SELECTOR_IMPL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

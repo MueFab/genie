@@ -4,20 +4,20 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_INDUSTRIAL_PARK_H
-#define GENIE_INDUSTRIAL_PARK_H
+#ifndef SRC_GENIE_UTIL_INDUSTRIAL_PARK_H_
+#define SRC_GENIE_UTIL_INDUSTRIAL_PARK_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <functional>
 #include <map>
+#include <memory>
 #include <typeindex>
-
-#include "bitreader.h"
-#include "factory.h"
-#include "generic-factory.h"
-#include "make-unique.h"
-#include "runtime-exception.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/factory.h"
+#include "genie/util/generic-factory.h"
+#include "genie/util/make-unique.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ namespace util {
  *
  */
 class IndustrialPark {
-   private:
+ private:
     std::map<std::type_index, std::unique_ptr<GenericFactory>> factories;  //!<
 
     /**
@@ -47,7 +47,7 @@ class IndustrialPark {
     template <typename T>
     Factory<T>* findAndFail() const;
 
-   public:
+ public:
     /**
      *
      * @tparam T
@@ -55,7 +55,8 @@ class IndustrialPark {
      * @param constructor
      */
     template <typename T>
-    void registerConstructor(uint8_t id, const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor);
+    void registerConstructor(
+        uint8_t id, const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor);
 
     /**
      *
@@ -64,7 +65,8 @@ class IndustrialPark {
      * @return
      */
     template <typename T>
-    uint8_t registerConstructor(const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor);
+    uint8_t registerConstructor(
+        const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor);
 
     /**
      *
@@ -92,11 +94,11 @@ class IndustrialPark {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "industrial-park.impl.h"
+#include "genie/util/industrial-park.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_INDUSTRIAL_PARK_H
+#endif  // SRC_GENIE_UTIL_INDUSTRIAL_PARK_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

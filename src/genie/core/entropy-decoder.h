@@ -4,14 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ENTROPY_DECODER_H
-#define GENIE_ENTROPY_DECODER_H
+#ifndef SRC_GENIE_CORE_ENTROPY_DECODER_H_
+#define SRC_GENIE_CORE_ENTROPY_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/parameter/descriptor_present/decoder.h>
-#include "access-unit.h"
-#include "module.h"
+#include <tuple>
+#include "genie/core/access-unit.h"
+#include "genie/core/module.h"
+#include "genie/core/parameter/descriptor_present/decoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,7 +23,7 @@ namespace core {
  * @brief Interface for entropy decoders. They convert access unit payloads to raw access units
  */
 class EntropyDecoder {
-   public:
+ public:
     /**
      *
      */
@@ -45,7 +46,7 @@ class EntropyDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ENTROPY_DECODER_H
+#endif  // SRC_GENIE_CORE_ENTROPY_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,18 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SPRING_PREPROCESS_H_
-#define SPRING_PREPROCESS_H_
+#ifndef SRC_GENIE_READ_SPRING_PREPROCESS_H_
+#define SRC_GENIE_READ_SPRING_PREPROCESS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/record/chunk.h>
-#include <genie/util/drain.h>
-#include <genie/util/ordered-lock.h>
-#include <genie/util/ordered-section.h>
-#include <filesystem/filesystem.hpp>
 #include <string>
-#include "util.h"
+#include "filesystem/filesystem.hpp"
+#include "genie/core/record/chunk.h"
+#include "genie/read/spring/util.h"
+#include "genie/util/drain.h"
+#include "genie/util/ordered-lock.h"
+#include "genie/util/ordered-section.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -98,7 +98,7 @@ struct Preprocessor {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SPRING_PREPROCESS_H_
+#endif  // SRC_GENIE_READ_SPRING_PREPROCESS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

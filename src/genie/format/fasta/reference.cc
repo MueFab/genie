@@ -4,7 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "reference.h"
+#include "genie/format/fasta/reference.h"
+#include <string>
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

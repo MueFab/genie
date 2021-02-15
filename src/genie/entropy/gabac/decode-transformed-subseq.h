@@ -4,16 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_DECODE_TRANSFORMED_SUBSEQ_H_
-#define GABAC_DECODE_TRANSFORMED_SUBSEQ_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_DECODE_TRANSFORMED_SUBSEQ_H_
+#define SRC_GENIE_ENTROPY_GABAC_DECODE_TRANSFORMED_SUBSEQ_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
 #include <vector>
-
-#include <genie/entropy/paramcabac/transformed-subseq.h>
-#include "reader.h"
+#include "genie/entropy/gabac/reader.h"
+#include "genie/entropy/paramcabac/transformed-subseq.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -46,7 +45,6 @@ typedef uint64_t (Reader::*binFunc)(const std::vector<unsigned int>);
 void decodeSignFlag(Reader &reader, const paramcabac::BinarizationParameters::BinarizationId binID,
                     uint64_t &symbolValue);
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
@@ -68,8 +66,8 @@ binFunc getBinarizorReader(const uint8_t outputSymbolSize, const bool bypassFlag
  * @param depSymbols
  * @return
  */
-size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq& trnsfSubseqConf, const unsigned int numEncodedSymbols,
-                             util::DataBlock* bitstream, util::DataBlock* const depSymbols = nullptr);
+size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq &trnsfSubseqConf, const unsigned int numEncodedSymbols,
+                             util::DataBlock *bitstream, util::DataBlock *const depSymbols = nullptr);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -79,7 +77,7 @@ size_t decodeTransformSubseq(const paramcabac::TransformedSubSeq& trnsfSubseqCon
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_DECODE_TRANSFORMED_SUBSEQ_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_DECODE_TRANSFORMED_SUBSEQ_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,13 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "alignment-external.h"
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
-#include <genie/util/runtime-exception.h>
-#include "alignment_external/none.h"
-#include "alignment_external/other-rec.h"
+#include "genie/core/record/alignment-external.h"
+#include "genie/core/record/alignment_external/none.h"
+#include "genie/core/record/alignment_external/other-rec.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

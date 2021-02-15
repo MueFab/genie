@@ -12,13 +12,13 @@
 // util::DataBlocks swap meaning. For wordsizes greater 1 this optimization is not possible, as the raw values do not
 // fit into the same data block where input values are still inside (different word sizes)
 
+#include "genie/entropy/gabac/equality-subseq-transform.h"
 #include <algorithm>
 #include <cassert>
 #include <iostream>
-
-#include <genie/util/block-stepper.h>
-#include <genie/util/data-block.h>
-#include "equality-subseq-transform.h"
+#include <vector>
+#include "genie/util/block-stepper.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

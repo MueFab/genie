@@ -4,24 +4,21 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "encode-desc-subseq.h"
-
+#include "genie/entropy/gabac/encode-desc-subseq.h"
 #include <algorithm>
 #include <cmath>
 #include <vector>
-
-#include <genie/entropy/paramcabac/transformed-subseq.h>
-#include <genie/util/block-stepper.h>
-#include <genie/util/data-block.h>
-#include "configuration.h"
-#include "encode-transformed-subseq.h"
-#include "stream-handler.h"
-#include "writer.h"
-
-#include "equality-subseq-transform.h"
-#include "match-subseq-transform.h"
-#include "merge-subseq-transform.h"
-#include "rle-subseq-transform.h"
+#include "genie/entropy/gabac/configuration.h"
+#include "genie/entropy/gabac/encode-transformed-subseq.h"
+#include "genie/entropy/gabac/equality-subseq-transform.h"
+#include "genie/entropy/gabac/match-subseq-transform.h"
+#include "genie/entropy/gabac/merge-subseq-transform.h"
+#include "genie/entropy/gabac/rle-subseq-transform.h"
+#include "genie/entropy/gabac/stream-handler.h"
+#include "genie/entropy/gabac/writer.h"
+#include "genie/entropy/paramcabac/transformed-subseq.h"
+#include "genie/util/block-stepper.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -70,7 +67,7 @@ static inline void doSubsequenceTransform(const paramcabac::Subsequence &subseqC
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
+uint64_t encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
     conf.validate();
     const paramcabac::Subsequence &subseqCfg = enConf.getSubseqConfig();
     util::DataBlock subsequence(0, 4);
@@ -128,7 +125,7 @@ unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingC
         }
     }
 
-    return (unsigned long)subseqPayloadSize;
+    return (uint64_t)subseqPayloadSize;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

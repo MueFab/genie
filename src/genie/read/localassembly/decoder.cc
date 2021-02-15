@@ -4,13 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "decoder.h"
-#include <genie/core/global-cfg.h>
-#include <genie/core/name-decoder.h>
-#include <genie/core/record/alignment_split/same-rec.h>
-#include <genie/read/basecoder/decoder.h>
-#include <genie/util/watch.h>
+#include "genie/read/localassembly/decoder.h"
 #include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
+#include "genie/core/global-cfg.h"
+#include "genie/core/name-decoder.h"
+#include "genie/core/record/alignment_split/same-rec.h"
+#include "genie/read/basecoder/decoder.h"
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

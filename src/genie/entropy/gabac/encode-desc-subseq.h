@@ -4,8 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_ENCODE_DESC_SUBSEQ_H_
-#define GABAC_ENCODE_DESC_SUBSEQ_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_ENCODE_DESC_SUBSEQ_H_
+#define SRC_GENIE_ENTROPY_GABAC_ENCODE_DESC_SUBSEQ_H_
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <cstdint>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +28,7 @@ struct EncodingConfiguration;
  * @param enConf
  * @return
  */
-unsigned long encodeDescSubsequence(const IOConfiguration& conf, const EncodingConfiguration& enConf);
+uint64_t encodeDescSubsequence(const IOConfiguration& conf, const EncodingConfiguration& enConf);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,7 +38,7 @@ unsigned long encodeDescSubsequence(const IOConfiguration& conf, const EncodingC
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_ENCODE_DESC_SUBSEQ_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_ENCODE_DESC_SUBSEQ_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

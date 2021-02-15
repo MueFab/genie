@@ -4,21 +4,21 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#ifdef _WIN32
 #define NOMINMAX
+#endif
 
-#include "decoder.h"
+#include "genie/read/spring/decoder.h"
 #include <algorithm>
 #include <array>
-#include <fstream>
 #include <iostream>
-#include <limits>
-#include <map>
 #include <stdexcept>
 #include <string>
 #include <tuple>
+#include <utility>
 #include <vector>
-#include "params.h"
-#include "util.h"
+#include "genie/read/spring/params.h"
+#include "genie/read/spring/util.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -61,7 +61,8 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
             // put in refBuf
             auto rlen = (uint32_t)au.get(core::GenSub::RLEN).pull() + 1;  // rlen
             for (uint32_t i = 0; i < rlen; i++) {
-                refBuf.push_back(getAlphabetProperties(core::AlphabetID::ACGTN).lut[au.get(core::GenSub::UREADS).pull()]);  // ureads
+                refBuf.push_back(
+                    getAlphabetProperties(core::AlphabetID::ACGTN).lut[au.get(core::GenSub::UREADS).pull()]);  // ureads
             }
         } else {
             // rtype can be 1 (P) or 3 (M)
@@ -123,8 +124,8 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
             }
             uint32_t rlen[2];
             for (int i = 0; i < number_of_record_segments; i++)
-                rlen[i] = (uint32_t)(au.get(core::GenSub::RLEN).pull()) + 1;  // rlen
-            auto pos = (uint32_t)au.get(core::GenSub::POS_MAPPING_FIRST).pull();    // pos
+                rlen[i] = (uint32_t)(au.get(core::GenSub::RLEN).pull()) + 1;      // rlen
+            auto pos = (uint32_t)au.get(core::GenSub::POS_MAPPING_FIRST).pull();  // pos
 
             abs_pos += pos;
             std::string cur_read[2];
@@ -141,7 +142,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                 for (int i = 0; i < number_of_record_segments; i++) {
                     uint32_t abs_mmpos = 0;
                     while (true) {
-                        bool mmpos_flag = (bool)(au.get(core::GenSub::MMPOS_TERMINATOR).pull());
+                        bool mmpos_flag = static_cast<bool>(au.get(core::GenSub::MMPOS_TERMINATOR).pull());
                         if (mmpos_flag == 1) break;
                         uint32_t mmpos = (uint32_t)(au.get(core::GenSub::MMPOS_POSITION).pull());
                         abs_mmpos += mmpos;
@@ -149,9 +150,11 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                         if (mmtype_0 != 0)  // i.e., not substitution
                             throw std::runtime_error("Non zero mmtype encountered.");
                         const auto mmtype_1 = au.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()->dataLeft()
-                                              ? au.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()
-                                                  ->decodeMismatch(getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[cur_read[i][abs_mmpos]])
-                                              : getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N'];
+                                                  ? au.get(core::GenSub::MMTYPE_SUBSTITUTION)
+                                                        .getMismatchDecoder()
+                                                        ->decodeMismatch(getAlphabetProperties(core::AlphabetID::ACGTN)
+                                                                             .inverseLut[cur_read[i][abs_mmpos]])
+                                                  : getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N'];
                         cur_read[i][abs_mmpos] = getAlphabetProperties(core::AlphabetID::ACGTN).lut[mmtype_1];
                         abs_mmpos++;
                     }
@@ -208,7 +211,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                                       unmatched_same_au[0].end());
             std::vector<std::pair<uint32_t, uint32_t>> record_index_for_sorting(size_unmatched);
             for (size_t i = 0; i < size_unmatched; i++)
-                record_index_for_sorting[i] = std::make_pair(mate_record_index_same_rec[i], uint32_t (i));
+                record_index_for_sorting[i] = std::make_pair(mate_record_index_same_rec[i], uint32_t(i));
             std::sort(
                 record_index_for_sorting.begin(), record_index_for_sorting.end(),
                 [](std::pair<uint32_t, uint32_t> a, std::pair<uint32_t, uint32_t> b) { return a.first < b.first; });
@@ -373,14 +376,16 @@ void Decoder::flushIn(uint64_t& pos) {
         if (size_unmatched > 0) {
             std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> au_id_index_for_sorting(size_unmatched);
             for (size_t i = 0; i < size_unmatched; i++)
-                au_id_index_for_sorting[i] = std::make_tuple(mate_au_id_concat[i], mate_record_index_concat[i], (uint32_t)i);
+                au_id_index_for_sorting[i] =
+                    std::make_tuple(mate_au_id_concat[i], mate_record_index_concat[i], (uint32_t)i);
             std::sort(au_id_index_for_sorting.begin(), au_id_index_for_sorting.end(),
                       [](std::tuple<uint32_t, uint32_t, uint32_t> a, std::tuple<uint32_t, uint32_t, uint32_t> b) {
                           return (std::get<0>(a) == std::get<0>(b)) ? (std::get<1>(a) < std::get<1>(b))
                                                                     : (std::get<0>(a) < std::get<0>(b));
                       });
             std::vector<uint32_t> reverse_index(size_unmatched);
-            for (size_t i = 0; i < size_unmatched; i++) reverse_index[std::get<2>(au_id_index_for_sorting[i])] = (uint32_t)i;
+            for (size_t i = 0; i < size_unmatched; i++)
+                reverse_index[std::get<2>(au_id_index_for_sorting[i])] = (uint32_t)i;
 
             // now reorder the unmatched records in file 2, by picking them in chunks
             uint32_t bin_size = std::min(BIN_SIZE_COMBINE_PAIRS, (uint32_t)size_unmatched);

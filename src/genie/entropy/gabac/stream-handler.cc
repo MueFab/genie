@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "stream-handler.h"
-#include <genie/util/data-block.h>
+#include "genie/entropy/gabac/stream-handler.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -158,8 +158,8 @@ size_t StreamHandler::writeU7(std::ostream &output, uint64_t value) {
     size_t c = 0;  // counter
     int shift;
     const int inputMaxSize = sizeof(value) * 8;
-    for (shift = 0; (shift < inputMaxSize) && ((value >> shift) != 0); shift += 7)
-        ;
+    for (shift = 0; (shift < inputMaxSize) && ((value >> shift) != 0); shift += 7) {
+    }
     if (shift > 0) shift -= 7;
 
     for (; shift >= 0; shift -= 7) {

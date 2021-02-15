@@ -4,18 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_TOKENIZER_H
-#define GENIE_TOKENIZER_H
+#ifndef SRC_GENIE_NAME_TOKENIZER_TOKENIZER_H_
+#define SRC_GENIE_NAME_TOKENIZER_TOKENIZER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <access-unit.h>
 #include <cstdint>
 #include <limits>
 #include <string>
 #include <vector>
+#include "genie/core/access-unit.h"
+#include "genie/name/tokenizer/token.h"
 #include "genie/util/data-block.h"
-#include "token.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ namespace tokenizer {
  *
  */
 struct TokenState {
-   private:
+ private:
     uint32_t token_pos;                      //!<
     const std::vector<SingleToken>& oldRec;  //!<
     std::vector<SingleToken> curRec;         //!<
@@ -35,7 +35,7 @@ struct TokenState {
     std::string::const_iterator cur_it;  //!<
     std::string::const_iterator end_it;  //!<
 
-   protected:
+ protected:
     /**
      *
      * @return
@@ -98,7 +98,7 @@ struct TokenState {
      */
     void character();
 
-   public:
+ public:
     /**
      *
      * @param old
@@ -128,7 +128,7 @@ struct TokenState {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_TOKENIZER_H
+#endif  // SRC_GENIE_NAME_TOKENIZER_TOKENIZER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

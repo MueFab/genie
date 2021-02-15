@@ -4,16 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SUBSEQUENCE_H
-#define GENIE_SUBSEQUENCE_H
+#ifndef SRC_GENIE_ENTROPY_PARAMCABAC_SUBSEQUENCE_H_
+#define SRC_GENIE_ENTROPY_PARAMCABAC_SUBSEQUENCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitwriter.h>
 #include <memory>
 #include <vector>
-#include "transformed-subseq.h"
-#include "transformed_parameters.h"
+#include "genie/entropy/paramcabac/transformed-subseq.h"
+#include "genie/entropy/paramcabac/transformed_parameters.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ namespace paramcabac {
  *
  */
 class Subsequence {
-   public:
+ public:
     /**
      *
      */
@@ -116,7 +116,7 @@ class Subsequence {
                transformSubseq_cfgs == seq.transformSubseq_cfgs;
     }
 
-   private:
+ private:
     boost::optional<uint16_t> descriptor_subsequence_ID;  //!<
     bool tokentypeFlag;                                   //!< helper field - not written to bitstream
     TransformedParameters transform_subseq_parameters;    //!<
@@ -131,7 +131,7 @@ class Subsequence {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_SUBSEQUENCE_H
+#endif  // SRC_GENIE_ENTROPY_PARAMCABAC_SUBSEQUENCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

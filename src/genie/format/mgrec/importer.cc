@@ -4,9 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "importer.h"
-#include <genie/util/ordered-section.h>
-#include <genie/util/watch.h>
+#include "genie/format/mgrec/importer.h"
+#include <utility>
+#include "genie/util/ordered-section.h"
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

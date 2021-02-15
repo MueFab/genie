@@ -4,24 +4,21 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_MPEGG2_EXPORTER_H
-#define GENIE_MPEGG2_EXPORTER_H
+#ifndef SRC_GENIE_FORMAT_MGB_EXPORTER_H_
+#define SRC_GENIE_FORMAT_MGB_EXPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/drain.h>
-
-#include <genie/core/access-unit.h>
 #include <memory>
 #include <vector>
-
-#include <genie/core/access-unit.h>
-#include <genie/core/format-exporter-compressed.h>
-#include <genie/core/format-exporter.h>
-#include <genie/core/stats/perf-stats.h>
-#include <genie/util/ordered-lock.h>
-#include <genie/util/ordered-section.h>
-#include "access_unit.h"
+#include "genie/core/access-unit.h"
+#include "genie/core/format-exporter-compressed.h"
+#include "genie/core/format-exporter.h"
+#include "genie/core/stats/perf-stats.h"
+#include "genie/format/mgb/access_unit.h"
+#include "genie/util/drain.h"
+#include "genie/util/ordered-lock.h"
+#include "genie/util/ordered-section.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -33,12 +30,13 @@ namespace mgb {
  *
  */
 class Exporter : public core::FormatExporterCompressed {
-   private:
+ private:
     util::BitWriter writer;                                      //!<
     util::OrderedLock lock;                                      //!<
     size_t id_ctr;                                               //!<
     std::vector<core::parameter::ParameterSet> parameter_stash;  //!<
-   public:
+
+ public:
     /**
      *
      * @param _file
@@ -67,7 +65,7 @@ class Exporter : public core::FormatExporterCompressed {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_EXPORTER_H
+#endif  // SRC_GENIE_FORMAT_MGB_EXPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

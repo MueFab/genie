@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "read-decoder.h"
+#include "genie/core/read-decoder.h"
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +38,9 @@ AccessUnit ReadDecoder::entropyCodeAU(EntropySelector* select, AccessUnit&& a, b
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit ReadDecoder::entropyCodeAU(AccessUnit&& a, bool mmCoderEnabled) { return entropyCodeAU(entropycoder, std::move(a), mmCoderEnabled); }
+AccessUnit ReadDecoder::entropyCodeAU(AccessUnit&& a, bool mmCoderEnabled) {
+    return entropyCodeAU(entropycoder, std::move(a), mmCoderEnabled);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

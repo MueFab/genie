@@ -4,8 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "au_type_cfg.h"
-#include <genie/util/bitwriter.h>
+#include "genie/format/mgb/au_type_cfg.h"
+#include <utility>
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,10 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "transformed_parameters.h"
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
-#include <genie/util/runtime-exception.h>
+#include "genie/entropy/paramcabac/transformed_parameters.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ TransformedParameters::TransformedParameters(util::BitReader &reader) {
         case TransformIdSubseq::MERGE_CODING:
             merge_coding_subseq_count = reader.read<uint8_t>(4);
             merge_coding_shift_size.resize(*merge_coding_subseq_count);
-            for (int i=0; i < *merge_coding_subseq_count; i++) {
+            for (int i = 0; i < *merge_coding_subseq_count; i++) {
                 merge_coding_shift_size[i] = reader.read<uint8_t>(5);
             }
             break;
@@ -77,9 +77,9 @@ TransformedParameters::TransformedParameters(const TransformIdSubseq &_transform
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t TransformedParameters::getNumStreams() const {
-    if (transform_ID_subseq == TransformedParameters::TransformIdSubseq::MERGE_CODING)
+    if (transform_ID_subseq == TransformedParameters::TransformIdSubseq::MERGE_CODING) {
         return *merge_coding_subseq_count;
-    else {
+    } else {
         static const std::vector<size_t> lut = {1, 2, 3, 2, 1};
         return lut[uint8_t(transform_ID_subseq)];
     }

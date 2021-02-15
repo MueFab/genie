@@ -4,10 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "reader.h"
-#include <genie/util/runtime-exception.h>
-
+#include "genie/format/sam/reader.h"
 #include <limits>
+#include <string>
+#include <utility>
+#include <vector>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -18,29 +20,28 @@ namespace sam {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Reader::Reader(std::istream& _stream, bool _with_index) : stream(_stream), header(stream), with_index(_with_index) {
-
     uint16_t seqID = 0;
-    for (auto &headerLine : header.getLines()){
+    for (auto& headerLine : header.getLines()) {
         if (headerLine.getName() == "SQ") {
-            for (auto &tag : headerLine.getTags()) {
+            for (auto& tag : headerLine.getTags()) {
                 auto tagName = tag->getName();
 
-                if (tagName == "SN"){
+                if (tagName == "SN") {
                     refs.emplace(tag->toString(), seqID);
-                } else if(tagName == "AN"){
+                } else if (tagName == "AN") {
                     // Exclude Tag AN
-                    //refs.emplace(tag->toString(), seqID);
+                    // refs.emplace(tag->toString(), seqID);
                 }
             }
             seqID++;
         }
     }
 
-    if (with_index){
+    if (with_index) {
         auto init_pos = stream.tellg();
 
         // Add entry to index
-        while(stream.good()){
+        while (stream.good()) {
             std::string str;
             size_t pos = stream.tellg();
 
@@ -50,13 +51,12 @@ Reader::Reader(std::istream& _stream, bool _with_index) : stream(_stream), heade
             UTILS_DIE_IF(str[0] == '@', "Found header in the middle of SAM file");
 
             // Handle case where there is empty line before EOF
-            if (str.length()){
+            if (str.length()) {
                 addCacheEntry(str, pos);
             }
 
             // Move to next line, skip the rest of fields
             stream.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
         }
 
         // Reset error flags then go back to initial position
@@ -75,7 +75,7 @@ const header::Header& Reader::getHeader() const { return header; }
 std::map<std::string, uint16_t>& Reader::getRefs() { return refs; }
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Reader::addCacheEntry(std::string &qname, size_t &pos) {
+void Reader::addCacheEntry(std::string& qname, size_t& pos) {
     auto search = index.find(qname);
     if (!(search == index.end())) {
         search->second.push_back(pos);
@@ -89,11 +89,11 @@ void Reader::addCacheEntry(std::string &qname, size_t &pos) {
 bool Reader::read(std::list<std::string>& lines) {
     std::string line;
 
-    if (with_index){
+    if (with_index) {
         auto entry = index.begin();
 
-        //while (!entry->second.empty()){
-        for (auto& pos: entry->second){
+        // while (!entry->second.empty()){
+        for (auto& pos : entry->second) {
             stream.clear();
 
             stream.seekg(pos);
@@ -112,14 +112,11 @@ bool Reader::read(std::list<std::string>& lines) {
         lines.push_back(std::move(line));
         return true;
     }
-
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Reader::good() {
-    return (stream.good() && !(with_index && index.empty()));
-}
+bool Reader::good() { return (stream.good() && !(with_index && index.empty())); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -128,7 +125,7 @@ ReadTemplateGroup::ReadTemplateGroup(bool _enable_window) : counter(0), enable_w
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReadTemplateGroup::addEntry(const std::string& qname) {
-    if (enable_window){
+    if (enable_window) {
         window.emplace_front(qname, counter);
         counter++;
     }
@@ -136,18 +133,18 @@ void ReadTemplateGroup::addEntry(const std::string& qname) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReadTemplateGroup::updateEntry(const std::string& qname) {
-    if (enable_window){
+    if (enable_window) {
         bool found = false;
-        for (auto iter = window.begin(); iter != window.end(); iter++){
-            if (iter->first == qname){
+        for (auto iter = window.begin(); iter != window.end(); iter++) {
+            if (iter->first == qname) {
                 found = true;
                 iter->second = counter;
-                counter ++;
+                counter++;
 
                 window.push_front(std::move(*iter));
                 window.erase(iter);
 
-                //window.splice(window.begin(), window, iter, std::next(iter));
+                // window.splice(window.begin(), window, iter, std::next(iter));
                 break;
             }
         }
@@ -177,7 +174,7 @@ void ReadTemplateGroup::removeEntry(const std::string& qname) {
 
 void ReadTemplateGroup::addRecord(Record&& rec) {
     auto qname = rec.getQname();
-    if (data.find(qname) == data.end()){
+    if (data.find(qname) == data.end()) {
         data.emplace(qname, ReadTemplate(std::move(rec)));
         addEntry(qname);
     } else {
@@ -190,7 +187,7 @@ void ReadTemplateGroup::addRecord(Record&& rec) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReadTemplateGroup::addRecords(std::list<Record>& recs) {
-    for (auto & rec : recs){
+    for (auto& rec : recs) {
         addRecord(std::move(rec));
     }
     recs.clear();
@@ -199,7 +196,7 @@ void ReadTemplateGroup::addRecords(std::list<Record>& recs) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReadTemplateGroup::addRecords(std::vector<Record>& recs) {
-    for (auto & rec : recs){
+    for (auto& rec : recs) {
         addRecord(std::move(rec));
     }
     recs.clear();
@@ -208,7 +205,7 @@ void ReadTemplateGroup::addRecords(std::vector<Record>& recs) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReadTemplateGroup::addRecords(std::list<std::string>& lines) {
-    for (auto &line: lines){
+    for (auto& line : lines) {
         Record sam_rec(line);
 
         addRecord(std::move(sam_rec));
@@ -220,7 +217,7 @@ void ReadTemplateGroup::addRecords(std::list<std::string>& lines) {
 void ReadTemplateGroup::resetCounter() {
     auto lowest_counter = window.back().second;
     counter -= lowest_counter;
-    for (auto & entry : window){
+    for (auto& entry : window) {
         entry.second -= lowest_counter;
     }
 }
@@ -230,7 +227,7 @@ void ReadTemplateGroup::resetCounter() {
 bool ReadTemplateGroup::getTemplate(ReadTemplate& t, const size_t& threshold) {
     if (enable_window) {
         if (counter - window.back().second > threshold) {
-            if (!window.empty() && data[window.back().first].isValid()){
+            if (!window.empty() && data[window.back().first].isValid()) {
                 t = std::move(data[window.back().first]);
                 data.erase(window.back().first);
                 window.erase(std::prev(window.end()));
@@ -244,7 +241,7 @@ bool ReadTemplateGroup::getTemplate(ReadTemplate& t, const size_t& threshold) {
             return false;
         }
     } else {
-        if (!data.empty()){
+        if (!data.empty()) {
             t = std::move(data.at(data.begin()->first));
             data.erase(t.getQname());
             return true;
@@ -252,7 +249,6 @@ bool ReadTemplateGroup::getTemplate(ReadTemplate& t, const size_t& threshold) {
             return false;
         }
     }
-
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -261,7 +257,7 @@ void ReadTemplateGroup::getTemplates(std::list<ReadTemplate>& ts, const size_t& 
     ts.clear();
 
     ReadTemplate t;
-    while (getTemplate(t, threshold)){
+    while (getTemplate(t, threshold)) {
         ts.push_back(std::move(t));
     }
 }

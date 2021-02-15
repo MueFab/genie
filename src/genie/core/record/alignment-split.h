@@ -4,15 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ALIGNMENT_SPLIT_H
-#define GENIE_ALIGNMENT_SPLIT_H
+#ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_H_
+#define SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
 #include <cstdint>
 #include <memory>
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ namespace record {
  *
  */
 class AlignmentSplit {
-   public:
+ public:
     /**
      *
      */
@@ -67,7 +67,7 @@ class AlignmentSplit {
      */
     Type getType() const;
 
-   protected:
+ protected:
     Type split_alignment;  //!<
 };
 
@@ -79,7 +79,7 @@ class AlignmentSplit {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ALIGNMENT_SPLIT_H
+#endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

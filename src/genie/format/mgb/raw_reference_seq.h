@@ -4,17 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_RAW_REFERENCE_SEQ_H
-#define GENIE_RAW_REFERENCE_SEQ_H
+#ifndef SRC_GENIE_FORMAT_MGB_RAW_REFERENCE_SEQ_H_
+#define SRC_GENIE_FORMAT_MGB_RAW_REFERENCE_SEQ_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-#include <genie/util/runtime-exception.h>
-
 #include <memory>
 #include <string>
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,13 +25,13 @@ namespace mgb {
  *
  */
 class RawReferenceSequence {
-   private:
+ private:
     uint16_t sequence_ID;      //!<
     uint64_t seq_start;        //!<
     uint64_t seq_end;          //!<
     std::string ref_sequence;  //!<
 
-   public:
+ public:
     /**
      *
      * @return
@@ -111,7 +110,7 @@ class RawReferenceSequence {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_RAW_REFERENCE_SEQ_H
+#endif  // SRC_GENIE_FORMAT_MGB_RAW_REFERENCE_SEQ_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

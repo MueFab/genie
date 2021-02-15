@@ -4,16 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "decode-transformed-subseq.h"
-
+#include "genie/entropy/gabac/decode-transformed-subseq.h"
+#include <algorithm>
 #include <cassert>
 #include <limits>
-
-#include <genie/entropy/paramcabac/subsequence.h>
-#include <genie/util/data-block.h>
-
-#include "context-selector.h"
-#include "luts-subsymbol-transform.h"
+#include "genie/entropy/gabac/context-selector.h"
+#include "genie/entropy/gabac/luts-subsymbol-transform.h"
+#include "genie/entropy/paramcabac/subsequence.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -146,7 +144,7 @@ size_t decodeTransformSubseqOrder0(const paramcabac::TransformedSubSeq &trnsfSub
     Reader reader(bitstream, bypassFlag, (unsigned int)stateVars.getNumCtxTotal());
     reader.start();
 
-    std::vector<unsigned int> binParams(4, // first three elements are for binarization params, last one is for ctxIdx
+    std::vector<unsigned int> binParams(4,  // first three elements are for binarization params, last one is for ctxIdx
                                         0);
 
     util::DataBlock decodedSymbols(numEncodedSymbols, 4);
@@ -272,8 +270,8 @@ size_t decodeTransformSubseqOrder1(const paramcabac::TransformedSubSeq &trnsfSub
 
             if (customCmaxTU) {
                 subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder1(subsymbols, lutIdx, prvIdx);
-                binParams[0] = (unsigned int)
-                    std::min((uint64_t)binarzationParams.getCMax(), subsymbols[s].lutNumMaxElems);  // update cMax
+                binParams[0] = (unsigned int)std::min((uint64_t)binarzationParams.getCMax(),
+                                                      subsymbols[s].lutNumMaxElems);  // update cMax
             }
             subsymbols[s].subsymValue = (reader.*func)(binParams);
 
@@ -330,7 +328,7 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
     Reader reader(bitstream, bypassFlag, (unsigned int)stateVars.getNumCtxTotal());
     reader.start();
 
-    std::vector<unsigned int> binParams(4, // first three elements are for binarization params, last one is for ctxIdx
+    std::vector<unsigned int> binParams(4,  // first three elements are for binarization params, last one is for ctxIdx
                                         0);
 
     util::DataBlock decodedSymbols(numEncodedSymbols, 4);
@@ -363,8 +361,8 @@ size_t decodeTransformSubseqOrder2(const paramcabac::TransformedSubSeq &trnsfSub
 
             if (customCmaxTU) {
                 subsymbols[s].lutNumMaxElems = invLutsSubsymTrnsfm.getNumMaxElemsOrder2(subsymbols, lutIdx, prvIdx);
-                binParams[0] = (unsigned int)
-                    std::min((uint64_t)binarzationParams.getCMax(), subsymbols[s].lutNumMaxElems);  // update cMax
+                binParams[0] = (unsigned int)std::min((uint64_t)binarzationParams.getCMax(),
+                                                      subsymbols[s].lutNumMaxElems);  // update cMax
             }
             subsymbols[s].subsymValue = (reader.*func)(binParams);
 

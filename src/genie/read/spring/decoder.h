@@ -4,20 +4,20 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SPRING_DECOMPRESS_H_
-#define SPRING_DECOMPRESS_H_
+#ifndef SRC_GENIE_READ_SPRING_DECODER_H_
+#define SRC_GENIE_READ_SPRING_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/read-decoder.h>
-#include <genie/util/ordered-section.h>
-#include <genie/util/watch.h>
-#include <filesystem/filesystem.hpp>
 #include <map>
 #include <string>
 #include <vector>
-#include "params.h"
-#include "util.h"
+#include "filesystem/filesystem.hpp"
+#include "genie/core/read-decoder.h"
+#include "genie/read/spring/params.h"
+#include "genie/read/spring/util.h"
+#include "genie/util/ordered-section.h"
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -56,7 +56,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
  *
  */
 class Decoder : public genie::core::ReadDecoder {
-   private:
+ private:
     compression_params cp{};        //!<
     bool combine_pairs;             //!<
     util::OrderedLock lock;         //!<
@@ -69,7 +69,7 @@ class Decoder : public genie::core::ReadDecoder {
 
     std::vector<uint32_t> mate_au_id_concat, mate_record_index_concat;  //!<
 
-   public:
+ public:
     /**
      *
      * @param working_dir
@@ -122,7 +122,7 @@ class Decoder : public genie::core::ReadDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SPRING_DECOMPRESS_H_
+#endif  // SRC_GENIE_READ_SPRING_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

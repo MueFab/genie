@@ -4,14 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DESC_DECODER_H
-#define GENIE_DESC_DECODER_H
+#ifndef SRC_GENIE_CORE_PARAMETER_DESCRIPTOR_PRESENT_DECODER_H_
+#define SRC_GENIE_CORE_PARAMETER_DESCRIPTOR_PRESENT_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
-
-#include <genie/util/bitwriter.h>
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +23,7 @@ namespace desc_pres {
  *
  */
 class Decoder {
-   public:
+ public:
     /**
      *
      * @param writer
@@ -61,7 +60,7 @@ class Decoder {
      */
     virtual bool equals(const Decoder* dec) const;
 
-   protected:
+ protected:
     uint8_t encoding_mode_ID;  //!<
 };
 
@@ -74,7 +73,7 @@ class Decoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DECODER_H
+#endif  // SRC_GENIE_CORE_PARAMETER_DESCRIPTOR_PRESENT_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

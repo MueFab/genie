@@ -4,17 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "genie/core/record/record.h"
 #include <algorithm>
-
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
-#include <genie/util/runtime-exception.h>
-#include "alignment-box.h"
-#include "alignment-shared-data.h"
-#include "alignment_external/none.h"
-#include "record.h"
-#include "segment.h"
+#include <string>
+#include <utility>
+#include "genie/core/record/alignment-box.h"
+#include "genie/core/record/alignment-shared-data.h"
+#include "genie/core/record/alignment_external/none.h"
+#include "genie/core/record/segment.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -275,11 +276,11 @@ uint64_t Record::getLengthOfCigar(const std::string &cigar) {
 
 size_t Record::getMappedLength(size_t alignment, size_t split) const {
     if (split == 0) {
-        return (size_t) getLengthOfCigar(getAlignments()[alignment].getAlignment().getECigar());
+        return (size_t)getLengthOfCigar(getAlignments()[alignment].getAlignment().getECigar());
     }
     auto &s2 =
         dynamic_cast<record::alignment_split::SameRec &>(*getAlignments()[alignment].getAlignmentSplits()[split - 1]);
-    return (size_t) getLengthOfCigar(s2.getAlignment().getECigar());
+    return (size_t)getLengthOfCigar(s2.getAlignment().getECigar());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -308,7 +309,7 @@ size_t Record::getPosition(size_t alignment, size_t split) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Record::setMoreAlignmentInfo(std::unique_ptr<AlignmentExternal> _more_alignment_info) {
-        moreAlignmentInfo = std::move(_more_alignment_info);
+    moreAlignmentInfo = std::move(_more_alignment_info);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

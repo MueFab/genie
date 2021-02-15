@@ -20,7 +20,7 @@ target_link_libraries(genie-module PUBLIC genie-sam)
 target_link_libraries(genie-module PUBLIC genie-qvwriteout)
 target_link_libraries(genie-module PUBLIC genie-localassembly)
 target_link_libraries(genie-module PUBLIC genie-lowlatency)
-target_link_libraries(genie-module PUBLIC genie-mpegg_p1)
+#target_link_libraries(genie-module PUBLIC genie-mpegg_p1)
 target_link_libraries(genie-module PUBLIC genie-gabac)
 target_link_libraries(genie-module PUBLIC genie-spring)
 

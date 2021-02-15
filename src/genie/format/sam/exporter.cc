@@ -4,10 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "exporter.h"
-#include <genie/core/constants.h>
-#include <genie/core/record/alignment_split/same-rec.h>
-#include <genie/util/ordered-section.h>
+#include "genie/format/sam/exporter.h"
+#include <string>
+#include <utility>
+#include <vector>
+#include "genie/core/constants.h"
+#include "genie/core/record/alignment_split/same-rec.h"
+#include "genie/util/ordered-section.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -88,8 +91,9 @@ Exporter::Stash Exporter::stashFromMainAlignment(const core::record::AlignmentBo
         ret.qual = rec.getSegments().front().getQualities().front();
     }
     ret.cigar = eCigar2Cigar(alignment.getAlignment().getECigar());
-    ret.mappingScore =
-        alignment.getAlignment().getMappingScores().empty() ? 0 : (uint8_t)alignment.getAlignment().getMappingScores().front();
+    ret.mappingScore = alignment.getAlignment().getMappingScores().empty()
+                           ? 0
+                           : (uint8_t)alignment.getAlignment().getMappingScores().front();
     ret.rcomp = alignment.getAlignment().getRComp();
     ret.flags = mpeggFlagsToSamFlags(rec.getFlags(), ret.rcomp);
 
@@ -196,16 +200,16 @@ void Exporter::generateRecords(bool primary, std::vector<Stash>& stash, const co
         }
         std::string name = rec.getName().empty() ? "*" : rec.getName();
         out.emplace_back(name, stash[i].flags, "ref" + std::to_string(rec.getAlignmentSharedData().getSeqID()),
-                         (uint32_t) stash[i].position, stash[i].mappingScore, stash[i].cigar, "=", (uint32_t)stash[i + 1].position, (int32_t)tlen,
-                         stash[i].seq, stash[i].qual);
+                         (uint32_t)stash[i].position, stash[i].mappingScore, stash[i].cigar, "=",
+                         (uint32_t)stash[i + 1].position, (int32_t)tlen, stash[i].seq, stash[i].qual);
     }
     if (stash.front().rcomp) {
         stash[i].flags |= 32;
     }
     std::string name = rec.getName().empty() ? "*" : rec.getName();
     out.emplace_back(name, stash[i].flags, "ref" + std::to_string(rec.getAlignmentSharedData().getSeqID()),
-                     (uint32_t) stash[i].position, stash[i].mappingScore, stash[i].cigar, "=", (uint32_t)stash.front().position, (int32_t)-tlen,
-                     stash[i].seq, stash[i].qual);
+                     (uint32_t)stash[i].position, stash[i].mappingScore, stash[i].cigar, "=",
+                     (uint32_t)stash.front().position, (int32_t)-tlen, stash[i].seq, stash[i].qual);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

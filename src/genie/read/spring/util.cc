@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "util.h"
+#include "genie/read/spring/util.h"
 #include <algorithm>
 #include <cstring>
 #include <fstream>
@@ -26,10 +26,10 @@ std::vector<int64_t> read_vector_from_file(const std::string &file_name) {
     std::vector<int64_t> vec;
     if (!f_in.is_open()) return vec;
     int64_t val;
-    f_in.read((char *)&val, sizeof(int64_t));
+    f_in.read(reinterpret_cast<char *>(&val), sizeof(int64_t));
     while (!f_in.eof()) {
         vec.push_back(val);
-        f_in.read((char *)&val, sizeof(int64_t));
+        f_in.read(reinterpret_cast<char *>(&val), sizeof(int64_t));
     }
     return vec;
 }

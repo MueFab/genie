@@ -4,15 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_STREAMS_H_
-#define GABAC_STREAMS_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_STREAMS_H_
+#define SRC_GENIE_ENTROPY_GABAC_STREAMS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <istream>
 #include <ostream>
-
-#include <genie/util/data-block.h>
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,14 +23,14 @@ namespace gabac {
  * @brief FILE* wrapper
  */
 class FileBuffer : public std::streambuf {
-   public:
+ public:
     /**
      * @brief Create new buffer
      * @param f FILE* to operate on
      */
     explicit FileBuffer(FILE *f);
 
-   protected:
+ protected:
     /**
      *
      * @param c
@@ -67,7 +66,7 @@ class FileBuffer : public std::streambuf {
      */
     int underflow() override;
 
-   private:
+ private:
     FILE *fileptr;  //!<
 };
 
@@ -75,7 +74,7 @@ class FileBuffer : public std::streambuf {
  * @brief Buffer for data blocks
  */
 class DataBlockBuffer : public std::streambuf {
-   public:
+ public:
     /**
      * @brief Create new buffer
      * @param d Data block to operate on
@@ -89,7 +88,7 @@ class DataBlockBuffer : public std::streambuf {
      */
     size_t size() const;
 
-   protected:
+ protected:
     /**
      *
      * @param c
@@ -148,40 +147,16 @@ class DataBlockBuffer : public std::streambuf {
     pos_type seekoff(off_type off, std::ios_base::seekdir dir,
                      std::ios_base::openmode which = std::ios_base::in) override;
 
-   private:
+ private:
     util::DataBlock block;  //!<
     size_t pos;             //!<
-};
-
-/**
- * @brief File input
- */
-class IFileStream : public FileBuffer, public std::istream {
-   public:
-    /**
-     * @brief Create new stream
-     * @param f FILE* to operate on
-     */
-    explicit IFileStream(FILE *f);
-};
-
-/**
- * @brief File output
- */
-class OFileStream : public FileBuffer, public std::ostream {
-   public:
-    /**
-     * @brief Create new stream
-     * @param f FILE* to operate on
-     */
-    explicit OFileStream(FILE *f);
 };
 
 /**
  * @brief Buffer input
  */
 class IBufferStream : public DataBlockBuffer, public std::istream {
-   public:
+ public:
     /**
      * @brief Create new stream.
      * @param d Data block to operate on.
@@ -194,7 +169,7 @@ class IBufferStream : public DataBlockBuffer, public std::istream {
  * @brief Buffer output
  */
 class OBufferStream : public DataBlockBuffer, public std::ostream {
-   public:
+ public:
     /**
      * @brief Create new buffer
      * @param d data block to operate on
@@ -213,7 +188,7 @@ class OBufferStream : public DataBlockBuffer, public std::ostream {
  * @brief Buffer doing nothing
  */
 class NullBuffer : public std::streambuf {
-   protected:
+ protected:
     /**
      *
      * @param c
@@ -226,13 +201,13 @@ class NullBuffer : public std::streambuf {
  * @brief Stream doing nothing
  */
 class NullStream : public std::ostream {
-   public:
+ public:
     /**
      * @brief Create new nullstream
      */
     NullStream();
 
-   private:
+ private:
     NullBuffer m_sb;  //!<
 };
 
@@ -244,7 +219,7 @@ class NullStream : public std::ostream {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_STREAMS_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_STREAMS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

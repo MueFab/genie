@@ -4,20 +4,22 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#ifdef _WIN32
 #define NOMINMAX
+#endif
 
-#include "preprocess.h"
-#include <genie/core/record/record.h>
-#include <genie/util/drain.h>
-#include <genie/util/ordered-section.h>
+#include "genie/read/spring/preprocess.h"
 #include <algorithm>
 #include <cstdint>
 #include <cstdio>
 #include <iostream>
-#include <limits>
 #include <string>
-#include "params.h"
-#include "util.h"
+#include <utility>
+#include "genie/core/record/record.h"
+#include "genie/read/spring/params.h"
+#include "genie/read/spring/util.h"
+#include "genie/util/drain.h"
+#include "genie/util/ordered-section.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +32,7 @@ namespace spring {
 void Preprocessor::setup(const std::string &wdir, size_t num_thr, bool paired_end) {
     cp.preserve_id = true;
     cp.preserve_quality = true;
-    cp.num_thr = (int)num_thr;
+    cp.num_thr = static_cast<int>(num_thr);
     working_dir = wdir;
     used = false;
 
@@ -97,7 +99,7 @@ void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section &id) 
             if (seq.getSequence().find('N') != std::string::npos) {
                 fout_N[seg_index] << seq.getSequence() << "\n";
                 uint32_t pos_N = cp.num_reads + (uint32_t)rec_index;
-                fout_order_N[seg_index].write((char *)&pos_N, sizeof(uint32_t));
+                fout_order_N[seg_index].write(reinterpret_cast<char *>(&pos_N), sizeof(uint32_t));
             } else {
                 fout_clean[seg_index] << seq.getSequence() << "\n";
                 cp.num_reads_clean[seg_index]++;
@@ -146,9 +148,9 @@ void Preprocessor::finish(size_t id) {
         uint32_t num_N_file_2 = cp.num_reads - cp.num_reads_clean[1];
         uint32_t order_N;
         for (uint32_t i = 0; i < num_N_file_2; i++) {
-            fin_order_N.read((char *)&order_N, sizeof(uint32_t));
+            fin_order_N.read(reinterpret_cast<char *>(&order_N), sizeof(uint32_t));
             order_N += cp.num_reads;
-            fout_order_N_PE.write((char *)&order_N, sizeof(uint32_t));
+            fout_order_N_PE.write(reinterpret_cast<char *>(&order_N), sizeof(uint32_t));
         }
         fin_order_N.close();
         fout_order_N_PE.close();

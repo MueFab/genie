@@ -4,16 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DESCRIPTOR_H
-#define GENIE_DESCRIPTOR_H
+#ifndef SRC_GENIE_CORE_PARAMETER_DESCRIPTOR_H_
+#define SRC_GENIE_CORE_PARAMETER_DESCRIPTOR_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/constants.h>
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-
 #include <memory>
+#include "genie/core/constants.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +24,7 @@ namespace parameter {
  *
  */
 class Descriptor {
-   public:
+ public:
     /**
      *
      * @param _dec_cfg_preset
@@ -70,7 +69,7 @@ class Descriptor {
      */
     uint8_t getPreset() const;
 
-   protected:
+ protected:
     uint8_t dec_cfg_preset;  //!<
 };
 
@@ -82,7 +81,7 @@ class Descriptor {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DESCRIPTOR_H
+#endif  // SRC_GENIE_CORE_PARAMETER_DESCRIPTOR_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
