@@ -4,15 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_LA_ENCODER_H
-#define GENIE_LA_ENCODER_H
+#ifndef SRC_GENIE_READ_LOCALASSEMBLY_ENCODER_H_
+#define SRC_GENIE_READ_LOCALASSEMBLY_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/read-encoder.h>
-#include <genie/core/record/alignment_split/same-rec.h>
-#include <genie/read/basecoder/encoder.h>
-#include "local-reference.h"
+#include <memory>
+#include <string>
+#include "genie/core/read-encoder.h"
+#include "genie/core/record/alignment_split/same-rec.h"
+#include "genie/read/basecoder/encoder.h"
+#include "genie/read/localassembly/local-reference.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +26,7 @@ namespace localassembly {
  * @brief Module using local assembly to encode aligned reads
  */
 class Encoder : public core::ReadEncoder {
-   private:
+ private:
     bool debug;                //!< @brief If true, debugging information will be printed to std::cout
     uint32_t cr_buf_max_size;  //!< @brief Buffer size for local assembly reference memory
 
@@ -91,7 +93,7 @@ class Encoder : public core::ReadEncoder {
                           std::unique_ptr<core::parameter::QualityValues> qvparam, core::record::ClassType type,
                           Encoder::LaeState& state) const;
 
-   public:
+ public:
     /**
      * @brief Process one chunk of data
      * @param t The input data
@@ -130,7 +132,7 @@ class Encoder : public core::ReadEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ENCODER_H
+#endif  // SRC_GENIE_READ_LOCALASSEMBLY_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

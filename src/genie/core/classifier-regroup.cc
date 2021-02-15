@@ -4,14 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "classifier-regroup.h"
-
-#include <genie/util/watch.h>
-
-#include "cigar-tokenizer.h"
-#include "constants.h"
-
+#include "genie/core/classifier-regroup.h"
+#include <algorithm>
 #include <iostream>
+#include <string>
+#include <utility>
+#include <vector>
+#include "genie/core/cigar-tokenizer.h"
+#include "genie/core/constants.h"
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

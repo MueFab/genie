@@ -4,7 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "decoder.h"
+#include "genie/quality/qvwriteout/decoder.h"
+#include <string>
+#include <tuple>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,7 +37,7 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(
                 auto codebook = (uint8_t)param_casted.getNumberCodeBooks() - 1;
                 if (core::getECigarInfo().lut_step_ref[cigar] ||
                     core::getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar)) {
-                    codebook = desc.get(1).end() ? 0 : (uint8_t) desc.get(1).pull();
+                    codebook = desc.get(1).end() ? 0 : (uint8_t)desc.get(1).pull();
                 }
 
                 for (size_t i = 0; i < bs.length(); ++i) {

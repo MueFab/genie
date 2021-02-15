@@ -4,16 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SPRING_GENERATE_READ_STREAMS_H_
-#define SPRING_GENERATE_READ_STREAMS_H_
+#ifndef SRC_GENIE_READ_SPRING_GENERATE_READ_STREAMS_H_
+#define SRC_GENIE_READ_SPRING_GENERATE_READ_STREAMS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <map>
 #include <string>
-
-#include <genie/core/read-encoder.h>
-#include "util.h"
+#include <vector>
+#include "genie/core/read-encoder.h"
+#include "genie/read/spring/util.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ void generate_read_streams(const std::string &temp_dir, const compression_params
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SPRING_GENERATE_READ_STREAMS_H_
+#endif  // SRC_GENIE_READ_SPRING_GENERATE_READ_STREAMS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

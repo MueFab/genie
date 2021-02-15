@@ -4,12 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "fai-file.h"
-
-#include <genie/util/runtime-exception.h>
-
+#include "genie/format/fasta/fai-file.h"
 #include <istream>
 #include <ostream>
+#include <utility>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

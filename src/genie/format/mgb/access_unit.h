@@ -4,26 +4,26 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ACCESS_UNIT_H
-#define GENIE_ACCESS_UNIT_H
+#ifndef SRC_GENIE_FORMAT_MGB_ACCESS_UNIT_H_
+#define SRC_GENIE_FORMAT_MGB_ACCESS_UNIT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/parameter/data_unit.h>
-#include <genie/core/record/record.h>
-#include <genie/core/stats/perf-stats.h>
-#include <genie/entropy/gabac/gabac.h>
-#include <genie/format/mgb/au_type_cfg.h>
-#include <genie/format/mgb/block.h>
-#include <genie/format/mgb/mm_cfg.h>
-#include <genie/format/mgb/ref_cfg.h>
-#include <genie/format/mgb/signature_cfg.h>
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
 #include <cstdint>
 #include <map>
 #include <memory>
 #include <vector>
+#include "genie/core/parameter/data_unit.h"
+#include "genie/core/record/record.h"
+#include "genie/core/stats/perf-stats.h"
+#include "genie/entropy/gabac/gabac.h"
+#include "genie/format/mgb/au_type_cfg.h"
+#include "genie/format/mgb/block.h"
+#include "genie/format/mgb/mm_cfg.h"
+#include "genie/format/mgb/ref_cfg.h"
+#include "genie/format/mgb/signature_cfg.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@ namespace mgb {
  *
  */
 class AccessUnit : public core::parameter::DataUnit {
-   public:
+ public:
     /**
      *
      * @param parameterSets
@@ -150,7 +150,7 @@ class AccessUnit : public core::parameter::DataUnit {
      */
     core::record::ClassType getClass() const;
 
-   private:
+ private:
     /**
      *
      * @param writer
@@ -181,7 +181,7 @@ class AccessUnit : public core::parameter::DataUnit {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ACCESS_UNIT_H
+#endif  // SRC_GENIE_FORMAT_MGB_ACCESS_UNIT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

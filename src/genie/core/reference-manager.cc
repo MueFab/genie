@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "reference-manager.h"
+#include "genie/core/reference-manager.h"
+#include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -132,7 +133,7 @@ const std::string& ReferenceManager::ReferenceExcerpt::getRefName() const { retu
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::shared_ptr<const std::string> ReferenceManager::ReferenceExcerpt::getChunkAt(size_t pos) const {
-    int id = int((pos - (global_start - global_start % CHUNK_SIZE)) / CHUNK_SIZE);
+    int id = static_cast<int>((pos - (global_start - global_start % CHUNK_SIZE)) / CHUNK_SIZE);
     UTILS_DIE_IF(id < 0 || id >= (int)data.size(), "Invalid index");
     return data[id];
 }
@@ -140,7 +141,7 @@ std::shared_ptr<const std::string> ReferenceManager::ReferenceExcerpt::getChunkA
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReferenceManager::ReferenceExcerpt::mapChunkAt(size_t pos, std::shared_ptr<const std::string> dat) {
-    int id = int((pos - (global_start - global_start % CHUNK_SIZE)) / CHUNK_SIZE);
+    int id = static_cast<int>((pos - (global_start - global_start % CHUNK_SIZE)) / CHUNK_SIZE);
     UTILS_DIE_IF(id < 0 || id >= (int)data.size(), "Invalid index");
     data[id] = std::move(dat);
 }

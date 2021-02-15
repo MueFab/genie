@@ -10,18 +10,19 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/access-unit.h>
-#include <genie/core/read-encoder.h>
-#include <genie/core/record/chunk.h>
-#include <genie/core/record/segment.h>
 #include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
-#include "reorder-compress-quality-id.h"
-#include "util.h"
+#include "genie/core/access-unit.h"
+#include "genie/core/read-encoder.h"
+#include "genie/core/record/chunk.h"
+#include "genie/core/record/segment.h"
+#include "genie/read/spring/reorder-compress-quality-id.h"
+#include "genie/read/spring/util.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -48,7 +49,6 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
 
     std::string file_order = basedir + "/read_order.bin";
     std::string file_id = basedir + "/id_1";
-    ;
     std::string file_quality[2];
     file_quality[0] = basedir + "/quality_1";
     file_quality[1] = basedir + "/quality_2";
@@ -62,7 +62,6 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
         generate_order(file_order, order_array, numreads);
 
         uint32_t str_array_size = (1 + (numreads / 4 - 1) / num_reads_per_block) * num_reads_per_block;
-        ;
         // smallest multiple of num_reads_per_block bigger than numreads/4
         // numreads/4 chosen so that these many qualities/ids can be stored in
         // memory without exceeding the RAM consumption of reordering stage
@@ -140,12 +139,12 @@ void read_block_start_end(const std::string &file_blocks, std::vector<uint32_t> 
                           std::vector<uint32_t> &block_end) {
     std::ifstream f_blocks(file_blocks, std::ios::binary);
     uint32_t block_pos_temp;
-    f_blocks.read((char *)&block_pos_temp, sizeof(uint32_t));
+    f_blocks.read(reinterpret_cast<char *>(&block_pos_temp), sizeof(uint32_t));
     while (!f_blocks.eof()) {
         block_start.push_back(block_pos_temp);
-        f_blocks.read((char *)&block_pos_temp, sizeof(uint32_t));
+        f_blocks.read(reinterpret_cast<char *>(&block_pos_temp), sizeof(uint32_t));
         block_end.push_back(block_pos_temp);
-        f_blocks.read((char *)&block_pos_temp, sizeof(uint32_t));
+        f_blocks.read(reinterpret_cast<char *>(&block_pos_temp), sizeof(uint32_t));
     }
     f_blocks.close();
 }
@@ -156,7 +155,7 @@ void generate_order(const std::string &file_order, uint32_t *order_array, const 
     std::ifstream fin_order(file_order, std::ios::binary);
     uint32_t order;
     for (uint32_t i = 0; i < numreads; i++) {
-        fin_order.read((char *)&order, sizeof(uint32_t));
+        fin_order.read(reinterpret_cast<char *>(&order), sizeof(uint32_t));
         order_array[order] = i;
     }
     fin_order.close();
@@ -183,7 +182,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
         std::string *id_array_block = new std::string[block_end[block_num] - block_start[block_num]];
         uint32_t index;
         for (uint32_t j = block_start[block_num]; j < block_end[block_num]; j++) {
-            f_order_id.read((char *)&index, sizeof(uint32_t));
+            f_order_id.read(reinterpret_cast<char *>(&index), sizeof(uint32_t));
             id_array_block[j - block_start[block_num]] = id_array[index];
         }
         genie::core::record::Chunk chunk;
@@ -308,7 +307,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 str_array[order_array[i] - start_read_bin] = temp_str;
         }
         f_in.close();
-        uint64_t blocks = uint64_t(std::ceil(float(num_reads_bin) / num_reads_per_block));
+        uint64_t blocks = uint64_t(std::ceil(static_cast<float>(num_reads_bin) / num_reads_per_block));
 
         //
         // According to the execution profile, this is the 2nd hottest

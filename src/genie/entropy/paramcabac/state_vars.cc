@@ -3,10 +3,10 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-#include "state_vars.h"
-#include <genie/util/runtime-exception.h>
+#include "genie/entropy/paramcabac/state_vars.h"
 #include <cmath>
-#include "binarization_parameters.h"
+#include "genie/entropy/paramcabac/binarization_parameters.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ StateVars::StateVars()
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t StateVars::getNumAlphaSpecial(const core::GenSubIndex subsequence_ID, const core::AlphabetID alphabet_ID) {
-    unsigned long numAlphaSpecial = 0;
+    uint64_t numAlphaSpecial = 0;
     if (subsequence_ID == core::GenSub::MMTYPE_TYPE) {  // mmtype subseq 0
         numAlphaSpecial = 3;
     } else if ((subsequence_ID == core::GenSub::MMTYPE_SUBSTITUTION)  // mmtype subseq 1
@@ -63,7 +63,9 @@ uint8_t StateVars::getNumLuts(const uint8_t codingOrder, const bool shareSubsymL
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t StateVars::getNumPrvs(const bool shareSubsymPrvFlag) const { return (shareSubsymPrvFlag) ? 1 : (uint8_t)numSubsyms; }
+uint8_t StateVars::getNumPrvs(const bool shareSubsymPrvFlag) const {
+    return (shareSubsymPrvFlag) ? 1 : (uint8_t)numSubsyms;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -111,18 +113,18 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
                 numCtxSubsym = cabacBinazParams.getCMax();  // cmax
                 break;
             case BinarizationParameters::BinarizationId::EG:
-                numCtxSubsym = uint32_t (std::floor(std::log2(numAlphaSubsym + 1)) + 1);
+                numCtxSubsym = uint32_t(std::floor(std::log2(numAlphaSubsym + 1)) + 1);
                 break;
             case BinarizationParameters::BinarizationId::SEG:
-                numCtxSubsym = uint32_t (std::floor(std::log2(numAlphaSubsym + 1)) + 2);
+                numCtxSubsym = uint32_t(std::floor(std::log2(numAlphaSubsym + 1)) + 2);
                 break;
             case BinarizationParameters::BinarizationId::TEG:
                 numCtxSubsym = cabacBinazParams.getCMaxTeg()  // cmax_teg
-                               + uint32_t (std::floor(std::log2(numAlphaSubsym + 1)) + 1);
+                               + uint32_t(std::floor(std::log2(numAlphaSubsym + 1)) + 1);
                 break;
             case BinarizationParameters::BinarizationId::STEG:
                 numCtxSubsym = cabacBinazParams.getCMaxTeg()  // cmax_teg
-                               + uint32_t (std::floor(std::log2(numAlphaSubsym + 1)) + 2);
+                               + uint32_t(std::floor(std::log2(numAlphaSubsym + 1)) + 2);
                 break;
             case BinarizationParameters::BinarizationId::SUTU: {
                 uint8_t splitUnitSize = cabacBinazParams.getSplitUnitSize();
@@ -169,12 +171,9 @@ void StateVars::populate(const SupportValues::TransformIdSubsym transform_ID_sub
                  binarization_ID <= BinarizationParameters::BinarizationId::SDTU) ||
                 codingOrder == 0 || (1u << codingSubsymSize) > MAX_LUT_SIZE) {
                 UTILS_THROW_RUNTIME_EXCEPTION(
-                    "LUT_TRANSFORM not supported with given configuration: coding_order = 0\
-                                             , binarization_ID = " +
+                    "LUT_TRANSFORM not supported with given configuration: coding_order = 0, binarization_ID = " +
                     std::to_string((uint8_t)binarization_ID) +
-                    "\
-                                             , coding_subsym_size = " +
-                    std::to_string(codingSubsymSize));
+                    ", coding_subsym_size = " + std::to_string(codingSubsymSize));
             } else {
                 numCtxLuts = (codingSubsymSize / 2) * ((1 << 2) - 1) + ((1 << (codingSubsymSize % 2)) - 1);
             }

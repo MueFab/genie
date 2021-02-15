@@ -4,15 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_MM_CFG_H
-#define GENIE_MM_CFG_H
+#ifndef SRC_GENIE_FORMAT_MGB_MM_CFG_H_
+#define SRC_GENIE_FORMAT_MGB_MM_CFG_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-
 #include <cstdint>
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,11 +23,11 @@ namespace mgb {
  * ISO 23092-2 Section 3.4.1.1 table 19 lines 7 to 10
  */
 class MmCfg {
-   private:
+ private:
     uint16_t mm_threshold;  //!< Line 8
     uint32_t mm_count;      //!< Line 9
 
-   public:
+ public:
     /**
      *
      * @param _mm_threshold
@@ -67,7 +66,7 @@ class MmCfg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_MM_CFG_H
+#endif  // SRC_GENIE_FORMAT_MGB_MM_CFG_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

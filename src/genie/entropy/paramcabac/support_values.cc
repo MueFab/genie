@@ -4,9 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "support_values.h"
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
+#include "genie/entropy/paramcabac/support_values.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

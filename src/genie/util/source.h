@@ -4,12 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SOURCE_H
-#define GENIE_SOURCE_H
+#ifndef SRC_GENIE_UTIL_SOURCE_H_
+#define SRC_GENIE_UTIL_SOURCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "drain.h"
+#include "genie/util/drain.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,10 +22,10 @@ namespace util {
  */
 template <typename TYPE>
 class Source {
-   protected:
+ protected:
     Drain<TYPE>* drain;  //!< @brief Where to propagate output to.
 
-   protected:
+ protected:
     /**
      * @brief Propagate data to drain set before.
      * @param t Current chunk of data.
@@ -44,7 +44,7 @@ class Source {
      */
     void skipOut(const Section& id);
 
-   public:
+ public:
     /**
      * @brief Current data output will be propagated to a new destination.
      * @param d New destination for output data.
@@ -64,11 +64,11 @@ class Source {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "source.impl.h"
+#include "genie/util/source.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_SOURCE_H
+#endif  // SRC_GENIE_UTIL_SOURCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

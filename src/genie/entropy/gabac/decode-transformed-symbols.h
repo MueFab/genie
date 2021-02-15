@@ -4,14 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_TRANSFORMED_SYMBOLS_DECODER_H
-#define GABAC_TRANSFORMED_SYMBOLS_DECODER_H
+#ifndef SRC_GENIE_ENTROPY_GABAC_DECODE_TRANSFORMED_SYMBOLS_H_
+#define SRC_GENIE_ENTROPY_GABAC_DECODE_TRANSFORMED_SYMBOLS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "decode-transformed-subseq.h"
-#include "context-selector.h"
-#include "luts-subsymbol-transform.h"
+#include <vector>
+#include "genie/entropy/gabac/context-selector.h"
+#include "genie/entropy/gabac/decode-transformed-subseq.h"
+#include "genie/entropy/gabac/luts-subsymbol-transform.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,14 +24,12 @@ namespace gabac {
  *
  */
 class TransformedSymbolsDecoder {
-   public:
-
+ public:
     /**
      *
      * @param
      */
-    explicit TransformedSymbolsDecoder(util::DataBlock *bitstream,
-                                       const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+    explicit TransformedSymbolsDecoder(util::DataBlock *bitstream, const paramcabac::TransformedSubSeq &trnsfSubseqConf,
                                        const unsigned int numEncodedSymbols);
 
     /**
@@ -58,7 +57,7 @@ class TransformedSymbolsDecoder {
      */
     size_t symbolsAvail() const;
 
-   private:
+ private:
     /**
      * @brief
      * @param
@@ -112,7 +111,7 @@ class TransformedSymbolsDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_TRANSFORMED_SYMBOLS_DECODER_H
+#endif  // SRC_GENIE_ENTROPY_GABAC_DECODE_TRANSFORMED_SYMBOLS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

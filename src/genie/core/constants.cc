@@ -4,8 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "constants.h"
+#include "genie/core/constants.h"
 #include <algorithm>
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -145,7 +146,10 @@ const std::vector<GenomicDescriptorProperties> &getDescriptors() {
           {GenSub::MMAP_REF_SEQ, "reference_seq", false},
           {GenSub::MMAP_REF_POS, "reference_pos", false}}},
 
-        {GenDesc::MSAR, "msar", true, {{GenSub::MSAR_CABAC_0, "cabac_0", false}, {GenSub::MSAR_CABAC_1, "cabac_1", false}}},
+        {GenDesc::MSAR,
+         "msar",
+         true,
+         {{GenSub::MSAR_CABAC_0, "cabac_0", false}, {GenSub::MSAR_CABAC_1, "cabac_1", false}}},
 
         {GenDesc::RTYPE, "rtype", false, {{GenSub::RTYPE, "rtype", false}}},
 
@@ -164,7 +168,10 @@ const std::vector<GenomicDescriptorProperties> &getDescriptors() {
           {GenSub::QV_STEPS_5, "steps_5", false},
           {GenSub::QV_STEPS_6, "steps_6", false}}},
 
-        {GenDesc::RNAME, "rname", true, {{GenSub::RNAME_CABAC_0, "cabac0", false}, {GenSub::RNAME_CABAC_1, "cabac1", false}}},
+        {GenDesc::RNAME,
+         "rname",
+         true,
+         {{GenSub::RNAME_CABAC_0, "cabac0", false}, {GenSub::RNAME_CABAC_1, "cabac1", false}}},
 
         {GenDesc::RFTP, "rftp", false, {{GenSub::RFTP, "rftp", false}}},
 
@@ -224,7 +231,7 @@ bool Alphabet::isIncluded(char c) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 const CigarFormatInfo &getECigarInfo() {
-    const static auto formatInfo = []() -> CigarFormatInfo {
+    static const auto formatInfo = []() -> CigarFormatInfo {
         const auto ref_step2 = []() -> std::vector<uint8_t> {
             std::vector<uint8_t> lut(128, 0);
             lut['='] = 1;

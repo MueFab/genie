@@ -4,15 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_LUT_SUBSYMBOL_TRANSFORM_H_
-#define GABAC_LUT_SUBSYMBOL_TRANSFORM_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_LUTS_SUBSYMBOL_TRANSFORM_H_
+#define SRC_GENIE_ENTROPY_GABAC_LUTS_SUBSYMBOL_TRANSFORM_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/entropy/paramcabac/state_vars.h>
-#include "reader.h"
-#include "writer.h"
-#include "subsymbol.h"
+#include <vector>
+#include "genie/entropy/gabac/reader.h"
+#include "genie/entropy/gabac/subsymbol.h"
+#include "genie/entropy/gabac/writer.h"
+#include "genie/entropy/paramcabac/state_vars.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -58,7 +59,7 @@ typedef std::vector<LutOrder1> LutOrder2;
  *
  */
 class LUTsSubSymbolTransform {
-   public:
+ public:
     /**
      *
      * @param _supportVals
@@ -88,8 +89,7 @@ class LUTsSubSymbolTransform {
      * @param symbols
      * @param depSymbols
      */
-    void encodeLUTs(Writer& writer, util::DataBlock* const symbols,
-                    util::DataBlock* const depSymbols = nullptr);
+    void encodeLUTs(Writer& writer, util::DataBlock* const symbols, util::DataBlock* const depSymbols = nullptr);
 
     /**
      *
@@ -149,7 +149,7 @@ class LUTsSubSymbolTransform {
     void transformOrder1(std::vector<Subsymbol>& subsymbols, const uint8_t subsymIdx, const uint8_t lutIdx,
                          const uint8_t prvIdx);
 
-   private:
+ private:
     /**
      *
      * @param numAlphaSubsym
@@ -220,7 +220,7 @@ class LUTsSubSymbolTransform {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_LUT_SUBSYMBOL_TRANSFORM_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_LUTS_SUBSYMBOL_TRANSFORM_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

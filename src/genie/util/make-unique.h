@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_MAKE_UNIQUE_H
-#define GENIE_MAKE_UNIQUE_H
+#ifndef SRC_GENIE_UTIL_MAKE_UNIQUE_H_
+#define SRC_GENIE_UTIL_MAKE_UNIQUE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -52,7 +52,7 @@ struct Unique_if<T[N]> {
  * @return
  */
 template <class T, class... Args>
-typename Unique_if<T>::Single_object make_unique(Args &&... args);
+typename Unique_if<T>::Single_object make_unique(Args &&...args);
 
 /**
  *
@@ -79,11 +79,11 @@ typename Unique_if<T>::Known_bound make_unique(Args &&...) = delete;  // NOLINT
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "make-unique.impl.h"
+#include "genie/util/make-unique.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_MAKE_UNIQUE_H
+#endif  // SRC_GENIE_UTIL_MAKE_UNIQUE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

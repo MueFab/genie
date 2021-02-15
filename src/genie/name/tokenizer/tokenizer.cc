@@ -4,8 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "tokenizer.h"
-#include <access-unit.h>
+#include "genie/name/tokenizer/tokenizer.h"
+#include <utility>
+#include "genie/core/access-unit.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -49,7 +50,7 @@ void TokenState::pushTokenString(const std::string& param) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 const SingleToken& TokenState::getOldToken() {
-    const static SingleToken INVALID(Tokens::NONE, 0, "");
+    static const SingleToken INVALID(Tokens::NONE, 0, "");
     if (oldRec.size() > token_pos) {
         return oldRec[token_pos];
     } else {
@@ -145,13 +146,9 @@ std::vector<SingleToken>&& TokenState::run() {
         // Check if the token is an alphabetic word
         if (isalpha(get())) {
             alphabetic();
-        }
-        // check if the token is a run of zeros
-        else if (get() == '0') {
+        } else if (get() == '0') {  // check if the token is a run of zeros
             zeros();
-        }
-        // Check if the token is a number smaller than (1<<29)
-        else if (isdigit(get())) {
+        } else if (isdigit(get())) {  // Check if the token is a number smaller than (1<<29)
             number();
         } else {
             character();

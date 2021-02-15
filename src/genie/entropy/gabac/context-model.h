@@ -4,12 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_CONTEXT_MODEL_H_
-#define GABAC_CONTEXT_MODEL_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_CONTEXT_MODEL_H_
+#define SRC_GENIE_ENTROPY_GABAC_CONTEXT_MODEL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "cabac-tables.h"
+#include "genie/entropy/gabac/cabac-tables.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ namespace gabac {
  *
  */
 class ContextModel {
-   public:
+ public:
     /**
      *
      * @param initState
@@ -53,7 +53,7 @@ class ContextModel {
      */
     void updateMps();
 
-   private:
+ private:
     unsigned char m_state;  //!<
 };
 
@@ -87,7 +87,7 @@ inline void ContextModel::updateMps() { m_state = cabactables::nextStateMps[m_st
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_CONTEXT_MODEL_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_CONTEXT_MODEL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

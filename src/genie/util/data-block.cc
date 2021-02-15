@@ -4,9 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "genie/util/data-block.h"
 #include <algorithm>
-
-#include "data-block.h"
+#include <string>
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

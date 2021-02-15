@@ -4,8 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "tag-number.h"
-#include <genie/util/make-unique.h>
+#include "genie/format/sam/header/tag-number.h"
+#include <string>
+#include <utility>
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

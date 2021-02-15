@@ -4,9 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "encoder.h"
-#include <core/record/alignment_split/same-rec.h>
-#include <util/watch.h>
+#include "genie/quality/qvwriteout/encoder.h"
+#include <string>
+#include <utility>
+#include "genie/core/record/alignment_split/same-rec.h"
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -49,7 +51,7 @@ void Encoder::encodeAlignedSegment(const core::record::Segment& s, const std::st
                 uint8_t codebook = core::getECigarInfo().lut_step_ref[cigar] ||
                                            core::getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar)
                                        ? 2
-                                       : (uint8_t) desc.getSize() - 1;
+                                       : (uint8_t)desc.getSize() - 1;
                 for (const auto& c : qvs) {
                     UTILS_DIE_IF(c < 33 || c > 126, "Invalid quality score");
                     desc.get(codebook).push(c - 33);

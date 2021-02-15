@@ -4,15 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_HEADER_INFO_H
-#define GENIE_HEADER_INFO_H
+#ifndef SRC_GENIE_FORMAT_SAM_HEADER_HEADER_INFO_H_
+#define SRC_GENIE_FORMAT_SAM_HEADER_HEADER_INFO_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <functional>
 #include <memory>
 #include <string>
-#include "tag.h"
+#include <vector>
+#include "genie/format/sam/header/tag.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +25,7 @@ namespace header {
 // ---------------------------------------------------------------------------------------------------------------------
 
 struct TagInfo {
-   public:
+ public:
     std::string name;
     bool required;
     std::string regex;
@@ -51,7 +52,7 @@ const std::vector<HeaderLineInfo>& getHeaderInfo();
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_HEADER_INFO_H
+#endif  // SRC_GENIE_FORMAT_SAM_HEADER_HEADER_INFO_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

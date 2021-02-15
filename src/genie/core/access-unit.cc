@@ -4,11 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "access-unit.h"
-#include "mismatch-decoder.h"
-#include <genie/util/make-unique.h>
+#include "genie/core/access-unit.h"
 #include <algorithm>
 #include <utility>
+#include "genie/core/mismatch-decoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -49,8 +48,8 @@ AccessUnit::Subsequence::Subsequence(Subsequence &&sub) noexcept { *this = sub; 
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const util::DataBlock* AccessUnit::Subsequence::getDependency() const {
-    if(id == GenSub::MMTYPE_SUBSTITUTION || id == GenSub::RFTT)
+const util::DataBlock *AccessUnit::Subsequence::getDependency() const {
+    if (id == GenSub::MMTYPE_SUBSTITUTION || id == GenSub::RFTT)
         return &dependency;
     else
         return nullptr;
@@ -58,8 +57,8 @@ const util::DataBlock* AccessUnit::Subsequence::getDependency() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-util::DataBlock* AccessUnit::Subsequence::getDependency() {
-    if(id == GenSub::MMTYPE_SUBSTITUTION || id == GenSub::RFTT)
+util::DataBlock *AccessUnit::Subsequence::getDependency() {
+    if (id == GenSub::MMTYPE_SUBSTITUTION || id == GenSub::RFTT)
         return &dependency;
     else
         return nullptr;
@@ -84,7 +83,7 @@ AccessUnit::Subsequence::Subsequence(uint8_t wordSize, GenSubIndex _id)
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence::Subsequence(util::DataBlock d, GenSubIndex _id)
-    : data(std::move(d)), position(0), id(std::move(_id)), dependency(0,(uint8_t)d.getWordSize()) {}
+    : data(std::move(d)), position(0), id(std::move(_id)), dependency(0, (uint8_t)d.getWordSize()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -137,22 +136,20 @@ const AccessUnit::Subsequence &AccessUnit::Descriptor::get(uint16_t sub) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const util::DataBlock* AccessUnit::Descriptor::getDependency(uint16_t sub) const {
+const util::DataBlock *AccessUnit::Descriptor::getDependency(uint16_t sub) const {
     return subdesc[sub].getDependency();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-util::DataBlock* AccessUnit::Descriptor::getDependency(uint16_t sub) {
-    return subdesc[sub].getDependency();
-}
+util::DataBlock *AccessUnit::Descriptor::getDependency(uint16_t sub) { return subdesc[sub].getDependency(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::Subsequence &AccessUnit::Descriptor::getTokenType(uint16_t pos, uint8_t _type) {
     uint16_t s_id = ((pos << 4u) | (_type & 0xfu));
     while (subdesc.size() <= s_id) {
-        subdesc.emplace_back((uint8_t)4, GenSubIndex(getID(), uint16_t (subdesc.size())));
+        subdesc.emplace_back((uint8_t)4, GenSubIndex(getID(), uint16_t(subdesc.size())));
     }
     return get(s_id);
 }
@@ -265,7 +262,7 @@ AccessUnit::Subsequence::Subsequence(GenSubIndex _id, size_t size, util::BitRead
     : data(0, 1), id(std::move(_id)), numSymbols(0), dependency(0, 1) {
     data.resize(size);
     // no need to resize 'dependency' as it's not used on decoder side
-    reader.readBypass((char *)data.getData(), size);
+    reader.readBypass(reinterpret_cast<char *>(data.getData()), size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -350,8 +347,7 @@ AccessUnit::Descriptor::Descriptor() : id(GenDesc(0)) {}
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::AccessUnit(parameter::ParameterSet &&set, size_t _numRecords)
-    : descriptors(), parameters(std::move(set)), numReads(_numRecords), minPos(0), maxPos(0),
-      referenceSequence(0) {
+    : descriptors(), parameters(std::move(set)), numReads(_numRecords), minPos(0), maxPos(0), referenceSequence(0) {
     const size_t WORDSIZE = 4;
     for (const auto &desc : getDescriptors()) {
         Descriptor desc_data(desc.id);

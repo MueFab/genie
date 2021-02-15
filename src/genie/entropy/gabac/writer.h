@@ -4,18 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_WRITER_H_
-#define GABAC_WRITER_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_WRITER_H_
+#define SRC_GENIE_ENTROPY_GABAC_WRITER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstddef>
 #include <cstdint>
 #include <vector>
-
-#include <genie/util/bitwriter.h>
-#include "binary-arithmetic-encoder.h"
-#include "streams.h"
+#include "genie/entropy/gabac/binary-arithmetic-encoder.h"
+#include "genie/entropy/gabac/streams.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -35,14 +34,14 @@ namespace gabac {
  *
  */
 class Writer {
-   public:
+ public:
     /**
      *
      * @param bitstream
      * @param bypassFlag
      * @param numContexts
      */
-    explicit Writer(OBufferStream *bitstream, const bool bypassFlag = true, const unsigned long numContexts = 0);
+    explicit Writer(OBufferStream *constbitstream, const bool bypassFlag = true, uint64_t numContexts = 0);
 
     /**
      *
@@ -161,13 +160,13 @@ class Writer {
      */
     void writeSignFlag(int64_t input);
 
-   private:
+ private:
     util::BitWriter m_bitOutputStream;  //!<
 
     BinaryArithmeticEncoder m_binaryArithmeticEncoder;  //!<
 
-    bool m_bypassFlag;            //!<
-    unsigned long m_numContexts;  //!<
+    bool m_bypassFlag;       //!<
+    uint64_t m_numContexts;  //!<
 
     std::vector<ContextModel> m_contextModels;  //!<
 };
@@ -180,7 +179,7 @@ class Writer {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_WRITER_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_WRITER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

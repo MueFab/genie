@@ -4,12 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SELECTOR_HEAD_H
-#define GENIE_SELECTOR_HEAD_H
+#ifndef SRC_GENIE_UTIL_SELECTOR_HEAD_H_
+#define SRC_GENIE_UTIL_SELECTOR_HEAD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <functional>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,11 +23,11 @@ namespace util {
  */
 template <typename Tin>
 class SelectorHead : public genie::util::Drain<Tin> {
-   private:
+ private:
     std::vector<genie::util::Drain<Tin>*> mods;  //!<
     std::function<size_t(const Tin& t)> select;  //!<
 
-   protected:
+ protected:
     /**
      *
      * @param t
@@ -41,7 +42,7 @@ class SelectorHead : public genie::util::Drain<Tin> {
      */
     static size_t defaultSelect(const Tin&);
 
-   public:
+ public:
     /**
      *
      */
@@ -91,11 +92,11 @@ class SelectorHead : public genie::util::Drain<Tin> {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "selector-head.impl.h"
+#include "genie/util/selector-head.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_SELECTOR_HEAD_H
+#endif  // SRC_GENIE_UTIL_SELECTOR_HEAD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

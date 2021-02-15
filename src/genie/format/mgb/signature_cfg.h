@@ -4,17 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SIGNATURE_CFG_H
-#define GENIE_SIGNATURE_CFG_H
+#ifndef SRC_GENIE_FORMAT_MGB_SIGNATURE_CFG_H_
+#define SRC_GENIE_FORMAT_MGB_SIGNATURE_CFG_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
-#include <boost/optional/optional.hpp>
 #include <memory>
 #include <vector>
+#include "boost/optional/optional.hpp"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,13 +26,13 @@ namespace mgb {
  *
  */
 class SignatureCfg {
-   private:
+ private:
     boost::optional<uint16_t> num_signatures;   //!<
     std::vector<uint64_t> U_cluster_signature;  //!<
 
     uint8_t U_signature_size;  //!<
 
-   public:
+ public:
     /**
      *
      * @param _U_cluster_signature_0
@@ -74,7 +74,7 @@ class SignatureCfg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_SIGNATURE_CFG_H
+#endif  // SRC_GENIE_FORMAT_MGB_SIGNATURE_CFG_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

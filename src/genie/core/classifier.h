@@ -1,11 +1,12 @@
+
 /**
  * @file
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CLASSIFIER_H
-#define GENIE_CLASSIFIER_H
+#ifndef SRC_GENIE_CORE_CLASSIFIER_H_
+#define SRC_GENIE_CORE_CLASSIFIER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,7 +22,7 @@ namespace core {
  *
  */
 class Classifier {
-   public:
+ public:
     /**
      *
      * @return
@@ -52,7 +53,7 @@ class Classifier {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_CLASSIFIER_H
+#endif  // SRC_GENIE_CORE_CLASSIFIER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,9 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "encoder-none.h"
-
-#include <quality/paramqv1/qv_coding_config_1.h>
+#include "genie/quality/qvwriteout/encoder-none.h"
+#include <utility>
+#include "genie/quality/paramqv1/qv_coding_config_1.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

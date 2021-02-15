@@ -4,14 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_BINARIZATION_H
-#define GENIE_BINARIZATION_H
+#ifndef SRC_GENIE_ENTROPY_PARAMCABAC_BINARIZATION_H_
+#define SRC_GENIE_ENTROPY_PARAMCABAC_BINARIZATION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitwriter.h>
-#include "binarization_parameters.h"
-#include "context.h"
+#include "genie/entropy/paramcabac/binarization_parameters.h"
+#include "genie/entropy/paramcabac/context.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ namespace paramcabac {
  *
  */
 class Binarization {
-   public:
+ public:
     /**
      *
      */
@@ -100,7 +100,7 @@ class Binarization {
                cabac_context_parameters == bin.cabac_context_parameters;
     }
 
-   private:
+ private:
     BinarizationParameters::BinarizationId binarization_ID;  //!<
     uint8_t bypass_flag;                                     //!<
     BinarizationParameters cabac_binarization_parameters;    //!<
@@ -115,7 +115,7 @@ class Binarization {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_BINARIZATION_H
+#endif  // SRC_GENIE_ENTROPY_PARAMCABAC_BINARIZATION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

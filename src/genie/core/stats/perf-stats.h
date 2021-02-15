@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef PERF_STATS_H_
-#define PERF_STATS_H_
+#ifndef SRC_GENIE_CORE_STATS_PERF_STATS_H_
+#define SRC_GENIE_CORE_STATS_PERF_STATS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@ namespace stats {
  *
  */
 class PerfStats {
-   public:
+ public:
     /**
      *
      */
@@ -101,7 +101,7 @@ class PerfStats {
      */
     bool isActive() const;
 
-   private:
+ private:
     bool active{true};                 //!<
     std::map<std::string, Stat> data;  //!<
 };
@@ -122,7 +122,7 @@ std::ostream& operator<<(std::ostream& stream, const PerfStats& stats);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // PERF_STATS_H_
+#endif  // SRC_GENIE_CORE_STATS_PERF_STATS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

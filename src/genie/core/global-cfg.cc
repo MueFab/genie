@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "global-cfg.h"
+#include "genie/core/global-cfg.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

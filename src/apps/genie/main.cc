@@ -4,12 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <genie/module/manager.h>
-#include <genie/run/main.h>
-#include <genie/util/runtime-exception.h>
-#include <cli11/CLI11.hpp>
+#include "genie/run/main.h"
 #include <iostream>
 #include <string>
+#include "cli11/CLI11.hpp"
+#include "genie/module/manager.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -38,7 +38,8 @@ int main(int argc, char* argv[]) {
     try {
         UTILS_DIE_IF(argc <= OPERATION_INDEX, "No operation specified, type 'genie help' for more info.");
         std::string operation = argv[OPERATION_INDEX];
-        transform(operation.begin(), operation.end(), operation.begin(), [](char x) -> char {return (char)tolower(x);});
+        transform(operation.begin(), operation.end(), operation.begin(),
+                  [](char x) -> char { return static_cast<char>(tolower(x)); });
         if (operation == "run") {
             genieapp::run::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else if (operation == "stat") {
@@ -48,7 +49,6 @@ int main(int argc, char* argv[]) {
         } else {
             UTILS_DIE("Unknown operation " + operation);
         }
-
     } catch (const genie::util::Exception& e) {
         std::cerr << "ERROR: " << e.what() << std::endl;
         return -1;

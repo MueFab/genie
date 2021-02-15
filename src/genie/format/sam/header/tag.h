@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_TAG_H
-#define GENIE_TAG_H
+#ifndef SRC_GENIE_FORMAT_SAM_HEADER_TAG_H_
+#define SRC_GENIE_FORMAT_SAM_HEADER_TAG_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -39,10 +39,10 @@ enum class Platform : uint8_t {
 // ---------------------------------------------------------------------------------------------------------------------
 
 class TagBase {
-   private:
+ private:
     std::string name;
 
-   public:
+ public:
     explicit TagBase(std::string _name);
     const std::string& getName() const;
     virtual std::string toString() const = 0;
@@ -72,7 +72,7 @@ const std::string& getSAMRegex();
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_TAG_H
+#endif  // SRC_GENIE_FORMAT_SAM_HEADER_TAG_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

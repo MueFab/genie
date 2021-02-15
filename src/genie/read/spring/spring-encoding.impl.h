@@ -4,8 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SPRING_ENCODING_IMPL_H
-#define GENIE_SPRING_ENCODING_IMPL_H
+#ifndef SRC_GENIE_READ_SPRING_SPRING_ENCODING_IMPL_H_
+#define SRC_GENIE_READ_SPRING_SPRING_ENCODING_IMPL_H_
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <list>
+#include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -39,7 +44,7 @@ std::string bitsettostring(std::bitset<bitset_size> b, const uint16_t readlen,
     static const char revinttochar[8] = {'A', 'N', 'G', 0, 'C', 0, 'T', 0};
     std::string s;
     s.resize(readlen);
-    unsigned long long ull;
+    uint64_t ull;
     for (int i = 0; i < 3 * readlen / 63 + 1; i++) {
         ull = (b & egb.mask63).to_ullong();
         b >>= 63;
@@ -122,15 +127,14 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
             if (!(in_flag >> c)) done = true;
             if (!done) {
                 std::getline(f, current);
-                rc = (char)in_RC.get();
-                in_pos.read((char *)&p, sizeof(int64_t));
-                in_order.read((char *)&ord, sizeof(uint32_t));
-                in_readlength.read((char *)&rl, sizeof(uint16_t));
+                rc = static_cast<char>(in_RC.get());
+                in_pos.read(reinterpret_cast<char *>(&p), sizeof(int64_t));
+                in_order.read(reinterpret_cast<char *>(&ord), sizeof(uint32_t));
+                in_readlength.read(reinterpret_cast<char *>(&rl), sizeof(uint16_t));
             }
-            if (c == '0' || done || list_size > 10000000)  // limit on list size so
-                                                           // that memory doesn't get
-                                                           // too large
-            {
+            if (c == '0' || done || list_size > 10000000) {  // limit on list size so
+                                                             // that memory doesn't get
+                                                             // too large
                 if (list_size != 0) {
                     // sort contig according to pos
                     current_contig.sort([](const contig_reads &ar, const contig_reads &br) { return ar.pos < br.pos; });
@@ -146,10 +150,11 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                         // first create bitsets from first readlen positions of ref
                         forward_bitset.reset();
                         reverse_bitset.reset();
-                        stringtobitset(ref.substr(0, eg.max_readlen), (uint16_t)eg.max_readlen, forward_bitset, egb.basemask);
+                        stringtobitset(ref.substr(0, eg.max_readlen), (uint16_t)eg.max_readlen, forward_bitset,
+                                       egb.basemask);
                         stringtobitset(reverse_complement(ref.substr(0, eg.max_readlen), eg.max_readlen),
                                        (uint16_t)eg.max_readlen, reverse_bitset, egb.basemask);
-                        for (long j = 0; j < (int64_t)ref.size() - eg.max_readlen + 1; j++) {
+                        for (int64_t j = 0; j < (int64_t)ref.size() - eg.max_readlen + 1; j++) {
                             // search for singleton reads
                             for (int rev = 0; rev < 2; rev++) {
                                 for (int l = 0; l < eg.numdict_s; l++) {
@@ -170,8 +175,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                         // dictpos
 #endif
                                     dict[l].findpos(dictidx, startposidx);
-                                    if (dict[l].empty_bin[startposidx])  // bin is empty
-                                    {
+                                    if (dict[l].empty_bin[startposidx]) {  // bin is empty
 #ifdef GENIE_USE_OPENMP
                                         dict_lock[startposidx].unset();
 #endif
@@ -180,20 +184,21 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                     uint64_t ull1 =
                                         ((read[dict[l].read_id[dictidx[0]]] & mask1[l]) >> 3 * dict[l].start)
                                             .to_ullong();
-                                    if (ull == ull1)  // checking if ull is actually the key for this bin
-                                    {
+                                    if (ull == ull1) {  // checking if ull is actually the key for this bin
                                         for (int64_t i = dictidx[1] - 1; i >= dictidx[0] && i >= dictidx[1] - maxsearch;
                                              i--) {
                                             auto rid = dict[l].read_id[i];
                                             int hamming;
                                             if (!rev)
-                                                hamming = int(((forward_bitset ^ read[rid]) &
-                                                           mask[0][eg.max_readlen - read_lengths_s[rid]])
-                                                              .count());
+                                                hamming =
+                                                    static_cast<int>(((forward_bitset ^ read[rid]) &
+                                                                      mask[0][eg.max_readlen - read_lengths_s[rid]])
+                                                                         .count());
                                             else
-                                                hamming = int(((reverse_bitset ^ read[rid]) &
-                                                           mask[0][eg.max_readlen - read_lengths_s[rid]])
-                                                              .count());
+                                                hamming =
+                                                    static_cast<int>(((reverse_bitset ^ read[rid]) &
+                                                                      mask[0][eg.max_readlen - read_lengths_s[rid]])
+                                                                         .count());
                                             if (hamming <= thresh_s) {
 #ifdef GENIE_USE_OPENMP
                                                 read_lock[rid].set();
@@ -206,12 +211,11 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                                 read_lock[rid].unset();
 #endif
                                             }
-                                            if (flag == 1)  // match found
-                                            {
+                                            if (flag == 1) {  // match found
                                                 flag = 0;
                                                 list_size++;
                                                 char l_rc = rev ? 'r' : 'd';
-                                                long pos = rev ? (j + eg.max_readlen - read_lengths_s[rid]) : j;
+                                                int64_t pos = rev ? (j + eg.max_readlen - read_lengths_s[rid]) : j;
                                                 std::string read_string =
                                                     rev ? reverse_complement(bitsettostring<bitset_size>(
                                                                                  read[rid], read_lengths_s[rid], egb),
@@ -253,8 +257,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                         }
                                 }
                             }
-                            if (j != (int64_t)ref.size() - eg.max_readlen)  // not at last position,shift bitsets
-                            {
+                            if (j != (int64_t)ref.size() - eg.max_readlen) {  // not at last position,shift bitsets
                                 forward_bitset >>= 3;
                                 forward_bitset = forward_bitset & mask[0][0];
                                 forward_bitset |= egb.basemask[eg.max_readlen - 1][(uint8_t)ref[j + eg.max_readlen]];
@@ -263,7 +266,6 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                                 reverse_bitset |=
                                     egb.basemask[0][(uint8_t)chartorevchar[(uint8_t)ref[j + eg.max_readlen]]];
                             }
-
                         }  // end for
                     }      // end if
                     // sort contig according to pos
@@ -275,8 +277,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
                     current_contig = {{current, p, rc, ord, rl}};
                     list_size = 1;
                 }
-            } else if (c == '1')  // read found during rightward search
-            {
+            } else if (c == '1') {  // read found during rightward search
                 current_contig.push_back({current, p, rc, ord, rl});
                 list_size++;
             }
@@ -360,8 +361,8 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     for (uint32_t i = 0; i < eg.numreads_s; i++)
         if (remainingreads[i] == 1) {
             matched_s--;
-            f_order.write((char *)&order_s[i], sizeof(uint32_t));
-            f_readlength.write((char *)&read_lengths_s[i], sizeof(uint16_t));
+            f_order.write(reinterpret_cast<char *>(&order_s[i]), sizeof(uint32_t));
+            f_readlength.write(reinterpret_cast<char *>(&read_lengths_s[i]), sizeof(uint16_t));
             f_unaligned << bitsettostring<bitset_size>(read[i], read_lengths_s[i], egb);
         }
     uint32_t matched_N = eg.numreads_N;
@@ -369,8 +370,8 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
         if (remainingreads[i] == 1) {
             matched_N--;
             f_unaligned << bitsettostring<bitset_size>(read[i], read_lengths_s[i], egb);
-            f_order.write((char *)&order_s[i], sizeof(uint32_t));
-            f_readlength.write((char *)&read_lengths_s[i], sizeof(uint16_t));
+            f_order.write(reinterpret_cast<char *>(&order_s[i]), sizeof(uint32_t));
+            f_readlength.write(reinterpret_cast<char *>(&read_lengths_s[i]), sizeof(uint16_t));
         }
     f_order.close();
     f_readlength.close();
@@ -391,11 +392,11 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     std::ofstream fout_pos(eg.outfile_pos, std::ios::binary);
     for (int tid = 0; tid < eg.num_thr; tid++) {
         std::ifstream fin_pos(eg.outfile_pos + '.' + std::to_string(tid), std::ios::binary);
-        fin_pos.read((char *)&abs_pos_thr, sizeof(uint64_t));
+        fin_pos.read(reinterpret_cast<char *>(&abs_pos_thr), sizeof(uint64_t));
         while (!fin_pos.eof()) {
             abs_pos_thr += abs_pos;
-            fout_pos.write((char *)&abs_pos_thr, sizeof(uint64_t));
-            fin_pos.read((char *)&abs_pos_thr, sizeof(uint64_t));
+            fout_pos.write(reinterpret_cast<char *>(&abs_pos_thr), sizeof(uint64_t));
+            fin_pos.read(reinterpret_cast<char *>(&abs_pos_thr), sizeof(uint64_t));
         }
         fin_pos.close();
         remove((eg.outfile_pos + '.' + std::to_string(tid)).c_str());
@@ -475,16 +476,17 @@ void readsingletons(std::bitset<bitset_size> *read, uint32_t *order_s, uint16_t 
     f.open(eg.infile_N);
     for (uint32_t i = eg.numreads_s; i < eg.numreads_s + eg.numreads_N; i++) {
         std::getline(f, s);
-        read_lengths_s[i] = uint16_t (s.length());
+        read_lengths_s[i] = uint16_t(s.length());
         stringtobitset<bitset_size>(s, read_lengths_s[i], read[i], egb.basemask);
     }
     std::ifstream f_order_s(eg.infile_order + ".singleton", std::ios::binary);
-    for (uint32_t i = 0; i < eg.numreads_s; i++) f_order_s.read((char *)&order_s[i], sizeof(uint32_t));
+    for (uint32_t i = 0; i < eg.numreads_s; i++)
+        f_order_s.read(reinterpret_cast<char *>(&order_s[i]), sizeof(uint32_t));
     f_order_s.close();
     remove((eg.infile_order + ".singleton").c_str());
     std::ifstream f_order_N(eg.infile_order_N, std::ios::binary);
     for (uint32_t i = eg.numreads_s; i < eg.numreads_s + eg.numreads_N; i++)
-        f_order_N.read((char *)&order_s[i], sizeof(uint32_t));
+        f_order_N.read(reinterpret_cast<char *>(&order_s[i]), sizeof(uint32_t));
     f_order_N.close();
 }
 
@@ -558,7 +560,7 @@ void encoder_main(const std::string &temp_dir, const compression_params &cp) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_SPRING_ENCODING_IMPL_H
+#endif  // SRC_GENIE_READ_SPRING_SPRING_ENCODING_IMPL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

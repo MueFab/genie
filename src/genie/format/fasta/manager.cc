@@ -4,8 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "manager.h"
-#include "reference.h"
+#include "genie/format/fasta/manager.h"
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+#include "genie/format/fasta/reference.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

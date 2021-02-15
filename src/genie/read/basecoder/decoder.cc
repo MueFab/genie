@@ -4,9 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "decoder.h"
-#include <genie/core/record/alignment_split/same-rec.h>
-#include <qv-decoder.h>
+#include "genie/read/basecoder/decoder.h"
+#include <tuple>
+#include <utility>
+#include "genie/core/qv-decoder.h"
+#include "genie/core/record/alignment_split/same-rec.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -75,7 +77,7 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(siz
                                ? 0
                                : container.pull(core::GenSub::FLAGS_PROPER_PAIR)
                                      << core::GenConst::FLAGS_PROPER_PAIR_POS;
-    const auto FLAGS = uint8_t (FLAG_PCR | FLAG_QUAL | FLAG_PAIR);
+    const auto FLAGS = uint8_t(FLAG_PCR | FLAG_QUAL | FLAG_PAIR);
 
     const auto MSCORE = (uint32_t)container.pull(core::GenSub::MSCORE);
 
@@ -161,7 +163,7 @@ void Decoder::decodeAdditional(size_t softclip_offset, std::string &&seq, std::s
     const auto PAIRING_CASE = container.pull(core::GenSub::PAIR_DECODING_CASE);
     UTILS_DIE_IF(PAIRING_CASE != core::GenConst::PAIR_SAME_RECORD, "Same-Record pair decoding supported only!");
 
-    const auto SAME_REC_DATA = (uint32_t )container.pull(core::GenSub::PAIR_SAME_REC);
+    const auto SAME_REC_DATA = (uint32_t)container.pull(core::GenSub::PAIR_SAME_REC);
     //        const bool FIRST1 = SAME_REC_DATA & 1u;
     const uint32_t DELTA = SAME_REC_DATA >> 1u;
 
@@ -209,10 +211,13 @@ void Decoder::decodeMismatches(size_t clip_offset, std::string &sequence, std::s
         const auto POSITION = mismatchPosition - 1 + clip_offset;
         const auto TYPE = container.pull((core::GenSub::MMTYPE_TYPE));
         if (TYPE == core::GenConst::MMTYPE_SUBSTITUTION) {
-            const auto SUBSTITUTION = container.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()->dataLeft()
-                                          ? container.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()
-                                                ->decodeMismatch(getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[sequence[POSITION]])
-                                          : getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N'];
+            const auto SUBSTITUTION =
+                container.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()->dataLeft()
+                    ? container.get(core::GenSub::MMTYPE_SUBSTITUTION)
+                          .getMismatchDecoder()
+                          ->decodeMismatch(
+                              getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[sequence[POSITION]])
+                    : getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N'];
             const auto SUBSTITUTION_CHAR = getAlphabetProperties(core::AlphabetID::ACGTN).lut[SUBSTITUTION];
             sequence[POSITION] = SUBSTITUTION_CHAR;
             cigar_extended[POSITION + cigarOffset] = SUBSTITUTION_CHAR;
@@ -275,7 +280,7 @@ std::tuple<size_t, size_t> Decoder::decodeClips(std::vector<std::string> &sequen
 
             if (seq_position == 0) {
                 if (record_no == 0) {
-                    std::get<0>(softclip_offset) = softClip.length();  // TODO: not working for paired
+                    std::get<0>(softclip_offset) = softClip.length();  // TODO(Fabian): not working for paired
                 } else {
                     std::get<1>(softclip_offset) = softClip.length();
                 }

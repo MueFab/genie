@@ -4,16 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "encoder.h"
-#include <genie/quality/paramqv1/qv_coding_config_1.h>
-#include <genie/util/thread-manager.h>
-#include <genie/util/watch.h>
+#include "genie/read/spring/encoder.h"
 #include <iostream>
+#include <string>
 #include <utility>
-#include "call-template-functions.h"
-#include "encoder-source.h"
-#include "generate-read-streams.h"
-#include "reorder-compress-quality-id.h"
+#include <vector>
+#include "genie/quality/paramqv1/qv_coding_config_1.h"
+#include "genie/read/spring/call-template-functions.h"
+#include "genie/read/spring/encoder-source.h"
+#include "genie/read/spring/generate-read-streams.h"
+#include "genie/read/spring/reorder-compress-quality-id.h"
+#include "genie/util/thread-manager.h"
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

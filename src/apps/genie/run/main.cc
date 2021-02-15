@@ -4,26 +4,32 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <genie/core/format-importer-null.h>
-#include <genie/core/name-encoder-none.h>
-#include <genie/util/watch.h>
-#include <genie/format/fasta/exporter.h>
-#include <genie/format/fasta/manager.h>
-#include <genie/format/fastq/exporter.h>
-#include <genie/format/fastq/importer.h>
-#include <genie/format/mgb/exporter.h>
-#include <genie/format/mgb/importer.h>
-#include <genie/format/mgrec/exporter.h>
-#include <genie/format/mgrec/importer.h>
-#include <genie/format/sam/exporter.h>
-#include <genie/format/sam/importer.h>
-#include <genie/module/default-setup.h>
-#include <genie/read/lowlatency/encoder.h>
-#include <filesystem/filesystem.hpp>
-#include "program-options.h"
-
-#include <genie/quality/qvwriteout/encoder-none.h>
+#include "apps/genie/run/main.h"
 #include <iostream>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+#include "apps/genie/run/program-options.h"
+#include "genie/core/format-importer-null.h"
+#include "genie/core/name-encoder-none.h"
+#include "genie/format/fasta/exporter.h"
+#include "genie/format/fasta/manager.h"
+#include "genie/format/fastq/exporter.h"
+#include "genie/format/fastq/importer.h"
+#include "genie/format/mgb/exporter.h"
+#include "genie/format/mgb/importer.h"
+#include "genie/format/mgrec/exporter.h"
+#include "genie/format/mgrec/importer.h"
+#include "genie/format/sam/exporter.h"
+#include "genie/format/sam/importer.h"
+#include "genie/module/default-setup.h"
+#include "genie/quality/qvwriteout/encoder-none.h"
+#include "genie/read/lowlatency/encoder.h"
+#include "genie/util/watch.h"
+
+// TODO(Fabian): For some reason, compilation on windows fails if we move this include further up. Investigate.
+#include "filesystem/filesystem.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -36,7 +42,7 @@ std::string file_extension(const std::string& path) {
     auto pos = path.find_last_of('.');
     std::string ext = path.substr(pos + 1);
     for (auto& c : ext) {
-        c = (char)std::tolower(c);
+        c = static_cast<char>(std::tolower(c));
     }
     return ext;
 }

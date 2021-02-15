@@ -4,24 +4,26 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_RECORD_H
-#define GENIE_RECORD_H
+#ifndef SRC_GENIE_CORE_RECORD_RECORD_H_
+#define SRC_GENIE_CORE_RECORD_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/constants.h>
-#include <genie/core/record/alignment_split/same-rec.h>
-#include <genie/core/stats/perf-stats.h>
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
 #include <cstdint>
 #include <memory>
+#include <string>
+#include <utility>
 #include <vector>
-#include "alignment-box.h"
-#include "alignment-external.h"
-#include "alignment-shared-data.h"
-#include "class-type.h"
-#include "segment.h"
+#include "genie/core/constants.h"
+#include "genie/core/record/alignment-box.h"
+#include "genie/core/record/alignment-external.h"
+#include "genie/core/record/alignment-shared-data.h"
+#include "genie/core/record/alignment_split/same-rec.h"
+#include "genie/core/record/class-type.h"
+#include "genie/core/record/segment.h"
+#include "genie/core/stats/perf-stats.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -33,7 +35,7 @@ namespace record {
  *
  */
 class Record {
-   private:
+ private:
     uint8_t number_of_template_segments{};    //!<
     ClassType class_ID{ClassType::NONE};      //!<
     bool read_1_first{};                      //!<
@@ -47,7 +49,7 @@ class Record {
 
     std::unique_ptr<AlignmentExternal> moreAlignmentInfo;  //!<
 
-   public:
+ public:
     /**
      *
      */
@@ -62,7 +64,7 @@ class Record {
      * @param _flags
      */
     Record(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::string&& _read_name,
-           std::string&& _read_group, uint8_t _flags, bool _is_read_1_first=true);
+           std::string&& _read_group, uint8_t _flags, bool _is_read_1_first = true);
 
     /**
      *
@@ -240,7 +242,6 @@ class Record {
      * @return
      */
     void setMoreAlignmentInfo(std::unique_ptr<AlignmentExternal> _more_alignment_info);
-
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -251,7 +252,7 @@ class Record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_RECORD_H
+#endif  // SRC_GENIE_CORE_RECORD_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

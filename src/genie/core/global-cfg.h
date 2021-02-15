@@ -4,12 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_GLOBAL_CFG_H
-#define GENIE_GLOBAL_CFG_H
+#ifndef SRC_GENIE_CORE_GLOBAL_CFG_H_
+#define SRC_GENIE_CORE_GLOBAL_CFG_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/industrial-park.h>
+#include "genie/util/industrial-park.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,7 +20,7 @@ namespace core {
  * @brief Configuration regarding modules, factories, ...
  */
 class GlobalCfg {
-   private:
+ private:
     /**
      *
      */
@@ -34,7 +34,7 @@ class GlobalCfg {
 
     util::IndustrialPark fpark;  //! @brief Our factories
 
-   public:
+ public:
     /**
      * @brief Access the set of all active factories
      * @return Factories
@@ -55,7 +55,7 @@ class GlobalCfg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_GLOBAL_CFG_H
+#endif  // SRC_GENIE_CORE_GLOBAL_CFG_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

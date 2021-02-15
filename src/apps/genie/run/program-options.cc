@@ -4,14 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "program-options.h"
-#include <genie/util/runtime-exception.h>
-#include <cli11/CLI11.hpp>
-#include <filesystem/filesystem.hpp>
+#include "apps/genie/run/program-options.h"
 #include <iostream>
 #include <set>
 #include <string>
 #include <thread>
+#include <vector>
+#include "cli11/CLI11.hpp"
+#include "filesystem/filesystem.hpp"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

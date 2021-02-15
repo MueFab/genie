@@ -4,25 +4,28 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "default-setup.h"
-
-#include <genie/core/classifier-bypass.h>
-#include <genie/core/classifier-regroup.h>
-#include <genie/core/flowgraph-convert.h>
-#include <genie/entropy/gabac/decoder.h>
-#include <genie/entropy/gabac/encoder.h>
-#include <genie/name/tokenizer/decoder.h>
-#include <genie/name/tokenizer/encoder.h>
-#include <genie/quality/qvwriteout/decoder.h>
-#include <genie/quality/qvwriteout/encoder.h>
-#include <genie/read/localassembly/decoder.h>
-#include <genie/read/localassembly/encoder.h>
-#include <genie/read/lowlatency/decoder.h>
-#include <genie/read/lowlatency/encoder.h>
-#include <genie/read/refcoder/decoder.h>
-#include <genie/read/refcoder/encoder.h>
-#include <genie/read/spring/decoder.h>
-#include <genie/read/spring/encoder.h>
+#include "genie/module/default-setup.h"
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+#include "genie/core/classifier-bypass.h"
+#include "genie/core/classifier-regroup.h"
+#include "genie/core/flowgraph-convert.h"
+#include "genie/entropy/gabac/decoder.h"
+#include "genie/entropy/gabac/encoder.h"
+#include "genie/name/tokenizer/decoder.h"
+#include "genie/name/tokenizer/encoder.h"
+#include "genie/quality/qvwriteout/decoder.h"
+#include "genie/quality/qvwriteout/encoder.h"
+#include "genie/read/localassembly/decoder.h"
+#include "genie/read/localassembly/encoder.h"
+#include "genie/read/lowlatency/decoder.h"
+#include "genie/read/lowlatency/encoder.h"
+#include "genie/read/refcoder/decoder.h"
+#include "genie/read/refcoder/encoder.h"
+#include "genie/read/spring/decoder.h"
+#include "genie/read/spring/encoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

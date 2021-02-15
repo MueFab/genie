@@ -4,16 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "decoder.h"
-#include "decode-transformed-subseq.h"
-#include "stream-handler.h"
-
-#include <genie/util/runtime-exception.h>
-#include <genie/util/watch.h>
-
-#include "mismatch-decoder.h"
-
+#include "genie/entropy/gabac/decoder.h"
 #include <iostream>
+#include <tuple>
+#include <utility>
+#include "genie/entropy/gabac/decode-transformed-subseq.h"
+#include "genie/entropy/gabac/mismatch-decoder.h"
+#include "genie/entropy/gabac/stream-handler.h"
+#include "genie/util/runtime-exception.h"
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -37,8 +36,8 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
     uint16_t num_tokentype_descriptors = 0;
     {
         const size_t READAHEAD = 6;
-        util::DataBlock tmp =
-            util::DataBlock(static_cast<uint8_t*>(remainingData.getData()), READAHEAD, (uint8_t)remainingData.getWordSize());
+        util::DataBlock tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()), READAHEAD,
+                                              (uint8_t)remainingData.getWordSize());
         gabac::IBufferStream stream(&tmp);
         util::BitReader reader(stream);
 
@@ -67,11 +66,13 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
 
         tmp = util::DataBlock(static_cast<uint8_t*>(remainingData.getData()) + offset,
                               remainingData.getRawSize() - offset, remainingData.getWordSize());
-        offset += gabac::decodeTransformSubseq(conf0.getSubseqConfig().getTransformSubseqCfg(0), (unsigned int)numSymbols, &tmp);
+        offset += gabac::decodeTransformSubseq(conf0.getSubseqConfig().getTransformSubseqCfg(0),
+                                               (unsigned int)numSymbols, &tmp);
         while (ret.getSize() < mappedTypeId) {
-            ret.add(core::AccessUnit::Subsequence(1, GenSubIndex{GenDesc::RNAME, (uint16_t)ret.getSize()}));
+            ret.add(core::AccessUnit::Subsequence(1, core::GenSubIndex{core::GenDesc::RNAME, (uint16_t)ret.getSize()}));
         }
-        ret.add(core::AccessUnit::Subsequence(std::move(tmp), GenSubIndex{GenDesc::RNAME, (uint16_t)mappedTypeId}));
+        ret.add(core::AccessUnit::Subsequence(std::move(tmp),
+                                              core::GenSubIndex{core::GenDesc::RNAME, (uint16_t)mappedTypeId}));
     }
     return ret;
 }
@@ -79,11 +80,10 @@ core::AccessUnit::Descriptor decompressTokens(const gabac::EncodingConfiguration
 // ---------------------------------------------------------------------------------------------------------------------
 
 core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfiguration& conf,
-                                                  core::AccessUnit::Subsequence&& data,
-                                                  bool mmCoderEnabled) {
+                                                  core::AccessUnit::Subsequence&& data, bool mmCoderEnabled) {
     core::AccessUnit::Subsequence in = std::move(data);
 
-    if(getDescriptor(in.getID().first).getSubSeq((uint8_t)in.getID().second).mismatchDecoding && mmCoderEnabled) {
+    if (getDescriptor(in.getID().first).getSubSeq((uint8_t)in.getID().second).mismatchDecoding && mmCoderEnabled) {
         in.attachMismatchDecoder(util::make_unique<MismatchDecoder>(in.move(), conf));
         return in;
     }
@@ -116,7 +116,7 @@ core::AccessUnit::Subsequence Decoder::decompress(const gabac::EncodingConfigura
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::process(
-    const parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d, bool mmCoderEnabled) {
+    const core::parameter::DescriptorSubseqCfg& param, core::AccessUnit::Descriptor& d, bool mmCoderEnabled) {
     util::Watch watch;
     std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> desc;
     std::get<0>(desc) = std::move(d);
@@ -163,8 +163,8 @@ std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> Decoder::proces
                     subseq.getRawSize());
             }
 
-            std::get<0>(desc).set(d_id.second,
-                                  decompress(gabac::EncodingConfiguration(std::move(conf0)), std::move(subseq), mmCoderEnabled));
+            std::get<0>(desc).set(d_id.second, decompress(gabac::EncodingConfiguration(std::move(conf0)),
+                                                          std::move(subseq), mmCoderEnabled));
 
             if (!std::get<0>(desc).get(d_id.second).isEmpty()) {
                 std::get<1>(desc).addInteger("size-gabac-total-raw", std::get<0>(desc).get(d_id.second).getRawSize());

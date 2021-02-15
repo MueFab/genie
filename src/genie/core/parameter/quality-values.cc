@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "quality-values.h"
+#include "genie/core/parameter/quality-values.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

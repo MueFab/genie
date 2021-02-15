@@ -4,14 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "luts-subsymbol-transform.h"
-
+#include "genie/entropy/gabac/luts-subsymbol-transform.h"
 #include <algorithm>
 #include <functional>
 #include <vector>
-
-#include <genie/util/block-stepper.h>
-#include <genie/util/data-block.h>
+#include "genie/util/block-stepper.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,8 +25,7 @@ bool LutEntry::operator>=(const LutEntry& entry) const { return (freq >= entry.f
 
 LutOrder1 LUTsSubSymbolTransform::getInitLutsOrder1(uint64_t numAlphaSubsym) {
     return std::vector<LutRow>(numAlphaSubsym, {std::vector<LutEntry>(numAlphaSubsym, {0, 0}),  // value, freq
-                                                0}                                              // numMaxElems
-    );
+                                                0});
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -36,13 +33,22 @@ LutOrder1 LUTsSubSymbolTransform::getInitLutsOrder1(uint64_t numAlphaSubsym) {
 LUTsSubSymbolTransform::LUTsSubSymbolTransform(const paramcabac::SupportValues& _supportVals,
                                                const paramcabac::StateVars& _stateVars, uint8_t _numLuts,
                                                uint8_t _numPrvs, const bool _modeFlag)
-    : supportVals(_supportVals), stateVars(_stateVars), numLuts(_numLuts), numPrvs(_numPrvs), encodingModeFlag(_modeFlag) {}
+    : supportVals(_supportVals),
+      stateVars(_stateVars),
+      numLuts(_numLuts),
+      numPrvs(_numPrvs),
+      encodingModeFlag(_modeFlag) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 LUTsSubSymbolTransform::LUTsSubSymbolTransform(const LUTsSubSymbolTransform& src)
-    : supportVals(src.supportVals), stateVars(src.stateVars), numLuts(src.numLuts), numPrvs(src.numPrvs),
-      encodingModeFlag(src.encodingModeFlag), lutsO1(src.lutsO1), lutsO2(src.lutsO2) {}
+    : supportVals(src.supportVals),
+      stateVars(src.stateVars),
+      numLuts(src.numLuts),
+      numPrvs(src.numPrvs),
+      encodingModeFlag(src.encodingModeFlag),
+      lutsO1(src.lutsO1),
+      lutsO2(src.lutsO2) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

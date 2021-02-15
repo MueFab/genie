@@ -4,15 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CABAC_DECODER_CONF_H
-#define GENIE_CABAC_DECODER_CONF_H
+#ifndef SRC_GENIE_ENTROPY_PARAMCABAC_DECODER_H_
+#define SRC_GENIE_ENTROPY_PARAMCABAC_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/parameter/descriptor_present/decoder-regular.h>
-#include <genie/core/parameter/descriptor_present/decoder-tokentype.h>
-#include <genie/util/bitwriter.h>
-#include "subsequence.h"
+#include <memory>
+#include <vector>
+#include "genie/core/parameter/descriptor_present/decoder-regular.h"
+#include "genie/core/parameter/descriptor_present/decoder-tokentype.h"
+#include "genie/entropy/paramcabac/subsequence.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,11 +26,11 @@ namespace paramcabac {
  *
  */
 class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
-   protected:
+ protected:
     uint8_t rle_guard_tokentype : 8;                       //!<
     std::vector<Subsequence> descriptor_subsequence_cfgs;  //!<
 
-   public:
+ public:
     static const uint8_t MODE_CABAC = 0;  //!<
 
     bool equals(const Decoder *dec) const override {
@@ -41,7 +43,7 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
     /**
      *
      */
-    explicit DecoderTokenType();
+    DecoderTokenType();
 
     /**
      *
@@ -81,7 +83,8 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
      * @param reader
      * @return
      */
-    static std::unique_ptr<core::parameter::desc_pres::DecoderTokentype> create(genie::core::GenDesc desc, util::BitReader &reader);
+    static std::unique_ptr<core::parameter::desc_pres::DecoderTokentype> create(genie::core::GenDesc desc,
+                                                                                util::BitReader &reader);
 
     /**
      *
@@ -100,10 +103,10 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
  *
  */
 class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
-   protected:
+ protected:
     std::vector<Subsequence> descriptor_subsequence_cfgs;  //!<
 
-   public:
+ public:
     static const uint8_t MODE_CABAC = 0;  //!<
 
     bool equals(const Decoder *dec) const override {
@@ -160,7 +163,8 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
      * @param reader
      * @return
      */
-    static std::unique_ptr<core::parameter::desc_pres::DecoderRegular> create(genie::core::GenDesc desc, util::BitReader &reader);
+    static std::unique_ptr<core::parameter::desc_pres::DecoderRegular> create(genie::core::GenDesc desc,
+                                                                              util::BitReader &reader);
 
     /**
      *
@@ -177,7 +181,7 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DECODER_H
+#endif  // SRC_GENIE_ENTROPY_PARAMCABAC_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

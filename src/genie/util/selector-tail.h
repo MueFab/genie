@@ -4,12 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SELECTOR_TAIL_H
-#define GENIE_SELECTOR_TAIL_H
+#ifndef SRC_GENIE_UTIL_SELECTOR_TAIL_H_
+#define SRC_GENIE_UTIL_SELECTOR_TAIL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "source.h"
+#include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,16 +22,16 @@ namespace util {
  */
 template <typename Tout>
 class SelectorTail : public genie::util::Source<Tout>, public genie::util::Drain<Tout> {
-   private:
+ private:
     size_t dryCtr{};    //!<
     size_t modNum{};    //!<
     size_t position{};  //!<
 
-   public:
+ public:
     /**
      *
      */
-    explicit SelectorTail();
+    SelectorTail();
 
     /**
      *
@@ -71,11 +71,11 @@ class SelectorTail : public genie::util::Source<Tout>, public genie::util::Drain
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "selector-tail.impl.h"
+#include "genie/util/selector-tail.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_SELECTOR_TAIL_H
+#endif  // SRC_GENIE_UTIL_SELECTOR_TAIL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

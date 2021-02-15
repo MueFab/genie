@@ -4,13 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "genie/entropy/gabac/merge-subseq-transform.h"
 #include <algorithm>
 #include <cassert>
 #include <iostream>
-
-#include <genie/util/block-stepper.h>
-#include <genie/util/data-block.h>
-#include "merge-subseq-transform.h"
+#include <vector>
+#include "genie/util/block-stepper.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

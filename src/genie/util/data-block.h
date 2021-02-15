@@ -4,16 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_DATA_BLOCK_H_
-#define GABAC_DATA_BLOCK_H_
+#ifndef SRC_GENIE_UTIL_DATA_BLOCK_H_
+#define SRC_GENIE_UTIL_DATA_BLOCK_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstring>
+#include <string>
+#include <utility>
 #include <vector>
-
-#include "block-stepper.h"
-#include "runtime-exception.h"
+#include "genie/util/block-stepper.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,11 +30,11 @@ struct BlockStepper;
  * efficient.
  */
 class DataBlock {
-   private:
+ private:
     uint8_t lgWordSize;         //!< @brief log2 of the wordsize. Wordsize = 1 << lgWordsize
     std::vector<uint8_t> data;  //!< @brief The actual raw data.
 
-   public:
+ public:
     /**
      * @brief Get lg base 2 of the size of one symbol in bytes
      * @return lg2 bytes of one symbol
@@ -135,11 +136,11 @@ class DataBlock {
      */
     template <typename T>
     class ProxyCore {
-       private:
+     private:
         T stream;         //!< @brief The DataBlock we are referring to.
         size_t position;  //!< @brief The position inside the datablock.
 
-       public:
+     public:
         /**
          * @brief Create access proxy
          * @param str Block we are referring to
@@ -169,11 +170,11 @@ class DataBlock {
      */
     template <typename T>
     class IteratorCore {
-       private:
+     private:
         T stream;         //!< @brief The DataBlock we are referring to.
         size_t position;  //!< @brief The position inside the datablock.
 
-       public:
+     public:
         /**
          * @brief Create iterator
          * @param str Data block
@@ -252,8 +253,7 @@ class DataBlock {
          */
         bool operator!=(const IteratorCore &c) const;
 
-        using iterator_category = std::random_access_iterator_tag; /**< @brief Iterator category for
-                                                                      STL */
+        using iterator_category = std::random_access_iterator_tag; /**< @brief Iterator category for  STL */
         using reference = ProxyCore<T>;                            /**< @brief Reference type for STL */
         using pointer = ProxyCore<T> *;                            /**< @brief Pointer type for STL */
         using value_type = ProxyCore<T>;                           /**< @brief Value type for STL */
@@ -417,11 +417,11 @@ class DataBlock {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "data-block.impl.h"
+#include "genie/util/data-block.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_DATA_BLOCK_H_
+#endif  // SRC_GENIE_UTIL_DATA_BLOCK_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

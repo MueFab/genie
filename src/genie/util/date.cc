@@ -4,10 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "date.h"
+#include "genie/util/date.h"
 #include <regex>
-#include "runtime-exception.h"
-#include "string-helpers.h"
+#include "genie/util/runtime-exception.h"
+#include "genie/util/string-helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

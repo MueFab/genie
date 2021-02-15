@@ -4,18 +4,19 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_GABAC_SEQ_CONF_SET_H
-#define GENIE_GABAC_SEQ_CONF_SET_H
+#ifndef SRC_GENIE_ENTROPY_GABAC_GABAC_SEQ_CONF_SET_H_
+#define SRC_GENIE_ENTROPY_GABAC_GABAC_SEQ_CONF_SET_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/access-unit.h>
-#include <genie/core/parameter/descriptor_present/descriptor_present.h>
-#include <genie/entropy/gabac/gabac.h>
-#include <genie/entropy/paramcabac/decoder.h>
-#include <genie/entropy/paramcabac/subsequence.h>
-#include <genie/entropy/paramcabac/transformed-subseq.h>
+#include <utility>
 #include <vector>
+#include "genie/core/access-unit.h"
+#include "genie/core/parameter/descriptor_present/descriptor_present.h"
+#include "genie/entropy/gabac/gabac.h"
+#include "genie/entropy/paramcabac/decoder.h"
+#include "genie/entropy/paramcabac/subsequence.h"
+#include "genie/entropy/paramcabac/transformed-subseq.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,13 +28,12 @@ namespace gabac {
  * @brief Manages the current set of gabac configurations and handles the translation to MPEG-G P2 parameter sets.
  */
 class GabacSeqConfSet {
-   private:
+ private:
     typedef std::vector<gabac::EncodingConfiguration> SeqConf;  //!< @brief Configuration for one genomic descriptor
     std::vector<SeqConf> conf;                                  //!< @brief Configuration for all genomic descriptors
 
     // Shortcuts
     using DescriptorSubsequenceCfg = entropy::paramcabac::Subsequence;
-    using DecoderConfigurationCabac = entropy::paramcabac::DecoderRegular;
     using ParameterSet = core::parameter::ParameterSet;
 
     /**
@@ -47,8 +47,6 @@ class GabacSeqConfSet {
     template <typename T>
     static const T &loadDescriptorDecoderCfg(const GabacSeqConfSet::ParameterSet &parameterSet,
                                              core::GenDesc descriptor_id) {
-        using namespace entropy::paramcabac;
-
         auto &curDesc = parameterSet.getDescriptor(descriptor_id);
         UTILS_DIE_IF(curDesc.isClassSpecific(), "Class specific config not supported");
         auto PRESENT = core::parameter::desc_pres::DescriptorPresent::PRESENT;
@@ -61,7 +59,7 @@ class GabacSeqConfSet {
         return dynamic_cast<const T &>(decoder_conf);
     }
 
-   public:
+ public:
     /**
      * @brief Retrieve a configuration from the current set, fitting for the specified subsequence
      * @param sub - identifies descriptor subseuqence
@@ -131,7 +129,7 @@ class GabacSeqConfSet {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_GABAC_SEQ_CONF_SET_H
+#endif  // SRC_GENIE_ENTROPY_GABAC_GABAC_SEQ_CONF_SET_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

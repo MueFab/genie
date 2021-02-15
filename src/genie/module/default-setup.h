@@ -4,15 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DEFAULTSETUP_H
-#define GENIE_DEFAULTSETUP_H
+#ifndef SRC_GENIE_MODULE_DEFAULT_SETUP_H_
+#define SRC_GENIE_MODULE_DEFAULT_SETUP_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/classifier-regroup.h>
-#include <genie/core/flowgraph-convert.h>
-#include <genie/core/flowgraph-decode.h>
-#include <genie/core/flowgraph-encode.h>
+#include <memory>
+#include <string>
+#include "genie/core/classifier-regroup.h"
+#include "genie/core/flowgraph-convert.h"
+#include "genie/core/flowgraph-decode.h"
+#include "genie/core/flowgraph-encode.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -51,7 +53,7 @@ std::unique_ptr<core::FlowGraphConvert> buildDefaultConverter(size_t threads);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DEFAULTSETUP_H
+#endif  // SRC_GENIE_MODULE_DEFAULT_SETUP_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,16 +4,21 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SAM_IMPORTER_H
-#define GENIE_SAM_IMPORTER_H
+#ifndef SRC_GENIE_FORMAT_SAM_IMPORTER_H_
+#define SRC_GENIE_FORMAT_SAM_IMPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/format-importer.h>
-#include <genie/core/record/record.h>
-#include <genie/util/ordered-lock.h>
+#include <list>
 #include <map>
-#include "reader.h"
+#include <memory>
+#include <string>
+#include <tuple>
+#include <vector>
+#include "genie/core/format-importer.h"
+#include "genie/core/record/record.h"
+#include "genie/format/sam/reader.h"
+#include "genie/util/ordered-lock.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +32,7 @@ typedef std::list<Record> SamRecords;
 typedef std::list<std::list<Record>> SamRecords2D;
 
 class Importer : public core::FormatImporter {
-   private:
+ private:
     size_t blockSize;
     Reader samReader;
     ReadTemplateGroup rtg;
@@ -91,7 +96,7 @@ class Importer : public core::FormatImporter {
      * @param sam_recs_2d: List of List of sam records (alignments).
      * @param refs: Map, contains Reference ID associated to each Reference Name
      */
-    static void convertPairedEndNoSplit(std::list<core::record::Record> &records, SamRecords2D& sam_recs_2d,
+    static void convertPairedEndNoSplit(std::list<core::record::Record>& records, SamRecords2D& sam_recs_2d,
                                         std::map<std::string, uint16_t>& refs);
 
     /**
@@ -118,7 +123,6 @@ class Importer : public core::FormatImporter {
     static void addAlignmentToSplitRec(std::unique_ptr<core::record::Record>& rec, Record& sam_r1, Record* sam_r2_ptr,
                                        std::map<std::string, uint16_t>& refs);
 
-
     /**
      * Convert SAM Records that belongs to the same template to SplitRec MPEG-G records
      *
@@ -126,16 +130,16 @@ class Importer : public core::FormatImporter {
      * @param sam_recs_2d
      * @param refs
      */
-    static void convertPairedEndSplitPair(std::list<core::record::Record> &records, SamRecords2D& sam_recs_2d,
+    static void convertPairedEndSplitPair(std::list<core::record::Record>& records, SamRecords2D& sam_recs_2d,
                                           std::map<std::string, uint16_t>& refs);
 
-   public:
+ public:
     /**
      *
      * @param _blockSize
      * @param _file
      */
-    Importer(size_t _blockSize, std::istream &_file);
+    Importer(size_t _blockSize, std::istream& _file);
 
     /**
      * Convert SAM flags to MPEG-G record flags
@@ -166,14 +170,14 @@ class Importer : public core::FormatImporter {
      * @param seq
      * @return
      */
-    static std::string convertCigar2ECigar(const std::string &cigar, const std::string &seq);
+    static std::string convertCigar2ECigar(const std::string& cigar, const std::string& seq);
 
     /**
      *
      * @param id
      * @return
      */
-   // bool pump(uint64_t& id, std::mutex& lock) override;
+    // bool pump(uint64_t& id, std::mutex& lock) override;
 
     /**
      *
@@ -187,25 +191,25 @@ class Importer : public core::FormatImporter {
      */
     void flushIn(uint64_t& pos) override;
 
-     /**
-      *
-      * @param records: List of MPEG-G records
-      * @param sam_recs: SAM record
-      */
-    static void convertUnmapped(std::list<core::record::Record> &records, SamRecords& sam_recs);
+    /**
+     *
+     * @param records: List of MPEG-G records
+     * @param sam_recs: SAM record
+     */
+    static void convertUnmapped(std::list<core::record::Record>& records, SamRecords& sam_recs);
 
-     /**
-      * Convert Single-end Reads SAM records to MPEG-G records
-      *
-      * @param records: List of MPEG-G records
-      * @param sam_recs: SAM record
-      * @param refs: Map, contains Reference ID associated to each Reference Name
-      * @param unmapped_pair:  SAM record has pair which is unmapped
-      * @param is_read_1_first
-      */
-    static void convertSingleEnd(std::list<core::record::Record> &records, SamRecords& sam_recs,
-                                 std::map<std::string, uint16_t>& refs,
-                                 bool unmapped_pair=false, bool is_read_1_first=true);
+    /**
+     * Convert Single-end Reads SAM records to MPEG-G records
+     *
+     * @param records: List of MPEG-G records
+     * @param sam_recs: SAM record
+     * @param refs: Map, contains Reference ID associated to each Reference Name
+     * @param unmapped_pair:  SAM record has pair which is unmapped
+     * @param is_read_1_first
+     */
+    static void convertSingleEnd(std::list<core::record::Record>& records, SamRecords& sam_recs,
+                                 std::map<std::string, uint16_t>& refs, bool unmapped_pair = false,
+                                 bool is_read_1_first = true);
 
     /**
      * Convert Paired-end Reads SAM records to MPEG-G records
@@ -215,8 +219,8 @@ class Importer : public core::FormatImporter {
      * @param refs: Map, contains Reference ID associated to each Reference Name
      * @param force_split: Force creation of MPEG-G record for each read.
      */
-    static void convertPairedEnd(std::list<core::record::Record> &records, SamRecords2D& sam_recs_2d,
-                                 std::map<std::string, uint16_t>& refs, bool force_split=false);
+    static void convertPairedEnd(std::list<core::record::Record>& records, SamRecords2D& sam_recs_2d,
+                                 std::map<std::string, uint16_t>& refs, bool force_split = false);
 
     /**
      * Convert SAM records contained in ReadTemplate data structure to MPEG-G records
@@ -226,9 +230,8 @@ class Importer : public core::FormatImporter {
      * @param refs: Map, contains Reference ID associated to each Reference Name
      * @param force_split: Force creation of MPEG-G record for each read.
      */
-    static void convert(std::list<core::record::Record> &records, ReadTemplate& rt,
-                        std::map<std::string, uint16_t>& refs,
-                        bool force_split=false);
+    static void convert(std::list<core::record::Record>& records, ReadTemplate& rt,
+                        std::map<std::string, uint16_t>& refs, bool force_split = false);
 
     /**
      * Compare mapping position of primary alignment of r1 and r2
@@ -250,7 +253,7 @@ class Importer : public core::FormatImporter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_IMPORTER_H
+#endif  // SRC_GENIE_FORMAT_SAM_IMPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

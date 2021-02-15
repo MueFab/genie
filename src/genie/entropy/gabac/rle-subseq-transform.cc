@@ -4,10 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "genie/entropy/gabac/rle-subseq-transform.h"
 #include <cassert>
-
-#include <genie/util/block-stepper.h>
-#include "rle-subseq-transform.h"
+#include <vector>
+#include "genie/util/block-stepper.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

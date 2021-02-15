@@ -4,9 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "encoder.h"
-#include <genie/read/basecoder/encoder.h>
-#include <genie/util/watch.h>
+#include "genie/read/refcoder/encoder.h"
+#include <memory>
+#include <string>
+#include <utility>
+#include "genie/read/basecoder/encoder.h"
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

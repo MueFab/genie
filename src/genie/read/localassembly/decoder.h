@@ -4,13 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_LAE_DECODER_H
-#define GENIE_LAE_DECODER_H
+#ifndef SRC_GENIE_READ_LOCALASSEMBLY_DECODER_H_
+#define SRC_GENIE_READ_LOCALASSEMBLY_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/read-decoder.h>
-#include "local-reference.h"
+#include "genie/core/read-decoder.h"
+#include "genie/read/localassembly/local-reference.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,8 +22,8 @@ namespace localassembly {
  *
  */
 class Decoder : public core::ReadDecoder {
-   private:
-   public:
+ private:
+ public:
     /**
      *
      * @param t
@@ -40,7 +40,7 @@ class Decoder : public core::ReadDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DECODER_H
+#endif  // SRC_GENIE_READ_LOCALASSEMBLY_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

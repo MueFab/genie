@@ -4,18 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_QV_CODING_CONFIG_1_H
-#define GENIE_QV_CODING_CONFIG_1_H
+#ifndef SRC_GENIE_QUALITY_PARAMQV1_QV_CODING_CONFIG_1_H_
+#define SRC_GENIE_QUALITY_PARAMQV1_QV_CODING_CONFIG_1_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/parameter/parameter_set.h>
-#include <genie/core/parameter/quality-values.h>
-#include <genie/util/bitwriter.h>
 #include <memory>
-#include "parameter_set.h"
-
-#include <boost/optional/optional.hpp>
+#include "boost/optional/optional.hpp"
+#include "genie/core/parameter/parameter_set.h"
+#include "genie/core/parameter/quality-values.h"
+#include "genie/quality/paramqv1/parameter_set.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +26,7 @@ namespace paramqv1 {
  *
  */
 class QualityValues1 : public core::parameter::QualityValues {
-   public:
+ public:
     static const uint8_t MODE_QV1 = 1;  //!<
 
     /**
@@ -113,7 +112,7 @@ class QualityValues1 : public core::parameter::QualityValues {
      */
     bool equals(const QualityValues* qv) const override;
 
-   private:
+ private:
     boost::optional<ParameterSet> parameter_set_qvps;  //!<
     boost::optional<QvpsPresetId> qvps_preset_ID;      //!<
 };
@@ -126,7 +125,7 @@ class QualityValues1 : public core::parameter::QualityValues {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_QV_CODING_CONFIG_1_H
+#endif  // SRC_GENIE_QUALITY_PARAMQV1_QV_CODING_CONFIG_1_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

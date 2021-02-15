@@ -4,15 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CORE_REFERENCE_H
-#define GENIE_CORE_REFERENCE_H
+#ifndef SRC_GENIE_CORE_REFERENCE_H_
+#define SRC_GENIE_CORE_REFERENCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/runtime-exception.h>
 #include <memory>
 #include <string>
 #include <vector>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,12 +23,12 @@ namespace core {
  *
  */
 class Reference {
-   private:
+ private:
     std::string name;  //!<
     uint64_t start;    //!<
     uint64_t end;      //!<
 
-   public:
+ public:
     /**
      *
      * @return
@@ -76,7 +76,7 @@ class Reference {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_REFERENCE_H
+#endif  // SRC_GENIE_CORE_REFERENCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

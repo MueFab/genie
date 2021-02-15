@@ -4,9 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "exporter.h"
-#include <genie/util/ordered-section.h>
-#include <genie/util/watch.h>
+#include "genie/format/fastq/exporter.h"
+#include <string>
+#include <utility>
+#include "genie/util/ordered-section.h"
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

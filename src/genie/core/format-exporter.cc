@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "format-exporter.h"
+#include "genie/core/format-exporter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,14 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_FORMAT_EXPORTER_H
-#define GENIE_FORMAT_EXPORTER_H
+#ifndef SRC_GENIE_CORE_FORMAT_EXPORTER_H_
+#define SRC_GENIE_CORE_FORMAT_EXPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/access-unit.h>
-#include <genie/core/record/chunk.h>
-#include <genie/util/drain.h>
+#include "genie/core/access-unit.h"
+#include "genie/core/record/chunk.h"
+#include "genie/util/drain.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,10 +22,10 @@ namespace core {
  * @brief Interface for exporters of various file formats. Note that each importer has to convert from mpegg-records
  */
 class FormatExporter : public util::Drain<record::Chunk> {
-   private:
+ private:
     stats::PerfStats stats;  //!<
 
-   public:
+ public:
     /**
      *
      * @return
@@ -56,7 +56,7 @@ class FormatExporter : public util::Drain<record::Chunk> {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_FORMAT_EXPORTER_H
+#endif  // SRC_GENIE_CORE_FORMAT_EXPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

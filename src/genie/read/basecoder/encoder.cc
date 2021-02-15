@@ -4,11 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "encoder.h"
-#include <genie/core/parameter/parameter_set.h>
-#include <genie/core/record/alignment-box.h>
-#include <genie/core/record/alignment_split/same-rec.h>
+#include "genie/read/basecoder/encoder.h"
+#include <algorithm>
 #include <array>
+#include <utility>
+#include "genie/core/parameter/parameter_set.h"
+#include "genie/core/record/alignment-box.h"
+#include "genie/core/record/alignment_split/same-rec.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -37,9 +39,10 @@ Encoder::Encoder(int32_t startingMappingPos)
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Encoder::encodeFirstSegment(const core::record::Record &rec) {
-    // TODO: Splices
-    const auto &ALIGNMENT = rec.getAlignments().front();  // TODO: Multiple alignments. Currently only 1 supported
-    const auto &RECORD = rec.getSegments().front();       // First segment
+    // TODO(Fabian): Splices
+    const auto &ALIGNMENT =
+        rec.getAlignments().front();                 // TODO(Fabian): Multiple alignments. Currently only 1 supported
+    const auto &RECORD = rec.getSegments().front();  // First segment
 
     container.push(core::GenSub::RTYPE, uint8_t(rec.getClassID()));
 
@@ -63,20 +66,21 @@ void Encoder::encodeFirstSegment(const core::record::Record &rec) {
         (rec.getFlags() & core::GenConst::FLAGS_PROPER_PAIR_MASK) >> core::GenConst::FLAGS_PROPER_PAIR_POS;
     container.push(core::GenSub::FLAGS_PROPER_PAIR, FLAG_PAIR);
 
-    const auto MSCORE = ALIGNMENT.getAlignment().getMappingScores().empty()
-                            ? 255
-                            : ALIGNMENT.getAlignment().getMappingScores().front();  // TODO: Multiple mapping scores
+    const auto MSCORE =
+        ALIGNMENT.getAlignment().getMappingScores().empty()
+            ? 255
+            : ALIGNMENT.getAlignment().getMappingScores().front();  // TODO(Fabian): Multiple mapping scores
     container.push(core::GenSub::MSCORE, MSCORE);
 
-    // const auto RGROUP = 0;  // TODO
+    // const auto RGROUP = 0;  // TODO(Fabian)
     //  container.push(core::GenSub::RGROUP, RGROUP);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const core::record::alignment_split::SameRec &Encoder::extractPairedAlignment(const core::record::Record &rec) const {
-    // TODO: More than 2 split alignments (even supported by standard?)
-    // TODO: Multialignments
+    // TODO(Fabian): More than 2 split alignments (even supported by standard?)
+    // TODO(Fabian): Multialignments
     const auto SAME_REC = core::record::AlignmentSplit::Type::SAME_REC;
     UTILS_DIE_IF(rec.getAlignments().front().getAlignmentSplits().front()->getType() != SAME_REC,
                  "Only same record split alignments supported");
@@ -93,14 +97,14 @@ void Encoder::encodeAdditionalSegment(size_t length, const core::record::alignme
     const auto RCOMP = srec.getAlignment().getRComp();
     container.push(core::GenSub::RCOMP, RCOMP);
 
-    // TODO: MSCORE depth != 1
+    // TODO(Fabian): MSCORE depth != 1
     const auto MSCORE = srec.getAlignment().getMappingScores().front();
     container.push(core::GenSub::MSCORE, MSCORE);
 
     container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_SAME_RECORD);
 
     const auto DELTA = srec.getDelta();
-    const bool FIRST1 = srec.getDelta() >= 0;           // Alignment 1 was the first if delta is positive
+    const bool FIRST1 = srec.getDelta() >= 0;                     // Alignment 1 was the first if delta is positive
     const auto SAME_REC_DATA = (DELTA << 1u) | uint32_t(FIRST1);  // FIRST1 is encoded in least significant bit
     container.push(core::GenSub::PAIR_SAME_REC, SAME_REC_DATA);
 }
@@ -113,7 +117,7 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
     encodeFirstSegment(rec);
 
     const auto &SEQUENCE = rec.getSegments().front().getSequence();
-    const auto &CIGAR = rec.getAlignments().front().getAlignment().getECigar();  // TODO: Multi-alignments
+    const auto &CIGAR = rec.getAlignments().front().getAlignment().getECigar();  // TODO(Fabian): Multi-alignments
     clips.first = encodeCigar(SEQUENCE, CIGAR, ref1, rec.getClassID());
 
     // Check if record is paired
@@ -200,8 +204,9 @@ void Encoder::encodeSubstitution(CodingState &state) {
         container.push(core::GenSub::MMTYPE_TYPE, core::GenConst::MMTYPE_SUBSTITUTION);
         const auto SYMBOL = getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[state.read[state.read_pos]];
         container.push(core::GenSub::MMTYPE_SUBSTITUTION, SYMBOL);
-        container.pushDependency(core::GenSub::MMTYPE_SUBSTITUTION,
-                                 getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[state.ref[state.ref_offset]]);
+        container.pushDependency(
+            core::GenSub::MMTYPE_SUBSTITUTION,
+            getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[state.ref[state.ref_offset]]);
     }
 }
 
@@ -236,7 +241,7 @@ bool Encoder::updateCount(char cigar_char, CodingState &state) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Encoder::encodeCigarToken(char cigar_char, CodingState &state) {
-    if (getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar_char)) {  // TODO: other alphabets
+    if (getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar_char)) {  // TODO(Fabian): other alphabets
         const char AMBIGUOUS_CHAR = '-';  // Character used twice in ecigar (deletion + alphabet 2)
         if ((cigar_char == AMBIGUOUS_CHAR && state.count == 0) || cigar_char != AMBIGUOUS_CHAR) {
             state.count = std::max(state.count, size_t(1));
@@ -323,7 +328,8 @@ bool Encoder::encodeSingleClip(const ClipInformation &inf, bool last) {
             for (const auto &c : inf.softClips[index]) {
                 container.push(core::GenSub::CLIPS_SOFT_STRING, c);
             }
-            const auto TERMINATOR = getAlphabetProperties(core::AlphabetID::ACGTN).lut.size();  // TODO: other alphabets
+            const auto TERMINATOR =
+                getAlphabetProperties(core::AlphabetID::ACGTN).lut.size();  // TODO(Fabian): other alphabets
             container.push(core::GenSub::CLIPS_SOFT_STRING, TERMINATOR);
         } else if (inf.hardClips[index]) {
             const auto TYPE = 0x4u | (uint32_t(last) << 1u) | index;
@@ -345,7 +351,7 @@ void Encoder::encodeClips(const std::pair<ClipInformation, ClipInformation> &cli
         container.push(core::GenSub::CLIPS_TYPE, core::GenConst::CLIPS_RECORD_END);
     }
 
-    readCounter += 1;  // TODO: Check if this applies to unpaired situations
+    readCounter += 1;  // TODO(Fabian): Check if this applies to unpaired situations
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

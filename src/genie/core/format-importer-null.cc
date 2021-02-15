@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "format-importer-null.h"
+#include "genie/core/format-importer-null.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
