@@ -1,8 +1,13 @@
 #ifndef GENIE_PART1_DATASET_HEADER_MIT_H
 #define GENIE_PART1_DATASET_HEADER_MIT_H
 
+#include <genie/util/bitwriter.h>
+#include <genie/util/bitreader.h>
+#include <genie/util/exception.h>
+#include <genie/util/runtime-exception.h>
+
+
 #include "block_header_flags.h"
-#include "genie/util/bitwriter.h"
 
 namespace genie {
 namespace format {
@@ -16,6 +21,8 @@ class WithHeader : public BlockConfig {
     WithHeader();
 
     WithHeader(bool _mit_flag, bool _cc_mode_flag);
+
+    void ReadWithHeader(genie::util::BitReader& reader, size_t length);
 
     uint64_t getBitLength() const override;
 
