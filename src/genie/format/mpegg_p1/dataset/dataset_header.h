@@ -13,9 +13,10 @@ class DatasetType;
 #include <string>
 #include <vector>
 
-
-#include "genie/util/bitwriter.h"
+#include <genie/util/bitreader.h>
+#include <genie/util/bitwriter.h>
 #include <genie/util/exception.h>
+#include "genie/util/runtime-exception.h"
 #include <genie/format/mpegg_p1/util.h>
 
 #include "fields/block_header_flags/block_header_flags.h"
@@ -92,6 +93,13 @@ class DatasetHeader {
                   bool _non_overlapping_AU_range_flag, Pos40SizeFlag _pos_40_bits_flag,
                   bool _multiple_alignment_flag, core::parameter::DataUnit::DatasetType _dataset_type,
                   uint8_t _alphabet_ID, uint32_t _num_U_access_units);
+
+    /**
+     *
+     * @param bit_reader
+     * @param length
+     */
+    DatasetHeader(genie::util::BitReader& bit_reader, size_t length);
 
     /**
      *

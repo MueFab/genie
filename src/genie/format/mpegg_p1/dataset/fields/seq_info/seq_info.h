@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "genie/util/bitwriter.h"
+#include "genie/util/bitreader.h"
 
 namespace genie {
 namespace format {
@@ -22,6 +23,8 @@ class SequenceConfig {
     SequenceConfig();
 
     explicit SequenceConfig(uint8_t _ref_ID);
+
+    void ReadSequenceConfig(genie::util::BitReader& reader, size_t length);
 
     uint64_t getBitLength() const;
 

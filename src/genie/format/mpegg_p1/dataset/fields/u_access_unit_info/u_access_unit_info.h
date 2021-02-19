@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include "genie/util/bitwriter.h"
+#include "genie/util/bitreader.h"
 
 namespace genie {
 namespace format {
@@ -21,6 +22,8 @@ class UAccessUnitInfo {
     UAccessUnitInfo();
 
     explicit UAccessUnitInfo(uint32_t _num_U_clusters);
+
+    void readUAccessUnitInfo(genie::util::BitReader& reader, size_t length);
 
     void setMultipleSignature(uint32_t base, uint8_t size);
     void setConstantSignature(uint8_t sign_length);
