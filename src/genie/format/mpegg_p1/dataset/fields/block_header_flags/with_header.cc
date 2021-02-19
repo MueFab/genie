@@ -12,12 +12,28 @@ WithHeader::WithHeader(bool _mit_flag, bool _cc_mode_flag)
     : BlockConfig(true, _mit_flag),
       CC_mode_flag(_cc_mode_flag){}
 
+void WithHeader::ReadWithHeader(genie::util::BitReader& reader, size_t length) {
 
-uint64_t WithHeader::getBitLength() const {
-    return BlockConfig::getBitLength() + 2; // block_header_flag, MIT_flag, CC_mode_flag
+    size_t start_pos = reader.getPos();
+
+    auto block_length = reader.read<size_t>();
+    BlockConfig::ReadBlockConfig(reader, block_length);
+
+    // MIT_flag u(1)
+    MIT_flag = reader.read<bool>(1);
+
+    // CC_mode_flag u(1)
+    CC_mode_flag = reader.read<bool>(1);
+
+    UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid ReadWithHeader length!");
 }
 
-void WithHeader::write(genie::util::BitWriter& bit_writer) const {
+
+uint64_t WithHeader::getBitLength() const {
+    return BlockConfig::getBitLength() + 2; // block_header_flag, MIT_flag u(1), CC_mode_flag u(1)
+}
+
+ void WithHeader::write(genie::util::BitWriter& bit_writer) const {
 
     // block_header_flag u(1)
     BlockConfig::write(bit_writer);
@@ -28,7 +44,6 @@ void WithHeader::write(genie::util::BitWriter& bit_writer) const {
     // CC_mode_flag u(1)
     bit_writer.write(CC_mode_flag, 1);
 }
-
 
 }  // namespace mpegg_p1
 }  // namespace format

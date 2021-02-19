@@ -2,8 +2,13 @@
 #define GENIE_PART1_DATASET_HEADER_BLOCK_HEADER_H
 
 #include <memory>
+#include <vector>
 
-#include "genie/util/bitwriter.h"
+#include <genie/util/bitwriter.h>
+#include <genie/util/bitreader.h>
+#include <genie/util/exception.h>
+#include <genie/util/runtime-exception.h>
+
 #include "class_info/class_info.h"
 
 namespace genie {
@@ -12,11 +17,15 @@ namespace mpegg_p1 {
 
 class BlockConfig {
    private:
+    uint8_t num_classes;
 
    public:
+
     BlockConfig();
 
     BlockConfig(bool _block_header_flag, bool _mit_flag);
+
+    void ReadBlockConfig(genie::util::BitReader& reader, size_t length);
 
     /**
      *
@@ -81,8 +90,6 @@ class BlockConfig {
    protected:
     bool block_header_flag;
     bool MIT_flag;
-    //bool CC_mode_flag;
-    //bool ordered_blocks_flag;
 
     std::vector<ClassInfo> class_infos;
 };
