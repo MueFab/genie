@@ -8,12 +8,61 @@ namespace mpegg_p1 {
 SequenceConfig::SequenceConfig()
     : reference_ID(0),
       seq_IDs(),
-      seq_blocks(){}
+      seq_blocks(),
+      thress() {}
 
 SequenceConfig::SequenceConfig(uint8_t _ref_ID)
     : reference_ID(_ref_ID),
       seq_IDs(),
-      seq_blocks(){}
+      seq_blocks(),
+      thress() {}
+
+void SequenceConfig::ReadSequenceConfig(util::BitReader& reader, size_t length) {
+
+    size_t start_pos = reader.getPos();
+
+    // seq_count u(16)
+    reader.read<uint16_t>();
+
+    if (anySeq()){
+        // reference_ID u(8)
+        reference_ID = reader.read<uint8_t>();
+
+        // seq_ID u(16)
+        for (auto seq_ID: seq_IDs){
+            reader.read<uint16_t>();
+        }
+
+        // seq_blocks u(32)
+        for (auto seq_block: seq_blocks){
+            reader.read<uint32_t>();
+        }
+        // tflag[0] u(1)
+        reader.read<bool>(1);
+
+        // thres[0] u(31)
+        reader.read<uint32_t>(31);
+
+        auto thres = thress.begin();
+
+        while (thres != thress.end()){
+            auto next_thres = thres +1;
+
+            bool tflag = *thres != *next_thres;
+            // tflag[i] u(1)
+            reader.read<bool>(1);
+
+            if (tflag){
+                // thres[i] u(31)
+                reader.read<uint32_t>(31);
+            }
+
+            thres = next_thres;
+        }
+    }
+
+    UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid readUAccessUnitInfo length!");
+}
 
 bool SequenceConfig::isValid() const { return seq_IDs.size() == thress.size(); }
 
@@ -142,6 +191,7 @@ void SequenceConfig::writeThres(util::BitWriter& bit_writer) const {
 
     }
 }
+
 
 }  // namespace mpegg_p1
 }  // namespace format

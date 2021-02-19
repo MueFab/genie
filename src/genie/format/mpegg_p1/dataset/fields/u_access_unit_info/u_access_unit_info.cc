@@ -1,4 +1,4 @@
-
+#include "genie/util/runtime-exception.h"
 #include "u_access_unit_info.h"
 
 namespace genie {
@@ -18,6 +18,30 @@ UAccessUnitInfo::UAccessUnitInfo(uint32_t _num_U_clusters)
       U_signature_size(0),
       U_signature_constant_length(false),
       U_signature_length(0){}
+
+void UAccessUnitInfo::readUAccessUnitInfo(util::BitReader& reader, size_t length) {
+
+    size_t start_pos = reader.getPos();
+
+    // num_U_clusters u(32), multiple_signature_base u(31)
+    num_U_clusters = reader.read<uint32_t>();
+    multiple_signature_base = reader.read<uint32_t>(31);
+
+    if (multiple_signature_base > 0) {
+        // U_signature_size u(6)
+        U_signature_size = reader.read<uint8_t>(6);
+    }
+
+    // U_signature_constant_length u(1)
+    U_signature_constant_length = reader.read<bool>(1);
+
+    if (U_signature_constant_length){
+        // U_signature_length u(8)
+        U_signature_length = reader.read<uint8_t>();
+    }
+
+    UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid readUAccessUnitInfo length!");
+}
 
 void UAccessUnitInfo::setMultipleSignature(uint32_t base, uint8_t size) {
     multiple_signature_base = base;
@@ -70,6 +94,7 @@ void UAccessUnitInfo::write(util::BitWriter& bit_writer) const {
         bit_writer.write(U_signature_constant_length, 8);
     }
 }
+
 
 }  // namespace mpegg_p1
 }  // namespace format
