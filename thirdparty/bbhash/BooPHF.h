@@ -5,7 +5,7 @@
 #ifndef BOOPHF_H
 #define BOOPHF_H
 
-#include <cstdio>
+#include <stdio.h>
 #include <climits>
 #include <stdlib.h>
 #include <iostream>
@@ -20,21 +20,8 @@
 
 #ifdef _WIN32
 # include <process.h>
-#define getpid _getpid
-#define unlink _unlink
 #else
 # include <unistd.h>
-
-// Replace safe windows fopen_s
-inline int fopen_s(FILE **f, const char *name, const char *mode) {
-    int ret = 0;
-    assert(f);
-    *f = fopen(name, mode);
-    /* Can't be sure about 1-to-1 mapping of errno and MS' errno_t */
-    if (!*f)
-        ret = errno;
-    return ret;
-}
 #endif
 
 //
@@ -102,6 +89,11 @@ inline u_int64_t printPt( pthread_t pt) {
 
 #endif /* BOOPHF_USE_PTHREADS */
 
+////////////////////////////////////////////////////////////////
+#pragma mark -
+#pragma mark utils
+////////////////////////////////////////////////////////////////
+
 
 // iterator from disk file of u_int64_t with buffered read,   todo template
 template <typename basetype>
@@ -133,7 +125,7 @@ class bfile_iterator : public std::iterator<std::forward_iterator_tag, basetype>
         //printf("bf it %p\n",_is);
         _buffsize = 10000;
         _buffer = (basetype *) malloc(_buffsize*sizeof(basetype));
-        fseek(_is,0,SEEK_SET);
+        int reso = fseek(_is,0,SEEK_SET);
         advance();
     }
 
@@ -171,7 +163,7 @@ class bfile_iterator : public std::iterator<std::forward_iterator_tag, basetype>
         if(_cptread >= _inbuff)
         {
 
-            auto res = (int)fread(_buffer,int(sizeof(basetype)),_buffsize,_is);
+            int res = fread(_buffer,sizeof(basetype),_buffsize,_is);
 
             //printf("read %i new elem last %llu  %p\n",res,_buffer[res-1],_is);
             _inbuff = res; _cptread = 0;
@@ -203,7 +195,8 @@ class file_binary{
 
     file_binary(const char* filename)
     {
-        fopen_s(&_is, filename, "rb");
+        _is = fopen(filename, "rb");
+
         if (!_is) {
             throw std::invalid_argument("Error opening " + std::string(filename));
         }
@@ -250,6 +243,13 @@ inline unsigned int popcount_64(uint64_t x)
 
     return (popcount_32(low) + popcount_32(high));
 }
+
+
+
+////////////////////////////////////////////////////////////////
+#pragma mark -
+#pragma mark hasher
+////////////////////////////////////////////////////////////////
 
 typedef std::array<uint64_t,10> hash_set_t;
 typedef std::array<uint64_t,2> hash_pair_t;
@@ -423,6 +423,11 @@ template <typename Item, class SingleHasher_t> class XorshiftHashFunctors
 };
 
 
+////////////////////////////////////////////////////////////////
+#pragma mark -
+#pragma mark iterators
+////////////////////////////////////////////////////////////////
+
 template <typename Iterator>
 struct iter_range
 {
@@ -445,6 +450,11 @@ iter_range<Iterator> range(Iterator begin, Iterator end)
 {
     return iter_range<Iterator>(begin, end);
 }
+
+////////////////////////////////////////////////////////////////
+#pragma mark -
+#pragma mark BitVector
+////////////////////////////////////////////////////////////////
 
 class bitVector {
 
@@ -574,7 +584,7 @@ class bitVector {
         }
         printf("\n");
 
-        printf("rank array : size %lu \n",(unsigned long)(_ranks.size()));
+        printf("rank array : size %lu \n",_ranks.size());
         for (uint64_t ii = 0; ii< _ranks.size(); ii++)
         {
             printf("%llu :  %lli,  ",(long long unsigned int)ii,(long long int)_ranks[ii]);
@@ -696,6 +706,10 @@ class bitVector {
     std::vector<uint64_t> _ranks;
 };
 
+////////////////////////////////////////////////////////////////
+#pragma mark -
+#pragma mark level
+////////////////////////////////////////////////////////////////
 
 
 static inline uint64_t fastrange64(uint64_t word, uint64_t p) {
@@ -734,6 +748,10 @@ class level{
 };
 
 
+////////////////////////////////////////////////////////////////
+#pragma mark -
+#pragma mark mphf
+////////////////////////////////////////////////////////////////
 
 
 #define NBBUFF 10000
@@ -900,7 +918,7 @@ class mphf {
     void pthread_processLevel( std::vector<elem_t>  & buffer , std::shared_ptr<Iterator> shared_it, std::shared_ptr<Iterator> until_p, int i)
     {
         uint64_t nb_done =0;
-        uint64_t tid = INTR_FETCH_AND_ADD((long long*)& _nb_living, 1);
+        int tid = INTR_FETCH_AND_ADD((long long*)& _nb_living, 1);
         auto until = *until_p;
         uint64_t inbuff =0;
 
@@ -1140,7 +1158,7 @@ class mphf {
 
         if(_fastmode)
         {
-            setLevelFastmode.resize(uint64_t(_percent_elem_loaded_for_fastMode * (double)_nelem ));
+            setLevelFastmode.resize(_percent_elem_loaded_for_fastMode * (double)_nelem );
         }
 
 
@@ -1155,7 +1173,7 @@ class mphf {
 
         _proba_collision = 1.0 -  pow(((_gamma*(double)_nelem -1 ) / (_gamma*(double)_nelem)),_nelem-1);
 
-        //double sum_geom =_gamma * ( 1.0 +  _proba_collision / (1.0 - _proba_collision));
+        double sum_geom =_gamma * ( 1.0 +  _proba_collision / (1.0 - _proba_collision));
         //printf("proba collision %f  sum_geom  %f   \n",_proba_collision,sum_geom);
 
         _nb_levels = 25;
@@ -1250,15 +1268,14 @@ class mphf {
 
         //printf("---process level %i   wr %i fast %i ---\n",i,_writeEachLevel,_fastmode);
 
-        const size_t BUFFER_SIZE = 1000;
-        char fname_old[BUFFER_SIZE];
-        std::snprintf(fname_old, BUFFER_SIZE, "temp_p%i_level_%i",_pid,i-2);
+        char fname_old[1000];
+        sprintf(fname_old,"temp_p%i_level_%i",_pid,i-2);
 
-        char fname_curr[BUFFER_SIZE];
-        std::snprintf(fname_curr, BUFFER_SIZE, "temp_p%i_level_%i",_pid,i);
+        char fname_curr[1000];
+        sprintf(fname_curr,"temp_p%i_level_%i",_pid,i);
 
-        char fname_prev[BUFFER_SIZE];
-        std::snprintf(fname_prev, BUFFER_SIZE, "temp_p%i_level_%i",_pid,i-1);
+        char fname_prev[1000];
+        sprintf(fname_prev,"temp_p%i_level_%i",_pid,i-1);
 
         if(_writeEachLevel)
         {
@@ -1271,7 +1288,7 @@ class mphf {
 
             if(i< _nb_levels-1 && i > 0 ) //create curr file
             {
-                fopen_s(&_currlevelFile, fname_curr,"wb");
+                _currlevelFile = fopen(fname_curr,"wb");
             }
         }
 
@@ -1434,6 +1451,10 @@ class mphf {
 #endif /* BOOPHF_USE_PTHREADS */
 };
 
+////////////////////////////////////////////////////////////////
+#pragma mark -
+#pragma mark threading
+////////////////////////////////////////////////////////////////
 
 
 template <typename elem_t, typename Hasher_t, typename Range, typename it_type>
