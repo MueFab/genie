@@ -46,14 +46,15 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCH
     if(${GENIE_WERROR})
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
     endif()
-    if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-    endif()
+    # Use -g with Release builds as well as Debug builds
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     #
 elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel") # Intel Compiler
     #
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
+    # Use -g with Release builds as well as Debug builds
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     #
 elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC") # Microsoft Compiler
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
