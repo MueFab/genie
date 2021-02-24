@@ -65,7 +65,7 @@ stages:
     - script: |
         mkdir cmake-build-debug
         cd cmake-build-debug
-        cmake .. $(architecture) -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=OFF -DGENIE_WERROR=ON
+        cmake .. $(architecture) -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=OFF
       displayName: 'Genie cmake'
     - script: |
         cd cmake-build-debug
@@ -127,7 +127,7 @@ stages:
     - script: |
         mkdir cmake-build-release
         cd cmake-build-release
-        cmake .. $(architecture) -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=OFF -DGENIE_WERROR=ON
+        cmake .. $(architecture) -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=OFF
       displayName: 'Genie cmake'
     - script: |
         cd cmake-build-release
