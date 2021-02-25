@@ -45,4 +45,4 @@ cd $git_root_dir/ci
 ./memory_test.sh || { echo 'Memory tests failed!' ; exit 1; }
 ./roundtrip_test.sh || { echo 'Roundtrip tests failed!' ; exit 1; }
 ./conformance_test.sh || { echo 'Conformance tests failed!' ; exit 1; }
-
+echo "Genie works as expected!"

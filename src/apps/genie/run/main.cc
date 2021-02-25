@@ -248,6 +248,9 @@ std::unique_ptr<genie::core::FlowGraph> buildConverter(const ProgramOptions& pOp
 
 int main(int argc, char* argv[]) {
     ProgramOptions pOpts(argc, argv);
+    if (pOpts.help) {
+        return 0;
+    }
     genie::util::Watch watch;
     std::unique_ptr<genie::core::FlowGraph> flowGraph;
     std::vector<std::unique_ptr<std::ifstream>> inputFiles;
