@@ -7,79 +7,64 @@ stages:
         ubuntu2004:
           imageName: 'ubuntu-20.04'
           artifactName: 'ubuntu2004'
-          architecture: ''
           binDir: 'bin'
         ubuntu1804:
           imageName: 'ubuntu-18.04'
           artifactName: 'ubuntu1804'
-          architecture: ''
           binDir: 'bin'
         ubuntu1604:
           imageName: 'ubuntu-16.04'
           artifactName: 'ubuntu1604'
-          architecture: ''
           binDir: 'bin'
         macos1015:
           imageName: 'macos-10.15'
           artifactName: 'macos1015'
-          architecture: ''
           binDir: 'bin'
         macos1014:
           imageName: 'macos-10.14'
           artifactName: 'macos1014'
-          architecture: ''
           binDir: 'bin'
         windows2016:
           imageName: 'vs2017-win2016'
           artifactName: 'windows2016'
-          architecture: '-A x64'
           binDir: 'bin/Debug'
         windows2019:
           imageName: 'windows-2019'
           artifactName: 'windows2019'
-          architecture: '-A x64'
           binDir: 'bin/Debug'
     pool:
       vmImage: $(imageName)
     steps:
-    - script: |
+    - bash: |
         export PATH="$HOME/.local/bin:$PATH"
         pip3 install --upgrade pip
-        pip3 install cpplint
-        cd src
-        cpplint --recursive --linelength=120 --filter=-runtime/references,-build/c++11 ./  
-      displayName: 'Cpplint (Ubuntu 20.04)'
-      condition: eq( variables['artifactName'], 'ubuntu2004')
-   
-    - script: |
+        sudo pip3 install cpplint
         sudo apt-get update
         sudo apt-get install cppcheck
-        cd src
-        cppcheck --error-exitcode=1 -DGENIE_USE_OPENMP ./
-      displayName: 'Cppcheck (Ubuntu 20.04)'
+      displayName: 'Install prerequisites (Ubuntu 20.04)'
       condition: eq( variables['artifactName'], 'ubuntu2004')
 
-    - script: brew install libomp
+    - bash: brew install libomp
       displayName: 'Openmp installation (OSX)'
       condition: eq( variables['Agent.OS'], 'Darwin' )
-    - script: |
-        mkdir cmake-build-debug
-        cd cmake-build-debug
-        cmake .. $(architecture) -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=OFF -DGENIE_WERROR=ON
-      displayName: 'Genie cmake'
-    - script: |
-        cd cmake-build-debug
-        make --jobs
-      displayName: 'Genie build (make)'
-      condition: ne( variables['Agent.OS'], 'Windows_NT' )
+
+    - bash: ./ci/src_test.sh
+      displayName: 'Check source code'
+      condition: eq( variables['artifactName'], 'ubuntu2004')
+
+    - bash: ./ci/build.sh debug
+      displayName: 'Genie build'
+
     - task: VSBuild@1
       inputs:
         solution: 'cmake-build-debug\genie.sln'
         msbuildArgs: '-m' 
       displayName: 'Genie build (MSVC)'
       condition: eq( variables['Agent.OS'], 'Windows_NT' )
+
     - publish: cmake-build-debug/$(binDir)
       artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
+
   - job: 'Release'
     strategy:
       matrix:
@@ -121,19 +106,13 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - script: brew install libomp
+    - bash: brew install libomp
       displayName: 'Openmp installation (OSX)'
       condition: eq( variables['Agent.OS'], 'Darwin' )
-    - script: |
-        mkdir cmake-build-release
-        cd cmake-build-release
-        cmake .. $(architecture) -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=OFF -DGENIE_WERROR=ON
-      displayName: 'Genie cmake'
-    - script: |
-        cd cmake-build-release
-        make --jobs
-      displayName: 'Genie build (make)'
-      condition: ne( variables['Agent.OS'], 'Windows_NT' )
+
+    - bash: ./ci/build.sh release
+      displayName: 'Genie build'
+
     - task: VSBuild@1
       inputs:
         solution: 'cmake-build-release\genie.sln'
@@ -180,21 +159,134 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - checkout: none
-    - script: brew install libomp
+    - bash: brew install libomp
       displayName: 'Openmp installation (OSX)'
       condition: eq( variables['Agent.OS'], 'Darwin' )
+
     - download: current
       artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
+
     - bash: |
-        chmod +x ../genie-debug-$(artifactName)-$(Build.SourceVersion)/*
-        ../genie-debug-$(artifactName)-$(Build.SourceVersion)/util-tests$(fileExt) --gtest_output=xml
+        mkdir cmake-build-debug
+        mv ../genie-debug-$(artifactName)-$(Build.SourceVersion) cmake-build-debug/bin
+        chmod +x cmake-build-debug/bin/*
+      displayName: 'Copy binaries'
+
+    - bash: ci/unit_test.sh
       displayName: 'Genie run unit tests'
+
     - task: PublishTestResults@2
-      displayName: Publish Util test Results
+      displayName: Publish utils test Results
       inputs:
-        testResultsFiles: 'test_detail.xml'
-        testRunTitle: 'util-$(artifactName)-$(Build.SourceVersion)'
+        testResultsFiles: 'cmake-build-debug/bin/utils_test.xml'
+        testRunTitle: 'utils-$(artifactName)-$(Build.SourceVersion)'
+  
+    - task: PublishTestResults@2
+      displayName: Publish coding test Results
+      inputs:
+        testResultsFiles: 'cmake-build-debug/bin/coding_test.xml'
+        testRunTitle: 'coding-$(artifactName)-$(Build.SourceVersion)'
+
+    - task: PublishTestResults@2
+      displayName: Publish gabac test Results
+      inputs:
+        testResultsFiles: 'cmake-build-debug/bin/gabac_test.xml'
+        testRunTitle: 'gabac-$(artifactName)-$(Build.SourceVersion)'
+
+
+  - job: 'Memory'
+    strategy:
+      matrix:
+        ubuntu2004:
+          imageName: 'ubuntu-20.04'
+          artifactName: 'ubuntu2004'
+          fileExt: ''
+        ubuntu1804:
+          imageName: 'ubuntu-18.04'
+          artifactName: 'ubuntu1804'
+          fileExt: ''
+        ubuntu1604:
+          imageName: 'ubuntu-16.04'
+          artifactName: 'ubuntu1604'
+          fileExt: ''
+        macos1015:
+          imageName: 'macos-10.15'
+          artifactName: 'macos1015'
+          fileExt: ''
+        macos1014:
+          imageName: 'macos-10.14'
+          artifactName: 'macos1014'
+          fileExt: ''
+    pool:
+      vmImage: $(imageName)
+    steps:
+    - bash: brew install libomp
+      displayName: 'Openmp installation (OSX)'
+      condition: eq( variables['Agent.OS'], 'Darwin' )
+
+    - download: current
+      artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
+
+    - bash: |
+        mkdir cmake-build-debug
+        mv ../genie-debug-$(artifactName)-$(Build.SourceVersion) cmake-build-debug/bin
+        chmod +x cmake-build-debug/bin/*
+      displayName: 'Copy binaries'
+
+    - bash: ci/memory_test.sh
+      displayName: 'Genie run memory tests'
+
+
+  - job: 'Roundtrip'
+    strategy:
+      matrix:
+        ubuntu2004:
+          imageName: 'ubuntu-20.04'
+          artifactName: 'ubuntu2004'
+          fileExt: ''
+        ubuntu1804:
+          imageName: 'ubuntu-18.04'
+          artifactName: 'ubuntu1804'
+          fileExt: ''
+        ubuntu1604:
+          imageName: 'ubuntu-16.04'
+          artifactName: 'ubuntu1604'
+          fileExt: ''
+        macos1015:
+          imageName: 'macos-10.15'
+          artifactName: 'macos1015'
+          fileExt: ''
+        macos1014:
+          imageName: 'macos-10.14'
+          artifactName: 'macos1014'
+          fileExt: ''
+        windows2016:
+          imageName: 'vs2017-win2016'
+          artifactName: 'windows2016'
+          fileExt: '.exe'
+        windows2019:
+          imageName: 'windows-2019'
+          artifactName: 'windows2019'
+          fileExt: '.exe'
+    pool:
+      vmImage: $(imageName)
+    steps:
+    - bash: brew install libomp
+      displayName: 'Openmp installation (OSX)'
+      condition: eq( variables['Agent.OS'], 'Darwin' )
+
+    - download: current
+      artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
+
+    - bash: |
+        mkdir cmake-build-debug
+        mv ../genie-debug-$(artifactName)-$(Build.SourceVersion) cmake-build-debug/bin
+        chmod +x cmake-build-debug/bin/*
+      displayName: 'Copy binaries'
+
+    - bash: ci/roundtrip_test.sh
+      displayName: 'Genie run roundtrip tests'
+
 
   - job: 'Conformance'
     strategy:
@@ -230,12 +322,10 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - checkout: none
-    - script: brew install libomp
+    - bash: brew install libomp
       displayName: 'Openmp installation (OSX)'
       condition: eq( variables['Agent.OS'], 'Darwin' )
-    - download: current
-      artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
+
     - bash: |
         mkdir ref-decoder
         cd ref-decoder
@@ -253,11 +343,23 @@ stages:
         cd ref-decoder
         cmake .
       displayName: 'Reference decoder cmake'
-    - script: |
+    - bash: |
         cd ref-decoder
         make --jobs 
       displayName: 'Reference decoder build (make)'
       condition: ne( variables['Agent.OS'], 'Windows_NT' )
+
+    - download: current
+      artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
+
+    - bash: |
+        mkdir cmake-build-debug
+        mv ../genie-debug-$(artifactName)-$(Build.SourceVersion) cmake-build-debug/bin
+        chmod +x cmake-build-debug/bin/*
+      displayName: 'Copy binaries'
+
+    - bash: ci/roundtrip_test.sh
+      displayName: 'Genie run roundtrip tests'
 
 #    - task: VSBuild@1
 #      inputs:
@@ -265,6 +367,7 @@ stages:
 #        msbuildArgs: '-m' 
 #      displayName: 'Reference decoder build (MSVC)'
 #      condition: eq( variables['Agent.OS'], 'Windows_NT' )
+
 
 - stage: 'Deployment'
   jobs:
@@ -289,7 +392,7 @@ stages:
     - checkout: none
     - download: current
       artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
-    - script: echo "Not yet implemented"
+    - bash: echo "Not yet implemented"
       displayName: 'Build debian package'
   - job: 'OSX'
     strategy:
@@ -308,5 +411,5 @@ stages:
     - checkout: none
     - download: current
       artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
-    - script: echo "Not yet implemented"
+    - bash: echo "Not yet implemented"
       displayName: 'Build OSX dmg'
