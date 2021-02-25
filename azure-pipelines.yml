@@ -209,20 +209,13 @@ stages:
           imageName: 'ubuntu-16.04'
           artifactName: 'ubuntu1604'
           fileExt: ''
-        macos1015:
-          imageName: 'macos-10.15'
-          artifactName: 'macos1015'
-          fileExt: ''
-        macos1014:
-          imageName: 'macos-10.14'
-          artifactName: 'macos1014'
-          fileExt: ''
     pool:
       vmImage: $(imageName)
     steps:
-    - bash: brew install libomp
-      displayName: 'Openmp installation (OSX)'
-      condition: eq( variables['Agent.OS'], 'Darwin' )
+    - bash: |
+          sudo apt-get install valgrind
+      displayName: 'Installation prerequisites (Linux)'
+      condition: eq( variables['Agent.OS'], 'Linux' )
 
     - download: current
       artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
@@ -311,14 +304,6 @@ stages:
           imageName: 'macos-10.14'
           artifactName: 'macos1014'
           fileExt: ''
-#        windows2016:
-#          imageName: 'vs2017-win2016'
-#          artifactName: 'windows2016'
-#          fileExt: ''
-#        windows2019:
-#          imageName: 'windows-2019'
-#          artifactName: 'windows2019'
-#          fileExt: ''
     pool:
       vmImage: $(imageName)
     steps:
@@ -358,16 +343,8 @@ stages:
         chmod +x cmake-build-debug/bin/*
       displayName: 'Copy binaries'
 
-    - bash: ci/roundtrip_test.sh
+    - bash: ci/conformance_test.sh
       displayName: 'Genie run roundtrip tests'
-
-#    - task: VSBuild@1
-#      inputs:
-#        solution: 'ref-decoder\mpegg_reference_sw.sln'
-#        msbuildArgs: '-m' 
-#      displayName: 'Reference decoder build (MSVC)'
-#      condition: eq( variables['Agent.OS'], 'Windows_NT' )
-
 
 - stage: 'Deployment'
   jobs:

@@ -21,3 +21,6 @@ git_root_dir="$(git rev-parse --show-toplevel)"
 
 
 ############ Run ###############
+
+cd $git_root_dir/cmake-build-debug/bin
+valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=1 ./genie$fileExt run --help || { echo 'Memcheck failed!' ; exit 1; }

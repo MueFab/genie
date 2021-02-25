@@ -39,7 +39,7 @@ std::string parent_dir(const std::string &path) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ProgramOptions::ProgramOptions(int argc, char *argv[]) {
+ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
     CLI::App app("Genie MPEG-G reference encoder\n");
 
     app.add_option("-i,--input-file", inputFile, "")->mandatory(true);
@@ -87,6 +87,10 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) {
         while (workingDirectory.back() == '/') {
             workingDirectory.pop_back();
         }
+    } catch (const CLI::CallForHelp&) {
+        std::cout << app.help() << std::endl;
+        help = true;
+        return;
     } catch (const CLI::ParseError &e) {
         UTILS_DIE("Command line parsing failed:" + std::to_string(app.exit(e)));
     }
