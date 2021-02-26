@@ -20,17 +20,18 @@ namespace genie {
 namespace util {
 
 /**
- *
+ * @brief
  * @tparam T
  */
 template <typename T>
 class Factory : public GenericFactory {
  private:
-    std::map<uint8_t, std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>> factories;  //!<
+    std::map<uint8_t, std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>>
+        factories;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param id
      * @param factory
      */
@@ -38,21 +39,22 @@ class Factory : public GenericFactory {
                       const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& factory);
 
     /**
-     *
+     * @brief
      * @param factory
      * @return
      */
     uint8_t registerType(const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& factory);
 
     /**
-     *
+     * @brief
      * @param id
      */
     void unregisterType(uint8_t id);
 
     /**
-     *
+     * @brief
      * @param id
+     * @param desc
      * @param reader
      * @return
      */

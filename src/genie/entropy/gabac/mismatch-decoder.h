@@ -23,13 +23,14 @@ namespace entropy {
 namespace gabac {
 
 /**
- *
+ * @brief
  */
 class MismatchDecoder : public core::MismatchDecoder {
  public:
     /**
-     *
+     * @brief
      * @param d
+     * @param c
      */
     explicit MismatchDecoder(util::DataBlock &&d, const EncodingConfiguration &c);
 

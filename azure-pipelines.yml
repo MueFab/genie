@@ -41,6 +41,7 @@ stages:
         sudo pip3 install cpplint
         sudo apt-get update
         sudo apt-get install cppcheck
+        sudo apt-get install doxygen
       displayName: 'Install prerequisites (Ubuntu 20.04)'
       condition: eq( variables['artifactName'], 'ubuntu2004')
 
@@ -49,7 +50,11 @@ stages:
       condition: eq( variables['Agent.OS'], 'Darwin' )
 
     - bash: ./ci/src_test.sh
-      displayName: 'Check source code'
+      displayName: 'Check source code (Ubuntu 20.04)'
+      condition: eq( variables['artifactName'], 'ubuntu2004')
+
+    - bash: ./ci/build.sh doc
+      displayName: 'Build documentation (Ubuntu 20.04)'
       condition: eq( variables['artifactName'], 'ubuntu2004')
 
     - bash: ./ci/build.sh debug
@@ -64,6 +69,12 @@ stages:
 
     - publish: cmake-build-debug/$(binDir)
       artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
+      displayName: 'Publish binaries'
+
+    - publish: cmake-build-debug/documentation/html
+      artifact: 'genie-documentation-$(Build.SourceVersion)'
+      displayName: 'Publish documentation (ubuntu2004)'
+      condition: eq( variables['artifactName'], 'ubuntu2004')
 
   - job: 'Release'
     strategy:
@@ -122,6 +133,7 @@ stages:
       condition: eq( variables['Agent.OS'], 'Windows_NT' )
     - publish: cmake-build-release/$(binDir)
       artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
+      displayName: 'Publish binaries'
 
 - stage: 'Testing'
   jobs:
@@ -165,6 +177,7 @@ stages:
 
     - download: current
       artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
+      displayName: 'Download binaries'
 
     - bash: |
         mkdir cmake-build-debug
@@ -219,6 +232,7 @@ stages:
 
     - download: current
       artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
+      displayName: 'Download binaries'
 
     - bash: |
         mkdir cmake-build-debug
@@ -270,6 +284,7 @@ stages:
 
     - download: current
       artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
+      displayName: 'Download binaries'
 
     - bash: |
         mkdir cmake-build-debug
@@ -336,6 +351,7 @@ stages:
 
     - download: current
       artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
+      displayName: 'Download binaries'
 
     - bash: |
         mkdir cmake-build-debug
@@ -343,8 +359,8 @@ stages:
         chmod +x cmake-build-debug/bin/*
       displayName: 'Copy binaries'
 
-    - bash: ci/conformance_test.sh
-      displayName: 'Genie run roundtrip tests'
+    - bash: MPEGG_REF_DECODER=$PWD/ref-decoder/bin/decoder/mpegg-decoder-p2 ci/conformance_test.sh
+      displayName: 'Genie run conformance tests'
 
 - stage: 'Deployment'
   jobs:
@@ -369,6 +385,7 @@ stages:
     - checkout: none
     - download: current
       artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
+      displayName: 'Download binaries'
     - bash: echo "Not yet implemented"
       displayName: 'Build debian package'
   - job: 'OSX'
@@ -388,5 +405,6 @@ stages:
     - checkout: none
     - download: current
       artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
+      displayName: 'Download binaries'
     - bash: echo "Not yet implemented"
       displayName: 'Build OSX dmg'
