@@ -38,9 +38,10 @@ class Decoder : public core::EntropyDecoder {
 
  public:
     /**
-     *
+     * @brief
      * @param param
      * @param d
+     * @param mmCoderEnabled
      * @return
      */
     std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(

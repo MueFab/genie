@@ -36,181 +36,182 @@ namespace record {
  */
 class Record {
  private:
-    uint8_t number_of_template_segments{};    //!<
-    ClassType class_ID{ClassType::NONE};      //!<
-    bool read_1_first{};                      //!<
-    AlignmentSharedData sharedAlignmentInfo;  //!<
-    uint8_t qv_depth{};                       //!<
-    std::string read_name;                    //!<
-    std::string read_group;                   //!<
-    std::vector<Segment> reads;               //!<
-    std::vector<AlignmentBox> alignmentInfo;  //!<
-    uint8_t flags{};                          //!<
+    uint8_t number_of_template_segments{};    //!< @brief
+    ClassType class_ID{ClassType::NONE};      //!< @brief
+    bool read_1_first{};                      //!< @brief
+    AlignmentSharedData sharedAlignmentInfo;  //!< @brief
+    uint8_t qv_depth{};                       //!< @brief
+    std::string read_name;                    //!< @brief
+    std::string read_group;                   //!< @brief
+    std::vector<Segment> reads;               //!< @brief
+    std::vector<AlignmentBox> alignmentInfo;  //!< @brief
+    uint8_t flags{};                          //!< @brief
 
-    std::unique_ptr<AlignmentExternal> moreAlignmentInfo;  //!<
+    std::unique_ptr<AlignmentExternal> moreAlignmentInfo;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      */
     Record();
 
     /**
-     *
+     * @brief
      * @param _number_of_template_segments
      * @param _auTypeCfg
      * @param _read_name
      * @param _read_group
      * @param _flags
+     * @param _is_read_1_first
      */
     Record(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::string&& _read_name,
            std::string&& _read_group, uint8_t _flags, bool _is_read_1_first = true);
 
     /**
-     *
+     * @brief
      * @param rec
      */
     Record(const Record& rec);
 
     /**
-     *
+     * @brief
      * @param rec
      */
     Record(Record&& rec) noexcept;
 
     /**
-     *
+     * @brief
      */
     ~Record() = default;
 
     /**
-     *
+     * @brief
      * @param rec
      * @return
      */
     Record& operator=(const Record& rec);
 
     /**
-     *
+     * @brief
      * @param rec
      * @return
      */
     Record& operator=(Record&& rec) noexcept;
 
     /**
-     *
+     * @brief
      * @param reader
      */
     explicit Record(util::BitReader& reader);
 
     /**
-     *
+     * @brief
      * @param rec
      */
     void addSegment(Segment&& rec);
 
     /**
-     *
+     * @brief
      * @param _seq_id
      * @param rec
      */
     void addAlignment(uint16_t _seq_id, AlignmentBox&& rec);
 
     /**
-     *
+     * @brief
      * @param index
      * @return
      */
     std::vector<Segment>& getSegments();
 
     /**
-     *
+     * @brief
      * @return
      */
     const std::vector<Segment>& getSegments() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     size_t getNumberOfTemplateSegments() const;
 
     /**
-     *
+     * @brief
      * @param index
      * @return
      */
     const std::vector<AlignmentBox>& getAlignments() const;
 
     /**
-     *
+     * @brief
      * @param writer
      */
     void write(util::BitWriter& writer) const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint8_t getFlags() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     ClassType getClassID() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     const std::string& getName() const;
 
     /**
-     *
+     * @brief
      * @param _name
      */
     void setName(const std::string& _name);
 
     /**
-     *
+     * @brief
      * @param type
      */
     void setClassType(ClassType type);
 
     /**
-     *
+     * @brief
      * @return
      */
     const std::string& getGroup() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     const AlignmentSharedData& getAlignmentSharedData() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     const AlignmentExternal& getAlignmentExternal() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     bool isRead1First() const;
 
     /**
-     *
+     * @brief
      * @param cigar
      * @return
      */
     static uint64_t getLengthOfCigar(const std::string& cigar);
 
     /**
-     *
+     * @brief
      * @param alignment
      * @param split
      * @return
@@ -218,13 +219,13 @@ class Record {
     size_t getMappedLength(size_t alignment, size_t split) const;
 
     /**
-     *
+     * @brief
      * @return
      */
     std::pair<size_t, size_t> getTemplatePosition() const;
 
     /**
-     *
+     * @brief
      * @param alignment
      * @param split
      * @return
@@ -232,13 +233,13 @@ class Record {
     size_t getPosition(size_t alignment, size_t split) const;
 
     /**
-     *
+     * @brief
      * @return
      */
     bool getRead1First() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     void setMoreAlignmentInfo(std::unique_ptr<AlignmentExternal> _more_alignment_info);

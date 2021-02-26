@@ -26,16 +26,16 @@ namespace read {
 namespace spring {
 
 /**
- *
+ * @brief
  */
 struct Record {
-    std::string name;  //!<
-    std::string seq;   //!<
-    std::string qv;    //!<
+    std::string name;  //!< @brief
+    std::string seq;   //!< @brief
+    std::string qv;    //!< @brief
 };
 
 /**
- *
+ * @brief
  * @param au
  * @param paired_end
  * @param combine_pairs
@@ -53,48 +53,47 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                     std::vector<std::string>& qvs);
 
 /**
- *
+ * @brief
  */
 class Decoder : public genie::core::ReadDecoder {
  private:
-    compression_params cp{};        //!<
-    bool combine_pairs;             //!<
-    util::OrderedLock lock;         //!<
-    std::ofstream fout_unmatched1;  //!<
-    std::ofstream fout_unmatched2;  //!<
+    compression_params cp{};        //!< @brief
+    bool combine_pairs;             //!< @brief
+    util::OrderedLock lock;         //!< @brief
+    std::ofstream fout_unmatched1;  //!< @brief
+    std::ofstream fout_unmatched2;  //!< @brief
 
-    std::string file_unmatched_fastq1;  //!<
-    std::string file_unmatched_fastq2;  //!<
-    std::string basedir;                //!<
+    std::string file_unmatched_fastq1;  //!< @brief
+    std::string file_unmatched_fastq2;  //!< @brief
+    std::string basedir;                //!< @brief
 
-    std::vector<uint32_t> mate_au_id_concat, mate_record_index_concat;  //!<
+    std::vector<uint32_t> mate_au_id_concat, mate_record_index_concat;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param working_dir
      * @param comb_p
      * @param paired_end
-     * @param threads
      */
     explicit Decoder(const std::string& working_dir, bool comb_p, bool paired_end);
 
     /**
-     *
+     * @brief
      * @param t
      * @param id
      */
     void flowIn(genie::core::AccessUnit&& t, const util::Section& id) override;
 
     /**
-     *
+     * @brief
      * @param i
      * @param r
      */
     static void readRec(std::ifstream& i, Record& r);
 
     /**
-     *
+     * @brief
      * @param chunk
      * @param r
      * @param pos
@@ -102,13 +101,13 @@ class Decoder : public genie::core::ReadDecoder {
     void add(core::record::Chunk& chunk, core::record::Record&& r, uint64_t& pos);
 
     /**
-     *
+     * @brief
      * @param pos
      */
     void flushIn(uint64_t& pos) override;
 
     /**
-     *
+     * @brief
      * @param id
      */
     void skipIn(const util::Section& id) override;

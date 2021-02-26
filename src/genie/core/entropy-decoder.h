@@ -25,14 +25,15 @@ namespace core {
 class EntropyDecoder {
  public:
     /**
-     *
+     * @brief
      */
     virtual ~EntropyDecoder() = default;
 
     /**
-     *
+     * @brief
      * @param param
      * @param desc
+     * @param mmCoderEnabled
      * @return
      */
     virtual std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(

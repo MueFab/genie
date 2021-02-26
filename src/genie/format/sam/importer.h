@@ -31,34 +31,42 @@ namespace sam {
 typedef std::list<Record> SamRecords;
 typedef std::list<std::list<Record>> SamRecords2D;
 
+/**
+ * @brief
+ */
 class Importer : public core::FormatImporter {
  private:
-    size_t blockSize;
-    Reader samReader;
-    ReadTemplateGroup rtg;
+    size_t blockSize;  //!< @brief
+    Reader samReader;  //!< @brief
+    ReadTemplateGroup rtg;  //!< @brief
     util::OrderedLock lock;  //!< @brief Lock to ensure in order execution
-    uint64_t last_position{0};
+    uint64_t last_position{0};  //!< @brief
 
-    std::vector<std::list<core::record::Record>> records_by_ref;
+    std::vector<std::list<core::record::Record>> records_by_ref;  //!< @brief
 
     /**
-     * Check if there is any remaining mpeg-g record to be stored.
+     * @brief Check if there is any remaining mpeg-g record to be stored.
      *
      * @return true, if end of sam file is reached and Check if there is no remaining mpeg-g record to be stored
      */
     bool good();
 
     /**
-     * Check if there is any remaining mpeg-g record to be stored
+     * @brief Check if there is any remaining mpeg-g record to be stored
      *
      * @return
      */
     bool anyRemainingMpeggRecord();
 
+    /**
+     * @brief
+     * @param recs
+     * @return
+     */
     bool isEnoughRecs(std::list<core::record::Record>& recs) const;
 
     /**
-     * Check if the number of mpeg-g records of any group (MPEG-G records grouped by ref) reach blockSize
+     * @brief Check if the number of mpeg-g records of any group (MPEG-G records grouped by ref) reach blockSize
      *
      * @return true, if the number of mpeg-g records of one group exceeds blockSize
      */
@@ -124,7 +132,7 @@ class Importer : public core::FormatImporter {
                                        std::map<std::string, uint16_t>& refs);
 
     /**
-     * Convert SAM Records that belongs to the same template to SplitRec MPEG-G records
+     * @brief Convert SAM Records that belongs to the same template to SplitRec MPEG-G records
      *
      * @param template_chunk:
      * @param sam_recs_2d
@@ -135,14 +143,14 @@ class Importer : public core::FormatImporter {
 
  public:
     /**
-     *
+     * @brief
      * @param _blockSize
      * @param _file
      */
     Importer(size_t _blockSize, std::istream& _file);
 
     /**
-     * Convert SAM flags to MPEG-G record flags
+     * @brief Convert SAM flags to MPEG-G record flags
      *
      * @param flags: SAM flags
      * @return
@@ -150,21 +158,21 @@ class Importer : public core::FormatImporter {
     static std::tuple<bool, uint8_t> convertFlags2Mpeg(uint16_t flags);
 
     /**
-     *
+     * @brief
      * @param token
      * @return
      */
     static char convertCigar2ECigarChar(char token);
 
     /**
-     *
+     * @brief
      * @param token
      * @return
      */
     static int stepSequence(char token);
 
     /**
-     * Convert CIGAR string to ECIGAR string
+     * @brief Convert CIGAR string to ECIGAR string
      *
      * @param cigar
      * @param seq
@@ -173,33 +181,26 @@ class Importer : public core::FormatImporter {
     static std::string convertCigar2ECigar(const std::string& cigar, const std::string& seq);
 
     /**
-     *
-     * @param id
-     * @return
-     */
-    // bool pump(uint64_t& id, std::mutex& lock) override;
-
-    /**
-     *
+     * @brief
      * @param _classifier
      * @return
      */
     bool pumpRetrieve(core::Classifier* _classifier) override;
 
     /**
-     *
+     * @brief
      */
     void flushIn(uint64_t& pos) override;
 
     /**
-     *
+     * @brief
      * @param records: List of MPEG-G records
      * @param sam_recs: SAM record
      */
     static void convertUnmapped(std::list<core::record::Record>& records, SamRecords& sam_recs);
 
     /**
-     * Convert Single-end Reads SAM records to MPEG-G records
+     * @brief Convert Single-end Reads SAM records to MPEG-G records
      *
      * @param records: List of MPEG-G records
      * @param sam_recs: SAM record
@@ -212,7 +213,7 @@ class Importer : public core::FormatImporter {
                                  bool is_read_1_first = true);
 
     /**
-     * Convert Paired-end Reads SAM records to MPEG-G records
+     * @brief Convert Paired-end Reads SAM records to MPEG-G records
      *
      * @param records: List of MPEG-G records
      * @param sam_recs_2d: List of List of sam records (alignments).
@@ -223,7 +224,7 @@ class Importer : public core::FormatImporter {
                                  std::map<std::string, uint16_t>& refs, bool force_split = false);
 
     /**
-     * Convert SAM records contained in ReadTemplate data structure to MPEG-G records
+     * @brief Convert SAM records contained in ReadTemplate data structure to MPEG-G records
      *
      * @param records: List of MPEG-G records
      * @param rt: ReadTemplate object, contains SAM reads belongs to one template
@@ -234,7 +235,7 @@ class Importer : public core::FormatImporter {
                         std::map<std::string, uint16_t>& refs, bool force_split = false);
 
     /**
-     * Compare mapping position of primary alignment of r1 and r2
+     * @brief Compare mapping position of primary alignment of r1 and r2
      *
      * @param r1
      * @param r2
@@ -242,6 +243,11 @@ class Importer : public core::FormatImporter {
      */
     static bool compare(const core::record::Record& r1, const core::record::Record& r2);
 
+    /**
+     * @brief
+     * @param r
+     * @return
+     */
     static uint64_t getMinPos(const core::record::Record& r);
 };
 

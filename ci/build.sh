@@ -3,8 +3,8 @@
 
 ############ Check prerequisites ###############
 
-if [[ "$1" != "debug" && "$1" != "release" ]]; then
-    echo "Usage: build.sh [debug|release]"
+if [[ "$1" != "debug" && "$1" != "release" && "$1" != "doc" ]]; then
+    echo "Usage: build.sh [debug|release|doc]"
     exit 1
 fi
 
@@ -39,20 +39,19 @@ git_root_dir="$(git rev-parse --show-toplevel)"
 cd $git_root_dir
 
 if [[ "$1" == "debug" ]]; then
-    mkdir cmake-build-debug
+    mkdir -p cmake-build-debug
     cd cmake-build-debug
-    cmake .. $architecture -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=OFF -DGENIE_WERROR=ON || { echo 'Cmake failed!' ; exit 1; }
+    cmake .. $architecture -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=ON -DGENIE_WERROR=ON || { echo 'Cmake failed!' ; exit 1; }
 
     if [[ "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "msys" ]]; then
         echo "Skipping automatic build for MSVC"
         exit 0
     fi
 
-    cd cmake-build-debug
     make --jobs || { echo 'Make failed!' ; exit 1; }
 
-else
-    mkdir cmake-build-release
+elif [[ "$1" == "release" ]]; then
+    mkdir -p cmake-build-release
     cd cmake-build-release
     cmake .. $architecture -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=OFF -DGENIE_WERROR=ON || { echo 'Cmake failed!' ; exit 1; }
 
@@ -61,7 +60,16 @@ else
         exit 0
     fi
 
-    cd cmake-build-release
     make --jobs || { echo 'Make failed!' ; exit 1; }
+else
+    if ! command -v doxygen &> /dev/null
+    then
+        echo "Doxygen could not be found. Please install cmake (debian: sudo apt-get install doxygen)."
+         exit 1
+    fi
+    mkdir -p cmake-build-debug
+    cd cmake-build-debug
+    cmake .. $architecture -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DGENIE_USE_OPENMP=ON -DBUILD_DOCUMENTATION=ON -DGENIE_WERROR=ON || { echo 'Cmake failed!' ; exit 1; }
 
+    make doc || { echo 'Generating documentation failed!' ; exit 1; }
 fi

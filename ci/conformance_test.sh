@@ -10,6 +10,12 @@ then
     exit 1
 fi
 
+if [[ ! -x $MPEGG_REF_DECODER ]]
+then
+    echo "MPEG-G reference decoder could not be found. Please set environment variable MPEGG_REF_DECODER."
+    exit 1
+fi
+
 if [[ "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "msys" ]]; then
     fileExt=".exe"
 else
