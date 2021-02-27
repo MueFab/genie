@@ -355,8 +355,8 @@ stages:
 
     - bash: |
         mkdir cmake-build-release
-        mv ../genie-release-$(artifactName)-$(Build.SourceVersion) cmake-build-debug/bin
-        chmod +x cmake-build-debug/bin/*
+        mv ../genie-release-$(artifactName)-$(Build.SourceVersion) cmake-build-release/bin
+        chmod +x cmake-build-release/bin/*
       displayName: 'Copy binaries'
 
     - bash: MPEGG_REF_DECODER=$PWD/ref-decoder/bin/decoder/mpegg-decoder-p2 ci/conformance_test.sh
