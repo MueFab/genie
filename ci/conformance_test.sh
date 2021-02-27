@@ -27,3 +27,22 @@ git_root_dir="$(git rev-parse --show-toplevel)"
 
 
 ############ Run ###############
+
+echo "Single-end fastq"
+wget --no-check-certificate https://cloud.fab-mue.de/s/J8bYea9BYfdNPBj/download -O /tmp/ERR174310_short_1.fastq.gz || { echo 'Could not download single end fastq!' ; exit 1; }
+gzip -df /tmp/ERR174310_short_1.fastq.gz
+/usr/bin/time -f "Command ran for %Es, used %Mkb ram" $git_root_dir/cmake-build-release/bin/genie$fileExt run -i /tmp/ERR174310_short_1.fastq -o /tmp/single_fastq.mgb -f || { echo 'Genie failed to compress single end fastq!' ; exit 1; }
+/usr/bin/time -f "Command ran for %Es, used %Mkb ram" $MPEGG_REF_DECODER -i /tmp/single_fastq.mgb -o /tmp/single_fastq.mgrec || { echo 'MPEGG reference decoder failed to decompress single end fastq!' ; exit 1; }
+rm /tmp/single_fastq.mgb
+#rm /tmp/single_fastq.mgrec
+
+echo "Paired-end fastq"
+wget --no-check-certificate https://cloud.fab-mue.de/s/Hzx8b29cbAYBBto/download -O /tmp/ERR174310_short_2.fastq.gz || { echo 'Could not download paired end fastq!' ; exit 1; }
+gzip -df /tmp/ERR174310_short_2.fastq.gz
+/usr/bin/time -f "Command ran for %Es, used %Mkb ram" $git_root_dir/cmake-build-release/bin/genie$fileExt run -i /tmp/ERR174310_short_1.fastq --input-suppl-file /tmp/ERR174310_short_2.fastq -o /tmp/paired_fastq.mgb -f || { echo 'Genie failed to compress paired end fastq!' ; exit 1; }
+/usr/bin/time -f "Command ran for %Es, used %Mkb ram" $MPEGG_REF_DECODER -i /tmp/paired_fastq.mgb -o /tmp/paired_fastq.mgrec || { echo 'MPEGG reference decoder failed to decompress paired end fastq!' ; exit 1; }
+rm /tmp/paired_fastq.mgb
+#rm /tmp/paired_fastq.mgrec
+
+rm /tmp/ERR174310_short_1.fastq
+rm /tmp/ERR174310_short_2.fastq
