@@ -214,14 +214,14 @@ stages:
           imageName: 'ubuntu-20.04'
           artifactName: 'ubuntu2004'
           fileExt: ''
-        ubuntu1804:
-          imageName: 'ubuntu-18.04'
-          artifactName: 'ubuntu1804'
-          fileExt: ''
-        ubuntu1604:
-          imageName: 'ubuntu-16.04'
-          artifactName: 'ubuntu1604'
-          fileExt: ''
+#        ubuntu1804:
+#          imageName: 'ubuntu-18.04'
+#          artifactName: 'ubuntu1804'
+#          fileExt: ''
+#        ubuntu1604:
+#          imageName: 'ubuntu-16.04'
+#          artifactName: 'ubuntu1604'
+#          fileExt: ''
     pool:
       vmImage: $(imageName)
     steps:
@@ -350,12 +350,12 @@ stages:
       condition: ne( variables['Agent.OS'], 'Windows_NT' )
 
     - download: current
-      artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
+      artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
       displayName: 'Download binaries'
 
     - bash: |
-        mkdir cmake-build-debug
-        mv ../genie-debug-$(artifactName)-$(Build.SourceVersion) cmake-build-debug/bin
+        mkdir cmake-build-release
+        mv ../genie-release-$(artifactName)-$(Build.SourceVersion) cmake-build-debug/bin
         chmod +x cmake-build-debug/bin/*
       displayName: 'Copy binaries'
 
