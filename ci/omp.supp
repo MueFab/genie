@@ -89,6 +89,20 @@
    fun:_ZN8genieapp3run4mainEiPPc
    fun:main
 }
-
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   fun:pthread_create@@GLIBC_2.2.5
+   fun:_ZNSt6thread15_M_start_threadESt10shared_ptrINS_10_Impl_baseEEPFvvE
+   fun:_ZN5genie4util13ThreadManager3runEv
+   fun:_ZN5genie4core15FlowGraphEncode3runEv
+   fun:_ZN8genieapp3run4mainEiPPc
+   fun:main
+}
 
 
