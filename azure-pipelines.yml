@@ -231,13 +231,13 @@ stages:
       condition: eq( variables['Agent.OS'], 'Linux' )
 
     - download: current
-      artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
+      artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
       displayName: 'Download binaries'
 
     - bash: |
-        mkdir cmake-build-debug
-        mv ../genie-debug-$(artifactName)-$(Build.SourceVersion) cmake-build-debug/bin
-        chmod +x cmake-build-debug/bin/*
+        mkdir cmake-build-release
+        mv ../genie-release-$(artifactName)-$(Build.SourceVersion) cmake-build-release/bin
+        chmod +x cmake-build-release/bin/*
       displayName: 'Copy binaries'
 
     - bash: ci/memory_test.sh
