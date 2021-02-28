@@ -85,11 +85,11 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
     std::unique_ptr<core::parameter::desc_pres::Decoder> clone() const override;
 
     /**
-    * @brief
-    * @param desc
-    * @param reader
-    * @return
-    */
+     * @brief
+     * @param desc
+     * @param reader
+     * @return
+     */
     static std::unique_ptr<core::parameter::desc_pres::DecoderTokentype> create(genie::core::GenDesc desc,
                                                                                 util::BitReader &reader);
 

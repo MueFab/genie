@@ -87,7 +87,7 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
         while (workingDirectory.back() == '/') {
             workingDirectory.pop_back();
         }
-    } catch (const CLI::CallForHelp&) {
+    } catch (const CLI::CallForHelp &) {
         std::cout << app.help() << std::endl;
         help = true;
         return;

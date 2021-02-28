@@ -36,10 +36,10 @@ typedef std::list<std::list<Record>> SamRecords2D;
  */
 class Importer : public core::FormatImporter {
  private:
-    size_t blockSize;  //!< @brief
-    Reader samReader;  //!< @brief
-    ReadTemplateGroup rtg;  //!< @brief
-    util::OrderedLock lock;  //!< @brief Lock to ensure in order execution
+    size_t blockSize;           //!< @brief
+    Reader samReader;           //!< @brief
+    ReadTemplateGroup rtg;      //!< @brief
+    util::OrderedLock lock;     //!< @brief Lock to ensure in order execution
     uint64_t last_position{0};  //!< @brief
 
     std::vector<std::list<core::record::Record>> records_by_ref;  //!< @brief
