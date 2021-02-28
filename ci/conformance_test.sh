@@ -18,8 +18,16 @@ fi
 
 if [[ "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "msys" ]]; then
     fileExt=".exe"
-else
+    timecmd=""
+    timeMsg=""
+elif [[ "$OSTYPE" == "darwin"* ]]; then
     fileExt=""
+    timeMsg="Command ran for %Es, used %Mkb ram"
+    timecmd='gtime -f'
+else 
+    fileExt=""
+    timeMsg="Command ran for %Es, used %Mkb ram"
+    timecmd='/usr/bin/time -f'
 fi
 
 
@@ -35,7 +43,7 @@ else
 fi
 
 echo "Genie compress"
-/usr/bin/time -f "Command ran for %Es, used %Mkb ram" \
+$timecmd "$timeMsg" \
     $git_root_dir/cmake-build-release/bin/genie$fileExt run \
     -i $1 \
     $second_input_file \
@@ -50,7 +58,7 @@ ls -l $2
 fi
 ls -l /tmp/output.mgb
 echo "Genie decompress"
-/usr/bin/time -f "Command ran for %Es, used %Mkb ram" \
+$timecmd "$timeMsg" \
     $git_root_dir/cmake-build-release/bin/genie$fileExt run \
     -o /tmp/output_1.fastq \
     --output-suppl-file output_2.fastq \
@@ -60,7 +68,7 @@ rm /tmp/output_1.fastq
 rm -f /tmp/output_2.fastq
 
 echo "Refdecoder decompress"
-/usr/bin/time -f "Command ran for %Es, used %Mkb ram" \
+$timecmd "$timeMsg" \
     $MPEGG_REF_DECODER \
     -i /tmp/output.mgb \
     -o /tmp/output.mgrec \
@@ -68,7 +76,7 @@ echo "Refdecoder decompress"
 rm /tmp/output.mgb
 
 echo "Genie convert"
-/usr/bin/time -f "Command ran for %Es, used %Mkb ram" \
+$timecmd "$timeMsg" \
     $git_root_dir/cmake-build-release/bin/genie$fileExt run \
     -o /tmp/output_1.fastq \
     --output-suppl-file /tmp/output_2.fastq \
@@ -87,7 +95,7 @@ else
 fi
 
 echo "Genie convert"
-/usr/bin/time -f "Command ran for %Es, used %Mkb ram" \
+$timecmd "$timeMsg" \
     $git_root_dir/cmake-build-release/bin/genie$fileExt run \
     -o /tmp/output.mgrec \
     -i $1 -f \
@@ -96,7 +104,7 @@ echo "Genie convert"
     || { echo "Genie convert ($1; $2; $3) failed!" ; exit 1; }
 
 echo "Genie convert back"
-/usr/bin/time -f "Command ran for %Es, used %Mkb ram" \
+$timecmd "$timeMsg" \
     $git_root_dir/cmake-build-release/bin/genie$fileExt run \
     -i /tmp/output.mgrec \
     -o /tmp/output_1.fastq \
