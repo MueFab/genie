@@ -30,7 +30,8 @@ SupportValues::SupportValues(uint8_t _output_symbol_size, uint8_t _coding_subsym
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SupportValues::SupportValues(TransformIdSubsym transformIdSubsym, util::BitReader &reader) {
+SupportValues::SupportValues(TransformIdSubsym transformIdSubsym, util::BitReader &reader)
+    : share_subsym_lut_flag(false), share_subsym_prv_flag(false) {
     output_symbol_size = reader.read<uint8_t>(6);
     coding_subsym_size = reader.read<uint8_t>(6);
     coding_order = reader.read<uint8_t>(2);
