@@ -28,7 +28,7 @@ namespace sam {
  */
 class Exporter : public core::FormatExporter {
     util::OrderedLock lock;  //!< @brief Lock to ensure in order execution
-    Writer writer;  //!< @brief
+    Writer writer;           //!< @brief
 
  public:
     /**
@@ -63,13 +63,13 @@ class Exporter : public core::FormatExporter {
      * @brief
      */
     struct Stash {
-        uint16_t flags;  //!< @brief
-        uint64_t position;  //!< @brief
+        uint16_t flags;        //!< @brief
+        uint64_t position;     //!< @brief
         uint8_t mappingScore;  //!< @brief
-        std::string cigar;  //!< @brief
-        std::string seq;  //!< @brief
-        std::string qual;  //!< @brief
-        bool rcomp;  //!< @brief
+        std::string cigar;     //!< @brief
+        std::string seq;       //!< @brief
+        std::string qual;      //!< @brief
+        bool rcomp;            //!< @brief
     };
 
     /**

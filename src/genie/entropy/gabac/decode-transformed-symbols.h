@@ -83,23 +83,23 @@ class TransformedSymbolsDecoder {
 
     uint8_t outputSymbolSize;  //!< @brief
     uint8_t codingSubsymSize;  //!< @brief
-    uint8_t codingOrder;  //!< @brief
-    uint64_t subsymMask;  //!< @brief
-    uint8_t numSubSyms;  //!< @brief
-    uint8_t numLuts;  //!< @brief
-    uint8_t numPrvs;  //!< @brief
+    uint8_t codingOrder;       //!< @brief
+    uint64_t subsymMask;       //!< @brief
+    uint8_t numSubSyms;        //!< @brief
+    uint8_t numLuts;           //!< @brief
+    uint8_t numPrvs;           //!< @brief
 
-    Reader reader;  //!< @brief
-    ContextSelector ctxSelector;  //!< @brief
+    Reader reader;                               //!< @brief
+    ContextSelector ctxSelector;                 //!< @brief
     LUTsSubSymbolTransform invLutsSubsymTrnsfm;  //!< @brief
 
-    bool diffEnabled;  //!< @brief
-    bool customCmaxTU;  //!< @brief
+    bool diffEnabled;      //!< @brief
+    bool customCmaxTU;     //!< @brief
     uint64_t defaultCmax;  //!< @brief
 
     paramcabac::BinarizationParameters::BinarizationId binID;  //!< @brief
-    std::vector<unsigned int> binParams;  //!< @brief
-    binFunc binarizor;  //!< @brief
+    std::vector<unsigned int> binParams;                       //!< @brief
+    binFunc binarizor;                                         //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -44,7 +44,7 @@ AccessUnit::Subsequence::Subsequence(const Subsequence &sub) { *this = sub; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::Subsequence::Subsequence(Subsequence &&sub) noexcept { *this = sub; }
+AccessUnit::Subsequence::Subsequence(Subsequence &&sub) noexcept { *this = std::move(sub); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

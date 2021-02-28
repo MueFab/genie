@@ -51,7 +51,7 @@ class ProgramOptions {
     size_t numberOfThreads;  //!< @brief
     bool rawReference;       //!< @brief
 
-    bool help;     //!< @brief
+    bool help;  //!< @brief
 
  private:
     /**

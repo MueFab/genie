@@ -48,10 +48,17 @@ class MismatchDecoder : public core::MismatchDecoder {
     bool dataLeft() const override;
 
     /**
+     * @brief get the total number of symbols in the subsequence.
+     * @return number of symbols.
+     */
+    uint64_t getSubseqSymbolsTotal() const;
+
+    /**
      * @brief Copies the object.
      * @return A copy of the full object state.
      */
     std::unique_ptr<core::MismatchDecoder> copy() const override;
+    std::vector<util::DataBlock> trnsfSubseqData;
 
  private:
     uint64_t numSubseqSymbolsTotal;
