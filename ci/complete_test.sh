@@ -56,7 +56,6 @@ cd $git_root_dir/ci
 ./build.sh debug || { echo 'Building debug failed!' ; exit 1; }
 ./unit_test.sh || { echo 'Unit tests failed!' ; exit 1; }
 ./memory_test.sh || { echo 'Memory tests failed!' ; exit 1; }
-./roundtrip_test.sh || { echo 'Roundtrip tests failed!' ; exit 1; }
 ./conformance_test.sh || { echo 'Conformance tests failed!' ; exit 1; }
 ./build.sh release || { echo 'Building release failed!' ; exit 1; }
 echo "Genie works as expected!"
