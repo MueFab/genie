@@ -244,59 +244,7 @@ stages:
       displayName: 'Genie run memory tests'
 
 
-  - job: 'Roundtrip'
-    strategy:
-      matrix:
-        ubuntu2004:
-          imageName: 'ubuntu-20.04'
-          artifactName: 'ubuntu2004'
-          fileExt: ''
-#        ubuntu1804:
-#          imageName: 'ubuntu-18.04'
-#          artifactName: 'ubuntu1804'
-#          fileExt: ''
-#        ubuntu1604:
-#          imageName: 'ubuntu-16.04'
-#          artifactName: 'ubuntu1604'
-#          fileExt: ''
-#        macos1015:
-#          imageName: 'macos-10.15'
-#          artifactName: 'macos1015'
-#          fileExt: ''
-#        macos1014:
-#          imageName: 'macos-10.14'
-#          artifactName: 'macos1014'
-#          fileExt: ''
-#        windows2016:
-#          imageName: 'vs2017-win2016'
-#          artifactName: 'windows2016'
-#          fileExt: '.exe'
-#        windows2019:
-#          imageName: 'windows-2019'
-#          artifactName: 'windows2019'
-#          fileExt: '.exe'
-    pool:
-      vmImage: $(imageName)
-    steps:
-    - bash: brew install libomp
-      displayName: 'Openmp installation (OSX)'
-      condition: eq( variables['Agent.OS'], 'Darwin' )
-
-    - download: current
-      artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
-      displayName: 'Download binaries'
-
-    - bash: |
-        mkdir cmake-build-debug
-        mv ../genie-debug-$(artifactName)-$(Build.SourceVersion) cmake-build-debug/bin
-        chmod +x cmake-build-debug/bin/*
-      displayName: 'Copy binaries'
-
-    - bash: ci/roundtrip_test.sh
-      displayName: 'Genie run roundtrip tests'
-
-
-  - job: 'Conformance'
+  - job: 'Conformance/Roundtrip'
     strategy:
       matrix:
         ubuntu2004:
