@@ -98,9 +98,9 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
         std::ifstream in_RC(eg.infile_RC + '.' + std::to_string(tid));
         std::ifstream in_readlength(eg.infile_readlength + '.' + std::to_string(tid), std::ios::binary);
         std::ofstream f_seq(eg.outfile_seq + '.' + std::to_string(tid));
-        std::ofstream f_pos(eg.outfile_pos + '.' + std::to_string(tid));
+        std::ofstream f_pos(eg.outfile_pos + '.' + std::to_string(tid), std::ios::binary);
         std::ofstream f_noise(eg.outfile_noise + '.' + std::to_string(tid));
-        std::ofstream f_noisepos(eg.outfile_noisepos + '.' + std::to_string(tid));
+        std::ofstream f_noisepos(eg.outfile_noisepos + '.' + std::to_string(tid),std::ios::binary);
         std::ofstream f_order(eg.infile_order + '.' + std::to_string(tid) + ".tmp", std::ios::binary);
         std::ofstream f_RC(eg.infile_RC + '.' + std::to_string(tid) + ".tmp");
         std::ofstream f_readlength(eg.infile_readlength + '.' + std::to_string(tid) + ".tmp", std::ios::binary);
@@ -306,18 +306,18 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
         in_seq.close();
     }
     // Combine files produced by the threads
-    std::ofstream f_order(eg.infile_order);
-    std::ofstream f_readlength(eg.infile_readlength);
-    std::ofstream f_noisepos(eg.outfile_noisepos);
+    std::ofstream f_order(eg.infile_order,std::ios::binary);
+    std::ofstream f_readlength(eg.infile_readlength,std::ios::binary);
+    std::ofstream f_noisepos(eg.outfile_noisepos,std::ios::binary);
     std::ofstream f_noise(eg.outfile_noise);
     std::ofstream f_RC(eg.infile_RC);
     std::ofstream f_seq(eg.outfile_seq);
     for (int tid = 0; tid < eg.num_thr; tid++) {
         std::ifstream in_seq(eg.outfile_seq + '.' + std::to_string(tid));
-        std::ifstream in_order(eg.infile_order + '.' + std::to_string(tid) + ".tmp");
-        std::ifstream in_readlength(eg.infile_readlength + '.' + std::to_string(tid) + ".tmp");
+        std::ifstream in_order(eg.infile_order + '.' + std::to_string(tid) + ".tmp",std::ios::binary);
+        std::ifstream in_readlength(eg.infile_readlength + '.' + std::to_string(tid) + ".tmp",std::ios::binary);
         std::ifstream in_RC(eg.infile_RC + '.' + std::to_string(tid) + ".tmp");
-        std::ifstream in_noisepos(eg.outfile_noisepos + '.' + std::to_string(tid));
+        std::ifstream in_noisepos(eg.outfile_noisepos + '.' + std::to_string(tid),std::ios::binary);
         std::ifstream in_noise(eg.outfile_noise + '.' + std::to_string(tid));
         f_seq << in_seq.rdbuf();
         f_seq.clear();
