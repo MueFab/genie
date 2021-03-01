@@ -132,7 +132,7 @@ class bfile_iterator : public std::iterator<std::forward_iterator_tag, basetype>
         //printf("bf it %p\n",_is);
         _buffsize = 10000;
         _buffer = (basetype *) malloc(_buffsize*sizeof(basetype));
-        int reso = fseek(_is,0,SEEK_SET);
+        fseek(_is,0,SEEK_SET);
         advance();
     }
 
