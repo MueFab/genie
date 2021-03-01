@@ -577,7 +577,7 @@ class bitVector {
         }
         printf("\n");
 
-        printf("rank array : size %lu \n",_ranks.size());
+        printf("rank array : size %lu \n",(unsigned long)_ranks.size());
         for (uint64_t ii = 0; ii< _ranks.size(); ii++)
         {
             printf("%llu :  %lli,  ",(long long unsigned int)ii,(long long int)_ranks[ii]);
@@ -902,7 +902,7 @@ class mphf {
     void pthread_processLevel( std::vector<elem_t>  & buffer , std::shared_ptr<Iterator> shared_it, std::shared_ptr<Iterator> until_p, int i)
     {
         uint64_t nb_done =0;
-        int tid = INTR_FETCH_AND_ADD((long long*)& _nb_living, 1);
+        int tid = (int)INTR_FETCH_AND_ADD((long long*)& _nb_living, 1);
         auto until = *until_p;
         uint64_t inbuff =0;
 
@@ -1142,7 +1142,7 @@ class mphf {
 
         if(_fastmode)
         {
-            setLevelFastmode.resize(_percent_elem_loaded_for_fastMode * (double)_nelem );
+            setLevelFastmode.resize((uint64_t)(_percent_elem_loaded_for_fastMode * (double)_nelem));
         }
 
 

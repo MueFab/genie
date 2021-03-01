@@ -70,8 +70,8 @@ MismatchDecoder::MismatchDecoder(util::DataBlock &&d, const EncodingConfiguratio
                             inputStream, trnsfSubseqPayloadSizeRemain, &trnsfSubseqData[i]);
                     }
 
-                    trnsfSymbolsDecoder.emplace_back(&trnsfSubseqData[i], subseqCfg.getTransformSubseqCfg(i),
-                                                     currNumtrnsfSymbols);
+                    trnsfSymbolsDecoder.emplace_back(&trnsfSubseqData[i], subseqCfg.getTransformSubseqCfg((uint8_t)i),
+                                                     (unsigned int)currNumtrnsfSymbols);
                 }
             }
         }
