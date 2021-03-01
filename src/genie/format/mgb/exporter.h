@@ -27,31 +27,31 @@ namespace format {
 namespace mgb {
 
 /**
- *
+ * @brief
  */
 class Exporter : public core::FormatExporterCompressed {
  private:
-    util::BitWriter writer;                                      //!<
-    util::OrderedLock lock;                                      //!<
-    size_t id_ctr;                                               //!<
-    std::vector<core::parameter::ParameterSet> parameter_stash;  //!<
+    util::BitWriter writer;                                      //!< @brief
+    util::OrderedLock lock;                                      //!< @brief
+    size_t id_ctr;                                               //!< @brief
+    std::vector<core::parameter::ParameterSet> parameter_stash;  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param _file
      */
     explicit Exporter(std::ostream* _file);
 
     /**
-     *
+     * @brief
      * @param t
      * @param id
      */
     void flowIn(core::AccessUnit&& t, const genie::util::Section& id) override;
 
     /**
-     *
+     * @brief
      * @param id
      */
     void skipIn(const genie::util::Section& id) override;

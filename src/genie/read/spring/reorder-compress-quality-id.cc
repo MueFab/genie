@@ -199,7 +199,7 @@ void reorder_compress_id_pe(std::string *id_array, const std::string &temp_dir, 
         std::string name = file_name + "." + std::to_string(block_num);
         params[block_num].setDescriptor(core::GenDesc::RNAME, std::move(std::get<0>(encoded)));
         std::string file_to_save_streams = id_desc_prefix + std::to_string(block_num);
-        std::ofstream outfile(file_to_save_streams);
+        std::ofstream outfile(file_to_save_streams, std::ios::binary);
         util::BitWriter bw(&outfile);
         std::get<1>(encoded).write(bw);
 
@@ -269,7 +269,7 @@ void reorder_compress_quality_pe(std::string file_quality[2], const std::string 
             params[block_num].addClass(core::record::ClassType::CLASS_U, std::move(std::get<0>(raw_desc)));
             params[block_num].setDescriptor(core::GenDesc::QV, std::move(std::get<0>(encoded)));
             std::string file_to_save_streams = quality_desc_prefix + std::to_string(block_num);
-            std::ofstream out(file_to_save_streams);
+            std::ofstream out(file_to_save_streams, std::ios::binary);
             util::BitWriter bw(&out);
             std::get<1>(encoded).write(bw);
         }
@@ -359,7 +359,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                 params[block_num_offset + block_num].setDescriptor(core::GenDesc::RNAME,
                                                                    std::move(std::get<0>(encoded)));
                 std::string file_to_save_streams = id_desc_prefix + std::to_string(block_num_offset + block_num);
-                std::ofstream out(file_to_save_streams);
+                std::ofstream out(file_to_save_streams, std::ios::binary);
                 util::BitWriter bw(&out);
                 std::get<1>(encoded).write(bw);
             } else /* mode == "quality" */ {
@@ -379,7 +379,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
                                                               std::move(std::get<0>(qv_str)));
                 params[block_num_offset + block_num].setDescriptor(core::GenDesc::QV, std::move(std::get<0>(encoded)));
                 std::string file_to_save_streams = quality_desc_prefix + std::to_string(block_num_offset + block_num);
-                std::ofstream out(file_to_save_streams);
+                std::ofstream out(file_to_save_streams, std::ios::binary);
                 util::BitWriter bw(&out);
                 std::get<1>(encoded).write(bw);
             }

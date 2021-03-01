@@ -25,14 +25,14 @@ namespace genie {
 namespace util {
 
 /**
- *
+ * @brief
  */
 class IndustrialPark {
  private:
-    std::map<std::type_index, std::unique_ptr<GenericFactory>> factories;  //!<
+    std::map<std::type_index, std::unique_ptr<GenericFactory>> factories;  //!< @brief
 
     /**
-     *
+     * @brief
      * @tparam T
      * @return
      */
@@ -40,7 +40,7 @@ class IndustrialPark {
     Factory<T>* findAndCreate();
 
     /**
-     *
+     * @brief
      * @tparam T
      * @return
      */
@@ -49,7 +49,7 @@ class IndustrialPark {
 
  public:
     /**
-     *
+     * @brief
      * @tparam T
      * @param id
      * @param constructor
@@ -59,7 +59,7 @@ class IndustrialPark {
         uint8_t id, const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor);
 
     /**
-     *
+     * @brief
      * @tparam T
      * @param constructor
      * @return
@@ -69,7 +69,7 @@ class IndustrialPark {
         const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor);
 
     /**
-     *
+     * @brief
      * @tparam T
      * @param id
      */
@@ -77,9 +77,10 @@ class IndustrialPark {
     void unregisterConstructor(uint8_t id);
 
     /**
-     *
+     * @brief
      * @tparam T
      * @param id
+     * @param desc
      * @param reader
      * @return
      */

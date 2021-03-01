@@ -29,18 +29,18 @@ namespace format {
 namespace mgb {
 
 /**
- *
+ * @brief
  */
 class Importer : public core::FormatImporterCompressed, public core::ReferenceSource {
  private:
-    util::BitReader reader;               //!<
-    std::mutex lock;                      //!<
-    mgb::DataUnitFactory factory;         //!<
-    core::ReferenceManager* ref_manager;  //!<
-    core::RefDecoder* decoder;            //!<
+    util::BitReader reader;               //!< @brief
+    std::mutex lock;                      //!< @brief
+    mgb::DataUnitFactory factory;         //!< @brief
+    core::ReferenceManager* ref_manager;  //!< @brief
+    core::RefDecoder* decoder;            //!< @brief
 
     /**
-     *
+     * @brief
      * @param au
      * @return
      */
@@ -48,17 +48,16 @@ class Importer : public core::FormatImporterCompressed, public core::ReferenceSo
 
  public:
     /**
-     *
+     * @brief
      * @param _file
      * @param manager
      * @param refd
      * @param refOnly
-     * @param _stats
      */
     explicit Importer(std::istream& _file, core::ReferenceManager* manager, core::RefDecoder* refd, bool refOnly);
 
     /**
-     *
+     * @brief
      * @param id
      * @param lock
      * @return
@@ -66,7 +65,7 @@ class Importer : public core::FormatImporterCompressed, public core::ReferenceSo
     bool pump(uint64_t& id, std::mutex& lock) override;
 
     /**
-     *
+     * @brief
      * @param raw
      * @param f_pos
      * @param start

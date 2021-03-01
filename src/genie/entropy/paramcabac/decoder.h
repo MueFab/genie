@@ -23,16 +23,21 @@ namespace entropy {
 namespace paramcabac {
 
 /**
- *
+ * @brief
  */
 class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
  protected:
-    uint8_t rle_guard_tokentype : 8;                       //!<
-    std::vector<Subsequence> descriptor_subsequence_cfgs;  //!<
+    uint8_t rle_guard_tokentype : 8;                       //!< @brief
+    std::vector<Subsequence> descriptor_subsequence_cfgs;  //!< @brief
 
  public:
-    static const uint8_t MODE_CABAC = 0;  //!<
+    static const uint8_t MODE_CABAC = 0;  //!< @brief
 
+    /**
+     * @brief
+     * @param dec
+     * @return
+     */
     bool equals(const Decoder *dec) const override {
         return core::parameter::desc_pres::Decoder::equals(dec) &&
                dynamic_cast<const DecoderTokenType *>(dec)->rle_guard_tokentype == rle_guard_tokentype &&
@@ -41,45 +46,47 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
     }
 
     /**
-     *
+     * @brief
      */
     DecoderTokenType();
 
     /**
-     *
+     * @brief
+     * @param desc
      * @param reader
      */
     explicit DecoderTokenType(core::GenDesc desc, util::BitReader &reader);
 
     /**
-     *
+     * @brief
      * @param index
      * @param cfg
      */
     void setSubsequenceCfg(uint8_t index, Subsequence &&cfg);
 
     /**
-     *
+     * @brief
      * @param index
      * @return
      */
     const Subsequence &getSubsequenceCfg(uint8_t index) const;
 
     /**
-     *
+     * @brief
      * @param index
      * @return
      */
     Subsequence &getSubsequenceCfg(uint8_t index);
 
     /**
-     *
+     * @brief
      * @return
      */
     std::unique_ptr<core::parameter::desc_pres::Decoder> clone() const override;
 
     /**
-     *
+     * @brief
+     * @param desc
      * @param reader
      * @return
      */
@@ -87,79 +94,86 @@ class DecoderTokenType : public core::parameter::desc_pres::DecoderTokentype {
                                                                                 util::BitReader &reader);
 
     /**
-     *
+     * @brief
      * @param writer
      */
     void write(util::BitWriter &writer) const override;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint8_t getRleGuardTokentype() const;
 };
 
 /**
- *
+ * @brief
  */
 class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
  protected:
-    std::vector<Subsequence> descriptor_subsequence_cfgs;  //!<
+    std::vector<Subsequence> descriptor_subsequence_cfgs;  //!< @brief
 
  public:
-    static const uint8_t MODE_CABAC = 0;  //!<
+    static const uint8_t MODE_CABAC = 0;  //!< @brief
 
+    /**
+     * @brief
+     * @param dec
+     * @return
+     */
     bool equals(const Decoder *dec) const override {
         return core::parameter::desc_pres::Decoder::equals(dec) &&
                dynamic_cast<const DecoderRegular *>(dec)->descriptor_subsequence_cfgs == descriptor_subsequence_cfgs;
     }
 
     /**
-     *
+     * @brief
      */
     DecoderRegular();
 
     /**
-     *
+     * @brief
      * @param desc
      */
     explicit DecoderRegular(core::GenDesc desc);
 
     /**
-     *
+     * @brief
+     * @param desc
      * @param reader
      */
     explicit DecoderRegular(core::GenDesc desc, util::BitReader &reader);
 
     /**
-     *
+     * @brief
      * @param index
      * @param cfg
      */
     void setSubsequenceCfg(uint8_t index, Subsequence &&cfg);
 
     /**
-     *
+     * @brief
      * @param index
      * @return
      */
     const Subsequence &getSubsequenceCfg(uint8_t index) const;
 
     /**
-     *
+     * @brief
      * @param index
      * @return
      */
     Subsequence &getSubsequenceCfg(uint8_t index);
 
     /**
-     *
+     * @brief
      * @return
      */
     std::unique_ptr<core::parameter::desc_pres::Decoder> clone() const override;
 
     /**
-     *
+     * @brief
+     * @param desc
      * @param reader
      * @return
      */
@@ -167,7 +181,7 @@ class DecoderRegular : public core::parameter::desc_pres::DecoderRegular {
                                                                               util::BitReader &reader);
 
     /**
-     *
+     * @brief
      * @param writer
      */
     void write(util::BitWriter &writer) const override;

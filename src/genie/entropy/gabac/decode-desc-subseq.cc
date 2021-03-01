@@ -28,12 +28,6 @@ namespace gabac {
 
 static inline void doInverseSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
                                                  std::vector<util::DataBlock> *const transformedSubseqs) {
-    // GABACIFY_LOG_TRACE << "Encoding sequence of length: " <<
-    // (*transformedSequences)[0].size();
-
-    // GABACIFY_LOG_DEBUG << "Performing sequence transformation " <<
-    // gabac::transformationInformation[id].name;
-
     switch (subseqCfg.getTransformParameters().getTransformIdSubseq()) {
         case paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM:
             transformedSubseqs->resize(1);
@@ -54,13 +48,6 @@ static inline void doInverseSubsequenceTransform(const paramcabac::Subsequence &
             UTILS_DIE("Invalid subseq transforamtion");
             break;
     }
-
-    // GABACIFY_LOG_TRACE << "Got " << transformedSequences->size() << "
-    // sequences";
-    // for (unsigned i = 0; i < transformedSubseqs->size(); ++i) {
-    // GABACIFY_LOG_TRACE << i << ": " << (*transformedSequences)[i].size()
-    // << " bytes";
-    // }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -96,8 +83,6 @@ uint64_t decodeDescSubsequence(const IOConfiguration &ioConf, const EncodingConf
             // Loop through the transformed sequences
             std::vector<util::DataBlock> transformedSubseqs(numTrnsfSubseqsCfgs);
             for (size_t i = 0; i < numTrnsfSubseqsCfgs; i++) {
-                // GABACIFY_LOG_TRACE << "Processing transformed sequence: " << i;
-
                 util::DataBlock decodedTransformedSubseq;
                 uint64_t numtrnsfSymbols = 0;
                 uint64_t trnsfSubseqPayloadSizeRemain = 0;
@@ -132,7 +117,6 @@ uint64_t decodeDescSubsequence(const IOConfiguration &ioConf, const EncodingConf
             }
 
             doInverseSubsequenceTransform(subseqCfg, &transformedSubseqs);
-            // GABACIFY_LOG_TRACE << "Decoded sequence of length: " << transformedSubseqs[0].size();
 
             gabac::StreamHandler::writeBytes(*ioConf.outputStream, &transformedSubseqs[0]);
         }
