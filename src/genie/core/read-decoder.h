@@ -34,48 +34,50 @@ class ReadDecoder : public Module<AccessUnit, record::Chunk> {
  public:
     using QvSelector = util::SideSelector<QVDecoder, std::tuple<std::vector<std::string>, core::stats::PerfStats>,
                                           const parameter::QualityValues&, const std::vector<std::string>&,
-                                          AccessUnit::Descriptor&>;  //!<
+                                          AccessUnit::Descriptor&>;  //!< @brief
     using NameSelector = util::SideSelector<NameDecoder, std::tuple<std::vector<std::string>, core::stats::PerfStats>,
-                                            AccessUnit::Descriptor&>;  //!<
+                                            AccessUnit::Descriptor&>;  //!< @brief
     using EntropySelector =
         util::SideSelector<EntropyDecoder, std::tuple<AccessUnit::Descriptor, core::stats::PerfStats>,
-                           const parameter::DescriptorSubseqCfg&, AccessUnit::Descriptor&, bool>;  //!<
+                           const parameter::DescriptorSubseqCfg&, AccessUnit::Descriptor&, bool>;  //!< @brief
 
  protected:
-    QvSelector* qvcoder{};            //!<
-    NameSelector* namecoder{};        //!<
-    EntropySelector* entropycoder{};  //!<
+    QvSelector* qvcoder{};            //!< @brief
+    NameSelector* namecoder{};        //!< @brief
+    EntropySelector* entropycoder{};  //!< @brief
 
  public:
     /**
-     *
+     * @brief
      * @param coder
      */
     virtual void setQVCoder(QvSelector* coder);
 
     /**
-     *
+     * @brief
      * @param coder
      */
     virtual void setNameCoder(NameSelector* coder);
 
     /**
-     *
+     * @brief
      * @param coder
      */
     virtual void setEntropyCoder(EntropySelector* coder);
 
     /**
-     *
+     * @brief
      * @param select
      * @param a
+     * @param mmCoderEnabled
      * @return
      */
     static AccessUnit entropyCodeAU(EntropySelector* select, AccessUnit&& a, bool mmCoderEnabled);
 
     /**
-     *
+     * @brief
      * @param a
+     * @param mmCoderEnabled
      * @return
      */
     AccessUnit entropyCodeAU(AccessUnit&& a, bool mmCoderEnabled);

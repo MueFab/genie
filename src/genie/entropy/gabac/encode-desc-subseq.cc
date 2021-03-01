@@ -30,12 +30,6 @@ namespace gabac {
 
 static inline void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
                                           std::vector<util::DataBlock> *const transformedSubseqs) {
-    // GABACIFY_LOG_TRACE << "Encoding sequence of length: " <<
-    // (*transformedSequences)[0].size();
-
-    // GABACIFY_LOG_DEBUG << "Performing sequence transformation " <<
-    // gabac::transformationInformation[id].name;
-
     switch (subseqCfg.getTransformParameters().getTransformIdSubseq()) {
         case paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM:
             transformedSubseqs->resize(1);
@@ -56,13 +50,6 @@ static inline void doSubsequenceTransform(const paramcabac::Subsequence &subseqC
             UTILS_DIE("Invalid subseq transforamtion");
             break;
     }
-
-    // GABACIFY_LOG_TRACE << "Got " << transformedSequences->size() << "
-    // sequences";
-    // for (unsigned i = 0; i < transformedSubseqs->size(); ++i) {
-    // GABACIFY_LOG_TRACE << i << ": " << (*transformedSequences)[i].size()
-    // << " bytes";
-    // }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,108 @@
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   fun:pthread_create@@GLIBC_2.2.5
+   obj:/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+   fun:GOMP_parallel
+   fun:_ZN5genie4read6spring12reorder_mainILm256EEEvRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKNS1_18compression_paramsE
+   fun:_ZN5genie4read6spring7Encoder7flushInERm
+   fun:_ZN5genie4util8SelectorINS_4core6record5ChunkENS2_10AccessUnitEE7flushInERm
+   fun:_ZN5genie4util13ThreadManager3runEv
+   fun:_ZN5genie4core15FlowGraphEncode3runEv
+   fun:_ZN8genieapp3run4mainEiPPc
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   fun:pthread_create@@GLIBC_2.2.5
+   obj:/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+   fun:GOMP_parallel
+   fun:_ZN5genie4read6spring6encodeILm320EEEvPSt6bitsetIXT_EEPNS1_10bbhashdictEPjPtRKNS1_14encoder_globalERKNS1_16encoder_global_bIXT_EEE
+   fun:_ZN5genie4read6spring12encoder_mainILm320EEEvRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKNS1_18compression_paramsE
+   fun:_ZN5genie4read6spring7Encoder7flushInERm
+   fun:_ZN5genie4util8SelectorINS_4core6record5ChunkENS2_10AccessUnitEE7flushInERm
+   fun:_ZN5genie4util13ThreadManager3runEv
+   fun:_ZN5genie4core15FlowGraphEncode3runEv
+   fun:_ZN8genieapp3run4mainEiPPc
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   fun:pthread_create@@GLIBC_2.2.5
+   fun:_ZNSt6thread15_M_start_threadESt10unique_ptrINS_6_StateESt14default_deleteIS1_EEPFvvE
+   fun:_ZN5genie4util13ThreadManager3runEv
+   fun:_ZN5genie4core15FlowGraphEncode3runEv
+   fun:_ZN8genieapp3run4mainEiPPc
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   fun:pthread_create@@GLIBC_2.2.5
+   obj:/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+   fun:GOMP_parallel
+   fun:_ZN5genie4read6spring7reorderILm256EEEvPSt6bitsetIXT_EEPNS1_10bbhashdictEPtRKNS1_14reorder_globalIXT_EEE
+   fun:_ZN5genie4read6spring12reorder_mainILm256EEEvRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKNS1_18compression_paramsE
+   fun:_ZN5genie4read6spring7Encoder7flushInERm
+   fun:_ZN5genie4util8SelectorINS_4core6record5ChunkENS2_10AccessUnitEE7flushInERm
+   fun:_ZN5genie4util13ThreadManager3runEv
+   fun:_ZN5genie4core15FlowGraphEncode3runEv
+   fun:_ZN8genieapp3run4mainEiPPc
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   fun:pthread_create@@GLIBC_2.2.5
+   fun:_ZNSt6thread15_M_start_threadESt10unique_ptrINS_6_StateESt14default_deleteIS1_EEPFvvE
+   fun:_ZN5genie4util13ThreadManager3runEv
+   fun:_ZN5genie4core15FlowGraphEncode3runEv
+   fun:_ZN8genieapp3run4mainEiPPc
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   fun:pthread_create@@GLIBC_2.2.5
+   fun:_ZNSt6thread15_M_start_threadESt10shared_ptrINS_10_Impl_baseEEPFvvE
+   fun:_ZN5genie4util13ThreadManager3runEv
+   fun:_ZN5genie4core15FlowGraphEncode3runEv
+   fun:_ZN8genieapp3run4mainEiPPc
+   fun:main
+}
+
+

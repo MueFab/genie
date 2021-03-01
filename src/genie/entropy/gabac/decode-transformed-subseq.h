@@ -32,15 +32,16 @@ namespace gabac {
 
 /**
  *
- * @param
  */
 typedef uint64_t (Reader::*binFunc)(const std::vector<unsigned int>);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
- *
- * @param
+ * @brief
+ * @param reader
+ * @param binID
+ * @param symbolValue
  */
 void decodeSignFlag(Reader &reader, const paramcabac::BinarizationParameters::BinarizationId binID,
                     uint64_t &symbolValue);
@@ -48,8 +49,14 @@ void decodeSignFlag(Reader &reader, const paramcabac::BinarizationParameters::Bi
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
- *
- * @param
+ * @brief
+ * @param outputSymbolSize
+ * @param bypassFlag
+ * @param binID
+ * @param binarzationParams
+ * @param stateVars
+ * @param binParams
+ * @return
  */
 binFunc getBinarizorReader(const uint8_t outputSymbolSize, const bool bypassFlag,
                            const paramcabac::BinarizationParameters::BinarizationId binID,
@@ -59,7 +66,7 @@ binFunc getBinarizorReader(const uint8_t outputSymbolSize, const bool bypassFlag
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
- *
+ * @brief
  * @param trnsfSubseqConf
  * @param numEncodedSymbols
  * @param bitstream

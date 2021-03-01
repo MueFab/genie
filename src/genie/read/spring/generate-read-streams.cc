@@ -177,7 +177,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
             if (d.isEmpty()) {
                 continue;
             }
-            std::ofstream out(file_to_save_streams + "." + std::to_string(uint8_t(d.getID())));
+            std::ofstream out(file_to_save_streams + "." + std::to_string(uint8_t(d.getID())), std::ios::binary);
             util::BitWriter bw(&out);
             d.write(bw);
         }
@@ -622,14 +622,6 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
     const unsigned cur_thread_num = 0;
 #endif
 
-    // char_to_int
-    int64_t char_to_int[128];
-    char_to_int[(uint8_t)'A'] = 0;
-    char_to_int[(uint8_t)'C'] = 1;
-    char_to_int[(uint8_t)'G'] = 2;
-    char_to_int[(uint8_t)'T'] = 3;
-    char_to_int[(uint8_t)'N'] = 4;
-
     int64_t rc_to_int[128];
     rc_to_int[(uint8_t)'d'] = 0;
     rc_to_int[(uint8_t)'r'] = 1;
@@ -641,7 +633,8 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
         raw_au.get(core::GenSub::RLEN).push(seq_end - seq_start - 1);  // rlen
         raw_au.get(core::GenSub::RTYPE).push(5);                       // rtype
         for (uint64_t i = seq_start; i < seq_end; i++)
-            raw_au.get(core::GenSub::UREADS).push(char_to_int[(uint8_t)data.seq[i]]);  // ureads
+            raw_au.get(core::GenSub::UREADS)
+                .push(getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[data.seq[i]]);  // ureads
     }
     uint64_t prevpos = 0, diffpos;
     // Write streams
@@ -672,11 +665,13 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                     .push(data.read_length_arr[current] + data.read_length_arr[pair] - 1);  // rlen
                 for (uint64_t j = 0; j < data.read_length_arr[current]; j++) {
                     raw_au.get(core::GenSub::UREADS)
-                        .push(char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
+                        .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                                  .inverseLut[data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
                 }
                 for (uint64_t j = 0; j < data.read_length_arr[pair]; j++) {
                     raw_au.get(core::GenSub::UREADS)
-                        .push(char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[pair] + j]]);  // ureads
+                        .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                                  .inverseLut[data.unaligned_arr[data.pos_arr[pair] + j]]);  // ureads
                 }
                 raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(seq_end - prevpos);     // pos
                 raw_au.get(core::GenSub::RCOMP).push(0);                                 // rcomp
@@ -714,9 +709,11 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                                     .push(data.noisepos_arr[data.pos_in_noise_arr[index] + j] - 1);  // mmpos
                             raw_au.get(core::GenSub::MMTYPE_TYPE).push(0);  // mmtype = Substitution
                             raw_au.get(core::GenSub::MMTYPE_SUBSTITUTION)
-                                .push(char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[index] + j]]);
+                                .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                                          .inverseLut[data.noise_arr[data.pos_in_noise_arr[index] + j]]);
                             raw_au.pushDependency(core::GenSub::MMTYPE_SUBSTITUTION,
-                                                  char_to_int[(uint8_t)data.seq[data.pos_arr[index] + curr_noise_pos]]);
+                                                  getAlphabetProperties(core::AlphabetID::ACGTN)
+                                                      .inverseLut[data.seq[data.pos_arr[index] + curr_noise_pos]]);
                         }
                         raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(1);  // mmpos
                     }
@@ -748,9 +745,11 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                                 .push(data.noisepos_arr[data.pos_in_noise_arr[current] + j] - 1);  // mmpos
                         raw_au.get(core::GenSub::MMTYPE_TYPE).push(0);  // mmtype = Substitution
                         raw_au.get(core::GenSub::MMTYPE_SUBSTITUTION)
-                            .push(char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[current] + j]]);
+                            .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                                      .inverseLut[data.noise_arr[data.pos_in_noise_arr[current] + j]]);
                         raw_au.pushDependency(core::GenSub::MMTYPE_SUBSTITUTION,
-                                              char_to_int[(uint8_t)data.seq[data.pos_arr[current] + curr_noise_pos]]);
+                                              getAlphabetProperties(core::AlphabetID::ACGTN)
+                                                  .inverseLut[data.seq[data.pos_arr[current] + curr_noise_pos]]);
                     }
                     raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(1);
                 }
@@ -759,7 +758,8 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                 raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] - 1);  // rlen
                 for (uint64_t j = 0; j < data.read_length_arr[current]; j++) {
                     raw_au.get(core::GenSub::UREADS)
-                        .push(char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
+                        .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                                  .inverseLut[data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
                 }
                 raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(seq_end - prevpos);     // pos
                 raw_au.get(core::GenSub::RCOMP).push(0);                                 // rcomp
@@ -860,7 +860,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
             if (d.isEmpty()) {
                 continue;
             }
-            std::ofstream out(file_to_save_streams + "." + std::to_string(uint8_t(d.getID())));
+            std::ofstream out(file_to_save_streams + "." + std::to_string(uint8_t(d.getID())), std::ios::binary);
             util::BitWriter bw(&out);
             d.write(bw);
         }
