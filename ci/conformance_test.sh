@@ -21,15 +21,12 @@ fi
 if [[ "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "msys" ]]; then
     fileExt=".exe"
     timecmd=""
-    timeMsg=""
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     fileExt=""
-    timeMsg="Command ran for %Es, used %Mkb ram"
-    timecmd='gtime -f'
+    timecmd='gtime -f "Command ran for %Es, used %Mkb ram"'
 else 
     fileExt=""
-    timeMsg="Command ran for %Es, used %Mkb ram"
-    timecmd='/usr/bin/time -f'
+    timecmd='/usr/bin/time -f "Command ran for %Es, used %Mkb ram"'
 fi
 
 
@@ -44,7 +41,7 @@ compress_roundtrip () {
     fi
 
     echo "Genie compress"
-    $timecmd "$timeMsg" \
+    eval $timecmd \
         $git_root_dir/cmake-build-release/bin/genie$fileExt run \
         -i $1 \
         $second_input_file \
@@ -59,7 +56,7 @@ compress_roundtrip () {
     fi
     ls -l /tmp/output.mgb
     echo "Genie decompress"
-    $timecmd "$timeMsg" \
+    eval $timecmd \
         $git_root_dir/cmake-build-release/bin/genie$fileExt run \
         -o /tmp/output_1.fastq \
         --output-suppl-file output_2.fastq \
@@ -70,7 +67,7 @@ compress_roundtrip () {
 
     if [[ "$OSTYPE" != "win32" && "$OSTYPE" != "cygwin" && "$OSTYPE" != "msys" ]]; then
         echo "Refdecoder decompress"
-        $timecmd "$timeMsg" \
+        eval $timecmd \
             $MPEGG_REF_DECODER \
             -i /tmp/output.mgb \
             -o /tmp/output.mgrec \
@@ -78,7 +75,7 @@ compress_roundtrip () {
         rm /tmp/output.mgb
 
         echo "Genie convert"
-        $timecmd "$timeMsg" \
+        eval $timecmd \
             $git_root_dir/cmake-build-release/bin/genie$fileExt run \
             -o /tmp/output_1.fastq \
             --output-suppl-file /tmp/output_2.fastq \
@@ -98,7 +95,7 @@ convert_roundtrip() {
     fi
 
     echo "Genie convert"
-    $timecmd "$timeMsg" \
+    eval $timecmd \
         $git_root_dir/cmake-build-release/bin/genie$fileExt run \
         -o /tmp/output.mgrec \
         -i $1 -f \
@@ -107,7 +104,7 @@ convert_roundtrip() {
         || { echo "Genie convert ($1; $2; $3) failed!" ; exit 1; }
 
     echo "Genie convert back"
-    $timecmd "$timeMsg" \
+    eval $timecmd \
         $git_root_dir/cmake-build-release/bin/genie$fileExt run \
         -i /tmp/output.mgrec \
         -o /tmp/output_1.fastq \
