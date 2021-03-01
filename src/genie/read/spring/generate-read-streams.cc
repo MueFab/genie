@@ -177,7 +177,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
             if (d.isEmpty()) {
                 continue;
             }
-            std::ofstream out(file_to_save_streams + "." + std::to_string(uint8_t(d.getID())),std::ios::binary);
+            std::ofstream out(file_to_save_streams + "." + std::to_string(uint8_t(d.getID())), std::ios::binary);
             util::BitWriter bw(&out);
             d.write(bw);
         }
@@ -860,7 +860,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
             if (d.isEmpty()) {
                 continue;
             }
-            std::ofstream out(file_to_save_streams + "." + std::to_string(uint8_t(d.getID())),std::ios::binary);
+            std::ofstream out(file_to_save_streams + "." + std::to_string(uint8_t(d.getID())), std::ios::binary);
             util::BitWriter bw(&out);
             d.write(bw);
         }
