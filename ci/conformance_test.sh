@@ -124,10 +124,11 @@ convert_roundtrip() {
 ############ Run ###############
 
 echo "*** Single-end fastq"
+
 # Get fastq file no 1
-wget --no-check-certificate \
+curl \
     https://cloud.fab-mue.de/s/J8bYea9BYfdNPBj/download \
-    -O /tmp/ERR174310_short_1.fastq.gz \
+    --output /tmp/ERR174310_short_1.fastq.gz \
     || { echo 'Could not download single end fastq!' ; exit 1; }
 gzip -df /tmp/ERR174310_short_1.fastq.gz
 
@@ -139,9 +140,9 @@ convert_roundtrip "/tmp/ERR174310_short_1.fastq" "" ""
 
 echo "*** Paired-end fastq"
 # Get fastq file no 2
-wget --no-check-certificate \
+curl \
     https://cloud.fab-mue.de/s/Hzx8b29cbAYBBto/download \
-    -O /tmp/ERR174310_short_2.fastq.gz \
+    --output /tmp/ERR174310_short_2.fastq.gz \
     || { echo 'Could not download paired end fastq!' ; exit 1; }
 gzip -df /tmp/ERR174310_short_2.fastq.gz
 

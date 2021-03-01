@@ -105,9 +105,9 @@ rm /tmp/output.mgrec
 
 echo "*** Single-end fastq"
 # Get fastq file no 1
-wget --no-check-certificate \
+curl \
     https://cloud.fab-mue.de/s/bC6ZQrCxMkW2P4y/download  \
-    -O /tmp/ERR174310_tiny_1.fastq.gz \
+    --output /tmp/ERR174310_tiny_1.fastq.gz \
     || { echo 'Could not download single end fastq!' ; exit 1; }
 gzip -df /tmp/ERR174310_tiny_1.fastq.gz
 
@@ -119,9 +119,9 @@ convert_roundtrip "/tmp/ERR174310_tiny_1.fastq" "" ""
 
 echo "*** Paired-end fastq"
 # Get fastq file no 2
-wget --no-check-certificate \
+curl \
     https://cloud.fab-mue.de/s/QMoZPiX47NwJqcP/download \
-    -O /tmp/ERR174310_tiny_2.fastq.gz \
+    --output /tmp/ERR174310_tiny_2.fastq.gz \
     || { echo 'Could not download paired end fastq!' ; exit 1; }
 gzip -df /tmp/ERR174310_tiny_2.fastq.gz
 
