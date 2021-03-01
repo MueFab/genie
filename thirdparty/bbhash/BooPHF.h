@@ -5,7 +5,7 @@
 #ifndef BOOPHF_H
 #define BOOPHF_H
 
-#include <stdio.h>
+#include <cstdio>
 #include <climits>
 #include <stdlib.h>
 #include <iostream>
@@ -19,9 +19,22 @@
 #include <memory> // for make_shared
 
 #ifdef _WIN32
-# include <process.h>
+#include <process.h>
+#define getpid _getpid
+#define unlink _unlink
 #else
 # include <unistd.h>
+
+// Replace safe windows fopen_s
+inline int fopen_s(FILE **f, const char *name, const char *mode) {
+    int ret = 0;
+    assert(f);
+    *f = fopen(name, mode);
+    /* Can't be sure about 1-to-1 mapping of errno and MS' errno_t */
+    if (!*f)
+        ret = errno;
+    return ret;
+}
 #endif
 
 //
@@ -88,12 +101,6 @@ inline u_int64_t printPt( pthread_t pt) {
     }
 
 #endif /* BOOPHF_USE_PTHREADS */
-
-////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark utils
-////////////////////////////////////////////////////////////////
-
 
 // iterator from disk file of u_int64_t with buffered read,   todo template
 template <typename basetype>
@@ -245,11 +252,6 @@ inline unsigned int popcount_64(uint64_t x)
 }
 
 
-
-////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark hasher
-////////////////////////////////////////////////////////////////
 
 typedef std::array<uint64_t,10> hash_set_t;
 typedef std::array<uint64_t,2> hash_pair_t;
@@ -423,11 +425,6 @@ template <typename Item, class SingleHasher_t> class XorshiftHashFunctors
 };
 
 
-////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark iterators
-////////////////////////////////////////////////////////////////
-
 template <typename Iterator>
 struct iter_range
 {
@@ -451,10 +448,6 @@ iter_range<Iterator> range(Iterator begin, Iterator end)
     return iter_range<Iterator>(begin, end);
 }
 
-////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark BitVector
-////////////////////////////////////////////////////////////////
 
 class bitVector {
 
@@ -706,10 +699,6 @@ class bitVector {
     std::vector<uint64_t> _ranks;
 };
 
-////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark level
-////////////////////////////////////////////////////////////////
 
 
 static inline uint64_t fastrange64(uint64_t word, uint64_t p) {
@@ -747,11 +736,6 @@ class level{
     bitVector  bitset;
 };
 
-
-////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark mphf
-////////////////////////////////////////////////////////////////
 
 
 #define NBBUFF 10000
@@ -1173,7 +1157,7 @@ class mphf {
 
         _proba_collision = 1.0 -  pow(((_gamma*(double)_nelem -1 ) / (_gamma*(double)_nelem)),_nelem-1);
 
-        double sum_geom =_gamma * ( 1.0 +  _proba_collision / (1.0 - _proba_collision));
+        //double sum_geom =_gamma * ( 1.0 +  _proba_collision / (1.0 - _proba_collision));
         //printf("proba collision %f  sum_geom  %f   \n",_proba_collision,sum_geom);
 
         _nb_levels = 25;
@@ -1268,14 +1252,15 @@ class mphf {
 
         //printf("---process level %i   wr %i fast %i ---\n",i,_writeEachLevel,_fastmode);
 
-        char fname_old[1000];
-        sprintf(fname_old,"temp_p%i_level_%i",_pid,i-2);
+        const size_t BUFFER_SIZE = 1000;
+        char fname_old[BUFFER_SIZE];
+        std::snprintf(fname_old, BUFFER_SIZE, "temp_p%i_level_%i",_pid,i-2);
 
-        char fname_curr[1000];
-        sprintf(fname_curr,"temp_p%i_level_%i",_pid,i);
+        char fname_curr[BUFFER_SIZE];
+        std::snprintf(fname_curr, BUFFER_SIZE, "temp_p%i_level_%i",_pid,i);
 
-        char fname_prev[1000];
-        sprintf(fname_prev,"temp_p%i_level_%i",_pid,i-1);
+        char fname_prev[BUFFER_SIZE];
+        std::snprintf(fname_prev, BUFFER_SIZE, "temp_p%i_level_%i",_pid,i-1);
 
         if(_writeEachLevel)
         {
@@ -1450,11 +1435,6 @@ class mphf {
     pthread_mutex_t _mutex;
 #endif /* BOOPHF_USE_PTHREADS */
 };
-
-////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark threading
-////////////////////////////////////////////////////////////////
 
 
 template <typename elem_t, typename Hasher_t, typename Range, typename it_type>
