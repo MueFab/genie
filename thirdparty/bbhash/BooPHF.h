@@ -170,7 +170,7 @@ class bfile_iterator : public std::iterator<std::forward_iterator_tag, basetype>
         if(_cptread >= _inbuff)
         {
 
-            int res = fread(_buffer,sizeof(basetype),_buffsize,_is);
+            auto res = (int)fread(_buffer,sizeof(basetype),_buffsize,_is);
 
             //printf("read %i new elem last %llu  %p\n",res,_buffer[res-1],_is);
             _inbuff = res; _cptread = 0;
@@ -202,7 +202,7 @@ class file_binary{
 
     file_binary(const char* filename)
     {
-        _is = fopen(filename, "rb");
+        fopen_s(&_is, filename, "rb");
 
         if (!_is) {
             throw std::invalid_argument("Error opening " + std::string(filename));
@@ -1273,7 +1273,7 @@ class mphf {
 
             if(i< _nb_levels-1 && i > 0 ) //create curr file
             {
-                _currlevelFile = fopen(fname_curr,"wb");
+                fopen_s(&_currlevelFile, fname_curr,"wb");
             }
         }
 
