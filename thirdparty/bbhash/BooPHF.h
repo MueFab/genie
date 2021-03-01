@@ -5,7 +5,7 @@
 #ifndef BOOPHF_H
 #define BOOPHF_H
 
-#include <stdio.h>
+#include <cstdio>
 #include <climits>
 #include <stdlib.h>
 #include <iostream>
@@ -24,6 +24,17 @@
 #define unlink _unlink
 #else
 # include <unistd.h>
+
+// Replace safe windows fopen_s
+inline int fopen_s(FILE **f, const char *name, const char *mode) {
+    int ret = 0;
+    assert(f);
+    *f = fopen(name, mode);
+    /* Can't be sure about 1-to-1 mapping of errno and MS' errno_t */
+    if (!*f)
+        ret = errno;
+    return ret;
+}
 #endif
 
 //
@@ -121,7 +132,7 @@ class bfile_iterator : public std::iterator<std::forward_iterator_tag, basetype>
         //printf("bf it %p\n",_is);
         _buffsize = 10000;
         _buffer = (basetype *) malloc(_buffsize*sizeof(basetype));
-        int reso = fseek(_is,0,SEEK_SET);
+        fseek(_is,0,SEEK_SET);
         advance();
     }
 
@@ -414,11 +425,6 @@ template <typename Item, class SingleHasher_t> class XorshiftHashFunctors
 };
 
 
-////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark iterators
-////////////////////////////////////////////////////////////////
-
 template <typename Iterator>
 struct iter_range
 {
@@ -693,10 +699,6 @@ class bitVector {
     std::vector<uint64_t> _ranks;
 };
 
-////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark level
-////////////////////////////////////////////////////////////////
 
 
 static inline uint64_t fastrange64(uint64_t word, uint64_t p) {
@@ -735,10 +737,6 @@ class level{
 };
 
 
-////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark mphf
-////////////////////////////////////////////////////////////////
 
 #define NBBUFF 10000
 //#define NBBUFF 2
@@ -1159,7 +1157,7 @@ class mphf {
 
         _proba_collision = 1.0 -  pow(((_gamma*(double)_nelem -1 ) / (_gamma*(double)_nelem)),_nelem-1);
 
-        double sum_geom =_gamma * ( 1.0 +  _proba_collision / (1.0 - _proba_collision));
+        //double sum_geom =_gamma * ( 1.0 +  _proba_collision / (1.0 - _proba_collision));
         //printf("proba collision %f  sum_geom  %f   \n",_proba_collision,sum_geom);
 
         _nb_levels = 25;
@@ -1254,14 +1252,15 @@ class mphf {
 
         //printf("---process level %i   wr %i fast %i ---\n",i,_writeEachLevel,_fastmode);
 
-        char fname_old[1000];
-        sprintf(fname_old,"temp_p%i_level_%i",_pid,i-2);
+        const size_t BUFFER_SIZE = 1000;
+        char fname_old[BUFFER_SIZE];
+        std::snprintf(fname_old, BUFFER_SIZE, "temp_p%i_level_%i",_pid,i-2);
 
-        char fname_curr[1000];
-        sprintf(fname_curr,"temp_p%i_level_%i",_pid,i);
+        char fname_curr[BUFFER_SIZE];
+        std::snprintf(fname_curr, BUFFER_SIZE, "temp_p%i_level_%i",_pid,i);
 
-        char fname_prev[1000];
-        sprintf(fname_prev,"temp_p%i_level_%i",_pid,i-1);
+        char fname_prev[BUFFER_SIZE];
+        std::snprintf(fname_prev, BUFFER_SIZE, "temp_p%i_level_%i",_pid,i-1);
 
         if(_writeEachLevel)
         {
@@ -1274,7 +1273,7 @@ class mphf {
 
             if(i< _nb_levels-1 && i > 0 ) //create curr file
             {
-                _currlevelFile = fopen(fname_curr,"wb");
+                fopen_s(&_currlevelFile, fname_curr,"wb");
             }
         }
 
@@ -1437,10 +1436,6 @@ class mphf {
 #endif /* BOOPHF_USE_PTHREADS */
 };
 
-////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark threading
-////////////////////////////////////////////////////////////////
 
 template <typename elem_t, typename Hasher_t, typename Range, typename it_type>
 void * thread_processLevel(void * args)
