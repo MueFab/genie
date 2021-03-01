@@ -8,30 +8,30 @@ stages:
           imageName: 'ubuntu-20.04'
           artifactName: 'ubuntu2004'
           binDir: 'bin'
-        ubuntu1804:
-          imageName: 'ubuntu-18.04'
-          artifactName: 'ubuntu1804'
-          binDir: 'bin'
-        ubuntu1604:
-          imageName: 'ubuntu-16.04'
-          artifactName: 'ubuntu1604'
-          binDir: 'bin'
-        macos1015:
-          imageName: 'macos-10.15'
-          artifactName: 'macos1015'
-          binDir: 'bin'
-        macos1014:
-          imageName: 'macos-10.14'
-          artifactName: 'macos1014'
-          binDir: 'bin'
-#        windows2016:
-#          imageName: 'vs2017-win2016'
-#          artifactName: 'windows2016'
-#          binDir: 'bin/Debug'
-#        windows2019:
-#          imageName: 'windows-2019'
-#          artifactName: 'windows2019'
-#          binDir: 'bin/Debug'
+#        ubuntu1804:
+#          imageName: 'ubuntu-18.04'
+#          artifactName: 'ubuntu1804'
+#          binDir: 'bin'
+#        ubuntu1604:
+#          imageName: 'ubuntu-16.04'
+#          artifactName: 'ubuntu1604'
+#          binDir: 'bin'
+#        macos1015:
+#          imageName: 'macos-10.15'
+#          artifactName: 'macos1015'
+#          binDir: 'bin'
+#        macos1014:
+#          imageName: 'macos-10.14'
+#          artifactName: 'macos1014'
+#          binDir: 'bin'
+        windows2016:
+          imageName: 'vs2017-win2016'
+          artifactName: 'windows2016'
+          binDir: 'bin/Debug'
+        windows2019:
+          imageName: 'windows-2019'
+          artifactName: 'windows2019'
+          binDir: 'bin/Debug'
     pool:
       vmImage: $(imageName)
     steps:
@@ -84,36 +84,36 @@ stages:
           artifactName: 'ubuntu2004'
           architecture: ''
           binDir: 'bin'
-        ubuntu1804:
-          imageName: 'ubuntu-18.04'
-          artifactName: 'ubuntu1804'
-          architecture: ''
-          binDir: 'bin'
-        ubuntu1604:
-          imageName: 'ubuntu-16.04'
-          artifactName: 'ubuntu1604'
-          architecture: ''
-          binDir: 'bin'
-        macos1015:
-          imageName: 'macos-10.15'
-          artifactName: 'macos1015'
-          architecture: ''
-          binDir: 'bin'
-        macos1014:
-          imageName: 'macos-10.14'
-          artifactName: 'macos1014'
-          architecture: ''
-          binDir: 'bin'
-#        windows2016:
-#          imageName: 'vs2017-win2016'
-#          artifactName: 'windows2016'
-#          architecture: '-A x64'
-#          binDir: 'bin/Release'
-#        windows2019:
-#          imageName: 'windows-2019'
-#          artifactName: 'windows2019'
-#          architecture: '-A x64'
-#          binDir: 'bin/Release'
+#        ubuntu1804:
+#          imageName: 'ubuntu-18.04'
+#          artifactName: 'ubuntu1804'
+#          architecture: ''
+#          binDir: 'bin'
+#        ubuntu1604:
+#          imageName: 'ubuntu-16.04'
+#          artifactName: 'ubuntu1604'
+#          architecture: ''
+#          binDir: 'bin'
+#        macos1015:
+#          imageName: 'macos-10.15'
+#          artifactName: 'macos1015'
+#          architecture: ''
+#          binDir: 'bin'
+#        macos1014:
+#          imageName: 'macos-10.14'
+#          artifactName: 'macos1014'
+#          architecture: ''
+#          binDir: 'bin'
+        windows2016:
+          imageName: 'vs2017-win2016'
+          artifactName: 'windows2016'
+          architecture: '-A x64'
+          binDir: 'bin/Release'
+        windows2019:
+          imageName: 'windows-2019'
+          artifactName: 'windows2019'
+          architecture: '-A x64'
+          binDir: 'bin/Release'
     pool:
       vmImage: $(imageName)
     steps:
@@ -140,34 +140,34 @@ stages:
   - job: 'Unit'
     strategy:
       matrix:
-        ubuntu2004:
-          imageName: 'ubuntu-20.04'
-          artifactName: 'ubuntu2004'
-          fileExt: ''
-        ubuntu1804:
-          imageName: 'ubuntu-18.04'
-          artifactName: 'ubuntu1804'
-          fileExt: ''
-        ubuntu1604:
-          imageName: 'ubuntu-16.04'
-          artifactName: 'ubuntu1604'
-          fileExt: ''
-        macos1015:
-          imageName: 'macos-10.15'
-          artifactName: 'macos1015'
-          fileExt: ''
-        macos1014:
-          imageName: 'macos-10.14'
-          artifactName: 'macos1014'
-          fileExt: ''
-#        windows2016:
-#          imageName: 'vs2017-win2016'
-#          artifactName: 'windows2016'
-#          fileExt: '.exe'
-#        windows2019:
-#          imageName: 'windows-2019'
-#          artifactName: 'windows2019'
-#          fileExt: '.exe'
+#        ubuntu2004:
+#          imageName: 'ubuntu-20.04'
+#          artifactName: 'ubuntu2004'
+#          fileExt: ''
+#        ubuntu1804:
+#          imageName: 'ubuntu-18.04'
+#          artifactName: 'ubuntu1804'
+#          fileExt: ''
+#        ubuntu1604:
+#          imageName: 'ubuntu-16.04'
+#          artifactName: 'ubuntu1604'
+#          fileExt: ''
+#        macos1015:
+#          imageName: 'macos-10.15'
+#          artifactName: 'macos1015'
+#          fileExt: ''
+#        macos1014:
+#          imageName: 'macos-10.14'
+#          artifactName: 'macos1014'
+#          fileExt: ''
+        windows2016:
+          imageName: 'vs2017-win2016'
+          artifactName: 'windows2016'
+          fileExt: '.exe'
+        windows2019:
+          imageName: 'windows-2019'
+          artifactName: 'windows2019'
+          fileExt: '.exe'
     pool:
       vmImage: $(imageName)
     steps:
@@ -214,14 +214,14 @@ stages:
           imageName: 'ubuntu-20.04'
           artifactName: 'ubuntu2004'
           fileExt: ''
-        ubuntu1804:
-          imageName: 'ubuntu-18.04'
-          artifactName: 'ubuntu1804'
-          fileExt: ''
-        ubuntu1604:
-          imageName: 'ubuntu-16.04'
-          artifactName: 'ubuntu1604'
-          fileExt: ''
+#        ubuntu1804:
+#          imageName: 'ubuntu-18.04'
+#          artifactName: 'ubuntu1804'
+#          fileExt: ''
+#        ubuntu1604:
+#          imageName: 'ubuntu-16.04'
+#          artifactName: 'ubuntu1604'
+#          fileExt: ''
     pool:
       vmImage: $(imageName)
     steps:
@@ -251,22 +251,30 @@ stages:
           imageName: 'ubuntu-20.04'
           artifactName: 'ubuntu2004'
           fileExt: ''
-        ubuntu1804:
-          imageName: 'ubuntu-18.04'
-          artifactName: 'ubuntu1804'
-          fileExt: ''
-        ubuntu1604:
-          imageName: 'ubuntu-16.04'
-          artifactName: 'ubuntu1604'
-          fileExt: ''
-        macos1015:
-          imageName: 'macos-10.15'
-          artifactName: 'macos1015'
-          fileExt: ''
-        macos1014:
-          imageName: 'macos-10.14'
-          artifactName: 'macos1014'
-          fileExt: ''
+#        ubuntu1804:
+#          imageName: 'ubuntu-18.04'
+#          artifactName: 'ubuntu1804'
+#          fileExt: ''
+#        ubuntu1604:
+#          imageName: 'ubuntu-16.04'
+#          artifactName: 'ubuntu1604'
+#          fileExt: ''
+#        macos1015:
+#          imageName: 'macos-10.15'
+#          artifactName: 'macos1015'
+#          fileExt: ''
+#        macos1014:
+#          imageName: 'macos-10.14'
+#          artifactName: 'macos1014'
+#          fileExt: ''
+        windows2016:
+          imageName: 'vs2017-win2016'
+          artifactName: 'windows2016'
+          binDir: 'bin/Debug'
+        windows2019:
+          imageName: 'windows-2019'
+          artifactName: 'windows2019'
+          binDir: 'bin/Debug'
     pool:
       vmImage: $(imageName)
     steps:
@@ -321,14 +329,14 @@ stages:
           imageName: 'ubuntu-20.04'
           artifactName: 'ubuntu2004'
           fileExt: ''
-        ubuntu1804:
-          imageName: 'ubuntu-18.04'
-          artifactName: 'ubuntu1804'
-          fileExt: ''
-        ubuntu1604:
-          imageName: 'ubuntu-16.04'
-          artifactName: 'ubuntu1604'
-          fileExt: ''
+#        ubuntu1804:
+#          imageName: 'ubuntu-18.04'
+#          artifactName: 'ubuntu1804'
+#          fileExt: ''
+#        ubuntu1604:
+#          imageName: 'ubuntu-16.04'
+#          artifactName: 'ubuntu1604'
+#          fileExt: ''
     pool:
       vmImage: $(imageName)
     steps:
