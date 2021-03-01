@@ -183,7 +183,7 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
             UTILS_DIE("Unknown reference format");
         }
     }
-    outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile));
+    outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile,std::ios::binary));
     flow->addExporter(genie::util::make_unique<genie::format::mgb::Exporter>(outputFiles.back().get()));
     attachImporter(*flow, pOpts, inputFiles);
     if (pOpts.qvMode == "none") {
@@ -226,7 +226,7 @@ std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts
                 *inputFiles.back(), &flow->getRefMgr(), flow->getRefDecoder(), true));
         }
     }
-    inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile));
+    inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile,std::ios::binary));
     flow->addImporter(genie::util::make_unique<genie::format::mgb::Importer>(
         *inputFiles.back(), &flow->getRefMgr(), flow->getRefDecoder(), file_extension(pOpts.outputFile) == "fasta"));
     attachExporter(*flow, pOpts, outputFiles);
