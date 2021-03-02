@@ -99,8 +99,10 @@ compress_roundtrip () {
 convert_roundtrip() {
     if [[ "$2" == "" ]]; then
         second_input_file=""
+        cmp_files="-i $1 -p /tmp/output_1.fastq"
     else
         second_input_file="--input-suppl-file $2"
+        cmp_files="-i $1 -j $2 -p /tmp/output_1.fastq -q /tmp/output_2.fastq"
     fi
 
     echo "Genie convert"
@@ -119,6 +121,8 @@ convert_roundtrip() {
         -o /tmp/output_1.fastq \
         --output-suppl-file /tmp/output_2.fastq \
         || { echo "Genie convert ($1; $2; $3) failed!" ; exit 1; }
+
+    $git_root_dir/ci/fastq_cmp_complete.py $cmp_files $4 || { echo "Invalid output!" ; exit 1; }
 
     rm /tmp/output_1.fastq
     rm /tmp/output_2.fastq
@@ -154,8 +158,8 @@ gzip -df /tmp/ERR174310_short_2.fastq.gz
 
 compress_roundtrip "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq" "--low-latency --qv none --read-ids none" "-n -s -u"
 compress_roundtrip "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq" "--low-latency" "-c"
-compress_roundtrip "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq" "--qv none --read-ids none" "-n -s -u"
-compress_roundtrip "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq" "" "-u -c"
-convert_roundtrip "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq" ""
+compress_roundtrip "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq" "--qv none --read-ids none" "-n -s -u -x"
+compress_roundtrip "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq" "" "-u -c -x"
+convert_roundtrip "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq" "" "-c"
 rm /tmp/ERR174310_short_2.fastq
 rm /tmp/ERR174310_short_1.fastq
