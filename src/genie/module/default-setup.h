@@ -37,7 +37,8 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
  * @param threads
  * @return
  */
-std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const std::string&, bool combinePairsFlag, size_t);
+std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const std::string&, bool combinePairsFlag,
+                                                           size_t);
 
 /**
  *

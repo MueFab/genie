@@ -209,7 +209,8 @@ std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts
                                                      std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
     constexpr size_t BLOCKSIZE = 10000;
-    auto flow = genie::module::buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory, pOpts.combinePairsFlag, BLOCKSIZE);
+    auto flow = genie::module::buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory,
+                                                   pOpts.combinePairsFlag, BLOCKSIZE);
     if (!pOpts.inputRefFile.empty()) {
         if (file_extension(pOpts.inputRefFile) == "fasta") {
             std::string fai = pOpts.inputRefFile.substr(0, pOpts.inputRefFile.size() - 5) + "fai";

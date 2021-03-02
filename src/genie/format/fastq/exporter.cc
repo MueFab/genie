@@ -39,18 +39,16 @@ void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
 
     auto num_files = file.size();
     // ideally should be 2 for paired end, but we can handle 1 as well
-    const char readname_suffix[2][3] = {"/1","/2"};
+    const char readname_suffix[2][3] = {"/1", "/2"};
     // suffix attached when paired end data but only one output fastq file
-    bool second_read_flag = false; // true when we are handling second read
-
+    bool second_read_flag = false;  // true when we are handling second read
 
     for (const auto &i : data.getData()) {
         auto file_ptr = file.data();
         second_read_flag = false;
-        if (!i.isRead1First() ) {
+        if (!i.isRead1First()) {
             second_read_flag = true;
-            if (num_files == 2)
-                file_ptr = &file.back();
+            if (num_files == 2) file_ptr = &file.back();
         }
         for (const auto &rec : i.getSegments()) {
             // ID

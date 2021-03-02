@@ -126,11 +126,11 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
         while (!done) {
             if (!(in_flag >> c)) done = true;
             if (!done) {
-                read_dna_from_bits(current,f);
+                read_dna_from_bits(current, f);
                 rc = in_RC.get();
-                in_pos.read((char *)&p, sizeof(int64_t));
-                in_order.read((char *)&ord, sizeof(uint32_t));
-                in_readlength.read((char *)&rl, sizeof(uint16_t));
+                in_pos.read(reinterpret_cast<char *>(&p), sizeof(int64_t));
+                in_order.read(reinterpret_cast<char *>(&ord), sizeof(uint32_t));
+                in_readlength.read(reinterpret_cast<char *>(&rl), sizeof(uint16_t));
             }
             if (c == '0' || done || list_size > 10000000) {  // limit on list size so
                                                              // that memory doesn't get
@@ -357,8 +357,8 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     for (uint32_t i = 0; i < eg.numreads_s; i++)
         if (remainingreads[i] == 1) {
             matched_s--;
-            f_order.write((char *)&order_s[i], sizeof(uint32_t));
-            f_readlength.write((char *)&read_lengths_s[i], sizeof(uint16_t));
+            f_order.write(reinterpret_cast<char *>(&order_s[i]), sizeof(uint32_t));
+            f_readlength.write(reinterpret_cast<char *>(&read_lengths_s[i]), sizeof(uint16_t));
             std::string unaligned_read = bitsettostring<bitset_size>(read[i], read_lengths_s[i], egb);
             write_dnaN_in_bits(unaligned_read, f_unaligned);
             len_unaligned += read_lengths_s[i];
@@ -369,8 +369,8 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
             matched_N--;
             std::string unaligned_read = bitsettostring<bitset_size>(read[i], read_lengths_s[i], egb);
             write_dnaN_in_bits(unaligned_read, f_unaligned);
-            f_order.write((char *)&order_s[i], sizeof(uint32_t));
-            f_readlength.write((char *)&read_lengths_s[i], sizeof(uint16_t));
+            f_order.write(reinterpret_cast<char *>(&order_s[i]), sizeof(uint32_t));
+            f_readlength.write(reinterpret_cast<char *>(&read_lengths_s[i]), sizeof(uint16_t));
             len_unaligned += read_lengths_s[i];
         }
     f_order.close();
@@ -386,8 +386,8 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     delete[] mask1;
 
     // write length of unaligned array
-    std::ofstream f_unaligned_count(eg.outfile_unaligned+".count", std::ios::binary);
-    f_unaligned_count.write((char*)&len_unaligned, sizeof(uint64_t));
+    std::ofstream f_unaligned_count(eg.outfile_unaligned + ".count", std::ios::binary);
+    f_unaligned_count.write(reinterpret_cast<char *>(&len_unaligned), sizeof(uint64_t));
     f_unaligned_count.close();
 
     // convert read_pos into 8 byte non-diff (absolute)
@@ -469,10 +469,10 @@ template <size_t bitset_size>
 void readsingletons(std::bitset<bitset_size> *read, uint32_t *order_s, uint16_t *read_lengths_s,
                     const encoder_global &eg, const encoder_global_b<bitset_size> &egb) {
     // not parallelized right now since these are very small number of reads
-    std::ifstream f(eg.infile + ".singleton", std::ifstream::in|std::ios::binary);
+    std::ifstream f(eg.infile + ".singleton", std::ifstream::in | std::ios::binary);
     std::string s;
     for (uint32_t i = 0; i < eg.numreads_s; i++) {
-        read_dna_from_bits(s,f);
+        read_dna_from_bits(s, f);
         read_lengths_s[i] = s.length();
         stringtobitset<bitset_size>(s, read_lengths_s[i], read[i], egb.basemask);
     }
@@ -480,7 +480,7 @@ void readsingletons(std::bitset<bitset_size> *read, uint32_t *order_s, uint16_t 
     remove((eg.infile + ".singleton").c_str());
     f.open(eg.infile_N, std::ios::binary);
     for (uint32_t i = eg.numreads_s; i < eg.numreads_s + eg.numreads_N; i++) {
-        read_dnaN_from_bits(s,f);
+        read_dnaN_from_bits(s, f);
         read_lengths_s[i] = s.length();
         stringtobitset<bitset_size>(s, read_lengths_s[i], read[i], egb.basemask);
     }

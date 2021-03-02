@@ -42,6 +42,12 @@ compress_roundtrip () {
         cmp_files="-i $1 -j $2 -p /tmp/output_1.fastq -q /tmp/output_2.fastq"
     fi
 
+    if [[ $3 != *"--read-ids none"* && "$2" != "" ]]; then
+        recombine_param="--combine-pairs"
+    else
+        recombine_param=""
+    fi
+
     echo "Genie compress"
     eval $timecmd \
         $git_root_dir/cmake-build-release/bin/genie$fileExt run \
@@ -62,6 +68,7 @@ compress_roundtrip () {
         $git_root_dir/cmake-build-release/bin/genie$fileExt run \
         -o /tmp/output_1.fastq \
         --output-suppl-file /tmp/output_2.fastq \
+        $recombine_param \
         -i /tmp/output.mgb -f \
         || { echo "Genie decompress ($1; $2; $3) failed!" ; exit 1; }
 
@@ -133,28 +140,28 @@ echo "*** Single-end fastq"
 
 # Get fastq file no 1
 curl \
-    https://cloud.fab-mue.de/s/J8bYea9BYfdNPBj/download \
+    http://www.tnt.uni-hannover.de/~voges/data/genie/wgs/h-sapiens/ERP001775/ERR174310_short_1.fastq.gz \
     --output /tmp/ERR174310_short_1.fastq.gz \
     || { echo 'Could not download single end fastq!' ; exit 1; }
 gzip -df /tmp/ERR174310_short_1.fastq.gz
 
-compress_roundtrip "/tmp/ERR174310_short_1.fastq" "" "--low-latency --qv none --read-ids none" "-n -s"
-compress_roundtrip "/tmp/ERR174310_short_1.fastq" "" "--low-latency" ""
-compress_roundtrip "/tmp/ERR174310_short_1.fastq" "" "--qv none --read-ids none" "-n -s -u"
-compress_roundtrip "/tmp/ERR174310_short_1.fastq" "" "" "-u"
-convert_roundtrip "/tmp/ERR174310_short_1.fastq" "" "" ""
+#compress_roundtrip "/tmp/ERR174310_short_1.fastq" "" "--low-latency --qv none --read-ids none" "-n -s"
+#compress_roundtrip "/tmp/ERR174310_short_1.fastq" "" "--low-latency" ""
+#compress_roundtrip "/tmp/ERR174310_short_1.fastq" "" "--qv none --read-ids none" "-n -s -u"
+#compress_roundtrip "/tmp/ERR174310_short_1.fastq" "" "" "-u"
+#convert_roundtrip "/tmp/ERR174310_short_1.fastq" "" "" ""
 
 echo "*** Paired-end fastq"
 # Get fastq file no 2
 curl \
-    https://cloud.fab-mue.de/s/Hzx8b29cbAYBBto/download \
+    http://www.tnt.uni-hannover.de/~voges/data/genie/wgs/h-sapiens/ERP001775/ERR174310_short_2.fastq.gz \
     --output /tmp/ERR174310_short_2.fastq.gz \
     || { echo 'Could not download paired end fastq!' ; exit 1; }
 gzip -df /tmp/ERR174310_short_2.fastq.gz
 
-compress_roundtrip "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq" "--low-latency --qv none --read-ids none" "-n -s -u"
-compress_roundtrip "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq" "--low-latency" "-c"
-compress_roundtrip "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq" "--qv none --read-ids none" "-n -s -u"
+#compress_roundtrip "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq" "--low-latency --qv none --read-ids none" "-n -s -u"
+#compress_roundtrip "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq" "--low-latency" "-c"
+#compress_roundtrip "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq" "--qv none --read-ids none" "-n -s -u"
 compress_roundtrip "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq" "" "-u -c"
 convert_roundtrip "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq" ""
 rm /tmp/ERR174310_short_2.fastq
