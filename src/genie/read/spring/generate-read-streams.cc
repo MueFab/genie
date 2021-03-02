@@ -14,6 +14,8 @@
 #include <array>
 #include <cmath>  // abs
 #include <cstdio>
+#include <cstring> // memcpy
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <numeric>
@@ -276,12 +278,21 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
 
     // Now start with unaligned reads
     num_reads_unaligned = num_reads - num_reads_aligned;
-    std::ifstream f_unaligned(file_unaligned);
-    f_unaligned.seekg(0, f_unaligned.end);
-    uint64_t unaligned_array_size = f_unaligned.tellg();
-    f_unaligned.seekg(0, f_unaligned.beg);
+    std::string file_unaligned_count = file_unaligned+".count";
+    std::ifstream f_unaligned_count(file_unaligned_count);
+    uint64_t unaligned_array_size;
+    f_unaligned_count.read((char*)&unaligned_array_size, sizeof(uint64_t));
+    f_unaligned_count.close();
+    remove(file_unaligned_count.c_str());
     data->unaligned_arr = std::vector<char>(unaligned_array_size);
-    f_unaligned.read(data->unaligned_arr.data(), unaligned_array_size);
+    std::ifstream f_unaligned(file_unaligned, std::ios::binary);
+    std::string unaligned_read;
+    uint64_t pos_in_unaligned_arr = 0;
+    for (uint32_t i = 0; i < num_reads_unaligned; i++) {
+      read_dnaN_from_bits(unaligned_read, f_unaligned);
+      std::memcpy(data->unaligned_arr.data()+pos_in_unaligned_arr, &unaligned_read[0], unaligned_read.size());
+      pos_in_unaligned_arr += unaligned_read.size();
+    }
     f_unaligned.close();
     uint64_t current_pos_in_unaligned_arr = 0;
     for (uint32_t i = 0; i < num_reads_unaligned; i++) {
@@ -405,13 +416,23 @@ void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_d
 
     // Now start with unaligned reads
     num_reads_unaligned = cp.num_reads - num_reads_aligned;
-    std::ifstream f_unaligned(file_unaligned);
-    f_unaligned.seekg(0, f_unaligned.end);
-    uint64_t unaligned_array_size = f_unaligned.tellg();
-    f_unaligned.seekg(0, f_unaligned.beg);
+    std::string file_unaligned_count = file_unaligned+".count";
+    std::ifstream f_unaligned_count(file_unaligned_count);
+    uint64_t unaligned_array_size;
+    f_unaligned_count.read((char*)&unaligned_array_size, sizeof(uint64_t));
+    f_unaligned_count.close();
+    remove(file_unaligned_count.c_str());
     data->unaligned_arr = std::vector<char>(unaligned_array_size);
-    f_unaligned.read(&data->unaligned_arr[0], unaligned_array_size);
+    std::ifstream f_unaligned(file_unaligned, std::ios::binary);
+    std::string unaligned_read;
+    uint64_t pos_in_unaligned_arr = 0;
+    for (uint32_t i = 0; i < num_reads_unaligned; i++) {
+      read_dnaN_from_bits(unaligned_read, f_unaligned);
+      std::memcpy(data->unaligned_arr.data()+pos_in_unaligned_arr, &unaligned_read[0], unaligned_read.size());
+      pos_in_unaligned_arr += unaligned_read.size();
+    }
     f_unaligned.close();
+
     uint64_t current_pos_in_unaligned_arr = 0;
     for (uint32_t i = 0; i < num_reads_unaligned; i++) {
         f_order.read(reinterpret_cast<char *>(&order), sizeof(uint32_t));
@@ -779,18 +800,12 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
             bool read_1_first = (current < pair);
             if (same_block && !read_1_first) {
                 raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(1);  // R1_split
-                raw_au.get(core::GenSub::PAIR_R1_SPLIT).push(bdata.genomic_record_index[pair]);
             } else if (same_block && read_1_first) {
                 raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(2);  // R2_split
-                raw_au.get(core::GenSub::PAIR_R2_SPLIT).push(bdata.genomic_record_index[pair]);
             } else if (!same_block && !read_1_first) {
                 raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(3);  // R1_diff_ref_seq
-                raw_au.get(core::GenSub::PAIR_R1_DIFF_SEQ).push(bdata.block_num[pair]);
-                raw_au.get(core::GenSub::PAIR_R1_DIFF_POS).push(bdata.genomic_record_index[pair]);
             } else {
                 raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(4);  // R2_diff_ref_seq
-                raw_au.get(core::GenSub::PAIR_R2_DIFF_SEQ).push(bdata.block_num[pair]);
-                raw_au.get(core::GenSub::PAIR_R2_DIFF_POS).push(bdata.genomic_record_index[pair]);
             }
         }
     }

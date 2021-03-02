@@ -91,7 +91,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
 #else
         int tid = 0;
 #endif
-        std::ifstream f(eg.infile + '.' + std::to_string(tid));
+        std::ifstream f(eg.infile + '.' + std::to_string(tid), std::ios::binary);
         std::ifstream in_flag(eg.infile_flag + '.' + std::to_string(tid));
         std::ifstream in_pos(eg.infile_pos + '.' + std::to_string(tid), std::ios::binary);
         std::ifstream in_order(eg.infile_order + '.' + std::to_string(tid), std::ios::binary);
@@ -126,11 +126,11 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
         while (!done) {
             if (!(in_flag >> c)) done = true;
             if (!done) {
-                std::getline(f, current);
-                rc = static_cast<char>(in_RC.get());
-                in_pos.read(reinterpret_cast<char *>(&p), sizeof(int64_t));
-                in_order.read(reinterpret_cast<char *>(&ord), sizeof(uint32_t));
-                in_readlength.read(reinterpret_cast<char *>(&rl), sizeof(uint16_t));
+                read_dna_from_bits(current,f);
+                rc = in_RC.get();
+                in_pos.read((char *)&p, sizeof(int64_t));
+                in_order.read((char *)&ord, sizeof(uint32_t));
+                in_readlength.read((char *)&rl, sizeof(uint16_t));
             }
             if (c == '0' || done || list_size > 10000000) {  // limit on list size so
                                                              // that memory doesn't get
@@ -348,30 +348,30 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     f_order.close();
     f_readlength.close();
     // write remaining singleton reads now
-    std::ofstream f_unaligned(eg.outfile_unaligned);
+    std::ofstream f_unaligned(eg.outfile_unaligned, std::ios::binary);
     f_order.open(eg.infile_order, std::ios::binary | std::ofstream::app);
     f_readlength.open(eg.infile_readlength, std::ios::binary | std::ofstream::app);
     uint32_t matched_s = eg.numreads_s;
+    uint64_t len_unaligned = 0;
 
-    //
-    // There is a little bit to be gained here (1%) by parallelizing the
-    // bitsettostring<>() calls in the following two loops.  Doing that
-    // efficiently while keeping the file writes in order is problematic.
-    //
     for (uint32_t i = 0; i < eg.numreads_s; i++)
         if (remainingreads[i] == 1) {
             matched_s--;
-            f_order.write(reinterpret_cast<char *>(&order_s[i]), sizeof(uint32_t));
-            f_readlength.write(reinterpret_cast<char *>(&read_lengths_s[i]), sizeof(uint16_t));
-            f_unaligned << bitsettostring<bitset_size>(read[i], read_lengths_s[i], egb);
+            f_order.write((char *)&order_s[i], sizeof(uint32_t));
+            f_readlength.write((char *)&read_lengths_s[i], sizeof(uint16_t));
+            std::string unaligned_read = bitsettostring<bitset_size>(read[i], read_lengths_s[i], egb);
+            write_dnaN_in_bits(unaligned_read, f_unaligned);
+            len_unaligned += read_lengths_s[i];
         }
     uint32_t matched_N = eg.numreads_N;
     for (uint32_t i = eg.numreads_s; i < eg.numreads_s + eg.numreads_N; i++)
         if (remainingreads[i] == 1) {
             matched_N--;
-            f_unaligned << bitsettostring<bitset_size>(read[i], read_lengths_s[i], egb);
-            f_order.write(reinterpret_cast<char *>(&order_s[i]), sizeof(uint32_t));
-            f_readlength.write(reinterpret_cast<char *>(&read_lengths_s[i]), sizeof(uint16_t));
+            std::string unaligned_read = bitsettostring<bitset_size>(read[i], read_lengths_s[i], egb);
+            write_dnaN_in_bits(unaligned_read, f_unaligned);
+            f_order.write((char *)&order_s[i], sizeof(uint32_t));
+            f_readlength.write((char *)&read_lengths_s[i], sizeof(uint16_t));
+            len_unaligned += read_lengths_s[i];
         }
     f_order.close();
     f_readlength.close();
@@ -384,6 +384,11 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     for (int i = 0; i < eg.max_readlen; i++) delete[] mask[i];
     delete[] mask;
     delete[] mask1;
+
+    // write length of unaligned array
+    std::ofstream f_unaligned_count(eg.outfile_unaligned+".count", std::ios::binary);
+    f_unaligned_count.write((char*)&len_unaligned, sizeof(uint64_t));
+    f_unaligned_count.close();
 
     // convert read_pos into 8 byte non-diff (absolute)
     // positions
@@ -464,19 +469,19 @@ template <size_t bitset_size>
 void readsingletons(std::bitset<bitset_size> *read, uint32_t *order_s, uint16_t *read_lengths_s,
                     const encoder_global &eg, const encoder_global_b<bitset_size> &egb) {
     // not parallelized right now since these are very small number of reads
-    std::ifstream f(eg.infile + ".singleton", std::ifstream::in);
+    std::ifstream f(eg.infile + ".singleton", std::ifstream::in|std::ios::binary);
     std::string s;
     for (uint32_t i = 0; i < eg.numreads_s; i++) {
-        std::getline(f, s);
-        read_lengths_s[i] = uint16_t(s.length());
+        read_dna_from_bits(s,f);
+        read_lengths_s[i] = s.length();
         stringtobitset<bitset_size>(s, read_lengths_s[i], read[i], egb.basemask);
     }
     f.close();
     remove((eg.infile + ".singleton").c_str());
-    f.open(eg.infile_N);
+    f.open(eg.infile_N, std::ios::binary);
     for (uint32_t i = eg.numreads_s; i < eg.numreads_s + eg.numreads_N; i++) {
-        std::getline(f, s);
-        read_lengths_s[i] = uint16_t(s.length());
+        read_dnaN_from_bits(s,f);
+        read_lengths_s[i] = s.length();
         stringtobitset<bitset_size>(s, read_lengths_s[i], read[i], egb.basemask);
     }
     std::ifstream f_order_s(eg.infile_order + ".singleton", std::ios::binary);
@@ -523,6 +528,7 @@ void encoder_main(const std::string &temp_dir, const compression_params &cp) {
     uint32_t *order_s = new uint32_t[eg.numreads_s + eg.numreads_N];
     uint16_t *read_lengths_s = new uint16_t[eg.numreads_s + eg.numreads_N];
     readsingletons<bitset_size>(read, order_s, read_lengths_s, eg, egb);
+    remove(eg.infile_N.c_str());
     correct_order(order_s, eg);
 
     bbhashdict *dict = new bbhashdict[eg.numdict_s];
@@ -543,7 +549,6 @@ void encoder_main(const std::string &temp_dir, const compression_params &cp) {
                                          eg.basedir, eg.num_thr);
 
     encode<bitset_size>(read, dict, order_s, read_lengths_s, eg, egb);
-    remove(eg.infile_N.c_str());
     delete[] read;
     delete[] dict;
     delete[] order_s;

@@ -65,6 +65,9 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
     forceOverwrite = false;
     app.add_flag("-f,--force", forceOverwrite, "");
 
+    combinePairsFlag = false;
+    app.add_flag("--combine-pairs", combinePairsFlag, "");
+
     lowLatency = false;
     app.add_flag("--low-latency", lowLatency, "");
 
