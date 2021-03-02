@@ -193,8 +193,8 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
         flow->setNameCoder(genie::util::make_unique<genie::core::NameEncoderNone>(), 0);
     }
     if (pOpts.lowLatency) {
-        flow->setReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(), 2);
         flow->setReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(), 3);
+        flow->setReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(), 4);
     }
     return flow;
 }
