@@ -32,6 +32,8 @@ ap.add_argument("-c", "--patched_names", required=False,
    help="Use names from first fastq only", action='store_true')
 ap.add_argument("-u", "--unordered_cmp", required=False,
    help="Order of records is not important", action='store_true')
+ap.add_argument("-x", "--unordered_cmp_broken_pairs", required=False,
+   help="Order of records is not important and pairing is broken", action='store_true')
 args = ap.parse_args()
 
 
@@ -76,25 +78,59 @@ else:
 
 
 if args.unordered_cmp:
-    bashCommand = script_path + "/fastq_sort.py -i " + args.first_pair_first_file + ".stripped -o " + args.first_pair_first_file + ".sorted"
-    if args.first_pair_second_file is not None:
-        bashCommand = bashCommand + " -j " + args.first_pair_second_file + ".stripped -p " + args.first_pair_second_file + ".sorted"
-    print(bashCommand)
-    process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
-    output, error = process.communicate()
-    if process.returncode:
-        print("Error sorting")
-        sys.exit(1)
+    if args.unordered_cmp_broken_pairs:
+        bashCommand = script_path + "/fastq_sort.py -i " + args.first_pair_first_file + ".stripped -o " + args.first_pair_first_file + ".sorted"
+        print(bashCommand)
+        process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+        output, error = process.communicate()
+        if process.returncode:
+            print("Error sorting")
+            sys.exit(1)
+       
+        bashCommand = script_path + "/fastq_sort.py -i " + args.second_pair_first_file + ".stripped -o " + args.second_pair_first_file + ".sorted"
+        print(bashCommand)
+        process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+        output, error = process.communicate()
+        if process.returncode:
+            print("Error sorting")
+            sys.exit(1)
 
-    bashCommand = script_path + "/fastq_sort.py -i " + args.second_pair_first_file + ".stripped -o " + args.second_pair_first_file + ".sorted"
-    if args.first_pair_second_file is not None:
-        bashCommand = bashCommand + " -j " + args.second_pair_second_file + ".stripped -p " + args.second_pair_second_file + ".sorted"
-    print(bashCommand)
-    process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
-    output, error = process.communicate()
-    if process.returncode:
-        print("Error sorting")
-        sys.exit(1)
+        if args.first_pair_second_file is not None:
+            bashCommand = script_path + "/fastq_sort.py -i " + args.first_pair_second_file + ".stripped -o " + args.first_pair_second_file + ".sorted"
+            print(bashCommand)
+            process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+            output, error = process.communicate()
+            if process.returncode:
+                print("Error sorting")
+                sys.exit(1)
+       
+            bashCommand = script_path + "/fastq_sort.py -i " + args.second_pair_second_file + ".stripped -o " + args.second_pair_second_file + ".sorted"
+            print(bashCommand)
+            process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+            output, error = process.communicate()
+            if process.returncode:
+                print("Error sorting")
+                sys.exit(1)
+    else:
+        bashCommand = script_path + "/fastq_sort.py -i " + args.first_pair_first_file + ".stripped -o " + args.first_pair_first_file + ".sorted"
+        if args.first_pair_second_file is not None:
+            bashCommand = bashCommand + " -j " + args.first_pair_second_file + ".stripped -p " + args.first_pair_second_file + ".sorted"
+        print(bashCommand)
+        process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+        output, error = process.communicate()
+        if process.returncode:
+            print("Error sorting")
+            sys.exit(1)
+
+        bashCommand = script_path + "/fastq_sort.py -i " + args.second_pair_first_file + ".stripped -o " + args.second_pair_first_file + ".sorted"
+        if args.first_pair_second_file is not None:
+            bashCommand = bashCommand + " -j " + args.second_pair_second_file + ".stripped -p " + args.second_pair_second_file + ".sorted"
+        print(bashCommand)
+        process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+        output, error = process.communicate()
+        if process.returncode:
+            print("Error sorting")
+            sys.exit(1)
 
 else:
     move(args.first_pair_first_file + ".stripped", args.first_pair_first_file + ".sorted")
