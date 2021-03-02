@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <string>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -175,23 +176,23 @@ void updaterefcount(std::bitset<bitset_size> &cur, std::bitset<bitset_size> &ref
 
 template <size_t bitset_size>
 void readDnaFile(std::bitset<bitset_size> *read, uint16_t *read_lengths, const reorder_global<bitset_size> &rg) {
-    std::ifstream f(rg.infile[0], std::ifstream::in|std::ios::binary);
+    std::ifstream f(rg.infile[0], std::ifstream::in | std::ios::binary);
     for (uint32_t i = 0; i < rg.numreads_array[0]; i++) {
-      f.read((char*)&read_lengths[i],sizeof(uint16_t));
-      uint16_t num_bytes_to_read = ((uint32_t)read_lengths[i]+4-1)/4;
-      f.read((char*)&read[i],num_bytes_to_read);
+        f.read(reinterpret_cast<char *>(&read_lengths[i]), sizeof(uint16_t));
+        uint16_t num_bytes_to_read = ((uint32_t)read_lengths[i] + 4 - 1) / 4;
+        f.read(reinterpret_cast<char *>(&read[i]), num_bytes_to_read);
     }
     f.close();
     remove(rg.infile[0].c_str());
     if (rg.paired_end) {
-      f.open(rg.infile[1], std::ifstream::in|std::ios::binary);
-      for (uint32_t i = rg.numreads_array[0]; i < rg.numreads_array[0] + rg.numreads_array[1]; i++) {
-        f.read((char*)&read_lengths[i],sizeof(uint16_t));
-        uint16_t num_bytes_to_read = ((uint32_t)read_lengths[i]+4-1)/4;
-        f.read((char*)&read[i],num_bytes_to_read);
-      }
-      f.close();
-      remove(rg.infile[1].c_str());
+        f.open(rg.infile[1], std::ifstream::in | std::ios::binary);
+        for (uint32_t i = rg.numreads_array[0]; i < rg.numreads_array[0] + rg.numreads_array[1]; i++) {
+            f.read(reinterpret_cast<char *>(&read_lengths[i]), sizeof(uint16_t));
+            uint16_t num_bytes_to_read = ((uint32_t)read_lengths[i] + 4 - 1) / 4;
+            f.read(reinterpret_cast<char *>(&read[i]), num_bytes_to_read);
+        }
+        f.close();
+        remove(rg.infile[1].c_str());
     }
     return;
 }
@@ -597,34 +598,34 @@ void writetofile(std::bitset<bitset_size> *read, uint16_t *read_lengths, reorder
         uint32_t tid = 0;  // set thread ID to zero if not using OpenMP
 #endif
         std::string tid_str = std::to_string(tid);
-        std::ofstream fout(rg.outfile + '.' + tid_str, std::ofstream::out|std::ios::binary);
-        std::ofstream fout_s(rg.outfile + ".singleton." + tid_str, std::ofstream::out|std::ios::binary);
+        std::ofstream fout(rg.outfile + '.' + tid_str, std::ofstream::out | std::ios::binary);
+        std::ofstream fout_s(rg.outfile + ".singleton." + tid_str, std::ofstream::out | std::ios::binary);
         std::ifstream finRC(rg.outfileRC + '.' + tid_str, std::ifstream::in);
         std::ifstream finorder(rg.outfileorder + '.' + tid_str, std::ifstream::in | std::ios::binary);
         std::ifstream finorder_s(rg.outfileorder + ".singleton." + tid_str, std::ifstream::in | std::ios::binary);
         char s[MAX_READ_LEN + 1], s1[MAX_READ_LEN + 1];
         uint32_t current;
         char c;
-        while (finRC >> std::noskipws >> c)  // read character by character
-        {
-            finorder.read((char *)&current, sizeof(uint32_t));
+        // read character by character
+        while (finRC >> std::noskipws >> c) {
+            finorder.read(reinterpret_cast<char *>(&current), sizeof(uint32_t));
             if (c == 'd') {
-              uint16_t num_bytes_to_write = ((uint32_t)read_lengths[current] + 4 - 1)/4;
-      	      fout.write((char*)&read_lengths[current],sizeof(uint16_t));
-      	      fout.write((char*)&read[current], num_bytes_to_write);
+                uint16_t num_bytes_to_write = ((uint32_t)read_lengths[current] + 4 - 1) / 4;
+                fout.write(reinterpret_cast<char *>(&read_lengths[current]), sizeof(uint16_t));
+                fout.write(reinterpret_cast<char *>(&read[current]), num_bytes_to_write);
             } else {
-      	       bitsettostring<bitset_size>(read[current], s, read_lengths[current], rg);
-      	       reverse_complement(s, s1, read_lengths[current]);
-      	       write_dna_in_bits(s1, fout);
+                bitsettostring<bitset_size>(read[current], s, read_lengths[current], rg);
+                reverse_complement(s, s1, read_lengths[current]);
+                write_dna_in_bits(s1, fout);
             }
         }
         finorder_s.read(reinterpret_cast<char *>(&current), sizeof(uint32_t));
         while (!finorder_s.eof()) {
             numreads_s_thr[tid]++;
-            uint16_t num_bytes_to_write = ((uint32_t)read_lengths[current] + 4 - 1)/4;
-            fout_s.write((char*)&read_lengths[current],sizeof(uint16_t));
-            fout_s.write((char*)&read[current], num_bytes_to_write);
-            finorder_s.read((char *)&current, sizeof(uint32_t));
+            uint16_t num_bytes_to_write = ((uint32_t)read_lengths[current] + 4 - 1) / 4;
+            fout_s.write(reinterpret_cast<char *>(&read_lengths[current]), sizeof(uint16_t));
+            fout_s.write(reinterpret_cast<char *>(&read[current]), num_bytes_to_write);
+            finorder_s.read(reinterpret_cast<char *>(&current), sizeof(uint32_t));
         }
 
         fout.close();
@@ -635,19 +636,18 @@ void writetofile(std::bitset<bitset_size> *read, uint16_t *read_lengths, reorder
     }
 
     uint32_t numreads_s = 0;
-    for (int i = 0; i < rg.num_thr; i++)
-    numreads_s += numreads_s_thr[i];
+    for (int i = 0; i < rg.num_thr; i++) numreads_s += numreads_s_thr[i];
     // write numreads_s to a file
-    std::ofstream fout_s_count(rg.outfile + ".singleton"+".count", std::ofstream::out|std::ios::binary);
-    fout_s_count.write((char*)&numreads_s, sizeof(uint32_t));
+    std::ofstream fout_s_count(rg.outfile + ".singleton" + ".count", std::ofstream::out | std::ios::binary);
+    fout_s_count.write(reinterpret_cast<char *>(&numreads_s), sizeof(uint32_t));
     fout_s_count.close();
 
     // Now combine the num_thr order files
-    std::ofstream fout_s(rg.outfile + ".singleton", std::ofstream::out|std::ios::binary);
+    std::ofstream fout_s(rg.outfile + ".singleton", std::ofstream::out | std::ios::binary);
     std::ofstream foutorder_s(rg.outfileorder + ".singleton", std::ofstream::out | std::ios::binary);
     for (int tid = 0; tid < rg.num_thr; tid++) {
         std::string tid_str = std::to_string(tid);
-        std::ifstream fin_s(rg.outfile + ".singleton." + tid_str, std::ifstream::in|std::ios::binary);
+        std::ifstream fin_s(rg.outfile + ".singleton." + tid_str, std::ifstream::in | std::ios::binary);
         std::ifstream finorder_s(rg.outfileorder + ".singleton." + tid_str, std::ifstream::in | std::ios::binary);
 
         fout_s << fin_s.rdbuf();  // write entire file

@@ -97,11 +97,11 @@ void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section &id) 
             UTILS_DIE_IF(seq.getSequence().size() > MAX_READ_LEN, "Too long read length");
             cp.max_readlen = std::max(cp.max_readlen, (uint32_t)seq.getSequence().length());
             if (seq.getSequence().find('N') != std::string::npos) {
-                write_dnaN_in_bits(seq.getSequence(),fout_N[seg_index]);
+                write_dnaN_in_bits(seq.getSequence(), fout_N[seg_index]);
                 uint32_t pos_N = cp.num_reads + rec_index;
-                fout_order_N[seg_index].write((char *)&pos_N, sizeof(uint32_t));
+                fout_order_N[seg_index].write(reinterpret_cast<char *>(&pos_N), sizeof(uint32_t));
             } else {
-                write_dna_in_bits(seq.getSequence(),fout_clean[seg_index]);
+                write_dna_in_bits(seq.getSequence(), fout_clean[seg_index]);
                 cp.num_reads_clean[seg_index]++;
             }
             if (!seq.getQualities().empty()) {
@@ -137,7 +137,7 @@ void Preprocessor::finish(size_t id) {
 
     if (cp.paired_end) {
         // merge input_N and input_order_N for the two files
-        std::ofstream fout_N_PE(outfileN[0], std::ios::app|std::ios::binary);
+        std::ofstream fout_N_PE(outfileN[0], std::ios::app | std::ios::binary);
         std::ifstream fin_N_PE(outfileN[1], std::ios::binary);
         fout_N_PE << fin_N_PE.rdbuf();
         fout_N_PE.close();

@@ -14,7 +14,7 @@
 #include <array>
 #include <cmath>  // abs
 #include <cstdio>
-#include <cstring> // memcpy
+#include <cstring>  // memcpy
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -278,10 +278,10 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
 
     // Now start with unaligned reads
     num_reads_unaligned = num_reads - num_reads_aligned;
-    std::string file_unaligned_count = file_unaligned+".count";
+    std::string file_unaligned_count = file_unaligned + ".count";
     std::ifstream f_unaligned_count(file_unaligned_count);
     uint64_t unaligned_array_size;
-    f_unaligned_count.read((char*)&unaligned_array_size, sizeof(uint64_t));
+    f_unaligned_count.read(reinterpret_cast<char *>(&unaligned_array_size), sizeof(uint64_t));
     f_unaligned_count.close();
     remove(file_unaligned_count.c_str());
     data->unaligned_arr = std::vector<char>(unaligned_array_size);
@@ -289,9 +289,9 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     std::string unaligned_read;
     uint64_t pos_in_unaligned_arr = 0;
     for (uint32_t i = 0; i < num_reads_unaligned; i++) {
-      read_dnaN_from_bits(unaligned_read, f_unaligned);
-      std::memcpy(data->unaligned_arr.data()+pos_in_unaligned_arr, &unaligned_read[0], unaligned_read.size());
-      pos_in_unaligned_arr += unaligned_read.size();
+        read_dnaN_from_bits(unaligned_read, f_unaligned);
+        std::memcpy(data->unaligned_arr.data() + pos_in_unaligned_arr, &unaligned_read[0], unaligned_read.size());
+        pos_in_unaligned_arr += unaligned_read.size();
     }
     f_unaligned.close();
     uint64_t current_pos_in_unaligned_arr = 0;
@@ -416,10 +416,10 @@ void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_d
 
     // Now start with unaligned reads
     num_reads_unaligned = cp.num_reads - num_reads_aligned;
-    std::string file_unaligned_count = file_unaligned+".count";
+    std::string file_unaligned_count = file_unaligned + ".count";
     std::ifstream f_unaligned_count(file_unaligned_count);
     uint64_t unaligned_array_size;
-    f_unaligned_count.read((char*)&unaligned_array_size, sizeof(uint64_t));
+    f_unaligned_count.read(reinterpret_cast<char *>(&unaligned_array_size), sizeof(uint64_t));
     f_unaligned_count.close();
     remove(file_unaligned_count.c_str());
     data->unaligned_arr = std::vector<char>(unaligned_array_size);
@@ -427,9 +427,9 @@ void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     std::string unaligned_read;
     uint64_t pos_in_unaligned_arr = 0;
     for (uint32_t i = 0; i < num_reads_unaligned; i++) {
-      read_dnaN_from_bits(unaligned_read, f_unaligned);
-      std::memcpy(data->unaligned_arr.data()+pos_in_unaligned_arr, &unaligned_read[0], unaligned_read.size());
-      pos_in_unaligned_arr += unaligned_read.size();
+        read_dnaN_from_bits(unaligned_read, f_unaligned);
+        std::memcpy(data->unaligned_arr.data() + pos_in_unaligned_arr, &unaligned_read[0], unaligned_read.size());
+        pos_in_unaligned_arr += unaligned_read.size();
     }
     f_unaligned.close();
 
