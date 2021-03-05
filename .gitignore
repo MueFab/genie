@@ -20,3 +20,5 @@ page-output/
 
 # Visual Studio Code workspace settings directory
 .vscode/
+
+__pycache__/
