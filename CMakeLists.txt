@@ -59,7 +59,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel") # Intel Compiler
 elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC") # Microsoft Compiler
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
     if(${GENIE_WERROR})
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
+      #  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
     endif()
 else()
     message(WARNING "C++ compiler not supported: ${CMAKE_CXX_COMPILER_ID}")

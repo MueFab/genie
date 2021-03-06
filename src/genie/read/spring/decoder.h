@@ -41,8 +41,6 @@ struct Record {
  * @param combine_pairs
  * @param matched_records
  * @param unmatched_records
- * @param mate_au_id
- * @param mate_record_index
  * @param names
  * @param qvs
  */
@@ -58,7 +56,6 @@ class Decoder : public genie::core::ReadDecoder {
  private:
     compression_params cp{};                   //!<
     bool combine_pairs;                        //!<
-    size_t num_thr;                            //!<
     util::OrderedLock lock;                    //!<
     std::ofstream fout_unmatched1;             //!<
     std::ofstream fout_unmatched2;             //!<

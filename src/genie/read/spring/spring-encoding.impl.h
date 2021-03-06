@@ -127,7 +127,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
             if (!(in_flag >> c)) done = true;
             if (!done) {
                 read_dna_from_bits(current, f);
-                rc = in_RC.get();
+                rc = static_cast<char>(in_RC.get());
                 in_pos.read(reinterpret_cast<char *>(&p), sizeof(int64_t));
                 in_order.read(reinterpret_cast<char *>(&ord), sizeof(uint32_t));
                 in_readlength.read(reinterpret_cast<char *>(&rl), sizeof(uint16_t));
@@ -473,7 +473,7 @@ void readsingletons(std::bitset<bitset_size> *read, uint32_t *order_s, uint16_t 
     std::string s;
     for (uint32_t i = 0; i < eg.numreads_s; i++) {
         read_dna_from_bits(s, f);
-        read_lengths_s[i] = s.length();
+        read_lengths_s[i] = static_cast<uint16_t>(s.length());
         stringtobitset<bitset_size>(s, read_lengths_s[i], read[i], egb.basemask);
     }
     f.close();
@@ -481,7 +481,7 @@ void readsingletons(std::bitset<bitset_size> *read, uint32_t *order_s, uint16_t 
     f.open(eg.infile_N, std::ios::binary);
     for (uint32_t i = eg.numreads_s; i < eg.numreads_s + eg.numreads_N; i++) {
         read_dnaN_from_bits(s, f);
-        read_lengths_s[i] = s.length();
+        read_lengths_s[i] = static_cast<uint16_t>(s.length());
         stringtobitset<bitset_size>(s, read_lengths_s[i], read[i], egb.basemask);
     }
     std::ifstream f_order_s(eg.infile_order + ".singleton", std::ios::binary);

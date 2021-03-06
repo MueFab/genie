@@ -97,14 +97,6 @@ Encoder::Encoder(const std::string& working_dir, size_t num_thr, bool paired_end
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void flowIn(genie::core::record::Chunk&& t, const util::Section& id);
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void flushIn(uint64_t& pos);
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void Encoder::skipIn(const util::Section& id) {
     preprocessor.skip(id);
     skipOut(id);

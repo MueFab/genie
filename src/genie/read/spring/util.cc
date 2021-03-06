@@ -77,7 +77,7 @@ void write_dna_in_bits(const std::string &read, std::ofstream &fout) {
     dna2int[(uint8_t)'T'] = 3;
     uint8_t bitarray[128];
     uint8_t pos_in_bitarray = 0;
-    uint16_t readlen = read.size();
+    auto readlen = static_cast<uint16_t>(read.size());
     fout.write(reinterpret_cast<char *>(&readlen), sizeof(uint16_t));
     for (int i = 0; i < readlen / 4; i++) {
         bitarray[pos_in_bitarray] = 0;
@@ -134,7 +134,7 @@ void write_dnaN_in_bits(const std::string &read, std::ofstream &fout) {
     dna2int[(uint8_t)'N'] = 4;
     uint8_t bitarray[256];
     uint8_t pos_in_bitarray = 0;
-    uint16_t readlen = read.size();
+    auto readlen = static_cast<uint16_t>(read.size());
     fout.write(reinterpret_cast<char *>(&readlen), sizeof(uint16_t));
     for (int i = 0; i < readlen / 2; i++) {
         bitarray[pos_in_bitarray] = 0;
