@@ -44,6 +44,8 @@ namespace {
 #include <locale.h>
 #include <stdio.h>
 
+#define strdup _strdup
+
 #if defined _WIN32 || defined __WIN32__ || defined __EMX__ || defined __DJGPP__
 /* Win32, OS/2, DOS */
 #define HAS_DEVICE(P) ((((P)[0] >= 'A' && (P)[0] <= 'Z') || ((P)[0] >= 'a' && (P)[0] <= 'z')) && (P)[1] == ':')
@@ -520,7 +522,7 @@ KwayMergeSortIterator KwayMergeSort::end() { return KwayMergeSortIterator(this, 
 
 void KwayMergeSort::OpenTempFiles() {
     for (size_t i = 0; i < _vTempFileNames.size(); ++i) {
-        ifstream *file;
+        ifstream *file = nullptr;
 
         // not gzipped
         // if ((isGzipFile(_vTempFileNames[i]) == false) && (isRegularFile(_vTempFileNames[i]) == true)) {
@@ -567,13 +569,11 @@ bool isRegularFile(const string &filename) {
 
     i = stat(filename.c_str(), &buf);
     if (i != 0) {
-        cerr << "Error: can't determine file type of '" << filename << "': " << strerror(errno) << endl;
+        cerr << "Error: can't determine file type of '" << filename << endl; //"': " << strerror(errno) << endl;
         exit(1);
     }
     //  if (S_ISREG(buf.st_mode))
     return true;
-
-    return false;
 }
 
 /*

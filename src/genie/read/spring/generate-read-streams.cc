@@ -279,7 +279,7 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     // Now start with unaligned reads
     num_reads_unaligned = num_reads - num_reads_aligned;
     std::string file_unaligned_count = file_unaligned + ".count";
-    std::ifstream f_unaligned_count(file_unaligned_count);
+    std::ifstream f_unaligned_count(file_unaligned_count, std::ios::in | std::ios::binary);
     uint64_t unaligned_array_size;
     f_unaligned_count.read(reinterpret_cast<char *>(&unaligned_array_size), sizeof(uint64_t));
     f_unaligned_count.close();
@@ -417,7 +417,7 @@ void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     // Now start with unaligned reads
     num_reads_unaligned = cp.num_reads - num_reads_aligned;
     std::string file_unaligned_count = file_unaligned + ".count";
-    std::ifstream f_unaligned_count(file_unaligned_count);
+    std::ifstream f_unaligned_count(file_unaligned_count, std::ios::in | std::ios::binary);
     uint64_t unaligned_array_size;
     f_unaligned_count.read(reinterpret_cast<char *>(&unaligned_array_size), sizeof(uint64_t));
     f_unaligned_count.close();
@@ -800,12 +800,18 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
             bool read_1_first = (current < pair);
             if (same_block && !read_1_first) {
                 raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(1);  // R1_split
+                raw_au.get(core::GenSub::PAIR_R1_SPLIT).push(bdata.genomic_record_index[pair]);
             } else if (same_block && read_1_first) {
                 raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(2);  // R2_split
+                raw_au.get(core::GenSub::PAIR_R2_SPLIT).push(bdata.genomic_record_index[pair]);
             } else if (!same_block && !read_1_first) {
                 raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(3);  // R1_diff_ref_seq
+                raw_au.get(core::GenSub::PAIR_R1_DIFF_SEQ).push(bdata.block_num[pair]);
+                raw_au.get(core::GenSub::PAIR_R1_DIFF_POS).push(bdata.genomic_record_index[pair]);
             } else {
                 raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(4);  // R2_diff_ref_seq
+                raw_au.get(core::GenSub::PAIR_R2_DIFF_SEQ).push(bdata.block_num[pair]);
+                raw_au.get(core::GenSub::PAIR_R2_DIFF_POS).push(bdata.genomic_record_index[pair]);
             }
         }
     }

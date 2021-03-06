@@ -20,7 +20,10 @@
 #include <vector>
 #include "genie/read/spring/params.h"
 #include "genie/read/spring/util.h"
+
+
 #include "kwaymergesort/kwaymergesort.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -189,7 +192,8 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                         if (same_au_flag) {
                             unmatched_same_au[first_read_flag ? 0 : 1].push_back(cur_record);
                             if (first_read_flag)
-                                pos_in_unmatched_same_au_0[cur_record.name] = unmatched_same_au[0].size() - 1;
+                                pos_in_unmatched_same_au_0[cur_record.name] =
+                                    static_cast<unsigned int>(unmatched_same_au[0].size() - 1);
                         } else {
                             unmatched_records[first_read_flag ? 0 : 1].push_back(cur_record);
                         }
@@ -211,7 +215,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
             std::vector<std::pair<uint32_t, uint32_t>> record_index_for_sorting(size_unmatched);
             for (size_t i = 0; i < size_unmatched; i++)
                 record_index_for_sorting[i] =
-                    std::make_pair(pos_in_unmatched_same_au_0[unmatched_same_au[1][i].name], i);
+                    std::make_pair(pos_in_unmatched_same_au_0[unmatched_same_au[1][i].name], static_cast<uint32_t>(i));
             std::sort(
                 record_index_for_sorting.begin(), record_index_for_sorting.end(),
                 [](std::pair<uint32_t, uint32_t> a, std::pair<uint32_t, uint32_t> b) { return a.first < b.first; });
@@ -317,8 +321,8 @@ void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
     // now put unmatched reads to chunks if combine_pairs is false
     if (!combine_pairs) {
         for (size_t i = 0; i < unmatched_records[0].size(); ++i) {
-            chunk.getData().emplace_back(cp.paired_end ? 2 : 1, core::record::ClassType::CLASS_U,
-                                         std::move(unmatched_records[0][i].name), "", 0, true);
+            chunk.getData().emplace_back(cp.paired_end ? (uint8_t)2 : (uint8_t)1, core::record::ClassType::CLASS_U,
+                                         std::move(unmatched_records[0][i].name), "", (uint8_t)0, true);
             // last parameter is read_1_first
             core::record::Segment seg(std::move(unmatched_records[0][i].seq));
             if (!unmatched_records[0][i].qv.empty()) {
@@ -327,8 +331,8 @@ void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
             chunk.getData().back().addSegment(std::move(seg));
         }
         for (size_t i = 0; i < unmatched_records[1].size(); ++i) {
-            chunk.getData().emplace_back(cp.paired_end ? 2 : 1, core::record::ClassType::CLASS_U,
-                                         std::move(unmatched_records[1][i].name), "", 0, false);
+            chunk.getData().emplace_back(cp.paired_end ? (uint8_t)2 : (uint8_t)1, core::record::ClassType::CLASS_U,
+                                         std::move(unmatched_records[1][i].name), "", (uint8_t)0, false);
             // last parameter is read_1_first
             core::record::Segment seg(std::move(unmatched_records[1][i].seq));
             if (!unmatched_records[1][i].qv.empty()) {
@@ -428,13 +432,14 @@ void Decoder::flushIn(uint64_t& pos) {
             size_t maxBufferSize = 2000000000;  // roughly 2 GB
             std::ofstream fout_unmatched_readnames_1_sorted(file_unmatched_readnames_1_sorted);
             std::ofstream fout_unmatched_readnames_2_sorted(file_unmatched_readnames_2_sorted);
-            kwaymergesort::KwayMergeSort* sorter = new kwaymergesort::KwayMergeSort(
-                file_unmatched_readnames_1, &fout_unmatched_readnames_1_sorted, maxBufferSize, false, basedir);
+            kwaymergesort::KwayMergeSort* sorter =
+                new kwaymergesort::KwayMergeSort(file_unmatched_readnames_1, &fout_unmatched_readnames_1_sorted,
+                                                 static_cast<int>(maxBufferSize), false, basedir);
             sorter->Sort();
             delete sorter;
             fout_unmatched_readnames_1_sorted.close();
             sorter = new kwaymergesort::KwayMergeSort(file_unmatched_readnames_2, &fout_unmatched_readnames_2_sorted,
-                                                      maxBufferSize, false, basedir);
+                                                      static_cast<int>(maxBufferSize), false, basedir);
             sorter->Sort();
             delete sorter;
             fout_unmatched_readnames_2_sorted.close();
@@ -457,7 +462,7 @@ void Decoder::flushIn(uint64_t& pos) {
             uint32_t num_lines = 0;
             while (std::getline(fin_unmatched_readnames_1_sorted, line)) {
                 auto pos_tab = line.find_last_of('\t');  // find last tab
-                index_file_1[num_lines++] = std::stoull(line.substr(pos_tab + 1));
+                index_file_1[num_lines++] = static_cast<uint32_t>(std::stoull(line.substr(pos_tab + 1)));
             }
             if (num_lines != size_unmatched)
                 UTILS_DIE("Sizes of unmatched reads across AUs don't match (readnames_1_sorted).");

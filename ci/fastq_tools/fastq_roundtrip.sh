@@ -41,12 +41,18 @@ git_root_dir="$(git rev-parse --show-toplevel)"
 compress_roundtrip () {
     genie_encoder_parameters="$1"
     fastq_cmp_error_parameters="$2"
+    fastq_cmp_error_parameters_refdecoder="$fastq_cmp_error_parameters"
+    genie_decoder_recombine=""
     if [[ "$paired_fastq_file" == "" ]]; then
         paired_fastq_parameter=""
         fastq_cmp_input_parameters="-i $primary_fastq_file -p /tmp/output_1.fastq"
     else
         paired_fastq_parameter="--input-suppl-file $paired_fastq_file"
         fastq_cmp_input_parameters="-i $primary_fastq_file -j $paired_fastq_file -p /tmp/output_1.fastq -q /tmp/output_2.fastq"
+        if [[ "$genie_encoder_parameters" != *"--low-latency"* ]] && [[ "$genie_encoder_parameters" != *"--read-ids none"* ]]; then
+            genie_decoder_recombine="--combine-pairs"
+            fastq_cmp_error_parameters_refdecoder="$fastq_cmp_error_parameters_refdecoder --broken_pairing"
+        fi
     fi
 
     echo "Genie compress"
@@ -70,6 +76,7 @@ compress_roundtrip () {
         -o /tmp/output_1.fastq \
         --output-suppl-file /tmp/output_2.fastq \
         -i /tmp/output.mgb -f \
+        $genie_decoder_recombine \
         || { echo "Genie decompress ($primary_fastq_file; $paired_fastq_file; $genie_encoder_parameters) failed!" ; exit 1; }
 
     $git_root_dir/ci/fastq_tools/fastq_cmp_complete.py $fastq_cmp_input_parameters $fastq_cmp_error_parameters || { echo "Invalid output!" ; exit 1; }
@@ -96,7 +103,7 @@ compress_roundtrip () {
 
         rm /tmp/output.mgrec
 
-        $git_root_dir/ci/fastq_tools/fastq_cmp_complete.py $fastq_cmp_input_parameters $fastq_cmp_error_parameters || { echo "Invalid output!" ; exit 1; }
+        $git_root_dir/ci/fastq_tools/fastq_cmp_complete.py $fastq_cmp_input_parameters $fastq_cmp_error_parameters_refdecoder || { echo "Invalid output!" ; exit 1; }
 
         rm /tmp/output_1.fastq
         rm -f /tmp/output_2.fastq
@@ -146,6 +153,6 @@ else
     compress_roundtrip "--low-latency --qv none --read-ids none" "--broken_names --broken_qualities"
     compress_roundtrip "--low-latency" "--patched_names"
     compress_roundtrip "--qv none --read-ids none" "--broken_names --broken_qualities --broken_order --broken_pairing"
-    compress_roundtrip "" "--broken_order --patched_names --broken_pairing"
+    compress_roundtrip "" "--broken_order --patched_names"
     convert_roundtrip "--patched_names"
 fi

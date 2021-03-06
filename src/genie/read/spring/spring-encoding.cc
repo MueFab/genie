@@ -105,7 +105,7 @@ void getDataParams(encoder_global &eg, const compression_params &cp) {
     numreads_clean = cp.num_reads_clean[0] + cp.num_reads_clean[1];
     numreads_total = cp.num_reads;
 
-    std::ifstream myfile_s_count(eg.infile + ".singleton" + ".count", std::ifstream::in);
+    std::ifstream myfile_s_count(eg.infile + ".singleton" + ".count", std::ifstream::in | std::ios::binary);
     myfile_s_count.read(reinterpret_cast<char *>(&eg.numreads_s), sizeof(uint32_t));
     myfile_s_count.close();
     std::string file_s_count = eg.infile + ".singleton" + ".count";

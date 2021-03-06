@@ -33,8 +33,9 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
                                                            core::ClassifierRegroup::RefMode externalref, bool rawref);
 
 /**
- *
+ * @brief
  * @param threads
+ * @param combinePairsFlag
  * @return
  */
 std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const std::string&, bool combinePairsFlag,

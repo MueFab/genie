@@ -98,7 +98,7 @@ void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section &id) 
             cp.max_readlen = std::max(cp.max_readlen, (uint32_t)seq.getSequence().length());
             if (seq.getSequence().find('N') != std::string::npos) {
                 write_dnaN_in_bits(seq.getSequence(), fout_N[seg_index]);
-                uint32_t pos_N = cp.num_reads + rec_index;
+                auto pos_N = static_cast<uint32_t>(cp.num_reads + rec_index);
                 fout_order_N[seg_index].write(reinterpret_cast<char *>(&pos_N), sizeof(uint32_t));
             } else {
                 write_dna_in_bits(seq.getSequence(), fout_clean[seg_index]);
