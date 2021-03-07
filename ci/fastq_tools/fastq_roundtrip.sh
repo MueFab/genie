@@ -4,7 +4,7 @@ set -e
 
 primary_fastq_file="$1"
 paired_fastq_file="$2"
-working_dir="$3"
+working_dir="${3:-"./"}"
 
 ############ Check prerequisites ###############
 
