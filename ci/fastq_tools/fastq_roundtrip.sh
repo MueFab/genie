@@ -4,6 +4,7 @@ set -e
 
 primary_fastq_file="$1"
 paired_fastq_file="$2"
+working_dir="$3"
 
 ############ Check prerequisites ###############
 
@@ -43,10 +44,10 @@ compress_roundtrip () {
     fastq_cmp_error_parameters="$2"
     if [[ "$paired_fastq_file" == "" ]]; then
         paired_fastq_parameter=""
-        fastq_cmp_input_parameters="-i $primary_fastq_file -p /tmp/output_1.fastq"
+        fastq_cmp_input_parameters="-i $primary_fastq_file -p $working_dir/output_1.fastq"
     else
         paired_fastq_parameter="--input-suppl-file $paired_fastq_file"
-        fastq_cmp_input_parameters="-i $primary_fastq_file -j $paired_fastq_file -p /tmp/output_1.fastq -q /tmp/output_2.fastq"
+        fastq_cmp_input_parameters="-i $primary_fastq_file -j $paired_fastq_file -p $working_dir/output_1.fastq -q $working_dir/output_2.fastq"
     fi
 
     echo "Genie compress"
@@ -54,7 +55,8 @@ compress_roundtrip () {
         $git_root_dir/cmake-build-release/bin/genie$exe_file_extension run \
         -i $primary_fastq_file \
         $paired_fastq_parameter \
-        -o /tmp/output.mgb -f \
+        -o $working_dir/output.mgb -f \
+        -w $working_dir \
         $genie_encoder_parameters \
         || { echo "Genie compress ($primary_fastq_file; $paired_fastq_file; $genie_encoder_parameters) failed!" ; exit 1; }
 
@@ -63,43 +65,45 @@ compress_roundtrip () {
     if [[ "$paired_fastq_file" != "" ]]; then
         ls -l $paired_fastq_file
     fi
-    ls -l /tmp/output.mgb
+    ls -l $working_dir/output.mgb
     echo "Genie decompress"
     eval $timing_command \
         $git_root_dir/cmake-build-release/bin/genie$exe_file_extension run \
-        -o /tmp/output_1.fastq \
-        --output-suppl-file /tmp/output_2.fastq \
-        -i /tmp/output.mgb -f \
+        -o $working_dir/output_1.fastq \
+        --output-suppl-file $working_dir/output_2.fastq \
+        -w $working_dir \
+        -i $working_dir/output.mgb -f \
         || { echo "Genie decompress ($primary_fastq_file; $paired_fastq_file; $genie_encoder_parameters) failed!" ; exit 1; }
 
     $git_root_dir/ci/fastq_tools/fastq_cmp_complete.py $fastq_cmp_input_parameters $fastq_cmp_error_parameters || { echo "Invalid output!" ; exit 1; }
 
-    rm /tmp/output_1.fastq
-    rm -f /tmp/output_2.fastq
+    rm $working_dir/output_1.fastq
+    rm -f $working_dir/output_2.fastq
 
     if [[ "$OSTYPE" != "win32" && "$OSTYPE" != "cygwin" && "$OSTYPE" != "msys" ]]; then
         echo "Refdecoder decompress"
         eval $timing_command \
             $MPEGG_REF_DECODER \
-            -i /tmp/output.mgb \
-            -o /tmp/output.mgrec \
+            -i $working_dir/output.mgb \
+            -o $working_dir/output.mgrec \
             || { echo "Reference decoder ($primary_fastq_file; $paired_fastq_file; $genie_encoder_parameters) failed!" ; exit 1; }
-        rm /tmp/output.mgb
+        rm $working_dir/output.mgb
 
         echo "Genie convert"
         eval $timing_command \
             $git_root_dir/cmake-build-release/bin/genie$exe_file_extension run \
-            -o /tmp/output_1.fastq \
-            --output-suppl-file /tmp/output_2.fastq \
-            -i /tmp/output.mgrec -f \
+            -o $working_dir/output_1.fastq \
+            --output-suppl-file $working_dir/output_2.fastq \
+            -i $working_dir/output.mgrec -f \
+            -w $working_dir \
             || { echo "Genie convert ($primary_fastq_file; $paired_fastq_file; $genie_encoder_parameters) failed!" ; exit 1; }
 
-        rm /tmp/output.mgrec
+        rm $working_dir/output.mgrec
 
         $git_root_dir/ci/fastq_tools/fastq_cmp_complete.py $fastq_cmp_input_parameters $fastq_cmp_error_parameters || { echo "Invalid output!" ; exit 1; }
 
-        rm /tmp/output_1.fastq
-        rm -f /tmp/output_2.fastq
+        rm $working_dir/output_1.fastq
+        rm -f $working_dir/output_2.fastq
     fi
 }
 
@@ -107,16 +111,17 @@ convert_roundtrip() {
     fastq_cmp_error_parameters="$1"
     if [[ "$paired_fastq_file" == "" ]]; then
         paired_fastq_parameter=""
-        fastq_cmp_input_parameters="-i $primary_fastq_file -p /tmp/output_1.fastq"
+        fastq_cmp_input_parameters="-i $primary_fastq_file -p $working_dir/output_1.fastq"
     else
         paired_fastq_parameter="--input-suppl-file $paired_fastq_file"
-        fastq_cmp_input_parameters="-i $primary_fastq_file -j $paired_fastq_file -p /tmp/output_1.fastq -q /tmp/output_2.fastq"
+        fastq_cmp_input_parameters="-i $primary_fastq_file -j $paired_fastq_file -p $working_dir/output_1.fastq -q $working_dir/output_2.fastq"
     fi
 
     echo "Genie convert"
     eval $timing_command \
         $git_root_dir/cmake-build-release/bin/genie$exe_file_extension run \
-        -o /tmp/output.mgrec \
+        -o $working_dir/output.mgrec \
+        -w $working_dir \
         -i $primary_fastq_file -f \
         $paired_fastq_parameter \
         || { echo "Genie convert ($primary_fastq_file; $paired_fastq_file) failed!" ; exit 1; }
@@ -124,16 +129,17 @@ convert_roundtrip() {
     echo "Genie convert back"
     eval $timing_command \
         $git_root_dir/cmake-build-release/bin/genie$exe_file_extension run \
-        -i /tmp/output.mgrec \
-        -o /tmp/output_1.fastq \
-        --output-suppl-file /tmp/output_2.fastq \
+        -i $working_dir/output.mgrec \
+        -w $working_dir \
+        -o $working_dir/output_1.fastq \
+        --output-suppl-file $working_dir/output_2.fastq \
         || { echo "Genie convert ($primary_fastq_file; $paired_fastq_file) failed!" ; exit 1; }
 
     $git_root_dir/ci/fastq_tools/fastq_cmp_complete.py $fastq_cmp_input_parameters $fastq_cmp_error_parameters || { echo "Invalid output!" ; exit 1; }
 
-    rm /tmp/output_1.fastq
-    rm /tmp/output_2.fastq
-    rm /tmp/output.mgrec
+    rm $working_dir/output_1.fastq
+    rm $working_dir/output_2.fastq
+    rm $working_dir/output.mgrec
 }
 
 if [[ "$paired_fastq_file" == "" ]]; then
