@@ -5,18 +5,15 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-std::string&& readKey(util::BitReader &reader){
-    std::string key = "XXXX";
-    for (uint8_t i = 0; i < key.size(); i++){
+std::string&& readKey(util::BitReader &reader, std::string&& key){
+    for (uint8_t i = 0; i < (uint8_t) key.size(); i++){
         auto c = reader.read<uint8_t>();
         key[i] = c;
     }
-
     return std::move(key);
 }
 
-std::string&& readNullTerminatedStr(util::BitReader &reader) {
-    std::string string;
+std::string&& readNullTerminatedStr(util::BitReader &reader, std::string&& string) {
     char c = 0;
     do {
         c = reader.read<uint8_t>();
