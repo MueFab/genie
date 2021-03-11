@@ -7,7 +7,6 @@
 #include <genie/util/bitreader.h>
 
 #include <genie/core/record/class-type.h>
-#include <genie/format/mpegg_p1/dataset/fields/block_header_flags/block_header_flags.h>
 
 namespace genie {
 namespace format {
@@ -22,7 +21,7 @@ class ClassInfo{
 
     explicit ClassInfo(core::record::ClassType _clid);
 
-    void ReadClassInfo(util::BitReader& reader, size_t length, bool block_header_flag);
+    void ReadClassInfo(util::BitReader& reader, bool block_header_flag);
 
     void addDescriptorID(uint8_t _desc_ID);
     void addDescriptorIDs(std::vector<uint8_t>& _desc_IDs);

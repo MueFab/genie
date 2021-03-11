@@ -11,9 +11,7 @@ ClassInfo::ClassInfo(core::record::ClassType _clid)
     : clid(_clid),
       descriptor_IDs(){}
 
-void ClassInfo::ReadClassInfo(util::BitReader& reader, size_t length, bool block_header_flag) {
-
-    size_t start_pos = reader.getPos();
+void ClassInfo::ReadClassInfo(util::BitReader& reader, bool block_header_flag) {
 
     /// clid[] u(4)
     clid = reader.read<core::record::ClassType>(4);
@@ -28,7 +26,6 @@ void ClassInfo::ReadClassInfo(util::BitReader& reader, size_t length, bool block
         }
     }
 
-    UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid ClassInfo length!");
 }
 
 void ClassInfo::addDescriptorID(uint8_t _desc_ID) {

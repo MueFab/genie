@@ -42,53 +42,35 @@ DatasetHeader::DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSizeFlag _
     UTILS_DIE_IF(4 != version.size(), "Version string must consists of 4 characters");
 }
 
-DatasetHeader::DatasetHeader(util::BitReader& bit_reader, size_t length) {
-
-    size_t start_pos = bit_reader.getPos();
+DatasetHeader::DatasetHeader(util::BitReader& bit_reader, size_t length)
+    : dataset_group_ID(bit_reader.read<uint8_t>()),
+      dataset_ID(bit_reader.read<uint16_t>()),
+      version(readNullTerminatedStr(bit_reader)),
+      byte_offset_size_flag(bit_reader.read<ByteOffsetSizeFlag>(1)),
+      non_overlapping_AU_range_flag(bit_reader.read<bool>(1)),
+      pos_40_bits_flag(bit_reader.read<Pos40SizeFlag>(1)),
+      multiple_alignment_flag(bit_reader.read<bool>(1)),
+      dataset_type(bit_reader.read<core::parameter::DataUnit::DatasetType>(4)),
+      alphabet_ID(bit_reader.read<uint8_t>()),
+      num_U_access_units(bit_reader.read<uint32_t>()) {
 
     std::string key = readKey(bit_reader);
     UTILS_DIE_IF(key != "dthd", "DatasetHeader is not Found");
 
-    // dataset_group_ID u(8)
-    dataset_group_ID = bit_reader.read<uint8_t>();
-
-    // dataset_ID u(16)
-    dataset_ID = bit_reader.read<uint16_t>();
-
-    // version c(4)
-    readNullTerminatedStr(bit_reader);
-
-    // byte_offset_size_flag u(1)
-    byte_offset_size_flag = bit_reader.read<ByteOffsetSizeFlag>(1);
-
-    // non_overlapping_AU_range_flag u(1)
-    non_overlapping_AU_range_flag = bit_reader.read<bool>(1);
-
-    // pos_40_bits_flag u(1)
-    pos_40_bits_flag = bit_reader.read<Pos40SizeFlag>(1);
+    size_t start_pos = bit_reader.getPos();
 
     /// Class BlockConfig including ClassInfo
-    auto Block_length = bit_reader.read<size_t>();
-    block_header.ReadBlockConfig(bit_reader, Block_length);
-
-    // dataset_type u(4)
-    dataset_type = bit_reader.read<core::parameter::DataUnit::DatasetType>(4);
-
-    // alphabet_ID u(8), num_U_access_units u(32)
-    alphabet_ID = bit_reader.read<uint8_t>();
-    num_U_access_units = bit_reader.read<uint32_t>();
+    block_header.ReadBlockConfig(bit_reader);
 
     /// Class UAccessUnitInfo
     if (num_U_access_units > 0) {
         if (u_access_unit_info != nullptr) {
-            auto u_acc_unit_length = bit_reader.read<size_t>();
-            u_access_unit_info->readUAccessUnitInfo(bit_reader, u_acc_unit_length);
+            u_access_unit_info->readUAccessUnitInfo(bit_reader);
         }
     }
 
     /// Class SequenceConfig
-    auto Sequence_length = bit_reader.read<size_t>();
-    seq_info.ReadSequenceConfig(bit_reader, Sequence_length);
+    seq_info.ReadSequenceConfig(bit_reader);
 
     UTILS_DIE_IF(bit_reader.getPos()-start_pos != length, "Invalid DatasetHeader length!");
 }

@@ -17,9 +17,9 @@ SequenceConfig::SequenceConfig(uint8_t _ref_ID)
       seq_blocks(),
       thress() {}
 
-void SequenceConfig::ReadSequenceConfig(util::BitReader& reader, size_t length) {
+void SequenceConfig::ReadSequenceConfig(util::BitReader& reader) {
 
-    size_t start_pos = reader.getPos();
+//    size_t start_pos = reader.getPos();
 
     // seq_count u(16)
     reader.read<uint16_t>();
@@ -61,7 +61,7 @@ void SequenceConfig::ReadSequenceConfig(util::BitReader& reader, size_t length) 
         }
     }
 
-    UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid readUAccessUnitInfo length!");
+//    UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid readUAccessUnitInfo length!");
 }
 
 bool SequenceConfig::isValid() const { return seq_IDs.size() == thress.size(); }
