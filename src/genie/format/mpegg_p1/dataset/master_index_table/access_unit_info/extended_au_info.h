@@ -20,10 +20,11 @@ class MITExtendedAUInfo {
      *  ------------------------------------------------------------------------------------------------------------ */
     DatasetHeader::Pos40SizeFlag pos_40_flag;
    public:
-
-    explicit MITExtendedAUInfo(util::BitReader& reader);
+    MITExtendedAUInfo();
 
     MITExtendedAUInfo(uint64_t start_pos, uint64_t end_pos, DatasetHeader::Pos40SizeFlag flag);
+
+    explicit MITExtendedAUInfo(util::BitReader& reader);
 
     uint64_t getBitLength() const;
 
