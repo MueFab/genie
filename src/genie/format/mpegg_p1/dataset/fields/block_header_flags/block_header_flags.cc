@@ -7,41 +7,42 @@ namespace mpegg_p1 {
 BlockConfig::BlockConfig()
     : block_header_flag(false),
       MIT_flag(false),
-      class_infos(){}
+      CC_mode_flag(false),
+      ordered_blocks_flag(false),
+      class_infos(),
+      num_classes() {}
 
 BlockConfig::BlockConfig(bool _block_header_flag, bool _mit_flag)
     : block_header_flag(_block_header_flag),
       MIT_flag(_mit_flag),
-      class_infos(){}
+      CC_mode_flag(false),
+      ordered_blocks_flag(false),
+      class_infos(),
+      num_classes() {}
 
-// TODO(Raouf): fix With/Without section in Read/Write and getLength methods
-void BlockConfig::ReadBlockConfig(genie::util::BitReader& reader, size_t length) {
-    size_t start_pos = reader.getPos();
-
+void BlockConfig::ReadBlockConfig(genie::util::BitReader& reader) {
     /// block_header_flag u(1)
     block_header_flag = reader.read<bool>(1);
-/*
+
     if (block_header_flag) {
-        /// MIT_flag, CC_mode_flag
-        auto WithHeader_length = reader.read<size_t>();
-        ReadWithHeader(reader, WithHeader_length);
+        /// MIT_flag u(1), CC_mode_flag u(1)
+        MIT_flag = reader.read<bool>(1);
+        CC_mode_flag = reader.read<bool>(1);
+
     } else {
-        /// ordered_blocks_flag
-        auto WithoutHeader_length = reader.read<size_t>();
-        ReadWithoutHeader(reader, WithoutHeader_length);
+        /// ordered_blocks_flag u(1)
+        ordered_blocks_flag = reader.read<bool>(1);
     }
-*/
+
     if (MIT_flag) {
         /// num_classes u(4)
         num_classes = reader.read<uint8_t>(4);
 
-        auto ClassInfo_length = reader.read<size_t>();
         for ( auto& info : class_infos) {
-            info.ReadClassInfo(reader, ClassInfo_length, block_header_flag);   /// clid[], num_descriptors[], descriptors_ID[][]
+            /// clid[], num_descriptors[], descriptors_ID[][]
+            info.ReadClassInfo(reader, block_header_flag);
         }
     }
-
-    UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid ReadBlockConfig length!");
 }
 
 bool BlockConfig::getBlockHeaderFlag() const { return block_header_flag; }
@@ -73,13 +74,13 @@ void BlockConfig::setClassInfos(std::vector<ClassInfo>&& _cls_infos) {
 uint64_t BlockConfig::getBitLength() const {
 
     uint64_t bitlen = 1;  /// block_header_flag u(1)
-/*
+
     if (block_header_flag) {
-        bitlen += with.getBitLength();  /// MIT_flag, CC_mode_flag
+        bitlen += 2;  /// MIT_flag u(1), CC_mode_flag u(1)
     } else {
-        bitlen += without.getBitLength();  /// ordered_blocks_flag
+        bitlen += 1;  /// ordered_blocks_flag u(1)
     }
-*/
+
     if (MIT_flag) {
         /// num_classes u(4)
         bitlen += 4;
@@ -98,14 +99,16 @@ void BlockConfig::write(genie::util::BitWriter& bit_writer) const {
 
     // block_header_flag u(1)
     bit_writer.write(block_header_flag, 1);
-/*
+
     if (block_header_flag) {
-        with.write(bit_writer);    /// MIT_flag, CC_mode_flag
+        /// MIT_flag, CC_mode_flag
+        bit_writer.write(MIT_flag, 1);
+        bit_writer.write(CC_mode_flag, 1);
     }
     else {
-        without.write(bit_writer);  /// ordered_blocks_flag
+        bit_writer.write(ordered_blocks_flag, 1);  /// ordered_blocks_flag
     }
-*/
+
 }
 
 void BlockConfig::writeClassInfos(genie::util::BitWriter& bit_writer) const {
@@ -115,8 +118,8 @@ void BlockConfig::writeClassInfos(genie::util::BitWriter& bit_writer) const {
         bit_writer.write(getNumClasses(), 4);
 
         // clid[ci], num_descriptors[ci], descriptor_ID[ci][di]
-        for (auto& class_info: class_infos) {
-            class_info.write(bit_writer, block_header_flag);
+        for (auto& info: class_infos) {
+            info.write(bit_writer, block_header_flag);
         }
     }
 }

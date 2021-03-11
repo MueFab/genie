@@ -1,4 +1,3 @@
-#include "genie/util/runtime-exception.h"
 #include "u_access_unit_info.h"
 
 namespace genie {
@@ -19,9 +18,9 @@ UAccessUnitInfo::UAccessUnitInfo(uint32_t _num_U_clusters)
       U_signature_constant_length(false),
       U_signature_length(0){}
 
-void UAccessUnitInfo::readUAccessUnitInfo(util::BitReader& reader, size_t length) {
+void UAccessUnitInfo::readUAccessUnitInfo(util::BitReader& reader) {
 
-    size_t start_pos = reader.getPos();
+//    size_t start_pos = reader.getPos();
 
     // num_U_clusters u(32), multiple_signature_base u(31)
     num_U_clusters = reader.read<uint32_t>();
@@ -40,7 +39,7 @@ void UAccessUnitInfo::readUAccessUnitInfo(util::BitReader& reader, size_t length
         U_signature_length = reader.read<uint8_t>();
     }
 
-    UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid readUAccessUnitInfo length!");
+//    UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid readUAccessUnitInfo length!");
 }
 
 void UAccessUnitInfo::setMultipleSignature(uint32_t base, uint8_t size) {

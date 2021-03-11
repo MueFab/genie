@@ -10,22 +10,17 @@
 #include <genie/util/runtime-exception.h>
 
 #include "class_info/class_info.h"
-
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
 class BlockConfig {
-   private:
-    uint8_t num_classes;
-
    public:
-
     BlockConfig();
 
     BlockConfig(bool _block_header_flag, bool _mit_flag);
 
-    void ReadBlockConfig(genie::util::BitReader& reader, size_t length);
+    void ReadBlockConfig(genie::util::BitReader& reader);
 
     /**
      *
@@ -87,11 +82,15 @@ class BlockConfig {
      */
     void writeClassInfos(genie::util::BitWriter& bit_writer) const;
 
-   protected:
+   private:
     bool block_header_flag;
     bool MIT_flag;
 
+    bool CC_mode_flag;
+    bool ordered_blocks_flag;
+
     std::vector<ClassInfo> class_infos;
+    uint8_t num_classes;
 };
 
 

@@ -24,7 +24,7 @@ class SequenceConfig {
 
     explicit SequenceConfig(uint8_t _ref_ID);
 
-    void ReadSequenceConfig(genie::util::BitReader& reader, size_t length);
+    void ReadSequenceConfig(genie::util::BitReader& reader);
 
     uint64_t getBitLength() const;
 

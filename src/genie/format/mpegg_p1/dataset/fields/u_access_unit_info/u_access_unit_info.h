@@ -5,6 +5,7 @@
 
 #include "genie/util/bitwriter.h"
 #include "genie/util/bitreader.h"
+#include "genie/util/runtime-exception.h"
 
 namespace genie {
 namespace format {
@@ -17,13 +18,14 @@ class UAccessUnitInfo {
     uint8_t U_signature_size;
     bool U_signature_constant_length;
     uint8_t U_signature_length;
+
    public:
 
     UAccessUnitInfo();
 
     explicit UAccessUnitInfo(uint32_t _num_U_clusters);
 
-    void readUAccessUnitInfo(genie::util::BitReader& reader, size_t length);
+    void readUAccessUnitInfo(genie::util::BitReader& reader);
 
     void setMultipleSignature(uint32_t base, uint8_t size);
     void setConstantSignature(uint8_t sign_length);
