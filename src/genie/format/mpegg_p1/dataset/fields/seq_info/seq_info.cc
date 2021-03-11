@@ -29,12 +29,12 @@ void SequenceConfig::ReadSequenceConfig(util::BitReader& reader) {
         reference_ID = reader.read<uint8_t>();
 
         // seq_ID u(16)
-        for (auto seq_ID: seq_IDs){
+        for (auto seq = 0; seq < getSeqCount(); seq++){
             reader.read<uint16_t>();
         }
 
         // seq_blocks u(32)
-        for (auto seq_block: seq_blocks){
+        for (auto seq = 0; seq < getSeqCount(); seq++){
             reader.read<uint32_t>();
         }
         // tflag[0] u(1)
