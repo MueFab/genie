@@ -7,6 +7,10 @@
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 
+//#include "external_reference/checksum.h"
+#include "external_reference/mpegg_ref.h"
+#include "external_reference/raw_ref.h"
+#include "external_reference/fasta_ref.h"
 #include "external_reference/external_reference.h"
 #include "reference_location.h"
 
@@ -29,7 +33,7 @@ class External : public ReferenceLocation {
 
     Checksum::Algo getChecksumAlg() const;
 
-    uint64_t getLength() const;
+    uint64_t getLength() const override;
 
     void write(genie::util::BitWriter& writer) const override;
 };

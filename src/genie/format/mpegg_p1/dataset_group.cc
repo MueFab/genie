@@ -3,10 +3,12 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
+//#include <genie/format/mpegg_p1/util.h>
+#include <genie/util/runtime-exception.h>
 
 #include "dataset_group.h"
 
-#include <genie/format/mpegg_p1/util.h>
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,6 +22,22 @@ DGMetadata::DGMetadata() : DG_metadata_value() {
     DG_metadata_value = {0x37, 0xfd, 0x58, 0x7a, 0x00, 0x5a, 0x04, 0x00, 0xd6, 0xe6, 0x46,
                          0xb4, 0x00, 0x00, 0x00, 0x00, 0xdf, 0x1c, 0x21, 0x44, 0xb6, 0x1f,
                          0x7d, 0xf3, 0x00, 0x01, 0x00, 0x00, 0x04, 0x00, 0x5a, 0x59};
+}
+// ---------------------------------------------------------------------------------------------------------------------
+
+DGMetadata::DGMetadata(util::BitReader& reader, size_t length) {
+
+    std::string key = readKey(reader, "XXXX");
+    UTILS_DIE_IF(key != "dgmd", "DGMetadata is not Found");
+
+    size_t start_pos = reader.getPos();
+
+    // DG_metadata_value[uint8_t]
+    for (auto& val : DG_metadata_value) {
+        val = reader.read<uint8_t>();
+    }
+
+    UTILS_DIE_IF(reader.getPos() - start_pos != length, "Invalid DGMetadata length!");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -44,6 +62,23 @@ DGProtection::DGProtection() : DG_protection_value() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+DGProtection::DGProtection(util::BitReader& reader, size_t length) {
+
+    std::string key = readKey(reader, "XXXX");
+    UTILS_DIE_IF(key != "dgpr", "DGMetadata is not Found");
+
+    size_t start_pos = reader.getPos();
+
+    // DG_protection_value[uint8_t]
+    for (auto& val : DG_protection_value) {
+        val = reader.read<uint8_t>();
+    }
+
+    UTILS_DIE_IF(reader.getPos() - start_pos != length, "Invalid DGMetadata length!");
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint64_t DGProtection::getLength() const {return DG_protection_value.size();}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -55,11 +90,11 @@ void DGProtection::write(util::BitWriter& bit_writer) const {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-
+/*
 DatasetGroup::DatasetGroup(std::vector<Dataset> &&_datasets)
     : dataset_group_ID(0),
       version_number(0), // FIXME: Fix version number
-      datasets(std::move(_datasets)){
+      datasets(_datasets){
 
     std::vector<uint16_t> dataset_IDs(getDatasetIDs(true));
 
@@ -67,7 +102,7 @@ DatasetGroup::DatasetGroup(std::vector<Dataset> &&_datasets)
 
     UTILS_DIE_IF(!(it == dataset_IDs.end() ), "dataset_ID is not unique!");
 }
-
+*/
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetGroup::DatasetGroup(util::BitReader& reader, size_t length)
@@ -76,30 +111,49 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, size_t length)
 
     size_t start_pos = reader.getPos();
 
-    std::string key = readKey(reader);
-
+    std::string key = readKey(reader, "XXXX");
     UTILS_DIE_IF(key != "dghd", "DatasetGroupHeader is not Found");
 
+    // Class dataset_group_header
     auto header_length = reader.read<size_t>();
-
     readHeader(reader, header_length-12);
 
     do {
-        key = readKey(reader);
-        auto value_length = reader.read<size_t>();
-
+        key = readKey(reader, "XXXX");
         if (key == "rfgn"){
-            references.emplace_back(reader, value_length);
+            // reference[]
+            auto ref_length = reader.read<size_t>();
+            references.emplace_back(reader, ref_length);
+
+            key = readKey(reader, "XXXX");
         } else if (key == "rfmd"){
+            // reference_metadata[]
+            //auto ref_meta_length = reader.read<size_t>();
+            //reference_metadata.emplace_back(reader, ref_meta_length);
 
+            key = readKey(reader, "XXXX");
         } else if (key == "labl"){
+            // label_list
+            auto label_length = reader.read<size_t>();
+            label_list = util::make_unique<LabelList>(reader, label_length);
 
+            key = readKey(reader, "XXXX");
         } else if (key == "dgmd"){
+            // DG_metadata
+            auto metadata_length = reader.read<size_t>();
+            DG_metadata = util::make_unique<DGMetadata>(reader, metadata_length);
 
+            key = readKey(reader, "XXXX");
         } else if (key == "dgpr"){
+            // DG_protection
+            auto protection_length = reader.read<size_t>();
+            DG_protection = util::make_unique<DGProtection>(reader, protection_length);
 
+            key = readKey(reader, "XXXX");
         } else if (key == "dtcn"){
-
+            // Dataset
+            auto dataset_length = reader.read<size_t>();
+            datasets.emplace_back(reader, dataset_length);
         }
 
     } while (reader.getPos() - start_pos < length);
@@ -108,7 +162,7 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, size_t length)
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-
+/*
 std::vector<uint16_t>&& DatasetGroup::getDatasetIDs(bool sort_ids) const {
     std::vector<uint16_t> dataset_IDs;
 
@@ -122,7 +176,7 @@ std::vector<uint16_t>&& DatasetGroup::getDatasetIDs(bool sort_ids) const {
 
     return std::move(dataset_IDs);
 }
-
+*/
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetGroup::addReferences(std::vector<Reference>&& _references) {references = std::move(_references);}
@@ -230,12 +284,12 @@ uint64_t DatasetGroup::getHeaderLength() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetGroup::writeHeader(util::BitWriter& writer) const {
-    // KLV (Key Length Value) format
 
-    // Key of KVL format
+    /// KLV (Key Length Value) format
+    // Key of KLV format
     writer.write("dghd");
 
-    // Length of KVL format
+    // Length of KLV format
     writer.write(getLength(), 64);
 
     // dataset_group_ID u(8)
@@ -243,12 +297,12 @@ void DatasetGroup::writeHeader(util::BitWriter& writer) const {
 
     // version_number u(8)
     writer.write(version_number, 8);
-
+/*
     // dataset_IDs[] u(16)
     for (auto &d_ID: getDatasetIDs()){
         writer.write(d_ID, 16);
     }
-
+*/
     writer.flush();
 }
 
@@ -260,7 +314,12 @@ void DatasetGroup::readHeader(util::BitReader& reader, size_t length) {
 
     dataset_group_ID = reader.read<uint8_t>();
     version_number = reader.read<uint8_t>();
-
+/*
+    // dataset_IDs[] u(16)
+    for (auto &d_ID: getDatasetIDs()){
+        d_ID = reader.read<uint16_t>();
+    }
+*/
     UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid DatasetGroupHeader length!");
 }
 
@@ -268,8 +327,8 @@ void DatasetGroup::readHeader(util::BitReader& reader, size_t length) {
 
 uint64_t DatasetGroup::getLength() const {
 
-    // key (4), Length (8)
-    uint64_t len = 12;
+    /// Key c(4) Length u(64)
+    uint64_t len = (4 * sizeof(char) + 8);   // gen_info
 
     len += getHeaderLength();
 
@@ -303,12 +362,12 @@ uint64_t DatasetGroup::getLength() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetGroup::write(util::BitWriter& writer) const {
-    // KLV (Key Length Value) format
 
-    // Key of KVL format
+    /// KLV (Key Length Value) format
+    // Key of KLV format
     writer.write("dgcn");
 
-    // Length of KVL format
+    // Length of KLV format
     writer.write(getLength(), 64);
 
     // dataset_group_header

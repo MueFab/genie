@@ -34,7 +34,7 @@ class ExternalReference{
 
     Type getReferenceType() const;
 
-    virtual uint64_t getlength();
+    virtual uint64_t getLength();
 
     virtual void write(genie::util::BitWriter& writer);
 

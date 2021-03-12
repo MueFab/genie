@@ -5,14 +5,13 @@
 #include <cstdint>
 #include <memory>
 
+#include <genie/util/bitreader.h>
+#include <genie/util/bitwriter.h>
+
 //#include <genie/format/mpegg_p1/dataset/dataset_header.h>
 #include "extended_au_info.h"
 #include <genie/format/mpegg_p1/dataset/master_index_table/ref_seq_info.h>
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-#include <genie/util/exception.h>
-#include <genie/format/mpegg_p1/util.h>
 
 namespace genie {
 namespace format {
@@ -53,7 +52,7 @@ class MITAccessUnitInfo {
      * @param _pos_40_size_flag
      */
     MITAccessUnitInfo(uint64_t _AU_byte_offset, uint64_t _AU_start_position, uint64_t _AU_end_position,
-                      std::vector<uint64_t> _block_byte_offset, DatasetHeader&& _datasetHeader,
+                      std::vector<uint64_t>&& _block_byte_offset, DatasetHeader* _datasetHeader,
                       DatasetHeader::ByteOffsetSizeFlag _byte_offset_size_flag,
                       DatasetHeader::Pos40SizeFlag _pos_40_size_flag);
 
@@ -62,7 +61,7 @@ class MITAccessUnitInfo {
      * @param reader
      * @param length
      */
-    MITAccessUnitInfo(util::BitReader& reader);
+    //MITAccessUnitInfo(util::BitReader& reader);
 
 
     /**

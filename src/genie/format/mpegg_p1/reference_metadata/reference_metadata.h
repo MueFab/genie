@@ -20,27 +20,38 @@ class ReferenceMetadata {
 //    std::vector<ReferenceMetadataValue> reference_metadata_value;
 
    public:
+    /**
+     * Default
+     */
     ReferenceMetadata();
-
     /**
         *
         * @param _ds_group_ID
         * @param _ref_ID
-        * @param _ref_metadata_value
         */
-    ReferenceMetadata(uint8_t _ds_group_ID, uint8_t _ref_ID, std::vector<uint8_t>&& _ref_metadata_value);
-
+    explicit ReferenceMetadata(uint8_t _ds_group_ID, uint8_t _ref_ID);
     /**
     *
     * @param reader
     * @param length
     */
-    ReferenceMetadata(util::BitReader& reader, size_t length);
+    //ReferenceMetadata(util::BitReader& reader, size_t length);
 
+    /**
+     *
+     * @param _dataset_group_ID
+     */
     void setDatasetGroupId(uint8_t _dataset_group_ID);
 
+    /**
+     *
+     * @return
+     */
     uint64_t getLength() const;
-
+    /**
+     *
+     * @param bit_writer
+     */
     void write(util::BitWriter& bit_writer) const;
 };
 

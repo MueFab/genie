@@ -5,7 +5,6 @@
  */
 
 #include <utility>
-#include <genie/util/runtime-exception.h>
 
 #include "master_index_table.h"
 
@@ -19,37 +18,52 @@ MasterIndexTable::MasterIndexTable()
       datasetHeader()
 {}
 
+MasterIndexTable::MasterIndexTable(std::vector<mpegg_p1::MITAccessUnitInfo>&& _ac_info,
+                                   std::vector<mpegg_p1::MITUAccessUnitInfo>&& _u_ac_info,
+                                   DatasetHeader* header)
+    : ac_info(std::move(_ac_info)),
+      u_ac_info(std::move(_u_ac_info)),
+      datasetHeader(header)
+{}
 
-MasterIndexTable::MasterIndexTable(util::BitReader& reader, size_t length)
+/*
+MasterIndexTable::MasterIndexTable(util::BitReader& reader, size_t length, DatasetHeader* _dataset_header)
     : ac_info(),
       u_ac_info(),
-      datasetHeader()
-{
-/*
-    std::string key = readKey(reader);
+      datasetHeader(_dataset_header) {
+    std::string key = readKey(reader, "XXXX");
     UTILS_DIE_IF(key != "mitb", "MasterIndexTable is not Found");
-*/
+
     size_t start_pos = reader.getPos();
 
-    // Class MITAccessUnitInfo()
+    /// Class MITAccessUnitInfo()
     for (auto seq = 0; seq < datasetHeader->getSeqInfo().getSeqCount(); seq++) {
-        ac_info.emplace_back(MITAccessUnitInfo(reader));
-    }
+        for (auto ci = 0; ci < datasetHeader->getBlockHeader().getNumClasses(); ci++) {
+            if (datasetHeader->getBlockHeader().getClassInfos()[ci].getClid() != core::record::ClassType::CLASS_U) {
+                for (auto au_id = 0; au_id < datasetHeader->getSeqInfo().getSeqBlocks()[seq]; au_id++) {
+                }
+                auto MITAU_length = reader.read<size_t>();
+                ac_info.emplace_back(MITAccessUnitInfo(reader, MITAU_length));
+            }
 
-    // Class MITUAccessUnitInfo()
-    for (auto uau_id=0; uau_id < datasetHeader->getNumUAccessUnits(); uau_id++) {
-        u_ac_info.emplace_back(MITUAccessUnitInfo(reader));
-    }
+            /// Class MITUAccessUnitInfo()
+            for (auto uau_id = 0; uau_id < datasetHeader->getNumUAccessUnits(); uau_id++) {
+                auto MITUAU_length = reader.read<size_t>();
+                u_ac_info.emplace_back(MITUAccessUnitInfo(reader, MITUAU_length));
+            }
 
-    UTILS_DIE_IF(reader.getPos() - start_pos != length, "Invalid MasterIndexTable length!");
+            UTILS_DIE_IF(reader.getPos() - start_pos != length, "Invalid MasterIndexTable length!");
+        }
+    }
 }
+*/
 
 uint64_t MasterIndexTable::getLength() const {
 
     //length is first calculated in bits then converted in bytes
     /// Key c(4) Length u(64)
     uint64_t bitlen = (4 * sizeof(char) + 8) * 8 ;   // gen_info
-
+/*
     // data encapsulated in class MITUAccessUnitInfo()
     /// U_ref
     /// U_ref_sequence_id, U_ref_start_position, U_ref_end_position
@@ -67,10 +81,11 @@ uint64_t MasterIndexTable::getLength() const {
     for (auto& ac_i : ac_info) {
         bitlen += ac_i.getBitLength();
     }
-
+*/
     return bitlen / 8 ;
-}
 
+}
+/*
 void MasterIndexTable::write(util::BitWriter& bit_writer) const {
     // TODO (Yeremia): Implement this!
     // KLV (Key Length Value) format
@@ -107,9 +122,8 @@ void MasterIndexTable::write(util::BitWriter& bit_writer) const {
     for (auto  &u_ac_i : u_ac_info) {
         u_ac_i.write(bit_writer);
     }
-
 }
-
+*/
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie

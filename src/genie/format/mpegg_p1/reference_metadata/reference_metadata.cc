@@ -9,20 +9,22 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceMetadata::ReferenceMetadata() : dataset_group_ID(0), reference_ID(0){}
+ReferenceMetadata::ReferenceMetadata()
+    : dataset_group_ID(0),
+      reference_ID(0) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 ReferenceMetadata::ReferenceMetadata(uint8_t _ds_group_ID, uint8_t _ref_ID)
-    : dataset_group_ID(_ds_group_ID), reference_ID(_ref_ID){
-}
+    : dataset_group_ID(_ds_group_ID),
+      reference_ID(_ref_ID) {}
 //      reference_metadata_value(std::move(_ref_metadata_value)){}
 
 // ---------------------------------------------------------------------------------------------------------------------
-
+/*
 ReferenceMetadata::ReferenceMetadata(util::BitReader& reader, size_t length)
     : dataset_group_ID(0),
-      reference_ID(0),
+      reference_ID(0)
     {
 //      reference_metadata_value() reader{
 
@@ -37,15 +39,16 @@ ReferenceMetadata::ReferenceMetadata(util::BitReader& reader, size_t length)
 
     UTILS_DIE_IF(reader.getPos() - start_pos != length, "Invalid DatasetGroup length!");
 }
-
+*/
 // ---------------------------------------------------------------------------------------------------------------------
+
 void ReferenceMetadata::setDatasetGroupId(uint8_t _dataset_group_ID) {dataset_group_ID = _dataset_group_ID;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t ReferenceMetadata::getLength() const {
-    // key c(4), Length u(64)
-    uint64_t len = 12;
+    /// Key c(4) Length u(64)
+    uint64_t len = (4 * sizeof(char) + 8);   // gen_info
 
     // dataset_group_ID u(8)
     len += 1;

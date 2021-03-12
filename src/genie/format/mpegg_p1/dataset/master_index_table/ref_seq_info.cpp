@@ -27,9 +27,7 @@ MITReferenceSequenceInfo::MITReferenceSequenceInfo(uint16_t seq_id, uint64_t sta
 
 uint64_t MITReferenceSequenceInfo::getBitLength() const {
 
-    uint64_t bitlen;
-
-    bitlen += 16;      /// ref_sequence_id u(16)
+    uint64_t bitlen = 16;   /// ref_sequence_id u(16)
 
     /// ref_start_position[seq][ci]][au_id] u(posSize)
     /// ref_end_position[seq][ci]][au_id] u(posSize)

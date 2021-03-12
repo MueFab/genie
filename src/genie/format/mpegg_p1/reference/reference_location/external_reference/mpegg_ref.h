@@ -6,8 +6,10 @@
 #include <genie/util/exception.h>
 #include <genie/util/runtime-exception.h>
 
-#include <genie/format/mpegg_p1/reference/reference_location/external_reference/external_reference.h>
+#include "external_reference.h"
 #include "checksum.h"
+#include "md5.h"
+#include "sha256.h"
 
 namespace genie {
 namespace format {
@@ -36,7 +38,7 @@ class MpegReference: public ExternalReference {
      */
     MpegReference(util::BitReader& reader, Checksum::Algo checksum_alg);
 
-    /**.
+    /**
      *
      * @return
      */

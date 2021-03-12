@@ -4,11 +4,6 @@
 #include <genie/format/mpegg_p1/util.h>
 
 #include "external.h"
-#include "external_reference/checksum.h"
-#include "external_reference/external_reference.h"
-#include "external_reference/mpegg_ref.h"
-#include "external_reference/raw_ref.h"
-#include "external_reference/fasta_ref.h"
 
 namespace genie {
 namespace format {
@@ -25,10 +20,10 @@ namespace mpegg_p1 {
 
 External::External(util::BitReader& reader, uint16_t seq_count)
     : ReferenceLocation(ReferenceLocation::Flag::EXTERNAL),
-      ref_uri() {
+      ref_uri(readNullTerminatedStr(reader, "XXXX")) {
 
-    auto checksum_alg = reader.read<Checksum::Algo>();
-    auto reference_type = reader.read<ExternalReference::Type>();
+    auto checksum_alg = reader.read<Checksum::Algo>();  //checksum_alg u(8)
+    auto reference_type = reader.read<ExternalReference::Type>();   //reference_type u(8)
 
     if (reference_type == ExternalReference::Type::MPEGG_REF){
         external_reference = util::make_unique<MpegReference>(reader, checksum_alg);
@@ -52,8 +47,6 @@ Checksum::Algo External::getChecksumAlg() const { return external_reference->get
 
 uint64_t External::getLength() const {
 
-
-//    UTILS_DIE("Not yet implemented");
     //ref_uri st(v)
     uint64_t len = (getRefUri().size() + 1);
     //checksum_alg u(8)
@@ -61,7 +54,7 @@ uint64_t External::getLength() const {
     //reference_type u(8)
     len += 1;
 
-    len += external_reference->getlength();
+    len += external_reference->getLength();
 
     return len;
 }
@@ -70,8 +63,7 @@ uint64_t External::getLength() const {
 
 void External::write(util::BitWriter& writer) const {
     // ref_uri st(v)
-    writer.write(ref_uri);
-    writer.write('\0', 8);
+    writeNullTerminatedStr(writer, ref_uri);
 
     // checksum_alg u(8)
     writer.write((uint8_t) getChecksumAlg(), 8);
@@ -79,7 +71,7 @@ void External::write(util::BitWriter& writer) const {
     // reference_type u(8)
     writer.write((uint8_t) external_reference->getReferenceType(), 8);
 
-    // external_datset_group_ID, external_dataset_ID, ref_checksum or checksum[seqID]
+    // external_dataset_group_ID, external_dataset_ID, ref_checksum or checksum[seqID]
     external_reference->write(writer);
 }
 
