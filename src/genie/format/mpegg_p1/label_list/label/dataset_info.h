@@ -3,6 +3,9 @@
 
 #include <cstdint>
 #include <vector>
+#include "genie/util/bitwriter.h"
+#include "genie/util/bitreader.h"
+
 #include "dataset_region.h"
 
 namespace genie {
@@ -20,51 +23,54 @@ class DatasetInfo{
     std::vector<DatasetRegion> dataset_regions;
 
    public:
-
+    /**
+     *
+     */
+    DatasetInfo();
+    /**
+     *
+     * @param _ds_ID
+     */
     explicit DatasetInfo(uint16_t _ds_ID);
+    /**
+     *
+     * @param reader
+     */
+    void ReadDatasetInfo(util::BitReader& reader);
+
 
     /**
      *
      * @param _ds_region
      */
     void addDatasetRegion(DatasetRegion&& _ds_region);
-
     /**
      *
      * @param _ds_regions
      */
     void addDatasetRegions(std::vector<DatasetRegion>& _ds_regions);
-
     /**
      *
      * @param _ds_regions
      */
     void setDatasetRegions(std::vector<DatasetRegion>&& _ds_regions);
-
     /**
      *
      * @return
      */
     uint16_t getDatasetID() const;
-
     /**
      *
      * @return
      */
     uint8_t getNumRegions() const;
 
-    /**
-     *
-     * @return
-     */
-    const std::vector<DatasetRegion>& getDatasetRegions() const;
 
     /**
      *
      * @return
      */
     uint64_t getBitLength() const;
-
     /**
      *
      * @param bit_writer

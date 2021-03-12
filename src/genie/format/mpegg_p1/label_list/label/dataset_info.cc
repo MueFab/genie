@@ -1,3 +1,5 @@
+#include "genie/util/runtime-exception.h"
+#include <genie/format/mpegg_p1/util.h>
 
 #include "dataset_info.h"
 
@@ -5,8 +7,26 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
+DatasetInfo::DatasetInfo()
+    : dataset_ID(0),
+      dataset_regions() {}
+
 DatasetInfo::DatasetInfo(uint16_t _ds_ID)
     : dataset_ID(_ds_ID){}
+
+void DatasetInfo::ReadDatasetInfo(util::BitReader& reader) {
+
+    // dataset_IDs u(16)
+    dataset_ID = reader.read<uint16_t>();
+    // num_regions u(8)
+    reader.read<uint8_t>();
+
+    /// data encapsulated in Class dataset_region
+    for (auto& ds_reg: dataset_regions){
+        ds_reg.ReadDatasetRegion(reader);
+    }
+
+}
 
 void DatasetInfo::addDatasetRegion(DatasetRegion&& _ds_region) {
     dataset_regions.push_back(std::move(_ds_region));
@@ -24,8 +44,6 @@ uint16_t DatasetInfo::getDatasetID() const { return dataset_ID; }
 
 uint8_t DatasetInfo::getNumRegions() const { return (uint8_t) dataset_regions.size(); }
 
-const std::vector<DatasetRegion>& DatasetInfo::getDatasetRegions() const { return dataset_regions; }
-
 uint64_t DatasetInfo::getBitLength() const {
 
     // dataset_IDs u(16)
@@ -34,7 +52,7 @@ uint64_t DatasetInfo::getBitLength() const {
     // num_regions u(8)
     bitlen += 8;
 
-    // for dataset_regions
+    /// data encapsulated in Class dataset_region
     for (auto& ds_reg: dataset_regions){
         bitlen += ds_reg.getBitLength();
     }
@@ -50,9 +68,9 @@ void DatasetInfo::writeToFile(util::BitWriter& bit_writer) const {
     // num_regions u(8)
     bit_writer.write(getNumRegions(), 8);
 
-    // for dataset_regions
-    for (auto& dataset_region: dataset_regions){
-        dataset_region.write(bit_writer);
+    /// data encapsulated in Class dataset_region
+    for (auto& ds_reg: dataset_regions){
+        ds_reg.write(bit_writer);
     }
 }
 
