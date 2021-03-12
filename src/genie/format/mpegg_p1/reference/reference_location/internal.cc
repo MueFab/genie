@@ -22,22 +22,21 @@ Internal::Internal(util::BitReader& reader)
 
 uint64_t Internal::getLength() const {
 
-    // internal_dataset_group_ID u(8), internal_dataset_ID u(16)
-    uint64_t bitlen = 1+2;
-
-    return bitlen;
+    /// internal_dataset_group_ID u(8), internal_dataset_ID u(16)
+    return ReferenceLocation::getLength() + 3;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Internal::write(util::BitWriter& bit_writer) const {
+
+
     // internal_dataset_group_ID u(8)
     bit_writer.write(dataset_group_ID, 8);
 
     // internal_dataset_ID u(16)
     bit_writer.write(dataset_ID, 16);
 }
-
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie

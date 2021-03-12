@@ -35,7 +35,7 @@ void DatasetRegion::ReadDatasetRegion(util::BitReader& reader) {
 
     // for class_IDs[] u(4)
     for (auto& class_ID: class_IDs){
-        reader.read<uint8_t>(4);
+        class_ID = reader.read<uint8_t>(4);
     }
 
     // start_pos u(40)

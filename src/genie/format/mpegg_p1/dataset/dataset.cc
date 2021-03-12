@@ -31,7 +31,7 @@ DTMetadata::DTMetadata(util::BitReader& reader, size_t length) {
 
     // DT_metadata_value[uint8_t]
     for (auto& val : DT_metadata_value) {
-        reader.read<uint8_t>();
+        val = reader.read<uint8_t>();
     }
 
     UTILS_DIE_IF(reader.getPos() - start_pos != length, "Invalid DTMetadata length!");
@@ -62,7 +62,7 @@ void DTMetadata::write(genie::util::BitWriter &bit_writer) const {
 
     // DT_metadata_value[] std::vector<uint8_t>
     for (auto val : DT_metadata_value){
-        bit_writer.write(val, 8);
+        bit_writer.write(val,8);
     }
 }
 
@@ -88,7 +88,7 @@ DTProtection::DTProtection(util::BitReader& reader, size_t length)
 
     // DT_protection_value[uint8_t]
     for (auto& val : DT_protection_value) {
-        reader.read<uint8_t>();
+        val = reader.read<uint8_t>();
     }
 
     UTILS_DIE_IF(reader.getPos() - start_pos != length, "Invalid DTProtection length!");
@@ -218,11 +218,11 @@ void Dataset::setGroupId(uint8_t group_ID){ header.setGroupId(group_ID);}
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetHeader::ByteOffsetSizeFlag Dataset::getByteOffsetSizeFlag() const { getHeader().getByteOffsetSizeFlag();}
+DatasetHeader::ByteOffsetSizeFlag Dataset::getByteOffsetSizeFlag() const { return getHeader().getByteOffsetSizeFlag();}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetHeader::Pos40SizeFlag Dataset::getPos40SizeFlag() const { getHeader().getPos40SizeFlag();}
+DatasetHeader::Pos40SizeFlag Dataset::getPos40SizeFlag() const { return getHeader().getPos40SizeFlag();}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -242,7 +242,7 @@ bool Dataset::getMultipleAlignmentFlag() const { return getHeader().getMultipleA
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-core::parameter::DataUnit::DatasetType Dataset::getDatasetType() const { getHeader().getDatasetType();}
+core::parameter::DataUnit::DatasetType Dataset::getDatasetType() const { return getHeader().getDatasetType();}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

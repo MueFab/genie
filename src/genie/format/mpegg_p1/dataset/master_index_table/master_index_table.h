@@ -1,15 +1,15 @@
 #ifndef GENIE_PART1_MIT_H
 #define GENIE_PART1_MIT_H
 
-#include "genie/format/mpegg_p1/dataset/master_index_table/access_unit_info/access_unit_info.h"
-#include "genie/format/mpegg_p1/dataset/master_index_table/u_access_unit_info/u_access_unit_info.h"
-#include "genie/format/mpegg_p1/dataset/dataset_header.h"
-
 #include <genie/util/bitwriter.h>
 #include <genie/util/bitreader.h>
 #include <genie/util/exception.h>
 #include <genie/format/mpegg_p1/util.h>
 
+
+#include "access_unit_info/access_unit_info.h"
+#include "u_access_unit_info/u_access_unit_info.h"
+#include "genie/format/mpegg_p1/dataset/dataset_header.h"
 //#include <genie/src/core/parameter/data_unit.h>
 
 namespace genie {
@@ -35,10 +35,17 @@ class MasterIndexTable {
     MasterIndexTable();
     /**
      *
+     * @param _ac_info
+     * @param _u_ac_info
+     * @param header
+     */
+    MasterIndexTable(std::vector<mpegg_p1::MITAccessUnitInfo>&& _ac_info, std::vector<mpegg_p1::MITUAccessUnitInfo>&& _u_ac_info, DatasetHeader* header);
+    /**
+     *
      * @param bitReader
      * @param length
      */
-    MasterIndexTable(genie::util::BitReader& bitReader, size_t length);
+    MasterIndexTable(util::BitReader& reader, size_t length, DatasetHeader* _dataset_header);
 
     /**
      *

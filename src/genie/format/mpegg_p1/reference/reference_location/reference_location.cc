@@ -13,7 +13,20 @@ ReferenceLocation::ReferenceLocation(ReferenceLocation::Flag _flag)
 bool ReferenceLocation::isExternal() const { return external_ref_flag == Flag::EXTERNAL; }
 
 ReferenceLocation::Flag ReferenceLocation::getExternalRefFlag() const { return external_ref_flag; }
+/*
+uint64_t ReferenceLocation::getLength() const {
 
+    uint64_t len;
+    if (external_ref_flag == ReferenceLocation::Flag::INTERNAL){
+        //len += external;
+    } else {
+        //len += internal;
+    }
+
+    return len;
+
+}
+*/
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie

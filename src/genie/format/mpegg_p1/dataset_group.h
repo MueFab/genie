@@ -15,7 +15,6 @@
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 
-//#include <genie/format/mpegg_p1/reference/reference.h>
 #include "reference/reference.h"
 #include "dataset/dataset.h"
 #include "reference_metadata/reference_metadata.h"
@@ -27,15 +26,18 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-/**
- *
- */
 class DGMetadata {
    public:
     /**
      *
      */
     DGMetadata();
+    /**
+     *
+     * @param reader
+     * @param length
+     */
+    DGMetadata(util::BitReader& reader, size_t length);
 
     /**
      * Get length of DG metadata in bytes
@@ -43,7 +45,6 @@ class DGMetadata {
      * @return
      */
     uint64_t getLength() const;
-
     /**
      *
      * @param bit_writer
@@ -55,15 +56,18 @@ class DGMetadata {
 
 };
 
-/**
- *
- */
 class DGProtection {
    public:
     /**
      *
      */
     DGProtection();
+    /**
+     *
+     * @param reader
+     * @param length
+     */
+    DGProtection(util::BitReader& reader, size_t length);
 
     /**
      * Get length of DG protection in bytes
@@ -71,7 +75,6 @@ class DGProtection {
      * @return
      */
     uint64_t getLength() const;
-
     /**
      *
      * @param bit_writer
@@ -125,128 +128,112 @@ class DatasetGroup {
      *
      * @param _datasets
      */
-    explicit DatasetGroup(std::vector<Dataset>&& _datasets);
-
+    //explicit DatasetGroup(std::vector<Dataset>&& _datasets);
     /**
      *
      * @param bit_reader
      */
     explicit DatasetGroup(util::BitReader& reader, size_t length);
 
+
     /**
      *
      * @param sort_ids
      * @return
      */
-    std::vector<uint16_t>&& getDatasetIDs(bool sort_ids=false) const;
-
+    //std::vector<uint16_t>&& getDatasetIDs(bool sort_ids=false) const;
     /**
      *
      * @param _references
      */
     void addReferences(std::vector<Reference>&& _references);
-
     /**
      *
      * @return
      */
     const std::vector<Reference>& getReferences() const;
-
     /**
      *
      * @param _ref_metadata
      */
     void addReferenceMetadata(std::vector<ReferenceMetadata>&& _ref_metadata);
-
     /**
      * Get an array of reference metadata
      *
      * @return
      */
     const std::vector<ReferenceMetadata>& getReferenceMetadata() const;
-
     /**
      *
      * @param _labels
      */
     void addLabels(std::vector<Label>&& _labels);
-
     /**
      *
      * @param _label_list
      */
     void addLabelList(std::unique_ptr<LabelList> _label_list);
-
     /**
      *
      * @return
      */
     const LabelList& getLabelList() const;
-
     /**
      * Add DG_metadata
      *
      * @param _dg_metadata
      */
     void addDGMetadata(std::unique_ptr<DGMetadata> _dg_metadata);
-
     /**
      * Get DG_metadata
      *
      * @return
      */
     const DGMetadata& getDgMetadata() const;
-
     /**
      * Add DG_protection
      *
      * @param _dg_protection
      */
     void addDGProtection(std::unique_ptr<DGProtection>_dg_protection);
-
     /**
      * Get DG_protection
      *
      * @return
      */
     const DGProtection& getDgProtection() const;
-
     /**
      *
      * @return
      */
     const std::vector<Dataset>& getDatasets() const;
-
     /**
      *
      * @param ID
      */
     void setID(uint8_t ID);
-
     /**
      *
      * @return
      */
     uint64_t getHeaderLength() const;
-
     /**
      *
      * @param writer
      */
     void writeHeader(util::BitWriter& writer) const;
-
     /**
      *
      * @param reader
      */
     void readHeader(util::BitReader& reader, size_t length);
 
+
     /**
      * Get length of Dataset Header in bytes.
      * @return
      */
     uint64_t getLength() const;
-
     /**
      *
      * @param writer

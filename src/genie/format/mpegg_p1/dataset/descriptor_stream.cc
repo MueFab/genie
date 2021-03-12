@@ -27,7 +27,7 @@ DSProtection::DSProtection(util::BitReader& bit_reader, size_t length)
 
     // DS_protection_value[uint8_t]
     for (auto& DS_val : DS_protection_value) {
-        bit_reader.read<uint8_t>();
+        DS_val = bit_reader.read<uint8_t>();
     }
 
     UTILS_DIE_IF(bit_reader.getPos() - start_pos != length, "Invalid DSProtection length!");
@@ -85,7 +85,7 @@ DescriptorStream::DescriptorStream(genie::util::BitReader& bit_reader, size_t le
 
     /// block_payload
     for (auto& data : block_payload) {
-        bit_reader.read<uint8_t>();
+        data = bit_reader.read<uint8_t>();
     }
 
     UTILS_DIE_IF(bit_reader.getPos() - start_pos != length, "Invalid DescriptorStream length!");

@@ -2,8 +2,6 @@
 #include <genie/util/make-unique.h>
 
 #include "reference.h"
-#include "reference_location/external.h"
-#include "reference_location/internal.h"
 
 namespace genie {
 namespace format {
@@ -39,24 +37,17 @@ Reference::Reference(uint8_t _ds_group_ID, uint8_t _ref_ID, std::string _ref_nam
 // ---------------------------------------------------------------------------------------------------------------------
 
 Reference::Reference(util::BitReader& reader, size_t length)
-    : dataset_group_ID(0),
-      reference_ID(0),
-      reference_name(),
-      reference_major_version(0),
-      reference_minor_version(0),
-      reference_patch_version(0),
-      sequence_names(0)
-//      reference_location()
+    : dataset_group_ID(reader.read<uint8_t>()),
+      reference_ID(reader.read<uint8_t>()),
+      reference_name()
 {
+    std::string key = readKey(reader, "XXXX");
+    UTILS_DIE_IF(key != "rfgn", "Reference is not Found");
 
     size_t start_pos = reader.getPos();
 
-    // dataset_group_ID u(8)
-    dataset_group_ID = reader.read<uint8_t>();
-    // reference_ID u(8)
-    reference_ID = reader.read<uint8_t>();
     // reference_name st(v)
-    reference_name = readNullTerminatedStr(reader);
+    reference_name = readNullTerminatedStr(reader, "XXXX");
 
     // reference_major_version u(16)
     reference_major_version = reader.read<uint16_t>();
@@ -65,12 +56,12 @@ Reference::Reference(util::BitReader& reader, size_t length)
     // reference_patch_version u(16)
     reference_patch_version = reader.read<uint16_t>();
 
-    // seq_count  u(16)
+    // seq_count u(16)
     auto seq_count = reader.read<uint16_t>();
 
     for (auto seqID = 0; seqID < seq_count; seqID++){
         // sequence_name[seqID] st(v)
-        sequence_names.emplace_back(readNullTerminatedStr(reader));
+        sequence_names.emplace_back(readNullTerminatedStr(reader, "XXXX"));
     }
 
     // reserved u(7)
@@ -87,7 +78,7 @@ Reference::Reference(util::BitReader& reader, size_t length)
 //        reference_location = util::make_unique<Internal>(reader);
     }
 
-    UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid DatasetGroup length!");
+    UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid Reference length!");
 
 }
 
@@ -169,10 +160,10 @@ uint64_t Reference::getLength() const {
 void Reference::write(util::BitWriter& writer) const {
     // KLV (Key Length Value) format
 
-    // Key of KVL format
+    // Key of KLV format
     writer.write("rfgn");
 
-    // Length of KVL format
+    // Length of KLV format
     writer.write(getLength(), 64);
 
     // dataset_group_ID u(8)
@@ -201,7 +192,7 @@ void Reference::write(util::BitWriter& writer) const {
         writer.write(sequence_name);
     }
 
-    // reserve 7 bits u(7)
+    // reserved u(7)
     writer.write(0, 7);
 
     // write external_ref_flag u(1)

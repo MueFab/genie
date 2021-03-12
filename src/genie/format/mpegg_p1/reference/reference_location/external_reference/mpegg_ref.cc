@@ -1,7 +1,4 @@
 #include "mpegg_ref.h"
-#include "checksum.h"
-#include "md5.h"
-#include "sha256.h"
 
 namespace genie {
 namespace format {
@@ -60,7 +57,8 @@ Checksum::Algo MpegReference::getChecksumAlg() const { return ref_checksum.getTy
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t MpegReference::getLength(){
-    // TODO: Check this one
+    //  TODO: Check this one
+    // external_dataset_group_ID u(8), external_dataset_ID u(16)
     uint64_t len = 1 + 2;
     len += ref_checksum.getLength();
 

@@ -1,9 +1,11 @@
 #ifndef GENIE_PART1_REFERENCE_LOCATION_H
 #define GENIE_PART1_REFERENCE_LOCATION_H
 
-#include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
-#include "genie/util/runtime-exception.h"
+#include <genie/util/bitwriter.h>
+#include <genie/util/exception.h>
+#include <genie/util/runtime-exception.h>
+
+
 
 namespace genie {
 namespace format {
@@ -22,7 +24,7 @@ class ReferenceLocation{
 
     bool isExternal() const;
 
-    ReferenceLocation::Flag getExternalRefFlag() const;
+    Flag getExternalRefFlag() const;
 
     virtual uint64_t getLength() const;
 

@@ -24,9 +24,6 @@ class MITUAccessUnitInfo {
     uint16_t num_signatures;
 
     DatasetHeader* datasetHeader;
-   // MITAccessUnitInfo ac_info;
-
-
 
     //uint16_t U_ref_sequence_id;
     //uint8_t U_ref_start_position;
@@ -54,7 +51,7 @@ class MITUAccessUnitInfo {
      * @param reader
      * @param length
      */
-    MITUAccessUnitInfo(util::BitReader& reader);
+    //MITUAccessUnitInfo(util::BitReader& reader, size_t length);
     /**
      *
      * @param base
@@ -87,7 +84,7 @@ class MITUAccessUnitInfo {
      *
      * @param bit_writer
      */
-    void write(genie::util::BitWriter& bit_writer) const;
+    //void write(genie::util::BitWriter& bit_writer) const;
 };
 
 }  // namespace mpegg_p1

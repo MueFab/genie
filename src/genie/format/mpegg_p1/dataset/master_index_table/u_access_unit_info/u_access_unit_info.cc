@@ -10,9 +10,9 @@ MITUAccessUnitInfo::MITUAccessUnitInfo()
       U_signature_size(0),
       U_signature_constant_length(false),
       U_signature_length(0),
-      datasetHeader(),
       U_cluster_signature(),
       num_signatures(0),
+      datasetHeader(),
       byte_offset_size_flag(DatasetHeader::ByteOffsetSizeFlag::OFF),
       pos_40_size_flag(DatasetHeader::Pos40SizeFlag::OFF)
 {}
@@ -23,26 +23,26 @@ MITUAccessUnitInfo::MITUAccessUnitInfo(uint32_t _num_U_clusters)
       U_signature_size(0),
       U_signature_constant_length(false),
       U_signature_length(0),
-      datasetHeader(),
       U_cluster_signature(),
       num_signatures(0),
+      datasetHeader(),
       byte_offset_size_flag(DatasetHeader::ByteOffsetSizeFlag::OFF),
       pos_40_size_flag(DatasetHeader::Pos40SizeFlag::OFF)
 {}
 
-
-MITUAccessUnitInfo::MITUAccessUnitInfo(util::BitReader& reader) {
+/*
+MITUAccessUnitInfo::MITUAccessUnitInfo(util::BitReader& reader, size_t length) {
 
     /// AU_byte_offset[uau_id] u(byteOffsetSize)    // TODO (Raouf) : check
-/*    uint64_t AU_byte_offset;
+    uint64_t AU_byte_offset;
     AU_byte_offset = reader.read<uint64_t>((uint8_t) byte_offset_size_flag);
-*/
+
     if (datasetHeader->getDatasetType() == core::parameter::DataUnit::DatasetType::REFERENCE) { //TODO: check existence of variables
-/*
+
         U_ref_sequence_id = reader.read<uint16_t>();  /// U_ref_sequence_id[uau_id]  u(16)
         U_ref_start_position = reader.read<uint64_t>((uint8_t) pos_40_size_flag);  /// U_ref_start_position[uau_id] u(posSize)
         U_ref_end_position = reader.read<uint64_t>((uint8_t) pos_40_size_flag);  /// U_ref_end_position[uau_id] u(posSize)datasetHeader->getDatasetType()
-*/
+
     }
     else {
         if (multiple_signature_base != 0) {
@@ -63,14 +63,14 @@ MITUAccessUnitInfo::MITUAccessUnitInfo(util::BitReader& reader) {
     }
 
     // byte aligned                     // TODO (Raouf) : check
-/*    std::vector<uint64_t> block_byte_offset;
+    std::vector<uint64_t> block_byte_offset;
     if (!datasetHeader->getBlockHeader().getBlockHeaderFlag()) {
         for (auto di = 0; di < datasetHeader->getBlockHeader().getClassInfos()[datasetHeader->getBlockHeader().getNumClasses() - 1].getDescriptorIDs().size(); di++) {
             block_byte_offset.emplace_back(reader.read<uint64_t>((uint8_t) byte_offset_size_flag));  /// block_byte_offset[uau_id][di] u(byteOffsetSize)
         }
     }
-*/
 }
+ */
 
 void MITUAccessUnitInfo::setMultipleSignature(uint32_t base, uint8_t size) {
     multiple_signature_base = base;
@@ -85,6 +85,7 @@ uint8_t MITUAccessUnitInfo::getUSignatureSize() const { return U_signature_size;
 
 uint32_t MITUAccessUnitInfo::getMultipleSignatureBase() const { return multiple_signature_base; }
 
+/*
 uint64_t MITUAccessUnitInfo::getBitLength() const {
 
     uint64_t bitlen;
@@ -116,11 +117,12 @@ uint64_t MITUAccessUnitInfo::getBitLength() const {
     // byte aligned
     bitlen += bitlen % 8;
 
-    //}
-
     return bitlen;
-}
 
+}
+*/
+
+/*
 void MITUAccessUnitInfo::write(util::BitWriter& bit_writer) const {
 
     //for (auto uau_id=0; uau_id < datasetHeader->getNumUAccessUnits(); uau_id++) {
@@ -130,13 +132,13 @@ void MITUAccessUnitInfo::write(util::BitWriter& bit_writer) const {
     bit_writer.write(AU_byte_offset, (uint8_t) byte_offset_size_flag);
 
     if (datasetHeader->getDatasetType() == core::parameter::DataUnit::DatasetType::REFERENCE) {
-        /*            /// U_ref_sequence_id[uau_id]  u(16)
+                  /// U_ref_sequence_id[uau_id]  u(16)
                     bit_writer.write(U_ref_sequence_id, 16);
 
                     /// U_ref_start_position[uau_id] u(posSize), U_ref_end_position[uau_id] u(posSize)
                     bit_writer.write(U_ref_start_position, (uint8_t) pos_40_size_flag);
                     bit_writer.write(U_ref_end_position, (uint8_t) pos_40_size_flag);
-        */
+
     } else {
         if (multiple_signature_base != 0) {
             /// U_cluster_signature[uau_id][0] u(U_signature_size)
@@ -168,9 +170,8 @@ void MITUAccessUnitInfo::write(util::BitWriter& bit_writer) const {
             bit_writer.write(block_byte_offset[di], (uint8_t) byte_offset_size_flag);
         }
     }
-    //}
-
 }
+ */
 
 
 }  // namespace mpegg_p1
