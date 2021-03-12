@@ -20,13 +20,13 @@ DSProtection::DSProtection()
 DSProtection::DSProtection(util::BitReader& bit_reader, size_t length)
     : DS_protection_value() {
 
-    size_t start_pos = bit_reader.getPos();
-
-    std::string key = readKey(bit_reader);
+    std::string key = readKey(bit_reader, "XXXX");
     UTILS_DIE_IF(key != "dspr", "DSProtection is not Found");
 
-    // DS_protection_value std::vector<uint8_t>
-    for (auto& val : DS_protection_value) {
+    size_t start_pos = bit_reader.getPos();
+
+    // DS_protection_value[uint8_t]
+    for (auto& DS_val : DS_protection_value) {
         bit_reader.read<uint8_t>();
     }
 
@@ -46,20 +46,22 @@ uint64_t DSProtection::getLength() const {
 }
 
 
-void DSProtection::write(genie::util::BitWriter &bit_writer) const {
+void DSProtection::write(genie::util::BitWriter& bit_writer) const {
 
     /// KLV (Key Length Value) format
+    // Key of KLV format
     bit_writer.write("dspr");
 
     // Length of KLV format
     bit_writer.write(getLength(), 64);
 
-    for (auto& val : DS_protection_value){
-        bit_writer.write(val, 8);
+    for (auto& DS_val : DS_protection_value){
+        bit_writer.write(DS_val, 8);
     }
 }
 
 
+// ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 
 DescriptorStream::DescriptorStream()
@@ -68,30 +70,23 @@ DescriptorStream::DescriptorStream()
       block_payload() {}
 
 
-DescriptorStream::DescriptorStream(genie::util::BitReader& bit_reader, size_t length)
-    : descriptor_stream_header(),
-      DS_protection(),
-      block_payload() {
+DescriptorStream::DescriptorStream(genie::util::BitReader& bit_reader, size_t length) {
+
+    std::string key = readKey(bit_reader, "XXXX");
+    UTILS_DIE_IF(key != "dscn", "DescriptorStream is not Found");
 
     size_t start_pos = bit_reader.getPos();
 
-    std::string key = readKey(bit_reader);
-    UTILS_DIE_IF(key != "dscn", "DescriptorStream is not Found");
-    // TODO(Raouf) : check
-
     /// descriptor_stream_header
-    auto header_length = bit_reader.read<size_t>();
-    descriptor_stream_header = DescriptorStreamHeader(bit_reader,  header_length);
+    descriptor_stream_header = DescriptorStreamHeader(bit_reader);
     /// DS_protection
     auto DS_length = bit_reader.read<size_t>();
     DS_protection = DSProtection(bit_reader, DS_length);
 
     /// block_payload
-    for (auto block : block_payload) {
-        block_payload.emplace_back(bit_reader.read<uint8_t>());
+    for (auto& data : block_payload) {
+        bit_reader.read<uint8_t>();
     }
-
-    bit_reader.flush();
 
     UTILS_DIE_IF(bit_reader.getPos() - start_pos != length, "Invalid DescriptorStream length!");
 }
@@ -131,7 +126,6 @@ void DescriptorStream::write(util::BitWriter& bit_writer) const {
         bit_writer.write(data, 8);
     }
 
-    bit_writer.flush();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

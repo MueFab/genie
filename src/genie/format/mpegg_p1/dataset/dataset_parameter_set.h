@@ -34,13 +34,6 @@ class DatasetParameterSet {
      *
      */
     explicit DatasetParameterSet(const core::parameter::ParameterSet&&);
-
-    /**
-     *
-     * @param ID
-     */
-    explicit DatasetParameterSet(uint16_t ID, const core::parameter::ParameterSet&&);
-
     /**
      *
      * @param group_ID
@@ -48,33 +41,46 @@ class DatasetParameterSet {
      */
     explicit DatasetParameterSet(uint8_t group_ID, uint16_t ID,
                                  const core::parameter::ParameterSet&& parameterSet);
+    /**
+     *
+     * @param ID
+     */
+    explicit DatasetParameterSet(uint16_t ID, const core::parameter::ParameterSet&&);
+    /**
+     *
+     * @param bit_reader
+     * @param length
+     */
+    DatasetParameterSet(genie::util::BitReader& bit_reader, size_t length);
 
-    DatasetParameterSet(util::BitReader& bit_reader, size_t length);
 
+    /**
+     *
+     * @param datasetId
+     */
+    void setDatasetID(uint16_t datasetID);
     /**
      *
      * @return
      */
     uint16_t getDatasetID() const;
-
     /**
      *
      * @return
      */
     uint8_t getDatasetGroupID() const;
-
     /**
      *
      * @param datasetGroupId
      */
-    void setDatasetGroupId(uint8_t datasetGroupId);
+    void setDatasetGroupID(uint8_t datasetGroupID);
+
 
     /**
      *
      * @return
      */
     uint64_t getLength() const;
-
     /**
      *
      * @param bit_writer

@@ -19,17 +19,18 @@ DescriptorStreamHeader::DescriptorStreamHeader()
       class_ID(),
       num_blocks() {}
 
-DescriptorStreamHeader::DescriptorStreamHeader(genie::util::BitReader& bit_reader, size_t length)
-    : reserved(),
-      descriptor_ID(),
-      class_ID(),
-      num_blocks() {
 
-    size_t start_pos = bit_reader.getPos();
+DescriptorStreamHeader::DescriptorStreamHeader(uint8_t _res, uint8_t _descriptor_ID, uint8_t _class_ID,
+                                               uint32_t _num_blocks)
+    : reserved(_res),
+      descriptor_ID(_descriptor_ID),
+      class_ID(_class_ID),
+      num_blocks(_num_blocks) {}
 
-    std::string key = readKey(bit_reader);
+DescriptorStreamHeader::DescriptorStreamHeader(util::BitReader& bit_reader) {
+
+    std::string key = readKey(bit_reader, "XXXX");
     UTILS_DIE_IF(key != "dshd", "DescriptorStreamHeader is not Found");
-
 
     /// reserved u(1)
     reserved = bit_reader.read<uint8_t>(1);
@@ -40,7 +41,7 @@ DescriptorStreamHeader::DescriptorStreamHeader(genie::util::BitReader& bit_reade
     /// num_blocks u(32)
     num_blocks = bit_reader.read<uint32_t>();
 
-    UTILS_DIE_IF(bit_reader.getPos() - start_pos != length, "Invalid DescriptorStreamHeader length!");
+    bit_reader.flush();
 }
 
 
@@ -65,15 +66,18 @@ uint64_t DescriptorStreamHeader::getLength() const {
 
     /// !byte_aligned()
     bitlen += bitlen % 8;
+    /// byte conversion
+    bitlen /= 8;
 
-    return bitlen / 8;
+    return bitlen;
 }
 
 void DescriptorStreamHeader::write(util::BitWriter& bit_writer) const {
 
+    // Key of KLV format
     bit_writer.write("dshd");
 
-    // Length of KVL format
+    // Length of KLV format
     bit_writer.write(getLength(), 64);
 
     // reserved u(1)
@@ -91,7 +95,6 @@ void DescriptorStreamHeader::write(util::BitWriter& bit_writer) const {
     bit_writer.flush();
 
 }
-
 
 }  // namespace mpegg_p1
 }  // namespace format

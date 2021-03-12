@@ -30,11 +30,21 @@ class DSProtection {
      * Default
      */
     DSProtection();
-
+    /**
+     *
+     * @param bit_reader
+     * @param length
+     */
     DSProtection(genie::util::BitReader& bit_reader, size_t length);
-
+    /**
+     *
+     * @return
+     */
     uint64_t getLength() const;
-
+    /**
+     *
+     * @param bit_writer
+     */
     void write(genie::util::BitWriter& bit_writer) const;
 };
 
@@ -61,12 +71,12 @@ class DescriptorStream {
      */
     DescriptorStream(genie::util::BitReader& bit_reader, size_t length);
 
+
     /**
      *
      * @return
      */
     uint64_t getLength() const;
-
     /**
      *
      * @param bit_writer

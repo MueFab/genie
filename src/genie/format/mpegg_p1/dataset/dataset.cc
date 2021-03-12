@@ -17,9 +17,33 @@ DTMetadata::DTMetadata()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t DTMetadata::getLength() const {
-    uint64_t len = 12;  // gen_info
+DTMetadata::DTMetadata(std::vector<uint8_t>&& _DT_metadata_value)
+    : DT_metadata_value(std::move(_DT_metadata_value)) {}
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+DTMetadata::DTMetadata(util::BitReader& reader, size_t length) {
+
+    std::string key = readKey(reader, "XXXX");
+    UTILS_DIE_IF(key != "dtmd", "DTMetadata is not Found");
+
+    size_t start_pos = reader.getPos();
+
+    // DT_metadata_value[uint8_t]
+    for (auto& val : DT_metadata_value) {
+        reader.read<uint8_t>();
+    }
+
+    UTILS_DIE_IF(reader.getPos() - start_pos != length, "Invalid DTMetadata length!");
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t DTMetadata::getLength() const {
+    /// Key c(4) Length u(64)
+    uint64_t len = (4 * sizeof(char) + 8);   // gen_info
+
+    // DT_metadata_value[] std::vector<uint8_t>
     len += DT_metadata_value.size();
 
     return len;
@@ -28,14 +52,15 @@ uint64_t DTMetadata::getLength() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DTMetadata::write(genie::util::BitWriter &bit_writer) const {
-    // KLV (Key Length Value) format
 
+    /// KLV (Key Length Value) format
     // Key of KLV format
     bit_writer.write("dtmd");
 
     // Length of KLV format
     bit_writer.write(getLength(), 64);
 
+    // DT_metadata_value[] std::vector<uint8_t>
     for (auto val : DT_metadata_value){
         bit_writer.write(val, 8);
     }
@@ -48,9 +73,35 @@ DTProtection::DTProtection()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t DTProtection::getLength() const {
-    uint64_t len = 12;  // gen_info
+DTProtection::DTProtection(std::vector<uint8_t>&& _DT_protection_value)
+    : DT_protection_value(std::move(_DT_protection_value)) {}
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+DTProtection::DTProtection(util::BitReader& reader, size_t length)
+    : DT_protection_value() {
+
+    std::string key = readKey(reader, "XXXX");
+    UTILS_DIE_IF(key != "dtpr", "DTProtection is not Found");
+
+    size_t start_pos = reader.getPos();
+
+    // DT_protection_value[uint8_t]
+    for (auto& val : DT_protection_value) {
+        reader.read<uint8_t>();
+    }
+
+    UTILS_DIE_IF(reader.getPos() - start_pos != length, "Invalid DTProtection length!");
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t DTProtection::getLength() const {
+
+    /// Key c(4) Length u(64)
+    uint64_t len = (4 * sizeof(char) + 8);   // gen_info
+
+    // DT_protection_value[] std::vector<uint8_t>
     len += DT_protection_value.size();
 
     return len;
@@ -59,22 +110,60 @@ uint64_t DTProtection::getLength() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DTProtection::write(genie::util::BitWriter &bit_writer) const {
-    // KLV (Key Length Value) format
-
+    /// // KLV (Key Length Value) format
     // Key of KVL format
     bit_writer.write("dtpr");
 
     // Length of KVL format
     bit_writer.write(getLength(), 64);
 
+    // DT_protection_value[] std::vector<uint8_t>
     for (auto val : DT_protection_value){
         bit_writer.write(val, 8);
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+/*
+Dataset::Dataset(util::BitReader& reader, size_t length) {
 
-//Dataset::Dataset(uint16_t ID, const genie::format::mgb::DataUnitFactory& dataUnitFactory,
+    size_t start_pos = reader.getPos();
+
+    std::string key = readKey(reader, "XXXX");
+    UTILS_DIE_IF(key != "dtcn", "DatasetHeader is not Found");
+
+    /// Class Dataset_header
+    auto header_length = reader.read<size_t>();
+    header = DatasetHeader(reader, header_length);
+
+    do {
+        key = readKey(reader, "XXXX");
+        auto metadata_length = reader.read<size_t>();
+        if (key == "dtmd"){
+            DT_metadata = util::make_unique<DatasetHeader>(reader, metadata_length);
+        } else if (key == "dtpr"){
+            DT_metadata = util::make_unique<DatasetHeader>(reader, protection_length);
+        } else if (key == "pars"){
+
+        } else if (key == "mitb"){
+
+        } else if (key == "aucun"){
+
+        } else if (key == "dscn"){
+
+        }
+
+    } while (reader.getPos() - start_pos < length);
+
+
+
+
+    UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid Dataset length!");
+}
+*/
+// ---------------------------------------------------------------------------------------------------------------------
+
+//Dataset::Dataset(uint16_t ID, DatasetHeader& _header, const genie::format::mgb::DataUnitFactory& dataUnitFactory,
 //                 std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2)
 //    : dataset_group_ID(group_ID),
 //      dataset_ID(ID),
@@ -84,7 +173,8 @@ void DTProtection::write(genie::util::BitWriter &bit_writer) const {
 //      pos_40_bits_flag(_pos_40_bits_flag),
 //      dataset_type(_dataset_type),
 //      alphabet_ID(_alphabet_ID),
-//      num_U_access_units(_num_U_access_units){
+//      num_U_access_units(_num_U_access_units),
+//     header(std::move(_header)) {
 //
 //    for (unsigned int i = 0;; ++i) {
 //        try {  // to iterate over dataUnitFactory.getParams(i)
@@ -94,14 +184,11 @@ void DTProtection::write(genie::util::BitWriter &bit_writer) const {
 //            break;
 //        }
 //    }
-//
+
 //    for (auto& au : accessUnits_p2) {
 //        access_units.emplace_back(std::move(au));
 //    }
 //}
-
-
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -161,7 +248,8 @@ core::parameter::DataUnit::DatasetType Dataset::getDatasetType() const { getHead
 
 uint64_t Dataset::getLength() const {
 
-    uint64_t len = 12;  // KLV
+    /// Key c(4) Length u(64)
+    uint64_t len = (4 * sizeof(char) + 8);   // gen_info
 
     len += header.getLength();
 
@@ -175,28 +263,31 @@ uint64_t Dataset::getLength() const {
         DT_protection->getLength();
     }
 
-    // TODO: Master Index Table
-    //write master_index_table depending on MIT_FLAG
-    //if (block_config.getMITFlag()){
-    //    master_index_table->getBitLength();
-    //}
-
     for (auto const& it : dataset_parameter_sets) {
         // dataset_group_ID u(8) + dataset_ID u(16)
         len += sizeof(uint8_t) + sizeof(uint16_t);
         len += it.getLength();
     }
 
+    // TODO: Master Index Table
+    //write master_index_table depending on MIT_FLAG
+    //if (getBlockHeader().getMITFlag()){
+    //    if (master_index_table != nullptr) {
+    //        master_index_table->getLength();
+    //    }
+    //}
+
+
     for (auto const& it : access_units) {
         len += it.getLength();
     }
 
     // TODO (Yeremia): write descriptor_stream depending on block_header_flag
-//    if (block_header_flag == 0){
-//        for (auto &ds: descriptor_streams){
-//            len += ds.geLength();
-//        }
-//    }
+    //if (getBlockHeader().getBlockHeaderFlag() == 0){
+    //    for (auto &ds: descriptor_streams){
+    //        len += ds.getLength();
+    //    }
+    //}
 
     return len;
 }
@@ -228,10 +319,10 @@ void Dataset::write(util::BitWriter& bit_writer) const {
     }
 
     // TODO: Master Index Table
-//    // write master_index_table depending on MIT_FLAG
-//    if (block_config.getMITFlag()){
-//        master_index_table->write(bit_writer);
-//    }
+    // write master_index_table depending on MIT_FLAG
+    //if (getBlockHeader().getMITFlag()){
+    //    master_index_table->write(bit_writer);
+    //}
 
     // dataset_parameter_set[]
     for (auto const& ps : dataset_parameter_sets) {
@@ -243,11 +334,11 @@ void Dataset::write(util::BitWriter& bit_writer) const {
     }
 
     // TODO (Yeremia): write descriptor_stream depending on block_header_flag
-//    if (block_header_flag == 0){
-//        for (auto &ds: descriptor_streams){
-//            ds.write(bit_writer);
-//        }
-//    }
+    //if (getBlockHeader().getBlockHeaderFlag() == 0){
+    //    for (auto &ds: descriptor_streams){
+    //        ds.write(bit_writer);
+    //    }
+    //}
 
     // TODO (Yeremia): implement write of Dataset
     UTILS_DIE("Not implemented yet");

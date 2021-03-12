@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <vector>
+
 #include <genie/util/bitwriter.h>
 #include <genie/util/bitreader.h>
 
@@ -38,10 +39,19 @@ class DescriptorStreamHeader{
     DescriptorStreamHeader();
     /**
      *
+     * @param _res
+     * @param _descriptor_ID
+     * @param _class_ID
+     * @param _num_blocks
+     */
+    explicit DescriptorStreamHeader(uint8_t _res, uint8_t _descriptor_ID,
+                                    uint8_t _class_ID, uint32_t _num_blocks);
+    /**
+     *
      * @param bit_reader
      * @param length
      */
-    DescriptorStreamHeader(genie::util::BitReader& bit_reader, size_t length);
+    explicit DescriptorStreamHeader(util::BitReader& bit_reader);
 
     /**
      *

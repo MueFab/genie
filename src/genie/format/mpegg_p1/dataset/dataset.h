@@ -14,7 +14,8 @@
 #include <genie/core/parameter/parameter_set.h>
 #include <genie/format/mgb/data-unit-factory.h>
 
-//#include <genie/format/mpegg_p1/dataset/master_index_table/master_index_table.h>
+#include "descriptor_stream.h"
+#include <genie/format/mpegg_p1/dataset/master_index_table/master_index_table.h>
 #include <genie/format/mpegg_p1/dataset/access_unit/access_unit.h>
 #include <genie/format/mpegg_p1/dataset/dataset_parameter_set.h>
 #include "dataset_header.h"
@@ -33,9 +34,26 @@ class DTMetadata {
      *
      */
     DTMetadata();
-
+    /**
+     *
+     * @param _DT_metadata_value
+     */
+    explicit DTMetadata(std::vector<uint8_t>&& _DT_metadata_value);
+    /**
+     *
+     * @param reader
+     * @param length
+     */
+    DTMetadata(genie::util::BitReader& reader, size_t length);
+    /**
+     *
+     * @return
+     */
     uint64_t getLength() const;
-
+    /**
+     *
+     * @param bit_writer
+     */
     void write(genie::util::BitWriter& bit_writer) const;
 
    private:
@@ -51,9 +69,26 @@ class DTProtection {
      *
      */
     DTProtection();
-
+    /**
+     *
+     * @param _DT_metadata_value
+     */
+    explicit DTProtection(std::vector<uint8_t>&& _DT_protection_value);
+    /**
+     *
+     * @param reader
+     * @param length
+     */
+    DTProtection(genie::util::BitReader& reader, size_t length);
+    /**
+     *
+     * @return
+     */
     uint64_t getLength() const;
-
+    /**
+     *
+     * @param bit_writer
+     */
     void write(genie::util::BitWriter& bit_writer) const;
 
    private:
@@ -83,14 +118,14 @@ class Dataset {
     // ISO 23092-1 Section 6.5.3.1 - specification 23092-1
     // optional
     // TODO: Master Index Table
-//    std::unique_ptr<MasterIndexTable> master_index_table;
+    //std::unique_ptr<MasterIndexTable> master_index_table;
 
     // ISO 23092-1 Section 6.5.3
     std::vector<AccessUnit> access_units;
 
     // TODO(Yeremia): Descriptor Stream
     // ISO 23092-1 Section 6.5.4
-//    std::vector<DescriptorStream> descriptor_streams;
+    //std::vector<DescriptorStream> descriptor_streams;
 
    public:
     /**
@@ -98,16 +133,14 @@ class Dataset {
      * @param _dataset_ID
      */
     explicit Dataset(uint16_t _dataset_ID);
-    /**
-     *
-     * @param dataUnitFactory
-     * @param accessUnits_p2
-     * @param ID
-     */
-    Dataset(uint16_t ID, const genie::format::mgb::DataUnitFactory& dataUnitFactory,
-            std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2);
+    /*
+    Dataset(uint16_t ID, DatasetHeader& _header, std::unique_ptr<DTMetadata> _DT_metadata, std::unique_ptr<DTProtection> _DT_protection,
+            const genie::format::mgb::DataUnitFactory& dataUnitFactory,
+            std::unique_ptr<MasterIndexTable> _master_index_table,
+            std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2, std::vector<DescriptorStream> _descriptor_streams);
+*/
 
-
+    Dataset(util::BitReader& reader, size_t length);
 
     /**
      *
