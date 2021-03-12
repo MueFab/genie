@@ -1,3 +1,5 @@
+#include "genie/util/runtime-exception.h"
+#include <genie/format/mpegg_p1/util.h>
 
 #include "label.h"
 
@@ -8,12 +10,32 @@ namespace mpegg_p1 {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Label::Label()
-    : label_ID() {}
+    : label_ID(),
+      dataset_infos() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 Label::Label(std::string& _label_ID)
     : label_ID(std::move(_label_ID)){}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Label::ReadLabel(util::BitReader& reader) {
+
+    std::string key = readKey(reader, "XXXX");
+    UTILS_DIE_IF(key != "lbll", "Label is not Found");
+
+    // label_ID st(v)
+    label_ID = readNullTerminatedStr(reader, "XXXX");
+    // num_datasets u(16)
+    reader.read<uint16_t>();
+
+    /// data encapsulated in Class dataset_info
+    for (auto& ds_info: dataset_infos){
+        ds_info.ReadDatasetInfo(reader);
+    }
+
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -41,7 +63,7 @@ uint16_t Label::getNumDatasets() const { return (uint16_t) dataset_infos.size();
 
 uint64_t Label::getLength() const {
 
-    // key c(4), Length u(64)
+    /// key c(4), Length u(64)
     uint64_t bitlen = (4 * sizeof(char) + 8) * 8;   //gen_info
 
     // label_ID st(v)
@@ -50,14 +72,14 @@ uint64_t Label::getLength() const {
     // num_datasets u(16)
     bitlen += 16;
 
-    // for num_datasets
+    /// data encapsulated in Class dataset_info
     for (auto& ds_info: dataset_infos){
         bitlen += ds_info.getBitLength();
     }
 
-    // aligned to byte
+    /// aligned to byte
     bitlen += bitlen % 8;
-    // Convert to byte
+    /// Convert to byte
     bitlen /= 8;
 
     return bitlen;
@@ -66,8 +88,8 @@ uint64_t Label::getLength() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Label::write(util::BitWriter& bit_writer) const {
-    // KLV (Key Length Value) format
 
+    /// KLV (Key Length Value) format
     // Key of KVL format
     bit_writer.write("lbll");
 
@@ -75,15 +97,18 @@ void Label::write(util::BitWriter& bit_writer) const {
     bit_writer.write(getLength(), 64);
 
     // label_ID st(v)
-    bit_writer.write(label_ID);
+    writeNullTerminatedStr(bit_writer, label_ID);
 
     // num_datasets u(16)
     bit_writer.write(getNumDatasets(), 16);
 
-    // for num_datasets
-    for (auto& dataset_info: dataset_infos){
-        dataset_info.writeToFile(bit_writer);
+    /// data encapsulated in Class dataset_info
+    for (auto& ds_info: dataset_infos){
+        ds_info.writeToFile(bit_writer);
     }
+
+    /// aligned to byte
+    bit_writer.flush();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

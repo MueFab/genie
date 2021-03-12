@@ -8,9 +8,10 @@
 
 #include <string>
 #include <vector>
+#include "genie/util/bitwriter.h"
+#include "genie/util/bitreader.h"
 
 #include "dataset_info.h"
-#include "genie/util/bitwriter.h"
 
 namespace genie {
 namespace format {
@@ -22,50 +23,57 @@ class Label{
     * ISO 23092-1 Section 6.5.1.5.4 table 15
     **/
     std::string label_ID;
-
     std::vector<DatasetInfo> dataset_infos;
 
    public:
-
+    /**
+     *
+     */
     Label();
+    /**
+     *
+     * @param _label_ID
+     */
     explicit Label(std::string& _label_ID);
+    /**
+     *
+     * @param reader
+     */
+    void ReadLabel(util::BitReader& reader);
+
 
     /**
      *
      * @param _ds_info
      */
     void addDatasetInfo(DatasetInfo&& _ds_info);
-
     /**
      *
      * @param _ds_infos
      */
     void addDatasetInfos(std::vector<DatasetInfo>& _ds_infos);
-
     /**
      *
      * @param _ds_infos
      */
     void setDatasetInfos(std::vector<DatasetInfo>&& _ds_infos);
-
     /**
      *
      * @return
      */
     const std::string& getLabelID() const;
-
     /**
      *
      * @return
      */
     uint16_t getNumDatasets() const;
 
+
     /**
      *
      * @return
      */
     uint64_t getLength() const;
-
     /**
      *
      * @param bit_writer
