@@ -15,9 +15,6 @@ class DatasetType;
 
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
-#include <genie/util/exception.h>
-#include "genie/util/runtime-exception.h"
-#include <genie/format/mpegg_p1/util.h>
 
 #include "fields/block_header_flags/block_header_flags.h"
 #include "fields/seq_info/seq_info.h"

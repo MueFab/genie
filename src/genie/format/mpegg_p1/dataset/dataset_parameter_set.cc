@@ -46,17 +46,17 @@ DatasetParameterSet::DatasetParameterSet(util::BitReader& bit_reader, size_t len
       dataset_ID(),
       parameterSet_p2() {
 
-    size_t start_pos = bit_reader.getPos();
-
-    std::string key = readKey(bit_reader);
+    std::string key = readKey(bit_reader, "XXXX");
     UTILS_DIE_IF(key != "pars", "DatasetParameterSet is not Found");
+
+    size_t start_pos = bit_reader.getPos();
 
     // dataset_group_ID u(8)
     dataset_group_ID = bit_reader.read<uint8_t>();
-    // dataset_ID u(8)
+    // dataset_ID u(16)
     dataset_ID = bit_reader.read<uint16_t>();
 
-    /// parameter_set_ID and parent_parameter_set_ID also encoded_parameters()
+    /// parameter_set_ID, parent_parameter_set_ID and encoded_parameters()
 //    parameterSet_p2 = ParameterSet(bit_reader);
 
     bit_reader.flush();
@@ -66,15 +66,21 @@ DatasetParameterSet::DatasetParameterSet(util::BitReader& bit_reader, size_t len
 }
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint16_t DatasetParameterSet::getDatasetID() const { return dataset_ID; }
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetParameterSet::setDatasetID(uint16_t datasetID) { dataset_ID = datasetID;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t DatasetParameterSet::getDatasetGroupID() const { return dataset_group_ID; }
+uint16_t DatasetParameterSet::getDatasetID() const { return dataset_ID;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetParameterSet::setDatasetGroupId(uint8_t datasetGroupId) { dataset_group_ID = datasetGroupId; }
+uint8_t DatasetParameterSet::getDatasetGroupID() const { return dataset_group_ID;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetParameterSet::setDatasetGroupID(uint8_t datasetGroupID) { dataset_group_ID = datasetGroupID;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -108,7 +114,7 @@ void DatasetParameterSet::write(util::BitWriter& bit_writer) const {
     /// Key of KLV format
     bit_writer.write("pars");
 
-    /// Length of KVL format
+    /// Length of KLV format
     bit_writer.write(getLength(), 64);
 
     // dataset_group_ID u(8)

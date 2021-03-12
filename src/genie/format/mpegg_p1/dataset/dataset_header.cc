@@ -3,6 +3,9 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
+#include <genie/util/exception.h>
+#include "genie/util/runtime-exception.h"
+#include <genie/format/mpegg_p1/util.h>
 
 #include "dataset_header.h"
 
@@ -45,7 +48,7 @@ DatasetHeader::DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSizeFlag _
 DatasetHeader::DatasetHeader(util::BitReader& bit_reader, size_t length)
     : dataset_group_ID(bit_reader.read<uint8_t>()),
       dataset_ID(bit_reader.read<uint16_t>()),
-      version(readNullTerminatedStr(bit_reader)),
+      version(readNullTerminatedStr(bit_reader, "XXXX")),
       byte_offset_size_flag(bit_reader.read<ByteOffsetSizeFlag>(1)),
       non_overlapping_AU_range_flag(bit_reader.read<bool>(1)),
       pos_40_bits_flag(bit_reader.read<Pos40SizeFlag>(1)),
@@ -54,7 +57,7 @@ DatasetHeader::DatasetHeader(util::BitReader& bit_reader, size_t length)
       alphabet_ID(bit_reader.read<uint8_t>()),
       num_U_access_units(bit_reader.read<uint32_t>()) {
 
-    std::string key = readKey(bit_reader);
+    std::string key = readKey(bit_reader, "XXXX");
     UTILS_DIE_IF(key != "dthd", "DatasetHeader is not Found");
 
     size_t start_pos = bit_reader.getPos();
