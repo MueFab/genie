@@ -133,7 +133,7 @@ class DatasetGroup {
      *
      * @param bit_reader
      */
-    explicit DatasetGroup(util::BitReader& reader, size_t length);
+    //explicit DatasetGroup(util::BitReader& reader, size_t length);
 
 
     /**

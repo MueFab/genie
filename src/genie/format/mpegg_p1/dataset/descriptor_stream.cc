@@ -20,7 +20,7 @@ DSProtection::DSProtection()
 DSProtection::DSProtection(util::BitReader& bit_reader, size_t length)
     : DS_protection_value() {
 
-    std::string key = readKey(bit_reader, "XXXX");
+    std::string key = readKey(bit_reader);
     UTILS_DIE_IF(key != "dspr", "DSProtection is not Found");
 
     size_t start_pos = bit_reader.getPos();
@@ -72,7 +72,7 @@ DescriptorStream::DescriptorStream()
 
 DescriptorStream::DescriptorStream(genie::util::BitReader& bit_reader, size_t length) {
 
-    std::string key = readKey(bit_reader, "XXXX");
+    std::string key = readKey(bit_reader);
     UTILS_DIE_IF(key != "dscn", "DescriptorStream is not Found");
 
     size_t start_pos = bit_reader.getPos();

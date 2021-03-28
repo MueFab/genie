@@ -57,7 +57,7 @@ DatasetHeader::DatasetHeader(util::BitReader& bit_reader, size_t length)
       alphabet_ID(bit_reader.read<uint8_t>()),
       num_U_access_units(bit_reader.read<uint32_t>()) {
 
-    std::string key = readKey(bit_reader, "XXXX");
+    std::string key = readKey(bit_reader);
     UTILS_DIE_IF(key != "dthd", "DatasetHeader is not Found");
 
     size_t start_pos = bit_reader.getPos();

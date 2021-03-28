@@ -125,7 +125,7 @@ class Dataset {
 
     // TODO(Yeremia): Descriptor Stream
     // ISO 23092-1 Section 6.5.4
-    //std::vector<DescriptorStream> descriptor_streams;
+    std::vector<DescriptorStream> descriptor_streams;
 
    public:
     /**
@@ -133,14 +133,20 @@ class Dataset {
      * @param _dataset_ID
      */
     explicit Dataset(uint16_t _dataset_ID);
-    /*
-    Dataset(uint16_t ID, DatasetHeader& _header, std::unique_ptr<DTMetadata> _DT_metadata, std::unique_ptr<DTProtection> _DT_protection,
-            const genie::format::mgb::DataUnitFactory& dataUnitFactory,
-            std::unique_ptr<MasterIndexTable> _master_index_table,
-            std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2, std::vector<DescriptorStream> _descriptor_streams);
-*/
 
-    Dataset(util::BitReader& reader, size_t length);
+    Dataset(uint8_t group_ID, uint16_t ID, DatasetHeader::ByteOffsetSizeFlag _byte_offset_size_flag,
+            bool _non_overlapping_AU_range_flag,
+            DatasetHeader::Pos40SizeFlag _pos_40_bits_flag,
+            bool _multiple_alignment_flag,
+            core::parameter::DataUnit::DatasetType _dataset_type,
+            uint8_t _alphabet_ID,
+            uint32_t _num_U_access_units,
+            std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2,
+            const genie::format::mgb::DataUnitFactory& dataUnitFactory
+//            std::unique_ptr<MasterIndexTable> _master_index_table
+    );
+
+    //Dataset(util::BitReader& reader, size_t length);
 
     /**
      *

@@ -22,7 +22,7 @@ Label::Label(std::string& _label_ID)
 
 void Label::ReadLabel(util::BitReader& reader) {
 
-    std::string key = readKey(reader, "XXXX");
+    std::string key = readKey(reader);
     UTILS_DIE_IF(key != "lbll", "Label is not Found");
 
     // label_ID st(v)

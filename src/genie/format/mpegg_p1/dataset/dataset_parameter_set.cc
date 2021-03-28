@@ -46,7 +46,7 @@ DatasetParameterSet::DatasetParameterSet(util::BitReader& bit_reader, size_t len
       dataset_ID(),
       parameterSet_p2() {
 
-    std::string key = readKey(bit_reader, "XXXX");
+    std::string key = readKey(bit_reader);
     UTILS_DIE_IF(key != "pars", "DatasetParameterSet is not Found");
 
     size_t start_pos = bit_reader.getPos();
