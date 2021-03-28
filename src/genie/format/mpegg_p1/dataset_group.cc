@@ -27,7 +27,7 @@ DGMetadata::DGMetadata() : DG_metadata_value() {
 
 DGMetadata::DGMetadata(util::BitReader& reader, size_t length) {
 
-    std::string key = readKey(reader, "XXXX");
+    std::string key = readKey(reader);
     UTILS_DIE_IF(key != "dgmd", "DGMetadata is not Found");
 
     size_t start_pos = reader.getPos();
@@ -64,7 +64,7 @@ DGProtection::DGProtection() : DG_protection_value() {
 
 DGProtection::DGProtection(util::BitReader& reader, size_t length) {
 
-    std::string key = readKey(reader, "XXXX");
+    std::string key = readKey(reader);
     UTILS_DIE_IF(key != "dgpr", "DGMetadata is not Found");
 
     size_t start_pos = reader.getPos();
@@ -104,14 +104,14 @@ DatasetGroup::DatasetGroup(std::vector<Dataset> &&_datasets)
 }
 */
 // ---------------------------------------------------------------------------------------------------------------------
-
+/*
 DatasetGroup::DatasetGroup(util::BitReader& reader, size_t length)
     : dataset_group_ID(0),
       version_number(0) {
 
     size_t start_pos = reader.getPos();
 
-    std::string key = readKey(reader, "XXXX");
+    std::string key = readKey(reader);
     UTILS_DIE_IF(key != "dghd", "DatasetGroupHeader is not Found");
 
     // Class dataset_group_header
@@ -119,37 +119,37 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, size_t length)
     readHeader(reader, header_length-12);
 
     do {
-        key = readKey(reader, "XXXX");
+        key = readKey(reader);
         if (key == "rfgn"){
             // reference[]
             auto ref_length = reader.read<size_t>();
             references.emplace_back(reader, ref_length);
 
-            key = readKey(reader, "XXXX");
+            key = readKey(reader);
         } else if (key == "rfmd"){
             // reference_metadata[]
             //auto ref_meta_length = reader.read<size_t>();
             //reference_metadata.emplace_back(reader, ref_meta_length);
 
-            key = readKey(reader, "XXXX");
+            key = readKey(reader);
         } else if (key == "labl"){
             // label_list
             auto label_length = reader.read<size_t>();
             label_list = util::make_unique<LabelList>(reader, label_length);
 
-            key = readKey(reader, "XXXX");
+            key = readKey(reader);
         } else if (key == "dgmd"){
             // DG_metadata
             auto metadata_length = reader.read<size_t>();
             DG_metadata = util::make_unique<DGMetadata>(reader, metadata_length);
 
-            key = readKey(reader, "XXXX");
+            key = readKey(reader);
         } else if (key == "dgpr"){
             // DG_protection
             auto protection_length = reader.read<size_t>();
             DG_protection = util::make_unique<DGProtection>(reader, protection_length);
 
-            key = readKey(reader, "XXXX");
+            key = readKey(reader);
         } else if (key == "dtcn"){
             // Dataset
             auto dataset_length = reader.read<size_t>();
@@ -160,7 +160,7 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, size_t length)
 
     UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid DatasetGroup length!");
 }
-
+*/
 // ---------------------------------------------------------------------------------------------------------------------
 /*
 std::vector<uint16_t>&& DatasetGroup::getDatasetIDs(bool sort_ids) const {

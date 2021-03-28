@@ -41,7 +41,7 @@ Reference::Reference(util::BitReader& reader, size_t length)
       reference_ID(reader.read<uint8_t>()),
       reference_name()
 {
-    std::string key = readKey(reader, "XXXX");
+    std::string key = readKey(reader);
     UTILS_DIE_IF(key != "rfgn", "Reference is not Found");
 
     size_t start_pos = reader.getPos();

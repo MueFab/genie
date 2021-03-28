@@ -24,7 +24,7 @@ DTMetadata::DTMetadata(std::vector<uint8_t>&& _DT_metadata_value)
 
 DTMetadata::DTMetadata(util::BitReader& reader, size_t length) {
 
-    std::string key = readKey(reader, "XXXX");
+    std::string key = readKey(reader);
     UTILS_DIE_IF(key != "dtmd", "DTMetadata is not Found");
 
     size_t start_pos = reader.getPos();
@@ -81,7 +81,7 @@ DTProtection::DTProtection(std::vector<uint8_t>&& _DT_protection_value)
 DTProtection::DTProtection(util::BitReader& reader, size_t length)
     : DT_protection_value() {
 
-    std::string key = readKey(reader, "XXXX");
+    std::string key = readKey(reader);
     UTILS_DIE_IF(key != "dtpr", "DTProtection is not Found");
 
     size_t start_pos = reader.getPos();
@@ -122,7 +122,53 @@ void DTProtection::write(genie::util::BitWriter &bit_writer) const {
         bit_writer.write(val, 8);
     }
 }
+// ---------------------------------------------------------------------------------------------------------------------
 
+Dataset::Dataset(uint16_t _dataset_ID)
+    :header(_dataset_ID)
+{}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Dataset::Dataset(uint8_t group_ID, uint16_t ID, DatasetHeader::ByteOffsetSizeFlag _byte_offset_size_flag,
+                 bool _non_overlapping_AU_range_flag,
+                 DatasetHeader::Pos40SizeFlag _pos_40_bits_flag,
+                 bool _multiple_alignment_flag,
+                 core::parameter::DataUnit::DatasetType _dataset_type,
+                 uint8_t _alphabet_ID,
+                 uint32_t _num_U_access_units,
+                 std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2,
+                 const genie::format::mgb::DataUnitFactory& dataUnitFactory
+//                 std::unique_ptr<MasterIndexTable> _master_index_table
+)
+
+    : header(group_ID, ID, _byte_offset_size_flag, _non_overlapping_AU_range_flag, _pos_40_bits_flag,
+             _multiple_alignment_flag, _dataset_type, _alphabet_ID, _num_U_access_units)
+//    master_index_table(std::move(_master_index_table))
+
+{
+    /// dataset_parameter_set[]
+    for (unsigned int i = 0;; ++i) {
+        try {  // to iterate over dataUnitFactory.getParams(i)
+            dataset_parameter_sets.emplace_back(ID, std::move(dataUnitFactory.getParams(i)));
+        } catch (const std::out_of_range&) {
+            // std::cout << "Got " << i << " ParameterSet/s from DataUnitFactory" << std::endl; //debuginfo
+            break;
+        }
+    }
+
+    /// access_unit[]
+    for (auto& au : accessUnits_p2) {
+        access_units.emplace_back(std::move(au));
+    }
+
+    /// descriptor_stream[]
+    if (header.getBlockHeader().getBlockHeaderFlag() == 0) {
+        for (auto& ds : descriptor_streams) {
+            descriptor_streams.emplace_back(std::move(ds));
+        }
+    }
+}
 // ---------------------------------------------------------------------------------------------------------------------
 /*
 Dataset::Dataset(util::BitReader& reader, size_t length) {
@@ -161,34 +207,6 @@ Dataset::Dataset(util::BitReader& reader, size_t length) {
     UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid Dataset length!");
 }
 */
-// ---------------------------------------------------------------------------------------------------------------------
-
-//Dataset::Dataset(uint16_t ID, DatasetHeader& _header, const genie::format::mgb::DataUnitFactory& dataUnitFactory,
-//                 std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2)
-//    : dataset_group_ID(group_ID),
-//      dataset_ID(ID),
-//      version("XXXX"), // TODO (Yeremia): Version
-//      byte_offset_size_flag(_byte_offset_size_flag),
-//      non_overlapping_AU_range_flag(_non_overlapping_AU_range_flag),
-//      pos_40_bits_flag(_pos_40_bits_flag),
-//      dataset_type(_dataset_type),
-//      alphabet_ID(_alphabet_ID),
-//      num_U_access_units(_num_U_access_units),
-//     header(std::move(_header)) {
-//
-//    for (unsigned int i = 0;; ++i) {
-//        try {  // to iterate over dataUnitFactory.getParams(i)
-//            dataset_parameter_sets.emplace_back(ID, std::move(dataUnitFactory.getParams(i)));
-//        } catch (const std::out_of_range&) {
-//            // std::cout << "Got " << i << " ParameterSet/s from DataUnitFactory" << std::endl; //debuginfo
-//            break;
-//        }
-//    }
-
-//    for (auto& au : accessUnits_p2) {
-//        access_units.emplace_back(std::move(au));
-//    }
-//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

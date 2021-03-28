@@ -29,7 +29,7 @@ DescriptorStreamHeader::DescriptorStreamHeader(uint8_t _res, uint8_t _descriptor
 
 DescriptorStreamHeader::DescriptorStreamHeader(util::BitReader& bit_reader) {
 
-    std::string key = readKey(bit_reader, "XXXX");
+    std::string key = readKey(bit_reader);
     UTILS_DIE_IF(key != "dshd", "DescriptorStreamHeader is not Found");
 
     /// reserved u(1)

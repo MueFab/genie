@@ -27,7 +27,7 @@ LabelList::LabelList(uint8_t _ds_group_ID, std::vector<Label> &&_labels)
 // ---------------------------------------------------------------------------------------------------------------------
 LabelList::LabelList(util::BitReader& reader, size_t length) {
 
-    std::string key = readKey(reader, "XXXX");
+    std::string key = readKey(reader);
     UTILS_DIE_IF(key != "labl", "LabelList is not Found");
 
     size_t start_pos = reader.getPos();
