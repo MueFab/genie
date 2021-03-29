@@ -4,14 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_WRITER_H
-#define GENIE_WRITER_H
+#ifndef SRC_GENIE_FORMAT_SAM_WRITER_H_
+#define SRC_GENIE_FORMAT_SAM_WRITER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <ostream>
-#include "header/header.h"
-#include "record.h"
+#include "genie/format/sam/header/header.h"
+#include "genie/format/sam/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,11 +22,11 @@ namespace sam {
 // ---------------------------------------------------------------------------------------------------------------------
 
 class Writer {
-   private:
+ private:
     header::Header header;
     std::ostream& file;
 
-   public:
+ public:
     Writer(header::Header&& fileHeader, std::ostream& stream);
     const header::Header& getHeader() const;
 
@@ -41,7 +41,7 @@ class Writer {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_WRITER_H
+#endif  // SRC_GENIE_FORMAT_SAM_WRITER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

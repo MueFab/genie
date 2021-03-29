@@ -4,9 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "importer.h"
-#include <genie/util/watch.h>
-#include "access_unit.h"
+#include "genie/format/mgb/importer.h"
+#include <string>
+#include <utility>
+#include "genie/format/mgb/access_unit.h"
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

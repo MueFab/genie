@@ -1,8 +1,6 @@
 project("genie-gabac")
 
 set(source_files
-        binary-arithmetic-encoder.cc
-        binary-arithmetic-decoder.cc
         bit-input-stream.cc
         config-manual.cc
         configuration.cc

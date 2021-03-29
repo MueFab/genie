@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_GABAC_H_
-#define GABAC_GABAC_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_GABAC_H_
+#define SRC_GENIE_ENTROPY_GABAC_GABAC_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -14,11 +14,11 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 /* Encode / Decode */
-#include "configuration.h"
-#include "run.h"
+#include "genie/entropy/gabac/configuration.h"
+#include "genie/entropy/gabac/run.h"
 
 /* io */
-#include "streams.h"
+#include "genie/entropy/gabac/streams.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,6 +26,6 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif /* GABAC_GABAC_H_ */
+#endif  // SRC_GENIE_ENTROPY_GABAC_GABAC_H_
 
 // ---------------------------------------------------------------------------------------------------------------------

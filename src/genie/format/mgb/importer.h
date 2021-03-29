@@ -4,22 +4,23 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_MGB_IMPORTER_H
-#define GENIE_MGB_IMPORTER_H
+#ifndef SRC_GENIE_FORMAT_MGB_IMPORTER_H_
+#define SRC_GENIE_FORMAT_MGB_IMPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/format-importer-compressed.h>
-#include <genie/core/ref-decoder.h>
-#include <genie/core/reference-source.h>
-#include <genie/core/stats/perf-stats.h>
-#include <genie/util/bitreader.h>
-#include <genie/util/ordered-section.h>
-#include <genie/util/original-source.h>
-#include <genie/util/source.h>
 #include <map>
-#include "data-unit-factory.h"
-#include "format-importer.h"
+#include <string>
+#include "genie/core/format-importer-compressed.h"
+#include "genie/core/format-importer.h"
+#include "genie/core/ref-decoder.h"
+#include "genie/core/reference-source.h"
+#include "genie/core/stats/perf-stats.h"
+#include "genie/format/mgb/data-unit-factory.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/ordered-section.h"
+#include "genie/util/original-source.h"
+#include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,36 +29,35 @@ namespace format {
 namespace mgb {
 
 /**
- *
+ * @brief
  */
 class Importer : public core::FormatImporterCompressed, public core::ReferenceSource {
-   private:
-    util::BitReader reader;               //!<
-    std::mutex lock;                      //!<
-    mgb::DataUnitFactory factory;         //!<
-    core::ReferenceManager* ref_manager;  //!<
-    core::RefDecoder* decoder;            //!<
+ private:
+    util::BitReader reader;               //!< @brief
+    std::mutex lock;                      //!< @brief
+    mgb::DataUnitFactory factory;         //!< @brief
+    core::ReferenceManager* ref_manager;  //!< @brief
+    core::RefDecoder* decoder;            //!< @brief
 
     /**
-     *
+     * @brief
      * @param au
      * @return
      */
     core::AccessUnit convertAU(mgb::AccessUnit&& au);
 
-   public:
+ public:
     /**
-     *
+     * @brief
      * @param _file
      * @param manager
      * @param refd
      * @param refOnly
-     * @param _stats
      */
     explicit Importer(std::istream& _file, core::ReferenceManager* manager, core::RefDecoder* refd, bool refOnly);
 
     /**
-     *
+     * @brief
      * @param id
      * @param lock
      * @return
@@ -65,7 +65,7 @@ class Importer : public core::FormatImporterCompressed, public core::ReferenceSo
     bool pump(uint64_t& id, std::mutex& lock) override;
 
     /**
-     *
+     * @brief
      * @param raw
      * @param f_pos
      * @param start
@@ -83,7 +83,7 @@ class Importer : public core::FormatImporterCompressed, public core::ReferenceSo
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_IMPORTER_H
+#endif  // SRC_GENIE_FORMAT_MGB_IMPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

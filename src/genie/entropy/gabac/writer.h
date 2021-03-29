@@ -4,18 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_WRITER_H_
-#define GABAC_WRITER_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_WRITER_H_
+#define SRC_GENIE_ENTROPY_GABAC_WRITER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstddef>
 #include <cstdint>
 #include <vector>
-
-#include <genie/util/bitwriter.h>
-#include "binary-arithmetic-encoder.h"
-#include "streams.h"
+#include "genie/entropy/gabac/binary-arithmetic-encoder.h"
+#include "genie/entropy/gabac/streams.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -32,144 +31,144 @@ namespace entropy {
 namespace gabac {
 
 /**
- *
+ * @brief
  */
 class Writer {
-   public:
+ public:
     /**
-     *
-     * @param bitstream
+     * @brief
+     * @param constbitstream
      * @param bypassFlag
      * @param numContexts
      */
-    explicit Writer(OBufferStream *bitstream, const bool bypassFlag = true, const unsigned long numContexts = 0);
+    explicit Writer(OBufferStream *constbitstream, const bool bypassFlag = true, uint64_t numContexts = 0);
 
     /**
-     *
+     * @brief
      */
     ~Writer();
 
     /**
-     *
+     * @brief
      */
     void start();
 
     /**
-     *
+     * @brief
      */
     void close();
 
     /**
-     *
+     * @brief
      */
     void reset();
 
     /**
-     *
+     * @brief
      * @param input
      * @param binParams
      */
     void writeAsBIbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param input
      * @param binParams
      */
     void writeAsBIcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param input
      * @param binParams
      */
     void writeAsTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param input
      * @param binParams
      */
     void writeAsTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param input
      * @param binParams
      */
     void writeAsEGbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param input
      * @param binParams
      */
     void writeAsEGcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param input
      * @param binParams
      */
     void writeAsTEGbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param input
      * @param binParams
      */
     void writeAsTEGcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param input
      * @param binParams
      */
     void writeAsSUTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param input
      * @param binParams
      */
     void writeAsSUTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param input
      * @param binParams
      */
     void writeAsDTUbypass(uint64_t input, const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param input
      * @param binParams
      */
     void writeAsDTUcabac(uint64_t input, const std::vector<unsigned int> binParams);
 
     /**
-     *
+     * @brief
      * @param input
      * @param codingSubsymSize
      */
     void writeLutSymbol(uint64_t input, const uint8_t codingSubsymSize);
 
     /**
-     *
+     * @brief
      * @param input
      */
     void writeSignFlag(int64_t input);
 
-   private:
-    util::BitWriter m_bitOutputStream;  //!<
+ private:
+    util::BitWriter m_bitOutputStream;  //!< @brief
 
-    BinaryArithmeticEncoder m_binaryArithmeticEncoder;  //!<
+    BinaryArithmeticEncoder m_binaryArithmeticEncoder;  //!< @brief
 
-    bool m_bypassFlag;            //!<
-    unsigned long m_numContexts;  //!<
+    bool m_bypassFlag;       //!< @brief
+    uint64_t m_numContexts;  //!< @brief
 
-    std::vector<ContextModel> m_contextModels;  //!<
+    std::vector<ContextModel> m_contextModels;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -180,7 +179,7 @@ class Writer {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_WRITER_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_WRITER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,20 +4,22 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#ifdef _WIN32
 #define NOMINMAX
+#endif
 
-#include "preprocess.h"
-#include <genie/core/record/record.h>
-#include <genie/util/drain.h>
-#include <genie/util/ordered-section.h>
+#include "genie/read/spring/preprocess.h"
 #include <algorithm>
 #include <cstdint>
 #include <cstdio>
 #include <iostream>
-#include <limits>
 #include <string>
-#include "params.h"
-#include "util.h"
+#include <utility>
+#include "genie/core/record/record.h"
+#include "genie/read/spring/params.h"
+#include "genie/read/spring/util.h"
+#include "genie/util/drain.h"
+#include "genie/util/ordered-section.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +32,7 @@ namespace spring {
 void Preprocessor::setup(const std::string &wdir, size_t num_thr, bool paired_end) {
     cp.preserve_id = true;
     cp.preserve_quality = true;
-    cp.num_thr = num_thr;
+    cp.num_thr = static_cast<int>(num_thr);
     working_dir = wdir;
     used = false;
 
@@ -66,8 +68,8 @@ void Preprocessor::setup(const std::string &wdir, size_t num_thr, bool paired_en
 
     for (int j = 0; j < 2; j++) {
         if (j == 1 && !cp.paired_end) continue;
-        fout_clean[j].open(outfileclean[j]);
-        fout_N[j].open(outfileN[j]);
+        fout_clean[j].open(outfileclean[j], std::ios::binary);
+        fout_N[j].open(outfileN[j], std::ios::binary);
         fout_order_N[j].open(outfileorderN[j], std::ios::binary);
         if (cp.preserve_quality) fout_quality[j].open(outfilequality[j]);
     }
@@ -95,11 +97,11 @@ void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section &id) 
             UTILS_DIE_IF(seq.getSequence().size() > MAX_READ_LEN, "Too long read length");
             cp.max_readlen = std::max(cp.max_readlen, (uint32_t)seq.getSequence().length());
             if (seq.getSequence().find('N') != std::string::npos) {
-                fout_N[seg_index] << seq.getSequence() << "\n";
-                uint32_t pos_N = cp.num_reads + rec_index;
-                fout_order_N[seg_index].write((char *)&pos_N, sizeof(uint32_t));
+                write_dnaN_in_bits(seq.getSequence(), fout_N[seg_index]);
+                auto pos_N = static_cast<uint32_t>(cp.num_reads + rec_index);
+                fout_order_N[seg_index].write(reinterpret_cast<char *>(&pos_N), sizeof(uint32_t));
             } else {
-                fout_clean[seg_index] << seq.getSequence() << "\n";
+                write_dna_in_bits(seq.getSequence(), fout_clean[seg_index]);
                 cp.num_reads_clean[seg_index]++;
             }
             if (!seq.getQualities().empty()) {
@@ -110,7 +112,7 @@ void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section &id) 
         fout_id << rec.getName() << "\n";
         ++rec_index;
     }
-    cp.num_reads += rec_index;
+    cp.num_reads += (uint32_t)rec_index;
     cp.num_blocks++;
 
     UTILS_DIE_IF(cp.num_reads == 0, "No reads found.");
@@ -135,8 +137,8 @@ void Preprocessor::finish(size_t id) {
 
     if (cp.paired_end) {
         // merge input_N and input_order_N for the two files
-        std::ofstream fout_N_PE(outfileN[0], std::ios::app);
-        std::ifstream fin_N_PE(outfileN[1]);
+        std::ofstream fout_N_PE(outfileN[0], std::ios::app | std::ios::binary);
+        std::ifstream fin_N_PE(outfileN[1], std::ios::binary);
         fout_N_PE << fin_N_PE.rdbuf();
         fout_N_PE.close();
         fin_N_PE.close();
@@ -146,9 +148,9 @@ void Preprocessor::finish(size_t id) {
         uint32_t num_N_file_2 = cp.num_reads - cp.num_reads_clean[1];
         uint32_t order_N;
         for (uint32_t i = 0; i < num_N_file_2; i++) {
-            fin_order_N.read((char *)&order_N, sizeof(uint32_t));
+            fin_order_N.read(reinterpret_cast<char *>(&order_N), sizeof(uint32_t));
             order_N += cp.num_reads;
-            fout_order_N_PE.write((char *)&order_N, sizeof(uint32_t));
+            fout_order_N_PE.write(reinterpret_cast<char *>(&order_N), sizeof(uint32_t));
         }
         fin_order_N.close();
         fout_order_N_PE.close();

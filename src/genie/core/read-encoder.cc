@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "read-encoder.h"
+#include "genie/core/read-encoder.h"
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

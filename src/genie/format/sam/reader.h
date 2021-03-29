@@ -4,18 +4,19 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_READER_H
-#define GENIE_READER_H
+#ifndef SRC_GENIE_FORMAT_SAM_READER_H_
+#define SRC_GENIE_FORMAT_SAM_READER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <istream>
-#include "header/header.h"
-#include "record.h"
-
-#include <map>
 #include <list>
+#include <map>
+#include <string>
 #include <utility>
+#include <vector>
+#include "genie/format/sam/header/header.h"
+#include "genie/format/sam/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,22 +27,22 @@ namespace sam {
 // ---------------------------------------------------------------------------------------------------------------------
 
 class Reader {
-   private:
+ private:
     std::istream& stream;
     header::Header header;
-    std::map<std::string, size_t> refs;
+    std::map<std::string, uint16_t> refs;
     bool with_index;
 
     std::map<std::string, std::vector<size_t>> index;
 
-   public:
+ public:
     /**
      * @brief Initialize Reader given istream, allows index to group reads that belongs to the same template
      *
      * @param _stream: Input stream of sam records
-     * @param _with_index: 
+     * @param _with_index:
      */
-    explicit Reader(std::istream& _stream, bool _with_index=true);
+    explicit Reader(std::istream& _stream, bool _with_index = true);
 
     /**
      *
@@ -54,7 +55,7 @@ class Reader {
      *
      * @return map contains RNAME and ref_id pair
      */
-    std::map<std::string, size_t>& getRefs();
+    std::map<std::string, uint16_t>& getRefs();
 
     /**
      * Add qname and file position pair to cache for indexing purpose
@@ -62,7 +63,7 @@ class Reader {
      * @param qname: QNAME of sam record
      * @param pos: Position of sam record in the sam file
      */
-    void addCacheEntry(std::string& qname, size_t &pos);
+    void addCacheEntry(std::string& qname, size_t& pos);
 
     /**
      * Read sam records
@@ -82,8 +83,8 @@ class Reader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-class ReadTemplateGroup{
-   private:
+class ReadTemplateGroup {
+ private:
     std::list<std::pair<std::string, size_t>> window;
     std::map<std::string, ReadTemplate> data;
     size_t counter;
@@ -107,12 +108,12 @@ class ReadTemplateGroup{
      */
     void removeEntry(const std::string& qname);
 
-   public:
+ public:
     /**
      *
      * @param _enable_window
      */
-    explicit ReadTemplateGroup(bool _enable_window=false);
+    explicit ReadTemplateGroup(bool _enable_window = false);
 
     /**
      *
@@ -149,14 +150,14 @@ class ReadTemplateGroup{
      * @param threshold
      * @return
      */
-    bool getTemplate(ReadTemplate& t, const size_t& threshold=0);
+    bool getTemplate(ReadTemplate& t, const size_t& threshold = 0);
 
     /**
      *
      * @param ts
      * @param threshold
      */
-    void getTemplates(std::list<ReadTemplate>& ts, const size_t& threshold=0);
+    void getTemplates(std::list<ReadTemplate>& ts, const size_t& threshold = 0);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -166,7 +167,7 @@ class ReadTemplateGroup{
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_READER_H
+#endif  // SRC_GENIE_FORMAT_SAM_READER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

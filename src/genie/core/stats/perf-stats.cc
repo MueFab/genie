@@ -4,13 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "perf-stats.h"
-
-#include <genie/util/runtime-exception.h>
-
+#include "genie/core/stats/perf-stats.h"
 #include <algorithm>
 #include <iomanip>
 #include <ostream>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

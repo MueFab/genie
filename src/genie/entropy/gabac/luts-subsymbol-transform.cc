@@ -4,14 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "luts-subsymbol-transform.h"
-
+#include "genie/entropy/gabac/luts-subsymbol-transform.h"
 #include <algorithm>
 #include <functional>
 #include <vector>
-
-#include <genie/util/block-stepper.h>
-#include <genie/util/data-block.h>
+#include "genie/util/block-stepper.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,8 +25,7 @@ bool LutEntry::operator>=(const LutEntry& entry) const { return (freq >= entry.f
 
 LutOrder1 LUTsSubSymbolTransform::getInitLutsOrder1(uint64_t numAlphaSubsym) {
     return std::vector<LutRow>(numAlphaSubsym, {std::vector<LutEntry>(numAlphaSubsym, {0, 0}),  // value, freq
-                                                0}                                              // numMaxElems
-    );
+                                                0});
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -36,13 +33,22 @@ LutOrder1 LUTsSubSymbolTransform::getInitLutsOrder1(uint64_t numAlphaSubsym) {
 LUTsSubSymbolTransform::LUTsSubSymbolTransform(const paramcabac::SupportValues& _supportVals,
                                                const paramcabac::StateVars& _stateVars, uint8_t _numLuts,
                                                uint8_t _numPrvs, const bool _modeFlag)
-    : supportVals(_supportVals), stateVars(_stateVars), numLuts(_numLuts), numPrvs(_numPrvs), encodingModeFlag(_modeFlag) {}
+    : supportVals(_supportVals),
+      stateVars(_stateVars),
+      numLuts(_numLuts),
+      numPrvs(_numPrvs),
+      encodingModeFlag(_modeFlag) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 LUTsSubSymbolTransform::LUTsSubSymbolTransform(const LUTsSubSymbolTransform& src)
-    : supportVals(src.supportVals), stateVars(src.stateVars), numLuts(src.numLuts), numPrvs(src.numPrvs),
-      encodingModeFlag(src.encodingModeFlag), lutsO1(src.lutsO1), lutsO2(src.lutsO2) {}
+    : supportVals(src.supportVals),
+      stateVars(src.stateVars),
+      numLuts(src.numLuts),
+      numPrvs(src.numPrvs),
+      encodingModeFlag(src.encodingModeFlag),
+      lutsO1(src.lutsO1),
+      lutsO2(src.lutsO2) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -76,7 +82,7 @@ void LUTsSubSymbolTransform::buildLuts(util::DataBlock* const symbols, util::Dat
     uint8_t const outputSymbolSize = supportVals.getOutputSymbolSize();
     uint8_t const codingSubsymSize = supportVals.getCodingSubsymSize();
     uint8_t const codingOrder = supportVals.getCodingOrder();
-    uint8_t const numSubsymbols = stateVars.getNumSubsymbols();
+    auto const numSubsymbols = (uint8_t)stateVars.getNumSubsymbols();
     uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
     uint64_t const subsymMask = paramcabac::StateVars::get2PowN(codingSubsymSize) - 1;
 
@@ -164,14 +170,14 @@ void LUTsSubSymbolTransform::decodeLUTs(Reader& reader) {
     uint64_t const numAlphaSubsym = stateVars.getNumAlphaSubsymbol();
 
     if (codingOrder == 2) {
-        setupLutsOrder2(stateVars.getNumSubsymbols(), numAlphaSubsym);
+        setupLutsOrder2((uint8_t)stateVars.getNumSubsymbols(), numAlphaSubsym);
         for (uint32_t s = 0; s < numLuts; s++) {
             for (uint32_t k = 0; k < numAlphaSubsym; k++) {
                 decodeLutOrder1(reader, numAlphaSubsym, codingSubsymSize, lutsO2[s][k]);
             }
         }
     } else if (codingOrder == 1) {
-        setupLutsOrder1(stateVars.getNumSubsymbols(), numAlphaSubsym);
+        setupLutsOrder1((uint8_t)stateVars.getNumSubsymbols(), numAlphaSubsym);
         for (uint32_t s = 0; s < numLuts; s++) {
             decodeLutOrder1(reader, numAlphaSubsym, codingSubsymSize, lutsO1[s]);
         }

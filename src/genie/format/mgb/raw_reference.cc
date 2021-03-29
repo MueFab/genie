@@ -4,11 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "raw_reference.h"
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
-#include <genie/util/runtime-exception.h>
+#include "genie/format/mgb/raw_reference.h"
 #include <sstream>
+#include <utility>
+#include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

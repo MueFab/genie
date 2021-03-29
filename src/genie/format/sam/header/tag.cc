@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "tag.h"
+#include "genie/format/sam/header/tag.h"
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

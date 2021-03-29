@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "bitreader.h"
+#include "genie/util/bitreader.h"
+#include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -39,7 +40,7 @@ void BitReader::skip(size_t bytes) { istream.seekg(bytes, std::ios_base::cur); }
 
 void BitReader::readBypass(void *in, size_t size) {
     bitsRead += size * 8;
-    istream.read((char *)in, size);
+    istream.read(reinterpret_cast<char *>(in), size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -72,7 +73,7 @@ uint64_t BitReader::read_b(uint8_t numBits) {
     if (numBits <= m_numHeldBits) {
         // Get numBits most significant bits from heldBits as bits
         bits = m_heldBits >> uint8_t(m_numHeldBits - numBits);
-        bits &= ~(0xffu << numBits);
+        bits &= ~(uint64_t(0xff) << numBits);
         m_numHeldBits -= numBits;
         return bits;
     }
@@ -148,7 +149,7 @@ void BitReader::readBypass(std::string &str) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool BitReader::isGood() const { return bool(istream); }
+bool BitReader::isGood() const { return static_cast<bool>(istream); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

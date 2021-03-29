@@ -1,5 +1,3 @@
-#include <genie/entropy/gabac/decode-cabac.h>
-#include <genie/entropy/gabac/encode-cabac.h>
 #include <genie/util/data-block.h>
 #include <gtest/gtest.h>
 #include <algorithm>

@@ -4,8 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DATA_BLOCK_IMPL_H
-#define GENIE_DATA_BLOCK_IMPL_H
+#ifndef SRC_GENIE_UTIL_DATA_BLOCK_IMPL_H_
+#define SRC_GENIE_UTIL_DATA_BLOCK_IMPL_H_
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -18,7 +22,7 @@ inline uint8_t DataBlock::getLgWordSize() const { return lgWordSize; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline int DataBlock::getWordSize() const { return 1 << lgWordSize; }
+inline uint8_t DataBlock::getWordSize() const { return 1 << lgWordSize; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -91,11 +95,11 @@ inline DataBlock::Iterator DataBlock::begin() { return {this, 0}; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline DataBlock::ConstIterator DataBlock::end() const { return {this, divByWordSize(data.size())}; }
+inline DataBlock::ConstIterator DataBlock::end() const { return {this, size_t(divByWordSize(data.size()))}; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-inline DataBlock::Iterator DataBlock::end() { return {this, divByWordSize(data.size())}; }
+inline DataBlock::Iterator DataBlock::end() { return {this, size_t(divByWordSize(data.size()))}; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -286,7 +290,7 @@ DataBlock::DataBlock(std::vector<T> *vec) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DATA_BLOCK_IMPL_H
+#endif  // SRC_GENIE_UTIL_DATA_BLOCK_IMPL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

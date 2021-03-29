@@ -4,15 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "header-info.h"
-#include <genie/core/locus.h>
-#include <genie/util/date.h>
-#include "tag-enum.h"
-#include "tag-number.h"
-#include "tag-object.h"
-#include "tag-string-list.h"
-#include "tag-string.h"
-#include "tag-version.h"
+#include "genie/format/sam/header/header-info.h"
+#include <vector>
+#include "genie/core/locus.h"
+#include "genie/format/sam/header/tag-enum.h"
+#include "genie/format/sam/header/tag-number.h"
+#include "genie/format/sam/header/tag-object.h"
+#include "genie/format/sam/header/tag-string-list.h"
+#include "genie/format/sam/header/tag-string.h"
+#include "genie/format/sam/header/tag-version.h"
+#include "genie/util/date.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

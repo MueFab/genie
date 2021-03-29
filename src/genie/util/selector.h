@@ -4,19 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SELECTOR_H
-#define GENIE_SELECTOR_H
+#ifndef SRC_GENIE_UTIL_SELECTOR_H_
+#define SRC_GENIE_UTIL_SELECTOR_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstddef>
 #include <functional>
 #include <vector>
-
-#include "drain.h"
-#include "selector-head.h"
-#include "selector-tail.h"
-#include "source.h"
+#include "genie/util/drain.h"
+#include "genie/util/selector-head.h"
+#include "genie/util/selector-tail.h"
+#include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,11 +29,11 @@ namespace util {
  */
 template <typename Tin, typename Tout>
 class Selector : public genie::util::Drain<Tin>, public genie::util::Source<Tout> {
-   private:
+ private:
     SelectorHead<Tin> head;   //!<
     SelectorTail<Tout> tail;  //!<
 
-   public:
+ public:
     /**
      *
      */
@@ -88,11 +87,11 @@ class Selector : public genie::util::Drain<Tin>, public genie::util::Source<Tout
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "selector.impl.h"
+#include "genie/util/selector.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_SELECTOR_H
+#endif  // SRC_GENIE_UTIL_SELECTOR_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

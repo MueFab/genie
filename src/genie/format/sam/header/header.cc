@@ -4,14 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "header.h"
-#include <genie/util/string-helpers.h>
-#include <regex>
+#include "genie/format/sam/header/header.h"
 #include <iostream>
-#include "tag-enum.h"
-#include "tag-number.h"
-#include "tag-string.h"
-#include "tag-version.h"
+#include <regex>
+#include <utility>
+#include "genie/format/sam/header/tag-enum.h"
+#include "genie/format/sam/header/tag-number.h"
+#include "genie/format/sam/header/tag-string.h"
+#include "genie/format/sam/header/tag-version.h"
+#include "genie/util/string-helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,9 +35,7 @@ void HeaderLine::addTag(std::unique_ptr<TagBase> tag) { tags.push_back(std::move
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<std::unique_ptr<TagBase>> &&HeaderLine::moveTags() {
-    return std::move(tags);
-}
+std::vector<std::unique_ptr<TagBase>>&& HeaderLine::moveTags() { return std::move(tags); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -96,13 +95,13 @@ HeaderLine::HeaderLine(const std::string& line) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 HeaderLine::HeaderLine(HeaderLine&& line) noexcept
-//    : name(std::move(line.name)), comment(std::move(line.comment)), tags(std::move(line.tags)) {}
+    //    : name(std::move(line.name)), comment(std::move(line.comment)), tags(std::move(line.tags)) {}
     : name(std::move(line.name)), tags(std::move(line.tags)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-HeaderLine::HeaderLine(std::string&& _name, std::string&& _comment)
-//    : name(std::move(_name)), comment(std::move(_comment)) {}
+HeaderLine::HeaderLine(std::string&& _name, std::string&&)
+    //    : name(std::move(_name)), comment(std::move(_comment)) {}
     : name(std::move(_name)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -123,12 +122,11 @@ Header::Header(std::istream& stream) {
         std::getline(stream, str);
 
         // Handle comment
-        if (str.substr(1, 2) == "CO"){
+        if (str.substr(1, 2) == "CO") {
             addComment(str.substr(4));
         } else {
             lines.emplace_back(str);
         }
-
     }
 }
 
@@ -150,9 +148,7 @@ const std::vector<HeaderLine>& Header::getLines() const { return lines; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Header::addComment(std::string&& _str) {
-    comments.push_back(std::move(_str.substr(4)));
-}
+void Header::addComment(std::string&& _str) { comments.push_back(_str.substr(4)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -161,7 +157,7 @@ void Header::addLine(HeaderLine&& line) { lines.emplace_back(std::move(line)); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Header::globalChecks() const {
-    // TODO
+    // TODO(Fabian): Implement
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -12,13 +12,13 @@
 // util::DataBlocks swap meaning. For wordsizes greater 1 this optimization is not possible, as the raw values do not
 // fit into the same data block where input values are still inside (different word sizes)
 
+#include "genie/entropy/gabac/equality-subseq-transform.h"
 #include <algorithm>
 #include <cassert>
 #include <iostream>
-
-#include <genie/util/block-stepper.h>
-#include <genie/util/data-block.h>
-#include "equality-subseq-transform.h"
+#include <vector>
+#include "genie/util/block-stepper.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -115,7 +115,7 @@ void inverseTransformEqualityCoding(std::vector<util::DataBlock> *const transfor
     // Prepare internal and the output data structures
     util::DataBlock *const flags = &((*transformedSubseqs)[0]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
-    util::DataBlock symbols(0, rawValues->getWordSize());
+    util::DataBlock symbols(0, (uint8_t)rawValues->getWordSize());
 
     util::BlockStepper rflag = flags->getReader();
     util::BlockStepper rval = rawValues->getReader();

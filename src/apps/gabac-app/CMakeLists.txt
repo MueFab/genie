@@ -9,3 +9,6 @@ set(source_files
 add_executable(gabac-app ${source_files})
 
 target_link_libraries(gabac-app PRIVATE genie-gabac)
+
+install(TARGETS gabac-app
+        RUNTIME DESTINATION "usr/bin")

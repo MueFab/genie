@@ -6,14 +6,14 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#ifndef GENIE_FASTA_REFERENCE_H
-#define GENIE_FASTA_REFERENCE_H
+#ifndef SRC_GENIE_FORMAT_FASTA_REFERENCE_H_
+#define SRC_GENIE_FORMAT_FASTA_REFERENCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/reference.h>
-
-#include "manager.h"
+#include <string>
+#include "genie/core/reference.h"
+#include "genie/format/fasta/manager.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,10 +25,10 @@ namespace fasta {
  *
  */
 class Reference : public core::Reference {
-   private:
+ private:
     Manager* mgr;  //!<
 
-   public:
+ public:
     /**
      *
      * @param name
@@ -54,7 +54,7 @@ class Reference : public core::Reference {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_FASTA_REFERENCE_H
+#endif  // SRC_GENIE_FORMAT_FASTA_REFERENCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

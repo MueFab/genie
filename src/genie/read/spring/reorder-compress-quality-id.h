@@ -4,18 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SPRING_REORDER_COMPRESS_QUALITY_ID_H_
-#define SPRING_REORDER_COMPRESS_QUALITY_ID_H_
+#ifndef SRC_GENIE_READ_SPRING_REORDER_COMPRESS_QUALITY_ID_H_
+#define SRC_GENIE_READ_SPRING_REORDER_COMPRESS_QUALITY_ID_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/entropy-encoder.h>
-#include <genie/core/name-encoder.h>
-#include <genie/core/qv-encoder.h>
-#include <genie/core/read-encoder.h>
 #include <string>
-
-#include "util.h"
+#include <vector>
+#include "genie/core/entropy-encoder.h"
+#include "genie/core/name-encoder.h"
+#include "genie/core/qv-encoder.h"
+#include "genie/core/read-encoder.h"
+#include "genie/read/spring/util.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -134,7 +134,7 @@ void reorder_compress(const std::string &file_name, const std::string &temp_dir,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SPRING_REORDER_COMPRESS_QUALITY_ID_H_
+#endif  // SRC_GENIE_READ_SPRING_REORDER_COMPRESS_QUALITY_ID_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

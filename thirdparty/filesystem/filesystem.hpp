@@ -1236,7 +1236,7 @@ GHC_INLINE unsigned consumeUtf8Fragment(const unsigned state, const uint8_t frag
     codepoint = (state ? (codepoint << 6) | (fragment & 0x3f) : (0xff >> category) & fragment);
     return state == S_RJCT ? static_cast<unsigned>(S_RJCT) : static_cast<unsigned>((utf8_state_info[category + 16] >> (state << 2)) & 0xf);
 }
-    
+
 GHC_INLINE bool validUtf8(const std::string& utf8String)
 {
     std::string::const_iterator iter = utf8String.begin();
@@ -1254,9 +1254,9 @@ GHC_INLINE bool validUtf8(const std::string& utf8String)
 }
 
 }  // namespace detail
-    
+
 #endif
-    
+
 namespace detail {
 
 template <class StringType, typename std::enable_if<(sizeof(typename StringType::value_type) == 1)>::type* = nullptr>
@@ -4013,7 +4013,7 @@ GHC_INLINE bool remove(const path& p)
     std::error_code ec;
     auto result = remove(p, ec);
     if (ec) {
-        throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
+//        throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
     }
     return result;
 }

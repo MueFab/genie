@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "reference.h"
-#include "importer.h"
+#include "genie/format/mgb/reference.h"
+#include "genie/format/mgb/importer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

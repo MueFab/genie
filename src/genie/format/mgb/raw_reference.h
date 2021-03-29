@@ -4,16 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_RAW_REFERENCE_H
-#define GENIE_RAW_REFERENCE_H
+#ifndef SRC_GENIE_FORMAT_MGB_RAW_REFERENCE_H_
+#define SRC_GENIE_FORMAT_MGB_RAW_REFERENCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/parameter/data_unit.h>
-#include <genie/util/bitwriter.h>
 #include <cstdint>
 #include <vector>
-#include "raw_reference_seq.h"
+#include "genie/core/parameter/data_unit.h"
+#include "genie/format/mgb/raw_reference_seq.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,10 +25,10 @@ namespace mgb {
  *
  */
 class RawReference : public core::parameter::DataUnit {
-   private:
+ private:
     std::vector<RawReferenceSequence> seqs;  //!<
 
-   public:
+ public:
     /**
      *
      */
@@ -92,7 +92,7 @@ class RawReference : public core::parameter::DataUnit {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_RAW_REFERENCE_H
+#endif  // SRC_GENIE_FORMAT_MGB_RAW_REFERENCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

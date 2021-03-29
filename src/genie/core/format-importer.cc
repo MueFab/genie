@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "format-importer.h"
+#include "genie/core/format-importer.h"
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,13 +26,13 @@ bool FormatImporter::pump(uint64_t& id, std::mutex& lock) {
         chunk = classifier->getChunk();
         uint32_t segment_count = 0;
         for (const auto& r : chunk.getData()) {
-            segment_count += r.getSegments().size();
+            segment_count += uint32_t(r.getSegments().size());
         }
         if (chunk.getData().empty()) {
             segment_count = 1;
         }
         if (!chunk.getData().empty() || !chunk.getRefToWrite().empty()) {
-            sec = {id, segment_count, true};
+            sec = {size_t(id), segment_count, true};
             id += segment_count;
         } else {
             bool dataLeft = pumpRetrieve(classifier);

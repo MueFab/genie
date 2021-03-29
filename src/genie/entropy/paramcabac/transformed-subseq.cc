@@ -4,10 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "transformed-subseq.h"
-
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
+#include "genie/entropy/paramcabac/transformed-subseq.h"
+#include <utility>
+#include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -18,7 +18,8 @@ namespace paramcabac {
 // ---------------------------------------------------------------------------------------------------------------------
 
 TransformedSubSeq::TransformedSubSeq()
-    : TransformedSubSeq(SupportValues::TransformIdSubsym::NO_TRANSFORM, SupportValues(), Binarization(), core::GenSub::POS_MAPPING_FIRST) {}
+    : TransformedSubSeq(SupportValues::TransformIdSubsym::NO_TRANSFORM, SupportValues(), Binarization(),
+                        core::GenSub::POS_MAPPING_FIRST) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DRAIN_H
-#define GENIE_DRAIN_H
+#ifndef SRC_GENIE_UTIL_DRAIN_H_
+#define SRC_GENIE_UTIL_DRAIN_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ struct Section {
  */
 template <typename TYPE>
 class Drain {
-   public:
+ public:
     /**
      * @brief Accept one chunk of data.
      * @param t Input data chunk
@@ -65,7 +65,7 @@ class Drain {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DRAIN_H
+#endif  // SRC_GENIE_UTIL_DRAIN_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

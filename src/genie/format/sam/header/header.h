@@ -4,17 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_HEADER_H
-#define GENIE_HEADER_H
+#ifndef SRC_GENIE_FORMAT_SAM_HEADER_HEADER_H_
+#define SRC_GENIE_FORMAT_SAM_HEADER_HEADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
-#include "header-info.h"
-#include "tag.h"
-#include <map>
+#include "genie/format/sam/header/header-info.h"
+#include "genie/format/sam/header/tag.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,14 +26,14 @@ namespace header {
 // ---------------------------------------------------------------------------------------------------------------------
 
 class HeaderLine {
-   private:
+ private:
     std::string name;
     std::vector<std::unique_ptr<TagBase>> tags;
 
     void parseSingleTag(const std::string& value, const TagInfo& info);
     void parseTags(const std::vector<std::string>& _tags, const HeaderLineInfo& info);
 
-   public:
+ public:
     const std::string& getName() const;
 
     const std::vector<std::unique_ptr<TagBase>>& getTags() const;
@@ -51,15 +51,13 @@ class HeaderLine {
 
 // Store parsed header lines
 class Header {
-   private:
+ private:
     std::vector<HeaderLine> lines;
     std::vector<std::string> comments;
 
     void globalChecks() const;
 
-   public:
-
-
+ public:
     explicit Header(std::istream& stream);
     Header() = default;
     Header(Header&& header) noexcept;
@@ -82,7 +80,7 @@ class Header {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_HEADER_H
+#endif  // SRC_GENIE_FORMAT_SAM_HEADER_HEADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

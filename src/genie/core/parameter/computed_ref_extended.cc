@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "computed_ref_extended.h"
+#include "genie/core/parameter/computed_ref_extended.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

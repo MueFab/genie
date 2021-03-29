@@ -4,17 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_TRANSFORMED_SUBSEQ_H
-#define GENIE_TRANSFORMED_SUBSEQ_H
+#ifndef SRC_GENIE_ENTROPY_PARAMCABAC_TRANSFORMED_SUBSEQ_H_
+#define SRC_GENIE_ENTROPY_PARAMCABAC_TRANSFORMED_SUBSEQ_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
 #include <memory>
-#include "binarization.h"
-#include "state_vars.h"
-#include "support_values.h"
+#include "genie/entropy/paramcabac/binarization.h"
+#include "genie/entropy/paramcabac/state_vars.h"
+#include "genie/entropy/paramcabac/support_values.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ namespace paramcabac {
  * ISO 23092-2 Section 8.3.1 table lines 9 to 11
  */
 class TransformedSubSeq {
-   public:
+ public:
     /**
      *
      */
@@ -41,8 +41,7 @@ class TransformedSubSeq {
      * @param _alphabet_ID
      */
     TransformedSubSeq(SupportValues::TransformIdSubsym _transform_ID_subsym, SupportValues&& _support_values,
-                      Binarization&& _cabac_binarization,
-                      const core::GenSubIndex _subsequence_ID,
+                      Binarization&& _cabac_binarization, const core::GenSubIndex _subsequence_ID,
                       const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
     /**
      *
@@ -50,8 +49,7 @@ class TransformedSubSeq {
      * @param _subsequence_ID
      * @param _alphabet_ID
      */
-    TransformedSubSeq(util::BitReader& reader,
-                      const core::GenSubIndex _subsequence_ID,
+    TransformedSubSeq(util::BitReader& reader, const core::GenSubIndex _subsequence_ID,
                       const core::AlphabetID _alphabet_ID = core::AlphabetID::ACGTN);
 
     /**
@@ -119,7 +117,7 @@ class TransformedSubSeq {
                subsequence_ID == val.subsequence_ID && alphabet_ID == val.alphabet_ID;
     }
 
-   private:
+ private:
     SupportValues::TransformIdSubsym transform_ID_subsym;  //!< : 3; Line 9
     SupportValues support_values;                          //!< Line 10
     Binarization cabac_binarization;                       //!< Line 11
@@ -138,7 +136,7 @@ class TransformedSubSeq {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_TRANSFORMED_SUBSEQ_H
+#endif  // SRC_GENIE_ENTROPY_PARAMCABAC_TRANSFORMED_SUBSEQ_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,9 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "exporter.h"
-#include <genie/util/watch.h>
-#include "raw_reference.h"
+#include "genie/format/mgb/exporter.h"
+#include <string>
+#include <utility>
+#include "genie/format/mgb/raw_reference.h"
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,8 +28,8 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
     util::OrderedSection section(&lock, id);
     getStats().add(data.getStats());
     size_t parameter_id = parameter_stash.size();
-    data.getParameters().setID(parameter_id);
-    data.getParameters().setParentID(parameter_id);
+    data.getParameters().setID((uint8_t)parameter_id);
+    data.getParameters().setParentID((uint8_t)parameter_id);
     mgb::RawReference ref;
     for (const auto& p : data.getRefToWrite()) {
         auto string = *data.getReferenceExcerpt().getChunkAt(p.first);
@@ -63,7 +65,8 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
                            : (data.isReferenceOnly() ? core::parameter::DataUnit::DatasetType::REFERENCE
                                                      : core::parameter::DataUnit::DatasetType::NON_ALIGNED);
 
-    mgb::AccessUnit au(id_ctr, parameter_id, data.getClassType(), data.getNumReads(), datasetType, 32, 32, 0);
+    mgb::AccessUnit au((uint32_t)id_ctr, (uint8_t)parameter_id, data.getClassType(), (uint32_t)data.getNumReads(),
+                       datasetType, 32, 32, 0);
     if (data.isReferenceOnly()) {
         au.setRefCfg(RefCfg(data.getReference(), data.getReferenceExcerpt().getGlobalStart(),
                             data.getReferenceExcerpt().getGlobalEnd() - 1, 32));
@@ -72,7 +75,7 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
         au.setAuTypeCfg(
             AuTypeCfg(data.getReference(), data.getMinPos(), data.getMaxPos(), data.getParameters().getPosSize()));
     }
-    for (size_t descriptor = 0; descriptor < core::getDescriptors().size(); ++descriptor) {
+    for (uint8_t descriptor = 0; descriptor < (uint8_t)core::getDescriptors().size(); ++descriptor) {
         if (data.get(core::GenDesc(descriptor)).isEmpty()) {
             continue;
         }

@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_CONFIGURATION_H_
-#define GABAC_CONFIGURATION_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_CONFIGURATION_H_
+#define SRC_GENIE_ENTROPY_GABAC_CONFIGURATION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -13,9 +13,8 @@
 #include <ostream>
 #include <string>
 #include <vector>
-
-#include <genie/entropy/paramcabac/subsequence.h>
-#include "config-manual.h"
+#include "genie/entropy/gabac/config-manual.h"
+#include "genie/entropy/paramcabac/subsequence.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +26,7 @@ namespace gabac {
  * @brief Specifies which gabac transformations to execute
  */
 struct EncodingConfiguration {
-   public:
+ public:
     /**
      * @brief Create default config
      */
@@ -42,7 +41,7 @@ struct EncodingConfiguration {
     /**
      * @brief Create config from subseq
      */
-    EncodingConfiguration(paramcabac::Subsequence&& _subseq);
+    explicit EncodingConfiguration(paramcabac::Subsequence&& _subseq);
 
     /**
      * @brief Destroy config
@@ -81,7 +80,7 @@ struct EncodingConfiguration {
      */
     void setSubseqConfig(paramcabac::Subsequence&& _subseqCfg);
 
-   private:
+ private:
     paramcabac::Subsequence subseqCfg;  //!<
 };
 
@@ -92,8 +91,7 @@ struct IOConfiguration {
     std::istream* inputStream;      /**< @brief Where to read from */
     std::istream* dependencyStream; /**< @brief Where to read from */
     std::ostream* outputStream;     /**< @brief Where to write to */
-    size_t blocksize;               /**< @brief How many bytes to read at once. Put 0 to read
-                                       all in one go */
+    size_t blocksize;               /**< @brief How many bytes to read at once. Put 0 to read all in one go */
 
     std::ostream* logStream; /**< @brief Where to write logging information*/
 
@@ -134,7 +132,7 @@ struct IOConfiguration {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_CONFIGURATION_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_CONFIGURATION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

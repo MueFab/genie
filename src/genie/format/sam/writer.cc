@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "writer.h"
+#include "genie/format/sam/writer.h"
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,17 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DESCRIPTOR_SUBSEQ_CFG_H
-#define GENIE_DESCRIPTOR_SUBSEQ_CFG_H
+#ifndef SRC_GENIE_CORE_PARAMETER_DESCRIPTOR_SUBSEQ_CFG_H_
+#define SRC_GENIE_CORE_PARAMETER_DESCRIPTOR_SUBSEQ_CFG_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/constants.h>
-#include <genie/util/bitreader.h>
-
 #include <memory>
-
-#include "descriptor.h"
+#include <vector>
+#include "genie/core/constants.h"
+#include "genie/core/parameter/descriptor.h"
+#include "genie/util/bitreader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +25,7 @@ namespace parameter {
  *
  */
 class DescriptorSubseqCfg {
-   public:
+ public:
     /**
      *
      */
@@ -122,7 +121,7 @@ class DescriptorSubseqCfg {
      */
     bool operator==(const DescriptorSubseqCfg& cfg) const;
 
-   private:
+ private:
     /**
      *
      * @param cfg
@@ -142,7 +141,7 @@ class DescriptorSubseqCfg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DESCRIPTOR_SUBSEQ_CFG_H
+#endif  // SRC_GENIE_CORE_PARAMETER_DESCRIPTOR_SUBSEQ_CFG_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

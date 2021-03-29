@@ -4,16 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SEGMENT_H
-#define GENIE_SEGMENT_H
+#ifndef SRC_GENIE_CORE_RECORD_SEGMENT_H_
+#define SRC_GENIE_CORE_RECORD_SEGMENT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
 #include <memory>
 #include <string>
 #include <vector>
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ class Segment {
     std::string sequence;                     //!<
     std::vector<std::string> quality_values;  //!<
 
-   public:
+ public:
     /**
      *
      */
@@ -83,7 +83,7 @@ class Segment {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_SEGMENT_H
+#endif  // SRC_GENIE_CORE_RECORD_SEGMENT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
