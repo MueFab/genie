@@ -4,17 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_READER_H_
-#define GABAC_READER_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_READER_H_
+#define SRC_GENIE_ENTROPY_GABAC_READER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstddef>
 #include <cstdint>
 #include <vector>
-
-#include "binary-arithmetic-decoder.h"
-#include "bit-input-stream.h"
+#include "genie/entropy/gabac/binary-arithmetic-decoder.h"
+#include "genie/entropy/gabac/bit-input-stream.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,14 +33,14 @@ namespace gabac {
  *
  */
 class Reader {
-   public:
+ public:
     /**
      *
      * @param bitstream
      * @param bypassFlag
      * @param numContexts
      */
-    explicit Reader(util::DataBlock *bitstream, const bool bypassFlag = true, const unsigned long numContexts = 0);
+    explicit Reader(util::DataBlock *bitstream, const bool bypassFlag = true, uint64_t numContexts = 0);
 
     /**
      *
@@ -175,12 +174,12 @@ class Reader {
      */
     void reset();
 
-   private:
+ private:
     BitInputStream m_bitInputStream;        //!<
     BinaryArithmeticDecoder m_decBinCabac;  //!<
 
-    bool m_bypassFlag;            //!<
-    unsigned long m_numContexts;  //!<
+    bool m_bypassFlag;       //!<
+    uint64_t m_numContexts;  //!<
 
     std::vector<ContextModel> m_contextModels;  //!<
 };
@@ -193,7 +192,7 @@ class Reader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_READER_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_READER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

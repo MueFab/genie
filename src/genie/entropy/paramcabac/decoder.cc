@@ -4,8 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "decoder.h"
-#include <genie/util/bitwriter.h>
+#include "genie/entropy/paramcabac/decoder.h"
+#include <memory>
+#include <utility>
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,13 +24,14 @@ DecoderRegular::DecoderRegular() : core::parameter::desc_pres::DecoderRegular(MO
 DecoderRegular::DecoderRegular(core::GenDesc desc)
     : core::parameter::desc_pres::DecoderRegular(MODE_CABAC), descriptor_subsequence_cfgs() {
     for (size_t i = 0; i < core::getDescriptors()[uint8_t(desc)].subseqs.size(); ++i) {
-        descriptor_subsequence_cfgs.emplace_back(i, false);
+        descriptor_subsequence_cfgs.emplace_back((uint16_t)i, false);
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DecoderRegular::DecoderRegular(core::GenDesc desc, util::BitReader &reader) : core::parameter::desc_pres::DecoderRegular(MODE_CABAC) {
+DecoderRegular::DecoderRegular(core::GenDesc desc, util::BitReader &reader)
+    : core::parameter::desc_pres::DecoderRegular(MODE_CABAC) {
     uint8_t num_descriptor_subsequence_cfgs = reader.read<uint8_t>() + 1;
     for (size_t i = 0; i < num_descriptor_subsequence_cfgs; ++i) {
         descriptor_subsequence_cfgs.emplace_back(false, desc, reader);
@@ -59,7 +62,8 @@ Subsequence &DecoderRegular::getSubsequenceCfg(uint8_t index) { return descripto
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<core::parameter::desc_pres::DecoderRegular> DecoderRegular::create(genie::core::GenDesc desc, util::BitReader &reader) {
+std::unique_ptr<core::parameter::desc_pres::DecoderRegular> DecoderRegular::create(genie::core::GenDesc desc,
+                                                                                   util::BitReader &reader) {
     return util::make_unique<DecoderRegular>(desc, reader);
 }
 
@@ -77,14 +81,15 @@ void DecoderRegular::write(util::BitWriter &writer) const {
 
 DecoderTokenType::DecoderTokenType()
     : core::parameter::desc_pres::DecoderTokentype(MODE_CABAC), rle_guard_tokentype(0), descriptor_subsequence_cfgs() {
-    for (size_t i = 0; i < 2; ++i) {
+    for (uint16_t i = 0; i < 2; ++i) {
         descriptor_subsequence_cfgs.emplace_back(i, true);
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DecoderTokenType::DecoderTokenType(core::GenDesc desc, util::BitReader &reader) : core::parameter::desc_pres::DecoderTokentype(MODE_CABAC) {
+DecoderTokenType::DecoderTokenType(core::GenDesc desc, util::BitReader &reader)
+    : core::parameter::desc_pres::DecoderTokentype(MODE_CABAC) {
     uint8_t num_descriptor_subsequence_cfgs = 2;
     rle_guard_tokentype = reader.read<uint8_t>();
     for (size_t i = 0; i < num_descriptor_subsequence_cfgs; ++i) {
@@ -116,7 +121,8 @@ Subsequence &DecoderTokenType::getSubsequenceCfg(uint8_t index) { return descrip
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<core::parameter::desc_pres::DecoderTokentype> DecoderTokenType::create(genie::core::GenDesc desc, util::BitReader &reader) {
+std::unique_ptr<core::parameter::desc_pres::DecoderTokentype> DecoderTokenType::create(genie::core::GenDesc desc,
+                                                                                       util::BitReader &reader) {
     return util::make_unique<DecoderTokenType>(desc, reader);
 }
 

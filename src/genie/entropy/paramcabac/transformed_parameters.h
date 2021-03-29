@@ -4,17 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_TRANSFORMED_PARAMETERS_H
-#define GENIE_TRANSFORMED_PARAMETERS_H
+#ifndef SRC_GENIE_ENTROPY_PARAMCABAC_TRANSFORMED_PARAMETERS_H_
+#define SRC_GENIE_ENTROPY_PARAMCABAC_TRANSFORMED_PARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
-#include <boost/optional/optional.hpp>
 #include <memory>
 #include <vector>
+#include "boost/optional/optional.hpp"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ namespace paramcabac {
  * ISO 23092-2 Section 8.3.4 table
  */
 class TransformedParameters {
-   public:
+ public:
     /**
      *
      */
@@ -104,7 +104,7 @@ class TransformedParameters {
                merge_coding_shift_size == val.merge_coding_shift_size;
     }
 
-   private:
+ private:
     TransformIdSubseq transform_ID_subseq;               //!< : 8; Line 2
     boost::optional<uint16_t> match_coding_buffer_size;  //!< : 16; Line 6
     boost::optional<uint8_t> rle_coding_guard;           //!< : 8; Line 9
@@ -120,7 +120,7 @@ class TransformedParameters {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_TRANSFORMED_PARAMETERS_H
+#endif  // SRC_GENIE_ENTROPY_PARAMCABAC_TRANSFORMED_PARAMETERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

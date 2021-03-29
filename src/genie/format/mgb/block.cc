@@ -4,10 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "block.h"
-#include <genie/util/bitwriter.h>
+#include "genie/format/mgb/block.h"
 #include <memory>
 #include <sstream>
+#include <utility>
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

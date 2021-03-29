@@ -4,13 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SUPPORT_VALUES_H
-#define GENIE_SUPPORT_VALUES_H
+#ifndef SRC_GENIE_ENTROPY_PARAMCABAC_SUPPORT_VALUES_H_
+#define SRC_GENIE_ENTROPY_PARAMCABAC_SUPPORT_VALUES_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@ namespace paramcabac {
  * ISO 23092-2 Section 8.3.2 table
  */
 class SupportValues {
-   public:
+ public:
     /**
      *
      */
@@ -99,7 +99,7 @@ class SupportValues {
                share_subsym_prv_flag == val.share_subsym_prv_flag;
     }
 
-   private:
+ private:
     uint8_t output_symbol_size;  //!<
     uint8_t coding_subsym_size;  //!<
     uint8_t coding_order;        //!<
@@ -115,7 +115,7 @@ class SupportValues {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_SUPPORT_VALUES_H
+#endif  // SRC_GENIE_ENTROPY_PARAMCABAC_SUPPORT_VALUES_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

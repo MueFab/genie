@@ -4,10 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "genie/entropy/gabac/rle-subseq-transform.h"
 #include <cassert>
-
-#include <genie/util/block-stepper.h>
-#include "rle-subseq-transform.h"
+#include <vector>
+#include "genie/util/block-stepper.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,7 +20,7 @@ namespace gabac {
 void transformRleCoding(const paramcabac::Subsequence &subseqCfg,
                         std::vector<util::DataBlock> *const transformedSubseqs) {
     assert(transformedSubseqs != nullptr);
-    const uint8_t guard = subseqCfg.getTransformParameters().getParam();
+    const auto guard = (uint8_t)subseqCfg.getTransformParameters().getParam();
     assert(guard > 0);
 
     // Prepare internal and the output data structures
@@ -87,13 +87,13 @@ void inverseTransformRleCoding(const paramcabac::Subsequence &subseqCfg,
         UTILS_DIE("invalid subseq count for rle inverse transform");
     }
 
-    const uint8_t guard = subseqCfg.getTransformParameters().getParam();
+    const auto guard = (uint16_t)subseqCfg.getTransformParameters().getParam();
     assert(guard > 0);
 
     // Prepare internal and the output data structures
     util::DataBlock *const lengths = &((*transformedSubseqs)[0]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[1]);
-    util::DataBlock symbols(0, rawValues->getWordSize());
+    util::DataBlock symbols(0, (uint8_t)rawValues->getWordSize());
 
     util::BlockStepper rVal = rawValues->getReader();
     util::BlockStepper rLen = lengths->getReader();

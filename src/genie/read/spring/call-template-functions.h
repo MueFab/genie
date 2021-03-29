@@ -4,13 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SPRING_CALL_TEMPLATE_FUNCTIONS_H_
-#define SPRING_CALL_TEMPLATE_FUNCTIONS_H_
+#ifndef SRC_GENIE_READ_SPRING_CALL_TEMPLATE_FUNCTIONS_H_
+#define SRC_GENIE_READ_SPRING_CALL_TEMPLATE_FUNCTIONS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <string>
-#include "util.h"
+#include "genie/read/spring/util.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ void call_encoder(const std::string &temp_dir, compression_params &cp);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SPRING_CALL_TEMPLATE_FUNCTIONS_H_
+#endif  // SRC_GENIE_READ_SPRING_CALL_TEMPLATE_FUNCTIONS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

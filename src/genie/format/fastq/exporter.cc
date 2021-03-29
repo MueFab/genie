@@ -4,9 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "exporter.h"
-#include <genie/util/ordered-section.h>
-#include <genie/util/watch.h>
+#include "genie/format/fastq/exporter.h"
+#include <string>
+#include <utility>
+#include "genie/util/ordered-section.h"
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,10 +36,19 @@ void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
     size_t size_seq = 0;
     size_t size_qual = 0;
     size_t size_name = 0;
+
+    auto num_files = file.size();
+    // ideally should be 2 for paired end, but we can handle 1 as well
+    const char readname_suffix[2][3] = {"/1", "/2"};
+    // suffix attached when paired end data but only one output fastq file
+    bool second_read_flag = false;  // true when we are handling second read
+
     for (const auto &i : data.getData()) {
         auto file_ptr = file.data();
+        second_read_flag = false;
         if (!i.isRead1First()) {
-            file_ptr = &file.back();
+            second_read_flag = true;
+            if (num_files == 2) file_ptr = &file.back();
         }
         for (const auto &rec : i.getSegments()) {
             // ID
@@ -45,6 +56,8 @@ void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
             constexpr const char *ID_TOKEN = "@";
             (*file_ptr)->write(ID_TOKEN, 1);
             (*file_ptr)->write(i.getName().c_str(), i.getName().length());
+            if (i.getNumberOfTemplateSegments() == 2 && num_files == 1)
+                (*file_ptr)->write(readname_suffix[second_read_flag], 2);
             (*file_ptr)->write("\n", 1);
 
             // Sequence
@@ -68,10 +81,13 @@ void Exporter::flowIn(core::record::Chunk &&t, const util::Section &id) {
                 (*file_ptr)->write(qual.c_str(), qual.length());
             }
             (*file_ptr)->write("\n", 1);
-            if (i.isRead1First()) {
-                file_ptr++;
-            } else {
-                file_ptr--;
+            second_read_flag = !second_read_flag;
+            if (num_files == 2) {
+                if (i.isRead1First()) {
+                    file_ptr++;
+                } else {
+                    file_ptr--;
+                }
             }
         }
     }

@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "decoder-tokentype.h"
+#include "genie/core/parameter/descriptor_present/decoder-tokentype.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

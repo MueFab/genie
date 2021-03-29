@@ -4,18 +4,19 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ENCODER_SOURCE_H
-#define GENIE_ENCODER_SOURCE_H
+#ifndef SRC_GENIE_READ_SPRING_ENCODER_SOURCE_H_
+#define SRC_GENIE_READ_SPRING_ENCODER_SOURCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/access-unit.h>
-#include <genie/core/parameter/parameter_set.h>
-#include <genie/core/stats/perf-stats.h>
-#include <genie/util/original-source.h>
-#include <genie/util/source.h>
+#include <string>
 #include <vector>
-#include "util.h"
+#include "genie/core/access-unit.h"
+#include "genie/core/parameter/parameter_set.h"
+#include "genie/core/stats/perf-stats.h"
+#include "genie/read/spring/util.h"
+#include "genie/util/original-source.h"
+#include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ namespace spring {
  *
  */
 class SpringSource : public util::OriginalSource, public util::Source<core::AccessUnit> {
-   private:
+ private:
     uint32_t num_AUs;                                    //!<
     std::string read_desc_prefix;                        //!<
     std::string id_desc_prefix;                          //!<
@@ -39,7 +40,7 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
 
     core::stats::PerfStats stats;  //!<
 
-   public:
+ public:
     /**
      *
      * @param temp_dir
@@ -73,7 +74,7 @@ class SpringSource : public util::OriginalSource, public util::Source<core::Acce
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ENCODER_SOURCE_H
+#endif  // SRC_GENIE_READ_SPRING_ENCODER_SOURCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

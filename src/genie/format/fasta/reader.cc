@@ -4,12 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "reader.h"
-
-#include <genie/util/runtime-exception.h>
-
+#include "genie/format/fasta/reader.h"
 #include <algorithm>
 #include <istream>
+#include <set>
+#include <string>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@ std::string FastaReader::loadSection(const std::string& sequence, uint64_t start
             break;
         }
     }
-    std::transform(ret.begin(), ret.end(), ret.begin(), ::toupper);
+    std::transform(ret.begin(), ret.end(), ret.begin(), [](char x) -> char { return static_cast<char>(toupper(x)); });
     return ret;
 }
 

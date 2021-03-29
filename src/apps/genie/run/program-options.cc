@@ -4,14 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "program-options.h"
-#include <genie/util/runtime-exception.h>
-#include <cli11/CLI11.hpp>
-#include <filesystem/filesystem.hpp>
+#include "apps/genie/run/program-options.h"
 #include <iostream>
 #include <set>
 #include <string>
 #include <thread>
+#include <vector>
+#include "cli11/CLI11.hpp"
+#include "filesystem/filesystem.hpp"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -38,7 +39,7 @@ std::string parent_dir(const std::string &path) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ProgramOptions::ProgramOptions(int argc, char *argv[]) {
+ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
     CLI::App app("Genie MPEG-G reference encoder\n");
 
     app.add_option("-i,--input-file", inputFile, "")->mandatory(true);
@@ -64,6 +65,9 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) {
     forceOverwrite = false;
     app.add_flag("-f,--force", forceOverwrite, "");
 
+    combinePairsFlag = false;
+    app.add_flag("--combine-pairs", combinePairsFlag, "");
+
     lowLatency = false;
     app.add_flag("--low-latency", lowLatency, "");
 
@@ -86,6 +90,10 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) {
         while (workingDirectory.back() == '/') {
             workingDirectory.pop_back();
         }
+    } catch (const CLI::CallForHelp &) {
+        std::cout << app.help() << std::endl;
+        help = true;
+        return;
     } catch (const CLI::ParseError &e) {
         UTILS_DIE("Command line parsing failed:" + std::to_string(app.exit(e)));
     }

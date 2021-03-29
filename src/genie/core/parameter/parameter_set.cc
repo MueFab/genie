@@ -4,11 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "parameter_set.h"
-
-#include <genie/core/global-cfg.h>
-
+#include "genie/core/parameter/parameter_set.h"
 #include <sstream>
+#include <string>
+#include <utility>
+#include "genie/core/global-cfg.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -56,8 +56,8 @@ ParameterSet::ParameterSet(util::BitReader &bitReader) : DataUnit(DataUnitType::
     }
     for (size_t i = 0; i < num_classes; ++i) {
         auto mode = bitReader.read<uint8_t>(4);
-        qv_coding_configs.emplace_back(
-            GlobalCfg::getSingleton().getIndustrialPark().construct<QualityValues>(mode, genie::core::GenDesc::QV, bitReader));
+        qv_coding_configs.emplace_back(GlobalCfg::getSingleton().getIndustrialPark().construct<QualityValues>(
+            mode, genie::core::GenDesc::QV, bitReader));
     }
     auto crps_flag = bitReader.read<bool>(1);
     if (crps_flag) {
@@ -396,7 +396,7 @@ const QualityValues &ParameterSet::getQVConfig(record::ClassType type) const {
             return *(qv_coding_configs[i]);
         }
     }
-    UTILS_DIE("No matching qv config " + std::to_string(int(type)) + " in parameter set");
+    UTILS_DIE("No matching qv config " + std::to_string(static_cast<int>(type)) + " in parameter set");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -409,7 +409,7 @@ void ParameterSet::setParentID(uint8_t id) { parent_parameter_set_ID = id; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ParameterSet::getParentID() const {return parent_parameter_set_ID;}
+uint8_t ParameterSet::getParentID() const { return parent_parameter_set_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_CABAC_TABLES_H_
-#define GABAC_CABAC_TABLES_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_CABAC_TABLES_H_
+#define SRC_GENIE_ENTROPY_GABAC_CABAC_TABLES_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ const std::vector<unsigned char> nextStateMps = {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_CABAC_TABLES_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_CABAC_TABLES_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

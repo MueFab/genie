@@ -4,17 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DATA_UNIT_FACTORY_H
-#define GENIE_DATA_UNIT_FACTORY_H
+#ifndef SRC_GENIE_FORMAT_MGB_DATA_UNIT_FACTORY_H_
+#define SRC_GENIE_FORMAT_MGB_DATA_UNIT_FACTORY_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/parameter/parameter_set.h>
-
 #include <map>
-
-#include "access_unit.h"
-#include "raw_reference.h"
+#include "genie/core/parameter/parameter_set.h"
+#include "genie/format/mgb/access_unit.h"
+#include "genie/format/mgb/raw_reference.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,13 +28,13 @@ class Importer;
  *
  */
 class DataUnitFactory {
-   private:
+ private:
     std::map<size_t, core::parameter::ParameterSet> parameters;  //!<
     core::ReferenceManager* refmgr;                              //!<
     Importer* importer;                                          //!<
     bool referenceOnly;                                          //!<
 
-   public:
+ public:
     /**
      *
      * @param mgr
@@ -74,7 +72,7 @@ class DataUnitFactory {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DATA_UNIT_FACTORY_H
+#endif  // SRC_GENIE_FORMAT_MGB_DATA_UNIT_FACTORY_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,15 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_STATE_VARS_H
-#define GENIE_STATE_VARS_H
+#ifndef SRC_GENIE_ENTROPY_PARAMCABAC_STATE_VARS_H_
+#define SRC_GENIE_ENTROPY_PARAMCABAC_STATE_VARS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "binarization.h"
-#include "support_values.h"
-
-#include <genie/core/constants.h>
+#include "genie/core/constants.h"
+#include "genie/entropy/paramcabac/binarization.h"
+#include "genie/entropy/paramcabac/support_values.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +23,7 @@ namespace paramcabac {
  * ISO 23092-2 Section 8.3.2 table
  */
 class StateVars {
-   private:
+ private:
     uint64_t numAlphaSubsym;           //!<
     uint32_t numSubsyms;               //!<
     uint32_t numCtxSubsym;             //!<
@@ -34,7 +33,7 @@ class StateVars {
     uint32_t numCtxLuts;               //!<
     uint64_t numCtxTotal;              //!<
 
-   public:
+ public:
     static const uint32_t MAX_LUT_SIZE = (1u << 8u);  //!<
 
     bool operator==(const StateVars& bin) const {
@@ -185,7 +184,7 @@ class StateVars {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_STATE_VARS_H
+#endif  // SRC_GENIE_ENTROPY_PARAMCABAC_STATE_VARS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

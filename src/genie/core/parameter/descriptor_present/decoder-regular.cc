@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "decoder-regular.h"
+#include "genie/core/parameter/descriptor_present/decoder-regular.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

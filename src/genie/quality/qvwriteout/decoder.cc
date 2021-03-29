@@ -4,7 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "decoder.h"
+#include "genie/quality/qvwriteout/decoder.h"
+#include <string>
+#include <tuple>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -31,14 +34,14 @@ std::tuple<std::vector<std::string>, core::stats::PerfStats> Decoder::process(
         core::CigarTokenizer::tokenize(
             ecigar, core::getECigarInfo(),
             [&qv, &desc, &param_casted](uint8_t cigar, const util::StringView& bs, const util::StringView&) -> bool {
-                uint8_t codebook = param_casted.getNumberCodeBooks() - 1;
+                auto codebook = (uint8_t)param_casted.getNumberCodeBooks() - 1;
                 if (core::getECigarInfo().lut_step_ref[cigar] ||
                     core::getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar)) {
-                    codebook = desc.get(1).end() ? 0 : desc.get(1).pull();
+                    codebook = desc.get(1).end() ? 0 : (uint8_t)desc.get(1).pull();
                 }
 
                 for (size_t i = 0; i < bs.length(); ++i) {
-                    uint8_t index = desc.get(codebook + 2).pull();
+                    auto index = (uint8_t)desc.get((uint16_t)(codebook + 2)).pull();
                     std::get<0>(qv).back().push_back(param_casted.getCodebook(codebook).getEntries()[index]);
                 }
                 return true;

@@ -4,21 +4,21 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_REFERENCE_MANAGER_H
-#define GENIE_REFERENCE_MANAGER_H
+#ifndef SRC_GENIE_CORE_REFERENCE_MANAGER_H_
+#define SRC_GENIE_CORE_REFERENCE_MANAGER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/make-unique.h>
 #include <algorithm>
 #include <deque>
 #include <map>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <utility>
 #include <vector>
-
-#include "reference-collection.h"
+#include "genie/core/reference-collection.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ namespace core {
  *
  */
 class ReferenceManager {
-   private:
+ private:
     ReferenceCollection mgr;  //!<
 
     struct CacheLine {
@@ -51,7 +51,7 @@ class ReferenceManager {
      */
     void touch(const std::string& name, size_t num);
 
-   public:
+ public:
     /**
      *
      * @param id
@@ -82,13 +82,13 @@ class ReferenceManager {
      *
      */
     struct ReferenceExcerpt {
-       private:
+     private:
         std::string ref_name;                                  //!<
         size_t global_start;                                   //!<
         size_t global_end;                                     //!<
         std::vector<std::shared_ptr<const std::string>> data;  //!<
 
-       public:
+     public:
         /**
          *
          * @return
@@ -202,14 +202,14 @@ class ReferenceManager {
          *
          */
         struct Stepper {
-           private:
+         private:
             std::vector<std::shared_ptr<const std::string>>::const_iterator startVecIt;  //!<
             std::vector<std::shared_ptr<const std::string>>::const_iterator vecIt;       //!<
             std::vector<std::shared_ptr<const std::string>>::const_iterator endVecIt;    //!<
             size_t stringPos;                                                            //!<
             const char* curString;                                                       //!<
 
-           public:
+         public:
             /**
              *
              * @param e
@@ -321,7 +321,7 @@ class ReferenceManager {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_REFERENCE_MANAGER_H
+#endif  // SRC_GENIE_CORE_REFERENCE_MANAGER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

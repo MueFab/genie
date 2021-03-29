@@ -4,15 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ALIGNMENT_SHARED_DATA_H
-#define GENIE_ALIGNMENT_SHARED_DATA_H
+#ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_SHARED_DATA_H_
+#define SRC_GENIE_CORE_RECORD_ALIGNMENT_SHARED_DATA_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
 #include <cstdint>
 #include <memory>
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ class AlignmentSharedData {
     uint16_t seq_ID;   //!<
     uint8_t as_depth;  //!<
 
-   public:
+ public:
     /**
      *
      */
@@ -73,7 +73,7 @@ class AlignmentSharedData {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ALIGNMENT_SHARED_DATA_H
+#endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_SHARED_DATA_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,13 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CHUNK_H
-#define GENIE_CHUNK_H
+#ifndef SRC_GENIE_CORE_RECORD_CHUNK_H_
+#define SRC_GENIE_CORE_RECORD_CHUNK_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/reference-manager.h>
-#include "record.h"
+#include <utility>
+#include <vector>
+#include "genie/core/record/record.h"
+#include "genie/core/reference-manager.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,14 +24,15 @@ namespace record {
  *
  */
 class Chunk {
-   private:
+ private:
     std::vector<Record> data;                           //!<
     ReferenceManager::ReferenceExcerpt reference;       //!<
-    std::vector<std::pair<size_t, size_t>> refToWrite;  //! y
+    std::vector<std::pair<size_t, size_t>> refToWrite;  //!<
     size_t refID;                                       //!<
     stats::PerfStats stats;                             //!<
     bool referenceOnly{false};                          //!<
-   public:
+
+ public:
     /**
      *
      * @return
@@ -112,7 +115,7 @@ class Chunk {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_CHUNK_H
+#endif  // SRC_GENIE_CORE_RECORD_CHUNK_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

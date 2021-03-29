@@ -4,12 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_BITREADER_H
-#define GENIE_BITREADER_H
+#ifndef SRC_GENIE_UTIL_BITREADER_H_
+#define SRC_GENIE_UTIL_BITREADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <istream>
+#include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,13 +21,13 @@ namespace util {
  * @brief Wrapper around an input stream to read data bit by bit instead of byte aligned.
  */
 class BitReader {
-   private:
+ private:
     std::istream &istream;  //!< @brief Data input stream to fetch new bytes.
     uint8_t m_heldBits;     //!< @brief Bits from last byte which have not been consumed so far.
     uint8_t m_numHeldBits;  //!< @brief Number of bits from last byte which have not been consumed so far.
     uint64_t bitsRead;      //!< @brief Total number of bits read since the BitReader has been created.
 
-   public:
+ public:
     /**
      * @return Total number of bits read since the BitReader has been created.
      */
@@ -132,11 +133,11 @@ class BitReader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "bitreader.impl.h"
+#include "genie/util/bitreader.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_BITREADER_H
+#endif  // SRC_GENIE_UTIL_BITREADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

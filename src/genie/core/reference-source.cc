@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "reference-source.h"
+#include "genie/core/reference-source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

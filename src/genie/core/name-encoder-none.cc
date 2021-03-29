@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "name-encoder-none.h"
+#include "genie/core/name-encoder-none.h"
+#include <tuple>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -14,7 +15,7 @@ namespace core {
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::tuple<AccessUnit::Descriptor, core::stats::PerfStats> NameEncoderNone::process(const record::Chunk&) {
-    return {AccessUnit::Descriptor(GenDesc::RNAME), core::stats::PerfStats()};
+    return std::make_tuple(AccessUnit::Descriptor(GenDesc::RNAME), core::stats::PerfStats());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

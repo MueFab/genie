@@ -4,26 +4,32 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <genie/core/format-importer-null.h>
-#include <genie/core/name-encoder-none.h>
-#include <genie/util/watch.h>
-#include <genie/format/fasta/exporter.h>
-#include <genie/format/fasta/manager.h>
-#include <genie/format/fastq/exporter.h>
-#include <genie/format/fastq/importer.h>
-#include <genie/format/mgb/exporter.h>
-#include <genie/format/mgb/importer.h>
-#include <genie/format/mgrec/exporter.h>
-#include <genie/format/mgrec/importer.h>
-#include <genie/format/sam/exporter.h>
-#include <genie/format/sam/importer.h>
-#include <genie/module/default-setup.h>
-#include <genie/read/lowlatency/encoder.h>
-#include <filesystem/filesystem.hpp>
-#include "program-options.h"
-
-#include <genie/quality/qvwriteout/encoder-none.h>
+#include "apps/genie/run/main.h"
 #include <iostream>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+#include "apps/genie/run/program-options.h"
+#include "genie/core/format-importer-null.h"
+#include "genie/core/name-encoder-none.h"
+#include "genie/format/fasta/exporter.h"
+#include "genie/format/fasta/manager.h"
+#include "genie/format/fastq/exporter.h"
+#include "genie/format/fastq/importer.h"
+#include "genie/format/mgb/exporter.h"
+#include "genie/format/mgb/importer.h"
+#include "genie/format/mgrec/exporter.h"
+#include "genie/format/mgrec/importer.h"
+#include "genie/format/sam/exporter.h"
+#include "genie/format/sam/importer.h"
+#include "genie/module/default-setup.h"
+#include "genie/quality/qvwriteout/encoder-none.h"
+#include "genie/read/lowlatency/encoder.h"
+#include "genie/util/watch.h"
+
+// TODO(Fabian): For some reason, compilation on windows fails if we move this include further up. Investigate.
+#include "filesystem/filesystem.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -36,7 +42,7 @@ std::string file_extension(const std::string& path) {
     auto pos = path.find_last_of('.');
     std::string ext = path.substr(pos + 1);
     for (auto& c : ext) {
-        c = std::tolower(c);
+        c = static_cast<char>(std::tolower(c));
     }
     return ext;
 }
@@ -135,6 +141,10 @@ void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
         flow.addImporter(genie::util::make_unique<genie::format::sam::Importer>(BLOCKSIZE, *inputFiles.back()));
     } else if (file_extension(pOpts.inputFile) == "fastq") {
         if (file_extension(pOpts.inputSupFile) == "fastq") {
+            if (pOpts.readNameMode == "none") {
+                std::cerr << "WARNING: paired fastq provided with read name mode set to none"
+                          << " - the pairing information of some reads will be lost when using SPRING encoding.\n";
+            }
             auto& file1 = *inputFiles.back();
             inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputSupFile));
             flow.addImporter(
@@ -177,7 +187,7 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
             UTILS_DIE("Unknown reference format");
         }
     }
-    outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile));
+    outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile, std::ios::binary));
     flow->addExporter(genie::util::make_unique<genie::format::mgb::Exporter>(outputFiles.back().get()));
     attachImporter(*flow, pOpts, inputFiles);
     if (pOpts.qvMode == "none") {
@@ -187,8 +197,8 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
         flow->setNameCoder(genie::util::make_unique<genie::core::NameEncoderNone>(), 0);
     }
     if (pOpts.lowLatency) {
-        flow->setReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(), 2);
         flow->setReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(), 3);
+        flow->setReadCoder(genie::util::make_unique<genie::read::lowlatency::Encoder>(), 4);
     }
     return flow;
 }
@@ -199,7 +209,8 @@ std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts
                                                      std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
     constexpr size_t BLOCKSIZE = 10000;
-    auto flow = genie::module::buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory, BLOCKSIZE);
+    auto flow = genie::module::buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory,
+                                                   pOpts.combinePairsFlag, BLOCKSIZE);
     if (!pOpts.inputRefFile.empty()) {
         if (file_extension(pOpts.inputRefFile) == "fasta") {
             std::string fai = pOpts.inputRefFile.substr(0, pOpts.inputRefFile.size() - 5) + "fai";
@@ -220,7 +231,7 @@ std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts
                 *inputFiles.back(), &flow->getRefMgr(), flow->getRefDecoder(), true));
         }
     }
-    inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile));
+    inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile, std::ios::binary));
     flow->addImporter(genie::util::make_unique<genie::format::mgb::Importer>(
         *inputFiles.back(), &flow->getRefMgr(), flow->getRefDecoder(), file_extension(pOpts.outputFile) == "fasta"));
     attachExporter(*flow, pOpts, outputFiles);
@@ -242,6 +253,9 @@ std::unique_ptr<genie::core::FlowGraph> buildConverter(const ProgramOptions& pOp
 
 int main(int argc, char* argv[]) {
     ProgramOptions pOpts(argc, argv);
+    if (pOpts.help) {
+        return 0;
+    }
     genie::util::Watch watch;
     std::unique_ptr<genie::core::FlowGraph> flowGraph;
     std::vector<std::unique_ptr<std::ifstream>> inputFiles;

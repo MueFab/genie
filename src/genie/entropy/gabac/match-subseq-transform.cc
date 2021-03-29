@@ -4,13 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "genie/entropy/gabac/match-subseq-transform.h"
 #include <algorithm>
 #include <cassert>
 #include <iostream>
-
-#include <genie/util/block-stepper.h>
-#include <genie/util/data-block.h>
-#include "match-subseq-transform.h"
+#include <vector>
+#include "genie/util/block-stepper.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -91,7 +91,7 @@ void inverseTransformMatchCoding(std::vector<util::DataBlock> *const transformed
     util::DataBlock *const lengths = &((*transformedSubseqs)[1]);
     util::DataBlock *const rawValues = &((*transformedSubseqs)[2]);
 
-    util::DataBlock symbols(0, rawValues->getWordSize());
+    util::DataBlock symbols(0, (uint8_t)rawValues->getWordSize());
     assert(lengths->size() == pointers->size() + rawValues->size());
 
     // Re-compute the symbols from the pointer, lengths and raw values

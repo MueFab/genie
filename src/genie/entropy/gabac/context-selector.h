@@ -4,16 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_CONTEXT_SELECTOR_H_
-#define GABAC_CONTEXT_SELECTOR_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_CONTEXT_SELECTOR_H_
+#define SRC_GENIE_ENTROPY_GABAC_CONTEXT_SELECTOR_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/entropy/paramcabac/state_vars.h>
-#include "context-tables.h"
-#include "subsymbol.h"
-
 #include <cassert>
+#include <vector>
+#include "genie/entropy/gabac/context-tables.h"
+#include "genie/entropy/gabac/subsymbol.h"
+#include "genie/entropy/paramcabac/state_vars.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,18 +25,18 @@ namespace gabac {
  *
  */
 class ContextSelector {
-   public:
+ public:
     /**
      *
      * @param _stateVars
      */
-    ContextSelector(const paramcabac::StateVars& _stateVars);
+    explicit ContextSelector(const paramcabac::StateVars& _stateVars);
 
     /**
      *
      * @param src
      */
-    ContextSelector(const ContextSelector &src);
+    ContextSelector(const ContextSelector& src);
 
     /**
      *
@@ -61,8 +61,8 @@ class ContextSelector {
     unsigned int getContextIdxOrderGT0(const uint8_t subsymIdx, const uint8_t prvIdx,
                                        const std::vector<Subsymbol>& subsymbols, const uint8_t codingOrder);
 
-   private:
-    const paramcabac::StateVars& stateVars;  //!<
+ private:
+    const paramcabac::StateVars stateVars;  //!<
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -73,7 +73,7 @@ class ContextSelector {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_CONTEXT_SELECTOR_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_CONTEXT_SELECTOR_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
