@@ -8,6 +8,8 @@
 #define GENIE_PART1_REFERENCE_METADATA_VALUE_H
 
 #include <cstdint>
+#include <string>
+
 #include <genie/util/bitreader.h>
 #include <genie/util/bitwriter.h>
 #include <genie/format/mpegg_p1/reference/reference.h>
@@ -17,21 +19,21 @@ namespace format {
 namespace mpegg_p1 {
 
 
-class ReferenceMetadataValue{
+class ReferenceMetadataValue {
     /** ------------------------------------------------------------------------------------------------------------
     *  ISO/IEC 23092-3 Section 6.5.1.4 table 13
     *  ------------------------------------------------------------------------------------------------------------ */
    private:
-
     uint32_t length;
+
 //    AlternativeLocusType alternative_locus_location;
+//needs to be fixed _ from part3
 
     std::string alternative_sequence_name;
     std::string genome_assembly_identifier;
     std::string description;
     std::string species;
     std::string URI;
-
 
    public:
     /**
@@ -49,9 +51,10 @@ class ReferenceMetadataValue{
      * @param _species
      * @param _URI
      */
-    ReferenceMetadataValue(uint32_t _length, AlternativeLocusType _alternative_locus_location,
+    ReferenceMetadataValue(uint32_t _length,
+//                         AlternativeLocusType _alternative_locus_location,
                            std::string _alternative_sequence_name, std::string _genome_assembly_identifier,
-                           std::string _description, std::string _species, std::string _URI);
+                           std::string _description, std::string _species, std::string&& _URI);
 
     /**
      *
@@ -63,7 +66,7 @@ class ReferenceMetadataValue{
     /**
     *
     * @return
-    */
+     */
     uint64_t getLength() const;
 
     /**
@@ -71,6 +74,7 @@ class ReferenceMetadataValue{
      * @param bit_writer
      */
     void write(genie::util::BitWriter& bit_writer) const;
+};
 
 }  // namespace mpegg_p1
 }  // namespace format

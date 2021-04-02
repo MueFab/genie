@@ -65,7 +65,7 @@ DGProtection::DGProtection() : DG_protection_value() {
 DGProtection::DGProtection(util::BitReader& reader, size_t length) {
 
     std::string key = readKey(reader);
-    UTILS_DIE_IF(key != "dgpr", "DGMetadata is not Found");
+    UTILS_DIE_IF(key != "dgpr", "DGProtection is not Found");
 
     size_t start_pos = reader.getPos();
 
@@ -74,7 +74,7 @@ DGProtection::DGProtection(util::BitReader& reader, size_t length) {
         val = reader.read<uint8_t>();
     }
 
-    UTILS_DIE_IF(reader.getPos() - start_pos != length, "Invalid DGMetadata length!");
+    UTILS_DIE_IF(reader.getPos() - start_pos != length, "Invalid DGProtection length!");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -90,11 +90,11 @@ void DGProtection::write(util::BitWriter& bit_writer) const {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-/*
+
 DatasetGroup::DatasetGroup(std::vector<Dataset> &&_datasets)
     : dataset_group_ID(0),
       version_number(0), // FIXME: Fix version number
-      datasets(_datasets){
+      datasets(std::move(_datasets)){
 
     std::vector<uint16_t> dataset_IDs(getDatasetIDs(true));
 
@@ -102,9 +102,9 @@ DatasetGroup::DatasetGroup(std::vector<Dataset> &&_datasets)
 
     UTILS_DIE_IF(!(it == dataset_IDs.end() ), "dataset_ID is not unique!");
 }
-*/
+
 // ---------------------------------------------------------------------------------------------------------------------
-/*
+
 DatasetGroup::DatasetGroup(util::BitReader& reader, size_t length)
     : dataset_group_ID(0),
       version_number(0) {
@@ -112,7 +112,7 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, size_t length)
     size_t start_pos = reader.getPos();
 
     std::string key = readKey(reader);
-    UTILS_DIE_IF(key != "dghd", "DatasetGroupHeader is not Found");
+    UTILS_DIE_IF(key != "dgcn", "DatasetGroup is not Found");
 
     // Class dataset_group_header
     auto header_length = reader.read<size_t>();
@@ -124,18 +124,17 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, size_t length)
             // reference[]
             auto ref_length = reader.read<size_t>();
             references.emplace_back(reader, ref_length);
-
             key = readKey(reader);
         } else if (key == "rfmd"){
             // reference_metadata[]
-            //auto ref_meta_length = reader.read<size_t>();
-            //reference_metadata.emplace_back(reader, ref_meta_length);
+//            auto rm_length = reader.read<size_t>();
+//            reference_metadata.emplace_back(reader, rm_length);
 
             key = readKey(reader);
         } else if (key == "labl"){
             // label_list
-            auto label_length = reader.read<size_t>();
-            label_list = util::make_unique<LabelList>(reader, label_length);
+            auto ll_length = reader.read<size_t>();
+            label_list = util::make_unique<LabelList>(reader, ll_length);
 
             key = readKey(reader);
         } else if (key == "dgmd"){
@@ -160,9 +159,9 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, size_t length)
 
     UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid DatasetGroup length!");
 }
-*/
+
 // ---------------------------------------------------------------------------------------------------------------------
-/*
+
 std::vector<uint16_t>&& DatasetGroup::getDatasetIDs(bool sort_ids) const {
     std::vector<uint16_t> dataset_IDs;
 
@@ -176,7 +175,7 @@ std::vector<uint16_t>&& DatasetGroup::getDatasetIDs(bool sort_ids) const {
 
     return std::move(dataset_IDs);
 }
-*/
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetGroup::addReferences(std::vector<Reference>&& _references) {references = std::move(_references);}
@@ -266,7 +265,8 @@ void DatasetGroup::setID(uint8_t ID) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t DatasetGroup::getHeaderLength() const {
-    // key (4), Length (8)
+
+    /// Key c(4) Length u(64)
     uint64_t len = 12;
 
     // dataset_group_ID u(8)
@@ -297,12 +297,12 @@ void DatasetGroup::writeHeader(util::BitWriter& writer) const {
 
     // version_number u(8)
     writer.write(version_number, 8);
-/*
+
     // dataset_IDs[] u(16)
     for (auto &d_ID: getDatasetIDs()){
         writer.write(d_ID, 16);
     }
-*/
+
     writer.flush();
 }
 
@@ -312,14 +312,17 @@ void DatasetGroup::readHeader(util::BitReader& reader, size_t length) {
 
     size_t start_pos = reader.getPos();
 
+    std::string key = readKey(reader);
+    UTILS_DIE_IF(key != "dghd", "DatasetGroupHeader is not Found");
+
     dataset_group_ID = reader.read<uint8_t>();
     version_number = reader.read<uint8_t>();
-/*
+
     // dataset_IDs[] u(16)
     for (auto &d_ID: getDatasetIDs()){
         d_ID = reader.read<uint16_t>();
     }
-*/
+
     UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid DatasetGroupHeader length!");
 }
 
@@ -364,7 +367,6 @@ uint64_t DatasetGroup::getLength() const {
 void DatasetGroup::write(util::BitWriter& writer) const {
 
     /// KLV (Key Length Value) format
-    // Key of KLV format
     writer.write("dgcn");
 
     // Length of KLV format

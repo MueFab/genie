@@ -11,7 +11,7 @@ namespace mpegg_p1 {
 
 ReferenceMetadataValue::ReferenceMetadataValue()
     : length(0),
-      alternative_locus_location(),
+//      alternative_locus_location(),
       alternative_sequence_name(),
       genome_assembly_identifier(),
       description(),
@@ -20,11 +20,12 @@ ReferenceMetadataValue::ReferenceMetadataValue()
 {}
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceMetadataValue::ReferenceMetadataValue(long _length, AlternativeLocusType _alternative_locus_location,
+ReferenceMetadataValue::ReferenceMetadataValue(uint32_t _length,
+//                                               AlternativeLocusType _alternative_locus_location,
                                                std::string _alternative_sequence_name, std::string _genome_assembly_identifier,
-                                               std::string _description, std::string _species, anyURI _URI)
+                                               std::string _description, std::string _species, std::string&& _URI)
     : length(_length),
-      alternative_locus_location(std::move(_alternative_locus_location)),
+//      alternative_locus_location(std::move(_alternative_locus_location)),
       alternative_sequence_name(std::move(_alternative_sequence_name)),
       genome_assembly_identifier(std::move(_genome_assembly_identifier)),
       description(std::move(_description)),
@@ -34,47 +35,52 @@ ReferenceMetadataValue::ReferenceMetadataValue(long _length, AlternativeLocusTyp
 {}
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceMetadataValue(util::BitReader& reader, size_t length)
-    : length(0),
-      alternative_locus_location(),
-      alternative_sequence_name(),
-      genome_assembly_identifier(),
-      description(),
-      species(),
-      URI() {
+ReferenceMetadataValue::ReferenceMetadataValue(util::BitReader& reader, size_t length) {
 
     size_t start_pos = reader.getPos();
 
     length = reader.read<uint32_t>();
-    alternative_locus_location = reader.read<AlternativeLocusType>();
-    alternative_sequence_name = reader.read<std::string>();
-    genome_assembly_identifier = reader.read<std::string>();
-    description = reader.read<std::string>();
-    species = reader.read<std::string>();
-    URI = reader.read<anyURI>();
+//    alternative_locus_location = reader.read<AlternativeLocusType>();
+    alternative_sequence_name = readNullTerminatedStr(reader);
+    genome_assembly_identifier = readNullTerminatedStr(reader);
+    description = readNullTerminatedStr(reader);
+    species = readNullTerminatedStr(reader);
+    URI = readNullTerminatedStr(reader);
 
     UTILS_DIE_IF(reader.getPos() - start_pos != length, "Invalid DatasetGroup length!");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t getLength() const {
-/*
-    //Key c(4) length u(64)
-    uint64_t len = (4* sizeof(char) + 8) * 8;   //gen_info
+uint64_t ReferenceMetadataValue::getLength() const {
+
+    ///Key c(4) length u(64)
+    uint64_t len = (4* sizeof(char) + 8);   //gen_info
 
     //length u(32)
-    len += 32;
+    len += 4;
 
-//TODO : length of Value[]
+//    //Class AlternativeLocusType
+//    len += alternative_locus_location.getLength();
+
+    //alternative_sequence_name st(v)
+    len += alternative_sequence_name.size() + 1;
+    //genome_assembly_identifier st(v)
+    len += genome_assembly_identifier.size() + 1;
+    //description st(v)
+    len += description.size() + 1;
+    //species st(v)
+    len += species.size() + 1;
+    //URI st(v)
+    len += URI.size() + 1;
 
     return len;
-*/
+
 }
 // ---------------------------------------------------------------------------------------------------------------------
 
-void write(genie::util::BitWriter& bit_writer) const {
-    /*
+void ReferenceMetadataValue::write(genie::util::BitWriter& bit_writer) const {
+
     // KLV (Key Length Value) format
 
     // Key of KLV format
@@ -84,26 +90,26 @@ void write(genie::util::BitWriter& bit_writer) const {
     bit_writer.write(getLength(), 64);
 
     // length
-    bit_writer.write(length, 8);
+    bit_writer.write(length, 32);
 
-    // alternative_locus_location
-    alternative_locus_location.write(bit_writer);
+//    // alternative_locus_location
+//    alternative_locus_location.write(bit_writer);
 
     //alternative_sequence_name
-    bit_writer.write(alternative_sequence_name);
+    writeNullTerminatedStr(bit_writer, alternative_sequence_name);
 
     //genome_assembly_identifier
-    bitwriter.write(genome_assembly_name);
+    writeNullTerminatedStr(bit_writer, genome_assembly_identifier);
 
     //description
-    bitwriter.write(description);
+    writeNullTerminatedStr(bit_writer, description);
 
     //species
-    bit_writer.write(species);
+    writeNullTerminatedStr(bit_writer, species);
 
     //URI
-    bit_writer.write(URI);
-*/
+    writeNullTerminatedStr(bit_writer, URI);
+
 }
 
 

@@ -47,7 +47,7 @@ Reference::Reference(util::BitReader& reader, size_t length)
     size_t start_pos = reader.getPos();
 
     // reference_name st(v)
-    reference_name = readNullTerminatedStr(reader, "XXXX");
+    reference_name = readNullTerminatedStr(reader);
 
     // reference_major_version u(16)
     reference_major_version = reader.read<uint16_t>();
@@ -61,7 +61,7 @@ Reference::Reference(util::BitReader& reader, size_t length)
 
     for (auto seqID = 0; seqID < seq_count; seqID++){
         // sequence_name[seqID] st(v)
-        sequence_names.emplace_back(readNullTerminatedStr(reader, "XXXX"));
+        sequence_names.emplace_back(readNullTerminatedStr(reader));
     }
 
     // reserved u(7)
@@ -100,11 +100,11 @@ const std::vector<std::string>& Reference::getSequenceNames() const {return sequ
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//void Reference::addReferenceLocation(ReferenceLocation&& _ref_loc) {reference_location = std::move(_ref_loc);}
+void Reference::addReferenceLocation(ReferenceLocation&& _ref_loc) {reference_location = std::move(_ref_loc);}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//const ReferenceLocation &Reference::getReferenceLocation() const {return reference_location;}
+const ReferenceLocation &Reference::getReferenceLocation() const {return reference_location;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -150,7 +150,6 @@ uint64_t Reference::getLength() const {
     len += 1;
 
     len += reference_location.getLength();
-//    len += reference_location->getBitLength();
 
     return len;
 }

@@ -14,7 +14,8 @@ std::string&& readKey(util::BitReader &reader){
     return std::move(key);
 }
 
-std::string&& readNullTerminatedStr(util::BitReader &reader, std::string&& string) {
+std::string&& readNullTerminatedStr(util::BitReader &reader) {
+    std::string string;
     char c = 0;
     do {
         c = reader.read<uint8_t>();

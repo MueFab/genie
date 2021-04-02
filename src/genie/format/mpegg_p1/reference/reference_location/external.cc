@@ -20,7 +20,7 @@ namespace mpegg_p1 {
 
 External::External(util::BitReader& reader, uint16_t seq_count)
     : ReferenceLocation(ReferenceLocation::Flag::EXTERNAL),
-      ref_uri(readNullTerminatedStr(reader, "XXXX")) {
+      ref_uri(readNullTerminatedStr(reader)) {
 
     auto checksum_alg = reader.read<Checksum::Algo>();  //checksum_alg u(8)
     auto reference_type = reader.read<ExternalReference::Type>();   //reference_type u(8)

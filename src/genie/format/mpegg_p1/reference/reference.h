@@ -107,14 +107,14 @@ class Reference{
      * @param _ref_loc
      */
      //TODO: FIX ME
-//    void addReferenceLocation(ReferenceLocation&& _ref_loc);
+    void addReferenceLocation(ReferenceLocation&& _ref_loc);
 
     /**
      *
      * @return
      */
     //TODO: FIX ME
-//    const ReferenceLocation& getReferenceLocation() const;
+    const ReferenceLocation& getReferenceLocation() const;
 
     /**
      *

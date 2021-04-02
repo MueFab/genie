@@ -26,7 +26,7 @@ void Label::ReadLabel(util::BitReader& reader) {
     UTILS_DIE_IF(key != "lbll", "Label is not Found");
 
     // label_ID st(v)
-    label_ID = readNullTerminatedStr(reader, "XXXX");
+    label_ID = readNullTerminatedStr(reader);
     // num_datasets u(16)
     reader.read<uint16_t>();
 

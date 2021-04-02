@@ -117,13 +117,11 @@ class Dataset {
 
     // ISO 23092-1 Section 6.5.3.1 - specification 23092-1
     // optional
-    // TODO: Master Index Table
     //std::unique_ptr<MasterIndexTable> master_index_table;
 
     // ISO 23092-1 Section 6.5.3
     std::vector<AccessUnit> access_units;
 
-    // TODO(Yeremia): Descriptor Stream
     // ISO 23092-1 Section 6.5.4
     std::vector<DescriptorStream> descriptor_streams;
 
@@ -142,11 +140,9 @@ class Dataset {
             uint8_t _alphabet_ID,
             uint32_t _num_U_access_units,
             std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2,
-            const genie::format::mgb::DataUnitFactory& dataUnitFactory
-//            std::unique_ptr<MasterIndexTable> _master_index_table
-    );
+            const genie::format::mgb::DataUnitFactory& dataUnitFactory);
 
-    //Dataset(util::BitReader& reader, size_t length);
+    Dataset(util::BitReader& reader, size_t length);
 
     /**
      *
