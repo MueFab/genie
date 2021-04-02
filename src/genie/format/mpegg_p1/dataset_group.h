@@ -128,12 +128,12 @@ class DatasetGroup {
      *
      * @param _datasets
      */
-    //explicit DatasetGroup(std::vector<Dataset>&& _datasets);
+    explicit DatasetGroup(std::vector<Dataset>&& _datasets);
     /**
      *
      * @param bit_reader
      */
-    //explicit DatasetGroup(util::BitReader& reader, size_t length);
+    explicit DatasetGroup(util::BitReader& reader, size_t length);
 
 
     /**
@@ -141,7 +141,7 @@ class DatasetGroup {
      * @param sort_ids
      * @return
      */
-    //std::vector<uint16_t>&& getDatasetIDs(bool sort_ids=false) const;
+    std::vector<uint16_t>&& getDatasetIDs(bool sort_ids=false) const;
     /**
      *
      * @param _references

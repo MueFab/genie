@@ -138,13 +138,10 @@ Dataset::Dataset(uint8_t group_ID, uint16_t ID, DatasetHeader::ByteOffsetSizeFla
                  uint8_t _alphabet_ID,
                  uint32_t _num_U_access_units,
                  std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2,
-                 const genie::format::mgb::DataUnitFactory& dataUnitFactory
-//                 std::unique_ptr<MasterIndexTable> _master_index_table
-)
+                 const genie::format::mgb::DataUnitFactory& dataUnitFactory)
 
     : header(group_ID, ID, _byte_offset_size_flag, _non_overlapping_AU_range_flag, _pos_40_bits_flag,
              _multiple_alignment_flag, _dataset_type, _alphabet_ID, _num_U_access_units)
-//    master_index_table(std::move(_master_index_table))
 
 {
     /// dataset_parameter_set[]
@@ -157,25 +154,29 @@ Dataset::Dataset(uint8_t group_ID, uint16_t ID, DatasetHeader::ByteOffsetSizeFla
         }
     }
 
+//    if (getBlockHeader().getMITFlag()) {
+//        master_index_table = util::make_unique<MasterIndexTable>();
+//    }
+
     /// access_unit[]
     for (auto& au : accessUnits_p2) {
         access_units.emplace_back(std::move(au));
     }
 
     /// descriptor_stream[]
-    if (header.getBlockHeader().getBlockHeaderFlag() == 0) {
+    if (getBlockHeader().getBlockHeaderFlag() == 0) {
         for (auto& ds : descriptor_streams) {
             descriptor_streams.emplace_back(std::move(ds));
         }
     }
 }
 // ---------------------------------------------------------------------------------------------------------------------
-/*
+
 Dataset::Dataset(util::BitReader& reader, size_t length) {
 
     size_t start_pos = reader.getPos();
 
-    std::string key = readKey(reader, "XXXX");
+    std::string key = readKey(reader);
     UTILS_DIE_IF(key != "dtcn", "DatasetHeader is not Found");
 
     /// Class Dataset_header
@@ -183,30 +184,45 @@ Dataset::Dataset(util::BitReader& reader, size_t length) {
     header = DatasetHeader(reader, header_length);
 
     do {
-        key = readKey(reader, "XXXX");
-        auto metadata_length = reader.read<size_t>();
+        key = readKey(reader);
         if (key == "dtmd"){
-            DT_metadata = util::make_unique<DatasetHeader>(reader, metadata_length);
+            auto metadata_length = reader.read<size_t>();
+            DT_metadata = util::make_unique<DTMetadata>(reader, metadata_length);
+            key = readKey(reader);
         } else if (key == "dtpr"){
-            DT_metadata = util::make_unique<DatasetHeader>(reader, protection_length);
+            auto protection_length = reader.read<size_t>();
+            DT_protection = util::make_unique<DTProtection>(reader, protection_length);
+            key = readKey(reader);
         } else if (key == "pars"){
-
+            auto set_length = reader.read<size_t>();
+            //set = reader.read<DatasetParameterSet>();
+            dataset_parameter_sets.emplace_back(reader, set_length);
+            key = readKey(reader);
         } else if (key == "mitb"){
-
+            if (getHeader().getBlockHeader().getMITFlag()) {
+               // auto mit_length = reader.read<size_t>();
+              // master_index_table = util::make_unique<MasterIndexTable>(reader, mit_length);
+            }
+            key = readKey(reader);
         } else if (key == "aucun"){
+//            auto au_length = reader.read<size_t>();
+//            access_units.emplace_back(reader, au_length);
+//TODO(Raouf): fix access_unit constructor
 
+            key = readKey(reader);
         } else if (key == "dscn"){
-
+            if (getBlockHeader().getBlockHeaderFlag() == 0) {
+                auto ds_length = reader.read<size_t>();
+                descriptor_streams.emplace_back(reader, ds_length);
+            }
         }
 
     } while (reader.getPos() - start_pos < length);
 
 
-
-
     UTILS_DIE_IF(reader.getPos()-start_pos != length, "Invalid Dataset length!");
 }
-*/
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -300,12 +316,11 @@ uint64_t Dataset::getLength() const {
         len += it.getLength();
     }
 
-    // TODO (Yeremia): write descriptor_stream depending on block_header_flag
-    //if (getBlockHeader().getBlockHeaderFlag() == 0){
-    //    for (auto &ds: descriptor_streams){
-    //        len += ds.getLength();
-    //    }
-    //}
+    if (getBlockHeader().getBlockHeaderFlag() == 0){
+        for (auto &ds: descriptor_streams){
+            len += ds.getLength();
+        }
+    }
 
     return len;
 }
@@ -336,32 +351,29 @@ void Dataset::write(util::BitWriter& bit_writer) const {
         DT_protection->write(bit_writer);
     }
 
-    // TODO: Master Index Table
-    // write master_index_table depending on MIT_FLAG
-    //if (getBlockHeader().getMITFlag()){
-    //    master_index_table->write(bit_writer);
-    //}
-
     // dataset_parameter_set[]
     for (auto const& ps : dataset_parameter_sets) {
         ps.write(bit_writer);
     }
 
+
+    // write master_index_table depending on MIT_FLAG
+    //if (getBlockHeader().getMITFlag()){
+    //    master_index_table->write(bit_writer);
+    //}
+
     for (auto &ac: access_units){
         ac.write(bit_writer);
     }
 
-    // TODO (Yeremia): write descriptor_stream depending on block_header_flag
-    //if (getBlockHeader().getBlockHeaderFlag() == 0){
-    //    for (auto &ds: descriptor_streams){
-    //        ds.write(bit_writer);
-    //    }
-    //}
+    if (getBlockHeader().getBlockHeaderFlag() == 0){
+        for (auto &ds: descriptor_streams){
+            ds.write(bit_writer);
+        }
+    }
 
-    // TODO (Yeremia): implement write of Dataset
     UTILS_DIE("Not implemented yet");
 }
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 

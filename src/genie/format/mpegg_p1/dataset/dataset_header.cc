@@ -33,7 +33,7 @@ DatasetHeader::DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSizeFlag _
                              uint8_t _alphabet_ID, uint32_t _num_U_access_units)
     : dataset_group_ID(group_ID),
       dataset_ID(ID),
-      version("XXXX"), // TODO (Yeremia): Version
+      version("XXXX"),
       byte_offset_size_flag(_byte_offset_size_flag),
       non_overlapping_AU_range_flag(_non_overlapping_AU_range_flag),
       pos_40_bits_flag(_pos_40_bits_flag),
@@ -48,7 +48,7 @@ DatasetHeader::DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSizeFlag _
 DatasetHeader::DatasetHeader(util::BitReader& bit_reader, size_t length)
     : dataset_group_ID(bit_reader.read<uint8_t>()),
       dataset_ID(bit_reader.read<uint16_t>()),
-      version(readNullTerminatedStr(bit_reader, "XXXX")),
+      version(readNullTerminatedStr(bit_reader)),
       byte_offset_size_flag(bit_reader.read<ByteOffsetSizeFlag>(1)),
       non_overlapping_AU_range_flag(bit_reader.read<bool>(1)),
       pos_40_bits_flag(bit_reader.read<Pos40SizeFlag>(1)),
