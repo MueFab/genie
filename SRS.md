@@ -22,7 +22,7 @@ The prefix ``sam::`` is *not* repeated throughout this section for brevity.
 
 ### Transcoding from the SAM Format to MPEG-G Records
 
-**SAM.1)** The input file is a file in the SAM, BAM, or CRAM format which is compliant to [https://www.htslib.org](HTSlib), release 1.11.
+**SAM.1)** The input file is a file in the SAM, BAM, or CRAM format which is compliant to [HTSlib](https://www.htslib.org), release 1.11.
 
 **SAM.2)** If the input SAM/BAM/CRAM file contains aligned data the corresponding reference file, i.e., a file in the FASTA format that contains the reference sequence(s) used during alignment, must be provided.
 
