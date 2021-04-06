@@ -44,7 +44,7 @@ SAM.6) The implementation shall provide a data structure containing the configur
 SAM.7) The configuration shall comply to the values specified in Table...
 
 | Variable Name   | Default Value | Accepted Values |
------------------------------------------------------
+|-----------------|---------------|-----------------|
 | sam_file_path   | ""            | String containing the path of a file in the SAM/BAM/CRAM format |
 | fasta_file_path | ""            | String containing the path of a file in the FASTA format |
 | mgrec_file_path | ""            | String containing a path where a file will be created that will contain the generated sequence of concatenated MPEG-G records |
