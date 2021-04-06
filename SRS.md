@@ -8,17 +8,17 @@ The prefix ``genie::`` is *not* repeated throughout the document for brevity.
 ## Core Library
 
 Core library API specifications are grouped in the namespace ``core``.
-The prefix ``core::`` is *not* repeated through this section for brevity.
+The prefix ``core::`` is *not* repeated throughout this section for brevity.
 
 ## FASTQ Transcoding
 
 FASTQ transcoding API specifications are grouped in the namespace ``fastq``.
-The prefix ``fastq::`` is *not* repeated through this section for brevity.
+The prefix ``fastq::`` is *not* repeated throughout this section for brevity.
 
 ## SAM Transcoding
 
 SAM transcoding API specifications are grouped in the namespace ``sam``.
-The prefix ``sam::`` is *not* repeated through this section for brevity.
+The prefix ``sam::`` is *not* repeated throughout this section for brevity.
 
 ### Transcoding from the SAM Format to MPEG-G Records
 
