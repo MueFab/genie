@@ -10,17 +10,22 @@ The prefix ``genie::`` is *not* repeated throughout the document for brevity.
 Core library API specifications are grouped in the namespace ``core``.
 The prefix ``core::`` is *not* repeated throughout this section for brevity.
 
-## FASTQ Transcoding
+## Transcoding Library
+
+Transcoding library API specifications are grouped in the namespace ``transcoding``.
+The prefix ``transcoding::`` is *not* repeated throughout this section for brevity.
+
+### FASTQ
 
 FASTQ transcoding API specifications are grouped in the namespace ``fastq``.
 The prefix ``fastq::`` is *not* repeated throughout this section for brevity.
 
-## SAM Transcoding
+### SAM
 
 SAM transcoding API specifications are grouped in the namespace ``sam``.
 The prefix ``sam::`` is *not* repeated throughout this section for brevity.
 
-### Transcoding from the SAM Format to MPEG-G Records
+#### Transcoding from the SAM Format to MPEG-G Records
 
 **SAM.1)** The input file is a file in the SAM, BAM, or CRAM format which is compliant to [HTSlib](https://www.htslib.org), release 1.11.
 
@@ -67,4 +72,9 @@ enum ErrorCode {
 ErrorCode transcode(Config cfg);
 ```
 
-### Transcoding from MPEG-G Records to the SAM Format
+#### Transcoding from MPEG-G Records to the SAM Format
+
+## Tools Library
+
+Transcoding library API specifications are grouped in the namespace ``tools``.
+The prefix ``tools::`` is *not* repeated throughout this section for brevity.
