@@ -39,13 +39,15 @@ class MasterIndexTable {
      * @param _u_ac_info
      * @param header
      */
-    MasterIndexTable(std::vector<mpegg_p1::MITAccessUnitInfo>&& _ac_info, std::vector<mpegg_p1::MITUAccessUnitInfo>&& _u_ac_info, DatasetHeader* header);
+    MasterIndexTable(std::vector<mpegg_p1::MITAccessUnitInfo>&& _ac_info,
+                     std::vector<mpegg_p1::MITUAccessUnitInfo>&& _u_ac_info,
+                     DatasetHeader* header);
     /**
      *
      * @param bitReader
      * @param length
      */
-    MasterIndexTable(util::BitReader& reader, size_t length, DatasetHeader* _dataset_header);
+    MasterIndexTable(util::BitReader& reader, size_t length, DatasetHeader* _header);
 
     /**
      *
