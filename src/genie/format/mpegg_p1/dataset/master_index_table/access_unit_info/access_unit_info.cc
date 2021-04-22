@@ -29,16 +29,15 @@ MITAccessUnitInfo::MITAccessUnitInfo(uint64_t _AU_byte_offset, uint64_t _AU_star
       byte_offset_size_flag(_byte_offset_size_flag),
       pos_40_size_flag(_pos_40_size_flag) {}
 
-/*
-MITAccessUnitInfo::MITAccessUnitInfo(util::BitReader& reader) {
 
+MITAccessUnitInfo::MITAccessUnitInfo(util::BitReader& reader) {
     /// AU_byte_offset[seq][ci]][au_id] u(byteOffsetSize)
-    AU_byte_offset = reader.read<uint64_t>((uint8_t)byte_offset_size_flag);
+    AU_byte_offset = reader.read<uint64_t>((uint8_t) byte_offset_size_flag);
 
     /// AU_start_position[seq][ci]][au_id] u(posSize)
     /// AU_end_position[seq][ci]][au_id] u(posSize)
-    AU_start_position = reader.read<uint64_t>((uint8_t)pos_40_size_flag);
-    AU_end_position = reader.read<uint64_t>((uint8_t)pos_40_size_flag);
+    AU_start_position = reader.read<uint64_t>((uint8_t) pos_40_size_flag);
+    AU_end_position = reader.read<uint64_t>((uint8_t) pos_40_size_flag);
 
     if (datasetHeader->getDatasetType() == core::parameter::DataUnit::DatasetType::REFERENCE) {
         // MITReferenceSequenceInfo
@@ -56,9 +55,8 @@ MITAccessUnitInfo::MITAccessUnitInfo(util::BitReader& reader) {
             block_byte_offset.emplace_back(reader.read<uint64_t>((uint8_t)byte_offset_size_flag));
         }
     }
-
 }
-*/
+
 
 uint64_t MITAccessUnitInfo::getAUbyteOffset() const { return AU_byte_offset; }
 

@@ -14,7 +14,7 @@ namespace mpegg_p1 {
 
 class MITUAccessUnitInfo {
    private:
-    uint32_t num_U_clusters;
+    //uint32_t num_U_clusters;
     uint32_t multiple_signature_base;
     uint8_t U_signature_size;
     bool U_signature_constant_length;
@@ -25,9 +25,9 @@ class MITUAccessUnitInfo {
 
     DatasetHeader* datasetHeader;
 
-    //uint16_t U_ref_sequence_id;
-    //uint8_t U_ref_start_position;
-    //uint8_t U_ref_end_position;
+    uint16_t U_ref_sequence_id;
+    uint64_t U_ref_start_position;
+    uint64_t U_ref_end_position;
 
     /** ------------------------------------------------------------------------------------------------------------
      *  Internal
@@ -51,7 +51,7 @@ class MITUAccessUnitInfo {
      * @param reader
      * @param length
      */
-    //MITUAccessUnitInfo(util::BitReader& reader, size_t length);
+    MITUAccessUnitInfo(util::BitReader& reader);
     /**
      *
      * @param base

@@ -145,7 +145,7 @@ Dataset::Dataset(uint8_t group_ID, uint16_t ID, DatasetHeader::ByteOffsetSizeFla
 
 {
     /// dataset_parameter_set[]
-    for (unsigned int i = 0;; ++i) {
+    for (unsigned int i = 0;///*TODO(Raouf)*/; ++i) {
         try {  // to iterate over dataUnitFactory.getParams(i)
             dataset_parameter_sets.emplace_back(ID, std::move(dataUnitFactory.getParams(i)));
         } catch (const std::out_of_range&) {
@@ -204,7 +204,7 @@ Dataset::Dataset(util::BitReader& reader, size_t length) {
               // master_index_table = util::make_unique<MasterIndexTable>(reader, mit_length);
             }
             key = readKey(reader);
-        } else if (key == "aucun"){
+        } else if (key == "aucn"){
 //            auto au_length = reader.read<size_t>();
 //            access_units.emplace_back(reader, au_length);
 //TODO(Raouf): fix access_unit constructor

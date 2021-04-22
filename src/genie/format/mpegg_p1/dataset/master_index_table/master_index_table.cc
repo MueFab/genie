@@ -26,12 +26,10 @@ MasterIndexTable::MasterIndexTable(std::vector<mpegg_p1::MITAccessUnitInfo>&& _a
       datasetHeader(header)
 {}
 
-/*
-MasterIndexTable::MasterIndexTable(util::BitReader& reader, size_t length, DatasetHeader* _dataset_header)
-    : ac_info(),
-      u_ac_info(),
-      datasetHeader(_dataset_header) {
-    std::string key = readKey(reader, "XXXX");
+
+MasterIndexTable::MasterIndexTable(util::BitReader& reader, size_t length, DatasetHeader* _header)
+    : datasetHeader(_header) {
+    std::string key = readKey(reader);
     UTILS_DIE_IF(key != "mitb", "MasterIndexTable is not Found");
 
     size_t start_pos = reader.getPos();
@@ -41,22 +39,23 @@ MasterIndexTable::MasterIndexTable(util::BitReader& reader, size_t length, Datas
         for (auto ci = 0; ci < datasetHeader->getBlockHeader().getNumClasses(); ci++) {
             if (datasetHeader->getBlockHeader().getClassInfos()[ci].getClid() != core::record::ClassType::CLASS_U) {
                 for (auto au_id = 0; au_id < datasetHeader->getSeqInfo().getSeqBlocks()[seq]; au_id++) {
+
+                    ac_info.emplace_back(reader);
                 }
-                auto MITAU_length = reader.read<size_t>();
-                ac_info.emplace_back(MITAccessUnitInfo(reader, MITAU_length));
             }
-
-            /// Class MITUAccessUnitInfo()
-            for (auto uau_id = 0; uau_id < datasetHeader->getNumUAccessUnits(); uau_id++) {
-                auto MITUAU_length = reader.read<size_t>();
-                u_ac_info.emplace_back(MITUAccessUnitInfo(reader, MITUAU_length));
-            }
-
-            UTILS_DIE_IF(reader.getPos() - start_pos != length, "Invalid MasterIndexTable length!");
         }
     }
+
+
+    /// Class MITUAccessUnitInfo()
+    for (uint32_t uau_id = 0; uau_id < datasetHeader->getNumUAccessUnits(); uau_id++) {
+        u_ac_info.emplace_back(reader);
+    }
+
+
+    UTILS_DIE_IF(reader.getPos() - start_pos != length, "Invalid MasterIndexTable length!");
 }
-*/
+
 
 uint64_t MasterIndexTable::getLength() const {
 

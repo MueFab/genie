@@ -61,7 +61,7 @@ class MITAccessUnitInfo {
      * @param reader
      * @param length
      */
-    //MITAccessUnitInfo(util::BitReader& reader);
+    MITAccessUnitInfo(util::BitReader& reader);
 
 
     /**
