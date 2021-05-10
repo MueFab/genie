@@ -78,6 +78,7 @@ option(BUILD_DOCUMENTATION "Build Doxygen documentation" OFF)
 option(BUILD_TESTS "Build tests" OFF)
 option(GABAC_BUILD_SHARED_LIB "Build shared GABAC library" OFF)
 option(GENIE_USE_OPENMP "Use OpenMP parallelization in Genie" ON)
+option(BUILD_TRANSCODER "Compile and build legacy format to mpeg-g format transcoder" OFF)
 
 message(STATUS "")
 message(STATUS "******** Options ********")
@@ -86,6 +87,7 @@ message(STATUS "  BUILD_DOCUMENTATION    : ${BUILD_DOCUMENTATION}")
 message(STATUS "  BUILD_TESTS            : ${BUILD_TESTS}")
 message(STATUS "  GABAC_BUILD_SHARED_LIB : ${GABAC_BUILD_SHARED_LIB}")
 message(STATUS "  GENIE_USE_OPENMP       : ${GENIE_USE_OPENMP}")
+message(STATUS "  BUILD_TRANSCODER       : ${BUILD_TRANSCODER}")
 message(STATUS "")
 
 if(${BUILD_COVERAGE})
@@ -115,7 +117,9 @@ if(${GENIE_USE_OPENMP})
     endif()
 endif()
 
-
+if(${BUILD_TRANSCODER})
+    include(htslib)
+endif()
 #==============================================================================
 # Executable/library paths
 #==============================================================================

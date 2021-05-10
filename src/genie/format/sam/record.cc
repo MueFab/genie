@@ -152,14 +152,14 @@ void Record::checkValuesUsingCondition() const{
 //        rname = "*";
 //        pos = 0;
 //        cigar = "*";
-//        mapq = 255; // TODO (Yeremia): Check default value of mapq
+//        qual = 255; // TODO (Yeremia): Check default value of qual
 //
 //        flag &= ~(1u << uint16_t(Record::FlagPos::PROPERLY_ALIGNED));
 //        flag &= ~(1u << uint16_t(Record::FlagPos::SECONDARY_ALIGNMENT));
 //        flag &= ~(1u << uint16_t(Record::FlagPos::SUPPLEMENTARY_ALIGNMENT));
 //    }
 
-    // TODO (Yeremia): Should the value of mapq set to default and unset flags just like using reliable unmapped condition?
+    // TODO (Yeremia): Should the value of qual set to default and unset flags just like using reliable unmapped condition?
     //       Case can be found in "simulation.1.homoINDELs.homoCEUsnps.reads2.fq.sam.samelength.sam"
     // Secondary unmapped condition - no assumption can be made
 //    if (rname == "*" || pos == 0 || cigar == "*") {
