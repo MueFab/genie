@@ -5,7 +5,7 @@ set(source_files
         #FileHandlingUtils.cc
         main.cc
         program-options.cc
-)
+        ../transcoder/main.cc)
 
 add_executable(encapsulator ${source_files})
 
