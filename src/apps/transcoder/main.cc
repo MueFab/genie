@@ -7,7 +7,10 @@ int main(int argc, char* argv[]) {
     try {
         transcoder::ProgramOptions programOptions(argc, argv);
 
-        sam_transcoder::sam_to_mgrec(programOptions);
+        uint8_t ret;
+        if ((ret = sam_transcoder::sam_to_mgrec(programOptions)) != 0){
+            UTILS_DIE("ERROR");
+        }
 
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;

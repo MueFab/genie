@@ -148,7 +148,7 @@ void Record::checkValuesUsingCondition() const{
 
     // True unmapped
     //   File : "simulation.1.homoINDELs.homoCEUsnps.reads2.fq.sam.samelength.sam"
-//    if (isCatUnmapped()) {
+//    if (isUnmapped()) {
 //        rname = "*";
 //        pos = 0;
 //        cigar = "*";
@@ -293,7 +293,7 @@ bool Record::isUnmapped() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Record::isNextUnmapped() const {
-    // See isCatUnmapped()
+    // See isUnmapped()
     return checkFlag(FlagPos::NEXT_SEGMENT_UNMAPPED) || rnext == "*";
 }
 
