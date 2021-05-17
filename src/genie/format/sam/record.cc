@@ -148,7 +148,7 @@ void Record::checkValuesUsingCondition() const{
 
     // True unmapped
     //   File : "simulation.1.homoINDELs.homoCEUsnps.reads2.fq.sam.samelength.sam"
-//    if (isUnmapped()) {
+//    if (isCatUnmapped()) {
 //        rname = "*";
 //        pos = 0;
 //        cigar = "*";
@@ -293,7 +293,7 @@ bool Record::isUnmapped() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Record::isNextUnmapped() const {
-    // See isUnmapped()
+    // See isCatUnmapped()
     return checkFlag(FlagPos::NEXT_SEGMENT_UNMAPPED) || rnext == "*";
 }
 
@@ -424,12 +424,12 @@ bool ReadTemplate::isSingle() {
 
 bool ReadTemplate::isPair() {
     // Pair non- and multiple alignments
-//    return !data[uint8_t(Index::PAIR_FIRST)].empty() &&
-//           !data[uint8_t(Index::PAIR_LAST)].empty() &&
-//           data[uint8_t(Index::PAIR_FIRST)].front().isPrimaryLine() &&
-//           data[uint8_t(Index::PAIR_LAST)].front().isPrimaryLine() &&
-//           data[uint8_t(Index::PAIR_FIRST)].front().isPairOf(data[uint8_t(Index::PAIR_LAST)].front()) &&
-//           data[uint8_t(Index::PAIR_LAST)].front().isPairOf(data[uint8_t(Index::PAIR_FIRST)].front());
+//    return !data[uint8_t(Index::PAIR_READ1)].empty() &&
+//           !data[uint8_t(Index::PAIR_READ2)].empty() &&
+//           data[uint8_t(Index::PAIR_READ1)].front().isPrimaryLine() &&
+//           data[uint8_t(Index::PAIR_READ2)].front().isPrimaryLine() &&
+//           data[uint8_t(Index::PAIR_READ1)].front().isPairOf(data[uint8_t(Index::PAIR_READ2)].front()) &&
+//           data[uint8_t(Index::PAIR_READ2)].front().isPairOf(data[uint8_t(Index::PAIR_READ1)].front());
 
     // Allow unpaired reads
     return (!data[uint8_t(Index::PAIR_FIRST)].empty() && data[uint8_t(Index::PAIR_FIRST)].front().isPrimaryLine()) ||

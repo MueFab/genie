@@ -1,24 +1,18 @@
 //#include <htslib/sam.h>
-#include <genie/format/sam/record.h>
+//#include <genie/format/sam/record.h>
 #include <algorithm>
 #include <genie/core/record/alignment_split/other-rec.h>
 #include <genie/core/record/alignment_split/same-rec.h>
 #include <genie/core/record/alignment_split/unpaired.h>
 #include <genie/core/record/alignment_external/other-rec.h>
 
+#include <genie/util/runtime-exception.h>
+
 #include "sam_record.h"
 
 namespace sam_transcoder {
 
-bool checkFlag(SamRecord& rec, uint16_t flag){
-    return (rec.flag & flag) != 0;
-}
-
-bool isPrimary(SamRecord& rec){
-    return !checkFlag(rec, BAM_FSECONDARY) && !checkFlag(rec, BAM_FSUPPLEMENTARY);
-}
-
-char fourBitBase2Char(uint8_t int_base){
+char Record::fourBitBase2Char(uint8_t int_base){
     switch(int_base){
         case 1:
             return 'A';
@@ -36,7 +30,7 @@ char fourBitBase2Char(uint8_t int_base){
     }
 }
 
-std::string getCigarString(bam1_t *sam_alignment){
+std::string Record::getCigarString(bam1_t *sam_alignment){
     auto n_cigar = sam_alignment->core.n_cigar;
     auto cigar_ptr = bam_get_cigar(sam_alignment);
 
@@ -49,40 +43,185 @@ std::string getCigarString(bam1_t *sam_alignment){
     return cigar;
 }
 
-SamRecord alignment2Record(bam1_t *sam_alignment){
-//    std::string qname(bam_get_qname(sam_alignment));
-
+std::string Record::getSeqString(bam1_t *sam_alignment){
     auto seq_len = sam_alignment->core.l_qseq;
     auto seq_ptr = bam_get_seq(sam_alignment);
-//    std::vector<uint8_t> seq(seq_len);
-    std::string seq(seq_len, '\0');
+    std::string tmp_seq(seq_len, ' ');
     for (auto i=0; i<seq_len; i++){
-        seq[i] = fourBitBase2Char(bam_seqi(seq_ptr, i));
+        tmp_seq[i] = fourBitBase2Char(bam_seqi(seq_ptr, i));
     }
 
-    auto cigar = getCigarString(sam_alignment);
-
-    auto qual_ptr = bam_get_qual(sam_alignment);
-    std::string qual(seq_len, ' ');
-    for (auto i=0; i<seq_len; i++){
-        qual[i] = char(qual_ptr[i] + 33);
-    }
-
-    SamRecord sam_rec = {
-        bam_get_qname(sam_alignment),
-        sam_alignment->core.flag, // flag
-        sam_alignment->core.tid, // rid
-        (uint32_t) sam_alignment->core.pos, // pos
-        sam_alignment->core.qual, // mapq
-        std::move(cigar),
-        sam_alignment->core.mtid,
-        (uint32_t)sam_alignment->core.mpos,
-        sam_alignment->core.isize,
-        std::move(seq),// Seq,
-        std::move(qual) // QUAL
-    };
-
-    return sam_rec;
+    return tmp_seq;
 }
+
+std::string Record::getQualString(bam1_t *sam_alignment){
+    auto seq_len = sam_alignment->core.l_qseq;
+    auto qual_ptr = bam_get_qual(sam_alignment);
+    std::string tmp_qual(seq_len, ' ');
+    for (auto i=0; i<seq_len; i++){
+        tmp_qual[i] = char(qual_ptr[i] + 33);
+    }
+    return tmp_qual;
+}
+
+char Record::convertCigar2ECigarChar(char token) {
+    static const auto lut_loc = []() -> std::string {
+        std::string lut(128, 0);
+        lut['M'] = '=';
+        lut['='] = '=';
+        lut['X'] = '=';
+        lut['I'] = '+';
+        lut['D'] = '-';
+        lut['N'] = '*';
+        lut['S'] = ')';
+        lut['H'] = ']';
+        lut['P'] = ']';
+        return lut;
+    }();
+    UTILS_DIE_IF(token < 0, "Invalid cigar token " + std::to_string(token));
+    char ret = lut_loc[token];
+    UTILS_DIE_IF(ret == 0, "Invalid cigar token" + std::to_string(token));
+    return ret;
+}
+
+int Record::stepSequence(char token) {
+    static const auto lut_loc = []() -> std::string {
+        std::string lut(128, 0);
+        lut['M'] = 1;
+        lut['='] = 1;
+        lut['X'] = 1;
+        lut['I'] = 1;
+        lut['D'] = 0;
+        lut['N'] = 0;
+        lut['S'] = 1;
+        lut['H'] = 0;
+        lut['P'] = 0;
+        return lut;
+    }();
+    UTILS_DIE_IF(token < 0, "Invalid cigar token " + std::to_string(token));
+    return lut_loc[token];
+}
+
+std::string Record::convertCigar2ECigar(const std::string& cigar, const std::string& seq){
+    std::string ecigar;
+    const size_t EXPECTED_ELONGATION = 4;  // Additional braces for softclips + hardclips
+    ecigar.reserve(cigar.length() + EXPECTED_ELONGATION);
+    size_t seq_pos = 0;
+    std::string digits;
+    for (const auto &a : cigar) {
+        if (std::isdigit(a)) {
+            digits += a;
+            continue;
+        }
+        if (a == 'X') {
+            size_t end = std::stoi(digits) + seq_pos;
+            UTILS_DIE_IF(end >= seq.length(), "CIGAR not valid for seq");
+            for (; seq_pos < end; ++seq_pos) {
+                ecigar += std::toupper(seq[seq_pos]);
+            }
+        } else {
+            if (a == 'S') {
+                ecigar += '(';
+            } else if (a == 'H') {
+                ecigar += '[';
+            }
+            char token = convertCigar2ECigarChar(a);
+            seq_pos += stepSequence(a) * std::stoi(digits);
+            ecigar += digits;
+            ecigar += token;
+        }
+        digits.clear();
+    }
+    return ecigar;
+}
+
+Record::Record(bam1_t *sam_alignment):
+    qname(bam_get_qname(sam_alignment)),
+    flag(sam_alignment->core.flag),
+    rid(sam_alignment->core.tid),
+    pos((uint32_t) sam_alignment->core.pos),
+    mapq(sam_alignment->core.qual),
+    cigar(getCigarString(sam_alignment)),
+    mate_rid(sam_alignment->core.mtid),
+    mate_pos((uint32_t)sam_alignment->core.mpos),
+    tlen(sam_alignment->core.isize),
+    seq(getSeqString(sam_alignment)), // Initialized with empty char due to conversion later
+    qual(getQualString(sam_alignment)) // Initialized with empty char due to conversion later
+
+{}
+
+const std::string& Record::getQname() { return qname; }
+
+std::string&& Record::moveQname() { return std::move(qname); }
+
+uint16_t Record::getFlag() const { return flag; }
+
+int32_t Record::getRID() const {return rid; }
+
+uint32_t Record::getPos() const {return pos; }
+
+uint8_t Record::getMapq() const {return mapq; }
+
+const std::string& Record::getCigar() const { return cigar; }
+
+std::string&& Record::moveCigar() {return std::move(cigar); }
+
+std::string Record::getECigar() const{
+    return convertCigar2ECigar(cigar, seq);
+}
+
+int32_t Record::getMRID() const { return mate_rid;}
+
+uint32_t Record::getMPos() const { return mate_pos;}
+
+const std::string& Record::getSeq() const { return seq; }
+
+std::string&& Record::moveSeq() { return std::move(seq); }
+
+const std::string& Record::getQual() const { return qual; }
+
+std::string&& Record::moveQual(){ return std::move(qual); }
+
+bool Record::checkFlag(uint16_t _flag) const{ return (flag & _flag) == _flag; } // All must be set
+
+bool Record::checkNFlag(uint16_t _flag) const{ return (flag & _flag) == 0; } // All must be unset
+
+bool Record::isUnmapped() const{ return checkFlag(BAM_FUNMAP); }
+
+bool Record::isPrimary() const{
+    // "... satisfies ‘FLAG& 0x900 == 0’.  This line is called the primary line of the read."
+    return checkNFlag(BAM_FSECONDARY | BAM_FSUPPLEMENTARY);
+}
+
+bool Record::isSecondary() const{ return checkFlag(BAM_FSECONDARY); }
+
+bool Record::isDuplicates() const{ return checkFlag(BAM_FDUP); }
+
+bool Record::isSupplementary() const{ return checkFlag(BAM_FSUPPLEMENTARY); }
+
+bool Record::isPaired() const{ return checkFlag(BAM_FPAIRED); }
+
+bool Record::isRead1() const{ return checkFlag(BAM_FPAIRED | BAM_FREAD1); }
+
+bool Record::isRead2() const{ return checkFlag(BAM_FPAIRED | BAM_FREAD2); }
+
+/**
+* SamRecord are correctly oriented with respect to one another,
+* i.e. that one of the mate pairs maps to the forward strand and the other maps to the reverse strand.
+* If the mates don't map in a proper pair, that may mean that both reads map to the forward or reverse strand.
+* This includes that the reads are mapped to the same chromosomes.
+* @return
+*/
+bool Record::isProperlyPaired() const{
+    return checkFlag(BAM_FPAIRED | BAM_FPROPER_PAIR) &&
+           checkNFlag(BAM_FUNMAP);
+}
+
+bool Record::isPairedAndBothMapped() const{
+    return checkFlag(BAM_FPAIRED) &&
+           checkNFlag(BAM_FUNMAP | BAM_FMUNMAP);
+}
+
+bool Record::isReverse() const { return checkFlag(BAM_FREVERSE); }
 
 }
