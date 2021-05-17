@@ -13,53 +13,59 @@ namespace sam_transcoder {
 class SamRecordGroup {  // Helping structure to sort the records
    public:
     enum class Index : uint8_t {
-        SINGLE_UNMAPPED = 0,
-        SINGLE_MAPPED = 1,
-        PAIR_FIRST = 2,
-        PAIR_LAST = 3,
+        UNMAPPED = 0,
+        NOT_PAIRED = 1,
+        PAIR_READ1 = 2,
+        PAIR_READ2 = 3,
         UNKNOWN = 4,
         TOTAL_TYPES = 5,  // Not used
     };
 
    private:
-    std::vector<std::list<SamRecord>> data;
+    std::vector<std::list<Record>> data;
 
     std::tuple<bool, uint8_t> convertFlags2Mpeg(uint16_t flags);
 
     void convertUnmapped(std::list<genie::core::record::Record> &records);
-    void convertSingleEnd(std::list<genie::core::record::Record> &records, bool is_read_1_first=true);
-    void convertPairedEnd(std::list<genie::core::record::Record> &records, bool force_split);
+    void convertSingleEnd(std::list<genie::core::record::Record> &records,
+                          bool unmapped_pair=false, bool is_read_1_first=true);
+    void convertPairedEnd(std::list<genie::core::record::Record> &records,
+                          bool force_split=false);
 
    public:
     SamRecordGroup();
-    void addRecord(SamRecord &&rec);
+
+    bool getRecords(std::list<std::list<Record>>& sam_recs);
+
+    void addRecord(Record &&rec);
+
     /**
      * @brief Check if sam records in ReadTemplate are unmapped
      *
      * @return
      */
-    bool isUnmapped();
+    bool isCatUnmapped();
 
     /**
      * @brief Check if sam records in ReadTemplate are single-end reads
      *
      * @return
      */
-    bool isSingle();
+    bool isCatNotPaired();
 
     /**
      * @brief Check if sam records in ReadTemplate are paired-end reads
      *
      * @return
      */
-    bool isPair();
+    bool isCatPaired();
 
     /**
      * @brief Check if sam records in ReadTemplate cannot be categorized
      *
      * @return
      */
-    bool isUnknown();
+    bool isCatUnknown();
 
     /**
      * @brief Check if sam records are valid and does not belongs to 2 or more different category

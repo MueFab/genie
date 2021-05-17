@@ -22,5 +22,5 @@ target_link_libraries(transcoder ${CMAKE_BINARY_DIR}/htslib-build/lib/libhts.so)
 add_dependencies(transcoder genie-util)
 target_link_libraries(transcoder genie-util)
 
-add_dependencies(transcoder genie-sam)
-target_link_libraries(transcoder genie-sam)
+add_dependencies(transcoder genie-core)
+target_link_libraries(transcoder genie-core)

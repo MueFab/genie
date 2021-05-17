@@ -1,4 +1,7 @@
 #include "sam_transcoder.h"
+#include <record/alignment_split/unpaired.h>
+//#include <genie/util/make-unique.h>
+//#include <genie/util/runtime-exception.h>
 
 namespace sam_transcoder {
 
@@ -15,9 +18,9 @@ std::tuple<bool, uint8_t> SamRecordGroup::convertFlags2Mpeg(uint16_t flags) {
 }
 
 void SamRecordGroup::convertUnmapped(std::list<genie::core::record::Record> &records) {
-    auto &sam_rec = data[uint8_t(Index::SINGLE_UNMAPPED)].front();
+    auto &sam_rec = data[uint8_t(Index::UNMAPPED)].front();
 
-    auto flag_tuple = convertFlags2Mpeg(sam_rec.flag);
+    auto flag_tuple = convertFlags2Mpeg(sam_rec.getFlag());
     genie::core::record::Record rec(1, genie::core::record::ClassType::CLASS_I, std::move(sam_rec.qname), "Genie",
                                     std::get<1>(flag_tuple));
 
@@ -46,55 +49,61 @@ void SamRecordGroup::convertUnmapped(std::list<genie::core::record::Record> &rec
 
 void SamRecordGroup::convertSingleEnd(
     std::list<genie::core::record::Record> &records,
+    bool unmapped_pair,
     bool is_read_1_first
 ) {
 
-    auto &sam_recs = data[uint8_t(Index::SINGLE_MAPPED)];
+    auto &sam_recs = data[uint8_t(Index::NOT_PAIRED)];
     auto sam_rec = std::move(sam_recs.front());
     sam_recs.pop_front();
 
-    auto flag_tuple = convertFlags2Mpeg(sam_rec.flag);
-    genie::core::record::Record rec(1, genie::core::record::ClassType::CLASS_I, std::move(sam_rec.qname), "Genie", std::get<1>(flag_tuple),
-                             is_read_1_first);
+    auto flag_tuple = convertFlags2Mpeg(sam_rec.getFlag());
+    genie::core::record::Record rec(1,
+                                    genie::core::record::ClassType::CLASS_I,
+                                    sam_rec.moveQname(),
+                                    "Genie",
+                                    std::get<1>(flag_tuple),
+                                    is_read_1_first);
 
     {
         genie::core::record::Alignment alignment(
-            convertCigar2ECigar(sam_rec.cigar, sam_rec.seq),
-            checkFlag(sam_rec, BAM_FREVERSE)
+            sam_rec.getECigar(),
+            sam_rec.isReverse()
         );
-        alignment.addMappingScore(sam_rec.mapq);
+        alignment.addMappingScore(sam_rec.getMapq());
 
-        genie::core::record::AlignmentBox alignmentContainer(sam_rec.pos, std::move(alignment));
-        rec.addAlignment(sam_rec.rid, std::move(alignmentContainer));
+        genie::core::record::AlignmentBox alignmentContainer(sam_rec.getPos(), std::move(alignment));
+        rec.addAlignment(sam_rec.getRID(), std::move(alignmentContainer));
     }
 
-    genie::core::record::Segment segment(std::move(sam_rec.seq));
-    if (sam_rec.qual != "*") {
-        segment.addQualities(std::move(sam_rec.qual));
+    genie::core::record::Segment segment(sam_rec.moveSeq());
+    if (sam_rec.getQual() != "*") {
+        segment.addQualities(sam_rec.moveQual());
     } else {
         segment.addQualities(std::string("\0", 1));
     }
     rec.addSegment(std::move(segment));
 
     for (auto sam_rec_it = sam_recs.begin(); sam_rec_it != sam_recs.end(); sam_rec_it++) {
-        //        UTILS_DIE_IF(sam_rec_it->isUnmapped(),
+        //        UTILS_DIE_IF(sam_rec_it->isCatUnmapped(),
         //                     "Unaligned sam record found for qname " + sam_rec.getQname());
 
         genie::core::record::Alignment alignment(
-            convertCigar2ECigar(sam_rec_it->cigar, sam_rec_it->seq),
-            checkFlag(*sam_rec_it, BAM_FREVERSE)
+            sam_rec.getECigar(),
+            sam_rec_it->isReverse()
         );
-        alignment.addMappingScore(sam_rec_it->mapq);
+        alignment.addMappingScore(sam_rec_it->getMapq());
 
         // Convert from sam 1-based mapping position to mpeg-g 0-based coordinate
-        genie::core::record::AlignmentBox alignmentContainer(sam_rec.pos, std::move(alignment));
+        genie::core::record::AlignmentBox alignmentContainer(sam_rec.getPos(), std::move(alignment));
 
         if (unmapped_pair) {
-            auto splitAlign = util::make_unique<core::record::alignment_split::Unpaired>();
+            auto splitAlign = genie::util::make_unique<genie::core::record::alignment_split::Unpaired>();
             alignmentContainer.addAlignmentSplit(std::move(splitAlign));
         }
 
-        rec.addAlignment(refs.at(sam_rec_it->getRname()), std::move(alignmentContainer));
+        // TODO
+//        rec.addAlignment(refs.at(sam_rec_it->getRname()), std::move(alignmentContainer));
     }
 
     records.push_back(std::move(rec));
@@ -106,57 +115,78 @@ void SamRecordGroup::convertPairedEnd(std::list<genie::core::record::Record> &re
 
 SamRecordGroup::SamRecordGroup() : data(size_t(Index::TOTAL_TYPES)) {}
 
-void SamRecordGroup::addRecord(SamRecord &&rec) {
+void SamRecordGroup::addRecord(Record &&rec) {
+
+    // Default is class "UNKNOWN"
     auto idx = Index::UNKNOWN;
 
+    // Handles unmapped read
+    if (rec.isUnmapped()){
+        idx = Index::UNMAPPED;
+    }
+    // Single-end read
+    else if (!rec.isPaired()){
+        idx = Index::NOT_PAIRED;
+    }
     // Handles paired-end read / multi segments
-    if (checkFlag(rec, 1)) {
-        if (checkFlag(rec, BAM_FREAD1)) {
-            idx = Index::PAIR_FIRST;
-        } else if (checkFlag(rec, BAM_FREAD2)) {
-            idx = Index::PAIR_LAST;
+    else if (rec.isPaired()) {
+        if (rec.isRead1()) {
+            idx = Index::PAIR_READ1;
+        } else if (rec.isRead2()) {
+            idx = Index::PAIR_READ2;
         } else {
-            //            UTILS_DIE("Neither first nor last segment for Template " + rec.qname + " !");
+            UTILS_DIE("Neiter read1 nor read2:" + rec.getQname());
         }
-
-        // Handles single-end read / single segment
-        // TODO (Yeremia): for linear template FIRST_SEGMENT and LAST_SEGMENT are set,
-    } else if (!checkFlag(rec, BAM_FREAD1) && !checkFlag(rec, BAM_FREAD2)) {
-        idx = checkFlag(rec, BAM_FUNMAP) ? Index::SINGLE_UNMAPPED : Index::SINGLE_MAPPED;
-
-        // Should never be reached
+    // Should never be reached
     } else {
-        //        UTILS_DIE("Not handled case found for QNAME " + rec.qname + " !");
+        UTILS_DIE("Unhandeled case found:" + rec.getQname());
     }
 
-    if (isPrimary(rec)) {
+    // Push data based on property "isPrimary"
+    if (rec.isPrimary()) {
         data[uint8_t(idx)].push_front(std::move(rec));
     } else {
         data[uint8_t(idx)].push_back(std::move(rec));
     }
 }
 
-bool SamRecordGroup::isUnmapped() { return data[uint8_t(Index::SINGLE_UNMAPPED)].size() == 1; }
+bool SamRecordGroup::getRecords(std::list<std::list<Record>> &sam_recs) {
+    sam_recs.clear();
+    if (isValid()){
+        if (isCatUnmapped()){
+            sam_recs.push_back(std::move(data[uint8_t(Index::UNMAPPED)]));
+        } else if (isCatNotPaired()) {
+            sam_recs.push_back(std::move(data[uint8_t(Index::NOT_PAIRED)]));
+        } else if (isCatPaired()){
+            sam_recs.push_back(std::move(data[uint8_t(Index::PAIR_READ1)]));
+            sam_recs.push_back(std::move(data[uint8_t(Index::PAIR_READ2)]));
+        }
+    } else {
+        return false;
+    }
+}
 
-bool SamRecordGroup::isSingle() {
+bool SamRecordGroup::isCatUnmapped() { return data[uint8_t(Index::UNMAPPED)].size() == 1; }
+
+bool SamRecordGroup::isCatNotPaired() {
     // Single non- and multiplie alignements
-    return !data[uint8_t(Index::SINGLE_MAPPED)].empty() && isPrimary(data[uint8_t(Index::SINGLE_MAPPED)].front());
+    return !data[uint8_t(Index::NOT_PAIRED)].empty() && isPrimary(data[uint8_t(Index::NOT_PAIRED)].front());
 }
 
-bool SamRecordGroup::isPair() {
-    return (!data[uint8_t(Index::PAIR_FIRST)].empty() && isPrimary(data[uint8_t(Index::PAIR_FIRST)].front())) ||
-           (!data[uint8_t(Index::PAIR_LAST)].empty() && isPrimary(data[uint8_t(Index::PAIR_LAST)].front()));
+bool SamRecordGroup::isCatPaired() {
+    return (!data[uint8_t(Index::PAIR_READ1)].empty() && isPrimary(data[uint8_t(Index::PAIR_READ1)].front())) ||
+           (!data[uint8_t(Index::PAIR_READ2)].empty() && isPrimary(data[uint8_t(Index::PAIR_READ2)].front()));
 }
 
-bool SamRecordGroup::isUnknown() { return !data[uint8_t(Index::UNKNOWN)].empty(); }
+bool SamRecordGroup::isCatUnknown() { return !data[uint8_t(Index::UNKNOWN)].empty(); }
 
 bool SamRecordGroup::isValid() {
-    if (isUnknown() || data[uint8_t(Index::SINGLE_UNMAPPED)].size() > 1) {
+    if (isCatUnknown() || data[uint8_t(Index::UNMAPPED)].size() > 1) {
         return false;
     } else {
-        auto is_unmapped = isUnmapped();
-        auto is_single = isSingle();
-        auto is_pair = isPair();
+        auto is_unmapped = isCatUnmapped();
+        auto is_single = isCatNotPaired();
+        auto is_pair = isCatPaired();
 
         // Check if the current sam record groups belong to only one group
         return (is_unmapped && !is_single && !is_pair) || (!is_unmapped && is_single && !is_pair) ||
@@ -169,9 +199,9 @@ void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bo
         // TODO: Add error here
     }
 
-    auto is_unmapped = isUnmapped();
-    auto is_single = isSingle();
-    auto is_pair = isPair();
+    auto is_unmapped = isCatUnmapped();
+    auto is_single = isCatNotPaired();
+    auto is_pair = isCatPaired();
 
     if (is_unmapped) {
         convertUnmapped(records);
@@ -198,15 +228,15 @@ uint8_t sam_to_mgrec(transcoder::ProgramOptions& options){
     if (res == -1){
         return 1; // return ERROR
     }
-    auto sam_rec = alignment2Record(sam_alignment);
-    std::string curr_qname = sam_rec.qname;
+    auto sam_rec = Record(sam_alignment);
+    auto curr_qname = sam_rec.getQname();
     buffer.addRecord(std::move(sam_rec));
 
     while(sam_read1(sam_file, sam_header, sam_alignment) != -1){
-        sam_rec = sam_transcoder::alignment2Record(sam_alignment);
+        sam_rec = Record(sam_alignment);
 
-        if (sam_rec.qname != curr_qname){
-            curr_qname = sam_rec.qname;
+        if (sam_rec.getQname() != curr_qname){
+            curr_qname = sam_rec.getQname();
             buffer.convert(records);
         }
         buffer.addRecord(std::move(sam_rec));
@@ -216,75 +246,5 @@ uint8_t sam_to_mgrec(transcoder::ProgramOptions& options){
     sam_hdr_destroy(sam_header);
 }
 
-std::string SamRecordGroup::convertCigar2ECigar(const std::string &cigar, const std::string &seq) {
-    std::string ecigar;
-    const size_t EXPECTED_ELONGATION = 4;  // Additional braces for softclips + hardclips
-    ecigar.reserve(cigar.length() + EXPECTED_ELONGATION);
-    size_t seq_pos = 0;
-    std::string digits;
-    for (const auto &a : cigar) {
-        if (std::isdigit(a)) {
-            digits += a;
-            continue;
-        }
-        if (a == 'X') {
-            size_t end = std::stoi(digits) + seq_pos;
-            UTILS_DIE_IF(end >= seq.length(), "CIGAR not valid for seq");
-            for (; seq_pos < end; ++seq_pos) {
-                ecigar += std::toupper(seq[seq_pos]);
-            }
-        } else {
-            if (a == 'S') {
-                ecigar += '(';
-            } else if (a == 'H') {
-                ecigar += '[';
-            }
-            char token = convertCigar2ECigarChar(a);
-            seq_pos += stepSequence(a) * std::stoi(digits);
-            ecigar += digits;
-            ecigar += token;
-        }
-        digits.clear();
-    }
-    return ecigar;
-}
-
-int SamRecordGroup::stepSequence(char token) {
-    static const auto lut_loc = []() -> std::string {
-      std::string lut(128, 0);
-      lut['M'] = 1;
-      lut['='] = 1;
-      lut['X'] = 1;
-      lut['I'] = 1;
-      lut['D'] = 0;
-      lut['N'] = 0;
-      lut['S'] = 1;
-      lut['H'] = 0;
-      lut['P'] = 0;
-      return lut;
-    }();
-    UTILS_DIE_IF(token < 0, "Invalid cigar token " + std::to_string(token));
-    return lut_loc[token];
-}
-
-char SamRecordGroup::convertCigar2ECigarChar(char token) {
-    static const auto lut_loc = []() -> std::string {
-      std::string lut(128, 0);
-      lut['M'] = '=';
-      lut['='] = '=';
-      lut['X'] = '=';
-      lut['I'] = '+';
-      lut['D'] = '-';
-      lut['N'] = '*';
-      lut['S'] = ')';
-      lut['H'] = ']';
-      lut['P'] = ']';
-      return lut;
-    }();
-    UTILS_DIE_IF(token < 0, "Invalid cigar token " + std::to_string(token));
-    char ret = lut_loc[token];
-    UTILS_DIE_IF(ret == 0, "Invalid cigar token" + std::to_string(token));
-    return ret;
-}
 
 }
