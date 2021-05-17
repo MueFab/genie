@@ -641,7 +641,7 @@ void Importer::convertSingleEnd(std::list<core::record::Record> &records, SamRec
     rec.addSegment(std::move(segment));
 
     for (auto sam_rec_it = ++sam_recs.begin(); sam_rec_it != sam_recs.end(); sam_rec_it++) {
-        //        UTILS_DIE_IF(sam_rec_it->isCatUnmapped(),
+        //        UTILS_DIE_IF(sam_rec_it->isUnmapped(),
         //                     "Unaligned sam record found for qname " + sam_rec.getQname());
 
         core::record::Alignment alignment(convertCigar2ECigar(sam_rec_it->getCigar(), sam_rec_it->getSeq()),
@@ -672,7 +672,7 @@ void Importer::convertPairedEnd(std::list<core::record::Record> &records, SamRec
     auto read_1_primary = false;
     if (!read_1_empty) {
         read_1_primary = read_1.front().isPrimaryLine();
-        read_1_unmapped = read_1.front().isCatUnmapped();
+        read_1_unmapped = read_1.front().isUnmapped();
     }
     auto read_1_ok = !read_1_empty && read_1_primary && !read_1_unmapped;
 
@@ -681,7 +681,7 @@ void Importer::convertPairedEnd(std::list<core::record::Record> &records, SamRec
     auto read_2_unmapped = false;
     auto read_2_primary = false;
     if (!read_2_empty) {
-        read_2_unmapped = read_2.front().isCatUnmapped();
+        read_2_unmapped = read_2.front().isUnmapped();
         read_2_primary = read_2.front().isPrimaryLine();
     }
     auto read_2_ok = !read_2_empty && read_2_primary && !read_2_unmapped;

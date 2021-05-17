@@ -5,6 +5,7 @@
 #include <vector>
 #include <list>
 #include <genie/core/record/record.h>
+#include <genie/util/bitwriter.h>
 
 #include "sam_record.h"
 
@@ -14,11 +15,20 @@ class SamRecordGroup {  // Helping structure to sort the records
    public:
     enum class Index : uint8_t {
         UNMAPPED = 0,
-        NOT_PAIRED = 1,
-        PAIR_READ1 = 2,
-        PAIR_READ2 = 3,
-        UNKNOWN = 4,
-        TOTAL_TYPES = 5,  // Not used
+        SINGLE = 1,
+        PAIR_READ1_PRIMARY = 2,
+        PAIR_READ2_PRIMARY = 3,
+        PAIR_READ1_NONPRIMARY = 4,
+        PAIR_READ2_NONPRIMARY = 5,
+        UNKNOWN = 6,
+        TOTAL_INDICES = 7,  // Not used
+    };
+
+    enum class Class : uint8_t {
+        INVALID = 0,
+        UNMAPPED = 1,
+        SINGLE = 2,
+        PAIRED = 4,
     };
 
    private:
@@ -26,16 +36,22 @@ class SamRecordGroup {  // Helping structure to sort the records
 
     std::tuple<bool, uint8_t> convertFlags2Mpeg(uint16_t flags);
 
-    void convertUnmapped(std::list<genie::core::record::Record> &records);
+    void convertUnmapped(std::list<genie::core::record::Record>& records,
+                         Record& sam_rec);
+
     void convertSingleEnd(std::list<genie::core::record::Record> &records,
-                          bool unmapped_pair=false, bool is_read_1_first=true);
+                          std::list<Record>& sam_recs,
+                          bool unmapped_pair=false,
+                          bool is_read_1_first=true);
+
     void convertPairedEnd(std::list<genie::core::record::Record> &records,
+                          std::list<std::list<Record>>& sam_recs_2d,
                           bool force_split=false);
 
    public:
     SamRecordGroup();
 
-    bool getRecords(std::list<std::list<Record>>& sam_recs);
+    SamRecordGroup::Class getRecords(std::list<std::list<Record>>& sam_recs);
 
     void addRecord(Record &&rec);
 
@@ -44,28 +60,28 @@ class SamRecordGroup {  // Helping structure to sort the records
      *
      * @return
      */
-    bool isCatUnmapped();
+    bool isUnmapped();
 
     /**
      * @brief Check if sam records in ReadTemplate are single-end reads
      *
      * @return
      */
-    bool isCatNotPaired();
+    bool isSingle() const;
 
     /**
      * @brief Check if sam records in ReadTemplate are paired-end reads
      *
      * @return
      */
-    bool isCatPaired();
+    bool isPaired() const;
 
     /**
      * @brief Check if sam records in ReadTemplate cannot be categorized
      *
      * @return
      */
-    bool isCatUnknown();
+    bool isUnknown();
 
     /**
      * @brief Check if sam records are valid and does not belongs to 2 or more different category
@@ -74,31 +90,16 @@ class SamRecordGroup {  // Helping structure to sort the records
      */
     bool isValid();
 
+    Class computeClass();
+
     void convert(std::list<genie::core::record::Record> &records, bool force_split=false);
-
-    /**
-     *
-     * @param token
-     * @return
-     */
-    static char convertCigar2ECigarChar(char token);
-
-    /**
-     *
-     * @param token
-     * @return
-     */
-    static int stepSequence(char token);
-
-    /**
-     * Convert CIGAR string to ECIGAR string
-     *
-     * @param cigar
-     * @param seq
-     * @return
-     */
-    static std::string convertCigar2ECigar(const std::string &cigar, const std::string &seq);
 };
+
+bool save_mgrecs_by_rid(std::list<genie::core::record::Record>& mpegg_recs,
+                        std::map<int32_t, genie::util::BitWriter>& writers
+                        );
+
+uint8_t sam_to_mgrec_phase1(transcoder::ProgramOptions& options, int& nref);
 
 uint8_t sam_to_mgrec(transcoder::ProgramOptions& options);
 
