@@ -1,10 +1,13 @@
 #include "sam_transcoder.h"
 
+#include <iostream>
+#include <record/alignment_split/unpaired.h>
+#include <algorithm>
 #include <fstream>
 #include <map>
-#include <record/alignment_split/unpaired.h>
 //#include <genie/util/make-unique.h>
 //#include <genie/util/runtime-exception.h>
+#include "sam_sorter.h"
 
 namespace sam_transcoder {
 
@@ -21,8 +24,7 @@ std::tuple<bool, uint8_t> SamRecordGroup::convertFlags2Mpeg(uint16_t flags) {
 }
 
 void SamRecordGroup::convertUnmapped(
-    std::list<genie::core::record::Record> &records,
-    Record& sam_rec
+    std::list<genie::core::record::Record> &records, SamRecord& sam_rec
 ) {
 
     auto flag_tuple = convertFlags2Mpeg(sam_rec.getFlag());
@@ -34,7 +36,7 @@ void SamRecordGroup::convertUnmapped(
 
     // No alignmnent
     // core::record::Alignment alignment(convertCigar2ECigar(sam_rec.getCigar(), sam_rec.getSeq()),
-    //                                   sam_rec.checkFlag(Record::FlagPos::SEQ_REVERSE));
+    //                                   sam_rec.checkFlag(SamRecord::FlagPos::SEQ_REVERSE));
 
     // alignment.addMappingScore(sam_rec.getMapQ());
     // core::record::AlignmentBox alignmentContainer(sam_rec.getPos(), std::move(alignment));
@@ -56,7 +58,7 @@ void SamRecordGroup::convertUnmapped(
 
 void SamRecordGroup::convertSingleEnd(
     std::list<genie::core::record::Record> &records,
-    std::list<Record>& sam_recs,
+    std::list<SamRecord>& sam_recs,
     bool unmapped_pair,
     bool is_read_1_first
 ) {
@@ -111,7 +113,7 @@ void SamRecordGroup::convertSingleEnd(
 
 void SamRecordGroup::convertPairedEnd(
     std::list<genie::core::record::Record> &records,
-    std::list<std::list<Record>>& sam_recs,
+    std::list<std::list<SamRecord>>& sam_recs,
     bool force_split
 ) {
 
@@ -119,7 +121,7 @@ void SamRecordGroup::convertPairedEnd(
 
 SamRecordGroup::SamRecordGroup() : data(size_t(Index::TOTAL_INDICES)) {}
 
-void SamRecordGroup::addRecord(Record &&rec) {
+void SamRecordGroup::addRecord(SamRecord&&rec) {
 
     // Default is class "UNKNOWN"
     auto idx = Index::UNKNOWN;
@@ -160,7 +162,7 @@ void SamRecordGroup::addRecord(Record &&rec) {
     data[uint8_t(idx)].push_back(std::move(rec));
 }
 
-SamRecordGroup::Class SamRecordGroup::getRecords(std::list<std::list<Record>> &sam_recs) {
+SamRecordGroup::Class SamRecordGroup::getRecords(std::list<std::list<SamRecord>> &sam_recs) {
     sam_recs.clear();
 
     auto cls = computeClass();
@@ -234,7 +236,7 @@ SamRecordGroup::Class SamRecordGroup::computeClass() {
 
 void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bool force_split) {
 
-    std::list<std::list<Record>> sam_recs_2d;
+    std::list<std::list<SamRecord>> sam_recs_2d;
 
     auto cls = getRecords(sam_recs_2d);
     if (cls == Class::INVALID) {
@@ -259,25 +261,22 @@ void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bo
 
 bool save_mgrecs_by_rid(
     std::list<genie::core::record::Record>&recs,
-    std::map<int32_t, genie::util::BitWriter>& writers
-){
+    std::map<int32_t, genie::util::BitWriter>& bitwriters){
 
     for (auto & rec : recs) {
         auto ref_id = rec.getAlignmentSharedData().getSeqID();
 
         try {
-            auto writer = writers.at(ref_id);
+            auto bitwriter = bitwriters.at(ref_id);
 
             // TODO: Handle case where harddrive is full
-            rec.write(writer);
-            writer.flush();
+            rec.write(bitwriter);
+            bitwriter.flush();
         } catch (std::out_of_range){
             return false;
         }
     }
-
     recs.clear();
-
     return true;
 }
 
@@ -317,7 +316,7 @@ uint8_t sam_to_mgrec_phase1(
 
     nref = sam_hdr_nref(sam_header);
     for (int32_t i=0; i<nref; i++){
-        std::string fpath = options.tmp_dir_path + "/" + std::to_string(i) + ".mgrec";
+        std::string fpath = options.tmp_dir_path + "/" + std::to_string(i) + PHASE1_EXT;
 
         p1_writers.emplace_back(fpath, std::ios::trunc | std::ios::binary);
         p1_bitwriters.emplace(i, &(p1_writers.back()));
@@ -332,12 +331,12 @@ uint8_t sam_to_mgrec_phase1(
 
         return return_code;
     }
-    auto sam_rec = Record(sam_alignment);
+    auto sam_rec = SamRecord(sam_alignment);
     auto curr_qname = sam_rec.getQname();
     buffer.addRecord(std::move(sam_rec));
 
     while((res = sam_read1(sam_file, sam_header, sam_alignment)) >= 0){
-        sam_rec = Record(sam_alignment);
+        sam_rec = SamRecord(sam_alignment);
 
         if (sam_rec.getQname() != curr_qname){
             curr_qname = sam_rec.getQname();
@@ -374,12 +373,99 @@ uint8_t sam_to_mgrec_phase1(
     return return_code;
 }
 
+uint8_t sam_to_mgrec_phase2(
+    transcoder::ProgramOptions& options,
+    int& nref
+){
+    for (auto i = 0; i< nref; i++){
+        auto n_tmp_files = 0;
+
+        std::string fpath = options.tmp_dir_path + "/" + std::to_string(i) + PHASE1_EXT;
+        std::ifstream reader(fpath, std::ios::binary);
+        genie::util::BitReader bitreader(reader);
+
+        std::string tmp_fpath = options.tmp_dir_path + "/" + std::to_string(i) + PHASE2_EXT;
+        std::ofstream writer(tmp_fpath, std::ios::trunc | std::ios::binary);
+        genie::util::BitWriter bitwriter(&writer);
+
+        std::vector<genie::core::record::Record> buffer;
+
+        /// Split mgrec into multiple files
+        while(reader.good() && reader.peek() != EOF) {
+            /// Read MPEG-G records
+            while (reader.good() && buffer.size() < BUFFER_SIZE) {
+                genie::core::record::Record rec(bitreader);
+                bitreader.flush();
+
+                /// Store unmapped record to output file
+                if (rec.getAlignments().empty()) {
+                    rec.write(bitwriter);
+                    bitwriter.flush();
+                } else {
+                    buffer.emplace_back(std::move(rec));
+                }
+            }
+
+            /// Sort records in buffer by POS
+            std::sort(buffer.begin(), buffer.end(), compare);
+
+            tmp_fpath = options.tmp_dir_path + "/" + std::to_string(i) +
+                        '.' + std::to_string(n_tmp_files++) + PHASE2_TMP_EXT;
+            std::ofstream tmp_writer(tmp_fpath, std::ios::trunc | std::ios::binary);
+            genie::util::BitWriter tmp_bitwriter(&tmp_writer);
+
+            for (auto& rec : buffer) {
+                rec.write(tmp_bitwriter);
+                tmp_bitwriter.flush();
+            }
+
+            buffer.clear();
+            tmp_writer.close();
+        }
+        reader.close();
+
+        std::list<SubfileReader> tmp_file_readers;
+        for (auto i_file=0; i_file < n_tmp_files; i_file++){
+            tmp_fpath = options.tmp_dir_path + "/" + std::to_string(i) +
+                        '.' + std::to_string(i_file) + PHASE2_TMP_EXT;
+
+            tmp_file_readers.emplace_back(tmp_fpath);
+
+            /// Cache MPEG-G record
+            if (!tmp_file_readers.back().readRecord()){
+                tmp_file_readers.pop_back();
+            }
+        }
+
+        while(!tmp_file_readers.empty()){
+            /// Find reader containing MPEG-G record with smallest POS value
+            auto reader_with_smallest_pos = tmp_file_readers.begin();
+            for (auto iter = std::next(tmp_file_readers.begin()); iter != tmp_file_readers.end(); iter++){
+                if (iter->getPos() < reader_with_smallest_pos->getPos()){
+                    reader_with_smallest_pos = iter;
+                }
+            }
+
+            reader_with_smallest_pos->writeRecord(bitwriter);
+            if (!reader_with_smallest_pos->readRecord()){
+                tmp_file_readers.erase(reader_with_smallest_pos);
+            }
+        }
+
+        printf("");
+    }
+}
+
 uint8_t sam_to_mgrec(transcoder::ProgramOptions& options){
 
     int nref;
+    uint8_t status;
 
-    auto status =sam_to_mgrec_phase1(options, nref) != 0;
-    if (status != 0){
+//    if ((status = sam_to_mgrec_phase1(options, nref)) != 0){
+//        return status;
+//    }
+
+    if ((status = sam_to_mgrec_phase2(options, nref)) != 0){
         return status;
     }
 

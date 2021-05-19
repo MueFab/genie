@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "program-options.h"
+#include "sam_sorter.h"
 #include "sam_transcoder.h"
 
 int main(int argc, char* argv[]) {
