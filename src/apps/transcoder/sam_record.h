@@ -10,7 +10,7 @@
 
 namespace sam_transcoder {
 
-class Record{
+class SamRecord {
   private:
     std::string qname; // Query template name
     uint16_t flag; // Flag
@@ -38,7 +38,7 @@ class Record{
 
     static std::string convertCigar2ECigar(const std::string &cigar, const std::string &seq);
 
-    explicit Record(bam1_t *sam_alignment);
+    explicit SamRecord(bam1_t *sam_alignment);
 
     const std::string& getQname();
 

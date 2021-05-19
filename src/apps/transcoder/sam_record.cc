@@ -12,7 +12,7 @@
 
 namespace sam_transcoder {
 
-char Record::fourBitBase2Char(uint8_t int_base){
+char SamRecord::fourBitBase2Char(uint8_t int_base){
     switch(int_base){
         case 1:
             return 'A';
@@ -30,7 +30,7 @@ char Record::fourBitBase2Char(uint8_t int_base){
     }
 }
 
-std::string Record::getCigarString(bam1_t *sam_alignment){
+std::string SamRecord::getCigarString(bam1_t *sam_alignment){
     auto n_cigar = sam_alignment->core.n_cigar;
     auto cigar_ptr = bam_get_cigar(sam_alignment);
 
@@ -43,7 +43,7 @@ std::string Record::getCigarString(bam1_t *sam_alignment){
     return cigar;
 }
 
-std::string Record::getSeqString(bam1_t *sam_alignment){
+std::string SamRecord::getSeqString(bam1_t *sam_alignment){
     auto seq_len = sam_alignment->core.l_qseq;
     auto seq_ptr = bam_get_seq(sam_alignment);
     std::string tmp_seq(seq_len, ' ');
@@ -54,7 +54,7 @@ std::string Record::getSeqString(bam1_t *sam_alignment){
     return tmp_seq;
 }
 
-std::string Record::getQualString(bam1_t *sam_alignment){
+std::string SamRecord::getQualString(bam1_t *sam_alignment){
     auto seq_len = sam_alignment->core.l_qseq;
     auto qual_ptr = bam_get_qual(sam_alignment);
     std::string tmp_qual(seq_len, ' ');
@@ -64,7 +64,7 @@ std::string Record::getQualString(bam1_t *sam_alignment){
     return tmp_qual;
 }
 
-char Record::convertCigar2ECigarChar(char token) {
+char SamRecord::convertCigar2ECigarChar(char token) {
     static const auto lut_loc = []() -> std::string {
         std::string lut(128, 0);
         lut['M'] = '=';
@@ -84,7 +84,7 @@ char Record::convertCigar2ECigarChar(char token) {
     return ret;
 }
 
-int Record::stepSequence(char token) {
+int SamRecord::stepSequence(char token) {
     static const auto lut_loc = []() -> std::string {
         std::string lut(128, 0);
         lut['M'] = 1;
@@ -102,7 +102,7 @@ int Record::stepSequence(char token) {
     return lut_loc[token];
 }
 
-std::string Record::convertCigar2ECigar(const std::string& cigar, const std::string& seq){
+std::string SamRecord::convertCigar2ECigar(const std::string& cigar, const std::string& seq){
     std::string ecigar;
     const size_t EXPECTED_ELONGATION = 4;  // Additional braces for softclips + hardclips
     ecigar.reserve(cigar.length() + EXPECTED_ELONGATION);
@@ -135,7 +135,7 @@ std::string Record::convertCigar2ECigar(const std::string& cigar, const std::str
     return ecigar;
 }
 
-Record::Record(bam1_t *sam_alignment):
+SamRecord::SamRecord(bam1_t *sam_alignment):
     qname(bam_get_qname(sam_alignment)),
     flag(sam_alignment->core.flag),
     rid(sam_alignment->core.tid),
@@ -150,60 +150,60 @@ Record::Record(bam1_t *sam_alignment):
 
 {}
 
-const std::string& Record::getQname() { return qname; }
+const std::string& SamRecord::getQname() { return qname; }
 
-std::string&& Record::moveQname() { return std::move(qname); }
+std::string&& SamRecord::moveQname() { return std::move(qname); }
 
-uint16_t Record::getFlag() const { return flag; }
+uint16_t SamRecord::getFlag() const { return flag; }
 
-int32_t Record::getRID() const {return rid; }
+int32_t SamRecord::getRID() const {return rid; }
 
-uint32_t Record::getPos() const {return pos; }
+uint32_t SamRecord::getPos() const {return pos; }
 
-uint8_t Record::getMapq() const {return mapq; }
+uint8_t SamRecord::getMapq() const {return mapq; }
 
-const std::string& Record::getCigar() const { return cigar; }
+const std::string& SamRecord::getCigar() const { return cigar; }
 
-std::string&& Record::moveCigar() {return std::move(cigar); }
+std::string&& SamRecord::moveCigar() {return std::move(cigar); }
 
-std::string Record::getECigar() const{
+std::string SamRecord::getECigar() const{
     return convertCigar2ECigar(cigar, seq);
 }
 
-int32_t Record::getMRID() const { return mate_rid;}
+int32_t SamRecord::getMRID() const { return mate_rid;}
 
-uint32_t Record::getMPos() const { return mate_pos;}
+uint32_t SamRecord::getMPos() const { return mate_pos;}
 
-const std::string& Record::getSeq() const { return seq; }
+const std::string& SamRecord::getSeq() const { return seq; }
 
-std::string&& Record::moveSeq() { return std::move(seq); }
+std::string&& SamRecord::moveSeq() { return std::move(seq); }
 
-const std::string& Record::getQual() const { return qual; }
+const std::string& SamRecord::getQual() const { return qual; }
 
-std::string&& Record::moveQual(){ return std::move(qual); }
+std::string&& SamRecord::moveQual(){ return std::move(qual); }
 
-bool Record::checkFlag(uint16_t _flag) const{ return (flag & _flag) == _flag; } // All must be set
+bool SamRecord::checkFlag(uint16_t _flag) const{ return (flag & _flag) == _flag; } // All must be set
 
-bool Record::checkNFlag(uint16_t _flag) const{ return (flag & _flag) == 0; } // All must be unset
+bool SamRecord::checkNFlag(uint16_t _flag) const{ return (flag & _flag) == 0; } // All must be unset
 
-bool Record::isUnmapped() const{ return checkFlag(BAM_FUNMAP); }
+bool SamRecord::isUnmapped() const{ return checkFlag(BAM_FUNMAP); }
 
-bool Record::isPrimary() const{
+bool SamRecord::isPrimary() const{
     // "... satisfies ‘FLAG& 0x900 == 0’.  This line is called the primary line of the read."
     return checkNFlag(BAM_FSECONDARY | BAM_FSUPPLEMENTARY);
 }
 
-bool Record::isSecondary() const{ return checkFlag(BAM_FSECONDARY); }
+bool SamRecord::isSecondary() const{ return checkFlag(BAM_FSECONDARY); }
 
-bool Record::isDuplicates() const{ return checkFlag(BAM_FDUP); }
+bool SamRecord::isDuplicates() const{ return checkFlag(BAM_FDUP); }
 
-bool Record::isSupplementary() const{ return checkFlag(BAM_FSUPPLEMENTARY); }
+bool SamRecord::isSupplementary() const{ return checkFlag(BAM_FSUPPLEMENTARY); }
 
-bool Record::isPaired() const{ return checkFlag(BAM_FPAIRED); }
+bool SamRecord::isPaired() const{ return checkFlag(BAM_FPAIRED); }
 
-bool Record::isRead1() const{ return checkFlag(BAM_FPAIRED | BAM_FREAD1); }
+bool SamRecord::isRead1() const{ return checkFlag(BAM_FPAIRED | BAM_FREAD1); }
 
-bool Record::isRead2() const{ return checkFlag(BAM_FPAIRED | BAM_FREAD2); }
+bool SamRecord::isRead2() const{ return checkFlag(BAM_FPAIRED | BAM_FREAD2); }
 
 /**
 * SamRecord are correctly oriented with respect to one another,
@@ -212,16 +212,16 @@ bool Record::isRead2() const{ return checkFlag(BAM_FPAIRED | BAM_FREAD2); }
 * This includes that the reads are mapped to the same chromosomes.
 * @return
 */
-bool Record::isProperlyPaired() const{
+bool SamRecord::isProperlyPaired() const{
     return checkFlag(BAM_FPAIRED | BAM_FPROPER_PAIR) &&
            checkNFlag(BAM_FUNMAP);
 }
 
-bool Record::isPairedAndBothMapped() const{
+bool SamRecord::isPairedAndBothMapped() const{
     return checkFlag(BAM_FPAIRED) &&
            checkNFlag(BAM_FUNMAP | BAM_FMUNMAP);
 }
 
-bool Record::isReverse() const { return checkFlag(BAM_FREVERSE); }
+bool SamRecord::isReverse() const { return checkFlag(BAM_FREVERSE); }
 
 }
