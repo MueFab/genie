@@ -1,12 +1,15 @@
 #include "sam_transcoder.h"
 
 #include <iostream>
-#include <record/alignment_split/unpaired.h>
 #include <algorithm>
 #include <fstream>
 #include <map>
+#include <cstdio>
+
 //#include <genie/util/make-unique.h>
 //#include <genie/util/runtime-exception.h>
+#include <record/alignment_split/unpaired.h>
+
 #include "sam_sorter.h"
 
 namespace sam_transcoder {
@@ -267,11 +270,12 @@ bool save_mgrecs_by_rid(
         auto ref_id = rec.getAlignmentSharedData().getSeqID();
 
         try {
+            UTILS_DIE_IF(rec.getClassID() != genie::core::record::ClassType::CLASS_I, "Invalid Class");
             auto bitwriter = bitwriters.at(ref_id);
 
             // TODO: Handle case where harddrive is full
             rec.write(bitwriter);
-            bitwriter.flush();
+//            bitwriter.flush();
         } catch (std::out_of_range){
             return false;
         }
@@ -363,8 +367,12 @@ uint8_t sam_to_mgrec_phase1(
         UTILS_DIE("Cannot save MPEG-G Records");
     }
 
-    // Close all bitreader
-    // TODO
+    auto iter_map = p1_bitwriters.begin();
+    auto iter_writer = p1_writers.begin();
+    while (iter_map != p1_bitwriters.end() && iter_writer == p1_writers.end()){
+        iter_map->second.flush();
+        iter_writer->close();
+    }
 
     bam_destroy1(sam_alignment);
     bam_hdr_destroy(sam_header);
@@ -373,34 +381,44 @@ uint8_t sam_to_mgrec_phase1(
     return return_code;
 }
 
+std::string gen_p2_tmp_fpath(
+    transcoder::ProgramOptions& options,
+    int rid,
+    int ifile
+){
+    return options.tmp_dir_path + "/" + std::to_string(rid) +
+                '.' + std::to_string(ifile) + PHASE2_TMP_EXT;
+}
+
 uint8_t sam_to_mgrec_phase2(
     transcoder::ProgramOptions& options,
     int& nref
 ){
-    for (auto i = 0; i< nref; i++){
+    for (auto iref = 0; iref < nref; iref++){
         auto n_tmp_files = 0;
 
-        std::string fpath = options.tmp_dir_path + "/" + std::to_string(i) + PHASE1_EXT;
+        std::string fpath = options.tmp_dir_path + "/" + std::to_string(iref) + PHASE1_EXT;
         std::ifstream reader(fpath, std::ios::binary);
         genie::util::BitReader bitreader(reader);
 
-        std::string tmp_fpath = options.tmp_dir_path + "/" + std::to_string(i) + PHASE2_EXT;
-        std::ofstream writer(tmp_fpath, std::ios::trunc | std::ios::binary);
-        genie::util::BitWriter bitwriter(&writer);
+        std::string tmp_fpath = options.tmp_dir_path + "/" + std::to_string(iref) + PHASE2_EXT;
+        std::ofstream p2_writer(tmp_fpath, std::ios::binary | std::ios::trunc);
+        genie::util::BitWriter p2_bitwriter(&p2_writer);
 
         std::vector<genie::core::record::Record> buffer;
 
-        /// Split mgrec into multiple files
+        /// Split mgrec into multiple files and the records are sorted
         while(reader.good() && reader.peek() != EOF) {
             /// Read MPEG-G records
-            while (reader.good() && buffer.size() < BUFFER_SIZE) {
+            while (reader.good() && reader.peek() != EOF && buffer.size() < BUFFER_SIZE) {
                 genie::core::record::Record rec(bitreader);
-                bitreader.flush();
 
+                UTILS_DIE_IF(rec.getClassID() != genie::core::record::ClassType::CLASS_I,
+                             "Invalid Class found while reading records from phase 1 transcoding");
+//
                 /// Store unmapped record to output file
                 if (rec.getAlignments().empty()) {
-                    rec.write(bitwriter);
-                    bitwriter.flush();
+                    rec.write(p2_bitwriter);
                 } else {
                     buffer.emplace_back(std::move(rec));
                 }
@@ -409,9 +427,8 @@ uint8_t sam_to_mgrec_phase2(
             /// Sort records in buffer by POS
             std::sort(buffer.begin(), buffer.end(), compare);
 
-            tmp_fpath = options.tmp_dir_path + "/" + std::to_string(i) +
-                        '.' + std::to_string(n_tmp_files++) + PHASE2_TMP_EXT;
-            std::ofstream tmp_writer(tmp_fpath, std::ios::trunc | std::ios::binary);
+            std::ofstream tmp_writer(gen_p2_tmp_fpath(options, iref, n_tmp_files++),
+                                     std::ios::trunc | std::ios::binary);
             genie::util::BitWriter tmp_bitwriter(&tmp_writer);
 
             for (auto& rec : buffer) {
@@ -424,14 +441,12 @@ uint8_t sam_to_mgrec_phase2(
         }
         reader.close();
 
+        /// Open and cache the first record from each temporary file
         std::list<SubfileReader> tmp_file_readers;
         for (auto i_file=0; i_file < n_tmp_files; i_file++){
-            tmp_fpath = options.tmp_dir_path + "/" + std::to_string(i) +
-                        '.' + std::to_string(i_file) + PHASE2_TMP_EXT;
+            tmp_file_readers.emplace_back(gen_p2_tmp_fpath(options, iref, i_file));
 
-            tmp_file_readers.emplace_back(tmp_fpath);
-
-            /// Cache MPEG-G record
+            /// Try to cache the first MPEG-G record, otherwise delete
             if (!tmp_file_readers.back().readRecord()){
                 tmp_file_readers.pop_back();
             }
@@ -446,14 +461,24 @@ uint8_t sam_to_mgrec_phase2(
                 }
             }
 
-            reader_with_smallest_pos->writeRecord(bitwriter);
+            reader_with_smallest_pos->writeRecord(p2_bitwriter);
+            /// Close the current tmp file if it contains no more record;
             if (!reader_with_smallest_pos->readRecord()){
                 tmp_file_readers.erase(reader_with_smallest_pos);
             }
         }
 
-        printf("");
+        /// Close Phase 2 transcoding output file
+        p2_bitwriter.flush();
+        p2_writer.close();
+
+        /// Remove all temporary file belonging to current RID
+        for (auto i_file=0; i_file < n_tmp_files; i_file++){
+            std::remove(gen_p2_tmp_fpath(options, iref, i_file).c_str());
+        }
     }
+
+    return EXIT_SUCCESS;
 }
 
 uint8_t sam_to_mgrec(transcoder::ProgramOptions& options){
@@ -461,15 +486,15 @@ uint8_t sam_to_mgrec(transcoder::ProgramOptions& options){
     int nref;
     uint8_t status;
 
-//    if ((status = sam_to_mgrec_phase1(options, nref)) != 0){
-//        return status;
-//    }
-
-    if ((status = sam_to_mgrec_phase2(options, nref)) != 0){
-        return status;
+    if ((status = sam_to_mgrec_phase1(options, nref)) != EXIT_SUCCESS){
+        return EXIT_FAILURE;
     }
 
-    return status;
+    if ((status = sam_to_mgrec_phase2(options, nref)) != EXIT_SUCCESS){
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 
 }
 

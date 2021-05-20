@@ -1,71 +1,32 @@
 #include "sam_sorter.h"
 
+#include <iostream>
+
 namespace sam_transcoder {
-
-SubfileWriter::SubfileWriter(const std::string& fpath):
-    curr_mgrec_pos(0),
-    writer(fpath, std::ios::trunc | std::ios::binary), // Always overwrite
-    bitwriter(&writer)
-{}
-
-bool SubfileWriter::writeUnmappedRecord(genie::core::record::Record &rec) {
-
-    rec.write(bitwriter);
-    bitwriter.flush();
-
-    return true;
-}
-
-bool SubfileWriter::writeRecord(genie::core::record::Record &rec) {
-
-    auto rec_pos = getMinPos(rec);
-
-    if (rec_pos < curr_mgrec_pos){
-        return false;
-    } else{
-        rec.write(bitwriter);
-        bitwriter.flush();
-        curr_mgrec_pos = rec_pos;
-
-        return true;
-    }
-}
-
-void SubfileWriter::close() {
-    bitwriter.flush();
-    if (writer.is_open()){
-        writer.close();
-    }
-}
 
 SubfileReader::SubfileReader(const std::string& fpath):
     curr_mgrec_pos(0),
     reader(fpath, std::ios::binary), // Start from the end to tell the filesize
     bitreader(reader),
     rec()
-{
-    if (reader.good()){
-        rec = genie::core::record::Record(bitreader);
-        curr_mgrec_pos = getMinPos(rec);
-    }
-}
+{}
 
 SubfileReader::~SubfileReader(){
     reader.close();
 }
 
 bool SubfileReader::readRecord(){
-    if (reader.good()){
+//    std::cout << reader.tellg();
+//    printf(std::to_string(reader.tellg()));
+    auto pos = reader.tellg();
+    if (reader.good() && reader.peek() != EOF){
         rec = genie::core::record::Record(bitreader);
-        bitreader.flush();
-
-        if (rec.getAlignments().empty()) {
-            auto x = 2;
-        }
         curr_mgrec_pos = getMinPos(rec);
 
         return true;
     } else {
+        bitreader.flush();
+        reader.close();
         return false;
     }
 }

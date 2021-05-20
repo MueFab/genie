@@ -104,6 +104,8 @@ bool save_mgrecs_by_rid(std::list<genie::core::record::Record>& mpegg_recs,
 
 uint8_t sam_to_mgrec_phase1(transcoder::ProgramOptions& options, int& nref);
 
+std::string gen_p2_tmp_fpath( transcoder::ProgramOptions& options, int rid, int ifile);
+
 uint8_t sam_to_mgrec_phase2(transcoder::ProgramOptions& options, int& nref);
 
 uint8_t sam_to_mgrec(transcoder::ProgramOptions& options);
