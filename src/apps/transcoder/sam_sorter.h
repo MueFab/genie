@@ -8,22 +8,6 @@
 
 namespace sam_transcoder {
 
-class SubfileWriter {
-   private:
-    uint64_t curr_mgrec_pos;
-    std::ofstream writer;
-    genie::util::BitWriter bitwriter;
-
-   public:
-    explicit SubfileWriter(const std::string& fpath);
-
-    bool writeUnmappedRecord(genie::core::record::Record& rec);
-
-    bool writeRecord(genie::core::record::Record& rec);
-
-    void close();
-};
-
 class SubfileReader {
    private:
     uint64_t curr_mgrec_pos;
