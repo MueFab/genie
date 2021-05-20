@@ -178,16 +178,16 @@ void SamRecordGroup::addRecord(SamRecord &&rec) {
     /// Default is class "UNKNOWN"
     auto idx = Index::UNKNOWN;
 
-    /// Handles unmapped read
-    if (rec.isUnmapped()) {
-        idx = Index::UNMAPPED;
-    }
     /// Single-end read
-    else if (!rec.isPaired()) {
-        idx = Index::SINGLE;
+    if (!rec.isPaired()) {
+        if (rec.isUnmapped()){
+            idx = Index::UNMAPPED;
+        } else {
+            idx = Index::SINGLE;
+        }
     }
     // Handles paired-end read / multi segments
-    else if (rec.isPaired()) {
+    else {
         if (rec.isRead1()) {
             if (rec.isPrimary()) {
                 idx = Index::PAIR_READ1_PRIMARY;
@@ -203,10 +203,6 @@ void SamRecordGroup::addRecord(SamRecord &&rec) {
         } else {
             UTILS_DIE("Neiter read1 nor read2:" + rec.getQname());
         }
-
-        /// Should never be reached
-    } else {
-        UTILS_DIE("Unhandeled case found:" + rec.getQname());
     }
 
     data[uint8_t(idx)].push_back(std::move(rec));
