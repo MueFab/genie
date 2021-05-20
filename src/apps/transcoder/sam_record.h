@@ -78,6 +78,8 @@ class SamRecord {
 
     bool isUnmapped() const;
 
+    bool isMateUnmapped() const;
+
     bool isPrimary() const;
 
     bool isSecondary() const;

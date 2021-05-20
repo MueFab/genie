@@ -201,6 +201,8 @@ bool SamRecord::checkNFlag(uint16_t _flag) const{ return (flag & _flag) == 0; } 
 
 bool SamRecord::isUnmapped() const{ return checkFlag(BAM_FUNMAP); }
 
+bool SamRecord::isMateUnmapped() const { return checkFlag(BAM_FMUNMAP); }
+
 bool SamRecord::isPrimary() const{
     // "... satisfies ‘FLAG& 0x900 == 0’.  This line is called the primary line of the read."
     return checkNFlag(BAM_FSECONDARY | BAM_FSUPPLEMENTARY);
@@ -238,7 +240,32 @@ bool SamRecord::isPairedAndBothMapped() const{
 bool SamRecord::isReverse() const { return checkFlag(BAM_FREVERSE); }
 
 bool SamRecord::isPairOf(SamRecord& r) {
+    /// Both must be paired-ended
+    if (isPaired() != r.isPaired() || !isPaired()){
+        return false;
+    }
 
+    if (isPrimary() == r.isPrimary()) {
+        if (isUnmapped() == r.isMateUnmapped() &&
+            r.isUnmapped() == isMateUnmapped()){
+
+            if (getMPos() == r.getPos() &&
+                r.getMPos() == getPos()) {
+
+                /// Is pair because one of the RNEXT cannot be determined
+                if (getMPos() == 0 || r.getMPos() == 0){
+                    return true;
+                } else {
+                    return getRID() == r.getMRID() &&
+                           r.getRID() == getMRID() &&
+                           isRead1() != r.isRead1();
+                }
+            }
+
+        }
+    }
+
+    return false;
 }
 
 }
