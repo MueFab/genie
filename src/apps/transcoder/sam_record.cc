@@ -237,4 +237,8 @@ bool SamRecord::isPairedAndBothMapped() const{
 
 bool SamRecord::isReverse() const { return checkFlag(BAM_FREVERSE); }
 
+bool SamRecord::isPairOf(SamRecord& r) {
+
+}
+
 }

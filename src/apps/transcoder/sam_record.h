@@ -97,6 +97,8 @@ class SamRecord {
     bool isPairedAndBothMapped() const;
 
     bool isReverse() const;
+
+    bool isPairOf(SamRecord& r);
 };
 
 
