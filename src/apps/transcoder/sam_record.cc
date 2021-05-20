@@ -135,6 +135,20 @@ std::string SamRecord::convertCigar2ECigar(const std::string& cigar, const std::
     return ecigar;
 }
 
+SamRecord::SamRecord():
+    qname(""),
+    flag(0),
+    rid(0),
+    pos(0),
+    mapq(0),
+    cigar(""),
+    mate_rid(0),
+    mate_pos(0),
+    tlen(0),
+    seq(""),
+    qual("")
+{}
+
 SamRecord::SamRecord(bam1_t *sam_alignment):
     qname(bam_get_qname(sam_alignment)),
     flag(sam_alignment->core.flag),
@@ -147,7 +161,6 @@ SamRecord::SamRecord(bam1_t *sam_alignment):
     tlen(sam_alignment->core.isize),
     seq(getSeqString(sam_alignment)), // Initialized with empty char due to conversion later
     qual(getQualString(sam_alignment)) // Initialized with empty char due to conversion later
-
 {}
 
 const std::string& SamRecord::getQname() { return qname; }

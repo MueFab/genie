@@ -38,6 +38,8 @@ class SamRecord {
 
     static std::string convertCigar2ECigar(const std::string &cigar, const std::string &seq);
 
+    SamRecord();
+
     explicit SamRecord(bam1_t *sam_alignment);
 
     const std::string& getQname();

@@ -14,7 +14,8 @@ namespace sam_transcoder {
 #define PHASE1_EXT ".phase1.mgrec"
 #define PHASE2_EXT ".phase2.mgrec"
 #define PHASE2_TMP_EXT ".phase2.tmp"
-#define BUFFER_SIZE 500000
+#define PHASE1_BUFFER_SIZE 50000
+#define PHASE2_BUFFER_SIZE 500000
 
 class SamRecordGroup {  // Helping structure to sort the records
    public:
@@ -29,7 +30,7 @@ class SamRecordGroup {  // Helping structure to sort the records
         TOTAL_INDICES = 7,  // Not used
     };
 
-    enum class Class : uint8_t {
+    enum class Category : uint8_t {
         INVALID = 0,
         UNMAPPED = 1,
         SINGLE = 2,
@@ -39,9 +40,9 @@ class SamRecordGroup {  // Helping structure to sort the records
    private:
     std::vector<std::list<SamRecord>> data;
 
-    std::tuple<bool, uint8_t> convertFlags2Mpeg(uint16_t flags);
 
-    void convertUnmapped(std::list<genie::core::record::Record>& records, SamRecord& sam_rec);
+    void convertUnmapped(std::list<genie::core::record::Record>& records,
+                         SamRecord& sam_rec);
 
     void convertSingleEnd(std::list<genie::core::record::Record> &records,
                           std::list<SamRecord>& sam_recs,
@@ -55,7 +56,9 @@ class SamRecordGroup {  // Helping structure to sort the records
    public:
     SamRecordGroup();
 
-    SamRecordGroup::Class getRecords(std::list<std::list<SamRecord>>& sam_recs);
+    static std::tuple<bool, uint8_t> convertFlags2Mpeg(uint16_t flags);
+
+    SamRecordGroup::Category getRecords(std::list<std::list<SamRecord>>& sam_recs);
 
     void addRecord(SamRecord&&rec);
 
@@ -94,19 +97,25 @@ class SamRecordGroup {  // Helping structure to sort the records
      */
     bool isValid();
 
-    Class computeClass();
+    Category computeClass();
 
-    void convert(std::list<genie::core::record::Record> &records, bool force_split=false);
+    void convert(std::list<genie::core::record::Record> &records,
+                 bool force_split=false);
 };
 
 bool save_mgrecs_by_rid(std::list<genie::core::record::Record>& mpegg_recs,
-                        std::map<int32_t, genie::util::BitWriter>& bitwriters);
+                        std::map<int32_t,
+                        genie::util::BitWriter>& bitwriters);
 
-uint8_t sam_to_mgrec_phase1(transcoder::ProgramOptions& options, int& nref);
+uint8_t sam_to_mgrec_phase1(transcoder::ProgramOptions& options,
+                            int& nref);
 
-std::string gen_p2_tmp_fpath( transcoder::ProgramOptions& options, int rid, int ifile);
+std::string gen_p2_tmp_fpath(transcoder::ProgramOptions& options,
+                             int rid,
+                             int ifile);
 
-uint8_t sam_to_mgrec_phase2(transcoder::ProgramOptions& options, int& nref);
+uint8_t sam_to_mgrec_phase2(transcoder::ProgramOptions& options,
+                            int& nref);
 
 uint8_t sam_to_mgrec(transcoder::ProgramOptions& options);
 

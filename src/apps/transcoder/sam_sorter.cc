@@ -12,23 +12,29 @@ SubfileReader::SubfileReader(const std::string& fpath):
 {}
 
 SubfileReader::~SubfileReader(){
-    reader.close();
+    close();
 }
 
 bool SubfileReader::readRecord(){
-//    std::cout << reader.tellg();
-//    printf(std::to_string(reader.tellg()));
-    auto pos = reader.tellg();
-    if (reader.good() && reader.peek() != EOF){
+    if (good()){
         rec = genie::core::record::Record(bitreader);
-        curr_mgrec_pos = getMinPos(rec);
+
+        if (rec.getAlignments().empty()){
+            curr_mgrec_pos = getMinPos(rec);
+        }
 
         return true;
     } else {
-        bitreader.flush();
-        reader.close();
         return false;
     }
+}
+
+genie::core::record::Record&& SubfileReader::moveRecord(){
+    return std::move(rec);
+}
+
+const genie::core::record::Record& SubfileReader::getRecord() const{
+    return rec;
 }
 
 void SubfileReader::writeRecord(genie::util::BitWriter& bitwriter){
@@ -40,11 +46,22 @@ uint64_t SubfileReader::getPos() const{
     return curr_mgrec_pos;
 }
 
+bool SubfileReader::good(){
+    return reader.good() && reader.peek() != EOF;
+}
+
+void SubfileReader::close(){
+    bitreader.flush();
+    reader.close();
+}
+
 uint64_t getMinPos(const genie::core::record::Record& r){
 
     auto alignments = r.getAlignments();
 
-    UTILS_DIE_IF(alignments.empty(), "Unmapped record");
+    if (alignments.empty()){
+        return 0;
+    }
 
     uint64_t first_pos = alignments.front().getPosition();
     if (r.isRead1First()){
