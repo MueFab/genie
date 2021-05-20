@@ -1,15 +1,16 @@
 #include "sam_transcoder.h"
 
-#include <iostream>
+//#include <iostream>
 #include <algorithm>
 #include <fstream>
-#include <map>
-#include <cstdio>
+//#include <map>
+//#include <cstdio>
 
 //#include <genie/util/make-unique.h>
 //#include <genie/util/runtime-exception.h>
 #include <record/alignment_split/unpaired.h>
 
+#include "sam_reader.h"
 #include "sam_sorter.h"
 
 namespace sam_transcoder {
@@ -37,7 +38,7 @@ void SamRecordGroup::convertUnmapped(
                                     "Genie",
                                     std::get<1>(flag_tuple));
 
-    // No alignmnent
+    /// No alignmnent
     // core::record::Alignment alignment(convertCigar2ECigar(sam_rec.getCigar(), sam_rec.getSeq()),
     //                                   sam_rec.checkFlag(SamRecord::FlagPos::SEQ_REVERSE));
 
@@ -54,7 +55,7 @@ void SamRecordGroup::convertUnmapped(
     }
     rec.addSegment(std::move(segment));
 
-    // No alignment
+    /// No alignment
     //    ret.addAlignment(ref, std::move(alignmentContainer));
     records.push_back(std::move(rec));
 }
@@ -126,14 +127,14 @@ SamRecordGroup::SamRecordGroup() : data(size_t(Index::TOTAL_INDICES)) {}
 
 void SamRecordGroup::addRecord(SamRecord&&rec) {
 
-    // Default is class "UNKNOWN"
+    /// Default is class "UNKNOWN"
     auto idx = Index::UNKNOWN;
 
-    // Handles unmapped read
+    /// Handles unmapped read
     if (rec.isUnmapped()){
         idx = Index::UNMAPPED;
     }
-    // Single-end read
+    /// Single-end read
     else if (!rec.isPaired()){
         idx = Index::SINGLE;
     }
@@ -157,7 +158,7 @@ void SamRecordGroup::addRecord(SamRecord&&rec) {
             UTILS_DIE("Neiter read1 nor read2:" + rec.getQname());
         }
 
-    // Should never be reached
+    /// Should never be reached
     } else {
         UTILS_DIE("Unhandeled case found:" + rec.getQname());
     }
@@ -165,19 +166,19 @@ void SamRecordGroup::addRecord(SamRecord&&rec) {
     data[uint8_t(idx)].push_back(std::move(rec));
 }
 
-SamRecordGroup::Class SamRecordGroup::getRecords(std::list<std::list<SamRecord>> &sam_recs) {
+SamRecordGroup::Category SamRecordGroup::getRecords(std::list<std::list<SamRecord>> &sam_recs) {
     sam_recs.clear();
 
     auto cls = computeClass();
 
     switch (cls){
-        case Class::UNMAPPED:
+        case Category::UNMAPPED:
             sam_recs.push_back(std::move(data[uint8_t(Index::UNMAPPED)]));
             break;
-        case Class::SINGLE:
+        case Category::SINGLE:
             sam_recs.push_back(std::move(data[uint8_t(Index::SINGLE)]));
             break;
-        case Class::PAIRED:
+        case Category::PAIRED:
             sam_recs.push_back(data[uint8_t(Index::PAIR_READ1_PRIMARY)]);
             sam_recs.push_back(data[uint8_t(Index::PAIR_READ2_PRIMARY)]);
 
@@ -216,9 +217,9 @@ bool SamRecordGroup::isValid() {
     }
 }
 
-SamRecordGroup::Class SamRecordGroup::computeClass() {
+SamRecordGroup::Category SamRecordGroup::computeClass() {
     if (isUnknown() || data[uint8_t(Index::UNMAPPED)].size() > 1) {
-        return Class::INVALID;
+        return Category::INVALID;
     } else {
         auto is_unmapped = isUnmapped();
         auto is_single = isSingle();
@@ -226,34 +227,33 @@ SamRecordGroup::Class SamRecordGroup::computeClass() {
 
         // Check if the current sam record groups belong to only one class
         if ((is_unmapped && !is_single && !is_pair)){
-            return Class::UNMAPPED;
+            return Category::UNMAPPED;
         } else if (!is_unmapped && is_single && !is_pair){
-            return Class::SINGLE;
+            return Category::SINGLE;
         } else if (!is_unmapped && !is_single && is_pair) {
-            return Class::PAIRED;
+            return Category::PAIRED;
         } else {
-            return Class::INVALID;
+            return Category::INVALID;
         }
     }
 }
 
 void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bool force_split) {
-
     std::list<std::list<SamRecord>> sam_recs_2d;
 
     auto cls = getRecords(sam_recs_2d);
-    if (cls == Class::INVALID) {
+    if (cls == Category::INVALID) {
         UTILS_DIE("SAM records belong to multiple category (unmapped, single, paired)");
     }
 
     switch (cls){
-        case Class::UNMAPPED:
+        case Category::UNMAPPED:
             convertUnmapped(records, sam_recs_2d.front().front());
             break;
-        case Class::SINGLE:
+        case Category::SINGLE:
             convertSingleEnd(records, sam_recs_2d.front());
             break;
-        case Class::PAIRED:
+        case Category::PAIRED:
             convertPairedEnd(records, sam_recs_2d, force_split);
             break;
         default:
@@ -288,37 +288,21 @@ uint8_t sam_to_mgrec_phase1(
     transcoder::ProgramOptions& options,
     int& nref
 ){
-    // Phase 1
+
     std::list<std::ofstream> p1_writers;
     std::map<int32_t, genie::util::BitWriter> p1_bitwriters;
     int res;
     uint8_t return_code = 0;
-
-    samFile *sam_file = hts_open(options.sam_file_path.c_str(), "r"); //open bam file
-    bam_hdr_t *sam_header = NULL; //read header
-    bam1_t *sam_alignment = bam_init1(); //initialize an alignment
     SamRecordGroup buffer;
 
-    if (!sam_file) {
-        return_code = 1;
-        bam_destroy1(sam_alignment);
-        bam_hdr_destroy(sam_header);
-        if (sam_file) sam_close(sam_file);
+    std::list<genie::core::record::Record> records;
 
-        return return_code;
+    auto sam_reader = SamReader(options.sam_file_path);
+    if (!sam_reader.ready()){
+        return EXIT_FAILURE;
     }
 
-    sam_header = sam_hdr_read(sam_file); //read header
-    if (!sam_header) {
-        return_code = 2;
-        bam_destroy1(sam_alignment);
-        bam_hdr_destroy(sam_header);
-        if (sam_file) sam_close(sam_file);
-
-        return return_code;
-    }
-
-    nref = sam_hdr_nref(sam_header);
+    nref = sam_reader.getNumRef();
     for (int32_t i=0; i<nref; i++){
         std::string fpath = options.tmp_dir_path + "/" + std::to_string(i) + PHASE1_EXT;
 
@@ -326,22 +310,17 @@ uint8_t sam_to_mgrec_phase1(
         p1_bitwriters.emplace(i, &(p1_writers.back()));
     }
 
-    std::list<genie::core::record::Record> records;
-    if ((res = sam_read1(sam_file, sam_header, sam_alignment)) < 0){
-        return_code = 3;
-        bam_destroy1(sam_alignment);
-        bam_hdr_destroy(sam_header);
-        if (sam_file) sam_close(sam_file);
-
-        return return_code;
+    auto sam_rec = SamRecord();
+    if (sam_reader.readSamRecord(sam_rec) < 0){
+        return EXIT_FAILURE;
     }
-    auto sam_rec = SamRecord(sam_alignment);
+
     auto curr_qname = sam_rec.getQname();
     buffer.addRecord(std::move(sam_rec));
 
-    while((res = sam_read1(sam_file, sam_header, sam_alignment)) >= 0){
-        sam_rec = SamRecord(sam_alignment);
+    while((res = sam_reader.readSamRecord(sam_rec)) >= 0){
 
+        /// Add to buffers as long as it has the same QNAMEs
         if (sam_rec.getQname() != curr_qname){
             curr_qname = sam_rec.getQname();
             buffer.convert(records);
@@ -354,12 +333,7 @@ uint8_t sam_to_mgrec_phase1(
         buffer.addRecord(std::move(sam_rec));
     }
     if (res < -1) {
-        return_code = 3;
-        bam_destroy1(sam_alignment);
-        bam_hdr_destroy(sam_header);
-        if (sam_file) sam_close(sam_file);
-
-        return return_code;
+        return EXIT_FAILURE;
     }
 
     buffer.convert(records);
@@ -373,10 +347,6 @@ uint8_t sam_to_mgrec_phase1(
         iter_map->second.flush();
         iter_writer->close();
     }
-
-    bam_destroy1(sam_alignment);
-    bam_hdr_destroy(sam_header);
-    if (sam_file) sam_close(sam_file);
 
     return return_code;
 }
@@ -398,8 +368,7 @@ uint8_t sam_to_mgrec_phase2(
         auto n_tmp_files = 0;
 
         std::string fpath = options.tmp_dir_path + "/" + std::to_string(iref) + PHASE1_EXT;
-        std::ifstream reader(fpath, std::ios::binary);
-        genie::util::BitReader bitreader(reader);
+        SubfileReader mgg_reader(fpath);
 
         std::string tmp_fpath = options.tmp_dir_path + "/" + std::to_string(iref) + PHASE2_EXT;
         std::ofstream p2_writer(tmp_fpath, std::ios::binary | std::ios::trunc);
@@ -408,19 +377,17 @@ uint8_t sam_to_mgrec_phase2(
         std::vector<genie::core::record::Record> buffer;
 
         /// Split mgrec into multiple files and the records are sorted
-        while(reader.good() && reader.peek() != EOF) {
+        while(mgg_reader.good()) {
             /// Read MPEG-G records
-            while (reader.good() && reader.peek() != EOF && buffer.size() < BUFFER_SIZE) {
-                genie::core::record::Record rec(bitreader);
-
-                UTILS_DIE_IF(rec.getClassID() != genie::core::record::ClassType::CLASS_I,
+            while (mgg_reader.readRecord() && buffer.size() < PHASE2_BUFFER_SIZE) {
+                UTILS_DIE_IF(mgg_reader.getRecord().getClassID() != genie::core::record::ClassType::CLASS_I,
                              "Invalid Class found while reading records from phase 1 transcoding");
 //
                 /// Store unmapped record to output file
-                if (rec.getAlignments().empty()) {
-                    rec.write(p2_bitwriter);
+                if (mgg_reader.getRecord().getAlignments().empty()) {
+                    mgg_reader.writeRecord(p2_bitwriter);
                 } else {
-                    buffer.emplace_back(std::move(rec));
+                    buffer.emplace_back(mgg_reader.moveRecord());
                 }
             }
 
@@ -439,7 +406,6 @@ uint8_t sam_to_mgrec_phase2(
             buffer.clear();
             tmp_writer.close();
         }
-        reader.close();
 
         /// Open and cache the first record from each temporary file
         std::list<SubfileReader> tmp_file_readers;
@@ -462,6 +428,7 @@ uint8_t sam_to_mgrec_phase2(
             }
 
             reader_with_smallest_pos->writeRecord(p2_bitwriter);
+
             /// Close the current tmp file if it contains no more record;
             if (!reader_with_smallest_pos->readRecord()){
                 tmp_file_readers.erase(reader_with_smallest_pos);

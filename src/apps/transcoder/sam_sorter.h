@@ -8,6 +8,11 @@
 
 namespace sam_transcoder {
 
+class PerRIDWriter{
+   private:
+
+};
+
 class SubfileReader {
    private:
     uint64_t curr_mgrec_pos;
@@ -21,9 +26,17 @@ class SubfileReader {
     ~SubfileReader();
 
     bool readRecord();
+
+    genie::core::record::Record&& moveRecord();
+
+    const genie::core::record::Record& getRecord() const;
+
     void writeRecord(genie::util::BitWriter& bitwriter);
 
     uint64_t getPos() const;
+
+    bool good();
+    void close();
 };
 
 uint64_t getMinPos(const genie::core::record::Record& r);

@@ -6,11 +6,11 @@ set(
     program-options.cc
     sam_record.h
     sam_record.cc
-    sam_transcoder.cpp
+    sam_transcoder.cc
     sam_transcoder.h
-        sam_sorter.cc
-        sam_sorter.h
-)
+    sam_sorter.cc
+    sam_sorter.h
+        sam_reader.h sam_reader.cc)
 add_executable(transcoder ${source_files})
 
 include_directories(${LIBLZMA_INCLUDE_DIRS})
