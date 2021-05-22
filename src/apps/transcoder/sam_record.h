@@ -68,9 +68,15 @@ class SamRecord {
 
     std::string &&moveSeq();
 
+    void setSeq(std::string&& _seq);
+
+    void setSeq(const std::string& _seq);
+
     const std::string& getQual() const;
 
     std::string&& moveQual();
+
+    void setQual(const std::string& _qual);
 
     bool checkFlag(uint16_t _flag) const;
 

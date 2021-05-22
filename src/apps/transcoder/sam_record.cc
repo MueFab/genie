@@ -191,9 +191,22 @@ const std::string& SamRecord::getSeq() const { return seq; }
 
 std::string&& SamRecord::moveSeq() { return std::move(seq); }
 
+void SamRecord::setSeq(std::string&& _seq) {
+    seq = _seq;
+}
+
+void SamRecord::setSeq(const std::string& _seq) {
+    seq = _seq;
+
+}
+
 const std::string& SamRecord::getQual() const { return qual; }
 
 std::string&& SamRecord::moveQual(){ return std::move(qual); }
+
+void SamRecord::setQual(const std::string& _qual) {
+    qual = _qual;
+}
 
 bool SamRecord::checkFlag(uint16_t _flag) const{ return (flag & _flag) == _flag; } // All must be set
 
@@ -247,19 +260,18 @@ bool SamRecord::isPairOf(SamRecord& r) {
 
     if (isPrimary() == r.isPrimary()) {
         if (isUnmapped() == r.isMateUnmapped() &&
-            r.isUnmapped() == isMateUnmapped()){
+            r.isUnmapped() == isMateUnmapped() &&
+            getMPos() == r.getPos() &&
+            r.getMPos() == getPos()
+        ){
 
-            if (getMPos() == r.getPos() &&
-                r.getMPos() == getPos()) {
-
-                /// Is pair because one of the RNEXT cannot be determined
-                if (getMPos() == 0 || r.getMPos() == 0){
-                    return true;
-                } else {
-                    return getRID() == r.getMRID() &&
-                           r.getRID() == getMRID() &&
-                           isRead1() != r.isRead1();
-                }
+            /// Is pair because one of the RNEXT cannot be determined
+            if (getMPos() == 0 || r.getMPos() == 0){
+                return true;
+            } else {
+                return getRID() == r.getMRID() &&
+                       r.getRID() == getMRID() &&
+                       isRead1() != r.isRead1();
             }
 
         }
