@@ -35,6 +35,14 @@ class SamRecordGroup {  // Helping structure to sort the records
    private:
     std::vector<std::list<SamRecord>> data;
 
+    genie::core::record::Record pairedEndedToMpegg(SamRecord& _r1,
+                                                   SamRecord* r2,
+                                                   bool force_split=true);
+
+    void addAlignment(genie::core::record::Record& rec,
+                      SamRecord& r,
+                      SamRecord* other_r,
+                      bool force_split=true);
 
     void convertUnmapped(std::list<genie::core::record::Record>& records,
                          SamRecord& sam_rec);
@@ -44,9 +52,10 @@ class SamRecordGroup {  // Helping structure to sort the records
                           bool unmapped_pair=false,
                           bool is_read_1_first=true);
 
-    void convertPairedEnd(std::list<genie::core::record::Record> &records,
-                          std::list<std::list<SamRecord>>& sam_recs_2d,
-                          bool force_split=false);
+    void convertPairedEnd(std::map<int32_t, genie::core::record::Record>& recs1_by_rid,
+                          std::map<int32_t, genie::core::record::Record>& recs2_by_rid,
+                          std::list<std::list<SamRecord>> sam_recs_2d);
+
 
    public:
     SamRecordGroup();
@@ -95,7 +104,7 @@ class SamRecordGroup {  // Helping structure to sort the records
     Category computeClass();
 
     void convert(std::list<genie::core::record::Record> &records,
-                 bool force_split=false);
+                 bool create_same_rec=false);
 };
 
 }
