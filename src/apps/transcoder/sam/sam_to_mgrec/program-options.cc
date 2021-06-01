@@ -5,17 +5,19 @@
 #include <cassert>
 #include <fstream>
 
+namespace genie {
 namespace transcoder {
+namespace sam {
+namespace sam_to_mgrec {
 
-ProgramOptions::ProgramOptions(int argc, char *argv[])
-    : verbosity_level(0), tmp_dir_path(""), fasta_file_path(""),
-      sam_file_path(""), mgrec_file_path(""){
+Config::Config(int argc, char *argv[])
+    : verbosity_level(0), tmp_dir_path(), fasta_file_path(), sam_file_path(), mgrec_file_path() {
     processCommandLine(argc, argv);
 }
 
-ProgramOptions::~ProgramOptions() = default;
+Config::~Config() = default;
 
-void ProgramOptions::processCommandLine(int argc, char *argv[]) {
+void Config::processCommandLine(int argc, char *argv[]) {
     CLI::App app{"Transcoder - Transcode legacy format to mpeg-g format"};
 
     app.add_option("--ref", fasta_file_path, "Reference file");
@@ -39,8 +41,9 @@ void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     validate();
 }
 
-void ProgramOptions::validate() const {
+void Config::validate() const {}
 
 }
-
-}  // namespace gabacify
+}
+}
+}

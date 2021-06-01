@@ -3,17 +3,20 @@
 
 #include <string>
 
+namespace genie {
 namespace transcoder {
+namespace sam {
+namespace sam_to_mgrec {
 
-class ProgramOptions {
+class Config {
    public:
-    enum format: std::uint8_t {
+    enum format : std::uint8_t {
         sam = 0,
     };
 
-    ProgramOptions(int argc, char *argv[]);
+    Config(int argc, char *argv[]);
 
-    ~ProgramOptions();
+    ~Config();
 
    public:
     int verbosity_level;
@@ -28,6 +31,9 @@ class ProgramOptions {
     void validate() const;
 };
 
-}  // namespace transcoder
+}
+}
+}
+}
 
 #endif  // TRANSCODER_PROGRAM_OPTIONS_H_

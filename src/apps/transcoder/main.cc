@@ -1,15 +1,15 @@
 #include <iostream>
 
-#include "program-options.h"
-#include "sam_sorter.h"
-#include "sam_transcoder.h"
+#include "transcoder/sam/sam_to_mgrec/program-options.h"
+#include "transcoder/sam/sam_to_mgrec/sorter.h"
+#include "transcoder/sam/sam_to_mgrec/transcoder.h"
 
 int main(int argc, char* argv[]) {
     try {
-        transcoder::ProgramOptions programOptions(argc, argv);
+        genie::transcoder::sam::sam_to_mgrec::Config programOptions(argc, argv);
 
-        uint8_t ret;
-        if ((ret = sam_transcoder::sam_to_mgrec(programOptions)) != 0){
+        genie::transcoder::ErrorCode ret;
+        if ((ret = transcode(programOptions)) != genie::transcoder::ErrorCode::success){
             UTILS_DIE("ERROR");
         }
 
