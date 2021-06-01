@@ -1,17 +1,15 @@
-#ifndef GENIE_SAM_SORTER_H
-#define GENIE_SAM_SORTER_H
+#ifndef GENIE_SORTER_H
+#define GENIE_SORTER_H
 
 #include <fstream>
 #include <genie/util/bitwriter.h>
 #include <genie/util/bitreader.h>
 #include <genie/core/record/record.h>
 
-namespace sam_transcoder {
-
-class PerRIDWriter{
-   private:
-
-};
+namespace genie {
+namespace transcoder {
+namespace sam {
+namespace sam_to_mgrec {
 
 class SubfileReader {
    private:
@@ -41,8 +39,11 @@ class SubfileReader {
 
 uint64_t getMinPos(const genie::core::record::Record& r);
 
-bool compare(const genie::core::record::Record &r1, const genie::core::record::Record &r2);
+bool compare(const genie::core::record::Record& r1, const genie::core::record::Record& r2);
 
 }
+}
+}
+}
 
-#endif  // GENIE_SAM_SORTER_H
+#endif  // GENIE_SORTER_H

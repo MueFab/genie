@@ -6,15 +6,18 @@
 
 #include "sam_record.h"
 
-namespace sam_transcoder {
+namespace genie {
+namespace transcoder {
+namespace sam {
+namespace sam_to_mgrec {
 
-class SamReader{
+class SamReader {
    private:
-    samFile *sam_file;
-    bam_hdr_t *sam_header;
-    bam1_t *sam_alignment;
-   public:
+    samFile* sam_file;
+    bam_hdr_t* sam_header;
+    bam1_t* sam_alignment;
 
+   public:
     explicit SamReader(const char* fpath);
 
     explicit SamReader(std::string& fpath);
@@ -26,9 +29,11 @@ class SamReader{
     bool ready();
 
     int readSamRecord(SamRecord& sr);
-
 };
 
+}
+}
+}
 }
 
 #endif  // TRANSCODER_SAM_READER_H

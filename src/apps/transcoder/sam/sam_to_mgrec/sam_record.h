@@ -8,39 +8,43 @@
 
 #include "program-options.h"
 
-namespace sam_transcoder {
+namespace genie {
+namespace transcoder {
+namespace sam {
+namespace sam_to_mgrec {
 
 class SamRecord {
-  private:
-    std::string qname; // Query template name
-    uint16_t flag; // Flag
-    int32_t rid; // Reference sequence ID
-    uint32_t pos; // Position
-    uint8_t mapq; // Mapping Quality
-    std::string cigar; // CIGAR
-    int32_t mate_rid; // Mate reference sequence ID
-    uint32_t mate_pos; // Mate position
-    int64_t tlen; // Observed template length
-    std::string seq; // Read sequence
+   private:
+    std::string qname;  // Query template name
+    uint16_t flag;      // Flag
+    int32_t rid;        // Reference sequence ID
+    uint32_t pos;       // Position
+    uint8_t mapq;       // Mapping Quality
+    std::string cigar;  // CIGAR
+    int32_t mate_rid;   // Mate reference sequence ID
+    uint32_t mate_pos;  // Mate position
+    int64_t tlen;       // Observed template length
+    std::string seq;    // Read sequence
     std::string qual;
-  public:
+
+   public:
     static char fourBitBase2Char(uint8_t int_base);
 
-    static std::string getCigarString(bam1_t *sam_alignment);
+    static std::string getCigarString(bam1_t* sam_alignment);
 
-    static std::string getSeqString(bam1_t *sam_alignment);
+    static std::string getSeqString(bam1_t* sam_alignment);
 
-    static std::string getQualString(bam1_t *sam_alignment);
+    static std::string getQualString(bam1_t* sam_alignment);
 
     static char convertCigar2ECigarChar(char token);
 
     static int stepSequence(char token);
 
-    static std::string convertCigar2ECigar(const std::string &cigar, const std::string &seq);
+    static std::string convertCigar2ECigar(const std::string& cigar, const std::string& seq);
 
     SamRecord();
 
-    explicit SamRecord(bam1_t *sam_alignment);
+    explicit SamRecord(bam1_t* sam_alignment);
 
     const std::string& getQname();
 
@@ -66,7 +70,7 @@ class SamRecord {
 
     const std::string& getSeq() const;
 
-    std::string &&moveSeq();
+    std::string&& moveSeq();
 
     void setSeq(std::string&& _seq);
 
@@ -109,7 +113,9 @@ class SamRecord {
     bool isPairOf(SamRecord& r);
 };
 
-
+}
+}
+}
 }
 
 #endif  // SAM_RECORD_H

@@ -10,7 +10,10 @@
 
 #include "sam_record.h"
 
-namespace sam_transcoder {
+namespace genie {
+namespace transcoder {
+namespace sam {
+namespace sam_to_mgrec {
 
 class SamRecordGroup {  // Helping structure to sort the records
    public:
@@ -35,27 +38,18 @@ class SamRecordGroup {  // Helping structure to sort the records
    private:
     std::vector<std::list<SamRecord>> data;
 
-    genie::core::record::Record pairedEndedToMpegg(SamRecord& _r1,
-                                                   SamRecord* r2,
-                                                   bool force_split=true);
+    genie::core::record::Record pairedEndedToMpegg(SamRecord& _r1, SamRecord* r2, bool force_split = true);
 
-    void addAlignment(genie::core::record::Record& rec,
-                      SamRecord& r,
-                      SamRecord* other_r,
-                      bool force_split=true);
+    void addAlignment(genie::core::record::Record& rec, SamRecord& r, SamRecord* other_r, bool force_split = true);
 
-    void convertUnmapped(std::list<genie::core::record::Record>& records,
-                         SamRecord& sam_rec);
+    void convertUnmapped(std::list<genie::core::record::Record>& records, SamRecord& sam_rec);
 
-    void convertSingleEnd(std::list<genie::core::record::Record> &records,
-                          std::list<SamRecord>& sam_recs,
-                          bool unmapped_pair=false,
-                          bool is_read_1_first=true);
+    void convertSingleEnd(std::list<genie::core::record::Record>& records, std::list<SamRecord>& sam_recs,
+                          bool unmapped_pair = false, bool is_read_1_first = true);
 
     void convertPairedEnd(std::map<int32_t, genie::core::record::Record>& recs1_by_rid,
                           std::map<int32_t, genie::core::record::Record>& recs2_by_rid,
                           std::list<std::list<SamRecord>> sam_recs_2d);
-
 
    public:
     SamRecordGroup();
@@ -64,7 +58,7 @@ class SamRecordGroup {  // Helping structure to sort the records
 
     SamRecordGroup::Category getRecords(std::list<std::list<SamRecord>>& sam_recs);
 
-    void addRecord(SamRecord&&rec);
+    void addRecord(SamRecord&& rec);
 
     /**
      * @brief Check if sam records in ReadTemplate are unmapped
@@ -103,10 +97,12 @@ class SamRecordGroup {  // Helping structure to sort the records
 
     Category computeClass();
 
-    void convert(std::list<genie::core::record::Record> &records,
-                 bool create_same_rec=false);
+    void convert(std::list<genie::core::record::Record>& records, bool create_same_rec = false);
 };
 
+}
+}
+}
 }
 
 #endif  // TRANSCODER_SAM_GROUP_H

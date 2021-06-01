@@ -3,15 +3,19 @@ project("transcoder")
 set(
     source_files
     main.cc
-    program-options.cc
-    sam_record.h
-    sam_record.cc
-    sam_transcoder.cc
-    sam_transcoder.h
-    sam_sorter.cc
-    sam_sorter.h
-    sam_reader.h
-    sam_reader.cc sam_group.h sam_group.cc)
+    transcoding.h
+    sam/sam_to_mgrec/program-options.cc
+    sam/sam_to_mgrec/sam_record.h
+    sam/sam_to_mgrec/sam_record.cc
+    sam/sam_to_mgrec/transcoder.cc
+    sam/sam_to_mgrec/transcoder.h
+    sam/sam_to_mgrec/sorter.cc
+    sam/sam_to_mgrec/sorter.h
+    sam/sam_to_mgrec/sam_reader.h
+    sam/sam_to_mgrec/sam_reader.cc
+    sam/sam_to_mgrec/sam_group.h
+    sam/sam_to_mgrec/sam_group.cc)
+
 add_executable(transcoder ${source_files})
 
 include_directories(${LIBLZMA_INCLUDE_DIRS})
