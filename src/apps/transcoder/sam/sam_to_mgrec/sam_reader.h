@@ -26,7 +26,9 @@ class SamReader {
 
     int getNumRef();
 
-    bool ready();
+    bool isReady();
+
+    bool isValid();
 
     int readSamRecord(SamRecord& sr);
 };
