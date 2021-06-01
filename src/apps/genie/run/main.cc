@@ -15,8 +15,6 @@
 #include <genie/format/mgb/importer.h>
 #include <genie/format/mgrec/exporter.h>
 #include <genie/format/mgrec/importer.h>
-#include <genie/format/sam/exporter.h>
-#include <genie/format/sam/importer.h>
 #include <genie/module/default-setup.h>
 #include <genie/read/lowlatency/encoder.h>
 #include <filesystem/filesystem.hpp>
@@ -88,10 +86,7 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 template <class T>
 void attachExporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
     outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile));
-    if (file_extension(pOpts.outputFile) == "sam") {
-        flow.addExporter(genie::util::make_unique<genie::format::sam::Exporter>(
-            genie::format::sam::header::Header::createDefaultHeader(), *outputFiles.back()));
-    } else if (file_extension(pOpts.outputFile) == "fastq") {
+    if (file_extension(pOpts.outputFile) == "fastq") {
         if (file_extension(pOpts.outputSupFile) == "fastq") {
             auto& file1 = *outputFiles.back();
             outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputSupFile));
@@ -131,9 +126,7 @@ template <class T>
 void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ifstream>>& inputFiles) {
     constexpr size_t BLOCKSIZE = 10000;
     inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile));
-    if (file_extension(pOpts.inputFile) == "sam") {
-        flow.addImporter(genie::util::make_unique<genie::format::sam::Importer>(BLOCKSIZE, *inputFiles.back()));
-    } else if (file_extension(pOpts.inputFile) == "fastq") {
+    if (file_extension(pOpts.inputFile) == "fastq") {
         if (file_extension(pOpts.inputSupFile) == "fastq") {
             auto& file1 = *inputFiles.back();
             inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputSupFile));
