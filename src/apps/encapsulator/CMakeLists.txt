@@ -4,8 +4,7 @@ set(source_files
         # TODO: Fix FileHandlingUtils
         #FileHandlingUtils.cc
         main.cc
-        program-options.cc
-        ../transcoder/main.cc)
+        program-options.cc)
 
 add_executable(encapsulator ${source_files})
 
