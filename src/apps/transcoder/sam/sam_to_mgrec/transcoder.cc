@@ -41,7 +41,7 @@ ErrorCode sam_to_mgrec_phase1(Config& options, int& nref) {
     std::list<genie::core::record::Record> records;
 
     auto sam_reader = SamReader(options.sam_file_path);
-    if (!sam_reader.ready()) {
+    if (!sam_reader.isReady() or !sam_reader.isValid()) {
         return ErrorCode::failure;
     }
 

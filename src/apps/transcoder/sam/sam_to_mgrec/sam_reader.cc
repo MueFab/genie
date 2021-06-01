@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "sam_reader.h"
 #include "sam_record.h"
 
@@ -22,13 +24,29 @@ SamReader::~SamReader() {
 
 int SamReader::getNumRef() { return sam_hdr_nref(sam_header); }
 
-bool SamReader::ready() {
+bool SamReader::isReady() {
     if (!sam_file) {
         return false;
     }
 
     sam_header = sam_hdr_read(sam_file);  // read header
     if (!sam_header) {
+        return false;
+    }
+
+    return true;
+}
+
+bool SamReader::isValid() {
+    kstring_t kstr;
+
+    /// Find Tag HD with key "SO" to find out the ordering
+    if (sam_hdr_find_tag_hd(sam_header, "SO", &kstr) != 0){
+        return false;
+    }
+
+    /// Find out if records are sorted by query name
+    if(std::strcmp(kstr.s, "queryname") != 0){
         return false;
     }
 
