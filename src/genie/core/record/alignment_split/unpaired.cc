@@ -4,8 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "unpaired.h"
-#include <genie/util/make-unique.h>
+#include "genie/core/record/alignment_split/unpaired.h"
+#include <memory>
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

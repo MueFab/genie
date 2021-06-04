@@ -4,16 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SUBSEQUENCE_H
-#define GENIE_SUBSEQUENCE_H
+#ifndef SRC_GENIE_ENTROPY_PARAMCABAC_SUBSEQUENCE_H_
+#define SRC_GENIE_ENTROPY_PARAMCABAC_SUBSEQUENCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitwriter.h>
 #include <memory>
 #include <vector>
-#include "transformed-subseq.h"
-#include "transformed_parameters.h"
+#include "genie/entropy/paramcabac/transformed-subseq.h"
+#include "genie/entropy/paramcabac/transformed_parameters.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,24 +22,24 @@ namespace entropy {
 namespace paramcabac {
 
 /**
- *
+ * @brief
  */
 class Subsequence {
-   public:
+ public:
     /**
-     *
+     * @brief
      */
     Subsequence();
 
     /**
-     *
+     * @brief
      * @param _descriptor_subsequence_ID
      * @param _tokentypeFlag
      */
     Subsequence(uint16_t _descriptor_subsequence_ID, bool _tokentypeFlag);
 
     /**
-     *
+     * @brief
      * @param _transform_subseq_parameters
      * @param _descriptor_subsequence_ID
      * @param _tokentypeFlag
@@ -49,78 +49,84 @@ class Subsequence {
                 bool _tokentypeFlag, std::vector<TransformedSubSeq>&& transformSubseq_cfgs);
 
     /**
-     *
+     * @brief
      * @param tokentype
+     * @param desc
      * @param reader
      */
     Subsequence(bool tokentype, core::GenDesc desc, util::BitReader& reader);
 
     /**
-     *
+     * @brief
      */
     virtual ~Subsequence() = default;
 
     /**
-     *
+     * @brief
      * @param index
      * @param _transformSubseq_cfg
      */
     void setTransformSubseqCfg(size_t index, TransformedSubSeq&& _transformSubseq_cfg);
 
     /**
-     *
+     * @brief
      * @param writer
      */
     virtual void write(util::BitWriter& writer) const;
 
     /**
-     *
+     * @brief
      * @return
      */
     uint16_t getDescriptorSubsequenceID() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     const TransformedParameters& getTransformParameters() const;
 
     /**
-     *
+     * @brief
      * @param index
      * @return
      */
     const TransformedSubSeq& getTransformSubseqCfg(uint8_t index) const;
 
     /**
-     *
+     * @brief
      * @return
      */
     size_t getNumTransformSubseqCfgs() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     const std::vector<TransformedSubSeq>& getTransformSubseqCfgs() const;
 
     /**
-     *
+     * @brief
      * @return
      */
     bool getTokentypeFlag() const;
 
+    /**
+     * @brief
+     * @param seq
+     * @return
+     */
     bool operator==(const Subsequence& seq) const {
         return descriptor_subsequence_ID == seq.descriptor_subsequence_ID && tokentypeFlag == seq.tokentypeFlag &&
                transform_subseq_parameters == seq.transform_subseq_parameters &&
                transformSubseq_cfgs == seq.transformSubseq_cfgs;
     }
 
-   private:
-    boost::optional<uint16_t> descriptor_subsequence_ID;  //!<
-    bool tokentypeFlag;                                   //!< helper field - not written to bitstream
-    TransformedParameters transform_subseq_parameters;    //!<
-    std::vector<TransformedSubSeq> transformSubseq_cfgs;  //!<
+ private:
+    boost::optional<uint16_t> descriptor_subsequence_ID;  //!< @brief
+    bool tokentypeFlag;                                   //!< @brief helper field - not written to bitstream
+    TransformedParameters transform_subseq_parameters;    //!< @brief
+    std::vector<TransformedSubSeq> transformSubseq_cfgs;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -131,7 +137,7 @@ class Subsequence {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_SUBSEQUENCE_H
+#endif  // SRC_GENIE_ENTROPY_PARAMCABAC_SUBSEQUENCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

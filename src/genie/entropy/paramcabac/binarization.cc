@@ -4,8 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "binarization.h"
-#include <genie/util/bitwriter.h>
+#include "genie/entropy/paramcabac/binarization.h"
+#include <utility>
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

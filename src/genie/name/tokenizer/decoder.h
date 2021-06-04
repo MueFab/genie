@@ -4,14 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_TOK_DECODER_H
-#define GENIE_TOK_DECODER_H
+#ifndef SRC_GENIE_NAME_TOKENIZER_DECODER_H_
+#define SRC_GENIE_NAME_TOKENIZER_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/data-block.h>
-#include <name-decoder.h>
-#include "token.h"
+#include <string>
+#include <tuple>
+#include <vector>
+#include "genie/core/name-decoder.h"
+#include "genie/name/tokenizer/token.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +33,7 @@ class Decoder : public core::NameDecoder {
      */
     static std::string inflate(const std::vector<SingleToken>& rec);
 
-   public:
+ public:
     /**
      *
      * @param desc
@@ -47,7 +50,7 @@ class Decoder : public core::NameDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DECODER_H
+#endif  // SRC_GENIE_NAME_TOKENIZER_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,17 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_QV_ENCODER_H
-#define GENIE_QV_ENCODER_H
+#ifndef SRC_GENIE_CORE_QV_ENCODER_H_
+#define SRC_GENIE_CORE_QV_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/record/chunk.h>
-#include <genie/util/drain.h>
-#include <genie/util/source.h>
-#include "access-unit.h"
-
+#include <memory>
+#include <tuple>
 #include <utility>
+#include "genie/core/access-unit.h"
+#include "genie/core/record/chunk.h"
+#include "genie/util/drain.h"
+#include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +26,7 @@ namespace core {
  * @brief The basic interface for modules encoding quality values
  */
 class QVEncoder {
-   public:
+ public:
     using QVCoded =
         std::tuple<std::unique_ptr<parameter::QualityValues>, AccessUnit::Descriptor, core::stats::PerfStats>;  //!<
 
@@ -49,7 +50,7 @@ class QVEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_QV_ENCODER_H
+#endif  // SRC_GENIE_CORE_QV_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

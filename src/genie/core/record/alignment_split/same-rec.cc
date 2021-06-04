@@ -4,10 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "same-rec.h"
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
+#include "genie/core/record/alignment_split/same-rec.h"
+#include <utility>
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

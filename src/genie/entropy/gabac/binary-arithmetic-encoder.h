@@ -4,13 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_BINARY_ARITHMETIC_ENCODER_H_
-#define GABAC_BINARY_ARITHMETIC_ENCODER_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_BINARY_ARITHMETIC_ENCODER_H_
+#define SRC_GENIE_ENTROPY_GABAC_BINARY_ARITHMETIC_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitwriter.h>
-#include "context-model.h"
+#include "genie/entropy/gabac/context-model.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@ namespace gabac {
  *
  */
 class BinaryArithmeticEncoder {
-   public:
+ public:
     /**
      *
      * @param bitOutputStream
@@ -70,7 +70,7 @@ class BinaryArithmeticEncoder {
      */
     void flush();
 
-   private:
+ private:
     /**
      *
      */
@@ -102,7 +102,7 @@ class BinaryArithmeticEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_BINARY_ARITHMETIC_ENCODER_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_BINARY_ARITHMETIC_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

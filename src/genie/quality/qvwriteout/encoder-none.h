@@ -4,12 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ENCODER_NONE_H
-#define GENIE_ENCODER_NONE_H
+#ifndef SRC_GENIE_QUALITY_QVWRITEOUT_ENCODER_NONE_H_
+#define SRC_GENIE_QUALITY_QVWRITEOUT_ENCODER_NONE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/qv-encoder.h>
+#include "genie/core/qv-encoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ namespace qvwriteout {
  *
  */
 class NoneEncoder : public core::QVEncoder {
-   public:
+ public:
     /**
      *
      * @return
@@ -37,7 +37,7 @@ class NoneEncoder : public core::QVEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ENCODER_NONE_H
+#endif  // SRC_GENIE_QUALITY_QVWRITEOUT_ENCODER_NONE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

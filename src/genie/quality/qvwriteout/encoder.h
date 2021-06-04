@@ -4,15 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_QVOUTENCODER_H
-#define GENIE_QVOUTENCODER_H
+#ifndef SRC_GENIE_QUALITY_QVWRITEOUT_ENCODER_H_
+#define SRC_GENIE_QUALITY_QVWRITEOUT_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/cigar-tokenizer.h>
-#include <genie/core/qv-encoder.h>
-#include <genie/quality/paramqv1/qv_coding_config_1.h>
-#include <genie/util/stringview.h>
+#include <string>
+#include "genie/core/cigar-tokenizer.h"
+#include "genie/core/qv-encoder.h"
+#include "genie/quality/paramqv1/qv_coding_config_1.h"
+#include "genie/util/stringview.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +25,7 @@ namespace qvwriteout {
  *
  */
 class Encoder : public core::QVEncoder {
-   private:
+ private:
     /**
      *
      * @param rec
@@ -50,7 +51,7 @@ class Encoder : public core::QVEncoder {
      */
     static void encodeUnalignedSegment(const core::record::Segment& s, core::AccessUnit::Descriptor& desc);
 
-   public:
+ public:
     /**
      *
      * @param rec
@@ -67,7 +68,7 @@ class Encoder : public core::QVEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ENCODER_H
+#endif  // SRC_GENIE_QUALITY_QVWRITEOUT_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "context-selector.h"
+#include "genie/entropy/gabac/context-selector.h"
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +24,7 @@ ContextSelector::ContextSelector(const ContextSelector& src) : stateVars(src.sta
 // ---------------------------------------------------------------------------------------------------------------------
 
 unsigned int ContextSelector::getContextIdxOrder0(const uint8_t subsymIdx) {
-    return subsymIdx * stateVars.getCodingSizeCtxOffset();
+    return (unsigned int)(subsymIdx * stateVars.getCodingSizeCtxOffset());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -33,9 +34,9 @@ unsigned int ContextSelector::getContextIdxOrderGT0(const uint8_t subsymIdx, con
                                                     const uint8_t codingOrder) {
     unsigned int ctxIdx = 0;
     ctxIdx += stateVars.getNumCtxLUTs();
-    ctxIdx += subsymIdx * stateVars.getCodingSizeCtxOffset();
-    for (unsigned int i = 1; i <= codingOrder; i++) {
-        ctxIdx += subsymbols[prvIdx].prvValues[i - 1] * stateVars.getCodingOrderCtxOffset(i);
+    ctxIdx += (unsigned int)(subsymIdx * stateVars.getCodingSizeCtxOffset());
+    for (uint8_t i = 1; i <= codingOrder; i++) {
+        ctxIdx += (unsigned int)(subsymbols[prvIdx].prvValues[i - 1] * stateVars.getCodingOrderCtxOffset(i));
     }
 
     return ctxIdx;

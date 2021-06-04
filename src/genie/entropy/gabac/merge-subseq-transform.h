@@ -4,14 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_MERGE_CODING_H_
-#define GABAC_MERGE_CODING_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_MERGE_SUBSEQ_TRANSFORM_H_
+#define SRC_GENIE_ENTROPY_GABAC_MERGE_SUBSEQ_TRANSFORM_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/entropy/paramcabac/subsequence.h>
-#include <genie/util/data-block.h>
 #include <cstdint>
+#include <vector>
+#include "genie/entropy/paramcabac/subsequence.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -43,7 +44,7 @@ void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg,
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_MERGE_CODING_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_MERGE_SUBSEQ_TRANSFORM_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

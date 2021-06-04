@@ -4,17 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_MGREC_EXPORTER_H
-#define GENIE_MGREC_EXPORTER_H
+#ifndef SRC_GENIE_FORMAT_MGREC_EXPORTER_H_
+#define SRC_GENIE_FORMAT_MGREC_EXPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/format-exporter.h>
-#include <genie/core/record/chunk.h>
-#include <genie/core/stats/perf-stats.h>
-#include <genie/util/bitwriter.h>
-#include <genie/util/drain.h>
-#include <genie/util/ordered-lock.h>
+#include "genie/core/format-exporter.h"
+#include "genie/core/record/chunk.h"
+#include "genie/core/stats/perf-stats.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/drain.h"
+#include "genie/util/ordered-lock.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ class Exporter : public core::FormatExporter {
     util::BitWriter writer;  //!<
     util::OrderedLock lock;  //!<
 
-   public:
+ public:
     /**
      *
      * @param _file_1
@@ -58,7 +58,7 @@ class Exporter : public core::FormatExporter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_EXPORTER_H
+#endif  // SRC_GENIE_FORMAT_MGREC_EXPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

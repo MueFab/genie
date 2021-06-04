@@ -18,3 +18,6 @@ target_link_libraries(util-tests PRIVATE gtest_main)
 target_link_libraries(util-tests PRIVATE genie-core)
 target_link_libraries(util-tests PRIVATE genie-util)
 #target_link_libraries(util-tests PRIVATE genie-sam)
+
+install(TARGETS util-tests
+        RUNTIME DESTINATION "usr/bin")

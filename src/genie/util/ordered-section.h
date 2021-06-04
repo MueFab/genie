@@ -4,13 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ORDERED_SECTION_H
-#define GENIE_ORDERED_SECTION_H
+#ifndef SRC_GENIE_UTIL_ORDERED_SECTION_H_
+#define SRC_GENIE_UTIL_ORDERED_SECTION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "drain.h"
-#include "ordered-lock.h"
+#include "genie/util/drain.h"
+#include "genie/util/ordered-lock.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,11 +21,11 @@ namespace util {
  * @brief Protects a section of code using an ordered lock
  */
 class OrderedSection {
-   private:
+ private:
     OrderedLock* lock;  //!< @brief Underlying lock
     size_t length;      //!<
 
-   public:
+ public:
     /**
      * @brief Try to acquire the lock
      * @param _lock Underlying lock
@@ -46,7 +46,7 @@ class OrderedSection {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ORDERED_SECTION_H
+#endif  // SRC_GENIE_UTIL_ORDERED_SECTION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,18 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_FORMAT_IMPORTER_H
-#define GENIE_FORMAT_IMPORTER_H
+#ifndef SRC_GENIE_CORE_FORMAT_IMPORTER_H_
+#define SRC_GENIE_CORE_FORMAT_IMPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/access-unit.h>
-#include <genie/util/original-source.h>
-#include <genie/util/source.h>
-#include "classifier.h"
-#include "record/record.h"
-
 #include <mutex>
+#include "genie/core/access-unit.h"
+#include "genie/core/classifier.h"
+#include "genie/core/record/record.h"
+#include "genie/util/original-source.h"
+#include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,10 +25,11 @@ namespace core {
  * @brief Interface for importers of various file formats. Note that each importer has to convert to mpegg-records
  */
 class FormatImporter : public util::OriginalSource, public util::Source<record::Chunk> {
-   private:
+ private:
     Classifier* classifier;  //!<
     bool flushing{false};    //!<
-   protected:
+
+ protected:
     /**
      *
      * @param _classifier
@@ -37,7 +37,7 @@ class FormatImporter : public util::OriginalSource, public util::Source<record::
      */
     virtual bool pumpRetrieve(Classifier* _classifier) = 0;
 
-   public:
+ public:
     /**
      *
      * @param _classifier
@@ -70,7 +70,7 @@ class FormatImporter : public util::OriginalSource, public util::Source<record::
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_FORMAT_IMPORTER_H
+#endif  // SRC_GENIE_CORE_FORMAT_IMPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

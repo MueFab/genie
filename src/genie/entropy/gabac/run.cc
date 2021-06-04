@@ -4,10 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "run.h"
-
-#include "decode-desc-subseq.h"
-#include "encode-desc-subseq.h"
+#include "genie/entropy/gabac/run.h"
+#include <cstdint>
+#include "genie/entropy/gabac/decode-desc-subseq.h"
+#include "genie/entropy/gabac/encode-desc-subseq.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ namespace gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-unsigned long run(const IOConfiguration& conf, const EncodingConfiguration& enConf, bool decode) {
+uint64_t run(const IOConfiguration& conf, const EncodingConfiguration& enConf, bool decode) {
     if (decode) {
         return gabac::decodeDescSubsequence(conf, enConf);
     } else {

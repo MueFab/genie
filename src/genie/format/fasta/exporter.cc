@@ -4,11 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "exporter.h"
-
-#include <genie/util/thread-manager.h>
-
-#include "fasta-source.h"
+#include "genie/format/fasta/exporter.h"
+#include <vector>
+#include "genie/format/fasta/fasta-source.h"
+#include "genie/util/thread-manager.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

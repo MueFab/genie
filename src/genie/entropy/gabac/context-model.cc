@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "context-model.h"
+#include "genie/entropy/gabac/context-model.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

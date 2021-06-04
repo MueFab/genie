@@ -1,8 +1,14 @@
-#include "gabac/gabac.h"
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "gabac/gabac.h"
 
 #define FALSE 0
 #define TRUE 1

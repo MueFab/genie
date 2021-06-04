@@ -4,17 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_GABAC_ENCODER_H
-#define GENIE_GABAC_ENCODER_H
+#ifndef SRC_GENIE_ENTROPY_GABAC_ENCODER_H_
+#define SRC_GENIE_ENTROPY_GABAC_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/access-unit.h>
-#include <genie/core/entropy-encoder.h>
-#include <genie/entropy/gabac/gabac.h>
-#include <genie/util/make-unique.h>
-#include <genie/util/watch.h>
-#include "gabac-seq-conf-set.h"
+#include "genie/core/access-unit.h"
+#include "genie/core/entropy-encoder.h"
+#include "genie/entropy/gabac/gabac-seq-conf-set.h"
+#include "genie/entropy/gabac/gabac.h"
+#include "genie/util/make-unique.h"
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ namespace gabac {
  * @brief Module to compress raw access units into blockpayloads using GABAC
  */
 class Encoder : public core::EntropyEncoder {
-   private:
+ private:
     /**
      * @brief Run the actual gabac compression
      * @param conf GABAC configuration to use
@@ -45,7 +45,7 @@ class Encoder : public core::EntropyEncoder {
     static core::AccessUnit::Descriptor compressTokens(const gabac::EncodingConfiguration& conf0,
                                                        core::AccessUnit::Descriptor&& in);
 
-   public:
+ public:
     GabacSeqConfSet configSet;  //!< @brief Config set to use. In contrast to decompression it's static over time
 
     /**
@@ -64,7 +64,7 @@ class Encoder : public core::EntropyEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ENCODER_H
+#endif  // SRC_GENIE_ENTROPY_GABAC_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

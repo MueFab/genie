@@ -4,14 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DESCRIPTOR_PRESENT_H
-#define GENIE_DESCRIPTOR_PRESENT_H
+#ifndef SRC_GENIE_CORE_PARAMETER_DESCRIPTOR_PRESENT_DESCRIPTOR_PRESENT_H_
+#define SRC_GENIE_CORE_PARAMETER_DESCRIPTOR_PRESENT_DESCRIPTOR_PRESENT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/parameter/descriptor.h>
-
-#include "decoder.h"
+#include <memory>
+#include "genie/core/parameter/descriptor.h"
+#include "genie/core/parameter/descriptor_present/decoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,10 +24,10 @@ namespace desc_pres {
  *
  */
 class DescriptorPresent : public Descriptor {
-   private:
+ private:
     std::unique_ptr<Decoder> decoder_configuration;  //!<
 
-   public:
+ public:
     static constexpr int8_t PRESENT = 0;  //!<
 
     /**
@@ -40,7 +40,7 @@ class DescriptorPresent : public Descriptor {
     /**
      *
      */
-    explicit DescriptorPresent();
+    DescriptorPresent();
 
     /**
      *
@@ -83,7 +83,7 @@ class DescriptorPresent : public Descriptor {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DESCRIPTOR_PRESENT_H
+#endif  // SRC_GENIE_CORE_PARAMETER_DESCRIPTOR_PRESENT_DESCRIPTOR_PRESENT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

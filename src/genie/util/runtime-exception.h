@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_RUNTIME_EXCEPTION_H
-#define GENIE_RUNTIME_EXCEPTION_H
+#ifndef SRC_GENIE_UTIL_RUNTIME_EXCEPTION_H_
+#define SRC_GENIE_UTIL_RUNTIME_EXCEPTION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,7 +20,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "exception.h"
+#include <string>
+#include "genie/util/exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -31,7 +32,7 @@ namespace util {
  * @brief Genie runtime exception for all the bad stuff that can happen.
  */
 class RuntimeException : public Exception {
-   public:
+ public:
     /**
      *
      * @param file
@@ -61,7 +62,7 @@ class RuntimeException : public Exception {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_RUNTIME_EXCEPTION_H
+#endif  // SRC_GENIE_UTIL_RUNTIME_EXCEPTION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

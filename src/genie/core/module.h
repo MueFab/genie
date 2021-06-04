@@ -4,12 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_MODULE_H
-#define GENIE_MODULE_H
+#ifndef SRC_GENIE_CORE_MODULE_H_
+#define SRC_GENIE_CORE_MODULE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/source.h>
+#include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ namespace core {
  */
 template <typename Tin, typename Tout>
 class Module : public util::Source<Tout>, public util::Drain<Tin> {
-   public:
+ public:
     /**
      *
      * @param id
@@ -48,11 +48,11 @@ class Module : public util::Source<Tout>, public util::Drain<Tin> {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "module.imp.h"
+#include "genie/core/module.imp.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_MODULE_H
+#endif  // SRC_GENIE_CORE_MODULE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

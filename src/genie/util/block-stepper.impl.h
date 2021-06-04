@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_BLOCK_STEPPER_IMPL_H
-#define GENIE_BLOCK_STEPPER_IMPL_H
+#ifndef SRC_GENIE_UTIL_BLOCK_STEPPER_IMPL_H_
+#define SRC_GENIE_UTIL_BLOCK_STEPPER_IMPL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -66,7 +66,7 @@ inline void BlockStepper::set(uint64_t val) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_BLOCK_STEPPER_IMPL_H
+#endif  // SRC_GENIE_UTIL_BLOCK_STEPPER_IMPL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

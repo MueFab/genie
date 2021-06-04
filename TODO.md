@@ -2,6 +2,7 @@
 
 ---
 
+- [ ] Clean up ('legacy') tags
 - [ ] Windows build?
 - [ ] openMP build on macOS
 - [ ] Code coverage

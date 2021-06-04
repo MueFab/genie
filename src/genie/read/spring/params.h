@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SPRING_PARAMS_H_
-#define SPRING_PARAMS_H_
+#ifndef SRC_GENIE_READ_SPRING_PARAMS_H_
+#define SRC_GENIE_READ_SPRING_PARAMS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ const int NUM_READS_PER_BLOCK_UREADS =
     256000;  //!< might want NUM_READS_PER_BLOCK_UREADS to be a bit smaller since it can have longer reads
 const uint32_t MAX_NUM_TOKENS_ID = 1024;  //!<
 const uint32_t BIN_SIZE_COMBINE_PAIRS =
-    10000000;  //!< number of records put in memory at a time when decompressing with combine_pairs on. Higher value
+    30000000;  //!< number of records put in memory at a time when decompressing with combine_pairs on. Higher value
                //!< uses more memory but is slightly faster.
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -64,10 +64,10 @@ inline uint64_t reorder_lock_idx(uint64_t hval) { return hval & LOCKS_REORDER_MA
  * In the future, we will extend the interface with debugging aids.
  */
 class omp_lock {
-   private:
+ private:
     omp_lock_t lck;  //!<
 
-   public:
+ public:
     /**
      *
      */
@@ -107,7 +107,7 @@ class omp_lock {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SPRING_PARAMS_H_
+#endif  // SRC_GENIE_READ_SPRING_PARAMS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

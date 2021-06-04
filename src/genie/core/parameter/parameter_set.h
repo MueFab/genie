@@ -4,21 +4,21 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_QV_PARAMETER_SET_H
-#define GENIE_QV_PARAMETER_SET_H
+#ifndef SRC_GENIE_CORE_PARAMETER_PARAMETER_SET_H_
+#define SRC_GENIE_CORE_PARAMETER_PARAMETER_SET_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
-
-#include <genie/core/constants.h>
-#include <genie/core/record/class-type.h>
-#include <genie/util/bitreader.h>
-
-#include "computed_ref.h"
-#include "data_unit.h"
-#include "descriptor_subseq_cfg.h"
-#include "quality-values.h"
+#include <string>
+#include <vector>
+#include "genie/core/constants.h"
+#include "genie/core/parameter/computed_ref.h"
+#include "genie/core/parameter/data_unit.h"
+#include "genie/core/parameter/descriptor_subseq_cfg.h"
+#include "genie/core/parameter/quality-values.h"
+#include "genie/core/record/class-type.h"
+#include "genie/util/bitreader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ namespace parameter {
  *
  */
 class ParameterSet : public DataUnit {
-   public:
+ public:
     /**
      *
      * @param bitReader
@@ -219,7 +219,6 @@ class ParameterSet : public DataUnit {
      */
     void setParentID(uint8_t id);
 
-
     uint8_t getParentID() const;
 
     /**
@@ -243,15 +242,13 @@ class ParameterSet : public DataUnit {
      */
     void preWrite(util::BitWriter &writer) const;
 
-
-   private:
+ private:
     /**
      *
      * @param ps
      * @return
      */
     bool qual_cmp(const ParameterSet &ps) const;
-
 
     uint8_t parameter_set_ID;         //!<
     uint8_t parent_parameter_set_ID;  //!<
@@ -283,7 +280,7 @@ class ParameterSet : public DataUnit {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_PARAMETER_SET_H
+#endif  // SRC_GENIE_CORE_PARAMETER_PARAMETER_SET_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

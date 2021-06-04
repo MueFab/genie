@@ -4,13 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_BIT_INPUT_STREAM_H_
-#define GABAC_BIT_INPUT_STREAM_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_BIT_INPUT_STREAM_H_
+#define SRC_GENIE_ENTROPY_GABAC_BIT_INPUT_STREAM_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/block-stepper.h>
-#include <genie/util/data-block.h>
+#include "genie/util/block-stepper.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ namespace gabac {
  *
  */
 class BitInputStream {
-   public:
+ public:
     /**
      *
      * @param bitstream
@@ -78,7 +78,7 @@ class BitInputStream {
      */
     void reset();
 
-   private:
+ private:
     util::DataBlock *m_bitstream;  //!<
 
     util::BlockStepper m_reader;  //!<
@@ -96,7 +96,7 @@ class BitInputStream {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_BIT_INPUT_STREAM_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_BIT_INPUT_STREAM_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

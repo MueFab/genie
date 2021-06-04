@@ -10,22 +10,23 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/access-unit.h>
-#include <genie/core/parameter/parameter_set.h>
-#include <genie/core/read-encoder.h>
+#include <algorithm>
 #include <array>
 #include <cmath>  // abs
 #include <cstdio>
+#include <cstring>  // memcpy
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <numeric>
-#include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
-
-#include "generate-read-streams.h"
-#include "util.h"
+#include "genie/core/access-unit.h"
+#include "genie/core/parameter/parameter_set.h"
+#include "genie/core/read-encoder.h"
+#include "genie/read/spring/generate-read-streams.h"
+#include "genie/read/spring/util.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -66,9 +67,9 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
 
     // first find the seq
     uint64_t seq_start, seq_end;
-    if (data.flag_arr[start_read_num] == false)
+    if (data.flag_arr[start_read_num] == false) {
         seq_start = seq_end = 0;  // all reads unaligned
-    else {
+    } else {
         seq_end = seq_start = data.pos_arr[start_read_num];
         // find last read in AU that's aligned
         uint64_t i = start_read_num;
@@ -82,7 +83,8 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
         raw_au.get(core::GenSub::RLEN).push(seq_end - seq_start - 1);  // rlen
         raw_au.get(core::GenSub::RTYPE).push(5);                       // rtype
         for (uint64_t i = seq_start; i < seq_end; i++)
-            raw_au.get(core::GenSub::UREADS).push(getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[data.seq[i]]);  // ureads
+            raw_au.get(core::GenSub::UREADS)
+                .push(getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[data.seq[i]]);  // ureads
     }
     uint64_t prevpos = 0, diffpos;
     // Write streams
@@ -100,9 +102,9 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
                 raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(diffpos);  // pos
                 prevpos = data.pos_arr[i];
             }
-            if (data.noise_len_arr[i] == 0)
+            if (data.noise_len_arr[i] == 0) {
                 raw_au.get(core::GenSub::RTYPE).push(1);  // rtype = P
-            else {
+            } else {
                 raw_au.get(core::GenSub::RTYPE).push(3);  // rtype = M
                 uint16_t curr_noise_pos = 0;
                 for (uint16_t j = 0; j < data.noise_len_arr[i]; j++) {
@@ -115,9 +117,11 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
                             .push(data.noisepos_arr[data.pos_in_noise_arr[i] + j] - 1);  // decoder adds +1
                     raw_au.get(core::GenSub::MMTYPE_TYPE).push(0);                       // mmtype = Substitution
                     raw_au.get(core::GenSub::MMTYPE_SUBSTITUTION)
-                        .push(getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[data.noise_arr[data.pos_in_noise_arr[i] + j]]);
+                        .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                                  .inverseLut[data.noise_arr[data.pos_in_noise_arr[i] + j]]);
                     raw_au.pushDependency(core::GenSub::MMTYPE_SUBSTITUTION,
-                                          getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[data.seq[data.pos_arr[i]+curr_noise_pos]]);
+                                          getAlphabetProperties(core::AlphabetID::ACGTN)
+                                              .inverseLut[data.seq[data.pos_arr[i] + curr_noise_pos]]);
                 }
                 raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(1);
             }
@@ -126,7 +130,8 @@ void generate_subseqs(const se_data &data, uint64_t block_num, core::AccessUnit 
             raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[i] - 1);  // rlen
             for (uint64_t j = 0; j < data.read_length_arr[i]; j++) {
                 raw_au.get(core::GenSub::UREADS)
-                    .push(getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[data.unaligned_arr[data.pos_arr[i] + j]]);  // ureads
+                    .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                              .inverseLut[data.unaligned_arr[data.pos_arr[i] + j]]);  // ureads
             }
             raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(seq_end - prevpos);  // pos
             raw_au.get(core::GenSub::RCOMP).push(0);                              // rcomp
@@ -145,7 +150,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
                               std::vector<core::parameter::ParameterSet> &params, core::stats::PerfStats &stats) {
     // Now generate new streams and compress blocks in parallel
     // this is actually number of read pairs per block for PE
-    uint64_t blocks = uint64_t(std::ceil(float(data.cp.num_reads) / data.cp.num_reads_per_block));
+    uint64_t blocks = uint64_t(std::ceil(static_cast<float>(data.cp.num_reads) / data.cp.num_reads_per_block));
 
     params.resize(blocks);
 
@@ -162,7 +167,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
         core::AccessUnit au(std::move(params[block_num]), 0);
 
         generate_subseqs(data, block_num, au);
-        num_reads_per_block[block_num] = au.get(core::GenSub::RCOMP).getNumSymbols();  // rcomp
+        num_reads_per_block[block_num] = (uint32_t)au.get(core::GenSub::RCOMP).getNumSymbols();  // rcomp
 
         au = core::ReadEncoder::entropyCodeAU(entropycoder, std::move(au));
         stat_vec[block_num].add(au.getStats());
@@ -174,7 +179,7 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
             if (d.isEmpty()) {
                 continue;
             }
-            std::ofstream out(file_to_save_streams + "." + std::to_string(uint8_t(d.getID())));
+            std::ofstream out(file_to_save_streams + "." + std::to_string(uint8_t(d.getID())), std::ios::binary);
             util::BitWriter bw(&out);
             d.write(bw);
         }
@@ -188,8 +193,8 @@ void generate_and_compress_se(const std::string &temp_dir, const se_data &data,
     const std::string block_info_file = temp_dir + "/block_info.bin";
     std::ofstream f_block_info(block_info_file, std::ios::binary);
     uint32_t num_blocks = (uint32_t)blocks;
-    f_block_info.write((char *)&num_blocks, sizeof(uint32_t));
-    f_block_info.write((char *)&num_reads_per_block[0], num_blocks * sizeof(uint32_t));
+    f_block_info.write(reinterpret_cast<char *>(&num_blocks), sizeof(uint32_t));
+    f_block_info.write(reinterpret_cast<char *>(&num_reads_per_block[0]), num_blocks * sizeof(uint32_t));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -243,8 +248,8 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     uint16_t read_length, noisepos;
 
     while (f_RC.get(rc)) {
-        f_readlength.read((char *)&read_length, sizeof(uint16_t));
-        f_pos.read((char *)&pos, sizeof(uint64_t));
+        f_readlength.read(reinterpret_cast<char *>(&read_length), sizeof(uint16_t));
+        f_pos.read(reinterpret_cast<char *>(&pos), sizeof(uint64_t));
         data->RC_arr[order] = rc;
         data->read_length_arr[order] = read_length;
         data->flag_arr[order] = true;  // aligned
@@ -258,7 +263,7 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
             f_noise.get(noise_char);
         }
         for (uint16_t i = 0; i < num_noise_in_curr_read; i++) {
-            f_noisepos.read((char *)&noisepos, sizeof(uint16_t));
+            f_noisepos.read(reinterpret_cast<char *>(&noisepos), sizeof(uint16_t));
             data->noisepos_arr[current_pos_noisepos_arr] = noisepos;
             current_pos_noisepos_arr++;
         }
@@ -273,16 +278,25 @@ void loadSE_Data(const compression_params &cp, const std::string &temp_dir, se_d
 
     // Now start with unaligned reads
     num_reads_unaligned = num_reads - num_reads_aligned;
-    std::ifstream f_unaligned(file_unaligned);
-    f_unaligned.seekg(0, f_unaligned.end);
-    uint64_t unaligned_array_size = f_unaligned.tellg();
-    f_unaligned.seekg(0, f_unaligned.beg);
+    std::string file_unaligned_count = file_unaligned + ".count";
+    std::ifstream f_unaligned_count(file_unaligned_count, std::ios::in | std::ios::binary);
+    uint64_t unaligned_array_size;
+    f_unaligned_count.read(reinterpret_cast<char *>(&unaligned_array_size), sizeof(uint64_t));
+    f_unaligned_count.close();
+    remove(file_unaligned_count.c_str());
     data->unaligned_arr = std::vector<char>(unaligned_array_size);
-    f_unaligned.read(data->unaligned_arr.data(), unaligned_array_size);
+    std::ifstream f_unaligned(file_unaligned, std::ios::binary);
+    std::string unaligned_read;
+    uint64_t pos_in_unaligned_arr = 0;
+    for (uint32_t i = 0; i < num_reads_unaligned; i++) {
+        read_dnaN_from_bits(unaligned_read, f_unaligned);
+        std::memcpy(data->unaligned_arr.data() + pos_in_unaligned_arr, &unaligned_read[0], unaligned_read.size());
+        pos_in_unaligned_arr += unaligned_read.size();
+    }
     f_unaligned.close();
     uint64_t current_pos_in_unaligned_arr = 0;
     for (uint32_t i = 0; i < num_reads_unaligned; i++) {
-        f_readlength.read((char *)&read_length, sizeof(uint16_t));
+        f_readlength.read(reinterpret_cast<char *>(&read_length), sizeof(uint16_t));
         data->read_length_arr[order] = read_length;
         data->pos_arr[order] = current_pos_in_unaligned_arr;
         current_pos_in_unaligned_arr += read_length;
@@ -371,10 +385,10 @@ void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_d
     uint16_t read_length, noisepos;
     uint32_t ind = 0;
     while (f_RC.get(rc)) {
-        f_order.read((char *)&order, sizeof(uint32_t));
+        f_order.read(reinterpret_cast<char *>(&order), sizeof(uint32_t));
         data->order_arr[ind++] = order;
-        f_readlength.read((char *)&read_length, sizeof(uint16_t));
-        f_pos.read((char *)&pos, sizeof(uint64_t));
+        f_readlength.read(reinterpret_cast<char *>(&read_length), sizeof(uint16_t));
+        f_pos.read(reinterpret_cast<char *>(&pos), sizeof(uint64_t));
         data->RC_arr[order] = rc;
         data->read_length_arr[order] = read_length;
         data->flag_arr[order] = true;  // aligned
@@ -388,7 +402,7 @@ void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_d
             f_noise.get(noise_char);
         }
         for (uint16_t i = 0; i < num_noise_in_curr_read; i++) {
-            f_noisepos.read((char *)&noisepos, sizeof(uint16_t));
+            f_noisepos.read(reinterpret_cast<char *>(&noisepos), sizeof(uint16_t));
             data->noisepos_arr[current_pos_noisepos_arr] = noisepos;
             current_pos_noisepos_arr++;
         }
@@ -402,18 +416,28 @@ void loadPE_Data(const compression_params &cp, const std::string &temp_dir, se_d
 
     // Now start with unaligned reads
     num_reads_unaligned = cp.num_reads - num_reads_aligned;
-    std::ifstream f_unaligned(file_unaligned);
-    f_unaligned.seekg(0, f_unaligned.end);
-    uint64_t unaligned_array_size = f_unaligned.tellg();
-    f_unaligned.seekg(0, f_unaligned.beg);
+    std::string file_unaligned_count = file_unaligned + ".count";
+    std::ifstream f_unaligned_count(file_unaligned_count, std::ios::in | std::ios::binary);
+    uint64_t unaligned_array_size;
+    f_unaligned_count.read(reinterpret_cast<char *>(&unaligned_array_size), sizeof(uint64_t));
+    f_unaligned_count.close();
+    remove(file_unaligned_count.c_str());
     data->unaligned_arr = std::vector<char>(unaligned_array_size);
-    f_unaligned.read(&data->unaligned_arr[0], unaligned_array_size);
+    std::ifstream f_unaligned(file_unaligned, std::ios::binary);
+    std::string unaligned_read;
+    uint64_t pos_in_unaligned_arr = 0;
+    for (uint32_t i = 0; i < num_reads_unaligned; i++) {
+        read_dnaN_from_bits(unaligned_read, f_unaligned);
+        std::memcpy(data->unaligned_arr.data() + pos_in_unaligned_arr, &unaligned_read[0], unaligned_read.size());
+        pos_in_unaligned_arr += unaligned_read.size();
+    }
     f_unaligned.close();
+
     uint64_t current_pos_in_unaligned_arr = 0;
     for (uint32_t i = 0; i < num_reads_unaligned; i++) {
-        f_order.read((char *)&order, sizeof(uint32_t));
+        f_order.read(reinterpret_cast<char *>(&order), sizeof(uint32_t));
         data->order_arr[ind++] = order;
-        f_readlength.read((char *)&read_length, sizeof(uint16_t));
+        f_readlength.read(reinterpret_cast<char *>(&read_length), sizeof(uint16_t));
         data->read_length_arr[order] = read_length;
         data->pos_arr[order] = current_pos_in_unaligned_arr;
         current_pos_in_unaligned_arr += read_length;
@@ -467,7 +491,7 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
             if (!data.flag_arr[current])
                 bdata->block_seq_start.push_back(0);
             else
-                bdata->block_seq_start.push_back(data.pos_arr[current]);
+                bdata->block_seq_start.push_back((uint32_t)data.pos_arr[current]);
         }
         if (!already_seen[current]) {
             // current is already seen when current is unaligned and its pair has
@@ -514,7 +538,7 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
             if (data.flag_arr[current]) {
                 // update current_block_seq_end
                 if (current_block_seq_end < data.pos_arr[current] + data.read_length_arr[current])
-                    current_block_seq_end = data.pos_arr[current] + data.read_length_arr[current];
+                    current_block_seq_end = uint32_t(data.pos_arr[current] + data.read_length_arr[current]);
             }
         }
         if (num_records_current_block == data.cp.num_reads_per_block || i == data.cp.num_reads - 1) {
@@ -534,7 +558,7 @@ void generateBlocksPE(const se_data &data, pe_block_data *bdata) {
                 num_records_current_block = 0;
                 current_block_num++;
                 current_block_seq_end = 0;
-                bdata->block_start.push_back(bdata->read_index_genomic_record.size());
+                bdata->block_start.push_back((uint32_t)bdata->read_index_genomic_record.size());
             }
         }
     }
@@ -559,24 +583,24 @@ void generate_qual_id_pe(const std::string &temp_dir, const pe_block_data &bdata
     // because here we measure in terms of quality values rather than records
     uint32_t quality_block_pos = 0;
     for (uint32_t i = 0; i < bdata.block_start.size(); i++) {
-        f_blocks_quality.write((char *)&quality_block_pos, sizeof(uint32_t));
+        f_blocks_quality.write(reinterpret_cast<char *>(&quality_block_pos), sizeof(uint32_t));
         for (uint32_t j = bdata.block_start[i]; j < bdata.block_end[i]; j++) {
             uint32_t current = bdata.read_index_genomic_record[j];
             uint32_t pair = (current < num_reads / 2) ? (current + num_reads / 2) : (current - num_reads / 2);
             if ((bdata.block_num[current] == bdata.block_num[pair]) &&
                 (bdata.genomic_record_index[pair] == bdata.genomic_record_index[current])) {
                 // pair in genomic record
-                f_order_quality.write((char *)&current, sizeof(uint32_t));
+                f_order_quality.write(reinterpret_cast<char *>(&current), sizeof(uint32_t));
                 quality_block_pos++;
-                f_order_quality.write((char *)&pair, sizeof(uint32_t));
+                f_order_quality.write(reinterpret_cast<char *>(&pair), sizeof(uint32_t));
                 quality_block_pos++;
             } else {
                 // only single read in genomic record
-                f_order_quality.write((char *)&current, sizeof(uint32_t));
+                f_order_quality.write(reinterpret_cast<char *>(&current), sizeof(uint32_t));
                 quality_block_pos++;
             }
         }
-        f_blocks_quality.write((char *)&quality_block_pos, sizeof(uint32_t));
+        f_blocks_quality.write(reinterpret_cast<char *>(&quality_block_pos), sizeof(uint32_t));
     }
     f_order_quality.close();
     f_blocks_quality.close();
@@ -585,8 +609,8 @@ void generate_qual_id_pe(const std::string &temp_dir, const pe_block_data &bdata
     // store block start and end positions (measured in terms of records since 1
     // record = 1 id)
     for (uint32_t i = 0; i < bdata.block_start.size(); i++) {
-        f_blocks_id.write((char *)&bdata.block_start[i], sizeof(uint32_t));
-        f_blocks_id.write((char *)&bdata.block_end[i], sizeof(uint32_t));
+        f_blocks_id.write(reinterpret_cast<const char *>(&bdata.block_start[i]), sizeof(uint32_t));
+        f_blocks_id.write(reinterpret_cast<const char *>(&bdata.block_end[i]), sizeof(uint32_t));
         std::ofstream f_order_id(file_order_id + "." + std::to_string(i), std::ios::binary);
         // store order
         for (uint32_t j = bdata.block_start[i]; j < bdata.block_end[i]; j++) {
@@ -594,7 +618,7 @@ void generate_qual_id_pe(const std::string &temp_dir, const pe_block_data &bdata
             uint32_t pair = (current < num_reads / 2) ? (current + num_reads / 2) : (current - num_reads / 2);
             // just write the min of current and pair
             uint32_t min_index = (current > pair) ? pair : current;
-            f_order_id.write((char *)&min_index, sizeof(uint32_t));
+            f_order_id.write(reinterpret_cast<char *>(&min_index), sizeof(uint32_t));
         }
         f_order_id.close();
     }
@@ -619,14 +643,6 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
     const unsigned cur_thread_num = 0;
 #endif
 
-    // char_to_int
-    int64_t char_to_int[128];
-    char_to_int[(uint8_t)'A'] = 0;
-    char_to_int[(uint8_t)'C'] = 1;
-    char_to_int[(uint8_t)'G'] = 2;
-    char_to_int[(uint8_t)'T'] = 3;
-    char_to_int[(uint8_t)'N'] = 4;
-
     int64_t rc_to_int[128];
     rc_to_int[(uint8_t)'d'] = 0;
     rc_to_int[(uint8_t)'r'] = 1;
@@ -638,7 +654,8 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
         raw_au.get(core::GenSub::RLEN).push(seq_end - seq_start - 1);  // rlen
         raw_au.get(core::GenSub::RTYPE).push(5);                       // rtype
         for (uint64_t i = seq_start; i < seq_end; i++)
-            raw_au.get(core::GenSub::UREADS).push(char_to_int[(uint8_t)data.seq[i]]);  // ureads
+            raw_au.get(core::GenSub::UREADS)
+                .push(getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[data.seq[i]]);  // ureads
     }
     uint64_t prevpos = 0, diffpos;
     // Write streams
@@ -669,11 +686,13 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                     .push(data.read_length_arr[current] + data.read_length_arr[pair] - 1);  // rlen
                 for (uint64_t j = 0; j < data.read_length_arr[current]; j++) {
                     raw_au.get(core::GenSub::UREADS)
-                        .push(char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
+                        .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                                  .inverseLut[data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
                 }
                 for (uint64_t j = 0; j < data.read_length_arr[pair]; j++) {
                     raw_au.get(core::GenSub::UREADS)
-                        .push(char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[pair] + j]]);  // ureads
+                        .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                                  .inverseLut[data.unaligned_arr[data.pos_arr[pair] + j]]);  // ureads
                 }
                 raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(seq_end - prevpos);     // pos
                 raw_au.get(core::GenSub::RCOMP).push(0);                                 // rcomp
@@ -693,9 +712,9 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                 raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[pair] - 1);             // rlen
                 raw_au.get(core::GenSub::RCOMP).push(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
                 raw_au.get(core::GenSub::RCOMP).push(rc_to_int[(uint8_t)data.RC_arr[pair]]);     // rcomp
-                if (data.noise_len_arr[current] == 0 && data.noise_len_arr[pair] == 0)
+                if (data.noise_len_arr[current] == 0 && data.noise_len_arr[pair] == 0) {
                     raw_au.get(core::GenSub::RTYPE).push(1);  // rtype = P
-                else {
+                } else {
                     raw_au.get(core::GenSub::RTYPE).push(3);  // rtype = M
                     for (int k = 0; k < 2; k++) {
                         uint32_t index = k ? pair : current;
@@ -711,16 +730,17 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                                     .push(data.noisepos_arr[data.pos_in_noise_arr[index] + j] - 1);  // mmpos
                             raw_au.get(core::GenSub::MMTYPE_TYPE).push(0);  // mmtype = Substitution
                             raw_au.get(core::GenSub::MMTYPE_SUBSTITUTION)
-                                .push(char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[index] + j]]);
+                                .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                                          .inverseLut[data.noise_arr[data.pos_in_noise_arr[index] + j]]);
                             raw_au.pushDependency(core::GenSub::MMTYPE_SUBSTITUTION,
-                                                  char_to_int[(uint8_t) data.seq[data.pos_arr[index]+curr_noise_pos]]);
-
+                                                  getAlphabetProperties(core::AlphabetID::ACGTN)
+                                                      .inverseLut[data.seq[data.pos_arr[index] + curr_noise_pos]]);
                         }
                         raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(1);  // mmpos
                     }
                 }
                 bool read_1_first = (current < pair);
-                uint16_t delta = data.pos_arr[pair] - data.pos_arr[current];
+                auto delta = (uint16_t)(data.pos_arr[pair] - data.pos_arr[current]);
                 raw_au.get(core::GenSub::PAIR_DECODING_CASE).push(0);  // pair decoding case same_rec
                 raw_au.get(core::GenSub::PAIR_SAME_REC).push(!(read_1_first) + 2 * delta);  // pair
                 pest->count_same_rec[cur_thread_num]++;
@@ -730,9 +750,9 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
             if (data.flag_arr[current] == true) {
                 raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] - 1);          // rlen
                 raw_au.get(core::GenSub::RCOMP).push(rc_to_int[(uint8_t)data.RC_arr[current]]);  // rcomp
-                if (data.noise_len_arr[current] == 0)
+                if (data.noise_len_arr[current] == 0) {
                     raw_au.get(core::GenSub::RTYPE).push(1);  // rtype = P
-                else {
+                } else {
                     raw_au.get(core::GenSub::RTYPE).push(3);  // rtype = M
                     uint16_t curr_noise_pos = 0;
                     for (uint16_t j = 0; j < data.noise_len_arr[current]; j++) {
@@ -746,9 +766,11 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                                 .push(data.noisepos_arr[data.pos_in_noise_arr[current] + j] - 1);  // mmpos
                         raw_au.get(core::GenSub::MMTYPE_TYPE).push(0);  // mmtype = Substitution
                         raw_au.get(core::GenSub::MMTYPE_SUBSTITUTION)
-                            .push(char_to_int[(uint8_t)data.noise_arr[data.pos_in_noise_arr[current] + j]]);
+                            .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                                      .inverseLut[data.noise_arr[data.pos_in_noise_arr[current] + j]]);
                         raw_au.pushDependency(core::GenSub::MMTYPE_SUBSTITUTION,
-                                              char_to_int[(uint8_t) data.seq[data.pos_arr[current]+curr_noise_pos]]);
+                                              getAlphabetProperties(core::AlphabetID::ACGTN)
+                                                  .inverseLut[data.seq[data.pos_arr[current] + curr_noise_pos]]);
                     }
                     raw_au.get(core::GenSub::MMPOS_TERMINATOR).push(1);
                 }
@@ -757,7 +779,8 @@ void generate_streams_pe(const se_data &data, const pe_block_data &bdata, uint64
                 raw_au.get(core::GenSub::RLEN).push(data.read_length_arr[current] - 1);  // rlen
                 for (uint64_t j = 0; j < data.read_length_arr[current]; j++) {
                     raw_au.get(core::GenSub::UREADS)
-                        .push(char_to_int[(uint8_t)data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
+                        .push(getAlphabetProperties(core::AlphabetID::ACGTN)
+                                  .inverseLut[data.unaligned_arr[data.pos_arr[current] + j]]);  // ureads
                 }
                 raw_au.get(core::GenSub::POS_MAPPING_FIRST).push(seq_end - prevpos);     // pos
                 raw_au.get(core::GenSub::RCOMP).push(0);                                 // rcomp
@@ -844,7 +867,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
         core::AccessUnit au(std::move(params[cur_block_num]), 0);
 
         generate_streams_pe(data, bdata, cur_block_num, &pest, au);
-        num_reads_per_block[cur_block_num] = au.get(core::GenSub::RCOMP).getNumSymbols();  // rcomp
+        num_reads_per_block[cur_block_num] = (uint32_t)au.get(core::GenSub::RCOMP).getNumSymbols();  // rcomp
         num_records_per_block[cur_block_num] =
             bdata.block_end[cur_block_num] - bdata.block_start[cur_block_num];  // used later for ids
         au = core::ReadEncoder::entropyCodeAU(entropycoder, std::move(au));
@@ -858,7 +881,7 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
             if (d.isEmpty()) {
                 continue;
             }
-            std::ofstream out(file_to_save_streams + "." + std::to_string(uint8_t(d.getID())));
+            std::ofstream out(file_to_save_streams + "." + std::to_string(uint8_t(d.getID())), std::ios::binary);
             util::BitWriter bw(&out);
             d.write(bw);
         }
@@ -878,10 +901,10 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
     // write num blocks, reads per block and records per block to a file
     const std::string block_info_file = temp_dir + "/block_info.bin";
     std::ofstream f_block_info(block_info_file, std::ios::binary);
-    uint32_t num_blocks = bdata.block_start.size();
-    f_block_info.write((char *)&num_blocks, sizeof(uint32_t));
-    f_block_info.write((char *)&num_reads_per_block[0], num_blocks * sizeof(uint32_t));
-    f_block_info.write((char *)&num_records_per_block[0], num_blocks * sizeof(uint32_t));
+    auto num_blocks = (uint32_t)bdata.block_start.size();
+    f_block_info.write(reinterpret_cast<char *>(&num_blocks), sizeof(uint32_t));
+    f_block_info.write(reinterpret_cast<char *>(&num_reads_per_block[0]), num_blocks * sizeof(uint32_t));
+    f_block_info.write(reinterpret_cast<char *>(&num_records_per_block[0]), num_blocks * sizeof(uint32_t));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,15 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ALIGNMENT_EXT_OTHER_REC_H
-#define GENIE_ALIGNMENT_EXT_OTHER_REC_H
+#ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_EXTERNAL_OTHER_REC_H_
+#define SRC_GENIE_CORE_RECORD_ALIGNMENT_EXTERNAL_OTHER_REC_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-#include <record/alignment-external.h>
 #include <cstdint>
+#include <memory>
+#include "genie/core/record/alignment-external.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,15 +29,13 @@ class OtherRec : public AlignmentExternal {
     uint64_t next_pos;     //!<
     uint16_t next_seq_ID;  //!<
 
-   public:
+ public:
     /**
      *
      * @param _next_pos
      * @param _next_seq_ID
      */
     OtherRec(uint64_t _next_pos, uint16_t _next_seq_ID);
-
-
 
     /**
      *
@@ -83,7 +82,7 @@ class OtherRec : public AlignmentExternal {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_OTHER_REC_H_EXT
+#endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_EXTERNAL_OTHER_REC_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

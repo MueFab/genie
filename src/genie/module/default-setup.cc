@@ -4,25 +4,28 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "default-setup.h"
-
-#include <genie/core/classifier-bypass.h>
-#include <genie/core/classifier-regroup.h>
-#include <genie/core/flowgraph-convert.h>
-#include <genie/entropy/gabac/decoder.h>
-#include <genie/entropy/gabac/encoder.h>
-#include <genie/name/tokenizer/decoder.h>
-#include <genie/name/tokenizer/encoder.h>
-#include <genie/quality/qvwriteout/decoder.h>
-#include <genie/quality/qvwriteout/encoder.h>
-#include <genie/read/localassembly/decoder.h>
-#include <genie/read/localassembly/encoder.h>
-#include <genie/read/lowlatency/decoder.h>
-#include <genie/read/lowlatency/encoder.h>
-#include <genie/read/refcoder/decoder.h>
-#include <genie/read/refcoder/encoder.h>
-#include <genie/read/spring/decoder.h>
-#include <genie/read/spring/encoder.h>
+#include "genie/module/default-setup.h"
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+#include "genie/core/classifier-bypass.h"
+#include "genie/core/classifier-regroup.h"
+#include "genie/core/flowgraph-convert.h"
+#include "genie/entropy/gabac/decoder.h"
+#include "genie/entropy/gabac/encoder.h"
+#include "genie/name/tokenizer/decoder.h"
+#include "genie/name/tokenizer/encoder.h"
+#include "genie/quality/qvwriteout/decoder.h"
+#include "genie/quality/qvwriteout/encoder.h"
+#include "genie/read/localassembly/decoder.h"
+#include "genie/read/localassembly/encoder.h"
+#include "genie/read/lowlatency/decoder.h"
+#include "genie/read/lowlatency/encoder.h"
+#include "genie/read/refcoder/decoder.h"
+#include "genie/read/refcoder/encoder.h"
+#include "genie/read/spring/decoder.h"
+#include "genie/read/spring/encoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -82,7 +85,8 @@ std::unique_ptr<core::FlowGraphEncode> buildDefaultEncoder(size_t threads, const
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const std::string& working_dir, size_t) {
+std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const std::string& working_dir,
+                                                           bool combinePairsFlag, size_t) {
     std::unique_ptr<core::FlowGraphDecode> ret = genie::util::make_unique<core::FlowGraphDecode>(threads);
 
     ret->addReadCoder(genie::util::make_unique<genie::read::refcoder::Decoder>());
@@ -90,8 +94,8 @@ std::unique_ptr<core::FlowGraphDecode> buildDefaultDecoder(size_t threads, const
     auto lld = genie::util::make_unique<genie::read::lowlatency::Decoder>();
     ret->setRefDecoder(lld.get());
     ret->addReadCoder(std::move(lld));
-    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, true, false));
-    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, true, true));
+    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, combinePairsFlag, false));
+    ret->addReadCoder(genie::util::make_unique<genie::read::spring::Decoder>(working_dir, combinePairsFlag, true));
     ret->setReadCoderSelector([](const genie::core::AccessUnit& au) -> size_t {
         if (au.getParameters().isComputedReference()) {
             switch (au.getParameters().getComputedRef().getAlgorithm()) {

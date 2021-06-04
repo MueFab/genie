@@ -4,15 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_REFERENCE_SOURCE_H
-#define GENIE_REFERENCE_SOURCE_H
+#ifndef SRC_GENIE_CORE_REFERENCE_SOURCE_H_
+#define SRC_GENIE_CORE_REFERENCE_SOURCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
 #include <vector>
-#include "reference-manager.h"
-#include "reference.h"
+#include "genie/core/reference-manager.h"
+#include "genie/core/reference.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,9 +23,9 @@ namespace core {
  *
  */
 class ReferenceSource {
-   protected:
+ protected:
     ReferenceManager* refMgr;  //!<
-   public:
+ public:
     /**
      *
      * @param mgr
@@ -40,7 +40,7 @@ class ReferenceSource {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_REFERENCE_SOURCE_H
+#endif  // SRC_GENIE_CORE_REFERENCE_SOURCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

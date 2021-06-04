@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_STRINGVIEW_H
-#define GENIE_STRINGVIEW_H
+#ifndef SRC_GENIE_UTIL_STRINGVIEW_H_
+#define SRC_GENIE_UTIL_STRINGVIEW_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,12 +20,12 @@ namespace util {
  * @brief Represents a read-only section of a string.
  */
 struct StringView {
-   private:
+ private:
     size_t start;        //!< @brief First character's offset in the string.
     size_t stop;         //!< @brief Last character's offset plus 1.
     const char* memory;  //!< @brief String pointer.
 
-   public:
+ public:
     /**
      * @brief Create a string view without deploying to an actual string. Just save the offsets.
      * @param start_p String begin.
@@ -71,7 +71,7 @@ struct StringView {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_STRINGVIEW_H
+#endif  // SRC_GENIE_UTIL_STRINGVIEW_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

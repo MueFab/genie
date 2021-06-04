@@ -4,21 +4,26 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#ifdef _WIN32
 #define NOMINMAX
+#endif
 
-#include "decoder.h"
+#include "genie/read/spring/decoder.h"
 #include <algorithm>
 #include <array>
-#include <fstream>
 #include <iostream>
-#include <limits>
-#include <map>
 #include <stdexcept>
 #include <string>
 #include <tuple>
+#include <unordered_map>
+#include <utility>
 #include <vector>
-#include "params.h"
-#include "util.h"
+#include "genie/read/spring/params.h"
+#include "genie/read/spring/util.h"
+
+
+#include "kwaymergesort/kwaymergesort.h"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,23 +35,27 @@ namespace spring {
 
 void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                     std::array<std::vector<Record>, 2>& matched_records,
-                    std::array<std::vector<Record>, 2>& unmatched_records, std::vector<uint32_t>& mate_au_id,
-                    std::vector<uint32_t>& mate_record_index, std::vector<std::string>& names,
+                    std::array<std::vector<Record>, 2>& unmatched_records, std::vector<std::string>& names,
                     std::vector<std::string>& qvs) {
     /*
      * return values are matched_records[2] (for pairs that are matched),
-     * unmatched_records[2] (for pairs that are unmatched), mate_au_id,
-     * mate_record_index (which store position of the pair of the
-     * unmatched_records[1]). For single end case, only matched_records[0] is
+     * unmatched_records[2] (for pairs that are unmatched).
+     * For single end case, only matched_records[0] is
      * populated, for paired end reads with combine_pairs false, only
      * matched_records[0] and matched_records[1] are populated (unmatched records
      * also put in these). For paired end with combine_pairs true, matched_records
      * arrays contain the matched records and have equal size, unmatched_records
-     * have the records that don't have pair within the same AU, and mate_au_id &
-     * mate_au_id contain the information needed to match them together.
+     * have the records that don't have pair within the same AU.
+     * Unmatched pairs are combined based on matching read ids. For reads whose
+     * pair is in same AU, we perform matching here itself (using a hash table to
+     * map read name to the index and then using this to match the pairs).
+     * Otherwise, we put them in unmatched_records and the matching is
+     * performed across AUs later (see Decoder::flushIn).
      */
-    std::vector<uint32_t> mate_record_index_same_rec;  // for sorting in the combine_pairs case
     std::vector<Record> unmatched_same_au[2];
+    std::unordered_map<std::string, uint32_t> pos_in_unmatched_same_au_0;
+    // hash table mapping the read name to its position in unmatched_same_au[0]
+    // used to reorder the unmatched_same_au[1] in the same order
     size_t qv_pos = 0;
     size_t name_pos = 0;
     Record cur_record;
@@ -59,9 +68,10 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
         auto rtype = au.get(core::GenSub::RTYPE).pull();
         if (rtype == 5) {
             // put in refBuf
-            uint32_t rlen = au.get(core::GenSub::RLEN).pull() + 1;  // rlen
+            auto rlen = (uint32_t)au.get(core::GenSub::RLEN).pull() + 1;  // rlen
             for (uint32_t i = 0; i < rlen; i++) {
-                refBuf.push_back(getAlphabetProperties(core::AlphabetID::ACGTN).lut[au.get(core::GenSub::UREADS).pull()]);  // ureads
+                refBuf.push_back(
+                    getAlphabetProperties(core::AlphabetID::ACGTN).lut[au.get(core::GenSub::UREADS).pull()]);  // ureads
             }
         } else {
             // rtype can be 1 (P) or 3 (M)
@@ -81,31 +91,25 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                 uint16_t data_pair;
                 switch (pairing_decoding_case) {
                     case 0:
-                        data_pair = au.get(core::GenSub::PAIR_SAME_REC).pull();
+                        data_pair = (uint16_t)au.get(core::GenSub::PAIR_SAME_REC).pull();
                         read_1_first = !(((uint16_t)(data_pair)) & 1);
                         delta = ((uint16_t)(data_pair)) >> 1;
                         number_of_record_segments = 2;
                         break;
                     case 1:
                     case 3:
-                    case 6:
                         number_of_record_segments = 1;
                         read_1_first = false;
                         if (combine_pairs) {
                             if (pairing_decoding_case == 1) {
-                                mate_record_index_same_rec.push_back(
-                                    (uint32_t)(au.get(core::GenSub::PAIR_R1_SPLIT).pull()));
                                 same_au_flag = true;
                             } else if (pairing_decoding_case == 3) {
-                                mate_au_id.push_back((uint32_t)(au.get(core::GenSub::PAIR_R1_DIFF_SEQ).pull()));
-                                mate_record_index.push_back((uint32_t)(au.get(core::GenSub::PAIR_R1_DIFF_POS).pull()));
                                 same_au_flag = false;
                             }
                         }
                         break;
                     case 2:
                     case 4:
-                    case 5:
                         number_of_record_segments = 1;
                         read_1_first = true;
                         if (combine_pairs) {
@@ -116,15 +120,15 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                         }
                         break;
                     default:
-                        throw std::runtime_error("Invalid pair decoding case encountered");
+                        throw std::runtime_error("Unsupported pair decoding case encountered");
                 }
             } else {
                 number_of_record_segments = 1;
             }
             uint32_t rlen[2];
             for (int i = 0; i < number_of_record_segments; i++)
-                rlen[i] = (uint32_t)(au.get(core::GenSub::RLEN).pull()) + 1;  // rlen
-            uint32_t pos = au.get(core::GenSub::POS_MAPPING_FIRST).pull();    // pos
+                rlen[i] = (uint32_t)(au.get(core::GenSub::RLEN).pull()) + 1;      // rlen
+            auto pos = (uint32_t)au.get(core::GenSub::POS_MAPPING_FIRST).pull();  // pos
 
             abs_pos += pos;
             std::string cur_read[2];
@@ -141,7 +145,7 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                 for (int i = 0; i < number_of_record_segments; i++) {
                     uint32_t abs_mmpos = 0;
                     while (true) {
-                        bool mmpos_flag = (bool)(au.get(core::GenSub::MMPOS_TERMINATOR).pull());
+                        bool mmpos_flag = static_cast<bool>(au.get(core::GenSub::MMPOS_TERMINATOR).pull());
                         if (mmpos_flag == 1) break;
                         uint32_t mmpos = (uint32_t)(au.get(core::GenSub::MMPOS_POSITION).pull());
                         abs_mmpos += mmpos;
@@ -149,9 +153,11 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                         if (mmtype_0 != 0)  // i.e., not substitution
                             throw std::runtime_error("Non zero mmtype encountered.");
                         const auto mmtype_1 = au.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()->dataLeft()
-                                              ? au.get(core::GenSub::MMTYPE_SUBSTITUTION).getMismatchDecoder()
-                                                  ->decodeMismatch(getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut[cur_read[i][abs_mmpos]])
-                                              : getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N'];
+                                                  ? au.get(core::GenSub::MMTYPE_SUBSTITUTION)
+                                                        .getMismatchDecoder()
+                                                        ->decodeMismatch(getAlphabetProperties(core::AlphabetID::ACGTN)
+                                                                             .inverseLut[cur_read[i][abs_mmpos]])
+                                                  : getAlphabetProperties(core::AlphabetID::ACGTN).inverseLut['N'];
                         cur_read[i][abs_mmpos] = getAlphabetProperties(core::AlphabetID::ACGTN).lut[mmtype_1];
                         abs_mmpos++;
                     }
@@ -180,16 +186,16 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
                 if (!paired_end) {
                     matched_records[0].push_back(cur_record);
                 } else {
-                    if (!combine_pairs) {
+                    if (number_of_record_segments == 2) {
                         matched_records[first_read_flag ? 0 : 1].push_back(cur_record);
                     } else {
-                        if (number_of_record_segments == 2) {
-                            matched_records[first_read_flag ? 0 : 1].push_back(cur_record);
+                        if (same_au_flag) {
+                            unmatched_same_au[first_read_flag ? 0 : 1].push_back(cur_record);
+                            if (first_read_flag)
+                                pos_in_unmatched_same_au_0[cur_record.name] =
+                                    static_cast<unsigned int>(unmatched_same_au[0].size() - 1);
                         } else {
-                            if (same_au_flag)
-                                unmatched_same_au[first_read_flag ? 0 : 1].push_back(cur_record);
-                            else
-                                unmatched_records[first_read_flag ? 0 : 1].push_back(cur_record);
+                            unmatched_records[first_read_flag ? 0 : 1].push_back(cur_record);
                         }
                     }
                 }
@@ -201,14 +207,15 @@ void decode_streams(core::AccessUnit& au, bool paired_end, bool combine_pairs,
     // match, and push this to matched_records arrays
     if (paired_end && combine_pairs) {
         size_t size_unmatched = unmatched_same_au[0].size();
-        if (size_unmatched != unmatched_same_au[1].size() || size_unmatched != mate_record_index_same_rec.size())
-            throw std::runtime_error("Sizes of unmatched same AU vectors don't match.");
+        if (size_unmatched != unmatched_same_au[1].size() || size_unmatched != pos_in_unmatched_same_au_0.size())
+            UTILS_DIE("Sizes of unmatched same AU vectors don't match.");
         if (size_unmatched > 0) {
             matched_records[0].insert(matched_records[0].end(), unmatched_same_au[0].begin(),
                                       unmatched_same_au[0].end());
             std::vector<std::pair<uint32_t, uint32_t>> record_index_for_sorting(size_unmatched);
             for (size_t i = 0; i < size_unmatched; i++)
-                record_index_for_sorting[i] = std::make_pair(mate_record_index_same_rec[i], i);
+                record_index_for_sorting[i] =
+                    std::make_pair(pos_in_unmatched_same_au_0[unmatched_same_au[1][i].name], static_cast<uint32_t>(i));
             std::sort(
                 record_index_for_sorting.begin(), record_index_for_sorting.end(),
                 [](std::pair<uint32_t, uint32_t> a, std::pair<uint32_t, uint32_t> b) { return a.first < b.first; });
@@ -231,7 +238,6 @@ Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end) :
     }
     UTILS_DIE_IF(!ghc::filesystem::create_directory(basedir), "Cannot create temporary directory.");
     std::cout << "Temporary directory: " << basedir << "\n";
-
     // Read compression params
     std::string compression_params_file = "cp.bin";
     std::string file_quality = "quality_1";
@@ -241,10 +247,15 @@ Decoder::Decoder(const std::string& working_dir, bool comb_p, bool paired_end) :
     // temporary files for combine pairs case
     file_unmatched_fastq1 = basedir + "/unmatched_1.fastq";
     file_unmatched_fastq2 = basedir + "/unmatched_2.fastq";
+    file_unmatched_readnames_1 = basedir + "/unmatched_readnames_1.txt";
+    file_unmatched_readnames_2 = basedir + "/unmatched_readnames_2.txt";
     if (cp.paired_end) {
         if (combine_pairs && !cp.ureads_flag) {
             fout_unmatched1.open(file_unmatched_fastq1);
             fout_unmatched2.open(file_unmatched_fastq2);
+            fout_unmatched_readnames_1.open(file_unmatched_readnames_1);
+            fout_unmatched_readnames_2.open(file_unmatched_readnames_2);
+            unmatched_record_index[0] = unmatched_record_index[1] = 0;
         }
     }
 }
@@ -257,8 +268,6 @@ void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
     util::Watch watch;
     std::array<std::vector<Record>, 2> matched_records;
     std::array<std::vector<Record>, 2> unmatched_records;
-    std::vector<uint32_t> mate_au_id;
-    std::vector<uint32_t> mate_record_index;
 
     std::vector<std::string> ecigars;
     while (!au.get(core::GenSub::RTYPE).end()) {
@@ -279,18 +288,23 @@ void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
 
     watch.pause();
     auto names = namecoder->process(au.get(core::GenDesc::RNAME));
+
+    // if read names is empty but combine_pairs is set to true, raise error
+    if (au.getNumReads() > 0 && std::get<0>(names).empty() && combine_pairs)
+        UTILS_DIE("combinePairsFlag cannot be set to true when read names are not present for all records.");
+
     au.getStats().add(std::get<1>(names));
     auto qvs = qvcoder->process(au.getParameters().getQVConfig(core::record::ClassType::CLASS_U), ecigars,
                                 au.get(core::GenDesc::QV));
     au.getStats().add(std::get<1>(qvs));
     watch.resume();
 
-    decode_streams(au, cp.paired_end, combine_pairs, matched_records, unmatched_records, mate_au_id, mate_record_index,
-                   std::get<0>(names), std::get<0>(qvs));
+    decode_streams(au, cp.paired_end, combine_pairs, matched_records, unmatched_records, std::get<0>(names),
+                   std::get<0>(qvs));
 
     for (size_t i = 0; i < matched_records[0].size(); ++i) {
-        chunk.getData().emplace_back(cp.paired_end ? 2 : 1, core::record::ClassType::CLASS_U,
-                                     std::move(matched_records[0][i].name), "", 0);
+        chunk.getData().emplace_back(cp.paired_end ? (uint8_t)2 : (uint8_t)1, core::record::ClassType::CLASS_U,
+                                     std::move(matched_records[0][i].name), "", (uint8_t)0);
         core::record::Segment seg(std::move(matched_records[0][i].seq));
         if (!matched_records[0][i].qv.empty()) {
             seg.addQualities(std::move(matched_records[0][i].qv));
@@ -304,20 +318,42 @@ void Decoder::flowIn(genie::core::AccessUnit&& t, const util::Section& id) {
             chunk.getData().back().addSegment(std::move(seg2));
         }
     }
+    // now put unmatched reads to chunks if combine_pairs is false
+    if (!combine_pairs) {
+        for (size_t i = 0; i < unmatched_records[0].size(); ++i) {
+            chunk.getData().emplace_back(cp.paired_end ? (uint8_t)2 : (uint8_t)1, core::record::ClassType::CLASS_U,
+                                         std::move(unmatched_records[0][i].name), "", (uint8_t)0, true);
+            // last parameter is read_1_first
+            core::record::Segment seg(std::move(unmatched_records[0][i].seq));
+            if (!unmatched_records[0][i].qv.empty()) {
+                seg.addQualities(std::move(unmatched_records[0][i].qv));
+            }
+            chunk.getData().back().addSegment(std::move(seg));
+        }
+        for (size_t i = 0; i < unmatched_records[1].size(); ++i) {
+            chunk.getData().emplace_back(cp.paired_end ? (uint8_t)2 : (uint8_t)1, core::record::ClassType::CLASS_U,
+                                         std::move(unmatched_records[1][i].name), "", (uint8_t)0, false);
+            // last parameter is read_1_first
+            core::record::Segment seg(std::move(unmatched_records[1][i].seq));
+            if (!unmatched_records[1][i].qv.empty()) {
+                seg.addQualities(std::move(unmatched_records[1][i].qv));
+            }
+            chunk.getData().back().addSegment(std::move(seg));
+        }
+    }
     {
         util::OrderedSection sec(&lock, id);
         if (cp.paired_end && combine_pairs) {
             for (int j = 0; j < 2; j++) {
                 std::ostream& tmpout = (j == 0) ? fout_unmatched1 : fout_unmatched2;
+                std::ostream& tmpoutreadnames = (j == 0) ? fout_unmatched_readnames_1 : fout_unmatched_readnames_2;
                 for (auto& fastqRecord : unmatched_records[j]) {
                     tmpout << fastqRecord.name << "\n";
                     tmpout << fastqRecord.seq << "\n";
                     tmpout << fastqRecord.qv << "\n";
+                    tmpoutreadnames << fastqRecord.name << "\t" << unmatched_record_index[j]++ << "\n";
                 }
             }
-            mate_au_id_concat.insert(mate_au_id_concat.end(), mate_au_id.begin(), mate_au_id.end());
-            mate_record_index_concat.insert(mate_record_index_concat.end(), mate_record_index.begin(),
-                                            mate_record_index.end());
         }
     }
 
@@ -349,7 +385,7 @@ void Decoder::add(core::record::Chunk& chunk, core::record::Record&& r, uint64_t
     chunk.getData().push_back(std::move(r));
     if (chunk.getData().size() >= CHUNK_SIZE) {
         size_t size = chunk.getData().size() * 2;
-        flowOut(std::move(chunk), {pos, size, true});
+        flowOut(std::move(chunk), {size_t(pos), size, true});
         pos += size;
     }
 }
@@ -361,29 +397,100 @@ void Decoder::flushIn(uint64_t& pos) {
 
     // now reorder the remaining unmatched reads so that they are paired and then
     // write them to file.
+
+    // Strategy: we wrote all unmatched records for read 1 and read 2
+    // to files. We also wrote the read names along with their
+    // position in the unmatched reads to separate files.
+    // First step will be to sort the read names for unmatched_1 and unmatched_2
+    // - that will provide us with a mapping between the records in
+    // unmatched_1 and unmatched_2. Then we write the unmatched_1 in their original
+    // order, and unmatched_2 in the corresponding sorted order. This last part is
+    // done in chunks whose size is determined by BIN_SIZE_COMBINE_PAIRS, to
+    // put a limit on the memory usage for this step. Higher BIN_SIZE_COMBINE_PAIRS
+    // can lead to speed up due to fewer disk accesses.
+
     if (!cp.ureads_flag && cp.paired_end && combine_pairs) {
         std::cout << "Order unmatched decoded reads..." << std::endl;
         fout_unmatched1.close();
         fout_unmatched2.close();
-        // first write the reads in file 1 as it is
-        std::ifstream fin_unmatched1(file_unmatched_fastq1);
+        fout_unmatched_readnames_1.close();
+        fout_unmatched_readnames_2.close();
 
-        // now build index and reverse index to reorder reads in file 2
-        size_t size_unmatched = mate_au_id_concat.size();
+        // verify that the two unmatched reads have same number of reads
+        if (unmatched_record_index[0] != unmatched_record_index[1])
+            UTILS_DIE("Sizes of unmatched reads across AUs don't match.");
+        uint32_t size_unmatched = unmatched_record_index[0];
+        std::cout << "Pairs to match: " << size_unmatched << "\n";
+
+        std::string file_unmatched_readnames_1_sorted = file_unmatched_readnames_1 + ".sorted";
+        std::string file_unmatched_readnames_2_sorted = file_unmatched_readnames_2 + ".sorted";
+
         if (size_unmatched > 0) {
-            std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> au_id_index_for_sorting(size_unmatched);
-            for (size_t i = 0; i < size_unmatched; i++)
-                au_id_index_for_sorting[i] = std::make_tuple(mate_au_id_concat[i], mate_record_index_concat[i], i);
-            std::sort(au_id_index_for_sorting.begin(), au_id_index_for_sorting.end(),
-                      [](std::tuple<uint32_t, uint32_t, uint32_t> a, std::tuple<uint32_t, uint32_t, uint32_t> b) {
-                          return (std::get<0>(a) == std::get<0>(b)) ? (std::get<1>(a) < std::get<1>(b))
-                                                                    : (std::get<0>(a) < std::get<0>(b));
-                      });
-            std::vector<uint32_t> reverse_index(size_unmatched);
-            for (size_t i = 0; i < size_unmatched; i++) reverse_index[std::get<2>(au_id_index_for_sorting[i])] = i;
+            // first sort fout_unmatched_readnames_* using disk-based merge sort
+            // from fork of https://github.com/arq5x/kway-mergesort
+            auto sort_readnames_start = std::chrono::steady_clock::now();
+            size_t maxBufferSize = 2000000000;  // roughly 2 GB
+            std::ofstream fout_unmatched_readnames_1_sorted(file_unmatched_readnames_1_sorted);
+            std::ofstream fout_unmatched_readnames_2_sorted(file_unmatched_readnames_2_sorted);
+            kwaymergesort::KwayMergeSort* sorter =
+                new kwaymergesort::KwayMergeSort(file_unmatched_readnames_1, &fout_unmatched_readnames_1_sorted,
+                                                 static_cast<int>(maxBufferSize), false, basedir);
+            sorter->Sort();
+            delete sorter;
+            fout_unmatched_readnames_1_sorted.close();
+            sorter = new kwaymergesort::KwayMergeSort(file_unmatched_readnames_2, &fout_unmatched_readnames_2_sorted,
+                                                      static_cast<int>(maxBufferSize), false, basedir);
+            sorter->Sort();
+            delete sorter;
+            fout_unmatched_readnames_2_sorted.close();
+            auto sort_readnames_end = std::chrono::steady_clock::now();
+
+            std::cout
+                << "Time for sorting read names: "
+                << std::chrono::duration_cast<std::chrono::seconds>(sort_readnames_end - sort_readnames_start).count()
+                << " s\n";
+
+            // now build an index that tells for read i in file_2, where it's pair in
+            // file_1 lies.
+            std::vector<uint32_t> index_file_1(size_unmatched);
+            // map sorted position to unsorted
+            std::vector<uint32_t> reverse_index_file_2(size_unmatched);
+            // map unsorted to sorted (for now, reused later to map unsorted in file 2 to unsorted in file 1)
+
+            std::ifstream fin_unmatched_readnames_1_sorted(file_unmatched_readnames_1_sorted);
+            std::string line;
+            uint32_t num_lines = 0;
+            while (std::getline(fin_unmatched_readnames_1_sorted, line)) {
+                auto pos_tab = line.find_last_of('\t');  // find last tab
+                index_file_1[num_lines++] = static_cast<uint32_t>(std::stoull(line.substr(pos_tab + 1)));
+            }
+            if (num_lines != size_unmatched)
+                UTILS_DIE("Sizes of unmatched reads across AUs don't match (readnames_1_sorted).");
+            fin_unmatched_readnames_1_sorted.close();
+
+            std::ifstream fin_unmatched_readnames_2_sorted(file_unmatched_readnames_2_sorted);
+            num_lines = 0;
+            while (std::getline(fin_unmatched_readnames_2_sorted, line)) {
+                auto pos_tab = line.find_last_of('\t');  // find last tab
+                reverse_index_file_2[std::stoull(line.substr(pos_tab + 1))] = num_lines++;
+            }
+            if (num_lines != size_unmatched)
+                UTILS_DIE("Sizes of unmatched reads across AUs don't match (readnames_2_sorted).");
+            fin_unmatched_readnames_2_sorted.close();
+
+            // now build index from file 2 to file 1
+            for (uint32_t i = 0; i < size_unmatched; i++) {
+                reverse_index_file_2[i] = index_file_1[reverse_index_file_2[i]];
+            }
+
+            index_file_1.clear();
+
+            auto reorder_unmatched_start = std::chrono::steady_clock::now();
+            // we will write the reads in file 1 in the same order as in file_unmatched_fastq1
+            std::ifstream fin_unmatched1(file_unmatched_fastq1);
 
             // now reorder the unmatched records in file 2, by picking them in chunks
-            uint32_t bin_size = std::min((size_t)BIN_SIZE_COMBINE_PAIRS, size_unmatched);
+            uint32_t bin_size = std::min(BIN_SIZE_COMBINE_PAIRS, size_unmatched);
             std::vector<Record> records_bin(bin_size);
             Record tmpFastqRecord;
             for (uint32_t i = 0; i <= size_unmatched / bin_size; i++) {
@@ -393,8 +500,8 @@ void Decoder::flushIn(uint64_t& pos) {
                 std::ifstream fin_unmatched2(file_unmatched_fastq2);
                 uint32_t bin_start = i * bin_size;
                 for (uint32_t j = 0; j < size_unmatched; j++) {
-                    if (reverse_index[j] >= bin_start && reverse_index[j] < bin_start + num_records_bin) {
-                        readRec(fin_unmatched2, records_bin[reverse_index[j] - bin_start]);
+                    if (reverse_index_file_2[j] >= bin_start && reverse_index_file_2[j] < bin_start + num_records_bin) {
+                        readRec(fin_unmatched2, records_bin[reverse_index_file_2[j] - bin_start]);
                     } else {
                         readRec(fin_unmatched2, tmpFastqRecord);
                     }
@@ -420,14 +527,24 @@ void Decoder::flushIn(uint64_t& pos) {
                     add(chunk, std::move(r), pos);
                 }
             }
+            ghc::filesystem::remove(file_unmatched_readnames_1_sorted);
+            ghc::filesystem::remove(file_unmatched_readnames_2_sorted);
+            auto reorder_unmatched_end = std::chrono::steady_clock::now();
+            std::cout << "Time for reordering unmatched reads: "
+                      << std::chrono::duration_cast<std::chrono::seconds>(reorder_unmatched_end -
+                                                                          reorder_unmatched_start)
+                             .count()
+                      << " s\n";
         }
         ghc::filesystem::remove(file_unmatched_fastq1);
         ghc::filesystem::remove(file_unmatched_fastq2);
+        ghc::filesystem::remove(file_unmatched_readnames_1);
+        ghc::filesystem::remove(file_unmatched_readnames_2);
     }
 
     size_t size = chunk.getData().size() * 2;
     if (size) {
-        flowOut(std::move(chunk), {pos, size, true});
+        flowOut(std::move(chunk), {size_t(pos), size, true});
         pos += size;
     }
 

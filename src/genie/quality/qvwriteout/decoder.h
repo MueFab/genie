@@ -4,15 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DECODER_H
-#define GENIE_DECODER_H
+#ifndef SRC_GENIE_QUALITY_QVWRITEOUT_DECODER_H_
+#define SRC_GENIE_QUALITY_QVWRITEOUT_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/cigar-tokenizer.h>
-#include <genie/core/qv-decoder.h>
-#include <genie/quality/paramqv1/qv_coding_config_1.h>
-#include <genie/util/watch.h>
+#include <string>
+#include <tuple>
+#include <vector>
+#include "genie/core/cigar-tokenizer.h"
+#include "genie/core/qv-decoder.h"
+#include "genie/quality/paramqv1/qv_coding_config_1.h"
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +27,7 @@ namespace qvwriteout {
  *
  */
 class Decoder : public core::QVDecoder {
-   public:
+ public:
     /**
      *
      * @param param
@@ -45,7 +48,7 @@ class Decoder : public core::QVDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DECODER_H
+#endif  // SRC_GENIE_QUALITY_QVWRITEOUT_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

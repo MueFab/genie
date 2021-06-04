@@ -4,9 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "context.h"
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
+#include "genie/entropy/paramcabac/context.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,19 +4,19 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_IMPORTER_H
-#define GENIE_IMPORTER_H
+#ifndef SRC_GENIE_FORMAT_MGREC_IMPORTER_H_
+#define SRC_GENIE_FORMAT_MGREC_IMPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <classifier.h>
-#include <format-importer.h>
-#include <genie/core/record/chunk.h>
-#include <genie/core/stats/perf-stats.h>
-#include <genie/util/bitreader.h>
-#include <genie/util/ordered-lock.h>
-#include <genie/util/original-source.h>
-#include <genie/util/source.h>
+#include "genie/core/classifier.h"
+#include "genie/core/format-importer.h"
+#include "genie/core/record/chunk.h"
+#include "genie/core/stats/perf-stats.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/ordered-lock.h"
+#include "genie/util/original-source.h"
+#include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,11 +28,11 @@ namespace mgrec {
  *
  */
 class Importer : public core::FormatImporter {
-   private:
+ private:
     size_t blockSize;        //!<
     util::BitReader reader;  //!<
 
-   public:
+ public:
     /**
      *
      * @param _blockSize
@@ -56,7 +56,7 @@ class Importer : public core::FormatImporter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_IMPORTER_H
+#endif  // SRC_GENIE_FORMAT_MGREC_IMPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
