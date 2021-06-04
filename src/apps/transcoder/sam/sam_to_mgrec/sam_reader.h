@@ -16,6 +16,7 @@ class SamReader {
     samFile* sam_file;
     bam_hdr_t* sam_header;
     bam1_t* sam_alignment;
+    kstring_t header_info;
 
    public:
     explicit SamReader(const char* fpath);
