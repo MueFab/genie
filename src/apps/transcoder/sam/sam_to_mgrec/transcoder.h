@@ -17,7 +17,7 @@ namespace sam_to_mgrec {
 #define PHASE1_EXT ".phase1.mgrec"
 #define PHASE2_EXT ".phase2.mgrec"
 #define PHASE2_TMP_EXT ".phase2.tmp"
-#define PHASE1_BUFFER_SIZE 50000
+//#define PHASE1_BUFFER_SIZE 50000
 #define PHASE2_BUFFER_SIZE 500000
 
 bool save_mgrecs_by_rid(std::list<genie::core::record::Record>& mpegg_recs,
