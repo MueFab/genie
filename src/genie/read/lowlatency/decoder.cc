@@ -76,6 +76,9 @@ core::record::Chunk Decoder::decode_common(core::AccessUnit&& t) {
                 }
                 qvCounter++;
             }
+            if(!r.getSegments().empty()) {
+                r.setQVDepth(r.getSegments().front().getQualities().size());
+            }
         }
     }
 
