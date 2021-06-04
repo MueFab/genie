@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SPRING_UTIL_H_
-#define SPRING_UTIL_H_
+#ifndef SRC_GENIE_READ_SPRING_UTIL_H_
+#define SRC_GENIE_READ_SPRING_UTIL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -65,6 +65,38 @@ std::string reverse_complement(const std::string &s, const int readlen);
  */
 std::string random_string(size_t length);
 
+/**
+ *
+ * @param read
+ * @param fout
+ * @return
+ */
+void write_dnaN_in_bits(const std::string &read, std::ofstream &fout);
+
+/**
+ *
+ * @param read
+ * @param fin
+ * @return
+ */
+void read_dnaN_from_bits(std::string &read, std::ifstream &fin);
+
+/**
+ *
+ * @param read
+ * @param fout
+ * @return
+ */
+void write_dna_in_bits(const std::string &read, std::ofstream &fout);
+
+/**
+ *
+ * @param read
+ * @param fin
+ * @return
+ */
+void read_dna_from_bits(std::string &read, std::ifstream &fin);
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace spring
@@ -73,7 +105,7 @@ std::string random_string(size_t length);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SPRING_UTIL_H_
+#endif  // SRC_GENIE_READ_SPRING_UTIL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

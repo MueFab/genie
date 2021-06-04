@@ -4,14 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_CONTEXT_TABLES_H_
-#define GABAC_CONTEXT_TABLES_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_CONTEXT_TABLES_H_
+#define SRC_GENIE_ENTROPY_GABAC_CONTEXT_TABLES_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <cstdint>
 #include <vector>
-
-#include "context-model.h"
+#include "genie/entropy/gabac/context-model.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ namespace contexttables {
  * @param numContexts
  * @return
  */
-std::vector<ContextModel> buildContextTable(unsigned long numContexts);
+std::vector<ContextModel> buildContextTable(uint64_t numContexts);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -36,7 +36,7 @@ std::vector<ContextModel> buildContextTable(unsigned long numContexts);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_CONTEXT_TABLES_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_CONTEXT_TABLES_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

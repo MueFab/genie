@@ -4,12 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_EQUALITY_CODING_H_
-#define GABAC_EQUALITY_CODING_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_EQUALITY_SUBSEQ_TRANSFORM_H_
+#define SRC_GENIE_ENTROPY_GABAC_EQUALITY_SUBSEQ_TRANSFORM_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/data-block.h>
+#include <vector>
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +38,7 @@ void inverseTransformEqualityCoding(std::vector<util::DataBlock> *const transfor
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_EQUALITY_CODING_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_EQUALITY_SUBSEQ_TRANSFORM_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

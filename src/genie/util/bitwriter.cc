@@ -4,8 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "bitwriter.h"
-#include "runtime-exception.h"
+#include "genie/util/bitwriter.h"
+#include <string>
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -159,7 +160,7 @@ void BitWriter::writeBypass(const void *in, size_t size) {
     if (!isAligned()) {
         UTILS_DIE("Writer not aligned when it should be");
     }
-    stream->write((char *)in, size);
+    stream->write(reinterpret_cast<const char *>(in), size);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

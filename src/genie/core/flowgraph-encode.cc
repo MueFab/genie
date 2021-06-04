@@ -4,7 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "flowgraph-encode.h"
+#include "genie/core/flowgraph-encode.h"
+#include <memory>
+#include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

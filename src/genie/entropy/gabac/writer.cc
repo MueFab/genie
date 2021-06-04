@@ -4,19 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "writer.h"
-
+#include "genie/entropy/gabac/writer.h"
 #include <cassert>
 #include <cmath>
 #include <limits>
-
-#include "context-tables.h"
+#include "genie/entropy/gabac/context-tables.h"
 //
 // #include binary-arithmetic-decoder.cc from here instead of compiling it
 // separately, so that we may call inlined member functions of class
 // BinaryArithmeticDecoder in this file.
 //
-#include "binary-arithmetic-encoder.cc"
+#include "genie/entropy/gabac/binary-arithmetic-encoder.cc"  // NOLINT
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +24,7 @@ namespace gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Writer::Writer(OBufferStream *const bitstream, const bool bypassFlag, const unsigned long numContexts)
+Writer::Writer(OBufferStream *const bitstream, const bool bypassFlag, uint64_t numContexts)
     : m_bitOutputStream(bitstream),
       m_binaryArithmeticEncoder(m_bitOutputStream),
       m_bypassFlag(bypassFlag),
@@ -68,8 +66,7 @@ void Writer::writeAsBIcabac(uint64_t input, const std::vector<unsigned int> binP
     const unsigned int cLength = binParams[0];
     unsigned int cm = binParams[3];
     auto scan = m_contextModels.begin() + cm;
-    for (int i = cLength - 1; i >= 0; i--)  // i must be signed
-    {
+    for (int i = cLength - 1; i >= 0; i--) {  // i must be signed
         unsigned int bin = static_cast<unsigned int>(static_cast<uint64_t>(input) >> static_cast<uint8_t>(i)) & 0x1u;
         m_binaryArithmeticEncoder.encodeBin(bin, &*(scan++));
     }
@@ -104,8 +101,8 @@ void Writer::writeAsTUcabac(uint64_t input, const std::vector<unsigned int> binP
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Writer::writeAsEGbypass(uint64_t input, const std::vector<unsigned int>) {
-    unsigned int valuePlus1 = input + 1;
-    unsigned int numLeadZeros = floor(log2(valuePlus1));
+    auto valuePlus1 = (unsigned int)(input + 1);
+    auto numLeadZeros = (unsigned int)floor(log2(valuePlus1));
 
     /* prefix */
     writeAsBIbypass(1, std::vector<unsigned int>({numLeadZeros + 1}));
@@ -118,8 +115,8 @@ void Writer::writeAsEGbypass(uint64_t input, const std::vector<unsigned int>) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Writer::writeAsEGcabac(uint64_t input, const std::vector<unsigned int> binParams) {
-    unsigned int valuePlus1 = input + 1;
-    unsigned int numLeadZeros = floor(log2(valuePlus1));
+    auto valuePlus1 = (unsigned int)(input + 1);
+    auto numLeadZeros = (unsigned int)floor(log2(valuePlus1));
 
     /* prefix */
     writeAsBIcabac(1, std::vector<unsigned int>({numLeadZeros + 1, 0, 0, binParams[3]}));
@@ -218,7 +215,7 @@ void Writer::writeAsDTUcabac(uint64_t input, const std::vector<unsigned int> bin
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Writer::writeLutSymbol(uint64_t input, const uint8_t codingSubsymSize) {
-    std::vector<unsigned int> binParams({codingSubsymSize, 2, 0, 0}); // ctxIdx = 0
+    std::vector<unsigned int> binParams({codingSubsymSize, 2, 0, 0});  // ctxIdx = 0
     writeAsSUTUcabac(input, binParams);
 }
 

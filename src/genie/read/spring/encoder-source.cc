@@ -4,8 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "encoder-source.h"
-#include <filesystem/filesystem.hpp>
+#include "genie/read/spring/encoder-source.h"
+#include <string>
+#include <utility>
+#include "filesystem/filesystem.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,14 +24,14 @@ SpringSource::SpringSource(const std::string& temp_dir, const compression_params
     // read info about number of blocks (AUs) and the number of reads and records in those
     const std::string block_info_file = temp_dir + "/block_info.bin";
     std::ifstream f_block_info(block_info_file, std::ios::binary);
-    f_block_info.read((char*)&num_AUs, sizeof(uint32_t));
+    f_block_info.read(reinterpret_cast<char*>(&num_AUs), sizeof(uint32_t));
     num_reads_per_AU = std::vector<uint32_t>(num_AUs);
     num_records_per_AU = std::vector<uint32_t>(num_AUs);
-    f_block_info.read((char*)&num_reads_per_AU[0], num_AUs * sizeof(uint32_t));
+    f_block_info.read(reinterpret_cast<char*>(&num_reads_per_AU[0]), num_AUs * sizeof(uint32_t));
     if (!cp.paired_end)  // num reads same as num records per AU
         num_records_per_AU = num_reads_per_AU;
     else
-        f_block_info.read((char*)&num_records_per_AU[0], num_AUs * sizeof(uint32_t));
+        f_block_info.read(reinterpret_cast<char*>(&num_records_per_AU[0]), num_AUs * sizeof(uint32_t));
 
     f_block_info.close();
     ghc::filesystem::remove(block_info_file);
@@ -72,14 +74,14 @@ bool SpringSource::pump(uint64_t& id, std::mutex& lock) {
                 ghc::filesystem::remove(filename);
                 continue;
             }
-            std::ifstream input(filename);
+            std::ifstream input(filename, std::ios::binary);
             util::BitReader br(input);
             d = core::AccessUnit::Descriptor(d.getID(), count, ghc::filesystem::file_size(filename), br);
             input.close();
             ghc::filesystem::remove(filename);
         }
         auId++;
-        sec = {id, au.getNumReads(), true};
+        sec = {size_t(id), au.getNumReads(), true};
         id += sec.length;
     }
     au.setStats(std::move(stats));

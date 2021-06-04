@@ -4,13 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_BITWRITER_H
-#define GENIE_BITWRITER_H
+#ifndef SRC_GENIE_UTIL_BITWRITER_H_
+#define SRC_GENIE_UTIL_BITWRITER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <istream>
 #include <ostream>
+#include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,7 +22,7 @@ namespace util {
  * @brief Controlled output to an std::ostream. Allows to write single bits.
  */
 class BitWriter {
-   private:
+ private:
     std::ostream *stream;    //!< @brief Where to direct output. A file for example.
     uint64_t m_heldBits;     //!< @brief Contains bits which cannot be written yet, as no byte is full.
     uint8_t m_numHeldBits;   //!< @brief How many bits there are in m_heldBits.
@@ -33,7 +34,7 @@ class BitWriter {
      */
     void writeOut(uint8_t byte);
 
-   public:
+ public:
     /**
      * @brief Create a bitwriter from an existing output stream.
      * @param str Some output stream. Must be valid to write to.
@@ -103,7 +104,7 @@ class BitWriter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_BITWRITER_H
+#endif  // SRC_GENIE_UTIL_BITWRITER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

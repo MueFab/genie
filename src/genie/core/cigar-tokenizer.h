@@ -4,13 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CIGAR_TOKENIZER_H
-#define GENIE_CIGAR_TOKENIZER_H
+#ifndef SRC_GENIE_CORE_CIGAR_TOKENIZER_H_
+#define SRC_GENIE_CORE_CIGAR_TOKENIZER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/constants.h>
-#include <genie/util/stringview.h>
+#include <string>
+#include "genie/core/constants.h"
+#include "genie/util/stringview.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,7 +22,7 @@ namespace core {
  *
  */
 class CigarTokenizer {
-   public:
+ public:
     /**
      *
      * @tparam Lambda
@@ -40,11 +41,11 @@ class CigarTokenizer {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "cigar-tokenizer.impl.h"
+#include "genie/core/cigar-tokenizer.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_CIGAR_TOKENIZER_H
+#endif  // SRC_GENIE_CORE_CIGAR_TOKENIZER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

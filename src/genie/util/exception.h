@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef UTIL_EXCEPTIONS_H_
-#define UTIL_EXCEPTIONS_H_
+#ifndef SRC_GENIE_UTIL_EXCEPTION_H_
+#define SRC_GENIE_UTIL_EXCEPTION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,7 +20,7 @@ namespace util {
  * @brief A general exception.
  */
 class Exception : public std::exception {
-   public:
+ public:
     /**
      * @brief Initialize with a message.
      * @param msg The message.
@@ -48,7 +48,7 @@ class Exception : public std::exception {
      */
     const char* what() const noexcept override;
 
-   protected:
+ protected:
     std::string msg_;  //!< @brief The exception message.
 };
 
@@ -59,7 +59,7 @@ class Exception : public std::exception {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // UTIL_EXCEPTIONS_H_
+#endif  // SRC_GENIE_UTIL_EXCEPTION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

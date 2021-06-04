@@ -4,9 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "mm_cfg.h"
-
-#include <genie/util/bitwriter.h>
+#include "genie/format/mgb/mm_cfg.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_ENCODE_TRANSFORMED_SUBSEQ_H_
-#define GABAC_ENCODE_TRANSFORMED_SUBSEQ_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_ENCODE_TRANSFORMED_SUBSEQ_H_
+#define SRC_GENIE_ENTROPY_GABAC_ENCODE_TRANSFORMED_SUBSEQ_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -13,8 +13,7 @@
 #include <cstdint>
 #include <limits>
 #include <vector>
-
-#include <genie/entropy/paramcabac/transformed-subseq.h>
+#include "genie/entropy/paramcabac/transformed-subseq.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -50,7 +49,7 @@ size_t encodeTransformSubseq(const paramcabac::TransformedSubSeq& trnsfSubseqCon
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_ENCODE_TRANSFORMED_SUBSEQ_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_ENCODE_TRANSFORMED_SUBSEQ_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "bitset-util.h"
-#include "params.h"
+#include "genie/read/spring/bitset-util.h"
+#include "genie/read/spring/params.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,8 +34,7 @@ void bbhashdict::findpos(int64_t *dictidx, const uint64_t &startposidx) {
 
 void bbhashdict::remove(int64_t *dictidx, const uint64_t &startposidx, const int64_t current) {
     auto size = dictidx[1] - dictidx[0];
-    if (size == 1)  // just one read left in bin
-    {
+    if (size == 1) {  // just one read left in bin
         empty_bin[startposidx] = 1;
         return;  // need to keep one read to check during matching
     }
@@ -43,15 +42,14 @@ void bbhashdict::remove(int64_t *dictidx, const uint64_t &startposidx, const int
 
     for (int64_t i = dictidx[0] + pos; i < dictidx[1] - 1; i++) read_id[i] = read_id[i + 1];
     auto endidx = startpos[startposidx + 1];
-    if (dictidx[1] == endidx)  // this is first read to be deleted
+    if (dictidx[1] == endidx) {  // this is first read to be deleted
         read_id[endidx - 1] = MAX_NUM_READS;
-    else if (read_id[endidx - 1] == MAX_NUM_READS)  // exactly one read has been deleted till now
-    {
+    } else if (read_id[endidx - 1] == MAX_NUM_READS) {  // exactly one read has been deleted till now
         read_id[endidx - 1] = MAX_NUM_READS + 1;
         read_id[endidx - 2] = (uint32_t)(size - 1);  // number of reads left in bin
-    } else                                           // more than two reads have been deleted
+    } else {                                         // more than two reads have been deleted
         read_id[endidx - 2]--;
-
+    }
     return;
 }
 

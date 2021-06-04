@@ -4,9 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "genie/util/data-block.h"
 #include <algorithm>
-
-#include "data-block.h"
+#include <string>
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -41,11 +42,11 @@ DataBlock &DataBlock::operator=(const std::initializer_list<uint64_t> &il) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t util::DataBlock::size() const { return divByWordSize(data.size()); }
+size_t util::DataBlock::size() const { return (size_t)divByWordSize(data.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void util::DataBlock::reserve(size_t size) { data.reserve(mulByWordSize(size)); }
+void util::DataBlock::reserve(size_t size) { data.reserve((size_t)mulByWordSize(size)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -57,7 +58,7 @@ void util::DataBlock::clear() { data.clear(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void util::DataBlock::resize(size_t size) { data.resize(mulByWordSize(size)); }
+void util::DataBlock::resize(size_t size) { data.resize((size_t)mulByWordSize(size)); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

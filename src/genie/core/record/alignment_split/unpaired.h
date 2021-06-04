@@ -4,13 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ALIGNMENT_SPLIT_UNPAIRED_H
-#define GENIE_ALIGNMENT_SPLIT_UNPAIRED_H
+#ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_UNPAIRED_H_
+#define SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_UNPAIRED_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitwriter.h>
-#include <record/alignment-split.h>
+#include <memory>
+#include "genie/core/record/alignment-split.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +24,7 @@ namespace alignment_split {
  *
  */
 class Unpaired : public AlignmentSplit {
-   public:
+ public:
     /**
      *
      */
@@ -51,7 +52,7 @@ class Unpaired : public AlignmentSplit {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_UNPAIRED_H
+#endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_UNPAIRED_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,10 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "qv_coding_config_1.h"
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
-#include <genie/util/runtime-exception.h>
+#include "genie/quality/paramqv1/qv_coding_config_1.h"
+#include <utility>
+#include <vector>
+#include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,6 +27,7 @@ QualityValues1::QualityValues1(QvpsPresetId _qvps_preset_ID, bool _reverse_flag)
 // ---------------------------------------------------------------------------------------------------------------------
 
 QualityValues1::QualityValues1(genie::core::GenDesc desc, util::BitReader& reader) : QualityValues(MODE_QV1, false) {
+    (void)desc;
     assert(desc == genie::core::GenDesc::QV);
 
     auto qvps_flag = reader.read<bool>(1);
@@ -47,7 +50,7 @@ void QualityValues1::setQvps(ParameterSet&& _parameter_set_qvps) {
 
 void QualityValues1::write(util::BitWriter& writer) const {
     writer.write(uint8_t(qv_coding_mode), 4);
-    writer.write((bool)parameter_set_qvps, 1);
+    writer.write(static_cast<bool>(parameter_set_qvps), 1);
     if (parameter_set_qvps) {
         parameter_set_qvps->write(writer);
     }
@@ -72,14 +75,15 @@ std::unique_ptr<core::parameter::QualityValues> QualityValues1::clone() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::unique_ptr<QualityValues1::QualityValues> QualityValues1::create(genie::core::GenDesc desc, util::BitReader& reader) {
+std::unique_ptr<QualityValues1::QualityValues> QualityValues1::create(genie::core::GenDesc desc,
+                                                                      util::BitReader& reader) {
     return util::make_unique<QualityValues1>(desc, reader);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const Codebook& QualityValues1::getPresetCodebook(QvpsPresetId id) {
-    const static std::vector<Codebook> pSet = []() -> std::vector<Codebook> {
+    static const std::vector<Codebook> pSet = []() -> std::vector<Codebook> {
         std::vector<Codebook> ret;
         Codebook set(33, 34);
         for (uint8_t p = 2; p < 94; ++p) {

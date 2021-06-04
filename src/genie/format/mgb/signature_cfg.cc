@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "signature_cfg.h"
-#include <genie/util/bitwriter.h>
+#include "genie/format/mgb/signature_cfg.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

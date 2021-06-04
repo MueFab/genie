@@ -4,14 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_QUALITY_VALUES_H
-#define GENIE_QUALITY_VALUES_H
+#ifndef SRC_GENIE_CORE_PARAMETER_QUALITY_VALUES_H_
+#define SRC_GENIE_CORE_PARAMETER_QUALITY_VALUES_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitwriter.h>
-
 #include <memory>
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +22,7 @@ namespace parameter {
  *
  */
 class QualityValues {
-   public:
+ public:
     /**
      *
      * @param writer
@@ -67,7 +66,7 @@ class QualityValues {
      */
     virtual bool equals(const QualityValues* qv) const;
 
-   protected:
+ protected:
     uint8_t qv_coding_mode;  //!<
     bool qv_reverse_flag;    //!<
 };
@@ -80,7 +79,7 @@ class QualityValues {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_QUALITY_VALUES_H
+#endif  // SRC_GENIE_CORE_PARAMETER_QUALITY_VALUES_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

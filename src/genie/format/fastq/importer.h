@@ -4,21 +4,22 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_FASTQ_IMPORTER_H
-#define GENIE_FASTQ_IMPORTER_H
+#ifndef SRC_GENIE_FORMAT_FASTQ_IMPORTER_H_
+#define SRC_GENIE_FORMAT_FASTQ_IMPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <array>
-
-#include <format-importer.h>
-#include <genie/core/record/record.h>
-#include <genie/core/stats/perf-stats.h>
-#include <genie/util/make-unique.h>
-#include <genie/util/ordered-lock.h>
-#include <genie/util/original-source.h>
-#include <genie/util/runtime-exception.h>
-#include <genie/util/source.h>
+#include <string>
+#include <vector>
+#include "genie/core/format-importer.h"
+#include "genie/core/record/record.h"
+#include "genie/core/stats/perf-stats.h"
+#include "genie/util/make-unique.h"
+#include "genie/util/ordered-lock.h"
+#include "genie/util/original-source.h"
+#include "genie/util/runtime-exception.h"
+#include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +31,7 @@ namespace fastq {
  * @brief Module to reads fastq files and convert them into MPEGG-Record format
  */
 class Importer : public core::FormatImporter {
-   private:
+ private:
     static constexpr size_t LINES_PER_RECORD = 4;  //!< @brief How many lines in a fastq file belong to one record
     size_t blockSize;                              //!< @brief How many records to read in one pump() run
     std::vector<std::istream *> file_list;         //!< @brief Input streams (paired files supported)
@@ -60,7 +61,7 @@ class Importer : public core::FormatImporter {
      */
     static core::record::Record buildRecord(std::vector<std::array<std::string, LINES_PER_RECORD>> data);
 
-   public:
+ public:
     /**
      * @brief Unpaired input
      * @param _blockSize How many records to extract per pump()
@@ -92,7 +93,7 @@ class Importer : public core::FormatImporter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_IMPORTER_H
+#endif  // SRC_GENIE_FORMAT_FASTQ_IMPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,12 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_EXPRTER_H
-#define GENIE_EXPRTER_H
+#ifndef SRC_GENIE_FORMAT_FASTA_EXPORTER_H_
+#define SRC_GENIE_FORMAT_FASTA_EXPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/format-exporter.h>
+#include "genie/core/format-exporter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,11 +21,12 @@ namespace fasta {
  *
  */
 class Exporter : public core::FormatExporter {
-   private:
+ private:
     core::ReferenceManager* refMgr;  //!<
     std::ostream* outfile;           //!<
     size_t num_threads;              //!<
-   public:
+
+ public:
     /**
      *
      * @param _refMgr
@@ -56,7 +57,7 @@ class Exporter : public core::FormatExporter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_EXPRTER_H
+#endif  // SRC_GENIE_FORMAT_FASTA_EXPORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

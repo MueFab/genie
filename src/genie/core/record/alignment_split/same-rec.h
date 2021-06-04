@@ -4,17 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ALIGNMENT_SPLIT_SAME_REC_H
-#define GENIE_ALIGNMENT_SPLIT_SAME_REC_H
+#ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_SAME_REC_H_
+#define SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_SAME_REC_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
 #include <cstdint>
 #include <memory>
-#include "record/alignment-split.h"
-#include "record/alignment.h"
+#include "genie/core/record/alignment-split.h"
+#include "genie/core/record/alignment.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,11 +27,11 @@ namespace alignment_split {
  *
  */
 class SameRec : public AlignmentSplit {
-   private:
+ private:
     int64_t delta;        //!<
     Alignment alignment;  //!<
 
-   public:
+ public:
     /**
      *
      */
@@ -85,7 +85,7 @@ class SameRec : public AlignmentSplit {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_SAME_REC_H
+#endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_SPLIT_SAME_REC_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

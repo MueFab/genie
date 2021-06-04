@@ -4,11 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "data-unit-factory.h"
+#include "genie/format/mgb/data-unit-factory.h"
 #include <iostream>
-#include "access_unit.h"
-#include "raw_reference.h"
-#include "reference.h"
+#include <utility>
+#include "genie/format/mgb/access_unit.h"
+#include "genie/format/mgb/raw_reference.h"
+#include "genie/format/mgb/reference.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

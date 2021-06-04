@@ -4,13 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "genie/entropy/gabac/merge-subseq-transform.h"
 #include <algorithm>
 #include <cassert>
 #include <iostream>
-
-#include <genie/util/block-stepper.h>
-#include <genie/util/data-block.h>
-#include "merge-subseq-transform.h"
+#include <vector>
+#include "genie/util/block-stepper.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg,
     // split
     for (uint64_t i = 0; i < symbolsCount; i++) {
         uint64_t symbolValue = symbols.get(i);
-        int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(symbolValue, symbols.getWordSize());
+        int64_t signedSymbolValue = paramcabac::StateVars::getSignedValue(symbolValue, (uint8_t)symbols.getWordSize());
 
         bool isNegative = false;
         if (signedSymbolValue < 0) {
@@ -61,7 +61,7 @@ void transformMergeCoding(const paramcabac::Subsequence& subseqCfg,
         for (uint64_t ts = 0; ts < subseqCount; ts++) {
             uint64_t trnsfSymbol = (symbolValue >> subseqShiftSizes[ts]) & trnsSubseqMasks[ts];
             if (isNegative && trnsfSymbol != 0) {
-                int64_t trnsfSymbolSigned = -(trnsfSymbol);
+                int64_t trnsfSymbolSigned = -((int64_t)trnsfSymbol);
                 trnsfSymbol = static_cast<uint64_t>(trnsfSymbolSigned);
                 isNegative = false;
             }
@@ -103,7 +103,7 @@ void inverseTransformMergeCoding(const paramcabac::Subsequence& subseqCfg,
         }
 
         if (isNegative) {
-            int64_t symbolValueSigned = -(symbolValue);
+            int64_t symbolValueSigned = -((int64_t)symbolValue);
             symbolValue = static_cast<uint64_t>(symbolValueSigned);
         }
 

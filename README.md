@@ -1,14 +1,21 @@
 # Genie
 
-Open source MPEG-G codec
+Open Source MPEG-G Codec
 
-<!-- [![ci](https://travis-ci.org/mitogen/genie.svg?branch=master)](https://travis-ci.org/mitogen/genie) -->
-<!-- [![codecov](https://codecov.io/gh/mitogen/genie/branch/master/graph/badge.svg)](https://codecov.io/gh/mitogen/genie) -->
-[![page](https://img.shields.io/badge/page-online-blue)](https://mitogen.github.io/genie)
-
-**First off, we refer the reader to our [usage policy](USAGE_POLICY.md).**
+[![Build Status](https://dev.azure.com/janvoges/genie/_apis/build/status/mitogen.genie?branchName=master)](https://dev.azure.com/janvoges/genie/_build/latest?definitionId=1&branchName=master)
 
 ---
+
+## Usage policy
+
+The open source MPEG-G codec Genie is made available before scientific publication.
+
+This pre-publication software is preliminary and may contain errors.
+The software is provided in good faith, but without any express or implied warranties.
+We refer the reader to our [license](LICENSE).
+
+The goal of our policy is that early release should enable the progress of science.
+We kindly ask to refrain from publishing analyses that were conducted using this software while its development is in progress.
 
 ## Quick start
 
@@ -50,6 +57,23 @@ Note the absence of the ``--generate`` flag.
 To uncompress a ``.genie`` file, run the following command:
 
     genie compressed.genie --config-dir /path/to/config/dir/
+
+## Version numbers
+
+We use the [Semantic Versioning 2.0.0](https://semver.org).
+
+That means:
+
+- The release version number format is: MAJOR.MINOR.PATCH
+- We increment the
+  - MAJOR version when making incompatible API changes,
+  - MINOR version when adding functionality in a backwards-compatible manner, and
+  - PATCH version when making backwards-compatible bug fixes.
+- Pre-release versions are denoted by appending a hyphen and a series of dot separated identifiers immediately following the patch version.
+  - Example 1: 1.0.0-alpha.1 ("alpha version 1 of the planned major release 1")
+  - Example 2: 1.0.0-beta.1 ("beta version 1 of the planned major release 1")
+  - Example 3: 1.0.0-rc.1 ("release candidate (rc) 1 of the planned major release 1")
+  - Note: 1.0.0-alpha.1 < 1.0.0-beta.1 < 1.0.0-rc.1 by definition
 
 ## Who do I talk to?
 

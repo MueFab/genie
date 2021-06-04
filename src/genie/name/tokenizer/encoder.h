@@ -4,22 +4,20 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ENCODER_H
-#define GENIE_ENCODER_H
+#ifndef SRC_GENIE_NAME_TOKENIZER_ENCODER_H_
+#define SRC_GENIE_NAME_TOKENIZER_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/watch.h>
 #include <limits>
 #include <string>
+#include <tuple>
 #include <vector>
 #include "genie/core/name-encoder.h"
 #include "genie/core/record/record.h"
+#include "genie/name/tokenizer/tokenizer.h"
 #include "genie/util/data-block.h"
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#include "tokenizer.h"
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +28,7 @@ namespace tokenizer {
 // ---------------------------------------------------------------------------------------------------------------------
 
 class Encoder : public core::NameEncoder {
-   public:
+ public:
     std::tuple<core::AccessUnit::Descriptor, core::stats::PerfStats> process(const core::record::Chunk& recs) override;
 };
 
@@ -42,7 +40,7 @@ class Encoder : public core::NameEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ENCODER_H
+#endif  // SRC_GENIE_NAME_TOKENIZER_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

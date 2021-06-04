@@ -4,21 +4,21 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ALIGNMENT_BOX_H
-#define GENIE_ALIGNMENT_BOX_H
+#ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_BOX_H_
+#define SRC_GENIE_CORE_RECORD_ALIGNMENT_BOX_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
-#include <genie/util/runtime-exception.h>
 #include <cstdint>
 #include <memory>
 #include <vector>
-#include "alignment-split.h"
-#include "alignment.h"
-#include "class-type.h"
+#include "genie/core/record/alignment-split.h"
+#include "genie/core/record/alignment.h"
+#include "genie/core/record/class-type.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ class AlignmentBox {
     Alignment alignment;                                              //!<
     std::vector<std::unique_ptr<AlignmentSplit>> splitAlignmentInfo;  //!<
 
-   public:
+ public:
     /**
      *
      * @param writer
@@ -133,7 +133,7 @@ class AlignmentBox {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ALIGNMENT_BOX_H
+#endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_BOX_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
