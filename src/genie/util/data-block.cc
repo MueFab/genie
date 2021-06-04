@@ -42,11 +42,11 @@ DataBlock &DataBlock::operator=(const std::initializer_list<uint64_t> &il) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t util::DataBlock::size() const { return (size_t)divByWordSize(data.size()); }
+size_t util::DataBlock::size() const { return static_cast<size_t>(divByWordSize(data.size())); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void util::DataBlock::reserve(size_t size) { data.reserve((size_t)mulByWordSize(size)); }
+void util::DataBlock::reserve(size_t size) { data.reserve(static_cast<size_t>(mulByWordSize(size))); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ void util::DataBlock::clear() { data.clear(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void util::DataBlock::resize(size_t size) { data.resize((size_t)mulByWordSize(size)); }
+void util::DataBlock::resize(size_t size) { data.resize(static_cast<size_t>(mulByWordSize(size))); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
