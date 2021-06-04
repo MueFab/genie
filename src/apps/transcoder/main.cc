@@ -5,11 +5,12 @@
 #include "transcoder/sam/sam_to_mgrec/transcoder.h"
 
 int main(int argc, char* argv[]) {
+
     try {
         genie::transcoder::sam::sam_to_mgrec::Config programOptions(argc, argv);
 
-        genie::transcoder::ErrorCode ret;
-        if ((ret = transcode(programOptions)) != genie::transcoder::ErrorCode::success){
+        genie::transcoder::ErrorCode ret = transcode(programOptions);
+        if (ret != genie::transcoder::ErrorCode::success){
             UTILS_DIE("ERROR");
         }
 
