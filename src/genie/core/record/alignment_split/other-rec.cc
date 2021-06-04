@@ -43,6 +43,7 @@ uint16_t OtherRec::getNextSeq() const { return split_seq_ID; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void OtherRec::write(util::BitWriter &writer) const {
+    AlignmentSplit::write(writer);
     writer.write(split_pos, 40);
     writer.write(split_seq_ID, 16);
 }
