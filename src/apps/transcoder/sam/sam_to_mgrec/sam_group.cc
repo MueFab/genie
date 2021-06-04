@@ -1,8 +1,8 @@
-
-#include <record/alignment_split/other-rec.h>
-#include <record/alignment_external/other-rec.h>
-#include <transcoder/utils.h>
 #include "sam_group.h"
+#include "genie/core/record/alignment_external/other-rec.h"
+#include "apps/transcoder/utils.h"
+#include "genie/core/record/alignment_split/other-rec.h"
+#include "genie/core/record/alignment_split/unpaired.h"
 
 namespace genie {
 namespace transcoder {

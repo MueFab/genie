@@ -25,7 +25,7 @@ bool save_mgrecs_by_rid(std::list<genie::core::record::Record>& recs,
             // TODO: Handle case where harddrive is full
             rec.write(bitwriter);
 
-        } catch (std::out_of_range) {
+        } catch (std::out_of_range& r) {
             return false;
         }
     }
@@ -190,8 +190,6 @@ ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
 
 void clean_phase1_files(Config& options, int& nref){
     for (auto iref = 0; iref < nref; iref++) {
-        auto n_tmp_files = 0;
-
         std::string fpath = options.tmp_dir_path + "/" + std::to_string(iref) + PHASE1_EXT;
         std::remove(fpath.c_str());
     }
