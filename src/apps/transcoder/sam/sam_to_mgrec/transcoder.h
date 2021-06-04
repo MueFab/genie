@@ -29,6 +29,8 @@ std::string gen_p2_tmp_fpath(Config& options, int rid, int ifile);
 
 ErrorCode sam_to_mgrec_phase2(Config& options, int& nref);
 
+void clean_phase1_files(Config& options, int& nref);
+
 ErrorCode transcode(Config& options);
 
 }
