@@ -276,11 +276,11 @@ uint64_t Record::getLengthOfCigar(const std::string &cigar) {
 
 size_t Record::getMappedLength(size_t alignment, size_t split) const {
     if (split == 0) {
-        return (size_t)getLengthOfCigar(getAlignments()[alignment].getAlignment().getECigar());
+        return static_cast<size_t>(getLengthOfCigar(getAlignments()[alignment].getAlignment().getECigar()));
     }
     auto &s2 =
         dynamic_cast<record::alignment_split::SameRec &>(*getAlignments()[alignment].getAlignmentSplits()[split - 1]);
-    return (size_t)getLengthOfCigar(s2.getAlignment().getECigar());
+    return static_cast<size_t>(getLengthOfCigar(s2.getAlignment().getECigar()));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -299,11 +299,11 @@ std::pair<size_t, size_t> Record::getTemplatePosition() const {
 
 size_t Record::getPosition(size_t alignment, size_t split) const {
     if (split == 0) {
-        return (size_t)getAlignments()[alignment].getPosition();
+        return static_cast<size_t>(getAlignments()[alignment].getPosition());
     }
     auto &s2 =
         dynamic_cast<record::alignment_split::SameRec &>(*getAlignments()[alignment].getAlignmentSplits()[split - 1]);
-    return (size_t)(getAlignments()[alignment].getPosition() + s2.getDelta());
+    return static_cast<size_t>(getAlignments()[alignment].getPosition() + s2.getDelta());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
