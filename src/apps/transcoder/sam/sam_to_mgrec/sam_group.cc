@@ -1,5 +1,8 @@
-#include "sam_group.h"
+
 #include <record/alignment_split/other-rec.h>
+#include <record/alignment_external/other-rec.h>
+#include <transcoder/utils.h>
+#include "sam_group.h"
 
 namespace genie {
 namespace transcoder {
@@ -18,7 +21,10 @@ std::tuple<bool, uint8_t> SamRecordGroup::convertFlags2Mpeg(uint16_t flags) {
     return std::make_tuple(rcomp, flags_mpeg);
 }
 
-genie::core::record::Record SamRecordGroup::pairedEndedToMpegg(SamRecord &r1, SamRecord *r2, bool force_split) {
+genie::core::record::Record SamRecordGroup::pairedEndedToMpegg(SamRecord &r1,
+                                                               SamRecord *r2,
+                                                               bool force_split) {
+
     bool is_r1_read1 = r1.isRead1();
     bool is_r1_first;
     if (r2 == nullptr || r2->isUnmapped()) {
@@ -72,7 +78,7 @@ void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord &r
                 other_r->getPos(), other_r->getRID());
             alignmentContainer.addAlignmentSplit(std::move(splitAlign));
 
-            /// Case 1: SameRec
+        /// Case 1: SameRec
         } else {
             genie::core::record::Alignment alignment2(other_r->getECigar(), other_r->isReverse());
             alignment2.addMappingScore(other_r->getMapq());
@@ -164,17 +170,47 @@ void SamRecordGroup::convertSingleEnd(std::list<genie::core::record::Record> &re
     records.push_back(std::move(rec));
 }
 
+void SamRecordGroup::createMgrecAndAddAlignment(std::map<int32_t, genie::core::record::Record>& mgrecs_by_rid,
+                                                std::vector<int32_t>& recs_rid_order,
+                                                SamRecord &rec, SamRecord *other_rec) {
+
+    auto mgrec_iter = mgrecs_by_rid.find(rec.getRID());
+
+    if (mgrec_iter == mgrecs_by_rid.end()) {
+        auto primary_rid = recs_rid_order.front();
+        if (rec.getSeq().empty()) {
+            rec.setSeq(mgrecs_by_rid.at(primary_rid).getSegments().front().getSequence());
+        }
+
+        if (rec.getQual().empty()) {
+            rec.setQual(mgrecs_by_rid.at(primary_rid).getSegments().front().getQualities().front());
+        }
+
+        auto rid = rec.getRID();
+
+        /// Create new MPEG-G record
+        genie::core::record::Record mgrec = pairedEndedToMpegg(rec, other_rec);
+        addAlignment(mgrec, rec, other_rec);
+        mgrecs_by_rid.emplace(rid, std::move(mgrec));
+        recs_rid_order.emplace_back(rid);
+
+    } else {
+        addAlignment(mgrec_iter->second, rec, other_rec);
+    }
+}
+
 void SamRecordGroup::convertPairedEnd(std::map<int32_t, genie::core::record::Record> &recs1_by_rid,
+                                      std::vector<int32_t> &recs1_rid_order,
                                       std::map<int32_t, genie::core::record::Record> &recs2_by_rid,
+                                      std::vector<int32_t> &recs2_rid_order,
                                       std::list<std::list<SamRecord>> sam_recs_2d) {
+
     auto r1_template = sam_recs_2d.begin();
     auto r2_template = std::next(r1_template);
 
-    int32_t recs1_primary_rid, recs2_primary_rid;
-
-    /// Only one of the primary alignment found
+    /// Handles the primary alignment of read1
     if (!r1_template->empty()) {
-        recs1_primary_rid = r1_template->front().getRID();
+        recs1_rid_order.emplace_back(r1_template->front().getRID());
 
         genie::core::record::Record rec = pairedEndedToMpegg(r1_template->front(), nullptr);
 
@@ -186,8 +222,9 @@ void SamRecordGroup::convertPairedEnd(std::map<int32_t, genie::core::record::Rec
 
         recs1_by_rid.emplace(r1_template->front().getRID(), std::move(rec));
     }
+    /// Handles the primary alignment of read2
     if (!r2_template->empty()) {
-        recs2_primary_rid = r2_template->front().getRID();
+        recs2_rid_order.emplace_back(r2_template->front().getRID());
 
         genie::core::record::Record rec = pairedEndedToMpegg(r2_template->front(), nullptr);
 
@@ -200,6 +237,7 @@ void SamRecordGroup::convertPairedEnd(std::map<int32_t, genie::core::record::Rec
         recs2_by_rid.emplace(r2_template->front().getRID(), std::move(rec));
     }
 
+    /// Remove transcoded SAM record
     if (!r1_template->empty()) r1_template->pop_front();
     if (!r2_template->empty()) r2_template->pop_front();
 
@@ -207,57 +245,16 @@ void SamRecordGroup::convertPairedEnd(std::map<int32_t, genie::core::record::Rec
         auto r1_rec_iter = r1_template->begin();
 
         bool pair_found = false;
-
         /// Find pair of r1_rec_iter and add alignment to MPEG-G record if exist, otherwise create new record first
         for (auto r2_rec_iter = r2_template->begin(); r2_rec_iter != r2_template->end(); r2_rec_iter++) {
             if (r1_rec_iter->isPairOf(*r2_rec_iter)) {
-                {
-                    auto mgrec_iter = recs1_by_rid.find(r1_rec_iter->getRID());
+                /// Process read1
+                createMgrecAndAddAlignment(recs1_by_rid, recs1_rid_order,
+                                           *r1_rec_iter, &*r2_rec_iter);
 
-                    if (mgrec_iter == recs1_by_rid.end()) {
-                        if (r1_rec_iter->getSeq().empty()) {
-                            r1_rec_iter->setSeq(recs1_by_rid.at(recs1_primary_rid).getSegments().front().getSequence());
-                        }
-
-                        if (r1_rec_iter->getQual().empty()) {
-                            r1_rec_iter->setQual(
-                                recs1_by_rid.at(recs1_primary_rid).getSegments().front().getQualities().front());
-                        }
-
-                        genie::core::record::Record rec = pairedEndedToMpegg(*r1_rec_iter, &*r2_rec_iter);
-
-                        addAlignment(rec, *r1_rec_iter, &*r2_rec_iter);
-
-                        recs1_by_rid.emplace(r1_rec_iter->getRID(), std::move(rec));
-
-                    } else {
-                        addAlignment(mgrec_iter->second, *r1_rec_iter, &*r2_rec_iter);
-                    }
-                }
-
-                {
-                    auto mgrec_iter = recs2_by_rid.find(r2_rec_iter->getRID());
-
-                    if (mgrec_iter == recs2_by_rid.end()) {
-                        if (r2_rec_iter->getSeq().empty()) {
-                            r2_rec_iter->setSeq(recs2_by_rid.at(recs2_primary_rid).getSegments().front().getSequence());
-                        }
-
-                        if (r2_rec_iter->getQual().empty()) {
-                            r2_rec_iter->setQual(
-                                recs2_by_rid.at(recs2_primary_rid).getSegments().front().getQualities().front());
-                        }
-
-                        genie::core::record::Record rec = pairedEndedToMpegg(*r2_rec_iter, &*r1_rec_iter);
-
-                        addAlignment(rec, *r2_rec_iter, &*r1_rec_iter);
-
-                        recs2_by_rid.emplace(r2_rec_iter->getRID(), std::move(rec));
-
-                    } else {
-                        addAlignment(mgrec_iter->second, *r2_rec_iter, &*r1_rec_iter);
-                    }
-                }
+                /// Process read2
+                createMgrecAndAddAlignment(recs2_by_rid,recs2_rid_order,
+                                           *r2_rec_iter, &*r1_rec_iter);
 
                 r2_template->erase(r2_rec_iter);
                 pair_found = true;
@@ -265,94 +262,29 @@ void SamRecordGroup::convertPairedEnd(std::map<int32_t, genie::core::record::Rec
             }
         }
 
-        /// At this point no pair of r1_rec_iter is found, thus handle case 4
+        /// At this point no pair of r1_rec_iter is found, thus handle case 4 (No pair)
         if (!pair_found) {
-            {
-                auto mgrec_iter = recs1_by_rid.find(r1_rec_iter->getRID());
-
-                if (mgrec_iter == recs1_by_rid.end()) {
-                    if (r1_rec_iter->getSeq().empty()) {
-                        r1_rec_iter->setSeq(recs1_by_rid.at(recs1_primary_rid).getSegments().front().getSequence());
-                    }
-
-                    if (r1_rec_iter->getQual().empty()) {
-                        r1_rec_iter->setQual(
-                            recs1_by_rid.at(recs1_primary_rid).getSegments().front().getQualities().front());
-                    }
-
-                    genie::core::record::Record rec = pairedEndedToMpegg(*r1_rec_iter, nullptr);
-
-                    addAlignment(rec, *r1_rec_iter, nullptr);
-
-                    recs1_by_rid.emplace(r1_rec_iter->getRID(), std::move(rec));
-
-                } else {
-                    addAlignment(mgrec_iter->second, *r1_rec_iter, nullptr);
-                }
-            }
+            createMgrecAndAddAlignment(recs1_by_rid,recs1_rid_order,
+                                       *r1_rec_iter, nullptr);
         }
 
         r1_template->pop_front();
-        // r1_template->erase(r1_rec_iter);
     }
 
     while (!r2_template->empty()) {
         auto r2_rec_iter = r2_template->begin();
 
         bool pair_found = false;
-
         /// Find pair of r1_rec_iter and add alignment to MPEG-G record if exist, otherwise create new record first
         for (auto r1_rec_iter = r1_template->begin(); r1_rec_iter != r1_template->end(); r1_rec_iter++) {
             if (r2_rec_iter->isPairOf(*r1_rec_iter)) {
-                /// Handle Read2
-                {
-                    auto mgrec_iter = recs2_by_rid.find(r2_rec_iter->getRID());
+                /// Process read2
+                createMgrecAndAddAlignment(recs2_by_rid, recs2_rid_order,
+                                           *r2_rec_iter, &*r1_rec_iter);
 
-                    if (mgrec_iter == recs2_by_rid.end()) {
-                        if (r2_rec_iter->getSeq().empty()) {
-                            r2_rec_iter->setSeq(recs2_by_rid.at(recs2_primary_rid).getSegments().front().getSequence());
-                        }
-
-                        if (r2_rec_iter->getQual().empty()) {
-                            r2_rec_iter->setQual(
-                                recs2_by_rid.at(recs2_primary_rid).getSegments().front().getQualities().front());
-                        }
-
-                        genie::core::record::Record rec = pairedEndedToMpegg(*r2_rec_iter, &*r1_rec_iter);
-
-                        addAlignment(rec, *r2_rec_iter, &*r1_rec_iter);
-
-                        recs1_by_rid.emplace(r2_rec_iter->getRID(), std::move(rec));
-
-                    } else {
-                        addAlignment(mgrec_iter->second, *r2_rec_iter, &*r1_rec_iter);
-                    }
-                }
-
-                /// Handle Read1
-                {
-                    auto mgrec_iter = recs1_by_rid.find(r1_rec_iter->getRID());
-
-                    if (mgrec_iter == recs1_by_rid.end()) {
-                        if (r1_rec_iter->getSeq().empty()) {
-                            r1_rec_iter->setSeq(recs1_by_rid.at(recs1_primary_rid).getSegments().front().getSequence());
-                        }
-
-                        if (r1_rec_iter->getQual().empty()) {
-                            r1_rec_iter->setQual(
-                                recs1_by_rid.at(recs1_primary_rid).getSegments().front().getQualities().front());
-                        }
-
-                        genie::core::record::Record rec = pairedEndedToMpegg(*r2_rec_iter, &*r1_rec_iter);
-
-                        addAlignment(rec, *r2_rec_iter, &*r1_rec_iter);
-
-                        recs2_by_rid.emplace(r2_rec_iter->getRID(), std::move(rec));
-
-                    } else {
-                        addAlignment(mgrec_iter->second, *r2_rec_iter, &*r1_rec_iter);
-                    }
-                }
+                /// Process read1
+                createMgrecAndAddAlignment(recs1_by_rid, recs1_rid_order,
+                                           *r1_rec_iter, &*r2_rec_iter);
 
                 r2_template->erase(r2_rec_iter);
                 pair_found = true;
@@ -360,36 +292,44 @@ void SamRecordGroup::convertPairedEnd(std::map<int32_t, genie::core::record::Rec
             }
         }
 
-        /// At this point no pair of r1_rec_iter is found, thus handle case 4
+        /// At this point no pair of r2_rec_iter is found, thus handle case 4 (No pair)
         if (!pair_found) {
-            {
-                auto mgrec_iter = recs2_by_rid.find(r2_rec_iter->getRID());
-
-                if (mgrec_iter == recs2_by_rid.end()) {
-                    if (r2_rec_iter->getSeq().empty()) {
-                        r2_rec_iter->setSeq(recs2_by_rid.at(recs2_primary_rid).getSegments().front().getSequence());
-                    }
-
-                    if (r2_rec_iter->getQual().empty()) {
-                        r2_rec_iter->setQual(
-                            recs2_by_rid.at(recs2_primary_rid).getSegments().front().getQualities().front());
-                    }
-
-                    genie::core::record::Record rec = pairedEndedToMpegg(*r2_rec_iter, nullptr);
-
-                    addAlignment(rec, *r2_rec_iter, nullptr);
-
-                    recs1_by_rid.emplace(r2_rec_iter->getRID(), std::move(rec));
-
-                } else {
-                    addAlignment(mgrec_iter->second, *r2_rec_iter, nullptr);
-                }
-            }
+            createMgrecAndAddAlignment(recs2_by_rid, recs2_rid_order,
+                                       *r2_rec_iter, nullptr);
         }
 
         r2_template->pop_front();
-        // r2_template->erase(r1_rec_iter);
     }
+}
+
+void SamRecordGroup::handlesMoreAlignments(std::map<int32_t, genie::core::record::Record> &recs_by_rid,
+                                          std::vector<int32_t> &recs_rid_order) {
+
+    UTILS_DIE_IF(recs_by_rid.size() != recs_rid_order.size(),
+                 "recs_by_rid and recs_rid_order have different size");
+
+    if (recs_rid_order.size() < 2){
+        return;
+    }
+
+    for (auto rid: recs_rid_order){
+        UTILS_DIE_IF(recs_by_rid.find(rid) == recs_by_rid.end(),
+                     "Could not find MPEG-G record with with RID " + std::to_string(rid));
+    }
+
+    for (auto tail_rid_iter = std::next(recs_rid_order.begin()); tail_rid_iter != recs_rid_order.end(); tail_rid_iter++){
+        auto head_rid_iter = std::prev(tail_rid_iter);
+        auto head_mgrec_iter = recs_by_rid.find(*head_rid_iter);
+        auto tail_mgrec_iter = recs_by_rid.find(*tail_rid_iter);
+
+        auto next_seq_ID = *tail_rid_iter;
+        auto next_pos = getMinPos(tail_mgrec_iter->second);
+
+        auto more_alignments = util::make_unique<genie::core::record::alignment_external::OtherRec>(next_pos,
+                                                                                                    next_seq_ID);
+        head_mgrec_iter->second.setMoreAlignmentInfo(std::move(more_alignments));
+    }
+
 }
 
 SamRecordGroup::SamRecordGroup() : data(size_t(Index::TOTAL_INDICES)) {}
@@ -505,6 +445,7 @@ void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bo
     std::list<std::list<SamRecord>> sam_recs_2d;
 
     std::map<int32_t, genie::core::record::Record> recs1_by_rid, recs2_by_rid;
+    std::vector<int32_t> recs1_rid_order, recs2_rid_order;
 
     auto cls = getRecords(sam_recs_2d);
     if (cls == Category::INVALID) {
@@ -519,21 +460,23 @@ void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bo
             convertSingleEnd(records, sam_recs_2d.front());
             break;
         case Category::PAIRED:
-            // TODO: fix more_alignments
-            convertPairedEnd(recs1_by_rid, recs2_by_rid, sam_recs_2d);
+            convertPairedEnd(recs1_by_rid, recs1_rid_order, recs2_by_rid, recs2_rid_order, sam_recs_2d);
             if (create_same_rec) {
                 UTILS_DIE("Not Implemented");
-            } else {
-                for (auto &entry : recs1_by_rid) {
-                    records.emplace_back(std::move(entry.second));
-                }
-                recs1_by_rid.clear();
-
-                for (auto &entry : recs2_by_rid) {
-                    records.emplace_back(std::move(entry.second));
-                }
-                recs2_by_rid.clear();
             }
+
+            handlesMoreAlignments(recs1_by_rid, recs1_rid_order);
+            handlesMoreAlignments(recs2_by_rid, recs2_rid_order);
+
+            for (auto &entry : recs1_by_rid) {
+                records.emplace_back(std::move(entry.second));
+            }
+            recs1_by_rid.clear();
+
+            for (auto &entry : recs2_by_rid) {
+                records.emplace_back(std::move(entry.second));
+            }
+            recs2_by_rid.clear();
             break;
         default:
             UTILS_DIE("Unhandeled conversion");

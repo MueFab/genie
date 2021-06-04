@@ -47,9 +47,19 @@ class SamRecordGroup {  // Helping structure to sort the records
     void convertSingleEnd(std::list<genie::core::record::Record>& records, std::list<SamRecord>& sam_recs,
                           bool unmapped_pair = false, bool is_read_1_first = true);
 
-    void convertPairedEnd(std::map<int32_t, genie::core::record::Record>& recs1_by_rid,
-                          std::map<int32_t, genie::core::record::Record>& recs2_by_rid,
+    void createMgrecAndAddAlignment(std::map<int32_t, genie::core::record::Record>& mgrecs_by_rid,
+                                    std::vector<int32_t>& recs_rid_order,
+                                    SamRecord& rec,
+                                    SamRecord* other_rec);
+
+    void convertPairedEnd(std::map<int32_t, genie::core::record::Record> &recs1_by_rid,
+                          std::vector<int32_t> &recs1_rid_order,
+                          std::map<int32_t, genie::core::record::Record> &recs2_by_rid,
+                          std::vector<int32_t> &recs2_rid_order,
                           std::list<std::list<SamRecord>> sam_recs_2d);
+
+    void handlesMoreAlignments(std::map<int32_t, genie::core::record::Record> &recs_by_rid,
+                              std::vector<int32_t> &recs_rid_order);
 
    public:
     SamRecordGroup();
