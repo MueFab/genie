@@ -6,6 +6,7 @@
 #include "sam_group.h"
 #include "sam_reader.h"
 #include "sorter.h"
+#include <transcoder/utils.h>
 
 namespace genie {
 namespace transcoder {
@@ -23,7 +24,7 @@ bool save_mgrecs_by_rid(std::list<genie::core::record::Record>& recs,
 
             // TODO: Handle case where harddrive is full
             rec.write(bitwriter);
-            //            bitwriter.flush();
+
         } catch (std::out_of_range) {
             return false;
         }
@@ -85,9 +86,12 @@ ErrorCode sam_to_mgrec_phase1(Config& options, int& nref) {
 
     auto iter_map = p1_bitwriters.begin();
     auto iter_writer = p1_writers.begin();
-    while (iter_map != p1_bitwriters.end() && iter_writer == p1_writers.end()) {
-        iter_map->second.flush();
-        iter_writer->close();
+    while (iter_map != p1_bitwriters.end() && iter_writer != p1_writers.end()) {
+        iter_map->second.flush(); /// flush bitwriter
+        iter_writer->close(); /// close phase1 file
+
+        iter_map++;
+        iter_writer++;
     }
 
     return ErrorCode::success;
@@ -98,6 +102,8 @@ std::string gen_p2_tmp_fpath(Config& options, int rid, int ifile) {
 }
 
 ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
+
+    /// Process MPEG-G records of each RefID
     for (auto iref = 0; iref < nref; iref++) {
         auto n_tmp_files = 0;
 
