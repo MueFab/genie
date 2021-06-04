@@ -188,6 +188,15 @@ ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
     return ErrorCode::success;
 }
 
+void clean_phase1_files(Config& options, int& nref){
+    for (auto iref = 0; iref < nref; iref++) {
+        auto n_tmp_files = 0;
+
+        std::string fpath = options.tmp_dir_path + "/" + std::to_string(iref) + PHASE1_EXT;
+        std::remove(fpath.c_str());
+    }
+}
+
 ErrorCode transcode(Config& options) {
     int nref;
     ErrorCode status;
@@ -199,6 +208,8 @@ ErrorCode transcode(Config& options) {
     if ((status = sam_to_mgrec_phase2(options, nref)) != ErrorCode::success) {
         return ErrorCode::failure;
     }
+
+    clean_phase1_files(options, nref);
 
     return ErrorCode::success;
 }
