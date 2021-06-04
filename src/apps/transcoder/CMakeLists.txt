@@ -4,6 +4,8 @@ set(
     source_files
     main.cc
     transcoding.h
+    utils.cc
+    utils.h
     sam/sam_to_mgrec/program-options.cc
     sam/sam_to_mgrec/sam_record.h
     sam/sam_to_mgrec/sam_record.cc
