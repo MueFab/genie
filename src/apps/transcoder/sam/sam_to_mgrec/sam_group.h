@@ -6,7 +6,6 @@
 #include <list>
 
 #include <genie/core/record/record.h>
-#include <record/alignment_split/unpaired.h>
 
 #include "sam_record.h"
 

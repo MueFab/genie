@@ -21,8 +21,6 @@
 #include "genie/format/mgb/importer.h"
 #include "genie/format/mgrec/exporter.h"
 #include "genie/format/mgrec/importer.h"
-#include "genie/format/sam/exporter.h"
-#include "genie/format/sam/importer.h"
 #include "genie/module/default-setup.h"
 #include "genie/quality/qvwriteout/encoder-none.h"
 #include "genie/read/lowlatency/encoder.h"
