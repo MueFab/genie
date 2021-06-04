@@ -37,10 +37,6 @@ class SubfileReader {
     void close();
 };
 
-uint64_t getMinPos(const genie::core::record::Record& r);
-
-bool compare(const genie::core::record::Record& r1, const genie::core::record::Record& r2);
-
 }
 }
 }
