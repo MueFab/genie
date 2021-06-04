@@ -238,6 +238,27 @@
    fun:_ZN5genie4core15FlowGraphEncode3runEv
    fun:_ZN8genieapp3run4mainEiPPc
 }
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   fun:pthread_create@@GLIBC_2.2.5
+   obj:/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+   fun:GOMP_parallel
+   fun:_ZN5genie4read6spring19constructdictionaryILm256EEEvPSt6bitsetIXT_EEPNS1_10bbhashdictEPtiRKjiRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKi
+   fun:_ZN5genie4read6spring12reorder_mainILm256EEEvRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKNS1_18compression_paramsE
+   fun:_ZN5genie4read6spring7Encoder7flushInERm
+   fun:flushIn
+   fun:_ZN5genie4util8SelectorINS_4core6record5ChunkENS2_10AccessUnitEE7flushInERm
+   fun:_ZN5genie4util13ThreadManager3runEv
+   fun:_ZN5genie4core15FlowGraphEncode3runEv
+   fun:_ZN8genieapp3run4mainEiPPc
+}
 
 
 
