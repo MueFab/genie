@@ -55,7 +55,7 @@ stages:
         make -j
         sudo make install
       displayName: 'Install HTSLib (Unix)'
-      condition: neq( variables['Agent.OS'], 'Windows_NT' )
+      condition: ne( variables['Agent.OS'], 'Windows_NT' )
 
     - bash: ./ci/src_test.sh
       displayName: 'Check source code (Ubuntu 20.04)'
