@@ -7,8 +7,12 @@
 #include "apps/transcoder/utils.h"
 #include <genie/core/record/alignment_split/other-rec.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace transcoder {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t getMinPos(const genie::core::record::Record& r) {
     auto alignments = r.getAlignments();
@@ -45,6 +49,8 @@ uint64_t getMinPos(const genie::core::record::Record& r) {
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool compare(const genie::core::record::Record& r1, const genie::core::record::Record& r2) {
     if (r1.getAlignments().empty()) {
         return false;
@@ -55,5 +61,10 @@ bool compare(const genie::core::record::Record& r1, const genie::core::record::R
     return getMinPos(r1) < getMinPos(r2);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace transcoder
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

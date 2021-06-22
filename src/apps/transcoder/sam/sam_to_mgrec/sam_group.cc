@@ -6,19 +6,27 @@
 
 #include "apps/transcoder/sam/sam_to_mgrec/sam_group.h"
 
-#include <string>
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include <map>
+#include <string>
 #include <utility>
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include "apps/transcoder/utils.h"
 #include "genie/core/record/alignment_external/other-rec.h"
 #include "genie/core/record/alignment_split/other-rec.h"
 #include "genie/core/record/alignment_split/unpaired.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace transcoder {
 namespace sam {
 namespace sam_to_mgrec {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 std::tuple<bool, uint8_t> SamRecordGroup::convertFlags2Mpeg(uint16_t flags) {
     uint8_t flags_mpeg = 0;
@@ -31,6 +39,8 @@ std::tuple<bool, uint8_t> SamRecordGroup::convertFlags2Mpeg(uint16_t flags) {
 
     return std::make_tuple(rcomp, flags_mpeg);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 genie::core::record::Record SamRecordGroup::pairedEndedToMpegg(SamRecord &r1, SamRecord *r2, bool force_split) {
     bool is_r1_read1 = r1.isRead1();
@@ -66,6 +76,8 @@ genie::core::record::Record SamRecordGroup::pairedEndedToMpegg(SamRecord &r1, Sa
 
     return rec;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord &r, SamRecord *other_r,
                                   bool force_split) {
@@ -108,6 +120,8 @@ void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord &r
     rec.addAlignment(r.getRID(), std::move(alignmentContainer));
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void SamRecordGroup::convertUnmapped(std::list<genie::core::record::Record> &records, SamRecord &sam_rec) {
     auto flag_tuple = convertFlags2Mpeg(sam_rec.getFlag());
     genie::core::record::Record rec(1, genie::core::record::ClassType::CLASS_I, sam_rec.moveQname(), "Genie",
@@ -134,6 +148,8 @@ void SamRecordGroup::convertUnmapped(std::list<genie::core::record::Record> &rec
     //    ret.addAlignment(ref, std::move(alignmentContainer));
     records.push_back(std::move(rec));
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void SamRecordGroup::convertSingleEnd(std::list<genie::core::record::Record> &records, std::list<SamRecord> &sam_recs,
                                       bool unmapped_pair, bool is_read_1_first) {
@@ -178,6 +194,8 @@ void SamRecordGroup::convertSingleEnd(std::list<genie::core::record::Record> &re
     records.push_back(std::move(rec));
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void SamRecordGroup::createMgrecAndAddAlignment(std::map<int32_t, genie::core::record::Record> &mgrecs_by_rid,
                                                 std::vector<int32_t> &recs_rid_order, SamRecord &rec,
                                                 SamRecord *other_rec) {
@@ -205,6 +223,8 @@ void SamRecordGroup::createMgrecAndAddAlignment(std::map<int32_t, genie::core::r
         addAlignment(mgrec_iter->second, rec, other_rec);
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void SamRecordGroup::convertPairedEnd(std::map<int32_t, genie::core::record::Record> &recs1_by_rid,
                                       std::vector<int32_t> &recs1_rid_order,
@@ -302,6 +322,8 @@ void SamRecordGroup::convertPairedEnd(std::map<int32_t, genie::core::record::Rec
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void SamRecordGroup::handlesMoreAlignments(std::map<int32_t, genie::core::record::Record> &recs_by_rid,
                                            std::vector<int32_t> &recs_rid_order) {
     UTILS_DIE_IF(recs_by_rid.size() != recs_rid_order.size(), "recs_by_rid and recs_rid_order have different size");
@@ -330,7 +352,11 @@ void SamRecordGroup::handlesMoreAlignments(std::map<int32_t, genie::core::record
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 SamRecordGroup::SamRecordGroup() : data(size_t(Index::TOTAL_INDICES)) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void SamRecordGroup::addRecord(SamRecord &&rec) {
     /// Default is class "UNKNOWN"
@@ -365,6 +391,8 @@ void SamRecordGroup::addRecord(SamRecord &&rec) {
     data[uint8_t(idx)].push_back(std::move(rec));
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 SamRecordGroup::Category SamRecordGroup::getRecords(std::list<std::list<SamRecord>> &sam_recs) {
     sam_recs.clear();
 
@@ -391,17 +419,27 @@ SamRecordGroup::Category SamRecordGroup::getRecords(std::list<std::list<SamRecor
     return cls;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool SamRecordGroup::isUnmapped() { return data[uint8_t(Index::UNMAPPED)].size() == 1; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 bool SamRecordGroup::isSingle() const {
     return !data[(uint8_t)Index::SINGLE].empty();
 }  // Single non- and multiplie alignements
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool SamRecordGroup::isPaired() const {
     return !data[(uint8_t)Index::PAIR_READ1_PRIMARY].empty() && !data[(uint8_t)Index::PAIR_READ2_PRIMARY].empty();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool SamRecordGroup::isUnknown() { return !data[uint8_t(Index::UNKNOWN)].empty(); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 bool SamRecordGroup::isValid() {
     if (isUnknown() || data[uint8_t(Index::UNMAPPED)].size() > 1) {
@@ -416,6 +454,8 @@ bool SamRecordGroup::isValid() {
                (!is_unmapped && !is_single && is_pair);
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 SamRecordGroup::Category SamRecordGroup::computeClass() {
     if (isUnknown() || data[uint8_t(Index::UNMAPPED)].size() > 1) {
@@ -437,6 +477,8 @@ SamRecordGroup::Category SamRecordGroup::computeClass() {
         }
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bool create_same_rec) {
     std::list<std::list<SamRecord>> sam_recs_2d;
@@ -481,7 +523,12 @@ void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bo
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace sam_to_mgrec
 }  // namespace sam
 }  // namespace transcoder
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

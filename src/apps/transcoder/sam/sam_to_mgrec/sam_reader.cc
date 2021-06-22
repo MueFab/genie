@@ -6,13 +6,19 @@
 
 #include <cstring>
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include "apps/transcoder/sam/sam_to_mgrec/sam_reader.h"
 #include "apps/transcoder/sam/sam_to_mgrec/sam_record.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace transcoder {
 namespace sam {
 namespace sam_to_mgrec {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 SamReader::SamReader(const char* fpath)
     : sam_file(hts_open(fpath, "r")),  // open bam file
@@ -20,7 +26,11 @@ SamReader::SamReader(const char* fpath)
       sam_alignment(bam_init1()),      // initialize an alignment
       header_info(KS_INITIALIZE) {}
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 SamReader::SamReader(std::string& fpath) : SamReader(fpath.c_str()) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 SamReader::~SamReader() {
     bam_destroy1(sam_alignment);
@@ -29,7 +39,11 @@ SamReader::~SamReader() {
     if (header_info.s) free(header_info.s);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 int SamReader::getNumRef() { return sam_hdr_nref(sam_header); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 bool SamReader::isReady() {
     if (!sam_file) {
@@ -43,6 +57,8 @@ bool SamReader::isReady() {
 
     return true;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 bool SamReader::isValid() {
     /// Find Tag HD with key "SO" to find out the ordering
@@ -58,6 +74,8 @@ bool SamReader::isValid() {
     return true;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 int SamReader::readSamRecord(SamRecord& sr) {
     auto res = sam_read1(sam_file, sam_header, sam_alignment);
 
@@ -68,7 +86,12 @@ int SamReader::readSamRecord(SamRecord& sr) {
     return res;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace sam_to_mgrec
 }  // namespace sam
 }  // namespace transcoder
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
