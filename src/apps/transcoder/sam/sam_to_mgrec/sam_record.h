@@ -39,7 +39,7 @@ class SamRecord {
     std::string cigar;  //!< @brief CIGAR
     int32_t mate_rid;   //!< @brief Mate reference sequence ID
     uint32_t mate_pos;  //!< @brief Mate position
-    int64_t tlen;       //!< @brief Observed template length
+//    int64_t tlen;       //!< @brief Observed template length
     std::string seq;    //!< @brief Read sequence
     std::string qual;   //!< @brief
 

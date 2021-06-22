@@ -20,14 +20,14 @@ stages:
           imageName: 'macos-10.14'
           artifactName: 'macos1014'
           binDir: 'bin'
-        windows2016:
-          imageName: 'vs2017-win2016'
-          artifactName: 'windows2016'
-          binDir: 'bin/Debug'
-        windows2019:
-          imageName: 'windows-2019'
-          artifactName: 'windows2019'
-          binDir: 'bin/Debug'
+#        windows2016:
+#          imageName: 'vs2017-win2016'
+#          artifactName: 'windows2016'
+#          binDir: 'bin/Debug'
+#        windows2019:
+#          imageName: 'windows-2019'
+#          artifactName: 'windows2019'
+#          binDir: 'bin/Debug'
     pool:
       vmImage: $(imageName)
     steps:
@@ -107,22 +107,34 @@ stages:
           artifactName: 'macos1014'
           architecture: ''
           binDir: 'bin'
-        windows2016:
-          imageName: 'vs2017-win2016'
-          artifactName: 'windows2016'
-          architecture: '-A x64'
-          binDir: 'bin/Release'
-        windows2019:
-          imageName: 'windows-2019'
-          artifactName: 'windows2019'
-          architecture: '-A x64'
-          binDir: 'bin/Release'
+#        windows2016:
+#          imageName: 'vs2017-win2016'
+#          artifactName: 'windows2016'
+#          architecture: '-A x64'
+#          binDir: 'bin/Release'
+#        windows2019:
+#          imageName: 'windows-2019'
+#          artifactName: 'windows2019'
+#          architecture: '-A x64'
+#          binDir: 'bin/Release'
     pool:
       vmImage: $(imageName)
     steps:
     - bash: brew install libomp
       displayName: 'Openmp installation (OSX)'
       condition: eq( variables['Agent.OS'], 'Darwin' )
+
+    - bash: |
+        git clone https://github.com/samtools/htslib.git
+        cd htslib
+        git checkout tags/1.12
+        git submodule update --init --recursive
+        autoreconf -i
+        ./configure
+        make -j
+        sudo make install
+      displayName: 'Install HTSLib (Unix)'
+      condition: ne( variables['Agent.OS'], 'Windows_NT' )
 
     - bash: ./ci/build.sh release
       displayName: 'Genie build'
@@ -159,14 +171,14 @@ stages:
           imageName: 'macos-10.14'
           artifactName: 'macos1014'
           fileExt: ''
-        windows2016:
-          imageName: 'vs2017-win2016'
-          artifactName: 'windows2016'
-          fileExt: '.exe'
-        windows2019:
-          imageName: 'windows-2019'
-          artifactName: 'windows2019'
-          fileExt: '.exe'
+#        windows2016:
+#          imageName: 'vs2017-win2016'
+#          artifactName: 'windows2016'
+#          fileExt: '.exe'
+#        windows2019:
+#          imageName: 'windows-2019'
+#          artifactName: 'windows2019'
+#          fileExt: '.exe'
     pool:
       vmImage: $(imageName)
     steps:
@@ -258,14 +270,14 @@ stages:
           imageName: 'macos-10.14'
           artifactName: 'macos1014'
           fileExt: ''
-        windows2016:
-          imageName: 'vs2017-win2016'
-          artifactName: 'windows2016'
-          binDir: 'bin/Debug'
-        windows2019:
-          imageName: 'windows-2019'
-          artifactName: 'windows2019'
-          binDir: 'bin/Debug'
+#        windows2016:
+#          imageName: 'vs2017-win2016'
+#          artifactName: 'windows2016'
+#          binDir: 'bin/Debug'
+#        windows2019:
+#          imageName: 'windows-2019'
+#          artifactName: 'windows2019'
+#          binDir: 'bin/Debug'
     pool:
       vmImage: $(imageName)
     steps:
