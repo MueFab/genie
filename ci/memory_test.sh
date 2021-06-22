@@ -29,8 +29,8 @@ git_root_dir="$(git rev-parse --show-toplevel)"
 
 echo "*** Single-end fastq"
 # Get fastq file no 1
-curl \
-    http://www.tnt.uni-hannover.de/~voges/data/genie/wgs/h-sapiens/ERP001775/ERR174310_tiny_1.fastq.gz  \
+curl -L \
+    https://seafile.cloud.uni-hannover.de/f/436246ec6e0245728fb1/?dl=1  \
     --output /tmp/ERR174310_tiny_1.fastq.gz \
     || { echo 'Could not download single end fastq!' ; exit 1; }
 gzip -df /tmp/ERR174310_tiny_1.fastq.gz
@@ -39,8 +39,8 @@ $git_root_dir/ci/fastq_tools/fastq_memcheck.sh "/tmp/ERR174310_tiny_1.fastq" ""
 
 echo "*** Paired-end fastq"
 # Get fastq file no 2
-curl \
-    http://www.tnt.uni-hannover.de/~voges/data/genie/wgs/h-sapiens/ERP001775/ERR174310_tiny_2.fastq.gz \
+curl -L \
+    https://seafile.cloud.uni-hannover.de/f/5cdec5d05dca497092c4/?dl=1 \
     --output /tmp/ERR174310_tiny_2.fastq.gz \
     || { echo 'Could not download paired end fastq!' ; exit 1; }
 gzip -df /tmp/ERR174310_tiny_2.fastq.gz

@@ -1,12 +1,19 @@
-#ifndef SAM_RECORD_H
-#define SAM_RECORD_H
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
+#ifndef SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SAM_RECORD_H_
+#define SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SAM_RECORD_H_
 
 #include <htslib/sam.h>
 #include <vector>
-//#include <list>
-//#include <genie/core/record/record.h>
+#include <string>
+// #include <list>
+// #include <genie/core/record/record.h>
 
-#include "program-options.h"
+#include "apps/transcoder/sam/sam_to_mgrec/program-options.h"
 
 namespace genie {
 namespace transcoder {
@@ -14,7 +21,7 @@ namespace sam {
 namespace sam_to_mgrec {
 
 class SamRecord {
-   private:
+ private:
     std::string qname;  // Query template name
     uint16_t flag;      // Flag
     int32_t rid;        // Reference sequence ID
@@ -27,7 +34,7 @@ class SamRecord {
     std::string seq;    // Read sequence
     std::string qual;
 
-   public:
+ public:
     static char fourBitBase2Char(uint8_t int_base);
 
     static std::string getCigarString(bam1_t* sam_alignment);
@@ -113,9 +120,9 @@ class SamRecord {
     bool isPairOf(SamRecord& r);
 };
 
-}
-}
-}
-}
+}  // namespace sam_to_mgrec
+}  // namespace sam
+}  // namespace transcoder
+}  // namespace genie
 
-#endif  // SAM_RECORD_H
+#endif  // SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SAM_RECORD_H_

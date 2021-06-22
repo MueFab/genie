@@ -1,13 +1,19 @@
-#ifndef TRANSCODER_SAM_GROUP_H
-#define TRANSCODER_SAM_GROUP_H
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
+#ifndef SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SAM_GROUP_H_
+#define SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SAM_GROUP_H_
+
+#include <list>
 #include <tuple>
 #include <vector>
-#include <list>
+#include <map>
 
-#include <genie/core/record/record.h>
-
-#include "sam_record.h"
+#include "apps/transcoder/sam/sam_to_mgrec/sam_record.h"
+#include "genie/core/record/record.h"
 
 namespace genie {
 namespace transcoder {
@@ -15,7 +21,7 @@ namespace sam {
 namespace sam_to_mgrec {
 
 class SamRecordGroup {  // Helping structure to sort the records
-   public:
+ public:
     enum class Index : uint8_t {
         UNMAPPED = 0,
         SINGLE = 1,
@@ -34,7 +40,7 @@ class SamRecordGroup {  // Helping structure to sort the records
         PAIRED = 4,
     };
 
-   private:
+ private:
     std::vector<std::list<SamRecord>> data;
 
     genie::core::record::Record pairedEndedToMpegg(SamRecord& _r1, SamRecord* r2, bool force_split = true);
@@ -47,20 +53,17 @@ class SamRecordGroup {  // Helping structure to sort the records
                           bool unmapped_pair = false, bool is_read_1_first = true);
 
     void createMgrecAndAddAlignment(std::map<int32_t, genie::core::record::Record>& mgrecs_by_rid,
-                                    std::vector<int32_t>& recs_rid_order,
-                                    SamRecord& rec,
-                                    SamRecord* other_rec);
+                                    std::vector<int32_t>& recs_rid_order, SamRecord& rec, SamRecord* other_rec);
 
-    void convertPairedEnd(std::map<int32_t, genie::core::record::Record> &recs1_by_rid,
-                          std::vector<int32_t> &recs1_rid_order,
-                          std::map<int32_t, genie::core::record::Record> &recs2_by_rid,
-                          std::vector<int32_t> &recs2_rid_order,
-                          std::list<std::list<SamRecord>> sam_recs_2d);
+    void convertPairedEnd(std::map<int32_t, genie::core::record::Record>& recs1_by_rid,
+                          std::vector<int32_t>& recs1_rid_order,
+                          std::map<int32_t, genie::core::record::Record>& recs2_by_rid,
+                          std::vector<int32_t>& recs2_rid_order, std::list<std::list<SamRecord>> sam_recs_2d);
 
-    void handlesMoreAlignments(std::map<int32_t, genie::core::record::Record> &recs_by_rid,
-                              std::vector<int32_t> &recs_rid_order);
+    void handlesMoreAlignments(std::map<int32_t, genie::core::record::Record>& recs_by_rid,
+                               std::vector<int32_t>& recs_rid_order);
 
-   public:
+ public:
     SamRecordGroup();
 
     static std::tuple<bool, uint8_t> convertFlags2Mpeg(uint16_t flags);
@@ -109,9 +112,9 @@ class SamRecordGroup {  // Helping structure to sort the records
     void convert(std::list<genie::core::record::Record>& records, bool create_same_rec = false);
 };
 
-}
-}
-}
-}
+}  // namespace sam_to_mgrec
+}  // namespace sam
+}  // namespace transcoder
+}  // namespace genie
 
-#endif  // TRANSCODER_SAM_GROUP_H
+#endif  // SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SAM_GROUP_H_

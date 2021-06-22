@@ -1,12 +1,19 @@
-#include "transcoder.h"
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
+#include "apps/transcoder/sam/sam_to_mgrec/transcoder.h"
 
 #include <algorithm>
 #include <fstream>
+#include <utility>
 
-#include "sam_group.h"
-#include "sam_reader.h"
-#include "sorter.h"
-#include <transcoder/utils.h>
+#include "apps/transcoder/utils.h"
+#include "apps/transcoder/sam/sam_to_mgrec/sam_group.h"
+#include "apps/transcoder/sam/sam_to_mgrec/sam_reader.h"
+#include "apps/transcoder/sam/sam_to_mgrec/sorter.h"
 
 namespace genie {
 namespace transcoder {
@@ -22,9 +29,8 @@ bool save_mgrecs_by_rid(std::list<genie::core::record::Record>& recs,
             UTILS_DIE_IF(rec.getClassID() != genie::core::record::ClassType::CLASS_I, "Invalid Class");
             auto bitwriter = bitwriters.at(ref_id);
 
-            // TODO: Handle case where harddrive is full
+            // TODO(Yeremia): Handle case where harddrive is full
             rec.write(bitwriter);
-
         } catch (std::out_of_range& r) {
             return false;
         }
@@ -42,7 +48,7 @@ ErrorCode sam_to_mgrec_phase1(Config& options, int& nref) {
     std::list<genie::core::record::Record> records;
 
     auto sam_reader = SamReader(options.sam_file_path);
-    if (!sam_reader.isReady() or !sam_reader.isValid()) {
+    if (!sam_reader.isReady() || !sam_reader.isValid()) {
         return ErrorCode::failure;
     }
 
@@ -87,8 +93,8 @@ ErrorCode sam_to_mgrec_phase1(Config& options, int& nref) {
     auto iter_map = p1_bitwriters.begin();
     auto iter_writer = p1_writers.begin();
     while (iter_map != p1_bitwriters.end() && iter_writer != p1_writers.end()) {
-        iter_map->second.flush(); /// flush bitwriter
-        iter_writer->close(); /// close phase1 file
+        iter_map->second.flush();  /// flush bitwriter
+        iter_writer->close();      /// close phase1 file
 
         iter_map++;
         iter_writer++;
@@ -102,7 +108,6 @@ std::string gen_p2_tmp_fpath(Config& options, int rid, int ifile) {
 }
 
 ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
-
     /// Process MPEG-G records of each RefID
     for (auto iref = 0; iref < nref; iref++) {
         auto n_tmp_files = 0;
@@ -188,7 +193,7 @@ ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
     return ErrorCode::success;
 }
 
-void clean_phase1_files(Config& options, int& nref){
+void clean_phase1_files(Config& options, int& nref) {
     for (auto iref = 0; iref < nref; iref++) {
         std::string fpath = options.tmp_dir_path + "/" + std::to_string(iref) + PHASE1_EXT;
         std::remove(fpath.c_str());
@@ -211,8 +216,7 @@ ErrorCode transcode(Config& options) {
 
     return ErrorCode::success;
 }
-}
-}
-}
-
-}
+}  // namespace sam_to_mgrec
+}  // namespace sam
+}  // namespace transcoder
+}  // namespace genie

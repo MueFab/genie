@@ -1,6 +1,17 @@
-#include "sam_group.h"
-#include "genie/core/record/alignment_external/other-rec.h"
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
+#include "apps/transcoder/sam/sam_to_mgrec/sam_group.h"
+
+#include <string>
+#include <map>
+#include <utility>
+
 #include "apps/transcoder/utils.h"
+#include "genie/core/record/alignment_external/other-rec.h"
 #include "genie/core/record/alignment_split/other-rec.h"
 #include "genie/core/record/alignment_split/unpaired.h"
 
@@ -21,10 +32,7 @@ std::tuple<bool, uint8_t> SamRecordGroup::convertFlags2Mpeg(uint16_t flags) {
     return std::make_tuple(rcomp, flags_mpeg);
 }
 
-genie::core::record::Record SamRecordGroup::pairedEndedToMpegg(SamRecord &r1,
-                                                               SamRecord *r2,
-                                                               bool force_split) {
-
+genie::core::record::Record SamRecordGroup::pairedEndedToMpegg(SamRecord &r1, SamRecord *r2, bool force_split) {
     bool is_r1_read1 = r1.isRead1();
     bool is_r1_first;
     if (r2 == nullptr || r2->isUnmapped()) {
@@ -78,7 +86,7 @@ void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord &r
                 other_r->getPos(), other_r->getRID());
             alignmentContainer.addAlignmentSplit(std::move(splitAlign));
 
-        /// Case 1: SameRec
+            /// Case 1: SameRec
         } else {
             genie::core::record::Alignment alignment2(other_r->getECigar(), other_r->isReverse());
             alignment2.addMappingScore(other_r->getMapq());
@@ -170,10 +178,9 @@ void SamRecordGroup::convertSingleEnd(std::list<genie::core::record::Record> &re
     records.push_back(std::move(rec));
 }
 
-void SamRecordGroup::createMgrecAndAddAlignment(std::map<int32_t, genie::core::record::Record>& mgrecs_by_rid,
-                                                std::vector<int32_t>& recs_rid_order,
-                                                SamRecord &rec, SamRecord *other_rec) {
-
+void SamRecordGroup::createMgrecAndAddAlignment(std::map<int32_t, genie::core::record::Record> &mgrecs_by_rid,
+                                                std::vector<int32_t> &recs_rid_order, SamRecord &rec,
+                                                SamRecord *other_rec) {
     auto mgrec_iter = mgrecs_by_rid.find(rec.getRID());
 
     if (mgrec_iter == mgrecs_by_rid.end()) {
@@ -204,7 +211,6 @@ void SamRecordGroup::convertPairedEnd(std::map<int32_t, genie::core::record::Rec
                                       std::map<int32_t, genie::core::record::Record> &recs2_by_rid,
                                       std::vector<int32_t> &recs2_rid_order,
                                       std::list<std::list<SamRecord>> sam_recs_2d) {
-
     auto r1_template = sam_recs_2d.begin();
     auto r2_template = std::next(r1_template);
 
@@ -249,12 +255,10 @@ void SamRecordGroup::convertPairedEnd(std::map<int32_t, genie::core::record::Rec
         for (auto r2_rec_iter = r2_template->begin(); r2_rec_iter != r2_template->end(); r2_rec_iter++) {
             if (r1_rec_iter->isPairOf(*r2_rec_iter)) {
                 /// Process read1
-                createMgrecAndAddAlignment(recs1_by_rid, recs1_rid_order,
-                                           *r1_rec_iter, &*r2_rec_iter);
+                createMgrecAndAddAlignment(recs1_by_rid, recs1_rid_order, *r1_rec_iter, &*r2_rec_iter);
 
                 /// Process read2
-                createMgrecAndAddAlignment(recs2_by_rid,recs2_rid_order,
-                                           *r2_rec_iter, &*r1_rec_iter);
+                createMgrecAndAddAlignment(recs2_by_rid, recs2_rid_order, *r2_rec_iter, &*r1_rec_iter);
 
                 r2_template->erase(r2_rec_iter);
                 pair_found = true;
@@ -264,8 +268,7 @@ void SamRecordGroup::convertPairedEnd(std::map<int32_t, genie::core::record::Rec
 
         /// At this point no pair of r1_rec_iter is found, thus handle case 4 (No pair)
         if (!pair_found) {
-            createMgrecAndAddAlignment(recs1_by_rid,recs1_rid_order,
-                                       *r1_rec_iter, nullptr);
+            createMgrecAndAddAlignment(recs1_by_rid, recs1_rid_order, *r1_rec_iter, nullptr);
         }
 
         r1_template->pop_front();
@@ -279,12 +282,10 @@ void SamRecordGroup::convertPairedEnd(std::map<int32_t, genie::core::record::Rec
         for (auto r1_rec_iter = r1_template->begin(); r1_rec_iter != r1_template->end(); r1_rec_iter++) {
             if (r2_rec_iter->isPairOf(*r1_rec_iter)) {
                 /// Process read2
-                createMgrecAndAddAlignment(recs2_by_rid, recs2_rid_order,
-                                           *r2_rec_iter, &*r1_rec_iter);
+                createMgrecAndAddAlignment(recs2_by_rid, recs2_rid_order, *r2_rec_iter, &*r1_rec_iter);
 
                 /// Process read1
-                createMgrecAndAddAlignment(recs1_by_rid, recs1_rid_order,
-                                           *r1_rec_iter, &*r2_rec_iter);
+                createMgrecAndAddAlignment(recs1_by_rid, recs1_rid_order, *r1_rec_iter, &*r2_rec_iter);
 
                 r2_template->erase(r2_rec_iter);
                 pair_found = true;
@@ -294,8 +295,7 @@ void SamRecordGroup::convertPairedEnd(std::map<int32_t, genie::core::record::Rec
 
         /// At this point no pair of r2_rec_iter is found, thus handle case 4 (No pair)
         if (!pair_found) {
-            createMgrecAndAddAlignment(recs2_by_rid, recs2_rid_order,
-                                       *r2_rec_iter, nullptr);
+            createMgrecAndAddAlignment(recs2_by_rid, recs2_rid_order, *r2_rec_iter, nullptr);
         }
 
         r2_template->pop_front();
@@ -303,21 +303,20 @@ void SamRecordGroup::convertPairedEnd(std::map<int32_t, genie::core::record::Rec
 }
 
 void SamRecordGroup::handlesMoreAlignments(std::map<int32_t, genie::core::record::Record> &recs_by_rid,
-                                          std::vector<int32_t> &recs_rid_order) {
+                                           std::vector<int32_t> &recs_rid_order) {
+    UTILS_DIE_IF(recs_by_rid.size() != recs_rid_order.size(), "recs_by_rid and recs_rid_order have different size");
 
-    UTILS_DIE_IF(recs_by_rid.size() != recs_rid_order.size(),
-                 "recs_by_rid and recs_rid_order have different size");
-
-    if (recs_rid_order.size() < 2){
+    if (recs_rid_order.size() < 2) {
         return;
     }
 
-    for (auto rid: recs_rid_order){
+    for (auto rid : recs_rid_order) {
         UTILS_DIE_IF(recs_by_rid.find(rid) == recs_by_rid.end(),
                      "Could not find MPEG-G record with with RID " + std::to_string(rid));
     }
 
-    for (auto tail_rid_iter = std::next(recs_rid_order.begin()); tail_rid_iter != recs_rid_order.end(); tail_rid_iter++){
+    for (auto tail_rid_iter = std::next(recs_rid_order.begin()); tail_rid_iter != recs_rid_order.end();
+         tail_rid_iter++) {
         auto head_rid_iter = std::prev(tail_rid_iter);
         auto head_mgrec_iter = recs_by_rid.find(*head_rid_iter);
         auto tail_mgrec_iter = recs_by_rid.find(*tail_rid_iter);
@@ -325,11 +324,10 @@ void SamRecordGroup::handlesMoreAlignments(std::map<int32_t, genie::core::record
         auto next_seq_ID = *tail_rid_iter;
         auto next_pos = getMinPos(tail_mgrec_iter->second);
 
-        auto more_alignments = util::make_unique<genie::core::record::alignment_external::OtherRec>(next_pos,
-                                                                                                    next_seq_ID);
+        auto more_alignments =
+            util::make_unique<genie::core::record::alignment_external::OtherRec>(next_pos, next_seq_ID);
         head_mgrec_iter->second.setMoreAlignmentInfo(std::move(more_alignments));
     }
-
 }
 
 SamRecordGroup::SamRecordGroup() : data(size_t(Index::TOTAL_INDICES)) {}
@@ -345,9 +343,8 @@ void SamRecordGroup::addRecord(SamRecord &&rec) {
         } else {
             idx = Index::SINGLE;
         }
-    }
-    // Handles paired-end read / multi segments
-    else {
+        // Handles paired-end read / multi segments
+    } else {
         if (rec.isRead1()) {
             if (rec.isPrimary()) {
                 idx = Index::PAIR_READ1_PRIMARY;
@@ -484,7 +481,7 @@ void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bo
     }
 }
 
-}
-}
-}
-}
+}  // namespace sam_to_mgrec
+}  // namespace sam
+}  // namespace transcoder
+}  // namespace genie

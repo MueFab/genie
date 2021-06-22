@@ -32,7 +32,7 @@ std::string ReferenceCollection::getSequence(const std::string& name, uint64_t _
             }
 
             if (it2->get()->getStart() > position) {
-                nearest = std::min<size_t>(nearest, (size_t)it2->get()->getStart());
+                nearest = std::min<size_t>(nearest, static_cast<size_t>(it2->get()->getStart()));
             }
 
             if (it2->get()->getStart() <= position && it2->get()->getEnd() > position) {

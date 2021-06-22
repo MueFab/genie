@@ -175,6 +175,12 @@ class Record {
 
     /**
      * @brief
+     * @param depth
+     */
+    void setQVDepth(uint8_t depth);
+
+    /**
+     * @brief
      * @param type
      */
     void setClassType(ClassType type);

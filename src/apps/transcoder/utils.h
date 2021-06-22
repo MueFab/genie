@@ -1,5 +1,11 @@
-#ifndef GENIE_TRANSCODER_UTILS_H
-#define GENIE_TRANSCODER_UTILS_H
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
+#ifndef SRC_APPS_TRANSCODER_UTILS_H_
+#define SRC_APPS_TRANSCODER_UTILS_H_
 
 #include <genie/core/record/record.h>
 
@@ -8,10 +14,9 @@ namespace transcoder {
 
 uint64_t getMinPos(const genie::core::record::Record& r);
 
-bool compare(const genie::core::record::Record& r1,
-             const genie::core::record::Record& r2);
+bool compare(const genie::core::record::Record& r1, const genie::core::record::Record& r2);
 
-}
-}
+}  // namespace transcoder
+}  // namespace genie
 
-#endif  // GENIE_TRANSCODER_UTILS_H
+#endif  // SRC_APPS_TRANSCODER_UTILS_H_

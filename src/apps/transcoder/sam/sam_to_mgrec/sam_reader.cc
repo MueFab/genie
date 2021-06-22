@@ -1,7 +1,13 @@
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
 #include <cstring>
 
-#include "sam_reader.h"
-#include "sam_record.h"
+#include "apps/transcoder/sam/sam_to_mgrec/sam_reader.h"
+#include "apps/transcoder/sam/sam_to_mgrec/sam_record.h"
 
 namespace genie {
 namespace transcoder {
@@ -12,8 +18,7 @@ SamReader::SamReader(const char* fpath)
     : sam_file(hts_open(fpath, "r")),  // open bam file
       sam_header(nullptr),             // read header
       sam_alignment(bam_init1()),      // initialize an alignment
-      header_info(KS_INITIALIZE)
-{}
+      header_info(KS_INITIALIZE) {}
 
 SamReader::SamReader(std::string& fpath) : SamReader(fpath.c_str()) {}
 
@@ -41,12 +46,12 @@ bool SamReader::isReady() {
 
 bool SamReader::isValid() {
     /// Find Tag HD with key "SO" to find out the ordering
-    if (sam_hdr_find_tag_hd(sam_header, "SO", &header_info) != 0){
+    if (sam_hdr_find_tag_hd(sam_header, "SO", &header_info) != 0) {
         return false;
     }
 
     /// Find out if records are sorted by query name
-    if(std::strcmp(header_info.s, "queryname") != 0){
+    if (std::strcmp(header_info.s, "queryname") != 0) {
         return false;
     }
 
@@ -63,8 +68,7 @@ int SamReader::readSamRecord(SamRecord& sr) {
     return res;
 }
 
-}
-}
-}
-}
-
+}  // namespace sam_to_mgrec
+}  // namespace sam
+}  // namespace transcoder
+}  // namespace genie

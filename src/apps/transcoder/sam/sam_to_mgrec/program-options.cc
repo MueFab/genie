@@ -1,9 +1,15 @@
-#include "program-options.h"
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
-#include <cli11/CLI11.hpp>
+#include "apps/transcoder/sam/sam_to_mgrec/program-options.h"
 
 #include <cassert>
 #include <fstream>
+
+#include <cli11/CLI11.hpp>
 
 namespace genie {
 namespace transcoder {
@@ -43,7 +49,7 @@ void Config::processCommandLine(int argc, char *argv[]) {
 
 void Config::validate() const {}
 
-}
-}
-}
-}
+}  // namespace sam_to_mgrec
+}  // namespace sam
+}  // namespace transcoder
+}  // namespace genie
