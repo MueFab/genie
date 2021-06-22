@@ -1,14 +1,23 @@
-//#include <htslib/sam.h>
-//#include <genie/format/sam/record.h>
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
+// #include <htslib/sam.h>
+// #include <genie/format/sam/record.h>
+
+#include "apps/transcoder/sam/sam_to_mgrec/sam_record.h"
+
 #include <algorithm>
-#include <genie/core/record/alignment_split/other-rec.h>
-#include <genie/core/record/alignment_split/same-rec.h>
-#include <genie/core/record/alignment_split/unpaired.h>
-#include <genie/core/record/alignment_external/other-rec.h>
+#include <utility>
+#include <string>
+#include "genie/util/runtime-exception.h"
+#include "genie/core/record/alignment_external/other-rec.h"
+#include "genie/core/record/alignment_split/other-rec.h"
+#include "genie/core/record/alignment_split/same-rec.h"
+#include "genie/core/record/alignment_split/unpaired.h"
 
-#include <genie/util/runtime-exception.h>
-
-#include "sam_record.h"
 
 namespace genie {
 namespace transcoder {
@@ -62,7 +71,7 @@ std::string SamRecord::getQualString(bam1_t* sam_alignment) {
     auto qual_ptr = bam_get_qual(sam_alignment);
     std::string tmp_qual(seq_len, ' ');
     for (auto i = 0; i < seq_len; i++) {
-        tmp_qual[i] = char(qual_ptr[i] + 33);
+        tmp_qual[i] = static_cast<char>(qual_ptr[i] + 33);
     }
     return tmp_qual;
 }
@@ -217,11 +226,11 @@ bool SamRecord::isRead1() const { return checkFlag(BAM_FPAIRED | BAM_FREAD1); }
 bool SamRecord::isRead2() const { return checkFlag(BAM_FPAIRED | BAM_FREAD2); }
 
 /**
-* SamRecord are correctly oriented with respect to one another,
-* i.e. that one of the mate pairs maps to the forward strand and the other maps to the reverse strand.
-* If the mates don't map in a proper pair, that may mean that both reads map to the forward or reverse strand.
-* This includes that the reads are mapped to the same chromosomes.
-* @return
+ * SamRecord are correctly oriented with respect to one another,
+ * i.e. that one of the mate pairs maps to the forward strand and the other maps to the reverse strand.
+ * If the mates don't map in a proper pair, that may mean that both reads map to the forward or reverse strand.
+ * This includes that the reads are mapped to the same chromosomes.
+ * @return
  */
 bool SamRecord::isProperlyPaired() const { return checkFlag(BAM_FPAIRED | BAM_FPROPER_PAIR) && checkNFlag(BAM_FUNMAP); }
 
@@ -250,7 +259,7 @@ bool SamRecord::isPairOf(SamRecord& r) {
     return false;
 }
 
-}
-}
-}
-}
+}  // namespace sam_to_mgrec
+}  // namespace sam
+}  // namespace transcoder
+}  // namespace genie

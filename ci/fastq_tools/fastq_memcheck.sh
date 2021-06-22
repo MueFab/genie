@@ -40,6 +40,18 @@ compress_roundtrip () {
         genie_paired_output_parameter="--output-suppl-file $paired_fastq_file"
     fi
 
+    echo "Genie transcode fastq to mgrec"
+    valgrind --suppressions=$git_root_dir/ci/omp.supp \
+        --gen-suppressions=all \
+        --leak-check=full \
+        --track-origins=yes \
+        --error-exitcode=1 \
+        $git_root_dir/cmake-build-release/bin/genie$exe_file_extension transcode-fastq \
+        -i $primary_fastq_file \
+        $genie_paired_input_parameter \
+        -o /tmp/transcoded.mgrec -f \
+        || { echo "Genie transcode ($primary_fastq_file; $paired_fastq_file; $genie_encoder_parameters) failed!" ; exit 1; }
+
     echo "Genie compress"
     valgrind --suppressions=$git_root_dir/ci/omp.supp \
         --gen-suppressions=all \
@@ -47,11 +59,12 @@ compress_roundtrip () {
         --track-origins=yes \
         --error-exitcode=1 \
         $git_root_dir/cmake-build-release/bin/genie$exe_file_extension run \
-        -i $primary_fastq_file \
-        $genie_paired_input_parameter \
+        -i /tmp/transcoded.mgrec \
         -o /tmp/output.mgb -f \
         $genie_encoder_parameters \
         || { echo "Genie compress ($primary_fastq_file; $paired_fastq_file; $genie_encoder_parameters) failed!" ; exit 1; }
+
+    rm /tmp/transcoded.mgrec
 
     echo "Genie decompress"
     valgrind --suppressions=$git_root_dir/ci/omp.supp \
@@ -60,54 +73,30 @@ compress_roundtrip () {
         --track-origins=yes \
         --error-exitcode=1 \
         $git_root_dir/cmake-build-release/bin/genie$exe_file_extension run \
-        -o /tmp/output_1.fastq \
-        --output-suppl-file /tmp/output_2.fastq \
+        -o /tmp/output.mgrec \
         -i /tmp/output.mgb -f \
         || { echo "Genie decompress ($primary_fastq_file; $paired_fastq_file; $genie_encoder_parameters) failed!" ; exit 1; }
+
+
+    echo "Genie transcode fastq to mgrec"
+    valgrind --suppressions=$git_root_dir/ci/omp.supp \
+        --gen-suppressions=all \
+        --leak-check=full \
+        --track-origins=yes \
+        --error-exitcode=1 \
+        $git_root_dir/cmake-build-release/bin/genie$exe_file_extension transcode-fastq \
+        -i /tmp/output.mgrec \
+        -o /tmp/output_1.fastq \
+        --output-suppl-file /tmp/output_2.fastq -f \
+        || { echo "Genie transcode ($primary_fastq_file; $paired_fastq_file; $genie_encoder_parameters) failed!" ; exit 1; }
+
+    
     rm /tmp/output_1.fastq
     rm -f /tmp/output_2.fastq
     rm /tmp/output.mgb
-}
-
-convert_roundtrip() {
-    if [[ "$paired_fastq_file" == "" ]]; then
-        genie_paired_input_parameter=""
-    else
-        genie_paired_input_parameter="--input-suppl-file $paired_fastq_file"
-    fi
-
-    echo "Genie convert"
-    valgrind --suppressions=$git_root_dir/ci/omp.supp \
-        --gen-suppressions=all \
-        --leak-check=full \
-        --track-origins=yes \
-        --error-exitcode=1 \
-        $git_root_dir/cmake-build-release/bin/genie$exe_file_extension run \
-        -o /tmp/output.mgrec \
-        -i $primary_fastq_file -f \
-        $genie_paired_input_parameter \
-        $genie_encoder_parameters \
-        || { echo "Genie convert ($primary_fastq_file; $paired_fastq_file; $genie_encoder_parameters) failed!" ; exit 1; }
-
-    echo "Genie convert back"
-    valgrind --suppressions=$git_root_dir/ci/omp.supp \
-        --gen-suppressions=all \
-        --leak-check=full \
-        --track-origins=yes \
-        --error-exitcode=1 \
-        $git_root_dir/cmake-build-release/bin/genie$exe_file_extension run \
-        -i /tmp/output.mgrec \
-        -o /tmp/output_1.fastq \
-        --output-suppl-file /tmp/output_2.fastq \
-        || { echo "Genie convert ($primary_fastq_file; $paired_fastq_file; $genie_encoder_parameters) failed!" ; exit 1; }
-
-    rm /tmp/output_1.fastq
-    rm /tmp/output_2.fastq
-    rm /tmp/output.mgrec
 }
 
 compress_roundtrip "--low-latency --qv none --read-ids none"
 compress_roundtrip "--low-latency" 
 compress_roundtrip "--qv none --read-ids none"
 compress_roundtrip ""
-convert_roundtrip

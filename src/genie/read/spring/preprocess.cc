@@ -91,7 +91,8 @@ void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section &id) 
 
     size_t rec_index = 0;
     for (auto &rec : data.getData()) {
-        UTILS_DIE_IF(rec.getSegments().size() != ((size_t)cp.paired_end + 1), "Number of segments differs");
+        UTILS_DIE_IF(rec.getSegments().size() != (static_cast<size_t>(cp.paired_end + 1)),
+                     "Number of segments differs");
         size_t seg_index = 0;
         for (auto &seq : rec.getSegments()) {
             UTILS_DIE_IF(seq.getSequence().size() > MAX_READ_LEN, "Too long read length");

@@ -5,6 +5,7 @@
  */
 
 #include "genie/run/main.h"
+#include "genie/transcode-fastq/main.h"
 #include <iostream>
 #include <string>
 #include "cli11/CLI11.hpp"
@@ -56,6 +57,8 @@ int main(int argc, char* argv[]) {
             genieapp::run::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else if (operation == "stat") {
             stat(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
+        } else if (operation == "transcode-fastq") {
+            genieapp::transcode_fastq::main(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else if (operation == "help") {
             help(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else {

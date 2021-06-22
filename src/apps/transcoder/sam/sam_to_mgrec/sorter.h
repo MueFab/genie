@@ -1,10 +1,17 @@
-#ifndef GENIE_SORTER_H
-#define GENIE_SORTER_H
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
-#include <fstream>
-#include <genie/util/bitwriter.h>
-#include <genie/util/bitreader.h>
+#ifndef SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SORTER_H_
+#define SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SORTER_H_
+
 #include <genie/core/record/record.h>
+#include <genie/util/bitreader.h>
+#include <genie/util/bitwriter.h>
+#include <fstream>
+#include <string>
 
 namespace genie {
 namespace transcoder {
@@ -12,13 +19,13 @@ namespace sam {
 namespace sam_to_mgrec {
 
 class SubfileReader {
-   private:
+ private:
     uint64_t curr_mgrec_pos;
     std::ifstream reader;
     genie::util::BitReader bitreader;
     genie::core::record::Record rec;
 
-   public:
+ public:
     explicit SubfileReader(const std::string& fpath);
 
     ~SubfileReader();
@@ -37,9 +44,9 @@ class SubfileReader {
     void close();
 };
 
-}
-}
-}
-}
+}  // namespace sam_to_mgrec
+}  // namespace sam
+}  // namespace transcoder
+}  // namespace genie
 
-#endif  // GENIE_SORTER_H
+#endif  // SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SORTER_H_

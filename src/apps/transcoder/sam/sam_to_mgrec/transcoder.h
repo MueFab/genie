@@ -1,13 +1,21 @@
-#ifndef SAM_TRANSCODER_H
-#define SAM_TRANSCODER_H
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
-#include <vector>
-#include <list>
+#ifndef SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_TRANSCODER_H_
+#define SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_TRANSCODER_H_
+
 #include <genie/core/record/record.h>
 #include <genie/util/bitwriter.h>
 #include <transcoder/transcoding.h>
+#include <list>
+#include <map>
+#include <string>
+#include <vector>
 
-#include "sam_record.h"
+#include "apps/transcoder/sam/sam_to_mgrec/sam_record.h"
 
 namespace genie {
 namespace transcoder {
@@ -17,7 +25,7 @@ namespace sam_to_mgrec {
 #define PHASE1_EXT ".phase1.mgrec"
 #define PHASE2_EXT ".phase2.mgrec"
 #define PHASE2_TMP_EXT ".phase2.tmp"
-//#define PHASE1_BUFFER_SIZE 50000
+// #define PHASE1_BUFFER_SIZE 50000
 #define PHASE2_BUFFER_SIZE 500000
 
 bool save_mgrecs_by_rid(std::list<genie::core::record::Record>& mpegg_recs,
@@ -33,9 +41,9 @@ void clean_phase1_files(Config& options, int& nref);
 
 ErrorCode transcode(Config& options);
 
-}
-}
-}
-}
+}  // namespace sam_to_mgrec
+}  // namespace sam
+}  // namespace transcoder
+}  // namespace genie
 
-#endif  // SAM_TRANSCODER_H
+#endif  // SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_TRANSCODER_H_
