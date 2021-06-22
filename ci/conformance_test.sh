@@ -39,7 +39,7 @@ echo "*** Single-end fastq"
 
 # Get fastq file no 1
 curl \
-    http://www.tnt.uni-hannover.de/~voges/data/genie/wgs/h-sapiens/ERP001775/ERR174310_short_1.fastq.gz \
+    https://seafile.cloud.uni-hannover.de/f/4749edb38dce4c9c8787/?dl=1 \
     --output /tmp/ERR174310_short_1.fastq.gz \
     || { echo 'Could not download single end fastq!' ; exit 1; }
 gzip -df /tmp/ERR174310_short_1.fastq.gz
@@ -49,7 +49,7 @@ $git_root_dir/ci/fastq_tools/fastq_roundtrip.sh "/tmp/ERR174310_short_1.fastq" "
 echo "*** Paired-end fastq"
 # Get fastq file no 2
 curl \
-    http://www.tnt.uni-hannover.de/~voges/data/genie/wgs/h-sapiens/ERP001775/ERR174310_short_2.fastq.gz \
+    https://seafile.cloud.uni-hannover.de/f/b9ae03430f0b4bc493d5/?dl=1 \
     --output /tmp/ERR174310_short_2.fastq.gz \
     || { echo 'Could not download paired end fastq!' ; exit 1; }
 gzip -df /tmp/ERR174310_short_2.fastq.gz
