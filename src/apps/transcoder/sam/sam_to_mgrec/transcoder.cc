@@ -6,19 +6,27 @@
 
 #include "apps/transcoder/sam/sam_to_mgrec/transcoder.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include <algorithm>
 #include <fstream>
 #include <utility>
 
-#include "apps/transcoder/utils.h"
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include "apps/transcoder/sam/sam_to_mgrec/sam_group.h"
 #include "apps/transcoder/sam/sam_to_mgrec/sam_reader.h"
 #include "apps/transcoder/sam/sam_to_mgrec/sorter.h"
+#include "apps/transcoder/utils.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace transcoder {
 namespace sam {
 namespace sam_to_mgrec {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 bool save_mgrecs_by_rid(std::list<genie::core::record::Record>& recs,
                         std::map<int32_t, genie::util::BitWriter>& bitwriters) {
@@ -38,6 +46,8 @@ bool save_mgrecs_by_rid(std::list<genie::core::record::Record>& recs,
     recs.clear();
     return true;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 ErrorCode sam_to_mgrec_phase1(Config& options, int& nref) {
     std::list<std::ofstream> p1_writers;
@@ -103,9 +113,13 @@ ErrorCode sam_to_mgrec_phase1(Config& options, int& nref) {
     return ErrorCode::success;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::string gen_p2_tmp_fpath(Config& options, int rid, int ifile) {
     return options.tmp_dir_path + "/" + std::to_string(rid) + '.' + std::to_string(ifile) + PHASE2_TMP_EXT;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
     /// Process MPEG-G records of each RefID
@@ -193,12 +207,16 @@ ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
     return ErrorCode::success;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void clean_phase1_files(Config& options, int& nref) {
     for (auto iref = 0; iref < nref; iref++) {
         std::string fpath = options.tmp_dir_path + "/" + std::to_string(iref) + PHASE1_EXT;
         std::remove(fpath.c_str());
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 ErrorCode transcode(Config& options) {
     int nref;
@@ -216,7 +234,13 @@ ErrorCode transcode(Config& options) {
 
     return ErrorCode::success;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace sam_to_mgrec
 }  // namespace sam
 }  // namespace transcoder
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

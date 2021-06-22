@@ -7,22 +7,32 @@
 // #include <htslib/sam.h>
 // #include <genie/format/sam/record.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include "apps/transcoder/sam/sam_to_mgrec/sam_record.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include <algorithm>
-#include <utility>
 #include <string>
-#include "genie/util/runtime-exception.h"
+#include <utility>
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include "genie/core/record/alignment_external/other-rec.h"
 #include "genie/core/record/alignment_split/other-rec.h"
 #include "genie/core/record/alignment_split/same-rec.h"
 #include "genie/core/record/alignment_split/unpaired.h"
+#include "genie/util/runtime-exception.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace transcoder {
 namespace sam {
 namespace sam_to_mgrec {
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 char SamRecord::fourBitBase2Char(uint8_t int_base) {
     switch (int_base) {
@@ -42,6 +52,8 @@ char SamRecord::fourBitBase2Char(uint8_t int_base) {
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::string SamRecord::getCigarString(bam1_t* sam_alignment) {
     auto n_cigar = sam_alignment->core.n_cigar;
     auto cigar_ptr = bam_get_cigar(sam_alignment);
@@ -55,6 +67,8 @@ std::string SamRecord::getCigarString(bam1_t* sam_alignment) {
     return cigar;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::string SamRecord::getSeqString(bam1_t* sam_alignment) {
     auto seq_len = sam_alignment->core.l_qseq;
     auto seq_ptr = bam_get_seq(sam_alignment);
@@ -66,6 +80,8 @@ std::string SamRecord::getSeqString(bam1_t* sam_alignment) {
     return tmp_seq;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::string SamRecord::getQualString(bam1_t* sam_alignment) {
     auto seq_len = sam_alignment->core.l_qseq;
     auto qual_ptr = bam_get_qual(sam_alignment);
@@ -75,6 +91,8 @@ std::string SamRecord::getQualString(bam1_t* sam_alignment) {
     }
     return tmp_qual;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 char SamRecord::convertCigar2ECigarChar(char token) {
     static const auto lut_loc = []() -> std::string {
@@ -96,6 +114,8 @@ char SamRecord::convertCigar2ECigarChar(char token) {
     return ret;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 int SamRecord::stepSequence(char token) {
     static const auto lut_loc = []() -> std::string {
         std::string lut(128, 0);
@@ -113,6 +133,8 @@ int SamRecord::stepSequence(char token) {
     UTILS_DIE_IF(token < 0, "Invalid cigar token " + std::to_string(token));
     return lut_loc[token];
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 std::string SamRecord::convertCigar2ECigar(const std::string& cigar, const std::string& seq) {
     std::string ecigar;
@@ -147,8 +169,12 @@ std::string SamRecord::convertCigar2ECigar(const std::string& cigar, const std::
     return ecigar;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 SamRecord::SamRecord()
     : qname(""), flag(0), rid(0), pos(0), mapq(0), cigar(""), mate_rid(0), mate_pos(0), tlen(0), seq(""), qual("") {}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 SamRecord::SamRecord(bam1_t* sam_alignment)
     : qname(bam_get_qname(sam_alignment)),
@@ -164,79 +190,138 @@ SamRecord::SamRecord(bam1_t* sam_alignment)
       qual(getQualString(sam_alignment))  // Initialized with empty char due to conversion later
 {}
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 const std::string& SamRecord::getQname() { return qname; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 std::string&& SamRecord::moveQname() { return std::move(qname); }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint16_t SamRecord::getFlag() const { return flag; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 int32_t SamRecord::getRID() const { return rid; }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint32_t SamRecord::getPos() const { return pos; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 uint8_t SamRecord::getMapq() const { return mapq; }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 const std::string& SamRecord::getCigar() const { return cigar; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 std::string&& SamRecord::moveCigar() { return std::move(cigar); }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::string SamRecord::getECigar() const { return convertCigar2ECigar(cigar, seq); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 int32_t SamRecord::getMRID() const { return mate_rid; }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint32_t SamRecord::getMPos() const { return mate_pos; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 const std::string& SamRecord::getSeq() const { return seq; }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::string&& SamRecord::moveSeq() { return std::move(seq); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void SamRecord::setSeq(std::string&& _seq) { seq = _seq; }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void SamRecord::setSeq(const std::string& _seq) { seq = _seq; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 const std::string& SamRecord::getQual() const { return qual; }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::string&& SamRecord::moveQual() { return std::move(qual); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void SamRecord::setQual(const std::string& _qual) { qual = _qual; }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool SamRecord::checkFlag(uint16_t _flag) const { return (flag & _flag) == _flag; }  // All must be set
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 bool SamRecord::checkNFlag(uint16_t _flag) const { return (flag & _flag) == 0; }  // All must be unset
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool SamRecord::isUnmapped() const { return checkFlag(BAM_FUNMAP); }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool SamRecord::isMateUnmapped() const { return checkFlag(BAM_FMUNMAP); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 bool SamRecord::isPrimary() const {
     // "... satisfies ‘FLAG& 0x900 == 0’.  This line is called the primary line of the read."
     return checkNFlag(BAM_FSECONDARY | BAM_FSUPPLEMENTARY);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool SamRecord::isSecondary() const { return checkFlag(BAM_FSECONDARY); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 bool SamRecord::isDuplicates() const { return checkFlag(BAM_FDUP); }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool SamRecord::isSupplementary() const { return checkFlag(BAM_FSUPPLEMENTARY); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 bool SamRecord::isPaired() const { return checkFlag(BAM_FPAIRED); }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool SamRecord::isRead1() const { return checkFlag(BAM_FPAIRED | BAM_FREAD1); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 bool SamRecord::isRead2() const { return checkFlag(BAM_FPAIRED | BAM_FREAD2); }
 
-/**
- * SamRecord are correctly oriented with respect to one another,
- * i.e. that one of the mate pairs maps to the forward strand and the other maps to the reverse strand.
- * If the mates don't map in a proper pair, that may mean that both reads map to the forward or reverse strand.
- * This includes that the reads are mapped to the same chromosomes.
- * @return
- */
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool SamRecord::isProperlyPaired() const { return checkFlag(BAM_FPAIRED | BAM_FPROPER_PAIR) && checkNFlag(BAM_FUNMAP); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 bool SamRecord::isPairedAndBothMapped() const { return checkFlag(BAM_FPAIRED) && checkNFlag(BAM_FUNMAP | BAM_FMUNMAP); }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool SamRecord::isReverse() const { return checkFlag(BAM_FREVERSE); }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 bool SamRecord::isPairOf(SamRecord& r) {
     /// Both must be paired-ended
@@ -259,7 +344,12 @@ bool SamRecord::isPairOf(SamRecord& r) {
     return false;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace sam_to_mgrec
 }  // namespace sam
 }  // namespace transcoder
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
