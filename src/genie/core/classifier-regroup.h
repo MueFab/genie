@@ -4,13 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CLASSIFIERREGROUP_H
-#define GENIE_CLASSIFIERREGROUP_H
+#ifndef SRC_GENIE_CORE_CLASSIFIER_REGROUP_H_
+#define SRC_GENIE_CORE_CLASSIFIER_REGROUP_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "classifier.h"
-#include "record/record.h"
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
+#include "genie/core/classifier.h"
+#include "genie/core/record/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,10 +25,10 @@ namespace core {
  *
  */
 class ClassifierRegroup : public Classifier {
-   public:
+ public:
     enum class RefMode { NONE = 0, RELEVANT = 1, FULL = 2 };
 
-   private:
+ private:
     std::vector<record::Chunk> finishedChunks;  //!<
 
     using ClassBlock = std::vector<record::Chunk>;  //!<
@@ -75,7 +79,7 @@ class ClassifierRegroup : public Classifier {
      */
     void queueFinishedChunk(core::record::Chunk& data);
 
-   public:
+ public:
     /**
      *
      * @param ref
@@ -158,7 +162,7 @@ class ClassifierRegroup : public Classifier {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_CLASSIFIERREGROUP_H
+#endif  // SRC_GENIE_CORE_CLASSIFIER_REGROUP_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

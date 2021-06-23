@@ -4,14 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SPRING_ENCODER_H
-#define GENIE_SPRING_ENCODER_H
+#ifndef SRC_GENIE_READ_SPRING_ENCODER_H_
+#define SRC_GENIE_READ_SPRING_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/read-encoder.h>
-#include <genie/core/stats/perf-stats.h>
-#include "preprocess.h"
+#include <string>
+#include "genie/core/read-encoder.h"
+#include "genie/core/stats/perf-stats.h"
+#include "genie/read/spring/preprocess.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,10 +24,10 @@ namespace spring {
  *
  */
 class Encoder : public genie::core::ReadEncoder {
-   private:
+ private:
     Preprocessor preprocessor;  //!<
 
-   public:
+ public:
     /**
      *
      * @param working_dir
@@ -63,7 +64,7 @@ class Encoder : public genie::core::ReadEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ENCODER_H
+#endif  // SRC_GENIE_READ_SPRING_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

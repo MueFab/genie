@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_STREAM_HANDLER_H_
-#define GABAC_STREAM_HANDLER_H_
+#ifndef SRC_GENIE_ENTROPY_GABAC_STREAM_HANDLER_H_
+#define SRC_GENIE_ENTROPY_GABAC_STREAM_HANDLER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ namespace gabac {
  *
  */
 class StreamHandler {
-   public:
+ public:
     /**
      *
      * @param input
@@ -133,7 +133,7 @@ class StreamHandler {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_STREAM_HANDLER_H_
+#endif  // SRC_GENIE_ENTROPY_GABAC_STREAM_HANDLER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

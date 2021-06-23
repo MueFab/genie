@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SPRING_BITSET_UTIL_H_
-#define SPRING_BITSET_UTIL_H_
+#ifndef SRC_GENIE_READ_SPRING_BITSET_UTIL_H_
+#define SRC_GENIE_READ_SPRING_BITSET_UTIL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,7 +20,7 @@
 #include <bitset>
 #include <fstream>
 #include <string>
-#include "params.h"
+#include "genie/read/spring/params.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ typedef boomphf::mphf<uint64_t, hasher_t> boophf_t;
  *
  */
 class bbhashdict {
-   public:
+ public:
     boophf_t *bphf;          //!<
     int start;               //!<
     int end;                 //!<
@@ -150,11 +150,11 @@ void chartobitset(char *s, const int readlen, std::bitset<bitset_size> &b, std::
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "bitset-util.impl.h"
+#include "genie/read/spring/bitset-util.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SPRING_BITSET_UTIL_H_
+#endif  // SRC_GENIE_READ_SPRING_BITSET_UTIL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

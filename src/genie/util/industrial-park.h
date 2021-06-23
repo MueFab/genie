@@ -4,20 +4,20 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_INDUSTRIAL_PARK_H
-#define GENIE_INDUSTRIAL_PARK_H
+#ifndef SRC_GENIE_UTIL_INDUSTRIAL_PARK_H_
+#define SRC_GENIE_UTIL_INDUSTRIAL_PARK_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <functional>
 #include <map>
+#include <memory>
 #include <typeindex>
-
-#include "bitreader.h"
-#include "factory.h"
-#include "generic-factory.h"
-#include "make-unique.h"
-#include "runtime-exception.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/factory.h"
+#include "genie/util/generic-factory.h"
+#include "genie/util/make-unique.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,14 +25,14 @@ namespace genie {
 namespace util {
 
 /**
- *
+ * @brief
  */
 class IndustrialPark {
-   private:
-    std::map<std::type_index, std::unique_ptr<GenericFactory>> factories;  //!<
+ private:
+    std::map<std::type_index, std::unique_ptr<GenericFactory>> factories;  //!< @brief
 
     /**
-     *
+     * @brief
      * @tparam T
      * @return
      */
@@ -40,34 +40,36 @@ class IndustrialPark {
     Factory<T>* findAndCreate();
 
     /**
-     *
+     * @brief
      * @tparam T
      * @return
      */
     template <typename T>
     Factory<T>* findAndFail() const;
 
-   public:
+ public:
     /**
-     *
+     * @brief
      * @tparam T
      * @param id
      * @param constructor
      */
     template <typename T>
-    void registerConstructor(uint8_t id, const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor);
+    void registerConstructor(
+        uint8_t id, const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor);
 
     /**
-     *
+     * @brief
      * @tparam T
      * @param constructor
      * @return
      */
     template <typename T>
-    uint8_t registerConstructor(const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor);
+    uint8_t registerConstructor(
+        const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& constructor);
 
     /**
-     *
+     * @brief
      * @tparam T
      * @param id
      */
@@ -75,9 +77,10 @@ class IndustrialPark {
     void unregisterConstructor(uint8_t id);
 
     /**
-     *
+     * @brief
      * @tparam T
      * @param id
+     * @param desc
      * @param reader
      * @return
      */
@@ -92,11 +95,11 @@ class IndustrialPark {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "industrial-park.impl.h"
+#include "genie/util/industrial-park.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_INDUSTRIAL_PARK_H
+#endif  // SRC_GENIE_UTIL_INDUSTRIAL_PARK_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

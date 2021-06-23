@@ -19,3 +19,5 @@ set(source_files
 add_library(genie-util ${source_files})
 find_package(Threads)
 target_link_libraries(genie-util Threads::Threads)
+get_filename_component(TOP_DIR ../../ ABSOLUTE)
+target_include_directories(genie-util PUBLIC "${TOP_DIR}")

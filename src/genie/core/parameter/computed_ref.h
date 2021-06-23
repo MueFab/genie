@@ -4,19 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_COMPUTED_REF_H
-#define GENIE_COMPUTED_REF_H
+#ifndef SRC_GENIE_CORE_PARAMETER_COMPUTED_REF_H_
+#define SRC_GENIE_CORE_PARAMETER_COMPUTED_REF_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
-
-#include "computed_ref_extended.h"
-
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-
-#include <boost/optional/optional.hpp>
+#include "boost/optional/optional.hpp"
+#include "genie/core/parameter/computed_ref_extended.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,7 +25,7 @@ namespace parameter {
  *
  */
 class ComputedRef {
-   public:
+ public:
     /**
      *
      */
@@ -40,11 +37,11 @@ class ComputedRef {
         GLOBAL_ASSEMBLY = 4
     };
 
-   private:
+ private:
     Algorithm cr_alg_ID;                             //!<
     boost::optional<ComputedRefExtended> extension;  //!<
 
-   public:
+ public:
     /**
      *
      * @param cr
@@ -102,7 +99,7 @@ class ComputedRef {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_COMPUTED_REF_H
+#endif  // SRC_GENIE_CORE_PARAMETER_COMPUTED_REF_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

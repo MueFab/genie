@@ -1,20 +1,27 @@
-#include "program-options.h"
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
-#include <cli11/CLI11.hpp>
-
-#include <genie/util/runtime-exception.h>
+#include "apps/gabac-app/program-options.h"
 #include <cassert>
 #include <fstream>
+#include "cli11/CLI11.hpp"
+#include "genie/util/runtime-exception.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace gabacify {
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 ProgramOptions::ProgramOptions(int argc, char *argv[])
-    : logLevel(), inputFilePath(), outputFilePath(), task(),
-      blocksize(0), descID(0), subseqID(0) {
+    : logLevel(), inputFilePath(), outputFilePath(), task(), blocksize(0), descID(0), subseqID(0) {
     processCommandLine(argc, argv);
 }
 
-ProgramOptions::~ProgramOptions() = default;
+// ---------------------------------------------------------------------------------------------------------------------
 
 void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     CLI::App app{"Gabacify - GABAC entropy encoder application"};
@@ -49,17 +56,22 @@ void ProgramOptions::processCommandLine(int argc, char *argv[]) {
     validate();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 void ProgramOptions::validate() const {
     // Do stuff depending on the task
     if (this->task == "encode" || this->task == "decode") {
-        UTILS_DIE_IF(this->inputFilePath.empty(),
-                     "Input file path both not provided!");
+        UTILS_DIE_IF(this->inputFilePath.empty(), "Input file path both not provided!");
 
-        UTILS_DIE_IF(this->outputFilePath.empty(),
-                     "Output file path both not provided!");
+        UTILS_DIE_IF(this->outputFilePath.empty(), "Output file path both not provided!");
     } else {
         UTILS_DIE("Task '" + this->task + "' is invalid");
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace gabacify
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

@@ -4,8 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "streams.h"
-
+#include "genie/entropy/gabac/streams.h"
 #include <algorithm>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -119,14 +118,6 @@ std::streambuf::pos_type DataBlockBuffer::seekoff(off_type off, std::ios_base::s
         pos = (off < 0 && std::abs(off) > 0) ? 0 : std::min<size_t>(size_t(0) + off, block.size());
     return pos;
 }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-IFileStream::IFileStream(FILE *f) : FileBuffer(f), std::istream(this) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-OFileStream::OFileStream(FILE *f) : FileBuffer(f), std::ostream(this) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

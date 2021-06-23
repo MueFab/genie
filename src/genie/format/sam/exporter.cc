@@ -4,10 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "exporter.h"
-#include <genie/core/constants.h>
-#include <genie/core/record/alignment_split/same-rec.h>
-#include <genie/util/ordered-section.h>
+#include "genie/format/sam/exporter.h"
+#include <string>
+#include <utility>
+#include <vector>
+#include "genie/core/constants.h"
+#include "genie/core/record/alignment_split/same-rec.h"
+#include "genie/util/ordered-section.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -88,8 +91,9 @@ Exporter::Stash Exporter::stashFromMainAlignment(const core::record::AlignmentBo
         ret.qual = rec.getSegments().front().getQualities().front();
     }
     ret.cigar = eCigar2Cigar(alignment.getAlignment().getECigar());
-    ret.mappingScore =
-        alignment.getAlignment().getMappingScores().empty() ? 0 : alignment.getAlignment().getMappingScores().front();
+    ret.mappingScore = alignment.getAlignment().getMappingScores().empty()
+                           ? 0
+                           : (uint8_t)alignment.getAlignment().getMappingScores().front();
     ret.rcomp = alignment.getAlignment().getRComp();
     ret.flags = mpeggFlagsToSamFlags(rec.getFlags(), ret.rcomp);
 
@@ -163,7 +167,7 @@ Exporter::Stash Exporter::stashFromSplitAlignment(const core::record::alignment_
     ret.seq = rec.getSegments()[rec_count].getSequence();
     ret.qual = rec.getSegments()[rec_count].getQualities().front();
     ret.cigar = eCigar2Cigar(split.getAlignment().getECigar());
-    ret.mappingScore = split.getAlignment().getMappingScores().front();
+    ret.mappingScore = (uint8_t)split.getAlignment().getMappingScores().front();
     ret.rcomp = split.getAlignment().getRComp();
     ret.flags = mpeggFlagsToSamFlags(rec.getFlags(), ret.rcomp);
     return ret;
@@ -196,16 +200,16 @@ void Exporter::generateRecords(bool primary, std::vector<Stash>& stash, const co
         }
         std::string name = rec.getName().empty() ? "*" : rec.getName();
         out.emplace_back(name, stash[i].flags, "ref" + std::to_string(rec.getAlignmentSharedData().getSeqID()),
-                         stash[i].position, stash[i].mappingScore, stash[i].cigar, "=", stash[i + 1].position, tlen,
-                         stash[i].seq, stash[i].qual);
+                         (uint32_t)stash[i].position, stash[i].mappingScore, stash[i].cigar, "=",
+                         (uint32_t)stash[i + 1].position, (int32_t)tlen, stash[i].seq, stash[i].qual);
     }
     if (stash.front().rcomp) {
         stash[i].flags |= 32;
     }
     std::string name = rec.getName().empty() ? "*" : rec.getName();
     out.emplace_back(name, stash[i].flags, "ref" + std::to_string(rec.getAlignmentSharedData().getSeqID()),
-                     stash[i].position, stash[i].mappingScore, stash[i].cigar, "=", stash.front().position, -tlen,
-                     stash[i].seq, stash[i].qual);
+                     (uint32_t)stash[i].position, stash[i].mappingScore, stash[i].cigar, "=",
+                     (uint32_t)stash.front().position, (int32_t)-tlen, stash[i].seq, stash[i].qual);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -249,7 +253,7 @@ void Exporter::flowIn(core::record::Chunk&& records, const util::Section& id) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Exporter::flushIn(uint64_t& pos) {}
+void Exporter::flushIn(uint64_t&) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,13 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "access_unit.h"
-#include <genie/core/parameter/parameter_set.h>
-#include <genie/util/bitwriter.h>
-#include <genie/util/data-block.h>
-#include <genie/util/runtime-exception.h>
+#include "genie/format/mgb/access_unit.h"
 #include <map>
 #include <sstream>
+#include <utility>
+#include "genie/core/parameter/parameter_set.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/data-block.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

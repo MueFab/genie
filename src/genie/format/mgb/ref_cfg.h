@@ -4,15 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_REF_CFG_H
-#define GENIE_REF_CFG_H
+#ifndef SRC_GENIE_FORMAT_MGB_REF_CFG_H_
+#define SRC_GENIE_FORMAT_MGB_REF_CFG_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-
 #include <cstdint>
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,13 +23,14 @@ namespace mgb {
  * ISO 23092-2 Section 3.4.1.1 table 19 lines 11 to 15
  */
 class RefCfg {
-   private:
+ private:
     uint16_t ref_sequence_ID;     //!< Line 12
     uint64_t ref_start_position;  //!< Line 13
     uint64_t ref_end_position;    //!< Line 14
 
     uint8_t posSize;  //!< internal
-   public:
+
+ public:
     /**
      *
      * @return
@@ -91,7 +91,7 @@ class RefCfg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_REF_CFG_H
+#endif  // SRC_GENIE_FORMAT_MGB_REF_CFG_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

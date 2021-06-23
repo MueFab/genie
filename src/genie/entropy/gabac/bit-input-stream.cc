@@ -4,10 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "bit-input-stream.h"
-#include <genie/util/data-block.h>
+#include "genie/entropy/gabac/bit-input-stream.h"
 #include <cassert>
 #include <limits>
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -76,7 +76,7 @@ unsigned int BitInputStream::read(unsigned int numBits) {
     // assert(numBits <= 64);
 
     // Bits are extracted from the MSB of each byte
-    unsigned int bits = 0;
+    unsigned int bits{};
     // uint64_t bits = 0;
     if (numBits <= m_numHeldBits) {
         // Get numBits most significant bits from heldBits as bits

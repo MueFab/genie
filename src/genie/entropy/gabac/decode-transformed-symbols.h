@@ -4,14 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GABAC_TRANSFORMED_SYMBOLS_DECODER_H
-#define GABAC_TRANSFORMED_SYMBOLS_DECODER_H
+#ifndef SRC_GENIE_ENTROPY_GABAC_DECODE_TRANSFORMED_SYMBOLS_H_
+#define SRC_GENIE_ENTROPY_GABAC_DECODE_TRANSFORMED_SYMBOLS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "decode-transformed-subseq.h"
-#include "context-selector.h"
-#include "luts-subsymbol-transform.h"
+#include <vector>
+#include "genie/entropy/gabac/context-selector.h"
+#include "genie/entropy/gabac/decode-transformed-subseq.h"
+#include "genie/entropy/gabac/luts-subsymbol-transform.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,34 +21,33 @@ namespace entropy {
 namespace gabac {
 
 /**
- *
+ * @brief
  */
 class TransformedSymbolsDecoder {
-   public:
-
+ public:
     /**
-     *
-     * @param
+     * @brief
+     * @param bitstream
+     * @param trnsfSubseqConf
+     * @param numEncodedSymbols
      */
-    explicit TransformedSymbolsDecoder(util::DataBlock *bitstream,
-                                       const paramcabac::TransformedSubSeq &trnsfSubseqConf,
+    explicit TransformedSymbolsDecoder(util::DataBlock *bitstream, const paramcabac::TransformedSubSeq &trnsfSubseqConf,
                                        const unsigned int numEncodedSymbols);
 
     /**
-     *
-     * @param
+     * @brief
+     * @param trnsfSubseqDecoder
      */
     explicit TransformedSymbolsDecoder(const TransformedSymbolsDecoder &trnsfSubseqDecoder);
 
     /**
-     *
-     * @param
+     * @brief
      */
     ~TransformedSymbolsDecoder() = default;
 
     /**
      * @brief Decodes next symbol. Before invoking this, caller should check availability with symbolsAvail().
-     * @param
+     * @param depSymbol
      * @return
      */
     uint64_t decodeNextSymbol(uint64_t *depSymbol);
@@ -58,50 +58,48 @@ class TransformedSymbolsDecoder {
      */
     size_t symbolsAvail() const;
 
-   private:
+ private:
     /**
      * @brief
-     * @param
      * @return
      */
     uint64_t decodeNextSymbolOrder0();
 
     /**
      * @brief
-     * @param
+     * @param depSymbol
      * @return
      */
     uint64_t decodeNextSymbolOrder1(uint64_t *depSymbol);
 
     /**
      * @brief
-     * @param
      * @return
      */
     uint64_t decodeNextSymbolOrder2();
 
-    unsigned int numEncodedSymbols;
-    unsigned int numDecodedSymbols;
+    unsigned int numEncodedSymbols;  //!< @brief
+    unsigned int numDecodedSymbols;  //!< @brief
 
-    uint8_t outputSymbolSize;
-    uint8_t codingSubsymSize;
-    uint8_t codingOrder;
-    uint64_t subsymMask;
-    uint8_t numSubSyms;
-    uint8_t numLuts;
-    uint8_t numPrvs;
+    uint8_t outputSymbolSize;  //!< @brief
+    uint8_t codingSubsymSize;  //!< @brief
+    uint8_t codingOrder;       //!< @brief
+    uint64_t subsymMask;       //!< @brief
+    uint8_t numSubSyms;        //!< @brief
+    uint8_t numLuts;           //!< @brief
+    uint8_t numPrvs;           //!< @brief
 
-    Reader reader;
-    ContextSelector ctxSelector;
-    LUTsSubSymbolTransform invLutsSubsymTrnsfm;
+    Reader reader;                               //!< @brief
+    ContextSelector ctxSelector;                 //!< @brief
+    LUTsSubSymbolTransform invLutsSubsymTrnsfm;  //!< @brief
 
-    bool diffEnabled;
-    bool customCmaxTU;
-    uint64_t defaultCmax;
+    bool diffEnabled;      //!< @brief
+    bool customCmaxTU;     //!< @brief
+    uint64_t defaultCmax;  //!< @brief
 
-    paramcabac::BinarizationParameters::BinarizationId binID;
-    std::vector<unsigned int> binParams;
-    binFunc binarizor;
+    paramcabac::BinarizationParameters::BinarizationId binID;  //!< @brief
+    std::vector<unsigned int> binParams;                       //!< @brief
+    binFunc binarizor;                                         //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -112,7 +110,7 @@ class TransformedSymbolsDecoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GABAC_TRANSFORMED_SYMBOLS_DECODER_H
+#endif  // SRC_GENIE_ENTROPY_GABAC_DECODE_TRANSFORMED_SYMBOLS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

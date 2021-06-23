@@ -4,12 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_LL_ENCODER_H
-#define GENIE_LL_ENCODER_H
+#ifndef SRC_GENIE_READ_LOWLATENCY_ENCODER_H_
+#define SRC_GENIE_READ_LOWLATENCY_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/read-encoder.h>
+#include <memory>
+#include "genie/core/read-encoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,7 +22,7 @@ namespace lowlatency {
  *
  */
 class Encoder : public core::ReadEncoder {
-   private:
+ private:
     /**
      *
      */
@@ -32,7 +33,7 @@ class Encoder : public core::ReadEncoder {
         bool refOnly;              //!<
     };
 
-   public:
+ public:
     /**
      *
      * @param t
@@ -60,7 +61,7 @@ class Encoder : public core::ReadEncoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ENCODER_H
+#endif  // SRC_GENIE_READ_LOWLATENCY_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

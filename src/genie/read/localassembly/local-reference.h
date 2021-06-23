@@ -4,15 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_LOCAL_REFERENCE_H
-#define GENIE_LOCAL_REFERENCE_H
+#ifndef SRC_GENIE_READ_LOCALASSEMBLY_LOCAL_REFERENCE_H_
+#define SRC_GENIE_READ_LOCALASSEMBLY_LOCAL_REFERENCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/record/record.h>
 #include <limits>
 #include <string>
 #include <vector>
+#include "genie/core/record/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ namespace localassembly {
  *
  */
 class LocalReference {
-   public:
+ public:
     uint32_t cr_buf_max_size;  //!<
 
     std::vector<std::string> sequences;        //!<
@@ -61,7 +61,7 @@ class LocalReference {
      */
     static uint32_t lengthFromCigar(const std::string &cigar);
 
-   public:
+ public:
     /**
      *
      * @param _cr_buf_max_size
@@ -118,7 +118,7 @@ class LocalReference {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_LOCAL_REFERENCE_H
+#endif  // SRC_GENIE_READ_LOCALASSEMBLY_LOCAL_REFERENCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,9 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "binarization_parameters.h"
-#include <genie/util/bitwriter.h>
-#include <genie/util/runtime-exception.h>
+#include "genie/entropy/paramcabac/binarization_parameters.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -16,8 +16,7 @@ namespace paramcabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-BinarizationParameters::BinarizationParameters()
-    : BinarizationParameters(BinarizationId::BI, std::vector<uint8_t>()) {}
+BinarizationParameters::BinarizationParameters() : BinarizationParameters(BinarizationId::BI, std::vector<uint8_t>()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -111,8 +110,7 @@ uint8_t BinarizationParameters::getSplitUnitSize() const { return split_unit_siz
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t BinarizationParameters::numParams[unsigned(BinarizationId::SDTU) + 1u] = {
-    0, 1, 0, 0, 1, 1, 1, 1, 2, 2};
+uint8_t BinarizationParameters::numParams[unsigned(BinarizationId::SDTU) + 1u] = {0, 1, 0, 0, 1, 1, 1, 1, 2, 2};
 
 uint8_t BinarizationParameters::getNumBinarizationParams(BinarizationParameters::BinarizationId binarzationId) {
     return BinarizationParameters::numParams[uint8_t(binarzationId)];

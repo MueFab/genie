@@ -4,8 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "exporter.h"
-#include <genie/util/ordered-section.h>
+#include "genie/format/mgrec/exporter.h"
+#include <utility>
+#include "genie/util/ordered-section.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -4,15 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ALIGNMENT_EXTERNAL_H
-#define GENIE_ALIGNMENT_EXTERNAL_H
+#ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_EXTERNAL_H_
+#define SRC_GENIE_CORE_RECORD_ALIGNMENT_EXTERNAL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
 #include <cstdint>
 #include <memory>
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ namespace record {
  *
  */
 class AlignmentExternal {
-   public:
+ public:
     /**
      *
      */
@@ -60,7 +60,7 @@ class AlignmentExternal {
      */
     virtual std::unique_ptr<AlignmentExternal> clone() const = 0;
 
-   protected:
+ protected:
     Type moreAlignmentInfoType;  //!<
 };
 
@@ -72,7 +72,7 @@ class AlignmentExternal {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ALIGNMENT_EXTERNAL_H
+#endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_EXTERNAL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,15 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CODEBOOK_H
-#define GENIE_CODEBOOK_H
+#ifndef SRC_GENIE_QUALITY_PARAMQV1_CODEBOOK_H_
+#define SRC_GENIE_QUALITY_PARAMQV1_CODEBOOK_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
 #include <cstdint>
 #include <vector>
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,10 +24,10 @@ namespace paramqv1 {
  *
  */
 class Codebook {
-   private:
+ private:
     std::vector<uint8_t> qv_recon;  //!<
 
-   public:
+ public:
     /**
      *
      * @param ps
@@ -80,7 +80,7 @@ class Codebook {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_CODEBOOK_H
+#endif  // SRC_GENIE_QUALITY_PARAMQV1_CODEBOOK_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

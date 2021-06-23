@@ -4,19 +4,20 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_FLOWGRAPH_ENCODE_H
-#define GENIE_FLOWGRAPH_ENCODE_H
+#ifndef SRC_GENIE_CORE_FLOWGRAPH_ENCODE_H_
+#define SRC_GENIE_CORE_FLOWGRAPH_ENCODE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/thread-manager.h>
-
-#include "entropy-encoder.h"
-#include "flowgraph.h"
-#include "format-exporter-compressed.h"
-#include "format-importer.h"
-#include "read-encoder.h"
-#include "reference-source.h"
+#include <memory>
+#include <vector>
+#include "genie/core/entropy-encoder.h"
+#include "genie/core/flowgraph.h"
+#include "genie/core/format-exporter-compressed.h"
+#include "genie/core/format-importer.h"
+#include "genie/core/read-encoder.h"
+#include "genie/core/reference-source.h"
+#include "genie/util/thread-manager.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -53,7 +54,7 @@ class FlowGraphEncode : public FlowGraph {
     std::vector<std::unique_ptr<genie::core::FormatExporterCompressed>> exporters;  //!<
     genie::util::SelectorHead<genie::core::AccessUnit> exporterSelector;            //!<
 
-   public:
+ public:
     /**
      *
      * @param threads
@@ -211,7 +212,7 @@ class FlowGraphEncode : public FlowGraph {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_FLOWGRAPH_ENCODE_H
+#endif  // SRC_GENIE_CORE_FLOWGRAPH_ENCODE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

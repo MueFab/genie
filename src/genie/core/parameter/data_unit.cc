@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "data_unit.h"
+#include "genie/core/parameter/data_unit.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

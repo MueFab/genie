@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_THREAD_MANAGER_H
-#define GENIE_THREAD_MANAGER_H
+#ifndef SRC_GENIE_UTIL_THREAD_MANAGER_H_
+#define SRC_GENIE_UTIL_THREAD_MANAGER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -13,8 +13,7 @@
 #include <mutex>
 #include <thread>
 #include <vector>
-
-#include "original-source.h"
+#include "genie/util/original-source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +24,7 @@ namespace util {
  * @brief Allows to run the genie pipeline with multiple threads.
  */
 class ThreadManager {
-   private:
+ private:
     uint64_t counter;                  //!< @brief Identifier for next block.
     std::vector<std::thread> threads;  //!< @brief Storage for all the threads.
     std::atomic<bool> stopFlag;        //!< @brief Threads will stop after current block when set.
@@ -38,7 +37,7 @@ class ThreadManager {
      */
     void action(size_t id);
 
-   public:
+ public:
     static thread_local size_t threadID;   //!< @brief Each thread will see its own ID here
     static thread_local size_t threadNum;  //!< @brief Each thread will see the number of threads here.
 
@@ -81,7 +80,7 @@ class ThreadManager {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_THREAD_MANAGER_H
+#endif  // SRC_GENIE_UTIL_THREAD_MANAGER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

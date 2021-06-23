@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_FAI_FILE_H
-#define GENIE_FAI_FILE_H
+#ifndef SRC_GENIE_FORMAT_FASTA_FAI_FILE_H_
+#define SRC_GENIE_FORMAT_FASTA_FAI_FILE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ namespace fasta {
  *
  */
 class FaiFile {
-   public:
+ public:
     /**
      *
      */
@@ -91,7 +91,7 @@ class FaiFile {
      */
     uint64_t getLength(const std::string& seq) const;
 
-   private:
+ private:
     std::map<std::string, FaiSequence> seqs;  //!<
 
     friend std::ostream& operator<<(std::ostream& stream, const FaiFile& file);
@@ -121,7 +121,7 @@ std::ostream& operator<<(std::ostream& stream, const FaiFile& file);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_FAI_FILE_H
+#endif  // SRC_GENIE_FORMAT_FASTA_FAI_FILE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

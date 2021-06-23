@@ -4,16 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "reader.h"
-
-#include "context-tables.h"
+#include "genie/entropy/gabac/reader.h"
+#include "genie/entropy/gabac/context-tables.h"
 
 //
 // #include binary-arithmetic-decoder.cc from here instead of compiling it
 // separately, so that we may call inlined member functions of class
 // BinaryArithmeticDecoder in this file.
 //
-#include "binary-arithmetic-decoder.cc"
+#include "genie/entropy/gabac/binary-arithmetic-decoder.cc"  // NOLINT
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +22,7 @@ namespace gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Reader::Reader(util::DataBlock *const bitstream, const bool bypassFlag, const unsigned long numContexts)
+Reader::Reader(util::DataBlock *bitstream, const bool bypassFlag, uint64_t numContexts)
     : m_bitInputStream(bitstream),
       m_decBinCabac(m_bitInputStream),
       m_bypassFlag(bypassFlag),
@@ -61,10 +60,8 @@ uint64_t Reader::readAsBIcabac(const std::vector<unsigned int> binParams) {
 uint64_t Reader::readAsTUbypass(const std::vector<unsigned int> binParams) {
     unsigned int i = 0;
     const unsigned int cMax = binParams[0];
-    uint8_t b = 0;
     while (i < cMax) {
-        b = m_decBinCabac.decodeBinsEP(1);
-        if (b == 0) break;
+        if (m_decBinCabac.decodeBinsEP(1) == 0) break;
         i++;
     }
     return static_cast<uint64_t>(i);
@@ -77,10 +74,8 @@ uint64_t Reader::readAsTUcabac(const std::vector<unsigned int> binParams) {
     unsigned int cm = binParams[3];
     const unsigned int cMax = binParams[0];
     auto scan = m_contextModels.begin() + cm;
-    uint8_t b = 0;
     while (i < cMax) {
-        b = m_decBinCabac.decodeBin(&*scan);
-        if (b == 0) break;
+        if (m_decBinCabac.decodeBin(&*scan) == 0) break;
         i++;
         scan++;
     }
@@ -217,7 +212,7 @@ uint64_t Reader::readAsDTUcabac(const std::vector<unsigned int> binParams) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t Reader::readLutSymbol(const uint8_t codingSubsymSize) {
-    std::vector<unsigned int> binParams({codingSubsymSize, 2, 0, 0}); // ctxIdx = 0
+    std::vector<unsigned int> binParams({codingSubsymSize, 2, 0, 0});  // ctxIdx = 0
     return readAsSUTUcabac(binParams);
 }
 
@@ -226,9 +221,10 @@ uint64_t Reader::readLutSymbol(const uint8_t codingSubsymSize) {
 bool Reader::readSignFlag() {
     std::vector<unsigned int> binParams({1});
     if (m_bypassFlag)
-        return (bool)readAsBIbypass(std::vector<unsigned int>({1}));
+        return static_cast<bool>(readAsBIbypass(std::vector<unsigned int>({1})));
     else
-        return (bool)readAsBIcabac(std::vector<unsigned int>({1, 0, 0, static_cast<unsigned int>(m_numContexts - 1)}));
+        return static_cast<bool>(
+            readAsBIcabac(std::vector<unsigned int>({1, 0, 0, static_cast<unsigned int>(m_numContexts - 1)})));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

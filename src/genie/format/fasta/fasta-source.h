@@ -4,17 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_FASTA_SOURCE_H
-#define GENIE_FASTA_SOURCE_H
+#ifndef SRC_GENIE_FORMAT_FASTA_FASTA_SOURCE_H_
+#define SRC_GENIE_FORMAT_FASTA_FASTA_SOURCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/reference-manager.h>
-#include <genie/util/ordered-lock.h>
-#include <genie/util/original-source.h>
-#include <genie/util/source.h>
-
+#include <map>
 #include <string>
+#include "genie/core/reference-manager.h"
+#include "genie/util/ordered-lock.h"
+#include "genie/util/original-source.h"
+#include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,14 +26,14 @@ namespace fasta {
  *
  */
 class FastaSource : public util::OriginalSource, public util::Source<std::string> {
-   private:
+ private:
     std::ostream* outfile;                       //!<
     util::OrderedLock outlock;                   //!<
     core::ReferenceManager* refMgr;              //!<
     std::map<std::string, size_t> accu_lengths;  //!<
     size_t line_length;                          //!<
 
-   public:
+ public:
     /**
      *
      * @param _outfile
@@ -64,7 +64,7 @@ class FastaSource : public util::OriginalSource, public util::Source<std::string
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_FASTA_SOURCE_H
+#endif  // SRC_GENIE_FORMAT_FASTA_FASTA_SOURCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

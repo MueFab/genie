@@ -4,14 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DATA_UNIT_H
-#define GENIE_DATA_UNIT_H
+#ifndef SRC_GENIE_CORE_PARAMETER_DATA_UNIT_H_
+#define SRC_GENIE_CORE_PARAMETER_DATA_UNIT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitwriter.h>
-
 #include <cstdint>
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +31,7 @@ namespace parameter {
  *
  */
 class DataUnit {
-   public:
+ public:
     /**
      *
      */
@@ -43,10 +42,10 @@ class DataUnit {
      */
     enum class DatasetType : uint8_t { NON_ALIGNED = 0, ALIGNED = 1, REFERENCE = 2 };
 
-   private:
+ private:
     DataUnitType data_unit_type;  //!<
 
-   public:
+ public:
     /**
      *
      * @param t
@@ -79,7 +78,7 @@ class DataUnit {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DATA_UNIT_H
+#endif  // SRC_GENIE_CORE_PARAMETER_DATA_UNIT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

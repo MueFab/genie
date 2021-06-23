@@ -4,8 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "parameter_set.h"
-#include <genie/util/bitwriter.h>
+#include "genie/quality/paramqv1/parameter_set.h"
+#include <utility>
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

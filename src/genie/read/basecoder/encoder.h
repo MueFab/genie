@@ -4,19 +4,19 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_R_ENCODER_H
-#define GENIE_R_ENCODER_H
+#ifndef SRC_GENIE_READ_BASECODER_ENCODER_H_
+#define SRC_GENIE_READ_BASECODER_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <array>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
-
-#include <genie/core/access-unit.h>
-#include <genie/core/record/alignment_split/same-rec.h>
-#include <genie/core/record/record.h>
+#include "genie/core/access-unit.h"
+#include "genie/core/record/alignment_split/same-rec.h"
+#include "genie/core/record/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ namespace basecoder {
  *
  */
 class Encoder {
-   private:
+ private:
     core::AccessUnit container;  //!<
     int32_t pos;                 //!<
     uint32_t readCounter;        //!<
@@ -166,12 +166,12 @@ class Encoder {
      */
     const core::record::alignment_split::SameRec &extractPairedAlignment(const core::record::Record &rec) const;
 
-   public:
+ public:
     /**
      *
      * @param startingMappingPos
      */
-    explicit Encoder(uint64_t startingMappingPos);
+    explicit Encoder(int32_t startingMappingPos);
 
     /**
      *
@@ -196,7 +196,7 @@ class Encoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ENCODER_H
+#endif  // SRC_GENIE_READ_BASECODER_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

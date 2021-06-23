@@ -4,12 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "encoder.h"
-
-#include <genie/quality/paramqv1/qv_coding_config_1.h>
-#include <genie/util/watch.h>
-
+#include "genie/read/localassembly/encoder.h"
+#include <algorithm>
 #include <iostream>
+#include <limits>
+#include <memory>
+#include <string>
+#include <utility>
+#include "genie/quality/paramqv1/qv_coding_config_1.h"
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,8 +23,8 @@ namespace localassembly {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Encoder::LaeState::LaeState(size_t cr_buf_max_size, uint64_t startingPos)
-    : refCoder(cr_buf_max_size),
-      readCoder(startingPos),
+    : refCoder((uint32_t)cr_buf_max_size),
+      readCoder((int32_t)startingPos),
       pairedEnd(false),
       readLength(0),
       classType(core::record::ClassType::NONE),
@@ -54,7 +57,7 @@ void Encoder::printDebug(const Encoder::LaeState& state, const std::string& ref1
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Encoder::updateAssembly(const core::record::Record& r, Encoder::LaeState& state) const {
-    std::string ref1 = state.refCoder.getReference(r.getAlignments().front().getPosition(),
+    std::string ref1 = state.refCoder.getReference((uint32_t)r.getAlignments().front().getPosition(),
                                                    r.getAlignments().front().getAlignment().getECigar());
     std::string ref2;
 
@@ -62,7 +65,7 @@ void Encoder::updateAssembly(const core::record::Record& r, Encoder::LaeState& s
                        state);
     if (state.pairedEnd) {
         const auto& srec = getPairedAlignment(state, r);
-        ref2 = state.refCoder.getReference(r.getAlignments().front().getPosition() + srec.getDelta(),
+        ref2 = state.refCoder.getReference((uint32_t)(r.getAlignments().front().getPosition() + srec.getDelta()),
                                            srec.getAlignment().getECigar());
         updateAUBoundaries(r.getAlignments().front().getPosition() + srec.getDelta(), srec.getAlignment().getECigar(),
                            state);
@@ -110,8 +113,8 @@ core::AccessUnit Encoder::pack(size_t id, uint16_t ref, uint8_t qv_depth,
                                std::unique_ptr<core::parameter::QualityValues> qvparam, core::record::ClassType type,
                                Encoder::LaeState& state) const {
     core::parameter::DataUnit::DatasetType dataType = core::parameter::DataUnit::DatasetType::ALIGNED;
-    core::parameter::ParameterSet ret(id, id, dataType, core::AlphabetID::ACGTN, state.readLength, state.pairedEnd,
-                                      false, qv_depth, 0, false, false);
+    core::parameter::ParameterSet ret((uint8_t)id, (uint8_t)id, dataType, core::AlphabetID::ACGTN,
+                                      (uint32_t)state.readLength, state.pairedEnd, false, qv_depth, 0, false, false);
     ret.addClass(type, std::move(qvparam));
     auto crps = core::parameter::ComputedRef(core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY);
     crps.setExtension(core::parameter::ComputedRefExtended(0, cr_buf_max_size));
@@ -152,9 +155,10 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     size_t read_num = 0;
     for (auto& r : data.getData()) {
         read_num += r.getSegments().size();
-        uint64_t curPos = r.isRead1First() ? r.getAlignments().front().getPosition() : r.getAlignments().front().getPosition() + getPairedAlignment(state, r).getDelta();
-        UTILS_DIE_IF(curPos < lastPos,
-                     "Data seems to be unsorted. Local assembly encoding needs sorted input data.");
+        uint64_t curPos = r.isRead1First()
+                              ? r.getAlignments().front().getPosition()
+                              : r.getAlignments().front().getPosition() + getPairedAlignment(state, r).getDelta();
+        UTILS_DIE_IF(curPos < lastPos, "Data seems to be unsorted. Local assembly encoding needs sorted input data.");
 
         lastPos = r.getAlignments().front().getPosition();
 

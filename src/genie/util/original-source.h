@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ORIGINAL_SOURCE_H
-#define GENIE_ORIGINAL_SOURCE_H
+#ifndef SRC_GENIE_UTIL_ORIGINAL_SOURCE_H_
+#define SRC_GENIE_UTIL_ORIGINAL_SOURCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ namespace util {
  * @brief Implementing this interface signals the ability to introduce new data into the application without any input
  */
 class OriginalSource {
-   public:
+ public:
     /**
      *
      * @param id
@@ -48,7 +48,7 @@ class OriginalSource {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ORIGINAL_SOURCE_H
+#endif  // SRC_GENIE_UTIL_ORIGINAL_SOURCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

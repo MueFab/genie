@@ -4,18 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_R_DECODER_H
-#define GENIE_R_DECODER_H
+#ifndef SRC_GENIE_READ_BASECODER_DECODER_H_
+#define SRC_GENIE_READ_BASECODER_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <string>
-#include <vector>
-
-#include <genie/core/access-unit.h>
-#include <genie/core/record/record.h>
-#include <qv-decoder.h>
 #include <memory>
+#include <string>
+#include <tuple>
+#include <vector>
+#include "genie/core/access-unit.h"
+#include "genie/core/qv-decoder.h"
+#include "genie/core/record/record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ namespace basecoder {
  *
  */
 class Decoder {
-   private:
+ private:
     core::AccessUnit container;  //!<
     uint64_t position;           //!<
     uint64_t length;             //!<
@@ -36,7 +36,7 @@ class Decoder {
 
     size_t number_template_segments;  //!<
 
-   public:
+ public:
     /**
      *
      * @param au
@@ -59,14 +59,6 @@ class Decoder {
     struct SegmentMeta {
         uint64_t position;  //!<
         uint64_t length;    //!<
-    };
-
-    /**
-     *
-     */
-    struct SegmentDecoded {
-        core::record::Record record;  //!<
-        uint64_t length;              //!<
     };
 
     /**
@@ -140,7 +132,7 @@ class Decoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DECODER_H
+#endif  // SRC_GENIE_READ_BASECODER_DECODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

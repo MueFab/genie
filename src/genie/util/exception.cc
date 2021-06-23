@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "exception.h"
+#include "genie/util/exception.h"
+#include <utility>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

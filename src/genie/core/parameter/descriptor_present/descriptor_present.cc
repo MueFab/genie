@@ -4,12 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <genie/util/make-unique.h>
-
-#include <global-cfg.h>
-#include "decoder-regular.h"
-#include "decoder-tokentype.h"
-#include "descriptor_present.h"
+#include "genie/core/parameter/descriptor_present/descriptor_present.h"
+#include <memory>
+#include <utility>
+#include "genie/core/global-cfg.h"
+#include "genie/core/parameter/descriptor_present/decoder-regular.h"
+#include "genie/core/parameter/descriptor_present/decoder-tokentype.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -29,9 +30,11 @@ DescriptorPresent::DescriptorPresent() : Descriptor(PRESENT), decoder_configurat
 DescriptorPresent::DescriptorPresent(GenDesc desc, util::BitReader &reader) : Descriptor(PRESENT) {
     auto mode = reader.read<uint8_t>();
     if (desc == GenDesc::MSAR || desc == GenDesc::RNAME) {
-        decoder_configuration = GlobalCfg::getSingleton().getIndustrialPark().construct<DecoderTokentype>(mode, desc, reader);
+        decoder_configuration =
+            GlobalCfg::getSingleton().getIndustrialPark().construct<DecoderTokentype>(mode, desc, reader);
     } else {
-        decoder_configuration = GlobalCfg::getSingleton().getIndustrialPark().construct<DecoderRegular>(mode, desc, reader);
+        decoder_configuration =
+            GlobalCfg::getSingleton().getIndustrialPark().construct<DecoderRegular>(mode, desc, reader);
     }
 }
 

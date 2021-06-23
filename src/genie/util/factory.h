@@ -4,55 +4,57 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_FACTORY_H
-#define GENIE_FACTORY_H
+#ifndef SRC_GENIE_UTIL_FACTORY_H_
+#define SRC_GENIE_UTIL_FACTORY_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <map>
 #include <memory>
-#include "generic-factory.h"
-#include <genie/core/constants.h>
+#include "genie/core/constants.h"
+#include "genie/util/generic-factory.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace util {
 
-using namespace genie::core;
-
 /**
- *
+ * @brief
  * @tparam T
  */
 template <typename T>
 class Factory : public GenericFactory {
-   private:
-    std::map<uint8_t, std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>> factories;  //!<
+ private:
+    std::map<uint8_t, std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>>
+        factories;  //!< @brief
 
-   public:
+ public:
     /**
-     *
+     * @brief
      * @param id
      * @param factory
      */
-    void registerType(uint8_t id, const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& factory);
+    void registerType(uint8_t id,
+                      const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& factory);
 
     /**
-     *
+     * @brief
      * @param factory
      * @return
      */
     uint8_t registerType(const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& factory);
 
     /**
-     *
+     * @brief
      * @param id
      */
     void unregisterType(uint8_t id);
 
     /**
-     *
+     * @brief
      * @param id
+     * @param desc
      * @param reader
      * @return
      */
@@ -66,11 +68,11 @@ class Factory : public GenericFactory {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "factory.impl.h"
+#include "genie/util/factory.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_FACTORY_H
+#endif  // SRC_GENIE_UTIL_FACTORY_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

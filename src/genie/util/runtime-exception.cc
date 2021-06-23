@@ -4,7 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "runtime-exception.h"
+#include "genie/util/runtime-exception.h"
+#include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -1,5 +1,10 @@
-#include "code.h"
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
+#include "apps/gabac-app/code.h"
 #include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -10,17 +15,17 @@
 #include <limits>
 #include <utility>
 #include <vector>
+#include "genie/core/constants.h"
+#include "genie/entropy/gabac/gabac.h"
 
-#include <genie/core/constants.h>
-#include <genie/entropy/gabac/gabac.h>
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace gabacify {
 
-//------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 
-void code(const std::string &inputFilePath,
-          const std::string &outputFilePath, size_t blocksize, uint8_t descID, uint8_t subseqID, bool decode,
-          const std::string &dependencyFilePath) {
+void code(const std::string &inputFilePath, const std::string &outputFilePath, size_t blocksize, uint8_t descID,
+          uint8_t subseqID, bool decode, const std::string &dependencyFilePath) {
     std::ifstream inputFile;
     std::ifstream dependencyFile;
     std::ofstream outputFile;
@@ -66,7 +71,10 @@ void code(const std::string &inputFilePath,
     genie::core::GenSubIndex genieSubseqID =
         (genie::core::GenSubIndex)std::pair<genie::core::GenDesc, uint8_t>((genie::core::GenDesc)descID, subseqID);
 
-    genie::entropy::gabac::run(ioconf, genie::entropy::gabac::getEncoderConfigManual(genieSubseqID), decode);
+    genie::entropy::gabac::run(
+        ioconf,
+        genie::entropy::gabac::EncodingConfiguration(genie::entropy::gabac::getEncoderConfigManual(genieSubseqID)),
+        decode);
 
     /* GABACIFY_LOG_INFO << "Wrote buffer of size "
                       << outStream.bytesWritten()
@@ -74,9 +82,9 @@ void code(const std::string &inputFilePath,
                       << outputFilePath;*/
 }
 
-//------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace gabacify
 
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

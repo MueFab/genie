@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "spring-encoding.h"
+#include "genie/read/spring/spring-encoding.h"
 #include <algorithm>
 #include <array>
 #include <bitset>
@@ -28,7 +28,7 @@ namespace spring {
 
 std::string buildcontig(std::list<contig_reads> &current_contig, const uint32_t &list_size) {
     static const char longtochar[5] = {'A', 'C', 'G', 'T', 'N'};
-    static const long chartolong[128] = {
+    static const int64_t chartolong[128] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -37,11 +37,11 @@ std::string buildcontig(std::list<contig_reads> &current_contig, const uint32_t 
     if (list_size == 1) return (current_contig.front()).read;
     auto current_contig_it = current_contig.begin();
     int64_t currentpos = 0, currentsize = 0, to_insert;
-    std::vector<std::array<long, 4>> count;
+    std::vector<std::array<int64_t, 4>> count;
     for (; current_contig_it != current_contig.end(); ++current_contig_it) {
-        if (current_contig_it == current_contig.begin())  // first read
+        if (current_contig_it == current_contig.begin()) {  // first read
             to_insert = (*current_contig_it).read_length;
-        else {
+        } else {
             currentpos = (*current_contig_it).pos;
             if (currentpos + (*current_contig_it).read_length > currentsize)
                 to_insert = currentpos + (*current_contig_it).read_length - currentsize;
@@ -50,13 +50,13 @@ std::string buildcontig(std::list<contig_reads> &current_contig, const uint32_t 
         }
         count.insert(count.end(), to_insert, {0, 0, 0, 0});
         currentsize = currentsize + to_insert;
-        for (long i = 0; i < (*current_contig_it).read_length; i++)
+        for (int64_t i = 0; i < (*current_contig_it).read_length; i++)
             count[currentpos + i][chartolong[(uint8_t)(*current_contig_it).read[i]]] += 1;
     }
     std::string ref(count.size(), 'A');
     for (size_t i = 0; i < count.size(); i++) {
-        long max = 0, indmax = 0;
-        for (long j = 0; j < 4; j++)
+        int64_t max = 0, indmax = 0;
+        for (int64_t j = 0; j < 4; j++)
             if (count[i][j] > max) {
                 max = count[i][j];
                 indmax = j;
@@ -73,25 +73,25 @@ void writecontig(const std::string &ref, std::list<contig_reads> &current_contig
                  std::ofstream &f_RC, std::ofstream &f_readlength, uint64_t &abs_pos) {
     f_seq << ref;
     uint16_t pos_var;
-    long prevj = 0;
+    int64_t prevj = 0;
     auto current_contig_it = current_contig.begin();
-    long currentpos;
+    int64_t currentpos;
     uint64_t abs_current_pos;
     for (; current_contig_it != current_contig.end(); ++current_contig_it) {
-        currentpos = (*current_contig_it).pos;
+        currentpos = (int64_t)(*current_contig_it).pos;
         prevj = 0;
-        for (long j = 0; j < (*current_contig_it).read_length; j++)
+        for (int64_t j = 0; j < (*current_contig_it).read_length; j++)
             if ((*current_contig_it).read[j] != ref[currentpos + j]) {
                 f_noise << (*current_contig_it).read[j];
-                pos_var = j - prevj;
-                f_noisepos.write((char *)&pos_var, sizeof(uint16_t));
+                pos_var = (uint16_t)(j - prevj);
+                f_noisepos.write(reinterpret_cast<char *>(&pos_var), sizeof(uint16_t));
                 prevj = j;
             }
         f_noise << "\n";
         abs_current_pos = abs_pos + currentpos;
-        f_pos.write((char *)&abs_current_pos, sizeof(uint64_t));
-        f_order.write((char *)&((*current_contig_it).order), sizeof(uint32_t));
-        f_readlength.write((char *)&((*current_contig_it).read_length), sizeof(uint16_t));
+        f_pos.write(reinterpret_cast<char *>(&abs_current_pos), sizeof(uint64_t));
+        f_order.write(reinterpret_cast<char *>(&((*current_contig_it).order)), sizeof(uint32_t));
+        f_readlength.write(reinterpret_cast<char *>(&((*current_contig_it).read_length)), sizeof(uint16_t));
         f_RC << (*current_contig_it).RC;
     }
     abs_pos += ref.size();
@@ -105,11 +105,12 @@ void getDataParams(encoder_global &eg, const compression_params &cp) {
     numreads_clean = cp.num_reads_clean[0] + cp.num_reads_clean[1];
     numreads_total = cp.num_reads;
 
-    std::ifstream myfile_s(eg.infile + ".singleton", std::ifstream::in);
-    eg.numreads_s = 0;
-    std::string line;
-    while (std::getline(myfile_s, line)) ++eg.numreads_s;
-    myfile_s.close();
+    std::ifstream myfile_s_count(eg.infile + ".singleton" + ".count", std::ifstream::in | std::ios::binary);
+    myfile_s_count.read(reinterpret_cast<char *>(&eg.numreads_s), sizeof(uint32_t));
+    myfile_s_count.close();
+    std::string file_s_count = eg.infile + ".singleton" + ".count";
+    remove(file_s_count.c_str());
+
     eg.numreads = numreads_clean - eg.numreads_s;
     eg.numreads_N = numreads_total - numreads_clean;
 
@@ -147,11 +148,11 @@ void correct_order(uint32_t *order_s, const encoder_global &eg) {
         std::ifstream fin_order(eg.infile_order + '.' + std::to_string(tid), std::ios::binary);
         std::ofstream fout_order(eg.infile_order + '.' + std::to_string(tid) + ".tmp", std::ios::binary);
         uint32_t pos;
-        fin_order.read((char *)&pos, sizeof(uint32_t));
+        fin_order.read(reinterpret_cast<char *>(&pos), sizeof(uint32_t));
         while (!fin_order.eof()) {
             pos += cumulative_N_reads[pos];
-            fout_order.write((char *)&pos, sizeof(uint32_t));
-            fin_order.read((char *)&pos, sizeof(uint32_t));
+            fout_order.write(reinterpret_cast<char *>(&pos), sizeof(uint32_t));
+            fin_order.read(reinterpret_cast<char *>(&pos), sizeof(uint32_t));
         }
         fin_order.close();
         fout_order.close();

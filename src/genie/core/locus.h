@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_LOCUS_H
-#define GENIE_LOCUS_H
+#ifndef SRC_GENIE_CORE_LOCUS_H_
+#define SRC_GENIE_CORE_LOCUS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,13 +20,13 @@ namespace core {
  * @brief Refers to a specific position in the genome
  */
 class Locus {
-   private:
+ private:
     std::string refName;  //! @brief Reference sequence / chromosome name
     bool posPresent;      //! @brief If false, no assumptions can be made about start and end
     uint32_t start;       //! @brief First base included in the locus
     uint32_t end;         //! @brief First base not included in the locus
 
-   public:
+ public:
     /**
      * @brief Getter for reference name
      * @return refName
@@ -86,7 +86,7 @@ class Locus {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_LOCUS_H
+#endif  // SRC_GENIE_CORE_LOCUS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,10 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "binary-arithmetic-decoder.h"
+#include "genie/entropy/gabac/binary-arithmetic-decoder.h"
 #include <cassert>
-#include "bit-input-stream.h"
-#include "cabac-tables.h"
+#include "genie/entropy/gabac/bit-input-stream.h"
+#include "genie/entropy/gabac/cabac-tables.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -104,10 +104,9 @@ void BinaryArithmeticDecoder::decodeBinTrm() {
         // bin = 1;
     } else {
         // bin = 0;
-        if (scaledRange < (256u << 7u))  // spec: ivlCurrRange < 256
-        {
-            m_range = scaledRange >> 6u;  // spec: ivlCurrRange << 1
-            m_value <<= 1;                // spec: ivlOffset = ivlOffset << 1
+        if (scaledRange < (256u << 7u)) {  // spec: ivlCurrRange < 256
+            m_range = scaledRange >> 6u;   // spec: ivlCurrRange << 1
+            m_value <<= 1;                 // spec: ivlOffset = ivlOffset << 1
             if (++m_numBitsNeeded == 0) {
                 m_numBitsNeeded = -8;
                 m_value += m_bitInputStream.readByte();

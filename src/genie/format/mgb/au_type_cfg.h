@@ -4,17 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_AU_TYPE_CFG_H
-#define GENIE_AU_TYPE_CFG_H
+#ifndef SRC_GENIE_FORMAT_MGB_AU_TYPE_CFG_H_
+#define SRC_GENIE_FORMAT_MGB_AU_TYPE_CFG_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
-
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
-#include <boost/optional/optional.hpp>
-#include "extended_au.h"
+#include "boost/optional/optional.hpp"
+#include "genie/format/mgb/extended_au.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +25,7 @@ namespace mgb {
  *
  */
 class AuTypeCfg {
-   private:
+ private:
     uint16_t sequence_ID;                     //!<
     uint64_t AU_start_position;               //!<
     uint64_t AU_end_position;                 //!<
@@ -34,7 +33,7 @@ class AuTypeCfg {
 
     uint8_t posSize;  //!< internal
 
-   public:
+ public:
     /**
      *
      * @param _sequence_ID
@@ -102,6 +101,6 @@ class AuTypeCfg {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_AU_TYPE_CFG_H
+#endif  // SRC_GENIE_FORMAT_MGB_AU_TYPE_CFG_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
