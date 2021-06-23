@@ -4,9 +4,9 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/format/mpegg_p1/util.h"
-#include <string>
-#include <utility>
+#include "genie/format/mpegg_p1/reference/reference_location/external_reference/md5.h"
+#include "genie/util/exception.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -16,34 +16,39 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string &&readKey(util::BitReader &reader) {
-    std::string &&key = "XXXX";
-    for (uint8_t i = 0; i < (uint8_t)key.size(); i++) {
-        auto c = reader.read<uint8_t>();
-        key[i] = c;
+Md5::Md5() : Checksum(Checksum::Algo::MD5) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Md5::Md5(util::BitReader& reader) : Md5() {
+    for (size_t i = 0; i < data.size(); i++) {
+        data[i] = reader.read<uint64_t>();
     }
-    return std::move(key);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string &&readNullTerminatedStr(util::BitReader &reader) {
-    std::string string;
-    char c = 0;
-    do {
-        c = reader.read<uint8_t>();
-        //        string.push_back(c);
-        string += c;
-    } while (c);
+Md5::Md5(std::vector<uint64_t>& _data) : Md5() {
+    UTILS_DIE_IF(_data.size() != _data.size(), "Invalid data length");
 
-    return std::move(string);
+    for (size_t i = 0; i < _data.size(); i++) {
+        data[i] = _data[i];
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void writeNullTerminatedStr(util::BitWriter &writer, const std::string &string) {
-    writer.write(string);
-    writer.write('\0', 8);
+uint64_t Md5::getLength() const {
+    // 128 bits
+    return 16;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Md5::write(util::BitWriter& writer) const {
+    for (auto c : data) {
+        writer.write(c, 64);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -6,6 +6,8 @@
 
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/mpegg_ref.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 namespace genie {
 namespace format {
 namespace mpegg_p1 {

@@ -4,16 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_EXTERNAL_REFERENCE_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_EXTERNAL_REFERENCE_H_
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_FILE_HEADER_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_FILE_HEADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include "genie/util/bitreader.h"
+#include <string>
+#include <vector>
 #include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
-#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,55 +22,52 @@ namespace mpegg_p1 {
 /**
  * @brief
  */
-class ExternalReference {
+class FileHeader {
  public:
     /**
      * @brief
      */
-    enum class Type : uint8_t { MPEGG_REF = 0, RAW_REF = 1, FASTA_REF = 2 };
+    FileHeader() = default;
 
     /**
      * @brief
      */
-    ExternalReference();
+    explicit FileHeader(std::vector<std::string>*);  // FIXME:strings needs to be checked for size!
 
     /**
      * @brief
-     * @param _reference_type
+     * @param brand
      */
-    explicit ExternalReference(Type _reference_type);
-
-    /**
-     * @brief
-     */
-    ~ExternalReference() = default;
+    void addCompatibleBrand(const std::string& brand);
 
     /**
      * @brief
      * @return
      */
-    virtual Checksum::Algo getChecksumAlg() const;
+    const char* getMajorBrand() const;
 
     /**
      * @brief
      * @return
      */
-    Type getReferenceType() const;
+    const char* getMinorBrand() const;
 
     /**
      * @brief
      * @return
      */
-    virtual uint64_t getLength();
+    const std::vector<std::string>& getCompatibleBrand() const;
 
     /**
      * @brief
-     * @param writer
+     * @param bitWriter
      */
-    virtual void write(genie::util::BitWriter& writer);
+    void writeToFile(genie::util::BitWriter& bitWriter) const;
 
  private:
-    Type reference_type;  //!< @brief
+    const char* const major_brand = "MPEG-G";   //!< @brief
+    const char* const minor_brand = "2000";     //!< @brief @FIXME: 19 or 20?
+    std::vector<std::string> compatible_brand;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -83,7 +78,7 @@ class ExternalReference {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_EXTERNAL_REFERENCE_H_
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_FILE_HEADER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

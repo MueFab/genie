@@ -4,16 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_EXTERNAL_REFERENCE_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_EXTERNAL_REFERENCE_H_
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_MPEGG_FILE_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_MPEGG_FILE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include "genie/util/bitreader.h"
+#include <string>
+#include <vector>
+#include "genie/format/mpegg_p1/dataset_group.h"
+#include "genie/format/mpegg_p1/file_header.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
-#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,55 +24,37 @@ namespace mpegg_p1 {
 /**
  * @brief
  */
-class ExternalReference {
+class MpeggFile {
  public:
     /**
      * @brief
      */
-    enum class Type : uint8_t { MPEGG_REF = 0, RAW_REF = 1, FASTA_REF = 2 };
+    explicit MpeggFile(std::vector<DatasetGroup>*);
 
     /**
      * @brief
      */
-    ExternalReference();
-
-    /**
-     * @brief
-     * @param _reference_type
-     */
-    explicit ExternalReference(Type _reference_type);
+    explicit MpeggFile(std::vector<DatasetGroup>*, std::vector<std::string>*);
 
     /**
      * @brief
      */
-    ~ExternalReference() = default;
+    const FileHeader& getFileHeader() const;
 
     /**
      * @brief
-     * @return
      */
-    virtual Checksum::Algo getChecksumAlg() const;
+    const std::vector<DatasetGroup>& getDatasetGroups() const;
 
     /**
      * @brief
-     * @return
+     * @param bitWriter
      */
-    Type getReferenceType() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    virtual uint64_t getLength();
-
-    /**
-     * @brief
-     * @param writer
-     */
-    virtual void write(genie::util::BitWriter& writer);
+    void writeToFile(genie::util::BitWriter& bitWriter) const;
 
  private:
-    Type reference_type;  //!< @brief
+    FileHeader fileHeader;                    //!< @brief
+    std::vector<DatasetGroup> datasetGroups;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -83,7 +65,7 @@ class ExternalReference {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_EXTERNAL_REFERENCE_H_
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_MPEGG_FILE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
