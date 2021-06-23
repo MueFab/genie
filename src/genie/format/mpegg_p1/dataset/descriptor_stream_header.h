@@ -50,7 +50,6 @@ class DescriptorStreamHeader {
     /**
      * @brief
      * @param bit_reader
-     * @param length
      */
     explicit DescriptorStreamHeader(util::BitReader& bit_reader);
 

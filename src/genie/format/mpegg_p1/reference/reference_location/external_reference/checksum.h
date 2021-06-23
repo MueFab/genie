@@ -40,6 +40,11 @@ class Checksum {
 
     /**
      * @brief
+     */
+    virtual ~Checksum() = default;
+
+    /**
+     * @brief
      * @param _algo
      */
     explicit Checksum(Algo _algo);

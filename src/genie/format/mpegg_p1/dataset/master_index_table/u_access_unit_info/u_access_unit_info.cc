@@ -15,8 +15,7 @@ namespace mpegg_p1 {
 // ---------------------------------------------------------------------------------------------------------------------
 
 MITUAccessUnitInfo::MITUAccessUnitInfo()
-    : num_U_clusters(0),
-      multiple_signature_base(0),
+    : multiple_signature_base(0),
       U_signature_size(0),
       U_signature_constant_length(false),
       U_signature_length(0),
@@ -28,9 +27,8 @@ MITUAccessUnitInfo::MITUAccessUnitInfo()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MITUAccessUnitInfo::MITUAccessUnitInfo(uint32_t _num_U_clusters)
-    : num_U_clusters(_num_U_clusters),
-      multiple_signature_base(0),
+MITUAccessUnitInfo::MITUAccessUnitInfo(uint32_t)
+    : multiple_signature_base(0),
       U_signature_size(0),
       U_signature_constant_length(false),
       U_signature_length(0),
@@ -44,7 +42,7 @@ MITUAccessUnitInfo::MITUAccessUnitInfo(uint32_t _num_U_clusters)
 
 MITUAccessUnitInfo::MITUAccessUnitInfo(util::BitReader& reader) {
     /// AU_byte_offset[uau_id] u(byteOffsetSize)
-    auto AU_byte_offset = reader.read<uint64_t>((uint8_t)byte_offset_size_flag);
+    reader.read<uint64_t>((uint8_t)byte_offset_size_flag);
 
     if (datasetHeader->getDatasetType() == core::parameter::DataUnit::DatasetType::REFERENCE) {
         /// U_ref_sequence_id[uau_id]  u(16)

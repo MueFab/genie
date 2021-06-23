@@ -16,27 +16,27 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string &&readKey(util::BitReader &reader) {
-    std::string &&key = "XXXX";
+std::string readKey(util::BitReader &reader) {
+    std::string key = "XXXX";
     for (uint8_t i = 0; i < (uint8_t)key.size(); i++) {
-        auto c = reader.read<uint8_t>();
+        auto c = reader.read<char>();
         key[i] = c;
     }
-    return std::move(key);
+    return key;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string &&readNullTerminatedStr(util::BitReader &reader) {
+std::string readNullTerminatedStr(util::BitReader &reader) {
     std::string string;
     char c = 0;
     do {
-        c = reader.read<uint8_t>();
+        c = reader.read<char>();
         //        string.push_back(c);
         string += c;
     } while (c);
 
-    return std::move(string);
+    return string;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

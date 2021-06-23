@@ -38,7 +38,7 @@ class LabelList {
     /**
      *
      * @param _ds_group_ID
-     * @param labels
+     * @param _labels
      **/
     LabelList(uint8_t _ds_group_ID, std::vector<Label>&& _labels);
     /**

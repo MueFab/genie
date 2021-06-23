@@ -30,19 +30,25 @@ class DatasetParameterSet {
  public:
     /**
      * @brief
+     * @param parameterSet
      */
-    explicit DatasetParameterSet(const core::parameter::ParameterSet&&);
+    explicit DatasetParameterSet(const core::parameter::ParameterSet&& parameterSet);
+
     /**
      * @brief
      * @param group_ID
      * @param ID
+     * @param parameterSet
      */
     explicit DatasetParameterSet(uint8_t group_ID, uint16_t ID, const core::parameter::ParameterSet&& parameterSet);
+
     /**
      * @brief
      * @param ID
+     * @param parameterSet
      */
-    explicit DatasetParameterSet(uint16_t ID, const core::parameter::ParameterSet&&);
+    explicit DatasetParameterSet(uint16_t ID, const core::parameter::ParameterSet&& parameterSet);
+
     /**
      * @brief
      * @param bit_reader
@@ -52,7 +58,7 @@ class DatasetParameterSet {
 
     /**
      * @brief
-     * @param datasetId
+     * @param datasetID
      */
     void setDatasetID(uint16_t datasetID);
 
@@ -70,7 +76,7 @@ class DatasetParameterSet {
 
     /**
      * @brief
-     * @param datasetGroupId
+     * @param datasetGroupID
      */
     void setDatasetGroupID(uint8_t datasetGroupID);
 

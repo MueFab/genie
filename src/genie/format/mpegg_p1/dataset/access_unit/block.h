@@ -40,7 +40,7 @@ class Block {
     /**
      * @brief
      * @param _desc_ID
-     * @param payload
+     * @param _block_payload
      */
     explicit Block(uint8_t _desc_ID, std::list<uint8_t>& _block_payload);
 
