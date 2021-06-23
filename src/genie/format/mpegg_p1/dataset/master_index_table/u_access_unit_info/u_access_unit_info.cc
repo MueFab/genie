@@ -55,19 +55,19 @@ MITUAccessUnitInfo::MITUAccessUnitInfo(util::BitReader& reader) {
     } else {
         if (multiple_signature_base != 0) {
             /// U_cluster_signature[uau_id][0] u(U_signature_size)
-            U_cluster_signature[0] = reader.read<uint64_t>((uint8_t)U_signature_size);
+            U_cluster_signature[0] = static_cast<uint8_t>(reader.read<uint64_t>((uint8_t)U_signature_size));
 
             if (U_cluster_signature[0] != ((1 << U_signature_size) - 1)) {
                 for (uint32_t i = 0; i < multiple_signature_base; i++) {
                     /// U_cluster_signature[uau_id][i] u(U_signature_size)
-                    U_cluster_signature[i] = reader.read<uint64_t>((uint8_t)U_signature_size);
+                    U_cluster_signature[i] = static_cast<uint8_t>(reader.read<uint64_t>((uint8_t)U_signature_size));
                 }
             } else {
                 /// num_signatures  u(16)
                 num_signatures = reader.read<uint16_t>();
                 for (auto i = 0; i < num_signatures; i++) {
                     /// U_cluster_signature[uau_id][i] u(U_signature_size)
-                    U_cluster_signature[i] = reader.read<uint64_t>((uint8_t)U_signature_size);
+                    U_cluster_signature[i] = static_cast<uint8_t>(reader.read<uint64_t>((uint8_t)U_signature_size));
                 }
             }
         }
