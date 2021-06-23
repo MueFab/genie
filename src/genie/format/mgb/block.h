@@ -4,15 +4,15 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_BLOCK_H
-#define GENIE_BLOCK_H
+#ifndef SRC_GENIE_FORMAT_MGB_BLOCK_H_
+#define SRC_GENIE_FORMAT_MGB_BLOCK_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/access-unit.h>
-#include <genie/util/bitwriter.h>
 #include <cstdint>
 #include <vector>
+#include "genie/core/access-unit.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,13 +24,13 @@ namespace mgb {
  *
  */
 class Block {
-   private:
+ private:
     uint8_t descriptor_ID;        //!<
     uint32_t block_payload_size;  //!<
 
     core::AccessUnit::Descriptor payload;  //!<
 
-   public:
+ public:
     /**
      *
      */
@@ -88,7 +88,7 @@ class Block {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_BLOCK_H
+#endif  // SRC_GENIE_FORMAT_MGB_BLOCK_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

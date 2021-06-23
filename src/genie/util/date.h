@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DATE_H
-#define GENIE_DATE_H
+#ifndef SRC_GENIE_UTIL_DATE_H_
+#define SRC_GENIE_UTIL_DATE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,7 +20,7 @@ namespace util {
  * @brief Represents an ISO compliant date and optionally time.
  */
 class Date {
-   private:
+ private:
     uint16_t year;     //!< @brief Full year.
     uint8_t month;     //!< @brief ID of month.
     uint8_t day;       //!< @brief Day inside of month. @attention Not all months have the same number of days.
@@ -34,7 +34,7 @@ class Date {
      */
     bool checkValidity() const;
 
-   public:
+ public:
     /**
      * @return A regex which can be used to check for valid ISO strings.
      */
@@ -120,7 +120,7 @@ class Date {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DATE_H
+#endif  // SRC_GENIE_UTIL_DATE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

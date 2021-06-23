@@ -4,17 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_REFERENCE_COLLECTION_H
-#define GENIE_REFERENCE_COLLECTION_H
+#ifndef SRC_GENIE_CORE_REFERENCE_COLLECTION_H_
+#define SRC_GENIE_CORE_REFERENCE_COLLECTION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
-
-#include "reference.h"
+#include "genie/core/reference.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,10 +25,10 @@ namespace core {
  *
  */
 class ReferenceCollection {
-   private:
+ private:
     std::map<std::string, std::vector<std::unique_ptr<Reference>>> refs;  //!<
 
-   public:
+ public:
     /**
      *
      * @param name
@@ -71,7 +71,7 @@ class ReferenceCollection {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_REFERENCE_COLLECTION_H
+#endif  // SRC_GENIE_CORE_REFERENCE_COLLECTION_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

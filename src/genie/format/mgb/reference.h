@@ -4,14 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_MGB_REFERENCE_H
-#define GENIE_MGB_REFERENCE_H
+#ifndef SRC_GENIE_FORMAT_MGB_REFERENCE_H_
+#define SRC_GENIE_FORMAT_MGB_REFERENCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/reference.h>
-
 #include <string>
+#include "genie/core/reference.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,11 +26,12 @@ class Importer;
  *
  */
 class Reference : public core::Reference {
-   private:
+ private:
     Importer* mgr;  //!<
     size_t f_pos;   //!<
     bool raw;       //!<
-   public:
+
+ public:
     /**
      *
      * @param _name
@@ -61,7 +61,7 @@ class Reference : public core::Reference {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_REFERENCE_H
+#endif  // SRC_GENIE_FORMAT_MGB_REFERENCE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

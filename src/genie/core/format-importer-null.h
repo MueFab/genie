@@ -4,12 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_FORMAT_IMPORTER_NULL_H
-#define GENIE_FORMAT_IMPORTER_NULL_H
+#ifndef SRC_GENIE_CORE_FORMAT_IMPORTER_NULL_H_
+#define SRC_GENIE_CORE_FORMAT_IMPORTER_NULL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "format-importer.h"
+#include "genie/core/format-importer.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ namespace core {
  *
  */
 class NullImporter : public FormatImporter {
-   protected:
+ protected:
     /**
      *
      * @param _classifier
@@ -35,7 +35,7 @@ class NullImporter : public FormatImporter {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_FORMAT_IMPORTER_NULL_H
+#endif  // SRC_GENIE_CORE_FORMAT_IMPORTER_NULL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

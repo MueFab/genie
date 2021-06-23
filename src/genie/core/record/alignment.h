@@ -4,17 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_ALIGNMENT_H
-#define GENIE_ALIGNMENT_H
+#ifndef SRC_GENIE_CORE_RECORD_ALIGNMENT_H_
+#define SRC_GENIE_CORE_RECORD_ALIGNMENT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ class Alignment {
     uint8_t reverse_comp;                //!<
     std::vector<int32_t> mapping_score;  //!<
 
-   public:
+ public:
     /**
      *
      * @param _ecigar_string
@@ -89,7 +89,7 @@ class Alignment {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_ALIGNMENT_H
+#endif  // SRC_GENIE_CORE_RECORD_ALIGNMENT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,18 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_PARAMETER_SET_H
-#define GENIE_PARAMETER_SET_H
+#ifndef SRC_GENIE_QUALITY_PARAMQV1_PARAMETER_SET_H_
+#define SRC_GENIE_QUALITY_PARAMQV1_PARAMETER_SET_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/make-unique.h>
 #include <cstdint>
 #include <memory>
 #include <vector>
-
-#include <genie/util/bitwriter.h>
-#include "codebook.h"
+#include "genie/quality/paramqv1/codebook.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,10 +26,10 @@ namespace paramqv1 {
  *
  */
 class ParameterSet {
-   private:
+ private:
     std::vector<Codebook> qv_codebooks;  //!<
 
-   public:
+ public:
     /**
      *
      * @param ps
@@ -47,7 +46,7 @@ class ParameterSet {
     /**
      *
      */
-    explicit ParameterSet() = default;
+    ParameterSet() = default;
 
     /**
      *
@@ -81,7 +80,7 @@ class ParameterSet {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_PARAMETER_SET_H
+#endif  // SRC_GENIE_QUALITY_PARAMQV1_PARAMETER_SET_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

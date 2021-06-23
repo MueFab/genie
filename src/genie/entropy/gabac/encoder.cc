@@ -4,11 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "encoder.h"
-#include <genie/util/make-unique.h>
-#include <genie/util/watch.h>
-
+#include "genie/entropy/gabac/encoder.h"
 #include <iostream>
+#include <string>
+#include <utility>
+#include "genie/util/make-unique.h"
+#include "genie/util/watch.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,7 +35,7 @@ core::AccessUnit::Descriptor Encoder::compressTokens(const gabac::EncodingConfig
     if (num_streams == 0) {
         auto ret_empty = core::AccessUnit::Descriptor(desc.getID());
         // add empty payload
-        ret_empty.add(core::AccessUnit::Subsequence({desc.getID(), 0}, util::DataBlock(0, 1)));
+        ret_empty.add(core::AccessUnit::Subsequence({desc.getID(), (uint16_t)0}, util::DataBlock(0, 1)));
         return ret_empty;
     }
 
@@ -51,7 +52,7 @@ core::AccessUnit::Descriptor Encoder::compressTokens(const gabac::EncodingConfig
 
     stream.flush(&block);
     core::AccessUnit::Descriptor ret(desc.getID());
-    ret.add(core::AccessUnit::Subsequence({desc.getID(), 0}, std::move(block)));
+    ret.add(core::AccessUnit::Subsequence({desc.getID(), (uint8_t)0}, std::move(block)));
     return ret;
 }
 
@@ -66,7 +67,7 @@ core::AccessUnit::Subsequence Encoder::compress(const gabac::EncodingConfigurati
     gabac::IBufferStream bufferInputStream(&buffer);
 
     gabac::IBufferStream *bufferDependencyStream = nullptr;
-    if(data.getDependency() != nullptr) {
+    if (data.getDependency() != nullptr) {
         bufferDependencyStream = new gabac::IBufferStream(data.getDependency());
     }
 
@@ -89,7 +90,7 @@ core::AccessUnit::Subsequence Encoder::compress(const gabac::EncodingConfigurati
     out.annotateNumSymbols(num_symbols);
     out.set(std::move(outblock));
 
-    if(bufferDependencyStream != nullptr) {
+    if (bufferDependencyStream != nullptr) {
         delete bufferDependencyStream;
     }
 
@@ -110,10 +111,10 @@ core::EntropyEncoder::EntropyCoded Encoder::process(core::AccessUnit::Descriptor
                 auto id = subdesc.getID();
 
                 std::get<2>(ret).addInteger("size-gabac-total-raw", subdesc.getRawSize());
-                std::get<2>(ret).addInteger(
-                    "size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-" +
-                    core::getDescriptor(std::get<1>(ret).getID()).subseqs[id.second].name + "-raw",
-                    subdesc.getRawSize());
+                std::get<2>(ret).addInteger("size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-" +
+                                                core::getDescriptor(std::get<1>(ret).getID()).subseqs[id.second].name +
+                                                "-raw",
+                                            subdesc.getRawSize());
 
                 std::get<1>(ret).set(id.second, compress(conf, std::move(subdesc)));
 
@@ -121,7 +122,7 @@ core::EntropyEncoder::EntropyCoded Encoder::process(core::AccessUnit::Descriptor
                     std::get<2>(ret).addInteger("size-gabac-total-comp", std::get<1>(ret).get(id.second).getRawSize());
                     std::get<2>(ret).addInteger(
                         "size-gabac-" + core::getDescriptor(std::get<1>(ret).getID()).name + "-" +
-                        core::getDescriptor(std::get<1>(ret).getID()).subseqs[id.second].name + "-comp",
+                            core::getDescriptor(std::get<1>(ret).getID()).subseqs[id.second].name + "-comp",
                         std::get<1>(ret).get(id.second).getRawSize());
                 }
             } else {
@@ -137,7 +138,7 @@ core::EntropyEncoder::EntropyCoded Encoder::process(core::AccessUnit::Descriptor
             size += s.getNumSymbols() * sizeof(uint32_t);
         }
         std::string name = getDescriptor(std::get<1>(ret).getID()).name;
-        const auto &conf = configSet.getConfAsGabac({std::get<1>(ret).getID(), 0});
+        const auto &conf = configSet.getConfAsGabac({std::get<1>(ret).getID(), (uint16_t)0});
         std::get<1>(ret) = compressTokens(conf, std::move(std::get<1>(ret)));
         configSet.storeParameters(std::get<1>(ret).getID(), std::get<0>(ret));
 

@@ -4,9 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "locus.h"
-#include <genie/util/runtime-exception.h>
-#include <genie/util/string-helpers.h>
+#include "genie/core/locus.h"
+#include <utility>
+#include "genie/util/runtime-exception.h"
+#include "genie/util/string-helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

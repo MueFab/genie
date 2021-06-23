@@ -4,12 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_DECODER_TOKENTYPE_H
-#define GENIE_DECODER_TOKENTYPE_H
+#ifndef SRC_GENIE_CORE_PARAMETER_DESCRIPTOR_PRESENT_DECODER_TOKENTYPE_H_
+#define SRC_GENIE_CORE_PARAMETER_DESCRIPTOR_PRESENT_DECODER_TOKENTYPE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "decoder.h"
+#include "genie/core/parameter/descriptor_present/decoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@ namespace desc_pres {
  *
  */
 class DecoderTokentype : public Decoder {
-   public:
+ public:
     /**
      *
      * @param _encoding_mode_id
@@ -44,7 +44,7 @@ class DecoderTokentype : public Decoder {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_DECODER_TOKENTYPE_H
+#endif  // SRC_GENIE_CORE_PARAMETER_DESCRIPTOR_PRESENT_DECODER_TOKENTYPE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,17 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_SAM_RECORD_H
-#define GENIE_SAM_RECORD_H
+#ifndef SRC_GENIE_FORMAT_SAM_RECORD_H_
+#define SRC_GENIE_FORMAT_SAM_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <string>
-#include <genie/core/cigar-tokenizer.h>
-
-#include <map>
 #include <list>
+#include <map>
+#include <string>
 #include <vector>
+#include "genie/core/cigar-tokenizer.h"
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -23,11 +23,11 @@ namespace sam {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const core::CigarFormatInfo& getSAMCigarInfo();
+const core::CigarFormatInfo &getSAMCigarInfo();
 
 // ---------------------------------------------------------------------------------------------------------------------
 class Record {
-private:
+ private:
     std::string qname;
     uint16_t flag;
     std::string rname;
@@ -39,7 +39,8 @@ private:
     int32_t tlen;
     std::string seq;
     std::string qual;
-public:
+
+ public:
     enum class FlagPos : uint16_t {
         MULTI_SEGMENT_TEMPLATE = 0,
         PROPERLY_ALIGNED = 1,
@@ -59,7 +60,6 @@ public:
      * @brief Default constructor of SAM record
      */
     Record();
-
 
     /**
      *
@@ -147,7 +147,7 @@ public:
 
     std::string toString() const;
 
-//    const std::string &getReverseSeq() const;
+    //    const std::string &getReverseSeq() const;
 
     void checkValuesUsingRegex() const;
 
@@ -203,23 +203,23 @@ public:
      */
     bool isPairOf(Record &other) const;
 
-    void setSeq(const std::string& _seq);
+    void setSeq(const std::string &_seq);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-class ReadTemplate{
-   public:
+class ReadTemplate {
+ public:
     enum class Index : uint8_t {
         SINGLE_UNMAPPED = 0,
         SINGLE_MAPPED = 1,
-        PAIR_FIRST= 2,
+        PAIR_FIRST = 2,
         PAIR_LAST = 3,
         UNKNOWN = 4,
         TOTAL_TYPES = 5,
     };
 
-   private:
+ private:
     std::string qname;
     std::vector<std::list<Record>> data;
 
@@ -229,8 +229,7 @@ class ReadTemplate{
      */
     void initializeData();
 
-   public:
-
+ public:
     /**
      * @brief Default constructor of ReadTemplate
      *
@@ -242,21 +241,21 @@ class ReadTemplate{
      *
      * @param rec
      */
-    explicit ReadTemplate(Record&& rec);
+    explicit ReadTemplate(Record &&rec);
 
     /**
      * @brief Get QNAME
      *
      * @return
      */
-    const std::string& getQname();
+    const std::string &getQname();
 
     /**
      * @brief Add sam record
      *
      * @param rec
      */
-    void addRecord(Record&& rec);
+    void addRecord(Record &&rec);
 
     /**
      * @brief Check if sam records in ReadTemplate are unmapped
@@ -299,7 +298,7 @@ class ReadTemplate{
      * @param sam_recs
      * @return
      */
-    bool getRecords(std::list<std::list<Record>> & sam_recs);
+    bool getRecords(std::list<std::list<Record>> &sam_recs);
 };
 
 }  // namespace sam
@@ -308,7 +307,7 @@ class ReadTemplate{
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_RECORD_H
+#endif  // SRC_GENIE_FORMAT_SAM_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

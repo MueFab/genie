@@ -4,16 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CONTEXT_H
-#define GENIE_CONTEXT_H
+#ifndef SRC_GENIE_ENTROPY_PARAMCABAC_CONTEXT_H_
+#define SRC_GENIE_ENTROPY_PARAMCABAC_CONTEXT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-#include <genie/util/make-unique.h>
-#include <boost/optional/optional.hpp>
 #include <vector>
+#include "boost/optional/optional.hpp"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/make-unique.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ namespace paramcabac {
  *
  */
 class Context {
-   public:
+ public:
     /**
      *
      */
@@ -96,7 +96,7 @@ class Context {
                share_subsym_ctx_flag == ctx.share_subsym_ctx_flag;
     }
 
-   private:
+ private:
     bool adaptive_mode_flag : true;                     //!<
     uint16_t num_contexts : 16;                         //!<
     std::vector<uint8_t> context_initialization_value;  //!<
@@ -111,7 +111,7 @@ class Context {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_CONTEXT_H
+#endif  // SRC_GENIE_ENTROPY_PARAMCABAC_CONTEXT_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,14 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_COMPUTED_REF_EXTENDED_H
-#define GENIE_COMPUTED_REF_EXTENDED_H
+#ifndef SRC_GENIE_CORE_PARAMETER_COMPUTED_REF_EXTENDED_H_
+#define SRC_GENIE_CORE_PARAMETER_COMPUTED_REF_EXTENDED_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/bitwriter.h>
-
 #include <cstdint>
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,11 +22,11 @@ namespace parameter {
  *
  */
 class ComputedRefExtended {
-   private:
+ private:
     uint8_t cr_pad_size;       //!<
     uint32_t cr_buf_max_size;  //!<
 
-   public:
+ public:
     /**
      *
      * @param ext
@@ -68,7 +67,7 @@ class ComputedRefExtended {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_COMPUTED_REF_EXTENDED_H
+#endif  // SRC_GENIE_CORE_PARAMETER_COMPUTED_REF_EXTENDED_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,12 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_CLASSIFIER_BYPASS_H
-#define GENIE_CLASSIFIER_BYPASS_H
+#ifndef SRC_GENIE_CORE_CLASSIFIER_BYPASS_H_
+#define SRC_GENIE_CORE_CLASSIFIER_BYPASS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "classifier.h"
+#include <vector>
+#include "genie/core/classifier.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +24,7 @@ class ClassifierBypass : public Classifier {
     std::vector<record::Chunk> vec;  //!<
     bool flushing = false;           //!<
 
-   public:
+ public:
     /**
      *
      * @return
@@ -49,7 +50,7 @@ class ClassifierBypass : public Classifier {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_CLASSIFIER_BYPASS_H
+#endif  // SRC_GENIE_CORE_CLASSIFIER_BYPASS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

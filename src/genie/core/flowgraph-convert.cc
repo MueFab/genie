@@ -4,7 +4,10 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "flowgraph-convert.h"
+#include "genie/core/flowgraph-convert.h"
+#include <memory>
+#include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 

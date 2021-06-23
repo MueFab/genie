@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "ordered-lock.h"
+#include "genie/util/ordered-lock.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

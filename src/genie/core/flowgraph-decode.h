@@ -4,22 +4,24 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_FLOWGRAPH_DECODE_H
-#define GENIE_FLOWGRAPH_DECODE_H
+#ifndef SRC_GENIE_CORE_FLOWGRAPH_DECODE_H_
+#define SRC_GENIE_CORE_FLOWGRAPH_DECODE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/ref-decoder.h>
-#include <genie/util/selector.h>
-#include <genie/util/side-selector.h>
-#include <genie/util/thread-manager.h>
-
-#include "entropy-decoder.h"
-#include "flowgraph.h"
-#include "format-exporter.h"
-#include "format-importer-compressed.h"
-#include "read-decoder.h"
-#include "reference-source.h"
+#include <memory>
+#include <string>
+#include <vector>
+#include "genie/core/entropy-decoder.h"
+#include "genie/core/flowgraph.h"
+#include "genie/core/format-exporter.h"
+#include "genie/core/format-importer-compressed.h"
+#include "genie/core/read-decoder.h"
+#include "genie/core/ref-decoder.h"
+#include "genie/core/reference-source.h"
+#include "genie/util/selector.h"
+#include "genie/util/side-selector.h"
+#include "genie/util/thread-manager.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -52,7 +54,7 @@ class FlowGraphDecode : public FlowGraph {
     std::vector<std::unique_ptr<genie::core::FormatExporter>> exporters;     //!<
     genie::util::SelectorHead<genie::core::record::Chunk> exporterSelector;  //!<
 
-   public:
+ public:
     /**
      *
      * @param dat
@@ -160,8 +162,8 @@ class FlowGraphDecode : public FlowGraph {
      *
      * @param fun
      */
-    void setEntropyCoderSelector(
-        const std::function<size_t(const parameter::DescriptorSubseqCfg&, genie::core::AccessUnit::Descriptor&, bool)>& fun);
+    void setEntropyCoderSelector(const std::function<size_t(const parameter::DescriptorSubseqCfg&,
+                                                            genie::core::AccessUnit::Descriptor&, bool)>& fun);
 
     /**
      *
@@ -214,7 +216,7 @@ class FlowGraphDecode : public FlowGraph {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_FLOWGRAPH_DECODE_H
+#endif  // SRC_GENIE_CORE_FLOWGRAPH_DECODE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

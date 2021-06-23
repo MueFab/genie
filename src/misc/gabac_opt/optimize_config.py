@@ -16,6 +16,7 @@ import argparse
 #     )import os
 import json
 from gabac_api import GABAC_TRANSFORM
+
 from gabac_ga import GeneticAlgorithmForGabac
 from gabac_sa import SimulatedAnnealingForGabac
 

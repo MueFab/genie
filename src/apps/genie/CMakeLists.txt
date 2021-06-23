@@ -4,6 +4,8 @@ set(source_files
         main.cc
         run/main.cc
         run/program-options.cc
+        transcode-fastq/main.cc
+        transcode-fastq/program-options.cc
         )
 
 add_executable(genie ${source_files})
@@ -24,3 +26,6 @@ if (${GENIE_USE_OPENMP})
     target_compile_definitions(genie PRIVATE GENIE_USE_OPENMP)
     target_link_libraries(genie PRIVATE ${OpenMP_CXX_LIBRARIES})
 endif ()
+
+install(TARGETS genie
+        RUNTIME DESTINATION "usr/bin")

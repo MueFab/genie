@@ -4,24 +4,21 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "encode-desc-subseq.h"
-
+#include "genie/entropy/gabac/encode-desc-subseq.h"
 #include <algorithm>
 #include <cmath>
 #include <vector>
-
-#include <genie/entropy/paramcabac/transformed-subseq.h>
-#include <genie/util/block-stepper.h>
-#include <genie/util/data-block.h>
-#include "configuration.h"
-#include "encode-transformed-subseq.h"
-#include "stream-handler.h"
-#include "writer.h"
-
-#include "equality-subseq-transform.h"
-#include "match-subseq-transform.h"
-#include "merge-subseq-transform.h"
-#include "rle-subseq-transform.h"
+#include "genie/entropy/gabac/configuration.h"
+#include "genie/entropy/gabac/encode-transformed-subseq.h"
+#include "genie/entropy/gabac/equality-subseq-transform.h"
+#include "genie/entropy/gabac/match-subseq-transform.h"
+#include "genie/entropy/gabac/merge-subseq-transform.h"
+#include "genie/entropy/gabac/rle-subseq-transform.h"
+#include "genie/entropy/gabac/stream-handler.h"
+#include "genie/entropy/gabac/writer.h"
+#include "genie/entropy/paramcabac/transformed-subseq.h"
+#include "genie/util/block-stepper.h"
+#include "genie/util/data-block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -33,12 +30,6 @@ namespace gabac {
 
 static inline void doSubsequenceTransform(const paramcabac::Subsequence &subseqCfg,
                                           std::vector<util::DataBlock> *const transformedSubseqs) {
-    // GABACIFY_LOG_TRACE << "Encoding sequence of length: " <<
-    // (*transformedSequences)[0].size();
-
-    // GABACIFY_LOG_DEBUG << "Performing sequence transformation " <<
-    // gabac::transformationInformation[id].name;
-
     switch (subseqCfg.getTransformParameters().getTransformIdSubseq()) {
         case paramcabac::TransformedParameters::TransformIdSubseq::NO_TRANSFORM:
             transformedSubseqs->resize(1);
@@ -59,18 +50,11 @@ static inline void doSubsequenceTransform(const paramcabac::Subsequence &subseqC
             UTILS_DIE("Invalid subseq transforamtion");
             break;
     }
-
-    // GABACIFY_LOG_TRACE << "Got " << transformedSequences->size() << "
-    // sequences";
-    // for (unsigned i = 0; i < transformedSubseqs->size(); ++i) {
-    // GABACIFY_LOG_TRACE << i << ": " << (*transformedSequences)[i].size()
-    // << " bytes";
-    // }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
+uint64_t encodeDescSubsequence(const IOConfiguration &conf, const EncodingConfiguration &enConf) {
     conf.validate();
     const paramcabac::Subsequence &subseqCfg = enConf.getSubseqConfig();
     util::DataBlock subsequence(0, 4);
@@ -110,7 +94,7 @@ unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingC
             if (numtrnsfSymbols > 0) {
                 // Encoding
                 trnsfSubseqPayloadSize =
-                    gabac::encodeTransformSubseq(subseqCfg.getTransformSubseqCfg(i), &(transformedSubseqs[i]),
+                    gabac::encodeTransformSubseq(subseqCfg.getTransformSubseqCfg((uint8_t)i), &(transformedSubseqs[i]),
                                                  (dependency.size()) ? &dependency : nullptr);
             }
 
@@ -128,7 +112,7 @@ unsigned long encodeDescSubsequence(const IOConfiguration &conf, const EncodingC
         }
     }
 
-    return subseqPayloadSize;
+    return (uint64_t)subseqPayloadSize;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

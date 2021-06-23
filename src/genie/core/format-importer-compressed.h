@@ -4,14 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_FORMAT_IMPORTER_COMPRESSED_H
-#define GENIE_FORMAT_IMPORTER_COMPRESSED_H
+#ifndef SRC_GENIE_CORE_FORMAT_IMPORTER_COMPRESSED_H_
+#define SRC_GENIE_CORE_FORMAT_IMPORTER_COMPRESSED_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/access-unit.h>
-#include <genie/util/original-source.h>
-#include <genie/util/source.h>
+#include "genie/core/access-unit.h"
+#include "genie/util/original-source.h"
+#include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@ namespace core {
  *
  */
 class FormatImporterCompressed : public util::Source<AccessUnit>, public util::OriginalSource {
-   public:
+ public:
     /**
      *
      */
@@ -41,7 +41,7 @@ class FormatImporterCompressed : public util::Source<AccessUnit>, public util::O
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_FORMAT_IMPORTER_COMPRESSED_H
+#endif  // SRC_GENIE_CORE_FORMAT_IMPORTER_COMPRESSED_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

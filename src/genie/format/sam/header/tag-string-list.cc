@@ -4,9 +4,12 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "tag-string-list.h"
-#include <genie/util/make-unique.h>
-#include <genie/util/string-helpers.h>
+#include "genie/format/sam/header/tag-string-list.h"
+#include <string>
+#include <utility>
+#include <vector>
+#include "genie/util/make-unique.h"
+#include "genie/util/string-helpers.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

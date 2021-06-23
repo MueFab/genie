@@ -4,20 +4,21 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_READ_ENCODER_H
-#define GENIE_READ_ENCODER_H
+#ifndef SRC_GENIE_CORE_READ_ENCODER_H_
+#define SRC_GENIE_CORE_READ_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/util/drain.h>
-#include <genie/util/selector.h>
-#include <genie/util/side-selector.h>
-#include <genie/util/source.h>
-#include "access-unit.h"
-#include "entropy-encoder.h"
-#include "module.h"
-#include "name-encoder.h"
-#include "qv-encoder.h"
+#include <tuple>
+#include "genie/core/access-unit.h"
+#include "genie/core/entropy-encoder.h"
+#include "genie/core/module.h"
+#include "genie/core/name-encoder.h"
+#include "genie/core/qv-encoder.h"
+#include "genie/util/drain.h"
+#include "genie/util/selector.h"
+#include "genie/util/side-selector.h"
+#include "genie/util/source.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,19 +29,19 @@ namespace core {
  * @brief The basic interface for modules encoding the plain read data
  */
 class ReadEncoder : public Module<record::Chunk, AccessUnit> {
-   public:
+ public:
     using QvSelector = util::SideSelector<QVEncoder, QVEncoder::QVCoded, const record::Chunk&>;  //!<
     using NameSelector = util::SideSelector<NameEncoder, std::tuple<AccessUnit::Descriptor, core::stats::PerfStats>,
                                             const record::Chunk&>;  //!<
     using EntropySelector =
         util::SideSelector<EntropyEncoder, EntropyEncoder::EntropyCoded, AccessUnit::Descriptor&>;  //!<
 
-   protected:
+ protected:
     QvSelector* qvcoder{};            //!<
     NameSelector* namecoder{};        //!<
     EntropySelector* entropycoder{};  //!<
 
-   public:
+ public:
     /**
      *
      * @param coder
@@ -87,7 +88,7 @@ class ReadEncoder : public Module<record::Chunk, AccessUnit> {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_READ_ENCODER_H
+#endif  // SRC_GENIE_CORE_READ_ENCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

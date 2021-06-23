@@ -4,16 +4,17 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_MANAGER_H
-#define GENIE_MANAGER_H
+#ifndef SRC_GENIE_FORMAT_FASTA_MANAGER_H_
+#define SRC_GENIE_FORMAT_FASTA_MANAGER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/reference-source.h>
-
+#include <memory>
 #include <set>
-
-#include "reader.h"
+#include <string>
+#include <vector>
+#include "genie/core/reference-source.h"
+#include "genie/format/fasta/reader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,10 +29,10 @@ class Manager : public core::ReferenceSource {
     FastaReader reader;
     std::mutex readerMutex;
 
-   private:
+ private:
     std::vector<std::unique_ptr<core::Reference>> generateRefHandles();
 
-   public:
+ public:
     /**
      *
      * @param fasta
@@ -71,7 +72,7 @@ class Manager : public core::ReferenceSource {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_MANAGER_H
+#endif  // SRC_GENIE_FORMAT_FASTA_MANAGER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

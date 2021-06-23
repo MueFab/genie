@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef UTIL_STRING_HELPERS_H_
-#define UTIL_STRING_HELPERS_H_
+#ifndef SRC_GENIE_UTIL_STRING_HELPERS_H_
+#define SRC_GENIE_UTIL_STRING_HELPERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -60,7 +60,7 @@ std::vector<std::string> tokenize(const std::string &str, char delim);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // UTIL_STRING_HELPERS_H_
+#endif  // SRC_GENIE_UTIL_STRING_HELPERS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,32 +4,34 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_FACTORY_IMPL_H
-#define GENIE_FACTORY_IMPL_H
+#ifndef SRC_GENIE_UTIL_FACTORY_IMPL_H_
+#define SRC_GENIE_UTIL_FACTORY_IMPL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "runtime-exception.h"
-#include <genie/core/constants.h>
+#include <memory>
+#include <utility>
+#include "genie/core/constants.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace util {
 
-using namespace genie::core;
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-void Factory<T>::registerType(uint8_t id, const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& factory) {
+void Factory<T>::registerType(
+    uint8_t id, const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& factory) {
     factories.insert(std::make_pair(id, factory));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-uint8_t Factory<T>::registerType(const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& factory) {
+uint8_t Factory<T>::registerType(
+    const std::function<std::unique_ptr<T>(genie::core::GenDesc desc, util::BitReader&)>& factory) {
     uint8_t id = 0;
     auto it = factories.find(id);
     while (it != factories.end()) {
@@ -63,7 +65,7 @@ std::unique_ptr<T> Factory<T>::create(uint8_t id, genie::core::GenDesc desc, uti
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_FACTORY_IMPL_H
+#endif  // SRC_GENIE_UTIL_FACTORY_IMPL_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
