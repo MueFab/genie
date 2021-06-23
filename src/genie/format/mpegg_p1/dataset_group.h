@@ -98,25 +98,26 @@ class DatasetGroup {
     /** ------------------------------------------------------------------------------------------------------------
      * ISO 23092-1 Section 6.5.1.2 table 9 - dataset_group_header
      * ------------------------------------------------------------------------------------------------------------- */
-    uint8_t dataset_group_ID; //!< @brief
-    uint8_t version_number; //!< @brief
+    uint8_t dataset_group_ID;  //!< @brief
+    uint8_t version_number;    //!< @brief
 
     // dataset_IDs[] u(16) from datasets
     /** ------------------------------------------------------------------------------------------------------------
      * ISO 23092-1 Section 6.5.1 table 8
      * ------------------------------------------------------------------------------------------------------------- */
 
-    std::vector<Reference> references; //!< @brief ISO 23092-1 Section 6.5.1.3, optional
+    std::vector<Reference> references;  //!< @brief ISO 23092-1 Section 6.5.1.3, optional
 
-    std::vector<ReferenceMetadata> reference_metadata; //!< @brief ISO 23092-1 Section 6.5.1.4, optional
+    std::vector<ReferenceMetadata> reference_metadata;  //!< @brief ISO 23092-1 Section 6.5.1.4, optional
 
-    std::unique_ptr<LabelList> label_list; //!< @brief ISO 23092-1 Section 6.5.1.5, optional
+    std::unique_ptr<LabelList> label_list;  //!< @brief ISO 23092-1 Section 6.5.1.5, optional
 
-    std::unique_ptr<DGMetadata> DG_metadata; //!< @brief ISO 23092-1 Section 6.5.1.6 specification 23092-3, optional
+    std::unique_ptr<DGMetadata> DG_metadata;  //!< @brief ISO 23092-1 Section 6.5.1.6 specification 23092-3, optional
 
-    std::unique_ptr<DGProtection> DG_protection; //!< @brief ISO 23092-1 Section 6.5.1.7 specification 23092-3, optional
+    std::unique_ptr<DGProtection>
+        DG_protection;  //!< @brief ISO 23092-1 Section 6.5.1.7 specification 23092-3, optional
 
-    std::vector<Dataset> datasets; //!< @brief ISO 23092-1 Section 6.5.2.1
+    std::vector<Dataset> datasets;  //!< @brief ISO 23092-1 Section 6.5.2.1
 
  public:
     /**

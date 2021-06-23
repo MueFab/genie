@@ -48,9 +48,9 @@ class ReferenceMetadataValue {
      * @param _species
      * @param _URI
      */
-    ReferenceMetadataValue(uint32_t _length,
-                           std::string _alternative_sequence_name, std::string _genome_assembly_identifier,
-                           std::string _description, std::string _species, std::string&& _URI);
+    ReferenceMetadataValue(uint32_t _length, std::string _alternative_sequence_name,
+                           std::string _genome_assembly_identifier, std::string _description, std::string _species,
+                           std::string&& _URI);
 
     /**
      *
