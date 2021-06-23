@@ -25,8 +25,8 @@ namespace mpegg_p1 {
  */
 class ReferenceMetadata {
  private:
-    uint8_t dataset_group_ID; //!< @brief
-    uint8_t reference_ID; //!< @brief
+    uint8_t dataset_group_ID;  //!< @brief
+    uint8_t reference_ID;      //!< @brief
 
  public:
     /**
