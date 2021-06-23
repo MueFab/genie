@@ -46,7 +46,7 @@ class ExternalReference {
     /**
      * @brief
      */
-    ~ExternalReference() = default;
+    virtual ~ExternalReference() = default;
 
     /**
      * @brief

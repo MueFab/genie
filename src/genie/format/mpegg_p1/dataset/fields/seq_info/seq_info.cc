@@ -84,14 +84,14 @@ void SequenceConfig::setRefID(uint8_t _ref_ID) { reference_ID = _ref_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SequenceConfig::addEntry(uint16_t seq_ID, uint32_t seq_block) {
+void SequenceConfig::addEntry(uint16_t seq_ID, uint16_t seq_block) {
     seq_IDs.push_back(seq_ID);
     seq_blocks.push_back(seq_block);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void SequenceConfig::addEntries(std::vector<uint16_t>& _seq_IDs, std::vector<uint32_t>& _seq_blocks) {
+void SequenceConfig::addEntries(std::vector<uint16_t>& _seq_IDs, std::vector<uint16_t>& _seq_blocks) {
     UTILS_DIE_IF(_seq_IDs.empty() || _seq_blocks.empty(), "Either _seq_IDs or _seq_blocks is empty");
 
     UTILS_DIE_IF(_seq_IDs.size() != _seq_blocks.size(), "The number of _seq_IDs and _seq_blocks are different!");
@@ -102,7 +102,7 @@ void SequenceConfig::addEntries(std::vector<uint16_t>& _seq_IDs, std::vector<uin
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint16_t SequenceConfig::getSeqCount() const { return seq_IDs.size(); }
+uint16_t SequenceConfig::getSeqCount() const { return static_cast<uint16_t>(seq_IDs.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
