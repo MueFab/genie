@@ -56,7 +56,7 @@ core::record::ClassType ClassInfo::getClid() const { return clid; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t ClassInfo::getNumDescriptors() const { return descriptor_IDs.size(); }
+uint8_t ClassInfo::getNumDescriptors() const { return static_cast<uint8_t>(descriptor_IDs.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

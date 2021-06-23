@@ -65,7 +65,7 @@ uint16_t DatasetRegion::getSeqID() const { return seq_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t DatasetRegion::getNumClasses() const { return class_IDs.size(); }
+uint8_t DatasetRegion::getNumClasses() const { return static_cast<uint8_t>(class_IDs.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

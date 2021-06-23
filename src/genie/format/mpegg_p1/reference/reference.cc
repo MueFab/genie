@@ -111,7 +111,7 @@ const ReferenceLocation& Reference::getReferenceLocation() const { return refere
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint16_t Reference::getSeqCount() const { return sequence_names.size(); }
+uint16_t Reference::getSeqCount() const { return static_cast<uint16_t>(sequence_names.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

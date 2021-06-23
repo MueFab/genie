@@ -70,7 +70,7 @@ bool BlockConfig::getMITFlag() const { return MIT_flag; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t BlockConfig::getNumClasses() const { return class_infos.size(); }
+uint8_t BlockConfig::getNumClasses() const { return static_cast<uint8_t>(class_infos.size()); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

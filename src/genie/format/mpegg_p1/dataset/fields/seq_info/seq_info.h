@@ -78,14 +78,14 @@ class SequenceConfig {
      * @param seq_ID
      * @param seq_block
      */
-    void addEntry(uint16_t seq_ID, uint32_t seq_block);
+    void addEntry(uint16_t seq_ID, uint16_t seq_block);
 
     /**
      * @brief
      * @param _seq_IDs
      * @param _seq_blocks
      */
-    void addEntries(std::vector<uint16_t>& _seq_IDs, std::vector<uint32_t>& _seq_blocks);
+    void addEntries(std::vector<uint16_t>& _seq_IDs, std::vector<uint16_t>& _seq_blocks);
 
     /**
      * @brief
