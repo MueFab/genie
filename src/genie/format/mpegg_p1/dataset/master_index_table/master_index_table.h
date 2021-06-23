@@ -51,10 +51,12 @@ class MasterIndexTable {
      */
     MasterIndexTable(std::vector<mpegg_p1::MITAccessUnitInfo>&& _ac_info,
                      std::vector<mpegg_p1::MITUAccessUnitInfo>&& _u_ac_info, DatasetHeader* header);
+
     /**
      * @brief
-     * @param bitReader
+     * @param reader
      * @param length
+     * @param _header
      */
     MasterIndexTable(util::BitReader& reader, size_t length, DatasetHeader* _header);
 

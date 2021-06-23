@@ -93,6 +93,7 @@ class DatasetHeader {
      * @param _byte_offset_size_flag
      * @param _non_overlapping_AU_range_flag
      * @param _pos_40_bits_flag
+     * @param _multiple_alignment_flag
      * @param _dataset_type
      * @param _alphabet_ID
      * @param _num_U_access_units

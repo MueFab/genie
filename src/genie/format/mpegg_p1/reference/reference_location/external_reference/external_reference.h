@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
+#include "genie/format/mpegg_p1/reference/reference_location/external_reference/checksum.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/exception.h"

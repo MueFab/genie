@@ -58,7 +58,6 @@ class MITUAccessUnitInfo {
     /**
      * @brief
      * @param reader
-     * @param length
      */
     explicit MITUAccessUnitInfo(util::BitReader& reader);
     /**

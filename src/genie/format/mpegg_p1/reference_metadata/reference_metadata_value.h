@@ -42,7 +42,6 @@ class ReferenceMetadataValue {
     /**
      *
      * @param _length
-     * @param _alternative_locus_location
      * @param _alternative_sequence_name
      * @param _genome_assembly_identifier
      * @param _description
@@ -50,7 +49,6 @@ class ReferenceMetadataValue {
      * @param _URI
      */
     ReferenceMetadataValue(uint32_t _length,
-                           //                         AlternativeLocusType _alternative_locus_location,
                            std::string _alternative_sequence_name, std::string _genome_assembly_identifier,
                            std::string _description, std::string _species, std::string&& _URI);
 

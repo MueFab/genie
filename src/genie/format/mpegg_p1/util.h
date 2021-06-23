@@ -24,14 +24,14 @@ namespace mpegg_p1 {
  * @param reader
  * @return
  */
-std::string &&readKey(util::BitReader &reader);
+std::string readKey(util::BitReader &reader);
 
 /**
  * @brief
  * @param reader
  * @return
  */
-std::string &&readNullTerminatedStr(util::BitReader &reader);
+std::string readNullTerminatedStr(util::BitReader &reader);
 
 /**
  * @brief

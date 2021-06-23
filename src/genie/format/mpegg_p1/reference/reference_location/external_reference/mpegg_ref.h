@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <memory>
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/checksum.h"
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/external_reference.h"
 #include "genie/util/bitreader.h"
@@ -30,7 +31,7 @@ class MpegReference : public ExternalReference {
     uint8_t dataset_group_ID;  //!< @brief
     uint16_t dataset_ID;       //!< @brief
 
-    Checksum ref_checksum;  //!< @brief
+    std::unique_ptr<Checksum> ref_checksum;  //!< @brief
 
  public:
     /**
@@ -39,7 +40,7 @@ class MpegReference : public ExternalReference {
      * @param _dataset_ID
      * @param _ref_checksum
      */
-    MpegReference(uint8_t _dataset_group_ID, uint16_t _dataset_ID, Checksum&& _ref_checksum);
+    MpegReference(uint8_t _dataset_group_ID, uint16_t _dataset_ID, std::unique_ptr<Checksum> _ref_checksum);
 
     /**
      * @brief

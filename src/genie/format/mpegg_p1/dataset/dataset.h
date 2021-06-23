@@ -77,9 +77,9 @@ class DTProtection {
 
     /**
      * @brief
-     * @param _DT_metadata_value
+     * @param _dt_protection_value
      */
-    explicit DTProtection(std::vector<uint8_t>&& _DT_protection_value);
+    explicit DTProtection(std::vector<uint8_t>&& _dt_protection_value);
 
     /**
      * @brief

@@ -72,8 +72,8 @@ DTProtection::DTProtection() : DT_protection_value() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DTProtection::DTProtection(std::vector<uint8_t>&& _DT_protection_value)
-    : DT_protection_value(std::move(_DT_protection_value)) {}
+DTProtection::DTProtection(std::vector<uint8_t>&& _dt_protection_value)
+    : DT_protection_value(std::move(_dt_protection_value)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
