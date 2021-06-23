@@ -1,26 +1,31 @@
-#ifndef GENIE_PART1_LABEL_LIST_H
-#define GENIE_PART1_LABEL_LIST_H
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_LIST_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_LIST_H_
 
 #include <cstdint>
 #include <vector>
-#include "genie/util/bitwriter.h"
+#include "genie/format/mpegg_p1/label_list/label/label.h"
 #include "genie/util/bitreader.h"
-
-#include "label/label.h"
+#include "genie/util/bitwriter.h"
 
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-class LabelList{
-   private:
+class LabelList {
+ private:
     /**
      * ISO 23092-1 Section 6.5.1.5 table 14
      **/
     uint8_t dataset_group_ID;
     std::vector<Label> labels;
 
-   public:
+ public:
     /**
      *
      */
@@ -34,7 +39,7 @@ class LabelList{
      *
      * @param _ds_group_ID
      * @param labels
-    **/
+     **/
     LabelList(uint8_t _ds_group_ID, std::vector<Label>&& _labels);
     /**
      *
@@ -42,7 +47,6 @@ class LabelList{
      * @param length
      */
     LabelList(util::BitReader& reader, size_t length);
-
 
     /**
      *
@@ -60,16 +64,15 @@ class LabelList{
      */
     void setLabels(std::vector<Label>&& _labels);
     /**
-    *
-    * @return
-    */
+     *
+     * @return
+     */
     const std::vector<Label>& getLabels() const;
     /**
      *
      * @return
      */
     uint16_t getNumLabels() const;
-
 
     /**
      *
@@ -87,4 +90,4 @@ class LabelList{
 }  // namespace format
 }  // namespace genie
 
-#endif  // GENIE_PART1_LABEL_LIST_H
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_LIST_H_

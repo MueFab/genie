@@ -4,21 +4,19 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_PART1_DATASET_GROUP_H
-#define GENIE_PART1_DATASET_GROUP_H
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_DATASET_GROUP_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_DATASET_GROUP_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
 #include <vector>
-
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-
-#include "reference/reference.h"
 #include "dataset/dataset.h"
-#include "reference_metadata/reference_metadata.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 #include "label_list/label_list.h"
+#include "reference/reference.h"
+#include "reference_metadata/reference_metadata.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +25,7 @@ namespace format {
 namespace mpegg_p1 {
 
 class DGMetadata {
-   public:
+ public:
     /**
      *
      */
@@ -51,13 +49,12 @@ class DGMetadata {
      */
     void write(util::BitWriter& bit_writer) const;
 
-   private:
+ private:
     std::vector<uint8_t> DG_metadata_value;  //!<
-
 };
 
 class DGProtection {
-   public:
+ public:
     /**
      *
      */
@@ -81,14 +78,12 @@ class DGProtection {
      */
     void write(util::BitWriter& bit_writer) const;
 
-   private:
+ private:
     std::vector<uint8_t> DG_protection_value;  //!<
-
 };
 
 class DatasetGroup {
-   private:
-
+ private:
     /** ------------------------------------------------------------------------------------------------------------
      * ISO 23092-1 Section 6.5.1.2 table 9 - dataset_group_header
      * ------------------------------------------------------------------------------------------------------------- */
@@ -122,8 +117,7 @@ class DatasetGroup {
     // ISO 23092-1 Section 6.5.2.1
     std::vector<Dataset> datasets;
 
-   public:
-
+ public:
     /**
      *
      * @param _datasets
@@ -135,13 +129,12 @@ class DatasetGroup {
      */
     explicit DatasetGroup(util::BitReader& reader, size_t length);
 
-
     /**
      *
      * @param sort_ids
      * @return
      */
-    std::vector<uint16_t>&& getDatasetIDs(bool sort_ids=false) const;
+    std::vector<uint16_t>&& getDatasetIDs(bool sort_ids = false) const;
     /**
      *
      * @param _references
@@ -195,7 +188,7 @@ class DatasetGroup {
      *
      * @param _dg_protection
      */
-    void addDGProtection(std::unique_ptr<DGProtection>_dg_protection);
+    void addDGProtection(std::unique_ptr<DGProtection> _dg_protection);
     /**
      * Get DG_protection
      *
@@ -228,7 +221,6 @@ class DatasetGroup {
      */
     void readHeader(util::BitReader& reader, size_t length);
 
-
     /**
      * Get length of Dataset Header in bytes.
      * @return
@@ -239,7 +231,6 @@ class DatasetGroup {
      * @param writer
      */
     void write(util::BitWriter& writer) const;
-
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -250,7 +241,7 @@ class DatasetGroup {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // GENIE_PART1_DATASET_GROUP_H
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_DATASET_GROUP_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

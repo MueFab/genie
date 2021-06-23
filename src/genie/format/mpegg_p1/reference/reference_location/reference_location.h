@@ -1,22 +1,23 @@
-#ifndef GENIE_PART1_REFERENCE_LOCATION_H
-#define GENIE_PART1_REFERENCE_LOCATION_H
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
 
-#include <genie/util/bitwriter.h>
-#include <genie/util/exception.h>
-#include <genie/util/runtime-exception.h>
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_REFERENCE_LOCATION_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_REFERENCE_LOCATION_H_
 
-
+#include "genie/util/bitwriter.h"
+#include "genie/util/exception.h"
+#include "genie/util/runtime-exception.h"
 
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-class ReferenceLocation{
-   public:
-    enum class Flag: bool {
-        INTERNAL = false,
-        EXTERNAL = true
-    };
+class ReferenceLocation {
+ public:
+    enum class Flag : bool { INTERNAL = false, EXTERNAL = true };
 
     ReferenceLocation();
 
@@ -30,7 +31,7 @@ class ReferenceLocation{
 
     virtual void write(genie::util::BitWriter& writer) const;
 
-   private:
+ private:
     Flag external_ref_flag;
 };
 
@@ -38,4 +39,4 @@ class ReferenceLocation{
 }  // namespace format
 }  // namespace genie
 
-#endif  // GENIE_PART1_REFERENCE_LOCATION_H
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_REFERENCE_LOCATION_H_

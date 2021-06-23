@@ -4,30 +4,28 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef GENIE_PART1_REFERENCE_METADATA_VALUE_H
-#define GENIE_PART1_REFERENCE_METADATA_VALUE_H
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_METADATA_REFERENCE_METADATA_VALUE_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_METADATA_REFERENCE_METADATA_VALUE_H_
 
 #include <cstdint>
 #include <string>
-
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-#include <genie/format/mpegg_p1/reference/reference.h>
+#include "genie/format/mpegg_p1/reference/reference.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-
 class ReferenceMetadataValue {
     /** ------------------------------------------------------------------------------------------------------------
-    *  ISO/IEC 23092-3 Section 6.5.1.4 table 13
-    *  ------------------------------------------------------------------------------------------------------------ */
-   private:
+     *  ISO/IEC 23092-3 Section 6.5.1.4 table 13
+     *  ------------------------------------------------------------------------------------------------------------ */
+ private:
     uint32_t length;
 
-//    AlternativeLocusType alternative_locus_location;
-//needs to be fixed _ from part3
+    //    AlternativeLocusType alternative_locus_location;
+    // needs to be fixed _ from part3
 
     std::string alternative_sequence_name;
     std::string genome_assembly_identifier;
@@ -35,7 +33,7 @@ class ReferenceMetadataValue {
     std::string species;
     std::string URI;
 
-   public:
+ public:
     /**
      *
      */
@@ -52,7 +50,7 @@ class ReferenceMetadataValue {
      * @param _URI
      */
     ReferenceMetadataValue(uint32_t _length,
-//                         AlternativeLocusType _alternative_locus_location,
+                           //                         AlternativeLocusType _alternative_locus_location,
                            std::string _alternative_sequence_name, std::string _genome_assembly_identifier,
                            std::string _description, std::string _species, std::string&& _URI);
 
@@ -64,8 +62,8 @@ class ReferenceMetadataValue {
     ReferenceMetadataValue(util::BitReader& reader, size_t length);
 
     /**
-    *
-    * @return
+     *
+     * @return
      */
     uint64_t getLength() const;
 
@@ -80,4 +78,4 @@ class ReferenceMetadataValue {
 }  // namespace format
 }  // namespace genie
 
-#endif  // GENIE_PART1_REFERENCE_METADATA_VALUE_H
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_METADATA_REFERENCE_METADATA_VALUE_H_

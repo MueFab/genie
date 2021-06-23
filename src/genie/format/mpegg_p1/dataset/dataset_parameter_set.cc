@@ -4,10 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "dataset_parameter_set.h"
-#include <genie/util/runtime-exception.h>
-#include <genie/format/mpegg_p1/util.h>
+#include "genie/format/mpegg_p1/dataset/dataset_parameter_set.h"
 #include <sstream>
+#include <string>
+#include "genie/format/mpegg_p1/util.h"
+#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -18,34 +19,23 @@ namespace mpegg_p1 {
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetParameterSet::DatasetParameterSet(const core::parameter::ParameterSet&& parameterSet)
-    : dataset_group_ID(),
-      dataset_ID(),
-      parameterSet_p2(parameterSet) {
-}
+    : dataset_group_ID(), dataset_ID(), parameterSet_p2(parameterSet) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetParameterSet::DatasetParameterSet(uint8_t group_ID, uint16_t ID,
                                          const core::parameter::ParameterSet&& parameterSet)
-    : dataset_group_ID(group_ID),
-      dataset_ID(ID),
-      parameterSet_p2(parameterSet) {}
+    : dataset_group_ID(group_ID), dataset_ID(ID), parameterSet_p2(parameterSet) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetParameterSet::DatasetParameterSet(uint16_t ID,
-                                         const core::parameter::ParameterSet&& parameterSet)
-    : dataset_group_ID(),
-      dataset_ID(ID),
-      parameterSet_p2(parameterSet) {}
+DatasetParameterSet::DatasetParameterSet(uint16_t ID, const core::parameter::ParameterSet&& parameterSet)
+    : dataset_group_ID(), dataset_ID(ID), parameterSet_p2(parameterSet) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetParameterSet::DatasetParameterSet(util::BitReader& bit_reader, size_t length)
-    : dataset_group_ID(),
-      dataset_ID(),
-      parameterSet_p2() {
-
+    : dataset_group_ID(), dataset_ID(), parameterSet_p2() {
     std::string key = readKey(bit_reader);
     UTILS_DIE_IF(key != "pars", "DatasetParameterSet is not Found");
 
@@ -57,37 +47,34 @@ DatasetParameterSet::DatasetParameterSet(util::BitReader& bit_reader, size_t len
     dataset_ID = bit_reader.read<uint16_t>();
 
     /// parameter_set_ID, parent_parameter_set_ID and encoded_parameters()
-//    parameterSet_p2 = ParameterSet(bit_reader);
+    //    parameterSet_p2 = ParameterSet(bit_reader);
 
     bit_reader.flush();
 
-    UTILS_DIE_IF(bit_reader.getPos()-start_pos != length, "Invalid DatasetParameterSet length!");
-
+    UTILS_DIE_IF(bit_reader.getPos() - start_pos != length, "Invalid DatasetParameterSet length!");
 }
-// ---------------------------------------------------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetParameterSet::setDatasetID(uint16_t datasetID) { dataset_ID = datasetID;}
+void DatasetParameterSet::setDatasetID(uint16_t datasetID) { dataset_ID = datasetID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint16_t DatasetParameterSet::getDatasetID() const { return dataset_ID;}
+uint16_t DatasetParameterSet::getDatasetID() const { return dataset_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t DatasetParameterSet::getDatasetGroupID() const { return dataset_group_ID;}
+uint8_t DatasetParameterSet::getDatasetGroupID() const { return dataset_group_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetParameterSet::setDatasetGroupID(uint8_t datasetGroupID) { dataset_group_ID = datasetGroupID;}
+void DatasetParameterSet::setDatasetGroupID(uint8_t datasetGroupID) { dataset_group_ID = datasetGroupID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t DatasetParameterSet::getLength() const {
-
     /// Key c(4) Length u(64)
-    uint64_t len = (4 * sizeof(char) + 8);   // gen_info
+    uint64_t len = (4 * sizeof(char) + 8);  // gen_info
 
     // dataset_group_ID u(8)
     len += 1;
@@ -110,7 +97,6 @@ uint64_t DatasetParameterSet::getLength() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DatasetParameterSet::write(util::BitWriter& bit_writer) const {
-
     /// Key of KLV format
     bit_writer.write("pars");
 
@@ -128,7 +114,6 @@ void DatasetParameterSet::write(util::BitWriter& bit_writer) const {
 
     bit_writer.flush();
 }
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -3,38 +3,33 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-#ifndef GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE
-#define GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE
+
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_H_
 
 #include <string>
 #include <vector>
-
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-#include <genie/util/exception.h>
-#include <genie/format/mpegg_p1/util.h>
-
-#include "reference_location/reference_location.h"
-#include "reference_location/external.h"
-#include "reference_location/internal.h"
+#include "genie/format/mpegg_p1/reference/reference_location/external.h"
+#include "genie/format/mpegg_p1/reference/reference_location/internal.h"
+#include "genie/format/mpegg_p1/reference/reference_location/reference_location.h"
+#include "genie/format/mpegg_p1/util.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/exception.h"
 
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-class Reference{
-   public:
-    enum class ReferenceType : uint8_t {
-        MPEGG_REF = 0,
-        RAW_REF = 1,
-        FASTA_REF = 2
-    };
+class Reference {
+ public:
+    enum class ReferenceType : uint8_t { MPEGG_REF = 0, RAW_REF = 1, FASTA_REF = 2 };
 
-   private:
+ private:
     /** ------------------------------------------------------------------------------------------------------------
-    * Reference - ISO 23092-1 Section 6.5.1.3 table 10
-    * Reference Metadata - ISO 23092-1 Section 6.5.1.4 table 13 - metadata specified in ISO/IEC 23092-3
-    * ------------------------------------------------------------------------------------------------------------- */
+     * Reference - ISO 23092-1 Section 6.5.1.3 table 10
+     * Reference Metadata - ISO 23092-1 Section 6.5.1.4 table 13 - metadata specified in ISO/IEC 23092-3
+     * ------------------------------------------------------------------------------------------------------------- */
     uint8_t dataset_group_ID;
     uint8_t reference_ID;
     std::string reference_name;
@@ -47,10 +42,9 @@ class Reference{
 
     // Contains external_ref_flag and corresponding data
     ReferenceLocation reference_location;
-//    std::unique_ptr<ReferenceLocation> reference_location;
+    //    std::unique_ptr<ReferenceLocation> reference_location;
 
-   public:
-
+ public:
     /**
      *
      */
@@ -106,14 +100,14 @@ class Reference{
      *
      * @param _ref_loc
      */
-     //TODO: FIX ME
+    // TODO(Raouf): FIX ME
     void addReferenceLocation(ReferenceLocation&& _ref_loc);
 
     /**
      *
      * @return
      */
-    //TODO: FIX ME
+    // TODO(Raouf): FIX ME
     const ReferenceLocation& getReferenceLocation() const;
 
     /**
@@ -140,4 +134,4 @@ class Reference{
 }  // namespace format
 }  // namespace genie
 
-#endif  // GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_H_

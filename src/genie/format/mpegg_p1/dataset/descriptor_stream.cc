@@ -4,22 +4,24 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <genie/util/runtime-exception.h>
-#include <genie/format/mpegg_p1/util.h>
+#include "genie/format/mpegg_p1/dataset/descriptor_stream.h"
+#include <string>
+#include "genie/format/mpegg_p1/util.h"
+#include "genie/util/runtime-exception.h"
 
-#include "descriptor_stream.h"
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
-DSProtection::DSProtection()
-    : DS_protection_value() {}
 
-DSProtection::DSProtection(util::BitReader& bit_reader, size_t length)
-    : DS_protection_value() {
+DSProtection::DSProtection() : DS_protection_value() {}
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+DSProtection::DSProtection(util::BitReader& bit_reader, size_t length) : DS_protection_value() {
     std::string key = readKey(bit_reader);
     UTILS_DIE_IF(key != "dspr", "DSProtection is not Found");
 
@@ -33,11 +35,11 @@ DSProtection::DSProtection(util::BitReader& bit_reader, size_t length)
     UTILS_DIE_IF(bit_reader.getPos() - start_pos != length, "Invalid DSProtection length!");
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t DSProtection::getLength() const {
-
     /// Key c(4) Length u(64)
-    uint64_t len = (4 * sizeof(char) + 8);   // gen_info
+    uint64_t len = (4 * sizeof(char) + 8);  // gen_info
 
     // DS_protection_value[] std::vector<uint8_t>
     len += DS_protection_value.size();
@@ -45,9 +47,9 @@ uint64_t DSProtection::getLength() const {
     return len;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
 
 void DSProtection::write(genie::util::BitWriter& bit_writer) const {
-
     /// KLV (Key Length Value) format
     // Key of KLV format
     bit_writer.write("dspr");
@@ -55,23 +57,18 @@ void DSProtection::write(genie::util::BitWriter& bit_writer) const {
     // Length of KLV format
     bit_writer.write(getLength(), 64);
 
-    for (auto& DS_val : DS_protection_value){
+    for (auto& DS_val : DS_protection_value) {
         bit_writer.write(DS_val, 8);
     }
 }
 
-
-// ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorStream::DescriptorStream()
-    : descriptor_stream_header(),
-      DS_protection(),
-      block_payload() {}
+DescriptorStream::DescriptorStream() : descriptor_stream_header(), DS_protection(), block_payload() {}
 
+// ---------------------------------------------------------------------------------------------------------------------
 
 DescriptorStream::DescriptorStream(genie::util::BitReader& bit_reader, size_t length) {
-
     std::string key = readKey(bit_reader);
     UTILS_DIE_IF(key != "dscn", "DescriptorStream is not Found");
 
@@ -91,10 +88,11 @@ DescriptorStream::DescriptorStream(genie::util::BitReader& bit_reader, size_t le
     UTILS_DIE_IF(bit_reader.getPos() - start_pos != length, "Invalid DescriptorStream length!");
 }
 
-uint64_t DescriptorStream::getLength() const {
+// ---------------------------------------------------------------------------------------------------------------------
 
+uint64_t DescriptorStream::getLength() const {
     /// Key c(4) Length u(64)
-    uint64_t len = (4 * sizeof(char) + 8);   // gen_info
+    uint64_t len = (4 * sizeof(char) + 8);  // gen_info
 
     // descriptor_stream_header
     len += descriptor_stream_header.getLength();
@@ -107,6 +105,8 @@ uint64_t DescriptorStream::getLength() const {
 
     return len;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 void DescriptorStream::write(util::BitWriter& bit_writer) const {
     /// Key of KLV format
@@ -122,10 +122,9 @@ void DescriptorStream::write(util::BitWriter& bit_writer) const {
     DS_protection.write(bit_writer);
 
     // block_payload
-    for (auto& data: block_payload){
+    for (auto& data : block_payload) {
         bit_writer.write(data, 8);
     }
-
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -134,3 +133,5 @@ void DescriptorStream::write(util::BitWriter& bit_writer) const {
 }  // namespace format
 }  // namespace genie
 
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
