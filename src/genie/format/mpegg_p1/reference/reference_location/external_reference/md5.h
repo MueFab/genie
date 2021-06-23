@@ -4,12 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_EXTERNAL_REFERENCE_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_EXTERNAL_REFERENCE_H_
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_MD5_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_MD5_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
+#include <array>
+#include <vector>
+#include "genie/format/mpegg_p1/reference/reference_location/external_reference/checksum.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/exception.h"
@@ -24,55 +26,39 @@ namespace mpegg_p1 {
 /**
  * @brief
  */
-class ExternalReference {
+class Md5 : public Checksum {
+ private:
+    std::array<uint64_t, 2> data;  //!< @brief
+
  public:
     /**
-     * @brief
+     * @brief Default constructor
      */
-    enum class Type : uint8_t { MPEGG_REF = 0, RAW_REF = 1, FASTA_REF = 2 };
+    Md5();
 
     /**
-     * @brief
+     * @brief Read MD5 checksum from reader
+     * @param reader
      */
-    ExternalReference();
+    explicit Md5(util::BitReader& reader);
 
     /**
-     * @brief
-     * @param _reference_type
+     * @brief Initialize MD5 from array
+     * @param _data
      */
-    explicit ExternalReference(Type _reference_type);
-
-    /**
-     * @brief
-     */
-    ~ExternalReference() = default;
+    explicit Md5(std::vector<uint64_t>& _data);
 
     /**
      * @brief
      * @return
      */
-    virtual Checksum::Algo getChecksumAlg() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    Type getReferenceType() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    virtual uint64_t getLength();
+    uint64_t getLength() const override;
 
     /**
      * @brief
      * @param writer
      */
-    virtual void write(genie::util::BitWriter& writer);
-
- private:
-    Type reference_type;  //!< @brief
+    void write(genie::util::BitWriter& writer) const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -83,7 +69,7 @@ class ExternalReference {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_EXTERNAL_REFERENCE_H_
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_MD5_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

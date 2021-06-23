@@ -4,16 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_EXTERNAL_REFERENCE_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_EXTERNAL_REFERENCE_H_
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_CHECKSUM_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_CHECKSUM_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
-#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,55 +22,45 @@ namespace mpegg_p1 {
 /**
  * @brief
  */
-class ExternalReference {
+class Checksum {
  public:
     /**
      * @brief
      */
-    enum class Type : uint8_t { MPEGG_REF = 0, RAW_REF = 1, FASTA_REF = 2 };
-
-    /**
-     * @brief
-     */
-    ExternalReference();
-
-    /**
-     * @brief
-     * @param _reference_type
-     */
-    explicit ExternalReference(Type _reference_type);
-
-    /**
-     * @brief
-     */
-    ~ExternalReference() = default;
-
-    /**
-     * @brief
-     * @return
-     */
-    virtual Checksum::Algo getChecksumAlg() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    Type getReferenceType() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    virtual uint64_t getLength();
-
-    /**
-     * @brief
-     * @param writer
-     */
-    virtual void write(genie::util::BitWriter& writer);
+    enum class Algo : uint8_t { MD5 = 0, SHA256 = 1 };
 
  private:
-    Type reference_type;  //!< @brief
+    Algo checksum_alg;  //!< @brief
+
+ public:
+    /**
+     * @brief
+     */
+    Checksum();
+
+    /**
+     * @brief
+     * @param _algo
+     */
+    explicit Checksum(Algo _algo);
+
+    /**
+     * @brief
+     * @return
+     */
+    Algo getType() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    virtual uint64_t getLength() const;
+
+    /**
+     * @brief
+     * @param bit_writer
+     */
+    virtual void write(genie::util::BitWriter& bit_writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -83,7 +71,7 @@ class ExternalReference {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_EXTERNAL_REFERENCE_H_
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_CHECKSUM_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,16 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_EXTERNAL_REFERENCE_H_
-#define SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_EXTERNAL_REFERENCE_H_
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_DATASET_ACCESS_UNIT_BLOCK_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_DATASET_ACCESS_UNIT_BLOCK_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
+#include <list>
+#include <vector>
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/exception.h"
-#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,55 +24,67 @@ namespace mpegg_p1 {
 /**
  * @brief
  */
-class ExternalReference {
+class Block {
+ private:
+    uint8_t descriptor_ID;  //!< @brief
+
+    std::list<uint8_t> block_payload;  //!< @brief block_payload_size (implicite), block_payload[]
+
  public:
     /**
      * @brief
+     * @param reader
      */
-    enum class Type : uint8_t { MPEGG_REF = 0, RAW_REF = 1, FASTA_REF = 2 };
+    explicit Block(util::BitReader& reader);
 
     /**
      * @brief
+     * @param _desc_ID
+     * @param payload
      */
-    ExternalReference();
-
-    /**
-     * @brief
-     * @param _reference_type
-     */
-    explicit ExternalReference(Type _reference_type);
-
-    /**
-     * @brief
-     */
-    ~ExternalReference() = default;
+    explicit Block(uint8_t _desc_ID, std::list<uint8_t>& _block_payload);
 
     /**
      * @brief
      * @return
      */
-    virtual Checksum::Algo getChecksumAlg() const;
+    uint8_t getDescID() const;
 
     /**
      * @brief
      * @return
      */
-    Type getReferenceType() const;
+    uint32_t getPayloadSize() const;
 
     /**
      * @brief
      * @return
      */
-    virtual uint64_t getLength();
+    const std::list<uint8_t>& getPayload() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    uint64_t getHeaderLength() const;
 
     /**
      * @brief
      * @param writer
      */
-    virtual void write(genie::util::BitWriter& writer);
+    void writeHeader(util::BitWriter& writer) const;
 
- private:
-    Type reference_type;  //!< @brief
+    /**
+     * @brief
+     * @return
+     */
+    uint64_t getLength() const;
+
+    /**
+     * @brief
+     * @param writer
+     */
+    void write(genie::util::BitWriter& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -83,7 +95,7 @@ class ExternalReference {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_GENIE_FORMAT_MPEGG_P1_REFERENCE_REFERENCE_LOCATION_EXTERNAL_REFERENCE_EXTERNAL_REFERENCE_H_
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_DATASET_ACCESS_UNIT_BLOCK_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
