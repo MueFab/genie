@@ -1,4 +1,10 @@
-#include "mpegg_ref.h"
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
+#include "genie/format/mpegg_p1/reference/reference_location/external_reference/mpegg_ref.h"
 
 namespace genie {
 namespace format {
@@ -7,10 +13,7 @@ namespace mpegg_p1 {
 // ---------------------------------------------------------------------------------------------------------------------
 
 MpegReference::MpegReference(util::BitReader& reader, Checksum::Algo checksum_alg)
-    : dataset_group_ID(reader.read<uint8_t>()),
-      dataset_ID(reader.read<uint8_t>()),
-      ref_checksum(){
-
+    : dataset_group_ID(reader.read<uint8_t>()), dataset_ID(reader.read<uint8_t>()), ref_checksum() {
     switch (checksum_alg) {
         case Checksum::Algo::MD5: {
             ref_checksum = Md5(reader);
@@ -27,14 +30,13 @@ MpegReference::MpegReference(util::BitReader& reader, Checksum::Algo checksum_al
     }
 }
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
-MpegReference::MpegReference(uint8_t _dataset_group_ID, uint16_t _dataset_ID, Checksum &&_ref_checksum)
+MpegReference::MpegReference(uint8_t _dataset_group_ID, uint16_t _dataset_ID, Checksum&& _ref_checksum)
     : ExternalReference(ExternalReference::Type::MPEGG_REF),
       dataset_group_ID(_dataset_group_ID),
       dataset_ID(_dataset_ID),
-      ref_checksum(_ref_checksum){}
+      ref_checksum(_ref_checksum) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -46,18 +48,12 @@ uint16_t MpegReference::getDatasetID() const { return dataset_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//void MpegReference::addChecksum(Checksum&& _checksum) {
-//    ref_checksum = _checksum;
-//}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 Checksum::Algo MpegReference::getChecksumAlg() const { return ref_checksum.getType(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t MpegReference::getLength(){
-    //  TODO: Check this one
+uint64_t MpegReference::getLength() {
+    // TODO(Raouf): Check this one
     // external_dataset_group_ID u(8), external_dataset_ID u(16)
     uint64_t len = 1 + 2;
     len += ref_checksum.getLength();
@@ -92,3 +88,6 @@ void MpegReference::write(util::BitWriter& writer) {
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

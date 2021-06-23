@@ -3,29 +3,28 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-#ifndef GENIE_PART1_LABEL_H
-#define GENIE_PART1_LABEL_H
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_LABEL_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_LABEL_H_
 
 #include <string>
 #include <vector>
-#include "genie/util/bitwriter.h"
+#include "genie/format/mpegg_p1/label_list/label/dataset_info.h"
 #include "genie/util/bitreader.h"
-
-#include "dataset_info.h"
+#include "genie/util/bitwriter.h"
 
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-class Label{
-   private:
+class Label {
+ private:
     /**
-    * ISO 23092-1 Section 6.5.1.5.4 table 15
-    **/
+     * ISO 23092-1 Section 6.5.1.5.4 table 15
+     **/
     std::string label_ID;
     std::vector<DatasetInfo> dataset_infos;
 
-   public:
+ public:
     /**
      *
      */
@@ -40,7 +39,6 @@ class Label{
      * @param reader
      */
     void ReadLabel(util::BitReader& reader);
-
 
     /**
      *
@@ -68,7 +66,6 @@ class Label{
      */
     uint16_t getNumDatasets() const;
 
-
     /**
      *
      * @return
@@ -81,9 +78,8 @@ class Label{
     void write(genie::util::BitWriter& bit_writer) const;
 };
 
-
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie
 
-#endif  // GENIE_LABEL_H
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_LABEL_H_

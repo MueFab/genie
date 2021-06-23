@@ -3,29 +3,37 @@
  * @copyright This file is part of GENIE. See LICENSE and/or
  * https://github.com/mitogen/genie for more details.
  */
-#include <genie/util/exception.h>
-#include "genie/util/runtime-exception.h"
-#include <genie/format/mpegg_p1/util.h>
 
-#include "dataset_header.h"
+#include "genie/format/mpegg_p1/dataset/dataset_header.h"
+#include "genie/format/mpegg_p1/util.h"
+#include "genie/util/exception.h"
+#include "genie/util/runtime-exception.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-DatasetHeader::DatasetHeader():
-    dataset_group_ID(0),
-    dataset_ID(0),
-    version(),
-    byte_offset_size_flag(ByteOffsetSizeFlag::OFF),
-    non_overlapping_AU_range_flag(false),
-    pos_40_bits_flag(Pos40SizeFlag::OFF),
-    multiple_alignment_flag(false),
-    dataset_type(core::parameter::DataUnit::DatasetType::NON_ALIGNED),
-    alphabet_ID(0),
-    num_U_access_units(0) {}
+// ---------------------------------------------------------------------------------------------------------------------
+
+DatasetHeader::DatasetHeader()
+    : dataset_group_ID(0),
+      dataset_ID(0),
+      version(),
+      byte_offset_size_flag(ByteOffsetSizeFlag::OFF),
+      non_overlapping_AU_range_flag(false),
+      pos_40_bits_flag(Pos40SizeFlag::OFF),
+      multiple_alignment_flag(false),
+      dataset_type(core::parameter::DataUnit::DatasetType::NON_ALIGNED),
+      alphabet_ID(0),
+      num_U_access_units(0) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 DatasetHeader::DatasetHeader(uint16_t datasetID) : dataset_ID(datasetID) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 DatasetHeader::DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSizeFlag _byte_offset_size_flag,
                              bool _non_overlapping_AU_range_flag, Pos40SizeFlag _pos_40_bits_flag,
@@ -40,10 +48,11 @@ DatasetHeader::DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSizeFlag _
       multiple_alignment_flag(_multiple_alignment_flag),
       dataset_type(_dataset_type),
       alphabet_ID(_alphabet_ID),
-      num_U_access_units(_num_U_access_units){
-
+      num_U_access_units(_num_U_access_units) {
     UTILS_DIE_IF(4 != version.size(), "Version string must consists of 4 characters");
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 DatasetHeader::DatasetHeader(util::BitReader& bit_reader, size_t length)
     : dataset_group_ID(bit_reader.read<uint8_t>()),
@@ -56,7 +65,6 @@ DatasetHeader::DatasetHeader(util::BitReader& bit_reader, size_t length)
       dataset_type(bit_reader.read<core::parameter::DataUnit::DatasetType>(4)),
       alphabet_ID(bit_reader.read<uint8_t>()),
       num_U_access_units(bit_reader.read<uint32_t>()) {
-
     std::string key = readKey(bit_reader);
     UTILS_DIE_IF(key != "dthd", "DatasetHeader is not Found");
 
@@ -75,42 +83,63 @@ DatasetHeader::DatasetHeader(util::BitReader& bit_reader, size_t length)
     /// Class SequenceConfig
     seq_info.ReadSequenceConfig(bit_reader);
 
-    UTILS_DIE_IF(bit_reader.getPos()-start_pos != length, "Invalid DatasetHeader length!");
+    UTILS_DIE_IF(bit_reader.getPos() - start_pos != length, "Invalid DatasetHeader length!");
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 uint16_t DatasetHeader::getID() const { return dataset_ID; }
 
-void DatasetHeader::setID(uint16_t ID) { dataset_ID = ID;}
+// ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t DatasetHeader::getGroupID() const {return dataset_group_ID;}
+void DatasetHeader::setID(uint16_t ID) { dataset_ID = ID; }
 
-void DatasetHeader::setGroupId(uint8_t group_ID) { dataset_group_ID = group_ID;}
+// ---------------------------------------------------------------------------------------------------------------------
 
+uint8_t DatasetHeader::getGroupID() const { return dataset_group_ID; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void DatasetHeader::setGroupId(uint8_t group_ID) { dataset_group_ID = group_ID; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 DatasetHeader::ByteOffsetSizeFlag DatasetHeader::getByteOffsetSizeFlag() const { return byte_offset_size_flag; }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 DatasetHeader::Pos40SizeFlag DatasetHeader::getPos40SizeFlag() const { return pos_40_bits_flag; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 const SequenceConfig& DatasetHeader::getSeqInfo() const { return seq_info; }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 const BlockConfig& DatasetHeader::getBlockHeader() const { return block_header; }
 
-uint32_t DatasetHeader::getNumUAccessUnits() const { return num_U_access_units;}
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint32_t DatasetHeader::getNumUAccessUnits() const { return num_U_access_units; }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 bool DatasetHeader::getMultipleAlignmentFlag() const { return multiple_alignment_flag; }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 core::parameter::DataUnit::DatasetType DatasetHeader::getDatasetType() const { return dataset_type; }
 
+// ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t DatasetHeader::getLength() const {
-
-//length is first calculated in bits then converted in bytes
+    // length is first calculated in bits then converted in bytes
 
     /// Key c(4) Length u(64)
-    uint64_t bitlen = (4 * sizeof(char) + 8) * 8 ;   // gen_info
+    uint64_t bitlen = (4 * sizeof(char) + 8) * 8;  // gen_info
 
     bitlen += (1 + 2 + 4) * 8;  // dataset_group_ID u(8), dataset_ID u(16), version c(4)
-    bitlen += 3; // byte_offset_size_flag u(1), non_overlapping_AU_range_flag u(1) , pos_40_bits_flag u(1)
+    bitlen += 3;  // byte_offset_size_flag u(1), non_overlapping_AU_range_flag u(1) , pos_40_bits_flag u(1)
 
     // data encapsulated in Class: BlockConfig
     /// block_header_flag, MIT_flag, CC_mode_flag, ordered_blocks_flag
@@ -127,7 +156,7 @@ uint64_t DatasetHeader::getLength() const {
         // data encapsulated in Class: UAccessUnitInfo
         /// num_U_clusters, multiple_signature_base, U_signature_size,
         /// U_signature_constant_length, U_signature_length
-        if ( u_access_unit_info != nullptr) {
+        if (u_access_unit_info != nullptr) {
             bitlen += u_access_unit_info->getBitLength();
         }
     }
@@ -142,8 +171,9 @@ uint64_t DatasetHeader::getLength() const {
     return bitlen / 8;
 }
 
-void DatasetHeader::write(util::BitWriter& bit_writer) const {
+// ---------------------------------------------------------------------------------------------------------------------
 
+void DatasetHeader::write(util::BitWriter& bit_writer) const {
     /// Key of KLV format
     bit_writer.write("dthd");
 
@@ -160,7 +190,7 @@ void DatasetHeader::write(util::BitWriter& bit_writer) const {
     writeNullTerminatedStr(bit_writer, version);
 
     // byte_offset_size_flag u(1)
-    if (byte_offset_size_flag == ByteOffsetSizeFlag::ON){
+    if (byte_offset_size_flag == ByteOffsetSizeFlag::ON) {
         bit_writer.write(1, 1);
     } else {
         bit_writer.write(0, 1);
@@ -184,7 +214,7 @@ void DatasetHeader::write(util::BitWriter& bit_writer) const {
     seq_info.write(bit_writer);
 
     // dataset_type u(4)
-    switch(dataset_type) {
+    switch (dataset_type) {
         case core::parameter::DataUnit::DatasetType::NON_ALIGNED:
             bit_writer.write(0, 4);
             break;
@@ -205,10 +235,10 @@ void DatasetHeader::write(util::BitWriter& bit_writer) const {
     // num_U_access_units u(32)
     bit_writer.write(num_U_access_units, 32);
 
-    if (num_U_access_units){
+    if (num_U_access_units) {
         UTILS_DIE_IF(u_access_unit_info == nullptr, "No u_access_unit_info stored!");
 
-        ///num_U_clusters, multiple_signature_base, U_signature_size, U_signature_constant_length, U_signature_length
+        /// num_U_clusters, multiple_signature_base, U_signature_size, U_signature_constant_length, U_signature_length
         u_access_unit_info->write(bit_writer);
     }
 
@@ -217,9 +247,13 @@ void DatasetHeader::write(util::BitWriter& bit_writer) const {
 
     /// nesting zero bit
     bit_writer.flush();
-
 }
 
-}// namespace mpegg_p1
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

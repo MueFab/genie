@@ -4,31 +4,30 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include <genie/util/runtime-exception.h>
-#include <genie/format/mpegg_p1/util.h>
+#include "genie/format/mpegg_p1/dataset/descriptor_stream_header.h"
+#include <string>
+#include "genie/format/mpegg_p1/util.h"
+#include "genie/util/runtime-exception.h"
 
-#include "descriptor_stream_header.h"
+// ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-DescriptorStreamHeader::DescriptorStreamHeader()
-    : reserved(),
-      descriptor_ID(),
-      class_ID(),
-      num_blocks() {}
+// ---------------------------------------------------------------------------------------------------------------------
 
+DescriptorStreamHeader::DescriptorStreamHeader() : reserved(), descriptor_ID(), class_ID(), num_blocks() {}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 DescriptorStreamHeader::DescriptorStreamHeader(uint8_t _res, uint8_t _descriptor_ID, uint8_t _class_ID,
                                                uint32_t _num_blocks)
-    : reserved(_res),
-      descriptor_ID(_descriptor_ID),
-      class_ID(_class_ID),
-      num_blocks(_num_blocks) {}
+    : reserved(_res), descriptor_ID(_descriptor_ID), class_ID(_class_ID), num_blocks(_num_blocks) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 DescriptorStreamHeader::DescriptorStreamHeader(util::BitReader& bit_reader) {
-
     std::string key = readKey(bit_reader);
     UTILS_DIE_IF(key != "dshd", "DescriptorStreamHeader is not Found");
 
@@ -44,9 +43,9 @@ DescriptorStreamHeader::DescriptorStreamHeader(util::BitReader& bit_reader) {
     bit_reader.flush();
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t DescriptorStreamHeader::getLength() const {
-
     /// length is first calculated in bits then converted in bytes
 
     /// Key c(4) Length u(64)
@@ -72,8 +71,9 @@ uint64_t DescriptorStreamHeader::getLength() const {
     return bitlen;
 }
 
-void DescriptorStreamHeader::write(util::BitWriter& bit_writer) const {
+// ---------------------------------------------------------------------------------------------------------------------
 
+void DescriptorStreamHeader::write(util::BitWriter& bit_writer) const {
     // Key of KLV format
     bit_writer.write("dshd");
 
@@ -93,9 +93,13 @@ void DescriptorStreamHeader::write(util::BitWriter& bit_writer) const {
     bit_writer.write(num_blocks, 32);
 
     bit_writer.flush();
-
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------

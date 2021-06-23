@@ -1,28 +1,33 @@
-#ifndef GENIE_PART1_DATASET_INFO_H
-#define GENIE_PART1_DATASET_INFO_H
+/**
+ * @file
+ * @copyright This file is part of GENIE. See LICENSE and/or
+ * https://github.com/mitogen/genie for more details.
+ */
+
+#ifndef SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_DATASET_INFO_H_
+#define SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_DATASET_INFO_H_
 
 #include <cstdint>
 #include <vector>
-#include "genie/util/bitwriter.h"
+#include "genie/format/mpegg_p1/label_list/label/dataset_region.h"
 #include "genie/util/bitreader.h"
-
-#include "dataset_region.h"
+#include "genie/util/bitwriter.h"
 
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-class DatasetInfo{
-   private:
+class DatasetInfo {
+ private:
     /**
-    * ISO 23092-1 Section 6.5.1.5.4 table 15 (for num_dataset)
-    *
-    **/
+     * ISO 23092-1 Section 6.5.1.5.4 table 15 (for num_dataset)
+     *
+     **/
     uint16_t dataset_ID;
 
     std::vector<DatasetRegion> dataset_regions;
 
-   public:
+ public:
     /**
      *
      */
@@ -37,7 +42,6 @@ class DatasetInfo{
      * @param reader
      */
     void ReadDatasetInfo(util::BitReader& reader);
-
 
     /**
      *
@@ -65,7 +69,6 @@ class DatasetInfo{
      */
     uint8_t getNumRegions() const;
 
-
     /**
      *
      * @return
@@ -82,4 +85,4 @@ class DatasetInfo{
 }  // namespace format
 }  // namespace genie
 
-#endif  // GENIE_PART1_DATASET_INFO_H
+#endif  // SRC_GENIE_FORMAT_MPEGG_P1_LABEL_LIST_LABEL_DATASET_INFO_H_
