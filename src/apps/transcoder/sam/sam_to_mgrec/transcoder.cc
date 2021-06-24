@@ -87,8 +87,8 @@ ErrorCode sam_to_mgrec_phase1(Config& options, int& nref) {
             if (!save_mgrecs_by_rid(records, p1_bitwriters)) {
                 UTILS_DIE("Cannot save MPEG-G Records");
             }
+            buffer = SamRecordGroup();
         }
-
         buffer.addRecord(std::move(sam_rec));
     }
     if (res < -1) {
@@ -122,16 +122,15 @@ std::string gen_p2_tmp_fpath(Config& options, int rid, int ifile) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
+    std::ofstream total_output(options.mgrec_file_path, std::ios::binary | std::ios::trunc);
+    genie::util::BitWriter total_output_writer(&total_output);
+
     /// Process MPEG-G records of each RefID
     for (auto iref = 0; iref < nref; iref++) {
         auto n_tmp_files = 0;
 
         std::string fpath = options.tmp_dir_path + "/" + std::to_string(iref) + PHASE1_EXT;
         SubfileReader mgg_reader(fpath);
-
-        std::string tmp_fpath = options.tmp_dir_path + "/" + std::to_string(iref) + PHASE2_EXT;
-        std::ofstream p2_writer(tmp_fpath, std::ios::binary | std::ios::trunc);
-        genie::util::BitWriter p2_bitwriter(&p2_writer);
 
         std::vector<genie::core::record::Record> buffer;
 
@@ -144,7 +143,7 @@ ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
                 //
                 /// Store unmapped record to output file
                 if (mgg_reader.getRecord().getAlignments().empty()) {
-                    mgg_reader.writeRecord(p2_bitwriter);
+                    mgg_reader.writeRecord(total_output_writer);
                 } else {
                     buffer.emplace_back(mgg_reader.moveRecord());
                 }
@@ -186,7 +185,7 @@ ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
                 }
             }
 
-            reader_with_smallest_pos->writeRecord(p2_bitwriter);
+            reader_with_smallest_pos->writeRecord(total_output_writer);
 
             /// Close the current tmp file if it contains no more record;
             if (!reader_with_smallest_pos->readRecord()) {
@@ -194,15 +193,14 @@ ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
             }
         }
 
-        /// Close Phase 2 transcoding output file
-        p2_bitwriter.flush();
-        p2_writer.close();
-
         /// Remove all temporary file belonging to current RID
         for (auto i_file = 0; i_file < n_tmp_files; i_file++) {
             std::remove(gen_p2_tmp_fpath(options, iref, i_file).c_str());
         }
     }
+
+    total_output_writer.flush();
+    total_output.flush();
 
     return ErrorCode::success;
 }
@@ -229,6 +227,8 @@ ErrorCode transcode(Config& options) {
     if ((status = sam_to_mgrec_phase2(options, nref)) != ErrorCode::success) {
         return ErrorCode::failure;
     }
+
+    clean_phase1_files(options, nref);
 
     clean_phase1_files(options, nref);
 

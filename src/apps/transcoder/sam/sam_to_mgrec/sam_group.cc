@@ -8,6 +8,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <iostream>
 #include <map>
 #include <string>
 #include <utility>
@@ -458,6 +459,15 @@ bool SamRecordGroup::isValid() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 SamRecordGroup::Category SamRecordGroup::computeClass() {
+
+    if  (data[(uint8_t)Index::PAIR_READ1_PRIMARY].empty() && !data[(uint8_t)Index::PAIR_READ2_PRIMARY].empty()) {
+        data[(uint8_t)Index::SINGLE] = std::move(data[(uint8_t)Index::PAIR_READ2_PRIMARY]);
+    }
+
+    if  (!data[(uint8_t)Index::PAIR_READ1_PRIMARY].empty() && data[(uint8_t)Index::PAIR_READ2_PRIMARY].empty()) {
+        data[(uint8_t)Index::SINGLE] = std::move(data[(uint8_t)Index::PAIR_READ1_PRIMARY]);
+    }
+
     if (isUnknown() || data[uint8_t(Index::UNMAPPED)].size() > 1) {
         return Category::INVALID;
     } else {
@@ -488,7 +498,9 @@ void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bo
 
     auto cls = getRecords(sam_recs_2d);
     if (cls == Category::INVALID) {
-        UTILS_DIE("SAM records belong to multiple category (unmapped, single, paired)");
+       //  UTILS_DIE("SAM records belong to multiple category (unmapped, single, paired)");
+       std::cerr << "Skipped read" << std::endl;
+       return;
     }
 
     switch (cls) {
