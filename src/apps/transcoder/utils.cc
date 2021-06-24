@@ -43,6 +43,10 @@ uint64_t getMinPos(const genie::core::record::Record& r) {
                 return first_pos < second_pos ? first_pos : second_pos;
             }
 
+            case genie::core::record::AlignmentSplit::Type::UNPAIRED: {
+                return first_pos;
+            }
+
             default:
                 UTILS_DIE("Unknown type found while computing minimum position");
         }
