@@ -63,7 +63,7 @@ void Encoder::updateAssembly(const core::record::Record& r, Encoder::LaeState& s
 
     updateAUBoundaries(r.getAlignments().front().getPosition(), r.getAlignments().front().getAlignment().getECigar(),
                        state);
-    if (state.pairedEnd) {
+    if (state.pairedEnd && r.getAlignments().front().getAlignmentSplits().front()->getType() == core::record::AlignmentSplit::Type::SAME_REC) {
         const auto& srec = getPairedAlignment(state, r);
         ref2 = state.refCoder.getReference((uint32_t)(r.getAlignments().front().getPosition() + srec.getDelta()),
                                            srec.getAlignment().getECigar());
@@ -154,10 +154,14 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     watch.reset();
     size_t read_num = 0;
     for (auto& r : data.getData()) {
+        if (r.getClassID() == core::record::ClassType::CLASS_HM) {
+            std::cerr << "Skipping record of class HM in local assembly..." << std::endl;
+            continue;
+        }
         read_num += r.getSegments().size();
-        uint64_t curPos = r.isRead1First()
-                              ? r.getAlignments().front().getPosition()
-                              : r.getAlignments().front().getPosition() + getPairedAlignment(state, r).getDelta();
+        uint64_t curPos = (!r.isRead1First()) && r.getAlignments().front().getAlignmentSplits().front()->getType() == core::record::AlignmentSplit::Type::SAME_REC
+                              ? r.getAlignments().front().getPosition() + getPairedAlignment(state, r).getDelta()
+                              : r.getAlignments().front().getPosition();
         UTILS_DIE_IF(curPos < lastPos, "Data seems to be unsorted. Local assembly encoding needs sorted input data.");
 
         lastPos = r.getAlignments().front().getPosition();
