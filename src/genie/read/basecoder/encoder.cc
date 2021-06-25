@@ -5,6 +5,7 @@
  */
 
 #include "genie/read/basecoder/encoder.h"
+#include <genie/core/record/alignment_split/other-rec.h>
 #include <algorithm>
 #include <array>
 #include <utility>
@@ -122,6 +123,7 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
 
     // Check if record is paired
     if (rec.getSegments().size() > 1) {
+        // Same record
         const core::record::alignment_split::SameRec &srec = extractPairedAlignment(rec);
         const auto SECOND_RECORD_INDEX = 1;
         const auto LENGTH2 = rec.getSegments()[SECOND_RECORD_INDEX].getSequence().length();
@@ -130,6 +132,38 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
         const auto &SEQUENCE2 = rec.getSegments()[SECOND_RECORD_INDEX].getSequence();
         const auto &CIGAR2 = srec.getAlignment().getECigar();
         clips.second = encodeCigar(SEQUENCE2, CIGAR2, ref2, rec.getClassID());
+    } else if (rec.getNumberOfTemplateSegments() > 1) {
+        // Unpaired
+        if(rec.getAlignments().front().getAlignmentSplits().front()->getType() == core::record::AlignmentSplit::Type::UNPAIRED) {
+            if(rec.isRead1First()) {
+                container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_UNPAIRED);
+            } else {
+                container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_UNPAIRED);
+            }
+        // Other record
+        } else {
+            const auto ALIGNMENT = rec.getAlignments().front().getAlignmentSplits().front().get();
+            auto split = *reinterpret_cast<const core::record::alignment_split::OtherRec *>(ALIGNMENT);
+            if(rec.isRead1First()) {
+                if(split.getNextSeq() == rec.getAlignmentSharedData().getSeqID()) {
+                    container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_DIFF_REF);
+                    container.push(core::GenSub::PAIR_R2_DIFF_SEQ, split.getNextSeq());
+                    container.push(core::GenSub::PAIR_R2_DIFF_POS, split.getNextPos());
+                } else {
+                    container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_SPLIT);
+                    container.push(core::GenSub::PAIR_R2_SPLIT, split.getNextPos());
+                }
+            } else {
+                if(split.getNextSeq() == rec.getAlignmentSharedData().getSeqID()) {
+                    container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_DIFF_REF);
+                    container.push(core::GenSub::PAIR_R1_DIFF_SEQ, split.getNextSeq());
+                    container.push(core::GenSub::PAIR_R1_DIFF_POS, split.getNextPos());
+                } else {
+                    container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_SPLIT);
+                    container.push(core::GenSub::PAIR_R1_SPLIT, split.getNextPos());
+                }
+            }
+        }
     }
 
     encodeClips(clips);

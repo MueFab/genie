@@ -145,6 +145,8 @@ struct GenConst {
     static constexpr uint8_t PAIR_R2_SPLIT = 2;
     static constexpr uint8_t PAIR_R1_DIFF_REF = 3;
     static constexpr uint8_t PAIR_R2_DIFF_REF = 4;
+    static constexpr uint8_t PAIR_R1_UNPAIRED = 5;
+    static constexpr uint8_t PAIR_R2_UNPAIRED = 6;
     static constexpr uint8_t RTYPE_REFERENCE = 0;
     static constexpr uint8_t RTYPE_CLASS_P = 1;
     static constexpr uint8_t RTYPE_CLASS_N = 2;

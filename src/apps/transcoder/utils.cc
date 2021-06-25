@@ -22,7 +22,7 @@ uint64_t getMinPos(const genie::core::record::Record& r) {
     }
 
     uint64_t first_pos = alignments.front().getPosition();
-    if (r.isRead1First()) {
+    if (r.isRead1First() || r.getClassID() == genie::core::record::ClassType::CLASS_HM) {
         return first_pos;
     } else {
         auto& split = r.getAlignments().front().getAlignmentSplits().front();

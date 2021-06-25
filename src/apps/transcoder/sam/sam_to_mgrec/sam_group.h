@@ -34,29 +34,27 @@ class SamRecordGroup {
     /**
      * @brief
      */
-    enum class Index : uint8_t {
-        UNMAPPED = 0,
-        SINGLE = 1,
-        PAIR_READ1_PRIMARY = 2,
-        PAIR_READ2_PRIMARY = 3,
-        PAIR_READ1_NONPRIMARY = 4,
-        PAIR_READ2_NONPRIMARY = 5,
-        UNKNOWN = 6,
-        TOTAL_INDICES = 7,  // Not used
+
+    enum class TemplateType : uint8_t {
+        SINGLE = 0,
+        PAIRED_1 = 1,
+        PAIRED_2 = 2,
+        PAIRED_UNKNOWN = 3,
+        TOTAL_INDICES = 4,  // Not used
     };
 
-    /**
-     * @brief
-     */
-    enum class Category : uint8_t {
-        INVALID = 0,
-        UNMAPPED = 1,
-        SINGLE = 2,
-        PAIRED = 4,
+    enum class MappingType : uint8_t {
+        UNMAPPED = 0,
+        PRIMARY = 1,
+        NONPRIMARY = 2,
+        TOTAL_INDICES = 3,  // Not used
     };
+
+
 
  private:
-    std::vector<std::list<SamRecord>> data;  //!< @brief
+
+    std::vector<std::vector<std::vector<SamRecord>>> data;  //!< @brief
 
     /**
      * @brief
@@ -74,7 +72,7 @@ class SamRecordGroup {
      * @param other_r
      * @param force_split
      */
-    void addAlignment(genie::core::record::Record& rec, SamRecord& r, SamRecord* other_r, bool force_split = true);
+    void addAlignment(genie::core::record::Record &rec, SamRecord *r1, SamRecord *r2, bool paired_end, bool force_split = false);
 
     /**
      * @brief
@@ -137,59 +135,18 @@ class SamRecordGroup {
      */
     static std::tuple<bool, uint8_t> convertFlags2Mpeg(uint16_t flags);
 
+
     /**
-     * @brief
-     * @param sam_recs
+     *
      * @return
      */
-    SamRecordGroup::Category getRecords(std::list<std::list<SamRecord>>& sam_recs);
+    std::pair<bool, genie::core::record::ClassType> validate();
 
     /**
      * @brief
      * @param rec
      */
     void addRecord(SamRecord&& rec);
-
-    /**
-     * @brief Check if sam records in ReadTemplate are unmapped
-     *
-     * @return
-     */
-    bool isUnmapped();
-
-    /**
-     * @brief Check if sam records in ReadTemplate are single-end reads
-     *
-     * @return
-     */
-    bool isSingle() const;
-
-    /**
-     * @brief Check if sam records in ReadTemplate are paired-end reads
-     *
-     * @return
-     */
-    bool isPaired() const;
-
-    /**
-     * @brief Check if sam records in ReadTemplate cannot be categorized
-     *
-     * @return
-     */
-    bool isUnknown();
-
-    /**
-     * @brief Check if sam records are valid and does not belongs to 2 or more different category
-     *
-     * @return
-     */
-    bool isValid();
-
-    /**
-     *
-     * @return
-     */
-    Category computeClass();
 
     /**
      * @brief

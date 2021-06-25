@@ -34,7 +34,6 @@ bool save_mgrecs_by_rid(std::list<genie::core::record::Record>& recs,
         auto ref_id = rec.getAlignmentSharedData().getSeqID();
 
         try {
-            UTILS_DIE_IF(rec.getClassID() != genie::core::record::ClassType::CLASS_I, "Invalid Class");
             auto bitwriter = bitwriters.at(ref_id);
 
             // TODO(Yeremia): Handle case where harddrive is full
@@ -138,8 +137,6 @@ ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
         while (mgg_reader.good()) {
             /// Read MPEG-G records
             while (mgg_reader.readRecord() && buffer.size() < PHASE2_BUFFER_SIZE) {
-                UTILS_DIE_IF(mgg_reader.getRecord().getClassID() != genie::core::record::ClassType::CLASS_I,
-                             "Invalid Class found while reading records from phase 1 transcoding");
                 //
                 /// Store unmapped record to output file
                 if (mgg_reader.getRecord().getAlignments().empty()) {
@@ -227,8 +224,6 @@ ErrorCode transcode(Config& options) {
     if ((status = sam_to_mgrec_phase2(options, nref)) != ErrorCode::success) {
         return ErrorCode::failure;
     }
-
-    clean_phase1_files(options, nref);
 
     clean_phase1_files(options, nref);
 

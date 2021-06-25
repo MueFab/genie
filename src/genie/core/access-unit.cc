@@ -224,7 +224,9 @@ void AccessUnit::push(GenSubIndex sub, uint64_t value) { get(sub).push(value); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void AccessUnit::pushDependency(GenSubIndex sub, uint64_t value) { get(sub).pushDependency(value); }
+void AccessUnit::pushDependency(GenSubIndex sub, uint64_t value) {
+    get(sub).pushDependency(value);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

@@ -44,6 +44,20 @@ class SamRecord {
     std::string qual;   //!< @brief
 
  public:
+
+    bool operator== (const SamRecord& rec) const{
+        return qname == rec.qname &&
+        flag == rec.flag &&
+        rid == rec.rid &&
+        pos == rec.pos &&
+        mapq == rec.mapq &&
+        cigar == rec.cigar &&
+        mate_rid == rec.mate_rid &&
+        mate_pos == rec.mate_pos &&
+        seq == rec.seq &&
+        qual == rec.qual;
+    }
+
     /**
      * @brief
      * @param int_base
