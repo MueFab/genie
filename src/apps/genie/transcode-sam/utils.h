@@ -4,58 +4,41 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_GENIE_TRANSCODE_FASTQ_PROGRAM_OPTIONS_H_
-#define SRC_APPS_GENIE_TRANSCODE_FASTQ_PROGRAM_OPTIONS_H_
+#ifndef SRC_APPS_TRANSCODER_UTILS_H_
+#define SRC_APPS_TRANSCODER_UTILS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <string>
+#include <genie/core/record/record.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genieapp {
-namespace transcode_fastq {
+namespace transcode_sam {
 
 /**
  * @brief
+ * @param r
+ * @return
  */
-class ProgramOptions {
- public:
-    /**
-     * @brief
-     * @param argc
-     * @param argv
-     */
-    ProgramOptions(int argc, char *argv[]);
+uint64_t getMinPos(const genie::core::record::Record& r);
 
- public:
-    std::string inputFile;     //!< @brief
-    std::string inputSupFile;  //!< @brief
-
-    std::string outputFile;     //!< @brief
-    std::string outputSupFile;  //!< @brief
-
-    bool forceOverwrite;  //!< @brief
-
-    size_t numberOfThreads;  //!< @brief
-
-    bool help;  //!< @brief
-
- private:
-    /**
-     * @brief
-     */
-    void validate();
-};
+/**
+ * @brief
+ * @param r1
+ * @param r2
+ * @return
+ */
+bool compare(const genie::core::record::Record& r1, const genie::core::record::Record& r2);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace transcode_fastq
+}  // namespace transcode_sam
 }  // namespace genieapp
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_GENIE_TRANSCODE_FASTQ_PROGRAM_OPTIONS_H_
+#endif  // SRC_APPS_TRANSCODER_UTILS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

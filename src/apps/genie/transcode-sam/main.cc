@@ -8,18 +8,23 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "apps/transcoder/sam/sam_to_mgrec/program-options.h"
-#include "apps/transcoder/sam/sam_to_mgrec/sorter.h"
-#include "apps/transcoder/sam/sam_to_mgrec/transcoder.h"
+#include "apps/genie/transcode-sam/sam/sam_to_mgrec/program-options.h"
+#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sorter.h"
+#include "apps/genie/transcode-sam/sam/sam_to_mgrec/transcoder.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+namespace genieapp {
+namespace transcode_sam {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 int main(int argc, char* argv[]) {
     try {
-        genie::transcoder::sam::sam_to_mgrec::Config programOptions(argc, argv);
+        genieapp::transcode_sam::sam::sam_to_mgrec::Config programOptions(argc, argv);
 
-        genie::transcoder::ErrorCode ret = transcode(programOptions);
-        if (ret != genie::transcoder::ErrorCode::success) {
+        genieapp::transcode_sam::ErrorCode ret = transcode(programOptions);
+        if (ret != genieapp::transcode_sam::ErrorCode::success) {
             UTILS_DIE("ERROR");
         }
     } catch (const std::exception& e) {
@@ -32,6 +37,11 @@ int main(int argc, char* argv[]) {
 
     return EXIT_SUCCESS;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace transcode_sam
+}  // namespace genieapp
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

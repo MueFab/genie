@@ -16,13 +16,13 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "apps/transcoder/sam/sam_to_mgrec/sam_record.h"
 #include "genie/core/record/record.h"
+#include "sam_record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace transcoder {
+namespace genieapp {
+namespace transcode_sam {
 namespace sam {
 namespace sam_to_mgrec {
 
@@ -50,10 +50,7 @@ class SamRecordGroup {
         TOTAL_INDICES = 3,  // Not used
     };
 
-
-
  private:
-
     std::vector<std::vector<std::vector<SamRecord>>> data;  //!< @brief
 
     /**
@@ -72,7 +69,8 @@ class SamRecordGroup {
      * @param other_r
      * @param force_split
      */
-    void addAlignment(genie::core::record::Record &rec, SamRecord *r1, SamRecord *r2, bool paired_end, bool force_split = false);
+    void addAlignment(genie::core::record::Record& rec, SamRecord* r1, SamRecord* r2, bool paired_end,
+                      bool force_split = false);
 
     /**
      * @brief
@@ -135,7 +133,6 @@ class SamRecordGroup {
      */
     static std::tuple<bool, uint8_t> convertFlags2Mpeg(uint16_t flags);
 
-
     /**
      *
      * @return
@@ -160,8 +157,8 @@ class SamRecordGroup {
 
 }  // namespace sam_to_mgrec
 }  // namespace sam
-}  // namespace transcoder
-}  // namespace genie
+}  // namespace transcode_sam
+}  // namespace genieapp
 
 // ---------------------------------------------------------------------------------------------------------------------
 

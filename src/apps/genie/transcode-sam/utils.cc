@@ -4,13 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "apps/transcoder/utils.h"
+#include "utils.h"
 #include <genie/core/record/alignment_split/other-rec.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace transcoder {
+namespace genieapp {
+namespace transcode_sam {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -67,8 +67,8 @@ bool compare(const genie::core::record::Record& r1, const genie::core::record::R
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace transcoder
-}  // namespace genie
+}  // namespace transcode_sam
+}  // namespace genieapp
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

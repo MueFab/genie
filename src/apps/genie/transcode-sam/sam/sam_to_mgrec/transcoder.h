@@ -9,9 +9,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/record/record.h>
-#include <genie/util/bitwriter.h>
-#include <transcoder/transcoding.h>
+#include "genie/core/record/record.h"
+#include "apps/genie/transcode-sam/transcoding.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,12 +22,12 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "apps/transcoder/sam/sam_to_mgrec/sam_record.h"
+#include "sam_record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace transcoder {
+namespace genieapp {
+namespace transcode_sam {
 namespace sam {
 namespace sam_to_mgrec {
 
@@ -91,8 +91,8 @@ ErrorCode transcode(Config& options);
 
 }  // namespace sam_to_mgrec
 }  // namespace sam
-}  // namespace transcoder
-}  // namespace genie
+}  // namespace transcode_sam
+}  // namespace genieapp
 
 // ---------------------------------------------------------------------------------------------------------------------
 

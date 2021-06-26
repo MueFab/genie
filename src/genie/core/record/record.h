@@ -181,6 +181,12 @@ class Record {
 
     /**
      * @brief
+     * @param val
+     */
+    void setRead1First(bool val);
+
+    /**
+     * @brief
      * @param type
      */
     void setClassType(ClassType type);

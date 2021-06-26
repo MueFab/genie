@@ -13,8 +13,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace transcoder {
+namespace genieapp {
+namespace transcode_sam {
 namespace sam {
 namespace sam_to_mgrec {
 
@@ -46,8 +46,9 @@ class Config {
     int verbosity_level;          //!< @brief
     std::string tmp_dir_path;     //!< @brief
     std::string fasta_file_path;  //!< @brief
-    std::string sam_file_path;    //!< @brief
-    std::string mgrec_file_path;  //!< @brief
+    std::string inputFile;    //!< @brief
+    std::string outputFile;  //!< @brief
+    bool forceOverwrite;
 
  private:
     /**
@@ -60,15 +61,15 @@ class Config {
     /**
      * @brief
      */
-    void validate() const;
+    void validate();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace sam_to_mgrec
 }  // namespace sam
-}  // namespace transcoder
-}  // namespace genie
+}  // namespace transcode_sam
+}  // namespace genieapp
 
 // ---------------------------------------------------------------------------------------------------------------------
 

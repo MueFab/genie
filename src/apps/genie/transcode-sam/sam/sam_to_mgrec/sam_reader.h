@@ -4,101 +4,89 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SORTER_H_
-#define SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SORTER_H_
+#ifndef SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SAM_READER_H_
+#define SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SAM_READER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/record/record.h>
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#include <fstream>
+#include <htslib/sam.h>
 #include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace transcoder {
+#include "sam_record.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+namespace genieapp {
+namespace transcode_sam {
 namespace sam {
 namespace sam_to_mgrec {
 
 /**
  * @brief
  */
-class SubfileReader {
+class SamReader {
  private:
-    uint64_t curr_mgrec_pos;           //!< @brief
-    std::ifstream reader;              //!< @brief
-    genie::util::BitReader bitreader;  //!< @brief
-    genie::core::record::Record rec;   //!< @brief
+    samFile* sam_file;      //!< @brief
+    bam_hdr_t* sam_header;  //!< @brief
+    bam1_t* sam_alignment;  //!< @brief
+    kstring_t header_info;  //!< @brief
 
  public:
     /**
      * @brief
      * @param fpath
      */
-    explicit SubfileReader(const std::string& fpath);
+    explicit SamReader(const char* fpath);
+
+    /**
+     * @brief
+     * @param fpath
+     */
+    explicit SamReader(std::string& fpath);
 
     /**
      * @brief
      */
-    ~SubfileReader();
-
-    /**
-     * @brief
-     * @return
-     */
-    bool readRecord();
-
-    /**
-     * @brief
-     * @return
-     */
-    genie::core::record::Record&& moveRecord();
+    ~SamReader();
 
     /**
      * @brief
      * @return
      */
-    const genie::core::record::Record& getRecord() const;
-
-    /**
-     * @brief
-     * @param bitwriter
-     */
-    void writeRecord(genie::util::BitWriter& bitwriter);
+    int getNumRef();
 
     /**
      * @brief
      * @return
      */
-    uint64_t getPos() const;
+    bool isReady();
 
     /**
      * @brief
      * @return
      */
-    bool good();
+    bool isValid();
 
     /**
      * @brief
+     * @param sr
+     * @return
      */
-    void close();
+    int readSamRecord(SamRecord& sr);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace sam_to_mgrec
 }  // namespace sam
-}  // namespace transcoder
-}  // namespace genie
+}  // namespace transcode_sam
+}  // namespace genieapp
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SORTER_H_
+#endif  // SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SAM_READER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

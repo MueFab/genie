@@ -136,9 +136,9 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
         // Unpaired
         if(rec.getAlignments().front().getAlignmentSplits().front()->getType() == core::record::AlignmentSplit::Type::UNPAIRED) {
             if(rec.isRead1First()) {
-                container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_UNPAIRED);
-            } else {
                 container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_UNPAIRED);
+            } else {
+                container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_UNPAIRED);
             }
         // Other record
         } else {

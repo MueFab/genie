@@ -52,7 +52,7 @@ The prefix ``fastq_to_mgrec::`` is *not* repeated throughout this section for br
 struct Config {
     std::string fastq1_file_path;
     std::string fastq2_file_path;
-    std::string mgrec_file_path;
+    std::string outputFile;
     std::string tmp_dir_path;
     int verbosity_level;
 };
@@ -62,9 +62,9 @@ struct Config {
 
 | Variable Name   | Default Value | Accepted Values |
 |-----------------|---------------|-----------------|
-| sam_file_path   | ""            | String containing the path to a file in the SAM/BAM/CRAM format |
+| inputFile   | ""            | String containing the path to a file in the SAM/BAM/CRAM format |
 | fasta_file_path | ""            | String containing the path to a file in the FASTA format |
-| mgrec_file_path | ""            | String containing the path at which a file will be created that will contain the generated output sequence of concatenated MPEG-G records |
+| outputFile | ""            | String containing the path at which a file will be created that will contain the generated output sequence of concatenated MPEG-G records |
 | tmp_dir_path    | ""            | String containing the path of a directory that will be used for the storage of temporary files |
 | verbosity_level | 0             | 0 (silent), 1 (errors), 2 (errors and informational messages) |
 
@@ -98,9 +98,9 @@ The prefix ``sam_to_mgrec::`` is *not* repeated throughout this section for brev
 
 ```
 struct Config {
-    std::string sam_file_path;
+    std::string inputFile;
     std::string fasta_file_path;
-    std::string mgrec_file_path;
+    std::string outputFile;
     std::string tmp_dir_path;
     int verbosity_level;
 };
@@ -110,9 +110,9 @@ struct Config {
 
 | Variable Name   | Default Value | Accepted Values |
 |-----------------|---------------|-----------------|
-| sam_file_path   | ""            | String containing the path to a file in the SAM/BAM/CRAM format |
+| inputFile   | ""            | String containing the path to a file in the SAM/BAM/CRAM format |
 | fasta_file_path | ""            | String containing the path to a file in the FASTA format |
-| mgrec_file_path | ""            | String containing the path at which a file will be created that will contain the generated output sequence of concatenated MPEG-G records |
+| outputFile | ""            | String containing the path at which a file will be created that will contain the generated output sequence of concatenated MPEG-G records |
 | tmp_dir_path    | ""            | String containing the path of a directory that will be used for the storage of temporary files |
 | verbosity_level | 0             | 0 (silent), 1 (errors), 2 (errors and informational messages) |
 

@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "apps/transcoder/sam/sam_to_mgrec/sam_record.h"
+#include "sam_record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -27,8 +27,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace transcoder {
+namespace genieapp {
+namespace transcode_sam {
 namespace sam {
 namespace sam_to_mgrec {
 
@@ -172,9 +172,17 @@ std::string SamRecord::convertCigar2ECigar(const std::string& cigar, const std::
 // ---------------------------------------------------------------------------------------------------------------------
 
 SamRecord::SamRecord()
-    : qname(""), flag(0), rid(0), pos(0), mapq(0), cigar(""), mate_rid(0), mate_pos(0),
-//      tlen(0),
-      seq(""), qual("") {}
+    : qname(""),
+      flag(0),
+      rid(0),
+      pos(0),
+      mapq(0),
+      cigar(""),
+      mate_rid(0),
+      mate_pos(0),
+      //      tlen(0),
+      seq(""),
+      qual("") {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -187,7 +195,7 @@ SamRecord::SamRecord(bam1_t* sam_alignment)
       cigar(getCigarString(sam_alignment)),
       mate_rid(sam_alignment->core.mtid),
       mate_pos((uint32_t)sam_alignment->core.mpos),
-//      tlen(sam_alignment->core.isize),
+      //      tlen(sam_alignment->core.isize),
       seq(getSeqString(sam_alignment)),   // Initialized with empty char due to conversion later
       qual(getQualString(sam_alignment))  // Initialized with empty char due to conversion later
 {}
@@ -350,8 +358,8 @@ bool SamRecord::isPairOf(SamRecord& r) {
 
 }  // namespace sam_to_mgrec
 }  // namespace sam
-}  // namespace transcoder
-}  // namespace genie
+}  // namespace transcode_sam
+}  // namespace genieapp
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

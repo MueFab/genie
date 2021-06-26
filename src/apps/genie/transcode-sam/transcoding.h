@@ -4,41 +4,27 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_TRANSCODER_UTILS_H_
-#define SRC_APPS_TRANSCODER_UTILS_H_
+#ifndef SRC_APPS_TRANSCODER_TRANSCODING_H_
+#define SRC_APPS_TRANSCODER_TRANSCODING_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <genie/core/record/record.h>
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-namespace genie {
-namespace transcoder {
+namespace genieapp {
+namespace transcode_sam {
 
 /**
  * @brief
- * @param r
- * @return
  */
-uint64_t getMinPos(const genie::core::record::Record& r);
-
-/**
- * @brief
- * @param r1
- * @param r2
- * @return
- */
-bool compare(const genie::core::record::Record& r1, const genie::core::record::Record& r2);
+enum class ErrorCode : uint8_t { success = 0, failure = 1 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace transcoder
-}  // namespace genie
+}  // namespace transcode_sam
+}  // namespace genieapp
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_TRANSCODER_UTILS_H_
+#endif  // SRC_APPS_TRANSCODER_TRANSCODING_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

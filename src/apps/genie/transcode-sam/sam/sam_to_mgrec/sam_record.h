@@ -17,12 +17,12 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "apps/transcoder/sam/sam_to_mgrec/program-options.h"
+#include "program-options.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace transcoder {
+namespace genieapp {
+namespace transcode_sam {
 namespace sam {
 namespace sam_to_mgrec {
 
@@ -39,23 +39,15 @@ class SamRecord {
     std::string cigar;  //!< @brief CIGAR
     int32_t mate_rid;   //!< @brief Mate reference sequence ID
     uint32_t mate_pos;  //!< @brief Mate position
-//    int64_t tlen;       //!< @brief Observed template length
+                        //    int64_t tlen;       //!< @brief Observed template length
     std::string seq;    //!< @brief Read sequence
     std::string qual;   //!< @brief
 
  public:
-
-    bool operator== (const SamRecord& rec) const{
-        return qname == rec.qname &&
-        flag == rec.flag &&
-        rid == rec.rid &&
-        pos == rec.pos &&
-        mapq == rec.mapq &&
-        cigar == rec.cigar &&
-        mate_rid == rec.mate_rid &&
-        mate_pos == rec.mate_pos &&
-        seq == rec.seq &&
-        qual == rec.qual;
+    bool operator==(const SamRecord& rec) const {
+        return qname == rec.qname && flag == rec.flag && rid == rec.rid && pos == rec.pos && mapq == rec.mapq &&
+               cigar == rec.cigar && mate_rid == rec.mate_rid && mate_pos == rec.mate_pos && seq == rec.seq &&
+               qual == rec.qual;
     }
 
     /**
@@ -328,8 +320,8 @@ class SamRecord {
 
 }  // namespace sam_to_mgrec
 }  // namespace sam
-}  // namespace transcoder
-}  // namespace genie
+}  // namespace transcode_sam
+}  // namespace genieapp
 
 // ---------------------------------------------------------------------------------------------------------------------
 
