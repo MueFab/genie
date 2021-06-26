@@ -4,86 +4,94 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "apps/transcoder/sam/sam_to_mgrec/sorter.h"
+#include <cstring>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <iostream>
-#include <string>
-#include <utility>
+#include "sam_reader.h"
+#include "sam_record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "apps/transcoder/utils.h"
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-namespace genie {
-namespace transcoder {
+namespace genieapp {
+namespace transcode_sam {
 namespace sam {
 namespace sam_to_mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SubfileReader::SubfileReader(const std::string& fpath)
-    : curr_mgrec_pos(0), reader(fpath, std::ios::binary), bitreader(reader), rec() {}
+SamReader::SamReader(const char* fpath)
+    : sam_file(hts_open(fpath, "r")),  // open bam file
+      sam_header(nullptr),             // read header
+      sam_alignment(bam_init1()),      // initialize an alignment
+      header_info(KS_INITIALIZE) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SubfileReader::~SubfileReader() { close(); }
+SamReader::SamReader(std::string& fpath) : SamReader(fpath.c_str()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool SubfileReader::readRecord() {
-    if (good()) {
-        rec = genie::core::record::Record(bitreader);
+SamReader::~SamReader() {
+    bam_destroy1(sam_alignment);
+    bam_hdr_destroy(sam_header);
+    if (sam_file) sam_close(sam_file);
+    if (header_info.s) free(header_info.s);
+}
 
-        if (rec.getAlignments().empty()) {
-            curr_mgrec_pos = getMinPos(rec);
-        }
+// ---------------------------------------------------------------------------------------------------------------------
 
-        return true;
-    } else {
+int SamReader::getNumRef() { return sam_hdr_nref(sam_header); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool SamReader::isReady() {
+    if (!sam_file) {
         return false;
     }
+
+    sam_header = sam_hdr_read(sam_file);  // read header
+    if (!sam_header) {
+        return false;
+    }
+
+    return true;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::core::record::Record&& SubfileReader::moveRecord() { return std::move(rec); }
+bool SamReader::isValid() {
+    /// Find Tag HD with key "SO" to find out the ordering
+    if (sam_hdr_find_tag_hd(sam_header, "SO", &header_info) != 0) {
+        return false;
+    }
 
-// ---------------------------------------------------------------------------------------------------------------------
+    /// Find out if records are sorted by query name
+    if (std::strcmp(header_info.s, "queryname") != 0) {
+        return false;
+    }
 
-const genie::core::record::Record& SubfileReader::getRecord() const { return rec; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void SubfileReader::writeRecord(genie::util::BitWriter& bitwriter) {
-    rec.write(bitwriter);
-    bitwriter.flush();
+    return true;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t SubfileReader::getPos() const { return curr_mgrec_pos; }
+int SamReader::readSamRecord(SamRecord& sr) {
+    auto res = sam_read1(sam_file, sam_header, sam_alignment);
 
-// ---------------------------------------------------------------------------------------------------------------------
+    if (res >= 0) {
+        sr = SamRecord(sam_alignment);
+    }
 
-bool SubfileReader::good() { return reader.good() && reader.peek() != EOF; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void SubfileReader::close() {
-    bitreader.flush();
-    reader.close();
+    return res;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace sam_to_mgrec
 }  // namespace sam
-}  // namespace transcoder
-}  // namespace genie
+}  // namespace transcode_sam
+}  // namespace genieapp
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

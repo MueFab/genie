@@ -73,11 +73,11 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     for (size_t recID = 0; recID < numRecords; ++recID) {
         auto meta = decoder.readSegmentMeta();
         std::vector<std::string> refs;
-        refs.reserve(meta.size());
-        for (const auto& m : meta) {
-            refs.emplace_back(refEncoder.getReference((uint32_t)m.position, (uint32_t)m.length));
+        refs.reserve(meta.num_segments);
+        for (size_t i=0; i < meta.num_segments; ++i) {
+            refs.emplace_back(refEncoder.getReference((uint32_t)meta.position[i], (uint32_t)meta.length[i]));
         }
-        auto rec = decoder.pull(ref, std::move(refs));
+        auto rec = decoder.pull(ref, std::move(refs), meta);
         if (!std::get<0>(names).empty()) {
             rec.setName(std::get<0>(names)[recID]);
         }

@@ -4,27 +4,40 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_TRANSCODER_TRANSCODING_H_
-#define SRC_APPS_TRANSCODER_TRANSCODING_H_
+#ifndef SRC_APPS_GABAC_APP_CODE_H_
+#define SRC_APPS_GABAC_APP_CODE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace transcoder {
+#include <cstddef>
+#include <string>
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+namespace genieapp {
+namespace gabac {
 
 /**
  * @brief
+ * @param inputFilePath
+ * @param outputFilePath
+ * @param blocksize
+ * @param descID
+ * @param subseqID
+ * @param decode
+ * @param dependencyFilePath
  */
-enum class ErrorCode : uint8_t { success = 0, failure = 1 };
+void code(const std::string& inputFilePath, const std::string& outputFilePath, size_t blocksize, uint8_t descID,
+          uint8_t subseqID, bool decode, const std::string& dependencyFilePath = "");
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace transcoder
-}  // namespace genie
+}  // namespace gabac
+}  // namespace genieapp
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_TRANSCODER_TRANSCODING_H_
+#endif  // SRC_APPS_GABAC_APP_CODE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

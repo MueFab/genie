@@ -10,22 +10,27 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include "apps/gabac-app/code.h"
-#include "apps/gabac-app/program-options.h"
+#include "code.h"
 #include "genie/entropy/gabac/gabac.h"
+#include "program-options.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+namespace genieapp {
+namespace gabac {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 int main(int argc, char* argv[]) {
     try {
-        gabacify::ProgramOptions programOptions(argc, argv);
+        ProgramOptions programOptions(argc, argv);
 
         if (programOptions.task == "encode") {
-            gabacify::code(programOptions.inputFilePath, programOptions.outputFilePath, programOptions.blocksize,
-                           programOptions.descID, programOptions.subseqID, false, programOptions.dependencyFilePath);
+            code(programOptions.inputFilePath, programOptions.outputFilePath, programOptions.blocksize,
+                 programOptions.descID, programOptions.subseqID, false, programOptions.dependencyFilePath);
         } else if (programOptions.task == "decode") {
-            gabacify::code(programOptions.inputFilePath, programOptions.outputFilePath, programOptions.blocksize,
-                           programOptions.descID, programOptions.subseqID, true, programOptions.dependencyFilePath);
+            code(programOptions.inputFilePath, programOptions.outputFilePath, programOptions.blocksize,
+                 programOptions.descID, programOptions.subseqID, true, programOptions.dependencyFilePath);
         } else {
             UTILS_DIE("Invalid task: " + std::string(programOptions.task));
         }
@@ -39,6 +44,11 @@ int main(int argc, char* argv[]) {
 
     return EXIT_SUCCESS;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+}  // namespace gabac
+}  // namespace genieapp
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -46,26 +46,30 @@ class Decoder {
     Decoder(core::AccessUnit &&au, size_t segments, size_t pos = 0);
 
     /**
+ *
+ */
+    struct SegmentMeta {
+        std::array<uint64_t, 2> position;  //!<
+        std::array<uint64_t, 2> length;    //!<
+        bool first1;
+        uint8_t decoding_case;
+        uint8_t num_segments;
+    };
+
+    /**
      *
      * @param ref
      * @param vec
      * @return
      */
-    core::record::Record pull(uint16_t ref, std::vector<std::string> &&vec);
+    core::record::Record pull(uint16_t ref, std::vector<std::string> &&vec, const SegmentMeta& meta);
 
-    /**
-     *
-     */
-    struct SegmentMeta {
-        uint64_t position;  //!<
-        uint64_t length;    //!<
-    };
 
     /**
      *
      * @return
      */
-    std::vector<SegmentMeta> readSegmentMeta();
+    Decoder::SegmentMeta readSegmentMeta();
 
     /**
      *
@@ -91,7 +95,7 @@ class Decoder {
      * @param cigar
      * @param state
      */
-    void decodeAdditional(size_t softclip_offset, std::string &&seq, std::string &&cigar,
+    void decodeAdditional(size_t softclip_offset, std::string &&seq, std::string &&cigar, uint16_t delta_pos,
                           std::tuple<core::record::AlignmentBox, core::record::Record> &state);
 
     /**

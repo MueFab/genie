@@ -54,7 +54,17 @@ curl -L \
     || { echo 'Could not download paired end fastq!' ; exit 1; }
 gzip -df /tmp/ERR174310_short_2.fastq.gz
 
-$git_root_dir/ci/fastq_tools/fastq_roundtrip.sh "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq"
+echo "*** SAM"
+# Get sam file
+curl -L \
+    https://seafile.cloud.uni-hannover.de/f/573d427afbb4478d9d12/?dl=1  \
+    --output /tmp/sorted.sam.gz \
+    || { echo 'Could not download sam file!' ; exit 1; }
+gzip -df /tmp/sorted.sam.gz
+
+$git_root_dir/ci/sam_tools/sam_roundtrip.sh "/tmp/sorted.sam"
+#$git_root_dir/ci/fastq_tools/fastq_roundtrip.sh "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq"
 
 rm /tmp/ERR174310_short_2.fastq
 rm /tmp/ERR174310_short_1.fastq
+rm /tmp/sorted.sam

@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "apps/transcoder/sam/sam_to_mgrec/transcoder.h"
+#include "transcoder.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -14,15 +14,15 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "apps/transcoder/sam/sam_to_mgrec/sam_group.h"
-#include "apps/transcoder/sam/sam_to_mgrec/sam_reader.h"
-#include "apps/transcoder/sam/sam_to_mgrec/sorter.h"
-#include "apps/transcoder/utils.h"
+#include "apps/genie/transcode-sam/utils.h"
+#include "sam_group.h"
+#include "sam_reader.h"
+#include "sorter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genie {
-namespace transcoder {
+namespace genieapp {
+namespace transcode_sam {
 namespace sam {
 namespace sam_to_mgrec {
 
@@ -56,7 +56,7 @@ ErrorCode sam_to_mgrec_phase1(Config& options, int& nref) {
 
     std::list<genie::core::record::Record> records;
 
-    auto sam_reader = SamReader(options.sam_file_path);
+    auto sam_reader = SamReader(options.inputFile);
     if (!sam_reader.isReady() || !sam_reader.isValid()) {
         return ErrorCode::failure;
     }
@@ -121,7 +121,7 @@ std::string gen_p2_tmp_fpath(Config& options, int rid, int ifile) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
-    std::ofstream total_output(options.mgrec_file_path, std::ios::binary | std::ios::trunc);
+    std::ofstream total_output(options.outputFile, std::ios::binary | std::ios::trunc);
     genie::util::BitWriter total_output_writer(&total_output);
 
     /// Process MPEG-G records of each RefID
@@ -234,8 +234,8 @@ ErrorCode transcode(Config& options) {
 
 }  // namespace sam_to_mgrec
 }  // namespace sam
-}  // namespace transcoder
-}  // namespace genie
+}  // namespace transcode_sam
+}  // namespace genieapp
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

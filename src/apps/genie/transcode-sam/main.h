@@ -4,38 +4,30 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_GABAC_APP_CODE_H_
-#define SRC_APPS_GABAC_APP_CODE_H_
+#ifndef SRC_APPS_GENIE_TRANSCODE_SAM_MAIN_H_
+#define SRC_APPS_GENIE_TRANSCODE_SAM_MAIN_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstddef>
-#include <string>
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-namespace gabacify {
+namespace genieapp {
+namespace transcode_sam {
 
 /**
- * @brief
- * @param inputFilePath
- * @param outputFilePath
- * @param blocksize
- * @param descID
- * @param subseqID
- * @param decode
- * @param dependencyFilePath
+ *
+ * @param argc
+ * @param argv
+ * @return
  */
-void code(const std::string& inputFilePath, const std::string& outputFilePath, size_t blocksize, uint8_t descID,
-          uint8_t subseqID, bool decode, const std::string& dependencyFilePath = "");
+int main(int argc, char* argv[]);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace gabacify
+}  // namespace transcode_sam
+}  // namespace genieapp
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_GABAC_APP_CODE_H_
+#endif  // SRC_APPS_GENIE_TRANSCODE_SAM_MAIN_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
