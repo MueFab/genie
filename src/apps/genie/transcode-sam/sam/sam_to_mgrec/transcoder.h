@@ -85,7 +85,14 @@ void clean_phase1_files(Config& options, int& nref);
  * @param options
  * @return
  */
-ErrorCode transcode(Config& options);
+ErrorCode transcode_sam2mpg(Config& options);
+
+/**
+ *
+ * @param options
+ * @return
+ */
+ErrorCode transcode_mpg2sam(Config& options);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

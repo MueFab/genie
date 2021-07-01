@@ -41,6 +41,7 @@ void Config::processCommandLine(int argc, char *argv[]) {
     CLI::App app{"Transcoder - Transcode legacy format to mpeg-g format"};
 
     app.add_option("--ref", fasta_file_path, "Reference file");
+    tmp_dir_path = "/tmp";
     app.add_option("-w,--working-dir", tmp_dir_path, "Temporary directory path");
     app.add_option("-i,--input-file", inputFile, "Input file")->mandatory(true);
     app.add_option("-o,--output-file", outputFile, "Output file")->mandatory(true);
