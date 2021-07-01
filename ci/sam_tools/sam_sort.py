@@ -13,7 +13,7 @@ def _sam_unix_sort(input_path, output_path):
     with open(output_path, "w") as file_out:
         my_env = os.environ.copy()
         my_env["LC_COLLATE"] = "C"
-        bash_command = "sort " + input_path
+        bash_command = "sort -u " + input_path
         print(bash_command)
         process = subprocess.Popen(bash_command.split(), env=my_env, stdout=file_out)
         process.communicate()

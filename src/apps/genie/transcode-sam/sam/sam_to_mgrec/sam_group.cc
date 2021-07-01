@@ -61,12 +61,19 @@ void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord *r
         return;
     }
 
-    /// Case4: Unmapped
     if (r1 == nullptr || r2 == nullptr) {
-        auto splitAlign = genie::util::make_unique<genie::core::record::alignment_split::Unpaired>();
-        alignmentContainer.addAlignmentSplit(std::move(splitAlign));
+        auto r = r1 ? r1 : r2;
+        /// Case4: Unmapped
+        if(r->mate_rid == r->getRID()) {
+            auto splitAlign = genie::util::make_unique<genie::core::record::alignment_split::Unpaired>();
+            alignmentContainer.addAlignmentSplit(std::move(splitAlign));
+            /// Case4: Other RID
+        } else {
+            auto splitAlign = genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(r->mate_pos, r->mate_rid);
+            alignmentContainer.addAlignmentSplit(std::move(splitAlign));
+        }
 
-    } else if (r1->getRID() == r2->getRID()) {
+    } else {
         /// Case 2: OtherRec - Same RID
         if (force_split) {
             auto splitAlign =
@@ -84,12 +91,6 @@ void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord *r
 
             alignmentContainer.addAlignmentSplit(std::move(splitAlign));
         }
-
-        /// Case 2 : OtherRec - Different RID
-    } else {
-        auto splitAlign =
-            genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(r2->getPos(), r2->getRID());
-        alignmentContainer.addAlignmentSplit(std::move(splitAlign));
     }
 
     rec.addAlignment(base_rec->getRID(), std::move(alignmentContainer));
@@ -489,7 +490,7 @@ void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bo
                       data[uint8_t(TemplateType::PAIRED_2)][uint8_t(MappingType::PRIMARY)].front().getPos();
     }
 
-    if( r1 ? r1->getQname() == "HSQ1004:134:C0D8DACXX:1:1101:10050:171246" : r2->getQname() == "HSQ1004:134:C0D8DACXX:1:1101:10050:171246") {
+    if( r1 ? r1->getQname() == "HSQ1004:134:C0D8DACXX:1:1207:8509:94557" : r2->getQname() == "HSQ1004:134:C0D8DACXX:1:1207:8509:94557") {
         std::cout << "Gotcha2" << std::endl;
     }
 
