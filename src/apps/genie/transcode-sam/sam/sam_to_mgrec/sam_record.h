@@ -30,7 +30,7 @@ namespace sam_to_mgrec {
  * @brief
  */
 class SamRecord {
- private:
+ public:
     std::string qname;  //!< @brief Query template name
     uint16_t flag;      //!< @brief Flag
     int32_t rid;        //!< @brief Reference sequence ID

@@ -47,6 +47,9 @@ std::tuple<bool, uint8_t> SamRecordGroup::convertFlags2Mpeg(uint16_t flags) {
 void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord *r1, SamRecord *r2, bool paired_end,
                                   bool force_split) {
     SamRecord *base_rec = r1 ? r1 : r2;
+    if(r1 && r2 && r1->isUnmapped()) {
+        base_rec = r2;
+    }
     genie::core::record::Alignment alignment(base_rec->getECigar(), base_rec->isReverse());
     alignment.addMappingScore(base_rec->getMapq());
 
@@ -67,7 +70,7 @@ void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord *r
         /// Case 2: OtherRec - Same RID
         if (force_split) {
             auto splitAlign =
-                genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(r2->getPos(), r2->getRID());
+                genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(r2->getPos() - 1, r2->getRID());
             alignmentContainer.addAlignmentSplit(std::move(splitAlign));
 
             /// Case 1: SameRec
@@ -75,7 +78,7 @@ void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord *r
             genie::core::record::Alignment alignment2(r2->getECigar(), r2->isReverse());
             alignment2.addMappingScore(r2->getMapq());
 
-            auto delta = (int64_t)r2->getPos() - (int64_t)r1->getPos();
+            auto delta = r2->getPos() - r1->getPos();
             auto splitAlign =
                 genie::util::make_unique<genie::core::record::alignment_split::SameRec>(delta, std::move(alignment2));
 
@@ -486,6 +489,10 @@ void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bo
                       data[uint8_t(TemplateType::PAIRED_2)][uint8_t(MappingType::PRIMARY)].front().getPos();
     }
 
+    if( r1 ? r1->getQname() == "HSQ1004:134:C0D8DACXX:1:1101:10050:171246" : r2->getQname() == "HSQ1004:134:C0D8DACXX:1:1101:10050:171246") {
+        std::cout << "Gotcha2" << std::endl;
+    }
+
     genie::core::record::Record rec(cls.first ? 2 : 1, cls.second, r1 ? r1->moveQname() : r2->moveQname(), "Genie",
                                     std::get<1>(flag_tuple), is_r1_first);
 
@@ -513,7 +520,11 @@ void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bo
         return;
     }
 
-    addAlignment(rec, r1, r2, cls.first);
+    if(is_r1_first) {
+        addAlignment(rec, r1, r2, cls.first);
+    } else {
+        addAlignment(rec, r2, r1, cls.first);
+    }
 
     records.push_back(std::move(rec));
 }
