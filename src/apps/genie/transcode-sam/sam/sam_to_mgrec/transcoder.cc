@@ -36,7 +36,7 @@ bool save_mgrecs_by_rid(std::list<genie::core::record::Record>& recs,
         auto ref_id = rec.getAlignmentSharedData().getSeqID();
 
         try {
-            auto bitwriter = bitwriters.at(ref_id);
+            auto& bitwriter = bitwriters.at(ref_id);
 
             // TODO(Yeremia): Handle case where harddrive is full
             rec.write(bitwriter);
@@ -138,7 +138,13 @@ ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
         /// Split mgrec into multiple files and the records are sorted
         while (mgg_reader.good()) {
             /// Read MPEG-G records
-            while (mgg_reader.readRecord() && buffer.size() < PHASE2_BUFFER_SIZE) {
+            while (buffer.size() < PHASE2_BUFFER_SIZE) {
+                if(!mgg_reader.readRecord()) {
+                    break;
+                }
+                if (mgg_reader.getRecord().getName() == "HSQ1004:134:C0D8DACXX:1:1207:8510:121926") {
+                    std::cout << "gotcha3" << std::endl;
+                }
                 //
                 /// Store unmapped record to output file
                 if (mgg_reader.getRecord().getAlignments().empty()) {
@@ -149,6 +155,7 @@ ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
             }
 
             /// Sort records in buffer by POS
+
             std::sort(buffer.begin(), buffer.end(), compare);
 
             std::ofstream tmp_writer(gen_p2_tmp_fpath(options, iref, n_tmp_files++),
@@ -156,6 +163,9 @@ ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
             genie::util::BitWriter tmp_bitwriter(&tmp_writer);
 
             for (auto& rec : buffer) {
+                if (rec.getName() == "HSQ1004:134:C0D8DACXX:1:1207:8510:121926") {
+                    std::cout << "gotcha4" << std::endl;
+                }
                 rec.write(tmp_bitwriter);
                 tmp_bitwriter.flush();
             }
@@ -194,7 +204,7 @@ ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
 
         /// Remove all temporary file belonging to current RID
         for (auto i_file = 0; i_file < n_tmp_files; i_file++) {
-            std::remove(gen_p2_tmp_fpath(options, iref, i_file).c_str());
+     //       std::remove(gen_p2_tmp_fpath(options, iref, i_file).c_str());
         }
     }
 
@@ -209,7 +219,7 @@ ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
 void clean_phase1_files(Config& options, int& nref) {
     for (auto iref = 0; iref < nref; iref++) {
         std::string fpath = options.tmp_dir_path + "/" + std::to_string(iref) + PHASE1_EXT;
-        std::remove(fpath.c_str());
+    //    std::remove(fpath.c_str());
     }
 }
 
@@ -337,7 +347,7 @@ ErrorCode transcode_mpg2sam(Config& options) {
         for (size_t s = 0; s < record.getSegments().size(); ++s) {
             for (size_t a = 0; a < std::max(record.getAlignments().size(), size_t(1)); ++a) {
                 std::string sam_record = record.getName() + "\t";
-                if(record.getName() == "HSQ1004:134:C0D8DACXX:1:1101:10050:171246") {
+                if (record.getName() == "HSQ1004:134:C0D8DACXX:1:1101:10329:176352") {
                     std::cout << "gotcha" << std::endl;
                 }
                 uint16_t flags = 0;
@@ -364,7 +374,7 @@ ErrorCode transcode_mpg2sam(Config& options) {
                     other_mapped = false;
                 }
                 // First or second read?
-                if (s == 0) {
+                if ((s == 0 && record.getSegments().size() == 2) || (record.getSegments().size() == 1 && record.isRead1First())) {
                     flags |= 0x40;
                 } else {
                     flags |= 0x80;
@@ -428,9 +438,12 @@ ErrorCode transcode_mpg2sam(Config& options) {
                 }
 
                 if (other_mapped && record.getNumberOfTemplateSegments() == 2) {
-                    // According to SAM standard, secondary alignments
-                    if ((s == 1 && record.isRead1First()) || (s == 0 && !record.isRead1First()) ||
-                        record.getSegments().size() == 1) {
+                    // According to SAM standard, primary alignments only
+                    auto split_type = record.getClassID() == genie::core::record::ClassType::CLASS_HM
+                                          ? genie::core::record::AlignmentSplit::Type::UNPAIRED
+                                          : record.getAlignments()[0].getAlignmentSplits().front()->getType();
+                    if ((((s == 1 && record.isRead1First()) || (s == 0 && !record.isRead1First())) && split_type == genie::core::record::AlignmentSplit::Type::SAME_REC) ||
+                        (split_type == genie::core::record::AlignmentSplit::Type::UNPAIRED)) {
                         // Paired read is first read
                         pnext = std::to_string(record.getAlignments()[0].getPosition() + 1);
                         tlen += record.getAlignments()[0].getPosition() + 1;
@@ -440,13 +453,12 @@ ErrorCode transcode_mpg2sam(Config& options) {
                         }
                     } else {
                         // Paired read is second read
-                        auto split_type = record.getAlignments()[0].getAlignmentSplits().front()->getType();
                         if (split_type == genie::core::record::AlignmentSplit::Type::SAME_REC) {
                             const auto& split = dynamic_cast<const genie::core::record::alignment_split::SameRec&>(
                                 *record.getAlignments()[0].getAlignmentSplits().front().get());
                             pnext = std::to_string(record.getAlignments()[0].getPosition() + split.getDelta() + 1);
-                            tlen +=
-                                record.getAlignments()[0].getPosition() + split.getDelta() + 1 + mappedLength(eCigar2Cigar(split.getAlignment().getECigar()));
+                            tlen += record.getAlignments()[0].getPosition() + split.getDelta() + 1 +
+                                    mappedLength(eCigar2Cigar(split.getAlignment().getECigar()));
 
                             rnext = std::to_string(record.getAlignmentSharedData().getSeqID());
                             if (split.getAlignment().getRComp()) {
@@ -457,7 +469,7 @@ ErrorCode transcode_mpg2sam(Config& options) {
                                 *record.getAlignments()[0].getAlignmentSplits().front().get());
                             rnext = std::to_string(split.getNextSeq());
                             pnext = std::to_string(split.getNextPos() + 1);
-                            tlen = 0; // Not available without reading second record
+                            tlen = 0;  // Not available without reading second record
                         } else {
                             tlen = 0;
                         }

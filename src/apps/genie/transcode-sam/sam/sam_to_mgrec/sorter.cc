@@ -38,7 +38,7 @@ bool SubfileReader::readRecord() {
     if (good()) {
         rec = genie::core::record::Record(bitreader);
 
-        if (rec.getAlignments().empty()) {
+        if (!rec.getAlignments().empty()) {
             curr_mgrec_pos = getMinPos(rec);
         }
 
