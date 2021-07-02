@@ -74,7 +74,7 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
         auto meta = decoder.readSegmentMeta();
         std::vector<std::string> refs;
         refs.reserve(meta.num_segments);
-        for (size_t i=0; i < meta.num_segments; ++i) {
+        for (size_t i = 0; i < meta.num_segments; ++i) {
             refs.emplace_back(refEncoder.getReference((uint32_t)meta.position[i], (uint32_t)meta.length[i]));
         }
         auto rec = decoder.pull(ref, std::move(refs), meta);

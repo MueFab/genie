@@ -4,18 +4,13 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "program-options.h"
-
-// ---------------------------------------------------------------------------------------------------------------------
-
+#include "apps/genie/transcode-sam/sam/sam_to_mgrec/program-options.h"
 #include <cassert>
 #include <fstream>
-
-// ---------------------------------------------------------------------------------------------------------------------
-
+#include <vector>
+#include "cli11/CLI11.hpp"
+#include "filesystem/filesystem.hpp"
 #include "genie/util/runtime-exception.h"
-#include <cli11/CLI11.hpp>
-#include <filesystem/filesystem.hpp>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -79,7 +74,7 @@ void validateOutputFile(const std::string &file, bool forced) {
     UTILS_DIE_IF(ghc::filesystem::exists(file) && !ghc::filesystem::is_regular_file(file),
                  "Output file already existing, force flag set, but not a regular file. Genie won't overwrite folders "
                  "or special files: " +
-                 file);
+                     file);
     {
         std::ofstream stream(file);
         const std::string TEST_STRING = "test";
@@ -138,7 +133,6 @@ void Config::validate() {
     validateOutputFile(outputFile, forceOverwrite);
     std::cout << "Output file: " << outputFile << " with "
               << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
-
 
     std::cout << std::endl;
 }

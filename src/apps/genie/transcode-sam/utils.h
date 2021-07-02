@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_TRANSCODER_UTILS_H_
-#define SRC_APPS_TRANSCODER_UTILS_H_
+#ifndef SRC_APPS_GENIE_TRANSCODE_SAM_UTILS_H_
+#define SRC_APPS_GENIE_TRANSCODE_SAM_UTILS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ bool compare(const genie::core::record::Record& r1, const genie::core::record::R
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_TRANSCODER_UTILS_H_
+#endif  // SRC_APPS_GENIE_TRANSCODE_SAM_UTILS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -4,19 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SORTER_H_
-#define SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SORTER_H_
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#include <genie/core/record/record.h>
-#include <genie/util/bitreader.h>
-#include <genie/util/bitwriter.h>
+#ifndef SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SORTER_H_
+#define SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <fstream>
 #include <string>
+#include "genie/core/record/record.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -98,7 +95,7 @@ class SubfileReader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SORTER_H_
+#endif  // SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SORTER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

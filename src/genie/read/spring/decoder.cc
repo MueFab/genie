@@ -21,9 +21,7 @@
 #include "genie/read/spring/params.h"
 #include "genie/read/spring/util.h"
 
-
 #include "kwaymergesort/kwaymergesort.h"
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 

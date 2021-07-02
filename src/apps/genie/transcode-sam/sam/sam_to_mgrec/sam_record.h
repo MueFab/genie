@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SAM_RECORD_H_
-#define SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SAM_RECORD_H_
+#ifndef SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SAM_RECORD_H_
+#define SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SAM_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "program-options.h"
+#include "apps/genie/transcode-sam/sam/sam_to_mgrec/program-options.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -325,7 +325,7 @@ class SamRecord {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SAM_RECORD_H_
+#endif  // SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SAM_RECORD_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

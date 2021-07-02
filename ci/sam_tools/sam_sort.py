@@ -75,9 +75,9 @@ if __name__ == "__main__":
 
     ap = argparse.ArgumentParser()
     ap.add_argument("-i", "--input", required=True,
-                    help="First fastq input file")
+                    help="First sam input file")
     ap.add_argument("-o", "--output", required=True,
-                    help="First fastq output file")
+                    help="First sam output file")
     args = ap.parse_args()
     sam_sort(args.input, args.output)
     

@@ -8,8 +8,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "sam_reader.h"
-#include "sam_record.h"
+#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_reader.h"
+#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

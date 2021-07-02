@@ -4,22 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "transcoder.h"
-
-// ---------------------------------------------------------------------------------------------------------------------
-
+#include "apps/genie/transcode-sam/sam/sam_to_mgrec/transcoder.h"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <utility>
-
-// ---------------------------------------------------------------------------------------------------------------------
-
+#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_group.h"
+#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_reader.h"
+#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sorter.h"
 #include "apps/genie/transcode-sam/utils.h"
 #include "genie/core/record/alignment_split/other-rec.h"
-#include "sam_group.h"
-#include "sam_reader.h"
-#include "sorter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -139,13 +133,9 @@ ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
         while (mgg_reader.good()) {
             /// Read MPEG-G records
             while (buffer.size() < PHASE2_BUFFER_SIZE) {
-                if(!mgg_reader.readRecord()) {
+                if (!mgg_reader.readRecord()) {
                     break;
                 }
-                if (mgg_reader.getRecord().getName() == "HSQ1004:134:C0D8DACXX:1:1207:8510:121926") {
-                    std::cout << "gotcha3" << std::endl;
-                }
-                //
                 /// Store unmapped record to output file
                 if (mgg_reader.getRecord().getAlignments().empty()) {
                     mgg_reader.writeRecord(total_output_writer);
@@ -163,9 +153,6 @@ ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
             genie::util::BitWriter tmp_bitwriter(&tmp_writer);
 
             for (auto& rec : buffer) {
-                if (rec.getName() == "HSQ1004:134:C0D8DACXX:1:1207:8510:121926") {
-                    std::cout << "gotcha4" << std::endl;
-                }
                 rec.write(tmp_bitwriter);
                 tmp_bitwriter.flush();
             }
@@ -204,7 +191,7 @@ ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
 
         /// Remove all temporary file belonging to current RID
         for (auto i_file = 0; i_file < n_tmp_files; i_file++) {
-     //       std::remove(gen_p2_tmp_fpath(options, iref, i_file).c_str());
+            std::remove(gen_p2_tmp_fpath(options, iref, i_file).c_str());
         }
     }
 
@@ -219,7 +206,7 @@ ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
 void clean_phase1_files(Config& options, int& nref) {
     for (auto iref = 0; iref < nref; iref++) {
         std::string fpath = options.tmp_dir_path + "/" + std::to_string(iref) + PHASE1_EXT;
-    //    std::remove(fpath.c_str());
+        std::remove(fpath.c_str());
     }
 }
 
@@ -263,6 +250,8 @@ char convertECigar2CigarChar(char token) {
     return ret;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 int stepRef(char token) {
     static const auto lut_loc = []() -> std::string {
         std::string lut(128, 0);
@@ -281,6 +270,8 @@ int stepRef(char token) {
     return lut_loc[token];
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint64_t mappedLength(const std::string& cigar) {
     if (cigar == "*") {
         return 0;
@@ -297,6 +288,8 @@ uint64_t mappedLength(const std::string& cigar) {
     }
     return length;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 std::string eCigar2Cigar(const std::string& ecigar) {
     std::string cigar;
@@ -336,6 +329,124 @@ std::string eCigar2Cigar(const std::string& ecigar) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+uint16_t computeSAMFlags(size_t s, size_t a, const genie::core::record::Record& record) {
+    uint16_t flags = 0;
+    if (record.getNumberOfTemplateSegments() > 1) {
+        flags |= 0x1;
+    }
+    if (record.getFlags() & genie::core::GenConst::FLAGS_PROPER_PAIR_MASK) {
+        flags |= 0x2;
+    }
+    // This read is unmapped
+    if (record.getClassID() == genie::core::record::ClassType::CLASS_U ||
+        ((record.getClassID() == genie::core::record::ClassType::CLASS_HM) &&
+         ((s == 1 && record.isRead1First()) || (s == 0 && !record.isRead1First())))) {
+        flags |= 0x4;
+    }
+    // Paired read is unmapped
+    if (record.getClassID() == genie::core::record::ClassType::CLASS_U ||
+        ((record.getClassID() == genie::core::record::ClassType::CLASS_HM) &&
+         ((s == 0 && record.isRead1First()) || (s == 1 && !record.isRead1First())))) {
+        flags |= 0x8;
+    }
+    // First or second read?
+    if ((s == 0 && record.getSegments().size() == 2) || (record.getSegments().size() == 1 && record.isRead1First())) {
+        flags |= 0x40;
+    } else {
+        flags |= 0x80;
+    }
+    // Secondary alignment
+    if (a > 0) {
+        flags |= 0x100;
+    }
+    if (record.getFlags() & genie::core::GenConst::FLAGS_QUALITY_FAIL_MASK) {
+        flags |= 0x200;
+    }
+    if (record.getFlags() & genie::core::GenConst::FLAGS_PCR_DUPLICATE_MASK) {
+        flags |= 0x400;
+    }
+    return flags;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void processFirstMappedSegment(size_t s, size_t a, const genie::core::record::Record& record, std::string& rname,
+                               std::string& pos, int64_t& tlen, std::string& mapping_qual, std::string& cigar,
+                               uint16_t& flags) {
+    // This read is mapped, process mapping
+    rname = std::to_string(record.getAlignmentSharedData().getSeqID());
+    if ((s == 0 && record.isRead1First()) || (s == 1 && !record.isRead1First()) || record.getSegments().size() == 1) {
+        // First segment is in primary alignment
+        pos = std::to_string(record.getAlignments()[a].getPosition() + 1);
+        tlen -= record.getAlignments()[a].getPosition() + 1;
+        mapping_qual = record.getAlignments()[a].getAlignment().getMappingScores().empty()
+                           ? "0"
+                           : std::to_string(record.getAlignments()[a].getAlignment().getMappingScores().front());
+        cigar = eCigar2Cigar(record.getAlignments()[a].getAlignment().getECigar());
+        if (record.getAlignments()[a].getAlignment().getRComp()) {
+            flags |= 0x10;
+        }
+    } else {
+        // First segment is mapped in split alignment
+        const auto& split = dynamic_cast<const genie::core::record::alignment_split::SameRec&>(
+            *record.getAlignments()[a].getAlignmentSplits().front().get());
+        cigar = eCigar2Cigar(split.getAlignment().getECigar());
+        pos = std::to_string(record.getAlignments()[a].getPosition() + split.getDelta() + 1);
+        tlen -= record.getAlignments()[a].getPosition() + split.getDelta() + 1 + mappedLength(cigar);
+        mapping_qual = split.getAlignment().getMappingScores().empty()
+                           ? "0"
+                           : std::to_string(split.getAlignment().getMappingScores().front());
+        if (split.getAlignment().getRComp()) {
+            flags |= 0x10;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void processSecondMappedSegment(size_t s, const genie::core::record::Record& record, int64_t& tlen,
+                               uint16_t& flags, std::string& pnext, std::string& rnext) {
+    // According to SAM standard, primary alignments only
+    auto split_type = record.getClassID() == genie::core::record::ClassType::CLASS_HM
+                      ? genie::core::record::AlignmentSplit::Type::UNPAIRED
+                      : record.getAlignments()[0].getAlignmentSplits().front()->getType();
+    if ((((s == 1 && record.isRead1First()) || (s == 0 && !record.isRead1First())) &&
+         split_type == genie::core::record::AlignmentSplit::Type::SAME_REC) ||
+        (split_type == genie::core::record::AlignmentSplit::Type::UNPAIRED)) {
+        // Paired read is first read
+        pnext = std::to_string(record.getAlignments()[0].getPosition() + 1);
+        tlen += record.getAlignments()[0].getPosition() + 1;
+        rnext = std::to_string(record.getAlignmentSharedData().getSeqID());
+        if (record.getAlignments()[0].getAlignment().getRComp()) {
+            flags |= 0x20;
+        }
+    } else {
+        // Paired read is second read
+        if (split_type == genie::core::record::AlignmentSplit::Type::SAME_REC) {
+            const auto& split = dynamic_cast<const genie::core::record::alignment_split::SameRec&>(
+                *record.getAlignments()[0].getAlignmentSplits().front().get());
+            pnext = std::to_string(record.getAlignments()[0].getPosition() + split.getDelta() + 1);
+            tlen += record.getAlignments()[0].getPosition() + split.getDelta() + 1 +
+                    mappedLength(eCigar2Cigar(split.getAlignment().getECigar()));
+
+            rnext = std::to_string(record.getAlignmentSharedData().getSeqID());
+            if (split.getAlignment().getRComp()) {
+                flags |= 0x20;
+            }
+        } else if (split_type == genie::core::record::AlignmentSplit::Type::OTHER_REC) {
+            const auto& split = dynamic_cast<const genie::core::record::alignment_split::OtherRec&>(
+                *record.getAlignments()[0].getAlignmentSplits().front().get());
+            rnext = std::to_string(split.getNextSeq());
+            pnext = std::to_string(split.getNextPos() + 1);
+            tlen = 0;  // Not available without reading second record
+        } else {
+            tlen = 0;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 ErrorCode transcode_mpg2sam(Config& options) {
     std::ifstream input_file(options.inputFile);
     std::ofstream output_file(options.outputFile);
@@ -347,48 +458,9 @@ ErrorCode transcode_mpg2sam(Config& options) {
         for (size_t s = 0; s < record.getSegments().size(); ++s) {
             for (size_t a = 0; a < std::max(record.getAlignments().size(), size_t(1)); ++a) {
                 std::string sam_record = record.getName() + "\t";
-                if (record.getName() == "HSQ1004:134:C0D8DACXX:1:1101:10329:176352") {
-                    std::cout << "gotcha" << std::endl;
-                }
-                uint16_t flags = 0;
-                bool mapped = true;
-                bool other_mapped = true;
-                if (record.getNumberOfTemplateSegments() > 1) {
-                    flags |= 0x1;
-                }
-                if (record.getFlags() & genie::core::GenConst::FLAGS_PROPER_PAIR_MASK) {
-                    flags |= 0x2;
-                }
-                // This read is unmapped
-                if (record.getClassID() == genie::core::record::ClassType::CLASS_U ||
-                    ((record.getClassID() == genie::core::record::ClassType::CLASS_HM) &&
-                     ((s == 1 && record.isRead1First()) || (s == 0 && !record.isRead1First())))) {
-                    flags |= 0x4;
-                    mapped = false;
-                }
-                // Paired read is unmapped
-                if (record.getClassID() == genie::core::record::ClassType::CLASS_U ||
-                    ((record.getClassID() == genie::core::record::ClassType::CLASS_HM) &&
-                     ((s == 0 && record.isRead1First()) || (s == 1 && !record.isRead1First())))) {
-                    flags |= 0x8;
-                    other_mapped = false;
-                }
-                // First or second read?
-                if ((s == 0 && record.getSegments().size() == 2) || (record.getSegments().size() == 1 && record.isRead1First())) {
-                    flags |= 0x40;
-                } else {
-                    flags |= 0x80;
-                }
-                // Secondary alignment
-                if (a > 0) {
-                    flags |= 0x100;
-                }
-                if (record.getFlags() & genie::core::GenConst::FLAGS_QUALITY_FAIL_MASK) {
-                    flags |= 0x200;
-                }
-                if (record.getFlags() & genie::core::GenConst::FLAGS_PCR_DUPLICATE_MASK) {
-                    flags |= 0x400;
-                }
+                uint16_t flags = computeSAMFlags(s, a, record);
+                bool mapped = !(flags & 0x4);
+                bool other_mapped = !(flags & 0x8);
 
                 std::string rname = "*";
                 std::string pos = "0";
@@ -398,35 +470,8 @@ ErrorCode transcode_mpg2sam(Config& options) {
                 std::string pnext = "0";
                 int64_t tlen = 0;
                 if (mapped) {
-                    // This read is mapped, process mapping
-                    rname = std::to_string(record.getAlignmentSharedData().getSeqID());
-                    if ((s == 0 && record.isRead1First()) || (s == 1 && !record.isRead1First()) ||
-                        record.getSegments().size() == 1) {
-                        // First segment
-                        pos = std::to_string(record.getAlignments()[a].getPosition() + 1);
-                        tlen -= record.getAlignments()[a].getPosition() + 1;
-                        mapping_qual =
-                            record.getAlignments()[a].getAlignment().getMappingScores().empty()
-                                ? "0"
-                                : std::to_string(record.getAlignments()[a].getAlignment().getMappingScores().front());
-                        cigar = eCigar2Cigar(record.getAlignments()[a].getAlignment().getECigar());
-                        if (record.getAlignments()[a].getAlignment().getRComp()) {
-                            flags |= 0x10;
-                        }
-                    } else {
-                        // Second segment is mapped in split alignment
-                        const auto& split = dynamic_cast<const genie::core::record::alignment_split::SameRec&>(
-                            *record.getAlignments()[a].getAlignmentSplits().front().get());
-                        cigar = eCigar2Cigar(split.getAlignment().getECigar());
-                        pos = std::to_string(record.getAlignments()[a].getPosition() + split.getDelta() + 1);
-                        tlen -= record.getAlignments()[a].getPosition() + split.getDelta() + 1 + mappedLength(cigar);
-                        mapping_qual = split.getAlignment().getMappingScores().empty()
-                                           ? "0"
-                                           : std::to_string(split.getAlignment().getMappingScores().front());
-                        if (split.getAlignment().getRComp()) {
-                            flags |= 0x10;
-                        }
-                    }
+                    // First segment is mapped
+                    processFirstMappedSegment(s, a, record, rname, pos, tlen, mapping_qual, cigar, flags);
                 } else if (record.getClassID() == genie::core::record::ClassType::CLASS_HM) {
                     // According to SAM standard, HM-like records should have same position for the unmapped part, too
                     pos = std::to_string(record.getAlignments()[a].getPosition() + 1);
@@ -438,48 +483,14 @@ ErrorCode transcode_mpg2sam(Config& options) {
                 }
 
                 if (other_mapped && record.getNumberOfTemplateSegments() == 2) {
-                    // According to SAM standard, primary alignments only
-                    auto split_type = record.getClassID() == genie::core::record::ClassType::CLASS_HM
-                                          ? genie::core::record::AlignmentSplit::Type::UNPAIRED
-                                          : record.getAlignments()[0].getAlignmentSplits().front()->getType();
-                    if ((((s == 1 && record.isRead1First()) || (s == 0 && !record.isRead1First())) && split_type == genie::core::record::AlignmentSplit::Type::SAME_REC) ||
-                        (split_type == genie::core::record::AlignmentSplit::Type::UNPAIRED)) {
-                        // Paired read is first read
-                        pnext = std::to_string(record.getAlignments()[0].getPosition() + 1);
-                        tlen += record.getAlignments()[0].getPosition() + 1;
-                        rnext = std::to_string(record.getAlignmentSharedData().getSeqID());
-                        if (record.getAlignments()[0].getAlignment().getRComp()) {
-                            flags |= 0x20;
-                        }
-                    } else {
-                        // Paired read is second read
-                        if (split_type == genie::core::record::AlignmentSplit::Type::SAME_REC) {
-                            const auto& split = dynamic_cast<const genie::core::record::alignment_split::SameRec&>(
-                                *record.getAlignments()[0].getAlignmentSplits().front().get());
-                            pnext = std::to_string(record.getAlignments()[0].getPosition() + split.getDelta() + 1);
-                            tlen += record.getAlignments()[0].getPosition() + split.getDelta() + 1 +
-                                    mappedLength(eCigar2Cigar(split.getAlignment().getECigar()));
-
-                            rnext = std::to_string(record.getAlignmentSharedData().getSeqID());
-                            if (split.getAlignment().getRComp()) {
-                                flags |= 0x20;
-                            }
-                        } else if (split_type == genie::core::record::AlignmentSplit::Type::OTHER_REC) {
-                            const auto& split = dynamic_cast<const genie::core::record::alignment_split::OtherRec&>(
-                                *record.getAlignments()[0].getAlignmentSplits().front().get());
-                            rnext = std::to_string(split.getNextSeq());
-                            pnext = std::to_string(split.getNextPos() + 1);
-                            tlen = 0;  // Not available without reading second record
-                        } else {
-                            tlen = 0;
-                        }
-                    }
+                    processSecondMappedSegment(s, record, tlen, flags, pnext, rnext);
                 } else {
                     rnext = rname;
                     pnext = pos;
                     tlen = 0;
                 }
 
+                // Use "=" shorthand
                 if (rnext == rname && rnext != "*") {
                     rnext = "=";
                 }
@@ -510,6 +521,7 @@ ErrorCode transcode_mpg2sam(Config& options) {
     }
     return ErrorCode::success;
 }
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace sam_to_mgrec

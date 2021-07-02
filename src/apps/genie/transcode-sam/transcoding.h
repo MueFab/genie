@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_TRANSCODER_TRANSCODING_H_
-#define SRC_APPS_TRANSCODER_TRANSCODING_H_
+#ifndef SRC_APPS_GENIE_TRANSCODE_SAM_TRANSCODING_H_
+#define SRC_APPS_GENIE_TRANSCODE_SAM_TRANSCODING_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ enum class ErrorCode : uint8_t { success = 0, failure = 1 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_TRANSCODER_TRANSCODING_H_
+#endif  // SRC_APPS_GENIE_TRANSCODE_SAM_TRANSCODING_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

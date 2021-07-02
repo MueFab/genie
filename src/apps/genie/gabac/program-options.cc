@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "program-options.h"
+#include "apps/genie/gabac/program-options.h"
 #include <cassert>
 #include <fstream>
 #include "cli11/CLI11.hpp"

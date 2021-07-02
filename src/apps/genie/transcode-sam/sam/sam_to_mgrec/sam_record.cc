@@ -9,16 +9,10 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "sam_record.h"
-
-// ---------------------------------------------------------------------------------------------------------------------
-
+#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_record.h"
 #include <algorithm>
 #include <string>
 #include <utility>
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 #include "genie/core/record/alignment_external/other-rec.h"
 #include "genie/core/record/alignment_split/other-rec.h"
 #include "genie/core/record/alignment_split/same-rec.h"

@@ -4,14 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_TRANSCODER_H_
-#define SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_TRANSCODER_H_
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#include "genie/core/record/record.h"
-#include "apps/genie/transcode-sam/transcoding.h"
-#include "genie/util/bitwriter.h"
+#ifndef SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_TRANSCODER_H_
+#define SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_TRANSCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -19,10 +13,10 @@
 #include <map>
 #include <string>
 #include <vector>
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#include "sam_record.h"
+#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_record.h"
+#include "apps/genie/transcode-sam/transcoding.h"
+#include "genie/core/record/record.h"
+#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -103,7 +97,7 @@ ErrorCode transcode_mpg2sam(Config& options);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_TRANSCODER_H_
+#endif  // SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_TRANSCODER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

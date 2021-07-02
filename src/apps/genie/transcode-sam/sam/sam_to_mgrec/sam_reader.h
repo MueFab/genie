@@ -4,17 +4,14 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SAM_READER_H_
-#define SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SAM_READER_H_
+#ifndef SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SAM_READER_H_
+#define SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SAM_READER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <htslib/sam.h>
 #include <string>
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-#include "sam_record.h"
+#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -86,7 +83,7 @@ class SamReader {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SAM_READER_H_
+#endif  // SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SAM_READER_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
