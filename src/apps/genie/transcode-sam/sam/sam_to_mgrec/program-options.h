@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_PROGRAM_OPTIONS_H_
-#define SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_PROGRAM_OPTIONS_H_
+#ifndef SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_PROGRAM_OPTIONS_H_
+#define SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_PROGRAM_OPTIONS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -46,8 +46,8 @@ class Config {
     int verbosity_level;          //!< @brief
     std::string tmp_dir_path;     //!< @brief
     std::string fasta_file_path;  //!< @brief
-    std::string inputFile;    //!< @brief
-    std::string outputFile;  //!< @brief
+    std::string inputFile;        //!< @brief
+    std::string outputFile;       //!< @brief
     bool forceOverwrite;
 
  private:
@@ -73,7 +73,7 @@ class Config {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_PROGRAM_OPTIONS_H_
+#endif  // SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_PROGRAM_OPTIONS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

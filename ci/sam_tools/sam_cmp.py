@@ -4,17 +4,13 @@
 import subprocess
 import os
 
-def sam_cmp(input_first, input_second, skip_qvs, skip_names):
+def sam_cmp(input_first, input_second):
     """
     Sort a file using the unix sort command
     :param input_path: File to sort
     :param output_path: Where to save the sorted file
     """
     cmp_matrix = str("11111111011")
-    if skip_qvs == True:
-        cmp_matrix = cmp_matrix[0:10] + "0" + cmp_matrix[11:]
-    if skip_names == True:
-        cmp_matrix = "0" + cmp_matrix[1:]
     refTranslate = {}
     with open(input_first, "r") as input_file_first:
         with open(input_second, "r") as input_file_second:
@@ -37,6 +33,7 @@ def sam_cmp(input_first, input_second, skip_qvs, skip_names):
                         f2 = f2 & ~0x800
                         f2 = f2 & ~0x100
 
+                        # In rare cases, DUP flag can be set only in one segment in SAM, which is not encodable in MPEG-G
                         f2 = f2 & ~0x400
                         f1 = f1 & ~0x400
 
@@ -99,13 +96,9 @@ if __name__ == "__main__":
 
     ap = argparse.ArgumentParser()
     ap.add_argument("-i", "--input_first", required=True, \
-                    help="First fastq input file")
+                    help="First sam input file")
     ap.add_argument("-j", "--input_second", required=True, \
-                    help="First fastq output file")
-    ap.add_argument("-n", "--skip_names", action='store_true', \
-                    help="First fastq output file")
-    ap.add_argument("-q", "--skip_qvs", action='store_true', \
-                    help="First fastq output file")
+                    help="First sam output file")
     args = ap.parse_args()
 
-    sam_cmp(args.input_first, args.input_second, args.skip_qvs, args.skip_names)
+    sam_cmp(args.input_first, args.input_second)

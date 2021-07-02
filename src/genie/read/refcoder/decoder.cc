@@ -56,7 +56,7 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     auto minPos = t_data.getMinPos();
     size_t numRecords = t_data.getNumReads();
     size_t segments = t_data.getParameters().getNumberTemplateSegments();
-  //  uint16_t ref = t_data.getReference();
+    //  uint16_t ref = t_data.getReference();
     std::stringstream str;
     util::BitReader reader(str);
     core::record::Chunk chunk;
@@ -71,20 +71,20 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     basecoder::Decoder decoder(std::move(t_data), segments, minPos);
     std::vector<std::string> ecigars;
     for (size_t recID = 0; recID < numRecords; ++recID) {
- /*       auto meta = decoder.readSegmentMeta();
-        std::vector<std::string> refs;
-        refs.reserve(meta.num_segments);
-        for (const auto& m : meta) {
-            refs.emplace_back(
-                ref_excerpt.getString(m.position, std::min<size_t>(ref_excerpt.getGlobalEnd(), m.position + m.length)));
-            refs.back().resize(m.length);
-        }
-        auto rec = decoder.pull(ref, std::move(refs));
-        if (!std::get<0>(names).empty()) {
-            rec.setName(std::get<0>(names)[recID]);
-        }
-        addECigar(rec, ecigars);
-        chunk.getData().emplace_back(std::move(rec));*/
+        /*       auto meta = decoder.readSegmentMeta();
+               std::vector<std::string> refs;
+               refs.reserve(meta.num_segments);
+               for (const auto& m : meta) {
+                   refs.emplace_back(
+                       ref_excerpt.getString(m.position, std::min<size_t>(ref_excerpt.getGlobalEnd(), m.position +
+           m.length))); refs.back().resize(m.length);
+               }
+               auto rec = decoder.pull(ref, std::move(refs));
+               if (!std::get<0>(names).empty()) {
+                   rec.setName(std::get<0>(names)[recID]);
+               }
+               addECigar(rec, ecigars);
+               chunk.getData().emplace_back(std::move(rec));*/
     }
     chunk.getStats().addDouble("time-localassembly", watch.check());
     watch.reset();

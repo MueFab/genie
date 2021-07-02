@@ -4,20 +4,18 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SAM_GROUP_H_
-#define SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SAM_GROUP_H_
+#ifndef SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SAM_GROUP_H_
+#define SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SAM_GROUP_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <list>
 #include <map>
 #include <tuple>
+#include <utility>
 #include <vector>
-
-// ---------------------------------------------------------------------------------------------------------------------
-
+#include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_record.h"
 #include "genie/core/record/record.h"
-#include "sam_record.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -55,15 +53,6 @@ class SamRecordGroup {
 
     /**
      * @brief
-     * @param _r1
-     * @param r2
-     * @param force_split
-     * @return
-     */
-    genie::core::record::Record pairedEndedToMpegg(SamRecord& _r1, SamRecord* r2, bool force_split = true);
-
-    /**
-     * @brief
      * @param rec
      * @param r
      * @param other_r
@@ -74,51 +63,80 @@ class SamRecordGroup {
 
     /**
      * @brief
-     * @param records
-     * @param sam_rec
+     * @return
      */
-    void convertUnmapped(std::list<genie::core::record::Record>& records, SamRecord& sam_rec);
+    bool checkIfPaired();
 
     /**
      * @brief
-     * @param records
-     * @param sam_recs
-     * @param unmapped_pair
-     * @param is_read_1_first
+     * @return
      */
-    void convertSingleEnd(std::list<genie::core::record::Record>& records, std::list<SamRecord>& sam_recs,
-                          bool unmapped_pair = false, bool is_read_1_first = true);
+    genie::core::record::ClassType checkClassTypeSingle();
 
     /**
      * @brief
-     * @param mgrecs_by_rid
-     * @param recs_rid_order
+     * @param tempType
+     * @param mapType
+     */
+    void removeDuplicatesPaired(TemplateType tempType, MappingType mapType);
+
+    /**
+     * @brief
+     * @param tempType
+     * @return
+     */
+    size_t primaryTemplateCount(TemplateType tempType);
+
+    /**
+     * @brief
+     * @param mapType
+     * @return
+     */
+    size_t mappingCount(MappingType mapType);
+
+    /**
+     * @brief
+     */
+    void removeAmbiguousSecondaryAlignments();
+
+    /**
+     * @brief
+     */
+    void moveSecondaryAlignments();
+
+    /**
+     * @brief
+     * @param unknown_count
+     * @param read_1_count
+     * @param read_2_count
+     */
+    void guessUnknownReadOrder(size_t& unknown_count, size_t& read_1_count, size_t& read_2_count);
+
+    /**
+     * @brief
+     * @return
+     */
+    genie::core::record::ClassType checkClassTypePaired();
+
+    /**
+     * @brief
+     * @return
+     */
+    std::pair<SamRecord*, SamRecord*> getReadTuple();
+
+    /**
+     * @brief
+     * @param cls
+     * @return
+     */
+    bool isR1First(const std::pair<bool, genie::core::record::ClassType>& cls);
+
+    /**
+     * @brief
      * @param rec
-     * @param other_rec
+     * @param r1
      */
-    void createMgrecAndAddAlignment(std::map<int32_t, genie::core::record::Record>& mgrecs_by_rid,
-                                    std::vector<int32_t>& recs_rid_order, SamRecord& rec, SamRecord* other_rec);
-
-    /**
-     * @brief
-     * @param recs1_by_rid
-     * @param recs1_rid_order
-     * @param recs2_by_rid
-     * @param recs2_rid_order
-     * @param sam_recs_2d
-     */
-    void convertPairedEnd(std::map<int32_t, genie::core::record::Record>& recs1_by_rid,
-                          std::vector<int32_t>& recs1_rid_order,
-                          std::map<int32_t, genie::core::record::Record>& recs2_by_rid,
-                          std::vector<int32_t>& recs2_rid_order, std::list<std::list<SamRecord>> sam_recs_2d);
-
-    /**
-     * @brief
-     * @param recs_by_rid
-     * @param recs_rid_order
-     */
-    void handlesMoreAlignments(std::map<int32_t, genie::core::record::Record>& recs_by_rid,
-                               std::vector<int32_t>& recs_rid_order);
+    void addSegment(genie::core::record::Record &rec, SamRecord *r1);
 
  public:
     /**
@@ -134,7 +152,7 @@ class SamRecordGroup {
     static std::tuple<bool, uint8_t> convertFlags2Mpeg(uint16_t flags);
 
     /**
-     *
+     * @brief
      * @return
      */
     std::pair<bool, genie::core::record::ClassType> validate();
@@ -162,7 +180,7 @@ class SamRecordGroup {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_TRANSCODER_SAM_SAM_TO_MGREC_SAM_GROUP_H_
+#endif  // SRC_APPS_GENIE_TRANSCODE_SAM_SAM_SAM_TO_MGREC_SAM_GROUP_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

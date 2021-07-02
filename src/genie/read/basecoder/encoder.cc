@@ -134,18 +134,19 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
         clips.second = encodeCigar(SEQUENCE2, CIGAR2, ref2, rec.getClassID());
     } else if (rec.getNumberOfTemplateSegments() > 1) {
         // Unpaired
-        if(rec.getAlignments().front().getAlignmentSplits().front()->getType() == core::record::AlignmentSplit::Type::UNPAIRED) {
-            if(rec.isRead1First()) {
+        if (rec.getAlignments().front().getAlignmentSplits().front()->getType() ==
+            core::record::AlignmentSplit::Type::UNPAIRED) {
+            if (rec.isRead1First()) {
                 container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_UNPAIRED);
             } else {
                 container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_UNPAIRED);
             }
-        // Other record
+            // Other record
         } else {
             const auto ALIGNMENT = rec.getAlignments().front().getAlignmentSplits().front().get();
             auto split = *reinterpret_cast<const core::record::alignment_split::OtherRec *>(ALIGNMENT);
-            if(rec.isRead1First()) {
-                if(split.getNextSeq() == rec.getAlignmentSharedData().getSeqID()) {
+            if (rec.isRead1First()) {
+                if (split.getNextSeq() == rec.getAlignmentSharedData().getSeqID()) {
                     container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R2_DIFF_REF);
                     container.push(core::GenSub::PAIR_R2_DIFF_SEQ, split.getNextSeq());
                     container.push(core::GenSub::PAIR_R2_DIFF_POS, split.getNextPos());
@@ -154,7 +155,7 @@ void Encoder::add(const core::record::Record &rec, const std::string &ref1, cons
                     container.push(core::GenSub::PAIR_R2_SPLIT, split.getNextPos());
                 }
             } else {
-                if(split.getNextSeq() == rec.getAlignmentSharedData().getSeqID()) {
+                if (split.getNextSeq() == rec.getAlignmentSharedData().getSeqID()) {
                     container.push(core::GenSub::PAIR_DECODING_CASE, core::GenConst::PAIR_R1_DIFF_REF);
                     container.push(core::GenSub::PAIR_R1_DIFF_SEQ, split.getNextSeq());
                     container.push(core::GenSub::PAIR_R1_DIFF_POS, split.getNextPos());

@@ -74,7 +74,8 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec,
             break;
     }
     for (size_t i = 1; i < sequences.size(); ++i) {
-        decodeAdditional(std::get<1>(clip_offset), std::move(sequences[i]), std::move(cigars[i]), meta.position[1] - meta.position[0], state);
+        decodeAdditional(std::get<1>(clip_offset), std::move(sequences[i]), std::move(cigars[i]),
+                         meta.position[1] - meta.position[0], state);
     }
 
     std::get<1>(state).addAlignment(ref, std::move(std::get<0>(state)));
@@ -86,7 +87,6 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec,
 Decoder::SegmentMeta Decoder::readSegmentMeta() {
     SegmentMeta meta{};
     meta.position[0] = position + container.get(core::GenSub::POS_MAPPING_FIRST).get(0);
-    ;
 
     meta.num_segments = 1;
     if (number_template_segments == 2) {
@@ -213,7 +213,8 @@ void Decoder::decodeAdditional(size_t softclip_offset, std::string &&seq, std::s
 
     core::record::Alignment alignment(contractECigar(ecigar), RCOMP);
     alignment.addMappingScore(MSCORE);
-    std::get<0>(state).addAlignmentSplit(genie::util::make_unique<genie::core::record::alignment_split::SameRec>(delta_pos, alignment));
+    std::get<0>(state).addAlignmentSplit(
+        genie::util::make_unique<genie::core::record::alignment_split::SameRec>(delta_pos, alignment));
 
     core::record::Segment segment(std::move(sequence));
     std::get<1>(state).addSegment(std::move(segment));

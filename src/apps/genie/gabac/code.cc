@@ -4,7 +4,7 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "code.h"
+#include "apps/genie/gabac/code.h"
 #include <algorithm>
 #include <cassert>
 #include <cmath>

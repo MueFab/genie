@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_GABAC_APP_PROGRAM_OPTIONS_H_
-#define SRC_APPS_GABAC_APP_PROGRAM_OPTIONS_H_
+#ifndef SRC_APPS_GENIE_GABAC_PROGRAM_OPTIONS_H_
+#define SRC_APPS_GENIE_GABAC_PROGRAM_OPTIONS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -65,7 +65,7 @@ class ProgramOptions {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_GABAC_APP_PROGRAM_OPTIONS_H_
+#endif  // SRC_APPS_GENIE_GABAC_PROGRAM_OPTIONS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

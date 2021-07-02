@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#ifndef SRC_APPS_GABAC_APP_CODE_H_
-#define SRC_APPS_GABAC_APP_CODE_H_
+#ifndef SRC_APPS_GENIE_GABAC_CODE_H_
+#define SRC_APPS_GENIE_GABAC_CODE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ void code(const std::string& inputFilePath, const std::string& outputFilePath, s
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#endif  // SRC_APPS_GABAC_APP_CODE_H_
+#endif  // SRC_APPS_GENIE_GABAC_CODE_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -51,15 +51,15 @@ transcoder_roundtrip () {
         -f \
         || { echo "Genie transcode ($sam_file; $genie_encoder_parameters) failed!" ; exit 1; }
 
- #   rm $working_dir/transcoded.mgrec
+    rm $working_dir/transcoded.mgrec
     echo "-----------------Output transcoded:"
     ls -l $working_dir/output.sam
 
     echo "-----------------Check output files:"
-    $git_root_dir/ci/sam_tools/sam_cmp_complete.py -i $working_dir/output.sam -j $sam_file $fastq_cmp_input_parameters $fastq_cmp_error_parameters || { echo "Invalid output!" ; exit 1; }
+    $git_root_dir/ci/sam_tools/sam_cmp_complete.py -i $working_dir/output.sam -j $sam_file || { echo "Invalid output!" ; exit 1; }
     echo "-----------------Output files ok!"
 
-  #  rm $working_dir/output.sam
+    rm $working_dir/output.sam
 }
 
 transcoder_roundtrip ""

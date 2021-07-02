@@ -4,8 +4,8 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "utils.h"
-#include <genie/core/record/alignment_split/other-rec.h>
+#include "apps/genie/transcode-sam/utils.h"
+#include "genie/core/record/alignment_split/other-rec.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

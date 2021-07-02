@@ -4,15 +4,16 @@
  * https://github.com/mitogen/genie for more details.
  */
 
+#include "apps/genie/gabac/main.h"
 #include <cassert>
 #include <csignal>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
-#include "code.h"
+#include "apps/genie/gabac/code.h"
+#include "apps/genie/gabac/program-options.h"
 #include "genie/entropy/gabac/gabac.h"
-#include "program-options.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
