@@ -186,6 +186,18 @@ stages:
       displayName: 'Openmp installation (OSX)'
       condition: eq( variables['Agent.OS'], 'Darwin' )
 
+    - bash: |
+        git clone https://github.com/samtools/htslib.git
+        cd htslib
+        git checkout tags/1.12
+        git submodule update --init --recursive
+        autoreconf -i
+        ./configure
+        make -j
+        sudo make install
+      displayName: 'Install HTSLib (Unix)'
+      condition: ne( variables['Agent.OS'], 'Windows_NT' )
+
     - download: current
       artifact: 'genie-debug-$(artifactName)-$(Build.SourceVersion)'
       displayName: 'Download binaries'
@@ -237,6 +249,18 @@ stages:
       displayName: 'Installation prerequisites (Linux)'
       condition: eq( variables['Agent.OS'], 'Linux' )
 
+    - bash: |
+        git clone https://github.com/samtools/htslib.git
+        cd htslib
+        git checkout tags/1.12
+        git submodule update --init --recursive
+        autoreconf -i
+        ./configure
+        make -j
+        sudo make install
+      displayName: 'Install HTSLib (Unix)'
+      condition: ne( variables['Agent.OS'], 'Windows_NT' )
+
     - download: current
       artifact: 'genie-release-$(artifactName)-$(Build.SourceVersion)'
       displayName: 'Download binaries'
@@ -286,6 +310,18 @@ stages:
         brew install gnu-time
       displayName: 'Openmp installation (OSX)'
       condition: eq( variables['Agent.OS'], 'Darwin' )
+
+    - bash: |
+        git clone https://github.com/samtools/htslib.git
+        cd htslib
+        git checkout tags/1.12
+        git submodule update --init --recursive
+        autoreconf -i
+        ./configure
+        make -j
+        sudo make install
+      displayName: 'Install HTSLib (Unix)'
+      condition: ne( variables['Agent.OS'], 'Windows_NT' )
 
     - bash: |
         mkdir ref-decoder
