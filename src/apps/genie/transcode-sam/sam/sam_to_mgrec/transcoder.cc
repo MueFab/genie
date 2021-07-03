@@ -404,12 +404,12 @@ void processFirstMappedSegment(size_t s, size_t a, const genie::core::record::Re
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void processSecondMappedSegment(size_t s, const genie::core::record::Record& record, int64_t& tlen,
-                               uint16_t& flags, std::string& pnext, std::string& rnext) {
+void processSecondMappedSegment(size_t s, const genie::core::record::Record& record, int64_t& tlen, uint16_t& flags,
+                                std::string& pnext, std::string& rnext) {
     // According to SAM standard, primary alignments only
     auto split_type = record.getClassID() == genie::core::record::ClassType::CLASS_HM
-                      ? genie::core::record::AlignmentSplit::Type::UNPAIRED
-                      : record.getAlignments()[0].getAlignmentSplits().front()->getType();
+                          ? genie::core::record::AlignmentSplit::Type::UNPAIRED
+                          : record.getAlignments()[0].getAlignmentSplits().front()->getType();
     if ((((s == 1 && record.isRead1First()) || (s == 0 && !record.isRead1First())) &&
          split_type == genie::core::record::AlignmentSplit::Type::SAME_REC) ||
         (split_type == genie::core::record::AlignmentSplit::Type::UNPAIRED)) {

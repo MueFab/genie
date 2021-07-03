@@ -33,7 +33,7 @@ bool SubfileReader::readRecord() {
         rec = genie::core::record::Record(bitreader);
 
         if (!rec.getAlignments().empty()) {
-            curr_mgrec_pos = getMinPos(rec);
+            curr_mgrec_pos = rec.getAlignments().front().getPosition();
         }
 
         return true;

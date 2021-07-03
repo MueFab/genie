@@ -160,10 +160,7 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
             continue;
         }
         read_num += r.getSegments().size();
-        uint64_t curPos = (!r.isRead1First()) && r.getAlignments().front().getAlignmentSplits().front()->getType() ==
-                                                     core::record::AlignmentSplit::Type::SAME_REC
-                              ? r.getAlignments().front().getPosition() + getPairedAlignment(state, r).getDelta()
-                              : r.getAlignments().front().getPosition();
+        uint64_t curPos = r.getAlignments().front().getPosition();
         UTILS_DIE_IF(curPos < lastPos, "Data seems to be unsorted. Local assembly encoding needs sorted input data.");
 
         lastPos = r.getAlignments().front().getPosition();

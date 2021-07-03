@@ -136,7 +136,7 @@ class SamRecordGroup {
      * @param rec
      * @param r1
      */
-    void addSegment(genie::core::record::Record &rec, SamRecord *r1);
+    void addSegment(genie::core::record::Record& rec, SamRecord* r1);
 
  public:
     /**
