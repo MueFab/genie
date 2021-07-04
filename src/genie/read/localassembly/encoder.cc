@@ -101,7 +101,7 @@ void Encoder::updateGuesses(const core::record::Record& r, Encoder::LaeState& st
         state.readLength = 0;
     }
 
-    if (state.pairedEnd) {
+    if (r.getSegments().size() == 2) {
         if (r.getSegments()[1].getSequence().length() != state.readLength) {
             state.readLength = 0;
         }
@@ -144,6 +144,10 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
         } else {
             ++it;
         }
+    }
+    if (data.getData().empty()) {
+        skipOut(id);
+        return;
     }
 
     LaeState state(cr_buf_max_size, data.getData().front().getAlignments().front().getPosition());
