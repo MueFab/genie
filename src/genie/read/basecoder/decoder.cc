@@ -55,13 +55,15 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec,
             std::get<1>(state).setRead1First(false);
             std::get<0>(state).addAlignmentSplit(
                 genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(
-                    container.pull(core::GenSub::PAIR_R1_DIFF_POS), container.pull(core::GenSub::PAIR_R1_DIFF_SEQ)));
+                    container.pull(core::GenSub::PAIR_R1_DIFF_POS),
+                    (uint16_t)container.pull(core::GenSub::PAIR_R1_DIFF_SEQ)));
             break;
         case core::GenConst::PAIR_R2_DIFF_REF:
             std::get<1>(state).setRead1First(true);
             std::get<0>(state).addAlignmentSplit(
                 genie::util::make_unique<genie::core::record::alignment_split::OtherRec>(
-                    container.pull(core::GenSub::PAIR_R2_DIFF_POS), container.pull(core::GenSub::PAIR_R2_DIFF_SEQ)));
+                    container.pull(core::GenSub::PAIR_R2_DIFF_POS),
+                    (uint16_t)container.pull(core::GenSub::PAIR_R2_DIFF_SEQ)));
             break;
         case core::GenConst::PAIR_R1_UNPAIRED:
             std::get<1>(state).setRead1First(false);
@@ -76,7 +78,7 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec,
     }
     for (size_t i = 1; i < sequences.size(); ++i) {
         decodeAdditional(std::get<1>(clip_offset), std::move(sequences[i]), std::move(cigars[i]),
-                         meta.position[1] - meta.position[0], state);
+                         uint16_t(meta.position[1] - meta.position[0]), state);
     }
 
     std::get<1>(state).addAlignment(ref, std::move(std::get<0>(state)));
@@ -94,12 +96,12 @@ Decoder::SegmentMeta Decoder::readSegmentMeta() {
 
     meta.num_segments = 1;
     if (number_template_segments == 2) {
-        meta.decoding_case = container.pull(core::GenSub::PAIR_DECODING_CASE);
+        meta.decoding_case = uint8_t(container.pull(core::GenSub::PAIR_DECODING_CASE));
         if (meta.decoding_case == core::GenConst::PAIR_SAME_RECORD) {
             meta.num_segments = 2;
             const auto SAME_REC_DATA = (uint32_t)container.pull(core::GenSub::PAIR_SAME_REC);
             meta.first1 = SAME_REC_DATA & 1u;
-            const int16_t DELTA = SAME_REC_DATA >> 1u;
+            const auto DELTA = (int16_t)(uint16_t)(SAME_REC_DATA >> 1u);
             meta.position[1] = meta.position[0] + DELTA;
         }
     }
@@ -146,7 +148,7 @@ std::tuple<core::record::AlignmentBox, core::record::Record> Decoder::decode(siz
     decodeMismatches(clip_offset, sequence, ecigar);
 
     core::record::Alignment alignment(contractECigar(ecigar), RCOMP);
-    alignment.addMappingScore(MSCORE);
+    alignment.addMappingScore((int32_t)MSCORE);
 
     std::tuple<core::record::AlignmentBox, core::record::Record> ret;
     std::get<0>(ret) = core::record::AlignmentBox(POSITION, std::move(alignment));
