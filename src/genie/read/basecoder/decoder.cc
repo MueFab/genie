@@ -33,6 +33,7 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec,
         cigars.emplace_back(sequence.size(), '=');
     }
     auto clip_offset = decodeClips(sequences, cigars);
+
     auto state = decode(std::get<0>(clip_offset), std::move(sequences.front()), std::move(cigars.front()));
     switch (meta.decoding_case) {
         case core::GenConst::PAIR_SAME_RECORD:
@@ -79,6 +80,9 @@ core::record::Record Decoder::pull(uint16_t ref, std::vector<std::string> &&vec,
     }
 
     std::get<1>(state).addAlignment(ref, std::move(std::get<0>(state)));
+    if (!std::get<1>(state).isRead1First()) {
+        std::get<1>(state).swapSegmentOrder();
+    }
     return std::get<1>(state);
 }
 

@@ -82,25 +82,29 @@ core::QVEncoder::QVCoded Encoder::process(const core::record::Chunk& rec) {
     setUpParameters(rec, *param, desc);
 
     for (const auto& r : rec.getData()) {
-        size_t num_aligned_segs = r.getAlignments().empty() ? 0 : 1;
-        if (num_aligned_segs) {
-            num_aligned_segs += r.getAlignments().front().getAlignmentSplits().size();
+        auto& s_first = !r.isRead1First() && r.getSegments().size() == 2 ? r.getSegments()[1] : r.getSegments()[0];
+
+        if (r.getAlignments().empty()) {
+            encodeUnalignedSegment(s_first, desc);
+        } else {
+            encodeAlignedSegment(s_first, r.getAlignments().front().getAlignment().getECigar(), desc);
         }
 
-        size_t ctr = 0;
-        for (const auto& s : r.getSegments()) {
-            bool aligned = ctr < num_aligned_segs;
-            if (aligned) {
-                const std::string& cigar = ctr ? reinterpret_cast<const core::record::alignment_split::SameRec&>(
-                                                     *r.getAlignments().front().getAlignmentSplits().at(ctr - 1))
-                                                     .getAlignment()
-                                                     .getECigar()
-                                               : r.getAlignments().front().getAlignment().getECigar();
-                encodeAlignedSegment(s, cigar, desc);
-            } else {
-                encodeUnalignedSegment(s, desc);
-            }
-            ctr++;
+        if (r.getSegments().size() == 1) {
+            continue;
+        }
+
+        auto& s_second = r.isRead1First() ? r.getSegments()[1] : r.getSegments()[0];
+
+        if (r.getClassID() == core::record::ClassType::CLASS_HM || r.getClassID() == core::record::ClassType::CLASS_U) {
+            encodeUnalignedSegment(s_second, desc);
+        } else {
+            encodeAlignedSegment(s_second,
+                                 dynamic_cast<const core::record::alignment_split::SameRec*>(
+                                     r.getAlignments().front().getAlignmentSplits().front().get())
+                                     ->getAlignment()
+                                     .getECigar(),
+                                 desc);
         }
     }
 

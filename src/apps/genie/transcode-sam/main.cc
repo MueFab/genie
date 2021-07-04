@@ -18,25 +18,17 @@ namespace transcode_sam {
 // ---------------------------------------------------------------------------------------------------------------------
 
 int main(int argc, char* argv[]) {
-    try {
-        genieapp::transcode_sam::sam::sam_to_mgrec::Config programOptions(argc, argv);
-        genieapp::transcode_sam::ErrorCode ret = genieapp::transcode_sam::ErrorCode::success;
-        if (programOptions.inputFile.substr(programOptions.inputFile.length() - 3) == "sam" &&
-            programOptions.outputFile.substr(programOptions.outputFile.length() - 5) == "mgrec") {
-            ret = transcode_sam2mpg(programOptions);
-        } else if (programOptions.outputFile.substr(programOptions.outputFile.length() - 3) == "sam" &&
-                   programOptions.inputFile.substr(programOptions.inputFile.length() - 5) == "mgrec") {
-            ret = transcode_mpg2sam(programOptions);
-        }
-        if (ret != genieapp::transcode_sam::ErrorCode::success) {
-            UTILS_DIE("ERROR");
-        }
-    } catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
-    } catch (...) {
-        std::cerr << "Unkown error occurred" << std::endl;
-        return EXIT_FAILURE;
+    genieapp::transcode_sam::sam::sam_to_mgrec::Config programOptions(argc, argv);
+    genieapp::transcode_sam::ErrorCode ret = genieapp::transcode_sam::ErrorCode::success;
+    if (programOptions.inputFile.substr(programOptions.inputFile.length() - 3) == "sam" &&
+        programOptions.outputFile.substr(programOptions.outputFile.length() - 5) == "mgrec") {
+        ret = transcode_sam2mpg(programOptions);
+    } else if (programOptions.outputFile.substr(programOptions.outputFile.length() - 3) == "sam" &&
+               programOptions.inputFile.substr(programOptions.inputFile.length() - 5) == "mgrec") {
+        ret = transcode_mpg2sam(programOptions);
+    }
+    if (ret != genieapp::transcode_sam::ErrorCode::success) {
+        UTILS_DIE("ERROR");
     }
 
     return EXIT_SUCCESS;

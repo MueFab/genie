@@ -126,6 +126,11 @@ class Record {
 
     /**
      * @brief
+     */
+    void swapSegmentOrder();
+
+    /**
+     * @brief
      * @return
      */
     const std::vector<Segment>& getSegments() const;

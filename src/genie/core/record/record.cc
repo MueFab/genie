@@ -172,6 +172,17 @@ std::vector<Segment> &Record::getSegments() { return reads; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void Record::swapSegmentOrder() {
+    if (reads.size() != 2) {
+        return;
+    }
+    auto s_tmp = std::move(reads[0]);
+    reads[0] = std::move(reads[1]);
+    reads[1] = std::move(s_tmp);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 size_t Record::getNumberOfTemplateSegments() const { return number_of_template_segments; }
 
 // ---------------------------------------------------------------------------------------------------------------------
