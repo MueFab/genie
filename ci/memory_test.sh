@@ -35,7 +35,7 @@ curl -L \
     || { echo 'Could not download single end fastq!' ; exit 1; }
 gzip -df /tmp/ERR174310_tiny_1.fastq.gz
 
-#$git_root_dir/ci/fastq_tools/fastq_memcheck.sh "/tmp/ERR174310_tiny_1.fastq" ""
+$git_root_dir/ci/fastq_tools/fastq_memcheck.sh "/tmp/ERR174310_tiny_1.fastq" ""
 
 echo "*** Paired-end fastq"
 # Get fastq file no 2
@@ -45,7 +45,10 @@ curl -L \
     || { echo 'Could not download paired end fastq!' ; exit 1; }
 gzip -df /tmp/ERR174310_tiny_2.fastq.gz
 
-#$git_root_dir/ci/fastq_tools/fastq_memcheck.sh "/tmp/ERR174310_tiny_1.fastq" "/tmp/ERR174310_tiny_2.fastq"
+$git_root_dir/ci/fastq_tools/fastq_memcheck.sh "/tmp/ERR174310_tiny_1.fastq" "/tmp/ERR174310_tiny_2.fastq"
+
+rm /tmp/ERR174310_tiny_1.fastq
+rm /tmp/ERR174310_tiny_2.fastq
 
 echo "*** SAM"
 curl -L \
@@ -56,6 +59,4 @@ gzip -df /tmp/NA12878_S1_chr22_tiny.sam.gz
 
 $git_root_dir/ci/sam_tools/sam_memcheck.sh "/tmp/NA12878_S1_chr22_tiny.sam" ""
 
-rm /tmp/ERR174310_tiny_1.fastq
-rm /tmp/ERR174310_tiny_2.fastq
 rm /tmp/NA12878_S1_chr22_tiny.sam
