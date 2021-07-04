@@ -54,18 +54,23 @@ curl -L \
     || { echo 'Could not download paired end fastq!' ; exit 1; }
 gzip -df /tmp/ERR174310_short_2.fastq.gz
 
-echo "*** SAM"
-# Get sam file
-curl -L \
-    https://seafile.cloud.uni-hannover.de/f/ed4f5f9570d14c9b9d24/?dl=1  \
-    --output /tmp/NA12878_S1_chr22_trunc.sam.gz \
-    || { echo 'Could not download sam file!' ; exit 1; }
-gzip -df /tmp/NA12878_S1_chr22_trunc.sam.gz
-
-$git_root_dir/ci/sam_tools/sam_transcoder_test.sh "/tmp/NA12878_S1_chr22_trunc.sam"
-$git_root_dir/ci/sam_tools/sam_roundtrip.sh "/tmp/NA12878_S1_chr22_trunc.sam"
 $git_root_dir/ci/fastq_tools/fastq_roundtrip.sh "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq"
-
 rm /tmp/ERR174310_short_2.fastq
 rm /tmp/ERR174310_short_1.fastq
-rm /tmp/NA12878_S1_chr22_trunc.sam
+
+if [[ "$OSTYPE" != "win32" && "$OSTYPE" != "cygwin" && "$OSTYPE" != "msys" ]]; then
+
+    echo "*** SAM"
+    # Get sam file
+    curl -L \
+        https://seafile.cloud.uni-hannover.de/f/ed4f5f9570d14c9b9d24/?dl=1  \
+        --output /tmp/NA12878_S1_chr22_trunc.sam.gz \
+        || { echo 'Could not download sam file!' ; exit 1; }
+    gzip -df /tmp/NA12878_S1_chr22_trunc.sam.gz
+
+    $git_root_dir/ci/sam_tools/sam_transcoder_test.sh "/tmp/NA12878_S1_chr22_trunc.sam"
+    $git_root_dir/ci/sam_tools/sam_roundtrip.sh "/tmp/NA12878_S1_chr22_trunc.sam"
+
+    rm /tmp/NA12878_S1_chr22_trunc.sam
+
+fi
