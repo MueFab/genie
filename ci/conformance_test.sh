@@ -63,6 +63,7 @@ curl -L \
 gzip -df /tmp/NA12878_S1_chr22_trunc.sam.gz
 
 $git_root_dir/ci/sam_tools/sam_transcoder_test.sh "/tmp/NA12878_S1_chr22_trunc.sam"
+$git_root_dir/ci/sam_tools/sam_roundtrip.sh "/tmp/NA12878_S1_chr22_trunc.sam"
 $git_root_dir/ci/fastq_tools/fastq_roundtrip.sh "/tmp/ERR174310_short_1.fastq" "/tmp/ERR174310_short_2.fastq"
 
 rm /tmp/ERR174310_short_2.fastq

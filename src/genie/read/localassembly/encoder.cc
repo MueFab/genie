@@ -136,6 +136,16 @@ core::AccessUnit Encoder::pack(size_t id, uint16_t ref, uint8_t qv_depth,
 void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     util::Watch watch;
     core::record::Chunk data = std::move(t);
+    for (auto it = data.getData().begin(); it != data.getData().end();) {
+        if (it->getClassID() == core::record::ClassType::CLASS_HM) {
+            //    std::cerr << "Skipping record of class HM in local assembly..." << std::endl;
+            it = data.getData().erase(it);
+            continue;
+        } else {
+            ++it;
+        }
+    }
+
     LaeState state(cr_buf_max_size, data.getData().front().getAlignments().front().getPosition());
 
     state.pairedEnd = data.getData().front().getNumberOfTemplateSegments() > 1;
@@ -155,10 +165,6 @@ void Encoder::flowIn(core::record::Chunk&& t, const util::Section& id) {
     watch.reset();
     size_t read_num = 0;
     for (auto& r : data.getData()) {
-        if (r.getClassID() == core::record::ClassType::CLASS_HM) {
-            std::cerr << "Skipping record of class HM in local assembly..." << std::endl;
-            continue;
-        }
         read_num += r.getSegments().size();
         uint64_t curPos = r.getAlignments().front().getPosition();
         UTILS_DIE_IF(curPos < lastPos, "Data seems to be unsorted. Local assembly encoding needs sorted input data.");

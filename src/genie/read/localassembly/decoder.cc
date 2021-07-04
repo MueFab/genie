@@ -24,26 +24,28 @@ namespace localassembly {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void addECigar(const core::record::Record& rec, std::vector<std::string>& cig_vec) {
-    size_t num = 0;
-    for (const auto& seg : rec.getSegments()) {
-        if (rec.getAlignments().empty()) {
-            cig_vec.emplace_back(std::to_string(seg.getSequence().length()) + '+');
-            num++;
-            continue;
-        }
-        if (!num) {
-            cig_vec.emplace_back(rec.getAlignments().front().getAlignment().getECigar());
-        } else {
-            if (rec.getAlignments().front().getAlignmentSplits().size() <= num - 1) {
-                auto* split = dynamic_cast<const core::record::alignment_split::SameRec*>(
-                    rec.getAlignments().front().getAlignmentSplits()[num - 1].get());
-                cig_vec.emplace_back(split->getAlignment().getECigar());
-            } else {
-                cig_vec.emplace_back(std::to_string(seg.getSequence().length()) + '+');
-            }
-        }
-        num++;
+    const auto& s_first =
+        !rec.isRead1First() && rec.getSegments().size() == 2 ? rec.getSegments()[1] : rec.getSegments()[0];
+
+    if (rec.getAlignments().empty()) {
+        cig_vec.emplace_back(std::to_string(s_first.getSequence().length()) + '+');
+    } else {
+        cig_vec.emplace_back(rec.getAlignments().front().getAlignment().getECigar());
     }
+
+    if (rec.getSegments().size() == 1) {
+        return;
+    }
+
+    if (rec.getClassID() == core::record::ClassType::CLASS_HM) {
+        const auto& s_second = rec.isRead1First() ? rec.getSegments()[1] : rec.getSegments()[0];
+        cig_vec.emplace_back(std::to_string(s_second.getSequence().length()) + '+');
+        return;
+    }
+
+    const auto& split = dynamic_cast<const core::record::alignment_split::SameRec*>(
+        rec.getAlignments().front().getAlignmentSplits().front().get());
+    cig_vec.emplace_back(split->getAlignment().getECigar());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -70,16 +72,18 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     chunk.setStats(std::move(t_data.getStats()));
     basecoder::Decoder decoder(std::move(t_data), segments);
     std::vector<std::string> ecigars;
-    for (size_t recID = 0; recID < numRecords; ++recID) {
+    size_t nameID = 0;
+    for (size_t recID = 0; recID < numRecords;) {
         auto meta = decoder.readSegmentMeta();
         std::vector<std::string> refs;
         refs.reserve(meta.num_segments);
+        recID += meta.num_segments;
         for (size_t i = 0; i < meta.num_segments; ++i) {
             refs.emplace_back(refEncoder.getReference((uint32_t)meta.position[i], (uint32_t)meta.length[i]));
         }
         auto rec = decoder.pull(ref, std::move(refs), meta);
         if (!std::get<0>(names).empty()) {
-            rec.setName(std::get<0>(names)[recID]);
+            rec.setName(std::get<0>(names)[nameID++]);
         }
         addECigar(rec, ecigars);
         refEncoder.addRead(rec);
@@ -91,11 +95,19 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
     size_t qvCounter = 0;
     if (!std::get<0>(qvs).empty()) {
         for (auto& r : chunk.getData()) {
-            for (auto& s : r.getSegments()) {
-                if (!std::get<0>(qvs)[qvCounter].empty()) {
-                    s.addQualities(std::move(std::get<0>(qvs)[qvCounter]));
-                }
-                qvCounter++;
+            auto& s_first = !r.isRead1First() && r.getSegments().size() == 2 ? r.getSegments()[1] : r.getSegments()[0];
+            if (!std::get<0>(qvs)[qvCounter].empty()) {
+                s_first.addQualities(std::move(std::get<0>(qvs)[qvCounter++]));
+                r.setQVDepth(1);
+            }
+
+            if (r.getSegments().size() == 1) {
+                continue;
+            }
+
+            auto& s_second = r.isRead1First() ? r.getSegments()[1] : r.getSegments()[0];
+            if (!std::get<0>(qvs)[qvCounter].empty()) {
+                s_second.addQualities(std::move(std::get<0>(qvs)[qvCounter++]));
             }
         }
     }
