@@ -6,10 +6,12 @@ set(source_files
         run/program-options.cc
         transcode-fastq/main.cc
         transcode-fastq/program-options.cc
-        )
+        capsulator/program-options.cc
+        capsulator/main.cc)
 
 add_executable(genie ${source_files})
 
+target_link_libraries(genie PRIVATE genie-mpegg_p1)
 target_link_libraries(genie PRIVATE genie-gabac)
 target_link_libraries(genie PRIVATE genie-module)
 target_link_libraries(genie PRIVATE genie-spring)
