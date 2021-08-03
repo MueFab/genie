@@ -10,6 +10,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <vector>
+#include <memory>
+#include "genie/format/mpegg_p1/file_header.h"
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/checksum.h"
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/external_reference.h"
 #include "genie/util/bitreader.h"
@@ -26,7 +28,7 @@ namespace mpegg_p1 {
  */
 class FastaReference : public ExternalReference {
  private:
-    std::vector<Checksum> checksums;  //!< @brief
+    std::vector<std::unique_ptr<Checksum>> checksums;  //!< @brief
 
  public:
     /**
@@ -40,13 +42,13 @@ class FastaReference : public ExternalReference {
      * @param checksum_alg
      * @param seq_count
      */
-    FastaReference(util::BitReader& reader, Checksum::Algo checksum_alg, uint16_t seq_count);
+    FastaReference(util::BitReader& reader, FileHeader& fhd, Checksum::Algo checksum_alg, uint16_t seq_count);
 
     /**
      * @brief
      * @param _checksums
      */
-    explicit FastaReference(std::vector<Checksum>&& _checksums);
+//    explicit FastaReference(std::vector<std::unique_ptr<Checksum>>&& _checksums);
 
     /**
      * @brief
@@ -58,7 +60,7 @@ class FastaReference : public ExternalReference {
      * @brief
      * @param bit_writer
      */
-    void write(genie::util::BitWriter& bit_writer) override;
+    void write(genie::util::BitWriter& bit_writer) const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

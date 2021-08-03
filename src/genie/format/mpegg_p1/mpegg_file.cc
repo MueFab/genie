@@ -28,6 +28,21 @@ MpeggFile::MpeggFile(std::vector<DatasetGroup>* x_datasetGroups, std::vector<std
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+MpeggFile::MpeggFile(genie::util::BitReader& reader): fileHeader(reader), datasetGroups() {
+    while (true) {
+        /// Read K,L of KLV
+        size_t start_pos = reader.getPos();
+        std::string key = readKey(reader);
+        auto val_length = reader.read<uint64_t>();
+
+        UTILS_DIE_IF(key != "dgcn", "Dataset group is not Found");
+        datasetGroups.emplace_back(reader, fileHeader, start_pos, val_length);
+        break;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 const FileHeader& MpeggFile::getFileHeader() const { return fileHeader; }
 
 // ---------------------------------------------------------------------------------------------------------------------

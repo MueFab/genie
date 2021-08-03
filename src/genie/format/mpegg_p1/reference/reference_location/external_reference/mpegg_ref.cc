@@ -16,25 +16,6 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-MpegReference::MpegReference(util::BitReader& reader, Checksum::Algo checksum_alg)
-    : dataset_group_ID(reader.read<uint8_t>()), dataset_ID(reader.read<uint8_t>()), ref_checksum() {
-    switch (checksum_alg) {
-        case Checksum::Algo::MD5: {
-            ref_checksum = genie::util::make_unique<Md5>(reader);
-            break;
-        }
-        case Checksum::Algo::SHA256: {
-            ref_checksum = genie::util::make_unique<Sha256>(reader);
-            break;
-        }
-        default: {
-            UTILS_DIE("Unsupported checksum algorithm");
-            break;
-        }
-    }
-}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -43,6 +24,30 @@ MpegReference::MpegReference(uint8_t _dataset_group_ID, uint16_t _dataset_ID, st
       dataset_group_ID(_dataset_group_ID),
       dataset_ID(_dataset_ID),
       ref_checksum(std::move(_ref_checksum)) {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+MpegReference::MpegReference(util::BitReader& reader, FileHeader& fhd, Checksum::Algo checksum_alg)
+    : dataset_group_ID(reader.read<uint8_t>()), dataset_ID(reader.read<uint8_t>()), ref_checksum() {
+
+    if (fhd.getMinorVersion() == "1900") {
+        switch (checksum_alg) {
+            case Checksum::Algo::MD5: {
+                ref_checksum = genie::util::make_unique<Md5>(reader);
+                break;
+            }
+            case Checksum::Algo::SHA256: {
+                ref_checksum = genie::util::make_unique<Sha256>(reader);
+                break;
+            }
+            default: {
+                UTILS_DIE("Unsupported checksum algorithm");
+                break;
+            }
+        }
+    }
+
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -58,7 +63,7 @@ Checksum::Algo MpegReference::getChecksumAlg() const { return ref_checksum->getT
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t MpegReference::getLength() {
+uint64_t MpegReference::getLength() const {
     // TODO(Raouf): Check this one
     // external_dataset_group_ID u(8), external_dataset_ID u(16)
     uint64_t len = 1 + 2;
@@ -69,7 +74,7 @@ uint64_t MpegReference::getLength() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void MpegReference::write(util::BitWriter& writer) {
+void MpegReference::write(util::BitWriter& writer) const {
     writer.write(dataset_group_ID, 8);
     writer.write(dataset_ID, 16);
     ref_checksum->write(writer);

@@ -9,7 +9,21 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <string>
+#include <vector>
+#include <memory>
+#include "genie/util/make-unique.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/exception.h"
+#include "genie/util/runtime-exception.h"
+#include "genie/format/mpegg_p1/file_header.h"
+#include "genie/format/mpegg_p1/util.h"
+#include "genie/format/mpegg_p1/dataset/class_description.h"
+
 #include "genie/core/parameter/parameter_set.h"
+#include <sstream>
+#include <string>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,53 +34,26 @@ namespace mpegg_p1 {
 /**
  * @brief
  */
-class DatasetParameterSet {
+class DatasetParameterSet: public core::parameter::ParameterSet {
  private:
-    uint8_t dataset_group_ID : 8;  //!< @brief
-    uint16_t dataset_ID : 16;      //!< @brief
-
-    core::parameter::ParameterSet parameterSet_p2;  //!< @brief
+    uint8_t group_ID;  //!< @brief
+    uint16_t ID;      //!< @brief
 
  public:
-    /**
-     * @brief
-     * @param parameterSet
-     */
-    explicit DatasetParameterSet(const core::parameter::ParameterSet&& parameterSet);
-
     /**
      * @brief
      * @param group_ID
      * @param ID
      * @param parameterSet
      */
-    explicit DatasetParameterSet(uint8_t group_ID, uint16_t ID, const core::parameter::ParameterSet&& parameterSet);
-
-    /**
-     * @brief
-     * @param ID
-     * @param parameterSet
-     */
-    explicit DatasetParameterSet(uint16_t ID, const core::parameter::ParameterSet&& parameterSet);
+    explicit DatasetParameterSet(uint8_t _group_ID, uint16_t _ID, const core::parameter::ParameterSet&& p2_param_set);
 
     /**
      * @brief
      * @param bit_reader
      * @param length
      */
-    DatasetParameterSet(genie::util::BitReader& bit_reader, size_t length);
-
-    /**
-     * @brief
-     * @param datasetID
-     */
-    void setDatasetID(uint16_t datasetID);
-
-    /**
-     * @brief
-     * @return
-     */
-    uint16_t getDatasetID() const;
+    DatasetParameterSet(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length);
 
     /**
      * @brief
@@ -84,13 +71,25 @@ class DatasetParameterSet {
      * @brief
      * @return
      */
+    uint16_t getDatasetID() const;
+
+    /**
+     * @brief
+     * @param datasetID
+     */
+    void setDatasetID(uint16_t datasetID);
+
+    /**
+     * @brief
+     * @return
+     */
     uint64_t getLength() const;
 
     /**
      * @brief
-     * @param bit_writer
+     * @param writer
      */
-    void write(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

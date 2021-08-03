@@ -10,6 +10,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
+#include <memory>
+#include "genie/util/make-unique.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
@@ -27,7 +29,7 @@ class Checksum {
     /**
      * @brief
      */
-    enum class Algo : uint8_t { MD5 = 0, SHA256 = 1 };
+    enum class Algo : uint8_t { MD5 = 0, SHA256 = 1 , UNKNOWN = 2};
 
  private:
     Algo checksum_alg;  //!< @brief
@@ -40,20 +42,33 @@ class Checksum {
 
     /**
      * @brief
+     * @param _algo
+     */
+    explicit Checksum(Algo _algo);
+
+    /**
+     *
+     * @param _container
+     */
+    Checksum(Checksum&& _container) noexcept;
+
+    /**
+     *
      */
     virtual ~Checksum() = default;
 
     /**
-     * @brief
-     * @param _algo
+     *
+     * @return
      */
-    explicit Checksum(Algo _algo);
+    virtual std::unique_ptr<Checksum> clone() const = 0;
 
     /**
      * @brief
      * @return
      */
     Algo getType() const;
+
 
     /**
      * @brief

@@ -33,7 +33,7 @@ uint64_t ReferenceMetadata::getLength() const {
     /// Key c(4) Length u(64)
     uint64_t len = (4 * sizeof(char) + 8);  // gen_info
 
-    // dataset_group_ID u(8)
+    // ID u(8)
     len += 1;
 
     // reference_ID u(8)
@@ -56,7 +56,7 @@ void ReferenceMetadata::write(genie::util::BitWriter& bit_writer) const {
     // Length of KLV format
     bit_writer.write(getLength(), 64);
 
-    // dataset_group_ID u(8)
+    // ID u(8)
     bit_writer.write(dataset_group_ID, 8);
 
     // reference_ID u(8)

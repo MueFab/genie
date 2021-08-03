@@ -29,18 +29,21 @@ Internal::Internal(util::BitReader& reader)
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t Internal::getLength() const {
-    /// internal_dataset_group_ID u(8), internal_dataset_ID u(16)
+    // reserved u(7), external_ref_flag u(1), internal_dataset_group_ID u(8), internal_dataset_ID u(16)
     return ReferenceLocation::getLength() + 3;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Internal::write(util::BitWriter& bit_writer) const {
+void Internal::write(util::BitWriter& bitwriter) const {
+    // reserved u(7), external_ref_flag u(1)
+    ReferenceLocation::write(bitwriter);
+
     // internal_dataset_group_ID u(8)
-    bit_writer.write(dataset_group_ID, 8);
+    bitwriter.write(dataset_group_ID, 8);
 
     // internal_dataset_ID u(16)
-    bit_writer.write(dataset_ID, 16);
+    bitwriter.write(dataset_ID, 16);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

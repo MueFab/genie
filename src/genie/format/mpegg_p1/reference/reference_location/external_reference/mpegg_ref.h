@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <memory>
+#include "genie/format/mpegg_p1/file_header.h"
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/checksum.h"
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/external_reference.h"
 #include "genie/util/bitreader.h"
@@ -47,7 +48,7 @@ class MpegReference : public ExternalReference {
      * @param reader
      * @param checksum_alg
      */
-    MpegReference(util::BitReader& reader, Checksum::Algo checksum_alg);
+    MpegReference(util::BitReader& reader, FileHeader& fhd, Checksum::Algo checksum_alg);
 
     /**
      * @brief
@@ -78,13 +79,13 @@ class MpegReference : public ExternalReference {
      * @brief
      * @return
      */
-    uint64_t getLength() override;
+    uint64_t getLength() const override;
 
     /**
      * @brief
      * @param writer
      */
-    void write(genie::util::BitWriter& writer) override;
+    void write(genie::util::BitWriter& writer) const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

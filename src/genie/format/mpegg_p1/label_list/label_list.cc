@@ -36,7 +36,7 @@ LabelList::LabelList(util::BitReader& reader, size_t length) {
 
     size_t start_pos = reader.getPos();
 
-    // dataset_group_ID u(8)
+    // ID u(8)
     dataset_group_ID = reader.read<uint8_t>();
     // num_labels u(16)
     reader.read<uint16_t>();
@@ -74,7 +74,7 @@ uint64_t LabelList::getLength() const {
     /// key c(4), Length u(64)
     uint64_t len = (4 * sizeof(char) + 8) * 1;  // gen_info
 
-    // dataset_group_ID u(8)
+    // ID u(8)
     len += 1;
 
     // num_labels u(16)
@@ -98,7 +98,7 @@ void LabelList::writeToFile(util::BitWriter& bit_writer) const {
     // Length of KVL format
     bit_writer.write(getLength(), 64);
 
-    // dataset_group_ID u(8)
+    // ID u(8)
     bit_writer.write(dataset_group_ID, 8);
 
     // num_labels u(16)

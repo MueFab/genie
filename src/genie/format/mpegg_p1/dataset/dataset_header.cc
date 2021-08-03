@@ -17,90 +17,115 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetHeader::DatasetHeader()
-    : dataset_group_ID(0),
-      dataset_ID(0),
-      version(),
-      byte_offset_size_flag(ByteOffsetSizeFlag::OFF),
-      non_overlapping_AU_range_flag(false),
-      pos_40_bits_flag(Pos40SizeFlag::OFF),
-      multiple_alignment_flag(false),
-      dataset_type(core::parameter::DataUnit::DatasetType::NON_ALIGNED),
-      alphabet_ID(0),
-      num_U_access_units(0) {}
+DatasetHeader::DatasetHeader():
+    group_ID(0),
+    ID(0),
+    version("2000"),
+    multiple_alignment_flag(false),
+    byte_offset_size_flag(ByteOffsetSizeFlag::OFF),
+    non_overlapping_AU_range_flag(0),
+    pos_40_bits_flag(Pos40SizeFlag::OFF),
+    block_header_flag(false),
+    MIT_flag(false),
+    CC_mode_flag(false),
+    ordered_blocks_flag(false),
+    reference_ID(0),
+    seq_IDs(),
+    seq_blocks(),
+    dataset_type(),
+    class_descs(),
+    alphabet_ID(0),
+    u_access_unit_info(),
+    thress() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetHeader::DatasetHeader(uint16_t datasetID) : dataset_ID(datasetID) {}
+DatasetHeader::DatasetHeader(genie::util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length) :
+    group_ID(reader.read<uint8_t>()),
+    ID(reader.read<uint16_t>()),
+    version(readFixedLengthChars(reader, 4)),
+    multiple_alignment_flag(reader.read<bool>(1)),
+    byte_offset_size_flag(reader.read<ByteOffsetSizeFlag>(1)),
+    non_overlapping_AU_range_flag(reader.read<bool>(1)),
+    pos_40_bits_flag(reader.read<Pos40SizeFlag>(1)),
+    block_header_flag(reader.read<bool>(1)),
+    MIT_flag(block_header_flag ? reader.read<bool>(1) : false),
+    CC_mode_flag(block_header_flag ? reader.read<bool>(1) : false),
+    ordered_blocks_flag(!block_header_flag ? reader.read<bool>(1) : false),
+    reference_ID(0),
+    seq_IDs(),
+    seq_blocks(),
+    dataset_type(),
+    class_descs(),
+    alphabet_ID(0),
+    u_access_unit_info(),
+    thress()
+{
+    auto seq_count = reader.read<uint16_t>();
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-DatasetHeader::DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSizeFlag _byte_offset_size_flag,
-                             bool _non_overlapping_AU_range_flag, Pos40SizeFlag _pos_40_bits_flag,
-                             bool _multiple_alignment_flag, core::parameter::DataUnit::DatasetType _dataset_type,
-                             uint8_t _alphabet_ID, uint32_t _num_U_access_units)
-    : dataset_group_ID(group_ID),
-      dataset_ID(ID),
-      version("XXXX"),
-      byte_offset_size_flag(_byte_offset_size_flag),
-      non_overlapping_AU_range_flag(_non_overlapping_AU_range_flag),
-      pos_40_bits_flag(_pos_40_bits_flag),
-      multiple_alignment_flag(_multiple_alignment_flag),
-      dataset_type(_dataset_type),
-      alphabet_ID(_alphabet_ID),
-      num_U_access_units(_num_U_access_units) {
-    UTILS_DIE_IF(4 != version.size(), "Version string must consists of 4 characters");
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-DatasetHeader::DatasetHeader(util::BitReader& bit_reader, size_t length)
-    : dataset_group_ID(bit_reader.read<uint8_t>()),
-      dataset_ID(bit_reader.read<uint16_t>()),
-      version(readNullTerminatedStr(bit_reader)),
-      byte_offset_size_flag(bit_reader.read<ByteOffsetSizeFlag>(1)),
-      non_overlapping_AU_range_flag(bit_reader.read<bool>(1)),
-      pos_40_bits_flag(bit_reader.read<Pos40SizeFlag>(1)),
-      multiple_alignment_flag(bit_reader.read<bool>(1)),
-      dataset_type(bit_reader.read<core::parameter::DataUnit::DatasetType>(4)),
-      alphabet_ID(bit_reader.read<uint8_t>()),
-      num_U_access_units(bit_reader.read<uint32_t>()) {
-    std::string key = readKey(bit_reader);
-    UTILS_DIE_IF(key != "dthd", "DatasetHeader is not Found");
-
-    size_t start_pos = bit_reader.getPos();
-
-    /// Class BlockConfig including ClassInfo
-    block_header.ReadBlockConfig(bit_reader);
-
-    /// Class UAccessUnitInfo
-    if (num_U_access_units > 0) {
-        if (u_access_unit_info != nullptr) {
-            u_access_unit_info->readUAccessUnitInfo(bit_reader);
+    if (seq_count > 0){
+        reference_ID = reader.read<uint8_t>();
+        for (auto seq=0;seq<seq_count;seq++){
+            seq_IDs.push_back(reader.read<uint16_t>());
+        }
+        for (auto seq=0;seq<seq_count;seq++){
+            seq_blocks.push_back(reader.read<uint32_t>());
         }
     }
 
-    /// Class SequenceConfig
-    seq_info.ReadSequenceConfig(bit_reader);
+    dataset_type = reader.read<core::parameter::DataUnit::DatasetType>(4);
 
-    UTILS_DIE_IF(bit_reader.getPos() - start_pos != length, "Invalid DatasetHeader length!");
+    if (MIT_flag){
+        auto num_classes = reader.read<uint8_t>(4);
+
+        for (auto ci=0;ci<num_classes;ci++){
+            class_descs.emplace_back(reader, block_header_flag);
+        }
+    }
+
+    parameters_update_flag = reader.read<bool>(1);
+    alphabet_ID = reader.read<uint8_t>(7);
+
+    u_access_unit_info = UAccessUnitInfo(reader, fhd);
+
+    if (seq_count > 0){
+        bool tflag = reader.read<bool>(1);
+        thress.push_back(reader.read<uint32_t>(31));
+        for (auto i=1;i<seq_count;i++){
+            tflag = reader.read<bool>(1);
+            if (tflag){
+                thress.push_back(reader.read<uint32_t>(31));
+            } else {
+                thress.push_back(thress.back());
+            }
+        }
+    }
+
+    /// nesting_zero_big
+    reader.flush();
+
+    auto tlen = reader.getPos() - start_pos;
+    auto elen = getLength();
+
+    UTILS_DIE_IF(!reader.isAligned() || reader.getPos() - start_pos != length,
+                 "Invalid DatasetHeader length!");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint16_t DatasetHeader::getID() const { return dataset_ID; }
+uint8_t DatasetHeader::getGroupID() const { return group_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetHeader::setID(uint16_t ID) { dataset_ID = ID; }
+void DatasetHeader::setGroupId(uint8_t _group_ID) { group_ID = group_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t DatasetHeader::getGroupID() const { return dataset_group_ID; }
+uint16_t DatasetHeader::getID() const { return ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetHeader::setGroupId(uint8_t group_ID) { dataset_group_ID = group_ID; }
+void DatasetHeader::setID(uint16_t _ID) { ID = _ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -108,19 +133,27 @@ DatasetHeader::ByteOffsetSizeFlag DatasetHeader::getByteOffsetSizeFlag() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool DatasetHeader::getNonOverlappingAURangeFlag() const{ return non_overlapping_AU_range_flag;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 DatasetHeader::Pos40SizeFlag DatasetHeader::getPos40SizeFlag() const { return pos_40_bits_flag; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const SequenceConfig& DatasetHeader::getSeqInfo() const { return seq_info; }
+bool DatasetHeader::getBlockHeaderFlag() const {return block_header_flag;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const BlockConfig& DatasetHeader::getBlockHeader() const { return block_header; }
+bool DatasetHeader::getMITFlag() const {return MIT_flag;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint32_t DatasetHeader::getNumUAccessUnits() const { return num_U_access_units; }
+bool DatasetHeader::getCCModeFlag() const {return CC_mode_flag;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool DatasetHeader::getOrderedBlocksFlag() const {return ordered_blocks_flag;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -138,33 +171,72 @@ uint64_t DatasetHeader::getLength() const {
     /// Key c(4) Length u(64)
     uint64_t bitlen = (4 * sizeof(char) + 8) * 8;  // gen_info
 
-    bitlen += (1 + 2 + 4) * 8;  // dataset_group_ID u(8), dataset_ID u(16), version c(4)
-    bitlen += 3;  // byte_offset_size_flag u(1), non_overlapping_AU_range_flag u(1) , pos_40_bits_flag u(1)
+    /// group_ID u(8), ID u(16), version c(4)
+    bitlen += (1 + 2 + 4) * 8;
 
-    // data encapsulated in Class: BlockConfig
-    /// block_header_flag, MIT_flag, CC_mode_flag, ordered_blocks_flag
-    // data encapsulated in Class: ClassInfo under BlockConfig
-    /// num_classes, clid[], num_descriptors[], descriptors_ID[][]
-    bitlen += block_header.getBitLength();
+    /// multiple_alignment_flag, byte_offset_size_flag u(1), non_overlapping_AU_range_flag u(1),
+    /// pos_40_bits_flag u(1), block_header_flag
+    bitlen += 5;
 
-    // dataset_type u(4)
+    if (block_header_flag){
+        /// MIT_flag, CC_mode_flag
+        bitlen += 2;
+    } else{
+        /// ordered_blocks_flag
+        bitlen += 1;
+    }
+
+    /// seq_count
+    bitlen += 16;
+
+    UTILS_DIE_IF(seq_IDs.size() != seq_blocks.size(), "Different number of seq_ID[] and seq_blocks[]");
+    uint64_t seq_count = seq_blocks.size();
+
+    if (seq_count > 0){
+        /// reference_ID u(8)
+        bitlen += 8;
+
+        /// seq_ID[] u(16)
+        bitlen += 16*seq_count;
+
+        /// seq_blocks[] u(32)
+        bitlen += 32*seq_count;
+    }
+
+    /// dataset_type u(4)
     bitlen += 4;
 
-    bitlen += 8 + 32;  // alphabet_ID u(8), num_U_access_units u(32)
+    if (MIT_flag){
+        /// num_classes u(4)
+        bitlen += 4;
 
-    if (num_U_access_units > 0) {
-        // data encapsulated in Class: UAccessUnitInfo
-        /// num_U_clusters, multiple_signature_base, U_signature_size,
-        /// U_signature_constant_length, U_signature_length
-        if (u_access_unit_info != nullptr) {
-            bitlen += u_access_unit_info->getBitLength();
+        for (auto &class_desc:class_descs){
+            bitlen += class_desc.getBitLength();
         }
     }
 
-    // data encapsulated in Class: SequenceConfig
-    /// seq_count, reference_ID, seq_ID[], seq_blocks[],
-    /// tflag[0], thres[0], thres[]
-    bitlen += seq_info.getBitLength();
+    /// parameters_update_flagu(1), alphabet_ID u(7)
+    bitlen += 1+7;
+
+    /// num_U_access_units, num_U_clusters, multiple_signature_base, U_signature_size
+    /// U_signature_constant_length, U_signature_length
+    u_access_unit_info.getBitLength();
+
+    if (seq_count > 0){
+        /// tflang[0] u(1), thres[0] u(31)
+        bitlen += 32;
+
+        /// tflang[i] u(1), thres[i] u(31)
+        for (uint64_t i=1;i<seq_count;i++){
+            bool tflag = thress[i] != thress[i-1];
+            bitlen += 1;
+            if (tflag){
+                bitlen += 31;
+            } else {
+                /// thress[i] == thress[i-1];
+            }
+        }
+    }
 
     bitlen += bitlen % 8;  /// byte_aligned() f(1)
 
@@ -173,80 +245,89 @@ uint64_t DatasetHeader::getLength() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetHeader::write(util::BitWriter& bit_writer) const {
+void DatasetHeader::write(util::BitWriter& writer) const {
     /// Key of KLV format
-    bit_writer.write("dthd");
+    writer.write("dthd");
 
     /// Length of KLV format
-    bit_writer.write(getLength(), 64);
+    writer.write(getLength(), 64);
 
-    // dataset_group_ID u(8)
-    bit_writer.write(dataset_group_ID, 8);
+    /// version c(4)
+    writer.write(version);
 
-    // dataset_ID u(16)
-    bit_writer.write(dataset_ID, 16);
+    /// multiple_alignment_flag, byte_offset_size_flag u(1), non_overlapping_AU_range_flag u(1),
+    /// pos_40_bits_flag u(1), block_header_flag
+    writer.write(multiple_alignment_flag, 1);
+    writer.write(byte_offset_size_flag == ByteOffsetSizeFlag::ON, 1);
+    writer.write(non_overlapping_AU_range_flag, 1);
+    writer.write(pos_40_bits_flag == Pos40SizeFlag::ON, 1);
+    writer.write(block_header_flag, 1);
 
-    // version c(4)
-    writeNullTerminatedStr(bit_writer, version);
-
-    // byte_offset_size_flag u(1)
-    if (byte_offset_size_flag == ByteOffsetSizeFlag::ON) {
-        bit_writer.write(1, 1);
-    } else {
-        bit_writer.write(0, 1);
+    if (block_header_flag){
+        /// MIT_flag, CC_mode_flag
+        writer.write(MIT_flag, 1);
+        writer.write(CC_mode_flag, 1);
+    } else{
+        /// ordered_blocks_flag
+        writer.write(ordered_blocks_flag, 1);
     }
 
-    // non_overlapping_AU_range_flag u(1)
-    bit_writer.write(non_overlapping_AU_range_flag, 1);
+    uint64_t seq_count = seq_blocks.size();
 
-    // pos_40_bits_flag u(1)
-    if (pos_40_bits_flag == Pos40SizeFlag::ON) {
-        bit_writer.write(1, 1);
-    } else {
-        bit_writer.write(0, 1);
+    /// seq_count u(16)
+    writer.write(seq_count, 16);
+
+    if (seq_count > 0){
+        /// reference_ID u(8)
+        writer.write(reference_ID, 8);
+
+        for (auto seq=0;seq<seq_count;seq++){
+            /// seq_ID[] u(16)
+            writer.write(seq_IDs[seq], 16);
+        }
+
+        for (auto seq=0;seq<seq_count;seq++){
+            /// seq_blocks[] u(32)
+            writer.write(seq_blocks[seq], 32);
+        }
     }
 
-    /// block_header_flag, MIT_flag, CC_mode_flag, ordered_blocks_flag
-    block_header.write(bit_writer);
+    /// dataset_type u(4)
+    writer.write((uint8_t)dataset_type, 4);
 
-    // seq_count u(16)
-    /// reference_ID, seq_ID[seq] and seq_blocks[seq]
-    seq_info.write(bit_writer);
+    if (MIT_flag){
+        /// num_classes u(4)
+        writer.write(class_descs.size(), 4);
 
-    // dataset_type u(4)
-    switch (dataset_type) {
-        case core::parameter::DataUnit::DatasetType::NON_ALIGNED:
-            bit_writer.write(0, 4);
-            break;
-        case core::parameter::DataUnit::DatasetType::ALIGNED:
-            bit_writer.write(1, 4);
-            break;
-        case core::parameter::DataUnit::DatasetType::REFERENCE:
-            bit_writer.write(2, 4);
-            break;
+        for (auto &class_desc:class_descs){
+            class_desc.write(writer);
+        }
     }
 
-    /// num_classes, clid[ci], num_descriptors[ci], descriptor_ID[ci][di]
-    block_header.writeClassInfos(bit_writer);
+    /// alphabet_ID u(8)
+    writer.write(alphabet_ID, 8)
+;
+    /// num_U_access_units, num_U_clusters, multiple_signature_base, U_signature_size
+    /// U_signature_constant_length, U_signature_length
+    u_access_unit_info.write(writer);
 
-    // alphabet_ID u(8)
-    bit_writer.write(alphabet_ID, 8);
+    if (seq_count > 0){
+        /// tflang[0] u(1), thres[0] u(31)
+        writer.write(0, 1);
+        writer.write(thress[0], 31);
 
-    // num_U_access_units u(32)
-    bit_writer.write(num_U_access_units, 32);
-
-    if (num_U_access_units) {
-        UTILS_DIE_IF(u_access_unit_info == nullptr, "No u_access_unit_info stored!");
-
-        /// num_U_clusters, multiple_signature_base, U_signature_size, U_signature_constant_length, U_signature_length
-        u_access_unit_info->write(bit_writer);
+        for (auto i=1;i<seq_count;i++){
+            bool tflag = thress[i] != thress[i-1];
+            if (tflag){
+                writer.write(thress[i], 31);
+            } else {
+                /// thress[i] == thress[i-1];
+            }
+        }
     }
-
-    // tflag[], thres[]
-    seq_info.writeThres(bit_writer);
 
     /// nesting zero bit
-    bit_writer.flush();
+    writer.flush();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

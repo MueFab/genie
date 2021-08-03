@@ -5,10 +5,6 @@
  */
 
 #include "genie/format/mpegg_p1/dataset/dataset_parameter_set.h"
-#include <sstream>
-#include <string>
-#include "genie/format/mpegg_p1/util.h"
-#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -18,57 +14,38 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetParameterSet::DatasetParameterSet(const core::parameter::ParameterSet&& parameterSet)
-    : dataset_group_ID(), dataset_ID(), parameterSet_p2(parameterSet) {}
+DatasetParameterSet::DatasetParameterSet(uint8_t _group_ID, uint16_t _ID,
+                                         const core::parameter::ParameterSet&& p2_param_set)
+    : group_ID(_group_ID),
+      ID(_ID),
+      core::parameter::ParameterSet(p2_param_set){}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetParameterSet::DatasetParameterSet(uint8_t group_ID, uint16_t ID,
-                                         const core::parameter::ParameterSet&& parameterSet)
-    : dataset_group_ID(group_ID), dataset_ID(ID), parameterSet_p2(parameterSet) {}
+DatasetParameterSet::DatasetParameterSet(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length):
+    group_ID(reader.read<uint8_t>()),
+    ID(reader.read<uint16_t>()),
+    core::parameter::ParameterSet(reader) {
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-DatasetParameterSet::DatasetParameterSet(uint16_t ID, const core::parameter::ParameterSet&& parameterSet)
-    : dataset_group_ID(), dataset_ID(ID), parameterSet_p2(parameterSet) {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-DatasetParameterSet::DatasetParameterSet(util::BitReader& bit_reader, size_t length)
-    : dataset_group_ID(), dataset_ID(), parameterSet_p2() {
-    std::string key = readKey(bit_reader);
-    UTILS_DIE_IF(key != "pars", "DatasetParameterSet is not Found");
-
-    size_t start_pos = bit_reader.getPos();
-
-    // dataset_group_ID u(8)
-    dataset_group_ID = bit_reader.read<uint8_t>();
-    // dataset_ID u(16)
-    dataset_ID = bit_reader.read<uint16_t>();
-
-    /// parameter_set_ID, parent_parameter_set_ID and encoded_parameters()
-    //    parameterSet_p2 = ParameterSet(bit_reader);
-
-    bit_reader.flush();
-
-    UTILS_DIE_IF(bit_reader.getPos() - start_pos != length, "Invalid DatasetParameterSet length!");
+    UTILS_DIE_IF(!reader.isAligned() || reader.getPos() - start_pos != length,
+                 "Invalid dataset parameter set length!");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetParameterSet::setDatasetID(uint16_t datasetID) { dataset_ID = datasetID; }
+uint8_t DatasetParameterSet::getDatasetGroupID() const { return group_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint16_t DatasetParameterSet::getDatasetID() const { return dataset_ID; }
+void DatasetParameterSet::setDatasetGroupID(uint8_t _group_ID) { group_ID = _group_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint8_t DatasetParameterSet::getDatasetGroupID() const { return dataset_group_ID; }
+uint16_t DatasetParameterSet::getDatasetID() const { return ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetParameterSet::setDatasetGroupID(uint8_t datasetGroupID) { dataset_group_ID = datasetGroupID; }
+void DatasetParameterSet::setDatasetID(uint16_t _ID) { ID = _ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -76,43 +53,36 @@ uint64_t DatasetParameterSet::getLength() const {
     /// Key c(4) Length u(64)
     uint64_t len = (4 * sizeof(char) + 8);  // gen_info
 
-    // dataset_group_ID u(8)
+    /// ID u(8)
     len += 1;
 
-    // dataset_ID u(16)
+    /// ID u(16)
     len += 2;
 
-    // parameter_set_ID u(8), parent_parameter_set_ID u(8), Length of ParameterSet without parameter_set_ID
-    // Reference : ParameterSet::write()
-    std::stringstream ss;
-    util::BitWriter tmp_writer(&ss);
-    parameterSet_p2.preWrite(tmp_writer);
-    tmp_writer.flush();
-
-    len += tmp_writer.getBitsWritten() / 8;
+    len += core::parameter::ParameterSet::getLength();
 
     return len;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetParameterSet::write(util::BitWriter& bit_writer) const {
+void DatasetParameterSet::write(util::BitWriter& writer) const {
     /// Key of KLV format
-    bit_writer.write("pars");
+    writer.write("pars");
 
     /// Length of KLV format
-    bit_writer.write(getLength(), 64);
+    writer.write(getLength(), 64);
 
-    // dataset_group_ID u(8)
-    bit_writer.write(dataset_group_ID, 8);
+    // ID u(8)
+    writer.write(group_ID, 8);
 
-    // dataset_ID u(16)
-    bit_writer.write(dataset_ID, 16);
+    // ID u(16)
+    writer.write(ID, 16);
 
     // parameter_set_ID u(8), parent_parameter_set_ID u(8), encoding parameter()
-    parameterSet_p2.write(bit_writer);
+    core::parameter::ParameterSet::write(writer);
 
-    bit_writer.flush();
+    writer.flush();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

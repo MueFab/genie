@@ -9,17 +9,21 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <iostream>
-#include <memory>
 #include <string>
 #include <vector>
-#include "genie/core/parameter/data_unit.h"
-#include "genie/format/mpegg_p1/dataset/fields/block_header_flags/block_header_flags.h"
-#include "genie/format/mpegg_p1/dataset/fields/seq_info/seq_info.h"
-#include "genie/format/mpegg_p1/dataset/fields/u_access_unit_info/u_access_unit_info.h"
+#include <memory>
+#include "genie/util/make-unique.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/util/exception.h"
+#include "genie/format/mpegg_p1/file_header.h"
+#include "genie/format/mpegg_p1/util.h"
+#include "genie/format/mpegg_p1/dataset/class_description.h"
+
+#include <cstdint>
+#include <iostream>
+#include "genie/core/parameter/data_unit.h"
+#include "u_access_unit_info.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -52,27 +56,35 @@ class DatasetHeader {
     /** ------------------------------------------------------------------------------------------------------------
      *  ISO 23092-1 Section 6.5.2 table 19
      *  ------------------------------------------------------------------------------------------------------------ */
-    uint8_t dataset_group_ID;                  //!< @brief
-    uint16_t dataset_ID;                       //!< @brief
-    std::string version;                       //!< @brief
-    ByteOffsetSizeFlag byte_offset_size_flag;  //!< @brief
-    bool non_overlapping_AU_range_flag;        //!< @brief
-    Pos40SizeFlag pos_40_bits_flag;            //!< @brief
-    bool multiple_alignment_flag;              //!< @TODO(Raouf): check existence of variable
+    uint8_t group_ID;
+    uint16_t ID;
+    std::string version;
+    bool multiple_alignment_flag;
+    ByteOffsetSizeFlag byte_offset_size_flag;
+    bool non_overlapping_AU_range_flag;
+    Pos40SizeFlag pos_40_bits_flag;
+    bool block_header_flag;
 
-    BlockConfig block_header;  //!< @brief block_header_flag, MIT_flag, CC_mode_flag, ordered_blocks_flag, ClassInfo
-                               //!< (num_classes, clid[], num_descriptors[], descriptor_ID[][])
+    /// Optional flags
+    bool MIT_flag;
+    bool CC_mode_flag;
+    bool ordered_blocks_flag;
 
-    SequenceConfig seq_info;  //!< @brief seq_count, reference_ID, seq_ID[], seq_blocks[], tflag[], thres[]
+    uint8_t reference_ID;
+    std::vector<uint16_t> seq_IDs;
+    std::vector<uint16_t> seq_blocks;
 
-    core::parameter::DataUnit::DatasetType dataset_type;  //!< @brief
+    core::parameter::DataUnit::DatasetType dataset_type;
 
-    uint8_t alphabet_ID;          //!< @brief
-    uint32_t num_U_access_units;  //!< @brief
+    std::vector<ClassDescription> class_descs; /// num_classes, clid, num_descriptors[], descriptor_ID[][]
 
-    std::unique_ptr<UAccessUnitInfo>
-        u_access_unit_info;  //!< @brief num_U_clusters, multiple_signature_base, U_signature_size,
-                             //!< U_signature_constant_length, U_signature_length
+    bool parameters_update_flag;
+    uint8_t alphabet_ID;
+
+    UAccessUnitInfo u_access_unit_info; /// num_U_access_units, num_U_clusters, multiple_signature_base
+                                        /// U_signature_size, U_signature_constant_length, U_signature_length
+
+    std::vector<uint32_t> thress;  ///
 
  public:
     /**
@@ -80,47 +92,35 @@ class DatasetHeader {
      */
     DatasetHeader();
 
-    /**
-     * @brief
-     * @param datasetID
-     */
-    explicit DatasetHeader(uint16_t datasetID);
+//    /**
+//     * @brief
+//     * @param datasetID
+//     */
+//    explicit DatasetHeader(uint16_t datasetID);
+//
+//    /**
+//     * @brief
+//     * @param group_ID
+//     * @param ID
+//     * @param _byte_offset_size_flag
+//     * @param _non_overlapping_AU_range_flag
+//     * @param _pos_40_bits_flag
+//     * @param _multiple_alignment_flag
+//     * @param _dataset_type
+//     * @param _alphabet_ID
+//     * @param _num_U_access_units
+//     */
+//    DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSizeFlag _byte_offset_size_flag,
+//                  bool _non_overlapping_AU_range_flag, Pos40SizeFlag _pos_40_bits_flag, bool _multiple_alignment_flag,
+//                  core::parameter::DataUnit::DatasetType _dataset_type, uint8_t _alphabet_ID,
+//                  uint32_t _num_U_access_units);
 
     /**
      * @brief
-     * @param group_ID
-     * @param ID
-     * @param _byte_offset_size_flag
-     * @param _non_overlapping_AU_range_flag
-     * @param _pos_40_bits_flag
-     * @param _multiple_alignment_flag
-     * @param _dataset_type
-     * @param _alphabet_ID
-     * @param _num_U_access_units
-     */
-    DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSizeFlag _byte_offset_size_flag,
-                  bool _non_overlapping_AU_range_flag, Pos40SizeFlag _pos_40_bits_flag, bool _multiple_alignment_flag,
-                  core::parameter::DataUnit::DatasetType _dataset_type, uint8_t _alphabet_ID,
-                  uint32_t _num_U_access_units);
-
-    /**
-     * @brief
-     * @param bit_reader
+     * @param reader
      * @param length
      */
-    DatasetHeader(genie::util::BitReader& bit_reader, size_t length);
-
-    /**
-     * @brief
-     * @return
-     */
-    uint16_t getID() const;
-
-    /**
-     * @brief
-     * @param ID
-     */
-    void setID(uint16_t ID);
+    DatasetHeader(genie::util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length);
 
     /**
      * @brief
@@ -132,7 +132,19 @@ class DatasetHeader {
      * @brief
      * @param group_ID
      */
-    void setGroupId(uint8_t group_ID);
+    void setGroupId(uint8_t _group_ID);
+
+    /**
+     * @brief
+     * @return
+     */
+    uint16_t getID() const;
+
+    /**
+     * @brief
+     * @param ID
+     */
+    void setID(uint16_t _ID);
 
     /**
      * @brief
@@ -141,28 +153,40 @@ class DatasetHeader {
     ByteOffsetSizeFlag getByteOffsetSizeFlag() const;
 
     /**
+     *
+     * @return
+     */
+    bool getNonOverlappingAURangeFlag() const;
+
+    /**
      * @brief
      * @return
      */
     Pos40SizeFlag getPos40SizeFlag() const;
 
     /**
-     * @brief
+     *
      * @return
      */
-    const SequenceConfig& getSeqInfo() const;
+    bool getBlockHeaderFlag() const;
 
     /**
-     * @brief
+     *
      * @return
      */
-    const BlockConfig& getBlockHeader() const;
+    bool getMITFlag() const;
 
     /**
-     * @brief
+     *
      * @return
      */
-    uint32_t getNumUAccessUnits() const;
+    bool getCCModeFlag() const;
+
+    /**
+     *
+     * @return
+     */
+    bool getOrderedBlocksFlag() const;
 
     /**
      * @brief
@@ -184,9 +208,9 @@ class DatasetHeader {
 
     /**
      * @brief
-     * @param bit_writer
+     * @param writer
      */
-    void write(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

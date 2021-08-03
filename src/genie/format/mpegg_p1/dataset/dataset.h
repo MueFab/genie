@@ -9,16 +9,23 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <memory>
+#include <string>
 #include <vector>
-#include "genie/core/parameter/data_unit.h"
-#include "genie/core/parameter/parameter_set.h"
-#include "genie/format/mgb/data-unit-factory.h"
-#include "genie/format/mpegg_p1/dataset/access_unit/access_unit.h"
+#include <memory>
+#include "genie/util/make-unique.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/exception.h"
+#include "genie/format/mpegg_p1/file_header.h"
+
 #include "genie/format/mpegg_p1/dataset/dataset_header.h"
 #include "genie/format/mpegg_p1/dataset/dataset_parameter_set.h"
+#include "genie/format/mpegg_p1/dataset/access_unit/access_unit.h"
 #include "genie/format/mpegg_p1/dataset/descriptor_stream.h"
-#include "genie/format/mpegg_p1/dataset/master_index_table/master_index_table.h"
+
+#include "genie/core/parameter/data_unit.h"
+#include "genie/format/mgb/data-unit-factory.h"
+//#include "genie/format/mpegg_p1/dataset/master_index_table/master_index_table.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -47,7 +54,7 @@ class DTMetadata {
      * @param reader
      * @param length
      */
-    DTMetadata(genie::util::BitReader& reader, size_t length);
+    DTMetadata(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length);
 
     /**
      *
@@ -86,7 +93,7 @@ class DTProtection {
      * @param reader
      * @param length
      */
-    DTProtection(genie::util::BitReader& reader, size_t length);
+    DTProtection(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length);
 
     /**
      * @brief
@@ -115,129 +122,55 @@ class Dataset {
 
     DatasetHeader header;  //!< @brief
 
-    std::unique_ptr<DTMetadata> DT_metadata;  //!< @brief ISO 23092-1 Section 6.5.2.3 - specification 23092-3, optional
+    std::unique_ptr<DTMetadata> metadata;  //!< @brief ISO 23092-1 Section 6.5.2.3 - specification 23092-3
 
-    std::unique_ptr<DTProtection>
-        DT_protection;  //!< @brief ISO 23092-1 Section 6.5.2.4 - specification 23092-3, optional
+    std::unique_ptr<DTProtection> protection;  //!< @brief ISO 23092-1 Section 6.5.2.4 - specification 23092-3
 
-    std::vector<DatasetParameterSet>
-        dataset_parameter_sets;  //!< @brief ISO 23092-1 Section 6.5.2.5 - specification 23092-2, optional
+    std::vector<DatasetParameterSet> parameter_sets;  //!< @brief ISO 23092-1 Section 6.5.2.5 - specification 23092-2
 
     std::vector<AccessUnit> access_units;  //!< @brief ISO 23092-1 Section 6.5.3
 
     std::vector<DescriptorStream> descriptor_streams;  //!< @brief ISO 23092-1 Section 6.5.4
 
  public:
-    /**
-     * @brief
-     * @param _dataset_ID
-     */
-    explicit Dataset(uint16_t _dataset_ID);
 
     /**
-     * @brief
-     * @param group_ID
-     * @param ID
-     * @param _byte_offset_size_flag
-     * @param _non_overlapping_AU_range_flag
-     * @param _pos_40_bits_flag
-     * @param _multiple_alignment_flag
-     * @param _dataset_type
-     * @param _alphabet_ID
-     * @param _num_U_access_units
-     * @param accessUnits_p2
-     * @param dataUnitFactory
+     *
      */
-    Dataset(uint8_t group_ID, uint16_t ID, DatasetHeader::ByteOffsetSizeFlag _byte_offset_size_flag,
-            bool _non_overlapping_AU_range_flag, DatasetHeader::Pos40SizeFlag _pos_40_bits_flag,
-            bool _multiple_alignment_flag, core::parameter::DataUnit::DatasetType _dataset_type, uint8_t _alphabet_ID,
-            uint32_t _num_U_access_units, std::vector<genie::format::mgb::AccessUnit>& accessUnits_p2,
-            const genie::format::mgb::DataUnitFactory& dataUnitFactory);
+    Dataset();
 
     /**
-     * @brief
+     *
      * @param reader
+     * @param fhd
+     * @param start_pos
      * @param length
      */
-    Dataset(util::BitReader& reader, size_t length);
+    explicit Dataset(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length);
 
     /**
      * @brief
      * @return
      */
-    const std::vector<DatasetParameterSet>& getParameterSets() const;
+    DatasetHeader& getHeader();
 
     /**
      * @brief
      * @return
      */
-    const DatasetHeader& getHeader() const;
+    std::vector<DatasetParameterSet>& getParameterSets();
 
     /**
      * @brief
      * @return
      */
-    uint16_t getID() const;
-
-    /**
-     * @brief
-     * @param ID
-     */
-    void setID(uint16_t ID);
+    std::vector<AccessUnit>& getAccessUnits();
 
     /**
      * @brief
      * @return
      */
-    uint8_t getGroupID() const;
-
-    /**
-     * @brief
-     * @param group_ID
-     */
-    void setGroupId(uint8_t group_ID);
-
-    /**
-     * @brief
-     * @return
-     */
-    DatasetHeader::ByteOffsetSizeFlag getByteOffsetSizeFlag() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    DatasetHeader::Pos40SizeFlag getPos40SizeFlag() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    const SequenceConfig& getSeqInfo() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    const BlockConfig& getBlockHeader() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    uint32_t getNumUAccessUnits() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    bool getMultipleAlignmentFlag() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    core::parameter::DataUnit::DatasetType getDatasetType() const;
+    std::vector<DescriptorStream>& getDescriptorStreams();
 
     /**
      * @brief
@@ -249,7 +182,7 @@ class Dataset {
      * @brief
      * @param bit_writer
      */
-    void write(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

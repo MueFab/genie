@@ -11,7 +11,11 @@
 
 #include <string>
 #include <vector>
+#include <memory>
+#include "genie/util/make-unique.h"
+#include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/util/exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -35,6 +39,11 @@ class FileHeader {
     explicit FileHeader(std::vector<std::string>*);  // FIXME:strings needs to be checked for size!
 
     /**
+    * @brief
+    */
+    FileHeader(genie::util::BitReader& bitreader);
+
+    /**
      * @brief
      * @param brand
      */
@@ -50,7 +59,7 @@ class FileHeader {
      * @brief
      * @return
      */
-    const char* getMinorBrand() const;
+    const char* getMinorVersion() const;
 
     /**
      * @brief
@@ -65,8 +74,10 @@ class FileHeader {
     void writeToFile(genie::util::BitWriter& bitWriter) const;
 
  private:
+//    const char* const major_brand = "MPEG-G";   //!< @brief
+//    const char* const minor_version = "2000";     //!< @brief @FIXME: 19 or 20?
     const char* const major_brand = "MPEG-G";   //!< @brief
-    const char* const minor_brand = "2000";     //!< @brief @FIXME: 19 or 20?
+    const char* minor_version = "2000";     //!< @brief @FIXME: 19 or 20?
     std::vector<std::string> compatible_brand;  //!< @brief
 };
 

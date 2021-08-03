@@ -8,6 +8,7 @@
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/checksum.h"
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/md5.h"
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/sha256.h"
+#include "genie/util/make-unique.h"
 #include "genie/util/exception.h"
 #include "genie/util/runtime-exception.h"
 
@@ -23,41 +24,45 @@ FastaReference::FastaReference() : ExternalReference(ExternalReference::Type::FA
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FastaReference::FastaReference(util::BitReader &reader, Checksum::Algo checksum_alg, uint16_t seq_count) {
-    switch (checksum_alg) {
-        case Checksum::Algo::MD5: {
-            for (auto i = 0; i < seq_count; i++) {
-                checksums.push_back(Md5(reader));
+FastaReference::FastaReference(util::BitReader &reader, FileHeader& fhd, Checksum::Algo checksum_alg, uint16_t seq_count) {
+    for (auto i = 0; i < seq_count; i++) {
+        switch (checksum_alg) {
+            case Checksum::Algo::MD5: {
+                auto checksum = genie::util::make_unique<Md5>(reader);
+                checksums.push_back(std::move(checksum));
+                break;
             }
-            break;
-        }
-        case Checksum::Algo::SHA256: {
-            for (auto i = 0; i < seq_count; i++) {
-                checksums.push_back(Sha256(reader));
+            case Checksum::Algo::SHA256: {
+                auto checksum = genie::util::make_unique<Sha256>(reader);
+                checksums.push_back(std::move(checksum));
+                break;
             }
-            break;
+            default: {
+                UTILS_DIE("Unsupported checksum algorithm");
+                break;
+            }
         }
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FastaReference::FastaReference(std::vector<Checksum> &&_checksums)
-    : ExternalReference(ExternalReference::Type::FASTA_REF), checksums(_checksums) {
-    for (auto &checksum : checksums) {
-        UTILS_DIE_IF(checksums.front().getType() != checksum.getType(), "Different checksum algorithm");
-    }
-}
+//FastaReference::FastaReference(std::vector<std::unique_ptr<Checksum>> &&_checksums)
+//    : ExternalReference(ExternalReference::Type::FASTA_REF), checksums(_checksums) {
+//    for (auto &checksum : checksums) {
+//        UTILS_DIE_IF(checksums.front().getType() != checksum.getType(), "Different checksum algorithm");
+//    }
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Checksum::Algo FastaReference::getChecksumAlg() const { return checksums.front().getType(); }
+Checksum::Algo FastaReference::getChecksumAlg() const { return checksums.front()->getType(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FastaReference::write(util::BitWriter &bit_writer) {
+void FastaReference::write(util::BitWriter &bit_writer) const {
     for (auto &checksum : checksums) {
-        checksum.write(bit_writer);
+        checksum->write(bit_writer);
     }
 }
 

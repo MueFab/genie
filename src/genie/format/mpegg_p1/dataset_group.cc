@@ -89,83 +89,71 @@ void DGProtection::write(util::BitWriter& bit_writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetGroup::DatasetGroup(std::vector<Dataset>&& _datasets)
-    : dataset_group_ID(0),
-      version_number(0),  // FIXME: Fix version number
-      datasets(std::move(_datasets)) {
-    std::vector<uint16_t> dataset_IDs(getDatasetIDs(true));
-
-    auto it = std::unique(dataset_IDs.begin(), dataset_IDs.end());
-
-    UTILS_DIE_IF(!(it == dataset_IDs.end()), "dataset_ID is not unique!");
-}
+//DatasetGroup::DatasetGroup(std::vector<Dataset>&& _datasets):
+//    ID(0),
+//    version(0),  // FIXME: Fix version number
+//    dataset_IDs(),
+//    datasets(std::move(_datasets)) {
+//
+//    std::vector<uint16_t> dataset_IDs(getDatasetIDs(true));
+//
+//    auto it = std::unique(dataset_IDs.begin(), dataset_IDs.end());
+//
+//    UTILS_DIE_IF(!(it == dataset_IDs.end()), "ID is not unique!");
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetGroup::DatasetGroup(util::BitReader& reader, size_t length) : dataset_group_ID(0), version_number(0) {
-    size_t start_pos = reader.getPos();
-
-    std::string key = readKey(reader);
-    UTILS_DIE_IF(key != "dgcn", "DatasetGroup is not Found");
-
-    // Class dataset_group_header
-    auto header_length = reader.read<size_t>();
-    readHeader(reader, header_length - 12);
+DatasetGroup::DatasetGroup(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length) :
+    references(),
+    reference_metadata(),
+    label_list(),
+    DG_metadata(nullptr),
+    DG_protection(nullptr),
+    datasets()
+{
+    /// dataset_group_header
+    size_t box_start_pos = reader.getPos();
+    std::string box_key = readKey(reader);
+    auto box_length = reader.read<uint64_t>();
+    UTILS_DIE_IF(box_key != "dghd",
+                 "Dataset group header is not found!");
+    header = DatasetGroupHeader(reader, fhd, box_start_pos, box_length);
 
     do {
-        key = readKey(reader);
-        if (key == "rfgn") {
-            // reference[]
-            auto ref_length = reader.read<size_t>();
-            references.emplace_back(reader, ref_length);
-            key = readKey(reader);
-        } else if (key == "rfmd") {
-            // reference_metadata[]
-            //            auto rm_length = reader.read<size_t>();
-            //            reference_metadata.emplace_back(reader, rm_length);
+        /// Read K,L of KLV
+        box_start_pos = reader.getPos();
+        box_key = readKey(reader);
+        box_length = reader.read<uint64_t>();
 
-            key = readKey(reader);
-        } else if (key == "labl") {
-            // label_list
-            auto ll_length = reader.read<size_t>();
-            label_list = util::make_unique<LabelList>(reader, ll_length);
+        /// reference[]
+        if (box_key == "rfgn") {
+            references.emplace_back(reader, fhd, box_start_pos, box_length);
 
-            key = readKey(reader);
-        } else if (key == "dgmd") {
-            // DG_metadata
-            auto metadata_length = reader.read<size_t>();
-            DG_metadata = util::make_unique<DGMetadata>(reader, metadata_length);
+        /// reference_metadata[]
+        } else if (box_key == "rfmd") {
+            //TODO(Yeremia) Insert reference metadata here
+            UTILS_DIE("TODO");
 
-            key = readKey(reader);
-        } else if (key == "dgpr") {
-            // DG_protection
-            auto protection_length = reader.read<size_t>();
-            DG_protection = util::make_unique<DGProtection>(reader, protection_length);
+        /// label_list
+        } else if (box_key == "labl") {
+            label_list = util::make_unique<LabelList>(reader, box_length);
 
-            key = readKey(reader);
-        } else if (key == "dtcn") {
-            // Dataset
-            auto dataset_length = reader.read<size_t>();
-            datasets.emplace_back(reader, dataset_length);
+        /// DG_metadata
+        } else if (box_key == "dgmd") {
+            DG_metadata = util::make_unique<DGMetadata>(reader, box_length);
+
+        /// DG_protection
+        } else if (box_key == "dgpr") {
+            DG_protection = util::make_unique<DGProtection>(reader, box_length);
+
+        /// Dataset
+        } else if (box_key == "dtcn") {
+            datasets.emplace_back(reader, fhd, box_start_pos, box_length);
         }
     } while (reader.getPos() - start_pos < length);
-    UTILS_DIE_IF(reader.getPos() - start_pos != length, "Invalid DatasetGroup length!");
-}
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-std::vector<uint16_t> DatasetGroup::getDatasetIDs(bool sort_ids) const {
-    std::vector<uint16_t> dataset_IDs;
-
-    for (auto& ds : datasets) {
-        dataset_IDs.push_back(ds.getID());
-    }
-
-    if (sort_ids) {
-        sort(dataset_IDs.begin(), dataset_IDs.end());
-    }
-
-    return dataset_IDs;
+    UTILS_DIE_IF(!reader.isAligned() || (reader.getPos() - start_pos != length), "Invalid DatasetGroup length!");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -191,7 +179,7 @@ const std::vector<ReferenceMetadata>& DatasetGroup::getReferenceMetadata() const
 void DatasetGroup::addLabels(std::vector<Label>&& _labels) {
     UTILS_DIE_IF(label_list != nullptr, "Label list is already added");
 
-    label_list = util::make_unique<LabelList>(dataset_group_ID, std::move(_labels));
+    label_list = util::make_unique<LabelList>(header.getID(), std::move(_labels));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -230,89 +218,28 @@ const std::vector<Dataset>& DatasetGroup::getDatasets() const { return datasets;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetGroup::setID(uint8_t ID) {
-    dataset_group_ID = ID;
+void DatasetGroup::setID(uint8_t _ID) {
+
+    header.setID(_ID);
 
     for (auto& ref : references) {
-        ref.setDatasetGroupId(ID);
+        ref.setDatasetGroupId(header.getID());
     }
 
     for (auto& ref_meta : reference_metadata) {
-        ref_meta.setDatasetGroupId(ID);
+        ref_meta.setDatasetGroupId(header.getID());
     }
 
     if (label_list != nullptr) {
-        label_list->setDatasetGroupId(ID);
+        label_list->setDatasetGroupId(header.getID());
     }
 
-    // DG_metadata has no dataset_group_ID
-
-    // DG_protection has no dataset_group_ID
+    /// DG_metadata has no ID
+    /// DG_protection has no ID
 
     for (auto& ds : datasets) {
-        ds.setGroupId(ID);
+        ds.getHeader().setGroupId(header.getID());
     }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-uint64_t DatasetGroup::getHeaderLength() const {
-    /// Key c(4) Length u(64)
-    uint64_t len = 12;
-
-    // dataset_group_ID u(8)
-    len += sizeof(uint8_t);
-
-    // version_number u(8)
-    len += sizeof(uint8_t);
-
-    // dataset_IDs[] u(16)
-    len += sizeof(uint16_t) * datasets.size();
-
-    return len;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetGroup::writeHeader(util::BitWriter& writer) const {
-    /// KLV (Key Length Value) format
-    // Key of KLV format
-    writer.write("dghd");
-
-    // Length of KLV format
-    writer.write(getLength(), 64);
-
-    // dataset_group_ID u(8)
-    writer.write(dataset_group_ID, 8);
-
-    // version_number u(8)
-    writer.write(version_number, 8);
-
-    // dataset_IDs[] u(16)
-    for (auto& d_ID : getDatasetIDs()) {
-        writer.write(d_ID, 16);
-    }
-
-    writer.flush();
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void DatasetGroup::readHeader(util::BitReader& reader, size_t length) {
-    size_t start_pos = reader.getPos();
-
-    std::string key = readKey(reader);
-    UTILS_DIE_IF(key != "dghd", "DatasetGroupHeader is not Found");
-
-    dataset_group_ID = reader.read<uint8_t>();
-    version_number = reader.read<uint8_t>();
-
-    // dataset_IDs[] u(16)
-    for (auto& d_ID : getDatasetIDs()) {
-        d_ID = reader.read<uint16_t>();
-    }
-
-    UTILS_DIE_IF(reader.getPos() - start_pos != length, "Invalid DatasetGroupHeader length!");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -321,8 +248,10 @@ uint64_t DatasetGroup::getLength() const {
     /// Key c(4) Length u(64)
     uint64_t len = (4 * sizeof(char) + 8);  // gen_info
 
-    len += getHeaderLength();
+    /// DatasetGroupHeader
+    len += header.getLength();
 
+    /// DatasetGroupHeader
     for (auto& ref : references) {
         len += ref.getLength();
     }
@@ -356,38 +285,38 @@ void DatasetGroup::write(util::BitWriter& writer) const {
     /// KLV (Key Length Value) format
     writer.write("dgcn");
 
-    // Length of KLV format
+    /// Length of KLV format
     writer.write(getLength(), 64);
 
-    // dataset_group_header
-    writeHeader(writer);
+    /// dataset_group_header
+    header.write(writer);
 
-    // reference (optional)
+    /// reference (optional)
     for (auto& reference : references) {
         reference.write(writer);
     }
 
-    // reference_metadata (optional)
+    /// reference_metadata (optional)
     for (auto& ref_metadata : reference_metadata) {
         ref_metadata.write(writer);
     }
 
-    // label_list (optional)
+    /// label_list (optional)
     if (label_list != nullptr) {
         label_list->writeToFile(writer);
     }
 
-    // DG_metadata (optional)
+    /// DG_metadata (optional)
     if (DG_metadata != nullptr) {
         DG_metadata->write(writer);
     }
 
-    // DG_protection (optional)
+    /// DG_protection (optional)
     if (DG_protection != nullptr) {
         DG_protection->write(writer);
     }
 
-    // dataset[]
+    /// dataset[]
     for (auto& ds : datasets) {
         ds.write(writer);
     }

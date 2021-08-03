@@ -101,13 +101,14 @@ uint64_t AccessUnit::getLength() const {
 
     len += getHeaderLength();
 
-    if (AU_information) {
-        len += AU_information->getLength();
-    }
-
-    if (AU_protection) {
-        len += AU_protection->getLength();
-    }
+    // TODO(Yeremia): Integration of part 3
+//    if (AU_information) {
+//        len += AU_information->getLength();
+//    }
+//
+//    if (AU_protection) {
+//        len += AU_protection->getLength();
+//    }
 
     if (block_header_flag) {
         for (auto& block : blocks) {
@@ -129,13 +130,14 @@ void AccessUnit::write(util::BitWriter& writer) const {
 
     writeHeader(writer);
 
-    if (AU_information) {
-        AU_information->write(writer);
-    }
-
-    if (AU_protection) {
-        AU_protection->write(writer);
-    }
+    // TODO(Yeremia): Integration of part 3
+//    if (AU_information) {
+//        AU_information->write(writer);
+//    }
+//
+//    if (AU_protection) {
+//        AU_protection->write(writer);
+//    }
 
     if (block_header_flag) {
         for (auto& block : blocks) {

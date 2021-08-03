@@ -9,14 +9,22 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <memory>
+#include <string>
 #include <vector>
-#include "dataset/dataset.h"
+#include <memory>
+#include "genie/util/make-unique.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
-#include "label_list/label_list.h"
+#include "genie/util/exception.h"
+#include "genie/format/mpegg_p1/file_header.h"
+#include "genie/format/mpegg_p1/util.h"
+#include "genie/format/mpegg_p1/dataset/class_description.h"
+
+#include "genie/format/mpegg_p1/dataset_group_header.h"
 #include "reference/reference.h"
 #include "reference_metadata/reference_metadata.h"
+#include "label_list/label_list.h"
+#include "dataset/dataset.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -95,16 +103,12 @@ class DGProtection {
  */
 class DatasetGroup {
  private:
-    /** ------------------------------------------------------------------------------------------------------------
-     * ISO 23092-1 Section 6.5.1.2 table 9 - dataset_group_header
-     * ------------------------------------------------------------------------------------------------------------- */
-    uint8_t dataset_group_ID;  //!< @brief
-    uint8_t version_number;    //!< @brief
 
-    // dataset_IDs[] u(16) from datasets
     /** ------------------------------------------------------------------------------------------------------------
      * ISO 23092-1 Section 6.5.1 table 8
      * ------------------------------------------------------------------------------------------------------------- */
+
+    DatasetGroupHeader header;
 
     std::vector<Reference> references;  //!< @brief ISO 23092-1 Section 6.5.1.3, optional
 
@@ -124,21 +128,14 @@ class DatasetGroup {
      * @brief
      * @param _datasets
      */
-    explicit DatasetGroup(std::vector<Dataset>&& _datasets);
+//    explicit DatasetGroup(std::vector<Dataset>&& _datasets);
 
     /**
-     * @brief
+     *
      * @param reader
-     * @param length
+     * @param fhd
      */
-    explicit DatasetGroup(util::BitReader& reader, size_t length);
-
-    /**
-     * @brief
-     * @param sort_ids
-     * @return
-     */
-    std::vector<uint16_t> getDatasetIDs(bool sort_ids = false) const;
+    explicit DatasetGroup(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length);
 
     /**
      * @brief
@@ -219,26 +216,7 @@ class DatasetGroup {
     void setID(uint8_t ID);
 
     /**
-     * @brief
-     * @return
-     */
-    uint64_t getHeaderLength() const;
-
-    /**
-     * @brief
-     * @param writer
-     */
-    void writeHeader(util::BitWriter& writer) const;
-
-    /**
-     * @brief
-     * @param reader
-     * @param length
-     */
-    void readHeader(util::BitReader& reader, size_t length);
-
-    /**
-     * @brief Get length of Dataset Header in bytes.
+     * @brief Get length of Dataset in byte
      * @return
      */
     uint64_t getLength() const;
