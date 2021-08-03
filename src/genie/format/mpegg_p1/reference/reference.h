@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+#include "genie/format/mpegg_p1/file_header.h"
 #include "genie/format/mpegg_p1/reference/reference_location/external.h"
 #include "genie/format/mpegg_p1/reference/reference_location/internal.h"
 #include "genie/format/mpegg_p1/reference/reference_location/reference_location.h"
@@ -39,10 +40,11 @@ class Reference {
 
     // seq_count is length of vector
     std::vector<std::string> sequence_names;
+    std::vector<uint32_t> sequence_lengths; //!< @brief ISO 23092-1:2020 (2nd Ed.) Section 6.5.2.3.2
+    std::vector<uint16_t> sequence_IDs; //!< @brief ISO 23092-1:2020 (2nd Ed.) Section 6.5.2.3.2
 
     // Contains external_ref_flag and corresponding data
-    ReferenceLocation reference_location;
-    //    std::unique_ptr<ReferenceLocation> reference_location;
+    std::unique_ptr<ReferenceLocation> reference_location;
 
  public:
     /**
@@ -61,16 +63,18 @@ class Reference {
      * @param _seq_names
      * @param _ref_loc
      */
-    Reference(uint8_t _ds_group_ID, uint8_t _ref_ID, std::string _ref_name, uint16_t _ref_major_ver,
-              uint16_t _ref_minor_ver, uint16_t _ref_patch_ver, std::vector<std::string>&& _seq_names,
-              ReferenceLocation&& _ref_loc);
+//    Reference::Reference(uint8_t _ds_group_ID, uint8_t _ref_ID, std::string _ref_name, uint16_t _ref_major_ver,
+//                         uint16_t _ref_minor_ver, uint16_t _ref_patch_ver, std::vector<std::string>&& _seq_names,
+//                         std::unique_ptr<ReferenceLocation> _ref_loc);
 
     /**
-     *
-     * @param reader
+     * @brief Read Reference from bitstream. FileHeader is required to determine syntax.
+     * @param bitreader
+     * @param fhd
+     * @param start_pos
      * @param length
      */
-    Reference(util::BitReader& reader, size_t length);
+    Reference(util::BitReader& bitreader, FileHeader& fhd, size_t start_pos, size_t length);
 
     /**
      *
@@ -100,15 +104,13 @@ class Reference {
      *
      * @param _ref_loc
      */
-    // TODO(Raouf): FIX ME
-    void addReferenceLocation(ReferenceLocation&& _ref_loc);
+//    void addReferenceLocation(ReferenceLocation&& _ref_loc);
 
     /**
      *
      * @return
      */
-    // TODO(Raouf): FIX ME
-    const ReferenceLocation& getReferenceLocation() const;
+//    const ReferenceLocation& getReferenceLocation() const;
 
     /**
      *

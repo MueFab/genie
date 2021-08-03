@@ -10,9 +10,17 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <cstdint>
+#include <string>
+#include <vector>
+#include <memory>
+#include "genie/util/make-unique.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/util/exception.h"
 #include "genie/util/runtime-exception.h"
+#include "genie/format/mpegg_p1/file_header.h"
+#include "genie/format/mpegg_p1/util.h"
+#include "genie/format/mpegg_p1/dataset/class_description.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,11 +33,15 @@ namespace mpegg_p1 {
  */
 class UAccessUnitInfo {
  private:
-    uint32_t num_U_clusters;           //!< @brief
-    uint32_t multiple_signature_base;  //!< @brief
-    uint8_t U_signature_size;          //!< @brief
-    bool U_signature_constant_length;  //!< @brief
-    uint8_t U_signature_length;        //!< @brief
+    uint32_t num_U_access_units;    //!< @brief
+    uint32_t num_U_clusters;    //!< @brief
+    bool U_signature_flag;
+    uint32_t multiple_signature_base;   //!< @brief
+    uint8_t U_signature_size;   //!< @brief
+    bool U_signature_constant_length;   //!< @brief
+    uint8_t U_signature_length;    //!< @brief
+
+    bool reserved_flag;
 
  public:
     /**
@@ -39,15 +51,9 @@ class UAccessUnitInfo {
 
     /**
      * @brief
-     * @param _num_U_clusters
-     */
-    explicit UAccessUnitInfo(uint32_t _num_U_clusters);
-
-    /**
-     * @brief
      * @param reader
      */
-    void readUAccessUnitInfo(genie::util::BitReader& reader);
+    UAccessUnitInfo(genie::util::BitReader& reader, FileHeader& fhd);
 
     /**
      * @brief
@@ -70,11 +76,11 @@ class UAccessUnitInfo {
     uint64_t getBitLength() const;
 
     /**
-     * @brief Write to bit_writer
+     * @brief Write to writer
      *
-     * @param bit_writer
+     * @param writer
      */
-    void write(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

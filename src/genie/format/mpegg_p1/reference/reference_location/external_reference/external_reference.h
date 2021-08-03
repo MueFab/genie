@@ -30,7 +30,7 @@ class ExternalReference {
     /**
      * @brief
      */
-    enum class Type : uint8_t { MPEGG_REF = 0, RAW_REF = 1, FASTA_REF = 2 };
+    enum class Type : uint8_t { MPEGG_REF = 0, RAW_REF = 1, FASTA_REF = 2, UNKNOWN = 3 };
 
     /**
      * @brief
@@ -64,13 +64,13 @@ class ExternalReference {
      * @brief
      * @return
      */
-    virtual uint64_t getLength();
+    virtual uint64_t getLength() const;
 
     /**
      * @brief
-     * @param writer
+     * @param bitwriter
      */
-    virtual void write(genie::util::BitWriter& writer);
+    virtual void write(genie::util::BitWriter& bitwriter) const;
 
  private:
     Type reference_type;  //!< @brief

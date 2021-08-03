@@ -9,6 +9,10 @@
 #include <fstream>
 #include "genie/util/runtime-exception.h"
 #include "genie/format/mpegg_p1/util.h"
+#include "genie/format/mpegg_p1/mpegg_file.h"
+//#include "genie/format/mpegg_p1/file_header.h"
+//#include "genie/format/mpegg_p1/dataset_group.h"
+#include "genie/format/mgb/raw_reference.h"
 //#include "genie/format/mpegg_p1/dataset_group.h"
 
 namespace genieapp {
@@ -26,29 +30,18 @@ ErrorCode decapsulate(ProgramOptions& options){
     std::ifstream reader(options.inputFile);
     genie::util::BitReader bitreader(reader);
 
-    std::string key = genie::format::mpegg_p1::readKey(bitreader);
-    if (key == "flhl"){
+    genie::format::mpegg_p1::MpeggFile mpegg_file(bitreader);
 
-    } else if (key == "dgcn") {
-        DataUnitType data_unit_type = bitreader.read<DataUnitType>();
-        uint64_t data_unit_size;
-        if (data_unit_type == DataUnitType::RAW_REF){
-            data_unit_size = bitreader.read<uint64_t>();
-            std::cout << "OK";
-        } else if (data_unit_type == DataUnitType::PAR_SET) {
-            bitreader.read<uint64_t>(10);
-            data_unit_size = bitreader.read<uint64_t>(22);
-            std::cout << "OK";
-        } else if (data_unit_type == DataUnitType::ACC_UNT) {
-            bitreader.read<uint64_t>(3);
-            data_unit_size = bitreader.read<uint64_t>(29);
-            std::cout << "OK";
-        } else {
-            UTILS_DIE("Invalid data unit type found");
-        }
-    } else {
-        UTILS_DIE("Invalid box");
-    }
+//    while (true){
+//        std::string key = genie::format::mpegg_p1::readKey(bitreader);
+//        if (key == "flhd"){
+//            auto fh = genie::format::mpegg_p1::FileHeader(bitreader);
+//        } else if (key == "dgcn") {
+//            auto ds_group = genie::format::mpegg_p1::DatasetGroup(bitreader);
+//        } else {
+//            UTILS_DIE("Invalid box");
+//        }
+//    }
 
 
 }

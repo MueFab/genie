@@ -14,6 +14,7 @@
 #include "genie/format/mpegg_p1/dataset_group.h"
 #include "genie/format/mpegg_p1/file_header.h"
 #include "genie/util/bitwriter.h"
+#include "genie/util/bitreader.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -35,6 +36,11 @@ class MpeggFile {
      * @brief
      */
     explicit MpeggFile(std::vector<DatasetGroup>*, std::vector<std::string>*);
+
+    /**
+     * @brief
+     */
+    explicit MpeggFile(genie::util::BitReader& reader);
 
     /**
      * @brief

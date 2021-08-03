@@ -11,6 +11,7 @@
 
 #include <memory>
 #include <string>
+#include "genie/format/mpegg_p1/file_header.h"
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/external_reference.h"
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/fasta_ref.h"
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/mpegg_ref.h"
@@ -36,10 +37,10 @@ class External : public ReferenceLocation {
  public:
     /**
      * @brief
-     * @param reader
+     * @param bitreader
      * @param seq_count
      */
-    explicit External(util::BitReader& reader, uint16_t seq_count);
+    explicit External(util::BitReader& bitreader, FileHeader& fhd, uint16_t seq_count);
 
     /**
      * @brief
@@ -61,9 +62,9 @@ class External : public ReferenceLocation {
 
     /**
      * @brief
-     * @param writer
+     * @param bitwriter
      */
-    void write(genie::util::BitWriter& writer) const override;
+    void write(genie::util::BitWriter& bitwriter) const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

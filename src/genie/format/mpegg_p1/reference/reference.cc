@@ -4,9 +4,11 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "genie/format/mpegg_p1/reference/reference.h"
 #include <utility>
+#include "genie/format/mpegg_p1/reference/reference.h"
 #include "genie/util/make-unique.h"
+#include "genie/format/mpegg_p1/reference/reference_location/internal.h"
+#include "genie/format/mpegg_p1/reference/reference_location/external.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,61 +30,64 @@ Reference::Reference()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Reference::Reference(uint8_t _ds_group_ID, uint8_t _ref_ID, std::string _ref_name, uint16_t _ref_major_ver,
-                     uint16_t _ref_minor_ver, uint16_t _ref_patch_ver, std::vector<std::string>&& _seq_names,
-                     ReferenceLocation&& _ref_loc)
-    : dataset_group_ID(_ds_group_ID),
-      reference_ID(_ref_ID),
-      reference_name(std::move(_ref_name)),
-      reference_major_version(_ref_major_ver),
-      reference_minor_version(_ref_minor_ver),
-      reference_patch_version(_ref_patch_ver),
-      sequence_names(std::move(_seq_names)),
-      //      reference_location(util::make_unique<ReferenceLocation>(_ref_loc))
-      reference_location(std::move(_ref_loc)) {}
+//Reference::Reference(uint8_t _ds_group_ID, uint8_t _ref_ID, std::string _ref_name, uint16_t _ref_major_ver,
+//                     uint16_t _ref_minor_ver, uint16_t _ref_patch_ver, std::vector<std::string>&& _seq_names,
+//                     std::unique_ptr<ReferenceLocation> _ref_loc)
+//    : ID(_ds_group_ID),
+//      reference_ID(_ref_ID),
+//      reference_name(std::move(_ref_name)),
+//      reference_major_version(_ref_major_ver),
+//      reference_minor_version(_ref_minor_ver),
+//      reference_patch_version(_ref_patch_ver),
+//      sequence_names(std::move(_seq_names)),
+//      //      reference_location(util::make_unique<ReferenceLocation>(_ref_loc))
+//      reference_location(std::move(_ref_loc)) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Reference::Reference(util::BitReader& reader, size_t length)
-    : dataset_group_ID(reader.read<uint8_t>()), reference_ID(reader.read<uint8_t>()), reference_name() {
-    std::string key = readKey(reader);
-    UTILS_DIE_IF(key != "rfgn", "Reference is not Found");
-
-    size_t start_pos = reader.getPos();
-
-    // reference_name st(v)
-    reference_name = readNullTerminatedStr(reader);
-
-    // reference_major_version u(16)
-    reference_major_version = reader.read<uint16_t>();
-    // reference_minor_version u(16)
-    reference_minor_version = reader.read<uint16_t>();
-    // reference_patch_version u(16)
-    reference_patch_version = reader.read<uint16_t>();
+Reference::Reference(util::BitReader& bitreader, FileHeader& fhd, size_t start_pos, size_t length):
+    /// reference_ID u(8)
+    dataset_group_ID(bitreader.read<uint8_t>()),
+    /// reference_ID u(8)
+    reference_ID(bitreader.read<uint8_t>()),
+    /// reference_name st(v)
+    reference_name(readNullTerminatedStr(bitreader)),
+    /// reference_name u(16)
+    reference_major_version(bitreader.read<uint16_t>()),
+    /// reference_name u(16)
+    reference_minor_version(bitreader.read<uint16_t>()),
+    /// reference_name u(16)
+    reference_patch_version(bitreader.read<uint16_t>()),
+    sequence_names(),
+    reference_location() {
 
     // seq_count u(16)
-    auto seq_count = reader.read<uint16_t>();
+    auto seq_count = bitreader.read<uint16_t>();
 
     for (auto seqID = 0; seqID < seq_count; seqID++) {
         // sequence_name[seqID] st(v)
-        sequence_names.emplace_back(readNullTerminatedStr(reader));
+        sequence_names.emplace_back(readNullTerminatedStr(bitreader));
+
+        if (fhd.getMinorVersion() != "1900"){
+            sequence_lengths.emplace_back(bitreader.read<uint32_t>());
+            sequence_IDs.emplace_back(bitreader.read<uint16_t>());
+        }
     }
 
-    // reserved u(7)
-    reader.read<uint8_t>(7);
+    /// reserved u(7)
+    bitreader.read<uint8_t>(7);
 
-    // external_ref_flat u(1)
-    bool external_ref_flag = reader.read<bool>();
+    /// external_ref_flat u(1)
+    bool external_ref_flag = bitreader.read<bool>(1);
 
     if (external_ref_flag) {
-        reference_location = External(reader, seq_count);
-        //        reference_location = util::make_unique<External>(reader, seq_count);
+        reference_location = util::make_unique<External>(bitreader, fhd, seq_count);
     } else {
-        reference_location = Internal(reader);
-        //        reference_location = util::make_unique<Internal>(reader);
+        reference_location = util::make_unique<Internal>(bitreader);
     }
 
-    UTILS_DIE_IF(reader.getPos() - start_pos != length, "Invalid Reference length!");
+    UTILS_DIE_IF(!bitreader.isAligned() || bitreader.getPos() - start_pos != length,
+                 "Invalid Reference length!");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -103,11 +108,11 @@ const std::vector<std::string>& Reference::getSequenceNames() const { return seq
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Reference::addReferenceLocation(ReferenceLocation&& _ref_loc) { reference_location = std::move(_ref_loc); }
+//void Reference::addReferenceLocation(std::unique_ptr<ReferenceLocation> _ref_loc) { reference_location = std::move(_ref_loc); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const ReferenceLocation& Reference::getReferenceLocation() const { return reference_location; }
+//const ReferenceLocation& Reference::getReferenceLocation() const { return reference_location; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -121,23 +126,23 @@ uint64_t Reference::getLength() const {
     // key c(4), Length u(64)
     uint64_t len = (4 * sizeof(char) + 8);  // gen_info
 
-    // dataset_group_ID u(8)
-    len += 1;
+    // ID u(8)
+    len += sizeof(dataset_group_ID);
 
     // reference_ID u(8)
-    len += 1;
+    len += sizeof(reference_ID);
 
     // reference_name st(v)
     len += (reference_name.size() + 1);  // // bit_len of string (stringLength + 1)*8 - Section 6.2.3
 
     // reference_major_version u(16)
-    len += 2;
+    len += sizeof(reference_major_version);
 
     // reference_minor_version u(16)
-    len += 2;
+    len += sizeof(reference_minor_version);
 
     // reference_patch_version u(16)
-    len += 2;
+    len += sizeof(reference_patch_version);
 
     // seq_count u(16)
     len += 2;
@@ -148,10 +153,12 @@ uint64_t Reference::getLength() const {
         len += (sequence_name.size() + 1);
     }
 
-    // reserved u(7), external_ref_flag u(1)
-    len += 1;
-
-    len += reference_location.getLength();
+    // reserved u(7), external_ref_flag u(1) and its content
+    if (reference_location->isExternal()){
+        len += dynamic_cast<External&>(*reference_location).getLength();
+    } else {
+        len += dynamic_cast<Internal&>(*reference_location).getLength();
+    }
 
     return len;
 }
@@ -167,7 +174,7 @@ void Reference::write(util::BitWriter& writer) const {
     // Length of KLV format
     writer.write(getLength(), 64);
 
-    // dataset_group_ID u(8)
+    // ID u(8)
     writer.write(dataset_group_ID, 8);
 
     // reference_ID u(8)
@@ -193,14 +200,12 @@ void Reference::write(util::BitWriter& writer) const {
         writer.write(sequence_name);
     }
 
-    // reserved u(7)
-    writer.write(0, 7);
-
-    // write external_ref_flag u(1)
-    writer.write(reference_location.isExternal(), 1);
-
-    // if (external_ref_flag)
-    reference_location.write(writer);
+    // write reserved u(7), external_ref_flag u(1) and its content
+    if (reference_location->isExternal()){
+        dynamic_cast<External&>(*reference_location).write(writer);
+    } else {
+        dynamic_cast<Internal&>(*reference_location).write(writer);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

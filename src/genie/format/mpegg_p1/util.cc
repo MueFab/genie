@@ -27,6 +27,17 @@ std::string readKey(util::BitReader &reader) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+std::string readFixedLengthChars(util::BitReader &reader, uint8_t n) {
+    std::string str;
+    for (uint8_t i = 0; i < n; i++) {
+        auto c = reader.read<char>();
+        str += c;
+    }
+    return str;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::string readNullTerminatedStr(util::BitReader &reader) {
     std::string string;
     char c = 0;

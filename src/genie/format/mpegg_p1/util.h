@@ -31,6 +31,13 @@ std::string readKey(util::BitReader &reader);
  * @param reader
  * @return
  */
+std::string readFixedLengthChars(util::BitReader &reader, uint8_t n);
+
+/**
+ * @brief
+ * @param reader
+ * @return
+ */
 std::string readNullTerminatedStr(util::BitReader &reader);
 
 /**

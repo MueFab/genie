@@ -37,7 +37,7 @@ class ReferenceLocation {
     /**
      * @brief
      */
-    virtual ~ReferenceLocation() = default;
+//    virtual ~ReferenceLocation();
 
     /**
      * @brief
@@ -65,9 +65,9 @@ class ReferenceLocation {
 
     /**
      * @brief
-     * @param writer
+     * @param bitwriter
      */
-    virtual void write(genie::util::BitWriter& writer) const;
+    virtual void write(genie::util::BitWriter& bitwriter) const;
 
  private:
     Flag external_ref_flag;  //!< @brief

@@ -49,6 +49,12 @@ class Sha256 : public Checksum {
     explicit Sha256(std::vector<uint64_t>& _data);
 
     /**
+     *
+     * @return
+     */
+    std::unique_ptr<Checksum> clone() const override;
+
+    /**
      * @brief
      * @return
      */

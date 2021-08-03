@@ -30,6 +30,17 @@ ReferenceLocation::Flag ReferenceLocation::getExternalRefFlag() const { return e
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+uint64_t ReferenceLocation::getLength() const { return 1; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ReferenceLocation::write(util::BitWriter& bitwriter) const {
+    bitwriter.write(0, 7);
+    bitwriter.write((uint64_t)external_ref_flag, 1);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 }  // namespace mpegg_p1
 }  // namespace format
 }  // namespace genie
