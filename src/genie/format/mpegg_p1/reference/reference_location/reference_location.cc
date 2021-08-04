@@ -35,7 +35,9 @@ uint64_t ReferenceLocation::getLength() const { return 1; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ReferenceLocation::write(util::BitWriter& bitwriter) const {
+    /// reserved u(7)
     bitwriter.write(0, 7);
+    /// external_ref_flag u(1)
     bitwriter.write((uint64_t)external_ref_flag, 1);
 }
 

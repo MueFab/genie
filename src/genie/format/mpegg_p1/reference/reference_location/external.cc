@@ -18,19 +18,29 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-External::External(util::BitReader& bitreader, FileHeader& fhd, uint16_t seq_count)
-    : ReferenceLocation(ReferenceLocation::Flag::EXTERNAL),
-      ref_uri(readNullTerminatedStr(bitreader)) {
+External::External(util::BitReader& reader, FileHeader& fhd, uint16_t seq_count)
+    : ReferenceLocation(ReferenceLocation::Flag::EXTERNAL){
 
-    auto checksum_alg = bitreader.read<Checksum::Algo>();             // checksum_alg u(8)
-    auto reference_type = bitreader.read<ExternalReference::Type>();  // reference_type u(8)
+    ref_uri = readNullTerminatedStr(reader); /// ref_uri st(v)
+    checksum_alg = reader.read<Checksum::Algo>(); /// checksum_alg u(8)
 
+    auto startpos = reader.getPos();
+    auto reference_type = reader.read<ExternalReference::Type>(); /// reference_type u(8)
     if (reference_type == ExternalReference::Type::MPEGG_REF) {
-        external_reference = util::make_unique<MpegReference>(bitreader, fhd, checksum_alg);
+        external_reference = util::make_unique<MpegReference>(reader, fhd, checksum_alg);
+        auto writesize = dynamic_cast<MpegReference&>(*external_reference).getLength();
+        auto readsize = reader.getPos() - startpos;
+        UTILS_DIE_IF(writesize != readsize, "MpegReference has size");
     } else if (reference_type == ExternalReference::Type::RAW_REF) {
-        external_reference = util::make_unique<RawReference>(bitreader, fhd, checksum_alg, seq_count);
+        external_reference = util::make_unique<RawReference>(reader, fhd, checksum_alg, seq_count);
+        auto writesize = dynamic_cast<RawReference&>(*external_reference).getLength();
+        auto readsize = reader.getPos() - startpos;
+        UTILS_DIE_IF(writesize != readsize, "RawReference has different size");
     } else if (reference_type == ExternalReference::Type::FASTA_REF) {
-        external_reference = util::make_unique<FastaReference>(bitreader, fhd, checksum_alg, seq_count);
+        external_reference = util::make_unique<FastaReference>(reader, fhd, checksum_alg, seq_count);
+        auto writesize = dynamic_cast<FastaReference&>(*external_reference).getLength();
+        auto readsize = reader.getPos() - startpos;
+        UTILS_DIE_IF(writesize != readsize, "FastaReference has different size");
     } else {
         UTILS_DIE("Unsupported reference_type");
     }
@@ -49,38 +59,58 @@ Checksum::Algo External::getChecksumAlg() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t External::getLength() const {
-    // reserved u(7), external_ref_flag u(1)
+    /// reserved u(7), external_ref_flag u(1)
     uint64_t len = ReferenceLocation::getLength();
 
-    // ref_uri st(v)
-    len += (getRefUri().size() + 1);
-    // checksum_alg u(8)
-    len += 1;
-    // reference_type u(8)
-    len += 1;
+    len += (getRefUri().size() + 1); /// ref_uri st(v)
 
-    len += external_reference->getLength();
+    len += 1; /// checksum_alg u(8)
+
+    switch (external_reference->getReferenceType()){
+        case (ExternalReference::Type::MPEGG_REF):
+            len += dynamic_cast<MpegReference&>(*external_reference).getLength();
+            break;
+        case (ExternalReference::Type::FASTA_REF):
+            len += dynamic_cast<FastaReference&>(*external_reference).getLength();
+            break;
+        case (ExternalReference::Type::RAW_REF):
+            len += dynamic_cast<RawReference&>(*external_reference).getLength();
+            break;
+        default:
+            UTILS_DIE("Invalid external reference type!");
+            break;
+    }
 
     return len;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void External::write(util::BitWriter& bitwriter) const {
-    // reserved u(7), external_ref_flag u(1)
-    ReferenceLocation::write(bitwriter);
+void External::write(util::BitWriter& writer) const {
+    /// reserved u(7), external_ref_flag u(1)
+    ReferenceLocation::write(writer);
 
-    // ref_uri st(v)
-    writeNullTerminatedStr(bitwriter, ref_uri);
+    /// ref_uri st(v)
+    writeNullTerminatedStr(writer, ref_uri);
 
-    // checksum_alg u(8)
-    bitwriter.write((uint8_t)getChecksumAlg(), 8);
+    /// checksum_alg u(8)
+    writer.write((uint8_t)checksum_alg, 8);
 
-    // reference_type u(8)
-    bitwriter.write((uint8_t)external_reference->getReferenceType(), 8);
-
-    // external_dataset_group_ID, external_dataset_ID, ref_checksum or checksum[seqID]
-    external_reference->write(bitwriter);
+    /// reference_type u(8), external_dataset_group_ID, external_dataset_ID, ref_checksum or checksum[seqID]
+    switch (external_reference->getReferenceType()){
+        case (ExternalReference::Type::MPEGG_REF):
+            dynamic_cast<MpegReference&>(*external_reference).write(writer);
+            break;
+        case (ExternalReference::Type::FASTA_REF):
+            dynamic_cast<FastaReference&>(*external_reference).write(writer);
+            break;
+        case (ExternalReference::Type::RAW_REF):
+            dynamic_cast<RawReference&>(*external_reference).write(writer);
+            break;
+        default:
+            UTILS_DIE("Invalid external reference type!");
+            break;
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

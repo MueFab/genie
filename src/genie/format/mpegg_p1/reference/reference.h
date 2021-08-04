@@ -17,6 +17,10 @@
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/exception.h"
+#include <utility>
+#include "genie/util/make-unique.h"
+#include "genie/format/mpegg_p1/reference/reference_location/internal.h"
+#include "genie/format/mpegg_p1/reference/reference_location/external.h"
 
 namespace genie {
 namespace format {
@@ -45,6 +49,9 @@ class Reference {
 
     // Contains external_ref_flag and corresponding data
     std::unique_ptr<ReferenceLocation> reference_location;
+
+    /// Additional
+    std::string minor_version;
 
  public:
     /**

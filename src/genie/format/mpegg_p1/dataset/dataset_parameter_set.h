@@ -19,12 +19,9 @@
 #include "genie/util/runtime-exception.h"
 #include "genie/format/mpegg_p1/file_header.h"
 #include "genie/format/mpegg_p1/util.h"
-#include "genie/format/mpegg_p1/dataset/class_description.h"
 
 #include "genie/core/parameter/parameter_set.h"
-#include <sstream>
-#include <string>
-
+#include "genie/format/mpegg_p1/dataset/dataset_header.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -36,8 +33,22 @@ namespace mpegg_p1 {
  */
 class DatasetParameterSet: public core::parameter::ParameterSet {
  private:
-    uint8_t group_ID;  //!< @brief
-    uint16_t ID;      //!< @brief
+    std::string minor_version;
+    bool parameters_update_flag;
+    uint32_t num_U_access_units;
+
+    uint8_t dataset_group_ID;
+    uint16_t dataset_ID;
+//    uint8_t ID;
+//    uint8_t parent_ID;
+
+    bool multiple_alignment_flag;
+    DatasetHeader::Pos40Size pos_40_bits_flag;
+    uint8_t alphabet_ID;
+    bool U_signature_flag;
+    bool U_signature_constant_length;
+    uint8_t U_signature_length;
+
 
  public:
     /**
@@ -46,14 +57,14 @@ class DatasetParameterSet: public core::parameter::ParameterSet {
      * @param ID
      * @param parameterSet
      */
-    explicit DatasetParameterSet(uint8_t _group_ID, uint16_t _ID, const core::parameter::ParameterSet&& p2_param_set);
+//    explicit DatasetParameterSet(uint8_t _group_ID, uint16_t _ID, const core::parameter::ParameterSet&& p2_param_set);
 
     /**
      * @brief
      * @param bit_reader
      * @param length
      */
-    DatasetParameterSet(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length);
+    DatasetParameterSet(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length, DatasetHeader& dthd);
 
     /**
      * @brief
@@ -65,7 +76,7 @@ class DatasetParameterSet: public core::parameter::ParameterSet {
      * @brief
      * @param datasetGroupID
      */
-    void setDatasetGroupID(uint8_t datasetGroupID);
+    void setDatasetGroupID(uint8_t _dataset_group_ID);
 
     /**
      * @brief
@@ -77,7 +88,7 @@ class DatasetParameterSet: public core::parameter::ParameterSet {
      * @brief
      * @param datasetID
      */
-    void setDatasetID(uint16_t datasetID);
+    void setDatasetID(uint16_t _dataset_ID);
 
     /**
      * @brief
@@ -89,7 +100,7 @@ class DatasetParameterSet: public core::parameter::ParameterSet {
      * @brief
      * @param writer
      */
-    void write(genie::util::BitWriter& writer) const;
+    void write(genie::util::BitWriter& writer, bool empty_length=false) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

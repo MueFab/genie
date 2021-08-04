@@ -70,6 +70,18 @@ class ParameterSet : public DataUnit {
 
     /**
      *
+     * @param bitReader
+     */
+    ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, util::BitReader &bitReader);
+
+    /**
+     *
+     * @param writer
+     */
+    void writeEncodingParams(util::BitWriter &writer) const;
+
+    /**
+     *
      * @return
      */
     const ComputedRef &getComputedRef() const;

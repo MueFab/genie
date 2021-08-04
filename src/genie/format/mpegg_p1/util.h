@@ -13,6 +13,8 @@
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 
+#define ROUNDTRIP_CONSTRUCTOR true
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -46,6 +48,8 @@ std::string readNullTerminatedStr(util::BitReader &reader);
  * @param string
  */
 void writeNullTerminatedStr(util::BitWriter &writer, const std::string &string);
+
+void skipRead(util::BitReader &reader, uint64_t length);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

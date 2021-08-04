@@ -5,9 +5,7 @@
  */
 
 #include "genie/format/mpegg_p1/dataset/dataset_header.h"
-#include "genie/format/mpegg_p1/util.h"
-#include "genie/util/exception.h"
-#include "genie/util/runtime-exception.h"
+#include <sstream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -22,9 +20,9 @@ DatasetHeader::DatasetHeader():
     ID(0),
     version("2000"),
     multiple_alignment_flag(false),
-    byte_offset_size_flag(ByteOffsetSizeFlag::OFF),
+    byte_offset_size_flag(ByteOffsetSize::OFF),
     non_overlapping_AU_range_flag(0),
-    pos_40_bits_flag(Pos40SizeFlag::OFF),
+    pos_40_bits_flag(Pos40Size::OFF),
     block_header_flag(false),
     MIT_flag(false),
     CC_mode_flag(false),
@@ -34,7 +32,7 @@ DatasetHeader::DatasetHeader():
     seq_blocks(),
     dataset_type(),
     class_descs(),
-    alphabet_ID(0),
+    alphabet_ID(core::AlphabetID::ACGTN),
     u_access_unit_info(),
     thress() {}
 
@@ -45,21 +43,13 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader, FileHeader& fhd, si
     ID(reader.read<uint16_t>()),
     version(readFixedLengthChars(reader, 4)),
     multiple_alignment_flag(reader.read<bool>(1)),
-    byte_offset_size_flag(reader.read<ByteOffsetSizeFlag>(1)),
+    byte_offset_size_flag(reader.read<bool>(1) ? ByteOffsetSize::ON : ByteOffsetSize::OFF),
     non_overlapping_AU_range_flag(reader.read<bool>(1)),
-    pos_40_bits_flag(reader.read<Pos40SizeFlag>(1)),
+    pos_40_bits_flag(reader.read<bool>(1) ? Pos40Size::ON : Pos40Size::OFF),
     block_header_flag(reader.read<bool>(1)),
     MIT_flag(block_header_flag ? reader.read<bool>(1) : false),
     CC_mode_flag(block_header_flag ? reader.read<bool>(1) : false),
-    ordered_blocks_flag(!block_header_flag ? reader.read<bool>(1) : false),
-    reference_ID(0),
-    seq_IDs(),
-    seq_blocks(),
-    dataset_type(),
-    class_descs(),
-    alphabet_ID(0),
-    u_access_unit_info(),
-    thress()
+    ordered_blocks_flag(!block_header_flag ? reader.read<bool>(1) : false)
 {
     auto seq_count = reader.read<uint16_t>();
 
@@ -84,7 +74,7 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader, FileHeader& fhd, si
     }
 
     parameters_update_flag = reader.read<bool>(1);
-    alphabet_ID = reader.read<uint8_t>(7);
+    alphabet_ID = reader.read<core::AlphabetID>(7);
 
     u_access_unit_info = UAccessUnitInfo(reader, fhd);
 
@@ -104,8 +94,16 @@ DatasetHeader::DatasetHeader(genie::util::BitReader& reader, FileHeader& fhd, si
     /// nesting_zero_big
     reader.flush();
 
-    auto tlen = reader.getPos() - start_pos;
-    auto elen = getLength();
+#if ROUNDTRIP_CONSTRUCTOR
+    std::stringstream ss;
+    util::BitWriter tmp_writer(&ss);
+    write(tmp_writer);
+    tmp_writer.flush();
+    uint64_t wlen = tmp_writer.getBitsWritten() / 8;
+    uint64_t elen = getLength();
+    UTILS_DIE_IF(wlen != length, "Invalid DatasetHeader write()");
+    UTILS_DIE_IF( elen != length, "Invalid DatasetHeader getLength()");
+#endif
 
     UTILS_DIE_IF(!reader.isAligned() || reader.getPos() - start_pos != length,
                  "Invalid DatasetHeader length!");
@@ -129,7 +127,7 @@ void DatasetHeader::setID(uint16_t _ID) { ID = _ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetHeader::ByteOffsetSizeFlag DatasetHeader::getByteOffsetSizeFlag() const { return byte_offset_size_flag; }
+DatasetHeader::ByteOffsetSize DatasetHeader::getByteOffsetSizeFlag() const { return byte_offset_size_flag; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -137,7 +135,7 @@ bool DatasetHeader::getNonOverlappingAURangeFlag() const{ return non_overlapping
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetHeader::Pos40SizeFlag DatasetHeader::getPos40SizeFlag() const { return pos_40_bits_flag; }
+DatasetHeader::Pos40Size DatasetHeader::getPos40SizeFlag() const { return pos_40_bits_flag; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -165,92 +163,47 @@ core::parameter::DataUnit::DatasetType DatasetHeader::getDatasetType() const { r
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool DatasetHeader::getParamUpdateFlag() const {return parameters_update_flag;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+core::AlphabetID DatasetHeader::getAlphabetID() const {return alphabet_ID;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const UAccessUnitInfo& DatasetHeader::getUAccessUnitInfo() const {return u_access_unit_info;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint32_t DatasetHeader::getNumAccessUnits() const {return u_access_unit_info.getNumAccessUnits();}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint64_t DatasetHeader::getLength() const {
-    // length is first calculated in bits then converted in bytes
+    std::stringstream ss;
+    util::BitWriter tmp_writer(&ss);
+    write(tmp_writer, true);
+    tmp_writer.flush();
+    uint64_t len = tmp_writer.getBitsWritten() / 8;
 
-    /// Key c(4) Length u(64)
-    uint64_t bitlen = (4 * sizeof(char) + 8) * 8;  // gen_info
-
-    /// group_ID u(8), ID u(16), version c(4)
-    bitlen += (1 + 2 + 4) * 8;
-
-    /// multiple_alignment_flag, byte_offset_size_flag u(1), non_overlapping_AU_range_flag u(1),
-    /// pos_40_bits_flag u(1), block_header_flag
-    bitlen += 5;
-
-    if (block_header_flag){
-        /// MIT_flag, CC_mode_flag
-        bitlen += 2;
-    } else{
-        /// ordered_blocks_flag
-        bitlen += 1;
-    }
-
-    /// seq_count
-    bitlen += 16;
-
-    UTILS_DIE_IF(seq_IDs.size() != seq_blocks.size(), "Different number of seq_ID[] and seq_blocks[]");
-    uint64_t seq_count = seq_blocks.size();
-
-    if (seq_count > 0){
-        /// reference_ID u(8)
-        bitlen += 8;
-
-        /// seq_ID[] u(16)
-        bitlen += 16*seq_count;
-
-        /// seq_blocks[] u(32)
-        bitlen += 32*seq_count;
-    }
-
-    /// dataset_type u(4)
-    bitlen += 4;
-
-    if (MIT_flag){
-        /// num_classes u(4)
-        bitlen += 4;
-
-        for (auto &class_desc:class_descs){
-            bitlen += class_desc.getBitLength();
-        }
-    }
-
-    /// parameters_update_flagu(1), alphabet_ID u(7)
-    bitlen += 1+7;
-
-    /// num_U_access_units, num_U_clusters, multiple_signature_base, U_signature_size
-    /// U_signature_constant_length, U_signature_length
-    u_access_unit_info.getBitLength();
-
-    if (seq_count > 0){
-        /// tflang[0] u(1), thres[0] u(31)
-        bitlen += 32;
-
-        /// tflang[i] u(1), thres[i] u(31)
-        for (uint64_t i=1;i<seq_count;i++){
-            bool tflag = thress[i] != thress[i-1];
-            bitlen += 1;
-            if (tflag){
-                bitlen += 31;
-            } else {
-                /// thress[i] == thress[i-1];
-            }
-        }
-    }
-
-    bitlen += bitlen % 8;  /// byte_aligned() f(1)
-
-    return bitlen / 8;
+    return len;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetHeader::write(util::BitWriter& writer) const {
+void DatasetHeader::write(util::BitWriter& writer, bool empty_length) const {
     /// Key of KLV format
     writer.write("dthd");
 
     /// Length of KLV format
-    writer.write(getLength(), 64);
+    if (empty_length){
+        writer.write(0, 64);
+    } else {
+        writer.write(getLength(), 64);
+    }
+
+    writer.write(group_ID, 8); /// group_ID u(8)
+    writer.write(ID, 16); /// ID u(8)
 
     /// version c(4)
     writer.write(version);
@@ -258,9 +211,9 @@ void DatasetHeader::write(util::BitWriter& writer) const {
     /// multiple_alignment_flag, byte_offset_size_flag u(1), non_overlapping_AU_range_flag u(1),
     /// pos_40_bits_flag u(1), block_header_flag
     writer.write(multiple_alignment_flag, 1);
-    writer.write(byte_offset_size_flag == ByteOffsetSizeFlag::ON, 1);
+    writer.write(byte_offset_size_flag == ByteOffsetSize::ON, 1);
     writer.write(non_overlapping_AU_range_flag, 1);
-    writer.write(pos_40_bits_flag == Pos40SizeFlag::ON, 1);
+    writer.write(pos_40_bits_flag == Pos40Size::ON, 1);
     writer.write(block_header_flag, 1);
 
     if (block_header_flag){
@@ -281,12 +234,12 @@ void DatasetHeader::write(util::BitWriter& writer) const {
         /// reference_ID u(8)
         writer.write(reference_ID, 8);
 
-        for (auto seq=0;seq<seq_count;seq++){
+        for (uint64_t seq=0;seq<seq_count;seq++){
             /// seq_ID[] u(16)
             writer.write(seq_IDs[seq], 16);
         }
 
-        for (auto seq=0;seq<seq_count;seq++){
+        for (uint64_t seq=0;seq<seq_count;seq++){
             /// seq_blocks[] u(32)
             writer.write(seq_blocks[seq], 32);
         }
@@ -304,19 +257,20 @@ void DatasetHeader::write(util::BitWriter& writer) const {
         }
     }
 
-    /// alphabet_ID u(8)
-    writer.write(alphabet_ID, 8)
-;
+
+    writer.write(parameters_update_flag, 1); /// parameter_update_flag u(1)
+    writer.write((uint8_t)alphabet_ID, 7); /// alphabet_ID u(8)
+
     /// num_U_access_units, num_U_clusters, multiple_signature_base, U_signature_size
     /// U_signature_constant_length, U_signature_length
     u_access_unit_info.write(writer);
 
     if (seq_count > 0){
         /// tflang[0] u(1), thres[0] u(31)
-        writer.write(0, 1);
+        writer.write(1, 1);
         writer.write(thress[0], 31);
 
-        for (auto i=1;i<seq_count;i++){
+        for (uint64_t i=1;i<seq_count;i++){
             bool tflag = thress[i] != thress[i-1];
             if (tflag){
                 writer.write(thress[i], 31);

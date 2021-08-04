@@ -27,7 +27,7 @@ class MITExtendedAUInfo {
     uint64_t extended_AU_start_position;  //!< @brief
     uint64_t extended_AU_end_position;    //!< @brief
 
-    DatasetHeader::Pos40SizeFlag pos_40_flag;  //!< @brief
+    DatasetHeader::Pos40Size pos_40_flag;  //!< @brief
 
  public:
     /**
@@ -41,7 +41,7 @@ class MITExtendedAUInfo {
      * @param end_pos
      * @param flag
      */
-    MITExtendedAUInfo(uint64_t start_pos, uint64_t end_pos, DatasetHeader::Pos40SizeFlag flag);
+    MITExtendedAUInfo(uint64_t start_pos, uint64_t end_pos, DatasetHeader::Pos40Size flag);
 
     /**
      * @brief

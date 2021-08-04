@@ -40,8 +40,8 @@ class MITUAccessUnitInfo {
     uint64_t U_ref_start_position;  //!< @brief
     uint64_t U_ref_end_position;    //!< @brief
 
-    DatasetHeader::ByteOffsetSizeFlag byte_offset_size_flag;  //!< @brief
-    DatasetHeader::Pos40SizeFlag pos_40_size_flag;            //!< @brief
+    DatasetHeader::ByteOffsetSize byte_offset_size_flag;  //!< @brief
+    DatasetHeader::Pos40Size pos_40_size_flag;            //!< @brief
 
  public:
     /**

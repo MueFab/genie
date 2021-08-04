@@ -15,108 +15,112 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
-                       uint32_t _reads_count, core::parameter::DataUnit::DatasetType dataset_type, uint8_t posSize,
-                       uint8_t signatureSize, uint32_t multiple_signature_base)
-    : DataUnit(DataUnitType::ACCESS_UNIT),
-      access_unit_ID(_access_unit_ID),
-      num_blocks(0),
-      parameter_set_ID(_parameter_set_ID),
-      au_type(_au_type),
-      reads_count(_reads_count) {
-    if (au_type == core::record::ClassType::CLASS_N || au_type == core::record::ClassType::CLASS_M) {
-        mm_cfg = util::make_unique<mgb::MmCfg>();
-    }
-    if (dataset_type == DatasetType::REFERENCE) {
-        ref_cfg = util::make_unique<mgb::RefCfg>(posSize);
-    }
-    if (au_type != core::record::ClassType::CLASS_U) {
-        au_Type_U_Cfg = util::make_unique<mgb::AuTypeCfg>(posSize);
-    } else {
-        if (multiple_signature_base != 0) {
-            signature_config = util::make_unique<mgb::SignatureCfg>(0, signatureSize);
-        }
-    }
-}
+//AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
+//                       uint32_t _reads_count, core::parameter::DataUnit::DatasetType dataset_type, uint8_t posSize,
+//                       uint8_t signatureSize, uint32_t multiple_signature_base)
+//    : DataUnit(DataUnitType::ACCESS_UNIT),
+//      access_unit_ID(_access_unit_ID),
+//      num_blocks(0),
+//      parameter_set_ID(_parameter_set_ID),
+//      au_type(_au_type),
+//      reads_count(_reads_count) {
+//    if (au_type == core::record::ClassType::CLASS_N || au_type == core::record::ClassType::CLASS_M) {
+//        mm_cfg = util::make_unique<mgb::MmCfg>();
+//    }
+//    if (dataset_type == DatasetType::REFERENCE) {
+//        ref_cfg = util::make_unique<mgb::RefCfg>(posSize);
+//    }
+//    if (au_type != core::record::ClassType::CLASS_U) {
+//        au_Type_U_Cfg = util::make_unique<mgb::AuTypeCfg>(posSize);
+//    } else {
+//        if (multiple_signature_base != 0) {
+//            signature_config = util::make_unique<mgb::SignatureCfg>(0, signatureSize);
+//        }
+//    }
+//}
+//
+//// ---------------------------------------------------------------------------------------------------------------------
+//
+//AccessUnit::AccessUnit(mgb::AccessUnit&& au)
+//    : DataUnit(DataUnitType::ACCESS_UNIT),
+//      access_unit_ID(au.getID()),
+//      num_blocks(0),
+//      parameter_set_ID(au.getParameterID()),
+//      au_type(au.getClass()),
+//      reads_count(au.getReadCount()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-AccessUnit::AccessUnit(mgb::AccessUnit&& au)
-    : DataUnit(DataUnitType::ACCESS_UNIT),
-      access_unit_ID(au.getID()),
-      num_blocks(0),
-      parameter_set_ID(au.getParameterID()),
-      au_type(au.getClass()),
-      reads_count(au.getReadCount()) {}
+AccessUnit::AccessUnit(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length,
+                       DatasetHeader& dhd) {
 
-// ---------------------------------------------------------------------------------------------------------------------
+    /// access_unit_header
+    size_t box_start_pos = reader.getPos();
+    std::string box_key = readKey(reader);
+    auto box_length = reader.read<uint64_t>();
+    UTILS_DIE_IF(box_key != "auhd",
+                 "Access unit header is not found!");
+    header = AccessUnitHeader(reader, fhd, box_start_pos, box_length, dhd);
 
-uint64_t AccessUnit::getHeaderLength() const {
-    // Calculate size and write structure to tmp buffer
-    std::stringstream ss;
-    util::BitWriter tmp_writer(&ss);
-    writeHeader(tmp_writer, true);
-    tmp_writer.flush();
+    do {
+        /// Read K,L of KLV
+        box_start_pos = reader.getPos();
+        box_key = readKey(reader);
+        box_length = reader.read<uint64_t>();
 
-    return tmp_writer.getBitsWritten() / 8;
-}
+//        /// reference[]
+//        if (box_key == "rfgn") {
+//            references.emplace_back(reader, fhd, box_start_pos, box_length);
+//
+//            /// reference_metadata[]
+//        } else if (box_key == "rfmd") {
+//            //TODO(Yeremia) Insert reference metadata here
+//            UTILS_DIE("TODO");
+//
+//            /// label_list
+//        } else if (box_key == "labl") {
+//            label_list = util::make_unique<LabelList>(reader, box_length);
+//
+//            /// DG_metadata
+//        } else if (box_key == "dgmd") {
+//            DG_metadata = util::make_unique<DGMetadata>(reader, box_length);
+//
+//            /// DG_protection
+//        } else if (box_key == "dgpr") {
+//            DG_protection = util::make_unique<DGProtection>(reader, box_length);
+//
+//            /// Dataset
+//        } else if (box_key == "dtcn") {
+//            datasets.emplace_back(reader, fhd, box_start_pos, box_length);
+//        }
+    } while (reader.getPos() - start_pos < length);
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-void AccessUnit::writeHeader(util::BitWriter& writer, bool write_dummy_length) const {
-    // Key of KVL format
-    writer.write("aucn");
-
-    if (write_dummy_length) {
-        // Length of KVL format
-        writer.write(0, 64);
-    } else {
-        // Length of KVL format
-        writer.write(getHeaderLength(), 64);
-    }
-
-    writer.write(access_unit_ID, 32);
-    writer.write(num_blocks, 8);
-    writer.write(parameter_set_ID, 8);
-    writer.write(uint8_t(au_type), 4);
-    writer.write(reads_count, 32);
-    if (mm_cfg) {
-        mm_cfg->write(writer);
-    }
-    if (ref_cfg) {
-        ref_cfg->write(writer);
-    }
-    if (au_Type_U_Cfg) {
-        au_Type_U_Cfg->write(writer);
-    }
-    if (signature_config) {
-        signature_config->write(writer);
-    }
+    UTILS_DIE_IF(!reader.isAligned() || (reader.getPos() - start_pos != length), "Invalid DatasetGroup length!");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t AccessUnit::getLength() const {
-    uint64_t len = 12;  // KVL
-
-    len += getHeaderLength();
-
-    // TODO(Yeremia): Integration of part 3
-//    if (AU_information) {
-//        len += AU_information->getLength();
+//    uint64_t len = 12;  // KVL
+//
+//    len += getHeaderLength();
+//
+//    // TODO(Yeremia): Integration of part 3
+////    if (AU_information) {
+////        len += AU_information->getLength();
+////    }
+////
+////    if (AU_protection) {
+////        len += AU_protection->getLength();
+////    }
+//
+//    if (block_header_flag) {
+//        for (auto& block : blocks) {
+//            len += block.getLength();
+//        }
 //    }
 //
-//    if (AU_protection) {
-//        len += AU_protection->getLength();
-//    }
-
-    if (block_header_flag) {
-        for (auto& block : blocks) {
-            len += block.getLength();
-        }
-    }
-
-    return len;
+//    return len;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -128,22 +132,22 @@ void AccessUnit::write(util::BitWriter& writer) const {
     // Length of KVL format
     writer.write(getLength(), 64);
 
-    writeHeader(writer);
-
-    // TODO(Yeremia): Integration of part 3
-//    if (AU_information) {
-//        AU_information->write(writer);
-//    }
+//    writeHeader(writer);
 //
-//    if (AU_protection) {
-//        AU_protection->write(writer);
+//    // TODO(Yeremia): Integration of part 3
+////    if (AU_information) {
+////        AU_information->write(writer);
+////    }
+////
+////    if (AU_protection) {
+////        AU_protection->write(writer);
+////    }
+//
+//    if (block_header_flag) {
+//        for (auto& block : blocks) {
+//            block.write(writer);
+//        }
 //    }
-
-    if (block_header_flag) {
-        for (auto& block : blocks) {
-            block.write(writer);
-        }
-    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

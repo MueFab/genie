@@ -39,8 +39,8 @@ class MITAccessUnitInfo {
     std::vector<uint64_t> block_byte_offset;  //!< @brief
 
     DatasetHeader* datasetHeader;                             //!< @brief
-    DatasetHeader::ByteOffsetSizeFlag byte_offset_size_flag;  //!< @brief
-    DatasetHeader::Pos40SizeFlag pos_40_size_flag;            //!< @brief
+    DatasetHeader::ByteOffsetSize byte_offset_size_flag;  //!< @brief
+    DatasetHeader::Pos40Size pos_40_size_flag;            //!< @brief
 
  public:
     /**
@@ -60,8 +60,8 @@ class MITAccessUnitInfo {
      */
     MITAccessUnitInfo(uint64_t _AU_byte_offset, uint64_t _AU_start_position, uint64_t _AU_end_position,
                       std::vector<uint64_t>&& _block_byte_offset, DatasetHeader* _datasetHeader,
-                      DatasetHeader::ByteOffsetSizeFlag _byte_offset_size_flag,
-                      DatasetHeader::Pos40SizeFlag _pos_40_size_flag);
+                      DatasetHeader::ByteOffsetSize _byte_offset_size_flag,
+                      DatasetHeader::Pos40Size _pos_40_size_flag);
 
     /**
      * @brief

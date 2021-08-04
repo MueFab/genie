@@ -24,7 +24,8 @@ FastaReference::FastaReference() : ExternalReference(ExternalReference::Type::FA
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FastaReference::FastaReference(util::BitReader &reader, FileHeader& fhd, Checksum::Algo checksum_alg, uint16_t seq_count) {
+FastaReference::FastaReference(util::BitReader &reader, FileHeader& fhd, Checksum::Algo checksum_alg, uint16_t seq_count)
+    : ExternalReference(ExternalReference::Type::FASTA_REF) {
     for (auto i = 0; i < seq_count; i++) {
         switch (checksum_alg) {
             case Checksum::Algo::MD5: {
@@ -60,9 +61,56 @@ Checksum::Algo FastaReference::getChecksumAlg() const { return checksums.front()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FastaReference::write(util::BitWriter &bit_writer) const {
-    for (auto &checksum : checksums) {
-        checksum->write(bit_writer);
+uint64_t FastaReference::getLength() const {
+    uint64_t len = ExternalReference::getLength();
+
+    /// Only write if the content is not empty as to get the checksum_alg requires at least 1 entry
+    if (!checksums.empty()){
+        auto checksum_algo = getChecksumAlg();
+        for (auto &checksum : checksums) {
+            switch (checksum_algo) {
+                case Checksum::Algo::MD5: {
+                    len += dynamic_cast<Md5&>(*checksum).getLength();
+                    break;
+                }
+                case Checksum::Algo::SHA256: {
+                    len += dynamic_cast<Sha256&>(*checksum).getLength();
+                    break;
+                }
+                default: {
+                    UTILS_DIE("Unsupported checksum algorithm");
+                    break;
+                }
+            }
+        }
+    }
+    return len;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void FastaReference::write(util::BitWriter &writer) const {
+    ExternalReference::write(writer);
+
+    /// Only write if the content is not empty as to get the checksum_alg requires at least 1 entry
+    if (!checksums.empty()){
+        auto checksum_algo = getChecksumAlg();
+        for (auto &checksum : checksums) {
+            switch (checksum_algo) {
+                case Checksum::Algo::MD5: {
+                    dynamic_cast<Md5&>(*checksum).write(writer);
+                    break;
+                }
+                case Checksum::Algo::SHA256: {
+                    dynamic_cast<Sha256&>(*checksum).write(writer);
+                    break;
+                }
+                default: {
+                    UTILS_DIE("Unsupported checksum algorithm");
+                    break;
+                }
+            }
+        }
     }
 }
 

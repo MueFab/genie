@@ -8,11 +8,20 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <list>
-#include <map>
-#include <memory>
+#include <string>
 #include <vector>
+#include <memory>
+#include "genie/util/make-unique.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/exception.h"
+#include "genie/util/runtime-exception.h"
+#include "genie/format/mpegg_p1/file_header.h"
+#include "genie/format/mpegg_p1/util.h"
+#include "genie/format/mpegg_p1/dataset/class_description.h"
+
+#include <genie/format/mpegg_p1/dataset/dataset_header.h>
+#include "genie/format/mpegg_p1/dataset/access_unit/access_unit_header.h"
 #include "genie/core/parameter/data_unit.h"
 #include "genie/core/record/class-type.h"
 #include "genie/format/mgb/access_unit.h"
@@ -21,8 +30,6 @@
 #include "genie/format/mgb/ref_cfg.h"
 #include "genie/format/mgb/signature_cfg.h"
 #include "genie/format/mpegg_p1/dataset/access_unit/block.h"
-#include "genie/util/bitwriter.h"
-#include "genie/util/exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -85,26 +92,17 @@ class AUProtection {
 /**
  * @brief
  */
-class AccessUnit : public core::parameter::DataUnit {
+class AccessUnit {
  private:
+
+    AccessUnitHeader header;
+
     /* ----- internal ----- */
     bool block_header_flag;  //!< @brief From Dataset/BlockHeaderFlags/block_header_flag
     // already inside ref_cfg
     // uint8_t posSize;
     // already inside signature_config
     // uint8_t U_signature_size;
-
-    /* ----- access_unit_header ----- */
-    uint32_t access_unit_ID;          //!< @brief
-    uint8_t num_blocks;               //!< @brief
-    uint8_t parameter_set_ID;         //!< @brief
-    core::record::ClassType au_type;  //!< @brief
-    uint32_t reads_count;             //!< @brief
-
-    std::unique_ptr<mgb::MmCfg> mm_cfg;                   //!< @brief
-    std::unique_ptr<mgb::RefCfg> ref_cfg;                 //!< @brief
-    std::unique_ptr<mgb::AuTypeCfg> au_Type_U_Cfg;        //!< @brief
-    std::unique_ptr<mgb::SignatureCfg> signature_config;  //!< @brief
 
     /* ----- access_unit ----- */
 
@@ -114,26 +112,36 @@ class AccessUnit : public core::parameter::DataUnit {
     std::list<Block> blocks;  //!< @brief
 
  public:
-    /**
-     * @brief
-     * @param _access_unit_ID
-     * @param _parameter_set_ID
-     * @param _au_type
-     * @param _reads_count
-     * @param dataset_type
-     * @param posSize
-     * @param signatureSize
-     * @param multiple_signature_base
-     */
-    AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
-               uint32_t _reads_count, DatasetType dataset_type, uint8_t posSize, uint8_t signatureSize,
-               uint32_t multiple_signature_base);
+//    /**
+//     * @brief
+//     * @param _access_unit_ID
+//     * @param _parameter_set_ID
+//     * @param _au_type
+//     * @param _reads_count
+//     * @param dataset_type
+//     * @param posSize
+//     * @param signatureSize
+//     * @param multiple_signature_base
+//     */
+//    AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
+//               uint32_t _reads_count, DatasetType dataset_type, uint8_t posSize, uint8_t signatureSize,
+//               uint32_t multiple_signature_base);
+//
+//    /**
+//     * @brief
+//     * @param au
+//     */
+//    explicit AccessUnit(format::mgb::AccessUnit&& au);
 
     /**
-     * @brief
-     * @param au
+     *
+     * @param reader
+     * @param fhd
+     * @param start_pos
+     * @param length
      */
-    explicit AccessUnit(format::mgb::AccessUnit&& au);
+    explicit AccessUnit(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length,
+                        DatasetHeader& dhd);
 
     /**
      * @brief
@@ -158,7 +166,7 @@ class AccessUnit : public core::parameter::DataUnit {
      * @brief
      * @param writer
      */
-    void write(genie::util::BitWriter& writer) const override;
+    void write(genie::util::BitWriter& writer) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -22,6 +22,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <genie/core/constants.h>
 #include "genie/core/parameter/data_unit.h"
 #include "u_access_unit_info.h"
 
@@ -39,7 +40,7 @@ class DatasetHeader {
     /**
      * @brief
      */
-    enum class ByteOffsetSizeFlag : uint8_t {
+    enum class ByteOffsetSize : uint8_t {
         ON = 64,
         OFF = 32,
     };
@@ -47,7 +48,7 @@ class DatasetHeader {
     /**
      * @brief
      */
-    enum class Pos40SizeFlag : uint8_t {
+    enum class Pos40Size : uint8_t {
         ON = 40,
         OFF = 32,
     };
@@ -60,9 +61,9 @@ class DatasetHeader {
     uint16_t ID;
     std::string version;
     bool multiple_alignment_flag;
-    ByteOffsetSizeFlag byte_offset_size_flag;
+    ByteOffsetSize byte_offset_size_flag;
     bool non_overlapping_AU_range_flag;
-    Pos40SizeFlag pos_40_bits_flag;
+    Pos40Size pos_40_bits_flag;
     bool block_header_flag;
 
     /// Optional flags
@@ -79,7 +80,7 @@ class DatasetHeader {
     std::vector<ClassDescription> class_descs; /// num_classes, clid, num_descriptors[], descriptor_ID[][]
 
     bool parameters_update_flag;
-    uint8_t alphabet_ID;
+    core::AlphabetID alphabet_ID;
 
     UAccessUnitInfo u_access_unit_info; /// num_U_access_units, num_U_clusters, multiple_signature_base
                                         /// U_signature_size, U_signature_constant_length, U_signature_length
@@ -110,8 +111,8 @@ class DatasetHeader {
 //     * @param _alphabet_ID
 //     * @param _num_U_access_units
 //     */
-//    DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSizeFlag _byte_offset_size_flag,
-//                  bool _non_overlapping_AU_range_flag, Pos40SizeFlag _pos_40_bits_flag, bool _multiple_alignment_flag,
+//    DatasetHeader(uint8_t group_ID, uint16_t ID, ByteOffsetSize _byte_offset_size_flag,
+//                  bool _non_overlapping_AU_range_flag, Pos40Size _pos_40_bits_flag, bool _multiple_alignment_flag,
 //                  core::parameter::DataUnit::DatasetType _dataset_type, uint8_t _alphabet_ID,
 //                  uint32_t _num_U_access_units);
 
@@ -150,7 +151,7 @@ class DatasetHeader {
      * @brief
      * @return
      */
-    ByteOffsetSizeFlag getByteOffsetSizeFlag() const;
+    ByteOffsetSize getByteOffsetSizeFlag() const;
 
     /**
      *
@@ -162,7 +163,7 @@ class DatasetHeader {
      * @brief
      * @return
      */
-    Pos40SizeFlag getPos40SizeFlag() const;
+    Pos40Size getPos40SizeFlag() const;
 
     /**
      *
@@ -201,6 +202,30 @@ class DatasetHeader {
     core::parameter::DataUnit::DatasetType getDatasetType() const;
 
     /**
+     *
+     * @return
+     */
+    bool getParamUpdateFlag() const;
+
+    /**
+     *
+     * @return
+     */
+    core::AlphabetID getAlphabetID() const;
+
+    /**
+     *
+     * @return
+     */
+    const UAccessUnitInfo& getUAccessUnitInfo() const;
+
+    /**
+     *
+     * @return
+     */
+    uint32_t getNumAccessUnits() const;
+
+    /**
      * @brief
      * @return
      */
@@ -210,7 +235,7 @@ class DatasetHeader {
      * @brief
      * @param writer
      */
-    void write(genie::util::BitWriter& writer) const;
+    void write(genie::util::BitWriter& writer, bool empty_length=false) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

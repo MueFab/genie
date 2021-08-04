@@ -28,7 +28,7 @@ class MITReferenceSequenceInfo {
     uint64_t ref_start_position;  //!< @brief
     uint64_t ref_end_position;    //!< @brief
 
-    DatasetHeader::Pos40SizeFlag pos_40_flag;  //!< @brief
+    DatasetHeader::Pos40Size pos_40_flag;  //!< @brief
 
  public:
     /**
@@ -44,7 +44,7 @@ class MITReferenceSequenceInfo {
      * @param end_pos
      * @param flag
      */
-    MITReferenceSequenceInfo(uint16_t seq_id, uint64_t start_pos, uint64_t end_pos, DatasetHeader::Pos40SizeFlag flag);
+    MITReferenceSequenceInfo(uint16_t seq_id, uint64_t start_pos, uint64_t end_pos, DatasetHeader::Pos40Size flag);
 
     /**
      * @brief

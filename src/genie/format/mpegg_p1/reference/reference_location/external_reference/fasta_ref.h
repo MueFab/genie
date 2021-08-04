@@ -57,10 +57,16 @@ class FastaReference : public ExternalReference {
     Checksum::Algo getChecksumAlg() const override;
 
     /**
-     * @brief
-     * @param bit_writer
+     *
+     * @return
      */
-    void write(genie::util::BitWriter& bit_writer) const override;
+    uint64_t getLength() const override;
+
+    /**
+     * @brief
+     * @param writer
+     */
+    void write(genie::util::BitWriter& writer) const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
