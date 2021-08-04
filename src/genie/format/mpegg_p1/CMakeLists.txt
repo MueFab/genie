@@ -9,6 +9,8 @@ set(source_files
         #        dataset_header.cc
         util.cc
         dataset/access_unit/access_unit.cc
+        dataset/access_unit/access_unit_header.cc
+        dataset/access_unit/signature_cfg.cc
         dataset/access_unit/block.cc
         dataset/u_access_unit_info.cc
         #        dataset/master_index_table/access_unit_info/extended_au_info.cc
@@ -55,7 +57,8 @@ set(source_files
         label_list/label/label.cc
         label_list/label/dataset_info.cc
         label_list/label/dataset_region.cc
-        dataset/class_description.h dataset/class_description.cc dataset_group_header.h dataset_group_header.cc)
+        dataset/class_description.h dataset/class_description.cc dataset_group_header.h dataset_group_header.cc
+)
 
 add_library(genie-mpegg_p1 ${source_files})
 

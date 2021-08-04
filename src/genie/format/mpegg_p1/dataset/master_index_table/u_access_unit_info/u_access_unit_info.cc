@@ -22,8 +22,8 @@ MITUAccessUnitInfo::MITUAccessUnitInfo()
       U_cluster_signature(),
       num_signatures(0),
       datasetHeader(),
-      byte_offset_size_flag(DatasetHeader::ByteOffsetSizeFlag::OFF),
-      pos_40_size_flag(DatasetHeader::Pos40SizeFlag::OFF) {}
+      byte_offset_size_flag(DatasetHeader::ByteOffsetSize::OFF),
+      pos_40_size_flag(DatasetHeader::Pos40Size::OFF) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -35,8 +35,8 @@ MITUAccessUnitInfo::MITUAccessUnitInfo(uint32_t)
       U_cluster_signature(),
       num_signatures(0),
       datasetHeader(),
-      byte_offset_size_flag(DatasetHeader::ByteOffsetSizeFlag::OFF),
-      pos_40_size_flag(DatasetHeader::Pos40SizeFlag::OFF) {}
+      byte_offset_size_flag(DatasetHeader::ByteOffsetSize::OFF),
+      pos_40_size_flag(DatasetHeader::Pos40Size::OFF) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

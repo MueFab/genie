@@ -29,10 +29,11 @@ namespace mpegg_p1 {
  */
 class MpegReference : public ExternalReference {
  private:
-    uint8_t dataset_group_ID;  //!< @brief
-    uint16_t dataset_ID;       //!< @brief
+    uint8_t group_ID;
+    uint16_t ID;
 
     std::unique_ptr<Checksum> ref_checksum;  //!< @brief
+    std::string minor_version;
 
  public:
     /**

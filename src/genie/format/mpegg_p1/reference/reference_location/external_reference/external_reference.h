@@ -68,9 +68,9 @@ class ExternalReference {
 
     /**
      * @brief
-     * @param bitwriter
+     * @param writer
      */
-    virtual void write(genie::util::BitWriter& bitwriter) const;
+    virtual void write(genie::util::BitWriter& writer) const;
 
  private:
     Type reference_type;  //!< @brief

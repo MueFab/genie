@@ -56,6 +56,29 @@ class UAccessUnitInfo {
     UAccessUnitInfo(genie::util::BitReader& reader, FileHeader& fhd);
 
     /**
+     *
+     * @return
+     */
+    uint32_t getNumAccessUnits() const;
+
+    /**
+     *
+     * @return
+     */
+    bool getUSignatureFlag() const;
+
+    /**
+     *
+     */
+    bool getUSignatureConstantLength() const;
+
+    /**
+     *
+     * @return
+     */
+    uint8_t getUSignatureLength() const;
+
+    /**
      * @brief
      * @param base
      * @param size

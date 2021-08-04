@@ -5,10 +5,6 @@
  */
 
 #include "genie/format/mpegg_p1/dataset_group.h"
-#include <algorithm>
-#include <string>
-#include <utility>
-#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

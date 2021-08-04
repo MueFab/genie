@@ -40,12 +40,11 @@ std::string readFixedLengthChars(util::BitReader &reader, uint8_t n) {
 
 std::string readNullTerminatedStr(util::BitReader &reader) {
     std::string string;
-    char c = 0;
-    do {
-        c = reader.read<char>();
-        //        string.push_back(c);
+    char c = reader.read<char>();
+    while (c != '\0'){
         string += c;
-    } while (c);
+        c = reader.read<char>();
+    }
 
     return string;
 }
@@ -55,6 +54,10 @@ std::string readNullTerminatedStr(util::BitReader &reader) {
 void writeNullTerminatedStr(util::BitWriter &writer, const std::string &string) {
     writer.write(string);
     writer.write('\0', 8);
+}
+
+void skipRead(util::BitReader &reader, uint64_t length){
+    for (uint64_t i = 0; i<length-8-4;i++) reader.read<uint8_t>();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

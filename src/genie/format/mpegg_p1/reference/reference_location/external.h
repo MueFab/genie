@@ -32,15 +32,16 @@ namespace mpegg_p1 {
 class External : public ReferenceLocation {
  private:
     std::string ref_uri;                                    //!< @brief
+    Checksum::Algo checksum_alg;
     std::unique_ptr<ExternalReference> external_reference;  //!< @brief
 
  public:
     /**
      * @brief
-     * @param bitreader
+     * @param reader
      * @param seq_count
      */
-    explicit External(util::BitReader& bitreader, FileHeader& fhd, uint16_t seq_count);
+    explicit External(util::BitReader& reader, FileHeader& fhd, uint16_t seq_count);
 
     /**
      * @brief
@@ -62,9 +63,9 @@ class External : public ReferenceLocation {
 
     /**
      * @brief
-     * @param bitwriter
+     * @param writer
      */
-    void write(genie::util::BitWriter& bitwriter) const override;
+    void write(genie::util::BitWriter& writer) const override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

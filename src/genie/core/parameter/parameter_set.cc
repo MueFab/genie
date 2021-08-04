@@ -117,6 +117,97 @@ ParameterSet::ParameterSet()
       qv_coding_configs(0),
       parameter_set_crps() {}
 
+
+ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, util::BitReader &bitReader)
+    : DataUnit(DataUnitType::PARAMETER_SET){
+
+    parameter_set_ID = _parameter_set_ID;
+    parent_parameter_set_ID = _parent_parameter_set_ID;
+
+    dataset_type = bitReader.read<DatasetType>(4);
+    alphabet_ID = bitReader.read<AlphabetID>();
+    read_length = bitReader.read<uint32_t>(24);
+    number_of_template_segments_minus1 = bitReader.read<uint8_t>(2);
+    bitReader.read_b(6);
+    max_au_data_unit_size = bitReader.read<uint32_t>(29);
+    pos_40_bits_flag = bitReader.read<bool>(1);
+    qv_depth = bitReader.read<uint8_t>(3);
+    as_depth = bitReader.read<uint8_t>(3);
+    auto num_classes = bitReader.read<uint8_t>(4);
+    for (size_t i = 0; i < num_classes; ++i) {
+        class_IDs.push_back(bitReader.read<record::ClassType>(4));
+    }
+    for (size_t i = 0; i < getDescriptors().size(); ++i) {
+        descriptors.emplace_back(DescriptorSubseqCfg(num_classes, GenDesc(i), bitReader));
+    }
+    auto num_groups = bitReader.read<uint16_t>();
+    for (size_t i = 0; i < num_groups; ++i) {
+        rgroup_IDs.emplace_back();
+        char c = 0;
+        do {
+            c = bitReader.read<uint8_t>();
+            rgroup_IDs.back().push_back(c);
+        } while (c);
+    }
+    multiple_alignments_flag = bitReader.read<bool>(1);
+    spliced_reads_flag = bitReader.read<bool>(1);
+    multiple_signature_base = bitReader.read<uint32_t>(31);
+    if (multiple_signature_base > 0) {
+        u_signature_size = bitReader.read<uint8_t>(6);
+    }
+    for (size_t i = 0; i < num_classes; ++i) {
+        auto mode = bitReader.read<uint8_t>(4);
+        qv_coding_configs.emplace_back(GlobalCfg::getSingleton().getIndustrialPark().construct<QualityValues>(
+            mode, genie::core::GenDesc::QV, bitReader));
+    }
+    auto crps_flag = bitReader.read<bool>(1);
+    if (crps_flag) {
+        parameter_set_crps = ComputedRef(bitReader);
+    }
+    bitReader.flush();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ParameterSet::writeEncodingParams(util::BitWriter &writer) const{
+    writer.write(uint8_t(dataset_type), 4);
+    writer.write(uint8_t(alphabet_ID), 8);
+    writer.write(read_length, 24);
+    writer.write(number_of_template_segments_minus1, 2);
+    writer.write(0, 6);  // reserved_2
+    writer.write(max_au_data_unit_size, 29);
+    writer.write(static_cast<uint8_t>(pos_40_bits_flag), 1);
+    writer.write(qv_depth, 3);
+    writer.write(as_depth, 3);
+    writer.write(class_IDs.size(), 4);  // num_classes
+    for (auto &i : class_IDs) {
+        writer.write(uint8_t(i), 4);
+    }
+    for (auto &i : descriptors) {
+        i.write(writer);
+    }
+    writer.write(rgroup_IDs.size(), 16);  // num_groups
+    for (auto &i : rgroup_IDs) {
+        for (auto &j : i) {
+            writer.write(static_cast<uint8_t>(j), 8);
+        }
+        writer.write('\0', 8);  // NULL termination
+    }
+    writer.write(static_cast<uint8_t>(multiple_alignments_flag), 1);
+    writer.write(static_cast<uint8_t>(spliced_reads_flag), 1);
+    writer.write(multiple_signature_base, 31);
+    if (u_signature_size) {
+        writer.write(*u_signature_size, 6);
+    }
+    for (auto &i : qv_coding_configs) {
+        i->write(writer);
+    }
+    writer.write(static_cast<uint8_t>(static_cast<bool>(parameter_set_crps)), 1);
+    if (parameter_set_crps) {
+        parameter_set_crps->write(writer);
+    }
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ParameterSet::write(util::BitWriter &writer) const {

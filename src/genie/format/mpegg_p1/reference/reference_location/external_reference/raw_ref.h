@@ -56,6 +56,12 @@ class RawReference : public ExternalReference {
     Checksum::Algo getChecksumAlg() const override;
 
     /**
+     *
+     * @return
+     */
+    uint64_t getLength() const override;
+
+    /**
      * @brief
      * @param bitwriter
      */

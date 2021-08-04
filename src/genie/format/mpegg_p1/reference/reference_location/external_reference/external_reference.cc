@@ -33,13 +33,15 @@ ExternalReference::Type ExternalReference::getReferenceType() const { return ref
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t ExternalReference::getLength() const {
-    UTILS_DIE("This is base class");
+    /// reference_type u(8)
+    return 1;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ExternalReference::write(genie::util::BitWriter& bitwriter) const {
-    bitwriter.write((uint64_t) reference_type, 8);
+void ExternalReference::write(genie::util::BitWriter& writer) const {
+    /// reference_type u(8)
+    writer.write((uint64_t) reference_type, 8);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

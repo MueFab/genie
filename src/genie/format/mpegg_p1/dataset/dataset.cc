@@ -140,11 +140,13 @@ Dataset::Dataset(util::BitReader& reader, FileHeader& fhd, size_t start_pos, siz
 
         /// Dataset Parameter Sets
         } else if (box_key == "pars") {
-            parameter_sets.emplace_back(reader, fhd, box_start_pos, box_length);
+            /// TODO(Yeremia): src/genie/core/parameter/descriptor.cc:factory:31: Invalid DecCfgPreset
+//            parameter_sets.emplace_back(reader, fhd, box_start_pos, box_length, header);
+            skipRead(reader, box_length);
         } else if (box_key == "mitb") {
 
         } else if (box_key == "aucn") {
-
+            access_units.emplace_back(reader, fhd, box_start_pos, box_length, header);
         } else if (box_key == "dscn") {
 
         }
