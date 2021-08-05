@@ -47,11 +47,7 @@ class AccessUnitHeader{
     std::unique_ptr<SignatureCfg> signature_cfg;
 
     /* ----- internal ----- */
-//    DatasetHeader::Pos40Size pos_40_bits_flag;
-//    core::parameter::DataUnit::DatasetType dataset_type;
-//    bool MIT_flag;
-//    core::AlphabetID alphabet_ID;
-//    bool multiple_alignment_flag;
+    bool MIT_flag;
 
  public:
 
@@ -70,6 +66,17 @@ class AccessUnitHeader{
     explicit AccessUnitHeader(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length,
                               DatasetHeader& dhd);
 
+    /**
+     *
+     * @return
+     */
+    uint64_t getLength() const;
+
+    /**
+     *
+     * @param writer
+     */
+    void write(util::BitWriter& writer, bool zero_length=false) const;
 };
 }
 }

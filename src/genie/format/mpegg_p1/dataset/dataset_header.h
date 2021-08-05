@@ -235,7 +235,7 @@ class DatasetHeader {
      * @brief
      * @param writer
      */
-    void write(genie::util::BitWriter& writer, bool empty_length=false) const;
+    void write(genie::util::BitWriter& writer, bool zero_length =false) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

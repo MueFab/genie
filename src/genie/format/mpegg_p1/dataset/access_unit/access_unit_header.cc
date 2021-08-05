@@ -26,11 +26,6 @@ AccessUnitHeader::AccessUnitHeader()
 AccessUnitHeader::AccessUnitHeader(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length,
                                    DatasetHeader& dhd){
 
-//    dataset_type = dhd.getDatasetType();
-////    MIT_flag = dhd.getMITFlag();
-//    alphabet_ID = dhd.getAlphabetID();
-//    multiple_alignment_flag = dhd.getMultipleAlignmentFlag();
-
     /// access_unit_ID u(32)
     ID = reader.read<uint32_t>();
 
@@ -61,7 +56,8 @@ AccessUnitHeader::AccessUnitHeader(util::BitReader& reader, FileHeader& fhd, siz
         ref_cfg = nullptr;
     }
 
-    if (dhd.getMITFlag()){
+    MIT_flag = dhd.getMITFlag();
+    if (!MIT_flag){
         if (au_type != core::record::ClassType::CLASS_U){
             au_type_cfg = util::make_unique<format::mgb::AuTypeCfg>((uint64_t)dhd.getPos40SizeFlag(),
                                                                     dhd.getMultipleAlignmentFlag(),
@@ -74,22 +70,82 @@ AccessUnitHeader::AccessUnitHeader(util::BitReader& reader, FileHeader& fhd, siz
     }
 
     reader.flush();
-//#if ROUNDTRIP_CONSTRUCTOR
-//    std::stringstream ss;
-//    util::BitWriter tmp_writer(&ss);
-//    write(tmp_writer);
-//    tmp_writer.flush();
-//    uint64_t wlen = tmp_writer.getBitsWritten() / 8;
-//    uint64_t elen = getLength();
-//    UTILS_DIE_IF(wlen != length, "Invalid DatasetHeader write()");
-//    UTILS_DIE_IF( elen != length, "Invalid DatasetHeader getLength()");
-//#endif
+#if ROUNDTRIP_CONSTRUCTOR
+    std::stringstream ss;
+    util::BitWriter tmp_writer(&ss);
+    write(tmp_writer);
+    tmp_writer.flush();
+    uint64_t wlen = tmp_writer.getBitsWritten() / 8;
+    uint64_t elen = getLength();
+    UTILS_DIE_IF(wlen != length, "Invalid AccessUnitHeader write()");
+    UTILS_DIE_IF( elen != length, "Invalid AccessUnitHeader getLength()");
+#endif
 
-    auto x = reader.getPos() - start_pos;
     UTILS_DIE_IF(!reader.isAligned() || reader.getPos() - start_pos != length,
                  "Invalid AccessUnitHeader length!");
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint64_t AccessUnitHeader::getLength() const{
+    std::stringstream ss;
+    util::BitWriter tmp_writer(&ss);
+    write(tmp_writer, true);
+    tmp_writer.flush();
+    return tmp_writer.getBitsWritten() / 8;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void AccessUnitHeader::write(util::BitWriter& writer, bool zero_length) const{
+    // Key of KVL format
+    writer.write("auhd");
+
+    /// Length of KLV format
+    if (zero_length){
+        writer.write(0, 64);
+    } else {
+        writer.write(getLength(), 64);
+    }
+
+    /// access_unit_ID u(32)
+    writer.write(ID, 32);
+
+    /// num_blocks u(8)
+    writer.write(num_blocks, 8);
+
+    /// parameter_set_ID u(8)
+    writer.write(parameter_set_ID, 8);
+
+    /// au_type u(4)
+    writer.write((uint8_t)au_type, 4);
+
+    /// reads_count u(32)
+    writer.write(reads_count, 32);
+
+    if (au_type == core::record::ClassType::CLASS_N || au_type == core::record::ClassType::CLASS_M){
+        mm_cfg->write(writer);
+    } else {
+
+    }
+
+    /// dataset_type == 2
+    if (ref_cfg != nullptr){
+        ref_cfg->write(writer);
+    } else {
+
+    }
+
+    if (!MIT_flag){
+        if (au_type_cfg != nullptr){
+            au_type_cfg->write(writer);
+        } else {
+            signature_cfg->write(writer);
+        }
+    }
+
+    writer.flush();
+}
 
 }
 }
