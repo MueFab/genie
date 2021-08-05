@@ -191,12 +191,12 @@ uint64_t DatasetHeader::getLength() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetHeader::write(util::BitWriter& writer, bool empty_length) const {
+void DatasetHeader::write(util::BitWriter& writer, bool zero_length) const {
     /// Key of KLV format
     writer.write("dthd");
 
     /// Length of KLV format
-    if (empty_length){
+    if (zero_length){
         writer.write(0, 64);
     } else {
         writer.write(getLength(), 64);

@@ -43,12 +43,14 @@ namespace mpegg_p1 {
 class AUInformation {
  private:
     std::vector<uint8_t> AU_information_value;  //!< @brief
-
+    std::string minor_version;
+    uint8_t dataset_group_ID;
+    uint16_t dataset_ID;
  public:
     /**
      * @brief
      */
-    AUInformation();
+    AUInformation(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length);
 
     /**
      * @brief
@@ -60,7 +62,7 @@ class AUInformation {
      * @brief
      * @param bit_writer
      */
-    void write(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& writer) const;
 };
 
 /**
@@ -69,12 +71,14 @@ class AUInformation {
 class AUProtection {
  private:
     std::vector<uint8_t> AU_protection_value;  //!< @brief
-
+    std::string minor_version;
+    uint8_t dataset_group_ID;
+    uint16_t dataset_ID;
  public:
     /**
      * @brief
      */
-    AUProtection();
+    AUProtection(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length);
 
     /**
      * @brief
@@ -86,7 +90,7 @@ class AUProtection {
      * @brief
      * @param bit_writer
      */
-    void write(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& writer) const;
 };
 
 /**

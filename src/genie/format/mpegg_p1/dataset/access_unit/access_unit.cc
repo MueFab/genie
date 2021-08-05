@@ -13,46 +13,95 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
-// ---------------------------------------------------------------------------------------------------------------------
+AUInformation::AUInformation(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length)
+    : minor_version(fhd.getMinorVersion()){
 
-//AccessUnit::AccessUnit(uint32_t _access_unit_ID, uint8_t _parameter_set_ID, core::record::ClassType _au_type,
-//                       uint32_t _reads_count, core::parameter::DataUnit::DatasetType dataset_type, uint8_t posSize,
-//                       uint8_t signatureSize, uint32_t multiple_signature_base)
-//    : DataUnit(DataUnitType::ACCESS_UNIT),
-//      access_unit_ID(_access_unit_ID),
-//      num_blocks(0),
-//      parameter_set_ID(_parameter_set_ID),
-//      au_type(_au_type),
-//      reads_count(_reads_count) {
-//    if (au_type == core::record::ClassType::CLASS_N || au_type == core::record::ClassType::CLASS_M) {
-//        mm_cfg = util::make_unique<mgb::MmCfg>();
-//    }
-//    if (dataset_type == DatasetType::REFERENCE) {
-//        ref_cfg = util::make_unique<mgb::RefCfg>(posSize);
-//    }
-//    if (au_type != core::record::ClassType::CLASS_U) {
-//        au_Type_U_Cfg = util::make_unique<mgb::AuTypeCfg>(posSize);
-//    } else {
-//        if (multiple_signature_base != 0) {
-//            signature_config = util::make_unique<mgb::SignatureCfg>(0, signatureSize);
-//        }
-//    }
-//}
-//
-//// ---------------------------------------------------------------------------------------------------------------------
-//
-//AccessUnit::AccessUnit(mgb::AccessUnit&& au)
-//    : DataUnit(DataUnitType::ACCESS_UNIT),
-//      access_unit_ID(au.getID()),
-//      num_blocks(0),
-//      parameter_set_ID(au.getParameterID()),
-//      au_type(au.getClass()),
-//      reads_count(au.getReadCount()) {}
+    if (minor_version != "1900"){
+        dataset_group_ID = reader.read<uint8_t>();
+        dataset_ID = reader.read<uint16_t>();
+    }
+    for (auto ibyte=0; ibyte<length-(4+8);ibyte++){
+        AU_information_value.emplace_back(reader.read<uint8_t>());
+    }
+#if ROUNDTRIP_CONSTRUCTOR
+    std::stringstream ss;
+    util::BitWriter tmp_writer(&ss);
+    write(tmp_writer);
+    tmp_writer.flush();
+    uint64_t wlen = tmp_writer.getBitsWritten() / 8;
+    uint64_t elen = getLength();
+    UTILS_DIE_IF(wlen != length, "Invalid AUInformation write()");
+    UTILS_DIE_IF( elen != length, "Invalid AUInformation getLength()");
+#endif
+    UTILS_DIE_IF(!reader.isAligned() || reader.getPos() - start_pos != length,
+                 "Invalid AUInformation length!");
+}
+
+uint64_t AUInformation::getLength() const{
+    return AU_information_value.size();
+}
+void AUInformation::write(genie::util::BitWriter& writer) const{
+    writer.write("auin");
+
+    writer.write(getLength(), 64);
+
+    if (minor_version != "1900"){
+        writer.write(dataset_group_ID, 8);
+        writer.write(dataset_ID, 16);
+    }
+
+    for (auto& byte:AU_information_value){
+        writer.write(byte, 8);
+    }
+}
+
+AUProtection::AUProtection(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length)
+    : minor_version(fhd.getMinorVersion()){
+
+    if (minor_version != "1900"){
+        dataset_group_ID = reader.read<uint8_t>();
+        dataset_ID = reader.read<uint16_t>();
+    }
+
+    for (auto ibyte=0; ibyte<length-(4+8);ibyte++){
+        AU_protection_value.emplace_back(reader.read<uint8_t>());
+    }
+#if ROUNDTRIP_CONSTRUCTOR
+    std::stringstream ss;
+    util::BitWriter tmp_writer(&ss);
+    write(tmp_writer);
+    tmp_writer.flush();
+    uint64_t wlen = tmp_writer.getBitsWritten() / 8;
+    uint64_t elen = getLength();
+    UTILS_DIE_IF(wlen != length, "Invalid AUProtection write()");
+    UTILS_DIE_IF( elen != length, "Invalid AUProtection getLength()");
+#endif
+    UTILS_DIE_IF(!reader.isAligned() || reader.getPos() - start_pos != length,
+                 "Invalid AUProtection length!");
+}
+uint64_t AUProtection::getLength() const{
+    return AU_protection_value.size();
+}
+void AUProtection::write(genie::util::BitWriter& writer) const{
+    writer.write("aupr");
+
+    writer.write(getLength(), 64);
+
+    if (minor_version != "1900"){
+        writer.write(dataset_group_ID, 8);
+        writer.write(dataset_ID, 16);
+    }
+
+    for (auto& byte:AU_protection_value){
+        writer.write(byte, 8);
+    }
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 AccessUnit::AccessUnit(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length,
-                       DatasetHeader& dhd) {
+                       DatasetHeader& dhd)
+    : block_header_flag(dhd.getBlockHeaderFlag()){
 
     /// access_unit_header
     size_t box_start_pos = reader.getPos();
@@ -68,34 +117,22 @@ AccessUnit::AccessUnit(util::BitReader& reader, FileHeader& fhd, size_t start_po
         box_key = readKey(reader);
         box_length = reader.read<uint64_t>();
 
-//        /// reference[]
-//        if (box_key == "rfgn") {
-//            references.emplace_back(reader, fhd, box_start_pos, box_length);
-//
-//            /// reference_metadata[]
-//        } else if (box_key == "rfmd") {
-//            //TODO(Yeremia) Insert reference metadata here
-//            UTILS_DIE("TODO");
-//
-//            /// label_list
-//        } else if (box_key == "labl") {
-//            label_list = util::make_unique<LabelList>(reader, box_length);
-//
-//            /// DG_metadata
-//        } else if (box_key == "dgmd") {
-//            DG_metadata = util::make_unique<DGMetadata>(reader, box_length);
-//
-//            /// DG_protection
-//        } else if (box_key == "dgpr") {
-//            DG_protection = util::make_unique<DGProtection>(reader, box_length);
-//
-//            /// Dataset
-//        } else if (box_key == "dtcn") {
-//            datasets.emplace_back(reader, fhd, box_start_pos, box_length);
+        /// AU_information
+        if (box_key == "auin") {
+            UTILS_DIE_IF(AU_information != nullptr, "Multiple AU_information found within one access unit!");
+            AU_information = util::make_unique<AUInformation>(reader, fhd, box_start_pos, box_length);
+        /// AU_protection
+        } else if (box_key == "aupr") {
+            UTILS_DIE_IF(AU_protection != nullptr, "Multiple AU_protection found within one access unit!");
+            AU_protection = util::make_unique<AUProtection>(reader, fhd, box_start_pos, box_length);
+        }
+
+
 //        }
     } while (reader.getPos() - start_pos < length);
 
-    UTILS_DIE_IF(!reader.isAligned() || (reader.getPos() - start_pos != length), "Invalid DatasetGroup length!");
+    UTILS_DIE_IF(!reader.isAligned() || (reader.getPos() - start_pos != length),
+                 "Invalid AccessUnit length!");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
