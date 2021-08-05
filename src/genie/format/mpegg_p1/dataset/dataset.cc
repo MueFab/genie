@@ -130,25 +130,32 @@ Dataset::Dataset(util::BitReader& reader, FileHeader& fhd, size_t start_pos, siz
         box_key = readKey(reader);
         box_length = reader.read<uint64_t>();
 
-        /// Dataset Metadata
+        /// DatasetMetadata
         if (box_key == "dtmd") {
             metadata = util::make_unique<DTMetadata>(reader, fhd, box_start_pos, box_length);
 
-        /// Dataset Protection
+        /// DatasetProtection
         } else if (box_key == "dtpr") {
             protection = util::make_unique<DTProtection>(reader, fhd, box_start_pos, box_length);
 
         /// Dataset Parameter Sets
         } else if (box_key == "pars") {
             /// TODO(Yeremia): src/genie/core/parameter/descriptor.cc:factory:31: Invalid DecCfgPreset
+            /// ERROR src/genie/util/factory.impl.h:create:57: Unknown implementation in factory
 //            parameter_sets.emplace_back(reader, fhd, box_start_pos, box_length, header);
             skipRead(reader, box_length);
-        } else if (box_key == "mitb") {
 
+        /// MasterIndexTable
+        } else if (box_key == "mitb") {
+            UTILS_DIE("Not Implemented Error: DescriptorStream");
+
+        /// AccessUnit
         } else if (box_key == "aucn") {
             access_units.emplace_back(reader, fhd, box_start_pos, box_length, header);
-        } else if (box_key == "dscn") {
 
+        /// DescriptorStream
+        } else if (box_key == "dscn" && header.getBlockHeaderFlag()) {
+            UTILS_DIE("Not Implemented Error: DescriptorStream");
         }
     } while (reader.getPos() - start_pos < length);
 
@@ -192,11 +199,11 @@ uint64_t Dataset::getLength() const {
     }
 
     /// dataset_parameter_set[]
-    for (auto const& ps : parameter_sets) {
+    for (auto& ps : parameter_sets) {
         len += ps.getLength();
     }
 
-    // TODO(Raouf): Master Index Table
+    // TODO(Yeremia): Master Index Table
     // write master_index_table depending on MIT_FLAG
     // if (getBlockHeader().getMITFlag()){
     //    if (master_index_table != nullptr) {
@@ -248,7 +255,7 @@ void Dataset::write(util::BitWriter& writer) const {
         ps.write(writer);
     }
 
-    // TODO(Raouf): Master Index Table
+    // TODO(Yeremia): Master Index Table
 
     /// access_units[]
     for (auto const& ac : access_units) {

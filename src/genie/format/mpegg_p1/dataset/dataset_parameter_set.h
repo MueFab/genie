@@ -33,14 +33,14 @@ namespace mpegg_p1 {
  */
 class DatasetParameterSet: public core::parameter::ParameterSet {
  private:
+    /* ----- internal ----- */
     std::string minor_version;
+
     bool parameters_update_flag;
     uint32_t num_U_access_units;
 
     uint8_t dataset_group_ID;
     uint16_t dataset_ID;
-//    uint8_t ID;
-//    uint8_t parent_ID;
 
     bool multiple_alignment_flag;
     DatasetHeader::Pos40Size pos_40_bits_flag;

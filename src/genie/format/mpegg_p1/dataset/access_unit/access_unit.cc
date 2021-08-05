@@ -125,12 +125,33 @@ AccessUnit::AccessUnit(util::BitReader& reader, FileHeader& fhd, size_t start_po
         } else if (box_key == "aupr") {
             UTILS_DIE_IF(AU_protection != nullptr, "Multiple AU_protection found within one access unit!");
             AU_protection = util::make_unique<AUProtection>(reader, fhd, box_start_pos, box_length);
+
+        /// Handle block[i]
+        } else {
+
+            /// This needs to be done as blocks does not have Key
+            reader.flush();
+            reader.setPos(box_start_pos);
+
+            if (block_header_flag){
+                for (auto i=0; i<header.getNumBlocks(); i++){
+                    blocks.emplace_back(reader, fhd);
+                }
+            }
         }
 
-
-//        }
     } while (reader.getPos() - start_pos < length);
 
+#if ROUNDTRIP_CONSTRUCTOR
+//    std::stringstream ss;
+//    util::BitWriter tmp_writer(&ss);
+//    write(tmp_writer);
+//    tmp_writer.flush();
+//    uint64_t wlen = tmp_writer.getBitsWritten() / 8;
+    uint64_t elen = getLength();
+//    UTILS_DIE_IF(wlen != length, "Invalid AccessUnitHeader write()");
+    UTILS_DIE_IF( elen != length, "Invalid AccessUnit getLength()");
+#endif
     UTILS_DIE_IF(!reader.isAligned() || (reader.getPos() - start_pos != length),
                  "Invalid AccessUnit length!");
 }
@@ -138,53 +159,54 @@ AccessUnit::AccessUnit(util::BitReader& reader, FileHeader& fhd, size_t start_po
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t AccessUnit::getLength() const {
-//    uint64_t len = 12;  // KVL
-//
-//    len += getHeaderLength();
-//
-//    // TODO(Yeremia): Integration of part 3
-////    if (AU_information) {
-////        len += AU_information->getLength();
-////    }
-////
-////    if (AU_protection) {
-////        len += AU_protection->getLength();
-////    }
-//
-//    if (block_header_flag) {
-//        for (auto& block : blocks) {
-//            len += block.getLength();
-//        }
-//    }
-//
-//    return len;
+    uint64_t len = 12;  /// K,L
+    len += header.getLength();
+
+    if (AU_information != nullptr) {
+        len += AU_information->getLength();
+    }
+
+    /// AU_information
+    if (AU_protection != nullptr) {
+        len += AU_protection->getLength();
+    }
+
+    if (block_header_flag) {
+        for (auto& block : blocks) {
+            len += block.getLength();
+        }
+    }
+
+    return len;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AccessUnit::write(util::BitWriter& writer) const {
-    // Key of KVL format
+    /// Key of KVL format
     writer.write("aucn");
 
-    // Length of KVL format
+    /// Length of KVL format
     writer.write(getLength(), 64);
 
-//    writeHeader(writer);
-//
-//    // TODO(Yeremia): Integration of part 3
-////    if (AU_information) {
-////        AU_information->write(writer);
-////    }
-////
-////    if (AU_protection) {
-////        AU_protection->write(writer);
-////    }
-//
-//    if (block_header_flag) {
-//        for (auto& block : blocks) {
-//            block.write(writer);
-//        }
-//    }
+    /// AccessUnitHeader
+    header.write(writer);
+
+    /// AU_information
+    if (AU_information) {
+        AU_information->write(writer);
+    }
+
+    /// AU_protection
+    if (AU_protection) {
+        AU_protection->write(writer);
+    }
+
+    if (block_header_flag) {
+        for (auto& block : blocks) {
+            block.write(writer);
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

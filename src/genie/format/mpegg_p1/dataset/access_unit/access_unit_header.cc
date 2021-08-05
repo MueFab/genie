@@ -47,7 +47,6 @@ AccessUnitHeader::AccessUnitHeader(util::BitReader& reader, FileHeader& fhd, siz
         mm_cfg = nullptr;
     }
 
-//    dataset_type = dhd.getDatasetType();
     /// dataset_type == 2
     if (dhd.getDatasetType() == core::parameter::DataUnit::DatasetType::REFERENCE){
         ref_cfg = util::make_unique<format::mgb::RefCfg>((uint64_t)dhd.getPos40SizeFlag(),
@@ -84,6 +83,14 @@ AccessUnitHeader::AccessUnitHeader(util::BitReader& reader, FileHeader& fhd, siz
     UTILS_DIE_IF(!reader.isAligned() || reader.getPos() - start_pos != length,
                  "Invalid AccessUnitHeader length!");
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint32_t AccessUnitHeader::getID() const{ return ID;}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t AccessUnitHeader::getNumBlocks() const{return num_blocks;}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

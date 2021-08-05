@@ -9,11 +9,20 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <string>
 #include <list>
 #include <vector>
+#include <memory>
+#include "genie/util/make-unique.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
 #include "genie/util/exception.h"
+#include "genie/util/runtime-exception.h"
+#include "genie/format/mpegg_p1/file_header.h"
+#include "genie/format/mpegg_p1/util.h"
+#include "genie/format/mpegg_p1/dataset/class_description.h"
+
+#include <genie/format/mpegg_p1//dataset/access_unit/block_header.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -26,8 +35,7 @@ namespace mpegg_p1 {
  */
 class Block {
  private:
-    uint8_t descriptor_ID;  //!< @brief
-
+    BlockHeader header;
     std::list<uint8_t> block_payload;  //!< @brief block_payload_size (implicite), block_payload[]
 
  public:
@@ -35,20 +43,7 @@ class Block {
      * @brief
      * @param reader
      */
-    explicit Block(util::BitReader& reader);
-
-    /**
-     * @brief
-     * @param _desc_ID
-     * @param _block_payload
-     */
-    explicit Block(uint8_t _desc_ID, std::list<uint8_t>& _block_payload);
-
-    /**
-     * @brief
-     * @return
-     */
-    uint8_t getDescID() const;
+    explicit Block(util::BitReader &reader, FileHeader& fhd);
 
     /**
      * @brief
@@ -61,18 +56,6 @@ class Block {
      * @return
      */
     const std::list<uint8_t>& getPayload() const;
-
-    /**
-     * @brief
-     * @return
-     */
-    uint64_t getHeaderLength() const;
-
-    /**
-     * @brief
-     * @param writer
-     */
-    void writeHeader(util::BitWriter& writer) const;
 
     /**
      * @brief

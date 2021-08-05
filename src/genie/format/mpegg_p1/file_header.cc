@@ -38,8 +38,7 @@ FileHeader::FileHeader(genie::util::BitReader& bitreader):
     std::string f_major_brand(readFixedLengthChars(bitreader, 6));
     UTILS_DIE_IF(f_major_brand != major_brand, "Invalid major_brand in file header");
 
-    minor_version = readFixedLengthChars(bitreader, 4).c_str();
-//    auto read_minor_version = readFixedLengthChars(bitreader, 4).c_str();
+    minor_version = readFixedLengthChars(bitreader, 4);
 
     for (uint32_t i = 0; i<num_compatible_brands; i++){
         compatible_brand.emplace_back(readFixedLengthChars(bitreader, 4));
@@ -71,11 +70,11 @@ void FileHeader::addCompatibleBrand(const std::string& brand) { compatible_brand
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const char* FileHeader::getMajorBrand() const { return major_brand; }
+const std::string& FileHeader::getMajorBrand() const { return major_brand; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const char* FileHeader::getMinorVersion() const { return minor_version; }
+const std::string& FileHeader::getMinorVersion() const { return minor_version; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

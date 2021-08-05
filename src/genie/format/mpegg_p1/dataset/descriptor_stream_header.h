@@ -9,10 +9,20 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
+#include <memory>
+#include <string>
 #include <vector>
+#include "genie/format/mpegg_p1/file_header.h"
+#include "genie/format/mpegg_p1/util.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/util/exception.h"
+#include "genie/util/make-unique.h"
+#include "genie/util/runtime-exception.h"
+#include <genie/format/mpegg_p1/file_header.h>
+
+#include <genie/core/constants.h>
+#include <genie/core/record/class-type.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,19 +35,19 @@ namespace mpegg_p1 {
  */
 class DescriptorStreamHeader {
  private:
-    uint8_t reserved;  //!< @brief u(1)
+    /* ----- internal ----- */
+    std::string minor_version;
 
-    uint8_t descriptor_ID;  //!< @brief u(7)
-
-    uint8_t class_ID;  //!< @brief u(4)
-
-    uint32_t num_blocks;  //!< @brief u(32)
+    uint8_t descriptor_ID;
+    core::record::ClassType class_ID;
+    uint32_t num_blocks;
 
  public:
     /**
      * @brief Default
      */
     DescriptorStreamHeader();
+
     /**
      * @brief
      * @param _res
@@ -45,13 +55,13 @@ class DescriptorStreamHeader {
      * @param _class_ID
      * @param _num_blocks
      */
-    explicit DescriptorStreamHeader(uint8_t _res, uint8_t _descriptor_ID, uint8_t _class_ID, uint32_t _num_blocks);
+//    explicit DescriptorStreamHeader(uint8_t _res, uint8_t _descriptor_ID, uint8_t _class_ID, uint32_t _num_blocks);
 
     /**
      * @brief
      * @param bit_reader
      */
-    explicit DescriptorStreamHeader(util::BitReader& bit_reader);
+    explicit DescriptorStreamHeader(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length);
 
     /**
      * @brief
@@ -61,9 +71,9 @@ class DescriptorStreamHeader {
 
     /**
      * @brief
-     * @param bit_writer
+     * @param writer
      */
-    void write(genie::util::BitWriter& bit_writer) const;
+    void write(genie::util::BitWriter& writer, bool zero_length=false) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

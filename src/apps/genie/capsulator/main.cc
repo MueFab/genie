@@ -32,18 +32,7 @@ ErrorCode decapsulate(ProgramOptions& options){
 
     genie::format::mpegg_p1::MpeggFile mpegg_file(bitreader);
 
-//    while (true){
-//        std::string key = genie::format::mpegg_p1::readKey(bitreader);
-//        if (key == "flhd"){
-//            auto fh = genie::format::mpegg_p1::FileHeader(bitreader);
-//        } else if (key == "dgcn") {
-//            auto ds_group = genie::format::mpegg_p1::DatasetGroup(bitreader);
-//        } else {
-//            UTILS_DIE("Invalid box");
-//        }
-//    }
-
-
+    return ErrorCode::success;
 }
 
 int main(int argc, char* argv[]) {
