@@ -119,8 +119,12 @@ ParameterSet::ParameterSet()
 
 
 ParameterSet::ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, util::BitReader &bitReader)
-    : DataUnit(DataUnitType::PARAMETER_SET){
+    : DataUnit(DataUnitType::PARAMETER_SET) {
 
+//    bitReader.read<uint16_t>(10);  // ISO 23092-2 Section 3.1 table 3
+//    bitReader.read<uint32_t>(22);
+//    parameter_set_ID = bitReader.read<uint8_t>();
+//    parent_parameter_set_ID = bitReader.read<uint8_t>();
     parameter_set_ID = _parameter_set_ID;
     parent_parameter_set_ID = _parent_parameter_set_ID;
 

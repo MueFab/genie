@@ -5,9 +5,6 @@
  */
 
 #include "genie/format/mpegg_p1/dataset/descriptor_stream.h"
-#include <string>
-#include "genie/format/mpegg_p1/util.h"
-#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -64,28 +61,38 @@ void DSProtection::write(genie::util::BitWriter& bit_writer) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorStream::DescriptorStream() : descriptor_stream_header(), DS_protection(), block_payload() {}
+DescriptorStream::DescriptorStream() : header(), DS_protection(), block_payload() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DescriptorStream::DescriptorStream(genie::util::BitReader& bit_reader, size_t length) {
-    std::string key = readKey(bit_reader);
-    UTILS_DIE_IF(key != "dscn", "DescriptorStream is not Found");
+DescriptorStream::DescriptorStream(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length)
+    : minor_version(fhd.getMinorVersion()){
 
-    size_t start_pos = bit_reader.getPos();
+    /// access_unit_header
+    size_t box_start_pos = reader.getPos();
+    std::string box_key = readKey(reader);
+    auto box_length = reader.read<uint64_t>();
+    UTILS_DIE_IF(box_key != "dshd",
+                 "DescriptorStreamHeader is not found!");
 
-    /// descriptor_stream_header
-    descriptor_stream_header = DescriptorStreamHeader(bit_reader);
-    /// DS_protection
-    auto DS_length = bit_reader.read<size_t>();
-    DS_protection = DSProtection(bit_reader, DS_length);
+    header = DescriptorStreamHeader(reader, fhd, box_start_pos, box_length);
 
-    /// block_payload
-    for (auto& data : block_payload) {
-        data = bit_reader.read<uint8_t>();
-    }
+    do {
+        /// Read K,L of KLV
+        box_start_pos = reader.getPos();
+        box_key = readKey(reader);
+        box_length = reader.read<uint64_t>();
 
-    UTILS_DIE_IF(bit_reader.getPos() - start_pos != length, "Invalid DescriptorStream length!");
+        /// AU_information
+        if (box_key == "auin") {
+
+        } else if (box_key == "aupr") {
+
+        } else {
+
+        }
+
+    } while (reader.getPos() - start_pos < length);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -94,10 +101,10 @@ uint64_t DescriptorStream::getLength() const {
     /// Key c(4) Length u(64)
     uint64_t len = (4 * sizeof(char) + 8);  // gen_info
 
-    // descriptor_stream_header
-    len += descriptor_stream_header.getLength();
+    /// descriptor_stream_header
+    len += header.getLength();
 
-    // DS_protection
+    /// DS_protection
     len += DS_protection.getLength();
 
     // block_payload
@@ -115,13 +122,13 @@ void DescriptorStream::write(util::BitWriter& bit_writer) const {
     /// Length of KLV format
     bit_writer.write(getLength(), 64);
 
-    // descriptor_stream_header
-    descriptor_stream_header.write(bit_writer);
+    /// descriptor_stream_header
+    header.write(bit_writer);
 
-    // DS_protection
+    /// DS_protection
     DS_protection.write(bit_writer);
 
-    // block_payload
+    /// block_payload
     for (auto& data : block_payload) {
         bit_writer.write(data, 8);
     }

@@ -4,6 +4,7 @@ set(source_files
         mpegg_file.cc
         file_header.cc
         dataset_group.cc
+        dataset_group_header.cc
         #        dataset/access_unit_p1.cc
         #        dataset.cc
         #        dataset_header.cc
@@ -21,6 +22,7 @@ set(source_files
         dataset/dataset.cc
         dataset/dataset_header.cc
         dataset/dataset_parameter_set.cc
+        dataset/access_unit/block_header.cc
         dataset/descriptor_stream.cc
         dataset/descriptor_stream_header.cc
 
@@ -57,8 +59,8 @@ set(source_files
         label_list/label/label.cc
         label_list/label/dataset_info.cc
         label_list/label/dataset_region.cc
-        dataset/class_description.h dataset/class_description.cc dataset_group_header.h dataset_group_header.cc
-)
+        dataset/class_description.cc
+        )
 
 add_library(genie-mpegg_p1 ${source_files})
 

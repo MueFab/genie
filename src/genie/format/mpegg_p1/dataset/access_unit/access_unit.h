@@ -9,6 +9,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <string>
+#include <list>
 #include <vector>
 #include <memory>
 #include "genie/util/make-unique.h"
@@ -22,13 +23,13 @@
 
 #include <genie/format/mpegg_p1/dataset/dataset_header.h>
 #include "genie/format/mpegg_p1/dataset/access_unit/access_unit_header.h"
-#include "genie/core/parameter/data_unit.h"
-#include "genie/core/record/class-type.h"
-#include "genie/format/mgb/access_unit.h"
-#include "genie/format/mgb/au_type_cfg.h"
-#include "genie/format/mgb/mm_cfg.h"
-#include "genie/format/mgb/ref_cfg.h"
-#include "genie/format/mgb/signature_cfg.h"
+//#include "genie/core/parameter/data_unit.h"
+//#include "genie/core/record/class-type.h"
+//#include "genie/format/mgb/access_unit.h"
+//#include "genie/format/mgb/au_type_cfg.h"
+//#include "genie/format/mgb/mm_cfg.h"
+//#include "genie/format/mgb/ref_cfg.h"
+//#include "genie/format/mgb/signature_cfg.h"
 #include "genie/format/mpegg_p1/dataset/access_unit/block.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -42,7 +43,7 @@ namespace mpegg_p1 {
  */
 class AUInformation {
  private:
-    std::vector<uint8_t> AU_information_value;  //!< @brief
+    std::list<uint8_t> AU_information_value;  //!< @brief
     std::string minor_version;
     uint8_t dataset_group_ID;
     uint16_t dataset_ID;
@@ -70,7 +71,7 @@ class AUInformation {
  */
 class AUProtection {
  private:
-    std::vector<uint8_t> AU_protection_value;  //!< @brief
+    std::list<uint8_t> AU_protection_value;  //!< @brief
     std::string minor_version;
     uint8_t dataset_group_ID;
     uint16_t dataset_ID;
@@ -103,10 +104,6 @@ class AccessUnit {
 
     /* ----- internal ----- */
     bool block_header_flag;  //!< @brief From Dataset/BlockHeaderFlags/block_header_flag
-    // already inside ref_cfg
-    // uint8_t posSize;
-    // already inside signature_config
-    // uint8_t U_signature_size;
 
     /* ----- access_unit ----- */
 

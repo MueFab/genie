@@ -9,13 +9,21 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <cstdint>
-#include <list>
+#include <genie/format/mpegg_p1/file_header.h>
+#include <memory>
+#include <string>
 #include <vector>
-#include "genie/core/access-unit.h"
-#include "genie/format/mpegg_p1/dataset/descriptor_stream_header.h"
+#include <list>
+#include "descriptor_stream_header.h"
+#include "genie/format/mpegg_p1/file_header.h"
+#include "genie/format/mpegg_p1/util.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/util/exception.h"
+#include "genie/util/make-unique.h"
+#include "genie/util/runtime-exception.h"
+
+#include <genie/format/mpegg_p1/dataset/descriptor_stream_header.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -60,10 +68,11 @@ class DSProtection {
  */
 class DescriptorStream {
  private:
-    DescriptorStreamHeader descriptor_stream_header;  //!< @brief ISO 23092-1 Section 6.6.4.2
+    /* ----- internal ----- */
+    std::string minor_version;
 
+    DescriptorStreamHeader header;  //!< @brief ISO 23092-1 Section 6.6.4.2
     DSProtection DS_protection;  //!< @brief ISO 23092-1 Section 6.6.4.3
-
     std::list<uint8_t> block_payload;  //!< @brief ISO 23092-2
 
  public:
@@ -77,7 +86,7 @@ class DescriptorStream {
      * @param bit_reader
      * @param length
      */
-    DescriptorStream(genie::util::BitReader& bit_reader, size_t length);
+    DescriptorStream(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length);
 
     /**
      * @brief

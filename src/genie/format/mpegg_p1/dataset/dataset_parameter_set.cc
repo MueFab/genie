@@ -24,22 +24,22 @@ namespace mpegg_p1 {
 // ---------------------------------------------------------------------------------------------------------------------
 
 DatasetParameterSet::DatasetParameterSet(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length,
-                                         DatasetHeader& dthd):
-    parameters_update_flag(dthd.getParamUpdateFlag()),
-    num_U_access_units(dthd.getNumAccessUnits()),
-    minor_version(fhd.getMinorVersion()),
-    dataset_group_ID(reader.read<uint8_t>()),
-    dataset_ID(reader.read<uint16_t>()),
-    multiple_alignment_flag(0),
-    pos_40_bits_flag(DatasetHeader::Pos40Size::OFF),
-    alphabet_ID(0),
-    U_signature_flag(0),
-    U_signature_constant_length(0),
-    U_signature_length(0)
-{
+                                         DatasetHeader& dthd)
+    : core::parameter::ParameterSet(),
+      minor_version(fhd.getMinorVersion()),
+      parameters_update_flag(dthd.getParamUpdateFlag()),
+      num_U_access_units(dthd.getNumAccessUnits()),
+      dataset_group_ID(reader.read<uint8_t>()),
+      dataset_ID(reader.read<uint16_t>()),
+      multiple_alignment_flag(false),
+      pos_40_bits_flag(DatasetHeader::Pos40Size::OFF),
+      alphabet_ID(),
+      U_signature_flag(0),
+      U_signature_constant_length(0),
+      U_signature_length(0) {
 
-    auto _parameter_set_ID = reader.read<uint16_t>();
-    auto _parent_parameter_set_ID(reader.read<uint16_t>());
+    auto _parameter_set_ID = reader.read<uint8_t>();
+    auto _parent_parameter_set_ID(reader.read<uint8_t>());
 
     if (minor_version != "1900" && parameters_update_flag){
         multiple_alignment_flag = reader.read<bool>(1);

@@ -65,14 +65,14 @@ class ParameterSet : public DataUnit {
 
     /**
      *
-     */
-    ParameterSet();
-
-    /**
-     *
      * @param bitReader
      */
     ParameterSet(uint8_t _parameter_set_ID, uint8_t _parent_parameter_set_ID, util::BitReader &bitReader);
+
+    /**
+     *
+     */
+    ParameterSet();
 
     /**
      *

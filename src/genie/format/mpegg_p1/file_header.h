@@ -53,13 +53,13 @@ class FileHeader {
      * @brief
      * @return
      */
-    const char* getMajorBrand() const;
+    const std::string& getMajorBrand() const;
 
     /**
      * @brief
      * @return
      */
-    const char* getMinorVersion() const;
+    const std::string& getMinorVersion() const;
 
     /**
      * @brief
@@ -76,8 +76,8 @@ class FileHeader {
  private:
 //    const char* const major_brand = "MPEG-G";   //!< @brief
 //    const char* const minor_version = "2000";     //!< @brief @FIXME: 19 or 20?
-    const char* const major_brand = "MPEG-G";   //!< @brief
-    const char* minor_version = "2000";     //!< @brief @FIXME: 19 or 20?
+    std::string major_brand = "MPEG-G";   //!< @brief
+    std::string minor_version = "2000";     //!< @brief @FIXME: 19 or 20?
     std::vector<std::string> compatible_brand;  //!< @brief
 };
 

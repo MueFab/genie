@@ -70,6 +70,18 @@ class AccessUnitHeader{
      *
      * @return
      */
+    uint32_t getID() const;
+
+    /**
+     *
+     * @return
+     */
+    uint8_t getNumBlocks() const;
+
+    /**
+     *
+     * @return
+     */
     uint64_t getLength() const;
 
     /**
