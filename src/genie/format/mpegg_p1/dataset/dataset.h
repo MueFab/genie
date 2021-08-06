@@ -11,6 +11,7 @@
 
 #include <string>
 #include <vector>
+#include <list>
 #include <memory>
 #include "genie/util/make-unique.h"
 #include "genie/util/bitreader.h"
@@ -126,7 +127,8 @@ class Dataset {
 
     std::unique_ptr<DTProtection> protection;  //!< @brief ISO 23092-1 Section 6.5.2.4 - specification 23092-3
 
-    std::vector<DatasetParameterSet> parameter_sets;  //!< @brief ISO 23092-1 Section 6.5.2.5 - specification 23092-2
+//    std::vector<DatasetParameterSet> parameter_sets;  //!< @brief ISO 23092-1 Section 6.5.2.5 - specification 23092-2
+    std::vector<std::list<uint8_t>> parameter_sets;
 
     std::vector<AccessUnit> access_units;  //!< @brief ISO 23092-1 Section 6.5.3
 

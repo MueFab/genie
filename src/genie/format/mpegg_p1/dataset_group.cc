@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mpegg_p1/dataset_group.h"
+#include <sstream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -128,8 +129,7 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, FileHeader& fhd, size_t star
 
         /// reference_metadata[]
         } else if (box_key == "rfmd") {
-            //TODO(Yeremia) Insert reference metadata here
-            UTILS_DIE("TODO");
+            reference_metadata.emplace_back(reader, fhd, box_start_pos, box_length);
 
         /// label_list
         } else if (box_key == "labl") {
@@ -148,6 +148,17 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, FileHeader& fhd, size_t star
             datasets.emplace_back(reader, fhd, box_start_pos, box_length);
         }
     } while (reader.getPos() - start_pos < length);
+
+#if ROUNDTRIP_CONSTRUCTOR
+    std::stringstream ss;
+    util::BitWriter tmp_writer(&ss);
+    write(tmp_writer);
+    tmp_writer.flush();
+    uint64_t wlen = tmp_writer.getBitsWritten() / 8;
+    uint64_t elen = getLength();
+    UTILS_DIE_IF(wlen != length, "Invalid DatasetGroup write()");
+    UTILS_DIE_IF( elen != length, "Invalid DatasetGroup getLength()");
+#endif
 
     UTILS_DIE_IF(!reader.isAligned() || (reader.getPos() - start_pos != length), "Invalid DatasetGroup length!");
 }

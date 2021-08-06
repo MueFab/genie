@@ -5,8 +5,7 @@
  */
 
 #include "genie/format/mpegg_p1/dataset/dataset.h"
-#include <string>
-#include <utility>
+#include <sstream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -25,6 +24,7 @@ DTMetadata::DTMetadata(std::vector<uint8_t>&& _DT_metadata_value) : DT_metadata_
 // ---------------------------------------------------------------------------------------------------------------------
 
 DTMetadata::DTMetadata(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length): DT_metadata_value() {
+
     UTILS_DIE_IF(!reader.isAligned() || reader.getPos() - start_pos != length,
                  "Invalid dataset metadata length!");
 }
@@ -143,7 +143,9 @@ Dataset::Dataset(util::BitReader& reader, FileHeader& fhd, size_t start_pos, siz
             /// TODO(Yeremia): src/genie/core/parameter/descriptor.cc:factory:31: Invalid DecCfgPreset
             /// ERROR src/genie/util/factory.impl.h:create:57: Unknown implementation in factory
 //            parameter_sets.emplace_back(reader, fhd, box_start_pos, box_length, header);
-            skipRead(reader, box_length);
+//            skipRead(reader, box_length);
+            parameter_sets.emplace_back();
+            readRawBox(parameter_sets.back(), reader, box_start_pos, box_length);
 
         /// MasterIndexTable
         } else if (box_key == "mitb") {
@@ -159,6 +161,16 @@ Dataset::Dataset(util::BitReader& reader, FileHeader& fhd, size_t start_pos, siz
         }
     } while (reader.getPos() - start_pos < length);
 
+#if ROUNDTRIP_CONSTRUCTOR
+    std::stringstream ss;
+    util::BitWriter tmp_writer(&ss);
+    write(tmp_writer);
+    tmp_writer.flush();
+    uint64_t wlen = tmp_writer.getBitsWritten() / 8;
+    uint64_t elen = getLength();
+    UTILS_DIE_IF(wlen != length, "Invalid Dataset write()");
+    UTILS_DIE_IF( elen != length, "Invalid Dataset getLength()");
+#endif
     UTILS_DIE_IF(!reader.isAligned() || reader.getPos() - start_pos != length,
                  "Invalid Dataset length!");
 }
@@ -169,7 +181,7 @@ DatasetHeader& Dataset::getHeader() { return header; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<DatasetParameterSet>& Dataset::getParameterSets() { return parameter_sets; }
+//std::vector<DatasetParameterSet>& Dataset::getParameterSets() { return parameter_sets; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -199,8 +211,9 @@ uint64_t Dataset::getLength() const {
     }
 
     /// dataset_parameter_set[]
-    for (auto& ps : parameter_sets) {
-        len += ps.getLength();
+    for (auto const& ps : parameter_sets) {
+//        len += ps.getLength();
+        len += ps.size();
     }
 
     // TODO(Yeremia): Master Index Table
@@ -252,7 +265,8 @@ void Dataset::write(util::BitWriter& writer) const {
 
     /// dataset_parameter_set[]
     for (auto const& ps : parameter_sets) {
-        ps.write(writer);
+//        ps.write(writer);
+        writeRawBox(ps, writer);
     }
 
     // TODO(Yeremia): Master Index Table

@@ -143,13 +143,13 @@ AccessUnit::AccessUnit(util::BitReader& reader, FileHeader& fhd, size_t start_po
     } while (reader.getPos() - start_pos < length);
 
 #if ROUNDTRIP_CONSTRUCTOR
-//    std::stringstream ss;
-//    util::BitWriter tmp_writer(&ss);
-//    write(tmp_writer);
-//    tmp_writer.flush();
-//    uint64_t wlen = tmp_writer.getBitsWritten() / 8;
+    std::stringstream ss;
+    util::BitWriter tmp_writer(&ss);
+    write(tmp_writer);
+    tmp_writer.flush();
+    uint64_t wlen = tmp_writer.getBitsWritten() / 8;
     uint64_t elen = getLength();
-//    UTILS_DIE_IF(wlen != length, "Invalid AccessUnitHeader write()");
+    UTILS_DIE_IF(wlen != length, "Invalid AccessUnit write()");
     UTILS_DIE_IF( elen != length, "Invalid AccessUnit getLength()");
 #endif
     UTILS_DIE_IF(!reader.isAligned() || (reader.getPos() - start_pos != length),
