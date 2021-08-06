@@ -10,8 +10,14 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <string>
+#include <vector>
+#include <list>
+#include <memory>
+#include "genie/util/make-unique.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/util/exception.h"
+#include "genie/util/runtime-exception.h"
 
 #define ROUNDTRIP_CONSTRUCTOR true
 
@@ -50,6 +56,10 @@ std::string readNullTerminatedStr(util::BitReader &reader);
 void writeNullTerminatedStr(util::BitWriter &writer, const std::string &string);
 
 void skipRead(util::BitReader &reader, uint64_t length);
+
+void readRawBox(std::list<uint8_t>& box, util::BitReader& reader, size_t start_pos, size_t length);
+
+void writeRawBox(const std::list<uint8_t>& box, util::BitWriter& writer);
 
 // ---------------------------------------------------------------------------------------------------------------------
 

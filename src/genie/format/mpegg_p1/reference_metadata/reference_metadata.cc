@@ -5,8 +5,6 @@
  */
 
 #include "genie/format/mpegg_p1/reference_metadata/reference_metadata.h"
-#include "genie/util/exception.h"
-#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -16,12 +14,29 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ReferenceMetadata::ReferenceMetadata() : dataset_group_ID(0), reference_ID(0) {}
+ReferenceMetadata::ReferenceMetadata() : dataset_group_ID(0), ID(0), values() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 ReferenceMetadata::ReferenceMetadata(uint8_t _ds_group_ID, uint8_t _ref_ID)
-    : dataset_group_ID(_ds_group_ID), reference_ID(_ref_ID) {}
+    : dataset_group_ID(_ds_group_ID), ID(_ref_ID), values() {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+ReferenceMetadata::ReferenceMetadata(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length){
+    dataset_group_ID = reader.read<uint8_t>();
+    ID = reader.read<uint8_t>();
+
+    auto reference_metadata_value_length = length-(4+8)-2; /// K, L, dataset_groupID, ID
+    values.resize(reference_metadata_value_length);
+
+    for (auto& v: values){
+        v = reader.read<uint8_t>();
+    }
+
+    UTILS_DIE_IF(!reader.isAligned() || reader.getPos() - start_pos != length,
+                 "Invalid ReferenceMetadata length!");
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -40,7 +55,7 @@ uint64_t ReferenceMetadata::getLength() const {
     len += 1;
 
     // reference_metadata_value()
-    //    len += reference_metadata_value.size();
+    len += values.size();
 
     return len;
 }
@@ -60,11 +75,11 @@ void ReferenceMetadata::write(genie::util::BitWriter& bit_writer) const {
     bit_writer.write(dataset_group_ID, 8);
 
     // reference_ID u(8)
-    bit_writer.write(reference_ID, 8);
+    bit_writer.write(ID, 8);
 
-    //    for (auto val: reference_metadata_value){
-    //        bit_writer.write(val, 8);
-    //    }
+    for (auto v: values){
+        bit_writer.write(v, 8);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
