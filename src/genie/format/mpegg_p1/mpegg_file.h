@@ -26,6 +26,10 @@ namespace mpegg_p1 {
  * @brief
  */
 class MpeggFile {
+ private:
+    FileHeader fileHeader;
+    std::vector<DatasetGroup> ds_groups;
+
  public:
     /**
      * @brief
@@ -57,10 +61,6 @@ class MpeggFile {
      * @param bitWriter
      */
     void writeToFile(genie::util::BitWriter& bitWriter) const;
-
- private:
-    FileHeader fileHeader;                    //!< @brief
-    std::vector<DatasetGroup> datasetGroups;  //!< @brief
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

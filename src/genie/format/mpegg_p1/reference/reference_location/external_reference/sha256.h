@@ -11,6 +11,7 @@
 
 #include <array>
 #include <vector>
+#include <list>
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/checksum.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
@@ -28,7 +29,7 @@ namespace mpegg_p1 {
  */
 class Sha256 : public Checksum {
  private:
-    std::array<uint64_t, 4> data;  //!< @brief
+    std::list<uint64_t> data;  //!< @brief
 
  public:
     /**
@@ -46,7 +47,7 @@ class Sha256 : public Checksum {
      * @brief
      * @param _data
      */
-    explicit Sha256(std::vector<uint64_t>& _data);
+//    explicit Sha256(std::vector<uint64_t>& _data);
 
     /**
      *

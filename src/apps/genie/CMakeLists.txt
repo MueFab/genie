@@ -7,7 +7,10 @@ set(source_files
         transcode-fastq/main.cc
         transcode-fastq/program-options.cc
         capsulator/program-options.cc
-        capsulator/main.cc)
+        capsulator/main.cc
+        conformance/program-options.cc
+        conformance/main.cc
+)
 
 add_executable(genie ${source_files})
 

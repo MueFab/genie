@@ -36,6 +36,12 @@ class RawReference : public ExternalReference {
     RawReference();
 
     /**
+     *
+     * @param _checksums
+     */
+    RawReference(const std::vector<std::unique_ptr<Checksum>>& _checksums);
+
+    /**
      * @brief
      * @param reader
      * @param checksum_alg
@@ -44,10 +50,10 @@ class RawReference : public ExternalReference {
     RawReference(util::BitReader& reader, FileHeader& fhd, Checksum::Algo checksum_alg, uint16_t seq_count);
 
     /**
-     * @brief
-     * @param _checksums
+     *
+     * @return
      */
-//    explicit RawReference(std::vector<std::unique_ptr<Checksum>>&& _checksums);
+    std::unique_ptr<ExternalReference> clone() const override;
 
     /**
      * @brief

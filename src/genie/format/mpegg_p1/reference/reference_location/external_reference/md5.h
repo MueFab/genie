@@ -11,6 +11,7 @@
 
 #include <array>
 #include <vector>
+#include <list>
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/checksum.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
@@ -28,7 +29,7 @@ namespace mpegg_p1 {
  */
 class Md5 : public Checksum {
  private:
-    std::array<uint64_t, 2> data;  //!< @brief
+    std::list<uint64_t> data;  //!< @brief
 
  public:
     /**
@@ -46,7 +47,7 @@ class Md5 : public Checksum {
      * @brief Initialize MD5 from array
      * @param _data
      */
-    explicit Md5(std::vector<uint64_t>& _data);
+//    explicit Md5(std::vector<uint64_t>& _data);
 
     /**
      *

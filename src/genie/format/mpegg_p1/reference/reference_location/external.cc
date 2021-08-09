@@ -5,16 +5,29 @@
  */
 
 #include "genie/format/mpegg_p1/reference/reference_location/external.h"
-#include "genie/format/mpegg_p1/util.h"
-#include "genie/util/exception.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
 namespace format {
 namespace mpegg_p1 {
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+External::External(): ReferenceLocation(ReferenceLocation::Flag::EXTERNAL),
+                       ref_uri(), checksum_alg(Checksum::Algo::UNKNOWN), external_reference(nullptr){}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+External::External(const External& other){*this = other; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+External::External(std::string& _ref_uri, Checksum::Algo _checksum_alg, std::unique_ptr<ExternalReference> _ext_ref)
+    : ReferenceLocation(ReferenceLocation::Flag::EXTERNAL),
+      ref_uri(_ref_uri),
+      checksum_alg(_checksum_alg),
+      external_reference(std::move(_ext_ref)){}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -48,12 +61,30 @@ External::External(util::BitReader& reader, FileHeader& fhd, uint16_t seq_count)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+External& External::operator=(const External& other) {
+//    if (this == &container) {
+//        return *this;
+//    }
+    this->ref_uri = other.ref_uri;
+    this->checksum_alg = other.checksum_alg;
+
+    this->external_reference = other.external_reference->clone();
+
+    return *this;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::string External::getRefUri() const { return ref_uri; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 Checksum::Algo External::getChecksumAlg() const {
     return external_reference->getChecksumAlg();
+}
+
+ExternalReference& External::getExternalRef() const{
+    return *(external_reference.get());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -66,7 +97,7 @@ uint64_t External::getLength() const {
 
     len += 1; /// checksum_alg u(8)
 
-    switch (external_reference->getReferenceType()){
+    switch (external_reference->getType()){
         case (ExternalReference::Type::MPEGG_REF):
             len += dynamic_cast<MpegReference&>(*external_reference).getLength();
             break;
@@ -97,7 +128,7 @@ void External::write(util::BitWriter& writer) const {
     writer.write((uint8_t)checksum_alg, 8);
 
     /// reference_type u(8), external_dataset_group_ID, external_dataset_ID, ref_checksum or checksum[seqID]
-    switch (external_reference->getReferenceType()){
+    switch (external_reference->getType()){
         case (ExternalReference::Type::MPEGG_REF):
             dynamic_cast<MpegReference&>(*external_reference).write(writer);
             break;

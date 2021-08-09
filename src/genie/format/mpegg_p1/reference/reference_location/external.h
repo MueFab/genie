@@ -9,16 +9,23 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <memory>
 #include <string>
+#include <vector>
+#include <memory>
+#include "genie/util/make-unique.h"
+#include "genie/util/bitreader.h"
+#include "genie/util/bitwriter.h"
+#include "genie/util/exception.h"
+#include "genie/util/runtime-exception.h"
 #include "genie/format/mpegg_p1/file_header.h"
+#include "genie/format/mpegg_p1/util.h"
+#include "genie/format/mpegg_p1/dataset/class_description.h"
+
+#include "genie/format/mpegg_p1/reference/reference_location/reference_location.h"
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/external_reference.h"
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/fasta_ref.h"
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/mpegg_ref.h"
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/raw_ref.h"
-#include "genie/format/mpegg_p1/reference/reference_location/reference_location.h"
-#include "genie/util/bitreader.h"
-#include "genie/util/bitwriter.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -36,12 +43,32 @@ class External : public ReferenceLocation {
     std::unique_ptr<ExternalReference> external_reference;  //!< @brief
 
  public:
+
+    External();
+
+    External(const genie::format::mpegg_p1::External& other);
+
     /**
      * @brief
      * @param reader
      * @param seq_count
      */
-    explicit External(util::BitReader& reader, FileHeader& fhd, uint16_t seq_count);
+    External(util::BitReader& reader, FileHeader& fhd, uint16_t seq_count);
+
+    /**
+     *
+     * @param _ref_uri
+     * @param _checksum_alg
+     * @param _ext_ref
+     */
+    External(std::string& _ref_uri, Checksum::Algo _checksum_alg, std::unique_ptr<ExternalReference> _ext_ref);
+
+    /**
+     *
+     * @param container
+     * @return
+     */
+    External& operator=(const External& other);
 
     /**
      * @brief
@@ -54,6 +81,12 @@ class External : public ReferenceLocation {
      * @return
      */
     Checksum::Algo getChecksumAlg() const;
+
+    /**
+     *
+     * @return
+     */
+    ExternalReference& getExternalRef() const;
 
     /**
      * @brief

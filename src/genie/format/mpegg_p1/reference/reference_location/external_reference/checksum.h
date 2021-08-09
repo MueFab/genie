@@ -50,7 +50,7 @@ class Checksum {
      *
      * @param _container
      */
-    Checksum(Checksum&& _container) noexcept;
+    Checksum(const Checksum&& _container);
 
     /**
      *

@@ -133,7 +133,7 @@ class DatasetHeader {
      * @brief
      * @param group_ID
      */
-    void setGroupId(uint8_t _group_ID);
+    void setGroupID(uint8_t _group_ID);
 
     /**
      * @brief
