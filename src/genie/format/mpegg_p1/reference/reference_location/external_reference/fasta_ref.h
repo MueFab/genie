@@ -9,14 +9,20 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <string>
 #include <vector>
 #include <memory>
-#include "genie/format/mpegg_p1/file_header.h"
-#include "genie/format/mpegg_p1/reference/reference_location/external_reference/checksum.h"
-#include "genie/format/mpegg_p1/reference/reference_location/external_reference/external_reference.h"
+#include "genie/util/make-unique.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
+#include "genie/util/exception.h"
+#include "genie/util/runtime-exception.h"
+#include "genie/format/mpegg_p1/file_header.h"
+#include "genie/format/mpegg_p1/util.h"
+#include "genie/format/mpegg_p1/dataset/class_description.h"
 
+#include "genie/format/mpegg_p1/reference/reference_location/external_reference/external_reference.h"
+#include "genie/format/mpegg_p1/reference/reference_location/external_reference/checksum.h"
 // ---------------------------------------------------------------------------------------------------------------------
 
 namespace genie {
@@ -37,6 +43,13 @@ class FastaReference : public ExternalReference {
     FastaReference();
 
     /**
+     *
+     * @param _checksums
+     * @return
+     */
+    FastaReference(const std::vector<std::unique_ptr<Checksum>>& _checksums);
+
+    /**
      * @brief
      * @param reader
      * @param checksum_alg
@@ -45,10 +58,10 @@ class FastaReference : public ExternalReference {
     FastaReference(util::BitReader& reader, FileHeader& fhd, Checksum::Algo checksum_alg, uint16_t seq_count);
 
     /**
-     * @brief
-     * @param _checksums
+     *
+     * @return
      */
-//    explicit FastaReference(std::vector<std::unique_ptr<Checksum>>&& _checksums);
+    std::unique_ptr<ExternalReference> clone() const override;
 
     /**
      * @brief

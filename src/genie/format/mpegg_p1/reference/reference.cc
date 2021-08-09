@@ -121,7 +121,7 @@ const std::vector<std::string>& Reference::getSequenceNames() const { return seq
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//const ReferenceLocation& Reference::getReferenceLocation() const { return reference_location; }
+const ReferenceLocation& Reference::getReferenceLocation() const { return *reference_location; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

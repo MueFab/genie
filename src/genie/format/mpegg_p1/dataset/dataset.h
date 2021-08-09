@@ -154,25 +154,49 @@ class Dataset {
      * @brief
      * @return
      */
-    DatasetHeader& getHeader();
+    const DatasetHeader& getHeader() const;
 
     /**
      * @brief
      * @return
      */
-    std::vector<DatasetParameterSet>& getParameterSets();
+    uint8_t getGroupID() const;
+
+    /**
+     * @brief
+     * @param group_ID
+     */
+    void setGroupID(uint8_t _group_ID);
 
     /**
      * @brief
      * @return
      */
-    std::vector<AccessUnit>& getAccessUnits();
+    uint16_t getID() const;
+
+    /**
+     * @brief
+     * @param ID
+     */
+    void setID(uint16_t _ID);
+
+//    /**
+//     * @brief
+//     * @return
+//     */
+//    std::vector<DatasetParameterSet>& getParameterSets();
 
     /**
      * @brief
      * @return
      */
-    std::vector<DescriptorStream>& getDescriptorStreams();
+    const std::vector<AccessUnit>& getAccessUnits() const;
+
+    /**
+     * @brief
+     * @return
+     */
+    const std::vector<DescriptorStream>& getDescriptorStreams() const;
 
     /**
      * @brief

@@ -49,6 +49,12 @@ class ExternalReference {
     virtual ~ExternalReference() = default;
 
     /**
+     *
+     * @return
+     */
+    virtual std::unique_ptr<ExternalReference> clone() const = 0;
+
+    /**
      * @brief
      * @return
      */
@@ -58,7 +64,7 @@ class ExternalReference {
      * @brief
      * @return
      */
-    Type getReferenceType() const;
+    Type getType() const;
 
     /**
      * @brief

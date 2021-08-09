@@ -16,6 +16,10 @@ namespace genie {
 namespace format {
 namespace mpegg_p1 {
 
+MpegReference::MpegReference(): ExternalReference(ExternalReference::Type::MPEGG_REF),
+                                 group_ID(0),
+                                 ID(0),
+                                 ref_checksum(nullptr){}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -59,6 +63,14 @@ MpegReference::MpegReference(util::BitReader& reader, FileHeader& fhd, Checksum:
         }
     }
 
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::unique_ptr<ExternalReference> MpegReference::clone() const{
+    auto ret = util::make_unique<MpegReference>(this->group_ID, this->ID, this->ref_checksum->clone());
+
+    return ret;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

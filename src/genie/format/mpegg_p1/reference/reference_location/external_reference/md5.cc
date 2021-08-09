@@ -16,25 +16,30 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Md5::Md5() : Checksum(Checksum::Algo::MD5) {}
+Md5::Md5(): Checksum(Checksum::Algo::MD5),
+            data() {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Md5::Md5(util::BitReader& reader) : Md5() {
-    for (size_t i = 0; i < data.size(); i++) {
-        data[i] = reader.read<uint64_t>();
+Md5::Md5(util::BitReader& reader)
+    : Checksum(Checksum::Algo::MD5) {
+
+    /// MD5 u(128)
+    for (size_t i = 0; i < 2; i++) {
+        data.emplace_back(reader.read<uint64_t>());
     }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-Md5::Md5(std::vector<uint64_t>& _data) : Md5() {
-    UTILS_DIE_IF(_data.size() != _data.size(), "Invalid data length");
-
-    for (size_t i = 0; i < _data.size(); i++) {
-        data[i] = _data[i];
-    }
-}
+//// ---------------------------------------------------------------------------------------------------------------------
+//
+//Md5::Md5(std::vector<uint64_t>& _data) : Md5() {
+//    UTILS_DIE_IF(_data.size() != 2, "Invalid data length");
+//
+//    /// MD5 u(128)
+//    for (size_t i = 0; i < _data.size(); i++) {
+//        data[i] = _data[i];
+//    }
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -47,7 +52,7 @@ std::unique_ptr<Checksum> Md5::clone() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t Md5::getLength() const {
-    // 128 bits
+    /// MD5 u(128)
     return 128/8;
 }
 

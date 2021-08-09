@@ -16,19 +16,19 @@ namespace mpegg_p1 {
 // ---------------------------------------------------------------------------------------------------------------------
 
 MpeggFile::MpeggFile(std::vector<DatasetGroup>* x_datasetGroups) : fileHeader() {
-    datasetGroups = std::move(*x_datasetGroups);
+    ds_groups = std::move(*x_datasetGroups);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 MpeggFile::MpeggFile(std::vector<DatasetGroup>* x_datasetGroups, std::vector<std::string>* compatible_brand)
     : fileHeader(compatible_brand) {
-    datasetGroups = std::move(*x_datasetGroups);
+    ds_groups = std::move(*x_datasetGroups);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-MpeggFile::MpeggFile(genie::util::BitReader& reader): fileHeader(reader), datasetGroups() {
+MpeggFile::MpeggFile(genie::util::BitReader& reader): fileHeader(reader), ds_groups() {
     while (true) {
         /// Read K,L of KLV
         size_t start_pos = reader.getPos();
@@ -36,7 +36,7 @@ MpeggFile::MpeggFile(genie::util::BitReader& reader): fileHeader(reader), datase
         auto val_length = reader.read<uint64_t>();
 
         UTILS_DIE_IF(key != "dgcn", "Dataset group is not Found");
-        datasetGroups.emplace_back(reader, fileHeader, start_pos, val_length);
+        ds_groups.emplace_back(reader, fileHeader, start_pos, val_length);
         break;
     }
 }
@@ -47,14 +47,14 @@ const FileHeader& MpeggFile::getFileHeader() const { return fileHeader; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::vector<DatasetGroup>& MpeggFile::getDatasetGroups() const { return datasetGroups; }
+const std::vector<DatasetGroup>& MpeggFile::getDatasetGroups() const { return ds_groups; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void MpeggFile::writeToFile(genie::util::BitWriter& bitWriter) const {
     fileHeader.writeToFile(bitWriter);
-    for (auto& datasetGroup : datasetGroups) {
-        datasetGroup.write(bitWriter);
+    for (auto& ds_group : ds_groups) {
+        ds_group.write(bitWriter);
     }
 }
 

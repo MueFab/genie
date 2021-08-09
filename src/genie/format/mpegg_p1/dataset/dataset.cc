@@ -177,7 +177,23 @@ Dataset::Dataset(util::BitReader& reader, FileHeader& fhd, size_t start_pos, siz
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-DatasetHeader& Dataset::getHeader() { return header; }
+const DatasetHeader& Dataset::getHeader() const { return header; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint8_t Dataset::getGroupID() const { return header.getGroupID(); };
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Dataset::setGroupID(uint8_t _group_ID) { header.setGroupID(_group_ID); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+uint16_t Dataset::getID() const { return header.getID(); };
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Dataset::setID(uint16_t _ID){ header.setID(_ID);}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -185,11 +201,11 @@ DatasetHeader& Dataset::getHeader() { return header; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<AccessUnit>& Dataset::getAccessUnits() { return access_units; }
+const std::vector<AccessUnit>& Dataset::getAccessUnits() const { return access_units; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<DescriptorStream>& Dataset::getDescriptorStreams() { return descriptor_streams; }
+const std::vector<DescriptorStream>& Dataset::getDescriptorStreams() const { return descriptor_streams; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

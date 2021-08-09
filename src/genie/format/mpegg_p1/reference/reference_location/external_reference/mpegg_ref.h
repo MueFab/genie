@@ -36,6 +36,12 @@ class MpegReference : public ExternalReference {
     std::string minor_version;
 
  public:
+
+    /**
+     *
+     */
+    MpegReference();
+
     /**
      * @brief
      * @param _dataset_group_ID
@@ -50,6 +56,12 @@ class MpegReference : public ExternalReference {
      * @param checksum_alg
      */
     MpegReference(util::BitReader& reader, FileHeader& fhd, Checksum::Algo checksum_alg);
+
+    /**
+     *
+     * @return
+     */
+    std::unique_ptr<ExternalReference> clone() const override;
 
     /**
      * @brief

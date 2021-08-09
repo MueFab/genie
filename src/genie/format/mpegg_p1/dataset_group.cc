@@ -245,7 +245,7 @@ void DatasetGroup::setID(uint8_t _ID) {
     /// DG_protection has no ID
 
     for (auto& ds : datasets) {
-        ds.getHeader().setGroupId(header.getID());
+        ds.setGroupID(header.getID());
     }
 }
 

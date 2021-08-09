@@ -117,7 +117,7 @@ class Reference {
      *
      * @return
      */
-//    const ReferenceLocation& getReferenceLocation() const;
+    const ReferenceLocation& getReferenceLocation() const;
 
     /**
      *

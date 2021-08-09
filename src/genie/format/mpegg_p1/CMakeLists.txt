@@ -34,6 +34,7 @@ set(source_files
         reference/reference_location/external.cc
         reference/reference_location/internal.cc
 
+        # ExternalReference
         reference/reference_location/external_reference/external_reference.cc
         reference/reference_location/external_reference/mpegg_ref.cc
         reference/reference_location/external_reference/fasta_ref.cc

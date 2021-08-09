@@ -115,7 +115,7 @@ uint8_t DatasetHeader::getGroupID() const { return group_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DatasetHeader::setGroupId(uint8_t _group_ID) { group_ID = group_ID; }
+void DatasetHeader::setGroupID(uint8_t _group_ID) { group_ID = group_ID; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

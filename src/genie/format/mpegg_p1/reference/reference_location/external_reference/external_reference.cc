@@ -28,7 +28,7 @@ Checksum::Algo ExternalReference::getChecksumAlg() const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-ExternalReference::Type ExternalReference::getReferenceType() const { return reference_type; }
+ExternalReference::Type ExternalReference::getType() const { return reference_type; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

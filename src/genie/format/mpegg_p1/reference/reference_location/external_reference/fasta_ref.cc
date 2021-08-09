@@ -5,12 +5,8 @@
  */
 
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/fasta_ref.h"
-#include "genie/format/mpegg_p1/reference/reference_location/external_reference/checksum.h"
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/md5.h"
 #include "genie/format/mpegg_p1/reference/reference_location/external_reference/sha256.h"
-#include "genie/util/make-unique.h"
-#include "genie/util/exception.h"
-#include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,7 +16,19 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FastaReference::FastaReference() : ExternalReference(ExternalReference::Type::FASTA_REF) {}
+FastaReference::FastaReference()
+    : ExternalReference(ExternalReference::Type::FASTA_REF),
+      checksums(){}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+FastaReference::FastaReference(const std::vector<std::unique_ptr<Checksum>>& _checksums){
+    auto checksum = _checksums.begin();
+    while (checksum != _checksums.end()){
+        checksums.emplace_back(std::move((*checksum)->clone()));
+        checksum++;
+    }
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -40,7 +48,6 @@ FastaReference::FastaReference(util::BitReader &reader, FileHeader& fhd, Checksu
             }
             default: {
                 UTILS_DIE("Unsupported checksum algorithm");
-                break;
             }
         }
     }
@@ -48,12 +55,11 @@ FastaReference::FastaReference(util::BitReader &reader, FileHeader& fhd, Checksu
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//FastaReference::FastaReference(std::vector<std::unique_ptr<Checksum>> &&_checksums)
-//    : ExternalReference(ExternalReference::Type::FASTA_REF), checksums(_checksums) {
-//    for (auto &checksum : checksums) {
-//        UTILS_DIE_IF(checksums.front().getType() != checksum.getType(), "Different checksum algorithm");
-//    }
-//}
+std::unique_ptr<ExternalReference> FastaReference::clone() const{
+    auto ret = util::make_unique<FastaReference>(this->checksums);
+
+    return ret;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

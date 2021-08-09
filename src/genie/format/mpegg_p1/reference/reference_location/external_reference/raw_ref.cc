@@ -22,8 +22,18 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-RawReference::RawReference() : ExternalReference(ExternalReference::Type::RAW_REF) {}
+RawReference::RawReference() : ExternalReference(ExternalReference::Type::RAW_REF),
+                               checksums(){}
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+RawReference::RawReference(const std::vector<std::unique_ptr<Checksum>>& _checksums){
+    auto checksum = _checksums.begin();
+    while (checksum != _checksums.end()){
+        checksums.emplace_back(std::move((*checksum)->clone()));
+        checksum++;
+    }
+}
 // ---------------------------------------------------------------------------------------------------------------------
 
 RawReference::RawReference(util::BitReader &reader, FileHeader& fhd, Checksum::Algo checksum_alg, uint16_t seq_count)
@@ -50,13 +60,11 @@ RawReference::RawReference(util::BitReader &reader, FileHeader& fhd, Checksum::A
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-//RawReference::RawReference(std::vector<std::unique_ptr<Checksum>> &&_checksums)
-//    : ExternalReference(ExternalReference::Type::RAW_REF), checksums(_checksums) {
-////    for (auto &checksum: checksums) {
-////        UTILS_DIE_IF(checksums.front().getType() != checksum.getType(), "Different checksum algorithm");
-////    }
-//}
+std::unique_ptr<ExternalReference> RawReference::clone() const{
+    auto ret = util::make_unique<RawReference>(this->checksums);
 
+    return ret;
+}
 // ---------------------------------------------------------------------------------------------------------------------
 
 Checksum::Algo RawReference::getChecksumAlg() const { return checksums.front()->getType(); }

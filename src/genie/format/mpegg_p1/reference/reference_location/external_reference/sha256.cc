@@ -15,25 +15,27 @@ namespace mpegg_p1 {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Sha256::Sha256() : Checksum(Checksum::Algo::SHA256) {}
+Sha256::Sha256(): Checksum(Checksum::Algo::SHA256),
+                  data(){}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 Sha256::Sha256(util::BitReader &reader) : Sha256() {
-    for (size_t i = 0; i < data.size(); i++) {
-        data[i] = reader.read<uint64_t>();
+    /// SHA256 u(256)
+    for (size_t i = 0; i < 4; i++) {
+        data.emplace_back(reader.read<uint64_t>());
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Sha256::Sha256(std::vector<uint64_t> &_data) : Sha256() {
-    UTILS_DIE_IF(_data.size() != _data.size(), "Invalid data length");
-
-    for (size_t i = 0; i < _data.size(); i++) {
-        data[i] = _data[i];
-    }
-}
+//Sha256::Sha256(std::vector<uint64_t> &_data) : Sha256() {
+//    UTILS_DIE_IF(_data.size() != 4data.emplace_back(reader.read<uint64_t>());, "Invalid data length");
+//
+//    for (size_t i = 0; i < _data.size(); i++) {
+//        data.emplace_back(_data[i]);
+//    }
+//}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -46,7 +48,7 @@ std::unique_ptr<Checksum> Sha256::clone() const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 uint64_t Sha256::getLength() const {
-    // 256 bits
+    /// SHA256 u(256)
     return 256/8;
 }
 
