@@ -27,7 +27,7 @@ enum class DataUnitType : uint8_t { RAW_REF = 0, PAR_SET = 1, ACC_UNT = 2};
 
 ErrorCode test(ProgramOptions& options){
 
-    for (auto i=1;i<27;i++){
+    for (auto i=5;i<27;i++){
         auto fpath = options.getFilePath(i);
 
         std::ifstream reader(fpath.string());
@@ -35,10 +35,10 @@ ErrorCode test(ProgramOptions& options){
 
         genie::format::mpegg_p1::MpeggFile mgg_file(bitreader);
 
+        std::cout << "Checking " << options.getFilePath(i) << "..." << std::endl;
+
         switch (i){
             case 1: {
-                std::cout << "Checking abl-001..." << std::endl;
-
                 auto& ds_groups = mgg_file.getDatasetGroups();
 
                 auto& dss = ds_groups[0].getDatasets();
@@ -58,7 +58,34 @@ ErrorCode test(ProgramOptions& options){
 
                 UTILS_DIE_IF(type != genie::format::mpegg_p1::ExternalReference::Type::FASTA_REF,
                              "Wrong external reference type found!");
+                break;
+            }
+            case 2: {
+                continue;
+                auto& ds_groups = mgg_file.getDatasetGroups();
 
+                auto& dss = ds_groups[0].getDatasets();
+                auto ds_ID = dss[0].getID();
+                UTILS_DIE_IF(ds_ID != 2,
+                             "Wrong dataset_ID found!");
+                break;
+            }
+            case 3: {
+                break;
+            }
+            case 4: {
+                break;
+            }
+            case 5: {
+                break;
+            }
+            case 6: {
+                break;
+            }
+            case 7: {
+                break;
+            }
+            case 8: {
                 break;
             }
             default:

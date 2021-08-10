@@ -19,7 +19,7 @@
 #include "genie/util/exception.h"
 #include "genie/util/runtime-exception.h"
 
-#define ROUNDTRIP_CONSTRUCTOR true
+#define ROUNDTRIP_CONSTRUCTOR false
 
 // ---------------------------------------------------------------------------------------------------------------------
 
