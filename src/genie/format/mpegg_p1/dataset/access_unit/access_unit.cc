@@ -37,9 +37,14 @@ AUInformation::AUInformation(util::BitReader& reader, FileHeader& fhd, size_t st
                  "Invalid AUInformation length!");
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint64_t AUInformation::getLength() const{
     return AU_information_value.size();
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void AUInformation::write(genie::util::BitWriter& writer) const{
     writer.write("auin");
 
@@ -54,6 +59,8 @@ void AUInformation::write(genie::util::BitWriter& writer) const{
         writer.write(byte, 8);
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 AUProtection::AUProtection(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length)
     : minor_version(fhd.getMinorVersion()){
@@ -79,9 +86,15 @@ AUProtection::AUProtection(util::BitReader& reader, FileHeader& fhd, size_t star
     UTILS_DIE_IF(!reader.isAligned() || reader.getPos() - start_pos != length,
                  "Invalid AUProtection length!");
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 uint64_t AUProtection::getLength() const{
     return AU_protection_value.size();
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void AUProtection::write(genie::util::BitWriter& writer) const{
     writer.write("aupr");
 

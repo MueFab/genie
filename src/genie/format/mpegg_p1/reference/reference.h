@@ -76,12 +76,12 @@ class Reference {
 
     /**
      * @brief Read Reference from bitstream. FileHeader is required to determine syntax.
-     * @param bitreader
+     * @param reader
      * @param fhd
      * @param start_pos
      * @param length
      */
-    Reference(util::BitReader& bitreader, FileHeader& fhd, size_t start_pos, size_t length);
+    Reference(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length);
 
     /**
      *

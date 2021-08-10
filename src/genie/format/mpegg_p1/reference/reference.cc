@@ -42,46 +42,48 @@ Reference::Reference()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Reference::Reference(util::BitReader& bitreader, FileHeader& fhd, size_t start_pos, size_t length):
-    /// group_ID u(8)
-    dataset_group_ID(bitreader.read<uint8_t>()),
-    /// reference_ID u(8)
-    reference_ID(bitreader.read<uint8_t>()),
-    /// reference_name st(v)
-    reference_name(readNullTerminatedStr(bitreader)),
-    /// reference_name u(16)
-    reference_major_version(bitreader.read<uint16_t>()),
-    /// reference_name u(16)
-    reference_minor_version(bitreader.read<uint16_t>()),
-    /// reference_name u(16)
-    reference_patch_version(bitreader.read<uint16_t>()),
-    sequence_names(),
-    reference_location(),
+Reference::Reference(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length):
     minor_version(fhd.getMinorVersion())
 {
+    /// group_ID u(8)
+    dataset_group_ID = reader.read<uint8_t>();
 
-    // seq_count u(16)
-    auto seq_count = bitreader.read<uint16_t>();
+    /// reference_ID u(8)
+    reference_ID = reader.read<uint8_t>();
+    /// reference_name st(v)
+    reference_name = readNullTerminatedStr(reader);
+
+    /// reference_name u(16)
+    reference_major_version = reader.read<uint16_t>();
+    /// reference_name u(16)
+    reference_minor_version = reader.read<uint16_t>();
+    /// reference_name u(16)
+    reference_patch_version = reader.read<uint16_t>();
+
+    /// seq_count u(16)
+    auto seq_count = reader.read<uint16_t>();
 
     for (auto seqID = 0; seqID < seq_count; seqID++) {
-        // sequence_name[seqID] st(v)
-        sequence_names.emplace_back(readNullTerminatedStr(bitreader));
+        /// sequence_name[seqID] st(v)
+        sequence_names.emplace_back(readNullTerminatedStr(reader));
 
         if (minor_version != "1900"){
-            sequence_lengths.emplace_back(bitreader.read<uint32_t>());
-            sequence_IDs.emplace_back(bitreader.read<uint16_t>());
+            if (reference_minor_version == 20){
+                sequence_lengths.emplace_back(reader.read<uint32_t>());
+            }
+            sequence_IDs.emplace_back(reader.read<uint16_t>());
         }
     }
 
     /// reserved u(7)
-    bitreader.read<uint8_t>(7);
+    reader.read_b(7);
     /// external_ref_flat u(1)
-    bool external_ref_flag = bitreader.read<bool>(1);
+    bool external_ref_flag = reader.read<bool>(1);
 
     if (external_ref_flag) {
-        reference_location = util::make_unique<External>(bitreader, fhd, seq_count);
+        reference_location = util::make_unique<External>(reader, fhd, seq_count);
     } else {
-        reference_location = util::make_unique<Internal>(bitreader);
+        reference_location = util::make_unique<Internal>(reader);
     }
 
 #if ROUNDTRIP_CONSTRUCTOR
@@ -95,7 +97,7 @@ Reference::Reference(util::BitReader& bitreader, FileHeader& fhd, size_t start_p
     UTILS_DIE_IF( elen != length, "Invalid Reference getLength()");
 #endif
 
-    UTILS_DIE_IF(!bitreader.isAligned() || bitreader.getPos() - start_pos != length,
+    UTILS_DIE_IF(!reader.isAligned() || reader.getPos() - start_pos != length,
                  "Invalid Reference length!");
 }
 
@@ -163,8 +165,10 @@ uint64_t Reference::getLength() const {
         len += sequence_names[seqID].size() + 1;
 
         if (minor_version != "1900"){
-            /// sequence_lengths u(32)
-            len += sizeof(sequence_lengths[seqID]);
+            if (reference_minor_version == 20) {
+                /// sequence_lengths u(32)
+                len += sizeof(sequence_lengths[seqID]);
+            }
 
             /// sequence_IDs u(16)
             len += sizeof(sequence_IDs[seqID]);
@@ -215,8 +219,10 @@ void Reference::write(util::BitWriter& writer) const {
         writeNullTerminatedStr(writer, sequence_names[seqID]);
 
         if (minor_version != "1900"){
-            /// sequence_lengths u(32)
-            writer.write(sequence_lengths[seqID], 32);
+            if (reference_minor_version == 20){
+                /// sequence_lengths u(32)
+                writer.write(sequence_lengths[seqID], 32);
+            }
             /// sequence_IDs u(16)
             writer.write(sequence_IDs[seqID], 16);
         }

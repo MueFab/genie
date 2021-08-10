@@ -20,11 +20,14 @@ AccessUnitHeader::AccessUnitHeader()
       mm_cfg(nullptr),
       ref_cfg(nullptr),
       au_type_cfg(nullptr),
-      signature_cfg(nullptr) {}
+      signature_cfgs() {}
 
 
 AccessUnitHeader::AccessUnitHeader(util::BitReader& reader, FileHeader& fhd, size_t start_pos, size_t length,
-                                   DatasetHeader& dhd){
+                                   DatasetHeader& dhd)
+    : signature_cfgs(){
+
+    MIT_flag = dhd.getMITFlag();
 
     /// access_unit_ID u(32)
     ID = reader.read<uint32_t>();
@@ -49,22 +52,29 @@ AccessUnitHeader::AccessUnitHeader(util::BitReader& reader, FileHeader& fhd, siz
 
     /// dataset_type == 2
     if (dhd.getDatasetType() == core::parameter::DataUnit::DatasetType::REFERENCE){
-        ref_cfg = util::make_unique<format::mgb::RefCfg>((uint64_t)dhd.getPos40SizeFlag(),
+        auto pos_size = (uint64_t)dhd.getPos40SizeFlag();
+        ref_cfg = util::make_unique<format::mgb::RefCfg>(pos_size,
                                                          reader);
     } else {
         ref_cfg = nullptr;
     }
 
-    MIT_flag = dhd.getMITFlag();
     if (!MIT_flag){
         if (au_type != core::record::ClassType::CLASS_U){
             au_type_cfg = util::make_unique<format::mgb::AuTypeCfg>((uint64_t)dhd.getPos40SizeFlag(),
                                                                     dhd.getMultipleAlignmentFlag(),
                                                                     reader);
-            signature_cfg = nullptr;
+
         } else {
             au_type_cfg = nullptr;
-            signature_cfg = util::make_unique<SignatureCfg>(reader, dhd);
+
+            if (dhd.getUAccessUnitInfo().getUSignatureFlag()){
+                auto num_signatures = reader.read<uint16_t>();
+                for (auto i=0; i<num_signatures; i++){
+                    auto signature_cfg = util::make_unique<SignatureCfg>(reader, dhd);
+                    signature_cfgs.emplace_back(std::move(signature_cfg));
+                }
+            }
         }
     }
 
@@ -147,7 +157,9 @@ void AccessUnitHeader::write(util::BitWriter& writer, bool zero_length) const{
         if (au_type_cfg != nullptr){
             au_type_cfg->write(writer);
         } else {
-            signature_cfg->write(writer);
+            for (auto i=0; i<signature_cfgs.size();i++){
+                signature_cfgs[i]->write(writer);
+            }
         }
     }
 

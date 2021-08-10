@@ -44,10 +44,11 @@ class AccessUnitHeader{
     std::unique_ptr<format::mgb::MmCfg> mm_cfg;
     std::unique_ptr<format::mgb::RefCfg> ref_cfg;
     std::unique_ptr<format::mgb::AuTypeCfg> au_type_cfg;
-    std::unique_ptr<SignatureCfg> signature_cfg;
+    std::vector<std::unique_ptr<SignatureCfg>> signature_cfgs;
 
     /* ----- internal ----- */
     bool MIT_flag;
+//    bool U_signature_flag;
 
  public:
 

@@ -42,7 +42,7 @@ MpegReference::MpegReference(uint8_t _dataset_group_ID, uint16_t _dataset_ID, st
 MpegReference::MpegReference(util::BitReader& reader, FileHeader& fhd, Checksum::Algo checksum_alg)
     : ExternalReference(ExternalReference::Type::MPEGG_REF),
       group_ID(reader.read<uint8_t>()),
-      ID(reader.read<uint8_t>()),
+      ID(reader.read<uint16_t>()),
       ref_checksum(),
       minor_version(fhd.getMinorVersion()){
 
@@ -125,10 +125,14 @@ void MpegReference::write(util::BitWriter& writer) const {
         switch (ref_checksum->getType()) {
             case Checksum::Algo::MD5: {
                 dynamic_cast<Md5&>(*ref_checksum).write(writer);
+//                auto& checksum = dynamic_cast<Md5&>(*ref_checksum);
+//                checksum.write(writer);
                 break;
             }
             case Checksum::Algo::SHA256: {
                 dynamic_cast<Sha256&>(*ref_checksum).write(writer);
+//                auto& checksum = dynamic_cast<Sha256&>(*ref_checksum);
+//                checksum.write(writer);
                 break;
             }
             default: {
@@ -137,8 +141,6 @@ void MpegReference::write(util::BitWriter& writer) const {
             }
         }
     }
-
-    ref_checksum->write(writer);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

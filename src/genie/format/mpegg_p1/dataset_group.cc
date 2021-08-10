@@ -117,6 +117,7 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, FileHeader& fhd, size_t star
                  "Dataset group header is not found!");
     header = DatasetGroupHeader(reader, fhd, box_start_pos, box_length);
 
+    auto curr_len = reader.getPos() - start_pos;
     do {
         /// Read K,L of KLV
         box_start_pos = reader.getPos();
@@ -147,7 +148,8 @@ DatasetGroup::DatasetGroup(util::BitReader& reader, FileHeader& fhd, size_t star
         } else if (box_key == "dtcn") {
             datasets.emplace_back(reader, fhd, box_start_pos, box_length);
         }
-    } while (reader.getPos() - start_pos < length);
+        curr_len = reader.getPos() - start_pos;
+    } while (curr_len < length);
 
 #if ROUNDTRIP_CONSTRUCTOR
     std::stringstream ss;
