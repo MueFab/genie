@@ -41,7 +41,7 @@ struct LutEntry {
      * @param entry
      * @return
      */
-    bool operator>=(const LutEntry& entry) const;
+    bool operator>(const LutEntry& entry) const;
 };
 
 /**
