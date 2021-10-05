@@ -22,7 +22,13 @@ namespace sam_to_mgrec {
 // ---------------------------------------------------------------------------------------------------------------------
 
 Config::Config(int argc, char *argv[])
-    : verbosity_level(0), tmp_dir_path(), fasta_file_path(), inputFile(), outputFile() {
+    : verbosity_level(0),
+      tmp_dir_path(),
+      fasta_file_path(),
+      inputFile(),
+      outputFile(),
+      forceOverwrite(false),
+      help(false) {
     processCommandLine(argc, argv);
 }
 
@@ -37,7 +43,8 @@ void Config::processCommandLine(int argc, char *argv[]) {
 
     app.add_option("--ref", fasta_file_path, "Path to fasta reference file\n");
     tmp_dir_path = "/tmp";
-    app.add_option("-w,--working-dir", tmp_dir_path, "Path to a directory where temporary\n"
+    app.add_option("-w,--working-dir", tmp_dir_path,
+                   "Path to a directory where temporary\n"
                    "files can be stored. If no path is provided, \nthe current working dir is used. Please make sure \n"
                    "that enough space is available.\n");
     app.add_option("-i,--input-file", inputFile, "Input file (sam or mgrec)\n")->mandatory(true);
