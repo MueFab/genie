@@ -42,20 +42,20 @@ std::string parent_dir(const std::string &path) {
 ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
     CLI::App app("Genie MPEG-G reference encoder\n");
 
-    app.add_option("-i,--input-file", inputFile, "")->mandatory(true);
-    app.add_option("-o,--output-file", outputFile, "")->mandatory(true);
+    app.add_option("-i,--input-file", inputFile, "Input file (fastq or mgrec)\n")->mandatory(true);
+    app.add_option("-o,--output-file", outputFile, "Output file (fastq or mgrec)\n")->mandatory(true);
 
     inputSupFile = "";
-    app.add_option("--input-suppl-file", inputSupFile, "");
+    app.add_option("--input-suppl-file", inputSupFile, "Paired input fastq file\n");
 
     outputSupFile = "";
-    app.add_option("--output-suppl-file", outputSupFile, "");
+    app.add_option("--output-suppl-file", outputSupFile, "Paired output fastq file\n");
 
     forceOverwrite = false;
-    app.add_flag("-f,--force", forceOverwrite, "");
+    app.add_flag("-f,--force", forceOverwrite, "Override existing files\n");
 
     numberOfThreads = std::thread::hardware_concurrency();
-    app.add_option("-t,--threads", numberOfThreads, "");
+    app.add_option("-t,--threads", numberOfThreads, "Number of threads\n");
 
     try {
         app.parse(argc, argv);

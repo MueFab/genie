@@ -35,24 +35,23 @@ Config::~Config() = default;
 void Config::processCommandLine(int argc, char *argv[]) {
     CLI::App app{"Transcoder - Transcode legacy format to mpeg-g format"};
 
-    app.add_option("--ref", fasta_file_path, "Reference file");
+    app.add_option("--ref", fasta_file_path, "Path to fasta reference file\n");
     tmp_dir_path = "/tmp";
-    app.add_option("-w,--working-dir", tmp_dir_path, "Temporary directory path");
-    app.add_option("-i,--input-file", inputFile, "Input file")->mandatory(true);
-    app.add_option("-o,--output-file", outputFile, "Output file")->mandatory(true);
+    app.add_option("-w,--working-dir", tmp_dir_path, "Path to a directory where temporary\n"
+                   "files can be stored. If no path is provided, \nthe current working dir is used. Please make sure \n"
+                   "that enough space is available.\n");
+    app.add_option("-i,--input-file", inputFile, "Input file (sam or mgrec)\n")->mandatory(true);
+    app.add_option("-o,--output-file", outputFile, "Output file (sam or mgrec)\n")->mandatory(true);
     forceOverwrite = false;
-    app.add_flag("-f,--force", forceOverwrite, "");
+    app.add_flag("-f,--force", forceOverwrite, "Override existing output files\n");
     try {
         app.parse(argc, argv);
+    } catch (const CLI::CallForHelp &) {
+        std::cout << app.help() << std::endl;
+        help = true;
+        return;
     } catch (const CLI::ParseError &e) {
-        if (app.count("--help")) {
-            // Set our internal help flag so that the caller can act on that
-            app.exit(e);
-            return;
-        } else {
-            app.exit(e);
-            throw std::runtime_error("command line parsing failed");
-        }
+        UTILS_DIE("Command line parsing failed:" + std::to_string(app.exit(e)));
     }
 
     validate();
