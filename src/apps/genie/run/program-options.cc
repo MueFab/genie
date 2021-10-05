@@ -42,43 +42,62 @@ std::string parent_dir(const std::string &path) {
 ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
     CLI::App app("Genie MPEG-G reference encoder\n");
 
-    app.add_option("-i,--input-file", inputFile, "")->mandatory(true);
-    app.add_option("-o,--output-file", outputFile, "")->mandatory(true);
+    app.add_option("-i,--input-file", inputFile, "Input file (mgrec or mgb)\n")->mandatory(true);
+    app.add_option("-o,--output-file", outputFile, "Output file (mgrec or mgb)\n")->mandatory(true);
 
-    inputSupFile = "";
-    app.add_option("--input-suppl-file", inputSupFile, "");
     inputRefFile = "";
-    app.add_option("--input-ref-file", inputRefFile, "");
-
-    outputSupFile = "";
-    app.add_option("--output-suppl-file", outputSupFile, "");
+    app.add_option("--input-ref-file", inputRefFile,
+                   "Path to a reference fasta file. \n"
+                   "Only relevant for aligned records. \nIf no path is provided, a \n"
+                   "computed reference will be used instead.\n");
 
     workingDirectory = "";
-    app.add_option("-w,--working-dir", workingDirectory, "");
+    app.add_option("-w,--working-dir", workingDirectory,
+                   "Path to a directory where \n"
+                   "temporary files can be stored. \nIf no path is provided, \nthe current working dir is used. \n"
+                   "Please make sure that \nenough space is available.\n");
 
     qvMode = "lossless";
-    app.add_option("--qv", qvMode, "");
+    app.add_option("--qv", qvMode,
+                   "How to encode quality values. \nPossible values are \n"
+                   "\"lossless\" (default, keep all values) and \n\"none\" (discard all values).\n");
 
     readNameMode = "lossless";
-    app.add_option("--read-ids", readNameMode, "");
+    app.add_option("--read-ids", readNameMode,
+                   "How to encode read ids. Possible values \n"
+                   "are \"lossless\" (default, keep all values) and \n\"none\" (discard all values).\n");
 
     forceOverwrite = false;
-    app.add_flag("-f,--force", forceOverwrite, "");
+    app.add_flag("-f,--force", forceOverwrite,
+                 "Flag, if set already existing output \n"
+                 "files are overridden.\n");
 
     combinePairsFlag = false;
-    app.add_flag("--combine-pairs", combinePairsFlag, "");
+    app.add_flag(
+        "--combine-pairs", combinePairsFlag,
+        "Flag, if provided to a decoding \n"
+        "operation, unaligned reads will \nget matched to their mate again. \nNote: has no effect if encoded with \n"
+        "--low-latency in case of aligned reads only. \nDoes not work if encoded with --read-ids \"none\"\n");
 
     lowLatency = false;
-    app.add_flag("--low-latency", lowLatency, "");
+    app.add_flag(
+        "--low-latency", lowLatency,
+        "Flag, if set no global reference will be \n"
+        "calculated for unaligned records. \nThis will increase encoding speed, \nbut decrease compression rate.\n");
 
     refMode = "relevant";
-    app.add_option("--embedded-ref", refMode, "");
+    app.add_option("--embedded-ref", refMode,
+                   "How to encode the reference. Possible \n"
+                   "values are \"none\" (no encoding and reference must \nbe kept externally for decompression),\n"
+                   " \"relevant\" (only parts of the reference \nneeded for decoding are encoded)\n");
 
     numberOfThreads = std::thread::hardware_concurrency();
-    app.add_option("-t,--threads", numberOfThreads, "");
+    app.add_option("-t,--threads", numberOfThreads, "Number of threads to use.\n");
 
     rawReference = false;
-    app.add_flag("--raw-ref", rawReference, "");
+    app.add_flag("--raw-ref", rawReference,
+                 "Flag, if set references will be encoded raw \n"
+                 "instead of compressed. This will increase \nencoding speed, but decrease compression rate.\n");
 
     try {
         app.parse(argc, argv);

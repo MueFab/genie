@@ -31,9 +31,9 @@ int stat(int, char*[]) { UTILS_DIE("Stat not implemented"); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 int help(int, char*[]) {
-    std::cout << "Usage: \ngenie run -i [input-file] -o [output-file]\nUse -f to overwrite existing output files.\nUse "
-                 "-t to specify the number of threads.\nIn case of paired fastq files, use --input-suppl-file or "
-                 "--output-suppl-file to specify the second file."
+    std::cout << "Usage: \ngenie <operation> <operation specific options> \n\nList of operations:\n"
+              << "help\nrun\ntranscode-fastq\ntranscode-sam\n\n"
+              << "To learn more about an operation, type \"genie <operation> --help\"."
               << std::endl;
     return 0;
 }
@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
         } else if (operation == "help") {
             help(argc - OPERATION_INDEX, argv + OPERATION_INDEX);
         } else {
-            UTILS_DIE("Unknown operation " + operation);
+            UTILS_DIE("Unknown operation " + operation + "! Type \"genie help\" for a list of operations.");
         }
     } catch (const genie::util::Exception& e) {
         std::cerr << "ERROR: " << e.what() << std::endl;

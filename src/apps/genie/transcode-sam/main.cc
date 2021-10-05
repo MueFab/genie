@@ -19,6 +19,9 @@ namespace transcode_sam {
 
 int main(int argc, char* argv[]) {
     genieapp::transcode_sam::sam::sam_to_mgrec::Config programOptions(argc, argv);
+    if (programOptions.help) {
+        return 0;
+    }
     genieapp::transcode_sam::ErrorCode ret = genieapp::transcode_sam::ErrorCode::success;
     if (programOptions.inputFile.substr(programOptions.inputFile.length() - 3) == "sam" &&
         programOptions.outputFile.substr(programOptions.outputFile.length() - 5) == "mgrec") {

@@ -49,6 +49,7 @@ class Config {
     std::string inputFile;        //!< @brief
     std::string outputFile;       //!< @brief
     bool forceOverwrite;
+    bool help;
 
  private:
     /**
