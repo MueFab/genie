@@ -86,16 +86,18 @@ void Preprocessor::preprocess(core::record::Chunk &&t, const util::Section &id) 
     stats.add(data.getStats());
 
     UTILS_DIE_IF(
-        data.getData().front().getNumberOfTemplateSegments() * data.getData().size() + cp.num_reads > MAX_NUM_READS,
-        "Too many reads");
+        data.getData().front().getNumberOfTemplateSegments() * (data.getData().size() + cp.num_reads) > MAX_NUM_READS,
+        "Too many reads in the input. Global assembly only supports up to " + std::to_string(MAX_NUM_READS) +
+            " reads.");
 
     size_t rec_index = 0;
     for (auto &rec : data.getData()) {
         UTILS_DIE_IF(rec.getSegments().size() != (static_cast<size_t>(cp.paired_end + 1)),
-                     "Number of segments differs");
+                     "Number of segments differs between global assembly data chunks.");
         size_t seg_index = 0;
         for (auto &seq : rec.getSegments()) {
-            UTILS_DIE_IF(seq.getSequence().size() > MAX_READ_LEN, "Too long read length");
+            UTILS_DIE_IF(seq.getSequence().size() > MAX_READ_LEN,
+                         "Global assembly maximum read length " + std::to_string(MAX_READ_LEN) + " exceeded.");
             cp.max_readlen = std::max(cp.max_readlen, (uint32_t)seq.getSequence().length());
             if (seq.getSequence().find('N') != std::string::npos) {
                 write_dnaN_in_bits(seq.getSequence(), fout_N[seg_index]);
