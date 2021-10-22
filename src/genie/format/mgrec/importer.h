@@ -32,6 +32,8 @@ class Importer : public core::FormatImporter {
     size_t blockSize;        //!<
     util::BitReader reader;  //!<
 
+    boost::optional<core::record::Record> bufferedRecord;
+
  public:
     /**
      *
