@@ -249,9 +249,9 @@ const CigarFormatInfo &getECigarInfo() {
             lut['='] = 1;
             lut['+'] = 1;
             lut['-'] = 0;
-            lut['%'] = 1;
-            lut['/'] = 1;
-            lut['*'] = 1;
+            lut['%'] = 0;
+            lut['/'] = 0;
+            lut['*'] = 0;
             lut[')'] = 1;
             lut[']'] = 0;
             return lut;
