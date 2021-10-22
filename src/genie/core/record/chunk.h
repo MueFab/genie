@@ -28,7 +28,7 @@ class Chunk {
     std::vector<Record> data;                           //!<
     ReferenceManager::ReferenceExcerpt reference;       //!<
     std::vector<std::pair<size_t, size_t>> refToWrite;  //!<
-    size_t refID;                                       //!<
+    size_t refID{};                                     //!<
     stats::PerfStats stats;                             //!<
     bool referenceOnly{false};                          //!<
 
