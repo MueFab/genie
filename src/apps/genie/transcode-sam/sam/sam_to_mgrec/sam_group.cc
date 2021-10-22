@@ -225,15 +225,20 @@ void SamRecordGroup::moveSecondaryAlignments() {
     // Move secondary alignments which can be associated with a primary read
     auto s1 = std::move(data[uint8_t(TemplateType::PAIRED_1)][uint8_t(MappingType::NONPRIMARY)]);
     auto s2 = std::move(data[uint8_t(TemplateType::PAIRED_2)][uint8_t(MappingType::NONPRIMARY)]);
-    for (auto it1 = s1.begin(); it1 != s1.end(); ++it1) {
-        for (auto it2 = s2.begin(); it2 != s2.end(); ++it2) {
+    for (auto it1 = s1.begin(); it1 != s1.end();) {
+        bool found = false;
+        for (auto it2 = s2.begin(); it2 != s2.end(); it2++) {
             if (it1->isPairOf(*it2)) {
+                found = true;
                 data[uint8_t(TemplateType::PAIRED_1)][uint8_t(MappingType::NONPRIMARY)].push_back(*it1);
                 data[uint8_t(TemplateType::PAIRED_2)][uint8_t(MappingType::NONPRIMARY)].push_back(*it2);
                 it1 = s1.erase(it1);
-                it2 = s2.erase(it2);
+                s2.erase(it2);
                 break;
             }
+        }
+        if (!found) {
+            it1++;
         }
     }
 
@@ -299,7 +304,7 @@ genie::core::record::ClassType SamRecordGroup::checkClassTypePaired() {
     UTILS_DIE_IF(primary_count > 2, "More than 2 primary reads in paired sam record");
 
     if (primary_count == 0) {
-        std::cerr << "Warning: Paired-end SAM record without primary reads, discarding whole record" << std::endl;
+        // std::cerr << "Warning: Paired-end SAM record without primary reads, discarding whole record" << std::endl;
         data.clear();
         return genie::core::record::ClassType::NONE;
     }
