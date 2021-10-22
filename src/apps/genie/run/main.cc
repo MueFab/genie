@@ -120,7 +120,7 @@ void addFasta(const std::string& fastaFile, genie::core::FlowGraphEncode* flow,
 
 template <class T>
 void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ifstream>>& inputFiles) {
-    constexpr size_t BLOCKSIZE = 10000;
+    constexpr size_t BLOCKSIZE = 256000;
     inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile));
     if (file_extension(pOpts.inputFile) == "mgrec") {
         flow.addImporter(genie::util::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, *inputFiles.back()));
@@ -134,7 +134,7 @@ void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
 std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts,
                                                      std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    constexpr size_t BLOCKSIZE = 10000;
+    constexpr size_t BLOCKSIZE = 256000;
     genie::core::ClassifierRegroup::RefMode mode;
     if (pOpts.refMode == "none") {
         mode = genie::core::ClassifierRegroup::RefMode::NONE;
@@ -178,7 +178,7 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
 std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts,
                                                      std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
                                                      std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    constexpr size_t BLOCKSIZE = 10000;
+    constexpr size_t BLOCKSIZE = 256000;
     auto flow = genie::module::buildDefaultDecoder(pOpts.numberOfThreads, pOpts.workingDirectory,
                                                    pOpts.combinePairsFlag, BLOCKSIZE);
     if (!pOpts.inputRefFile.empty()) {
