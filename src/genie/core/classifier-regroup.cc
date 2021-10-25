@@ -115,7 +115,7 @@ bool ClassifierRegroup::isWritten(const std::string& ref, size_t index) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ClassifierRegroup::ClassifierRegroup(size_t _auSize, ReferenceManager* rfmgr, RefMode mode, bool raw_ref)
-    : refMgr(rfmgr), auSize(_auSize), refMode(mode), rawRefMode(raw_ref) {
+    : refMgr(rfmgr), currentSeqID(0), auSize(_auSize), refMode(mode), rawRefMode(raw_ref) {
     currentChunks.resize(2);
     for (auto& c : currentChunks) {
         c.resize(2);
@@ -315,8 +315,9 @@ void ClassifierRegroup::add(record::Chunk&& c) {
     record::Chunk chunk = std::move(c);
 
     // New reference
-    if (chunk.getRef().getRefName() != currentSeq) {
+    if (chunk.getRefID() != currentSeqID) {
         currentSeq = chunk.getRef().getRefName();
+        currentSeqID = static_cast<uint16_t>(chunk.getRefID());
         currentSeqCoverage = refMgr->getCoverage(currentSeq);
         for (auto& refblock : currentChunks) {
             for (auto& pairblock : refblock) {
