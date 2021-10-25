@@ -33,8 +33,7 @@ int stat(int, char*[]) { UTILS_DIE("Stat not implemented"); }
 int help(int, char*[]) {
     std::cerr << "Usage: \ngenie <operation> <operation specific options> \n\nList of operations:\n"
               << "help\nrun\ntranscode-fastq\ntranscode-sam\n\n"
-              << "To learn more about an operation, type \"genie <operation> --help\"."
-              << std::endl;
+              << "To learn more about an operation, type \"genie <operation> --help\"." << std::endl;
     return 0;
 }
 
