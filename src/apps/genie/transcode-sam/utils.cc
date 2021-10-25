@@ -21,6 +21,9 @@ bool compare(const genie::core::record::Record& r1, const genie::core::record::R
     if (r2.getAlignments().empty()) {
         return true;
     }
+    if (r1.getAlignmentSharedData().getSeqID() != r2.getAlignmentSharedData().getSeqID()) {
+        return r1.getAlignmentSharedData().getSeqID() < r2.getAlignmentSharedData().getSeqID();
+    }
     return r1.getAlignments().front().getPosition() < r2.getAlignments().front().getPosition();
 }
 

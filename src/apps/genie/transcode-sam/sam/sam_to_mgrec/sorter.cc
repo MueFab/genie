@@ -20,57 +20,39 @@ namespace sam_to_mgrec {
 // ---------------------------------------------------------------------------------------------------------------------
 
 SubfileReader::SubfileReader(const std::string& fpath)
-    : curr_mgrec_pos(0), reader(fpath, std::ios::binary), bitreader(reader), rec() {}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-SubfileReader::~SubfileReader() { close(); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool SubfileReader::readRecord() {
+    : reader(fpath, std::ios::binary), bitreader(reader), rec(), path(fpath) {
     if (good()) {
         rec = genie::core::record::Record(bitreader);
-
-        if (!rec.getAlignments().empty()) {
-            curr_mgrec_pos = rec.getAlignments().front().getPosition();
-        }
-
-        return true;
-    } else {
-        return false;
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-genie::core::record::Record&& SubfileReader::moveRecord() { return std::move(rec); }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-const genie::core::record::Record& SubfileReader::getRecord() const { return rec; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void SubfileReader::writeRecord(genie::util::BitWriter& bitwriter) {
-    rec.write(bitwriter);
-    bitwriter.flush();
+SubfileReader::~SubfileReader() {
+    bitreader.flush();
+    reader.close();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t SubfileReader::getPos() const { return curr_mgrec_pos; }
+genie::core::record::Record SubfileReader::moveRecord() {
+    UTILS_DIE_IF(!rec, "No record available.");
+    auto ret = std::move(rec.get());
+    if (good()) {
+        rec = genie::core::record::Record(bitreader);
+    } else {
+        rec.reset();
+    }
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const boost::optional<genie::core::record::Record>& SubfileReader::getRecord() const { return rec; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool SubfileReader::good() { return reader.good() && reader.peek() != EOF; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void SubfileReader::close() {
-    bitreader.flush();
-    reader.close();
-}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
