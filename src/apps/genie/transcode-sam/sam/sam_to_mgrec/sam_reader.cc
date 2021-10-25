@@ -5,6 +5,8 @@
  */
 
 #include <cstring>
+#include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -82,14 +84,36 @@ bool SamReader::isValid() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-int SamReader::readSamRecord(SamRecord& sr) {
-    auto res = sam_read1(sam_file, sam_header, sam_alignment);
-
-    if (res >= 0) {
-        sr = SamRecord(sam_alignment);
+int SamReader::readSamQuery(std::vector<SamRecord>& sr) {
+    sr.clear();
+    if (buffered_rec) {
+        sr.push_back(std::move(buffered_rec.get()));
+        buffered_rec.reset();
+    } else {
+        auto res = sam_read1(sam_file, sam_header, sam_alignment);
+        if (res >= 0) {
+            sr.emplace_back(sam_alignment);
+        } else {
+            return res;
+        }
     }
 
-    return res;
+    while (true) {
+        auto res = sam_read1(sam_file, sam_header, sam_alignment);
+        if (res >= 0) {
+            buffered_rec = SamRecord(sam_alignment);
+        } else {
+            return res;
+        }
+        if (buffered_rec->qname != sr.front().qname) {
+            return 0;
+        } else {
+            sr.push_back(std::move(buffered_rec.get()));
+            buffered_rec.reset();
+        }
+    }
+
+    return 0;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
