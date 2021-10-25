@@ -140,7 +140,7 @@ record::Chunk ClassifierRegroup::getChunk() {
                 if (!isWritten(seq, chunkOffset + refModeFullChunkID)) {
                     core::record::Chunk refChunk;
 
-                    std::cout << "Writing ref " << seq << " ["
+                    std::cerr << "Writing ref " << seq << " ["
                               << std::max(cov.first, (chunkOffset + refModeFullChunkID) * refMgr->getChunkSize())
                               << ", "
                               << std::min(cov.second, (chunkOffset + refModeFullChunkID + 1) * refMgr->getChunkSize())

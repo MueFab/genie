@@ -891,11 +891,11 @@ void generate_read_streams_pe(const std::string &temp_dir, const compression_par
         stats.add(s);
     }
 
-    std::cout << "count_same_rec: " << std::accumulate(pest.count_same_rec.begin(), pest.count_same_rec.end(), 0)
+    std::cerr << "count_same_rec: " << std::accumulate(pest.count_same_rec.begin(), pest.count_same_rec.end(), 0)
               << "\n";
-    std::cout << "count_split_same_AU: "
+    std::cerr << "count_split_same_AU: "
               << std::accumulate(pest.count_split_same_AU.begin(), pest.count_split_same_AU.end(), 0) << "\n";
-    std::cout << "count_split_diff_AU: "
+    std::cerr << "count_split_diff_AU: "
               << std::accumulate(pest.count_split_diff_AU.begin(), pest.count_split_diff_AU.end(), 0) << "\n";
 
     // write num blocks, reads per block and records per block to a file

@@ -566,7 +566,7 @@ void reorder(std::bitset<bitset_size> *read, bbhashdict *dict, uint16_t *read_le
     delete[] dict_lock;
     delete[] read_lock;
 #endif
-    std::cout << "Reordering done, " << std::accumulate(unmatched, unmatched + rg.num_thr, 0) << " were unmatched\n";
+    std::cerr << "Reordering done, " << std::accumulate(unmatched, unmatched + rg.num_thr, 0) << " were unmatched\n";
     for (int i = 0; i < rg.max_readlen; i++) delete[] mask[i];
     delete[] mask;
     delete[] mask1;
@@ -702,21 +702,21 @@ void reorder_main(const std::string &temp_dir, const compression_params &cp) {
     setglobalarrays(rg);
     std::bitset<bitset_size> *read = new std::bitset<bitset_size>[rg.numreads];
     uint16_t *read_lengths = new uint16_t[rg.numreads];
-    std::cout << "Reading file\n";
+    std::cerr << "Reading file\n";
     readDnaFile<bitset_size>(read, read_lengths, rg);
     if (rg.numreads > 0) {
-        std::cout << "Constructing dictionaries\n";
+        std::cerr << "Constructing dictionaries\n";
         constructdictionary<bitset_size>(read, dict, read_lengths, rg.numdict, rg.numreads, 2, rg.basedir, rg.num_thr);
     }
-    std::cout << "Reordering reads\n";
+    std::cerr << "Reordering reads\n";
     reorder<bitset_size>(read, dict, read_lengths, rg);
-    std::cout << "Writing to file\n";
+    std::cerr << "Writing to file\n";
     writetofile<bitset_size>(read, read_lengths, rg);
     delete[] read;
     delete[] dict;
     delete[] read_lengths;
     delete rg_pointer;
-    std::cout << "Done!\n";
+    std::cerr << "Done!\n";
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

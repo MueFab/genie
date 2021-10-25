@@ -110,7 +110,7 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
             workingDirectory.pop_back();
         }
     } catch (const CLI::CallForHelp &) {
-        std::cout << app.help() << std::endl;
+        std::cerr << app.help() << std::endl;
         help = true;
         return;
     } catch (const CLI::ParseError &e) {
@@ -207,44 +207,44 @@ void validateOutputFile(const std::string &file, bool forced) {
 
 void ProgramOptions::validate() {
     validateInputFile(inputFile);
-    std::cout << "Input file: " << inputFile << " with size " << size_string(ghc::filesystem::file_size(inputFile))
+    std::cerr << "Input file: " << inputFile << " with size " << size_string(ghc::filesystem::file_size(inputFile))
               << std::endl;
 
     if (!inputSupFile.empty()) {
         validateInputFile(inputSupFile);
-        std::cout << "Input supplementary file: " << inputSupFile << " with size "
+        std::cerr << "Input supplementary file: " << inputSupFile << " with size "
                   << size_string(ghc::filesystem::file_size(inputSupFile)) << std::endl;
     }
     if (!inputRefFile.empty()) {
         validateInputFile(inputRefFile);
-        std::cout << "Input reference file: " << inputRefFile << " with size "
+        std::cerr << "Input reference file: " << inputRefFile << " with size "
                   << size_string(ghc::filesystem::file_size(inputRefFile)) << std::endl;
     }
 
     if (!paramsetPath.empty()) {
         validateInputFile(paramsetPath);
-        std::cout << "Parameter input file: " << paramsetPath << " with size "
+        std::cerr << "Parameter input file: " << paramsetPath << " with size "
                   << size_string(ghc::filesystem::file_size(paramsetPath)) << std::endl;
     }
 
-    std::cout << std::endl;
+    std::cerr << std::endl;
 
     validateWorkingDir(workingDirectory);
-    std::cout << "Working directory: " << workingDirectory << " with "
+    std::cerr << "Working directory: " << workingDirectory << " with "
               << size_string(ghc::filesystem::space(workingDirectory).available) << " available" << std::endl;
 
     validateOutputFile(outputFile, forceOverwrite);
-    std::cout << "Output file: " << outputFile << " with "
+    std::cerr << "Output file: " << outputFile << " with "
               << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
 
     if (!outputSupFile.empty()) {
         validateOutputFile(outputSupFile, forceOverwrite);
-        std::cout << "Output supplementary file: " << outputSupFile << " with "
+        std::cerr << "Output supplementary file: " << outputSupFile << " with "
                   << size_string(ghc::filesystem::space(parent_dir(outputSupFile)).available) << " available"
                   << std::endl;
     }
 
-    std::cout << std::endl;
+    std::cerr << std::endl;
 
     UTILS_DIE_IF(qvMode != "none" && qvMode != "lossless", "QVMode " + qvMode + " unknown");
     UTILS_DIE_IF(refMode != "none" && refMode != "relevant" && refMode != "full", "RefMode " + refMode + " unknown");
@@ -255,12 +255,12 @@ void ProgramOptions::validate() {
                      "Invalid number of threads: " + std::to_string(numberOfThreads) +
                          ". Your system supports between 1 and " + std::to_string(std::thread::hardware_concurrency()) +
                          " threads.");
-        std::cout << "Threads: " << numberOfThreads << " with " << std::thread::hardware_concurrency() << " supported"
+        std::cerr << "Threads: " << numberOfThreads << " with " << std::thread::hardware_concurrency() << " supported"
                   << std::endl;
     } else {
         UTILS_DIE_IF(!numberOfThreads,
                      "Could not detect hardware concurrency level. Please provide a number of threads manually.");
-        std::cout << "Threads: " << numberOfThreads << " (could not detected supported number automatically)"
+        std::cerr << "Threads: " << numberOfThreads << " (could not detected supported number automatically)"
                   << std::endl;
     }
 }

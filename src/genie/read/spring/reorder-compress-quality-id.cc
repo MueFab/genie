@@ -69,14 +69,14 @@ void reorder_compress_quality_id(const std::string &temp_dir, const compression_
         // array to load ids and/or qualities into
 
         if (preserve_quality) {
-            std::cout << "Compressing qualities\n";
+            std::cerr << "Compressing qualities\n";
             uint32_t num_reads_per_file = numreads;
             reorder_compress(file_quality[0], temp_dir, num_reads_per_file, num_thr, num_reads_per_block, str_array,
                              str_array_size, order_array, "quality", qv_coder, name_coder, entropy, params, stats);
             remove(file_quality[0].c_str());
         }
         if (preserve_id) {
-            std::cout << "Compressing ids\n";
+            std::cerr << "Compressing ids\n";
             uint32_t num_reads_per_file = numreads;
             reorder_compress(file_id, temp_dir, num_reads_per_file, num_thr, num_reads_per_block, str_array,
                              str_array_size, order_array, "id", qv_coder, name_coder, entropy, params, stats);

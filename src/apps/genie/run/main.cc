@@ -105,7 +105,7 @@ void addFasta(const std::string& fastaFile, genie::core::FlowGraphEncode* flow,
     std::string fai = fastaFile.substr(0, fastaFile.size() - 5) + "fai";
     auto fasta_file = genie::util::make_unique<std::ifstream>(fastaFile);
     if (!ghc::filesystem::exists(fai)) {
-        std::cout << "Indexing " << fastaFile << " ..." << std::endl;
+        std::cerr << "Indexing " << fastaFile << " ..." << std::endl;
         std::ofstream fai_file(fai);
         genie::format::fasta::FastaReader::index(*fasta_file, fai_file);
     }
@@ -186,7 +186,7 @@ std::unique_ptr<genie::core::FlowGraph> buildDecoder(const ProgramOptions& pOpts
             std::string fai = pOpts.inputRefFile.substr(0, pOpts.inputRefFile.size() - 5) + "fai";
             auto fasta_file = genie::util::make_unique<std::ifstream>(pOpts.inputRefFile);
             if (!ghc::filesystem::exists(fai)) {
-                std::cout << "Indexing " << pOpts.inputRefFile << " ..." << std::endl;
+                std::cerr << "Indexing " << pOpts.inputRefFile << " ..." << std::endl;
                 std::ofstream fai_file(fai);
                 genie::format::fasta::FastaReader::index(*fasta_file, fai_file);
             }
@@ -238,7 +238,7 @@ int main(int argc, char* argv[]) {
 
     auto stats = flowGraph->getStats();
     stats.addDouble("time-total", watch.check());
-    std::cout << stats << std::endl;
+    std::cerr << stats << std::endl;
 
     return 0;
 }

@@ -17,11 +17,11 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 static void printCmdLine(int argc, char* argv[]) {
-    std::cout << "genie: command line: ";
+    std::cerr << "genie: command line: ";
     for (int i = 0; i < argc; i++) {
-        std::cout << argv[i] << " ";
+        std::cerr << argv[i] << " ";
     }
-    std::cout << std::endl;
+    std::cerr << std::endl;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ int stat(int, char*[]) { UTILS_DIE("Stat not implemented"); }
 // ---------------------------------------------------------------------------------------------------------------------
 
 int help(int, char*[]) {
-    std::cout << "Usage: \ngenie <operation> <operation specific options> \n\nList of operations:\n"
+    std::cerr << "Usage: \ngenie <operation> <operation specific options> \n\nList of operations:\n"
               << "help\nrun\ntranscode-fastq\ntranscode-sam\n\n"
               << "To learn more about an operation, type \"genie <operation> --help\"."
               << std::endl;
@@ -44,9 +44,9 @@ int main(int argc, char* argv[]) {
     printCmdLine(argc, argv);
 
 #ifdef GENIE_USE_OPENMP
-    std::cout << "genie: built with OpenMP\n\n" << std::endl;
+    std::cerr << "genie: built with OpenMP\n\n" << std::endl;
 #else
-    std::cout << "genie: *not* built with OpenMP\n\n" << std::endl;
+    std::cerr << "genie: *not* built with OpenMP\n\n" << std::endl;
 #endif
     genie::module::detect();
     constexpr int OPERATION_INDEX = 1;
