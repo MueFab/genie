@@ -85,20 +85,27 @@ OperationCase getOperation(const std::string& filenameIn, const std::string& fil
 
 template <class T>
 void attachExporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
-    outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile));
+    std::ostream* file1 = &std::cout;
+    if (pOpts.outputFile.substr(0, 2) != "-.") {
+        outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile));
+        file1 = outputFiles.back().get();
+    }
     if (file_extension(pOpts.outputFile) == "fastq") {
         if (file_extension(pOpts.outputSupFile) == "fastq") {
-            auto& file1 = *outputFiles.back();
-            outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputSupFile));
-            flow.addExporter(genie::util::make_unique<genie::format::fastq::Exporter>(file1, *outputFiles.back()));
+            std::ostream* file2 = &std::cout;
+            if (pOpts.outputSupFile.substr(0, 2) != "-.") {
+                outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputSupFile));
+                file2 = outputFiles.back().get();
+            }
+            flow.addExporter(genie::util::make_unique<genie::format::fastq::Exporter>(*file1, *file2));
         } else {
-            flow.addExporter(genie::util::make_unique<genie::format::fastq::Exporter>(*outputFiles.back()));
+            flow.addExporter(genie::util::make_unique<genie::format::fastq::Exporter>(*file1));
         }
     } else if (file_extension(pOpts.outputFile) == "mgrec") {
-        flow.addExporter(genie::util::make_unique<genie::format::mgrec::Exporter>(*outputFiles.back()));
+        flow.addExporter(genie::util::make_unique<genie::format::mgrec::Exporter>(*file1));
     } else if (file_extension(pOpts.outputFile) == "fasta") {
-        flow.addExporter(genie::util::make_unique<genie::format::fasta::Exporter>(
-            &flow.getRefMgr(), outputFiles.back().get(), pOpts.numberOfThreads));
+        flow.addExporter(
+            genie::util::make_unique<genie::format::fasta::Exporter>(&flow.getRefMgr(), file1, pOpts.numberOfThreads));
     }
 }
 
@@ -106,19 +113,25 @@ void attachExporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
 
 template <class T>
 void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ifstream>>& inputFiles) {
-    constexpr size_t BLOCKSIZE = 10000;
-    inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile));
+    constexpr size_t BLOCKSIZE = 256000;
+    std::istream* file1 = &std::cin;
+    if (pOpts.inputFile.substr(0, 2) != "-.") {
+        inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputFile));
+        file1 = inputFiles.back().get();
+    }
     if (file_extension(pOpts.inputFile) == "fastq") {
         if (file_extension(pOpts.inputSupFile) == "fastq") {
-            auto& file1 = *inputFiles.back();
-            inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputSupFile));
-            flow.addImporter(
-                genie::util::make_unique<genie::format::fastq::Importer>(BLOCKSIZE, file1, *inputFiles.back()));
+            std::istream* file2 = &std::cin;
+            if (pOpts.inputSupFile.substr(0, 2) != "-.") {
+                inputFiles.emplace_back(genie::util::make_unique<std::ifstream>(pOpts.inputSupFile));
+                file2 = inputFiles.back().get();
+            }
+            flow.addImporter(genie::util::make_unique<genie::format::fastq::Importer>(BLOCKSIZE, *file1, *file2));
         } else {
-            flow.addImporter(genie::util::make_unique<genie::format::fastq::Importer>(BLOCKSIZE, *inputFiles.back()));
+            flow.addImporter(genie::util::make_unique<genie::format::fastq::Importer>(BLOCKSIZE, *file1));
         }
     } else if (file_extension(pOpts.inputFile) == "mgrec") {
-        flow.addImporter(genie::util::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, *inputFiles.back()));
+        flow.addImporter(genie::util::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, *file1));
     }
 }
 

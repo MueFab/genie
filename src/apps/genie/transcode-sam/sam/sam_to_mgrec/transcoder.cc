@@ -8,11 +8,13 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <utility>
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_group.h"
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_reader.h"
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sorter.h"
 #include "apps/genie/transcode-sam/utils.h"
+#include "boost/optional/optional.hpp"
 #include "genie/core/record/alignment_split/other-rec.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -117,8 +119,13 @@ std::string gen_p2_tmp_fpath(Config& options, int rid, int ifile) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
-    std::ofstream total_output(options.outputFile, std::ios::binary | std::ios::trunc);
-    genie::util::BitWriter total_output_writer(&total_output);
+    std::unique_ptr<std::ostream> total_output;
+    std::ostream* out_stream = &std::cout;
+    if (options.outputFile.substr(0, 2) != "-.") {
+        total_output = genie::util::make_unique<std::ofstream>(options.outputFile, std::ios::binary | std::ios::trunc);
+        out_stream = total_output.get();
+    }
+    genie::util::BitWriter total_output_writer(out_stream);
 
     /// Process MPEG-G records of each RefID
     for (auto iref = 0; iref < nref; iref++) {
@@ -196,7 +203,7 @@ ErrorCode sam_to_mgrec_phase2(Config& options, int& nref) {
     }
 
     total_output_writer.flush();
-    total_output.flush();
+    out_stream->flush();
 
     return ErrorCode::success;
 }
@@ -448,9 +455,22 @@ void processSecondMappedSegment(size_t s, const genie::core::record::Record& rec
 // ---------------------------------------------------------------------------------------------------------------------
 
 ErrorCode transcode_mpg2sam(Config& options) {
-    std::ifstream input_file(options.inputFile);
-    std::ofstream output_file(options.outputFile);
-    genie::util::BitReader reader(input_file);
+    std::istream* input_file = &std::cin;
+    std::ostream* output_file = &std::cout;
+    boost::optional<std::ifstream> input_stream;
+    boost::optional<std::ofstream> output_stream;
+
+    if (options.inputFile.substr(0, 2) != "-.") {
+        input_stream = std::ifstream(options.inputFile);
+        input_file = &input_stream.get();
+    }
+
+    if (options.outputFile.substr(0, 2) != "-.") {
+        output_stream = std::ofstream(options.outputFile);
+        output_file = &output_stream.get();
+    }
+
+    genie::util::BitReader reader(*input_file);
 
     while (reader.isGood()) {
         genie::core::record::Record record(reader);
@@ -515,7 +535,7 @@ ErrorCode transcode_mpg2sam(Config& options) {
                     sam_record += record.getSegments()[s].getQualities()[0] + "\n";
                 }
 
-                output_file.write(sam_record.c_str(), sam_record.length());
+                output_file->write(sam_record.c_str(), sam_record.length());
             }
         }
     }

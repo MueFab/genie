@@ -20,11 +20,17 @@ namespace sam_to_mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SamReader::SamReader(const char* fpath)
-    : sam_file(hts_open(fpath, "r")),  // open bam file
-      sam_header(nullptr),             // read header
-      sam_alignment(bam_init1()),      // initialize an alignment
-      header_info(KS_INITIALIZE) {}
+SamReader::SamReader(const std::string& fpath)
+    : sam_file(nullptr),           // open bam file
+      sam_header(nullptr),         // read header
+      sam_alignment(bam_init1()),  // initialize an alignment
+      header_info(KS_INITIALIZE) {
+    if (fpath.substr(0, 2) == "-.") {
+        sam_file = hts_open("-", "r");
+    } else {
+        sam_file = hts_open(fpath.c_str(), "r");
+    }
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

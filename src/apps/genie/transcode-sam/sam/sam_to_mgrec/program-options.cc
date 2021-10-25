@@ -67,6 +67,9 @@ void Config::processCommandLine(int argc, char *argv[]) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void validateInputFile(const std::string &file) {
+    if (file.substr(0, 2) == "-.") {
+        return;
+    }
     UTILS_DIE_IF(!ghc::filesystem::exists(file), "Input file does not exist: " + file);
     std::ifstream stream(file);
     UTILS_DIE_IF(!stream, "Input file does exist, but is not accessible. Insufficient permissions? " + file);
@@ -75,6 +78,9 @@ void validateInputFile(const std::string &file) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void validateOutputFile(const std::string &file, bool forced) {
+    if (file.substr(0, 2) == "-.") {
+        return;
+    }
     UTILS_DIE_IF(ghc::filesystem::exists(file) && !forced,
                  "Output file already existing and no force flag set: " + file);
     UTILS_DIE_IF(ghc::filesystem::exists(file) && !ghc::filesystem::is_regular_file(file),
@@ -131,14 +137,22 @@ std::string parent_dir(const std::string &path) {
 
 void Config::validate() {
     validateInputFile(inputFile);
-    std::cerr << "Input file: " << inputFile << " with size " << size_string(ghc::filesystem::file_size(inputFile))
-              << std::endl;
+    if (inputFile.substr(0, 2) != "-.") {
+        std::cerr << "Input file: " << inputFile << " with size " << size_string(ghc::filesystem::file_size(inputFile))
+                  << std::endl;
+    } else {
+        std::cerr << "Input file: stdin" << std::endl;
+    }
 
     std::cerr << std::endl;
 
     validateOutputFile(outputFile, forceOverwrite);
-    std::cerr << "Output file: " << outputFile << " with "
-              << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
+    if (outputFile.substr(0, 2) != "-.") {
+        std::cerr << "Output file: " << outputFile << " with "
+                  << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
+    } else {
+        std::cerr << "Output file: stdout" << std::endl;
+    }
 
     std::cerr << std::endl;
 }
