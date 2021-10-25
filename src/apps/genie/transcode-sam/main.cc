@@ -23,12 +23,15 @@ int main(int argc, char* argv[]) {
         if (programOptions.help) {
             return 0;
         }
-        if (programOptions.inputFile.substr(programOptions.inputFile.length() - 3) == "sam" &&
+        if ((programOptions.inputFile.substr(programOptions.inputFile.length() - 3) == "sam" ||
+             programOptions.inputFile.substr(programOptions.inputFile.length() - 3) == "bam") &&
             programOptions.outputFile.substr(programOptions.outputFile.length() - 5) == "mgrec") {
             transcode_sam2mpg(programOptions);
         } else if (programOptions.outputFile.substr(programOptions.outputFile.length() - 3) == "sam" &&
                    programOptions.inputFile.substr(programOptions.inputFile.length() - 5) == "mgrec") {
             transcode_mpg2sam(programOptions);
+        } else {
+            UTILS_DIE("Unknown operation. Check the file extensions of inputs and outputs.");
         }
     } catch (const genie::util::Exception& e) {
         std::cerr << "Genie error: " << e.what() << std::endl;
