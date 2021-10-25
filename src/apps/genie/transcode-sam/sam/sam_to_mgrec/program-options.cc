@@ -54,7 +54,7 @@ void Config::processCommandLine(int argc, char *argv[]) {
     try {
         app.parse(argc, argv);
     } catch (const CLI::CallForHelp &) {
-        std::cout << app.help() << std::endl;
+        std::cerr << app.help() << std::endl;
         help = true;
         return;
     } catch (const CLI::ParseError &e) {
@@ -131,16 +131,16 @@ std::string parent_dir(const std::string &path) {
 
 void Config::validate() {
     validateInputFile(inputFile);
-    std::cout << "Input file: " << inputFile << " with size " << size_string(ghc::filesystem::file_size(inputFile))
+    std::cerr << "Input file: " << inputFile << " with size " << size_string(ghc::filesystem::file_size(inputFile))
               << std::endl;
 
-    std::cout << std::endl;
+    std::cerr << std::endl;
 
     validateOutputFile(outputFile, forceOverwrite);
-    std::cout << "Output file: " << outputFile << " with "
+    std::cerr << "Output file: " << outputFile << " with "
               << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
 
-    std::cout << std::endl;
+    std::cerr << std::endl;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

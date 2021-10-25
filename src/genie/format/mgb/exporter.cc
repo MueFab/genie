@@ -41,7 +41,7 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
     }
     if (!ref.isEmpty()) {
         for (auto& r : ref) {
-            std::cout << "Writing Ref " << r.getSeqID() << ":" << r.getStart() << "-" << r.getEnd() << "..."
+            std::cerr << "Writing Ref " << r.getSeqID() << ":" << r.getStart() << "-" << r.getEnd() << "..."
                       << std::endl;
         }
         ref.write(writer);
@@ -61,7 +61,7 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
     }
 
     if (!found) {
-        std::cout << "Writing PS " << uint32_t(data.getParameters().getID()) << "..." << std::endl;
+        std::cerr << "Writing PS " << uint32_t(data.getParameters().getID()) << "..." << std::endl;
         data.getParameters().write(writer);
         parameter_stash.push_back(data.getParameters());
     }
@@ -87,7 +87,7 @@ void Exporter::flowIn(core::AccessUnit&& t, const util::Section& id) {
         }
         au.addBlock(Block(descriptor, std::move(data.get(core::GenDesc(descriptor)))));
     }
-    std::cout << "Writing AU " << au.getID() << "..." << std::endl;
+    std::cerr << "Writing AU " << au.getID() << "..." << std::endl;
     au.write(writer);
     id_ctr++;
     getStats().addDouble("time-mgb-export", watch.check());

@@ -158,7 +158,7 @@ int main(int argc, char* argv[]) {
 
     auto stats = flowGraph->getStats();
     stats.addDouble("time-total", watch.check());
-    std::cout << stats << std::endl;
+    std::cerr << stats << std::endl;
 
     return 0;
 }
