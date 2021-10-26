@@ -103,7 +103,7 @@ void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord *r
 
 SamRecordGroup::SamRecordGroup()
     : data(size_t(TemplateType::TOTAL_INDICES),
-           std::vector<std::vector<SamRecord>>(size_t(MappingType::TOTAL_INDICES))) {}
+           std::vector<std::list<SamRecord>>(size_t(MappingType::TOTAL_INDICES))) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -165,15 +165,15 @@ genie::core::record::ClassType SamRecordGroup::checkClassTypeSingle() {
                            data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::UNMAPPED)].size();
     UTILS_DIE_IF(primary_count > 1, "Multiple primary alignments in single ended SAM record");
     if (primary_count == 0) {
-        std::cerr << "Warning: Single ended SAM record without primary reads, discarding whole record" << std::endl;
+        // std::cerr << "Warning: Single ended SAM record without primary reads, discarding whole record" << std::endl;
         data.clear();
         return genie::core::record::ClassType::NONE;
     } else if (data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::PRIMARY)].empty() &&
                !data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::NONPRIMARY)].empty()) {
-        std::cerr << "Warning: Single ended SAM record without primary alignment, but with secondary alignments, "
-                     "discarding "
-                     "alignments"
-                  << std::endl;
+    // std::cerr << "Warning: Single ended SAM record without primary alignment, but with secondary alignments, "
+    //              "discarding "
+    //              "alignments"
+    //           << std::endl;
         data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::NONPRIMARY)].clear();
     }
     return data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::PRIMARY)].empty()

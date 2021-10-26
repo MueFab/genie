@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <iostream>
 #include <memory>
+#include <mutex>
+#include <thread>
 #include <utility>
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_group.h"
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_reader.h"
@@ -25,24 +27,30 @@ namespace sam_to_mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void sam_to_mgrec_phase1(Config& options, int& chunk_id) {
-    auto sam_reader = SamReader(options.inputFile);
-    UTILS_DIE_IF(!sam_reader.isReady() || !sam_reader.isValid(), "Cannot open SAM file.");
-
-    chunk_id = 0;
+void phase1_thread(SamReader& sam_reader, int& chunk_id, const std::string& tmp_path, std::mutex& lock) {
     while (true) {
-        int ret = 0;
         std::vector<genie::core::record::Record> output_buffer;
         std::vector<std::vector<SamRecord>> queries;
-        std::cerr << "Converting chunk " << chunk_id << "..." << std::endl;
-        for (int i = 0; i < PHASE2_BUFFER_SIZE; ++i) {
-            queries.emplace_back();
-            ret = sam_reader.readSamQuery(queries.back());
-            UTILS_DIE_IF(ret < -1, "Error reading sam query");
-            if (ret == -1) {
-                break;
+        int ret = 0;
+        int this_chunk = 0;
+
+        // Load data
+
+        {
+            std::lock_guard<std::mutex> guard(lock);
+            this_chunk = chunk_id++;
+            std::cerr << "Processing chunk " << this_chunk << "..." << std::endl;
+            for (int i = 0; i < PHASE2_BUFFER_SIZE; ++i) {
+                queries.emplace_back();
+                ret = sam_reader.readSamQuery(queries.back());
+                if (ret == EOF) {
+                    break;
+                }
+                UTILS_DIE_IF(ret, "Error reading sam query: " + std::string(strerror(ret)));
             }
         }
+
+        // Convert data
         for (auto& q : queries) {
             SamRecordGroup buffer;
             for (auto& s : q) {
@@ -57,11 +65,13 @@ void sam_to_mgrec_phase1(Config& options, int& chunk_id) {
         }
         queries.clear();
 
-        std::cerr << "Sorting chunk " << chunk_id << "..." << std::endl;
+        // Sort data
+
         std::sort(output_buffer.begin(), output_buffer.end(), compare);
-        std::cerr << "Writing chunk " << chunk_id << "..." << std::endl;
+
+        // Write data
         {
-            std::string fpath = options.tmp_dir_path + "/" + std::to_string(chunk_id) + PHASE1_EXT;
+            std::string fpath = tmp_path + "/" + std::to_string(this_chunk) + PHASE1_EXT;
             std::ofstream output_file(fpath, std::ios::trunc | std::ios::binary);
             genie::util::BitWriter bwriter(&output_file);
 
@@ -72,17 +82,32 @@ void sam_to_mgrec_phase1(Config& options, int& chunk_id) {
             bwriter.flush();
         }
 
-        chunk_id++;
-
-        if (ret == -1) {
+        if (ret == EOF) {
             return;
         }
+    }
+}
+
+void sam_to_mgrec_phase1(Config& options, int& chunk_id) {
+    auto sam_reader = SamReader(options.inputFile);
+    UTILS_DIE_IF(!sam_reader.isReady() || !sam_reader.isValid(), "Cannot open SAM file.");
+
+    chunk_id = 0;
+    std::mutex lock;
+    std::vector<std::thread> threads;
+    threads.reserve(options.num_threads);
+    for (uint32_t i = 0; i < options.num_threads; ++i) {
+        threads.emplace_back([&]() { phase1_thread(sam_reader, chunk_id, options.tmp_dir_path, lock); });
+    }
+    for (auto& t : threads) {
+        t.join();
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void sam_to_mgrec_phase2(Config& options, int num_chunks) {
+    std::cerr << "Merging " << num_chunks << " chunks..." << std::endl;
     std::unique_ptr<std::ostream> total_output;
     std::ostream* out_stream = &std::cout;
     if (options.outputFile.substr(0, 2) != "-.") {
@@ -105,6 +130,7 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks) {
                 auto file = readers[i]->getPath();
                 readers.erase(readers.begin() + i);
                 std::remove(file.c_str());
+                std::cerr << file << " depleted" << std::endl;
             } else {
                 if (smallest == -1) {
                     smallest = i;
@@ -127,6 +153,8 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks) {
 
     total_output_writer.flush();
     out_stream->flush();
+
+    std::cerr << "Finished merging!" << std::endl;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

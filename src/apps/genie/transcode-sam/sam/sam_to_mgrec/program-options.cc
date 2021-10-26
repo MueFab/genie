@@ -7,6 +7,7 @@
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/program-options.h"
 #include <cassert>
 #include <fstream>
+#include <thread>
 #include <vector>
 #include "cli11/CLI11.hpp"
 #include "filesystem/filesystem.hpp"
@@ -51,6 +52,8 @@ void Config::processCommandLine(int argc, char *argv[]) {
     app.add_option("-o,--output-file", outputFile, "Output file (sam or mgrec)\n")->mandatory(true);
     forceOverwrite = false;
     app.add_flag("-f,--force", forceOverwrite, "Override existing output files\n");
+    num_threads = std::thread::hardware_concurrency();
+    app.add_option("-t,--threads", num_threads, "Number of threads to use.\n");
     try {
         app.parse(argc, argv);
     } catch (const CLI::CallForHelp &) {
@@ -152,6 +155,20 @@ void Config::validate() {
                   << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
     } else {
         std::cerr << "Output file: stdout" << std::endl;
+    }
+
+    if (std::thread::hardware_concurrency()) {
+        UTILS_DIE_IF(num_threads < 1 || num_threads > std::thread::hardware_concurrency(),
+                     "Invalid number of threads: " + std::to_string(num_threads) +
+                         ". Your system supports between 1 and " + std::to_string(std::thread::hardware_concurrency()) +
+                         " threads.");
+        std::cerr << "Threads: " << num_threads << " with " << std::thread::hardware_concurrency() << " supported"
+                  << std::endl;
+    } else {
+        UTILS_DIE_IF(!num_threads,
+                     "Could not detect hardware concurrency level. Please provide a number of threads manually.");
+        std::cerr << "Threads: " << num_threads << " (could not detected supported number automatically)"
+                  << std::endl;
     }
 
     std::cerr << std::endl;

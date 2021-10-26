@@ -49,7 +49,7 @@ class SamRecordGroup {
     };
 
  private:
-    std::vector<std::vector<std::vector<SamRecord>>> data;  //!< @brief
+    std::vector<std::vector<std::list<SamRecord>>> data;  //!< @brief
 
     /**
      * @brief
