@@ -39,7 +39,7 @@ AlignmentBox::AlignmentBox(ClassType type, uint8_t as_depth, uint8_t number_of_t
         return;
     }
     for (size_t tSeg = 1; tSeg < number_of_template_segments; tSeg++) {
-        splitAlignmentInfo.push_back(AlignmentSplit::factory(as_depth, reader));
+        splitAlignmentInfo[tSeg - 1] = AlignmentSplit::factory(as_depth, reader);
     }
 }
 
