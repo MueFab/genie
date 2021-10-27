@@ -9,6 +9,7 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <queue>
 #include <thread>
 #include <utility>
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_group.h"
@@ -118,37 +119,46 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks) {
 
     std::vector<std::unique_ptr<SubfileReader>> readers;
     readers.reserve(num_chunks);
+    auto cmp = [&](const SubfileReader* a, SubfileReader* b) {
+        return !compare(a->getRecord().get(), b->getRecord().get());
+    };
+    std::priority_queue<SubfileReader*, std::vector<SubfileReader*>, decltype(cmp)> heap(cmp);
     for (int i = 0; i < num_chunks; ++i) {
         readers.emplace_back(
             genie::util::make_unique<SubfileReader>(options.tmp_dir_path + "/" + std::to_string(i) + PHASE1_EXT));
+        if (!readers.back()->getRecord()) {
+            auto path = readers.back()->getPath();
+            std::cerr << path << " depleted" << std::endl;
+            readers.pop_back();
+            std::remove(path.c_str());
+        } else {
+            heap.push(readers.back().get());
+        }
     }
 
     while (true) {
-        int smallest = -1;
-        for (int i = 0; i < static_cast<int>(readers.size());) {
-            if (!readers[i]->getRecord()) {
-                auto file = readers[i]->getPath();
-                readers.erase(readers.begin() + i);
-                std::remove(file.c_str());
-                std::cerr << file << " depleted" << std::endl;
-            } else {
-                if (smallest == -1) {
-                    smallest = i;
-                } else {
-                    if (compare(readers[i]->getRecord().get(), readers[smallest]->getRecord().get())) {
-                        smallest = i;
-                    }
+        auto* reader = heap.top();
+        heap.pop();
+        auto rec = reader->moveRecord();
+        rec.write(total_output_writer);
+
+        if (reader->getRecord()) {
+            heap.push(reader);
+        } else {
+            auto path = reader->getPath();
+            std::cerr << path << " depleted" << std::endl;
+            for (auto it = readers.begin(); it != readers.end(); ++it) {
+                if (it->get() == reader) {
+                    readers.erase(it);
+                    break;
                 }
-                i++;
+            }
+            std::remove(path.c_str());
+
+            if (heap.empty()) {
+                break;
             }
         }
-
-        if (smallest == -1) {
-            break;
-        }
-
-        auto rec = readers[smallest]->moveRecord();
-        rec.write(total_output_writer);
     }
 
     total_output_writer.flush();
