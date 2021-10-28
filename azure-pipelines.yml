@@ -16,13 +16,13 @@ stages:
           imageName: 'macos-10.15'
           artifactName: 'macos1015'
           binDir: 'bin'
-        macos1014:
-          imageName: 'macos-10.14'
-          artifactName: 'macos1014'
+        macos1100:
+          imageName: 'macos-11'
+          artifactName: 'macos1100'
           binDir: 'bin'
-        windows2016:
-          imageName: 'vs2017-win2016'
-          artifactName: 'windows2016'
+        windows2022:
+          imageName: 'windows-2022'
+          artifactName: 'windows2022'
           binDir: 'bin/Debug'
         windows2019:
           imageName: 'windows-2019'
@@ -102,14 +102,14 @@ stages:
           artifactName: 'macos1015'
           architecture: ''
           binDir: 'bin'
-        macos1014:
-          imageName: 'macos-10.14'
-          artifactName: 'macos1014'
+        macos1100:
+          imageName: 'macos-11'
+          artifactName: 'macos1100'
           architecture: ''
           binDir: 'bin'
-        windows2016:
-          imageName: 'vs2017-win2016'
-          artifactName: 'windows2016'
+        windows2022:
+          imageName: 'windows-2022'
+          artifactName: 'windows2022'
           architecture: '-A x64'
           binDir: 'bin/Release'
         windows2019:
@@ -167,13 +167,13 @@ stages:
           imageName: 'macos-10.15'
           artifactName: 'macos1015'
           fileExt: ''
-        macos1014:
-          imageName: 'macos-10.14'
-          artifactName: 'macos1014'
+        macos1100:
+          imageName: 'macos-11'
+          artifactName: 'macos1100'
           fileExt: ''
-        windows2016:
-          imageName: 'vs2017-win2016'
-          artifactName: 'windows2016'
+        windows2022:
+          imageName: 'windows-2022'
+          artifactName: 'windows2022'
           fileExt: '.exe'
         windows2019:
           imageName: 'windows-2019'
@@ -290,13 +290,13 @@ stages:
           imageName: 'macos-10.15'
           artifactName: 'macos1015'
           fileExt: ''
-        macos1014:
-          imageName: 'macos-10.14'
-          artifactName: 'macos1014'
+        macos1100:
+          imageName: 'macos-11'
+          artifactName: 'macos1100'
           fileExt: ''
-        windows2016:
-          imageName: 'vs2017-win2016'
-          artifactName: 'windows2016'
+        windows2022:
+          imageName: 'windows-2022'
+          artifactName: 'windows2022'
           binDir: 'bin/Debug'
         windows2019:
           imageName: 'windows-2019'
@@ -388,9 +388,9 @@ stages:
           imageName: 'macos-10.15'
           artifactName: 'macos1015'
           fileExt: ''
-        macos1014:
-          imageName: 'macos-10.14'
-          artifactName: 'macos1014'
+        macos1100:
+          imageName: 'macos-11'
+          artifactName: 'macos1100'
           fileExt: ''
     pool:
       vmImage: $(imageName)
