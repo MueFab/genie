@@ -237,6 +237,13 @@ class Record {
 
     /**
      * @brief
+     * @param id
+     * @param b
+     */
+    void setAlignment(size_t id, AlignmentBox&& b);
+
+    /**
+     * @brief
      * @return
      */
     std::pair<size_t, size_t> getTemplatePosition() const;

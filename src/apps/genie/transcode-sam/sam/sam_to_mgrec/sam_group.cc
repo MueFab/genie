@@ -102,8 +102,8 @@ void SamRecordGroup::addAlignment(genie::core::record::Record &rec, SamRecord *r
 // ---------------------------------------------------------------------------------------------------------------------
 
 SamRecordGroup::SamRecordGroup()
-    : data(size_t(TemplateType::TOTAL_INDICES),
-           std::vector<std::list<SamRecord>>(size_t(MappingType::TOTAL_INDICES))) {}
+    : data(size_t(TemplateType::TOTAL_INDICES), std::vector<std::list<SamRecord>>(size_t(MappingType::TOTAL_INDICES))) {
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -170,10 +170,10 @@ genie::core::record::ClassType SamRecordGroup::checkClassTypeSingle() {
         return genie::core::record::ClassType::NONE;
     } else if (data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::PRIMARY)].empty() &&
                !data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::NONPRIMARY)].empty()) {
-    // std::cerr << "Warning: Single ended SAM record without primary alignment, but with secondary alignments, "
-    //              "discarding "
-    //              "alignments"
-    //           << std::endl;
+        // std::cerr << "Warning: Single ended SAM record without primary alignment, but with secondary alignments, "
+        //              "discarding "
+        //              "alignments"
+        //           << std::endl;
         data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::NONPRIMARY)].clear();
     }
     return data[uint8_t(TemplateType::SINGLE)][uint8_t(MappingType::PRIMARY)].empty()
@@ -397,6 +397,11 @@ void SamRecordGroup::convert(std::list<genie::core::record::Record> &records, bo
     auto tuple = SamRecordGroup::getReadTuple();
     SamRecord *r1 = tuple.first;
     SamRecord *r2 = tuple.second;
+
+    // TODO(Fabian): Support for paired records, mapped to different references
+    if (r1 && r2 && r1->getRID() != r2->getRID()) {
+        return;
+    }
 
     auto flag_tuple = convertFlags2Mpeg(r1 ? r1->getFlag() : r2->getFlag());
     bool is_r1_first = isR1First(cls);

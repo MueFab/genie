@@ -17,6 +17,7 @@
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sorter.h"
 #include "apps/genie/transcode-sam/utils.h"
 #include "boost/optional/optional.hpp"
+#include "filesystem/filesystem.hpp"
 #include "genie/core/record/alignment_split/other-rec.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -25,6 +26,36 @@ namespace genieapp {
 namespace transcode_sam {
 namespace sam {
 namespace sam_to_mgrec {
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+RefInfo::RefInfo(const std::string& fasta_name)
+    : refMgr(genie::util::make_unique<genie::core::ReferenceManager>(4)), valid(false) {
+    if (!ghc::filesystem::exists(fasta_name)) {
+        return;
+    }
+
+    std::string fai_name = fasta_name.substr(0, fasta_name.find_last_of('.')) + ".fai";
+    if (!ghc::filesystem::exists(fai_name)) {
+        std::ifstream fasta_in(fasta_name);
+        std::ofstream fai_out(fai_name);
+        genie::format::fasta::FastaReader::index(fasta_in, fai_out);
+    }
+
+    fastaFile = genie::util::make_unique<std::ifstream>(fasta_name);
+    faiFile = genie::util::make_unique<std::ifstream>(fai_name);
+
+    fastaMgr = genie::util::make_unique<genie::format::fasta::Manager>(*fastaFile, *faiFile, refMgr.get());
+    valid = true;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool RefInfo::isValid() const { return valid; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+genie::core::ReferenceManager* RefInfo::getMgr() { return refMgr.get(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -89,7 +120,9 @@ void phase1_thread(SamReader& sam_reader, int& chunk_id, const std::string& tmp_
     }
 }
 
-void sam_to_mgrec_phase1(Config& options, int& chunk_id) {
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::vector<std::pair<std::string, size_t>> sam_to_mgrec_phase1(Config& options, int& chunk_id) {
     auto sam_reader = SamReader(options.inputFile);
     UTILS_DIE_IF(!sam_reader.isReady() || !sam_reader.isValid(), "Cannot open SAM file.");
 
@@ -103,12 +136,165 @@ void sam_to_mgrec_phase1(Config& options, int& chunk_id) {
     for (auto& t : threads) {
         t.join();
     }
+
+    auto refs = sam_reader.getRefs();
+    return refs;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void sam_to_mgrec_phase2(Config& options, int num_chunks) {
+std::string patch_ecigar(const std::string& ref, const std::string& seq, const std::string& ecigar) {
+    std::string fixedCigar;
+    auto classChecker = [&](uint8_t cigar, const genie::util::StringView& _bs,
+                            const genie::util::StringView& _rs) -> bool {
+        auto bs = _bs.deploy(seq.data());
+        auto rs = _rs.deploy(ref.data());
+        auto length = std::max(bs.length(), rs.length());
+        switch (cigar) {
+            case '+':
+            case '-':
+            case ')':
+            case ']':
+            case '*':
+            case '/':
+            case '%':
+                if (cigar == ')') {
+                    fixedCigar += std::string(1, '(');
+                }
+                if (cigar == ']') {
+                    fixedCigar += std::string(1, '[');
+                }
+                fixedCigar += std::to_string(length) + std::string(1, cigar);
+                return true;
+            default:
+                break;
+        }
+
+        if (genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN).isIncluded(cigar)) {
+            fixedCigar += std::string(1, cigar);
+            return true;
+        }
+
+        UTILS_DIE_IF(cigar != '=', "Unknown ecigar char.");
+
+        size_t counter = 0;
+
+        for (size_t i = 0; i < length; ++i) {
+            if (*(bs.begin() + i) != *(rs.begin() + i)) {
+                if (counter != 0) {
+                    fixedCigar += std::to_string(counter) + "=";
+                    counter = 0;
+                }
+                fixedCigar += std::string(1, *(bs.begin() + i));
+
+            } else {
+                counter++;
+            }
+        }
+
+        if (counter != 0) {
+            fixedCigar += std::to_string(counter) + "=";
+            counter = 0;
+        }
+
+        return true;
+    };
+
+    genie::core::CigarTokenizer::tokenize(ecigar, genie::core::getECigarInfo(), classChecker);
+    return fixedCigar;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+genie::core::record::ClassType classifyEcigar(const std::string& cigar) {
+    genie::core::record::ClassType ret = genie::core::record::ClassType::CLASS_P;
+    for (const auto& c : cigar) {
+        if (c >= '0' && c <= '9') {
+            continue;
+        }
+        if (c == '+' || c == '-' || c == '(' || c == '[') {
+            return genie::core::record::ClassType::CLASS_I;
+        }
+        if (genie::core::getAlphabetProperties(genie::core::AlphabetID::ACGTN).isIncluded(c)) {
+            if (c == 'N') {
+                ret = std::max(ret, genie::core::record::ClassType::CLASS_N);
+            } else {
+                ret = std::max(ret, genie::core::record::ClassType::CLASS_M);
+            }
+        }
+    }
+    return ret;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std::string, size_t>>& refNames,
+                RefInfo& ref) {
+    if (r.getClassID() == genie::core::record::ClassType::CLASS_U) {
+        return;
+    }
+
+    if (!ref.isValid()) {
+        return;
+    }
+
+    size_t alignment_ctr = 0;
+    for (auto& a : r.getAlignments()) {
+        auto pos = a.getPosition();
+        auto refSeq = ref.getMgr()
+                          ->load(refNames[r.getAlignmentSharedData().getSeqID()].first, pos,
+                                 pos + r.getMappedLength(alignment_ctr, 0))
+                          .getString(pos, pos + r.getMappedLength(alignment_ctr, 0));
+        auto cigar = a.getAlignment().getECigar();
+        auto seq = r.getSegments()[r.getSegments().size() == 2 ? !r.isRead1First() : 0].getSequence();
+
+        cigar = patch_ecigar(refSeq, seq, cigar);
+
+        if (r.getClassID() != genie::core::record::ClassType::CLASS_HM) {
+            r.setClassType(classifyEcigar(cigar));
+        }
+
+        genie::core::record::AlignmentBox newBox(
+            a.getPosition(), genie::core::record::Alignment(std::move(cigar), a.getAlignment().getRComp()));
+
+        // -----------
+
+        if (a.getAlignmentSplits().size() == 1) {
+            if (a.getAlignmentSplits().front()->getType() == genie::core::record::AlignmentSplit::Type::SAME_REC) {
+                const auto& split =
+                    dynamic_cast<const genie::core::record::alignment_split::SameRec&>(*a.getAlignmentSplits().front());
+                pos = a.getPosition() + split.getDelta();
+                refSeq = ref.getMgr()
+                             ->load(refNames[r.getAlignmentSharedData().getSeqID()].first, pos,
+                                    pos + r.getMappedLength(alignment_ctr, 1))
+                             .getString(pos, pos + r.getMappedLength(alignment_ctr, 1));
+                cigar = split.getAlignment().getECigar();
+                seq = r.getSegments()[r.isRead1First()].getSequence();
+
+                cigar = patch_ecigar(refSeq, seq, cigar);
+
+                if (r.getClassID() != genie::core::record::ClassType::CLASS_HM) {
+                    r.setClassType(std::max(r.getClassID(), classifyEcigar(cigar)));
+                }
+
+                newBox.addAlignmentSplit(genie::util::make_unique<genie::core::record::alignment_split::SameRec>(
+                    split.getDelta(),
+                    genie::core::record::Alignment(std::move(cigar), split.getAlignment().getRComp())));
+            } else {
+                newBox.addAlignmentSplit(a.getAlignmentSplits().front()->clone());
+            }
+        }
+        r.setAlignment(alignment_ctr, std::move(newBox));
+        alignment_ctr++;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std::pair<std::string, size_t>>& refs) {
     std::cerr << "Merging " << num_chunks << " chunks..." << std::endl;
+    RefInfo refinf(options.fasta_file_path);
+
     std::unique_ptr<std::ostream> total_output;
     std::ostream* out_stream = &std::cout;
     if (options.outputFile.substr(0, 2) != "-.") {
@@ -140,6 +326,9 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks) {
         auto* reader = heap.top();
         heap.pop();
         auto rec = reader->moveRecord();
+
+        fix_ecigar(rec, refs, refinf);
+
         rec.write(total_output_writer);
 
         if (reader->getRecord()) {
@@ -172,8 +361,8 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks) {
 void transcode_sam2mpg(Config& options) {
     int nref;
 
-    sam_to_mgrec_phase1(options, nref);
-    sam_to_mgrec_phase2(options, nref);
+    auto refs = sam_to_mgrec_phase1(options, nref);
+    sam_to_mgrec_phase2(options, nref, refs);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

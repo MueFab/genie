@@ -54,6 +54,10 @@ void Config::processCommandLine(int argc, char *argv[]) {
     app.add_flag("-f,--force", forceOverwrite, "Override existing output files\n");
     num_threads = std::thread::hardware_concurrency();
     app.add_option("-t,--threads", num_threads, "Number of threads to use.\n");
+    fasta_file_path = "";
+    app.add_option("-r,--reference", fasta_file_path,
+                   "Reference to infer the class of "
+                   "MPEG records. If no reference path is supplied, classes M, N and P are not generated.\n");
     try {
         app.parse(argc, argv);
     } catch (const CLI::CallForHelp &) {
@@ -167,8 +171,7 @@ void Config::validate() {
     } else {
         UTILS_DIE_IF(!num_threads,
                      "Could not detect hardware concurrency level. Please provide a number of threads manually.");
-        std::cerr << "Threads: " << num_threads << " (could not detected supported number automatically)"
-                  << std::endl;
+        std::cerr << "Threads: " << num_threads << " (could not detected supported number automatically)" << std::endl;
     }
 
     std::cerr << std::endl;

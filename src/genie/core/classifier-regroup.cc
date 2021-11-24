@@ -333,7 +333,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
     }
 
     for (auto& r : chunk.getData()) {
-        auto classtype = coarseClassify(r);  // Only look at the ecigar for first classification
+        auto classtype = r.getClassID();  // Only look at the ecigar for first classification
         bool paired = r.getNumberOfTemplateSegments() > 1;
         bool refBased = false;
 
@@ -343,7 +343,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
         if (classtype != core::record::ClassType::CLASS_U) {
             refBased = isCovered(r);
         }
-        if (refBased) {
+ /*       if (refBased) {
             // Load reference and do detailed classification
             if (classtype == record::ClassType::CLASS_M) {
                 classtype = fineClassifierRecord(record_reference, r, false);
@@ -351,7 +351,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
                 fineClassifierRecord(record_reference, r, true);
             }
         }
-        r.setClassType(classtype);
+        r.setClassType(classtype);*/
 
         currentChunks[refBased][paired][(uint8_t)classtype - 1].getData().push_back(r);
         currentChunks[refBased][paired][(uint8_t)classtype - 1].getRef().merge(record_reference);
