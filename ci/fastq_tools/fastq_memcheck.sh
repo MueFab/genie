@@ -19,9 +19,9 @@ else
     exe_file_extension=""
 fi
 
-if [[ "$OSTYPE" != "linux-gnu"* ]]; then
+if [[ "$OSTYPE" != "linux"* ]]; then
     echo "Skipping memcheck for non-linux OS"
-    return 0
+    exit 0
 fi
 
 
