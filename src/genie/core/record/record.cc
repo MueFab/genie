@@ -298,6 +298,10 @@ size_t Record::getMappedLength(size_t alignment, size_t split) const {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void Record::setAlignment(size_t id, AlignmentBox &&b) { this->alignmentInfo[id] = std::move(b); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::pair<size_t, size_t> Record::getTemplatePosition() const {
     std::pair<size_t, size_t> ret = {getPosition(0, 0), getPosition(0, 0) + getMappedLength(0, 0)};
     for (size_t i = 0; i < getAlignments().front().getAlignmentSplits().size(); ++i) {
