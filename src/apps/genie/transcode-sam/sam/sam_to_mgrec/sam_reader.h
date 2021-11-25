@@ -11,7 +11,9 @@
 
 #include <htslib/sam.h>
 #include <string>
+#include <vector>
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/sam_record.h"
+#include "boost/optional/optional.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -30,12 +32,14 @@ class SamReader {
     bam1_t* sam_alignment;  //!< @brief
     kstring_t header_info;  //!< @brief
 
+    boost::optional<SamRecord> buffered_rec;
+
  public:
     /**
      * @brief
      * @param fpath
      */
-    explicit SamReader(const char* fpath);
+    explicit SamReader(const std::string& fpath);
 
     /**
      * @brief
@@ -71,7 +75,7 @@ class SamReader {
      * @param sr
      * @return
      */
-    int readSamRecord(SamRecord& sr);
+    int readSamQuery(std::vector<SamRecord>& sr);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

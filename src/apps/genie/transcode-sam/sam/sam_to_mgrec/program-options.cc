@@ -7,6 +7,7 @@
 #include "apps/genie/transcode-sam/sam/sam_to_mgrec/program-options.h"
 #include <cassert>
 #include <fstream>
+#include <thread>
 #include <vector>
 #include "cli11/CLI11.hpp"
 #include "filesystem/filesystem.hpp"
@@ -51,10 +52,12 @@ void Config::processCommandLine(int argc, char *argv[]) {
     app.add_option("-o,--output-file", outputFile, "Output file (sam or mgrec)\n")->mandatory(true);
     forceOverwrite = false;
     app.add_flag("-f,--force", forceOverwrite, "Override existing output files\n");
+    num_threads = std::thread::hardware_concurrency();
+    app.add_option("-t,--threads", num_threads, "Number of threads to use.\n");
     try {
         app.parse(argc, argv);
     } catch (const CLI::CallForHelp &) {
-        std::cout << app.help() << std::endl;
+        std::cerr << app.help() << std::endl;
         help = true;
         return;
     } catch (const CLI::ParseError &e) {
@@ -67,6 +70,9 @@ void Config::processCommandLine(int argc, char *argv[]) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void validateInputFile(const std::string &file) {
+    if (file.substr(0, 2) == "-.") {
+        return;
+    }
     UTILS_DIE_IF(!ghc::filesystem::exists(file), "Input file does not exist: " + file);
     std::ifstream stream(file);
     UTILS_DIE_IF(!stream, "Input file does exist, but is not accessible. Insufficient permissions? " + file);
@@ -75,6 +81,9 @@ void validateInputFile(const std::string &file) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void validateOutputFile(const std::string &file, bool forced) {
+    if (file.substr(0, 2) == "-.") {
+        return;
+    }
     UTILS_DIE_IF(ghc::filesystem::exists(file) && !forced,
                  "Output file already existing and no force flag set: " + file);
     UTILS_DIE_IF(ghc::filesystem::exists(file) && !ghc::filesystem::is_regular_file(file),
@@ -131,16 +140,38 @@ std::string parent_dir(const std::string &path) {
 
 void Config::validate() {
     validateInputFile(inputFile);
-    std::cout << "Input file: " << inputFile << " with size " << size_string(ghc::filesystem::file_size(inputFile))
-              << std::endl;
+    if (inputFile.substr(0, 2) != "-.") {
+        std::cerr << "Input file: " << inputFile << " with size " << size_string(ghc::filesystem::file_size(inputFile))
+                  << std::endl;
+    } else {
+        std::cerr << "Input file: stdin" << std::endl;
+    }
 
-    std::cout << std::endl;
+    std::cerr << std::endl;
 
     validateOutputFile(outputFile, forceOverwrite);
-    std::cout << "Output file: " << outputFile << " with "
-              << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
+    if (outputFile.substr(0, 2) != "-.") {
+        std::cerr << "Output file: " << outputFile << " with "
+                  << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
+    } else {
+        std::cerr << "Output file: stdout" << std::endl;
+    }
 
-    std::cout << std::endl;
+    if (std::thread::hardware_concurrency()) {
+        UTILS_DIE_IF(num_threads < 1 || num_threads > std::thread::hardware_concurrency(),
+                     "Invalid number of threads: " + std::to_string(num_threads) +
+                         ". Your system supports between 1 and " + std::to_string(std::thread::hardware_concurrency()) +
+                         " threads.");
+        std::cerr << "Threads: " << num_threads << " with " << std::thread::hardware_concurrency() << " supported"
+                  << std::endl;
+    } else {
+        UTILS_DIE_IF(!num_threads,
+                     "Could not detect hardware concurrency level. Please provide a number of threads manually.");
+        std::cerr << "Threads: " << num_threads << " (could not detected supported number automatically)"
+                  << std::endl;
+    }
+
+    std::cerr << std::endl;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

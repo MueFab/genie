@@ -11,6 +11,7 @@
 
 #include <fstream>
 #include <string>
+#include "boost/optional/optional.hpp"
 #include "genie/core/record/record.h"
 #include "genie/util/bitreader.h"
 #include "genie/util/bitwriter.h"
@@ -27,10 +28,10 @@ namespace sam_to_mgrec {
  */
 class SubfileReader {
  private:
-    uint64_t curr_mgrec_pos;           //!< @brief
-    std::ifstream reader;              //!< @brief
-    genie::util::BitReader bitreader;  //!< @brief
-    genie::core::record::Record rec;   //!< @brief
+    std::ifstream reader;                              //!< @brief
+    genie::util::BitReader bitreader;                  //!< @brief
+    boost::optional<genie::core::record::Record> rec;  //!< @brief
+    std::string path;
 
  public:
     /**
@@ -48,31 +49,13 @@ class SubfileReader {
      * @brief
      * @return
      */
-    bool readRecord();
+    genie::core::record::Record moveRecord();
 
     /**
      * @brief
      * @return
      */
-    genie::core::record::Record&& moveRecord();
-
-    /**
-     * @brief
-     * @return
-     */
-    const genie::core::record::Record& getRecord() const;
-
-    /**
-     * @brief
-     * @param bitwriter
-     */
-    void writeRecord(genie::util::BitWriter& bitwriter);
-
-    /**
-     * @brief
-     * @return
-     */
-    uint64_t getPos() const;
+    const boost::optional<genie::core::record::Record>& getRecord() const;
 
     /**
      * @brief
@@ -80,10 +63,7 @@ class SubfileReader {
      */
     bool good();
 
-    /**
-     * @brief
-     */
-    void close();
+    std::string getPath() const { return path; }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

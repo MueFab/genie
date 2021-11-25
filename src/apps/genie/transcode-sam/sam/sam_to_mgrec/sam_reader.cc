@@ -5,6 +5,8 @@
  */
 
 #include <cstring>
+#include <utility>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -20,11 +22,17 @@ namespace sam_to_mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-SamReader::SamReader(const char* fpath)
-    : sam_file(hts_open(fpath, "r")),  // open bam file
-      sam_header(nullptr),             // read header
-      sam_alignment(bam_init1()),      // initialize an alignment
-      header_info(KS_INITIALIZE) {}
+SamReader::SamReader(const std::string& fpath)
+    : sam_file(nullptr),           // open bam file
+      sam_header(nullptr),         // read header
+      sam_alignment(bam_init1()),  // initialize an alignment
+      header_info(KS_INITIALIZE) {
+    if (fpath.substr(0, 2) == "-.") {
+        sam_file = hts_open("-", "r");
+    } else {
+        sam_file = hts_open(fpath.c_str(), "r");
+    }
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -76,14 +84,36 @@ bool SamReader::isValid() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-int SamReader::readSamRecord(SamRecord& sr) {
-    auto res = sam_read1(sam_file, sam_header, sam_alignment);
-
-    if (res >= 0) {
-        sr = SamRecord(sam_alignment);
+int SamReader::readSamQuery(std::vector<SamRecord>& sr) {
+    sr.clear();
+    if (buffered_rec) {
+        sr.push_back(std::move(buffered_rec.get()));
+        buffered_rec.reset();
+    } else {
+        auto res = sam_read1(sam_file, sam_header, sam_alignment);
+        if (res >= 0) {
+            sr.emplace_back(sam_alignment);
+        } else {
+            return res;
+        }
     }
 
-    return res;
+    while (true) {
+        auto res = sam_read1(sam_file, sam_header, sam_alignment);
+        if (res >= 0) {
+            buffered_rec = SamRecord(sam_alignment);
+        } else {
+            return res;
+        }
+        if (buffered_rec->qname != sr.front().qname) {
+            return 0;
+        } else {
+            sr.push_back(std::move(buffered_rec.get()));
+            buffered_rec.reset();
+        }
+    }
+
+    return 0;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
