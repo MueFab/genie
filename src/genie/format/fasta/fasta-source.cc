@@ -56,7 +56,7 @@ bool FastaSource::pump(uint64_t& id, std::mutex& lock) {
     size_t actual_length =
         loc_id.start == (accu_lengths[seq] - 1) ? refMgr->getLength(seq) % refMgr->getChunkSize() : string->length();
 
-    std::cout << "Decompressing " << seq << " [" << pos * refMgr->getChunkSize() << ", "
+    std::cerr << "Decompressing " << seq << " [" << pos * refMgr->getChunkSize() << ", "
               << pos * refMgr->getChunkSize() + actual_length << "]" << std::endl;
 
     util::OrderedSection outSec(&outlock, loc_id);

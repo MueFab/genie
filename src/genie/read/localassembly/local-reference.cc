@@ -226,9 +226,9 @@ void LocalReference::printWindow() const {
     for (size_t i = 0; i < sequences.size(); ++i) {
         uint64_t totalOffset = sequence_positions[i] - minPos;
         for (size_t s = 0; s < totalOffset; ++s) {
-            std::cout << ".";
+            std::cerr << ".";
         }
-        std::cout << sequences[i] << std::endl;
+        std::cerr << sequences[i] << std::endl;
     }
 }
 

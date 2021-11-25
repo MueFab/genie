@@ -60,7 +60,7 @@ ProgramOptions::ProgramOptions(int argc, char *argv[]) : help(false) {
     try {
         app.parse(argc, argv);
     } catch (const CLI::CallForHelp &) {
-        std::cout << app.help() << std::endl;
+        std::cerr << app.help() << std::endl;
         help = true;
         return;
     } catch (const CLI::ParseError &e) {
@@ -92,6 +92,9 @@ std::string size_string(std::uintmax_t f_size) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void validateInputFile(const std::string &file) {
+    if (file.substr(0, 2) == "-.") {
+        return;
+    }
     UTILS_DIE_IF(!ghc::filesystem::exists(file), "Input file does not exist: " + file);
     std::ifstream stream(file);
     UTILS_DIE_IF(!stream, "Input file does exist, but is not accessible. Insufficient permissions? " + file);
@@ -138,6 +141,9 @@ void validateWorkingDir(const std::string &dir) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void validateOutputFile(const std::string &file, bool forced) {
+    if (file.substr(0, 2) == "-.") {
+        return;
+    }
     UTILS_DIE_IF(ghc::filesystem::exists(file) && !forced,
                  "Output file already existing and no force flag set: " + file);
     UTILS_DIE_IF(ghc::filesystem::exists(file) && !ghc::filesystem::is_regular_file(file),
@@ -157,41 +163,58 @@ void validateOutputFile(const std::string &file, bool forced) {
 
 void ProgramOptions::validate() {
     validateInputFile(inputFile);
-    std::cout << "Input file: " << inputFile << " with size " << size_string(ghc::filesystem::file_size(inputFile))
-              << std::endl;
+
+    if (inputFile.substr(0, 2) != "-.") {
+        std::cerr << "Input file: " << inputFile << " with size " << size_string(ghc::filesystem::file_size(inputFile))
+                  << std::endl;
+    } else {
+        std::cerr << "Input file: stdin" << std::endl;
+    }
 
     if (!inputSupFile.empty()) {
         validateInputFile(inputSupFile);
-        std::cout << "Input supplementary file: " << inputSupFile << " with size "
-                  << size_string(ghc::filesystem::file_size(inputSupFile)) << std::endl;
+        if (inputSupFile.substr(0, 2) != "-.") {
+            std::cerr << "Input supplementary file: " << inputSupFile << " with size "
+                      << size_string(ghc::filesystem::file_size(inputSupFile)) << std::endl;
+        } else {
+            std::cerr << "Input supplementary file: stdin" << std::endl;
+        }
     }
 
-    std::cout << std::endl;
+    std::cerr << std::endl;
 
     validateOutputFile(outputFile, forceOverwrite);
-    std::cout << "Output file: " << outputFile << " with "
-              << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
+    if (outputFile.substr(0, 2) != "-.") {
+        std::cerr << "Output file: " << outputFile << " with "
+                  << size_string(ghc::filesystem::space(parent_dir(outputFile)).available) << " available" << std::endl;
+    } else {
+        std::cerr << "Output file: stdout" << std::endl;
+    }
 
     if (!outputSupFile.empty()) {
         validateOutputFile(outputSupFile, forceOverwrite);
-        std::cout << "Output supplementary file: " << outputSupFile << " with "
-                  << size_string(ghc::filesystem::space(parent_dir(outputSupFile)).available) << " available"
-                  << std::endl;
+        if (outputFile.substr(0, 2) != "-.") {
+            std::cerr << "Output supplementary file: " << outputSupFile << " with "
+                      << size_string(ghc::filesystem::space(parent_dir(outputSupFile)).available) << " available"
+                      << std::endl;
+        } else {
+            std::cerr << "Output supplementary file: stdout" << std::endl;
+        }
     }
 
-    std::cout << std::endl;
+    std::cerr << std::endl;
 
     if (std::thread::hardware_concurrency()) {
         UTILS_DIE_IF(numberOfThreads < 1 || numberOfThreads > std::thread::hardware_concurrency(),
                      "Invalid number of threads: " + std::to_string(numberOfThreads) +
                          ". Your system supports between 1 and " + std::to_string(std::thread::hardware_concurrency()) +
                          " threads.");
-        std::cout << "Threads: " << numberOfThreads << " with " << std::thread::hardware_concurrency() << " supported"
+        std::cerr << "Threads: " << numberOfThreads << " with " << std::thread::hardware_concurrency() << " supported"
                   << std::endl;
     } else {
         UTILS_DIE_IF(!numberOfThreads,
                      "Could not detect hardware concurrency level. Please provide a number of threads manually.");
-        std::cout << "Threads: " << numberOfThreads << " (could not detected supported number automatically)"
+        std::cerr << "Threads: " << numberOfThreads << " (could not detected supported number automatically)"
                   << std::endl;
     }
 }

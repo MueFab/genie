@@ -4,33 +4,35 @@
  * https://github.com/mitogen/genie for more details.
  */
 
-#include "apps/genie/transcode-sam/utils.h"
-#include "genie/core/record/alignment_split/other-rec.h"
+#ifndef SRC_GENIE_UTIL_ENDIANNESS_H_
+#define SRC_GENIE_UTIL_ENDIANNESS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-namespace genieapp {
-namespace transcode_sam {
+namespace genie {
+namespace util {
+
+/**
+ * @brief Swap endianness of value
+ * @tparam T Data type
+ * @tparam SIZE Size in bytes of value
+ * @param u Value
+ */
+template <typename T, size_t SIZE = sizeof(T)>
+inline void swap_endianness(T& u);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool compare(const genie::core::record::Record& r1, const genie::core::record::Record& r2) {
-    if (r1.getAlignments().empty()) {
-        return false;
-    }
-    if (r2.getAlignments().empty()) {
-        return true;
-    }
-    if (r1.getAlignmentSharedData().getSeqID() != r2.getAlignmentSharedData().getSeqID()) {
-        return r1.getAlignmentSharedData().getSeqID() < r2.getAlignmentSharedData().getSeqID();
-    }
-    return r1.getAlignments().front().getPosition() < r2.getAlignments().front().getPosition();
-}
+}  // namespace util
+}  // namespace genie
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-}  // namespace transcode_sam
-}  // namespace genieapp
+#include "genie/util/endianness.impl.h"
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#endif  // SRC_GENIE_UTIL_ENDIANNESS_H_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

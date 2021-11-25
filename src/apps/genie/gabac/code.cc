@@ -34,8 +34,8 @@ void code(const std::string &inputFilePath, const std::string &outputFilePath, s
 
     std::istream *istream = &std::cin;
     std::istream *dstream = nullptr;
-    std::ostream *ostream = &std::cout;
-    std::ostream *logstream = &std::cout;
+    std::ostream *ostream = &std::cerr;
+    std::ostream *logstream = &std::cerr;
 
     if (!inputFilePath.empty()) {
         // Read in the entire input file
