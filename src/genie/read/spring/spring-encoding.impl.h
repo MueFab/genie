@@ -81,7 +81,7 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     // paralelization and 3rd parallel region in reorder.h).  It shows
     // good load balancing and benefits from parallelization.
     //
-    std::cout << "Encoding reads\n";
+    std::cerr << "Encoding reads\n";
 #ifdef GENIE_USE_OPENMP
 #pragma omp parallel num_threads(eg.num_thr)
 #endif
@@ -410,9 +410,9 @@ void encode(std::bitset<bitset_size> *read, bbhashdict *dict, uint32_t *order_s,
     fout_pos.close();
     delete[] file_len_seq_thr;
 
-    std::cout << "Encoding done:\n";
-    std::cout << matched_s << " singleton reads were aligned\n";
-    std::cout << matched_N << " reads with N were aligned\n";
+    std::cerr << "Encoding done:\n";
+    std::cerr << matched_s << " singleton reads were aligned\n";
+    std::cerr << matched_N << " reads with N were aligned\n";
     return;
 }
 

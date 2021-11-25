@@ -37,14 +37,14 @@ namespace record {
 class Record {
  private:
     uint8_t number_of_template_segments{};    //!< @brief
+    std::vector<Segment> reads;               //!< @brief
+    std::vector<AlignmentBox> alignmentInfo;  //!< @brief
     ClassType class_ID{ClassType::NONE};      //!< @brief
+    std::string read_group;                   //!< @brief
     bool read_1_first{};                      //!< @brief
     AlignmentSharedData sharedAlignmentInfo;  //!< @brief
     uint8_t qv_depth{};                       //!< @brief
     std::string read_name;                    //!< @brief
-    std::string read_group;                   //!< @brief
-    std::vector<Segment> reads;               //!< @brief
-    std::vector<AlignmentBox> alignmentInfo;  //!< @brief
     uint8_t flags{};                          //!< @brief
 
     std::unique_ptr<AlignmentExternal> moreAlignmentInfo;  //!< @brief

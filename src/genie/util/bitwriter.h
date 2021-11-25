@@ -95,12 +95,25 @@ class BitWriter {
      * @attention This bypasses the bit by bit writing method.
      */
     void writeBypass(const void *in, size_t size);
+
+    /**
+     * @brief Write a single value as big endian
+     * @tparam T Type name
+     * @tparam SIZE Size of value
+     * @param val Value
+     */
+    template <typename T, size_t SIZE = sizeof(T), typename = std::enable_if<std::is_integral<T>::value>>
+    void writeBypassBE(T val);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 }  // namespace util
 }  // namespace genie
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+#include "genie/util/bitwriter.impl.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 

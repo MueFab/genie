@@ -20,7 +20,7 @@ namespace record {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void AlignmentBox::write(util::BitWriter& writer) const {
-    writer.write(mapping_pos, 40);
+    writer.writeBypassBE<uint64_t, 5>(mapping_pos);
     alignment.write(writer);
     for (const auto& a : splitAlignmentInfo) {
         a->write(writer);
@@ -30,15 +30,16 @@ void AlignmentBox::write(util::BitWriter& writer) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 AlignmentBox::AlignmentBox(ClassType type, uint8_t as_depth, uint8_t number_of_template_segments,
-                           util::BitReader& reader) {
-    mapping_pos = reader.read<uint64_t>(40);
+                           util::BitReader& reader)
+    : splitAlignmentInfo(type == ClassType::CLASS_HM ? 0 : number_of_template_segments - 1) {
+    mapping_pos = reader.readBypassBE<uint64_t, 5>();
     alignment = Alignment(as_depth, reader);
 
     if (type == ClassType::CLASS_HM) {
         return;
     }
     for (size_t tSeg = 1; tSeg < number_of_template_segments; tSeg++) {
-        splitAlignmentInfo.push_back(AlignmentSplit::factory(as_depth, reader));
+        splitAlignmentInfo[tSeg - 1] = AlignmentSplit::factory(as_depth, reader);
     }
 }
 

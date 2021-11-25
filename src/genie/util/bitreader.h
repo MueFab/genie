@@ -124,6 +124,15 @@ class BitReader {
      * @attention This bypasses the bit wise reading mechanism.
      */
     void readBypass(void *in, size_t size);
+
+    /**
+     * @brief Read a single value as big endian
+     * @tparam T Type name
+     * @tparam SIZE Size of value
+     * @return Value
+     */
+    template <typename T, size_t SIZE = sizeof(T), typename = std::enable_if<std::is_integral<T>::value>>
+    T readBypassBE();
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

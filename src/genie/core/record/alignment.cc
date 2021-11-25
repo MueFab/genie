@@ -23,12 +23,14 @@ Alignment::Alignment(std::string &&_ecigar_string, uint8_t _reverse_comp)
 // ---------------------------------------------------------------------------------------------------------------------
 
 Alignment::Alignment(uint8_t as_depth, util::BitReader &reader) {
-    ecigar_string.resize(reader.read<uint32_t>(24));
-    reader.readBypass(ecigar_string);
+    ecigar_string.resize(reader.readBypassBE<uint32_t, 3>());
+    reader.readBypass(&ecigar_string[0], ecigar_string.size());
 
-    reverse_comp = reader.read<uint8_t>();
-    for (size_t a = 0; a < as_depth; ++a) {
-        mapping_score.push_back(reader.read<int32_t>());
+    reverse_comp = reader.readBypassBE<uint8_t>();
+    mapping_score.resize(as_depth);
+    reader.readBypass(&mapping_score[0], as_depth * sizeof(int32_t));
+    for (auto &s : mapping_score) {
+        util::swap_endianness(s);
     }
 }
 
@@ -55,11 +57,11 @@ uint8_t Alignment::getRComp() const { return this->reverse_comp; }
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Alignment::write(util::BitWriter &writer) const {
-    writer.write(ecigar_string.length(), 24);
-    writer.write(ecigar_string);
-    writer.write(reverse_comp, 8);
-    for (const auto &q : mapping_score) {
-        writer.write(uint32_t(q), 32);
+    writer.writeBypassBE<uint32_t, 3>(static_cast<uint32_t>(ecigar_string.length()));
+    writer.writeBypass(ecigar_string.data(), ecigar_string.length());
+    writer.writeBypassBE(reverse_comp);
+    for (auto s : mapping_score) {
+        writer.writeBypassBE(s);
     }
 }
 

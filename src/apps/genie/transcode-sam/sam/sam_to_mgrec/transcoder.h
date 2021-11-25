@@ -48,7 +48,7 @@ bool save_mgrecs_by_rid(std::list<genie::core::record::Record>& mpegg_recs,
  * @param nref
  * @return
  */
-ErrorCode sam_to_mgrec_phase1(Config& options, int& nref);
+void sam_to_mgrec_phase1(Config& options, int& nref);
 
 /**
  * @brief
@@ -65,7 +65,7 @@ std::string gen_p2_tmp_fpath(Config& options, int rid, int ifile);
  * @param nref
  * @return
  */
-ErrorCode sam_to_mgrec_phase2(Config& options, int& nref);
+void sam_to_mgrec_phase2(Config& options, int nref);
 
 /**
  * @brief
@@ -79,14 +79,14 @@ void clean_phase1_files(Config& options, int& nref);
  * @param options
  * @return
  */
-ErrorCode transcode_sam2mpg(Config& options);
+void transcode_sam2mpg(Config& options);
 
 /**
  *
  * @param options
  * @return
  */
-ErrorCode transcode_mpg2sam(Config& options);
+void transcode_mpg2sam(Config& options);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
