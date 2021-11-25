@@ -27,7 +27,7 @@ namespace localassembly {
  */
 class Encoder : public core::ReadEncoder {
  private:
-    bool debug;                //!< @brief If true, debugging information will be printed to std::cout
+    bool debug;                //!< @brief If true, debugging information will be printed to std::cerr
     uint32_t cr_buf_max_size;  //!< @brief Buffer size for local assembly reference memory
 
     /**

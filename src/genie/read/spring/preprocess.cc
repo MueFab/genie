@@ -54,7 +54,7 @@ void Preprocessor::setup(const std::string &wdir, size_t num_thr, bool paired_en
         if (!ghc::filesystem::exists(temp_dir)) break;
     }
     UTILS_DIE_IF(!ghc::filesystem::create_directory(temp_dir), "Cannot create temporary directory.");
-    std::cout << "Temporary directory: " << temp_dir << "\n";
+    std::cerr << "Temporary directory: " << temp_dir << "\n";
 
     outfileclean[0] = temp_dir + "/input_clean_1.dna";
     outfileclean[1] = temp_dir + "/input_clean_2.dna";
@@ -162,10 +162,10 @@ void Preprocessor::finish(size_t id) {
 
     cp.num_reads = cp.paired_end ? cp.num_reads * 2 : cp.num_reads;
 
-    std::cout << "Max Read length: " << cp.max_readlen << "\n";
-    std::cout << "Total number of reads: " << cp.num_reads << "\n";
+    std::cerr << "Max Read length: " << cp.max_readlen << "\n";
+    std::cerr << "Total number of reads: " << cp.num_reads << "\n";
 
-    std::cout << "Total number of reads without N: " << cp.num_reads_clean[0] + cp.num_reads_clean[1] << "\n";
+    std::cerr << "Total number of reads without N: " << cp.num_reads_clean[0] + cp.num_reads_clean[1] << "\n";
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

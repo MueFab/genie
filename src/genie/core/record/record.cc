@@ -27,14 +27,14 @@ namespace record {
 
 Record::Record()
     : number_of_template_segments(0),
+      reads(),
+      alignmentInfo(0),
       class_ID(ClassType::NONE),
+      read_group(),
       read_1_first(false),
       sharedAlignmentInfo(),
       qv_depth(0),
       read_name(),
-      read_group(),
-      reads(),
-      alignmentInfo(0),
       flags(0),
       moreAlignmentInfo(nullptr) {}
 
@@ -43,41 +43,35 @@ Record::Record()
 Record::Record(uint8_t _number_of_template_segments, ClassType _auTypeCfg, std::string &&_read_name,
                std::string &&_read_group, uint8_t _flags, bool _is_read_1_first)
     : number_of_template_segments(_number_of_template_segments),
+      reads(),
+      alignmentInfo(0),
       class_ID(_auTypeCfg),
+      read_group(std::move(_read_group)),
       read_1_first(_is_read_1_first),
       sharedAlignmentInfo(),
       qv_depth(0),
       read_name(std::move(_read_name)),
-      read_group(std::move(_read_group)),
-      reads(),
-      alignmentInfo(0),
       flags(_flags),
       moreAlignmentInfo(util::make_unique<alignment_external::None>()) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Record::Record(util::BitReader &reader) {
-    number_of_template_segments = reader.read<uint8_t>();
-    reads.resize(reader.read<uint8_t>());
-    alignmentInfo.resize(reader.read<uint16_t>());
-    class_ID = ClassType(reader.read<uint8_t>());
-    read_group.resize(reader.read<uint8_t>());
-    read_1_first = reader.read<uint8_t>();
-    if (!alignmentInfo.empty()) {
-        sharedAlignmentInfo = AlignmentSharedData(reader);
-    }
+Record::Record(util::BitReader &reader)
+    : number_of_template_segments(reader.readBypassBE<uint8_t>()),
+      reads(reader.readBypassBE<uint8_t>()),
+      alignmentInfo(reader.readBypassBE<uint16_t>()),
+      class_ID(reader.readBypassBE<ClassType>()),
+      read_group(reader.readBypassBE<uint8_t>(), 0),
+      read_1_first(reader.readBypassBE<uint8_t>()),
+      sharedAlignmentInfo(!alignmentInfo.empty() ? AlignmentSharedData(reader) : AlignmentSharedData()) {
     std::vector<uint32_t> readSizes(reads.size());
-    for (auto &a : readSizes) {
-        a = reader.read<uint32_t>(24);
+    for (auto &s : readSizes) {
+        s = reader.readBypassBE<uint32_t, 3>();
     }
-    qv_depth = reader.read<uint8_t>();
-    read_name.resize(reader.read<uint8_t>());
-    for (auto &c : read_name) {
-        c = reader.read<uint8_t>();
-    }
-    for (auto &c : read_group) {
-        c = reader.read<uint8_t>();
-    }
+    qv_depth = reader.readBypassBE<uint8_t>();
+    read_name.resize(reader.readBypassBE<uint8_t>());
+    reader.readBypass(&read_name[0], read_name.size());
+    reader.readBypass(&read_group[0], read_group.size());
 
     size_t index = 0;
     for (auto &r : reads) {
@@ -87,7 +81,7 @@ Record::Record(util::BitReader &reader) {
     for (auto &a : alignmentInfo) {
         a = AlignmentBox(class_ID, sharedAlignmentInfo.getAsDepth(), uint8_t(number_of_template_segments), reader);
     }
-    flags = reader.read<uint8_t>();
+    flags = reader.readBypassBE<uint8_t>();
     moreAlignmentInfo = AlignmentExternal::factory(reader);
 }
 
@@ -97,7 +91,7 @@ Record::Record(const Record &rec) { *this = rec; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Record::Record(Record &&rec) noexcept { *this = rec; }
+Record::Record(Record &&rec) noexcept { *this = std::move(rec); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -192,29 +186,29 @@ const std::vector<AlignmentBox> &Record::getAlignments() const { return alignmen
 // ---------------------------------------------------------------------------------------------------------------------
 
 void Record::write(util::BitWriter &writer) const {
-    writer.write(number_of_template_segments, 8);
-    writer.write(reads.size(), 8);
-    writer.write(alignmentInfo.size(), 16);
-    writer.write((uint8_t)class_ID, 8);
-    writer.write(read_group.length(), 8);
-    writer.write(uint64_t(read_1_first), 8);
+    writer.writeBypassBE(number_of_template_segments);
+    writer.writeBypassBE<uint8_t>(static_cast<uint8_t>(reads.size()));
+    writer.writeBypassBE<uint16_t>(static_cast<uint16_t>(alignmentInfo.size()));
+    writer.writeBypassBE(class_ID);
+    writer.writeBypassBE<uint8_t>(static_cast<uint8_t>(read_group.length()));
+    writer.writeBypassBE(read_1_first);
     if (!alignmentInfo.empty()) {
         sharedAlignmentInfo.write(writer);
     }
     for (const auto &a : reads) {
-        writer.write(a.getSequence().length(), 24);
+        writer.writeBypassBE<uint32_t, 3>(static_cast<uint32_t>(a.getSequence().length()));
     }
-    writer.write(qv_depth, 8);
-    writer.write(read_name.length(), 8);
-    writer.write(read_name);
-    writer.write(read_group);
+    writer.writeBypassBE(qv_depth);
+    writer.writeBypassBE<uint8_t>(static_cast<uint8_t>(read_name.length()));
+    writer.writeBypass(read_name.data(), read_name.length());
+    writer.writeBypass(read_group.data(), read_group.length());
     for (const auto &r : reads) {
         r.write(writer);
     }
     for (const auto &a : alignmentInfo) {
         a.write(writer);
     }
-    writer.write(flags, 8);
+    writer.writeBypassBE(flags);
     moreAlignmentInfo->write(writer);
 }
 

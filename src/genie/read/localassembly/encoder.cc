@@ -39,19 +39,19 @@ void Encoder::printDebug(const Encoder::LaeState& state, const std::string& ref1
         return;
     }
     state.refCoder.printWindow();
-    std::cout << "pair!" << std::endl;
-    std::cout << "ref1: " << std::endl;
+    std::cerr << "pair!" << std::endl;
+    std::cerr << "ref1: " << std::endl;
     for (size_t i = 0; i < r.getAlignments().front().getPosition() - state.refCoder.getWindowBorder(); ++i) {
-        std::cout << " ";
+        std::cerr << " ";
     }
-    std::cout << ref1 << std::endl;
+    std::cerr << ref1 << std::endl;
 
-    std::cout << "ref2: " << std::endl;
+    std::cerr << "ref2: " << std::endl;
     for (size_t i = 0; i < r.getAlignments().front().getPosition() - state.refCoder.getWindowBorder(); ++i) {
-        std::cout << " ";
+        std::cerr << " ";
     }
-    std::cout << ref2 << std::endl;
-    std::cout << std::endl;
+    std::cerr << ref2 << std::endl;
+    std::cerr << std::endl;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

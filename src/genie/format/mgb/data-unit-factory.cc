@@ -43,7 +43,7 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                 auto r = RawReference(bitReader, true);
                 for (auto& ref : r) {
                     pos += 12;
-                    std::cout << "Found ref(raw) " << ref.getSeqID() << ":[" << ref.getStart() << ", " << ref.getEnd()
+                    std::cerr << "Found ref(raw) " << ref.getSeqID() << ":[" << ref.getStart() << ", " << ref.getEnd()
                               << "] ..." << std::endl;
                     refmgr->validateRefID(ref.getSeqID());
                     refmgr->addRef(util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
@@ -54,7 +54,7 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
             }
             case core::parameter::DataUnit::DataUnitType::PARAMETER_SET: {
                 auto p = core::parameter::ParameterSet(bitReader);
-                std::cout << "Found PS " << (uint32_t)p.getID() << "..." << std::endl;
+                std::cerr << "Found PS " << (uint32_t)p.getID() << "..." << std::endl;
                 parameters.insert(std::make_pair(p.getID(), std::move(p)));
                 break;
             }
@@ -63,7 +63,7 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                 if (getParams(ret.getParameterID()).getDatasetType() == mgb::AccessUnit::DatasetType::REFERENCE) {
                     const auto& ref = ret.getRefCfg();
                     refmgr->validateRefID(ref.getSeqID());
-                    std::cout << "Found ref(compressed) " << ref.getSeqID() << ":[" << ref.getStart() << ", "
+                    std::cerr << "Found ref(compressed) " << ref.getSeqID() << ":[" << ref.getStart() << ", "
                               << ref.getEnd() << "] ..." << std::endl;
                     refmgr->addRef(util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
                                                                      ref.getEnd() + 1, importer, pos, false));
@@ -71,7 +71,7 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                 } else {
                     if (!referenceOnly) {
                         ret.loadPayload(bitReader);
-                        std::cout << "Decompressing AU " << ret.getID() << "..." << std::endl;
+                        std::cerr << "Decompressing AU " << ret.getID() << "..." << std::endl;
                         return ret;
                     } else {
                         bitReader.skip(ret.getPayloadSize());
