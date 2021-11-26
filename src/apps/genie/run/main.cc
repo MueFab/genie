@@ -106,7 +106,7 @@ void attachExporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
 
 void addFasta(const std::string& fastaFile, genie::core::FlowGraphEncode* flow,
               std::vector<std::unique_ptr<std::ifstream>>& inputFiles) {
-    std::string fai = fastaFile.substr(0, fastaFile.size() - 5) + "fai";
+    std::string fai = fastaFile.substr(0, fastaFile.find_last_of('.') + 1) + "fai";
     auto fasta_file = genie::util::make_unique<std::ifstream>(fastaFile);
     if (!ghc::filesystem::exists(fai)) {
         std::cerr << "Indexing " << fastaFile << " ..." << std::endl;
@@ -162,7 +162,7 @@ std::unique_ptr<genie::core::FlowGraph> buildEncoder(const ProgramOptions& pOpts
     if (file_extension(pOpts.inputFile) == "fasta") {
         addFasta(pOpts.inputFile, flow.get(), inputFiles);
     } else if (!pOpts.inputRefFile.empty()) {
-        if (file_extension(pOpts.inputRefFile) == "fasta") {
+        if (file_extension(pOpts.inputRefFile) == "fasta" || file_extension(pOpts.inputRefFile) == "fa") {
             addFasta(pOpts.inputRefFile, flow.get(), inputFiles);
         } else {
             UTILS_DIE("Unknown reference format");
