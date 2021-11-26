@@ -112,7 +112,8 @@ void attachExporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
 // ---------------------------------------------------------------------------------------------------------------------
 
 template <class T>
-void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ifstream>>& inputFiles) {
+void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::unique_ptr<std::ifstream>>& inputFiles,
+                    std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
     constexpr size_t BLOCKSIZE = 256000;
     std::istream* file1 = &std::cin;
     if (pOpts.inputFile.substr(0, 2) != "-.") {
@@ -131,7 +132,9 @@ void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
             flow.addImporter(genie::util::make_unique<genie::format::fastq::Importer>(BLOCKSIZE, *file1));
         }
     } else if (file_extension(pOpts.inputFile) == "mgrec") {
-        flow.addImporter(genie::util::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, *file1));
+        outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile + ".unsupported.mgrec"));
+        flow.addImporter(
+            genie::util::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, *file1, *outputFiles.back()));
     }
 }
 
@@ -142,7 +145,7 @@ std::unique_ptr<genie::core::FlowGraph> buildConverter(const ProgramOptions& pOp
                                                        std::vector<std::unique_ptr<std::ofstream>>& outputFiles) {
     auto flow = genie::module::buildDefaultConverter(pOpts.numberOfThreads);
     attachExporter(*flow, pOpts, outputFiles);
-    attachImporter(*flow, pOpts, inputFiles);
+    attachImporter(*flow, pOpts, inputFiles, outputFiles);
     return flow;
 }
 

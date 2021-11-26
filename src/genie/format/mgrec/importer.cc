@@ -5,6 +5,7 @@
  */
 
 #include "genie/format/mgrec/importer.h"
+#include <iostream>
 #include <string>
 #include <utility>
 #include "genie/util/ordered-section.h"
@@ -18,8 +19,8 @@ namespace mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Importer::Importer(size_t _blockSize, std::istream& _file_1)
-    : blockSize(_blockSize), reader(_file_1), bufferedRecord(boost::none) {}
+Importer::Importer(size_t _blockSize, std::istream& _file_1, std::ostream& _unsupported)
+    : blockSize(_blockSize), reader(_file_1), writer(&_unsupported), bufferedRecord(boost::none) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,19 +35,31 @@ bool isECigarSupported(const std::string& ecigar) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool isRecordSupported(const core::record::Record& rec) {
+bool Importer::isRecordSupported(const core::record::Record& rec) {
     for (const auto& a : rec.getAlignments()) {
+        if (rec.getClassID() == genie::core::record::ClassType::CLASS_HM) {
+            discarded_HM++;
+            return false;
+        }
+        if (rec.getClassID() == genie::core::record::ClassType::CLASS_U &&
+            rec.getSegments().size() != rec.getNumberOfTemplateSegments()) {
+            discarded_missing_pair_U++;
+            return false;
+        }
         if (!isECigarSupported(a.getAlignment().getECigar())) {
+            discarded_splices++;
             return false;
         }
         for (const auto& s : a.getAlignmentSplits()) {
             if (s->getType() == core::record::AlignmentSplit::Type::SAME_REC) {
                 if (!isECigarSupported(
                         dynamic_cast<core::record::alignment_split::SameRec&>(*s).getAlignment().getECigar())) {
+                    discarded_splices++;
                     return false;
                 }
                 // Splits with more than 32767 delta must be encoded in separate records, which is not yet supported
                 if (std::abs(dynamic_cast<core::record::alignment_split::SameRec&>(*s).getDelta()) > 32767) {
+                    discarded_long_distance++;
                     return false;
                 }
             }
@@ -67,6 +80,8 @@ bool Importer::pumpRetrieve(core::Classifier* _classifier) {
             seqid_valid = true;
             if (isRecordSupported(bufferedRecord.get())) {
                 chunk.getData().emplace_back(std::move(bufferedRecord.get()));
+            } else {
+                bufferedRecord.get().write(writer);
             }
             bufferedRecord = boost::none;
             continue;
@@ -87,13 +102,38 @@ bool Importer::pumpRetrieve(core::Classifier* _classifier) {
         } else {
             if (isRecordSupported(rec)) {
                 chunk.getData().emplace_back(std::move(rec));
+            } else {
+                rec.write(writer);
             }
         }
     }
 
     chunk.getStats().addDouble("time-mgrec-import", watch.check());
+    for (const auto& c : chunk.getData()) {
+        missing_additional_alignments += c.getAlignments().empty() ? 0 : c.getAlignments().size() - 1;
+    }
     _classifier->add(std::move(chunk));
     return reader.isGood() || bufferedRecord;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Importer::printStats() const {
+    std::cerr << std::endl << "The following number of reads were dropped:" << std::endl;
+    std::cerr << discarded_splices << " containing splices" << std::endl;
+    std::cerr << discarded_HM << " class HM reads" << std::endl;
+    std::cerr << discarded_long_distance << " aligned, paired reads with mapping distance too big" << std::endl;
+    std::cerr << discarded_missing_pair_U << " unaligned reads with missing pair" << std::endl;
+    std::cerr << discarded_splices + discarded_HM + discarded_long_distance + discarded_missing_pair_U << " in total"
+              << std::endl;
+    std::cerr << std::endl << missing_additional_alignments << " additional alignments were dropped" << std::endl;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Importer::flushIn(uint64_t& pos) {
+    FormatImporter::flushIn(pos);
+    printStats();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
