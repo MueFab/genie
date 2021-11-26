@@ -254,8 +254,11 @@ void fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
             r.setClassType(classifyEcigar(cigar));
         }
 
-        genie::core::record::AlignmentBox newBox(
-            a.getPosition(), genie::core::record::Alignment(std::move(cigar), a.getAlignment().getRComp()));
+        auto alg = genie::core::record::Alignment(std::move(cigar), a.getAlignment().getRComp());
+        for (const auto& s : a.getAlignment().getMappingScores()) {
+            alg.addMappingScore(s);
+        }
+        genie::core::record::AlignmentBox newBox(a.getPosition(), std::move(alg));
 
         // -----------
 
@@ -277,9 +280,14 @@ void fix_ecigar(genie::core::record::Record& r, const std::vector<std::pair<std:
                     r.setClassType(std::max(r.getClassID(), classifyEcigar(cigar)));
                 }
 
+                alg = genie::core::record::Alignment(std::move(cigar), split.getAlignment().getRComp());
+                for (const auto& s : split.getAlignment().getMappingScores()) {
+                    alg.addMappingScore(s);
+                }
+
                 newBox.addAlignmentSplit(genie::util::make_unique<genie::core::record::alignment_split::SameRec>(
                     split.getDelta(),
-                    genie::core::record::Alignment(std::move(cigar), split.getAlignment().getRComp())));
+                    std::move(alg)));
             } else {
                 newBox.addAlignmentSplit(a.getAlignmentSplits().front()->clone());
             }

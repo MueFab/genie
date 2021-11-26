@@ -229,7 +229,9 @@ void ReferenceManager::ReferenceExcerpt::Stepper::inc(size_t off) {
         stringPos -= CHUNK_SIZE;
         vecIt++;
     }
-    curString = vecIt->get()->data();
+    if (vecIt != endVecIt) {
+        curString = vecIt->get()->data();
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
