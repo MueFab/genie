@@ -97,11 +97,11 @@ void transcode_mpg2sam(Config& options);
  */
 class RefInfo {
  private:
-    std::unique_ptr<genie::core::ReferenceManager> refMgr;  //!< @brief
+    std::unique_ptr<genie::core::ReferenceManager> refMgr;    //!< @brief
     std::unique_ptr<genie::format::fasta::Manager> fastaMgr;  //!< @brief
-    std::unique_ptr<std::istream> fastaFile;  //!< @brief
-    std::unique_ptr<std::istream> faiFile;  //!< @brief
-    bool valid;  //!< @brief
+    std::unique_ptr<std::istream> fastaFile;                  //!< @brief
+    std::unique_ptr<std::istream> faiFile;                    //!< @brief
+    bool valid;                                               //!< @brief
 
  public:
     /**
