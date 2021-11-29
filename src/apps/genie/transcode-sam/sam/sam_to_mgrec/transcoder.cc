@@ -301,16 +301,22 @@ void sam_to_mgrec_phase2(Config& options, int num_chunks, const std::vector<std:
     RefInfo refinf(options.fasta_file_path);
 
     std::vector<size_t> sam_hdr_to_fasta_lut;
-    for (size_t i = 0; i < refs.size(); ++i) {
-        bool found = false;
-        for (size_t j = 0; j < refinf.getMgr()->getSequences().size(); ++j) {
-            if (refs[i].first == refinf.getMgr()->getSequences().at(j)) {
-                sam_hdr_to_fasta_lut.push_back(j);
-                found = true;
-                break;
+    if (!options.no_ref) {
+        for (size_t i = 0; i < refs.size(); ++i) {
+            bool found = false;
+            for (size_t j = 0; j < refinf.getMgr()->getSequences().size(); ++j) {
+                if (refs[i].first == refinf.getMgr()->getSequences().at(j)) {
+                    sam_hdr_to_fasta_lut.push_back(j);
+                    found = true;
+                    break;
+                }
             }
+            UTILS_DIE_IF(!found, "Did not find ref " + refs[i].first);
         }
-        UTILS_DIE_IF(!found, "Did not find ref " + refs[i].first);
+    } else {
+        for (size_t i = 0; i < refs.size(); ++i) {
+            sam_hdr_to_fasta_lut.push_back(i);
+        }
     }
 
     std::unique_ptr<std::ostream> total_output;

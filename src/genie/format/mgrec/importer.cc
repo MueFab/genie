@@ -19,8 +19,12 @@ namespace mgrec {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Importer::Importer(size_t _blockSize, std::istream& _file_1, std::ostream& _unsupported)
-    : blockSize(_blockSize), reader(_file_1), writer(&_unsupported), bufferedRecord(boost::none) {}
+Importer::Importer(size_t _blockSize, std::istream& _file_1, std::ostream& _unsupported, bool _checkSupport)
+    : blockSize(_blockSize),
+      reader(_file_1),
+      writer(&_unsupported),
+      bufferedRecord(boost::none),
+      checkSupport(_checkSupport) {}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -36,6 +40,9 @@ bool isECigarSupported(const std::string& ecigar) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Importer::isRecordSupported(const core::record::Record& rec) {
+    if (!checkSupport) {
+        return true;
+    }
     if (rec.getClassID() == genie::core::record::ClassType::CLASS_U &&
         rec.getSegments().size() != rec.getNumberOfTemplateSegments()) {
         discarded_missing_pair_U++;

@@ -134,7 +134,7 @@ void attachImporter(T& flow, const ProgramOptions& pOpts, std::vector<std::uniqu
     } else if (file_extension(pOpts.inputFile) == "mgrec") {
         outputFiles.emplace_back(genie::util::make_unique<std::ofstream>(pOpts.outputFile + ".unsupported.mgrec"));
         flow.addImporter(
-            genie::util::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, *file1, *outputFiles.back()));
+            genie::util::make_unique<genie::format::mgrec::Importer>(BLOCKSIZE, *file1, *outputFiles.back(), false));
     }
 }
 

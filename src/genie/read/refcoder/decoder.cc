@@ -79,8 +79,8 @@ void Decoder::flowIn(core::AccessUnit&& t, const util::Section& id) {
         refs.reserve(meta.num_segments);
         recID += meta.num_segments;
         for (size_t i = 0; i < meta.num_segments; ++i) {
-            auto end =
-                std::min<uint32_t>((uint32_t)meta.position[i] + (uint32_t)meta.length[i], ref_excerpt.getGlobalEnd());
+            auto end = std::min<uint32_t>((uint32_t)meta.position[i] + (uint32_t)meta.length[i],
+                                          static_cast<uint32_t>(ref_excerpt.getGlobalEnd()));
             auto clipsize = (uint32_t)meta.position[i] + (uint32_t)meta.length[i] - end;
             refs.emplace_back(ref_excerpt.getString((uint32_t)meta.position[i], end) + std::string(clipsize, 'N'));
         }

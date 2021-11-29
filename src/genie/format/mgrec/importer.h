@@ -40,6 +40,7 @@ class Importer : public core::FormatImporter {
     size_t missing_additional_alignments{};
 
     boost::optional<core::record::Record> bufferedRecord;
+    bool checkSupport;
 
     bool isRecordSupported(const core::record::Record& rec);
 
@@ -49,8 +50,9 @@ class Importer : public core::FormatImporter {
      * @param _blockSize
      * @param _file_1
      * @param _unsupported
+     * @param checkSupport
      */
-    Importer(size_t _blockSize, std::istream& _file_1, std::ostream& _unsupported);
+    Importer(size_t _blockSize, std::istream& _file_1, std::ostream& _unsupported, bool checkSupport = true);
 
     /**
      *
