@@ -6,6 +6,7 @@
 
 #include "genie/core/classifier-regroup.h"
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -39,26 +40,17 @@ bool ClassifierRegroup::isCovered(size_t start, size_t end) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool ClassifierRegroup::isCovered(const core::record::Record& r) const {
-    for (size_t i = 0; i <= r.getAlignments().front().getAlignmentSplits().size(); ++i) {
+    for (size_t i = 0; i < r.getAlignments().front().getAlignmentSplits().size() + 1; ++i) {
+        if (i > 0 && r.getAlignments().front().getAlignmentSplits()[i - 1]->getType() !=
+                         genie::core::record::AlignmentSplit::Type::SAME_REC) {
+            continue;
+        }
         auto pos = r.getPosition(0, i);
         if (!isCovered(pos, pos + r.getMappedLength(0, i))) {
             return false;
         }
     }
     return true;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void ClassifierRegroup::push(bool refBased, bool paired, core::record::ClassType classtype, core::record::Record& r) {
-    auto& chunk = currentChunks[refBased][paired][(uint8_t)classtype - 1];
-    if (chunk.getRef().getRefName().empty()) {
-        auto pos = r.getPosition(0, 0);
-        chunk.getRef() = ReferenceManager::ReferenceExcerpt(currentSeq, pos, pos + r.getMappedLength(0, 0));
-        for (size_t i = 0; i < r.getAlignments().front().getAlignmentSplits().size(); ++i) {
-            pos = r.getPosition(0, 1);
-        }
-    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -115,7 +107,7 @@ bool ClassifierRegroup::isWritten(const std::string& ref, size_t index) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ClassifierRegroup::ClassifierRegroup(size_t _auSize, ReferenceManager* rfmgr, RefMode mode, bool raw_ref)
-    : refMgr(rfmgr), currentSeqID(0), auSize(_auSize), refMode(mode), rawRefMode(raw_ref) {
+    : refMgr(rfmgr), currentSeqID(-1), auSize(_auSize), refMode(mode), rawRefMode(raw_ref) {
     currentChunks.resize(2);
     for (auto& c : currentChunks) {
         c.resize(2);
@@ -223,10 +215,13 @@ void ClassifierRegroup::add(record::Chunk&& c) {
     record::Chunk chunk = std::move(c);
 
     // New reference
-    if (chunk.getRefID() != currentSeqID) {
-        currentSeq = chunk.getRef().getRefName();
+    if (chunk.getRefID() != static_cast<uint16_t>(currentSeqID)) {
         currentSeqID = static_cast<uint16_t>(chunk.getRefID());
-        currentSeqCoverage = refMgr->getCoverage(currentSeq);
+        if (refMgr->refKnown(currentSeqID)) {
+            currentSeqCoverage = refMgr->getCoverage(refMgr->ID2Ref(currentSeqID));
+        } else {
+            currentSeqCoverage = std::vector<std::pair<size_t, size_t>>();
+        }
         for (auto& refblock : currentChunks) {
             for (auto& pairblock : refblock) {
                 for (auto& classblock : pairblock) {
@@ -250,6 +245,21 @@ void ClassifierRegroup::add(record::Chunk&& c) {
         // Unaligned reads can't be ref based, otherwise check if reference available
         if (classtype != core::record::ClassType::CLASS_U) {
             refBased = isCovered(r);
+            if (refBased) {
+                size_t end = 0;
+                if (r.getAlignments().front().getAlignmentSplits().empty() ||
+                    r.getAlignments().front().getAlignmentSplits().front()->getType() !=
+                        core::record::AlignmentSplit::Type::SAME_REC) {
+                    end = r.getAlignments().front().getPosition() + r.getMappedLength(0, 0);
+                } else {
+                    end = r.getAlignments().front().getPosition() + r.getMappedLength(0, 1) +
+                          dynamic_cast<const core::record::alignment_split::SameRec&>(
+                              *r.getAlignments().front().getAlignmentSplits().front())
+                              .getDelta();
+                }
+                record_reference = this->refMgr->load(refMgr->ID2Ref(r.getAlignmentSharedData().getSeqID()),
+                                                      r.getAlignments().front().getPosition(), end);
+            }
         }
 
         currentChunks[refBased][paired][(uint8_t)classtype - 1].getData().push_back(r);

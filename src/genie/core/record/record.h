@@ -53,6 +53,11 @@ class Record {
     /**
      * @brief
      */
+    void patchRefID(size_t refID);
+
+    /**
+     * @brief
+     */
     Record();
 
     /**
