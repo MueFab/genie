@@ -52,12 +52,17 @@ void Config::processCommandLine(int argc, char *argv[]) {
     app.add_option("-o,--output-file", outputFile, "Output file (sam or mgrec)\n")->mandatory(true);
     forceOverwrite = false;
     app.add_flag("-f,--force", forceOverwrite, "Override existing output files\n");
+    no_ref = false;
+    app.add_flag("--no_ref", no_ref, "Don't use a reference.\n");
     num_threads = std::thread::hardware_concurrency();
     app.add_option("-t,--threads", num_threads, "Number of threads to use.\n");
     fasta_file_path = "";
-    app.add_option("-r,--reference", fasta_file_path,
-                   "Reference to infer the class of "
-                   "MPEG records. If no reference path is supplied, classes M, N and P are not generated.\n");
+    app.add_option(
+        "-r,--reference", fasta_file_path,
+        "Reference to infer the class of "
+        "MPEG records. If no reference path is supplied, classes M, N and P are not generated. Additionally,"
+        "the reference IDs might mismatch with the actual reference so that reference-based compression could"
+        " fail and only local assembly is available.\n");
     try {
         app.parse(argc, argv);
     } catch (const CLI::CallForHelp &) {
@@ -78,6 +83,14 @@ void validateInputFile(const std::string &file) {
         return;
     }
     UTILS_DIE_IF(!ghc::filesystem::exists(file), "Input file does not exist: " + file);
+    std::ifstream stream(file);
+    UTILS_DIE_IF(!stream, "Input file does exist, but is not accessible. Insufficient permissions? " + file);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void validateReference(const std::string &file) {
+    UTILS_DIE_IF(!ghc::filesystem::exists(file), "Reference file does not exist: " + file);
     std::ifstream stream(file);
     UTILS_DIE_IF(!stream, "Input file does exist, but is not accessible. Insufficient permissions? " + file);
 }
@@ -172,6 +185,16 @@ void Config::validate() {
         UTILS_DIE_IF(!num_threads,
                      "Could not detect hardware concurrency level. Please provide a number of threads manually.");
         std::cerr << "Threads: " << num_threads << " (could not detected supported number automatically)" << std::endl;
+    }
+
+    UTILS_DIE_IF(fasta_file_path.empty() && !no_ref,
+                 "You did not pass a reference file. "
+                 "Reference based compression might not work and record classes N and P can't be detected. "
+                 "Are you sure? If yes, pass '--no_ref'.");
+    if (no_ref) {
+        fasta_file_path = "";
+    } else {
+        validateReference(fasta_file_path);
     }
 
     std::cerr << std::endl;
