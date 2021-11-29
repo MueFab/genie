@@ -38,7 +38,10 @@ FaiFile::FaiSequence::FaiSequence() : name(), length(0), offset(0), linebases(0)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void FaiFile::addSequence(const FaiSequence& seq) { seqs.insert(std::make_pair(seq.name, seq)); }
+void FaiFile::addSequence(const FaiSequence& seq) {
+    seqs.insert(std::make_pair(seq.name, seq));
+    indices.insert(std::make_pair(indices.size(), seq.name));
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -65,10 +68,10 @@ uint64_t FaiFile::getFilePosition(const std::string& sequence, uint64_t position
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::set<std::string> FaiFile::getSequences() const {
-    std::set<std::string> ret;
-    for (const auto& s : seqs) {
-        ret.insert(s.first);
+std::map<size_t, std::string> FaiFile::getSequences() const {
+    std::map<size_t, std::string> ret;
+    for (const auto& s : indices) {
+        ret.insert(std::make_pair(s.first, s.second));
     }
     return ret;
 }

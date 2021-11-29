@@ -11,8 +11,8 @@
 
 #include <cstdint>
 #include <map>
-#include <set>
 #include <string>
+#include <vector>
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -75,7 +75,7 @@ class FaiFile {
      *
      * @return
      */
-    std::set<std::string> getSequences() const;
+    std::map<size_t, std::string> getSequences() const;
 
     /**
      *
@@ -93,6 +93,7 @@ class FaiFile {
 
  private:
     std::map<std::string, FaiSequence> seqs;  //!<
+    std::map<size_t, std::string> indices;
 
     friend std::ostream& operator<<(std::ostream& stream, const FaiFile& file);
 };

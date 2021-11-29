@@ -7,8 +7,8 @@
 #include "genie/format/fasta/reader.h"
 #include <algorithm>
 #include <istream>
-#include <set>
 #include <string>
+#include <vector>
 #include "genie/util/runtime-exception.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ FastaReader::FastaReader(std::istream& fastaFile, std::istream& faiFile) : fai(f
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::set<std::string> FastaReader::getSequences() const { return fai.getSequences(); }
+std::map<size_t, std::string> FastaReader::getSequences() const { return fai.getSequences(); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
