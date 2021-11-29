@@ -25,6 +25,12 @@ namespace record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void Record::patchRefID(size_t refID) {
+    sharedAlignmentInfo = AlignmentSharedData(static_cast<uint16_t>(refID), sharedAlignmentInfo.getAsDepth());
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 Record::Record()
     : number_of_template_segments(0),
       reads(),
@@ -295,6 +301,10 @@ size_t Record::getMappedLength(size_t alignment, size_t split) const {
         dynamic_cast<record::alignment_split::SameRec &>(*getAlignments()[alignment].getAlignmentSplits()[split - 1]);
     return static_cast<size_t>(getLengthOfCigar(s2.getAlignment().getECigar()));
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Record::setAlignment(size_t id, AlignmentBox &&b) { this->alignmentInfo[id] = std::move(b); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 

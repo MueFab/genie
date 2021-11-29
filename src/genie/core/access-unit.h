@@ -73,14 +73,6 @@ class AccessUnit {
 
         /**
          * @brief
-         * @param sub
-         * @return
-         */
-        const util::DataBlock* getDependency() const;
-
-        /**
-         * @brief
-         * @param sub
          * @return
          */
         util::DataBlock* getDependency();
@@ -142,7 +134,6 @@ class AccessUnit {
 
         /**
          * @brief
-         * @param block
          */
         util::DataBlock&& move();
 
@@ -244,20 +235,6 @@ class AccessUnit {
          * @return
          */
         const Subsequence& get(uint16_t sub) const;
-
-        /**
-         * @brief
-         * @param sub
-         * @return
-         */
-        const util::DataBlock* getDependency(uint16_t sub) const;
-
-        /**
-         * @brief
-         * @param sub
-         * @return
-         */
-        util::DataBlock* getDependency(uint16_t sub);
 
         /**
          *

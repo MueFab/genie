@@ -36,8 +36,7 @@ class ClassifierRegroup : public Classifier {
     using RefNoRefBlock = std::vector<PairedBlock>;
     RefNoRefBlock currentChunks;                                //!<
     ReferenceManager* refMgr;                                   //!<
-    std::string currentSeq;                                     //!<
-    uint16_t currentSeqID;                                      //!<
+    int16_t currentSeqID;                                       //!<
     std::vector<std::pair<size_t, size_t>> currentSeqCoverage;  //!<
     std::map<std::string, std::vector<uint8_t>> refState;       //!<
 

@@ -39,10 +39,11 @@ class ReferenceManager {
     };
 
     std::map<std::string, std::vector<std::unique_ptr<CacheLine>>> data;  //!<
-    std::deque<std::pair<std::string, size_t>> cacheInfo;                 //!<
-    std::mutex cacheInfoLock;                                             //!<
-    uint64_t cacheSize;                                                   //!<
-    static const uint64_t CHUNK_SIZE;                                     //!<
+    std::map<size_t, std::string> indices;
+    std::deque<std::pair<std::string, size_t>> cacheInfo;  //!<
+    std::mutex cacheInfoLock;                              //!<
+    uint64_t cacheSize;                                    //!<
+    static const uint64_t CHUNK_SIZE;                      //!<
 
     /**
      *
@@ -71,6 +72,8 @@ class ReferenceManager {
      * @return
      */
     std::string ID2Ref(size_t id);
+
+    bool refKnown(size_t id);
 
     /**
      *
@@ -105,18 +108,6 @@ class ReferenceManager {
          *
          * @return
          */
-        size_t getDataStart() const;
-
-        /**
-         *
-         * @return
-         */
-        size_t getDataEnd() const;
-
-        /**
-         *
-         * @return
-         */
         size_t getGlobalStart() const;
 
         /**
@@ -144,14 +135,6 @@ class ReferenceManager {
          * @param dat
          */
         void mapChunkAt(size_t pos, std::shared_ptr<const std::string> dat);
-
-        /**
-         *
-         * @param start
-         * @param end
-         * @param _mgr
-         */
-        void mapSection(size_t start, size_t end, ReferenceManager* _mgr);
 
         /**
          *
@@ -194,12 +177,6 @@ class ReferenceManager {
 
         /**
          *
-         * @param pos
-         */
-        void unMapAt(size_t pos);
-
-        /**
-         *
          */
         struct Stepper {
          private:
@@ -222,11 +199,6 @@ class ReferenceManager {
              */
             void inc(size_t off = 1);
 
-            /**
-             *
-             * @param pos
-             */
-            void setPos(size_t pos);
 
             /**
              *
@@ -247,13 +219,6 @@ class ReferenceManager {
          */
         Stepper getStepper() const;
 
-        /**
-         *
-         * @param start
-         * @param end
-         * @return
-         */
-        ReferenceExcerpt getSubExcerpt(size_t start, size_t end) const;
 
         /**
          *
@@ -271,10 +236,11 @@ class ReferenceManager {
     explicit ReferenceManager(size_t csize);
 
     /**
-     *
+     * @brief
+     * @param index
      * @param ref
      */
-    void addRef(std::unique_ptr<Reference> ref);
+    void addRef(size_t index, std::unique_ptr<Reference> ref);
 
     /**
      *

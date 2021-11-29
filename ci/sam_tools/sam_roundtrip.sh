@@ -51,6 +51,7 @@ compress_roundtrip () {
         -i $sam_file \
         -w $working_dir \
         -o $working_dir/transcoded.mgrec -f \
+        --no_ref \
         || { echo "Genie transcode ($sam_file; $genie_encoder_parameters) failed!" ; exit 1; }
 
     echo "-----------------input transcoded:"

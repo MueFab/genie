@@ -31,16 +31,28 @@ class Importer : public core::FormatImporter {
  private:
     size_t blockSize;        //!<
     util::BitReader reader;  //!<
+    util::BitWriter writer;
+
+    size_t discarded_splices{};
+    size_t discarded_long_distance{};
+    size_t discarded_HM{};
+    size_t discarded_missing_pair_U{};
+    size_t missing_additional_alignments{};
 
     boost::optional<core::record::Record> bufferedRecord;
+    bool checkSupport;
+
+    bool isRecordSupported(const core::record::Record& rec);
 
  public:
     /**
-     *
+     * @brief
      * @param _blockSize
      * @param _file_1
+     * @param _unsupported
+     * @param checkSupport
      */
-    Importer(size_t _blockSize, std::istream& _file_1);
+    Importer(size_t _blockSize, std::istream& _file_1, std::ostream& _unsupported, bool checkSupport = true);
 
     /**
      *
@@ -48,6 +60,13 @@ class Importer : public core::FormatImporter {
      * @return
      */
     bool pumpRetrieve(core::Classifier* _classifier) override;
+
+    /**
+     * @brief
+     */
+    void printStats() const;
+
+    void flushIn(uint64_t& pos) override;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

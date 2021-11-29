@@ -6,6 +6,7 @@
 
 #include "genie/core/classifier-regroup.h"
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -39,26 +40,17 @@ bool ClassifierRegroup::isCovered(size_t start, size_t end) const {
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool ClassifierRegroup::isCovered(const core::record::Record& r) const {
-    for (size_t i = 0; i <= r.getAlignments().front().getAlignmentSplits().size(); ++i) {
+    for (size_t i = 0; i < r.getAlignments().front().getAlignmentSplits().size() + 1; ++i) {
+        if (i > 0 && r.getAlignments().front().getAlignmentSplits()[i - 1]->getType() !=
+                         genie::core::record::AlignmentSplit::Type::SAME_REC) {
+            continue;
+        }
         auto pos = r.getPosition(0, i);
         if (!isCovered(pos, pos + r.getMappedLength(0, i))) {
             return false;
         }
     }
     return true;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-void ClassifierRegroup::push(bool refBased, bool paired, core::record::ClassType classtype, core::record::Record& r) {
-    auto& chunk = currentChunks[refBased][paired][(uint8_t)classtype - 1];
-    if (chunk.getRef().getRefName().empty()) {
-        auto pos = r.getPosition(0, 0);
-        chunk.getRef() = ReferenceManager::ReferenceExcerpt(currentSeq, pos, pos + r.getMappedLength(0, 0));
-        for (size_t i = 0; i < r.getAlignments().front().getAlignmentSplits().size(); ++i) {
-            pos = r.getPosition(0, 1);
-        }
-    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -115,7 +107,7 @@ bool ClassifierRegroup::isWritten(const std::string& ref, size_t index) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 ClassifierRegroup::ClassifierRegroup(size_t _auSize, ReferenceManager* rfmgr, RefMode mode, bool raw_ref)
-    : refMgr(rfmgr), currentSeqID(0), auSize(_auSize), refMode(mode), rawRefMode(raw_ref) {
+    : refMgr(rfmgr), currentSeqID(-1), auSize(_auSize), refMode(mode), rawRefMode(raw_ref) {
     currentChunks.resize(2);
     for (auto& c : currentChunks) {
         c.resize(2);
@@ -219,106 +211,17 @@ record::Chunk ClassifierRegroup::getChunk() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-record::ClassType ClassifierRegroup::fineClassifierECigar(const std::string& ref, const std::string& seq,
-                                                          const std::string& ecigar) {
-    record::ClassType classtype = record::ClassType::CLASS_P;
-
-    auto classChecker = [&classtype, &ref, &seq](uint8_t cigar, const util::StringView& _bs,
-                                                 const util::StringView& _rs) -> bool {
-        auto bs = _bs.deploy(seq.data());
-        auto rs = _rs.deploy(ref.data());
-        // Possible mismatches not encoded in ecigar
-        if (cigar == '=') {
-            for (size_t i = 0; i < bs.length(); ++i) {
-                // Mismatch
-                if (*(bs.begin() + i) != *(rs.begin() + i)) {
-                    if (*(bs.begin() + i) == 'N') {
-                        classtype = record::ClassType::CLASS_N;
-                    } else {
-                        // Abort, class must be M
-                        classtype = record::ClassType::CLASS_M;
-                        return false;
-                    }
-                }
-            }
-            // Mismatch already encoded in ecigar
-        } else if (core::getAlphabetProperties(core::AlphabetID::ACGTN).isIncluded(cigar)) {
-            if (cigar != 'N') {
-                classtype = record::ClassType::CLASS_M;
-                return false;
-            }
-            classtype = record::ClassType::CLASS_N;
-            return true;
-        }
-        return true;
-    };
-
-    core::CigarTokenizer::tokenize(ecigar, core::getECigarInfo(), classChecker);
-    return classtype;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-record::ClassType ClassifierRegroup::fineClassifierRecord(ReferenceManager::ReferenceExcerpt& record_reference,
-                                                          const core::record::Record& rec, bool loadonly) {
-    record::ClassType ret = record::ClassType::CLASS_P;
-    auto segment_it = rec.getSegments().begin();
-
-    auto pos_s = rec.getPosition(0, 0);
-    auto pos_e = pos_s + rec.getMappedLength(0, 0);
-
-    if (record_reference.getRefName().empty()) {
-        record_reference = ReferenceManager::ReferenceExcerpt(currentSeq, pos_s, pos_e);
-    } else {
-        record_reference.extend(pos_e);
-    }
-
-    record_reference.mapSection(pos_s, pos_e, refMgr);
-
-    std::string ref = record_reference.getString(pos_s, pos_e);
-
-    if (!loadonly) {
-        ret = std::max(ret, fineClassifierECigar(ref, segment_it->getSequence(),
-                                                 rec.getAlignments().front().getAlignment().getECigar()));
-    }
-
-    for (size_t i = 0; i < rec.getAlignments().front().getAlignmentSplits().size(); ++i) {
-        if (ret == core::record::ClassType::CLASS_M) {
-            return ret;
-        }
-        segment_it++;
-
-        pos_s = rec.getPosition(0, i + 1);
-        pos_e = pos_s + rec.getMappedLength(0, i + 1);
-
-        record_reference.extend(pos_e);
-
-        record_reference.mapSection(pos_s, pos_e, refMgr);
-
-        ref = record_reference.getString(pos_s, pos_e);
-
-        if (!loadonly) {
-            ret = std::max(ret, fineClassifierECigar(ref, segment_it->getSequence(),
-                                                     dynamic_cast<core::record::alignment_split::SameRec&>(
-                                                         *rec.getAlignments().front().getAlignmentSplits()[i])
-                                                         .getAlignment()
-                                                         .getECigar()));
-        }
-    }
-
-    return ret;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 void ClassifierRegroup::add(record::Chunk&& c) {
     record::Chunk chunk = std::move(c);
 
     // New reference
-    if (chunk.getRefID() != currentSeqID) {
-        currentSeq = chunk.getRef().getRefName();
+    if (chunk.getRefID() != static_cast<uint16_t>(currentSeqID)) {
         currentSeqID = static_cast<uint16_t>(chunk.getRefID());
-        currentSeqCoverage = refMgr->getCoverage(currentSeq);
+        if (refMgr->refKnown(currentSeqID)) {
+            currentSeqCoverage = refMgr->getCoverage(refMgr->ID2Ref(currentSeqID));
+        } else {
+            currentSeqCoverage = std::vector<std::pair<size_t, size_t>>();
+        }
         for (auto& refblock : currentChunks) {
             for (auto& pairblock : refblock) {
                 for (auto& classblock : pairblock) {
@@ -333,7 +236,7 @@ void ClassifierRegroup::add(record::Chunk&& c) {
     }
 
     for (auto& r : chunk.getData()) {
-        auto classtype = coarseClassify(r);  // Only look at the ecigar for first classification
+        auto classtype = r.getClassID();  // Only look at the ecigar for first classification
         bool paired = r.getNumberOfTemplateSegments() > 1;
         bool refBased = false;
 
@@ -342,16 +245,22 @@ void ClassifierRegroup::add(record::Chunk&& c) {
         // Unaligned reads can't be ref based, otherwise check if reference available
         if (classtype != core::record::ClassType::CLASS_U) {
             refBased = isCovered(r);
-        }
-        if (refBased) {
-            // Load reference and do detailed classification
-            if (classtype == record::ClassType::CLASS_M) {
-                classtype = fineClassifierRecord(record_reference, r, false);
-            } else {
-                fineClassifierRecord(record_reference, r, true);
+            if (refBased) {
+                size_t end = 0;
+                if (r.getAlignments().front().getAlignmentSplits().empty() ||
+                    r.getAlignments().front().getAlignmentSplits().front()->getType() !=
+                        core::record::AlignmentSplit::Type::SAME_REC) {
+                    end = r.getAlignments().front().getPosition() + r.getMappedLength(0, 0);
+                } else {
+                    end = r.getAlignments().front().getPosition() + r.getMappedLength(0, 1) +
+                          dynamic_cast<const core::record::alignment_split::SameRec&>(
+                              *r.getAlignments().front().getAlignmentSplits().front())
+                              .getDelta();
+                }
+                record_reference = this->refMgr->load(refMgr->ID2Ref(r.getAlignmentSharedData().getSeqID()),
+                                                      r.getAlignments().front().getPosition(), end);
             }
         }
-        r.setClassType(classtype);
 
         currentChunks[refBased][paired][(uint8_t)classtype - 1].getData().push_back(r);
         currentChunks[refBased][paired][(uint8_t)classtype - 1].getRef().merge(record_reference);
@@ -375,72 +284,6 @@ void ClassifierRegroup::flush() {
             }
         }
     }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-record::ClassType ClassifierRegroup::classifyECigar(const std::string& cigar) {
-    auto highest = record::ClassType::CLASS_P;
-    for (const auto& c : cigar) {
-        if (c == '+' || c == '-' || c == ')' || c == ']') {
-            return record::ClassType::CLASS_I;
-        }
-        if (getAlphabetProperties(AlphabetID::ACGTN).isIncluded(c)) {
-            highest = record::ClassType::CLASS_M;
-        }
-    }
-    return highest;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-record::ClassType ClassifierRegroup::classifySeq(const std::string& seq) {
-    for (const auto& c : seq) {
-        if (c == 'N') {
-            return record::ClassType::CLASS_N;
-        }
-    }
-    return record::ClassType::CLASS_P;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-record::ClassType ClassifierRegroup::coarseClassify(const record::Record& r) {
-    if (r.getAlignments().empty()) {
-        return record::ClassType::CLASS_U;
-    }
-    if (r.getAlignments().front().getAlignmentSplits().size() + 1 < r.getSegments().size()) {
-        return record::ClassType::CLASS_HM;
-    }
-
-    record::ClassType highestClass = record::ClassType::CLASS_M;
-    highestClass = std::max(highestClass, classifyECigar(r.getAlignments().front().getAlignment().getECigar()));
-    if (highestClass == record::ClassType::CLASS_I) {
-        return highestClass;
-    }
-    for (const auto& a : r.getAlignments().front().getAlignmentSplits()) {
-        if (a->getType() != record::AlignmentSplit::Type::SAME_REC) {
-            continue;
-        }
-        auto& split = dynamic_cast<const record::alignment_split::SameRec&>(*a);
-        highestClass = std::max(highestClass, classifyECigar(split.getAlignment().getECigar()));
-        if (highestClass == record::ClassType::CLASS_I) {
-            return highestClass;
-        }
-    }
-
-    if (highestClass >= record::ClassType::CLASS_M) {
-        return highestClass;
-    }
-
-    for (const auto& s : r.getSegments()) {
-        highestClass = std::max(highestClass, classifySeq(s.getSequence()));
-        if (highestClass >= record::ClassType::CLASS_N) {
-            return highestClass;
-        }
-    }
-
-    return highestClass;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

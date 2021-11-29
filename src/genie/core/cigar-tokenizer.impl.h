@@ -35,7 +35,7 @@ void CigarTokenizer::tokenize(const std::string& cigar, const CigarFormatInfo& f
         }
 
         auto old_pos_bases = pos_bases;
-        auto old_pos_ref = pos_bases;
+        auto old_pos_ref = pos_ref;
         if (size == 0) {
             pos_bases += 1;
             pos_ref += 1;
