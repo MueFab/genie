@@ -25,6 +25,12 @@ namespace record {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void Record::patchRefID(size_t refID) {
+    sharedAlignmentInfo = AlignmentSharedData(refID, sharedAlignmentInfo.getAsDepth());
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 Record::Record()
     : number_of_template_segments(0),
       reads(),
