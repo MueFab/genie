@@ -30,6 +30,7 @@ const core::parameter::ParameterSet& DataUnitFactory::getParams(size_t id) const
 
 boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
     core::parameter::DataUnit::DataUnitType type;
+    int i = 0;
     do {
         type = bitReader.read<core::parameter::DataUnit::DataUnitType>();
         size_t pos = bitReader.getPos();
@@ -46,7 +47,8 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                     std::cerr << "Found ref(raw) " << ref.getSeqID() << ":[" << ref.getStart() << ", " << ref.getEnd()
                               << "] ..." << std::endl;
                     refmgr->validateRefID(ref.getSeqID());
-                    refmgr->addRef(util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
+                    refmgr->addRef(i++,
+                                   util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
                                                                      ref.getEnd() + 1, importer, pos, true));
                     pos += (ref.getEnd() - ref.getStart() + 1);
                 }
@@ -65,13 +67,47 @@ boost::optional<AccessUnit> DataUnitFactory::read(util::BitReader& bitReader) {
                     refmgr->validateRefID(ref.getSeqID());
                     std::cerr << "Found ref(compressed) " << ref.getSeqID() << ":[" << ref.getStart() << ", "
                               << ref.getEnd() << "] ..." << std::endl;
-                    refmgr->addRef(util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
+                    refmgr->addRef(i++,
+                                   util::make_unique<mgb::Reference>(refmgr->ID2Ref(ref.getSeqID()), ref.getStart(),
                                                                      ref.getEnd() + 1, importer, pos, false));
                     bitReader.skip(ret.getPayloadSize());
                 } else {
+                    std::string lut[] = {"NONE", "P", "N", "M", "I", "HM", "U"};
                     if (!referenceOnly) {
                         ret.loadPayload(bitReader);
-                        std::cerr << "Decompressing AU " << ret.getID() << "..." << std::endl;
+                        std::cerr << "Decompressing AU " << ret.getID() << " of class " << lut[int(ret.getClass())];
+                        UTILS_DIE_IF(ret.getClass() == genie::core::record::ClassType::CLASS_HM,
+                                     "Class HM not supported");
+                        if (ret.getClass() == genie::core::record::ClassType::CLASS_U) {
+                            if (!parameters.at(ret.getParameterID()).isComputedReference()) {
+                                std::cerr << " (Low Latency)";
+                            } else {
+                                if (parameters.at(ret.getParameterID()).getComputedRef().getAlgorithm() ==
+                                    core::parameter::ComputedRef::Algorithm::GLOBAL_ASSEMBLY) {
+                                    std::cerr << " (Global Assembly)";
+                                } else {
+                                    UTILS_DIE(
+                                        "Computed ref not supported: " +
+                                        std::to_string(
+                                            (int)parameters.at(ret.getParameterID()).getComputedRef().getAlgorithm()));
+                                }
+                            }
+                        } else {
+                            if (!parameters.at(ret.getParameterID()).isComputedReference()) {
+                                std::cerr << " (Reference)";
+                            } else {
+                                if (parameters.at(ret.getParameterID()).getComputedRef().getAlgorithm() ==
+                                    core::parameter::ComputedRef::Algorithm::LOCAL_ASSEMBLY) {
+                                    std::cerr << " (Local Assembly)";
+                                } else {
+                                    UTILS_DIE(
+                                        "Computed ref not supported: " +
+                                        std::to_string(
+                                            (int)parameters.at(ret.getParameterID()).getComputedRef().getAlgorithm()));
+                                }
+                            }
+                        }
+                        std::cerr << "..." << std::endl;
                         return ret;
                     } else {
                         bitReader.skip(ret.getPayloadSize());
